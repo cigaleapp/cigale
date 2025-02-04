@@ -23,8 +23,8 @@ develop:
       - public
 
   environment:
-    name: Develop
-    url: "https://git.inpt.fr/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html"
+    name: "$CI_MERGE_REQUEST_TITLE"
+    url: "https://$CI_PROJECT_NAMESPACE.pages.inpt.fr/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html"
 
   script:
     - npm run build
