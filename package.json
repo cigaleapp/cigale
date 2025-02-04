@@ -14,6 +14,14 @@
 		"lint": "eslint .",
 		"commit": "gitmoji -c"
 	},
+	"lint-staged": {
+		"*.{js,ts,svelte}": [
+			"eslint --fix"
+		],
+		"*": [
+			"prettier --write --ignore-unknown"
+		]
+	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
@@ -26,6 +34,7 @@
 		"gitmoji-cli": "^9.5.0",
 		"globals": "^15.14.0",
 		"husky": "^9.1.7",
+		"lint-staged": "^15.4.3",
 		"mdsvex": "^0.12.3",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
