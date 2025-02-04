@@ -20,3 +20,9 @@ Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
     ```
     npm dev
     ```
+
+4. Pour respecter la convention de nommage des commits: 
+    ```
+    # au lieu de git commit
+    npm run commit
+    ```
