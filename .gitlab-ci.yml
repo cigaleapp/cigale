@@ -3,6 +3,7 @@ image: node:22.13.1
 # Functions that should be executed before the build script is run
 before_script:
   - npm i
+
 pages:
   script:
     - npm run build
@@ -15,3 +16,20 @@ pages:
     # a pages deploy
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
     - when: manual
+
+develop:
+  artifacts:
+    paths:
+      - public
+
+  environment:
+    name: Develop
+    url: "https://git.inpt.fr/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html"
+
+  script:
+    - npm run build
+
+  stage: deploy
+
+  variables:
+    PUBLIC_URL: "/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public"
