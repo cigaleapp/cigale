@@ -33,5 +33,9 @@
 	},
 	"dependencies": {
 		"@inlang/paraglide-sveltekit": "^0.15.5"
+	},
+	"volta": {
+		"node": "22.13.1",
+		"npm": "10.9.2"
 	}
 }
