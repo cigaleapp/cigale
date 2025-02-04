@@ -33,6 +33,10 @@
 		"typescript": "^5.0.0",
 		"vite": "^6.0.0"
 	},
+	"dependencies": {
+		"@tensorflow-models/mobilenet": "^2.1.1",
+		"@tensorflow/tfjs": "^4.22.0"
+	},
 	"volta": {
 		"node": "22.13.1",
 		"npm": "11.1.0"
