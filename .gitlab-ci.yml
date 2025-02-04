@@ -23,13 +23,13 @@ develop:
       - public
 
   environment:
-    name: "$CI_MERGE_REQUEST_TITLE"
+    name: "review/$CI_COMMIT_REF_SLUG"
     url: "https://$CI_PROJECT_NAMESPACE.pages.inpt.fr/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html"
 
   script:
     - npm run build
 
-  stage: test
+  stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - when: manual
