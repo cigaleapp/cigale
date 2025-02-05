@@ -15,7 +15,6 @@ pages:
     # This ensures that only pushes to the default branch will trigger
     # a pages deploy
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-    - when: manual
 
 develop:
   artifacts:
@@ -32,7 +31,6 @@ develop:
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - when: manual
 
   variables:
     PUBLIC_URL: '/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public'
