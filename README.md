@@ -4,12 +4,16 @@ Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
 
 ## Développement
 
-### MacOS / Linux / Windows (WSL)
-
 1. Installer Volta
 
+   Linux / MacOS / Windows (WSL)
    ```
    curl https://get.volta.sh | bash
+   ```
+
+   Windows
+   ```
+   winget install Volta.Volta
    ```
 
 2. Installer les dépendances
