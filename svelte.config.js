@@ -6,7 +6,9 @@ const config = {
 	kit: {
 		adapter: adapter({
 			pages: 'public',
-			assets: 'public'
+			assets: 'public',
+			strict: false,
+			fallback: 'index.html'
 		})
 	},
 
