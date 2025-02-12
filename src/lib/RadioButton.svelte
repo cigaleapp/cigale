@@ -1,10 +1,12 @@
-<br />
-{#each [1, 2, 3] as number}
-	<label>
-		<input type="radio" name="scoops" value={number} />
+<script>
+	export let options;
+</script>
 
-		{number}
-		{number === 1 ? 'scoop' : 'scoops'}
+<br />
+{#each options as option}
+	<label>
+		<input type="radio" name="scoops" value={option} />
+		{option}
 	</label><br />
 {/each}
 
