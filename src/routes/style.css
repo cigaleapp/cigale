@@ -1,14 +1,14 @@
 :root {
-	--background-primary-color: #30b9b3;
-	--foreground-primary-color: #2c004b;
-	--background-dark-primary-color: #7bbbb0;
-	--foreground-dark-primary-color: #2f3040;
-	--background-warning-color: #fff7b3;
-	--foreground-warning-color: #a85400;
-	--background-error-color: #ffa08f;
-	--foreground-error-color: #940000;
-	--background-success-color: #6bff6b;
-	--foreground-success-color: #006600;
-	--background-neutral-color: #ffffff;
-	--foreground-neutral-color: #000000;
+	--bg-primary: #30b9b3;
+	--fg-primary: #2c004b;
+	--bg-dark-primary: #7bbbb0;
+	--fg-dark-primary: #2f3040;
+	--bg-warning: #fff7b3;
+	--fg-warning: #a85400;
+	--bg-error: #ffa08f;
+	--fg-error: #940000;
+	--bg-success: #6bff6b;
+	--fg-success: #006600;
+	--bg-neutral: #ffffff;
+	--fg-neutral: #000000;
 }
