@@ -1,11 +1,11 @@
 <script>
-	export let options;
+	let { options, name } = $props()
 </script>
 
 <br />
 {#each options as option}
 	<label>
-		<input type="radio" name="scoops" value={option} />
+		<input type="radio" {name} value={option} />
 		{option}
 	</label><br />
 {/each}
