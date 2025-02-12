@@ -1,7 +1,6 @@
 <script>
 	import * as tf from '@tensorflow/tfjs';
 	import * as mobilenet from '@tensorflow-models/mobilenet';
-	import './style.css';
 	let image_file = $state();
 	let classe = $state();
 	let certainty = $state();
