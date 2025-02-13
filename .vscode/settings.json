@@ -1,0 +1,11 @@
+{
+	"cssvar.extensions": ["css", "svelte"],
+	"cssvar.files": ["packages/app/src/routes/colors.css"],
+	"iconify.delimiters": ["/"],
+	"iconify.includes": ["ph"],
+	"emmet.syntaxProfiles": {
+		"html": {
+			"compactBooleanAttributes": true
+		}
+	}
+}
