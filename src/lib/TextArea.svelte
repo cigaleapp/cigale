@@ -15,11 +15,12 @@
     }
 
     textarea:hover {
-        background-color: azure;
+        background-color: var(--bg-primary-translucent);
     }
 
     textarea:focus-visible {
-        border-color: chocolate;
-        background-color: azure;
+        border-color: var(--bg-primary);
+        background-color: var(--bg-primary-translucent);
+        color: var(--fg-primary);
     }
 </style>
