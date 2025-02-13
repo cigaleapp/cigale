@@ -8,8 +8,14 @@ const config = {
 			pages: 'public',
 			assets: 'public',
 			strict: false,
-			fallback: 'index.html'
-		})
+			fallback: '404.html'
+		}),
+		router: {
+			type: 'hash'
+		},
+		paths: {
+			base: process.env.ENVIRONMENT_URL ? new URL(process.env.ENVIRONMENT_URL).pathname.replace(/\/index\.html$/, '') : ''
+		},
 	},
 
 	preprocess: [mdsvex()],
