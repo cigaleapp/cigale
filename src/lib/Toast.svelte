@@ -10,9 +10,14 @@
 	import { default as IconClose, default as IconError } from '~icons/ph/x';
 
 	/**
+	 * @typedef Toast
+	 * @type {import('$lib/toasts.svelte').Toast<T>}
+	 */
+
+	/**
 	 * @typedef Props
 	 * @property {string} message the toast to display
-	 * @property {import('$lib/toasts.svelte').Toast<T>['type']} type the type of toast to display
+	 * @property {Toast['type']} type the type of toast to display
 	 * @property {?() => void} onaction the action to perform when the user interacts with the toast
 	 * @property {?string} action the text to use for the action button
 	 * @property {?() => void} ondismiss the action to perform when the user dismisses the toast
