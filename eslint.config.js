@@ -8,6 +8,8 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
+	// TODO: fix this
+	{ name: 'patch no-undef .svelte.js lints', ignores: ['**/*.svelte.js'] },
 	includeIgnoreFile(gitignorePath),
 	js.configs.recommended,
 	...svelte.configs['flat/recommended'],

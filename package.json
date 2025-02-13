@@ -51,6 +51,7 @@
 		"@tensorflow-models/mobilenet": "^2.1.1",
 		"@tensorflow/tfjs": "^4.22.0",
 		"sveltejs-tippy": "^3.0.0",
+		"date-fns": "^4.1.0",
 		"unplugin-icons": "^22.0.0"
 	},
 	"volta": {
