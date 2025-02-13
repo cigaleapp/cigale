@@ -22,15 +22,15 @@ develop:
       - public
 
   environment:
-    name: 'review/$CI_COMMIT_REF_SLUG'
-    url: 'https://$CI_PROJECT_NAMESPACE.pages.inpt.fr/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html'
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_NAMESPACE.pages.inpt.fr/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public/index.html
 
   script:
-    - npm run build
+    - ENVIRONMENT_URL=$CI_ENVIRONMENT_URL npm run build
 
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
   variables:
-    PUBLIC_URL: '/-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public'
+    PUBLIC_URL: /-/$CI_PROJECT_NAME/-/jobs/$CI_JOB_ID/artifacts/public
