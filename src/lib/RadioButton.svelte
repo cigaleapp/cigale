@@ -1,16 +1,15 @@
 <script>
-	let { options, name } = $props();
-	let resultat = $state(1);
+	let { options, name, value } = $props();
 </script>
 
 <br />
 {#each options as option}
 	<label>
-		<input type="radio" {name} value={option} bind:group={resultat} />
+		<input type="radio" {name} value={option} bind:group={value} />
 		{option}
 	</label><br />
 {/each}
-Vous avez choisi l'option {resultat} félicitation
+Vous avez choisi l'option {value} félicitation
 
 <style>
 	:root {
