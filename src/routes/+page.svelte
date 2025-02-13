@@ -18,7 +18,6 @@
 					let tensor = tf.browser.fromPixels(img).resizeBilinear([224, 224]).toFloat();
 					tensor = tensor.div(tensor.max());
 					tensor = tensor.sub(tensor.mean());
-					//tensor = tensor.sub([0.485, 0.456, 0.406]).div([0.229, 0.224, 0.225]);
 
 					let tensor_copy = tf.browser.fromPixels(img).clone();
 
@@ -29,7 +28,6 @@
 					canva_element.height = 224;
 					await tf.browser.toPixels(tensor_copy, canva_element);
 
-					// eslint-disable-next-line no-unused-vars
 					tensor = tensor.expandDims();
 
 					const model = await mobilenet.load();

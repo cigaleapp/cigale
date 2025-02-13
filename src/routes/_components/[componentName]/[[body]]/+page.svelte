@@ -1,68 +1,82 @@
-<script lang="ts">
-	import { page } from '$app/stores';
+<script>
+	import { pushState } from '$app/navigation';
+	import { page } from '$app/state';
 
-	let [componentName, slotContent] = $page.params['componentName'].split('/', 2);
-	let props = Object.fromEntries(
-		Array(...$page.url.searchParams.entries()).map(([k, v]) => {
-			let value;
-			if (v === '') {
-				value = true;
-			} else {
-				try {
-					value = JSON.parse(v);
-				} catch (e) {
-					value = v;
+	let componentName = $derived(page.params['componentName']);
+	let slotContent = $derived(page.params['body']);
+	let props = $state(
+		Object.fromEntries(
+			Array(...page.url.searchParams.entries()).map(([k, v]) => {
+				let value;
+				if (v === '') {
+					value = true;
+				} else {
+					try {
+						value = JSON.parse(v);
+					} catch (e) {
+						value = v;
+					}
 				}
-			}
-			return [k, value];
-		})
+				return [k, value];
+			})
+		)
 	);
 
-	let title: string;
-	$: {
-		title = `<${componentName}`;
+	/** @type {string|undefined} */
+	let title = $derived.by(() => {
+		let out = `<${componentName}`;
 		if (Object.keys(props).length > 0) {
-			title +=
+			out +=
 				' ' +
 				Object.entries(props)
 					.map(([k, v]) => (v === true ? k : `${k}=${JSON.stringify(v)}`))
 					.join(' ');
 		}
 		if (slotContent) {
-			title += `>${slotContent}</${componentName}>`;
+			out += `>${slotContent}</${componentName}>`;
 		} else {
-			title += '/>';
+			out += '/>';
 		}
-	}
+		return out;
+	});
 
-	let wireframe = false;
-	let componentDomNode: HTMLElement;
-	let newPropKey = '';
-	let newPropValue = '';
+	let wireframe = $state(false);
+
+	/** @type {HTMLElement|undefined} */
+	let componentDomNode = $state();
+	let newPropKey = $state('');
+	let newPropValue = $state('');
 </script>
 
 <svelte:head>
 	<title>{title}</title>
 </svelte:head>
-<main>
+<div class="content">
 	<h1>{title}</h1>
 
-	{#await import(`../../../lib/${componentName}.svelte`) then component}
+	{#await import(`../../../../lib/${componentName}.svelte`) then component}
 		<main class:wireframe bind:this={componentDomNode}>
 			{#if slotContent}
-				<svelte:component this={component.default} {...props}>
+				<component.default {...props}>
 					{slotContent}
-				</svelte:component>
+				</component.default>
 			{:else}
-				<svelte:component this={component.default} {...props} />
+				<component.default {...props} />
 			{/if}
 		</main>
 		<section class="props">
-			{#each Object.entries(props) as [key, value] (key)}
+			{#each Object.keys(props) as key (key)}
 				<label for={`prop-${key}`}
 					>{key}
 					<input id={`prop-${key}`} type="text" bind:value={props[key]} />
-					<button on:click={() => delete props[key]}>del</button>
+					<button
+						onclick={() => {
+							let newURL = new URL(page.url);
+							newURL.searchParams.delete(key);
+							pushState(newURL, {});
+							delete props[key];
+						}}>del</button
+					>
 				</label>
 			{/each}
 
@@ -71,10 +85,17 @@
 				<input type="text" bind:value={newPropKey} />
 				<input type="text" bind:value={newPropValue} />
 				<button
-					on:click={() => {
-						props[newPropKey] = JSON.parse(newPropValue);
+					onclick={() => {
+						try {
+							props[newPropKey] = JSON.parse(newPropValue);
+						} catch {
+							props[newPropKey] = newPropValue;
+						}
 						newPropKey = '';
 						newPropValue = '';
+						let newURL = new URL(page.url);
+						newURL.searchParams.set(newPropKey, newPropValue);
+						pushState(newURL, {});
 					}}>Add</button
 				>
 			</div>
@@ -99,7 +120,7 @@
 			<pre><code>{error}</code></pre>
 		</section>
 	{/await}
-</main>
+</div>
 
 <style>
 	section.errored {
