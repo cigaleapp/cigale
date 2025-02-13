@@ -13,7 +13,7 @@
 				} else {
 					try {
 						value = JSON.parse(v);
-					} catch (e) {
+					} catch {
 						value = v;
 					}
 				}
@@ -91,11 +91,11 @@
 						} catch {
 							props[newPropKey] = newPropValue;
 						}
-						newPropKey = '';
-						newPropValue = '';
 						let newURL = new URL(page.url);
 						newURL.searchParams.set(newPropKey, newPropValue);
 						pushState(newURL, {});
+						newPropKey = '';
+						newPropValue = '';
 					}}>Add</button
 				>
 			</div>
