@@ -7,7 +7,7 @@
 	<label>
 		<input type="radio" {name} value={option} bind:group={value} />
 		{option}
-	</label><br />
+	</label>
 {/each}
 Vous avez choisi l'option {value} félicitation
 
