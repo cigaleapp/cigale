@@ -5,20 +5,26 @@
 <br />
 {#each options as option}
 	<label>
-		<input type="radio" {name} value={option} bind:group={value} />
-		{option}
+		<input type="radio" {name} value={option} bind:group={value} /> {option} 
 	</label>
 {/each}
+<br />
 Vous avez choisi l'option {value} félicitation
 
 <style>
 	:root {
 		--accent-color: CornflowerBlue;
-		--color: #30b9b3;
+		--color: #30b9b3; /*à remplacer avec --bg-primary */
 	}
 
 	input[type='radio'] {
 		accent-color: var(--color);
 		color: white;
+		display: flex;
+	}
+	input[type='radio']:hover {
+		color: var(--color);
+		border-radius: 50%;
+		box-shadow: 0 0 8px var(--color);
 	}
 </style>
