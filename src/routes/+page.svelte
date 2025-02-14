@@ -1,6 +1,7 @@
 <script>
-	import * as tf from '@tensorflow/tfjs';
+	import RadioButton from '$lib/RadioButton.svelte';
 	import * as mobilenet from '@tensorflow-models/mobilenet';
+	import * as tf from '@tensorflow/tfjs';
 	let image_file = $state();
 	let classe = $state();
 	let certainty = $state();
@@ -49,3 +50,4 @@
 <input type="file" accept="image/*" bind:files={image_file} />
 <p>classse : {classe} with certainty : {certainty}</p>
 <canvas id="canvas" bind:this={canva_element}></canvas>
+<RadioButton options={['chocolat', 'pomme', 'banane', 'je pleure']} name="fruit" bind:value={classe} />
