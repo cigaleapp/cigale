@@ -1,8 +1,13 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-
-// feur
+import icons from 'unplugin-icons/vite';
 
 export default defineConfig({
-	plugins: [sveltekit()]
+	plugins: [
+		icons({
+			compiler: 'svelte',
+			defaultClass: 'icon'
+		}),
+		sveltekit()
+	]
 });

@@ -4,4 +4,6 @@
 
 <input type="text" bind:value={componentName} />
 
-<a href="/_components/{componentName}">Aller à /_components/{componentName}</a>
+<a href="/_components/{componentName}">
+	Aller à /_components/{componentName}
+</a>

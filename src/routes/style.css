@@ -1,0 +1,15 @@
+:root {
+	--bg-primary: #30b9b3;
+	--bg-primary-translucent: rgb(from var(--bg-primary) r g b / 0.35);
+	--fg-primary: #2c004b;
+	--bg-dark-primary: #7bbbb0;
+	--fg-dark-primary: #2f3040;
+	--bg-warning: #fff7b3;
+	--fg-warning: #a85400;
+	--bg-error: #ffa08f;
+	--fg-error: #940000;
+	--bg-success: #6bff6b;
+	--fg-success: #006600;
+	--bg-neutral: #ffffff;
+	--fg-neutral: #000000;
+}
