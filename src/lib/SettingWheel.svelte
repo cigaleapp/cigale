@@ -27,7 +27,7 @@
 		color: var(--bg-primary);
 	}
 
-	.isActive {
+	button[aria-pressed="true"] {
 		position: fixed;
 		display: flex;
 		color: red;
