@@ -1,47 +1,81 @@
 <script>
+	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
 	import Card from './Card.svelte';
+	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips';
-	import IconCheck from '~icons/ph/check';
 
 	/**
 	 * @typedef Props
 	 * @type {object}
 	 * @property {() => void} onclick
+	 * @property {() => void} [onstacksizeclick]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
 	 * @property {boolean} selected
-	 * @property {number} [loading] - progress (between 0 and 1) of loading the image
+	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
+	 * @property {string} [loadingText] - text to show when loading and progress is -1
 	 */
 
-	/** @type {Props}*/
-	const { onclick, title, image, loading, selected, stacksize = 1 } = $props();
+	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
+	const {
+		onclick,
+		onstacksizeclick,
+		title,
+		image,
+		loading,
+		selected,
+		loadingText = 'Chargement…',
+		stacksize = 1,
+		...rest
+	} = $props();
 
 	const stacked = $derived(stacksize > 1);
 
+	// TODO: extract logic to tooltip.js
 	// https://stackoverflow.com/a/10017343/9943464
 	let titleElement = $state();
-	const titleWasEllipsed = $derived.by(() => {
-		// Re-run code when selected changes since it may cause the title to be ellipsed/un-ellipsed
-		selected;
-		return titleElement?.offsetWidth < titleElement?.scrollWidth;
-	});
+	let titleOffsetWidth = $state(0);
+	let titleWasEllipsed = $derived(titleOffsetWidth < titleElement?.scrollWidth);
 </script>
 
-<div class="observation" class:selected class:loading class:stacked>
+<div class="observation" class:selected class:loading class:stacked {...rest}>
 	<Card {onclick}>
 		<div class="inner">
+			{#if loading !== undefined}
+				<div class="loading-overlay">
+					<LoadingSpinner progress={loading === -1 ? undefined : loading} />
+					<span class="text" class:smol={loading === -1}>
+						{#if loading !== -1}
+							{Math.round(loading * 100)}%
+						{:else}
+							{loadingText}
+						{/if}
+					</span>
+				</div>
+			{/if}
 			<img src={image} alt={title} />
 			<footer>
-				{#if selected}
-					<div class="check-icon">
-						<IconCheck />
-					</div>
-				{/if}
-				<h2 bind:this={titleElement} use:tooltip={titleWasEllipsed ? title : undefined}>{title}</h2>
-				<span class="stack-count" use:tooltip={`Cette observation regroupe ${stacksize} images`}>
+				<div class="check-icon">
+					<AnimatableCheckmark />
+				</div>
+				<h2
+					bind:this={titleElement}
+					bind:offsetWidth={titleOffsetWidth}
+					use:tooltip={titleWasEllipsed ? title : undefined}
+				>
+					{title}
+				</h2>
+				<button
+					class="stack-count"
+					use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
+					onclick={(e) => {
+						e.stopPropagation();
+						onstacksizeclick?.();
+					}}
+				>
 					{stacksize}
-				</span>
+				</button>
 			</footer>
 		</div>
 	</Card>
@@ -77,6 +111,31 @@
 		grid-template-columns: 100%;
 		width: 100%;
 		height: 100%;
+		position: relative;
+	}
+
+	.loading-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgb(from var(--bg-neutral) r g b / 0.75);
+		z-index: 10;
+		font-size: 3em;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.loading-overlay .text {
+		font-size: 1.5rem;
+	}
+
+	.loading-overlay .text.smol {
+		margin-top: 0.5em;
+		font-size: 1.2rem;
 	}
 
 	img {
@@ -88,9 +147,43 @@
 	footer {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
 		padding: 0 0.5em;
-		gap: 0.25em;
+	}
+
+	.check-icon {
+		overflow: hidden;
+		/* opacity: 0; */
+		width: 0;
+		/* animation: reveal-icon 0.3s ease forwards; */
+		transition: all 0.3s 0.1s;
+	}
+
+	.check-icon :global(svg path) {
+		stroke-dasharray: 20;
+		stroke-dashoffset: 20;
+		transition: all 0.3s;
+	}
+
+	.selected .check-icon {
+		/* animation: reveal-icon 0.3s ease reverse forwards; */
+		width: 1.5rem;
+	}
+
+	.selected .check-icon :global(svg path) {
+		stroke-dashoffset: 0;
+	}
+
+	@keyframes reveal-icon {
+		from {
+			opacity: 0;
+			width: 0;
+		}
+		20% {
+			opacity: 1;
+		}
+		to {
+			width: 1.7rem;
+		}
 	}
 
 	h2 {
@@ -115,7 +208,13 @@
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
-		border: 1px solid transparent;
+		border: 2px solid transparent;
+		margin-left: auto;
+		cursor: pointer;
+	}
+
+	.stack-count:is(:hover, :focus-visible) {
+		border-color: var(--fg-primary);
 	}
 
 	/** Lazy hack to keep alignment of title when check icon gets added but we have stacked==false */
