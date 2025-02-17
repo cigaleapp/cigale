@@ -18,6 +18,14 @@
 	const { onclick, title, image, loading, selected, stacksize = 1 } = $props();
 
 	const stacked = $derived(stacksize > 1);
+
+	// https://stackoverflow.com/a/10017343/9943464
+	let titleElement = $state();
+	const titleWasEllipsed = $derived.by(() => {
+		// Re-run code when selected changes since it may cause the title to be ellipsed/un-ellipsed
+		selected;
+		return titleElement?.offsetWidth < titleElement?.scrollWidth;
+	});
 </script>
 
 <div class="observation" class:selected class:loading class:stacked>
@@ -30,7 +38,7 @@
 						<IconCheck />
 					</div>
 				{/if}
-				<h2 use:tooltip={title}>{title}</h2>
+				<h2 bind:this={titleElement} use:tooltip={titleWasEllipsed ? title : undefined}>{title}</h2>
 				<span class="stack-count" use:tooltip={`Cette observation regroupe ${stacksize} images`}>
 					{stacksize}
 				</span>

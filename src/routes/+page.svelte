@@ -51,10 +51,11 @@
 		'https://www.dgaae.de/files/user-upload/insekt_des_jahres/2024/Stierhornk%C3%A4fer_Schmitt.jpg'
 	].map((image) => ({
 		image,
-		title: `IMG_${Math.ceil(Math.random() * 1000)}.JPEG`,
+		title: `IMG_${Math.ceil(Math.random() * 100000)}.JPEG`,
 		stacksize: Math.ceil(Math.random() * 5)
 	}));
 
+	/** @type {string[]} */
 	let selection = $state([]);
 </script>
 
