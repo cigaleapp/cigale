@@ -24,7 +24,7 @@
 		letter-spacing: 0.05em;
 	}
 
-	button:hover {
+	button:is(:hover, :focus-visible) {
 		background-color: var(--bg-primary-translucent);
 	}
 </style>
