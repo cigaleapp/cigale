@@ -6,7 +6,7 @@
 	let { value = $bindable(), icons: iconsOverride = undefined } = $props();
 
 	function click() {
-		pushed = !pushed;
+		value = !value;
 	}
 
 	/** @type {boolean} */
@@ -23,13 +23,13 @@
 <button
 	class="switch"
 	role="switch"
-	aria-checked={pushed}
+	aria-checked={value}
 	onclick={click}
 	aria-labelledby="On off switch"
 >
 	<div class="handle" class:pushed={value}>
 		{#if showHints || iconsOverride}
-			{#if pushed}
+			{#if value}
 				<icons.on />
 			{:else}
 				<icons.off />
