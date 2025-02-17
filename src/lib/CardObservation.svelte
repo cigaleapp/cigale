@@ -31,11 +31,9 @@
 					</div>
 				{/if}
 				<h2 use:tooltip={title}>{title}</h2>
-				{#if stacked}
-					<span class="stack-count" use:tooltip={`Cette observation regroupe ${stacksize} images`}>
-						{stacksize}
-					</span>
-				{/if}
+				<span class="stack-count" use:tooltip={`Cette observation regroupe ${stacksize} images`}>
+					{stacksize}
+				</span>
 			</footer>
 		</div>
 	</Card>
@@ -110,6 +108,12 @@
 		justify-content: center;
 		flex-shrink: 0;
 		border: 1px solid transparent;
+	}
+
+	/** Lazy hack to keep alignment of title when check icon gets added but we have stacked==false */
+	.observation:not(.stacked) .stack-count {
+		opacity: 0;
+		visibility: hidden;
 	}
 
 	.stack-backgroud-card {
