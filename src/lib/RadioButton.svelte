@@ -3,7 +3,7 @@
 </script>
 
 {#each options as option}
-	<div class="radio">
+	<label class="radio">
 		<input type="radio" {name} value={option} style="align-items: center;" bind:group={value} />
 		{option}
 	</div>
