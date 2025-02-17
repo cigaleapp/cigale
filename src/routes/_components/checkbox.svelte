@@ -1,7 +1,8 @@
 <!-- ici mettre class:checked={value} pour avoir la classe checked seulement quand c'est coché -->
 <script>
-	export let value = false;
+	//export let value = false;
 	import Icon from '~icons/ph/check-light';
+	let { text, value = $bindable() } = $props();
 </script>
 
 <label class:checked={value}>
@@ -36,7 +37,7 @@
 	</div>
 
 	<input type="checkbox" bind:checked={value} />
-	hello
+	{text}
 </label>
 
 <style>
