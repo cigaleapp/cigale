@@ -48,7 +48,6 @@
 	},
 	"dependencies": {
 		"@iconify-json/ph": "^1.2.2",
-		"@iconify/svelte": "^4.2.0",
 		"@tensorflow-models/mobilenet": "^2.1.1",
 		"@tensorflow/tfjs": "^4.22.0",
 		"sveltejs-tippy": "^3.0.0",
