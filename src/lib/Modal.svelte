@@ -17,6 +17,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	 * @property {() => void} [open] a function you can bind to, to open the modal
 	 * @property {() => void} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {import('svelte').Snippet} children the content of the modal
+	 * @property {import('svelte').Snippet} [footer] the content of the footer
 	 */
 
 	/**  @type {Props} */
@@ -25,6 +26,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		title,
 		open = $bindable(undefined),
 		close = $bindable(undefined),
+		footer = undefined,
 		children
 	} = $props();
 
@@ -67,6 +69,11 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	<main>
 		{@render children()}
 	</main>
+	{#if footer}
+		<footer>
+			{@render footer()}
+		</footer>
+	{/if}
 </dialog>
 
 <style>
@@ -118,6 +125,10 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+
+	footer {
+		margin-top: auto;
 	}
 
 	h1 {
