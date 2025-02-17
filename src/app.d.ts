@@ -8,7 +8,7 @@ declare global {
 		// interface Error {}
 		// interface Locals {}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState extends Record<string, any> {}
 		// interface Platform {}
 	}
 }
