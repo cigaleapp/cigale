@@ -27,7 +27,7 @@
 	onclick={click}
 	aria-labelledby="On off switch"
 >
-	<div class="handle" class:pushed>
+	<div class="handle" class:pushed={value}>
 		{#if showHints || iconsOverride}
 			{#if pushed}
 				<icons.on />
