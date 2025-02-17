@@ -1,30 +1,19 @@
 <script>
 	import Icon from '~icons/ph/gear-light';
 	let isActive = false;
-	let isDivActive = false;
 
 	function handleClick() {
 		isActive = !isActive;
-		isDivActive = !isDivActive;
 	}
 </script>
 
-<div class:isDivActive class="container" aria-pressed={isDivActive}>
+<div class="container" aria-pressed={isActive}>
 	<button class:isActive onclick={handleClick} aria-pressed={isActive} type="button">
-		<Icon class="icon" />
+		<Icon />
 	</button>
 </div>
 
 <style>
-	:root {
-		font-size: em;
-		color: var(--fg-primary);
-	}
-
-	.isDivActive {
-		background-color: var(--bg-primary);
-	}
-
 	button {
 		position: fixed;
 		display: flex;
@@ -35,7 +24,7 @@
 	}
 
 	button:hover {
-		color: #35c8bf;
+		color: var(--bg-primary);
 	}
 
 	.isActive {
@@ -46,11 +35,10 @@
 		transition: transform 1s ease-in-out;
 	}
 
-	.isDivActive {
+	.container[aria-pressed='true'] {
+		background-color: var(--bg-primary);
 		position: fixed;
-		display: flex;
-		height: 1vh;
-		width: 1vw;
+		display: inline-block;
 		background-color: var(--bg-primary);
 		transition: background-color 1s ease-in-out;
 	}
