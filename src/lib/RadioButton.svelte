@@ -3,9 +3,11 @@
 </script>
 
 {#each options as option}
-	<label class="radio">
-		<input type="radio" {name} value={option} style="align-items: center;" bind:group={value} />
-		{option}
+	<div>
+		<label class="radio">
+			<input type="radio" {name} value={option} style="align-items: center;" bind:group={value} />
+			{option}
+		</label>
 	</div>
 {/each}
 Vous avez choisi l'option {value} félicitation
