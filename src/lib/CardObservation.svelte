@@ -114,6 +114,7 @@
 	.observation:not(.stacked) .stack-count {
 		opacity: 0;
 		visibility: hidden;
+		width: 0;
 	}
 
 	.stack-backgroud-card {
