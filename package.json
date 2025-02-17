@@ -1,6 +1,7 @@
 {
 	"name": "cigale",
 	"private": true,
+	"description": "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune",
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
@@ -12,7 +13,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "eslint .",
-		"commit": "gitmoji -c"
+		"commit": "gitmoji -c",
+		"postinstall": "merge-drivers install"
 	},
 	"lint-staged": {
 		"*.{js,ts,svelte}": [
@@ -36,6 +38,7 @@
 		"husky": "^9.1.7",
 		"lint-staged": "^15.4.3",
 		"mdsvex": "^0.12.3",
+		"merge-drivers": "^1.0.2",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
 		"svelte": "^5.0.0",
@@ -48,6 +51,7 @@
 		"@iconify/svelte": "^4.2.0",
 		"@tensorflow-models/mobilenet": "^2.1.1",
 		"@tensorflow/tfjs": "^4.22.0",
+		"sveltejs-tippy": "^3.0.0",
 		"unplugin-icons": "^22.0.0"
 	},
 	"volta": {
