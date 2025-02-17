@@ -13,7 +13,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		border: 1px var(--bg-neutral) solid;
+		border: none;
 		--height: 1em;
 		--padding: 0.5em;
 		padding: var(--padding);
