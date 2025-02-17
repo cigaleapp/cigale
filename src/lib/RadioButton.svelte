@@ -8,7 +8,6 @@
 		{option}
 	</div>
 {/each}
-<br />
 Vous avez choisi l'option {value} félicitation
 
 <style>
@@ -25,7 +24,6 @@ Vous avez choisi l'option {value} félicitation
 	input[type='radio']:hover {
 		color: var(--color);
 		border-radius: 50%;
-		box-shadow: 0 0 8px var(--color);
 	}
 
 	.radio {
