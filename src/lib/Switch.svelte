@@ -3,7 +3,7 @@
 	import Check from '~icons/ph/check-bold';
 	import Cross from '~icons/ph/x-bold';
 
-	let { pushed = $bindable(), icons: iconsOverride = undefined } = $props();
+	let { value = $bindable(), icons: iconsOverride = undefined } = $props();
 
 	function click() {
 		pushed = !pushed;
