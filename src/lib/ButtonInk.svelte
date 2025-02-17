@@ -1,11 +1,9 @@
 <script>
-	function nothing() {}
-
-	let { label, handleclick = nothing } = $props();
+	let { children, onclick } = $props();
 </script>
 
-<button onclick={handleclick}>
-	{label}
+<button {onclick}>
+	{@render children()}
 </button>
 
 <style>
