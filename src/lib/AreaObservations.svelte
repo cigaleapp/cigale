@@ -106,14 +106,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			{...props}
 			{loadingText}
 			selected={selection.includes(props.title)}
-			onclick={() => {
-				if (props.loading) return;
-				if (selection.includes(props.title)) {
-					selection = selection.filter((title) => title !== props.title);
-				} else {
-					selection.push(props.title);
-				}
-			}}
 		/>
 	{/each}
 </section>
