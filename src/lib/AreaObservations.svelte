@@ -1,3 +1,17 @@
+<!-- 
+@component
+
+A zone where observations can be selected, by dragging or via keyboard shortcuts.
+
+The zone where dragging can be performed is defined by the _parent element_ of the component.
+
+⚠️ Using this component registers global keyboard shortcuts: 
+
+- `CmdOrCtrl+A` to select all observations
+- `CmdOrCtrl+D` to deselect all observations
+
+-->
+
 <script>
 	import DragSelect from 'dragselect';
 	// @ts-ignore
