@@ -14,10 +14,7 @@
 		justify-content: center;
 		align-items: center;
 		border: none;
-		--height: 1em;
-		--padding: 0.5em;
-		padding: var(--padding);
-		height: calc(var(--height) +2 * var(--padding));
+		padding: 0.5em 0.75em;
 		border-radius: var(--corner-radius);
 		text-transform: uppercase;
 		font-weight: bold;
