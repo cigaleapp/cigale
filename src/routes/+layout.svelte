@@ -1,8 +1,12 @@
 <script>
 	import { base } from '$app/paths';
+	import { setContext } from 'svelte';
 	import './style.css';
 
 	const { children } = $props();
+
+	// TODO get value from DB
+	setContext('showSwitchHints', true);
 </script>
 
 <svelte:head>
