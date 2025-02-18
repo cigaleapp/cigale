@@ -92,6 +92,7 @@
 		--card-height: 250px;
 		--card-padding: 0; /* since the image kisses the corners */
 		--stack-offset: 0.25em;
+		--transition-duration: 0.3s;
 		position: relative;
 		width: var(--card-width);
 	}
@@ -152,20 +153,17 @@
 
 	.check-icon {
 		overflow: hidden;
-		/* opacity: 0; */
 		width: 0;
-		/* animation: reveal-icon 0.3s ease forwards; */
-		transition: all 0.3s 0.1s;
+		transition: all var(--transition-duration) calc(var(--transition-duration) * 0.1);
 	}
 
 	.check-icon :global(svg path) {
 		stroke-dasharray: 20;
 		stroke-dashoffset: 20;
-		transition: all 0.3s;
+		transition: all var(--transition-duration);
 	}
 
 	.selected .check-icon {
-		/* animation: reveal-icon 0.3s ease reverse forwards; */
 		width: 1.5rem;
 	}
 
@@ -183,6 +181,12 @@
 		}
 		to {
 			width: 1.7rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.observation {
+			--transition-duration: 0s;
 		}
 	}
 
@@ -232,7 +236,7 @@
 		width: var(--card-width);
 		pointer-events: none;
 		transition:
-			top 0.3s,
-			left 0.3s;
+			top var(--transition-duration),
+			left var(--transition-duration);
 	}
 </style>
