@@ -66,9 +66,21 @@
 	}));
 </script>
 
+<h1>Démo observations lol</h1>
+<p>Zone ou on peut selectionner en glissant = fond gris</p>
+
+<section class="demo-observations">
+	<AreaObservations {images} loadingText="Analyse…" />
+</section>
+
 <h1>Welcome to chocolat</h1>
 <input type="file" accept="image/*" bind:files={image_file} />
 <p>classse : {classe} with certainty : {certainty}</p>
 <canvas id="canvas" bind:this={canva_element}></canvas>
 
-<AreaObservations {images} loadingText="Analyse…" />
+<style>
+	.demo-observations {
+		padding: 4em;
+		background-color: rgb(from var(--fg-neutral) r g b / 0.1);
+	}
+</style>
