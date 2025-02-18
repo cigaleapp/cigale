@@ -22,6 +22,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @typedef Image
 	 * @property {string} image
 	 * @property {string} title
+	 * @property {number} index
 	 * @property {number} stacksize
 	 * @property {number} [loading]
 	 */
@@ -66,6 +67,33 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			if (!item.dataset.title) return;
 			selection = selection.filter((title) => title !== item.dataset.title);
 		});
+		// Implement shift-click selection:
+		// We get the item we just selected, and the closest item before it that was already selected. We select everything in between.
+		dragselect?.subscribe('DS:end', ({ items, event }) => {
+			if (!event?.shiftKey) return;
+			if (!(event.target instanceof HTMLElement)) return;
+			const targetIndex = Number.parseInt(
+				// @ts-ignore
+				event.target?.closest('[data-selectable]')?.dataset.index
+			);
+			const closestSelectedIndex = Math.max(
+				// @ts-ignore
+				...items
+					.map(({ dataset }) => Number.parseInt(dataset.index ?? '-1'))
+					.filter((index) => index < targetIndex)
+			);
+			dragselect?.addSelection(
+				// @ts-ignore
+				imagesContainer
+					?.querySelectorAll(`[data-selectable]`)
+					.values()
+					// @ts-ignore
+					.filter(({ dataset }) => {
+						const index = Number.parseInt(dataset.index);
+						return index >= closestSelectedIndex && index <= targetIndex;
+					})
+			);
+		});
 	});
 
 	$effect(() => {
@@ -103,6 +131,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			data-selectable
 			data-title={props.title}
 			data-loading={props.loading}
+			data-index={props.index}
 			{...props}
 			{loadingText}
 			selected={selection.includes(props.title)}
