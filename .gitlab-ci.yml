@@ -8,6 +8,7 @@ pages:
   script:
     - npm run build
   artifacts:
+    expire_in: 1 week
     paths:
       # The folder that contains the files to be exposed at the Page URL
       - public
@@ -18,6 +19,7 @@ pages:
 
 develop:
   artifacts:
+    expire_in: 1 week
     paths:
       - public
 
