@@ -11,35 +11,43 @@
 	<button class:isActive onclick={handleClick} aria-pressed={isActive} type="button">
 		<Icon />
 	</button>
+	{#if isActive}
+		<div class="dropdown-menu">
+			<p>Paramètres</p>
+			<p>Langues</p>
+			<p>Quitter</p>
+		</div>
+	{/if}
 </div>
 
 <style>
 	button {
-		position: fixed;
+		position: absolute;
 		display: flex;
-		color: var(--color);
-		background: none;
+		align-items: center;
+		color: var(--bg-primary);
 		border: none;
 		cursor: pointer;
+		background: none;
 	}
 
 	button:hover {
 		color: var(--bg-primary);
 	}
 
-	button[aria-pressed="true"] {
-		position: fixed;
-		display: flex;
+	button[aria-pressed='true'] {
+		position: absolute;
 		color: red;
 		transform: rotate(360deg);
 		transition: transform 1s ease-in-out;
 	}
 
-	.container[aria-pressed='true'] {
+	.dropdown-menu {
+		position: absolute;
+		top: 8rem;
 		background-color: var(--bg-primary);
-		position: fixed;
-		display: inline-block;
-		background-color: var(--bg-primary);
-		transition: background-color 1s ease-in-out;
+		color: var(--text-primary);
+		border-radius: 0.5rem;
+		padding: 0.5rem;
 	}
 </style>
