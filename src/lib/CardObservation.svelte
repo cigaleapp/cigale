@@ -40,45 +40,50 @@
 </script>
 
 <div class="observation" class:selected class:loading class:stacked {...rest}>
-	<Card onclick={loading ? undefined : onclick}>
-		<div class="inner">
-			{#if loading !== undefined}
-				<div class="loading-overlay">
-					<LoadingSpinner progress={loading === -1 ? undefined : loading} />
-					<span class="text" class:smol={loading === -1}>
-						{#if loading !== -1}
-							{Math.round(loading * 100)}%
-						{:else}
-							{loadingText}
-						{/if}
-					</span>
-				</div>
-			{/if}
-			<img src={image} alt={title} />
-			<footer>
-				<div class="check-icon">
-					<AnimatableCheckmark />
-				</div>
-				<h2
-					bind:this={titleElement}
-					bind:offsetWidth={titleOffsetWidth}
-					use:tooltip={titleWasEllipsed ? title : undefined}
-				>
-					{title}
-				</h2>
-				<button
-					class="stack-count"
-					use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
-					onclick={(e) => {
-						e.stopPropagation();
-						onstacksizeclick?.();
-					}}
-				>
-					{stacksize}
-				</button>
-			</footer>
-		</div>
-	</Card>
+	<div class="main-card">
+		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
+		<Card onclick={loading ? undefined : (onclick ?? (() => {}))}>
+			<div class="inner">
+				{#if loading !== undefined}
+					<div class="loading-overlay">
+						<LoadingSpinner progress={loading === -1 ? undefined : loading} />
+						<span class="text" class:smol={loading === -1}>
+							{#if loading !== -1}
+								{Math.round(loading * 100)}%
+							{:else}
+								{loadingText}
+							{/if}
+						</span>
+					</div>
+				{/if}
+				<img src={image} alt={title} />
+				<footer>
+					<div class="check-icon">
+						<AnimatableCheckmark />
+					</div>
+					<h2
+						bind:this={titleElement}
+						bind:offsetWidth={titleOffsetWidth}
+						use:tooltip={titleWasEllipsed ? title : undefined}
+					>
+						{title}
+					</h2>
+					<button
+						disabled={loading}
+						class="stack-count"
+						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
+						onclick={(e) => {
+							e.stopPropagation();
+							onstacksizeclick?.();
+						}}
+					>
+						{stacksize}
+					</button>
+				</footer>
+			</div>
+		</Card>
+	</div>
+
 	{#if stacked}
 		<div class="stack-backgroud-card">
 			<Card></Card>
@@ -93,8 +98,14 @@
 		--card-padding: 0; /* since the image kisses the corners */
 		--stack-offset: 0.25em;
 		--transition-duration: 0.3s;
+		--card-bg: var(--bg-neutral);
 		position: relative;
 		width: var(--card-width);
+		user-select: none;
+	}
+
+	.observation:not(.loading) {
+		cursor: pointer;
 	}
 
 	.observation.selected {
@@ -102,8 +113,15 @@
 		color: var(--fg-primary);
 	}
 
-	.observation:is(:hover, :has(:focus-visible)) {
-		--stack-offset: 0.4em;
+	.main-card {
+		transition: transform calc(var(--transition-duration) / 1.5);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		/* TODO: remove :global(), c pa bi1!! */
+		.observation:not(.loading).stacked:is(:hover, :has(:focus-visible)) .main-card {
+			transform: rotate(-3deg);
+		}
 	}
 
 	.inner {
@@ -233,6 +251,10 @@
 		width: 0;
 	}
 
+	.observation:not(.loading):is(:hover, :has(:focus-visible)) {
+		--stack-offset: 0.4em;
+	}
+
 	.stack-backgroud-card {
 		position: absolute;
 		top: var(--stack-offset);
@@ -241,7 +263,13 @@
 		width: var(--card-width);
 		pointer-events: none;
 		transition:
-			top var(--transition-duration),
-			left var(--transition-duration);
+			top calc(var(--transition-duration) / 1.5),
+			left calc(var(--transition-duration) / 1.5);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.observation:not(.loading):is(:hover, :has(:focus-visible)) .stack-backgroud-card {
+			transform: rotate(3deg);
+		}
 	}
 </style>
