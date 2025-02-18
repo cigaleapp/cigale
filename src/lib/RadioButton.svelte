@@ -10,7 +10,6 @@
 		</label>
 	</div>
 {/each}
-Vous avez choisi l'option {value} félicitation
 
 <style>
 	:root {
