@@ -17,6 +17,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	// @ts-ignore
 	import { tinykeys } from 'tinykeys';
 	import CardObservation from './CardObservation.svelte';
+	import Modal from './Modal.svelte';
 
 	/**
 	 * @typedef Image
@@ -122,8 +123,35 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				);
 			}
 		});
+
+		// "?" doesnt work with tinykeys, see https://github.com/jamiebuilds/tinykeys/issues/130
+		window.addEventListener('keyup', (e) => {
+			if (e.key === '?') {
+				openKeyboardShortcutsHelp?.();
+			}
+		});
 	});
+
+	/** @type {(() => void)|undefined} */
+	let openKeyboardShortcutsHelp = $state();
 </script>
+
+<Modal
+	bind:open={openKeyboardShortcutsHelp}
+	key="observations-keyboard-shortcuts-help"
+	title="Raccourcis clavier"
+>
+	<dl>
+		<dt>
+			<kbd>Ctrl/Cmd</kbd> + <kbd>A</kbd>
+		</dt>
+		<dd>Tout sélectionner</dd>
+		<dt>
+			<kbd>Ctrl/Cmd</kbd> + <kbd>D</kbd>
+		</dt>
+		<dd>Tout désélectionner</dd>
+	</dl>
+</Modal>
 
 <section class="images" bind:this={imagesContainer}>
 	{#each images as props}
