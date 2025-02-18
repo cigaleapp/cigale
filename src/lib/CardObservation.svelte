@@ -7,7 +7,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {() => void} onclick
+	 * @property {() => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
