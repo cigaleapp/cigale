@@ -8,7 +8,9 @@
 		Object.fromEntries(
 			Array(...page.url.searchParams.entries()).map(([k, v]) => {
 				let value;
-				if (v === '') {
+				if (v.startsWith('{') && v.endsWith('}')) {
+					value = eval(`(${v.replace(/^{/, '').replace(/}$/, '')})`);
+				} else if (v === '') {
 					value = true;
 				} else {
 					try {
@@ -29,7 +31,7 @@
 			out +=
 				' ' +
 				Object.entries(props)
-					.map(([k, v]) => (v === true ? k : `${k}=${JSON.stringify(v)}`))
+					.map(([k, v]) => (v === true ? k : `${k}=${JSON.stringify(v) ?? `{${v}}`}`))
 					.join(' ');
 		}
 		if (slotContent) {
