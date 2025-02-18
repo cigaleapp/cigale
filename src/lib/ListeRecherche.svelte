@@ -1,69 +1,51 @@
 <script>
-	import { onMount } from 'svelte';
+	import Fuse from 'fuse.js';
 
-	let { items, searchQuery, filteredItems, selectedvalue } = $props();
+	/**
+	 * @typedef Props
+	 * @type {object}
+	 * @property {string[]} options possible options
+	 * @property {string} searchQuery the string we're searching for
+	 * @property {string} selectedValue the option selected by the user
+	 */
 
-	onMount(() => {
-		// Example items, replace with your data
-		items = [
-			'Apple',
-			'Banana',
-			'Cherry',
-			'Date',
-			'Elderberry',
-			'Fig',
-			'Grape',
-			'Honeydew',
-			'Kiwi',
-			'Lemon',
-			'Mango',
-			'Nectarine',
-			'Orange',
-			'Papaya',
-			'Quince',
-			'Raspberry',
-			'Strawberry',
-			'Tomato',
-			'Ugli fruit',
-			'Vanilla',
-			'Watermelon',
-			'Xigua',
-			'Yellow passion fruit',
-			'Zucchini'
-		];
-		filteredItems = items;
-	});
+	/** @type {Props} */
+	let { options, searchQuery = $bindable(''), selectedValue = $bindable() } = $props();
 
-	function handleSearch(event) {
-		searchQuery = event.target.value.toLowerCase();
-		filteredItems = items.filter((item) => item.toLowerCase().includes(searchQuery));
-	}
+	const fuse = $derived(new Fuse(options));
+
+	/** @type {string[]} options that match searchQuery */
+	const filteredItems = $derived(
+		searchQuery ? fuse.search(searchQuery).map((r) => r.item) : options
+	);
 </script>
 
-<div>
-	<input class="search-bar" type="text" placeholder="Search..." oninput={handleSearch} />
+<div class="listeRecherche">
+	<input class="search-bar" type="text" placeholder="Search..." bind:value={searchQuery} />
 
-	<div class="container">
-		{#each filteredItems as item}
-			<div>
-				<button class="button" onclick={() => (selectedvalue = item)}>
-					{item}
+	<ul class="container">
+		{#each filteredItems as option}
+			<li>
+				<button class="button" onclick={() => (selectedValue = option)}>
+					{option}
 				</button>
-			</div>
+			</li>
 		{/each}
-	</div>
-	Vous avez choisi : {selectedvalue}
+	</ul>
+	Vous avez choisi : {selectedValue}
 </div>
 
 <style>
 	.container {
+		position: absolute;
 		max-height: 100px;
 		overflow-y: auto;
 		border: 1px solid #ccc;
 		padding: 10px;
+		top: var(--searchBarHeight);
 	}
 	.search-bar {
-		margin-bottom: 10px;
+		height: var(--searchBarHeight);
 	}
 	.button {
 		width: 100%;
@@ -74,5 +56,15 @@
 		border-radius: 5px;
 		cursor: pointer;
 		text-align: left;
+	}
+
+	ul {
+		list-style: none;
+		padding-left: 0;
+	}
+
+	.listeRecherche {
+		position: relative;
+		--searchBarHeight: 2.5em;
 	}
 </style>
