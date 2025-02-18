@@ -201,7 +201,7 @@
 	}
 
 	.stack-count {
-		background: var(--bg-primary);
+		background: var(--bg-primary-translucent);
 		color: var(--fg-primary);
 		border-radius: 50%;
 		width: 1.5em;
@@ -215,6 +215,11 @@
 		border: 2px solid transparent;
 		margin-left: auto;
 		cursor: pointer;
+		transition: all calc(var(--transition-duration) / 2);
+	}
+
+	.selected .stack-count {
+		background-color: var(--bg-primary);
 	}
 
 	.stack-count:is(:hover, :focus-visible) {
