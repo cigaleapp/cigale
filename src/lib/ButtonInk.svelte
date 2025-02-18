@@ -19,6 +19,7 @@
 		text-transform: uppercase;
 		font-weight: bold;
 		letter-spacing: 0.05em;
+                cursor: pointer;
 	}
 
 	button:is(:hover, :focus-visible) {
