@@ -12,18 +12,13 @@
 {/each}
 
 <style>
-	:root {
-		--accent-color: CornflowerBlue;
-		--color: var(--bg-primary);
-	}
-
 	input[type='radio'] {
-		accent-color: var(--color);
-		color: --bg-neutral;
+		accent-color: var(--bg-primary);
+		color: var(--bg-neutral);
 		align-items: center;
 	}
 	input[type='radio']:hover {
-		color: var(--color);
+		color: var(--bg-primary);
 		border-radius: 50%;
 	}
 
