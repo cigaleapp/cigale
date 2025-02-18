@@ -40,7 +40,7 @@
 </script>
 
 <div class="observation" class:selected class:loading class:stacked {...rest}>
-	<Card {onclick}>
+	<Card onclick={loading ? undefined : onclick}>
 		<div class="inner">
 			{#if loading !== undefined}
 				<div class="loading-overlay">
