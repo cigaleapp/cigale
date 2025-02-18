@@ -14,8 +14,10 @@ const config = {
 			type: 'hash'
 		},
 		paths: {
-			base: process.env.ENVIRONMENT_URL ? new URL(process.env.ENVIRONMENT_URL).pathname.replace(/\/index\.html$/, '') : ''
-		},
+			base: process.env.ENVIRONMENT_URL
+				? new URL(process.env.ENVIRONMENT_URL).pathname.replace(/\/index\.html$/, '')
+				: ''
+		}
 	},
 
 	preprocess: [mdsvex()],
