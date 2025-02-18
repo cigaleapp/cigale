@@ -58,7 +58,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 <KeyboardShortcuts
 	preventDefault
 	binds={{
+		// Fill the object with keybindings the user of the component gives us
+		// throught the "binds" prop
 		...binds,
+		// Also register Ctrl-A to select all
 		'$mod+a': {
 			help: 'Tout sélectionner',
 			do: () => {
@@ -66,6 +69,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				dragselect?.setSelection(selection);
 			}
 		},
+		// And Ctrl-D to deselect all
 		'$mod+d': {
 			help: 'Tout désélectionner',
 			do: () => {
