@@ -12,4 +12,5 @@
 	--fg-success: #006600;
 	--bg-neutral: #ffffff;
 	--fg-neutral: #000000;
+	--gray: rgb(from var(--fg-neutral) r g b / 0.35);
 }
