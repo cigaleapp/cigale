@@ -38,11 +38,27 @@ export class DragSelect {
 	}
 
 	/**
+	 * @param {Element[]} newItems
+	 */
+	setItems(newItems) {
+		if (!this.#instance) return;
+		this.#instance.clearSelection();
+		// @ts-ignore
+		return this.#instance.setSettings({ selectables: newItems });
+	}
+
+	destroy() {
+		this.#instance?.stop();
+	}
+
+	/**
 	 *
 	 * @param {HTMLElement} container the container where all the [data-selectable] elements are. Selection square will be available in the parent of this container.
+	 * @param {string[]} [initialSelection]
 	 */
-	constructor(container) {
+	constructor(container, initialSelection = []) {
 		// Save the container element on the class instance
+		this.selection = initialSelection;
 		this.imagesContainer = container;
 		// If the container doesn't exist, we can't do anything
 		if (!this.imagesContainer) return;
