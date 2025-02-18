@@ -58,7 +58,8 @@
 		'https://i.pinimg.com/originals/d4/b6/c4/d4b6c4366f33a5e45694ccfa466c09f8.jpg',
 		'https://cdn.pixabay.com/photo/2023/04/25/03/02/butterfly-7949342_640.jpg',
 		'https://www.bioexplorer.net/images/1-Blue-Morpho.jpg'
-	].map((image) => ({
+	].map((image, index) => ({
+		index,
 		image,
 		title: `IMG_${Math.ceil(Math.random() * 100000)}.JPEG`,
 		stacksize: Math.random() > 0.2 ? Math.ceil(Math.random() * 5) : 1,
