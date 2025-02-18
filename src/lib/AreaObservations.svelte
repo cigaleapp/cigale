@@ -37,6 +37,7 @@
 		return new DragSelect({
 			// @ts-ignore
 			selectables: [...imagesContainer.querySelectorAll('[data-selectable]')],
+			area: imagesContainer,
 			draggability: false
 		});
 	});
