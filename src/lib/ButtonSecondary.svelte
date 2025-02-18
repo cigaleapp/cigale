@@ -9,12 +9,12 @@
 <style>
 	button {
 		cursor: pointer;
-		background-color: var(--bg-primary);
-		color: var(--fg-primary);
+		background-color: var(--bg-neutral);
+		color: var(--fg-neutral);
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		border: none;
+		border: 1px solid var(--gray);
 		padding: 0.75em;
 		border-radius: var(--corner-radius);
 		width: var(--width, 7.5em);
@@ -23,7 +23,8 @@
 	}
 
 	button:is(:hover, :focus-visible) {
-		background-color: var(--bg-dark-primary);
-		color: var(--fg-dark-primary);
+		background-color: var(--bg-primary-translucent);
+		color: var(--fg-primary);
+		border-color: var(--bg-primary);
 	}
 </style>
