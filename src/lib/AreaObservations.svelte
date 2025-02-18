@@ -5,7 +5,7 @@ A zone where observations can be selected, by dragging or via keyboard shortcuts
 
 The zone where dragging can be performed is defined by the _parent element_ of the component.
 
-⚠️ Using this component registers global keyboard shortcuts: 
+⚠️ Using this component registers keyboard shortcuts for the whole page: 
 
 - `CmdOrCtrl+A` to select all observations
 - `CmdOrCtrl+D` to deselect all observations
@@ -13,11 +13,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script>
-	import DragSelect from 'dragselect';
 	// @ts-ignore
-	import { tinykeys } from 'tinykeys';
 	import CardObservation from './CardObservation.svelte';
-	import Modal from './Modal.svelte';
+	import { DragSelect } from './dragselect.svelte';
+	import KeyboardShortcuts from './KeyboardShortcuts.svelte';
 
 	/**
 	 * @typedef Image
@@ -34,124 +33,48 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {Image[]} images
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
+	 * @property {import('./KeyboardShortcuts.svelte').Keymap} [binds] keybinds to define alongside the ones this component defines
 	 */
 
 	/** @type {Props } */
-	let { images = $bindable(), loadingText, selection = $bindable([]) } = $props();
+	let { images = $bindable(), loadingText, binds, selection = $bindable([]) } = $props();
 
-	/** @type {HTMLElement|undefined} */
+	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
-	$effect(() => {
-		if (!imagesContainer) return;
-	});
-
 	const dragselect = $derived.by(() => {
-		// recompute when children of imagesContainer change
+		if (!imagesContainer) return;
+
+		// Recompute when images change
 		images;
 
-		if (!imagesContainer) return;
-		return new DragSelect({
-			// @ts-ignore
-			selectables: [...imagesContainer.querySelectorAll('[data-selectable]')],
-			area: imagesContainer.parentElement ?? imagesContainer,
-			draggability: false
-		});
+		return new DragSelect(imagesContainer);
 	});
 
 	$effect(() => {
-		dragselect?.subscribe('DS:select', ({ item }) => {
-			if (!item.dataset.title) return;
-			if (item.dataset.loading) return;
-			selection.push(item.dataset.title);
-		});
-		dragselect?.subscribe('DS:unselect', ({ item }) => {
-			if (!item.dataset.title) return;
-			selection = selection.filter((title) => title !== item.dataset.title);
-		});
-		// Implement shift-click selection:
-		// We get the item we just selected, and the closest item before it that was already selected. We select everything in between.
-		dragselect?.subscribe('DS:end', ({ items, event }) => {
-			if (!event?.shiftKey) return;
-			if (!(event.target instanceof HTMLElement)) return;
-			const targetIndex = Number.parseInt(
-				// @ts-ignore
-				event.target?.closest('[data-selectable]')?.dataset.index
-			);
-			const closestSelectedIndex = Math.max(
-				// @ts-ignore
-				...items
-					.map(({ dataset }) => Number.parseInt(dataset.index ?? '-1'))
-					.filter((index) => index < targetIndex)
-			);
-			dragselect?.addSelection(
-				// @ts-ignore
-				imagesContainer
-					?.querySelectorAll(`[data-selectable]`)
-					.values()
-					// @ts-ignore
-					.filter(({ dataset }) => {
-						const index = Number.parseInt(dataset.index);
-						return index >= closestSelectedIndex && index <= targetIndex;
-					})
-			);
-		});
+		selection = dragselect?.selection ?? [];
 	});
-
-	$effect(() => {
-		// TODO: notsure about window here, but its most likely the right call
-		tinykeys(window, {
-			// @ts-ignore
-			'$mod+a': (e) => {
-				e.preventDefault();
-				selection = images.map((img) => img.title);
-				dragselect?.setSelection(
-					// @ts-ignore
-					selection.map((title) =>
-						imagesContainer?.querySelector(`[data-selectable][data-title="${title}"]`)
-					)
-				);
-			},
-			// @ts-ignore
-			'$mod+d': (e) => {
-				e.preventDefault();
-				selection = [];
-				dragselect?.setSelection(
-					// @ts-ignore
-					selection.map((title) =>
-						imagesContainer?.querySelector(`[data-selectable][data-title="${title}"]`)
-					)
-				);
-			}
-		});
-
-		// "?" doesnt work with tinykeys, see https://github.com/jamiebuilds/tinykeys/issues/130
-		window.addEventListener('keyup', (e) => {
-			if (e.key === '?') {
-				openKeyboardShortcutsHelp?.();
-			}
-		});
-	});
-
-	/** @type {(() => void)|undefined} */
-	let openKeyboardShortcutsHelp = $state();
 </script>
 
-<Modal
-	bind:open={openKeyboardShortcutsHelp}
-	key="observations-keyboard-shortcuts-help"
-	title="Raccourcis clavier"
->
-	<dl>
-		<dt>
-			<kbd>Ctrl/Cmd</kbd> + <kbd>A</kbd>
-		</dt>
-		<dd>Tout sélectionner</dd>
-		<dt>
-			<kbd>Ctrl/Cmd</kbd> + <kbd>D</kbd>
-		</dt>
-		<dd>Tout désélectionner</dd>
-	</dl>
-</Modal>
+<KeyboardShortcuts
+	preventDefault
+	binds={{
+		...binds,
+		'$mod+a': {
+			help: 'Tout sélectionner',
+			do: () => {
+				selection = images.map((img) => img.title);
+				dragselect?.setSelection(selection);
+			}
+		},
+		'$mod+d': {
+			help: 'Tout désélectionner',
+			do: () => {
+				selection = [];
+				dragselect?.setSelection([]);
+			}
+		}
+	}}
+/>
 
 <section class="images" bind:this={imagesContainer}>
 	{#each images as props}
