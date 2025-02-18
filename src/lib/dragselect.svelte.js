@@ -12,6 +12,16 @@ export class DragSelect {
 	#instance;
 
 	/**
+	 * title of last selected item that wasn't selected by shift-clicking.
+	 * needed to properly do shift-click selection
+	 *
+	 * See https://stackoverflow.com/a/16530782
+	 *
+	 * @type {string|undefined}
+	 */
+	shiftSelectionAnchor;
+
+	/**
 	 * @param {string[]} newSelection
 	 */
 	setSelection(newSelection) {
@@ -33,49 +43,65 @@ export class DragSelect {
 
 		if (!this.imagesContainer) return;
 
-		this.dragselect = new _DragSelect({
+		this.#instance = new _DragSelect({
 			// @ts-ignore
 			selectables: [...this.imagesContainer.querySelectorAll('[data-selectable]')],
 			area: this.imagesContainer.parentElement ?? this.imagesContainer,
 			draggability: false
 		});
 
-		this.dragselect.subscribe('DS:select', ({ item }) => {
+		this.#instance.subscribe('DS:select', ({ item }) => {
 			if (!item.dataset.title) return;
 			if (item.dataset.loading) return;
 			this.selection.push(item.dataset.title);
 		});
-		this.dragselect.subscribe('DS:unselect', ({ item }) => {
+		this.#instance.subscribe('DS:unselect', ({ item }) => {
 			if (!item.dataset.title) return;
 			this.selection = this.selection.filter((title) => title !== item.dataset.title);
 		});
 
 		// Implement shift-click selection:
-		// We get the item we just selected, and the closest item before it that was already selected. We select everything in between.
-		this.dragselect.subscribe('DS:end', ({ items, event }) => {
-			if (!event?.shiftKey) return;
-			if (!(event.target instanceof HTMLElement)) return;
+		// We get the item we just selected, and the item that was last selected without shift-clicking (the "shift selection anchor").
+		// We then select all items between these two.
+		// See https://stackoverflow.com/a/16530782 for more info
+		this.#instance.subscribe('DS:end', ({ event }) => {
+			if (!(event?.target instanceof HTMLElement)) return;
+			if (!event.shiftKey) {
+				this.shiftSelectionAnchor =
+					// @ts-ignore
+					event.target.closest('[data-selectable]')?.dataset.title ?? this.shiftSelectionAnchor;
+				return;
+			}
 			const targetIndex = Number.parseInt(
 				// @ts-ignore
-				event.target?.closest('[data-selectable]')?.dataset.index
+				event.target.closest('[data-selectable]')?.dataset.index
 			);
-			const closestSelectedIndex = Math.max(
+			const anchorIndex = Number.parseInt(
 				// @ts-ignore
-				...items
-					.map(({ dataset }) => Number.parseInt(dataset.index ?? '-1'))
-					.filter((index) => index < targetIndex)
+				this.imagesContainer?.querySelector(`[data-title="${this.shiftSelectionAnchor}"]`)?.dataset
+					.index
 			);
-			this.dragselect?.addSelection(
+			this.#instance?.addSelection(
 				// @ts-ignore
 				this.imagesContainer
 					?.querySelectorAll(`[data-selectable]`)
 					.values()
-					// @ts-ignore
-					.filter(({ dataset }) => {
-						const index = Number.parseInt(dataset.index);
-						return index >= closestSelectedIndex && index <= targetIndex;
-					})
+					.filter((element) =>
+						// @ts-ignore
+						inRange([anchorIndex, targetIndex], Number.parseInt(element.dataset.index))
+					)
 			);
 		});
 	}
+}
+
+/**
+ *
+ * @param {[number, number]} bounds of the range - can be in any order
+ * @param {number} subject number to test for
+ * @returns {boolean} whether the subject is in the range
+ */
+function inRange(bounds, subject) {
+	const [min, max] = bounds.sort((a, b) => a - b);
+	return subject >= min && subject <= max;
 }
