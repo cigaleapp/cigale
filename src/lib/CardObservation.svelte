@@ -102,6 +102,7 @@
 		position: relative;
 		width: var(--card-width);
 		user-select: none;
+		cursor: pointer;
 	}
 
 	.observation:not(.loading) {
