@@ -75,6 +75,7 @@
 	.switch:is(:hover, :focus-visible) {
 		border-color: var(--bg-primary);
 		background-color: var(--bg-primary-translucent);
+                outline: none;
 	}
 
 	.switch:is(:hover, :focus-visible) .handle {
