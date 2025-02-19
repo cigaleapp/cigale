@@ -8,6 +8,7 @@
 	import IconInfo from '~icons/ph/info';
 	import IconWarning from '~icons/ph/warning';
 	import { default as IconClose, default as IconError } from '~icons/ph/x';
+	import ButtonInk from './ButtonInk.svelte';
 
 	/**
 	 * @typedef Toast
@@ -52,19 +53,20 @@
 	<p>{message}</p>
 	<section class="actions">
 		{#if action && onaction}
-			<!-- TODO: Use ButtonInk -->
-			<button onclick={onaction}>
+			<ButtonInk onclick={onaction}>
 				{action}
-			</button>
+			</ButtonInk>
 		{/if}
 		<!-- TODO: Use ButtonInk / ButtonIcon -->
-		<button onclick={ondismiss}>
-			{#if dismiss}
+		{#if dismiss}
+			<ButtonInk onclick={ondismiss}>
 				{dismiss}
-			{:else}
+			</ButtonInk>
+		{:else}
+			<button onclick={ondismiss}>
 				<IconClose />
-			{/if}
-		</button>
+			</button>
+		{/if}
 	</section>
 </article>
 
@@ -77,6 +79,12 @@
 		justify-content: center;
 		align-items: center;
 		cursor: pointer;
+		padding: 0.5em;
+	}
+
+	button:is(:hover, :focus-visible) {
+		background-color: rgb(from var(--fg-neutral) r g b / 0.15);
+		border-radius: var(--corner-radius);
 	}
 
 	article {
