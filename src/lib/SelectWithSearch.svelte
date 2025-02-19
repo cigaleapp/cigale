@@ -21,6 +21,7 @@
 	// svelte-ignore non_reactive_update
 	let activeIndex = -1; // Tracks currently selected option in the list
 	let listRef;
+	let InputRef;
 
 	function handleKeyDown(event) {
 		const itemCount = filteredItems.length;
@@ -34,6 +35,8 @@
 		} else if (event.key === 'Enter' && itemCount > 0) {
 			event.preventDefault();
 			searchQuery = filteredItems[activeIndex]; // Select active item
+			listRef.blur();
+			InputRef.blur();
 		}
 		// Update the border of the active button
 		Array.from(listRef.children).forEach((child, index) => {
@@ -47,16 +50,23 @@
 </script>
 
 <div class="listeRecherche" role="listbox" tabindex={activeIndex} onkeydown={handleKeyDown}>
-	<input class="search-bar" type="text" placeholder="Search..." bind:value={searchQuery} />
+	<input
+		class="search-bar"
+		type="text"
+		placeholder="Search..."
+		bind:value={searchQuery}
+		bind:this={InputRef}
+	/>
 
 	<ul class="container" bind:this={listRef}>
 		{#each filteredItems as option, i}
 			<li>
 				<button
 					class="button {activeIndex === i ? option : ''}"
-					onclick={() => {
+					onclick={(e) => {
 						selectedValue = option;
 						searchQuery = option;
+						e.currentTarget.blur();
 					}}
 					tabindex="-1"
 				>
