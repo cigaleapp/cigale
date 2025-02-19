@@ -1,6 +1,6 @@
 :root {
 	--bg-primary: #30b9b3;
-	--bg-primary-translucent: rgb(from var(--bg-primary) r g b / 0.35);
+	--bg-primary-translucent: color-mix(in srgb, var(--bg-primary) 35%, var(--bg-neutral));
 	--fg-primary: #2c004b;
 	--bg-dark-primary: #7bbbb0;
 	--fg-dark-primary: #2f3040;
