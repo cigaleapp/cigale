@@ -54,7 +54,10 @@
 			<li>
 				<button
 					class="button {activeIndex === i ? option : ''}"
-					onclick={() => (selectedValue = option)}
+					onclick={() => {
+						selectedValue = option;
+						searchQuery = option;
+					}}
 					tabindex="-1"
 				>
 					{option}
@@ -70,16 +73,31 @@
 		max-height: 100px;
 		overflow: hidden;
 		border: 1px solid #ccc;
-		border-radius: 5px;
+		border-bottom-left-radius: 5px;
+		border-bottom-right-radius: 5px;
+		margin-top: 0;
 	}
 	.search-bar {
+		border: 1px solid var(--gray);
 		height: var(--searchBarHeight);
+		border-radius: 5px;
+		padding: 0 1em;
+	}
+
+	.search-bar:focus {
+		outline: none;
+		border-color: var(--bg-primary);
+	}
+	.search-bar:hover {
+		border-color: var(--bg-primary-translucent);
 	}
 	.button {
 		width: 100%;
 		height: 100%;
 		border: none;
 		text-align: left;
+		display: flex;
+		padding: 0 1em;
 	}
 	ul {
 		list-style: none;
@@ -91,6 +109,11 @@
 
 	.listeRecherche:focus-within ul {
 		visibility: visible;
+	}
+
+	.listeRecherche:focus-within .search-bar {
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
 	}
 
 	.listeRecherche {
