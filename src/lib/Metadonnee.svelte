@@ -1,9 +1,9 @@
 <script>
-	let { value = $bindable() } = $props();
+	let { value = $bindable(), children } = $props();
 </script>
 
 <div class="meta">
-	<div class="label">Label</div>
+	<div class="label">{@render children()}</div>
 	<textarea class="zone" bind:value placeholder="Entrez une valeur"></textarea>
 	<rect class="ligne"></rect>
 </div>
@@ -16,6 +16,7 @@
 	.label {
 		color: var(--gray);
 		text-transform: uppercase;
+		font-weight: bold;
 		font-size: 0.75em;
 	}
 
@@ -48,5 +49,9 @@
 
 	.meta:focus-within .ligne {
 		background-color: var(--bg-primary);
+	}
+
+	.meta:focus-within .label {
+		color: var(--fg-neutral);
 	}
 </style>
