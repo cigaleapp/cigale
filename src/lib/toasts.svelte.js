@@ -74,9 +74,11 @@ export class Toasts {
 			...rest
 		};
 
-		setTimeout(() => {
-			this.remove(id);
-		}, newToast.lifetime);
+		if (Number.isFinite(newToast.lifetime)) {
+			setTimeout(() => {
+				this.remove(id);
+			}, newToast.lifetime);
+		}
 
 		this.items = [...this.items.slice(0, MAX_TOASTS_COUNT - 1), newToast];
 		return id;
