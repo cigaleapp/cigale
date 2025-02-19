@@ -1,8 +1,16 @@
 <script>
-	let { children } = $props();
+	/**
+	 * @typedef Props
+	 * @type {object}
+	 * @property {() => void} onclick
+	 * @property {import('svelte').Snippet} children
+	 */
+
+	/** @type {Props} */
+	let { children, onclick } = $props();
 </script>
 
-<button>
+<button {onclick}>
 	{@render children()}
 </button>
 
@@ -11,7 +19,7 @@
 		cursor: pointer;
 		background-color: var(--bg-neutral);
 		color: var(--fg-neutral);
-		display: inline-block;
+		display: inline-flex;
 		justify-content: center;
 		align-items: center;
 		border: 1px solid var(--gray);
