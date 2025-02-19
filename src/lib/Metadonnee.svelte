@@ -1,16 +1,45 @@
 <script>
-	let { value = $bindable(), children } = $props();
+	import Checkbox from './Checkbox.svelte';
+	import RadioButtons from './RadioButtons.svelte';
+
+	let { value = $bindable(), children, type, options = [] } = $props();
 </script>
 
 <div class="meta">
 	<div class="label">{@render children()}</div>
-	<textarea class="zone" bind:value placeholder="Entrez une valeur"></textarea>
-	<rect class="ligne"></rect>
+
+	{#if type === 'date'}
+		<input class="date" type="date" bind:value />
+	{:else if type === 'enumeration'}
+		<RadioButtons
+			{options}
+			bind:value
+			name="si tu lis ça envoie le a 3 de tes amis sinon tu vas mourr dns lé tris prochan jou"
+		></RadioButtons>
+	{:else if type === 'number'}
+		<input type="text" bind:value />
+		<div class="ligne"></div>
+	{:else if type === 'boolean'}
+		<Checkbox bind:value>
+			<div class="niOuiNiNon">
+				{#if value}
+					Oui
+				{:else}
+					Non
+				{/if}
+			</div>
+		</Checkbox>
+	{:else}
+		<input type="text" bind:value />
+		<div class="ligne"></div>
+	{/if}
 </div>
 
 <style>
 	.meta {
 		gap: 0.1em;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.label {
@@ -22,12 +51,20 @@
 
 	.ligne {
 		height: 2px;
-		width: 100px;
 		background-color: var(--bg-neutral);
 		display: flex;
 	}
 
-	.zone {
+	input {
+		outline: none;
+		border: none;
+	}
+
+	input {
+		outline: none;
+	}
+
+	/* .zone {
 		width: 100px;
 		height: 1em;
 		border: none;
@@ -41,7 +78,7 @@
 
 	.zone:focus-visible::placeholder {
 		color: var(--gray);
-	}
+	} */
 
 	.meta:hover .ligne {
 		background-color: var(--fg-neutral);
@@ -52,6 +89,21 @@
 	}
 
 	.meta:focus-within .label {
+		color: var(--fg-neutral);
+	}
+
+	.niOuiNiNon {
+		color: var(--gay);
+	}
+
+	.niOuiNiNon:hover {
+		color: var(--fg-neutral);
+	}
+	.date {
+		color: var(--gay);
+	}
+
+	.date:hover {
 		color: var(--fg-neutral);
 	}
 </style>
