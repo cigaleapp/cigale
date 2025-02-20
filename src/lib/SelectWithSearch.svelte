@@ -81,11 +81,11 @@
 	.container {
 		position: absolute;
 		max-height: 100px;
-		overflow: hidden;
 		border: 1px solid #ccc;
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
 		margin-top: 0;
+		overflow-x: auto;
 	}
 	.search-bar {
 		border: 1px solid var(--gray);
@@ -109,6 +109,11 @@
 		display: flex;
 		padding: 0 1em;
 	}
+	.ul:last-child {
+		border-bottom-left-radius: 5px;
+		border-bottom-right-radius: 5px;
+	}
+
 	ul {
 		list-style: none;
 		padding-left: 0;
