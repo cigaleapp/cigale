@@ -6,16 +6,12 @@
 </script>
 
 <div class="meta">
-	<div class="label">{@render children()}</div>
+	<label>{@render children()}</label>
 
 	{#if type === 'date'}
 		<input class="date" type="date" bind:value />
 	{:else if type === 'enumeration'}
-		<RadioButtons
-			{options}
-			bind:value
-			name="si tu lis ça envoie le a 3 de tes amis sinon tu vas mourr dns lé tris prochan jou"
-		></RadioButtons>
+		<RadioButtons {options} bind:value name=""></RadioButtons>
 	{:else if type === 'number'}
 		<input type="text" bind:value />
 		<div class="ligne"></div>
@@ -42,7 +38,7 @@
 		flex-direction: column;
 	}
 
-	.label {
+	label {
 		color: var(--gray);
 		text-transform: uppercase;
 		font-weight: bold;
@@ -60,26 +56,6 @@
 		border: none;
 	}
 
-	input {
-		outline: none;
-	}
-
-	/* .zone {
-		width: 100px;
-		height: 1em;
-		border: none;
-		resize: none;
-	}
-
-	.zone:focus-visible {
-		outline: none;
-		color: var(--bg-primary);
-	}
-
-	.zone:focus-visible::placeholder {
-		color: var(--gray);
-	} */
-
 	.meta:hover .ligne {
 		background-color: var(--fg-neutral);
 	}
@@ -88,7 +64,7 @@
 		background-color: var(--bg-primary);
 	}
 
-	.meta:focus-within .label {
+	.meta:focus-within label {
 		color: var(--fg-neutral);
 	}
 
