@@ -16,6 +16,25 @@
 	--gay: rgb(from var(--fg-neutral) r g b / 0.75);
 }
 
+@media (prefers-color-scheme: dark) {
+	:root {
+		--fg-primary: #30b9b3;
+		--bg-primary-translucent: rgb(from var(--bg-primary) r g b / 0.35);
+		--bg-primary: #2c004b;
+		--fg-dark-primary: #7bbbb0;
+		--bg-dark-primary: #2f3040;
+		--fg-warning: #fff7b3;
+		--bg-warning: #a85400;
+		--fg-error: #ffa08f;
+		--bg-error: #940000;
+		--fg-success: #6bff6b;
+		--bg-success: #006600;
+		--fg-neutral: #ffffff;
+		--bg-neutral: #000000;
+		--gray: rgb(from var(--fg-neutral) r g b / 0.35);
+	}
+}
+
 * {
 	box-sizing: border-box;
 }
