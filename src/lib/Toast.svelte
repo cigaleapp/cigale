@@ -9,6 +9,7 @@
 	import IconWarning from '~icons/ph/warning';
 	import { default as IconClose, default as IconError } from '~icons/ph/x';
 	import ButtonInk from './ButtonInk.svelte';
+	import { fade, slide } from 'svelte/transition';
 
 	/**
 	 * @typedef Toast
@@ -48,7 +49,13 @@
 	});
 </script>
 
-<article class="toast" style:--bg="var(--bg-{style})" style:--fg="var(--fg-{style})">
+<article
+	class="toast"
+	style:--bg="var(--bg-{style})"
+	style:--fg="var(--fg-{style})"
+	in:slide={{ axis: 'y', duration: 200 }}
+	out:fade={{ duration: 200 }}
+>
 	<div class="icon"><Icon /></div>
 	<p>{message}</p>
 	<section class="actions">
@@ -57,7 +64,6 @@
 				{action}
 			</ButtonInk>
 		{/if}
-		<!-- TODO: Use ButtonInk / ButtonIcon -->
 		{#if dismiss}
 			<ButtonInk onclick={ondismiss}>
 				{dismiss}
