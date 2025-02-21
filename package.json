@@ -52,6 +52,8 @@
 		"@tensorflow/tfjs": "^4.22.0",
 		"fuse.js": "^7.1.0",
 		"sveltejs-tippy": "^3.0.0",
+		"date-fns": "^4.1.0",
+		"sveltejs-tippy": "^3.0.0",
 		"unplugin-icons": "^22.0.0"
 	},
 	"volta": {
