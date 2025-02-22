@@ -1,37 +1,48 @@
-/**
- * @typedef ID
- * @type {string}
- */
+import { type } from 'arktype';
+
+const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
 
 /**
- * @typedef Probability
- * @type {number} between 0 and 1
+ * Between 0 and 1
  */
+const Probability = type('0 <= number <= 1');
+
+const MetadataValues = type({
+	// TODO: figure out a way to reuse the ID const
+	'[/[a-z0-9_]+/]': {
+		value: 'string',
+		confidence: Probability,
+		alternatives: {
+			'[string]': Probability
+		}
+	}
+});
+
+const Image = type({
+	id: ID,
+	filename: 'string',
+	metadata: MetadataValues
+});
+
+const Observation = type({
+	id: ID,
+	label: 'string',
+	metadataOverrides: MetadataValues,
+	images: Image.array()
+});
+
+const MetadataType = type.enumerated(
+	'string',
+	'boolean',
+	'integer',
+	'float',
+	'enum',
+	'date',
+	'location'
+);
 
 /**
- * @typedef Image
- * @type {object}
- * @property {ID} id
- * @property {string} filename
- * @property {MetadataValues} metadata
- */
-
-/**
- * @typedef Observation
- * @type {object}
- * @property {ID} id
- * @property {string} label
- * @property {MetadataValues} metadataOverrides
- * @property {Image[]} images
- */
-
-/**
- * @typedef MetadataType
- * @type { "string" | "boolean" | "integer" | "float" | "enum" | "date" | "location" }
- */
-
-/**
- * @type { Record<MetadataType, string> }
+ * @type { Record<typeof MetadataType.infer, string> }
  */
 export const METADATA_TYPES = {
 	string: 'texte',
@@ -43,13 +54,10 @@ export const METADATA_TYPES = {
 	location: 'localisation'
 };
 
-/**
- * @typedef MetadataMergeMethod
- * @type { "min" | "max" | "average" | "median" | "none" }
- */
+const MetadataMergeMethod = type.enumerated('min', 'max', 'average', 'median', 'none');
 
 /**
- * @type { Record<MetadataMergeMethod, { label: string; help: string }> }
+ * @type { Record<typeof MetadataMergeMethod.infer, { label: string; help: string }> }
  */
 export const METADATA_MERGE_METHODS = {
 	min: {
@@ -74,54 +82,43 @@ export const METADATA_MERGE_METHODS = {
 	}
 };
 
-/**
- * @typedef MetadataEnumVariant
- * @type {object}
- * @property {string} key
- * @property {string} label
- * @property {string} description
- * @property {?URL} learnMore
- */
+const MetadataEnumVariant = type({
+	key: ID,
+	label: 'string',
+	description: 'string',
+	learnMore: 'string.url.parse | null'
+});
+const Metadata = type({
+	id: ID,
+	label: 'string',
+	type: MetadataType,
+	mergeMethod: MetadataMergeMethod,
+	options: MetadataEnumVariant.array().atLeastLength(1).optional(),
+	required: 'boolean',
+	description: 'string',
+	learnMore: 'string.url.parse | null'
+});
+
+const Protocol = type({
+	id: ID,
+	name: 'string',
+	source: 'string.url.parse | null',
+	metadata: Metadata.array(),
+	author: {
+		email: 'string',
+		name: 'string'
+	}
+});
+
+const Settings = type({
+	protocols: Protocol.array(),
+	theme: type.enumerated('dark', 'light', 'auto'),
+	gridSize: 'number',
+	language: type.enumerated('fr')
+});
 
 /**
- * @typedef Metadata
- * @type {object}
- * @property {ID} id
- * @property {string} label
- * @property {MetadataType} type
- * @property {MetadataMergeMethod} mergeMethod
- * @property {MetadataEnumVariant[]} [options=[]]
- * @property {boolean} required
- * @property {string} description
- * @property {?URL} learnMore
- */
-
-/**
- * @typedef Protocol
- * @type {object}
- * @property {ID} id
- * @property {string} name
- * @property {?URL} source
- * @property {?{ email: string; name: string }} author
- * @property {Metadata[]} metadata
- */
-
-/**
- * @typedef Settings
- * @type {object}
- * @property {Protocol[]} protocols
- * @property {"dark"|"light"|"auto"} theme
- * @property {number} gridSize
- * @property {"fr"} language
- */
-
-/**
- * @typedef MetadataValues
- * @type {{[metadata: ID]: { value: string; confidence: Probability; alternatives: Record<string, Probability> }}}
- */
-
-/**
- * @type {Metadata[]}
+ * @type {Array<typeof Metadata.infer>}
  */
 export const BUILTIN_METADATA = [
 	{
@@ -157,3 +154,72 @@ export const BUILTIN_METADATA = [
 		required: true
 	}
 ];
+
+export const Schemas = {
+	ID,
+	Probability,
+	MetadataValues,
+	Image,
+	Observation,
+	MetadataType,
+	MetadataMergeMethod,
+	MetadataEnumVariant,
+	Metadata,
+	Protocol,
+	Settings
+};
+
+/**
+ * @typedef  ID
+ * @type {typeof ID.infer}
+ */
+
+/**
+ * @typedef  Probability
+ * @type {typeof Probability.infer}
+ */
+
+/**
+ * @typedef  MetadataValues
+ * @type {typeof MetadataValues.infer}
+ */
+
+/**
+ * @typedef  Image
+ * @type {typeof Image.infer}
+ */
+
+/**
+ * @typedef  Observation
+ * @type {typeof Observation.infer}
+ */
+
+/**
+ * @typedef  MetadataType
+ * @type {typeof MetadataType.infer}
+ */
+
+/**
+ * @typedef  MetadataMergeMethod
+ * @type {typeof MetadataMergeMethod.infer}
+ */
+
+/**
+ * @typedef  MetadataEnumVariant
+ * @type {typeof MetadataEnumVariant.infer}
+ */
+
+/**
+ * @typedef  Metadata
+ * @type {typeof Metadata.infer}
+ */
+
+/**
+ * @typedef  Protocol
+ * @type {typeof Protocol.infer}
+ */
+
+/**
+ * @typedef  Settings
+ * @type {typeof Settings.infer}
+ */
