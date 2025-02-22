@@ -11,6 +11,15 @@ declare global {
 		interface PageState extends Record<string, any> {}
 		// interface Platform {}
 	}
+
+	interface ArkEnv {
+		meta(): {
+			// meta properties should always be optional
+			table?: {
+				keyPath: string | string[];
+			};
+		};
+	}
 }
 
 export {};
