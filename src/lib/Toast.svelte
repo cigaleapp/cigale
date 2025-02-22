@@ -21,9 +21,9 @@
 	 * @property {string} message the toast to display
 	 * @property {Toast['type']} type the type of toast to display
 	 * @property {?() => void} onaction the action to perform when the user interacts with the toast
-	 * @property {?string} action the text to use for the action button
+	 * @property {string} [action] the text to use for the action button
 	 * @property {?() => void} ondismiss the action to perform when the user dismisses the toast
-	 * @property {?string} dismiss the text to use for the dismiss button. If not set, a close icon will be used instead
+	 * @property {string} [dismiss] the text to use for the dismiss button. If not set, a close icon will be used instead
 	 */
 
 	/** @type {Props} */
