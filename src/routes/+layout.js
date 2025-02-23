@@ -1,9 +1,8 @@
-import { openDatabase } from '$lib/idb';
+import { fillBuiltinData, get } from '$lib/idb';
 
 export async function load() {
-	const db = await openDatabase();
+	await fillBuiltinData();
 	return {
-		db,
-		showInputHints: await db.get('Settings', '_').then((settings) => settings?.showInputHints)
+		showInputHints: await get('Settings', '_').then((settings) => settings?.showInputHints)
 	};
 }
