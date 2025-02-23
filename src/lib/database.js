@@ -3,15 +3,6 @@ import { type } from 'arktype';
 // TODO make table() take an object that can be passed to type() instead of a schema
 //  * @template { {[x: string]: import('arktype').Type | string} } Schema
 
-/**
- *
- * @param {string|string[]} keyPath
- * @param {Schema} schema
- * @template {import('arktype').Type} Schema
- * @returns
- */
-const table = (keyPath, schema) => schema.configure({ table: { keyPath } });
-
 const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
 
 /**
@@ -22,8 +13,8 @@ const Probability = type('0 <= number <= 1');
 const MetadataValues = type({
 	// TODO: figure out a way to reuse the ID const
 	'[/[a-z0-9_]+/]': {
-		value: 'string',
-		confidence: Probability,
+		value: 'string.json',
+		confidence: Probability.default(1),
 		alternatives: {
 			'[string]': Probability
 		}
@@ -206,6 +197,17 @@ export const Tables = {
 	Protocol,
 	Settings
 };
+
+/**
+ *
+ * @param {string|string[]} keyPath
+ * @param {Schema} schema
+ * @template {import('arktype').Type} Schema
+ * @returns
+ */
+function table(keyPath, schema) {
+	return schema.configure({ table: { keyPath } });
+}
 
 /**
  * @typedef  ID

@@ -1,4 +1,4 @@
-import { get, set } from './idb';
+import { tables } from './idb';
 
 /**
  *
@@ -7,13 +7,13 @@ import { get, set } from './idb';
  * @template {keyof import("./database").Settings} Key
  */
 export async function setSetting(key, value) {
-	const current = (await get('Settings', 'user')) ?? (await get('Settings', 'defaults'));
+	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
 
 	if (!current) {
 		throw new Error("Les réglages par défaut n'ont pas été initialisés. Rechargez la page.");
 	}
 
-	return set('Settings', {
+	return tables.Settings.set({
 		...current,
 		layer: 'user',
 		[key]: value
@@ -26,7 +26,7 @@ export async function setSetting(key, value) {
  * @template {keyof import("./database").Settings} Key
  */
 export async function getSetting(key) {
-	const settings = (await get('Settings', 'user')) ?? (await get('Settings', 'defaults'));
+	const settings = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
 
 	if (!settings) {
 		throw new Error("Les réglages par défaut n'ont pas été initialisés. Rechargez la page.");
