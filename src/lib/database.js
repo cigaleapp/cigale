@@ -136,9 +136,9 @@ const Protocol = table(
 );
 
 const Settings = table(
-	'_',
+	'layer',
 	type({
-		_: '"_"',
+		layer: '"defaults" | "user"',
 		protocols: Protocol.array(),
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: 'number',
