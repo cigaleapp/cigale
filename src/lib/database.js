@@ -10,31 +10,35 @@ const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
  */
 const Probability = type('0 <= number <= 1');
 
-const MetadataValues = type({
-	// TODO: figure out a way to reuse the ID const
-	'[/[a-z0-9_]+/]': {
-		value: 'string.json',
-		confidence: Probability.default(1),
-		alternatives: {
-			'[string]': Probability
-		}
+const MetadataValue = type({
+	value: 'string.json.parse',
+	confidence: Probability.default(1),
+	alternatives: {
+		'[string.json]': Probability
 	}
 });
 
+const MetadataValues = type({
+	// TODO: figure out a way to reuse the ID const
+	'[/[a-z0-9_]+/]': MetadataValue
+});
+
 const Image = table(
-	'id',
+	['id', 'addedAt'],
 	type({
 		id: ID,
 		filename: 'string',
+		addedAt: 'string.date.iso.parse',
 		metadata: MetadataValues
 	})
 );
 
 const Observation = table(
-	'id',
+	['id', 'addedAt'],
 	type({
 		id: ID,
 		label: 'string',
+		addedAt: 'string.date.iso.parse',
 		metadataOverrides: MetadataValues,
 		images: ID.array()
 	})
@@ -95,7 +99,7 @@ const MetadataEnumVariant = type({
 	key: ID,
 	label: 'string',
 	description: 'string',
-	learnMore: 'string.url | null'
+	learnMore: 'string.url.parse | null'
 });
 
 const Metadata = table(
@@ -108,7 +112,7 @@ const Metadata = table(
 		options: MetadataEnumVariant.array().atLeastLength(1).optional(),
 		required: 'boolean',
 		description: 'string',
-		learnMore: 'string.url | null'
+		learnMore: 'string.url.parse | null'
 	})
 );
 
@@ -117,7 +121,7 @@ const Protocol = table(
 	type({
 		id: ID,
 		name: 'string',
-		source: 'string.url | null',
+		source: 'string.url.parse | null',
 		metadata: ID.array(),
 		author: {
 			email: 'string',
@@ -139,7 +143,7 @@ const Settings = table(
 );
 
 /**
- * @type {Array<typeof Metadata.infer>}
+ * @type {Array<typeof Metadata.inferIn>}
  */
 export const BUILTIN_METADATA = [
 	{
@@ -173,6 +177,15 @@ export const BUILTIN_METADATA = [
 		type: 'date',
 		mergeMethod: 'average',
 		required: true
+	},
+	{
+		id: 'shoot_location',
+		description: 'Localisation de la prise de vue',
+		label: 'Lieu',
+		learnMore: null,
+		type: 'location',
+		mergeMethod: 'average',
+		required: false
 	}
 ];
 
@@ -200,13 +213,17 @@ export const Tables = {
 
 /**
  *
- * @param {string|string[]} keyPath
+ * @param {string|string[]|string[][]} keyPaths expanded to a 2D array. Every element is an index to be created. Name of the indexes are dot-joined. First index is given as the keyPath argument when creating the object store instead.
  * @param {Schema} schema
  * @template {import('arktype').Type} Schema
  * @returns
  */
-function table(keyPath, schema) {
-	return schema.configure({ table: { keyPath } });
+function table(keyPaths, schema) {
+	const expandedKeyPaths = Array.isArray(keyPaths)
+		? keyPaths.map((keyPath) => (Array.isArray(keyPath) ? keyPath : [keyPath]))
+		: [[keyPaths]];
+
+	return schema.configure({ table: { indexes: expandedKeyPaths } });
 }
 
 /**
@@ -217,6 +234,11 @@ function table(keyPath, schema) {
 /**
  * @typedef  Probability
  * @type {typeof Probability.infer}
+ */
+
+/**
+ * @typedef  MetadataValue
+ * @type {typeof MetadataValue.infer}
  */
 
 /**

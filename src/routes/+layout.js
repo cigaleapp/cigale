@@ -1,5 +1,5 @@
 import { BUILTIN_METADATA } from '$lib/database';
-import { set } from '$lib/idb';
+import { tables } from '$lib/idb';
 import { getSetting } from '$lib/settings';
 
 export async function load() {
@@ -11,8 +11,8 @@ export async function load() {
 
 async function fillBuiltinData() {
 	await Promise.allSettled([
-		...BUILTIN_METADATA.map(async (m) => set('Metadata', m)),
-		set('Settings', {
+		...BUILTIN_METADATA.map(tables.Metadata.set),
+		tables.Settings.set({
 			layer: 'defaults',
 			protocols: [],
 			theme: 'auto',

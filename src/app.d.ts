@@ -16,7 +16,7 @@ declare global {
 		meta(): {
 			// meta properties should always be optional
 			table?: {
-				keyPath: string | string[];
+				indexes: string[][]
 			};
 		};
 	}
