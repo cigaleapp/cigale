@@ -45,7 +45,7 @@ const Observation = table(
 		id: ID,
 		label: 'string',
 		metadataOverrides: MetadataValues,
-		images: Image.array()
+		images: ID.array()
 	})
 );
 
@@ -127,7 +127,7 @@ const Protocol = table(
 		id: ID,
 		name: 'string',
 		source: 'string.url | null',
-		metadata: Metadata.array(),
+		metadata: ID.array(),
 		author: {
 			email: 'string',
 			name: 'string'
@@ -139,7 +139,7 @@ const Settings = table(
 	'layer',
 	type({
 		layer: '"defaults" | "user"',
-		protocols: Protocol.array(),
+		protocols: ID.array(),
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: 'number',
 		language: type.enumerated('fr'),
