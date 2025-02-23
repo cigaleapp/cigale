@@ -1,18 +1,31 @@
 import { openDB } from 'idb';
-import { BUILTIN_METADATA, Tables } from './database';
+import { Tables } from './database';
 
-export async function fillBuiltinData() {
-	await Promise.allSettled([
-		...BUILTIN_METADATA.map(async (m) => set('Metadata', m)),
-		set('Settings', {
-			layer: 'defaults',
-			protocols: [],
-			theme: 'auto',
-			gridSize: 10,
-			language: 'fr',
-			showInputHints: true
-		})
-	]);
+/** @type {Array<keyof typeof Tables>} */
+// @ts-ignore
+const tableNames = Object.keys(Tables);
+
+/**
+ *
+ * @type {{
+ *  [Name in keyof typeof Tables]: ReturnType<typeof wrangler<Name>>
+ * }}
+ */
+// @ts-ignore
+export const tables = Object.fromEntries(tableNames.map((name) => [name, wrangler(name)]));
+
+/**
+ *
+ * @param {Table} table
+ * @template {keyof typeof Tables} Table
+ */
+function wrangler(table) {
+	return {
+		/** @param {string} key  */
+		get: async (key) => get(table, key),
+		/** @param {typeof Tables[Table]['inferIn']} value */
+		set: async (value) => set(table, value)
+	};
 }
 
 /**
@@ -56,7 +69,7 @@ export async function openDatabase() {
 	return _database;
 }
 
-// Magie vodou Typescript, pas besoin de comprendre
+// Magie vodoo Typescript, pas besoin de comprendre
 // Si t'es curieuxse, demande à Gwenn qui sera ravie
 // de t'expliquer :3
 /**

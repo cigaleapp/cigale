@@ -8,7 +8,6 @@
 
 	const { children, data } = $props();
 
-	setContext('db', data.db);
 	setContext('showSwitchHints', data.showInputHints);
 </script>
 
