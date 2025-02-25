@@ -14,7 +14,7 @@
 	 */
 
 	/** @type {Props} */
-	let { current_pages = 'Classif', has_images = true } = $props();
+	let { current_pages = 'Import', has_images = true } = $props();
 
 	let openFeur = $state();
 
@@ -133,7 +133,7 @@
 	}
 
 	button:disabled {
-		color: var(--gay);
+		color: var(--gray);
 	}
 
 	button:hover:not(:disabled) {
