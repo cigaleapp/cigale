@@ -3,14 +3,16 @@
 	import { setContext } from 'svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Toast from '$lib/Toast.svelte';
-
 	import './style.css';
+	import Navigation from './Navigation.svelte';
 
 	const { children } = $props();
 
 	// TODO get value from DB
 	setContext('showSwitchHints', true);
 </script>
+
+<Navigation></Navigation>
 
 <svelte:head>
 	<base href={base} />
