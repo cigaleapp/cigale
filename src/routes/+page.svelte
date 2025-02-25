@@ -1,8 +1,9 @@
 <script>
 	import { Jimp } from "jimp";
 	import {infer,loadModel, inferSequentialy} from "./inference.js"
-	import {applyBBsOnImages} from "./inference_utils.js"
+	import {applyBBsOnImages,imload, normalizeTensors, applyBBsOnTensors} from "./inference_utils.js"
 	import {img_proceed} from './state.svelte.js';
+	import { input, norm } from "@tensorflow/tfjs";
 
 	//ort.env.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@dev/dist/';
 
@@ -12,7 +13,7 @@
 	let crop_canvas; // The canvas containing the cropped insect.
 	let processedContainer; // Container DOM element for the preprocessed canvas.
 	let cropContainer; // Container DOM element for the cropped image.
-	export let croppedImages = [];
+	export let croppedImagesMIME = [];
 	let model = null;
 
 	async function processImage() {
@@ -47,10 +48,16 @@
 			ctx.putImageData(imageData, 0, 0);
 			
 			//var BsandBs = await infer(image_file,model, img_proceed);
+
 			var BsandBs = await inferSequentialy(image_file,model, img_proceed);
+
 			let boundingboxes = BsandBs[0];
 			let bestScores = BsandBs[1];
 			let start = BsandBs[2];
+			let inputTensors = BsandBs[3];
+			//console.log('inputTensors before: ', await  inputTensors[0].getData());
+			//inputTensors = await normalizeTensors(inputTensors, [0.5,0.5,0.5],[0.5,0.5,0.5]);
+			//console.log('inputTensors after: ',  await inputTensors[0].getData());
 
 			let best_boxes = boundingboxes[0];
 			let bestScore = bestScores[0];
@@ -72,7 +79,7 @@
 			let i =0;
 			for (let file of files) {
 
-				let img = await Jimp.read(URL.createObjectURL(file));
+				let img = await Jimp.read(URL.createObjectURL(file));	
 								
 				images.push(img);
 				img_proceed.nb = i+1;
@@ -81,8 +88,10 @@
 			}
 			
 			img_proceed.state= "finished"
-
-			croppedImages = await applyBBsOnImages( boundingboxes, images);
+			let ctensor = await applyBBsOnTensors( boundingboxes, inputTensors);
+			console.log('ctensor : ', ctensor);
+			let cImages = await applyBBsOnImages( boundingboxes, images);
+			croppedImagesMIME = cImages[0];
 		}
 	}
 
@@ -114,7 +123,6 @@
     }
 </style>
 
-
 <h1>dect'insect</h1>
 
 <!-- Step 1: Ask the user to load an image -->
@@ -132,7 +140,7 @@
 <p>image proceed : {img_proceed.nb}  ;  time taken (s): {img_proceed.time}</p>
 
 <div class="grid-container">
-    {#each croppedImages as row}
+    {#each croppedImagesMIME as row}
         {#each row as image}
             <div class="grid-item">
                 <img src={image} alt="Cropped Image">
