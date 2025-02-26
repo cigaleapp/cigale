@@ -105,7 +105,7 @@ export function postprocess_BB(boundingboxes,numfiles) {
 }
 
 export async function imload(files, targetWidth, targetHeight) {
-    const float32Data = new Float32Array(targetHeight * targetWidth * 3 * files.length);
+    var float32Data = new Float32Array(targetHeight * targetWidth * 3 * files.length);
     for (let f = 0; f < files.length; f++) {
         let file = files[f];
 
@@ -129,6 +129,7 @@ export async function imload(files, targetWidth, targetHeight) {
             float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
         }
     }
+    
 
     console.log('done !');
     var tensor = new ort.Tensor('float32', float32Data, [
@@ -137,6 +138,7 @@ export async function imload(files, targetWidth, targetHeight) {
         targetHeight,
         targetWidth
     ]);
+    float32Data = new Float32Array(0);
     return tensor;
 }
   

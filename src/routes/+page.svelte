@@ -86,17 +86,7 @@
 			}
 
 			
-			let images = [];
-			let i =0;
-			for (let file of files) {
-
-				let img = await Jimp.Jimp.read(URL.createObjectURL(file));	
-								
-				images.push(img);
-				img_proceed.nb = i+1;
-				img_proceed.time = (Date.now()-start)/1000;
-				i++;
-			}
+			
 			
 			img_proceed.state= "finished"
 			let ctensors = await applyBBsOnTensors( boundingboxes, inputTensors);
