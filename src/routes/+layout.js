@@ -19,6 +19,13 @@ async function fillBuiltinData() {
 			gridSize: 10,
 			language: 'fr',
 			showInputHints: true
+		}),
+		tables.Protocol.set({
+			id: 'test',
+			name: 'Test',
+			source: null,
+			author: { email: '', name: '' },
+			metadata: BUILTIN_METADATA.map(({ id }) => id)
 		})
 	]);
 }

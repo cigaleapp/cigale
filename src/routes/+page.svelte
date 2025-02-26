@@ -1,6 +1,8 @@
 <script>
-	import * as tf from '@tensorflow/tfjs';
+	import ButtonInk from '$lib/ButtonInk.svelte';
+	import { exportProtocol, importProtocol } from '$lib/protocols';
 	import * as mobilenet from '@tensorflow-models/mobilenet';
+	import * as tf from '@tensorflow/tfjs';
 	let image_file = $state();
 	let classe = $state();
 	let certainty = $state();
@@ -44,3 +46,19 @@
 <input type="file" accept="image/*" bind:files={image_file} />
 <p>classse : {classe} with certainty : {certainty}</p>
 <canvas id="canvas" bind:this={canva_element}></canvas>
+
+<ButtonInk
+	onclick={async () => {
+		await exportProtocol('test');
+	}}
+>
+	Export
+</ButtonInk>
+
+<ButtonInk
+	onclick={async () => {
+		await importProtocol();
+	}}
+>
+	Import
+</ButtonInk>
