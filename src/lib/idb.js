@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { Tables } from './database';
+import { Tables } from './database.js';
 
 /** @type {Array<keyof typeof Tables>} */
 // @ts-ignore

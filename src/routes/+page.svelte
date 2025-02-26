@@ -3,6 +3,7 @@
 	import { exportProtocol, importProtocol } from '$lib/protocols';
 	import * as mobilenet from '@tensorflow-models/mobilenet';
 	import * as tf from '@tensorflow/tfjs';
+	import { toasts } from '$lib/toasts.svelte.js';
 	let image_file = $state();
 	let classe = $state();
 	let certainty = $state();
@@ -57,7 +58,14 @@
 
 <ButtonInk
 	onclick={async () => {
-		await importProtocol();
+		try {
+			const protocol = await importProtocol();
+			toasts.success(
+				`Protocole ${protocol.name} (dont ${protocol.metadata.length} métadonnées) importé`
+			);
+		} catch (e) {
+			toasts.error(e.toString());
+		}
 	}}
 >
 	Import
