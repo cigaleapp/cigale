@@ -24,7 +24,7 @@
 		if (current_pages != 'Import') {
 			where_do_i_go = 'Import';
 			console.log('IL A CLICKEEEEEEEEEEE');
-			openFeur = true;
+			openFeur();
 		}
 	}
 
@@ -33,7 +33,7 @@
 			current_pages = 'Crop';
 		} else if (current_pages != 'Crop') {
 			where_do_i_go = 'Crop';
-			openFeur = true;
+			openFeur();
 		}
 	}
 
@@ -42,7 +42,7 @@
 			current_pages = 'Classif';
 		} else if (current_pages != 'Classif') {
 			where_do_i_go = 'Classif';
-			openFeur = true;
+			openFeur();
 		}
 	}
 
@@ -51,18 +51,21 @@
 	}
 </script>
 
-<ModalConfirm
-	key="Confirmation"
-	title="Attention"
-	onconfirm={() => {
-		current_pages = where_do_i_go;
-	}}
-	bind:open={openFeur}
->
-	<p>
-		Êtes vous sur de vouloir revenir en arrière? Cela peut engendrer de la perte de vos avancements.
-	</p>
-</ModalConfirm>
+<div class="center">
+	<ModalConfirm
+		key="Confirmation"
+		title="Attention"
+		onconfirm={() => {
+			current_pages = where_do_i_go;
+		}}
+		bind:open={openFeur}
+	>
+		<p>
+			Êtes vous sur de vouloir revenir en arrière? Cela peut engendrer de la perte de vos
+			avancements.
+		</p>
+	</ModalConfirm>
+</div>
 
 <div class="navigation">
 	<div class="divLogo">
