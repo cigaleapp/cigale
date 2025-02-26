@@ -1,3 +1,7 @@
+stages:
+  - test
+  - deploy
+
 # The Docker image that will be used to build your app
 image: node:22.14.0
 # Functions that should be executed before the build script is run
@@ -16,6 +20,15 @@ pages:
     # This ensures that only pushes to the default branch will trigger
     # a pages deploy
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+check:
+  stage: test
+  script:
+    - npm i
+    - npx svelte-check
+
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 develop:
   artifacts:
