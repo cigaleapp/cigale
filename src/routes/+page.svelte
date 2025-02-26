@@ -4,6 +4,7 @@
 	import * as mobilenet from '@tensorflow-models/mobilenet';
 	import * as tf from '@tensorflow/tfjs';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import { base } from '$app/paths';
 	let image_file = $state();
 	let classe = $state();
 	let certainty = $state();
@@ -50,7 +51,7 @@
 
 <ButtonInk
 	onclick={async () => {
-		await exportProtocol('test');
+		await exportProtocol(base, 'test');
 	}}
 >
 	Export
@@ -64,7 +65,7 @@
 				`Protocole ${protocol.name} (dont ${protocol.metadata.length} métadonnées) importé`
 			);
 		} catch (e) {
-			toasts.error(e.toString());
+			toasts.error(e?.toString() ?? 'Erreur inattendue');
 		}
 	}}
 >

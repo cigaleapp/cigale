@@ -1,4 +1,3 @@
-import { base } from '$app/paths';
 import { Schemas } from './database.js';
 import { tables } from './idb.js';
 
@@ -14,9 +13,10 @@ export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
 
 /**
  * Exports a protocol by ID into a JSON file, and triggers a download of that file.
+ * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {import("./database").ID} id
  */
-export async function exportProtocol(id) {
+export async function exportProtocol(base, id) {
 	let protocol = await tables.Protocol.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
 
@@ -54,8 +54,9 @@ export async function importProtocol() {
 			const reader = new FileReader();
 			reader.onload = async () => {
 				try {
-					const protocol = JSON.parse(reader.result);
-					ExportedProtocol.assert(protocol);
+					if (!reader.result) throw new Error('Fichier vide');
+					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
+					const protocol = ExportedProtocol.assert(JSON.parse(reader.result));
 					await Promise.all([
 						...protocol.metadata.map((m) => tables.Metadata.set(m)),
 						tables.Protocol.set({
