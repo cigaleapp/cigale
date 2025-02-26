@@ -55,10 +55,15 @@ function wrangler(table) {
  * @template {keyof typeof Tables} TableName
  */
 export async function set(tableName, value) {
+	const key = 'id' in value ? value.id : value.layer;
+	console.time(`set ${tableName} ${key}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	validator.assert(value);
-	return await db.put(tableName, value);
+	return await db.put(tableName, value).then((result) => {
+		console.timeEnd(`set ${tableName} ${key}`);
+		return result;
+	});
 }
 
 /**
@@ -69,11 +74,14 @@ export async function set(tableName, value) {
  * @template {keyof typeof Tables} TableName
  */
 export async function get(tableName, key) {
+	console.time(`get ${tableName} ${key}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
-	return await db
-		.get(tableName, key)
-		.then((value) => (value ? validator.assert(value) : undefined));
+	return await db.get(tableName, key).then((value) => {
+		const out = value ? validator.assert(value) : undefined;
+		console.timeEnd(`get ${tableName} ${key}`);
+		return out;
+	});
 }
 
 /**
