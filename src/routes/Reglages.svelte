@@ -3,8 +3,9 @@
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import Gears from '~icons/ph/gear-light';
-	/** import Sun from "~icons/ph/sun-light";
-    import Moon from "~icons/ph/moon-light"; */
+	import Sun from '~icons/ph/sun-light';
+	import Moon from '~icons/ph/moon-light';
+	import Cross from '~icons/ph/x-circle-light';
 
 	/**    let Screentheme = window.matchMedia('(prefers-color-scheme: dark)').addEventListener(({ matches }) => {
                         if (matches) "Sombre"
@@ -29,7 +30,17 @@
 	</div>
 	<div class="listParam">
 		<div class="Sizeimage">
-			Nombre d'images par ligne :
+			<div class="TextFermeture">
+				Nombre d'images par ligne :
+				<Cross
+					cursor="pointer"
+					onclick={() => {
+						let listParam = document.querySelector('.listParam');
+						listParam.style.visibility = 'hidden';
+						open = false;
+					}}
+				></Cross>
+			</div>
 			<input type="range" id="size" name="size" min="1" max="20" class="slider" />
 		</div>
 		<div class="Language">
@@ -39,15 +50,17 @@
 		</div>
 		<div class="Theme">
 			Thème :
-			<Switch>
-				<!--  <Sun></Sun>
-                <Moon></Moon> -->
-			</Switch>
+			<Switch icons={{ on: Sun, off: Moon }}></Switch>
 		</div>
 	</div>
 </div>
 
 <style>
+	.TextFermeture {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+	}
 	.container {
 		margin-left: auto;
 		margin-right: 0;
