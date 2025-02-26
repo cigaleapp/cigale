@@ -118,7 +118,7 @@ export async function preprocess_for_classification(tensors,mean, std) {
 export async function loadClassMapping(classmapping) {
     const response = await fetch(classmapping);
     const text = await response.text();
-    classmap = text.split('\n');
+    let classmap = text.split('\n');
     return classmap;
 }
 
