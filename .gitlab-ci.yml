@@ -25,6 +25,7 @@ check:
   stage: test
   script:
     - npm i
+    - npx svelte-kit sync
     - npx svelte-check
 
   rules:
