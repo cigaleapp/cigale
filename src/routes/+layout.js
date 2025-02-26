@@ -27,7 +27,7 @@ async function fillBuiltinData(url) {
 			id: 'test',
 			name: 'Test',
 			source: url.href,
-			author: { email: '', name: '' },
+			authors: [],
 			metadata: BUILTIN_METADATA.map(({ id }) => id)
 		})
 	]);

@@ -13,7 +13,7 @@ const Probability = type('0 <= number <= 1');
 /**
  * Can't use string.url.parse because it prevents us from generating JSON schemas
  */
-const URLString = type('/https?:\\/\\/.+/').pipe((maybeUrl) => new URL(maybeUrl));
+const URLString = type('/https?:\\/\\/.+/');
 
 const MetadataValue = type({
 	value: type('string.json.parse').pipe(
@@ -128,10 +128,10 @@ const ProtocolWithoutMetadata = type({
 	id: ID,
 	name: 'string',
 	source: URLString,
-	author: {
-		email: 'string',
+	authors: type({
+		email: 'string.email',
 		name: 'string'
-	}
+	}).array()
 });
 
 const Protocol = table(
