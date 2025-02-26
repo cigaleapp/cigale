@@ -5,11 +5,14 @@
 	import { setContext } from 'svelte';
 
 	import './style.css';
+	import Navigation from './Navigation.svelte';
 
 	const { children, data } = $props();
 
 	setContext('showSwitchHints', data.showInputHints);
 </script>
+
+<Navigation hasImages={true}></Navigation>
 
 <svelte:head>
 	<base href={base} />

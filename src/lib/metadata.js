@@ -37,8 +37,6 @@ export async function storeMetadataValue(
 	}
 }
 
-
-
 /**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
  * @param {import('./database').Observation} observation
@@ -87,7 +85,7 @@ export async function mergeMetadataValues(images) {
 			images.flatMap((img) =>
 				Object.entries(img.metadata)
 					.filter(([k]) => k === key)
-					.map(([_, v]) => v)
+					.map(([, v]) => v)
 			)
 		);
 	}
@@ -103,19 +101,34 @@ export async function mergeMetadataValues(images) {
 function mergeMetadata(definition, values) {
 	switch (definition.mergeMethod) {
 		case 'average':
-			return mergeAverage(
-				definition.type,
-				values.map((v) => v.value)
-			);
+			return {
+				value: mergeAverage(
+					definition.type,
+					// @ŧs-ignore
+					values.map((v) => v.value)
+				),
+				confidence: 0 /*todo*/,
+				alternatives: {}
+			};
 		case 'max':
-			return mergeMajority(definition, values);
+			// return mergeMajority(definition, values);
+			throw new Error('Pas encore implémenté!');
 		case 'min':
-			return mergeMinority(definition, values);
+			// return mergeMinority(definition, values);
+			throw new Error('Pas encore implémenté!');
 		case 'median':
-			return mergeMedian(definition, values);
+			return {
+				value: mergeMedian(
+					definition.type,
+					values.map((v) => v.value)
+				),
+				confidence: 0 /*todo*/,
+				alternatives: {}
+			};
 		case 'none':
 			return {
-				value: null,
+				// TODO use null instead
+				value: '',
 				confidence: 0,
 				alternatives: {}
 			};
@@ -131,17 +144,35 @@ function mergeMetadata(definition, values) {
  * @template {import('./database').MetadataType} Type
  */
 function mergeAverage(type, values) {
+	/** @param {typeof values} values  */
 	const average = (values) =>
 		toNumber(type, values).reduce((acc, cur) => acc + cur, 0) / values.length;
 
+	// @ts-ignore
 	if (type === 'boolean') return average(values) > 0.5;
+	// @ts-ignore
 	if (type === 'integer') return Math.ceil(average(values));
+	// @ts-ignore
 	if (type === 'float') return average(values);
+	// @ts-ignore
 	if (type === 'date') return new Date(average(values));
 	if (type === 'location') {
+		// @ts-ignore
 		return {
-			latitude: average(values.map((v) => v.latitude)),
-			longitude: average(values.map((v) => v.longitude))
+			latitude: average(
+				values.map(
+					(v) =>
+						// @ts-ignore
+						v.latitude
+				)
+			),
+			longitude: average(
+				values.map(
+					(
+						v //@ts-ignore
+					) => v.longitude
+				)
+			)
 		};
 	}
 
@@ -157,42 +188,63 @@ function mergeAverage(type, values) {
  * @template {import('./database').MetadataType} Type
  */
 function mergeMedian(type, values) {
-    const median = (values) => {
-        const sorted = toNumber(type, values).sort((a, b) => a - b);
-        const middle = Math.floor(sorted.length / 2);
-        if (sorted.length % 2 === 0) {
-            return (sorted[middle - 1] + sorted[middle]) / 2;
-        }
-        return sorted[middle];
-    };
+	/** @param {typeof values} values */
+	const median = (values) => {
+		const sorted = toNumber(type, values).sort((a, b) => a - b);
+		const middle = Math.floor(sorted.length / 2);
+		if (sorted.length % 2 === 0) {
+			return (sorted[middle - 1] + sorted[middle]) / 2;
+		}
+		return sorted[middle];
+	};
 
-    if (type === 'boolean') return median(values) > 0.5;
-    if (type === 'integer') return Math.ceil(median(values));
-    if (type === 'float') return median(values);
-    if (type === 'date') return new Date(median(values));
-    if (type === 'location') {
-        return {
-            latitude: median(values.map((v) => v.latitude)),
-            longitude: median(values.map((v) => v.longitude))
-        };
-    }
+	// @ts-ignore
+	if (type === 'boolean') return median(values) > 0.5;
+	// @ts-ignore
+	if (type === 'integer') return Math.ceil(median(values));
+	// @ts-ignore
+	if (type === 'float') return median(values);
+	// @ts-ignore
+	if (type === 'date') return new Date(median(values));
+	if (type === 'location') {
+		// @ts-ignore
+		return {
+			latitude: median(
+				values.map(
+					(v) =>
+						// @ts-ignore
+						v.latitude
+				)
+			),
+			longitude: median(
+				values.map(
+					(v) =>
+						// @ts-ignore
+						v.longitude
+				)
+			)
+		};
+	}
 
-    throw new Error(`Impossible de fusionner en mode médiane des valeurs de type ${type}`);
+	throw new Error(`Impossible de fusionner en mode médiane des valeurs de type ${type}`);
 }
-
 
 /**
  * Convert series of values to an output number
  * @param {Type} type
  * @param {Value[]} values
  * @template {RuntimeValue<Type>} Value
- * @template {'integer' | 'float' | 'boolean' | 'date'} Type
+ * @template {import('./database').MetadataType} Type
+ * @returns {number[]}
  */
 function toNumber(type, values) {
+	// @ts-ignore
 	if (type === 'integer') return values;
+	// @ts-ignore
 	if (type === 'float') return values;
 	if (type === 'boolean') return values.map((v) => (v ? 1 : 0));
-	if (type === 'date') return values.map((v) => v.getTime());
+	if (type === 'date') return values.map((v) => new Date(/** @type {Date|string} */ (v)).getTime());
+	throw new Error(`Impossible de convertir des valeurs de type ${type} en nombre`);
 }
 
 /**
