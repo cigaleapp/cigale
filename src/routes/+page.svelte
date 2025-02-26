@@ -13,22 +13,19 @@
 			let reader = new FileReader();
 			reader.onload = function (e) {
 				let img = new Image();
+				if (!e.target) return;
+				if (typeof e.target.result !== 'string') return;
 				img.src = e.target.result;
 				img.onload = async function () {
-					let tensor = tf.browser.fromPixels(img).resizeBilinear([224, 224]).toFloat();
-					tensor = tensor.div(tensor.max());
-					tensor = tensor.sub(tensor.mean());
-
 					let tensor_copy = tf.browser.fromPixels(img).clone();
 
+					// @ts-ignore
 					tensor_copy = tensor_copy.resizeBilinear([224, 224]).toFloat();
 					tensor_copy = tensor_copy.div(255.0);
 
 					canva_element.width = 224;
 					canva_element.height = 224;
 					await tf.browser.toPixels(tensor_copy, canva_element);
-
-					tensor = tensor.expandDims();
 
 					const model = await mobilenet.load();
 					const predictions = await model.classify(img);
