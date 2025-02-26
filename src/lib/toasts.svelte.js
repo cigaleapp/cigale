@@ -110,6 +110,17 @@ export class Toasts {
 	}
 
 	/**
+	 * Displays a success toast.
+	 * @template T
+	 * @param {string} message
+	 * @param {ToastOptions<T>} [options]
+	 * @returns {string | undefined}
+	 */
+	success(message, options) {
+		return this.add('success', message, options);
+	}
+
+	/**
 	 * Removes a toast by ID.
 	 * @param {string} id
 	 * @returns {Promise<void>}
