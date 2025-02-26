@@ -64,7 +64,7 @@ export class Toasts {
 		const newToast = {
 			addedAt: new Date(),
 			id,
-			message,
+			message: message.replaceAll('\n', '; '),
 			type,
 			labels: labels ?? {},
 			// @ts-ignore
@@ -107,6 +107,17 @@ export class Toasts {
 			...options,
 			lifetime: options?.lifetime ?? 'inferred'
 		});
+	}
+
+	/**
+	 * Displays a success toast.
+	 * @template T
+	 * @param {string} message
+	 * @param {ToastOptions<T>} [options]
+	 * @returns {string | undefined}
+	 */
+	success(message, options) {
+		return this.add('success', message, options);
 	}
 
 	/**
