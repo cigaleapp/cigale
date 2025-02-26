@@ -51,21 +51,18 @@
 	}
 </script>
 
-<div class="center">
-	<ModalConfirm
-		key="Confirmation"
-		title="Attention"
-		onconfirm={() => {
-			current_pages = where_do_i_go;
-		}}
-		bind:open={openFeur}
-	>
-		<p>
-			Êtes vous sur de vouloir revenir en arrière? Cela peut engendrer de la perte de vos
-			avancements.
-		</p>
-	</ModalConfirm>
-</div>
+<ModalConfirm
+	key="Confirmation"
+	title="Attention"
+	onconfirm={() => {
+		current_pages = where_do_i_go;
+	}}
+	bind:open={openFeur}
+>
+	<p>
+		Êtes vous sur de vouloir revenir en arrière? Cela peut engendrer de la perte de vos avancements.
+	</p>
+</ModalConfirm>
 
 <div class="navigation">
 	<div class="divLogo">
