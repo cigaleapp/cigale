@@ -99,33 +99,28 @@
 			}
 			
 			img_proceed.state= "finished"
-			let ctensor = await applyBBsOnTensors( boundingboxes, inputTensors);
-			// normalisation des images pr le resnet
-			let new_ctensors = [];
-			for (let i=0;i<ctensor.length;i++) {
-				let c = ctensor[i];
-				c = await normalizeTensors(c, MEAN,STD);
-				c = await resizeTensors(c, 224,224);
-				new_ctensors.push(c);
-			}
+			let ctensors = await applyBBsOnTensors( boundingboxes, inputTensors);
+			
 
 			// initialisation des labels : 
 			labels = [];
 			conf = []
-			for (let i=0;i<new_ctensors.length;i++) {
+			for (let i=0;i<ctensors.length;i++) {
 				let l = [];
-				for (let j=0; j<new_ctensors[i].length; j++) {
+				let c = [];
+				for (let j=0; j<ctensors[i].length; j++) {
 					l.push("un sect (je crois j'ai pas compris)");
-					conf.push(0);
+					c.push(0);
 				}
 				labels.push(l);
+				conf.push(c);
 			}
 
 			// ça c'est la partie affichage 
 			let croppedImagesURL_buffer = [];
-			for (let i=0;i<new_ctensors.length;i++) {
+			for (let i=0;i<ctensors.length;i++) {
 				let croppedImagesURL_inter = [];
-				let c = new_ctensors[i];
+				let c = ctensors[i];
 				for (let j=0; j<c.length; j++) {
 					let img = c[j].toDataURL();
 					croppedImagesURL_inter.push(img);
@@ -133,6 +128,15 @@
 				croppedImagesURL_buffer.push(croppedImagesURL_inter);
 			}
 			croppedImagesURL = croppedImagesURL_buffer;
+
+			// normalisation des images pr le resnet
+			let new_ctensors = [];
+			for (let i=0;i<ctensors.length;i++) {
+				let c = ctensors[i];
+				c = await normalizeTensors(c, MEAN,STD);
+				c = await resizeTensors(c, 224,224);
+				new_ctensors.push(c);
+			}
 
 			// initialisation de la table de labels
 			await loadClassMapping();
@@ -145,7 +149,7 @@
 			console.log("loading classifier...");
 			let cmodel =  await loadModel(true);
 			console.log("classifying...");
-			let coutput = await classify(new_ctensors, cmodel,img_proceed);
+			let coutput = await classify(new_ctensors, cmodel,img_proceed,start);
 			console.log('output : ', coutput);
 			
 
