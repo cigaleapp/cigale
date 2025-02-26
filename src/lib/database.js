@@ -1,5 +1,8 @@
 import { type } from 'arktype';
 
+// TODO make table() take an object that can be passed to type() instead of a schema
+//  * @template { {[x: string]: import('arktype').Type | string} } Schema
+
 const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
 
 /**
@@ -7,29 +10,39 @@ const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
  */
 const Probability = type('0 <= number <= 1');
 
-const MetadataValues = type({
-	// TODO: figure out a way to reuse the ID const
-	'[/[a-z0-9_]+/]': {
-		value: 'string',
-		confidence: Probability,
-		alternatives: {
-			'[string]': Probability
-		}
+const MetadataValue = type({
+	value: 'string.json.parse',
+	confidence: Probability.default(1),
+	alternatives: {
+		'[string.json]': Probability
 	}
 });
 
-const Image = type({
-	id: ID,
-	filename: 'string',
-	metadata: MetadataValues
+const MetadataValues = type({
+	// TODO: figure out a way to reuse the ID const
+	'[/[a-z0-9_]+/]': MetadataValue
 });
 
-const Observation = type({
-	id: ID,
-	label: 'string',
-	metadataOverrides: MetadataValues,
-	images: Image.array()
-});
+const Image = table(
+	['id', 'addedAt'],
+	type({
+		id: ID,
+		filename: 'string',
+		addedAt: 'string.date.iso.parse',
+		metadata: MetadataValues
+	})
+);
+
+const Observation = table(
+	['id', 'addedAt'],
+	type({
+		id: ID,
+		label: 'string',
+		addedAt: 'string.date.iso.parse',
+		metadataOverrides: MetadataValues,
+		images: ID.array()
+	})
+);
 
 const MetadataType = type.enumerated(
 	'string',
@@ -88,44 +101,56 @@ const MetadataEnumVariant = type({
 	description: 'string',
 	learnMore: 'string.url.parse | null'
 });
-const Metadata = type({
-	id: ID,
-	label: 'string',
-	type: MetadataType,
-	mergeMethod: MetadataMergeMethod,
-	options: MetadataEnumVariant.array().atLeastLength(1).optional(),
-	required: 'boolean',
-	description: 'string',
-	learnMore: 'string.url.parse | null'
-});
 
-const Protocol = type({
-	id: ID,
-	name: 'string',
-	source: 'string.url.parse | null',
-	metadata: Metadata.array(),
-	author: {
-		email: 'string',
-		name: 'string'
-	}
-});
+const Metadata = table(
+	'id',
+	type({
+		id: ID,
+		label: 'string',
+		type: MetadataType,
+		mergeMethod: MetadataMergeMethod,
+		options: MetadataEnumVariant.array().atLeastLength(1).optional(),
+		required: 'boolean',
+		description: 'string',
+		learnMore: 'string.url.parse | null'
+	})
+);
 
-const Settings = type({
-	protocols: Protocol.array(),
-	theme: type.enumerated('dark', 'light', 'auto'),
-	gridSize: 'number',
-	language: type.enumerated('fr')
-});
+const Protocol = table(
+	'id',
+	type({
+		id: ID,
+		name: 'string',
+		source: 'string.url.parse | null',
+		metadata: ID.array(),
+		author: {
+			email: 'string',
+			name: 'string'
+		}
+	})
+);
+
+const Settings = table(
+	'layer',
+	type({
+		layer: '"defaults" | "user"',
+		protocols: ID.array(),
+		theme: type.enumerated('dark', 'light', 'auto'),
+		gridSize: 'number',
+		language: type.enumerated('fr'),
+		showInputHints: 'boolean'
+	})
+);
 
 /**
- * @type {Array<typeof Metadata.infer>}
+ * @type {Array<typeof Metadata.inferIn>}
  */
 export const BUILTIN_METADATA = [
 	{
 		id: 'sex',
 		description: "Sexe de l'individu",
 		label: 'Sexe',
-		learnMore: new URL('https://fr.wikipedia.org/wiki/Sexe'),
+		learnMore: 'https://fr.wikipedia.org/wiki/Sexe',
 		type: 'enum',
 		mergeMethod: 'none',
 		required: false,
@@ -133,13 +158,13 @@ export const BUILTIN_METADATA = [
 			{
 				key: 'm',
 				label: 'Male',
-				learnMore: new URL('https://fr.wikipedia.org/wiki/M%C3%A2le'),
+				learnMore: 'https://fr.wikipedia.org/wiki/M%C3%A2le',
 				description: ''
 			},
 			{
 				key: 'f',
 				label: 'Femelle',
-				learnMore: new URL('https://fr.wikipedia.org/wiki/Femelle'),
+				learnMore: 'https://fr.wikipedia.org/wiki/Femelle',
 				description: ''
 			}
 		]
@@ -152,6 +177,15 @@ export const BUILTIN_METADATA = [
 		type: 'date',
 		mergeMethod: 'average',
 		required: true
+	},
+	{
+		id: 'shoot_location',
+		description: 'Localisation de la prise de vue',
+		label: 'Lieu',
+		learnMore: null,
+		type: 'location',
+		mergeMethod: 'average',
+		required: false
 	}
 ];
 
@@ -169,6 +203,29 @@ export const Schemas = {
 	Settings
 };
 
+export const Tables = {
+	Image,
+	Observation,
+	Metadata,
+	Protocol,
+	Settings
+};
+
+/**
+ *
+ * @param {string|string[]|string[][]} keyPaths expanded to a 2D array. Every element is an index to be created. Name of the indexes are dot-joined. First index is given as the keyPath argument when creating the object store instead.
+ * @param {Schema} schema
+ * @template {import('arktype').Type} Schema
+ * @returns
+ */
+function table(keyPaths, schema) {
+	const expandedKeyPaths = Array.isArray(keyPaths)
+		? keyPaths.map((keyPath) => (Array.isArray(keyPath) ? keyPath : [keyPath]))
+		: [[keyPaths]];
+
+	return schema.configure({ table: { indexes: expandedKeyPaths } });
+}
+
 /**
  * @typedef  ID
  * @type {typeof ID.infer}
@@ -177,6 +234,11 @@ export const Schemas = {
 /**
  * @typedef  Probability
  * @type {typeof Probability.infer}
+ */
+
+/**
+ * @typedef  MetadataValue
+ * @type {typeof MetadataValue.infer}
  */
 
 /**
