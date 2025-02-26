@@ -17,8 +17,8 @@
 <style>
 	button {
 		cursor: pointer;
-		background-color: var(--bg-neutral);
-		color: var(--fg-neutral);
+		background-color: var(--bg-primary-translucent);
+		color: var(--fg-primary);
 		display: inline-flex;
 		justify-content: center;
 		align-items: center;
@@ -27,11 +27,11 @@
 		border-radius: var(--corner-radius);
 		font-weight: bold;
 		font-size: var(--font-size, 1em);
+		border: none;
 	}
 
 	button:is(:hover, :focus-visible) {
-		background-color: var(--bg-primary-translucent);
-		color: var(--fg-primary);
-		border-color: var(--bg-primary);
+		background-color: var(--bg-neutral);
+		color: var(--fg-neutral);
 	}
 </style>
