@@ -25,3 +25,7 @@ vite.config.ts.timestamp-*
 # Paraglide
 src/lib/paraglide
 public
+
+
+# JSON Schemas are generated from ArkType schemas to ensure that they are always in sync
+static/*.schema.json

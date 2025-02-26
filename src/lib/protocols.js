@@ -1,5 +1,16 @@
-import { tables } from './idb';
-import { toasts } from './toasts.svelte';
+import { base } from '$app/paths';
+import { Schemas } from './database.js';
+import { tables } from './idb.js';
+
+export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
+	metadata: Schemas.Metadata.array()
+}).pipe((protocol) => ({
+	...protocol,
+	metadata: protocol.metadata.map((metadata) => ({
+		...metadata,
+		id: `${protocol.id}__${metadata.id}`
+	}))
+}));
 
 /**
  * Exports a protocol by ID into a JSON file, and triggers a download of that file.
@@ -8,18 +19,21 @@ import { toasts } from './toasts.svelte';
 export async function exportProtocol(id) {
 	let protocol = await tables.Protocol.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
+
 	protocol = {
+		$schema: `${window.location.origin}${base}/protocol.schema.json`,
 		...protocol,
 		// @ts-ignore
 		metadata: await Promise.all(protocol.metadata.map((id) => tables.Metadata.get(id))).then((m) =>
 			m.filter((m) => m)
 		)
 	};
+
 	const blob = new Blob([JSON.stringify(protocol, null, 2)], { type: 'application/json' });
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement('a');
 	a.href = url;
-	a.download = `${protocol.id}.json`;
+	a.download = `${id}.json`;
 	a.click();
 	URL.revokeObjectURL(url);
 }
@@ -27,33 +41,35 @@ export async function exportProtocol(id) {
 /**
  * Imports a protocol from a JSON file.
  * Asks the user to select a file, then imports the protocol from that file.
+ * @returns {Promise<typeof ExportedProtocol.infer>}
  */
 export async function importProtocol() {
-	const input = document.createElement('input');
-	input.type = 'file';
-	input.accept = '.json';
-	input.onchange = async () => {
-		if (!input.files || !input.files[0]) return;
-		const file = input.files[0];
-		const reader = new FileReader();
-		reader.onload = async () => {
-			const protocol = JSON.parse(reader.result);
-			try {
-				await Promise.all([
-					...protocol.metadata.map((m) => tables.Metadata.set(m)),
-					tables.Protocol.set({
-						...protocol,
-						metadata: protocol.metadata.map((m) => m.id)
-					})
-				]);
-				toasts.success(
-					`Protocole ${protocol.name} (dont ${protocol.metadata.length} métadonnées) importé`
-				);
-			} catch (e) {
-				toasts.error(e.toString());
-			}
+	return new Promise((resolve, reject) => {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+		input.onchange = async () => {
+			if (!input.files || !input.files[0]) return;
+			const file = input.files[0];
+			const reader = new FileReader();
+			reader.onload = async () => {
+				try {
+					const protocol = JSON.parse(reader.result);
+					ExportedProtocol.assert(protocol);
+					await Promise.all([
+						...protocol.metadata.map((m) => tables.Metadata.set(m)),
+						tables.Protocol.set({
+							...protocol,
+							metadata: protocol.metadata.map((m) => m.id)
+						})
+					]);
+					resolve(protocol);
+				} catch (error) {
+					reject(error);
+				}
+			};
+			reader.readAsText(file);
 		};
-		reader.readAsText(file);
-	};
-	input.click();
+		input.click();
+	});
 }
