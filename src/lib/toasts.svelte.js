@@ -64,7 +64,7 @@ export class Toasts {
 		const newToast = {
 			addedAt: new Date(),
 			id,
-			message,
+			message: message.replaceAll('\n', '; '),
 			type,
 			labels: labels ?? {},
 			// @ts-ignore
