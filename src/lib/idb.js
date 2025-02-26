@@ -1,4 +1,5 @@
 import { openDB } from 'idb';
+import { nanoid } from 'nanoid';
 import { Tables } from './database';
 
 /** @type {Array<keyof typeof Tables>} */
@@ -118,7 +119,7 @@ export async function openDatabase() {
 				const keyPath = schema.meta.table.indexes[0];
 				const store = db.createObjectStore(tableName, { keyPath });
 				for (const index of schema.meta.table.indexes.slice(1)) {
-					store.createIndex(index.join('.'), index);
+					store.createIndex(index, index);
 				}
 			}
 		}
