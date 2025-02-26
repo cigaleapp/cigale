@@ -1,7 +1,7 @@
 import { onMount } from 'svelte';
 import * as ort from 'onnxruntime-web';
 import * as Jimp from 'jimp';
-import { postprocess_BB, imload , output2BB} from './inference_utils.js';
+import { postprocess_BB, imload , output2BB,preprocess_for_classification} from './inference_utils.js';
 import { input } from '@tensorflow/tfjs';
 
 
@@ -101,6 +101,7 @@ export async function classify (images, model,img_proceed,start) {
 
     let argmaxs = [];
     let bestScores = [];
+    images = preprocess_for_classification(images,MEAN,STD);
 
     for (let i=0; i<images.length; i++) {
         let outputTensors = [];
@@ -129,3 +130,5 @@ export async function classify (images, model,img_proceed,start) {
 
     return [argmaxs, bestScores];
 }
+
+

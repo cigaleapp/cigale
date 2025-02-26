@@ -2,7 +2,7 @@
 	import * as Jimp from 'jimp';
 
 	import {infer,loadModel, inferSequentialy,STD,MEAN, classify} from "./inference.js"
-	import {applyBBsOnImages,imload, normalizeTensors, applyBBsOnTensors, resizeTensors} from "./inference_utils.js"
+	import {applyBBsOnImages,labelize,imload, normalizeTensors, applyBBsOnTensors, resizeTensors,loadClassMapping} from "./inference_utils.js"
 	import {img_proceed} from './state.svelte.js';
 
 	//ort.env.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@dev/dist/';
@@ -22,11 +22,7 @@
 	export let conf = [];
 
 	// Load the class mapping file.
-	async function loadClassMapping() {
-		const response = await fetch(classmapping);
-		const text = await response.text();
-		classmap = text.split('\n');
-	}
+	
 
 	async function processImage() {
 		img_proceed.nb = 0;
@@ -67,15 +63,9 @@
 			let bestScores = BsandBs[1];
 			let start = BsandBs[2];
 			let inputTensors = BsandBs[3];
-			//console.log('inputTensors before: ', await  inputTensors[0].getData());
-			//inputTensors = await normalizeTensors(inputTensors, [0.5,0.5,0.5],[0.5,0.5,0.5]);
-			//console.log('inputTensors after: ',  await inputTensors[0].getData());
 
 			let best_boxes = boundingboxes[0];
 			let bestScore = bestScores[0];
-
-			console.log('Best boxes : ', best_boxes);
-			console.log("best score : ", bestScore);
 
 			img_proceed.nb = 0;
 			img_proceed.state= "post processing"
@@ -85,13 +75,9 @@
 				ctx.strokeRect(best_boxes[i][0], best_boxes[i][1], best_boxes[i][2], best_boxes[i][3]);
 			}
 
-			
-			
-			
 			img_proceed.state= "finished"
 			let ctensors = await applyBBsOnTensors( boundingboxes, inputTensors);
 			
-
 			// initialisation des labels : 
 			labels = [];
 			conf = []
@@ -99,7 +85,7 @@
 				let l = [];
 				let c = [];
 				for (let j=0; j<ctensors[i].length; j++) {
-					l.push("un sect (je crois j'ai pas compris)");
+					l.push("hihi chocolat");
 					c.push(0);
 				}
 				labels.push(l);
@@ -119,46 +105,15 @@
 			}
 			croppedImagesURL = croppedImagesURL_buffer;
 
-			// normalisation des images pr le resnet
-			let new_ctensors = [];
-			for (let i=0;i<ctensors.length;i++) {
-				let c = ctensors[i];
-				c = await normalizeTensors(c, MEAN,STD);
-				c = await resizeTensors(c, 224,224);
-				new_ctensors.push(c);
-			}
+			classmap = await loadClassMapping(classmapping);
 
-			// initialisation de la table de labels
-			await loadClassMapping();
-			console.log('classmap : ', classmap);
-
-			// ça marche aussi mais c'est moins opti hihi
-			//let cImages = await applyBBsOnImages( boundingboxes, images);
-			//croppedImagesURL = cImages[0];
-
-			console.log("loading classifier...");
 			let cmodel =  await loadModel(true);
-			console.log("classifying...");
-			let coutput = await classify(new_ctensors, cmodel,img_proceed,start);
-			console.log('output : ', coutput);
+			let coutput = await classify(ctensors, cmodel,img_proceed,start);
 			
-
-			let labels_inter = [];
-			labels = [];
-			for (let i=0;i<coutput[0].length;i++) {
-				let l = [];
-				for (let j=0; j<coutput[0][i].length; j++) {
-					let index = coutput[0][i][j];
-					l.push(classmap[index]);
-				}
-				labels_inter.push(l)
-			}
-			labels = labels_inter;
-			conf = coutput[1];
+			let labelandconf = labelize(coutput, classmap);
+			labels = labelandconf[0];
+			conf = labelandconf[1];
 			console.log("label",labels);
-
-
-
 		}
 	}
 
@@ -176,11 +131,19 @@
 	}
 </script>
 <style>
+	h1 {
+		text-align: center;
+		margin-top: 20px;
+	}
+	h2 {
+		margin-top: 20px;
+	}
     .grid-container {
         display: grid;
         grid-template-columns: repeat(10, 1fr);
         gap: 10px;
         padding: 20px;
+		background-color: cadetblue;
     }
     .grid-item img {
         width: 100%;

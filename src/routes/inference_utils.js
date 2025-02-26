@@ -104,6 +104,37 @@ export function postprocess_BB(boundingboxes,numfiles) {
     return boundingboxes;
 }
 
+export async function preprocess_for_classification(tensors,mean, std) {
+    let new_ctensors = [];
+    for (let i=0;i<tensors.length;i++) {
+        let c = tensors[i];
+        c = await normalizeTensors(c, mean,std);
+        c = await resizeTensors(c, 224,224);
+        new_ctensors.push(c);
+    }
+    return new_ctensors;
+}
+
+export async function loadClassMapping(classmapping) {
+    const response = await fetch(classmapping);
+    const text = await response.text();
+    classmap = text.split('\n');
+    return classmap;
+}
+
+export function labelize (output,classmap) {
+    let labels_inter = [];
+    for (let i=0;i<output[0].length;i++) {
+        let l = [];
+        for (let j=0; j<output[0][i].length; j++) {
+            let index = output[0][i][j];
+            l.push(classmap[index]);
+        }
+        labels_inter.push(l)
+    }
+    return [labels_inter,output[1]];
+}
+
 export async function imload(files, targetWidth, targetHeight) {
     var float32Data = new Float32Array(targetHeight * targetWidth * 3 * files.length);
     for (let f = 0; f < files.length; f++) {
