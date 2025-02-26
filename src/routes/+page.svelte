@@ -1,6 +1,7 @@
 <script>
-	import { Jimp } from "jimp";
-	import {infer,loadModel, inferSequentialy} from "./inference.js"
+	import * as Jimp from 'jimp';
+
+	import {infer,loadModel, inferSequentialy,STD,MEAN} from "./inference.js"
 	import {applyBBsOnImages,imload, normalizeTensors, applyBBsOnTensors} from "./inference_utils.js"
 	import {img_proceed} from './state.svelte.js';
 	import { input, norm } from "@tensorflow/tfjs";
@@ -13,7 +14,7 @@
 	let crop_canvas; // The canvas containing the cropped insect.
 	let processedContainer; // Container DOM element for the preprocessed canvas.
 	let cropContainer; // Container DOM element for the cropped image.
-	export let croppedImagesMIME = [];
+	export let croppedImagesURL = [];
 	let model = null;
 
 	async function processImage() {
@@ -79,7 +80,7 @@
 			let i =0;
 			for (let file of files) {
 
-				let img = await Jimp.read(URL.createObjectURL(file));	
+				let img = await Jimp.Jimp.read(URL.createObjectURL(file));	
 								
 				images.push(img);
 				img_proceed.nb = i+1;
@@ -89,9 +90,33 @@
 			
 			img_proceed.state= "finished"
 			let ctensor = await applyBBsOnTensors( boundingboxes, inputTensors);
-			console.log('ctensor : ', ctensor);
-			let cImages = await applyBBsOnImages( boundingboxes, images);
-			croppedImagesMIME = cImages[0];
+			// normalisation des images pr le resnet
+			let new_ctensors = [];
+			for (let i=0;i<ctensor.length;i++) {
+				let c = ctensor[i];
+				c = await normalizeTensors(c, MEAN,STD);
+				new_ctensors.push(c);
+			}
+
+			// ça c'est la partie affichage 
+			let croppedImagesURL_buffer = [];
+			for (let i=0;i<new_ctensors.length;i++) {
+				let croppedImagesURL_inter = [];
+				let c = new_ctensors[i];
+				for (let j=0; j<c.length; j++) {
+					let img = c[j].toDataURL();
+					croppedImagesURL_inter.push(img);
+				}
+				croppedImagesURL_buffer.push(croppedImagesURL_inter);
+			}
+			croppedImagesURL = croppedImagesURL_buffer;
+
+
+			// ça marche aussi mais c'est moins opti hihi
+			//let cImages = await applyBBsOnImages( boundingboxes, images);
+			//croppedImagesURL = cImages[0];
+
+			
 		}
 	}
 
@@ -140,9 +165,10 @@
 <p>image proceed : {img_proceed.nb}  ;  time taken (s): {img_proceed.time}</p>
 
 <div class="grid-container">
-    {#each croppedImagesMIME as row}
+    {#each croppedImagesURL as row}
         {#each row as image}
             <div class="grid-item">
+				<p>c'est un insecte si je ne m'abuse</p>
                 <img src={image} alt="Cropped Image">
             </div>
         {/each}
