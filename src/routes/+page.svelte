@@ -1,10 +1,9 @@
 <script>
 	import * as Jimp from 'jimp';
 
-	import {infer,loadModel, inferSequentialy,STD,MEAN} from "./inference.js"
-	import {applyBBsOnImages,imload, normalizeTensors, applyBBsOnTensors} from "./inference_utils.js"
+	import {infer,loadModel, inferSequentialy,STD,MEAN, classify} from "./inference.js"
+	import {applyBBsOnImages,imload, normalizeTensors, applyBBsOnTensors, resizeTensors} from "./inference_utils.js"
 	import {img_proceed} from './state.svelte.js';
-	import { input, norm } from "@tensorflow/tfjs";
 
 	//ort.env.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@dev/dist/';
 
@@ -16,6 +15,18 @@
 	let cropContainer; // Container DOM element for the cropped image.
 	export let croppedImagesURL = [];
 	let model = null;
+	export let labels = [];
+	let label_table = [];
+	let classmapping = "/class_mapping.txt";
+	let classmap = [];
+	export let conf = [];
+
+	// Load the class mapping file.
+	async function loadClassMapping() {
+		const response = await fetch(classmapping);
+		const text = await response.text();
+		classmap = text.split('\n');
+	}
 
 	async function processImage() {
 		img_proceed.nb = 0;
@@ -73,7 +84,6 @@
 				ctx.lineWidth = 2;
 				ctx.strokeRect(best_boxes[i][0], best_boxes[i][1], best_boxes[i][2], best_boxes[i][3]);
 			}
-			
 
 			
 			let images = [];
@@ -95,7 +105,20 @@
 			for (let i=0;i<ctensor.length;i++) {
 				let c = ctensor[i];
 				c = await normalizeTensors(c, MEAN,STD);
+				c = await resizeTensors(c, 224,224);
 				new_ctensors.push(c);
+			}
+
+			// initialisation des labels : 
+			labels = [];
+			conf = []
+			for (let i=0;i<new_ctensors.length;i++) {
+				let l = [];
+				for (let j=0; j<new_ctensors[i].length; j++) {
+					l.push("un sect (je crois j'ai pas compris)");
+					conf.push(0);
+				}
+				labels.push(l);
 			}
 
 			// ça c'est la partie affichage 
@@ -111,12 +134,37 @@
 			}
 			croppedImagesURL = croppedImagesURL_buffer;
 
+			// initialisation de la table de labels
+			await loadClassMapping();
+			console.log('classmap : ', classmap);
 
 			// ça marche aussi mais c'est moins opti hihi
 			//let cImages = await applyBBsOnImages( boundingboxes, images);
 			//croppedImagesURL = cImages[0];
 
+			console.log("loading classifier...");
+			let cmodel =  await loadModel(true);
+			console.log("classifying...");
+			let coutput = await classify(new_ctensors, cmodel,img_proceed);
+			console.log('output : ', coutput);
 			
+
+			let labels_inter = [];
+			labels = [];
+			for (let i=0;i<coutput[0].length;i++) {
+				let l = [];
+				for (let j=0; j<coutput[0][i].length; j++) {
+					let index = coutput[0][i][j];
+					l.push(classmap[index]);
+				}
+				labels_inter.push(l)
+			}
+			labels = labels_inter;
+			conf = coutput[1];
+			console.log("label",labels);
+
+
+
 		}
 	}
 
@@ -165,10 +213,11 @@
 <p>image proceed : {img_proceed.nb}  ;  time taken (s): {img_proceed.time}</p>
 
 <div class="grid-container">
-    {#each croppedImagesURL as row}
-        {#each row as image}
+    {#each croppedImagesURL as row,i}
+        {#each row as image,j}
             <div class="grid-item">
-				<p>c'est un insecte si je ne m'abuse</p>
+
+				<p>({i};{j}):{labels[i][j]}:{conf[i][j]}</p>
                 <img src={image} alt="Cropped Image">
             </div>
         {/each}
