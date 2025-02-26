@@ -124,10 +124,12 @@ export async function loadClassMapping(classmapping) {
 
 export function labelize (output,classmap) {
     let labels_inter = [];
+    console.log("output : ",output);
     for (let i=0;i<output[0].length;i++) {
         let l = [];
         for (let j=0; j<output[0][i].length; j++) {
             let index = output[0][i][j];
+            console.log("index : ",index)
             l.push(classmap[index]);
         }
         labels_inter.push(l)

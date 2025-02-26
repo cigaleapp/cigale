@@ -97,11 +97,10 @@ export async function classify (images, model,img_proceed,start) {
     img_proceed.nb = 0;
 
     const inputName = model.inputNames[0];
-    let outputs = [];
 
     let argmaxs = [];
     let bestScores = [];
-    images = preprocess_for_classification(images,MEAN,STD);
+    images = await preprocess_for_classification(images,MEAN,STD);
 
     for (let i=0; i<images.length; i++) {
         let outputTensors = [];

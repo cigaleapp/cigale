@@ -77,8 +77,7 @@
 
 			img_proceed.state= "finished"
 			let ctensors = await applyBBsOnTensors( boundingboxes, inputTensors);
-			
-			// initialisation des labels : 
+			// initialisation des labels : 	
 			labels = [];
 			conf = []
 			for (let i=0;i<ctensors.length;i++) {
@@ -113,7 +112,6 @@
 			let labelandconf = labelize(coutput, classmap);
 			labels = labelandconf[0];
 			conf = labelandconf[1];
-			console.log("label",labels);
 		}
 	}
 
