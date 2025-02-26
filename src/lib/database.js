@@ -213,15 +213,18 @@ export const Tables = {
 
 /**
  *
- * @param {string|string[]|string[][]} keyPaths expanded to a 2D array. Every element is an index to be created. Name of the indexes are dot-joined. First index is given as the keyPath argument when creating the object store instead.
+ * @param {string|string[]} keyPaths expanded to an array.
+ * Every element is an index to be created.
+ * Indexes are dot-joined paths to keys in the objects.
+ * First index is given as the keyPath argument when creating the object store instead.
  * @param {Schema} schema
  * @template {import('arktype').Type} Schema
  * @returns
  */
 function table(keyPaths, schema) {
 	const expandedKeyPaths = Array.isArray(keyPaths)
-		? keyPaths.map((keyPath) => (Array.isArray(keyPath) ? keyPath : [keyPath]))
-		: [[keyPaths]];
+		? keyPaths.map((keyPath) => keyPath)
+		: [keyPaths];
 
 	return schema.configure({ table: { indexes: expandedKeyPaths } });
 }
