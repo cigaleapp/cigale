@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -14,25 +14,39 @@
 			else console.log('clèr');
 		});
 	});
+
+	function onGearClose() {
+		open = !open;
+		let listParam = document.querySelector('.listParam');
+		if (listParam instanceof HTMLElement) {
+			if (open) {
+				listParam.style.visibility = 'visible';
+				listParam.style.display = 'flex';
+			} else {
+				listParam.style.visibility = 'hidden';
+				listParam.style.display = 'none';
+			}
+		}
+	}
+	function onButtonClose() {
+		let listParam = document.querySelector('.listParam');
+		if (listParam instanceof HTMLElement) {
+			listParam.style.visibility = 'hidden';
+		}
+		open = false;
+	}
+
+	function onSizeChange(event) {
+		const target = event.target;
+		if (target instanceof HTMLInputElement) {
+			console.log(target.value);
+		}
+	}
 </script>
 
 <div class="container">
 	<div class="IconButton">
-		<ButtonIcon
-			onclick={() => {
-				open = !open;
-				let listParam = document.querySelector('.listParam');
-				if (listParam) {
-					if (open) {
-						listParam.style.visibility = 'visible';
-						listParam.style.display = 'flex';
-					} else {
-						listParam.style.visibility = 'hidden';
-						listParam.style.display = 'none';
-					}
-				}
-			}}
-		>
+		<ButtonIcon onclick={onGearClose}>
 			<Gears className="Gears"></Gears>
 		</ButtonIcon>
 	</div>
@@ -43,11 +57,7 @@
 				<Cross
 					cursor="pointer"
 					onclick={() => {
-						let listParam = document.querySelector('.listParam');
-						if (listParam) {
-							listParam.style.visibility = 'hidden';
-						}
-						open = false;
+						onButtonClose();
 					}}
 				></Cross>
 			</div>
@@ -58,12 +68,7 @@
 				min="1"
 				max="20"
 				class="slider"
-				onchange={(event) => {
-					const target = event.target;
-					if (target) {
-						console.log(target.value);
-					}
-				}}
+				onchange={onSizeChange}
 			/>
 		</div>
 		<div class="Language">
