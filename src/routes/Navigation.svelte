@@ -5,114 +5,151 @@
 	import logo from '../favicon.png';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { page } from '$app/state';
+	import { beforeNavigate } from '$app/navigation';
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {String} current_pages
-	 * @property {Boolean} has_images
+	 * @property {Boolean} hasImages
 	 */
 
 	/** @type {Props} */
-	let { current_pages = 'Import', has_images = true } = $props();
+	let { hasImages = true } = $props();
 
-	let openFeur = $state();
+	let openConfirm = $state();
 
-	let where_do_i_go = 'Import';
+	// function clickImport() {
+	// 	if (currentPage != 'Import') {
+	// 		whereNext = 'Import';
+	// 		openConfirm();
+	// 	}
+	// }
 
-	function click_import() {
-		if (current_pages != 'Import') {
-			where_do_i_go = 'Import';
-			console.log('IL A CLICKEEEEEEEEEEE');
-			openFeur();
+	// function clickCrop() {
+	// 	if (currentPage == 'Import') {
+	// 		currentPage = 'Crop';
+	// 	} else if (currentPage != 'Crop') {
+	// 		whereNext = 'Crop';
+	// 		openConfirm();
+	// 	}
+	// }
+
+	// function clickClassif() {
+	// 	if (currentPage == 'Import' || currentPage == 'Crop') {
+	// 		currentPage = 'Classif';
+	// 	} else if (currentPage != 'Classif') {
+	// 		whereNext = 'Classif';
+	// 		openConfirm();
+	// 	}
+	// }
+
+	// function clickDownload() {
+	// 	currentPage = 'Download';
+	// }
+
+	let waitingConfirm = false;
+	let reseau = 1;
+
+	beforeNavigate(async ({ to, from }) => {
+		if (to?.route?.id == '/classification' && from?.route?.id != '/crop') {
+			openConfirm();
+
+			await waitingConfirm;
+
+			console.log(reseau);
+
+			waitingConfirm = false;
 		}
-	}
-
-	function click_crop() {
-		if (current_pages == 'Import') {
-			current_pages = 'Crop';
-		} else if (current_pages != 'Crop') {
-			where_do_i_go = 'Crop';
-			openFeur();
-		}
-	}
-
-	function click_classif() {
-		if (current_pages == 'Import' || current_pages == 'Crop') {
-			current_pages = 'Classif';
-		} else if (current_pages != 'Classif') {
-			where_do_i_go = 'Classif';
-			openFeur();
-		}
-	}
-
-	function click_download() {
-		current_pages = 'Download';
-	}
+	});
 </script>
 
 <ModalConfirm
 	key="Confirmation"
 	title="Attention"
 	onconfirm={() => {
-		current_pages = where_do_i_go;
+		waitingConfirm = true;
+		reseau = 1;
 	}}
-	bind:open={openFeur}
+	oncancel={() => {
+		waitingConfirm = true;
+		reseau = 2;
+	}}
+	bind:open={openConfirm}
 >
 	<p>
 		Êtes vous sur de vouloir revenir en arrière? Cela peut engendrer de la perte de vos avancements.
 	</p>
 </ModalConfirm>
 
-<div class="navigation">
+<nav>
 	<div class="divLogo">
 		<img class="logo" src={logo} alt="logo" />
 		C.i.g.a.l.e.
 	</div>
 
-	<button onclick={click_import}>
+	<a href="/#/import">
 		Import
-		{#if current_pages == 'Import'}
+		{#if page.route.id == '/import'}
 			<div class="line"></div>
 		{/if}
-	</button>
+	</a>
 
 	<Sup></Sup>
 
-	<button disabled={!has_images} onclick={click_crop}>
+	<a
+		href="/#/crop"
+		aria-disabled={!hasImages &&
+			page.route.id != '/classification' &&
+			page.route.id != '/resultats' &&
+			page.route.id != '/crop' &&
+			page.route.id != '/import'}
+	>
 		Crop
-		{#if current_pages == 'Crop'}
+		{#if page.route.id == '/crop'}
 			<div class="line"></div>
 		{/if}
-	</button>
+	</a>
 
 	<Sup></Sup>
 
-	<button disabled={current_pages == 'Import'} onclick={click_classif}>
+	<a
+		href="/#/classification"
+		aria-disabled={page.route.id != '/classification' &&
+			page.route.id != '/resultats' &&
+			page.route.id != '/crop'}
+	>
 		Classification
-		{#if current_pages == 'Classif'}
+		{#if page.route.id == '/classification'}
 			<div class="line"></div>
 		{/if}
-	</button>
+	</a>
 
 	<Sup></Sup>
-	<button disabled={current_pages == 'Import' || current_pages == 'Crop'} onclick={click_download}>
+	<a
+		href="/#/resultats"
+		aria-disabled={page.route.id != '/classification' && page.route.id != '/resultats'}
+	>
 		<div class="download">
 			<Download></Download>
 			Résultats
 		</div>
-		{#if current_pages == 'Download'}
+		{#if page.route.id == '/resultats'}
 			<div class="line"></div>
 		{/if}
-	</button>
+	</a>
 
-	<ButtonIcon onclick={() => {}}>
+	<ButtonIcon
+		onclick={() => {
+			console.log(page.route.id);
+		}}
+	>
 		<Gear></Gear>
 	</ButtonIcon>
-</div>
+</nav>
 
 <style>
-	.navigation {
+	nav {
 		background-color: var(--bg-primary-translucent);
 		height: 8%;
 		display: flex;
@@ -124,19 +161,22 @@
 		resize: vertical;
 	}
 
-	button {
+	a {
 		background: none;
 		border: none;
 		padding: 7.5px;
 		padding-left: 15px;
 		padding-right: 15px;
+		text-decoration: none;
+		color: var(--fg-neutral);
 	}
 
-	button:disabled {
+	a[aria-disabled='true'] {
+		pointer-events: none;
 		color: var(--gray);
 	}
 
-	button:hover:not(:disabled) {
+	a:hover[aria-disabled='true'] {
 		background-color: var(--bg-primary);
 		border-radius: var(--corner-radius);
 		color: var(--fg-primary);
@@ -166,7 +206,7 @@
 		border-radius: 1000000px;
 	}
 
-	button:is(:disabled) .line {
+	a[aria-disabled='true'] .line {
 		visibility: hidden;
 	}
 </style>
