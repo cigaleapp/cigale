@@ -7,12 +7,13 @@
 	import Moon from '~icons/ph/moon-light';
 	import Cross from '~icons/ph/x-circle-light';
 
-	/** let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
-		isDark = matches;
-	});
-	*/
 	let open = false;
+	$effect(() => {
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
+			if (matches) console.log('sombr');
+			else console.log('clèr');
+		});
+	});
 </script>
 
 <div class="container">
@@ -21,12 +22,14 @@
 			onclick={() => {
 				open = !open;
 				let listParam = document.querySelector('.listParam');
-				if (open) {
-					listParam.style.visibility = 'visible';
-					listParam.style.display = 'flex';
-				} else {
-					listParam.style.visibility = 'hidden';
-					listParam.style.display = 'none';
+				if (listParam) {
+					if (open) {
+						listParam.style.visibility = 'visible';
+						listParam.style.display = 'flex';
+					} else {
+						listParam.style.visibility = 'hidden';
+						listParam.style.display = 'none';
+					}
 				}
 			}}
 		>
@@ -41,7 +44,9 @@
 					cursor="pointer"
 					onclick={() => {
 						let listParam = document.querySelector('.listParam');
-						listParam.style.visibility = 'hidden';
+						if (listParam) {
+							listParam.style.visibility = 'hidden';
+						}
 						open = false;
 					}}
 				></Cross>
@@ -55,7 +60,9 @@
 				class="slider"
 				onchange={(event) => {
 					const target = event.target;
-					console.log(target.value);
+					if (target) {
+						console.log(target.value);
+					}
 				}}
 			/>
 		</div>
