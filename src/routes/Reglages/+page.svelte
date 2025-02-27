@@ -36,6 +36,7 @@
 		open = false;
 	}
 
+	// @ts-ignore
 	function onSizeChange(event) {
 		const target = event.target;
 		if (target instanceof HTMLInputElement) {
