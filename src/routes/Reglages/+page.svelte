@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -7,10 +7,11 @@
 	import Moon from '~icons/ph/moon-light';
 	import Cross from '~icons/ph/x-circle-light';
 
-	/**    let Screentheme = window.matchMedia('(prefers-color-scheme: dark)').addEventListener(({ matches }) => {
-                        if (matches) "Sombre"
-                        else "Clair"
-                        }) */
+	/** let isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
+		isDark = matches;
+	});
+	*/
 	let open = false;
 </script>
 
@@ -20,9 +21,13 @@
 			onclick={() => {
 				open = !open;
 				let listParam = document.querySelector('.listParam');
-				if (open) listParam.style.visibility = 'visible';
-				else listParam.style.visibility = 'hidden';
-				console.log(open);
+				if (open) {
+					listParam.style.visibility = 'visible';
+					listParam.style.display = 'flex';
+				} else {
+					listParam.style.visibility = 'hidden';
+					listParam.style.display = 'none';
+				}
 			}}
 		>
 			<Gears className="Gears"></Gears>
@@ -41,12 +46,31 @@
 					}}
 				></Cross>
 			</div>
-			<input type="range" id="size" name="size" min="1" max="20" class="slider" />
+			<input
+				type="range"
+				id="size"
+				name="size"
+				min="1"
+				max="20"
+				class="slider"
+				onchange={(event) => {
+					const target = event.target;
+					console.log(target.value);
+				}}
+			/>
 		</div>
 		<div class="Language">
 			Langue :
-			<ButtonPrimary onclick={() => {}}>Français</ButtonPrimary>
-			<ButtonPrimary onclick={() => {}}>English</ButtonPrimary>
+			<ButtonPrimary
+				onclick={() => {
+					console.log("J'aime le français");
+				}}>Français</ButtonPrimary
+			>
+			<ButtonPrimary
+				onclick={() => {
+					console.log("J'aime le Anglais");
+				}}>English</ButtonPrimary
+			>
 		</div>
 		<div class="Theme">
 			Thème :
@@ -66,6 +90,11 @@
 		margin-right: 0;
 		display: flex;
 		flex-direction: column;
+		position: fixed;
+		width: 100%;
+		padding-left: 25px;
+		padding-right: 25px;
+		z-index: 10;
 	}
 
 	.IconButton {
@@ -74,7 +103,6 @@
 	}
 	.listParam {
 		margin: inherit;
-		display: flex;
 		width: 30%;
 		flex-direction: column;
 		gap: 1em;
