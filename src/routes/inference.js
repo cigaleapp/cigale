@@ -4,7 +4,8 @@ import * as Jimp from 'jimp';
 import { postprocess_BB, imload , output2BB,preprocess_for_classification} from './inference_utils.js';
 import { input } from '@tensorflow/tfjs';
 
-
+//ort.env.wasm.proxy = true;
+ort.env.wasm.numThreads = 4;
 ort.env.wasm.wasmPaths = {
     'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm'
 };
@@ -17,12 +18,15 @@ export const NUMCONF = 0.437;
 export const STD= [0.229, 0.224, 0.225];
 export const MEAN = [0.485, 0.456, 0.406];
 
+
 export async function loadModel(classif = false) {
     let model;
     let MODELPATH = MODELDETECTPATH;
     if (classif) {
         MODELPATH = MODELCLASSIFPATH;
     }
+    
+
     try {
         model = await ort.InferenceSession.create(MODELPATH);
         console.log('ONNX Model loaded successfully.');
@@ -59,8 +63,6 @@ export async function infer (files,model,img_proceed,sequence=false) {
         img_proceed.nb = files.length;
         img_proceed.time = (Date.now()-start)/1000;
     }
-    
-    outputTensor.output0.dispose();
 
 
     return [boundingboxes, bestScores,start, inputTensor];
@@ -109,7 +111,8 @@ export async function classify (images, model,img_proceed,start) {
         for (let j=0; j<images[i].length; j++) {
             let inputTensor = images[i][j];
             const outputTensor = await model.run({ [inputName]: inputTensor });
-            //outputTensors.push(outputTensor);
+            console.log(outputTensor)
+
             let argmax_ = outputTensor.output.data.indexOf(Math.max(...outputTensor.output.data));
             let bestScore_ = outputTensor.output.data[argmax_];
             argmax.push(argmax_);

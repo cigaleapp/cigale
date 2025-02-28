@@ -21,6 +21,7 @@
 	let classmap = [];
 	export let conf = [];
 
+
 	// Load the class mapping file.
 	
 
@@ -171,8 +172,8 @@
     {#each croppedImagesURL as row,i}
         {#each row as image,j}
             <div class="grid-item">
-
-				<p>({i};{j}):{labels[i][j]}:{conf[i][j]}</p>
+				<p>{labels[i][j]}:
+					{conf[i][j]}</p>
                 <img src={image} alt="Cropped Image">
             </div>
         {/each}
