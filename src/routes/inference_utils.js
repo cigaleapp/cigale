@@ -2,6 +2,8 @@ import * as ort from 'onnxruntime-web';
 import * as Jimp from 'jimp';
 
 function IoU(bb1, bb2) {
+    // Intersection over Union
+    // bb1 et bb2 sont des bounding boxes de la forme : [x, y, w, h]
     let x1 = Math.max(bb1[0], bb2[0]);
     let y1 = Math.max(bb1[1], bb2[1]);
     let x2 = Math.min(bb1[0] + bb1[2], bb2[0] + bb2[2]);
@@ -14,6 +16,16 @@ function IoU(bb1, bb2) {
 }
 
 export async function cropTensor (tensor, x1, y1, x2, y2) {
+    /*Crop tensor : 
+    -------input------- :
+        tensor : tensor à cropper 
+            forme : [1, C, H, W]
+        x1, y1, x2, y2 : coordonnées de la bounding box
+
+    -------output------- :
+        croppedTensor : tensor croppé
+            forme : [1, C, y2-y1, x2-x1]
+    */
     let data = await tensor.getData();
     let dims = tensor.dims;
 
@@ -34,6 +46,18 @@ export async function cropTensor (tensor, x1, y1, x2, y2) {
 }
 
 export async function applyBBsOnTensor (BBs,tensor,marge=10) {
+    /*Applique les bounding boxes sur UN tenseur :
+    -------input------- :
+        BBs : liste de bounding boxes
+            forme : [each bounding boxes : [x, y, w, h]]
+        tensor : tensor à cropper
+            forme : [1, C, H, W]
+        marge : marge à ajouter autour de la bounding box
+    
+    -------output------- :
+        croppedTensors : liste de tenseurs croppés
+            forme : [1, C, h+2*marge, w+2*marge]
+    */
     let croppedTensors = [];
     for (let i = 0; i < BBs.length; i++) {
         let x = BBs[i][0];
@@ -67,6 +91,9 @@ export async function applyBBsOnTensor (BBs,tensor,marge=10) {
 }
 
 export async function applyBBsOnTensors (BBs,tensors) {
+    // Applique les bounding boxes sur une LISTE de tenseurs
+    // cette fonction sert à appliquer les bounding boxes obtenues par inference/infer sur les Input tensor 
+
     let croppedTensors = [];
     for (let i = 0; i < tensors.length; i++) {
         let croppedTensor = await applyBBsOnTensor( BBs[i],tensors[i]);
@@ -77,16 +104,26 @@ export async function applyBBsOnTensors (BBs,tensors) {
 
 
 export function postprocess_BB(boundingboxes,numfiles) {
-    let numbb = boundingboxes.length/numfiles;
-    let subbb = null;
+    /*supprime les bounding boxes qui ont un IoU > 0.5
+    -------input------- :
+        boundingboxes : liste de bounding boxes
+            forme : [each img [each box [x, y, w, h]]]
+        numfiles : nombre d'images sur lesquelles on a fait l'inférence
+    
+    -------output------- :
+        boundingboxes : liste de bounding boxes après suppression des doublons
+            forme : [each img [each box [x, y, w, h]]]
+
+    */
+
     for (let k=0; k< numfiles; k++) {
-        for (let i = 0; i < boundingboxes[k].length; i++) {
+        for (let i = 0; i < boundingboxes[k].length-1; i++) {
             let x1 = boundingboxes[k][i][0];
             let y1 = boundingboxes[k][i][1];
             let w = boundingboxes[k][i][2];
             let h = boundingboxes[k][i][3];
 
-            for (let j = i; j < boundingboxes[k].length; j++) {
+            for (let j = i+1; j < boundingboxes[k].length; j++) {
                 if (i != j) {
                     let x2 = boundingboxes[k][j][0];
                     let y2 = boundingboxes[k][j][1];
@@ -105,6 +142,20 @@ export function postprocess_BB(boundingboxes,numfiles) {
 }
 
 export async function preprocess_for_classification(tensors,mean, std) {
+    /*preprocess les tenseurs pour la classification
+    -------input------- :
+        tensors : liste de tenseurs à prétraiter
+            forme : [each img [1, C, H, W]]
+        mean : liste des moyennes pour chaque canal
+        std : liste des écarts-types pour chaque canal
+
+    -------output------- :
+        new_ctensors : liste de tenseurs prétraités
+            forme : [each img [1, C, 224, 224]]
+
+    les tenseurs sont resized au format [3,224,224] et normalisés
+    */
+
     let new_ctensors = [];
     for (let i=0;i<tensors.length;i++) {
         let c = tensors[i];
@@ -116,6 +167,7 @@ export async function preprocess_for_classification(tensors,mean, std) {
 }
 
 export async function loadClassMapping(classmapping) {
+    // charge le fichier de mapping des classes (nom des classes)
     const response = await fetch(classmapping);
     const text = await response.text();
     let classmap = text.split('\n');
@@ -123,6 +175,7 @@ export async function loadClassMapping(classmapping) {
 }
 
 export function labelize (output,classmap) {
+    // à partir de la sortie du inference/classif, renvoie les labels des classes
     let labels_inter = [];
     console.log("output : ",output);
     for (let i=0;i<output[0].length;i++) {
@@ -138,6 +191,19 @@ export function labelize (output,classmap) {
 }
 
 export async function imload(files, targetWidth, targetHeight) {
+
+    /*
+    charge les images et les resize
+    -------input------- :
+        files : liste de fichiers
+        targetWidth : largeur cible
+        targetHeight : hauteur cible
+    
+    -------output------- :
+        tensor : tenseur contenant les images
+            forme : [files.length, 3, targetHeight, targetWidth]
+    */
+
     var float32Data = new Float32Array(targetHeight * targetWidth * 3 * files.length);
     for (let f = 0; f < files.length; f++) {
         let file = files[f];
@@ -208,6 +274,19 @@ export async function normalizeTensors (tensors, mean, std) {
 }
 
 export function output2BB (output,numImages,minConfidence) {
+    /*reshape les bounding boxes obtenues par le modèle d'inférence
+    -------input------- :
+        output : liste de bounding boxes obtenues par le modèle d'inférence
+            forme : [xxxx,yyyyy,wwww,hhhh,confconfconf,etc...] (se répète pr chaque img)
+        numfiles : nombre d'images sur lesquelles on a fait l'inférence*
+        minConfidence : seuil de confiance minimum pour considérer une bounding box
+
+    -------output------- :
+        bestBoxes : liste de bounding boxes après suppression des doublons
+            forme : [each img [each box [x, y, w, h]]]
+        bestScore : liste des meilleurs scores pour chaque image
+            forme : [each img [each box score]]
+    */
     console.log("output : ",output);
     let bestBoxes = [];
     let bestPerImageBoxes = [];
@@ -288,6 +367,11 @@ async function resizeTensor(tensor, targetWidth, targetHeight) {
 }
 
 async function applyBBsOnImage (BBs, image,marge=10) {
+    /*Même chose que applyBBsOnTensor mais pour une image, en vrai c'est deprecated, on l'utilise plus*/
+
+    console.warn("applyBBsOnImage is deprecated, use applyBBsOnTensors instead");
+
+
     let subimages = [];
     let subimageMIMES = [];
     for (let i = 0; i < BBs.length; i++) {

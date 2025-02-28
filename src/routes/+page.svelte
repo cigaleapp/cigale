@@ -11,21 +11,20 @@
 	let image_file; // Holds the selected file(s) from the input.
 	let processed_canvas; // The off-screen canvas showing the resized/preprocessed image.
 	let crop_canvas; // The canvas containing the cropped insect.
+	// les container
 	let processedContainer; // Container DOM element for the preprocessed canvas.
-	let cropContainer; // Container DOM element for the cropped image.
 	export let croppedImagesURL = [];
+	// le model de détection et de classif
 	let model = null;
+	let cmodel = null;
+	// les labels à afficher sur les images crops
 	export let labels = [];
-	let label_table = [];
+	// fichier contenant le mapping des classes
 	let classmapping = "/class_mapping.txt";
-	let classmap = [];
-	export let conf = [];
-
-
-	// Load the class mapping file.
-	
+	export let conf = [];	
 
 	async function processImage() {
+		let classmap = [];
 		img_proceed.nb = 0;
 		img_proceed.time = 0;
 		img_proceed.state= "loading"
@@ -33,7 +32,7 @@
 		if (image_file && image_file.length > 0) {
 			let files = Array.from(image_file);
 			if (!model) {model = await loadModel();}
-			
+
 			// 1. Ask the user to load the image: get the first file.
 			const file = image_file[0];
 			const img = await createImageBitmap(file);
@@ -57,7 +56,12 @@
 			ctx.putImageData(imageData, 0, 0);
 			
 			//var BsandBs = await infer(image_file,model, img_proceed);
-
+			// le inferSequentialy appel juste de manière séquentielle infer 
+			// BsandBs = [boundingboxes, bestScores, start, inputTensors]
+			// boundingboxes sous la forme [each image [each boxes [x,y,w,h]]]
+			// bestScores sous la forme [each image [each score]]
+			// start : le temps de départ (pour le calcul du temps total)
+			// inputTensors : les tensors d'entrée, ils servent à ne pas être recalculé à chaque fois
 			var BsandBs = await inferSequentialy(image_file,model, img_proceed);
 
 			let boundingboxes = BsandBs[0];
@@ -68,6 +72,7 @@
 			let best_boxes = boundingboxes[0];
 			let bestScore = bestScores[0];
 
+			// bon là juste on trace les bb comme ça
 			img_proceed.nb = 0;
 			img_proceed.state= "post processing"
 			for (let i = 0; i < best_boxes.length; i++) {
@@ -77,8 +82,10 @@
 			}
 
 			img_proceed.state= "finished"
+			// crop chaque tenseurs d'entrée (i.e les images) avec les bounding boxes
 			let ctensors = await applyBBsOnTensors( boundingboxes, inputTensors);
-			// initialisation des labels : 	
+
+			// initialisation des labels pour pas que l'affichage bug
 			labels = [];
 			conf = []
 			for (let i=0;i<ctensors.length;i++) {
@@ -92,7 +99,7 @@
 				conf.push(c);
 			}
 
-			// ça c'est la partie affichage 
+			// on affiche les images crops obtenues avec le applyBBsOnTensors
 			let croppedImagesURL_buffer = [];
 			for (let i=0;i<ctensors.length;i++) {
 				let croppedImagesURL_inter = [];
@@ -104,17 +111,29 @@
 				croppedImagesURL_buffer.push(croppedImagesURL_inter);
 			}
 			croppedImagesURL = croppedImagesURL_buffer;
+			// ensuite on libère la ram du model de détection
 
+			model.release();
+			model = null;
+
+			// ça charge le fichier de mapping de classes et en créé un tableau
 			classmap = await loadClassMapping(classmapping);
 
-			let cmodel =  await loadModel(true);
+			// le true c'est juste pr dire qu'on vas load le model de classif
+			if (!cmodel) {cmodel = await loadModel(true);}
+			// on classifie chaque image crop, coutput = [each image [each class]] ; [each image [each conf]]
 			let coutput = await classify(ctensors, cmodel,img_proceed,start);
-			
+			// on passe de la coutput à [each image[each label]] et [each image[each conf]]
 			let labelandconf = labelize(coutput, classmap);
 			labels = labelandconf[0];
 			conf = labelandconf[1];
+
+			// on libère la ram du model de classif
+			cmodel.release();
+			cmodel = null;
 		}
 	}
+	// bon le reste c'est du html c'est pas moi qu'ais fait c'est chatgpt parce que flm
 
 	// Reactive statement: when processedContainer and processed_canvas are set,
 	// update the container's content to display the preprocessed image.
@@ -123,11 +142,6 @@
 		processedContainer.appendChild(processed_canvas);
 	}
 
-	// Reactive statement: similarly update the container for the cropped image.
-	$: if (cropContainer && crop_canvas) {
-		cropContainer.innerHTML = '';
-		cropContainer.appendChild(crop_canvas);
-	}
 </script>
 <style>
 	h1 {
@@ -163,7 +177,6 @@
 
 <!-- Step 5: Display the cropped insect image -->
 <h2>Cropped Insect</h2>
-<div bind:this={cropContainer}></div>
 
 <h3>{img_proceed.state}</h3>
 <p>image proceed : {img_proceed.nb}  ;  time taken (s): {img_proceed.time}</p>
