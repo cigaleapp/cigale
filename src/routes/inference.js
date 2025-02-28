@@ -33,7 +33,10 @@ les fonctions sont les suivantes :
         6. labelize sur les indices des classes prédites pour obtenir les labels
         7. afficher les résultats (voir le fichier +page.svelt pour des exemples)
 
-PS : 
+        PS : quand les models ne sont plus utiliser on peux les disposer avec model.release()
+            de même avec les tensors : tensor.dispose()
+
+PPS : 
 il est thecniquement possible d'utiliser le webgpu, mais c'est pas encore implémenté, 
 de plus ça se lance que sur chrome, avec la commande linux mettant les flags : 
  google-chrome-stable --enable-unsafe-webgpu --enable-features=Vulkan
