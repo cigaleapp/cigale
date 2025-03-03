@@ -27,7 +27,12 @@ function wrangler(table) {
 		/** @param {typeof Tables[Table]['inferIn']} value */
 		set: async (value) => set(table, value),
 		/** @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value */
-		add: async (value) => set(table, { ...value, id: `${table}_${nanoid()}` }),
+		add: async (value) =>
+			set(
+				table,
+				// @ts-ignore
+				{ ...value, id: `${table}_${nanoid()}` }
+			),
 		list: async () => list(table),
 		all: () => iterator(table),
 		/** @param {string} index  */
@@ -93,6 +98,7 @@ export async function get(tableName, key) {
 export async function list(tableName) {
 	const db = await openDatabase();
 	const validator = Tables[tableName];
+	// @ts-ignore
 	return await db.getAll(tableName).then((values) => values.map(validator.assert));
 }
 
