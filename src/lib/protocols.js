@@ -1,3 +1,4 @@
+import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { tables } from './idb.js';
 
@@ -56,7 +57,7 @@ export async function importProtocol() {
 				try {
 					if (!reader.result) throw new Error('Fichier vide');
 					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-					const protocol = ExportedProtocol.assert(JSON.parse(reader.result));
+					const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
 					await Promise.all([
 						...protocol.metadata.map((m) => tables.Metadata.set(m)),
 						tables.Protocol.set({

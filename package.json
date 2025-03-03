@@ -56,7 +56,8 @@
 		"fuse.js": "^7.1.0",
 		"idb": "^8.0.2",
 		"sveltejs-tippy": "^3.0.0",
-		"unplugin-icons": "^22.0.0"
+		"unplugin-icons": "^22.0.0",
+		"yaml": "^2.7.0"
 	},
 	"volta": {
 		"node": "22.14.0",
