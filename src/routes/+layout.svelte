@@ -11,6 +11,7 @@
 
 	// TODO get value from DB
 	setContext('showSwitchHints', true);
+	let img = 'https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg';
 	let sexe = 0;
 	let date = 0;
 	let metaValue = $state([sexe, date]);
@@ -37,8 +38,9 @@
 </section>
 
 <PreviewSidePannel
+	images={[img, img, img, img, img, img, img, img, img, img, img]}
 	metaNom={['sexe', 'heure']}
-	metaType={['number', 'date']}
+	metaType={['enumeration', 'date']}
 	bind:metaValue
 	metaOptions={[['male', 'femelle'], []]}
 ></PreviewSidePannel>
