@@ -3,8 +3,8 @@
 	import { setContext } from 'svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Toast from '$lib/Toast.svelte';
-
 	import './style.css';
+	import Navigation from './Navigation.svelte';
 	import PreviewSidePannel from './PreviewSidePannel.svelte';
 
 	const { children } = $props();
@@ -18,6 +18,8 @@
 	$inspect(metaValue);
 	$inspect(sexe);
 </script>
+
+<Navigation hasImages={true}></Navigation>
 
 <svelte:head>
 	<base href={base} />
