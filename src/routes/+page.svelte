@@ -15,7 +15,7 @@
 			let reader = new FileReader();
 			reader.onload = function (e) {
 				let img = new Image();
-				img.src = e.target.result;
+				img.src = e.target?.result?.toString() ?? '';
 				img.onload = async function () {
 					let tensor = tf.browser.fromPixels(img).resizeBilinear([224, 224]).toFloat();
 					tensor = tensor.div(tensor.max());
@@ -23,6 +23,7 @@
 
 					let tensor_copy = tf.browser.fromPixels(img).clone();
 
+					// @ts-ignore
 					tensor_copy = tensor_copy.resizeBilinear([224, 224]).toFloat();
 					tensor_copy = tensor_copy.div(255.0);
 
