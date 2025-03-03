@@ -15,6 +15,8 @@
 	let sexe = 0;
 	let date = 0;
 	let metaValue = $state([sexe, date]);
+	$inspect(metaValue);
+	$inspect(sexe);
 </script>
 
 <svelte:head>
@@ -39,11 +41,14 @@
 
 <PreviewSidePannel
 	images={[img, img, img, img, img, img, img, img, img, img, img]}
-	metaNom={['sexe', 'heure']}
+	metaNom={['sexe', 'date']}
 	metaType={['enumeration', 'date']}
 	bind:metaValue
 	metaOptions={[['male', 'femelle'], []]}
-></PreviewSidePannel>
+	clickFusion={() => {}}
+	clickAddMeta={() => {}}
+	showFusion="true"
+/>
 <button
 	onclick={() => {
 		console.log(sexe);
