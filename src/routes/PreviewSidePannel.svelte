@@ -1,7 +1,17 @@
 <script>
+	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
-	let { images, metaNom, metaType, metaValue = $bindable(), metaOptions } = $props();
+	let {
+		images,
+		metaNom,
+		metaType,
+		metaValue = $bindable(),
+		metaOptions,
+		clickFusion,
+		clickAddMeta,
+		showFusion
+	} = $props();
 </script>
 
 <div class="pannel">
@@ -18,6 +28,14 @@
 			</Metadata>
 		{/each}
 	</MetadataList>
+	<div class="button">
+		{#if showFusion}
+			<ButtonPrimary onclick={clickFusion} --width="80%">Fusionner les observations</ButtonPrimary>
+		{/if}
+		<ButtonPrimary onclick={clickAddMeta} --width="80%">
+			Ajouter une métadonner les métadonnées
+		</ButtonPrimary>
+	</div>
 </div>
 
 <style>
@@ -29,12 +47,15 @@
 		background-color: var(--bg-neutral);
 		overflow: hidden;
 		padding-top: 10px;
+		padding-left: 5px;
 		display: flex;
 		flex-direction: column;
 		gap: 30px;
-		border-color: black;
-		border-width: 50px;
-		border-radius: var(--border-radius);
+		border-style: solid;
+		border-color: var(--bg-primary);
+		border-width: var(--border-thickness);
+		border-top-left-radius: var(--corner-radius);
+		border-bottom-left-radius: var(--corner-radius);
 	}
 
 	h1 {
@@ -51,5 +72,16 @@
 
 	img {
 		height: 50px;
+	}
+
+	.button {
+		position: fixed;
+		display: flex;
+		gap: 20px;
+		align-items: center;
+		flex-direction: column;
+		bottom: 5%;
+		height: fit-content;
+		width: 30%;
 	}
 </style>
