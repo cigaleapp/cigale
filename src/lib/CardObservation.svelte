@@ -72,7 +72,7 @@
 						disabled={loading}
 						class="stack-count"
 						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
-						onclick={(e) => {
+						onclick={(/** @type {MouseEvent} */ e) => {
 							e.stopPropagation();
 							onstacksizeclick?.();
 						}}

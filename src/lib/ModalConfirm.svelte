@@ -1,4 +1,6 @@
 <script>
+	import ButtonPrimary from './ButtonPrimary.svelte';
+	import ButtonSecondary from './ButtonSecondary.svelte';
 	import Modal from './Modal.svelte';
 
 	/**
@@ -32,24 +34,22 @@
 	{@render children?.()}
 	{#snippet footer()}
 		<div class="actions">
-			<!-- TODO Use button primary -->
-			<button
-				onclick={() => {
-					close?.();
-					onconfirm();
-				}}
-			>
-				{confirm}
-			</button>
-			<!-- TODO use button secondary  -->
-			<button
+			<ButtonSecondary
 				onclick={() => {
 					close?.();
 					oncancel?.();
 				}}
 			>
 				{cancel}
-			</button>
+			</ButtonSecondary>
+			<ButtonPrimary
+				onclick={() => {
+					close?.();
+					onconfirm();
+				}}
+			>
+				{confirm}
+			</ButtonPrimary>
 		</div>
 	{/snippet}
 </Modal>
