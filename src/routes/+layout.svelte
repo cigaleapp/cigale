@@ -12,7 +12,7 @@
 	setContext('showSwitchHints', true);
 </script>
 
-<Navigation></Navigation>
+<Navigation hasImages={true}></Navigation>
 
 <svelte:head>
 	<base href={base} />

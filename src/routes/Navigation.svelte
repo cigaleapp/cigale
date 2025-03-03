@@ -22,7 +22,7 @@
 		C.i.g.a.l.e.
 	</div>
 
-	<a href="/#/import">
+	<a href="#/import">
 		Import
 		{#if page.route.id == '/import'}
 			<div class="line"></div>
@@ -32,7 +32,7 @@
 	<Sup></Sup>
 
 	<a
-		href="/#/crop"
+		href="#/crop"
 		aria-disabled={!hasImages &&
 			page.route.id != '/classification' &&
 			page.route.id != '/resultats' &&
@@ -48,7 +48,7 @@
 	<Sup></Sup>
 
 	<a
-		href="/#/classification"
+		href="#/classification"
 		aria-disabled={page.route.id != '/classification' &&
 			page.route.id != '/resultats' &&
 			page.route.id != '/crop'}
@@ -61,7 +61,7 @@
 
 	<Sup></Sup>
 	<a
-		href="/#/resultats"
+		href="#/resultats"
 		aria-disabled={page.route.id != '/classification' && page.route.id != '/resultats'}
 	>
 		<div class="download">
