@@ -95,15 +95,20 @@
 
 	article {
 		background: var(--bg-neutral);
-		padding: 0.125em 1em;
+		padding: 0.5em 1em;
 		border-radius: var(--corner-radius);
 		display: flex;
 		border: calc(3 * var(--border-thickness)) solid var(--bg);
 		color: var(--fg);
 		align-items: center;
-		gap: 1em;
+		gap: 0.25em 1em;
 		width: max-content;
 		min-width: calc(min(200px, 100vw));
+		max-width: calc(100vw - 2em);
+	}
+
+	p {
+		margin: 0;
 	}
 
 	.icon {
