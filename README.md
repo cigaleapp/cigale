@@ -2,6 +2,10 @@
 
 Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
 
+## Organisation de données
+
+![](./database.png)
+
 ## Développement
 
 1. Installer Volta
