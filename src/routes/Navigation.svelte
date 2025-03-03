@@ -4,9 +4,7 @@
 	import Gear from '~icons/ph/gear';
 	import logo from '../favicon.png';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { page } from '$app/state';
-	import { beforeNavigate } from '$app/navigation';
 
 	/**
 	 * @typedef Props
@@ -16,71 +14,7 @@
 
 	/** @type {Props} */
 	let { hasImages = true } = $props();
-
-	let openConfirm = $state();
-
-	// function clickImport() {
-	// 	if (currentPage != 'Import') {
-	// 		whereNext = 'Import';
-	// 		openConfirm();
-	// 	}
-	// }
-
-	// function clickCrop() {
-	// 	if (currentPage == 'Import') {
-	// 		currentPage = 'Crop';
-	// 	} else if (currentPage != 'Crop') {
-	// 		whereNext = 'Crop';
-	// 		openConfirm();
-	// 	}
-	// }
-
-	// function clickClassif() {
-	// 	if (currentPage == 'Import' || currentPage == 'Crop') {
-	// 		currentPage = 'Classif';
-	// 	} else if (currentPage != 'Classif') {
-	// 		whereNext = 'Classif';
-	// 		openConfirm();
-	// 	}
-	// }
-
-	// function clickDownload() {
-	// 	currentPage = 'Download';
-	// }
-
-	let waitingConfirm = false;
-	let reseau = 1;
-
-	beforeNavigate(async ({ to, from }) => {
-		if (to?.route?.id == '/classification' && from?.route?.id != '/crop') {
-			openConfirm();
-
-			await waitingConfirm;
-
-			console.log(reseau);
-
-			waitingConfirm = false;
-		}
-	});
 </script>
-
-<ModalConfirm
-	key="Confirmation"
-	title="Attention"
-	onconfirm={() => {
-		waitingConfirm = true;
-		reseau = 1;
-	}}
-	oncancel={() => {
-		waitingConfirm = true;
-		reseau = 2;
-	}}
-	bind:open={openConfirm}
->
-	<p>
-		Êtes vous sur de vouloir revenir en arrière? Cela peut engendrer de la perte de vos avancements.
-	</p>
-</ModalConfirm>
 
 <nav>
 	<div class="divLogo">
