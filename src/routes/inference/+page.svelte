@@ -80,12 +80,14 @@
 			var BsandBs = await inferSequentialy(image_file, model, img_proceed);
 
 			let boundingboxes = BsandBs[0];
+			// @ts-ignore
 			let start = BsandBs[2];
 			let inputTensors = BsandBs[3];
 
 			// bon là juste on trace les bb comme ça
 			img_proceed.nb = 0;
 			img_proceed.state = 'post processing';
+			// @ts-ignore
 			img_proceed.time = (Date.now() - start) / 1000;
 			//for (let i = 0; i < best_boxes.length; i++) {
 			//	ctx.strokeStyle = 'red';
@@ -95,6 +97,7 @@
 
 			img_proceed.state = 'finished';
 			// crop chaque tenseurs d'entrée (i.e les images) avec les bounding boxes
+			// @ts-ignore
 			let ctensors = await applyBBsOnTensors(boundingboxes, inputTensors);
 
 			// initialisation des labels pour pas que l'affichage bug
@@ -110,6 +113,7 @@
 				labels.push(l);
 				conf.push(c);
 			}
+			// @ts-ignore
 			img_proceed.time = (Date.now() - start) / 1000;
 
 			// on affiche les images crops obtenues avec le applyBBsOnTensors
@@ -118,15 +122,19 @@
 			let croppedImagesURL_buffer = [];
 			for (let i = 0; i < ctensors.length; i++) {
 				let croppedImagesURL_inter = [];
+				// @ts-ignore
 				let c = ctensors[i];
 				for (let j = 0; j < c.length; j++) {
+					// @ts-ignore
 					let img = c[j].toDataURL();
 					croppedImagesURL_inter.push(img);
 					img_proceed.nb += 1;
+					// @ts-ignore
 					img_proceed.time = (Date.now() - start) / 1000;
 				}
 				croppedImagesURL_buffer.push(croppedImagesURL_inter);
 			}
+			// @ts-ignore
 			croppedImagesURL = croppedImagesURL_buffer;
 			// ensuite on libère la ram du model de détection
 
@@ -138,6 +146,7 @@
 				cmodel = await loadModel(true);
 			}
 			// on classifie chaque image crop, coutput = [each image [each class]] ; [each image [each conf]]
+			// @ts-ignore
 			let coutput = await classify(ctensors, cmodel, img_proceed, start);
 			// on passe de la coutput à [each image[each label]] et [each image[each conf]]
 			let labelandconf = labelize(coutput, classmap);

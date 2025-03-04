@@ -50,7 +50,9 @@ de plus ça se lance que sur chrome, avec la commande linux mettant les flags :
 // nombre de threads pour wasm
 ort.env.wasm.numThreads = -1;
 // nécéssaire sinon ça casse
+
 ort.env.wasm.wasmPaths = {
+	// @ts-ignore
 	'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm'
 };
 
@@ -62,13 +64,22 @@ export const NUMCONF = 0.437; // seuil de confiance pour la détection
 export const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
 export const NMS = true;
-
+/**
+ *
+ * @param {string} path
+ * @returns {string}
+ */
 export function torawpath(path) {
 	let debut = 'https://git.inpt.fr/api/v4/projects/1535/repository/files/models%2f';
 	let fin = '/raw?lfs=true';
 	return debut + path + fin;
 }
-
+/**
+ *
+ * @param {boolean} classif
+ * @param {boolean} webgpu
+ * @returns
+ */
 export async function loadModel(classif = false, webgpu = false) {
 	let MODELCLASSIFPATH = torawpath('model_classif.onnx');
 	let MODELDETECTPATH = torawpath('arthropod_detector_yolo11n_conf0.437.onnx');
@@ -93,6 +104,15 @@ export async function loadModel(classif = false, webgpu = false) {
 	}
 	return model;
 }
+/**
+ *
+ * @param {FileList} files
+ * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @param {boolean} sequence
+ * @param {boolean} webgpu
+ * @returns
+ */
 export async function infer(files, model, img_proceed, sequence = false, webgpu = true) {
 	/*Effectue une inférence de détection sur une ou plusieurs images. 
     -------------inputs----------------
@@ -138,6 +158,7 @@ export async function infer(files, model, img_proceed, sequence = false, webgpu 
 	console.log('output tensor: ', outputTensor);
 
 	console.log('post proc...');
+	// @ts-ignore
 	const bbs = output2BB(outputTensor.output0.data, files.length, NUMCONF, NMS);
 	console.log('done !');
 	const bestScores = bbs[1];
@@ -157,16 +178,32 @@ export async function infer(files, model, img_proceed, sequence = false, webgpu 
 	return [boundingboxes, bestScores, start, inputTensor];
 }
 
+/**
+ *
+ * @param {FileList} files
+ * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {number} i
+ * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @returns
+ */
 async function mapToFiles(files, model, i, img_proceed) {
 	let imfile = files[i];
+	// @ts-ignore
 	var BandB = await infer([imfile], model, img_proceed, false);
 	let boundingboxe = BandB[0];
 	let bestScore = BandB[1];
 	let inputTensor = BandB[3];
-
+	// @ts-ignore
 	return [boundingboxe[0], bestScore[0], inputTensor];
 }
 
+/**
+ *
+ * @param {FileList} files
+ * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @returns
+ */
 export async function inferSequentialy(files, model, img_proceed) {
 	/*Effectue une inférence de détection sur une ou plusieurs images.
     Cette fonction est similaire à infer, mais permet l'inférence une à une 
@@ -183,12 +220,14 @@ export async function inferSequentialy(files, model, img_proceed) {
 
 	for (let i = 0; i < files.length; i++) {
 		let imfile = files[i];
+		// @ts-ignore
 		var BandB = await infer([imfile], model, img_proceed, false);
 		let boundingboxe = BandB[0];
 		let bestScore = BandB[1];
 		let inputTensor = BandB[3];
-
+		// @ts-ignore
 		boundingboxes.push(boundingboxe[0]);
+		// @ts-ignore
 		bestScores.push(bestScore[0]);
 		inputTensors.push(inputTensor);
 
@@ -197,7 +236,13 @@ export async function inferSequentialy(files, model, img_proceed) {
 	}
 	return [boundingboxes, bestScores, start, inputTensors];
 }
-
+/**
+ *
+ * @param {FileList} files
+ * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @returns
+ */
 export async function inferSequentialyConcurrent(files, model, img_proceed) {
 	/*Effectue une inférence de détection sur une ou plusieurs images de manière 
     concurentielle. 
@@ -224,7 +269,14 @@ export async function inferSequentialyConcurrent(files, model, img_proceed) {
 	}
 	return [boundingboxes, bestScores, start, inputTensors];
 }
-
+/**
+ *
+ * @param {ort.Tensor[][]} images
+ * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @param {number} start
+ * @returns
+ */
 export async function classify(images, model, img_proceed, start) {
 	/*Effectue une inférence de classification sur une ou plusieurs images.
     -------------inputs----------------
@@ -253,6 +305,7 @@ export async function classify(images, model, img_proceed, start) {
 	let argmaxs = [];
 	let bestScores = [];
 	img_proceed.state = 'preprocessing for classification...';
+	// @ts-ignore
 	images = await preprocess_for_classification(images, MEAN, STD);
 	img_proceed.state = 'classification...';
 
@@ -262,7 +315,7 @@ export async function classify(images, model, img_proceed, start) {
 		for (let j = 0; j < images[i].length; j++) {
 			let inputTensor = images[i][j];
 			const outputTensor = await model.run({ [inputName]: inputTensor });
-
+			// @ts-ignore
 			let argmax_ = outputTensor.output.data.indexOf(Math.max(...outputTensor.output.data));
 			let bestScore_ = outputTensor.output.data[argmax_];
 			argmax.push(argmax_);
