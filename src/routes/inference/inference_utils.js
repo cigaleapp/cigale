@@ -91,7 +91,7 @@ export async function cropTensor(tensor, x1, y1, x2, y2) {
  * @param {number[]} BB
  * @param {ort.Tensor} tensor
  * @param {number} marge
- * @returns
+ * @returns {Promise<ort.Tensor>}
  */
 async function applyBBOnTensor(BB, tensor, marge = 10) {
 	/*Applique une bounding box sur UN tenseur :
@@ -558,7 +558,7 @@ async function resizeTensor(tensor, targetWidth, targetHeight) {
  * @param {number[][]} BBs
  * @param {Image} image
  * @param {number} marge
- * @returns
+ * @returns {Promise<[string[], Image[]]>}
  */
 async function applyBBsOnImage(BBs, image, marge = 10) {
 	/*Même chose que applyBBsOnTensor mais pour une image, en vrai c'est deprecated, on l'utilise plus*/
@@ -605,7 +605,7 @@ async function applyBBsOnImage(BBs, image, marge = 10) {
  *
  * @param {number[][][]} BBs
  * @param {Image[]} images
- * @returns
+ * @returns {Promise<[string[], Image[]]>}
  */
 export async function applyBBsOnImages(BBs, images) {
 	let croppedImages = [];
@@ -618,5 +618,6 @@ export async function applyBBsOnImages(BBs, images) {
 		croppedImagesMIME.push(subImages[0]);
 	}
 	//return [croppedImagesMIME,croppedImages];
+	// @ts-ignore
 	return [croppedImagesMIME];
 }
