@@ -5,6 +5,7 @@
 		"phoenisx.cssvar",
 		"stylelint.vscode-stylelint",
 		"svelte.svelte-vscode",
-		"antfu.iconify"
+		"antfu.iconify",
+		"arktypeio.arkdark"
 	]
 }

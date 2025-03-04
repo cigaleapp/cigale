@@ -2,27 +2,42 @@
 	import Fuse from 'fuse.js';
 
 	/**
+	 * @typedef {{  key: string, label: string }} Option
+	 */
+
+	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {string[]} options possible options
+	 * @property {Option[]} options possible options. Each option is a tuple of [value, label]. The double-array allows you to explicitly specify the order of the options.
 	 * @property {string} searchQuery the string we're searching for
-	 * @property {string} selectedValue the option selected by the user
+	 * @property {string} [placeholder="Rechercher…"] the placeholder text for the search bar
+	 * @property {string|undefined} selectedValue the option selected by the user
+	 * @property {(value: string|undefined) => void} [onblur] callback to call when the user quits the search bar
 	 */
 
 	/** @type {Props} */
-	let { options, searchQuery = $bindable(''), selectedValue = $bindable() } = $props();
+	let {
+		options,
+		onblur,
+		placeholder,
+		searchQuery = $bindable(''),
+		selectedValue = $bindable(),
+		...rest
+	} = $props();
 
-	const fuse = $derived(new Fuse(options));
+	const fuse = $derived(new Fuse(options, { keys: ['key', 'label'] }));
 
-	/** @type {string[]} options that match searchQuery */
+	/** @type {Option[]} options that match searchQuery */
 	const filteredItems = $derived(
 		searchQuery ? fuse.search(searchQuery).map((r) => r.item) : options
 	);
-	// svelte-ignore non_reactive_update
-	let activeIndex = -1; // Tracks currently selected option in the list
+	let activeIndex = $state(-1);
+	/** @type {HTMLUListElement} */
 	let listRef;
+	/** @type {HTMLInputElement} */
 	let InputRef;
 
+	/** @param {KeyboardEvent} event */
 	function handleKeyDown(event) {
 		const itemCount = filteredItems.length;
 
@@ -34,43 +49,51 @@
 			activeIndex = (activeIndex - 1 + itemCount) % itemCount; // Loop to last item
 		} else if (event.key === 'Enter' && itemCount > 0) {
 			event.preventDefault();
-			searchQuery = filteredItems[activeIndex]; // Select active item
+			searchQuery = filteredItems[activeIndex].label; // Select active item
+			selectedValue = filteredItems[activeIndex].key;
 			listRef.blur();
 			InputRef.blur();
 		}
-		// Update the border of the active button
-		Array.from(listRef.children).forEach((child, index) => {
-			child.firstElementChild.style.background =
-				index === activeIndex ? 'var(--bg-primary-translucent)' : 'var(--bg-neutral)';
-		});
 
 		// Ensure the active button is scrolled into view
 		listRef?.children[activeIndex]?.scrollIntoView({ block: 'nearest' });
 	}
 </script>
 
-<div class="listeRecherche" role="listbox" tabindex={activeIndex} onkeydown={handleKeyDown}>
+<div class="listeRecherche" role="listbox">
 	<input
+		{...rest}
 		class="search-bar"
 		type="text"
-		placeholder="Search..."
-		bind:value={searchQuery}
+		{placeholder}
+		value={searchQuery}
 		bind:this={InputRef}
+		onkeydown={handleKeyDown}
+		oninput={({ currentTarget }) => {
+			console.log('input', currentTarget.value);
+			searchQuery = currentTarget.value;
+			activeIndex = 0;
+		}}
+		onblur={() => {
+			onblur?.(selectedValue);
+			activeIndex = 0;
+		}}
 	/>
 
 	<ul class="container" bind:this={listRef}>
-		{#each filteredItems as option, i}
+		{#each filteredItems as { key, label }, i (key)}
 			<li>
 				<button
-					class="button {activeIndex === i ? option : ''}"
+					class="button"
+					class:highlighted={i === activeIndex}
 					onclick={(e) => {
-						selectedValue = option;
-						searchQuery = option;
+						selectedValue = key;
+						searchQuery = label;
 						e.currentTarget.blur();
 					}}
 					tabindex="-1"
 				>
-					{option}
+					{label}
 				</button>
 			</li>
 		{/each}
@@ -80,36 +103,47 @@
 <style>
 	.container {
 		position: absolute;
-		max-height: 100px;
+		max-height: 200px;
 		border: 1px solid #ccc;
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
 		margin-top: 0;
 		overflow-x: auto;
 	}
+
 	.search-bar {
 		border: 1px solid var(--gray);
 		height: var(--searchBarHeight);
 		border-radius: 5px;
 		padding: 0 1em;
+		width: 100%;
+		font-size: 1em;
 	}
 
 	.search-bar:focus {
 		outline: none;
 		border-color: var(--bg-primary);
 	}
+
 	.search-bar:hover {
 		border-color: var(--bg-primary-translucent);
 	}
+
 	.button {
 		width: 100%;
 		height: 100%;
 		border: none;
 		text-align: left;
 		display: flex;
-		padding: 0 1em;
+		padding: 0.25em 1em;
+		font-size: 1em;
 	}
-	.ul:last-child {
+
+	.button.highlighted {
+		background-color: var(--bg-primary-translucent);
+	}
+
+	ul:last-child {
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
 	}
@@ -132,8 +166,8 @@
 	}
 
 	.listeRecherche {
+		width: 100%;
 		position: relative;
-		width: fit-content;
 		--searchBarHeight: 2.5em;
 	}
 </style>
