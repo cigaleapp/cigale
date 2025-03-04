@@ -20,7 +20,7 @@
 	// les labels à afficher sur les images crops
 	export let labels = [];
 	// fichier contenant le mapping des classes
-	let classmapping = "/class_mapping.txt";
+	let classmapping = "https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/raw/main/models/class_mapping.txt";
 	export let conf = [];	
 
 	async function processImage() {
