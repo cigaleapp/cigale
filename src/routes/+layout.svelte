@@ -1,16 +1,16 @@
 <script>
 	import { base } from '$app/paths';
-	import { setContext } from 'svelte';
-	import { toasts } from '$lib/toasts.svelte';
 	import Toast from '$lib/Toast.svelte';
+	import { toasts } from '$lib/toasts.svelte';
+	import { setContext } from 'svelte';
+
 	import './style.css';
 	import Navigation from './Navigation.svelte';
 	import Reglages from './Reglages.svelte';
 
-	const { children } = $props();
+	const { children, data } = $props();
 
-	// TODO get value from DB
-	setContext('showSwitchHints', true);
+	setContext('showSwitchHints', data.showInputHints);
 </script>
 
 <div class="navbar">
