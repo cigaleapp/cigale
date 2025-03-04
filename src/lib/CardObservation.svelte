@@ -2,19 +2,31 @@
 	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
 	import Card from './Card.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
+	import Logo from './Logo.svelte';
+	import ButtonInk from './ButtonInk.svelte';
+	import IconDelete from '~icons/ph/trash';
+	import IconImage from '~icons/ph/image';
 	import { tooltip } from './tooltips';
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {() => void} onclick
+	 * @property {() => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
+	 * @property {() => void} [ondelete]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
 	 * @property {boolean} selected
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
+	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
+	 * @property {number} boundingBoxes.x
+	 * @property {number} boundingBoxes.y
+	 * @property {number} boundingBoxes.width
+	 * @property {number} boundingBoxes.height
+	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
+	 * @property {string} [statusText] - text to show when loading and progress is -1
 	 */
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
@@ -25,8 +37,11 @@
 		image,
 		loading,
 		selected,
-		loadingText = 'Chargement…',
+		errored = false,
+		statusText = 'Chargement…',
 		stacksize = 1,
+		boundingBoxes = [],
+		ondelete,
 		...rest
 	} = $props();
 
@@ -39,24 +54,60 @@
 	let titleWasEllipsed = $derived(titleOffsetWidth < titleElement?.scrollWidth);
 </script>
 
-<div class="observation" class:selected class:loading class:stacked {...rest}>
+<div
+	class="observation"
+	class:selected
+	class:loading
+	class:stacked
+	{...rest}
+	use:tooltip={errored ? statusText : undefined}
+>
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
-		<Card onclick={loading ? undefined : (onclick ?? (() => {}))}>
+		<Card onclick={loading || errored ? undefined : (onclick ?? (() => {}))}>
 			<div class="inner">
-				{#if loading !== undefined}
+				{#if loading !== undefined || errored}
 					<div class="loading-overlay">
-						<LoadingSpinner progress={loading === -1 ? undefined : loading} />
-						<span class="text" class:smol={loading === -1}>
-							{#if loading !== -1}
-								{Math.round(loading * 100)}%
+						{#if errored}
+							<Logo --size="1.5em" variant="error" />
+						{:else}
+							<LoadingSpinner progress={loading === -1 ? undefined : loading} />
+						{/if}
+						<span class="text" class:smol={errored || loading === -1}>
+							{#if errored || loading === undefined}
+								Erreur
+							{:else if loading === -1}
+								{statusText}
 							{:else}
-								{loadingText}
+								{Math.round(loading * 100)}%
 							{/if}
 						</span>
+						{#if ondelete}
+							<section class="errored-actions">
+								<ButtonInk onclick={ondelete}>
+									<IconDelete /> Supprimer
+								</ButtonInk>
+							</section>
+						{/if}
 					</div>
 				{/if}
-				<img src={image} alt={title} />
+				<div class="containbb">
+					{#if image}
+						<img src={image} alt={title} />
+					{:else}
+						<div class="img-placeholder">
+							<IconImage />
+						</div>
+					{/if}
+					{#each boundingBoxes as bounding, index (index)}
+						<div
+							class="bb"
+							style="left: {bounding.x * 100}%; top: {bounding.y * 80}%; width: {bounding.width *
+								100}%; height: {80 * bounding.height}%;"
+						></div>
+					{/each}
+				</div>
+
 				<footer>
 					<div class="check-icon">
 						<AnimatableCheckmark />
@@ -72,7 +123,7 @@
 						disabled={loading}
 						class="stack-count"
 						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
-						onclick={(e) => {
+						onclick={(/** @type {MouseEvent} */ e) => {
 							e.stopPropagation();
 							onstacksizeclick?.();
 						}}
@@ -102,6 +153,7 @@
 		position: relative;
 		width: var(--card-width);
 		user-select: none;
+		cursor: pointer;
 	}
 
 	.observation:not(.loading) {
@@ -118,7 +170,6 @@
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		/* TODO: remove :global(), c pa bi1!! */
 		.observation:not(.loading).stacked:is(:hover, :has(:focus-visible)) .main-card {
 			transform: rotate(-3deg);
 		}
@@ -157,10 +208,21 @@
 		font-size: 1.2rem;
 	}
 
-	img {
+	img,
+	.img-placeholder {
 		width: 100%;
 		height: 200px;
-		object-fit: cover;
+		/*object-fit: cover;*/
+	}
+
+	.img-placeholder {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 3em;
+		opacity: 0.25;
+		color: var(--gay);
+		background: var(--gray);
 	}
 
 	footer {
@@ -267,9 +329,27 @@
 			left calc(var(--transition-duration) / 1.5);
 	}
 
+	.bb {
+		position: absolute;
+		border: 2px solid white;
+		outline: 2px solid black;
+		filter: contrast(200%);
+	}
+
+	.containbb {
+		display: inline-block;
+	}
+
 	@media (prefers-reduced-motion: no-preference) {
 		.observation:not(.loading):is(:hover, :has(:focus-visible)) .stack-backgroud-card {
 			transform: rotate(3deg);
 		}
+	}
+
+	.errored-actions {
+		margin-top: 0.75em;
+		font-size: 0.4em;
+		--fg: var(--fg-error);
+		--bg-hover: var(--bg-error);
 	}
 </style>

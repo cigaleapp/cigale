@@ -1,16 +1,28 @@
 <script>
-	let { children, onclick } = $props();
+	import { tooltip } from './tooltips';
+
+	/**
+	 * @typedef Props
+	 * @type {object}
+	 * @property {import('svelte').Snippet} children
+	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {string} [help]
+	 */
+
+	/** @type {Props} */
+	let { children, onclick, help } = $props();
 </script>
 
-<button {onclick}>
+<button {onclick} use:tooltip={help}>
 	{@render children()}
 </button>
 
 <style>
 	button {
-		background-color: var(--bg-neutral);
-		color: var(--bg-primary);
+		background-color: var(--bg, var(--bg-neutral));
+		color: var(--fg, var(--bg-primary));
 		display: flex;
+		gap: 0.5em;
 		justify-content: center;
 		align-items: center;
 		border: none;
@@ -23,6 +35,6 @@
 	}
 
 	button:is(:hover, :focus-visible) {
-		background-color: var(--bg-primary-translucent);
+		background-color: var(--bg-hover, var(--bg-primary-translucent));
 	}
 </style>
