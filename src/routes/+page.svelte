@@ -1,7 +1,7 @@
 <script>
 	import * as Jimp from 'jimp';
 
-	import {infer,loadModel, inferSequentialy,STD,MEAN, classify,inferSequentialyConcurrent} from "./inference.js"
+	import {infer,loadModel, inferSequentialy,STD,MEAN, classify,inferSequentialyConcurrent,torawpath} from "./inference.js"
 	import {applyBBsOnImages,labelize,imload, normalizeTensors, applyBBsOnTensors, resizeTensors,loadClassMapping} from "./inference_utils.js"
 	import {img_proceed} from './state.svelte.js';
 
@@ -20,7 +20,7 @@
 	// les labels à afficher sur les images crops
 	export let labels = [];
 	// fichier contenant le mapping des classes
-	let classmapping = "https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/raw/main/models/class_mapping.txt";
+	let classmapping = torawpath("class_mapping.txt");
 	export let conf = [];	
 
 	async function processImage() {
@@ -31,6 +31,7 @@
 
 		// ça charge le fichier de mapping de classes et en créé un tableau
 		classmap = await loadClassMapping(classmapping);
+		console.log("classmap : ", classmap);
 
 		if (image_file && image_file.length > 0) {
 			let files = Array.from(image_file);
