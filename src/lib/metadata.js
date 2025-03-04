@@ -99,6 +99,23 @@ export async function mergeMetadataValues(images) {
  * @param {import("./database").MetadataValue[]} values
  */
 function mergeMetadata(definition, values) {
+	/**
+	 * @param {(probabilities: number[]) => number} merger
+	 * @param {import('./database').MetadataValue[]} values
+	 * Run merger on array of confidences for every probability of each alternative of each values:
+	 * example: [ { alternatives: { a: 0.8, b: 0.2 } }, { alternatives: { a: 0.6, b: 0.4 } } ]
+	 * turns into: { a: merger([0.8, 0.6]), b: merger([0.2, 0.4]) }
+	 */
+	const mergeAlternatives = (merger, values) =>
+		Object.fromEntries(
+			values
+				.flatMap((v) => Object.keys(v.alternatives))
+				.map((valueAsString) => [
+					valueAsString,
+					merger(values.flatMap((v) => v.alternatives[valueAsString] ?? null).filter(Boolean))
+				])
+		);
+
 	switch (definition.mergeMethod) {
 		case 'average':
 			return {
@@ -107,8 +124,8 @@ function mergeMetadata(definition, values) {
 					// @ŧs-ignore
 					values.map((v) => v.value)
 				),
-				confidence: 0 /*todo*/,
-				alternatives: {}
+				confidence: avg(values.map((v) => v.confidence)),
+				alternatives: mergeAlternatives(avg, values)
 			};
 		case 'max':
 			// return mergeMajority(definition, values);
@@ -122,8 +139,8 @@ function mergeMetadata(definition, values) {
 					definition.type,
 					values.map((v) => v.value)
 				),
-				confidence: 0 /*todo*/,
-				alternatives: {}
+				confidence: median(values.map((v) => v.confidence)),
+				alternatives: mergeAlternatives(median, values)
 			};
 		case 'none':
 			return {
@@ -135,6 +152,11 @@ function mergeMetadata(definition, values) {
 	}
 }
 
+/** @param {number[]} values  */
+function avg(values) {
+	return values.reduce((acc, cur) => acc + cur, 0) / values.length;
+}
+
 /**
  * Merge values by average.
  * @param {Type} type
@@ -144,9 +166,10 @@ function mergeMetadata(definition, values) {
  * @template {import('./database').MetadataType} Type
  */
 function mergeAverage(type, values) {
-	/** @param {typeof values} values  */
-	const average = (values) =>
-		toNumber(type, values).reduce((acc, cur) => acc + cur, 0) / values.length;
+	/**
+	 * @param {typeof values} values
+	 */
+	const average = (values) => avg(toNumber(type, values));
 
 	// @ts-ignore
 	if (type === 'boolean') return average(values) > 0.5;
@@ -179,6 +202,16 @@ function mergeAverage(type, values) {
 	throw new Error(`Impossible de fusionner en mode moyenne des valeurs de type ${type}`);
 }
 
+/** @param {number[]} values */
+const median = (values) => {
+	const sorted = values.sort((a, b) => a - b);
+	const middle = Math.floor(sorted.length / 2);
+	if (sorted.length % 2 === 0) {
+		return (sorted[middle - 1] + sorted[middle]) / 2;
+	}
+	return sorted[middle];
+};
+
 /**
  * Merge values by median.
  * @param {Type} type
@@ -189,23 +222,16 @@ function mergeAverage(type, values) {
  */
 function mergeMedian(type, values) {
 	/** @param {typeof values} values */
-	const median = (values) => {
-		const sorted = toNumber(type, values).sort((a, b) => a - b);
-		const middle = Math.floor(sorted.length / 2);
-		if (sorted.length % 2 === 0) {
-			return (sorted[middle - 1] + sorted[middle]) / 2;
-		}
-		return sorted[middle];
-	};
+	const median_ = (values) => median(toNumber(type, values));
 
 	// @ts-ignore
-	if (type === 'boolean') return median(values) > 0.5;
+	if (type === 'boolean') return median_(values) > 0.5;
 	// @ts-ignore
-	if (type === 'integer') return Math.ceil(median(values));
+	if (type === 'integer') return Math.ceil(median_(values));
 	// @ts-ignore
-	if (type === 'float') return median(values);
+	if (type === 'float') return median_(values);
 	// @ts-ignore
-	if (type === 'date') return new Date(median(values));
+	if (type === 'date') return new Date(median_(values));
 	if (type === 'location') {
 		// @ts-ignore
 		return {
