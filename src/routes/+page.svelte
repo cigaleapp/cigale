@@ -1,7 +1,7 @@
 <script>
 	import * as Jimp from 'jimp';
 
-	import {infer,loadModel, inferSequentialy,STD,MEAN, classify} from "./inference.js"
+	import {infer,loadModel, inferSequentialy,STD,MEAN, classify,inferSequentialyConcurrent} from "./inference.js"
 	import {applyBBsOnImages,labelize,imload, normalizeTensors, applyBBsOnTensors, resizeTensors,loadClassMapping} from "./inference_utils.js"
 	import {img_proceed} from './state.svelte.js';
 
@@ -102,8 +102,11 @@
 				labels.push(l);
 				conf.push(c);
 			}
+			img_proceed.time= (Date.now() - start) / 1000;
 
 			// on affiche les images crops obtenues avec le applyBBsOnTensors
+			img_proceed.state = "affichage";
+			img_proceed.nb = 0;
 			let croppedImagesURL_buffer = [];
 			for (let i=0;i<ctensors.length;i++) {
 				let croppedImagesURL_inter = [];
@@ -111,6 +114,8 @@
 				for (let j=0; j<c.length; j++) {
 					let img = c[j].toDataURL();
 					croppedImagesURL_inter.push(img);
+					img_proceed.nb += 1;
+					img_proceed.time = (Date.now() - start) / 1000;
 				}
 				croppedImagesURL_buffer.push(croppedImagesURL_inter);
 			}

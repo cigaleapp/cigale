@@ -150,7 +150,7 @@ export async function infer (files,model,img_proceed,sequence=false,webgpu=true)
     return [boundingboxes, bestScores,start, inputTensor];
 }
 
-async function mapToFiles (files, model) {
+async function mapToFiles (files, model,i,img_proceed) {
     let imfile = files[i];
     var BandB = await infer([imfile],model, img_proceed,false);
     let boundingboxe = BandB[0];
@@ -192,6 +192,35 @@ export async function inferSequentialy (files,model,img_proceed) {
     return [boundingboxes, bestScores,start, inputTensors];
 
 }
+
+export async function inferSequentialyConcurrent (files,model,img_proceed) {
+    /*Effectue une inférence de détection sur une ou plusieurs images de manière 
+    concurentielle. 
+    */
+
+    let boundingboxes = [];
+    let bestScores = [];
+    let start = Date.now();
+    let inputTensors = [];
+
+    let promises = [];
+    for (let i=0; i<files.length; i++) {
+        promises.push(mapToFiles(files,model,i,img_proceed));
+    }
+
+    let results = await Promise.all(promises);
+    for (let i=0; i<results.length; i++) {
+        boundingboxes.push(results[i][0]);
+        bestScores.push(results[i][1]);
+        inputTensors.push(results[i][2]);
+
+        img_proceed.nb = i+1;
+        img_proceed.time = (Date.now()-start)/1000;
+    }
+    return [boundingboxes, bestScores,start, inputTensors];
+
+}
+
 
 export async function classify (images, model,img_proceed,start) {
 
