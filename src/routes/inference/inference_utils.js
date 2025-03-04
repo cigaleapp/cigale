@@ -55,7 +55,6 @@ export async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
  * @param {number} y2
  * @returns {Promise<ort.Tensor>}
  */
-
 export async function cropTensor(tensor, x1, y1, x2, y2) {
 	/*Crop tensor : 
     -------input------- :
@@ -79,6 +78,7 @@ export async function cropTensor(tensor, x1, y1, x2, y2) {
 				//   --- /!\ si ça marche pas, faut ptet inverser x et y---
 				let i = c * dims[2] * dims[3] + y * dims[3] + x;
 				let newI = c * newDims[2] * newDims[3] + (y - y1) * newDims[3] + (x - x1);
+				// @ts-ignore
 				newData[newI] = data[i];
 			}
 		}
@@ -163,12 +163,13 @@ export async function applyBBsOnTensor(BBs, tensor, marge = 10) {
 }
 /**
  *
- * @param {number[][]} BBs
+ * @param {number[][][]} BBs
  * @param {ort.Tensor[][]} tensors
  * @returns {Promise<ort.Tensor[][]>}
  */
 export async function applyBBsOnTensors(BBs, tensors) {
 	// Create an array of promises using map
+	// @ts-ignore
 	const croppedTensorPromises = tensors.map((tensor, i) => applyBBsOnTensor(BBs[i], tensor));
 
 	// Wait for all promises to resolve concurrently
@@ -254,7 +255,7 @@ export async function preprocess_for_classification(tensors, mean, std) {
 
     les tenseurs sont resized au format [3,224,224] et normalisés
     */
-
+	// @ts-ignore
 	let new_ctensorsPromise = tensors.map((tensor) =>
 		map_preprocess_for_classification(tensor, mean, std)
 	);
@@ -265,7 +266,7 @@ export async function preprocess_for_classification(tensors, mean, std) {
 /**
  *
  * @param {string} classmapping
- * @returns {string[]}
+ * @returns {Promise<string[]>}
  */
 export async function loadClassMapping(classmapping) {
 	// charge le fichier de mapping des classes (nom des classes)
@@ -361,6 +362,7 @@ export async function normalizeTensor(tensor, mean, std) {
 		for (let y = 0; y < dims[3]; y++) {
 			for (let c = 0; c < dims[1]; c++) {
 				let i = c * dims[2] * dims[3] + x * dims[3] + y;
+				// @ts-ignore
 				data[i] = (data[i] - mean[c]) / std[c];
 			}
 		}
@@ -536,10 +538,12 @@ async function resizeTensor(tensor, targetWidth, targetHeight) {
 		for (let y = 0; y < targetHeight; y++) {
 			for (let c = 0; c < 3; c++) {
 				const i = c * targetHeight * targetWidth + y * targetWidth + x;
+
 				const j =
 					c * dims[2] * dims[3] +
 					Math.floor(y * heightRatio) * dims[3] +
 					Math.floor(x * widthRatio);
+				// @ts-ignore
 				resizedData[i] = data[j];
 			}
 		}
