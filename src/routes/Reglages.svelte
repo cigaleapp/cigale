@@ -88,6 +88,31 @@
 			Thème :
 			<Switch icons={{ on: Sun, off: Moon }}></Switch>
 		</div>
+		<div class="Protocole">
+			Protocoles :
+
+			<ButtonPrimary
+				onclick={() => {
+					window.location.href = '#/reglages';
+				}}
+			>
+				Gérer
+			</ButtonPrimary>
+			<ButtonPrimary
+				onclick={() => {
+					window.location.href = '';
+				}}
+			>
+				Retour
+			</ButtonPrimary>
+			<ButtonPrimary
+				onclick={() => {
+					console.log("J'exporte");
+				}}
+			>
+				Export
+			</ButtonPrimary>
+		</div>
 	</div>
 </div>
 
@@ -176,6 +201,13 @@
 		gap: 1em;
 	}
 	.Theme {
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 1em;
+	}
+	.Protocole {
 		width: 100%;
 		display: flex;
 		flex-direction: row;
