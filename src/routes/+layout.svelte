@@ -15,8 +15,6 @@
 	let sexe = 0;
 	let date = 0;
 	let metaValue = $state([sexe, date]);
-	$inspect(metaValue);
-	$inspect(sexe);
 </script>
 
 <Navigation hasImages={true}></Navigation>
@@ -40,7 +38,6 @@
 		/>
 	{/each}
 </section>
-
 <PreviewSidePannel
 	images={[img, img, img, img, img, img, img, img, img, img, img]}
 	metaNom={['sexe', 'date']}
@@ -51,12 +48,7 @@
 	clickAddMeta={() => {}}
 	showFusion="true"
 />
-<button
-	onclick={() => {
-		console.log(sexe);
-	}}>wesh</button
->
-{sexe}
+
 {@render children?.()}
 
 <style>
