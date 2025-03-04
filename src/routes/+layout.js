@@ -1,9 +1,11 @@
 import { BUILTIN_METADATA } from '$lib/database';
 import { tables } from '$lib/idb';
 import { getSetting } from '$lib/settings';
+import { defineSpeciesMetadata } from '$lib/species';
 
 export async function load() {
 	await fillBuiltinData();
+	await defineSpeciesMetadata('species');
 	return {
 		showInputHints: await getSetting('showInputHints')
 	};
