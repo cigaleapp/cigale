@@ -2,6 +2,12 @@ import * as ort from 'onnxruntime-web';
 import * as Jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
 
+/**
+ *
+ * @param {number[]} bb1
+ * @param {number[]} bb2
+ * @returns
+ */
 function IoU(bb1, bb2) {
 	// Intersection over Union
 	// bb1 et bb2 sont des bounding boxes de la forme : [x, y, w, h]
@@ -16,8 +22,17 @@ function IoU(bb1, bb2) {
 	return intersection / union;
 }
 
+/**
+ * @param {ort.Tensor} tensor
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @returns {Promise<ort.Tensor>}
+ */
 export async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
 	// Convert ONNX tensor to tf.Tensor
+	// @ts-ignore
 	const tfTensor = tf.tensor(tensor.data, tensor.dims);
 	let w = Math.abs(x1 - x2);
 	let h = Math.abs(y1 - y2);
@@ -31,6 +46,15 @@ export async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
 
 	return croppedOnnxTensor;
 }
+
+/**
+ * @param {ort.Tensor} tensor
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @returns {Promise<ort.Tensor>}
+ */
 
 export async function cropTensor(tensor, x1, y1, x2, y2) {
 	/*Crop tensor : 
@@ -62,7 +86,13 @@ export async function cropTensor(tensor, x1, y1, x2, y2) {
 	tensor.dispose();
 	return new ort.Tensor(tensor.type, newData, newDims);
 }
-
+/**
+ *
+ * @param {number[]} BB
+ * @param {ort.Tensor} tensor
+ * @param {number} marge
+ * @returns
+ */
 async function applyBBOnTensor(BB, tensor, marge = 10) {
 	/*Applique une bounding box sur UN tenseur :
     -------input------- :
@@ -103,6 +133,14 @@ async function applyBBOnTensor(BB, tensor, marge = 10) {
 	return croppedTensor;
 }
 
+/**
+ *
+ * @param {number[][]} BBs
+ * @param {ort.Tensor} tensor
+ * @param {number} marge
+ * @returns {Promise<ort.Tensor[]>}
+ */
+
 export async function applyBBsOnTensor(BBs, tensor, marge = 10) {
 	/*Applique les bounding boxes sur UN tenseur :
     -------input------- :
@@ -123,7 +161,12 @@ export async function applyBBsOnTensor(BBs, tensor, marge = 10) {
 	}
 	return croppedTensors;
 }
-
+/**
+ *
+ * @param {number[][]} BBs
+ * @param {ort.Tensor[][]} tensors
+ * @returns {Promise<ort.Tensor[][]>}
+ */
 export async function applyBBsOnTensors(BBs, tensors) {
 	// Create an array of promises using map
 	const croppedTensorPromises = tensors.map((tensor, i) => applyBBsOnTensor(BBs[i], tensor));
@@ -132,7 +175,12 @@ export async function applyBBsOnTensors(BBs, tensors) {
 	let tobereturned = await Promise.all(croppedTensorPromises);
 	return tobereturned;
 }
-
+/**
+ *
+ * @param {number[][][]} boundingboxes
+ * @param {number} numfiles
+ * @returns {number[][][]}
+ */
 export function postprocess_BB(boundingboxes, numfiles) {
 	/*supprime les bounding boxes qui ont un IoU > 0.5
     -------input------- :
@@ -171,6 +219,13 @@ export function postprocess_BB(boundingboxes, numfiles) {
 	return boundingboxes;
 }
 
+/**
+ *
+ * @param {ort.Tensor[]} tensor
+ * @param {number[]} mean
+ * @param {number[]} std
+ * @returns {Promise<ort.Tensor[]>}
+ */
 async function map_preprocess_for_classification(tensor, mean, std) {
 	let c = tensor;
 	c = await normalizeTensors(c, mean, std);
@@ -178,7 +233,13 @@ async function map_preprocess_for_classification(tensor, mean, std) {
 
 	return c;
 }
-
+/**
+ *
+ * @param {ort.Tensor} tensors
+ * @param {number[]} mean
+ * @param {number[]} std
+ * @returns {Promise<ort.Tensor[]>}
+ */
 export async function preprocess_for_classification(tensors, mean, std) {
 	/*preprocess les tenseurs pour la classification
     -------input------- :
@@ -201,7 +262,11 @@ export async function preprocess_for_classification(tensors, mean, std) {
 
 	return new_ctensors;
 }
-
+/**
+ *
+ * @param {string} classmapping
+ * @returns {string[]}
+ */
 export async function loadClassMapping(classmapping) {
 	// charge le fichier de mapping des classes (nom des classes)
 	const response = await fetch(classmapping);
@@ -210,6 +275,12 @@ export async function loadClassMapping(classmapping) {
 	return classmap;
 }
 
+/**
+ *
+ * @param {number[][][]} output
+ * @param {string[]} classmap
+ * @returns {[string[][], number[][]]}
+ */
 export function labelize(output, classmap) {
 	// à partir de la sortie du inference/classif, renvoie les labels des classes
 	let labels_inter = [];
@@ -225,7 +296,13 @@ export function labelize(output, classmap) {
 	}
 	return [labels_inter, output[1]];
 }
-
+/**
+ *
+ * @param {FileList} files
+ * @param {number} targetWidth
+ * @param {number} targetHeight
+ * @returns {Promise<ort.Tensor>}
+ */
 export async function imload(files, targetWidth, targetHeight) {
 	/*
     charge les images et les resize
@@ -269,7 +346,13 @@ export async function imload(files, targetWidth, targetHeight) {
 	float32Data = new Float32Array(0);
 	return tensor;
 }
-
+/**
+ *
+ * @param {ort.Tensor} tensor
+ * @param {number[]} mean
+ * @param {number[]} std
+ * @returns {Promise<ort.Tensor>}
+ */
 export async function normalizeTensor(tensor, mean, std) {
 	const data = await tensor.getData();
 	const dims = tensor.dims;
@@ -286,7 +369,13 @@ export async function normalizeTensor(tensor, mean, std) {
 	tensor.dispose();
 	return newTensor;
 }
-
+/**
+ *
+ * @param {ort.Tensor[]} tensors
+ * @param {number[]} mean
+ * @param {number[]} std
+ * @returns {Promise<ort.Tensor[]>}
+ */
 export async function normalizeTensors(tensors, mean, std) {
 	let newTensors = [];
 	for (let i = 0; i < tensors.length; i++) {
@@ -301,6 +390,14 @@ export async function normalizeTensors(tensors, mean, std) {
 	return newTensors;
 }
 
+/**
+ *
+ * @param {ort.Tensor} output
+ * @param {number} numImages
+ * @param {number} minConfidence
+ * @param {boolean} nms
+ * @returns {[number[][][], number[]]}
+ */
 export function output2BB(output, numImages, minConfidence, nms = false) {
 	/*reshape les bounding boxes obtenues par le modèle d'inférence
     -------input------- :
@@ -322,6 +419,7 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 	if (nms) {
 		let bestBoxes = [];
 		let bestScores = [];
+		// @ts-ignore
 		let numbb = output.length / 6;
 		let bestPerImageBoxes = [];
 		let bestScorePerImage = 0;
@@ -332,6 +430,7 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 		for (let k = 0; k < numImages; k++) {
 			bestPerImageBoxes = [];
 			bestScorePerImage = 0;
+			// @ts-ignore
 			suboutput = output.slice(k * numbb * 6, (k + 1) * numbb * 6);
 
 			for (let i = 0; i < suboutput.length; i += 6) {
@@ -366,11 +465,13 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 		let bestScore = [];
 		let bestScorePerImage = 0;
 		let suboutput = null;
+		// @ts-ignore
 		let numbb = output.length / numImages / 5;
 
 		for (let k = 0; k < numImages; k++) {
 			bestPerImageBoxes = [];
 			bestScorePerImage = 0;
+			// @ts-ignore
 			suboutput = output.slice(k * numbb * 5, (k + 1) * numbb * 5);
 
 			for (let i = 0; i < suboutput.length / 5; i++) {
@@ -397,7 +498,13 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 		return [bestBoxes, bestScore];
 	}
 }
-
+/**
+ *
+ * @param {ort.Tensor[]} tensors
+ * @param {number} targetWidth
+ * @param {number} targetHeight
+ * @returns {Promise<ort.Tensor[]>}
+ */
 export async function resizeTensors(tensors, targetWidth, targetHeight) {
 	let resizedTensors = [];
 	for (let i = 0; i < tensors.length; i++) {
@@ -407,7 +514,13 @@ export async function resizeTensors(tensors, targetWidth, targetHeight) {
 
 	return resizedTensors;
 }
-
+/**
+ *
+ * @param {ort.Tensor} tensor
+ * @param {number} targetWidth
+ * @param {number} targetHeight
+ * @returns {Promise<ort.Tensor>}
+ */
 async function resizeTensor(tensor, targetWidth, targetHeight) {
 	// resize using nearest neighbor interpolation
 	const data = await tensor.getData();
@@ -436,6 +549,13 @@ async function resizeTensor(tensor, targetWidth, targetHeight) {
 	return resizedTensor;
 }
 
+/**
+ *
+ * @param {number[][]} BBs
+ * @param {Image} image
+ * @param {number} marge
+ * @returns
+ */
 async function applyBBsOnImage(BBs, image, marge = 10) {
 	/*Même chose que applyBBsOnTensor mais pour une image, en vrai c'est deprecated, on l'utilise plus*/
 
@@ -449,11 +569,14 @@ async function applyBBsOnImage(BBs, image, marge = 10) {
 		let w = BBs[i][2];
 		let h = BBs[i][3];
 
-		// relative bbs
-		x = (x / 640) * image.bitmap.width;
-		y = (y / 640) * image.bitmap.height;
-		w = (w / 640) * image.bitmap.width;
-		h = (h / 640) * image.bitmap.height;
+		// relative bbs*
+		/** @type {{width: number, height: number}} */
+		// @ts-ignore
+		const { width, height } = image.bitmap;
+		x = (x / 640) * width;
+		y = (y / 640) * height;
+		w = (w / 640) * width;
+		h = (h / 640) * height;
 		x = x - marge;
 		y = y - marge;
 		w = w + 2 * marge;
@@ -461,9 +584,10 @@ async function applyBBsOnImage(BBs, image, marge = 10) {
 
 		x = Math.round(Math.max(0, x));
 		y = Math.round(Math.max(0, y));
-		w = Math.round(Math.min(image.bitmap.width - x, w));
-		h = Math.round(Math.min(image.bitmap.height - y, h));
+		w = Math.round(Math.min(width - x, w));
+		h = Math.round(Math.min(height - y, h));
 
+		// @ts-ignore
 		let subimage = image.clone();
 		subimage = subimage.crop({ x, y, w, h });
 		let subimageMIME = await subimage.getBase64(Jimp.JimpMime.png);
@@ -473,6 +597,12 @@ async function applyBBsOnImage(BBs, image, marge = 10) {
 	return [subimageMIMES, subimages];
 }
 
+/**
+ *
+ * @param {number[][][]} BBs
+ * @param {Image[]} images
+ * @returns
+ */
 export async function applyBBsOnImages(BBs, images) {
 	let croppedImages = [];
 	let croppedImagesMIME = [];
