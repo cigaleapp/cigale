@@ -78,11 +78,12 @@
 			// bon là juste on trace les bb comme ça
 			img_proceed.nb = 0;
 			img_proceed.state= "post processing"
-			for (let i = 0; i < best_boxes.length; i++) {
-				ctx.strokeStyle = 'red';
-				ctx.lineWidth = 2;
-				ctx.strokeRect(best_boxes[i][0], best_boxes[i][1], best_boxes[i][2], best_boxes[i][3]);
-			}
+			img_proceed.time = (Date.now() - start) / 1000;
+			//for (let i = 0; i < best_boxes.length; i++) {
+			//	ctx.strokeStyle = 'red';
+			//	ctx.lineWidth = 2;
+			//	ctx.strokeRect(best_boxes[i][0], best_boxes[i][1], best_boxes[i][2], best_boxes[i][3]);
+			//}
 
 			img_proceed.state= "finished"
 			// crop chaque tenseurs d'entrée (i.e les images) avec les bounding boxes
@@ -133,6 +134,7 @@
 			// on libère la ram du model de classif
 			cmodel.release();
 			cmodel = null;
+			console.log("finiiiiis")
 		}
 	}
 	// bon le reste c'est du html c'est pas moi qu'ais fait c'est chatgpt parce que flm

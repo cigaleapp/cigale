@@ -26,11 +26,12 @@ export async function cropTensorUsingTFJS (tensor, x1, y1, x2, y2) {
     const croppedData = croppedTfTensor.dataSync();
     // Create new ONNX tensor
     const croppedOnnxTensor = new ort.Tensor(tensor.type, croppedData, [1, 3, h, w]);
+    tfTensor.dispose();
+    croppedTfTensor.dispose();
 
     return croppedOnnxTensor;
 
 }
-
 
 export async function cropTensor (tensor, x1, y1, x2, y2) {
     /*Crop tensor : 
@@ -59,7 +60,48 @@ export async function cropTensor (tensor, x1, y1, x2, y2) {
             }   
         }
     }
+    tensor.dispose()
     return new ort.Tensor(tensor.type, newData, newDims);
+}
+
+async function applyBBOnTensor (BB,tensor,marge=10) {
+    /*Applique une bounding box sur UN tenseur :
+    -------input------- :
+        BB : bounding box
+            forme : [x, y, w, h]
+        tensor : tensor à cropper
+            forme : [1, C, H, W]
+        marge : marge à ajouter autour de la bounding box
+    
+    -------output------- :
+        croppedTensor : tenseur croppé
+            forme : [1, C, h+2*marge, w+2*marge]
+    */
+    let x = BB[0];
+    let y = BB[1];
+    let w = BB[2];
+    let h = BB[3];
+
+    let tsrwidth = tensor.dims[3];
+    let tsrheight = tensor.dims[2];
+
+    x = x - marge;
+    y = y -marge
+    w = w + 2*marge;
+    h = h + 2*marge;
+
+    x = Math.max(0, x);
+    y = Math.max(0, y);
+    w = Math.min(tsrwidth - x, w);
+    h = Math.min(tsrheight - y, h);
+    
+    x = Math.round(x);
+    y = Math.round(y);
+    w = Math.round(w);
+    h = Math.round(h);
+
+    let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x + w, y + h);
+    return croppedTensor;
 }
 
 export async function applyBBsOnTensor (BBs,tensor,marge=10) {
@@ -78,46 +120,23 @@ export async function applyBBsOnTensor (BBs,tensor,marge=10) {
     */
     let croppedTensors = [];
     for (let i = 0; i < BBs.length; i++) {
-        let x = BBs[i][0];
-        let y = BBs[i][1];
-        let w = BBs[i][2];
-        let h = BBs[i][3];
-
-        let tsrwidth = tensor.dims[3];
-        let tsrheight = tensor.dims[2];
-
-        x = x - marge;
-        y = y -marge
-        w = w + 2*marge;
-        h = h + 2*marge;
-
-        x = Math.max(0, x);
-        y = Math.max(0, y);
-        w = Math.min(tsrwidth - x, w);
-        h = Math.min(tsrheight - y, h);
-        
-        x = Math.round(x);
-        y = Math.round(y);
-        w = Math.round(w);
-        h = Math.round(h);
-
-        let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x + w, y + h);
+        let croppedTensor = await applyBBOnTensor(BBs[i],tensor,marge);
         croppedTensors.push(croppedTensor);
     }
     return croppedTensors;
 }
 
-export async function applyBBsOnTensors (BBs,tensors) {
-    // Applique les bounding boxes sur une LISTE de tenseurs
-    // cette fonction sert à appliquer les bounding boxes obtenues par inference/infer sur les Input tensor 
+export async function applyBBsOnTensors(BBs, tensors) {
+    // Create an array of promises using map
+    const croppedTensorPromises = tensors.map((tensor, i) =>
+        applyBBsOnTensor(BBs[i], tensor)
+    );
 
-    let croppedTensors = [];
-    for (let i = 0; i < tensors.length; i++) {
-        let croppedTensor = await applyBBsOnTensor( BBs[i],tensors[i]);
-        croppedTensors.push(croppedTensor);
-    }
-    return croppedTensors;
+    // Wait for all promises to resolve concurrently
+    let tobereturned=  await Promise.all(croppedTensorPromises);
+    return tobereturned;
 }
+
 
 export function postprocess_BB(boundingboxes,numfiles) {
     /*supprime les bounding boxes qui ont un IoU > 0.5
@@ -157,6 +176,14 @@ export function postprocess_BB(boundingboxes,numfiles) {
     return boundingboxes;
 }
 
+async function map_preprocess_for_classification(tensor, mean, std) {
+    let c = tensor;
+    c = await normalizeTensors(c, mean, std);
+    c = await resizeTensors(c, 224, 224);
+
+    return c;
+}
+
 export async function preprocess_for_classification(tensors,mean, std) {
     /*preprocess les tenseurs pour la classification
     -------input------- :
@@ -172,13 +199,9 @@ export async function preprocess_for_classification(tensors,mean, std) {
     les tenseurs sont resized au format [3,224,224] et normalisés
     */
 
-    let new_ctensors = [];
-    for (let i=0;i<tensors.length;i++) {
-        let c = tensors[i];
-        c = await normalizeTensors(c, mean,std);
-        c = await resizeTensors(c, 224,224);
-        new_ctensors.push(c);
-    }
+    let new_ctensorsPromise = tensors.map((tensor) => map_preprocess_for_classification(tensor, mean, std));
+    let new_ctensors = await Promise.all(new_ctensorsPromise);
+
     return new_ctensors;
 }
 
@@ -257,6 +280,28 @@ export async function imload(files, targetWidth, targetHeight) {
     return tensor;
 }
   
+async function normalizeTensorUsingTFJS(tensor, mean, std) {
+    // Convert ONNX tensor to tf.Tensor
+    const tfTensor = tf.tensor(tensor.data, tensor.dims);
+
+    const meanTensor = tf.tensor(mean).reshape([1, tfTensor.shape[1], 1, 1]);
+    const stdTensor = tf.tensor(std).reshape([1, tfTensor.shape[1], 1, 1]);
+
+    // Normalize
+    const normalizedTfTensor = tfTensor.sub(meanTensor).div(stdTensor);
+    const normalizedData = normalizedTfTensor.dataSync();
+
+    // Create new ONNX tensor
+    const normalizedOnnxTensor = new ort.Tensor(tensor.type, normalizedData, tensor.dims);
+
+    tfTensor.dispose();
+    meanTensor.dispose();
+    stdTensor.dispose();
+    normalizedTfTensor.dispose();
+
+    return normalizedOnnxTensor;
+}
+
 
 export async function normalizeTensor (tensor, mean, std,) {
     const data = await tensor.getData();
@@ -271,6 +316,7 @@ export async function normalizeTensor (tensor, mean, std,) {
         }
     }
     const newTensor = new ort.Tensor(tensor.type, data, dims);
+    tensor.dispose();
     return newTensor;
 }
 
@@ -284,6 +330,7 @@ export async function normalizeTensors (tensors, mean, std) {
     for (let i=0; i<tensors.length; i++) {
         tensors[i].dispose();
     }
+
 
     return newTensors;
 
@@ -391,7 +438,7 @@ export function output2BB (output,numImages,minConfidence,nms=false) {
             bestScore.push(bestScorePerImage);
         }
         return [bestBoxes,bestScore];
-    }
+    }   
         
 }
 
@@ -402,12 +449,9 @@ export async function resizeTensors(tensors, targetWidth, targetHeight) {
         resizedTensors.push(resizedTensor);
     }
 
-    for (let i = 0; i < tensors.length; i++) {
-        tensors[i].dispose();
-    }
-
     return resizedTensors;
 }
+
 
 async function resizeTensor(tensor, targetWidth, targetHeight) {
     // resize using nearest neighbor interpolation
