@@ -20,9 +20,12 @@
 	);
 	// svelte-ignore non_reactive_update
 	let activeIndex = -1; // Tracks currently selected option in the list
+	/** @type {HTMLUListElement} */
 	let listRef;
+	/** @type {HTMLInputElement} */
 	let InputRef;
 
+	/** @param {KeyboardEvent} event */
 	function handleKeyDown(event) {
 		const itemCount = filteredItems.length;
 
@@ -40,6 +43,8 @@
 		}
 		// Update the border of the active button
 		Array.from(listRef.children).forEach((child, index) => {
+			if (!child.firstElementChild) return;
+			if (!(child.firstElementChild instanceof HTMLLIElement)) return;
 			child.firstElementChild.style.background =
 				index === activeIndex ? 'var(--bg-primary-translucent)' : 'var(--bg-neutral)';
 		});
@@ -59,7 +64,7 @@
 	/>
 
 	<ul class="container" bind:this={listRef}>
-		{#each filteredItems as option, i}
+		{#each filteredItems as option, i (option)}
 			<li>
 				<button
 					class="button {activeIndex === i ? option : ''}"

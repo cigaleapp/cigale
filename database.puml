@@ -1,0 +1,82 @@
+@startuml
+
+class Image {
+     id \t\t\t ID 
+     filename \t\t string 
+     metadata \t MetadataValues 
+}
+
+class Observation {
+     id \t\t\t\t\t ID 
+     label \t\t\t\t string 
+     metadataOverrides \t  MetadataValues 
+     images \t\t\t \t Image[] 
+}
+
+class MetadataEnumVariant {
+     key \t\t\t string 
+     label \t\t string 
+     description \t string 
+     learnMore \t URL 
+}
+
+class Metadata {
+     id \t\t\t\t ID 
+     label \t\t\t string 
+     type \t\t\t MetadataType 
+     mergeMethod \t MetadataMergeMethod 
+     options \t\t\t MetadataEnumVariant[] 
+     required \t\t\t boolean 
+     description \t\t string 
+     learnMore \t\t URL 
+}
+
+class MetadataValues {
+    {ID} -> { value: string, confidence: Probability, alternatives: Record<string, Probability> }
+}
+
+enum MetadataType {
+    string
+    boolean
+    integer
+    float
+    enum
+    date
+    location
+}
+
+enum MetadataMergeMethod {
+    min
+    max
+    average
+    median
+    none
+}
+
+class Protocol {
+     id \t\t\t ID 
+     name \t\t string 
+     source \t\t URL 
+     author \t\t { email: string; name: string } 
+     metadata \t Metadata[] 
+}
+
+class Settings {
+     protocols \t Protocol[] 
+     theme \t\t "dark" | "light" | "auto" 
+     gridSize \t\t number 
+     language \t "fr" 
+}
+
+Protocol "1" -- "*" Metadata
+Settings "1" -- "*" Protocol
+
+Observation "*" -- "*" Image
+MetadataValues "*" -- "1" Metadata
+Observation "1" -- "*" MetadataValues
+Image "1" -- "*" MetadataValues
+Metadata "1" -- "*" MetadataEnumVariant
+
+MetadataType -- Metadata
+MetadataMergeMethod -- Metadata
+@enduml

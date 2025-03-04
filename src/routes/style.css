@@ -14,6 +14,13 @@
 	--fg-neutral: #000000;
 	--gray: rgb(from var(--fg-neutral) r g b / 0.35);
 	--gay: rgb(from var(--fg-neutral) r g b / 0.75);
+	--corner-radius: 7px;
+	--border-thickness: 1px;
+}
+
+* {
+	margin: 0%;
+	box-sizing: border-box;
 }
 
 @media (prefers-color-scheme: dark) {

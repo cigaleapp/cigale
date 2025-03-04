@@ -7,7 +7,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {() => void} onclick
+	 * @property {() => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
@@ -72,7 +72,7 @@
 						disabled={loading}
 						class="stack-count"
 						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
-						onclick={(e) => {
+						onclick={(/** @type {MouseEvent} */ e) => {
 							e.stopPropagation();
 							onstacksizeclick?.();
 						}}
@@ -102,6 +102,7 @@
 		position: relative;
 		width: var(--card-width);
 		user-select: none;
+		cursor: pointer;
 	}
 
 	.observation:not(.loading) {

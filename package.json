@@ -32,9 +32,9 @@
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
-		"eslint-plugin-svelte": "^2.46.1",
+		"eslint-plugin-svelte": "^3.0.0",
 		"gitmoji-cli": "^9.5.0",
-		"globals": "^15.14.0",
+		"globals": "^16.0.0",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.4.3",
 		"mdsvex": "^0.12.3",
@@ -50,12 +50,25 @@
 		"@iconify-json/ph": "^1.2.2",
 		"@tensorflow-models/mobilenet": "^2.1.1",
 		"@tensorflow/tfjs": "^4.22.0",
+		"dragselect": "^3.1.1",
+		"arktype": "^2.0.4",
+		"date-fns": "^4.1.0",
 		"fuse.js": "^7.1.0",
+		"idb": "^8.0.2",
 		"sveltejs-tippy": "^3.0.0",
+		"tinykeys": "^3.0.0",
 		"unplugin-icons": "^22.0.0"
 	},
 	"volta": {
 		"node": "22.14.0",
 		"npm": "11.1.0"
+	},
+	"husky": {
+		"hooks": {
+			"post-checkout": "echo $HUSKY_GIT_STDIN | lfs-hooks/post-checkout $HUSKY_GIT_PARAMS",
+			"post-commit": "echo $HUSKY_GIT_STDIN | lfs-hooks/post-commit $HUSKY_GIT_PARAMS",
+			"post-merge": "echo $HUSKY_GIT_STDIN | lfs-hooks/post-merge $HUSKY_GIT_PARAMS",
+			"pre-push": "echo $HUSKY_GIT_STDIN | lfs-hooks/pre-push $HUSKY_GIT_PARAMS"
+		}
 	}
 }
