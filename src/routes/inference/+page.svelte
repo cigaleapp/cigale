@@ -148,7 +148,8 @@
 			// on classifie chaque image crop, coutput = [each image [each class]] ; [each image [each conf]]
 			// @ts-ignore
 			let coutput = await classify(ctensors, cmodel, img_proceed, start);
-			// on passe de la coutput à [each image[each label]] et [each image[each conf]]
+			// on passe de la coutput à [each image[each label]] et [each image[each conf]]*
+			// @ts-ignore
 			let labelandconf = labelize(coutput, classmap);
 			labels = labelandconf[0];
 			conf = labelandconf[1];

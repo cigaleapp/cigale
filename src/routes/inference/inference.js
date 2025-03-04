@@ -78,7 +78,7 @@ export function torawpath(path) {
  *
  * @param {boolean} classif
  * @param {boolean} webgpu
- * @returns
+ * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
 export async function loadModel(classif = false, webgpu = false) {
 	let MODELCLASSIFPATH = torawpath('model_classif.onnx');
@@ -111,7 +111,7 @@ export async function loadModel(classif = false, webgpu = false) {
  * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
  * @param {boolean} sequence
  * @param {boolean} webgpu
- * @returns
+ * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[]]>}
  */
 export async function infer(files, model, img_proceed, sequence = false, webgpu = true) {
 	/*Effectue une inférence de détection sur une ou plusieurs images. 
@@ -174,7 +174,7 @@ export async function infer(files, model, img_proceed, sequence = false, webgpu 
 		img_proceed.nb = files.length;
 		img_proceed.time = (Date.now() - start) / 1000;
 	}
-
+	// @ts-ignore
 	return [boundingboxes, bestScores, start, inputTensor];
 }
 
@@ -184,7 +184,7 @@ export async function infer(files, model, img_proceed, sequence = false, webgpu 
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {number} i
  * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
- * @returns
+ * @returns {Promise<[number[][], number[][], ort.Tensor[]]>}
  */
 async function mapToFiles(files, model, i, img_proceed) {
 	let imfile = files[i];
@@ -193,7 +193,6 @@ async function mapToFiles(files, model, i, img_proceed) {
 	let boundingboxe = BandB[0];
 	let bestScore = BandB[1];
 	let inputTensor = BandB[3];
-	// @ts-ignore
 	return [boundingboxe[0], bestScore[0], inputTensor];
 }
 
@@ -202,7 +201,7 @@ async function mapToFiles(files, model, i, img_proceed) {
  * @param {FileList} files
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
- * @returns
+ * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[][]]>}
  */
 export async function inferSequentialy(files, model, img_proceed) {
 	/*Effectue une inférence de détection sur une ou plusieurs images.
@@ -241,7 +240,7 @@ export async function inferSequentialy(files, model, img_proceed) {
  * @param {FileList} files
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
- * @returns
+ * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[][]]>}
  */
 export async function inferSequentialyConcurrent(files, model, img_proceed) {
 	/*Effectue une inférence de détection sur une ou plusieurs images de manière 
@@ -275,7 +274,7 @@ export async function inferSequentialyConcurrent(files, model, img_proceed) {
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
  * @param {number} start
- * @returns
+ * @returns {Promise<[number[][], (string | number | bigint)[][]]>}
  */
 export async function classify(images, model, img_proceed, start) {
 	/*Effectue une inférence de classification sur une ou plusieurs images.
