@@ -56,8 +56,8 @@ ort.env.wasm.wasmPaths = {
 
 export const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
 export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de détection
-export const MODELDETECTPATH = '/arthropod_detector_yolo11n_conf0.437.onnx'; // chemin du modèle de détection
-export const MODELCLASSIFPATH = '/model_classif.onnx'; // chemin du modèle de classification
+export const MODELDETECTPATH = ' https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/raw/main/models/arthropod_detector_yolo11n_conf0.437.onnx'; // chemin du modèle de détection
+export const MODELCLASSIFPATH = 'https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/raw/main/models/model_classif.onnx'; // chemin du modèle de classification
 export const NUMCONF = 0.437; // seuil de confiance pour la détection
 export const STD= [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
