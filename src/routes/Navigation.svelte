@@ -6,25 +6,27 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { page } from '$app/state';
 
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {Boolean} hasImages
-	 */
+	import DownloadModal from '$lib/DownloadModal.svelte';
 
-	/** @type {Props} */
-	let { hasImages = true } = $props();
+	/** @type {Boolean} */
+	let showDownloadModal = false;
+
+	function toggleDownloadModal() {
+		showDownloadModal = !showDownloadModal;
+	}
+
+	let hasImages;
 </script>
 
 <nav>
 	<div class="divLogo">
-		<img class="logo" src={logo} alt="logo" />
+		<img class="logo" src={logo} alt="logo C.i.g.a.l.e." />
 		C.i.g.a.l.e.
 	</div>
 
 	<a href="#/import">
 		Import
-		{#if page.route.id == '/import'}
+		{#if page.route.id === '/import'}
 			<div class="line"></div>
 		{/if}
 	</a>
@@ -34,13 +36,13 @@
 	<a
 		href="#/crop"
 		aria-disabled={!hasImages &&
-			page.route.id != '/classification' &&
-			page.route.id != '/resultats' &&
-			page.route.id != '/crop' &&
-			page.route.id != '/import'}
+			page.route.id !== '/classification' &&
+			page.route.id !== '/resultats' &&
+			page.route.id !== '/crop' &&
+			page.route.id !== '/import'}
 	>
 		Crop
-		{#if page.route.id == '/crop'}
+		{#if page.route.id === '/crop'}
 			<div class="line"></div>
 		{/if}
 	</a>
@@ -49,38 +51,36 @@
 
 	<a
 		href="#/classification"
-		aria-disabled={page.route.id != '/classification' &&
-			page.route.id != '/resultats' &&
-			page.route.id != '/crop'}
+		aria-disabled={page.route.id !== '/classification' &&
+			page.route.id !== '/resultats' &&
+			page.route.id !== '/crop'}
 	>
 		Classification
-		{#if page.route.id == '/classification'}
+		{#if page.route.id === '/classification'}
 			<div class="line"></div>
 		{/if}
 	</a>
 
 	<Sup></Sup>
-	<a
-		href="#/resultats"
-		aria-disabled={page.route.id != '/classification' && page.route.id != '/resultats'}
-	>
+
+	<a href="#/resultats">
 		<div class="download">
-			<Download></Download>
-			Résultats
+			<button on:click={toggleDownloadModal} class="icon-clickable">
+				<Download color="white" />
+			</button>
+			<span>Résultats</span>
 		</div>
-		{#if page.route.id == '/resultats'}
+		{#if page.route.id === '/resultats'}
 			<div class="line"></div>
 		{/if}
 	</a>
 
-	<ButtonIcon
-		onclick={() => {
-			console.log(page.route.id);
-		}}
-	>
+	<ButtonIcon onclick={() => console.log(page.route.id)}>
 		<Gear></Gear>
 	</ButtonIcon>
 </nav>
+
+<DownloadModal bind:show={showDownloadModal} />
 
 <style>
 	nav {
@@ -98,11 +98,10 @@
 	a {
 		background: none;
 		border: none;
-		padding: 7.5px;
-		padding-left: 15px;
-		padding-right: 15px;
+		padding: 8px 15px;
 		text-decoration: none;
 		color: var(--fg-neutral);
+		cursor: pointer;
 	}
 
 	a[aria-disabled='true'] {
@@ -131,6 +130,25 @@
 		display: flex;
 		align-items: center;
 		gap: 1em;
+	}
+
+	.icon-clickable {
+		background: none;
+		border: none;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		color: inherit;
+	}
+
+	.icon-clickable:hover {
+		transform: scale(1.1);
+		opacity: 0.8;
+	}
+
+	.icon-clickable:focus {
+		outline: none;
 	}
 
 	.line {

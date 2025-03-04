@@ -15,8 +15,6 @@
 	let sexe = 0;
 	let date = 0;
 	let metaValue = $state([sexe, date]);
-	$inspect(metaValue);
-	$inspect(sexe);
 </script>
 
 <Navigation hasImages={true}></Navigation>
