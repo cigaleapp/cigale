@@ -5,7 +5,7 @@ export class DragSelect {
 	imagesContainer;
 
 	/** @type {string[]} */
-	// eslint-disable-next-line no-undef
+	 
 	selection = $state([]);
 
 	/** @type {_DragSelect|undefined}  */
@@ -127,13 +127,16 @@ export class DragSelect {
 					.index
 			);
 
+			const selectables = [
+				...(this.imagesContainer
+					// Get all elements marked with [data-selectable] inside the container
+					?.querySelectorAll(`[data-selectable]`) ?? [])
+			];
+
 			// Select all selectables that have an index between the one we clicked and the anchor:
 			this.#instance?.addSelection(
 				// @ts-ignore
-				this.imagesContainer
-					// Get all elements marked with [data-selectable] inside the container
-					?.querySelectorAll(`[data-selectable]`)
-					.values()
+				selectables
 					// Only keep elements with an index within the range we want
 					.filter((element) =>
 						// @ts-ignore

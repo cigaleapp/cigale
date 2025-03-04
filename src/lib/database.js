@@ -11,7 +11,10 @@ const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
 const Probability = type('0 <= number <= 1');
 
 const MetadataValue = type({
-	value: 'string.json.parse',
+	value: type('string.json.parse').pipe(
+		(primitive) =>
+			/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */ (primitive)
+	),
 	confidence: Probability.default(1),
 	alternatives: {
 		'[string.json]': Probability
@@ -131,9 +134,9 @@ const Protocol = table(
 );
 
 const Settings = table(
-	'layer',
+	'id',
 	type({
-		layer: '"defaults" | "user"',
+		id: '"defaults" | "user"',
 		protocols: ID.array(),
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: 'number',
