@@ -6,18 +6,31 @@
 	//ort.env.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@dev/dist/';
 
 	// Reactive state variables.
+	/*** @type {FileList}*/
 	let image_file; // Holds the selected file(s) from the input.
+	/*** @type {HTMLDivElement}*/
 	let processedContainer; // Container DOM element for the preprocessed canvas.
+	/**@type {string[]}*/
 	let croppedImagesURL = [];
 	// le model de détection et de classif
+	/**
+	 * @type {import('onnxruntime-web').InferenceSession | null}
+	 */
 	let model = null;
+	/**
+	 * @type {import('onnxruntime-web').InferenceSession | null}
+	 */
 	let cmodel = null;
 	// les labels à afficher sur les images crops
+	/**@type {string[][]}*/
 	let labels = [];
 	// fichier contenant le mapping des classes
 	let classmapping = torawpath('class_mapping.txt');
+	/**@type {number[][]}*/
 	let conf = [];
-
+	/**
+	 * @type {HTMLCanvasElement}
+	 */
 	let canvas;
 
 	async function processImage() {
@@ -47,6 +60,9 @@
 			canvas.height = targetHeight;
 
 			const ctx = canvas.getContext('2d');
+			if (!ctx) {
+				throw new Error('Could not get 2d context from canvas');
+			}
 			ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
 			// Extract pixel data from the canvas.
