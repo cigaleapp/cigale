@@ -1,5 +1,6 @@
 import * as ort from 'onnxruntime-web';
 import { postprocess_BB, imload , output2BB,preprocess_for_classification} from './inference_utils.js';
+import { conv1d } from '@tensorflow/tfjs';
 
 
 /* 
@@ -41,11 +42,11 @@ il est thecniquement possible d'utiliser le webgpu, mais c'est pas encore implé
 de plus ça se lance que sur chrome, avec la commande linux mettant les flags : 
  google-chrome-stable --enable-unsafe-webgpu --enable-features=Vulkan
 
-*/
+*/  
 
 
 // nombre de threads pour wasm
-ort.env.wasm.numThreads = 4;
+ort.env.wasm.numThreads = -1;
 // nécéssaire sinon ça casse
 ort.env.wasm.wasmPaths = {
     'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm'
@@ -60,6 +61,7 @@ export const MODELCLASSIFPATH = '/model_classif.onnx'; // chemin du modèle de c
 export const NUMCONF = 0.437; // seuil de confiance pour la détection
 export const STD= [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
+export const NMS=true;
 
 
 export async function loadModel(classif = false,webgpu=false) {
@@ -125,14 +127,20 @@ export async function infer (files,model,img_proceed,sequence=false,webgpu=true)
     console.log("inference...")
     const outputTensor = await model.run({ [inputName]: inputTensor });
     console.log("done !")
+    console.log("output tensor: ",outputTensor);
 
     console.log("post proc...")
-    const bbs = output2BB(outputTensor.output0.data,files.length,NUMCONF);
+    const bbs = output2BB(outputTensor.output0.data,files.length,NUMCONF,NMS);
     console.log("done !");
     const bestScores = bbs[1];
     const bestBoxes = bbs[0];
 
-    const boundingboxes = postprocess_BB(bestBoxes,files.length);
+    let  boundingboxes = [];
+    if (!NMS) {
+        boundingboxes = postprocess_BB(bestBoxes,files.length);
+    } else {
+        boundingboxes = bestBoxes;
+    }
     if (!sequence) {
         img_proceed.nb = files.length;
         img_proceed.time = (Date.now()-start)/1000;
@@ -140,6 +148,16 @@ export async function infer (files,model,img_proceed,sequence=false,webgpu=true)
 
 
     return [boundingboxes, bestScores,start, inputTensor];
+}
+
+async function mapToFiles (files, model) {
+    let imfile = files[i];
+    var BandB = await infer([imfile],model, img_proceed,false);
+    let boundingboxe = BandB[0];
+    let bestScore = BandB[1];
+    let inputTensor = BandB[3];
+
+    return [boundingboxe[0], bestScore[0], inputTensor];
 }
 
 export async function inferSequentialy (files,model,img_proceed) {
@@ -153,6 +171,9 @@ export async function inferSequentialy (files,model,img_proceed) {
     let bestScores = [];
     let start = Date.now();
     let inputTensors = [];
+
+    // TODO [!] faire un await de all et faire un array de promise !!!!!!! 
+    
 
     for (let i=0; i<files.length; i++) {
         let imfile = files[i];

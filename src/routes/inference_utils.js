@@ -1,5 +1,6 @@
 import * as ort from 'onnxruntime-web';
 import * as Jimp from 'jimp';
+import * as tf from '@tensorflow/tfjs';
 
 function IoU(bb1, bb2) {
     // Intersection over Union
@@ -14,6 +15,22 @@ function IoU(bb1, bb2) {
 
     return intersection / union;
 }
+
+export async function cropTensorUsingTFJS (tensor, x1, y1, x2, y2) {
+    // Convert ONNX tensor to tf.Tensor
+    const tfTensor = tf.tensor(tensor.data, tensor.dims);
+    let w = Math.abs(x1-x2);
+    let h = Math.abs(y1-y2);
+    // Slice: [batch, channel, row, col]
+    const croppedTfTensor = tf.slice(tfTensor, [0, 0, y1, x1], [1, 3, h, w]);
+    const croppedData = croppedTfTensor.dataSync();
+    // Create new ONNX tensor
+    const croppedOnnxTensor = new ort.Tensor(tensor.type, croppedData, [1, 3, h, w]);
+
+    return croppedOnnxTensor;
+
+}
+
 
 export async function cropTensor (tensor, x1, y1, x2, y2) {
     /*Crop tensor : 
@@ -46,6 +63,7 @@ export async function cropTensor (tensor, x1, y1, x2, y2) {
 }
 
 export async function applyBBsOnTensor (BBs,tensor,marge=10) {
+    
     /*Applique les bounding boxes sur UN tenseur :
     -------input------- :
         BBs : liste de bounding boxes
@@ -78,13 +96,12 @@ export async function applyBBsOnTensor (BBs,tensor,marge=10) {
         w = Math.min(tsrwidth - x, w);
         h = Math.min(tsrheight - y, h);
         
-
         x = Math.round(x);
         y = Math.round(y);
         w = Math.round(w);
         h = Math.round(h);
 
-        let croppedTensor = await cropTensor(tensor, x, y, x + w, y + h);
+        let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x + w, y + h);
         croppedTensors.push(croppedTensor);
     }
     return croppedTensors;
@@ -101,7 +118,6 @@ export async function applyBBsOnTensors (BBs,tensors) {
     }
     return croppedTensors;
 }
-
 
 export function postprocess_BB(boundingboxes,numfiles) {
     /*supprime les bounding boxes qui ont un IoU > 0.5
@@ -273,13 +289,17 @@ export async function normalizeTensors (tensors, mean, std) {
 
 }
 
-export function output2BB (output,numImages,minConfidence) {
+export function output2BB (output,numImages,minConfidence,nms=false) {
     /*reshape les bounding boxes obtenues par le modèle d'inférence
     -------input------- :
         output : liste de bounding boxes obtenues par le modèle d'inférence
-            forme : [xxxx,yyyyy,wwww,hhhh,confconfconf,etc...] (se répète pr chaque img)
+            forme : [xxxx,yyyyy,wwww,hhhh,confconfconf,etc...] (se répète pr chaque img) si nms = False
+            forme : [xywhconf,iou,xywhconf,iou,...] si nms = True
         numfiles : nombre d'images sur lesquelles on a fait l'inférence*
         minConfidence : seuil de confiance minimum pour considérer une bounding box
+        nms : booléen, si True, alors on applique le fait que la sortie d'un modèle 
+            ultralytics avec des nms est différente que quand yen a pas
+            
 
     -------output------- :
         bestBoxes : liste de bounding boxes après suppression des doublons
@@ -287,43 +307,91 @@ export function output2BB (output,numImages,minConfidence) {
         bestScore : liste des meilleurs scores pour chaque image
             forme : [each img [each box score]]
     */
-    console.log("output : ",output);
+   if (nms) {
     let bestBoxes = [];
+    let bestScores = [];
+    let numbb = output.length/6;
     let bestPerImageBoxes = [];
-    let bestScore = [];
     let bestScorePerImage = 0;
     let suboutput = null;
-    let numbb = (output.length/numImages)/5;
 
-    for (let k=0;k<numImages; k++){
+    let getmeoutofhere = false;
+    console.log("num images : ", numImages);
+    
+    for (let k=0;k<numImages; k++) {
         bestPerImageBoxes= [];
         bestScorePerImage = 0;
-        suboutput = output.slice(k*numbb*5,(k+1)*numbb*5);
+        suboutput = output.slice(k*numbb*6,(k+1)*numbb*6);
 
-        for (let i=0;i<suboutput.length/5;i++) {
+        for (let i = 0; i<suboutput.length; i+=6) {
+            let conf = suboutput[i+4]
+            let x = suboutput[i];
+            let y = suboutput[i+1];
+            let w = suboutput[i+2];
+            let h = suboutput[i+3];
 
-            let conf = suboutput[i+4*numbb];
+            w = Math.abs(x-w);
+            h = Math.abs(y-h);
+
+            if (x == 0 && y == 0 && w == 0 && h == 0) {
+                getmeoutofhere = true;
+                console.log("get me out of here !!!")
+                break;
+            }
             if (conf > bestScorePerImage) {
                 bestScorePerImage = conf;
             }
- 
-            
             if (conf > minConfidence) {
-                let x = suboutput[i];
-                let y = suboutput[i + numbb];
-                let w = suboutput[i + 2*numbb];
-                let h = suboutput[i+ 3*numbb];
-
-                x = x - w / 2;
-				y = y - h / 2;
-
                 bestPerImageBoxes.push([x, y, w, h]);
             }
         }
+        
         bestBoxes.push(bestPerImageBoxes);
-        bestScore.push(bestScorePerImage);
+        bestScores.push(bestScorePerImage);
+        
+
     }
-    return [bestBoxes,bestScore];
+    return [bestBoxes,bestScores];
+   }
+   else {
+        console.log("output : ",output);
+        let bestBoxes = [];
+        let bestPerImageBoxes = [];
+        let bestScore = [];
+        let bestScorePerImage = 0;
+        let suboutput = null;
+        let numbb = (output.length/numImages)/5;
+
+        for (let k=0;k<numImages; k++){
+            bestPerImageBoxes= [];
+            bestScorePerImage = 0;
+            suboutput = output.slice(k*numbb*5,(k+1)*numbb*5);
+
+            for (let i=0;i<suboutput.length/5;i++) {
+
+                let conf = suboutput[i+4*numbb];
+                if (conf > bestScorePerImage) {
+                    bestScorePerImage = conf;
+                }
+    
+                
+                if (conf > minConfidence) {
+                    let x = suboutput[i];
+                    let y = suboutput[i + numbb];
+                    let w = suboutput[i + 2*numbb];
+                    let h = suboutput[i+ 3*numbb];
+
+                    x = x - w / 2;
+                    y = y - h / 2;
+
+                    bestPerImageBoxes.push([x, y, w, h]);
+                }
+            }
+            bestBoxes.push(bestPerImageBoxes);
+            bestScore.push(bestScorePerImage);
+        }
+        return [bestBoxes,bestScore];
+    }
         
 }
 

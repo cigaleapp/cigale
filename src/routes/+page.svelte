@@ -29,6 +29,9 @@
 		img_proceed.time = 0;
 		img_proceed.state= "loading"
 
+		// ça charge le fichier de mapping de classes et en créé un tableau
+		classmap = await loadClassMapping(classmapping);
+
 		if (image_file && image_file.length > 0) {
 			let files = Array.from(image_file);
 			if (!model) {model = await loadModel();}
@@ -116,8 +119,7 @@
 			model.release();
 			model = null;
 
-			// ça charge le fichier de mapping de classes et en créé un tableau
-			classmap = await loadClassMapping(classmapping);
+			
 
 			// le true c'est juste pr dire qu'on vas load le model de classif
 			if (!cmodel) {cmodel = await loadModel(true);}
