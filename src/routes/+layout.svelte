@@ -5,6 +5,7 @@
 	import Toast from '$lib/Toast.svelte';
 	import './style.css';
 	import Navigation from './Navigation.svelte';
+	import Reglages from './Reglages.svelte';
 
 	const { children } = $props();
 
@@ -12,8 +13,14 @@
 	setContext('showSwitchHints', true);
 </script>
 
-<Navigation hasImages={true}></Navigation>
-
+<div class="navbar">
+	<div style="position: relative;">
+		<Navigation hasImages={true}></Navigation>
+	</div>
+	<div class="container">
+		<Reglages></Reglages>
+	</div>
+</div>
 <svelte:head>
 	<base href={base} />
 </svelte:head>
@@ -50,5 +57,22 @@
 
 	:global(*) {
 		font-family: 'Host Grotesk', sans-serif;
+	}
+
+	.navbar {
+		position: fixed;
+		z-index: 100;
+		width: 100%;
+		height: fit-content;
+	}
+
+	.container {
+		margin-left: auto;
+		margin-right: 0;
+		display: flex;
+		flex-direction: column;
+		position: fixed;
+		top: 0;
+		z-index: 100;
 	}
 </style>

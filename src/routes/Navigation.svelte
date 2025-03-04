@@ -1,9 +1,7 @@
 <script>
 	import Sup from '~icons/ph/greater-than';
 	import Download from '~icons/ph/download-simple';
-	import Gear from '~icons/ph/gear';
 	import logo from '../favicon.png';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { page } from '$app/state';
 
 	/**
@@ -72,26 +70,18 @@
 			<div class="line"></div>
 		{/if}
 	</a>
-
-	<ButtonIcon
-		onclick={() => {
-			console.log(page.route.id);
-		}}
-	>
-		<Gear></Gear>
-	</ButtonIcon>
 </nav>
 
 <style>
 	nav {
 		background-color: var(--bg-primary-translucent);
-		height: 8%;
+		height: 40%;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
 		padding-left: 10px;
-		padding-right: 10px;
+		padding-right: 150px;
 		resize: vertical;
 	}
 
