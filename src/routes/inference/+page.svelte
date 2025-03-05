@@ -1,5 +1,4 @@
 <script>
-	// @ts-nocheck
 	import { loadModel, inferSequentialy, classify, torawpath } from './inference.js';
 	import { labelize, applyBBsOnTensors, loadClassMapping } from './inference_utils.js';
 	import { img_proceed } from './state.svelte.js';
