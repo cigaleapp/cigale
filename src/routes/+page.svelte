@@ -9,6 +9,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { img_proceed } from './inference/state.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 
 	/** @type {Map<number, string>} */
 	const previewURLs = new SvelteMap();
@@ -28,12 +29,10 @@
 	);
 
 	let cropperModel = $state();
-	$effect(() => {
-		void loadModel(false).then((model) => {
-			cropperModel = model;
-			toasts.success('Modèle de recadrage chargé');
-		});
-	});
+	async function loadCropperModel() {
+		cropperModel = await loadModel(false);
+		toasts.success('Modèle de recadrage chargé');
+	}
 
 	/**
 	 * @param {string} contentType
@@ -107,38 +106,65 @@
 	});
 </script>
 
-<h1>Démo observations lol</h1>
-<p>Zone ou on peut selectionner en glissant = fond gris</p>
-
-<Dropzone
-	clickable={images.length === 0}
-	onfiles={async ({ files }) => {
-		const currentLength = images.length;
-		await Promise.all(
-			files.map(async (file, index) => {
-				const id = currentLength + index;
-				console.log(`adding image ${id} (cur length ${currentLength})`);
-				await tables.Image.set({
-					id: id.toString(),
-					filename: file.name,
-					addedAt: formatISO(new Date()),
-					metadata: {},
-					bufferExists: false,
-					contentType: file.type
-				});
-				await writeImage(file, id);
-			})
-		);
-	}}
->
-	<section class="demo-observations">
-		<AreaObservations {images} loadingText="Analyse…" />
+{#await loadCropperModel()}
+	<section class="loading">
+		<LoadingSpinner />
+		<p>Chargement du modèle de recadrage…</p>
 	</section>
-</Dropzone>
+{:then _}
+	<Dropzone
+		clickable={images.length === 0}
+		onfiles={async ({ files }) => {
+			const currentLength = images.length;
+			await Promise.all(
+				files.map(async (file, index) => {
+					const id = currentLength + index;
+					console.log(`adding image ${id} (cur length ${currentLength})`);
+					await tables.Image.set({
+						id: id.toString(),
+						filename: file.name,
+						addedAt: formatISO(new Date()),
+						metadata: {},
+						bufferExists: false,
+						contentType: file.type
+					});
+					await writeImage(file, id);
+				})
+			);
+		}}
+	>
+		<section class="observations">
+			<AreaObservations {images} loadingText="Analyse…" />
+		</section>
+	</Dropzone>
+{:catch error}
+	<section class="loading errored">
+		<h2>Oops!</h2>
+		<p>Impossible de charger le modèle de recadrage</p>
+		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
+	</section>
+{/await}
 
 <style>
-	.demo-observations {
+	.observations {
 		padding: 4em;
 		background-color: rgb(from var(--fg-neutral) r g b / 0.1);
+	}
+
+	.loading {
+		display: flex;
+		flex-direction: column;
+		gap: 1.2em;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+	}
+
+	.loading.errored {
+		gap: 0.5em;
+	}
+
+	.loading.errored *:not(p.message) {
+		color: var(--fg-error);
 	}
 </style>
