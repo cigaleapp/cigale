@@ -94,6 +94,7 @@
 			<ButtonPrimary
 				onclick={() => {
 					window.location.href = '#/reglages';
+					onGearClose();
 				}}
 			>
 				Gérer
@@ -101,6 +102,7 @@
 			<ButtonPrimary
 				onclick={() => {
 					window.location.href = '';
+					onGearClose();
 				}}
 			>
 				Retour
@@ -124,7 +126,7 @@
 		width: 100%;
 		padding-left: 25px;
 		padding-right: 25px;
-		z-index: 100;
+		z-index: 2;
 	}
 
 	.IconButton {
