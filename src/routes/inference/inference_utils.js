@@ -1,7 +1,7 @@
 import * as ort from 'onnxruntime-web';
 import * as Jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
-
+//@ts-nocheck
 /**
  *
  * @param {number[]} bb1
