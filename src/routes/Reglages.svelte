@@ -98,6 +98,13 @@
 			>
 				Gérer
 			</ButtonPrimary>
+			<ButtonPrimary
+				onclick={() => {
+					window.location.href = '';
+				}}
+			>
+				Retour
+			</ButtonPrimary>
 		</div>
 	</div>
 </div>
