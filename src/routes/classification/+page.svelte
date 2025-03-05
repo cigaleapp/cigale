@@ -5,7 +5,10 @@
 	import Cropup from '$lib/Cropup.svelte';
 	let openFeur = $state();
 
-	let boundingBoxes = [];
+	/**
+	 * @type {Array<Array<{x: number, y: number, width: number, height: number}>>}
+	 */
+	let boundingBoxes = $state([]);
 	/**
 	 * @type {string[]}
 	 */
@@ -61,7 +64,7 @@
 	key="test"
 	bind:open={openFeur}
 	image={img_list[parseInt(selection[0])]}
-	boundingBoxes={[[0],[0],[0],[0]]}
+	boundingBoxes={boundingBoxes[parseInt(selection[0])]}
 	>
 </Cropup>
 
