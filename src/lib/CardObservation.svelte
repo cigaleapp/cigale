@@ -16,8 +16,10 @@
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes
-	 * @property {[number, number]} boundingBoxes.topLeft - the top left corner of bouding box in form of [x,y]
-	 * @property {[number, number]} boundingBoxes.bottomRight - the bottom right corner of bouding box in form of [x,y]
+	 * @property {number} boundingBoxes.x 
+	 * @property {number} boundingBoxes.y 
+	 * @property {number} boundingBoxes.width 
+	 * @property {number} boundingBoxes.height
 	 *
 	 */
 
@@ -66,9 +68,8 @@
 					{#each boundingBoxes as bounding, index (index)}
 						<div
 							class="bb"
-							style="left: {bounding.topLeft[0] * 100}%; top: {bounding.topLeft[1] *
-								100}%; right: {100 - bounding.bottomRight[0] * 100}%; height: {200 *
-								(bounding.bottomRight[1] - bounding.topLeft[1])}px;"
+							style="left: {bounding.x * 100}%; top: {bounding.y *
+								100}%; width: {bounding.width * 100}%; height: {100*bounding.height}%;"
 						></div>
 					{/each}
 				</div>

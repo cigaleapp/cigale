@@ -5,14 +5,11 @@
 	import Cropup from '$lib/Cropup.svelte';
 	let openFeur = $state();
 
-	/** @type {(x: number, y: number) => [number, number]} */
-	const point = (x, y) => [x, y];
-	let boundingBoxes = [
-		{ topLeft: point(0.1, 0.2), bottomRight: point(0.8, 0.9) },
-		{ topLeft: point(0.2, 0.2), bottomRight: point(0.4, 0.4) }
-	];
-	let images = $state(
-		[
+	let boundingBoxes = [];
+	/**
+	 * @type {string[]}
+	 */
+	let img_list = [
 			'https://parlonssciences.ca/sites/default/files/2019-11/What_is_an_insect.jpg',
 			'https://www.mnhn.fr/system/files/styles/medium/private/2023-05/Phasme.jpg.webp?itok=ShPjddHh',
 			'https://c02.purpledshub.com/uploads/sites/62/2023/10/What-are-insects.jpg?w=1029&webp=1',
@@ -26,13 +23,25 @@
 			'https://i.pinimg.com/originals/d4/b6/c4/d4b6c4366f33a5e45694ccfa466c09f8.jpg',
 			'https://cdn.pixabay.com/photo/2023/04/25/03/02/butterfly-7949342_640.jpg',
 			'https://www.bioexplorer.net/images/1-Blue-Morpho.jpg'
-		].map((image, index) => ({
+		];
+
+	for (let i = 0; i<img_list.length; i++){
+		boundingBoxes.push([{
+			x:0,
+			y:0,
+			width:0.2,
+			height:0.2
+		}]);
+	}
+
+	let images = $state(
+		img_list.map((image, index) => ({
 			index,
 			image,
-			title: `IMG_${Math.ceil(Math.random() * 100000)}.JPEG`,
+			title: index.toString(),
 			stacksize: 1,
 			loading: Math.random() > 0.8 ? (Math.random() > 0.3 ? Math.random() : -1) : undefined,
-			boundingBoxes: boundingBoxes
+			boundingBoxes: boundingBoxes[index]
 		}))
 	);
 	
@@ -51,7 +60,7 @@
 <Cropup
 	key="test"
 	bind:open={openFeur}
-	image={selection[0]}
+	image={img_list[parseInt(selection[0])]}
 	boundingBoxes={[[0],[0],[0],[0]]}
 	>
 </Cropup>
