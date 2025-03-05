@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { Tables } from './database';
+import { Tables } from './database.js';
 
 /** @type {Array<keyof typeof Tables>} */
 // @ts-ignore
@@ -29,6 +29,7 @@ export const tables = {
 	async initialize() {
 		await Promise.allSettled(
 			tableNames.map(async (name) => {
+				// @ts-expect-error
 				tableValues[name] = await tables[name].list();
 			})
 		);

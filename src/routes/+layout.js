@@ -14,7 +14,7 @@ export async function load() {
 }
 
 async function fillBuiltinData() {
-	await Promise.allSettled([
+	await Promise.all([
 		...BUILTIN_METADATA.map(tables.Metadata.set),
 		tables.Settings.set({
 			id: 'defaults',
