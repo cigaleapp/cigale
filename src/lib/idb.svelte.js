@@ -230,8 +230,14 @@ export async function openDatabase() {
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
-	_database = await openDB('database', 1, {
-		upgrade(db) {
+	_database = await openDB('database', 2, {
+		upgrade(db, oldVersion) {
+			// No clean migration path for 1 -> 2, just drop everything
+			if (oldVersion === 1) {
+				for (const tableName of db.objectStoreNames) {
+					db.deleteObjectStore(tableName);
+				}
+			}
 			for (const [tableName, schema] of tablesByName) {
 				if (!schema.meta.table) continue;
 				const keyPath = schema.meta.table.indexes[0];
