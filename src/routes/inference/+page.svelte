@@ -188,7 +188,7 @@
 					{labels[i][j]}:
 					{conf[i][j]}
 				</p>
-				<img src={image} />
+				<img src={image} alt="croped image" />
 			</div>
 		{/each}
 	{/each}
