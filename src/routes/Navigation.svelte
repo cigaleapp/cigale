@@ -1,10 +1,10 @@
 <script>
-	import Sup from '~icons/ph/greater-than';
+	import { page } from '$app/state';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import Logo from '$lib/Logo.svelte';
 	import Download from '~icons/ph/download-simple';
 	import Gear from '~icons/ph/gear';
-	import logo from '../favicon.png';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { page } from '$app/state';
+	import Sup from '~icons/ph/caret-right';
 
 	/**
 	 * @typedef Props
@@ -17,14 +17,14 @@
 </script>
 
 <nav>
-	<div class="divLogo">
-		<img class="logo" src={logo} alt="logo" />
+	<a class="logo" href="#/">
+		<Logo --fill="var(--bg-primary)" />
 		C.i.g.a.l.e.
-	</div>
+	</a>
 
-	<a href="#/import">
+	<a href="#/">
 		Import
-		{#if page.route.id == '/import'}
+		{#if page.route.id == '/'}
 			<div class="line"></div>
 		{/if}
 	</a>
@@ -85,13 +85,11 @@
 <style>
 	nav {
 		background-color: var(--bg-primary-translucent);
-		height: 8%;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		padding-left: 10px;
-		padding-right: 10px;
+		padding: 0.5rem 1rem;
 		resize: vertical;
 	}
 
@@ -117,14 +115,10 @@
 	}
 
 	.logo {
-		width: 60px;
-		height: 40px;
-	}
-	.divLogo {
+		--size: 40px;
 		display: flex;
 		align-items: center;
-		font-weight: bold;
-		text-transform: uppercase;
+		gap: 0.5em;
 	}
 
 	.download {

@@ -3,13 +3,13 @@
 	import Dropzone from '$lib/Dropzone.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import Logo from '$lib/Logo.svelte';
+	import { storeMetadataValue } from '$lib/metadata';
+	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { inferSequentialy, loadModel } from './inference/inference';
-	import { toasts } from '$lib/toasts.svelte';
 	import { img_proceed } from './inference/state.svelte';
-	import { storeMetadataValue } from '$lib/metadata';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 
 	/** @type {Map<number, string>} */
 	const previewURLs = new SvelteMap();
@@ -27,6 +27,19 @@
 					: -1
 		}))
 	);
+
+	let loadingLogoDrawPercent = $state(0);
+	let loadingLogoDrawingForwards = $state(true);
+	$effect(() => {
+		setInterval(() => {
+			loadingLogoDrawPercent =
+				loadingLogoDrawPercent + (loadingLogoDrawingForwards ? 1 : -1) * 0.03;
+			if (loadingLogoDrawPercent > 1) {
+				loadingLogoDrawingForwards = !loadingLogoDrawingForwards;
+				loadingLogoDrawPercent = 0;
+			}
+		}, 10);
+	});
 
 	let cropperModel = $state();
 	async function loadCropperModel() {
@@ -108,7 +121,7 @@
 
 {#await loadCropperModel()}
 	<section class="loading">
-		<LoadingSpinner />
+		<Logo drawpercent={loadingLogoDrawPercent} />
 		<p>Chargement du modèle de recadrage…</p>
 	</section>
 {:then _}
@@ -133,12 +146,16 @@
 			);
 		}}
 	>
-		<section class="observations">
+		<section class="observations" class:empty={!images.length}>
 			<AreaObservations {images} loadingText="Analyse…" />
+			{#if !images.length}
+				<p>Cliquer ou déposer des images ici</p>
+			{/if}
 		</section>
 	</Dropzone>
 {:catch error}
 	<section class="loading errored">
+		<Logo variant="error" />
 		<h2>Oops!</h2>
 		<p>Impossible de charger le modèle de recadrage</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
@@ -148,7 +165,14 @@
 <style>
 	.observations {
 		padding: 4em;
-		background-color: rgb(from var(--fg-neutral) r g b / 0.1);
+		display: flex;
+		flex-grow: 1;
+	}
+
+	.observations.empty {
+		justify-content: center;
+		align-items: center;
+		text-align: center;
 	}
 
 	.loading {
@@ -158,6 +182,8 @@
 		justify-content: center;
 		align-items: center;
 		height: 100vh;
+		/* Logo size */
+		--size: 5em;
 	}
 
 	.loading.errored {

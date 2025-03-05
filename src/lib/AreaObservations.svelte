@@ -112,6 +112,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	section.images {
 		display: flex;
 		flex-wrap: wrap;
+		align-content: flex-start;
 		gap: 2em;
 	}
 </style>
