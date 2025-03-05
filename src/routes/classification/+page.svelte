@@ -2,6 +2,7 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import Cropup from '$lib/Cropup.svelte';
 	let openFeur = $state();
 
 	/** @type {(x: number, y: number) => [number, number]} */
@@ -34,20 +35,31 @@
 			boundingBoxes: boundingBoxes
 		}))
 	);
+	
+	/**
+	 * @type {string[]}
+	 */
+	let selection = $state([]);
+
+	$effect(() => {
+		console.log(" slelection : ")
+		console.log(selection);
+	})
+
 </script>
 
-<ModalConfirm
+<Cropup
 	key="test"
-	title="hmmmm"
-	onconfirm={() => console.log('confirm')}
-	bind:open={openFeur}>
-	<p>hello</p>
-</ModalConfirm>
+	bind:open={openFeur}
+	image={selection[0]}
+	boundingBoxes={[[0],[0],[0],[0]]}
+	>
+</Cropup>
 
 
 <h1>Classif</h1>
 <section class="demo-observations">
-	<AreaObservations bind:images loadingText="Analyse…" />
+	<AreaObservations bind:images={images} bind:selection={selection} loadingText="Analyse…" />
 </section>
 
 <ButtonPrimary onclick={openFeur}>Modifier un crop</ButtonPrimary>
