@@ -67,8 +67,10 @@
 	main {
 		display: flex;
 		flex-direction: column;
+		gap: 1em;
 		height: 100%;
 		overflow-y: scroll;
+		padding: 1.2em;
 	}
 
 	.global-progress-bar.inactive {

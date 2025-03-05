@@ -8,7 +8,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
-	import { inferSequentialy, loadModel } from './inference/inference';
+	import { inferSequentialy, loadModel, MODELDETECTPATH } from './inference/inference';
 	import { uiState } from './inference/state.svelte';
 
 	/** @type {Map<number, string>} */
@@ -128,10 +128,20 @@
 	});
 </script>
 
+{#snippet modelsource()}
+	<a
+		href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/tree/main/models/{MODELDETECTPATH}"
+		target="_blank"
+	>
+		<code>{MODELDETECTPATH}</code>
+	</a>
+{/snippet}
+
 {#await loadCropperModel()}
 	<section class="loading">
 		<Logo drawpercent={loadingLogoDrawPercent} />
 		<p>Chargement du modèle de recadrage…</p>
+		<p class="source">{@render modelsource()}</p>
 	</section>
 {:then _}
 	<Dropzone
@@ -167,6 +177,7 @@
 		<Logo variant="error" />
 		<h2>Oops!</h2>
 		<p>Impossible de charger le modèle de recadrage</p>
+		<p class="source">{@render modelsource()}</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
 	</section>
 {/await}
@@ -193,6 +204,10 @@
 		height: 100vh;
 		/* Logo size */
 		--size: 5em;
+	}
+
+	.loading .source {
+		font-size: 0.8em;
 	}
 
 	.loading.errored {
