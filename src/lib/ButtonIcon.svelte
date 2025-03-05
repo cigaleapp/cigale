@@ -28,6 +28,8 @@
 		font-weight: bold;
 		font-size: var(--font-size, 1em);
 		border: none;
+		height: 40px;
+		width: 40px;
 	}
 
 	button:is(:hover, :focus-visible) {
