@@ -15,7 +15,7 @@
 <Navigation hasImages={true}></Navigation>
 
 <svelte:head>
-	<base href={base} />
+	<base href={base ? `${base}/index.html` : ''} />
 </svelte:head>
 
 <section class="toasts">
