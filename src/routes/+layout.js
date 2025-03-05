@@ -19,7 +19,10 @@ async function fillBuiltinData() {
 		tables.Protocol.set({
 			id: 'test',
 			metadata: [...BUILTIN_METADATA.map((m) => m.id), 'species'],
-			author: { name: 'Feur', email: 'gwenn.elbikergre@gmai.com' },
+			authors: [
+				{ name: 'Feur', email: 'gwenn.elbikergre@gmai.com' },
+				{ name: 'Incofeurgniote', email: 'igriuojgr@fokejofe.com' }
+			],
 			name: 'Test',
 			source: 'https://gwen.works'
 		}),
