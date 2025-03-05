@@ -7,13 +7,7 @@
 	const strokeDashoffset = 1206;
 </script>
 
-<svg
-	width="calc(var(--size, 1.2em) * 3204 / 2017)"
-	height="var(--size, 1.2em)"
-	viewBox="0 0 3204 2017"
-	fill="var(--fill, none)"
-	xmlns="http://www.w3.org/2000/svg"
->
+<svg viewBox="0 0 3204 2017" fill="var(--fill, none)" xmlns="http://www.w3.org/2000/svg">
 	{#if variant === 'regular'}
 		<path
 			d="M1020.07 294.532L1283.62 482.788V303.639C1261.34 270.383 1222.2 179.965 1303.91 115.305C1376.19 58.0998 1441.36 108.379 1471.37 133.436L1283.62 303.639V482.788L1217.18 724.197L1471.37 942.764L1308.87 1031.25L1020.07 1188.53L624.147 1067.03L937.818 724.197L696.449 707.796L370.907 724.197L81.6314 534.363L24.7183 279.146L211.153 282.028L1020.07 294.532Z"
@@ -65,3 +59,10 @@
 		/>
 	{/if}
 </svg>
+
+<style>
+	svg {
+		width: calc(var(--size, 1.2em) * 3204 / 2017);
+		height: var(--size, 1.2em);
+	}
+</style>
