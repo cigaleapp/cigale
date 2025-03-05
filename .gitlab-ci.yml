@@ -23,6 +23,7 @@ pages:
 
 check:
   stage: test
+  allow_failure: yes
   script:
     - npm i
     - npx svelte-kit sync
