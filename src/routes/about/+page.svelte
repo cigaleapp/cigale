@@ -1,0 +1,175 @@
+<script>
+	import Logo from '$lib/Logo.svelte';
+
+	let logoDrawPercent = $state(0);
+	$effect(() => {
+		const interval = setInterval(() => {
+			logoDrawPercent = Math.max(1, logoDrawPercent + 0.03);
+		}, 10);
+		return () => {
+			if (logoDrawPercent >= 1) {
+				clearInterval(interval);
+			}
+		};
+	});
+
+	const authors = [
+		{ name: 'Achraf Khairoun', gitlab: 'khairoa' },
+		{ name: 'Céleste Tiano', gitlab: 'tianoc' },
+		{ name: 'Gaetan Laumonier', gitlab: 'laumong' },
+		{ name: 'Gwenn Le Bihan', gitlab: 'gwennlbh', url: 'https://gwen.works' },
+		{ name: 'Ines Charles', gitlab: 'charlei' },
+		{ name: 'Olivier Lamothe', gitlab: 'lamotho' }
+	].map(({ name, gitlab, url }) => ({ name, url: url ?? `https://git.inpt.fr/${gitlab}` }));
+
+	const supervisors = [
+		// Waiting for approval to show full names
+		{ name: 'Axel C.', url: '' },
+		{ name: 'Maxime C.', url: '' },
+		{ name: 'Rémy E.', url: '' },
+		{ name: 'Thomas F.', url: '' }
+	];
+
+	/**
+	 * @returns {Promise<Array<[string, string]>>} Array of [package name, version used]
+	 */
+	async function showDependencies() {
+		// Fetch package.json text
+		const response = await fetch(
+			'https://git.inpt.fr/api/v4/projects/cigale%2Fcigale.pages.inpt.fr/repository/files/package.json/raw'
+		)
+			.then((res) => res.text())
+			.then((text) => JSON.parse(text))
+			.then((pkg) =>
+				[...Object.entries(pkg.dependencies), ...Object.entries(pkg.devDependencies)].map(
+					([name, version]) => [name, version.replace('^', '')]
+				)
+			);
+
+		// @ts-expect-error
+		return response;
+	}
+</script>
+
+{#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ people)}
+	{#each people as { url, name }, i (url || name)}
+		{#if i > 0},
+		{/if}
+		{#if url}
+			<a target="_blank" href={url}>{name}</a>
+		{:else}
+			{name}
+		{/if}
+	{/each}
+{/snippet}
+
+<header>
+	<Logo drawpercent={logoDrawPercent} />
+	<div class="text">
+		<h1>C.i.g.a.l.e.</h1>
+		<p class="subtitle">
+			Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
+		</p>
+	</div>
+</header>
+
+<dl>
+	<dt>Développé par</dt>
+	<dd>
+		{@render peoplelinks(authors)}
+	</dd>
+	<dt>Sous la supervision de</dt>
+	<dd>
+		{@render peoplelinks(supervisors)}
+	</dd>
+	<dt>Dans le cadre d'un</dt>
+	<dd>
+		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
+	</dd>
+	<dt>Code source</dt>
+	<dd>
+		<a href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr">git.inpt.fr/cigale/app</a>
+		<br />
+		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a> (mirroir)
+	</dd>
+	<dt>Gentillement hébergé par</dt>
+	<dd>
+		<a href="https://net7.dev">net7</a>, l'association étudiante informatique de l'ENSEEIHT
+	</dd>
+	<dt>Avec les modèles</dt>
+	<dd>
+		<dl>
+			<dt>Détection & recadrage</dt>
+			<dd>
+				<a href="TODO">YOLO 11n</a>
+			</dd>
+			<dt>Classification</dt>
+			<dd>
+				<a href="TODO">TODO</a>
+			</dd>
+		</dl>
+	</dd>
+	<dt>Fontes</dt>
+	<dd>
+		<a href="https://elementtype.co/host-grotesk/">Host Grotesk</a> par Doğukan Karapınar et İbrahim
+		Kaçtıoğlu
+	</dd>
+	<dt>Icônes</dt>
+	<dd>
+		<a href="https://phosphoricons.com/">Phosphor Icons</a> par
+		<a href="https://helenazhang.com">Helena Zhang</a>
+		et <a href="https://tobiasfried.com">Tobias Fried</a>
+	</dd>
+
+	<dt>Grâce aux bibliothèques</dt>
+	<dd>
+		{#await showDependencies()}
+			<p>Chargement des dépendances…</p>
+		{:then deps}
+			<dl>
+				{#each deps as [name, version] (name)}
+					<dt>
+						<a target="_blank" href="https://npmjs.com/package/{name}">{name}</a>
+					</dt>
+					<dd>{version}</dd>
+				{/each}
+			</dl>
+		{:catch error}
+			<p>Impossible de charger les dépendances</p>
+			<p>{error}</p>
+		{/await}
+	</dd>
+</dl>
+
+<style>
+	header {
+		display: flex;
+		align-items: center;
+		--size: 3rem;
+		column-gap: 0.5em;
+		row-gap: 0;
+	}
+
+	header p {
+		margin-top: -0.25em;
+	}
+
+	dl {
+		display: flex;
+		flex-direction: column;
+	}
+
+	dd {
+		padding-left: 0.5em;
+		margin-bottom: 1em;
+	}
+
+	dl > dd > dl {
+		display: grid;
+		grid-template-columns: max-content max-content;
+	}
+
+	dl > dd > dl > dd {
+		margin-bottom: 0;
+	}
+</style>
