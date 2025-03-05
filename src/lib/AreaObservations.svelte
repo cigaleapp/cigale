@@ -25,6 +25,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {number} index
 	 * @property {number} stacksize
 	 * @property {number} [loading]
+	 * @property {object[]} [boundingBoxes] - array of bounding boxes
+	 * @property {[number, number]} boundingBoxes.topLeft - the top left corner of bouding box in form of [x,y]
+	 * @property {[number, number]} boundingBoxes.bottomRight - the bottom right corner of bouding box in form of [x,y]
 	 */
 
 	/**
@@ -81,7 +84,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 />
 
 <section class="images" bind:this={imagesContainer}>
-	{#each images as props}
+	{#each images as props, index (index)}
 		<CardObservation
 			data-selectable
 			data-title={props.title}
@@ -90,6 +93,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			{...props}
 			{loadingText}
 			selected={selection.includes(props.title)}
+			boundingBoxes={props.boundingBoxes}
 		/>
 	{/each}
 </section>

@@ -15,6 +15,10 @@
 	 * @property {boolean} selected
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
+	 * @property {object[]} [boundingBoxes] - array of bounding boxes
+	 * @property {[number, number]} boundingBoxes.topLeft - the top left corner of bouding box in form of [x,y]
+	 * @property {[number, number]} boundingBoxes.bottomRight - the bottom right corner of bouding box in form of [x,y]
+	 *
 	 */
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
@@ -27,6 +31,7 @@
 		selected,
 		loadingText = 'Chargement…',
 		stacksize = 1,
+		boundingBoxes = [],
 		...rest
 	} = $props();
 
@@ -56,7 +61,18 @@
 						</span>
 					</div>
 				{/if}
-				<img src={image} alt={title} />
+				<div class="containbb">
+					<img src={image} alt={title} />
+					{#each boundingBoxes as bounding, index (index)}
+						<div
+							class="bb"
+							style="left: {bounding.topLeft[0] * 100}%; top: {bounding.topLeft[1] *
+								100}%; right: {100 - bounding.bottomRight[0] * 100}%; height: {200 *
+								(bounding.bottomRight[1] - bounding.topLeft[1])}px;"
+						></div>
+					{/each}
+				</div>
+
 				<footer>
 					<div class="check-icon">
 						<AnimatableCheckmark />
@@ -266,6 +282,15 @@
 		transition:
 			top calc(var(--transition-duration) / 1.5),
 			left calc(var(--transition-duration) / 1.5);
+	}
+
+	.bb {
+		position: absolute;
+		outline: 2px solid var(--fg-neutral);
+	}
+
+	.containbb {
+		display: inline-block;
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
