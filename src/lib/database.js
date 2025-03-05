@@ -31,13 +31,24 @@ const MetadataValues = type({
 	'[/[a-z0-9_]+/]': MetadataValue
 });
 
+const ImageFile = table(
+	['id'],
+	type({
+		/** ID of the associated Image object */
+		id: ID,
+		bytes: 'ArrayBuffer'
+	})
+);
+
 const Image = table(
 	['id', 'addedAt'],
 	type({
-		id: ID,
+		id: 'string.integer.parse',
 		filename: 'string',
 		addedAt: 'string.date.iso.parse',
-		metadata: MetadataValues
+		metadata: MetadataValues,
+		contentType: /\w+\/\w+/,
+		bufferExists: 'boolean'
 	})
 );
 
@@ -213,8 +224,11 @@ export const Schemas = {
 	Settings
 };
 
+export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile']);
+
 export const Tables = {
 	Image,
+	ImageFile,
 	Observation,
 	Metadata,
 	Protocol,
