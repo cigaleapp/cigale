@@ -1,16 +1,16 @@
 <script>
 	import { base } from '$app/paths';
-	import { setContext } from 'svelte';
-	import { toasts } from '$lib/toasts.svelte';
 	import Toast from '$lib/Toast.svelte';
+	import { toasts } from '$lib/toasts.svelte';
+	import { setContext } from 'svelte';
+
 	import './style.css';
 	import Navigation from './Navigation.svelte';
 	import PreviewSidePannel from './PreviewSidePannel.svelte';
 
-	const { children } = $props();
+	const { children, data } = $props();
 
-	// TODO get value from DB
-	setContext('showSwitchHints', true);
+	setContext('showSwitchHints', data.showInputHints);
 	let img = 'https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg';
 	let sexe = 0;
 	let date = 0;
@@ -20,7 +20,7 @@
 <Navigation hasImages={true}></Navigation>
 
 <svelte:head>
-	<base href={base} />
+	<base href={base ? `${base}/index.html` : ''} />
 </svelte:head>
 
 <section class="toasts">
