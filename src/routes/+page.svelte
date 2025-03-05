@@ -5,6 +5,10 @@
 	import { tables } from '$lib/idb.svelte';
 	import { formatISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { inferSequentialy, loadModel } from './inference/inference';
+	import { toasts } from '$lib/toasts.svelte';
+	import { img_proceed } from './inference/state.svelte';
+	import { storeMetadataValue } from '$lib/metadata';
 
 	/** @type {Map<number, string>} */
 	const previewURLs = new SvelteMap();
@@ -16,11 +20,20 @@
 			title: image.filename,
 			index: image.id,
 			stacksize: 1,
-			loading: image.bufferExists && previewURLs.has(image.id) ? undefined : -1
+			loading:
+				image.bufferExists && image.metadata.bounding_boxes && previewURLs.has(image.id)
+					? undefined
+					: -1
 		}))
 	);
 
-	$inspect(tables.Image.state);
+	let cropperModel = $state();
+	$effect(() => {
+		void loadModel(false).then((model) => {
+			cropperModel = model;
+			toasts.success('Modèle de recadrage chargé');
+		});
+	});
 
 	/**
 	 * @param {string} contentType
@@ -46,7 +59,41 @@
 		});
 		previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
 		await tables.Image.update(id.toString(), 'bufferExists', true);
+		await analyzeImage(bytes, id);
 	}
+
+	/**
+	 * @param {ArrayBuffer} buffer
+	 * @param {number} id
+	 */
+	async function analyzeImage(buffer, id) {
+		if (!cropperModel) {
+			toasts.error(
+				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
+			);
+			return;
+		}
+
+		const [boundingBoxes] = await inferSequentialy([buffer], cropperModel, img_proceed);
+		await storeMetadataValue({
+			subjectId: id.toString(),
+			metadataId: 'bounding_boxes',
+			value: JSON.stringify(boundingBoxes)
+		});
+	}
+
+	$effect(() => {
+		if (!cropperModel) return;
+		for (const image of tables.Image.state) {
+			if (image.bufferExists && !image.metadata.bounding_boxes) {
+				void (async () => {
+					const file = await db.get('ImageFile', image.id.toString());
+					if (!file) return;
+					await analyzeImage(file.bytes, image.id);
+				})();
+			}
+		}
+	});
 
 	$effect(() => {
 		for (const image of tables.Image.state) {

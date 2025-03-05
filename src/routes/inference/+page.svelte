@@ -77,7 +77,8 @@
 			// bestScores sous la forme [each image [each score]]
 			// start : le temps de départ (pour le calcul du temps total)
 			// inputTensors : les tensors d'entrée, ils servent à ne pas être recalculé à chaque fois
-			var BsandBs = await inferSequentialy(image_file, model, img_proceed);
+			const buffers = await Promise.all([...image_file].map((file) => file.arrayBuffer()));
+			var BsandBs = await inferSequentialy(buffers, model, img_proceed);
 
 			let boundingboxes = BsandBs[0];
 			// @ts-ignore
