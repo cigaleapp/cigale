@@ -13,10 +13,7 @@ export async function load() {
 	};
 }
 
-/**
- * @param {URL} url the url of the page we're requesting this on
- */
-async function fillBuiltinData(url) {
+async function fillBuiltinData() {
 	await Promise.all([
 		...BUILTIN_METADATA.map(tables.Metadata.set),
 		tables.Settings.set({
@@ -26,13 +23,6 @@ async function fillBuiltinData(url) {
 			gridSize: 10,
 			language: 'fr',
 			showInputHints: true
-		}),
-		tables.Protocol.set({
-			id: 'test',
-			name: 'Test',
-			source: url.href,
-			authors: [],
-			metadata: BUILTIN_METADATA.map(({ id }) => id)
 		})
 	]);
 }

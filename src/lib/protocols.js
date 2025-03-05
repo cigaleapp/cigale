@@ -1,6 +1,5 @@
 import YAML from 'yaml';
 import { Schemas } from './database.js';
-import { tables } from './idb.js';
 
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
 	metadata: Schemas.Metadata.array()
@@ -18,6 +17,9 @@ export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
  * @param {import("./database").ID} id
  */
 export async function exportProtocol(base, id) {
+	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
+	const { tables } = await import('./idb.svelte.js');
+
 	let protocol = await tables.Protocol.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
 
@@ -45,6 +47,8 @@ export async function exportProtocol(base, id) {
  * @returns {Promise<typeof ExportedProtocol.infer>}
  */
 export async function importProtocol() {
+	const { tables } = await import('./idb.svelte.js');
+
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
