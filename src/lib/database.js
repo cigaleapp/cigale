@@ -11,7 +11,10 @@ const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
 const Probability = type('0 <= number <= 1');
 
 const MetadataValue = type({
-	value: 'string.json.parse',
+	value: type('string.json.parse').pipe(
+		(primitive) =>
+			/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */ (primitive)
+	),
 	confidence: Probability.default(1),
 	alternatives: {
 		'[string.json]': Probability
