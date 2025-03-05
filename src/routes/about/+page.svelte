@@ -52,7 +52,7 @@
 </script>
 
 {#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ people)}
-	{#each people as { url, name }, i (url || name)}
+	{#each people.sort(() => Math.random() - 0.5) as { url, name }, i (url || name)}
 		{#if i > 0},
 		{/if}
 		{#if url}
