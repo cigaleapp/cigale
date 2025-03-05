@@ -58,8 +58,8 @@ ort.env.wasm.wasmPaths = {
 
 export const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
 export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de détection
-export let MODELDETECTPATH = '/arthropod_detector_yolo11n_conf0.437.onnx'; // chemin du modèle de détection
-export let MODELCLASSIFPATH = '/model_classif.onnx'; // chemin du modèle de classification
+export let MODELDETECTPATH = 'arthropod_detector_yolo11n_conf0.437.onnx'; // chemin du modèle de détection
+export let MODELCLASSIFPATH = 'model_classif.onnx'; // chemin du modèle de classification
 export const NUMCONF = 0.437; // seuil de confiance pour la détection
 export const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
@@ -81,26 +81,16 @@ export function torawpath(path) {
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
 export async function loadModel(classif = false, webgpu = false) {
-	let MODELCLASSIFPATH = torawpath('model_classif.onnx');
-	let MODELDETECTPATH = torawpath('arthropod_detector_yolo11n_conf0.437.onnx');
 	console.log('models paht : ', MODELCLASSIFPATH, MODELDETECTPATH);
 	// load un modèle ONNX, soit de classification, soit de détection.
 
 	let model;
-	let MODELPATH = MODELDETECTPATH;
-	if (classif) {
-		MODELPATH = MODELCLASSIFPATH;
-	}
+	const MODELPATH = torawpath(classif ? MODELCLASSIFPATH : MODELDETECTPATH);
 
-	try {
-		if (webgpu) {
-			model = await ort.InferenceSession.create(MODELPATH, { executionProviders: ['webgpu'] });
-		} else {
-			model = await ort.InferenceSession.create(MODELPATH);
-		}
-		console.log('ONNX Model loaded successfully.');
-	} catch (err) {
-		console.error('Failed to load ONNX model:', err);
+	if (webgpu) {
+		model = await ort.InferenceSession.create(MODELPATH, { executionProviders: ['webgpu'] });
+	} else {
+		model = await ort.InferenceSession.create(MODELPATH);
 	}
 	return model;
 }
