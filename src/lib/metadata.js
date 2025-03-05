@@ -1,4 +1,4 @@
-import { tables } from './idb';
+import { tables } from './idb.svelte.js';
 
 /**
  *
