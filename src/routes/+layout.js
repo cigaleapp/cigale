@@ -4,6 +4,7 @@ import { getSetting } from '$lib/settings.svelte.js';
 import { defineSpeciesMetadata } from '$lib/species.js';
 
 export async function load() {
+	await tables.initialize();
 	await fillBuiltinData();
 	await defineSpeciesMetadata('species');
 	await tables.initialize();

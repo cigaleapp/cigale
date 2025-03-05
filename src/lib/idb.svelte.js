@@ -27,7 +27,11 @@ const tableValues = $state({
 export const tables = {
 	...Object.fromEntries(tableNames.map((name) => [name, wrangler(name)])),
 	async initialize() {
-		await Promise.allSettled(tableNames.map((name) => tables[name].list()));
+		await Promise.allSettled(
+			tableNames.map(async (name) => {
+				tableValues[name] = await tables[name].list();
+			})
+		);
 	}
 };
 
@@ -47,7 +51,7 @@ function wrangler(table) {
 		async set(value) {
 			await set(table, value);
 			const output = Tables[table].assert(value);
-			const index = this.state.findIndex((item) => item.id === value.id);
+			const index = tableValues[table].findIndex((item) => item.id === value.id);
 			if (index !== -1) tableValues[table][index] = output;
 			else tableValues[table].push(output);
 		},
