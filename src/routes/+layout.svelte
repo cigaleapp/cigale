@@ -34,7 +34,7 @@
 	{/each}
 </section>
 
-{@render children?.()}
+<main>{@render children?.()}</main>
 
 <style>
 	.toasts {
@@ -47,6 +47,19 @@
 		left: 0;
 		right: 0;
 		z-index: 1000;
+	}
+
+	main {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		overflow-y: scroll;
+	}
+
+	:global(body) {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
 	}
 
 	:global(*) {
