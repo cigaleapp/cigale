@@ -1,10 +1,15 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	let openFeur = $state();
 
 	/** @type {(x: number, y: number) => [number, number]} */
 	const point = (x, y) => [x, y];
-
+	let boundingBoxes = [
+		{ topLeft: point(0.1, 0.2), bottomRight: point(0.8, 0.9) },
+		{ topLeft: point(0.2, 0.2), bottomRight: point(0.4, 0.4) }
+	];
 	let images = $state(
 		[
 			'https://parlonssciences.ca/sites/default/files/2019-11/What_is_an_insect.jpg',
@@ -26,20 +31,26 @@
 			title: `IMG_${Math.ceil(Math.random() * 100000)}.JPEG`,
 			stacksize: 1,
 			loading: Math.random() > 0.8 ? (Math.random() > 0.3 ? Math.random() : -1) : undefined,
-			boundingBoxes: [
-				{ topLeft: point(0.1, 0.2), bottomRight: point(0.8, 0.9) },
-				{ topLeft: point(0.2, 0.2), bottomRight: point(0.4, 0.4) }
-			]
+			boundingBoxes: boundingBoxes
 		}))
 	);
 </script>
+
+<ModalConfirm
+	key="test"
+	title="hmmmm"
+	onconfirm={() => console.log('confirm')}
+	bind:open={openFeur}>
+	<p>hello</p>
+</ModalConfirm>
+
 
 <h1>Classif</h1>
 <section class="demo-observations">
 	<AreaObservations bind:images loadingText="Analyse…" />
 </section>
 
-<ButtonPrimary onclick={() => {}}>Modifier un crop</ButtonPrimary>
+<ButtonPrimary onclick={openFeur}>Modifier un crop</ButtonPrimary>
 
 <style>
 	h1 {
