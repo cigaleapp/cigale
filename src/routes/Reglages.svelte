@@ -98,20 +98,6 @@
 			>
 				Gérer
 			</ButtonPrimary>
-			<ButtonPrimary
-				onclick={() => {
-					window.location.href = '';
-				}}
-			>
-				Retour
-			</ButtonPrimary>
-			<ButtonPrimary
-				onclick={() => {
-					console.log("J'exporte");
-				}}
-			>
-				Export
-			</ButtonPrimary>
 		</div>
 	</div>
 </div>

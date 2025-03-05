@@ -44,6 +44,7 @@ Available CSS variables:
 		width: var(--width, 7.5em);
 		font-weight: bold;
 		font-size: var(--font-size, 1em);
+		gap: 0.5em;
 	}
 
 	button:is(:hover, :focus-visible) {
