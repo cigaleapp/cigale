@@ -1,17 +1,8 @@
 <script>
-<<<<<<< HEAD
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import { exportProtocol, importProtocol } from '$lib/protocols';
-	import * as mobilenet from '@tensorflow-models/mobilenet';
-	import * as tf from '@tensorflow/tfjs';
-	import { toasts } from '$lib/toasts.svelte.js';
-	import { base } from '$app/paths';
-=======
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import * as mobilenet from '@tensorflow-models/mobilenet';
 	import * as tf from '@tensorflow/tfjs';
->>>>>>> main
 	let image_file = $state();
 	let classe = $state();
 	let certainty = $state();
@@ -88,34 +79,9 @@
 <p>classse : {classe} with certainty : {certainty}</p>
 <canvas id="canvas" bind:this={canva_element}></canvas>
 
-<<<<<<< HEAD
-<ButtonInk
-	onclick={async () => {
-		await exportProtocol(base, 'test');
-	}}
->
-	Export
-</ButtonInk>
-
-<ButtonInk
-	onclick={async () => {
-		try {
-			const protocol = await importProtocol();
-			toasts.success(
-				`Protocole ${protocol.name} (dont ${protocol.metadata.length} métadonnées) importé`
-			);
-		} catch (e) {
-			toasts.error(e?.toString() ?? 'Erreur inattendue');
-		}
-	}}
->
-	Import
-</ButtonInk>
-=======
 <style>
 	.demo-observations {
 		padding: 4em;
 		background-color: rgb(from var(--fg-neutral) r g b / 0.1);
 	}
 </style>
->>>>>>> main

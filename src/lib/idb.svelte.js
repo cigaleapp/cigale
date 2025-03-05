@@ -29,6 +29,7 @@ export const tables = {
 	async initialize() {
 		await Promise.allSettled(
 			tableNames.map(async (name) => {
+				// @ts-expect-error
 				tableValues[name] = await tables[name].list();
 			})
 		);
