@@ -6,14 +6,34 @@ import { Tables } from './database';
 // @ts-ignore
 const tableNames = Object.keys(Tables);
 
+/** @type {{[Table in keyof typeof Tables]: Array<typeof Tables[Table]['infer']>}} */
+const tableValues = $state({
+	Image: [],
+	Metadata: [],
+	Observation: [],
+	Protocol: [],
+	Settings: []
+});
+
 /**
  *
  * @type {{
  *  [Name in keyof typeof Tables]: ReturnType<typeof wrangler<Name>>
+ * } & {
+ * 	initialize: () => Promise<void>
  * }}
  */
 // @ts-ignore
-export const tables = Object.fromEntries(tableNames.map((name) => [name, wrangler(name)]));
+export const tables = {
+	...Object.fromEntries(tableNames.map((name) => [name, wrangler(name)])),
+	async initialize() {
+		await Promise.allSettled(
+			tableNames.map(async (name) => {
+				tableValues[name] = await tables[name].list();
+			})
+		);
+	}
+};
 
 /**
  *
@@ -22,17 +42,26 @@ export const tables = Object.fromEntries(tableNames.map((name) => [name, wrangle
  */
 function wrangler(table) {
 	return {
+		get state() {
+			return tableValues[table];
+		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
 		/** @param {typeof Tables[Table]['inferIn']} value */
-		set: async (value) => set(table, value),
+		async set(value) {
+			await set(table, value);
+			const output = Tables[table].assert(value);
+			const index = tableValues[table].findIndex((item) => item.id === value.id);
+			if (index !== -1) tableValues[table][index] = output;
+			else tableValues[table].push(output);
+		},
 		/** @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value */
-		add: async (value) =>
-			set(
-				table,
+		async add(value) {
+			return this.set(
 				// @ts-ignore
 				{ ...value, id: `${table}_${nanoid()}` }
-			),
+			);
+		},
 		list: async () => list(table),
 		all: () => iterator(table),
 		/** @param {string} index  */
@@ -60,13 +89,12 @@ function wrangler(table) {
  * @template {keyof typeof Tables} TableName
  */
 export async function set(tableName, value) {
-	const key = 'id' in value ? value.id : value.layer;
-	console.time(`set ${tableName} ${key}`);
+	console.time(`set ${tableName} ${value.id}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	validator.assert(value);
 	return await db.put(tableName, value).then((result) => {
-		console.timeEnd(`set ${tableName} ${key}`);
+		console.timeEnd(`set ${tableName} ${value.id}`);
 		return result;
 	});
 }
