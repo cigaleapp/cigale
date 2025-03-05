@@ -7,6 +7,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"prebuild": "node scripts/generate-json-schemas.js",
 		"preview": "vite preview",
 		"prepare": "husky",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -44,22 +45,24 @@
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"typescript": "^5.0.0",
-		"vite": "^6.0.0"
+		"vite": "^6.0.0",
+		"vite-plugin-cross-origin-isolation": "^0.1.6"
 	},
 	"dependencies": {
 		"@iconify-json/ph": "^1.2.2",
 		"@tensorflow-models/mobilenet": "^2.1.1",
 		"@tensorflow/tfjs": "^4.22.0",
+		"arktype": "^2.0.4",
+		"date-fns": "^4.1.0",
 		"dragselect": "^3.1.1",
-		"arktype": "^2.0.4",
-		"date-fns": "^4.1.0",
 		"fuse.js": "^7.1.0",
-		"arktype": "^2.0.4",
-		"date-fns": "^4.1.0",
-		"fuse.js": "^7.1.0",
+		"idb": "^8.0.2",
+		"jimp": "^1.6.0",
+		"onnxruntime-web": "^1.22.0-dev.20250301-0a6b05fb2d",
 		"sveltejs-tippy": "^3.0.0",
 		"tinykeys": "^3.0.0",
-		"unplugin-icons": "^22.0.0"
+		"unplugin-icons": "^22.0.0",
+		"yaml": "^2.7.0"
 	},
 	"volta": {
 		"node": "22.14.0",

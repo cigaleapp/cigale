@@ -10,8 +10,16 @@ const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
  */
 const Probability = type('0 <= number <= 1');
 
+/**
+ * Can't use string.url.parse because it prevents us from generating JSON schemas
+ */
+const URLString = type('/https?:\\/\\/.+/');
+
 const MetadataValue = type({
-	value: 'string.json.parse',
+	value: type('string.json.parse').pipe(
+		(primitive) =>
+			/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */ (primitive)
+	),
 	confidence: Probability.default(1),
 	alternatives: {
 		'[string.json]': Probability
@@ -23,13 +31,24 @@ const MetadataValues = type({
 	'[/[a-z0-9_]+/]': MetadataValue
 });
 
+const ImageFile = table(
+	['id'],
+	type({
+		/** ID of the associated Image object */
+		id: ID,
+		bytes: 'ArrayBuffer'
+	})
+);
+
 const Image = table(
 	['id', 'addedAt'],
 	type({
-		id: ID,
+		id: 'string.integer.parse',
 		filename: 'string',
 		addedAt: 'string.date.iso.parse',
-		metadata: MetadataValues
+		metadata: MetadataValues,
+		contentType: /\w+\/\w+/,
+		bufferExists: 'boolean'
 	})
 );
 
@@ -99,7 +118,7 @@ const MetadataEnumVariant = type({
 	key: ID,
 	label: 'string',
 	description: 'string',
-	learnMore: 'string.url.parse | null'
+	learnMore: URLString.optional()
 });
 
 const Metadata = table(
@@ -112,28 +131,31 @@ const Metadata = table(
 		options: MetadataEnumVariant.array().atLeastLength(1).optional(),
 		required: 'boolean',
 		description: 'string',
-		learnMore: 'string.url.parse | null'
+		learnMore: URLString.optional()
 	})
 );
 
+const ProtocolWithoutMetadata = type({
+	id: ID,
+	name: 'string',
+	source: URLString,
+	authors: type({
+		email: 'string.email',
+		name: 'string'
+	}).array()
+});
+
 const Protocol = table(
 	'id',
-	type({
-		id: ID,
-		name: 'string',
-		source: 'string.url.parse | null',
-		metadata: ID.array(),
-		author: {
-			email: 'string',
-			name: 'string'
-		}
+	ProtocolWithoutMetadata.and({
+		metadata: ID.array()
 	})
 );
 
 const Settings = table(
-	'layer',
+	'id',
 	type({
-		layer: '"defaults" | "user"',
+		id: '"defaults" | "user"',
 		protocols: ID.array(),
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: 'number',
@@ -146,6 +168,14 @@ const Settings = table(
  * @type {Array<typeof Metadata.inferIn>}
  */
 export const BUILTIN_METADATA = [
+	{
+		id: 'bounding_boxes',
+		description: "Boîtes de recadrage pour l'image",
+		label: '',
+		type: 'string',
+		mergeMethod: 'none',
+		required: false
+	},
 	{
 		id: 'sex',
 		description: "Sexe de l'individu",
@@ -173,7 +203,6 @@ export const BUILTIN_METADATA = [
 		id: 'shoot_date',
 		description: '',
 		label: 'Date de prise de vue',
-		learnMore: null,
 		type: 'date',
 		mergeMethod: 'average',
 		required: true
@@ -182,7 +211,6 @@ export const BUILTIN_METADATA = [
 		id: 'shoot_location',
 		description: 'Localisation de la prise de vue',
 		label: 'Lieu',
-		learnMore: null,
 		type: 'location',
 		mergeMethod: 'average',
 		required: false
@@ -200,11 +228,15 @@ export const Schemas = {
 	MetadataEnumVariant,
 	Metadata,
 	Protocol,
+	ProtocolWithoutMetadata,
 	Settings
 };
 
+export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile']);
+
 export const Tables = {
 	Image,
+	ImageFile,
 	Observation,
 	Metadata,
 	Protocol,
