@@ -25,9 +25,11 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {number} index
 	 * @property {number} stacksize
 	 * @property {number} [loading]
-	 * @property {object[]} [boundingBoxes] - array of bounding boxes
-	 * @property {[number, number]} boundingBoxes.topLeft - the top left corner of bouding box in form of [x,y]
-	 * @property {[number, number]} boundingBoxes.bottomRight - the bottom right corner of bouding box in form of [x,y]
+ 	 * @property {object[]} [boundingBoxes] - array of bounding boxes
+	 * @property {number} boundingBoxes.x 
+	 * @property {number} boundingBoxes.y 
+	 * @property {number} boundingBoxes.width 
+	 * @property {number} boundingBoxes.height
 	 */
 
 	/**
