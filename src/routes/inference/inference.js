@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as ort from 'onnxruntime-web';
 import {
 	postprocess_BB,
