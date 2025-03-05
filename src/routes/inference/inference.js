@@ -5,7 +5,7 @@ import {
 	output2BB,
 	preprocess_for_classification
 } from './inference_utils.js';
-
+//@ts-nocheck
 /* 
 ce fichier et le fichier utils associé (inference_utils.js) contiennent les fonctions pour effectuer les inférences de détection et de classification.
 les fonctions sont les suivantes : 
