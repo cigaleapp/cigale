@@ -18,6 +18,14 @@
     let y = bb.y * 100;
     let width = bb.width * 100;
     let height = bb.height * 100;
+
+    let moving = false;
+
+    function start () {
+        moving = true;
+    }
+
+
 </script>
 
 <div class="bounding-box">
@@ -49,7 +57,10 @@
 		background: white;
 		border-radius: 50%;
 		transform: translate(-50%, -50%);
+        user-select: none;
+        cursor: move;
 	}
+    
 	.lines {
 		position: absolute;
 		width: 100%;
