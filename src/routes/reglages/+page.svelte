@@ -1,5 +1,5 @@
 <script>
-	import { tables } from '$lib/idb';
+	import { tables } from '$lib/idb.svelte.js';
 	import SelectWithSearch from '$lib/SelectWithSearch.svelte';
 </script>
 

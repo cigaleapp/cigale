@@ -15,15 +15,13 @@ export async function defineSpeciesMetadata(id) {
 		id,
 		description: "L'espèce de l'individu",
 		label: 'Espèce',
-		learnMore: null,
 		mergeMethod: 'max',
 		required: false,
 		type: 'enum',
 		options: names.filter(Boolean).map((name, i) => ({
 			key: i.toString(),
 			label: name,
-			description: '',
-			learnMore: null
+			description: ''
 		}))
 	});
 }
