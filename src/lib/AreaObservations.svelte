@@ -13,10 +13,11 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script>
-	// @ts-ignore
+	import { onMount } from 'svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import KeyboardShortcuts from './KeyboardShortcuts.svelte';
+	import { mutationobserver } from './mutations';
 
 	/**
 	 * @typedef Image
@@ -41,13 +42,14 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
-	const dragselect = $derived.by(() => {
+	/** @type {DragSelect |undefined} */
+	let dragselect;
+
+	onMount(() => {
 		if (!imagesContainer) return;
-
-		// Recompute when images change
-		images;
-
-		return new DragSelect(imagesContainer);
+		dragselect?.destroy();
+		dragselect = new DragSelect(imagesContainer, selection);
+		dragselect.setSelection(selection);
 	});
 
 	$effect(() => {
@@ -65,7 +67,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		'$mod+a': {
 			help: 'Tout sélectionner',
 			do: () => {
-				selection = images.map((img) => img.title);
+				selection = images.map((img) => img.index.toString());
 				dragselect?.setSelection(selection);
 			}
 		},
@@ -80,16 +82,29 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	}}
 />
 
-<section class="images" bind:this={imagesContainer}>
-	{#each images as props}
+<section
+	class="images"
+	bind:this={imagesContainer}
+	use:mutationobserver={{
+		childList: true,
+		subtree: true,
+		onchildList() {
+			if (!imagesContainer) return;
+			const items = [...imagesContainer.querySelectorAll('[data-selectable]')];
+			dragselect?.setItems(items);
+			dragselect?.setSelection(selection);
+		}
+	}}
+>
+	{#each images as props (props.index)}
 		<CardObservation
 			data-selectable
-			data-title={props.title}
+			data-title={props.index}
 			data-loading={props.loading}
 			data-index={props.index}
 			{...props}
 			{loadingText}
-			selected={selection.includes(props.title)}
+			selected={selection.includes(props.index.toString())}
 		/>
 	{/each}
 </section>
@@ -98,6 +113,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	section.images {
 		display: flex;
 		flex-wrap: wrap;
+		align-content: flex-start;
 		gap: 2em;
 	}
 </style>
