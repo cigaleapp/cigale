@@ -169,6 +169,14 @@ const Settings = table(
  */
 export const BUILTIN_METADATA = [
 	{
+		id: 'bounding_boxes',
+		description: "Boîtes de recadrage pour l'image",
+		label: '',
+		type: 'string',
+		mergeMethod: 'none',
+		required: false
+	},
+	{
 		id: 'sex',
 		description: "Sexe de l'individu",
 		label: 'Sexe',

@@ -299,12 +299,12 @@ export function labelize(output, classmap) {
 }
 /**
  *
- * @param {FileList} files
+ * @param {ArrayBuffer[]} buffers
  * @param {number} targetWidth
  * @param {number} targetHeight
  * @returns {Promise<ort.Tensor>}
  */
-export async function imload(files, targetWidth, targetHeight) {
+export async function imload(buffers, targetWidth, targetHeight) {
 	/*
     charge les images et les resize
     -------input------- :
@@ -317,11 +317,11 @@ export async function imload(files, targetWidth, targetHeight) {
             forme : [files.length, 3, targetHeight, targetWidth]
     */
 
-	var float32Data = new Float32Array(targetHeight * targetWidth * 3 * files.length);
-	for (let f = 0; f < files.length; f++) {
-		let file = files[f];
+	var float32Data = new Float32Array(targetHeight * targetWidth * 3 * buffers.length);
+	for (let f = 0; f < buffers.length; f++) {
+		let buffer = buffers[f];
 
-		var img_tensor = await Jimp.Jimp.read(await file.arrayBuffer());
+		var img_tensor = await Jimp.Jimp.read(buffer);
 		img_tensor.resize({ w: targetWidth, h: targetHeight });
 
 		var imageBufferData = img_tensor.bitmap.data;
@@ -343,7 +343,12 @@ export async function imload(files, targetWidth, targetHeight) {
 	}
 
 	console.log('done !');
-	var tensor = new ort.Tensor('float32', float32Data, [files.length, 3, targetHeight, targetWidth]);
+	var tensor = new ort.Tensor('float32', float32Data, [
+		buffers.length,
+		3,
+		targetHeight,
+		targetWidth
+	]);
 	float32Data = new Float32Array(0);
 	return tensor;
 }

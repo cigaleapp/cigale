@@ -106,14 +106,14 @@ export async function loadModel(classif = false, webgpu = false) {
 }
 /**
  *
- * @param {FileList} files
+ * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
  * @param {boolean} sequence
  * @param {boolean} webgpu
  * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[]]>}
  */
-export async function infer(files, model, img_proceed, sequence = false, webgpu = true) {
+export async function infer(buffers, model, img_proceed, sequence = false, webgpu = true) {
 	/*Effectue une inférence de détection sur une ou plusieurs images. 
     -------------inputs----------------
         files : liste de fichiers images
@@ -150,7 +150,7 @@ export async function infer(files, model, img_proceed, sequence = false, webgpu 
 	let inputTensor;
 
 	console.log('loading images...');
-	inputTensor = await imload(files, TARGETWIDTH, TARGETHEIGHT);
+	inputTensor = await imload(buffers, TARGETWIDTH, TARGETHEIGHT);
 
 	console.log('inference...');
 	const outputTensor = await model.run({ [inputName]: inputTensor });
@@ -159,19 +159,19 @@ export async function infer(files, model, img_proceed, sequence = false, webgpu 
 
 	console.log('post proc...');
 	// @ts-ignore
-	const bbs = output2BB(outputTensor.output0.data, files.length, NUMCONF, NMS);
+	const bbs = output2BB(outputTensor.output0.data, buffers.length, NUMCONF, NMS);
 	console.log('done !');
 	const bestScores = bbs[1];
 	const bestBoxes = bbs[0];
 
 	let boundingboxes = [];
 	if (!NMS) {
-		boundingboxes = postprocess_BB(bestBoxes, files.length);
+		boundingboxes = postprocess_BB(bestBoxes, buffers.length);
 	} else {
 		boundingboxes = bestBoxes;
 	}
 	if (!sequence) {
-		img_proceed.nb = files.length;
+		img_proceed.nb = buffers.length;
 		img_proceed.time = (Date.now() - start) / 1000;
 	}
 	// @ts-ignore
@@ -198,12 +198,12 @@ async function mapToFiles(files, model, i, img_proceed) {
 
 /**
  *
- * @param {FileList} files
+ * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
  * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[][]]>}
  */
-export async function inferSequentialy(files, model, img_proceed) {
+export async function inferSequentialy(buffers, model, img_proceed) {
 	/*Effectue une inférence de détection sur une ou plusieurs images.
     Cette fonction est similaire à infer, mais permet l'inférence une à une 
     et affiche les informations sur l'avancement de l'inférence
@@ -215,10 +215,8 @@ export async function inferSequentialy(files, model, img_proceed) {
 	let start = Date.now();
 	let inputTensors = [];
 
-	// TODO [!] faire un await de all et faire un array de promise !!!!!!!
-
-	for (let i = 0; i < files.length; i++) {
-		let imfile = files[i];
+	for (let i = 0; i < buffers.length; i++) {
+		let imfile = buffers[i];
 		// @ts-ignore
 		var BandB = await infer([imfile], model, img_proceed, false);
 		let boundingboxe = BandB[0];
