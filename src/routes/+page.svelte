@@ -9,7 +9,7 @@
 	import { formatISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { inferSequentialy, loadModel } from './inference/inference';
-	import { img_proceed } from './inference/state.svelte';
+	import { uiState } from './inference/state.svelte';
 
 	/** @type {Map<number, string>} */
 	const previewURLs = new SvelteMap();
@@ -86,7 +86,11 @@
 			return;
 		}
 
-		const [boundingBoxes] = await inferSequentialy([buffer], cropperModel, img_proceed);
+		const [boundingBoxes] = await inferSequentialy(
+			[buffer],
+			cropperModel,
+			$state.snapshot(uiState)
+		);
 		await storeMetadataValue({
 			subjectId: id.toString(),
 			metadataId: 'bounding_boxes',
@@ -105,6 +109,11 @@
 				})();
 			}
 		}
+	});
+
+	$effect(() => {
+		uiState.processing.total = images.length;
+		uiState.processing.done = images.filter((image) => image.loading === undefined).length;
 	});
 
 	$effect(() => {
@@ -147,7 +156,7 @@
 		}}
 	>
 		<section class="observations" class:empty={!images.length}>
-			<AreaObservations {images} loadingText="Analyse…" />
+			<AreaObservations bind:selection={uiState.selection} {images} loadingText="Analyse…" />
 			{#if !images.length}
 				<p>Cliquer ou déposer des images ici</p>
 			{/if}

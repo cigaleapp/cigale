@@ -108,12 +108,12 @@ export async function loadModel(classif = false, webgpu = false) {
  *
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @param {typeof import('./state.svelte.js').uiState} uiState
  * @param {boolean} sequence
  * @param {boolean} webgpu
  * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[]]>}
  */
-export async function infer(buffers, model, img_proceed, sequence = false, webgpu = true) {
+export async function infer(buffers, model, uiState, sequence = false, webgpu = true) {
 	/*Effectue une inférence de détection sur une ou plusieurs images. 
     -------------inputs----------------
         files : liste de fichiers images
@@ -144,7 +144,7 @@ export async function infer(buffers, model, img_proceed, sequence = false, webgp
 	let start = -1;
 	if (!sequence) {
 		start = Date.now();
-		img_proceed.state = 'inference';
+		uiState.processing.state = 'inference';
 	}
 	const inputName = model.inputNames[0];
 	let inputTensor;
@@ -171,8 +171,8 @@ export async function infer(buffers, model, img_proceed, sequence = false, webgp
 		boundingboxes = bestBoxes;
 	}
 	if (!sequence) {
-		img_proceed.nb = buffers.length;
-		img_proceed.time = (Date.now() - start) / 1000;
+		uiState.processing.done = buffers.length;
+		uiState.processing.time = (Date.now() - start) / 1000;
 	}
 	// @ts-ignore
 	return [boundingboxes, bestScores, start, inputTensor];
@@ -183,7 +183,7 @@ export async function infer(buffers, model, img_proceed, sequence = false, webgp
  * @param {FileList} files
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {number} i
- * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @param {typeof import('./state.svelte.js').uiState} img_proceed
  * @returns {Promise<[number[][], number[][], ort.Tensor[]]>}
  */
 async function mapToFiles(files, model, i, img_proceed) {
@@ -200,10 +200,10 @@ async function mapToFiles(files, model, i, img_proceed) {
  *
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @param {typeof import('./state.svelte.js').uiState} uiState
  * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[][]]>}
  */
-export async function inferSequentialy(buffers, model, img_proceed) {
+export async function inferSequentialy(buffers, model, uiState) {
 	/*Effectue une inférence de détection sur une ou plusieurs images.
     Cette fonction est similaire à infer, mais permet l'inférence une à une 
     et affiche les informations sur l'avancement de l'inférence
@@ -218,7 +218,7 @@ export async function inferSequentialy(buffers, model, img_proceed) {
 	for (let i = 0; i < buffers.length; i++) {
 		let imfile = buffers[i];
 		// @ts-ignore
-		var BandB = await infer([imfile], model, img_proceed, false);
+		var BandB = await infer([imfile], model, uiState, false);
 		let boundingboxe = BandB[0];
 		let bestScore = BandB[1];
 		let inputTensor = BandB[3];
@@ -228,8 +228,8 @@ export async function inferSequentialy(buffers, model, img_proceed) {
 		bestScores.push(bestScore[0]);
 		inputTensors.push(inputTensor);
 
-		img_proceed.nb = i + 1;
-		img_proceed.time = (Date.now() - start) / 1000;
+		uiState.processing.done = i + 1;
+		uiState.processing.time = (Date.now() - start) / 1000;
 	}
 	return [boundingboxes, bestScores, start, inputTensors];
 }
@@ -237,10 +237,10 @@ export async function inferSequentialy(buffers, model, img_proceed) {
  *
  * @param {FileList} files
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @param {typeof import('./state.svelte.js').uiState} uiState
  * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[][]]>}
  */
-export async function inferSequentialyConcurrent(files, model, img_proceed) {
+export async function inferSequentialyConcurrent(files, model, uiState) {
 	/*Effectue une inférence de détection sur une ou plusieurs images de manière 
     concurentielle. 
     */
@@ -252,7 +252,7 @@ export async function inferSequentialyConcurrent(files, model, img_proceed) {
 
 	let promises = [];
 	for (let i = 0; i < files.length; i++) {
-		promises.push(mapToFiles(files, model, i, img_proceed));
+		promises.push(mapToFiles(files, model, i, uiState));
 	}
 
 	let results = await Promise.all(promises);
@@ -261,8 +261,8 @@ export async function inferSequentialyConcurrent(files, model, img_proceed) {
 		bestScores.push(results[i][1]);
 		inputTensors.push(results[i][2]);
 
-		img_proceed.nb = i + 1;
-		img_proceed.time = (Date.now() - start) / 1000;
+		uiState.processing.done = i + 1;
+		uiState.processing.time = (Date.now() - start) / 1000;
 	}
 	return [boundingboxes, bestScores, start, inputTensors];
 }
@@ -270,11 +270,11 @@ export async function inferSequentialyConcurrent(files, model, img_proceed) {
  *
  * @param {ort.Tensor[][]} images
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').img_proceed} img_proceed
+ * @param {typeof import('./state.svelte.js').uiState} uiState
  * @param {number} start
  * @returns {Promise<[number[][], (string | number | bigint)[][]]>}
  */
-export async function classify(images, model, img_proceed, start) {
+export async function classify(images, model, uiState, start) {
 	/*Effectue une inférence de classification sur une ou plusieurs images.
     -------------inputs----------------
         images : liste d'images prétraitées
@@ -295,16 +295,16 @@ export async function classify(images, model, img_proceed, start) {
             forme : [each image [each class
     */
 
-	img_proceed.nb = 0;
+	uiState.processing.done = 0;
 
 	const inputName = model.inputNames[0];
 
 	let argmaxs = [];
 	let bestScores = [];
-	img_proceed.state = 'preprocessing for classification...';
+	uiState.processing.state = 'preprocessing';
 	// @ts-ignore
 	images = await preprocess_for_classification(images, MEAN, STD);
-	img_proceed.state = 'classification...';
+	uiState.processing.state = 'classification';
 
 	for (let i = 0; i < images.length; i++) {
 		let argmax = [];
@@ -320,12 +320,12 @@ export async function classify(images, model, img_proceed, start) {
 
 			outputTensor.output.dispose();
 			images[i][j].dispose();
-			img_proceed.time = (Date.now() - start) / 1000;
+			uiState.processing.time = (Date.now() - start) / 1000;
 		}
 		argmaxs.push(argmax);
 		bestScores.push(bestScore);
 
-		img_proceed.nb = i + 1;
+		uiState.processing.done = i + 1;
 	}
 
 	return [argmaxs, bestScores];
