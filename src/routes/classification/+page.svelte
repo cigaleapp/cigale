@@ -1,7 +1,6 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import Cropup from '$lib/Cropup.svelte';
 	let openFeur = $state();
 
@@ -60,13 +59,15 @@
 
 </script>
 
-<Cropup
-	key="test"
-	bind:open={openFeur}
-	image={img_list[parseInt(selection[0])]}
-	boundingBoxes={boundingBoxes[parseInt(selection[0])]}
-	>
-</Cropup>
+{#if selection.length > 0}
+	<Cropup
+		key="test"
+		bind:opener={openFeur}
+		image={img_list[parseInt(selection[0])]}
+		boundingBoxes={boundingBoxes[parseInt(selection[0])]}
+		bind:boundingBoxesout={boundingBoxes[parseInt(selection[0])]}>
+	</Cropup>
+{/if}
 
 
 <h1>Classif</h1>
