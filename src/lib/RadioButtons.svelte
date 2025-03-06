@@ -1,8 +1,11 @@
 <script>
-	let { options, name, value = $bindable() } = $props();
+	let { options, name, value = $bindable(), onchange = () => {} } = $props();
+	$effect(() => {
+		onchange(value);
+	});
 </script>
 
-{#each options as option}
+{#each options as option (option)}
 	<div>
 		<label class="radio">
 			<input type="radio" {name} value={option} bind:group={value} />
@@ -17,7 +20,7 @@
 		color: var(--bg-neutral);
 		align-items: center;
 	}
-	
+
 	input[type='radio']:hover {
 		color: var(--bg-primary);
 		border-radius: 50%;

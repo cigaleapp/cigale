@@ -5,7 +5,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import { imageBufferWasSaved, imageId, imageIdToFileId, imageIsCropped } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue } from '$lib/metadata';
+	import { storeMetadataValue, extractFromExif } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
 	import { onMount } from 'svelte';
@@ -83,6 +83,24 @@
 		const image = await tables.Image.raw.get(id);
 		if (!image) throw 'Image introuvable';
 		const bytes = await file.arrayBuffer();
+		const metadataFromExif = await extractFromExif(bytes).catch((e) => {
+			console.warn(e);
+			if (file.type === 'image/jpeg') {
+				toasts.warn(
+					`Impossible d'extraire les métadonnées EXIF de ${file.name}: ${e?.toString() ?? 'Erreur inattendue'}`
+				);
+			}
+			return {};
+		});
+		console.log(metadataFromExif);
+		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+			await storeMetadataValue({
+				subjectId: id,
+				metadataId: key,
+				value,
+				confidence
+			});
+		}
 		await db.set('ImageFile', { id: imageIdToFileId(id), bytes });
 		previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
 		await tables.Image.update(id, 'bufferExists', true);

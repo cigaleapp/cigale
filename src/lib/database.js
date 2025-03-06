@@ -166,8 +166,14 @@ const Settings = table(
 	})
 );
 
+export const BUILTIN_METADATA_IDS = {
+	crop: 'crop',
+	shoot_date: 'shoot_date',
+	shoot_location: 'shoot_location'
+};
+
 /**
- * @type {Array<typeof Metadata.inferIn>}
+ * @type {Array<typeof Metadata.inferIn & { id: keyof typeof BUILTIN_METADATA_IDS }>}
  */
 export const BUILTIN_METADATA = [
 	{
@@ -177,29 +183,6 @@ export const BUILTIN_METADATA = [
 		type: 'boundingbox',
 		mergeMethod: 'none',
 		required: false
-	},
-	{
-		id: 'sex',
-		description: "Sexe de l'individu",
-		label: 'Sexe',
-		learnMore: 'https://fr.wikipedia.org/wiki/Sexe',
-		type: 'enum',
-		mergeMethod: 'none',
-		required: false,
-		options: [
-			{
-				key: 'm',
-				label: 'Male',
-				learnMore: 'https://fr.wikipedia.org/wiki/M%C3%A2le',
-				description: ''
-			},
-			{
-				key: 'f',
-				label: 'Femelle',
-				learnMore: 'https://fr.wikipedia.org/wiki/Femelle',
-				description: ''
-			}
-		]
 	},
 	{
 		id: 'shoot_date',

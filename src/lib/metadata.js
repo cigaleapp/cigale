@@ -1,4 +1,5 @@
-import { Schemas } from './database';
+import { BUILTIN_METADATA_IDS, Schemas } from './database';
+import * as exifParser from 'exif-parser';
 import { tables, _tablesState } from './idb.svelte.js';
 
 /**
@@ -57,6 +58,33 @@ export async function storeMetadataValue({
 }
 
 /**
+ * @param {ArrayBuffer} buffer buffer of the image to extract EXIF data from
+ * @returns {Promise<import('./database.js').MetadataValues>}
+ */
+export async function extractFromExif(buffer) {
+	const exif = exifParser.create(buffer).enableImageSize(false).parse();
+	/** @type {Partial<Record<keyof typeof BUILTIN_METADATA_IDS, import('./metadata.js').RuntimeValue<import('./database.js').MetadataType>>>} */
+	const output = {};
+
+	if (!exif) return output;
+
+	if (exif.tags.DateTimeOriginal) {
+		output[BUILTIN_METADATA_IDS.shoot_date] = new Date(exif.tags.DateTimeOriginal);
+	}
+
+	if (exif.tags.GPSLatitude && exif.tags.GPSLongitude) {
+		output[BUILTIN_METADATA_IDS.shoot_location] = {
+			latitude: /** @type {number} */ (exif.tags.GPSLatitude),
+			longitude: /** @type {number} */ (exif.tags.GPSLongitude)
+		};
+	}
+
+	return Object.fromEntries(
+		Object.entries(output).map(([key, value]) => [key, { value, alternatives: {}, confidence: 1 }])
+	);
+}
+
+/**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
  * @param {import('./database').Observation} observation
  * @returns {Promise<import('./database').MetadataValues>}
@@ -90,7 +118,7 @@ export async function mergeMetadataValues(images) {
 	/** @type {import("./database").MetadataValues}  */
 	const output = {};
 
-	const keys = new Set(...images.map((image) => Object.keys(image.metadata)));
+	const keys = new Set(images.map((image) => Object.keys(image.metadata)));
 
 	for (const key of keys) {
 		const definition = await tables.Metadata.get(key);
@@ -123,22 +151,21 @@ export function combineMetadataValues(images) {
 
 	// TODO handle observations
 
-	const keys = new Set(...images.map((image) => Object.keys(image.metadata)));
+	let keys = new Set(images.flatMap((img) => Object.keys(img.metadata)));
 
 	for (const key of keys) {
-		const values = images.flatMap((img) =>
-			Object.entries(img.metadata)
-				.filter(([k]) => k === key)
-				.map(([, v]) => v)
+		const values = images.map(
+			(img) => img.metadata[key] ?? { value: null, confidence: 0, alternatives: {} }
 		);
 
-		const stringedValues = new Set(values.map((v) => JSON.stringify(v)));
-		if (stringedValues.size > 1) {
+		const stringedValues = new Set(values.map(({ value }) => JSON.stringify(value)));
+		console.log(`${[...keys]}: combining ${[...stringedValues]}`);
+		if (stringedValues.size > 1 || values.some(({ value }) => value === null)) {
 			output[key] = undefined;
 			continue;
 		}
 
-		const alternativeKeys = [...new Set(...values.flatMap((v) => Object.keys(v.alternatives)))];
+		const alternativeKeys = [...new Set(values.flatMap((v) => Object.keys(v.alternatives)))];
 
 		output[key] = {
 			value: values[0].value,
@@ -336,6 +363,6 @@ function toNumber(type, values) {
 }
 
 /**
- * @template {import('./database').MetadataType} Type
+ * @template {import('./database').MetadataType} [Type=import('./database').MetadataType]
  * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, width: number, height: number } : string} RuntimeValue
  */
