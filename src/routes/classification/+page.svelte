@@ -37,6 +37,13 @@
 		}]);
 	}
 
+	let boundingBoxesout = $state(boundingBoxes);
+
+	$effect(() => {
+		console.log("boundingBoxesout : ");
+		console.log(boundingBoxesout);
+	})
+
 	let images = $state(
 		img_list.map((image, index) => ({
 			index,
@@ -66,7 +73,7 @@
 		bind:opener={openFeur}
 		image={img_list[parseInt(selection[0])]}
 		boundingBoxes={boundingBoxes[parseInt(selection[0])]}
-		bind:boundingBoxesout={boundingBoxes[parseInt(selection[0])]}>
+		bind:boundingBoxesout={boundingBoxesout[parseInt(selection[0])]}>
 	</Cropup>
 {/if}
 
