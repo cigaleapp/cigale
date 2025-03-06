@@ -1,3 +1,4 @@
+
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
@@ -61,7 +62,7 @@
 
 {#if selection.length > 0}
 	<Cropup
-		key="test"
+		key="cropping"	
 		bind:opener={openFeur}
 		image={img_list[parseInt(selection[0])]}
 		boundingBoxes={boundingBoxes[parseInt(selection[0])]}
