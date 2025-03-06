@@ -20,6 +20,12 @@
 	/** @type {Map<string, string>} */
 	const previewURLs = new SvelteMap();
 
+	/**
+	 * Maps image ID to error message
+	 * @type {Map<string, string>}
+	 */
+	const erroredImages = new SvelteMap();
+
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
 		tables.Image.state.map((image, i) => ({
@@ -54,14 +60,14 @@
 	 * @param {import('$lib/database.js').Image} image
 	 */
 	function imageIsCropped(image) {
-		return image.metadata.crop;
+		return image.metadata.crop || erroredImages.has(image.id);
 	}
 
 	/**
 	 * @param {import('$lib/database.js').Image} image
 	 */
 	function imageBufferWasSaved(image) {
-		return image.bufferExists;
+		return image.bufferExists || erroredImages.has(image.id);
 	}
 
 	let loadingLogoDrawPercent = $state(0);
@@ -99,7 +105,7 @@
 	async function writeImage(file, id) {
 		console.log('writeImage', file, id);
 		const image = await tables.Image.raw.get(id);
-		if (!image) return;
+		if (!image) throw 'Image introuvable';
 		const bytes = await file.arrayBuffer();
 		await db.set('ImageFile', { id: imageIdToFileId(id), bytes });
 		previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
@@ -175,9 +181,14 @@
 		for (const image of tables.Image.state) {
 			if (imageBufferWasSaved(image) && !imageIsCropped(image)) {
 				void (async () => {
-					const file = await db.get('ImageFile', image.id);
-					if (!file) return;
-					await analyzeImage(file.bytes, image.id, image);
+					try {
+						const file = await db.get('ImageFile', image.id);
+						if (!file) return;
+						await analyzeImage(file.bytes, image.id, image);
+					} catch (error) {
+						console.error(error);
+						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
+					}
 				})();
 			}
 		}
@@ -223,15 +234,20 @@
 			await Promise.all(
 				files.map(async (file, index) => {
 					const id = imageId(currentLength + index);
-					await tables.Image.set({
-						id,
-						filename: file.name,
-						addedAt: formatISO(new Date()),
-						metadata: {},
-						bufferExists: false,
-						contentType: file.type
-					});
-					await writeImage(file, id);
+					try {
+						await tables.Image.set({
+							id,
+							filename: file.name,
+							addedAt: formatISO(new Date()),
+							metadata: {},
+							bufferExists: false,
+							contentType: file.type
+						});
+						await writeImage(file, id);
+					} catch (error) {
+						console.error(error);
+						erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+					}
 				})
 			);
 		}}
@@ -240,7 +256,13 @@
 			<AreaObservations
 				bind:selection={uiState.selection}
 				{images}
+				errors={erroredImages}
 				loadingText="Analyse…"
+				ondelete={async (id) => {
+					await tables.Image.remove(id);
+					await tables.Observation.remove(id);
+					await db.drop('ImageFile', imageIdToFileId(id));
+				}}
 				binds={{
 					'$mod+u': {
 						help: 'Supprimer toutes les images et observations',
