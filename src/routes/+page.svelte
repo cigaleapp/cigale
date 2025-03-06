@@ -8,25 +8,61 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
 	import { SvelteMap } from 'svelte/reactivity';
-	import { inferSequentialy, loadModel, MODELDETECTPATH } from './inference/inference';
+	import {
+		inferSequentialy,
+		loadModel,
+		MODELDETECTPATH,
+		TARGETWIDTH,
+		TARGETHEIGHT
+	} from './inference/inference';
 	import { uiState } from './inference/state.svelte';
 
-	/** @type {Map<number, string>} */
+	/** @type {Map<string, string>} */
 	const previewURLs = new SvelteMap();
 
-	/** @type {Array<{ index: number, image: string, title: string, stacksize: number, loading?: number }>} */
+	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
-		tables.Image.state.map((image) => ({
+		tables.Image.state.map((image, i) => ({
 			image: previewURLs.get(image.id) ?? '',
 			title: image.filename,
-			index: image.id,
+			id: image.id,
+			index: i,
 			stacksize: 1,
 			loading:
-				image.bufferExists && image.metadata.bounding_boxes && previewURLs.has(image.id)
-					? undefined
-					: -1
+				image.bufferExists && image.metadata.crop && previewURLs.has(image.id) ? undefined : -1
 		}))
 	);
+
+	/**
+	 * Retourne un id d'image sous la forme 000001_000001
+	 * @param {number|string} index
+	 * @param {number} subindex
+	 */
+	function imageId(index, subindex = 0) {
+		return `${Number.parseInt(index.toString(), 0).toString().padStart(6, '0')}_${subindex.toString().padStart(6, '0')}`;
+	}
+
+	/**
+	 * Retourne l'id d'un objet ImageFile associé à l'objet Image
+	 * @param {string} id
+	 */
+	function imageIdToFileId(id) {
+		return id.replace(/(_\d+)+$/, '');
+	}
+
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 */
+	function imageIsCropped(image) {
+		return image.metadata.crop;
+	}
+
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 */
+	function imageBufferWasSaved(image) {
+		return image.bufferExists;
+	}
 
 	let loadingLogoDrawPercent = $state(0);
 	let loadingLogoDrawingForwards = $state(true);
@@ -58,27 +94,27 @@
 
 	/**
 	 * @param {File} file
-	 * @param {number} id
+	 * @param {string} id
 	 */
 	async function writeImage(file, id) {
 		console.log('writeImage', file, id);
-		const image = await tables.Image.raw.get(id.toString());
+		const image = await tables.Image.raw.get(id);
 		if (!image) return;
 		const bytes = await file.arrayBuffer();
-		await db.set('ImageFile', {
-			id: id.toString(),
-			bytes
-		});
+		await db.set('ImageFile', { id: imageIdToFileId(id), bytes });
 		previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
-		await tables.Image.update(id.toString(), 'bufferExists', true);
-		await analyzeImage(bytes, id);
+		await tables.Image.update(id, 'bufferExists', true);
+		await analyzeImage(bytes, id, image);
 	}
 
 	/**
 	 * @param {ArrayBuffer} buffer
-	 * @param {number} id
+	 * @param {string} id
+	 * @param {object} image
+	 * @param {string} image.contentType
+	 * @param {string} image.filename
 	 */
-	async function analyzeImage(buffer, id) {
+	async function analyzeImage(buffer, id, { contentType, filename }) {
 		if (!cropperModel) {
 			toasts.error(
 				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -86,26 +122,62 @@
 			return;
 		}
 
-		const [boundingBoxes] = await inferSequentialy(
+		const [[boundingBoxes], [bestScores]] = await inferSequentialy(
 			[buffer],
 			cropperModel,
 			$state.snapshot(uiState)
 		);
-		await storeMetadataValue({
-			subjectId: id.toString(),
-			metadataId: 'bounding_boxes',
-			value: JSON.stringify(boundingBoxes)
+
+		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
+		let [firstScore, ...otherScores] = bestScores;
+
+		firstBoundingBox ??= [0, 0, TARGETWIDTH, TARGETHEIGHT];
+		firstScore ??= 1;
+		/**
+		 * @param {[number, number, number, number]} param0
+		 */
+		const toCropBox = ([x, y, width, height]) => ({
+			x,
+			y,
+			width,
+			height
 		});
+
+		await storeMetadataValue({
+			subjectId: id,
+			metadataId: 'crop',
+			type: 'boundingbox',
+			value: toCropBox(firstBoundingBox),
+			confidence: firstScore
+		});
+
+		// Create one more image for each new boundingbox, with id "(original id)_(1 to boundingBoxes.length)"
+		for (const [i, box] of otherBoundingBoxes.entries()) {
+			await tables.Image.set({
+				id: imageId(parseInt(id), i + 1),
+				filename,
+				contentType,
+				addedAt: formatISO(new Date()),
+				bufferExists: true,
+				metadata: {
+					crop: {
+						value: JSON.stringify(toCropBox(box)),
+						confidence: otherScores[i],
+						alternatives: {}
+					}
+				}
+			});
+		}
 	}
 
 	$effect(() => {
 		if (!cropperModel) return;
 		for (const image of tables.Image.state) {
-			if (image.bufferExists && !image.metadata.bounding_boxes) {
+			if (imageBufferWasSaved(image) && !imageIsCropped(image)) {
 				void (async () => {
-					const file = await db.get('ImageFile', image.id.toString());
+					const file = await db.get('ImageFile', image.id);
 					if (!file) return;
-					await analyzeImage(file.bytes, image.id);
+					await analyzeImage(file.bytes, image.id, image);
 				})();
 			}
 		}
@@ -120,7 +192,7 @@
 		for (const image of tables.Image.state) {
 			if (previewURLs.has(image.id)) continue;
 			void (async () => {
-				const file = await db.get('ImageFile', image.id.toString());
+				const file = await db.get('ImageFile', image.id.replace(/(_\d+)+$/, ''));
 				if (!file) return;
 				previewURLs.set(image.id, arrayBufferToObjectURL(image.contentType, file.bytes));
 			})();
@@ -150,10 +222,9 @@
 			const currentLength = images.length;
 			await Promise.all(
 				files.map(async (file, index) => {
-					const id = currentLength + index;
-					console.log(`adding image ${id} (cur length ${currentLength})`);
+					const id = imageId(currentLength + index);
 					await tables.Image.set({
-						id: id.toString(),
+						id,
 						filename: file.name,
 						addedAt: formatISO(new Date()),
 						metadata: {},
@@ -166,7 +237,22 @@
 		}}
 	>
 		<section class="observations" class:empty={!images.length}>
-			<AreaObservations bind:selection={uiState.selection} {images} loadingText="Analyse…" />
+			<AreaObservations
+				bind:selection={uiState.selection}
+				{images}
+				loadingText="Analyse…"
+				binds={{
+					'$mod+u': {
+						help: 'Supprimer toutes les images et observations',
+						async do() {
+							toasts.warn('Suppression de toutes les images et observations…');
+							await tables.Image.clear();
+							await db.clear('ImageFile');
+							await tables.Observation.clear();
+						}
+					}
+				}}
+			/>
 			{#if !images.length}
 				<p>Cliquer ou déposer des images ici</p>
 			{/if}

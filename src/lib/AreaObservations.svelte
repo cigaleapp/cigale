@@ -23,6 +23,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @typedef Image
 	 * @property {string} image
 	 * @property {string} title
+	 * @property {string} id
 	 * @property {number} index
 	 * @property {number} stacksize
 	 * @property {number} [loading]
@@ -99,7 +100,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	{#each images as props (props.index)}
 		<CardObservation
 			data-selectable
-			data-title={props.index}
+			data-id={props.id}
 			data-loading={props.loading}
 			data-index={props.index}
 			{...props}

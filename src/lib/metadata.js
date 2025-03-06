@@ -2,16 +2,19 @@ import { tables, _tablesState } from './idb.svelte.js';
 
 /**
  *
+ * @template {import('./database').MetadataType} Type
  * @param {object} options
  * @param {string} options.subjectId id de l'image ou l'observation
  * @param {string} options.metadataId id de la métadonnée
- * @param {RuntimeValue<import('./database').MetadataType>} options.value la valeur de la métadonnée
+ * @param {Type} [options.type] le type de données pour la métadonnée, sert à éviter des problèmes de typages
+ * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
- * @param {Array<{ value: RuntimeValue<import('./database').MetadataType>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
+ * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  */
 export async function storeMetadataValue({
 	subjectId,
 	metadataId,
+	type,
 	value,
 	confidence,
 	alternatives
@@ -27,6 +30,11 @@ export async function storeMetadataValue({
 		)
 	};
 
+	const metadata = await tables.Metadata.get(metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (type && metadata.type !== type)
+		throw new Error(`Type de métadonnée incorrect: ${metadata.type} !== ${type}`);
+
 	const image = await tables.Image.raw.get(subjectId);
 	const observation = await tables.Observation.raw.get(subjectId);
 
@@ -41,7 +49,7 @@ export async function storeMetadataValue({
 		await tables.Observation.raw.set(observation);
 		_tablesState.Observation[
 			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
-		].metadata[metadataId] = newValue;
+		].metadataOverrides[metadataId] = newValue;
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
@@ -285,5 +293,5 @@ function toNumber(type, values) {
 
 /**
  * @template {import('./database').MetadataType} Type
- * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : string} RuntimeValue
+ * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, width: number, height: number } : string} RuntimeValue
  */
