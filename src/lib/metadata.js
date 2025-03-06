@@ -1,4 +1,4 @@
-import { tables } from './idb.svelte.js';
+import { tables, _tablesState } from './idb.svelte.js';
 
 /**
  *
@@ -33,9 +33,15 @@ export async function storeMetadataValue({
 	if (image) {
 		image.metadata[metadataId] = newValue;
 		await tables.Image.raw.set(image);
+		_tablesState.Image[
+			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
+		].metadata[metadataId] = newValue;
 	} else if (observation) {
 		observation.metadataOverrides[metadataId] = newValue;
 		await tables.Observation.raw.set(observation);
+		_tablesState.Observation[
+			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
+		].metadata[metadataId] = newValue;
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}

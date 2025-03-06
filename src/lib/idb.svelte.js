@@ -15,7 +15,7 @@ import { NO_REACTIVE_STATE_TABLES, Tables } from './database.js';
 const tableNames = Object.keys(Tables);
 
 /** @type {{[Table in ReactiveTableNames]: Array<typeof Tables[Table]['infer']>}} */
-const tableValues = $state({
+export const _tablesState = $state({
 	Image: [],
 	Metadata: [],
 	Observation: [],
@@ -42,7 +42,7 @@ export const tables = {
 		await Promise.allSettled(
 			tableNames.map(async (name) => {
 				// @ts-expect-error
-				tableValues[name] = await tables[name].list();
+				_tablesState[name] = await tables[name].list();
 			})
 		);
 	}
@@ -56,7 +56,7 @@ export const tables = {
 function wrangler(table) {
 	return {
 		get state() {
-			return tableValues[table];
+			return _tablesState[table];
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
@@ -64,12 +64,12 @@ function wrangler(table) {
 		async set(value) {
 			await set(table, value);
 			const output = Tables[table].assert(value);
-			const index = tableValues[table].findIndex((item) => item.id === value.id);
+			const index = _tablesState[table].findIndex((item) => item.id === value.id);
 			console.log(`indexof ${table} ${value.id} = ${index}`);
-			if (index !== -1) tableValues[table][index] = output;
+			if (index !== -1) _tablesState[table][index] = output;
 			else {
-				tableValues[table].push(output);
-				tableValues[table].sort(idComparator);
+				_tablesState[table].push(output);
+				_tablesState[table].sort(idComparator);
 			}
 		},
 		/**
@@ -99,13 +99,13 @@ function wrangler(table) {
 			await set(table, item);
 
 			// Update reactive state
-			const index = tableValues[table].findIndex((item) => item.id === key);
+			const index = _tablesState[table].findIndex((item) => item.id === key);
 			if (index === -1) {
 				console.log(`${logLabel}: item not found in reactive state, refetching entire list`);
-				tableValues[table] = await this.list();
+				_tablesState[table] = await this.list();
 			} else {
 				console.log(`${logLabel}: updating state @ ${table}[${index}]`);
-				tableValues[table][index] = Tables[table].assert(item);
+				_tablesState[table][index] = Tables[table].assert(item);
 			}
 
 			console.timeEnd(logLabel);
