@@ -403,7 +403,7 @@ export async function normalizeTensors(tensors, mean, std) {
  * @param {number} numImages
  * @param {number} minConfidence
  * @param {boolean} nms
- * @returns {[number[][][], number[]]}
+ * @returns {[number[][][], number[][]]}
  */
 export function output2BB(output, numImages, minConfidence, nms = false) {
 	/*reshape les bounding boxes obtenues par le modèle d'inférence
@@ -437,11 +437,13 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 		for (let k = 0; k < numImages; k++) {
 			bestPerImageBoxes = [];
 			bestScorePerImage = 0;
+			/** @type {number[]} */
+			let bbScores = [];
 			// @ts-ignore
 			suboutput = output.slice(k * numbb * 6, (k + 1) * numbb * 6);
 
 			for (let i = 0; i < suboutput.length; i += 6) {
-				let conf = suboutput[i + 4];
+				let score = suboutput[i + 4];
 				let x = suboutput[i];
 				let y = suboutput[i + 1];
 				let w = suboutput[i + 2];
@@ -453,16 +455,17 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 				if (x == 0 && y == 0 && w == 0 && h == 0) {
 					break;
 				}
-				if (conf > bestScorePerImage) {
-					bestScorePerImage = conf;
-				}
-				if (conf > minConfidence) {
+				// if (score > bestScorePerImage) {
+				// 	bestScorePerImage = score;
+				// }
+				if (score > minConfidence) {
 					bestPerImageBoxes.push([x, y, w, h]);
+					bbScores.push(score);
 				}
 			}
 
 			bestBoxes.push(bestPerImageBoxes);
-			bestScores.push(bestScorePerImage);
+			bestScores.push(bbScores);
 		}
 		return [bestBoxes, bestScores];
 	} else {
@@ -477,17 +480,18 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 
 		for (let k = 0; k < numImages; k++) {
 			bestPerImageBoxes = [];
-			bestScorePerImage = 0;
+			/** @type {number[]} */
+			let bbScores = [];
 			// @ts-ignore
 			suboutput = output.slice(k * numbb * 5, (k + 1) * numbb * 5);
 
 			for (let i = 0; i < suboutput.length / 5; i++) {
-				let conf = suboutput[i + 4 * numbb];
-				if (conf > bestScorePerImage) {
-					bestScorePerImage = conf;
+				let score = suboutput[i + 4 * numbb];
+				if (score > bestScorePerImage) {
+					bestScorePerImage = score;
 				}
 
-				if (conf > minConfidence) {
+				if (score > minConfidence) {
 					let x = suboutput[i];
 					let y = suboutput[i + numbb];
 					let w = suboutput[i + 2 * numbb];
@@ -497,10 +501,11 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 					y = y - h / 2;
 
 					bestPerImageBoxes.push([x, y, w, h]);
+					bbScores.push(score);
 				}
 			}
 			bestBoxes.push(bestPerImageBoxes);
-			bestScore.push(bestScorePerImage);
+			bestScore.push(bbScores);
 		}
 		return [bestBoxes, bestScore];
 	}
