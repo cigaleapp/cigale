@@ -1,19 +1,19 @@
 <script>
 	import { base } from '$app/paths';
+	import { page } from '$app/state';
+	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import Toast from '$lib/Toast.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
-	import { onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import Navigation from './Navigation.svelte';
 	import PreviewSidePannel from './PreviewSidePannel.svelte';
 	import { uiState } from './inference/state.svelte';
 
-	import { page } from '$app/state';
 	import './style.css';
-	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 
-	const { children, data } = $props();
+	const { children } = $props();
 
 	onMount(() => {
 		uiState.keybinds['$mod+m'] = {
@@ -45,8 +45,6 @@
 			.map((id) => tables.Image.state.find((i) => i.id === id))
 			.filter((img) => img !== undefined)
 	);
-
-	setContext('showSwitchHints', data.showInputHints);
 </script>
 
 <Navigation hasImages={true}></Navigation>
@@ -159,5 +157,9 @@
 
 	:global(*) {
 		font-family: 'Host Grotesk', sans-serif;
+	}
+
+	:global(code, pre) {
+		font-family: 'Fira Code', monospace;
 	}
 </style>

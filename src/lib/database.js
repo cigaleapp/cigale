@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { parseISOSafe } from './date.js';
 
 // TODO make table() take an object that can be passed to type() instead of a schema
 //  * @template { {[x: string]: import('arktype').Type | string} } Schema
@@ -16,10 +17,12 @@ const Probability = type('0 <= number <= 1');
 const URLString = type('/https?:\\/\\/.+/');
 
 const MetadataValue = type({
-	value: type('string.json.parse').pipe(
-		(primitive) =>
-			/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */ (primitive)
-	),
+	value: type('string.json').pipe((jsonstring) => {
+		/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */
+		let out = JSON.parse(jsonstring);
+		if (typeof out === 'string') out = parseISOSafe(out) ?? out;
+		return out;
+	}),
 	confidence: Probability.default(1),
 	alternatives: {
 		'[string.json]': Probability
@@ -162,7 +165,8 @@ const Settings = table(
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: 'number',
 		language: type.enumerated('fr'),
-		showInputHints: 'boolean'
+		showInputHints: 'boolean',
+		showTechnicalMetadata: 'boolean'
 	})
 );
 
