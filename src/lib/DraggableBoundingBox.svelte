@@ -33,34 +33,20 @@
 		console.log("chocolat !");
     }
 
-	function stoptl () {
-        movingtl = false;
-		console.log("chocono !");
-    }
-
 	function starttr () {
 		movingtr = true;
 	}
 
-	function stoptr () {
-		movingtr = false;
-	}
 
 	function startbl () {
 		movingbl = true;
 	}
 
-	function stopbl () {
-		movingbl = false;
-	}
 
 	function startbr () {
 		movingbr = true;
 	}
 
-	function stopbr () {
-		movingbr = false;
-	}
 
 	function stopall () {
 		movingtl = false;
@@ -74,31 +60,31 @@
 	 */
 	function movebb (event) {
 		console.log("size : ", sizew, sizeh);
-		let xm = event.movementX;
-		let ym = event.movementY;
+		let xm = (event.movementX/sizew) * 100;
+		let ym = (event.movementY/sizeh) * 100;
 		console.log("xywh : ", x, y, width, height);
 		if (movingtl) {
-			x += xm / sizew * 100;
-			y += ym / sizeh * 100;
-			width -= xm / sizeh * 100;
-			height -= ym / sizeh * 100;
+			x += xm ;
+			y += ym ;
+			width -= xm ;
+			height -= ym;
 		}
 
 		if (movingtr) {
-			y += ym / sizeh * 100;
-			width += xm / sizew * 100;
-			height -= ym / sizeh * 100;
+			y += ym ;
+			width += xm ;
+			height -= ym;
 		}
 
 		if (movingbl) {
-			x += xm / sizew * 100;
-			width -= xm / sizew * 100;
-			height += ym / sizeh * 100;
+			x += xm ;
+			width -= xm ;
+			height += ym ;
 		}
 
 		if (movingbr) {
-			width += xm / sizew * 100;
-			height += ym / sizeh * 100;
+			width += xm ;
+			height += ym ;
 		}
 
 		x = Math.max(0, Math.min(x, 100 - width));
@@ -122,30 +108,26 @@
 	<!-- Four dots at each corner of the bounding box -->
 	<div class="dot" 
 		onmousedown="{starttl}"
-		onmouseup="{stoptl}"
-		style="	x: {x}%;
-				y: {y}%">
+		style="	left: {x}%;
+				top: {y}%">
 	</div>          <!-- top-left -->
 	
 	<div class="dot" 
 		onmousedown="{starttr}"
-		onmouseup="{stoptr}"
-		style="	x: {x + width}%;
-				y: {y}%">
+		style="	left: {x + width}%;
+				top: {y}%">
 	</div>   <!-- top-right -->
 	
 	<div class="dot" 
 		onmousedown="{startbl}"
-		onmouseup="{stopbl}"
-		style="	x: {x}%; 
-				y: {y + height}%">
+		style=" left: {x}%; 
+				top: {y + height}%">
 	</div>  <!-- bottom-left -->
 
 	<div class="dot" 
 		onmousedown="{startbr}"
-		onmouseup="{stopbr}"
-		style="	x: {x + width}%; 
-				y: {y + height}%">
+		style="	left: {x + width}%; 
+				top: {y + height}%">
 	</div> <!-- bottom-right -->
 
 	
@@ -171,7 +153,7 @@
 		position: absolute;
 		width: 2rem;
 		height: 2rem;
-		background: white;
+		background: rgb(186, 186, 186);
 		border-radius: 50%;
 		transform: translate(-50%, -50%);
         user-select: none;

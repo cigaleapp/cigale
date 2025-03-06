@@ -52,13 +52,14 @@ show a pop up to crop an image
     confirm="Crop"
     cancel="Cancel">
 
-<div style="position:relative" >
-    <img src = {image} alt="chocolat" style="width: 100%; height: auto;position:absolute;" bind:this={container}>
+<div style="position:relative; display: inline-block;" >
+    
     {#if boundingBoxes}
         {#each boundingBoxes as bb, index}
             <DraggableBoundingBox bb={bb} bbout={BBout[index]} sizew={container.getBoundingClientRect().width} sizeh={container.getBoundingClientRect().height}></DraggableBoundingBox>
         {/each}
     {/if}
+    <img src = {image} alt="chocolat" style="width: 100%; height: auto;" bind:this={container}>
 
 </div>
 
