@@ -34,7 +34,12 @@ show a pop up to crop an image
 
     export function cropconfirm () {
         console.log('crop confirm');
-        boundingBoxesout = BBout.map(bb => ({ ...bb }));
+        for (let i=0; i<boundingBoxes.length; i++){
+            boundingBoxesout[i].x = BBout[i].x;
+            boundingBoxesout[i].y = BBout[i].y;
+            boundingBoxesout[i].width = BBout[i].width;
+            boundingBoxesout[i].height = BBout[i].height;
+        }
     }
 
     export function cropcancel () {
@@ -56,10 +61,10 @@ show a pop up to crop an image
     
     {#if boundingBoxes}
         {#each boundingBoxes as bb, index}
-            <DraggableBoundingBox bb={bb} bbout={BBout[index]} sizew={container.getBoundingClientRect().width} sizeh={container.getBoundingClientRect().height}></DraggableBoundingBox>
+            <DraggableBoundingBox bb={bb} bind:bbout={BBout[index]} sizew={container.getBoundingClientRect().width} sizeh={container.getBoundingClientRect().height}></DraggableBoundingBox>
         {/each}
     {/if}
-    <img src = {image} alt="chocolat" style="width: 100%; height: auto;" bind:this={container}>
+    <img src = {image} alt="chocolat" style="width: 100%; height: 100%;" bind:this={container}>
 
 </div>
 

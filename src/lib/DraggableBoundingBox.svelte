@@ -59,10 +59,8 @@
 	 * @param {MouseEvent} event
 	 */
 	function movebb (event) {
-		console.log("size : ", sizew, sizeh);
 		let xm = (event.movementX/sizew) * 100;
 		let ym = (event.movementY/sizeh) * 100;
-		console.log("xywh : ", x, y, width, height);
 		if (movingtl) {
 			x += xm ;
 			y += ym ;
@@ -105,6 +103,13 @@
 <svelte:window onmousemove="{movebb}" onmouseup="{stopall}"></svelte:window>
 
 <div class="bounding-box">
+	<!-- SVG lines joining each dot -->
+	<svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+		<line x1="{x}" y1="{y}" x2="{x + width}" y2="{y}" />
+		<line x1="{x + width}" y1="{y}" x2="{x + width}" y2="{y + height}" />
+		<line x1="{x + width}" y1="{y + height}" x2="{x}" y2="{y + height}" />
+		<line x1="{x}" y1="{y + height}" x2="{x}" y2="{y}" />
+	</svg>
 	<!-- Four dots at each corner of the bounding box -->
 	<div class="dot" 
 		onmousedown="{starttl}"
@@ -131,13 +136,7 @@
 	</div> <!-- bottom-right -->
 
 	
-	<!-- SVG lines joining each dot -->
-	<svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-		<line x1="{x}" y1="{y}" x2="{x + width}" y2="{y}" />
-		<line x1="{x + width}" y1="{y}" x2="{x + width}" y2="{y + height}" />
-		<line x1="{x + width}" y1="{y + height}" x2="{x}" y2="{y + height}" />
-		<line x1="{x}" y1="{y + height}" x2="{x}" y2="{y}" />
-	</svg>
+	
 
 	
 </div>
