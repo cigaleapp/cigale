@@ -1,38 +1,58 @@
 <script>
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import { tables } from '$lib/idb.svelte';
+	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
-	let {
-		images,
-		metaNom,
-		metaType,
-		metaValue = $bindable(),
-		metaOptions,
-		clickFusion,
-		clickAddMeta,
-		showFusion
-	} = $props();
+
+	/**
+	 * @typedef {object} Props
+	 * @property {string[]} images source **href**s of the images/observations we're modifying the metadata on
+	 * @property {() => void} onmerge callback to call when the user wants to merge images or observations into a single one
+	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
+	 * @property {boolean} [allowmerge=false] whether the user is allowed to merge images or observations
+	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
+	 */
+
+	/** @type {Props} */
+	let { images, onmerge, onaddmetadata, allowmerge, metadata } = $props();
+
+	// TODO maybe put as a prop? hmmmmm
+	const definitions = $derived(
+		Object.fromEntries(
+			Object.entries(metadata).map(([id]) => [id, tables.Metadata.state.find((m) => m.id === id)])
+		)
+	);
 </script>
 
 <div class="pannel">
 	<div class="images">
-		{#each images as image, i}
+		{#each images as image, i (i)}
 			<img src={image} alt={'image ' + i} />
 		{/each}
 	</div>
 	<h1>Métadonnées</h1>
 	<MetadataList>
-		{#each metaNom as nom, i}
-			<Metadata bind:value={metaValue[i]} type={metaType[i]} options={metaOptions[i]}>
-				{nom}
-			</Metadata>
+		{#each Object.entries(metadata) as [id, value] (id)}
+			{@const definition = definitions[id]}
+			{#if definition}
+				<!-- the value variable here contains value, confidence and alternatives -->
+				<Metadata {...definition} {...value ?? { value: undefined }}>
+					{definition.label}
+				</Metadata>
+			{:else}
+				<p class="error">
+					<Logo variant="error" />
+					Métadonnée inconnue
+				</p>
+			{/if}
 		{/each}
 	</MetadataList>
 	<div class="button">
-		{#if showFusion}
-			<ButtonPrimary onclick={clickFusion} --width="80%">Fusionner les observations</ButtonPrimary>
+		{#if allowmerge}
+			<ButtonPrimary onclick={onmerge} --width="80%">Fusionner les observations</ButtonPrimary>
 		{/if}
-		<ButtonPrimary onclick={clickAddMeta} --width="80%">
+		<ButtonPrimary onclick={onaddmetadata} --width="80%">
 			Ajouter une métadonner les métadonnées
 		</ButtonPrimary>
 	</div>
@@ -40,16 +60,15 @@
 
 <style>
 	.pannel {
-		position: fixed;
-		right: 0;
-		width: 30%;
-		height: 100%;
+		width: 40vw;
+		max-width: 700px;
 		background-color: var(--bg-neutral);
-		overflow: hidden;
-		padding-top: 10px;
-		padding-left: 5px;
-		display: flex;
-		flex-direction: column;
+		overflow-x: auto;
+		padding: 1em;
+		display: grid;
+		grid-template-rows: max-content max-content auto max-content;
+		height: 100%;
+		flex-shrink: 0;
 		gap: 30px;
 		border-style: solid;
 		border-color: var(--bg-primary);
@@ -67,7 +86,8 @@
 		display: flex;
 		flex-direction: row;
 		gap: 5px;
-		mask-image: linear-gradient(to left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+		mask-image: linear-gradient(to left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 30%);
+		overflow-x: hidden;
 	}
 
 	img {
@@ -75,13 +95,9 @@
 	}
 
 	.button {
-		position: fixed;
 		display: flex;
 		gap: 20px;
 		align-items: center;
 		flex-direction: column;
-		bottom: 5%;
-		height: fit-content;
-		width: 30%;
 	}
 </style>

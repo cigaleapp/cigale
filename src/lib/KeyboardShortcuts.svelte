@@ -1,18 +1,3 @@
-<script module>
-	/**
-	 * @typedef Keybind
-	 * @type {object}
-	 * @property {string} help
-	 * @property {(e: MouseEvent|KeyboardEvent) => void} do
-	 * @property {boolean} [hidden=false] hide the keybinding from help
-	 */
-
-	/**
-	 * @typedef Keymap
-	 * @type {Record<string, Keybind>}
-	 */
-</script>
-
 <script>
 	// @ts-ignore
 	import { tinykeys } from 'tinykeys';
@@ -21,7 +6,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Keymap} binds
+	 * @property {import('../routes/inference/state.svelte.js').Keymap} binds
 	 * @property {boolean} [preventDefault=false] call e.preventDefault() before calling the handlers
 	 */
 
@@ -135,10 +120,10 @@
 	<dl>
 		<!-- Object.entries({a: 1, b: 2}) gives [["a", 1], ["b", 2]] -->
 		<!-- Then we filter out keybindings that are marked as hidden -->
-		{#each Object.entries(binds).filter(([_, { hidden }]) => !hidden) as [pattern, { help }]}
+		{#each Object.entries(binds).filter(([_, { hidden }]) => !hidden) as [pattern, { help }] (pattern)}
 			<dt>
 				<!-- .entries() gives us [[0, a], [1, b], ...] for [a, b, ...] -->
-				{#each displayPattern(pattern).entries() as [i, part]}
+				{#each displayPattern(pattern).entries() as [i, part] (i)}
 					{#if i % 2 == 0}
 						<!-- Every even part represents a key -->
 						<kbd>{part}</kbd>

@@ -173,7 +173,7 @@ export const BUILTIN_METADATA = [
 	{
 		id: 'crop',
 		description: "Boîte de recadrage pour l'image",
-		label: '',
+		label: 'Recadrage',
 		type: 'boundingbox',
 		mergeMethod: 'none',
 		required: false
@@ -223,6 +223,7 @@ export const Schemas = {
 	ID,
 	Probability,
 	MetadataValues,
+	MetadataValue,
 	Image,
 	Observation,
 	MetadataType,
