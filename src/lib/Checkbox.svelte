@@ -2,7 +2,10 @@
 <script>
 	//export let value = false;
 	import Icon from '~icons/ph/check-light';
-	let { children, value = $bindable() } = $props();
+	let { children, value = $bindable(), onchange = () => {} } = $props();
+	$effect(() => {
+		onchange(value);
+	});
 </script>
 
 <label class:checked={value}>

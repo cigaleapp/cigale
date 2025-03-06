@@ -2,7 +2,7 @@
 	import { base } from '$app/paths';
 	import Toast from '$lib/Toast.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import { combineMetadataValues } from '$lib/metadata';
+	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount, setContext } from 'svelte';
 	import Navigation from './Navigation.svelte';
@@ -26,8 +26,8 @@
 
 	export const snapshot = {
 		capture() {
-			const captured = $state.snapshot(uiState);
-			return { selection: captured.selection };
+			const selection = $state.snapshot(uiState.selection);
+			return { selection };
 		},
 		restore({ selection }) {
 			uiState.selection = selection;
@@ -47,8 +47,6 @@
 	);
 
 	setContext('showSwitchHints', data.showInputHints);
-
-	$inspect(selectedHrefs);
 </script>
 
 <Navigation hasImages={true}></Navigation>
@@ -87,6 +85,18 @@
 			metadata={combineMetadataValues(selectedImages)}
 			onmerge={() => {}}
 			onaddmetadata={() => {}}
+			onmetadatachange={async (id, value) => {
+				await Promise.all(
+					selectedImages.map(async (image) => {
+						storeMetadataValue({
+							subjectId: image.id,
+							metadataId: id,
+							confidence: 1,
+							value
+						});
+					})
+				);
+			}}
 			allowmerge
 		/>
 	{/if}

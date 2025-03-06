@@ -7,6 +7,7 @@
 	 * @property {Record<string, string>} options possible options. {key: user-friendly label}
 	 * @property {string} searchQuery the string we're searching for
 	 * @property {string} selectedValue the option selected by the user
+	 * @property {(value: string) => void} [onblur] callback to call when the user quits the search bar
 	 */
 
 	/**
@@ -14,7 +15,7 @@
 	 */
 
 	/** @type {Props} */
-	let { options, searchQuery = $bindable(''), selectedValue = $bindable() } = $props();
+	let { options, onblur, searchQuery = $bindable(''), selectedValue = $bindable() } = $props();
 
 	const items = $derived(Object.entries(options).map(([value, label]) => ({ value, label })));
 
@@ -65,6 +66,9 @@
 		placeholder="Search..."
 		bind:value={searchQuery}
 		bind:this={InputRef}
+		onblur={() => {
+			onblur?.(selectedValue);
+		}}
 	/>
 
 	<ul class="container" bind:this={listRef}>

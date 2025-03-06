@@ -10,12 +10,13 @@
 	 * @property {string[]} images source **href**s of the images/observations we're modifying the metadata on
 	 * @property {() => void} onmerge callback to call when the user wants to merge images or observations into a single one
 	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
+	 * @property {(key: string, value: import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [allowmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
 	 */
 
 	/** @type {Props} */
-	let { images, onmerge, onaddmetadata, allowmerge, metadata } = $props();
+	let { images, onmerge, onaddmetadata, onmetadatachange, allowmerge, metadata } = $props();
 
 	// TODO maybe put as a prop? hmmmmm
 	const definitions = $derived(
@@ -37,7 +38,14 @@
 			{@const definition = definitions[id]}
 			{#if definition}
 				<!-- the value variable here contains value, confidence and alternatives -->
-				<Metadata {...definition} {...value ?? { value: undefined }}>
+				<Metadata
+					{...definition}
+					{...value ?? { value: undefined }}
+					onblur={async (v) => {
+						if (v === undefined) return;
+						onmetadatachange(id, v);
+					}}
+				>
 					{definition.label}
 				</Metadata>
 			{:else}
