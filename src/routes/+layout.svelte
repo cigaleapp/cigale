@@ -1,15 +1,28 @@
 <script>
 	import { base } from '$app/paths';
 	import Toast from '$lib/Toast.svelte';
+	import { tables } from '$lib/idb.svelte';
+	import { combineMetadataValues } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import Navigation from './Navigation.svelte';
 	import PreviewSidePannel from './PreviewSidePannel.svelte';
 	import { uiState } from './inference/state.svelte';
 
+	import { page } from '$app/state';
 	import './style.css';
+	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 
 	const { children, data } = $props();
+
+	onMount(() => {
+		uiState.keybinds['$mod+m'] = {
+			help: 'Fusionner les observations sélectionnées',
+			do() {
+				alert('todo!');
+			}
+		};
+	});
 
 	export const snapshot = {
 		capture() {
@@ -21,7 +34,21 @@
 		}
 	};
 
+	const showSidePanel = $derived(!['/about', '/settings'].includes(page.route.id));
+
+	const selectedHrefs = $derived(
+		uiState.selection.map((id) => uiState.previewURLs.get(id)).filter((href) => href !== undefined)
+	);
+
+	const selectedImages = $derived(
+		uiState.selection
+			.map((id) => tables.Image.state.find((i) => i.id === id))
+			.filter((img) => img !== undefined)
+	);
+
 	setContext('showSwitchHints', data.showInputHints);
+
+	$inspect(selectedHrefs);
 </script>
 
 <Navigation hasImages={true}></Navigation>
@@ -33,6 +60,8 @@
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
 </svelte:head>
+
+<KeyboardShortcuts preventDefault binds={uiState.keybinds} />
 
 <section class="toasts">
 	{#each toasts.items as toast (toast.id)}
@@ -49,18 +78,19 @@
 		/>
 	{/each}
 </section>
-<PreviewSidePannel
-	images={[img, img, img, img, img, img, img, img, img, img, img]}
-	metaNom={['sexe', 'date']}
-	metaType={['enumeration', 'date']}
-	bind:metaValue
-	metaOptions={[['male', 'femelle'], []]}
-	clickFusion={() => {}}
-	clickAddMeta={() => {}}
-	showFusion="true"
-/>
 
-<main>{@render children?.()}</main>
+<div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
+	<main>{@render children?.()}</main>
+	{#if showSidePanel}
+		<PreviewSidePannel
+			images={selectedHrefs}
+			metadata={combineMetadataValues(selectedImages)}
+			onmerge={() => {}}
+			onaddmetadata={() => {}}
+			allowmerge
+		/>
+	{/if}
+</div>
 
 <style>
 	.toasts {
@@ -75,11 +105,22 @@
 		z-index: 1000;
 	}
 
+	.main-and-sidepanel {
+		height: 100%;
+		display: flex;
+		overflow: hidden;
+	}
+
+	.main-and-sidepanel:not(.has-sidepanel) main {
+		width: 100%;
+	}
+
 	main {
 		display: flex;
 		flex-direction: column;
 		gap: 1em;
 		height: 100%;
+		flex-grow: 1;
 		overflow-y: scroll;
 		padding: 1.2em;
 	}

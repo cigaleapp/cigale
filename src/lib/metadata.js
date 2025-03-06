@@ -1,3 +1,4 @@
+import { Schemas } from './database';
 import { tables, _tablesState } from './idb.svelte.js';
 
 /**
@@ -43,7 +44,7 @@ export async function storeMetadataValue({
 		await tables.Image.raw.set(image);
 		_tablesState.Image[
 			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
-		].metadata[metadataId] = newValue;
+		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else if (observation) {
 		observation.metadataOverrides[metadataId] = newValue;
 		await tables.Observation.raw.set(observation);
@@ -106,6 +107,49 @@ export async function mergeMetadataValues(images) {
 					.map(([, v]) => v)
 			)
 		);
+	}
+
+	return output;
+}
+
+/**
+ * Combine metadata values. Unlike `mergeMetadataValues`, this one does not attempt to merge different values for the same metadata definition, and puts `undefined` instead of a MetadataValue object when values differ.
+ * @param {import('./database').Image[]} images
+ * @returns {Record<string, import('./database').MetadataValue | undefined>}
+ */
+export function combineMetadataValues(images) {
+	/** @type {Record<string, import('./database').MetadataValue | undefined>} */
+	const output = {};
+
+	// TODO handle observations
+
+	const keys = new Set(...images.map((image) => Object.keys(image.metadata)));
+
+	for (const key of keys) {
+		const values = images.flatMap((img) =>
+			Object.entries(img.metadata)
+				.filter(([k]) => k === key)
+				.map(([, v]) => v)
+		);
+
+		const stringedValues = new Set(values.map((v) => JSON.stringify(v)));
+		if (stringedValues.size > 1) {
+			output[key] = undefined;
+			continue;
+		}
+
+		const alternativeKeys = [...new Set(...values.flatMap((v) => Object.keys(v.alternatives)))];
+
+		output[key] = {
+			value: values[0].value,
+			confidence: avg(values.map((v) => v.confidence)),
+			alternatives: Object.fromEntries(
+				alternativeKeys.map((key) => [
+					key,
+					avg(values.map((v) => v.alternatives[key] ?? null).filter((p) => p !== null))
+				])
+			)
+		};
 	}
 
 	return output;
