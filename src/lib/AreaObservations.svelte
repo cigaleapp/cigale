@@ -33,13 +33,22 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @typedef Props
 	 * @type {object}
 	 * @property {Image[]} images
+	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
+	 * @property {(id: string) => void} [ondelete] callback when an image is deleted, with the image/observation id as argument
 	 * @property {import('./KeyboardShortcuts.svelte').Keymap} [binds] keybinds to define alongside the ones this component defines
 	 */
 
 	/** @type {Props } */
-	let { images = $bindable(), loadingText, binds, selection = $bindable([]) } = $props();
+	let {
+		images = $bindable(),
+		ondelete,
+		errors,
+		loadingText,
+		binds,
+		selection = $bindable([])
+	} = $props();
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -104,7 +113,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			data-loading={props.loading}
 			data-index={props.index}
 			{...props}
-			{loadingText}
+			ondelete={ondelete ? () => ondelete(props.id) : undefined}
+			errored={errors?.has(props.id)}
+			statusText={errors?.get(props.id) ?? loadingText}
 			selected={selection.includes(props.index.toString())}
 		/>
 	{/each}

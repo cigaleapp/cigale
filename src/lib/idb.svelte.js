@@ -124,6 +124,14 @@ function wrangler(table) {
 			await clear(table);
 			_tablesState[table] = [];
 		},
+		/**
+		 * @param {string} id key of the object to remove
+		 */
+		async remove(id) {
+			await drop(table, id);
+			const index = _tablesState[table].findIndex((item) => item.id === id);
+			if (index !== -1) delete _tablesState[table][index];
+		},
 		list: async () => list(table),
 		all: () => iterator(table),
 		/** @param {string} index  */
@@ -224,6 +232,21 @@ export const idComparator = (a, b) => {
 	if (/^\d+$/.test(a.id) && /^\d+$/.test(b.id)) return Number(a.id) - Number(b.id);
 	return a.id.localeCompare(b.id);
 };
+
+/**
+ * Delete an entry from a table by key
+ * @param {TableName} table
+ * @param {string} id
+ * @returns {Promise<void>}
+ * @template {keyof typeof Tables} TableName
+ */
+export async function drop(table, id) {
+	console.time(`delete ${table} ${id}`);
+	const db = await openDatabase();
+	return await db.delete(table, id).then(() => {
+		console.timeEnd(`delete ${table} ${id}`);
+	});
+}
 
 /**
  *
