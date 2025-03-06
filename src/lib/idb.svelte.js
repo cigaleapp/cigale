@@ -35,7 +35,9 @@ export const _tablesState = $state({
 export const tables = {
 	...Object.fromEntries(
 		tableNames
+			// @ts-ignore
 			.filter((name) => !NO_REACTIVE_STATE_TABLES.includes(name))
+			// @ts-ignore
 			.map((name) => [name, wrangler(name)])
 	),
 	async initialize() {
@@ -118,6 +120,18 @@ function wrangler(table) {
 				{ ...value, id: `${table}_${nanoid()}` }
 			);
 		},
+		async clear() {
+			await clear(table);
+			_tablesState[table] = [];
+		},
+		/**
+		 * @param {string} id key of the object to remove
+		 */
+		async remove(id) {
+			await drop(table, id);
+			const index = _tablesState[table].findIndex((item) => item.id === id);
+			if (index !== -1) delete _tablesState[table][index];
+		},
 		list: async () => list(table),
 		all: () => iterator(table),
 		/** @param {string} index  */
@@ -154,6 +168,19 @@ export async function set(tableName, value) {
 	validator.assert(value);
 	return await db.put(tableName, value).then((result) => {
 		console.timeEnd(`set ${tableName} ${value.id}`);
+		return result;
+	});
+}
+
+/**
+ * @param {TableName} table
+ * @template {keyof typeof Tables} TableName
+ */
+export async function clear(table) {
+	console.time(`clr ${table}`);
+	const db = await openDatabase();
+	await db.clear(table).then((result) => {
+		console.timeEnd(`clr ${table}`);
 		return result;
 	});
 }
@@ -196,7 +223,7 @@ export async function list(tableName) {
  * If both IDs are numeric, they are compared numerically even if they are strings
  * @type {(a: {id: string|number}, b: {id: string|number}) => number}
  */
-const idComparator = (a, b) => {
+export const idComparator = (a, b) => {
 	if (typeof a.id === 'number' && typeof b.id === 'number') return a.id - b.id;
 
 	if (typeof a.id === 'number') return -1;
@@ -205,6 +232,21 @@ const idComparator = (a, b) => {
 	if (/^\d+$/.test(a.id) && /^\d+$/.test(b.id)) return Number(a.id) - Number(b.id);
 	return a.id.localeCompare(b.id);
 };
+
+/**
+ * Delete an entry from a table by key
+ * @param {TableName} table
+ * @param {string} id
+ * @returns {Promise<void>}
+ * @template {keyof typeof Tables} TableName
+ */
+export async function drop(table, id) {
+	console.time(`delete ${table} ${id}`);
+	const db = await openDatabase();
+	return await db.delete(table, id).then(() => {
+		console.timeEnd(`delete ${table} ${id}`);
+	});
+}
 
 /**
  *
