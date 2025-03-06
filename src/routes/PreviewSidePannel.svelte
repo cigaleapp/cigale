@@ -4,6 +4,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
+	import { getSettings } from '$lib/settings.svelte';
 
 	/**
 	 * @typedef {object} Props
@@ -24,19 +25,24 @@
 			Object.entries(metadata).map(([id]) => [id, tables.Metadata.state.find((m) => m.id === id)])
 		)
 	);
+
+	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
 </script>
 
 <div class="pannel">
 	<div class="images">
 		{#each images as image, i (i)}
 			<img src={image} alt={'image ' + i} />
+		{:else}
+			<!-- svelte-ignore a11y_missing_attribute -->
+			<img />
 		{/each}
 	</div>
 	<h1>Métadonnées</h1>
 	<MetadataList>
-		{#each Object.entries(metadata) as [id, value] (id)}
+		{#each Object.entries(metadata).sort(([a], [b]) => a.localeCompare(b)) as [id, value] (id)}
 			{@const definition = definitions[id]}
-			{#if definition}
+			{#if definition && (definition.label || showTechnicalMetadata)}
 				<!-- the value variable here contains value, confidence and alternatives -->
 				<Metadata
 					{...definition}
@@ -46,9 +52,13 @@
 						onmetadatachange(id, v);
 					}}
 				>
-					{definition.label}
+					{#if definition.label}
+						{definition.label}
+					{:else}
+						<code>{definition.id}</code>
+					{/if}
 				</Metadata>
-			{:else}
+			{:else if !definition}
 				<p class="error">
 					<Logo variant="error" />
 					Métadonnée inconnue

@@ -5,6 +5,8 @@
 	import IconMaps from '~icons/ph/map-trifold';
 	import SelectWithSearch from './SelectWithSearch.svelte';
 	import { tooltip } from './tooltips';
+	import { getSettings } from './settings.svelte';
+	import { format } from 'date-fns';
 
 	/**
 	 * @typedef {object} Props
@@ -33,10 +35,26 @@
 	/** @type {number|undefined} */
 	let longitude = $state(undefined);
 
+	/** @type {string|undefined} */
+	let datePart = $state(undefined);
+	/** @type {string|undefined} */
+	let timePart = $state(undefined);
+
 	$effect(() => {
 		if (type === 'location' && value !== undefined) {
+			// @ts-ignore
 			latitude = value.latitude;
+			// @ts-ignore
 			longitude = value.longitude;
+		}
+	});
+
+	$effect(() => {
+		if (type === 'date' && value !== undefined) {
+			// @ts-ignore
+			datePart = format(value, 'yyyy-MM-dd');
+			// @ts-ignore
+			timePart = format(value, 'HH:mm:ss');
 		}
 	});
 
@@ -65,13 +83,25 @@
 	</label>
 
 	{#if type === 'date'}
-		<input
-			class="date"
-			type="date"
-			bind:value
-			onblur={() => onblur(value)}
-			placeholder={value ? '' : 'Plusieurs valeurs'}
-		/>
+		<div class="date-and-time">
+			{#if !value}
+				<p>Plusieurs valeurs</p>
+			{/if}
+			<input
+				type="date"
+				bind:value={datePart}
+				onblur={() => {
+					if (datePart && timePart) onblur(new Date(`${datePart}T${timePart}`));
+				}}
+			/>
+			<input
+				type="time"
+				bind:value={timePart}
+				onblur={() => {
+					if (datePart && timePart) onblur(new Date(`${datePart}T${timePart}`));
+				}}
+			/>
+		</div>
 	{:else if type === 'float' || type === 'integer'}
 		<input
 			type="text"
@@ -152,17 +182,10 @@
 				/>
 			{/if}
 		</div>
-	{:else}
-		<code
-			class="unrepresentable-datatype"
-			use:tooltip={value ? JSON.stringify(value, null, 2) : undefined}
-		>
-			{#if value}
-				{JSON.stringify(value)}
-			{:else}
-				Plusieurs valeurs
-			{/if}
-		</code>
+	{:else if getSettings().showTechnicalMetadata}
+		<pre class="unrepresentable-datatype">{value
+				? JSON.stringify(value, null, 2)
+				: 'Plusieurs valeurs'}</pre>
 	{/if}
 </div>
 
@@ -203,7 +226,7 @@
 	}
 
 	.meta:hover .ligne {
-		background-color: var(--fg-neutral);
+		background-color: var(--bg-neutral);
 	}
 
 	.meta:focus-within .ligne {

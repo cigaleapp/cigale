@@ -24,5 +24,8 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		line-height: 1;
+		/* Center text vertically lol */
+		padding-top: 2px;
 	}
 </style>
