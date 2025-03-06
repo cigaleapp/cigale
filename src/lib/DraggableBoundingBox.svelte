@@ -5,14 +5,13 @@
      * @type {object}
      * @property {typeof bbs.BoundingBoxes} bb
 	 * @property {typeof bbs.BoundingBoxes} bbout
+	 * @property {number} sizew
+	 * @property {number} sizeh
     */
 
     /**  @type {Props} */
     // Remove fallback: require bbout is supplied via binding
-    let { bb, bbout=$bindable({x:bb.x, y:bb.y,width:bb.width,height:bb.height}) } = $props();
-
-	/** @type {HTMLDivElement} */
-	let container;
+    let { bb, bbout=$bindable({x:bb.x, y:bb.y,width:bb.width,height:bb.height}), sizew,sizeh} = $props();
 
 	let x = $state();
 	let y = $state();
@@ -74,37 +73,39 @@
 	 * @param {MouseEvent} event
 	 */
 	function movebb (event) {
-		const rect = container.getBoundingClientRect();
+		console.log("size : ", sizew, sizeh);
 		let xm = event.movementX;
 		let ym = event.movementY;
+		console.log("xywh : ", x, y, width, height);
 		if (movingtl) {
-			x += xm / rect.width * 100;
-			y += ym / rect.height * 100;
-			width -= xm / rect.width * 100;
-			height -= ym / rect.height * 100;
+			x += xm / sizew * 100;
+			y += ym / sizeh * 100;
+			width -= xm / sizeh * 100;
+			height -= ym / sizeh * 100;
 		}
 
 		if (movingtr) {
-			y += ym / rect.height * 100;
-			width += xm / rect.width * 100;
-			height -= ym / rect.height * 100;
+			y += ym / sizeh * 100;
+			width += xm / sizew * 100;
+			height -= ym / sizeh * 100;
 		}
 
 		if (movingbl) {
-			x += xm / rect.width * 100;
-			width -= xm / rect.width * 100;
-			height += ym / rect.height * 100;
+			x += xm / sizew * 100;
+			width -= xm / sizew * 100;
+			height += ym / sizeh * 100;
 		}
 
 		if (movingbr) {
-			width += xm / rect.width * 100;
-			height += ym / rect.height * 100;
+			width += xm / sizew * 100;
+			height += ym / sizeh * 100;
 		}
 
 		x = Math.max(0, Math.min(x, 100 - width));
 		y = Math.max(0, Math.min(y, 100 - height));
 		width = Math.max(0, Math.min(width, 100 - x));
 		height = Math.max(0, Math.min(height, 100 - y));
+		
 
 		bbout.x = x / 100;
 		bbout.y = y / 100;
@@ -117,34 +118,34 @@
 </script>
 <svelte:window onmousemove="{movebb}" onmouseup="{stopall}"></svelte:window>
 
-<div class="bounding-box" bind:this="{container}">
+<div class="bounding-box">
 	<!-- Four dots at each corner of the bounding box -->
 	<div class="dot" 
 		onmousedown="{starttl}"
 		onmouseup="{stoptl}"
-		style="	left: {x}%;
-				top: {y}%">
+		style="	x: {x}%;
+				y: {y}%">
 	</div>          <!-- top-left -->
 	
 	<div class="dot" 
 		onmousedown="{starttr}"
 		onmouseup="{stoptr}"
-		style="	left: {x + width}%;
-				top: {y}%">
+		style="	x: {x + width}%;
+				y: {y}%">
 	</div>   <!-- top-right -->
 	
 	<div class="dot" 
 		onmousedown="{startbl}"
 		onmouseup="{stopbl}"
-		style="	left: {x}%; 
-				top: {y + height}%">
+		style="	x: {x}%; 
+				y: {y + height}%">
 	</div>  <!-- bottom-left -->
 
 	<div class="dot" 
 		onmousedown="{startbr}"
 		onmouseup="{stopbr}"
-		style="	left: {x + width}%; 
-				top: {y + height}%">
+		style="	x: {x + width}%; 
+				y: {y + height}%">
 	</div> <!-- bottom-right -->
 
 	

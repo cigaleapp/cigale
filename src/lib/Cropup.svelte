@@ -27,6 +27,7 @@ show a pop up to crop an image
         boundingBoxes = []
     } = $props();
     
+    let container = $state();
 
     /** @type {typeof bbs.BoundingBoxes[]} */
     let BBout = boundingBoxes.map(bb => ({ x: bb.x, y: bb.y, width: bb.width, height: bb.height }));
@@ -42,7 +43,6 @@ show a pop up to crop an image
     }
 
 </script>
-
 <ModalConfirm
     key={StateKey}
     title="Crop"
@@ -52,13 +52,15 @@ show a pop up to crop an image
     confirm="Crop"
     cancel="Cancel">
 
+<div style="position:relative" >
+    <img src = {image} alt="chocolat" style="width: 100%; height: auto;position:absolute;" bind:this={container}>
+    {#if boundingBoxes}
+        {#each boundingBoxes as bb, index}
+            <DraggableBoundingBox bb={bb} bbout={BBout[index]} sizew={container.getBoundingClientRect().width} sizeh={container.getBoundingClientRect().height}></DraggableBoundingBox>
+        {/each}
+    {/if}
 
-<img src = {image} alt="chocolat" style="width: 100%; height: auto;position:absolute;">
-{#if boundingBoxes}
-    {#each boundingBoxes as bb, index}
-        <DraggableBoundingBox bb={bb} bbout={BBout[index]}></DraggableBoundingBox>
-    {/each}
-{/if}
+</div>
 
 
 </ModalConfirm>
