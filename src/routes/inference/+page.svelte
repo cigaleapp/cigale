@@ -1,7 +1,7 @@
 <script>
 	import { loadModel, inferSequentialy, classify, torawpath } from './inference.js';
 	import { labelize, applyBBsOnTensors, loadClassMapping } from './inference_utils.js';
-	import { img_proceed } from './state.svelte.js';
+	import { uiState as img_proceed } from './state.svelte.js';
 
 	//ort.env.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@dev/dist/';
 
@@ -35,9 +35,10 @@
 
 	async function processImage() {
 		let classmap = [];
-		img_proceed.nb = 0;
-		img_proceed.time = 0;
-		img_proceed.state = 'loading';
+		img_proceed.processing.done = 0;
+		img_proceed.processing.total = 0;
+		img_proceed.processing.time = 0;
+		img_proceed.processing.state = 'loading';
 
 		// ça charge le fichier de mapping de classes et en créé un tableau
 		classmap = await loadClassMapping(classmapping);
@@ -67,7 +68,7 @@
 
 			// Extract pixel data from the canvas.
 			const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
-			img_proceed.state = 'inference';
+			img_proceed.processing.state = 'inference';
 			ctx.putImageData(imageData, 0, 0);
 
 			//var BsandBs = await infer(image_file,model, img_proceed);
@@ -77,7 +78,8 @@
 			// bestScores sous la forme [each image [each score]]
 			// start : le temps de départ (pour le calcul du temps total)
 			// inputTensors : les tensors d'entrée, ils servent à ne pas être recalculé à chaque fois
-			var BsandBs = await inferSequentialy(image_file, model, img_proceed);
+			const buffers = await Promise.all([...image_file].map((file) => file.arrayBuffer()));
+			var BsandBs = await inferSequentialy(buffers, model, img_proceed);
 
 			let boundingboxes = BsandBs[0];
 			// @ts-ignore
@@ -85,8 +87,8 @@
 			let inputTensors = BsandBs[3];
 
 			// bon là juste on trace les bb comme ça
-			img_proceed.nb = 0;
-			img_proceed.state = 'post processing';
+			img_proceed.processing.done = 0;
+			img_proceed.processing.state = 'postprocessing';
 			// @ts-ignore
 			img_proceed.time = (Date.now() - start) / 1000;
 			//for (let i = 0; i < best_boxes.length; i++) {
@@ -95,7 +97,7 @@
 			//	ctx.strokeRect(best_boxes[i][0], best_boxes[i][1], best_boxes[i][2], best_boxes[i][3]);
 			//}
 
-			img_proceed.state = 'finished';
+			img_proceed.processing.state = 'finished';
 			// crop chaque tenseurs d'entrée (i.e les images) avec les bounding boxes
 			// @ts-ignore
 			let ctensors = await applyBBsOnTensors(boundingboxes, inputTensors);
@@ -113,12 +115,11 @@
 				labels.push(l);
 				conf.push(c);
 			}
-			// @ts-ignore
-			img_proceed.time = (Date.now() - start) / 1000;
+			img_proceed.processing.time = (Date.now() - start) / 1000;
 
 			// on affiche les images crops obtenues avec le applyBBsOnTensors
-			img_proceed.state = 'affichage';
-			img_proceed.nb = 0;
+			img_proceed.processing.state = 'visualizing';
+			img_proceed.processing.done = 0;
 			let croppedImagesURL_buffer = [];
 			for (let i = 0; i < ctensors.length; i++) {
 				let croppedImagesURL_inter = [];
@@ -128,9 +129,8 @@
 					// @ts-ignore
 					let img = c[j].toDataURL();
 					croppedImagesURL_inter.push(img);
-					img_proceed.nb += 1;
-					// @ts-ignore
-					img_proceed.time = (Date.now() - start) / 1000;
+					img_proceed.processing.done += 1;
+					img_proceed.processing.time = (Date.now() - start) / 1000;
 				}
 				croppedImagesURL_buffer.push(croppedImagesURL_inter);
 			}
@@ -177,8 +177,8 @@
 <!-- Step 5: Display the cropped insect image -->
 <h2>Cropped Insect</h2>
 
-<h3>{img_proceed.state}</h3>
-<p>image proceed : {img_proceed.nb} ; time taken (s): {img_proceed.time}</p>
+<h3>{img_proceed.processing.state}</h3>
+<p>image proceed : {img_proceed.processing.done} ; time taken (s): {img_proceed.processing.time}</p>
 
 <div class="grid-container">
 	{#each croppedImagesURL as row, i (i)}
