@@ -43,7 +43,7 @@ const ImageFile = table(
 const Image = table(
 	['id', 'addedAt'],
 	type({
-		id: 'string.integer.parse',
+		id: /\d+(_\d+)*/,
 		filename: 'string',
 		addedAt: 'string.date.iso.parse',
 		metadata: MetadataValues,
@@ -70,7 +70,8 @@ const MetadataType = type.enumerated(
 	'float',
 	'enum',
 	'date',
-	'location'
+	'location',
+	'boundingbox'
 );
 
 /**
@@ -83,7 +84,8 @@ export const METADATA_TYPES = {
 	float: 'nombre',
 	enum: 'énumération',
 	date: 'date',
-	location: 'localisation'
+	location: 'localisation',
+	boundingbox: 'boîte de recadrage'
 };
 
 const MetadataMergeMethod = type.enumerated('min', 'max', 'average', 'median', 'none');
@@ -169,10 +171,10 @@ const Settings = table(
  */
 export const BUILTIN_METADATA = [
 	{
-		id: 'bounding_boxes',
-		description: "Boîtes de recadrage pour l'image",
+		id: 'crop',
+		description: "Boîte de recadrage pour l'image",
 		label: '',
-		type: 'string',
+		type: 'boundingbox',
 		mergeMethod: 'none',
 		required: false
 	},
