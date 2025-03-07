@@ -1,3 +1,18 @@
+import { SvelteMap } from 'svelte/reactivity';
+
+/**
+ * @typedef Keybind
+ * @type {object}
+ * @property {string} help
+ * @property {(e: MouseEvent|KeyboardEvent) => void} do
+ * @property {boolean} [hidden=false] hide the keybinding from help
+ */
+
+/**
+ * @typedef Keymap
+ * @type {Record<string, Keybind>}
+ */
+
 /**
  * @typedef {object} UIState
  * @property {object} processing état actuel du processus de traitement
@@ -7,6 +22,9 @@
  * @property {number} processing.progress pourcentage entre 0 et 1 de l'avancement du processus
  * @property {'inference'|'preprocessing'|'classification'|'loading'|'postprocessing'|'finished'|'visualizing'|''} processing.state état actuel du processus
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées
+ * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
+ * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
+ * @property {Keymap} keybinds liste des raccourcis clavier
  */
 
 /**
@@ -22,5 +40,8 @@ export const uiState = $state({
 			return this.total ? this.done / this.total : 0;
 		}
 	},
-	selection: []
+	selection: [],
+	previewURLs: new SvelteMap(),
+	erroredImages: new SvelteMap(),
+	keybinds: {}
 });

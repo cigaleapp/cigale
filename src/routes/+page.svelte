@@ -3,28 +3,35 @@
 	import Dropzone from '$lib/Dropzone.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { imageBufferWasSaved, imageId, imageIdToFileId, imageIsCropped } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue } from '$lib/metadata';
+	import { storeMetadataValue, extractFromExif } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
-	import { SvelteMap } from 'svelte/reactivity';
+	import { onMount } from 'svelte';
 	import {
 		inferSequentialy,
 		loadModel,
 		MODELDETECTPATH,
-		TARGETWIDTH,
-		TARGETHEIGHT
+		TARGETHEIGHT,
+		TARGETWIDTH
 	} from './inference/inference';
 	import { uiState } from './inference/state.svelte';
 
-	/** @type {Map<string, string>} */
-	const previewURLs = new SvelteMap();
+	onMount(() => {
+		uiState.keybinds['$mod+u'] = {
+			help: 'Supprimer toutes les images et observations',
+			async do() {
+				toasts.warn('Suppression de toutes les images et observations…');
+				await tables.Image.clear();
+				await db.clear('ImageFile');
+				await tables.Observation.clear();
+			}
+		};
+	});
 
-	/**
-	 * Maps image ID to error message
-	 * @type {Map<string, string>}
-	 */
-	const erroredImages = new SvelteMap();
+	const previewURLs = $derived(uiState.previewURLs);
+	const erroredImages = $derived(uiState.erroredImages);
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
@@ -38,37 +45,6 @@
 				image.bufferExists && image.metadata.crop && previewURLs.has(image.id) ? undefined : -1
 		}))
 	);
-
-	/**
-	 * Retourne un id d'image sous la forme 000001_000001
-	 * @param {number|string} index
-	 * @param {number} subindex
-	 */
-	function imageId(index, subindex = 0) {
-		return `${Number.parseInt(index.toString(), 0).toString().padStart(6, '0')}_${subindex.toString().padStart(6, '0')}`;
-	}
-
-	/**
-	 * Retourne l'id d'un objet ImageFile associé à l'objet Image
-	 * @param {string} id
-	 */
-	function imageIdToFileId(id) {
-		return id.replace(/(_\d+)+$/, '');
-	}
-
-	/**
-	 * @param {import('$lib/database.js').Image} image
-	 */
-	function imageIsCropped(image) {
-		return image.metadata.crop || erroredImages.has(image.id);
-	}
-
-	/**
-	 * @param {import('$lib/database.js').Image} image
-	 */
-	function imageBufferWasSaved(image) {
-		return image.bufferExists || erroredImages.has(image.id);
-	}
 
 	let loadingLogoDrawPercent = $state(0);
 	let loadingLogoDrawingForwards = $state(true);
@@ -107,6 +83,24 @@
 		const image = await tables.Image.raw.get(id);
 		if (!image) throw 'Image introuvable';
 		const bytes = await file.arrayBuffer();
+		const metadataFromExif = await extractFromExif(bytes).catch((e) => {
+			console.warn(e);
+			if (file.type === 'image/jpeg') {
+				toasts.warn(
+					`Impossible d'extraire les métadonnées EXIF de ${file.name}: ${e?.toString() ?? 'Erreur inattendue'}`
+				);
+			}
+			return {};
+		});
+		console.log(metadataFromExif);
+		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+			await storeMetadataValue({
+				subjectId: id,
+				metadataId: key,
+				value,
+				confidence
+			});
+		}
 		await db.set('ImageFile', { id: imageIdToFileId(id), bytes });
 		previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
 		await tables.Image.update(id, 'bufferExists', true);
@@ -262,17 +256,6 @@
 					await tables.Image.remove(id);
 					await tables.Observation.remove(id);
 					await db.drop('ImageFile', imageIdToFileId(id));
-				}}
-				binds={{
-					'$mod+u': {
-						help: 'Supprimer toutes les images et observations',
-						async do() {
-							toasts.warn('Suppression de toutes les images et observations…');
-							await tables.Image.clear();
-							await db.clear('ImageFile');
-							await tables.Observation.clear();
-						}
-					}
 				}}
 			/>
 			{#if !images.length}
