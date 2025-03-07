@@ -27,6 +27,11 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {number} index
 	 * @property {number} stacksize
 	 * @property {number} [loading]
+	 * @property {object[]} [boundingBoxes] - array of bounding boxes
+	 * @property {number} boundingBoxes.x
+	 * @property {number} boundingBoxes.y
+	 * @property {number} boundingBoxes.width
+	 * @property {number} boundingBoxes.height
 	 */
 
 	/**
@@ -105,6 +110,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			errored={errors?.has(props.id)}
 			statusText={errors?.get(props.id) ?? loadingText}
 			selected={selection.includes(props.id.toString())}
+			boundingBoxes={props.boundingBoxes}
 			{loadingText}
 		/>
 	{/each}
