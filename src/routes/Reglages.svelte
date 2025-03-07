@@ -41,8 +41,9 @@
 
 <dialog class="container" open={open ? true : undefined} bind:this={dialogElement}>
 	<div class="listParam">
-		<div class="Language">
+		<div class="Language" role="button" aria-disabled="true">
 			Langue :
+			<span class="tooltiptext">Sélectionnez une langue (En cours de développement)</span>
 			<ButtonPrimary
 				onclick={() => {
 					console.log("J'aime le français");
@@ -133,5 +134,17 @@
 		flex-direction: row;
 		align-items: center;
 		gap: 1em;
+	}
+	.Language .tooltiptext {
+		visibility: hidden;
+		background-color: var(--bg-primary-translucent);
+		text-align: center;
+		padding: 5px 0;
+		border-radius: 6px;
+		position: absolute;
+		z-index: 1;
+	}
+	.Language:hover .tooltiptext {
+		visibility: visible;
 	}
 </style>
