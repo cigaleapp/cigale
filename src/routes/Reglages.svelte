@@ -7,70 +7,40 @@
 	import Moon from '~icons/ph/moon-light';
 	import Cross from '~icons/ph/x-circle-light';
 
-	let open = false;
+	let open = $state(false);
+	/** @type {HTMLDialogElement|undefined} */
+	let dialogElement = $state();
+
+	$effect(() => {
+		window.addEventListener('mouseup', ({ target }) => {
+			if (target === dialogElement) return;
+			if (dialogElement?.contains(target)) return;
+			open = false;
+		});
+	});
+
 	$effect(() => {
 		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
 			if (matches) console.log('sombr');
 			else console.log('clèr');
 		});
 	});
-	function onGearClose() {
-		open = !open;
-		let listParam = document.querySelector('.listParam');
-		if (listParam instanceof HTMLElement) {
-			if (open) {
-				listParam.style.visibility = 'visible';
-				listParam.style.display = 'flex';
-			} else {
-				listParam.style.visibility = 'hidden';
-				listParam.style.display = 'none';
-			}
-		}
-	}
-	function onButtonClose() {
-		let listParam = document.querySelector('.listParam');
-		if (listParam instanceof HTMLElement) {
-			listParam.style.visibility = 'hidden';
-		}
-		open = false;
-	}
-
-	// @ts-ignore
-	function onSizeChange(event) {
-		const target = event.target;
-		if (target instanceof HTMLInputElement) {
-			console.log(target.value);
-		}
-	}
 </script>
 
-<div class="container">
-	<div class="IconButton">
-		<ButtonIcon onclick={onGearClose}>
-			<Gears className="Gears"></Gears>
-		</ButtonIcon>
-	</div>
+<ButtonIcon
+	onclick={() => {
+		open = !open;
+	}}
+>
+	{#if open}
+		<Cross />
+	{:else}
+		<Gears />
+	{/if}
+</ButtonIcon>
+
+<dialog class="container" open={open ? true : undefined} bind:this={dialogElement}>
 	<div class="listParam">
-		<div class="Sizeimage">
-			<div class="TextFermeture">
-				Nombre d'images par ligne :
-				<Cross
-					cursor="pointer"
-					onclick={() => {
-						onButtonClose();
-					}}
-				></Cross>
-			</div>
-			<input
-				type="range"
-				id="size"
-				name="size"
-				min="1"
-				max="20"
-				class="slider"
-				onchange={onSizeChange}
-			/>
-		</div>
 		<div class="Language">
 			Langue :
 			<ButtonPrimary
@@ -94,100 +64,55 @@
 			<ButtonPrimary
 				onclick={() => {
 					window.location.href = '#/reglages';
-					onGearClose();
+					open = false;
 				}}
 			>
 				Gérer
 			</ButtonPrimary>
-			<ButtonPrimary
-				onclick={() => {
-					window.location.href = '';
-					onGearClose();
-				}}
-			>
-				Retour
-			</ButtonPrimary>
 		</div>
 	</div>
-</div>
+</dialog>
 
 <style>
-	.TextFermeture {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
+	dialog:not([open]) {
+		opacity: 0;
+		pointer-events: none;
+		transform: scale(0.75);
 	}
+
 	.container {
+		position: fixed;
+		top: var(--navbar-height, 70px);
+		border: none;
 		margin-left: auto;
 		margin-right: 0;
 		display: flex;
 		flex-direction: column;
-		position: fixed;
-		width: 100%;
 		padding-left: 25px;
 		padding-right: 25px;
 		z-index: 2;
+		background-color: var(--bg-primary-translucent);
+		border-bottom-left-radius: 5px;
 	}
 
-	.IconButton {
-		margin: inherit;
-		float: right;
-	}
 	.listParam {
 		margin: inherit;
-		width: 30%;
 		flex-direction: column;
+		flex-grow: 1;
+		display: flex;
 		gap: 1em;
 		align-items: center;
-		background-color: var(--bg-primary-translucent);
 		padding-left: 10px;
 		padding-right: 20px;
 		padding-top: 10px;
 		padding-bottom: 10px;
-		border-top-left-radius: 5px;
-		border-bottom-right-radius: 5px;
-		border-bottom-left-radius: 5px;
 		border-width: 3px;
 		border-color: var(--gay);
 		font-size: smaller;
 		font-weight: bold;
 		color: var(--fg-primary);
-		visibility: hidden;
-	}
-	.Sizeimage {
-		width: 100%;
 	}
 
-	.slider {
-		width: 100%;
-		height: 5px;
-		background: var(--gray);
-		outline: none;
-		opacity: 0.7;
-		-webkit-transition: 0.2s;
-		transition: opacity 0.2s;
-		border-radius: 3px;
-	}
-
-	.slider:hover {
-		opacity: 1;
-	}
-
-	.slider::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 25px;
-		height: 25px;
-		background: var(--bg-primary);
-		cursor: pointer;
-	}
-
-	.slider::-moz-range-thumb {
-		width: 10px;
-		height: 10px;
-		background: var(--bg-primary);
-		cursor: pointer;
-	}
 	.Language {
 		width: 100%;
 		display: flex;
