@@ -8,14 +8,17 @@ import { imageCompletelyLoaded } from './images';
  */
 export function toAreaObservationProps(images, observations) {
 	return [
-		...images.map((image, i) => ({
-			image: uiState.previewURLs.get(image.id) ?? '',
-			title: image.filename,
-			id: image.id,
-			index: i,
-			stacksize: 1,
-			loading: imageCompletelyLoaded(image, uiState.previewURLs) ? undefined : -1
-		})),
+		...images
+			// Keep images that aren't part of any observation only
+			.filter(({ id }) => !observations.some((observation) => observation.images.includes(id)))
+			.map((image, i) => ({
+				image: uiState.previewURLs.get(image.id) ?? '',
+				title: image.filename,
+				id: image.id,
+				index: i,
+				stacksize: 1,
+				loading: imageCompletelyLoaded(image, uiState.previewURLs) ? undefined : -1
+			})),
 		...observations.map((observation, i) => {
 			const imagesOfObservation = images.filter((img) => observation.images.includes(img.id));
 			return {
