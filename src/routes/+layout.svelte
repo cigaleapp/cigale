@@ -98,4 +98,21 @@
 	:global(*) {
 		font-family: 'Host Grotesk', sans-serif;
 	}
+
+	.navbar {
+		position: fixed;
+		z-index: 100;
+		width: 100%;
+		height: fit-content;
+	}
+
+	.container {
+		margin-left: auto;
+		margin-right: 0;
+		display: flex;
+		flex-direction: column;
+		position: fixed;
+		top: 0;
+		z-index: 100;
+	}
 </style>
