@@ -17,6 +17,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import KeyboardShortcuts from './KeyboardShortcuts.svelte';
+	import { mutationobserver } from './mutations';
 
 	/**
 	 * @typedef Image
@@ -46,13 +47,13 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
-	const dragselect = $derived.by(() => {
+	/** @type {DragSelect |undefined} */
+	let dragselect;
+
+	$effect(() => {
 		if (!imagesContainer) return;
-
-		// Recompute when images change
-		images;
-
-		return new DragSelect(imagesContainer);
+		dragselect?.destroy();
+		dragselect = new DragSelect(imagesContainer);
 	});
 
 	$effect(() => {
@@ -85,8 +86,21 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	}}
 />
 
-<section class="images" bind:this={imagesContainer}>
-	{#each images as props, index (index)}
+<section
+	class="images"
+	bind:this={imagesContainer}
+	use:mutationobserver={{
+		childList: true,
+		subtree: true,
+		onchildList() {
+			if (!imagesContainer) return;
+			const items = [...imagesContainer.querySelectorAll('[data-selectable]')];
+			dragselect?.setItems(items);
+			dragselect?.setSelection(selection);
+		}
+	}}
+>
+	{#each images as props (props.index)}
 		<CardObservation
 			data-selectable
 			data-title={props.title}

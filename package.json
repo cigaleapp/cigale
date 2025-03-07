@@ -7,6 +7,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"prebuild": "node scripts/generate-json-schemas.js",
 		"preview": "vite preview",
 		"prepare": "husky",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -57,7 +58,8 @@
 		"idb": "^8.0.2",
 		"sveltejs-tippy": "^3.0.0",
 		"tinykeys": "^3.0.0",
-		"unplugin-icons": "^22.0.0"
+		"unplugin-icons": "^22.0.0",
+		"yaml": "^2.7.0"
 	},
 	"volta": {
 		"node": "22.14.0",
