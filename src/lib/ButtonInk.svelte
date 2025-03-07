@@ -8,8 +8,8 @@
 
 <style>
 	button {
-		background-color: var(--bg-neutral);
-		color: var(--bg-primary);
+		background-color: var(--bg, var(--bg-neutral));
+		color: var(--fg, var(--bg-primary));
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -23,6 +23,6 @@
 	}
 
 	button:is(:hover, :focus-visible) {
-		background-color: var(--bg-primary-translucent);
+		background-color: var(--bg-hover, var(--bg-primary-translucent));
 	}
 </style>
