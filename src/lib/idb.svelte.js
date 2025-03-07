@@ -15,7 +15,7 @@ import { NO_REACTIVE_STATE_TABLES, Tables } from './database.js';
 const tableNames = Object.keys(Tables);
 
 /** @type {{[Table in ReactiveTableNames]: Array<typeof Tables[Table]['infer']>}} */
-const tableValues = $state({
+export const _tablesState = $state({
 	Image: [],
 	Metadata: [],
 	Observation: [],
@@ -35,14 +35,16 @@ const tableValues = $state({
 export const tables = {
 	...Object.fromEntries(
 		tableNames
+			// @ts-ignore
 			.filter((name) => !NO_REACTIVE_STATE_TABLES.includes(name))
+			// @ts-ignore
 			.map((name) => [name, wrangler(name)])
 	),
 	async initialize() {
 		await Promise.allSettled(
 			tableNames.map(async (name) => {
 				// @ts-expect-error
-				tableValues[name] = await tables[name].list();
+				_tablesState[name] = await tables[name].list();
 			})
 		);
 	}
@@ -56,7 +58,7 @@ export const tables = {
 function wrangler(table) {
 	return {
 		get state() {
-			return tableValues[table];
+			return _tablesState[table];
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
@@ -64,12 +66,12 @@ function wrangler(table) {
 		async set(value) {
 			await set(table, value);
 			const output = Tables[table].assert(value);
-			const index = tableValues[table].findIndex((item) => item.id === value.id);
+			const index = _tablesState[table].findIndex((item) => item.id === value.id);
 			console.log(`indexof ${table} ${value.id} = ${index}`);
-			if (index !== -1) tableValues[table][index] = output;
+			if (index !== -1) _tablesState[table][index] = output;
 			else {
-				tableValues[table].push(output);
-				tableValues[table].sort(idComparator);
+				_tablesState[table].push(output);
+				_tablesState[table].sort(idComparator);
 			}
 		},
 		/**
@@ -99,13 +101,13 @@ function wrangler(table) {
 			await set(table, item);
 
 			// Update reactive state
-			const index = tableValues[table].findIndex((item) => item.id === key);
+			const index = _tablesState[table].findIndex((item) => item.id === key);
 			if (index === -1) {
 				console.log(`${logLabel}: item not found in reactive state, refetching entire list`);
-				tableValues[table] = await this.list();
+				_tablesState[table] = await this.list();
 			} else {
 				console.log(`${logLabel}: updating state @ ${table}[${index}]`);
-				tableValues[table][index] = Tables[table].assert(item);
+				_tablesState[table][index] = Tables[table].assert(item);
 			}
 
 			console.timeEnd(logLabel);
@@ -117,6 +119,18 @@ function wrangler(table) {
 				// @ts-ignore
 				{ ...value, id: `${table}_${nanoid()}` }
 			);
+		},
+		async clear() {
+			await clear(table);
+			_tablesState[table] = [];
+		},
+		/**
+		 * @param {string} id key of the object to remove
+		 */
+		async remove(id) {
+			await drop(table, id);
+			const index = _tablesState[table].findIndex((item) => item.id === id);
+			if (index !== -1) delete _tablesState[table][index];
 		},
 		list: async () => list(table),
 		all: () => iterator(table),
@@ -159,6 +173,19 @@ export async function set(tableName, value) {
 }
 
 /**
+ * @param {TableName} table
+ * @template {keyof typeof Tables} TableName
+ */
+export async function clear(table) {
+	console.time(`clr ${table}`);
+	const db = await openDatabase();
+	await db.clear(table).then((result) => {
+		console.timeEnd(`clr ${table}`);
+		return result;
+	});
+}
+
+/**
  *
  * @param {TableName} tableName
  * @param {string} key
@@ -196,7 +223,7 @@ export async function list(tableName) {
  * If both IDs are numeric, they are compared numerically even if they are strings
  * @type {(a: {id: string|number}, b: {id: string|number}) => number}
  */
-const idComparator = (a, b) => {
+export const idComparator = (a, b) => {
 	if (typeof a.id === 'number' && typeof b.id === 'number') return a.id - b.id;
 
 	if (typeof a.id === 'number') return -1;
@@ -205,6 +232,21 @@ const idComparator = (a, b) => {
 	if (/^\d+$/.test(a.id) && /^\d+$/.test(b.id)) return Number(a.id) - Number(b.id);
 	return a.id.localeCompare(b.id);
 };
+
+/**
+ * Delete an entry from a table by key
+ * @param {TableName} table
+ * @param {string} id
+ * @returns {Promise<void>}
+ * @template {keyof typeof Tables} TableName
+ */
+export async function drop(table, id) {
+	console.time(`delete ${table} ${id}`);
+	const db = await openDatabase();
+	return await db.delete(table, id).then(() => {
+		console.timeEnd(`delete ${table} ${id}`);
+	});
+}
 
 /**
  *
@@ -230,8 +272,14 @@ export async function openDatabase() {
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
-	_database = await openDB('database', 1, {
-		upgrade(db) {
+	_database = await openDB('database', 2, {
+		upgrade(db, oldVersion) {
+			// No clean migration path for 1 -> 2, just drop everything
+			if (oldVersion === 1) {
+				for (const tableName of db.objectStoreNames) {
+					db.deleteObjectStore(tableName);
+				}
+			}
 			for (const [tableName, schema] of tablesByName) {
 				if (!schema.meta.table) continue;
 				const keyPath = schema.meta.table.indexes[0];

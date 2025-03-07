@@ -61,6 +61,7 @@
 	class="dropzone"
 	role="form"
 	class:dragging
+	class:clickable
 	ondragover={(e) => {
 		if (!e.dataTransfer) return;
 		e.preventDefault();
@@ -118,6 +119,12 @@
 
 	.dropzone {
 		position: relative;
+		display: flex;
+		flex-grow: 1;
+	}
+
+	.dropzone.clickable {
+		cursor: pointer;
 	}
 
 	.dropzone.dragging .dragging-overlay {

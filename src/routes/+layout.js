@@ -16,6 +16,16 @@ export async function load() {
 async function fillBuiltinData() {
 	await Promise.all([
 		...BUILTIN_METADATA.map(tables.Metadata.set),
+		tables.Protocol.set({
+			id: 'test',
+			metadata: [...BUILTIN_METADATA.map((m) => m.id), 'species'],
+			authors: [
+				{ name: 'Feur', email: 'gwenn.elbikergre@gmai.com' },
+				{ name: 'Incofeurgniote', email: 'igriuojgr@fokejofe.com' }
+			],
+			name: 'Test',
+			source: 'https://gwen.works'
+		}),
 		tables.Settings.set({
 			id: 'defaults',
 			protocols: [],
