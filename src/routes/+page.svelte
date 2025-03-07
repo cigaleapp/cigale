@@ -1,11 +1,12 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
+	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { imageBufferWasSaved, imageId, imageIdToFileId, imageIsCropped } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue, extractFromExif } from '$lib/metadata';
+	import { extractFromExif, storeMetadataValue } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
 	import { onMount } from 'svelte';
@@ -34,17 +35,7 @@
 	const erroredImages = $derived(uiState.erroredImages);
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
-	const images = $derived(
-		tables.Image.state.map((image, i) => ({
-			image: previewURLs.get(image.id) ?? '',
-			title: image.filename,
-			id: image.id,
-			index: i,
-			stacksize: 1,
-			loading:
-				image.bufferExists && image.metadata.crop && previewURLs.has(image.id) ? undefined : -1
-		}))
-	);
+	const images = $derived(toAreaObservationProps(tables.Image.state, tables.Observation.state));
 
 	let loadingLogoDrawPercent = $state(0);
 	let loadingLogoDrawingForwards = $state(true);

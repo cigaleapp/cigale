@@ -12,6 +12,7 @@
 	import { uiState } from './inference/state.svelte';
 
 	import './style.css';
+	import { mergeToObservation } from '$lib/observations';
 
 	const { children } = $props();
 
@@ -77,7 +78,9 @@
 		<PreviewSidePannel
 			images={selectedHrefs}
 			metadata={combineMetadataValues(selectedImages)}
-			onmerge={() => {}}
+			onmerge={async () => {
+				await mergeToObservation(uiState.selection);
+			}}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
 				await Promise.all(
@@ -154,7 +157,7 @@
 		position: fixed;
 		top: 0;
 		z-index: 100;
-    }
+	}
 
 	:global(code, pre) {
 		font-family: 'Fira Code', monospace;
