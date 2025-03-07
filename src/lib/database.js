@@ -31,13 +31,24 @@ const MetadataValues = type({
 	'[/[a-z0-9_]+/]': MetadataValue
 });
 
+const ImageFile = table(
+	['id'],
+	type({
+		/** ID of the associated Image object */
+		id: ID,
+		bytes: 'ArrayBuffer'
+	})
+);
+
 const Image = table(
 	['id', 'addedAt'],
 	type({
-		id: ID,
+		id: 'string.integer.parse',
 		filename: 'string',
 		addedAt: 'string.date.iso.parse',
-		metadata: MetadataValues
+		metadata: MetadataValues,
+		contentType: /\w+\/\w+/,
+		bufferExists: 'boolean'
 	})
 );
 
@@ -158,6 +169,14 @@ const Settings = table(
  */
 export const BUILTIN_METADATA = [
 	{
+		id: 'bounding_boxes',
+		description: "Boîtes de recadrage pour l'image",
+		label: '',
+		type: 'string',
+		mergeMethod: 'none',
+		required: false
+	},
+	{
 		id: 'sex',
 		description: "Sexe de l'individu",
 		label: 'Sexe',
@@ -213,8 +232,11 @@ export const Schemas = {
 	Settings
 };
 
+export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile']);
+
 export const Tables = {
 	Image,
+	ImageFile,
 	Observation,
 	Metadata,
 	Protocol,
