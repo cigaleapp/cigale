@@ -1,3 +1,5 @@
+import { BUILTIN_METADATA_IDS, Schemas } from './database';
+import * as exifParser from 'exif-parser';
 import { tables, _tablesState } from './idb.svelte.js';
 
 /**
@@ -43,7 +45,7 @@ export async function storeMetadataValue({
 		await tables.Image.raw.set(image);
 		_tablesState.Image[
 			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
-		].metadata[metadataId] = newValue;
+		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else if (observation) {
 		observation.metadataOverrides[metadataId] = newValue;
 		await tables.Observation.raw.set(observation);
@@ -53,6 +55,33 @@ export async function storeMetadataValue({
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
+}
+
+/**
+ * @param {ArrayBuffer} buffer buffer of the image to extract EXIF data from
+ * @returns {Promise<import('./database.js').MetadataValues>}
+ */
+export async function extractFromExif(buffer) {
+	const exif = exifParser.create(buffer).enableImageSize(false).parse();
+	/** @type {Partial<Record<keyof typeof BUILTIN_METADATA_IDS, import('./metadata.js').RuntimeValue<import('./database.js').MetadataType>>>} */
+	const output = {};
+
+	if (!exif) return output;
+
+	if (exif.tags.DateTimeOriginal) {
+		output[BUILTIN_METADATA_IDS.shoot_date] = new Date(exif.tags.DateTimeOriginal);
+	}
+
+	if (exif.tags.GPSLatitude && exif.tags.GPSLongitude) {
+		output[BUILTIN_METADATA_IDS.shoot_location] = {
+			latitude: /** @type {number} */ (exif.tags.GPSLatitude),
+			longitude: /** @type {number} */ (exif.tags.GPSLongitude)
+		};
+	}
+
+	return Object.fromEntries(
+		Object.entries(output).map(([key, value]) => [key, { value, alternatives: {}, confidence: 1 }])
+	);
 }
 
 /**
@@ -89,7 +118,7 @@ export async function mergeMetadataValues(images) {
 	/** @type {import("./database").MetadataValues}  */
 	const output = {};
 
-	const keys = new Set(...images.map((image) => Object.keys(image.metadata)));
+	const keys = new Set(images.map((image) => Object.keys(image.metadata)));
 
 	for (const key of keys) {
 		const definition = await tables.Metadata.get(key);
@@ -106,6 +135,48 @@ export async function mergeMetadataValues(images) {
 					.map(([, v]) => v)
 			)
 		);
+	}
+
+	return output;
+}
+
+/**
+ * Combine metadata values. Unlike `mergeMetadataValues`, this one does not attempt to merge different values for the same metadata definition, and puts `undefined` instead of a MetadataValue object when values differ.
+ * @param {import('./database').Image[]} images
+ * @returns {Record<string, import('./database').MetadataValue | undefined>}
+ */
+export function combineMetadataValues(images) {
+	/** @type {Record<string, import('./database').MetadataValue | undefined>} */
+	const output = {};
+
+	// TODO handle observations
+
+	let keys = new Set(images.flatMap((img) => Object.keys(img.metadata)));
+
+	for (const key of keys) {
+		const values = images.map(
+			(img) => img.metadata[key] ?? { value: null, confidence: 0, alternatives: {} }
+		);
+
+		const stringedValues = new Set(values.map(({ value }) => JSON.stringify(value)));
+		console.log(`${[...keys]}: combining ${[...stringedValues]}`);
+		if (stringedValues.size > 1 || values.some(({ value }) => value === null)) {
+			output[key] = undefined;
+			continue;
+		}
+
+		const alternativeKeys = [...new Set(values.flatMap((v) => Object.keys(v.alternatives)))];
+
+		output[key] = {
+			value: values[0].value,
+			confidence: avg(values.map((v) => v.confidence)),
+			alternatives: Object.fromEntries(
+				alternativeKeys.map((key) => [
+					key,
+					avg(values.map((v) => v.alternatives[key] ?? null).filter((p) => p !== null))
+				])
+			)
+		};
 	}
 
 	return output;
@@ -292,6 +363,6 @@ function toNumber(type, values) {
 }
 
 /**
- * @template {import('./database').MetadataType} Type
+ * @template {import('./database').MetadataType} [Type=import('./database').MetadataType]
  * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, width: number, height: number } : string} RuntimeValue
  */

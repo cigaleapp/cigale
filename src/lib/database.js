@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { parseISOSafe } from './date.js';
 
 // TODO make table() take an object that can be passed to type() instead of a schema
 //  * @template { {[x: string]: import('arktype').Type | string} } Schema
@@ -16,10 +17,12 @@ const Probability = type('0 <= number <= 1');
 const URLString = type('/https?:\\/\\/.+/');
 
 const MetadataValue = type({
-	value: type('string.json.parse').pipe(
-		(primitive) =>
-			/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */ (primitive)
-	),
+	value: type('string.json').pipe((jsonstring) => {
+		/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */
+		let out = JSON.parse(jsonstring);
+		if (typeof out === 'string') out = parseISOSafe(out) ?? out;
+		return out;
+	}),
 	confidence: Probability.default(1),
 	alternatives: {
 		'[string.json]': Probability
@@ -162,44 +165,28 @@ const Settings = table(
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: 'number',
 		language: type.enumerated('fr'),
-		showInputHints: 'boolean'
+		showInputHints: 'boolean',
+		showTechnicalMetadata: 'boolean'
 	})
 );
 
+export const BUILTIN_METADATA_IDS = {
+	crop: 'crop',
+	shoot_date: 'shoot_date',
+	shoot_location: 'shoot_location'
+};
+
 /**
- * @type {Array<typeof Metadata.inferIn>}
+ * @type {Array<typeof Metadata.inferIn & { id: keyof typeof BUILTIN_METADATA_IDS }>}
  */
 export const BUILTIN_METADATA = [
 	{
 		id: 'crop',
 		description: "Boîte de recadrage pour l'image",
-		label: '',
+		label: 'Recadrage',
 		type: 'boundingbox',
 		mergeMethod: 'none',
 		required: false
-	},
-	{
-		id: 'sex',
-		description: "Sexe de l'individu",
-		label: 'Sexe',
-		learnMore: 'https://fr.wikipedia.org/wiki/Sexe',
-		type: 'enum',
-		mergeMethod: 'none',
-		required: false,
-		options: [
-			{
-				key: 'm',
-				label: 'Male',
-				learnMore: 'https://fr.wikipedia.org/wiki/M%C3%A2le',
-				description: ''
-			},
-			{
-				key: 'f',
-				label: 'Femelle',
-				learnMore: 'https://fr.wikipedia.org/wiki/Femelle',
-				description: ''
-			}
-		]
 	},
 	{
 		id: 'shoot_date',
@@ -223,6 +210,7 @@ export const Schemas = {
 	ID,
 	Probability,
 	MetadataValues,
+	MetadataValue,
 	Image,
 	Observation,
 	MetadataType,

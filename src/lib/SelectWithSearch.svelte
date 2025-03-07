@@ -4,20 +4,25 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {string[]} options possible options
+	 * @property {Record<string, string>} options possible options. {key: user-friendly label}
 	 * @property {string} searchQuery the string we're searching for
 	 * @property {string} selectedValue the option selected by the user
+	 * @property {(value: string) => void} [onblur] callback to call when the user quits the search bar
+	 */
+
+	/**
+	 * @typedef {{  value: string, label: string }} Item
 	 */
 
 	/** @type {Props} */
-	let { options, searchQuery = $bindable(''), selectedValue = $bindable() } = $props();
+	let { options, onblur, searchQuery = $bindable(''), selectedValue = $bindable() } = $props();
 
-	const fuse = $derived(new Fuse(options));
+	const items = $derived(Object.entries(options).map(([value, label]) => ({ value, label })));
 
-	/** @type {string[]} options that match searchQuery */
-	const filteredItems = $derived(
-		searchQuery ? fuse.search(searchQuery).map((r) => r.item) : options
-	);
+	const fuse = $derived(new Fuse(items, { keys: ['value', 'label'] }));
+
+	/** @type {Item[]} options that match searchQuery */
+	const filteredItems = $derived(searchQuery ? fuse.search(searchQuery).map((r) => r.item) : items);
 	// svelte-ignore non_reactive_update
 	let activeIndex = -1; // Tracks currently selected option in the list
 	/** @type {HTMLUListElement} */
@@ -37,7 +42,7 @@
 			activeIndex = (activeIndex - 1 + itemCount) % itemCount; // Loop to last item
 		} else if (event.key === 'Enter' && itemCount > 0) {
 			event.preventDefault();
-			searchQuery = filteredItems[activeIndex]; // Select active item
+			searchQuery = filteredItems[activeIndex].label; // Select active item
 			listRef.blur();
 			InputRef.blur();
 		}
@@ -61,6 +66,9 @@
 		placeholder="Search..."
 		bind:value={searchQuery}
 		bind:this={InputRef}
+		onblur={() => {
+			onblur?.(selectedValue);
+		}}
 	/>
 
 	<ul class="container" bind:this={listRef}>
@@ -69,8 +77,8 @@
 				<button
 					class="button {activeIndex === i ? option : ''}"
 					onclick={(e) => {
-						selectedValue = option;
-						searchQuery = option;
+						selectedValue = option.value;
+						searchQuery = option.label;
 						e.currentTarget.blur();
 					}}
 					tabindex="-1"

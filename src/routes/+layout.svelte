@@ -1,31 +1,50 @@
 <script>
 	import { base } from '$app/paths';
+	import { page } from '$app/state';
+	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import Toast from '$lib/Toast.svelte';
+	import { tables } from '$lib/idb.svelte';
+	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
-	import { setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import Navigation from './Navigation.svelte';
 	import PreviewSidePannel from './PreviewSidePannel.svelte';
 	import { uiState } from './inference/state.svelte';
 
 	import './style.css';
 
-	const { children, data } = $props();
+	const { children } = $props();
+
+	onMount(() => {
+		uiState.keybinds['$mod+m'] = {
+			help: 'Fusionner les observations sélectionnées',
+			do() {
+				alert('todo!');
+			}
+		};
+	});
 
 	export const snapshot = {
 		capture() {
-			const captured = $state.snapshot(uiState);
-			return { selection: captured.selection };
+			const selection = $state.snapshot(uiState.selection);
+			return { selection };
 		},
 		restore({ selection }) {
 			uiState.selection = selection;
 		}
 	};
 
-	setContext('showSwitchHints', data.showInputHints);
-	let img = 'https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg';
-	let sexe = 0;
-	let date = 0;
-	let metaValue = $state([sexe, date]);
+	const showSidePanel = $derived(!['/about', '/settings'].includes(page.route.id ?? ''));
+
+	const selectedHrefs = $derived(
+		uiState.selection.map((id) => uiState.previewURLs.get(id)).filter((href) => href !== undefined)
+	);
+
+	const selectedImages = $derived(
+		uiState.selection
+			.map((id) => tables.Image.state.find((i) => i.id === id))
+			.filter((img) => img !== undefined)
+	);
 </script>
 
 <Navigation hasImages={true} progress={uiState.processing.progress}></Navigation>
@@ -33,6 +52,8 @@
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
 </svelte:head>
+
+<KeyboardShortcuts preventDefault binds={uiState.keybinds} />
 
 <section class="toasts">
 	{#each toasts.items as toast (toast.id)}
@@ -49,18 +70,31 @@
 		/>
 	{/each}
 </section>
-<PreviewSidePannel
-	images={[img, img, img, img, img, img, img, img, img, img, img]}
-	metaNom={['sexe', 'date']}
-	metaType={['enumeration', 'date']}
-	bind:metaValue
-	metaOptions={[['male', 'femelle'], []]}
-	clickFusion={() => {}}
-	clickAddMeta={() => {}}
-	showFusion="true"
-/>
 
-<main>{@render children?.()}</main>
+<div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
+	<main>{@render children?.()}</main>
+	{#if showSidePanel}
+		<PreviewSidePannel
+			images={selectedHrefs}
+			metadata={combineMetadataValues(selectedImages)}
+			onmerge={() => {}}
+			onaddmetadata={() => {}}
+			onmetadatachange={async (id, value) => {
+				await Promise.all(
+					selectedImages.map(async (image) => {
+						storeMetadataValue({
+							subjectId: image.id,
+							metadataId: id,
+							confidence: 1,
+							value
+						});
+					})
+				);
+			}}
+			allowmerge
+		/>
+	{/if}
+</div>
 
 <style>
 	.toasts {
@@ -75,11 +109,22 @@
 		z-index: 1000;
 	}
 
+	.main-and-sidepanel {
+		height: 100%;
+		display: flex;
+		overflow: hidden;
+	}
+
+	.main-and-sidepanel:not(.has-sidepanel) main {
+		width: 100%;
+	}
+
 	main {
 		display: flex;
 		flex-direction: column;
 		gap: 1em;
 		height: 100%;
+		flex-grow: 1;
 		overflow-y: scroll;
 		padding: 1.2em;
 	}

@@ -1,7 +1,7 @@
 <script>
-	import { getContext } from 'svelte';
 	import Check from '~icons/ph/check-bold';
 	import Cross from '~icons/ph/x-bold';
+	import { getSettings } from './settings.svelte';
 
 	let { value = $bindable(), icons: iconsOverride = undefined } = $props();
 
@@ -10,7 +10,7 @@
 	}
 
 	/** @type {boolean} */
-	let showHints = getContext('showSwitchHints');
+	let showHints = $derived(getSettings().showInputHints);
 
 	let icons = $derived(
 		iconsOverride ?? {
@@ -75,7 +75,7 @@
 	.switch:is(:hover, :focus-visible) {
 		border-color: var(--bg-primary);
 		background-color: var(--bg-primary-translucent);
-                outline: none;
+		outline: none;
 	}
 
 	.switch:is(:hover, :focus-visible) .handle {
