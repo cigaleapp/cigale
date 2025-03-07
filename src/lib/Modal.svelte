@@ -63,6 +63,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	<header>
 		<h1>{title}</h1>
 		<ButtonIcon
+			help="Fermer"
 			onclick={() => {
 				close?.();
 			}}
