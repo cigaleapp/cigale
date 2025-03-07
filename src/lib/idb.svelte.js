@@ -213,6 +213,7 @@ export async function drop(table, id) {
 		console.timeEnd(`delete ${table} ${id}`);
 	});
 }
+
 /**
  * Returns a comparator to sort objects by their id property
  * If both IDs are numeric, they are compared numerically even if they are strings
