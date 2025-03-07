@@ -13,15 +13,17 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script>
-	// @ts-ignore
+	import { onMount } from 'svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import KeyboardShortcuts from './KeyboardShortcuts.svelte';
+	import { mutationobserver } from './mutations';
 
 	/**
 	 * @typedef Image
 	 * @property {string} image
 	 * @property {string} title
+	 * @property {string} id
 	 * @property {number} index
 	 * @property {number} stacksize
 	 * @property {number} [loading]
@@ -31,23 +33,33 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @typedef Props
 	 * @type {object}
 	 * @property {Image[]} images
+	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
+	 * @property {(id: string) => void} [ondelete] callback when an image is deleted, with the image/observation id as argument
 	 * @property {import('./KeyboardShortcuts.svelte').Keymap} [binds] keybinds to define alongside the ones this component defines
 	 */
 
 	/** @type {Props } */
-	let { images = $bindable(), loadingText, binds, selection = $bindable([]) } = $props();
+	let {
+		images = $bindable(),
+		ondelete,
+		errors,
+		loadingText,
+		binds,
+		selection = $bindable([])
+	} = $props();
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
-	const dragselect = $derived.by(() => {
+	/** @type {DragSelect |undefined} */
+	let dragselect;
+
+	onMount(() => {
 		if (!imagesContainer) return;
-
-		// Recompute when images change
-		images;
-
-		return new DragSelect(imagesContainer);
+		dragselect?.destroy();
+		dragselect = new DragSelect(imagesContainer, selection);
+		dragselect.setSelection(selection);
 	});
 
 	$effect(() => {
@@ -65,7 +77,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		'$mod+a': {
 			help: 'Tout sélectionner',
 			do: () => {
-				selection = images.map((img) => img.title);
+				selection = images.map((img) => img.index.toString());
 				dragselect?.setSelection(selection);
 			}
 		},
@@ -80,16 +92,31 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	}}
 />
 
-<section class="images" bind:this={imagesContainer}>
-	{#each images as props}
+<section
+	class="images"
+	bind:this={imagesContainer}
+	use:mutationobserver={{
+		childList: true,
+		subtree: true,
+		onchildList() {
+			if (!imagesContainer) return;
+			const items = [...imagesContainer.querySelectorAll('[data-selectable]')];
+			dragselect?.setItems(items);
+			dragselect?.setSelection(selection);
+		}
+	}}
+>
+	{#each images as props (props.index)}
 		<CardObservation
 			data-selectable
-			data-title={props.title}
+			data-id={props.id}
 			data-loading={props.loading}
 			data-index={props.index}
 			{...props}
-			{loadingText}
-			selected={selection.includes(props.title)}
+			ondelete={ondelete ? () => ondelete(props.id) : undefined}
+			errored={errors?.has(props.id)}
+			statusText={errors?.get(props.id) ?? loadingText}
+			selected={selection.includes(props.index.toString())}
 		/>
 	{/each}
 </section>
@@ -98,6 +125,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	section.images {
 		display: flex;
 		flex-wrap: wrap;
+		align-content: flex-start;
 		gap: 2em;
 	}
 </style>

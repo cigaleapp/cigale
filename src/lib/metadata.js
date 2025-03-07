@@ -1,20 +1,27 @@
-import { tables } from './idb';
+import { tables, _tablesState } from './idb.svelte.js';
 
 /**
  *
- * @param {string} imageOrObservationId
- * @param {string} key
- * @param {{
- *      value: RuntimeValue<import('./database').MetadataType>;
- *      confidence: number;
- *      alternatives: Array<{ value: RuntimeValue<import('./database').MetadataType>; confidence: number }>;
- * }} value
+ * @template {import('./database').MetadataType} Type
+ * @param {object} options
+ * @param {string} options.subjectId id de l'image ou l'observation
+ * @param {string} options.metadataId id de la métadonnée
+ * @param {Type} [options.type] le type de données pour la métadonnée, sert à éviter des problèmes de typages
+ * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
+ * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
+ * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  */
-export async function storeMetadataValue(
-	imageOrObservationId,
-	key,
-	{ value, confidence, alternatives }
-) {
+export async function storeMetadataValue({
+	subjectId,
+	metadataId,
+	type,
+	value,
+	confidence,
+	alternatives
+}) {
+	alternatives ??= [];
+	confidence ??= 1;
+
 	const newValue = {
 		value: JSON.stringify(value),
 		confidence,
@@ -23,17 +30,28 @@ export async function storeMetadataValue(
 		)
 	};
 
-	const image = await tables.Image.raw.get(imageOrObservationId);
-	const observation = await tables.Observation.raw.get(imageOrObservationId);
+	const metadata = await tables.Metadata.get(metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (type && metadata.type !== type)
+		throw new Error(`Type de métadonnée incorrect: ${metadata.type} !== ${type}`);
+
+	const image = await tables.Image.raw.get(subjectId);
+	const observation = await tables.Observation.raw.get(subjectId);
 
 	if (image) {
-		image.metadata[key] = newValue;
+		image.metadata[metadataId] = newValue;
 		await tables.Image.raw.set(image);
+		_tablesState.Image[
+			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
+		].metadata[metadataId] = newValue;
 	} else if (observation) {
-		observation.metadataOverrides[key] = newValue;
+		observation.metadataOverrides[metadataId] = newValue;
 		await tables.Observation.raw.set(observation);
+		_tablesState.Observation[
+			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
+		].metadataOverrides[metadataId] = newValue;
 	} else {
-		throw new Error(`Aucune image ou observation avec l'ID ${imageOrObservationId}`);
+		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
 }
 
@@ -275,5 +293,5 @@ function toNumber(type, values) {
 
 /**
  * @template {import('./database').MetadataType} Type
- * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : string} RuntimeValue
+ * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, width: number, height: number } : string} RuntimeValue
  */
