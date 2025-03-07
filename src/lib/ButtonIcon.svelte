@@ -1,16 +1,19 @@
 <script>
+	import { tooltip } from './tooltips';
+
 	/**
 	 * @typedef Props
 	 * @type {object}
 	 * @property {() => void} onclick
 	 * @property {import('svelte').Snippet} children
+	 * @property {string} help
 	 */
 
 	/** @type {Props} */
-	let { children, onclick } = $props();
+	let { children, onclick, help } = $props();
 </script>
 
-<button {onclick}>
+<button {onclick} use:tooltip={help}>
 	{@render children()}
 </button>
 
