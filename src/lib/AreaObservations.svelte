@@ -20,24 +20,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { mutationobserver } from './mutations';
 
 	/**
-	 * @typedef Image
-	 * @property {string} image
-	 * @property {string} title
-	 * @property {string} id
-	 * @property {number} index
-	 * @property {number} stacksize
-	 * @property {number} [loading]
-	 * @property {object[]} [boundingBoxes] - array of bounding boxes
-	 * @property {number} boundingBoxes.x
-	 * @property {number} boundingBoxes.y
-	 * @property {number} boundingBoxes.width
-	 * @property {number} boundingBoxes.height
-	 */
-
-	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Image[]} images
+	 * @property {Array<import ('./AreaObservations.utils').CardObservation>} images
 	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
