@@ -1,9 +1,9 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { NO_REACTIVE_STATE_TABLES, Tables } from './database.js';
+import { isReactiveTable, Tables } from './database.js';
 
 /**
- * @typedef {typeof NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
+ * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
  */
 
 /**
@@ -33,20 +33,15 @@ export const _tablesState = $state({
  */
 // @ts-ignore
 export const tables = {
-	...Object.fromEntries(
-		tableNames
-			// @ts-ignore
-			.filter((name) => !NO_REACTIVE_STATE_TABLES.includes(name))
-			// @ts-ignore
-			.map((name) => [name, wrangler(name)])
-	),
+	...Object.fromEntries(tableNames.filter(isReactiveTable).map((name) => [name, wrangler(name)])),
 	async initialize() {
-		await Promise.allSettled(
-			tableNames.map(async (name) => {
-				// @ts-expect-error
-				_tablesState[name] = await tables[name].list();
-			})
-		);
+		console.time('*db initialize');
+		for (const name of tableNames) {
+			if (!isReactiveTable(name)) continue;
+			// @ts-expect-error
+			_tablesState[name] = await tables[name].list();
+		}
+		console.timeEnd('*db initialize');
 	}
 };
 
@@ -211,12 +206,17 @@ export async function get(tableName, key) {
  * @template {keyof typeof Tables} TableName
  */
 export async function list(tableName) {
+	console.time(`ls ${tableName}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	// @ts-ignore
 	return await db
 		.getAll(tableName)
-		.then((values) => values.map(validator.assert).sort(idComparator));
+		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
+		.then((result) => {
+			console.timeEnd(`ls ${tableName}`);
+			return result;
+		});
 }
 
 /**
@@ -244,7 +244,7 @@ export const idComparator = (a, b) => {
 export async function drop(table, id) {
 	console.time(`delete ${table} ${id}`);
 	const db = await openDatabase();
-	return await db.delete(table, id).then(() => {
+	return await db.delete(table, IDBKeyRange.only(id)).then(() => {
 		console.timeEnd(`delete ${table} ${id}`);
 	});
 }

@@ -224,6 +224,16 @@ export const Schemas = {
 
 export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile']);
 
+/**
+ *
+ * @template {keyof typeof Tables} TableName
+ * @param {TableName} name
+ * @returns {name is Exclude<TableName, typeof NO_REACTIVE_STATE_TABLES[number]>}
+ */
+export function isReactiveTable(name) {
+	return NO_REACTIVE_STATE_TABLES.every((n) => n !== name);
+}
+
 export const Tables = {
 	Image,
 	ImageFile,
