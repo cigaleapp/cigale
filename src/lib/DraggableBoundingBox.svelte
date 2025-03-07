@@ -17,7 +17,7 @@
 	let y = $state();
 	let width = $state();
 	let height = $state();
-	
+
 	$effect(() => {
 		x = bb.x * 100;
 		y = bb.y * 100;
@@ -29,6 +29,7 @@
 	let movingtr = false;
 	let movingbl = false;
 	let movingbr = false;
+	let movinggbl = false;
 
     function starttl () {
         movingtl = true;
@@ -48,13 +49,30 @@
 	function startbr () {
 		movingbr = true;
 	}
+	/**
+	 * @param {MouseEvent} event
+	 */
+	function startmoveglobal (event) {
+		let x2 = (event.offsetX/sizew) * 100;
+		let y2 = (event.offsetY/sizeh) * 100;
 
+		console.log("startmoveglobal");
+		if (x2 > x && x2 < x + width && y2 > y && y2 < y + height) {
+			movinggbl=true;
+		}
+
+	}
+
+	$effect(() => {
+		console.log("movinggbl : ",movinggbl);
+	});
 
 	function stopall () {
 		movingtl = false;
 		movingtr = false;
 		movingbl = false;
 		movingbr = false;
+		movinggbl = false;
 	}
 
 	/**
@@ -65,6 +83,17 @@
 		// TODO: utiliser x et y pr savoir si on est dans la bb combiner avec un mousemove sur la window pr pvr modifier la position global de la bb
 		let xm = (event.movementX/sizew) * 100;
 		let ym = (event.movementY/sizeh) * 100;
+
+		let x2 = (event.offsetX/sizew) * 100;
+		let y2 = (event.offsetY/sizeh) * 100;
+
+
+		if (x2 > x && x2 < x + width && y2 > y && y2 < y + height) {
+			document.body.style.cursor = "move";
+		} else {
+			document.body.style.cursor = "default";
+		}
+
 		if (movingtl) {
 			x += xm ;
 			y += ym ;
@@ -89,6 +118,11 @@
 			height += ym ;
 		}
 
+		if (movinggbl&& !movingtl && !movingtr && !movingbl && !movingbr) {
+			x += xm ;
+			y += ym ;
+		}
+
 		x = Math.max(0, Math.min(x, 100 - width));
 		y = Math.max(0, Math.min(y, 100 - height));
 		width = Math.max(0, Math.min(width, 100 - x));
@@ -104,9 +138,9 @@
 
 
 </script>
-<svelte:window onmousemove="{movebb}" onmouseup="{stopall}"></svelte:window>
+<svelte:window onmousemove="{movebb}" onmouseup="{stopall}" ></svelte:window>
 
-<div class="bounding-box">
+<div class="bounding-box" onmousedown="{startmoveglobal}">
 	<!-- SVG lines joining each dot -->
 	<svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none">
 		<line x1="{x}" y1="{y}" x2="{x + width}" y2="{y}" />
@@ -154,8 +188,8 @@
 	}
 	.dot {
 		position: absolute;
-		width: 2rem;
-		height: 2rem;
+		width: 1.5rem;
+		height: 1.5rem;
 		background: rgb(186, 186, 186);
 		border-radius: 50%;
 		transform: translate(-50%, -50%);
@@ -173,7 +207,7 @@
 	}
 	.lines line {
 		stroke: white;
-		stroke-width: 0.05rem;
+		stroke-width: 0.03rem;
 	}
 </style>
 
