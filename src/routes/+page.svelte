@@ -1,11 +1,12 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
+	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { imageBufferWasSaved, imageId, imageIdToFileId, imageIsCropped } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue, extractFromExif } from '$lib/metadata';
+	import { extractFromExif, storeMetadataValue } from '$lib/metadata';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
 	import { onMount } from 'svelte';
@@ -34,30 +35,7 @@
 	const erroredImages = $derived(uiState.erroredImages);
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
-	const images = $derived(
-		tables.Image.state.map((image, i) => ({
-			image: previewURLs.get(image.id) ?? '',
-			title: image.filename,
-			id: image.id,
-			index: i,
-			stacksize: 1,
-			loading:
-				image.bufferExists && image.metadata.crop && previewURLs.has(image.id) ? undefined : -1
-		}))
-	);
-
-	let loadingLogoDrawPercent = $state(0);
-	let loadingLogoDrawingForwards = $state(true);
-	$effect(() => {
-		setInterval(() => {
-			loadingLogoDrawPercent =
-				loadingLogoDrawPercent + (loadingLogoDrawingForwards ? 1 : -1) * 0.03;
-			if (loadingLogoDrawPercent > 1) {
-				loadingLogoDrawingForwards = !loadingLogoDrawingForwards;
-				loadingLogoDrawPercent = 0;
-			}
-		}, 10);
-	});
+	const images = $derived(toAreaObservationProps(tables.Image.state, tables.Observation.state));
 
 	let cropperModel = $state();
 	async function loadCropperModel() {
@@ -176,7 +154,7 @@
 			if (imageBufferWasSaved(image) && !imageIsCropped(image)) {
 				void (async () => {
 					try {
-						const file = await db.get('ImageFile', image.id);
+						const file = await db.get('ImageFile', imageIdToFileId(image.id));
 						if (!file) return;
 						await analyzeImage(file.bytes, image.id, image);
 					} catch (error) {
@@ -189,8 +167,8 @@
 	});
 
 	$effect(() => {
-		uiState.processing.total = images.length;
-		uiState.processing.done = images.filter((image) => image.loading === undefined).length;
+		uiState.processing.total = tables.Image.state.length;
+		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.crop).length;
 	});
 
 	$effect(() => {
@@ -216,7 +194,7 @@
 
 {#await loadCropperModel()}
 	<section class="loading">
-		<Logo drawpercent={loadingLogoDrawPercent} />
+		<Logo loading />
 		<p>Chargement du modèle de recadrage…</p>
 		<p class="source">{@render modelsource()}</p>
 	</section>

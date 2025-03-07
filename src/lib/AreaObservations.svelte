@@ -105,6 +105,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			errored={errors?.has(props.id)}
 			statusText={errors?.get(props.id) ?? loadingText}
 			selected={selection.includes(props.id.toString())}
+			{loadingText}
 		/>
 	{/each}
 </section>

@@ -4,6 +4,9 @@
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import Reglages from './Reglages.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { generateResultsZip } from '$lib/results';
+	import { tables } from '$lib/idb.svelte';
 
 	/**
 	 * @typedef Props
@@ -64,18 +67,24 @@
 		</a>
 
 		<Sup></Sup>
-		<a
-			href="#/resultats"
-			aria-disabled={page.route.id != '/classification' && page.route.id != '/resultats'}
-		>
+		<!-- <a href="#/resultats">
 			<div class="download">
-				<Download></Download>
+				<Download />
 				Résultats
 			</div>
 			{#if page.route.id == '/resultats'}
 				<div class="line"></div>
 			{/if}
-		</a>
+		</a> -->
+
+		<ButtonSecondary
+			onclick={async () => {
+				await generateResultsZip(tables.Observation.state, tables.Protocol.state[0]);
+			}}
+		>
+			<Download />
+			Résultats
+		</ButtonSecondary>
 
 		<Reglages --navbar-height="{height}px" />
 	</nav>
