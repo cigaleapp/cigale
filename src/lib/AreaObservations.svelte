@@ -13,7 +13,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script>
-	// @ts-ignore
+	import { onMount } from 'svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import KeyboardShortcuts from './KeyboardShortcuts.svelte';
@@ -45,10 +45,11 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	/** @type {DragSelect |undefined} */
 	let dragselect;
 
-	$effect(() => {
+	onMount(() => {
 		if (!imagesContainer) return;
 		dragselect?.destroy();
-		dragselect = new DragSelect(imagesContainer);
+		dragselect = new DragSelect(imagesContainer, selection);
+		dragselect.setSelection(selection);
 	});
 
 	$effect(() => {
@@ -66,7 +67,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		'$mod+a': {
 			help: 'Tout sélectionner',
 			do: () => {
-				selection = images.map((img) => img.title);
+				selection = images.map((img) => img.index.toString());
 				dragselect?.setSelection(selection);
 			}
 		},
@@ -95,15 +96,15 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each images as props}
+	{#each images as props (props.index)}
 		<CardObservation
 			data-selectable
-			data-title={props.title}
+			data-title={props.index}
 			data-loading={props.loading}
 			data-index={props.index}
 			{...props}
 			{loadingText}
-			selected={selection.includes(props.title)}
+			selected={selection.includes(props.index.toString())}
 		/>
 	{/each}
 </section>
@@ -112,6 +113,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	section.images {
 		display: flex;
 		flex-wrap: wrap;
+		align-content: flex-start;
 		gap: 2em;
 	}
 </style>
