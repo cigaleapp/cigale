@@ -3,6 +3,9 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import Cropup from '$lib/Cropup.svelte';
+
+	import { storeMetadataValue } from '$lib/metadata';
+
 	let openFeur = $state();
 
 	/**

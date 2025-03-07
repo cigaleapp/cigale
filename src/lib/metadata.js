@@ -1,20 +1,24 @@
-import { tables } from './idb';
+import { tables } from './idb.svelte.js';
 
 /**
  *
- * @param {string} imageOrObservationId
- * @param {string} key
- * @param {{
- *      value: RuntimeValue<import('./database').MetadataType>;
- *      confidence: number;
- *      alternatives: Array<{ value: RuntimeValue<import('./database').MetadataType>; confidence: number }>;
- * }} value
+ * @param {object} options
+ * @param {string} options.subjectId id de l'image ou l'observation
+ * @param {string} options.metadataId id de la métadonnée
+ * @param {RuntimeValue<import('./database').MetadataType>} options.value la valeur de la métadonnée
+ * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
+ * @param {Array<{ value: RuntimeValue<import('./database').MetadataType>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  */
-export async function storeMetadataValue(
-	imageOrObservationId,
-	key,
-	{ value, confidence, alternatives }
-) {
+export async function storeMetadataValue({
+	subjectId,
+	metadataId,
+	value,
+	confidence,
+	alternatives
+}) {
+	alternatives ??= [];
+	confidence ??= 1;
+
 	const newValue = {
 		value: JSON.stringify(value),
 		confidence,
@@ -23,17 +27,17 @@ export async function storeMetadataValue(
 		)
 	};
 
-	const image = await tables.Image.raw.get(imageOrObservationId);
-	const observation = await tables.Observation.raw.get(imageOrObservationId);
+	const image = await tables.Image.raw.get(subjectId);
+	const observation = await tables.Observation.raw.get(subjectId);
 
 	if (image) {
-		image.metadata[key] = newValue;
+		image.metadata[metadataId] = newValue;
 		await tables.Image.raw.set(image);
 	} else if (observation) {
-		observation.metadataOverrides[key] = newValue;
+		observation.metadataOverrides[metadataId] = newValue;
 		await tables.Observation.raw.set(observation);
 	} else {
-		throw new Error(`Aucune image ou observation avec l'ID ${imageOrObservationId}`);
+		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
 }
 
