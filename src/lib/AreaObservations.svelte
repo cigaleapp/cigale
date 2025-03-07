@@ -94,7 +94,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each images as props (props.index)}
+	{#each images as props (props.id)}
 		<CardObservation
 			data-selectable
 			data-id={props.id}
