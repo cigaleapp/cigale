@@ -4,9 +4,11 @@
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import Reglages from './Reglages.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { generateResultsZip } from '$lib/results';
 	import { tables } from '$lib/idb.svelte';
+	import { toasts } from '$lib/toasts.svelte';
 
 	/**
 	 * @typedef Props
@@ -20,6 +22,8 @@
 
 	/** @type {number|undefined} */
 	let height = $state();
+
+	let exporting = $state(false);
 </script>
 
 <header bind:clientHeight={height}>
@@ -79,10 +83,24 @@
 
 		<ButtonSecondary
 			onclick={async () => {
-				await generateResultsZip(tables.Observation.state, tables.Protocol.state[0]);
+				exporting = true;
+				try {
+					await generateResultsZip(tables.Observation.state, tables.Protocol.state[0]);
+				} catch (error) {
+					console.error(error);
+					toasts.error(
+						`Erreur lors de l'exportation des résultats: ${error?.toString() ?? 'Erreur inattendue'}`
+					);
+				} finally {
+					exporting = false;
+				}
 			}}
 		>
-			<Download />
+			{#if exporting}
+				<LoadingSpinner />
+			{:else}
+				<Download />
+			{/if}
 			Résultats
 		</ButtonSecondary>
 
