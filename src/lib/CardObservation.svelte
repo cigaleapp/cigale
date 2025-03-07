@@ -18,6 +18,12 @@
 	 * @property {string} image - image url
 	 * @property {boolean} selected
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
+	 * @property {string} [loadingText] - text to show when loading and progress is -1
+	 * @property {object[]} [boundingBoxes] - array of bounding boxes
+	 * @property {number} boundingBoxes.x
+	 * @property {number} boundingBoxes.y
+	 * @property {number} boundingBoxes.width
+	 * @property {number} boundingBoxes.height
 	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
 	 * @property {string} [statusText] - text to show when loading and progress is -1
 	 */
@@ -33,6 +39,7 @@
 		errored = false,
 		statusText = 'Chargement…',
 		stacksize = 1,
+		boundingBoxes = [],
 		ondelete,
 		...rest
 	} = $props();
@@ -83,7 +90,17 @@
 						{/if}
 					</div>
 				{/if}
-				<img src={image} alt={title} />
+				<div class="containbb">
+					<img src={image} alt={title} />
+					{#each boundingBoxes as bounding, index (index)}
+						<div
+							class="bb"
+							style="left: {bounding.x * 100}%; top: {bounding.y * 80}%; width: {bounding.width *
+								100}%; height: {80 * bounding.height}%;"
+						></div>
+					{/each}
+				</div>
+
 				<footer>
 					<div class="check-icon">
 						<AnimatableCheckmark />
@@ -188,7 +205,7 @@
 	img {
 		width: 100%;
 		height: 200px;
-		object-fit: cover;
+		/*object-fit: cover;*/
 	}
 
 	footer {
@@ -293,6 +310,15 @@
 		transition:
 			top calc(var(--transition-duration) / 1.5),
 			left calc(var(--transition-duration) / 1.5);
+	}
+
+	.bb {
+		position: absolute;
+		outline: 2px solid var(--fg-neutral);
+	}
+
+	.containbb {
+		display: inline-block;
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
