@@ -71,6 +71,16 @@
 		/>
 	{/each}
 </section>
+<PreviewSidePannel
+	images={[img, img, img, img, img, img, img, img, img, img, img]}
+	metaNom={['sexe', 'date']}
+	metaType={['enumeration', 'date']}
+	bind:metaValue
+	metaOptions={[['male', 'femelle'], []]}
+	clickFusion={() => {}}
+	clickAddMeta={() => {}}
+	showFusion="true"
+/>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
 	<main>{@render children?.()}</main>
@@ -140,23 +150,6 @@
 
 	:global(*) {
 		font-family: 'Host Grotesk', sans-serif;
-	}
-
-	.navbar {
-		position: fixed;
-		z-index: 100;
-		width: 100%;
-		height: fit-content;
-	}
-
-	.container {
-		margin-left: auto;
-		margin-right: 0;
-		display: flex;
-		flex-direction: column;
-		position: fixed;
-		top: 0;
-		z-index: 100;
 	}
 
 	:global(code, pre) {
