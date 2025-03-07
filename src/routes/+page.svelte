@@ -37,19 +37,6 @@
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(toAreaObservationProps(tables.Image.state, tables.Observation.state));
 
-	let loadingLogoDrawPercent = $state(0);
-	let loadingLogoDrawingForwards = $state(true);
-	$effect(() => {
-		setInterval(() => {
-			loadingLogoDrawPercent =
-				loadingLogoDrawPercent + (loadingLogoDrawingForwards ? 1 : -1) * 0.03;
-			if (loadingLogoDrawPercent > 1) {
-				loadingLogoDrawingForwards = !loadingLogoDrawingForwards;
-				loadingLogoDrawPercent = 0;
-			}
-		}, 10);
-	});
-
 	let cropperModel = $state();
 	async function loadCropperModel() {
 		cropperModel = await loadModel(false);
@@ -207,7 +194,7 @@
 
 {#await loadCropperModel()}
 	<section class="loading">
-		<Logo drawpercent={loadingLogoDrawPercent} />
+		<Logo loading />
 		<p>Chargement du modèle de recadrage…</p>
 		<p class="source">{@render modelsource()}</p>
 	</section>
