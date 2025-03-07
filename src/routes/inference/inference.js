@@ -6,6 +6,10 @@ import {
 	preprocess_for_classification
 } from './inference_utils.js';
 
+/**
+ * @typedef {[number, number, number, number]} BB [x,y,w,h]
+ */
+
 /* 
 ce fichier et le fichier utils associé (inference_utils.js) contiennent les fonctions pour effectuer les inférences de détection et de classification.
 les fonctions sont les suivantes : 
@@ -101,7 +105,7 @@ export async function loadModel(classif = false, webgpu = false) {
  * @param {typeof import('./state.svelte.js').uiState} uiState
  * @param {boolean} sequence
  * @param {boolean} webgpu
- * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[]]>}
+ * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
  */
 export async function infer(buffers, model, uiState, sequence = false, webgpu = true) {
 	/*Effectue une inférence de détection sur une ou plusieurs images. 
@@ -174,7 +178,7 @@ export async function infer(buffers, model, uiState, sequence = false, webgpu = 
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {number} i
  * @param {typeof import('./state.svelte.js').uiState} img_proceed
- * @returns {Promise<[number[][], number[][], ort.Tensor[]]>}
+ * @returns {Promise<[BB[], number[], ort.Tensor[]]>}
  */
 async function mapToFiles(files, model, i, img_proceed) {
 	let imfile = files[i];
@@ -191,7 +195,7 @@ async function mapToFiles(files, model, i, img_proceed) {
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').uiState} uiState
- * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[][]]>}
+ * @returns {Promise<[BB[][], number[][], number, ort.Tensor[][]]>}
  */
 export async function inferSequentialy(buffers, model, uiState) {
 	/*Effectue une inférence de détection sur une ou plusieurs images.
@@ -228,7 +232,7 @@ export async function inferSequentialy(buffers, model, uiState) {
  * @param {FileList} files
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').uiState} uiState
- * @returns {Promise<[number[][][], number[][][], number, ort.Tensor[][]]>}
+ * @returns {Promise<[BB[][], number[][], number, ort.Tensor[][]]>}
  */
 export async function inferSequentialyConcurrent(files, model, uiState) {
 	/*Effectue une inférence de détection sur une ou plusieurs images de manière 

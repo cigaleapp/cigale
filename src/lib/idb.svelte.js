@@ -35,7 +35,9 @@ export const _tablesState = $state({
 export const tables = {
 	...Object.fromEntries(
 		tableNames
+			// @ts-ignore
 			.filter((name) => !NO_REACTIVE_STATE_TABLES.includes(name))
+			// @ts-ignore
 			.map((name) => [name, wrangler(name)])
 	),
 	async initialize() {
@@ -118,6 +120,10 @@ function wrangler(table) {
 				{ ...value, id: `${table}_${nanoid()}` }
 			);
 		},
+		async clear() {
+			await clear(table);
+			_tablesState[table] = [];
+		},
 		/**
 		 * @param {string} id key of the object to remove
 		 */
@@ -167,6 +173,19 @@ export async function set(tableName, value) {
 }
 
 /**
+ * @param {TableName} table
+ * @template {keyof typeof Tables} TableName
+ */
+export async function clear(table) {
+	console.time(`clr ${table}`);
+	const db = await openDatabase();
+	await db.clear(table).then((result) => {
+		console.timeEnd(`clr ${table}`);
+		return result;
+	});
+}
+
+/**
  *
  * @param {TableName} tableName
  * @param {string} key
@@ -200,6 +219,21 @@ export async function list(tableName) {
 }
 
 /**
+ * Returns a comparator to sort objects by their id property
+ * If both IDs are numeric, they are compared numerically even if they are strings
+ * @type {(a: {id: string|number}, b: {id: string|number}) => number}
+ */
+export const idComparator = (a, b) => {
+	if (typeof a.id === 'number' && typeof b.id === 'number') return a.id - b.id;
+
+	if (typeof a.id === 'number') return -1;
+	if (typeof b.id === 'number') return 1;
+
+	if (/^\d+$/.test(a.id) && /^\d+$/.test(b.id)) return Number(a.id) - Number(b.id);
+	return a.id.localeCompare(b.id);
+};
+
+/**
  * Delete an entry from a table by key
  * @param {TableName} table
  * @param {string} id
@@ -213,21 +247,6 @@ export async function drop(table, id) {
 		console.timeEnd(`delete ${table} ${id}`);
 	});
 }
-
-/**
- * Returns a comparator to sort objects by their id property
- * If both IDs are numeric, they are compared numerically even if they are strings
- * @type {(a: {id: string|number}, b: {id: string|number}) => number}
- */
-const idComparator = (a, b) => {
-	if (typeof a.id === 'number' && typeof b.id === 'number') return a.id - b.id;
-
-	if (typeof a.id === 'number') return -1;
-	if (typeof b.id === 'number') return 1;
-
-	if (/^\d+$/.test(a.id) && /^\d+$/.test(b.id)) return Number(a.id) - Number(b.id);
-	return a.id.localeCompare(b.id);
-};
 
 /**
  *
