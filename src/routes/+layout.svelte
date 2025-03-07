@@ -47,11 +47,7 @@
 	);
 </script>
 
-<Navigation hasImages={true}></Navigation>
-
-<div class="global-progress-bar" class:inactive={[0, 1].includes(uiState.processing.progress)}>
-	<div class="completed" style:width="{uiState.processing.progress * 100}%"></div>
-</div>
+<Navigation hasImages={true} progress={uiState.processing.progress}></Navigation>
 
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
@@ -74,6 +70,16 @@
 		/>
 	{/each}
 </section>
+<PreviewSidePannel
+	images={[img, img, img, img, img, img, img, img, img, img, img]}
+	metaNom={['sexe', 'date']}
+	metaType={['enumeration', 'date']}
+	bind:metaValue
+	metaOptions={[['male', 'femelle'], []]}
+	clickFusion={() => {}}
+	clickAddMeta={() => {}}
+	showFusion="true"
+/>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
 	<main>{@render children?.()}</main>
@@ -131,22 +137,6 @@
 		flex-grow: 1;
 		overflow-y: scroll;
 		padding: 1.2em;
-	}
-
-	.global-progress-bar.inactive {
-		opacity: 0;
-		transition: opacity 1s;
-	}
-
-	.global-progress-bar {
-		width: 100%;
-		height: 0.25rem;
-	}
-
-	.global-progress-bar .completed {
-		height: 100%;
-		background: var(--fg-primary);
-		transition: width 0.5s;
 	}
 
 	:global(body) {
