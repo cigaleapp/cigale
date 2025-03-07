@@ -28,6 +28,7 @@
 </script>
 
 <ButtonIcon
+	help={open ? 'Fermer' : 'Réglages'}
 	onclick={() => {
 		open = !open;
 	}}
