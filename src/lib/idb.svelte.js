@@ -73,6 +73,7 @@ function wrangler(table) {
 				_tablesState[table].push(output);
 				_tablesState[table].sort(idComparator);
 			}
+			return output;
 		},
 		/**
 		 *

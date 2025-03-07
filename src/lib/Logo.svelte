@@ -1,10 +1,23 @@
 <script>
 	/**
-	 * @type {{variant?: 'regular' | 'error', drawpercent?: number }}
+	 * @type {{variant?: 'regular' | 'error', drawpercent?: number, loading?: boolean }}
 	 */
-	const { variant = 'regular', drawpercent = 1 } = $props();
+	let { variant = 'regular', drawpercent = $bindable(1), loading = false } = $props();
 
 	const strokeDashoffset = 1206;
+
+	let loadingLogoDrawingForwards = $state(true);
+	if (loading) {
+		$effect(() => {
+			setInterval(() => {
+				drawpercent = drawpercent + (loadingLogoDrawingForwards ? 1 : -1) * 0.03;
+				if (drawpercent > 1) {
+					loadingLogoDrawingForwards = !loadingLogoDrawingForwards;
+					drawpercent = 0;
+				}
+			}, 10);
+		});
+	}
 </script>
 
 <svg viewBox="0 0 3204 2017" fill="var(--fill, none)" xmlns="http://www.w3.org/2000/svg">
