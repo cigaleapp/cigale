@@ -3,12 +3,14 @@ import { Jimp } from 'jimp';
 import { TARGETHEIGHT, TARGETWIDTH } from '../routes/inference/inference';
 import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
-import { observationMetadata } from './metadata';
+import { metadataPrettyKey, metadataPrettyValue, observationMetadata } from './metadata';
+import { toasts } from './toasts.svelte';
 /**
  * @param {Array<import("./database").Observation>} observations
  * @param {import('./database').Protocol} protocolUsed
  */
 export async function generateResultsZip(observations, protocolUsed) {
+	/** @type {Record<string, {label: string; metadata: import('./database').MetadataValues}>}  */
 	const finalMetadata = Object.fromEntries(
 		await Promise.all(
 			observations.map(async (o) => [
@@ -20,10 +22,22 @@ export async function generateResultsZip(observations, protocolUsed) {
 			])
 		)
 	);
+	console.log({ finalMetadata });
+
+	const allMetadataKeys = [
+		...new Set(observations.flatMap((o) => Object.keys(finalMetadata[o.id].metadata)))
+	];
+
+	const metadataDefinitions = Object.fromEntries(
+		await Promise.all(allMetadataKeys.map((key) => db.tables.Metadata.get(key))).then((ms) =>
+			ms.filter((m) => m !== undefined).map((m) => [m.id, m])
+		)
+	);
+
 	const speciesDefinition = await db.tables.Metadata.get('species');
 	if (!speciesDefinition) throw 'Species metadata not found';
 
-	/** @param {string} key  */
+	/** @param {string|undefined} key  */
 	const speciesDisplayName = (key) =>
 		key ? (speciesDefinition.options?.find((o) => o.key === key)?.label ?? key) : undefined;
 
@@ -50,6 +64,25 @@ export async function generateResultsZip(observations, protocolUsed) {
 						observations: finalMetadata,
 						protocol: protocolUsed
 					})
+				),
+				'metadata.csv': strToU8(
+					toCSV(
+						[
+							'Identifiant',
+							'Observation',
+							...allMetadataKeys.map((k) => metadataPrettyKey(metadataDefinitions[k]))
+						],
+						observations.map((o) => ({
+							Identifiant: o.id,
+							Observation: o.label,
+							...Object.fromEntries(
+								Object.entries(finalMetadata[o.id].metadata).map(([key, { value }]) => [
+									metadataPrettyKey(metadataDefinitions[key]),
+									metadataPrettyValue(metadataDefinitions[key], value)
+								])
+							)
+						}))
+					)
 				),
 				...Object.fromEntries(
 					Object.entries(
@@ -114,13 +147,40 @@ export async function cropImage(image) {
 		heightWise: tensor.height / TARGETHEIGHT
 	};
 
-	const cropped = tensor.crop({
-		x: boundingBox.x * scaleFactors.widthWise,
-		y: boundingBox.y * scaleFactors.heightWise,
-		w: boundingBox.width * scaleFactors.widthWise,
-		h: boundingBox.height * scaleFactors.heightWise
-	});
+	try {
+		const cropped = tensor.crop({
+			x: boundingBox.x * scaleFactors.widthWise,
+			y: boundingBox.y * scaleFactors.heightWise,
+			w: boundingBox.width * scaleFactors.widthWise,
+			h: boundingBox.height * scaleFactors.heightWise
+		});
+		// @ts-ignore
+		return cropped.getBuffer(image.contentType);
+	} catch (error) {
+		toasts.warn(`Impossible de recadrer ${image.filename}, l'image sera incluse sans recadrage`);
+		console.error(
+			`Couldn't crop ${image.filename} (id ${image.id}) with `,
+			{ boundingBox, scaleFactors },
+			':',
+			error
+		);
+	}
 
-	// @ts-ignore
-	return cropped.getBuffer(image.contentType);
+	return bytes;
+}
+
+/**
+ * @template {string} HeaderKey
+ * @param {HeaderKey[]} header
+ * @param {Array<Record<NoInfer<HeaderKey>, string>>} rows
+ * @param {string} [separator=";"]
+ */
+function toCSV(header, rows, separator = ';') {
+	/** @param {string} cell */
+	const quote = (cell) => `"${cell.replace(/"/g, '""')}"`;
+
+	return [
+		header.map(quote).join(separator),
+		...rows.map((row) => header.map((key) => quote(row[key])).join(separator))
+	].join('\n');
 }

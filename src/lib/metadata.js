@@ -1,3 +1,4 @@
+import { type } from 'arktype';
 import * as exifParser from 'exif-parser';
 import { BUILTIN_METADATA_IDS, Schemas } from './database';
 import { _tablesState, tables } from './idb.svelte.js';
@@ -357,6 +358,65 @@ function toNumber(type, values) {
 	if (type === 'boolean') return values.map((v) => (v ? 1 : 0));
 	if (type === 'date') return values.map((v) => new Date(/** @type {Date|string} */ (v)).getTime());
 	throw new Error(`Impossible de convertir des valeurs de type ${type} en nombre`);
+}
+
+/**
+ * Returns a human-friendly string for a metadata value.
+ * Used for e.g. CSV exports.
+ * @param {import('./database').Metadata} metadata the metadata definition
+ * @param {import('./database').MetadataValue['value']} value the value of the metadata
+ */
+export function metadataPrettyValue(metadata, value) {
+	switch (metadata.type) {
+		case 'boolean':
+			return value ? 'Oui' : 'Non';
+
+		case 'date':
+			return value instanceof Date ? Intl.DateTimeFormat('fr-FR').format(value) : value.toString();
+
+		case 'enum':
+			return metadata.options?.find((o) => o.key === value)?.label ?? value.toString();
+
+		case 'location': {
+			const { latitude, longitude } = type({ latitude: 'number', longitude: 'number' }).assert(
+				value
+			);
+
+			return `${latitude}, ${longitude}`;
+		}
+
+		case 'boundingbox': {
+			const {
+				x: x1,
+				y: y1,
+				width,
+				height
+			} = type({ x: 'number', y: 'number', width: 'number', height: 'number' }).assert(value);
+
+			return `Boîte de (${x1}, ${y1}) à (${x1 + width}, ${y1 + height})`;
+		}
+
+		case 'float':
+			return Intl.NumberFormat('fr-FR').format(type('number').assert(value));
+
+		default:
+			return value.toString();
+	}
+}
+
+/**
+ * Returns a human-friendly string for a metadata key. Uses the label, and adds useful info about the data format if applicable.
+ * To be used with `metadataPrettyValue`.
+ * @param {import('./database').Metadata} metadata
+ * @returns
+ */
+export function metadataPrettyKey(metadata) {
+	let out = metadata.label;
+	switch (metadata.type) {
+		case 'location':
+			out += ' (latitude, longitude)';
+	}
+	return out;
 }
 
 /**
