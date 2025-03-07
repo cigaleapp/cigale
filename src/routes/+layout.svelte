@@ -4,6 +4,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { setContext } from 'svelte';
 	import Navigation from './Navigation.svelte';
+	import PreviewSidePannel from './PreviewSidePannel.svelte';
 	import { uiState } from './inference/state.svelte';
 
 	import './style.css';
@@ -21,6 +22,10 @@
 	};
 
 	setContext('showSwitchHints', data.showInputHints);
+	let img = 'https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/1015f/MainBefore.jpg';
+	let sexe = 0;
+	let date = 0;
+	let metaValue = $state([sexe, date]);
 </script>
 
 <Navigation hasImages={true} progress={uiState.processing.progress}></Navigation>
@@ -44,6 +49,16 @@
 		/>
 	{/each}
 </section>
+<PreviewSidePannel
+	images={[img, img, img, img, img, img, img, img, img, img, img]}
+	metaNom={['sexe', 'date']}
+	metaType={['enumeration', 'date']}
+	bind:metaValue
+	metaOptions={[['male', 'femelle'], []]}
+	clickFusion={() => {}}
+	clickAddMeta={() => {}}
+	showFusion="true"
+/>
 
 <main>{@render children?.()}</main>
 
