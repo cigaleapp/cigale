@@ -1,6 +1,6 @@
-import { BUILTIN_METADATA_IDS, Schemas } from './database';
 import * as exifParser from 'exif-parser';
-import { tables, _tablesState } from './idb.svelte.js';
+import { BUILTIN_METADATA_IDS, Schemas } from './database';
+import { _tablesState, tables } from './idb.svelte.js';
 
 /**
  *
@@ -127,7 +127,7 @@ export async function mergeMetadataValues(values) {
 			continue;
 		}
 
-		output[key] = mergeMetadata(
+		const merged = mergeMetadata(
 			definition,
 			values.flatMap((singleSubjectValues) =>
 				Object.entries(singleSubjectValues)
@@ -135,6 +135,8 @@ export async function mergeMetadataValues(values) {
 					.map(([, v]) => v)
 			)
 		);
+
+		if (merged !== null) output[key] = merged;
 	}
 
 	return output;
@@ -232,12 +234,7 @@ function mergeMetadata(definition, values) {
 				alternatives: mergeAlternatives(median, values)
 			};
 		case 'none':
-			return {
-				// TODO use null instead
-				value: '',
-				confidence: 0,
-				alternatives: {}
-			};
+			return null;
 	}
 }
 
@@ -271,14 +268,14 @@ function mergeAverage(type, values) {
 	if (type === 'location') {
 		// @ts-ignore
 		return {
-			latitude: average(
+			latitude: avg(
 				values.map(
 					(v) =>
 						// @ts-ignore
 						v.latitude
 				)
 			),
-			longitude: average(
+			longitude: avg(
 				values.map(
 					(
 						v //@ts-ignore
