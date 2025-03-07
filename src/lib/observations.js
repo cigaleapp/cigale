@@ -5,35 +5,30 @@ import { mergeMetadataValues } from './metadata';
  * @param {string[]} parts IDs of observations or images to merge
  */
 export async function mergeToObservation(parts) {
-	const observations = await Promise.all(
-		parts.map(async (part) => {
-			return tables.Observation.get(part);
-		})
-	).then((observations) => observations.filter((o) => o !== undefined));
+	const observations = parts
+		.map((part) => tables.Observation.state.find((o) => o.id === part))
+		.filter((o) => o !== undefined);
 
-	const images = await Promise.all(
-		parts.map(async (part) => {
-			return tables.Image.get(part);
-		})
-	).then((images) => images.filter((i) => i !== undefined));
+	const images = parts
+		.map((part) => tables.Image.state.find((i) => i.id === part))
+		.filter((i) => i !== undefined);
 
-	const imageIds = parts.flatMap(
-		(part) => observations.find((o) => o.id === part)?.images ?? [part]
-	);
+	const imageIds = [...images.map((i) => i.id), ...observations.flatMap((o) => o.images)];
 
 	const observation = await tables.Observation.add({
 		images: imageIds,
 		addedAt: new Date().toISOString(),
 		label: observations[0]?.label ?? images[0]?.filename ?? 'Nouvelle observation',
-		// @ts-expect-error
-		metadataOverrides: await mergeMetadataValues(observations.map((o) => o.metadataOverrides))
+		metadataOverrides: Object.fromEntries(
+			Object.entries(await mergeMetadataValues(observations.map((o) => o.metadataOverrides))).map(
+				([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }]
+			)
+		)
 	});
 
-	await Promise.all(
-		parts.map(async (part) => {
-			await tables.Observation.remove(part).catch(() => {});
-		})
-	);
+	for (const { id } of observations) {
+		await tables.Observation.remove(id);
+	}
 
 	return observation;
 }

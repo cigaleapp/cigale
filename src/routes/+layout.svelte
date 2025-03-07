@@ -5,6 +5,7 @@
 	import Toast from '$lib/Toast.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
+	import { mergeToObservation } from '$lib/observations';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import Navigation from './Navigation.svelte';
@@ -12,7 +13,6 @@
 	import { uiState } from './inference/state.svelte';
 
 	import './style.css';
-	import { mergeToObservation } from '$lib/observations';
 
 	const { children } = $props();
 
@@ -37,14 +37,25 @@
 
 	const showSidePanel = $derived(!['/about', '/settings'].includes(page.route.id ?? ''));
 
-	const selectedHrefs = $derived(
-		uiState.selection.map((id) => uiState.previewURLs.get(id)).filter((href) => href !== undefined)
-	);
-
 	const selectedImages = $derived(
 		uiState.selection
-			.map((id) => tables.Image.state.find((i) => i.id === id))
+			.flatMap((id) => {
+				// Try assuming id === image
+				const image = tables.Image.state.find((i) => i.id === id);
+				if (image) return [image];
+				// Otherwise, get every observation's image
+				return tables.Observation.state
+					.find((i) => i.id === id)
+					?.images.map((i) => tables.Image.state.find((img) => img.id === i))
+					.filter((img) => img !== undefined);
+			})
 			.filter((img) => img !== undefined)
+	);
+
+	const selectedHrefs = $derived(
+		selectedImages
+			.map((image) => uiState.previewURLs.get(image.id))
+			.filter((url) => url !== undefined)
 	);
 </script>
 
@@ -80,6 +91,7 @@
 			metadata={combineMetadataValues(selectedImages)}
 			onmerge={async () => {
 				await mergeToObservation(uiState.selection);
+				uiState.selection = [];
 			}}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
