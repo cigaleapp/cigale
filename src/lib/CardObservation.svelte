@@ -69,7 +69,7 @@
 						<div
 							class="bb"
 							style="left: {bounding.x * 100}%; top: {bounding.y *
-								100}%; width: {bounding.width * 100}%; height: {100*bounding.height}%;"
+								80}%; width: {bounding.width * 100}%; height: {80*bounding.height}%;"
 						></div>
 					{/each}
 				</div>
@@ -178,7 +178,7 @@
 	img {
 		width: 100%;
 		height: 200px;
-		object-fit: cover;
+		/*object-fit: cover;*/
 	}
 
 	footer {
