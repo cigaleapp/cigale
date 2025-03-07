@@ -93,6 +93,12 @@
 				await mergeToObservation(uiState.selection);
 				uiState.selection = [];
 			}}
+			ondelete={async () => {
+				for (const id of uiState.selection) {
+					await tables.Observation.remove(id).catch(() => {});
+					await tables.Image.remove(id).catch(() => {});
+				}
+			}}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
 				await Promise.all(

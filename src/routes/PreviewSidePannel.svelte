@@ -11,13 +11,14 @@
 	 * @property {string[]} images source **href**s of the images/observations we're modifying the metadata on
 	 * @property {() => void} onmerge callback to call when the user wants to merge images or observations into a single one
 	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
+	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
 	 * @property {(key: string, value: import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [allowmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
 	 */
 
 	/** @type {Props} */
-	let { images, onmerge, onaddmetadata, onmetadatachange, allowmerge, metadata } = $props();
+	let { images, onmerge, ondelete, onaddmetadata, onmetadatachange, allowmerge, metadata } = $props();
 
 	// TODO maybe put as a prop? hmmmmm
 	const definitions = $derived(
@@ -67,6 +68,7 @@
 		{/each}
 	</MetadataList>
 	<div class="button">
+		<ButtonPrimary onclick={ondelete} --width="80%">Supprimer les observations</ButtonPrimary>
 		{#if allowmerge}
 			<ButtonPrimary onclick={onmerge} --width="80%">Fusionner les observations</ButtonPrimary>
 		{/if}

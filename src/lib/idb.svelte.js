@@ -100,6 +100,7 @@ function wrangler(table) {
 			const index = _tablesState[table].findIndex((item) => item.id === key);
 			if (index === -1) {
 				console.log(`${logLabel}: item not found in reactive state, refetching entire list`);
+				// @ts-ignore
 				_tablesState[table] = await this.list();
 			} else {
 				console.log(`${logLabel}: updating state @ ${table}[${index}]`);
@@ -121,12 +122,18 @@ function wrangler(table) {
 			_tablesState[table] = [];
 		},
 		/**
-		 * @param {string} id key of the object to remove
+		 * @param {string | IDBKeyRange} id key of the object to remove
 		 */
 		async remove(id) {
 			await drop(table, id);
 			const index = _tablesState[table].findIndex((item) => item.id === id);
-			if (index !== -1) delete _tablesState[table][index];
+			if (index !== -1) {
+				console.warn(`del ${table} ${id}: not found in reactive state, re-fetching`);
+				// @ts-ignore
+				_tablesState[table] = await this.list();
+			} else {
+				delete _tablesState[table][index];
+			}
 		},
 		list: async () => list(table),
 		all: () => iterator(table),
@@ -237,16 +244,22 @@ export const idComparator = (a, b) => {
 /**
  * Delete an entry from a table by key
  * @param {TableName} table
- * @param {string} id
+ * @param {string | IDBKeyRange} id
  * @returns {Promise<void>}
  * @template {keyof typeof Tables} TableName
  */
 export async function drop(table, id) {
 	console.time(`delete ${table} ${id}`);
 	const db = await openDatabase();
-	return await db.delete(table, IDBKeyRange.only(id)).then(() => {
-		console.timeEnd(`delete ${table} ${id}`);
-	});
+	return await db
+		.delete(table, id)
+		.then(() => {
+			console.timeEnd(`delete ${table} ${id}`);
+			return list(table);
+		})
+		.then((list) => {
+			console.log(`delete ${table} ${id}: objects are now ${list.map((o) => o.id).join(', ')}`);
+		});
 }
 
 /**
