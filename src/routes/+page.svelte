@@ -154,7 +154,7 @@
 			if (imageBufferWasSaved(image) && !imageIsCropped(image)) {
 				void (async () => {
 					try {
-						const file = await db.get('ImageFile', image.id);
+						const file = await db.get('ImageFile', imageIdToFileId(image.id));
 						if (!file) return;
 						await analyzeImage(file.bytes, image.id, image);
 					} catch (error) {
@@ -167,8 +167,8 @@
 	});
 
 	$effect(() => {
-		uiState.processing.total = images.length;
-		uiState.processing.done = images.filter((image) => image.loading === undefined).length;
+		uiState.processing.total = tables.Image.state.length;
+		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.crop).length;
 	});
 
 	$effect(() => {
