@@ -12,7 +12,7 @@ export class DragSelect {
 	#instance;
 
 	/**
-	 * title of last selected item that wasn't selected by shift-clicking.
+	 * id of last selected item that wasn't selected by shift-clicking.
 	 * needed to properly do shift-click selection
 	 *
 	 * See https://stackoverflow.com/a/16530782
@@ -27,12 +27,12 @@ export class DragSelect {
 	setSelection(newSelection) {
 		if (!this.#instance) return;
 		// Tell DragSelect that the set of selected items changed
-		// Since we store the selection as an array of titles, we
-		// find the corresponding elements in the imagesContainer by [data-title]
+		// Since we store the selection as an array of ids, we
+		// find the corresponding elements in the imagesContainer by [data-id]
 		return this.#instance.setSelection(
 			// @ts-ignore
-			newSelection.map((title) =>
-				this.imagesContainer?.querySelector(`[data-selectable][data-title="${title}"]`)
+			newSelection.map((id) =>
+				this.imagesContainer?.querySelector(`[data-selectable][data-id="${id}"]`)
 			)
 		);
 	}
@@ -79,21 +79,21 @@ export class DragSelect {
 
 		// React to a selection event: we just selected a new item by dragging
 		this.#instance.subscribe('DS:select', ({ item }) => {
-			// If it doesn't have a [data-title], we can't add it to the selection, do nothing
-			if (!item.dataset.title) return;
+			// If it doesn't have a [data-id], we can't add it to the selection, do nothing
+			if (!item.dataset.id) return;
 			// If it's loading (has [data-loading]), do nothing: can't select a non-loaded item
 			if (item.dataset.loading) return;
-			// Add the title of the selected item to the selection
-			this.selection.push(item.dataset.title);
+			// Add the id of the selected item to the selection
+			this.selection.push(item.dataset.id);
 		});
 
 		// React to an unselection event: we just unselected an item by dragging
 		this.#instance.subscribe('DS:unselect', ({ item }) => {
-			// If it doesn't have a [data-title], we can't remove it from the selection, do nothing
-			if (!item.dataset.title) return;
-			// Remove the title of the unselected item from the selection by setting this.selection
-			// to a new array with every value except the one that matches the title of the item we unselected
-			this.selection = this.selection.filter((title) => title !== item.dataset.title);
+			// If it doesn't have a [data-id], we can't remove it from the selection, do nothing
+			if (!item.dataset.id) return;
+			// Remove the id of the unselected item from the selection by setting this.selection
+			// to a new array with every value except the one that matches the id of the item we unselected
+			this.selection = this.selection.filter((id) => id !== item.dataset.id);
 		});
 
 		// Implement shift-click selection:
@@ -108,7 +108,7 @@ export class DragSelect {
 				// We didn't hold the Shift key while selecting this item, so we change the anchor to that element
 				this.shiftSelectionAnchor =
 					// @ts-ignore
-					event.target.closest('[data-selectable]')?.dataset.title ?? this.shiftSelectionAnchor;
+					event.target.closest('[data-selectable]')?.dataset.id ?? this.shiftSelectionAnchor;
 				return;
 			}
 
@@ -120,10 +120,10 @@ export class DragSelect {
 				event.target.closest('[data-selectable]')?.dataset.index
 			);
 
-			// Get index of the shift selection anchor: find the element by its title, then get its index
+			// Get index of the shift selection anchor: find the element by its id, then get its index
 			const anchorIndex = Number.parseInt(
 				// @ts-ignore
-				this.imagesContainer?.querySelector(`[data-title="${this.shiftSelectionAnchor}"]`)?.dataset
+				this.imagesContainer?.querySelector(`[data-id="${this.shiftSelectionAnchor}"]`)?.dataset
 					.index
 			);
 
