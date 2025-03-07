@@ -1,10 +1,8 @@
 <script>
 	import { page } from '$app/state';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import Download from '~icons/ph/download-simple';
-	import Gear from '~icons/ph/gear';
 	import Sup from '~icons/ph/caret-right';
+	import Download from '~icons/ph/download-simple';
 
 	/**
 	 * @typedef Props
@@ -72,14 +70,6 @@
 			<div class="line"></div>
 		{/if}
 	</a>
-
-	<ButtonIcon
-		onclick={() => {
-			console.log(page.route.id);
-		}}
-	>
-		<Gear></Gear>
-	</ButtonIcon>
 </nav>
 
 <style>

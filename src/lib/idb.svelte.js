@@ -118,6 +118,14 @@ function wrangler(table) {
 				{ ...value, id: `${table}_${nanoid()}` }
 			);
 		},
+		/**
+		 * @param {string} id key of the object to remove
+		 */
+		async remove(id) {
+			await drop(table, id);
+			const index = _tablesState[table].findIndex((item) => item.id === id);
+			if (index !== -1) delete _tablesState[table][index];
+		},
 		list: async () => list(table),
 		all: () => iterator(table),
 		/** @param {string} index  */
@@ -189,6 +197,21 @@ export async function list(tableName) {
 	return await db
 		.getAll(tableName)
 		.then((values) => values.map(validator.assert).sort(idComparator));
+}
+
+/**
+ * Delete an entry from a table by key
+ * @param {TableName} table
+ * @param {string} id
+ * @returns {Promise<void>}
+ * @template {keyof typeof Tables} TableName
+ */
+export async function drop(table, id) {
+	console.time(`delete ${table} ${id}`);
+	const db = await openDatabase();
+	return await db.delete(table, id).then(() => {
+		console.timeEnd(`delete ${table} ${id}`);
+	});
 }
 
 /**
