@@ -101,7 +101,7 @@ export async function observationMetadata(observation) {
 		(images) => images.filter(Boolean)
 	);
 
-	const metadataFromImages = await mergeMetadataValues(images);
+	const metadataFromImages = await mergeMetadataValues(images.map((img) => img.metadata));
 
 	return {
 		...metadataFromImages,
@@ -111,14 +111,14 @@ export async function observationMetadata(observation) {
 
 /**
  *
- * @param {import("./database").Image[]} images
+ * @param {Array<import('./database').MetadataValues>} values
  * @returns {Promise<import("./database").MetadataValues>}
  */
-export async function mergeMetadataValues(images) {
+export async function mergeMetadataValues(values) {
 	/** @type {import("./database").MetadataValues}  */
 	const output = {};
 
-	const keys = new Set(images.map((image) => Object.keys(image.metadata)));
+	const keys = new Set(values.flatMap((singleSubjectValues) => Object.keys(singleSubjectValues)));
 
 	for (const key of keys) {
 		const definition = await tables.Metadata.get(key);
@@ -129,8 +129,8 @@ export async function mergeMetadataValues(images) {
 
 		output[key] = mergeMetadata(
 			definition,
-			images.flatMap((img) =>
-				Object.entries(img.metadata)
+			values.flatMap((singleSubjectValues) =>
+				Object.entries(singleSubjectValues)
 					.filter(([k]) => k === key)
 					.map(([, v]) => v)
 			)
