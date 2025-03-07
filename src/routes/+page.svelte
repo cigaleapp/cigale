@@ -202,7 +202,7 @@
 	<Dropzone
 		clickable={images.length === 0}
 		onfiles={async ({ files }) => {
-			const currentLength = images.length;
+			const currentLength = tables.Image.state.length;
 			await Promise.all(
 				files.map(async (file, index) => {
 					const id = imageId(currentLength + index);
