@@ -63,7 +63,8 @@
 			title: index.toString(),
 			stacksize: 1,
 			loading: Math.random() > 0.8 ? (Math.random() > 0.3 ? Math.random() : -1) : undefined,
-			boundingBoxes: boundingBoxes[index]
+			boundingBoxes: boundingBoxes[index],
+			id : index
 		}))
 	);
 	

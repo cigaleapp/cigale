@@ -31,13 +31,24 @@ const MetadataValues = type({
 	'[/[a-z0-9_]+/]': MetadataValue
 });
 
+const ImageFile = table(
+	['id'],
+	type({
+		/** ID of the associated Image object */
+		id: ID,
+		bytes: 'ArrayBuffer'
+	})
+);
+
 const Image = table(
 	['id', 'addedAt'],
 	type({
-		id: ID,
+		id: /\d+(_\d+)*/,
 		filename: 'string',
 		addedAt: 'string.date.iso.parse',
-		metadata: MetadataValues
+		metadata: MetadataValues,
+		contentType: /\w+\/\w+/,
+		bufferExists: 'boolean'
 	})
 );
 
@@ -59,7 +70,8 @@ const MetadataType = type.enumerated(
 	'float',
 	'enum',
 	'date',
-	'location'
+	'location',
+	'boundingbox'
 );
 
 /**
@@ -72,7 +84,8 @@ export const METADATA_TYPES = {
 	float: 'nombre',
 	enum: 'énumération',
 	date: 'date',
-	location: 'localisation'
+	location: 'localisation',
+	boundingbox: 'boîte de recadrage'
 };
 
 const MetadataMergeMethod = type.enumerated('min', 'max', 'average', 'median', 'none');
@@ -158,6 +171,14 @@ const Settings = table(
  */
 export const BUILTIN_METADATA = [
 	{
+		id: 'crop',
+		description: "Boîte de recadrage pour l'image",
+		label: '',
+		type: 'boundingbox',
+		mergeMethod: 'none',
+		required: false
+	},
+	{
 		id: 'sex',
 		description: "Sexe de l'individu",
 		label: 'Sexe',
@@ -213,8 +234,11 @@ export const Schemas = {
 	Settings
 };
 
+export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile']);
+
 export const Tables = {
 	Image,
+	ImageFile,
 	Observation,
 	Metadata,
 	Protocol,

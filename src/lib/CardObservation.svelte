@@ -2,6 +2,9 @@
 	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
 	import Card from './Card.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
+	import Logo from './Logo.svelte';
+	import ButtonInk from './ButtonInk.svelte';
+	import IconDelete from '~icons/ph/trash';
 	import { tooltip } from './tooltips';
 
 	/**
@@ -9,6 +12,7 @@
 	 * @type {object}
 	 * @property {() => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
+	 * @property {() => void} [ondelete]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
@@ -20,7 +24,8 @@
 	 * @property {number} boundingBoxes.y 
 	 * @property {number} boundingBoxes.width 
 	 * @property {number} boundingBoxes.height
-	 *
+	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
+	 * @property {string} [statusText] - text to show when loading and progress is -1
 	 */
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
@@ -31,9 +36,11 @@
 		image,
 		loading,
 		selected,
-		loadingText = 'Chargement…',
+		errored = false,
+		statusText = 'Chargement…',
 		stacksize = 1,
 		boundingBoxes = [],
+		ondelete,
 		...rest
 	} = $props();
 
@@ -46,21 +53,41 @@
 	let titleWasEllipsed = $derived(titleOffsetWidth < titleElement?.scrollWidth);
 </script>
 
-<div class="observation" class:selected class:loading class:stacked {...rest}>
+<div
+	class="observation"
+	class:selected
+	class:loading
+	class:stacked
+	{...rest}
+	use:tooltip={errored ? statusText : undefined}
+>
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
-		<Card onclick={loading ? undefined : (onclick ?? (() => {}))}>
+		<Card onclick={loading || errored ? undefined : (onclick ?? (() => {}))}>
 			<div class="inner">
-				{#if loading !== undefined}
+				{#if loading !== undefined || errored}
 					<div class="loading-overlay">
-						<LoadingSpinner progress={loading === -1 ? undefined : loading} />
-						<span class="text" class:smol={loading === -1}>
-							{#if loading !== -1}
-								{Math.round(loading * 100)}%
+						{#if errored}
+							<Logo --size="1.5em" variant="error" />
+						{:else}
+							<LoadingSpinner progress={loading === -1 ? undefined : loading} />
+						{/if}
+						<span class="text" class:smol={errored || loading === -1}>
+							{#if errored || loading === undefined}
+								Erreur
+							{:else if loading === -1}
+								{statusText}
 							{:else}
-								{loadingText}
+								{Math.round(loading * 100)}%
 							{/if}
 						</span>
+						{#if ondelete}
+							<section class="errored-actions">
+								<ButtonInk onclick={ondelete}>
+									<IconDelete /> Supprimer
+								</ButtonInk>
+							</section>
+						{/if}
 					</div>
 				{/if}
 				<div class="containbb">
@@ -298,5 +325,12 @@
 		.observation:not(.loading):is(:hover, :has(:focus-visible)) .stack-backgroud-card {
 			transform: rotate(3deg);
 		}
+	}
+
+	.errored-actions {
+		margin-top: 0.75em;
+		font-size: 0.4em;
+		--fg: var(--fg-error);
+		--bg-hover: var(--bg-error);
 	}
 </style>

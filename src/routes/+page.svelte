@@ -1,87 +1,328 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
-	import * as mobilenet from '@tensorflow-models/mobilenet';
-	import * as tf from '@tensorflow/tfjs';
-	let image_file = $state();
-	let classe = $state();
-	let certainty = $state();
+	import * as db from '$lib/idb.svelte';
+	import { tables } from '$lib/idb.svelte';
+	import Logo from '$lib/Logo.svelte';
+	import { storeMetadataValue } from '$lib/metadata';
+	import { toasts } from '$lib/toasts.svelte';
+	import { formatISO } from 'date-fns';
+	import { SvelteMap } from 'svelte/reactivity';
+	import {
+		inferSequentialy,
+		loadModel,
+		MODELDETECTPATH,
+		TARGETWIDTH,
+		TARGETHEIGHT
+	} from './inference/inference';
+	import { uiState } from './inference/state.svelte';
 
-	let canva_element = $state();
+	/** @type {Map<string, string>} */
+	const previewURLs = new SvelteMap();
+
+	/**
+	 * Maps image ID to error message
+	 * @type {Map<string, string>}
+	 */
+	const erroredImages = new SvelteMap();
+
+	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
+	const images = $derived(
+		tables.Image.state.map((image, i) => ({
+			image: previewURLs.get(image.id) ?? '',
+			title: image.filename,
+			id: image.id,
+			index: i,
+			stacksize: 1,
+			loading:
+				image.bufferExists && image.metadata.crop && previewURLs.has(image.id) ? undefined : -1
+		}))
+	);
+
+	/**
+	 * Retourne un id d'image sous la forme 000001_000001
+	 * @param {number|string} index
+	 * @param {number} subindex
+	 */
+	function imageId(index, subindex = 0) {
+		return `${Number.parseInt(index.toString(), 0).toString().padStart(6, '0')}_${subindex.toString().padStart(6, '0')}`;
+	}
+
+	/**
+	 * Retourne l'id d'un objet ImageFile associé à l'objet Image
+	 * @param {string} id
+	 */
+	function imageIdToFileId(id) {
+		return id.replace(/(_\d+)+$/, '');
+	}
+
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 */
+	function imageIsCropped(image) {
+		return image.metadata.crop || erroredImages.has(image.id);
+	}
+
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 */
+	function imageBufferWasSaved(image) {
+		return image.bufferExists || erroredImages.has(image.id);
+	}
+
+	let loadingLogoDrawPercent = $state(0);
+	let loadingLogoDrawingForwards = $state(true);
+	$effect(() => {
+		setInterval(() => {
+			loadingLogoDrawPercent =
+				loadingLogoDrawPercent + (loadingLogoDrawingForwards ? 1 : -1) * 0.03;
+			if (loadingLogoDrawPercent > 1) {
+				loadingLogoDrawingForwards = !loadingLogoDrawingForwards;
+				loadingLogoDrawPercent = 0;
+			}
+		}, 10);
+	});
+
+	let cropperModel = $state();
+	async function loadCropperModel() {
+		cropperModel = await loadModel(false);
+		toasts.success('Modèle de recadrage chargé');
+	}
+
+	/**
+	 * @param {string} contentType
+	 * @param {ArrayBuffer} buffer
+	 * */
+	function arrayBufferToObjectURL(contentType, buffer) {
+		const blob = new Blob([buffer], { type: contentType });
+		return URL.createObjectURL(blob);
+	}
+
+	/**
+	 * @param {File} file
+	 * @param {string} id
+	 */
+	async function writeImage(file, id) {
+		console.log('writeImage', file, id);
+		const image = await tables.Image.raw.get(id);
+		if (!image) throw 'Image introuvable';
+		const bytes = await file.arrayBuffer();
+		await db.set('ImageFile', { id: imageIdToFileId(id), bytes });
+		previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
+		await tables.Image.update(id, 'bufferExists', true);
+		await analyzeImage(bytes, id, image);
+	}
+
+	/**
+	 * @param {ArrayBuffer} buffer
+	 * @param {string} id
+	 * @param {object} image
+	 * @param {string} image.contentType
+	 * @param {string} image.filename
+	 */
+	async function analyzeImage(buffer, id, { contentType, filename }) {
+		if (!cropperModel) {
+			toasts.error(
+				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
+			);
+			return;
+		}
+
+		const [[boundingBoxes], [bestScores]] = await inferSequentialy(
+			[buffer],
+			cropperModel,
+			$state.snapshot(uiState)
+		);
+
+		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
+		let [firstScore, ...otherScores] = bestScores;
+
+		firstBoundingBox ??= [0, 0, TARGETWIDTH, TARGETHEIGHT];
+		firstScore ??= 1;
+		/**
+		 * @param {[number, number, number, number]} param0
+		 */
+		const toCropBox = ([x, y, width, height]) => ({
+			x,
+			y,
+			width,
+			height
+		});
+
+		await storeMetadataValue({
+			subjectId: id,
+			metadataId: 'crop',
+			type: 'boundingbox',
+			value: toCropBox(firstBoundingBox),
+			confidence: firstScore
+		});
+
+		// Create one more image for each new boundingbox, with id "(original id)_(1 to boundingBoxes.length)"
+		for (const [i, box] of otherBoundingBoxes.entries()) {
+			await tables.Image.set({
+				id: imageId(parseInt(id), i + 1),
+				filename,
+				contentType,
+				addedAt: formatISO(new Date()),
+				bufferExists: true,
+				metadata: {
+					crop: {
+						value: JSON.stringify(toCropBox(box)),
+						confidence: otherScores[i],
+						alternatives: {}
+					}
+				}
+			});
+		}
+	}
 
 	$effect(() => {
-		if (image_file) {
-			let img = Array.from(image_file)[0];
-			let reader = new FileReader();
-			reader.onload = function (e) {
-				let img = new Image();
-				img.src = e.target?.result?.toString() ?? '';
-				img.onload = async function () {
-					let tensor = tf.browser.fromPixels(img).resizeBilinear([224, 224]).toFloat();
-					tensor = tensor.div(tensor.max());
-					tensor = tensor.sub(tensor.mean());
-
-					let tensor_copy = tf.browser.fromPixels(img).clone();
-
-					// @ts-ignore
-					tensor_copy = tensor_copy.resizeBilinear([224, 224]).toFloat();
-					tensor_copy = tensor_copy.div(255.0);
-
-					canva_element.width = 224;
-					canva_element.height = 224;
-					await tf.browser.toPixels(tensor_copy, canva_element);
-
-					// eslint-disable-next-line no-unused-vars
-					tensor = tensor.expandDims();
-
-					const model = await mobilenet.load();
-					const predictions = await model.classify(img);
-
-					console.log(predictions);
-					classe = predictions[0].className;
-					certainty = predictions[0].probability;
-				};
-			};
-			reader.readAsDataURL(img);
+		if (!cropperModel) return;
+		for (const image of tables.Image.state) {
+			if (imageBufferWasSaved(image) && !imageIsCropped(image)) {
+				void (async () => {
+					try {
+						const file = await db.get('ImageFile', image.id);
+						if (!file) return;
+						await analyzeImage(file.bytes, image.id, image);
+					} catch (error) {
+						console.error(error);
+						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
+					}
+				})();
+			}
 		}
 	});
 
-	/** @type {Array<{ index: number, image: string, title: string, stacksize: number, loading?: number }>} */
-	const images = $state([]);
+	$effect(() => {
+		uiState.processing.total = images.length;
+		uiState.processing.done = images.filter((image) => image.loading === undefined).length;
+	});
+
+	$effect(() => {
+		for (const image of tables.Image.state) {
+			if (previewURLs.has(image.id)) continue;
+			void (async () => {
+				const file = await db.get('ImageFile', image.id.replace(/(_\d+)+$/, ''));
+				if (!file) return;
+				previewURLs.set(image.id, arrayBufferToObjectURL(image.contentType, file.bytes));
+			})();
+		}
+	});
 </script>
 
-<h1>Démo observations lol</h1>
-<p>Zone ou on peut selectionner en glissant = fond gris</p>
+{#snippet modelsource()}
+	<a
+		href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/tree/main/models/{MODELDETECTPATH}"
+		target="_blank"
+	>
+		<code>{MODELDETECTPATH}</code>
+	</a>
+{/snippet}
 
-<Dropzone
-	clickable={images.length === 0}
-	onfiles={({ files }) => {
-		console.log(`Adding ${files.length} files`);
-		console.log(files);
-		images.push(
-			...files.map((file, index) => ({
-				index: images.length + index,
-				image: URL.createObjectURL(file),
-				title: file.name,
-				stacksize: Math.random() > 0.2 ? Math.ceil(Math.random() * 5) : 1,
-				loading: Math.random() > 0.8 ? (Math.random() > 0.3 ? Math.random() : -1) : undefined
-			}))
-		);
-	}}
->
-	<section class="demo-observations">
-		<AreaObservations {images} loadingText="Analyse…" />
+{#await loadCropperModel()}
+	<section class="loading">
+		<Logo drawpercent={loadingLogoDrawPercent} />
+		<p>Chargement du modèle de recadrage…</p>
+		<p class="source">{@render modelsource()}</p>
 	</section>
-</Dropzone>
-
-<h1>Welcome to chocolat</h1>
-<input type="file" accept="image/*" bind:files={image_file} />
-<p>classse : {classe} with certainty : {certainty}</p>
-<canvas id="canvas" bind:this={canva_element}></canvas>
+{:then _}
+	<Dropzone
+		clickable={images.length === 0}
+		onfiles={async ({ files }) => {
+			const currentLength = images.length;
+			await Promise.all(
+				files.map(async (file, index) => {
+					const id = imageId(currentLength + index);
+					try {
+						await tables.Image.set({
+							id,
+							filename: file.name,
+							addedAt: formatISO(new Date()),
+							metadata: {},
+							bufferExists: false,
+							contentType: file.type
+						});
+						await writeImage(file, id);
+					} catch (error) {
+						console.error(error);
+						erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+					}
+				})
+			);
+		}}
+	>
+		<section class="observations" class:empty={!images.length}>
+			<AreaObservations
+				bind:selection={uiState.selection}
+				{images}
+				errors={erroredImages}
+				loadingText="Analyse…"
+				ondelete={async (id) => {
+					await tables.Image.remove(id);
+					await tables.Observation.remove(id);
+					await db.drop('ImageFile', imageIdToFileId(id));
+				}}
+				binds={{
+					'$mod+u': {
+						help: 'Supprimer toutes les images et observations',
+						async do() {
+							toasts.warn('Suppression de toutes les images et observations…');
+							await tables.Image.clear();
+							await db.clear('ImageFile');
+							await tables.Observation.clear();
+						}
+					}
+				}}
+			/>
+			{#if !images.length}
+				<p>Cliquer ou déposer des images ici</p>
+			{/if}
+		</section>
+	</Dropzone>
+{:catch error}
+	<section class="loading errored">
+		<Logo variant="error" />
+		<h2>Oops!</h2>
+		<p>Impossible de charger le modèle de recadrage</p>
+		<p class="source">{@render modelsource()}</p>
+		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
+	</section>
+{/await}
 
 <style>
-	.demo-observations {
+	.observations {
 		padding: 4em;
-		background-color: rgb(from var(--fg-neutral) r g b / 0.1);
+		display: flex;
+		flex-grow: 1;
+	}
+
+	.observations.empty {
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+	}
+
+	.loading {
+		display: flex;
+		flex-direction: column;
+		gap: 1.2em;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		/* Logo size */
+		--size: 5em;
+	}
+
+	.loading .source {
+		font-size: 0.8em;
+	}
+
+	.loading.errored {
+		gap: 0.5em;
+	}
+
+	.loading.errored *:not(p.message) {
+		color: var(--fg-error);
 	}
 </style>
