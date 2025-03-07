@@ -15,36 +15,31 @@ show a pop up to crop an image
 	 * @property {() => void} [opener] a function you can bind to, to open the modal
 	 * @property {string} image the image to crop 
      * @property {typeof bbs.BoundingBoxes[]} boundingBoxes the bounding boxes to display
-     * @property {typeof bbs.BoundingBoxes[]} [boundingBoxesout] the bounding boxes to display
+     * @property {(boundingbox:typeof bbs.BoundingBoxes[], id:number) => void} onconfirm a function to call when the user confirms the crop
+     * @property {number} id the id of the image 
 	 */
 
     /**  @type {Props} */
     let {
         key:StateKey,
         opener = $bindable(undefined),
-        boundingBoxesout = $bindable([]),
         image,
-        boundingBoxes = []
+        boundingBoxes = [],
+        onconfirm,
+        id,
     } = $props();
-    
+
     let container = $state();
 
     /** @type {typeof bbs.BoundingBoxes[]} */
-    let BBout = boundingBoxes.map(bb => ({ x: bb.x, y: bb.y, width: bb.width, height: bb.height }));
+    let BBout = [];
+    for (let i=0;i<boundingBoxes.length; i++){
+        BBout.push({x:boundingBoxes[i].x, y:boundingBoxes[i].y, width:boundingBoxes[i].width, height:boundingBoxes[i].height});
+    }
 
     export function cropconfirm () {
         console.log('crop confirm');
-        for (let i=0; i<boundingBoxes.length; i++){
-            boundingBoxesout[i].x = BBout[i].x;
-            boundingBoxesout[i].y = BBout[i].y;
-            boundingBoxesout[i].width = BBout[i].width;
-            boundingBoxesout[i].height = BBout[i].height;
-        }
-    }
-
-    export function cropcancel () {
-        console.log('crop cancel');
-        boundingBoxesout = boundingBoxes.map(bb => ({ ...bb }));
+        onconfirm(BBout,id);
     }
 
 </script>
@@ -52,7 +47,6 @@ show a pop up to crop an image
     key={StateKey}
     title="Crop"
     onconfirm={() => cropconfirm()}
-    oncancel={() => cropcancel()}
     bind:open={opener}
     confirm="Crop"
     cancel="Cancel">
@@ -64,7 +58,7 @@ show a pop up to crop an image
             <DraggableBoundingBox bb={bb} bind:bbout={BBout[index]} sizew={container.getBoundingClientRect().width} sizeh={container.getBoundingClientRect().height}></DraggableBoundingBox>
         {/each}
     {/if}
-    <img src = {image} alt="chocolat" style="width: 100%; height: 100%;" bind:this={container}>
+    <img src = {image} alt="imagetocrop" style="width: 100%; height: 100%;" bind:this={container}>
 
 </div>
 

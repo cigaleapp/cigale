@@ -37,12 +37,21 @@
 		}]);
 	}
 
-	let boundingBoxesout = $state(boundingBoxes);
+	/**
+	 * @param {Array<{x: number, y: number, width: number, height: number}>} boundingBoxesout
+	 * @param {number} id
+	 */
+	function oncrop (boundingBoxesout,id) { 
+		console.log(boundingBoxesout,"is cropped! at id : ",id);
+		for (let i = 0; i<boundingBoxesout.length; i++){
+			boundingBoxes[id][i].x = boundingBoxesout[i].x;
+			boundingBoxes[id][i].y = boundingBoxesout[i].y;
+			boundingBoxes[id][i].width = boundingBoxesout[i].width;
+			boundingBoxes[id][i].height = boundingBoxesout[i].height;
+		}
 
-	$effect(() => {
-		console.log("boundingBoxesout : ");
-		console.log(boundingBoxesout);
-	})
+	}
+
 
 	let images = $state(
 		img_list.map((image, index) => ({
@@ -72,8 +81,9 @@
 		key="cropping"	
 		bind:opener={openFeur}
 		image={img_list[parseInt(selection[0])]}
+		id = {parseInt(selection[0])}
 		boundingBoxes={boundingBoxes[parseInt(selection[0])]}
-		bind:boundingBoxesout={boundingBoxesout[parseInt(selection[0])]}>
+		onconfirm={oncrop}>
 	</Cropup>
 {/if}
 
