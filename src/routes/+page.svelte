@@ -99,11 +99,7 @@
 			return;
 		}
 
-		const [[boundingBoxes], [bestScores]] = await inferSequentialy(
-			[buffer],
-			cropperModel,
-			$state.snapshot(uiState)
-		);
+		const [[boundingBoxes], [bestScores]] = await inferSequentialy([buffer], cropperModel);
 
 		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
 		let [firstScore, ...otherScores] = bestScores;
