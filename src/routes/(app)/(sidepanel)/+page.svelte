@@ -16,8 +16,8 @@
 		MODELDETECTPATH,
 		TARGETHEIGHT,
 		TARGETWIDTH
-	} from './inference/inference';
-	import { uiState } from './inference/state.svelte';
+	} from '$lib/inference.js';
+	import { uiState } from '$lib/state.svelte.js';
 
 	onMount(() => {
 		uiState.keybinds['$mod+u'] = {
@@ -34,7 +34,6 @@
 	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
 
-	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(toAreaObservationProps(tables.Image.state, tables.Observation.state));
 
 	let cropperModel = $state();
@@ -100,11 +99,7 @@
 			return;
 		}
 
-		const [[boundingBoxes], [bestScores]] = await inferSequentialy(
-			[buffer],
-			cropperModel,
-			$state.snapshot(uiState)
-		);
+		const [[boundingBoxes], [bestScores]] = await inferSequentialy([buffer], cropperModel);
 
 		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
 		let [firstScore, ...otherScores] = bestScores;
@@ -151,7 +146,11 @@
 	$effect(() => {
 		if (!cropperModel) return;
 		for (const image of tables.Image.state) {
-			if (imageBufferWasSaved(image) && !imageIsCropped(image)) {
+			if (
+				imageBufferWasSaved(image) &&
+				!imageIsCropped(image) &&
+				!uiState.loadingImages.has(image.id)
+			) {
 				void (async () => {
 					try {
 						const file = await db.get('ImageFile', imageIdToFileId(image.id));
@@ -215,10 +214,13 @@
 							bufferExists: false,
 							contentType: file.type
 						});
+						uiState.loadingImages.add(id);
 						await writeImage(file, id);
 					} catch (error) {
 						console.error(error);
 						erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+					} finally {
+						uiState.loadingImages.delete(id);
 					}
 				})
 			);

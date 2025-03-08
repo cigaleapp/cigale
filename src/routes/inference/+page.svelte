@@ -1,7 +1,7 @@
 <script>
-	import { loadModel, inferSequentialy, classify, torawpath } from './inference.js';
-	import { labelize, applyBBsOnTensors, loadClassMapping } from './inference_utils.js';
-	import { uiState as img_proceed } from './state.svelte.js';
+	import { loadModel, inferSequentialy, classify, torawpath } from '$lib/inference.js';
+	import { labelize, applyBBsOnTensors, loadClassMapping } from '$lib/inference_utils.js';
+	import { uiState as img_proceed } from '$lib/state.svelte.js';
 
 	//ort.env.wasm.wasmPaths = 'https://unpkg.com/onnxruntime-web@dev/dist/';
 

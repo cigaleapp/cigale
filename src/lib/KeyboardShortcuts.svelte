@@ -6,7 +6,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {import('../routes/inference/state.svelte.js').Keymap} binds
+	 * @property {import('$lib/state.svelte.js').Keymap} binds
 	 * @property {boolean} [preventDefault=false] call e.preventDefault() before calling the handlers
 	 */
 

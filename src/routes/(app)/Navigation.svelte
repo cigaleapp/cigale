@@ -20,6 +20,8 @@
 	/** @type {Props} */
 	let { hasImages = true, progress = 0 } = $props();
 
+	const path = $derived(page.url.hash.replace(/^#/, ''));
+
 	/** @type {number|undefined} */
 	let height = $state();
 
@@ -35,7 +37,7 @@
 
 		<a href="#/">
 			Import
-			{#if page.route.id == '/'}
+			{#if path == '/'}
 				<div class="line"></div>
 			{/if}
 		</a>
@@ -45,13 +47,13 @@
 		<a
 			href="#/crop"
 			aria-disabled={!hasImages &&
-				page.route.id != '/classification' &&
-				page.route.id != '/resultats' &&
-				page.route.id != '/crop' &&
-				page.route.id != '/import'}
+				path != '/classification' &&
+				path != '/resultats' &&
+				path != '/crop' &&
+				path != '/import'}
 		>
 			Crop
-			{#if page.route.id == '/crop'}
+			{#if path == '/crop'}
 				<div class="line"></div>
 			{/if}
 		</a>
@@ -60,12 +62,10 @@
 
 		<a
 			href="#/classification"
-			aria-disabled={page.route.id != '/classification' &&
-				page.route.id != '/resultats' &&
-				page.route.id != '/crop'}
+			aria-disabled={path != '/classification' && path != '/resultats' && path != '/crop'}
 		>
 			Classification
-			{#if page.route.id == '/classification'}
+			{#if path == '/classification'}
 				<div class="line"></div>
 			{/if}
 		</a>
@@ -76,7 +76,7 @@
 				<Download />
 				Résultats
 			</div>
-			{#if page.route.id == '/resultats'}
+			{#if path == '/resultats'}
 				<div class="line"></div>
 			{/if}
 		</a> -->
@@ -149,12 +149,6 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
-	}
-
-	.download {
-		display: flex;
-		align-items: center;
-		gap: 1em;
 	}
 
 	.line {

@@ -429,14 +429,14 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 		// @ts-ignore
 		let numbb = output.length / 6;
 		let bestPerImageBoxes = [];
-		let bestScorePerImage = 0;
+		let _bestScorePerImage = 0;
 		let suboutput = null;
 
 		console.log('num images : ', numImages);
 
 		for (let k = 0; k < numImages; k++) {
 			bestPerImageBoxes = [];
-			bestScorePerImage = 0;
+			_bestScorePerImage = 0;
 			/** @type {number[]} */
 			let bbScores = [];
 			// @ts-ignore
