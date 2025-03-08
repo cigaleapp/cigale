@@ -1,4 +1,4 @@
-import { SvelteMap } from 'svelte/reactivity';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 /**
  * @typedef Keybind
@@ -24,6 +24,7 @@ import { SvelteMap } from 'svelte/reactivity';
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées
  * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
+ * @property {Set<string>} loadingImages liste des IDs d'images en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
  */
 
@@ -43,5 +44,6 @@ export const uiState = $state({
 	selection: [],
 	previewURLs: new SvelteMap(),
 	erroredImages: new SvelteMap(),
+	loadingImages: new SvelteSet(),
 	keybinds: {}
 });

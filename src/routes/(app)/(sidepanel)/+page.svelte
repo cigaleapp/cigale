@@ -146,7 +146,11 @@
 	$effect(() => {
 		if (!cropperModel) return;
 		for (const image of tables.Image.state) {
-			if (imageBufferWasSaved(image) && !imageIsCropped(image)) {
+			if (
+				imageBufferWasSaved(image) &&
+				!imageIsCropped(image) &&
+				!uiState.loadingImages.has(image.id)
+			) {
 				void (async () => {
 					try {
 						const file = await db.get('ImageFile', imageIdToFileId(image.id));
@@ -210,10 +214,13 @@
 							bufferExists: false,
 							contentType: file.type
 						});
+						uiState.loadingImages.add(id);
 						await writeImage(file, id);
 					} catch (error) {
 						console.error(error);
 						erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+					} finally {
+						uiState.loadingImages.delete(id);
 					}
 				})
 			);
