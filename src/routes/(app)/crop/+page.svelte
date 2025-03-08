@@ -1,0 +1,95 @@
+<script>
+	import AreaObservations from '$lib/AreaObservations.svelte';
+	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
+	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
+	import Cropup from '$lib/Cropup.svelte';
+	import { BUILTIN_METADATA_IDS } from '$lib/database';
+	import * as idb from '$lib/idb.svelte.js';
+	import { TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
+	import { storeMetadataValue } from '$lib/metadata';
+	import { uiState } from '$lib/state.svelte';
+
+	let openCropDialog = $state();
+
+	/** ID of the image we're cropping */
+	let croppingImage = $state('');
+	const currentCropbox = $derived(
+		toRelativeCoords(
+			// @ts-ignore
+			idb.tables.Image.state.find((i) => i.id === croppingImage)?.metadata.crop?.value ?? {
+				x: 0,
+				y: 0,
+				width: TARGETWIDTH,
+				height: TARGETHEIGHT
+			}
+		)
+	);
+
+	/**
+	 * @param {{x: number, y: number, width: number, height: number}} boundingBoxesout
+	 */
+	function onConfirmCrop(boundingBoxesout) {
+		const id = croppingImage;
+		console.log(boundingBoxesout, 'is cropped! at id : ', id);
+
+		const image = idb.tables.Image.state.find((image) => image.id === id);
+
+		// Get inferred value from alternatives (if non empty), or use the main value otherwise. Inferred value is the initial cropbox value as determined by the neural network.
+		// If this is the first time the user is re-cropping the box, this value will be the main values.
+		/** @type {undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }} */
+		// @ts-expect-error
+		let initialCrop = image?.metadata.crop ?? undefined;
+
+		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
+		if (
+			image?.metadata.crop.alternatives &&
+			Object.entries(image.metadata.crop.alternatives).length > 0
+		) {
+			const [stringValue, confidence] = Object.entries(image.metadata.crop.alternatives)[0];
+			initialCrop = {
+				value: JSON.parse(stringValue),
+				confidence
+			};
+		}
+
+		storeMetadataValue({
+			metadataId: BUILTIN_METADATA_IDS.crop,
+			subjectId: id,
+			type: 'boundingbox',
+			value: boundingBoxesout,
+			confidence: 1,
+			// Put the neural-network-inferred (initial) value in the alternatives as a backup
+			alternatives: initialCrop ? [initialCrop] : []
+		});
+	}
+
+	const images = $derived(toAreaObservationProps(idb.tables.Image.state, []));
+</script>
+
+<Cropup
+	key="cropping"
+	bind:opener={openCropDialog}
+	id={croppingImage}
+	boundingBoxes={[currentCropbox]}
+	onconfirm={onConfirmCrop}
+></Cropup>
+
+<section class="observations">
+	<AreaObservations
+		{images}
+		bind:selection={uiState.selection}
+		loadingText="Chargement…"
+		oncardclick={(id) => {
+			croppingImage = id;
+			openCropDialog();
+		}}
+	/>
+</section>
+
+<style>
+	.observations {
+		padding: 4em;
+		display: flex;
+		flex-grow: 1;
+	}
+</style>
