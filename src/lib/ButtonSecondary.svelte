@@ -18,15 +18,19 @@ Available CSS variables:
 	 * @type {object}
 	 * @property {import('svelte').Snippet} children
 	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {boolean} [disabled=false]
+	 * @property {string} [help]
 	 */
 </script>
 
 <script>
+	import { tooltip } from './tooltips';
+
 	/** @type {Props} */
-	let { children, onclick } = $props();
+	let { children, onclick, disabled = false, help } = $props();
 </script>
 
-<button {onclick}>
+<button {onclick} {disabled} use:tooltip={help}>
 	{@render children()}
 </button>
 
@@ -38,18 +42,23 @@ Available CSS variables:
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		border: 1px solid var(--bg, var(--gray));
+		border: 1px solid var(--fg, var(--gray));
 		padding: 0.75em;
 		border-radius: var(--corner-radius);
-		width: var(--width, 7.5em);
+		width: var(--width);
 		font-weight: bold;
 		font-size: var(--font-size, 1em);
 		gap: 0.5em;
 	}
 
-	button:is(:hover, :focus-visible) {
+	button:disabled {
+		opacity: 0.75;
+		cursor: not-allowed;
+	}
+
+	button:not(:disabled):is(:hover, :focus-visible) {
 		background-color: var(--bg-hover, var(--bg-primary-translucent));
 		color: var(--fg-hover, var(--fg-primary));
-		border-color: var(--bg-hover, var(--bg-primary));
+		border-color: var(--fg-hover, var(--bg-primary));
 	}
 </style>

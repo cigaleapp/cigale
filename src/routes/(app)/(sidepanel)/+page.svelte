@@ -18,6 +18,7 @@
 		TARGETWIDTH
 	} from '$lib/inference.js';
 	import { uiState } from '$lib/state.svelte.js';
+	import { mergeToObservation } from '$lib/observations';
 
 	onMount(() => {
 		uiState.keybinds['$mod+u'] = {
@@ -27,6 +28,13 @@
 				await tables.Image.clear();
 				await db.clear('ImageFile');
 				await tables.Observation.clear();
+			}
+		};
+		uiState.keybinds['$mod+g'] = {
+			help: 'Fusionner des observations ou images',
+			async do() {
+				await mergeToObservation(uiState.selection);
+				uiState.setSelection([]);
 			}
 		};
 	});

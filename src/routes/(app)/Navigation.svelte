@@ -36,7 +36,7 @@
 		</a>
 
 		<a href="#/">
-			Import
+			Importer
 			{#if path == '/'}
 				<div class="line"></div>
 			{/if}
@@ -47,12 +47,12 @@
 		<a
 			href="#/crop"
 			aria-disabled={!hasImages &&
-				path != '/classification' &&
-				path != '/resultats' &&
+				path != '/classify' &&
+				path != '/results' &&
 				path != '/crop' &&
 				path != '/import'}
 		>
-			Crop
+			Recadrer
 			{#if path == '/crop'}
 				<div class="line"></div>
 			{/if}
@@ -61,22 +61,22 @@
 		<Sup></Sup>
 
 		<a
-			href="#/classification"
-			aria-disabled={path != '/classification' && path != '/resultats' && path != '/crop'}
+			href="#/classify"
+			aria-disabled={path != '/classify' && path != '/results' && path != '/crop'}
 		>
-			Classification
-			{#if path == '/classification'}
+			Classifier
+			{#if path == '/classify'}
 				<div class="line"></div>
 			{/if}
 		</a>
 
 		<Sup></Sup>
-		<!-- <a href="#/resultats">
+		<!-- <a href="#/results">
 			<div class="download">
 				<Download />
 				Résultats
 			</div>
-			{#if path == '/resultats'}
+			{#if path == '/results'}
 				<div class="line"></div>
 			{/if}
 		</a> -->

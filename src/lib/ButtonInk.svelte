@@ -1,6 +1,15 @@
 <script>
 	import { tooltip } from './tooltips';
 
+	/**
+	 * @typedef Props
+	 * @type {object}
+	 * @property {import('svelte').Snippet} children
+	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {string} [help]
+	 */
+
+	/** @type {Props} */
 	let { children, onclick, help } = $props();
 </script>
 

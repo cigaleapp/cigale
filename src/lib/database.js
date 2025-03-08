@@ -4,7 +4,7 @@ import { parseISOSafe } from './date.js';
 // TODO make table() take an object that can be passed to type() instead of a schema
 //  * @template { {[x: string]: import('arktype').Type | string} } Schema
 
-const ID = type(/[\w_]+/).pipe((id) => id.toLowerCase());
+const ID = type(/[\w_]+/);
 
 /**
  * Between 0 and 1
