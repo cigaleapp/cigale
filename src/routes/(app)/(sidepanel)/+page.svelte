@@ -163,10 +163,13 @@
 					try {
 						const file = await db.get('ImageFile', imageIdToFileId(image.id));
 						if (!file) return;
+						uiState.loadingImages.add(image.id);
 						await analyzeImage(file.bytes, image.id, image);
 					} catch (error) {
 						console.error(error);
 						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
+					} finally {
+						uiState.loadingImages.delete(image.id);
 					}
 				})();
 			}
