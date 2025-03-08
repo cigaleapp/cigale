@@ -85,16 +85,17 @@ export function torawpath(path) {
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
 export async function loadModel(classif = false, webgpu = false) {
-	console.log('models paht : ', MODELCLASSIFPATH, MODELDETECTPATH);
+	
 	// load un modèle ONNX, soit de classification, soit de détection.
 
 	let model;
 	const MODELPATH = torawpath(classif ? MODELCLASSIFPATH : MODELDETECTPATH);
-
+	console.log("model path : ", MODELPATH);
 	if (webgpu) {
 		model = await ort.InferenceSession.create(MODELPATH, { executionProviders: ['webgpu'] });
 	} else {
 		model = await ort.InferenceSession.create(MODELPATH);
+		console.log("model loaded");
 	}
 	return model;
 }
@@ -301,8 +302,11 @@ export async function classify(images, model, uiState, start) {
 	// @ts-ignore
 	images = await preprocess_for_classification(images, MEAN, STD);
 	uiState.processing.state = 'classification';
+	console.log("coucou")
+	console.log(images)
 
 	for (let i = 0; i < images.length; i++) {
+		console.log("feur c'est pour gwenn")
 		let argmax = [];
 		let bestScore = [];
 		for (let j = 0; j < images[i].length; j++) {
