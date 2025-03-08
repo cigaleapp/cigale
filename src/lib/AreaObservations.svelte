@@ -14,7 +14,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <script>
 	import { onMount } from 'svelte';
-	import { uiState } from '../routes/inference/state.svelte';
+	import { uiState } from '$lib/state.svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import { mutationobserver } from './mutations';

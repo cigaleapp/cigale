@@ -6,6 +6,7 @@
 	import Sun from '~icons/ph/sun-light';
 	import Moon from '~icons/ph/moon-light';
 	import Cross from '~icons/ph/x-circle-light';
+	import { goto } from '$app/navigation';
 
 	let open = $state(false);
 	/** @type {HTMLDialogElement|undefined} */
@@ -63,14 +64,17 @@
 			Protocoles :
 
 			<ButtonPrimary
-				onclick={() => {
-					window.location.href = '#/reglages';
+				onclick={async () => {
 					open = false;
+					await goto('#/protocols');
 				}}
 			>
 				Gérer
 			</ButtonPrimary>
 		</div>
+		<footer>
+			C.i.g.a.l.e vDEV · <a href="#/about">À propos</a>
+		</footer>
 	</div>
 </dialog>
 
