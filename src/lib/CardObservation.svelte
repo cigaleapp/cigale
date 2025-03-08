@@ -20,9 +20,9 @@
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes
-	 * @property {number} boundingBoxes.x 
-	 * @property {number} boundingBoxes.y 
-	 * @property {number} boundingBoxes.width 
+	 * @property {number} boundingBoxes.x
+	 * @property {number} boundingBoxes.y
+	 * @property {number} boundingBoxes.width
 	 * @property {number} boundingBoxes.height
 	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
 	 * @property {string} [statusText] - text to show when loading and progress is -1
@@ -95,8 +95,8 @@
 					{#each boundingBoxes as bounding, index (index)}
 						<div
 							class="bb"
-							style="left: {bounding.x * 100}%; top: {bounding.y *
-								80}%; width: {bounding.width * 100}%; height: {80*bounding.height}%;"
+							style="left: {bounding.x * 100}%; top: {bounding.y * 80}%; width: {bounding.width *
+								100}%; height: {80 * bounding.height}%;"
 						></div>
 					{/each}
 				</div>

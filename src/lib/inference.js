@@ -102,7 +102,7 @@ export async function loadModel(classif = false, webgpu = false) {
  *
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').uiState} uiState
+ * @param {typeof import('./state.svelte.js').uiState} [uiState]
  * @param {boolean} sequence
  * @param {boolean} webgpu
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
@@ -138,7 +138,7 @@ export async function infer(buffers, model, uiState, sequence = false, webgpu = 
 	let start = -1;
 	if (!sequence) {
 		start = Date.now();
-		uiState.processing.state = 'inference';
+		if (uiState) uiState.processing.state = 'inference';
 	}
 	const inputName = model.inputNames[0];
 	let inputTensor;
@@ -164,7 +164,7 @@ export async function infer(buffers, model, uiState, sequence = false, webgpu = 
 	} else {
 		boundingboxes = bestBoxes;
 	}
-	if (!sequence) {
+	if (!sequence && uiState) {
 		uiState.processing.done = buffers.length;
 		uiState.processing.time = (Date.now() - start) / 1000;
 	}
@@ -194,7 +194,7 @@ async function mapToFiles(files, model, i, img_proceed) {
  *
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').uiState} uiState
+ * @param {typeof import('./state.svelte.js').uiState} [uiState]
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[][]]>}
  */
 export async function inferSequentialy(buffers, model, uiState) {
@@ -222,8 +222,10 @@ export async function inferSequentialy(buffers, model, uiState) {
 		bestScores.push(bestScore[0]);
 		inputTensors.push(inputTensor);
 
-		uiState.processing.done = i + 1;
-		uiState.processing.time = (Date.now() - start) / 1000;
+		if (uiState) {
+			uiState.processing.done = i + 1;
+			uiState.processing.time = (Date.now() - start) / 1000;
+		}
 	}
 	return [boundingboxes, bestScores, start, inputTensors];
 }

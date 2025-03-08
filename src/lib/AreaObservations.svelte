@@ -14,46 +14,23 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <script>
 	import { onMount } from 'svelte';
+	import { uiState } from '$lib/state.svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
-	import KeyboardShortcuts from './KeyboardShortcuts.svelte';
 	import { mutationobserver } from './mutations';
-
-	/**
-	 * @typedef Image
-	 * @property {string} image
-	 * @property {string} title
-	 * @property {string} id
-	 * @property {number} index
-	 * @property {number} stacksize
-	 * @property {number} [loading]
- 	 * @property {object[]} [boundingBoxes] - array of bounding boxes
-	 * @property {number} boundingBoxes.x 
-	 * @property {number} boundingBoxes.y 
-	 * @property {number} boundingBoxes.width 
-	 * @property {number} boundingBoxes.height
-	 */
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Image[]} images
+	 * @property {Array<import ('./AreaObservations.utils').CardObservation>} images
 	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
 	 * @property {(id: string) => void} [ondelete] callback when an image is deleted, with the image/observation id as argument
-	 * @property {import('./KeyboardShortcuts.svelte').Keymap} [binds] keybinds to define alongside the ones this component defines
 	 */
 
 	/** @type {Props } */
-	let {
-		images = $bindable(),
-		ondelete,
-		errors,
-		loadingText,
-		binds,
-		selection = $bindable([])
-	} = $props();
+	let { images = $bindable(), ondelete, errors, loadingText, selection = $bindable([]) } = $props();
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -70,32 +47,28 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	$effect(() => {
 		selection = dragselect?.selection ?? [];
 	});
-</script>
 
-<KeyboardShortcuts
-	preventDefault
-	binds={{
-		// Fill the object with keybindings the user of the component gives us
-		// throught the "binds" prop
-		...binds,
-		// Also register Ctrl-A to select all
-		'$mod+a': {
-			help: 'Tout sélectionner',
-			do: () => {
-				selection = images.map((img) => img.index.toString());
-				dragselect?.setSelection(selection);
+	onMount(() => {
+		uiState.keybinds = {
+			...uiState.keybinds,
+			// Also register Ctrl-A to select all
+			'$mod+a': {
+				help: 'Tout sélectionner',
+				do: () => {
+					dragselect?.setSelection(images.map((img) => img.id));
+				}
+			},
+			// And Ctrl-D to deselect all
+			'$mod+d': {
+				help: 'Tout désélectionner',
+				do: () => {
+					selection = [];
+					dragselect?.setSelection([]);
+				}
 			}
-		},
-		// And Ctrl-D to deselect all
-		'$mod+d': {
-			help: 'Tout désélectionner',
-			do: () => {
-				selection = [];
-				dragselect?.setSelection([]);
-			}
-		}
-	}}
-/>
+		};
+	});
+</script>
 
 <section
 	class="images"
@@ -111,7 +84,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each images as props (props.index)}
+	{#each images as props (props.id)}
 		<CardObservation
 			data-selectable
 			data-id={props.id}
@@ -121,7 +94,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			ondelete={ondelete ? () => ondelete(props.id) : undefined}
 			errored={errors?.has(props.id)}
 			statusText={errors?.get(props.id) ?? loadingText}
-			selected={selection.includes(props.index.toString())}
+			selected={selection.includes(props.id.toString())}
 			boundingBoxes={props.boundingBoxes}
 			{loadingText}
 		/>

@@ -4,6 +4,11 @@
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import Reglages from './Reglages.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { generateResultsZip } from '$lib/results';
+	import { tables } from '$lib/idb.svelte';
+	import { toasts } from '$lib/toasts.svelte';
 
 	/**
 	 * @typedef Props
@@ -15,8 +20,12 @@
 	/** @type {Props} */
 	let { hasImages = true, progress = 0 } = $props();
 
+	const path = $derived(page.url.hash.replace(/^#/, ''));
+
 	/** @type {number|undefined} */
 	let height = $state();
+
+	let exporting = $state(false);
 </script>
 
 <header bind:clientHeight={height}>
@@ -28,7 +37,7 @@
 
 		<a href="#/">
 			Import
-			{#if page.route.id == '/'}
+			{#if path == '/'}
 				<div class="line"></div>
 			{/if}
 		</a>
@@ -38,13 +47,13 @@
 		<a
 			href="#/crop"
 			aria-disabled={!hasImages &&
-				page.route.id != '/classification' &&
-				page.route.id != '/resultats' &&
-				page.route.id != '/crop' &&
-				page.route.id != '/import'}
+				path != '/classification' &&
+				path != '/resultats' &&
+				path != '/crop' &&
+				path != '/import'}
 		>
 			Crop
-			{#if page.route.id == '/crop'}
+			{#if path == '/crop'}
 				<div class="line"></div>
 			{/if}
 		</a>
@@ -53,29 +62,47 @@
 
 		<a
 			href="#/classification"
-			aria-disabled={page.route.id != '/classification' &&
-				page.route.id != '/resultats' &&
-				page.route.id != '/crop'}
+			aria-disabled={path != '/classification' && path != '/resultats' && path != '/crop'}
 		>
 			Classification
-			{#if page.route.id == '/classification'}
+			{#if path == '/classification'}
 				<div class="line"></div>
 			{/if}
 		</a>
 
 		<Sup></Sup>
-		<a
-			href="#/resultats"
-			aria-disabled={page.route.id != '/classification' && page.route.id != '/resultats'}
-		>
+		<!-- <a href="#/resultats">
 			<div class="download">
-				<Download></Download>
+				<Download />
 				Résultats
 			</div>
-			{#if page.route.id == '/resultats'}
+			{#if path == '/resultats'}
 				<div class="line"></div>
 			{/if}
-		</a>
+		</a> -->
+
+		<ButtonSecondary
+			onclick={async () => {
+				exporting = true;
+				try {
+					await generateResultsZip(tables.Observation.state, tables.Protocol.state[0]);
+				} catch (error) {
+					console.error(error);
+					toasts.error(
+						`Erreur lors de l'exportation des résultats: ${error?.toString() ?? 'Erreur inattendue'}`
+					);
+				} finally {
+					exporting = false;
+				}
+			}}
+		>
+			{#if exporting}
+				<LoadingSpinner />
+			{:else}
+				<Download />
+			{/if}
+			Résultats
+		</ButtonSecondary>
 
 		<Reglages --navbar-height="{height}px" />
 	</nav>
@@ -122,12 +149,6 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
-	}
-
-	.download {
-		display: flex;
-		align-items: center;
-		gap: 1em;
 	}
 
 	.line {

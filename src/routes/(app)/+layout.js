@@ -1,16 +1,21 @@
+import { dev } from '$app/environment';
 import { BUILTIN_METADATA } from '$lib/database.js';
+import { error } from '@sveltejs/kit';
 import { tables } from '$lib/idb.svelte.js';
-import { getSetting } from '$lib/settings.svelte.js';
 import { defineSpeciesMetadata } from '$lib/species.js';
 
 export async function load() {
-	await tables.initialize();
-	await fillBuiltinData();
-	await defineSpeciesMetadata('species');
-	await tables.initialize();
-	return {
-		showInputHints: await getSetting('showInputHints')
-	};
+	try {
+		await tables.initialize();
+		await fillBuiltinData();
+		await defineSpeciesMetadata('species');
+		await tables.initialize();
+	} catch (e) {
+		console.error(e);
+		error(400, {
+			message: e?.toString() ?? 'Erreur inattendue'
+		});
+	}
 }
 
 async function fillBuiltinData() {
@@ -32,7 +37,8 @@ async function fillBuiltinData() {
 			theme: 'auto',
 			gridSize: 10,
 			language: 'fr',
-			showInputHints: true
+			showInputHints: true,
+			showTechnicalMetadata: dev
 		})
 	]);
 }
