@@ -1,7 +1,6 @@
 import { uiState } from '$lib/state.svelte';
 import { toRelativeCoords } from './BoundingBoxes.svelte';
 import { idComparator } from './idb.svelte';
-import { imageCompletelyLoaded } from './images';
 
 /**
  * @typedef CardObservation
@@ -20,12 +19,18 @@ import { imageCompletelyLoaded } from './images';
  */
 
 /**
+ * @import {Image, Observation} from './database'
+ */
+
+/**
  *
- * @param {import("./database").Image[]} images
- * @param {import("./database").Observation[]} observations
+ * @param {Image[]} images
+ * @param {Observation[]} observations
+ * @param {object} param2
+ * @param {(image: Image) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
  * @returns {CardObservation[]}
  */
-export function toAreaObservationProps(images, observations) {
+export function toAreaObservationProps(images, observations, { isLoaded }) {
 	return (
 		[
 			...images
@@ -40,7 +45,7 @@ export function toAreaObservationProps(images, observations) {
 							id: image.id,
 							index: i,
 							stacksize: 1,
-							loading: imageCompletelyLoaded(image, uiState.previewURLs) ? undefined : -1,
+							loading: isLoaded(image) ? undefined : -1,
 							boundingBoxes: image.metadata.crop?.value
 								? // @ts-ignore
 									[toRelativeCoords(image.metadata.crop.value)]
@@ -65,11 +70,7 @@ export function toAreaObservationProps(images, observations) {
 						? // @ts-ignore
 							[toRelativeCoords(firstImage.metadata.crop.value)]
 						: [],
-					loading: imagesOfObservation.every((img) =>
-						imageCompletelyLoaded(img, uiState.previewURLs)
-					)
-						? undefined
-						: -1
+					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
 				};
 			})
 		]

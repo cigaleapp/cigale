@@ -42,7 +42,12 @@
 	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
 
-	const images = $derived(toAreaObservationProps(tables.Image.state, []));
+	const images = $derived(
+		toAreaObservationProps(tables.Image.state, [], {
+			isLoaded: (image) =>
+				imageBufferWasSaved(image) && previewURLs.has(image.id) && imageIsCropped(image)
+		})
+	);
 
 	let cropperModel = $state();
 	async function loadCropperModel() {

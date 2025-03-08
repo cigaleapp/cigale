@@ -59,11 +59,3 @@ export async function downloadImage(imageId, options) {
 	a.click();
 	URL.revokeObjectURL(url);
 }
-
-/**
- * @param {import('$lib/database').Image} image
- * @param {Map<string, string>} previewURLs
- */
-export function imageCompletelyLoaded(image, previewURLs) {
-	return image.bufferExists && image.metadata.crop && previewURLs.has(image.id);
-}
