@@ -5,6 +5,9 @@
 	import Cropup from '$lib/Cropup.svelte';
 
 	import { storeMetadataValue } from '$lib/metadata';
+	import { uiState } from '../inference/state.svelte';
+	import * as idb from '$lib/idb.svelte.js';
+	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 
 	let openFeur = $state();
 
@@ -46,17 +49,12 @@
 	 */
 	function oncrop (boundingBoxesout,id) { 
 		console.log(boundingBoxesout,"is cropped! at id : ",id);
-		for (let i = 0; i<boundingBoxesout.length; i++){
-			boundingBoxes[id][i].x = boundingBoxesout[i].x;
-			boundingBoxes[id][i].y = boundingBoxesout[i].y;
-			boundingBoxes[id][i].width = boundingBoxesout[i].width;
-			boundingBoxes[id][i].height = boundingBoxesout[i].height;
-		}
+		storeMetadataValue({subjectId: , value:boundingBoxesout[0], metadataId:"crop"});
 
 	}
 
 
-	let images = $state(
+	/*let images = $state(
 		img_list.map((image, index) => ({
 			index,
 			image,
@@ -66,8 +64,13 @@
 			boundingBoxes: boundingBoxes[index],
 			id : index
 		}))
-	);
+	);*/
+
+	let images = $derived( toAreaObservationProps(idb.tables.Image.state, idb.tables.Observation.state));
 	
+	
+	boundingBoxes = images.boundingBoxes;
+
 	/**
 	 * @type {string[]}
 	 */
@@ -76,7 +79,8 @@
 	$effect(() => {
 		console.log(" slelection : ")
 		console.log(selection);
-	})
+	});
+
 
 </script>
 
@@ -94,7 +98,7 @@
 
 <h1>Classif</h1>
 <section class="demo-observations">
-	<AreaObservations bind:images={images} bind:selection={selection} loadingText="Analyse…" />
+	<AreaObservations images={images} bind:selection={selection} loadingText="Analyse…" />
 </section>
 
 <ButtonPrimary onclick={openFeur}>Modifier un crop</ButtonPrimary>

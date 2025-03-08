@@ -14,7 +14,8 @@ export function toAreaObservationProps(images, observations) {
 			id: image.id,
 			index: i,
 			stacksize: 1,
-			loading: imageCompletelyLoaded(image, uiState.previewURLs) ? undefined : -1
+			loading: imageCompletelyLoaded(image, uiState.previewURLs) ? undefined : -1,
+			boundingBoxes: [image.metadata.crop.value] //pr l'instant, une seule bounding box par image
 		})),
 		...observations.map((observation, i) => {
 			const imagesOfObservation = images.filter((img) => observation.images.includes(img.id));
