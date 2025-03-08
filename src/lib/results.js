@@ -177,7 +177,7 @@ export async function cropImage(image) {
  */
 function toCSV(header, rows, separator = ';') {
 	/** @param {string} cell */
-	const quote = (cell) => `"${cell.replace(/"/g, '""')}"`;
+	const quote = (cell) => `"${cell?.replace(/"/g, '""') ?? ''}"`;
 
 	return [
 		header.map(quote).join(separator),
