@@ -308,6 +308,14 @@ export async function openDatabase() {
 	return _database;
 }
 
+export function nukeDatabase() {
+	if (_database) {
+		_database.close();
+		_database = undefined;
+	}
+	indexedDB.deleteDatabase('database');
+}
+
 // Magie vodoo Typescript, pas besoin de comprendre
 // Si t'es curieuxse, demande à Gwenn qui sera ravie
 // de t'expliquer :3

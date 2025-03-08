@@ -1,8 +1,10 @@
 <script>
-	let { children, onclick } = $props();
+	import { tooltip } from './tooltips';
+
+	let { children, onclick, help } = $props();
 </script>
 
-<button {onclick}>
+<button {onclick} use:tooltip={help}>
 	{@render children()}
 </button>
 
@@ -11,6 +13,7 @@
 		background-color: var(--bg, var(--bg-neutral));
 		color: var(--fg, var(--bg-primary));
 		display: flex;
+		gap: 0.5em;
 		justify-content: center;
 		align-items: center;
 		border: none;

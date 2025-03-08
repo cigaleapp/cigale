@@ -14,25 +14,15 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <script>
 	import { onMount } from 'svelte';
-	import { uiState } from '../routes/inference/state.svelte';
+	import { uiState } from '$lib/state.svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import { mutationobserver } from './mutations';
 
 	/**
-	 * @typedef Image
-	 * @property {string} image
-	 * @property {string} title
-	 * @property {string} id
-	 * @property {number} index
-	 * @property {number} stacksize
-	 * @property {number} [loading]
-	 */
-
-	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Image[]} images
+	 * @property {Array<import ('./AreaObservations.utils').CardObservation>} images
 	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
@@ -105,6 +95,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			errored={errors?.has(props.id)}
 			statusText={errors?.get(props.id) ?? loadingText}
 			selected={selection.includes(props.id.toString())}
+			boundingBoxes={props.boundingBoxes}
 			{loadingText}
 		/>
 	{/each}
