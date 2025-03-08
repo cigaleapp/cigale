@@ -173,13 +173,22 @@ const Settings = table(
 export const BUILTIN_METADATA_IDS = {
 	crop: 'crop',
 	shoot_date: 'shoot_date',
-	shoot_location: 'shoot_location'
+	shoot_location: 'shoot_location',
+	cuteness: 'cuteness'
 };
 
 /**
  * @type {Array<typeof Metadata.inferIn & { id: keyof typeof BUILTIN_METADATA_IDS }>}
  */
 export const BUILTIN_METADATA = [
+	{
+		id: 'cuteness',
+		description: "À quel point l'arthropode est trop cute 😖",
+		label: '🥺',
+		type: 'float',
+		mergeMethod: 'average',
+		required: false
+	},
 	{
 		id: 'crop',
 		description: "Boîte de recadrage pour l'image",

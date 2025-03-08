@@ -18,12 +18,12 @@
 	 * @property {() => void} onsplit callback to call when the user wants to split the selected observation(s)
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
 	 * @property {(key: string, value: import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
-	 * @property {boolean} [allowmerge=false] whether the user is allowed to merge images or observations
+	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
 	 */
 
 	/** @type {Props} */
-	let { images, onmerge, ondelete, onsplit, cansplit, onmetadatachange, allowmerge, metadata } =
+	let { images, onmerge, ondelete, onsplit, cansplit, onmetadatachange, canmerge, metadata } =
 		$props();
 
 	// TODO maybe put as a prop? hmmmmm
@@ -76,7 +76,7 @@
 	<section class="button">
 		<div class="side-by-side">
 			<ButtonSecondary
-				disabled={!allowmerge}
+				disabled={!canmerge}
 				onclick={onmerge}
 				help="Regrouper les images et/ou observations sélectionnées en une observation"
 			>
