@@ -1,4 +1,5 @@
 import { uiState } from '$lib/state.svelte';
+import { toRelativeCoords } from './BoundingBoxes.svelte';
 import { idComparator } from './idb.svelte';
 import { imageCompletelyLoaded } from './images';
 
@@ -39,7 +40,11 @@ export function toAreaObservationProps(images, observations) {
 							id: image.id,
 							index: i,
 							stacksize: 1,
-							loading: imageCompletelyLoaded(image, uiState.previewURLs) ? undefined : -1
+							loading: imageCompletelyLoaded(image, uiState.previewURLs) ? undefined : -1,
+							boundingBoxes: image.metadata.crop?.value
+								? // @ts-ignore
+									[toRelativeCoords(image.metadata.crop.value)]
+								: []
 						})
 				),
 			...observations.map((observation, i) => {
@@ -53,6 +58,10 @@ export function toAreaObservationProps(images, observations) {
 					index: images.length + i,
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
+					boundingBoxes: imagesOfObservation[0]?.metadata.crop?.value
+						? // @ts-ignore
+							[toRelativeCoords(imagesOfObservation[0].metadata.crop.value)]
+						: [],
 					loading: imagesOfObservation.every((img) =>
 						imageCompletelyLoaded(img, uiState.previewURLs)
 					)
