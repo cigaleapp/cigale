@@ -2,6 +2,7 @@
 	// @ts-ignore
 	import { tinykeys } from 'tinykeys';
 	import Modal from './Modal.svelte';
+	import { onMount } from 'svelte';
 
 	/**
 	 * @typedef Props
@@ -13,7 +14,7 @@
 	/** @type {Props} */
 	const { binds, preventDefault = false } = $props();
 
-	$effect(() => {
+	$effect(() =>
 		// Use the tinykeys package to bind the keybindings
 		// The library expect an object of the form {pattern: handler function}
 		// We need to construct the object, since the component asks for a
@@ -36,8 +37,10 @@
 						: bind.do
 				])
 			)
-		);
+		)
+	);
 
+	onMount(() => {
 		// "?" doesnt work with tinykeys, see https://github.com/jamiebuilds/tinykeys/issues/130
 		window.addEventListener('keyup', (e) => {
 			if (e.key === '?') {

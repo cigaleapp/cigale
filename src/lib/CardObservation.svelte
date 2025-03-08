@@ -314,7 +314,9 @@
 
 	.bb {
 		position: absolute;
-		outline: 2px solid var(--fg-neutral);
+		border: 2px solid white;
+		outline: 2px solid black;
+		filter: contrast(200%);
 	}
 
 	.containbb {
