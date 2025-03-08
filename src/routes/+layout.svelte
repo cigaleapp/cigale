@@ -20,4 +20,11 @@
 	:global(code, pre) {
 		font-family: 'Fira Code', monospace;
 	}
+
+	:global(svg.icon) {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		flex-shrink: 0;
+	}
 </style>

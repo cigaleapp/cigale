@@ -43,6 +43,13 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		dragselect = new DragSelect(imagesContainer, selection);
 		dragselect.setSelection(selection);
 	});
+	$effect(() => {
+		console.log(`Binding uiState.setSelection`);
+		/** @param {string[]} selection */
+		uiState.setSelection = (selection) => {
+			dragselect?.setSelection(selection);
+		};
+	});
 
 	$effect(() => {
 		selection = dragselect?.selection ?? [];
