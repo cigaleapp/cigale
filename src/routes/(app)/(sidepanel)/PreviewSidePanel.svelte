@@ -8,6 +8,7 @@
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
+	import { page } from '$app/state';
 
 	/**
 	 * @typedef {object} Props
@@ -74,24 +75,26 @@
 		{/each}
 	</MetadataList>
 	<section class="button">
-		<div class="side-by-side">
-			<ButtonSecondary
-				disabled={!canmerge}
-				onclick={onmerge}
-				help="Regrouper les images et/ou observations sélectionnées en une observation"
-			>
-				<IconMerge />
-				Regrouper
-			</ButtonSecondary>
-			<ButtonSecondary
-				disabled={!cansplit}
-				onclick={onsplit}
-				help="Séparer toutes les observations sélectionnées en images seules"
-			>
-				<IconSplit />
-				Séparer
-			</ButtonSecondary>
-		</div>
+		{#if page.url.pathname === '/classify'}
+			<div class="side-by-side">
+				<ButtonSecondary
+					disabled={!canmerge}
+					onclick={onmerge}
+					help="Regrouper les images et/ou observations sélectionnées en une observation"
+				>
+					<IconMerge />
+					Regrouper
+				</ButtonSecondary>
+				<ButtonSecondary
+					disabled={!cansplit}
+					onclick={onsplit}
+					help="Séparer toutes les observations sélectionnées en images seules"
+				>
+					<IconSplit />
+					Séparer
+				</ButtonSecondary>
+			</div>
+		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}

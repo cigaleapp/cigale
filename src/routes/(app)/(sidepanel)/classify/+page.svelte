@@ -20,7 +20,7 @@
 	let classifmodel = $state();
 	async function loadClassifModel() {
 		classifmodel = await loadModel(true);
-		toasts.success('Modèle de recadrage chargé');
+		toasts.success('Modèle de classification chargé');
 	}
 	/**
 	 * @param {ArrayBuffer} buffer
