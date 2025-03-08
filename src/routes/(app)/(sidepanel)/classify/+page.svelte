@@ -10,7 +10,6 @@
 	import { loadModel, MODELCLASSIFPATH, MODELDETECTPATH , classify, TARGETHEIGHT, TARGETWIDTH} from '$lib/inference';
 	import {imload, applyBBOnTensor} from '$lib/inference_utils';
 	import { uiState } from '$lib/state.svelte';
-	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 
 	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
@@ -29,6 +28,7 @@
 	 * @param {object} image
 	 * @param {string} image.contentType
 	 * @param {string} image.filename
+	 * @param {object} image.metadata
 	 */
 	async function analyzeImage(buffer, id, { contentType, filename ,metadata}) {
 		if (!classifmodel) {
@@ -40,16 +40,14 @@
 
 		console.log("Analyzing image", id, filename);
 
-
-		/**
-		 * @type {ort.Tensor}
-		 */
+		//@ts-ignore
+		/** @type {ort.Tensor}*/
 		let img = await imload([buffer], TARGETWIDTH,TARGETHEIGHT);
-		console.log("classifying image", id, filename);
-		console.log("img", img);
-
+		// @ts-ignore
 		let bbList = [metadata.crop.value.x, metadata.crop.value.y, metadata.crop.value.width, metadata.crop.value.height];
-		console.log("bbList", bbList);
+		
+		//@ts-ignore
+		/** @type {ort.Tensor}*/
 		const nimg = await applyBBOnTensor(bbList,img);
 		console.log("nimg", nimg);
 		const output_classif = await classify([[nimg]],classifmodel,uiState, 0);
@@ -69,7 +67,9 @@
 				metadataId: 'species',
 				type: 'enum',
 				value: species[0][0].toString(),
+				// @ts-ignore
 				confidence: confs[0][0],
+				// @ts-ignore
 				alternatives: species[0].slice(1).map((s, i) => ({ value: s.toString(), confidence: confs[0][i + 1] })),
 
 			});
@@ -79,15 +79,15 @@
 	$effect(() => {
 		if (!classifmodel) return;
 		for (const image of tables.Image.state) {
-			if (imageBufferWasSaved(image) && !imageIsCLassified(image) && !uiState.loadingImages.has(image.id) && !uiState.erroredImages.has(image.id)) {
+			if (imageBufferWasSaved(image) && !imageIsCLassified(image) && !uiState.loadingImages.has(image.id)) {
 				console.log("on est rentré !");
 				$inspect(uiState);
+				uiState.loadingImages.add(image.id);
 
 				void (async () => {
 					try {
 						const file = await db.get('ImageFile', imageIdToFileId(image.id));
 						if (!file) {console.log("pas de fichier ..?");return;}
-						uiState.loadingImages.add(image.id)
 						let code = await analyzeImage(file.bytes, image.id, image);
 						if (code == 0) {
 							erroredImages.set(image.id, "Erreur inattendue l'ors de la classification");
@@ -105,7 +105,7 @@
 
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length;
-		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.crop).length;
+		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.species).length;
 	});
 </script>
 
