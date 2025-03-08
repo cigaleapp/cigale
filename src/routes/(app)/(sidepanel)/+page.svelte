@@ -42,7 +42,7 @@
 	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
 
-	const images = $derived(toAreaObservationProps(tables.Image.state, tables.Observation.state));
+	const images = $derived(toAreaObservationProps(tables.Image.state, []));
 
 	let cropperModel = $state();
 	async function loadCropperModel() {
