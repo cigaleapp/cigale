@@ -3,8 +3,8 @@
     /**
      * @typedef Props
      * @type {object}
-     * @property {typeof bbs.BoundingBoxes} bb
-	 * @property {typeof bbs.BoundingBoxes} bbout
+     * @property {{x: number, y: number, width: number, height: number}} bb
+	 * @property {{x: number, y: number, width: number, height: number}} bbout
 	 * @property {number} sizew
 	 * @property {number} sizeh
     */
