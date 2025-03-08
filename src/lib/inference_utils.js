@@ -93,7 +93,7 @@ export async function cropTensor(tensor, x1, y1, x2, y2) {
  * @param {number} marge
  * @returns {Promise<ort.Tensor>}
  */
-async function applyBBOnTensor(BB, tensor, marge = 10) {
+export async function applyBBOnTensor(BB, tensor, marge = 10) {
 	/*Applique une bounding box sur UN tenseur :
     -------input------- :
         BB : bounding box
