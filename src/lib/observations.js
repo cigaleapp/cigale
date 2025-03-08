@@ -1,3 +1,4 @@
+import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { mergeMetadataValues } from './metadata';
 
@@ -13,22 +14,27 @@ export async function mergeToObservation(parts) {
 		.map((part) => tables.Image.state.find((i) => i.id === part))
 		.filter((i) => i !== undefined);
 
-	const imageIds = [...images.map((i) => i.id), ...observations.flatMap((o) => o.images)];
+	const imageIds = new Set(observations.flatMap((o) => o.images)).union(
+		new Set(images.map((i) => i.id))
+	);
 
-	const observation = await tables.Observation.add({
-		images: imageIds,
-		addedAt: new Date().toISOString(),
-		label: observations[0]?.label ?? images[0]?.filename ?? 'Nouvelle observation',
-		metadataOverrides: Object.fromEntries(
-			Object.entries(await mergeMetadataValues(observations.map((o) => o.metadataOverrides))).map(
-				([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }]
+	const newId = db.generateId('Observation');
+
+	await tables.Observation.do(async (tx) => {
+		tx.add({
+			id: newId,
+			images: [...imageIds],
+			addedAt: new Date().toISOString(),
+			label: observations[0]?.label ?? images[0]?.filename ?? 'Nouvelle observation',
+			metadataOverrides: Object.fromEntries(
+				Object.entries(await mergeMetadataValues(observations.map((o) => o.metadataOverrides))).map(
+					([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }]
+				)
 			)
-		)
+		});
+
+		for (const { id } of observations) {
+			tx.delete(id);
+		}
 	});
-
-	for (const { id } of observations) {
-		await tables.Observation.remove(id);
-	}
-
-	return observation;
 }

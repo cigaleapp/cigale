@@ -38,12 +38,19 @@ export const tables = {
 		console.time('*db initialize');
 		for (const name of tableNames) {
 			if (!isReactiveTable(name)) continue;
-			// @ts-expect-error
-			_tablesState[name] = await tables[name].list();
+			await tables[name].refresh();
 		}
 		console.timeEnd('*db initialize');
 	}
 };
+
+/**
+ * Generate an ID for a given table
+ * @param {keyof typeof Tables} table
+ */
+export function generateId(table) {
+	return table.slice(0, 1).toLowerCase() + Math.random().toString(36).slice(2, 9);
+}
 
 /**
  *
@@ -54,6 +61,10 @@ function wrangler(table) {
 	return {
 		get state() {
 			return _tablesState[table];
+		},
+		async refresh() {
+			// @ts-ignore
+			_tablesState[table] = await this.list();
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
@@ -114,7 +125,7 @@ function wrangler(table) {
 		async add(value) {
 			return this.set(
 				// @ts-ignore
-				{ ...value, id: `${table}_${nanoid()}` }
+				{ ...value, id: generateId(table) }
 			);
 		},
 		async clear() {
@@ -134,6 +145,21 @@ function wrangler(table) {
 			} else {
 				delete _tablesState[table][index];
 			}
+		},
+		/**
+		 * Create a read-write transaction, execute `actions` given the transaction's object store for that table, and commit the transaction
+		 * @param {(store: import('idb').IDBPObjectStore<IDBDatabaseType, [Table], Table, "readwrite">) => void | Promise<void>} actions
+		 * @returns
+		 */
+		async do(actions) {
+			const loglabel = `do ${table} #${nanoid()}`;
+			console.info(loglabel);
+			console.time(loglabel);
+			const tx = (await openDatabase()).transaction(table, 'readwrite');
+			await actions(tx.objectStore(table));
+			tx.commit();
+			await this.refresh();
+			console.timeEnd(loglabel);
 		},
 		list: async () => list(table),
 		all: () => iterator(table),
@@ -324,11 +350,8 @@ export function nukeDatabase() {
 	indexedDB.deleteDatabase('database');
 }
 
-// Magie vodoo Typescript, pas besoin de comprendre
-// Si t'es curieuxse, demande à Gwenn qui sera ravie
-// de t'expliquer :3
 /**
- * @type {import('idb').IDBPDatabase<{
+ * @typedef {{
  *   [Name in keyof typeof Tables]: {
  *      value: (typeof Tables[Name])['inferIn']
  *      key: string,
@@ -336,6 +359,13 @@ export function nukeDatabase() {
  *        [IndexName in string]: string;
  *     }
  *   }
- * }> | undefined}
+ * }} IDBDatabaseType
+ */
+
+// Magie vodoo Typescript, pas besoin de comprendre
+// Si t'es curieuxse, demande à Gwenn qui sera ravie
+// de t'expliquer :3
+/**
+ * @type {import('idb').IDBPDatabase<IDBDatabaseType> | undefined}
  */
 let _database;

@@ -29,7 +29,7 @@
 					// before calling the handler function if "preventDefault" is true
 					preventDefault
 						? /** @param {MouseEvent|KeyboardEvent} e */
-							(e) => {
+							async (e) => {
 								e.preventDefault();
 								bind.do(e);
 							}

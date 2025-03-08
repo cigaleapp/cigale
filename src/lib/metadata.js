@@ -33,7 +33,7 @@ export async function storeMetadataValue({
 		)
 	};
 
-	const metadata = await tables.Metadata.get(metadataId);
+	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
 	if (type && metadata.type !== type)
 		throw new Error(`Type de métadonnée incorrect: ${metadata.type} !== ${type}`);
@@ -162,7 +162,6 @@ export function combineMetadataValues(images) {
 		);
 
 		const stringedValues = new Set(values.map(({ value }) => JSON.stringify(value)));
-		console.log(`${[...keys]}: combining ${[...stringedValues]}`);
 		if (stringedValues.size > 1 || values.some(({ value }) => value === null)) {
 			output[key] = undefined;
 			continue;
