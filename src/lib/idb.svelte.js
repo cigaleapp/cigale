@@ -38,12 +38,19 @@ export const tables = {
 		console.time('*db initialize');
 		for (const name of tableNames) {
 			if (!isReactiveTable(name)) continue;
-			// @ts-expect-error
-			_tablesState[name] = await tables[name].list();
+			await tables[name].refresh();
 		}
 		console.timeEnd('*db initialize');
 	}
 };
+
+/**
+ * Generate an ID for a given table
+ * @param {keyof typeof Tables} table
+ */
+export function generateId(table) {
+	return table.slice(0, 1).toLowerCase() + Math.random().toString(36).slice(2, 9);
+}
 
 /**
  *
@@ -54,6 +61,10 @@ function wrangler(table) {
 	return {
 		get state() {
 			return _tablesState[table];
+		},
+		async refresh() {
+			// @ts-ignore
+			_tablesState[table] = await this.list();
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
@@ -100,6 +111,7 @@ function wrangler(table) {
 			const index = _tablesState[table].findIndex((item) => item.id === key);
 			if (index === -1) {
 				console.log(`${logLabel}: item not found in reactive state, refetching entire list`);
+				// @ts-ignore
 				_tablesState[table] = await this.list();
 			} else {
 				console.log(`${logLabel}: updating state @ ${table}[${index}]`);
@@ -113,7 +125,7 @@ function wrangler(table) {
 		async add(value) {
 			return this.set(
 				// @ts-ignore
-				{ ...value, id: `${table}_${nanoid()}` }
+				{ ...value, id: generateId(table) }
 			);
 		},
 		async clear() {
@@ -121,12 +133,33 @@ function wrangler(table) {
 			_tablesState[table] = [];
 		},
 		/**
-		 * @param {string} id key of the object to remove
+		 * @param {string | IDBKeyRange} id key of the object to remove
 		 */
 		async remove(id) {
 			await drop(table, id);
 			const index = _tablesState[table].findIndex((item) => item.id === id);
-			if (index !== -1) delete _tablesState[table][index];
+			if (index !== -1) {
+				console.warn(`del ${table} ${id}: not found in reactive state, re-fetching`);
+				// @ts-ignore
+				_tablesState[table] = await this.list();
+			} else {
+				delete _tablesState[table][index];
+			}
+		},
+		/**
+		 * Create a read-write transaction, execute `actions` given the transaction's object store for that table, and commit the transaction
+		 * @param {(store: import('idb').IDBPObjectStore<IDBDatabaseType, [Table], Table, "readwrite">) => void | Promise<void>} actions
+		 * @returns
+		 */
+		async do(actions) {
+			const loglabel = `do ${table} #${nanoid()}`;
+			console.info(loglabel);
+			console.time(loglabel);
+			const tx = (await openDatabase()).transaction(table, 'readwrite');
+			await actions(tx.objectStore(table));
+			tx.commit();
+			await this.refresh();
+			console.timeEnd(loglabel);
 		},
 		list: async () => list(table),
 		all: () => iterator(table),
@@ -222,31 +255,45 @@ export async function list(tableName) {
 /**
  * Returns a comparator to sort objects by their id property
  * If both IDs are numeric, they are compared numerically even if they are strings
- * @type {(a: {id: string|number}, b: {id: string|number}) => number}
+ * @template {{id: string|number} | string | number} IdOrObject
+ * @param {IdOrObject} a
+ * @param {IdOrObject} b
+ * @returns {number}
  */
 export const idComparator = (a, b) => {
-	if (typeof a.id === 'number' && typeof b.id === 'number') return a.id - b.id;
+	// @ts-ignore
+	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
+	// @ts-ignore
+	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
 
-	if (typeof a.id === 'number') return -1;
-	if (typeof b.id === 'number') return 1;
+	if (typeof a === 'number' && typeof b === 'number') return a - b;
 
-	if (/^\d+$/.test(a.id) && /^\d+$/.test(b.id)) return Number(a.id) - Number(b.id);
-	return a.id.localeCompare(b.id);
+	if (typeof a === 'number') return -1;
+	if (typeof b === 'number') return 1;
+
+	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
+	return a.localeCompare(b);
 };
 
 /**
  * Delete an entry from a table by key
  * @param {TableName} table
- * @param {string} id
+ * @param {string | IDBKeyRange} id
  * @returns {Promise<void>}
  * @template {keyof typeof Tables} TableName
  */
 export async function drop(table, id) {
 	console.time(`delete ${table} ${id}`);
 	const db = await openDatabase();
-	return await db.delete(table, IDBKeyRange.only(id)).then(() => {
-		console.timeEnd(`delete ${table} ${id}`);
-	});
+	return await db
+		.delete(table, id)
+		.then(() => {
+			console.timeEnd(`delete ${table} ${id}`);
+			return list(table);
+		})
+		.then((list) => {
+			console.log(`delete ${table} ${id}: objects are now ${list.map((o) => o.id).join(', ')}`);
+		});
 }
 
 /**
@@ -303,11 +350,8 @@ export function nukeDatabase() {
 	indexedDB.deleteDatabase('database');
 }
 
-// Magie vodoo Typescript, pas besoin de comprendre
-// Si t'es curieuxse, demande à Gwenn qui sera ravie
-// de t'expliquer :3
 /**
- * @type {import('idb').IDBPDatabase<{
+ * @typedef {{
  *   [Name in keyof typeof Tables]: {
  *      value: (typeof Tables[Name])['inferIn']
  *      key: string,
@@ -315,6 +359,13 @@ export function nukeDatabase() {
  *        [IndexName in string]: string;
  *     }
  *   }
- * }> | undefined}
+ * }} IDBDatabaseType
+ */
+
+// Magie vodoo Typescript, pas besoin de comprendre
+// Si t'es curieuxse, demande à Gwenn qui sera ravie
+// de t'expliquer :3
+/**
+ * @type {import('idb').IDBPDatabase<IDBDatabaseType> | undefined}
  */
 let _database;

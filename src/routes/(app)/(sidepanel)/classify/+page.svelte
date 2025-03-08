@@ -49,7 +49,7 @@
 	 */
 	function oncrop (boundingBoxesout,id) { 
 		console.log(boundingBoxesout,"is cropped! at id : ",id);
-		storeMetadataValue({subjectId: , value:boundingBoxesout[0], metadataId:"crop"});
+		storeMetadataValue({subjectId:"a", value:boundingBoxesout[0], metadataId:"crop"});
 
 	}
 

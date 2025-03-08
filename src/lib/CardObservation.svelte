@@ -19,7 +19,7 @@
 	 * @property {boolean} selected
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
-	 * @property {object[]} [boundingBoxes] - array of bounding boxes
+	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
 	 * @property {number} boundingBoxes.x
 	 * @property {number} boundingBoxes.y
 	 * @property {number} boundingBoxes.width

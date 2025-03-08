@@ -1,5 +1,8 @@
 <script>
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import IconMerge from '~icons/ph/selection-background';
+	import IconSplit from '~icons/ph/arrows-out-light';
+	import IconDelete from '~icons/ph/trash';
 	import { tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
@@ -11,13 +14,17 @@
 	 * @property {string[]} images source **href**s of the images/observations we're modifying the metadata on
 	 * @property {() => void} onmerge callback to call when the user wants to merge images or observations into a single one
 	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
+	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
+	 * @property {() => void} onsplit callback to call when the user wants to split the selected observation(s)
+	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
 	 * @property {(key: string, value: import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [allowmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
 	 */
 
 	/** @type {Props} */
-	let { images, onmerge, onaddmetadata, onmetadatachange, allowmerge, metadata } = $props();
+	let { images, onmerge, ondelete, onsplit, cansplit, onmetadatachange, allowmerge, metadata } =
+		$props();
 
 	// TODO maybe put as a prop? hmmmmm
 	const definitions = $derived(
@@ -66,14 +73,38 @@
 			{/if}
 		{/each}
 	</MetadataList>
-	<div class="button">
-		{#if allowmerge}
-			<ButtonPrimary onclick={onmerge} --width="80%">Fusionner les observations</ButtonPrimary>
-		{/if}
-		<ButtonPrimary onclick={onaddmetadata} --width="80%">
-			Ajouter une métadonner les métadonnées
-		</ButtonPrimary>
-	</div>
+	<section class="button">
+		<div class="side-by-side">
+			<ButtonSecondary
+				disabled={!allowmerge}
+				onclick={onmerge}
+				help="Regrouper les images et/ou observations sélectionnées en une observation"
+			>
+				<IconMerge />
+				Regrouper
+			</ButtonSecondary>
+			<ButtonSecondary
+				disabled={!cansplit}
+				onclick={onsplit}
+				help="Séparer toutes les observations sélectionnées en images seules"
+			>
+				<IconSplit />
+				Séparer
+			</ButtonSecondary>
+		</div>
+		<ButtonSecondary
+			disabled={images.length === 0}
+			onclick={ondelete}
+			help="Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
+			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
+			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
+			--bg-hover={images.length > 0 ? 'var(--bg-error)' : ''}
+			--fg-hover={images.length > 0 ? 'var(--fg-error)' : ''}
+		>
+			<IconDelete />
+			Supprimer {images.length} images
+		</ButtonSecondary>
+	</section>
 </div>
 
 <style>
@@ -114,8 +145,16 @@
 
 	.button {
 		display: flex;
-		gap: 20px;
+		gap: 0.75em;
 		align-items: center;
 		flex-direction: column;
+		--width: 100%;
+	}
+
+	.button .side-by-side {
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		width: 100%;
 	}
 </style>
