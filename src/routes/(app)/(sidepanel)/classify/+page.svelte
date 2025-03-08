@@ -15,7 +15,13 @@
 	const erroredImages = $derived(uiState.erroredImages);
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
-	const images = $derived(toAreaObservationProps(tables.Image.state, tables.Observation.state));
+	const images = $derived(
+		toAreaObservationProps(tables.Image.state, [], {
+			isLoaded: (image) =>
+				imageBufferWasSaved(image) && previewURLs.has(image.id) && imageIsCLassified(image)
+		})
+	);
+
 
 	let classifmodel = $state();
 	async function loadClassifModel() {
