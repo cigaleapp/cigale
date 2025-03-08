@@ -13,8 +13,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script>
-	import { onMount } from 'svelte';
 	import { uiState } from '$lib/state.svelte';
+	import { onMount } from 'svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import { mutationobserver } from './mutations';
@@ -27,10 +27,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
 	 * @property {(id: string) => void} [ondelete] callback when an image is deleted, with the image/observation id as argument
+	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
 	 */
 
 	/** @type {Props } */
-	let { images = $bindable(), ondelete, errors, loadingText, selection = $bindable([]) } = $props();
+	let {
+		images = $bindable(),
+		ondelete,
+		oncardclick,
+		errors,
+		loadingText,
+		selection = $bindable([])
+	} = $props();
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -38,21 +46,22 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	let dragselect;
 
 	onMount(() => {
+		if (oncardclick) return;
 		if (!imagesContainer) return;
+		console.log('setting up dragselect');
 		dragselect?.destroy();
 		dragselect = new DragSelect(imagesContainer, selection);
 		dragselect.setSelection(selection);
-	});
-	$effect(() => {
-		console.log(`Binding uiState.setSelection`);
-		/** @param {string[]} selection */
-		uiState.setSelection = (selection) => {
-			dragselect?.setSelection(selection);
+
+		return () => {
+			console.log('destroying dragselect');
+			dragselect?.destroy();
 		};
 	});
 
 	$effect(() => {
-		selection = dragselect?.selection ?? [];
+		if (oncardclick) return;
+		selection = [...new Set(dragselect?.selection ?? [])];
 	});
 
 	onMount(() => {
@@ -84,6 +93,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		childList: true,
 		subtree: true,
 		onchildList() {
+			if (oncardclick) return;
 			if (!imagesContainer) return;
 			const items = [...imagesContainer.querySelectorAll('[data-selectable]')];
 			dragselect?.setItems(items);
@@ -98,10 +108,12 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			data-loading={props.loading}
 			data-index={props.index}
 			{...props}
+			onclick={oncardclick ? () => oncardclick(props.id) : undefined}
 			ondelete={ondelete ? () => ondelete(props.id) : undefined}
 			errored={errors?.has(props.id)}
 			statusText={errors?.get(props.id) ?? loadingText}
 			selected={selection.includes(props.id.toString())}
+			boundingBoxes={props.boundingBoxes}
 			{loadingText}
 		/>
 	{/each}
