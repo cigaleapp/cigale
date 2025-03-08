@@ -229,16 +229,24 @@ export async function list(tableName) {
 /**
  * Returns a comparator to sort objects by their id property
  * If both IDs are numeric, they are compared numerically even if they are strings
- * @type {(a: {id: string|number}, b: {id: string|number}) => number}
+ * @template {{id: string|number} | string | number} IdOrObject
+ * @param {IdOrObject} a
+ * @param {IdOrObject} b
+ * @returns {number}
  */
 export const idComparator = (a, b) => {
-	if (typeof a.id === 'number' && typeof b.id === 'number') return a.id - b.id;
+	// @ts-ignore
+	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
+	// @ts-ignore
+	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
 
-	if (typeof a.id === 'number') return -1;
-	if (typeof b.id === 'number') return 1;
+	if (typeof a === 'number' && typeof b === 'number') return a - b;
 
-	if (/^\d+$/.test(a.id) && /^\d+$/.test(b.id)) return Number(a.id) - Number(b.id);
-	return a.id.localeCompare(b.id);
+	if (typeof a === 'number') return -1;
+	if (typeof b === 'number') return 1;
+
+	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
+	return a.localeCompare(b);
 };
 
 /**
