@@ -16,8 +16,8 @@
 		MODELDETECTPATH,
 		TARGETHEIGHT,
 		TARGETWIDTH
-	} from './inference/inference';
-	import { uiState } from './inference/state.svelte';
+	} from '$lib/inference.js';
+	import { uiState } from '$lib/state.svelte.js';
 
 	onMount(() => {
 		uiState.keybinds['$mod+u'] = {

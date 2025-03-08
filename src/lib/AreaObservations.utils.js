@@ -1,4 +1,4 @@
-import { uiState } from '../routes/inference/state.svelte';
+import { uiState } from '$lib/state.svelte';
 import { imageCompletelyLoaded } from './images';
 
 /**

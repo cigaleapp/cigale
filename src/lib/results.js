@@ -1,6 +1,6 @@
 import { strToU8, zip } from 'fflate';
 import { Jimp } from 'jimp';
-import { TARGETHEIGHT, TARGETWIDTH } from '../routes/inference/inference';
+import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
 import { metadataPrettyKey, metadataPrettyValue, observationMetadata } from './metadata';
