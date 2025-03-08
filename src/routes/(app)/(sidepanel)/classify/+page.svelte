@@ -49,14 +49,9 @@
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
 		const nimg = await applyBBOnTensor(bbList,img);
-		console.log("nimg", nimg);
 		const output_classif = await classify([[nimg]],classifmodel,uiState, 0);
-		console.log("classified image", id, filename, output_classif);
 		const species = output_classif[0]
 		const confs = output_classif[1]
-
-		console.log("Species", species);
-		console.log("Confs", confs);
 
 		if (output_classif[0].length == 0) {
 			console.warn("No species detected");
@@ -80,7 +75,6 @@
 		if (!classifmodel) return;
 		for (const image of tables.Image.state) {
 			if (imageBufferWasSaved(image) && !imageIsCLassified(image) && !uiState.loadingImages.has(image.id)) {
-				console.log("on est rentré !");
 				$inspect(uiState);
 				uiState.loadingImages.add(image.id);
 
