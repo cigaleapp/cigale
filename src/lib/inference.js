@@ -74,9 +74,8 @@ export const NMS = true;
  * @returns {string}
  */
 export function torawpath(path) {
-	let debut = 'https://git.inpt.fr/api/v4/projects/1535/repository/files/models%2f';
-	let fin = '/raw?lfs=true';
-	return debut + path + fin;
+	// TODO host on IRIT infrastructure?
+	return `https://media.gwen.works/cigale/models/${path}`;
 }
 /**
  *
