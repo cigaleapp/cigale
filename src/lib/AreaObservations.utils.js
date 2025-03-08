@@ -49,6 +49,9 @@ export function toAreaObservationProps(images, observations) {
 				),
 			...observations.map((observation, i) => {
 				const imagesOfObservation = images.filter((img) => observation.images.includes(img.id));
+				const firstImage = imagesOfObservation.find(
+					(i) => i.id === observation.images.toSorted(idComparator)[0]
+				);
 
 				/**  @satisfies {CardObservation} */
 				return {
@@ -58,9 +61,9 @@ export function toAreaObservationProps(images, observations) {
 					index: images.length + i,
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
-					boundingBoxes: imagesOfObservation[0]?.metadata.crop?.value
+					boundingBoxes: firstImage?.metadata.crop?.value
 						? // @ts-ignore
-							[toRelativeCoords(imagesOfObservation[0].metadata.crop.value)]
+							[toRelativeCoords(firstImage.metadata.crop.value)]
 						: [],
 					loading: imagesOfObservation.every((img) =>
 						imageCompletelyLoaded(img, uiState.previewURLs)

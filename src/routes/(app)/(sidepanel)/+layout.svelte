@@ -59,11 +59,12 @@
 		<PreviewSidePanel
 			images={selectedHrefs}
 			metadata={combineMetadataValues(selectedImages)}
-			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
+			canmerge={uiState.selection.length > 1}
 			onmerge={async () => {
 				await mergeToObservation(uiState.selection);
 				uiState.setSelection([]);
 			}}
+			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
 			onsplit={async () => {
 				await tables.Observation.do((tx) => {
 					uiState.selection.map((id) => tx.delete(id));
@@ -99,7 +100,6 @@
 					})
 				);
 			}}
-			allowmerge
 		/>
 	{/if}
 </div>
