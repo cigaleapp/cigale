@@ -323,13 +323,31 @@ export async function* iterator(tableName, index = undefined) {
  * @param {(tx: IDBTransactionWithAtLeast<Tables, Mode>) => void | Promise<void>} actions
  */
 export async function openTransaction(tableNames, { mode, tx }, actions) {
-	if (tx) return actions(tx);
+	// @ts-ignore
+	mode ??= 'readwrite';
+
+	if (tx) {
+		// @ts-ignore
+		console.log(`txn reuse ${tx.id}`);
+		return actions(tx);
+	}
+
+	const txid = nanoid(8);
+
+	console.log(`txn open ${txid} tables ${tableNames} mode ${mode}`);
 
 	const db = await openDatabase();
-	const newTx = db.transaction(tableNames, mode ?? 'readwrite');
+	const newTx = db.transaction(tableNames, mode);
 
-	// @ts-expect-error
+	// @ts-ignore
+	newTx.id = txid;
+
+	// @ts-ignore
 	await actions(newTx);
+
+	// @ts-ignore
+	console.log(`txn commit ${txid} `);
+
 	newTx.commit();
 
 	for (const table of tableNames.filter(isReactiveTable)) {
