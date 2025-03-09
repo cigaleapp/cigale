@@ -26,6 +26,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import { onMount } from 'svelte';
 
 	onMount(() => {
@@ -33,9 +34,15 @@
 			help: 'Supprimer toutes les images et observations',
 			async do() {
 				toasts.warn('Suppression de toutes les images et observations…');
-				await tables.Image.clear();
-				await db.clear('ImageFile');
-				await tables.Observation.clear();
+				await db.openTransaction(['Image', 'ImageFile', 'Observation'], {}, (tx) => {
+					tx.objectStore('Observation').clear();
+					tx.objectStore('ImageFile').clear();
+					uiState.previewURLs = new SvelteMap();
+					tx.objectStore('Image').clear();
+					uiState.erroredImages = new SvelteMap();
+					uiState.loadingImages = new SvelteSet();
+					uiState.setSelection([]);
+				});
 			}
 		};
 		uiState.keybinds['$mod+g'] = {
