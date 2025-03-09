@@ -3,6 +3,14 @@ import { BUILTIN_METADATA_IDS, Schemas } from './database.js';
 import { downloadAsFile } from './download.js';
 
 /**
+ *
+ * @param {string} base base path of the app - import `base` from `$app/paths`
+ */
+export function jsonSchemaURL(base) {
+	return `${window.location.origin}${base}/protocol.schema.json`;
+}
+
+/**
  * Ensures a metadata ID is namespaced to the given protocol ID
  * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
  * Built-in Metadata IDs are never namespaced.
@@ -90,13 +98,15 @@ export async function downloadProtocolTemplate(base, format) {
  * @param {typeof ExportedProtocol.infer} exportedProtocol
  */
 function downloadProtocol(base, format, exportedProtocol) {
-	let jsoned = jsonWithToplevelOrdering(
-		format,
-		`${window.location.origin}${base}/protocol.schema.json`,
-		exportedProtocol,
-		['id', 'name', 'source', 'authors', 'metadata']
-	);
+	let jsoned = stringifyWithToplevelOrdering(format, jsonSchemaURL(base), exportedProtocol, [
+		'id',
+		'name',
+		'source',
+		'authors',
+		'metadata'
+	]);
 
+	// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
 	downloadAsFile(jsoned, `${exportedProtocol.id}.${format}`, `application/${format}`);
 }
 
@@ -151,7 +161,7 @@ export async function importProtocol() {
  * @param {'json' | 'yaml'} format
  * @param {string} schema the json schema URL
  */
-function jsonWithToplevelOrdering(format, schema, object, ordering) {
+function stringifyWithToplevelOrdering(format, schema, object, ordering) {
 	let keysOrder = [...ordering];
 
 	if (format === 'json') {
