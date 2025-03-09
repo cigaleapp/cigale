@@ -1,6 +1,7 @@
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { namespacedMetadataId } from './metadata.js';
+import { downloadAsFile } from './download.js';
 
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
 	metadata: Schemas.Metadata.array()
@@ -32,7 +33,7 @@ export async function exportProtocol(base, id) {
 		)
 	};
 
-	const blob = jsonBlobWithToplevelOrdering(exportedProtocol, [
+	const jsoned = jsonWithToplevelOrdering(exportedProtocol, [
 		'$schema',
 		'id',
 		'name',
@@ -40,12 +41,7 @@ export async function exportProtocol(base, id) {
 		'authors',
 		'metadata'
 	]);
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = `${id}.json`;
-	a.click();
-	URL.revokeObjectURL(url);
+	downloadAsFile(jsoned, `${protocol.id}.json`, 'application/json');
 }
 
 /**
@@ -94,8 +90,8 @@ export async function importProtocol() {
  * @param {readonly Keys[]} keysOrder an array of keys in target order, for the top-level object
  * @returns
  */
-function jsonBlobWithToplevelOrdering(object, keysOrder) {
-	const jsoned = JSON.stringify(
+function jsonWithToplevelOrdering(object, keysOrder) {
+	return JSON.stringify(
 		object,
 		(_, value) => {
 			if (value === null) return value;
@@ -110,5 +106,4 @@ function jsonBlobWithToplevelOrdering(object, keysOrder) {
 		},
 		2
 	);
-	return new Blob([jsoned], { type: 'application/json' });
 }
