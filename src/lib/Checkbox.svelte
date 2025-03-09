@@ -2,8 +2,19 @@
 <script>
 	//export let value = false;
 	import Icon from '~icons/ph/check-light';
-	let { children, value = $bindable(), onchange = () => {} } = $props();
+
+	/**
+	 * @typedef {object} Props
+	 * @property {boolean} [value]
+	 * @property {(value: boolean) => void} [onchange]
+	 * @property {import('svelte').Snippet} children
+	 */
+
+	/** @type {Props} */
+	let { children, value = $bindable(), onchange = () => {}, ...rest } = $props();
+
 	$effect(() => {
+		if (value === undefined) return;
 		onchange(value);
 	});
 </script>
@@ -41,7 +52,7 @@
 		{/if}
 	</div>
 
-	<input type="checkbox" bind:checked={value} />
+	<input {...rest} type="checkbox" bind:checked={value} />
 	{@render children()}
 </label>
 
