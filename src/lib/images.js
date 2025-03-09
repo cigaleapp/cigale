@@ -63,13 +63,13 @@ export async function downloadImage(imageId, options) {
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImage(id, tx, notFoundOk = true) {
-	const image = await tables.Image.get(id);
-	if (!image) {
-		if (notFoundOk) return;
-		throw 'Image non trouvée';
-	}
+	await db.openTransaction(['Image', 'ImageFile'], { tx }, async (tx) => {
+		const image = await tx.objectStore('Image').get(id);
+		if (!image) {
+			if (notFoundOk) return;
+			throw 'Image non trouvée';
+		}
 
-	await db.openTransaction(['Image', 'ImageFile'], { tx }, (tx) => {
 		tx.objectStore('Image').delete(id);
 		tx.objectStore('ImageFile').delete(imageIdToFileId(id));
 

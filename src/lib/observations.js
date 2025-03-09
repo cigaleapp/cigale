@@ -52,13 +52,13 @@ export async function deleteObservation(
 	id,
 	{ recursive = false, notFoundOk = true, tx = undefined } = {}
 ) {
-	const observation = await tables.Observation.get(id);
-	if (!observation) {
-		if (notFoundOk) return;
-		throw 'Observation non trouvée';
-	}
+	await db.openTransaction(['Observation', 'Image', 'ImageFile'], { tx }, async (tx) => {
+		const observation = await tx.objectStore('Observation').get(id);
+		if (!observation) {
+			if (notFoundOk) return;
+			throw 'Observation non trouvée';
+		}
 
-	await db.openTransaction(['Observation', 'Image', 'ImageFile'], { tx }, (tx) => {
 		tx.objectStore('Observation').delete(id);
 
 		if (recursive) {
