@@ -84,16 +84,17 @@
 			}}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
-				await Promise.all(
-					selectedImages.map(async (image) => {
-						storeMetadataValue({
+				await openTransaction(['Image', 'Observation'], 'readwrite', async (tx) => {
+					for (const image of selectedImages) {
+						await storeMetadataValue({
+							tx,
 							subjectId: image.id,
 							metadataId: id,
 							confidence: 1,
 							value
 						});
-					})
-				);
+					}
+				});
 			}}
 		/>
 	{/if}
