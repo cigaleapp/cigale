@@ -255,7 +255,10 @@
 				}}
 			/>
 			{#if !images.length}
-				<p>Cliquer ou déposer des images ici</p>
+				<div class="empty-state">
+					<Logo variant="empty" />
+					<p>Cliquer ou déposer des images ici</p>
+				</div>
 			{/if}
 		</section>
 	</Dropzone>
@@ -282,15 +285,19 @@
 		text-align: center;
 	}
 
-	.loading {
+	.loading,
+	.empty-state {
 		display: flex;
 		flex-direction: column;
 		gap: 1.2em;
 		justify-content: center;
 		align-items: center;
-		height: 100vh;
 		/* Logo size */
 		--size: 5em;
+	}
+
+	.loading {
+		height: 100vh;
 	}
 
 	.loading .source {

@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/state';
 	import { openDatabase, tables } from '$lib/idb.svelte';
 	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { mergeToObservation } from '$lib/observations';
@@ -29,7 +28,7 @@
 		}
 	};
 
-	const showSidePanel = $derived(!['/about', '/settings'].includes(page.route.id ?? ''));
+	const showSidePanel = $derived(tables.Image.state.length + tables.Observation.state.length > 0);
 
 	const selectedImages = $derived(
 		uiState.selection
