@@ -3,11 +3,13 @@
 	import IconMerge from '~icons/ph/selection-background';
 	import IconSplit from '~icons/ph/arrows-out-light';
 	import IconDelete from '~icons/ph/trash';
-	import { tables } from '$lib/idb.svelte';
+	import deepEqual from 'deep-equal';
+	import { tables, idComparator } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
+	import { uiState } from '$lib/state.svelte.js';
 	import { page } from '$app/state';
 
 	/**
@@ -28,52 +30,58 @@
 		$props();
 
 	// TODO maybe put as a prop? hmmmmm
-	const definitions = $derived(
-		Object.fromEntries(
-			Object.entries(metadata).map(([id]) => [id, tables.Metadata.state.find((m) => m.id === id)])
-		)
-	);
+	const definitions = $derived.by(() => {
+		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocol);
+		if (!protocol) return [];
+		return protocol.metadata
+			.map((id) => tables.Metadata.state.find((m) => m.id === id))
+			.filter((m) => m !== undefined)
+			.toSorted(({ id: a }, { id: b }) => {
+				// Sort id "species" before all others
+				if (a === 'species') return -1;
+				if (b === 'species') return 1;
+				return idComparator(a, b);
+			});
+	});
 
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
 </script>
 
-<div class="pannel">
-	<div class="images">
-		{#each images as image, i (i)}
-			<img src={image} alt={'image ' + i} />
-		{:else}
-			<!-- svelte-ignore a11y_missing_attribute -->
-			<img />
-		{/each}
-	</div>
-	<h1>Métadonnées</h1>
-	<MetadataList>
-		{#each Object.entries(metadata).sort(([a], [b]) => a.localeCompare(b)) as [id, value] (id)}
-			{@const definition = definitions[id]}
-			{#if definition && (definition.label || showTechnicalMetadata)}
-				<!-- the value variable here contains value, confidence and alternatives -->
-				<Metadata
-					{...definition}
-					{...value ?? { value: undefined }}
-					onblur={async (v) => {
-						if (v === undefined) return;
-						onmetadatachange(id, v);
-					}}
-				>
-					{#if definition.label}
-						{definition.label}
-					{:else}
-						<code>{definition.id}</code>
-					{/if}
-				</Metadata>
-			{:else if !definition}
-				<p class="error">
-					<Logo variant="error" />
-					Métadonnée inconnue
-				</p>
-			{/if}
-		{/each}
-	</MetadataList>
+<div class="pannel" class:empty={images.length === 0}>
+		<div class="images">
+			{#each images as image, i (i)}
+				<img src={image} alt={'image ' + i} />
+			{/each}
+		</div>
+		<h1>Métadonnées</h1>
+		<MetadataList>
+			{#each definitions as definition (definition.id)}
+				{@const value = metadata[definition.id]}
+				{#if definition.label || showTechnicalMetadata}
+					<!-- 
+						There's to ways to have a undefined value:
+						- either the metadata does not exist on the observation/image yet (in that case, definition.id is not in metadata); or
+						- we have multiple multiple differing values for the images (and no override ) 
+					-->
+					<Metadata
+						conflicted={value === undefined && definition.id in metadata && images.length > 1}
+						{...definition}
+						{...value ?? { value: undefined }}
+						onblur={async (v) => {
+							if (v === undefined) return;
+							if (deepEqual(v, value?.value)) return;
+							onmetadatachange(definition.id, v);
+						}}
+					>
+						{#if definition.label}
+							{definition.label}
+						{:else}
+							<code>{definition.id}</code>
+						{/if}
+					</Metadata>
+				{/if}
+			{/each}
+		</MetadataList>
 	<section class="button">
 		{#if page.url.pathname === '/classify'}
 			<div class="side-by-side">

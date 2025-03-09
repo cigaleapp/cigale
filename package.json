@@ -54,6 +54,7 @@
 		"@tensorflow/tfjs": "^4.22.0",
 		"arktype": "^2.0.4",
 		"date-fns": "^4.1.0",
+		"deep-equal": "^2.2.3",
 		"dragselect": "^3.1.1",
 		"exif-parser": "^0.1.12",
 		"fflate": "^0.8.2",

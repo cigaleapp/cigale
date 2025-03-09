@@ -29,6 +29,7 @@ import { toasts } from './toasts.svelte';
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
  * @property {Set<string>} loadingImages liste des IDs d'images en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
+ * @property {string} currentProtocol ID du protocole choisi
  */
 
 /**
@@ -49,6 +50,8 @@ export const uiState = $state({
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
 	keybinds: {},
+	// TODO
+	currentProtocol: "test",
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection() {
 		toasts.error('Impossible de modifier la sélection');
