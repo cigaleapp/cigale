@@ -205,21 +205,20 @@
 	<Dropzone
 		clickable={images.length === 0}
 		onfiles={async ({ files }) => {
-			const currentLength = tables.Image.state.length;
-			await Promise.all(
-				files.map(async (file, index) => {
-					const id = imageId(currentLength + index);
-					try {
-						uiState.loadingImages.add(id);
-						await processImageFile(file, id);
-					} catch (error) {
-						console.error(error);
-						erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
-					} finally {
-						uiState.loadingImages.delete(id);
-					}
-				})
-			);
+
+			for (const file of files) {
+				const currentLength = tables.Image.state.length;
+				const id = imageId(currentLength);
+				try {
+					uiState.loadingImages.add(id);
+					await processImageFile(file, id);
+				} catch (error) {
+					console.error(error);
+					erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+				} finally {
+					uiState.loadingImages.delete(id);
+				}
+			}
 		}}
 	>
 		<section class="observations" class:empty={!images.length}>
