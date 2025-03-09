@@ -5,11 +5,6 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { imageBufferWasSaved, imageId, imageIdToFileId, imageIsCropped } from '$lib/images';
-	import Logo from '$lib/Logo.svelte';
-	import { extractFromExif, storeMetadataValue } from '$lib/metadata';
-	import { toasts } from '$lib/toasts.svelte';
-	import { formatISO } from 'date-fns';
-	import { onMount } from 'svelte';
 	import {
 		inferSequentialy,
 		loadModel,
@@ -17,8 +12,13 @@
 		TARGETHEIGHT,
 		TARGETWIDTH
 	} from '$lib/inference.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import Logo from '$lib/Logo.svelte';
+	import { extractFromExif, storeMetadataValue } from '$lib/metadata';
 	import { mergeToObservation } from '$lib/observations';
+	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte';
+	import { formatISO } from 'date-fns';
+	import { onMount } from 'svelte';
 
 	onMount(() => {
 		uiState.keybinds['$mod+u'] = {
@@ -83,17 +83,22 @@
 			return {};
 		});
 		console.log(metadataFromExif);
-		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-			await storeMetadataValue({
-				subjectId: id,
-				metadataId: key,
-				value,
-				confidence
-			});
-		}
-		await db.set('ImageFile', { id: imageIdToFileId(id), bytes });
-		previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
-		await tables.Image.update(id, 'bufferExists', true);
+		await db.openTransaction(['Image', 'Observation'], 'readwrite', async (tx) => {
+			for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+				await storeMetadataValue({
+					tx,
+					subjectId: id,
+					metadataId: key,
+					value,
+					confidence
+				});
+			}
+		});
+		await db.openTransaction(['Image', 'ImageFile'], 'readwrite', async (tx) => {
+			tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes });
+			previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
+			tx.objectStore('Image').put({ ...image, bufferExists: true });
+		});
 		await analyzeImage(bytes, id, image);
 	}
 
@@ -129,31 +134,34 @@
 			height
 		});
 
-		await storeMetadataValue({
-			subjectId: id,
-			metadataId: 'crop',
-			type: 'boundingbox',
-			value: toCropBox(firstBoundingBox),
-			confidence: firstScore
-		});
-
-		// Create one more image for each new boundingbox, with id "(original id)_(1 to boundingBoxes.length)"
-		for (const [i, box] of otherBoundingBoxes.entries()) {
-			await tables.Image.set({
-				id: imageId(parseInt(id), i + 1),
-				filename,
-				contentType,
-				addedAt: formatISO(new Date()),
-				bufferExists: true,
-				metadata: {
-					crop: {
-						value: JSON.stringify(toCropBox(box)),
-						confidence: otherScores[i],
-						alternatives: {}
-					}
-				}
+		await db.openTransaction(['Image', 'Observation'], 'readwrite', async (tx) => {
+			await storeMetadataValue({
+				tx,
+				subjectId: id,
+				metadataId: 'crop',
+				type: 'boundingbox',
+				value: toCropBox(firstBoundingBox),
+				confidence: firstScore
 			});
-		}
+
+			// Create one more image for each new boundingbox, with id "(original id)_(1 to boundingBoxes.length)"
+			for (const [i, box] of otherBoundingBoxes.entries()) {
+				await tx.objectStore('Image').put({
+					id: imageId(parseInt(id), i + 1),
+					filename,
+					contentType,
+					addedAt: formatISO(new Date()),
+					bufferExists: true,
+					metadata: {
+						crop: {
+							value: JSON.stringify(toCropBox(box)),
+							confidence: otherScores[i],
+							alternatives: {}
+						}
+					}
+				});
+			}
+		});
 	}
 
 	$effect(() => {

@@ -2,6 +2,9 @@ import { type } from 'arktype';
 import * as exifParser from 'exif-parser';
 import { BUILTIN_METADATA_IDS, Schemas } from './database';
 import { _tablesState, tables } from './idb.svelte.js';
+/**
+ * @import { IDBDatabaseType } from './idb.svelte.js'
+ */
 
 /**
  *
@@ -12,6 +15,7 @@ import { _tablesState, tables } from './idb.svelte.js';
  * @param {Type} [options.type] le type de données pour la métadonnée, sert à éviter des problèmes de typages
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
+ * @param {import('idb').IDBPTransaction<IDBDatabaseType, ["Image", "Observation"], "readwrite">} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  */
 export async function storeMetadataValue({
@@ -20,7 +24,8 @@ export async function storeMetadataValue({
 	type,
 	value,
 	confidence,
-	alternatives
+	alternatives,
+	tx = undefined
 }) {
 	alternatives ??= [];
 	confidence ??= 1;
@@ -38,18 +43,28 @@ export async function storeMetadataValue({
 	if (type && metadata.type !== type)
 		throw new Error(`Type de métadonnée incorrect: ${metadata.type} !== ${type}`);
 
-	const image = await tables.Image.raw.get(subjectId);
-	const observation = await tables.Observation.raw.get(subjectId);
+	const image = tx
+		? await tx.objectStore('Image').get(subjectId)
+		: await tables.Image.raw.get(subjectId);
+	const observation = tx
+		? await tx.objectStore('Observation').get(subjectId)
+		: await tables.Observation.raw.get(subjectId);
 
 	if (image) {
 		image.metadata[metadataId] = newValue;
-		await tables.Image.raw.set(image);
+
+		if (tx) tx.objectStore('Image').put(image);
+		else await tables.Image.raw.set(image);
+
 		_tablesState.Image[
 			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
 		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else if (observation) {
 		observation.metadataOverrides[metadataId] = newValue;
-		await tables.Observation.raw.set(observation);
+
+		if (tx) tx.objectStore('Observation').put(observation);
+		else await tables.Observation.raw.set(observation);
+
 		_tablesState.Observation[
 			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
 		].metadataOverrides[metadataId] = newValue;
@@ -422,6 +437,15 @@ export function namespacedMetadataId(protocolId, metadataId) {
 	if (metadataId in BUILTIN_METADATA_IDS) return metadataId;
 	metadataId = metadataId.replace(/^.+__/, '');
 	return `${protocolId}__${metadataId}`;
+}
+
+/**
+ * Checks if a given metadata ID is namespaced to a given protocol ID
+ * @param {string} protocolId
+ * @param {string} metadataId
+ */
+export function isNamespacedToProtocol(protocolId, metadataId) {
+	return metadataId.startsWith(`${protocolId}__`);
 }
 
 /**

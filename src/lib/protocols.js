@@ -1,7 +1,7 @@
 import YAML from 'yaml';
 import { Schemas } from './database.js';
-import { namespacedMetadataId } from './metadata.js';
 import { downloadAsFile } from './download.js';
+import { namespacedMetadataId } from './metadata.js';
 
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
 	metadata: Schemas.Metadata.array()
@@ -50,7 +50,9 @@ export async function exportProtocol(base, id) {
  * @returns {Promise<typeof ExportedProtocol.infer>}
  */
 export async function importProtocol() {
-	const { tables } = await import('./idb.svelte.js');
+	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
+	// (Node does not like .svelte.js files' runes)
+	const { openTransaction } = await import('./idb.svelte.js');
 
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
@@ -65,13 +67,13 @@ export async function importProtocol() {
 					if (!reader.result) throw new Error('Fichier vide');
 					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
 					const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
-					await Promise.all([
-						...protocol.metadata.map((m) => tables.Metadata.set(m)),
-						tables.Protocol.set({
+					await openTransaction(['Protocol', 'Metadata'], 'readwrite', (tx) => {
+						tx.objectStore('Protocol').put({
 							...protocol,
 							metadata: protocol.metadata.map((m) => m.id)
-						})
-					]);
+						});
+						protocol.metadata.map((metadata) => tx.objectStore('Metadata').put(metadata));
+					});
 					resolve(protocol);
 				} catch (error) {
 					reject(error);

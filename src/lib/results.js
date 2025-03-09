@@ -29,11 +29,7 @@ export async function generateResultsZip(observations, protocolUsed) {
 		...new Set(observations.flatMap((o) => Object.keys(finalMetadata[o.id].metadata)))
 	];
 
-	const metadataDefinitions = Object.fromEntries(
-		await Promise.all(allMetadataKeys.map((key) => db.tables.Metadata.get(key))).then((ms) =>
-			ms.filter((m) => m !== undefined).map((m) => [m.id, m])
-		)
-	);
+	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
 
 	const speciesDefinition = await db.tables.Metadata.get('species');
 	if (!speciesDefinition) throw 'Species metadata not found';

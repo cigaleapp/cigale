@@ -1,15 +1,16 @@
 <script>
-	import { tables } from '$lib/idb.svelte.js';
-	import Card from '$lib/Card.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import IconExport from '~icons/ph/share';
-	import IconImport from '~icons/ph/download';
-	import IconDelete from '~icons/ph/trash';
-	import { tooltip } from '$lib/tooltips';
-	import { exportProtocol, importProtocol } from '$lib/protocols';
 	import { base } from '$app/paths';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import Card from '$lib/Card.svelte';
+	import { openTransaction, tables } from '$lib/idb.svelte.js';
+	import { isNamespacedToProtocol } from '$lib/metadata';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { exportProtocol, importProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
+	import { tooltip } from '$lib/tooltips';
+	import IconImport from '~icons/ph/download';
+	import IconExport from '~icons/ph/share';
+	import IconDelete from '~icons/ph/trash';
 
 	/**
 	 * @param {typeof tables.Metadata.state} metadata
@@ -36,13 +37,20 @@
 	cancel="Annuler"
 	confirm="Oui, supprimer"
 	onconfirm={async () => {
-		if (!removingProtocol) return;
-		await tables.Protocol.remove(removingProtocol.id);
-		await Promise.all(
-			removingProtocol.metadata
-				.filter((id) => id.startsWith(`${removingProtocol?.id}__`))
-				.map((id) => tables.Metadata.remove(id))
-		);
+		await openTransaction(['Protocol', 'Metadata'], 'readwrite', (tx) => {
+			if (!removingProtocol) return;
+
+			tx.objectStore('Protocol').delete(removingProtocol.id);
+
+			const toRemove = removingProtocol.metadata.filter((id) =>
+				// @ts-ignore that shit is pretty dumb, of course removingProtocol is not undefined
+				isNamespacedToProtocol(removingProtocol.id, id)
+			);
+
+			for (const metadata of toRemove) {
+				tx.objectStore('Metadata').delete(metadata);
+			}
+		});
 		toasts.success('Protocole supprimé');
 	}}
 >
