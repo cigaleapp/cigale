@@ -91,15 +91,8 @@ export async function extractFromExif(buffer) {
  * @returns {Promise<import('./database').MetadataValues>}
  */
 export async function observationMetadata(observation) {
-	// TODO use a transaction instead
-	const images = await Promise.all(observation.images.map(tables.Image.get)).then(
-		/**
-		 * @template V
-		 * @param {V[]} images
-		 * @returns {NonNullable<V>[]}
-		 */
-		// @ts-ignore
-		(images) => images.filter(Boolean)
+	const images = await tables.Image.list().then((images) =>
+		images.filter((img) => observation.images.includes(img.id))
 	);
 
 	const metadataFromImages = await mergeMetadataValues(images.map((img) => img.metadata));
