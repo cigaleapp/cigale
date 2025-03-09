@@ -22,7 +22,8 @@ export async function defineSpeciesMetadata(id) {
 		options: names.filter(Boolean).map((name, i) => ({
 			key: i.toString(),
 			label: name,
-			description: ''
+			description: '',
+			learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
 		}))
 	});
 }
