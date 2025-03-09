@@ -239,7 +239,7 @@ const min = (values) => Math.min(...values);
  * Merge values by best confidence. If multiple values have the same confidence, use `strategy` to break the tie. If `strategy` throws, use first value as a fallback.
  * @param {Type} _type
  * @param {Array<{ value: Value, confidence: number }>} values
- * @param {(...values: Value[]) => Value} strategy
+ * @param {(values: Value[]) => Value} strategy
  * @returns {Value}
  * @template {RuntimeValue<Type>} Value
  * @template {import('./database').MetadataType} Type
@@ -248,7 +248,7 @@ function mergeByMajority(_type, values, strategy) {
 	const bestConfidence = Math.max(...values.map((v) => v.confidence));
 	const bestValues = values.filter((v) => v.confidence === bestConfidence);
 	try {
-		return strategy(...bestValues.map((v) => v.value));
+		return strategy(bestValues.map((v) => v.value));
 	} catch (error) {
 		console.error(error);
 		return bestValues[0].value;
