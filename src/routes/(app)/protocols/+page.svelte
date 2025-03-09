@@ -3,7 +3,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Card from '$lib/Card.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte.js';
-	import { isNamespacedToProtocol } from '$lib/metadata';
+	import { isNamespacedToProtocol } from '$lib/protocols.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { exportProtocol, importProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
