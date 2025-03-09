@@ -25,13 +25,17 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
 }
 
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
-	metadata: Schemas.Metadata.array()
+	metadata: {
+		'[string]': Schemas.MetadataWithoutID
+	}
 }).pipe((protocol) => ({
 	...protocol,
-	metadata: protocol.metadata.map((metadata) => ({
-		...metadata,
-		id: namespacedMetadataId(protocol.id, metadata.id)
-	}))
+	metadata: Object.fromEntries(
+		Object.entries(protocol.metadata).map(([id, metadata]) => [
+			namespacedMetadataId(protocol.id, id),
+			metadata
+		])
+	)
 }));
 
 /**
@@ -48,11 +52,11 @@ export async function exportProtocol(base, id) {
 
 	const exportedProtocol = {
 		$schema: `${window.location.origin}${base}/protocol.schema.json`,
-		...protocol,
-		metadata: await tables.Metadata.list().then((defs) =>
-			defs.filter((def) => protocol?.metadata.includes(def.id))
-		)
+		...protocol
 	};
+	await tables.Metadata.list()
+		.then((defs) => defs.filter((def) => protocol?.metadata.includes(def.id)))
+		.then((defs) => Object.fromEntries(defs.map(({ id, ...def }) => [id, def])));
 
 	const jsoned = jsonWithToplevelOrdering(exportedProtocol, [
 		'$schema',
@@ -91,9 +95,11 @@ export async function importProtocol() {
 					await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
 						tx.objectStore('Protocol').put({
 							...protocol,
-							metadata: protocol.metadata.map((m) => m.id)
+							metadata: Object.keys(protocol.metadata)
 						});
-						protocol.metadata.map((metadata) => tx.objectStore('Metadata').put(metadata));
+						Object.entries(protocol.metadata).map(([id, metadata]) =>
+							tx.objectStore('Metadata').put({ id, ...metadata })
+						);
 					});
 					resolve(protocol);
 				} catch (error) {
