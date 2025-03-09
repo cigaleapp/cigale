@@ -30,7 +30,7 @@ export async function defineSpeciesMetadata(id) {
 
 /** @param {undefined | import('./metadata.js').RuntimeValue} key  */
 export function speciesDisplayName(key) {
-	if (!key) return undefined;
+	if (key === undefined) return undefined;
 
 	const options = $state.snapshot(
 		tables.Metadata.state.find((m) => m.id === BUILTIN_METADATA_IDS.species)?.options
