@@ -4,19 +4,9 @@
 	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
-	import { onMount } from 'svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	const { children } = $props();
-
-	onMount(() => {
-		uiState.keybinds['$mod+m'] = {
-			help: 'Fusionner les observations sélectionnées',
-			do() {
-				alert('todo!');
-			}
-		};
-	});
 
 	export const snapshot = {
 		capture() {

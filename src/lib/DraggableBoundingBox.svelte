@@ -80,8 +80,6 @@
 	 * @param {MouseEvent} event
 	 */
 	function movebb(event) {
-		// TODO: utiliser x et y pr savoir si on est dans la bb et changer le curseur
-		// TODO: utiliser x et y pr savoir si on est dans la bb combiner avec un mousemove sur la window pr pvr modifier la position global de la bb
 		let xm = (event.movementX / sizew) * 100;
 		let ym = (event.movementY / sizeh) * 100;
 

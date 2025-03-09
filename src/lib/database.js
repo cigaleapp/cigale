@@ -1,9 +1,6 @@
 import { type } from 'arktype';
 import { parseISOSafe } from './date.js';
 
-// TODO make table() take an object that can be passed to type() instead of a schema
-//  * @template { {[x: string]: import('arktype').Type | string} } Schema
-
 const ID = type(/[\w_]+/);
 
 /**
@@ -30,7 +27,6 @@ const MetadataValue = type({
 });
 
 const MetadataValues = type({
-	// TODO: figure out a way to reuse the ID const
 	'[/[a-z0-9_]+/]': MetadataValue
 });
 

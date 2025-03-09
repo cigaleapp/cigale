@@ -163,7 +163,6 @@
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		/* TODO: remove :global(), c pa bi1!! */
 		.observation:not(.loading).stacked:is(:hover, :has(:focus-visible)) .main-card {
 			transform: rotate(-3deg);
 		}

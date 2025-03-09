@@ -29,7 +29,6 @@
 	let { images, onmerge, ondelete, onsplit, cansplit, onmetadatachange, canmerge, metadata } =
 		$props();
 
-	// TODO maybe put as a prop? hmmmmm
 	const definitions = $derived.by(() => {
 		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocol);
 		if (!protocol) return [];
