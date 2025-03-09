@@ -63,8 +63,9 @@
 		onclick={async () => {
 			await importProtocol()
 				.catch((e) =>
+					// TODO use regular (non-assert) arktype validation instead
 					toasts.error(
-						e?.toString().replace(/^AggregateError: /, 'Protocole invalide: ') ??
+						e?.toString().replace(/^TraversalError: /, 'Protocole invalide: ') ??
 							"Erreur inattendue pendant l'import du protocole"
 					)
 				)
