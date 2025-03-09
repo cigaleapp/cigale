@@ -155,7 +155,7 @@ function wrangler(table) {
 			const loglabel = `do ${table} #${nanoid()}`;
 			console.info(loglabel);
 			console.time(loglabel);
-			await openTransaction([table], 'readwrite', async (tx) => {
+			await openTransaction([table], {}, async (tx) => {
 				await actions(tx.objectStore(table));
 			});
 			console.timeEnd(loglabel);
@@ -315,17 +315,22 @@ export async function* iterator(tableName, index = undefined) {
 /**
  * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you
  * @template {Array<keyof typeof Tables>} Tables
- * @template {IDBTransactionMode} Mode
+ * @template {IDBTransactionMode} [Mode="readwrite"]
  * @param {Tables} tableNames
- * @param {Mode} mode
- * @param {(tx: import('idb').IDBPTransaction<IDBDatabaseType, Tables, Mode>) => void | Promise<void>} actions
+ * @param {object} param1
+ * @param {Mode} [param1.mode="readwrite"]
+ * @param {IDBTransactionWithAtLeast<Tables, Mode>} [param1.tx] already existing transaction to use instead of creating a new one. In that case, the transaction is not committed and the reactive tables' state is not refreshed, since it's assumed that a openTransactions() call higher up in the call stack will already do this
+ * @param {(tx: IDBTransactionWithAtLeast<Tables, Mode>) => void | Promise<void>} actions
  */
-export async function openTransaction(tableNames, mode, actions) {
-	const db = await openDatabase();
-	const tx = db.transaction(tableNames, mode);
+export async function openTransaction(tableNames, { mode, tx }, actions) {
+	if (tx) return actions(tx);
 
-	await actions(tx);
-	tx.commit();
+	const db = await openDatabase();
+	const newTx = db.transaction(tableNames, mode ?? 'readwrite');
+
+	// @ts-expect-error
+	await actions(newTx);
+	newTx.commit();
 
 	for (const table of tableNames.filter(isReactiveTable)) {
 		await tables[table].refresh();
@@ -379,6 +384,12 @@ export function nukeDatabase() {
  *     }
  *   }
  * }} IDBDatabaseType
+ */
+
+/**
+ * @template {Array<keyof typeof Tables>} Stores Required stores
+ * @template {IDBTransactionMode} [Mode="readwrite"]
+ * @typedef {import('idb').IDBPTransaction<IDBDatabaseType, [...Stores, ...Array<keyof typeof Tables>], Mode>} IDBTransactionWithAtLeast
  */
 
 // Magie vodoo Typescript, pas besoin de comprendre

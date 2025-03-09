@@ -1,8 +1,8 @@
 <script>
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { imageIdToFileId } from '$lib/images';
+	import { deleteImage } from '$lib/images';
 	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
-	import { mergeToObservation } from '$lib/observations';
+	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import { onMount } from 'svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
@@ -70,21 +70,16 @@
 				});
 			}}
 			ondelete={async () => {
-				await openTransaction(['Image', 'Observation', 'ImageFile'], 'readwrite', async (tx) => {
-					uiState.selection.map((id) => {
-						const obs = tables.Observation.state.find((o) => o.id === id);
-						const imagesToDelete = obs?.images ?? [id];
-						if (obs) tx.objectStore('Observation').delete(id);
-						imagesToDelete.map((id) => {
-							tx.objectStore('Image').delete(id);
-							tx.objectStore('ImageFile').delete(imageIdToFileId(id));
-						});
-					});
+				await openTransaction(['Image', 'Observation', 'ImageFile'], {}, async (tx) => {
+					for (const id of uiState.selection) {
+						await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
+						await deleteImage(id, tx);
+					}
 				});
 			}}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
-				await openTransaction(['Image', 'Observation'], 'readwrite', async (tx) => {
+				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
 					for (const image of selectedImages) {
 						await storeMetadataValue({
 							tx,

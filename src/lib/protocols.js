@@ -67,7 +67,7 @@ export async function importProtocol() {
 					if (!reader.result) throw new Error('Fichier vide');
 					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
 					const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
-					await openTransaction(['Protocol', 'Metadata'], 'readwrite', (tx) => {
+					await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
 						tx.objectStore('Protocol').put({
 							...protocol,
 							metadata: protocol.metadata.map((m) => m.id)

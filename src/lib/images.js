@@ -55,3 +55,46 @@ export async function downloadImage(imageId, options) {
 
 	downloadAsFile(file.bytes, options?.as || image.filename, image.contentType);
 }
+
+/**
+ *
+ * @param {string} id
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Image", "ImageFile"]>} [tx]
+ * @param {boolean} [notFoundOk=true]
+ */
+export async function deleteImage(id, tx, notFoundOk = true) {
+	const image = await tables.Image.get(id);
+	if (!image) {
+		if (notFoundOk) return;
+		throw 'Image non trouvée';
+	}
+
+	await db.openTransaction(['Image', 'ImageFile'], { tx }, (tx) => {
+		tx.objectStore('Image').delete(id);
+		tx.objectStore('ImageFile').delete(imageIdToFileId(id));
+
+		const previewURL = uiState.previewURLs.get(id);
+		if (previewURL) {
+			URL.revokeObjectURL(previewURL);
+			uiState.previewURLs.delete(id);
+		}
+	});
+}
+
+/**
+ *
+ * @param {string} id id of the image to store the bytes for
+ * @param {ArrayBuffer} bytes the image data
+ * @param {string} contentType MIME type of the image
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile']>} [tx] transaction to use
+ */
+export async function storeImageBytes(id, bytes, contentType, tx) {
+	await db.openTransaction(['Image', 'ImageFile'], { tx }, async (tx) => {
+		const image = await tx.objectStore('Image').get(id);
+		if (!image) throw 'Image non trouvée';
+		tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes });
+		const preview = new Blob([bytes], { type: contentType });
+		uiState.previewURLs.set(id, URL.createObjectURL(preview));
+		tx.objectStore('Image').put({ ...image, bufferExists: true });
+	});
+}
