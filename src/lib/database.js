@@ -122,10 +122,8 @@ const MetadataEnumVariant = type({
 	learnMore: URLString.optional()
 });
 
-const Metadata = table(
-	'id',
+const MetadataWithoutID = 
 	type({
-		id: ID,
 		label: 'string',
 		type: MetadataType,
 		mergeMethod: MetadataMergeMethod,
@@ -134,6 +132,9 @@ const Metadata = table(
 		description: 'string',
 		learnMore: URLString.optional()
 	})
+
+const Metadata = table(
+	'id', MetadataWithoutID.and({ id: ID })
 );
 
 const ProtocolWithoutMetadata = type({
@@ -222,6 +223,7 @@ export const Schemas = {
 	MetadataType,
 	MetadataMergeMethod,
 	MetadataEnumVariant,
+	MetadataWithoutID,
 	Metadata,
 	Protocol,
 	ProtocolWithoutMetadata,
