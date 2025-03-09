@@ -1,15 +1,29 @@
 <script>
-	let { options, name, value = $bindable(), onchange = () => {} } = $props();
+	/**
+	 * @typedef {{ key: string; label: string }} Item
+	 */
+
+	/**
+	 * @typedef {object} Props
+	 * @property {Array<Item>} options possible options
+	 * @property {string} [value] the value of the selected radio button
+	 * @property {(value: string|undefined) => void} [onchange] callback to call when the user selects a radio button
+	 * @property {import('svelte').Snippet} children
+	 */
+
+	/** @type {Props} */
+	let { options, value = $bindable(), onchange = () => {} } = $props();
+
 	$effect(() => {
 		onchange(value);
 	});
 </script>
 
-{#each options as option (option)}
+{#each options as { key, label } (key)}
 	<div>
 		<label class="radio">
-			<input type="radio" {name} value={option} bind:group={value} />
-			{option}
+			<input type="radio" value={key} bind:group={value} />
+			{label}
 		</label>
 	</div>
 {/each}

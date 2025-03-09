@@ -1,12 +1,11 @@
 <script>
-	import { page } from '$app/state';
-	import { openDatabase, tables } from '$lib/idb.svelte';
+	import { openTransaction, tables } from '$lib/idb.svelte';
+	import { imageIdToFileId } from '$lib/images';
 	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import { onMount } from 'svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { imageIdToFileId } from '$lib/images';
 
 	const { children } = $props();
 
@@ -29,7 +28,7 @@
 		}
 	};
 
-	const showSidePanel = $derived(!['/about', '/settings'].includes(page.route.id ?? ''));
+	const showSidePanel = $derived(tables.Image.state.length + tables.Observation.state.length > 0);
 
 	const selectedImages = $derived(
 		uiState.selection
@@ -71,34 +70,31 @@
 				});
 			}}
 			ondelete={async () => {
-				const tx = await openDatabase().then((db) =>
-					db.transaction(['Image', 'Observation', 'ImageFile'], 'readwrite')
-				);
-				uiState.selection.map((id) => {
-					const obs = tables.Observation.state.find((o) => o.id === id);
-					const imagesToDelete = obs?.images ?? [id];
-					if (obs) tx.objectStore('Observation').delete(id);
-					imagesToDelete.map((id) => {
-						tx.objectStore('Image').delete(id);
-						tx.objectStore('ImageFile').delete(imageIdToFileId(id));
+				await openTransaction(['Image', 'Observation', 'ImageFile'], 'readwrite', async (tx) => {
+					uiState.selection.map((id) => {
+						const obs = tables.Observation.state.find((o) => o.id === id);
+						const imagesToDelete = obs?.images ?? [id];
+						if (obs) tx.objectStore('Observation').delete(id);
+						imagesToDelete.map((id) => {
+							tx.objectStore('Image').delete(id);
+							tx.objectStore('ImageFile').delete(imageIdToFileId(id));
+						});
 					});
 				});
-				tx.commit();
-				await tables.Image.refresh();
-				await tables.Observation.refresh();
 			}}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
-				await Promise.all(
-					selectedImages.map(async (image) => {
-						storeMetadataValue({
+				await openTransaction(['Image', 'Observation'], 'readwrite', async (tx) => {
+					for (const image of selectedImages) {
+						await storeMetadataValue({
+							tx,
 							subjectId: image.id,
 							metadataId: id,
 							confidence: 1,
 							value
 						});
-					})
-				);
+					}
+				});
 			}}
 		/>
 	{/if}

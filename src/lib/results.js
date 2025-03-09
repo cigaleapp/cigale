@@ -5,6 +5,7 @@ import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
 import { metadataPrettyKey, metadataPrettyValue, observationMetadata } from './metadata';
 import { toasts } from './toasts.svelte';
+import { downloadAsFile } from './download';
 /**
  * @param {Array<import("./database").Observation>} observations
  * @param {import('./database').Protocol} protocolUsed
@@ -28,11 +29,7 @@ export async function generateResultsZip(observations, protocolUsed) {
 		...new Set(observations.flatMap((o) => Object.keys(finalMetadata[o.id].metadata)))
 	];
 
-	const metadataDefinitions = Object.fromEntries(
-		await Promise.all(allMetadataKeys.map((key) => db.tables.Metadata.get(key))).then((ms) =>
-			ms.filter((m) => m !== undefined).map((m) => [m.id, m])
-		)
-	);
+	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
 
 	const speciesDefinition = await db.tables.Metadata.get('species');
 	if (!speciesDefinition) throw 'Species metadata not found';
@@ -88,7 +85,8 @@ export async function generateResultsZip(observations, protocolUsed) {
 					Object.entries(
 						Object.groupBy(
 							observations,
-							(o) => speciesDisplayName(finalMetadata[o.id].metadata.species) ?? '(Unknown)'
+							(o) =>
+								speciesDisplayName(finalMetadata[o.id].metadata.species?.toString()) ?? '(Unknown)'
 						)
 					).map(([species, observations]) => [
 						species,
@@ -117,13 +115,7 @@ export async function generateResultsZip(observations, protocolUsed) {
 		)
 	);
 
-	const blob = new Blob([zipfile], { type: 'application/zip' });
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = 'results.zip';
-	a.click();
-	URL.revokeObjectURL(url);
+	downloadAsFile(zipfile, 'results.zip', 'application/zip');
 }
 
 /**
