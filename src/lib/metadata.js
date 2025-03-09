@@ -419,6 +419,19 @@ export function metadataPrettyKey(metadata) {
 }
 
 /**
+ * Ensures a metadata ID is namespaced to the given protocol ID
+ * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
+ * Built-in Metadata IDs are never namespaced.
+ * @param {string} protocolId
+ * @param {string} metadataId
+ */
+export function namespacedMetadataId(protocolId, metadataId) {
+	if (metadataId in BUILTIN_METADATA_IDS) return metadataId;
+	metadataId = metadataId.replace(/^.+__/, '');
+	return `${protocolId}__${metadataId}`;
+}
+
+/**
  * @template {import('./database').MetadataType} [Type=import('./database').MetadataType]
  * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, width: number, height: number } : string} RuntimeValue
  */

@@ -1,5 +1,6 @@
 import YAML from 'yaml';
 import { Schemas } from './database.js';
+import { namespacedMetadataId } from './metadata.js';
 
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
 	metadata: Schemas.Metadata.array()
@@ -7,7 +8,7 @@ export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
 	...protocol,
 	metadata: protocol.metadata.map((metadata) => ({
 		...metadata,
-		id: `${protocol.id}__${metadata.id}`
+		id: namespacedMetadataId(protocol.id, metadata.id)
 	}))
 }));
 
