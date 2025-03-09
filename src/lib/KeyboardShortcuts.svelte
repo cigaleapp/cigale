@@ -26,15 +26,14 @@
 				// Associating every pattern to its handler function...
 				Object.entries(binds).map(([pattern, bind]) => [
 					pattern,
-					// But stick in a call to event.preventDefault()
-					// before calling the handler function if "preventDefault" is true
-					preventDefault
-						? /** @param {MouseEvent|KeyboardEvent} e */
-							async (e) => {
-								e.preventDefault();
-								bind.do(e);
-							}
-						: bind.do
+					/** @param {MouseEvent|KeyboardEvent} e */
+					async (e) => {
+						if (bind.when && !bind.when(e)) return;
+						// Stick in a call to event.preventDefault()
+						// before calling the handler function if "preventDefault" is true
+						if (preventDefault) e.preventDefault();
+						bind.do(e);
+					}
 				])
 			)
 		)

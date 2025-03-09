@@ -70,6 +70,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			// Also register Ctrl-A to select all
 			'$mod+a': {
 				help: 'Tout sélectionner',
+				when: ({ target }) => !(target instanceof HTMLInputElement),
 				do: () => {
 					dragselect?.setSelection(images.map((img) => img.id));
 				}
@@ -77,6 +78,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			// And Ctrl-D to deselect all
 			'$mod+d': {
 				help: 'Tout désélectionner',
+				when: ({ target }) => !(target instanceof HTMLInputElement),
 				do: () => {
 					selection = [];
 					dragselect?.setSelection([]);
