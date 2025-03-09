@@ -1,7 +1,28 @@
 import YAML from 'yaml';
-import { Schemas } from './database.js';
+import { BUILTIN_METADATA_IDS, Schemas } from './database.js';
 import { downloadAsFile } from './download.js';
-import { namespacedMetadataId } from './metadata.js';
+
+/**
+ * Ensures a metadata ID is namespaced to the given protocol ID
+ * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
+ * Built-in Metadata IDs are never namespaced.
+ * @param {string} protocolId
+ * @param {string} metadataId
+ */
+export function namespacedMetadataId(protocolId, metadataId) {
+	if (metadataId in BUILTIN_METADATA_IDS) return metadataId;
+	metadataId = metadataId.replace(/^.+__/, '');
+	return `${protocolId}__${metadataId}`;
+}
+
+/**
+ * Checks if a given metadata ID is namespaced to a given protocol ID
+ * @param {string} protocolId
+ * @param {string} metadataId
+ */
+export function isNamespacedToProtocol(protocolId, metadataId) {
+	return metadataId.startsWith(`${protocolId}__`);
+}
 
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
 	metadata: Schemas.Metadata.array()

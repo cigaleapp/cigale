@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { BUILTIN_METADATA_IDS, Schemas } from './database';
+import { Schemas } from './database.js';
 import { _tablesState, tables } from './idb.svelte.js';
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
@@ -433,28 +433,6 @@ export function metadataPrettyKey(metadata) {
 			out += ' (latitude, longitude)';
 	}
 	return out;
-}
-
-/**
- * Ensures a metadata ID is namespaced to the given protocol ID
- * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
- * Built-in Metadata IDs are never namespaced.
- * @param {string} protocolId
- * @param {string} metadataId
- */
-export function namespacedMetadataId(protocolId, metadataId) {
-	if (metadataId in BUILTIN_METADATA_IDS) return metadataId;
-	metadataId = metadataId.replace(/^.+__/, '');
-	return `${protocolId}__${metadataId}`;
-}
-
-/**
- * Checks if a given metadata ID is namespaced to a given protocol ID
- * @param {string} protocolId
- * @param {string} metadataId
- */
-export function isNamespacedToProtocol(protocolId, metadataId) {
-	return metadataId.startsWith(`${protocolId}__`);
 }
 
 /**
