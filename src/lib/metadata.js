@@ -132,8 +132,6 @@ export function combineMetadataValues(images) {
 	/** @type {Record<string, import('./database').MetadataValue | undefined>} */
 	const output = {};
 
-	// TODO handle observations
-
 	let keys = new Set(images.flatMap((img) => Object.keys(img.metadata)));
 
 	for (const key of keys) {
