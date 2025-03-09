@@ -38,7 +38,7 @@
 	 * @param {string} id
 	 * @param {object} image
 	 * @param {string} image.filename
-	 * @param {object} image.metadata
+	 * @param {import('$lib/database').MetadataValues} image.metadata
 	 */
 	async function analyzeImage(buffer, id, { filename, metadata }) {
 		if (!classifmodel) {
@@ -53,13 +53,9 @@
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
 		let img = await imload([buffer], TARGETWIDTH, TARGETHEIGHT);
-		// @ts-ignore
-		let bbList = [
-			metadata.crop.value.x,
-			metadata.crop.value.y,
-			metadata.crop.value.width,
-			metadata.crop.value.height
-		];
+		const { x, y, width, height } =
+			/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */ (metadata.crop.value);
+		let bbList = [x, y, width, height];
 
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
