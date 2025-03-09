@@ -48,6 +48,7 @@
 </script>
 
 <div class="pannel" class:empty={images.length === 0}>
+	{#if images.length > 0}
 		<div class="images">
 			{#each images as image, i (i)}
 				<img src={image} alt={'image ' + i} />
@@ -82,6 +83,12 @@
 				{/if}
 			{/each}
 		</MetadataList>
+	{:else}
+		<section class="empty-selection">
+			<Logo variant="empty" />
+			<p>Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées</p>
+		</section>
+	{/if}
 	<section class="button">
 		{#if page.url.pathname === '/classify'}
 			<div class="side-by-side">
@@ -135,6 +142,21 @@
 		border-width: var(--border-thickness);
 		border-top-left-radius: var(--corner-radius);
 		border-bottom-left-radius: var(--corner-radius);
+	}
+
+	.pannel.empty {
+		grid-template-rows: auto max-content;
+	}
+
+	.empty-selection {
+		--size: 5rem;
+		margin: auto;
+		max-width: 300px;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		gap: 1em;
+		align-items: center;
 	}
 
 	h1 {
