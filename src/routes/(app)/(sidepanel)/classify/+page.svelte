@@ -36,7 +36,7 @@
 	 * @param {string} image.filename
 	 * @param {object} image.metadata
 	 */
-	async function analyzeImage(buffer, id, { contentType, filename ,metadata}) {
+	async function analyzeImage(buffer, id, { contentType, filename, metadata }) {
 		if (!classifmodel) {
 			toasts.error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'

@@ -3,11 +3,26 @@
 	import { page } from '$app/state';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import Toast from '$lib/Toast.svelte';
+	import * as db from '$lib/idb.svelte';
+	import { tables } from '$lib/idb.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Navigation from './Navigation.svelte';
 
 	const { children } = $props();
+
+	// Ensure every image has a preview URL at all times
+	$effect(() => {
+		for (const image of tables.Image.state) {
+			if (uiState.previewURLs.has(image.id)) continue;
+			void (async () => {
+				const file = await db.get('ImageFile', image.id.replace(/(_\d+)+$/, ''));
+				if (!file) return;
+				const blob = new Blob([file.bytes], { type: image.contentType });
+				uiState.previewURLs.set(image.id, URL.createObjectURL(blob));
+			})();
+		}
+	});
 </script>
 
 <Navigation hasImages={true} progress={uiState.processing.progress}></Navigation>
