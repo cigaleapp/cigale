@@ -2,6 +2,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import IconMerge from '~icons/ph/selection-background';
 	import IconSplit from '~icons/ph/arrows-out-light';
+	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import IconDelete from '~icons/ph/trash';
 	import deepEqual from 'deep-equal';
 	import { tables, idComparator } from '$lib/idb.svelte';
@@ -98,6 +99,7 @@
 				>
 					<IconMerge />
 					Regrouper
+					<KeyboardHint shortcut="$mod+g" />
 				</ButtonSecondary>
 				<ButtonSecondary
 					disabled={!cansplit}
@@ -106,6 +108,7 @@
 				>
 					<IconSplit />
 					Séparer
+					<KeyboardHint shortcut="$mod+alt+g" />
 				</ButtonSecondary>
 			</div>
 		{/if}
