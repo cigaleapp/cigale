@@ -42,31 +42,62 @@ export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
  * Exports a protocol by ID into a JSON file, and triggers a download of that file.
  * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {import("./database").ID} id
+ * @param {'json' | 'yaml'} [format='json']
  */
-export async function exportProtocol(base, id) {
+export async function exportProtocol(base, id, format = 'json') {
 	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
 	const { tables } = await import('./idb.svelte.js');
 
 	const protocol = await tables.Protocol.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
 
-	const exportedProtocol = {
-		$schema: `${window.location.origin}${base}/protocol.schema.json`,
-		...protocol
-	};
-	await tables.Metadata.list()
-		.then((defs) => defs.filter((def) => protocol?.metadata.includes(def.id)))
-		.then((defs) => Object.fromEntries(defs.map(({ id, ...def }) => [id, def])));
+	downloadProtocol(base, format, {
+		...protocol,
+		metadata: await tables.Metadata.list()
+			.then((defs) => defs.filter((def) => protocol?.metadata.includes(def.id)))
+			.then((defs) => Object.fromEntries(defs.map(({ id, ...def }) => [id, def])))
+	});
+}
 
-	const jsoned = jsonWithToplevelOrdering(exportedProtocol, [
-		'$schema',
-		'id',
-		'name',
-		'source',
-		'authors',
-		'metadata'
-	]);
-	downloadAsFile(jsoned, `${protocol.id}.json`, 'application/json');
+/**
+ *
+ * @param {string} base base path of the app - import `base` from `$app/paths`
+ * @param {'json' | 'yaml'} format
+ */
+export async function downloadProtocolTemplate(base, format) {
+	downloadProtocol(base, format, {
+		id: 'mon-protocole',
+		name: 'Mon protocole',
+		source: 'https://github.com/moi/mon-protocole',
+		authors: [{ name: 'Prénom Nom', email: 'prenom.nom@example.com' }],
+		metadata: {
+			'une-metadonnee': {
+				label: 'Une métadonnée',
+				description: 'Description de la métadonnée',
+				learnMore: 'https://example.com',
+				type: 'float',
+				required: false,
+				mergeMethod: 'average'
+			}
+		}
+	});
+}
+
+/**
+ * Downloads a protocol as a JSON file
+ * @param {string} base base path of the app - import `base` from `$app/paths`
+ * @param {'yaml'|'json'} format
+ * @param {typeof ExportedProtocol.infer} exportedProtocol
+ */
+function downloadProtocol(base, format, exportedProtocol) {
+	let jsoned = jsonWithToplevelOrdering(
+		format,
+		`${window.location.origin}${base}/protocol.schema.json`,
+		exportedProtocol,
+		['id', 'name', 'source', 'authors', 'metadata']
+	);
+
+	downloadAsFile(jsoned, `${exportedProtocol.id}.${format}`, `application/${format}`);
 }
 
 /**
@@ -82,7 +113,7 @@ export async function importProtocol() {
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.accept = '.json';
+		input.accept = ['.json', '.yaml', 'application/json'].join(',');
 		input.onchange = async () => {
 			if (!input.files || !input.files[0]) return;
 			const file = input.files[0];
@@ -116,23 +147,38 @@ export async function importProtocol() {
  *
  * @template {string} Keys
  * @param {Record<Keys, unknown>} object the object to serialize
- * @param {readonly Keys[]} keysOrder an array of keys in target order, for the top-level object
- * @returns
+ * @param {readonly Keys[]} ordering an array of keys in target order, for the top-level object
+ * @param {'json' | 'yaml'} format
+ * @param {string} schema the json schema URL
  */
-function jsonWithToplevelOrdering(object, keysOrder) {
-	return JSON.stringify(
-		object,
-		(_, value) => {
-			if (value === null) return value;
-			if (Array.isArray(value)) return value;
-			if (typeof value !== 'object') return value;
+function jsonWithToplevelOrdering(format, schema, object, ordering) {
+	let keysOrder = [...ordering];
 
-			// @ts-expect-error
-			if (Object.keys(value).every((key) => keysOrder.includes(key))) {
-				return Object.fromEntries(keysOrder.map((key) => [key, value[key]]));
-			}
-			return value;
-		},
-		2
-	);
+	if (format === 'json') {
+		// @ts-expect-error
+		keysOrder = ['$schema', ...keysOrder];
+	}
+
+	/**
+	 * @param {*} _
+	 * @param {*} value
+	 */
+	const reviver = (_, value) => {
+		if (value === null) return value;
+		if (Array.isArray(value)) return value;
+		if (typeof value !== 'object') return value;
+
+		// @ts-expect-error
+		if (Object.keys(value).every((key) => keysOrder.includes(key))) {
+			return Object.fromEntries(keysOrder.map((key) => [key, value[key]]));
+		}
+		return value;
+	};
+
+	if (format === 'yaml') {
+		const yamled = YAML.stringify(object, reviver, 2);
+		return `# yaml-language-server: $schema=${schema}\n\n${yamled}`;
+	}
+
+	return JSON.stringify({ $schema: schema, ...object }, reviver, 2);
 }
