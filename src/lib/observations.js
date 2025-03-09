@@ -1,5 +1,6 @@
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
+import { deleteImage } from './images';
 import { mergeMetadataValues } from './metadata';
 
 /**
@@ -35,6 +36,35 @@ export async function mergeToObservation(parts) {
 
 		for (const { id } of observations) {
 			tx.delete(id);
+		}
+	});
+}
+
+/**
+ *
+ * @param {string} id observation ID
+ * @param {object} [param1]
+ * @param {boolean} [param1.recursive=false] Also delete the observation's images
+ * @param {boolean} [param1.notFoundOk=true] Don't throw an error if the observation is not found
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image", "ImageFile"]>} [param1.tx]
+ */
+export async function deleteObservation(
+	id,
+	{ recursive = false, notFoundOk = true, tx = undefined } = {}
+) {
+	const observation = await tables.Observation.get(id);
+	if (!observation) {
+		if (notFoundOk) return;
+		throw 'Observation non trouvée';
+	}
+
+	await db.openTransaction(['Observation', 'Image', 'ImageFile'], { tx }, (tx) => {
+		tx.objectStore('Observation').delete(id);
+
+		if (recursive) {
+			for (const imageId of observation.images) {
+				deleteImage(imageId, tx, notFoundOk);
+			}
 		}
 	});
 }

@@ -19,7 +19,7 @@ export async function load() {
 }
 
 async function fillBuiltinData() {
-	await openTransaction(['Metadata', 'Protocol', 'Settings'], 'readwrite', (tx) => {
+	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, (tx) => {
 		for (const metadata of BUILTIN_METADATA) {
 			tx.objectStore('Metadata').put(metadata);
 		}

@@ -1,9 +1,8 @@
 import { type } from 'arktype';
-import * as exifParser from 'exif-parser';
 import { BUILTIN_METADATA_IDS, Schemas } from './database';
 import { _tablesState, tables } from './idb.svelte.js';
 /**
- * @import { IDBDatabaseType } from './idb.svelte.js'
+ * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
  */
 
 /**
@@ -15,7 +14,7 @@ import { _tablesState, tables } from './idb.svelte.js';
  * @param {Type} [options.type] le type de données pour la métadonnée, sert à éviter des problèmes de typages
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
- * @param {import('idb').IDBPTransaction<IDBDatabaseType, ["Image", "Observation"], "readwrite">} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
+ * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  */
 export async function storeMetadataValue({
@@ -71,33 +70,6 @@ export async function storeMetadataValue({
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
-}
-
-/**
- * @param {ArrayBuffer} buffer buffer of the image to extract EXIF data from
- * @returns {Promise<import('./database.js').MetadataValues>}
- */
-export async function extractFromExif(buffer) {
-	const exif = exifParser.create(buffer).enableImageSize(false).parse();
-	/** @type {Partial<Record<keyof typeof BUILTIN_METADATA_IDS, import('./metadata.js').RuntimeValue<import('./database.js').MetadataType>>>} */
-	const output = {};
-
-	if (!exif) return output;
-
-	if (exif.tags.DateTimeOriginal) {
-		output[BUILTIN_METADATA_IDS.shoot_date] = new Date(exif.tags.DateTimeOriginal);
-	}
-
-	if (exif.tags.GPSLatitude && exif.tags.GPSLongitude) {
-		output[BUILTIN_METADATA_IDS.shoot_location] = {
-			latitude: /** @type {number} */ (exif.tags.GPSLatitude),
-			longitude: /** @type {number} */ (exif.tags.GPSLongitude)
-		};
-	}
-
-	return Object.fromEntries(
-		Object.entries(output).map(([key, value]) => [key, { value, alternatives: {}, confidence: 1 }])
-	);
 }
 
 /**
@@ -227,11 +199,17 @@ function mergeMetadata(definition, values) {
 				alternatives: mergeAlternatives(avg, values)
 			};
 		case 'max':
-			// return mergeMajority(definition, values);
-			throw new Error('Pas encore implémenté!');
 		case 'min':
-			// return mergeMinority(definition, values);
-			throw new Error('Pas encore implémenté!');
+			return {
+				value: mergeByMajority(
+					definition.type,
+					// @ts-ignore
+					values,
+					definition.mergeMethod === 'max' ? max : min
+				),
+				confidence: max(values.map((v) => v.confidence)),
+				alternatives: mergeAlternatives(max, values)
+			};
 		case 'median':
 			return {
 				value: mergeMedian(
@@ -243,6 +221,37 @@ function mergeMetadata(definition, values) {
 			};
 		case 'none':
 			return null;
+	}
+}
+
+/**
+ *
+ * @param {number[]} values
+ */
+const max = (values) => Math.max(...values);
+
+/**
+ * @param {number[]} values
+ */
+const min = (values) => Math.min(...values);
+
+/**
+ * Merge values by best confidence. If multiple values have the same confidence, use `strategy` to break the tie. If `strategy` throws, use first value as a fallback.
+ * @param {Type} _type
+ * @param {Array<{ value: Value, confidence: number }>} values
+ * @param {(...values: Value[]) => Value} strategy
+ * @returns {Value}
+ * @template {RuntimeValue<Type>} Value
+ * @template {import('./database').MetadataType} Type
+ */
+function mergeByMajority(_type, values, strategy) {
+	const bestConfidence = Math.max(...values.map((v) => v.confidence));
+	const bestValues = values.filter((v) => v.confidence === bestConfidence);
+	try {
+		return strategy(...bestValues.map((v) => v.value));
+	} catch (error) {
+		console.error(error);
+		return bestValues[0].value;
 	}
 }
 

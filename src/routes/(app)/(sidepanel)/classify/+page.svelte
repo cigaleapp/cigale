@@ -3,25 +3,30 @@
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import { imageBufferWasSaved, imageIdToFileId, imageIsCLassified, imageIsCropped } from '$lib/images';
+	import {
+		imageBufferWasSaved,
+		imageIdToFileId,
+		imageIsCLassified,
+		deleteImage
+	} from '$lib/images';
+	import { classify, loadModel, MODELCLASSIFPATH, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
+	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
-	import { toasts } from '$lib/toasts.svelte';
-	import { loadModel, MODELCLASSIFPATH, MODELDETECTPATH , classify, TARGETHEIGHT, TARGETWIDTH} from '$lib/inference';
-	import {imload, applyBBOnTensor} from '$lib/inference_utils';
+	import { deleteObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
+	import { toasts } from '$lib/toasts.svelte';
 
 	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
-		toAreaObservationProps(tables.Image.state, [], {
+		toAreaObservationProps(tables.Image.state, tables.Observation.state, {
 			isLoaded: (image) =>
 				imageBufferWasSaved(image) && previewURLs.has(image.id) && imageIsCLassified(image)
 		})
 	);
-
 
 	let classifmodel = $state();
 	async function loadClassifModel() {
@@ -32,11 +37,10 @@
 	 * @param {ArrayBuffer} buffer
 	 * @param {string} id
 	 * @param {object} image
-	 * @param {string} image.contentType
 	 * @param {string} image.filename
 	 * @param {object} image.metadata
 	 */
-	async function analyzeImage(buffer, id, { contentType, filename, metadata }) {
+	async function analyzeImage(buffer, id, { filename, metadata }) {
 		if (!classifmodel) {
 			toasts.error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -44,25 +48,30 @@
 			return 0;
 		}
 
-		console.log("Analyzing image", id, filename);
+		console.log('Analyzing image', id, filename);
 
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
-		let img = await imload([buffer], TARGETWIDTH,TARGETHEIGHT);
+		let img = await imload([buffer], TARGETWIDTH, TARGETHEIGHT);
 		// @ts-ignore
-		let bbList = [metadata.crop.value.x, metadata.crop.value.y, metadata.crop.value.width, metadata.crop.value.height];
-		
+		let bbList = [
+			metadata.crop.value.x,
+			metadata.crop.value.y,
+			metadata.crop.value.width,
+			metadata.crop.value.height
+		];
+
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
-		const nimg = await applyBBOnTensor(bbList,img);
-		const output_classif = await classify([[nimg]],classifmodel,uiState, 0);
-		const species = output_classif[0]
-		const confs = output_classif[1]
+		const nimg = await applyBBOnTensor(bbList, img);
+		const output_classif = await classify([[nimg]], classifmodel, uiState, 0);
+		const species = output_classif[0];
+		const confs = output_classif[1];
 
 		if (output_classif[0].length == 0) {
-			console.warn("No species detected");
+			console.warn('No species detected');
 			return 0;
-		}else {
+		} else {
 			await storeMetadataValue({
 				subjectId: id,
 				metadataId: 'species',
@@ -71,8 +80,9 @@
 				// @ts-ignore
 				confidence: confs[0][0],
 				// @ts-ignore
-				alternatives: species[0].slice(1).map((s, i) => ({ value: s.toString(), confidence: confs[0][i + 1] })),
-
+				alternatives: species[0]
+					.slice(1)
+					.map((s, i) => ({ value: s.toString(), confidence: confs[0][i + 1] }))
 			});
 		}
 	}
@@ -80,14 +90,21 @@
 	$effect(() => {
 		if (!classifmodel) return;
 		for (const image of tables.Image.state) {
-			if (imageBufferWasSaved(image) && !imageIsCLassified(image) && !uiState.loadingImages.has(image.id)) {
+			if (
+				imageBufferWasSaved(image) &&
+				!imageIsCLassified(image) &&
+				!uiState.loadingImages.has(image.id)
+			) {
 				$inspect(uiState);
 				uiState.loadingImages.add(image.id);
 
 				void (async () => {
 					try {
 						const file = await db.get('ImageFile', imageIdToFileId(image.id));
-						if (!file) {console.log("pas de fichier ..?");return;}
+						if (!file) {
+							console.log('pas de fichier ..?');
+							return;
+						}
 						let code = await analyzeImage(file.bytes, image.id, image);
 						if (code == 0) {
 							erroredImages.set(image.id, "Erreur inattendue l'ors de la classification");
@@ -132,9 +149,8 @@
 			errors={erroredImages}
 			loadingText="Analyse…"
 			ondelete={async (id) => {
-				await tables.Image.remove(id);
-				await tables.Observation.remove(id);
-				await db.drop('ImageFile', imageIdToFileId(id));
+				await deleteObservation(id);
+				await deleteImage(id);
 			}}
 		/>
 		{#if !images.length}

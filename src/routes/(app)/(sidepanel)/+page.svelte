@@ -2,9 +2,17 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import Dropzone from '$lib/Dropzone.svelte';
+	import { processExifData } from '$lib/exif';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import { imageBufferWasSaved, imageId, imageIdToFileId, imageIsCropped } from '$lib/images';
+	import {
+		deleteImage,
+		imageBufferWasSaved,
+		imageId,
+		imageIdToFileId,
+		imageIsCropped,
+		storeImageBytes
+	} from '$lib/images';
 	import {
 		inferSequentialy,
 		loadModel,
@@ -13,8 +21,8 @@
 		TARGETWIDTH
 	} from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
-	import { extractFromExif, storeMetadataValue } from '$lib/metadata';
-	import { mergeToObservation } from '$lib/observations';
+	import { storeMetadataValue } from '$lib/metadata';
+	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
@@ -39,13 +47,12 @@
 		};
 	});
 
-	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
 
 	const images = $derived(
 		toAreaObservationProps(tables.Image.state, [], {
 			isLoaded: (image) =>
-				imageBufferWasSaved(image) && previewURLs.has(image.id) && imageIsCropped(image)
+				imageBufferWasSaved(image) && uiState.previewURLs.has(image.id) && imageIsCropped(image)
 		})
 	);
 
@@ -56,60 +63,34 @@
 	}
 
 	/**
-	 * @param {string} contentType
-	 * @param {ArrayBuffer} buffer
-	 * */
-	function arrayBufferToObjectURL(contentType, buffer) {
-		const blob = new Blob([buffer], { type: contentType });
-		return URL.createObjectURL(blob);
-	}
-
-	/**
 	 * @param {File} file
 	 * @param {string} id
 	 */
-	async function writeImage(file, id) {
-		console.log('writeImage', file, id);
-		const image = await tables.Image.raw.get(id);
-		if (!image) throw 'Image introuvable';
+	async function processImageFile(file, id) {
+		await tables.Image.set({
+			id,
+			filename: file.name,
+			addedAt: formatISO(new Date()),
+			metadata: {},
+			bufferExists: false,
+			contentType: file.type
+		});
+
 		const bytes = await file.arrayBuffer();
-		const metadataFromExif = await extractFromExif(bytes).catch((e) => {
-			console.warn(e);
-			if (file.type === 'image/jpeg') {
-				toasts.warn(
-					`Impossible d'extraire les métadonnées EXIF de ${file.name}: ${e?.toString() ?? 'Erreur inattendue'}`
-				);
-			}
-			return {};
-		});
-		console.log(metadataFromExif);
-		await db.openTransaction(['Image', 'Observation'], 'readwrite', async (tx) => {
-			for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-				await storeMetadataValue({
-					tx,
-					subjectId: id,
-					metadataId: key,
-					value,
-					confidence
-				});
-			}
-		});
-		await db.openTransaction(['Image', 'ImageFile'], 'readwrite', async (tx) => {
-			tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes });
-			previewURLs.set(id, arrayBufferToObjectURL(file.type, bytes));
-			tx.objectStore('Image').put({ ...image, bufferExists: true });
-		});
-		await analyzeImage(bytes, id, image);
+
+		await storeImageBytes(id, bytes, file.type);
+		await processExifData(id, bytes, file);
+		await inferBoundingBox(id, bytes, file);
 	}
 
 	/**
-	 * @param {ArrayBuffer} buffer
 	 * @param {string} id
+	 * @param {ArrayBuffer} buffer
 	 * @param {object} image
-	 * @param {string} image.contentType
-	 * @param {string} image.filename
+	 * @param {string} image.type
+	 * @param {string} image.name
 	 */
-	async function analyzeImage(buffer, id, { contentType, filename }) {
+	async function inferBoundingBox(id, buffer, { type: contentType, name: filename }) {
 		if (!cropperModel) {
 			toasts.error(
 				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -134,7 +115,7 @@
 			height
 		});
 
-		await db.openTransaction(['Image', 'Observation'], 'readwrite', async (tx) => {
+		await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
 			await storeMetadataValue({
 				tx,
 				subjectId: id,
@@ -177,7 +158,10 @@
 						const file = await db.get('ImageFile', imageIdToFileId(image.id));
 						if (!file) return;
 						uiState.loadingImages.add(image.id);
-						await analyzeImage(file.bytes, image.id, image);
+						await inferBoundingBox(image.id, file.bytes, {
+							type: image.contentType,
+							name: image.filename
+						});
 					} catch (error) {
 						console.error(error);
 						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
@@ -192,17 +176,6 @@
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length;
 		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.crop).length;
-	});
-
-	$effect(() => {
-		for (const image of tables.Image.state) {
-			if (previewURLs.has(image.id)) continue;
-			void (async () => {
-				const file = await db.get('ImageFile', image.id.replace(/(_\d+)+$/, ''));
-				if (!file) return;
-				previewURLs.set(image.id, arrayBufferToObjectURL(image.contentType, file.bytes));
-			})();
-		}
 	});
 </script>
 
@@ -230,16 +203,8 @@
 				files.map(async (file, index) => {
 					const id = imageId(currentLength + index);
 					try {
-						await tables.Image.set({
-							id,
-							filename: file.name,
-							addedAt: formatISO(new Date()),
-							metadata: {},
-							bufferExists: false,
-							contentType: file.type
-						});
 						uiState.loadingImages.add(id);
-						await writeImage(file, id);
+						await processImageFile(file, id);
 					} catch (error) {
 						console.error(error);
 						erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
@@ -257,9 +222,8 @@
 				errors={erroredImages}
 				loadingText="Analyse…"
 				ondelete={async (id) => {
-					await tables.Image.remove(id);
-					await tables.Observation.remove(id);
-					await db.drop('ImageFile', imageIdToFileId(id));
+					await deleteObservation(id);
+					await deleteImage(id);
 				}}
 			/>
 			{#if !images.length}
