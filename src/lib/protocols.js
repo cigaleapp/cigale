@@ -21,19 +21,25 @@ export async function exportProtocol(base, id) {
 	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
 	const { tables } = await import('./idb.svelte.js');
 
-	let protocol = await tables.Protocol.get(id);
+	const protocol = await tables.Protocol.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
 
-	protocol = {
+	const exportedProtocol = {
 		$schema: `${window.location.origin}${base}/protocol.schema.json`,
 		...protocol,
-		// @ts-ignore
-		metadata: await Promise.all(protocol.metadata.map((id) => tables.Metadata.get(id))).then((m) =>
-			m.filter((m) => m)
+		metadata: await tables.Metadata.list().then((defs) =>
+			defs.filter((def) => protocol?.metadata.includes(def.id))
 		)
 	};
 
-	const blob = new Blob([JSON.stringify(protocol, null, 2)], { type: 'application/json' });
+	const blob = jsonBlobWithToplevelOrdering(exportedProtocol, [
+		'$schema',
+		'id',
+		'name',
+		'source',
+		'authors',
+		'metadata'
+	]);
 	const url = URL.createObjectURL(blob);
 	const a = document.createElement('a');
 	a.href = url;
@@ -79,4 +85,30 @@ export async function importProtocol() {
 		};
 		input.click();
 	});
+}
+
+/**
+ *
+ * @template {string} Keys
+ * @param {Record<Keys, unknown>} object the object to serialize
+ * @param {readonly Keys[]} keysOrder an array of keys in target order, for the top-level object
+ * @returns
+ */
+function jsonBlobWithToplevelOrdering(object, keysOrder) {
+	const jsoned = JSON.stringify(
+		object,
+		(_, value) => {
+			if (value === null) return value;
+			if (Array.isArray(value)) return value;
+			if (typeof value !== 'object') return value;
+
+			// @ts-expect-error
+			if (Object.keys(value).every((key) => keysOrder.includes(key))) {
+				return Object.fromEntries(keysOrder.map((key) => [key, value[key]]));
+			}
+			return value;
+		},
+		2
+	);
+	return new Blob([jsoned], { type: 'application/json' });
 }
