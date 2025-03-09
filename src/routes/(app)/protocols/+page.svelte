@@ -4,7 +4,11 @@
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import Card from '$lib/Card.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte.js';
-	import { downloadProtocolTemplate, isNamespacedToProtocol } from '$lib/protocols.js';
+	import {
+		downloadProtocolTemplate,
+		isNamespacedToProtocol,
+		jsonSchemaURL
+	} from '$lib/protocols.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { exportProtocol, importProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
@@ -50,8 +54,8 @@
 	</p>
 	<p>Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche</p>
 	<p>
-		Sachant qu'un <a href="https://json-schema.org/">JSON Schema</a> est fourni avec ces fichiers, la
-		plupart des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
+		Sachant qu'un <a href={jsonSchemaURL(base)}>JSON Schema</a> est déclaré dans ces fichiers, la plupart
+		des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
 	</p>
 	<p>
 		Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il
