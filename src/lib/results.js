@@ -24,7 +24,6 @@ export async function generateResultsZip(observations, protocolUsed) {
 			])
 		)
 	);
-	console.log({ finalMetadata });
 
 	const allMetadataKeys = [
 		...new Set(observations.flatMap((o) => Object.keys(finalMetadata[o.id].metadata)))
