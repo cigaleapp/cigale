@@ -2,6 +2,7 @@ import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { deleteImage } from './images';
 import { mergeMetadataValues } from './metadata';
+import { uiState } from './state.svelte';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge
@@ -80,13 +81,18 @@ export async function ensureNoLoneImages(tx) {
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
+				const observationId = db.generateId('Observation');
 				tx.objectStore('Observation').add({
-					id: db.generateId('Observation'),
+					id: observationId,
 					images: [image.id],
 					addedAt: new Date().toISOString(),
 					label: image.filename,
 					metadataOverrides: {}
 				});
+				// Update ui selection so we don't have ghosts in preview side panel
+				uiState.setSelection(
+					uiState.selection.map((sel) => (sel === image.id ? observationId : sel))
+				);
 			}
 		}
 	});
