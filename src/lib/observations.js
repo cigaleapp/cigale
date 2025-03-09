@@ -68,3 +68,26 @@ export async function deleteObservation(
 		}
 	});
 }
+
+/**
+ * If there are any images that are not inside any observation, create an observation with a single image for each
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
+ */
+export async function ensureNoLoneImages(tx) {
+	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
+		const images = await tx.objectStore('Image').getAll();
+		const observations = await tx.objectStore('Observation').getAll();
+
+		for (const image of images) {
+			if (!observations.some((o) => o.images.includes(image.id))) {
+				tx.objectStore('Observation').add({
+					id: db.generateId('Observation'),
+					images: [image.id],
+					addedAt: new Date().toISOString(),
+					label: image.filename,
+					metadataOverrides: {}
+				});
+			}
+		}
+	});
+}
