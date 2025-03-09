@@ -9,6 +9,7 @@
 	import { generateResultsZip } from '$lib/results';
 	import { tables } from '$lib/idb.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { ensureNoLoneImages } from '$lib/observations';
 
 	/**
 	 * @typedef Props
@@ -85,6 +86,7 @@
 			onclick={async () => {
 				exporting = true;
 				try {
+					await ensureNoLoneImages();
 					await generateResultsZip(tables.Observation.state, tables.Protocol.state[0]);
 				} catch (error) {
 					console.error(error);
