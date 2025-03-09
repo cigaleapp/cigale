@@ -75,7 +75,7 @@
 	<label for="metadata-{id}">
 		<div class="first-line">
 			{#if confidence !== undefined && confidence < 1}
-				<div class="confidence" use:tooltip={`Confiance: ${confidence}`}>
+				<div class="confidence" use:tooltip={`Confiance: ${Math.round(confidence * 1e4) / 100}%`}>
 					<RadialIndicator value={confidence} />
 				</div>
 			{/if}

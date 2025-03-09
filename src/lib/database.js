@@ -228,7 +228,7 @@ export const BUILTIN_METADATA = [
 	{
 		id: 'crop',
 		description: "Boîte de recadrage pour l'image",
-		label: 'Recadrage',
+		label: '',
 		type: 'boundingbox',
 		mergeMethod: 'none',
 		required: false

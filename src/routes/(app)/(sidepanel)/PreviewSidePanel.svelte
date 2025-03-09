@@ -54,7 +54,6 @@
 				<img src={image} alt={'image ' + i} />
 			{/each}
 		</div>
-		<h1>Métadonnées</h1>
 		<MetadataList>
 			{#each definitions as definition (definition.id)}
 				{@const value = metadata[definition.id]}
@@ -133,17 +132,12 @@
 		max-width: 700px;
 		background-color: var(--bg-neutral);
 		overflow-x: auto;
-		padding: 1em;
+		padding: 1.7em;
 		display: grid;
-		grid-template-rows: max-content max-content auto max-content;
+		grid-template-rows: max-content auto max-content;
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
-		border-style: solid;
-		border-color: var(--bg-primary);
-		border-width: var(--border-thickness);
-		border-top-left-radius: var(--corner-radius);
-		border-bottom-left-radius: var(--corner-radius);
 	}
 
 	.pannel.empty {
@@ -161,11 +155,6 @@
 		align-items: center;
 	}
 
-	h1 {
-		font-size: 1.5em;
-		font-weight: bolder;
-	}
-
 	.images {
 		display: flex;
 		flex-direction: row;
@@ -176,6 +165,7 @@
 
 	img {
 		height: 50px;
+		border-radius: var(--corner-radius);
 	}
 
 	.button {
