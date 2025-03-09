@@ -155,10 +155,9 @@ function wrangler(table) {
 			const loglabel = `do ${table} #${nanoid()}`;
 			console.info(loglabel);
 			console.time(loglabel);
-			const tx = (await openDatabase()).transaction(table, 'readwrite');
-			await actions(tx.objectStore(table));
-			tx.commit();
-			await this.refresh();
+			await openTransaction([table], 'readwrite', async (tx) => {
+				await actions(tx.objectStore(table));
+			});
 			console.timeEnd(loglabel);
 		},
 		list: async () => list(table),
@@ -310,6 +309,26 @@ export async function* iterator(tableName, index = undefined) {
 	const iter = index ? store.index(index).iterate() : store.iterate();
 	for await (const cursor of iter) {
 		yield validator.assert(cursor.value);
+	}
+}
+
+/**
+ * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you
+ * @template {Array<keyof typeof Tables>} Tables
+ * @template {IDBTransactionMode} Mode
+ * @param {Tables} tableNames
+ * @param {Mode} mode
+ * @param {(tx: import('idb').IDBPTransaction<IDBDatabaseType, Tables, Mode>) => void | Promise<void>} actions
+ */
+export async function openTransaction(tableNames, mode, actions) {
+	const db = await openDatabase();
+	const tx = db.transaction(tableNames, mode);
+
+	await actions(tx);
+	tx.commit();
+
+	for (const table of tableNames.filter(isReactiveTable)) {
+		await tables[table].refresh();
 	}
 }
 

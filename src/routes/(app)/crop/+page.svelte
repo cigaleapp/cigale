@@ -63,8 +63,11 @@
 		});
 	}
 
-	const images = $derived(toAreaObservationProps(idb.tables.Image.state, [], {isLoaded: (image)=>true}));
-
+	const images = $derived(
+		toAreaObservationProps(idb.tables.Image.state, [], {
+			isLoaded: (image) => image.bufferExists && uiState.previewURLs.has(image.id)
+		})
+	);
 </script>
 
 <Cropup

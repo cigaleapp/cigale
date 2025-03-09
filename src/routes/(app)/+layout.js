@@ -1,7 +1,7 @@
 import { dev } from '$app/environment';
 import { BUILTIN_METADATA } from '$lib/database.js';
 import { error } from '@sveltejs/kit';
-import { tables } from '$lib/idb.svelte.js';
+import { openTransaction, tables } from '$lib/idb.svelte.js';
 import { defineSpeciesMetadata } from '$lib/species.js';
 
 export async function load() {
@@ -19,9 +19,11 @@ export async function load() {
 }
 
 async function fillBuiltinData() {
-	await Promise.all([
-		...BUILTIN_METADATA.map(tables.Metadata.set),
-		tables.Protocol.set({
+	await openTransaction(['Metadata', 'Protocol', 'Settings'], 'readwrite', (tx) => {
+		for (const metadata of BUILTIN_METADATA) {
+			tx.objectStore('Metadata').put(metadata);
+		}
+		tx.objectStore('Protocol').put({
 			id: 'test',
 			metadata: [...BUILTIN_METADATA.map((m) => m.id), 'species'],
 			authors: [
@@ -30,8 +32,8 @@ async function fillBuiltinData() {
 			],
 			name: 'Test',
 			source: 'https://gwen.works'
-		}),
-		tables.Settings.set({
+		});
+		tx.objectStore('Settings').put({
 			id: 'defaults',
 			protocols: [],
 			theme: 'auto',
@@ -39,6 +41,6 @@ async function fillBuiltinData() {
 			language: 'fr',
 			showInputHints: true,
 			showTechnicalMetadata: dev
-		})
-	]);
+		});
+	});
 }

@@ -1,4 +1,5 @@
 import { uiState } from '$lib/state.svelte';
+import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 
@@ -29,7 +30,7 @@ export function imageIsCropped(image) {
 /**
  * @param {import('$lib/database.js').Image} image
  */
-export function imageIsCLassified (image) {
+export function imageIsCLassified(image) {
 	return image.metadata.species || uiState.erroredImages.has(image.id);
 }
 
@@ -51,11 +52,6 @@ export async function downloadImage(imageId, options) {
 	if (!image) throw 'Image non trouvée';
 	const file = await db.get('ImageFile', imageIdToFileId(imageId));
 	if (!file) throw "L'image n'a pas de fichier associé";
-	const blob = new Blob([file.bytes], { type: image.contentType });
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = options?.as || image.filename;
-	a.click();
-	URL.revokeObjectURL(url);
+
+	downloadAsFile(file.bytes, options?.as || image.filename, image.contentType);
 }
