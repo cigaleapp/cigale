@@ -5,6 +5,10 @@
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+	import { onMount } from 'svelte';
+	import { toasts } from '$lib/toasts.svelte';
+	import * as db from '$lib/idb.svelte';
 
 	const { children } = $props();
 
@@ -17,6 +21,40 @@
 			uiState.selection = selection;
 		}
 	};
+
+	onMount(() => {
+		uiState.keybinds['$mod+u'] = {
+			help: 'Supprimer toutes les images et observations',
+			async do() {
+				toasts.warn('Suppression de toutes les images et observations…');
+				await db.openTransaction(['Image', 'ImageFile', 'Observation'], {}, (tx) => {
+					tx.objectStore('Observation').clear();
+					tx.objectStore('ImageFile').clear();
+					uiState.previewURLs = new SvelteMap();
+					tx.objectStore('Image').clear();
+					uiState.erroredImages = new SvelteMap();
+					uiState.loadingImages = new SvelteSet();
+					uiState.setSelection([]);
+				});
+			}
+		};
+		uiState.keybinds['$mod+g'] = {
+			help: 'Fusionner des observations ou images',
+			async do() {
+				await mergeToObservation(uiState.selection);
+				uiState.setSelection([]);
+			}
+		};
+		uiState.keybinds['$mod+alt+g'] = {
+			help: 'Séparer toutes les observations sélectionnées en images seules',
+			async do() {
+				await tables.Observation.do((tx) => {
+					uiState.selection.map((id) => tx.delete(id));
+				});
+				uiState.setSelection([]);
+			}
+		};
+	});
 
 	const showSidePanel = $derived(tables.Image.state.length + tables.Observation.state.length > 0);
 
@@ -90,6 +128,10 @@
 		height: 100%;
 		display: flex;
 		overflow: hidden;
+	}
+
+	.main-and-sidepanel.has-sidepanel main {
+		border-right: 1px solid var(--gray);
 	}
 
 	.main-and-sidepanel:not(.has-sidepanel) main {

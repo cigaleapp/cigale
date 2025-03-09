@@ -7,6 +7,7 @@
 	import Moon from '~icons/ph/moon-light';
 	import Cross from '~icons/ph/x-circle-light';
 	import { goto } from '$app/navigation';
+	import { getSettings, setSetting } from '$lib/settings.svelte';
 
 	let open = $state(false);
 	/** @type {HTMLDialogElement|undefined} */
@@ -15,15 +16,9 @@
 	$effect(() => {
 		window.addEventListener('mouseup', ({ target }) => {
 			if (target === dialogElement) return;
+			// @ts-ignore
 			if (dialogElement?.contains(target)) return;
 			open = false;
-		});
-	});
-
-	$effect(() => {
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
-			if (matches) console.log('sombr');
-			else console.log('clèr');
 		});
 	});
 </script>
@@ -43,7 +38,7 @@
 
 <dialog class="container" open={open ? true : undefined} bind:this={dialogElement}>
 	<div class="listParam">
-		<div class="Language">
+		<div class="setting">
 			Langue :
 			<ButtonPrimary
 				onclick={() => {
@@ -56,24 +51,42 @@
 				}}>English</ButtonPrimary
 			>
 		</div>
-		<div class="Theme">
-			Thème :
-			<Switch icons={{ on: Sun, off: Moon }}></Switch>
+		<div class="setting">
+			Thème
+			<Switch
+				value={getSettings().theme === 'light'}
+				onchange={async (isLight) => {
+					await setSetting('theme', isLight ? 'light' : 'dark');
+				}}
+				icons={{ on: Sun, off: Moon }}
+			></Switch>
 		</div>
-		<div class="Protocole">
-			Protocoles :
-
+		<div class="setting">
+			Mode debug
+			<Switch
+				value={getSettings().showTechnicalMetadata}
+				onchange={async (show) => {
+					await setSetting('showTechnicalMetadata', show);
+				}}
+			/>
+		</div>
+		<div class="setting">
 			<ButtonPrimary
 				onclick={async () => {
 					open = false;
 					await goto('#/protocols');
 				}}
 			>
-				Gérer
+				Gérer les protocoles
 			</ButtonPrimary>
 		</div>
 		<footer>
-			C.i.g.a.l.e vDEV · <a href="#/about">À propos</a>
+			C.i.g.a.l.e vDEV · <a
+				onclick={() => {
+					open = false;
+				}}
+				href="#/about">À propos</a
+			>
 		</footer>
 	</div>
 </dialog>
@@ -118,21 +131,7 @@
 		color: var(--fg-primary);
 	}
 
-	.Language {
-		width: 100%;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 1em;
-	}
-	.Theme {
-		width: 100%;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 1em;
-	}
-	.Protocole {
+	.setting {
 		width: 100%;
 		display: flex;
 		flex-direction: row;
