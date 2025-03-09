@@ -26,7 +26,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [loadingText]
-	 * @property {(id: string) => void} [ondelete] callback when an image is deleted, with the image/observation id as argument
+	 * @property {(id: string) => void} [ondelete] callback the user wants to delete an image or observation.
 	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
 	 */
 
@@ -56,6 +56,13 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		return () => {
 			console.log('destroying dragselect');
 			dragselect?.destroy();
+		};
+	});
+
+	$effect(() => {
+		if (oncardclick) return;
+		uiState.setSelection = (newSelection) => {
+			dragselect?.setSelection(newSelection);
 		};
 	});
 

@@ -90,7 +90,7 @@
 		</section>
 	{/if}
 	<section class="button">
-		{#if page.url.pathname === '/classify'}
+		{#if page.url.hash === '#/classify'}
 			<div class="side-by-side">
 				<ButtonSecondary
 					disabled={!canmerge}

@@ -24,21 +24,21 @@ export function imageIdToFileId(id) {
  * @param {import('$lib/database.js').Image} image
  */
 export function imageIsCropped(image) {
-	return image.metadata.crop || uiState.erroredImages.has(image.id);
+	return Boolean(image.metadata.crop || uiState.erroredImages.has(image.id));
 }
 
 /**
  * @param {import('$lib/database.js').Image} image
  */
 export function imageIsCLassified(image) {
-	return image.metadata.species || uiState.erroredImages.has(image.id);
+	return Boolean(image.metadata.species || uiState.erroredImages.has(image.id));
 }
 
 /**
  * @param {import('$lib/database.js').Image} image
  */
 export function imageBufferWasSaved(image) {
-	return image.bufferExists || uiState.erroredImages.has(image.id);
+	return Boolean(image.bufferExists || uiState.erroredImages.has(image.id));
 }
 
 /**
