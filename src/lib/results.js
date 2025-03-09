@@ -6,6 +6,7 @@ import { imageIdToFileId } from './images';
 import { metadataPrettyKey, metadataPrettyValue, observationMetadata } from './metadata';
 import { toasts } from './toasts.svelte';
 import { downloadAsFile } from './download';
+import { speciesDisplayName } from './species.svelte';
 /**
  * @param {Array<import("./database").Observation>} observations
  * @param {import('./database').Protocol} protocolUsed
@@ -30,13 +31,6 @@ export async function generateResultsZip(observations, protocolUsed) {
 	];
 
 	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
-
-	const speciesDefinition = await db.tables.Metadata.get('species');
-	if (!speciesDefinition) throw 'Species metadata not found';
-
-	/** @param {string|undefined} key  */
-	const speciesDisplayName = (key) =>
-		key ? (speciesDefinition.options?.find((o) => o.key === key)?.label ?? key) : undefined;
 
 	const buffersOfImages = await Promise.all(
 		observations.flatMap((o) =>
@@ -85,8 +79,7 @@ export async function generateResultsZip(observations, protocolUsed) {
 					Object.entries(
 						Object.groupBy(
 							observations,
-							(o) =>
-								speciesDisplayName(finalMetadata[o.id].metadata.species?.toString()) ?? '(Unknown)'
+							(o) => speciesDisplayName(finalMetadata[o.id].metadata.species?.value) ?? '(Unknown)'
 						)
 					).map(([species, observations]) => [
 						species,

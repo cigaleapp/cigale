@@ -58,7 +58,7 @@
 		<PreviewSidePanel
 			images={selectedHrefs}
 			metadata={combineMetadataValues(selectedImages)}
-			canmerge={uiState.selection.length > 1}
+			canmerge={uiState.selection.length > 0}
 			onmerge={async () => {
 				await mergeToObservation(uiState.selection);
 				uiState.setSelection([]);
