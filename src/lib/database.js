@@ -174,7 +174,8 @@ export const BUILTIN_METADATA_IDS = {
 	crop: 'crop',
 	shoot_date: 'shoot_date',
 	shoot_location: 'shoot_location',
-	cuteness: 'cuteness'
+	cuteness: 'cuteness',
+	species: 'species'
 };
 
 /**

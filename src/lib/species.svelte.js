@@ -1,3 +1,4 @@
+import { BUILTIN_METADATA_IDS } from './database.js';
 import { tables } from './idb.svelte.js';
 
 /**
@@ -24,4 +25,15 @@ export async function defineSpeciesMetadata(id) {
 			description: ''
 		}))
 	});
+}
+
+/** @param {undefined | import('./metadata.js').RuntimeValue} key  */
+export function speciesDisplayName(key) {
+	if (!key) return undefined;
+
+	const options = $state.snapshot(
+		tables.Metadata.state.find((m) => m.id === BUILTIN_METADATA_IDS.species)?.options
+	);
+
+	return options?.find((o) => o.key === key?.toString())?.label ?? key?.toString();
 }

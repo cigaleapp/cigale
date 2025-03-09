@@ -2,7 +2,7 @@ import { dev } from '$app/environment';
 import { BUILTIN_METADATA } from '$lib/database.js';
 import { error } from '@sveltejs/kit';
 import { openTransaction, tables } from '$lib/idb.svelte.js';
-import { defineSpeciesMetadata } from '$lib/species.js';
+import { defineSpeciesMetadata } from '$lib/species.svelte.js';
 
 export async function load() {
 	try {
