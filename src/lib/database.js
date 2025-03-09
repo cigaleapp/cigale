@@ -62,16 +62,26 @@ const Observation = table(
 	})
 );
 
-const MetadataType = type.enumerated(
-	'string',
-	'boolean',
-	'integer',
-	'float',
-	'enum',
-	'date',
-	'location',
-	'boundingbox'
-);
+const MetadataType = type("'string'", '@', 'du texte')
+	.or(type("'boolean'", '@', 'un booléen (vrai ou faux)'))
+	.or(type("'integer'", '@', 'un entier'))
+	.or(type("'float'", '@', 'un nombre, potentiellement à virgule'))
+	.or(
+		type(
+			"'enum'",
+			'@',
+			"un ensemble de valeur fixes. Utiliser 'options' sur la définition d'une métadonnée pour préciser les valeurs possibles"
+		)
+	)
+	.or(type("'date'", '@', 'une date'))
+	.or(type("'location'", '@', 'un objet avec deux nombres, `latitude` et `longitude`'))
+	.or(
+		type(
+			"'boundingbox'",
+			'@',
+			"un objet représentant une région rectangulaire, définie par son point supérieur gauche avec `x` et `y`, et sa largeur et hauteur avec `width` et `height'"
+		)
+	);
 
 /**
  * @type { Record<typeof MetadataType.infer, string> }
@@ -87,7 +97,21 @@ export const METADATA_TYPES = {
 	boundingbox: 'boîte de recadrage'
 };
 
-const MetadataMergeMethod = type.enumerated('min', 'max', 'average', 'median', 'none');
+const MetadataMergeMethod = type(
+	'"min"',
+	'@',
+	"Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+)
+	.or(
+		type(
+			'"max"',
+			'@',
+			"Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+		)
+	)
+	.or(type('"average"', '@', 'Prendre la moyenne des valeurs'))
+	.or(type('"median"', '@', 'Prendre la médiane des valeurs'))
+	.or(type('"none"', '@', 'Ne pas fusionner'));
 
 /**
  * @type { Record<typeof MetadataMergeMethod.infer, { label: string; help: string }> }
@@ -95,11 +119,11 @@ const MetadataMergeMethod = type.enumerated('min', 'max', 'average', 'median', '
 export const METADATA_MERGE_METHODS = {
 	min: {
 		label: 'Minimum',
-		help: 'Prend la valeur minimale'
+		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
 	},
 	max: {
 		label: 'Maximum',
-		help: 'Prend la valeur maximale'
+		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
 	},
 	average: {
 		label: 'Moyenne',
@@ -116,35 +140,49 @@ export const METADATA_MERGE_METHODS = {
 };
 
 const MetadataEnumVariant = type({
-	key: ID,
-	label: 'string',
-	description: 'string',
-	learnMore: URLString.optional()
+	key: [ID, '@', 'Identifiant unique pour cette option'],
+	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
+	description: ['string', '@', 'Description (optionnelle) de cette option'],
+	learnMore: URLString.describe(
+		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
+	).optional()
 });
 
-const MetadataWithoutID = 
-	type({
-		label: 'string',
-		type: MetadataType,
-		mergeMethod: MetadataMergeMethod,
-		options: MetadataEnumVariant.array().atLeastLength(1).optional(),
-		required: 'boolean',
-		description: 'string',
-		learnMore: URLString.optional()
-	})
+// TODO https://github.com/arktypeio/arktype/discussions/1360
+const _mergeMethodDescription =
+	"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images";
 
-const Metadata = table(
-	'id', MetadataWithoutID.and({ id: ID })
-);
+const MetadataWithoutID = type({
+	label: ['string', '@', 'Nom de la métadonnée'],
+	type: MetadataType,
+	mergeMethod: MetadataMergeMethod,
+	options: MetadataEnumVariant.array()
+		.atLeastLength(1)
+		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
+		.optional(),
+	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
+	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
+	learnMore: URLString.describe(
+		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
+	).optional()
+});
+
+const Metadata = table('id', MetadataWithoutID.and({ id: ID }));
 
 const ProtocolWithoutMetadata = type({
-	id: ID,
-	name: 'string',
-	source: URLString,
+	id: ID.describe(
+		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
+	),
+	name: ['string', '@', 'Nom du protocole'],
+	source: URLString.describe(
+		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
+	),
 	authors: type({
-		email: 'string.email',
-		name: 'string'
-	}).array()
+		email: ['string.email', '@', 'Adresse email'],
+		name: ['string', '@', 'Prénom Nom']
+	})
+		.array()
+		.describe("Les auteurices ayant participé à l'élaboration du protocole")
 });
 
 const Protocol = table(
