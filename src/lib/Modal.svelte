@@ -17,8 +17,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	 * @property {string} title the title used in the header
 	 * @property {() => void} [open] a function you can bind to, to open the modal
 	 * @property {() => void} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
-	 * @property {import('svelte').Snippet} children the content of the modal
-	 * @property {import('svelte').Snippet} [footer] the content of the footer
+	 * @property {import('svelte').Snippet<[{ close: () => void }]>} children the content of the modal
+	 * @property {import('svelte').Snippet<[{ close: () => void }]>} [footer] the content of the footer
 	 */
 
 	/**  @type {Props} */
@@ -52,7 +52,6 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	});
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
 	bind:this={modalElement}
 	onmousedown={({ target, currentTarget }) => {
@@ -72,11 +71,11 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		</ButtonIcon>
 	</header>
 	<main>
-		{@render children()}
+		{@render children({ close })}
 	</main>
 	{#if footer}
 		<footer>
-			{@render footer()}
+			{@render footer({ close })}
 		</footer>
 	{/if}
 </dialog>
@@ -92,7 +91,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		background: var(--bg-neutral);
 		border: none;
 		width: 75vw;
-		min-height: max(75vh, 300px);
+		min-height: max(50vh, 300px);
 		min-width: min(100vw, 400px);
 		max-width: 700px;
 		transition:
