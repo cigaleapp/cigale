@@ -1,15 +1,17 @@
 <script>
+	import { base } from '$app/paths';
 	import { page } from '$app/state';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { tables } from '$lib/idb.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { ensureNoLoneImages } from '$lib/observations';
+	import { generateResultsZip } from '$lib/results';
+	import { uiState } from '$lib/state.svelte';
+	import { toasts } from '$lib/toasts.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import Reglages from './Reglages.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { generateResultsZip } from '$lib/results';
-	import { tables } from '$lib/idb.svelte';
-	import { toasts } from '$lib/toasts.svelte';
-	import { ensureNoLoneImages } from '$lib/observations';
 
 	/**
 	 * @typedef Props
@@ -85,9 +87,15 @@
 		<ButtonSecondary
 			onclick={async () => {
 				exporting = true;
+				const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocol);
+				if (!chosenProtocol) {
+					toasts.error('Aucun protocole sélectionné');
+					exporting = false;
+					return;
+				}
 				try {
 					await ensureNoLoneImages();
-					await generateResultsZip(tables.Observation.state, tables.Protocol.state[0]);
+					await generateResultsZip(base, tables.Observation.state, chosenProtocol);
 				} catch (error) {
 					console.error(error);
 					toasts.error(
