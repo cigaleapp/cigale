@@ -3,7 +3,12 @@ import { Jimp } from 'jimp';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
-import { metadataPrettyKey, metadataPrettyValue, observationMetadata } from './metadata';
+import {
+	addValueLabels,
+	metadataPrettyKey,
+	metadataPrettyValue,
+	observationMetadata
+} from './metadata';
 import { toasts } from './toasts.svelte';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download';
 import { speciesDisplayName } from './species.svelte';
@@ -21,7 +26,7 @@ export async function generateResultsZip(base, observations, protocolUsed) {
 				o.id,
 				{
 					label: o.label,
-					metadata: await observationMetadata(o)
+					metadata: await observationMetadata(o).then(addValueLabels)
 				}
 			])
 		)

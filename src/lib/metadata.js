@@ -91,6 +91,29 @@ export async function observationMetadata(observation) {
 }
 
 /**
+ * Adds valueLabel to each metadata value object when the metadata is an enum.
+ * @param {import('./database').MetadataValues} values
+ * @returns {Record<string, import('./database').MetadataValue & { valueLabel?: string }>}
+ */
+export function addValueLabels(values) {
+	return Object.fromEntries(
+		Object.entries(values).map(([key, value]) => {
+			const definition = tables.Metadata.state.find((m) => m.id === key);
+			if (!definition) return [key, value];
+			if (definition.type !== 'enum') return [key, value];
+
+			return [
+				key,
+				{
+					...value,
+					valueLabel: definition.options?.find((o) => o.key === value.value.toString())?.label
+				}
+			];
+		})
+	);
+}
+
+/**
  *
  * @param {Array<import('./database').MetadataValues>} values
  * @returns {Promise<import("./database").MetadataValues>}
