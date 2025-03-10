@@ -148,14 +148,13 @@ const MetadataEnumVariant = type({
 	).optional()
 });
 
-// TODO https://github.com/arktypeio/arktype/discussions/1360
-const _mergeMethodDescription =
-	"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images";
-
 const MetadataWithoutID = type({
 	label: ['string', '@', 'Nom de la métadonnée'],
 	type: MetadataType,
-	mergeMethod: MetadataMergeMethod,
+	mergeMethod: MetadataMergeMethod.internal.withMeta({
+		description:
+			"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
+	}),
 	options: MetadataEnumVariant.array()
 		.atLeastLength(1)
 		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
