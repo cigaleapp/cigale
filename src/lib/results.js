@@ -5,13 +5,15 @@ import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
 import { metadataPrettyKey, metadataPrettyValue, observationMetadata } from './metadata';
 import { toasts } from './toasts.svelte';
-import { downloadAsFile } from './download';
+import { downloadAsFile, stringifyWithToplevelOrdering } from './download';
 import { speciesDisplayName } from './species.svelte';
+
 /**
+ * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {Array<import("./database").Observation>} observations
  * @param {import('./database').Protocol} protocolUsed
  */
-export async function generateResultsZip(observations, protocolUsed) {
+export async function generateResultsZip(base, observations, protocolUsed) {
 	/** @type {Record<string, {label: string; metadata: import('./database').MetadataValues}>}  */
 	const finalMetadata = Object.fromEntries(
 		await Promise.all(
@@ -50,10 +52,15 @@ export async function generateResultsZip(observations, protocolUsed) {
 		zip(
 			{
 				'analysis.json': strToU8(
-					JSON.stringify({
-						observations: finalMetadata,
-						protocol: protocolUsed
-					})
+					stringifyWithToplevelOrdering(
+						'json',
+						`${window.location.origin}${base}/results.schema.json`,
+						{
+							observations: finalMetadata,
+							protocol: protocolUsed
+						},
+						['protocol', 'observations']
+					)
 				),
 				'metadata.csv': strToU8(
 					toCSV(

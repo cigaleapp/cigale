@@ -11,7 +11,7 @@ const Probability = type('0 <= number <= 1');
 /**
  * Can't use string.url.parse because it prevents us from generating JSON schemas
  */
-const URLString = type('/https?:\\/\\/.+/');
+const URLString = type(/https?:\/\/.+/);
 
 const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {

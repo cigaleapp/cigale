@@ -1,6 +1,6 @@
 import YAML from 'yaml';
 import { BUILTIN_METADATA_IDS, Schemas } from './database.js';
-import { downloadAsFile } from './download.js';
+import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 
 /**
  *
@@ -151,44 +151,4 @@ export async function importProtocol() {
 		};
 		input.click();
 	});
-}
-
-/**
- *
- * @template {string} Keys
- * @param {Record<Keys, unknown>} object the object to serialize
- * @param {readonly Keys[]} ordering an array of keys in target order, for the top-level object
- * @param {'json' | 'yaml'} format
- * @param {string} schema the json schema URL
- */
-function stringifyWithToplevelOrdering(format, schema, object, ordering) {
-	let keysOrder = [...ordering];
-
-	if (format === 'json') {
-		// @ts-expect-error
-		keysOrder = ['$schema', ...keysOrder];
-	}
-
-	/**
-	 * @param {*} _
-	 * @param {*} value
-	 */
-	const reviver = (_, value) => {
-		if (value === null) return value;
-		if (Array.isArray(value)) return value;
-		if (typeof value !== 'object') return value;
-
-		// @ts-expect-error
-		if (Object.keys(value).every((key) => keysOrder.includes(key))) {
-			return Object.fromEntries(keysOrder.map((key) => [key, value[key]]));
-		}
-		return value;
-	};
-
-	if (format === 'yaml') {
-		const yamled = YAML.stringify(object, reviver, 2);
-		return `# yaml-language-server: $schema=${schema}\n\n${yamled}`;
-	}
-
-	return JSON.stringify({ $schema: schema, ...object }, reviver, 2);
 }
