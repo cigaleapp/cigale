@@ -19,8 +19,7 @@
 		loadModel,
 		MODELDETECTPATH,
 		TARGETHEIGHT,
-		TARGETWIDTH,
-		torawpath
+		TARGETWIDTH
 	} from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
@@ -28,6 +27,9 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
+	import { Jimp, JimpMime } from 'jimp';
+
+	const MAXWIDTH = 1024;
 
 	const erroredImages = $derived(uiState.erroredImages);
 
@@ -58,7 +60,12 @@
 			contentType: file.type
 		});
 
-		const bytes = await file.arrayBuffer();
+		//const bytes = await file.arrayBuffer();
+		const image = await Jimp.read(await file.arrayBuffer());
+		const { width, height: _height } = image.bitmap;
+		const newWidth = width > MAXWIDTH ? MAXWIDTH : width;
+		const resized = image.resize({ w: newWidth });
+		const bytes = await resized.getBuffer(JimpMime.png).then((r) => new Uint8Array(r).buffer);
 
 		await storeImageBytes(id, bytes, file.type);
 		await processExifData(id, bytes, file);
@@ -152,15 +159,18 @@
 
 	/** Counts files that we will process but that aren't loaded in the database yet. Useful to make progress bar more accurate */
 	let filesToProcess = $state(0);
-
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length + filesToProcess;
+		uiState.processing.total = tables.Image.state.length;
 		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.crop).length;
 	});
 </script>
 
 {#snippet modelsource()}
-	<a href={torawpath(MODELDETECTPATH)} target="_blank">
+	<a
+		href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/tree/main/models/{MODELDETECTPATH}"
+		target="_blank"
+	>
 		<code>{MODELDETECTPATH}</code>
 	</a>
 {/snippet}
