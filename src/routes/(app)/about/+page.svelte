@@ -105,7 +105,7 @@
 			</dd>
 			<dt>Classification</dt>
 			<dd>
-				<a href="TODO">TODO</a>
+				<a href="TODO">ResNet50</a>
 			</dd>
 		</dl>
 	</dd>
