@@ -1,17 +1,21 @@
 <script>
+	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import IconMerge from '~icons/ph/selection-background';
-	import IconSplit from '~icons/ph/arrows-out-light';
+	import { countThings } from '$lib/i18n';
+	import IconImage from '~icons/ph/image';
+	import IconObservation from '~icons/ph/bug-beetle';
+	import { idComparator, tables } from '$lib/idb.svelte';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
-	import IconDelete from '~icons/ph/trash';
-	import deepEqual from 'deep-equal';
-	import { tables, idComparator } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { page } from '$app/state';
+	import deepEqual from 'deep-equal';
+	import IconSplit from '~icons/ph/arrows-out-light';
+	import IconMerge from '~icons/ph/selection-background';
+	import IconDelete from '~icons/ph/trash';
 
 	/**
 	 * @typedef {object} Props
@@ -45,6 +49,25 @@
 	});
 
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
+
+	const singleObservationSelected = $derived(
+		uiState.selection.length === 1
+			? tables.Observation.state.find((obs) => obs.id === uiState.selection[0])
+			: undefined
+	);
+
+	const singleImageSelected = $derived(
+		uiState.selection.length === 1
+			? tables.Image.state.find((img) => img.id === uiState.selection[0])
+			: undefined
+	);
+
+	const selectionCounts = $derived({
+		image: uiState.selection.filter((id) => tables.Image.state.some((img) => img.id === id)).length,
+		observation: uiState.selection.filter((id) =>
+			tables.Observation.state.some((obs) => obs.id === id)
+		).length
+	});
 </script>
 
 <div class="pannel" class:empty={images.length === 0}>
@@ -54,6 +77,24 @@
 				<img src={image} alt={'image ' + i} />
 			{/each}
 		</div>
+		<h2>
+			{#if singleObservationSelected}
+				<IconObservation />
+				<InlineTextInput
+					label="Nom de l'observation"
+					value={singleObservationSelected.label}
+					onblur={async (value) => {
+						if (value === singleObservationSelected.label) return;
+						await tables.Observation.update(singleObservationSelected.id, 'label', value);
+					}}
+				/>
+			{:else if singleImageSelected}
+				<IconImage />
+				{singleImageSelected.filename}
+			{:else}
+				{countThings(selectionCounts)}
+			{/if}
+		</h2>
 		<MetadataList>
 			{#each definitions as definition (definition.id)}
 				{@const value = metadata[definition.id]}
@@ -134,7 +175,7 @@
 		overflow-x: auto;
 		padding: 1.7em;
 		display: grid;
-		grid-template-rows: max-content auto max-content;
+		grid-template-rows: max-content max-content auto max-content;
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
@@ -142,6 +183,12 @@
 
 	.pannel.empty {
 		grid-template-rows: auto max-content;
+	}
+
+	h2 {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 	}
 
 	.empty-selection {

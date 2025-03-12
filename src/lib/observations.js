@@ -6,7 +6,7 @@ import { uiState } from './state.svelte';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge
- * @returns {string} the ID of the new observation
+ * @returns {Promise<string>} the ID of the new observation
  */
 export async function mergeToObservation(parts) {
 	const observations = parts
@@ -28,7 +28,7 @@ export async function mergeToObservation(parts) {
 			id: newId,
 			images: [...imageIds],
 			addedAt: new Date().toISOString(),
-			label: observations[0]?.label ?? images[0]?.filename ?? 'Nouvelle observation',
+			label: defaultObservationLabel([...observations, ...images]),
 			metadataOverrides: Object.fromEntries(
 				Object.entries(await mergeMetadataValues(observations.map((o) => o.metadataOverrides))).map(
 					([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }]
@@ -74,6 +74,19 @@ export async function deleteObservation(
 }
 
 /**
+ * @param {Array<{ label: string } | { filename: string }>} parts
+ * @return {string} computed default label for the new observation
+ */
+export function defaultObservationLabel(parts) {
+	// TODO allow user to provide a template string here
+	for (const part of parts) {
+		if ('label' in part) return part.label;
+		if ('filename' in part) return part.filename.replace(/\.[^.]+$/, '');
+	}
+	return 'Nouvelle observation';
+}
+
+/**
  * If there are any images that are not inside any observation, create an observation with a single image for each
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
@@ -89,7 +102,7 @@ export async function ensureNoLoneImages(tx) {
 					id: observationId,
 					images: [image.id],
 					addedAt: new Date().toISOString(),
-					label: image.filename,
+					label: defaultObservationLabel([image]),
 					metadataOverrides: {}
 				});
 				// Update ui selection so we don't have ghosts in preview side panel
