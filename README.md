@@ -6,6 +6,14 @@ Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
 
 ![](./database.png)
 
+## Déploiement
+
+```
+npm i
+npm run build
+# le site est dans public/
+```
+
 ## Développement
 
 1. Installer Volta
