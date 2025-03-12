@@ -62,3 +62,14 @@ export function stringifyWithToplevelOrdering(format, schema, object, ordering) 
 
 	return JSON.stringify({ $schema: schema, ...object }, reviver, 2);
 }
+
+/**
+ * extension is all the last dotted parts: thing.tar.gz is [thing, tar.gz]
+ * @param {string} filename
+ * @returns [string, string] [filename without extension, extension]
+ */
+export function splitFilenameOnExtension(filename) {
+	const match = filename.match(/^([^.]+)\.(.+)$/);
+	if (!match) return [filename, ''];
+	return [match[1], match[2]];
+}

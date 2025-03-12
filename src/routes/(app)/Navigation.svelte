@@ -1,17 +1,11 @@
 <script>
-	import { base } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { ensureNoLoneImages } from '$lib/observations';
-	import { generateResultsZip } from '$lib/results';
-	import { uiState } from '$lib/state.svelte';
-	import { toasts } from '$lib/toasts.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import Reglages from './Reglages.svelte';
+	import DownloadResults from './DownloadResults.svelte';
 
 	/**
 	 * @typedef Props
@@ -28,8 +22,10 @@
 	/** @type {number|undefined} */
 	let height = $state();
 
-	let exporting = $state(false);
+	let openExportModal = $state();
 </script>
+
+<DownloadResults bind:open={openExportModal} />
 
 <header bind:clientHeight={height}>
 	<nav>
@@ -74,43 +70,8 @@
 		</a>
 
 		<Sup></Sup>
-		<!-- <a href="#/results">
-			<div class="download">
-				<Download />
-				Résultats
-			</div>
-			{#if path == '/results'}
-				<div class="line"></div>
-			{/if}
-		</a> -->
-
-		<ButtonSecondary
-			onclick={async () => {
-				exporting = true;
-				const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocol);
-				if (!chosenProtocol) {
-					toasts.error('Aucun protocole sélectionné');
-					exporting = false;
-					return;
-				}
-				try {
-					await ensureNoLoneImages();
-					await generateResultsZip(base, tables.Observation.state, chosenProtocol);
-				} catch (error) {
-					console.error(error);
-					toasts.error(
-						`Erreur lors de l'exportation des résultats: ${error?.toString() ?? 'Erreur inattendue'}`
-					);
-				} finally {
-					exporting = false;
-				}
-			}}
-		>
-			{#if exporting}
-				<LoadingSpinner />
-			{:else}
-				<Download />
-			{/if}
+		<ButtonSecondary onclick={openExportModal}>
+			<Download />
 			Résultats
 		</ButtonSecondary>
 
