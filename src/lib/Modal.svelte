@@ -135,6 +135,10 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 
 	footer {
 		margin-top: auto;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5em;
 	}
 
 	h1 {

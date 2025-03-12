@@ -1,12 +1,13 @@
-<script>
+<script generics="OptionKey extends string">
 	/**
-	 * @typedef {{ key: string; label: string }} Item
+	 * @template {string} Key
+	 * @typedef {{ key: Key; label: string }} Item
 	 */
 
 	/**
 	 * @typedef {object} Props
-	 * @property {Array<Item>} options possible options
-	 * @property {string} [value] the value of the selected radio button
+	 * @property {Array<Item<OptionKey>>} options possible options
+	 * @property {NoInfer<OptionKey>} [value] the value of the selected radio button
 	 * @property {(value: string|undefined) => void} [onchange] callback to call when the user selects a radio button
 	 * @property {import('svelte').Snippet} children
 	 */

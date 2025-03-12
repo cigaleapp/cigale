@@ -10,15 +10,25 @@ import {
 	observationMetadata
 } from './metadata';
 import { toasts } from './toasts.svelte';
-import { downloadAsFile, stringifyWithToplevelOrdering } from './download';
+import {
+	downloadAsFile,
+	splitFilenameOnExtension,
+	stringifyWithToplevelOrdering
+} from './download';
 import { speciesDisplayName } from './species.svelte';
 
 /**
- * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {Array<import("./database").Observation>} observations
  * @param {import('./database').Protocol} protocolUsed
+ * @param {object} param2
+ * @param {'croppedonly'|'full'|'metadataonly'} param2.include
+ * @param {string} param2.base base path of the app - import `base` from `$app/paths`
  */
-export async function generateResultsZip(base, observations, protocolUsed) {
+export async function generateResultsZip(
+	observations,
+	protocolUsed,
+	{ include = 'croppedonly', base }
+) {
 	/** @type {Record<string, {label: string; metadata: import('./database').MetadataValues}>}  */
 	const finalObservationsData = Object.fromEntries(
 		await Promise.all(
@@ -39,17 +49,29 @@ export async function generateResultsZip(base, observations, protocolUsed) {
 
 	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
 
-	const buffersOfImages = await Promise.all(
-		observations.flatMap((o) =>
-			o.images.map(async (imageId) => {
-				const image = await db.tables.Image.get(imageId);
-				if (!image) throw 'Image non trouvée';
-				const { contentType, filename } = image;
-				const bytes = await cropImage(image);
-				return { imageId, bytes: new Uint8Array(bytes), contentType, filename };
-			})
-		)
-	);
+	/**
+	 * @type {Array<{imageId: string, croppedBytes: Uint8Array, originalBytes?: Uint8Array, contentType: string, filename: string}>}
+	 */
+	let buffersOfImages = [];
+
+	if (include !== 'metadataonly')
+		buffersOfImages = await Promise.all(
+			observations.flatMap((o) =>
+				o.images.map(async (imageId) => {
+					const image = await db.tables.Image.get(imageId);
+					if (!image) throw 'Image non trouvée';
+					const { contentType, filename } = image;
+					const { cropped, original } = await cropImage(image);
+					return {
+						imageId,
+						croppedBytes: new Uint8Array(cropped),
+						originalBytes: include === 'full' ? new Uint8Array(original) : undefined,
+						contentType,
+						filename
+					};
+				})
+			)
+		);
 
 	/**
 	 * @type {Uint8Array<ArrayBufferLike>}
@@ -88,28 +110,39 @@ export async function generateResultsZip(base, observations, protocolUsed) {
 					)
 				),
 				...Object.fromEntries(
-					Object.entries(
-						Object.groupBy(
-							observations,
-							(o) =>
-								speciesDisplayName(finalObservationsData[o.id].metadata.species?.value) ??
-								'(Unknown)'
-						)
-					).map(([species, observations]) => [
-						species,
-						Object.fromEntries(
-							(observations ?? []).map((o) => [
-								o.label,
+					include === 'metadataonly'
+						? []
+						: Object.entries(
+								Object.groupBy(
+									observations,
+									(o) =>
+										speciesDisplayName(finalObservationsData[o.id].metadata.species?.value) ??
+										'(Unknown)'
+								)
+							).map(([species, observations]) => [
+								species,
 								Object.fromEntries(
-									o.images.map((imageId) => {
-										const img = buffersOfImages.find((i) => i.imageId === imageId);
-										if (!img) throw 'Image non trouvée';
-										return [img.filename, [img.bytes, { level: 0 }]];
-									})
+									(observations ?? []).map((o) => [
+										o.label,
+										Object.fromEntries(
+											o.images.flatMap((imageId) => {
+												const img = buffersOfImages.find((i) => i.imageId === imageId);
+												if (!img) throw 'Image non trouvée';
+
+												if (include === 'full') {
+													const [filestem, ext] = splitFilenameOnExtension(img.filename);
+													return [
+														[`${filestem}_cropped.${ext}`, [img.croppedBytes, { level: 0 }]],
+														[`${filestem}_original.${ext}`, [img.originalBytes, { level: 0 }]]
+													];
+												} else {
+													return [[img.filename, [img.croppedBytes, { level: 0 }]]];
+												}
+											})
+										)
+									])
 								)
 							])
-						)
-					])
 				)
 			},
 			{
@@ -127,6 +160,7 @@ export async function generateResultsZip(base, observations, protocolUsed) {
 
 /**
  * @param {import('./database').Image} image
+ * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
 export async function cropImage(image) {
 	const boundingBox =
@@ -154,7 +188,7 @@ export async function cropImage(image) {
 			h: boundingBox.height * scaleFactors.heightWise
 		});
 		// @ts-ignore
-		return cropped.getBuffer(image.contentType);
+		return { cropped: await cropped.getBuffer(image.contentType), original: bytes };
 	} catch (error) {
 		toasts.warn(`Impossible de recadrer ${image.filename}, l'image sera incluse sans recadrage`);
 		console.error(
@@ -165,7 +199,7 @@ export async function cropImage(image) {
 		);
 	}
 
-	return bytes;
+	return { cropped: bytes, original: bytes };
 }
 
 /**
