@@ -46,7 +46,7 @@ export async function extractMetadata(buffer) {
 	if (!exif) return output;
 
 	if (exif.tags.DateTimeOriginal) {
-		output[BUILTIN_METADATA_IDS.shoot_date] = new Date(exif.tags.DateTimeOriginal);
+		output[BUILTIN_METADATA_IDS.shoot_date] = new Date(exif.tags.DateTimeOriginal * 1e3);
 	}
 
 	if (exif.tags.GPSLatitude && exif.tags.GPSLongitude) {
