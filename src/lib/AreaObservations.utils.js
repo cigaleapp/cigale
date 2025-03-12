@@ -60,9 +60,9 @@ export function toAreaObservationProps(images, observations, { isLoaded }) {
 
 				/**  @satisfies {CardObservation} */
 				return {
-					image: uiState.previewURLs.get(observation.images[0] ?? '') ?? '',
+					image: uiState.previewURLs.get(firstImage?.id ?? '') ?? '',
 					subimages: observation.images.toSorted(idComparator),
-					title: observation.label ?? `Observation ${imagesOfObservation[0]?.filename ?? ''}`,
+					title: observation.label ?? `Observation ${firstImage?.filename ?? ''}`,
 					index: images.length + i,
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
