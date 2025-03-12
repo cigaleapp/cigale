@@ -6,6 +6,7 @@ import { uiState } from './state.svelte';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge
+ * @returns {string} the ID of the new observation
  */
 export async function mergeToObservation(parts) {
 	const observations = parts
@@ -39,6 +40,8 @@ export async function mergeToObservation(parts) {
 			tx.delete(id);
 		}
 	});
+
+	return newId;
 }
 
 /**

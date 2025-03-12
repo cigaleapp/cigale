@@ -41,8 +41,8 @@
 		uiState.keybinds['$mod+g'] = {
 			help: 'Fusionner des observations ou images',
 			async do() {
-				await mergeToObservation(uiState.selection);
-				uiState.setSelection([]);
+				const newId = await mergeToObservation(uiState.selection);
+				uiState.setSelection([newId]);
 			}
 		};
 		uiState.keybinds['$mod+alt+g'] = {
@@ -88,8 +88,8 @@
 			metadata={combineMetadataValues(selectedImages)}
 			canmerge={uiState.selection.length > 0}
 			onmerge={async () => {
-				await mergeToObservation(uiState.selection);
-				uiState.setSelection([]);
+				const newId = await mergeToObservation(uiState.selection);
+				uiState.setSelection([newId]);
 			}}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
 			onsplit={async () => {
