@@ -19,13 +19,13 @@
 	<svg class="circular-loader" viewBox="25 25 50 50" width="50" height="50">
 		<circle
 			class="loader-path"
-			stroke-dashoffset={dashOffset ?? '-10'}
+			stroke-dashoffset={dashOffset ?? '-30'}
 			cx="50"
 			cy="50"
 			r="20"
 			fill="none"
 			stroke="currentColor"
-			stroke-width="4"
+			stroke-width="6"
 		/>
 	</svg>
 </div>
@@ -36,6 +36,8 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		width: 1em;
+		height: 1em;
 	}
 
 	.loading-spinner:not(.infinite) {
