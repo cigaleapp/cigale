@@ -20,20 +20,21 @@ import { speciesDisplayName } from './species.svelte';
  */
 export async function generateResultsZip(base, observations, protocolUsed) {
 	/** @type {Record<string, {label: string; metadata: import('./database').MetadataValues}>}  */
-	const finalMetadata = Object.fromEntries(
+	const finalObservationsData = Object.fromEntries(
 		await Promise.all(
 			observations.map(async (o) => [
 				o.id,
 				{
 					label: o.label,
-					metadata: await observationMetadata(o).then(addValueLabels)
+					metadata: await observationMetadata(o).then(addValueLabels),
+					images: o.images.map((img) => db.tables.Image.state.find((i) => i.id === img))
 				}
 			])
 		)
 	);
 
 	const allMetadataKeys = [
-		...new Set(observations.flatMap((o) => Object.keys(finalMetadata[o.id].metadata)))
+		...new Set(observations.flatMap((o) => Object.keys(finalObservationsData[o.id].metadata)))
 	];
 
 	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
@@ -61,7 +62,7 @@ export async function generateResultsZip(base, observations, protocolUsed) {
 						'json',
 						`${window.location.origin}${base}/results.schema.json`,
 						{
-							observations: finalMetadata,
+							observations: finalObservationsData,
 							protocol: protocolUsed
 						},
 						['protocol', 'observations']
@@ -78,7 +79,7 @@ export async function generateResultsZip(base, observations, protocolUsed) {
 							Identifiant: o.id,
 							Observation: o.label,
 							...Object.fromEntries(
-								Object.entries(finalMetadata[o.id].metadata).map(([key, { value }]) => [
+								Object.entries(finalObservationsData[o.id].metadata).map(([key, { value }]) => [
 									metadataPrettyKey(metadataDefinitions[key]),
 									metadataPrettyValue(metadataDefinitions[key], value)
 								])
@@ -90,7 +91,9 @@ export async function generateResultsZip(base, observations, protocolUsed) {
 					Object.entries(
 						Object.groupBy(
 							observations,
-							(o) => speciesDisplayName(finalMetadata[o.id].metadata.species?.value) ?? '(Unknown)'
+							(o) =>
+								speciesDisplayName(finalObservationsData[o.id].metadata.species?.value) ??
+								'(Unknown)'
 						)
 					).map(([species, observations]) => [
 						species,
