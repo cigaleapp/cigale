@@ -412,7 +412,7 @@ export function metadataPrettyValue(metadata, value) {
 			return value instanceof Date ? Intl.DateTimeFormat('fr-FR').format(value) : value.toString();
 
 		case 'enum':
-			return metadata.options?.find((o) => o.key === value)?.label ?? value.toString();
+			return metadata.options?.find((o) => o.key === value.toString())?.label ?? value.toString();
 
 		case 'location': {
 			const { latitude, longitude } = type({ latitude: 'number', longitude: 'number' }).assert(
