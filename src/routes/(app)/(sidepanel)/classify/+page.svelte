@@ -9,7 +9,14 @@
 		imageIdToFileId,
 		imageIsCLassified
 	} from '$lib/images';
-	import { classify, loadModel, MODELCLASSIFPATH, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
+	import {
+		classify,
+		loadModel,
+		MODELCLASSIFPATH,
+		TARGETHEIGHT,
+		TARGETWIDTH,
+		torawpath
+	} from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
@@ -128,10 +135,7 @@
 </script>
 
 {#snippet modelsource()}
-	<a
-		href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/tree/main/models/{MODELCLASSIFPATH}"
-		target="_blank"
-	>
+	<a href={torawpath(MODELCLASSIFPATH)} target="_blank">
 		<code>{MODELCLASSIFPATH}</code>
 	</a>
 {/snippet}

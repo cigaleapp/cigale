@@ -88,13 +88,9 @@
 	</dd>
 	<dt>Code source</dt>
 	<dd>
-		<a href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr">git.inpt.fr/cigale/app</a>
+		<a href="https://github.com/cigaleapp/cigale.pages.inpt.fr">github.com/cigaleapp/cigale</a>
 		<br />
 		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a> (mirroir)
-	</dd>
-	<dt>Gentillement hébergé par</dt>
-	<dd>
-		<a href="https://net7.dev">net7</a>, l'association étudiante informatique de l'ENSEEIHT
 	</dd>
 	<dt>Avec les modèles</dt>
 	<dd>
