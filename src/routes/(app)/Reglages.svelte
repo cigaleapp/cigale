@@ -1,6 +1,6 @@
 <script>
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import Gears from '~icons/ph/gear-light';
 	import Sun from '~icons/ph/sun-light';
@@ -8,6 +8,11 @@
 	import Cross from '~icons/ph/x-circle-light';
 	import { goto } from '$app/navigation';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
+
+	/**
+	 * @type {{openKeyboardShortcuts?: () => void}}
+	 */
+	const { openKeyboardShortcuts } = $props();
 
 	let open = $state(false);
 	/** @type {HTMLDialogElement|undefined} */
@@ -39,19 +44,6 @@
 <dialog class="container" open={open ? true : undefined} bind:this={dialogElement}>
 	<div class="listParam">
 		<div class="setting">
-			Langue :
-			<ButtonPrimary
-				onclick={() => {
-					console.log("J'aime le français");
-				}}>Français</ButtonPrimary
-			>
-			<ButtonPrimary
-				onclick={() => {
-					console.log("J'aime le Anglais");
-				}}>English</ButtonPrimary
-			>
-		</div>
-		<div class="setting">
 			Thème
 			<Switch
 				value={getSettings().theme === 'light'}
@@ -71,14 +63,23 @@
 			/>
 		</div>
 		<div class="setting">
-			<ButtonPrimary
+			<ButtonSecondary
 				onclick={async () => {
 					open = false;
 					await goto('#/protocols');
 				}}
 			>
 				Gérer les protocoles
-			</ButtonPrimary>
+			</ButtonSecondary>
+		</div>
+		<div class="setting">
+			<ButtonSecondary
+				onclick={() => {
+					openKeyboardShortcuts?.();
+				}}
+			>
+				Raccourcis clavier
+			</ButtonSecondary>
 		</div>
 		<footer>
 			C.i.g.a.l.e vDEV · <a

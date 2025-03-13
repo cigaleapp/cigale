@@ -12,10 +12,11 @@
 	 * @type {object}
 	 * @property {Boolean} hasImages
 	 * @property {number} [progress=0]
+	 * @property {() => void} [openKeyboardShortcuts]
 	 */
 
 	/** @type {Props} */
-	let { hasImages = true, progress = 0 } = $props();
+	let { hasImages = true, openKeyboardShortcuts, progress = 0 } = $props();
 
 	const path = $derived(page.url.hash.replace(/^#/, ''));
 
@@ -75,7 +76,7 @@
 			Résultats
 		</ButtonSecondary>
 
-		<Reglages --navbar-height="{height}px" />
+		<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
 	</nav>
 	<div class="global-progress-bar" class:inactive={[0, 1].includes(progress)}>
 		<div class="completed" style:width="{progress * 100}%"></div>
