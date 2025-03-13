@@ -5,6 +5,7 @@
 	import Logo from './Logo.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import IconDelete from '~icons/ph/trash';
+	import IconImage from '~icons/ph/image';
 	import { tooltip } from './tooltips';
 
 	/**
@@ -91,7 +92,13 @@
 					</div>
 				{/if}
 				<div class="containbb">
-					<img src={image} alt={title} />
+					{#if image}
+						<img src={image} alt={title} />
+					{:else}
+						<div class="img-placeholder">
+							<IconImage />
+						</div>
+					{/if}
 					{#each boundingBoxes as bounding, index (index)}
 						<div
 							class="bb"
@@ -201,10 +208,21 @@
 		font-size: 1.2rem;
 	}
 
-	img {
+	img,
+	.img-placeholder {
 		width: 100%;
 		height: 200px;
 		/*object-fit: cover;*/
+	}
+
+	.img-placeholder {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 3em;
+		opacity: 0.25;
+		color: var(--gay);
+		background: var(--gray);
 	}
 
 	footer {
