@@ -79,7 +79,7 @@ const MetadataType = type("'string'", '@', 'du texte')
 		type(
 			"'boundingbox'",
 			'@',
-			"un objet représentant une région rectangulaire, définie par son point supérieur gauche avec `x` et `y`, et sa largeur et hauteur avec `width` et `height'"
+			'un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`'
 		)
 	);
 

@@ -1,21 +1,22 @@
 import { strToU8, zip } from 'fflate';
 import { Jimp } from 'jimp';
-import { TARGETHEIGHT, TARGETWIDTH } from './inference';
+import { toTopLeftCoords } from './BoundingBoxes.svelte';
+import {
+	downloadAsFile,
+	splitFilenameOnExtension,
+	stringifyWithToplevelOrdering
+} from './download';
 import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
+import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 import {
 	addValueLabels,
 	metadataPrettyKey,
 	metadataPrettyValue,
 	observationMetadata
 } from './metadata';
-import { toasts } from './toasts.svelte';
-import {
-	downloadAsFile,
-	splitFilenameOnExtension,
-	stringifyWithToplevelOrdering
-} from './download';
 import { speciesDisplayName } from './species.svelte';
+import { toasts } from './toasts.svelte';
 
 /**
  * @param {Array<import("./database").Observation>} observations
@@ -178,11 +179,13 @@ export async function generateResultsZip(
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
 export async function cropImage(image) {
-	const boundingBox =
+	const centeredBoundingBox =
 		/** @type {undefined | import("./metadata").RuntimeValue<'boundingbox'>}  */
 		(image.metadata.crop?.value);
 
-	if (!boundingBox) throw "L'image n'a pas d'information de recadrage";
+	if (!centeredBoundingBox) throw "L'image n'a pas d'information de recadrage";
+
+	const boundingBox = toTopLeftCoords(centeredBoundingBox);
 
 	const bytes = await db.get('ImageFile', imageIdToFileId(image.id)).then((f) => f?.bytes);
 	if (!bytes) throw "L'image n'a pas de fichier associé";
