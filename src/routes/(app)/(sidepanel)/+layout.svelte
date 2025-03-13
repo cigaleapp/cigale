@@ -64,6 +64,10 @@
 			help: 'Séparer toutes les observations sélectionnées en images seules',
 			do: splitSelection
 		};
+		uiState.keybinds['Delete'] = {
+			help: 'Supprimer les images et observations sélectionnées',
+			do: deleteSelection
+		};
 	});
 
 	const showSidePanel = $derived(tables.Image.state.length + tables.Observation.state.length > 0);
