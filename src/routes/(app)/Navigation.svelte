@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
@@ -27,6 +28,11 @@
 	let height = $state();
 
 	let openExportModal = $state();
+
+	$effect(() => {
+		if (!hasImages && !uiState.currentProtocol) goto('#/');
+		if (!hasImages) goto('#/import');
+	});
 </script>
 
 <DownloadResults bind:open={openExportModal} />
