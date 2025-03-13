@@ -37,7 +37,11 @@ export async function generateResultsZip(
 				{
 					label: o.label,
 					metadata: await observationMetadata(o).then(addValueLabels),
-					images: o.images.map((img) => db.tables.Image.state.find((i) => i.id === img))
+					images: o.images.map((id) => {
+						const image = db.tables.Image.state.find((i) => i.id === id);
+						if (!image) return;
+						return { ...image, metadata: addValueLabels(image.metadata) };
+					})
 				}
 			])
 		)
