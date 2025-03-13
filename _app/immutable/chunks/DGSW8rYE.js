@@ -1,1 +1,0 @@
-import{T as t,a as o}from"./BhYK881m.js";function h({x:i,y:r,width:e,height:a}){return{x:i/o,y:r/t,width:e/o,height:a/t}}function n({x:i,y:r,width:e,height:a}){return{x:i*o,y:r*t,width:e*o,height:a*t}}export{n as a,h as t};
