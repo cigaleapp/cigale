@@ -10,10 +10,11 @@
 	 * @type {object}
 	 * @property {import('$lib/state.svelte.js').Keymap} binds
 	 * @property {boolean} [preventDefault=false] call e.preventDefault() before calling the handlers
+	 * @property {() => void} [openHelp] open modal listing all keybindings
 	 */
 
 	/** @type {Props} */
-	const { binds, preventDefault = false } = $props();
+	let { binds, openHelp = $bindable(), preventDefault = false } = $props();
 
 	$effect(() =>
 		// Use the tinykeys package to bind the keybindings
@@ -45,24 +46,13 @@
 		window.addEventListener('keyup', (e) => {
 			if (e.key === '?') {
 				// Call the function that opens the keyboard shortcuts help modal
-				openKeyboardShortcutsHelp?.();
+				openHelp?.();
 			}
 		});
 	});
-
-	/**
-	 * Function that opens the keyboard shortcuts help modal.
-	 * Provided by the `<Modal>` component through `bind:open={...}`
-	 * @type {(() => void)|undefined}
-	 */
-	let openKeyboardShortcutsHelp = $state();
 </script>
 
-<Modal
-	bind:open={openKeyboardShortcutsHelp}
-	key="observations-keyboard-shortcuts-help"
-	title="Raccourcis clavier"
->
+<Modal bind:open={openHelp} key="observations-keyboard-shortcuts-help" title="Raccourcis clavier">
 	<dl>
 		<!-- Object.entries({a: 1, b: 2}) gives [["a", 1], ["b", 2]] -->
 		<!-- Then we filter out keybindings that are marked as hidden -->

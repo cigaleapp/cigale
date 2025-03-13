@@ -23,15 +23,19 @@
 			})();
 		}
 	});
+
+	/** @type {undefined|(() => void)} */
+	let openKeyboardShortcuts = $state();
 </script>
 
-<Navigation hasImages={true} progress={uiState.processing.progress}></Navigation>
+<Navigation {openKeyboardShortcuts} hasImages={true} progress={uiState.processing.progress}
+></Navigation>
 
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
 </svelte:head>
 
-<KeyboardShortcuts preventDefault binds={uiState.keybinds} />
+<KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
 
 <section class="toasts">
 	{#each toasts.items as toast (toast.id)}
