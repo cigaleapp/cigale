@@ -12,6 +12,27 @@
 
 	const { children } = $props();
 
+	async function mergeSelection() {
+		const newId = await mergeToObservation(uiState.selection);
+		uiState.setSelection?.([newId]);
+	}
+
+	async function splitSelection() {
+		await tables.Observation.do((tx) => {
+			uiState.selection.map((id) => tx.delete(id));
+		});
+	}
+
+	async function deleteSelection() {
+		await openTransaction(['Image', 'Observation', 'ImageFile'], {}, async (tx) => {
+			for (const id of uiState.selection) {
+				await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
+				await deleteImage(id, tx);
+			}
+		});
+		uiState.setSelection?.([]);
+	}
+
 	onMount(() => {
 		uiState.keybinds['$mod+u'] = {
 			help: 'Supprimer toutes les images et observations',
@@ -30,19 +51,11 @@
 		};
 		uiState.keybinds['$mod+g'] = {
 			help: 'Fusionner des observations ou images',
-			async do() {
-				const newId = await mergeToObservation(uiState.selection);
-				uiState.setSelection?.([newId]);
-			}
+			do: mergeSelection
 		};
 		uiState.keybinds['$mod+Shift+g'] = {
 			help: 'Séparer toutes les observations sélectionnées en images seules',
-			async do() {
-				await tables.Observation.do((tx) => {
-					uiState.selection.map((id) => tx.delete(id));
-				});
-				uiState.setSelection?.([]);
-			}
+			do: splitSelection
 		};
 	});
 
@@ -77,24 +90,10 @@
 			images={selectedHrefs}
 			metadata={combineMetadataValues(selectedImages)}
 			canmerge={uiState.selection.length > 0}
-			onmerge={async () => {
-				const newId = await mergeToObservation(uiState.selection);
-				uiState.setSelection?.([newId]);
-			}}
+			onmerge={mergeSelection}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
-			onsplit={async () => {
-				await tables.Observation.do((tx) => {
-					uiState.selection.map((id) => tx.delete(id));
-				});
-			}}
-			ondelete={async () => {
-				await openTransaction(['Image', 'Observation', 'ImageFile'], {}, async (tx) => {
-					for (const id of uiState.selection) {
-						await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
-						await deleteImage(id, tx);
-					}
-				});
-			}}
+			onsplit={splitSelection}
+			ondelete={deleteSelection}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
 				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
