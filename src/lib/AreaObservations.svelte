@@ -52,17 +52,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		dragselect?.destroy();
 		dragselect = new DragSelect(imagesContainer, selection);
 		dragselect.setSelection(selection);
+		uiState.setSelection = (newSelection) => {
+			if (!dragselect) {
+				console.error('dragselect not initialized');
+				return;
+			}
+			dragselect.setSelection(newSelection);
+		};
 
 		return () => {
 			console.log('destroying dragselect');
 			dragselect?.destroy();
-		};
-	});
-
-	$effect(() => {
-		if (oncardclick) return;
-		uiState.setSelection = (newSelection) => {
-			dragselect?.setSelection(newSelection);
+			uiState.setSelection = undefined;
 		};
 	});
 

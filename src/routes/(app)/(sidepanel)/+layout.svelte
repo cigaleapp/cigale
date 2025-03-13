@@ -12,16 +12,6 @@
 
 	const { children } = $props();
 
-	export const snapshot = {
-		capture() {
-			const selection = $state.snapshot(uiState.selection);
-			return { selection };
-		},
-		restore({ selection }) {
-			uiState.selection = selection;
-		}
-	};
-
 	onMount(() => {
 		uiState.keybinds['$mod+u'] = {
 			help: 'Supprimer toutes les images et observations',
@@ -34,7 +24,7 @@
 					tx.objectStore('Image').clear();
 					uiState.erroredImages = new SvelteMap();
 					uiState.loadingImages = new SvelteSet();
-					uiState.setSelection([]);
+					uiState.setSelection?.([]);
 				});
 			}
 		};
@@ -42,7 +32,7 @@
 			help: 'Fusionner des observations ou images',
 			async do() {
 				const newId = await mergeToObservation(uiState.selection);
-				uiState.setSelection([newId]);
+				uiState.setSelection?.([newId]);
 			}
 		};
 		uiState.keybinds['$mod+alt+g'] = {
@@ -51,7 +41,7 @@
 				await tables.Observation.do((tx) => {
 					uiState.selection.map((id) => tx.delete(id));
 				});
-				uiState.setSelection([]);
+				uiState.setSelection?.([]);
 			}
 		};
 	});
@@ -89,7 +79,7 @@
 			canmerge={uiState.selection.length > 0}
 			onmerge={async () => {
 				const newId = await mergeToObservation(uiState.selection);
-				uiState.setSelection([newId]);
+				uiState.setSelection?.([newId]);
 			}}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
 			onsplit={async () => {

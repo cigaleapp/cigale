@@ -106,7 +106,7 @@ export async function ensureNoLoneImages(tx) {
 					metadataOverrides: {}
 				});
 				// Update ui selection so we don't have ghosts in preview side panel
-				uiState.setSelection(
+				uiState.setSelection?.(
 					uiState.selection.map((sel) => (sel === image.id ? observationId : sel))
 				);
 			}
