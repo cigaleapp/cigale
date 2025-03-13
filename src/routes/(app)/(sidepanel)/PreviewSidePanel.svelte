@@ -163,6 +163,7 @@
 		>
 			<IconDelete />
 			Supprimer {images.length} images
+			<KeyboardHint shortcut="Delete" />
 		</ButtonSecondary>
 	</section>
 </div>
