@@ -18,6 +18,10 @@
 		color: var(--fg-neutral);
 	}
 
+	:global(::placeholder) {
+		color: var(--gay);
+	}
+
 	:global(*) {
 		font-family: 'Host Grotesk', sans-serif;
 	}

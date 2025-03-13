@@ -3,11 +3,12 @@
 	 * @typedef {object} Props
 	 * @property {string} label
 	 * @property {string} value
+	 * @property {string} [placeholder]
 	 * @property {(newValue: string) => void | Promise<void>} onblur also triggered on component unmount
 	 */
 
 	/** @type {Props} */
-	let { label, value, onblur } = $props();
+	let { label, value = $bindable(), onblur, placeholder } = $props();
 
 	// FIXME Doesn't work - see https://discord.com/channels/457912077277855764/1349511706669224049 on Svelte Discord
 	// onDestroy(() => onblur(value));
@@ -16,8 +17,9 @@
 <input
 	aria-label={label}
 	class="inline-input"
-	{value}
+	bind:value
 	onblur={({ currentTarget }) => onblur(currentTarget.value)}
+	{placeholder}
 />
 
 <style>
