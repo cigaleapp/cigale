@@ -1,24 +1,27 @@
 <script>
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { uiState } from '$lib/state.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
-	import Reglages from './Reglages.svelte';
 	import DownloadResults from './DownloadResults.svelte';
+	import Reglages from './Reglages.svelte';
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Boolean} hasImages
 	 * @property {number} [progress=0]
 	 * @property {() => void} [openKeyboardShortcuts]
 	 */
 
 	/** @type {Props} */
-	let { hasImages = true, openKeyboardShortcuts, progress = 0 } = $props();
+	let { openKeyboardShortcuts, progress = 0 } = $props();
 
 	const path = $derived(page.url.hash.replace(/^#/, ''));
+
+	const hasImages = $derived(tables.Image.state.length > 0);
 
 	/** @type {number|undefined} */
 	let height = $state();
@@ -43,31 +46,21 @@
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a href="#/import">
+			<a href="#/import" aria-disabled={!uiState.currentProtocol}>
 				Importer
 				{#if path == '/import'}
 					<div class="line"></div>
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a
-				href="#/crop"
-				aria-disabled={!hasImages &&
-					path != '/classify' &&
-					path != '/results' &&
-					path != '/crop' &&
-					path != '/import'}
-			>
+			<a href="#/crop" aria-disabled={!uiState.currentProtocol || !hasImages}>
 				Recadrer
 				{#if path == '/crop'}
 					<div class="line"></div>
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a
-				href="#/classify"
-				aria-disabled={path != '/classify' && path != '/results' && path != '/crop'}
-			>
+			<a href="#/classify" aria-disabled={!uiState.currentProtocol || !hasImages}>
 				Classifier
 				{#if path == '/classify'}
 					<div class="line"></div>
