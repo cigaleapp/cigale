@@ -1,14 +1,14 @@
 <script>
+	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImage } from '$lib/images';
-	import { combineMetadataValues, storeMetadataValue } from '$lib/metadata';
+	import { combineMetadataValuesWithOverrides, storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
-	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-	import { onMount } from 'svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import * as db from '$lib/idb.svelte';
+	import { onMount } from 'svelte';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	const { children } = $props();
 
@@ -87,6 +87,12 @@
 			.filter((img) => img !== undefined)
 	);
 
+	const selectedObservations = $derived(
+		uiState.selection
+			.map((id) => tables.Observation.state.find((o) => o.id === id))
+			.filter((o) => o !== undefined)
+	);
+
 	const selectedHrefs = $derived(
 		selectedImages
 			.map((image) => uiState.previewURLs.get(image.id))
@@ -99,7 +105,7 @@
 	{#if showSidePanel}
 		<PreviewSidePanel
 			images={selectedHrefs}
-			metadata={combineMetadataValues(selectedImages)}
+			metadata={combineMetadataValuesWithOverrides(selectedImages, selectedObservations)}
 			canmerge={uiState.selection.length > 0}
 			onmerge={mergeSelection}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
@@ -108,10 +114,10 @@
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
 				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
-					for (const image of selectedImages) {
+					for (const subjectId of uiState.selection) {
 						await storeMetadataValue({
 							tx,
-							subjectId: image.id,
+							subjectId,
 							metadataId: id,
 							confidence: 1,
 							value

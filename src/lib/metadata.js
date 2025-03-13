@@ -37,6 +37,8 @@ export async function storeMetadataValue({
 		)
 	};
 
+	console.log(`Store metadata ${metadataId} in ${subjectId}`, newValue);
+
 	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
 	if (type && metadata.type !== type)
@@ -50,6 +52,7 @@ export async function storeMetadataValue({
 		: await tables.Observation.raw.get(subjectId);
 
 	if (image) {
+		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
 		image.metadata[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Image').put(image);
@@ -59,6 +62,7 @@ export async function storeMetadataValue({
 			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
 		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else if (observation) {
+		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
 		observation.metadataOverrides[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Observation').put(observation);
@@ -147,20 +151,38 @@ export async function mergeMetadataValues(values) {
 }
 
 /**
- * Combine metadata values. Unlike `mergeMetadataValues`, this one does not attempt to merge different values for the same metadata definition, and puts `undefined` instead of a MetadataValue object when values differ.
  * @param {import('./database').Image[]} images
+ * @param {import('./database').Observation[]} observations
+ */
+export function combineMetadataValuesWithOverrides(images, observations) {
+	// Combine overrides
+	const metadataOverrides = combineMetadataValues(observations.map((o) => o.metadataOverrides));
+	// Combine images
+	const metadataFromImages = combineMetadataValues(images.map((i) => i.metadata));
+	// For each key, try from metadataOverrides, if not found, try from metadataFromImages
+	const keys = new Set([...Object.keys(metadataOverrides), ...Object.keys(metadataFromImages)]);
+	/** @type {import('./database').MetadataValues} */
+	const output = {};
+	for (const key of keys) {
+		// @ts-ignore
+		output[key] = metadataOverrides[key] ?? metadataFromImages[key];
+	}
+	return output;
+}
+
+/**
+ * Combine metadata values. Unlike `mergeMetadataValues`, this one does not attempt to merge different values for the same metadata definition, and puts `undefined` instead of a MetadataValue object when values differ.
+ * @param {import('./database').MetadataValues[]} valuesets
  * @returns {Record<string, import('./database').MetadataValue | undefined>}
  */
-export function combineMetadataValues(images) {
+export function combineMetadataValues(valuesets) {
 	/** @type {Record<string, import('./database').MetadataValue | undefined>} */
 	const output = {};
 
-	let keys = new Set(images.flatMap((img) => Object.keys(img.metadata)));
+	let keys = new Set(valuesets.flatMap((v) => Object.keys(v)));
 
 	for (const key of keys) {
-		const values = images.map(
-			(img) => img.metadata[key] ?? { value: null, confidence: 0, alternatives: {} }
-		);
+		const values = valuesets.map((v) => v[key] ?? { value: null, confidence: 0, alternatives: {} });
 
 		const stringedValues = new Set(values.map(({ value }) => JSON.stringify(value)));
 		if (stringedValues.size > 1 || values.some(({ value }) => value === null)) {
