@@ -18,7 +18,8 @@
 		loadModel,
 		MODELDETECTPATH,
 		TARGETHEIGHT,
-		TARGETWIDTH
+		TARGETWIDTH,
+		torawpath
 	} from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
@@ -163,10 +164,7 @@
 </script>
 
 {#snippet modelsource()}
-	<a
-		href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/tree/main/models/{MODELDETECTPATH}"
-		target="_blank"
-	>
+	<a href={torawpath(MODELDETECTPATH)} target="_blank">
 		<code>{MODELDETECTPATH}</code>
 	</a>
 {/snippet}
