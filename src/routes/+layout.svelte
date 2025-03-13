@@ -13,6 +13,11 @@
 		height: 100vh;
 	}
 
+	:global(body, input, textarea, button, dialog) {
+		background-color: var(--bg-neutral);
+		color: var(--fg-neutral);
+	}
+
 	:global(*) {
 		font-family: 'Host Grotesk', sans-serif;
 	}

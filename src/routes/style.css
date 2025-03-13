@@ -1,4 +1,5 @@
-:root {
+:root,
+dialog {
 	--bg-primary: #30b9b3;
 	--bg-primary-translucent: color-mix(in srgb, var(--bg-primary) 35%, var(--bg-neutral));
 	--fg-primary: #2c004b;
@@ -14,6 +15,23 @@
 	--fg-neutral: #000000;
 	--gray: rgb(from var(--fg-neutral) r g b / 0.35);
 	--gay: rgb(from var(--fg-neutral) r g b / 0.75);
+
+	--dark__fg-primary: #30b9b3;
+	--dark__bg-primary-translucent: rgb(from var(--bg-primary) r g b / 0.35);
+	--dark__bg-primary: #2c004b;
+	--dark__fg-dark-primary: #7bbbb0;
+	--dark__bg-dark-primary: #2f3040;
+	--dark__fg-warning: #fff7b3;
+	--dark__bg-warning: #a85400;
+	--dark__fg-error: #ffa08f;
+	--dark__bg-error: #940000;
+	--dark__fg-success: #6bff6b;
+	--dark__bg-success: #006600;
+	--dark__fg-neutral: #ffffff;
+	--dark__bg-neutral: #000000;
+	--dark__gray: rgb(from var(--fg-neutral) r g b / 0.35);
+	--dark__gay: rgb(from var(--fg-neutral) r g b / 0.75);
+
 	--corner-radius: 7px;
 	--border-thickness: 1px;
 }
@@ -21,6 +39,46 @@
 * {
 	margin: 0%;
 	box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']),
+	dialog:not([data-theme='light']) {
+		--bg-primary: var(--dark__bg-primary);
+		--bg-primary-translucent: var(--dark__bg-primary-translucent);
+		--fg-primary: var(--dark__fg-primary);
+		--bg-dark-primary: var(--dark__bg-dark-primary);
+		--fg-dark-primary: var(--dark__fg-dark-primary);
+		--bg-warning: var(--dark__bg-warning);
+		--fg-warning: var(--dark__fg-warning);
+		--bg-error: var(--dark__bg-error);
+		--fg-error: var(--dark__fg-error);
+		--bg-success: var(--dark__bg-success);
+		--fg-success: var(--dark__fg-success);
+		--bg-neutral: var(--dark__bg-neutral);
+		--fg-neutral: var(--dark__fg-neutral);
+		--gray: var(--dark__gray);
+		--gay: var(--dark__gay);
+	}
+}
+
+html[data-theme='dark'],
+dialog[data-theme='dark'] {
+	--bg-primary: var(--dark__bg-primary);
+	--bg-primary-translucent: var(--dark__bg-primary-translucent);
+	--fg-primary: var(--dark__fg-primary);
+	--bg-dark-primary: var(--dark__bg-dark-primary);
+	--fg-dark-primary: var(--dark__fg-dark-primary);
+	--bg-warning: var(--dark__bg-warning);
+	--fg-warning: var(--dark__fg-warning);
+	--bg-error: var(--dark__bg-error);
+	--fg-error: var(--dark__fg-error);
+	--bg-success: var(--dark__bg-success);
+	--fg-success: var(--dark__fg-success);
+	--bg-neutral: var(--dark__bg-neutral);
+	--fg-neutral: var(--dark__fg-neutral);
+	--gray: var(--dark__gray);
+	--gay: var(--dark__gay);
 }
 
 * {

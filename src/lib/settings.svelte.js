@@ -28,6 +28,7 @@ export function getSettings() {
  * @template {keyof import("./database.js").Settings} Key
  */
 export async function setSetting(key, value) {
+	console.log('setSetting', key, value);
 	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
 
 	if (!current) {
