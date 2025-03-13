@@ -35,7 +35,7 @@
 				uiState.setSelection?.([newId]);
 			}
 		};
-		uiState.keybinds['$mod+alt+g'] = {
+		uiState.keybinds['$mod+Shift+g'] = {
 			help: 'Séparer toutes les observations sélectionnées en images seules',
 			async do() {
 				await tables.Observation.do((tx) => {

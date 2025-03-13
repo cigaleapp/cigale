@@ -148,7 +148,7 @@
 				>
 					<IconSplit />
 					Séparer
-					<KeyboardHint shortcut="$mod+alt+g" />
+					<KeyboardHint shortcut="$mod+Shift+g" />
 				</ButtonSecondary>
 			</div>
 		{/if}
