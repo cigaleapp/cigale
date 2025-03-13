@@ -95,16 +95,27 @@ export async function generateResultsZip(
 						[
 							'Identifiant',
 							'Observation',
-							...allMetadataKeys.map((k) => metadataPrettyKey(metadataDefinitions[k]))
+							...allMetadataKeys.flatMap((k) => [
+								metadataPrettyKey(metadataDefinitions[k]),
+								`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
+							])
 						],
 						observations.map((o) => ({
 							Identifiant: o.id,
 							Observation: o.label,
 							...Object.fromEntries(
-								Object.entries(finalObservationsData[o.id].metadata).map(([key, { value }]) => [
-									metadataPrettyKey(metadataDefinitions[key]),
-									metadataPrettyValue(metadataDefinitions[key], value)
-								])
+								Object.entries(finalObservationsData[o.id].metadata).flatMap(
+									([key, { value, confidence }]) => [
+										[
+											metadataPrettyKey(metadataDefinitions[key]),
+											metadataPrettyValue(metadataDefinitions[key], value)
+										],
+										[
+											`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
+											confidence.toString()
+										]
+									]
+								)
 							)
 						}))
 					)
