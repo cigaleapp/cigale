@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
+	import { toCenteredCoords, toRelativeCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import Cropup from '$lib/Cropup.svelte';
 	import { BUILTIN_METADATA_IDS } from '$lib/database';
 	import * as idb from '$lib/idb.svelte.js';
@@ -15,13 +15,15 @@
 	let croppingImage = $state('');
 	const currentCropbox = $derived(
 		toRelativeCoords(
-			// @ts-ignore
-			idb.tables.Image.state.find((i) => i.id === croppingImage)?.metadata.crop?.value ?? {
-				x: 0,
-				y: 0,
-				width: TARGETWIDTH,
-				height: TARGETHEIGHT
-			}
+			toTopLeftCoords(
+				// @ts-ignore
+				idb.tables.Image.state.find((i) => i.id === croppingImage)?.metadata.crop?.value ?? {
+					x: 0,
+					y: 0,
+					width: TARGETWIDTH,
+					height: TARGETHEIGHT
+				}
+			)
 		)
 	);
 
@@ -56,7 +58,7 @@
 			metadataId: BUILTIN_METADATA_IDS.crop,
 			subjectId: id,
 			type: 'boundingbox',
-			value: boundingBoxesout,
+			value: toCenteredCoords(boundingBoxesout),
 			confidence: 1,
 			// Put the neural-network-inferred (initial) value in the alternatives as a backup
 			alternatives: initialCrop ? [initialCrop] : []

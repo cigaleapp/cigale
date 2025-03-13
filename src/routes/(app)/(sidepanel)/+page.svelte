@@ -1,6 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
+	import { toCenteredCoords } from '$lib/BoundingBoxes.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { processExifData } from '$lib/exif';
 	import * as db from '$lib/idb.svelte';
@@ -89,12 +90,7 @@
 		/**
 		 * @param {[number, number, number, number]} param0
 		 */
-		const toCropBox = ([x, y, width, height]) => ({
-			x,
-			y,
-			width,
-			height
-		});
+		const toCropBox = ([x, y, width, height]) => toCenteredCoords({ x, y, width, height });
 
 		await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
 			await storeMetadataValue({
