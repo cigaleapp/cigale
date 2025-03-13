@@ -15,11 +15,8 @@
 
 	function click() {
 		value = !value;
-	}
-
-	$effect(() => {
 		onchange(value);
-	});
+	}
 
 	/** @type {boolean} */
 	let showHints = $derived(getSettings().showInputHints);

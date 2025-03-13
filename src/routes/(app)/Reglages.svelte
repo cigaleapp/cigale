@@ -4,6 +4,7 @@
 	import Switch from '$lib/Switch.svelte';
 	import Gears from '~icons/ph/gear-light';
 	import Sun from '~icons/ph/sun-light';
+	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
 	import Moon from '~icons/ph/moon-light';
 	import Cross from '~icons/ph/x-circle-light';
 	import { goto } from '$app/navigation';
@@ -26,6 +27,13 @@
 			open = false;
 		});
 	});
+
+	let systemIsLight = $state(true);
+	$effect(() => {
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+			systemIsLight = !e.matches;
+		});
+	});
 </script>
 
 <ButtonIcon
@@ -41,17 +49,29 @@
 	{/if}
 </ButtonIcon>
 
-<dialog class="container" open={open ? true : undefined} bind:this={dialogElement}>
+<dialog
+	data-theme={getSettings().theme}
+	class="container"
+	open={open ? true : undefined}
+	bind:this={dialogElement}
+>
 	<div class="listParam">
 		<div class="setting">
 			Thème
 			<Switch
-				value={getSettings().theme === 'light'}
+				value={getSettings().theme === 'auto' ? systemIsLight : getSettings().theme === 'light'}
 				onchange={async (isLight) => {
 					await setSetting('theme', isLight ? 'light' : 'dark');
 				}}
 				icons={{ on: Sun, off: Moon }}
 			></Switch>
+			<ButtonIcon
+				disabled={getSettings().theme === 'auto'}
+				onclick={async () => await setSetting('theme', 'auto')}
+				help="Synchroniser avec le thème du système"
+			>
+				<IconSyncWithSystemTheme />
+			</ButtonIcon>
 		</div>
 		<div class="setting">
 			Mode debug

@@ -5,6 +5,7 @@
 	import Toast from '$lib/Toast.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Navigation from './Navigation.svelte';
@@ -22,6 +23,12 @@
 				uiState.previewURLs.set(image.id, URL.createObjectURL(blob));
 			})();
 		}
+	});
+
+	const settings = $derived(getSettings());
+
+	$effect(() => {
+		document.documentElement.dataset.theme = settings.theme;
 	});
 
 	/** @type {undefined|(() => void)} */

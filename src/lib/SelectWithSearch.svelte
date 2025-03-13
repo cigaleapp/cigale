@@ -104,7 +104,7 @@
 	.container {
 		position: absolute;
 		max-height: 200px;
-		border: 1px solid #ccc;
+		border: 1px solid var(--gay);
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
 		margin-top: 0;
@@ -137,6 +137,7 @@
 		display: flex;
 		padding: 0.25em 1em;
 		font-size: 1em;
+		z-index: 10;
 	}
 
 	.button.highlighted {
