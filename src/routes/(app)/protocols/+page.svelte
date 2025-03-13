@@ -119,7 +119,7 @@
 		<ButtonSecondary
 			onclick={async () => {
 				await importProtocol({ allowMultiple: true })
-					.catch(toasts.error)
+					.catch((e) => toasts.error(e))
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;
 						if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
@@ -187,7 +187,7 @@
 				<section class="actions">
 					<ButtonSecondary
 						onclick={async () => {
-							await exportProtocol(base, p.id).catch(toasts.error);
+							await exportProtocol(base, p.id).catch((e) => toasts.error(e));
 						}}
 					>
 						<IconExport />

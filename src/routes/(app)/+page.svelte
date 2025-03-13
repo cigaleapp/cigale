@@ -63,7 +63,9 @@
 		</ButtonSecondary>
 		<ButtonSecondary
 			onclick={async () => {
-				const protocol = await importProtocol({ allowMultiple: false }).catch(toasts.error);
+				const protocol = await importProtocol({ allowMultiple: false }).catch((e) =>
+					toasts.error(e)
+				);
 				if (!protocol || typeof protocol === 'string') return;
 				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);
 				uiState.currentProtocol = protocol.id;
