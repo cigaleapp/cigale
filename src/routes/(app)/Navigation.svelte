@@ -35,55 +35,50 @@
 			C.i.g.a.l.e.
 		</a>
 
-		<a href="#/">
-			Protocole
-			{#if path == '/'}
-				<div class="line"></div>
-			{/if}
-		</a>
-
-		<Sup></Sup>
-
-		<a href="#/import">
-			Importer
-			{#if path == '/import'}
-				<div class="line"></div>
-			{/if}
-		</a>
-
-		<Sup></Sup>
-
-		<a
-			href="#/crop"
-			aria-disabled={!hasImages &&
-				path != '/classify' &&
-				path != '/results' &&
-				path != '/crop' &&
-				path != '/import'}
-		>
-			Recadrer
-			{#if path == '/crop'}
-				<div class="line"></div>
-			{/if}
-		</a>
-
-		<Sup></Sup>
-
-		<a
-			href="#/classify"
-			aria-disabled={path != '/classify' && path != '/results' && path != '/crop'}
-		>
-			Classifier
-			{#if path == '/classify'}
-				<div class="line"></div>
-			{/if}
-		</a>
-
-		<Sup></Sup>
-		<ButtonSecondary onclick={openExportModal}>
-			<Download />
-			Résultats
-		</ButtonSecondary>
+		<div class="steps">
+			<a href="#/">
+				Protocole
+				{#if path == '/'}
+					<div class="line"></div>
+				{/if}
+			</a>
+			<Sup></Sup>
+			<a href="#/import">
+				Importer
+				{#if path == '/import'}
+					<div class="line"></div>
+				{/if}
+			</a>
+			<Sup></Sup>
+			<a
+				href="#/crop"
+				aria-disabled={!hasImages &&
+					path != '/classify' &&
+					path != '/results' &&
+					path != '/crop' &&
+					path != '/import'}
+			>
+				Recadrer
+				{#if path == '/crop'}
+					<div class="line"></div>
+				{/if}
+			</a>
+			<Sup></Sup>
+			<a
+				href="#/classify"
+				aria-disabled={path != '/classify' && path != '/results' && path != '/crop'}
+			>
+				Classifier
+				{#if path == '/classify'}
+					<div class="line"></div>
+				{/if}
+			</a>
+			<Sup></Sup>
+			<ButtonSecondary onclick={openExportModal}>
+				<Download />
+				Résultats
+			</ButtonSecondary>
+		</div>
 
 		<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
 	</nav>
@@ -112,6 +107,16 @@
 		padding-right: 15px;
 		text-decoration: none;
 		color: var(--fg-neutral);
+	}
+
+	.steps {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		justify-content: space-between;
+		width: 100%;
+		margin: 0 2rem;
+		max-width: 800px;
 	}
 
 	a[aria-disabled='true'] {
