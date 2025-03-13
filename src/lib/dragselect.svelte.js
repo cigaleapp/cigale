@@ -5,7 +5,7 @@ export class DragSelect {
 	imagesContainer;
 
 	/** @type {string[]} */
-	 
+
 	selection = $state([]);
 
 	/** @type {_DragSelect|undefined}  */
@@ -29,12 +29,15 @@ export class DragSelect {
 		// Tell DragSelect that the set of selected items changed
 		// Since we store the selection as an array of ids, we
 		// find the corresponding elements in the imagesContainer by [data-id]
-		return this.#instance.setSelection(
-			// @ts-ignore
-			newSelection.map((id) =>
-				this.imagesContainer?.querySelector(`[data-selectable][data-id="${id}"]`)
-			)
-		);
+		/** @type {import('dragselect').DSInputElement[]}  */
+		// @ts-ignore
+		const elements = newSelection
+			.map((id) => this.imagesContainer?.querySelector(`[data-selectable][data-id="${id}"]`))
+			.filter((el) => el !== null && el !== undefined);
+
+		const result = this.#instance.setSelection(elements);
+		this.selection = result.map((e) => e.dataset.id).filter((id) => id !== undefined);
+		return result;
 	}
 
 	/**
