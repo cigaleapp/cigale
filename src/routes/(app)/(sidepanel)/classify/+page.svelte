@@ -4,16 +4,16 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
+		deleteImage,
 		imageBufferWasSaved,
 		imageIdToFileId,
-		imageIsCLassified,
-		deleteImage
+		imageIsCLassified
 	} from '$lib/images';
 	import { classify, loadModel, MODELCLASSIFPATH, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
-	import { deleteObservation } from '$lib/observations';
+	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
@@ -82,6 +82,11 @@
 			});
 		}
 	}
+
+	$effect(() => {
+		if (!uiState.setSelection) return;
+		void ensureNoLoneImages();
+	});
 
 	$effect(() => {
 		if (!classifmodel) return;
