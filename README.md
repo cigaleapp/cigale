@@ -2,10 +2,6 @@
 
 Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
 
-## Organisation de données
-
-![](./database.png)
-
 ## Déploiement
 
 ```
@@ -48,3 +44,10 @@ npm run build
    # au lieu de git commit
    npm run commit
    ```
+
+### Organisation de données
+
+> [!WARNING]
+> Sûrement légèrement out of date
+
+![](./database.png)
