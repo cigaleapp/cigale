@@ -118,16 +118,12 @@
 	<section class="actions">
 		<ButtonSecondary
 			onclick={async () => {
-				await importProtocol()
-					.catch((e) =>
-						// TODO use regular (non-assert) arktype validation instead
-						toasts.error(
-							e?.toString().replace(/^TraversalError: /, 'Protocole invalide: ') ??
-								"Erreur inattendue pendant l'import du protocole"
-						)
-					)
-					.then((p) => {
-						if (p && p instanceof Object) toasts.success(`Protocole “${p.name}” importé`);
+				await importProtocol({ allowMultiple: true })
+					.catch(toasts.error)
+					.then((ps) => {
+						if (!ps || typeof ps === 'string' || ps.length === 0) return;
+						if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
+						else toasts.success(`${ps.length} protocoles importés`);
 					});
 			}}
 		>
@@ -191,9 +187,7 @@
 				<section class="actions">
 					<ButtonSecondary
 						onclick={async () => {
-							await exportProtocol(base, p.id).catch((e) =>
-								toasts.error(e?.toString() ?? 'Erreur inattendue')
-							);
+							await exportProtocol(base, p.id).catch(toasts.error);
 						}}
 					>
 						<IconExport />
