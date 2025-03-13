@@ -153,8 +153,11 @@
 		}
 	});
 
+	/** Counts files that we will process but that aren't loaded in the database yet. Useful to make progress bar more accurate */
+	let filesToProcess = $state(0);
+
 	$effect(() => {
-		uiState.processing.total = tables.Image.state.length;
+		uiState.processing.total = tables.Image.state.length + filesToProcess;
 		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.crop).length;
 	});
 </script>
@@ -178,12 +181,14 @@
 	<Dropzone
 		clickable={images.length === 0}
 		onfiles={async ({ files }) => {
+			filesToProcess = files.length;
 			for (const file of files) {
 				const currentLength = tables.Image.state.length;
 				const id = imageId(currentLength);
 				try {
 					uiState.loadingImages.add(id);
 					await processImageFile(file, id);
+					filesToProcess--;
 				} catch (error) {
 					console.error(error);
 					erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
