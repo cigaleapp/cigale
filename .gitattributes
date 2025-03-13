@@ -1,5 +1,1 @@
 package-lock.json merge=npm-lockfile
-*.wasm filter=lfs diff=lfs merge=lfs -text
-*.onnx filter=lfs diff=lfs merge=lfs -text
-models/*_model/* filter=lfs diff=lfs merge=lfs -text
-models/*_model/variables/* filter=lfs diff=lfs merge=lfs -text
