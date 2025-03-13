@@ -50,7 +50,7 @@ export const uiState = $state({
 	loadingImages: new SvelteSet(),
 	keybinds: {},
 	// TODO
-	currentProtocol: 'test',
+	currentProtocol: '',
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection: undefined
 });

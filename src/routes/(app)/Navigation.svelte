@@ -36,8 +36,17 @@
 		</a>
 
 		<a href="#/">
-			Importer
+			Protocole
 			{#if path == '/'}
+				<div class="line"></div>
+			{/if}
+		</a>
+
+		<Sup></Sup>
+
+		<a href="#/import">
+			Importer
+			{#if path == '/import'}
 				<div class="line"></div>
 			{/if}
 		</a>
