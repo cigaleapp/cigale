@@ -88,9 +88,7 @@
 	</dd>
 	<dt>Code source</dt>
 	<dd>
-		<a href="https://github.com/cigaleapp/cigale.pages.inpt.fr">github.com/cigaleapp/cigale</a>
-		<br />
-		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a> (mirroir)
+		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a>
 	</dd>
 	<dt>Avec les modèles</dt>
 	<dd>
