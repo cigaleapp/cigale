@@ -4,9 +4,12 @@
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import IconSearch from '~icons/ph/magnifying-glass';
+	import IconImport from '~icons/ph/download';
 	import { uiState } from '$lib/state.svelte';
 	import IconManage from '~icons/ph/gear';
 	import Fuse from 'fuse.js';
+	import { importProtocol } from '$lib/protocols';
+	import { toasts } from '$lib/toasts.svelte';
 
 	const currentProtocol = $derived(
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocol)
@@ -57,6 +60,18 @@
 		<ButtonSecondary onclick={() => goto('#/protocols')}>
 			<IconManage />
 			Gérer les protocoles
+		</ButtonSecondary>
+		<ButtonSecondary
+			onclick={async () => {
+				const protocol = await importProtocol({ allowMultiple: false }).catch(toasts.error);
+				if (!protocol || typeof protocol === 'string') return;
+				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);
+				uiState.currentProtocol = protocol.id;
+				goto('#/import');
+			}}
+		>
+			<IconImport />
+			Importer un protocole
 		</ButtonSecondary>
 	</section>
 </div>
