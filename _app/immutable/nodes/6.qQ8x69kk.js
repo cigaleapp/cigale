@@ -1,1 +1,0 @@
-import{t as a,a as r}from"../chunks/CCZ_fMQU.js";import"../chunks/ZhtD6Cxi.js";import{ah as e}from"../chunks/Bp-bnYO3.js";var p=a(`<h1 class="svelte-1izu57j">Import</h1> c'est l'Impooooooooooooooooooooort`,1);function i(o){var t=p();e(),r(o,t)}export{i as component};
