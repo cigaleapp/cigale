@@ -18,9 +18,16 @@
 	}
 
 	async function splitSelection() {
+		// Find IDs of all images in selected observations
+		const toselect = uiState.selection.flatMap((id) => {
+			const obs = tables.Observation.state.find((o) => o.id === id);
+			if (!obs) return [];
+			return obs.images;
+		});
 		await tables.Observation.do((tx) => {
 			uiState.selection.map((id) => tx.delete(id));
 		});
+		uiState.setSelection?.(toselect);
 	}
 
 	async function deleteSelection() {
