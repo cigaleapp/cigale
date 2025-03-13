@@ -111,8 +111,8 @@ function downloadProtocol(base, format, exportedProtocol) {
 }
 
 /**
- * Imports a protocol from a JSON file.
- * Asks the user to select a file, then imports the protocol from that file.
+ * Imports protocol(s) from JSON file(s).
+ * Asks the user to select files, then imports the protocols from those files.
  * @returns {Promise<typeof ExportedProtocol.infer>}
  */
 export async function importProtocol() {
@@ -123,31 +123,33 @@ export async function importProtocol() {
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
+		input.multiple = true;
 		input.accept = ['.json', '.yaml', 'application/json'].join(',');
 		input.onchange = async () => {
 			if (!input.files || !input.files[0]) return;
-			const file = input.files[0];
-			const reader = new FileReader();
-			reader.onload = async () => {
-				try {
-					if (!reader.result) throw new Error('Fichier vide');
-					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-					const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
-					await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
-						tx.objectStore('Protocol').put({
-							...protocol,
-							metadata: Object.keys(protocol.metadata)
+			for (const file of input.files) {
+				const reader = new FileReader();
+				reader.onload = async () => {
+					try {
+						if (!reader.result) throw new Error('Fichier vide');
+						if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
+						const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
+						await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
+							tx.objectStore('Protocol').put({
+								...protocol,
+								metadata: Object.keys(protocol.metadata)
+							});
+							Object.entries(protocol.metadata).map(([id, metadata]) =>
+								tx.objectStore('Metadata').put({ id, ...metadata })
+							);
 						});
-						Object.entries(protocol.metadata).map(([id, metadata]) =>
-							tx.objectStore('Metadata').put({ id, ...metadata })
-						);
-					});
-					resolve(protocol);
-				} catch (error) {
-					reject(error);
-				}
-			};
-			reader.readAsText(file);
+						resolve(protocol);
+					} catch (error) {
+						reject(error);
+					}
+				};
+				reader.readAsText(file);
+			}
 		};
 		input.click();
 	});
