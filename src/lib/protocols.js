@@ -113,9 +113,12 @@ function downloadProtocol(base, format, exportedProtocol) {
 /**
  * Imports protocol(s) from JSON file(s).
  * Asks the user to select files, then imports the protocols from those files.
- * @returns {Promise<typeof ExportedProtocol.infer>}
+ * @template {boolean|undefined} Multiple
+ * @param {object} param0
+ * @param {Multiple} [param0.allowMultiple=true] allow the user to select multiple files
+ * @returns {Promise<Multiple extends true ? Array<typeof ExportedProtocol.infer> : typeof ExportedProtocol.infer>}
  */
-export async function importProtocol() {
+export async function importProtocol({ allowMultiple } = {}) {
 	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
 	// (Node does not like .svelte.js files' runes)
 	const { openTransaction } = await import('./idb.svelte.js');
@@ -123,33 +126,42 @@ export async function importProtocol() {
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.multiple = true;
+		input.multiple = allowMultiple ?? false;
 		input.accept = ['.json', '.yaml', 'application/json'].join(',');
 		input.onchange = async () => {
 			if (!input.files || !input.files[0]) return;
-			for (const file of input.files) {
-				const reader = new FileReader();
-				reader.onload = async () => {
-					try {
-						if (!reader.result) throw new Error('Fichier vide');
-						if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-						const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
-						await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
-							tx.objectStore('Protocol').put({
-								...protocol,
-								metadata: Object.keys(protocol.metadata)
-							});
-							Object.entries(protocol.metadata).map(([id, metadata]) =>
-								tx.objectStore('Metadata').put({ id, ...metadata })
-							);
-						});
-						resolve(protocol);
-					} catch (error) {
-						reject(error);
-					}
-				};
-				reader.readAsText(file);
-			}
+			/** @type {Array<typeof ExportedProtocol.infer>}  */
+			const output = await Promise.all(
+				[...input.files].map(async (file) => {
+					const reader = new FileReader();
+					return new Promise((resolve) => {
+						reader.onload = async () => {
+							try {
+								if (!reader.result) throw new Error('Fichier vide');
+								if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
+								const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
+								await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
+									tx.objectStore('Protocol').put({
+										...protocol,
+										metadata: Object.keys(protocol.metadata)
+									});
+									Object.entries(protocol.metadata).map(([id, metadata]) =>
+										tx.objectStore('Metadata').put({ id, ...metadata })
+									);
+								});
+								resolve(protocol);
+							} catch (error) {
+								reject(
+									`Protocole ${file.name} invalide: ${error?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`
+								);
+							}
+						};
+						reader.readAsText(file);
+					});
+				})
+			);
+			if (allowMultiple) resolve(output);
+			else resolve(output[0]);
 		};
 		input.click();
 	});

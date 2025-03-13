@@ -98,12 +98,12 @@ export class Toasts {
 	/**
 	 * Displays an error toast.
 	 * @template T
-	 * @param {string} message
+	 * @param {any} message
 	 * @param {ToastOptions<T>} [options]
 	 * @returns {string | undefined}
 	 */
 	error(message, options) {
-		return this.add('error', message, {
+		return this.add('error', message?.toString() ?? 'Erreur inattendue', {
 			...options,
 			lifetime: options?.lifetime ?? 'inferred'
 		});
