@@ -1,14 +1,13 @@
 import { BUILTIN_METADATA_IDS } from './database.js';
 import { tables } from './idb.svelte.js';
+import { torawpath } from './inference.js';
 
 /**
  *
  * @param {string} id
  */
 export async function defineSpeciesMetadata(id) {
-	const names = await fetch(
-		`https://git.inpt.fr/api/v4/projects/cigale%2Fapp/repository/files/models%2Fclass_mapping.txt/raw?lfs=true`
-	)
+	const names = await fetch(torawpath('class_mapping.txt'))
 		.then((res) => res.text())
 		.then((text) => text.split('\n'));
 
