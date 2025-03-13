@@ -9,6 +9,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	import { page } from '$app/state';
 	import IconClose from '~icons/ph/x';
 	import ButtonIcon from './ButtonIcon.svelte';
+	import { getSettings } from './settings.svelte';
 
 	/**
 	 * @typedef Props
@@ -50,9 +51,12 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		if (page.state[stateKey]) modalElement.showModal();
 		else modalElement.close();
 	});
+
+	const theme = $derived(getSettings().theme);
 </script>
 
 <dialog
+	data-theme={theme}
 	bind:this={modalElement}
 	onmousedown={({ target, currentTarget }) => {
 		// Close on backdrop click
