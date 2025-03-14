@@ -9,6 +9,7 @@
 	import Download from '~icons/ph/download-simple';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 
 	/**
 	 * @typedef Props
@@ -35,7 +36,7 @@
 	});
 </script>
 
-<DownloadResults bind:open={openExportModal} />
+<DownloadResults {progress} bind:open={openExportModal} />
 
 <header bind:clientHeight={height}>
 	<nav>
@@ -81,9 +82,9 @@
 
 		<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
 	</nav>
-	<div class="global-progress-bar" class:inactive={[0, 1].includes(progress)}>
-		<div class="completed" style:width="{progress * 100}%"></div>
-	</div>
+
+	<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
+	<ProgressBar progress={uiState.processing.state === 'generating-zip' ? 0 : progress} />
 </header>
 
 <style>
@@ -145,21 +146,5 @@
 
 	a[aria-disabled='true'] .line {
 		visibility: hidden;
-	}
-
-	.global-progress-bar.inactive {
-		opacity: 0;
-		transition: opacity 1s;
-	}
-
-	.global-progress-bar {
-		width: 100%;
-		height: 0.25rem;
-	}
-
-	.global-progress-bar .completed {
-		height: 100%;
-		background: var(--fg-primary);
-		transition: width 0.5s;
 	}
 </style>
