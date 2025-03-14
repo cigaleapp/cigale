@@ -59,11 +59,11 @@ export async function downloadImage(imageId, options) {
 /**
  *
  * @param {string} id
- * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Image", "ImageFile"]>} [tx]
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImage(id, tx, notFoundOk = true) {
-	await db.openTransaction(['Image', 'ImageFile'], { tx }, async (tx) => {
+	await db.openTransaction(['Image', 'ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		const image = await tx.objectStore('Image').get(id);
 		if (!image) {
 			if (notFoundOk) return;
@@ -72,6 +72,9 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 
 		tx.objectStore('Image').delete(id);
 		tx.objectStore('ImageFile').delete(imageIdToFileId(id));
+		tx.objectStore('ImagePreviewFile').delete(imageIdToFileId(id));
+		uiState.erroredImages.delete(id);
+		uiState.loadingImages.delete(id);
 
 		const previewURL = uiState.previewURLs.get(id);
 		if (previewURL) {
@@ -83,17 +86,20 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 
 /**
  *
- * @param {string} id id of the image to store the bytes for
- * @param {ArrayBuffer} bytes the image data
- * @param {string} contentType MIME type of the image
- * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile']>} [tx] transaction to use
+ * @param {object} param0
+ * @param {string} param0.id id of the image to store the bytes for
+ * @param {ArrayBuffer} param0.originalBytes the image data
+ * @param {ArrayBuffer} param0.resizedBytes resized image data
+ * @param {string} param0.contentType MIME type of the image
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
  */
-export async function storeImageBytes(id, bytes, contentType, tx) {
-	await db.openTransaction(['Image', 'ImageFile'], { tx }, async (tx) => {
+export async function storeImageBytes({ id, originalBytes, resizedBytes, contentType, tx }) {
+	await db.openTransaction(['Image', 'ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		const image = await tx.objectStore('Image').get(id);
 		if (!image) throw 'Image non trouvée';
-		tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes });
-		const preview = new Blob([bytes], { type: contentType });
+		tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes: originalBytes });
+		tx.objectStore('ImagePreviewFile').put({ id: imageIdToFileId(id), bytes: resizedBytes });
+		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.previewURLs.set(id, URL.createObjectURL(preview));
 		tx.objectStore('Image').put({ ...image, bufferExists: true });
 	});
