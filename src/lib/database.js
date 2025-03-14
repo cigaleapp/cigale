@@ -137,7 +137,7 @@ const MetadataType = type("'string'", '@', 'du texte')
 		type(
 			"'boundingbox'",
 			'@',
-			'un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`'
+			"un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
 		)
 	);
 
