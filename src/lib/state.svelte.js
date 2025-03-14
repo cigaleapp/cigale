@@ -22,7 +22,7 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
  * @property {number} processing.done éléments traités
  * @property {number} processing.time temps écoulé depuis le début du processus, en
  * @property {number} processing.progress pourcentage entre 0 et 1 de l'avancement du processus
- * @property {'inference'|'preprocessing'|'classification'|'loading'|'postprocessing'|'finished'|'visualizing'|''} processing.state état actuel du processus
+ * @property {'inference'|'preprocessing'|'classification'|'loading'|'postprocessing'|'finished'|'visualizing'|'generating-zip'|''} processing.state état actuel du processus
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées. Utiliser setSelection pour modifier
  * @property {undefined | ((newSelection: string[]) => void)} setSelection modifier la sélection
  * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL

@@ -14,6 +14,8 @@ import {
 	metadataPrettyValue,
 	observationMetadata
 } from './metadata';
+import { speciesDisplayName } from './species.svelte';
+import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
 
 /**
@@ -57,7 +59,12 @@ export async function generateResultsZip(
 	 */
 	let buffersOfImages = [];
 
+	uiState.processing.state = 'generating-zip';
+	uiState.processing.total = 1;
+	uiState.processing.done = 0;
+
 	if (include !== 'metadataonly') {
+		uiState.processing.total += observations.flatMap((o) => o.images).length;
 		for (const imageId of observations.flatMap((o) => o.images)) {
 			const image = await db.tables.Image.get(imageId);
 			if (!image) throw 'Image non trouvée';
@@ -70,6 +77,7 @@ export async function generateResultsZip(
 				contentType,
 				filename
 			});
+			uiState.processing.done++;
 		}
 	}
 
@@ -172,6 +180,8 @@ export async function generateResultsZip(
 			}
 		)
 	);
+
+	uiState.processing.done++;
 
 	downloadAsFile(zipfile, 'results.zip', 'application/zip');
 }
