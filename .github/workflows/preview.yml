@@ -86,3 +86,4 @@ jobs:
           preview_base_url: ${{ env.PAGES_BASE }}
           preview_repo: ${{ env.PREVIEW_REPO }}
           preview_token: ${{ secrets.PREVIEW_DEPLOY_TOKEN }}
+          pr_comment: false # unexpected error encountered: HttpError: Resource not accessible by integration - see logs for more information
