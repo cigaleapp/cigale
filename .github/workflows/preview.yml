@@ -1,0 +1,88 @@
+# -------------------------------------------------------------------------------------------------
+# This workflow is meant to be copied to the source repo, in order to to build the website
+# trigger the deployment.
+# Remember to edit the placeholder commands and env variables below to best suit your needs.
+# You should also create a PREVIEW_DEPLOY_TOKEN secret following the action's README.
+# -------------------------------------------------------------------------------------------------
+
+name: Deploy
+on:
+  push:
+    branches:
+      - 'main'
+  delete:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+concurrency:
+  group: preview-${{ github.event_name }}-${{ github.event.number || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  dev:
+    name: Development
+    runs-on: ubuntu-latest
+    env:
+      PREVIEW_REPO: cigaleapp/preview
+      PAGES_BASE: https://cigaleapp.github.io/preview
+
+    steps:
+      - name: Checkout branch
+        if: ${{ !startsWith(github.event_name, 'pull_request') }}
+        uses: actions/checkout@v3
+
+      - name: Checkout PR head
+        if: ${{ startsWith(github.event_name, 'pull_request') && github.event.action != 'closed' }}
+        uses: actions/checkout@v3
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+
+      # Assuming you're using Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        if: ${{ github.event.action != 'closed' }} # Skipping these steps if the PR has been closed
+        with:
+          node-version: '16'
+          cache: npm
+
+      - name: Install dependencies
+        if: ${{ github.event.action != 'closed' }}
+        run: npm ci --ignore-scripts
+
+      # This will calculate the base URL for the website, based on the event that triggered the workflow.
+      # Leave this step as it is, unless you know what you're doing.
+      - name: Determine base URL
+        if: ${{ github.event.action != 'closed' }}
+        id: baseurl
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            full="${{ env.PAGES_BASE }}/${{ github.repository }}/pr/${{ github.event.number }}"
+          else
+            full="${{ env.PAGES_BASE }}/${{ github.repository }}/branch/${{ github.ref_name }}"
+          fi
+
+          relative=/$(echo "$full" | cut -d/ -f4-)
+
+          echo "full=$full" >> "$GITHUB_OUTPUT"
+          echo "relative=$relative" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      # Run your usual build command, but make sure to use the correct base URL
+      # This example assumes you're using React, and that you're using the PUBLIC_URL env variable
+      - name: Build
+        if: ${{ github.event.action != 'closed' }}
+        run: npm run build
+        env:
+          PUBLIC_URL: ${{ steps.baseurl.outputs.relative }}
+
+      # This will trigger the action. Make sure to change the build_dir input to the correct directory
+      - uses: EndBug/pages-preview@v1
+        with:
+          build_dir: public
+          preview_base_url: ${{ env.PAGES_BASE }}
+          preview_repo: ${{ env.PREVIEW_REPO }}
+          preview_token: ${{ secrets.PREVIEW_DEPLOY_TOKEN }}
