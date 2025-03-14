@@ -1,89 +1,29 @@
-# -------------------------------------------------------------------------------------------------
-# This workflow is meant to be copied to the source repo, in order to to build the website
-# trigger the deployment.
-# Remember to edit the placeholder commands and env variables below to best suit your needs.
-# You should also create a PREVIEW_DEPLOY_TOKEN secret following the action's README.
-# -------------------------------------------------------------------------------------------------
+name: Deploy PR previews
 
-name: Deploy
 on:
-  push:
-    branches:
-      - 'main'
-  delete:
-  pull_request_target:
+  pull_request:
     types:
       - opened
-      - synchronize
       - reopened
+      - synchronize
       - closed
 
-concurrency:
-  group: preview-${{ github.event_name }}-${{ github.event.number || github.ref_name }}
-  cancel-in-progress: true
+concurrency: preview-${{ github.ref }}
 
 jobs:
-  dev:
-    name: Development
+  deploy-preview:
     runs-on: ubuntu-latest
-    env:
-      PREVIEW_REPO: cigaleapp/preview
-      PAGES_BASE: https://cigaleapp.github.io/preview
-
     steps:
-      - name: Checkout branch
-        if: ${{ !startsWith(github.event_name, 'pull_request') }}
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Checkout PR head
-        if: ${{ startsWith(github.event_name, 'pull_request') && github.event.action != 'closed' }}
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ github.event.pull_request.number }}/merge
-
-      # Assuming you're using Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        if: ${{ github.event.action != 'closed' }} # Skipping these steps if the PR has been closed
-        with:
-          node-version: '22.14.0'
-          cache: npm
-
-      - name: Install dependencies
-        if: ${{ github.event.action != 'closed' }}
-        run: npm ci --ignore-scripts
-
-      # This will calculate the base URL for the website, based on the event that triggered the workflow.
-      # Leave this step as it is, unless you know what you're doing.
-      - name: Determine base URL
-        if: ${{ github.event.action != 'closed' }}
-        id: baseurl
+      - name: Install and Build
+        if: github.event.action != 'closed' # You might want to skip the build if the PR has been closed
         run: |
-          if [ "${{ github.event_name }}" == "pull_request_target" ]; then
-            full="${{ env.PAGES_BASE }}/${{ github.repository }}/pr/${{ github.event.number }}"
-          else
-            full="${{ env.PAGES_BASE }}/${{ github.repository }}/branch/${{ github.ref_name }}"
-          fi
+          npm install
+          npm run build
 
-          relative=/$(echo "$full" | cut -d/ -f4-)
-
-          echo "full=$full" >> "$GITHUB_OUTPUT"
-          echo "relative=$relative" >> "$GITHUB_OUTPUT"
-        shell: bash
-
-      # Run your usual build command, but make sure to use the correct base URL
-      # This example assumes you're using React, and that you're using the PUBLIC_URL env variable
-      - name: Build
-        if: ${{ github.event.action != 'closed' }}
-        run: npm run build
-        env:
-          PUBLIC_URL: ${{ steps.baseurl.outputs.relative }}
-
-      # This will trigger the action. Make sure to change the build_dir input to the correct directory
-      - uses: EndBug/pages-preview@v1
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
         with:
-          build_dir: public
-          preview_base_url: ${{ env.PAGES_BASE }}
-          preview_repo: ${{ env.PREVIEW_REPO }}
-          preview_token: ${{ secrets.PREVIEW_DEPLOY_TOKEN }}
-          pr_comment: false # unexpected error encountered: HttpError: Resource not accessible by integration - see logs for more information
+          source-dir: ./public
