@@ -50,27 +50,31 @@ export async function mergeToObservation(parts) {
  * @param {object} [param1]
  * @param {boolean} [param1.recursive=false] Also delete the observation's images
  * @param {boolean} [param1.notFoundOk=true] Don't throw an error if the observation is not found
- * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image", "ImageFile"]>} [param1.tx]
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image", "ImageFile", "ImagePreviewFile"]>} [param1.tx]
  */
 export async function deleteObservation(
 	id,
 	{ recursive = false, notFoundOk = true, tx = undefined } = {}
 ) {
-	await db.openTransaction(['Observation', 'Image', 'ImageFile'], { tx }, async (tx) => {
-		const observation = await tx.objectStore('Observation').get(id);
-		if (!observation) {
-			if (notFoundOk) return;
-			throw 'Observation non trouvée';
-		}
+	await db.openTransaction(
+		['Observation', 'Image', 'ImageFile', 'ImagePreviewFile'],
+		{ tx },
+		async (tx) => {
+			const observation = await tx.objectStore('Observation').get(id);
+			if (!observation) {
+				if (notFoundOk) return;
+				throw 'Observation non trouvée';
+			}
 
-		tx.objectStore('Observation').delete(id);
+			tx.objectStore('Observation').delete(id);
 
-		if (recursive) {
-			for (const imageId of observation.images) {
-				deleteImage(imageId, tx, notFoundOk);
+			if (recursive) {
+				for (const imageId of observation.images) {
+					deleteImage(imageId, tx, notFoundOk);
+				}
 			}
 		}
-	});
+	);
 }
 
 /**

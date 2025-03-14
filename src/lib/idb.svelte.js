@@ -365,21 +365,34 @@ export async function openDatabase() {
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
-	_database = await openDB(databaseName, 2, {
+	_database = await openDB(databaseName, 3, {
 		upgrade(db, oldVersion) {
+			/**
+			 *
+			 * @param {keyof typeof Tables} tableName
+			 * @param {import('arktype').Type} schema
+			 */
+			const createTable = (tableName, schema) => {
+				if (!schema.meta.table) return;
+				const keyPath = schema.meta.table.indexes[0];
+				const store = db.createObjectStore(tableName, { keyPath });
+				for (const index of schema.meta.table.indexes.slice(1)) {
+					store.createIndex(index, index);
+				}
+			};
+
 			// No clean migration path for 1 -> 2, just drop everything
 			if (oldVersion === 1) {
 				for (const tableName of db.objectStoreNames) {
 					db.deleteObjectStore(tableName);
 				}
 			}
+			if (oldVersion === 2) {
+				createTable('ImagePreviewFile', Tables.ImagePreviewFile);
+				return;
+			}
 			for (const [tableName, schema] of tablesByName) {
-				if (!schema.meta.table) continue;
-				const keyPath = schema.meta.table.indexes[0];
-				const store = db.createObjectStore(tableName, { keyPath });
-				for (const index of schema.meta.table.indexes.slice(1)) {
-					store.createIndex(index, index);
-				}
+				createTable(tableName, schema);
 			}
 		}
 	});
