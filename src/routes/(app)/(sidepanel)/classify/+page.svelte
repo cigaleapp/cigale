@@ -98,38 +98,38 @@
 		void ensureNoLoneImages();
 	});
 
-	$effect(() => {
-		if (!classifmodel) return;
-		for (const image of tables.Image.state) {
-			if (
-				imageBufferWasSaved(image) &&
-				!imageIsCLassified(image) &&
-				!uiState.loadingImages.has(image.id)
-			) {
-				$inspect(uiState);
-				uiState.loadingImages.add(image.id);
+	$effect(
+		() =>
+			void (async () => {
+				if (!classifmodel) return;
+				for (const image of tables.Image.state) {
+					if (
+						imageBufferWasSaved(image) &&
+						!imageIsCLassified(image) &&
+						!uiState.loadingImages.has(image.id)
+					) {
+						uiState.loadingImages.add(image.id);
 
-				void (async () => {
-					try {
-						const file = await db.get('ImageFile', imageIdToFileId(image.id));
-						if (!file) {
-							console.log('pas de fichier ..?');
-							return;
+						try {
+							const file = await db.get('ImagePreviewFile', imageIdToFileId(image.id));
+							if (!file) {
+								console.log('pas de fichier ..?');
+								return;
+							}
+							let code = await analyzeImage(file.bytes, image.id, image);
+							if (code == 0) {
+								erroredImages.set(image.id, "Erreur inattendue l'ors de la classification");
+							}
+						} catch (error) {
+							console.error(error);
+							erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
+						} finally {
+							uiState.loadingImages.delete(image.id);
 						}
-						let code = await analyzeImage(file.bytes, image.id, image);
-						if (code == 0) {
-							erroredImages.set(image.id, "Erreur inattendue l'ors de la classification");
-						}
-					} catch (error) {
-						console.error(error);
-						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
-					} finally {
-						uiState.loadingImages.delete(image.id);
 					}
-				})();
-			}
-		}
-	});
+				}
+			})()
+	);
 
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length;

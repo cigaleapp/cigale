@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toCenteredCoords } from '$lib/BoundingBoxes.svelte';
+	import { toCenteredCoords, toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { processExifData } from '$lib/exif';
 	import * as db from '$lib/idb.svelte';
@@ -27,9 +27,15 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
-	import { Jimp, JimpMime } from 'jimp';
+	import { resize } from 'pica-gpu';
 
 	const MAXWIDTH = 1024;
+	/**
+	 * @param {object} param0
+	 * @param {number} param0.width
+	 * @param {number} param0.height
+	 */
+	const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
 
 	const erroredImages = $derived(uiState.erroredImages);
 
@@ -60,16 +66,30 @@
 			contentType: file.type
 		});
 
-		//const bytes = await file.arrayBuffer();
-		const image = await Jimp.read(await file.arrayBuffer());
-		const { width, height: _height } = image.bitmap;
-		const newWidth = width > MAXWIDTH ? MAXWIDTH : width;
-		const resized = image.resize({ w: newWidth });
-		const bytes = await resized.getBuffer(JimpMime.png).then((r) => new Uint8Array(r).buffer);
+		const originalBytes = await file.arrayBuffer();
+		const originalImage = await createImageBitmap(file);
+		const originalCanvas = document.createElement('canvas');
+		originalCanvas.width = originalImage.width;
+		originalCanvas.height = originalImage.height;
+		originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
 
-		await storeImageBytes(id, bytes, file.type);
-		await processExifData(id, bytes, file);
-		await inferBoundingBox(id, bytes, file);
+		const resizedCanvas = document.createElement('canvas');
+		resizedCanvas.width = MAXWIDTH;
+		resizedCanvas.height = MAXHEIGHT(originalImage);
+		resize(originalCanvas, resizedCanvas, {
+			targetWidth: MAXWIDTH,
+			targetHeight: MAXHEIGHT(originalImage),
+			filter: 'mks2013'
+		});
+		const resizedBytes = await new Promise((resolve) => {
+			resizedCanvas.toBlob((blob) => {
+				if (!blob) throw new Error('Failed to resize image');
+				resolve(blob.arrayBuffer());
+			}, file.type);
+		});
+		await storeImageBytes({ id, resizedBytes, originalBytes, contentType: file.type });
+		await processExifData(id, originalBytes, file);
+		await inferBoundingBox(id, resizedBytes, file);
 	}
 
 	/**
@@ -97,7 +117,8 @@
 		/**
 		 * @param {[number, number, number, number]} param0
 		 */
-		const toCropBox = ([x, y, width, height]) => toCenteredCoords({ x, y, width, height });
+		const toCropBox = ([x, y, width, height]) =>
+			toCenteredCoords(toRelativeCoords({ x, y, width, height }));
 
 		await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
 			await storeMetadataValue({
@@ -139,7 +160,7 @@
 			) {
 				void (async () => {
 					try {
-						const file = await db.get('ImageFile', imageIdToFileId(image.id));
+						const file = await db.get('ImagePreviewFile', imageIdToFileId(image.id));
 						if (!file) return;
 						uiState.loadingImages.add(image.id);
 						await inferBoundingBox(image.id, file.bytes, {

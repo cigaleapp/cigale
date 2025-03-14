@@ -88,6 +88,15 @@ const ImageFile = table(
 	})
 );
 
+const ImagePreviewFile = table(
+	['id'],
+	type({
+		/** ID of the associated Image object */
+		id: ID,
+		bytes: 'ArrayBuffer'
+	})
+);
+
 const Image = table(
 	['id', 'addedAt'],
 	type({
@@ -335,7 +344,7 @@ export const Schemas = {
 	Settings
 };
 
-export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile']);
+export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile', 'ImagePreviewFile']);
 
 /**
  *
@@ -350,6 +359,7 @@ export function isReactiveTable(name) {
 export const Tables = {
 	Image,
 	ImageFile,
+	ImagePreviewFile,
 	Observation,
 	Metadata,
 	Protocol,
