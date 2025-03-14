@@ -46,7 +46,7 @@ jobs:
         uses: actions/setup-node@v3
         if: ${{ github.event.action != 'closed' }} # Skipping these steps if the PR has been closed
         with:
-          node-version: '16'
+          node-version: '16.20.2'
           cache: npm
 
       - name: Install dependencies
