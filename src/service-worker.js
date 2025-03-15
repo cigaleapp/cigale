@@ -8,9 +8,9 @@ const ASSETS = [
 	...build, // the app itself
 	...files, // everything in `static`
 	// Neural network models
-	'http://localhost:4000/arthropod_detector_yolo11n_conf0.437.onnx',
-	'http://localhost:4000/model_classif.onnx',
-	'http://localhost:4000/class_mapping.txt'
+	'https://media.gwen.works/cigale/models/arthropod_detector_yolo11n_conf0.437.onnx',
+	'https://media.gwen.works/cigale/models/model_classif.onnx',
+	'https://media.gwen.works/cigale/models/class_mapping.txt'
 ];
 
 self.addEventListener('install', (event) => {
