@@ -1,7 +1,56 @@
-import { type } from 'arktype';
+import { type, scope } from 'arktype';
 import { parseISOSafe } from './date.js';
+import Handlebars from 'handlebars';
+import { splitFilenameOnExtension } from './download.js';
 
 const ID = type(/[\w_]+/);
+
+/**
+ * Add a suffix to a filename, before the extension
+ */
+Handlebars.registerHelper('suffix', (subject, suffix) => {
+	type('string').assert(subject);
+	type('string').assert(suffix);
+
+	const [stem, ext] = splitFilenameOnExtension(subject);
+	return `${stem}${suffix}.${ext}`;
+});
+
+/**
+ * Get the extension part from a filename
+ */
+Handlebars.registerHelper('extension', (subject) => {
+	type('string').assert(subject);
+
+	return splitFilenameOnExtension(subject)[1];
+});
+
+/**
+ * Provide a default, akin to a ?? b
+ */
+Handlebars.registerHelper('fallback', (subject, fallback) => {
+	return subject ?? fallback;
+});
+
+const FilepathTemplate = type.string
+	.pipe((t) =>
+		Handlebars.compile(t, {
+			noEscape: true,
+			assumeObjects: true,
+			knownHelpersOnly: true,
+			knownHelpers: {
+				suffix: true,
+				extension: true,
+				fallback: true
+			}
+		})
+	)
+	.pipe(
+		(template) =>
+			/** @param {{ image: typeof Image.infer & { metadata: Record<string, typeof MetadataValue.infer & { valueLabel?: string }> }, observation: typeof Observation.infer, sequence: number }} data */
+			(data) =>
+				template(data).replaceAll('\\', '/')
+	);
 
 /**
  * Between 0 and 1
@@ -26,8 +75,8 @@ const MetadataValue = type({
 	}
 });
 
-const MetadataValues = type({
-	'[/[a-z0-9_]+/]': MetadataValue
+const MetadataValues = scope({ ID }).type({
+	'[ID]': MetadataValue
 });
 
 const ImageFile = table(
@@ -176,6 +225,24 @@ const ProtocolWithoutMetadata = type({
 	source: URLString.describe(
 		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
 	),
+	exports: type({
+		images: type({
+			cropped: FilepathTemplate.describe('Chemins des images recadrées'),
+			original: FilepathTemplate.describe('Chemins des images originales')
+		}).describe(
+			`Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename "_exemple"}} pour ajouter "_exemple" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename "_cropped"}} donnera "IMG_1245_cropped.JPEG" si l'image avait pour nom de fichier "IMG_12345.JPEG"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple "(Inconnnu)"}} pour utiliser "(Inconnu)" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/`
+		),
+		metadata: {
+			json: type.string
+				.describe("Chemin du fichier JSON contenant les résultats de l'analyse")
+				.pipe((path) => path.replaceAll('\\', '/')),
+			csv: type.string
+				.describe("Chemin du fichier CSV contenant les résultats de l'analyse")
+				.pipe((path) => path.replaceAll('\\', '/'))
+		}
+	})
+		.describe("La structure du fichier .zip d'export pour ce protocole.")
+		.optional(),
 	authors: type({
 		email: ['string.email', '@', 'Adresse email'],
 		name: ['string', '@', 'Prénom Nom']
@@ -252,6 +319,7 @@ export const BUILTIN_METADATA = [
 
 export const Schemas = {
 	ID,
+	FilepathTemplate,
 	Probability,
 	MetadataValues,
 	MetadataValue,
