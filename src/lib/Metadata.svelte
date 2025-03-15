@@ -163,7 +163,7 @@
 				placeholder={conflicted ? 'Plusieurs valeurs' : 'Rechercher…'}
 				{onblur}
 				{options}
-				searchQuery={value ? (options.find((o) => o.key === value)?.label ?? value) : ''}
+				searchQuery={value ? (options.find((o) => o.key === value.toString())?.label ?? value) : ''}
 				selectedValue={typeof value === 'string' ? value : undefined}
 			/>
 		{/if}

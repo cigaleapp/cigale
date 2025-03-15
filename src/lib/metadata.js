@@ -157,16 +157,16 @@ export function addValueLabels(values) {
 /**
  *
  * @param {Array<import('./database').MetadataValues>} values
- * @returns {Promise<import("./database").MetadataValues>}
+ * @returns {import("./database").MetadataValues}
  */
-export async function mergeMetadataValues(values) {
+export function mergeMetadataValues(values) {
 	/** @type {import("./database").MetadataValues}  */
 	const output = {};
 
 	const keys = new Set(values.flatMap((singleSubjectValues) => Object.keys(singleSubjectValues)));
 
 	for (const key of keys) {
-		const definition = await tables.Metadata.get(key);
+		const definition = tables.Metadata.state.find((m) => m.id === key);
 		if (!definition) {
 			console.warn(`Cannot merge metadata values for unknown key ${key}`);
 			continue;
@@ -196,13 +196,16 @@ export function combineMetadataValuesWithOverrides(images, observations) {
 	const metadataOverrides = combineMetadataValues(observations.map((o) => o.metadataOverrides));
 	// Combine images
 	const metadataFromImages = combineMetadataValues(images.map((i) => i.metadata));
+	// Merge metadata from images, used as a fallback when the values differ when combined and also differ when combining overrides
+	const mergedMetadataFromImages = mergeMetadataValues(images.map((i) => i.metadata));
 	// For each key, try from metadataOverrides, if not found, try from metadataFromImages
 	const keys = new Set([...Object.keys(metadataOverrides), ...Object.keys(metadataFromImages)]);
 	/** @type {import('./database').MetadataValues} */
 	const output = {};
 	for (const key of keys) {
 		// @ts-ignore
-		output[key] = metadataOverrides[key] ?? metadataFromImages[key];
+		output[key] =
+			metadataOverrides[key] ?? metadataFromImages[key] ?? mergedMetadataFromImages[key];
 	}
 	return output;
 }
