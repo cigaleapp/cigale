@@ -56,4 +56,5 @@ export const uiState = $state({
 	setSelection: undefined
 });
 
-export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)/.exec(base)?.[1];
+console.info(`Base path is ${base}`);
+export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
