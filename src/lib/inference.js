@@ -74,7 +74,9 @@ export const NMS = true;
  * @returns {string}
  */
 export function torawpath(path) {
-	return `https://sdrive.cnrs.fr/s/MXEEbdDC3jfNPc5/download?path=%2F&files=${encodeURIComponent(path)}`;
+	// FIXME can't use this because of CORS
+	// return `https://cloud.irit.fr/s/dS6J3DUkbkbZBWb/download?path=%2F&files=${encodeURIComponent(path)}`;
+	return `https://media.gwen.works/cigale/models/${path}`;
 }
 /**
  *
