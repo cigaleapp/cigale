@@ -80,7 +80,7 @@
 
 	const images = $derived(
 		toAreaObservationProps(idb.tables.Image.state, [], {
-			isLoaded: (image) => image.bufferExists && uiState.previewURLs.has(image.id)
+			isLoaded: (image) => image.bufferExists && uiState.hasPreviewURL(image)
 		})
 	);
 </script>
