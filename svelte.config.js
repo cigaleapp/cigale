@@ -4,6 +4,9 @@ import { mdsvex } from 'mdsvex';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
+		version: {
+			name: process.env.BUILD_COMMIT || 'dev'
+		},
 		adapter: adapter({
 			pages: 'public',
 			assets: 'public',
