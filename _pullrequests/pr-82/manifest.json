@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/refs/heads/master/src/schemas/json/web-manifest.json",
+	"$schema": "https://json.schemastore.org/web-manifest-combined.json",
 	"theme_color": "#25c8bf",
 	"background_color": "#cff3f1",
 	"icons": [
