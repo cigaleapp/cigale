@@ -1,6 +1,12 @@
 /// <reference types="@sveltejs/kit" />
 import { build, files, version } from '$service-worker';
 
+/** @param {string} path  */
+const remoteAsset = (path) =>
+	// FIXME can't use this because of CORS
+	// `https://cloud.irit.fr/s/dS6J3DUkbkbZBWb/download?path=%2F&files=${encodeURIComponent(path)}`;
+	`https://media.gwen.works/cigale/models/${path}`;
+
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
 
@@ -8,9 +14,9 @@ const ASSETS = [
 	...build, // the app itself
 	...files, // everything in `static`
 	// Neural network models
-	'https://media.gwen.works/cigale/models/arthropod_detector_yolo11n_conf0.437.onnx',
-	'https://media.gwen.works/cigale/models/model_classif.onnx',
-	'https://media.gwen.works/cigale/models/class_mapping.txt'
+	remoteAsset('arthropod_detector_yolo11n_conf0.437.onnx'),
+	remoteAsset('model_classif.onnx'),
+	remoteAsset('class_mapping.txt')
 ];
 
 self.addEventListener('install', (event) => {
