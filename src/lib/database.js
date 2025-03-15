@@ -283,7 +283,7 @@ const Settings = table(
 	})
 );
 
-export const BUILTIN_METADATA_IDS = {
+export const BUILTIN_METADATA_IDS = /** @type {const} */ ({
 	crop: 'crop',
 	shoot_date: 'shoot_date',
 	shoot_location: 'shoot_location',
@@ -294,7 +294,7 @@ export const BUILTIN_METADATA_IDS = {
 	order: 'order',
 	phylum: 'phylum',
 	kingdom: 'kingdom'
-};
+});
 
 /**
  * @type {Array<typeof Metadata.inferIn & { id: keyof typeof BUILTIN_METADATA_IDS }>}

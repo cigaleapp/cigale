@@ -18,7 +18,7 @@ const species = await fetch(CLASSMAPPING_URL)
 			.filter(Boolean)
 	);
 
-const out = { species: {}, phyla: {}, orders: {}, families: {}, genera: {} };
+const out = { phyla: {}, orders: {}, families: {}, genera: {}, species: {}, items: [] };
 let done = 0;
 const total = species.length;
 
@@ -26,9 +26,11 @@ process.stderr.write(`\x1b[KGot ${total} species\r`);
 
 for (const sp of species) {
 	process.stderr.write(`\x1b[K${done}/${total} ${sp}\r`);
+
 	const { key, nubKey, kingdom, phylum, order, family, genus, species, taxonomicStatus } =
 		await fetchTaxon(sp);
-	out.species[sp] = {
+
+	out.items.push({
 		gbifId: key,
 		gbifBackboneId: nubKey,
 		kingdom,
@@ -40,38 +42,41 @@ for (const sp of species) {
 		// ACCEPTED, DOUBTFUL, SYNONYM, HETEROTYPIC_SYNONYM, HOMOTYPIC_SYNONYM, PROPARTE_SYNONYM, MISAPPLIED
 		accepted: taxonomicStatus === 'ACCEPTED',
 		...(taxonomicStatus === 'ACCEPTED' ? {} : { notAcceptedWhy: taxonomicStatus })
-	};
+	});
 	done++;
+}
+
+process.stderr.write(`\x1b[KBuilding mapping species->genera...\r`);
+
+for (const { genus, species } of out.items) {
+	if (!out.species[species]) out.species[species] = {};
+	out.species[species] = genus;
 }
 
 process.stderr.write(`\x1b[KBuilding mapping genera->families...\r`);
 
-for (const sp of species) {
-	const { genus, family } = out.species[sp];
+for (const { genus, family } of out.items) {
 	if (!out.genera[genus]) out.genera[genus] = {};
 	out.genera[genus] = family;
 }
 
 process.stderr.write(`\x1b[KBuilding mapping families->orders...\r`);
 
-for (const sp of species) {
-	const { family, order } = out.species[sp];
+for (const { family, order } of out.items) {
 	if (!out.families[family]) out.families[family] = {};
 	out.families[family] = order;
 }
 
 process.stderr.write(`\x1b[KBuilding mapping orders->phyla...\r`);
 
-for (const sp of species) {
-	const { order, phylum } = out.species[sp];
+for (const { order, phylum } of out.items) {
 	if (!out.orders[order]) out.orders[order] = {};
 	out.orders[order] = phylum;
 }
 
 process.stderr.write(`\x1b[KBuilding mapping phyla->kingdoms...\r`);
 
-for (const sp of species) {
-	const { phylum, kingdom } = out.species[sp];
+for (const { phylum, kingdom } of out.items) {
 	if (!out.phyla[phylum]) out.phyla[phylum] = {};
 	out.phyla[phylum] = kingdom;
 }
