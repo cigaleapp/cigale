@@ -30,7 +30,7 @@ export async function defineSpeciesMetadata(id) {
 	const taxonomy = await initializeTaxonomy();
 
 	await tables.Metadata.do((tx) => {
-		const kingdoms = [...new Set(Object.values(taxonomy.species).map((t) => t.kingdom))];
+		const kingdoms = [...new Set(Object.values(taxonomy.items).map((t) => t.kingdom))];
 
 		tx.put({
 			id: 'kingdom',
@@ -47,7 +47,7 @@ export async function defineSpeciesMetadata(id) {
 			}))
 		});
 
-		const phyla = [...new Set(Object.values(taxonomy.species).map((t) => t.phylum))];
+		const phyla = [...new Set(Object.values(taxonomy.items).map((t) => t.phylum))];
 
 		tx.put({
 			id: 'phylum',
@@ -64,7 +64,7 @@ export async function defineSpeciesMetadata(id) {
 			}))
 		});
 
-		const orders = [...new Set(Object.values(taxonomy.species).map((t) => t.order))];
+		const orders = [...new Set(Object.values(taxonomy.items).map((t) => t.order))];
 
 		tx.put({
 			id: 'order',
@@ -81,7 +81,7 @@ export async function defineSpeciesMetadata(id) {
 			}))
 		});
 
-		const families = [...new Set(Object.values(taxonomy.species).map((t) => t.family))];
+		const families = [...new Set(Object.values(taxonomy.items).map((t) => t.family))];
 
 		tx.put({
 			id: 'family',
@@ -98,7 +98,7 @@ export async function defineSpeciesMetadata(id) {
 			}))
 		});
 
-		const genera = [...new Set(Object.values(taxonomy.species).map((t) => t.genus))];
+		const genera = [...new Set(Object.values(taxonomy.items).map((t) => t.genus))];
 
 		tx.put({
 			id: 'genus',
