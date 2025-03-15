@@ -1,8 +1,8 @@
 import { dev } from '$app/environment';
 import { BUILTIN_METADATA, BUILTIN_METADATA_IDS } from '$lib/database.js';
-import { error } from '@sveltejs/kit';
 import { openTransaction, tables } from '$lib/idb.svelte.js';
 import { defineSpeciesMetadata } from '$lib/species.svelte.js';
+import { error } from '@sveltejs/kit';
 
 export async function load() {
 	try {
@@ -24,12 +24,26 @@ async function fillBuiltinData() {
 			tx.objectStore('Metadata').put(metadata);
 		}
 		tx.objectStore('Protocol').put({
-			id: 'io.github.cigaleapp.transect',
+			id: 'io.github.cigaleapp.transects.arthropods',
 			metadata: [
 				BUILTIN_METADATA_IDS.species,
+				// BUILTIN_METADATA_IDS.kingdom,
+				// BUILTIN_METADATA_IDS.phylum,
+				BUILTIN_METADATA_IDS.order,
+				BUILTIN_METADATA_IDS.family,
+				BUILTIN_METADATA_IDS.genus,
 				BUILTIN_METADATA_IDS.shoot_date,
 				BUILTIN_METADATA_IDS.shoot_location,
 				BUILTIN_METADATA_IDS.crop
+			],
+			metadataOrder: [
+				BUILTIN_METADATA_IDS.crop,
+				BUILTIN_METADATA_IDS.species,
+				BUILTIN_METADATA_IDS.genus,
+				BUILTIN_METADATA_IDS.family,
+				BUILTIN_METADATA_IDS.order,
+				BUILTIN_METADATA_IDS.shoot_date,
+				BUILTIN_METADATA_IDS.shoot_location
 			],
 			authors: [],
 			exports: {
@@ -44,7 +58,7 @@ async function fillBuiltinData() {
 					csv: 'metadata.csv'
 				}
 			},
-			name: 'Transect',
+			name: "Transect d'arthropodes",
 			source: 'https://github.com/cigaleapp/cigale'
 		});
 		tx.objectStore('Settings').put({

@@ -20,9 +20,9 @@
 	} from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
+	import { setSpeciesWithLineage } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 
 	const erroredImages = $derived(uiState.erroredImages);
@@ -85,11 +85,9 @@
 			console.warn('No species detected');
 			return 0;
 		} else {
-			await storeMetadataValue({
+			await setSpeciesWithLineage({
 				subjectId: id,
-				metadataId: 'species',
-				type: 'enum',
-				value: species[0][0].toString(),
+				species: species[0][0].toString(),
 				// @ts-ignore
 				confidence: confs[0][0],
 				// @ts-ignore

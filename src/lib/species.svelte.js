@@ -1,6 +1,7 @@
 import { BUILTIN_METADATA_IDS } from './database.js';
 import { tables } from './idb.svelte.js';
 import { torawpath } from './inference.js';
+import { initializeTaxonomy } from './taxonomy.js';
 
 /**
  *
@@ -13,7 +14,7 @@ export async function defineSpeciesMetadata(id) {
 
 	await tables.Metadata.set({
 		id,
-		description: "L'espèce de l'individu",
+		description: '',
 		label: 'Espèce',
 		mergeMethod: 'max',
 		required: false,
@@ -24,6 +25,95 @@ export async function defineSpeciesMetadata(id) {
 			description: '',
 			learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
 		}))
+	});
+
+	const taxonomy = await initializeTaxonomy();
+
+	await tables.Metadata.do((tx) => {
+		const kingdoms = [...new Set(Object.values(taxonomy).map((t) => t.kingdom))];
+
+		tx.put({
+			id: 'kingdom',
+			description: '',
+			label: 'Règne',
+			mergeMethod: 'max',
+			required: false,
+			type: 'enum',
+			options: kingdoms.map((name, i) => ({
+				key: i.toString(),
+				label: name,
+				description: '',
+				learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
+			}))
+		});
+
+		const phyla = [...new Set(Object.values(taxonomy).map((t) => t.phylum))];
+
+		tx.put({
+			id: 'phylum',
+			description: '',
+			label: 'Phylum',
+			mergeMethod: 'max',
+			required: false,
+			type: 'enum',
+			options: phyla.map((name, i) => ({
+				key: i.toString(),
+				label: name,
+				description: '',
+				learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
+			}))
+		});
+
+		const orders = [...new Set(Object.values(taxonomy).map((t) => t.order))];
+
+		tx.put({
+			id: 'order',
+			description: '',
+			label: 'Ordre',
+			mergeMethod: 'max',
+			required: false,
+			type: 'enum',
+			options: orders.map((name, i) => ({
+				key: i.toString(),
+				label: name,
+				description: '',
+				learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
+			}))
+		});
+
+		const families = [...new Set(Object.values(taxonomy).map((t) => t.family))];
+
+		tx.put({
+			id: 'family',
+			description: '',
+			label: 'Famille',
+			mergeMethod: 'max',
+			required: false,
+			type: 'enum',
+			options: families.map((name, i) => ({
+				key: i.toString(),
+				label: name,
+				description: '',
+				learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
+			}))
+		});
+
+		const genera = [...new Set(Object.values(taxonomy).map((t) => t.genus))];
+
+		tx.put({
+			id: 'genus',
+			description: '',
+			label: 'Genre',
+			mergeMethod: 'max',
+			required: false,
+			type: 'enum',
+			options: genera.map((name, i) => ({
+				key: i.toString(),
+				label: name,
+				description: '',
+				learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
+			}))
+		});
 	});
 }
 
