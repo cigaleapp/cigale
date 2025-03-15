@@ -25,14 +25,13 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
-	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
 		toAreaObservationProps(tables.Image.state, tables.Observation.state, {
 			isLoaded: (image) =>
-				imageBufferWasSaved(image) && previewURLs.has(image.id) && imageIsCLassified(image)
+				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsCLassified(image)
 		})
 	);
 

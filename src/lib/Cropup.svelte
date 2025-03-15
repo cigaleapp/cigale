@@ -6,6 +6,7 @@ show a pop up to crop an image
 <script>
 	import { toPixelCoords } from './BoundingBoxes.svelte';
 	import DraggableBoundingBox from './DraggableBoundingBox.svelte';
+	import { imageIdToFileId } from './images';
 	import Logo from './Logo.svelte';
 	import ModalConfirm from './ModalConfirm.svelte';
 	import { uiState } from './state.svelte';
@@ -29,7 +30,7 @@ show a pop up to crop an image
 		id
 	} = $props();
 
-	const image = $derived(uiState.previewURLs.get(id));
+	const image = $derived(uiState.previewURLs.get(imageIdToFileId(id)));
 
 	/** @type {{x: number, y: number, width: number, height: number}[]} */
 	let BBout = [];

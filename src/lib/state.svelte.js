@@ -1,5 +1,6 @@
 import { base } from '$app/paths';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+import { imageIdToFileId } from './images';
 
 /**
  * @typedef Keybind
@@ -26,6 +27,9 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées. Utiliser setSelection pour modifier
  * @property {undefined | ((newSelection: string[]) => void)} setSelection modifier la sélection
  * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
+ * @property {(image: import('./database').Image | typeof import('./database').Tables.Image.in.infer, url: string) => void} setPreviewURL
+ * @property {(image: import('./database').Image | typeof import('./database').Tables.Image.in.infer | undefined) => boolean} hasPreviewURL
+ * @property {(image: import('./database').Image | typeof import('./database').Tables.Image.in.infer | undefined) => string | undefined} getPreviewURL
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
  * @property {Set<string>} loadingImages liste des IDs d'images en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
@@ -47,6 +51,17 @@ export const uiState = $state({
 	},
 	selection: [],
 	previewURLs: new SvelteMap(),
+	hasPreviewURL(image) {
+		if (!image) return false;
+		return this.previewURLs.has(imageIdToFileId(image.id));
+	},
+	setPreviewURL(image, url) {
+		this.previewURLs.set(imageIdToFileId(image.id), url);
+	},
+	getPreviewURL(image) {
+		if (!image) return undefined;
+		return this.previewURLs.get(imageIdToFileId(image.id));
+	},
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
 	keybinds: {},

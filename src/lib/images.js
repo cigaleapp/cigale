@@ -14,10 +14,13 @@ export function imageId(index, subindex = 0) {
 
 /**
  * Retourne l'id d'un objet ImageFile associé à l'objet Image
- * @param {string} id
+ * @template {string|undefined} T
+ * @param {T} id
+ * @returns {T}
  */
 export function imageIdToFileId(id) {
-	return id.replace(/(_\d+)+$/, '');
+	// @ts-expect-error
+	return id?.replace(/(_\d+)+$/, '');
 }
 
 /**
@@ -76,10 +79,10 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 		uiState.erroredImages.delete(id);
 		uiState.loadingImages.delete(id);
 
-		const previewURL = uiState.previewURLs.get(id);
+		const previewURL = uiState.previewURLs.get(imageIdToFileId(id));
 		if (previewURL) {
 			URL.revokeObjectURL(previewURL);
-			uiState.previewURLs.delete(id);
+			uiState.previewURLs.delete(imageIdToFileId(id));
 		}
 	});
 }
@@ -100,7 +103,7 @@ export async function storeImageBytes({ id, originalBytes, resizedBytes, content
 		tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes: originalBytes });
 		tx.objectStore('ImagePreviewFile').put({ id: imageIdToFileId(id), bytes: resizedBytes });
 		const preview = new Blob([resizedBytes], { type: contentType });
-		uiState.previewURLs.set(id, URL.createObjectURL(preview));
+		uiState.setPreviewURL(image, URL.createObjectURL(preview));
 		tx.objectStore('Image').put({ ...image, bufferExists: true });
 	});
 }

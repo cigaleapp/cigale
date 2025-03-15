@@ -42,7 +42,7 @@
 	const images = $derived(
 		toAreaObservationProps(tables.Image.state, [], {
 			isLoaded: (image) =>
-				imageBufferWasSaved(image) && uiState.previewURLs.has(image.id) && imageIsCropped(image)
+				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsCropped(image)
 		})
 	);
 
