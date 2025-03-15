@@ -25,11 +25,12 @@ export const Taxon = type({
 });
 
 export const Taxonomy = type({
-	species: { '[string]': Taxon },
+	items: Taxon.array(),
 	phyla: type({ '[string]': 'string' }).describe('phyla -> kingdoms'),
 	orders: type({ '[string]': 'string' }).describe('orders -> phyla'),
 	families: type({ '[string]': 'string' }).describe('families -> orders'),
-	genera: type({ '[string]': 'string' }).describe('genera -> families')
+	genera: type({ '[string]': 'string' }).describe('genera -> families'),
+	species: type({ '[string]': 'string' }).describe('species -> genera')
 });
 
 /**
@@ -44,6 +45,18 @@ export const CLADE_METADATA_IDS = /** @type {const} */ ([
 	BUILTIN_METADATA_IDS.species
 ]);
 
+/**
+ * Map singular-case clade names to their plural-case names, as used in the taxonomy object
+ */
+export const CLADE_METADATA_IDS_PLURAL = /** @type {const} */ ({
+	[BUILTIN_METADATA_IDS.kingdom]: 'kingdom',
+	[BUILTIN_METADATA_IDS.phylum]: 'phyla',
+	[BUILTIN_METADATA_IDS.order]: 'orders',
+	[BUILTIN_METADATA_IDS.family]: 'families',
+	[BUILTIN_METADATA_IDS.genus]: 'genera',
+	[BUILTIN_METADATA_IDS.species]: 'species'
+});
+
 export const Clade = type.enumerated(...CLADE_METADATA_IDS);
 
 /**
@@ -54,7 +67,8 @@ let _taxonomy = {
 	phyla: {},
 	orders: {},
 	families: {},
-	genera: {}
+	genera: {},
+	items: []
 };
 
 /**
@@ -80,221 +94,53 @@ export async function setTaxonAndInferParents({
 	alternatives,
 	tx
 }) {
+	await ensureTaxonomyInitialized();
 	console.log(`Setting taxon on ${subjectId}: ${clade} = ${value}`);
 	await openTransaction(['Image', 'Observation'], { tx }, async (tx) => {
-		switch (clade) {
-			case BUILTIN_METADATA_IDS.species: {
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: BUILTIN_METADATA_IDS.species,
-					value,
-					confidence,
-					alternatives
-				});
-
-				const speciesName = await labelOfEnumKey(BUILTIN_METADATA_IDS.species, value);
-				if (!speciesName) {
-					throw new Error(`Species ${value} not found in taxonomy`);
-				}
-
-				const lineage = await lineageOfSpecies(speciesName);
-				const key = await keyOfEnumLabel(BUILTIN_METADATA_IDS.genus, lineage.genus);
-				if (!key) {
-					throw new Error(`Genus ${lineage.genus} not found in taxonomy`);
-				}
-				await setTaxonAndInferParents({
-					tx,
-					subjectId,
-					clade: BUILTIN_METADATA_IDS.genus,
-					value: key
-				});
-				break;
-			}
-
-			case BUILTIN_METADATA_IDS.genus: {
-				// Store genus
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: BUILTIN_METADATA_IDS.genus,
-					value,
-					confidence,
-					alternatives
-				});
-
-				// Get genus name
-				const genusName = await labelOfEnumKey(BUILTIN_METADATA_IDS.genus, value);
-				if (!genusName) {
-					throw new Error(`Genus ${value} not found in taxonomy`);
-				}
-
-				// Get associated family, walking up the taxonomy tree
-				const family = _taxonomy.genera[genusName];
-				if (!family) {
-					throw new Error(`Genus ${value} has no family in taxonomy`);
-				}
-
-				// Get key in enum for family
-				const key = await keyOfEnumLabel(BUILTIN_METADATA_IDS.family, family);
-				if (!key) {
-					throw new Error(`Family ${family} not found in taxonomy`);
-				}
-
-				// Continue walking up the taxonomy tree
-				await setTaxonAndInferParents({
-					tx,
-					subjectId,
-					clade: BUILTIN_METADATA_IDS.family,
-					value: key
-				});
-				break;
-			}
-
-			case BUILTIN_METADATA_IDS.family: {
-				// Store family
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: BUILTIN_METADATA_IDS.family,
-					value,
-					confidence,
-					alternatives
-				});
-
-				// Get family name
-				const familyName = await labelOfEnumKey(BUILTIN_METADATA_IDS.family, value);
-				if (!familyName) {
-					throw new Error(`Family ${value} not found in taxonomy`);
-				}
-
-				// Get associated order, walking up the taxonomy tree
-				const order = _taxonomy.families[familyName];
-				if (!order) {
-					throw new Error(`Family ${value} has no order in taxonomy`);
-				}
-
-				// Get key in enum for order
-				const key = await keyOfEnumLabel(BUILTIN_METADATA_IDS.order, order);
-				if (!key) {
-					throw new Error(`Order ${order} not found in taxonomy`);
-				}
-
-				// Continue walking up the taxonomy tree
-				await setTaxonAndInferParents({
-					tx,
-					subjectId,
-					clade: BUILTIN_METADATA_IDS.order,
-					value: key
-				});
-				break;
-			}
-
-			case BUILTIN_METADATA_IDS.order: {
-				// Store order
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: BUILTIN_METADATA_IDS.order,
-					value,
-					confidence,
-					alternatives
-				});
-
-				// Get order name
-				const orderName = await labelOfEnumKey(BUILTIN_METADATA_IDS.order, value);
-				if (!orderName) {
-					throw new Error(`Order ${value} not found in taxonomy`);
-				}
-
-				// Get associated phylum, walking up the taxonomy tree
-				const phylum = _taxonomy.orders[orderName];
-				if (!phylum) {
-					throw new Error(`Order ${value} has no phylum in taxonomy`);
-				}
-
-				// Get key in enum for phylum
-				const key = await keyOfEnumLabel(BUILTIN_METADATA_IDS.phylum, phylum);
-				if (!key) {
-					throw new Error(`Phylum ${phylum} not found in taxonomy`);
-				}
-
-				// Continue walking up the taxonomy tree
-				await setTaxonAndInferParents({
-					tx,
-					subjectId,
-					clade: BUILTIN_METADATA_IDS.phylum,
-					value: key
-				});
-				break;
-			}
-
-			case BUILTIN_METADATA_IDS.phylum: {
-				// Store phylum
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: BUILTIN_METADATA_IDS.phylum,
-					value,
-					confidence,
-					alternatives
-				});
-
-				// Get phylum name
-				const phylumName = await labelOfEnumKey(BUILTIN_METADATA_IDS.phylum, value);
-				if (!phylumName) {
-					throw new Error(`Phylum ${value} not found in taxonomy`);
-				}
-
-				// Get associated kingdom, walking up the taxonomy tree
-				const kingdom = _taxonomy.phyla[phylumName];
-				if (!kingdom) {
-					throw new Error(`Phylum ${value} has no kingdom in taxonomy`);
-				}
-
-				// Get key in enum for kingdom
-				const key = await keyOfEnumLabel(BUILTIN_METADATA_IDS.kingdom, kingdom);
-				if (!key) {
-					throw new Error(`Kingdom ${kingdom} not found in taxonomy`);
-				}
-
-				// Continue walking up the taxonomy tree
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: BUILTIN_METADATA_IDS.kingdom,
-					value: key
-				});
-				break;
-			}
-
-			case BUILTIN_METADATA_IDS.kingdom: {
-				// Store kingdom
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: BUILTIN_METADATA_IDS.kingdom,
-					value,
-					confidence,
-					alternatives
-				});
-				break;
-			}
+		// Base case: kingdom clade
+		if (clade === 'kingdom') {
+			return storeMetadataValue({
+				tx,
+				subjectId,
+				metadataId: BUILTIN_METADATA_IDS.kingdom,
+				value,
+				confidence,
+				alternatives
+			});
 		}
-	});
-}
 
-/**
- * @param {string} species
- * @returns {Promise<typeof Taxon.infer>} The lineage of the species: kingdom, phylum, order, family, genus, species
- */
-export async function lineageOfSpecies(species) {
-	await ensureTaxonomyInitialized();
-	const taxon = _taxonomy.species[species];
-	if (!taxon) {
-		throw new Error(`Species ${species} not found in taxonomy`);
-	}
-	return taxon;
+		// Recursive case: store this clade, then infer parent
+		await storeMetadataValue({
+			tx,
+			subjectId,
+			metadataId: clade,
+			value,
+			confidence,
+			alternatives
+		});
+
+		const parentClade = CLADE_METADATA_IDS[CLADE_METADATA_IDS.indexOf(clade) - 1];
+		const valueName = await labelOfEnumKey(clade, value);
+		if (!valueName) {
+			throw new Error(`No ${clade} with key ${value} in taxonomy`);
+		}
+		const parentValueName = _taxonomy[CLADE_METADATA_IDS_PLURAL[clade]][valueName];
+		if (!parentValueName) {
+			throw new Error(`${valueName} has no ${parentClade} in taxonomy`);
+		}
+
+		const parentKey = await keyOfEnumLabel(parentClade, parentValueName);
+		if (!parentKey) {
+			throw new Error(`${parentValueName} not found in taxonomy`);
+		}
+
+		return setTaxonAndInferParents({
+			tx,
+			subjectId,
+			clade: parentClade,
+			value: parentKey
+		});
+	});
 }
 
 export async function ensureTaxonomyInitialized() {
