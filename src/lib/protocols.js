@@ -1,6 +1,7 @@
 import YAML from 'yaml';
-import { BUILTIN_METADATA_IDS, Schemas } from './database.js';
+import { BUILTIN_METADATA, BUILTIN_METADATA_IDS, Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
+import { fromEntries, keys } from './utils.js';
 
 /**
  *
@@ -32,19 +33,34 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
 	return metadataId.startsWith(`${protocolId}__`);
 }
 
-export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.and({
-	metadata: {
-		'[string]': Schemas.MetadataWithoutID
-	}
-}).pipe((protocol) => ({
-	...protocol,
-	metadata: Object.fromEntries(
-		Object.entries(protocol.metadata).map(([id, metadata]) => [
-			namespacedMetadataId(protocol.id, id),
-			metadata
-		])
-	)
-}));
+export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.in
+	.and({
+		metadata: {
+			'[string]': Schemas.MetadataWithoutID.describe('Métadonnée du protocole'),
+			...fromEntries(
+				keys(BUILTIN_METADATA_IDS).map(
+					(id) =>
+						/** @type {const} */ ([
+							`${id}?`,
+							[
+								'"builtin"',
+								'@',
+								`Métadonnée "${BUILTIN_METADATA.find((m) => m.id === id)?.label}" prédéfinie dans l'application: ${BUILTIN_METADATA.find((m) => m.id === id)?.description}`
+							]
+						])
+				)
+			)
+		}
+	})
+	.pipe((protocol) => ({
+		...protocol,
+		metadata: Object.fromEntries(
+			Object.entries(protocol.metadata).map(([id, metadata]) => [
+				namespacedMetadataId(protocol.id, id),
+				metadata
+			])
+		)
+	}));
 
 /**
  * Exports a protocol by ID into a JSON file, and triggers a download of that file.
@@ -56,14 +72,18 @@ export async function exportProtocol(base, id, format = 'json') {
 	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
 	const { tables } = await import('./idb.svelte.js');
 
-	const protocol = await tables.Protocol.get(id);
+	const protocol = await tables.Protocol.raw.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
 
 	downloadProtocol(base, format, {
 		...protocol,
 		metadata: await tables.Metadata.list()
 			.then((defs) => defs.filter((def) => protocol?.metadata.includes(def.id)))
-			.then((defs) => Object.fromEntries(defs.map(({ id, ...def }) => [id, def])))
+			.then((defs) =>
+				Object.fromEntries(
+					defs.map(({ id, ...def }) => [id, id in BUILTIN_METADATA_IDS ? 'builtin' : def])
+				)
+			)
 	});
 }
 
@@ -139,17 +159,19 @@ export async function importProtocol({ allowMultiple } = {}) {
 							try {
 								if (!reader.result) throw new Error('Fichier vide');
 								if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-								const protocol = ExportedProtocol.assert(YAML.parse(reader.result));
+								const protocol = ExportedProtocol.in.assert(YAML.parse(reader.result));
 								await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
 									tx.objectStore('Protocol').put({
 										...protocol,
 										metadata: Object.keys(protocol.metadata)
 									});
-									Object.entries(protocol.metadata).map(([id, metadata]) =>
-										tx.objectStore('Metadata').put({ id, ...metadata })
+									Object.entries(protocol.metadata).map(
+										([id, metadata]) =>
+											typeof metadata === 'string' ||
+											tx.objectStore('Metadata').put({ id, ...metadata })
 									);
 								});
-								resolve(protocol);
+								resolve(ExportedProtocol.assert(protocol));
 							} catch (error) {
 								reject(
 									`Protocole ${file.name} invalide: ${error?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`

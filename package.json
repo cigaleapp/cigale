@@ -59,6 +59,7 @@
 		"exif-parser": "^0.1.12",
 		"fflate": "^0.8.2",
 		"fuse.js": "^7.1.0",
+		"handlebars": "^4.7.8",
 		"idb": "^8.0.2",
 		"jimp": "^1.6.0",
 		"onnxruntime-web": "^1.22.0-dev.20250310-fe7634eb6f",
