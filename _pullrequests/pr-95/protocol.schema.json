@@ -40,6 +40,26 @@
           "const": "builtin",
           "description": "Métadonnée \"🥺\" prédéfinie dans l'application: À quel point l'arthropode est trop cute 😖"
         },
+        "family": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        },
+        "genus": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        },
+        "kingdom": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        },
+        "order": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        },
+        "phylum": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        },
         "shoot_date": {
           "const": "builtin",
           "description": "Métadonnée \"Date de prise de vue\" prédéfinie dans l'application: "
@@ -235,6 +255,14 @@
         "images",
         "metadata"
       ]
+    },
+    "metadataOrder": {
+      "type": "array",
+      "description": "L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici",
+      "items": {
+        "type": "string",
+        "pattern": "[\\w_]+"
+      }
     }
   },
   "required": [

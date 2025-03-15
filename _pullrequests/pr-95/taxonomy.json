@@ -6,6 +6,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Sminthuridae",
+		"species": "Allacma fusca",
 		"genus": "Allacma",
 		"accepted": true
 	},
@@ -16,6 +17,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Neanuridae",
+		"species": "Anurida maritima",
 		"genus": "Anurida",
 		"accepted": true
 	},
@@ -26,6 +28,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Neanuridae",
+		"species": "Bilobella aurantiaca",
 		"genus": "Bilobella",
 		"accepted": true
 	},
@@ -36,6 +39,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Neanuridae",
+		"species": "Bilobella braunerae",
 		"genus": "Bilobella",
 		"accepted": true
 	},
@@ -46,6 +50,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Bourletiellidae",
+		"species": "Bourletiella arvalis",
 		"genus": "Bourletiella",
 		"accepted": true
 	},
@@ -56,6 +61,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Bourletiellidae",
+		"species": "Bourletiella hortensis",
 		"genus": "Bourletiella",
 		"accepted": true
 	},
@@ -66,6 +72,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Brachystomellidae",
+		"species": "Brachystomella parvula",
 		"genus": "Brachystomella",
 		"accepted": true
 	},
@@ -76,6 +83,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Sminthuridae",
+		"species": "Caprainea marginata",
 		"genus": "Caprainea",
 		"accepted": true
 	},
@@ -86,6 +94,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Hypogastruridae",
+		"species": "Ceratophysella engadinensis",
 		"genus": "Ceratophysella",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -97,6 +106,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Hypogastruridae",
+		"species": "Ceratophysella longispina",
 		"genus": "Ceratophysella",
 		"accepted": true
 	},
@@ -107,6 +117,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Paronellidae",
+		"species": "Cyphoderus albinus",
 		"genus": "Cyphoderus",
 		"accepted": true
 	},
@@ -117,6 +128,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Bourletiellidae",
+		"species": "Deuterosminthurus bicinctus",
 		"genus": "Deuterosminthurus",
 		"accepted": true
 	},
@@ -127,6 +139,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Bourletiellidae",
+		"species": "Deuterosminthurus pallipes",
 		"genus": "Deuterosminthurus",
 		"accepted": true
 	},
@@ -137,6 +150,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Dicyrtomidae",
+		"species": "Dicyrtoma fusca",
 		"genus": "Dicyrtoma",
 		"accepted": true
 	},
@@ -147,6 +161,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Dicyrtomidae",
+		"species": "Dicyrtomina flavosignata",
 		"genus": "Dicyrtomina",
 		"accepted": true
 	},
@@ -157,6 +172,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Dicyrtomidae",
+		"species": "Dicyrtomina minuta",
 		"genus": "Dicyrtomina",
 		"accepted": true
 	},
@@ -167,6 +183,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Dicyrtomidae",
+		"species": "Dicyrtomina ornata",
 		"genus": "Dicyrtomina",
 		"accepted": true
 	},
@@ -177,6 +194,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Dicyrtomidae",
+		"species": "Dicyrtomina saundersi",
 		"genus": "Dicyrtomina",
 		"accepted": true
 	},
@@ -187,6 +205,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Dicyrtomidae",
+		"species": "Dicyrtomina signata",
 		"genus": "Dicyrtomina",
 		"accepted": true
 	},
@@ -197,6 +216,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya albocincta",
 		"genus": "Entomobrya",
 		"accepted": true
 	},
@@ -207,6 +227,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya atrocincta",
 		"genus": "Entomobrya",
 		"accepted": true
 	},
@@ -217,6 +238,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya nicoleti",
 		"genus": "Entomobrya",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -228,6 +250,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya marginata",
 		"genus": "Entomobrya",
 		"accepted": true
 	},
@@ -238,6 +261,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya arborea",
 		"genus": "Entomobrya",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -249,6 +273,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya nicoleti",
 		"genus": "Entomobrya",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -260,6 +285,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya nicoleti",
 		"genus": "Entomobrya",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -271,6 +297,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya restituta",
 		"genus": "Entomobrya",
 		"accepted": false,
 		"notAcceptedWhy": "PROPARTE_SYNONYM"
@@ -282,6 +309,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya nigrocincta",
 		"genus": "Entomobrya",
 		"accepted": false,
 		"notAcceptedWhy": "PROPARTE_SYNONYM"
@@ -293,6 +321,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Entomobrya superba",
 		"genus": "Entomobrya",
 		"accepted": true
 	},
@@ -303,6 +332,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Bourletiellidae",
+		"species": "Fasciosminthurus quinquefasciatus",
 		"genus": "Fasciosminthurus",
 		"accepted": true
 	},
@@ -313,6 +343,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Folsomia stella",
 		"genus": "Folsomia",
 		"accepted": false,
 		"notAcceptedWhy": "HETEROTYPIC_SYNONYM"
@@ -324,6 +355,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Folsomia quadrioculata",
 		"genus": "Folsomia",
 		"accepted": true
 	},
@@ -334,6 +366,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Orchesellidae",
+		"species": "Heteromurus major",
 		"genus": "Heteromurus",
 		"accepted": true
 	},
@@ -343,6 +376,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Orchesellidae",
+		"species": "Heteromurus nitidus",
 		"genus": "Heteromurus",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -354,6 +388,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Hypogastruridae",
+		"species": "Hypogastrura viatica",
 		"genus": "Hypogastrura",
 		"accepted": true
 	},
@@ -364,6 +399,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Isotoma riparia",
 		"genus": "Isotoma",
 		"accepted": true
 	},
@@ -374,6 +410,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Isotoma viridis",
 		"genus": "Isotoma",
 		"accepted": true
 	},
@@ -383,6 +420,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Isotomiella tamurai",
 		"genus": "Isotomiella",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -394,6 +432,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Isotomurus gallicus",
 		"genus": "Isotomurus",
 		"accepted": true
 	},
@@ -404,6 +443,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Isotomurus maculatus",
 		"genus": "Isotomurus",
 		"accepted": true
 	},
@@ -414,6 +454,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Isotomurus stuxbergi",
 		"genus": "Isotomurus",
 		"accepted": false,
 		"notAcceptedWhy": "HETEROTYPIC_SYNONYM"
@@ -425,6 +466,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Isotomurus unifasciatus",
 		"genus": "Isotomurus",
 		"accepted": true
 	},
@@ -435,6 +477,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Onychiuridae",
+		"species": "Kalaphorura burmeisteri",
 		"genus": "Kalaphorura",
 		"accepted": true
 	},
@@ -445,6 +488,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Lepidocyrtus curvicollis",
 		"genus": "Lepidocyrtus",
 		"accepted": true
 	},
@@ -455,6 +499,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Lepidocyrtus cyaneus",
 		"genus": "Lepidocyrtus",
 		"accepted": true
 	},
@@ -465,6 +510,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Lepidocyrtus fimetarius",
 		"genus": "Lepidocyrtus",
 		"accepted": true
 	},
@@ -475,6 +521,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Lepidocyrtus lignorum",
 		"genus": "Lepidocyrtus",
 		"accepted": true
 	},
@@ -485,6 +532,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Lepidocyrtus paradoxus",
 		"genus": "Lepidocyrtus",
 		"accepted": true
 	},
@@ -495,6 +543,7 @@
 		"phylum": "Arthropoda",
 		"order": "Neelipleona",
 		"family": "Neelidae",
+		"species": "Megalothorax minimus",
 		"genus": "Megalothorax",
 		"accepted": true
 	},
@@ -505,6 +554,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Neanuridae",
+		"species": "Monobella grassei",
 		"genus": "Monobella",
 		"accepted": true
 	},
@@ -515,6 +565,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Neanuridae",
+		"species": "Neanura muscorum",
 		"genus": "Neanura",
 		"accepted": true
 	},
@@ -525,6 +576,7 @@
 		"phylum": "Arthropoda",
 		"order": "Neelipleona",
 		"family": "Neelidae",
+		"species": "Neelus murinus",
 		"genus": "Neelus",
 		"accepted": true
 	},
@@ -535,6 +587,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Orchesellidae",
+		"species": "Orchesella bifasciata",
 		"genus": "Orchesella",
 		"accepted": true
 	},
@@ -545,6 +598,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Orchesellidae",
+		"species": "Orchesella cincta",
 		"genus": "Orchesella",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -555,6 +609,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Orchesellidae",
+		"species": "Orchesella villosa",
 		"genus": "Orchesella",
 		"accepted": false,
 		"notAcceptedWhy": "HETEROTYPIC_SYNONYM"
@@ -566,6 +621,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Orchesellidae",
+		"species": "Orchesella quinquefasciata",
 		"genus": "Orchesella",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -577,6 +633,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Orchesellidae",
+		"species": "Orchesella flavescens",
 		"genus": "Orchesella",
 		"accepted": false,
 		"notAcceptedWhy": "PROPARTE_SYNONYM"
@@ -588,6 +645,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Parisotoma notabilis",
 		"genus": "Parisotoma",
 		"accepted": true
 	},
@@ -598,6 +656,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Poduridae",
+		"species": "Podura aquatica",
 		"genus": "Podura",
 		"accepted": false,
 		"notAcceptedWhy": "HETEROTYPIC_SYNONYM"
@@ -609,6 +668,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Tomoceridae",
+		"species": "Pogonognathellus nigritus",
 		"genus": "Pogonognathellus",
 		"accepted": false,
 		"notAcceptedWhy": "HETEROTYPIC_SYNONYM"
@@ -620,6 +680,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Tomoceridae",
+		"species": "Pogonognathellus longicornis",
 		"genus": "Pogonognathellus",
 		"accepted": true
 	},
@@ -630,6 +691,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Seira ferrarii",
 		"genus": "Seira",
 		"accepted": true
 	},
@@ -640,6 +702,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Seira musarum",
 		"genus": "Seira",
 		"accepted": true
 	},
@@ -650,6 +713,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Sminthurididae",
+		"species": "Sminthurides aquaticus",
 		"genus": "Sminthurides",
 		"accepted": true
 	},
@@ -660,6 +724,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Sminthurididae",
+		"species": "Sminthurides malmgreni",
 		"genus": "Sminthurides",
 		"accepted": true
 	},
@@ -670,6 +735,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Sminthurididae",
+		"species": "Sminthurides penicillifer",
 		"genus": "Sminthurides",
 		"accepted": true
 	},
@@ -680,6 +746,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Katiannidae",
+		"species": "Sminthurinus aureussetosus",
 		"genus": "Sminthurinus",
 		"accepted": true
 	},
@@ -690,6 +757,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Katiannidae",
+		"species": "Sminthurinus elegans",
 		"genus": "Sminthurinus",
 		"accepted": true
 	},
@@ -700,6 +768,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Katiannidae",
+		"species": "Sminthurinus lawrencei",
 		"genus": "Sminthurinus",
 		"accepted": true
 	},
@@ -710,6 +779,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Katiannidae",
+		"species": "Sminthurinus mime",
 		"genus": "Sminthurinus",
 		"accepted": false,
 		"notAcceptedWhy": "HETEROTYPIC_SYNONYM"
@@ -721,6 +791,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Katiannidae",
+		"species": "Sminthurinus trinotatus",
 		"genus": "Sminthurinus",
 		"accepted": true
 	},
@@ -731,6 +802,7 @@
 		"phylum": "Arthropoda",
 		"order": "Symphypleona",
 		"family": "Sminthurididae",
+		"species": "Sminthurides spegazzinii",
 		"genus": "Sminthurides",
 		"accepted": true
 	},
@@ -741,6 +813,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Tomoceridae",
+		"species": "Tomocerus minor",
 		"genus": "Tomocerus",
 		"accepted": true
 	},
@@ -751,6 +824,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Tomoceridae",
+		"species": "Tomocerus jesonicus",
 		"genus": "Tomocerus",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -762,6 +836,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Isotomidae",
+		"species": "Vertagopus asiaticus",
 		"genus": "Vertagopus",
 		"accepted": true
 	},
@@ -772,6 +847,7 @@
 		"phylum": "Arthropoda",
 		"order": "Poduromorpha",
 		"family": "Neanuridae",
+		"species": "Vitronura giselae",
 		"genus": "Vitronura",
 		"accepted": true
 	},
@@ -782,6 +858,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Willowsia buski",
 		"genus": "Willowsia",
 		"accepted": false,
 		"notAcceptedWhy": "SYNONYM"
@@ -793,6 +870,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Willowsia nigromaculata",
 		"genus": "Willowsia",
 		"accepted": true
 	},
@@ -803,6 +881,7 @@
 		"phylum": "Arthropoda",
 		"order": "Entomobryomorpha",
 		"family": "Entomobryidae",
+		"species": "Willowsia platani",
 		"genus": "Willowsia",
 		"accepted": true
 	}

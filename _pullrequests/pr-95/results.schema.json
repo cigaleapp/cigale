@@ -53,7 +53,7 @@
     },
     "protocol": {
       "type": "object",
-      "table": "$ark.object251",
+      "table": "$ark.object252",
       "description": "Le protocole utilisé pour cette session d'analyse",
       "properties": {
         "authors": {
@@ -143,6 +143,14 @@
             "images",
             "metadata"
           ]
+        },
+        "metadataOrder": {
+          "type": "array",
+          "description": "L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici",
+          "items": {
+            "type": "string",
+            "pattern": "[\\w_]+"
+          }
         }
       },
       "required": [
