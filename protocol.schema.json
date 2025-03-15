@@ -31,8 +31,31 @@
     },
     "metadata": {
       "type": "object",
+      "properties": {
+        "crop": {
+          "const": "builtin",
+          "description": "Métadonnée \"\" prédéfinie dans l'application: Boîte de recadrage pour l'image"
+        },
+        "cuteness": {
+          "const": "builtin",
+          "description": "Métadonnée \"🥺\" prédéfinie dans l'application: À quel point l'arthropode est trop cute 😖"
+        },
+        "shoot_date": {
+          "const": "builtin",
+          "description": "Métadonnée \"Date de prise de vue\" prédéfinie dans l'application: "
+        },
+        "shoot_location": {
+          "const": "builtin",
+          "description": "Métadonnée \"Lieu\" prédéfinie dans l'application: Localisation de la prise de vue"
+        },
+        "species": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        }
+      },
       "additionalProperties": {
         "type": "object",
+        "description": "Métadonnée du protocole",
         "properties": {
           "description": {
             "type": "string",
@@ -167,6 +190,51 @@
       "type": "string",
       "description": "Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier",
       "pattern": "https?:\\/\\/.+"
+    },
+    "exports": {
+      "type": "object",
+      "description": "La structure du fichier .zip d'export pour ce protocole.",
+      "properties": {
+        "images": {
+          "type": "object",
+          "description": "Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename \"_exemple\"}} pour ajouter \"_exemple\" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename \"_cropped\"}} donnera \"IMG_1245_cropped.JPEG\" si l'image avait pour nom de fichier \"IMG_12345.JPEG\"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple \"(Inconnnu)\"}} pour utiliser \"(Inconnu)\" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/",
+          "properties": {
+            "cropped": {
+              "type": "string",
+              "description": "Chemins des images recadrées"
+            },
+            "original": {
+              "type": "string",
+              "description": "Chemins des images originales"
+            }
+          },
+          "required": [
+            "cropped",
+            "original"
+          ]
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "csv": {
+              "type": "string",
+              "description": "Chemin du fichier CSV contenant les résultats de l'analyse"
+            },
+            "json": {
+              "type": "string",
+              "description": "Chemin du fichier JSON contenant les résultats de l'analyse"
+            }
+          },
+          "required": [
+            "csv",
+            "json"
+          ]
+        }
+      },
+      "required": [
+        "images",
+        "metadata"
+      ]
     }
   },
   "required": [

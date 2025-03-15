@@ -1,1 +1,0 @@
-import{T as n,a as i}from"./U2Xd-D_N.js";function a({x:r,y:e,width:t,height:o}){return{x:r/i,y:e/n,width:t/i,height:o/n}}function u({x:r,y:e,width:t,height:o}){return{x:r*i,y:e*n,width:t*i,height:o*n}}function T({x:r,y:e,width:t,height:o}){return{x:r+t/2,y:e+o/2,w:t,h:o}}function d({x:r,y:e,w:t,h:o}){return{x:r-t/2,y:e-o/2,width:t,height:o}}export{d as a,T as b,u as c,a as t};
