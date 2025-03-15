@@ -40,7 +40,10 @@
 </script>
 
 <DownloadResults bind:open={openExportModal} />
-<DeploymentDetails bind:open={openPreviewPRDetails} />
+
+{#if previewingPrNumber}
+	<DeploymentDetails bind:open={openPreviewPRDetails} />
+{/if}
 
 <header bind:clientHeight={height}>
 	<nav>
