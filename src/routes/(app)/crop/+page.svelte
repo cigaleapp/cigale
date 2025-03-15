@@ -6,7 +6,7 @@
 	import { BUILTIN_METADATA_IDS } from '$lib/database';
 	import * as idb from '$lib/idb.svelte.js';
 	import { TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
-	import { storeMetadataValue } from '$lib/metadata';
+	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { uiState } from '$lib/state.svelte';
 
 	let openCropDialog = $state();
@@ -30,7 +30,7 @@
 	/**
 	 * @param {{x: number, y: number, width: number, height: number}} boundingBoxesout
 	 */
-	function onConfirmCrop(boundingBoxesout) {
+	async function onConfirmCrop(boundingBoxesout) {
 		const id = croppingImage;
 		console.log(boundingBoxesout, 'is cropped! at id : ', id);
 
@@ -54,14 +54,27 @@
 			};
 		}
 
-		storeMetadataValue({
-			metadataId: BUILTIN_METADATA_IDS.crop,
-			subjectId: id,
-			type: 'boundingbox',
-			value: toCenteredCoords(boundingBoxesout),
-			confidence: 1,
-			// Put the neural-network-inferred (initial) value in the alternatives as a backup
-			alternatives: initialCrop ? [initialCrop] : []
+		await idb.openTransaction(['Image', 'Observation'], {}, async (tx) => {
+			const image = await tx.objectStore('Image').get(id);
+			if (!image) return;
+			if (image.metadata.species && image.metadata.species.confidence < 1) {
+				// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
+				await deleteMetadataValue({
+					tx,
+					metadataId: BUILTIN_METADATA_IDS.species,
+					subjectId: id
+				});
+			}
+			await storeMetadataValue({
+				tx,
+				metadataId: BUILTIN_METADATA_IDS.crop,
+				subjectId: id,
+				type: 'boundingbox',
+				value: toCenteredCoords(boundingBoxesout),
+				confidence: 1,
+				// Put the neural-network-inferred (initial) value in the alternatives as a backup
+				alternatives: initialCrop ? [initialCrop] : []
+			});
 		});
 	}
 
