@@ -13,6 +13,9 @@ concurrency: preview-${{ github.ref }}
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
+    environment:
+      name: 'Preview PR #${{ github.event.number }}'
+      url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +29,7 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
 
       - name: Deploy preview
+        id: deploy-preview
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./public
