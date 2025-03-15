@@ -4,9 +4,10 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { previewingPrNumber, uiState } from '$lib/state.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
+	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -37,10 +38,15 @@
 		if (!hasImages) goto('#/import');
 	});
 
-	const prNumber = $derived(/cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1]);
+	/** @type {undefined | (() => void)} */
+	let openPreviewPRDetails = $state();
 </script>
 
 <DownloadResults {progress} bind:open={openExportModal} />
+
+{#if previewingPrNumber}
+	<DeploymentDetails bind:open={openPreviewPRDetails} />
+{/if}
 
 <header bind:clientHeight={height}>
 	<nav>
@@ -49,15 +55,10 @@
 				<Logo --fill="var(--bg-primary)" />
 				C.i.g.a.l.e.
 			</a>
-			{#if prNumber}
-				<a
-					href="https://github.com/cigaleapp/cigale/pull/{prNumber}"
-					class="pr-number"
-					use:tooltip={`Ceci est une preview de la PR #${prNumber} — Cliquer pour l'ouvrir sur GitHub`}
-					target="_blank"
-				>
-					Preview #{prNumber}
-				</a>
+			{#if previewingPrNumber}
+				<button class="pr-number" onclick={openPreviewPRDetails}>
+					Preview #{previewingPrNumber}
+				</button>
 			{/if}
 		</div>
 
@@ -115,7 +116,7 @@
 		position: relative;
 	}
 
-	a {
+	nav a {
 		background: none;
 		border: none;
 		padding: 7.5px;
@@ -135,12 +136,12 @@
 		max-width: 800px;
 	}
 
-	a[aria-disabled='true'] {
+	nav a[aria-disabled='true'] {
 		pointer-events: none;
 		color: var(--gray);
 	}
 
-	a:hover[aria-disabled='true'] {
+	nav a:hover[aria-disabled='true'] {
 		background-color: var(--bg-primary);
 		border-radius: var(--corner-radius);
 		color: var(--fg-primary);
@@ -161,11 +162,17 @@
 
 	.pr-number {
 		font-size: 0.8em;
-		color: var(--bg-primary);
+		color: var(--fg-primary);
 		padding: 0.5em;
 		border-radius: var(--corner-radius);
-		border: 1px solid var(--bg-primary);
+		border: 1px solid var(--fg-primary);
 		margin-left: 1rem;
+		background: none;
+		cursor: pointer;
+	}
+
+	.pr-number:is(:hover, :focus-within) {
+		background-color: var(--bg-primary);
 	}
 
 	.line {
@@ -175,7 +182,7 @@
 		border-radius: 1000000px;
 	}
 
-	a[aria-disabled='true'] .line {
+	nav a[aria-disabled='true'] .line {
 		visibility: hidden;
 	}
 </style>
