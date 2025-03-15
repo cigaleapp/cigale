@@ -74,8 +74,7 @@ export const NMS = true;
  * @returns {string}
  */
 export function torawpath(path) {
-	// TODO host on IRIT infrastructure?
-	return `https://media.gwen.works/cigale/models/${path}`;
+	return `https://sdrive.cnrs.fr/s/MXEEbdDC3jfNPc5/download?path=%2F&files=${encodeURIComponent(path)}`;
 }
 /**
  *
@@ -84,17 +83,16 @@ export function torawpath(path) {
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
 export async function loadModel(classif = false, webgpu = false) {
-	
 	// load un modèle ONNX, soit de classification, soit de détection.
 
 	let model;
 	const MODELPATH = torawpath(classif ? MODELCLASSIFPATH : MODELDETECTPATH);
-	console.log("model path : ", MODELPATH);
+	console.log('model path : ', MODELPATH);
 	if (webgpu) {
 		model = await ort.InferenceSession.create(MODELPATH, { executionProviders: ['webgpu'] });
 	} else {
 		model = await ort.InferenceSession.create(MODELPATH);
-		console.log("model loaded");
+		console.log('model loaded');
 	}
 	return model;
 }
@@ -301,11 +299,11 @@ export async function classify(images, model, uiState, start) {
 	// @ts-ignore
 	images = await preprocess_for_classification(images, MEAN, STD);
 	uiState.processing.state = 'classification';
-	console.log("coucou")
-	console.log(images)
+	console.log('coucou');
+	console.log(images);
 
 	for (let i = 0; i < images.length; i++) {
-		console.log("feur c'est pour gwenn")
+		console.log("feur c'est pour gwenn");
 		let argmax = [];
 		let bestScore = [];
 		for (let j = 0; j < images[i].length; j++) {
