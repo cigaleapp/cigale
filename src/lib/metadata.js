@@ -52,7 +52,7 @@ export async function storeMetadataValue({
 		: await tables.Observation.raw.get(subjectId);
 
 	if (image) {
-		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
+		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
 		image.metadata[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Image').put(image);
@@ -62,7 +62,7 @@ export async function storeMetadataValue({
 			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
 		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else if (observation) {
-		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
+		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
 		observation.metadataOverrides[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Observation').put(observation);

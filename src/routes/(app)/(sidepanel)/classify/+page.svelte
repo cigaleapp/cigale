@@ -22,7 +22,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
-	import { setSpeciesWithLineage } from '$lib/taxonomy';
+	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 
 	const erroredImages = $derived(uiState.erroredImages);
@@ -79,21 +79,22 @@
 
 		const output_classif = await classify([[nimg]], classifmodel, uiState, 0);
 		const species = output_classif[0];
-		const confs = output_classif[1];
+		const _confs = output_classif[1];
 
 		if (output_classif[0].length == 0) {
 			console.warn('No species detected');
 			return 0;
 		} else {
-			await setSpeciesWithLineage({
+			const [[firstChoice, firstChoiceConfidence], ...alternatives] = species;
+			await setTaxonAndInferParents({
 				subjectId: id,
-				species: species[0][0].toString(),
-				// @ts-ignore
-				confidence: confs[0][0],
-				// @ts-ignore
-				alternatives: species[0]
-					.slice(1)
-					.map((s, i) => ({ value: s.toString(), confidence: confs[0][i + 1] }))
+				clade: 'species',
+				value: firstChoice.toString(),
+				confidence: firstChoiceConfidence,
+				alternatives: alternatives.map(([value, confidence]) => ({
+					value: value.toString(),
+					confidence
+				}))
 			});
 		}
 	}

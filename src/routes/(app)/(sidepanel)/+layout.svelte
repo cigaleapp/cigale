@@ -5,12 +5,11 @@
 	import { combineMetadataValuesWithOverrides, storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
+	import { CLADE_METADATA_IDS, setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { BUILTIN_METADATA_IDS } from '$lib/database';
-	import { setSpeciesWithLineage } from '$lib/taxonomy';
 
 	const { children } = $props();
 
@@ -123,11 +122,12 @@
 			onmetadatachange={async (id, value) => {
 				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
 					for (const subjectId of uiState.selection) {
-						if (id === BUILTIN_METADATA_IDS.species) {
-							await setSpeciesWithLineage({
+						if (CLADE_METADATA_IDS.includes(id)) {
+							await setTaxonAndInferParents({
 								tx,
 								subjectId,
-								species: value?.toString(),
+								clade: id,
+								value: value.toString(),
 								confidence: 1
 							});
 						} else {
