@@ -2,6 +2,7 @@
 <html lang="fr" dir="ltr">
 	<head>
 		<meta charset="utf-8" />
+		<link rel="manifest" href="manifest.json" />
 		<link rel="icon" href="/cigale/favicon.png" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,12 +12,12 @@
 		/>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
-		<link rel="modulepreload" href="/cigale/_app/immutable/entry/start.CDlj51ce.js">
-		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/D0cYQ9jQ.js">
+		<link rel="modulepreload" href="/cigale/_app/immutable/entry/start.B4HmR0ok.js">
+		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/BI0dUvbG.js">
 		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/C5da3JO5.js">
-		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/Aew2sFo6.js">
+		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/B5nUwIAv.js">
 		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/CijPsvHn.js">
-		<link rel="modulepreload" href="/cigale/_app/immutable/entry/app.DgzoMuWN.js">
+		<link rel="modulepreload" href="/cigale/_app/immutable/entry/app.B-flpQbk.js">
 		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/C1FmrZbK.js">
 		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/CGuacY5z.js">
 		<link rel="modulepreload" href="/cigale/_app/immutable/chunks/B4fTvO1f.js">
@@ -30,7 +31,7 @@
 		<div style="display: contents">
 			<script>
 				{
-					__sveltekit_aahugi = {
+					__sveltekit_1e0gt4k = {
 						base: new URL('.', location).pathname.slice(0, -1),
 						assets: "/cigale"
 					};
@@ -38,11 +39,17 @@
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("/cigale/_app/immutable/entry/start.CDlj51ce.js"),
-						import("/cigale/_app/immutable/entry/app.DgzoMuWN.js")
+						import("/cigale/_app/immutable/entry/start.B4HmR0ok.js"),
+						import("/cigale/_app/immutable/entry/app.B-flpQbk.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element);
 					});
+
+					if ('serviceWorker' in navigator) {
+						addEventListener('load', function () {
+							navigator.serviceWorker.register('/cigale/service-worker.js');
+						});
+					}
 				}
 			</script>
 		</div>
