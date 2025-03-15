@@ -1,11 +1,8 @@
 import { strToU8, zip } from 'fflate';
 import { Jimp } from 'jimp';
 import { toTopLeftCoords } from './BoundingBoxes.svelte';
-import {
-	downloadAsFile,
-	splitFilenameOnExtension,
-	stringifyWithToplevelOrdering
-} from './download';
+import { Schemas } from './database';
+import { downloadAsFile, stringifyWithToplevelOrdering } from './download';
 import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
@@ -15,7 +12,6 @@ import {
 	metadataPrettyValue,
 	observationMetadata
 } from './metadata';
-import { speciesDisplayName } from './species.svelte';
 import { toasts } from './toasts.svelte';
 
 /**
@@ -78,13 +74,26 @@ export async function generateResultsZip(
 			)
 		);
 
+	const filepaths = protocolUsed.exports ?? {
+		images: {
+			cropped: Schemas.FilepathTemplate.assert('cropped/{{sequence}}.{{extension image.filename}}'),
+			original: Schemas.FilepathTemplate.assert(
+				'original/{{sequence}}.{{extension image.filename}}'
+			)
+		},
+		metadata: {
+			json: 'analysis.json',
+			csv: 'metadata.csv'
+		}
+	};
+
 	/**
 	 * @type {Uint8Array<ArrayBufferLike>}
 	 */
 	const zipfile = await new Promise((resolve, reject) =>
 		zip(
 			{
-				'analysis.json': strToU8(
+				[filepaths.metadata.json]: strToU8(
 					stringifyWithToplevelOrdering(
 						'json',
 						`${window.location.origin}${base}/results.schema.json`,
@@ -95,7 +104,7 @@ export async function generateResultsZip(
 						['protocol', 'observations']
 					)
 				),
-				'metadata.csv': strToU8(
+				[filepaths.metadata.csv]: strToU8(
 					toCSV(
 						[
 							'Identifiant',
@@ -128,37 +137,31 @@ export async function generateResultsZip(
 				...Object.fromEntries(
 					include === 'metadataonly'
 						? []
-						: Object.entries(
-								Object.groupBy(
-									observations,
-									(o) =>
-										speciesDisplayName(finalObservationsData[o.id].metadata.species?.value) ??
-										'(Unknown)'
-								)
-							).map(([species, observations]) => [
-								species,
-								Object.fromEntries(
-									(observations ?? []).map((o) => [
-										o.label,
-										Object.fromEntries(
-											o.images.flatMap((imageId) => {
-												const img = buffersOfImages.find((i) => i.imageId === imageId);
-												if (!img) throw 'Image non trouvée';
+						: observations
+								.flatMap((o) => o.images.map((imageId) => /** @type {const} */ ([o, imageId])))
+								.flatMap(([observation, imageId], index) => {
+									const buffers = buffersOfImages.find((i) => i.imageId === imageId);
+									if (!buffers) throw 'Image non trouvée';
+									const image = db.tables.Image.state.find((i) => i.id === imageId);
+									if (!image) throw 'Image non trouvée';
 
-												if (include === 'full') {
-													const [filestem, ext] = splitFilenameOnExtension(img.filename);
-													return [
-														[`${filestem}_cropped.${ext}`, [img.croppedBytes, { level: 0 }]],
-														[`${filestem}_original.${ext}`, [img.originalBytes, { level: 0 }]]
-													];
-												} else {
-													return [[img.filename, [img.croppedBytes, { level: 0 }]]];
-												}
-											})
-										)
-									])
-								)
-							])
+									const filepathTemplateData = {
+										image: { ...image, metadata: addValueLabels(image.metadata) },
+										observation,
+										sequence: index + 1
+									};
+
+									return [
+										[
+											filepaths.images.cropped(filepathTemplateData),
+											[buffers.croppedBytes, { level: 0 }]
+										],
+										[
+											filepaths.images.original(filepathTemplateData),
+											[buffers.originalBytes, { level: 0 }]
+										]
+									].filter(([, [bytes]]) => bytes !== undefined);
+								})
 				)
 			},
 			{
