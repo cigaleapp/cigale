@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { keyOfEnumLabel, labelOfEnumKey, storeMetadataValue } from './metadata';
 import { BUILTIN_METADATA_IDS } from './database';
 import { openTransaction } from './idb.svelte';
+import { base } from '$app/paths';
 
 export const Taxon = type({
 	gbifId: 'number.integer',
@@ -101,7 +102,7 @@ export async function ensureTaxonomyInitialized() {
 }
 
 export async function initializeTaxonomy() {
-	const data = await fetch('/taxonomy.json').then((response) => response.json());
+	const data = await fetch(`${base}/taxonomy.json`).then((response) => response.json());
 	_taxonomy = Taxonomy.assert(data);
 	return _taxonomy;
 }
