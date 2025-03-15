@@ -1,6 +1,9 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 import { isReactiveTable, Tables } from './database.js';
+import { previewingPrNumber } from './state.svelte.js';
+
+const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -362,7 +365,7 @@ export async function openDatabase() {
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
-	_database = await openDB('database', 2, {
+	_database = await openDB(databaseName, 2, {
 		upgrade(db, oldVersion) {
 			// No clean migration path for 1 -> 2, just drop everything
 			if (oldVersion === 1) {
@@ -389,7 +392,7 @@ export function nukeDatabase() {
 		_database.close();
 		_database = undefined;
 	}
-	indexedDB.deleteDatabase('database');
+	indexedDB.deleteDatabase(databaseName);
 }
 
 /**

@@ -4,13 +4,12 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { previewingPrNumber, uiState } from '$lib/state.svelte';
+	import { tooltip } from '$lib/tooltips';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
-	import { base } from '$app/paths';
-	import { tooltip } from '$lib/tooltips';
 
 	/**
 	 * @typedef Props
@@ -35,8 +34,6 @@
 		if (!hasImages && !uiState.currentProtocol) goto('#/');
 		if (!hasImages) goto('#/import');
 	});
-
-	const prNumber = $derived(/cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1]);
 </script>
 
 <DownloadResults bind:open={openExportModal} />
@@ -48,14 +45,14 @@
 				<Logo --fill="var(--bg-primary)" />
 				C.i.g.a.l.e.
 			</a>
-			{#if prNumber}
+			{#if previewingPrNumber}
 				<a
-					href="https://github.com/cigaleapp/cigale/pull/{prNumber}"
+					href="https://github.com/cigaleapp/cigale/pull/{previewingPrNumber}"
 					class="pr-number"
-					use:tooltip={`Ceci est une preview de la PR #${prNumber} — Cliquer pour l'ouvrir sur GitHub`}
+					use:tooltip={`Ceci est une preview de la PR #${previewingPrNumber} — Cliquer pour l'ouvrir sur GitHub`}
 					target="_blank"
 				>
-					Preview #{prNumber}
+					Preview #{previewingPrNumber}
 				</a>
 			{/if}
 		</div>

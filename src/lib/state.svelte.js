@@ -1,3 +1,4 @@
+import { base } from '$app/paths';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 /**
@@ -54,3 +55,5 @@ export const uiState = $state({
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection: undefined
 });
+
+export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)/.exec(base)?.[1];
