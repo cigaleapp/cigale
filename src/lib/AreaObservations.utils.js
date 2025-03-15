@@ -1,5 +1,5 @@
 import { uiState } from '$lib/state.svelte';
-import { toRelativeCoords, toTopLeftCoords } from './BoundingBoxes.svelte';
+import { toTopLeftCoords } from './BoundingBoxes.svelte';
 import { idComparator } from './idb.svelte';
 
 /**
@@ -40,7 +40,7 @@ export function toAreaObservationProps(images, observations, { isLoaded }) {
 					(image, i) =>
 						/**  @satisfies {CardObservation} */
 						({
-							image: uiState.previewURLs.get(image.id) ?? '',
+							image: uiState.getPreviewURL(image) ?? '',
 							title: image.filename,
 							id: image.id,
 							index: i,
@@ -48,7 +48,7 @@ export function toAreaObservationProps(images, observations, { isLoaded }) {
 							loading: isLoaded(image) ? undefined : -1,
 							boundingBoxes: image.metadata.crop?.value
 								? // @ts-ignore
-									[toRelativeCoords(toTopLeftCoords(image.metadata.crop.value))]
+									[toTopLeftCoords(image.metadata.crop.value)]
 								: []
 						})
 				),
@@ -60,7 +60,7 @@ export function toAreaObservationProps(images, observations, { isLoaded }) {
 
 				/**  @satisfies {CardObservation} */
 				return {
-					image: uiState.previewURLs.get(firstImage?.id ?? '') ?? '',
+					image: uiState.getPreviewURL(firstImage) ?? '',
 					subimages: observation.images.toSorted(idComparator),
 					title: observation.label ?? `Observation ${firstImage?.filename ?? ''}`,
 					index: images.length + i,
@@ -68,7 +68,7 @@ export function toAreaObservationProps(images, observations, { isLoaded }) {
 					stacksize: imagesOfObservation.length,
 					boundingBoxes: firstImage?.metadata.crop?.value
 						? // @ts-ignore
-							[toRelativeCoords(toTopLeftCoords(firstImage.metadata.crop.value))]
+							[toTopLeftCoords(firstImage.metadata.crop.value)]
 						: [],
 					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
 				};

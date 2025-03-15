@@ -2,36 +2,29 @@ import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
 /**
  *
- * @param {object} param0 coordinates in pixel values
+ * @param {object} param0
  * @param {number} param0.x
  * @param {number} param0.y
- * @param {number} param0.width
- * @param {number} param0.height
+ * @returns scaled coordinates
  */
-export function toRelativeCoords({ x, y, width, height }) {
-	return {
-		x: x / TARGETWIDTH,
-		y: y / TARGETHEIGHT,
-		width: width / TARGETWIDTH,
-		height: height / TARGETHEIGHT
-	};
+export function coordsScaler({ x: xwise, y: ywise }) {
+	/**
+	 * @param {object} param0
+	 * @param {number} param0.x
+	 * @param {number} param0.y
+	 * @param {number} param0.width
+	 * @param {number} param0.height
+	 */
+	return ({ x, y, width, height }) => ({
+		x: x * xwise,
+		y: y * ywise,
+		width: width * xwise,
+		height: height * ywise
+	});
 }
 
-/**
- * @param {object} param0 coordinates in relative values
- * @param {number} param0.x
- * @param {number} param0.y
- * @param {number} param0.width
- * @param {number} param0.height
- */
-export function toPixelCoords({ x, y, width, height }) {
-	return {
-		x: x * TARGETWIDTH,
-		y: y * TARGETHEIGHT,
-		width: width * TARGETWIDTH,
-		height: height * TARGETHEIGHT
-	};
-}
+export const toPixelCoords = coordsScaler({ x: TARGETWIDTH, y: TARGETHEIGHT });
+export const toRelativeCoords = coordsScaler({ x: 1 / TARGETWIDTH, y: 1 / TARGETHEIGHT });
 
 /**
  * @param {object} param0
