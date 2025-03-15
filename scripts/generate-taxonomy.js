@@ -18,7 +18,7 @@ const species = await fetch(CLASSMAPPING_URL)
 			.filter(Boolean)
 	);
 
-const out = {};
+const out = { species: {}, phyla: {}, orders: {}, families: {}, genera: {} };
 let done = 0;
 const total = species.length;
 
@@ -28,7 +28,7 @@ for (const sp of species) {
 	process.stderr.write(`\x1b[K${done}/${total} ${sp}\r`);
 	const { key, nubKey, kingdom, phylum, order, family, genus, species, taxonomicStatus } =
 		await fetchTaxon(sp);
-	out[sp] = {
+	out.species[sp] = {
 		gbifId: key,
 		gbifBackboneId: nubKey,
 		kingdom,
@@ -42,6 +42,38 @@ for (const sp of species) {
 		...(taxonomicStatus === 'ACCEPTED' ? {} : { notAcceptedWhy: taxonomicStatus })
 	};
 	done++;
+}
+
+process.stderr.write(`\x1b[KBuilding mapping genera->families...\r`);
+
+for (const sp of species) {
+	const { genus, family } = out.species[sp];
+	if (!out.genera[genus]) out.genera[genus] = {};
+	out.genera[genus] = family;
+}
+
+process.stderr.write(`\x1b[KBuilding mapping families->orders...\r`);
+
+for (const sp of species) {
+	const { family, order } = out.species[sp];
+	if (!out.families[family]) out.families[family] = {};
+	out.families[family] = order;
+}
+
+process.stderr.write(`\x1b[KBuilding mapping orders->phyla...\r`);
+
+for (const sp of species) {
+	const { order, phylum } = out.species[sp];
+	if (!out.orders[order]) out.orders[order] = {};
+	out.orders[order] = phylum;
+}
+
+process.stderr.write(`\x1b[KBuilding mapping phyla->kingdoms...\r`);
+
+for (const sp of species) {
+	const { phylum, kingdom } = out.species[sp];
+	if (!out.phyla[phylum]) out.phyla[phylum] = {};
+	out.phyla[phylum] = kingdom;
 }
 
 console.log(JSON.stringify(out, null, 2));
