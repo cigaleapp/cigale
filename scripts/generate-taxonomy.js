@@ -8,18 +8,35 @@ async function fetchTaxon(taxon) {
 	return data.results[0];
 }
 
-const species = await fetch('https://media.gwen.works/cigale/models/class_mapping.txt').then(
-	(response) => response.text()
-);
+const species = await fetch('https://media.gwen.works/cigale/models/class_mapping.txt')
+	.then((response) => response.text())
+	.then((text) =>
+		text
+			.split('\n')
+			.map((sp) => sp.trim())
+			.filter(Boolean)
+	);
 
 const out = {};
-
-for (const sp of species
-	.split('\n')
-	.map((sp) => sp.trim())
-	.filter(Boolean)) {
-	const taxon = await fetchTaxon(sp);
-	out[sp] = taxon;
+let done = 0;
+const total = species.length;
+for (const sp of species) {
+	process.stderr.write(`\x1b[K${done}/${total} ${sp}\r`);
+	const { key, nubKey, kingdom, phylum, order, family, genus, taxonomicStatus } =
+		await fetchTaxon(sp);
+	out[sp] = {
+		gbifId: key,
+		gbifBackboneId: nubKey,
+		kingdom,
+		phylum,
+		order,
+		family,
+		genus,
+		// ACCEPTED, DOUBTFUL, SYNONYM, HETEROTYPIC_SYNONYM, HOMOTYPIC_SYNONYM, PROPARTE_SYNONYM, MISAPPLIED
+		accepted: taxonomicStatus === 'ACCEPTED',
+		...(taxonomicStatus === 'ACCEPTED' ? {} : { notAcceptedWhy: taxonomicStatus })
+	};
+	done++;
 }
 
 console.log(JSON.stringify(out, null, 2));
