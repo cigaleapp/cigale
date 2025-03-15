@@ -31,8 +31,31 @@
     },
     "metadata": {
       "type": "object",
+      "properties": {
+        "crop": {
+          "const": "builtin",
+          "description": "Métadonnée \"\" prédéfinie dans l'application: Boîte de recadrage pour l'image"
+        },
+        "cuteness": {
+          "const": "builtin",
+          "description": "Métadonnée \"🥺\" prédéfinie dans l'application: À quel point l'arthropode est trop cute 😖"
+        },
+        "shoot_date": {
+          "const": "builtin",
+          "description": "Métadonnée \"Date de prise de vue\" prédéfinie dans l'application: "
+        },
+        "shoot_location": {
+          "const": "builtin",
+          "description": "Métadonnée \"Lieu\" prédéfinie dans l'application: Localisation de la prise de vue"
+        },
+        "species": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        }
+      },
       "additionalProperties": {
         "type": "object",
+        "description": "Métadonnée du protocole",
         "properties": {
           "description": {
             "type": "string",
