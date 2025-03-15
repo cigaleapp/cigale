@@ -57,7 +57,7 @@
 		await idb.openTransaction(['Image', 'Observation'], {}, async (tx) => {
 			const image = await tx.objectStore('Image').get(id);
 			if (!image) return;
-			if (image.metadata.species && image.metadata.species.confidence < 1) {
+			if (image.metadata.species?.confidence && image.metadata.species.confidence < 1) {
 				// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 				await deleteMetadataValue({
 					tx,
