@@ -10,6 +10,8 @@
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { base } from '$app/paths';
+	import { tooltip } from '$lib/tooltips';
 
 	/**
 	 * @typedef Props
@@ -34,16 +36,30 @@
 		if (!hasImages && !uiState.currentProtocol) goto('#/');
 		if (!hasImages) goto('#/import');
 	});
+
+	const prNumber = $derived(/cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1]);
 </script>
 
 <DownloadResults {progress} bind:open={openExportModal} />
 
 <header bind:clientHeight={height}>
 	<nav>
-		<a class="logo" href="#/">
-			<Logo --fill="var(--bg-primary)" />
-			C.i.g.a.l.e.
-		</a>
+		<div class="logo">
+			<a href="#/">
+				<Logo --fill="var(--bg-primary)" />
+				C.i.g.a.l.e.
+			</a>
+			{#if prNumber}
+				<a
+					href="https://github.com/cigaleapp/cigale/pull/{prNumber}"
+					class="pr-number"
+					use:tooltip={`Ceci est une preview de la PR #${prNumber} — Cliquer pour l'ouvrir sur GitHub`}
+					target="_blank"
+				>
+					Preview #{prNumber}
+				</a>
+			{/if}
+		</div>
 
 		<div class="steps">
 			<a href="#/">
@@ -135,6 +151,21 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+	}
+
+	.logo a:first-child {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.pr-number {
+		font-size: 0.8em;
+		color: var(--bg-primary);
+		padding: 0.5em;
+		border-radius: var(--corner-radius);
+		border: 1px solid var(--bg-primary);
+		margin-left: 1rem;
 	}
 
 	.line {
