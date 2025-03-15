@@ -1,6 +1,7 @@
 import YAML from 'yaml';
 import { BUILTIN_METADATA, BUILTIN_METADATA_IDS, Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
+import { fromEntries, keys } from './utils.js';
 
 /**
  *
@@ -36,15 +37,18 @@ export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.in
 	.and({
 		metadata: {
 			'[string]': Schemas.MetadataWithoutID.describe('Métadonnée du protocole'),
-			...Object.fromEntries(
-				Object.keys(BUILTIN_METADATA_IDS).map((id) => [
-					`${id}?`,
-					[
-						'"builtin"',
-						'@',
-						`Métadonnée "${BUILTIN_METADATA.find((m) => m.id === id)?.label}" prédéfinie dans l'application: ${BUILTIN_METADATA.find((m) => m.id === id)?.description}`
-					]
-				])
+			...fromEntries(
+				keys(BUILTIN_METADATA_IDS).map(
+					(id) =>
+						/** @type {const} */ ([
+							`${id}?`,
+							[
+								'"builtin"',
+								'@',
+								`Métadonnée "${BUILTIN_METADATA.find((m) => m.id === id)?.label}" prédéfinie dans l'application: ${BUILTIN_METADATA.find((m) => m.id === id)?.description}`
+							]
+						])
+				)
 			)
 		}
 	})
@@ -73,7 +77,6 @@ export async function exportProtocol(base, id, format = 'json') {
 
 	downloadProtocol(base, format, {
 		...protocol,
-		// @ts-expect-error See https://github.com/arktypeio/arktype/issues/1376
 		metadata: await tables.Metadata.list()
 			.then((defs) => defs.filter((def) => protocol?.metadata.includes(def.id)))
 			.then((defs) =>
