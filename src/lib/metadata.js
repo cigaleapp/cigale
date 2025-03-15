@@ -77,6 +77,43 @@ export async function storeMetadataValue({
 }
 
 /**
+ *
+ * @param {object} options
+ * @param {string} options.subjectId id de l'image ou l'observation
+ * @param {string} options.metadataId id de la métadonnée
+ * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
+ */
+export async function deleteMetadataValue({ subjectId, metadataId, tx }) {
+	const image = tx
+		? await tx.objectStore('Image').get(subjectId)
+		: await tables.Image.raw.get(subjectId);
+	const observation = tx
+		? await tx.objectStore('Observation').get(subjectId)
+		: await tables.Observation.raw.get(subjectId);
+
+	if (!image && !observation) throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+
+	console.log(`Delete metadata ${metadataId} in ${subjectId}`);
+	if (image) {
+		delete image.metadata[metadataId];
+		if (tx) tx.objectStore('Image').put(image);
+		else await tables.Image.raw.set(image);
+		delete _tablesState.Image[
+			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
+		].metadata[metadataId];
+	} else if (observation) {
+		delete observation.metadataOverrides[metadataId];
+		if (tx) tx.objectStore('Observation').put(observation);
+		else await tables.Observation.raw.set(observation);
+		delete _tablesState.Observation[
+			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
+		].metadataOverrides[metadataId];
+	}
+
+	return;
+}
+
+/**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
  * @param {import('./database').Observation} observation
  * @returns {Promise<import('./database').MetadataValues>}
