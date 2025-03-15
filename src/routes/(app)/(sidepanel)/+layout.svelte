@@ -9,6 +9,8 @@
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { BUILTIN_METADATA_IDS } from '$lib/database';
+	import { setSpeciesWithLineage } from '$lib/taxonomy';
 
 	const { children } = $props();
 
@@ -121,13 +123,22 @@
 			onmetadatachange={async (id, value) => {
 				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
 					for (const subjectId of uiState.selection) {
-						await storeMetadataValue({
-							tx,
-							subjectId,
-							metadataId: id,
-							confidence: 1,
-							value
-						});
+						if (id === BUILTIN_METADATA_IDS.species) {
+							await setSpeciesWithLineage({
+								tx,
+								subjectId,
+								species: value?.toString(),
+								confidence: 1
+							});
+						} else {
+							await storeMetadataValue({
+								tx,
+								subjectId,
+								metadataId: id,
+								confidence: 1,
+								value
+							});
+						}
 					}
 				});
 			}}

@@ -155,6 +155,34 @@ export function addValueLabels(values) {
 }
 
 /**
+ * Get the label of a enum metadata given its key.
+ * @param {string} metadataId
+ * @param {string} key
+ * @returns {Promise<string|undefined>}
+ */
+export async function labelOfEnumKey(metadataId, key) {
+	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
+
+	return metadata.options?.find((o) => o.key === key)?.label;
+}
+
+/**
+ * Get the key of a enum metadata given its label.
+ * @param {string} metadataId
+ * @param {string} label
+ * @returns {Promise<string|undefined>}
+ */
+export async function keyOfEnumLabel(metadataId, label) {
+	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
+
+	return metadata.options?.find((o) => o.label === label)?.key;
+}
+
+/**
  *
  * @param {Array<import('./database').MetadataValues>} values
  * @returns {Promise<import("./database").MetadataValues>}
