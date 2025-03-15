@@ -4,9 +4,10 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { previewingPrNumber, uiState } from '$lib/state.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
+	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
 
@@ -33,16 +34,27 @@
 		if (!hasImages && !uiState.currentProtocol) goto('#/');
 		if (!hasImages) goto('#/import');
 	});
+
+	/** @type {undefined | (() => void)} */
+	let openPreviewPRDetails = $state();
 </script>
 
 <DownloadResults bind:open={openExportModal} />
+<DeploymentDetails bind:open={openPreviewPRDetails} />
 
 <header bind:clientHeight={height}>
 	<nav>
-		<a class="logo" href="#/">
-			<Logo --fill="var(--bg-primary)" />
-			C.i.g.a.l.e.
-		</a>
+		<div class="logo">
+			<a href="#/">
+				<Logo --fill="var(--bg-primary)" />
+				C.i.g.a.l.e.
+			</a>
+			{#if previewingPrNumber}
+				<button class="pr-number" onclick={openPreviewPRDetails}>
+					Preview #{previewingPrNumber}
+				</button>
+			{/if}
+		</div>
 
 		<div class="steps">
 			<a href="#/">
@@ -98,7 +110,7 @@
 		position: relative;
 	}
 
-	a {
+	nav a {
 		background: none;
 		border: none;
 		padding: 7.5px;
@@ -118,12 +130,12 @@
 		max-width: 800px;
 	}
 
-	a[aria-disabled='true'] {
+	nav a[aria-disabled='true'] {
 		pointer-events: none;
 		color: var(--gray);
 	}
 
-	a:hover[aria-disabled='true'] {
+	nav a:hover[aria-disabled='true'] {
 		background-color: var(--bg-primary);
 		border-radius: var(--corner-radius);
 		color: var(--fg-primary);
@@ -136,6 +148,27 @@
 		gap: 0.5em;
 	}
 
+	.logo a:first-child {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.pr-number {
+		font-size: 0.8em;
+		color: var(--fg-primary);
+		padding: 0.5em;
+		border-radius: var(--corner-radius);
+		border: 1px solid var(--fg-primary);
+		margin-left: 1rem;
+		background: none;
+		cursor: pointer;
+	}
+
+	.pr-number:is(:hover, :focus-within) {
+		background-color: var(--bg-primary);
+	}
+
 	.line {
 		height: 3px;
 		background-color: var(--bg-primary);
@@ -143,7 +176,7 @@
 		border-radius: 1000000px;
 	}
 
-	a[aria-disabled='true'] .line {
+	nav a[aria-disabled='true'] .line {
 		visibility: hidden;
 	}
 
