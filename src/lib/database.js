@@ -1,4 +1,4 @@
-import { type } from 'arktype';
+import { type, scope } from 'arktype';
 import { parseISOSafe } from './date.js';
 import Handlebars from 'handlebars';
 import { splitFilenameOnExtension } from './download.js';
@@ -75,8 +75,8 @@ const MetadataValue = type({
 	}
 });
 
-const MetadataValues = type({
-	'[/[a-z0-9_]+/]': MetadataValue
+const MetadataValues = scope({ ID }).type({
+	'[ID]': MetadataValue
 });
 
 const ImageFile = table(
