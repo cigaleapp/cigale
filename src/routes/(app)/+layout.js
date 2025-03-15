@@ -30,6 +30,18 @@ async function fillBuiltinData() {
 				{ name: 'Feur', email: 'gwenn.elbikergre@gmai.com' },
 				{ name: 'Incofeurgniote', email: 'igriuojgr@fokejofe.com' }
 			],
+			exports: {
+				images: {
+					cropped:
+						'{{ default image.metadata.species.valueLabel "(Unknown)" }}/{{ observation.label }}/{{ suffix image.filename "_cropped" }}',
+					original:
+						'{{ default image.metadata.species.valueLabel "(Unknown)" }}/{{ observation.label }}/{{ suffix image.filename "_original" }}'
+				},
+				metadata: {
+					json: 'analysis.json',
+					csv: 'metadata.csv'
+				}
+			},
 			name: 'Test',
 			source: 'https://gwen.works'
 		});
