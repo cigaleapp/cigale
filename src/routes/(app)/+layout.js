@@ -35,9 +35,9 @@ async function fillBuiltinData() {
 			exports: {
 				images: {
 					cropped:
-						'Cropped/{{ default image.metadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}',
+						'Cropped/{{ fallback image.metadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}',
 					original:
-						'Original/{{ default image.metadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}'
+						'Original/{{ fallback image.metadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}'
 				},
 				metadata: {
 					json: 'analysis.json',
