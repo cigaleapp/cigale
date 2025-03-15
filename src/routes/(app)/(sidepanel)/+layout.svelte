@@ -102,9 +102,7 @@
 	);
 
 	const selectedHrefs = $derived(
-		selectedImages
-			.map((image) => uiState.previewURLs.get(image.id))
-			.filter((url) => url !== undefined)
+		selectedImages.map((image) => uiState.getPreviewURL(image)).filter((url) => url !== undefined)
 	);
 </script>
 
