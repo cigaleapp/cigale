@@ -37,7 +37,8 @@
 				#{previewingPrNumber}
 			</a>
 		</p>
-	{:then { title, user, issue_url, ...data }}
+	{:then { title, user, body }}
+		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
 		<p>Ceci est un déploiement de preview</p>
 		<ul>
 			<li>
@@ -46,9 +47,9 @@
 				de
 				{@render githubUser(user)}
 			</li>
-			{#if issue_url}
+			{#if issueNumber}
 				<li>
-					{#await fetch(issue_url).then((res) => res.json()) then { title, number, user, html_url }}
+					{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/issues/${issueNumber}`).then( (res) => res.json() ) then { title, number, user, html_url }}
 						pour l'issue <a href={html_url}>#{number} {title}</a> de {@render githubUser(user)}
 					{/await}
 				</li>
@@ -56,7 +57,7 @@
 			<br />
 		</ul>
 		<p>
-			{data.body}
+			{body}
 		</p>
 	{:catch _}
 		#{previewingPrNumber}
