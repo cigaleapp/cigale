@@ -257,7 +257,10 @@ const ProtocolWithoutMetadata = type({
 		name: ['string', '@', 'Prénom Nom']
 	})
 		.array()
-		.describe("Les auteurices ayant participé à l'élaboration du protocole")
+		.describe("Les auteurices ayant participé à l'élaboration du protocole"),
+	'metadataOrder?': type(ID.array()).describe(
+		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
+	)
 });
 
 const Protocol = table(
@@ -285,7 +288,12 @@ export const BUILTIN_METADATA_IDS = {
 	shoot_date: 'shoot_date',
 	shoot_location: 'shoot_location',
 	cuteness: 'cuteness',
-	species: 'species'
+	species: 'species',
+	genus: 'genus',
+	family: 'family',
+	order: 'order',
+	phylum: 'phylum',
+	kingdom: 'kingdom'
 };
 
 /**
