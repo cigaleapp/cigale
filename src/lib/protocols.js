@@ -1,5 +1,5 @@
 import YAML from 'yaml';
-import { BUILTIN_METADATA_IDS, Schemas } from './database.js';
+import { BUILTIN_METADATA, BUILTIN_METADATA_IDS, Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 
 /**
@@ -35,7 +35,17 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.in
 	.and({
 		metadata: {
-			'[string]': Schemas.MetadataWithoutID
+			'[string]': Schemas.MetadataWithoutID.describe('Métadonnée du protocole'),
+			...Object.fromEntries(
+				Object.keys(BUILTIN_METADATA_IDS).map((id) => [
+					`${id}?`,
+					[
+						'"builtin"',
+						'@',
+						`Métadonnée "${BUILTIN_METADATA.find((m) => m.id === id)?.label}" prédéfinie dans l'application: ${BUILTIN_METADATA.find((m) => m.id === id)?.description}`
+					]
+				])
+			)
 		}
 	})
 	.pipe((protocol) => ({
@@ -63,9 +73,14 @@ export async function exportProtocol(base, id, format = 'json') {
 
 	downloadProtocol(base, format, {
 		...protocol,
+		// @ts-expect-error See https://github.com/arktypeio/arktype/issues/1376
 		metadata: await tables.Metadata.list()
 			.then((defs) => defs.filter((def) => protocol?.metadata.includes(def.id)))
-			.then((defs) => Object.fromEntries(defs.map(({ id, ...def }) => [id, def])))
+			.then((defs) =>
+				Object.fromEntries(
+					defs.map(({ id, ...def }) => [id, id in BUILTIN_METADATA_IDS ? 'builtin' : def])
+				)
+			)
 	});
 }
 
@@ -147,8 +162,10 @@ export async function importProtocol({ allowMultiple } = {}) {
 										...protocol,
 										metadata: Object.keys(protocol.metadata)
 									});
-									Object.entries(protocol.metadata).map(([id, metadata]) =>
-										tx.objectStore('Metadata').put({ id, ...metadata })
+									Object.entries(protocol.metadata).map(
+										([id, metadata]) =>
+											typeof metadata === 'string' ||
+											tx.objectStore('Metadata').put({ id, ...metadata })
 									);
 								});
 								resolve(ExportedProtocol.assert(protocol));
