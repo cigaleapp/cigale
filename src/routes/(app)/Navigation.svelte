@@ -11,6 +11,8 @@
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { base } from '$app/paths';
+	import { tooltip } from '$lib/tooltips';
 
 	/**
 	 * @typedef Props
