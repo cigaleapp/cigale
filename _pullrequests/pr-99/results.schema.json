@@ -53,7 +53,7 @@
     },
     "protocol": {
       "type": "object",
-      "table": "$ark.object366",
+      "table": "$ark.object364",
       "description": "Le protocole utilisé pour cette session d'analyse",
       "properties": {
         "authors": {
@@ -168,14 +168,6 @@
                           "description": "L'URL de la requête",
                           "pattern": "https?:\\/\\/.+"
                         },
-                        "cacheable": {
-                          "anyOf": [
-                            {
-                              "type": "boolean"
-                            }
-                          ],
-                          "description": "Si la réponse à cette requête peut être mise en cache. Par défaut, oui."
-                        },
                         "headers": {
                           "type": "object",
                           "description": "Les en-têtes à ajouter dans la requête",
@@ -275,14 +267,6 @@
                           "type": "string",
                           "description": "L'URL de la requête",
                           "pattern": "https?:\\/\\/.+"
-                        },
-                        "cacheable": {
-                          "anyOf": [
-                            {
-                              "type": "boolean"
-                            }
-                          ],
-                          "description": "Si la réponse à cette requête peut être mise en cache. Par défaut, oui."
                         },
                         "headers": {
                           "type": "object",
@@ -405,14 +389,6 @@
                               "description": "L'URL de la requête",
                               "pattern": "https?:\\/\\/.+"
                             },
-                            "cacheable": {
-                              "anyOf": [
-                                {
-                                  "type": "boolean"
-                                }
-                              ],
-                              "description": "Si la réponse à cette requête peut être mise en cache. Par défaut, oui."
-                            },
                             "headers": {
                               "type": "object",
                               "description": "Les en-têtes à ajouter dans la requête",
@@ -526,14 +502,6 @@
                           "type": "string",
                           "description": "L'URL de la requête",
                           "pattern": "https?:\\/\\/.+"
-                        },
-                        "cacheable": {
-                          "anyOf": [
-                            {
-                              "type": "boolean"
-                            }
-                          ],
-                          "description": "Si la réponse à cette requête peut être mise en cache. Par défaut, oui."
                         },
                         "headers": {
                           "type": "object",
