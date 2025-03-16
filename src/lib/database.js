@@ -62,6 +62,26 @@ const Probability = type('0 <= number <= 1');
  */
 const URLString = type(/https?:\/\/.+/);
 
+const Request = URLString.internal
+	.withMeta({
+		description:
+			"L'URL à laquelle se situe le fichier. Effectue une requête GET sans en-têtes particuliers."
+	})
+	.or({
+		url: URLString.describe("L'URL de la requête"),
+		'headers?': type({ '[string]': 'string' }).describe('Les en-têtes à ajouter dans la requête'),
+		'cacheable?': type('boolean').describe(
+			'Si la réponse à cette requête peut être mise en cache. Par défaut, oui.'
+		),
+		'method?': type
+			.enumerated('GET', 'POST', 'PUT', 'DELETE')
+			.describe('La méthode de la requête (GET par défaut)')
+	})
+	.internal.withMeta({
+		description:
+			'Le requête HTTP pour obtenir le fichier, avec des en-têtes et une méthode personnalisable'
+	});
+
 const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
 		/** @type {import('./metadata').RuntimeValue<typeof MetadataType.infer>}  */
@@ -226,6 +246,26 @@ const MetadataWithoutID = type({
 
 const Metadata = table('id', MetadataWithoutID.and({ id: ID }));
 
+const ModelInput = type({
+	width: ['number', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
+	height: ['number', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
+	'disposition?': type(['"CHW"', '@', 'Tenseurs de la forme [3, H, W]']).or(
+		type(['"1CHW"', '@', 'Tenseurs de la forme [1, 3, H, W]'])
+	),
+	normalized: [
+		'boolean',
+		'@',
+		'Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255'
+	],
+	'name?': [
+		'string',
+		'@',
+		"Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
+	]
+});
+
+const Clade = type.enumerated('kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species');
+
 const ProtocolWithoutMetadata = type({
 	id: ID.describe(
 		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
@@ -233,6 +273,70 @@ const ProtocolWithoutMetadata = type({
 	name: ['string', '@', 'Nom du protocole'],
 	source: URLString.describe(
 		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
+	),
+	authors: type({
+		email: ['string.email', '@', 'Adresse email'],
+		name: ['string', '@', 'Prénom Nom']
+	})
+		.array()
+		.describe("Les auteurices ayant participé à l'élaboration du protocole"),
+	'inference?': type({
+		detection: type({
+			model: Request.describe(
+				'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
+			),
+			input: ModelInput.describe("Configuration de l'entrée du modèle"),
+			output: type({
+				normalized: [
+					'boolean',
+					'@',
+					"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
+				],
+				shape: type(['"cx"', '@', 'Coordonée X du point central'])
+					.or(type(['"cy"', '@', 'Coordonée Y du point central']))
+					.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
+					.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
+					.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
+					.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
+					.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
+					.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
+					.array()
+			}).describe(
+				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
+			)
+		}).describe("Configuration de l'inférence des boîtes englobantes (metadata.crop)"),
+		classification: type({
+			metadata: ID.describe(
+				'ID de la métadonnée où stocker les métadonnées inférée par ce modèle. Cette métadonnée doit être déclarée dans les métadonnées du protocole, et doit être de type "enum". Les options seront remplies par classmapping, et peuvent donc être laissées vides dans la définition de la métadonnée.'
+			),
+			'taxonomic?': type({
+				clade: Clade.describe('La clade inférée par le modèle.'),
+				taxonomy: Request.describe(
+					//  TODO describe the format of that JSON file
+					"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
+				),
+				targets: scope({ Clade })
+					.type({
+						'[Clade]': ID.describe("L'identifiant de la métadonnée")
+					})
+					.partial()
+					.describe(
+						"Dans quelles métadonnées stocker les clade supérieures inférées par l'arbre taxonomique. Similairement à metadata, ces métadonnées doivent être déclarées dans les métadonnées du protocole, et doivent être de type 'enum'. Les options seront remplies par l'arbre taxonomique, et peuvent donc être laissées vides dans la définition de la métadonnée."
+					)
+			}).describe(
+				"Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles"
+			),
+			model: Request.describe(
+				'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
+			),
+			input: ModelInput.describe("Configuration de l'entrée des modèles"),
+
+			classmapping: Request.describe(
+				'Lien vers un fichier texte contenant la correspondance entre les indices des neurones de la couche de sortie du modèle et les noms des classes'
+			)
+		}).describe("Configuration de l'inférence de l'espèce (metadata.species)")
+	}).describe(
+		"Contrôle l'inférance des boîtes englobantes (metadata.crop) et des espèces (metadata.species) par réseaux neuronaux"
 	),
 	exports: type({
 		images: type({
