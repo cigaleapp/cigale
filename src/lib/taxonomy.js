@@ -1,8 +1,5 @@
 import { type } from 'arktype';
-import { keyOfEnumLabel, labelOfEnumKey, storeMetadataValue } from './metadata';
-import { BUILTIN_METADATA_IDS } from './database';
-import { openTransaction } from './idb.svelte';
-import { base } from '$app/paths';
+import { BUILTIN_METADATA_IDS } from './builtins.js';
 
 export const Taxon = type({
 	gbifId: 'number.integer',
@@ -14,14 +11,7 @@ export const Taxon = type({
 	species: 'string',
 	genus: 'string',
 	accepted: 'boolean',
-	'notAcceptedWhy?': type.enumerated(
-		'DOUBTFUL',
-		'SYNONYM',
-		'HETEROTYPIC_SYNONYM',
-		'HOMOTYPIC_SYNONYM',
-		'PROPARTE_SYNONYM',
-		'MISAPPLIED'
-	)
+	'notAcceptedWhy?': 'string'
 });
 
 export const Taxonomy = type({
@@ -94,6 +84,9 @@ export async function setTaxonAndInferParents({
 	alternatives,
 	tx
 }) {
+	const { openTransaction } = await import('./idb.svelte.js');
+	const { keyOfEnumLabel, labelOfEnumKey, storeMetadataValue } = await import('./metadata.js');
+
 	await ensureTaxonomyInitialized();
 	console.log(`Setting taxon on ${subjectId}: ${clade} = ${value}`);
 	await openTransaction(['Image', 'Observation'], { tx }, async (tx) => {
@@ -150,6 +143,7 @@ export async function ensureTaxonomyInitialized() {
 }
 
 export async function initializeTaxonomy() {
+	const { base } = await import('$app/paths');
 	const data = await fetch(`${base}/taxonomy.json`).then((response) => response.json());
 	_taxonomy = Taxonomy.assert(data);
 	return _taxonomy;

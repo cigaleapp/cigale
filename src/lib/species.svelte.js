@@ -1,4 +1,4 @@
-import { BUILTIN_METADATA_IDS } from './database.js';
+import { BUILTIN_METADATA_IDS } from './builtins.js';
 import { tables } from './idb.svelte.js';
 import { torawpath } from './inference.js';
 import { initializeTaxonomy } from './taxonomy.js';
