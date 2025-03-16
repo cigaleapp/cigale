@@ -1,7 +1,8 @@
 import YAML from 'yaml';
-import { BUILTIN_METADATA, BUILTIN_METADATA_IDS, Schemas } from './database.js';
+import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { fromEntries, keys } from './utils.js';
+import { BUILTIN_METADATA_IDS, BUILTIN_METADATA } from './builtins.js';
 
 /**
  *

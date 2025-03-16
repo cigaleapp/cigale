@@ -2,6 +2,7 @@ import { type, scope } from 'arktype';
 import { parseISOSafe } from './date.js';
 import Handlebars from 'handlebars';
 import { splitFilenameOnExtension } from './download.js';
+import { Clade } from './taxonomy.js';
 
 const ID = type(/[\w_]+/);
 
@@ -264,8 +265,6 @@ const ModelInput = type({
 	]
 });
 
-const Clade = type.enumerated('kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species');
-
 const ProtocolWithoutMetadata = type({
 	id: ID.describe(
 		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
@@ -280,6 +279,9 @@ const ProtocolWithoutMetadata = type({
 	})
 		.array()
 		.describe("Les auteurices ayant participé à l'élaboration du protocole"),
+	'metadataOrder?': type(ID.array()).describe(
+		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
+	),
 	'inference?': type({
 		detection: type({
 			model: Request.describe(
@@ -312,7 +314,6 @@ const ProtocolWithoutMetadata = type({
 			'taxonomic?': type({
 				clade: Clade.describe('La clade inférée par le modèle.'),
 				taxonomy: Request.describe(
-					//  TODO describe the format of that JSON file
 					"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
 				),
 				targets: scope({ Clade })
@@ -355,16 +356,7 @@ const ProtocolWithoutMetadata = type({
 		}
 	})
 		.describe("La structure du fichier .zip d'export pour ce protocole.")
-		.optional(),
-	authors: type({
-		email: ['string.email', '@', 'Adresse email'],
-		name: ['string', '@', 'Prénom Nom']
-	})
-		.array()
-		.describe("Les auteurices ayant participé à l'élaboration du protocole"),
-	'metadataOrder?': type(ID.array()).describe(
-		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
-	)
+		.optional()
 });
 
 const Protocol = table(
@@ -386,57 +378,6 @@ const Settings = table(
 		showTechnicalMetadata: 'boolean'
 	})
 );
-
-export const BUILTIN_METADATA_IDS = /** @type {const} */ ({
-	crop: 'crop',
-	shoot_date: 'shoot_date',
-	shoot_location: 'shoot_location',
-	cuteness: 'cuteness',
-	species: 'species',
-	genus: 'genus',
-	family: 'family',
-	order: 'order',
-	phylum: 'phylum',
-	kingdom: 'kingdom'
-});
-
-/**
- * @type {Array<typeof Metadata.inferIn & { id: keyof typeof BUILTIN_METADATA_IDS }>}
- */
-export const BUILTIN_METADATA = [
-	{
-		id: 'cuteness',
-		description: "À quel point l'arthropode est trop cute 😖",
-		label: '🥺',
-		type: 'float',
-		mergeMethod: 'average',
-		required: false
-	},
-	{
-		id: 'crop',
-		description: "Boîte de recadrage pour l'image",
-		label: '',
-		type: 'boundingbox',
-		mergeMethod: 'none',
-		required: false
-	},
-	{
-		id: 'shoot_date',
-		description: '',
-		label: 'Date de prise de vue',
-		type: 'date',
-		mergeMethod: 'average',
-		required: true
-	},
-	{
-		id: 'shoot_location',
-		description: 'Localisation de la prise de vue',
-		label: 'Lieu',
-		type: 'location',
-		mergeMethod: 'average',
-		required: false
-	}
-];
 
 export const Schemas = {
 	ID,

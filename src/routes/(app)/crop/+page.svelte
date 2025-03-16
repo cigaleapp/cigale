@@ -3,7 +3,7 @@
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import { toCenteredCoords, toRelativeCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import Cropup from '$lib/Cropup.svelte';
-	import { BUILTIN_METADATA_IDS } from '$lib/database';
+	import { BUILTIN_METADATA_IDS } from '$lib/builtins';
 	import * as idb from '$lib/idb.svelte.js';
 	import { TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
