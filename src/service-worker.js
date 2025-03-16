@@ -47,10 +47,10 @@ self.addEventListener('fetch', (event) => {
 
 	async function respond() {
 		const url = new URL(event.request.url);
-		const cache = await caches.open(CACHE);
 
 		// `build`/`files` can always be served from the cache
 		if (ASSETS.includes(url.pathname)) {
+			const cache = await caches.open(CACHE);
 			console.log(`Serving ${url} from cache`);
 			const response = await cache.match(url.pathname);
 
@@ -60,6 +60,7 @@ self.addEventListener('fetch', (event) => {
 		}
 
 		if (MODELS.includes(url.href)) {
+			const cache = await caches.open(MODELS_CACHE);
 			console.log(`Serving ${url} from models cache`);
 			const response = await cache.match(url.href);
 
@@ -80,11 +81,13 @@ self.addEventListener('fetch', (event) => {
 			}
 
 			if (response.status === 200) {
+				const cache = await caches.open(CACHE);
 				cache.put(event.request, response.clone());
 			}
 
 			return response;
 		} catch (err) {
+			const cache = await caches.open(CACHE);
 			const response = await cache.match(event.request);
 
 			if (response) {
