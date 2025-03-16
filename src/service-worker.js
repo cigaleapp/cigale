@@ -12,9 +12,9 @@ const ASSETS = [
 ];
 const MODELS = [
 	// Neural network models
-	'https://media.gwen.works/cigale/models/arthropod_detector_yolo11n_conf0.437.onnx',
-	'https://media.gwen.works/cigale/models/model_classif.onnx',
-	'https://media.gwen.works/cigale/models/class_mapping.txt'
+	'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
+	'https://cigaleapp.github.io/models/model_classif.onnx',
+	'https://cigaleapp.github.io/models/class_mapping.txt'
 ];
 
 self.addEventListener('install', (event) => {
