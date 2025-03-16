@@ -123,7 +123,9 @@ function downloadProtocol(base, format, exportedProtocol) {
 		'name',
 		'source',
 		'authors',
-		'metadata'
+		'exports',
+		'metadata',
+		'inference'
 	]);
 
 	// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
