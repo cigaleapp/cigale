@@ -3,10 +3,14 @@ import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
+// Models are cached independently of the version
+const MODELS_CACHE = `cache-models`;
 
 const ASSETS = [
 	...build, // the app itself
-	...files, // everything in `static`
+	...files // everything in `static`
+];
+const MODELS = [
 	// Neural network models
 	'https://media.gwen.works/cigale/models/arthropod_detector_yolo11n_conf0.437.onnx',
 	'https://media.gwen.works/cigale/models/model_classif.onnx',
@@ -18,6 +22,8 @@ self.addEventListener('install', (event) => {
 	async function addFilesToCache() {
 		const cache = await caches.open(CACHE);
 		await cache.addAll(ASSETS);
+		const modelsCache = await caches.open(MODELS_CACHE);
+		await modelsCache.addAll(MODELS);
 	}
 
 	event.waitUntil(addFilesToCache());
@@ -28,7 +34,7 @@ self.addEventListener('activate', (event) => {
 	// Remove previous cached data from disk
 	async function deleteOldCaches() {
 		for (const key of await caches.keys()) {
-			if (key !== CACHE) await caches.delete(key);
+			if (![CACHE, MODELS_CACHE].includes(key)) await caches.delete(key);
 		}
 	}
 
@@ -47,6 +53,15 @@ self.addEventListener('fetch', (event) => {
 		if (ASSETS.includes(url.pathname)) {
 			console.log(`Serving ${url} from cache`);
 			const response = await cache.match(url.pathname);
+
+			if (response) {
+				return response;
+			}
+		}
+
+		if (MODELS.includes(url.href)) {
+			console.log(`Serving ${url} from models cache`);
+			const response = await cache.match(url.href);
 
 			if (response) {
 				return response;
