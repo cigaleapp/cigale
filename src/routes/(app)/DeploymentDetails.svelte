@@ -21,7 +21,7 @@
 		{#await fetch(user.url).then((res) => res.json())}
 			{user.login}
 		{:then { name }}
-			{name}
+			{name || user.login}
 		{:catch _}
 			{user.login}
 		{/await}
