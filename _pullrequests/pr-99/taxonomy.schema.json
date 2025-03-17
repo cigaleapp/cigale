@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "families": {
+      "type": "object",
+      "description": "families -> orders",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "genera": {
+      "type": "object",
+      "description": "genera -> families",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "family": {
+            "type": "string"
+          },
+          "gbifId": {
+            "type": "integer"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          },
+          "phylum": {
+            "type": "string"
+          },
+          "species": {
+            "type": "string"
+          },
+          "gbifBackboneId": {
+            "type": "integer"
+          },
+          "notAcceptedWhy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accepted",
+          "family",
+          "gbifId",
+          "genus",
+          "kingdom",
+          "order",
+          "phylum",
+          "species"
+        ]
+      }
+    },
+    "orders": {
+      "type": "object",
+      "description": "orders -> phyla",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "phyla": {
+      "type": "object",
+      "description": "phyla -> kingdoms",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "species": {
+      "type": "object",
+      "description": "species -> genera",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "families",
+    "genera",
+    "items",
+    "orders",
+    "phyla",
+    "species"
+  ]
+}
