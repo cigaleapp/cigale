@@ -1,302 +1,128 @@
-<script generics="Type extends import('./database').MetadataType">
-	import Checkbox from './Checkbox.svelte';
-	import RadialIndicator from './RadialIndicator.svelte';
-	import RadioButtons from './RadioButtons.svelte';
-	import IconMaps from '~icons/ph/map-trifold';
-	import SelectWithSearch from './SelectWithSearch.svelte';
+<script>
+	import IconClear from '~icons/ph/x';
+	import IconCheck from '~icons/ph/check';
+	import MetadataInput from './MetadataInput.svelte';
+	import debounce from 'debounce';
 	import { tooltip } from './tooltips';
-	import { getSettings } from './settings.svelte';
-	import { format } from 'date-fns';
 
 	/**
 	 * @typedef {object} Props
-	 * @property {Type} type
-	 * @property {string} id The id of the metadata
-	 * @property {string} [description=""] A description of the metadata
-	 * @property {?string} [learnMore=null] A link to learn more about the metadata
-	 * @property {import('./metadata').RuntimeValue<Type> | undefined} value
-	 * @property {number} [confidence] between 0 and 1
-	 * @property {import('svelte').Snippet} children
+	 * @property {import('./database').Metadata} definition
+	 * @property {undefined | import('./database').MetadataValue} value
 	 * @property {boolean} [conflicted] the value is in conflict (selection has multiple differing values)
-	 * @property {import('./database').Metadata['options']} [options]
-	 * @property {(value: import('./metadata').RuntimeValue<Type>) => void} [onchange]
-	 * @property {(value: undefined | import('./metadata').RuntimeValue<Type>) => void} [onblur]
+	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onchange]
 	 */
 
 	/** @type {Props} */
-	let {
-		value = $bindable(),
-		id,
-		conflicted,
-		confidence,
-		children,
-		type,
-		options = [],
-		description = '',
-		learnMore = null,
-		onchange = () => {},
-		onblur = () => {}
-	} = $props();
+	let { value, conflicted, definition, onchange: _onchange = () => {} } = $props();
 
-	/** @type {number|undefined} */
-	let latitude = $state(undefined);
-	/** @type {number|undefined} */
-	let longitude = $state(undefined);
+	const _id = $props.id();
 
-	/** @type {string|undefined} */
-	let datePart = $state(undefined);
-	/** @type {string|undefined} */
-	let timePart = $state(undefined);
-
-	$effect(() => {
-		if (type === 'location' && value !== undefined) {
-			// @ts-ignore
-			latitude = value.latitude;
-			// @ts-ignore
-			longitude = value.longitude;
-		}
-	});
-
-	$effect(() => {
-		if (type === 'date' && value !== undefined) {
-			// @ts-ignore
-			datePart = format(value, 'yyyy-MM-dd');
-			// @ts-ignore
-			timePart = format(value, 'HH:mm:ss');
-		}
-	});
-
-	$effect(() => {
-		if (value !== undefined) onchange(value);
-	});
+	const onchange = $derived(debounce(_onchange, 500));
 </script>
 
-<div class="meta">
-	<label for="metadata-{id}">
-		<div class="first-line">
-			{#if confidence !== undefined && confidence < 1}
-				<div class="confidence" use:tooltip={`Confiance: ${Math.round(confidence * 1e4) / 100}%`}>
-					<RadialIndicator value={confidence} />
-				</div>
-			{/if}
-			{@render children()}
-			{#if type === 'location' && value !== undefined}
-				<a
-					class="gmaps-link"
-					href="https://maps.google.com/maps/@{value.latitude},{value.longitude},17z"
-					target="_blank"
-				>
-					<IconMaps />
-				</a>
-			{/if}
+<div class="metadata">
+	<section class="first-line">
+		<label for={_id}>
+			{definition.label || definition.id}
+		</label>
+		<div class="value">
+			<MetadataInput
+				id={_id}
+				{definition}
+				bind:value={() => value?.value, (newValue) => onchange(newValue)}
+			/>
+			{@render confidenceDisplay(value?.confidence)}
+			<button
+				class="clear"
+				use:tooltip={'Supprimer cette valeur'}
+				disabled={!value}
+				onclick={() => {
+					if (!value) return;
+					value = undefined;
+					onchange(undefined);
+				}}
+			>
+				<IconClear />
+			</button>
 		</div>
-		<section class="about">
-			{#if description}
-				<p>{description}</p>
+	</section>
+	{#if value && Object.keys(value.alternatives).length > 0}
+		<section class="alternatives">
+			<div class="title">Alternatives</div>
+			<ul class="options">
+				{#each Object.entries(value.alternatives).sort(([, a], [, b]) => b - a) as [stringifiedValue, confidence] (stringifiedValue)}
+					<li>
+						<div class="value">{stringifiedValue}</div>
+						{@render confidenceDisplay(confidence)}
+						<button
+							use:tooltip={'Sélectionner cette valeur'}
+							onclick={() => {
+								value = {
+									value: JSON.parse(stringifiedValue),
+									confidence,
+									alternatives: value?.alternatives ?? {}
+								};
+								onchange(value?.value);
+							}}
+						>
+							<IconCheck />
+						</button>
+					</li>
+				{/each}
+			</ul>
+		</section>
+	{/if}
+	{#if definition.description || definition.learnMore}
+		<section class="learnmore">
+			{#if definition.description}
+				<p>{definition.description}</p>
 			{/if}
-			{#if learnMore}
-				<a href={learnMore} target="_blank">Plus d'infos</a>
+			{#if definition.learnMore}
+				<a href={definition.learnMore} target="_blank" rel="noopener">En savoir plus</a>
 			{/if}
 		</section>
-	</label>
-
-	{#if type === 'date'}
-		<div class="date-and-time">
-			{#if !value && conflicted}
-				<p>Plusieurs valeurs</p>
-			{/if}
-			<input
-				id="metadata-{id}"
-				type="date"
-				bind:value={datePart}
-				onblur={() => {
-					// @ts-ignore
-					if (datePart && timePart) onblur(new Date(`${datePart}T${timePart}`));
-				}}
-			/>
-			<input
-				type="time"
-				bind:value={timePart}
-				onblur={() => {
-					// @ts-ignore
-					if (datePart && timePart) onblur(new Date(`${datePart}T${timePart}`));
-				}}
-			/>
-		</div>
-		<div class="ligne"></div>
-	{:else if type === 'float' || type === 'integer'}
-		<input
-			id="metadata-{id}"
-			type="text"
-			inputmode="numeric"
-			placeholder={conflicted ? 'Plusieurs valeurs' : 'Nombre'}
-			value={value ?? ''}
-			onblur={({ currentTarget }) => {
-				const corced = currentTarget.valueAsNumber;
-				// @ts-ignore
-				if (!isNaN(corced)) onblur(corced);
-			}}
-		/>
-		<div class="ligne"></div>
-	{:else if type === 'boolean'}
-		<!-- https://github.com/sveltejs/language-tools/issues/1026#issuecomment-2495493220 -->
-		{/* @ts-ignore */ null}
-		<Checkbox id="metadata-{id}" bind:value onchange={onblur}>
-			<div class="niOuiNiNon">
-				{#if value === undefined && conflicted}
-					Plusieurs valeurs
-				{:else if value}
-					Oui
-				{:else}
-					Non
-				{/if}
-			</div>
-		</Checkbox>
-	{:else if type === 'enum'}
-		{#if options.length <= 5}
-			{/* @ts-ignore */ null}
-			<RadioButtons onchange={onblur} {options} bind:value></RadioButtons>
-		{:else}
-			{/* @ts-ignore */ null}
-			<SelectWithSearch
-				id="metadata-{id}"
-				placeholder={conflicted ? 'Plusieurs valeurs' : 'Rechercher…'}
-				{onblur}
-				{options}
-				searchQuery={value ? (options.find((o) => o.key === value)?.label ?? value) : ''}
-				selectedValue={typeof value === 'string' ? value : undefined}
-			/>
-		{/if}
-	{:else if type === 'string'}
-		<input id="metadata-{id}" type="text" bind:value onblur={() => onblur(value)} />
-		<div class="ligne"></div>
-	{:else if type === 'location'}
-		<div class="subfield">
-			Lat.
-			{/* @ts-ignore */ null}
-			{#if value?.latitude !== undefined}
-				{/* @ts-ignore */ null}
-				<input
-					id="metadata-{id}"
-					aria-label="Latitude"
-					type="text"
-					bind:value={value.latitude}
-					onblur={() => onblur(value)}
-				/>
-			{:else}
-				<input
-					id="metadata-{id}"
-					type="text"
-					inputmode="numeric"
-					aria-label="Latitude"
-					placeholder={conflicted ? 'Plusieurs valeurs' : '43.602419'}
-					bind:value={latitude}
-					onblur={() => {
-						// @ts-ignore
-						if (latitude && longitude) onblur({ latitude, longitude });
-					}}
-				/>
-			{/if}
-		</div>
-		<div class="subfield">
-			Lon.
-			{/* @ts-ignore */ null}
-			{#if value?.longitude !== undefined}
-				{/* @ts-ignore */ null}
-				<input
-					aria-label="Longitude"
-					type="text"
-					bind:value={value.longitude}
-					onblur={() => onblur(value)}
-				/>
-			{:else}
-				<input
-					type="text"
-					inputmode="numeric"
-					aria-label="Longitude"
-					placeholder={conflicted ? 'Plusieurs valeurs' : '1.456366'}
-					bind:value={longitude}
-					onblur={() => {
-						// @ts-ignore
-						if (latitude && longitude) onblur({ latitude, longitude });
-					}}
-				/>
-			{/if}
-		</div>
-	{:else if getSettings().showTechnicalMetadata}
-		<pre class="unrepresentable-datatype">{value
-				? JSON.stringify(value, null, 2)
-				: conflicted
-					? 'Plusieurs valeurs'
-					: 'undefined'}</pre>
 	{/if}
 </div>
 
+{#snippet confidenceDisplay(/** @type {number|undefined} */ confidence)}
+	{#if confidence && confidence > 0 && confidence < 1}
+		<code class="confidence">
+			{Math.round(confidence * 100)}%
+		</code>
+	{/if}
+{/snippet}
+
 <style>
-	.meta {
-		gap: 0.1em;
+	.metadata {
 		display: flex;
 		flex-direction: column;
+		gap: 0.5em;
 	}
-
-	label .first-line {
-		color: var(--gray);
-		text-transform: uppercase;
-		font-weight: bold;
+	.first-line {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 1em;
 	}
-
-	.unrepresentable-datatype {
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.confidence {
-		font-size: 0.7em;
-	}
-
-	.ligne {
-		height: 2px;
-		background-color: var(--bg-neutral);
+	.value {
 		display: flex;
+		align-items: center;
+		gap: 0.5em;
 	}
-
-	input {
-		outline: none;
+	button {
 		border: none;
-		font-size: 1em;
+		background: none;
+		cursor: pointer;
+	}
+	.metadata:not(:hover):not(:focus-within) button,
+	button:disabled {
+		opacity: 0;
 	}
 
-	input:empty ~ .ligne {
-		background-color: var(--gray);
-	}
-
-	.meta:hover .ligne {
-		background-color: var(--fg-neutral);
-	}
-
-	.meta:focus-within .ligne {
-		background-color: var(--bg-primary);
-	}
-
-	.meta:focus-within label {
-		color: var(--fg-neutral);
-	}
-
-	.niOuiNiNon {
+	label {
+		text-transform: uppercase;
 		color: var(--gay);
-	}
-
-	.niOuiNiNon:hover {
-		color: var(--fg-neutral);
-	}
-	.date {
-		color: var(--gay);
-	}
-
-	.date:hover {
-		color: var(--fg-neutral);
+		letter-spacing: 0.15em;
 	}
 </style>
