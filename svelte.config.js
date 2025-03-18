@@ -5,9 +5,7 @@ import { mdsvex } from 'mdsvex';
 const config = {
 	kit: {
 		version: {
-			name:
-				(process.env.BUILD_COMMIT || 'dev') +
-				(process.env.PREVIEWING_PR ? `/pr-${process.env.PREVIEWING_PR}` : '')
+			name: process.env.BUILD_COMMIT || 'dev'
 		},
 		adapter: adapter({
 			pages: 'public',
