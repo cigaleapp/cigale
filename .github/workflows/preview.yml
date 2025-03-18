@@ -24,7 +24,7 @@ jobs:
         if: github.event.action != 'closed' # You might want to skip the build if the PR has been closed
         run: |
           npm install
-          PREVIEWING_PR=${{ github.event.number }} BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale/_pullrequests/pr-$PR_NUMBER npm run build
+          BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale/_pullrequests/pr-$PR_NUMBER npm run build
         env:
           PR_NUMBER: ${{ github.event.number }}
 
