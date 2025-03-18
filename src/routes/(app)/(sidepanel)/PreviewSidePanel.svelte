@@ -106,9 +106,9 @@
 					-->
 					<Metadata
 						conflicted={value === undefined && definition.id in metadata && images.length > 1}
-						{...definition}
-						{...value ?? { value: undefined }}
-						onblur={async (v) => {
+						{definition}
+						{value}
+						onchange={async (v) => {
 							if (v === undefined) return;
 							if (deepEqual(v, value?.value)) return;
 							onmetadatachange(definition.id, v);

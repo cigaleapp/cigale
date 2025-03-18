@@ -544,6 +544,50 @@ export function metadataPrettyKey(metadata) {
 }
 
 /**
+ * Asserts that a metadata is of a certain type, inferring the correct runtime type for its value
+ * @template {import('./database').MetadataType} Type
+ * @template {undefined | import('./metadata').RuntimeValue} Value
+ * @param {Type} testedtyp
+ * @param {import('./metadata').RuntimeValue} metadatatyp
+ * @param {Value} value
+ * @returns {value is (Value extends (undefined | import('./metadata').RuntimeValue) ?  RuntimeValue<Type> : (undefined | RuntimeValue<Type>))}
+ */
+export function isType(testedtyp, metadatatyp, value) {
+	/**
+	 * @param {import('arktype').Type} v
+	 * @returns boolean
+	 */
+	const ok = (v) =>
+		metadatatyp === testedtyp && (value === undefined || !(v(value) instanceof type.errors));
+
+	switch (testedtyp) {
+		case 'boolean':
+			return ok(type('boolean'));
+		case 'integer':
+		case 'float':
+			return ok(type('number'));
+		case 'enum':
+			return ok(type('string | number'));
+		case 'date':
+			return ok(type('Date'));
+		case 'location':
+			return ok(type({ latitude: 'number', longitude: 'number' }));
+		case 'boundingbox':
+			return ok(type({ x: 'number', y: 'number', w: 'number', h: 'number' }));
+		case 'string':
+			return ok(type('string'));
+		default:
+			throw new Error(`Type inconnu: ${testedtyp}`);
+	}
+}
+
+/**
  * @template {import('./database').MetadataType} [Type=import('./database').MetadataType]
  * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, w: number, h: number } : string} RuntimeValue
+ */
+
+/**
+ * @template T
+ * @template Undefinable
+ * @typedef{ Undefinable extends true ? T | undefined : T } Maybe
  */

@@ -6,6 +6,8 @@ import { Clade } from './taxonomy.js';
 
 const ID = type(/[\w_]+/);
 
+const References = ID.array().pipe((ids) => [...new Set(ids)]);
+
 /**
  * Add a suffix to a filename, before the extension
  */
@@ -134,7 +136,7 @@ const Observation = table(
 		label: 'string',
 		addedAt: 'string.date.iso.parse',
 		metadataOverrides: MetadataValues,
-		images: ID.array()
+		images: References
 	})
 );
 
@@ -359,7 +361,7 @@ const ProtocolWithoutMetadata = type({
 const Protocol = table(
 	'id',
 	ProtocolWithoutMetadata.and({
-		metadata: ID.array()
+		metadata: References
 	})
 );
 
@@ -367,7 +369,7 @@ const Settings = table(
 	'id',
 	type({
 		id: '"defaults" | "user"',
-		protocols: ID.array(),
+		protocols: References,
 		theme: type.enumerated('dark', 'light', 'auto'),
 		gridSize: 'number',
 		language: type.enumerated('fr'),
