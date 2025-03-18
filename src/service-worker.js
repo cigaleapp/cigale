@@ -3,6 +3,10 @@ import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
+
+// Prevent serving assets from cache if we're previewing a PR, since cached assets from main can override PR's assets somehow
+const previewingPR = version.includes('/pr-');
+
 // Models are cached independently of the version
 const MODELS_CACHE = `cache-models`;
 
@@ -49,7 +53,8 @@ self.addEventListener('fetch', (event) => {
 		const url = new URL(event.request.url);
 
 		// `build`/`files` can always be served from the cache
-		if (ASSETS.includes(url.pathname)) {
+		// unless we're on a preview PR
+		if (!previewingPR && ASSETS.includes(url.pathname)) {
 			const cache = await caches.open(CACHE);
 			console.log(`Serving ${url} from cache`);
 			const response = await cache.match(url.pathname);
