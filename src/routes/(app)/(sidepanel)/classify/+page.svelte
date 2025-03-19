@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import { toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
@@ -60,9 +60,11 @@
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
 		let img = await imload([buffer], TARGETWIDTH, TARGETHEIGHT);
-		const { x, y, width, height } = toTopLeftCoords(
-			/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-			(metadata.crop.value)
+		const { x, y, width, height } = toPixelCoords(
+			toTopLeftCoords(
+				/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
+				(metadata.crop.value)
+			)
 		);
 		let bbList = [x, y, width, height];
 
