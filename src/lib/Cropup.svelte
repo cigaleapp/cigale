@@ -50,7 +50,7 @@ show a pop up to crop an image
 <ModalConfirm
 	key={StateKey}
 	title="Crop"
-	onconfirm={() => onconfirm(toPixelCoords(BBout[0]))}
+	onconfirm={() => onconfirm(BBout[0])}
 	bind:open={opener}
 	confirm="Crop"
 	cancel="Cancel"
@@ -60,7 +60,7 @@ show a pop up to crop an image
 			{#if boundingBoxes}
 				{#each boundingBoxes as bb, index (index)}
 					<DraggableBoundingBox
-						{bb}
+						bb={toPixelCoords(bb)}
 						bind:bbout={BBout[index]}
 						sizew={imageWidth}
 						sizeh={imageHeight}
