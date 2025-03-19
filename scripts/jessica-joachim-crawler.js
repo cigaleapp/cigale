@@ -1,8 +1,8 @@
 import { execa } from 'execa';
 import { JSDOM } from 'jsdom';
-import path from 'node:path';
-import { stat, mkdir, readFile, opendir, writeFile } from 'node:fs/promises';
 import { marked } from 'marked';
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import Turndown from 'turndown';
 
 // ANSI control sequences
@@ -12,7 +12,8 @@ const cc = {
 	reset: '\x1b[0m',
 	dim: '\x1b[2m',
 	blue: '\x1b[34m',
-	bold: '\x1b[1m'
+	bold: '\x1b[1m',
+	yellow: '\x1b[33m'
 };
 
 const _tdown = new Turndown();
@@ -45,37 +46,6 @@ await execa`wget --version`.catch((error) => {
 });
 
 const here = path.dirname(new URL(import.meta.url).pathname);
-const output = path.join(here, 'jessica-joachim.com');
-
-if (!(await exists(output))) {
-	await mkdir(output);
-
-	// Download whole site from jessica-joachim.com/identification, inheriting stdio and only downloading .html files and images, storing them inside the `output` directory
-	await execa(
-		'wget',
-		[
-			'--recursive',
-			'--page-requisites',
-			'--html-extension',
-			'--convert-links',
-			'--restrict-file-names=windows',
-			'--domains',
-			'jessica-joachim.com',
-			'--no-parent',
-			'--no-host-directories',
-			'--directory-prefix',
-			output,
-			'--accept',
-			'html,jpg,jpeg,png,gif',
-			'https://jessica-joachim.com/identification'
-		],
-		{ stdio: 'inherit' }
-	);
-}
-
-// Recursively walk all .html files, keeping in the array only text content of files whose text content contains "Espèce : "
-/** @type {Record<string, { url: string; text: string; images: string[] }>} */
-const species = {};
 
 /**
  * @type {typeof import('../src/lib/protocols').ExportedProtocol.inferIn}
@@ -103,104 +73,122 @@ const protocol = {
 const total = Object.keys(classmapping).length;
 let done = 0;
 
-for await (const file of walk(output)) {
-	if (file.endsWith('.html')) {
-		const content = await readFile(file).then((buffer) => buffer.toString());
-		const dom = new JSDOM(content);
-		const main = dom.window.document.querySelector('main');
-		if (!main) continue;
-		const text = main.textContent;
-		const markdown = htmlToMarkdown(main.innerHTML).replaceAll('\u00a0', ' ');
+for (const [name, index] of Object.entries(classmapping)) {
+	const progressHeader = `[${cc.blue}${done}/${total}${cc.reset}]`;
+	const progressHeaderLength = `[${done}/${total}]`.length;
+	const searchedName = name.trim().toLowerCase();
+	const searchurl = `https://jessica-joachim.com/?s=${encodeURIComponent(searchedName).replaceAll('%20', '+')}`;
+	// Do a search
+	const searchPage = await fetch(searchurl)
+		.then((r) => r.text())
+		.then((text) => new JSDOM(text).window.document);
 
-		if (/Espèce : .+/.test(text)) {
-			const name = /Espèce : (.+)/.exec(text)[1].trim();
-			if (name === '–') continue;
-			// console.log(`Adding ${name} to the species, from ${file}`);
-			let identificationHints = '';
-			try {
-				identificationHints = markdown.split('**Identification** : ')[1]?.split('**')[0];
-			} catch {
-				// eslint-disable no-empty
-			}
+	let speciesPageUrl = [...searchPage.querySelectorAll('a')].find(
+		(a) => a.textContent.trim().toLowerCase() === searchedName
+	)?.href;
+	if (!speciesPageUrl) {
+		// Try <gender name> sp. instead of matching full binomial species name
+		const [genus] = searchedName.split(' ');
+		speciesPageUrl = [...searchPage.querySelectorAll('a')].find(
+			(a) => a.textContent.trim().toLowerCase() === `${genus} sp`
+		)?.href;
 
-			if (!identificationHints) {
-				try {
-					identificationHints = markdown.split('#### Identification')[1]?.split('####')[0];
-				} catch {
-					// eslint-disable no-empty
-				}
-			}
-			const cleaneddom = new JSDOM(markdownToHtml(identificationHints || '<body></body>'));
-			const selfurl =
-				[...cleaneddom.window.document.querySelectorAll('a')].find(
-					(a) => a.textContent.trim() === name
-				)?.href ??
-				`https://jessica-joachim.com/${path.relative(output, file).replace('/index.html', '')}`;
-
-			species[name] = {
-				text: cleaneddom.window.document.documentElement.textContent
-					.replaceAll('\u00a0', ' ')
-					.replaceAll('• ', '\r\n• ')
-					.trim(),
-				classmapping: classmapping[name],
-				url: selfurl,
-				images: [...main.querySelectorAll('img')].map(({ src }) => src)
-			};
-
-			if (classmapping[name]) {
-				if (!species[name].text) {
-					console.error(
-						`\n\x1b[31mNo text found for ${name} in ${file}\nMain page content was:\x1b[0m`
-					);
-					console.error(markdown.replaceAll('\n', '\n\t'));
-					console.error();
-				}
-				protocol.metadata[`${protocol.id}__species`].options.push(
-					/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
-						key: classmapping[name].toString(),
-						label: name,
-						description: species[name].text,
-						learnMore: selfurl,
-						image: species[name].images[0]
-					})
-				);
-				protocol.metadata[`${protocol.id}__species`].options.sort(
-					(a, b) => parseFloat(a.key) - parseFloat(b.key)
-				);
-				done++;
-				// Erase previous line, print current progress
-				process.stdout.write(
-					`${cc.clearline}\r[${cc.blue}${done}/${total}${cc.reset}] Added ${cc.bold}${name}${cc.reset}`
-				);
-			} else {
-				process.stdout.write(
-					`${cc.clearline}\r[${cc.blue}${done}/${total}${cc.reset}] ${cc.dim}Skipped ${cc.bold}${name}${cc.reset}${cc.dim} (not in class mapping)${cc.reset}`
-				);
-			}
-
-			// writeFile(path.join(here, 'species.json'), JSON.stringify(species, null, 2));
-			await mkdir(path.join(here, '../examples'), { recursive: true });
-			writeFile(
-				path.join(here, '../examples/arthropods.cigaleprotocol.json'),
-				JSON.stringify(protocol, null, 2)
+		if (speciesPageUrl) {
+			console.error(
+				`${cc.clearline}\r${progressHeader} ${cc.yellow}Using ${genus} sp. instead of ${name}${cc.reset}`
 			);
 		}
 	}
-}
-
-async function* walk(dir) {
-	for await (const d of await opendir(dir)) {
-		const entry = path.join(dir, d.name);
-		if (d.isDirectory()) yield* walk(entry);
-		else if (d.isFile()) yield entry;
+	if (!speciesPageUrl) {
+		let linksFound = [...searchPage.querySelector('main').querySelectorAll('a')]
+			.filter((a) => a.textContent.trim())
+			.filter((a) => !a.textContent.includes('Lire la suite'))
+			.filter((a) => !a.textContent.endsWith(' commentaires'));
+		// Uniquify by URL
+		const uniqueLinks = new Map(linksFound.map((a) => [a.href, a]));
+		linksFound = [...uniqueLinks.values()];
+		console.error(
+			`${cc.clearline}\r${progressHeader} ${cc.red}${name}: not found (out of ${linksFound.length} links)${cc.reset}`
+		);
+		if (linksFound.length) {
+			console.error(`Links found on ${cc.dim}${cc.blue}${searchurl}${cc.reset}`);
+			for (const link of linksFound) {
+				console.error(
+					`${' '.repeat(progressHeaderLength)} ${cc.dim}${cc.bold}·${cc.reset} ${cc.bold}${cc.blue}${link.textContent}${cc.reset} ${cc.dim}${link.href}${cc.reset}`
+				);
+			}
+		}
+		continue;
 	}
+	await fetch(speciesPageUrl)
+		.then((r) => r.text())
+		.then((content) => parseAndAddToProtocol(content, speciesPageUrl, name, index));
 }
 
-async function exists(path) {
+/**
+ *
+ * @param {string} pageContent
+ * @param {string} url
+ * @param {string} name
+ * @param {number} classmappingIndex
+ */
+async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) {
+	const dom = new JSDOM(pageContent);
+	const main = dom.window.document.querySelector('main');
+	if (!main) return;
+	// const text = main.textContent;
+	const markdown = htmlToMarkdown(main.innerHTML).replaceAll('\u00a0', ' ');
+
+	// console.log(`Adding ${name} to the species, from ${file}`);
+	let identificationHints = '';
 	try {
-		await stat(path);
-		return true;
+		identificationHints = markdown.split('**Identification** : ')[1]?.split('**')[0];
 	} catch {
-		return false;
+		// eslint-disable no-empty
 	}
+
+	if (!identificationHints) {
+		try {
+			identificationHints = markdown.split('#### Identification')[1]?.split('####')[0];
+		} catch {
+			// eslint-disable no-empty
+		}
+	}
+	const cleaneddom = new JSDOM(markdownToHtml(identificationHints || '<body></body>'));
+
+	const text = cleaneddom.window.document.documentElement.textContent
+		.replaceAll('\u00a0', ' ')
+		.replaceAll('• ', '\r\n• ')
+		.trim();
+	const images = [...main.querySelectorAll('img')].map(({ src }) => src);
+
+	if (!text) {
+		console.error(`\n\x1b[31mNo text found, main page content was:\x1b[0m`);
+		console.error(markdown.replaceAll('\n', '\n\t'));
+		console.error();
+	}
+	protocol.metadata[`${protocol.id}__species`].options.push(
+		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
+			key: classmappingIndex.toString(),
+			label: name,
+			description: text,
+			learnMore: url,
+			image: images[0]
+		})
+	);
+	protocol.metadata[`${protocol.id}__species`].options.sort(
+		(a, b) => parseFloat(a.key) - parseFloat(b.key)
+	);
+	done++;
+	// Erase previous line, print current progress
+	process.stdout.write(
+		`${cc.clearline}\r[${cc.blue}${done}/${total}${cc.reset}] Added ${cc.bold}${name}${cc.reset}`
+	);
+
+	// writeFile(path.join(here, 'species.json'), JSON.stringify(species, null, 2));
+	await mkdir(path.join(here, '../examples'), { recursive: true });
+	writeFile(
+		path.join(here, '../examples/arthropods.cigaleprotocol.json'),
+		JSON.stringify(protocol, null, 2)
+	);
 }
