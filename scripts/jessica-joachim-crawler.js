@@ -118,6 +118,18 @@ for (const [name, index] of Object.entries(classmapping)) {
 				);
 			}
 		}
+		protocol.metadata[`${protocol.id}__species`].options.push(
+			/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
+				key: index.toString(),
+				label: name,
+				description: '',
+				learnMore: null,
+				image: ''
+			})
+		);
+		protocol.metadata[`${protocol.id}__species`].options.sort(
+			(a, b) => parseFloat(a.key) - parseFloat(b.key)
+		);
 		continue;
 	}
 	await fetch(speciesPageUrl)

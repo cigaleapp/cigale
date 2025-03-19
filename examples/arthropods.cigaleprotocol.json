@@ -21,11 +21,25 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2021/08/Allacma-fusca.jpg?resize=1024%2C771&ssl=1"
 				},
 				{
+					"key": "1",
+					"label": "Anurida maritima",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "2",
 					"label": "Bilobella aurantiaca",
 					"description": "Bilobella aurantiaca est de couleur jaune citron, d’aspect boudiné avec de petites excroissances rondes sur les segments. Le 6ème segment abdominal est bilobé, le bout des antennes est blanc et les deux ocelles orangés.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neanuridae/bilobella-aurantiaca/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/bilobella-aurantiaca-1.jpg?resize=1200%2C801&ssl=1"
+				},
+				{
+					"key": "3",
+					"label": "Bilobella braunerae",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "4",
@@ -75,6 +89,13 @@
 					"description": "Ce genre comprend de petits collemboles blanchâtres ne possédant pas d’yeux. Leur corps est court et ovale, très peu poilu, les antennes assez courtes avec le 3ème article en forme de goutte. L’espèce la plus courante est C.albinus.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/cyphoderus-sp/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/cyphoderus-sp-1.jpg?resize=1024%2C683&ssl=1"
+				},
+				{
+					"key": "11",
+					"label": "Deuterosminthurus bicinctus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "12",
@@ -133,6 +154,20 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/01/entomobrya-albocincta-1.jpg?resize=700%2C467&ssl=1"
 				},
 				{
+					"key": "20",
+					"label": "Entomobrya atrocincta",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "21",
+					"label": "Entomobrya corticalis",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "22",
 					"label": "Entomobrya marginata",
 					"description": "• corps de couleur verdâtre\r\n• apex des segments thoraciques et abdominaux à bande sombre\r\n• 4ème segment abdominal allongé\r\n• bande sombre entre les antennes",
@@ -168,6 +203,20 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/04/entomobrya-nigrocincta-1.jpg?resize=1200%2C1561&ssl=1"
 				},
 				{
+					"key": "27",
+					"label": "Entomobrya nivalis",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "28",
+					"label": "Entomobrya superba",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "29",
 					"label": "Fasciosminthurus quinquefasciatus",
 					"description": "Fasciosminthurus quinquefasciatus se reconnait facilement à sa couleur brune pus ou moins claire rayée de bandes blanches. Les flancs et le front présentes des taches blanches.",
@@ -175,11 +224,32 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/05/fasciosminthurus-quinquefaciatus.jpg?resize=1200%2C800&ssl=1"
 				},
 				{
+					"key": "30",
+					"label": "Folsomia candida",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "31",
+					"label": "Folsomia quadrioculata",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "32",
 					"label": "Heteromurus major",
 					"description": "Heteromurus major a le corps allongé de couleur grise. Le 4ème segment abdominal est relativement peu allongé par rapport aux Lepidocyrtus ou Entomobrya. Il a un aspect légèrement bossu. Les articles antennaires sont tous de même longueur.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/heteromurus-major/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/11/heteromurus-major-1.jpg?resize=700%2C466&ssl=1"
+				},
+				{
+					"key": "33",
+					"label": "Heteromurus nitidus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "34",
@@ -203,6 +273,20 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2022/12/Isotoma-sp.jpg?resize=1024%2C683&ssl=1"
 				},
 				{
+					"key": "37",
+					"label": "Isotomiella minor",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "38",
+					"label": "Isotomurus gallicus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "39",
 					"label": "Isotomurus maculatus",
 					"description": "Ce genre se reconnait à sa forme allongée, Ses articles antennaires plus ou moins tous de même longueur, son 4ème segment abdominal plus ou moins de même longueur que le 3ème, la présence de macrosètes (grandes soies effilées à l’apex et courbées) uniquement sur les segments abdominaux 4 à 6 et la présence de trichobothries (soies cylindriques très fines). Compte tenu de la variabilité du genre et des difficultés d’identification de certains spécimens, je classerais ici tous ceux dont l’identification au delà du genre est incertaine.",
@@ -215,6 +299,13 @@
 					"description": "Isotomurus palustris est une espèce très variable et présente de nombreuses formes (bande centrale sur le dos plus ou moins fine, souvent assez courte, 2 bandes latérales, toutes 3 pouvant être coupées en pointillés et très peu visibles, avec ou sans une couronne sur abd 4…). Son corps est allongée, ses articles antennaires sont plus ou moins tous de même longueur, son 4ème segment abdominal est plus ou moins de même longueur que le 3ème, il possède des macrosètes (grandes soies effilées à l’apex et courbées) uniquement sur les segments abdominaux 4 à 6 et des trichobothries (soies cylindriques très fines).",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomidae/isotomurus-palustris/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/isotomurus-palustris-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "41",
+					"label": "Isotomurus unifasciatus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "42",
@@ -238,11 +329,32 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/lepidocyrtus-cyaneus.jpg?resize=1200%2C800&ssl=1"
 				},
 				{
+					"key": "45",
+					"label": "Lepidocyrtus fimetarius",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "46",
 					"label": "Lepidocyrtus lignorum",
 					"description": "• corps cylindrique\r\n• corps recouvert d’écailles argentées à quelques reflets violets et bleus\r\n• 4ème segment abdominal allongé\r\n• pas d’angle droit marqué sur le thorax au-dessus de la tête\r\n• présence de soies interantennaires\r\n• pas de soies interoculaires\r\n• présence d’écailles sur les deux premiers segments antennaires et les pattes (mais ces dernières peuvent être peu visibles ou disparaitre par frottement)\r\n• articles antennaires 3 et 4 sans écailles",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/lepidocyrtus-lignorum/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2023/10/Lepidocyrtus-lignorum.jpg?resize=1024%2C594&ssl=1"
+				},
+				{
+					"key": "47",
+					"label": "Lepidocyrtus paradoxus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "48",
+					"label": "Megalothorax minimus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "49",
@@ -264,6 +376,13 @@
 					"description": "Neelus murinus est un collembole sans yeux, avec un corps rond et d’aspect bossu plus ou moins brun orangé. Il possède des soies à l’arrière de l’abdomen. Sa tête est allongée. Ses antennes sont relativement longues et fines. La furca possède des mucrons longs et étroits.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neelidae/neelus-murinus/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/03/neelus-murinus-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "52",
+					"label": "Orchesella bifasciata",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "53",
@@ -308,11 +427,32 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2021/05/Podura-aquatica.jpg?resize=1024%2C682&ssl=1"
 				},
 				{
+					"key": "59",
+					"label": "Pogonognathellus flavescens",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "60",
 					"label": "Pogonognathellus longicornis",
 					"description": "Pogonognathellus longicornis a un corps allongé et recouvert d’écailles grises. Ses antennes sont très longes, plus longues que le corps. Le 3ème segment antennaire est plus long que les autres et effilé à son apex. Il enroule souvent l’extrémité de ses antennes.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/tomoceridae/pogonognathellus-longicornis/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/10/pogonognathellus-longicornis-1.jpg?resize=700%2C467&ssl=1"
+				},
+				{
+					"key": "61",
+					"label": "Seira ferrarii",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "62",
+					"label": "Seira musarum",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "63",
@@ -327,6 +467,13 @@
 					"description": "Sminthurides malmgreni est un petit collembole au corps rond, jaune, avec l’abdomen ceintré d’une bande rose prune. Certaines formes possèdent une bande dorsale rose prune plus ou moins large, parfois divisée en deux lignes laissant apparaitre une bande centrale de la couleur du corps. Les antennes sont mauves, surtout le dernier article. La forme principalis est entièrement violette.Le mâle est plus petit que la femelle et a les antennes modifiées.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/sminthurididae/sminthurides-malmgreni/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/02/sminthurides-malmgreni-1.jpg?resize=1200%2C801&ssl=1"
+				},
+				{
+					"key": "65",
+					"label": "Sminthurides penicillifer",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "66",
@@ -350,6 +497,20 @@
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/02/sminthurinus-niger-1.jpg?resize=1200%2C799&ssl=1"
 				},
 				{
+					"key": "69",
+					"label": "Sminthurinus niger",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "70",
+					"label": "Sminthurinus trinotatus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
 					"key": "71",
 					"label": "Sminthurus viridis",
 					"description": "Sminthurus viridis a un corps arrondi avec de longues soies sur toute sa surface. Le 4ème segment antennaire est plus long que le 3ème. Elle est de couleur verte à jaune avec parfois des taches d’intensités différentes. La ssp cinereoviridis est beige à taches brun plus sombre, avec une ligne médiane sombre sur l’abdomen.",
@@ -362,6 +523,34 @@
 					"description": "• corps allongé, recouvert d’écailles\r\n• coloration gris argenté uniforme\r\n• antennes de 4 articles, longues mais plus courtes que le corps\r\n• le 3ème article antennaire beaucoup plus long que les autres et sans écailles (mais avec de fines soies), de couleur rose ou grise\r\n• collier de soies à la base du thorax\r\n• yeux composés de 6 ocelles\r\n• les 4 ocelles antérieurs forment un carré, la distance entre les ocelles A-C et B-D est à peu près égale",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/tomoceridae/tomocerus-minor/",
 					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2023/11/Tomocerus-minor.jpg?resize=1024%2C594&ssl=1"
+				},
+				{
+					"key": "73",
+					"label": "Tomocerus vulgaris",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "74",
+					"label": "Vertagopus asiaticus",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "75",
+					"label": "Vitronura giselae",
+					"description": "",
+					"learnMore": null,
+					"image": ""
+				},
+				{
+					"key": "76",
+					"label": "Willowsia buski",
+					"description": "",
+					"learnMore": null,
+					"image": ""
 				},
 				{
 					"key": "77",
