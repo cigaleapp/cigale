@@ -26,6 +26,13 @@ function markdownToHtml(markdown) {
 	return marked.parse(markdown);
 }
 
+/** @type {Array<{ name: string; url: string; found: Array<{ name: string; url: string }> }>}  */
+const reportTable = [];
+
+function renderReportTable() {
+	return `Recherche effectuée | Résultats\n-----------------|------------------\n${reportTable.map(({ name, url, found }) => `[${name}](${url}) | ${found.map(({ name, url }) => `[${name}](${url})`).join(', ')}`).join('\n')}`;
+}
+
 const classmapping = await fetch('https://cigaleapp.github.io/models/class_mapping.txt')
 	.then((r) => r.text())
 	.then((text) =>
@@ -130,11 +137,23 @@ for (const [name, index] of Object.entries(classmapping)) {
 		protocol.metadata[`${protocol.id}__species`].options.sort(
 			(a, b) => parseFloat(a.key) - parseFloat(b.key)
 		);
+		reportTable.push({
+			name,
+			url: searchurl,
+			found: linksFound.map((a) => ({ name: a.textContent, url: a.href }))
+		});
 		continue;
 	}
 	await fetch(speciesPageUrl)
 		.then((r) => r.text())
 		.then((content) => parseAndAddToProtocol(content, speciesPageUrl, name, index));
+}
+
+if (reportTable.length) {
+	await writeFile(path.join(here, 'jessica-joachim-crawler-report.md'), renderReportTable());
+	console.error(
+		`\n${cc.bold}${cc.blue}Report written to ${here}/jessica-joachim-crawler-report.md${cc.reset}`
+	);
 }
 
 /**
