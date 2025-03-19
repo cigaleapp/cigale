@@ -1,0 +1,187 @@
+{
+	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
+	"id": "io.github.cigaleapp.transects.arthropods",
+	"name": "Transect d'arthropodes",
+	"source": "https://github.com/cigaleapp/cigale/tree/main/scripts/jessica-joachim-crawler.js",
+	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
+	"authors": [],
+	"metadata": {
+		"io.github.cigaleapp.transects.arthropods__species": {
+			"type": "enum",
+			"label": "Espèce",
+			"description": "",
+			"required": true,
+			"mergeMethod": "max",
+			"options": [
+				{
+					"key": "2",
+					"label": "Bilobella aurantiaca",
+					"description": "Bilobella aurantiaca est de couleur jaune citron, d’aspect boudiné avec de petites excroissances rondes sur les segments. Le 6ème segment abdominal est bilobé, le bout des antennes est blanc et les deux ocelles orangés.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neanuridae/bilobella-aurantiaca/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/bilobella-aurantiaca-1.jpg?resize=1200%2C801&ssl=1"
+				},
+				{
+					"key": "4",
+					"label": "Bourletiella arvalis",
+					"description": "Bourletiella arvalis est un collembole au corps rond et de couleur jaune vif. Les poils de l’abdomen sont assez courts.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/bourletiella-arvalis/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/06/bourletiella-arvalis-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "5",
+					"label": "Bourletiella hortensis",
+					"description": "Bourletiella hortensis peut être de couleur jaune à orangé plus ou moins maculé de pâle (forme albomaculata), brunâtre plus ou moins foncé à violacé. Il possède une longue soie sur abd 5, les soies de l’abdomen sont assez courtes et denses.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/bourletiella-hortensis/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/03/bourletiella-hortensis.jpg?resize=1200%2C801&ssl=1"
+				},
+				{
+					"key": "7",
+					"label": "Caprainea marginata",
+					"description": "Caprainea marginata a un corps globuleux avec de longues soies droites et épaisses sur tout l’abdomen. Le 4ème segment antennaire est long. Elle peut-être de différentes couleurs selon les formes.\r\n•",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/sminthuridae/caprainea-marginata/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2023/12/Caprainea-marginata.jpg?resize=1200%2C454&ssl=1"
+				},
+				{
+					"key": "12",
+					"label": "Deuterosminthurus pallipes",
+					"description": "Deuterosminthurus pallipes est un collembole au corps assez allongé et qui a plusieurs formes de couleur. Une",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/deuterosminthurus-pallipes/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/03/deuterosminthurus-pallipes-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "19",
+					"label": "Entomobrya albocincta",
+					"description": "Entomobrya albocincta a une coloration typique qui permet de la reconnaitre au premier coup d’œil, chose rare chez les collemboles. Son corps est sombre, avec une bande claire thoracique, la première moitié du 4ème segment abdominal claire et l’apex de l’abdomen clair. Les antennes sont plus claires à la base.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-albocincta/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/01/entomobrya-albocincta-1.jpg?resize=700%2C467&ssl=1"
+				},
+				{
+					"key": "24",
+					"label": "Entomobrya muscorum",
+					"description": "Entomobrya muscorum a de longues antennes et le 4ème segment abdominal plus grand que le 3ème. Son corps est densément velu, ses yeux traversés par une ligne sombre. Elle possède sur le dos deux lignes longitudinales. Certains individus peuvent être plus sombres, notamment sur les premiers et le 4ème segment abdominal, avec une ceinture blanche sur le 3ème segment.La forme classique a une grosse taches centrale sombre sur le dernier segment abdominal.La forme postbimaculata possède deux taches sombres latérales sur le dernier segment abdominal.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-muscorum/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/02/entomobrya-muscorum-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "26",
+					"label": "Entomobrya nigrocincta",
+					"description": "Entomobrya nigrocincta présente un dimorphisme sexuel marqué.Le mâle a le corps clair avec le 2ème segment thoracique et le 1er abdominal sombres, le reste des segments sans ligne sombre. Les jeunes mâles n’ont pas la bande sombre thoracique et sont entièrement jaune orangés.La femelle est pâle avec de nettes bandes sombres à la marge postérieure des tergites, un bandeau facial sombre, une bande transversale sombre et dentée au centre du 4ème segment abdominal, l’apex du 5ème segment abdominal présente deux taches rondes latérales qui ne sont pas nettement reliées entre elles.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-nigrocincta/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/04/entomobrya-nigrocincta-1.jpg?resize=1200%2C1561&ssl=1"
+				},
+				{
+					"key": "29",
+					"label": "Fasciosminthurus quinquefasciatus",
+					"description": "Fasciosminthurus quinquefasciatus se reconnait facilement à sa couleur brune pus ou moins claire rayée de bandes blanches. Les flancs et le front présentes des taches blanches.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/fasciosminthurus-quinquefasciatus/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/05/fasciosminthurus-quinquefaciatus.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "32",
+					"label": "Heteromurus major",
+					"description": "Heteromurus major a le corps allongé de couleur grise. Le 4ème segment abdominal est relativement peu allongé par rapport aux Lepidocyrtus ou Entomobrya. Il a un aspect légèrement bossu. Les articles antennaires sont tous de même longueur.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/heteromurus-major/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/11/heteromurus-major-1.jpg?resize=700%2C466&ssl=1"
+				},
+				{
+					"key": "40",
+					"label": "Isotomurus palustris",
+					"description": "Isotomurus palustris est une espèce très variable et présente de nombreuses formes (bande centrale sur le dos plus ou moins fine, souvent assez courte, 2 bandes latérales, toutes 3 pouvant être coupées en pointillés et très peu visibles, avec ou sans une couronne sur abd 4…). Son corps est allongée, ses articles antennaires sont plus ou moins tous de même longueur, son 4ème segment abdominal est plus ou moins de même longueur que le 3ème, il possède des macrosètes (grandes soies effilées à l’apex et courbées) uniquement sur les segments abdominaux 4 à 6 et des trichobothries (soies cylindriques très fines).",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomidae/isotomurus-palustris/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/isotomurus-palustris-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "42",
+					"label": "Kalaphorura burmeisteri",
+					"description": "Kalaphorura burmeisteri a les antennes plus courtes que la tête, le 1er segment thoracique est présent, les pattes sont petites, elle n’a pas d’yeux ni de pigmentation sur le corps. Le corps est plus large au milieu, le premier segment antennaire est élargi, elle possède deux épines anales.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/onychiuridae/kalaphorura-burmeisteri/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/01/kalaphorura-burmeisteri-1.jpg?resize=700%2C467&ssl=1"
+				},
+				{
+					"key": "43",
+					"label": "Lepidocyrtus curvicollis",
+					"description": "Lepidocyrtus curvicollis est un collembole allongé au corps recouvert d’écailles grises. Les articles antennaires sont tous de même longueur, et le 4ème segment abdominal est allongé. Le thorax en vue de profil forme un angle de 90°., son extrémité en vue de dessus est arrondie. Ses pattes sont généralement grises.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/lepidocyrtus-curvicollis/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/11/lepidocyrtus-curvicollis-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "44",
+					"label": "Lepidocyrtus cyaneus",
+					"description": "Lepidocyrtus cyaneus se reconnait à son corps en forme de cône, avec des reflets violets sur les écailles. La base des antennes ne possède pas d’écailles, les pattes non plus. Il possède de grandes soies entre les yeux. Son corps est bleuté derrière les écailles.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/lepidocyrtus-cyaneus/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/lepidocyrtus-cyaneus.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "46",
+					"label": "Lepidocyrtus lignorum",
+					"description": "• corps cylindrique\r\n• corps recouvert d’écailles argentées à quelques reflets violets et bleus\r\n• 4ème segment abdominal allongé\r\n• pas d’angle droit marqué sur le thorax au-dessus de la tête\r\n• présence de soies interantennaires\r\n• pas de soies interoculaires\r\n• présence d’écailles sur les deux premiers segments antennaires et les pattes (mais ces dernières peuvent être peu visibles ou disparaitre par frottement)\r\n• articles antennaires 3 et 4 sans écailles",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/lepidocyrtus-lignorum",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2023/10/Lepidocyrtus-lignorum.jpg?resize=1024%2C594&ssl=1"
+				},
+				{
+					"key": "49",
+					"label": "Monobella grassei",
+					"description": "Monobella grassei est un collembole au corps allongé et boudiné avec de longues soies. Il est de couleur jaune pâle à orangé avec de petits tubercules discrets à l’apex des segments. Le 6ème segment abdominal est bilobé et caché sous le 5ème. Il possède deux petits ocelles noirs bien séparés, l’apex de ses antennes est blanchâtre.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neanuridae/monobella-grassei/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/02/monobella-grassei-1.jpg?resize=1200%2C799&ssl=1"
+				},
+				{
+					"key": "50",
+					"label": "Neanura muscorum",
+					"description": "Neanura muscorum a un corps allongé et boudiné de couleur bleu-mauve. Ses antennes sont petites et le 1er segment thoracique est présent. Le 6ème segment abdominal possède deux lobes terminaux et il est placé à la suite du 5ème segment, qui lui porte 4 lobes terminaux. La disposition ocellaire est de 2+1 ocelle. Les pièces buccales sont en forme de cône.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neanuridae/neanura-muscorum/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/neanura-muscorum.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "53",
+					"label": "Orchesella cincta",
+					"description": "Orchesella cincta a un corps allongé avec de grandes antennes. Le 2ème segment est subdivisé en deux parties. Le 1e segment antennaire est brun dans sa première moitié, blanc dans sa deuxième moitié. Les segments 3 et 4 sont bruns sans trop de contraste entre eux. Le 4ème segment de l’abdomen est plus long que le 3ème. Le 3ème segment abdominal est assombri et contraste avec l’apex clair du 2nd segment.Les mâles sont très sombres avec le second article antennaire entièrement noir.Les femelles sont brunes, le second article antennaire est sombre dans sa première subdivision, puis brun clair avec finalement l’apex sombre.Les adultes ont la tête noire.Les jeunes ont la tête claire.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/orchesella-cincta/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/10/orchesella-cincta-1.jpg?resize=700%2C466&ssl=1"
+				},
+				{
+					"key": "55",
+					"label": "Orchesella quinquefasciata",
+					"description": "Orchesella quinquefasciata est un grand collembole au corps recouvert de longues soies dressées, denses surtout sur le thorax. Son deuxième segment antennaire est subdivisé, comme chez toutes les espèces du genre. Il possède 5 lignes longitudinales sur le dessus du corps et un bandeau sombre entre les yeux. Le dessin du 4ème segment abdominal est variable, généralement bien présent.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/orchesella-quinquefasciata/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2020/01/orchesella-quinquefasciata-1.jpg?resize=1200%2C800&ssl=1"
+				},
+				{
+					"key": "56",
+					"label": "Orchesella villosa",
+					"description": "Orchesella villosa a un corps allongé avec de grandes antennes. Le 4ème segment de l’abdomen est plus long que le 3ème. Il peut être de couleur jaunâtre à brunâtre, avec une forte pilosité. le thorax possède 3 bandes longitudinales : une au centre et deux sur les côtés pratiquement à la marge. Il peut y avoir une bande supplémentaires entre la bande centrale et celle de la marge (5 bandes donc) mais cette dernière n’atteint pas la marge postérieure du segment. L’abdomen possède diverses marques sombres, avec des bandes en « U » partant de la base des segments. les antennes sont fortement marquées de bandes sombre/clair contrastant, en particulier sur les premiers segments. Les eux sont reliés entre eux par un bandeau sombre.Les jeunes sont moins contrastés.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/orchesella-villosa/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/02/orchesella-villosa-2-1.jpg?resize=700%2C467&ssl=1"
+				},
+				{
+					"key": "57",
+					"label": "Parisotoma notabilis",
+					"description": "Parisotoma notabilis a un corps allongé et velu, de couleur gris pâle. Ses antennes sont courtes et composées de 4 articles. Il possède un petit carré de 4 ocelles en avant de la tête.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomidae/parisotoma-notabilis/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2021/01/parisotoma-notabilis.jpg?resize=1200%2C799&ssl=1"
+				},
+				{
+					"key": "60",
+					"label": "Pogonognathellus longicornis",
+					"description": "Pogonognathellus longicornis a un corps allongé et recouvert d’écailles grises. Ses antennes sont très longes, plus longues que le corps. Le 3ème segment antennaire est plus long que les autres et effilé à son apex. Il enroule souvent l’extrémité de ses antennes.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/tomoceridae/pogonognathellus-longicornis/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/10/pogonognathellus-longicornis-1.jpg?resize=700%2C467&ssl=1"
+				},
+				{
+					"key": "72",
+					"label": "Tomocerus minor",
+					"description": "• corps allongé, recouvert d’écailles\r\n• coloration gris argenté uniforme\r\n• antennes de 4 articles, longues mais plus courtes que le corps\r\n• le 3ème article antennaire beaucoup plus long que les autres et sans écailles (mais avec de fines soies), de couleur rose ou grise\r\n• collier de soies à la base du thorax\r\n• yeux composés de 6 ocelles\r\n• les 4 ocelles antérieurs forment un carré, la distance entre les ocelles A-C et B-D est à peu près égale",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/tomoceridae/tomocerus-minor",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2023/11/Tomocerus-minor.jpg?resize=1024%2C594&ssl=1"
+				},
+				{
+					"key": "78",
+					"label": "Willowsia platani",
+					"description": "Willowsia platani a un pattern sombre rayé de pâle. Sa tête est pâle avec un bandeau noir entre les yeux. Le segment 2 du thorax est clair, le segment 3 sombre. Le segment abdominal 1 est clair, le 2 et le 3 sont plus ou moins sombre, il possède une bande claire à la base et à l’apex du 4. Il a une tache noire à l’apex du fémur 3.",
+					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/willowsia-platani/",
+					"image": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2019/10/willowsia-platani-1.jpg?resize=700%2C467&ssl=1"
+				}
+			]
+		}
+	}
+}
