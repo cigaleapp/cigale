@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate taxonomy
+      - name: Run crawler
         run: npx node scripts/jessica-joachim-crawler.js
 
       - name: Store scripts/jessica-joachim-crawler-report.md
@@ -37,6 +37,9 @@ jobs:
             echo 
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
+
+      - name: Format & lintfix
+        run: npm run format && npm run lintfix
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

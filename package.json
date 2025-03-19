@@ -14,6 +14,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "eslint .",
+		"lintfix": "eslint --fix .",
 		"commit": "gitmoji -c",
 		"postinstall": "merge-drivers install"
 	},
