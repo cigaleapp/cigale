@@ -1,4 +1,5 @@
 import { uiState } from '$lib/state.svelte';
+import { resize } from 'pica-gpu';
 import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
@@ -106,5 +107,42 @@ export async function storeImageBytes({ id, originalBytes, resizedBytes, content
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(image, URL.createObjectURL(preview));
 		tx.objectStore('Image').put({ ...image, bufferExists: true });
+	});
+}
+
+const MAXWIDTH = 1024;
+/**
+ * @param {object} param0
+ * @param {number} param0.width
+ * @param {number} param0.height
+ */
+const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
+
+/**
+ * Resize an image to fit within MAXWIDTH and MAXHEIGHT
+ * @param {object} param0
+ * @param {Blob} param0.source
+ * @returns {Promise<ArrayBuffer>}
+ */
+export async function resizeToMaxSize({ source }) {
+	const originalImage = await createImageBitmap(source);
+	const originalCanvas = document.createElement('canvas');
+	originalCanvas.width = originalImage.width;
+	originalCanvas.height = originalImage.height;
+	originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
+
+	const resizedCanvas = document.createElement('canvas');
+	resizedCanvas.width = MAXWIDTH;
+	resizedCanvas.height = MAXHEIGHT(originalImage);
+	resize(originalCanvas, resizedCanvas, {
+		targetWidth: MAXWIDTH,
+		targetHeight: MAXHEIGHT(originalImage),
+		filter: 'mks2013'
+	});
+	return new Promise((resolve) => {
+		resizedCanvas.toBlob((blob) => {
+			if (!blob) throw new Error('Failed to resize image');
+			resolve(blob.arrayBuffer());
+		}, source.type);
 	});
 }

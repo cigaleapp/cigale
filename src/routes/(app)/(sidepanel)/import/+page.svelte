@@ -12,6 +12,7 @@
 		imageId,
 		imageIdToFileId,
 		imageIsCropped,
+		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
 	import {
@@ -27,15 +28,6 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
-	import { resize } from 'pica-gpu';
-
-	const MAXWIDTH = 1024;
-	/**
-	 * @param {object} param0
-	 * @param {number} param0.width
-	 * @param {number} param0.height
-	 */
-	const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
 
 	const erroredImages = $derived(uiState.erroredImages);
 
@@ -67,26 +59,8 @@
 		});
 
 		const originalBytes = await file.arrayBuffer();
-		const originalImage = await createImageBitmap(file);
-		const originalCanvas = document.createElement('canvas');
-		originalCanvas.width = originalImage.width;
-		originalCanvas.height = originalImage.height;
-		originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
+		const resizedBytes = await resizeToMaxSize({ source: file });
 
-		const resizedCanvas = document.createElement('canvas');
-		resizedCanvas.width = MAXWIDTH;
-		resizedCanvas.height = MAXHEIGHT(originalImage);
-		resize(originalCanvas, resizedCanvas, {
-			targetWidth: MAXWIDTH,
-			targetHeight: MAXHEIGHT(originalImage),
-			filter: 'mks2013'
-		});
-		const resizedBytes = await new Promise((resolve) => {
-			resizedCanvas.toBlob((blob) => {
-				if (!blob) throw new Error('Failed to resize image');
-				resolve(blob.arrayBuffer());
-			}, file.type);
-		});
 		await storeImageBytes({ id, resizedBytes, originalBytes, contentType: file.type });
 		await processExifData(id, originalBytes, file);
 		await inferBoundingBox(id, resizedBytes, file);
