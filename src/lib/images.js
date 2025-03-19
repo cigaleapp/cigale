@@ -1,5 +1,4 @@
 import { uiState } from '$lib/state.svelte';
-import { resize } from 'pica-gpu';
 import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
@@ -125,6 +124,8 @@ const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width)
  * @returns {Promise<ArrayBuffer>}
  */
 export async function resizeToMaxSize({ source }) {
+	// For some reason top-level import fails
+	const { resize } = await import('pica-gpu');
 	const originalImage = await createImageBitmap(source);
 	const originalCanvas = document.createElement('canvas');
 	originalCanvas.width = originalImage.width;
