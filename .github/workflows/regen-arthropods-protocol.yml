@@ -34,6 +34,7 @@ jobs:
           {
             echo 'report<<EOF'
             cat scripts/jessica-joachim-crawler-report.md
+            echo 
             echo 'EOF'
           } >> "$GITHUB_OUTPUT"
 
