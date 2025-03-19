@@ -25,7 +25,7 @@
 	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
 	 * @property {() => void} onsplit callback to call when the user wants to split the selected observation(s)
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
-	 * @property {(key: string, value: import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
+	 * @property {(key: string, value: undefined | import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
 	 */
@@ -109,17 +109,10 @@
 						{definition}
 						{value}
 						onchange={async (v) => {
-							if (v === undefined) return;
 							if (deepEqual(v, value?.value)) return;
 							onmetadatachange(definition.id, v);
 						}}
-					>
-						{#if definition.label}
-							{definition.label}
-						{:else}
-							<code>{definition.id}</code>
-						{/if}
-					</Metadata>
+					></Metadata>
 				{/if}
 			{/each}
 		</MetadataList>

@@ -92,7 +92,7 @@ export async function setTaxonAndInferParents({
 	await openTransaction(['Image', 'Observation'], { tx }, async (tx) => {
 		// Base case: kingdom clade
 		if (clade === 'kingdom') {
-			return storeMetadataValue({
+			await storeMetadataValue({
 				tx,
 				subjectId,
 				metadataId: BUILTIN_METADATA_IDS.kingdom,
@@ -100,6 +100,7 @@ export async function setTaxonAndInferParents({
 				confidence,
 				alternatives
 			});
+			return
 		}
 
 		// Recursive case: store this clade, then infer parent
@@ -127,7 +128,7 @@ export async function setTaxonAndInferParents({
 			throw new Error(`${parentValueName} not found in taxonomy`);
 		}
 
-		return setTaxonAndInferParents({
+		await setTaxonAndInferParents({
 			tx,
 			subjectId,
 			clade: parentClade,

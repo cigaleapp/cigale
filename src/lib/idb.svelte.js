@@ -332,7 +332,8 @@ export async function openTransaction(tableNames, { mode, tx }, actions) {
 	if (tx) {
 		// @ts-ignore
 		console.log(`txn reuse ${tx.id}`);
-		return actions(tx);
+		await actions(tx);
+		return
 	}
 
 	const txid = nanoid(8);
