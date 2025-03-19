@@ -91,11 +91,7 @@
             "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
           },
           "required": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              }
-            ],
+            "type": "boolean",
             "description": "Si la métadonnée est obligatoire"
           },
           "type": {
