@@ -14,11 +14,9 @@
 	 */
 
 	/** @type {Props} */
-	let { value, conflicted, definition, onchange: _onchange = () => {} } = $props();
+	let { value, conflicted, definition, onchange = () => {} } = $props();
 
 	const _id = $props.id();
-
-	const onchange = $derived(debounce(_onchange, 500));
 </script>
 
 <div class="metadata">
@@ -27,11 +25,7 @@
 			{definition.label || definition.id}
 		</label>
 		<div class="value">
-			<MetadataInput
-				id={_id}
-				{definition}
-				bind:value={() => value?.value, (newValue) => onchange(newValue)}
-			/>
+			<MetadataInput id={_id} {definition} value={value?.value} onblur={onchange} />
 			{@render confidenceDisplay(value?.confidence)}
 			<button
 				class="clear"
@@ -79,7 +73,7 @@
 				<p>{definition.description}</p>
 			{/if}
 			{#if definition.learnMore}
-				<a href={definition.learnMore} target="_blank" rel="noopener">En savoir plus</a>
+				<a href={definition.learnMore} target="_blank">En savoir plus</a>
 			{/if}
 		</section>
 	{/if}

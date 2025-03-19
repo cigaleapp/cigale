@@ -13,8 +13,8 @@ dialog {
 	--fg-success: #006600;
 	--bg-neutral: #ffffff;
 	--fg-neutral: #000000;
-	--gray: rgb(from var(--fg-neutral) r g b / 0.35);
-	--gay: rgb(from var(--fg-neutral) r g b / 0.75);
+	--gray: color-mix(in srgb, var(--fg-neutral) 35%, var(--bg-neutral));
+	--gay: color-mix(in srgb, var(--fg-neutral) 75%, var(--bg-neutral));
 
 	--dark__fg-primary: #30b9b3;
 	--dark__bg-primary-translucent: rgb(from var(--bg-primary) r g b / 0.35);
@@ -29,8 +29,8 @@ dialog {
 	--dark__bg-success: #006600;
 	--dark__fg-neutral: #ffffff;
 	--dark__bg-neutral: #000000;
-	--dark__gray: rgb(from var(--fg-neutral) r g b / 0.35);
-	--dark__gay: rgb(from var(--fg-neutral) r g b / 0.75);
+	--dark__gray: color-mix(in srgb, var(--fg-neutral) 35%, var(--bg-neutral));
+	--dark__gay: color-mix(in srgb, var(--fg-neutral) 75%, var(--bg-neutral));
 
 	--corner-radius: 7px;
 	--border-thickness: 1px;

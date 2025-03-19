@@ -2,7 +2,11 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImage } from '$lib/images';
-	import { combineMetadataValuesWithOverrides, storeMetadataValue } from '$lib/metadata';
+	import {
+		combineMetadataValuesWithOverrides,
+		deleteMetadataValue,
+		storeMetadataValue
+	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import { CLADE_METADATA_IDS, setTaxonAndInferParents } from '$lib/taxonomy';
@@ -120,9 +124,12 @@
 			ondelete={deleteSelection}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
+				console.log({ onmetadatachange: { id, value } });
 				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
 					for (const subjectId of uiState.selection) {
-						if (CLADE_METADATA_IDS.includes(id)) {
+						if (value === undefined) {
+							await deleteMetadataValue({ tx, subjectId, metadataId: id, recursive: true });
+						} else if (CLADE_METADATA_IDS.includes(id)) {
 							await setTaxonAndInferParents({
 								tx,
 								subjectId,

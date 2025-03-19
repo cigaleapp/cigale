@@ -1,6 +1,7 @@
 import { type } from 'arktype';
 import { Schemas } from './database.js';
 import { _tablesState, tables } from './idb.svelte.js';
+import { format } from 'date-fns';
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
  */
@@ -30,14 +31,17 @@ export async function storeMetadataValue({
 	confidence ??= 1;
 
 	const newValue = {
-		value: JSON.stringify(value),
+		value: JSON.stringify(value instanceof Date ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value),
 		confidence,
 		alternatives: Object.fromEntries(
 			alternatives.map((alternative) => [JSON.stringify(alternative.value), alternative.confidence])
 		)
 	};
 
-	console.log(`Store metadata ${metadataId} in ${subjectId}`, newValue);
+	console.log(
+		`Store metadata ${metadataId} in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
+		newValue
+	);
 
 	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
@@ -81,9 +85,10 @@ export async function storeMetadataValue({
  * @param {object} options
  * @param {string} options.subjectId id de l'image ou l'observation
  * @param {string} options.metadataId id de la métadonnée
+ * @param {boolean} [options.recursive=false] si true, supprime la métadonnée de toutes les images composant l'observation
  * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  */
-export async function deleteMetadataValue({ subjectId, metadataId, tx }) {
+export async function deleteMetadataValue({ subjectId, metadataId, recursive = false, tx }) {
 	const image = tx
 		? await tx.objectStore('Image').get(subjectId)
 		: await tables.Image.raw.get(subjectId);
@@ -108,6 +113,11 @@ export async function deleteMetadataValue({ subjectId, metadataId, tx }) {
 		delete _tablesState.Observation[
 			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
 		].metadataOverrides[metadataId];
+		if (recursive) {
+			for (const imageId of observation.images) {
+				await deleteMetadataValue({ subjectId: imageId, recursive: false, metadataId, tx });
+			}
+		}
 	}
 
 	return;
