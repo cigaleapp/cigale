@@ -29,3 +29,5 @@ public
 
 # JSON Schemas are generated from ArkType schemas to ensure that they are always in sync
 static/*.schema.json
+
+scripts/jessica-joachim.com/
