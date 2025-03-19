@@ -83,6 +83,7 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 		if (previewURL) {
 			URL.revokeObjectURL(previewURL);
 			uiState.previewURLs.delete(imageIdToFileId(id));
+			uiState.croppedPreviewURLs.delete(imageIdToFileId(id));
 		}
 	});
 }

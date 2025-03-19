@@ -30,6 +30,9 @@
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
 		toAreaObservationProps(tables.Image.state, tables.Observation.state, {
+			previewURL: (image) =>
+				uiState.getPreviewURL(image, 'cropped') ?? uiState.getPreviewURL(image, 'full'),
+			showBoundingBoxes: (image) => !uiState.hasPreviewURL(image, 'cropped'),
 			isLoaded: (image) =>
 				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsCLassified(image)
 		})
@@ -71,6 +74,9 @@
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
 		const nimg = await applyBBOnTensor(bbList, img);
+		// TODO persist after page reload?
+		uiState.croppedPreviewURLs.set(imageIdToFileId(id), nimg.toDataURL());
+
 		const output_classif = await classify([[nimg]], classifmodel, uiState, 0);
 		const species = output_classif[0];
 		const confs = output_classif[1];
