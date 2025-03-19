@@ -24,7 +24,6 @@
 					"key": "1",
 					"label": "Anurida maritima",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -38,7 +37,6 @@
 					"key": "3",
 					"label": "Bilobella braunerae",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -94,7 +92,6 @@
 					"key": "11",
 					"label": "Deuterosminthurus bicinctus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -157,14 +154,12 @@
 					"key": "20",
 					"label": "Entomobrya atrocincta",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "21",
 					"label": "Entomobrya corticalis",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -206,14 +201,12 @@
 					"key": "27",
 					"label": "Entomobrya nivalis",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "28",
 					"label": "Entomobrya superba",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -227,14 +220,12 @@
 					"key": "30",
 					"label": "Folsomia candida",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "31",
 					"label": "Folsomia quadrioculata",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -248,7 +239,6 @@
 					"key": "33",
 					"label": "Heteromurus nitidus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -276,14 +266,12 @@
 					"key": "37",
 					"label": "Isotomiella minor",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "38",
 					"label": "Isotomurus gallicus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -304,7 +292,6 @@
 					"key": "41",
 					"label": "Isotomurus unifasciatus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -332,7 +319,6 @@
 					"key": "45",
 					"label": "Lepidocyrtus fimetarius",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -346,14 +332,12 @@
 					"key": "47",
 					"label": "Lepidocyrtus paradoxus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "48",
 					"label": "Megalothorax minimus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -381,7 +365,6 @@
 					"key": "52",
 					"label": "Orchesella bifasciata",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -430,7 +413,6 @@
 					"key": "59",
 					"label": "Pogonognathellus flavescens",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -444,14 +426,12 @@
 					"key": "61",
 					"label": "Seira ferrarii",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "62",
 					"label": "Seira musarum",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -472,7 +452,6 @@
 					"key": "65",
 					"label": "Sminthurides penicillifer",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -500,14 +479,12 @@
 					"key": "69",
 					"label": "Sminthurinus niger",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "70",
 					"label": "Sminthurinus trinotatus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
@@ -528,28 +505,24 @@
 					"key": "73",
 					"label": "Tomocerus vulgaris",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "74",
 					"label": "Vertagopus asiaticus",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "75",
 					"label": "Vitronura giselae",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
 					"key": "76",
 					"label": "Willowsia buski",
 					"description": "",
-					"learnMore": null,
 					"image": ""
 				},
 				{
