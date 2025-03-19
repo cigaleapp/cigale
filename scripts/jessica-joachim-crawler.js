@@ -130,7 +130,6 @@ for (const [name, index] of Object.entries(classmapping)) {
 				key: index.toString(),
 				label: name,
 				description: '',
-				learnMore: null,
 				image: ''
 			})
 		);
