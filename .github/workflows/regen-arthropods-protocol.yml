@@ -1,4 +1,4 @@
-name: Regenerate taxonomy.json
+name: Regenerate Arthropods protocol
 
 on:
   schedule:
