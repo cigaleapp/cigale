@@ -89,50 +89,37 @@ export async function setTaxonAndInferParents({
 
 	await ensureTaxonomyInitialized();
 	console.log(`Setting taxon on ${subjectId}: ${clade} = ${value}`);
-	await openTransaction(['Image', 'Observation'], { tx }, async (tx) => {
-		// Base case: kingdom clade
-		if (clade === 'kingdom') {
-			await storeMetadataValue({
-				tx,
-				subjectId,
-				metadataId: BUILTIN_METADATA_IDS.kingdom,
-				value,
-				confidence,
-				alternatives
-			});
-			return;
-		}
+	await storeMetadataValue({
+		subjectId,
+		metadataId: clade,
+		value,
+		confidence,
+		alternatives
+	});
 
-		// Recursive case: store this clade, then infer parent
-		await storeMetadataValue({
-			tx,
-			subjectId,
-			metadataId: clade,
-			value,
-			confidence,
-			alternatives
-		});
+	// Base case: kingdom clade
+	if (clade === 'kingdom') return;
 
-		const parentClade = CLADE_METADATA_IDS[CLADE_METADATA_IDS.indexOf(clade) - 1];
-		const valueName = await labelOfEnumKey(clade, value);
-		if (!valueName) {
-			throw new Error(`No ${clade} with key ${value} in taxonomy`);
-		}
-		const parentValueName = _taxonomy[CLADE_METADATA_IDS_PLURAL[clade]][valueName];
-		if (!parentValueName) {
-			throw new Error(`${valueName} has no ${parentClade} in taxonomy`);
-		}
+	// Recursive case: infer parent
+	const parentClade = CLADE_METADATA_IDS[CLADE_METADATA_IDS.indexOf(clade) - 1];
+	const valueName = await labelOfEnumKey(clade, value);
+	if (!valueName) {
+		throw new Error(`No ${clade} with key ${value} in taxonomy`);
+	}
+	const parentValueName = _taxonomy[CLADE_METADATA_IDS_PLURAL[clade]][valueName];
+	if (!parentValueName) {
+		throw new Error(`${valueName} has no ${parentClade} in taxonomy`);
+	}
 
-		const parentKey = await keyOfEnumLabel(parentClade, parentValueName);
-		if (!parentKey) {
-			throw new Error(`${parentValueName} not found in taxonomy`);
-		}
+	const parentKey = await keyOfEnumLabel(parentClade, parentValueName);
+	if (!parentKey) {
+		throw new Error(`${parentValueName} not found in taxonomy`);
+	}
 
-		await setTaxonAndInferParents({
-			subjectId,
-			clade: parentClade,
-			value: parentKey
-		});
+	await setTaxonAndInferParents({
+		subjectId,
+		clade: parentClade,
+		value: parentKey
 	});
 }
 

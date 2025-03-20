@@ -325,16 +325,17 @@ export async function* iterator(tableName, index = undefined) {
  * @param {IDBTransactionWithAtLeast<Tables, Mode>} [param1.tx] already existing transaction to use instead of creating a new one. In that case, the transaction is not committed and the reactive tables' state is not refreshed, since it's assumed that a openTransactions() call higher up in the call stack will already do this
  * @param {(tx: IDBTransactionWithAtLeast<Tables, Mode>) => void | Promise<void>} actions
  */
-export async function openTransaction(tableNames, { mode, tx }, actions) {
+export async function openTransaction(tableNames, { mode }, actions) {
 	// @ts-ignore
 	mode ??= 'readwrite';
 
-	if (tx) {
-		// @ts-ignore
-		console.log(`txn reuse ${tx.id}`);
-		await actions(tx);
-		return
-	}
+	// IndexedDB transactions are auto-comitted, so we can't reuse them reliably. will maybe find a fix for this.
+	// if (tx) {
+	// 	// @ts-ignore
+	// 	console.log(`txn reuse ${tx.id}`);
+	// 	await actions(tx);
+	// 	return
+	// }
 
 	const txid = nanoid(8);
 
