@@ -27,7 +27,7 @@
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
 	 * @property {(key: string, value: undefined | import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
-	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
+	 * @property {Record<string, import('$lib/database').MetadataValue & { merged: boolean } >} metadata values of the metadata we're viewing.
 	 */
 
 	/** @type {Props} */
@@ -99,13 +99,8 @@
 			{#each definitions as definition (definition.id)}
 				{@const value = metadata[definition.id]}
 				{#if definition.label || showTechnicalMetadata}
-					<!-- 
-						There's to ways to have a undefined value:
-						- either the metadata does not exist on the observation/image yet (in that case, definition.id is not in metadata); or
-						- we have multiple multiple differing values for the images (and no override ) 
-					-->
 					<Metadata
-						conflicted={value === undefined && definition.id in metadata && images.length > 1}
+						merged={value?.merged}
 						{definition}
 						{value}
 						onchange={async (v) => {

@@ -1,8 +1,8 @@
 <script>
 	import { Combobox, mergeProps } from 'bits-ui';
 	import IconArrowRight from '~icons/ph/arrow-right';
-	import Logo from './Logo.svelte';
 	import IconCheck from '~icons/ph/check';
+	import Logo from './Logo.svelte';
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 */
@@ -17,13 +17,12 @@
 	 */
 
 	/**
-	 * @type {Props & Omit<Combobox.RootProps, 'type' | 'value'> & {value: string|undefined}}
+	 * @type {Props & Combobox.RootProps}
 	 */
 	let {
 		options,
 		value = $bindable(),
 		open = $bindable(false),
-		id,
 		inputProps,
 		contentProps,
 		...restProps
@@ -32,6 +31,8 @@
 	let searchValue = $state('');
 
 	const hasImages = $derived(options.some((opt) => opt.image));
+
+	const label = $derived(options.find((opt) => opt.key === value)?.label ?? '');
 
 	/** @type {Item[]} */
 	const items = $derived(options.map((opt) => ({ value: opt.key, label: opt.label })));
@@ -55,21 +56,28 @@
 		if (!newOpen) searchValue = '';
 	}
 
-	/** @type {Omit<import('bits-ui').Combobox.RootProps, 'type'>} */
 	const mergedRootProps = $derived(mergeProps(restProps, { onOpenChange: handleOpenChange }));
 	const mergedInputProps = $derived(
-		mergeProps(inputProps, { oninput: handleInput, onfocus: () => (open = true) })
+		mergeProps(inputProps, {
+			oninput: handleInput,
+			onfocus: () => (open = true),
+			defaultValue: label
+		})
 	);
 
 	/** @type {undefined | import('./database').MetadataEnumVariant} */
 	let highlightedOption = $state();
 </script>
 
-<Combobox.Root bind:value bind:open {...mergedRootProps} type="single">
+<Combobox.Root {value} bind:open {...mergedRootProps} {items}>
 	<!-- <div class="search-icon" class:shown={open}>
 		<IconSearch />
 	</div> -->
-	<Combobox.Input {...mergedInputProps} />
+	<Combobox.Input {...mergedInputProps}>
+		{#snippet child({ props: { value, ...props } })}
+			<input {...props} value={open ? value : value || label} />
+		{/snippet}
+	</Combobox.Input>
 	<!-- <Combobox.Trigger>Open</Combobox.Trigger> -->
 	<Combobox.Portal>
 		<Combobox.Content

@@ -1,19 +1,22 @@
 <script>
 	import IconCheck from '~icons/ph/check';
 	import IconClear from '~icons/ph/x';
+	import IconMerged from '~icons/ph/stack';
+	import IconTechnical from '~icons/ph/wrench';
 	import MetadataInput from './MetadataInput.svelte';
 	import { tooltip } from './tooltips';
+	import { getSettings } from './settings.svelte';
 
 	/**
 	 * @typedef {object} Props
 	 * @property {import('./database').Metadata} definition
 	 * @property {undefined | import('./database').MetadataValue} value
-	 * @property {boolean} [conflicted] the value is in conflict (selection has multiple differing values)
+	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
 	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onchange]
 	 */
 
 	/** @type {Props} */
-	let { value, conflicted, definition, onchange = () => {} } = $props();
+	let { value, merged, definition, onchange = () => {} } = $props();
 
 	const _id = $props.id();
 </script>
@@ -21,11 +24,28 @@
 <div class="metadata">
 	<section class="first-line">
 		<label for={_id}>
-			{definition.label || definition.id}
+			{#if definition.label}
+				{definition.label}
+			{:else}
+				<div class="technical-indicator" use:tooltip={'Métadonnée technique'}>
+					<IconTechnical />
+				</div>
+				<code>
+					{definition.id}
+				</code>
+			{/if}
 		</label>
 		<div class="value">
-			<MetadataInput id={_id} {definition} value={value?.value} onblur={onchange} {conflicted} />
+			<MetadataInput id={_id} {definition} value={value?.value} onblur={onchange} {merged} />
 			{@render confidenceDisplay(value?.confidence)}
+			{#if merged}
+				<div
+					class="merged-indicator"
+					use:tooltip={'Valeur issue de la fusion de plusieurs valeurs différentes. Modifier cette valeur pour modifier toutes les valeurs de la sélection'}
+				>
+					<IconMerged />
+				</div>
+			{/if}
 			<button
 				class="clear"
 				use:tooltip={'Supprimer cette valeur'}
@@ -75,6 +95,9 @@
 				<a href={definition.learnMore} target="_blank">En savoir plus</a>
 			{/if}
 		</section>
+	{/if}
+	{#if getSettings().showTechnicalMetadata}
+		<pre>{JSON.stringify({ value }, null, 2)}</pre>
 	{/if}
 </div>
 
@@ -131,5 +154,15 @@
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.merged-indicator {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--fg-primary);
 	}
 </style>
