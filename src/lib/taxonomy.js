@@ -100,7 +100,7 @@ export async function setTaxonAndInferParents({
 				confidence,
 				alternatives
 			});
-			return
+			return;
 		}
 
 		// Recursive case: store this clade, then infer parent
@@ -129,7 +129,6 @@ export async function setTaxonAndInferParents({
 		}
 
 		await setTaxonAndInferParents({
-			tx,
 			subjectId,
 			clade: parentClade,
 			value: parentKey

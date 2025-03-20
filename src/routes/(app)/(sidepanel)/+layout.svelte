@@ -2,11 +2,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImage } from '$lib/images';
-	import {
-		combineMetadataValuesWithOverrides,
-		deleteMetadataValue,
-		storeMetadataValue
-	} from '$lib/metadata';
+	import { deleteMetadataValue, mergeMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import { CLADE_METADATA_IDS, setTaxonAndInferParents } from '$lib/taxonomy';
@@ -109,6 +105,20 @@
 	const selectedHrefs = $derived(
 		selectedImages.map((image) => uiState.getPreviewURL(image)).filter((url) => url !== undefined)
 	);
+
+	/** @type {Awaited<ReturnType<typeof mergeMetadataValues>>} */
+	let mergedMetadataValues = $state({});
+
+	$effect(() => {
+		void mergeMetadataValues(
+			[
+				...selectedImages.map((image) => image.metadata),
+				...selectedObservations.map((obs) => obs.metadataOverrides)
+			].filter((x) => Object.keys(x).length)
+		).then((values) => {
+			mergedMetadataValues = values;
+		});
+	});
 </script>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
@@ -116,7 +126,7 @@
 	{#if showSidePanel}
 		<PreviewSidePanel
 			images={selectedHrefs}
-			metadata={combineMetadataValuesWithOverrides(selectedImages, selectedObservations)}
+			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}
 			onmerge={mergeSelection}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
@@ -166,13 +176,6 @@
 
 	.main-and-sidepanel:not(.has-sidepanel) main {
 		width: 100%;
-	}
-
-	.sidepanel-drag-handle {
-		width: 10px;
-		height: 100%;
-		background: var(--gray);
-		cursor: ew-resize;
 	}
 
 	main {

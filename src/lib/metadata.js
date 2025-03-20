@@ -195,10 +195,14 @@ export async function keyOfEnumLabel(metadataId, label) {
 /**
  *
  * @param {Array<import('./database').MetadataValues>} values
- * @returns {Promise<import("./database").MetadataValues>}
+ * @returns {Promise<Record<string, import('./database').MetadataValue & { merged: boolean }>>}
  */
 export async function mergeMetadataValues(values) {
-	/** @type {import("./database").MetadataValues}  */
+	if (values.length === 1) {
+		return Object.fromEntries(Object.entries(values[0]).map((v) => ({ ...v, merged: false })));
+	}
+
+	/** @type {Record<string, import('./database').MetadataValue & { merged: boolean }>}  */
 	const output = {};
 
 	const keys = new Set(values.flatMap((singleSubjectValues) => Object.keys(singleSubjectValues)));
@@ -210,16 +214,19 @@ export async function mergeMetadataValues(values) {
 			continue;
 		}
 
-		const merged = mergeMetadata(
-			definition,
-			values.flatMap((singleSubjectValues) =>
-				Object.entries(singleSubjectValues)
-					.filter(([k]) => k === key)
-					.map(([, v]) => v)
-			)
+		const valuesOfKey = values.flatMap((singleSubjectValues) =>
+			Object.entries(singleSubjectValues)
+				.filter(([k]) => k === key)
+				.map(([, v]) => v)
 		);
 
-		if (merged !== null) output[key] = merged;
+		const merged = mergeMetadata(definition, valuesOfKey);
+
+		if (merged !== null && merged !== undefined)
+			output[key] = {
+				...merged,
+				merged: [...new Set(valuesOfKey.map((v) => JSON.stringify(v.value)))].length > 1
+			};
 	}
 
 	return output;
