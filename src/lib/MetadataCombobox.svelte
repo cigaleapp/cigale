@@ -1,6 +1,8 @@
 <script>
 	import { Combobox, mergeProps } from 'bits-ui';
-	import IconSearch from '~icons/ph/magnifying-glass';
+	import IconArrowRight from '~icons/ph/arrow-right';
+	import Logo from './Logo.svelte';
+	import IconCheck from '~icons/ph/check';
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 */
@@ -15,7 +17,7 @@
 	 */
 
 	/**
-	 * @type {Props & Combobox.RootProps}
+	 * @type {Props & Omit<Combobox.RootProps, 'type' | 'value'> & {value: string|undefined}}
 	 */
 	let {
 		options,
@@ -28,6 +30,8 @@
 	} = $props();
 
 	let searchValue = $state('');
+
+	const hasImages = $derived(options.some((opt) => opt.image));
 
 	/** @type {Item[]} */
 	const items = $derived(options.map((opt) => ({ value: opt.key, label: opt.label })));
@@ -51,27 +55,45 @@
 		if (!newOpen) searchValue = '';
 	}
 
+	/** @type {Omit<import('bits-ui').Combobox.RootProps, 'type'>} */
 	const mergedRootProps = $derived(mergeProps(restProps, { onOpenChange: handleOpenChange }));
 	const mergedInputProps = $derived(
 		mergeProps(inputProps, { oninput: handleInput, onfocus: () => (open = true) })
 	);
+
+	/** @type {undefined | import('./database').MetadataEnumVariant} */
+	let highlightedOption = $state();
 </script>
 
-<Combobox.Root bind:value bind:open {...mergedRootProps}>
+<Combobox.Root bind:value bind:open {...mergedRootProps} type="single">
 	<!-- <div class="search-icon" class:shown={open}>
 		<IconSearch />
 	</div> -->
 	<Combobox.Input {...mergedInputProps} />
 	<!-- <Combobox.Trigger>Open</Combobox.Trigger> -->
 	<Combobox.Portal>
-		<Combobox.Content {...contentProps} sideOffset={8}>
+		<Combobox.Content
+			{...contentProps}
+			sideOffset={8}
+			data-wide-docs={hasImages ? true : undefined}
+		>
 			<div class="viewport">
 				<div class="items">
 					{#each filteredItems as item, i (i + item.value)}
-						<Combobox.Item value={item.value} label={item.label}>
+						<Combobox.Item
+							value={item.value}
+							label={item.label}
+							onHighlight={() => {
+								highlightedOption = options.find((opt) => opt.key === item.value);
+							}}
+						>
 							{#snippet children({ selected })}
-								{item.label}
-								{selected ? '✅' : ''}
+								<div class="item" class:selected>
+									<div class="check">
+										<IconCheck />
+									</div>
+									<span class="label">{item.label}</span>
+								</div>
 							{/snippet}
 						</Combobox.Item>
 					{:else}
@@ -79,7 +101,32 @@
 					{/each}
 				</div>
 				<div class="docs">
-					<img src="/fuck.webp" alt="fuck you" class="thumb" />
+					{#if highlightedOption?.image}
+						<img src={highlightedOption.image} alt="" class="thumb" />
+					{:else if highlightedOption?.description || highlightedOption?.learnMore}
+						<h2>{highlightedOption.label}</h2>
+					{/if}
+					{#if highlightedOption?.description}
+						<section class="description">
+							{#each highlightedOption.description.split(/\r?\n/) as line, i (i)}
+								<p>{line}</p>
+							{/each}
+						</section>
+					{/if}
+					{#if highlightedOption?.learnMore}
+						<a href={highlightedOption.learnMore} target="_blank" class="learn-more">
+							<IconArrowRight />
+							<div class="text">
+								<span>En savoir plus</span>
+								<code class="domain">{new URL(highlightedOption.learnMore).hostname}</code>
+							</div>
+						</a>
+					{/if}
+					{#if !highlightedOption?.description && !highlightedOption?.learnMore && !highlightedOption?.image}
+						<section class="empty">
+							<Logo variant="empty" />
+						</section>
+					{/if}
 				</div>
 			</div>
 		</Combobox.Content>
@@ -94,15 +141,29 @@
 	:global([data-combobox-content]) {
 		width: 600px;
 		height: 500px;
-		padding: 1em;
-		border-radius: var(--corner-radius);
-		background-color: var(--gray);
+		border-radius: calc(2 * var(--corner-radius));
+		background-color: var(--bg2-neutral);
+		--viewport-padding: 1em;
+		padding: var(--viewport-padding);
+	}
+
+	:global([data-combobox-content][data-wide-docs]) {
+		width: 800px;
+	}
+
+	:global([data-wide-docs] .items) {
+		width: 40%;
+	}
+
+	:global([data-wide-docs] .docs) {
+		width: 60%;
 	}
 
 	.viewport {
 		display: flex;
 		flex-direction: row;
 		overflow: hidden;
+		gap: 1em;
 	}
 
 	:global(input) {
@@ -115,39 +176,83 @@
 	.items,
 	.docs {
 		width: 50%;
+		overflow-y: scroll;
 	}
 
 	.items {
-		overflow-y: scroll;
 		display: flex;
 		flex-direction: column;
 	}
 
 	.items :global([data-combobox-item]) {
-		padding: 0.5em 0;
+		padding: 0.75em 0.5em;
 		cursor: pointer;
 	}
 	.items :global([data-combobox-item][data-highlighted]) {
 		background-color: var(--bg-primary);
 		color: var(--fg-primary);
+		border-radius: calc(2 * var(--corner-radius) - var(--viewport-padding) / 2);
+	}
+
+	.item {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.item.selected {
+		color: var(--fg-primary);
+		font-weight: bold;
+	}
+
+	.item .check {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.item:not(.selected) .check {
+		opacity: 0;
+		visibility: hidden;
 	}
 
 	.docs {
 		display: flex;
 		flex-direction: column;
+		gap: 1.5em;
+	}
+
+	.docs .empty {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+		--size: 6rem;
 	}
 
 	img {
 		width: 100%;
+		border-radius: calc(2 * var(--corner-radius) - var(--viewport-padding) / 2);
+		overflow: hidden;
 	}
 
-	.search-icon {
+	.docs .description p:not(:last-child) {
+		margin-bottom: 0.5em;
+	}
+
+	.learn-more {
 		display: flex;
-		justify-content: center;
 		align-items: center;
+		color: var(--fg-primary);
+		text-decoration: none;
+		gap: 1em;
 	}
-
-	.search-icon:not(.shown) {
-		display: none;
+	.learn-more .text {
+		display: flex;
+		flex-direction: column;
+	}
+	.learn-more .text .domain {
+		font-size: 0.8em;
+		color: var(--gay);
 	}
 </style>
