@@ -168,6 +168,13 @@
 		width: 100%;
 	}
 
+	.sidepanel-drag-handle {
+		width: 10px;
+		height: 100%;
+		background: var(--gray);
+		cursor: ew-resize;
+	}
+
 	main {
 		display: flex;
 		flex-direction: column;
