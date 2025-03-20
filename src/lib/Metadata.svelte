@@ -1,8 +1,7 @@
 <script>
-	import IconClear from '~icons/ph/x';
 	import IconCheck from '~icons/ph/check';
+	import IconClear from '~icons/ph/x';
 	import MetadataInput from './MetadataInput.svelte';
-	import debounce from 'debounce';
 	import { tooltip } from './tooltips';
 
 	/**
@@ -81,8 +80,17 @@
 
 {#snippet confidenceDisplay(/** @type {number|undefined} */ confidence)}
 	{#if confidence && confidence > 0 && confidence < 1}
-		<code class="confidence">
-			{Math.round(confidence * 100)}%
+		<code
+			class="confidence"
+			style:color="var(--fg-{confidence < 0.25
+				? 'error'
+				: confidence < 0.5
+					? 'warning'
+					: confidence < 0.95
+						? 'neutral'
+						: 'success'})"
+		>
+			{Math.round(confidence * 100).toString().padStart(3, '\u00a0')}%
 		</code>
 	{/if}
 {/snippet}
@@ -118,5 +126,8 @@
 		text-transform: uppercase;
 		color: var(--gay);
 		letter-spacing: 0.15em;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 </style>
