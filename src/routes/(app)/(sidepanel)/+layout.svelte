@@ -135,29 +135,25 @@
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
 				console.log({ onmetadatachange: { id, value } });
-				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
-					for (const subjectId of uiState.selection) {
-						if (value === undefined) {
-							await deleteMetadataValue({ tx, subjectId, metadataId: id, recursive: true });
-						} else if (CLADE_METADATA_IDS.includes(id)) {
-							await setTaxonAndInferParents({
-								tx,
-								subjectId,
-								clade: id,
-								value: value.toString(),
-								confidence: 1
-							});
-						} else {
-							await storeMetadataValue({
-								tx,
-								subjectId,
-								metadataId: id,
-								confidence: 1,
-								value
-							});
-						}
+				for (const subjectId of uiState.selection) {
+					if (value === undefined) {
+						await deleteMetadataValue({ tx, subjectId, metadataId: id, recursive: true });
+					} else if (CLADE_METADATA_IDS.includes(id)) {
+						await setTaxonAndInferParents({
+							subjectId,
+							clade: id,
+							value: value.toString(),
+							confidence: 1
+						});
+					} else {
+						await storeMetadataValue({
+							subjectId,
+							metadataId: id,
+							confidence: 1,
+							value
+						});
 					}
-				});
+				}
 			}}
 		/>
 	{/if}
