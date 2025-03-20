@@ -164,7 +164,8 @@
 <style>
 	.pannel {
 		width: 40vw;
-		max-width: 700px;
+		resize: horizontal;
+		direction: rtl;
 		background-color: var(--bg-neutral);
 		overflow-x: auto;
 		padding: 1.7em;
@@ -173,6 +174,11 @@
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
+	}
+
+	/* Direction is set to RTL on .pannel to put the resize handle on the left of the container, this sets it back to LTR for every child so that text still has the correction direction (for French) */
+	.pannel :global(> *) {
+		direction: ltr;
 	}
 
 	.pannel.empty {
