@@ -129,8 +129,7 @@ for (const [name, index] of Object.entries(classmapping)) {
 			/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
 				key: index.toString(),
 				label: name,
-				description: '',
-				image: ''
+				description: ''
 			})
 		);
 		protocol.metadata[`${protocol.id}__species`].options.sort(
@@ -197,13 +196,26 @@ async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) 
 		console.error(markdown.replaceAll('\n', '\n\t'));
 		console.error();
 	}
+	// Download image since CORP prevents us from using them directly
+	let imagepath = '';
+	if (images.length) {
+		const image = images[0];
+		imagepath = path.join(here, '../examples/arthropods.cigaleprotocol.images', `${name}.jpeg`);
+		await mkdir(path.dirname(imagepath), { recursive: true });
+		await execa`wget -O ${imagepath} ${image}`;
+		images[0] = imagepath;
+	}
 	protocol.metadata[`${protocol.id}__species`].options.push(
 		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
 			key: classmappingIndex.toString(),
 			label: name,
 			description: text,
 			learnMore: url,
-			image: images[0]
+			...(imagepath
+				? {
+						image: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${encodeURIComponent(name)}.jpeg`
+					}
+				: {})
 		})
 	);
 	protocol.metadata[`${protocol.id}__species`].options.sort(
