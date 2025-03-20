@@ -12,13 +12,14 @@
 	 * @typedef {object} Props
 	 * @property {import('./database').Metadata} definition
 	 * @property {undefined | import('./metadata').RuntimeValue} value
+	 * @property {boolean} [conflicted] the value is in conflict (selection has multiple differing values)
 	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onblur]
 	 * @property {string} [id]
 	 * @property {boolean} [disabled]
 	 */
 
 	/** @type {Props} */
-	let { value = $bindable(), id, disabled, definition, onblur, ...props } = $props();
+	let { value = $bindable(), id, disabled, definition, onblur, conflicted } = $props();
 
 	const { type, options = [] } = definition;
 </script>
@@ -26,7 +27,10 @@
 <div class="metadata-input">
 	{#if isType('enum', type, value)}
 		<MetadataCombobox
-			inputProps={{ defaultValue: options.find((opt) => opt.key === value)?.label ?? '' }}
+			inputProps={{
+				defaultValue: options.find((opt) => opt.key === value)?.label ?? '',
+				placeholder: conflicted ? 'Plusieurs valeurs' : ''
+			}}
 			{id}
 			{disabled}
 			{options}
@@ -110,9 +114,13 @@
 			value={value ? `${value.latitude}, ${value.longitude}` : ''}
 		/>
 	{:else}
-		<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>
-			<IconError />
-			<p>Irreprésentable</p>
+		<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)} class:conflicted>
+			{#if conflicted}
+				<p>Plusieurs valeurs</p>
+			{:else}
+				<IconError />
+				<p>Irreprésentable</p>
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -139,5 +147,9 @@
 		align-items: center;
 		gap: 0.5em;
 		color: var(--fg-error);
+	}
+
+	.unrepresentable.conflicted {
+		color: var(--gray);
 	}
 </style>

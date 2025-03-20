@@ -24,7 +24,7 @@
 			{definition.label || definition.id}
 		</label>
 		<div class="value">
-			<MetadataInput id={_id} {definition} value={value?.value} onblur={onchange} />
+			<MetadataInput id={_id} {definition} value={value?.value} onblur={onchange} {conflicted} />
 			{@render confidenceDisplay(value?.confidence)}
 			<button
 				class="clear"
@@ -90,7 +90,9 @@
 						? 'neutral'
 						: 'success'})"
 		>
-			{Math.round(confidence * 100).toString().padStart(3, '\u00a0')}%
+			{Math.round(confidence * 100)
+				.toString()
+				.padStart(3, '\u00a0')}%
 		</code>
 	{/if}
 {/snippet}
