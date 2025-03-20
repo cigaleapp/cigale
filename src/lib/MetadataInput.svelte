@@ -3,8 +3,10 @@
 	import { isType } from './metadata';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import IconIncrement from '~icons/ph/plus';
+	import IconError from '~icons/ph/exclamation-mark-fill';
 	import IconDecrement from '~icons/ph/minus';
 	import { format, parse } from 'date-fns';
+	import { tooltip } from './tooltips';
 
 	/**
 	 * @typedef {object} Props
@@ -18,13 +20,11 @@
 	/** @type {Props} */
 	let { value = $bindable(), id, disabled, definition, onblur, ...props } = $props();
 
-	$inspect(value);
-
-	const { type, options } = definition;
+	const { type, options = [] } = definition;
 </script>
 
 <div class="metadata-input">
-	{#if isType('enum', type, value) && options}
+	{#if isType('enum', type, value)}
 		<MetadataCombobox
 			inputProps={{ defaultValue: options.find((opt) => opt.key === value)?.label ?? '' }}
 			{id}
@@ -110,23 +110,9 @@
 			value={value ? `${value.latitude}, ${value.longitude}` : ''}
 		/>
 	{:else}
-		<div class="unrepresentable">
-			<textarea
-				{id}
-				{disabled}
-				rows={3}
-				bind:value={
-					() => {
-						if (value === undefined) return '';
-						return JSON.stringify(value, null, 2);
-					},
-					(newValue) => {
-						if (newValue === '') return undefined;
-						return JSON.parse(newValue);
-					}
-				}
-			>
-			</textarea>
+		<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>
+			<IconError />
+			<p>Irreprésentable</p>
 		</div>
 	{/if}
 </div>
@@ -138,7 +124,7 @@
 		border: none;
 	}
 
-	.metadata-input {
+	.metadata-input:not(:has(.unrepresentable)) {
 		border-bottom: 2px dashed var(--fg-neutral);
 		display: flex;
 		align-items: center;
@@ -146,5 +132,12 @@
 
 	.metadata-input:focus-within {
 		border-bottom-style: solid;
+	}
+
+	.unrepresentable {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		color: var(--fg-error);
 	}
 </style>
