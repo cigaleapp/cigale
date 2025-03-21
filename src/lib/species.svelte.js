@@ -64,6 +64,23 @@ export async function defineSpeciesMetadata(id) {
 			}))
 		});
 
+		const classes = [...new Set(Object.values(taxonomy.items).map((t) => t.class))];
+
+		tx.put({
+			id: 'class',
+			description: '',
+			label: 'Classe',
+			mergeMethod: 'max',
+			required: false,
+			type: 'enum',
+			options: classes.map((name, i) => ({
+				key: i.toString(),
+				label: name,
+				description: '',
+				learnMore: `https://en.wikipedia.org/wiki/${encodeURIComponent(name)}`
+			}))
+		});
+
 		const orders = [...new Set(Object.values(taxonomy.items).map((t) => t.order))];
 
 		tx.put({

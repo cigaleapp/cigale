@@ -7,6 +7,7 @@ export const BUILTIN_METADATA_IDS = /** @type {const} */ ({
 	genus: 'genus',
 	family: 'family',
 	order: 'order',
+	class: 'class',
 	phylum: 'phylum',
 	kingdom: 'kingdom'
 });
