@@ -341,32 +341,32 @@
                       "type": "object",
                       "description": "Dans quelles métadonnées stocker les clade supérieures inférées par l'arbre taxonomique. Similairement à metadata, ces métadonnées doivent être déclarées dans les métadonnées du protocole, et doivent être de type 'enum'. Les options seront remplies par l'arbre taxonomique, et peuvent donc être laissées vides dans la définition de la métadonnée.",
                       "properties": {
-                        "class": {
+                        "classes": {
                           "type": "string",
                           "description": "L'identifiant de la métadonnée",
                           "pattern": "[\\w_]+"
                         },
-                        "family": {
+                        "families": {
                           "type": "string",
                           "description": "L'identifiant de la métadonnée",
                           "pattern": "[\\w_]+"
                         },
-                        "genus": {
+                        "genera": {
                           "type": "string",
                           "description": "L'identifiant de la métadonnée",
                           "pattern": "[\\w_]+"
                         },
-                        "kingdom": {
+                        "kingdoms": {
                           "type": "string",
                           "description": "L'identifiant de la métadonnée",
                           "pattern": "[\\w_]+"
                         },
-                        "order": {
+                        "orders": {
                           "type": "string",
                           "description": "L'identifiant de la métadonnée",
                           "pattern": "[\\w_]+"
                         },
-                        "phylum": {
+                        "phyla": {
                           "type": "string",
                           "description": "L'identifiant de la métadonnée",
                           "pattern": "[\\w_]+"
