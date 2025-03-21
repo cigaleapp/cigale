@@ -1,17 +1,21 @@
 import { strToU8, zip } from 'fflate';
-import { Jimp } from 'jimp';
-import { toTopLeftCoords } from './BoundingBoxes.svelte';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { Schemas } from './database';
-import { downloadAsFile, stringifyWithToplevelOrdering } from './download';
+import {
+	downloadAsFile,
+	splitFilenameOnExtension,
+	stringifyWithToplevelOrdering
+} from './download';
 import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
-import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 import {
 	addValueLabels,
 	metadataPrettyKey,
 	metadataPrettyValue,
 	observationMetadata
 } from './metadata';
+import { speciesDisplayName } from './species.svelte';
+import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
 
 /**
@@ -55,24 +59,27 @@ export async function generateResultsZip(
 	 */
 	let buffersOfImages = [];
 
-	if (include !== 'metadataonly')
-		buffersOfImages = await Promise.all(
-			observations.flatMap((o) =>
-				o.images.map(async (imageId) => {
-					const image = await db.tables.Image.get(imageId);
-					if (!image) throw 'Image non trouvée';
-					const { contentType, filename } = image;
-					const { cropped, original } = await cropImage(image);
-					return {
-						imageId,
-						croppedBytes: new Uint8Array(cropped),
-						originalBytes: include === 'full' ? new Uint8Array(original) : undefined,
-						contentType,
-						filename
-					};
-				})
-			)
-		);
+	uiState.processing.state = 'generating-zip';
+	uiState.processing.total = 1;
+	uiState.processing.done = 0;
+
+	if (include !== 'metadataonly') {
+		uiState.processing.total += observations.flatMap((o) => o.images).length;
+		for (const imageId of observations.flatMap((o) => o.images)) {
+			const image = await db.tables.Image.get(imageId);
+			if (!image) throw 'Image non trouvée';
+			const { contentType, filename } = image;
+			const { cropped, original } = await cropImage(image);
+			buffersOfImages.push({
+				imageId,
+				croppedBytes: new Uint8Array(cropped),
+				originalBytes: include === 'full' ? new Uint8Array(original) : undefined,
+				contentType,
+				filename
+			});
+			uiState.processing.done++;
+		}
+	}
 
 	const filepaths = protocolUsed.exports ?? {
 		images: {
@@ -174,6 +181,8 @@ export async function generateResultsZip(
 		)
 	);
 
+	uiState.processing.done++;
+
 	downloadAsFile(zipfile, 'results.zip', 'application/zip');
 }
 
@@ -188,36 +197,44 @@ export async function cropImage(image) {
 
 	if (!centeredBoundingBox) throw "L'image n'a pas d'information de recadrage";
 
-	const boundingBox = toTopLeftCoords(centeredBoundingBox);
-
 	const bytes = await db.get('ImageFile', imageIdToFileId(image.id)).then((f) => f?.bytes);
 	if (!bytes) throw "L'image n'a pas de fichier associé";
 
-	const tensor = await Jimp.read(bytes);
-
-	// Inferred crop box is for the [TARGETHEIGHT, TARGETWIDTH] resized image. Scale it back to it fits to the original image.
-	const scaleFactors = {
-		widthWise: tensor.width / TARGETWIDTH,
-		heightWise: tensor.height / TARGETHEIGHT
-	};
-
+	const bitmap = await createImageBitmap(new Blob([bytes], { type: image.contentType }));
+	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
+		toTopLeftCoords(centeredBoundingBox)
+	);
 	try {
-		const cropped = tensor.crop({
-			x: boundingBox.x * scaleFactors.widthWise,
-			y: boundingBox.y * scaleFactors.heightWise,
-			w: boundingBox.width * scaleFactors.widthWise,
-			h: boundingBox.height * scaleFactors.heightWise
-		});
+		const croppedBitmap = await createImageBitmap(
+			bitmap,
+			boundingBox.x,
+			boundingBox.y,
+			boundingBox.width,
+			boundingBox.height
+		);
+		const canvas = document.createElement('canvas');
+		canvas.width = croppedBitmap.width;
+		canvas.height = croppedBitmap.height;
+		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
+		const croppedBytes = await new Promise((resolve) =>
+			canvas.toBlob(
+				resolve,
+				['image/png', 'image/jpeg'].includes(image.contentType) ? image.contentType : 'image/png'
+			)
+		).then((blob) => blob.arrayBuffer());
+
 		// @ts-ignore
-		return { cropped: await cropped.getBuffer(image.contentType), original: bytes };
+		return { cropped: croppedBytes, original: bytes };
 	} catch (error) {
 		toasts.warn(`Impossible de recadrer ${image.filename}, l'image sera incluse sans recadrage`);
 		console.error(
 			`Couldn't crop ${image.filename} (id ${image.id}) with `,
-			{ boundingBox, scaleFactors },
+			{ boundingBox },
 			':',
 			error
 		);
+	} finally {
+		bitmap.close();
 	}
 
 	return { cropped: bytes, original: bytes };
