@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import { toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
@@ -25,14 +25,16 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
-	const previewURLs = $derived(uiState.previewURLs);
 	const erroredImages = $derived(uiState.erroredImages);
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
 		toAreaObservationProps(tables.Image.state, tables.Observation.state, {
+			previewURL: (image) =>
+				uiState.getPreviewURL(image, 'cropped') ?? uiState.getPreviewURL(image, 'full'),
+			showBoundingBoxes: (image) => !uiState.hasPreviewURL(image, 'cropped'),
 			isLoaded: (image) =>
-				imageBufferWasSaved(image) && previewURLs.has(image.id) && imageIsCLassified(image)
+				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsCLassified(image)
 		})
 	);
 
@@ -61,15 +63,20 @@
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
 		let img = await imload([buffer], TARGETWIDTH, TARGETHEIGHT);
-		const { x, y, width, height } = toTopLeftCoords(
-			/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-			(metadata.crop.value)
+		const { x, y, width, height } = toPixelCoords(
+			toTopLeftCoords(
+				/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
+				(metadata.crop.value)
+			)
 		);
 		let bbList = [x, y, width, height];
 
 		//@ts-ignore
 		/** @type {ort.Tensor}*/
 		const nimg = await applyBBOnTensor(bbList, img);
+		// TODO persist after page reload?
+		uiState.croppedPreviewURLs.set(imageIdToFileId(id), nimg.toDataURL());
+
 		const output_classif = await classify([[nimg]], classifmodel, uiState, 0);
 		const species = output_classif[0];
 		const confs = output_classif[1];
@@ -98,38 +105,38 @@
 		void ensureNoLoneImages();
 	});
 
-	$effect(() => {
-		if (!classifmodel) return;
-		for (const image of tables.Image.state) {
-			if (
-				imageBufferWasSaved(image) &&
-				!imageIsCLassified(image) &&
-				!uiState.loadingImages.has(image.id)
-			) {
-				$inspect(uiState);
-				uiState.loadingImages.add(image.id);
+	$effect(
+		() =>
+			void (async () => {
+				if (!classifmodel) return;
+				for (const image of tables.Image.state) {
+					if (
+						imageBufferWasSaved(image) &&
+						!imageIsCLassified(image) &&
+						!uiState.loadingImages.has(image.id)
+					) {
+						uiState.loadingImages.add(image.id);
 
-				void (async () => {
-					try {
-						const file = await db.get('ImageFile', imageIdToFileId(image.id));
-						if (!file) {
-							console.log('pas de fichier ..?');
-							return;
+						try {
+							const file = await db.get('ImagePreviewFile', imageIdToFileId(image.id));
+							if (!file) {
+								console.log('pas de fichier ..?');
+								return;
+							}
+							let code = await analyzeImage(file.bytes, image.id, image);
+							if (code == 0) {
+								erroredImages.set(image.id, "Erreur inattendue l'ors de la classification");
+							}
+						} catch (error) {
+							console.error(error);
+							erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
+						} finally {
+							uiState.loadingImages.delete(image.id);
 						}
-						let code = await analyzeImage(file.bytes, image.id, image);
-						if (code == 0) {
-							erroredImages.set(image.id, "Erreur inattendue l'ors de la classification");
-						}
-					} catch (error) {
-						console.error(error);
-						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
-					} finally {
-						uiState.loadingImages.delete(image.id);
 					}
-				})();
-			}
-		}
-	});
+				}
+			})()
+	);
 
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length;

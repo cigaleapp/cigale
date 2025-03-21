@@ -1,23 +1,25 @@
 <script>
+	import { base } from '$app/paths';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import Download from '~icons/ph/download-simple';
 	import Modal from '$lib/Modal.svelte';
 	import { ensureNoLoneImages } from '$lib/observations';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { generateResultsZip } from '$lib/results';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { base } from '$app/paths';
+	import Download from '~icons/ph/download-simple';
 
 	// TODO show download size estimates
 
 	/**
 	 * @typedef {object} Props
 	 * @property {() => void} open
+	 * @property {number} [progress] progress bar to in the modal content
 	 */
-	let { open = $bindable() } = $props();
+	let { open = $bindable(), progress } = $props();
 	let exporting = $state(false);
 	/** @type {'metadataonly'|'croppedonly'|'full'} */
 	let include = $state('croppedonly');
@@ -47,7 +49,7 @@
 	}
 </script>
 
-<Modal key="export-results" bind:open title="Exporter les résultats">
+<Modal --footer-direction="column" key="export-results" bind:open title="Exporter les résultats">
 	<RadioButtons
 		bind:value={include}
 		options={[
@@ -60,6 +62,12 @@
 	</RadioButtons>
 
 	{#snippet footer()}
+		<section class="progress">
+			{#if ![0, 1].includes(progress)}
+				<code>{Math.floor(progress * 100)}%</code>
+				<ProgressBar {progress} />
+			{/if}
+		</section>
 		<ButtonSecondary onclick={generateExport}>
 			{#if exporting}
 				<LoadingSpinner />
@@ -70,3 +78,15 @@
 		</ButtonSecondary>
 	{/snippet}
 </Modal>
+
+<style>
+	.progress {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 300px;
+		--corners: var(--corner-radius);
+		margin-bottom: 1rem;
+		gap: 0.5em;
+	}
+</style>

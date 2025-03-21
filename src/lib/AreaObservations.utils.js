@@ -1,5 +1,5 @@
 import { uiState } from '$lib/state.svelte';
-import { toRelativeCoords, toTopLeftCoords } from './BoundingBoxes.svelte';
+import { toTopLeftCoords } from './BoundingBoxes.svelte';
 import { idComparator } from './idb.svelte';
 
 /**
@@ -28,30 +28,37 @@ import { idComparator } from './idb.svelte';
  * @param {Observation[]} observations
  * @param {object} param2
  * @param {(image: Image) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
+ * @param {(image: Image|undefined) => string | undefined} [param2.previewURL] show cropped versions of images on cards where possible.
+ * @param {(image: Image|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes
  * @returns {CardObservation[]}
  */
-export function toAreaObservationProps(images, observations, { isLoaded }) {
+export function toAreaObservationProps(
+	images,
+	observations,
+	{ isLoaded, previewURL, showBoundingBoxes }
+) {
+	previewURL ??= (image) => uiState.getPreviewURL(image);
+	showBoundingBoxes ??= () => true;
 	return (
 		[
 			...images
 				// Keep images that aren't part of any observation only
 				.filter(({ id }) => !observations.some((observation) => observation.images.includes(id)))
-				.map(
-					(image, i) =>
-						/**  @satisfies {CardObservation} */
-						({
-							image: uiState.previewURLs.get(image.id) ?? '',
-							title: image.filename,
-							id: image.id,
-							index: i,
-							stacksize: 1,
-							loading: isLoaded(image) ? undefined : -1,
-							boundingBoxes: image.metadata.crop?.value
+				.map((image, i) => {
+					return /**  @satisfies {CardObservation} */ ({
+						image: previewURL(image) ?? '',
+						title: image.filename,
+						id: image.id,
+						index: i,
+						stacksize: 1,
+						loading: isLoaded(image) ? undefined : -1,
+						boundingBoxes:
+							showBoundingBoxes(image) && image.metadata.crop?.value
 								? // @ts-ignore
-									[toRelativeCoords(toTopLeftCoords(image.metadata.crop.value))]
+									[toTopLeftCoords(image.metadata.crop.value)]
 								: []
-						})
-				),
+					});
+				}),
 			...observations.map((observation, i) => {
 				const imagesOfObservation = images.filter((img) => observation.images.includes(img.id));
 				const firstImage = imagesOfObservation.find(
@@ -60,16 +67,17 @@ export function toAreaObservationProps(images, observations, { isLoaded }) {
 
 				/**  @satisfies {CardObservation} */
 				return {
-					image: uiState.previewURLs.get(firstImage?.id ?? '') ?? '',
+					image: previewURL(firstImage) ?? '',
 					subimages: observation.images.toSorted(idComparator),
 					title: observation.label ?? `Observation ${firstImage?.filename ?? ''}`,
 					index: images.length + i,
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
-					boundingBoxes: firstImage?.metadata.crop?.value
-						? // @ts-ignore
-							[toRelativeCoords(toTopLeftCoords(firstImage.metadata.crop.value))]
-						: [],
+					boundingBoxes:
+						showBoundingBoxes(firstImage) && firstImage?.metadata.crop?.value
+							? // @ts-ignore
+								[toTopLeftCoords(firstImage.metadata.crop.value)]
+							: [],
 					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
 				};
 			})

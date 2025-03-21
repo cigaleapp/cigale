@@ -31,12 +31,16 @@
 	}
 
 	async function deleteSelection() {
-		await openTransaction(['Image', 'Observation', 'ImageFile'], {}, async (tx) => {
-			for (const id of uiState.selection) {
-				await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
-				await deleteImage(id, tx);
+		await openTransaction(
+			['Image', 'Observation', 'ImageFile', 'ImagePreviewFile'],
+			{},
+			async (tx) => {
+				for (const id of uiState.selection) {
+					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
+					await deleteImage(id, tx);
+				}
 			}
-		});
+		);
 		uiState.setSelection?.([]);
 	}
 
@@ -45,15 +49,19 @@
 			help: 'Supprimer toutes les images et observations',
 			async do() {
 				toasts.warn('Suppression de toutes les images et observations…');
-				await db.openTransaction(['Image', 'ImageFile', 'Observation'], {}, (tx) => {
-					tx.objectStore('Observation').clear();
-					tx.objectStore('ImageFile').clear();
-					uiState.previewURLs = new SvelteMap();
-					tx.objectStore('Image').clear();
-					uiState.erroredImages = new SvelteMap();
-					uiState.loadingImages = new SvelteSet();
-					uiState.setSelection?.([]);
-				});
+				await db.openTransaction(
+					['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
+					{},
+					(tx) => {
+						tx.objectStore('Observation').clear();
+						tx.objectStore('ImageFile').clear();
+						uiState.previewURLs = new SvelteMap();
+						tx.objectStore('Image').clear();
+						uiState.erroredImages = new SvelteMap();
+						uiState.loadingImages = new SvelteSet();
+						uiState.setSelection?.([]);
+					}
+				);
 			}
 		};
 		uiState.keybinds['$mod+g'] = {
@@ -94,9 +102,7 @@
 	);
 
 	const selectedHrefs = $derived(
-		selectedImages
-			.map((image) => uiState.previewURLs.get(image.id))
-			.filter((url) => url !== undefined)
+		selectedImages.map((image) => uiState.getPreviewURL(image)).filter((url) => url !== undefined)
 	);
 </script>
 

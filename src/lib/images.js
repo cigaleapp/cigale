@@ -14,10 +14,13 @@ export function imageId(index, subindex = 0) {
 
 /**
  * Retourne l'id d'un objet ImageFile associé à l'objet Image
- * @param {string} id
+ * @template {string|undefined} T
+ * @param {T} id
+ * @returns {T}
  */
 export function imageIdToFileId(id) {
-	return id.replace(/(_\d+)+$/, '');
+	// @ts-expect-error
+	return id?.replace(/(_\d+)+$/, '');
 }
 
 /**
@@ -59,11 +62,11 @@ export async function downloadImage(imageId, options) {
 /**
  *
  * @param {string} id
- * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Image", "ImageFile"]>} [tx]
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImage(id, tx, notFoundOk = true) {
-	await db.openTransaction(['Image', 'ImageFile'], { tx }, async (tx) => {
+	await db.openTransaction(['Image', 'ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		const image = await tx.objectStore('Image').get(id);
 		if (!image) {
 			if (notFoundOk) return;
@@ -72,29 +75,75 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 
 		tx.objectStore('Image').delete(id);
 		tx.objectStore('ImageFile').delete(imageIdToFileId(id));
+		tx.objectStore('ImagePreviewFile').delete(imageIdToFileId(id));
+		uiState.erroredImages.delete(id);
+		uiState.loadingImages.delete(id);
 
-		const previewURL = uiState.previewURLs.get(id);
+		const previewURL = uiState.previewURLs.get(imageIdToFileId(id));
 		if (previewURL) {
 			URL.revokeObjectURL(previewURL);
-			uiState.previewURLs.delete(id);
+			uiState.previewURLs.delete(imageIdToFileId(id));
+			uiState.croppedPreviewURLs.delete(imageIdToFileId(id));
 		}
 	});
 }
 
 /**
  *
- * @param {string} id id of the image to store the bytes for
- * @param {ArrayBuffer} bytes the image data
- * @param {string} contentType MIME type of the image
- * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile']>} [tx] transaction to use
+ * @param {object} param0
+ * @param {string} param0.id id of the image to store the bytes for
+ * @param {ArrayBuffer} param0.originalBytes the image data
+ * @param {ArrayBuffer} param0.resizedBytes resized image data
+ * @param {string} param0.contentType MIME type of the image
+ * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
  */
-export async function storeImageBytes(id, bytes, contentType, tx) {
-	await db.openTransaction(['Image', 'ImageFile'], { tx }, async (tx) => {
+export async function storeImageBytes({ id, originalBytes, resizedBytes, contentType, tx }) {
+	await db.openTransaction(['Image', 'ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		const image = await tx.objectStore('Image').get(id);
 		if (!image) throw 'Image non trouvée';
-		tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes });
-		const preview = new Blob([bytes], { type: contentType });
-		uiState.previewURLs.set(id, URL.createObjectURL(preview));
+		tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes: originalBytes });
+		tx.objectStore('ImagePreviewFile').put({ id: imageIdToFileId(id), bytes: resizedBytes });
+		const preview = new Blob([resizedBytes], { type: contentType });
+		uiState.setPreviewURL(image, URL.createObjectURL(preview));
 		tx.objectStore('Image').put({ ...image, bufferExists: true });
+	});
+}
+
+const MAXWIDTH = 1024;
+/**
+ * @param {object} param0
+ * @param {number} param0.width
+ * @param {number} param0.height
+ */
+const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
+
+/**
+ * Resize an image to fit within MAXWIDTH and MAXHEIGHT
+ * @param {object} param0
+ * @param {Blob} param0.source
+ * @returns {Promise<ArrayBuffer>}
+ */
+export async function resizeToMaxSize({ source }) {
+	// For some reason top-level import fails
+	const { resize } = await import('pica-gpu');
+	const originalImage = await createImageBitmap(source);
+	const originalCanvas = document.createElement('canvas');
+	originalCanvas.width = originalImage.width;
+	originalCanvas.height = originalImage.height;
+	originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
+
+	const resizedCanvas = document.createElement('canvas');
+	resizedCanvas.width = MAXWIDTH;
+	resizedCanvas.height = MAXHEIGHT(originalImage);
+	resize(originalCanvas, resizedCanvas, {
+		targetWidth: MAXWIDTH,
+		targetHeight: MAXHEIGHT(originalImage),
+		filter: 'mks2013'
+	});
+	return new Promise((resolve) => {
+		resizedCanvas.toBlob((blob) => {
+			if (!blob) throw new Error('Failed to resize image');
+			resolve(blob.arrayBuffer());
+		}, source.type);
 	});
 }
