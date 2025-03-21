@@ -1,7 +1,5 @@
-import { BUILTIN_METADATA_IDS } from './builtins.js';
 import { tables } from './idb.svelte.js';
 import { torawpath } from './inference.js';
-import { uiState } from './state.svelte.js';
 import { initializeTaxonomy } from './taxonomy.js';
 
 /**
