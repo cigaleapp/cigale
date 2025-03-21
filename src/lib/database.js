@@ -2,7 +2,7 @@ import { type, scope } from 'arktype';
 import { parseISOSafe } from './date.js';
 import Handlebars from 'handlebars';
 import { splitFilenameOnExtension } from './download.js';
-import { Clade } from './taxonomy.js';
+import { Clade, CladePlural } from './taxonomy.js';
 
 const ID = type(/[\w_]+/);
 
@@ -221,9 +221,10 @@ const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
 	description: ['string', '@', 'Description (optionnelle) de cette option'],
-	learnMore: URLString.describe(
+	'image?': URLString,
+	'learnMore?': URLString.describe(
 		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
-	).optional()
+	)
 });
 
 const MetadataWithoutID = type({
@@ -315,9 +316,9 @@ const ProtocolWithoutMetadata = type({
 				taxonomy: Request.describe(
 					"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
 				),
-				targets: scope({ Clade })
+				targets: scope({ CladePlural })
 					.type({
-						'[Clade]': ID.describe("L'identifiant de la métadonnée")
+						'[CladePlural]': ID.describe("L'identifiant de la métadonnée")
 					})
 					.partial()
 					.describe(

@@ -5,7 +5,7 @@
 	import { deleteMetadataValue, mergeMetadataValues, storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
-	import { CLADE_METADATA_IDS, setTaxonAndInferParents } from '$lib/taxonomy';
+	import { CLADE_NAMES_SINGULAR as CLADE_NAMES_SINGULAR, setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -138,7 +138,7 @@
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
 						await deleteMetadataValue({ tx, subjectId, metadataId: id, recursive: true });
-					} else if (CLADE_METADATA_IDS.includes(id)) {
+					} else if (CLADE_NAMES_SINGULAR.includes(id)) {
 						await setTaxonAndInferParents({
 							subjectId,
 							clade: id,

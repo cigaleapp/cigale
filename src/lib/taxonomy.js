@@ -28,7 +28,7 @@ export const Taxonomy = type({
 /**
  * In order of less to more specific
  */
-export const CLADE_METADATA_IDS = /** @type {const} */ ([
+export const CLADE_NAMES_SINGULAR = /** @type {const} */ ([
 	BUILTIN_METADATA_IDS.kingdom,
 	BUILTIN_METADATA_IDS.phylum,
 	BUILTIN_METADATA_IDS.class,
@@ -41,8 +41,8 @@ export const CLADE_METADATA_IDS = /** @type {const} */ ([
 /**
  * Map singular-case clade names to their plural-case names, as used in the taxonomy object
  */
-export const CLADE_METADATA_IDS_PLURAL = /** @type {const} */ ({
-	[BUILTIN_METADATA_IDS.kingdom]: 'kingdom',
+export const CLADE_NAMES_PLURAL = /** @type {const} */ ({
+	[BUILTIN_METADATA_IDS.kingdom]: 'kingdoms',
 	[BUILTIN_METADATA_IDS.phylum]: 'phyla',
 	[BUILTIN_METADATA_IDS.class]: 'classes',
 	[BUILTIN_METADATA_IDS.order]: 'orders',
@@ -51,7 +51,8 @@ export const CLADE_METADATA_IDS_PLURAL = /** @type {const} */ ({
 	[BUILTIN_METADATA_IDS.species]: 'species'
 });
 
-export const Clade = type.enumerated(...CLADE_METADATA_IDS);
+export const Clade = type.enumerated(...CLADE_NAMES_SINGULAR);
+export const CladePlural = type.enumerated(...Object.values(CLADE_NAMES_PLURAL));
 
 /**
  * @type {typeof Taxonomy.infer}
@@ -74,6 +75,7 @@ let _taxonomy = {
 /**
  *
  * @param {object} options
+ * @param {import('$lib/database.js').Protocol} options.protocol le protocole utilisé
  * @param {string} options.subjectId id de l'image ou l'observation
  * @param {typeof Clade.infer} options.clade le clade à définir
  * @param {RuntimeValue<'enum'>} options.value l'espèce choisie/détectée
@@ -82,6 +84,7 @@ let _taxonomy = {
  * @param {Array<{ value: RuntimeValue<'enum'>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  */
 export async function setTaxonAndInferParents({
+	protocol,
 	subjectId,
 	clade,
 	value,
@@ -94,7 +97,12 @@ export async function setTaxonAndInferParents({
 	console.log(`Setting taxon on ${subjectId}: ${clade} = ${value}`);
 	await storeMetadataValue({
 		subjectId,
-		metadataId: clade,
+		metadataId:
+			(clade === protocol.inference?.classification?.taxonomic?.clade
+				? protocol.inference?.classification?.metadata
+				: protocol.inference?.classification?.taxonomic?.targets[
+						CLADE_NAMES_PLURAL[clade]
+					]) ?? BUILTIN_METADATA_IDS[clade],
 		value,
 		confidence,
 		alternatives
@@ -104,12 +112,12 @@ export async function setTaxonAndInferParents({
 	if (clade === 'kingdom') return;
 
 	// Recursive case: infer parent
-	const parentClade = CLADE_METADATA_IDS[CLADE_METADATA_IDS.indexOf(clade) - 1];
+	const parentClade = CLADE_NAMES_SINGULAR[CLADE_NAMES_SINGULAR.indexOf(clade) - 1];
 	const valueName = await labelOfEnumKey(clade, value);
 	if (!valueName) {
 		throw new Error(`No ${clade} with key ${value} in taxonomy`);
 	}
-	const parentValueName = _taxonomy[CLADE_METADATA_IDS_PLURAL[clade]][valueName];
+	const parentValueName = _taxonomy[CLADE_NAMES_PLURAL[clade]][valueName];
 	if (!parentValueName) {
 		throw new Error(`${valueName} has no ${parentClade} in taxonomy`);
 	}
@@ -120,6 +128,7 @@ export async function setTaxonAndInferParents({
 	}
 
 	await setTaxonAndInferParents({
+		protocol,
 		subjectId,
 		clade: parentClade,
 		value: parentKey

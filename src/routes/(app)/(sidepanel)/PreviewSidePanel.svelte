@@ -35,7 +35,7 @@
 		$props();
 
 	const definitions = $derived.by(() => {
-		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocol);
+		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!protocol) return [];
 		return protocol.metadata
 			.map((id) => tables.Metadata.state.find((m) => m.id === id))

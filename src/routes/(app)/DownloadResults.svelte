@@ -26,7 +26,7 @@
 
 	async function generateExport() {
 		exporting = true;
-		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocol);
+		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!chosenProtocol) {
 			toasts.error('Aucun protocole sélectionné');
 			exporting = false;

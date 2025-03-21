@@ -30,8 +30,8 @@ async function fillBuiltinData() {
 			authors: [],
 			metadata: [
 				BUILTIN_METADATA_IDS.species,
-				// BUILTIN_METADATA_IDS.kingdom,
-				// BUILTIN_METADATA_IDS.phylum,
+				BUILTIN_METADATA_IDS.kingdom,
+				BUILTIN_METADATA_IDS.phylum,
 				BUILTIN_METADATA_IDS.order,
 				BUILTIN_METADATA_IDS.family,
 				BUILTIN_METADATA_IDS.genus,
@@ -63,12 +63,12 @@ async function fillBuiltinData() {
 						clade: 'species',
 						taxonomy: 'https://raw.githubusercontent.com/cigaleapp/cigale/static/taxonomy.json',
 						targets: {
-							kingdom: 'kingdom',
-							phylum: 'phylum',
-							class: 'class',
-							order: 'order',
-							family: 'family',
-							genus: 'genus'
+							kingdoms: 'kingdom',
+							phyla: 'phylum',
+							classes: 'class',
+							orders: 'order',
+							families: 'family',
+							genera: 'genus'
 						}
 					},
 					input: {

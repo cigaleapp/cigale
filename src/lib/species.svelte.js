@@ -1,6 +1,7 @@
 import { BUILTIN_METADATA_IDS } from './builtins.js';
 import { tables } from './idb.svelte.js';
 import { torawpath } from './inference.js';
+import { uiState } from './state.svelte.js';
 import { initializeTaxonomy } from './taxonomy.js';
 
 /**
@@ -132,15 +133,4 @@ export async function defineSpeciesMetadata(id) {
 			}))
 		});
 	});
-}
-
-/** @param {undefined | import('./metadata.js').RuntimeValue} key  */
-export function speciesDisplayName(key) {
-	if (key === undefined) return undefined;
-
-	const options = $state.snapshot(
-		tables.Metadata.state.find((m) => m.id === BUILTIN_METADATA_IDS.species)?.options
-	);
-
-	return options?.find((o) => o.key === key?.toString())?.label ?? key?.toString();
 }

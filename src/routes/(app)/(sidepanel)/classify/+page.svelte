@@ -2,13 +2,14 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import { toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import { BUILTIN_METADATA_IDS } from '$lib/builtins';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
 		deleteImage,
 		imageBufferWasSaved,
 		imageIdToFileId,
-		imageIsCLassified
+		imageIsClassified
 	} from '$lib/images';
 	import {
 		classify,
@@ -20,6 +21,7 @@
 	} from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
+	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
@@ -34,7 +36,7 @@
 				uiState.getPreviewURL(image, 'cropped') ?? uiState.getPreviewURL(image, 'full'),
 			showBoundingBoxes: (image) => !uiState.hasPreviewURL(image, 'cropped'),
 			isLoaded: (image) =>
-				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsCLassified(image)
+				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsClassified(image)
 		})
 	);
 
@@ -86,9 +88,9 @@
 			return 0;
 		} else {
 			const [[firstChoice, firstChoiceConfidence], ...alternatives] = species;
-			await setTaxonAndInferParents({
+			if (!uiState.currentProtocol) return;
+			const metadataValue = /** @type {const} */ ({
 				subjectId: id,
-				clade: 'species',
 				value: firstChoice.toString(),
 				confidence: firstChoiceConfidence,
 				alternatives: alternatives.map(([value, confidence]) => ({
@@ -96,6 +98,18 @@
 					confidence
 				}))
 			});
+			if (uiState.currentProtocol.inference?.classification?.taxonomic) {
+				await setTaxonAndInferParents({
+					...metadataValue,
+					protocol: uiState.currentProtocol,
+					clade: uiState.currentProtocol.inference.classification.taxonomic.clade
+				});
+			} else {
+				await storeMetadataValue({
+					...metadataValue,
+					metadataId: uiState.classificationMetadataId
+				});
+			}
 		}
 	}
 
@@ -111,7 +125,7 @@
 				for (const image of tables.Image.state) {
 					if (
 						imageBufferWasSaved(image) &&
-						!imageIsCLassified(image) &&
+						!imageIsClassified(image) &&
 						!uiState.loadingImages.has(image.id)
 					) {
 						uiState.loadingImages.add(image.id);
@@ -139,7 +153,9 @@
 
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length;
-		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.species).length;
+		uiState.processing.done = tables.Image.state.filter(
+			(img) => img.metadata[uiState.classificationMetadataId]
+		).length;
 	});
 </script>
 
