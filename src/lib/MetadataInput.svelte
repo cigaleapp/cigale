@@ -7,6 +7,7 @@
 	import IconDecrement from '~icons/ph/minus';
 	import { format, parse } from 'date-fns';
 	import { tooltip } from './tooltips';
+	import { safeJSONParse } from './utils';
 
 	/**
 	 * @typedef {object} Props
@@ -33,7 +34,7 @@
 			options={options.map(({ key, ...rest }) => ({ key: key.toString(), ...rest }))}
 			{confidences}
 			type="single"
-			value={value?.toString()}
+			value={safeJSONParse(value?.toString())?.toString()}
 			onValueChange={(newValue) => {
 				if (newValue === undefined) {
 					onblur?.(undefined);
