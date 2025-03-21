@@ -2,7 +2,6 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import { toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
-	import { BUILTIN_METADATA_IDS } from '$lib/builtins';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
@@ -87,7 +86,8 @@
 				value: i.toString()
 			}))
 			.sort((a, b) => b.confidence - a.confidence)
-			.slice(0, 3);
+			.slice(0, 3)
+			.filter(({ confidence }) => confidence > 0.005);
 
 		if (!results.length) {
 			console.warn('No species detected');

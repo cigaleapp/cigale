@@ -85,7 +85,10 @@
 		height: 100%;
 		width: 100%;
 		flex-grow: 1;
-		overflow-y: scroll;
+		scrollbar-color: var(--gray) transparent;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		overflow-y: auto;
 	}
 
 	.contents.padded {
