@@ -34,7 +34,7 @@ export function fromEntries(subject) {
 
 /**
  * @template {string} K
- * @template {string} V
+ * @template {any} V
  * @param {Record<K, V>} subject
  * @returns {Array<[K, V]>}
  */
@@ -43,7 +43,6 @@ export function entries(subject) {
 	return Object.entries(subject);
 }
 
-// Reverse keys and values
 /**
  * @template {string} K
  * @template {string} V
@@ -52,6 +51,31 @@ export function entries(subject) {
  */
 export function invertRecord(subject) {
 	return fromEntries(entries(subject).map(([key, value]) => [value, key]));
+}
+
+/**
+ * Checks that a value is included in a list of values
+ * @template {string} T
+ * @param {string} value
+ * @param {T[]} values
+ * @returns {value is T}
+ */
+export function oneOf(value, values) {
+	// @ts-expect-error
+	return values.includes(value);
+}
+
+/**
+ * Pick only some keys from an object
+ * @template {string} KeysIn
+ * @template {KeysIn} KeysOut
+ * @template {any} V
+ * @param {Record<KeysIn, V>} subject
+ * @param {...KeysOut} keys
+ * @returns {Record<KeysOut, V>}
+ */
+export function pick(subject, ...keys) {
+	return fromEntries(entries(subject).filter(([key]) => oneOf(key, keys)));
 }
 
 /**

@@ -9,9 +9,19 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { pick } from '$lib/utils';
 	import Navigation from './Navigation.svelte';
 
 	const { children } = $props();
+
+	export const snapshot = {
+		capture() {
+			return pick(uiState, 'currentProtocolId');
+		},
+		restore({ currentProtocolId }) {
+			uiState.currentProtocolId = currentProtocolId;
+		}
+	};
 
 	// Ensure every image has a preview URL at all times
 	$effect(() => {
