@@ -52,7 +52,7 @@ export async function storeMetadataValue({
 		: await tables.Observation.raw.get(subjectId);
 
 	if (image) {
-		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
+		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
 		image.metadata[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Image').put(image);
@@ -62,7 +62,7 @@ export async function storeMetadataValue({
 			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
 		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else if (observation) {
-		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
+		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
 		observation.metadataOverrides[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Observation').put(observation);
@@ -152,6 +152,34 @@ export function addValueLabels(values) {
 			];
 		})
 	);
+}
+
+/**
+ * Get the label of a enum metadata given its key.
+ * @param {string} metadataId
+ * @param {string} key
+ * @returns {Promise<string|undefined>}
+ */
+export async function labelOfEnumKey(metadataId, key) {
+	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
+
+	return metadata.options?.find((o) => o.key === key)?.label;
+}
+
+/**
+ * Get the key of a enum metadata given its label.
+ * @param {string} metadataId
+ * @param {string} label
+ * @returns {Promise<string|undefined>}
+ */
+export async function keyOfEnumLabel(metadataId, label) {
+	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
+
+	return metadata.options?.find((o) => o.label === label)?.key;
 }
 
 /**

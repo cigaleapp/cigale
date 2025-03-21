@@ -41,9 +41,9 @@
 			.map((id) => tables.Metadata.state.find((m) => m.id === id))
 			.filter((m) => m !== undefined)
 			.toSorted(({ id: a }, { id: b }) => {
-				// Sort id "species" before all others
-				if (a === 'species') return -1;
-				if (b === 'species') return 1;
+				if (protocol.metadataOrder) {
+					return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
+				}
 				return idComparator(a, b);
 			});
 	});

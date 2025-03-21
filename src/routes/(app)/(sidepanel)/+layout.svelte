@@ -5,6 +5,7 @@
 	import { combineMetadataValuesWithOverrides, storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
+	import { CLADE_METADATA_IDS, setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -121,13 +122,23 @@
 			onmetadatachange={async (id, value) => {
 				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
 					for (const subjectId of uiState.selection) {
-						await storeMetadataValue({
-							tx,
-							subjectId,
-							metadataId: id,
-							confidence: 1,
-							value
-						});
+						if (CLADE_METADATA_IDS.includes(id)) {
+							await setTaxonAndInferParents({
+								tx,
+								subjectId,
+								clade: id,
+								value: value.toString(),
+								confidence: 1
+							});
+						} else {
+							await storeMetadataValue({
+								tx,
+								subjectId,
+								metadataId: id,
+								confidence: 1,
+								value
+							});
+						}
 					}
 				});
 			}}
