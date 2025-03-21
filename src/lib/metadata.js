@@ -38,6 +38,11 @@ export async function storeMetadataValue({
 		)
 	};
 
+	// Make sure the alternatives does not contain the value itself
+	newValue.alternatives = Object.fromEntries(
+		Object.entries(newValue.alternatives).filter(([key]) => key !== newValue.value)
+	);
+
 	console.log(
 		`Store metadata ${metadataId} in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
 		newValue
@@ -193,6 +198,30 @@ export async function keyOfEnumLabel(metadataId, label) {
 }
 
 /**
+ * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
+ * @param {import('./database').Image[]} images
+ * @param {import('./database').Observation[]} observations
+ */
+export async function mergeMetadataFromImagesAndObservations(images, observations) {
+	const mergedValues = await mergeMetadataValues(images.map((img) => img.metadata));
+	const mergedOverrides = await mergeMetadataValues(
+		observations.map((obs) => obs.metadataOverrides)
+	);
+
+	const keys = new Set([...Object.keys(mergedValues), ...Object.keys(mergedOverrides)]);
+
+	/** @type {Record<string, import('./database').MetadataValue & { merged: boolean }>}  */
+	const output = {};
+
+	for (const key of keys) {
+		const value = mergedOverrides[key] ?? mergedValues[key];
+		if (value) output[key] = value;
+	}
+
+	return output;
+}
+
+/**
  *
  * @param {Array<import('./database').MetadataValues>} values
  * @returns {Promise<Record<string, import('./database').MetadataValue & { merged: boolean }>>}
@@ -227,63 +256,6 @@ export async function mergeMetadataValues(values) {
 				...merged,
 				merged: [...new Set(valuesOfKey.map((v) => JSON.stringify(v.value)))].length > 1
 			};
-	}
-
-	return output;
-}
-
-/**
- * @param {import('./database').Image[]} images
- * @param {import('./database').Observation[]} observations
- */
-export function combineMetadataValuesWithOverrides(images, observations) {
-	// Combine overrides
-	const metadataOverrides = combineMetadataValues(observations.map((o) => o.metadataOverrides));
-	// Combine images
-	const metadataFromImages = combineMetadataValues(images.map((i) => i.metadata));
-	// For each key, try from metadataOverrides, if not found, try from metadataFromImages
-	const keys = new Set([...Object.keys(metadataOverrides), ...Object.keys(metadataFromImages)]);
-	/** @type {import('./database').MetadataValues} */
-	const output = {};
-	for (const key of keys) {
-		// @ts-ignore
-		output[key] = metadataOverrides[key] ?? metadataFromImages[key];
-	}
-	return output;
-}
-
-/**
- * Combine metadata values. Unlike `mergeMetadataValues`, this one does not attempt to merge different values for the same metadata definition, and puts `undefined` instead of a MetadataValue object when values differ.
- * @param {import('./database').MetadataValues[]} valuesets
- * @returns {Record<string, import('./database').MetadataValue | undefined>}
- */
-export function combineMetadataValues(valuesets) {
-	/** @type {Record<string, import('./database').MetadataValue | undefined>} */
-	const output = {};
-
-	let keys = new Set(valuesets.flatMap((v) => Object.keys(v)));
-
-	for (const key of keys) {
-		const values = valuesets.map((v) => v[key] ?? { value: null, confidence: 0, alternatives: {} });
-
-		const stringedValues = new Set(values.map(({ value }) => JSON.stringify(value)));
-		if (stringedValues.size > 1 || values.some(({ value }) => value === null)) {
-			output[key] = undefined;
-			continue;
-		}
-
-		const alternativeKeys = [...new Set(values.flatMap((v) => Object.keys(v.alternatives)))];
-
-		output[key] = {
-			value: values[0].value,
-			confidence: avg(values.map((v) => v.confidence)),
-			alternatives: Object.fromEntries(
-				alternativeKeys.map((key) => [
-					key,
-					avg(values.map((v) => v.alternatives[key] ?? null).filter((p) => p !== null))
-				])
-			)
-		};
 	}
 
 	return output;

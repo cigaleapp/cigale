@@ -1,5 +1,7 @@
 import { type } from 'arktype';
 import { BUILTIN_METADATA_IDS } from './builtins.js';
+import { entries, invertRecord } from './utils.js';
+import { dev } from '$app/environment';
 
 export const Taxon = type({
 	gbifId: 'number.integer',
@@ -74,10 +76,62 @@ let _taxonomy = {
 
 /**
  *
+ * @param {import('./database').Protocol} protocol
+ * @param {string} metadataId id of the metadata to check
+ */
+export function isTaxonomicMetadata(protocol, metadataId) {
+	// Check if it's the classification metadata target
+	if (metadataId === protocol.inference?.classification?.metadata) return true;
+
+	// Check if it's in the taxonomic targets
+	if (
+		Object.values(protocol.inference?.classification?.taxonomic?.targets ?? {}).includes(metadataId)
+	)
+		return true;
+
+	return false;
+}
+
+/**
+ *
+ * @param {import('./database').Protocol} protocol
+ * @param {string} metadataId
+ * @returns {undefined | typeof Clade.infer}
+ */
+export function cladeRepresentedByMetadata(protocol, metadataId) {
+	// If it's the classification metadata target, check taxonomic clade
+	if (metadataId === protocol.inference?.classification?.metadata) {
+		return protocol.inference?.classification?.taxonomic?.clade ?? 'species';
+	}
+
+	const defaultCladesMapping = {
+		species: BUILTIN_METADATA_IDS.species,
+		kingdoms: BUILTIN_METADATA_IDS.kingdom,
+		phyla: BUILTIN_METADATA_IDS.phylum,
+		classes: BUILTIN_METADATA_IDS.class,
+		orders: BUILTIN_METADATA_IDS.order,
+		families: BUILTIN_METADATA_IDS.family,
+		genera: BUILTIN_METADATA_IDS.genus
+	};
+
+	// Get clade from taxonomic targets
+	return entries({
+		...defaultCladesMapping,
+		...(protocol.inference?.classification?.taxonomic?.targets ?? {})
+	})
+		.map(([clade, metadata]) => ({
+			clade: invertRecord(CLADE_NAMES_PLURAL)[clade],
+			metadata
+		}))
+		.find(({ metadata }) => metadata === metadataId)?.clade;
+}
+
+/**
+ *
  * @param {object} options
  * @param {import('$lib/database.js').Protocol} options.protocol le protocole utilisé
  * @param {string} options.subjectId id de l'image ou l'observation
- * @param {typeof Clade.infer} options.clade le clade à définir
+ * @param {string} options.metadataId id de la métadonnée taxonomique
  * @param {RuntimeValue<'enum'>} options.value l'espèce choisie/détectée
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
  * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
@@ -86,23 +140,36 @@ let _taxonomy = {
 export async function setTaxonAndInferParents({
 	protocol,
 	subjectId,
-	clade,
+	metadataId,
 	value,
 	confidence,
 	alternatives
 }) {
-	const { keyOfEnumLabel, labelOfEnumKey, storeMetadataValue } = await import('./metadata.js');
+	const { storeMetadataValue } = await import('./metadata.js');
+	const { tables } = await import('./idb.svelte.js');
+
+	// Get clade the metadata represents
+	const clade = cladeRepresentedByMetadata(protocol, metadataId);
+	if (!clade) {
+		throw new Error(`Metadata ${metadataId} is not a taxonomic metadata`);
+	}
 
 	await ensureTaxonomyInitialized();
 	console.log(`Setting taxon on ${subjectId}: ${clade} = ${value}`);
+
+	const childCladeDef = await tables.Metadata.get(
+		(clade === protocol.inference?.classification?.taxonomic?.clade
+			? protocol.inference?.classification?.metadata
+			: protocol.inference?.classification?.taxonomic?.targets[CLADE_NAMES_PLURAL[clade]]) ??
+			BUILTIN_METADATA_IDS[clade]
+	);
+	if (!childCladeDef) {
+		throw new Error(`No metadata definition for ${clade}`);
+	}
+
 	await storeMetadataValue({
 		subjectId,
-		metadataId:
-			(clade === protocol.inference?.classification?.taxonomic?.clade
-				? protocol.inference?.classification?.metadata
-				: protocol.inference?.classification?.taxonomic?.targets[
-						CLADE_NAMES_PLURAL[clade]
-					]) ?? BUILTIN_METADATA_IDS[clade],
+		metadataId: childCladeDef.id,
 		value,
 		confidence,
 		alternatives
@@ -112,25 +179,75 @@ export async function setTaxonAndInferParents({
 	if (clade === 'kingdom') return;
 
 	// Recursive case: infer parent
-	const parentClade = CLADE_NAMES_SINGULAR[CLADE_NAMES_SINGULAR.indexOf(clade) - 1];
-	const valueName = await labelOfEnumKey(clade, value);
-	if (!valueName) {
-		throw new Error(`No ${clade} with key ${value} in taxonomy`);
-	}
-	const parentValueName = _taxonomy[CLADE_NAMES_PLURAL[clade]][valueName];
-	if (!parentValueName) {
-		throw new Error(`${valueName} has no ${parentClade} in taxonomy`);
+	const parentCladeName = CLADE_NAMES_SINGULAR[CLADE_NAMES_SINGULAR.indexOf(clade) - 1];
+
+	const parentCladeDef = await tables.Metadata.get(
+		protocol.inference?.classification?.taxonomic?.targets[CLADE_NAMES_PLURAL[clade]] ||
+			BUILTIN_METADATA_IDS[parentCladeName]
+	);
+
+	if (!parentCladeDef) {
+		throw new Error(`No metadata definition for ${parentCladeName}`);
 	}
 
-	const parentKey = await keyOfEnumLabel(parentClade, parentValueName);
+	console.log({ parentCladeDef });
+
+	/**
+	 *
+	 * @param {string} childCladeKey
+	 * @returns
+	 */
+	const parentCladeKey = (childCladeKey) => {
+		// 1. Get label of clade key
+		const childCladeLabel = childCladeDef.options?.find((o) => o.key === childCladeKey)?.label;
+		if (!childCladeLabel) {
+			throw new Error(`No label for ${clade} key ${childCladeKey}`);
+		}
+
+		// 2. Walk up the taxonomy to get parent clade label
+		const parentCladeLabel = _taxonomy[CLADE_NAMES_PLURAL[clade]][childCladeLabel];
+
+		// 3. Get key of parent clade
+		return parentCladeDef.options?.find((o) => o.label === parentCladeLabel)?.key;
+	};
+
+	const parentKey = parentCladeKey(value);
 	if (!parentKey) {
-		throw new Error(`${parentValueName} not found in taxonomy`);
+		throw new Error(`parent of ${value} not found in taxonomy`);
 	}
+
+	// Confidence is average of all values matching the parent clade in alternatives and value
+
+	/** @param {number[]} arr */
+	const avg = (arr) => {
+		if (!arr.length) {
+			if (dev) debugger;
+			throw new Error('Cannot average an empty array');
+		}
+		return arr.reduce((a, b) => a + b, 0) / arr.length;
+	};
+
+	/** @param {string} parentKey  */
+	const confidenceForParentValue = (parentKey) =>
+		avg(
+			[...(alternatives ?? []), { value, confidence }]
+				.filter(({ value }) => parentCladeKey(value) === parentKey)
+				.map(({ confidence }) => confidence)
+				.filter((x) => x !== undefined)
+		);
 
 	await setTaxonAndInferParents({
 		protocol,
 		subjectId,
-		clade: parentClade,
+		confidence: confidenceForParentValue(parentKey),
+		alternatives: Object.values(alternatives ?? {})
+			.map(({ value }) => parentCladeKey(value))
+			.filter((x) => x !== undefined)
+			.map((parentKey) => ({
+				value: parentKey,
+				confidence: confidenceForParentValue(parentKey)
+			})),
+		metadataId: parentCladeDef.id,
 		value: parentKey
 	});
 }

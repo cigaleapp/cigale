@@ -2,10 +2,15 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImage } from '$lib/images';
-	import { deleteMetadataValue, mergeMetadataValues, storeMetadataValue } from '$lib/metadata';
+	import {
+		deleteMetadataValue,
+		mergeMetadataFromImagesAndObservations,
+		mergeMetadataValues,
+		storeMetadataValue
+	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
-	import { CLADE_NAMES_SINGULAR as CLADE_NAMES_SINGULAR, setTaxonAndInferParents } from '$lib/taxonomy';
+	import { isTaxonomicMetadata, setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -110,14 +115,11 @@
 	let mergedMetadataValues = $state({});
 
 	$effect(() => {
-		void mergeMetadataValues(
-			[
-				...selectedImages.map((image) => image.metadata),
-				...selectedObservations.map((obs) => obs.metadataOverrides)
-			].filter((x) => Object.keys(x).length)
-		).then((values) => {
-			mergedMetadataValues = values;
-		});
+		void mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations).then(
+			(values) => {
+				mergedMetadataValues = values;
+			}
+		);
 	});
 </script>
 
@@ -134,16 +136,17 @@
 			ondelete={deleteSelection}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
-				console.log({ onmetadatachange: { id, value } });
+				if (!uiState.currentProtocol) return;
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
-						await deleteMetadataValue({ tx, subjectId, metadataId: id, recursive: true });
-					} else if (CLADE_NAMES_SINGULAR.includes(id)) {
+						await deleteMetadataValue({ subjectId, metadataId: id, recursive: true });
+					} else if (uiState.currentProtocol && isTaxonomicMetadata(uiState.currentProtocol, id)) {
 						await setTaxonAndInferParents({
+							protocol: uiState.currentProtocol,
 							subjectId,
-							clade: id,
-							value: value.toString(),
-							confidence: 1
+							metadataId: id,
+							confidence: 1,
+							value: value.toString()
 						});
 					} else {
 						await storeMetadataValue({

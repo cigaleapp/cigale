@@ -31,3 +31,38 @@ export function fromEntries(subject) {
 	// @ts-expect-error
 	return Object.fromEntries(subject);
 }
+
+/**
+ * @template {string} K
+ * @template {string} V
+ * @param {Record<K, V>} subject
+ * @returns {Array<[K, V]>}
+ */
+export function entries(subject) {
+	// @ts-expect-error
+	return Object.entries(subject);
+}
+
+// Reverse keys and values
+/**
+ * @template {string} K
+ * @template {string} V
+ * @param {Record<K, V>} subject
+ * @returns {Record<V, K>}
+ */
+export function invertRecord(subject) {
+	return fromEntries(entries(subject).map(([key, value]) => [value, key]));
+}
+
+/**
+ *
+ * @param {string} str
+ * @returns
+ */
+export function safeJSONParse(str) {
+	try {
+		return JSON.parse(str);
+	} catch {
+		return undefined;
+	}
+}

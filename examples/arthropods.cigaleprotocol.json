@@ -2,7 +2,7 @@
   "$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
   "id": "io.github.cigaleapp.transects.arthropods",
   "name": "Transect d'arthropodes",
-  "source": "https://github.com/cigaleapp/cigale/tree/6282c7bb8376ea7d2a528d4d9a19b6668fe71d3e/scripts/jessica-joachim-crawler.js#L68",
+  "source": "https://github.com/cigaleapp/cigale/tree/0d507b8ebc396ba893ea642e6bf7ece62ab0b0e8/scripts/jessica-joachim-crawler.js#L68",
   "description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
   "authors": [],
   "metadataOrder": [
