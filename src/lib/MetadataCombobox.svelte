@@ -10,7 +10,7 @@
 	/** @typedef { { value: string; label: string } } Item */
 	/**
 	 * @typedef {object} Props
-	 * @property {NonNullable<import('./database').Metadata['options']>} options
+	 * @property {import('./database.js').MetadataEnumVariant} options
 	 * @property {WithoutChildrenOrChild<Combobox.InputProps>} [inputProps]
 	 * @property {WithoutChildrenOrChild<Combobox.ContentProps>} [contentProps]
 	 * @property {string} [id]

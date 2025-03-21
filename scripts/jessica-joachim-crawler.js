@@ -4,6 +4,7 @@ import { marked } from 'marked';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import Turndown from 'turndown';
+import getCurrentLine from 'get-current-line';
 
 // ANSI control sequences
 const cc = {
@@ -54,6 +55,9 @@ await execa`wget --version`.catch((error) => {
 
 const here = path.dirname(new URL(import.meta.url).pathname);
 
+/** @param {string} id */
+const namespaced = (id) => `io.github.cigaleapp.transects.arthropods__${id}`;
+
 /**
  * @type {typeof import('../src/lib/protocols').ExportedProtocol.inferIn}
  */
@@ -61,18 +65,89 @@ const protocol = {
 	$schema: 'https://cigaleapp.github.io/cigale/protocol.schema.json',
 	id: 'io.github.cigaleapp.transects.arthropods',
 	name: "Transect d'arthropodes",
-	source: 'https://github.com/cigaleapp/cigale/tree/main/scripts/jessica-joachim-crawler.js',
+	source: `https://github.com/cigaleapp/cigale/tree/${await execa`git rev-parse HEAD`.then(result => result.stdout)}/scripts/jessica-joachim-crawler.js#L${getCurrentLine().line}`,
 	description:
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',
 	authors: [],
+	metadataOrder: [
+		namespaced('species'),
+		'genus',
+		'family',
+		'order',
+		'shoot_date',
+		'shoot_location',
+		'class',
+		'phylum',
+		'kingdom',
+		'crop'
+	],
 	metadata: {
-		'io.github.cigaleapp.transects.arthropods__species': {
+		kingdom: 'builtin',
+		phylum: 'builtin',
+		class: 'builtin',
+		order: 'builtin',
+		family: 'builtin',
+		genus: 'builtin',
+		shoot_date: 'builtin',
+		shoot_location: 'builtin',
+		crop: 'builtin',
+		[namespaced('species')]: {
 			type: 'enum',
 			label: 'Espèce',
 			description: '',
 			required: true,
 			mergeMethod: 'max',
 			options: []
+		}
+	},
+	inference: {
+		classification: {
+			model: 'https://cigaleapp.github.io/models/model_classif.onnx',
+			classmapping: 'https://cigaleapp.github.io/models/class_mapping.txt',
+			metadata: namespaced('species'),
+			taxonomic: {
+				clade: 'species',
+				taxonomy: 'https://cigaleapp.github.io/cigale/taxonomy.json',
+				targets: {
+					kingdom: 'kingdom',
+					phylum: 'phylum',
+					class: 'class',
+					order: 'order',
+					family: 'family',
+					genus: 'genus'
+				}
+			},
+			input: {
+				height: 640,
+				width: 640,
+				disposition: 'CHW',
+				normalized: false
+			}
+		},
+		detection: {
+			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
+			input: {
+				height: 224,
+				width: 224,
+				disposition: '1CHW',
+				normalized: true
+			},
+			output: {
+				normalized: true,
+				shape: ['cx', 'cy', 'w', 'h', 'score', '_']
+			}
+		},
+		exports: {
+			images: {
+				cropped:
+					'Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}',
+				original:
+					'Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}'
+			},
+			metadata: {
+				json: 'analysis.json',
+				csv: 'metadata.csv'
+			}
 		}
 	}
 };

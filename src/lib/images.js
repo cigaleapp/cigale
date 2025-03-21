@@ -1,4 +1,5 @@
 import { uiState } from '$lib/state.svelte';
+import { BUILTIN_METADATA_IDS } from './builtins';
 import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
@@ -27,14 +28,16 @@ export function imageIdToFileId(id) {
  * @param {import('$lib/database.js').Image} image
  */
 export function imageIsCropped(image) {
-	return Boolean(image.metadata.crop || uiState.erroredImages.has(image.id));
+	return Boolean(image.metadata[BUILTIN_METADATA_IDS.crop] || uiState.erroredImages.has(image.id));
 }
 
 /**
  * @param {import('$lib/database.js').Image} image
  */
-export function imageIsCLassified(image) {
-	return Boolean(image.metadata.species || uiState.erroredImages.has(image.id));
+export function imageIsClassified(image) {
+	return Boolean(
+		image.metadata[uiState.classificationMetadataId] || uiState.erroredImages.has(image.id)
+	);
 }
 
 /**
