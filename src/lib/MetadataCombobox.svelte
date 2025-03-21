@@ -242,6 +242,7 @@
 		width: 100%;
 		border-radius: calc(2 * var(--corner-radius) - var(--viewport-padding) / 2);
 		overflow: hidden;
+		flex-shrink: 0;
 	}
 
 	.docs .description p:not(:last-child) {
