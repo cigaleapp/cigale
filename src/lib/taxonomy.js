@@ -1,7 +1,6 @@
 import { type } from 'arktype';
 import { BUILTIN_METADATA_IDS } from './builtins.js';
 import { entries, invertRecord } from './utils.js';
-import { dev } from '$app/environment';
 
 export const Taxon = type({
 	gbifId: 'number.integer',
@@ -220,10 +219,7 @@ export async function setTaxonAndInferParents({
 
 	/** @param {number[]} arr */
 	const avg = (arr) => {
-		if (!arr.length) {
-			if (dev) debugger;
-			throw new Error('Cannot average an empty array');
-		}
+		if (!arr.length) throw new Error('Cannot average an empty array');
 		return arr.reduce((a, b) => a + b, 0) / arr.length;
 	};
 
