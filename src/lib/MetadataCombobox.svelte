@@ -155,18 +155,6 @@
 		padding: var(--viewport-padding);
 	}
 
-	:global([data-combobox-content][data-wide-docs]) {
-		width: 800px;
-	}
-
-	:global([data-wide-docs] .items) {
-		width: 40%;
-	}
-
-	:global([data-wide-docs] .docs) {
-		width: 60%;
-	}
-
 	.viewport {
 		display: flex;
 		flex-direction: row;
@@ -185,6 +173,18 @@
 	.docs {
 		width: 50%;
 		overflow-y: scroll;
+	}
+
+	:global([data-combobox-content][data-wide-docs]) {
+		width: 800px;
+	}
+
+	:global([data-wide-docs] .items) {
+		width: 40%;
+	}
+
+	:global([data-wide-docs] .docs) {
+		width: 60%;
 	}
 
 	.items {
