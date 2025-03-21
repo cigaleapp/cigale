@@ -2,6 +2,13 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "type": "object",
   "properties": {
+    "classes": {
+      "type": "object",
+      "description": "classes -> phyla",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "families": {
       "type": "object",
       "description": "families -> orders",
@@ -23,6 +30,9 @@
         "properties": {
           "accepted": {
             "type": "boolean"
+          },
+          "class": {
+            "type": "string"
           },
           "family": {
             "type": "string"
@@ -54,6 +64,7 @@
         },
         "required": [
           "accepted",
+          "class",
           "family",
           "gbifId",
           "genus",
@@ -66,7 +77,7 @@
     },
     "orders": {
       "type": "object",
-      "description": "orders -> phyla",
+      "description": "orders -> class",
       "additionalProperties": {
         "type": "string"
       }
@@ -87,6 +98,7 @@
     }
   },
   "required": [
+    "classes",
     "families",
     "genera",
     "items",

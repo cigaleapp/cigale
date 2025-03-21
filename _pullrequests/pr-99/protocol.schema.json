@@ -32,6 +32,10 @@
     "metadata": {
       "type": "object",
       "properties": {
+        "class": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        },
         "crop": {
           "const": "builtin",
           "description": "Métadonnée \"\" prédéfinie dans l'application: Boîte de recadrage pour l'image"
@@ -174,6 +178,10 @@
                 "label": {
                   "type": "string",
                   "description": "Nom de l'option, affichable dans une interface utilisateur"
+                },
+                "image": {
+                  "type": "string",
+                  "pattern": "https?:\\/\\/.+"
                 },
                 "learnMore": {
                   "type": "string",
@@ -415,6 +423,10 @@
                 "clade": {
                   "anyOf": [
                     {
+                      "const": "class",
+                      "description": "La clade inférée par le modèle."
+                    },
+                    {
                       "const": "family",
                       "description": "La clade inférée par le modèle."
                     },
@@ -445,27 +457,32 @@
                   "type": "object",
                   "description": "Dans quelles métadonnées stocker les clade supérieures inférées par l'arbre taxonomique. Similairement à metadata, ces métadonnées doivent être déclarées dans les métadonnées du protocole, et doivent être de type 'enum'. Les options seront remplies par l'arbre taxonomique, et peuvent donc être laissées vides dans la définition de la métadonnée.",
                   "properties": {
-                    "family": {
+                    "classes": {
                       "type": "string",
                       "description": "L'identifiant de la métadonnée",
                       "pattern": "[\\w_]+"
                     },
-                    "genus": {
+                    "families": {
                       "type": "string",
                       "description": "L'identifiant de la métadonnée",
                       "pattern": "[\\w_]+"
                     },
-                    "kingdom": {
+                    "genera": {
                       "type": "string",
                       "description": "L'identifiant de la métadonnée",
                       "pattern": "[\\w_]+"
                     },
-                    "order": {
+                    "kingdoms": {
                       "type": "string",
                       "description": "L'identifiant de la métadonnée",
                       "pattern": "[\\w_]+"
                     },
-                    "phylum": {
+                    "orders": {
+                      "type": "string",
+                      "description": "L'identifiant de la métadonnée",
+                      "pattern": "[\\w_]+"
+                    },
+                    "phyla": {
                       "type": "string",
                       "description": "L'identifiant de la métadonnée",
                       "pattern": "[\\w_]+"
