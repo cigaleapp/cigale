@@ -46,8 +46,7 @@
 	let openKeyboardShortcuts = $state();
 </script>
 
-<Navigation {openKeyboardShortcuts} hasImages={true} progress={uiState.processing.progress}
-></Navigation>
+<Navigation {openKeyboardShortcuts} progress={uiState.processing.progress} />
 
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
