@@ -32,6 +32,10 @@
     "metadata": {
       "type": "object",
       "properties": {
+        "class": {
+          "const": "builtin",
+          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+        },
         "crop": {
           "const": "builtin",
           "description": "Métadonnée \"\" prédéfinie dans l'application: Boîte de recadrage pour l'image"
@@ -415,6 +419,10 @@
                 "clade": {
                   "anyOf": [
                     {
+                      "const": "class",
+                      "description": "La clade inférée par le modèle."
+                    },
+                    {
                       "const": "family",
                       "description": "La clade inférée par le modèle."
                     },
@@ -445,6 +453,11 @@
                   "type": "object",
                   "description": "Dans quelles métadonnées stocker les clade supérieures inférées par l'arbre taxonomique. Similairement à metadata, ces métadonnées doivent être déclarées dans les métadonnées du protocole, et doivent être de type 'enum'. Les options seront remplies par l'arbre taxonomique, et peuvent donc être laissées vides dans la définition de la métadonnée.",
                   "properties": {
+                    "class": {
+                      "type": "string",
+                      "description": "L'identifiant de la métadonnée",
+                      "pattern": "[\\w_]+"
+                    },
                     "family": {
                       "type": "string",
                       "description": "L'identifiant de la métadonnée",
