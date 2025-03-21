@@ -1,4 +1,6 @@
 <script>
+	import { tooltip } from './tooltips';
+
 	/**
 	 * @typedef {object} Props
 	 * @property {number} value
@@ -11,6 +13,7 @@
 {#if value && value > 0 && value < 1}
 	<code
 		class="confidence"
+		use:tooltip={`Confiance: ${value * 100}%`}
 		style:color="var(--fg-{value < 0.25
 			? 'error'
 			: value < 0.5
@@ -21,6 +24,6 @@
 	>
 		{Math.round(value * 100)
 			.toString()
-			.padStart(3, '\u00a0')}%
+			.padStart(2, '\u00a0')}%
 	</code>
 {/if}

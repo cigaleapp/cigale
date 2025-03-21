@@ -187,7 +187,10 @@
 	.items,
 	.docs {
 		width: 50%;
-		overflow-y: scroll;
+		scrollbar-color: var(--gray) transparent;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		overflow-y: auto;
 	}
 
 	:global([data-combobox-content][data-wide-docs]) {
@@ -237,6 +240,10 @@
 	.item:not(.selected) .check {
 		opacity: 0;
 		visibility: hidden;
+	}
+
+	.items .confidence {
+		margin-left: auto;
 	}
 
 	.docs {

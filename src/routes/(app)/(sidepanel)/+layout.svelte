@@ -184,7 +184,10 @@
 		gap: 1em;
 		height: 100%;
 		flex-grow: 1;
-		overflow-y: scroll;
+		scrollbar-color: var(--gray) transparent;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		overflow-y: auto;
 		padding: 1.2rem;
 	}
 </style>

@@ -50,7 +50,7 @@
 						safeJSONParse(key)?.toString(),
 						value
 					]),
-					[value?.toString(), value?.confidence]
+					[safeJSONParse(value?.value)?.toString(), value?.confidence]
 				])}
 			/>
 			{#if value?.confidence}

@@ -56,12 +56,12 @@ export function invertRecord(subject) {
 
 /**
  *
- * @param {string} str
+ * @param {*} str
  * @returns
  */
 export function safeJSONParse(str) {
 	try {
-		return JSON.parse(str);
+		return JSON.parse(str?.toString() ?? '');
 	} catch {
 		return undefined;
 	}
