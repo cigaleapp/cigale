@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     permissions:
@@ -28,8 +31,9 @@ jobs:
         run: BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale npm run build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          publish_branch: gh-pages
+          folder: public # The folder the action should deploy.
+          force: yes
+          clean: no
+          clean-exclude: _pullrequests/
