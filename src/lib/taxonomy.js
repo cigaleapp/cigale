@@ -6,6 +6,7 @@ export const Taxon = type({
 	'gbifBackboneId?': 'number.integer',
 	kingdom: 'string',
 	phylum: 'string',
+	class: 'string',
 	order: 'string',
 	family: 'string',
 	species: 'string',
@@ -17,7 +18,8 @@ export const Taxon = type({
 export const Taxonomy = type({
 	items: Taxon.array(),
 	phyla: type({ '[string]': 'string' }).describe('phyla -> kingdoms'),
-	orders: type({ '[string]': 'string' }).describe('orders -> phyla'),
+	classes: type({ '[string]': 'string' }).describe('classes -> phyla'),
+	orders: type({ '[string]': 'string' }).describe('orders -> class'),
 	families: type({ '[string]': 'string' }).describe('families -> orders'),
 	genera: type({ '[string]': 'string' }).describe('genera -> families'),
 	species: type({ '[string]': 'string' }).describe('species -> genera')
@@ -29,6 +31,7 @@ export const Taxonomy = type({
 export const CLADE_METADATA_IDS = /** @type {const} */ ([
 	BUILTIN_METADATA_IDS.kingdom,
 	BUILTIN_METADATA_IDS.phylum,
+	BUILTIN_METADATA_IDS.class,
 	BUILTIN_METADATA_IDS.order,
 	BUILTIN_METADATA_IDS.family,
 	BUILTIN_METADATA_IDS.genus,
@@ -41,6 +44,7 @@ export const CLADE_METADATA_IDS = /** @type {const} */ ([
 export const CLADE_METADATA_IDS_PLURAL = /** @type {const} */ ({
 	[BUILTIN_METADATA_IDS.kingdom]: 'kingdom',
 	[BUILTIN_METADATA_IDS.phylum]: 'phyla',
+	[BUILTIN_METADATA_IDS.class]: 'classes',
 	[BUILTIN_METADATA_IDS.order]: 'orders',
 	[BUILTIN_METADATA_IDS.family]: 'families',
 	[BUILTIN_METADATA_IDS.genus]: 'genera',
@@ -54,10 +58,11 @@ export const Clade = type.enumerated(...CLADE_METADATA_IDS);
  */
 let _taxonomy = {
 	species: {},
-	phyla: {},
-	orders: {},
-	families: {},
 	genera: {},
+	families: {},
+	orders: {},
+	classes: {},
+	phyla: {},
 	items: []
 };
 
@@ -81,10 +86,8 @@ export async function setTaxonAndInferParents({
 	clade,
 	value,
 	confidence,
-	alternatives,
-	tx
+	alternatives
 }) {
-	const { openTransaction } = await import('./idb.svelte.js');
 	const { keyOfEnumLabel, labelOfEnumKey, storeMetadataValue } = await import('./metadata.js');
 
 	await ensureTaxonomyInitialized();

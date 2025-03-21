@@ -1,4 +1,4 @@
-const CLASSMAPPING_URL = 'https://media.gwen.works/cigale/models/class_mapping.txt';
+const CLASSMAPPING_URL = 'https://cigaleapp.github.io/models/class_mapping.txt';
 
 async function fetchTaxon(taxon) {
 	const response = await fetch(
@@ -18,7 +18,15 @@ const species = await fetch(CLASSMAPPING_URL)
 			.filter(Boolean)
 	);
 
-const out = { phyla: {}, orders: {}, families: {}, genera: {}, species: {}, items: [] };
+const out = {
+	phyla: {},
+	classes: {},
+	orders: {},
+	families: {},
+	genera: {},
+	species: {},
+	items: []
+};
 let done = 0;
 const total = species.length;
 
@@ -27,14 +35,25 @@ process.stderr.write(`\x1b[KGot ${total} species\r`);
 for (const sp of species) {
 	process.stderr.write(`\x1b[K${done}/${total} ${sp}\r`);
 
-	const { key, nubKey, kingdom, phylum, order, family, genus, species, taxonomicStatus } =
-		await fetchTaxon(sp);
+	const {
+		key,
+		nubKey,
+		kingdom,
+		phylum,
+		order,
+		family,
+		genus,
+		species,
+		taxonomicStatus,
+		class: klass
+	} = await fetchTaxon(sp);
 
 	out.items.push({
 		gbifId: key,
 		gbifBackboneId: nubKey,
 		kingdom,
 		phylum,
+		class: klass,
 		order,
 		family,
 		species,
@@ -67,11 +86,18 @@ for (const { family, order } of out.items) {
 	out.families[family] = order;
 }
 
-process.stderr.write(`\x1b[KBuilding mapping orders->phyla...\r`);
+process.stderr.write(`\x1b[KBuilding mapping orders->classes...\r`);
 
-for (const { order, phylum } of out.items) {
+for (const { order, class: klass } of out.items) {
 	if (!out.orders[order]) out.orders[order] = {};
-	out.orders[order] = phylum;
+	out.orders[order] = klass;
+}
+
+process.stderr.write(`\x1b[KBuilding mapping classes->phyla...\r`);
+
+for (const { class: klass, phylum } of out.items) {
+	if (!out.classes[klass]) out.classes[klass] = {};
+	out.classes[klass] = phylum;
 }
 
 process.stderr.write(`\x1b[KBuilding mapping phyla->kingdoms...\r`);
