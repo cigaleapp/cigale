@@ -1,11 +1,14 @@
 <script>
 	import IconCheck from '~icons/ph/check';
-	import IconClear from '~icons/ph/x';
 	import IconMerged from '~icons/ph/stack';
 	import IconTechnical from '~icons/ph/wrench';
+	import IconClear from '~icons/ph/x';
+	import ConfidencePercentage from './ConfidencePercentage.svelte';
+	import { isType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';
-	import { tooltip } from './tooltips';
 	import { getSettings } from './settings.svelte';
+	import { tooltip } from './tooltips';
+	import { safeJSONParse } from './utils';
 
 	/**
 	 * @typedef {object} Props
@@ -36,8 +39,23 @@
 			{/if}
 		</label>
 		<div class="value">
-			<MetadataInput id={_id} {definition} value={value?.value} onblur={onchange} {merged} />
-			{@render confidenceDisplay(value?.confidence)}
+			<MetadataInput
+				id={_id}
+				{definition}
+				value={value?.value}
+				onblur={onchange}
+				{merged}
+				confidences={Object.fromEntries([
+					...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
+						safeJSONParse(key)?.toString(),
+						value
+					]),
+					[value?.toString(), value?.confidence]
+				])}
+			/>
+			{#if value?.confidence}
+				<ConfidencePercentage value={value.confidence} />
+			{/if}
 			{#if merged}
 				<div
 					class="merged-indicator"
@@ -64,15 +82,21 @@
 		<section class="alternatives">
 			<div class="title">Alternatives</div>
 			<ul class="options">
-				{#each Object.entries(value.alternatives).sort(([, a], [, b]) => b - a) as [stringifiedValue, confidence] (stringifiedValue)}
+				{#each Object.entries(value.alternatives).sort(([, a], [, b]) => b - a) as [jsonValue, confidence] (jsonValue)}
+					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
+					{@const enumVariant = isType('enum', definition.type, stringValue)
+						? definition.options?.find(({ key }) => key === stringValue)
+						: undefined}
 					<li>
-						<div class="value">{stringifiedValue}</div>
-						{@render confidenceDisplay(confidence)}
+						<div class="value" use:tooltip={enumVariant?.description}>
+							{enumVariant?.label || stringValue}
+						</div>
+						<ConfidencePercentage value={confidence} />
 						<button
 							use:tooltip={'Sélectionner cette valeur'}
 							onclick={() => {
 								value = {
-									value: JSON.parse(stringifiedValue),
+									value: JSON.parse(jsonValue),
 									confidence,
 									alternatives: value?.alternatives ?? {}
 								};
@@ -97,28 +121,9 @@
 		</section>
 	{/if}
 	{#if getSettings().showTechnicalMetadata}
-		<pre>{JSON.stringify({ value }, null, 2)}</pre>
+		<pre>{JSON.stringify({ id: definition.id, value }, null, 2)}</pre>
 	{/if}
 </div>
-
-{#snippet confidenceDisplay(/** @type {number|undefined} */ confidence)}
-	{#if confidence && confidence > 0 && confidence < 1}
-		<code
-			class="confidence"
-			style:color="var(--fg-{confidence < 0.25
-				? 'error'
-				: confidence < 0.5
-					? 'warning'
-					: confidence < 0.95
-						? 'neutral'
-						: 'success'})"
-		>
-			{Math.round(confidence * 100)
-				.toString()
-				.padStart(3, '\u00a0')}%
-		</code>
-	{/if}
-{/snippet}
 
 <style>
 	.metadata {
@@ -156,6 +161,33 @@
 		text-overflow: ellipsis;
 		display: flex;
 		align-items: center;
+		gap: 0.5em;
+	}
+
+	.alternatives {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.alternatives .title {
+		text-transform: uppercase;
+		color: var(--gray);
+		letter-spacing: 0.2ch;
+	}
+
+	.alternatives ul {
+		list-style: none;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: end;
+		margin-top: 0.5em;
+		gap: 0.25em;
+	}
+	.alternatives li {
+		display: flex;
+		align-items: center;
+		justify-content: end;
 		gap: 0.5em;
 	}
 

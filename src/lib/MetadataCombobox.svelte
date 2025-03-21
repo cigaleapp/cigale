@@ -3,6 +3,7 @@
 	import IconArrowRight from '~icons/ph/arrow-right';
 	import IconCheck from '~icons/ph/check';
 	import Logo from './Logo.svelte';
+	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 */
@@ -10,10 +11,11 @@
 	/** @typedef { { value: string; label: string } } Item */
 	/**
 	 * @typedef {object} Props
-	 * @property {import('./database.js').MetadataEnumVariant} options
+	 * @property {import('./database.js').MetadataEnumVariant[]} options
 	 * @property {WithoutChildrenOrChild<Combobox.InputProps>} [inputProps]
 	 * @property {WithoutChildrenOrChild<Combobox.ContentProps>} [contentProps]
 	 * @property {string} [id]
+	 * @property {Record<string, number>} [confidences]
 	 */
 
 	/**
@@ -21,6 +23,7 @@
 	 */
 	let {
 		options,
+		confidences = {},
 		value = $bindable(),
 		open = $bindable(false),
 		inputProps,
@@ -38,7 +41,16 @@
 	const items = $derived(options.map((opt) => ({ value: opt.key, label: opt.label })));
 
 	const filteredItems = $derived.by(() => {
-		if (searchValue === '') return items;
+		if (searchValue === '')
+			return items.toSorted((a, b) => {
+				// Sort selected item first, then items with confidences (from high to low), then the rest, alphabetically
+				const confidence = (/** @type {string} */ key) => confidences[key] ?? -1;
+				if (a.value === value) return -1;
+				if (b.value === value) return 1;
+				const confidenceDiff = confidence(b.value) - confidence(a.value);
+				if (confidenceDiff !== 0) return confidenceDiff;
+				return a.label.localeCompare(b.label);
+			});
 		return items.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()));
 	});
 
@@ -101,6 +113,9 @@
 										<IconCheck />
 									</div>
 									<span class="label">{item.label}</span>
+									<div class="confidence">
+										<ConfidencePercentage value={confidences[item.value]} />
+									</div>
 								</div>
 							{/snippet}
 						</Combobox.Item>

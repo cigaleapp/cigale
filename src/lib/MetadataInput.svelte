@@ -16,10 +16,11 @@
 	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onblur]
 	 * @property {string} [id]
 	 * @property {boolean} [disabled]
+	 * @property {Record<string, number>} [confidences]
 	 */
 
 	/** @type {Props} */
-	let { value = $bindable(), id, disabled, definition, onblur } = $props();
+	let { value = $bindable(), confidences = {}, id, disabled, definition, onblur } = $props();
 
 	const { type, options = [] } = definition;
 </script>
@@ -30,6 +31,7 @@
 			{id}
 			{disabled}
 			options={options.map(({ key, ...rest }) => ({ key: key.toString(), ...rest }))}
+			{confidences}
 			type="single"
 			value={value?.toString()}
 			onValueChange={(newValue) => {

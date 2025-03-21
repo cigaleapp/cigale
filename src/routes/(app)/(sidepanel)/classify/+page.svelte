@@ -79,30 +79,33 @@
 		// TODO persist after page reload?
 		uiState.croppedPreviewURLs.set(imageIdToFileId(id), nimg.toDataURL());
 
-		const output_classif = await classify([[nimg]], classifmodel, uiState, 0);
-		const species = output_classif[0];
-		const _confs = output_classif[1];
+		const [[scores]] = await classify([[nimg]], classifmodel, uiState, 0);
 
-		if (output_classif[0].length == 0) {
+		const results = scores
+			.map((score, i) => ({
+				confidence: score,
+				value: i.toString()
+			}))
+			.sort((a, b) => b.confidence - a.confidence)
+			.slice(0, 3);
+
+		if (!results.length) {
 			console.warn('No species detected');
 			return 0;
 		} else {
-			const [[firstChoice, firstChoiceConfidence], ...alternatives] = species;
+			const [firstChoice, ...alternatives] = results;
 			if (!uiState.currentProtocol) return;
 			const metadataValue = /** @type {const} */ ({
 				subjectId: id,
-				value: firstChoice.toString(),
-				confidence: firstChoiceConfidence,
-				alternatives: alternatives.map(([value, confidence]) => ({
-					value: value.toString(),
-					confidence
-				}))
+				...firstChoice,
+				alternatives
 			});
-			if (uiState.currentProtocol.inference?.classification?.taxonomic) {
+
+			if (uiState.currentProtocol.inference?.classification?.metadata) {
 				await setTaxonAndInferParents({
 					...metadataValue,
 					protocol: uiState.currentProtocol,
-					clade: uiState.currentProtocol.inference.classification.taxonomic.clade
+					metadataId: uiState.currentProtocol.inference.classification.metadata
 				});
 			} else {
 				await storeMetadataValue({
