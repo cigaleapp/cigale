@@ -1,5 +1,5 @@
 import { dev } from '$app/environment';
-import { BUILTIN_METADATA, BUILTIN_METADATA_IDS } from '$lib/builtins.js';
+import { BUILTIN_METADATA } from '$lib/builtins.js';
 import { openTransaction, tables } from '$lib/idb.svelte.js';
 import { defineSpeciesMetadata } from '$lib/species.svelte.js';
 import { error } from '@sveltejs/kit';

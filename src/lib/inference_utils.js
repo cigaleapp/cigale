@@ -112,7 +112,7 @@ export async function applyBBOnTensor(BB, tensor, marge = 10) {
             forme : [1, C, h+2*marge, w+2*marge]
     */
 	let [x, y, w, h] = BB;
-	const [_, __, tsrheight, tsrwidth] = tensor.dims;
+	const [, , tsrheight, tsrwidth] = tensor.dims;
 
 	x = x - marge;
 	y = y - marge;
