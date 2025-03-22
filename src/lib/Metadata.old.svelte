@@ -136,11 +136,7 @@
 	{:else if isType('boolean', type, value)}
 		<!-- https://github.com/sveltejs/language-tools/issues/1026#issuecomment-2495493220 -->
 		{/* @ts-ignore */ null}
-		<Checkbox
-			id="metadata-{id}"
-			value={Boolean(value?.value)}
-			onchange={onblur}
-		>
+		<Checkbox id="metadata-{id}" value={Boolean(value?.value)} onchange={onblur}>
 			<div class="niOuiNiNon">
 				{#if value === undefined && conflicted}
 					Plusieurs valeurs

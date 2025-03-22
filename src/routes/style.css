@@ -18,8 +18,8 @@ dialog {
 	--gay: color-mix(in srgb, var(--fg-neutral) 75%, var(--bg-neutral));
 
 	--dark__fg-primary: #bb54ff;
-	--dark__bg-primary-translucent: color-mix(in srgb, var(--bg-primary)  35%, var(--bg-neutral));
-	--dark__bg-primary:  #042f52;
+	--dark__bg-primary-translucent: color-mix(in srgb, var(--bg-primary) 35%, var(--bg-neutral));
+	--dark__bg-primary: #042f52;
 	--dark__fg-dark-primary: #7bbbb0;
 	--dark__bg-dark-primary: #2f3040;
 	--dark__fg-warning: #fff7b3;
