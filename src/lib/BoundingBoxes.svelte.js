@@ -9,17 +9,15 @@ import { TARGETHEIGHT, TARGETWIDTH } from './inference';
  */
 export function coordsScaler({ x: xwise, y: ywise }) {
 	/**
-	 * @param {object} param0
-	 * @param {number} param0.x
-	 * @param {number} param0.y
-	 * @param {number} param0.width
-	 * @param {number} param0.height
+	 * @template {{x: number; y: number} & ({w: number; h: number} | {width: number; height: number})} Shape
+	 * @param {Shape} param0
+	 * @returns {Shape}
 	 */
-	return ({ x, y, width, height }) => ({
+	return ({ x, y, ...wh }) => ({
 		x: x * xwise,
 		y: y * ywise,
-		width: width * xwise,
-		height: height * ywise
+		['width' in wh ? 'width' : 'w']: (wh.width ?? wh.w) * xwise,
+		['height' in wh ? 'height' : 'h']: (wh.height ?? wh.h) * ywise
 	});
 }
 

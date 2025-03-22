@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toCenteredCoords, toRelativeCoords } from '$lib/BoundingBoxes.svelte';
+	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { processExifData } from '$lib/exif';
 	import * as db from '$lib/idb.svelte';
@@ -15,13 +15,7 @@
 		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
-	import {
-		inferSequentialy,
-		loadModel,
-		MODELDETECTPATH,
-		TARGETHEIGHT,
-		TARGETWIDTH
-	} from '$lib/inference.js';
+	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation } from '$lib/observations';
@@ -96,18 +90,13 @@
 
 		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
 		let [firstScore, ...otherScores] = bestScores;
-		const inputSettings = uiState.currentProtocol.inference?.detection.input ?? {
-			width: TARGETWIDTH,
-			height: TARGETHEIGHT
-		};
 
-		firstBoundingBox ??= [0, 0, inputSettings.width, inputSettings.height];
+		firstBoundingBox ??= [0, 0, 0.5, 0.5];
 		firstScore ??= 1;
 		/**
 		 * @param {[number, number, number, number]} param0
 		 */
-		const toCropBox = ([x, y, width, height]) =>
-			toCenteredCoords(toRelativeCoords(uiState.currentProtocol)({ x, y, width, height }));
+		const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
 
 		await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
 			await storeMetadataValue({
