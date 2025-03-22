@@ -79,12 +79,21 @@ export function hasOnce(value, values) {
 
 /**
  *
- * @param {any} a
- * @param {any} b
+ * @param {...any} args
  * @returns {boolean}
  */
-export function xor(a, b) {
-	return Boolean(a ? !b : b);
+export function xor(...args) {
+	if (args.length === 0) return false;
+	const [first, ...rest] = args;
+	return xor(...rest) !== first;
+}
+
+/**
+ * @param {...any} args
+ * @returns {boolean}
+ */
+export function or(...args) {
+	return args.some(Boolean);
 }
 
 /**

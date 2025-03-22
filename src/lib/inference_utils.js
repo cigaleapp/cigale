@@ -1,7 +1,7 @@
-import * as ort from 'onnxruntime-web';
-import * as Jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
-import { hasOnce, oneOf } from './utils.js';
+import { match } from 'arktype';
+import * as Jimp from 'jimp';
+import * as ort from 'onnxruntime-web';
 
 /**
  * @typedef {import('onnxruntime-web')} ort
@@ -430,8 +430,6 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 	let bestBoxes = [];
 	/** @type {number[][]}  */
 	let bestScores = [];
-	/** @type {?Float32Array}  */
-	let suboutput = null;
 
 	console.log(output);
 
@@ -444,14 +442,6 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 		'_'
 	];
 
-	const indexOffsets = {
-		x: outputShape.findIndex((v) => oneOf(v, ['cx', 'sx'])),
-		y: outputShape.findIndex((v) => oneOf(v, ['cy', 'sy'])),
-		w: outputShape.indexOf('w'),
-		h: outputShape.indexOf('h'),
-		score: outputShape.indexOf('score')
-	};
-
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;
 
@@ -461,34 +451,71 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 		/** @type {number[]} */
 		let bbScores = [];
 
-		suboutput = output.slice(
+		let suboutput = output.slice(
 			k * boundingBoxesCount * suboutputSize,
 			(k + 1) * boundingBoxesCount * suboutputSize
 		);
 
 		for (let i = 0; i < suboutput.length; i += suboutputSize) {
-			let x = suboutput[i + indexOffsets.x];
-			let y = suboutput[i + indexOffsets.y];
-			let w = suboutput[i + indexOffsets.w];
-			let h = suboutput[i + indexOffsets.h];
-			let score = suboutput[i + indexOffsets.score];
+			/**
+			 * Get a data point ("atom") for this bounding box for this model.
+			 * If the protocol's inference detection output shape does not include the atom, return undefined.
+			 * Otherwise, grab the data point from the suboutput using the index of the atom in the output shape.
+			 * For example, if the output shape is `['sx', '_', '_', 'sy']`, we can get the 'sy' atom using `suboutput[i + 3]`.
+			 * @param {import('./database').ModelDetectionOutputShape[number]} atom
+			 */
+			const atom = (atom) =>
+				outputShape.includes(atom) ? suboutput[i + outputShape.indexOf(atom)] : undefined;
 
-			// TODO understand this, seems like our model does _not_ really output width and height, what does it output then?
-			w = Math.abs(x - w);
-			h = Math.abs(y - h);
+			// All possible data points ("atoms") for this bounding box
+			const atoms = {
+				sx: atom('sx'),
+				sy: atom('sy'),
+				ex: atom('ex'),
+				ey: atom('ey'),
+				cx: atom('cx'),
+				cy: atom('cy'),
+				w: atom('w'),
+				h: atom('h'),
+				score: atom('score')
+			};
 
-			// If the x coord is a centered x (cx) and not a starting x (sx), convert it to starting (top-left) x
-			if (hasOnce('cx', outputShape)) x -= w / 2;
-			// Same for y
-			if (hasOnce('cy', outputShape)) y -= h / 2;
+			// Get center point x coord and width
+			const [x, w] = match({})
+				.case({ cx: 'number', w: 'number' }, ({ cx, w }) => [cx, w])
+				.case({ sx: 'number', w: 'number' }, ({ sx, w }) => [sx + w / 2, w])
+				.case({ ex: 'number', w: 'number' }, ({ ex, w }) => [ex - w / 2, w])
+				.case({ sx: 'number', ex: 'number' }, ({ sx, ex }) => [(sx + ex) / 2, ex - sx])
+				.default(() => {
+					throw new Error(
+						"Could not get center point x coord and width. Check your protocol's inference.detection.output.shape."
+					);
+				})(atoms);
+
+			const [y, h] = match({})
+				.case({ cy: 'number', h: 'number' }, ({ cy, h }) => [cy, h])
+				.case({ sy: 'number', h: 'number' }, ({ sy, h }) => [sy + h / 2, h])
+				.case({ ey: 'number', h: 'number' }, ({ ey, h }) => [ey - h / 2, h])
+				.case({ sy: 'number', ey: 'number' }, ({ sy, ey }) => [(sy + ey) / 2, ey - sy])
+				.default(() => {
+					throw new Error(
+						"Could not get center point y coord and height. Check your protocol's inference.detection.output.shape."
+					);
+				})(atoms);
 
 			if (x == 0 && y == 0 && w == 0 && h == 0) {
 				break;
 			}
 
-			if (score > minConfidence) {
+			if (atoms.score === undefined) {
+				throw new Error(
+					"Could not get score. Check your protocol's inference.detection.output.shape."
+				);
+			}
+
+			if (atoms.score > minConfidence) {
 				bestPerImageBoxes.push([x, y, w, h]);
-				bbScores.push(score);
+				bbScores.push(atoms.score);
 			}
 		}
 

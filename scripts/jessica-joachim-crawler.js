@@ -134,7 +134,7 @@ const protocol = {
 			},
 			output: {
 				normalized: true,
-				shape: ['sx', 'sy', 'w', 'h', 'score', '_']
+				shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
 			}
 		},
 		exports: {
