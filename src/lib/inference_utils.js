@@ -482,24 +482,28 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 
 			// Get center point x coord and width
 			const [x, w] = match({})
+				.case({ cx: 'number', ex: 'number' }, ({ cx, ex }) => [cx, 2 * (ex - cx)])
+				.case({ cx: 'number', sx: 'number' }, ({ sx, cx }) => [cx, 2 * (cx - sx)])
 				.case({ cx: 'number', w: 'number' }, ({ cx, w }) => [cx, w])
-				.case({ sx: 'number', w: 'number' }, ({ sx, w }) => [sx + w / 2, w])
+				.case({ ex: 'number', sx: 'number' }, ({ sx, ex }) => [(sx + ex) / 2, ex - sx])
 				.case({ ex: 'number', w: 'number' }, ({ ex, w }) => [ex - w / 2, w])
-				.case({ sx: 'number', ex: 'number' }, ({ sx, ex }) => [(sx + ex) / 2, ex - sx])
+				.case({ sx: 'number', w: 'number' }, ({ sx, w }) => [sx + w / 2, w])
 				.default(() => {
 					throw new Error(
-						"Could not get center point x coord and width. Check your protocol's inference.detection.output.shape."
+						`Could not get center point x coord and width. Check your protocol's inference.detection.output.shape. Available atoms: ${JSON.stringify(atoms)}`
 					);
 				})(atoms);
 
 			const [y, h] = match({})
+				.case({ cy: 'number', ey: 'number' }, ({ cy, ey }) => [cy, 2 * (ey - cy)])
+				.case({ cy: 'number', sy: 'number' }, ({ sy, cy }) => [cy, 2 * (cy - sy)])
 				.case({ cy: 'number', h: 'number' }, ({ cy, h }) => [cy, h])
-				.case({ sy: 'number', h: 'number' }, ({ sy, h }) => [sy + h / 2, h])
+				.case({ ey: 'number', sy: 'number' }, ({ sy, ey }) => [(sy + ey) / 2, ey - sy])
 				.case({ ey: 'number', h: 'number' }, ({ ey, h }) => [ey - h / 2, h])
-				.case({ sy: 'number', ey: 'number' }, ({ sy, ey }) => [(sy + ey) / 2, ey - sy])
+				.case({ sy: 'number', h: 'number' }, ({ sy, h }) => [sy + h / 2, h])
 				.default(() => {
 					throw new Error(
-						"Could not get center point y coord and height. Check your protocol's inference.detection.output.shape."
+						`Could not get center point y coord and height. Check your protocol's inference.detection.output.shape. Available atoms: ${JSON.stringify(atoms)}`
 					);
 				})(atoms);
 

@@ -301,7 +301,7 @@ const ProtocolWithoutMetadata = type({
 					"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
 				],
 				shape: ModelDetectionOutputShape.describe(
-					"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 3 parmi 'cx', 'sx', 'ex', 'w'; et 3 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
+					"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
 				)
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
