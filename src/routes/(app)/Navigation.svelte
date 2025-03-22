@@ -4,15 +4,13 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { previewingPrNumber, uiState } from '$lib/state.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { base } from '$app/paths';
-	import { tooltip } from '$lib/tooltips';
 
 	/**
 	 * @typedef Props
