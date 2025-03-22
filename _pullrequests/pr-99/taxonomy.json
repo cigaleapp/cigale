@@ -565,8 +565,8 @@
 			"notAcceptedWhy": "SYNONYM"
 		},
 		{
-			"gbifId": 2121447,
-			"gbifBackboneId": 2121447,
+			"gbifId": 11990337,
+			"gbifBackboneId": 11990337,
 			"kingdom": "Animalia",
 			"phylum": "Arthropoda",
 			"class": "Collembola",
@@ -574,7 +574,8 @@
 			"family": "Hypogastruridae",
 			"species": "Hypogastrura viatica",
 			"genus": "Hypogastrura",
-			"accepted": true
+			"accepted": false,
+			"notAcceptedWhy": "DOUBTFUL"
 		},
 		{
 			"gbifId": 7641902,
