@@ -3,7 +3,6 @@ import Handlebars from 'handlebars';
 import { parseISOSafe } from './date.js';
 import { splitFilenameOnExtension } from './download.js';
 import { Clade, CladePlural } from './taxonomy.js';
-import { hasOnce, or } from './utils.js';
 
 const ID = type(/[\w_]+/);
 
@@ -269,34 +268,7 @@ const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du point cent
 	.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
 	.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
 	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
-	.array()
-	.narrow(
-		(shape) =>
-			// Must have score
-			hasOnce('score', shape) &&
-			// Must have one of these configurations, to get the center X coord and the width. We essentially need 3 of the 4 values. since 4 choose 3 = 4, we have 4 cases possible.
-			or(
-				// cx & w
-				hasOnce('cx', shape) && hasOnce('w', shape),
-				// sx & w
-				hasOnce('sx', shape) && hasOnce('w', shape),
-				// ex & w
-				hasOnce('ex', shape) && hasOnce('w', shape),
-				// sx & ex
-				hasOnce('sx', shape) && hasOnce('ex', shape)
-			) &&
-			// Must have one of these configurations, t get the center Y coord and the height
-			or(
-				// cy
-				hasOnce('cy', shape) && hasOnce('h', shape),
-				// sy & h
-				hasOnce('sy', shape) && hasOnce('h', shape),
-				// ey & h
-				hasOnce('ey', shape) && hasOnce('h', shape),
-				// sy & ey
-				hasOnce('sy', shape) && hasOnce('ey', shape)
-			)
-	);
+	.array();
 
 const ProtocolWithoutMetadata = type({
 	id: ID.describe(
@@ -328,7 +300,9 @@ const ProtocolWithoutMetadata = type({
 					'@',
 					"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
 				],
-				shape: ModelDetectionOutputShape
+				shape: ModelDetectionOutputShape.describe(
+					"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 3 parmi 'cx', 'sx', 'ex', 'w'; et 3 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
+				)
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
