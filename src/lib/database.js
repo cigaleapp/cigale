@@ -1,9 +1,9 @@
-import { type, scope } from 'arktype';
-import { parseISOSafe } from './date.js';
+import { scope, type } from 'arktype';
 import Handlebars from 'handlebars';
+import { parseISOSafe } from './date.js';
 import { splitFilenameOnExtension } from './download.js';
 import { Clade, CladePlural } from './taxonomy.js';
-import { hasOnce, oneOf, xor } from './utils.js';
+import { hasOnce, or } from './utils.js';
 
 const ID = type(/[\w_]+/);
 
@@ -259,6 +259,45 @@ const ModelInput = type({
 	]
 });
 
+const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du point central'])
+	.or(type(['"cy"', '@', 'Coordonée Y du point central']))
+	.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
+	.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
+	.or(type(['"ex"', '@', 'Coordonée X du point inférieur droit']))
+	.or(type(['"ey"', '@', 'Coordonée Y du point inférieur droit']))
+	.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
+	.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
+	.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
+	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
+	.array()
+	.narrow(
+		(shape) =>
+			// Must have score
+			hasOnce('score', shape) &&
+			// Must have one of these configurations, to get the center X coord and the width. We essentially need 3 of the 4 values. since 4 choose 3 = 4, we have 4 cases possible.
+			or(
+				// cx & w
+				hasOnce('cx', shape) && hasOnce('w', shape),
+				// sx & w
+				hasOnce('sx', shape) && hasOnce('w', shape),
+				// ex & w
+				hasOnce('ex', shape) && hasOnce('w', shape),
+				// sx & ex
+				hasOnce('sx', shape) && hasOnce('ex', shape)
+			) &&
+			// Must have one of these configurations, t get the center Y coord and the height
+			or(
+				// cy
+				hasOnce('cy', shape) && hasOnce('h', shape),
+				// sy & h
+				hasOnce('sy', shape) && hasOnce('h', shape),
+				// ey & h
+				hasOnce('ey', shape) && hasOnce('h', shape),
+				// sy & ey
+				hasOnce('sy', shape) && hasOnce('ey', shape)
+			)
+	);
+
 const ProtocolWithoutMetadata = type({
 	id: ID.describe(
 		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
@@ -289,26 +328,7 @@ const ProtocolWithoutMetadata = type({
 					'@',
 					"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
 				],
-				shape: type(['"cx"', '@', 'Coordonée X du point central'])
-					.or(type(['"cy"', '@', 'Coordonée Y du point central']))
-					.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
-					.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
-					.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
-					.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
-					.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
-					.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
-					.array()
-					.narrow(
-						(shape) =>
-							// Must have w, h and score
-							hasOnce('w', shape) &&
-							hasOnce('h', shape) &&
-							hasOnce('score', shape) &&
-							// Must have cx XOR sx
-							xor(hasOnce('sx', shape), hasOnce('cx', shape)) &&
-							// Must have cy XOR sy
-							xor(hasOnce('sy', shape), hasOnce('cy', shape))
-					)
+				shape: ModelDetectionOutputShape
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
@@ -498,6 +518,21 @@ function table(keyPaths, schema) {
 /**
  * @typedef  Protocol
  * @type {typeof Protocol.infer}
+ */
+
+/**
+ * @typedef  ProtocolWithoutMetadata
+ * @type {typeof ProtocolWithoutMetadata.infer}
+ */
+
+/**
+ * @typedef  ModelInput
+ * @type {typeof ModelInput.infer}
+ */
+
+/**
+ * @typedef  ModelDetectionOutputShape
+ * @type {typeof ModelDetectionOutputShape.infer}
  */
 
 /**
