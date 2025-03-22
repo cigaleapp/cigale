@@ -40,7 +40,8 @@
 
 	let cropperModel = $state();
 	async function loadCropperModel() {
-		cropperModel = await loadModel(false);
+		if (!uiState.currentProtocol) return;
+		cropperModel = await loadModel(uiState.currentProtocol, 'detection');
 		toasts.success('Modèle de recadrage chargé');
 	}
 
@@ -74,6 +75,10 @@
 	 * @param {string} image.name
 	 */
 	async function inferBoundingBox(id, buffer, { type: contentType, name: filename }) {
+		if (!uiState.currentProtocol) {
+			toasts.error('Aucun protocole sélectionné');
+			return;
+		}
 		if (!cropperModel) {
 			toasts.error(
 				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -81,18 +86,28 @@
 			return;
 		}
 
-		const [[boundingBoxes], [bestScores]] = await inferSequentialy([buffer], cropperModel);
+		const [[boundingBoxes], [bestScores]] = await inferSequentialy(
+			uiState.currentProtocol,
+			[buffer],
+			cropperModel
+		);
+
+		console.log('Bounding boxes:', boundingBoxes);
 
 		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
 		let [firstScore, ...otherScores] = bestScores;
+		const inputSettings = uiState.currentProtocol.inference?.detection.input ?? {
+			width: TARGETWIDTH,
+			height: TARGETHEIGHT
+		};
 
-		firstBoundingBox ??= [0, 0, TARGETWIDTH, TARGETHEIGHT];
+		firstBoundingBox ??= [0, 0, inputSettings.width, inputSettings.height];
 		firstScore ??= 1;
 		/**
 		 * @param {[number, number, number, number]} param0
 		 */
 		const toCropBox = ([x, y, width, height]) =>
-			toCenteredCoords(toRelativeCoords({ x, y, width, height }));
+			toCenteredCoords(toRelativeCoords(uiState.currentProtocol)({ x, y, width, height }));
 
 		await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
 			await storeMetadataValue({

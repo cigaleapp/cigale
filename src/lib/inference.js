@@ -67,38 +67,52 @@ export let MODELCLASSIFPATH = 'model_classif.onnx'; // chemin du modèle de clas
 export const NUMCONF = 0.437; // seuil de confiance pour la détection
 export const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
-export const NMS = true;
 /**
  *
  * @param {string} path
  * @returns {string}
  */
 export function torawpath(path) {
-	// TODO host on IRIT infrastructure?
 	return `https://cigaleapp.github.io/models/${path}`;
 }
 /**
  *
- * @param {boolean} classif
+ * @param {import('./database.js').Protocol} protocol
+ * @param {'classification'|'detection'} task
  * @param {boolean} webgpu
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
-export async function loadModel(classif = false, webgpu = false) {
+export async function loadModel(protocol, task, webgpu = false) {
 	// load un modèle ONNX, soit de classification, soit de détection.
 
-	let model;
-	const MODELPATH = torawpath(classif ? MODELCLASSIFPATH : MODELDETECTPATH);
-	console.log('model path : ', MODELPATH);
-	if (webgpu) {
-		model = await ort.InferenceSession.create(MODELPATH, { executionProviders: ['webgpu'] });
-	} else {
-		model = await ort.InferenceSession.create(MODELPATH);
-		console.log('model loaded');
+	let modelUrl = torawpath(task === 'classification' ? MODELCLASSIFPATH : MODELDETECTPATH);
+
+	if (task === 'classification' && protocol.inference?.classification.model) {
+		if (typeof protocol.inference.classification.model !== 'string')
+			throw new Error(
+				'More advanced model loading not implemented yet, use a URL with a simple GET request'
+			);
+
+		modelUrl = protocol.inference.classification.model;
 	}
-	return model;
+
+	if (task === 'detection' && protocol.inference?.detection.model) {
+		if (typeof protocol.inference.detection.model !== 'string')
+			throw new Error(
+				'More advanced model loading not implemented yet, use a URL with a simple GET request'
+			);
+
+		modelUrl = protocol.inference.detection.model;
+	}
+
+	return ort.InferenceSession.create(modelUrl, {
+		executionProviders: webgpu ? ['webgpu'] : undefined
+	});
 }
 /**
  *
+ * @param {import('./database.js').Protocol} protocol
+ * @param {'classification'|'detection'} task
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').uiState} [uiState]
@@ -106,7 +120,15 @@ export async function loadModel(classif = false, webgpu = false) {
  * @param {boolean} webgpu
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
  */
-export async function infer(buffers, model, uiState, sequence = false, webgpu = true) {
+export async function infer(
+	protocol,
+	task,
+	buffers,
+	model,
+	uiState,
+	sequence = false,
+	webgpu = true
+) {
 	/*Effectue une inférence de détection sur une ou plusieurs images. 
     -------------inputs----------------
         files : liste de fichiers images
@@ -134,35 +156,46 @@ export async function infer(buffers, model, uiState, sequence = false, webgpu = 
 	if (webgpu) {
 		console.log('webgpu not implemented yet, using wasm');
 	}
+	if (!model) {
+		throw new Error('Model not loaded');
+	}
 	let start = -1;
 	if (!sequence) {
 		start = Date.now();
 		if (uiState) uiState.processing.state = 'inference';
 	}
-	const inputName = model.inputNames[0];
+	const taskSettings = {
+		...protocol.inference?.[task],
+		input: {
+			width: TARGETWIDTH,
+			height: TARGETHEIGHT,
+			name: model.inputNames[0],
+			...protocol.inference?.[task]?.input
+		},
+		output: {
+			name: 'output0',
+			...protocol.inference?.[task]?.output
+		}
+	};
 	let inputTensor;
 
 	console.log('loading images...');
-	inputTensor = await imload(buffers, TARGETWIDTH, TARGETHEIGHT);
+	inputTensor = await imload(buffers, taskSettings.input.width, taskSettings.input.height);
 
 	console.log('inference...');
-	const outputTensor = await model.run({ [inputName]: inputTensor });
+	const outputTensor = await model.run({ [taskSettings.input.name]: inputTensor });
 	console.log('done !');
 	console.log('output tensor: ', outputTensor);
 
 	console.log('post proc...');
-	// @ts-ignore
-	const bbs = output2BB(outputTensor.output0.data, buffers.length, NUMCONF, NMS);
+	const bbs = output2BB(
+		protocol,
+		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),
+		buffers.length,
+		NUMCONF
+	);
 	console.log('done !');
-	const bestScores = bbs[1];
-	const bestBoxes = bbs[0];
-
-	let boundingboxes = [];
-	if (!NMS) {
-		boundingboxes = postprocess_BB(bestBoxes, buffers.length);
-	} else {
-		boundingboxes = bestBoxes;
-	}
+	const [boundingboxes, bestScores] = bbs;
 	if (!sequence && uiState) {
 		uiState.processing.done = buffers.length;
 		uiState.processing.time = (Date.now() - start) / 1000;
@@ -191,17 +224,22 @@ async function mapToFiles(files, model, i, img_proceed) {
 
 /**
  *
+ * @param {import('./database.js').Protocol} protocol
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').uiState} [uiState]
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[][]]>}
  */
-export async function inferSequentialy(buffers, model, uiState) {
+export async function inferSequentialy(protocol, buffers, model, uiState) {
 	/*Effectue une inférence de détection sur une ou plusieurs images.
     Cette fonction est similaire à infer, mais permet l'inférence une à une 
     et affiche les informations sur l'avancement de l'inférence
     au fur et à mesure.
     */
+
+	if (!model) {
+		throw new Error('Model not loaded');
+	}
 
 	let boundingboxes = [];
 	let bestScores = [];
@@ -210,8 +248,8 @@ export async function inferSequentialy(buffers, model, uiState) {
 
 	for (let i = 0; i < buffers.length; i++) {
 		let imfile = buffers[i];
-		// @ts-ignore
-		var BandB = await infer([imfile], model, uiState, false);
+		var BandB = await infer(protocol, 'detection', [imfile], model, uiState, false);
+		console.log({ BandB });
 		let boundingboxe = BandB[0];
 		let bestScore = BandB[1];
 		let inputTensor = BandB[3];
@@ -263,13 +301,14 @@ export async function inferSequentialyConcurrent(files, model, uiState) {
 }
 /**
  *
+ * @param {import('./database.js').Protocol} protocol
  * @param {ort.Tensor[][]} images
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').uiState} uiState
  * @param {number} start
  * @returns {Promise<Array<Array<number[]>>>} scores pour chaque tensor de chaque image: [each image [each tensor [score classe 0, score classe 1, …]]]
  */
-export async function classify(images, model, uiState, start) {
+export async function classify(protocol, images, model, uiState, start) {
 	/*Effectue une inférence de classification sur une ou plusieurs images.
     -------------inputs----------------
         images : liste d'images prétraitées
@@ -292,21 +331,19 @@ export async function classify(images, model, uiState, start) {
 
 	uiState.processing.done = 0;
 
-	const inputName = model.inputNames[0];
+	const inputName = protocol.inference?.classification?.input?.name ?? model.inputNames[0];
 
 	/** @type {number[][][]}  */
 	const scores = [];
 	uiState.processing.state = 'preprocessing';
 	// @ts-ignore
-	images = await preprocess_for_classification(images, MEAN, STD);
+	images = await preprocess_for_classification(protocol, images, MEAN, STD);
 	uiState.processing.state = 'classification';
-	console.log('coucou');
 	console.log(images);
 
 	for (let i = 0; i < images.length; i++) {
 		/** @type {number[][]}  */
 		const imageScores = [];
-		console.log("feur c'est pour gwenn");
 		for (let j = 0; j < images[i].length; j++) {
 			let inputTensor = images[i][j];
 			const outputTensor = await model.run({ [inputName]: inputTensor });

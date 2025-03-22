@@ -23,8 +23,23 @@ export function coordsScaler({ x: xwise, y: ywise }) {
 	});
 }
 
-export const toPixelCoords = coordsScaler({ x: TARGETWIDTH, y: TARGETHEIGHT });
-export const toRelativeCoords = coordsScaler({ x: 1 / TARGETWIDTH, y: 1 / TARGETHEIGHT });
+/** @param {undefined | import('./database').Protocol} protocol  */
+export const toPixelCoords = (protocol) => {
+	if (!protocol) throw new Error('No protocol was provided');
+	return coordsScaler({
+		x: protocol.inference?.detection?.input?.width ?? TARGETWIDTH,
+		y: protocol.inference?.detection?.input?.height ?? TARGETHEIGHT
+	});
+};
+
+/** @param {undefined | import('./database').Protocol} protocol  */
+export const toRelativeCoords = (protocol) => {
+	if (!protocol) throw new Error('No protocol was provided');
+	return coordsScaler({
+		x: 1 / (protocol.inference?.detection?.input?.width ?? TARGETWIDTH),
+		y: 1 / (protocol.inference?.detection?.input?.height ?? TARGETHEIGHT)
+	});
+};
 
 /**
  * @param {object} param0
