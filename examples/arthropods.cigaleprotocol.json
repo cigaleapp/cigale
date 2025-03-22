@@ -570,7 +570,7 @@
 			},
 			"output": {
 				"normalized": true,
-				"shape": ["cx", "cy", "w", "h", "score", "_"]
+				"shape": ["sx", "sy", "w", "h", "score", "_"]
 			}
 		},
 		"exports": {

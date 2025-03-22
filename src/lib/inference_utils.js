@@ -1,7 +1,7 @@
 import * as ort from 'onnxruntime-web';
 import * as Jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
-import { oneOf } from './utils.js';
+import { hasOnce, oneOf } from './utils.js';
 
 /**
  * @typedef {import('onnxruntime-web')} ort
@@ -436,8 +436,8 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 	console.log(output);
 
 	const outputShape = protocol.inference?.detection.output.shape ?? [
-		'cx',
-		'cy',
+		'sx',
+		'sy',
 		'w',
 		'h',
 		'score',
@@ -451,6 +451,7 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 		h: outputShape.indexOf('h'),
 		score: outputShape.indexOf('score')
 	};
+
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;
 
@@ -475,6 +476,11 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 			// TODO understand this, seems like our model does _not_ really output width and height, what does it output then?
 			w = Math.abs(x - w);
 			h = Math.abs(y - h);
+
+			// If the x coord is a centered x (cx) and not a starting x (sx), convert it to starting (top-left) x
+			if (hasOnce('cx', outputShape)) x -= w / 2;
+			// Same for y
+			if (hasOnce('cy', outputShape)) y -= h / 2;
 
 			if (x == 0 && y == 0 && w == 0 && h == 0) {
 				break;
