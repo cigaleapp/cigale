@@ -1,10 +1,5 @@
 import * as ort from 'onnxruntime-web';
-import {
-	postprocess_BB,
-	imload,
-	output2BB,
-	preprocess_for_classification
-} from './inference_utils.js';
+import { imload, output2BB, preprocess_for_classification } from './inference_utils.js';
 
 /**
  * @typedef {[number, number, number, number]} BB [x,y,w,h]
