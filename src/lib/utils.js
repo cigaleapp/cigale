@@ -66,6 +66,28 @@ export function oneOf(value, values) {
 }
 
 /**
+ *
+ * @template {string} T
+ * @template {T} U
+ * @param {U} value
+ * @param {T[]} values
+ * @returns {values is [...Omit<T, U>[], U, ...Omit<T, U>[]]}
+ */
+export function hasOnce(value, values) {
+	return values.filter((v) => v === value).length === 1;
+}
+
+/**
+ *
+ * @param {any} a
+ * @param {any} b
+ * @returns {boolean}
+ */
+export function xor(a, b) {
+	return Boolean(a ? !b : b);
+}
+
+/**
  * Pick only some keys from an object
  * @template {string} KeysIn
  * @template {KeysIn} KeysOut

@@ -3,6 +3,7 @@ import { parseISOSafe } from './date.js';
 import Handlebars from 'handlebars';
 import { splitFilenameOnExtension } from './download.js';
 import { Clade, CladePlural } from './taxonomy.js';
+import { hasOnce, oneOf, xor } from './utils.js';
 
 const ID = type(/[\w_]+/);
 
@@ -65,22 +66,15 @@ const Probability = type('0 <= number <= 1');
  */
 const URLString = type(/https?:\/\/.+/);
 
-const Request = URLString.internal
-	.withMeta({
-		description:
-			"L'URL à laquelle se situe le fichier. Effectue une requête GET sans en-têtes particuliers."
-	})
-	.or({
-		url: URLString.describe("L'URL de la requête"),
-		'headers?': type({ '[string]': 'string' }).describe('Les en-têtes à ajouter dans la requête'),
-		'method?': type
-			.enumerated('GET', 'POST', 'PUT', 'DELETE')
-			.describe('La méthode de la requête (GET par défaut)')
-	})
-	.internal.withMeta({
-		description:
-			'Le requête HTTP pour obtenir le fichier, avec des en-têtes et une méthode personnalisable'
-	});
+const Request = URLString.or({
+	url: URLString.describe("L'URL de la requête"),
+	'headers?': type({ '[string]': 'string' }).describe('Les en-têtes à ajouter dans la requête'),
+	'method?': type
+		.enumerated('GET', 'POST', 'PUT', 'DELETE')
+		.describe('La méthode de la requête (GET par défaut)')
+}).describe(
+	"Une requête HTTP GET si on donne simplement une URL, ou une requête plus complexe si on donne un objet avec 'url'"
+);
 
 const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
@@ -248,8 +242,8 @@ const MetadataWithoutID = type({
 const Metadata = table('id', MetadataWithoutID.and({ id: ID }));
 
 const ModelInput = type({
-	width: ['number', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
-	height: ['number', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
+	width: ['number < 1024', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
+	height: ['number < 1024', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
 	'disposition?': type(['"CHW"', '@', 'Tenseurs de la forme [3, H, W]']).or(
 		type(['"1CHW"', '@', 'Tenseurs de la forme [1, 3, H, W]'])
 	),
@@ -289,6 +283,7 @@ const ProtocolWithoutMetadata = type({
 			),
 			input: ModelInput.describe("Configuration de l'entrée du modèle"),
 			output: type({
+				'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"],
 				normalized: [
 					'boolean',
 					'@',
@@ -303,6 +298,17 @@ const ProtocolWithoutMetadata = type({
 					.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
 					.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
 					.array()
+					.narrow(
+						(shape) =>
+							// Must have w, h and score
+							hasOnce('w', shape) &&
+							hasOnce('h', shape) &&
+							hasOnce('score', shape) &&
+							// Must have cx XOR sx
+							xor(hasOnce('sx', shape), hasOnce('cx', shape)) &&
+							// Must have cy XOR sy
+							xor(hasOnce('sy', shape), hasOnce('cy', shape))
+					)
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
@@ -331,7 +337,9 @@ const ProtocolWithoutMetadata = type({
 				'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
 			),
 			input: ModelInput.describe("Configuration de l'entrée des modèles"),
-
+			'output?': type({
+				'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
+			}),
 			classmapping: Request.describe(
 				'Lien vers un fichier texte contenant la correspondance entre les indices des neurones de la couche de sortie du modèle et les noms des classes'
 			)

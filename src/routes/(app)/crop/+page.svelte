@@ -1,15 +1,20 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toCenteredCoords, toRelativeCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import {
+		toRelativeCoords as _toRelativeCoords,
+		toCenteredCoords,
+		toTopLeftCoords
+	} from '$lib/BoundingBoxes.svelte';
 	import Cropup from '$lib/Cropup.svelte';
 	import { BUILTIN_METADATA_IDS } from '$lib/builtins';
 	import * as idb from '$lib/idb.svelte.js';
-	import { TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { uiState } from '$lib/state.svelte';
 
 	let openCropDialog = $state();
+
+	const toRelativeCoords = $derived(_toRelativeCoords(uiState.currentProtocol));
 
 	/** ID of the image we're cropping */
 	let croppingImage = $state('');
@@ -20,8 +25,8 @@
 				idb.tables.Image.state.find((i) => i.id === croppingImage)?.metadata.crop?.value ?? {
 					x: 0,
 					y: 0,
-					width: TARGETWIDTH,
-					height: TARGETHEIGHT
+					w: 0.5,
+					h: 0.5
 				}
 			)
 		)

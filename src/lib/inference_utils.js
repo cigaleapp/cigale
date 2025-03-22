@@ -1,6 +1,11 @@
 import * as ort from 'onnxruntime-web';
 import * as Jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
+import { oneOf } from './utils.js';
+
+/**
+ * @typedef {import('onnxruntime-web')} ort
+ */
 
 /**
  *
@@ -91,7 +96,7 @@ export async function cropTensor(tensor, x1, y1, x2, y2) {
  * @param {number[]} BB
  * @param {ort.Tensor} tensor
  * @param {number} marge
- * @returns {Promise<ort.Tensor>}
+ * @returns {Promise<import('onnxruntime-web').Tensor>}
  */
 export async function applyBBOnTensor(BB, tensor, marge = 10) {
 	/*Applique une bounding box sur UN tenseur :
@@ -106,13 +111,8 @@ export async function applyBBOnTensor(BB, tensor, marge = 10) {
         croppedTensor : tenseur croppé
             forme : [1, C, h+2*marge, w+2*marge]
     */
-	let x = BB[0];
-	let y = BB[1];
-	let w = BB[2];
-	let h = BB[3];
-
-	let tsrwidth = tensor.dims[3];
-	let tsrheight = tensor.dims[2];
+	let [x, y, w, h] = BB;
+	const [_, __, tsrheight, tsrwidth] = tensor.dims;
 
 	x = x - marge;
 	y = y - marge;
@@ -222,26 +222,31 @@ export function postprocess_BB(boundingboxes, numfiles) {
 
 /**
  *
+ * @param {import('./database.js').Protocol} protocol
  * @param {ort.Tensor[]} tensor
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-async function map_preprocess_for_classification(tensor, mean, std) {
+async function map_preprocess_for_classification(protocol, tensor, mean, std) {
 	let c = tensor;
-	c = await normalizeTensors(c, mean, std);
-	c = await resizeTensors(c, 224, 224);
+	if (protocol.inference?.classification.input.normalized) {
+		c = await normalizeTensors(c, mean, std);
+	}
+	const { width, height } = protocol.inference?.classification.input ?? { width: 224, height: 224 };
+	c = await resizeTensors(c, width, height);
 
 	return c;
 }
 /**
  *
+ * @param {import('./database.js').Protocol} protocol
  * @param {ort.Tensor} tensors
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function preprocess_for_classification(tensors, mean, std) {
+export async function preprocess_for_classification(protocol, tensors, mean, std) {
 	/*preprocess les tenseurs pour la classification
     -------input------- :
         tensors : liste de tenseurs à prétraiter
@@ -257,7 +262,7 @@ export async function preprocess_for_classification(tensors, mean, std) {
     */
 	// @ts-ignore
 	let new_ctensorsPromise = tensors.map((tensor) =>
-		map_preprocess_for_classification(tensor, mean, std)
+		map_preprocess_for_classification(protocol, tensor, mean, std)
 	);
 	let new_ctensors = await Promise.all(new_ctensorsPromise);
 
@@ -302,7 +307,7 @@ export function labelize(output, classmap) {
  * @param {ArrayBuffer[]} buffers
  * @param {number} targetWidth
  * @param {number} targetHeight
- * @returns {Promise<ort.Tensor>}
+ * @returns {Promise<import('onnxruntime-web').TypedTensor<'float32'>>}
  */
 export async function imload(buffers, targetWidth, targetHeight) {
 	/*
@@ -399,18 +404,16 @@ export async function normalizeTensors(tensors, mean, std) {
 
 /**
  *
- * @param {ort.Tensor} output
+ * @param {import('./database.js').Protocol} protocol
+ * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
- * @param {boolean} nms
- * @returns {[number[][][], number[][]]}
+ * @returns {[import('./inference.js').BB[][], number[][]]}
  */
-export function output2BB(output, numImages, minConfidence, nms = false) {
+export function output2BB(protocol, output, numImages, minConfidence) {
 	/*reshape les bounding boxes obtenues par le modèle d'inférence
     -------input------- :
         output : liste de bounding boxes obtenues par le modèle d'inférence
-            forme : [xxxx,yyyyy,wwww,hhhh,confconfconf,etc...] (se répète pr chaque img) si nms = False
-            forme : [xywhconf,iou,xywhconf,iou,...] si nms = True
         numfiles : nombre d'images sur lesquelles on a fait l'inférence*
         minConfidence : seuil de confiance minimum pour considérer une bounding box
         nms : booléen, si True, alors on applique le fait que la sortie d'un modèle 
@@ -423,94 +426,70 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
         bestScore : liste des meilleurs scores pour chaque image
             forme : [each img [each box score]]
     */
-	if (nms) {
-		let bestBoxes = [];
-		let bestScores = [];
-		// @ts-ignore
-		let numbb = output.length / 6;
+	/** @type {import('./inference.js').BB[][]}  */
+	let bestBoxes = [];
+	/** @type {number[][]}  */
+	let bestScores = [];
+	/** @type {?Float32Array}  */
+	let suboutput = null;
+
+	console.log(output);
+
+	const outputShape = protocol.inference?.detection.output.shape ?? [
+		'cx',
+		'cy',
+		'w',
+		'h',
+		'score',
+		'_'
+	];
+
+	const indexOffsets = {
+		x: outputShape.findIndex((v) => oneOf(v, ['cx', 'sx'])),
+		y: outputShape.findIndex((v) => oneOf(v, ['cy', 'sy'])),
+		w: outputShape.indexOf('w'),
+		h: outputShape.indexOf('h'),
+		score: outputShape.indexOf('score')
+	};
+	const suboutputSize = outputShape.length;
+	let boundingBoxesCount = output.length / suboutputSize;
+
+	for (let k = 0; k < numImages; k++) {
+		/** @type {import('./inference.js').BB[]}  */
 		let bestPerImageBoxes = [];
-		let _bestScorePerImage = 0;
-		let suboutput = null;
+		/** @type {number[]} */
+		let bbScores = [];
 
-		console.log(output)
+		suboutput = output.slice(
+			k * boundingBoxesCount * suboutputSize,
+			(k + 1) * boundingBoxesCount * suboutputSize
+		);
 
-		console.log('num images : ', numImages);
+		for (let i = 0; i < suboutput.length; i += suboutputSize) {
+			let x = suboutput[i + indexOffsets.x];
+			let y = suboutput[i + indexOffsets.y];
+			let w = suboutput[i + indexOffsets.w];
+			let h = suboutput[i + indexOffsets.h];
+			let score = suboutput[i + indexOffsets.score];
 
-		for (let k = 0; k < numImages; k++) {
-			bestPerImageBoxes = [];
-			_bestScorePerImage = 0;
-			/** @type {number[]} */
-			let bbScores = [];
-			// @ts-ignore
-			suboutput = output.slice(k * numbb * 6, (k + 1) * numbb * 6);
+			// TODO understand this, seems like our model does _not_ really output width and height, what does it output then?
+			w = Math.abs(x - w);
+			h = Math.abs(y - h);
 
-			for (let i = 0; i < suboutput.length; i += 6) {
-				let score = suboutput[i + 4];
-				let x = suboutput[i];
-				let y = suboutput[i + 1];
-				let w = suboutput[i + 2];
-				let h = suboutput[i + 3];
-
-				w = Math.abs(x - w);
-				h = Math.abs(y - h);
-
-				if (x == 0 && y == 0 && w == 0 && h == 0) {
-					break;
-				}
-				// if (score > bestScorePerImage) {
-				// 	bestScorePerImage = score;
-				// }
-				if (score > minConfidence) {
-					bestPerImageBoxes.push([x, y, w, h]);
-					bbScores.push(score);
-				}
+			if (x == 0 && y == 0 && w == 0 && h == 0) {
+				break;
 			}
 
-			bestBoxes.push(bestPerImageBoxes);
-			bestScores.push(bbScores);
-		}
-		return [bestBoxes, bestScores];
-	} else {
-		console.log('output : ', output);
-		let bestBoxes = [];
-		let bestPerImageBoxes = [];
-		let bestScore = [];
-		let bestScorePerImage = 0;
-		let suboutput = null;
-		// @ts-ignore
-		let numbb = output.length / numImages / 5;
-
-		for (let k = 0; k < numImages; k++) {
-			bestPerImageBoxes = [];
-			/** @type {number[]} */
-			let bbScores = [];
-			// @ts-ignore
-			suboutput = output.slice(k * numbb * 5, (k + 1) * numbb * 5);
-
-			for (let i = 0; i < suboutput.length / 5; i++) {
-				let score = suboutput[i + 4 * numbb];
-				if (score > bestScorePerImage) {
-					bestScorePerImage = score;
-				}
-
-				if (score > minConfidence) {
-					let x = suboutput[i];
-					let y = suboutput[i + numbb];
-					let w = suboutput[i + 2 * numbb];
-					let h = suboutput[i + 3 * numbb];
-
-					x = x - w / 2;
-					y = y - h / 2;
-
-					bestPerImageBoxes.push([x, y, w, h]);
-					bbScores.push(score);
-				}
+			if (score > minConfidence) {
+				bestPerImageBoxes.push([x, y, w, h]);
+				bbScores.push(score);
 			}
-			bestBoxes.push(bestPerImageBoxes);
-			bestScore.push(bbScores);
 		}
-		return [bestBoxes, bestScore];
+
+		bestBoxes.push(bestPerImageBoxes);
+		bestScores.push(bbScores);
 	}
+	return [bestBoxes, bestScores];
 }
 /**
  *
@@ -563,73 +542,4 @@ async function resizeTensor(tensor, targetWidth, targetHeight) {
 
 	const resizedTensor = new ort.Tensor(tensor.type, resizedData, resizedDims);
 	return resizedTensor;
-}
-
-/**
- *
- * @param {number[][]} BBs
- * @param {Image} image
- * @param {number} marge
- * @returns {Promise<[string[], Image[]]>}
- */
-async function applyBBsOnImage(BBs, image, marge = 10) {
-	/*Même chose que applyBBsOnTensor mais pour une image, en vrai c'est deprecated, on l'utilise plus*/
-
-	console.warn('applyBBsOnImage is deprecated, use applyBBsOnTensors instead');
-
-	let subimages = [];
-	let subimageMIMES = [];
-	for (let i = 0; i < BBs.length; i++) {
-		let x = BBs[i][0];
-		let y = BBs[i][1];
-		let w = BBs[i][2];
-		let h = BBs[i][3];
-
-		// relative bbs*
-		/** @type {{width: number, height: number}} */
-		// @ts-ignore
-		const { width, height } = image.bitmap;
-		x = (x / 640) * width;
-		y = (y / 640) * height;
-		w = (w / 640) * width;
-		h = (h / 640) * height;
-		x = x - marge;
-		y = y - marge;
-		w = w + 2 * marge;
-		h = h + 2 * marge;
-
-		x = Math.round(Math.max(0, x));
-		y = Math.round(Math.max(0, y));
-		w = Math.round(Math.min(width - x, w));
-		h = Math.round(Math.min(height - y, h));
-
-		// @ts-ignore
-		let subimage = image.clone();
-		subimage = subimage.crop({ x, y, w, h });
-		let subimageMIME = await subimage.getBase64(Jimp.JimpMime.png);
-		subimages.push(subimage);
-		subimageMIMES.push(subimageMIME);
-	}
-	return [subimageMIMES, subimages];
-}
-
-/**
- *
- * @param {number[][][]} BBs
- * @param {Image[]} images
- * @returns {Promise<[string[], Image[]]>}
- */
-export async function applyBBsOnImages(BBs, images) {
-	let croppedImages = [];
-	let croppedImagesMIME = [];
-	let subImages = [];
-
-	for (let i = 0; i < images.length; i++) {
-		subImages = await applyBBsOnImage(BBs[i], images[i]);
-		croppedImages.push(subImages[1]);
-		croppedImagesMIME.push(subImages[0]);
-	}
-	//return [croppedImagesMIME,croppedImages];
-	// @ts-ignore
-	return [croppedImagesMIME];
 }
