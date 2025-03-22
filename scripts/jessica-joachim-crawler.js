@@ -118,8 +118,8 @@ const protocol = {
 				}
 			},
 			input: {
-				height: 640,
-				width: 640,
+				height: 224,
+				width: 224,
 				disposition: 'CHW',
 				normalized: false
 			}
@@ -127,8 +127,8 @@ const protocol = {
 		detection: {
 			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
 			input: {
-				height: 224,
-				width: 224,
+				height: 640,
+				width: 640,
 				disposition: '1CHW',
 				normalized: true
 			},
