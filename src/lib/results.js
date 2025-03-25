@@ -1,11 +1,7 @@
 import { strToU8, zip } from 'fflate';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { Schemas } from './database';
-import {
-	downloadAsFile,
-	splitFilenameOnExtension,
-	stringifyWithToplevelOrdering
-} from './download';
+import { downloadAsFile, stringifyWithToplevelOrdering } from './download';
 import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
 import {
@@ -14,7 +10,6 @@ import {
 	metadataPrettyValue,
 	observationMetadata
 } from './metadata';
-import { speciesDisplayName } from './species.svelte';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
 
