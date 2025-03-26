@@ -11,6 +11,9 @@
 		gap: 1.5em;
 		display: flex;
 		flex-direction: column;
-		overflow-y: hidden;
+		scrollbar-color: var(--gray) transparent;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		overflow-y: auto;
 	}
 </style>

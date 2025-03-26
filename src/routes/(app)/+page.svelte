@@ -12,7 +12,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 
 	const currentProtocol = $derived(
-		tables.Protocol.state.find((p) => p.id === uiState.currentProtocol)
+		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
 	);
 
 	let searchQuery = $state('');
@@ -45,7 +45,7 @@
 				<button
 					class:selected={p.id === currentProtocol?.id}
 					onclick={() => {
-						uiState.currentProtocol = p.id;
+						uiState.currentProtocolId = p.id;
 						goto('#/import');
 					}}
 				>
@@ -68,7 +68,7 @@
 				);
 				if (!protocol || typeof protocol === 'string') return;
 				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);
-				uiState.currentProtocol = protocol.id;
+				uiState.currentProtocolId = protocol.id;
 				goto('#/import');
 			}}
 		>

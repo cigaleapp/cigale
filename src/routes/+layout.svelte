@@ -27,7 +27,7 @@
 	}
 
 	:global(code, pre) {
-		font-family: 'Fira Code', monospace;
+		font-family: 'Fragment Mono', monospace;
 	}
 
 	:global(svg.icon) {

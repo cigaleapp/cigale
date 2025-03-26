@@ -1,7 +1,8 @@
 import YAML from 'yaml';
-import { BUILTIN_METADATA, BUILTIN_METADATA_IDS, Schemas } from './database.js';
+import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { fromEntries, keys } from './utils.js';
+import { BUILTIN_METADATA_IDS, BUILTIN_METADATA } from './builtins.js';
 
 /**
  *
@@ -123,7 +124,9 @@ function downloadProtocol(base, format, exportedProtocol) {
 		'name',
 		'source',
 		'authors',
-		'metadata'
+		'exports',
+		'metadata',
+		'inference'
 	]);
 
 	// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
@@ -159,11 +162,23 @@ export async function importProtocol({ allowMultiple } = {}) {
 							try {
 								if (!reader.result) throw new Error('Fichier vide');
 								if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-								const protocol = ExportedProtocol.in.assert(YAML.parse(reader.result));
+
+								let parsed = YAML.parse(reader.result);
+
+								const builtinMetadata = Object.entries(parsed.metadata ?? {})
+									.filter(([, value]) => value === 'builtin')
+									.map(([id]) => id);
+
+								parsed.metadata = Object.fromEntries(
+									Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
+								);
+
+								const protocol = ExportedProtocol.in.assert(parsed);
+
 								await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
 									tx.objectStore('Protocol').put({
 										...protocol,
-										metadata: Object.keys(protocol.metadata)
+										metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
 									});
 									Object.entries(protocol.metadata).map(
 										([id, metadata]) =>

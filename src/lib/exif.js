@@ -2,7 +2,7 @@ import * as exifParser from 'exif-parser';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { toasts } from './toasts.svelte.js';
-import { BUILTIN_METADATA_IDS } from './database';
+import { BUILTIN_METADATA_IDS } from './builtins.js';
 
 /**
  *

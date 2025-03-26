@@ -8,7 +8,7 @@
 		deleteImage,
 		imageBufferWasSaved,
 		imageIdToFileId,
-		imageIsCLassified
+		imageIsClassified
 	} from '$lib/images';
 	import {
 		classify,
@@ -20,9 +20,10 @@
 	} from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue } from '$lib/metadata';
+	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
+	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 
 	const erroredImages = $derived(uiState.erroredImages);
@@ -34,7 +35,7 @@
 				uiState.getPreviewURL(image, 'cropped') ?? uiState.getPreviewURL(image, 'full'),
 			showBoundingBoxes: (image) => !uiState.hasPreviewURL(image, 'cropped'),
 			isLoaded: (image) =>
-				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsCLassified(image)
+				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsClassified(image)
 		})
 	);
 
@@ -77,26 +78,41 @@
 		// TODO persist after page reload?
 		uiState.croppedPreviewURLs.set(imageIdToFileId(id), nimg.toDataURL());
 
-		const output_classif = await classify([[nimg]], classifmodel, uiState, 0);
-		const species = output_classif[0];
-		const confs = output_classif[1];
+		const [[scores]] = await classify([[nimg]], classifmodel, uiState, 0);
 
-		if (output_classif[0].length == 0) {
+		const results = scores
+			.map((score, i) => ({
+				confidence: score,
+				value: i.toString()
+			}))
+			.sort((a, b) => b.confidence - a.confidence)
+			.slice(0, 3)
+			.filter(({ confidence }) => confidence > 0.005);
+
+		if (!results.length) {
 			console.warn('No species detected');
 			return 0;
 		} else {
-			await storeMetadataValue({
+			const [firstChoice, ...alternatives] = results;
+			if (!uiState.currentProtocol) return;
+			const metadataValue = /** @type {const} */ ({
 				subjectId: id,
-				metadataId: 'species',
-				type: 'enum',
-				value: species[0][0].toString(),
-				// @ts-ignore
-				confidence: confs[0][0],
-				// @ts-ignore
-				alternatives: species[0]
-					.slice(1)
-					.map((s, i) => ({ value: s.toString(), confidence: confs[0][i + 1] }))
+				...firstChoice,
+				alternatives
 			});
+
+			if (uiState.currentProtocol.inference?.classification?.metadata) {
+				await setTaxonAndInferParents({
+					...metadataValue,
+					protocol: uiState.currentProtocol,
+					metadataId: uiState.currentProtocol.inference.classification.metadata
+				});
+			} else {
+				await storeMetadataValue({
+					...metadataValue,
+					metadataId: uiState.classificationMetadataId
+				});
+			}
 		}
 	}
 
@@ -112,7 +128,7 @@
 				for (const image of tables.Image.state) {
 					if (
 						imageBufferWasSaved(image) &&
-						!imageIsCLassified(image) &&
+						!imageIsClassified(image) &&
 						!uiState.loadingImages.has(image.id)
 					) {
 						uiState.loadingImages.add(image.id);
@@ -140,7 +156,9 @@
 
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length;
-		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.species).length;
+		uiState.processing.done = tables.Image.state.filter(
+			(img) => img.metadata[uiState.classificationMetadataId]
+		).length;
 	});
 </script>
 

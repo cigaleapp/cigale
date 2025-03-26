@@ -90,23 +90,52 @@
 	<dd>
 		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a>
 	</dd>
+	<dt>Avec les données</dt>
+	<dd>
+		<dl>
+			<dt>Aides à l'identification</dt>
+			<dd>
+				<a href="https://jessica-joachim.com/identification">Les carnets nature de Jessica</a>
+			</dd>
+			<dt>Arbre taxonomique</dt>
+			<dd>
+				<a href="https://techdocs.gbif.org/en/openapi/v1/species#/Searching%20names/searchNames">
+					API de GBIF
+				</a>
+			</dd>
+		</dl>
+	</dd>
 	<dt>Avec les modèles</dt>
 	<dd>
 		<dl>
 			<dt>Détection & recadrage</dt>
-			<dd>
-				<a href="TODO">YOLO 11n</a>
-			</dd>
+			<dd>YOLO 11n</dd>
 			<dt>Classification</dt>
-			<dd>
-				<a href="TODO">ResNet50</a>
-			</dd>
+			<dd>ResNet50</dd>
 		</dl>
 	</dd>
 	<dt>Fontes</dt>
 	<dd>
-		<a href="https://elementtype.co/host-grotesk/">Host Grotesk</a> par Doğukan Karapınar et İbrahim
-		Kaçtıoğlu
+		<dl>
+			<dt>
+				<a href="https://elementtype.co/host-grotesk/">Host Grotesk</a>
+			</dt>
+			<dd>
+				par <a href="https://doughkan.com/">Doğukan Karapınar</a> et
+				<a href="https://ibrahimkactioglu.com/">İbrahim Kaçtıoğlu</a>, chez
+				<a href="https://elementtype.co/"> Element Type Foundry </a>
+			</dd>
+			<dt>
+				<a href="https://github.com/weiweihuanghuang/fragment-mono/"><code>Fragment Mono</code></a>
+			</dt>
+			<dd>
+				<code>
+					par
+					<a href="https://weiweihuanghuang.github.io/">Wei Huang</a>, chez
+					<a href="https://studiolin.org/projects/374-2/">Studio Lin</a>
+				</code>
+			</dd>
+		</dl>
 	</dd>
 	<dt>Icônes</dt>
 	<dd>

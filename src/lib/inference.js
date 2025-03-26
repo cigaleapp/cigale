@@ -267,7 +267,7 @@ export async function inferSequentialyConcurrent(files, model, uiState) {
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').uiState} uiState
  * @param {number} start
- * @returns {Promise<[number[][], (string | number | bigint)[][]]>}
+ * @returns {Promise<Array<Array<number[]>>>} scores pour chaque tensor de chaque image: [each image [each tensor [score classe 0, score classe 1, …]]]
  */
 export async function classify(images, model, uiState, start) {
 	/*Effectue une inférence de classification sur une ou plusieurs images.
@@ -294,8 +294,8 @@ export async function classify(images, model, uiState, start) {
 
 	const inputName = model.inputNames[0];
 
-	let argmaxs = [];
-	let bestScores = [];
+	/** @type {number[][][]}  */
+	const scores = [];
 	uiState.processing.state = 'preprocessing';
 	// @ts-ignore
 	images = await preprocess_for_classification(images, MEAN, STD);
@@ -304,27 +304,26 @@ export async function classify(images, model, uiState, start) {
 	console.log(images);
 
 	for (let i = 0; i < images.length; i++) {
+		/** @type {number[][]}  */
+		const imageScores = [];
 		console.log("feur c'est pour gwenn");
-		let argmax = [];
-		let bestScore = [];
 		for (let j = 0; j < images[i].length; j++) {
 			let inputTensor = images[i][j];
 			const outputTensor = await model.run({ [inputName]: inputTensor });
-			// @ts-ignore
-			let argmax_ = outputTensor.output.data.indexOf(Math.max(...outputTensor.output.data));
-			let bestScore_ = outputTensor.output.data[argmax_];
-			argmax.push(argmax_);
-			bestScore.push(bestScore_);
 
-			outputTensor.output.dispose();
+			imageScores.push(
+				await outputTensor.output
+					.getData(true)
+					.then((scores) => /** @type {number[]} */ ([...scores.values()]))
+			);
+
 			images[i][j].dispose();
 			uiState.processing.time = (Date.now() - start) / 1000;
 		}
-		argmaxs.push(argmax);
-		bestScores.push(bestScore);
 
+		scores.push(imageScores);
 		uiState.processing.done = i + 1;
 	}
 
-	return [argmaxs, bestScores];
+	return scores;
 }
