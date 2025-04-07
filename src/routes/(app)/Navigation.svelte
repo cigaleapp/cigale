@@ -32,8 +32,8 @@
 	let openExportModal = $state();
 
 	$effect(() => {
-		if (!uiState.currentProtocol) goto('#/');
-		if (uiState.currentProtocol && !hasImages) goto('#/import');
+		if (!uiState.currentProtocolId) goto('#/');
+		if (uiState.currentProtocolId && !hasImages) goto('#/import');
 	});
 
 	/** @type {undefined | (() => void)} */
@@ -68,21 +68,21 @@
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a href="#/import" aria-disabled={!uiState.currentProtocol}>
+			<a href="#/import" aria-disabled={!uiState.currentProtocolId}>
 				Importer
 				{#if path == '/import'}
 					<div class="line"></div>
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a href="#/crop" aria-disabled={!uiState.currentProtocol || !hasImages}>
+			<a href="#/crop" aria-disabled={!uiState.currentProtocolId || !hasImages}>
 				Recadrer
 				{#if path == '/crop'}
 					<div class="line"></div>
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a href="#/classify" aria-disabled={!uiState.currentProtocol || !hasImages}>
+			<a href="#/classify" aria-disabled={!uiState.currentProtocolId || !hasImages}>
 				Classifier
 				{#if path == '/classify'}
 					<div class="line"></div>

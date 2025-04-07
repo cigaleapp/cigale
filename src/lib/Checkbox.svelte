@@ -10,7 +10,7 @@
 	 * @property {import('svelte').Snippet} children
 	 */
 
-	/** @type {Props} */
+	/** @type {Props & Record<string, any>} */
 	let { children, value = $bindable(), onchange = () => {}, ...rest } = $props();
 
 	$effect(() => {

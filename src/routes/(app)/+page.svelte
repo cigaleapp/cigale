@@ -8,11 +8,11 @@
 	import { uiState } from '$lib/state.svelte';
 	import IconManage from '~icons/ph/gear';
 	import Fuse from 'fuse.js';
-	import { importProtocol } from '$lib/protocols';
+	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
 
 	const currentProtocol = $derived(
-		tables.Protocol.state.find((p) => p.id === uiState.currentProtocol)
+		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
 	);
 
 	let searchQuery = $state('');
@@ -45,7 +45,7 @@
 				<button
 					class:selected={p.id === currentProtocol?.id}
 					onclick={() => {
-						uiState.currentProtocol = p.id;
+						uiState.currentProtocolId = p.id;
 						goto('#/import');
 					}}
 				>
@@ -63,12 +63,12 @@
 		</ButtonSecondary>
 		<ButtonSecondary
 			onclick={async () => {
-				const protocol = await importProtocol({ allowMultiple: false }).catch((e) =>
+				const protocol = await promptAndImportProtocol({ allowMultiple: false }).catch((e) =>
 					toasts.error(e)
 				);
 				if (!protocol || typeof protocol === 'string') return;
 				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);
-				uiState.currentProtocol = protocol.id;
+				uiState.currentProtocolId = protocol.id;
 				goto('#/import');
 			}}
 		>

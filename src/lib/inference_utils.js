@@ -432,6 +432,8 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
 		let _bestScorePerImage = 0;
 		let suboutput = null;
 
+		console.log(output)
+
 		console.log('num images : ', numImages);
 
 		for (let k = 0; k < numImages; k++) {

@@ -2,7 +2,7 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.transects.arthropods",
 	"name": "Transect d'arthropodes",
-	"source": "https://github.com/cigaleapp/cigale/tree/main/scripts/jessica-joachim-crawler.js",
+	"source": "https://github.com/cigaleapp/cigale/tree/0d507b8ebc396ba893ea642e6bf7ece62ab0b0e8/scripts/jessica-joachim-crawler.js#L68",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
 		{
@@ -11,6 +11,15 @@
 		}
 	],
 	"metadata": {
+		"kingdom": "builtin",
+		"phylum": "builtin",
+		"class": "builtin",
+		"order": "builtin",
+		"family": "builtin",
+		"genus": "builtin",
+		"shoot_date": "builtin",
+		"shoot_location": "builtin",
+		"crop": "builtin",
 		"io.github.cigaleapp.transects.arthropods__species": {
 			"type": "enum",
 			"label": "Espèce",
@@ -518,6 +527,54 @@
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20platani.jpeg"
 				}
 			]
+		}
+	},
+	"inference": {
+		"classification": {
+			"model": "https://cigaleapp.github.io/models/model_classif.onnx",
+			"classmapping": "https://cigaleapp.github.io/models/class_mapping.txt",
+			"metadata": "io.github.cigaleapp.transects.arthropods__species",
+			"taxonomic": {
+				"clade": "species",
+				"taxonomy": "https://cigaleapp.github.io/cigale/taxonomy.json",
+				"targets": {
+					"kingdom": "kingdom",
+					"phylum": "phylum",
+					"class": "class",
+					"order": "order",
+					"family": "family",
+					"genus": "genus"
+				}
+			},
+			"input": {
+				"height": 224,
+				"width": 224,
+				"disposition": "CHW",
+				"normalized": false
+			}
+		},
+		"detection": {
+			"model": "https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx",
+			"input": {
+				"height": 640,
+				"width": 640,
+				"disposition": "1CHW",
+				"normalized": true
+			},
+			"output": {
+				"normalized": true,
+				"shape": ["cx", "cy", "w", "h", "score", "_"]
+			}
+		},
+		"exports": {
+			"images": {
+				"cropped": "Cropped/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}",
+				"original": "Original/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}"
+			},
+			"metadata": {
+				"json": "analysis.json",
+				"csv": "metadata.csv"
+			}
 		}
 	}
 }

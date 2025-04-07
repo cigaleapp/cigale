@@ -3,6 +3,7 @@ import { ExportedProtocol } from '../src/lib/protocols.js';
 import { type } from 'arktype';
 import path from 'node:path';
 import { Schemas } from '../src/lib/database.js';
+import { Taxonomy } from '../src/lib/taxonomy.js';
 
 const here = path.dirname(new URL(import.meta.url).pathname);
 const outputDir = path.resolve(here, '../static/');
@@ -16,10 +17,11 @@ async function exportJsonSchema(name, schema) {
 		null,
 		2
 	);
-	await writeFile(path.resolve(outputDir, `${name}.schema.json`), json);
+	await writeFile(path.resolve(outputDir, `${name}.schema.json`).replace('C:\\C:\\', 'C:\\'), json);
 }
 
 await exportJsonSchema('protocol', ExportedProtocol);
+await exportJsonSchema('taxonomy', Taxonomy);
 await exportJsonSchema(
 	'results',
 	type({

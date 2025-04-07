@@ -1,6 +1,8 @@
 import { base } from '$app/paths';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { imageIdToFileId } from './images';
+import { tables } from './idb.svelte';
+import { BUILTIN_METADATA_IDS } from './builtins';
 
 /**
  * @typedef Keybind
@@ -34,7 +36,9 @@ import { imageIdToFileId } from './images';
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
  * @property {Set<string>} loadingImages liste des IDs d'images en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
- * @property {string} currentProtocol ID du protocole choisi
+ * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
+ * @property {string} currentProtocolId ID du protocole choisi
+ * @property {import('./database').Protocol | undefined} currentProtocol protocole choisi
  */
 
 /**
@@ -74,8 +78,15 @@ export const uiState = $state({
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
 	keybinds: {},
-	// TODO
-	currentProtocol: '',
+	get classificationMetadataId() {
+		return (
+			this.currentProtocol?.inference?.classification?.metadata ?? BUILTIN_METADATA_IDS.species
+		);
+	},
+	get currentProtocol() {
+		return tables.Protocol.state.find((p) => p.id === this.currentProtocolId);
+	},
+	currentProtocolId: '',
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection: undefined
 });

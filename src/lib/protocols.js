@@ -1,7 +1,8 @@
 import YAML from 'yaml';
-import { BUILTIN_METADATA, BUILTIN_METADATA_IDS, Schemas } from './database.js';
+import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { fromEntries, keys } from './utils.js';
+import { BUILTIN_METADATA_IDS, BUILTIN_METADATA } from './builtins.js';
 
 /**
  *
@@ -123,7 +124,9 @@ function downloadProtocol(base, format, exportedProtocol) {
 		'name',
 		'source',
 		'authors',
-		'metadata'
+		'exports',
+		'metadata',
+		'inference'
 	]);
 
 	// application/yaml is finally a thing, see https://www.rfc-editor.org/rfc/rfc9512.html
@@ -138,11 +141,7 @@ function downloadProtocol(base, format, exportedProtocol) {
  * @param {Multiple} [param0.allowMultiple=true] allow the user to select multiple files
  * @returns {Promise<Multiple extends true ? Array<typeof ExportedProtocol.infer> : typeof ExportedProtocol.infer>}
  */
-export async function importProtocol({ allowMultiple } = {}) {
-	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
-	// (Node does not like .svelte.js files' runes)
-	const { openTransaction } = await import('./idb.svelte.js');
-
+export async function promptAndImportProtocol({ allowMultiple } = {}) {
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
@@ -156,27 +155,17 @@ export async function importProtocol({ allowMultiple } = {}) {
 					const reader = new FileReader();
 					return new Promise((resolve) => {
 						reader.onload = async () => {
-							try {
-								if (!reader.result) throw new Error('Fichier vide');
-								if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-								const protocol = ExportedProtocol.in.assert(YAML.parse(reader.result));
-								await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
-									tx.objectStore('Protocol').put({
-										...protocol,
-										metadata: Object.keys(protocol.metadata)
-									});
-									Object.entries(protocol.metadata).map(
-										([id, metadata]) =>
-											typeof metadata === 'string' ||
-											tx.objectStore('Metadata').put({ id, ...metadata })
-									);
-								});
-								resolve(ExportedProtocol.assert(protocol));
-							} catch (error) {
-								reject(
-									`Protocole ${file.name} invalide: ${error?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`
+							if (!reader.result) throw new Error('Fichier vide');
+							if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
+							importProtocol(reader.result)
+								.then(resolve)
+								.catch((err) =>
+									reject(
+										new Error(
+											`Protocole invalide: ${err?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`
+										)
+									)
 								);
-							}
 						};
 						reader.readAsText(file);
 					});
@@ -187,4 +176,40 @@ export async function importProtocol({ allowMultiple } = {}) {
 		};
 		input.click();
 	});
+}
+
+/**
+ *
+ * @param {string} contents
+ */
+export async function importProtocol(contents) {
+	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
+	// (Node does not like .svelte.js files' runes)
+	const { openTransaction } = await import('./idb.svelte.js');
+	let parsed = YAML.parse(contents);
+
+	console.info(`Importing protocol ${parsed.id}`);
+	console.info(parsed);
+
+	const builtinMetadata = Object.entries(parsed.metadata ?? {})
+		.filter(([, value]) => value === 'builtin')
+		.map(([id]) => id);
+
+	parsed.metadata = Object.fromEntries(
+		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
+	);
+
+	const protocol = ExportedProtocol.in.assert(parsed);
+
+	await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
+		tx.objectStore('Protocol').put({
+			...protocol,
+			metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
+		});
+		Object.entries(protocol.metadata).map(
+			([id, metadata]) =>
+				typeof metadata === 'string' || tx.objectStore('Metadata').put({ id, ...metadata })
+		);
+	});
+	return ExportedProtocol.assert(protocol);
 }

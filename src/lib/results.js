@@ -33,6 +33,11 @@ export async function generateResultsZip(
 				{
 					label: o.label,
 					metadata: await observationMetadata(o).then(addValueLabels),
+					protocolMetadata: Object.fromEntries(
+						Object.entries(await observationMetadata(o).then(addValueLabels))
+							.filter(([key]) => key.startsWith(`${protocolUsed.id}__`))
+							.map(([key, value]) => [key.replace(`${protocolUsed.id}__`, ''), value])
+					),
 					images: o.images.map((id) => {
 						const image = db.tables.Image.state.find((i) => i.id === id);
 						if (!image) return;
