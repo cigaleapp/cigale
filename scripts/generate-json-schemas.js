@@ -17,7 +17,7 @@ async function exportJsonSchema(name, schema) {
 		null,
 		2
 	);
-	await writeFile(path.resolve(outputDir, `${name}.schema.json`), json);
+	await writeFile(path.resolve(outputDir, `${name}.schema.json`).replace('C:\\C:\\', 'C:\\'), json);
 }
 
 await exportJsonSchema('protocol', ExportedProtocol);

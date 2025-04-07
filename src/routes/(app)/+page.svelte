@@ -8,7 +8,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import IconManage from '~icons/ph/gear';
 	import Fuse from 'fuse.js';
-	import { importProtocol } from '$lib/protocols';
+	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
 
 	const currentProtocol = $derived(
@@ -63,7 +63,7 @@
 		</ButtonSecondary>
 		<ButtonSecondary
 			onclick={async () => {
-				const protocol = await importProtocol({ allowMultiple: false }).catch((e) =>
+				const protocol = await promptAndImportProtocol({ allowMultiple: false }).catch((e) =>
 					toasts.error(e)
 				);
 				if (!protocol || typeof protocol === 'string') return;
