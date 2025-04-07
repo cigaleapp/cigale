@@ -65,11 +65,10 @@ const Probability = type('0 <= number <= 1');
  */
 const URLString = type(/https?:\/\/.+/);
 
-const Request = URLString.internal
-	.withMeta({
-		description:
-			"L'URL à laquelle se situe le fichier. Effectue une requête GET sans en-têtes particuliers."
-	})
+const Request = URLString.configure(
+	"L'URL à laquelle se situe le fichier. Effectue une requête GET sans en-têtes particuliers.",
+	'self'
+)
 	.or({
 		url: URLString.describe("L'URL de la requête"),
 		'headers?': type({ '[string]': 'string' }).describe('Les en-têtes à ajouter dans la requête'),
@@ -77,10 +76,10 @@ const Request = URLString.internal
 			.enumerated('GET', 'POST', 'PUT', 'DELETE')
 			.describe('La méthode de la requête (GET par défaut)')
 	})
-	.internal.withMeta({
-		description:
-			'Le requête HTTP pour obtenir le fichier, avec des en-têtes et une méthode personnalisable'
-	});
+	.configure(
+		'Le requête HTTP pour obtenir le fichier, avec des en-têtes et une méthode personnalisable',
+		'self'
+	);
 
 const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
@@ -230,10 +229,10 @@ const MetadataEnumVariant = type({
 const MetadataWithoutID = type({
 	label: ['string', '@', 'Nom de la métadonnée'],
 	type: MetadataType,
-	mergeMethod: MetadataMergeMethod.internal.withMeta({
-		description:
-			"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
-	}),
+	mergeMethod: MetadataMergeMethod.configure(
+		"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images",
+		'self'
+	),
 	options: MetadataEnumVariant.array()
 		.atLeastLength(1)
 		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
