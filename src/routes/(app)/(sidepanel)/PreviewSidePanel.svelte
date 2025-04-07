@@ -25,9 +25,9 @@
 	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
 	 * @property {() => void} onsplit callback to call when the user wants to split the selected observation(s)
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
-	 * @property {(key: string, value: import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
+	 * @property {(key: string, value: undefined | import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
-	 * @property {Record<string, import('$lib/database').MetadataValue | undefined>} metadata values of the metadata we're viewing. Undefined if a metadata has multiple differing values for the selection.
+	 * @property {Record<string, import('$lib/database').MetadataValue & { merged: boolean } >} metadata values of the metadata we're viewing.
 	 */
 
 	/** @type {Props} */
@@ -35,15 +35,15 @@
 		$props();
 
 	const definitions = $derived.by(() => {
-		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocol);
+		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!protocol) return [];
 		return protocol.metadata
 			.map((id) => tables.Metadata.state.find((m) => m.id === id))
 			.filter((m) => m !== undefined)
 			.toSorted(({ id: a }, { id: b }) => {
-				// Sort id "species" before all others
-				if (a === 'species') return -1;
-				if (b === 'species') return 1;
+				if (protocol.metadataOrder) {
+					return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
+				}
 				return idComparator(a, b);
 			});
 	});
@@ -99,27 +99,15 @@
 			{#each definitions as definition (definition.id)}
 				{@const value = metadata[definition.id]}
 				{#if definition.label || showTechnicalMetadata}
-					<!-- 
-						There's to ways to have a undefined value:
-						- either the metadata does not exist on the observation/image yet (in that case, definition.id is not in metadata); or
-						- we have multiple multiple differing values for the images (and no override ) 
-					-->
 					<Metadata
-						conflicted={value === undefined && definition.id in metadata && images.length > 1}
-						{...definition}
-						{...value ?? { value: undefined }}
-						onblur={async (v) => {
-							if (v === undefined) return;
+						merged={value?.merged}
+						{definition}
+						{value}
+						onchange={async (v) => {
 							if (deepEqual(v, value?.value)) return;
 							onmetadatachange(definition.id, v);
 						}}
-					>
-						{#if definition.label}
-							{definition.label}
-						{:else}
-							<code>{definition.id}</code>
-						{/if}
-					</Metadata>
+					></Metadata>
 				{/if}
 			{/each}
 		</MetadataList>
@@ -171,7 +159,8 @@
 <style>
 	.pannel {
 		width: 40vw;
-		max-width: 700px;
+		resize: horizontal;
+		direction: rtl;
 		background-color: var(--bg-neutral);
 		overflow-x: auto;
 		padding: 1.7em;
@@ -180,6 +169,11 @@
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
+	}
+
+	/* Direction is set to RTL on .pannel to put the resize handle on the left of the container, this sets it back to LTR for every child so that text still has the correction direction (for French) */
+	.pannel :global(> *) {
+		direction: ltr;
 	}
 
 	.pannel.empty {

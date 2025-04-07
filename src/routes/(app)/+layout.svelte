@@ -9,9 +9,19 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { pick } from '$lib/utils';
 	import Navigation from './Navigation.svelte';
 
 	const { children } = $props();
+
+	export const snapshot = {
+		capture() {
+			return pick(uiState, 'currentProtocolId');
+		},
+		restore({ currentProtocolId }) {
+			uiState.currentProtocolId = currentProtocolId;
+		}
+	};
 
 	// Ensure every image has a preview URL at all times
 	$effect(() => {
@@ -36,8 +46,7 @@
 	let openKeyboardShortcuts = $state();
 </script>
 
-<Navigation {openKeyboardShortcuts} hasImages={true} progress={uiState.processing.progress}
-></Navigation>
+<Navigation {openKeyboardShortcuts} progress={uiState.processing.progress} />
 
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
@@ -85,7 +94,10 @@
 		height: 100%;
 		width: 100%;
 		flex-grow: 1;
-		overflow-y: scroll;
+		scrollbar-color: var(--gray) transparent;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		overflow-y: auto;
 	}
 
 	.contents.padded {

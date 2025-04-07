@@ -12,13 +12,14 @@ dialog {
 	--bg-success: #6bff6b;
 	--fg-success: #006600;
 	--bg-neutral: #ffffff;
+	--bg2-neutral: #f3f3f3;
 	--fg-neutral: #000000;
-	--gray: rgb(from var(--fg-neutral) r g b / 0.35);
-	--gay: rgb(from var(--fg-neutral) r g b / 0.75);
+	--gray: color-mix(in srgb, var(--fg-neutral) 35%, var(--bg-neutral));
+	--gay: color-mix(in srgb, var(--fg-neutral) 75%, var(--bg-neutral));
 
-	--dark__fg-primary: #30b9b3;
-	--dark__bg-primary-translucent: rgb(from var(--bg-primary) r g b / 0.35);
-	--dark__bg-primary: #2c004b;
+	--dark__fg-primary: #bb54ff;
+	--dark__bg-primary-translucent: color-mix(in srgb, var(--bg-primary)  35%, var(--bg-neutral));
+	--dark__bg-primary:  #042f52;
 	--dark__fg-dark-primary: #7bbbb0;
 	--dark__bg-dark-primary: #2f3040;
 	--dark__fg-warning: #fff7b3;
@@ -28,9 +29,10 @@ dialog {
 	--dark__fg-success: #6bff6b;
 	--dark__bg-success: #006600;
 	--dark__fg-neutral: #ffffff;
+	--dark__bg2-neutral: #0c0c0c;
 	--dark__bg-neutral: #000000;
-	--dark__gray: rgb(from var(--fg-neutral) r g b / 0.35);
-	--dark__gay: rgb(from var(--fg-neutral) r g b / 0.75);
+	--dark__gray: color-mix(in srgb, var(--fg-neutral) 35%, var(--bg-neutral));
+	--dark__gay: color-mix(in srgb, var(--fg-neutral) 75%, var(--bg-neutral));
 
 	--corner-radius: 7px;
 	--border-thickness: 1px;
@@ -56,6 +58,7 @@ dialog {
 		--bg-success: var(--dark__bg-success);
 		--fg-success: var(--dark__fg-success);
 		--bg-neutral: var(--dark__bg-neutral);
+		--bg2-neutral: var(--dark__bg2-neutral);
 		--fg-neutral: var(--dark__fg-neutral);
 		--gray: var(--dark__gray);
 		--gay: var(--dark__gay);
@@ -76,6 +79,7 @@ dialog[data-theme='dark'] {
 	--bg-success: var(--dark__bg-success);
 	--fg-success: var(--dark__fg-success);
 	--bg-neutral: var(--dark__bg-neutral);
+	--bg2-neutral: var(--dark__bg2-neutral);
 	--fg-neutral: var(--dark__fg-neutral);
 	--gray: var(--dark__gray);
 	--gay: var(--dark__gay);

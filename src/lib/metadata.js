@@ -1,6 +1,7 @@
 import { type } from 'arktype';
 import { Schemas } from './database.js';
 import { _tablesState, tables } from './idb.svelte.js';
+import { format } from 'date-fns';
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
  */
@@ -30,14 +31,22 @@ export async function storeMetadataValue({
 	confidence ??= 1;
 
 	const newValue = {
-		value: JSON.stringify(value),
+		value: JSON.stringify(value instanceof Date ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value),
 		confidence,
 		alternatives: Object.fromEntries(
 			alternatives.map((alternative) => [JSON.stringify(alternative.value), alternative.confidence])
 		)
 	};
 
-	console.log(`Store metadata ${metadataId} in ${subjectId}`, newValue);
+	// Make sure the alternatives does not contain the value itself
+	newValue.alternatives = Object.fromEntries(
+		Object.entries(newValue.alternatives).filter(([key]) => key !== newValue.value)
+	);
+
+	console.log(
+		`Store metadata ${metadataId} in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
+		newValue
+	);
 
 	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
@@ -52,7 +61,7 @@ export async function storeMetadataValue({
 		: await tables.Observation.raw.get(subjectId);
 
 	if (image) {
-		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
+		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
 		image.metadata[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Image').put(image);
@@ -62,7 +71,7 @@ export async function storeMetadataValue({
 			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
 		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else if (observation) {
-		console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
+		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
 		observation.metadataOverrides[metadataId] = newValue;
 
 		if (tx) tx.objectStore('Observation').put(observation);
@@ -81,9 +90,10 @@ export async function storeMetadataValue({
  * @param {object} options
  * @param {string} options.subjectId id de l'image ou l'observation
  * @param {string} options.metadataId id de la métadonnée
+ * @param {boolean} [options.recursive=false] si true, supprime la métadonnée de toutes les images composant l'observation
  * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  */
-export async function deleteMetadataValue({ subjectId, metadataId, tx }) {
+export async function deleteMetadataValue({ subjectId, metadataId, recursive = false, tx }) {
 	const image = tx
 		? await tx.objectStore('Image').get(subjectId)
 		: await tables.Image.raw.get(subjectId);
@@ -108,6 +118,11 @@ export async function deleteMetadataValue({ subjectId, metadataId, tx }) {
 		delete _tablesState.Observation[
 			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
 		].metadataOverrides[metadataId];
+		if (recursive) {
+			for (const imageId of observation.images) {
+				await deleteMetadataValue({ subjectId: imageId, recursive: false, metadataId, tx });
+			}
+		}
 	}
 
 	return;
@@ -155,12 +170,68 @@ export function addValueLabels(values) {
 }
 
 /**
+ * Get the label of a enum metadata given its key.
+ * @param {string} metadataId
+ * @param {string} key
+ * @returns {Promise<string|undefined>}
+ */
+export async function labelOfEnumKey(metadataId, key) {
+	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
+
+	return metadata.options?.find((o) => o.key === key)?.label;
+}
+
+/**
+ * Get the key of a enum metadata given its label.
+ * @param {string} metadataId
+ * @param {string} label
+ * @returns {Promise<string|undefined>}
+ */
+export async function keyOfEnumLabel(metadataId, label) {
+	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
+	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
+	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
+
+	return metadata.options?.find((o) => o.label === label)?.key;
+}
+
+/**
+ * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
+ * @param {import('./database').Image[]} images
+ * @param {import('./database').Observation[]} observations
+ */
+export async function mergeMetadataFromImagesAndObservations(images, observations) {
+	const mergedValues = await mergeMetadataValues(images.map((img) => img.metadata));
+	const mergedOverrides = await mergeMetadataValues(
+		observations.map((obs) => obs.metadataOverrides)
+	);
+
+	const keys = new Set([...Object.keys(mergedValues), ...Object.keys(mergedOverrides)]);
+
+	/** @type {Record<string, import('./database').MetadataValue & { merged: boolean }>}  */
+	const output = {};
+
+	for (const key of keys) {
+		const value = mergedOverrides[key] ?? mergedValues[key];
+		if (value) output[key] = value;
+	}
+
+	return output;
+}
+
+/**
  *
  * @param {Array<import('./database').MetadataValues>} values
- * @returns {Promise<import("./database").MetadataValues>}
+ * @returns {Promise<Record<string, import('./database').MetadataValue & { merged: boolean }>>}
  */
 export async function mergeMetadataValues(values) {
-	/** @type {import("./database").MetadataValues}  */
+	if (values.length === 1) {
+		return Object.fromEntries(Object.entries(values[0]).map((v) => ({ ...v, merged: false })));
+	}
+
+	/** @type {Record<string, import('./database').MetadataValue & { merged: boolean }>}  */
 	const output = {};
 
 	const keys = new Set(values.flatMap((singleSubjectValues) => Object.keys(singleSubjectValues)));
@@ -172,73 +243,19 @@ export async function mergeMetadataValues(values) {
 			continue;
 		}
 
-		const merged = mergeMetadata(
-			definition,
-			values.flatMap((singleSubjectValues) =>
-				Object.entries(singleSubjectValues)
-					.filter(([k]) => k === key)
-					.map(([, v]) => v)
-			)
+		const valuesOfKey = values.flatMap((singleSubjectValues) =>
+			Object.entries(singleSubjectValues)
+				.filter(([k]) => k === key)
+				.map(([, v]) => v)
 		);
 
-		if (merged !== null) output[key] = merged;
-	}
+		const merged = mergeMetadata(definition, valuesOfKey);
 
-	return output;
-}
-
-/**
- * @param {import('./database').Image[]} images
- * @param {import('./database').Observation[]} observations
- */
-export function combineMetadataValuesWithOverrides(images, observations) {
-	// Combine overrides
-	const metadataOverrides = combineMetadataValues(observations.map((o) => o.metadataOverrides));
-	// Combine images
-	const metadataFromImages = combineMetadataValues(images.map((i) => i.metadata));
-	// For each key, try from metadataOverrides, if not found, try from metadataFromImages
-	const keys = new Set([...Object.keys(metadataOverrides), ...Object.keys(metadataFromImages)]);
-	/** @type {import('./database').MetadataValues} */
-	const output = {};
-	for (const key of keys) {
-		// @ts-ignore
-		output[key] = metadataOverrides[key] ?? metadataFromImages[key];
-	}
-	return output;
-}
-
-/**
- * Combine metadata values. Unlike `mergeMetadataValues`, this one does not attempt to merge different values for the same metadata definition, and puts `undefined` instead of a MetadataValue object when values differ.
- * @param {import('./database').MetadataValues[]} valuesets
- * @returns {Record<string, import('./database').MetadataValue | undefined>}
- */
-export function combineMetadataValues(valuesets) {
-	/** @type {Record<string, import('./database').MetadataValue | undefined>} */
-	const output = {};
-
-	let keys = new Set(valuesets.flatMap((v) => Object.keys(v)));
-
-	for (const key of keys) {
-		const values = valuesets.map((v) => v[key] ?? { value: null, confidence: 0, alternatives: {} });
-
-		const stringedValues = new Set(values.map(({ value }) => JSON.stringify(value)));
-		if (stringedValues.size > 1 || values.some(({ value }) => value === null)) {
-			output[key] = undefined;
-			continue;
-		}
-
-		const alternativeKeys = [...new Set(values.flatMap((v) => Object.keys(v.alternatives)))];
-
-		output[key] = {
-			value: values[0].value,
-			confidence: avg(values.map((v) => v.confidence)),
-			alternatives: Object.fromEntries(
-				alternativeKeys.map((key) => [
-					key,
-					avg(values.map((v) => v.alternatives[key] ?? null).filter((p) => p !== null))
-				])
-			)
-		};
+		if (merged !== null && merged !== undefined)
+			output[key] = {
+				...merged,
+				merged: [...new Set(valuesOfKey.map((v) => JSON.stringify(v.value)))].length > 1
+			};
 	}
 
 	return output;
@@ -516,6 +533,50 @@ export function metadataPrettyKey(metadata) {
 }
 
 /**
+ * Asserts that a metadata is of a certain type, inferring the correct runtime type for its value
+ * @template {import('./database').MetadataType} Type
+ * @template {undefined | import('./metadata').RuntimeValue} Value
+ * @param {Type} testedtyp
+ * @param {import('./metadata').RuntimeValue} metadatatyp
+ * @param {Value} value
+ * @returns {value is (Value extends (undefined | import('./metadata').RuntimeValue) ?  RuntimeValue<Type> : (undefined | RuntimeValue<Type>))}
+ */
+export function isType(testedtyp, metadatatyp, value) {
+	/**
+	 * @param {import('arktype').Type} v
+	 * @returns boolean
+	 */
+	const ok = (v) =>
+		metadatatyp === testedtyp && (value === undefined || !(v(value) instanceof type.errors));
+
+	switch (testedtyp) {
+		case 'boolean':
+			return ok(type('boolean'));
+		case 'integer':
+		case 'float':
+			return ok(type('number'));
+		case 'enum':
+			return ok(type('string | number'));
+		case 'date':
+			return ok(type('Date'));
+		case 'location':
+			return ok(type({ latitude: 'number', longitude: 'number' }));
+		case 'boundingbox':
+			return ok(type({ x: 'number', y: 'number', w: 'number', h: 'number' }));
+		case 'string':
+			return ok(type('string'));
+		default:
+			throw new Error(`Type inconnu: ${testedtyp}`);
+	}
+}
+
+/**
  * @template {import('./database').MetadataType} [Type=import('./database').MetadataType]
  * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, w: number, h: number } : string} RuntimeValue
+ */
+
+/**
+ * @template T
+ * @template Undefinable
+ * @typedef{ Undefinable extends true ? T | undefined : T } Maybe
  */

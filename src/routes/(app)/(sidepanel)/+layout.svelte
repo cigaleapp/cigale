@@ -2,9 +2,14 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImage } from '$lib/images';
-	import { combineMetadataValuesWithOverrides, storeMetadataValue } from '$lib/metadata';
+	import {
+		deleteMetadataValue,
+		mergeMetadataFromImagesAndObservations,
+		storeMetadataValue
+	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
+	import { isTaxonomicMetadata, setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -104,6 +109,19 @@
 	const selectedHrefs = $derived(
 		selectedImages.map((image) => uiState.getPreviewURL(image)).filter((url) => url !== undefined)
 	);
+
+	/** @type {Awaited<ReturnType<typeof mergeMetadataFromImagesAndObservations>>} */
+	let mergedMetadataValues = $state({});
+
+	$effect(() => {
+		// FIXME needed to force refresh when selectedObservations' metadataOverrides change values, this isn't picked up by Svelte for some reason. I tried reproducing but couldn't yet, see https://svelte.dev/playground/eef37e409ca04fa888badd3e7588f461?version=5.25.0
+		[selectedImages, selectedObservations];
+		void mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations).then(
+			(values) => {
+				mergedMetadataValues = values;
+			}
+		);
+	});
 </script>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
@@ -111,7 +129,7 @@
 	{#if showSidePanel}
 		<PreviewSidePanel
 			images={selectedHrefs}
-			metadata={combineMetadataValuesWithOverrides(selectedImages, selectedObservations)}
+			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}
 			onmerge={mergeSelection}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
@@ -119,17 +137,27 @@
 			ondelete={deleteSelection}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
-				await openTransaction(['Image', 'Observation'], {}, async (tx) => {
-					for (const subjectId of uiState.selection) {
+				if (!uiState.currentProtocol) return;
+				for (const subjectId of uiState.selection) {
+					if (value === undefined) {
+						await deleteMetadataValue({ subjectId, metadataId: id, recursive: true });
+					} else if (uiState.currentProtocol && isTaxonomicMetadata(uiState.currentProtocol, id)) {
+						await setTaxonAndInferParents({
+							protocol: uiState.currentProtocol,
+							subjectId,
+							metadataId: id,
+							confidence: 1,
+							value: value.toString()
+						});
+					} else {
 						await storeMetadataValue({
-							tx,
 							subjectId,
 							metadataId: id,
 							confidence: 1,
 							value
 						});
 					}
-				});
+				}
 			}}
 		/>
 	{/if}
@@ -156,7 +184,10 @@
 		gap: 1em;
 		height: 100%;
 		flex-grow: 1;
-		overflow-y: scroll;
+		scrollbar-color: var(--gray) transparent;
+		scrollbar-gutter: stable;
+		scrollbar-width: thin;
+		overflow-y: auto;
 		padding: 1.2rem;
 	}
 </style>
