@@ -64,7 +64,12 @@ const protocol = {
 	source: 'https://github.com/cigaleapp/cigale/tree/main/scripts/jessica-joachim-crawler.js',
 	description:
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',
-	authors: [],
+	authors: [
+		{
+			name: 'Jessica Joachim (photos et descriptions des espèces)',
+			email: 'tifaeriis@gmail.com'
+		}
+	],
 	metadata: {
 		'io.github.cigaleapp.transects.arthropods__species': {
 			type: 'enum',
