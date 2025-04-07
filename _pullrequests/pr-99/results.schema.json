@@ -53,7 +53,7 @@
     },
     "protocol": {
       "type": "object",
-      "table": "$ark.object382",
+      "table": "$ark.object416",
       "description": "Le protocole utilisé pour cette session d'analyse",
       "properties": {
         "authors": {
