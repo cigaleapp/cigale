@@ -10,7 +10,7 @@
 		jsonSchemaURL
 	} from '$lib/protocols.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { exportProtocol, importProtocol } from '$lib/protocols';
+	import { exportProtocol, promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import IconCreate from '~icons/ph/plus-circle';
@@ -118,7 +118,7 @@
 	<section class="actions">
 		<ButtonSecondary
 			onclick={async () => {
-				await importProtocol({ allowMultiple: true })
+				await promptAndImportProtocol({ allowMultiple: true })
 					.catch((e) => toasts.error(e))
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;
