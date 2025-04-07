@@ -4,18 +4,11 @@
 	"name": "Transect d'arthropodes",
 	"source": "https://github.com/cigaleapp/cigale/tree/0d507b8ebc396ba893ea642e6bf7ece62ab0b0e8/scripts/jessica-joachim-crawler.js#L68",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
-	"authors": [],
-	"metadataOrder": [
-		"io.github.cigaleapp.transects.arthropods__species",
-		"genus",
-		"family",
-		"order",
-		"shoot_date",
-		"shoot_location",
-		"class",
-		"phylum",
-		"kingdom",
-		"crop"
+	"authors": [
+		{
+			"name": "Jessica Joachim (photos et descriptions des espèces)",
+			"email": "tifaeriis@gmail.com"
+		}
 	],
 	"metadata": {
 		"kingdom": "builtin",
