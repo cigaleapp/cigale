@@ -33,48 +33,37 @@
       "type": "object",
       "properties": {
         "class": {
-          "const": "builtin",
-          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+          "anyOf": []
         },
         "crop": {
-          "const": "builtin",
-          "description": "Métadonnée \"\" prédéfinie dans l'application: Boîte de recadrage pour l'image"
+          "anyOf": []
         },
         "cuteness": {
-          "const": "builtin",
-          "description": "Métadonnée \"🥺\" prédéfinie dans l'application: À quel point l'arthropode est trop cute 😖"
+          "anyOf": []
         },
         "family": {
-          "const": "builtin",
-          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+          "anyOf": []
         },
         "genus": {
-          "const": "builtin",
-          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+          "anyOf": []
         },
         "kingdom": {
-          "const": "builtin",
-          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+          "anyOf": []
         },
         "order": {
-          "const": "builtin",
-          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+          "anyOf": []
         },
         "phylum": {
-          "const": "builtin",
-          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+          "anyOf": []
         },
         "shoot_date": {
-          "const": "builtin",
-          "description": "Métadonnée \"Date de prise de vue\" prédéfinie dans l'application: "
+          "anyOf": []
         },
         "shoot_location": {
-          "const": "builtin",
-          "description": "Métadonnée \"Lieu\" prédéfinie dans l'application: Localisation de la prise de vue"
+          "anyOf": []
         },
         "species": {
-          "const": "builtin",
-          "description": "Métadonnée \"undefined\" prédéfinie dans l'application: undefined"
+          "anyOf": []
         }
       },
       "additionalProperties": {
