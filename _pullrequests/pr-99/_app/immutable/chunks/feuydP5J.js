@@ -1,1 +1,0 @@
-var s;const t=((s=globalThis.__sveltekit_5bbt4b)==null?void 0:s.base)??"/cigale/_pullrequests/pr-99";var e;const b=((e=globalThis.__sveltekit_5bbt4b)==null?void 0:e.assets)??t;export{b as assets,t as base};
