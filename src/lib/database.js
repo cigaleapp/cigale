@@ -1,6 +1,6 @@
-import { type, scope } from 'arktype';
-import { parseISOSafe } from './date.js';
+import { scope, type } from 'arktype';
 import Handlebars from 'handlebars';
+import { parseISOSafe } from './date.js';
 import { splitFilenameOnExtension } from './download.js';
 import { Clade, CladePlural } from './taxonomy.js';
 
@@ -247,8 +247,8 @@ const MetadataWithoutID = type({
 const Metadata = table('id', MetadataWithoutID.and({ id: ID }));
 
 const ModelInput = type({
-	width: ['number', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
-	height: ['number', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
+	width: ['number < 1024', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
+	height: ['number < 1024', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
 	'disposition?': type(['"CHW"', '@', 'Tenseurs de la forme [3, H, W]']).or(
 		type(['"1CHW"', '@', 'Tenseurs de la forme [1, 3, H, W]'])
 	),
@@ -263,6 +263,18 @@ const ModelInput = type({
 		"Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
 	]
 });
+
+const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du point central'])
+	.or(type(['"cy"', '@', 'Coordonée Y du point central']))
+	.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
+	.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
+	.or(type(['"ex"', '@', 'Coordonée X du point inférieur droit']))
+	.or(type(['"ey"', '@', 'Coordonée Y du point inférieur droit']))
+	.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
+	.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
+	.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
+	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
+	.array();
 
 const ProtocolWithoutMetadata = type({
 	id: ID.describe(
@@ -288,20 +300,15 @@ const ProtocolWithoutMetadata = type({
 			),
 			input: ModelInput.describe("Configuration de l'entrée du modèle"),
 			output: type({
+				'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"],
 				normalized: [
 					'boolean',
 					'@',
 					"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
 				],
-				shape: type(['"cx"', '@', 'Coordonée X du point central'])
-					.or(type(['"cy"', '@', 'Coordonée Y du point central']))
-					.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
-					.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
-					.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
-					.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
-					.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
-					.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
-					.array()
+				shape: ModelDetectionOutputShape.describe(
+					"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
+				)
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
@@ -330,7 +337,9 @@ const ProtocolWithoutMetadata = type({
 				'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
 			),
 			input: ModelInput.describe("Configuration de l'entrée des modèles"),
-
+			'output?': type({
+				'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
+			}),
 			classmapping: Request.describe(
 				'Lien vers un fichier texte contenant la correspondance entre les indices des neurones de la couche de sortie du modèle et les noms des classes'
 			)
@@ -489,6 +498,21 @@ function table(keyPaths, schema) {
 /**
  * @typedef  Protocol
  * @type {typeof Protocol.infer}
+ */
+
+/**
+ * @typedef  ProtocolWithoutMetadata
+ * @type {typeof ProtocolWithoutMetadata.infer}
+ */
+
+/**
+ * @typedef  ModelInput
+ * @type {typeof ModelInput.infer}
+ */
+
+/**
+ * @typedef  ModelDetectionOutputShape
+ * @type {typeof ModelDetectionOutputShape.infer}
  */
 
 /**

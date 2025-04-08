@@ -25,7 +25,6 @@ async function fillBuiltinData() {
 		for (const metadata of BUILTIN_METADATA) {
 			tx.objectStore('Metadata').put(metadata);
 		}
-
 		tx.objectStore('Settings').put({
 			id: 'defaults',
 			protocols: [],

@@ -9,22 +9,35 @@ import { TARGETHEIGHT, TARGETWIDTH } from './inference';
  */
 export function coordsScaler({ x: xwise, y: ywise }) {
 	/**
-	 * @param {object} param0
-	 * @param {number} param0.x
-	 * @param {number} param0.y
-	 * @param {number} param0.width
-	 * @param {number} param0.height
+	 * @template {{x: number; y: number} & ({w: number; h: number} | {width: number; height: number})} Shape
+	 * @param {Shape} param0
+	 * @returns {Shape}
 	 */
-	return ({ x, y, width, height }) => ({
+	return ({ x, y, ...wh }) => ({
 		x: x * xwise,
 		y: y * ywise,
-		width: width * xwise,
-		height: height * ywise
+		['width' in wh ? 'width' : 'w']: (wh.width ?? wh.w) * xwise,
+		['height' in wh ? 'height' : 'h']: (wh.height ?? wh.h) * ywise
 	});
 }
 
-export const toPixelCoords = coordsScaler({ x: TARGETWIDTH, y: TARGETHEIGHT });
-export const toRelativeCoords = coordsScaler({ x: 1 / TARGETWIDTH, y: 1 / TARGETHEIGHT });
+/** @param {undefined | import('./database').Protocol} protocol  */
+export const toPixelCoords = (protocol) => {
+	if (!protocol) throw new Error('No protocol was provided');
+	return coordsScaler({
+		x: protocol.inference?.detection?.input?.width ?? TARGETWIDTH,
+		y: protocol.inference?.detection?.input?.height ?? TARGETHEIGHT
+	});
+};
+
+/** @param {undefined | import('./database').Protocol} protocol  */
+export const toRelativeCoords = (protocol) => {
+	if (!protocol) throw new Error('No protocol was provided');
+	return coordsScaler({
+		x: 1 / (protocol.inference?.detection?.input?.width ?? TARGETWIDTH),
+		y: 1 / (protocol.inference?.detection?.input?.height ?? TARGETHEIGHT)
+	});
+};
 
 /**
  * @param {object} param0
