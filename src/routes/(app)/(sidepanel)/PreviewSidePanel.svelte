@@ -2,18 +2,19 @@
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { countThings } from '$lib/i18n';
-	import IconImage from '~icons/ph/image';
-	import IconObservation from '~icons/ph/bug-beetle';
-	import { idComparator, tables } from '$lib/idb.svelte';
+	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { metadataDefinitionComparator } from '$lib/metadata';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import deepEqual from 'deep-equal';
 	import IconSplit from '~icons/ph/arrows-out-light';
+	import IconObservation from '~icons/ph/bug-beetle';
+	import IconImage from '~icons/ph/image';
 	import IconMerge from '~icons/ph/selection-background';
 	import IconDelete from '~icons/ph/trash';
 
@@ -40,12 +41,7 @@
 		return protocol.metadata
 			.map((id) => tables.Metadata.state.find((m) => m.id === id))
 			.filter((m) => m !== undefined)
-			.toSorted(({ id: a }, { id: b }) => {
-				if (protocol.metadataOrder) {
-					return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
-				}
-				return idComparator(a, b);
-			});
+			.toSorted(metadataDefinitionComparator(protocol));
 	});
 
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);

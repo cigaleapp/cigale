@@ -281,6 +281,7 @@ const ProtocolWithoutMetadata = type({
 		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
 	),
 	name: ['string', '@', 'Nom du protocole'],
+	description: ['string', '@', 'Description du protocole'],
 	source: URLString.describe(
 		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
 	),
@@ -402,7 +403,8 @@ export const Schemas = {
 	Metadata,
 	Protocol,
 	ProtocolWithoutMetadata,
-	Settings
+	Settings,
+	Request
 };
 
 export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile', 'ImagePreviewFile']);
@@ -518,4 +520,9 @@ function table(keyPaths, schema) {
 /**
  * @typedef  Settings
  * @type {typeof Settings.infer}
+ */
+
+/**
+ * @typedef  Request
+ * @type {typeof Request.infer}
  */
