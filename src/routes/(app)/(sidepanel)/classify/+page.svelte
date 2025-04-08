@@ -70,7 +70,8 @@
 			height: TARGETHEIGHT
 		};
 
-		let img = await imload([buffer], inputSettings.width, inputSettings.height);
+		// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
+		let img = await imload([buffer], { ...inputSettings, normalized: true });
 		const { x, y, width, height } = toPixelCoords(
 			toTopLeftCoords(
 				/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */

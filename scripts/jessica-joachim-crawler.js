@@ -126,7 +126,7 @@ const protocol = {
 				height: 224,
 				width: 224,
 				disposition: 'CHW',
-				normalized: false
+				normalized: true
 			}
 		},
 		detection: {
