@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 import { Schemas } from './database.js';
-import { _tablesState, tables } from './idb.svelte.js';
+import { _tablesState, idComparator, tables } from './idb.svelte.js';
 import { format } from 'date-fns';
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
@@ -568,6 +568,20 @@ export function isType(testedtyp, metadatatyp, value) {
 		default:
 			throw new Error(`Type inconnu: ${testedtyp}`);
 	}
+}
+
+/**
+ *
+ * @param {{metadataOrder?: undefined | string[]}} protocol
+ * @returns {(a: { id: string }, b: { id: string }) => number}
+ */
+export function metadataDefinitionComparator(protocol) {
+	return ({ id: a }, { id: b }) => {
+		if (protocol.metadataOrder) {
+			return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
+		}
+		return idComparator(a, b);
+	};
 }
 
 /**
