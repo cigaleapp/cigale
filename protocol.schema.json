@@ -24,6 +24,10 @@
         ]
       }
     },
+    "description": {
+      "type": "string",
+      "description": "Description du protocole"
+    },
     "id": {
       "type": "string",
       "description": "Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole",
@@ -748,6 +752,7 @@
   },
   "required": [
     "authors",
+    "description",
     "id",
     "metadata",
     "name",
