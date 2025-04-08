@@ -147,7 +147,6 @@ export async function infer(
             (pour pouvoir l'utiliser plus tard et pas avoir à load 35 fois les images)
     */
 
-	// [!] le modèle de détection renvoie [x,y,w,h,conf] mais (x,y) correspond au centre de la bounding box
 	if (webgpu) {
 		console.log('webgpu not implemented yet, using wasm');
 	}
@@ -175,7 +174,7 @@ export async function infer(
 	let inputTensor;
 
 	console.log('loading images...');
-	inputTensor = await imload(buffers, taskSettings.input.width, taskSettings.input.height);
+	inputTensor = await imload(buffers, taskSettings.input);
 
 	console.log('inference...');
 	const outputTensor = await model.run({ [taskSettings.input.name]: inputTensor });

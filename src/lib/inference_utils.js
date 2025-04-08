@@ -229,11 +229,13 @@ export function postprocess_BB(boundingboxes, numfiles) {
  * @returns {Promise<ort.Tensor[]>}
  */
 async function map_preprocess_for_classification(protocol, tensor, mean, std) {
+	const { width, height, normalized } = protocol.inference?.classification?.input ?? {
+		width: 224,
+		height: 224,
+		normalized: true
+	};
 	let c = tensor;
-	if (protocol.inference?.classification.input.normalized) {
-		c = await normalizeTensors(c, mean, std);
-	}
-	const { width, height } = protocol.inference?.classification.input ?? { width: 224, height: 224 };
+	c = await normalizeTensors(c, mean, std, !normalized);
 	c = await resizeTensors(c, width, height);
 
 	return c;
@@ -305,11 +307,13 @@ export function labelize(output, classmap) {
 /**
  *
  * @param {ArrayBuffer[]} buffers
- * @param {number} targetWidth
- * @param {number} targetHeight
+ * @param {object} settings
+ * @param {number} settings.height
+ * @param {number} settings.width
+ * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @returns {Promise<import('onnxruntime-web').TypedTensor<'float32'>>}
  */
-export async function imload(buffers, targetWidth, targetHeight) {
+export async function imload(buffers, { width: targetWidth, height: targetHeight, normalized }) {
 	/*
     charge les images et les resize
     -------input------- :
@@ -342,8 +346,10 @@ export async function imload(buffers, targetWidth, targetHeight) {
 		let i,
 			l = transposedData.length;
 
-		for (i = 0; i < l; i++) {
-			float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
+		if (normalized) {
+			for (i = 0; i < l; i++) {
+				float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
+			}
 		}
 	}
 
@@ -362,9 +368,10 @@ export async function imload(buffers, targetWidth, targetHeight) {
  * @param {ort.Tensor} tensor
  * @param {number[]} mean
  * @param {number[]} std
+ * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
  * @returns {Promise<ort.Tensor>}
  */
-export async function normalizeTensor(tensor, mean, std) {
+export async function normalizeTensor(tensor, mean, std, denormalize = false) {
 	const data = await tensor.getData();
 	const dims = tensor.dims;
 
@@ -374,6 +381,10 @@ export async function normalizeTensor(tensor, mean, std) {
 				let i = c * dims[2] * dims[3] + x * dims[3] + y;
 				// @ts-ignore
 				data[i] = (data[i] - mean[c]) / std[c];
+				if (denormalize) {
+					// @ts-ignore
+					data[i] = Math.min(data[i] * 255, 255);
+				}
 			}
 		}
 	}
@@ -386,12 +397,13 @@ export async function normalizeTensor(tensor, mean, std) {
  * @param {ort.Tensor[]} tensors
  * @param {number[]} mean
  * @param {number[]} std
+ * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function normalizeTensors(tensors, mean, std) {
+export async function normalizeTensors(tensors, mean, std, denormalize = false) {
 	let newTensors = [];
 	for (let i = 0; i < tensors.length; i++) {
-		let newtsr = await normalizeTensor(tensors[i], mean, std);
+		let newtsr = await normalizeTensor(tensors[i], mean, std, denormalize);
 		newTensors.push(newtsr);
 	}
 
