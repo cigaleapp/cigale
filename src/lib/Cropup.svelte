@@ -4,12 +4,14 @@ show a pop up to crop an image
 -->
 
 <script>
-	import { toPixelCoords } from './BoundingBoxes.svelte';
+	import { toPixelCoords as _toPixelCoords } from './BoundingBoxes.svelte';
 	import DraggableBoundingBox from './DraggableBoundingBox.svelte';
 	import { imageIdToFileId } from './images';
 	import Logo from './Logo.svelte';
 	import ModalConfirm from './ModalConfirm.svelte';
 	import { uiState } from './state.svelte';
+
+	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
 
 	/**
 	 * @typedef Props

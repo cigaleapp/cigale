@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import { toPixelCoords as _toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
@@ -27,6 +27,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 
 	const erroredImages = $derived(uiState.erroredImages);
+	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
@@ -41,7 +42,8 @@
 
 	let classifmodel = $state();
 	async function loadClassifModel() {
-		classifmodel = await loadModel(true);
+		if (!uiState.currentProtocol) return;
+		classifmodel = await loadModel(uiState.currentProtocol, 'classification');
 		toasts.success('Modèle de classification chargé');
 	}
 	/**
@@ -52,33 +54,37 @@
 	 * @param {import('$lib/database').MetadataValues} image.metadata
 	 */
 	async function analyzeImage(buffer, id, { filename, metadata }) {
+		if (!uiState.currentProtocol) {
+			throw new Error('Aucun protocole sélectionné');
+		}
 		if (!classifmodel) {
-			toasts.error(
+			throw new Error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
 			);
-			return 0;
 		}
 
 		console.log('Analyzing image', id, filename);
 
-		//@ts-ignore
-		/** @type {ort.Tensor}*/
-		let img = await imload([buffer], TARGETWIDTH, TARGETHEIGHT);
+		const inputSettings = uiState.currentProtocol.inference?.detection?.input ?? {
+			width: TARGETWIDTH,
+			height: TARGETHEIGHT
+		};
+
+		// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
+		let img = await imload([buffer], { ...inputSettings, normalized: true });
 		const { x, y, width, height } = toPixelCoords(
 			toTopLeftCoords(
 				/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
 				(metadata.crop.value)
 			)
 		);
-		let bbList = [x, y, width, height];
 
-		//@ts-ignore
-		/** @type {ort.Tensor}*/
-		const nimg = await applyBBOnTensor(bbList, img);
+		const nimg = await applyBBOnTensor([x, y, width, height], img);
+
 		// TODO persist after page reload?
 		uiState.croppedPreviewURLs.set(imageIdToFileId(id), nimg.toDataURL());
 
-		const [[scores]] = await classify([[nimg]], classifmodel, uiState, 0);
+		const [[scores]] = await classify(uiState.currentProtocol, [[nimg]], classifmodel, uiState, 0);
 
 		const results = scores
 			.map((score, i) => ({
@@ -90,8 +96,7 @@
 			.filter(({ confidence }) => confidence > 0.005);
 
 		if (!results.length) {
-			console.warn('No species detected');
-			return 0;
+			throw new Error('No species detected');
 		} else {
 			const [firstChoice, ...alternatives] = results;
 			if (!uiState.currentProtocol) return;
@@ -101,7 +106,7 @@
 				alternatives
 			});
 
-			if (uiState.currentProtocol.inference?.classification?.metadata) {
+			if (uiState.currentProtocol.inference?.classification?.taxonomic) {
 				await setTaxonAndInferParents({
 					...metadataValue,
 					protocol: uiState.currentProtocol,
@@ -135,14 +140,8 @@
 
 						try {
 							const file = await db.get('ImagePreviewFile', imageIdToFileId(image.id));
-							if (!file) {
-								console.log('pas de fichier ..?');
-								return;
-							}
-							let code = await analyzeImage(file.bytes, image.id, image);
-							if (code == 0) {
-								erroredImages.set(image.id, "Erreur inattendue l'ors de la classification");
-							}
+							if (!file) throw new Error('No file ..?');
+							await analyzeImage(file.bytes, image.id, image);
 						} catch (error) {
 							console.error(error);
 							erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');

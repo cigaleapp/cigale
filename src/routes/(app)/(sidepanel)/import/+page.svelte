@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toCenteredCoords, toRelativeCoords } from '$lib/BoundingBoxes.svelte';
+	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { processExifData } from '$lib/exif';
 	import * as db from '$lib/idb.svelte';
@@ -15,13 +15,7 @@
 		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
-	import {
-		inferSequentialy,
-		loadModel,
-		MODELDETECTPATH,
-		TARGETHEIGHT,
-		TARGETWIDTH
-	} from '$lib/inference.js';
+	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata';
 	import { deleteObservation } from '$lib/observations';
@@ -40,7 +34,8 @@
 
 	let cropperModel = $state();
 	async function loadCropperModel() {
-		cropperModel = await loadModel(false);
+		if (!uiState.currentProtocol) return;
+		cropperModel = await loadModel(uiState.currentProtocol, 'detection');
 		toasts.success('Modèle de recadrage chargé');
 	}
 
@@ -74,6 +69,10 @@
 	 * @param {string} image.name
 	 */
 	async function inferBoundingBox(id, buffer, { type: contentType, name: filename }) {
+		if (!uiState.currentProtocol) {
+			toasts.error('Aucun protocole sélectionné');
+			return;
+		}
 		if (!cropperModel) {
 			toasts.error(
 				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -81,18 +80,23 @@
 			return;
 		}
 
-		const [[boundingBoxes], [bestScores]] = await inferSequentialy([buffer], cropperModel);
+		const [[boundingBoxes], [bestScores]] = await inferSequentialy(
+			uiState.currentProtocol,
+			[buffer],
+			cropperModel
+		);
+
+		console.log('Bounding boxes:', boundingBoxes);
 
 		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
 		let [firstScore, ...otherScores] = bestScores;
 
-		firstBoundingBox ??= [0, 0, TARGETWIDTH, TARGETHEIGHT];
+		firstBoundingBox ??= [0, 0, 0.5, 0.5];
 		firstScore ??= 1;
 		/**
 		 * @param {[number, number, number, number]} param0
 		 */
-		const toCropBox = ([x, y, width, height]) =>
-			toCenteredCoords(toRelativeCoords({ x, y, width, height }));
+		const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
 
 		await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
 			await storeMetadataValue({

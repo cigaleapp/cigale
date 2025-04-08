@@ -11,7 +11,7 @@
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 
 	/**
-	 * @type {{openKeyboardShortcuts?: () => void}}
+	 * @type {{openKeyboardShortcuts?: (() => void) | undefined}}
 	 */
 	const { openKeyboardShortcuts } = $props();
 

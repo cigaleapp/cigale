@@ -126,7 +126,7 @@ const protocol = {
 				height: 224,
 				width: 224,
 				disposition: 'CHW',
-				normalized: false
+				normalized: true
 			}
 		},
 		detection: {
@@ -139,7 +139,7 @@ const protocol = {
 			},
 			output: {
 				normalized: true,
-				shape: ['cx', 'cy', 'w', 'h', 'score', '_']
+				shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
 			}
 		},
 		exports: {

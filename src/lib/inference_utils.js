@@ -1,6 +1,11 @@
-import * as ort from 'onnxruntime-web';
-import * as Jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
+import { match } from 'arktype';
+import * as Jimp from 'jimp';
+import * as ort from 'onnxruntime-web';
+
+/**
+ * @typedef {import('onnxruntime-web')} ort
+ */
 
 /**
  *
@@ -91,7 +96,7 @@ export async function cropTensor(tensor, x1, y1, x2, y2) {
  * @param {number[]} BB
  * @param {ort.Tensor} tensor
  * @param {number} marge
- * @returns {Promise<ort.Tensor>}
+ * @returns {Promise<import('onnxruntime-web').Tensor>}
  */
 export async function applyBBOnTensor(BB, tensor, marge = 10) {
 	/*Applique une bounding box sur UN tenseur :
@@ -106,13 +111,8 @@ export async function applyBBOnTensor(BB, tensor, marge = 10) {
         croppedTensor : tenseur croppé
             forme : [1, C, h+2*marge, w+2*marge]
     */
-	let x = BB[0];
-	let y = BB[1];
-	let w = BB[2];
-	let h = BB[3];
-
-	let tsrwidth = tensor.dims[3];
-	let tsrheight = tensor.dims[2];
+	let [x, y, w, h] = BB;
+	const [, , tsrheight, tsrwidth] = tensor.dims;
 
 	x = x - marge;
 	y = y - marge;
@@ -222,26 +222,33 @@ export function postprocess_BB(boundingboxes, numfiles) {
 
 /**
  *
+ * @param {import('./database.js').Protocol} protocol
  * @param {ort.Tensor[]} tensor
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-async function map_preprocess_for_classification(tensor, mean, std) {
+async function map_preprocess_for_classification(protocol, tensor, mean, std) {
+	const { width, height, normalized } = protocol.inference?.classification?.input ?? {
+		width: 224,
+		height: 224,
+		normalized: true
+	};
 	let c = tensor;
-	c = await normalizeTensors(c, mean, std);
-	c = await resizeTensors(c, 224, 224);
+	c = await normalizeTensors(c, mean, std, !normalized);
+	c = await resizeTensors(c, width, height);
 
 	return c;
 }
 /**
  *
+ * @param {import('./database.js').Protocol} protocol
  * @param {ort.Tensor} tensors
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function preprocess_for_classification(tensors, mean, std) {
+export async function preprocess_for_classification(protocol, tensors, mean, std) {
 	/*preprocess les tenseurs pour la classification
     -------input------- :
         tensors : liste de tenseurs à prétraiter
@@ -257,7 +264,7 @@ export async function preprocess_for_classification(tensors, mean, std) {
     */
 	// @ts-ignore
 	let new_ctensorsPromise = tensors.map((tensor) =>
-		map_preprocess_for_classification(tensor, mean, std)
+		map_preprocess_for_classification(protocol, tensor, mean, std)
 	);
 	let new_ctensors = await Promise.all(new_ctensorsPromise);
 
@@ -300,11 +307,13 @@ export function labelize(output, classmap) {
 /**
  *
  * @param {ArrayBuffer[]} buffers
- * @param {number} targetWidth
- * @param {number} targetHeight
- * @returns {Promise<ort.Tensor>}
+ * @param {object} settings
+ * @param {number} settings.height
+ * @param {number} settings.width
+ * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
+ * @returns {Promise<import('onnxruntime-web').TypedTensor<'float32'>>}
  */
-export async function imload(buffers, targetWidth, targetHeight) {
+export async function imload(buffers, { width: targetWidth, height: targetHeight, normalized }) {
 	/*
     charge les images et les resize
     -------input------- :
@@ -337,8 +346,10 @@ export async function imload(buffers, targetWidth, targetHeight) {
 		let i,
 			l = transposedData.length;
 
-		for (i = 0; i < l; i++) {
-			float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
+		if (normalized) {
+			for (i = 0; i < l; i++) {
+				float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
+			}
 		}
 	}
 
@@ -357,9 +368,10 @@ export async function imload(buffers, targetWidth, targetHeight) {
  * @param {ort.Tensor} tensor
  * @param {number[]} mean
  * @param {number[]} std
+ * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
  * @returns {Promise<ort.Tensor>}
  */
-export async function normalizeTensor(tensor, mean, std) {
+export async function normalizeTensor(tensor, mean, std, denormalize = false) {
 	const data = await tensor.getData();
 	const dims = tensor.dims;
 
@@ -369,6 +381,10 @@ export async function normalizeTensor(tensor, mean, std) {
 				let i = c * dims[2] * dims[3] + x * dims[3] + y;
 				// @ts-ignore
 				data[i] = (data[i] - mean[c]) / std[c];
+				if (denormalize) {
+					// @ts-ignore
+					data[i] = Math.min(data[i] * 255, 255);
+				}
 			}
 		}
 	}
@@ -381,12 +397,13 @@ export async function normalizeTensor(tensor, mean, std) {
  * @param {ort.Tensor[]} tensors
  * @param {number[]} mean
  * @param {number[]} std
+ * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function normalizeTensors(tensors, mean, std) {
+export async function normalizeTensors(tensors, mean, std, denormalize = false) {
 	let newTensors = [];
 	for (let i = 0; i < tensors.length; i++) {
-		let newtsr = await normalizeTensor(tensors[i], mean, std);
+		let newtsr = await normalizeTensor(tensors[i], mean, std, denormalize);
 		newTensors.push(newtsr);
 	}
 
@@ -399,18 +416,16 @@ export async function normalizeTensors(tensors, mean, std) {
 
 /**
  *
- * @param {ort.Tensor} output
+ * @param {import('./database.js').Protocol} protocol
+ * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
- * @param {boolean} nms
- * @returns {[number[][][], number[][]]}
+ * @returns {[import('./inference.js').BB[][], number[][]]}
  */
-export function output2BB(output, numImages, minConfidence, nms = false) {
+export function output2BB(protocol, output, numImages, minConfidence) {
 	/*reshape les bounding boxes obtenues par le modèle d'inférence
     -------input------- :
         output : liste de bounding boxes obtenues par le modèle d'inférence
-            forme : [xxxx,yyyyy,wwww,hhhh,confconfconf,etc...] (se répète pr chaque img) si nms = False
-            forme : [xywhconf,iou,xywhconf,iou,...] si nms = True
         numfiles : nombre d'images sur lesquelles on a fait l'inférence*
         minConfidence : seuil de confiance minimum pour considérer une bounding box
         nms : booléen, si True, alors on applique le fait que la sortie d'un modèle 
@@ -423,94 +438,107 @@ export function output2BB(output, numImages, minConfidence, nms = false) {
         bestScore : liste des meilleurs scores pour chaque image
             forme : [each img [each box score]]
     */
-	if (nms) {
-		let bestBoxes = [];
-		let bestScores = [];
-		// @ts-ignore
-		let numbb = output.length / 6;
+	/** @type {import('./inference.js').BB[][]}  */
+	let bestBoxes = [];
+	/** @type {number[][]}  */
+	let bestScores = [];
+
+	console.log(output);
+
+	const outputShape = protocol.inference?.detection.output.shape ?? [
+		'sx',
+		'sy',
+		'w',
+		'h',
+		'score',
+		'_'
+	];
+
+	const suboutputSize = outputShape.length;
+	let boundingBoxesCount = output.length / suboutputSize;
+
+	for (let k = 0; k < numImages; k++) {
+		/** @type {import('./inference.js').BB[]}  */
 		let bestPerImageBoxes = [];
-		let _bestScorePerImage = 0;
-		let suboutput = null;
+		/** @type {number[]} */
+		let bbScores = [];
 
-		console.log(output);
+		let suboutput = output.slice(
+			k * boundingBoxesCount * suboutputSize,
+			(k + 1) * boundingBoxesCount * suboutputSize
+		);
 
-		console.log('num images : ', numImages);
+		for (let i = 0; i < suboutput.length; i += suboutputSize) {
+			/**
+			 * Get a data point ("atom") for this bounding box for this model.
+			 * If the protocol's inference detection output shape does not include the atom, return undefined.
+			 * Otherwise, grab the data point from the suboutput using the index of the atom in the output shape.
+			 * For example, if the output shape is `['sx', '_', '_', 'sy']`, we can get the 'sy' atom using `suboutput[i + 3]`.
+			 * @param {import('./database').ModelDetectionOutputShape[number]} atom
+			 */
+			const atom = (atom) =>
+				outputShape.includes(atom) ? suboutput[i + outputShape.indexOf(atom)] : undefined;
 
-		for (let k = 0; k < numImages; k++) {
-			bestPerImageBoxes = [];
-			_bestScorePerImage = 0;
-			/** @type {number[]} */
-			let bbScores = [];
-			// @ts-ignore
-			suboutput = output.slice(k * numbb * 6, (k + 1) * numbb * 6);
+			// All possible data points ("atoms") for this bounding box
+			const atoms = {
+				sx: atom('sx'),
+				sy: atom('sy'),
+				ex: atom('ex'),
+				ey: atom('ey'),
+				cx: atom('cx'),
+				cy: atom('cy'),
+				w: atom('w'),
+				h: atom('h'),
+				score: atom('score')
+			};
 
-			for (let i = 0; i < suboutput.length; i += 6) {
-				let score = suboutput[i + 4];
-				let x = suboutput[i];
-				let y = suboutput[i + 1];
-				let w = suboutput[i + 2];
-				let h = suboutput[i + 3];
+			// Get center point x coord and width
+			const [x, w] = match({})
+				.case({ cx: 'number', ex: 'number' }, ({ cx, ex }) => [cx, 2 * (ex - cx)])
+				.case({ cx: 'number', sx: 'number' }, ({ sx, cx }) => [cx, 2 * (cx - sx)])
+				.case({ cx: 'number', w: 'number' }, ({ cx, w }) => [cx, w])
+				.case({ ex: 'number', sx: 'number' }, ({ sx, ex }) => [(sx + ex) / 2, ex - sx])
+				.case({ ex: 'number', w: 'number' }, ({ ex, w }) => [ex - w / 2, w])
+				.case({ sx: 'number', w: 'number' }, ({ sx, w }) => [sx + w / 2, w])
+				.default(() => {
+					throw new Error(
+						`Could not get center point x coord and width. Check your protocol's inference.detection.output.shape. Available atoms: ${JSON.stringify(atoms)}`
+					);
+				})(atoms);
 
-				w = Math.abs(x - w);
-				h = Math.abs(y - h);
+			const [y, h] = match({})
+				.case({ cy: 'number', ey: 'number' }, ({ cy, ey }) => [cy, 2 * (ey - cy)])
+				.case({ cy: 'number', sy: 'number' }, ({ sy, cy }) => [cy, 2 * (cy - sy)])
+				.case({ cy: 'number', h: 'number' }, ({ cy, h }) => [cy, h])
+				.case({ ey: 'number', sy: 'number' }, ({ sy, ey }) => [(sy + ey) / 2, ey - sy])
+				.case({ ey: 'number', h: 'number' }, ({ ey, h }) => [ey - h / 2, h])
+				.case({ sy: 'number', h: 'number' }, ({ sy, h }) => [sy + h / 2, h])
+				.default(() => {
+					throw new Error(
+						`Could not get center point y coord and height. Check your protocol's inference.detection.output.shape. Available atoms: ${JSON.stringify(atoms)}`
+					);
+				})(atoms);
 
-				if (x == 0 && y == 0 && w == 0 && h == 0) {
-					break;
-				}
-				// if (score > bestScorePerImage) {
-				// 	bestScorePerImage = score;
-				// }
-				if (score > minConfidence) {
-					bestPerImageBoxes.push([x, y, w, h]);
-					bbScores.push(score);
-				}
+			if (x == 0 && y == 0 && w == 0 && h == 0) {
+				break;
 			}
 
-			bestBoxes.push(bestPerImageBoxes);
-			bestScores.push(bbScores);
-		}
-		return [bestBoxes, bestScores];
-	} else {
-		console.log('output : ', output);
-		let bestBoxes = [];
-		let bestPerImageBoxes = [];
-		let bestScore = [];
-		let bestScorePerImage = 0;
-		let suboutput = null;
-		// @ts-ignore
-		let numbb = output.length / numImages / 5;
-
-		for (let k = 0; k < numImages; k++) {
-			bestPerImageBoxes = [];
-			/** @type {number[]} */
-			let bbScores = [];
-			// @ts-ignore
-			suboutput = output.slice(k * numbb * 5, (k + 1) * numbb * 5);
-
-			for (let i = 0; i < suboutput.length / 5; i++) {
-				let score = suboutput[i + 4 * numbb];
-				if (score > bestScorePerImage) {
-					bestScorePerImage = score;
-				}
-
-				if (score > minConfidence) {
-					let x = suboutput[i];
-					let y = suboutput[i + numbb];
-					let w = suboutput[i + 2 * numbb];
-					let h = suboutput[i + 3 * numbb];
-
-					x = x - w / 2;
-					y = y - h / 2;
-
-					bestPerImageBoxes.push([x, y, w, h]);
-					bbScores.push(score);
-				}
+			if (atoms.score === undefined) {
+				throw new Error(
+					"Could not get score. Check your protocol's inference.detection.output.shape."
+				);
 			}
-			bestBoxes.push(bestPerImageBoxes);
-			bestScore.push(bbScores);
+
+			if (atoms.score > minConfidence) {
+				bestPerImageBoxes.push([x, y, w, h]);
+				bbScores.push(atoms.score);
+			}
 		}
-		return [bestBoxes, bestScore];
+
+		bestBoxes.push(bestPerImageBoxes);
+		bestScores.push(bbScores);
 	}
+	return [bestBoxes, bestScores];
 }
 /**
  *
@@ -563,73 +591,4 @@ async function resizeTensor(tensor, targetWidth, targetHeight) {
 
 	const resizedTensor = new ort.Tensor(tensor.type, resizedData, resizedDims);
 	return resizedTensor;
-}
-
-/**
- *
- * @param {number[][]} BBs
- * @param {Image} image
- * @param {number} marge
- * @returns {Promise<[string[], Image[]]>}
- */
-async function applyBBsOnImage(BBs, image, marge = 10) {
-	/*Même chose que applyBBsOnTensor mais pour une image, en vrai c'est deprecated, on l'utilise plus*/
-
-	console.warn('applyBBsOnImage is deprecated, use applyBBsOnTensors instead');
-
-	let subimages = [];
-	let subimageMIMES = [];
-	for (let i = 0; i < BBs.length; i++) {
-		let x = BBs[i][0];
-		let y = BBs[i][1];
-		let w = BBs[i][2];
-		let h = BBs[i][3];
-
-		// relative bbs*
-		/** @type {{width: number, height: number}} */
-		// @ts-ignore
-		const { width, height } = image.bitmap;
-		x = (x / 640) * width;
-		y = (y / 640) * height;
-		w = (w / 640) * width;
-		h = (h / 640) * height;
-		x = x - marge;
-		y = y - marge;
-		w = w + 2 * marge;
-		h = h + 2 * marge;
-
-		x = Math.round(Math.max(0, x));
-		y = Math.round(Math.max(0, y));
-		w = Math.round(Math.min(width - x, w));
-		h = Math.round(Math.min(height - y, h));
-
-		// @ts-ignore
-		let subimage = image.clone();
-		subimage = subimage.crop({ x, y, w, h });
-		let subimageMIME = await subimage.getBase64(Jimp.JimpMime.png);
-		subimages.push(subimage);
-		subimageMIMES.push(subimageMIME);
-	}
-	return [subimageMIMES, subimages];
-}
-
-/**
- *
- * @param {number[][][]} BBs
- * @param {Image[]} images
- * @returns {Promise<[string[], Image[]]>}
- */
-export async function applyBBsOnImages(BBs, images) {
-	let croppedImages = [];
-	let croppedImagesMIME = [];
-	let subImages = [];
-
-	for (let i = 0; i < images.length; i++) {
-		subImages = await applyBBsOnImage(BBs[i], images[i]);
-		croppedImages.push(subImages[1]);
-		croppedImagesMIME.push(subImages[0]);
-	}
-	//return [croppedImagesMIME,croppedImages];
-	// @ts-ignore
-	return [croppedImagesMIME];
 }

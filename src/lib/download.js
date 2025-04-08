@@ -26,7 +26,7 @@ export function downloadAsFile(content, filename, contentType) {
 /**
  *
  * @template {string} Keys
- * @param {Record<Keys, unknown>} object the object to serialize
+ * @param { { [K in Keys]?: unknown } } object the object to serialize
  * @param {readonly Keys[]} ordering an array of keys in target order, for the top-level object
  * @param {'json' | 'yaml'} format
  * @param {string} schema the json schema URL

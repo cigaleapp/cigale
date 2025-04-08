@@ -112,6 +112,7 @@ export async function storeImageBytes({ id, originalBytes, resizedBytes, content
 	});
 }
 
+// ATTENTION: Changer aussi dans la validation des définitions de protocoles (Ctrl-F pour 1024 dans tout le projet pour être sûr·e de rien louper) si jamais on change ça
 const MAXWIDTH = 1024;
 /**
  * @param {object} param0
