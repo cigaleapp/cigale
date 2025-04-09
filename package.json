@@ -73,6 +73,7 @@
 		"pica-gpu": "^0.2.0",
 		"sveltejs-tippy": "^3.0.0",
 		"tinykeys": "^3.0.0",
+		"turbo_exif": "^0.1.1",
 		"unplugin-icons": "^22.1.0",
 		"yaml": "^2.7.0"
 	},

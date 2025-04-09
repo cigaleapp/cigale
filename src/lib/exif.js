@@ -3,6 +3,12 @@ import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { toasts } from './toasts.svelte.js';
 import { BUILTIN_METADATA_IDS } from './builtins.js';
+import turbo_exif_init, { add_metadata_to_image } from 'turbo_exif';
+import { format } from 'date-fns';
+
+turbo_exif_init()
+	.then(() => console.log('turbo_exif initialized'))
+	.catch((e) => console.error('turbo_exif initialization failed', e));
 
 /**
  *
@@ -39,8 +45,8 @@ export async function processExifData(imageId, imageBytes, file) {
  */
 export async function extractMetadata(buffer) {
 	const exif = exifParser.create(buffer).enableImageSize(false).parse();
-	/** @typedef {keyof typeof import('./database.js').BUILTIN_METADATA_IDS} BuiltinMetadataKeys  */
-	/** @type {{[K in BuiltinMetadataKeys]?: import('./database.js').MetadataValues[K]}} */
+	/** @typedef {keyof typeof import('./builtins.js').BUILTIN_METADATA_IDS} BuiltinMetadataKeys  */
+	/** @type {{[K in BuiltinMetadataKeys]?: import('./database.js').MetadataValues[K]['value']}} */
 	const output = {};
 
 	if (!exif) return output;
@@ -58,5 +64,25 @@ export async function extractMetadata(buffer) {
 
 	return Object.fromEntries(
 		Object.entries(output).map(([key, value]) => [key, { value, alternatives: {}, confidence: 1 }])
+	);
+}
+
+/**
+ * Append EXIF metadata to the image's bytes
+ * @param {Uint8Array} bytes
+ * @param {import('./database.js').MetadataValues} metadataValues
+ * @returns {Uint8Array} the image with EXIF metadata added
+ */
+export function addExifMetadata(bytes, metadataValues) {
+	const shotAt = metadataValues[BUILTIN_METADATA_IDS.shoot_date]?.value;
+	const location = metadataValues[BUILTIN_METADATA_IDS.shoot_location]?.value;
+	return add_metadata_to_image(
+		bytes,
+		JSON.stringify({
+			comment: `Exported by C.i.g.a.l.e -- ${window.location.origin}`,
+			date_acquired: shotAt ? format(shotAt, 'yyyy:MM:dd HH:mm:ss') : undefined,
+			latitude: location?.latitude,
+			longitude: location?.longitude
+		})
 	);
 }
