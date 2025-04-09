@@ -89,6 +89,9 @@ const MetadataValue = type({
 		return out;
 	}),
 	confidence: Probability.default(1),
+	manuallyModified: type('boolean')
+		.describe('Si la valeur a été modifiée manuellement')
+		.default(false),
 	alternatives: {
 		'[string.json]': Probability
 	}

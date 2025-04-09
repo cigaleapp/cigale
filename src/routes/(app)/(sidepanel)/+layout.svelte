@@ -147,6 +147,7 @@
 							subjectId,
 							metadataId: id,
 							confidence: 1,
+							manuallyModified: true,
 							value: value.toString()
 						});
 					} else {
@@ -154,6 +155,7 @@
 							subjectId,
 							metadataId: id,
 							confidence: 1,
+							manuallyModified: true,
 							value
 						});
 					}
