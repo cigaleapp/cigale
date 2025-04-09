@@ -14,6 +14,7 @@ import { format } from 'date-fns';
  * @param {string} options.metadataId id de la métadonnée
  * @param {Type} [options.type] le type de données pour la métadonnée, sert à éviter des problèmes de typages
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
+ * @param {boolean} [options.manuallyModified=false] si la valeur a été modifiée manuellement
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
  * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
@@ -25,6 +26,7 @@ export async function storeMetadataValue({
 	value,
 	confidence,
 	alternatives,
+	manuallyModified = false,
 	tx = undefined
 }) {
 	alternatives ??= [];
@@ -33,6 +35,7 @@ export async function storeMetadataValue({
 	const newValue = {
 		value: JSON.stringify(value instanceof Date ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value),
 		confidence,
+		manuallyModified,
 		alternatives: Object.fromEntries(
 			alternatives.map((alternative) => [JSON.stringify(alternative.value), alternative.confidence])
 		)
@@ -292,6 +295,7 @@ function mergeMetadata(definition, values) {
 					// @ŧs-ignore
 					values.map((v) => v.value)
 				),
+				manuallyModified: values.some((v) => v.manuallyModified),
 				confidence: avg(values.map((v) => v.confidence)),
 				alternatives: mergeAlternatives(avg, values)
 			};
@@ -304,6 +308,7 @@ function mergeMetadata(definition, values) {
 					values,
 					definition.mergeMethod === 'max' ? max : min
 				),
+				manuallyModified: values.some((v) => v.manuallyModified),
 				confidence: max(values.map((v) => v.confidence)),
 				alternatives: mergeAlternatives(max, values)
 			};
@@ -313,6 +318,7 @@ function mergeMetadata(definition, values) {
 					definition.type,
 					values.map((v) => v.value)
 				),
+				manuallyModified: values.some((v) => v.manuallyModified),
 				confidence: median(values.map((v) => v.confidence)),
 				alternatives: mergeAlternatives(median, values)
 			};
@@ -502,11 +508,11 @@ export function metadataPrettyValue(metadata, value) {
 			const {
 				x: x1,
 				y: y1,
-				width,
-				height
-			} = type({ x: 'number', y: 'number', width: 'number', height: 'number' }).assert(value);
+				w,
+				h
+			} = type({ x: 'number', y: 'number', h: 'number', w: 'number' }).assert(value);
 
-			return `Boîte de (${x1}, ${y1}) à (${x1 + width}, ${y1 + height})`;
+			return `Boîte de (${x1}, ${y1}) à (${x1 + w}, ${y1 + h})`;
 		}
 
 		case 'float':

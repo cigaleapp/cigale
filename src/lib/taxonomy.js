@@ -132,6 +132,7 @@ export function cladeRepresentedByMetadata(protocol, metadataId) {
  * @param {string} options.subjectId id de l'image ou l'observation
  * @param {string} options.metadataId id de la métadonnée taxonomique
  * @param {RuntimeValue<'enum'>} options.value l'espèce choisie/détectée
+ * @param {boolean} [options.manuallyModified=false] si la valeur a été modifiée manuellement
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
  * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<'enum'>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
@@ -142,7 +143,8 @@ export async function setTaxonAndInferParents({
 	metadataId,
 	value,
 	confidence,
-	alternatives
+	alternatives,
+	manuallyModified = false
 }) {
 	const { storeMetadataValue } = await import('./metadata.js');
 	const { tables } = await import('./idb.svelte.js');
@@ -171,7 +173,8 @@ export async function setTaxonAndInferParents({
 		metadataId: childCladeDef.id,
 		value,
 		confidence,
-		alternatives
+		alternatives,
+		manuallyModified
 	});
 
 	// Base case: kingdom clade
@@ -244,7 +247,8 @@ export async function setTaxonAndInferParents({
 				confidence: confidenceForParentValue(parentKey)
 			})),
 		metadataId: parentCladeDef.id,
-		value: parentKey
+		value: parentKey,
+		manuallyModified
 	});
 }
 
