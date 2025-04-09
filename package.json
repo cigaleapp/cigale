@@ -69,7 +69,7 @@
 		"idb": "^8.0.2",
 		"jimp": "^1.6.0",
 		"marked": "^15.0.7",
-		"onnxruntime-web": "^1.22.0-dev.20250310-fe7634eb6f",
+		"onnxruntime-web": "^1.22.0-dev.20250409-89f8206ba4",
 		"pica-gpu": "^0.2.0",
 		"sveltejs-tippy": "^3.0.0",
 		"tinykeys": "^3.0.0",
