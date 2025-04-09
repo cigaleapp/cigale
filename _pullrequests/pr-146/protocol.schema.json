@@ -24,6 +24,10 @@
         ]
       }
     },
+    "description": {
+      "type": "string",
+      "description": "Description du protocole"
+    },
     "id": {
       "type": "string",
       "description": "Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole",
@@ -315,7 +319,8 @@
               "properties": {
                 "height": {
                   "type": "number",
-                  "description": "Hauteur en pixels du tenseur d'entrée du modèle"
+                  "description": "Hauteur en pixels du tenseur d'entrée du modèle",
+                  "exclusiveMaximum": 1024
                 },
                 "normalized": {
                   "type": "boolean",
@@ -323,7 +328,8 @@
                 },
                 "width": {
                   "type": "number",
-                  "description": "Largeur en pixels du tenseur d'entrée du modèle"
+                  "description": "Largeur en pixels du tenseur d'entrée du modèle",
+                  "exclusiveMaximum": 1024
                 },
                 "disposition": {
                   "anyOf": [
@@ -404,6 +410,15 @@
                 }
               ],
               "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment."
+            },
+            "output": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Nom de l'output du modèle à utiliser. output0 par défaut"
+                }
+              }
             },
             "taxonomic": {
               "type": "object",
@@ -560,7 +575,8 @@
               "properties": {
                 "height": {
                   "type": "number",
-                  "description": "Hauteur en pixels du tenseur d'entrée du modèle"
+                  "description": "Hauteur en pixels du tenseur d'entrée du modèle",
+                  "exclusiveMaximum": 1024
                 },
                 "normalized": {
                   "type": "boolean",
@@ -568,7 +584,8 @@
                 },
                 "width": {
                   "type": "number",
-                  "description": "Largeur en pixels du tenseur d'entrée du modèle"
+                  "description": "Largeur en pixels du tenseur d'entrée du modèle",
+                  "exclusiveMaximum": 1024
                 },
                 "disposition": {
                   "anyOf": [
@@ -655,6 +672,7 @@
                 },
                 "shape": {
                   "type": "array",
+                  "description": "Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO",
                   "items": {
                     "anyOf": [
                       {
@@ -668,6 +686,14 @@
                       {
                         "const": "cy",
                         "description": "Coordonée Y du point central"
+                      },
+                      {
+                        "const": "ex",
+                        "description": "Coordonée X du point inférieur droit"
+                      },
+                      {
+                        "const": "ey",
+                        "description": "Coordonée Y du point inférieur droit"
                       },
                       {
                         "const": "h",
@@ -691,6 +717,10 @@
                       }
                     ]
                   }
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Nom de l'output du modèle à utiliser. output0 par défaut"
                 }
               },
               "required": [
@@ -722,6 +752,7 @@
   },
   "required": [
     "authors",
+    "description",
     "id",
     "metadata",
     "name",

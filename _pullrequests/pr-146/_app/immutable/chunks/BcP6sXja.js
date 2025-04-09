@@ -1,1 +1,0 @@
-import{Q as e,aa as f,h as i,I as d,V as p}from"./je5hudcr.js";function c(r,o){i&&d(p(r)),e(()=>{var a=o();for(var s in a){var t=a[s];t?r.style.setProperty(s,t):r.style.removeProperty(s)}}),f(()=>{r.remove()})}export{c};
