@@ -12,6 +12,7 @@ import {
 } from './metadata';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
+import { addExifMetadata } from './exif';
 
 /**
  * @param {Array<import("./database").Observation>} observations
@@ -66,14 +67,16 @@ export async function generateResultsZip(
 	if (include !== 'metadataonly') {
 		uiState.processing.total += observations.flatMap((o) => o.images).length;
 		for (const imageId of observations.flatMap((o) => o.images)) {
+			const metadata = db.tables.Image.state.find((i) => i.id === imageId)?.metadata;
 			const image = await db.tables.Image.get(imageId);
 			if (!image) throw 'Image non trouvée';
 			const { contentType, filename } = image;
 			const { cropped, original } = await cropImage(image);
 			buffersOfImages.push({
 				imageId,
-				croppedBytes: new Uint8Array(cropped),
-				originalBytes: include === 'full' ? new Uint8Array(original) : undefined,
+				croppedBytes: addExifMetadata(new Uint8Array(cropped), metadata),
+				originalBytes:
+					include === 'full' ? addExifMetadata(new Uint8Array(original), metadata) : undefined,
 				contentType,
 				filename
 			});

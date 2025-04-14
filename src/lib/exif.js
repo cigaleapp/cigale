@@ -2,6 +2,12 @@ import * as exifParser from 'exif-parser';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { toasts } from './toasts.svelte.js';
+import turbo_exif_init, { add_metadata_to_image } from 'turbo_exif';
+import { format } from 'date-fns';
+
+turbo_exif_init()
+	.then(() => console.log('turbo_exif initialized'))
+	.catch((e) => console.error('turbo_exif initialization failed', e));
 
 /**
  *
@@ -117,4 +123,24 @@ function coerceExifValue(value, coerceTo) {
 		default:
 			throw new Error(`Unknown type ${coerceTo}`);
 	}
+}
+
+/**
+ * Append EXIF metadata to the image's bytes
+ * @param {Uint8Array} bytes
+ * @param {import('./database.js').MetadataValues} metadataValues
+ * @returns {Uint8Array} the image with EXIF metadata added
+ */
+export function addExifMetadata(bytes, metadataValues) {
+	const shotAt = metadataValues[BUILTIN_METADATA_IDS.shoot_date]?.value;
+	const location = metadataValues[BUILTIN_METADATA_IDS.shoot_location]?.value;
+	return add_metadata_to_image(
+		bytes,
+		JSON.stringify({
+			comment: `Exported by C.i.g.a.l.e -- ${window.location.origin}`,
+			date_acquired: shotAt ? format(shotAt, 'yyyy:MM:dd HH:mm:ss') : undefined,
+			latitude: location?.latitude,
+			longitude: location?.longitude
+		})
+	);
 }
