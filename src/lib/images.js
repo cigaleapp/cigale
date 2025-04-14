@@ -1,5 +1,4 @@
 import { uiState } from '$lib/state.svelte';
-import { BUILTIN_METADATA_IDS } from './builtins';
 import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
@@ -25,10 +24,13 @@ export function imageIdToFileId(id) {
 }
 
 /**
+ * @param {import('$lib/database.js').Protocol} protocol
  * @param {import('$lib/database.js').Image} image
  */
-export function imageIsCropped(image) {
-	return Boolean(image.metadata[BUILTIN_METADATA_IDS.crop] || uiState.erroredImages.has(image.id));
+export function imageIsCropped(protocol, image) {
+	return Boolean(
+		image.metadata[protocol.crop?.metadata ?? 'crop'] || uiState.erroredImages.has(image.id)
+	);
 }
 
 /**

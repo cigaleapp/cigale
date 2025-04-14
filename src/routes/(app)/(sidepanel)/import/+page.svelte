@@ -28,7 +28,12 @@
 	const images = $derived(
 		toAreaObservationProps(tables.Image.state, [], {
 			isLoaded: (image) =>
-				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsCropped(image)
+				Boolean(
+					uiState.currentProtocol &&
+						imageBufferWasSaved(image) &&
+						uiState.hasPreviewURL(image) &&
+						imageIsCropped(uiState.currentProtocol, image)
+				)
 		})
 	);
 
@@ -44,6 +49,11 @@
 	 * @param {string} id
 	 */
 	async function processImageFile(file, id) {
+		if (!uiState.currentProtocol) {
+			toasts.error('Aucun protocole sélectionné');
+			return;
+		}
+
 		await tables.Image.set({
 			id,
 			filename: file.name,
@@ -57,7 +67,7 @@
 		const resizedBytes = await resizeToMaxSize({ source: file });
 
 		await storeImageBytes({ id, resizedBytes, originalBytes, contentType: file.type });
-		await processExifData(id, originalBytes, file);
+		await processExifData(uiState.currentProtocol.id, id, originalBytes, file);
 		await inferBoundingBox(id, resizedBytes, file);
 	}
 
@@ -102,7 +112,7 @@
 			await storeMetadataValue({
 				tx,
 				subjectId: id,
-				metadataId: 'crop',
+				metadataId: uiState.currentProtocol.crop?.metadata ?? 'crop',
 				type: 'boundingbox',
 				value: toCropBox(firstBoundingBox),
 				confidence: firstScore
@@ -130,10 +140,11 @@
 
 	$effect(() => {
 		if (!cropperModel) return;
+		if (!uiState.currentProtocol) return;
 		for (const image of tables.Image.state) {
 			if (
 				imageBufferWasSaved(image) &&
-				!imageIsCropped(image) &&
+				!imageIsCropped(uiState.currentProtocol, image) &&
 				!uiState.loadingImages.has(image.id)
 			) {
 				void (async () => {

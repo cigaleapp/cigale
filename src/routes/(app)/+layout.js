@@ -1,8 +1,6 @@
 import { dev } from '$app/environment';
-import { BUILTIN_METADATA } from '$lib/builtins.js';
 import { openTransaction, tables } from '$lib/idb.svelte.js';
 import { importProtocol } from '$lib/protocols';
-import { defineSpeciesMetadata } from '$lib/species.svelte.js';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
 
@@ -10,7 +8,6 @@ export async function load() {
 	try {
 		await tables.initialize();
 		await fillBuiltinData();
-		await defineSpeciesMetadata('species');
 		await tables.initialize();
 	} catch (e) {
 		console.error(e);
@@ -22,9 +19,6 @@ export async function load() {
 
 async function fillBuiltinData() {
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
-		for (const metadata of BUILTIN_METADATA) {
-			tx.objectStore('Metadata').put(metadata);
-		}
 		tx.objectStore('Settings').put({
 			id: 'defaults',
 			protocols: [],

@@ -13,7 +13,7 @@ export function mapValues(subject, mapper) {
 
 /**
  * @template {string} K
- * @param {Record<K, string>} subject
+ * @param {Record<K, unknown>} subject
  * @returns {K[]}
  */
 export function keys(subject) {

@@ -13,6 +13,7 @@
 	import IconBuiltin from '~icons/ph/diamond';
 	import IconAuthors from '~icons/ph/users';
 	import IconInferred from '~icons/ph/magic-wand';
+	import IconTag from '~icons/ph/tag';
 	import IconTechnical from '~icons/ph/wrench';
 	import IconClassification from '~icons/ph/list-star';
 	import IconArrow from '~icons/ph/arrow-right';
@@ -21,7 +22,7 @@
 	import { metadataDefinitionComparator } from '$lib/metadata';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
-	const { id, name, source, authors, metadata, description, ondelete, inference, metadataOrder } =
+	const { id, name, source, authors, metadata, description, ondelete, crop, metadataOrder } =
 		$props();
 
 	const metadataOfProtocol = $derived(
@@ -37,11 +38,26 @@
 		if (typeof source === 'string') return source;
 		return source.url;
 	}
-
-	function isTaxonomicMetadata(id) {
-		return Object.values(inference.classification?.taxonomic?.targets ?? {}).includes(id);
-	}
 </script>
+
+{#snippet modelDetails(
+	/** @type {{ model: import('$lib/database').Request, input: import('$lib/database').ModelInput }} */ params
+)}
+	{#if params}
+		<p>
+			<a href={inferenceModelUrl(params.model)}>
+				{inferenceModelUrl(params.model).split('/').at(-1)}
+			</a>
+		</p>
+		<p class="id">
+			<code use:tooltip={"Taille d'image en entrée du réseau"}>
+				{params.input.height} × {params.input.width} px
+			</code>
+		</p>
+	{:else}
+		<p class="empty">Pas de modèle</p>
+	{/if}
+{/snippet}
 
 <Card>
 	<header>
@@ -84,7 +100,7 @@
 							{#if m.label}
 								{m.label}
 							{:else}
-								<code>{m.id}</code>
+								<code>{m.id.replace(`${id}__`, '')}</code>
 							{/if}
 							{#if m.type === 'enum' && m.options}
 								<span
@@ -109,7 +125,7 @@
 									<IconTechnical />
 								</sup>
 							{/if}
-							{#if isTaxonomicMetadata(m.id)}
+							{#if 'taxonomic' in m}
 								<sup
 									use:tooltip={"Métadonnée taxonomique, déduite de la valeur de d'une autre métadonnée représentant la clade inférieure"}
 									style:color="var(--fg-warning)"
@@ -117,12 +133,21 @@
 									<IconTaxonomy />
 								</sup>
 							{/if}
-							{#if [inference?.classification?.metadata, 'crop'].includes(m.id)}
+							{#if m.id === crop?.metadata || (m.infer && 'neural' in m.infer)}
 								<sup
 									use:tooltip={'Métadonnée auto-détectée par inférence'}
 									style:color="var(--fg-primary)"
 								>
 									<IconInferred />
+								</sup>
+							{:else if m.infer && ('exif' in m.infer || ('latitude' in m.infer && 'exif' in m.infer.latitude))}
+								<sup
+									use:tooltip={'exif' in m.infer
+										? `Métadonnée auto-détectée à partir de la métadonnée EXIF "${m.infer.exif}" de l'image`
+										: `Métadonnée auto-détectée à partir des métadonnées EXIF "${m.infer.latitude.exif}" et "${m.infer.longitude.exif}" de l'image`}
+									style:color="var(--fg-primary)"
+								>
+									<IconTag />
 								</sup>
 							{/if}
 						</p>
@@ -141,39 +166,11 @@
 			{/each}
 		</ul>
 	</section>
-	{#if inference}
-		<section class="inference">
-			<p class="subtitle">Inférence</p>
-			{#snippet modelDetails(
-				/** @type {NonNullable<import('$lib/database').Protocol['inference']>['classification'|'detection']} */ params
-			)}
-				{#if params}
-					<p>
-						<a href={inferenceModelUrl(params.model)}>
-							{inferenceModelUrl(params.model).split('/').at(-1)}
-						</a>
-					</p>
-					<p class="id">
-						<code use:tooltip={"Taille d'image en entrée du réseau"}>
-							{params.input.height} × {params.input.width} px
-						</code>
-					</p>
-					{#if 'taxonomic' in params && params.taxonomic}
-						<p class="taxonomy">
-							<IconTaxonomy />
-							<a
-								href={inferenceModelUrl(params.taxonomic.taxonomy)}
-								use:tooltip={'Inférence taxonomique des clades supérieures'}
-							>
-								{inferenceModelUrl(params.taxonomic.taxonomy).split('/').at(-1)}
-							</a>
-						</p>
-					{/if}
-				{:else}
-					<p class="empty">Pas de modèle</p>
-				{/if}
-			{/snippet}
-			<ul>
+	<section class="inference">
+		<p class="subtitle">Inférence</p>
+
+		<ul>
+			{#if crop}
 				<li>
 					<IconDetection />
 					<div class="text">
@@ -184,27 +181,23 @@
 								crop
 							</code>
 						</p>
-						{@render modelDetails(inference.detection)}
+						{@render modelDetails(crop.infer)}
 					</div>
 				</li>
+			{/if}
+			{#each metadataOfProtocol.filter((m) => m.infer && 'neural' in m.infer) as m (m.id)}
 				<li>
 					<IconClassification />
 					<div class="text">
 						<p class="title">
-							Classification
-							{#if inference.classification?.metadata}
-								<IconArrow />
-								<code use:tooltip={"Le modèle permet d'inférrer une valeur à cette métadonnée"}>
-									{inference.classification?.metadata.replace(`${id}__`, '')}
-								</code>
-							{/if}
+							{m.label}
 						</p>
-						{@render modelDetails(inference.classification)}
+						{@render modelDetails(m.infer.neural)}
 					</div>
 				</li>
-			</ul>
-		</section>
-	{/if}
+			{/each}
+		</ul>
+	</section>
 	<section class="actions">
 		<ButtonSecondary
 			onclick={async () => {

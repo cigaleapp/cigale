@@ -5,11 +5,12 @@
 	import {
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
+		metadataById,
 		storeMetadataValue
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
-	import { isTaxonomicMetadata, setTaxonAndInferParents } from '$lib/taxonomy';
+	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
@@ -141,7 +142,7 @@
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
 						await deleteMetadataValue({ subjectId, metadataId: id, recursive: true });
-					} else if (uiState.currentProtocol && isTaxonomicMetadata(uiState.currentProtocol, id)) {
+					} else if (uiState.currentProtocol && 'taxonomic' in (metadataById(id) ?? {})) {
 						await setTaxonAndInferParents({
 							protocol: uiState.currentProtocol,
 							subjectId,

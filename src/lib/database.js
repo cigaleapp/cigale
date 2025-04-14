@@ -3,6 +3,8 @@ import Handlebars from 'handlebars';
 import { parseISOSafe } from './date.js';
 import { splitFilenameOnExtension } from './download.js';
 import { Clade, CladePlural } from './taxonomy.js';
+import { EXIF_FIELDS } from './exiffields.js';
+import { keys } from './utils.js';
 
 const ID = type(/[\w_]+/);
 
@@ -80,6 +82,38 @@ const Request = URLString.configure(
 		'Le requête HTTP pour obtenir le fichier, avec des en-têtes et une méthode personnalisable',
 		'self'
 	);
+
+const ModelInput = type({
+	width: ['number < 1024', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
+	height: ['number < 1024', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
+	'disposition?': type(['"CHW"', '@', 'Tenseurs de la forme [3, H, W]']).or(
+		type(['"1CHW"', '@', 'Tenseurs de la forme [1, 3, H, W]'])
+	),
+	normalized: [
+		'boolean',
+		'@',
+		'Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255'
+	],
+	'name?': [
+		'string',
+		'@',
+		"Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
+	]
+});
+
+const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du point central'])
+	.or(type(['"cy"', '@', 'Coordonée Y du point central']))
+	.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
+	.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
+	.or(type(['"ex"', '@', 'Coordonée X du point inférieur droit']))
+	.or(type(['"ey"', '@', 'Coordonée Y du point inférieur droit']))
+	.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
+	.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
+	.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
+	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
+	.array();
+
+const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 
 const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
@@ -229,55 +263,63 @@ const MetadataEnumVariant = type({
 	)
 });
 
+const MetadataInferOptions = type
+	.or(
+		type({ exif: EXIFField }).describe('Inférer depuis un champ EXIF', 'self'),
+		type({
+			neural: {
+				model: Request.describe(
+					'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
+				),
+				input: ModelInput.describe("Configuration de l'entrée des modèles"),
+				'output?': type({
+					'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
+				})
+			}
+		}).describe('Inférer depuis un modèle de réseau de neurones', 'self')
+	)
+	.describe('Comment inférer la valeur de cette métadonnée', 'self');
+
 const MetadataWithoutID = type({
 	label: ['string', '@', 'Nom de la métadonnée'],
-	type: MetadataType,
 	mergeMethod: MetadataMergeMethod.configure(
 		"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images",
 		'self'
 	),
-	options: MetadataEnumVariant.array()
-		.atLeastLength(1)
-		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
-		.optional(),
 	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
 	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
 	).optional()
-});
+}).and(
+	type.or(
+		{
+			type: "'location'",
+			'infer?': { latitude: MetadataInferOptions, longitude: MetadataInferOptions }
+		},
+		{
+			type: "'enum'",
+			'infer?': MetadataInferOptions,
+			'options?': MetadataEnumVariant.array()
+				.atLeastLength(1)
+				.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
+			'taxonomic?': type({
+				clade: Clade.describe('La clade représentée par cette métadonnée.'),
+				// taxonomy: Request.describe(
+				// 	"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
+				// )
+				parent: type({ '[string]': 'string' }).describe(
+					'Associe les valeurs (key) possibles de cette métadonnée aux valeurs (key) de la métadonnée représentant la clade parente'
+				)
+			}).describe(
+				"Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles. Bien penser à définir toutes les autres métadonnées représentant les clades supérieures avec `taxonomic.clade`"
+			)
+		},
+		{ type: MetadataType.exclude('"location" | "enum"'), 'infer?': MetadataInferOptions }
+	)
+);
 
 const Metadata = table('id', MetadataWithoutID.and({ id: ID }));
-
-const ModelInput = type({
-	width: ['number < 1024', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
-	height: ['number < 1024', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
-	'disposition?': type(['"CHW"', '@', 'Tenseurs de la forme [3, H, W]']).or(
-		type(['"1CHW"', '@', 'Tenseurs de la forme [1, 3, H, W]'])
-	),
-	normalized: [
-		'boolean',
-		'@',
-		'Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255'
-	],
-	'name?': [
-		'string',
-		'@',
-		"Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
-	]
-});
-
-const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du point central'])
-	.or(type(['"cy"', '@', 'Coordonée Y du point central']))
-	.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
-	.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
-	.or(type(['"ex"', '@', 'Coordonée X du point inférieur droit']))
-	.or(type(['"ey"', '@', 'Coordonée Y du point inférieur droit']))
-	.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
-	.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
-	.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
-	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
-	.array();
 
 const ProtocolWithoutMetadata = type({
 	id: ID.describe(
@@ -297,8 +339,9 @@ const ProtocolWithoutMetadata = type({
 	'metadataOrder?': type(ID.array()).describe(
 		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 	),
-	'inference?': type({
-		detection: type({
+	'crop?': type({
+		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
+		infer: type({
 			model: Request.describe(
 				'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
 			),
@@ -316,38 +359,7 @@ const ProtocolWithoutMetadata = type({
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
-		}).describe("Configuration de l'inférence des boîtes englobantes (metadata.crop)"),
-		classification: type({
-			metadata: ID.describe(
-				'ID de la métadonnée où stocker les métadonnées inférée par ce modèle. Cette métadonnée doit être déclarée dans les métadonnées du protocole, et doit être de type "enum". Les options seront remplies par classmapping, et peuvent donc être laissées vides dans la définition de la métadonnée.'
-			),
-			'taxonomic?': type({
-				clade: Clade.describe('La clade inférée par le modèle.'),
-				taxonomy: Request.describe(
-					"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
-				),
-				targets: scope({ CladePlural })
-					.type({
-						'[CladePlural]': ID.describe("L'identifiant de la métadonnée")
-					})
-					.partial()
-					.describe(
-						"Dans quelles métadonnées stocker les clade supérieures inférées par l'arbre taxonomique. Similairement à metadata, ces métadonnées doivent être déclarées dans les métadonnées du protocole, et doivent être de type 'enum'. Les options seront remplies par l'arbre taxonomique, et peuvent donc être laissées vides dans la définition de la métadonnée."
-					)
-			}).describe(
-				"Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles"
-			),
-			model: Request.describe(
-				'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
-			),
-			input: ModelInput.describe("Configuration de l'entrée des modèles"),
-			'output?': type({
-				'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
-			}),
-			classmapping: Request.describe(
-				'Lien vers un fichier texte contenant la correspondance entre les indices des neurones de la couche de sortie du modèle et les noms des classes'
-			)
-		}).describe("Configuration de l'inférence de l'espèce (metadata.species)")
+		}).describe("Configuration de l'inférence des boîtes englobantes (metadata.crop)")
 	}).describe(
 		"Contrôle l'inférance des boîtes englobantes (metadata.crop) et des espèces (metadata.species) par réseaux neuronaux"
 	),
@@ -528,4 +540,14 @@ function table(keyPaths, schema) {
 /**
  * @typedef  Request
  * @type {typeof Request.infer}
+ */
+
+/**
+ * @typedef EXIFField
+ * @type {typeof EXIFField.infer}
+ */
+
+/**
+ * @typedef MetadataInferOptions
+ * @type {typeof MetadataInferOptions.infer}
  */

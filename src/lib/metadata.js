@@ -600,3 +600,10 @@ export function metadataDefinitionComparator(protocol) {
  * @template Undefinable
  * @typedef{ Undefinable extends true ? T | undefined : T } Maybe
  */
+
+/**
+ * @param {string} id
+ */
+export function metadataById(id) {
+	return tables.Metadata.state.find((m) => m.id === id);
+}

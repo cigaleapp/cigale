@@ -1,0 +1,5932 @@
+<table style="width: 96%">
+	<colgroup>
+		<col style="width: 19%" />
+		<col style="width: 19%" />
+		<col style="width: 19%" />
+		<col style="width: 19%" />
+		<col style="width: 19%" />
+	</colgroup>
+	<tbody>
+		<tr>
+			<td>Tag ID</td>
+			<td>Tag Name</td>
+			<td>Writable</td>
+			<td>Group</td>
+			<td>Values / <span class="n">Notes</span></td>
+		</tr>
+		<tr>
+			<td>0x0001</td>
+			<td><u>Int eropIndex</u></td>
+			<td>string!</td>
+			<td>InteropIFD</td>
+			<td>
+				<span class="s"
+					>'R03' = R03 - DCF option file (Adobe RGB)<br />
+					'R98' = R98 - DCF basic file (sRGB)<br />
+					'THM' = THM - DCF thumbnail file</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0002</td>
+			<td>Int eropVersion</td>
+			<td>undef!:</td>
+			<td>InteropIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x000b</td>
+			<td>Process ingSoftware</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"><span class="n">(used by ACD Systems Digital Imaging )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x00fe</td>
+			<td>SubfileType</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(called New SubfileType by the TIFF specifica tion)</span><br />
+					0x0 = Full -resolution image<br />
+					0x1 = Reduced -resolution image<br />
+					0x2 = Single page of multi-page image<br />
+					0x3 = Single page of multi-page reduced -resolution image<br />
+					0x4 = T ransparency mask<br />
+					0x5 = T ransparency mask of reduced -resolution image<br />
+					0x6 = T ransparency mask of multi-page image<br />
+					0x7 = T ransparency mask of reduced -resolution multi-page image<br />
+					0x8 = Depth map<br />
+					0x9 = Depth map of reduced -resolution image<br />
+					0x10 = Enhanced image data<br />
+					0x10001 = Alternate reduced -resolution image<br />
+					0x10004 = Semantic Mask<br />
+					0xffffffff = invalid<br />
+					Bit 0 = Reduced resolution<br />
+					Bit 1 = Single page<br />
+					Bit 2 = T ransparency mask<br />
+					Bit 3 = TIFF/IT final page<br />
+					Bit 4 = TIFF-FX mixed raster c ontent</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x00ff</td>
+			<td>Old SubfileType</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(called SubfileType by the TIFF specifica tion)</span><br />
+					1 = Full -resolution image<br />
+					2 = Reduced -resolution image<br />
+					3 = Single page of multi-page image</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0100</td>
+			<td><u>I mageWidth</u></td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0101</td>
+			<td><u>Im ageHeight</u></td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"><span class="n">(called ImageLength by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0102</td>
+			<td><u>Bits PerSample</u></td>
+			<td>i nt16u[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0103</td>
+			<td><u>Co mpression</u></td>
+			<td>int16u!:</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="EXIF.html#C%20ompression">EXIF Compression Values</a></td>
+		</tr>
+		<tr>
+			<td>0x0106</td>
+			<td><u>Photo metricInter pretation</u></td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<h2 id="section">—</h2>
+				<p>
+					0 = W hiteIsZero<br />
+					1 = B lackIsZero<br />
+					2 = RGB<br />
+					3 = RGB Palette<br />
+					4 = T ransparency Mask<br />
+					5 = CMYK<br />
+				</p>
+				<p>6 = YCbCr<br /></p>
+				<p>8 = CIELab<br /></p>
+				<p>
+					9 = ICCLab<br />
+					1 0 = ITULab<br />
+					32 803 = Color Fi lter Array<br />
+					32 844 = Pixar LogL<br />
+					32 845 = Pixar LogLuv<br />
+					32892 =
+				</p>
+				<p>
+					Sequential Co lor Filter<br />
+					348 92 = Linear Raw<br />
+					51 177 = Depth Map<br />
+					52527 = Se mantic Mask
+				</p>
+				<h2 id="section-1">—</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0107</td>
+			<td>T hresholding</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>1 = No dithering or halftoning<br />
+					2 = Ordered dither or halftone<br />
+					3 = Randomized dither</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0108</td>
+			<td>CellWidth</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0109</td>
+			<td>CellLength</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x010a</td>
+			<td>FillOrder</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>1 = Normal<br />
+					2 = Re versed</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x010d</td>
+			<td>D ocumentName</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x010e</td>
+			<td><u>ImageDe scription</u></td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x010f</td>
+			<td><u>Make</u></td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0110</td>
+			<td><u>Model</u></td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0111</td>
+			<td>
+				[Stri pOffsets]{. underline}<br />
+				Other ImageStart<br />
+				Previ ewJXLStart<br />
+				St ripOffsets<br />
+				Preview ImageStart<br />
+				Preview ImageStart<br />
+				JpgF romRawStart
+			</td>
+			<td>
+				no<br />
+				no<br />
+				no<br />
+				no<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*
+			</td>
+			<td>
+				-<br />
+				-<br />
+				-<br />
+				-<br />
+				IFD0<br />
+				All<br />
+				SubIFD2
+			</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(called S tripOffsets in most locations, but it is Previe wImageStart in IFD0 of CR2
+						images and various IFD's of DNG images except for SubIFD2 where it is JpgF romRawStart
+						)</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0112</td>
+			<td><u>Or ientation</u></td>
+			<td>int16u</td>
+			<td>IFD0</td>
+			<td>
+				<h2 id="section-2">–</h2>
+				<p>1 =</p>
+				<p>Horizontal (normal)<br /></p>
+				<p>2 = Mirror</p>
+				<p>horizontal<br /></p>
+				<p>3 = Rotate 180<br /></p>
+				<p>4 = Mirror vertical<br /></p>
+				<p>5 = Mirror</p>
+				<p>horizontal</p>
+				<p>
+					and rotate 270 CW<br />
+					6 = Rotate 90 CW<br />
+				</p>
+				<p>7 = Mirror</p>
+				<p>horizontal an d rotate 90 CW<br /></p>
+				<p>8 = Rotate 270 CW</p>
+				<h2 id="section-3">–</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0115</td>
+			<td><u>Sample sPerPixel</u></td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0116</td>
+			<td><u>Row sPerStrip</u></td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0117</td>
+			<td>
+				[StripBy teCounts]{. underline}<br />
+				OtherI mageLength<br />
+				Previe wJXLLength<br />
+				Strip ByteCounts<br />
+				PreviewI mageLength<br />
+				PreviewI mageLength<br />
+				JpgFr omRawLength
+			</td>
+			<td>
+				no<br />
+				no<br />
+				no<br />
+				no<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*
+			</td>
+			<td>
+				-<br />
+				-<br />
+				-<br />
+				-<br />
+				IFD0<br />
+				All<br />
+				SubIFD2
+			</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(called Stri pByteCounts in most locations, but it is Preview ImageLength in IFD0 of
+						CR2 images and various IFD's of DNG images except for SubIFD2 where it is JpgFr
+						omRawLength )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0118</td>
+			<td>Min SampleValue</td>
+			<td>int16u</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0119</td>
+			<td>Max SampleValue</td>
+			<td>int16u</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x011a</td>
+			<td><u>XR esolution</u></td>
+			<td>r ational64u:</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x011b</td>
+			<td><u>YR esolution</u></td>
+			<td>r ational64u:</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x011c</td>
+			<td><u>PlanarConf iguration</u></td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>1 = Chunky<br />
+					2 = Planar</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x011d</td>
+			<td>PageName</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x011e</td>
+			<td>XPosition</td>
+			<td>rational64u</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x011f</td>
+			<td>YPosition</td>
+			<td>rational64u</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0120</td>
+			<td>FreeOffsets</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0121</td>
+			<td>Fre eByteCounts</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0122</td>
+			<td>GrayR esponseUnit</td>
+			<td>int16u</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>1 = 0.1<br />
+					2 = 0.001<br />
+					3 = 0.0001<br />
+					4 = 1e-05<br />
+					5 = 1e-06</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0123</td>
+			<td>GrayRe sponseCurve</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0124</td>
+			<td>T4Options</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>Bit 0 = 2- Dimensional encoding<br />
+					Bit 1 = Un compressed<br />
+					Bit 2 = Fill bits added</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0125</td>
+			<td>T6Options</td>
+			<td>no</td>
+			<td>-</td>
+			<td><span class="s">Bit 1 = Uncomp ressed</span></td>
+		</tr>
+		<tr>
+			<td>0x0128</td>
+			<td><u>Resol utionUnit</u></td>
+			<td>int16u:</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(the value 1 is not standard EXIF)</span><br />
+					1 = None<br />
+					2 = inches<br />
+					3 = cm</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0129</td>
+			<td>PageNumber</td>
+			<td>int16u[2]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x012c</td>
+			<td>ColorR esponseUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x012d</td>
+			<td><u>Transfe rFunction</u></td>
+			<td>int 16u[768]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0131</td>
+			<td><u>Software</u></td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0132</td>
+			<td><u>M odifyDate</u></td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"><span class="n">(called DateTime by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x013b</td>
+			<td><u>Artist</u></td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(becomes a list-type tag when the MWG module is loaded )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x013c</td>
+			<td>H ostComputer</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x013d</td>
+			<td>Predictor</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<h2 id="section-4">—-</h2>
+				<p>
+					1 = None<br />
+					2 = Horizontal di fferencing<br />
+					3 = Floating point<br />
+					34892 =
+				</p>
+				<p>
+					Horizontal dif ference X2<br />
+					34893 =
+				</p>
+				<p>
+					Horizontal dif ference X4<br />
+					34894 = Flo ating point X2<br />
+					34895 = Flo ating point X4
+				</p>
+				<h2 id="section-5">—-</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x013e</td>
+			<td><u>W hitePoint</u></td>
+			<td>ratio nal64u[2]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x013f</td>
+			<td><u>P rimaryChrom aticities</u></td>
+			<td>ratio nal64u[6]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0140</td>
+			<td>ColorMap</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0141</td>
+			<td>Ha lftoneHints</td>
+			<td>int16u[2]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0142</td>
+			<td>TileWidth</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0143</td>
+			<td>TileLength</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0144</td>
+			<td>TileOffsets</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0145</td>
+			<td>Til eByteCounts</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0146</td>
+			<td>BadFaxLines</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0147</td>
+			<td>C leanFaxData</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Clean<br />
+					1 = R egenerated<br />
+					2 = U nclean</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0148</td>
+			<td>Consecutive BadFaxLines</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x014a</td>
+			<td>
+				SubIFD<br />
+				A10 0DataOffset
+			</td>
+			<td>
+				-<br />
+				no
+			</td>
+			<td>
+				-<br />
+				IFD0
+			</td>
+			<td>
+				--&gt; <a href="EXIF.html">EXIF Tags</a><br />
+				<span class="n">(the data offset in original Sony DSLR-A100 ARW i mages)</span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x014c</td>
+			<td>InkSet</td>
+			<td>int16u</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>1 = CMYK<br />
+					2 = Not CMYK</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x014d</td>
+			<td>InkNames</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x014e</td>
+			<td>N umberofInks</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0150</td>
+			<td>DotRange</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0151</td>
+			<td>Ta rgetPrinter</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0152</td>
+			<td>E xtraSamples</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = U nspecified<br />
+					1 = Associated Alpha<br />
+					2 = U nassociated Alpha</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0153</td>
+			<td>S ampleFormat</td>
+			<td>no</td>
+			<td>SubIFD</td>
+			<td>
+				<p>
+					<span class="s"
+						><span class="n">(Samp lesPerPixel va lues)</span><br />
+						[Values 0-3]</span
+					>
+				</p>
+				<hr />
+				<h2 id="section-6">—- —- -</h2>
+				<p>
+					1 =    4 = Unsig ned<br />
+					Undefined<br />
+					2 = Si gned<br />
+					5 = Complex
+				</p>
+				<p>3 = Float int<br /></p>
+				<p>6 = Complex</p>
+				<pre><code>  float</code></pre>
+				<hr />
+				<h2 id="section-7">—- —- -</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0154</td>
+			<td>SMin SampleValue</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0155</td>
+			<td>SMax SampleValue</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0156</td>
+			<td>Tr ansferRange</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0157</td>
+			<td>ClipPath</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0158</td>
+			<td>XCl ipPathUnits</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0159</td>
+			<td>YCl ipPathUnits</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x015a</td>
+			<td>Indexed</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Not indexed<br />
+					1 = I ndexed</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x015b</td>
+			<td>JPEGTables</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x015f</td>
+			<td>OPIProxy</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Higher resolution image does not exist<br />
+					1 = Higher resolution image exists</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0190</td>
+			<td>GlobalPa rametersIFD</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; [EXIF Tags] (EXIF.html)</td>
+		</tr>
+		<tr>
+			<td>0x0191</td>
+			<td>ProfileType</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = U nspecified<br />
+					1 = Group 3 FAX</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0192</td>
+			<td>FaxProfile</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<ul>
+					<li>
+						<hr />
+						0 = Unknown<br />
+					</li>
+				</ul>
+				<p>
+					1 = Minimal B&amp;W l ossless, S<br />
+					2 = Extended B&amp;W l ossless, F<br />
+					3 = Lossless J BIG B&amp;W, J<br />
+					4 = Lossy color and
+				</p>
+				<p>
+					grayscale, C<br />
+					5 = Lossless color and
+				</p>
+				<p>
+					grayscale, L<br />
+					6 = Mixed raster
+				</p>
+				<p>content, M<br /></p>
+				<p>7 = Profile T<br /></p>
+				<p>255 = Multi Profiles</p>
+				<ul>
+					<li><hr /></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0193</td>
+			<td>Co dingMethods</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<h2 id="section-8">—</h2>
+				<p>Bit 0 =</p>
+				<p>
+					Unspecified c ompression<br />
+					Bit 1 = Modified Huffman<br />
+					Bit 2 = Mod ified Read<br />
+					Bit 3 = M odified MR<br />
+					Bi t 4 = JBIG<br />
+					Bit 5 = Bas eline JPEG<br />
+					B it 6 = JBIG color
+				</p>
+				<h2 id="section-9">—</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0194</td>
+			<td>VersionYear</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0195</td>
+			<td>ModeNumber</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x01b1</td>
+			<td>Decode</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x01b2</td>
+			<td>Defaul tImageColor</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x01b3</td>
+			<td>T82Options</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x01b5</td>
+			<td>JPEGTables</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0200</td>
+			<td>JPEGProc</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>1 = Baseline<br />
+					14 = Lo ssless</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0201</td>
+			<td>
+				[Thumbna ilOffset]{. underline}<br />
+				Thumb nailOffset<br />
+				Thumb nailOffset<br />
+				Preview ImageStart<br />
+				Preview ImageStart<br />
+				JpgFr omRawStart<br />
+				JpgFr omRawStart<br />
+				Other ImageStart<br />
+				Other ImageStart<br />
+				Othe rImageStart
+			</td>
+			<td>
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				no
+			</td>
+			<td>
+				IFD1<br />
+				IFD0<br />
+				SubIFD<br />
+				MakerNotes<br />
+				IFD0<br />
+				SubIFD<br />
+				IFD2<br />
+				SubIFD1<br />
+				SubIFD2<br />
+				-
+			</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(called JPEGInterc hangeFormat in the spe cification, this is Thum bnailOffset in IFD1
+						of JPEG and some TIFF-based images, IFD0 of MRW images and AVI and MOV videos, and the
+						SubIFD in IFD1 of SRW images; Previe wImageStart in MakerNotes and IFD0 of ARW and SR2
+						images; JpgF romRawStart in SubIFD of NEF images and IFD2 of PEF images; and Othe
+						rImageStart in everything else )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0202</td>
+			<td>
+				[Thumbna ilLength]{. underline}<br />
+				Thumb nailLength<br />
+				Thumb nailLength<br />
+				PreviewI mageLength<br />
+				PreviewI mageLength<br />
+				JpgFro mRawLength<br />
+				JpgFro mRawLength<br />
+				OtherI mageLength<br />
+				OtherI mageLength<br />
+				Other ImageLength
+			</td>
+			<td>
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				int32u*<br />
+				no
+			</td>
+			<td>
+				IFD1<br />
+				IFD0<br />
+				SubIFD<br />
+				MakerNotes<br />
+				IFD0<br />
+				SubIFD<br />
+				IFD2<br />
+				SubIFD1<br />
+				SubIFD2<br />
+				-
+			</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(called JPEGI nterchangeF ormatLength in the spe cification, this is Thum bnailLength
+						in IFD1 of JPEG and some TIFF-based images, IFD0 of MRW images and AVI and MOV videos,
+						and the SubIFD in IFD1 of SRW images; Preview ImageLength in MakerNotes and IFD0 of ARW
+						and SR2 images; JpgFr omRawLength in SubIFD of NEF images, and IFD2 of PEF images; and
+						Other ImageLength in everything else )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0203</td>
+			<td>JPEGRest artInterval</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0205</td>
+			<td>JPEGLossles sPredictors</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0206</td>
+			<td>JPEGPoin tTransforms</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0207</td>
+			<td>JPEGQTables</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0208</td>
+			<td>J PEGDCTables</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0209</td>
+			<td>J PEGACTables</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0211</td>
+			<td><u>YCbCrCoe fficients</u></td>
+			<td>ration al64u[3]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x0212</td>
+			<td><u>YCbCrSu bSampling</u></td>
+			<td>i nt16u[2]!</td>
+			<td>IFD0</td>
+			<td>
+				<hr />
+				<h2 id="section-10">—- —- -</h2>
+				<p>
+					'1 1 ' = '2 2' = YCbCr4 :4:4 YCbCr4:2:0 (1 1)<br />
+					(2 2)<br />
+					'1 2 ' = '2 4' = YCbCr4 :4:0 YCbCr4:2:1 (1 2)<br />
+					(2 4)<br />
+					'1 4 ' = '4 1' = YCbCr4 :4:1 YCbCr4:1:1 (1 4)<br />
+					(4 1)<br />
+					'2 1 ' = '4 2' = YCbCr4 :2:2 YCbCr4:1:0 ( 2 1) (4 2)
+				</p>
+				<hr />
+				<h2 id="section-11">—- —- -</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0213</td>
+			<td><u>YCbCrPo sitioning</u></td>
+			<td>int16u!:</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>1 = Centered<br />
+					2 = Co -sited</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x0214</td>
+			<td><u>ReferenceB lackWhite</u></td>
+			<td>ratio nal64u[6]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x022f</td>
+			<td>Str ipRowCounts</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x02bc</td>
+			<td>Appli cationNotes</td>
+			<td>int8u!</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="XMP.html">XMP Tags</a></td>
+		</tr>
+		<tr>
+			<td>0x0303</td>
+			<td>Rend eringIntent</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Perceptual<br />
+					1 = Relative Co lorimetric<br />
+					2 = Saturation<br />
+					3 = Absolute colori metric</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x03e7</td>
+			<td>USPTOMi scellaneous</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x1000</td>
+			<td>RelatedImag eFileFormat</td>
+			<td>string!</td>
+			<td>InteropIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x1001</td>
+			<td>Relate dImageWidth</td>
+			<td>int16u!</td>
+			<td>InteropIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x1002</td>
+			<td>Related ImageHeight</td>
+			<td>int16u!</td>
+			<td>InteropIFD</td>
+			<td>
+				<span class="s"><span class="n">(called Related ImageLength by the DCF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x4746</td>
+			<td>Rating</td>
+			<td>int16u/</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x4747</td>
+			<td>XP_DIP_XML</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x4748</td>
+			<td>StitchInfo</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; <a href="Microsoft.h%20tml#Stitch">Microsoft Stitch Tags</a></td>
+		</tr>
+		<tr>
+			<td>0x4749</td>
+			<td>Ra tingPercent</td>
+			<td>int16u/</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5001</td>
+			<td>Reso lutionXUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(ID's from 0x5001 to 0x5113 are obscure tags defined by Microsoft )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x5002</td>
+			<td>Reso lutionYUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5003</td>
+			<td>Resolution XLengthUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5004</td>
+			<td>Resolution YLengthUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5005</td>
+			<td>PrintFlags</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5006</td>
+			<td>PrintF lagsVersion</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5007</td>
+			<td>Pri ntFlagsCrop</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5008</td>
+			<td>PrintFlag sBleedWidth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5009</td>
+			<td>Pri ntFlagsBlee dWidthScale</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x500a</td>
+			<td>HalftoneLPI</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x500b</td>
+			<td>Half toneLPIUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x500c</td>
+			<td>Hal ftoneDegree</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x500d</td>
+			<td>Ha lftoneShape</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x500e</td>
+			<td>H alftoneMisc</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x500f</td>
+			<td>Hal ftoneScreen</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5010</td>
+			<td>JPEGQuality</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5011</td>
+			<td>GridSize</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5012</td>
+			<td>Thum bnailFormat</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5013</td>
+			<td>Thu mbnailWidth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5014</td>
+			<td>Thum bnailHeight</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5015</td>
+			<td>Thumbnai lColorDepth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5016</td>
+			<td>Thum bnailPlanes</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5017</td>
+			<td>Thumbn ailRawBytes</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5018</td>
+			<td>Thum bnailLength</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5019</td>
+			<td>T humbnailCom pressedSize</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x501a</td>
+			<td>ColorTrans ferFunction</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x501b</td>
+			<td>Th umbnailData</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5020</td>
+			<td>Thumbnai lImageWidth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5021</td>
+			<td>Thumbnail ImageHeight</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5022</td>
+			<td>ThumbnailBi tsPerSample</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5023</td>
+			<td>Thumbnail Compression</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5024</td>
+			<td>Thum bnailPhotom etricInterp</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5025</td>
+			<td>Thumbnail Description</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5026</td>
+			<td>Thumbna ilEquipMake</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5027</td>
+			<td>Thumbnai lEquipModel</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5028</td>
+			<td>ThumbnailS tripOffsets</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5029</td>
+			<td>Thumbnail Orientation</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x502a</td>
+			<td>Th umbnailSamp lesPerPixel</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x502b</td>
+			<td>ThumbnailR owsPerStrip</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x502c</td>
+			<td>Th umbnailStri pByteCounts</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x502d</td>
+			<td>Thumbnail ResolutionX</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x502e</td>
+			<td>Thumbnail ResolutionY</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x502f</td>
+			<td>ThumbnailP lanarConfig</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5030</td>
+			<td>T humbnailRes olutionUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5031</td>
+			<td>Thu mbnailTrans ferFunction</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5032</td>
+			<td>Thumbn ailSoftware</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5033</td>
+			<td>Thumbn ailDateTime</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5034</td>
+			<td>Thum bnailArtist</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5035</td>
+			<td>Thumbnai lWhitePoint</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5036</td>
+			<td>Thumbnai lPrimaryChr omaticities</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5037</td>
+			<td>Thum bnailYCbCrC oefficients</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5038</td>
+			<td>Thu mbnailYCbCr Subsampling</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5039</td>
+			<td>Thu mbnailYCbCr Positioning</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x503a</td>
+			<td>ThumbnailRe fBlackWhite</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x503b</td>
+			<td>Thumbna ilCopyright</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5090</td>
+			<td>Lum inanceTable</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5091</td>
+			<td>Chrom inanceTable</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5100</td>
+			<td>FrameDelay</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5101</td>
+			<td>LoopCount</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5102</td>
+			<td>Gl obalPalette</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5103</td>
+			<td>Inde xBackground</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5104</td>
+			<td>Index Transparent</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5110</td>
+			<td>PixelUnits</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5111</td>
+			<td>Pix elsPerUnitX</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5112</td>
+			<td>Pix elsPerUnitY</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x5113</td>
+			<td>Palet teHistogram</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x7000</td>
+			<td>Sony RawFileType</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Sony U ncompressed 14-bit RAW<br />
+					1 = Sony U ncompressed 12-bit RAW<br />
+					2 = Sony Compressed RAW<br />
+					3 = Sony Lossless Compressed RAW<br />
+					4 = Sony Lossless Compressed RAW 2</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7010</td>
+			<td>So nyToneCurve</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x7031</td>
+			<td>Vignettin gCorrection</td>
+			<td>int16s!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(found in Sony ARW im ages)</span><br />
+					256 = Off<br />
+					257 = Auto<br />
+					272 = Auto (ILCE-1)<br />
+					511 = No correction params ava ilable</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7032</td>
+			<td>Vignettin gCorrParams</td>
+			<td>in t16s[17]!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"><span class="n">(found in Sony ARW images )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7034</td>
+			<td>Chromat icAberratio nCorrection</td>
+			<td>int16s!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(found in Sony ARW im ages)</span><br />
+					0 = Off<br />
+					1 = Auto<br />
+					255 = No correction params ava ilable</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7035</td>
+			<td>Chromat icAberratio nCorrParams</td>
+			<td>in t16s[33]!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"><span class="n">(found in Sony ARW images )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7036</td>
+			<td>Distortio nCorrection</td>
+			<td>int16s!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(found in Sony ARW im ages)</span><br />
+					0 = Off<br />
+					1 = Auto<br />
+					17 = Auto fixed by lens<br />
+					255 = No correction params ava ilable</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7037</td>
+			<td>Distortio nCorrParams</td>
+			<td>in t16s[17]!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"><span class="n">(found in Sony ARW images )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7038</td>
+			<td>SonyR awImageSize</td>
+			<td>i nt32u[2]!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"><span class="n">(size of actual image in Sony ARW files )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7310</td>
+			<td>BlackLevel</td>
+			<td>i nt16u[4]!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"><span class="n">(found in Sony ARW images )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x7313</td>
+			<td>WB _RGGBLevels</td>
+			<td>i nt16s[4]!</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"><span class="n">(found in Sony ARW images )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x74c7</td>
+			<td>Sony CropTopLeft</td>
+			<td>i nt32u[2]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x74c8</td>
+			<td>S onyCropSize</td>
+			<td>i nt32u[2]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x800d</td>
+			<td>ImageID</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80a3</td>
+			<td>WangTag1</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80a4</td>
+			<td>Wan gAnnotation</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80a5</td>
+			<td>WangTag3</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80a6</td>
+			<td>WangTag4</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80b9</td>
+			<td>ImageRefe rencePoints</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80ba</td>
+			<td>RegionXfo rmTackPoint</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80bb</td>
+			<td>WarpQu adrilateral</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80bc</td>
+			<td>AffineT ransformMat</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80e3</td>
+			<td>Matteing</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80e4</td>
+			<td>DataType</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80e5</td>
+			<td>ImageDepth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x80e6</td>
+			<td>TileDepth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8214</td>
+			<td>Ima geFullWidth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8215</td>
+			<td>Imag eFullHeight</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8216</td>
+			<td>Te xtureFormat</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8217</td>
+			<td>WrapModes</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8218</td>
+			<td>FovCot</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8219</td>
+			<td>MatrixWo rldToScreen</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x821a</td>
+			<td>MatrixWo rldToCamera</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x827d</td>
+			<td>Model2</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x828d</td>
+			<td>CFARepea tPatternDim</td>
+			<td>i nt16u[2]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x828e</td>
+			<td>CFAPattern2</td>
+			<td>int8u[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x828f</td>
+			<td>B atteryLevel</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8290</td>
+			<td>KodakIFD</td>
+			<td>-</td>
+			<td>-</td>
+			<td>
+				--&gt; <a href="Kodak%20.html#IFD">Kodak IFD Tags</a><br />
+				<span class="n s">(used in various types of Kodak images)</span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8298</td>
+			<td><u>Copyright</u></td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(may contain copyright notices for p hotographer and editor, separated by a newline. As
+						per the EXIF spe cification, the newline is replaced by a null byte when writing to
+						file, but this may be avoided by disabling the print conversion )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x829a</td>
+			<td><u>Exp osureTime</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x829d</td>
+			<td><u>FNumber</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x82a5</td>
+			<td>MDFileTag</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(tags 0x 82a5-0x82ac are used in Molecular Dynamics GEL files )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x82a6</td>
+			<td>M DScalePixel</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x82a7</td>
+			<td>M DColorTable</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x82a8</td>
+			<td>MDLabName</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x82a9</td>
+			<td>M DSampleInfo</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x82aa</td>
+			<td>MDPrepDate</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x82ab</td>
+			<td>MDPrepTime</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x82ac</td>
+			<td>MDFileUnits</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x830e</td>
+			<td>PixelScale</td>
+			<td>double[3]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8335</td>
+			<td>AdventScale</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8336</td>
+			<td>Adv entRevision</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x835c</td>
+			<td>UIC1Tag</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x835d</td>
+			<td>UIC2Tag</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x835e</td>
+			<td>UIC3Tag</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x835f</td>
+			<td>UIC4Tag</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x83bb</td>
+			<td>IPTC-NAA</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>--&gt; [IPTC Tags] (IPTC.html)</td>
+		</tr>
+		<tr>
+			<td>0x847e</td>
+			<td>Intergrap hPacketData</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x847f</td>
+			<td>I ntergraphFl agRegisters</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8480</td>
+			<td>Inter graphMatrix</td>
+			<td>double[n]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8481</td>
+			<td>I NGRReserved</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8482</td>
+			<td>Mo delTiePoint</td>
+			<td>double[n]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84e0</td>
+			<td>Site</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84e1</td>
+			<td>Co lorSequence</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84e2</td>
+			<td>IT8Header</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84e3</td>
+			<td>Ra sterPadding</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Byte<br />
+					1 = Word<br />
+					2 = Long Word<br />
+					9 = Sector<br />
+					10 = Long Sector</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x84e4</td>
+			<td>BitsP erRunLength</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84e5</td>
+			<td>Bi tsPerExtend edRunLength</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84e6</td>
+			<td>ColorTable</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84e7</td>
+			<td>ImageCol orIndicator</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Unspecified Image Color<br />
+					1 = Specified Image Color</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x84e8</td>
+			<td>Ba ckgroundCol orIndicator</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Unspecified Background Color<br />
+					1 = Specified Background Color</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x84e9</td>
+			<td>Imag eColorValue</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84ea</td>
+			<td>Backgroun dColorValue</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84eb</td>
+			<td>PixelInt ensityRange</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84ec</td>
+			<td>Transparen cyIndicator</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84ed</td>
+			<td>ColorChara cterization</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84ee</td>
+			<td>HCUsage</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = CT<br />
+					1 = Line Art<br />
+					2 = Trap</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x84ef</td>
+			<td>Tr apIndicator</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x84f0</td>
+			<td>CMY KEquivalent</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8546</td>
+			<td>SEMInfo</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(found in some scanning electron microscope images )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8568</td>
+			<td>AFCP_IPTC</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; [IPTC Tags] (IPTC.html)</td>
+		</tr>
+		<tr>
+			<td>0x85b8</td>
+			<td>PixelMagic JBIGOptions</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x85d7</td>
+			<td>JPLCartoIFD</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x85d8</td>
+			<td>Mod elTransform</td>
+			<td>d ouble[16]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8602</td>
+			<td>WB _GRGBLevels</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"><span class="n">(found in IFD0 of Leaf MOS images )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8606</td>
+			<td>LeafData</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; [Leaf Tags] (Leaf.html)</td>
+		</tr>
+		<tr>
+			<td>0x8649</td>
+			<td>Photos hopSettings</td>
+			<td>-</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="Phot%20oshop.html">Photoshop Tags</a></td>
+		</tr>
+		<tr>
+			<td>0x8769</td>
+			<td><u>E xifOffset</u></td>
+			<td>-</td>
+			<td>IFD0</td>
+			<td>--&gt; [EXIF Tags] (EXIF.html)</td>
+		</tr>
+		<tr>
+			<td>0x8773</td>
+			<td>ICC_Profile</td>
+			<td>-</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="ICC_Pr%20ofile.html">ICC_Profile T ags</a></td>
+		</tr>
+		<tr>
+			<td>0x877f</td>
+			<td>TIFF_F XExtensions</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>Bit 0 = Resol ution/Image Width<br />
+					Bit 1 = N Layer Profile M<br />
+					Bit 2 = Shared Data<br />
+					Bit 3 = B&amp;W JBIG2<br />
+					Bit 4 = JBIG2 Profile M</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8780</td>
+			<td>Mu ltiProfiles</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<h2 id="section-12">——-</h2>
+				<p>
+					Bit 0 = Profile S<br />
+					Bit 1 = Profile F<br />
+					Bit 2 = Profile J<br />
+					Bit 3 = Profile C<br />
+					Bit 4 = Profile L<br />
+					Bit 5 = Profile M<br />
+					Bit 6 = Profile T<br />
+					Bit 7 = Resol ution/Image Width<br />
+					Bit 8 = N Layer
+				</p>
+				<p>
+					Profile M<br />
+					Bit 9 = Shared Data<br />
+					Bit 10 = JBIG2 Profile M
+				</p>
+				<h2 id="section-13">——-</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8781</td>
+			<td>SharedData</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8782</td>
+			<td>T88Options</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x87ac</td>
+			<td>ImageLayer</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x87af</td>
+			<td>GeoTi ffDirectory</td>
+			<td>in t16u[0.5]</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(these "GeoTiff" tags may read and written as a block, but they aren't extracted unless
+						s pecifically requested. Byte order changes are handled au tomatically when copying
+						between TIFF images with different byte order )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x87b0</td>
+			<td>GeoTiffD oubleParams</td>
+			<td>doub le[0.125]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x87b1</td>
+			<td>GeoTiff AsciiParams</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x87be</td>
+			<td>JBIGOptions</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8822</td>
+			<td><u>Exposu reProgram</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<p>
+					<span class="s"
+						><span class="n"
+							>(the value of 9 is not standard EXIF, but is used by the Canon EOS 7D )</span
+						></span
+					>
+				</p>
+				<h2 id="section-14">——–</h2>
+				<p>0 = N ot Defined<br /></p>
+				<p>
+					1 = Manual<br />
+					2 = Program AE<br />
+					3 = Apertu re-priority AE<br />
+					4 = Sh utter speed p riority AE<br />
+					5 = Cre ative (Slow speed)<br />
+					6 = A ction (High speed)<br />
+					7 = Portrait<br />
+					8 = Landscape<br />
+					9 = Bulb
+				</p>
+				<h2 id="section-15">——–</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8824</td>
+			<td><u>SpectralSe nsitivity</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8825</td>
+			<td><u>GPSInfo</u></td>
+			<td>-</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="GPS.html">GPS Tags</a></td>
+		</tr>
+		<tr>
+			<td>0x8827</td>
+			<td><u>ISO</u></td>
+			<td>int16u[n]</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(called ISOS peedRatings by EXIF 2.2, then P hotographic Sensitivity by the EXIF 2.3
+						spec. )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8828</td>
+			<td><u>Opt o-ElectricC onvFactor</u></td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"><span class="n">(called OECF by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8829</td>
+			<td>Interlace</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x882a</td>
+			<td>Tim eZoneOffset</td>
+			<td>int16s[n]</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(1 or 2 values: 1. The time zone offset of DateT imeOriginal from GMT in hours, 2. If
+						present, the time zone offset of ModifyDate )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x882b</td>
+			<td>Se lfTimerMode</td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8830</td>
+			<td><u>Sensit ivityType</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(applies to EXIF:ISO tag)</span><br />
+					0 = Unknown<br />
+					1 = Standard Output S ensitivity<br />
+					2 = Recommended Exposure Index<br />
+					3 = ISO Speed<br />
+					4 = Standard Output Sensitivity and Recommended Exposure Index<br />
+					5 = Standard Output Sensitivity and ISO Speed<br />
+					6 = Recommended Exposure Index and ISO Speed<br />
+					7 = Standard Output S ensitivity, Recommended Exposure Index and ISO Speed</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x8831</td>
+			<td><u>Stand ardOutputSe nsitivity</u></td>
+			<td>int32u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8832</td>
+			<td><u>Reco mmendedExpo sureIndex</u></td>
+			<td>int32u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8833</td>
+			<td><u>ISOSpeed</u></td>
+			<td>int32u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8834</td>
+			<td><u>ISOSpeedLa titudeyyy</u></td>
+			<td>int32u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8835</td>
+			<td><u>ISOSpeedLa titudezzz</u></td>
+			<td>int32u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x885c</td>
+			<td>Fa xRecvParams</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x885d</td>
+			<td>Fa xSubAddress</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x885e</td>
+			<td>FaxRecvTime</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x8871</td>
+			<td>FedexEDR</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x888a</td>
+			<td>LeafSubIFD</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; <a href="Leaf.h%20tml#SubIFD">Leaf SubIFD T ags</a></td>
+		</tr>
+		<tr>
+			<td>0x9000</td>
+			<td><u>Ex ifVersion</u></td>
+			<td>undef:</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9003</td>
+			<td><u>DateTim eOriginal</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(date/time when original image was taken )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9004</td>
+			<td><u>C reateDate</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(called DateTi meDigitized by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9009</td>
+			<td>GooglePlu sUploadCode</td>
+			<td>undef[n]</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9010</td>
+			<td><u>O ffsetTime</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(time zone for ModifyDate )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9011</td>
+			<td><u>OffsetTim eOriginal</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(time zone for DateT imeOriginal )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9012</td>
+			<td><u>OffsetTime Digitized</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(time zone for CreateDate )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9101</td>
+			<td><u>Com ponentsConf iguration</u></td>
+			<td>u ndef[4]!:</td>
+			<td>ExifIFD</td>
+			<td>
+				<table>
+					<thead>
+						<tr>
+							<th></th>
+							<th>—-</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td></td>
+							<td>0 =</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>  </td>
+							<td>4 =</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>-\</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td>R\</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>1 =</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td>5 =</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>Y\</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td>G\</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>2 =</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td>6 =</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>C</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>b\</td>
+							<td></td>
+							<td>B</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>3 =</p>
+				<p>Cr</p>
+				<hr />
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td>0x9102</td>
+			<td><u>Co mpressedBit sPerPixel</u></td>
+			<td>r ational64u!</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9201</td>
+			<td><u>ShutterS peedValue</u></td>
+			<td>rational64s</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(displayed in seconds, but stored as an APEX value )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9202</td>
+			<td><u>Aper tureValue</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(displayed as an F number, but stored as an APEX value )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9203</td>
+			<td><u>Bright nessValue</u></td>
+			<td>rational64s</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9204</td>
+			<td><u>ExposureCom pensation</u></td>
+			<td>rational64s</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(called Exposu reBiasValue by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9205</td>
+			<td><u>MaxAper tureValue</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(displayed as an F number, but stored as an APEX value )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9206</td>
+			<td><u>Subjec tDistance</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9207</td>
+			<td><u>Met eringMode</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<h2 id="section-16">——</h2>
+				<p>
+					0 = Unknown<br />
+					1 = Average<br />
+					2 = Cent er-weighted average<br />
+					3 = Spot<br />
+					4 = Multi-spot<br />
+					5 = Mul ti-segment<br />
+					6 = Partial<br />
+				</p>
+				<p>255 = Other</p>
+				<h2 id="section-17">——</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9208</td>
+			<td><u>Li ghtSource</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>--&gt; <a href="EXIF.html#L%20ightSource">EXIF LightSource Values</a></td>
+		</tr>
+		<tr>
+			<td>0x9209</td>
+			<td><u>Flash</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>--&gt; <a href="EXIF.%20html#Flash">EXIF Flash Va lues</a></td>
+		</tr>
+		<tr>
+			<td>0x920a</td>
+			<td><u>Fo calLength</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x920b</td>
+			<td>FlashEnergy</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x920c</td>
+			<td>Sp atialFreque ncyResponse</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x920d</td>
+			<td>Noise</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x920e</td>
+			<td>FocalPlane XResolution</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x920f</td>
+			<td>FocalPlane YResolution</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9210</td>
+			<td>Fo calPlaneRes olutionUnit</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>1 = None<br />
+					2 = inches<br />
+					3 = cm<br />
+					4 = mm<br />
+					5 = um</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9211</td>
+			<td>ImageNumber</td>
+			<td>int32u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9212</td>
+			<td>SecurityCla ssification</td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>'C' = Co nfidential<br />
+					'R' = Restricted<br />
+					'S' = Secret<br />
+					'T' = Top Secret<br />
+					'U' = Unclas sified</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9213</td>
+			<td>I mageHistory</td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9214</td>
+			<td><u>Su bjectArea</u></td>
+			<td>int16u[n]</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9215</td>
+			<td>Ex posureIndex</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9216</td>
+			<td>TIFF-E PStandardID</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9217</td>
+			<td>Se nsingMethod</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<ul>
+					<li>
+						<hr />
+						1 =
+					</li>
+				</ul>
+				<p>
+					Monochrome area<br />
+					2 = One-chip
+				</p>
+				<p>
+					color area<br />
+					3 = Two-chip
+				</p>
+				<p>
+					color area<br />
+					4 =
+				</p>
+				<p>Three-chip</p>
+				<p>
+					color area<br />
+					5 = Color
+				</p>
+				<p>
+					sequential area<br />
+					6 =
+				</p>
+				<p>
+					Monochrome linear<br />
+					7 =
+				</p>
+				<p>
+					Trilinear<br />
+					8 = Color
+				</p>
+				<p>sequential linear</p>
+				<ul>
+					<li><hr /></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>0x923a</td>
+			<td>C IP3DataFile</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x923b</td>
+			<td>CIP3Sheet</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x923c</td>
+			<td>CIP3Side</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x923f</td>
+			<td>StoNits</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x927c</td>
+			<td>
+				Make rNoteApple<br />
+				Make rNoteNikon<br />
+				Make rNoteCanon<br />
+				Make rNoteCasio<br />
+				Maker NoteCasio2<br />
+				MakerN oteDJIInfo<br />
+				Ma kerNoteDJI<br />
+				Mak erNoteFLIR<br />
+				MakerNo teFujiFilm<br />
+				M akerNoteGE<br />
+				Ma kerNoteGE2<br />
+				MakerNote Hasselblad<br />
+				M akerNoteHP<br />
+				Ma kerNoteHP2<br />
+				Ma kerNoteHP4<br />
+				Ma kerNoteHP6<br />
+				Ma kerNoteISL<br />
+				Ma kerNoteJVC<br />
+				MakerN oteJVCText<br />
+				MakerN oteKodak1a<br />
+				MakerN oteKodak1b<br />
+				Maker NoteKodak2<br />
+				Maker NoteKodak3<br />
+				Maker NoteKodak4<br />
+				Maker NoteKodak5<br />
+				MakerN oteKodak6a<br />
+				MakerN oteKodak6b<br />
+				Maker NoteKodak7<br />
+				MakerN oteKodak8a<br />
+				MakerN oteKodak8b<br />
+				MakerN oteKodak8c<br />
+				Maker NoteKodak9<br />
+				MakerN oteKodak10<br />
+				MakerN oteKodak11<br />
+				MakerN oteKodak12<br />
+				MakerNoteKo dakUnknown<br />
+				MakerN oteKyocera<br />
+				MakerN oteMinolta<br />
+				MakerNo teMinolta2<br />
+				MakerNo teMinolta3<br />
+				MakerNo teMotorola<br />
+				Maker NoteNikon2<br />
+				Maker NoteNikon3<br />
+				MakerNo teNintendo<br />
+				MakerN oteOlympus<br />
+				MakerNo teOlympus2<br />
+				MakerNo teOlympus3<br />
+				Make rNoteLeica<br />
+				Maker NoteLeica2<br />
+				Maker NoteLeica3<br />
+				Maker NoteLeica4<br />
+				Maker NoteLeica5<br />
+				Maker NoteLeica6<br />
+				Maker NoteLeica7<br />
+				Maker NoteLeica8<br />
+				Maker NoteLeica9<br />
+				MakerN oteLeica10<br />
+				MakerNot ePanasonic<br />
+				MakerNote Panasonic2<br />
+				MakerNote Panasonic3<br />
+				Maker NotePentax<br />
+				MakerN otePentax2<br />
+				MakerN otePentax3<br />
+				MakerN otePentax4<br />
+				MakerN otePentax5<br />
+				MakerN otePentax6<br />
+				MakerNo tePhaseOne<br />
+				MakerN oteReconyx<br />
+				MakerNo teReconyx2<br />
+				MakerNo teReconyx3<br />
+				MakerNoteR icohPentax<br />
+				Make rNoteRicoh<br />
+				Maker NoteRicoh2<br />
+				MakerNot eRicohText<br />
+				MakerNot eSamsung1a<br />
+				MakerNot eSamsung1b<br />
+				MakerNo teSamsung2<br />
+				Make rNoteSanyo<br />
+				MakerN oteSanyoC4<br />
+				MakerNote SanyoPatch<br />
+				Make rNoteSigma<br />
+				Mak erNoteSony<br />
+				Make rNoteSony2<br />
+				Make rNoteSony3<br />
+				Make rNoteSony4<br />
+				Make rNoteSony5<br />
+				MakerNoteSo nyEricsson<br />
+				MakerN oteSonySRF<br />
+				MakerNoteU nknownText<br />
+				M akerNoteUnk nownBinary<br />
+				<u>MakerNo teUnknown</u>
+			</td>
+			<td>
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef<br />
+				undef
+			</td>
+			<td>
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD<br />
+				ExifIFD
+			</td>
+			<td>
+				--&gt; <a href="A%20pple.html">Apple Tags</a><br />
+				--&gt; <a href="N%20ikon.html">Nikon Tags</a><br />
+				--&gt; <a href="C%20anon.html">Canon Tags</a><br />
+				--&gt; <a href="C%20asio.html">Casio Tags</a><br />
+				--&gt; <a href="Casio.h%20tml#Type2">Casio Type2 Ta gs</a><br />
+				--&gt; <a href="DJI.%20html#Info">DJI Info Tags</a><br />
+				--&gt; [DJI Tags] (DJI.html)<br />
+				--&gt; <a href="FLIR.html">FLIR Tags</a><br />
+				--&gt; <a href="Fuji%20Film.html">FujiFilm Tags</a><br />
+				--&gt; <a href="GE.html">GE Tags</a><br />
+				--&gt; <a href="Fuji%20Film.html">FujiFilm Tags</a><br />
+				--&gt; <a href="Unk%20nown.html">Unknown Tags</a><br />
+				--&gt; <a href="HP.html">HP Tags</a><br />
+				--&gt; <a href="HP.h%20tml#Type2">HP Type2 Tags</a><br />
+				--&gt; <a href="HP.h%20tml#Type4">HP Type4 Tags</a><br />
+				--&gt; <a href="HP.h%20tml#Type6">HP Type6 Tags</a><br />
+				--&gt; <a href="Unk%20nown.html">Unknown Tags</a><br />
+				--&gt; [JVC Tags] (JVC.html)<br />
+				--&gt; <a href="JVC.%20html#Text">JVC Text Tags</a><br />
+				--&gt; <a href="K%20odak.html">Kodak Tags</a><br />
+				--&gt; <a href="K%20odak.html">Kodak Tags</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type2">Kodak Type2 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type3">Kodak Type3 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type4">Kodak Type4 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type5">Kodak Type5 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type6">Kodak Type6 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type6">Kodak Type6 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type7">Kodak Type7 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type8">Kodak Type8 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type8">Kodak Type8 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type8">Kodak Type8 Ta gs</a><br />
+				--&gt; <a href="Kodak.h%20tml#Type9">Kodak Type9 Ta gs</a><br />
+				--&gt; <a href="Kodak.ht%20ml#Type10">Kodak Type10 Tag s</a><br />
+				--&gt; <a href="Kodak.ht%20ml#Type11">Kodak Type11 Tag s</a><br />
+				--&gt; <a href="Kodak.ht%20ml#Type11">Kodak Type11 Tag s</a><br />
+				--&gt; <a href="Kodak.htm%20l#Unknown">Kodak Unknown Tags</a><br />
+				--&gt; <a href="Unk%20nown.html">Unknown Tags</a><br />
+				--&gt; <a href="Min%20olta.html">Minolta Tags</a><br />
+				--&gt; <a href="Oly%20mpus.html">Olympus Tags</a><br />
+				<span class="n">(not EXIF-b ased)</span><br />
+				--&gt; <a href="Moto%20rola.html">Motorola Tags</a><br />
+				--&gt; <a href="Nikon.h%20tml#Type2">Nikon Type2 Ta gs</a><br />
+				--&gt; <a href="N%20ikon.html">Nikon Tags</a><br />
+				--&gt; <a href="Nint%20endo.html">Nintendo Tags</a><br />
+				--&gt; <a href="Oly%20mpus.html">Olympus Tags</a><br />
+				--&gt; <a href="Oly%20mpus.html">Olympus Tags</a><br />
+				--&gt; <a href="Oly%20mpus.html">Olympus Tags</a><br />
+				--&gt; <a href="Panas%20onic.html">Panasonic Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica2">Panasonic Leica2 Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica3">Panasonic Leica3 Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica4">Panasonic Leica4 Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica5">Panasonic Leica5 Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica6">Panasonic Leica6 Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica6">Panasonic Leica6 Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica5">Panasonic Leica5 Tags</a><br />
+				--&gt; <a href="P%20anasonic.ht%20ml#Leica9">Panasonic Leica9 Tags</a><br />
+				--&gt; <a href="Panas%20onic.html">Panasonic Tags</a><br />
+				--&gt; <a href="Panas%20onic.html">Panasonic Tags</a><br />
+				--&gt; <a href="Panasonic.h%20tml#Type2">Panasonic Type2 Tags</a><br />
+				--&gt; <a href="Panas%20onic.html">Panasonic Tags</a><br />
+				--&gt; <a href="Pe%20ntax.html">Pentax Tags</a><br />
+				--&gt; <a href="Pentax.h%20tml#Type2">Pentax Type2 Tag s</a><br />
+				--&gt; <a href="Casio.h%20tml#Type2">Casio Type2 Ta gs</a><br />
+				--&gt; <a href="Pentax.h%20tml#Type4">Pentax Type4 Tag s</a><br />
+				--&gt; <a href="Pe%20ntax.html">Pentax Tags</a><br />
+				--&gt; <a href="Penta%20x.html#S1">Pentax S1 Tags</a><br />
+				--&gt; <a href="Phas%20eOne.html">PhaseOne Tags</a><br />
+				--&gt; <a href="Rec%20onyx.html">Reconyx Tags</a><br />
+				--&gt; <a href="Reconyx.h%20tml#Type2">Reconyx Type2 Tags</a><br />
+				--&gt; <a href="Reconyx.h%20tml#Type3">Reconyx Type3 Tags</a><br />
+				--&gt; <a href="Pe%20ntax.html">Pentax Tags</a><br />
+				--&gt; <a href="R%20icoh.html">Ricoh Tags</a><br />
+				--&gt; <a href="Ricoh.h%20tml#Type2">Ricoh Type2 Ta gs</a><br />
+				--&gt; <a href="Ricoh.%20html#Text">Ricoh Text T ags</a><br />
+				<span class="n">(Samsung "STMN" maker notes without PreviewI mage)</span><br />
+				--&gt; <a href="Sam%20sung.html">Samsung Tags</a><br />
+				--&gt; <a href="Samsung.h%20tml#Type2">Samsung Type2 Tags</a><br />
+				--&gt; <a href="S%20anyo.html">Sanyo Tags</a><br />
+				--&gt; <a href="S%20anyo.html">Sanyo Tags</a><br />
+				--&gt; <a href="S%20anyo.html">Sanyo Tags</a><br />
+				--&gt; <a href="S%20igma.html">Sigma Tags</a><br />
+				--&gt; <a href="Sony.html">Sony Tags</a><br />
+				--&gt; <a href="Oly%20mpus.html">Olympus Tags</a><br />
+				--&gt; <a href="Oly%20mpus.html">Olympus Tags</a><br />
+				--&gt; <a href="Sony%20.html#PIC">Sony PIC Tags</a><br />
+				--&gt; <a href="Sony.html">Sony Tags</a><br />
+				--&gt; <a href="Sony.html%20#Ericsson">Sony Ericsson Tags</a><br />
+				--&gt; <a href="Sony%20.html#SRF">Sony SRF Tags</a><br />
+				<span class="n">(unknown text-based maker n otes)</span><br />
+				<span class="n">(unknown binary maker n otes)</span><br />
+				--&gt; <a href="Un%20known.html">Unknown Tags</a>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9286</td>
+			<td><u>Us erComment</u></td>
+			<td>undef</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9290</td>
+			<td><u>S ubSecTime</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(fractional seconds for ModifyDate )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9291</td>
+			<td><u>SubSecTim eOriginal</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(fractional seconds for DateT imeOriginal )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9292</td>
+			<td><u>SubSecTime Digitized</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(fractional seconds for CreateDate )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x932f</td>
+			<td>MSD ocumentText</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9330</td>
+			<td>MSPropert ySetStorage</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9331</td>
+			<td>MSDocumentT extPosition</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x935c</td>
+			<td>Imag eSourceData</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="Photos%20hop.html#Do%20cumentData">Photoshop D ocumentData T ags</a></td>
+		</tr>
+		<tr>
+			<td>0x9400</td>
+			<td><u>AmbientTe mperature</u></td>
+			<td>rational64s</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(ambient temperature in degrees C, called Temperature by the EXIF spec. )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9401</td>
+			<td><u>Humidity</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(ambient relative humidity in percent )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9402</td>
+			<td><u>Pressure</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(air pressure in hPa or mbar )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9403</td>
+			<td><u>W aterDepth</u></td>
+			<td>rational64s</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(depth under water in metres, negative for above water )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9404</td>
+			<td><u>Acc eleration</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(di rectionless camera a cceleration in units of mGal, or 10-5 m/s2 )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9405</td>
+			<td><u>CameraEleva tionAngle</u></td>
+			<td>rational64s</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9999</td>
+			<td>Xia omiSettings</td>
+			<td>string!</td>
+			<td>ExifIFD</td>
+			<td>--&gt; [JSON Tags] (JSON.html)</td>
+		</tr>
+		<tr>
+			<td>0x9a00</td>
+			<td>XiaomiModel</td>
+			<td>string!</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9c9b</td>
+			<td>XPTitle</td>
+			<td>int8u</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(tags 0x 9c9b-0x9c9f are used by Windows Explorer; special characters in these values
+						are converted to UTF-8 by default, or Windows Latin1 with the -L option. XPTitle is
+						ignored by Windows Explorer if Image Description exists )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9c9c</td>
+			<td>XPComment</td>
+			<td>int8u</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9c9d</td>
+			<td>XPAuthor</td>
+			<td>int8u</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(ignored by Windows Explorer if Artist exists )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0x9c9e</td>
+			<td>XPKeywords</td>
+			<td>int8u</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0x9c9f</td>
+			<td>XPSubject</td>
+			<td>int8u</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa000</td>
+			<td><u>Flashp ixVersion</u></td>
+			<td>undef:</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa001</td>
+			<td><u>C olorSpace</u></td>
+			<td>int16u:</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(the value of 0x2 is not standard EXIF. Instead, an Adobe RGB image is indicated by
+						"Unc alibrated" with an I nteropIndex of "R03". The values 0xfffd and 0xfffe are also no
+						n-standard, and are used by some Sony cam eras)</span
+					><br />
+					0x1 = sRGB<br />
+					0x2 = Adobe RGB<br />
+					0xfffd = Wide Gamut RGB<br />
+					0xfffe = ICC Profile<br />
+					0xffff = Uncali brated</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa002</td>
+			<td><u>ExifI mageWidth</u></td>
+			<td>int16u:</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(called Pixe lXDimension by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa003</td>
+			<td><u>ExifIm ageHeight</u></td>
+			<td>int16u:</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(called Pixe lYDimension by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa004</td>
+			<td><u>Related SoundFile</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa005</td>
+			<td><u>Inte ropOffset</u></td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; [EXIF Tags] (EXIF.html)</td>
+		</tr>
+		<tr>
+			<td>0xa010</td>
+			<td>Sa msungRawPoi ntersOffset</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa011</td>
+			<td>Sa msungRawPoi ntersLength</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa101</td>
+			<td>SamsungR awByteOrder</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa102</td>
+			<td>Samsung RawUnknown?</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa20b</td>
+			<td><u>Fl ashEnergy</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa20c</td>
+			<td><u>Spat ialFrequenc yResponse</u></td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa20d</td>
+			<td>Noise</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa20e</td>
+			<td><u>F ocalPlaneXR esolution</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa20f</td>
+			<td><u>F ocalPlaneYR esolution</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa210</td>
+			<td><u>Foca lPlaneResol utionUnit</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(values 1, 4 and 5 are not standard EXIF)</span><br />
+					1 = None<br />
+					2 = inches<br />
+					3 = cm<br />
+					4 = mm<br />
+					5 = um</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa211</td>
+			<td>ImageNumber</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa212</td>
+			<td>SecurityCla ssification</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa213</td>
+			<td>I mageHistory</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa214</td>
+			<td><u>Subjec tLocation</u></td>
+			<td>int16u[2]</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa215</td>
+			<td><u>Expo sureIndex</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa216</td>
+			<td>TIFF-E PStandardID</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa217</td>
+			<td><u>Sens ingMethod</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<ul>
+					<li>
+						<hr />
+						1 = Not defined<br />
+						2 = One-chip
+					</li>
+				</ul>
+				<p>
+					color area<br />
+					3 = Two-chip
+				</p>
+				<p>
+					color area<br />
+					4 =
+				</p>
+				<p>Three-chip</p>
+				<p>
+					color area<br />
+					5 = Color
+				</p>
+				<p>
+					sequential area<br />
+					7 =
+				</p>
+				<p>
+					Trilinear<br />
+					8 = Color
+				</p>
+				<p>sequential linear</p>
+				<ul>
+					<li><hr /></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa300</td>
+			<td><u>F ileSource</u></td>
+			<td>undef</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>1 = Film Scanner<br />
+					2 = Reflection Print Scanner<br />
+					3 = Digital Camera<br />
+					" \x03\x00<br />
+					\x00" = Sigma Digital Camera</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa301</td>
+			<td><u>SceneType</u></td>
+			<td>undef</td>
+			<td>ExifIFD</td>
+			<td><span class="s">1 = Directly photog raphed</span></td>
+		</tr>
+		<tr>
+			<td>0xa302</td>
+			<td><u>C FAPattern</u></td>
+			<td>undef</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa401</td>
+			<td><u>Custo mRendered</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<p>
+					<span class="s"
+						><span class="n"
+							>(only 0 and 1 are standard EXIF, but other values are used by Apple iOS devices
+							)</span
+						></span
+					>
+				</p>
+				<hr />
+				<p>0 = Normal<br /></p>
+				<p>1 = Custom<br /></p>
+				<p>
+					2 = HDR (no original saved)<br />
+					3 = HDR (original saved)<br />
+					4 = Original
+				</p>
+				<p>
+					(for HDR)<br />
+					6 = Panorama<br />
+					7 = Portrait HDR<br />
+					8 = Portrait
+				</p>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td>0xa402</td>
+			<td><u>Exp osureMode</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = Auto<br />
+					1 = Manual<br />
+					2 = Auto b racket</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa403</td>
+			<td><u>Whi teBalance</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = Auto<br />
+					1 = Manual</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa404</td>
+			<td><u>Digital ZoomRatio</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa405</td>
+			<td><u>Foc alLengthIn3 5mmFormat</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(called FocalLengt hIn35mmFilm by the EXIF spec. )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa406</td>
+			<td><u>SceneCa ptureType</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(the value of 4 is no n-standard, and used by some Samsung mo dels)</span
+					><br />
+					0 = Standard<br />
+					1 = Landscape<br />
+					2 = Portrait<br />
+					3 = Night<br />
+					4 = Other</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa407</td>
+			<td><u>Ga inControl</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = None<br />
+					1 = Low gain up<br />
+					2 = High gain up<br />
+					3 = Low gain down<br />
+					4 = High gain down</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa408</td>
+			<td><u>Contrast</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = Normal<br />
+					1 = Low<br />
+					2 = High</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa409</td>
+			<td><u>S aturation</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = Normal<br />
+					1 = Low<br />
+					2 = High</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa40a</td>
+			<td><u>Sharpness</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = Normal<br />
+					1 = Soft<br />
+					2 = Hard</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa40b</td>
+			<td><u>Devi ceSettingDe scription</u></td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa40c</td>
+			<td><u>SubjectDist anceRange</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = Unknown<br />
+					1 = Macro<br />
+					2 = Close<br />
+					3 = D istant</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa420</td>
+			<td><u>Imag eUniqueID</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa430</td>
+			<td><u>OwnerName</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(called Came raOwnerName by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa431</td>
+			<td><u>Ser ialNumber</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"><span class="n">(called BodyS erialNumber by the EXIF spec. )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa432</td>
+			<td><u>LensInfo</u></td>
+			<td>ratio nal64u[4]</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(4 rational values giving focal and aperture ranges, called LensSp ecification by the
+						EXIF spec. )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa433</td>
+			<td><u>LensMake</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa434</td>
+			<td><u>LensModel</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa435</td>
+			<td><u>LensSer ialNumber</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa436</td>
+			<td><u>I mageTitle</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa437</td>
+			<td><u>Pho tographer</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa438</td>
+			<td><u>Im ageEditor</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa439</td>
+			<td><u>Camer aFirmware</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa43a</td>
+			<td><u>R AWDevelopin gSoftware</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa43b</td>
+			<td><u>ImageEditin gSoftware</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa43c</td>
+			<td><u>Met adataEditin gSoftware</u></td>
+			<td>string</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa460</td>
+			<td><u>Compo siteImage</u></td>
+			<td>int16u</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					>0 = Unknown<br />
+					1 = Not a Composite Image<br />
+					2 = General Composite Image<br />
+					3 = Composite Image Captured While Sh ooting</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa461</td>
+			<td><u>CompositeI mageCount</u></td>
+			<td>int16u[2]</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(2 values: 1. Number of source images, 2. Number of images used. Called SourceImage
+						NumberOfCom positeImage by the EXIF spec. )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa462</td>
+			<td><u>Composi teImageExpo sureTimes</u></td>
+			<td>undef</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(11 or more values: 1. Total exposure time period, 2. Total exposure of all source
+						images, 3. Total exposure of all used images, 4. Max exposure time of source images, 5.
+						Max exposure time of used images, 6. Min exposure time of source images, 7. Min exposure
+						of used images, 8. Number of sequences, 9. Number of source images in sequence. 10-N.
+						Exposure times of each source image. Called So urceExposur eTimesOfCom positeImage by
+						the EXIF spec. )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xa480</td>
+			<td>G DALMetadata</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa481</td>
+			<td>GDALNoData</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xa500</td>
+			<td><u>Gamma</u></td>
+			<td>rational64u</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xafc0</td>
+			<td>Exp andSoftware</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xafc1</td>
+			<td>ExpandLens</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xafc2</td>
+			<td>ExpandFilm</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xafc3</td>
+			<td>Expan dFilterLens</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xafc4</td>
+			<td>Ex pandScanner</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xafc5</td>
+			<td>Expa ndFlashLamp</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xb4c3</td>
+			<td>Hasselb ladRawImage</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbc01</td>
+			<td>PixelFormat</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<p>
+					<span class="s"
+						><span class="n"
+							>(tags 0xbc** are used in Windows HD Photo (HDP and WDP) images. The actual
+							PixelFormat values are 16-byte GUID's but the leading 15 bytes, '6fdd c324-4e03-4
+							bfe-b1853-d 77768dc9', have been removed below to avoid unnecessary clutter )</span
+						></span
+					>
+				</p>
+				<ul>
+					<li><hr /></li>
+				</ul>
+				<p>0x5 = Black &amp; White<br /></p>
+				<p>
+					0x8 = 8-bit Gray<br />
+					0 x9 = 16-bit BGR555<br />
+					0 xa = 16-bit BGR565<br />
+					0 xb = 16-bit Gray<br />
+					0 xc = 24-bit BGR<br />
+					0 xd = 24-bit RGB<br />
+					0 xe = 32-bit BGR<br />
+					0 xf = 32-bit BGRA<br />
+					0x10 = 32-bit PBGRA<br />
+					0x11 =
+				</p>
+				<p>
+					32-bit Gray Float<br />
+					0x12 =
+				</p>
+				<p>
+					48-bit RGB F ixed Point<br />
+					0x13 = 32-bit
+				</p>
+				<p>
+					BGR101010<br />
+					0x15 =
+				</p>
+				<p>
+					48-bit RGB<br />
+					0x16 = 6 4-bit RGBA<br />
+					0x17 = 64-bit PRGBA<br />
+					0x18 =
+				</p>
+				<p>
+					96-bit RGB F ixed Point<br />
+					0x19 = 1 28-bit RGBA Float<br />
+					0x1a = 128-bit P RGBA Float<br />
+					0x1b =
+				</p>
+				<p>
+					128-bit RGB Float<br />
+					0x1c = 3 2-bit CMYK<br />
+					0x1d =
+				</p>
+				<p>
+					64-bit RGBA F ixed Point<br />
+					0x1e = 1 28-bit RGBA F ixed Point<br />
+					0x1f = 6 4-bit CMYK<br />
+					0x20 = 24-bit 3 Channels<br />
+					0x21 = 32-bit 4 Channels<br />
+					0x22 = 40-bit 5 Channels<br />
+					0x23 = 48-bit 6 Channels<br />
+					0x24 = 56-bit 7 Channels<br />
+					0x25 = 64-bit 8 Channels<br />
+					0x26 = 48-bit 3 Channels<br />
+					0x27 = 64-bit 4 Channels<br />
+					0x28 = 80-bit 5 Channels<br />
+					0x29 = 96-bit 6 Channels<br />
+					0x2a = 112-bit 7 Channels<br />
+					0x2b = 128-bit 8 Channels<br />
+					0x2c =
+				</p>
+				<p>
+					40-bit CMYK Alpha<br />
+					0x2d =
+				</p>
+				<p>
+					80-bit CMYK Alpha<br />
+					0x2e = 32-bit 3 Channels Alpha<br />
+					0x2f = 40-bit 4 Channels Alpha<br />
+					0x30 = 48-bit 5 Channels Alpha<br />
+					0x31 = 56-bit 6 Channels Alpha<br />
+					0x32 = 64-bit 7 Channels Alpha<br />
+					0x33 = 72-bit 8 Channels Alpha<br />
+					0x34 = 64-bit 3 Channels Alpha<br />
+					0x35 = 80-bit 4 Channels Alpha<br />
+					0x36 = 96-bit 5 Channels Alpha<br />
+					0x37 = 112-bit 6 Channels Alpha<br />
+					0x38 = 128-bit 7 Channels Alpha<br />
+					0x39 = 144-bit 8 Channels Alpha<br />
+					0x3a =
+				</p>
+				<p>
+					64-bit RGBA Half<br />
+					0x3b =
+				</p>
+				<p>
+					48-bit RGB Half<br />
+					0x3d = 3 2-bit RGBE<br />
+					0x3e =
+				</p>
+				<p>
+					16-bit Gray Half<br />
+					0x3f =
+				</p>
+				<p>32-bit Gray</p>
+				<p>Fixed Point</p>
+				<ul>
+					<li><hr /></li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>0xbc02</td>
+			<td>Tra nsformation</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<h2 id="section-18">–</h2>
+				<p>0 =</p>
+				<p>Horizontal (normal)<br /></p>
+				<p>1 = Mirror vertical<br /></p>
+				<p>2 = Mirror</p>
+				<p>horizontal<br /></p>
+				<p>
+					3 = Rotate 180<br />
+					4 = Rotate 90 CW<br />
+				</p>
+				<p>5 = Mirror</p>
+				<p>horizontal an d rotate 90 CW<br /></p>
+				<p>6 = Mirror</p>
+				<p>horizontal</p>
+				<p>and rotate 270 CW<br /></p>
+				<p>7 = Rotate 270 CW</p>
+				<h2 id="section-19">–</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0xbc03</td>
+			<td>U ncompressed</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = No<br />
+					1 = Yes</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xbc04</td>
+			<td>ImageType</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>Bit 0 = Preview<br />
+					Bit 1 = Page</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xbc80</td>
+			<td>ImageWidth</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbc81</td>
+			<td>ImageHeight</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbc82</td>
+			<td>Widt hResolution</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbc83</td>
+			<td>Heigh tResolution</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbcc0</td>
+			<td>ImageOffset</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbcc1</td>
+			<td>Ima geByteCount</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbcc2</td>
+			<td>AlphaOffset</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbcc3</td>
+			<td>Alp haByteCount</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xbcc4</td>
+			<td>Image DataDiscard</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Full Resolution<br />
+					1 = Flexbits Discarded<br />
+					2 = HighPass Frequency Data Discarded<br />
+					3 = Highpass and LowPass Frequency Data Dis carded</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xbcc5</td>
+			<td>Alpha DataDiscard</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Full Resolution<br />
+					1 = Flexbits Discarded<br />
+					2 = HighPass Frequency Data Discarded<br />
+					3 = Highpass and LowPass Frequency Data Dis carded</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc427</td>
+			<td>Oce ScanjobDesc</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc428</td>
+			<td>OceApplicat ionSelector</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc429</td>
+			<td>OceIDNumber</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc42a</td>
+			<td>Oc eImageLogic</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc44f</td>
+			<td>Annotations</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc4a5</td>
+			<td>PrintIM</td>
+			<td>undef</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="Pr%20intIM.html">PrintIM Tags</a></td>
+		</tr>
+		<tr>
+			<td>0xc519</td>
+			<td>Ha sselbladXML</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; <a href="PLIST.html">PLIST Tags</a></td>
+		</tr>
+		<tr>
+			<td>0xc51b</td>
+			<td>Has selbladExif</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; [EXIF Tags] (EXIF.html)</td>
+		</tr>
+		<tr>
+			<td>0xc573</td>
+			<td>Origi nalFileName</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"><span class="n">(used by some obscure software )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc580</td>
+			<td>US PTOOriginal ContentType</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>0 = Text or Drawing<br />
+					1 = Grayscale<br />
+					2 = Color</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc5e0</td>
+			<td>CR 2CFAPattern</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					>1 =&gt; '0 1 1 2' = [Red, Green][Gr een,Blue]<br />
+					4 =&gt; '1 0 2 1' = [Gree n,Red][Bl ue,Green]<br />
+					3 =&gt; '1 2 0 1' = [Gree n,Blue][R ed,Green]<br />
+					2 =&gt; '2 1 1 0' = [Blue,Gre en][Green ,Red]</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc612</td>
+			<td>DNGVersion</td>
+			<td>int8u[4]!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(tags 0x c612-0xcd48 are defined by the DNG sp ecification unless otherwise noted. See
+						&lt;h ttps://help x.adobe.com /photoshop/ digital-neg ative.html&gt; for the sp
+						ecification )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc613</td>
+			<td>DNGBack wardVersion</td>
+			<td>int8u[4]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc614</td>
+			<td>Unique CameraModel</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc615</td>
+			<td>Localized CameraModel</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc616</td>
+			<td>CF APlaneColor</td>
+			<td>no</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc617</td>
+			<td>CFALayout</td>
+			<td>no</td>
+			<td>SubIFD</td>
+			<td>
+				<span class="s"
+					>1 = R ectangular<br />
+					2 = Even columns offset down 1/2 row<br />
+					3 = Even columns offset up 1/2 row<br />
+					4 = Even rows offset right 1/2 column<br />
+					5 = Even rows offset left 1/2 column<br />
+					6 = Even rows offset up by 1/2 row, even columns offset left by 1/2 column<br />
+					7 = Even rows offset up by 1/2 row, even columns offset right by 1/2 column<br />
+					8 = Even rows offset down by 1/2 row, even columns offset left by 1/2 column<br />
+					9 = Even rows offset down by 1/2 row, even columns offset right by 1/2 column</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc618</td>
+			<td>Lineari zationTable</td>
+			<td>i nt16u[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc619</td>
+			<td>BlackLev elRepeatDim</td>
+			<td>i nt16u[2]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc61a</td>
+			<td>BlackLevel</td>
+			<td>ration al64u[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc61b</td>
+			<td>Black LevelDeltaH</td>
+			<td>ration al64s[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc61c</td>
+			<td>Black LevelDeltaV</td>
+			<td>ration al64s[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc61d</td>
+			<td>WhiteLevel</td>
+			<td>i nt32u[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc61e</td>
+			<td>D efaultScale</td>
+			<td>ration al64u[2]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc61f</td>
+			<td>Defaul tCropOrigin</td>
+			<td>i nt32u[2]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc620</td>
+			<td>Defa ultCropSize</td>
+			<td>i nt32u[2]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc621</td>
+			<td>C olorMatrix1</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc622</td>
+			<td>C olorMatrix2</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc623</td>
+			<td>CameraC alibration1</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc624</td>
+			<td>CameraC alibration2</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc625</td>
+			<td>Reduc tionMatrix1</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc626</td>
+			<td>Reduc tionMatrix2</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc627</td>
+			<td>An alogBalance</td>
+			<td>ration al64u[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc628</td>
+			<td>As ShotNeutral</td>
+			<td>ration al64u[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc629</td>
+			<td>As ShotWhiteXY</td>
+			<td>ration al64u[2]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc62a</td>
+			<td>Basel ineExposure</td>
+			<td>r ational64s!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc62b</td>
+			<td>Ba selineNoise</td>
+			<td>r ational64u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc62c</td>
+			<td>Baseli neSharpness</td>
+			<td>r ational64u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc62d</td>
+			<td>Baye rGreenSplit</td>
+			<td>int32u!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc62e</td>
+			<td>LinearRe sponseLimit</td>
+			<td>r ational64u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc62f</td>
+			<td>CameraS erialNumber</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc630</td>
+			<td>DNGLensInfo</td>
+			<td>ratio nal64u[4]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc631</td>
+			<td>Chrom aBlurRadius</td>
+			<td>r ational64u!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc632</td>
+			<td>AntiAl iasStrength</td>
+			<td>r ational64u!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc633</td>
+			<td>ShadowScale</td>
+			<td>r ational64u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc634</td>
+			<td>
+				SR2Private<br />
+				DN GAdobeData<br />
+				Maker NotePentax<br />
+				MakerN otePentax5<br />
+				MakerNoteR icohPentax<br />
+				MakerN oteDJIInfo<br />
+				DNG PrivateData
+			</td>
+			<td>
+				-<br />
+				undef!<br />
+				-<br />
+				-<br />
+				-<br />
+				-<br />
+				int8u!
+			</td>
+			<td>
+				IFD0<br />
+				IFD0<br />
+				IFD0<br />
+				IFD0<br />
+				IFD0<br />
+				IFD0<br />
+				IFD0
+			</td>
+			<td>
+				--&gt; <a href="Sony.html#S%20R2Private">Sony SR2Private Tags</a><br />
+				--&gt; <a href="DNG.html#%20AdobeData">DNG AdobeData Tags</a><br />
+				--&gt; <a href="Pe%20ntax.html">Pentax Tags</a><br />
+				--&gt; <a href="Pe%20ntax.html">Pentax Tags</a><br />
+				--&gt; <a href="Pe%20ntax.html">Pentax Tags</a><br />
+				--&gt; <a href="DJI%20.html#Info">DJI Info Tags</a>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc635</td>
+			<td>Make rNoteSafety</td>
+			<td>int16u</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Unsafe<br />
+					1 = Safe</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc640</td>
+			<td>RawImageS egmentation</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(used in segmented Canon CR2 images. 3 numbers: 1. Number of segments minus one; 2.
+						Pixel width of segments except last; 3. Pixel width of last segment )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc65a</td>
+			<td>Calibration Illuminant1</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="EXIF.html#L%20ightSource">EXIF LightSource Values</a></td>
+		</tr>
+		<tr>
+			<td>0xc65b</td>
+			<td>Calibration Illuminant2</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="EXIF.html#L%20ightSource">EXIF LightSource Values</a></td>
+		</tr>
+		<tr>
+			<td>0xc65c</td>
+			<td>BestQ ualityScale</td>
+			<td>r ational64u!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc65d</td>
+			<td>RawD ataUniqueID</td>
+			<td>i nt8u[16]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc660</td>
+			<td>AliasLa yerMetadata</td>
+			<td>no</td>
+			<td>-</td>
+			<td>
+				<span class="s"><span class="n">(used by Alias Sketchbook Pro )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc68b</td>
+			<td>Original RawFileName</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc68c</td>
+			<td>Original RawFileData</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td>--&gt; [DNG OriginalRaw Tags] (DNG.html#O riginalRaw)</td>
+		</tr>
+		<tr>
+			<td>0xc68d</td>
+			<td>ActiveArea</td>
+			<td>i nt32u[4]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc68e</td>
+			<td>MaskedAreas</td>
+			<td>i nt32u[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc68f</td>
+			<td>AsSho tICCProfile</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="ICC_Pr%20ofile.html">ICC_Profile T ags</a></td>
+		</tr>
+		<tr>
+			<td>0xc690</td>
+			<td>AsShotPrePr ofileMatrix</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc691</td>
+			<td>Curren tICCProfile</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="ICC_Pr%20ofile.html">ICC_Profile T ags</a></td>
+		</tr>
+		<tr>
+			<td>0xc692</td>
+			<td>C urrentPrePr ofileMatrix</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6bf</td>
+			<td>Colorimetr icReference</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Scen e-referred<br />
+					1 = Outp ut-referred (ICC Profile Dynamic Range)<br />
+					2 = Outp ut-referred (High Dyanmic Range)</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc6c5</td>
+			<td>SRawType</td>
+			<td>no</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6d2</td>
+			<td>Pan asonicTitle</td>
+			<td>undef</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">( proprietary Panasonic tag used for baby/pet name, etc )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc6d3</td>
+			<td>Pana sonicTitle2</td>
+			<td>undef</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>( proprietary Panasonic tag used for baby/pet name with age )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc6f3</td>
+			<td>CameraCal ibrationSig</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6f4</td>
+			<td>ProfileCal ibrationSig</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6f5</td>
+			<td>ProfileIFD</td>
+			<td>-</td>
+			<td>IFD0</td>
+			<td>--&gt; [EXIF Tags] (EXIF.html)</td>
+		</tr>
+		<tr>
+			<td>0xc6f6</td>
+			<td>AsShot ProfileName</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6f7</td>
+			<td>NoiseReduc tionApplied</td>
+			<td>r ational64u!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6f8</td>
+			<td>ProfileName</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6f9</td>
+			<td>ProfileHu eSatMapDims</td>
+			<td>i nt32u[3]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6fa</td>
+			<td>ProfileHue SatMapData1</td>
+			<td>float[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6fb</td>
+			<td>ProfileHue SatMapData2</td>
+			<td>float[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6fc</td>
+			<td>Profi leToneCurve</td>
+			<td>float[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc6fd</td>
+			<td>Profile EmbedPolicy</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Allow Copying<br />
+					1 = Embed if Used<br />
+					2 = Never Embed<br />
+					3 = No Restri ctions</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc6fe</td>
+			<td>Profi leCopyright</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc714</td>
+			<td>For wardMatrix1</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc715</td>
+			<td>For wardMatrix2</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc716</td>
+			<td>PreviewAppl icationName</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc717</td>
+			<td>Pre viewApplica tionVersion</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc718</td>
+			<td>PreviewS ettingsName</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc719</td>
+			<td>PreviewSet tingsDigest</td>
+			<td>int8u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc71a</td>
+			<td>Previe wColorSpace</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Unknown<br />
+					1 = Gray Gamma 2.2<br />
+					2 = sRGB<br />
+					3 = Adobe RGB<br />
+					4 = ProPhoto RGB</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc71b</td>
+			<td>Prev iewDateTime</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc71c</td>
+			<td>Raw ImageDigest</td>
+			<td>i nt8u[16]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc71d</td>
+			<td>OriginalRa wFileDigest</td>
+			<td>i nt8u[16]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc71e</td>
+			<td>SubTi leBlockSize</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc71f</td>
+			<td>RowInter leaveFactor</td>
+			<td>no</td>
+			<td>-</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc725</td>
+			<td>ProfileLo okTableDims</td>
+			<td>i nt32u[3]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc726</td>
+			<td>ProfileLo okTableData</td>
+			<td>float[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc740</td>
+			<td>OpcodeList1</td>
+			<td>undef~!</td>
+			<td>SubIFD</td>
+			<td>
+				<h2 id="section-20">—</h2>
+				<hr />
+				<h2 id="section-21">— ——-</h2>
+				<p>
+					1 = WarpRectil inear<br />
+					  8 = Map Polynomial<br />
+					2 = Warp Fisheye<br />
+					9 = GainMap<br />
+					3 = FixVignet teRadial<br />
+					10 = D eltaPerRow<br />
+				</p>
+				<p>4 =</p>
+				<pre><code>   11 =</code></pre>
+				<p>
+					FixBadPixel sConstant<br />
+					Delt aPerColumn<br />
+					5 = FixBadPix elsList<br />
+					12 = S calePerRow<br />
+				</p>
+				<p>
+					6 = TrimBou nds<br />
+					13 =
+				</p>
+				<p>7 = MapTabl e Scal ePerColumn<br /></p>
+				<pre><code>   14 =
+
+
+
+  WarpR</code></pre>
+				<p>ectilinear2</p>
+				<h2 id="section-22">—</h2>
+				<hr />
+				<h2 id="section-23">— ——-</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc741</td>
+			<td>OpcodeList2</td>
+			<td>undef~!</td>
+			<td>SubIFD</td>
+			<td>
+				<h2 id="section-24">—</h2>
+				<hr />
+				<h2 id="section-25">— ——-</h2>
+				<p>
+					1 = WarpRectil inear<br />
+					  8 = Map Polynomial<br />
+					2 = Warp Fisheye<br />
+					9 = GainMap<br />
+					3 = FixVignet teRadial<br />
+					10 = D eltaPerRow<br />
+				</p>
+				<p>4 =</p>
+				<pre><code>   11 =</code></pre>
+				<p>
+					FixBadPixel sConstant<br />
+					Delt aPerColumn<br />
+					5 = FixBadPix elsList<br />
+					12 = S calePerRow<br />
+				</p>
+				<p>
+					6 = TrimBou nds<br />
+					13 =
+				</p>
+				<p>7 = MapTabl e Scal ePerColumn<br /></p>
+				<pre><code>   14 =
+
+
+
+  WarpR</code></pre>
+				<p>ectilinear2</p>
+				<h2 id="section-26">—</h2>
+				<hr />
+				<h2 id="section-27">— ——-</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc74e</td>
+			<td>OpcodeList3</td>
+			<td>undef~!</td>
+			<td>SubIFD</td>
+			<td>
+				<h2 id="section-28">—</h2>
+				<hr />
+				<h2 id="section-29">— ——-</h2>
+				<p>
+					1 = WarpRectil inear<br />
+					  8 = Map Polynomial<br />
+					2 = Warp Fisheye<br />
+					9 = GainMap<br />
+					3 = FixVignet teRadial<br />
+					10 = D eltaPerRow<br />
+				</p>
+				<p>4 =</p>
+				<pre><code>   11 =</code></pre>
+				<p>
+					FixBadPixel sConstant<br />
+					Delt aPerColumn<br />
+					5 = FixBadPix elsList<br />
+					12 = S calePerRow<br />
+				</p>
+				<p>
+					6 = TrimBou nds<br />
+					13 =
+				</p>
+				<p>7 = MapTabl e Scal ePerColumn<br /></p>
+				<pre><code>   14 =
+
+
+
+  WarpR</code></pre>
+				<p>ectilinear2</p>
+				<h2 id="section-30">—</h2>
+				<hr />
+				<h2 id="section-31">— ——-</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc761</td>
+			<td>N oiseProfile</td>
+			<td>d ouble[n]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc763</td>
+			<td>TimeCodes</td>
+			<td>int8u[n]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc764</td>
+			<td>FrameRate</td>
+			<td>rational64s</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc772</td>
+			<td>TStop</td>
+			<td>ratio nal64u[n]</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc789</td>
+			<td>ReelName</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc791</td>
+			<td>Or iginalDefau ltFinalSize</td>
+			<td>i nt32u[2]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc792</td>
+			<td>O riginalBest QualitySize</td>
+			<td>i nt32u[2]!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(called Origin alBestQuali tyFinalSize by the DNG spec )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc793</td>
+			<td>O riginalDefa ultCropSize</td>
+			<td>ration al64u[2]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7a1</td>
+			<td>CameraLabel</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7a3</td>
+			<td>Pr ofileHueSat MapEncoding</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Linear<br />
+					1 = sRGB</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc7a4</td>
+			<td>Pr ofileLookTa bleEncoding</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Linear<br />
+					1 = sRGB</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc7a5</td>
+			<td>BaselineExp osureOffset</td>
+			<td>r ational64s!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7a6</td>
+			<td>Default BlackRender</td>
+			<td>int32u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Auto<br />
+					1 = None</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc7a7</td>
+			<td>NewRaw ImageDigest</td>
+			<td>i nt8u[16]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7a8</td>
+			<td>RawTo PreviewGain</td>
+			<td>double!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7aa</td>
+			<td>C acheVersion</td>
+			<td>int32u!</td>
+			<td>SubIFD2</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7b5</td>
+			<td>Defa ultUserCrop</td>
+			<td>ration al64u[4]!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7d5</td>
+			<td>N ikonNEFInfo</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; <a href="Nikon.ht%20ml#NEFInfo">Nikon NEFInfo Tag s</a></td>
+		</tr>
+		<tr>
+			<td>0xc7e9</td>
+			<td>DepthFormat</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					><span class="n">(tags 0x c7e9-0xc7ee added by DNG 1.5 .0.0)</span><br />
+					0 = Unknown<br />
+					1 = Linear<br />
+					2 = I nverse</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc7ea</td>
+			<td>DepthNear</td>
+			<td>r ational64u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7eb</td>
+			<td>DepthFar</td>
+			<td>r ational64u!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xc7ec</td>
+			<td>DepthUnits</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Unknown<br />
+					1 = Meters</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc7ed</td>
+			<td>Depth MeasureType</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"
+					>0 = Unknown<br />
+					1 = Optical Axis<br />
+					2 = Optical Ray</span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xc7ee</td>
+			<td>En hanceParams</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd2d</td>
+			<td>ProfileG ainTableMap</td>
+			<td>undef!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd2e</td>
+			<td>S emanticName</td>
+			<td>no</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd30</td>
+			<td>Semanti cInstanceID</td>
+			<td>no</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd31</td>
+			<td>Calibration Illuminant3</td>
+			<td>int16u!</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="EXIF.html#L%20ightSource">EXIF LightSource Values</a></td>
+		</tr>
+		<tr>
+			<td>0xcd32</td>
+			<td>CameraC alibration3</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd33</td>
+			<td>C olorMatrix3</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd34</td>
+			<td>For wardMatrix3</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd35</td>
+			<td>Illu minantData1</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd36</td>
+			<td>Illu minantData2</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd37</td>
+			<td>Illu minantData3</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd38</td>
+			<td>MaskSubArea</td>
+			<td>no</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd39</td>
+			<td>ProfileHue SatMapData3</td>
+			<td>float[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd3a</td>
+			<td>Reduc tionMatrix3</td>
+			<td>ration al64s[n]!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd3f</td>
+			<td>RGBTables</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd40</td>
+			<td>ProfileGa inTableMap2</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd41</td>
+			<td>JUMBF</td>
+			<td>-</td>
+			<td>-</td>
+			<td>--&gt; <a href="Jpe%20g2000.html">Jpeg2000 Tags</a></td>
+		</tr>
+		<tr>
+			<td>0xcd43</td>
+			<td>ColumnInter leaveFactor</td>
+			<td>int32u!</td>
+			<td>SubIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd44</td>
+			<td>ImageS equenceInfo</td>
+			<td>undef</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="DNG.htm%20l#ImageSeq">DNG ImageSeq Ta gs</a></td>
+		</tr>
+		<tr>
+			<td>0xcd46</td>
+			<td>ImageStats</td>
+			<td>undef!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd47</td>
+			<td>ProfileD ynamicRange</td>
+			<td>undef</td>
+			<td>IFD0</td>
+			<td>
+				--&gt; <a href="DNG.htm%20l#ProfileDy%20namicRange">DNG ProfileD ynamicRange Ta gs</a>
+			</td>
+		</tr>
+		<tr>
+			<td>0xcd48</td>
+			<td>Profi leGroupName</td>
+			<td>string!</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd49</td>
+			<td>JXLDistance</td>
+			<td>float</td>
+			<td>IFD0</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xcd4a</td>
+			<td>JXLEffort</td>
+			<td>int32u</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"><span class="n">(values range from 1=low to 9=high )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xcd4b</td>
+			<td>JXL DecodeSpeed</td>
+			<td>int32u</td>
+			<td>IFD0</td>
+			<td>
+				<span class="s"><span class="n">(values range from 1=slow to 4=fast )</span></span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xcea1</td>
+			<td>SEAL</td>
+			<td>string</td>
+			<td>IFD0</td>
+			<td>--&gt; <a href="XMP%20.html#SEAL">XMP SEAL Tags</a></td>
+		</tr>
+		<tr>
+			<td>0xea1c</td>
+			<td>Padding</td>
+			<td>undef!</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xea1d</td>
+			<td>O ffsetSchema</td>
+			<td>int32s!</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n">(M icrosoft's il l-conceived maker note offset difference )</span></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xfde8</td>
+			<td>OwnerName</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td>
+				<span class="s"
+					><span class="n"
+						>(tags 0x fde8-0xfdea and 0x fe4c-0xfe58 are generated by Photoshop Camera RAW. Some
+						names are the same as other EXIF tags, but ExifTool will avoid writing these unless they
+						already exist in the file )</span
+					></span
+				>
+			</td>
+		</tr>
+		<tr>
+			<td>0xfde9</td>
+			<td>S erialNumber</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfdea</td>
+			<td>Lens</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe00</td>
+			<td>KDC_IFD</td>
+			<td>-</td>
+			<td>-</td>
+			<td>
+				--&gt; <a href="Kodak.htm%20l#KDC_IFD">Kodak KDC_IFD Tags</a><br />
+				<span class="n s">(used in some Kodak KDC images)</span>
+			</td>
+		</tr>
+		<tr>
+			<td>0xfe4c</td>
+			<td>RawFile</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe4d</td>
+			<td>Converter</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe4e</td>
+			<td>W hiteBalance</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe51</td>
+			<td>Exposure</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe52</td>
+			<td>Shadows</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe53</td>
+			<td>Brightness</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe54</td>
+			<td>Contrast</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe55</td>
+			<td>Saturation</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe56</td>
+			<td>Sharpness</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe57</td>
+			<td>Smoothness</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>0xfe58</td>
+			<td>MoireFilter</td>
+			<td>string/</td>
+			<td>ExifIFD</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>

@@ -2,7 +2,6 @@ import { base } from '$app/paths';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { imageIdToFileId } from './images';
 import { tables } from './idb.svelte';
-import { BUILTIN_METADATA_IDS } from './builtins';
 
 /**
  * @typedef Keybind
@@ -80,7 +79,12 @@ export const uiState = $state({
 	keybinds: {},
 	get classificationMetadataId() {
 		return (
-			this.currentProtocol?.inference?.classification?.metadata ?? BUILTIN_METADATA_IDS.species
+			tables.Metadata.state.find(
+				(m) =>
+					this.currentProtocol?.metadata.includes(m.id) &&
+					'taxonomic' in m &&
+					m.taxonomic.clade === 'species'
+			)?.id ?? 'species'
 		);
 	},
 	get currentProtocol() {

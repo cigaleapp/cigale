@@ -73,7 +73,7 @@ export function torawpath(path) {
 /**
  *
  * @param {import('./database.js').Protocol} protocol
- * @param {'classification'|'detection'} task
+ * @param { '' } task
  * @param {boolean} webgpu
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
@@ -158,7 +158,10 @@ export async function infer(
 		start = Date.now();
 		if (uiState) uiState.processing.state = 'inference';
 	}
-	const taskSettings = {
+	let taskSettings = task === 'detection' ? protocol.crop?.infer : 
+		tables
+	;
+	taskSettings = {
 		...protocol.inference?.[task],
 		input: {
 			width: TARGETWIDTH,
