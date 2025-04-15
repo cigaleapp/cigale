@@ -10,7 +10,7 @@
 	import IconTaxonomy from '~icons/ph/graph';
 	import IconDelete from '~icons/ph/trash';
 	import IconSource from '~icons/ph/link-simple';
-	import IconBuiltin from '~icons/ph/diamond';
+	import IconForeign from '~icons/ph/diamond';
 	import IconAuthors from '~icons/ph/users';
 	import IconInferred from '~icons/ph/magic-wand';
 	import IconTag from '~icons/ph/tag';
@@ -155,8 +155,8 @@
 							{#if m.id.startsWith(`${id}__`)}
 								{m.id.replace(`${id}__`, '')}
 							{:else}
-								<span use:tooltip={'Métadonnée built-in'}>
-									<IconBuiltin />
+								<span use:tooltip={"Cette métadonnée n'est pas définie par ce protocole"}>
+									<IconForeign />
 								</span>
 								{m.id}
 							{/if}
