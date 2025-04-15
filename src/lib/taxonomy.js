@@ -1,5 +1,4 @@
 import { type } from 'arktype';
-import { toasts } from './toasts.svelte.js';
 
 export const Taxon = type({
 	gbifId: 'number.integer',
@@ -82,6 +81,8 @@ export async function setTaxonAndInferParents({
 }) {
 	const { storeMetadataValue } = await import('./metadata.js');
 	const { tables } = await import('./idb.svelte.js');
+	const { toasts } = await import('./toasts.svelte.js');
+
 	const metadata = await tables.Metadata.get(metadataId);
 	if (!metadata) throw new Error(`Metadata ${metadataId} not found`);
 	if (!('taxonomic' in metadata)) {
