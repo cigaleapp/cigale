@@ -101,8 +101,17 @@
 		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
 		let [firstScore, ...otherScores] = bestScores;
 
-		firstBoundingBox ??= [0, 0, 0.5, 0.5];
-		firstScore ??= 1;
+		if (!firstBoundingBox || !firstScore) {
+			await storeMetadataValue({
+				subjectId: id,
+				metadataId: uiState.currentProtocol.crop?.metadata ?? 'crop',
+				type: 'boundingbox',
+				value: { x: 0, y: 0, w: 0, h: 0 },
+				confidence: 0
+			});
+			return;
+		}
+
 		/**
 		 * @param {[number, number, number, number]} param0
 		 */
@@ -112,7 +121,7 @@
 			await storeMetadataValue({
 				tx,
 				subjectId: id,
-				metadataId: uiState.currentProtocol.crop?.metadata ?? 'crop',
+				metadataId: uiState.currentProtocol?.crop?.metadata ?? 'crop',
 				type: 'boundingbox',
 				value: toCropBox(firstBoundingBox),
 				confidence: firstScore
@@ -172,7 +181,9 @@
 	$effect(() => {
 		uiState.processing.total = tables.Image.state.length + filesToProcess;
 		uiState.processing.total = tables.Image.state.length;
-		uiState.processing.done = tables.Image.state.filter((img) => img.metadata.crop).length;
+		uiState.processing.done = tables.Image.state.filter(
+			(img) => img.metadata[uiState.cropMetadataId]
+		).length;
 	});
 </script>
 

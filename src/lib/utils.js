@@ -1,7 +1,7 @@
 /**
  * @template {string} K
- * @template {string} VIn
- * @template {string} VOut
+ * @template {any} VIn
+ * @template {any} VOut
  * @param {Record<K, VIn>} subject
  * @param {(value: VIn) => VOut} mapper
  * @returns {Record<K, NoInfer<VOut>>}

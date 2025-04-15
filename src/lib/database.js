@@ -2,8 +2,8 @@ import { scope, type } from 'arktype';
 import Handlebars from 'handlebars';
 import { parseISOSafe } from './date.js';
 import { splitFilenameOnExtension } from './download.js';
-import { Clade, CladePlural } from './taxonomy.js';
 import { EXIF_FIELDS } from './exiffields.js';
+import { Clade } from './taxonomy.js';
 import { keys } from './utils.js';
 
 const ID = type(/[\w_]+/);
@@ -359,10 +359,8 @@ const ProtocolWithoutMetadata = type({
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
-		}).describe("Configuration de l'inférence des boîtes englobantes (metadata.crop)")
-	}).describe(
-		"Contrôle l'inférance des boîtes englobantes (metadata.crop) et des espèces (metadata.species) par réseaux neuronaux"
-	),
+		}).describe("Configuration de l'inférence des boîtes englobantes")
+	}).describe('Configuration de la partie recadrage'),
 	exports: type({
 		images: type({
 			cropped: FilepathTemplate.describe('Chemins des images recadrées'),
@@ -410,7 +408,9 @@ export const Schemas = {
 	MetadataValues,
 	MetadataValue,
 	Image,
+	ModelInput,
 	Observation,
+	MetadataInferOptions,
 	MetadataType,
 	MetadataMergeMethod,
 	MetadataEnumVariant,

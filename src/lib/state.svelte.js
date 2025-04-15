@@ -36,6 +36,7 @@ import { tables } from './idb.svelte';
  * @property {Set<string>} loadingImages liste des IDs d'images en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
+ * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
  * @property {string} currentProtocolId ID du protocole choisi
  * @property {import('./database').Protocol | undefined} currentProtocol protocole choisi
  */
@@ -85,6 +86,15 @@ export const uiState = $state({
 					'taxonomic' in m &&
 					m.taxonomic.clade === 'species'
 			)?.id ?? 'species'
+		);
+	},
+	get cropMetadataId() {
+		return (
+			tables.Metadata.state.find(
+				(m) =>
+					this.currentProtocol?.metadata.includes(m.id) &&
+					this.currentProtocol?.crop?.metadata === m.id
+			)?.id ?? 'crop'
 		);
 	},
 	get currentProtocol() {

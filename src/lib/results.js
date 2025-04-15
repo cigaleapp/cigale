@@ -56,7 +56,7 @@ export async function generateResultsZip(
 	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
 
 	/**
-	 * @type {Array<{imageId: string, croppedBytes: Uint8Array, originalBytes?: Uint8Array, contentType: string, filename: string}>}
+	 * @type {Array<{imageId: string, croppedBytes: Uint8Array, originalBytes?: Uint8Array|undefined, contentType: string, filename: string}>}
 	 */
 	let buffersOfImages = [];
 
@@ -71,7 +71,7 @@ export async function generateResultsZip(
 			const image = await db.tables.Image.get(imageId);
 			if (!image) throw 'Image non trouvée';
 			const { contentType, filename } = image;
-			const { cropped, original } = await cropImage(image);
+			const { cropped, original } = await cropImage(protocolUsed, image);
 			buffersOfImages.push({
 				imageId,
 				croppedBytes: addExifMetadata(new Uint8Array(cropped), metadata),
@@ -190,13 +190,14 @@ export async function generateResultsZip(
 }
 
 /**
+ * @param {import('./database').Protocol} protocol protocol used
  * @param {import('./database').Image} image
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
-export async function cropImage(image) {
+export async function cropImage(protocol, image) {
 	const centeredBoundingBox =
 		/** @type {undefined | import("./metadata").RuntimeValue<'boundingbox'>}  */
-		(image.metadata.crop?.value);
+		(image.metadata[protocol.crop?.metadata ?? 'crop']?.value);
 
 	if (!centeredBoundingBox) throw "L'image n'a pas d'information de recadrage";
 

@@ -10,7 +10,7 @@ import { idComparator } from './idb.svelte';
  * @property {string} id
  * @property {number} index
  * @property {number} stacksize
- * @property {number} [loading]
+ * @property {number|undefined} [loading]
  * @property {object[]} [boundingBoxes] - array of bounding boxes
  * @property {number} boundingBoxes.x
  * @property {number} boundingBoxes.y
@@ -53,9 +53,9 @@ export function toAreaObservationProps(
 						stacksize: 1,
 						loading: isLoaded(image) ? undefined : -1,
 						boundingBoxes:
-							showBoundingBoxes(image) && image.metadata.crop?.value
+							showBoundingBoxes(image) && image.metadata[uiState.cropMetadataId]?.value
 								? // @ts-ignore
-									[toTopLeftCoords(image.metadata.crop.value)]
+									[toTopLeftCoords(image.metadata[uiState.cropMetadataId].value)]
 								: []
 					});
 				}),
@@ -74,9 +74,9 @@ export function toAreaObservationProps(
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
 					boundingBoxes:
-						showBoundingBoxes(firstImage) && firstImage?.metadata.crop?.value
+						showBoundingBoxes(firstImage) && firstImage?.metadata[uiState.cropMetadataId]?.value
 							? // @ts-ignore
-								[toTopLeftCoords(firstImage.metadata.crop.value)]
+								[toTopLeftCoords(firstImage.metadata[uiState.cropMetadataId].value)]
 							: [],
 					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
 				};

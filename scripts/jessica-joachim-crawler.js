@@ -106,16 +106,8 @@ const protocol = {
 	],
 	metadata: {
 		[namespaced('kingdom')]: {
-			type: 'enum',
-			options: [cladeEnumOption('Animalia')],
-			label: 'Règne',
-			description: '',
-			required: false,
-			mergeMethod: 'average',
-			taxonomic: {
-				clade: 'kingdom',
-				parent: {}
-			}
+			...cladeMetadata('kingdom', 'Règne', {}),
+			options: [cladeEnumOption('Animalia')]
 		},
 		[namespaced('phylum')]: cladeMetadata('phylum', 'Phylum', taxonomy.phyla),
 		[namespaced('class')]: cladeMetadata('class', 'Classe', taxonomy.classes),
@@ -154,14 +146,11 @@ const protocol = {
 			options: [],
 			taxonomic: {
 				clade: 'species',
-				parent: Object.fromEntries(
-					Object.entries(taxonomy.species).map(([k, v]) => [k.toLowerCase(), v.toLowerCase()])
-				)
+				parent: {}
 			},
 			infer: {
 				neural: {
 					model: 'https://cigaleapp.github.io/models/model_classif.onnx',
-					classmapping: 'https://cigaleapp.github.io/models/class_mapping.txt',
 					metadata: namespaced('species'),
 					input: {
 						height: 224,
@@ -251,14 +240,18 @@ for (const [name, index] of Object.entries(classmapping)) {
 				);
 			}
 		}
-		protocol.metadata[`${protocol.id}__species`].options.push(
-			/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
+		protocol.metadata[namespaced('species')].options.push(
+			/** @satisfies {import('../src/lib/database').MetadataEnumVariant} */ ({
 				key: index.toString(),
 				label: name,
 				description: ''
 			})
 		);
-		protocol.metadata[`${protocol.id}__species`].options.sort(
+
+		protocol.metadata[namespaced('species')].taxonomic.parent[index.toString()] =
+			taxonomy.species[name]?.toLowerCase() ?? '';
+
+		protocol.metadata[namespaced('species')].options.sort(
 			(a, b) => parseFloat(a.key) - parseFloat(b.key)
 		);
 		reportTable.push({
@@ -336,7 +329,7 @@ async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) 
 			});
 		images[0] = imagepath;
 	}
-	protocol.metadata[`${protocol.id}__species`].options.push(
+	protocol.metadata[namespaced('species')].options.push(
 		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
 			key: classmappingIndex.toString(),
 			label: name,
@@ -349,7 +342,9 @@ async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) 
 				: {})
 		})
 	);
-	protocol.metadata[`${protocol.id}__species`].options.sort(
+	protocol.metadata[namespaced('species')].taxonomic.parent[classmappingIndex.toString()] =
+		taxonomy.species[name]?.toLowerCase() ?? '';
+	protocol.metadata[namespaced('species')].options.sort(
 		(a, b) => parseFloat(a.key) - parseFloat(b.key)
 	);
 	done++;

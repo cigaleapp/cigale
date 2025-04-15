@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { toasts } from './toasts.svelte.js';
 
 export const Taxon = type({
 	gbifId: 'number.integer',
@@ -124,6 +125,9 @@ export async function setTaxonAndInferParents({
 
 	const parentKey = metadata.taxonomic.parent[value];
 	if (!parentKey) {
+		toasts.warn(
+			`Impossible d'inférer lea ${parentCladeName} de ${metadata.options?.find((o) => o.key === value)?.label ?? value}`
+		);
 		throw new Error(`parent of ${value} not found in taxonomy`);
 	}
 
