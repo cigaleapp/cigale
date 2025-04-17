@@ -51,7 +51,7 @@ const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:
 console.log({ here });
 
 /** @param {string} id */
-const namespaced = (id) => `io.github.cigaleapp.transects.arthropods__${id}`;
+const namespaced = (id) => `io.github.cigaleapp.arthropods.transects__${id}`;
 
 /** @param {string} clade  */
 const cladeEnumOption = (clade) => ({
@@ -81,7 +81,7 @@ const cladeMetadata = (clade, label, parent) => ({
  */
 const protocol = {
 	$schema: 'https://cigaleapp.github.io/cigale/protocol.schema.json',
-	id: 'io.github.cigaleapp.transects.arthropods',
+	id: 'io.github.cigaleapp.arthropods.transects',
 	name: "Transect d'arthropodes",
 	source: `https://github.com/cigaleapp/cigale/tree/${await execa`git rev-parse HEAD`.then((result) => result.stdout)}/scripts/jessica-joachim-crawler.js#L${getCurrentLine().line}`,
 	description:
