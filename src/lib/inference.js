@@ -22,10 +22,8 @@ les fonctions sont les suivantes :
     - applyBBsOnTensor : applique les bounding boxes sur un tensor
     - applyBBsOnTensors : applique les bounding boxes sur une liste de tensors
     - labelize : renvoie les labels des classes prédites
-    - loadClassMapping : charge le mapping des classes
 
     voici un éxemple de pipeline qui pourrait être utilisée pour effectuer une inférence de détection et de classification :
-        0. loadClassMapping & récupérer les fichiers contenant les images
         1. loadModel pour charger le modèle de détection
         2. infersequentialy pour effectuer l'inférence de détection
             on récupère ainsi : 

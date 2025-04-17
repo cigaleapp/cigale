@@ -270,18 +270,6 @@ export async function preprocess_for_classification(protocol, tensors, mean, std
 
 	return new_ctensors;
 }
-/**
- *
- * @param {string} classmapping
- * @returns {Promise<string[]>}
- */
-export async function loadClassMapping(classmapping) {
-	// charge le fichier de mapping des classes (nom des classes)
-	const response = await fetch(classmapping);
-	const text = await response.text();
-	let classmap = text.split('\n');
-	return classmap;
-}
 
 /**
  *
