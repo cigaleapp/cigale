@@ -34,7 +34,7 @@
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@types/piexifjs": "^1.0.0",
 		"eslint": "^9.24.0",
-		"eslint-config-prettier": "^10.1.1",
+		"eslint-config-prettier": "^10.1.2",
 		"eslint-plugin-svelte": "^3.1.0",
 		"execa": "^9.5.2",
 		"get-current-line": "^7.4.0",
