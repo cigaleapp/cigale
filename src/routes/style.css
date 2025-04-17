@@ -29,7 +29,7 @@ dialog {
 	--dark__fg-success: #6bff6b;
 	--dark__bg-success: #006600;
 	--dark__fg-neutral: #ffffff;
-	--dark__bg2-neutral: #0c0c0c;
+	--dark__bg2-neutral: #0c1527;
 	--dark__bg-neutral: #000000;
 	--dark__gray: color-mix(in srgb, var(--fg-neutral) 35%, var(--bg-neutral));
 	--dark__gay: color-mix(in srgb, var(--fg-neutral) 75%, var(--bg-neutral));
