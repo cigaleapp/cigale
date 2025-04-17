@@ -1,8 +1,6 @@
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { fromEntries, keys } from './utils.js';
-import { BUILTIN_METADATA_IDS, BUILTIN_METADATA } from './builtins.js';
 
 /**
  *
@@ -15,12 +13,10 @@ export function jsonSchemaURL(base) {
 /**
  * Ensures a metadata ID is namespaced to the given protocol ID
  * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
- * Built-in Metadata IDs are never namespaced.
  * @param {string} protocolId
  * @param {string} metadataId
  */
 export function namespacedMetadataId(protocolId, metadataId) {
-	if (metadataId in BUILTIN_METADATA_IDS) return metadataId;
 	metadataId = metadataId.replace(/^.+__/, '');
 	return `${protocolId}__${metadataId}`;
 }
@@ -34,23 +30,14 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
 	return metadataId.startsWith(`${protocolId}__`);
 }
 
+export function removeNamespaceFromMetadataId(metadataId) {
+	return metadataId.replace(/^.+__/, '');
+}
+
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.in
 	.and({
 		metadata: {
-			'[string]': Schemas.MetadataWithoutID.describe('Métadonnée du protocole'),
-			...fromEntries(
-				keys(BUILTIN_METADATA_IDS).map(
-					(id) =>
-						/** @type {const} */ ([
-							`${id}?`,
-							[
-								'"builtin"',
-								'@',
-								`Métadonnée "${BUILTIN_METADATA.find((m) => m.id === id)?.label}" prédéfinie dans l'application: ${BUILTIN_METADATA.find((m) => m.id === id)?.description}`
-							]
-						])
-				)
-			)
+			'[string]': Schemas.MetadataWithoutID.describe('Métadonnée du protocole')
 		}
 	})
 	.pipe((protocol) => ({
@@ -78,13 +65,11 @@ export async function exportProtocol(base, id, format = 'json') {
 
 	downloadProtocol(base, format, {
 		...protocol,
-		metadata: await tables.Metadata.list()
-			.then((defs) => defs.filter((def) => protocol?.metadata.includes(def.id)))
-			.then((defs) =>
-				Object.fromEntries(
-					defs.map(({ id, ...def }) => [id, id in BUILTIN_METADATA_IDS ? 'builtin' : def])
-				)
+		metadata: Object.fromEntries(
+			await tables.Metadata.list().then((defs) =>
+				defs.filter((def) => protocol?.metadata.includes(def.id)).map(({ id, ...def }) => [id, def])
 			)
+		)
 	});
 }
 
@@ -99,6 +84,7 @@ export async function downloadProtocolTemplate(base, format) {
 		name: 'Mon protocole',
 		source: 'https://github.com/moi/mon-protocole',
 		authors: [{ name: 'Prénom Nom', email: 'prenom.nom@example.com' }],
+		description: 'Description de mon protocole',
 		metadata: {
 			'une-metadonnee': {
 				label: 'Une métadonnée',

@@ -2,7 +2,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {number} [progress] - The progress of the loading spinner (between 0 and 1). Leave undefined to show the spinner without progress (infinite).
+	 * @property {number|undefined} [progress] - The progress of the loading spinner (between 0 and 1). Leave undefined to show the spinner without progress (infinite).
 	 */
 
 	/** @type {Props} */

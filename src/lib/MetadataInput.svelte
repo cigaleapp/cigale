@@ -34,7 +34,7 @@
 			options={options.map(({ key, ...rest }) => ({ key: key.toString(), ...rest }))}
 			{confidences}
 			type="single"
-			value={safeJSONParse(value?.toString())?.toString()}
+			value={safeJSONParse(value?.toString())?.toString() ?? value}
 			onValueChange={(newValue) => {
 				if (newValue === undefined) {
 					onblur?.(undefined);

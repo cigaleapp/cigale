@@ -1,4 +1,7 @@
+import { match, type } from 'arktype';
 import * as ort from 'onnxruntime-web';
+import { Schemas } from './database.js';
+import { tables } from './idb.svelte.js';
 import { imload, output2BB, preprocess_for_classification } from './inference_utils.js';
 
 /**
@@ -19,10 +22,8 @@ les fonctions sont les suivantes :
     - applyBBsOnTensor : applique les bounding boxes sur un tensor
     - applyBBsOnTensors : applique les bounding boxes sur une liste de tensors
     - labelize : renvoie les labels des classes prédites
-    - loadClassMapping : charge le mapping des classes
 
     voici un éxemple de pipeline qui pourrait être utilisée pour effectuer une inférence de détection et de classification :
-        0. loadClassMapping & récupérer les fichiers contenant les images
         1. loadModel pour charger le modèle de détection
         2. infersequentialy pour effectuer l'inférence de détection
             on récupère ainsi : 
@@ -70,34 +71,80 @@ export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la c
 export function torawpath(path) {
 	return `https://cigaleapp.github.io/models/${path}`;
 }
+
 /**
  *
  * @param {import('./database.js').Protocol} protocol
- * @param {'classification'|'detection'} task
+ */
+export function classificationInferenceSettings(protocol) {
+	const matcher = match
+		.case(
+			{
+				id: type.string.narrow((id) => protocol.metadata.includes(id)),
+				taxonomic: { clade: '"species"' },
+				infer: {
+					neural: {
+						model: Schemas.Request,
+						input: Schemas.ModelInput,
+						'output?': type({
+							'name?': 'string'
+						})
+					}
+				}
+			},
+			(m) => m.infer.neural
+		)
+		.default(() => undefined);
+
+	return tables.Metadata.state
+		.map((m) => matcher(m))
+		.filter(Boolean)
+		.at(0);
+}
+
+/**
+ *
+ * @param {import('./database.js').Protocol} protocol
+ * @param { 'classification'|'detection' } task
  * @param {boolean} webgpu
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
 export async function loadModel(protocol, task, webgpu = false) {
 	// load un modèle ONNX, soit de classification, soit de détection.
 
-	let modelUrl = torawpath(task === 'classification' ? MODELCLASSIFPATH : MODELDETECTPATH);
+	let modelUrl = '';
 
-	if (task === 'classification' && protocol.inference?.classification.model) {
-		if (typeof protocol.inference.classification.model !== 'string')
-			throw new Error(
-				'More advanced model loading not implemented yet, use a URL with a simple GET request'
-			);
-
-		modelUrl = protocol.inference.classification.model;
+	if (task === 'detection') {
+		switch (typeof protocol.crop?.infer.model) {
+			case 'string': {
+				modelUrl = protocol.crop.infer.model;
+				break;
+			}
+			case 'object': {
+				throw 'Les requetes ne sont pas encore supportées pour le modèle de détection, utilisez une URL';
+			}
+			default: {
+				throw "Le modèle de détection n'est pas spécifié";
+			}
+		}
+	} else {
+		const settings = classificationInferenceSettings(protocol);
+		switch (typeof settings?.model) {
+			case 'string': {
+				modelUrl = settings.model;
+				break;
+			}
+			case 'object': {
+				throw 'Les requetes ne sont pas encore supportées pour le modèle de détection, utilisez une URL';
+			}
+			default: {
+				throw "Le modèle de détection n'est pas spécifié";
+			}
+		}
 	}
 
-	if (task === 'detection' && protocol.inference?.detection.model) {
-		if (typeof protocol.inference.detection.model !== 'string')
-			throw new Error(
-				'More advanced model loading not implemented yet, use a URL with a simple GET request'
-			);
-
-		modelUrl = protocol.inference.detection.model;
+	if (!modelUrl) {
+		throw new Error('Model not found');
 	}
 
 	return ort.InferenceSession.create(modelUrl, {
@@ -158,17 +205,20 @@ export async function infer(
 		start = Date.now();
 		if (uiState) uiState.processing.state = 'inference';
 	}
-	const taskSettings = {
-		...protocol.inference?.[task],
+	let taskSettings =
+		task === 'detection' ? protocol.crop?.infer : classificationInferenceSettings(protocol);
+
+	taskSettings = {
+		...taskSettings,
 		input: {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT,
 			name: model.inputNames[0],
-			...protocol.inference?.[task]?.input
+			...taskSettings?.input
 		},
 		output: {
 			name: 'output0',
-			...protocol.inference?.[task]?.output
+			...taskSettings?.output
 		}
 	};
 	let inputTensor;

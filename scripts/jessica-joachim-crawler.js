@@ -5,6 +5,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import Turndown from 'turndown';
 import getCurrentLine from 'get-current-line';
+import { default as taxonomy } from '../static/taxonomy.json' with { type: 'json' };
+import { writeFileSync } from 'node:fs';
 
 // ANSI control sequences
 const cc = {
@@ -45,18 +47,34 @@ const classmapping = await fetch('https://cigaleapp.github.io/models/class_mappi
 		)
 	);
 
-// Check if wget is installed
-await execa`wget --version`.catch((error) => {
-	if (error) {
-		console.error('wget is not installed. Please install wget to use this script.');
-		process.exit(1);
-	}
-});
-
-const here = path.dirname(new URL(import.meta.url).pathname);
+const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:/');
+console.log({ here });
 
 /** @param {string} id */
 const namespaced = (id) => `io.github.cigaleapp.transects.arthropods__${id}`;
+
+/** @param {string} clade  */
+const cladeEnumOption = (clade) => ({
+	key: clade.toLowerCase(),
+	label: clade,
+	learnMore: `https://en.wikipedia.org/wiki/${clade.replaceAll(' ', '_')}`,
+	description: ''
+});
+
+const cladeMetadata = (clade, label, parent) => ({
+	type: 'enum',
+	options: Object.keys(parent).map(cladeEnumOption),
+	label,
+	required: false,
+	description: '',
+	mergeMethod: 'average',
+	taxonomic: {
+		clade,
+		parent: Object.fromEntries(
+			Object.entries(parent).map(([k, v]) => [k.toLowerCase(), v.toLowerCase()])
+		)
+	}
+});
 
 /**
  * @type {typeof import('../src/lib/protocols').ExportedProtocol.inferIn}
@@ -76,60 +94,77 @@ const protocol = {
 	],
 	metadataOrder: [
 		namespaced('species'),
-		'genus',
-		'family',
-		'order',
-		'shoot_date',
-		'shoot_location',
-		'class',
-		'phylum',
-		'kingdom',
-		'crop'
+		namespaced('genus'),
+		namespaced('family'),
+		namespaced('order'),
+		namespaced('shoot_date'),
+		namespaced('shoot_location'),
+		namespaced('class'),
+		namespaced('phylum'),
+		namespaced('kingdom'),
+		namespaced('crop')
 	],
 	metadata: {
-		kingdom: 'builtin',
-		phylum: 'builtin',
-		class: 'builtin',
-		order: 'builtin',
-		family: 'builtin',
-		genus: 'builtin',
-		shoot_date: 'builtin',
-		shoot_location: 'builtin',
-		crop: 'builtin',
+		[namespaced('kingdom')]: {
+			...cladeMetadata('kingdom', 'Règne', {}),
+			options: [cladeEnumOption('Animalia')]
+		},
+		[namespaced('phylum')]: cladeMetadata('phylum', 'Phylum', taxonomy.phyla),
+		[namespaced('class')]: cladeMetadata('class', 'Classe', taxonomy.classes),
+		[namespaced('order')]: cladeMetadata('order', 'Ordre', taxonomy.orders),
+		[namespaced('family')]: cladeMetadata('family', 'Famille', taxonomy.families),
+		[namespaced('genus')]: cladeMetadata('genus', 'Genre', taxonomy.genera),
+		[namespaced('shoot_date')]: {
+			type: 'date',
+			label: 'Date',
+			description: 'Moment où la photo a été prise',
+			required: false,
+			mergeMethod: 'average',
+			infer: { exif: 'DateTimeOriginal' }
+		},
+		[namespaced('shoot_location')]: {
+			type: 'location',
+			label: 'Localisation',
+			description: 'Endroit où la photo a été prise',
+			required: false,
+			mergeMethod: 'average',
+			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }
+		},
+		[namespaced('crop')]: {
+			type: 'boundingbox',
+			label: '',
+			description: '',
+			required: true,
+			mergeMethod: 'average'
+		},
 		[namespaced('species')]: {
 			type: 'enum',
 			label: 'Espèce',
 			description: '',
 			required: true,
 			mergeMethod: 'max',
-			options: []
-		}
-	},
-	inference: {
-		classification: {
-			model: 'https://cigaleapp.github.io/models/model_classif.onnx',
-			classmapping: 'https://cigaleapp.github.io/models/class_mapping.txt',
-			metadata: namespaced('species'),
+			options: [],
 			taxonomic: {
 				clade: 'species',
-				taxonomy: 'https://cigaleapp.github.io/cigale/taxonomy.json',
-				targets: {
-					kingdom: 'kingdom',
-					phylum: 'phylum',
-					class: 'class',
-					order: 'order',
-					family: 'family',
-					genus: 'genus'
-				}
+				parent: {}
 			},
-			input: {
-				height: 224,
-				width: 224,
-				disposition: 'CHW',
-				normalized: true
+			infer: {
+				neural: {
+					model: 'https://cigaleapp.github.io/models/model_classif.onnx',
+					metadata: namespaced('species'),
+					input: {
+						height: 224,
+						width: 224,
+						disposition: 'CHW',
+						normalized: true
+					}
+				}
 			}
-		},
-		detection: {
+		}
+	},
+	crop: {
+		metadata: namespaced('crop'),
+		infer: {
 			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
 			input: {
 				height: 640,
@@ -141,18 +176,18 @@ const protocol = {
 				normalized: true,
 				shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
 			}
+		}
+	},
+	exports: {
+		images: {
+			cropped:
+				'Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}',
+			original:
+				'Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}'
 		},
-		exports: {
-			images: {
-				cropped:
-					'Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}',
-				original:
-					'Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}'
-			},
-			metadata: {
-				json: 'analysis.json',
-				csv: 'metadata.csv'
-			}
+		metadata: {
+			json: 'analysis.json',
+			csv: 'metadata.csv'
 		}
 	}
 };
@@ -205,14 +240,18 @@ for (const [name, index] of Object.entries(classmapping)) {
 				);
 			}
 		}
-		protocol.metadata[`${protocol.id}__species`].options.push(
-			/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
+		protocol.metadata[namespaced('species')].options.push(
+			/** @satisfies {import('../src/lib/database').MetadataEnumVariant} */ ({
 				key: index.toString(),
 				label: name,
 				description: ''
 			})
 		);
-		protocol.metadata[`${protocol.id}__species`].options.sort(
+
+		protocol.metadata[namespaced('species')].taxonomic.parent[index.toString()] =
+			taxonomy.species[name]?.toLowerCase() ?? '';
+
+		protocol.metadata[namespaced('species')].options.sort(
 			(a, b) => parseFloat(a.key) - parseFloat(b.key)
 		);
 		reportTable.push({
@@ -282,10 +321,15 @@ async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) 
 		const image = images[0];
 		imagepath = path.join(here, '../examples/arthropods.cigaleprotocol.images', `${name}.jpeg`);
 		await mkdir(path.dirname(imagepath), { recursive: true });
-		await execa`wget -O ${imagepath} ${image}`;
+		// await execa`wget -O ${imagepath} ${image}`;
+		await fetch(image)
+			.then((r) => r.arrayBuffer())
+			.then((buf) => {
+				writeFileSync(imagepath, Buffer.from(buf));
+			});
 		images[0] = imagepath;
 	}
-	protocol.metadata[`${protocol.id}__species`].options.push(
+	protocol.metadata[namespaced('species')].options.push(
 		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
 			key: classmappingIndex.toString(),
 			label: name,
@@ -298,7 +342,9 @@ async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) 
 				: {})
 		})
 	);
-	protocol.metadata[`${protocol.id}__species`].options.sort(
+	protocol.metadata[namespaced('species')].taxonomic.parent[classmappingIndex.toString()] =
+		taxonomy.species[name]?.toLowerCase() ?? '';
+	protocol.metadata[namespaced('species')].options.sort(
 		(a, b) => parseFloat(a.key) - parseFloat(b.key)
 	);
 	done++;

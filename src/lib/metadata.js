@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { Schemas } from './database.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
 import { format } from 'date-fns';
+import { mapValues } from './utils.js';
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
  */
@@ -231,7 +232,7 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
  */
 export async function mergeMetadataValues(values) {
 	if (values.length === 1) {
-		return Object.fromEntries(Object.entries(values[0]).map((v) => ({ ...v, merged: false })));
+		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
 
 	/** @type {Record<string, import('./database').MetadataValue & { merged: boolean }>}  */
@@ -600,3 +601,10 @@ export function metadataDefinitionComparator(protocol) {
  * @template Undefinable
  * @typedef{ Undefinable extends true ? T | undefined : T } Maybe
  */
+
+/**
+ * @param {string} id
+ */
+export function metadataById(id) {
+	return tables.Metadata.state.find((m) => m.id === id);
+}

@@ -1,7 +1,9 @@
+import { match } from 'arktype';
+
 /**
  * @template {string} K
- * @template {string} VIn
- * @template {string} VOut
+ * @template {any} VIn
+ * @template {any} VOut
  * @param {Record<K, VIn>} subject
  * @param {(value: VIn) => VOut} mapper
  * @returns {Record<K, NoInfer<VOut>>}
@@ -13,7 +15,7 @@ export function mapValues(subject, mapper) {
 
 /**
  * @template {string} K
- * @param {Record<K, string>} subject
+ * @param {Record<K, unknown>} subject
  * @returns {K[]}
  */
 export function keys(subject) {
@@ -120,4 +122,8 @@ export function safeJSONParse(str) {
 	} catch {
 		return undefined;
 	}
+}
+
+export function matches(subject, pattern) {
+	return match.case(pattern, () => true).default(() => false)(subject);
 }

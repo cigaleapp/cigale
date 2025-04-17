@@ -1,0 +1,744 @@
+Tag ID	Tag Name
+0x0001	Int eropIndex
+0x0002	Int eropVersion
+0x000b	Process ingSoftware
+0x00fe	SubfileType
+0x00ff	Old SubfileType
+0x0100	I mageWidth
+0x0101	Im ageHeight
+0x0102	Bits PerSample
+0x0103	Co mpression
+0x0106	Photo metricInter pretation
+0x0107	T hresholding
+0x0108	CellWidth
+0x0109	CellLength
+0x010a	FillOrder
+0x010d	D ocumentName
+0x010e	ImageDe scription
+0x010f	Make
+0x0110	Model
+0x0111	"[Stri pOffsets]{. underline}
+ 				Other ImageStart
+ 				Previ ewJXLStart
+ 				St ripOffsets
+ 				Preview ImageStart
+ 				Preview ImageStart
+ 				JpgF romRawStart"
+0x0112	Or ientation
+0x0115	Sample sPerPixel
+0x0116	Row sPerStrip
+0x0117	"[StripBy teCounts]{. underline}
+ 				OtherI mageLength
+ 				Previe wJXLLength
+ 				Strip ByteCounts
+ 				PreviewI mageLength
+ 				PreviewI mageLength
+ 				JpgFr omRawLength"
+0x0118	Min SampleValue
+0x0119	Max SampleValue
+0x011a	XR esolution
+0x011b	YR esolution
+0x011c	PlanarConf iguration
+0x011d	PageName
+0x011e	XPosition
+0x011f	YPosition
+0x0120	FreeOffsets
+0x0121	Fre eByteCounts
+0x0122	GrayR esponseUnit
+0x0123	GrayRe sponseCurve
+0x0124	T4Options
+0x0125	T6Options
+0x0128	Resol utionUnit
+0x0129	PageNumber
+0x012c	ColorR esponseUnit
+0x012d	Transfe rFunction
+0x0131	Software
+0x0132	M odifyDate
+0x013b	Artist
+0x013c	H ostComputer
+0x013d	Predictor
+0x013e	W hitePoint
+0x013f	P rimaryChrom aticities
+0x0140	ColorMap
+0x0141	Ha lftoneHints
+0x0142	TileWidth
+0x0143	TileLength
+0x0144	TileOffsets
+0x0145	Til eByteCounts
+0x0146	BadFaxLines
+0x0147	C leanFaxData
+0x0148	Consecutive BadFaxLines
+0x014a	"SubIFD
+ 				A10 0DataOffset"
+0x014c	InkSet
+0x014d	InkNames
+0x014e	N umberofInks
+0x0150	DotRange
+0x0151	Ta rgetPrinter
+0x0152	E xtraSamples
+0x0153	S ampleFormat
+0x0154	SMin SampleValue
+0x0155	SMax SampleValue
+0x0156	Tr ansferRange
+0x0157	ClipPath
+0x0158	XCl ipPathUnits
+0x0159	YCl ipPathUnits
+0x015a	Indexed
+0x015b	JPEGTables
+0x015f	OPIProxy
+0x0190	GlobalPa rametersIFD
+0x0191	ProfileType
+0x0192	FaxProfile
+0x0193	Co dingMethods
+0x0194	VersionYear
+0x0195	ModeNumber
+0x01b1	Decode
+0x01b2	Defaul tImageColor
+0x01b3	T82Options
+0x01b5	JPEGTables
+0x0200	JPEGProc
+0x0201	"[Thumbna ilOffset]{. underline}
+ 				Thumb nailOffset
+ 				Thumb nailOffset
+ 				Preview ImageStart
+ 				Preview ImageStart
+ 				JpgFr omRawStart
+ 				JpgFr omRawStart
+ 				Other ImageStart
+ 				Other ImageStart
+ 				Othe rImageStart"
+0x0202	"[Thumbna ilLength]{. underline}
+ 				Thumb nailLength
+ 				Thumb nailLength
+ 				PreviewI mageLength
+ 				PreviewI mageLength
+ 				JpgFro mRawLength
+ 				JpgFro mRawLength
+ 				OtherI mageLength
+ 				OtherI mageLength
+ 				Other ImageLength"
+0x0203	JPEGRest artInterval
+0x0205	JPEGLossles sPredictors
+0x0206	JPEGPoin tTransforms
+0x0207	JPEGQTables
+0x0208	J PEGDCTables
+0x0209	J PEGACTables
+0x0211	YCbCrCoe fficients
+0x0212	YCbCrSu bSampling
+0x0213	YCbCrPo sitioning
+0x0214	ReferenceB lackWhite
+0x022f	Str ipRowCounts
+0x02bc	Appli cationNotes
+0x0303	Rend eringIntent
+0x03e7	USPTOMi scellaneous
+0x1000	RelatedImag eFileFormat
+0x1001	Relate dImageWidth
+0x1002	Related ImageHeight
+0x4746	Rating
+0x4747	XP_DIP_XML
+0x4748	StitchInfo
+0x4749	Ra tingPercent
+0x5001	Reso lutionXUnit
+0x5002	Reso lutionYUnit
+0x5003	Resolution XLengthUnit
+0x5004	Resolution YLengthUnit
+0x5005	PrintFlags
+0x5006	PrintF lagsVersion
+0x5007	Pri ntFlagsCrop
+0x5008	PrintFlag sBleedWidth
+0x5009	Pri ntFlagsBlee dWidthScale
+0x500a	HalftoneLPI
+0x500b	Half toneLPIUnit
+0x500c	Hal ftoneDegree
+0x500d	Ha lftoneShape
+0x500e	H alftoneMisc
+0x500f	Hal ftoneScreen
+0x5010	JPEGQuality
+0x5011	GridSize
+0x5012	Thum bnailFormat
+0x5013	Thu mbnailWidth
+0x5014	Thum bnailHeight
+0x5015	Thumbnai lColorDepth
+0x5016	Thum bnailPlanes
+0x5017	Thumbn ailRawBytes
+0x5018	Thum bnailLength
+0x5019	T humbnailCom pressedSize
+0x501a	ColorTrans ferFunction
+0x501b	Th umbnailData
+0x5020	Thumbnai lImageWidth
+0x5021	Thumbnail ImageHeight
+0x5022	ThumbnailBi tsPerSample
+0x5023	Thumbnail Compression
+0x5024	Thum bnailPhotom etricInterp
+0x5025	Thumbnail Description
+0x5026	Thumbna ilEquipMake
+0x5027	Thumbnai lEquipModel
+0x5028	ThumbnailS tripOffsets
+0x5029	Thumbnail Orientation
+0x502a	Th umbnailSamp lesPerPixel
+0x502b	ThumbnailR owsPerStrip
+0x502c	Th umbnailStri pByteCounts
+0x502d	Thumbnail ResolutionX
+0x502e	Thumbnail ResolutionY
+0x502f	ThumbnailP lanarConfig
+0x5030	T humbnailRes olutionUnit
+0x5031	Thu mbnailTrans ferFunction
+0x5032	Thumbn ailSoftware
+0x5033	Thumbn ailDateTime
+0x5034	Thum bnailArtist
+0x5035	Thumbnai lWhitePoint
+0x5036	Thumbnai lPrimaryChr omaticities
+0x5037	Thum bnailYCbCrC oefficients
+0x5038	Thu mbnailYCbCr Subsampling
+0x5039	Thu mbnailYCbCr Positioning
+0x503a	ThumbnailRe fBlackWhite
+0x503b	Thumbna ilCopyright
+0x5090	Lum inanceTable
+0x5091	Chrom inanceTable
+0x5100	FrameDelay
+0x5101	LoopCount
+0x5102	Gl obalPalette
+0x5103	Inde xBackground
+0x5104	Index Transparent
+0x5110	PixelUnits
+0x5111	Pix elsPerUnitX
+0x5112	Pix elsPerUnitY
+0x5113	Palet teHistogram
+0x7000	Sony RawFileType
+0x7010	So nyToneCurve
+0x7031	Vignettin gCorrection
+0x7032	Vignettin gCorrParams
+0x7034	Chromat icAberratio nCorrection
+0x7035	Chromat icAberratio nCorrParams
+0x7036	Distortio nCorrection
+0x7037	Distortio nCorrParams
+0x7038	SonyR awImageSize
+0x7310	BlackLevel
+0x7313	WB _RGGBLevels
+0x74c7	Sony CropTopLeft
+0x74c8	S onyCropSize
+0x800d	ImageID
+0x80a3	WangTag1
+0x80a4	Wan gAnnotation
+0x80a5	WangTag3
+0x80a6	WangTag4
+0x80b9	ImageRefe rencePoints
+0x80ba	RegionXfo rmTackPoint
+0x80bb	WarpQu adrilateral
+0x80bc	AffineT ransformMat
+0x80e3	Matteing
+0x80e4	DataType
+0x80e5	ImageDepth
+0x80e6	TileDepth
+0x8214	Ima geFullWidth
+0x8215	Imag eFullHeight
+0x8216	Te xtureFormat
+0x8217	WrapModes
+0x8218	FovCot
+0x8219	MatrixWo rldToScreen
+0x821a	MatrixWo rldToCamera
+0x827d	Model2
+0x828d	CFARepea tPatternDim
+0x828e	CFAPattern2
+0x828f	B atteryLevel
+0x8290	KodakIFD
+0x8298	Copyright
+0x829a	Exp osureTime
+0x829d	FNumber
+0x82a5	MDFileTag
+0x82a6	M DScalePixel
+0x82a7	M DColorTable
+0x82a8	MDLabName
+0x82a9	M DSampleInfo
+0x82aa	MDPrepDate
+0x82ab	MDPrepTime
+0x82ac	MDFileUnits
+0x830e	PixelScale
+0x8335	AdventScale
+0x8336	Adv entRevision
+0x835c	UIC1Tag
+0x835d	UIC2Tag
+0x835e	UIC3Tag
+0x835f	UIC4Tag
+0x83bb	IPTC-NAA
+0x847e	Intergrap hPacketData
+0x847f	I ntergraphFl agRegisters
+0x8480	Inter graphMatrix
+0x8481	I NGRReserved
+0x8482	Mo delTiePoint
+0x84e0	Site
+0x84e1	Co lorSequence
+0x84e2	IT8Header
+0x84e3	Ra sterPadding
+0x84e4	BitsP erRunLength
+0x84e5	Bi tsPerExtend edRunLength
+0x84e6	ColorTable
+0x84e7	ImageCol orIndicator
+0x84e8	Ba ckgroundCol orIndicator
+0x84e9	Imag eColorValue
+0x84ea	Backgroun dColorValue
+0x84eb	PixelInt ensityRange
+0x84ec	Transparen cyIndicator
+0x84ed	ColorChara cterization
+0x84ee	HCUsage
+0x84ef	Tr apIndicator
+0x84f0	CMY KEquivalent
+0x8546	SEMInfo
+0x8568	AFCP_IPTC
+0x85b8	PixelMagic JBIGOptions
+0x85d7	JPLCartoIFD
+0x85d8	Mod elTransform
+0x8602	WB _GRGBLevels
+0x8606	LeafData
+0x8649	Photos hopSettings
+0x8769	E xifOffset
+0x8773	ICC_Profile
+0x877f	TIFF_F XExtensions
+0x8780	Mu ltiProfiles
+0x8781	SharedData
+0x8782	T88Options
+0x87ac	ImageLayer
+0x87af	GeoTi ffDirectory
+0x87b0	GeoTiffD oubleParams
+0x87b1	GeoTiff AsciiParams
+0x87be	JBIGOptions
+0x8822	Exposu reProgram
+0x8824	SpectralSe nsitivity
+0x8825	GPSInfo
+0x8827	ISO
+0x8828	Opt o-ElectricC onvFactor
+0x8829	Interlace
+0x882a	Tim eZoneOffset
+0x882b	Se lfTimerMode
+0x8830	Sensit ivityType
+0x8831	Stand ardOutputSe nsitivity
+0x8832	Reco mmendedExpo sureIndex
+0x8833	ISOSpeed
+0x8834	ISOSpeedLa titudeyyy
+0x8835	ISOSpeedLa titudezzz
+0x885c	Fa xRecvParams
+0x885d	Fa xSubAddress
+0x885e	FaxRecvTime
+0x8871	FedexEDR
+0x888a	LeafSubIFD
+0x9000	Ex ifVersion
+0x9003	DateTim eOriginal
+0x9004	C reateDate
+0x9009	GooglePlu sUploadCode
+0x9010	O ffsetTime
+0x9011	OffsetTim eOriginal
+0x9012	OffsetTime Digitized
+0x9101	Com ponentsConf iguration
+	—-
+	0 =
+	
+	-\
+	
+	1 =
+	
+	Y\
+	
+	2 =
+	
+	C
+b\	
+0x9102	Co mpressedBit sPerPixel
+0x9201	ShutterS peedValue
+0x9202	Aper tureValue
+0x9203	Bright nessValue
+0x9204	ExposureCom pensation
+0x9205	MaxAper tureValue
+0x9206	Subjec tDistance
+0x9207	Met eringMode
+0x9208	Li ghtSource
+0x9209	Flash
+0x920a	Fo calLength
+0x920b	FlashEnergy
+0x920c	Sp atialFreque ncyResponse
+0x920d	Noise
+0x920e	FocalPlane XResolution
+0x920f	FocalPlane YResolution
+0x9210	Fo calPlaneRes olutionUnit
+0x9211	ImageNumber
+0x9212	SecurityCla ssification
+0x9213	I mageHistory
+0x9214	Su bjectArea
+0x9215	Ex posureIndex
+0x9216	TIFF-E PStandardID
+0x9217	Se nsingMethod
+0x923a	C IP3DataFile
+0x923b	CIP3Sheet
+0x923c	CIP3Side
+0x923f	StoNits
+0x927c	"Make rNoteApple
+ 				Make rNoteNikon
+ 				Make rNoteCanon
+ 				Make rNoteCasio
+ 				Maker NoteCasio2
+ 				MakerN oteDJIInfo
+ 				Ma kerNoteDJI
+ 				Mak erNoteFLIR
+ 				MakerNo teFujiFilm
+ 				M akerNoteGE
+ 				Ma kerNoteGE2
+ 				MakerNote Hasselblad
+ 				M akerNoteHP
+ 				Ma kerNoteHP2
+ 				Ma kerNoteHP4
+ 				Ma kerNoteHP6
+ 				Ma kerNoteISL
+ 				Ma kerNoteJVC
+ 				MakerN oteJVCText
+ 				MakerN oteKodak1a
+ 				MakerN oteKodak1b
+ 				Maker NoteKodak2
+ 				Maker NoteKodak3
+ 				Maker NoteKodak4
+ 				Maker NoteKodak5
+ 				MakerN oteKodak6a
+ 				MakerN oteKodak6b
+ 				Maker NoteKodak7
+ 				MakerN oteKodak8a
+ 				MakerN oteKodak8b
+ 				MakerN oteKodak8c
+ 				Maker NoteKodak9
+ 				MakerN oteKodak10
+ 				MakerN oteKodak11
+ 				MakerN oteKodak12
+ 				MakerNoteKo dakUnknown
+ 				MakerN oteKyocera
+ 				MakerN oteMinolta
+ 				MakerNo teMinolta2
+ 				MakerNo teMinolta3
+ 				MakerNo teMotorola
+ 				Maker NoteNikon2
+ 				Maker NoteNikon3
+ 				MakerNo teNintendo
+ 				MakerN oteOlympus
+ 				MakerNo teOlympus2
+ 				MakerNo teOlympus3
+ 				Make rNoteLeica
+ 				Maker NoteLeica2
+ 				Maker NoteLeica3
+ 				Maker NoteLeica4
+ 				Maker NoteLeica5
+ 				Maker NoteLeica6
+ 				Maker NoteLeica7
+ 				Maker NoteLeica8
+ 				Maker NoteLeica9
+ 				MakerN oteLeica10
+ 				MakerNot ePanasonic
+ 				MakerNote Panasonic2
+ 				MakerNote Panasonic3
+ 				Maker NotePentax
+ 				MakerN otePentax2
+ 				MakerN otePentax3
+ 				MakerN otePentax4
+ 				MakerN otePentax5
+ 				MakerN otePentax6
+ 				MakerNo tePhaseOne
+ 				MakerN oteReconyx
+ 				MakerNo teReconyx2
+ 				MakerNo teReconyx3
+ 				MakerNoteR icohPentax
+ 				Make rNoteRicoh
+ 				Maker NoteRicoh2
+ 				MakerNot eRicohText
+ 				MakerNot eSamsung1a
+ 				MakerNot eSamsung1b
+ 				MakerNo teSamsung2
+ 				Make rNoteSanyo
+ 				MakerN oteSanyoC4
+ 				MakerNote SanyoPatch
+ 				Make rNoteSigma
+ 				Mak erNoteSony
+ 				Make rNoteSony2
+ 				Make rNoteSony3
+ 				Make rNoteSony4
+ 				Make rNoteSony5
+ 				MakerNoteSo nyEricsson
+ 				MakerN oteSonySRF
+ 				MakerNoteU nknownText
+ 				M akerNoteUnk nownBinary
+ 				MakerNo teUnknown"
+0x9286	Us erComment
+0x9290	S ubSecTime
+0x9291	SubSecTim eOriginal
+0x9292	SubSecTime Digitized
+0x932f	MSD ocumentText
+0x9330	MSPropert ySetStorage
+0x9331	MSDocumentT extPosition
+0x935c	Imag eSourceData
+0x9400	AmbientTe mperature
+0x9401	Humidity
+0x9402	Pressure
+0x9403	W aterDepth
+0x9404	Acc eleration
+0x9405	CameraEleva tionAngle
+0x9999	Xia omiSettings
+0x9a00	XiaomiModel
+0x9c9b	XPTitle
+0x9c9c	XPComment
+0x9c9d	XPAuthor
+0x9c9e	XPKeywords
+0x9c9f	XPSubject
+0xa000	Flashp ixVersion
+0xa001	C olorSpace
+0xa002	ExifI mageWidth
+0xa003	ExifIm ageHeight
+0xa004	Related SoundFile
+0xa005	Inte ropOffset
+0xa010	Sa msungRawPoi ntersOffset
+0xa011	Sa msungRawPoi ntersLength
+0xa101	SamsungR awByteOrder
+0xa102	Samsung RawUnknown?
+0xa20b	Fl ashEnergy
+0xa20c	Spat ialFrequenc yResponse
+0xa20d	Noise
+0xa20e	F ocalPlaneXR esolution
+0xa20f	F ocalPlaneYR esolution
+0xa210	Foca lPlaneResol utionUnit
+0xa211	ImageNumber
+0xa212	SecurityCla ssification
+0xa213	I mageHistory
+0xa214	Subjec tLocation
+0xa215	Expo sureIndex
+0xa216	TIFF-E PStandardID
+0xa217	Sens ingMethod
+0xa300	F ileSource
+0xa301	SceneType
+0xa302	C FAPattern
+0xa401	Custo mRendered
+0xa402	Exp osureMode
+0xa403	Whi teBalance
+0xa404	Digital ZoomRatio
+0xa405	Foc alLengthIn3 5mmFormat
+0xa406	SceneCa ptureType
+0xa407	Ga inControl
+0xa408	Contrast
+0xa409	S aturation
+0xa40a	Sharpness
+0xa40b	Devi ceSettingDe scription
+0xa40c	SubjectDist anceRange
+0xa420	Imag eUniqueID
+0xa430	OwnerName
+0xa431	Ser ialNumber
+0xa432	LensInfo
+0xa433	LensMake
+0xa434	LensModel
+0xa435	LensSer ialNumber
+0xa436	I mageTitle
+0xa437	Pho tographer
+0xa438	Im ageEditor
+0xa439	Camer aFirmware
+0xa43a	R AWDevelopin gSoftware
+0xa43b	ImageEditin gSoftware
+0xa43c	Met adataEditin gSoftware
+0xa460	Compo siteImage
+0xa461	CompositeI mageCount
+0xa462	Composi teImageExpo sureTimes
+0xa480	G DALMetadata
+0xa481	GDALNoData
+0xa500	Gamma
+0xafc0	Exp andSoftware
+0xafc1	ExpandLens
+0xafc2	ExpandFilm
+0xafc3	Expan dFilterLens
+0xafc4	Ex pandScanner
+0xafc5	Expa ndFlashLamp
+0xb4c3	Hasselb ladRawImage
+0xbc01	PixelFormat
+0xbc02	Tra nsformation
+0xbc03	U ncompressed
+0xbc04	ImageType
+0xbc80	ImageWidth
+0xbc81	ImageHeight
+0xbc82	Widt hResolution
+0xbc83	Heigh tResolution
+0xbcc0	ImageOffset
+0xbcc1	Ima geByteCount
+0xbcc2	AlphaOffset
+0xbcc3	Alp haByteCount
+0xbcc4	Image DataDiscard
+0xbcc5	Alpha DataDiscard
+0xc427	Oce ScanjobDesc
+0xc428	OceApplicat ionSelector
+0xc429	OceIDNumber
+0xc42a	Oc eImageLogic
+0xc44f	Annotations
+0xc4a5	PrintIM
+0xc519	Ha sselbladXML
+0xc51b	Has selbladExif
+0xc573	Origi nalFileName
+0xc580	US PTOOriginal ContentType
+0xc5e0	CR 2CFAPattern
+0xc612	DNGVersion
+0xc613	DNGBack wardVersion
+0xc614	Unique CameraModel
+0xc615	Localized CameraModel
+0xc616	CF APlaneColor
+0xc617	CFALayout
+0xc618	Lineari zationTable
+0xc619	BlackLev elRepeatDim
+0xc61a	BlackLevel
+0xc61b	Black LevelDeltaH
+0xc61c	Black LevelDeltaV
+0xc61d	WhiteLevel
+0xc61e	D efaultScale
+0xc61f	Defaul tCropOrigin
+0xc620	Defa ultCropSize
+0xc621	C olorMatrix1
+0xc622	C olorMatrix2
+0xc623	CameraC alibration1
+0xc624	CameraC alibration2
+0xc625	Reduc tionMatrix1
+0xc626	Reduc tionMatrix2
+0xc627	An alogBalance
+0xc628	As ShotNeutral
+0xc629	As ShotWhiteXY
+0xc62a	Basel ineExposure
+0xc62b	Ba selineNoise
+0xc62c	Baseli neSharpness
+0xc62d	Baye rGreenSplit
+0xc62e	LinearRe sponseLimit
+0xc62f	CameraS erialNumber
+0xc630	DNGLensInfo
+0xc631	Chrom aBlurRadius
+0xc632	AntiAl iasStrength
+0xc633	ShadowScale
+0xc634	"SR2Private
+ 				DN GAdobeData
+ 				Maker NotePentax
+ 				MakerN otePentax5
+ 				MakerNoteR icohPentax
+ 				MakerN oteDJIInfo
+ 				DNG PrivateData"
+0xc635	Make rNoteSafety
+0xc640	RawImageS egmentation
+0xc65a	Calibration Illuminant1
+0xc65b	Calibration Illuminant2
+0xc65c	BestQ ualityScale
+0xc65d	RawD ataUniqueID
+0xc660	AliasLa yerMetadata
+0xc68b	Original RawFileName
+0xc68c	Original RawFileData
+0xc68d	ActiveArea
+0xc68e	MaskedAreas
+0xc68f	AsSho tICCProfile
+0xc690	AsShotPrePr ofileMatrix
+0xc691	Curren tICCProfile
+0xc692	C urrentPrePr ofileMatrix
+0xc6bf	Colorimetr icReference
+0xc6c5	SRawType
+0xc6d2	Pan asonicTitle
+0xc6d3	Pana sonicTitle2
+0xc6f3	CameraCal ibrationSig
+0xc6f4	ProfileCal ibrationSig
+0xc6f5	ProfileIFD
+0xc6f6	AsShot ProfileName
+0xc6f7	NoiseReduc tionApplied
+0xc6f8	ProfileName
+0xc6f9	ProfileHu eSatMapDims
+0xc6fa	ProfileHue SatMapData1
+0xc6fb	ProfileHue SatMapData2
+0xc6fc	Profi leToneCurve
+0xc6fd	Profile EmbedPolicy
+0xc6fe	Profi leCopyright
+0xc714	For wardMatrix1
+0xc715	For wardMatrix2
+0xc716	PreviewAppl icationName
+0xc717	Pre viewApplica tionVersion
+0xc718	PreviewS ettingsName
+0xc719	PreviewSet tingsDigest
+0xc71a	Previe wColorSpace
+0xc71b	Prev iewDateTime
+0xc71c	Raw ImageDigest
+0xc71d	OriginalRa wFileDigest
+0xc71e	SubTi leBlockSize
+0xc71f	RowInter leaveFactor
+0xc725	ProfileLo okTableDims
+0xc726	ProfileLo okTableData
+0xc740	OpcodeList1
+0xc741	OpcodeList2
+0xc74e	OpcodeList3
+0xc761	N oiseProfile
+0xc763	TimeCodes
+0xc764	FrameRate
+0xc772	TStop
+0xc789	ReelName
+0xc791	Or iginalDefau ltFinalSize
+0xc792	O riginalBest QualitySize
+0xc793	O riginalDefa ultCropSize
+0xc7a1	CameraLabel
+0xc7a3	Pr ofileHueSat MapEncoding
+0xc7a4	Pr ofileLookTa bleEncoding
+0xc7a5	BaselineExp osureOffset
+0xc7a6	Default BlackRender
+0xc7a7	NewRaw ImageDigest
+0xc7a8	RawTo PreviewGain
+0xc7aa	C acheVersion
+0xc7b5	Defa ultUserCrop
+0xc7d5	N ikonNEFInfo
+0xc7e9	DepthFormat
+0xc7ea	DepthNear
+0xc7eb	DepthFar
+0xc7ec	DepthUnits
+0xc7ed	Depth MeasureType
+0xc7ee	En hanceParams
+0xcd2d	ProfileG ainTableMap
+0xcd2e	S emanticName
+0xcd30	Semanti cInstanceID
+0xcd31	Calibration Illuminant3
+0xcd32	CameraC alibration3
+0xcd33	C olorMatrix3
+0xcd34	For wardMatrix3
+0xcd35	Illu minantData1
+0xcd36	Illu minantData2
+0xcd37	Illu minantData3
+0xcd38	MaskSubArea
+0xcd39	ProfileHue SatMapData3
+0xcd3a	Reduc tionMatrix3
+0xcd3f	RGBTables
+0xcd40	ProfileGa inTableMap2
+0xcd41	JUMBF
+0xcd43	ColumnInter leaveFactor
+0xcd44	ImageS equenceInfo
+0xcd46	ImageStats
+0xcd47	ProfileD ynamicRange
+0xcd48	Profi leGroupName
+0xcd49	JXLDistance
+0xcd4a	JXLEffort
+0xcd4b	JXL DecodeSpeed
+0xcea1	SEAL
+0xea1c	Padding
+0xea1d	O ffsetSchema
+0xfde8	OwnerName
+0xfde9	S erialNumber
+0xfdea	Lens
+0xfe00	KDC_IFD
+0xfe4c	RawFile
+0xfe4d	Converter
+0xfe4e	W hiteBalance
+0xfe51	Exposure
+0xfe52	Shadows
+0xfe53	Brightness
+0xfe54	Contrast
+0xfe55	Saturation
+0xfe56	Sharpness
+0xfe57	Smoothness
+0xfe58	MoireFilter
+	—-
+	0 =
+	
+	-\
+	
+	1 =
+	
+	Y\
+	
+	2 =
+	
+	C
+b\	
+	
+	

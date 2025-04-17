@@ -20,7 +20,7 @@
 	} from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue } from '$lib/metadata.js';
+	import { metadataById, storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
@@ -75,7 +75,7 @@
 		const { x, y, width, height } = toPixelCoords(
 			toTopLeftCoords(
 				/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-				(metadata.crop.value)
+				(metadata[uiState.cropMetadataId].value)
 			)
 		);
 
@@ -106,11 +106,11 @@
 				alternatives
 			});
 
-			if (uiState.currentProtocol.inference?.classification?.taxonomic) {
+			if ('taxonomic' in (metadataById(uiState.classificationMetadataId) ?? {})) {
 				await setTaxonAndInferParents({
 					...metadataValue,
 					protocol: uiState.currentProtocol,
-					metadataId: uiState.currentProtocol.inference.classification.metadata
+					metadataId: uiState.classificationMetadataId
 				});
 			} else {
 				await storeMetadataValue({
