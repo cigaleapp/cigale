@@ -149,7 +149,7 @@
 		--card-padding: 0; /* since the image kisses the corners */
 		--stack-offset: 0.25em;
 		--transition-duration: 0.3s;
-		--card-bg: var(--bg-neutral);
+		--card-bg: var(--bg2-neutral);
 		position: relative;
 		width: var(--card-width);
 		user-select: none;
