@@ -176,14 +176,7 @@ export async function generateResultsZip(
 										sequence: index + 1
 									});
 
-									downloadAsFile(
-										new Blob([buffers.croppedBytes], {
-											type: 'image/jpeg'
-										}),
-										'feur.jpeg'
-									);
-
-									const out = [
+									return [
 										[
 											filepaths.images.cropped.render(filepathTemplateData),
 											[buffers.croppedBytes, { level: 0 }]
@@ -193,9 +186,6 @@ export async function generateResultsZip(
 											[buffers.originalBytes, { level: 0 }]
 										]
 									].filter(([, [bytes]]) => bytes !== undefined);
-
-									console.log({ out });
-									return out;
 								})
 				)
 			},
