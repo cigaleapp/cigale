@@ -93,7 +93,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		padding: 1em;
 		border-radius: var(--corner-radius);
 		background: var(--bg-neutral);
-		border: none;
+		border: 3px solid var(--bg-primary);
 		width: 75vw;
 		min-height: max(50vh, 300px);
 		min-width: min(100vw, 400px);
@@ -117,11 +117,12 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 
 	dialog::backdrop {
 		background: rgba(0, 0, 0, 0);
-		transition: background-color 2s;
+		transition: all 2s;
 	}
 
 	dialog[open]::backdrop {
 		background: rgba(0, 0, 0, 0.5);
+		backdrop-filter: blur(10px);
 	}
 
 	header {
