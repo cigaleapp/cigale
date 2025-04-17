@@ -2,7 +2,7 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.transects.arthropods",
 	"name": "Transect d'arthropodes",
-	"source": "https://github.com/cigaleapp/cigale/tree/40cc20970bffb30a52d68c7f230eb7a21e781650/scripts/jessica-joachim-crawler.js#L86",
+	"source": "https://github.com/cigaleapp/cigale/tree/43c12255cee27cdb6478d711e6a01efe47a9af31/scripts/jessica-joachim-crawler.js#L86",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
 		{
@@ -520,8 +520,8 @@
 		},
 		"io.github.cigaleapp.transects.arthropods__shoot_date": {
 			"type": "date",
-			"label": "Date de la prise de vue",
-			"description": "",
+			"label": "Date",
+			"description": "Moment où la photo a été prise",
 			"required": false,
 			"mergeMethod": "average",
 			"infer": {
@@ -530,8 +530,8 @@
 		},
 		"io.github.cigaleapp.transects.arthropods__shoot_location": {
 			"type": "location",
-			"label": "Localisation de la prise de vue",
-			"description": "",
+			"label": "Localisation",
+			"description": "Endroit où la photo a été prise",
 			"required": false,
 			"mergeMethod": "average",
 			"infer": {
@@ -1144,7 +1144,6 @@
 			"infer": {
 				"neural": {
 					"model": "https://cigaleapp.github.io/models/model_classif.onnx",
-					"classmapping": "https://cigaleapp.github.io/models/class_mapping.txt",
 					"metadata": "io.github.cigaleapp.transects.arthropods__species",
 					"input": {
 						"height": 224,
