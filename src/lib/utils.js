@@ -1,3 +1,5 @@
+import { match } from 'arktype';
+
 /**
  * @template {string} K
  * @template {any} VIn
@@ -120,4 +122,8 @@ export function safeJSONParse(str) {
 	} catch {
 		return undefined;
 	}
+}
+
+export function matches(subject, pattern) {
+	return match.case(pattern, () => true).default(() => false)(subject);
 }

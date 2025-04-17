@@ -116,16 +116,16 @@ const protocol = {
 		[namespaced('genus')]: cladeMetadata('genus', 'Genre', taxonomy.genera),
 		[namespaced('shoot_date')]: {
 			type: 'date',
-			label: 'Date de la prise de vue',
-			description: '',
+			label: 'Date',
+			description: 'Moment où la photo a été prise',
 			required: false,
 			mergeMethod: 'average',
 			infer: { exif: 'DateTimeOriginal' }
 		},
 		[namespaced('shoot_location')]: {
 			type: 'location',
-			label: 'Localisation de la prise de vue',
-			description: '',
+			label: 'Localisation',
+			description: 'Endroit où la photo a été prise',
 			required: false,
 			mergeMethod: 'average',
 			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }

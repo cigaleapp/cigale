@@ -38,24 +38,33 @@ Handlebars.registerHelper('fallback', (subject, fallback) => {
 });
 
 const FilepathTemplate = type.string
-	.pipe((t) =>
-		Handlebars.compile(t, {
-			noEscape: true,
-			assumeObjects: true,
-			knownHelpersOnly: true,
-			knownHelpers: {
-				suffix: true,
-				extension: true,
-				fallback: true
-			}
-		})
-	)
-	.pipe(
-		(template) =>
-			/** @param {{ image: typeof Image.infer & { metadata: Record<string, typeof MetadataValue.infer & { valueLabel?: string }> }, observation: typeof Observation.infer, sequence: number }} data */
-			(data) =>
-				template(data).replaceAll('\\', '/')
-	);
+	.pipe((t) => {
+		try {
+			return {
+				source: t,
+				template: Handlebars.compile(t, {
+					noEscape: true,
+					assumeObjects: true,
+					knownHelpersOnly: true,
+					knownHelpers: {
+						suffix: true,
+						extension: true,
+						fallback: true
+					}
+				})
+			};
+		} catch (e) {
+			throw new Error(`Invalid template "${t}": ${e.message}`);
+		}
+	})
+	.pipe(({ source, template }) => ({
+		/** @param {{ image: typeof Image.infer & { metadata: Record<string, typeof MetadataValue.infer & { valueLabel?: string }> }, observation: typeof Observation.infer, sequence: number }} data */
+		render(data) {
+			console.log('Applying template', source, 'on', data);
+			return template(data, {}).replaceAll('\\', '/');
+		},
+		toJSON: () => source
+	}));
 
 /**
  * Between 0 and 1
@@ -419,6 +428,7 @@ export const Schemas = {
 	Protocol,
 	ProtocolWithoutMetadata,
 	Settings,
+	EXIFField,
 	Request
 };
 

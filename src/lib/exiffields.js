@@ -1,8 +1,4 @@
-/**
- * From https://github.com/bwindels/exif-parser/blob/master/lib/exif-tags.js
- */
-export const EXIF_FIELDS = /** @type {const} */ ({
-	// regular
+export const EXIF_REGULAR_FIELDS = /** @type {const} */ ({
 	InteropIndex: 0x0001,
 	InteropVersion: 0x0002,
 	ProcessingSoftware: 0x000b,
@@ -431,8 +427,11 @@ export const EXIF_FIELDS = /** @type {const} */ ({
 	//  'Saturation': 0xfe55,
 	//  'Sharpness': 0xfe56,
 	Smoothness: 0xfe57,
-	MoireFilter: 0xfe58,
+	MoireFilter: 0xfe58
 	// gps
+});
+
+export const EXIF_GPS_FIELDS = /** @type {const} */ ({
 	GPSVersionID: 0x0000,
 	GPSLatitudeRef: 0x0001,
 	GPSLatitude: 0x0002,
@@ -465,4 +464,12 @@ export const EXIF_FIELDS = /** @type {const} */ ({
 	GPSDateStamp: 0x001d,
 	GPSDifferential: 0x001e,
 	GPSHPositioningError: 0x001f
+});
+
+/**
+ * From https://github.com/bwindels/exif-parser/blob/master/lib/exif-tags.js
+ */
+export const EXIF_FIELDS = /** @type {const} */ ({
+	...EXIF_REGULAR_FIELDS,
+	...EXIF_GPS_FIELDS
 });

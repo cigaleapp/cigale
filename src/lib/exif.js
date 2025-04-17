@@ -1,13 +1,13 @@
+import { match, type } from 'arktype';
+import { format } from 'date-fns';
 import * as exifParser from 'exif-parser';
+import piexif from 'piexifjs';
+import { Schemas } from './database.js';
+import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { toasts } from './toasts.svelte.js';
-import turbo_exif_init, { add_metadata_to_image } from 'turbo_exif';
-import { format } from 'date-fns';
-
-turbo_exif_init()
-	.then(() => console.log('turbo_exif initialized'))
-	.catch((e) => console.error('turbo_exif initialization failed', e));
+import { matches } from './utils.js';
 
 /**
  *
@@ -26,15 +26,22 @@ export async function processExifData(protocolId, imageId, imageBytes, file) {
 	);
 	const metadataFromExif = await extractMetadata(
 		imageBytes,
-		Object.fromEntries(
-			(metadataOfProtocol ?? [])
-				.map((m) => {
-					if (!m.infer) return undefined;
-					if (!('exif' in m.infer)) return undefined;
-					return [m.infer.exif, m];
-				})
-				.filter((entry) => entry !== undefined)
-		)
+		(metadataOfProtocol ?? [])
+			.map((m) =>
+				match
+					.case(
+						{
+							infer: [
+								{ exif: 'string' },
+								'|',
+								{ latitude: { exif: 'string' }, longitude: { exif: 'string' } }
+							]
+						},
+						({ infer }) => /** @type {const} */ ([m.id, infer, m.type])
+					)
+					.default(() => undefined)(m)
+			)
+			.filter((entry) => entry !== undefined)
 	).catch((e) => {
 		console.warn(e);
 		if (file.type === 'image/jpeg') {
@@ -60,34 +67,38 @@ export async function processExifData(protocolId, imageId, imageBytes, file) {
 
 /**
  * @param {ArrayBuffer} buffer buffer of the image to extract EXIF data from
- * @param {Partial<Record<import('./database.js').EXIFField, { type: import('./database.js').MetadataType, id: string }>>} extractionPlan
+ * @param {Array<readonly [string, import('./database.js').MetadataInferOptions, import('./database.js').MetadataType]>} extractionPlan
  * @returns {Promise<Record<string, { value: unknown; confidence: number; alternatives: Record<string, unknown> }>>}
  */
 export async function extractMetadata(buffer, extractionPlan) {
 	const exif = exifParser.create(buffer).enableImageSize(false).parse();
 
 	if (!exif) return {};
+	console.log({ extractionPlan, exif });
 
 	return Object.fromEntries(
-		Object.entries(extractionPlan ?? {})
-			.map(([tagname, { type, id }]) => {
-				if (!exif.tags[tagname]) return undefined;
-				return [
+		extractionPlan
+			.map(([id, infer, type]) => {
+				return /** @type {const} */ ([
 					id,
 					{
 						value:
 							type === 'location'
 								? {
-										longitude: coerceExifValue(exif.tags[tagname].longitude, 'float'),
-										latitude: coerceExifValue(exif.tags[tagname].latitude, 'float')
+										longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
+										latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float')
 									}
-								: coerceExifValue(exif.tags[tagname], type),
+								: coerceExifValue(exif.tags[infer.exif], type),
 						confidence: 1,
 						alternatives: {}
 					}
-				];
+				]);
 			})
-			.filter((entry) => entry !== undefined)
+			.filter(
+				(entry) =>
+					entry !== undefined &&
+					!matches(entry[1].value, { latitude: 'number.NaN', longitude: 'number.NaN' })
+			)
 	);
 }
 
@@ -125,22 +136,43 @@ function coerceExifValue(value, coerceTo) {
 	}
 }
 
+function serializeExifValue(value) {
+	if (value instanceof Date) return format(value, 'yyyy:MM:dd HH:mm:ss');
+	if (typeof value === 'object' && value !== null) {
+		return Object.entries(value)
+			.map(([key, val]) => `${key}=${val}`)
+			.join(';');
+	}
+	return value?.toString() ?? '';
+}
+
 /**
  * Append EXIF metadata to the image's bytes
- * @param {Uint8Array} bytes
+ * @param {ArrayBuffer} bytes
+ * @param {import('./database.js').Metadata[]} metadataDefs
  * @param {import('./database.js').MetadataValues} metadataValues
  * @returns {Uint8Array} the image with EXIF metadata added
  */
-export function addExifMetadata(bytes, metadataValues) {
-	const shotAt = metadataValues[BUILTIN_METADATA_IDS.shoot_date]?.value;
-	const location = metadataValues[BUILTIN_METADATA_IDS.shoot_location]?.value;
-	return add_metadata_to_image(
-		bytes,
-		JSON.stringify({
-			comment: `Exported by C.i.g.a.l.e -- ${window.location.origin}`,
-			date_acquired: shotAt ? format(shotAt, 'yyyy:MM:dd HH:mm:ss') : undefined,
-			latitude: location?.latitude,
-			longitude: location?.longitude
-		})
-	);
+export function addExifMetadata(bytes, metadataDefs, metadataValues) {
+	const ExifMetadata = Schemas.Metadata.and({ infer: { exif: 'string' } });
+
+	const exifDict = { GPS: {}, Exif: {} };
+
+	for (const def of metadataDefs.map((m) => ExifMetadata(m))) {
+		if (def instanceof type.errors) continue;
+		const value = metadataValues[def.id]?.value;
+		if (value === undefined) continue;
+		const serialized = serializeExifValue(value);
+		if (serialized === undefined) continue;
+
+		const category = Object.keys(EXIF_GPS_FIELDS).includes(def.infer.exif) ? 'GPS' : 'Exif';
+		exifDict[category][piexif[`${category}IFD`][def.infer.exif]] = serialized;
+	}
+
+	// Piexif wants bytes _as a string_. why??? idk. but it seems like npm has no decent EXIF libraries that both support browsers and writing exif data.
+	const bytesstr = String.fromCharCode(...new Uint8Array(bytes));
+	console.log(bytesstr);
+	const outputstr = piexif.insert(piexif.dump(exifDict), bytesstr);
+	console.log(outputstr);
+	return new Uint8Array(Array.from(outputstr).map((c) => c.charCodeAt(0)));
 }

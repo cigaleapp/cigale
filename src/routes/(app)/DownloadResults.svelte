@@ -7,7 +7,7 @@
 	import { ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import { generateResultsZip } from '$lib/results';
+	import { generateResultsZip } from '$lib/results.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Download from '~icons/ph/download-simple';

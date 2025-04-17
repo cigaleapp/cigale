@@ -30,6 +30,10 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
 	return metadataId.startsWith(`${protocolId}__`);
 }
 
+export function removeNamespaceFromMetadataId(metadataId) {
+	return metadataId.replace(/^.+__/, '');
+}
+
 export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.in
 	.and({
 		metadata: {
