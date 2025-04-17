@@ -12,6 +12,8 @@ import {
 } from './metadata';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
+import { addExifMetadata } from './exif';
+import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from './protocols';
 
 /**
  * @param {Array<import("./database").Observation>} observations
@@ -35,8 +37,8 @@ export async function generateResultsZip(
 					metadata: await observationMetadata(o).then(addValueLabels),
 					protocolMetadata: Object.fromEntries(
 						Object.entries(await observationMetadata(o).then(addValueLabels))
-							.filter(([key]) => key.startsWith(`${protocolUsed.id}__`))
-							.map(([key, value]) => [key.replace(`${protocolUsed.id}__`, ''), value])
+							.filter(([key]) => isNamespacedToProtocol(protocolUsed.id, key))
+							.map(([key, value]) => [removeNamespaceFromMetadataId(key), value])
 					),
 					images: o.images.map((id) => {
 						const image = db.tables.Image.state.find((i) => i.id === id);
@@ -55,7 +57,7 @@ export async function generateResultsZip(
 	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
 
 	/**
-	 * @type {Array<{imageId: string, croppedBytes: Uint8Array, originalBytes?: Uint8Array, contentType: string, filename: string}>}
+	 * @type {Array<{imageId: string, croppedBytes: Uint8Array, originalBytes?: Uint8Array|undefined, contentType: string, filename: string}>}
 	 */
 	let buffersOfImages = [];
 
@@ -65,21 +67,29 @@ export async function generateResultsZip(
 
 	if (include !== 'metadataonly') {
 		uiState.processing.total += observations.flatMap((o) => o.images).length;
-		for (const imageId of observations.flatMap((o) => o.images)) {
+		for (const [observation, imageId] of observations.flatMap((o) =>
+			o.images.map((img) => /** @type {const} */ ([o, img]))
+		)) {
 			const image = await db.tables.Image.get(imageId);
 			if (!image) throw 'Image non trouvée';
+			const metadata = { ...image.metadata, ...observation.metadataOverrides };
 			const { contentType, filename } = image;
-			const { cropped, original } = await cropImage(image);
+			const { cropped, original } = await cropImage(protocolUsed, image);
 			buffersOfImages.push({
 				imageId,
-				croppedBytes: new Uint8Array(cropped),
-				originalBytes: include === 'full' ? new Uint8Array(original) : undefined,
+				croppedBytes: addExifMetadata(cropped, Object.values(metadataDefinitions), metadata),
+				originalBytes:
+					include === 'full'
+						? addExifMetadata(original, Object.values(metadataDefinitions), metadata)
+						: undefined,
 				contentType,
 				filename
 			});
 			uiState.processing.done++;
 		}
 	}
+
+	console.log({ buffersOfImages });
 
 	const filepaths = protocolUsed.exports ?? {
 		images: {
@@ -152,22 +162,40 @@ export async function generateResultsZip(
 									const image = db.tables.Image.state.find((i) => i.id === imageId);
 									if (!image) throw 'Image non trouvée';
 
-									const filepathTemplateData = {
-										image: { ...image, metadata: addValueLabels(image.metadata) },
+									const filepathTemplateData = $state.snapshot({
+										image: {
+											...image,
+											metadata: addValueLabels(image.metadata),
+											protocolMetadata: Object.fromEntries(
+												Object.entries(addValueLabels(image.metadata))
+													.filter(([key]) => isNamespacedToProtocol(protocolUsed.id, key))
+													.map(([key, value]) => [removeNamespaceFromMetadataId(key), value])
+											)
+										},
 										observation,
 										sequence: index + 1
-									};
+									});
 
-									return [
+									downloadAsFile(
+										new Blob([buffers.croppedBytes], {
+											type: 'image/jpeg'
+										}),
+										'feur.jpeg'
+									);
+
+									const out = [
 										[
-											filepaths.images.cropped(filepathTemplateData),
+											filepaths.images.cropped.render(filepathTemplateData),
 											[buffers.croppedBytes, { level: 0 }]
 										],
 										[
-											filepaths.images.original(filepathTemplateData),
+											filepaths.images.original.render(filepathTemplateData),
 											[buffers.originalBytes, { level: 0 }]
 										]
 									].filter(([, [bytes]]) => bytes !== undefined);
+
+									console.log({ out });
+									return out;
 								})
 				)
 			},
@@ -187,13 +215,14 @@ export async function generateResultsZip(
 }
 
 /**
+ * @param {import('./database').Protocol} protocol protocol used
  * @param {import('./database').Image} image
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
-export async function cropImage(image) {
+export async function cropImage(protocol, image) {
 	const centeredBoundingBox =
 		/** @type {undefined | import("./metadata").RuntimeValue<'boundingbox'>}  */
-		(image.metadata.crop?.value);
+		(image.metadata[protocol.crop?.metadata ?? 'crop']?.value);
 
 	if (!centeredBoundingBox) throw "L'image n'a pas d'information de recadrage";
 

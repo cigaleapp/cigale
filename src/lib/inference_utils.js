@@ -270,18 +270,6 @@ export async function preprocess_for_classification(protocol, tensors, mean, std
 
 	return new_ctensors;
 }
-/**
- *
- * @param {string} classmapping
- * @returns {Promise<string[]>}
- */
-export async function loadClassMapping(classmapping) {
-	// charge le fichier de mapping des classes (nom des classes)
-	const response = await fetch(classmapping);
-	const text = await response.text();
-	let classmap = text.split('\n');
-	return classmap;
-}
 
 /**
  *
@@ -445,14 +433,7 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 
 	console.log(output);
 
-	const outputShape = protocol.inference?.detection.output.shape ?? [
-		'sx',
-		'sy',
-		'w',
-		'h',
-		'score',
-		'_'
-	];
+	const outputShape = protocol.crop?.infer.output?.shape ?? ['sx', 'sy', 'w', 'h', 'score', '_'];
 
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;
@@ -493,7 +474,7 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 			};
 
 			// Get center point x coord and width
-			const [x, w] = match({})
+			const [x, w] = match
 				.case({ cx: 'number', ex: 'number' }, ({ cx, ex }) => [cx, 2 * (ex - cx)])
 				.case({ cx: 'number', sx: 'number' }, ({ sx, cx }) => [cx, 2 * (cx - sx)])
 				.case({ cx: 'number', w: 'number' }, ({ cx, w }) => [cx, w])
@@ -506,7 +487,7 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 					);
 				})(atoms);
 
-			const [y, h] = match({})
+			const [y, h] = match
 				.case({ cy: 'number', ey: 'number' }, ({ cy, ey }) => [cy, 2 * (ey - cy)])
 				.case({ cy: 'number', sy: 'number' }, ({ sy, cy }) => [cy, 2 * (cy - sy)])
 				.case({ cy: 'number', h: 'number' }, ({ cy, h }) => [cy, h])

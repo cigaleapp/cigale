@@ -2,7 +2,7 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.transects.arthropods",
 	"name": "Transect d'arthropodes",
-	"source": "https://github.com/cigaleapp/cigale/tree/71013d486629945af535ecad02f0064b65d37a28/scripts/jessica-joachim-crawler.js#L68",
+	"source": "https://github.com/cigaleapp/cigale/tree/43c12255cee27cdb6478d711e6a01efe47a9af31/scripts/jessica-joachim-crawler.js#L86",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
 		{
@@ -12,26 +12,544 @@
 	],
 	"metadataOrder": [
 		"io.github.cigaleapp.transects.arthropods__species",
-		"genus",
-		"family",
-		"order",
-		"shoot_date",
-		"shoot_location",
-		"class",
-		"phylum",
-		"kingdom",
-		"crop"
+		"io.github.cigaleapp.transects.arthropods__genus",
+		"io.github.cigaleapp.transects.arthropods__family",
+		"io.github.cigaleapp.transects.arthropods__order",
+		"io.github.cigaleapp.transects.arthropods__shoot_date",
+		"io.github.cigaleapp.transects.arthropods__shoot_location",
+		"io.github.cigaleapp.transects.arthropods__class",
+		"io.github.cigaleapp.transects.arthropods__phylum",
+		"io.github.cigaleapp.transects.arthropods__kingdom",
+		"io.github.cigaleapp.transects.arthropods__crop"
 	],
 	"metadata": {
-		"kingdom": "builtin",
-		"phylum": "builtin",
-		"class": "builtin",
-		"order": "builtin",
-		"family": "builtin",
-		"genus": "builtin",
-		"shoot_date": "builtin",
-		"shoot_location": "builtin",
-		"crop": "builtin",
+		"io.github.cigaleapp.transects.arthropods__kingdom": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "animalia",
+					"label": "Animalia",
+					"learnMore": "https://en.wikipedia.org/wiki/Animalia",
+					"description": ""
+				}
+			],
+			"label": "Règne",
+			"required": false,
+			"description": "",
+			"mergeMethod": "average",
+			"taxonomic": {
+				"clade": "kingdom",
+				"parent": {}
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__phylum": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "arthropoda",
+					"label": "Arthropoda",
+					"learnMore": "https://en.wikipedia.org/wiki/Arthropoda",
+					"description": ""
+				}
+			],
+			"label": "Phylum",
+			"required": false,
+			"description": "",
+			"mergeMethod": "average",
+			"taxonomic": {
+				"clade": "phylum",
+				"parent": {
+					"arthropoda": "animalia"
+				}
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__class": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "collembola",
+					"label": "Collembola",
+					"learnMore": "https://en.wikipedia.org/wiki/Collembola",
+					"description": ""
+				}
+			],
+			"label": "Classe",
+			"required": false,
+			"description": "",
+			"mergeMethod": "average",
+			"taxonomic": {
+				"clade": "class",
+				"parent": {
+					"collembola": "arthropoda"
+				}
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__order": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "symphypleona",
+					"label": "Symphypleona",
+					"learnMore": "https://en.wikipedia.org/wiki/Symphypleona",
+					"description": ""
+				},
+				{
+					"key": "poduromorpha",
+					"label": "Poduromorpha",
+					"learnMore": "https://en.wikipedia.org/wiki/Poduromorpha",
+					"description": ""
+				},
+				{
+					"key": "entomobryomorpha",
+					"label": "Entomobryomorpha",
+					"learnMore": "https://en.wikipedia.org/wiki/Entomobryomorpha",
+					"description": ""
+				},
+				{
+					"key": "neelipleona",
+					"label": "Neelipleona",
+					"learnMore": "https://en.wikipedia.org/wiki/Neelipleona",
+					"description": ""
+				}
+			],
+			"label": "Ordre",
+			"required": false,
+			"description": "",
+			"mergeMethod": "average",
+			"taxonomic": {
+				"clade": "order",
+				"parent": {
+					"symphypleona": "collembola",
+					"poduromorpha": "collembola",
+					"entomobryomorpha": "collembola",
+					"neelipleona": "collembola"
+				}
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__family": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "sminthuridae",
+					"label": "Sminthuridae",
+					"learnMore": "https://en.wikipedia.org/wiki/Sminthuridae",
+					"description": ""
+				},
+				{
+					"key": "neanuridae",
+					"label": "Neanuridae",
+					"learnMore": "https://en.wikipedia.org/wiki/Neanuridae",
+					"description": ""
+				},
+				{
+					"key": "bourletiellidae",
+					"label": "Bourletiellidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Bourletiellidae",
+					"description": ""
+				},
+				{
+					"key": "brachystomellidae",
+					"label": "Brachystomellidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Brachystomellidae",
+					"description": ""
+				},
+				{
+					"key": "hypogastruridae",
+					"label": "Hypogastruridae",
+					"learnMore": "https://en.wikipedia.org/wiki/Hypogastruridae",
+					"description": ""
+				},
+				{
+					"key": "paronellidae",
+					"label": "Paronellidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Paronellidae",
+					"description": ""
+				},
+				{
+					"key": "dicyrtomidae",
+					"label": "Dicyrtomidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Dicyrtomidae",
+					"description": ""
+				},
+				{
+					"key": "entomobryidae",
+					"label": "Entomobryidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Entomobryidae",
+					"description": ""
+				},
+				{
+					"key": "isotomidae",
+					"label": "Isotomidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Isotomidae",
+					"description": ""
+				},
+				{
+					"key": "orchesellidae",
+					"label": "Orchesellidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Orchesellidae",
+					"description": ""
+				},
+				{
+					"key": "onychiuridae",
+					"label": "Onychiuridae",
+					"learnMore": "https://en.wikipedia.org/wiki/Onychiuridae",
+					"description": ""
+				},
+				{
+					"key": "neelidae",
+					"label": "Neelidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Neelidae",
+					"description": ""
+				},
+				{
+					"key": "poduridae",
+					"label": "Poduridae",
+					"learnMore": "https://en.wikipedia.org/wiki/Poduridae",
+					"description": ""
+				},
+				{
+					"key": "tomoceridae",
+					"label": "Tomoceridae",
+					"learnMore": "https://en.wikipedia.org/wiki/Tomoceridae",
+					"description": ""
+				},
+				{
+					"key": "sminthurididae",
+					"label": "Sminthurididae",
+					"learnMore": "https://en.wikipedia.org/wiki/Sminthurididae",
+					"description": ""
+				},
+				{
+					"key": "katiannidae",
+					"label": "Katiannidae",
+					"learnMore": "https://en.wikipedia.org/wiki/Katiannidae",
+					"description": ""
+				}
+			],
+			"label": "Famille",
+			"required": false,
+			"description": "",
+			"mergeMethod": "average",
+			"taxonomic": {
+				"clade": "family",
+				"parent": {
+					"sminthuridae": "symphypleona",
+					"neanuridae": "poduromorpha",
+					"bourletiellidae": "symphypleona",
+					"brachystomellidae": "poduromorpha",
+					"hypogastruridae": "poduromorpha",
+					"paronellidae": "entomobryomorpha",
+					"dicyrtomidae": "symphypleona",
+					"entomobryidae": "entomobryomorpha",
+					"isotomidae": "entomobryomorpha",
+					"orchesellidae": "entomobryomorpha",
+					"onychiuridae": "poduromorpha",
+					"neelidae": "neelipleona",
+					"poduridae": "poduromorpha",
+					"tomoceridae": "entomobryomorpha",
+					"sminthurididae": "symphypleona",
+					"katiannidae": "symphypleona"
+				}
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__genus": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "allacma",
+					"label": "Allacma",
+					"learnMore": "https://en.wikipedia.org/wiki/Allacma",
+					"description": ""
+				},
+				{
+					"key": "anurida",
+					"label": "Anurida",
+					"learnMore": "https://en.wikipedia.org/wiki/Anurida",
+					"description": ""
+				},
+				{
+					"key": "bilobella",
+					"label": "Bilobella",
+					"learnMore": "https://en.wikipedia.org/wiki/Bilobella",
+					"description": ""
+				},
+				{
+					"key": "bourletiella",
+					"label": "Bourletiella",
+					"learnMore": "https://en.wikipedia.org/wiki/Bourletiella",
+					"description": ""
+				},
+				{
+					"key": "brachystomella",
+					"label": "Brachystomella",
+					"learnMore": "https://en.wikipedia.org/wiki/Brachystomella",
+					"description": ""
+				},
+				{
+					"key": "caprainea",
+					"label": "Caprainea",
+					"learnMore": "https://en.wikipedia.org/wiki/Caprainea",
+					"description": ""
+				},
+				{
+					"key": "ceratophysella",
+					"label": "Ceratophysella",
+					"learnMore": "https://en.wikipedia.org/wiki/Ceratophysella",
+					"description": ""
+				},
+				{
+					"key": "cyphoderus",
+					"label": "Cyphoderus",
+					"learnMore": "https://en.wikipedia.org/wiki/Cyphoderus",
+					"description": ""
+				},
+				{
+					"key": "deuterosminthurus",
+					"label": "Deuterosminthurus",
+					"learnMore": "https://en.wikipedia.org/wiki/Deuterosminthurus",
+					"description": ""
+				},
+				{
+					"key": "dicyrtoma",
+					"label": "Dicyrtoma",
+					"learnMore": "https://en.wikipedia.org/wiki/Dicyrtoma",
+					"description": ""
+				},
+				{
+					"key": "dicyrtomina",
+					"label": "Dicyrtomina",
+					"learnMore": "https://en.wikipedia.org/wiki/Dicyrtomina",
+					"description": ""
+				},
+				{
+					"key": "entomobrya",
+					"label": "Entomobrya",
+					"learnMore": "https://en.wikipedia.org/wiki/Entomobrya",
+					"description": ""
+				},
+				{
+					"key": "fasciosminthurus",
+					"label": "Fasciosminthurus",
+					"learnMore": "https://en.wikipedia.org/wiki/Fasciosminthurus",
+					"description": ""
+				},
+				{
+					"key": "folsomia",
+					"label": "Folsomia",
+					"learnMore": "https://en.wikipedia.org/wiki/Folsomia",
+					"description": ""
+				},
+				{
+					"key": "heteromurus",
+					"label": "Heteromurus",
+					"learnMore": "https://en.wikipedia.org/wiki/Heteromurus",
+					"description": ""
+				},
+				{
+					"key": "hypogastrura",
+					"label": "Hypogastrura",
+					"learnMore": "https://en.wikipedia.org/wiki/Hypogastrura",
+					"description": ""
+				},
+				{
+					"key": "isotoma",
+					"label": "Isotoma",
+					"learnMore": "https://en.wikipedia.org/wiki/Isotoma",
+					"description": ""
+				},
+				{
+					"key": "isotomiella",
+					"label": "Isotomiella",
+					"learnMore": "https://en.wikipedia.org/wiki/Isotomiella",
+					"description": ""
+				},
+				{
+					"key": "isotomurus",
+					"label": "Isotomurus",
+					"learnMore": "https://en.wikipedia.org/wiki/Isotomurus",
+					"description": ""
+				},
+				{
+					"key": "kalaphorura",
+					"label": "Kalaphorura",
+					"learnMore": "https://en.wikipedia.org/wiki/Kalaphorura",
+					"description": ""
+				},
+				{
+					"key": "lepidocyrtus",
+					"label": "Lepidocyrtus",
+					"learnMore": "https://en.wikipedia.org/wiki/Lepidocyrtus",
+					"description": ""
+				},
+				{
+					"key": "megalothorax",
+					"label": "Megalothorax",
+					"learnMore": "https://en.wikipedia.org/wiki/Megalothorax",
+					"description": ""
+				},
+				{
+					"key": "monobella",
+					"label": "Monobella",
+					"learnMore": "https://en.wikipedia.org/wiki/Monobella",
+					"description": ""
+				},
+				{
+					"key": "neanura",
+					"label": "Neanura",
+					"learnMore": "https://en.wikipedia.org/wiki/Neanura",
+					"description": ""
+				},
+				{
+					"key": "neelus",
+					"label": "Neelus",
+					"learnMore": "https://en.wikipedia.org/wiki/Neelus",
+					"description": ""
+				},
+				{
+					"key": "orchesella",
+					"label": "Orchesella",
+					"learnMore": "https://en.wikipedia.org/wiki/Orchesella",
+					"description": ""
+				},
+				{
+					"key": "parisotoma",
+					"label": "Parisotoma",
+					"learnMore": "https://en.wikipedia.org/wiki/Parisotoma",
+					"description": ""
+				},
+				{
+					"key": "podura",
+					"label": "Podura",
+					"learnMore": "https://en.wikipedia.org/wiki/Podura",
+					"description": ""
+				},
+				{
+					"key": "pogonognathellus",
+					"label": "Pogonognathellus",
+					"learnMore": "https://en.wikipedia.org/wiki/Pogonognathellus",
+					"description": ""
+				},
+				{
+					"key": "seira",
+					"label": "Seira",
+					"learnMore": "https://en.wikipedia.org/wiki/Seira",
+					"description": ""
+				},
+				{
+					"key": "sminthurides",
+					"label": "Sminthurides",
+					"learnMore": "https://en.wikipedia.org/wiki/Sminthurides",
+					"description": ""
+				},
+				{
+					"key": "sminthurinus",
+					"label": "Sminthurinus",
+					"learnMore": "https://en.wikipedia.org/wiki/Sminthurinus",
+					"description": ""
+				},
+				{
+					"key": "tomocerus",
+					"label": "Tomocerus",
+					"learnMore": "https://en.wikipedia.org/wiki/Tomocerus",
+					"description": ""
+				},
+				{
+					"key": "vertagopus",
+					"label": "Vertagopus",
+					"learnMore": "https://en.wikipedia.org/wiki/Vertagopus",
+					"description": ""
+				},
+				{
+					"key": "vitronura",
+					"label": "Vitronura",
+					"learnMore": "https://en.wikipedia.org/wiki/Vitronura",
+					"description": ""
+				},
+				{
+					"key": "willowsia",
+					"label": "Willowsia",
+					"learnMore": "https://en.wikipedia.org/wiki/Willowsia",
+					"description": ""
+				}
+			],
+			"label": "Genre",
+			"required": false,
+			"description": "",
+			"mergeMethod": "average",
+			"taxonomic": {
+				"clade": "genus",
+				"parent": {
+					"allacma": "sminthuridae",
+					"anurida": "neanuridae",
+					"bilobella": "neanuridae",
+					"bourletiella": "bourletiellidae",
+					"brachystomella": "brachystomellidae",
+					"caprainea": "sminthuridae",
+					"ceratophysella": "hypogastruridae",
+					"cyphoderus": "paronellidae",
+					"deuterosminthurus": "bourletiellidae",
+					"dicyrtoma": "dicyrtomidae",
+					"dicyrtomina": "dicyrtomidae",
+					"entomobrya": "entomobryidae",
+					"fasciosminthurus": "bourletiellidae",
+					"folsomia": "isotomidae",
+					"heteromurus": "orchesellidae",
+					"hypogastrura": "hypogastruridae",
+					"isotoma": "isotomidae",
+					"isotomiella": "isotomidae",
+					"isotomurus": "isotomidae",
+					"kalaphorura": "onychiuridae",
+					"lepidocyrtus": "entomobryidae",
+					"megalothorax": "neelidae",
+					"monobella": "neanuridae",
+					"neanura": "neanuridae",
+					"neelus": "neelidae",
+					"orchesella": "orchesellidae",
+					"parisotoma": "isotomidae",
+					"podura": "poduridae",
+					"pogonognathellus": "tomoceridae",
+					"seira": "entomobryidae",
+					"sminthurides": "sminthurididae",
+					"sminthurinus": "katiannidae",
+					"tomocerus": "tomoceridae",
+					"vertagopus": "isotomidae",
+					"vitronura": "neanuridae",
+					"willowsia": "entomobryidae"
+				}
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__shoot_date": {
+			"type": "date",
+			"label": "Date",
+			"description": "Moment où la photo a été prise",
+			"required": false,
+			"mergeMethod": "average",
+			"infer": {
+				"exif": "DateTimeOriginal"
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__shoot_location": {
+			"type": "location",
+			"label": "Localisation",
+			"description": "Endroit où la photo a été prise",
+			"required": false,
+			"mergeMethod": "average",
+			"infer": {
+				"latitude": {
+					"exif": "GPSLatitude"
+				},
+				"longitude": {
+					"exif": "GPSLongitude"
+				}
+			}
+		},
+		"io.github.cigaleapp.transects.arthropods__crop": {
+			"type": "boundingbox",
+			"label": "",
+			"description": "",
+			"required": true,
+			"mergeMethod": "average"
+		},
 		"io.github.cigaleapp.transects.arthropods__species": {
 			"type": "enum",
 			"label": "Espèce",
@@ -538,34 +1056,108 @@
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/willowsia-platani/",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20platani.jpeg"
 				}
-			]
-		}
-	},
-	"inference": {
-		"classification": {
-			"model": "https://cigaleapp.github.io/models/model_classif.onnx",
-			"classmapping": "https://cigaleapp.github.io/models/class_mapping.txt",
-			"metadata": "io.github.cigaleapp.transects.arthropods__species",
+			],
 			"taxonomic": {
 				"clade": "species",
-				"taxonomy": "https://cigaleapp.github.io/cigale/taxonomy.json",
-				"targets": {
-					"kingdom": "kingdom",
-					"phylum": "phylum",
-					"class": "class",
-					"order": "order",
-					"family": "family",
-					"genus": "genus"
+				"parent": {
+					"0": "allacma",
+					"1": "anurida",
+					"2": "bilobella",
+					"3": "bilobella",
+					"4": "bourletiella",
+					"5": "bourletiella",
+					"6": "brachystomella",
+					"7": "caprainea",
+					"8": "",
+					"9": "ceratophysella",
+					"10": "cyphoderus",
+					"11": "deuterosminthurus",
+					"12": "deuterosminthurus",
+					"13": "dicyrtoma",
+					"14": "dicyrtomina",
+					"15": "dicyrtomina",
+					"16": "dicyrtomina",
+					"17": "dicyrtomina",
+					"18": "dicyrtomina",
+					"19": "entomobrya",
+					"20": "entomobrya",
+					"21": "",
+					"22": "entomobrya",
+					"23": "",
+					"24": "",
+					"25": "entomobrya",
+					"26": "entomobrya",
+					"27": "",
+					"28": "entomobrya",
+					"29": "fasciosminthurus",
+					"30": "",
+					"31": "folsomia",
+					"32": "heteromurus",
+					"33": "heteromurus",
+					"34": "hypogastrura",
+					"35": "isotoma",
+					"36": "isotoma",
+					"37": "isotomiella",
+					"38": "isotomurus",
+					"39": "isotomurus",
+					"40": "",
+					"41": "isotomurus",
+					"42": "kalaphorura",
+					"43": "lepidocyrtus",
+					"44": "lepidocyrtus",
+					"45": "lepidocyrtus",
+					"46": "lepidocyrtus",
+					"47": "lepidocyrtus",
+					"48": "megalothorax",
+					"49": "monobella",
+					"50": "neanura",
+					"51": "neelus",
+					"52": "orchesella",
+					"53": "orchesella",
+					"54": "orchesella",
+					"55": "orchesella",
+					"56": "orchesella",
+					"57": "parisotoma",
+					"58": "podura",
+					"59": "",
+					"60": "pogonognathellus",
+					"61": "seira",
+					"62": "seira",
+					"63": "sminthurides",
+					"64": "sminthurides",
+					"65": "sminthurides",
+					"66": "",
+					"67": "sminthurinus",
+					"68": "sminthurinus",
+					"69": "sminthurinus",
+					"70": "sminthurinus",
+					"71": "",
+					"72": "tomocerus",
+					"73": "",
+					"74": "vertagopus",
+					"75": "vitronura",
+					"76": "willowsia",
+					"77": "willowsia",
+					"78": "willowsia"
 				}
 			},
-			"input": {
-				"height": 224,
-				"width": 224,
-				"disposition": "CHW",
-				"normalized": true
+			"infer": {
+				"neural": {
+					"model": "https://cigaleapp.github.io/models/model_classif.onnx",
+					"metadata": "io.github.cigaleapp.transects.arthropods__species",
+					"input": {
+						"height": 224,
+						"width": 224,
+						"disposition": "CHW",
+						"normalized": true
+					}
+				}
 			}
-		},
-		"detection": {
+		}
+	},
+	"crop": {
+		"metadata": "io.github.cigaleapp.transects.arthropods__crop",
+		"infer": {
 			"model": "https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx",
 			"input": {
 				"height": 640,
@@ -577,16 +1169,16 @@
 				"normalized": true,
 				"shape": ["sx", "sy", "ex", "ey", "score", "_"]
 			}
+		}
+	},
+	"exports": {
+		"images": {
+			"cropped": "Cropped/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}",
+			"original": "Original/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}"
 		},
-		"exports": {
-			"images": {
-				"cropped": "Cropped/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}",
-				"original": "Original/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}"
-			},
-			"metadata": {
-				"json": "analysis.json",
-				"csv": "metadata.csv"
-			}
+		"metadata": {
+			"json": "analysis.json",
+			"csv": "metadata.csv"
 		}
 	}
 }
