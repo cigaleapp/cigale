@@ -35,168 +35,2617 @@
     },
     "metadata": {
       "type": "object",
-      "properties": {
-        "class": {
-          "enum": []
-        },
-        "crop": {
-          "enum": []
-        },
-        "cuteness": {
-          "enum": []
-        },
-        "family": {
-          "enum": []
-        },
-        "genus": {
-          "enum": []
-        },
-        "kingdom": {
-          "enum": []
-        },
-        "order": {
-          "enum": []
-        },
-        "phylum": {
-          "enum": []
-        },
-        "shoot_date": {
-          "enum": []
-        },
-        "shoot_location": {
-          "enum": []
-        },
-        "species": {
-          "enum": []
-        }
-      },
       "additionalProperties": {
-        "type": "object",
-        "description": "Métadonnée du protocole",
-        "properties": {
-          "description": {
-            "type": "string",
-            "description": "Description, pour aider à comprendre la métadonnée"
-          },
-          "label": {
-            "type": "string",
-            "description": "Nom de la métadonnée"
-          },
-          "mergeMethod": {
-            "anyOf": [
-              {
-                "const": "average",
-                "description": "Prendre la moyenne des valeurs"
+        "anyOf": [
+          {
+            "type": "object",
+            "description": "Métadonnée du protocole",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "Description, pour aider à comprendre la métadonnée"
               },
-              {
-                "const": "max",
-                "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+              "label": {
+                "type": "string",
+                "description": "Nom de la métadonnée"
               },
-              {
-                "const": "median",
-                "description": "Prendre la médiane des valeurs"
+              "mergeMethod": {
+                "anyOf": [
+                  {
+                    "const": "average",
+                    "description": "Prendre la moyenne des valeurs"
+                  },
+                  {
+                    "const": "max",
+                    "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+                  },
+                  {
+                    "const": "median",
+                    "description": "Prendre la médiane des valeurs"
+                  },
+                  {
+                    "const": "min",
+                    "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+                  },
+                  {
+                    "const": "none",
+                    "description": "Ne pas fusionner"
+                  }
+                ],
+                "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
               },
-              {
-                "const": "min",
-                "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+              "required": {
+                "type": "boolean",
+                "description": "Si la métadonnée est obligatoire"
               },
-              {
-                "const": "none",
-                "description": "Ne pas fusionner"
+              "type": {
+                "anyOf": [
+                  {
+                    "const": "boolean",
+                    "description": "un booléen (vrai ou faux)"
+                  },
+                  {
+                    "const": "boundingbox",
+                    "description": "un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
+                  },
+                  {
+                    "const": "date",
+                    "description": "une date"
+                  },
+                  {
+                    "const": "float",
+                    "description": "un nombre, potentiellement à virgule"
+                  },
+                  {
+                    "const": "integer",
+                    "description": "un entier"
+                  },
+                  {
+                    "const": "string",
+                    "description": "du texte"
+                  }
+                ]
+              },
+              "infer": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "exif": {
+                        "enum": [
+                          "AFCP_IPTC",
+                          "ActiveArea",
+                          "AdventRevision",
+                          "AdventScale",
+                          "AliasLayerMetadata",
+                          "AlphaByteCount",
+                          "AlphaDataDiscard",
+                          "AlphaOffset",
+                          "AnalogBalance",
+                          "Annotations",
+                          "AntiAliasStrength",
+                          "ApertureValue",
+                          "ApplicationNotes",
+                          "Artist",
+                          "AsShotICCProfile",
+                          "AsShotNeutral",
+                          "AsShotPreProfileMatrix",
+                          "AsShotProfileName",
+                          "AsShotWhiteXY",
+                          "BackgroundColorIndicator",
+                          "BackgroundColorValue",
+                          "BadFaxLines",
+                          "BaselineExposure",
+                          "BaselineExposureOffset",
+                          "BaselineNoise",
+                          "BaselineSharpness",
+                          "BatteryLevel",
+                          "BayerGreenSplit",
+                          "BestQualityScale",
+                          "BitsPerExtendedRunLength",
+                          "BitsPerRunLength",
+                          "BitsPerSample",
+                          "BlackLevel",
+                          "BlackLevelDeltaH",
+                          "BlackLevelDeltaV",
+                          "BlackLevelRepeatDim",
+                          "Brightness",
+                          "BrightnessValue",
+                          "CFALayout",
+                          "CFAPattern",
+                          "CFAPattern2",
+                          "CFAPlaneColor",
+                          "CFARepeatPatternDim",
+                          "CIP3DataFile",
+                          "CIP3Sheet",
+                          "CIP3Side",
+                          "CMYKEquivalent",
+                          "CalibrationIlluminant1",
+                          "CalibrationIlluminant2",
+                          "CameraCalibration1",
+                          "CameraCalibration2",
+                          "CameraCalibrationSig",
+                          "CameraLabel",
+                          "CameraSerialNumber",
+                          "CellLength",
+                          "CellWidth",
+                          "ChromaBlurRadius",
+                          "CleanFaxData",
+                          "ClipPath",
+                          "CodingMethods",
+                          "ColorCharacterization",
+                          "ColorMap",
+                          "ColorMatrix1",
+                          "ColorMatrix2",
+                          "ColorResponseUnit",
+                          "ColorSequence",
+                          "ColorSpace",
+                          "ColorTable",
+                          "ColorimetricReference",
+                          "ComponentsConfiguration",
+                          "CompressedBitsPerPixel",
+                          "Compression",
+                          "ConsecutiveBadFaxLines",
+                          "Contrast",
+                          "Converter",
+                          "Copyright",
+                          "CreateDate",
+                          "CurrentICCProfile",
+                          "CurrentPreProfileMatrix",
+                          "CustomRendered",
+                          "DNGBackwardVersion",
+                          "DNGLensInfo",
+                          "DNGPrivateData",
+                          "DNGVersion",
+                          "DataType",
+                          "DateTimeOriginal",
+                          "Decode",
+                          "DefaultBlackRender",
+                          "DefaultCropOrigin",
+                          "DefaultCropSize",
+                          "DefaultImageColor",
+                          "DefaultScale",
+                          "DefaultUserCrop",
+                          "DeviceSettingDescription",
+                          "DigitalZoomRatio",
+                          "DocumentName",
+                          "DotRange",
+                          "ExifImageHeight",
+                          "ExifImageWidth",
+                          "ExifOffset",
+                          "ExifVersion",
+                          "ExpandFilm",
+                          "ExpandFilterLens",
+                          "ExpandFlashLamp",
+                          "ExpandLens",
+                          "ExpandScanner",
+                          "ExpandSoftware",
+                          "Exposure",
+                          "ExposureCompensation",
+                          "ExposureIndex",
+                          "ExposureMode",
+                          "ExposureProgram",
+                          "ExposureTime",
+                          "ExtraSamples",
+                          "FNumber",
+                          "FaxProfile",
+                          "FaxRecvParams",
+                          "FaxRecvTime",
+                          "FaxSubAddress",
+                          "FileSource",
+                          "FillOrder",
+                          "Flash",
+                          "FlashEnergy",
+                          "FlashpixVersion",
+                          "FocalLength",
+                          "FocalLengthIn35mmFormat",
+                          "FocalPlaneResolutionUnit",
+                          "FocalPlaneXResolution",
+                          "FocalPlaneYResolution",
+                          "ForwardMatrix1",
+                          "ForwardMatrix2",
+                          "FrameRate",
+                          "FreeByteCounts",
+                          "FreeOffsets",
+                          "GDALMetadata",
+                          "GDALNoData",
+                          "GPSAltitude",
+                          "GPSAltitudeRef",
+                          "GPSAreaInformation",
+                          "GPSDOP",
+                          "GPSDateStamp",
+                          "GPSDestBearing",
+                          "GPSDestBearingRef",
+                          "GPSDestDistance",
+                          "GPSDestDistanceRef",
+                          "GPSDestLatitude",
+                          "GPSDestLatitudeRef",
+                          "GPSDestLongitude",
+                          "GPSDestLongitudeRef",
+                          "GPSDifferential",
+                          "GPSHPositioningError",
+                          "GPSImgDirection",
+                          "GPSImgDirectionRef",
+                          "GPSInfo",
+                          "GPSLatitude",
+                          "GPSLatitudeRef",
+                          "GPSLongitude",
+                          "GPSLongitudeRef",
+                          "GPSMapDatum",
+                          "GPSMeasureMode",
+                          "GPSProcessingMethod",
+                          "GPSSatellites",
+                          "GPSSpeed",
+                          "GPSSpeedRef",
+                          "GPSStatus",
+                          "GPSTimeStamp",
+                          "GPSTrack",
+                          "GPSTrackRef",
+                          "GPSVersionID",
+                          "GainControl",
+                          "Gamma",
+                          "GeoTiffAsciiParams",
+                          "GeoTiffDirectory",
+                          "GeoTiffDoubleParams",
+                          "GlobalParametersIFD",
+                          "GrayResponseCurve",
+                          "GrayResponseUnit",
+                          "HCUsage",
+                          "HalftoneHints",
+                          "HeightResolution",
+                          "HostComputer",
+                          "ICC_Profile",
+                          "INGRReserved",
+                          "IPTC-NAA",
+                          "ISO",
+                          "ISOSpeed",
+                          "ISOSpeedLatitudeyyy",
+                          "ISOSpeedLatitudezzz",
+                          "IT8Header",
+                          "ImageByteCount",
+                          "ImageColorIndicator",
+                          "ImageColorValue",
+                          "ImageDataDiscard",
+                          "ImageDepth",
+                          "ImageDescription",
+                          "ImageHeight",
+                          "ImageHistory",
+                          "ImageID",
+                          "ImageLayer",
+                          "ImageNumber",
+                          "ImageOffset",
+                          "ImageSourceData",
+                          "ImageType",
+                          "ImageUniqueID",
+                          "ImageWidth",
+                          "Indexed",
+                          "InkNames",
+                          "InkSet",
+                          "IntergraphFlagRegisters",
+                          "IntergraphMatrix",
+                          "IntergraphPacketData",
+                          "Interlace",
+                          "InteropIndex",
+                          "InteropOffset",
+                          "InteropVersion",
+                          "JPEGACTables",
+                          "JPEGDCTables",
+                          "JPEGLosslessPredictors",
+                          "JPEGPointTransforms",
+                          "JPEGProc",
+                          "JPEGQTables",
+                          "JPEGRestartInterval",
+                          "JPEGTables",
+                          "KDC_IFD",
+                          "KodakIFD",
+                          "LeafData",
+                          "LeafSubIFD",
+                          "Lens",
+                          "LensInfo",
+                          "LensMake",
+                          "LensModel",
+                          "LensSerialNumber",
+                          "LightSource",
+                          "LinearResponseLimit",
+                          "LinearizationTable",
+                          "LocalizedCameraModel",
+                          "MDColorTable",
+                          "MDFileTag",
+                          "MDFileUnits",
+                          "MDLabName",
+                          "MDPrepDate",
+                          "MDPrepTime",
+                          "MDSampleInfo",
+                          "MDScalePixel",
+                          "MSDocumentText",
+                          "MSDocumentTextPosition",
+                          "MSPropertySetStorage",
+                          "Make",
+                          "MakerNote",
+                          "MakerNoteSafety",
+                          "MaskedAreas",
+                          "Matteing",
+                          "MaxApertureValue",
+                          "MaxSampleValue",
+                          "MeteringMode",
+                          "MinSampleValue",
+                          "ModeNumber",
+                          "Model",
+                          "Model2",
+                          "ModelTiePoint",
+                          "ModelTransform",
+                          "ModifyDate",
+                          "MoireFilter",
+                          "MultiProfiles",
+                          "NewRawImageDigest",
+                          "Noise",
+                          "NoiseProfile",
+                          "NoiseReductionApplied",
+                          "NumberofInks",
+                          "OPIProxy",
+                          "OceApplicationSelector",
+                          "OceIDNumber",
+                          "OceImageLogic",
+                          "OceScanjobDesc",
+                          "OffsetSchema",
+                          "OldSubfileType",
+                          "OpcodeList1",
+                          "OpcodeList2",
+                          "OpcodeList3",
+                          "Opto-ElectricConvFactor",
+                          "Orientation",
+                          "OriginalBestQualitySize",
+                          "OriginalDefaultCropSize",
+                          "OriginalDefaultFinalSize",
+                          "OriginalRawFileData",
+                          "OriginalRawFileDigest",
+                          "OriginalRawFileName",
+                          "OwnerName",
+                          "Padding",
+                          "PageName",
+                          "PageNumber",
+                          "PanasonicTitle",
+                          "PanasonicTitle2",
+                          "PhotometricInterpretation",
+                          "PhotoshopSettings",
+                          "PixelFormat",
+                          "PixelIntensityRange",
+                          "PixelMagicJBIGOptions",
+                          "PixelScale",
+                          "PlanarConfiguration",
+                          "Predictor",
+                          "PreviewApplicationName",
+                          "PreviewApplicationVersion",
+                          "PreviewColorSpace",
+                          "PreviewDateTime",
+                          "PreviewSettingsDigest",
+                          "PreviewSettingsName",
+                          "PrimaryChromaticities",
+                          "PrintIM",
+                          "ProcessingSoftware",
+                          "ProfileCalibrationSig",
+                          "ProfileCopyright",
+                          "ProfileEmbedPolicy",
+                          "ProfileHueSatMapData1",
+                          "ProfileHueSatMapData2",
+                          "ProfileHueSatMapDims",
+                          "ProfileHueSatMapEncoding",
+                          "ProfileIFD",
+                          "ProfileLookTableData",
+                          "ProfileLookTableDims",
+                          "ProfileLookTableEncoding",
+                          "ProfileName",
+                          "ProfileToneCurve",
+                          "ProfileType",
+                          "RasterPadding",
+                          "Rating",
+                          "RatingPercent",
+                          "RawDataUniqueID",
+                          "RawFile",
+                          "RawImageDigest",
+                          "RawImageSegmentation",
+                          "RawToPreviewGain",
+                          "RecommendedExposureIndex",
+                          "ReductionMatrix1",
+                          "ReductionMatrix2",
+                          "ReelName",
+                          "ReferenceBlackWhite",
+                          "RelatedImageFileFormat",
+                          "RelatedImageHeight",
+                          "RelatedImageWidth",
+                          "RelatedSoundFile",
+                          "ResolutionUnit",
+                          "RowInterleaveFactor",
+                          "RowsPerStrip",
+                          "SEMInfo",
+                          "SMaxSampleValue",
+                          "SMinSampleValue",
+                          "SampleFormat",
+                          "SamplesPerPixel",
+                          "Saturation",
+                          "SceneCaptureType",
+                          "SceneType",
+                          "SecurityClassification",
+                          "SelfTimerMode",
+                          "SensingMethod",
+                          "SensitivityType",
+                          "SerialNumber",
+                          "ShadowScale",
+                          "Shadows",
+                          "SharedData",
+                          "Sharpness",
+                          "ShutterSpeedValue",
+                          "Site",
+                          "Smoothness",
+                          "Software",
+                          "SpatialFrequencyResponse",
+                          "SpectralSensitivity",
+                          "StandardOutputSensitivity",
+                          "StitchInfo",
+                          "StoNits",
+                          "StripByteCounts",
+                          "StripOffsets",
+                          "StripRowCounts",
+                          "SubIFD",
+                          "SubSecTime",
+                          "SubSecTimeDigitized",
+                          "SubSecTimeOriginal",
+                          "SubTileBlockSize",
+                          "SubfileType",
+                          "SubjectArea",
+                          "SubjectDistance",
+                          "SubjectDistanceRange",
+                          "SubjectLocation",
+                          "T4Options",
+                          "T6Options",
+                          "T82Options",
+                          "T88Options",
+                          "TIFF-EPStandardID",
+                          "TIFF_FXExtensions",
+                          "TStop",
+                          "TargetPrinter",
+                          "Thresholding",
+                          "ThumbnailLength",
+                          "ThumbnailOffset",
+                          "TileByteCounts",
+                          "TileDepth",
+                          "TileLength",
+                          "TileOffsets",
+                          "TileWidth",
+                          "TimeCodes",
+                          "TimeZoneOffset",
+                          "TransferFunction",
+                          "TransferRange",
+                          "Transformation",
+                          "TransparencyIndicator",
+                          "TrapIndicator",
+                          "UIC1Tag",
+                          "UIC2Tag",
+                          "UIC3Tag",
+                          "UIC4Tag",
+                          "USPTOMiscellaneous",
+                          "USPTOOriginalContentType",
+                          "Uncompressed",
+                          "UniqueCameraModel",
+                          "UserComment",
+                          "VersionYear",
+                          "WB_GRGBLevels",
+                          "WangAnnotation",
+                          "WangTag1",
+                          "WangTag3",
+                          "WangTag4",
+                          "WhiteBalance",
+                          "WhiteLevel",
+                          "WhitePoint",
+                          "WidthResolution",
+                          "XClipPathUnits",
+                          "XPAuthor",
+                          "XPComment",
+                          "XPKeywords",
+                          "XPSubject",
+                          "XPTitle",
+                          "XP_DIP_XML",
+                          "XPosition",
+                          "XResolution",
+                          "YCbCrCoefficients",
+                          "YCbCrPositioning",
+                          "YCbCrSubSampling",
+                          "YClipPathUnits",
+                          "YPosition",
+                          "YResolution"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "exif"
+                    ],
+                    "description": "Inférer depuis un champ EXIF"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "neural": {
+                        "type": "object",
+                        "properties": {
+                          "input": {
+                            "type": "object",
+                            "description": "Configuration de l'entrée des modèles",
+                            "properties": {
+                              "height": {
+                                "type": "number",
+                                "description": "Hauteur en pixels du tenseur d'entrée du modèle",
+                                "exclusiveMaximum": 1024
+                              },
+                              "normalized": {
+                                "type": "boolean",
+                                "description": "Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255"
+                              },
+                              "width": {
+                                "type": "number",
+                                "description": "Largeur en pixels du tenseur d'entrée du modèle",
+                                "exclusiveMaximum": 1024
+                              },
+                              "disposition": {
+                                "anyOf": [
+                                  {
+                                    "const": "1CHW",
+                                    "description": "Tenseurs de la forme [1, 3, H, W]"
+                                  },
+                                  {
+                                    "const": "CHW",
+                                    "description": "Tenseurs de la forme [3, H, W]"
+                                  }
+                                ]
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
+                              }
+                            },
+                            "required": [
+                              "height",
+                              "normalized",
+                              "width"
+                            ]
+                          },
+                          "model": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                "pattern": "https?:\\/\\/.+"
+                              },
+                              {
+                                "type": "object",
+                                "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "description": "L'URL de la requête",
+                                    "pattern": "https?:\\/\\/.+"
+                                  },
+                                  "headers": {
+                                    "type": "object",
+                                    "description": "Les en-têtes à ajouter dans la requête",
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "method": {
+                                    "anyOf": [
+                                      {
+                                        "const": "DELETE",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      },
+                                      {
+                                        "const": "GET",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      },
+                                      {
+                                        "const": "POST",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      },
+                                      {
+                                        "const": "PUT",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      }
+                                    ],
+                                    "description": "La méthode de la requête (GET par défaut)"
+                                  }
+                                },
+                                "required": [
+                                  "url"
+                                ]
+                              }
+                            ],
+                            "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment."
+                          },
+                          "output": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Nom de l'output du modèle à utiliser. output0 par défaut"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "input",
+                          "model"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "neural"
+                    ],
+                    "description": "Inférer depuis un modèle de réseau de neurones"
+                  }
+                ],
+                "description": "Comment inférer la valeur de cette métadonnée"
+              },
+              "learnMore": {
+                "type": "string",
+                "description": "Un lien pour en apprendre plus sur ce que cette métadonnée décrit",
+                "pattern": "https?:\\/\\/.+"
               }
-            ],
-            "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
-          },
-          "required": {
-            "type": "boolean",
-            "description": "Si la métadonnée est obligatoire"
-          },
-          "type": {
-            "anyOf": [
-              {
-                "const": "boolean",
-                "description": "un booléen (vrai ou faux)"
-              },
-              {
-                "const": "boundingbox",
-                "description": "un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
-              },
-              {
-                "const": "date",
-                "description": "une date"
-              },
-              {
-                "const": "enum",
-                "description": "un ensemble de valeur fixes. Utiliser 'options' sur la définition d'une métadonnée pour préciser les valeurs possibles"
-              },
-              {
-                "const": "float",
-                "description": "un nombre, potentiellement à virgule"
-              },
-              {
-                "const": "integer",
-                "description": "un entier"
-              },
-              {
-                "const": "location",
-                "description": "un objet avec deux nombres, `latitude` et `longitude`"
-              },
-              {
-                "const": "string",
-                "description": "du texte"
-              }
+            },
+            "required": [
+              "description",
+              "label",
+              "mergeMethod",
+              "required",
+              "type"
             ]
           },
-          "learnMore": {
-            "type": "string",
-            "description": "Un lien pour en apprendre plus sur ce que cette métadonnée décrit",
-            "pattern": "https?:\\/\\/.+"
-          },
-          "options": {
-            "type": "array",
-            "description": "Les options valides. Uniquement utile pour une métadonnée de type \"enum\"",
-            "minItems": 1,
-            "items": {
-              "type": "object",
-              "properties": {
-                "description": {
-                  "type": "string",
-                  "description": "Description (optionnelle) de cette option"
-                },
-                "key": {
-                  "type": "string",
-                  "description": "Identifiant unique pour cette option",
-                  "pattern": "[\\w_]+"
-                },
-                "label": {
-                  "type": "string",
-                  "description": "Nom de l'option, affichable dans une interface utilisateur"
-                },
-                "image": {
-                  "type": "string",
-                  "pattern": "https?:\\/\\/.+"
-                },
-                "learnMore": {
-                  "type": "string",
-                  "description": "Lien pour en savoir plus sur cette option de l'énumération en particulier",
-                  "pattern": "https?:\\/\\/.+"
+          {
+            "type": "object",
+            "description": "Métadonnée du protocole",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "Description, pour aider à comprendre la métadonnée"
+              },
+              "label": {
+                "type": "string",
+                "description": "Nom de la métadonnée"
+              },
+              "mergeMethod": {
+                "anyOf": [
+                  {
+                    "const": "average",
+                    "description": "Prendre la moyenne des valeurs"
+                  },
+                  {
+                    "const": "max",
+                    "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+                  },
+                  {
+                    "const": "median",
+                    "description": "Prendre la médiane des valeurs"
+                  },
+                  {
+                    "const": "min",
+                    "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+                  },
+                  {
+                    "const": "none",
+                    "description": "Ne pas fusionner"
+                  }
+                ],
+                "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Si la métadonnée est obligatoire"
+              },
+              "type": {
+                "const": "enum"
+              },
+              "infer": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "exif": {
+                        "enum": [
+                          "AFCP_IPTC",
+                          "ActiveArea",
+                          "AdventRevision",
+                          "AdventScale",
+                          "AliasLayerMetadata",
+                          "AlphaByteCount",
+                          "AlphaDataDiscard",
+                          "AlphaOffset",
+                          "AnalogBalance",
+                          "Annotations",
+                          "AntiAliasStrength",
+                          "ApertureValue",
+                          "ApplicationNotes",
+                          "Artist",
+                          "AsShotICCProfile",
+                          "AsShotNeutral",
+                          "AsShotPreProfileMatrix",
+                          "AsShotProfileName",
+                          "AsShotWhiteXY",
+                          "BackgroundColorIndicator",
+                          "BackgroundColorValue",
+                          "BadFaxLines",
+                          "BaselineExposure",
+                          "BaselineExposureOffset",
+                          "BaselineNoise",
+                          "BaselineSharpness",
+                          "BatteryLevel",
+                          "BayerGreenSplit",
+                          "BestQualityScale",
+                          "BitsPerExtendedRunLength",
+                          "BitsPerRunLength",
+                          "BitsPerSample",
+                          "BlackLevel",
+                          "BlackLevelDeltaH",
+                          "BlackLevelDeltaV",
+                          "BlackLevelRepeatDim",
+                          "Brightness",
+                          "BrightnessValue",
+                          "CFALayout",
+                          "CFAPattern",
+                          "CFAPattern2",
+                          "CFAPlaneColor",
+                          "CFARepeatPatternDim",
+                          "CIP3DataFile",
+                          "CIP3Sheet",
+                          "CIP3Side",
+                          "CMYKEquivalent",
+                          "CalibrationIlluminant1",
+                          "CalibrationIlluminant2",
+                          "CameraCalibration1",
+                          "CameraCalibration2",
+                          "CameraCalibrationSig",
+                          "CameraLabel",
+                          "CameraSerialNumber",
+                          "CellLength",
+                          "CellWidth",
+                          "ChromaBlurRadius",
+                          "CleanFaxData",
+                          "ClipPath",
+                          "CodingMethods",
+                          "ColorCharacterization",
+                          "ColorMap",
+                          "ColorMatrix1",
+                          "ColorMatrix2",
+                          "ColorResponseUnit",
+                          "ColorSequence",
+                          "ColorSpace",
+                          "ColorTable",
+                          "ColorimetricReference",
+                          "ComponentsConfiguration",
+                          "CompressedBitsPerPixel",
+                          "Compression",
+                          "ConsecutiveBadFaxLines",
+                          "Contrast",
+                          "Converter",
+                          "Copyright",
+                          "CreateDate",
+                          "CurrentICCProfile",
+                          "CurrentPreProfileMatrix",
+                          "CustomRendered",
+                          "DNGBackwardVersion",
+                          "DNGLensInfo",
+                          "DNGPrivateData",
+                          "DNGVersion",
+                          "DataType",
+                          "DateTimeOriginal",
+                          "Decode",
+                          "DefaultBlackRender",
+                          "DefaultCropOrigin",
+                          "DefaultCropSize",
+                          "DefaultImageColor",
+                          "DefaultScale",
+                          "DefaultUserCrop",
+                          "DeviceSettingDescription",
+                          "DigitalZoomRatio",
+                          "DocumentName",
+                          "DotRange",
+                          "ExifImageHeight",
+                          "ExifImageWidth",
+                          "ExifOffset",
+                          "ExifVersion",
+                          "ExpandFilm",
+                          "ExpandFilterLens",
+                          "ExpandFlashLamp",
+                          "ExpandLens",
+                          "ExpandScanner",
+                          "ExpandSoftware",
+                          "Exposure",
+                          "ExposureCompensation",
+                          "ExposureIndex",
+                          "ExposureMode",
+                          "ExposureProgram",
+                          "ExposureTime",
+                          "ExtraSamples",
+                          "FNumber",
+                          "FaxProfile",
+                          "FaxRecvParams",
+                          "FaxRecvTime",
+                          "FaxSubAddress",
+                          "FileSource",
+                          "FillOrder",
+                          "Flash",
+                          "FlashEnergy",
+                          "FlashpixVersion",
+                          "FocalLength",
+                          "FocalLengthIn35mmFormat",
+                          "FocalPlaneResolutionUnit",
+                          "FocalPlaneXResolution",
+                          "FocalPlaneYResolution",
+                          "ForwardMatrix1",
+                          "ForwardMatrix2",
+                          "FrameRate",
+                          "FreeByteCounts",
+                          "FreeOffsets",
+                          "GDALMetadata",
+                          "GDALNoData",
+                          "GPSAltitude",
+                          "GPSAltitudeRef",
+                          "GPSAreaInformation",
+                          "GPSDOP",
+                          "GPSDateStamp",
+                          "GPSDestBearing",
+                          "GPSDestBearingRef",
+                          "GPSDestDistance",
+                          "GPSDestDistanceRef",
+                          "GPSDestLatitude",
+                          "GPSDestLatitudeRef",
+                          "GPSDestLongitude",
+                          "GPSDestLongitudeRef",
+                          "GPSDifferential",
+                          "GPSHPositioningError",
+                          "GPSImgDirection",
+                          "GPSImgDirectionRef",
+                          "GPSInfo",
+                          "GPSLatitude",
+                          "GPSLatitudeRef",
+                          "GPSLongitude",
+                          "GPSLongitudeRef",
+                          "GPSMapDatum",
+                          "GPSMeasureMode",
+                          "GPSProcessingMethod",
+                          "GPSSatellites",
+                          "GPSSpeed",
+                          "GPSSpeedRef",
+                          "GPSStatus",
+                          "GPSTimeStamp",
+                          "GPSTrack",
+                          "GPSTrackRef",
+                          "GPSVersionID",
+                          "GainControl",
+                          "Gamma",
+                          "GeoTiffAsciiParams",
+                          "GeoTiffDirectory",
+                          "GeoTiffDoubleParams",
+                          "GlobalParametersIFD",
+                          "GrayResponseCurve",
+                          "GrayResponseUnit",
+                          "HCUsage",
+                          "HalftoneHints",
+                          "HeightResolution",
+                          "HostComputer",
+                          "ICC_Profile",
+                          "INGRReserved",
+                          "IPTC-NAA",
+                          "ISO",
+                          "ISOSpeed",
+                          "ISOSpeedLatitudeyyy",
+                          "ISOSpeedLatitudezzz",
+                          "IT8Header",
+                          "ImageByteCount",
+                          "ImageColorIndicator",
+                          "ImageColorValue",
+                          "ImageDataDiscard",
+                          "ImageDepth",
+                          "ImageDescription",
+                          "ImageHeight",
+                          "ImageHistory",
+                          "ImageID",
+                          "ImageLayer",
+                          "ImageNumber",
+                          "ImageOffset",
+                          "ImageSourceData",
+                          "ImageType",
+                          "ImageUniqueID",
+                          "ImageWidth",
+                          "Indexed",
+                          "InkNames",
+                          "InkSet",
+                          "IntergraphFlagRegisters",
+                          "IntergraphMatrix",
+                          "IntergraphPacketData",
+                          "Interlace",
+                          "InteropIndex",
+                          "InteropOffset",
+                          "InteropVersion",
+                          "JPEGACTables",
+                          "JPEGDCTables",
+                          "JPEGLosslessPredictors",
+                          "JPEGPointTransforms",
+                          "JPEGProc",
+                          "JPEGQTables",
+                          "JPEGRestartInterval",
+                          "JPEGTables",
+                          "KDC_IFD",
+                          "KodakIFD",
+                          "LeafData",
+                          "LeafSubIFD",
+                          "Lens",
+                          "LensInfo",
+                          "LensMake",
+                          "LensModel",
+                          "LensSerialNumber",
+                          "LightSource",
+                          "LinearResponseLimit",
+                          "LinearizationTable",
+                          "LocalizedCameraModel",
+                          "MDColorTable",
+                          "MDFileTag",
+                          "MDFileUnits",
+                          "MDLabName",
+                          "MDPrepDate",
+                          "MDPrepTime",
+                          "MDSampleInfo",
+                          "MDScalePixel",
+                          "MSDocumentText",
+                          "MSDocumentTextPosition",
+                          "MSPropertySetStorage",
+                          "Make",
+                          "MakerNote",
+                          "MakerNoteSafety",
+                          "MaskedAreas",
+                          "Matteing",
+                          "MaxApertureValue",
+                          "MaxSampleValue",
+                          "MeteringMode",
+                          "MinSampleValue",
+                          "ModeNumber",
+                          "Model",
+                          "Model2",
+                          "ModelTiePoint",
+                          "ModelTransform",
+                          "ModifyDate",
+                          "MoireFilter",
+                          "MultiProfiles",
+                          "NewRawImageDigest",
+                          "Noise",
+                          "NoiseProfile",
+                          "NoiseReductionApplied",
+                          "NumberofInks",
+                          "OPIProxy",
+                          "OceApplicationSelector",
+                          "OceIDNumber",
+                          "OceImageLogic",
+                          "OceScanjobDesc",
+                          "OffsetSchema",
+                          "OldSubfileType",
+                          "OpcodeList1",
+                          "OpcodeList2",
+                          "OpcodeList3",
+                          "Opto-ElectricConvFactor",
+                          "Orientation",
+                          "OriginalBestQualitySize",
+                          "OriginalDefaultCropSize",
+                          "OriginalDefaultFinalSize",
+                          "OriginalRawFileData",
+                          "OriginalRawFileDigest",
+                          "OriginalRawFileName",
+                          "OwnerName",
+                          "Padding",
+                          "PageName",
+                          "PageNumber",
+                          "PanasonicTitle",
+                          "PanasonicTitle2",
+                          "PhotometricInterpretation",
+                          "PhotoshopSettings",
+                          "PixelFormat",
+                          "PixelIntensityRange",
+                          "PixelMagicJBIGOptions",
+                          "PixelScale",
+                          "PlanarConfiguration",
+                          "Predictor",
+                          "PreviewApplicationName",
+                          "PreviewApplicationVersion",
+                          "PreviewColorSpace",
+                          "PreviewDateTime",
+                          "PreviewSettingsDigest",
+                          "PreviewSettingsName",
+                          "PrimaryChromaticities",
+                          "PrintIM",
+                          "ProcessingSoftware",
+                          "ProfileCalibrationSig",
+                          "ProfileCopyright",
+                          "ProfileEmbedPolicy",
+                          "ProfileHueSatMapData1",
+                          "ProfileHueSatMapData2",
+                          "ProfileHueSatMapDims",
+                          "ProfileHueSatMapEncoding",
+                          "ProfileIFD",
+                          "ProfileLookTableData",
+                          "ProfileLookTableDims",
+                          "ProfileLookTableEncoding",
+                          "ProfileName",
+                          "ProfileToneCurve",
+                          "ProfileType",
+                          "RasterPadding",
+                          "Rating",
+                          "RatingPercent",
+                          "RawDataUniqueID",
+                          "RawFile",
+                          "RawImageDigest",
+                          "RawImageSegmentation",
+                          "RawToPreviewGain",
+                          "RecommendedExposureIndex",
+                          "ReductionMatrix1",
+                          "ReductionMatrix2",
+                          "ReelName",
+                          "ReferenceBlackWhite",
+                          "RelatedImageFileFormat",
+                          "RelatedImageHeight",
+                          "RelatedImageWidth",
+                          "RelatedSoundFile",
+                          "ResolutionUnit",
+                          "RowInterleaveFactor",
+                          "RowsPerStrip",
+                          "SEMInfo",
+                          "SMaxSampleValue",
+                          "SMinSampleValue",
+                          "SampleFormat",
+                          "SamplesPerPixel",
+                          "Saturation",
+                          "SceneCaptureType",
+                          "SceneType",
+                          "SecurityClassification",
+                          "SelfTimerMode",
+                          "SensingMethod",
+                          "SensitivityType",
+                          "SerialNumber",
+                          "ShadowScale",
+                          "Shadows",
+                          "SharedData",
+                          "Sharpness",
+                          "ShutterSpeedValue",
+                          "Site",
+                          "Smoothness",
+                          "Software",
+                          "SpatialFrequencyResponse",
+                          "SpectralSensitivity",
+                          "StandardOutputSensitivity",
+                          "StitchInfo",
+                          "StoNits",
+                          "StripByteCounts",
+                          "StripOffsets",
+                          "StripRowCounts",
+                          "SubIFD",
+                          "SubSecTime",
+                          "SubSecTimeDigitized",
+                          "SubSecTimeOriginal",
+                          "SubTileBlockSize",
+                          "SubfileType",
+                          "SubjectArea",
+                          "SubjectDistance",
+                          "SubjectDistanceRange",
+                          "SubjectLocation",
+                          "T4Options",
+                          "T6Options",
+                          "T82Options",
+                          "T88Options",
+                          "TIFF-EPStandardID",
+                          "TIFF_FXExtensions",
+                          "TStop",
+                          "TargetPrinter",
+                          "Thresholding",
+                          "ThumbnailLength",
+                          "ThumbnailOffset",
+                          "TileByteCounts",
+                          "TileDepth",
+                          "TileLength",
+                          "TileOffsets",
+                          "TileWidth",
+                          "TimeCodes",
+                          "TimeZoneOffset",
+                          "TransferFunction",
+                          "TransferRange",
+                          "Transformation",
+                          "TransparencyIndicator",
+                          "TrapIndicator",
+                          "UIC1Tag",
+                          "UIC2Tag",
+                          "UIC3Tag",
+                          "UIC4Tag",
+                          "USPTOMiscellaneous",
+                          "USPTOOriginalContentType",
+                          "Uncompressed",
+                          "UniqueCameraModel",
+                          "UserComment",
+                          "VersionYear",
+                          "WB_GRGBLevels",
+                          "WangAnnotation",
+                          "WangTag1",
+                          "WangTag3",
+                          "WangTag4",
+                          "WhiteBalance",
+                          "WhiteLevel",
+                          "WhitePoint",
+                          "WidthResolution",
+                          "XClipPathUnits",
+                          "XPAuthor",
+                          "XPComment",
+                          "XPKeywords",
+                          "XPSubject",
+                          "XPTitle",
+                          "XP_DIP_XML",
+                          "XPosition",
+                          "XResolution",
+                          "YCbCrCoefficients",
+                          "YCbCrPositioning",
+                          "YCbCrSubSampling",
+                          "YClipPathUnits",
+                          "YPosition",
+                          "YResolution"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "exif"
+                    ],
+                    "description": "Inférer depuis un champ EXIF"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "neural": {
+                        "type": "object",
+                        "properties": {
+                          "input": {
+                            "type": "object",
+                            "description": "Configuration de l'entrée des modèles",
+                            "properties": {
+                              "height": {
+                                "type": "number",
+                                "description": "Hauteur en pixels du tenseur d'entrée du modèle",
+                                "exclusiveMaximum": 1024
+                              },
+                              "normalized": {
+                                "type": "boolean",
+                                "description": "Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255"
+                              },
+                              "width": {
+                                "type": "number",
+                                "description": "Largeur en pixels du tenseur d'entrée du modèle",
+                                "exclusiveMaximum": 1024
+                              },
+                              "disposition": {
+                                "anyOf": [
+                                  {
+                                    "const": "1CHW",
+                                    "description": "Tenseurs de la forme [1, 3, H, W]"
+                                  },
+                                  {
+                                    "const": "CHW",
+                                    "description": "Tenseurs de la forme [3, H, W]"
+                                  }
+                                ]
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
+                              }
+                            },
+                            "required": [
+                              "height",
+                              "normalized",
+                              "width"
+                            ]
+                          },
+                          "model": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                "pattern": "https?:\\/\\/.+"
+                              },
+                              {
+                                "type": "object",
+                                "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                "properties": {
+                                  "url": {
+                                    "type": "string",
+                                    "description": "L'URL de la requête",
+                                    "pattern": "https?:\\/\\/.+"
+                                  },
+                                  "headers": {
+                                    "type": "object",
+                                    "description": "Les en-têtes à ajouter dans la requête",
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "method": {
+                                    "anyOf": [
+                                      {
+                                        "const": "DELETE",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      },
+                                      {
+                                        "const": "GET",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      },
+                                      {
+                                        "const": "POST",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      },
+                                      {
+                                        "const": "PUT",
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      }
+                                    ],
+                                    "description": "La méthode de la requête (GET par défaut)"
+                                  }
+                                },
+                                "required": [
+                                  "url"
+                                ]
+                              }
+                            ],
+                            "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment."
+                          },
+                          "output": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Nom de l'output du modèle à utiliser. output0 par défaut"
+                              }
+                            }
+                          }
+                        },
+                        "required": [
+                          "input",
+                          "model"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "neural"
+                    ],
+                    "description": "Inférer depuis un modèle de réseau de neurones"
+                  }
+                ],
+                "description": "Comment inférer la valeur de cette métadonnée"
+              },
+              "learnMore": {
+                "type": "string",
+                "description": "Un lien pour en apprendre plus sur ce que cette métadonnée décrit",
+                "pattern": "https?:\\/\\/.+"
+              },
+              "options": {
+                "type": "array",
+                "description": "Les options valides. Uniquement utile pour une métadonnée de type \"enum\"",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "description": "Description (optionnelle) de cette option"
+                    },
+                    "key": {
+                      "type": "string",
+                      "description": "Identifiant unique pour cette option",
+                      "pattern": "[\\w_]+"
+                    },
+                    "label": {
+                      "type": "string",
+                      "description": "Nom de l'option, affichable dans une interface utilisateur"
+                    },
+                    "image": {
+                      "type": "string",
+                      "pattern": "https?:\\/\\/.+"
+                    },
+                    "learnMore": {
+                      "type": "string",
+                      "description": "Lien pour en savoir plus sur cette option de l'énumération en particulier",
+                      "pattern": "https?:\\/\\/.+"
+                    }
+                  },
+                  "required": [
+                    "description",
+                    "key",
+                    "label"
+                  ]
                 }
               },
-              "required": [
-                "description",
-                "key",
-                "label"
-              ]
-            }
+              "taxonomic": {
+                "type": "object",
+                "description": "Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles. Bien penser à définir toutes les autres métadonnées représentant les clades supérieures avec `taxonomic.clade`",
+                "properties": {
+                  "clade": {
+                    "anyOf": [
+                      {
+                        "const": "class",
+                        "description": "La clade représentée par cette métadonnée."
+                      },
+                      {
+                        "const": "family",
+                        "description": "La clade représentée par cette métadonnée."
+                      },
+                      {
+                        "const": "genus",
+                        "description": "La clade représentée par cette métadonnée."
+                      },
+                      {
+                        "const": "kingdom",
+                        "description": "La clade représentée par cette métadonnée."
+                      },
+                      {
+                        "const": "order",
+                        "description": "La clade représentée par cette métadonnée."
+                      },
+                      {
+                        "const": "phylum",
+                        "description": "La clade représentée par cette métadonnée."
+                      },
+                      {
+                        "const": "species",
+                        "description": "La clade représentée par cette métadonnée."
+                      }
+                    ],
+                    "description": "La clade représentée par cette métadonnée."
+                  },
+                  "parent": {
+                    "type": "object",
+                    "description": "Associe les valeurs (key) possibles de cette métadonnée aux valeurs (key) de la métadonnée représentant la clade parente",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "clade",
+                  "parent"
+                ]
+              }
+            },
+            "required": [
+              "description",
+              "label",
+              "mergeMethod",
+              "required",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "description": "Métadonnée du protocole",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "Description, pour aider à comprendre la métadonnée"
+              },
+              "label": {
+                "type": "string",
+                "description": "Nom de la métadonnée"
+              },
+              "mergeMethod": {
+                "anyOf": [
+                  {
+                    "const": "average",
+                    "description": "Prendre la moyenne des valeurs"
+                  },
+                  {
+                    "const": "max",
+                    "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+                  },
+                  {
+                    "const": "median",
+                    "description": "Prendre la médiane des valeurs"
+                  },
+                  {
+                    "const": "min",
+                    "description": "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+                  },
+                  {
+                    "const": "none",
+                    "description": "Ne pas fusionner"
+                  }
+                ],
+                "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Si la métadonnée est obligatoire"
+              },
+              "type": {
+                "const": "location"
+              },
+              "infer": {
+                "type": "object",
+                "properties": {
+                  "latitude": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "exif": {
+                            "enum": [
+                              "AFCP_IPTC",
+                              "ActiveArea",
+                              "AdventRevision",
+                              "AdventScale",
+                              "AliasLayerMetadata",
+                              "AlphaByteCount",
+                              "AlphaDataDiscard",
+                              "AlphaOffset",
+                              "AnalogBalance",
+                              "Annotations",
+                              "AntiAliasStrength",
+                              "ApertureValue",
+                              "ApplicationNotes",
+                              "Artist",
+                              "AsShotICCProfile",
+                              "AsShotNeutral",
+                              "AsShotPreProfileMatrix",
+                              "AsShotProfileName",
+                              "AsShotWhiteXY",
+                              "BackgroundColorIndicator",
+                              "BackgroundColorValue",
+                              "BadFaxLines",
+                              "BaselineExposure",
+                              "BaselineExposureOffset",
+                              "BaselineNoise",
+                              "BaselineSharpness",
+                              "BatteryLevel",
+                              "BayerGreenSplit",
+                              "BestQualityScale",
+                              "BitsPerExtendedRunLength",
+                              "BitsPerRunLength",
+                              "BitsPerSample",
+                              "BlackLevel",
+                              "BlackLevelDeltaH",
+                              "BlackLevelDeltaV",
+                              "BlackLevelRepeatDim",
+                              "Brightness",
+                              "BrightnessValue",
+                              "CFALayout",
+                              "CFAPattern",
+                              "CFAPattern2",
+                              "CFAPlaneColor",
+                              "CFARepeatPatternDim",
+                              "CIP3DataFile",
+                              "CIP3Sheet",
+                              "CIP3Side",
+                              "CMYKEquivalent",
+                              "CalibrationIlluminant1",
+                              "CalibrationIlluminant2",
+                              "CameraCalibration1",
+                              "CameraCalibration2",
+                              "CameraCalibrationSig",
+                              "CameraLabel",
+                              "CameraSerialNumber",
+                              "CellLength",
+                              "CellWidth",
+                              "ChromaBlurRadius",
+                              "CleanFaxData",
+                              "ClipPath",
+                              "CodingMethods",
+                              "ColorCharacterization",
+                              "ColorMap",
+                              "ColorMatrix1",
+                              "ColorMatrix2",
+                              "ColorResponseUnit",
+                              "ColorSequence",
+                              "ColorSpace",
+                              "ColorTable",
+                              "ColorimetricReference",
+                              "ComponentsConfiguration",
+                              "CompressedBitsPerPixel",
+                              "Compression",
+                              "ConsecutiveBadFaxLines",
+                              "Contrast",
+                              "Converter",
+                              "Copyright",
+                              "CreateDate",
+                              "CurrentICCProfile",
+                              "CurrentPreProfileMatrix",
+                              "CustomRendered",
+                              "DNGBackwardVersion",
+                              "DNGLensInfo",
+                              "DNGPrivateData",
+                              "DNGVersion",
+                              "DataType",
+                              "DateTimeOriginal",
+                              "Decode",
+                              "DefaultBlackRender",
+                              "DefaultCropOrigin",
+                              "DefaultCropSize",
+                              "DefaultImageColor",
+                              "DefaultScale",
+                              "DefaultUserCrop",
+                              "DeviceSettingDescription",
+                              "DigitalZoomRatio",
+                              "DocumentName",
+                              "DotRange",
+                              "ExifImageHeight",
+                              "ExifImageWidth",
+                              "ExifOffset",
+                              "ExifVersion",
+                              "ExpandFilm",
+                              "ExpandFilterLens",
+                              "ExpandFlashLamp",
+                              "ExpandLens",
+                              "ExpandScanner",
+                              "ExpandSoftware",
+                              "Exposure",
+                              "ExposureCompensation",
+                              "ExposureIndex",
+                              "ExposureMode",
+                              "ExposureProgram",
+                              "ExposureTime",
+                              "ExtraSamples",
+                              "FNumber",
+                              "FaxProfile",
+                              "FaxRecvParams",
+                              "FaxRecvTime",
+                              "FaxSubAddress",
+                              "FileSource",
+                              "FillOrder",
+                              "Flash",
+                              "FlashEnergy",
+                              "FlashpixVersion",
+                              "FocalLength",
+                              "FocalLengthIn35mmFormat",
+                              "FocalPlaneResolutionUnit",
+                              "FocalPlaneXResolution",
+                              "FocalPlaneYResolution",
+                              "ForwardMatrix1",
+                              "ForwardMatrix2",
+                              "FrameRate",
+                              "FreeByteCounts",
+                              "FreeOffsets",
+                              "GDALMetadata",
+                              "GDALNoData",
+                              "GPSAltitude",
+                              "GPSAltitudeRef",
+                              "GPSAreaInformation",
+                              "GPSDOP",
+                              "GPSDateStamp",
+                              "GPSDestBearing",
+                              "GPSDestBearingRef",
+                              "GPSDestDistance",
+                              "GPSDestDistanceRef",
+                              "GPSDestLatitude",
+                              "GPSDestLatitudeRef",
+                              "GPSDestLongitude",
+                              "GPSDestLongitudeRef",
+                              "GPSDifferential",
+                              "GPSHPositioningError",
+                              "GPSImgDirection",
+                              "GPSImgDirectionRef",
+                              "GPSInfo",
+                              "GPSLatitude",
+                              "GPSLatitudeRef",
+                              "GPSLongitude",
+                              "GPSLongitudeRef",
+                              "GPSMapDatum",
+                              "GPSMeasureMode",
+                              "GPSProcessingMethod",
+                              "GPSSatellites",
+                              "GPSSpeed",
+                              "GPSSpeedRef",
+                              "GPSStatus",
+                              "GPSTimeStamp",
+                              "GPSTrack",
+                              "GPSTrackRef",
+                              "GPSVersionID",
+                              "GainControl",
+                              "Gamma",
+                              "GeoTiffAsciiParams",
+                              "GeoTiffDirectory",
+                              "GeoTiffDoubleParams",
+                              "GlobalParametersIFD",
+                              "GrayResponseCurve",
+                              "GrayResponseUnit",
+                              "HCUsage",
+                              "HalftoneHints",
+                              "HeightResolution",
+                              "HostComputer",
+                              "ICC_Profile",
+                              "INGRReserved",
+                              "IPTC-NAA",
+                              "ISO",
+                              "ISOSpeed",
+                              "ISOSpeedLatitudeyyy",
+                              "ISOSpeedLatitudezzz",
+                              "IT8Header",
+                              "ImageByteCount",
+                              "ImageColorIndicator",
+                              "ImageColorValue",
+                              "ImageDataDiscard",
+                              "ImageDepth",
+                              "ImageDescription",
+                              "ImageHeight",
+                              "ImageHistory",
+                              "ImageID",
+                              "ImageLayer",
+                              "ImageNumber",
+                              "ImageOffset",
+                              "ImageSourceData",
+                              "ImageType",
+                              "ImageUniqueID",
+                              "ImageWidth",
+                              "Indexed",
+                              "InkNames",
+                              "InkSet",
+                              "IntergraphFlagRegisters",
+                              "IntergraphMatrix",
+                              "IntergraphPacketData",
+                              "Interlace",
+                              "InteropIndex",
+                              "InteropOffset",
+                              "InteropVersion",
+                              "JPEGACTables",
+                              "JPEGDCTables",
+                              "JPEGLosslessPredictors",
+                              "JPEGPointTransforms",
+                              "JPEGProc",
+                              "JPEGQTables",
+                              "JPEGRestartInterval",
+                              "JPEGTables",
+                              "KDC_IFD",
+                              "KodakIFD",
+                              "LeafData",
+                              "LeafSubIFD",
+                              "Lens",
+                              "LensInfo",
+                              "LensMake",
+                              "LensModel",
+                              "LensSerialNumber",
+                              "LightSource",
+                              "LinearResponseLimit",
+                              "LinearizationTable",
+                              "LocalizedCameraModel",
+                              "MDColorTable",
+                              "MDFileTag",
+                              "MDFileUnits",
+                              "MDLabName",
+                              "MDPrepDate",
+                              "MDPrepTime",
+                              "MDSampleInfo",
+                              "MDScalePixel",
+                              "MSDocumentText",
+                              "MSDocumentTextPosition",
+                              "MSPropertySetStorage",
+                              "Make",
+                              "MakerNote",
+                              "MakerNoteSafety",
+                              "MaskedAreas",
+                              "Matteing",
+                              "MaxApertureValue",
+                              "MaxSampleValue",
+                              "MeteringMode",
+                              "MinSampleValue",
+                              "ModeNumber",
+                              "Model",
+                              "Model2",
+                              "ModelTiePoint",
+                              "ModelTransform",
+                              "ModifyDate",
+                              "MoireFilter",
+                              "MultiProfiles",
+                              "NewRawImageDigest",
+                              "Noise",
+                              "NoiseProfile",
+                              "NoiseReductionApplied",
+                              "NumberofInks",
+                              "OPIProxy",
+                              "OceApplicationSelector",
+                              "OceIDNumber",
+                              "OceImageLogic",
+                              "OceScanjobDesc",
+                              "OffsetSchema",
+                              "OldSubfileType",
+                              "OpcodeList1",
+                              "OpcodeList2",
+                              "OpcodeList3",
+                              "Opto-ElectricConvFactor",
+                              "Orientation",
+                              "OriginalBestQualitySize",
+                              "OriginalDefaultCropSize",
+                              "OriginalDefaultFinalSize",
+                              "OriginalRawFileData",
+                              "OriginalRawFileDigest",
+                              "OriginalRawFileName",
+                              "OwnerName",
+                              "Padding",
+                              "PageName",
+                              "PageNumber",
+                              "PanasonicTitle",
+                              "PanasonicTitle2",
+                              "PhotometricInterpretation",
+                              "PhotoshopSettings",
+                              "PixelFormat",
+                              "PixelIntensityRange",
+                              "PixelMagicJBIGOptions",
+                              "PixelScale",
+                              "PlanarConfiguration",
+                              "Predictor",
+                              "PreviewApplicationName",
+                              "PreviewApplicationVersion",
+                              "PreviewColorSpace",
+                              "PreviewDateTime",
+                              "PreviewSettingsDigest",
+                              "PreviewSettingsName",
+                              "PrimaryChromaticities",
+                              "PrintIM",
+                              "ProcessingSoftware",
+                              "ProfileCalibrationSig",
+                              "ProfileCopyright",
+                              "ProfileEmbedPolicy",
+                              "ProfileHueSatMapData1",
+                              "ProfileHueSatMapData2",
+                              "ProfileHueSatMapDims",
+                              "ProfileHueSatMapEncoding",
+                              "ProfileIFD",
+                              "ProfileLookTableData",
+                              "ProfileLookTableDims",
+                              "ProfileLookTableEncoding",
+                              "ProfileName",
+                              "ProfileToneCurve",
+                              "ProfileType",
+                              "RasterPadding",
+                              "Rating",
+                              "RatingPercent",
+                              "RawDataUniqueID",
+                              "RawFile",
+                              "RawImageDigest",
+                              "RawImageSegmentation",
+                              "RawToPreviewGain",
+                              "RecommendedExposureIndex",
+                              "ReductionMatrix1",
+                              "ReductionMatrix2",
+                              "ReelName",
+                              "ReferenceBlackWhite",
+                              "RelatedImageFileFormat",
+                              "RelatedImageHeight",
+                              "RelatedImageWidth",
+                              "RelatedSoundFile",
+                              "ResolutionUnit",
+                              "RowInterleaveFactor",
+                              "RowsPerStrip",
+                              "SEMInfo",
+                              "SMaxSampleValue",
+                              "SMinSampleValue",
+                              "SampleFormat",
+                              "SamplesPerPixel",
+                              "Saturation",
+                              "SceneCaptureType",
+                              "SceneType",
+                              "SecurityClassification",
+                              "SelfTimerMode",
+                              "SensingMethod",
+                              "SensitivityType",
+                              "SerialNumber",
+                              "ShadowScale",
+                              "Shadows",
+                              "SharedData",
+                              "Sharpness",
+                              "ShutterSpeedValue",
+                              "Site",
+                              "Smoothness",
+                              "Software",
+                              "SpatialFrequencyResponse",
+                              "SpectralSensitivity",
+                              "StandardOutputSensitivity",
+                              "StitchInfo",
+                              "StoNits",
+                              "StripByteCounts",
+                              "StripOffsets",
+                              "StripRowCounts",
+                              "SubIFD",
+                              "SubSecTime",
+                              "SubSecTimeDigitized",
+                              "SubSecTimeOriginal",
+                              "SubTileBlockSize",
+                              "SubfileType",
+                              "SubjectArea",
+                              "SubjectDistance",
+                              "SubjectDistanceRange",
+                              "SubjectLocation",
+                              "T4Options",
+                              "T6Options",
+                              "T82Options",
+                              "T88Options",
+                              "TIFF-EPStandardID",
+                              "TIFF_FXExtensions",
+                              "TStop",
+                              "TargetPrinter",
+                              "Thresholding",
+                              "ThumbnailLength",
+                              "ThumbnailOffset",
+                              "TileByteCounts",
+                              "TileDepth",
+                              "TileLength",
+                              "TileOffsets",
+                              "TileWidth",
+                              "TimeCodes",
+                              "TimeZoneOffset",
+                              "TransferFunction",
+                              "TransferRange",
+                              "Transformation",
+                              "TransparencyIndicator",
+                              "TrapIndicator",
+                              "UIC1Tag",
+                              "UIC2Tag",
+                              "UIC3Tag",
+                              "UIC4Tag",
+                              "USPTOMiscellaneous",
+                              "USPTOOriginalContentType",
+                              "Uncompressed",
+                              "UniqueCameraModel",
+                              "UserComment",
+                              "VersionYear",
+                              "WB_GRGBLevels",
+                              "WangAnnotation",
+                              "WangTag1",
+                              "WangTag3",
+                              "WangTag4",
+                              "WhiteBalance",
+                              "WhiteLevel",
+                              "WhitePoint",
+                              "WidthResolution",
+                              "XClipPathUnits",
+                              "XPAuthor",
+                              "XPComment",
+                              "XPKeywords",
+                              "XPSubject",
+                              "XPTitle",
+                              "XP_DIP_XML",
+                              "XPosition",
+                              "XResolution",
+                              "YCbCrCoefficients",
+                              "YCbCrPositioning",
+                              "YCbCrSubSampling",
+                              "YClipPathUnits",
+                              "YPosition",
+                              "YResolution"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "exif"
+                        ],
+                        "description": "Inférer depuis un champ EXIF"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "neural": {
+                            "type": "object",
+                            "properties": {
+                              "input": {
+                                "type": "object",
+                                "description": "Configuration de l'entrée des modèles",
+                                "properties": {
+                                  "height": {
+                                    "type": "number",
+                                    "description": "Hauteur en pixels du tenseur d'entrée du modèle",
+                                    "exclusiveMaximum": 1024
+                                  },
+                                  "normalized": {
+                                    "type": "boolean",
+                                    "description": "Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255"
+                                  },
+                                  "width": {
+                                    "type": "number",
+                                    "description": "Largeur en pixels du tenseur d'entrée du modèle",
+                                    "exclusiveMaximum": 1024
+                                  },
+                                  "disposition": {
+                                    "anyOf": [
+                                      {
+                                        "const": "1CHW",
+                                        "description": "Tenseurs de la forme [1, 3, H, W]"
+                                      },
+                                      {
+                                        "const": "CHW",
+                                        "description": "Tenseurs de la forme [3, H, W]"
+                                      }
+                                    ]
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "description": "Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
+                                  }
+                                },
+                                "required": [
+                                  "height",
+                                  "normalized",
+                                  "width"
+                                ]
+                              },
+                              "model": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                    "pattern": "https?:\\/\\/.+"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                    "properties": {
+                                      "url": {
+                                        "type": "string",
+                                        "description": "L'URL de la requête",
+                                        "pattern": "https?:\\/\\/.+"
+                                      },
+                                      "headers": {
+                                        "type": "object",
+                                        "description": "Les en-têtes à ajouter dans la requête",
+                                        "additionalProperties": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "method": {
+                                        "anyOf": [
+                                          {
+                                            "const": "DELETE",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          },
+                                          {
+                                            "const": "GET",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          },
+                                          {
+                                            "const": "POST",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          },
+                                          {
+                                            "const": "PUT",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          }
+                                        ],
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      }
+                                    },
+                                    "required": [
+                                      "url"
+                                    ]
+                                  }
+                                ],
+                                "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment."
+                              },
+                              "output": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "description": "Nom de l'output du modèle à utiliser. output0 par défaut"
+                                  }
+                                }
+                              }
+                            },
+                            "required": [
+                              "input",
+                              "model"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "neural"
+                        ],
+                        "description": "Inférer depuis un modèle de réseau de neurones"
+                      }
+                    ],
+                    "description": "Comment inférer la valeur de cette métadonnée"
+                  },
+                  "longitude": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "exif": {
+                            "enum": [
+                              "AFCP_IPTC",
+                              "ActiveArea",
+                              "AdventRevision",
+                              "AdventScale",
+                              "AliasLayerMetadata",
+                              "AlphaByteCount",
+                              "AlphaDataDiscard",
+                              "AlphaOffset",
+                              "AnalogBalance",
+                              "Annotations",
+                              "AntiAliasStrength",
+                              "ApertureValue",
+                              "ApplicationNotes",
+                              "Artist",
+                              "AsShotICCProfile",
+                              "AsShotNeutral",
+                              "AsShotPreProfileMatrix",
+                              "AsShotProfileName",
+                              "AsShotWhiteXY",
+                              "BackgroundColorIndicator",
+                              "BackgroundColorValue",
+                              "BadFaxLines",
+                              "BaselineExposure",
+                              "BaselineExposureOffset",
+                              "BaselineNoise",
+                              "BaselineSharpness",
+                              "BatteryLevel",
+                              "BayerGreenSplit",
+                              "BestQualityScale",
+                              "BitsPerExtendedRunLength",
+                              "BitsPerRunLength",
+                              "BitsPerSample",
+                              "BlackLevel",
+                              "BlackLevelDeltaH",
+                              "BlackLevelDeltaV",
+                              "BlackLevelRepeatDim",
+                              "Brightness",
+                              "BrightnessValue",
+                              "CFALayout",
+                              "CFAPattern",
+                              "CFAPattern2",
+                              "CFAPlaneColor",
+                              "CFARepeatPatternDim",
+                              "CIP3DataFile",
+                              "CIP3Sheet",
+                              "CIP3Side",
+                              "CMYKEquivalent",
+                              "CalibrationIlluminant1",
+                              "CalibrationIlluminant2",
+                              "CameraCalibration1",
+                              "CameraCalibration2",
+                              "CameraCalibrationSig",
+                              "CameraLabel",
+                              "CameraSerialNumber",
+                              "CellLength",
+                              "CellWidth",
+                              "ChromaBlurRadius",
+                              "CleanFaxData",
+                              "ClipPath",
+                              "CodingMethods",
+                              "ColorCharacterization",
+                              "ColorMap",
+                              "ColorMatrix1",
+                              "ColorMatrix2",
+                              "ColorResponseUnit",
+                              "ColorSequence",
+                              "ColorSpace",
+                              "ColorTable",
+                              "ColorimetricReference",
+                              "ComponentsConfiguration",
+                              "CompressedBitsPerPixel",
+                              "Compression",
+                              "ConsecutiveBadFaxLines",
+                              "Contrast",
+                              "Converter",
+                              "Copyright",
+                              "CreateDate",
+                              "CurrentICCProfile",
+                              "CurrentPreProfileMatrix",
+                              "CustomRendered",
+                              "DNGBackwardVersion",
+                              "DNGLensInfo",
+                              "DNGPrivateData",
+                              "DNGVersion",
+                              "DataType",
+                              "DateTimeOriginal",
+                              "Decode",
+                              "DefaultBlackRender",
+                              "DefaultCropOrigin",
+                              "DefaultCropSize",
+                              "DefaultImageColor",
+                              "DefaultScale",
+                              "DefaultUserCrop",
+                              "DeviceSettingDescription",
+                              "DigitalZoomRatio",
+                              "DocumentName",
+                              "DotRange",
+                              "ExifImageHeight",
+                              "ExifImageWidth",
+                              "ExifOffset",
+                              "ExifVersion",
+                              "ExpandFilm",
+                              "ExpandFilterLens",
+                              "ExpandFlashLamp",
+                              "ExpandLens",
+                              "ExpandScanner",
+                              "ExpandSoftware",
+                              "Exposure",
+                              "ExposureCompensation",
+                              "ExposureIndex",
+                              "ExposureMode",
+                              "ExposureProgram",
+                              "ExposureTime",
+                              "ExtraSamples",
+                              "FNumber",
+                              "FaxProfile",
+                              "FaxRecvParams",
+                              "FaxRecvTime",
+                              "FaxSubAddress",
+                              "FileSource",
+                              "FillOrder",
+                              "Flash",
+                              "FlashEnergy",
+                              "FlashpixVersion",
+                              "FocalLength",
+                              "FocalLengthIn35mmFormat",
+                              "FocalPlaneResolutionUnit",
+                              "FocalPlaneXResolution",
+                              "FocalPlaneYResolution",
+                              "ForwardMatrix1",
+                              "ForwardMatrix2",
+                              "FrameRate",
+                              "FreeByteCounts",
+                              "FreeOffsets",
+                              "GDALMetadata",
+                              "GDALNoData",
+                              "GPSAltitude",
+                              "GPSAltitudeRef",
+                              "GPSAreaInformation",
+                              "GPSDOP",
+                              "GPSDateStamp",
+                              "GPSDestBearing",
+                              "GPSDestBearingRef",
+                              "GPSDestDistance",
+                              "GPSDestDistanceRef",
+                              "GPSDestLatitude",
+                              "GPSDestLatitudeRef",
+                              "GPSDestLongitude",
+                              "GPSDestLongitudeRef",
+                              "GPSDifferential",
+                              "GPSHPositioningError",
+                              "GPSImgDirection",
+                              "GPSImgDirectionRef",
+                              "GPSInfo",
+                              "GPSLatitude",
+                              "GPSLatitudeRef",
+                              "GPSLongitude",
+                              "GPSLongitudeRef",
+                              "GPSMapDatum",
+                              "GPSMeasureMode",
+                              "GPSProcessingMethod",
+                              "GPSSatellites",
+                              "GPSSpeed",
+                              "GPSSpeedRef",
+                              "GPSStatus",
+                              "GPSTimeStamp",
+                              "GPSTrack",
+                              "GPSTrackRef",
+                              "GPSVersionID",
+                              "GainControl",
+                              "Gamma",
+                              "GeoTiffAsciiParams",
+                              "GeoTiffDirectory",
+                              "GeoTiffDoubleParams",
+                              "GlobalParametersIFD",
+                              "GrayResponseCurve",
+                              "GrayResponseUnit",
+                              "HCUsage",
+                              "HalftoneHints",
+                              "HeightResolution",
+                              "HostComputer",
+                              "ICC_Profile",
+                              "INGRReserved",
+                              "IPTC-NAA",
+                              "ISO",
+                              "ISOSpeed",
+                              "ISOSpeedLatitudeyyy",
+                              "ISOSpeedLatitudezzz",
+                              "IT8Header",
+                              "ImageByteCount",
+                              "ImageColorIndicator",
+                              "ImageColorValue",
+                              "ImageDataDiscard",
+                              "ImageDepth",
+                              "ImageDescription",
+                              "ImageHeight",
+                              "ImageHistory",
+                              "ImageID",
+                              "ImageLayer",
+                              "ImageNumber",
+                              "ImageOffset",
+                              "ImageSourceData",
+                              "ImageType",
+                              "ImageUniqueID",
+                              "ImageWidth",
+                              "Indexed",
+                              "InkNames",
+                              "InkSet",
+                              "IntergraphFlagRegisters",
+                              "IntergraphMatrix",
+                              "IntergraphPacketData",
+                              "Interlace",
+                              "InteropIndex",
+                              "InteropOffset",
+                              "InteropVersion",
+                              "JPEGACTables",
+                              "JPEGDCTables",
+                              "JPEGLosslessPredictors",
+                              "JPEGPointTransforms",
+                              "JPEGProc",
+                              "JPEGQTables",
+                              "JPEGRestartInterval",
+                              "JPEGTables",
+                              "KDC_IFD",
+                              "KodakIFD",
+                              "LeafData",
+                              "LeafSubIFD",
+                              "Lens",
+                              "LensInfo",
+                              "LensMake",
+                              "LensModel",
+                              "LensSerialNumber",
+                              "LightSource",
+                              "LinearResponseLimit",
+                              "LinearizationTable",
+                              "LocalizedCameraModel",
+                              "MDColorTable",
+                              "MDFileTag",
+                              "MDFileUnits",
+                              "MDLabName",
+                              "MDPrepDate",
+                              "MDPrepTime",
+                              "MDSampleInfo",
+                              "MDScalePixel",
+                              "MSDocumentText",
+                              "MSDocumentTextPosition",
+                              "MSPropertySetStorage",
+                              "Make",
+                              "MakerNote",
+                              "MakerNoteSafety",
+                              "MaskedAreas",
+                              "Matteing",
+                              "MaxApertureValue",
+                              "MaxSampleValue",
+                              "MeteringMode",
+                              "MinSampleValue",
+                              "ModeNumber",
+                              "Model",
+                              "Model2",
+                              "ModelTiePoint",
+                              "ModelTransform",
+                              "ModifyDate",
+                              "MoireFilter",
+                              "MultiProfiles",
+                              "NewRawImageDigest",
+                              "Noise",
+                              "NoiseProfile",
+                              "NoiseReductionApplied",
+                              "NumberofInks",
+                              "OPIProxy",
+                              "OceApplicationSelector",
+                              "OceIDNumber",
+                              "OceImageLogic",
+                              "OceScanjobDesc",
+                              "OffsetSchema",
+                              "OldSubfileType",
+                              "OpcodeList1",
+                              "OpcodeList2",
+                              "OpcodeList3",
+                              "Opto-ElectricConvFactor",
+                              "Orientation",
+                              "OriginalBestQualitySize",
+                              "OriginalDefaultCropSize",
+                              "OriginalDefaultFinalSize",
+                              "OriginalRawFileData",
+                              "OriginalRawFileDigest",
+                              "OriginalRawFileName",
+                              "OwnerName",
+                              "Padding",
+                              "PageName",
+                              "PageNumber",
+                              "PanasonicTitle",
+                              "PanasonicTitle2",
+                              "PhotometricInterpretation",
+                              "PhotoshopSettings",
+                              "PixelFormat",
+                              "PixelIntensityRange",
+                              "PixelMagicJBIGOptions",
+                              "PixelScale",
+                              "PlanarConfiguration",
+                              "Predictor",
+                              "PreviewApplicationName",
+                              "PreviewApplicationVersion",
+                              "PreviewColorSpace",
+                              "PreviewDateTime",
+                              "PreviewSettingsDigest",
+                              "PreviewSettingsName",
+                              "PrimaryChromaticities",
+                              "PrintIM",
+                              "ProcessingSoftware",
+                              "ProfileCalibrationSig",
+                              "ProfileCopyright",
+                              "ProfileEmbedPolicy",
+                              "ProfileHueSatMapData1",
+                              "ProfileHueSatMapData2",
+                              "ProfileHueSatMapDims",
+                              "ProfileHueSatMapEncoding",
+                              "ProfileIFD",
+                              "ProfileLookTableData",
+                              "ProfileLookTableDims",
+                              "ProfileLookTableEncoding",
+                              "ProfileName",
+                              "ProfileToneCurve",
+                              "ProfileType",
+                              "RasterPadding",
+                              "Rating",
+                              "RatingPercent",
+                              "RawDataUniqueID",
+                              "RawFile",
+                              "RawImageDigest",
+                              "RawImageSegmentation",
+                              "RawToPreviewGain",
+                              "RecommendedExposureIndex",
+                              "ReductionMatrix1",
+                              "ReductionMatrix2",
+                              "ReelName",
+                              "ReferenceBlackWhite",
+                              "RelatedImageFileFormat",
+                              "RelatedImageHeight",
+                              "RelatedImageWidth",
+                              "RelatedSoundFile",
+                              "ResolutionUnit",
+                              "RowInterleaveFactor",
+                              "RowsPerStrip",
+                              "SEMInfo",
+                              "SMaxSampleValue",
+                              "SMinSampleValue",
+                              "SampleFormat",
+                              "SamplesPerPixel",
+                              "Saturation",
+                              "SceneCaptureType",
+                              "SceneType",
+                              "SecurityClassification",
+                              "SelfTimerMode",
+                              "SensingMethod",
+                              "SensitivityType",
+                              "SerialNumber",
+                              "ShadowScale",
+                              "Shadows",
+                              "SharedData",
+                              "Sharpness",
+                              "ShutterSpeedValue",
+                              "Site",
+                              "Smoothness",
+                              "Software",
+                              "SpatialFrequencyResponse",
+                              "SpectralSensitivity",
+                              "StandardOutputSensitivity",
+                              "StitchInfo",
+                              "StoNits",
+                              "StripByteCounts",
+                              "StripOffsets",
+                              "StripRowCounts",
+                              "SubIFD",
+                              "SubSecTime",
+                              "SubSecTimeDigitized",
+                              "SubSecTimeOriginal",
+                              "SubTileBlockSize",
+                              "SubfileType",
+                              "SubjectArea",
+                              "SubjectDistance",
+                              "SubjectDistanceRange",
+                              "SubjectLocation",
+                              "T4Options",
+                              "T6Options",
+                              "T82Options",
+                              "T88Options",
+                              "TIFF-EPStandardID",
+                              "TIFF_FXExtensions",
+                              "TStop",
+                              "TargetPrinter",
+                              "Thresholding",
+                              "ThumbnailLength",
+                              "ThumbnailOffset",
+                              "TileByteCounts",
+                              "TileDepth",
+                              "TileLength",
+                              "TileOffsets",
+                              "TileWidth",
+                              "TimeCodes",
+                              "TimeZoneOffset",
+                              "TransferFunction",
+                              "TransferRange",
+                              "Transformation",
+                              "TransparencyIndicator",
+                              "TrapIndicator",
+                              "UIC1Tag",
+                              "UIC2Tag",
+                              "UIC3Tag",
+                              "UIC4Tag",
+                              "USPTOMiscellaneous",
+                              "USPTOOriginalContentType",
+                              "Uncompressed",
+                              "UniqueCameraModel",
+                              "UserComment",
+                              "VersionYear",
+                              "WB_GRGBLevels",
+                              "WangAnnotation",
+                              "WangTag1",
+                              "WangTag3",
+                              "WangTag4",
+                              "WhiteBalance",
+                              "WhiteLevel",
+                              "WhitePoint",
+                              "WidthResolution",
+                              "XClipPathUnits",
+                              "XPAuthor",
+                              "XPComment",
+                              "XPKeywords",
+                              "XPSubject",
+                              "XPTitle",
+                              "XP_DIP_XML",
+                              "XPosition",
+                              "XResolution",
+                              "YCbCrCoefficients",
+                              "YCbCrPositioning",
+                              "YCbCrSubSampling",
+                              "YClipPathUnits",
+                              "YPosition",
+                              "YResolution"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "exif"
+                        ],
+                        "description": "Inférer depuis un champ EXIF"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "neural": {
+                            "type": "object",
+                            "properties": {
+                              "input": {
+                                "type": "object",
+                                "description": "Configuration de l'entrée des modèles",
+                                "properties": {
+                                  "height": {
+                                    "type": "number",
+                                    "description": "Hauteur en pixels du tenseur d'entrée du modèle",
+                                    "exclusiveMaximum": 1024
+                                  },
+                                  "normalized": {
+                                    "type": "boolean",
+                                    "description": "Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255"
+                                  },
+                                  "width": {
+                                    "type": "number",
+                                    "description": "Largeur en pixels du tenseur d'entrée du modèle",
+                                    "exclusiveMaximum": 1024
+                                  },
+                                  "disposition": {
+                                    "anyOf": [
+                                      {
+                                        "const": "1CHW",
+                                        "description": "Tenseurs de la forme [1, 3, H, W]"
+                                      },
+                                      {
+                                        "const": "CHW",
+                                        "description": "Tenseurs de la forme [3, H, W]"
+                                      }
+                                    ]
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "description": "Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
+                                  }
+                                },
+                                "required": [
+                                  "height",
+                                  "normalized",
+                                  "width"
+                                ]
+                              },
+                              "model": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                    "pattern": "https?:\\/\\/.+"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
+                                    "properties": {
+                                      "url": {
+                                        "type": "string",
+                                        "description": "L'URL de la requête",
+                                        "pattern": "https?:\\/\\/.+"
+                                      },
+                                      "headers": {
+                                        "type": "object",
+                                        "description": "Les en-têtes à ajouter dans la requête",
+                                        "additionalProperties": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "method": {
+                                        "anyOf": [
+                                          {
+                                            "const": "DELETE",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          },
+                                          {
+                                            "const": "GET",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          },
+                                          {
+                                            "const": "POST",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          },
+                                          {
+                                            "const": "PUT",
+                                            "description": "La méthode de la requête (GET par défaut)"
+                                          }
+                                        ],
+                                        "description": "La méthode de la requête (GET par défaut)"
+                                      }
+                                    },
+                                    "required": [
+                                      "url"
+                                    ]
+                                  }
+                                ],
+                                "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment."
+                              },
+                              "output": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "description": "Nom de l'output du modèle à utiliser. output0 par défaut"
+                                  }
+                                }
+                              }
+                            },
+                            "required": [
+                              "input",
+                              "model"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "neural"
+                        ],
+                        "description": "Inférer depuis un modèle de réseau de neurones"
+                      }
+                    ],
+                    "description": "Comment inférer la valeur de cette métadonnée"
+                  }
+                },
+                "required": [
+                  "latitude",
+                  "longitude"
+                ]
+              },
+              "learnMore": {
+                "type": "string",
+                "description": "Un lien pour en apprendre plus sur ce que cette métadonnée décrit",
+                "pattern": "https?:\\/\\/.+"
+              }
+            },
+            "required": [
+              "description",
+              "label",
+              "mergeMethod",
+              "required",
+              "type"
+            ]
           }
-        },
-        "required": [
-          "description",
-          "label",
-          "mergeMethod",
-          "required",
-          "type"
-        ]
+        ],
+        "description": "Métadonnée du protocole"
       }
     },
     "name": {
@@ -208,366 +2657,13 @@
       "description": "Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier",
       "pattern": "https?:\\/\\/.+"
     },
-    "exports": {
+    "crop": {
       "type": "object",
-      "description": "La structure du fichier .zip d'export pour ce protocole.",
+      "description": "Configuration de la partie recadrage",
       "properties": {
-        "images": {
+        "infer": {
           "type": "object",
-          "description": "Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename \"_exemple\"}} pour ajouter \"_exemple\" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename \"_cropped\"}} donnera \"IMG_1245_cropped.JPEG\" si l'image avait pour nom de fichier \"IMG_12345.JPEG\"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple \"(Inconnnu)\"}} pour utiliser \"(Inconnu)\" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/",
-          "properties": {
-            "cropped": {
-              "type": "string",
-              "description": "Chemins des images recadrées"
-            },
-            "original": {
-              "type": "string",
-              "description": "Chemins des images originales"
-            }
-          },
-          "required": [
-            "cropped",
-            "original"
-          ]
-        },
-        "metadata": {
-          "type": "object",
-          "properties": {
-            "csv": {
-              "type": "string",
-              "description": "Chemin du fichier CSV contenant les résultats de l'analyse"
-            },
-            "json": {
-              "type": "string",
-              "description": "Chemin du fichier JSON contenant les résultats de l'analyse"
-            }
-          },
-          "required": [
-            "csv",
-            "json"
-          ]
-        }
-      },
-      "required": [
-        "images",
-        "metadata"
-      ]
-    },
-    "inference": {
-      "type": "object",
-      "description": "Contrôle l'inférance des boîtes englobantes (metadata.crop) et des espèces (metadata.species) par réseaux neuronaux",
-      "properties": {
-        "classification": {
-          "type": "object",
-          "description": "Configuration de l'inférence de l'espèce (metadata.species)",
-          "properties": {
-            "classmapping": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "description": "Lien vers un fichier texte contenant la correspondance entre les indices des neurones de la couche de sortie du modèle et les noms des classes",
-                  "pattern": "https?:\\/\\/.+"
-                },
-                {
-                  "type": "object",
-                  "description": "Lien vers un fichier texte contenant la correspondance entre les indices des neurones de la couche de sortie du modèle et les noms des classes",
-                  "properties": {
-                    "url": {
-                      "type": "string",
-                      "description": "L'URL de la requête",
-                      "pattern": "https?:\\/\\/.+"
-                    },
-                    "headers": {
-                      "type": "object",
-                      "description": "Les en-têtes à ajouter dans la requête",
-                      "additionalProperties": {
-                        "type": "string"
-                      }
-                    },
-                    "method": {
-                      "anyOf": [
-                        {
-                          "const": "DELETE",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        },
-                        {
-                          "const": "GET",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        },
-                        {
-                          "const": "POST",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        },
-                        {
-                          "const": "PUT",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        }
-                      ],
-                      "description": "La méthode de la requête (GET par défaut)"
-                    }
-                  },
-                  "required": [
-                    "url"
-                  ]
-                }
-              ],
-              "description": "Lien vers un fichier texte contenant la correspondance entre les indices des neurones de la couche de sortie du modèle et les noms des classes"
-            },
-            "input": {
-              "type": "object",
-              "description": "Configuration de l'entrée des modèles",
-              "properties": {
-                "height": {
-                  "type": "number",
-                  "description": "Hauteur en pixels du tenseur d'entrée du modèle",
-                  "exclusiveMaximum": 1024
-                },
-                "normalized": {
-                  "type": "boolean",
-                  "description": "Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255"
-                },
-                "width": {
-                  "type": "number",
-                  "description": "Largeur en pixels du tenseur d'entrée du modèle",
-                  "exclusiveMaximum": 1024
-                },
-                "disposition": {
-                  "anyOf": [
-                    {
-                      "const": "1CHW",
-                      "description": "Tenseurs de la forme [1, 3, H, W]"
-                    },
-                    {
-                      "const": "CHW",
-                      "description": "Tenseurs de la forme [3, H, W]"
-                    }
-                  ]
-                },
-                "name": {
-                  "type": "string",
-                  "description": "Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
-                }
-              },
-              "required": [
-                "height",
-                "normalized",
-                "width"
-              ]
-            },
-            "metadata": {
-              "type": "string",
-              "description": "ID de la métadonnée où stocker les métadonnées inférée par ce modèle. Cette métadonnée doit être déclarée dans les métadonnées du protocole, et doit être de type \"enum\". Les options seront remplies par classmapping, et peuvent donc être laissées vides dans la définition de la métadonnée.",
-              "pattern": "[\\w_]+"
-            },
-            "model": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
-                  "pattern": "https?:\\/\\/.+"
-                },
-                {
-                  "type": "object",
-                  "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.",
-                  "properties": {
-                    "url": {
-                      "type": "string",
-                      "description": "L'URL de la requête",
-                      "pattern": "https?:\\/\\/.+"
-                    },
-                    "headers": {
-                      "type": "object",
-                      "description": "Les en-têtes à ajouter dans la requête",
-                      "additionalProperties": {
-                        "type": "string"
-                      }
-                    },
-                    "method": {
-                      "anyOf": [
-                        {
-                          "const": "DELETE",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        },
-                        {
-                          "const": "GET",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        },
-                        {
-                          "const": "POST",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        },
-                        {
-                          "const": "PUT",
-                          "description": "La méthode de la requête (GET par défaut)"
-                        }
-                      ],
-                      "description": "La méthode de la requête (GET par défaut)"
-                    }
-                  },
-                  "required": [
-                    "url"
-                  ]
-                }
-              ],
-              "description": "Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment."
-            },
-            "output": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "description": "Nom de l'output du modèle à utiliser. output0 par défaut"
-                }
-              }
-            },
-            "taxonomic": {
-              "type": "object",
-              "description": "Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles",
-              "properties": {
-                "clade": {
-                  "anyOf": [
-                    {
-                      "const": "class",
-                      "description": "La clade inférée par le modèle."
-                    },
-                    {
-                      "const": "family",
-                      "description": "La clade inférée par le modèle."
-                    },
-                    {
-                      "const": "genus",
-                      "description": "La clade inférée par le modèle."
-                    },
-                    {
-                      "const": "kingdom",
-                      "description": "La clade inférée par le modèle."
-                    },
-                    {
-                      "const": "order",
-                      "description": "La clade inférée par le modèle."
-                    },
-                    {
-                      "const": "phylum",
-                      "description": "La clade inférée par le modèle."
-                    },
-                    {
-                      "const": "species",
-                      "description": "La clade inférée par le modèle."
-                    }
-                  ],
-                  "description": "La clade inférée par le modèle."
-                },
-                "targets": {
-                  "type": "object",
-                  "description": "Dans quelles métadonnées stocker les clade supérieures inférées par l'arbre taxonomique. Similairement à metadata, ces métadonnées doivent être déclarées dans les métadonnées du protocole, et doivent être de type 'enum'. Les options seront remplies par l'arbre taxonomique, et peuvent donc être laissées vides dans la définition de la métadonnée.",
-                  "properties": {
-                    "classes": {
-                      "type": "string",
-                      "description": "L'identifiant de la métadonnée",
-                      "pattern": "[\\w_]+"
-                    },
-                    "families": {
-                      "type": "string",
-                      "description": "L'identifiant de la métadonnée",
-                      "pattern": "[\\w_]+"
-                    },
-                    "genera": {
-                      "type": "string",
-                      "description": "L'identifiant de la métadonnée",
-                      "pattern": "[\\w_]+"
-                    },
-                    "kingdoms": {
-                      "type": "string",
-                      "description": "L'identifiant de la métadonnée",
-                      "pattern": "[\\w_]+"
-                    },
-                    "orders": {
-                      "type": "string",
-                      "description": "L'identifiant de la métadonnée",
-                      "pattern": "[\\w_]+"
-                    },
-                    "phyla": {
-                      "type": "string",
-                      "description": "L'identifiant de la métadonnée",
-                      "pattern": "[\\w_]+"
-                    },
-                    "species": {
-                      "type": "string",
-                      "description": "L'identifiant de la métadonnée",
-                      "pattern": "[\\w_]+"
-                    }
-                  }
-                },
-                "taxonomy": {
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "description": "Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json",
-                      "pattern": "https?:\\/\\/.+"
-                    },
-                    {
-                      "type": "object",
-                      "description": "Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json",
-                      "properties": {
-                        "url": {
-                          "type": "string",
-                          "description": "L'URL de la requête",
-                          "pattern": "https?:\\/\\/.+"
-                        },
-                        "headers": {
-                          "type": "object",
-                          "description": "Les en-têtes à ajouter dans la requête",
-                          "additionalProperties": {
-                            "type": "string"
-                          }
-                        },
-                        "method": {
-                          "anyOf": [
-                            {
-                              "const": "DELETE",
-                              "description": "La méthode de la requête (GET par défaut)"
-                            },
-                            {
-                              "const": "GET",
-                              "description": "La méthode de la requête (GET par défaut)"
-                            },
-                            {
-                              "const": "POST",
-                              "description": "La méthode de la requête (GET par défaut)"
-                            },
-                            {
-                              "const": "PUT",
-                              "description": "La méthode de la requête (GET par défaut)"
-                            }
-                          ],
-                          "description": "La méthode de la requête (GET par défaut)"
-                        }
-                      },
-                      "required": [
-                        "url"
-                      ]
-                    }
-                  ],
-                  "description": "Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
-                }
-              },
-              "required": [
-                "clade",
-                "targets",
-                "taxonomy"
-              ]
-            }
-          },
-          "required": [
-            "classmapping",
-            "input",
-            "metadata",
-            "model"
-          ]
-        },
-        "detection": {
-          "type": "object",
-          "description": "Configuration de l'inférence des boîtes englobantes (metadata.crop)",
+          "description": "Configuration de l'inférence des boîtes englobantes",
           "properties": {
             "input": {
               "type": "object",
@@ -734,11 +2830,61 @@
             "model",
             "output"
           ]
+        },
+        "metadata": {
+          "type": "string",
+          "description": "Métadonnée associée à la boîte englobante",
+          "pattern": "[\\w_]+"
         }
       },
       "required": [
-        "classification",
-        "detection"
+        "infer",
+        "metadata"
+      ]
+    },
+    "exports": {
+      "type": "object",
+      "description": "La structure du fichier .zip d'export pour ce protocole.",
+      "properties": {
+        "images": {
+          "type": "object",
+          "description": "Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename \"_exemple\"}} pour ajouter \"_exemple\" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename \"_cropped\"}} donnera \"IMG_1245_cropped.JPEG\" si l'image avait pour nom de fichier \"IMG_12345.JPEG\"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple \"(Inconnnu)\"}} pour utiliser \"(Inconnu)\" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/",
+          "properties": {
+            "cropped": {
+              "type": "string",
+              "description": "Chemins des images recadrées"
+            },
+            "original": {
+              "type": "string",
+              "description": "Chemins des images originales"
+            }
+          },
+          "required": [
+            "cropped",
+            "original"
+          ]
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "csv": {
+              "type": "string",
+              "description": "Chemin du fichier CSV contenant les résultats de l'analyse"
+            },
+            "json": {
+              "type": "string",
+              "description": "Chemin du fichier JSON contenant les résultats de l'analyse"
+            }
+          },
+          "required": [
+            "csv",
+            "json"
+          ]
+        }
+      },
+      "required": [
+        "images",
+        "metadata"
       ]
     },
     "metadataOrder": {
