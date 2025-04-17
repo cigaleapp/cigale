@@ -138,6 +138,8 @@ function coerceExifValue(value, coerceTo) {
 
 function serializeExifValue(value) {
 	if (value instanceof Date) return format(value, 'yyyy:MM:dd HH:mm:ss');
+	// Let mutlivalued exif entries through
+	if (Array.isArray(value)) return value;
 	if (typeof value === 'object' && value !== null) {
 		return Object.entries(value)
 			.map(([key, val]) => `${key}=${val}`)
@@ -154,19 +156,49 @@ function serializeExifValue(value) {
  * @returns {Uint8Array} the image with EXIF metadata added
  */
 export function addExifMetadata(bytes, metadataDefs, metadataValues) {
-	const ExifMetadata = Schemas.Metadata.and({ infer: { exif: 'string' } });
+	const ExifMetadata = Schemas.Metadata.and({
+		infer: [
+			{ exif: 'string' },
+			'|',
+			{ latitude: { exif: 'string' }, longitude: { exif: 'string' } }
+		]
+	});
 
 	const exifDict = { GPS: {}, Exif: {} };
+	const setExifKey = (key, value) => {
+		const category = Object.keys(EXIF_GPS_FIELDS).includes(key) ? 'GPS' : 'Exif';
+		const serialized = serializeExifValue(value);
+		if (serialized === undefined) return;
+		exifDict[category][piexif[`${category}IFD`][key]] = serialized;
+	};
 
 	for (const def of metadataDefs.map((m) => ExifMetadata(m))) {
 		if (def instanceof type.errors) continue;
 		const value = metadataValues[def.id]?.value;
 		if (value === undefined) continue;
-		const serialized = serializeExifValue(value);
-		if (serialized === undefined) continue;
 
-		const category = Object.keys(EXIF_GPS_FIELDS).includes(def.infer.exif) ? 'GPS' : 'Exif';
-		exifDict[category][piexif[`${category}IFD`][def.infer.exif]] = serialized;
+		if (
+			matches(def.infer, { latitude: { exif: 'string' }, longitude: { exif: 'string' } }) &&
+			matches(value, { latitude: 'number', longitude: 'number' })
+		) {
+			// XXX harcoded BS :/
+			if (def.infer.latitude.exif === 'GPSLatitude') {
+				setExifKey('GPSLatitudeRef', value.latitude >= 0 ? 'N' : 'S');
+				setExifKey('GPSLatitude', piexif.GPSHelper.degToDmsRational(value.latitude));
+			} else {
+				setExifKey(def.infer.latitude.exif, value.latitude);
+			}
+
+			// XXX harcoded BS :/
+			if (def.infer.longitude.exif === 'GPSLongitude') {
+				setExifKey('GPSLongitudeRef', value.longitude >= 0 ? 'E' : 'W');
+				setExifKey('GPSLongitude', piexif.GPSHelper.degToDmsRational(value.longitude));
+			} else {
+				setExifKey(def.infer.longitude.exif, value.longitude);
+			}
+		} else {
+			setExifKey(def.infer.exif, value);
+		}
 	}
 
 	// Piexif wants bytes _as a string_. why??? idk. but it seems like npm has no decent EXIF libraries that both support browsers and writing exif data.
