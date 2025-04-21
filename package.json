@@ -47,7 +47,7 @@
 		"merge-drivers": "^1.0.3",
 		"prettier": "^3.5.3",
 		"prettier-plugin-svelte": "^3.3.3",
-		"svelte": "^5.27.1",
+		"svelte": "^5.28.1",
 		"svelte-check": "^4.1.6",
 		"turndown": "^7.2.0",
 		"typescript": "^5.8.3",
