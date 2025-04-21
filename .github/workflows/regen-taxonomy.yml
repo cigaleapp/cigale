@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Generate taxonomy
-        run: npx node scripts/generate-taxonomy.json
+        run: npx node scripts/generate-taxonomy.js
 
       - name: Check for changes
         id: git-check
