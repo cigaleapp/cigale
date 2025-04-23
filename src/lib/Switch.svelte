@@ -7,11 +7,17 @@
 	 * @typedef {object} Props
 	 * @property {boolean} [value]
 	 * @property {{ on: import('svelte').Component, off: import('svelte').Component }} [icons]
+	 * @property {string} [label]
 	 * @property {(value: boolean) => void} [onchange]
 	 */
 
 	/** @type {Props} */
-	let { value = $bindable(), icons: iconsOverride = undefined, onchange = () => {} } = $props();
+	let {
+		value = $bindable(),
+		icons: iconsOverride = undefined,
+		onchange = () => {},
+		label
+	} = $props();
 
 	function click() {
 		value = !value;
@@ -34,7 +40,7 @@
 	role="switch"
 	aria-checked={value}
 	onclick={click}
-	aria-label="On off switch"
+	aria-label={label ?? 'on/off switch'}
 >
 	<div class="handle" class:pushed={value}>
 		{#if showHints || iconsOverride}
