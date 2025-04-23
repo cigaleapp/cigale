@@ -74,11 +74,11 @@
 	/**
 	 * @param {string} id
 	 * @param {ArrayBuffer} buffer
-	 * @param {object} image
-	 * @param {string} image.type
-	 * @param {string} image.name
+	 * @param {object} _image
+	 * @param {string} _image.type
+	 * @param {string} _image.name
 	 */
-	async function inferBoundingBox(id, buffer, { type: contentType, name: filename }) {
+	async function inferBoundingBox(id, buffer, _image) {
 		if (!uiState.currentProtocol) {
 			toasts.error('Aucun protocole sélectionné');
 			return;
@@ -98,8 +98,8 @@
 
 		console.log('Bounding boxes:', boundingBoxes);
 
-		let [firstBoundingBox, ...otherBoundingBoxes] = boundingBoxes;
-		let [firstScore, ...otherScores] = bestScores;
+		let [firstBoundingBox, ..._otherBoundingBoxes] = boundingBoxes;
+		let [firstScore, ..._otherScores] = bestScores;
 
 		if (!firstBoundingBox || !firstScore) {
 			await storeMetadataValue({
@@ -127,23 +127,7 @@
 				confidence: firstScore
 			});
 
-			// Create one more image for each new boundingbox, with id "(original id)_(1 to boundingBoxes.length)"
-			for (const [i, box] of otherBoundingBoxes.entries()) {
-				await tx.objectStore('Image').put({
-					id: imageId(parseInt(id), i + 1),
-					filename,
-					contentType,
-					addedAt: formatISO(new Date()),
-					bufferExists: true,
-					metadata: {
-						crop: {
-							value: JSON.stringify(toCropBox(box)),
-							confidence: otherScores[i],
-							alternatives: {}
-						}
-					}
-				});
-			}
+			// TODO: store multiple bounding boxes
 		});
 	}
 
