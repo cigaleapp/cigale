@@ -106,6 +106,10 @@
 		});
 	}
 
+	$effect(() => {
+		uiState.imageOpenedInCropper = imageId;
+	});
+
 	onMount(() => {
 		uiState.keybinds['ArrowLeft'] = {
 			help: 'Image précédente',

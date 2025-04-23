@@ -6,6 +6,12 @@
 	import { setTabTitle } from '$lib/seo';
 	import { uiState } from '$lib/state.svelte';
 
+	setTabTitle('Recadrer');
+
+	$effect(() => {
+		uiState.imageOpenedInCropper = 'gallery';
+	});
+
 	const images = $derived(
 		toAreaObservationProps(idb.tables.Image.state, [], {
 			isLoaded: (image) => image.bufferExists && uiState.hasPreviewURL(image)
