@@ -34,3 +34,4 @@ jobs:
         with:
           source-dir: ./public
           umbrella-dir: _pullrequests
+          comment: false
