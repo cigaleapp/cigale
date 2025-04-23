@@ -1,1 +1,0 @@
-import{E as e,a5 as f,h as i,l as d,J as p}from"./CAPylwYA.js";function c(r,o){i&&d(p(r)),e(()=>{var t=o();for(var s in t){var a=t[s];a?r.style.setProperty(s,a):r.style.removeProperty(s)}}),f(()=>{r.remove()})}export{c};

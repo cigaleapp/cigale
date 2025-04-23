@@ -1,0 +1,1 @@
+import{a0 as a,a1 as u,z as t,a2 as c,_ as e}from"./BTDOoBb0.js";function l(n){t===null&&a(),c&&t.l!==null?s(t).m.push(n):u(()=>{const o=e(n);if(typeof o=="function")return o})}function i(n){t===null&&a(),l(()=>()=>e(n))}function s(n){var o=n.l;return o.u??(o.u={a:[],b:[],m:[]})}export{i as a,l as o};
