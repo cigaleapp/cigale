@@ -1,20 +1,22 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toCenteredCoords } from '$lib/BoundingBoxes.svelte';
+	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import Switch from '$lib/Switch.svelte';
 	import * as idb from '$lib/idb.svelte.js';
-	import IconPrev from '~icons/ph/caret-line-left';
-	import IconNext from '~icons/ph/caret-line-right';
-	import IconHasCrop from '~icons/ph/circle';
-	import IconHasConfirmedCrop from '~icons/ph/check-circle';
 	import { imageIdToFileId } from '$lib/images';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
-	import { uiState } from '$lib/state.svelte';
-	import { goto } from '$app/navigation';
-	import Checkbox from '$lib/Checkbox.svelte';
-	import Switch from '$lib/Switch.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
+	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { onDestroy, onMount } from 'svelte';
+	import IconBack from '~icons/ph/arrow-left';
+	import IconPrev from '~icons/ph/caret-line-left';
+	import IconNext from '~icons/ph/caret-line-right';
+	import IconHasConfirmedCrop from '~icons/ph/check-circle';
+	import IconHasCrop from '~icons/ph/circle';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
@@ -44,7 +46,7 @@
 	/**
 	 * @param {{x: number, y: number, width: number, height: number}} boundingBoxesout
 	 */
-	async function onConfirmCrop(boundingBoxesout) {
+	async function _onConfirmCrop(boundingBoxesout) {
 		console.log(boundingBoxesout, 'is cropped! at id : ', imageId);
 
 		const image = idb.tables.Image.state.find((image) => image.id === imageId);
@@ -93,6 +95,28 @@
 			});
 		});
 	}
+
+	onMount(() => {
+		uiState.keybinds['ArrowLeft'] = {
+			help: 'Image précédente',
+			when: () => Boolean(previousImageId),
+			do: () => goto(`#/crop/${previousImageId}`)
+		};
+		uiState.keybinds['ArrowRight'] = {
+			help: 'Image suivante',
+			when: () => Boolean(nextImageId),
+			do: () => goto(`#/crop/${nextImageId}`)
+		};
+		uiState.keybinds['Space'] = {
+			help: 'Image suivante ou terminer',
+			do: () => goto(nextImageId ? `#/crop/${nextImageId}` : `#/classify`)
+		};
+	});
+	onDestroy(() => {
+		delete uiState.keybinds['ArrowLeft'];
+		delete uiState.keybinds['ArrowRight'];
+		delete uiState.keybinds['Space'];
+	});
 </script>
 
 <div class="layout">
@@ -101,6 +125,12 @@
 	</main>
 	<aside class="info">
 		<section class="top">
+			<nav class="back">
+				<ButtonInk onclick={() => goto('#/crop')}>
+					<IconBack /> Retour
+				</ButtonInk>
+			</nav>
+			<h1>{image?.filename}</h1>
 			<p class="process">
 				{#snippet percent(/** @type {number} */ value)}
 					<code>
@@ -122,7 +152,6 @@
 					{@render percent(confirmedCropsCount)}
 				</span>
 			</p>
-			<h1>{image?.filename}</h1>
 		</section>
 		<nav>
 			<ButtonSecondary
@@ -185,6 +214,12 @@
 		justify-content: space-between;
 	}
 
+	.info .top {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+	}
+
 	.info .top p,
 	.info .top p span {
 		display: flex;
@@ -194,6 +229,10 @@
 
 	.info .top .sep {
 		padding: 0 0.5em;
+	}
+
+	.info h1 {
+		font-size: 1.5em;
 	}
 
 	.info nav {

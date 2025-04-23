@@ -20,7 +20,7 @@
 <style>
 	button {
 		background-color: var(--bg, var(--bg-neutral));
-		color: var(--fg, var(--bg-primary));
+		color: var(--fg, var(--fg-primary));
 		display: flex;
 		gap: 0.5em;
 		justify-content: center;
