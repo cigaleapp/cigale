@@ -160,7 +160,7 @@
 			<p class="process">
 				{#snippet percent(/** @type {number} */ value)}
 					<code>
-						{(value / sortedImageIds.length) * 100}%
+						{Math.round((value / sortedImageIds.length) * 100)}%
 					</code>
 				{/snippet}
 
