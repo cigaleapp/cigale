@@ -38,6 +38,7 @@ import { tables } from './idb.svelte';
  * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
  * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
  * @property {string} currentProtocolId ID du protocole choisi
+ * @property {string | 'gallery' | 'none'} imageOpenedInCropper ID de l'image qu'on est en train de recadrer, ou 'gallery' si on est dans la galerie, ou 'none' si on n'a pas encore ouvert d'image
  * @property {import('./database').Protocol | undefined} currentProtocol protocole choisi
  */
 
@@ -55,6 +56,7 @@ export const uiState = $state({
 		}
 	},
 	selection: [],
+	imageOpenedInCropper: 'none',
 	previewURLs: new SvelteMap(),
 	croppedPreviewURLs: new SvelteMap(),
 	hasPreviewURL(image, variant = 'full') {

@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { tables } from '$lib/idb.svelte';
+	import { idComparator, tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { previewingPrNumber, uiState } from '$lib/state.svelte';
@@ -35,6 +35,13 @@
 		if (!uiState.currentProtocolId) goto('#/');
 		if (uiState.currentProtocolId && !hasImages) goto('#/import');
 	});
+
+	const firstImageId = $derived(
+		tables.Image.state
+			.map((img) => img.id)
+			.toSorted(idComparator)
+			.at(0)
+	);
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
@@ -75,9 +82,16 @@
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a href="#/crop" aria-disabled={!uiState.currentProtocolId || !hasImages}>
+			<a
+				href="#/crop/{uiState.imageOpenedInCropper === 'none'
+					? firstImageId
+					: uiState.imageOpenedInCropper === 'gallery'
+						? ''
+						: uiState.imageOpenedInCropper}"
+				aria-disabled={!uiState.currentProtocolId || !hasImages}
+			>
 				Recadrer
-				{#if path == '/crop'}
+				{#if path.startsWith('/crop')}
 					<div class="line"></div>
 				{/if}
 			</a>
