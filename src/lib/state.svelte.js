@@ -100,7 +100,14 @@ export const uiState = $state({
 	get currentProtocol() {
 		return tables.Protocol.state.find((p) => p.id === this.currentProtocolId);
 	},
-	currentProtocolId: '',
+	_currentProtocolId: '',
+	get currentProtocolId() {
+		return this._currentProtocolId || localStorage.getItem('currentProtocolId') || '';
+	},
+	set currentProtocolId(id) {
+		localStorage.setItem('currentProtocolId', id);
+		this._currentProtocolId = id;
+	},
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection: undefined
 });
