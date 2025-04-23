@@ -14,11 +14,11 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { onDestroy, onMount } from 'svelte';
-	import IconBack from '~icons/ph/arrow-left';
 	import IconPrev from '~icons/ph/caret-line-left';
 	import IconNext from '~icons/ph/caret-line-right';
 	import IconHasConfirmedCrop from '~icons/ph/check-circle';
 	import IconHasCrop from '~icons/ph/circle';
+	import IconGallery from '~icons/ph/squares-four';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
@@ -157,7 +157,7 @@
 		<section class="top">
 			<nav class="back">
 				<ButtonInk onclick={() => goto('#/crop')}>
-					<IconBack /> Retour
+					<IconGallery /> Toutes les photos
 				</ButtonInk>
 			</nav>
 			<h1>{image?.filename}</h1>
