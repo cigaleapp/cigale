@@ -1,15 +1,17 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { toCenteredCoords } from '$lib/BoundingBoxes.svelte';
+	import { toCenteredCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import * as idb from '$lib/idb.svelte.js';
 	import { imageIdToFileId } from '$lib/images';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
+	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { onDestroy, onMount } from 'svelte';
 	import IconBack from '~icons/ph/arrow-left';
@@ -20,6 +22,14 @@
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
+	const boundingBox = $derived(
+		image?.metadata[uiState.cropMetadataId]?.value ?? {
+			x: 0,
+			y: 0,
+			w: 0.5,
+			h: 0.5
+		}
+	);
 	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(imageId)));
 	const sortedImageIds = $derived(
 		idb.tables.Image.state.map((img) => img.id).toSorted(idb.idComparator)
@@ -46,20 +56,24 @@
 	/**
 	 * @param {{x: number, y: number, width: number, height: number}} boundingBoxesout
 	 */
-	async function _onConfirmCrop(boundingBoxesout) {
+	async function onConfirmCrop(boundingBoxesout) {
 		console.log(boundingBoxesout, 'is cropped! at id : ', imageId);
 
 		const image = idb.tables.Image.state.find((image) => image.id === imageId);
+		if (!image) {
+			toasts.error(`Image ${imageId} introuvable, impossible de sauvegarder le recadrage`);
+			return;
+		}
 
 		// Get inferred value from alternatives (if non empty), or use the main value otherwise. Inferred value is the initial cropbox value as determined by the neural network.
 		// If this is the first time the user is re-cropping the box, this value will be the main values.
 		/** @type {undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }} */
 		// @ts-expect-error
-		let initialCrop = image?.metadata[uiState.cropMetadataId] ?? undefined;
+		let initialCrop = image.metadata[uiState.cropMetadataId] ?? undefined;
 
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 		if (
-			image?.metadata[uiState.cropMetadataId].alternatives &&
+			image.metadata[uiState.cropMetadataId].alternatives &&
 			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
 		) {
 			const [[stringValue, confidence]] = Object.entries(
@@ -71,28 +85,24 @@
 			};
 		}
 
-		await idb.openTransaction(['Image', 'Observation'], {}, async (tx) => {
-			const image = await tx.objectStore('Image').get(imageId);
-			if (!image) return;
-			const species = image.metadata[uiState.classificationMetadataId];
-			if (species && !species.manuallyModified) {
-				// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
-				await deleteMetadataValue({
-					tx,
-					metadataId: uiState.classificationMetadataId,
-					subjectId: imageId
-				});
-			}
-			await storeMetadataValue({
-				tx,
-				metadataId: uiState.cropMetadataId,
-				subjectId: imageId,
-				type: 'boundingbox',
-				value: toCenteredCoords(boundingBoxesout),
-				confidence: 1,
-				// Put the neural-network-inferred (initial) value in the alternatives as a backup
-				alternatives: initialCrop ? [initialCrop] : []
+		const species = image.metadata[uiState.classificationMetadataId];
+		if (species && !species.manuallyModified) {
+			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
+			await deleteMetadataValue({
+				metadataId: uiState.classificationMetadataId,
+				subjectId: imageId
 			});
+		}
+
+		await storeMetadataValue({
+			metadataId: uiState.cropMetadataId,
+			subjectId: imageId,
+			type: 'boundingbox',
+			value: toCenteredCoords(boundingBoxesout),
+			confidence: 1,
+			// Put the neural-network-inferred (initial) value in the alternatives as a backup
+			alternatives: initialCrop ? [initialCrop] : [],
+			manuallyModified: true
 		});
 	}
 
@@ -111,17 +121,33 @@
 			help: 'Image suivante ou terminer',
 			do: () => goto(nextImageId ? `#/crop/${nextImageId}` : `#/classify`)
 		};
+		uiState.keybinds['Escape'] = {
+			help: 'Quitter le recadrage',
+			do: () => goto('#/crop')
+		};
 	});
 	onDestroy(() => {
 		delete uiState.keybinds['ArrowLeft'];
 		delete uiState.keybinds['ArrowRight'];
 		delete uiState.keybinds['Space'];
+		delete uiState.keybinds['Escape'];
 	});
+
+	let imageElement = $state();
 </script>
 
 <div class="layout">
 	<main class="crop-surface">
-		<img src={imageSrc} alt="" />
+		<img src={imageSrc} alt="" bind:this={imageElement} />
+		{#if boundingBox && imageElement}
+			<DraggableBoundingBox
+				{imageElement}
+				boundingBox={toTopLeftCoords(boundingBox)}
+				onchange={(newBox) => {
+					onConfirmCrop(newBox);
+				}}
+			/>
+		{/if}
 	</main>
 	<aside class="info">
 		<section class="top">
@@ -198,6 +224,8 @@
 
 	.crop-surface {
 		overflow: hidden;
+		position: relative;
+		user-select: none;
 		width: 70vw;
 		--cell-size: 50px;
 		background-size: var(--cell-size) var(--cell-size);
