@@ -5,14 +5,15 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {string} text  the text to display in the tooltip
-	 * @property {?number} delay the delay before the tooltip appears after starting to hover on the element
+	 * @property {string} [keyboard] the keyboard shortcut to display in the tooltip
+	 * @property {number} [delay] the delay before the tooltip appears after starting to hover on the element
 	 * @property {import('svelte').Snippet} children
 	 */
 
 	/** @type {Props} */
-	const { text = '', delay, children } = $props();
+	const { text = '', keyboard = '', delay, children } = $props();
 </script>
 
-<div use:tooltip={delay ? [text, delay] : text}>
+<div use:tooltip={keyboard ? { text, keyboard, delay } : delay ? [text, delay] : text}>
 	{@render children?.()}
 </div>

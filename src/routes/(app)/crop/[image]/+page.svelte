@@ -25,6 +25,7 @@
 	import IconGallery from '~icons/ph/squares-four';
 	import { seo } from '$lib/seo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import KeyboardHint from '$lib/KeyboardHint.svelte';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
@@ -234,6 +235,7 @@
 			<nav class="back">
 				<ButtonInk onclick={() => goto('#/crop')}>
 					<IconGallery /> Toutes les photos
+					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
 			</nav>
 			{#if image}
@@ -292,7 +294,10 @@
 			<div class="next-and-auto">
 				<span
 					class="auto"
-					use:tooltip={"Passer automatiquement à l'image suivante quand celle-ci est recadrée"}
+					use:tooltip={{
+						text: "Passer automatiquement à l'image suivante quand celle-ci est recadrée",
+						keyboard: 'A'
+					}}
 				>
 					<Switch
 						bind:value={
