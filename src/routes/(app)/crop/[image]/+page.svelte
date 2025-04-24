@@ -215,6 +215,11 @@
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
 	}
 
+	function goToGallery() {
+		uiState.imagePreviouslyOpenedInCropper = imageId;
+		goto('#/crop');
+	}
+
 	$effect(() => {
 		uiState.imageOpenedInCropper = imageId;
 	});
@@ -241,7 +246,7 @@
 		};
 		uiState.keybinds['Escape'] = {
 			help: 'Quitter le recadrage',
-			do: () => goto('#/crop')
+			do: goToGallery
 		};
 		uiState.keybinds['a'] = {
 			help: 'Activer/désactiver la continuation automatique',
@@ -285,7 +290,7 @@
 	<aside class="info">
 		<section class="top">
 			<nav class="back">
-				<ButtonInk onclick={() => goto('#/crop')}>
+				<ButtonInk onclick={goToGallery}>
 					<IconGallery /> Toutes les photos
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
