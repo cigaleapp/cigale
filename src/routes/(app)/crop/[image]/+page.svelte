@@ -23,9 +23,13 @@
 	import IconHasConfirmedCrop from '~icons/ph/seal-check';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconGallery from '~icons/ph/squares-four';
+	import { seo } from '$lib/seo.svelte';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
+
+	$effect(() => seo({ title: `Recadrer ${image?.filename ?? '...'}` }));
+
 	const boundingBox = $derived(
 		image?.metadata[uiState.cropMetadataId]?.value ?? {
 			x: 0,

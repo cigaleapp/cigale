@@ -1,8 +1,7 @@
 <script>
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { nukeDatabase } from '$lib/idb.svelte';
+	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { previewingPrNumber } from '$lib/state.svelte';
 
 	/**
 	 * @typedef {object} Props

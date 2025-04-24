@@ -15,9 +15,9 @@
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { setTabTitle } from '$lib/seo';
+	import { seo } from '$lib/seo.svelte';
 
-	setTabTitle('Importer');
+	seo({ title: 'Importer' });
 
 	const { children } = $props();
 

@@ -3,10 +3,10 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import * as idb from '$lib/idb.svelte.js';
-	import { setTabTitle } from '$lib/seo';
+	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 
-	setTabTitle('Recadrer');
+	seo({ title: 'Recadrer' });
 
 	$effect(() => {
 		uiState.imageOpenedInCropper = 'gallery';
