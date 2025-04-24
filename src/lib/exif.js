@@ -98,7 +98,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 				(entry) =>
 					entry !== undefined &&
 					!matches(entry[1].value, { latitude: 'number.NaN', longitude: 'number.NaN' }) &&
-					Number.isNaN(entry[1].value)
+					!Number.isNaN(entry[1].value)
 			)
 	);
 }
