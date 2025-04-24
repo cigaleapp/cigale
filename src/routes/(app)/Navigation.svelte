@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { idComparator, previewingPrNumber, tables } from '$lib/idb.svelte';
+	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -35,13 +35,6 @@
 		if (!uiState.currentProtocolId) goto('#/');
 		if (uiState.currentProtocolId && !hasImages) goto('#/import');
 	});
-
-	const firstImageId = $derived(
-		tables.Image.state
-			.map((img) => img.id)
-			.toSorted(idComparator)
-			.at(0)
-	);
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
@@ -83,11 +76,7 @@
 			</a>
 			<Sup></Sup>
 			<a
-				href="#/crop/{uiState.imageOpenedInCropper === 'none'
-					? firstImageId
-					: uiState.imageOpenedInCropper === 'gallery'
-						? ''
-						: uiState.imageOpenedInCropper}"
+				href="#/crop/{uiState.imageOpenedInCropper}"
 				aria-disabled={!uiState.currentProtocolId || !hasImages}
 			>
 				Recadrer
