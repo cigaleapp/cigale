@@ -9,7 +9,7 @@
 	seo({ title: 'Recadrer' });
 
 	$effect(() => {
-		uiState.imageOpenedInCropper = 'gallery';
+		uiState.imageOpenedInCropper = '';
 	});
 
 	const images = $derived(

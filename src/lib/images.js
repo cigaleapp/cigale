@@ -84,7 +84,7 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 		uiState.erroredImages.delete(id);
 		uiState.loadingImages.delete(id);
 		if (uiState.imageOpenedInCropper === id) {
-			uiState.imageOpenedInCropper = 'none';
+			uiState.imageOpenedInCropper = '';
 		}
 
 		const previewURL = uiState.previewURLs.get(imageIdToFileId(id));
