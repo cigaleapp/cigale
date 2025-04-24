@@ -36,6 +36,16 @@
 		}
 	});
 
+	$effect(() => {
+		uiState.keybinds['$mod+s'] = {
+			help: '',
+			hidden: true,
+			do: () => {
+				toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎');
+			}
+		};
+	});
+
 	const settings = $derived(getSettings());
 
 	$effect(() => {
