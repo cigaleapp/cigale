@@ -221,7 +221,7 @@
 <style>
 	header,
 	section {
-		max-width: 40rem;
+		max-width: 35rem;
 	}
 
 	header,
@@ -255,7 +255,6 @@
 	}
 
 	.source a {
-		max-width: 80%;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
