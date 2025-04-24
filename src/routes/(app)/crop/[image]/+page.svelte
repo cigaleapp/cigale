@@ -13,7 +13,7 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import { imageIdToFileId } from '$lib/images';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
-	import { getSettings, setSetting } from '$lib/settings.svelte';
+	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
@@ -199,12 +199,20 @@
 			help: 'Quitter le recadrage',
 			do: () => goto('#/crop')
 		};
+		uiState.keybinds['a'] = {
+			help: 'Activer/désactiver la continuation automatique',
+			async do() {
+				await toggleSetting('cropAutoNext');
+			}
+		};
 	});
 	onDestroy(() => {
+		// FIXME: allow registering keybinds for a specific page, and show them in a separate category on the keybinds help modal
 		delete uiState.keybinds['ArrowLeft'];
 		delete uiState.keybinds['ArrowRight'];
 		delete uiState.keybinds['Space'];
 		delete uiState.keybinds['Escape'];
+		delete uiState.keybinds['A'];
 	});
 
 	let imageElement = $state();
