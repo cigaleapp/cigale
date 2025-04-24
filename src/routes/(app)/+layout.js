@@ -9,11 +9,19 @@ export async function load() {
 		await tables.initialize();
 		await fillBuiltinData();
 		await tables.initialize();
+		await preloadAudio();
 	} catch (e) {
 		console.error(e);
 		error(400, {
 			message: e?.toString() ?? 'Erreur inattendue'
 		});
+	}
+}
+
+async function preloadAudio() {
+	const files = ['flintandsteel.mp3', 'vineboom.mp3'];
+	for (const file of files) {
+		new Audio(file);
 	}
 }
 
