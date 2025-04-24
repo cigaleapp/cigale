@@ -6,26 +6,28 @@
 		toCenteredCoords,
 		toTopLeftCoords
 	} from '$lib/BoundingBoxes.svelte';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
+	import KeyboardHint from '$lib/KeyboardHint.svelte';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import * as idb from '$lib/idb.svelte.js';
 	import { imageIdToFileId } from '$lib/images';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { onDestroy, onMount } from 'svelte';
-	import IconPrev from '~icons/ph/caret-line-left';
-	import IconNext from '~icons/ph/caret-line-right';
-	import IconConfirmedCrop from '~icons/ph/seal-check';
+	import IconPrev from '~icons/ph/caret-left';
+	import IconNext from '~icons/ph/caret-right';
+	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
+	import IconConfirmedCrop from '~icons/ph/seal-check';
 	import IconGallery from '~icons/ph/squares-four';
-	import { seo } from '$lib/seo.svelte';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import KeyboardHint from '$lib/KeyboardHint.svelte';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
@@ -168,6 +170,11 @@
 		}
 	}
 
+	async function moveToNextUnconfirmed() {
+		await onConfirmCrop(toTopLeftCoords(boundingBox));
+		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
+	}
+
 	$effect(() => {
 		uiState.imageOpenedInCropper = imageId;
 	});
@@ -190,10 +197,7 @@
 		};
 		uiState.keybinds['Space'] = {
 			help: 'Continuer',
-			async do() {
-				await onConfirmCrop(toTopLeftCoords(boundingBox));
-				await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
-			}
+			do: moveToNextUnconfirmed
 		};
 		uiState.keybinds['Escape'] = {
 			help: 'Quitter le recadrage',
@@ -262,9 +266,6 @@
 					<code>Image introuvable</code>
 				</h1>
 			{/if}
-			<code>
-				{sortedImageIds.indexOf(imageId) + 1}⁄{sortedImageIds.length}
-			</code>
 		</section>
 		<section class="progress">
 			{#snippet percent(/** @type {number} */ value)}
@@ -291,15 +292,32 @@
 			</div>
 		</section>
 		<nav>
-			<ButtonSecondary
-				disabled={!previousImageId}
-				onclick={() => {
-					goto(`#/crop/${previousImageId}`);
-				}}
-			>
-				<IconPrev /> Précédente
-			</ButtonSecondary>
-			<div class="next-and-auto">
+			<div class="navigation">
+				<ButtonIcon
+					disabled={!previousImageId}
+					help="Image précédente"
+					keyboard="ArrowLeft"
+					onclick={() => {
+						goto(`#/crop/${previousImageId}`);
+					}}
+				>
+					<IconPrev />
+				</ButtonIcon>
+				<code>
+					{sortedImageIds.indexOf(imageId) + 1}⁄{sortedImageIds.length}
+				</code>
+				<ButtonIcon
+					disabled={!nextImageId}
+					help="Image suivante"
+					keyboard="ArrowRight"
+					onclick={() => {
+						goto(`#/crop/${nextImageId}`);
+					}}
+				>
+					<IconNext />
+				</ButtonIcon>
+			</div>
+			<div class="continue">
 				<span
 					class="auto"
 					use:tooltip={{
@@ -316,12 +334,12 @@
 					Auto
 				</span>
 				<ButtonSecondary
-					disabled={!nextImageId}
-					onclick={() => {
-						goto(`#/crop/${nextImageId}`);
-					}}
+					onclick={moveToNextUnconfirmed}
+					keyboard="Space"
+					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
 				>
-					<IconNext /> Suivante
+					<IconContinue />
+					Continuer
 				</ButtonSecondary>
 			</div>
 		</nav>
@@ -369,7 +387,7 @@
 		overflow: hidden;
 		position: relative;
 		user-select: none;
-		width: 70vw;
+		width: 100%;
 		--cell-size: 50px;
 		background-size: var(--cell-size) var(--cell-size);
 		background-image:
@@ -382,7 +400,11 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 2em;
+		gap: 2.5em;
+		min-width: 450px;
+		resize: horizontal;
+		/* to make resize work */
+		overflow: hidden;
 	}
 
 	.info .top {
@@ -410,7 +432,7 @@
 		display: flex;
 		flex-direction: column;
 		--inactive-bg: var(--gray);
-		gap: 0.5em;
+		gap: 1.25em;
 	}
 
 	.info .progress .bar p {
@@ -438,8 +460,12 @@
 		align-items: center;
 	}
 
-	.info nav .next-and-auto {
-		gap: 1em;
+	.info nav .navigation {
+		gap: 0.25em;
+	}
+
+	.info nav .continue {
+		gap: 1.5em;
 	}
 
 	.info nav .auto {

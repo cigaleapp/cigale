@@ -98,7 +98,9 @@
 			</ButtonSecondary>
 		</div>
 
-		<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
+		<div class="settings">
+			<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
+		</div>
 	</nav>
 
 	<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
@@ -159,6 +161,10 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+	}
+
+	.settings {
+		--hover-bg: var(--bg-neutral);
 	}
 
 	.pr-number {
