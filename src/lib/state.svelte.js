@@ -1,7 +1,6 @@
-import { base } from '$app/paths';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import { imageIdToFileId } from './images';
 import { tables } from './idb.svelte';
+import { imageIdToFileId } from './images';
 
 /**
  * @typedef Keybind
@@ -113,6 +112,3 @@ export const uiState = $state({
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection: undefined
 });
-
-console.info(`Base path is ${base}`);
-export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];

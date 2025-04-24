@@ -2,10 +2,10 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { idComparator, tables } from '$lib/idb.svelte';
+	import { idComparator, previewingPrNumber, tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { previewingPrNumber, uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/state.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import DeploymentDetails from './DeploymentDetails.svelte';
