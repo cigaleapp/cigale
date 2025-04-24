@@ -1,5 +1,6 @@
 <script>
 	import { boundingBoxIsNonZero } from './BoundingBoxes.svelte';
+	import { getSettings } from './settings.svelte';
 
 	/**
 	 * @typedef Rect
@@ -137,6 +138,7 @@
 
 <div
 	class="change-area"
+	class:debug={getSettings().showTechnicalMetadata}
 	style:left="{imageRect.x}px"
 	style:top="{imageRect.y}px"
 	style:width="{imageRect.width}px"
@@ -251,6 +253,10 @@
 <style>
 	.change-area {
 		position: absolute;
+	}
+
+	.change-area.debug {
+		border: 5px dashed red;
 	}
 
 	.boundingbox {
