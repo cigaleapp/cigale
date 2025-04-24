@@ -22,7 +22,7 @@
 <section class="observations">
 	<AreaObservations
 		{images}
-		bind:selection={uiState.selection}
+		highlight={uiState.imagePreviouslyOpenedInCropper}
 		loadingText="Chargement…"
 		oncardclick={(id) => {
 			goto(`#/crop/${id}`);
