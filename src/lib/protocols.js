@@ -30,14 +30,19 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
 	return metadataId.startsWith(`${protocolId}__`);
 }
 
+/**
+ *
+ * @param {string} metadataId
+ * @returns {string}
+ */
 export function removeNamespaceFromMetadataId(metadataId) {
 	return metadataId.replace(/^.+__/, '');
 }
 
-export const ExportedProtocol = Schemas.ProtocolWithoutMetadata.in
-	.and({
+export const ExportedProtocol = Schemas.Protocol.omit('metadata')
+	.in.and({
 		metadata: {
-			'[string]': Schemas.MetadataWithoutID.describe('Métadonnée du protocole')
+			'[string]': Schemas.Metadata.omit('id').describe('Métadonnée du protocole')
 		}
 	})
 	.pipe((protocol) => ({
