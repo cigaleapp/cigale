@@ -348,7 +348,14 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		gap: 0.5em;
+	}
+
+	.info nav .next-and-auto {
+		gap: 1em;
+	}
+
+	.info nav .auto {
+		gap: 0.25em;
 	}
 
 	img {
