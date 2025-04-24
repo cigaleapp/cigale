@@ -1,0 +1,1 @@
+import{a2 as a,u,B as t,a3 as c,a0 as e}from"./Bi7RGEem.js";function l(n){t===null&&a(),c&&t.l!==null?s(t).m.push(n):u(()=>{const o=e(n);if(typeof o=="function")return o})}function i(n){t===null&&a(),l(()=>()=>e(n))}function s(n){var o=n.l;return o.u??(o.u={a:[],b:[],m:[]})}export{i as a,l as o};
