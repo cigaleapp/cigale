@@ -289,111 +289,112 @@ const MetadataInferOptions = type
 	)
 	.describe('Comment inférer la valeur de cette métadonnée', 'self');
 
-const MetadataWithoutID = type({
-	label: ['string', '@', 'Nom de la métadonnée'],
-	mergeMethod: MetadataMergeMethod.configure(
-		"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images",
-		'self'
-	),
-	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
-	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
-	learnMore: URLString.describe(
-		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
-	).optional()
-}).and(
-	type.or(
-		{
-			type: "'location'",
-			'infer?': { latitude: MetadataInferOptions, longitude: MetadataInferOptions }
-		},
-		{
-			type: "'enum'",
-			'infer?': MetadataInferOptions,
-			'options?': MetadataEnumVariant.array()
-				.atLeastLength(1)
-				.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
-			'taxonomic?': type({
-				clade: Clade.describe('La clade représentée par cette métadonnée.'),
-				// taxonomy: Request.describe(
-				// 	"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
-				// )
-				parent: type({ '[string]': 'string' }).describe(
-					'Associe les valeurs (key) possibles de cette métadonnée aux valeurs (key) de la métadonnée représentant la clade parente'
+const Metadata = table(
+	'id',
+	type({
+		id: ID.describe(
+			'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
+		),
+		label: ['string', '@', 'Nom de la métadonnée'],
+		mergeMethod: MetadataMergeMethod.configure(
+			"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images",
+			'self'
+		),
+		required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
+		description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
+		learnMore: URLString.describe(
+			'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
+		).optional()
+	}).and(
+		type.or(
+			{
+				type: "'location'",
+				'infer?': { latitude: MetadataInferOptions, longitude: MetadataInferOptions }
+			},
+			{
+				type: "'enum'",
+				'infer?': MetadataInferOptions,
+				'options?': MetadataEnumVariant.array()
+					.atLeastLength(1)
+					.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
+				'taxonomic?': type({
+					clade: Clade.describe('La clade représentée par cette métadonnée.'),
+					// taxonomy: Request.describe(
+					// 	"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
+					// )
+					parent: type({ '[string]': 'string' }).describe(
+						'Associe les valeurs (key) possibles de cette métadonnée aux valeurs (key) de la métadonnée représentant la clade parente'
+					)
+				}).describe(
+					"Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles. Bien penser à définir toutes les autres métadonnées représentant les clades supérieures avec `taxonomic.clade`"
 				)
-			}).describe(
-				"Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles. Bien penser à définir toutes les autres métadonnées représentant les clades supérieures avec `taxonomic.clade`"
-			)
-		},
-		{ type: MetadataType.exclude('"location" | "enum"'), 'infer?': MetadataInferOptions }
+			},
+			{ type: MetadataType.exclude('"location" | "enum"'), 'infer?': MetadataInferOptions }
+		)
 	)
 );
 
-const Metadata = table('id', MetadataWithoutID.and({ id: ID }));
-
-const ProtocolWithoutMetadata = type({
-	id: ID.describe(
-		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
-	),
-	name: ['string', '@', 'Nom du protocole'],
-	description: ['string', '@', 'Description du protocole'],
-	source: URLString.describe(
-		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
-	),
-	authors: type({
-		email: ['string.email', '@', 'Adresse email'],
-		name: ['string', '@', 'Prénom Nom']
-	})
-		.array()
-		.describe("Les auteurices ayant participé à l'élaboration du protocole"),
-	'metadataOrder?': type(ID.array()).describe(
-		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
-	),
-	'crop?': type({
-		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
-		infer: type({
-			model: Request.describe(
-				'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
-			),
-			input: ModelInput.describe("Configuration de l'entrée du modèle"),
-			output: type({
-				'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"],
-				normalized: [
-					'boolean',
-					'@',
-					"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
-				],
-				shape: ModelDetectionOutputShape.describe(
-					"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
-				)
-			}).describe(
-				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
-			)
-		}).describe("Configuration de l'inférence des boîtes englobantes")
-	}).describe('Configuration de la partie recadrage'),
-	exports: type({
-		images: type({
-			cropped: FilepathTemplate.describe('Chemins des images recadrées'),
-			original: FilepathTemplate.describe('Chemins des images originales')
-		}).describe(
-			`Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename "_exemple"}} pour ajouter "_exemple" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename "_cropped"}} donnera "IMG_1245_cropped.JPEG" si l'image avait pour nom de fichier "IMG_12345.JPEG"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple "(Inconnnu)"}} pour utiliser "(Inconnu)" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/`
-		),
-		metadata: {
-			json: type.string
-				.describe("Chemin du fichier JSON contenant les résultats de l'analyse")
-				.pipe((path) => path.replaceAll('\\', '/')),
-			csv: type.string
-				.describe("Chemin du fichier CSV contenant les résultats de l'analyse")
-				.pipe((path) => path.replaceAll('\\', '/'))
-		}
-	})
-		.describe("La structure du fichier .zip d'export pour ce protocole.")
-		.optional()
-});
-
 const Protocol = table(
 	'id',
-	ProtocolWithoutMetadata.and({
-		metadata: References
+	type({
+		id: ID.describe(
+			'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
+		),
+		metadata: References,
+		name: ['string', '@', 'Nom du protocole'],
+		description: ['string', '@', 'Description du protocole'],
+		source: URLString.describe(
+			"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
+		),
+		authors: type({
+			email: ['string.email', '@', 'Adresse email'],
+			name: ['string', '@', 'Prénom Nom']
+		})
+			.array()
+			.describe("Les auteurices ayant participé à l'élaboration du protocole"),
+		'metadataOrder?': type(ID.array()).describe(
+			"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
+		),
+		'crop?': type({
+			metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
+			infer: type({
+				model: Request.describe(
+					'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
+				),
+				input: ModelInput.describe("Configuration de l'entrée du modèle"),
+				output: type({
+					'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"],
+					normalized: [
+						'boolean',
+						'@',
+						"Si les coordonnées des boîtes englobantes sont normalisées par rapport aux dimensions de l'image"
+					],
+					shape: ModelDetectionOutputShape.describe(
+						"Forme de sortie de chaque boîte englobante. Nécéssite obligatoirement d'avoir 'score'; 2 parmi 'cx', 'sx', 'ex', 'w'; et 2 parmi 'cy', 'sy', 'ey', 'h'. Si les boîtes contiennent d'autre valeurs, bien les mentionner avec '_', même quand c'est à la fin de la liste: cela permet de savoir quand on passe à la boîte suivante. Par exemple, [cx, cy, w, h, score, _] correspond à un modèle YOLO11 COCO"
+					)
+				}).describe(
+					'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
+				)
+			}).describe("Configuration de l'inférence des boîtes englobantes")
+		}).describe('Configuration de la partie recadrage'),
+		exports: type({
+			images: type({
+				cropped: FilepathTemplate.describe('Chemins des images recadrées'),
+				original: FilepathTemplate.describe('Chemins des images originales')
+			}).describe(
+				`Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename "_exemple"}} pour ajouter "_exemple" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename "_cropped"}} donnera "IMG_1245_cropped.JPEG" si l'image avait pour nom de fichier "IMG_12345.JPEG"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple "(Inconnnu)"}} pour utiliser "(Inconnu)" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/`
+			),
+			metadata: {
+				json: type.string
+					.describe("Chemin du fichier JSON contenant les résultats de l'analyse")
+					.pipe((path) => path.replaceAll('\\', '/')),
+				csv: type.string
+					.describe("Chemin du fichier CSV contenant les résultats de l'analyse")
+					.pipe((path) => path.replaceAll('\\', '/'))
+			}
+		})
+			.describe("La structure du fichier .zip d'export pour ce protocole.")
+			.optional()
 	})
 );
 
@@ -423,10 +424,8 @@ export const Schemas = {
 	MetadataType,
 	MetadataMergeMethod,
 	MetadataEnumVariant,
-	MetadataWithoutID,
 	Metadata,
 	Protocol,
-	ProtocolWithoutMetadata,
 	Settings,
 	EXIFField,
 	Request
@@ -525,11 +524,6 @@ function table(keyPaths, schema) {
 /**
  * @typedef  Protocol
  * @type {typeof Protocol.infer}
- */
-
-/**
- * @typedef  ProtocolWithoutMetadata
- * @type {typeof ProtocolWithoutMetadata.infer}
  */
 
 /**
