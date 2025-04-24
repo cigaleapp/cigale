@@ -6,7 +6,7 @@ import { imageIdToFileId } from './images';
  * @typedef Keybind
  * @type {object}
  * @property {string} help
- * @property {(e: MouseEvent|KeyboardEvent) => void} do
+ * @property {(e: MouseEvent|KeyboardEvent) => (void | Promise<void>)} do
  * @property {boolean} [hidden=false] hide the keybinding from help
  * @property {(e: MouseEvent|KeyboardEvent) => boolean} [when=() => true] condition to check before executing the keybind
  */
