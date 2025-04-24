@@ -256,7 +256,7 @@
 
 	.boundingbox:hover:not(:has(:hover)):not(:has(.dragging)) .corner {
 		scale: 130%;
-		background: var(--bg-primary-translucent);
+		background: var(--light__bg-primary-translucent);
 	}
 
 	.corner {
@@ -269,13 +269,13 @@
 	}
 
 	.corner:hover {
-		background: var(--bg-primary-translucent);
+		background: var(--light__bg-primary-translucent);
 		scale: 130%;
 	}
 
 	.corner.dragging {
 		scale: 110%;
-		background: var(--bg-primary);
+		background: var(--light__bg-primary);
 	}
 
 	.topleft {
