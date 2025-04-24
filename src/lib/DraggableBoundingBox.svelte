@@ -1,4 +1,6 @@
 <script>
+	import { boundingBoxIsNonZero } from './BoundingBoxes.svelte';
+
 	/**
 	 * @typedef Rect
 	 * @type {object}
@@ -88,6 +90,15 @@
 
 	const boudingBoxPixel = $derived(toPixel(imageRect, boundingBox));
 
+	let creatingBoundingBox = $state(false);
+
+	let newBoundingBox = $state({
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0
+	});
+
 	let draggingCorner = $state({
 		topleft: false,
 		topright: false,
@@ -118,13 +129,43 @@
 	style:top="{imageRect.y}px"
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
+	style:cursor={boundingBoxIsNonZero(boundingBox) ? 'unset' : 'crosshair'}
 	onmouseup={() => {
+		if (creatingBoundingBox) {
+			boundingBox = {
+				x: newBoundingBox.x / imageRect.width,
+				y: newBoundingBox.y / imageRect.height,
+				width: newBoundingBox.width / imageRect.width,
+				height: newBoundingBox.height / imageRect.height
+			};
+			newBoundingBox = {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0
+			};
+		}
+		creatingBoundingBox = false;
 		draggingCorner.setAll(false);
 		onchange?.(boundingBox);
 	}}
-	onmousemove={(e) => {
-		const dx = e.movementX / imageRect.width;
-		const dy = e.movementY / imageRect.height;
+	onmousedown={({ offsetX, offsetY }) => {
+		if (boundingBoxIsNonZero(boundingBox)) return;
+		creatingBoundingBox = true;
+		newBoundingBox.x = offsetX;
+		newBoundingBox.y = offsetY;
+		console.log('newBoundingBox', newBoundingBox);
+	}}
+	onmousemove={({ movementX, movementY }) => {
+		const dx = movementX / imageRect.width;
+		const dy = movementY / imageRect.height;
+
+		if (creatingBoundingBox) {
+			newBoundingBox.width += movementX;
+			newBoundingBox.height += movementY;
+			console.log('newBoundingBox', newBoundingBox);
+			return;
+		}
 
 		if (draggingCorner.isAll(true)) {
 			boundingBox.x += dx;
@@ -157,32 +198,42 @@
 		}
 	}}
 >
-	<div
-		class="boundingbox"
-		style:left="{boudingBoxPixel.x - imageRect.x}px"
-		style:top="{boudingBoxPixel.y - imageRect.y}px"
-		style:width="{boudingBoxPixel.width}px"
-		style:height="{boudingBoxPixel.height}px"
-		onmousedown={() => {
-			draggingCorner.setAll(true);
-		}}
-	>
-		{#snippet corner(/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position)}
-			<div
-				class="corner {position}"
-				class:dragging={draggingCorner[position]}
-				onmousedown={(e) => {
-					draggingCorner[position] = true;
-					e.stopPropagation();
-				}}
-			></div>
-		{/snippet}
-
-		{@render corner('topleft')}
-		{@render corner('topright')}
-		{@render corner('bottomleft')}
-		{@render corner('bottomright')}
-	</div>
+	{#if creatingBoundingBox}
+		<div
+			class="boundingbox new"
+			style:left="{newBoundingBox.x}px"
+			style:top="{newBoundingBox.y}px"
+			style:width="{newBoundingBox.width}px"
+			style:height="{newBoundingBox.height}px"
+		></div>
+	{/if}
+	{#if boundingBoxIsNonZero(boundingBox)}
+		<div
+			class="boundingbox"
+			style:left="{boudingBoxPixel.x - imageRect.x}px"
+			style:top="{boudingBoxPixel.y - imageRect.y}px"
+			style:width="{boudingBoxPixel.width}px"
+			style:height="{boudingBoxPixel.height}px"
+			onmousedown={() => {
+				draggingCorner.setAll(true);
+			}}
+		>
+			{#snippet corner(/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position)}
+				<div
+					class="corner {position}"
+					class:dragging={draggingCorner[position]}
+					onmousedown={(e) => {
+						draggingCorner[position] = true;
+						e.stopPropagation();
+					}}
+				></div>
+			{/snippet}
+			{@render corner('topleft')}
+			{@render corner('topright')}
+			{@render corner('bottomleft')}
+			{@render corner('bottomright')}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -197,6 +248,9 @@
 		box-shadow:
 			white calc(-1 * var(--thick)) calc(-1 * var(--thick)) inset,
 			white var(--thick) var(--thick) inset;
+	}
+
+	.boundingbox:not(.new) {
 		cursor: move;
 	}
 

@@ -1,7 +1,11 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { toCenteredCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import {
+		boundingBoxIsNonZero,
+		toCenteredCoords,
+		toTopLeftCoords
+	} from '$lib/BoundingBoxes.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
@@ -30,6 +34,7 @@
 			h: 0.5
 		}
 	);
+	const boundingBoxExists = $derived(boundingBoxIsNonZero(boundingBox));
 	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(imageId)));
 	const sortedImageIds = $derived(
 		idb.tables.Image.state.map((img) => img.id).toSorted(idb.idComparator)
@@ -45,25 +50,40 @@
 		return sortedImageIds.at(idx);
 	});
 	const croppedImagesCount = $derived(
-		idb.tables.Image.state.filter((image) => image.metadata[uiState.cropMetadataId]).length
+		idb.tables.Image.state.filter(
+			(image) =>
+				image.metadata[uiState.cropMetadataId] &&
+				boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value)
+		).length
 	);
 	const confirmedCropsCount = $derived(
 		idb.tables.Image.state.filter(
-			(image) => image.metadata[uiState.cropMetadataId]?.manuallyModified
+			(image) =>
+				image.metadata[uiState.cropMetadataId] &&
+				boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value) &&
+				image.metadata[uiState.cropMetadataId].manuallyModified
 		).length
 	);
 
 	/**
-	 * @param {{x: number, y: number, width: number, height: number}} boundingBoxesout
+	 * @param {{x: number, y: number, width: number, height: number}} newBoundingBox
 	 */
-	async function onConfirmCrop(boundingBoxesout) {
-		console.log(boundingBoxesout, 'is cropped! at id : ', imageId);
-
+	async function onConfirmCrop(newBoundingBox) {
 		const image = idb.tables.Image.state.find((image) => image.id === imageId);
 		if (!image) {
 			toasts.error(`Image ${imageId} introuvable, impossible de sauvegarder le recadrage`);
 			return;
 		}
+
+		const willAutoskip =
+			// The user has auto-skip enabled
+			getSettings().cropAutoNext &&
+			// We aren't deleting the bounding box
+			boundingBoxIsNonZero(newBoundingBox) &&
+			// Auto-skip occurs when the user just created a bounding box (so there was no previous one)
+			(!boundingBoxExists ||
+				// or the bounding box was not manually modified before
+				!image?.metadata[uiState.cropMetadataId].manuallyModified);
 
 		// Get inferred value from alternatives (if non empty), or use the main value otherwise. Inferred value is the initial cropbox value as determined by the neural network.
 		// If this is the first time the user is re-cropping the box, this value will be the main values.
@@ -98,12 +118,16 @@
 			metadataId: uiState.cropMetadataId,
 			subjectId: imageId,
 			type: 'boundingbox',
-			value: toCenteredCoords(boundingBoxesout),
+			value: toCenteredCoords(newBoundingBox),
 			confidence: 1,
 			// Put the neural-network-inferred (initial) value in the alternatives as a backup
 			alternatives: initialCrop ? [initialCrop] : [],
 			manuallyModified: true
 		});
+
+		if (willAutoskip && nextImageId) {
+			await goto(`#/crop/${nextImageId}`);
+		}
 	}
 
 	$effect(() => {
@@ -112,6 +136,11 @@
 
 	onMount(() => {
 		uiState.keybinds['ArrowLeft'] = {
+			help: 'Image précédente',
+			when: () => Boolean(previousImageId),
+			do: () => goto(`#/crop/${previousImageId}`)
+		};
+		uiState.keybinds['Shift+Space'] = {
 			help: 'Image précédente',
 			when: () => Boolean(previousImageId),
 			do: () => goto(`#/crop/${previousImageId}`)
