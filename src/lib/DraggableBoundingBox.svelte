@@ -34,23 +34,35 @@
 	let naturalHeight = $state(imageElement.naturalHeight);
 
 	$effect(() => {
-		const observer = new ResizeObserver((_, observer) => {
+		const resizeObserver = new ResizeObserver((_, observer) => {
 			if (!imageElement) {
 				observer.disconnect();
 				return;
 			}
-			clientWidth = imageElement.clientWidth;
-			clientHeight = imageElement.clientHeight;
-			clientLeft = imageElement.clientLeft;
-			clientTop = imageElement.clientTop;
-			naturalWidth = imageElement.naturalWidth;
-			naturalHeight = imageElement.naturalHeight;
+
+			({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
+				imageElement);
 		});
 
-		observer.observe(imageElement);
+		const mutationObserver = new MutationObserver((_, observer) => {
+			if (!imageElement) {
+				observer.disconnect();
+				return;
+			}
+
+			({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
+				imageElement);
+		});
+
+		mutationObserver.observe(imageElement, {
+			attributes: true,
+			attributeFilter: ['src']
+		});
+		resizeObserver.observe(imageElement);
 
 		return () => {
-			observer.disconnect();
+			resizeObserver.disconnect();
+			mutationObserver.disconnect();
 		};
 	});
 
