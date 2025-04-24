@@ -49,7 +49,12 @@
 	}
 </script>
 
-<Modal --footer-direction="column" key="export-results" bind:open title="Exporter les résultats">
+<Modal
+	--footer-direction="column"
+	key="modal_export_results"
+	bind:open
+	title="Exporter les résultats"
+>
 	<RadioButtons
 		bind:value={include}
 		options={[

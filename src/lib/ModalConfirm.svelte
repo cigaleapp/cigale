@@ -6,12 +6,12 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {string} key a unique string, used to identify the modal in the page's state.
+	 * @property {`modal_${string}`} key a unique string, used to identify the modal in the page's state.
 	 * @property {string} title the title used in the header
 	 * @property {() => void} onconfirm what to do when the user confirms
-	 * @property {() => void} [oncancel] what to do when the user cancels
-	 * @property {() => void} [open] a function you can bind to, to open the modal
-	 * @property {() => void} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
+	 * @property {undefined | (() => void)} [oncancel] what to do when the user cancels
+	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
+	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {import('svelte').Snippet} [children] the content of the modal
 	 * @property {string} [confirm] the text to display on the confirm button
 	 * @property {string} [cancel] the text to display on the cancel button

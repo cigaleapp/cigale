@@ -27,7 +27,7 @@
 	</a>
 {/snippet}
 
-<Modal key="preview-pr" bind:open title="Preview de la PR #{previewingPrNumber}">
+<Modal key="modal_preview_pr" bind:open title="Preview de la PR #{previewingPrNumber}">
 	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
