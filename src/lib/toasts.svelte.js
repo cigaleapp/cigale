@@ -85,6 +85,17 @@ export class Toasts {
 	}
 
 	/**
+	 * Displays an info toast.
+	 * @template T
+	 * @param {string} message
+	 * @param {ToastOptions<T>} [options]
+	 * @returns {string | undefined}
+	 */
+	info(message, options) {
+		return this.add('info', message, options);
+	}
+
+	/**
 	 * Displays a warning toast.
 	 * @template T
 	 * @param {string} message
