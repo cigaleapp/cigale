@@ -10,6 +10,9 @@
 	import Fuse from 'fuse.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
+	import { setTabTitle } from '$lib/seo';
+
+	setTabTitle('Choisir un protocole');
 
 	const currentProtocol = $derived(
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
