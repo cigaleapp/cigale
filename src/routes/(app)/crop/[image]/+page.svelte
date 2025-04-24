@@ -24,6 +24,7 @@
 	import IconHasCrop from '~icons/ph/crop';
 	import IconGallery from '~icons/ph/squares-four';
 	import { seo } from '$lib/seo.svelte';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
@@ -205,27 +206,33 @@
 					</span>
 				{/if}
 			</h1>
-			<p class="process">
-				{#snippet percent(/** @type {number} */ value)}
-					<code>
-						{Math.round((value / sortedImageIds.length) * 100)}%
-					</code>
-				{/snippet}
-
+			<code>
+				{sortedImageIds.indexOf(imageId) + 1}⁄{sortedImageIds.length}
+			</code>
+		</section>
+		<section class="progress">
+			{#snippet percent(/** @type {number} */ value)}
 				<code>
-					{sortedImageIds.indexOf(imageId) + 1}⁄{sortedImageIds.length}
+					{Math.round((value / sortedImageIds.length) * 100)}%
 				</code>
-				<span class="sep">·</span>
-				<span use:tooltip={'Images avec recadrage (manuel ou détecté)'}>
+			{/snippet}
+
+			<div class="bar">
+				<p>
 					<IconHasCrop />
+					Images avec recadrage
 					{@render percent(croppedImagesCount)}
-				</span>
-				<span class="sep">·</span>
-				<span use:tooltip={'Images avec recadrage manuellement confirmé'}>
+				</p>
+				<ProgressBar alwaysActive progress={croppedImagesCount / sortedImageIds.length} />
+			</div>
+			<div class="bar">
+				<p>
 					<IconHasConfirmedCrop />
+					Recadrages confirmés
 					{@render percent(confirmedCropsCount)}
-				</span>
-			</p>
+				</p>
+				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedImageIds.length} />
+			</div>
 		</section>
 		<nav>
 			<ButtonSecondary
@@ -287,24 +294,14 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
+		gap: 2em;
 	}
 
 	.info .top {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
-	}
-
-	.info .top p,
-	.info .top p span {
-		display: flex;
-		align-items: center;
-		gap: 0.25em;
-	}
-
-	.info .top .sep {
-		padding: 0 0.5em;
+		margin-bottom: auto;
 	}
 
 	.info h1 {
@@ -319,6 +316,26 @@
 		font-size: 0.8em;
 		color: var(--fg-primary);
 		align-items: center;
+	}
+
+	.info .progress {
+		display: flex;
+		flex-direction: column;
+		--inactive-bg: var(--gray);
+		gap: 0.5em;
+	}
+
+	.info .progress .bar p {
+		margin-bottom: 0.25em;
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.info .progress .bar p code {
+		color: var(--gay);
+		font-size: 0.9em;
+		margin-left: auto;
 	}
 
 	.info nav {
