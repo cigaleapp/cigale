@@ -27,7 +27,9 @@
 	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconConfirmedCrop from '~icons/ph/seal-check';
+	import IconUnconfirmedCrop from '~icons/ph/seal';
 	import IconGallery from '~icons/ph/squares-four';
+	import IconReset from '~icons/ph/arrow-counter-clockwise';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
@@ -91,12 +93,50 @@
 	 * @param {import('$lib/database.js').Image} image
 	 */
 	function hasConfirmedCrop(image) {
-		return (
-			hasCrop(image) &&
-			(image.metadata[uiState.cropMetadataId].manuallyModified ||
-				image.metadata[uiState.cropMetadataId].confidence === 1)
-		);
+		return hasCrop(image) && image.metadata[uiState.cropMetadataId].manuallyModified;
 	}
+
+	async function revertToInferedCrop() {
+		if (!image) {
+			toasts.error(`Image ${imageId} introuvable, impossible de revenir au recadrage d'origine`);
+			return;
+		}
+
+		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
+		if (
+			!image.metadata[uiState.cropMetadataId]?.alternatives ||
+			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length === 0
+		) {
+			toasts.error(
+				`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
+			);
+			return;
+		}
+
+		const [[stringValue, confidence]] = Object.entries(
+			image.metadata[uiState.cropMetadataId].alternatives
+		);
+
+		await storeMetadataValue({
+			subjectId: imageId,
+			metadataId: uiState.cropMetadataId,
+			type: 'boundingbox',
+			value: JSON.parse(stringValue),
+			confidence
+		});
+
+		await deleteMetadataValue({
+			metadataId: uiState.classificationMetadataId,
+			subjectId: imageId
+		});
+	}
+
+	const canRevertToInferedCrop = $derived(
+		image &&
+			hasConfirmedCrop(image) &&
+			image.metadata[uiState.cropMetadataId]?.alternatives &&
+			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
+	);
 
 	/**
 	 * @param {{x: number, y: number, width: number, height: number}} newBoundingBox
@@ -250,22 +290,39 @@
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
 			</nav>
-			{#if image}
-				<h1>
-					{image.filename}
-					{#if hasConfirmedCrop(image)}
-						<div class="status" use:tooltip={'Recadrage confirmé'}>
-							<IconConfirmedCrop />
-						</div>
-					{:else if hasCrop(image)}
-						<div class="status" use:tooltip={'Marquer le recadrage comme confirmé'}></div>
-					{/if}
-				</h1>
-			{:else}
-				<h1>
-					<code>Image introuvable</code>
-				</h1>
-			{/if}
+			<div class="filename-actions">
+				{#if image}
+					<h1>
+						{image.filename}
+						{#if hasConfirmedCrop(image)}
+							<div class="status" use:tooltip={'Recadrage confirmé'}>
+								<IconConfirmedCrop />
+							</div>
+						{:else if hasCrop(image)}
+							<button
+								class="status"
+								use:tooltip={'Marquer le recadrage comme confirmé'}
+								onclick={() => onConfirmCrop(toTopLeftCoords(boundingBox), false)}
+							>
+								<IconUnconfirmedCrop />
+							</button>
+						{/if}
+					</h1>
+				{:else}
+					<h1>
+						<code>Image introuvable</code>
+					</h1>
+				{/if}
+				<div class="actions">
+					<ButtonInk
+						disabled={!canRevertToInferedCrop}
+						onclick={revertToInferedCrop}
+						help="Revenir au recadrage de départ"
+					>
+						<IconReset /> Annuler
+					</ButtonInk>
+				</div>
+			</div>
 		</section>
 		<section class="progress">
 			{#snippet percent(/** @type {number} */ value)}
@@ -414,6 +471,12 @@
 		margin-bottom: auto;
 	}
 
+	.info .filename-actions {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
 	.info h1 {
 		font-size: 1.5em;
 		display: flex;
@@ -426,6 +489,23 @@
 		font-size: 0.8em;
 		color: var(--fg-primary);
 		align-items: center;
+	}
+
+	.info button.status {
+		opacity: 0.5;
+		outline: none;
+		border: none;
+		background: none;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	.info button.status:is(:hover, :focus-visible) {
+		opacity: 1;
+	}
+
+	.info button.status:focus-visible {
+		border: 1px solid var(--fg-primary);
 	}
 
 	.info .progress {
