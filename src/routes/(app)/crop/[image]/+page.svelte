@@ -20,8 +20,8 @@
 	import { onDestroy, onMount } from 'svelte';
 	import IconPrev from '~icons/ph/caret-line-left';
 	import IconNext from '~icons/ph/caret-line-right';
-	import IconHasConfirmedCrop from '~icons/ph/check-circle';
-	import IconHasCrop from '~icons/ph/circle';
+	import IconHasConfirmedCrop from '~icons/ph/seal-check';
+	import IconHasCrop from '~icons/ph/crop';
 	import IconGallery from '~icons/ph/squares-four';
 
 	const imageId = $derived(page.params.image);
@@ -49,21 +49,25 @@
 		if (idx >= sortedImageIds.length) return undefined;
 		return sortedImageIds.at(idx);
 	});
-	const croppedImagesCount = $derived(
-		idb.tables.Image.state.filter(
-			(image) =>
-				image.metadata[uiState.cropMetadataId] &&
-				boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value)
-		).length
-	);
-	const confirmedCropsCount = $derived(
-		idb.tables.Image.state.filter(
-			(image) =>
-				image.metadata[uiState.cropMetadataId] &&
-				boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value) &&
-				image.metadata[uiState.cropMetadataId].manuallyModified
-		).length
-	);
+	const croppedImagesCount = $derived(idb.tables.Image.state.filter(hasCrop).length);
+	const confirmedCropsCount = $derived(idb.tables.Image.state.filter(hasConfirmedCrop).length);
+
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 */
+	function hasCrop(image) {
+		return (
+			image.metadata[uiState.cropMetadataId] &&
+			boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value)
+		);
+	}
+
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 */
+	function hasConfirmedCrop(image) {
+		return hasCrop(image) && image.metadata[uiState.cropMetadataId].manuallyModified;
+	}
 
 	/**
 	 * @param {{x: number, y: number, width: number, height: number}} newBoundingBox
@@ -189,7 +193,14 @@
 					<IconGallery /> Toutes les photos
 				</ButtonInk>
 			</nav>
-			<h1>{image?.filename}</h1>
+			<h1>
+				{image?.filename}
+				{#if image && hasConfirmedCrop(image)}
+					<span class="status" use:tooltip={'Recadrage confirmé'}>
+						<IconHasConfirmedCrop />
+					</span>
+				{/if}
+			</h1>
 			<p class="process">
 				{#snippet percent(/** @type {number} */ value)}
 					<code>
@@ -294,6 +305,16 @@
 
 	.info h1 {
 		font-size: 1.5em;
+		display: flex;
+		align-items: center;
+		gap: 0.25em;
+	}
+
+	.info h1 .status {
+		display: flex;
+		font-size: 0.8em;
+		color: var(--fg-primary);
+		align-items: center;
 	}
 
 	.info nav {
