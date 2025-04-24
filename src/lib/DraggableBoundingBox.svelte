@@ -117,6 +117,34 @@
 		topright: false,
 		bottomleft: false,
 		bottomright: false,
+		get left() {
+			return this.topleft && this.bottomleft;
+		},
+		set left(value) {
+			this.topleft = value;
+			this.bottomleft = value;
+		},
+		get right() {
+			return this.topright && this.bottomright;
+		},
+		set right(value) {
+			this.topright = value;
+			this.bottomright = value;
+		},
+		get top() {
+			return this.topleft && this.topright;
+		},
+		set top(value) {
+			this.topleft = value;
+			this.topright = value;
+		},
+		get bottom() {
+			return this.bottomleft && this.bottomright;
+		},
+		set bottom(value) {
+			this.bottomleft = value;
+			this.bottomright = value;
+		},
 		/** @param {boolean} value */
 		setAll(value) {
 			this.topleft = value;
@@ -187,6 +215,28 @@
 			return;
 		}
 
+		if (draggingCorner.left) {
+			boundingBox.x += dx;
+			boundingBox.width -= dx;
+			return;
+		}
+
+		if (draggingCorner.right) {
+			boundingBox.width += dx;
+			return;
+		}
+
+		if (draggingCorner.top) {
+			boundingBox.y += dy;
+			boundingBox.height -= dy;
+			return;
+		}
+
+		if (draggingCorner.bottom) {
+			boundingBox.height += dy;
+			return;
+		}
+
 		if (draggingCorner.topleft) {
 			boundingBox.x += dx;
 			boundingBox.y += dy;
@@ -232,6 +282,21 @@
 				draggingCorner.setAll(true);
 			}}
 		>
+			{#snippet side(/** @type {'top'|'bottom'|'left'|'right'} */ position)}
+				<div
+					class="side {position}"
+					class:dragging={draggingCorner[position]}
+					onmousedown={(e) => {
+						draggingCorner[position] = true;
+						e.stopPropagation();
+					}}
+				></div>
+			{/snippet}
+			{@render side('top')}
+			{@render side('bottom')}
+			{@render side('left')}
+			{@render side('right')}
+
 			{#snippet corner(/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position)}
 				<div
 					class="corner {position}"
@@ -260,21 +325,65 @@
 	}
 
 	.boundingbox {
-		--thick: 4px;
 		position: absolute;
-		border: var(--thick) solid black;
-		box-shadow:
-			white calc(-1 * var(--thick)) calc(-1 * var(--thick)) inset,
-			white var(--thick) var(--thick) inset;
 	}
 
 	.boundingbox:not(.new) {
 		cursor: move;
 	}
 
-	.boundingbox:hover:not(:has(:hover)):not(:has(.dragging)) .corner {
+	.boundingbox:hover:not(:has(:hover)):not(:has(.dragging)) .corner,
+	.boundingbox .side.left:hover:not(.dragging) ~ .corner:is(.bottomleft, .topleft),
+	.boundingbox .side.right:hover:not(.dragging) ~ .corner:is(.topright, .bottomright),
+	.boundingbox .side.top:hover:not(.dragging) ~ .corner:is(.topleft, .topright),
+	.boundingbox .side.bottom:hover:not(.dragging) ~ .corner:is(.bottomleft, .bottomright) {
 		scale: 130%;
 		background: var(--light__bg-primary-translucent);
+	}
+
+	.side {
+		--thick: 5px;
+		position: absolute;
+		background: black;
+		border-style: solid;
+		border-width: 0;
+		border-color: white;
+	}
+
+	.side.left,
+	.side.right {
+		top: 0;
+		bottom: 0;
+		width: calc(var(--thick) * 2);
+		cursor: ew-resize;
+	}
+
+	.side.left {
+		left: calc(-1 * var(--thick));
+		border-right-width: var(--thick);
+	}
+
+	.side.right {
+		right: calc(-1 * var(--thick));
+		border-left-width: var(--thick);
+	}
+
+	.side.top,
+	.side.bottom {
+		left: 0;
+		right: 0;
+		height: calc(var(--thick) * 2);
+		cursor: ns-resize;
+	}
+
+	.side.top {
+		top: calc(-1 * var(--thick));
+		border-bottom-width: var(--thick);
+	}
+
+	.side.bottom {
+		bottom: calc(-1 * var(--thick));
+		border-top-width: var(--thick);
 	}
 
 	.corner {
