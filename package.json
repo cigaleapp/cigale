@@ -35,7 +35,7 @@
 		"@types/piexifjs": "^1.0.0",
 		"eslint": "^9.25.1",
 		"eslint-config-prettier": "^10.1.2",
-		"eslint-plugin-svelte": "^3.1.0",
+		"eslint-plugin-svelte": "^3.5.1",
 		"execa": "^9.5.2",
 		"get-current-line": "^7.4.0",
 		"gitmoji-cli": "^9.6.0",
@@ -80,6 +80,6 @@
 	},
 	"volta": {
 		"node": "22.14.0",
-		"npm": "11.2.0"
+		"npm": "11.3.0"
 	}
 }
