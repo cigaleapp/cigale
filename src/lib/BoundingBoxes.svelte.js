@@ -1,3 +1,4 @@
+import { type } from 'arktype';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
 /**
@@ -69,4 +70,24 @@ export function toTopLeftCoords({ x, y, w, h }) {
 		width: w,
 		height: h
 	};
+}
+
+export function boundingBoxIsNonZero(boundingBox) {
+	return type({
+		x: 'number > 0',
+		y: 'number > 0'
+	})
+		.and(
+			type.or(
+				{
+					width: 'number > 0',
+					height: 'number > 0'
+				},
+				{
+					w: 'number > 0',
+					h: 'number > 0'
+				}
+			)
+		)
+		.allows(boundingBox);
 }
