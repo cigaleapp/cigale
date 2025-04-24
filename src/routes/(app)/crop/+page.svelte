@@ -9,7 +9,10 @@
 	import Cropup from '$lib/Cropup.svelte';
 	import * as idb from '$lib/idb.svelte.js';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import { setTabTitle } from '$lib/seo';
 	import { uiState } from '$lib/state.svelte';
+
+	setTabTitle('Recadrer');
 
 	let openCropDialog = $state();
 

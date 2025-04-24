@@ -22,9 +22,12 @@
 	import Logo from '$lib/Logo.svelte';
 	import { metadataById, storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
+	import { setTabTitle } from '$lib/seo';
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
+
+	setTabTitle('Classification');
 
 	const erroredImages = $derived(uiState.erroredImages);
 	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
