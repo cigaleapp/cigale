@@ -1,4 +1,5 @@
 <script>
+	import { sound } from './sound';
 	import { tooltip } from './tooltips';
 
 	/**
@@ -14,7 +15,7 @@
 	let { children, onclick, help, disabled } = $props();
 </script>
 
-<button {disabled} {onclick} use:tooltip={help}>
+<button {disabled} {onclick} use:tooltip={help} use:sound={'flintandsteel.mp3'}>
 	{@render children()}
 </button>
 
