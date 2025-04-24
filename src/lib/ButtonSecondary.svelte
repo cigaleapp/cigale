@@ -24,13 +24,15 @@ Available CSS variables:
 </script>
 
 <script>
+	import { sound } from './sound';
+
 	import { tooltip } from './tooltips';
 
 	/** @type {Props} */
 	let { children, onclick, disabled = false, help } = $props();
 </script>
 
-<button {onclick} {disabled} use:tooltip={help}>
+<button {onclick} {disabled} use:tooltip={help} use:sound={'vineboom.mp3'}>
 	{@render children()}
 </button>
 
