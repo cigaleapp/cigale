@@ -157,7 +157,7 @@
 					<dt>
 						<a target="_blank" href="https://npmjs.com/package/{name}">{name}</a>
 					</dt>
-					<dd>{version}</dd>
+					<dd><code>{version}</code></dd>
 				{/each}
 			</dl>
 		{:catch error}
