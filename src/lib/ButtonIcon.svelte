@@ -7,14 +7,15 @@
 	 * @property {() => void} onclick
 	 * @property {import('svelte').Snippet} children
 	 * @property {string} help
+	 * @property {string} [keyboard] keyboard shortcut hint to display in the help tooltip
 	 * @property {boolean} [disabled]
 	 */
 
 	/** @type {Props} */
-	let { children, onclick, help, disabled } = $props();
+	let { children, onclick, help, keyboard, disabled } = $props();
 </script>
 
-<button {disabled} {onclick} use:tooltip={help}>
+<button {disabled} {onclick} use:tooltip={{ text: help, keyboard }}>
 	{@render children()}
 </button>
 
