@@ -34,7 +34,7 @@
 						// Stick in a call to event.preventDefault()
 						// before calling the handler function if "preventDefault" is true
 						if (preventDefault) e.preventDefault();
-						bind.do(e);
+						await bind.do(e);
 					}
 				])
 			)

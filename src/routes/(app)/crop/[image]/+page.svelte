@@ -20,7 +20,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import IconPrev from '~icons/ph/caret-line-left';
 	import IconNext from '~icons/ph/caret-line-right';
-	import IconHasConfirmedCrop from '~icons/ph/seal-check';
+	import IconConfirmedCrop from '~icons/ph/seal-check';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconGallery from '~icons/ph/squares-four';
 	import { seo } from '$lib/seo.svelte';
@@ -29,20 +29,32 @@
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
 
+	// Controls visibility of the checkmark little centered overlay
+	let confirmedOverlayShown = $state(false);
+
 	$effect(() => seo({ title: `Recadrer ${image?.filename ?? '...'}` }));
 
 	const boundingBox = $derived(
-		image?.metadata[uiState.cropMetadataId]?.value ?? {
-			x: 0,
-			y: 0,
-			w: 0.5,
-			h: 0.5
-		}
+		/**
+		 * @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>}
+		 */ (
+			image?.metadata[uiState.cropMetadataId]?.value ?? {
+				x: 0,
+				y: 0,
+				w: 0.5,
+				h: 0.5
+			}
+		)
 	);
-	const boundingBoxExists = $derived(boundingBoxIsNonZero(boundingBox));
 	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(imageId)));
 	const sortedImageIds = $derived(
 		idb.tables.Image.state.map((img) => img.id).toSorted(idb.idComparator)
+	);
+	const unconfirmedCropImagesId = $derived(
+		idb.tables.Image.state
+			.filter((img) => !hasConfirmedCrop(img))
+			.map((img) => img.id)
+			.toSorted(idb.idComparator)
 	);
 	const previousImageId = $derived.by(() => {
 		const idx = sortedImageIds.indexOf(imageId) - 1;
@@ -53,6 +65,11 @@
 		const idx = sortedImageIds.indexOf(imageId) + 1;
 		if (idx >= sortedImageIds.length) return undefined;
 		return sortedImageIds.at(idx);
+	});
+	const nextUnconfirmedImageId = $derived.by(() => {
+		const idx = unconfirmedCropImagesId.indexOf(imageId) + 1;
+		if (idx >= unconfirmedCropImagesId.length) return undefined;
+		return unconfirmedCropImagesId.at(idx);
 	});
 	const croppedImagesCount = $derived(idb.tables.Image.state.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(idb.tables.Image.state.filter(hasConfirmedCrop).length);
@@ -71,28 +88,33 @@
 	 * @param {import('$lib/database.js').Image} image
 	 */
 	function hasConfirmedCrop(image) {
-		return hasCrop(image) && image.metadata[uiState.cropMetadataId].manuallyModified;
+		return (
+			hasCrop(image) &&
+			(image.metadata[uiState.cropMetadataId].manuallyModified ||
+				image.metadata[uiState.cropMetadataId].confidence === 1)
+		);
 	}
 
 	/**
 	 * @param {{x: number, y: number, width: number, height: number}} newBoundingBox
+	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 */
-	async function onConfirmCrop(newBoundingBox) {
+	async function onConfirmCrop(newBoundingBox, flashConfirmedOverlay = true) {
 		const image = idb.tables.Image.state.find((image) => image.id === imageId);
 		if (!image) {
 			toasts.error(`Image ${imageId} introuvable, impossible de sauvegarder le recadrage`);
 			return;
 		}
 
+		const willFlashConfirmedOverlay = flashConfirmedOverlay && !hasConfirmedCrop(image);
+
 		const willAutoskip =
 			// The user has auto-skip enabled
 			getSettings().cropAutoNext &&
 			// We aren't deleting the bounding box
 			boundingBoxIsNonZero(newBoundingBox) &&
-			// Auto-skip occurs when the user just created a bounding box (so there was no previous one)
-			(!boundingBoxExists ||
-				// or the bounding box was not manually modified before
-				!image?.metadata[uiState.cropMetadataId].manuallyModified);
+			// Auto-skip occurs when the bounding box did not exist before
+			!hasCrop(image);
 
 		// Get inferred value from alternatives (if non empty), or use the main value otherwise. Inferred value is the initial cropbox value as determined by the neural network.
 		// If this is the first time the user is re-cropping the box, this value will be the main values.
@@ -102,7 +124,7 @@
 
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 		if (
-			image.metadata[uiState.cropMetadataId].alternatives &&
+			image.metadata[uiState.cropMetadataId]?.alternatives &&
 			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
 		) {
 			const [[stringValue, confidence]] = Object.entries(
@@ -134,8 +156,14 @@
 			manuallyModified: true
 		});
 
-		if (willAutoskip && nextImageId) {
-			await goto(`#/crop/${nextImageId}`);
+		if (willFlashConfirmedOverlay) {
+			confirmedOverlayShown = true;
+			await new Promise((resolve) => setTimeout(resolve, 500));
+			confirmedOverlayShown = false;
+		}
+
+		if (willAutoskip) {
+			await goto(nextImageId ? `#/crop/${nextImageId}` : `#/classify`);
 		}
 	}
 
@@ -160,8 +188,11 @@
 			do: () => goto(`#/crop/${nextImageId}`)
 		};
 		uiState.keybinds['Space'] = {
-			help: 'Image suivante ou terminer',
-			do: () => goto(nextImageId ? `#/crop/${nextImageId}` : `#/classify`)
+			help: 'Continuer',
+			async do() {
+				await onConfirmCrop(toTopLeftCoords(boundingBox));
+				await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
+			}
 		};
 		uiState.keybinds['Escape'] = {
 			help: 'Quitter le recadrage',
@@ -177,6 +208,13 @@
 
 	let imageElement = $state();
 </script>
+
+<div class="confirmed-overlay" class:shown={confirmedOverlayShown}>
+	<div class="icon">
+		<IconConfirmedCrop />
+	</div>
+	<p>Confirmé</p>
+</div>
 
 <div class="layout">
 	<main class="crop-surface">
@@ -198,14 +236,22 @@
 					<IconGallery /> Toutes les photos
 				</ButtonInk>
 			</nav>
-			<h1>
-				{image?.filename}
-				{#if image && hasConfirmedCrop(image)}
-					<span class="status" use:tooltip={'Recadrage confirmé'}>
-						<IconHasConfirmedCrop />
-					</span>
-				{/if}
-			</h1>
+			{#if image}
+				<h1>
+					{image.filename}
+					{#if hasConfirmedCrop(image)}
+						<div class="status" use:tooltip={'Recadrage confirmé'}>
+							<IconConfirmedCrop />
+						</div>
+					{:else if hasCrop(image)}
+						<div class="status" use:tooltip={'Marquer le recadrage comme confirmé'}></div>
+					{/if}
+				</h1>
+			{:else}
+				<h1>
+					<code>Image introuvable</code>
+				</h1>
+			{/if}
 			<code>
 				{sortedImageIds.indexOf(imageId) + 1}⁄{sortedImageIds.length}
 			</code>
@@ -227,7 +273,7 @@
 			</div>
 			<div class="bar">
 				<p>
-					<IconHasConfirmedCrop />
+					<IconConfirmedCrop />
 					Recadrages confirmés
 					{@render percent(confirmedCropsCount)}
 				</p>
@@ -275,6 +321,35 @@
 		height: 100%;
 		gap: 1em;
 		overflow: hidden;
+	}
+
+	.confirmed-overlay {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 100;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 1.5rem;
+		padding: 2rem;
+		color: var(--fg-success);
+		background-color: var(--bg-neutral);
+		border-radius: var(--corner-radius);
+		display: flex;
+		flex-direction: column;
+		transition: opacity 0.2s;
+		pointer-events: none;
+	}
+
+	.confirmed-overlay:not(.shown) {
+		opacity: 0;
+	}
+
+	.confirmed-overlay .icon {
+		font-size: 2.5em;
+		margin-bottom: -1rem;
 	}
 
 	.crop-surface {
