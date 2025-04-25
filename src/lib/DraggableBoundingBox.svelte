@@ -212,14 +212,13 @@
 		// Don't try registering new bounding box points if we're about to move/transform the existing one
 		if ((movable || transformable) && withinBoundingBox(boudingBoxPixel, { x, y })) return;
 		creatingBoundingBox = true;
-		newBoundingBox.register(x, y);
+		newBoundingBox.registerPoint(x, y);
 	}}
 	onmousemove={({ movementX, movementY }) => {
 		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY });
 
 		if (creatingBoundingBox && createMode === 'clickanddrag') {
-			newBoundingBox.clickanddrag.width += movementX;
-			newBoundingBox.clickanddrag.height += movementY;
+			newBoundingBox.registerMovement(movementX, movementY);
 			return;
 		}
 
@@ -288,6 +287,10 @@
 			create {newBoundingBox.ready ? 'ready ' : ''}
 			{#if createMode === 'clickanddrag'}
 				{@render bb(newBoundingBox.clickanddrag)}
+				<br /> &nbsp;&nbsp;&nbsp;dir {@render point(
+					newBoundingBox.clickanddrag.dragDirection.x,
+					newBoundingBox.clickanddrag.dragDirection.y
+				)}
 			{:else if createMode === 'off'}
 				off
 			{:else}
