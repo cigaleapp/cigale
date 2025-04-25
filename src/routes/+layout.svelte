@@ -23,6 +23,14 @@
 		color: var(--gay);
 	}
 
+	:global(a, a:visited) {
+		color: inherit;
+	}
+
+	:global(a:hover) {
+		color: var(--fg-primary);
+	}
+
 	:global(*) {
 		font-family: 'Host Grotesk', sans-serif;
 	}
