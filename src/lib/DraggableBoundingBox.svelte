@@ -1,4 +1,5 @@
 <script>
+	import { tick } from 'svelte';
 	import { boundingBoxIsNonZero } from './BoundingBoxes.svelte';
 	import { getSettings } from './settings.svelte';
 
@@ -34,32 +35,38 @@
 	let naturalWidth = $state(imageElement.naturalWidth);
 	let naturalHeight = $state(imageElement.naturalHeight);
 
+	const refreshImageRect = async () => {
+		if (!imageElement) return;
+		({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
+			imageElement);
+		await tick();
+	};
+
 	$effect(() => {
-		const resizeObserver = new ResizeObserver((_, observer) => {
+		imageElement.addEventListener('load', refreshImageRect);
+
+		const resizeObserver = new ResizeObserver(async (_, observer) => {
 			if (!imageElement) {
 				observer.disconnect();
 				return;
 			}
 
-			({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
-				imageElement);
+			await refreshImageRect();
 		});
 
-		const mutationObserver = new MutationObserver((_, observer) => {
+		const mutationObserver = new MutationObserver(async (_, observer) => {
 			if (!imageElement) {
 				observer.disconnect();
 				return;
 			}
 
-			({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
-				imageElement);
+			await refreshImageRect();
 		});
 
 		mutationObserver.observe(imageElement, {
 			attributes: true,
 			attributeFilter: ['src']
 		});
-		resizeObserver.observe(imageElement);
 
 		return () => {
 			resizeObserver.disconnect();
