@@ -286,30 +286,20 @@
 			{/snippet}
 			bb {@render bb(boudingBoxPixel)}<br />
 			create {newBoundingBox.ready ? 'ready ' : ''}
-			{#if createMode === '2point'}
-				{@const { x1, y1, x2, y2 } = newBoundingBox['2point']}
-				2point {@render point(x1, y1)} / {@render point(x2, y2)}
-			{:else if createMode === '4point'}
-				4point <br />
-				{#each Object.entries(newBoundingBox['4point']) as [id, { x, y }] (id)}
-					({id}){@render point(x, y)} <br />
-				{/each}
-			{:else if createMode === 'clickanddrag'}
+			{#if createMode === 'clickanddrag'}
 				{@render bb(newBoundingBox.clickanddrag)}
-			{:else}
+			{:else if createMode === 'off'}
 				off
+			{:else}
+				<br />
+				{#each newBoundingBox.points as { x, y }, i (i)}
+					(i) {@render point(x, y)} <br />
+				{/each}
 			{/if}
 		</code>
 	{/if}
-	{#if createMode === '2point'}
-		{@const { x1, y1, x2, y2 } = newBoundingBox['2point']}
-		{#each [[1, x1, y1], [2, x2, y2]] as [id, x, y] (id)}
-			{#if x !== 0 && y !== 0}
-				<div class="boundingbox-point new" style:left="{x}px" style:top="{y}px"></div>
-			{/if}
-		{/each}
-	{:else if createMode === '4point'}
-		{#each Object.entries(newBoundingBox['4point']) as [id, { x, y }] (id)}
+	{#if createMode === '2point' || createMode === '4point'}
+		{#each newBoundingBox.points as { x, y }, i (i)}
 			{#if x !== 0 && y !== 0}
 				<div class="boundingbox-point new" style:left="{x}px" style:top="{y}px"></div>
 			{/if}
