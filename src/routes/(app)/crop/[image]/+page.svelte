@@ -102,10 +102,6 @@
 
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
-	$effect(() => {
-		document.body.style.cursor = activeTool.cursor || 'auto';
-	});
-
 	const boundingBox = $derived(
 		/**
 		 * @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>}
@@ -356,7 +352,7 @@
 			</button>
 		{/each}
 	</aside>
-	<main class="crop-surface">
+	<main class="crop-surface" style:cursor={activeTool.cursor}>
 		<img src={imageSrc} alt="" bind:this={imageElement} />
 		{#if boundingBox && imageElement}
 			<DraggableBoundingBox
