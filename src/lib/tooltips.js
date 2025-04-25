@@ -1,9 +1,13 @@
 import tippy from 'sveltejs-tippy';
-import { displayPattern } from './KeyboardHint.svelte';
 import xss from 'xss';
+import { displayPattern } from './KeyboardHint.svelte';
 
 /**
- * @typedef {{text: string; keyboard?: string|undefined; delay?: number|undefined}} TooltipParameters
+ * @typedef {object} TooltipParameters
+ * @property {string} text - The text to display in the tooltip.
+ * @property {string} [keyboard] - The keyboard shortcut to display in the tooltip.
+ * @property {number} [delay] - The delay before showing the tooltip.
+ * @property {`${'top'|'right'|'bottom'|'left'}${''|`-${'start'|'end'}`}`} [placement] - The placement of the tooltip .
  */
 
 /** @param {string | [string, number] | TooltipParameters | undefined} parameters */
