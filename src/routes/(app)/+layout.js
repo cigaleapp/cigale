@@ -19,10 +19,13 @@ export async function load() {
 }
 
 async function preloadAudio() {
-	const files = ['flintandsteel.mp3', 'vineboom.mp3'];
+	const files = ['flintandsteel.mp3', 'vineboom.mp3', 'flstudio.mp3'];
 	for (const file of files) {
 		new Audio(file);
 	}
+
+	// Play startup sound
+	new Audio('flstudio.mp3').play();
 }
 
 async function fillBuiltinData() {
