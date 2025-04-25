@@ -8,10 +8,12 @@ import xss from 'xss';
 
 /** @param {string | [string, number] | TooltipParameters | undefined} parameters */
 function props(parameters) {
+	const base = { arrow: svgArrow };
 	let content = '';
 	let delay = 50;
 	if (!parameters) {
 		return {
+			...base,
 			content: '',
 			delay: [delay, 0]
 		};
@@ -21,6 +23,8 @@ function props(parameters) {
 	else if (Array.isArray(parameters)) [content, delay] = parameters;
 	else {
 		return {
+			...base,
+			...parameters,
 			delay: [delay, 0],
 			allowHTML: Boolean(parameters.keyboard),
 			content:
@@ -40,7 +44,7 @@ function props(parameters) {
 		};
 	}
 
-	return { content, delay: [delay, 0] };
+	return { ...base, content, delay: [delay, 0] };
 }
 
 /**
@@ -66,3 +70,6 @@ export function tooltip(node, parameters) {
 		}
 	};
 }
+
+const svgArrow =
+	'<svg width="16" height="6" xmlns="http://www.w3.org/2000/svg"><path d="M0 6s1.796-.013 4.67-3.615C5.851.9 6.93.006 8 0c1.07-.006 2.148.887 3.343 2.385C14.233 6.005 16 6 16 6H0z"></svg>';
