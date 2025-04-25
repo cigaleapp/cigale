@@ -384,9 +384,7 @@
 	.boundingbox.precise {
 		--thick: 2px;
 		border: var(--thick) solid black;
-		box-shadow:
-			calc(-1 * var(--thick)) calc(-1 * var(--thick)) white,
-			var(--thick) var(--thick) white;
+		outline: var(--thick) solid white;
 	}
 
 	.boundingbox.movable:not(.new) {
