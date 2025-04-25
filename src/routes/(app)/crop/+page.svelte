@@ -32,7 +32,7 @@
 
 <style>
 	.observations {
-		padding: 4em;
+		padding: 2.5em;
 		display: flex;
 		flex-grow: 1;
 	}
