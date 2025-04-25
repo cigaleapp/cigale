@@ -129,6 +129,16 @@
 	let newBoundingBox = $state(new NewBoundingBox());
 	$effect(() => newBoundingBox.setCreateMode(createMode));
 
+	// Set cursor for corners for 4point mode
+	const cursor = $derived.by(() => {
+		if (createMode !== '4point') return '';
+		const { topleft, topright, bottomright } = newBoundingBox['4point'];
+		if (topleft.x === 0 && topleft.y === 0) return 'topleft-corner';
+		else if (topright.x === 0 && topright.y === 0) return 'topright-corner';
+		else if (bottomright.x === 0 && bottomright.y === 0) return 'bottomright-corner';
+		else return 'bottomleft-corner';
+	});
+
 	let draggingCorner = $state({
 		topleft: false,
 		topright: false,
@@ -190,7 +200,11 @@
 	style:top="{imageRect.y}px"
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
-	style:cursor={boundingBoxIsNonZero(boundingBox) ? 'unset' : 'crosshair'}
+	style:cursor={cursor
+		? `url(cursor-${cursor}.svg) 15 15, auto`
+		: boundingBoxIsNonZero(boundingBox)
+			? 'unset'
+			: 'crosshair'}
 	onmouseup={() => {
 		draggingCorner.setAll(false);
 		if (creatingBoundingBox && newBoundingBox.ready) {
