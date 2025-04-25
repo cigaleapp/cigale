@@ -1,8 +1,8 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
-	import { setTabTitle } from '$lib/seo';
+	import { seo } from '$lib/seo.svelte';
 
-	setTabTitle('À propos');
+	seo({ title: 'À propos' });
 
 	let logoDrawPercent = $state(0);
 	$effect(() => {

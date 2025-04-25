@@ -1,7 +1,11 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 import { isReactiveTable, Tables } from './database.js';
-import { previewingPrNumber } from './state.svelte.js';
+import { base } from '$app/paths';
+
+console.info(`Base path is ${base}`);
+
+export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
 
 const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 

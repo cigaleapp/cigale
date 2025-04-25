@@ -2,13 +2,14 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {number} progress
+	 * @property {boolean} [alwaysActive]
 	 */
 
 	/** @type {Props} */
-	const { progress } = $props();
+	const { progress, alwaysActive = false } = $props();
 </script>
 
-<div class="progress-bar" class:inactive={[0, 1].includes(progress)}>
+<div class="progress-bar" class:inactive={[0, 1].includes(progress) && !alwaysActive}>
 	<div class="completed" style:width="{progress * 100}%"></div>
 </div>
 
@@ -22,6 +23,7 @@
 		width: 100%;
 		height: 0.25rem;
 		border-radius: var(--corners, 0);
+		background: var(--inactive-bg);
 		overflow: hidden;
 	}
 

@@ -25,6 +25,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {Array<import ('./AreaObservations.utils').CardObservation>} images
 	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
+	 * @property {string} [highlight] id of image to highlight and scroll to
 	 * @property {string} [loadingText]
 	 * @property {(id: string) => void} [ondelete] callback the user wants to delete an image or observation.
 	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
@@ -36,6 +37,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		ondelete,
 		oncardclick,
 		errors,
+		highlight,
 		loadingText,
 		selection = $bindable([])
 	} = $props();
@@ -94,6 +96,17 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			}
 		};
 	});
+
+	$effect(() => {
+		const scrollTo = imagesContainer?.querySelector(`[data-id="${highlight}"]`);
+		if (!scrollTo) return;
+		scrollTo.style.scrollMarginTop = '10vh';
+		scrollTo.scrollIntoView({
+			behavior: 'instant',
+			block: 'start',
+			inline: 'nearest'
+		});
+	});
 </script>
 
 <section
@@ -122,6 +135,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			ondelete={ondelete ? () => ondelete(props.id) : undefined}
 			errored={errors?.has(props.id)}
 			statusText={errors?.get(props.id) ?? loadingText}
+			highlighted={props.id === highlight}
 			selected={selection.includes(props.id.toString())}
 			boundingBoxes={props.boundingBoxes}
 			{loadingText}

@@ -2,10 +2,10 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { tables } from '$lib/idb.svelte';
+	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { previewingPrNumber, uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/state.svelte';
 	import Sup from '~icons/ph/caret-right';
 	import Download from '~icons/ph/download-simple';
 	import DeploymentDetails from './DeploymentDetails.svelte';
@@ -75,9 +75,12 @@
 				{/if}
 			</a>
 			<Sup></Sup>
-			<a href="#/crop" aria-disabled={!uiState.currentProtocolId || !hasImages}>
+			<a
+				href="#/crop/{uiState.imageOpenedInCropper}"
+				aria-disabled={!uiState.currentProtocolId || !hasImages}
+			>
 				Recadrer
-				{#if path == '/crop'}
+				{#if path.startsWith('/crop')}
 					<div class="line"></div>
 				{/if}
 			</a>
@@ -95,7 +98,9 @@
 			</ButtonSecondary>
 		</div>
 
-		<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
+		<div class="settings">
+			<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
+		</div>
 	</nav>
 
 	<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
@@ -156,6 +161,10 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+	}
+
+	.settings {
+		--hover-bg: var(--bg-neutral);
 	}
 
 	.pr-number {

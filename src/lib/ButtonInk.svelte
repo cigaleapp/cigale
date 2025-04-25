@@ -6,21 +6,22 @@
 	 * @type {object}
 	 * @property {import('svelte').Snippet} children
 	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {boolean} [disabled=false]
 	 * @property {string} [help]
 	 */
 
 	/** @type {Props} */
-	let { children, onclick, help } = $props();
+	let { children, onclick, help, disabled = false } = $props();
 </script>
 
-<button {onclick} use:tooltip={help}>
+<button {onclick} use:tooltip={help} {disabled}>
 	{@render children()}
 </button>
 
 <style>
 	button {
 		background-color: var(--bg, var(--bg-neutral));
-		color: var(--fg, var(--bg-primary));
+		color: var(--fg, var(--fg-primary));
 		display: flex;
 		gap: 0.5em;
 		justify-content: center;
@@ -36,5 +37,10 @@
 
 	button:is(:hover, :focus-visible) {
 		background-color: var(--bg-hover, var(--bg-primary-translucent));
+	}
+
+	button:disabled {
+		color: var(--gay);
+		cursor: not-allowed;
 	}
 </style>

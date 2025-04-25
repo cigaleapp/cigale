@@ -1,13 +1,12 @@
-import { base } from '$app/paths';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import { imageIdToFileId } from './images';
 import { tables } from './idb.svelte';
+import { imageIdToFileId } from './images';
 
 /**
  * @typedef Keybind
  * @type {object}
  * @property {string} help
- * @property {(e: MouseEvent|KeyboardEvent) => void} do
+ * @property {(e: MouseEvent|KeyboardEvent) => (void | Promise<void>)} do
  * @property {boolean} [hidden=false] hide the keybinding from help
  * @property {(e: MouseEvent|KeyboardEvent) => boolean} [when=() => true] condition to check before executing the keybind
  */
@@ -38,6 +37,8 @@ import { tables } from './idb.svelte';
  * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
  * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
  * @property {string} currentProtocolId ID du protocole choisi
+ * @property {string | ''} imageOpenedInCropper ID de l'image qu'on est en train de recadrer, ou '' si on est dans la gallerie
+ * @property {string | ''} imagePreviouslyOpenedInCropper ID de l'image qu'on était en train de recadrer avant de changer d'image ou de revenir à la gallerie
  * @property {import('./database').Protocol | undefined} currentProtocol protocole choisi
  */
 
@@ -55,6 +56,8 @@ export const uiState = $state({
 		}
 	},
 	selection: [],
+	imageOpenedInCropper: '',
+	imagePreviouslyOpenedInCropper: '',
 	previewURLs: new SvelteMap(),
 	croppedPreviewURLs: new SvelteMap(),
 	hasPreviewURL(image, variant = 'full') {
@@ -111,6 +114,3 @@ export const uiState = $state({
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection: undefined
 });
-
-console.info(`Base path is ${base}`);
-export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
