@@ -1,245 +1,431 @@
 <script>
+	import { boundingBoxIsNonZero } from './BoundingBoxes.svelte';
+	import { getSettings } from './settings.svelte';
+
+	/**
+	 * @typedef Rect
+	 * @type {object}
+	 * @property {number} x
+	 * @property {number} y
+	 * @property {number} width
+	 * @property {number} height
+	 */
+
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {{x: number, y: number, width: number, height: number}} bb
-	 * @property {{x: number, y: number, width: number, height: number}} bbout
-	 * @property {number} sizew
-	 * @property {number} sizeh
+	 * @property {Rect} boundingBox bounding box with relative, top-left coordinates
+	 * @property {HTMLImageElement} imageElement
+	 * @property {(box: Rect) => void} onchange
 	 */
 
 	/**  @type {Props} */
-	// Remove fallback: require bbout is supplied via binding
-	let {
-		bb,
-		bbout = $bindable({ x: bb.x, y: bb.y, width: bb.width, height: bb.height }),
-		sizew,
-		sizeh
-	} = $props();
+	let { boundingBox: boudingBoxInitial, imageElement, onchange } = $props();
 
-	let x = $state();
-	let y = $state();
-	let width = $state();
-	let height = $state();
-
+	let boundingBox = $state(boudingBoxInitial);
 	$effect(() => {
-		x = bb.x * 100;
-		y = bb.y * 100;
-		width = bb.width * 100;
-		height = bb.height * 100;
+		boundingBox = boudingBoxInitial;
 	});
 
-	let movingtl = false;
-	let movingtr = false;
-	let movingbl = false;
-	let movingbr = false;
-	let movinggbl = false;
-
-	function starttl() {
-		movingtl = true;
-		console.log('chocolat !');
-	}
-
-	function starttr() {
-		movingtr = true;
-	}
-
-	function startbl() {
-		movingbl = true;
-	}
-
-	function startbr() {
-		movingbr = true;
-	}
-	/**
-	 * @param {MouseEvent} event
-	 */
-	function startmoveglobal(event) {
-		let x2 = (event.offsetX / sizew) * 100;
-		let y2 = (event.offsetY / sizeh) * 100;
-
-		console.log('startmoveglobal');
-		if (x2 > x && x2 < x + width && y2 > y && y2 < y + height) {
-			movinggbl = true;
-		}
-	}
+	let clientWidth = $state(imageElement.clientWidth);
+	let clientHeight = $state(imageElement.clientHeight);
+	let clientLeft = $state(imageElement.clientLeft);
+	let clientTop = $state(imageElement.clientTop);
+	let naturalWidth = $state(imageElement.naturalWidth);
+	let naturalHeight = $state(imageElement.naturalHeight);
 
 	$effect(() => {
-		console.log('movinggbl : ', movinggbl);
+		const resizeObserver = new ResizeObserver((_, observer) => {
+			if (!imageElement) {
+				observer.disconnect();
+				return;
+			}
+
+			({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
+				imageElement);
+		});
+
+		const mutationObserver = new MutationObserver((_, observer) => {
+			if (!imageElement) {
+				observer.disconnect();
+				return;
+			}
+
+			({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
+				imageElement);
+		});
+
+		mutationObserver.observe(imageElement, {
+			attributes: true,
+			attributeFilter: ['src']
+		});
+		resizeObserver.observe(imageElement);
+
+		return () => {
+			resizeObserver.disconnect();
+			mutationObserver.disconnect();
+		};
 	});
 
-	function stopall() {
-		movingtl = false;
-		movingtr = false;
-		movingbl = false;
-		movingbr = false;
-		movinggbl = false;
-	}
+	const imageRect = $derived.by(() => {
+		// The image has object-fit: contain, so the boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size
 
-	/**
-	 * @param {MouseEvent} event
-	 */
-	function movebb(event) {
-		let xm = (event.movementX / sizew) * 100;
-		let ym = (event.movementY / sizeh) * 100;
+		const naturalRatio = naturalWidth / naturalHeight;
+		const clientRatio = clientWidth / clientHeight;
 
-		let x2 = (event.offsetX / sizew) * 100;
-		let y2 = (event.offsetY / sizeh) * 100;
-
-		if (x2 > x && x2 < x + width && y2 > y && y2 < y + height) {
-			document.body.style.cursor = 'move';
+		let width = 0,
+			height = 0;
+		if (naturalRatio < clientRatio) {
+			width = clientHeight * naturalRatio;
+			height = clientHeight;
 		} else {
-			document.body.style.cursor = 'default';
+			height = clientWidth / naturalRatio;
+			width = clientWidth;
 		}
 
-		if (movingtl) {
-			x += xm;
-			y += ym;
-			width -= xm;
-			height -= ym;
+		return {
+			x: clientLeft + (clientWidth - width) / 2,
+			y: clientTop + (clientHeight - height) / 2,
+			width,
+			height
+		};
+	});
+
+	/**
+	 * @type {(imageRect: Rect,  box: Rect) => Rect}
+	 */
+	const toPixel = $derived((imageRect, { x, y, width, height }) => ({
+		x: imageRect.x + x * imageRect.width,
+		y: imageRect.y + y * imageRect.height,
+		width: width * imageRect.width,
+		height: height * imageRect.height
+	}));
+
+	const boudingBoxPixel = $derived(toPixel(imageRect, boundingBox));
+
+	let creatingBoundingBox = $state(false);
+
+	let newBoundingBox = $state({
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0
+	});
+
+	let draggingCorner = $state({
+		topleft: false,
+		topright: false,
+		bottomleft: false,
+		bottomright: false,
+		get left() {
+			return this.topleft && this.bottomleft;
+		},
+		set left(value) {
+			this.topleft = value;
+			this.bottomleft = value;
+		},
+		get right() {
+			return this.topright && this.bottomright;
+		},
+		set right(value) {
+			this.topright = value;
+			this.bottomright = value;
+		},
+		get top() {
+			return this.topleft && this.topright;
+		},
+		set top(value) {
+			this.topleft = value;
+			this.topright = value;
+		},
+		get bottom() {
+			return this.bottomleft && this.bottomright;
+		},
+		set bottom(value) {
+			this.bottomleft = value;
+			this.bottomright = value;
+		},
+		/** @param {boolean} value */
+		setAll(value) {
+			this.topleft = value;
+			this.topright = value;
+			this.bottomleft = value;
+			this.bottomright = value;
+		},
+		/** @param {boolean} value  */
+		isAll(value) {
+			return (
+				this.topleft === value &&
+				this.topright === value &&
+				this.bottomleft === value &&
+				this.bottomright === value
+			);
 		}
-
-		if (movingtr) {
-			y += ym;
-			width += xm;
-			height -= ym;
-		}
-
-		if (movingbl) {
-			x += xm;
-			width -= xm;
-			height += ym;
-		}
-
-		if (movingbr) {
-			width += xm;
-			height += ym;
-		}
-
-		if (movinggbl && !movingtl && !movingtr && !movingbl && !movingbr) {
-			x += xm;
-			y += ym;
-		}
-
-		x = Math.max(0, Math.min(x, 100 - width));
-		y = Math.max(0, Math.min(y, 100 - height));
-		width = Math.max(0, Math.min(width, 100 - x));
-		height = Math.max(0, Math.min(height, 100 - y));
-
-		bbout.x = x / 100;
-		bbout.y = y / 100;
-		bbout.width = width / 100;
-		bbout.height = height / 100;
-	}
-
-	const stroke = 0.5;
+	});
 </script>
 
-<svelte:window onmousemove={movebb} onmouseup={stopall} />
+<div
+	class="change-area"
+	class:debug={getSettings().showTechnicalMetadata}
+	style:left="{imageRect.x}px"
+	style:top="{imageRect.y}px"
+	style:width="{imageRect.width}px"
+	style:height="{imageRect.height}px"
+	style:cursor={boundingBoxIsNonZero(boundingBox) ? 'unset' : 'crosshair'}
+	onmouseup={() => {
+		if (creatingBoundingBox) {
+			boundingBox = {
+				x: newBoundingBox.x / imageRect.width,
+				y: newBoundingBox.y / imageRect.height,
+				width: newBoundingBox.width / imageRect.width,
+				height: newBoundingBox.height / imageRect.height
+			};
+			newBoundingBox = {
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0
+			};
+		}
+		creatingBoundingBox = false;
+		draggingCorner.setAll(false);
+		onchange?.(boundingBox);
+	}}
+	onmousedown={({ offsetX, offsetY }) => {
+		if (boundingBoxIsNonZero(boundingBox)) return;
+		creatingBoundingBox = true;
+		newBoundingBox.x = offsetX;
+		newBoundingBox.y = offsetY;
+		console.log('newBoundingBox', newBoundingBox);
+	}}
+	onmousemove={({ movementX, movementY }) => {
+		const dx = movementX / imageRect.width;
+		const dy = movementY / imageRect.height;
 
-<!-- TODO make this accessible -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="bounding-box" onmousedown={startmoveglobal}>
-	<!-- SVG lines joining each dot -->
-	<svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-		<line x1={x} y1={y} x2={x + width} y2={y} />
-		<line class="black" x1={x + stroke} y1={y + stroke} x2={x + width - stroke} y2={y + stroke} />
-		<line x1={x + width} y1={y} x2={x + width} y2={y + height} />
-		<line
-			class="black"
-			x1={x + width - stroke}
-			y1={y + stroke}
-			x2={x + width - stroke}
-			y2={y + height - stroke}
-		/>
-		<line x1={x + width} y1={y + height} x2={x} y2={y + height} />
-		<line
-			class="black"
-			x1={x + width - stroke}
-			y1={y + height - stroke}
-			x2={x + stroke}
-			y2={y + height - stroke}
-		/>
-		<line x1={x} y1={y + height} x2={x} y2={y} />
-		<line class="black" x1={x + stroke} y1={y + height - stroke} x2={x + stroke} y2={y + stroke} />
-	</svg>
-	<!-- Four dots at each corner of the bounding box -->
-	<div
-		class="dot"
-		onmousedown={starttl}
-		style="	left: {x}%;
-				top: {y}%;
-				cursor: nwse-resize"
-	></div>
-	<!-- top-left -->
+		if (creatingBoundingBox) {
+			newBoundingBox.width += movementX;
+			newBoundingBox.height += movementY;
+			console.log('newBoundingBox', newBoundingBox);
+			return;
+		}
 
-	<div
-		class="dot"
-		onmousedown={starttr}
-		style="	left: {x + width}%;
-				top: {y}%;
-				cursor: nesw-resize"
-	></div>
-	<!-- top-right -->
+		if (draggingCorner.isAll(true)) {
+			boundingBox.x += dx;
+			boundingBox.y += dy;
+			return;
+		}
 
-	<div
-		class="dot"
-		onmousedown={startbl}
-		style=" left: {x}%; 
-				top: {y + height}%;
-				cursor: nesw-resize"
-	></div>
-	<!-- bottom-left -->
+		if (draggingCorner.left) {
+			boundingBox.x += dx;
+			boundingBox.width -= dx;
+			return;
+		}
 
-	<div
-		class="dot"
-		onmousedown={startbr}
-		style="	left: {x + width}%; 
-				top: {y + height}%;
-				cursor: nwse-resize"
-	></div>
-	<!-- bottom-right -->
+		if (draggingCorner.right) {
+			boundingBox.width += dx;
+			return;
+		}
+
+		if (draggingCorner.top) {
+			boundingBox.y += dy;
+			boundingBox.height -= dy;
+			return;
+		}
+
+		if (draggingCorner.bottom) {
+			boundingBox.height += dy;
+			return;
+		}
+
+		if (draggingCorner.topleft) {
+			boundingBox.x += dx;
+			boundingBox.y += dy;
+			boundingBox.width -= dx;
+			boundingBox.height -= dy;
+		}
+
+		if (draggingCorner.topright) {
+			boundingBox.y += dy;
+			boundingBox.width += dx;
+			boundingBox.height -= dy;
+		}
+
+		if (draggingCorner.bottomleft) {
+			boundingBox.x += dx;
+			boundingBox.width -= dx;
+			boundingBox.height += dy;
+		}
+
+		if (draggingCorner.bottomright) {
+			boundingBox.width += dx;
+			boundingBox.height += dy;
+		}
+	}}
+>
+	{#if creatingBoundingBox}
+		<div
+			class="boundingbox new"
+			style:left="{newBoundingBox.x}px"
+			style:top="{newBoundingBox.y}px"
+			style:width="{newBoundingBox.width}px"
+			style:height="{newBoundingBox.height}px"
+		></div>
+	{/if}
+	{#if boundingBoxIsNonZero(boundingBox)}
+		<div
+			class="boundingbox"
+			style:left="{boudingBoxPixel.x - imageRect.x}px"
+			style:top="{boudingBoxPixel.y - imageRect.y}px"
+			style:width="{boudingBoxPixel.width}px"
+			style:height="{boudingBoxPixel.height}px"
+			onmousedown={() => {
+				draggingCorner.setAll(true);
+			}}
+		>
+			{#snippet side(/** @type {'top'|'bottom'|'left'|'right'} */ position)}
+				<div
+					class="side {position}"
+					class:dragging={draggingCorner[position]}
+					onmousedown={(e) => {
+						draggingCorner[position] = true;
+						e.stopPropagation();
+					}}
+				></div>
+			{/snippet}
+			{@render side('top')}
+			{@render side('bottom')}
+			{@render side('left')}
+			{@render side('right')}
+
+			{#snippet corner(/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position)}
+				<div
+					class="corner {position}"
+					class:dragging={draggingCorner[position]}
+					onmousedown={(e) => {
+						draggingCorner[position] = true;
+						e.stopPropagation();
+					}}
+				></div>
+			{/snippet}
+			{@render corner('topleft')}
+			{@render corner('topright')}
+			{@render corner('bottomleft')}
+			{@render corner('bottomright')}
+		</div>
+	{/if}
 </div>
 
 <style>
-	.bounding-box {
+	.change-area {
 		position: absolute;
-		width: 100%;
-		height: 100%;
 	}
-	.dot {
+
+	.change-area.debug {
+		border: 5px dashed red;
+	}
+
+	.boundingbox {
+		position: absolute;
+	}
+
+	.boundingbox:not(.new) {
+		cursor: move;
+	}
+
+	.boundingbox:hover:not(:has(:hover)):not(:has(.dragging)) .corner,
+	.boundingbox .side.left:hover:not(.dragging) ~ .corner:is(.bottomleft, .topleft),
+	.boundingbox .side.right:hover:not(.dragging) ~ .corner:is(.topright, .bottomright),
+	.boundingbox .side.top:hover:not(.dragging) ~ .corner:is(.topleft, .topright),
+	.boundingbox .side.bottom:hover:not(.dragging) ~ .corner:is(.bottomleft, .bottomright) {
+		scale: 130%;
+		background: var(--light__bg-primary-translucent);
+	}
+
+	.side {
+		--thick: 5px;
+		position: absolute;
+		background: black;
+		border-style: solid;
+		border-width: 0;
+		border-color: white;
+	}
+
+	.side.left,
+	.side.right {
+		top: 0;
+		bottom: 0;
+		width: calc(var(--thick) * 2);
+		cursor: ew-resize;
+	}
+
+	.side.left {
+		left: calc(-1 * var(--thick));
+		border-right-width: var(--thick);
+	}
+
+	.side.right {
+		right: calc(-1 * var(--thick));
+		border-left-width: var(--thick);
+	}
+
+	.side.top,
+	.side.bottom {
+		left: 0;
+		right: 0;
+		height: calc(var(--thick) * 2);
+		cursor: ns-resize;
+	}
+
+	.side.top {
+		top: calc(-1 * var(--thick));
+		border-bottom-width: var(--thick);
+	}
+
+	.side.bottom {
+		bottom: calc(-1 * var(--thick));
+		border-top-width: var(--thick);
+	}
+
+	.corner {
 		position: absolute;
 		width: 1.5rem;
 		height: 1.5rem;
 		background: white;
 		border: 3px solid black;
-		border-radius: 50%;
-		transform: translate(-50%, -50%);
-		user-select: none;
-		cursor: move;
-		transition: all 0.05s;
+		transition: scale 80ms;
 	}
 
-	.dot:is(:hover, :focus-visible) {
-		width: 2rem;
-		height: 2rem;
+	.corner:hover {
+		background: var(--light__bg-primary-translucent);
+		scale: 130%;
 	}
 
-	.lines {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		left: 0;
-		pointer-events: none;
+	.corner.dragging {
+		scale: 110%;
+		background: var(--light__bg-primary);
 	}
 
-	.lines line {
-		stroke: white;
-		stroke-width: 0.03rem;
+	.topleft {
+		top: -0.75rem;
+		left: -0.75rem;
+		cursor: nwse-resize;
 	}
 
-	.lines line.black {
-		stroke: black;
+	.topright {
+		top: -0.75rem;
+		right: -0.75rem;
+		cursor: nesw-resize;
+	}
+
+	.bottomleft {
+		bottom: -0.75rem;
+		left: -0.75rem;
+		cursor: nesw-resize;
+	}
+
+	.bottomright {
+		bottom: -0.75rem;
+		right: -0.75rem;
+		cursor: nwse-resize;
 	}
 </style>

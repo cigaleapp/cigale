@@ -18,6 +18,7 @@
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
 	 * @property {boolean} selected
+	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
@@ -37,6 +38,7 @@
 		image,
 		loading,
 		selected,
+		highlighted,
 		errored = false,
 		statusText = 'Chargement…',
 		stacksize = 1,
@@ -57,6 +59,7 @@
 <div
 	class="observation"
 	class:selected
+	class:highlighted
 	class:loading
 	class:stacked
 	{...rest}
@@ -160,7 +163,7 @@
 		cursor: pointer;
 	}
 
-	.observation.selected {
+	.observation:is(.selected, .highlighted) {
 		--card-bg: var(--bg-primary-translucent);
 		color: var(--fg-primary);
 	}

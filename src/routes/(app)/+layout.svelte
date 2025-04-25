@@ -36,6 +36,16 @@
 		}
 	});
 
+	$effect(() => {
+		uiState.keybinds['$mod+s'] = {
+			help: '',
+			hidden: true,
+			do: () => {
+				toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎');
+			}
+		};
+	});
+
 	const settings = $derived(getSettings());
 
 	$effect(() => {
@@ -70,7 +80,10 @@
 	{/each}
 </section>
 
-<div class="contents" class:padded={!page.route.id?.includes('/(sidepanel)')}>
+<div
+	class="contents"
+	class:padded={!page.route.id?.includes('/(sidepanel)') && page.route.id !== '/(app)/crop/[image]'}
+>
 	{@render children?.()}
 </div>
 

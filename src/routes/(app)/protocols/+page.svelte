@@ -31,7 +31,7 @@
 </script>
 
 <Modal
-	key="download-protocol-template"
+	key="modal_download_protocol_template"
 	title="Créer un protocole"
 	bind:open={downloadNewProtocolTemplate}
 >
@@ -77,7 +77,7 @@
 
 <ModalConfirm
 	title="Êtes-vous sûr·e?"
-	key="delete-protocol"
+	key="modal_delete_protocol"
 	bind:open={confirmDelete}
 	cancel="Annuler"
 	confirm="Oui, supprimer"

@@ -1,16 +1,4 @@
-<script>
-	import { tooltip } from './tooltips';
-
-	/**
-	 * @typedef Props
-	 * @type {object}
-	 * @property {string} shortcut
-	 * @property {string} [help]
-	 */
-
-	/** @type {Props} */
-	const { shortcut, help = '' } = $props();
-
+<script module>
 	/**
 	 * Returns an array of `[key, separator, key, separator...]` strings, to be shown as for example
 	 * ```html
@@ -22,7 +10,7 @@
 	 * @param {string} pattern the raw pattern as given to Tinykeys
 	 * @returns {string[]}
 	 */
-	function displayPattern(pattern) {
+	export function displayPattern(pattern) {
 		// Split by spaces: "ctrl+c arrowup" -> ["ctrl+c", "arrowup"]
 		const chords = pattern.split(' ');
 		const parts = chords
@@ -48,6 +36,7 @@
 			if (['shift', 'alt', 'win'].includes(part)) return part[0].toUpperCase() + part.slice(1);
 			if (part === 'delete') return 'Suppr';
 			if (part === 'space') return '␣';
+			if (part === 'escape') return 'Esc';
 
 			// Single-letter parts most likely represent letter keys,
 			// so uppercase them cuz its prettier
@@ -72,6 +61,20 @@
 	}
 </script>
 
+<script>
+	import { tooltip } from './tooltips';
+
+	/**
+	 * @typedef Props
+	 * @type {object}
+	 * @property {string} shortcut
+	 * @property {string} [help]
+	 */
+
+	/** @type {Props} */
+	const { shortcut, help = '' } = $props();
+</script>
+
 <kbd class="hint" use:tooltip={help}>
 	<!-- .entries() gives us [[0, a], [1, b], ...] for [a, b, ...] -->
 	{#each displayPattern(shortcut).entries() as [i, part] (i)}
@@ -86,7 +89,8 @@
 </kbd>
 
 <style>
-	kbd.hint {
+	/*  :global because tooltips also use this, see $lib/tooltips.js */
+	:global(kbd.hint) {
 		font-size: var(--size, 0.8em);
 		display: inline-flex;
 		border: 1px solid var(--gray);
@@ -95,6 +99,7 @@
 		padding: 0.2em 0.3em;
 		margin: 0 0.2em;
 	}
+
 	kbd.hint kbd {
 		color: var(--fg-primary);
 	}

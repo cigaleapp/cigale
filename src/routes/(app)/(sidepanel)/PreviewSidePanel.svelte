@@ -4,7 +4,6 @@
 	import { countThings } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { metadataDefinitionComparator } from '$lib/metadata';
 	import Metadata from '$lib/Metadata.svelte';
@@ -119,26 +118,27 @@
 				<ButtonSecondary
 					disabled={!canmerge}
 					onclick={onmerge}
+					keyboard="$mod+g"
 					help="Regrouper les images et/ou observations sélectionnées en une observation"
 				>
 					<IconMerge />
 					Regrouper
-					<KeyboardHint shortcut="$mod+g" />
 				</ButtonSecondary>
 				<ButtonSecondary
 					disabled={!cansplit}
 					onclick={onsplit}
+					keyboard="$mod+Shift+g"
 					help="Séparer toutes les observations sélectionnées en images seules"
 				>
 					<IconSplit />
 					Séparer
-					<KeyboardHint shortcut="$mod+Shift+g" />
 				</ButtonSecondary>
 			</div>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}
+			keyboard="Delete"
 			help="Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
 			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
 			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
@@ -147,7 +147,6 @@
 		>
 			<IconDelete />
 			Supprimer {images.length} images
-			<KeyboardHint shortcut="Delete" />
 		</ButtonSecondary>
 	</section>
 </div>

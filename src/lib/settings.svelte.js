@@ -59,3 +59,26 @@ export async function getSetting(key) {
 
 	return out;
 }
+
+/**
+ * @typedef {import('./database.js').Settings} Settings
+ */
+
+/**
+ * Toggle a boolean setting
+ * @param {Key} key
+ * @template {keyof { [ K in keyof Settings as Settings[K] extends boolean ? K : never ]: Settings[K] } } Key
+ */
+export async function toggleSetting(key) {
+	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
+
+	if (!current) {
+		throw new Error("Les réglages par défaut n'ont pas été initialisés. Rechargez la page.");
+	}
+
+	return tables.Settings.set({
+		...current,
+		id: 'user',
+		[key]: !current[key]
+	});
+}

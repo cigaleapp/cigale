@@ -1,8 +1,7 @@
 <script>
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { nukeDatabase } from '$lib/idb.svelte';
+	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { previewingPrNumber } from '$lib/state.svelte';
 
 	/**
 	 * @typedef {object} Props
@@ -28,7 +27,7 @@
 	</a>
 {/snippet}
 
-<Modal key="preview-pr" bind:open title="Preview de la PR #{previewingPrNumber}">
+<Modal key="modal_preview_pr" bind:open title="Preview de la PR #{previewingPrNumber}">
 	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>

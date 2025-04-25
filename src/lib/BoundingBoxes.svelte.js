@@ -1,3 +1,4 @@
+import { type } from 'arktype';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
 /**
@@ -25,8 +26,8 @@ export function coordsScaler({ x: xwise, y: ywise }) {
 export const toPixelCoords = (protocol) => {
 	if (!protocol) throw new Error('No protocol was provided');
 	return coordsScaler({
-		x: protocol.inference?.detection?.input?.width ?? TARGETWIDTH,
-		y: protocol.inference?.detection?.input?.height ?? TARGETHEIGHT
+		x: protocol.crop?.infer?.input?.width ?? TARGETWIDTH,
+		y: protocol.crop?.infer?.input?.height ?? TARGETHEIGHT
 	});
 };
 
@@ -34,8 +35,8 @@ export const toPixelCoords = (protocol) => {
 export const toRelativeCoords = (protocol) => {
 	if (!protocol) throw new Error('No protocol was provided');
 	return coordsScaler({
-		x: 1 / (protocol.inference?.detection?.input?.width ?? TARGETWIDTH),
-		y: 1 / (protocol.inference?.detection?.input?.height ?? TARGETHEIGHT)
+		x: 1 / (protocol.crop?.infer?.input?.width ?? TARGETWIDTH),
+		y: 1 / (protocol.crop?.infer?.input?.height ?? TARGETHEIGHT)
 	});
 };
 
@@ -69,4 +70,24 @@ export function toTopLeftCoords({ x, y, w, h }) {
 		width: w,
 		height: h
 	};
+}
+
+export function boundingBoxIsNonZero(boundingBox) {
+	return type({
+		x: 'number > 0',
+		y: 'number > 0'
+	})
+		.and(
+			type.or(
+				{
+					width: 'number > 0',
+					height: 'number > 0'
+				},
+				{
+					w: 'number > 0',
+					h: 'number > 0'
+				}
+			)
+		)
+		.allows(boundingBox);
 }
