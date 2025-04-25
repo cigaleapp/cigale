@@ -293,7 +293,7 @@
 			{:else}
 				<br />
 				{#each newBoundingBox.points as { x, y }, i (i)}
-					(i) {@render point(x, y)} <br />
+					#{i} {@render point(x, y)} <br />
 				{/each}
 			{/if}
 		</code>
