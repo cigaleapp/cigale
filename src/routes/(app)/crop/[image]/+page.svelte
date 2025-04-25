@@ -30,6 +30,7 @@
 	import IconUnconfirmedCrop from '~icons/ph/seal';
 	import IconGallery from '~icons/ph/squares-four';
 	import IconReset from '~icons/ph/arrow-counter-clockwise';
+	import { pick } from '$lib/utils';
 
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
@@ -79,6 +80,30 @@
 	const croppedImagesCount = $derived(idb.tables.Image.state.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(idb.tables.Image.state.filter(hasConfirmedCrop).length);
 
+	/** @type {undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }} */
+	const initialCrop = $derived.by(() => {
+		if (!image) return undefined;
+
+		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
+		if (
+			image.metadata[uiState.cropMetadataId]?.alternatives &&
+			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
+		) {
+			const [[stringValue, confidence]] = Object.entries(
+				image.metadata[uiState.cropMetadataId].alternatives
+			);
+			return {
+				value: JSON.parse(stringValue),
+				confidence
+			};
+		}
+
+		// If this is the first time the user is re-cropping the box, this value will be the main values.
+		return pick(image.metadata[uiState.cropMetadataId], 'value', 'confidence');
+	});
+
+	$inspect({ initialCrop });
+
 	/**
 	 * @param {import('$lib/database.js').Image} image
 	 */
@@ -90,39 +115,26 @@
 	}
 
 	/**
-	 * @param {import('$lib/database.js').Image} image
+	 * @param {import('$lib/database.js').Image|undefined} image
 	 */
 	function hasConfirmedCrop(image) {
-		return hasCrop(image) && image.metadata[uiState.cropMetadataId].manuallyModified;
+		return image && hasCrop(image) && image.metadata[uiState.cropMetadataId].manuallyModified;
 	}
 
 	async function revertToInferedCrop() {
-		if (!image) {
-			toasts.error(`Image ${imageId} introuvable, impossible de revenir au recadrage d'origine`);
-			return;
-		}
-
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
-		if (
-			!image.metadata[uiState.cropMetadataId]?.alternatives ||
-			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length === 0
-		) {
+		if (!initialCrop) {
 			toasts.error(
 				`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
 			);
 			return;
 		}
 
-		const [[stringValue, confidence]] = Object.entries(
-			image.metadata[uiState.cropMetadataId].alternatives
-		);
-
 		await storeMetadataValue({
 			subjectId: imageId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
-			value: JSON.parse(stringValue),
-			confidence
+			...initialCrop
 		});
 
 		await deleteMetadataValue({
@@ -131,12 +143,7 @@
 		});
 	}
 
-	const canRevertToInferedCrop = $derived(
-		image &&
-			hasConfirmedCrop(image) &&
-			image.metadata[uiState.cropMetadataId]?.alternatives &&
-			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
-	);
+	const canRevertToInferedCrop = $derived(initialCrop !== undefined && hasConfirmedCrop(image));
 
 	/**
 	 * @param {{x: number, y: number, width: number, height: number}} newBoundingBox
@@ -158,26 +165,6 @@
 			boundingBoxIsNonZero(newBoundingBox) &&
 			// Auto-skip occurs when the bounding box did not exist before
 			!hasCrop(image);
-
-		// Get inferred value from alternatives (if non empty), or use the main value otherwise. Inferred value is the initial cropbox value as determined by the neural network.
-		// If this is the first time the user is re-cropping the box, this value will be the main values.
-		/** @type {undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }} */
-		// @ts-expect-error
-		let initialCrop = image.metadata[uiState.cropMetadataId] ?? undefined;
-
-		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
-		if (
-			image.metadata[uiState.cropMetadataId]?.alternatives &&
-			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
-		) {
-			const [[stringValue, confidence]] = Object.entries(
-				image.metadata[uiState.cropMetadataId].alternatives
-			);
-			initialCrop = {
-				value: JSON.parse(stringValue),
-				confidence
-			};
-		}
 
 		const species = image.metadata[uiState.classificationMetadataId];
 		if (species && !species.manuallyModified) {
