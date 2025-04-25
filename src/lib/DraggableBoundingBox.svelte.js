@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { sign } from './utils';
 
 export class NewBoundingBox {
 	/** @type {'clickanddrag' | '2point' | '4point'|'off'} */
@@ -9,12 +10,17 @@ export class NewBoundingBox {
 		this.createMode = mode;
 	}
 
-	/** @type {{x: number, y: number, width: number, height: number}} */
+	/** @type {{x: number, y: number, width: number, height: number, dragDirection: {x:-1|0|1, y:-1|0|1}}} */
 	clickanddrag = $state({
 		x: 0,
 		y: 0,
 		width: 0,
-		height: 0
+		height: 0,
+		// -1 or 1
+		dragDirection: {
+			x: 0,
+			y: 0
+		}
 	});
 
 	/** @type {Array<{x: number; y: number}>}  */
@@ -76,7 +82,7 @@ export class NewBoundingBox {
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	register(x, y) {
+	registerPoint(x, y) {
 		if (this.createMode === 'off') {
 			return;
 		}
@@ -87,6 +93,50 @@ export class NewBoundingBox {
 		}
 
 		this.points.push({ x, y });
+	}
+
+	/**
+	 * @param {number} dx (MouseEvent).movementX
+	 * @param {number} dy (MouseEvent).movementY
+	 */
+	registerMovement(dx, dy) {
+		if (this.createMode !== 'clickanddrag') return;
+
+		const { width, height } = this.clickanddrag;
+
+		if (width <= 0 || height <= 0) {
+			this.clickanddrag.dragDirection = {
+				x: sign(dx),
+				y: sign(dy)
+			};
+		}
+
+		const { x: xdir, y: ydir } = this.clickanddrag.dragDirection;
+
+		// Drag direction: topleft -> bottomright
+		if (xdir > 0 && ydir > 0) {
+			this.clickanddrag.width += dx;
+			this.clickanddrag.height += dy;
+		}
+		// Drag direction: bottomright -> topleft
+		if (xdir < 0 && ydir < 0) {
+			this.clickanddrag.x += dx;
+			this.clickanddrag.y += dy;
+			this.clickanddrag.width -= dx;
+			this.clickanddrag.height -= dy;
+		}
+		// Drag direction: topright -> bottomleft
+		if (xdir < 0 && ydir > 0) {
+			this.clickanddrag.x += dx;
+			this.clickanddrag.height += dy;
+			this.clickanddrag.width -= dx;
+		}
+		// Drag direction: bottomleft -> topright
+		if (xdir > 0 && ydir < 0) {
+			this.clickanddrag.y += dy;
+			this.clickanddrag.width += dx;
+			this.clickanddrag.height -= dy;
+		}
 	}
 
 	rect() {
@@ -103,7 +153,11 @@ export class NewBoundingBox {
 			x: 0,
 			y: 0,
 			width: 0,
-			height: 0
+			height: 0,
+			dragDirection: {
+				x: 0,
+				y: 0
+			}
 		};
 		this.points = [];
 	}
@@ -113,7 +167,11 @@ export class NewBoundingBox {
 			x: 0,
 			y: 0,
 			width: 0,
-			height: 0
+			height: 0,
+			dragDirection: {
+				x: 0,
+				y: 0
+			}
 		};
 		this.points = [];
 	}
