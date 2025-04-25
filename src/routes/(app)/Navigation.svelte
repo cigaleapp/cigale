@@ -11,6 +11,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
+	import { sound } from '$lib/sound';
 
 	/**
 	 * @typedef Props
@@ -49,7 +50,7 @@
 <header bind:clientHeight={height}>
 	<nav>
 		<div class="logo">
-			<a href="#/">
+			<a href="#/" use:sound={'flstudio.mp3'}>
 				<Logo --fill="var(--bg-primary)" />
 				C.i.g.a.l.e.
 			</a>

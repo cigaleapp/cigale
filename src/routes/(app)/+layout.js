@@ -23,9 +23,6 @@ async function preloadAudio() {
 	for (const file of files) {
 		new Audio(file);
 	}
-
-	// Play startup sound
-	new Audio('flstudio.mp3').play();
 }
 
 async function fillBuiltinData() {
