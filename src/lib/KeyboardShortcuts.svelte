@@ -1,9 +1,10 @@
 <script>
 	// @ts-ignore
 	import { tinykeys } from 'tinykeys';
-	import Modal from './Modal.svelte';
+	import Modal, { hasAnyModalOpen } from './Modal.svelte';
 	import { onMount } from 'svelte';
 	import KeyboardHint from './KeyboardHint.svelte';
+	import { page } from '$app/state';
 
 	/**
 	 * @typedef Props
@@ -30,11 +31,15 @@
 					pattern,
 					/** @param {MouseEvent|KeyboardEvent} e */
 					async (e) => {
+						if (hasAnyModalOpen(page)) {
+							console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);
+							return;
+						}
 						if (bind.when && !bind.when(e)) return;
 						// Stick in a call to event.preventDefault()
 						// before calling the handler function if "preventDefault" is true
 						if (preventDefault) e.preventDefault();
-						bind.do(e);
+						await bind.do(e);
 					}
 				])
 			)
@@ -52,7 +57,7 @@
 	});
 </script>
 
-<Modal bind:open={openHelp} key="observations-keyboard-shortcuts-help" title="Raccourcis clavier">
+<Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title="Raccourcis clavier">
 	<dl>
 		<!-- Object.entries({a: 1, b: 2}) gives [["a", 1], ["b", 2]] -->
 		<!-- Then we filter out keybindings that are marked as hidden -->

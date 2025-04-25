@@ -20,20 +20,24 @@ Available CSS variables:
 	 * @property {(e: MouseEvent) => void} onclick
 	 * @property {boolean} [disabled=false]
 	 * @property {string} [help]
+	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 */
 </script>
 
 <script>
+  import KeyboardHint from './KeyboardHint.svelte';
 	import { sound } from './sound';
-
 	import { tooltip } from './tooltips';
 
 	/** @type {Props} */
-	let { children, onclick, disabled = false, help } = $props();
+	let { children, onclick, disabled = false, help, keyboard } = $props();
 </script>
 
-<button {onclick} {disabled} use:tooltip={help} use:sound={'vineboom.mp3'}>
+<button {onclick} {disabled} use:tooltip={help ? { text: help, keyboard } : undefined} use:sound={'vineboom.mp3'}>
 	{@render children()}
+	{#if keyboard}
+		<KeyboardHint shortcut={keyboard} />
+	{/if}
 </button>
 
 <style>
