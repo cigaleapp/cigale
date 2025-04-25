@@ -10,16 +10,17 @@ import { TARGETHEIGHT, TARGETWIDTH } from './inference';
  */
 export function coordsScaler({ x: xwise, y: ywise }) {
 	/**
-	 * @template {{x: number; y: number} & ({w: number; h: number} | {width: number; height: number})} Shape
+	 * @template {{x: number; y: number} | ({x: number, y: number} & ({w: number; h: number} | {width: number; height: number}))} Shape
 	 * @param {Shape} param0
 	 * @returns {Shape}
 	 */
-	return ({ x, y, ...wh }) => ({
-		x: x * xwise,
-		y: y * ywise,
-		['width' in wh ? 'width' : 'w']: (wh.width ?? wh.w) * xwise,
-		['height' in wh ? 'height' : 'h']: (wh.height ?? wh.h) * ywise
-	});
+	return ({ x, y, ...wh }) => {
+		const [newx, newy] = [x * xwise, y * ywise];
+		if ('width' in wh && 'height' in wh)
+			return { x: newx, y: newy, width: wh.width * xwise, height: wh.height * ywise };
+		if ('w' in wh && 'h' in wh) return { x: newx, y: newy, w: wh.w * xwise, h: wh.h * ywise };
+		return { x: newx, y: newy, ...wh };
+	};
 }
 
 /** @param {undefined | import('./database').Protocol} protocol  */
@@ -90,4 +91,16 @@ export function boundingBoxIsNonZero(boundingBox) {
 			)
 		)
 		.allows(boundingBox);
+}
+
+/**
+ *
+ * @param {{x: number, y: number, width: number, height: number}} boundingBox
+ * @param {{x: number, y: number}} point
+ * @returns
+ */
+export function withinBoundingBox(boundingBox, { x, y }) {
+	if (!boundingBoxIsNonZero(boundingBox)) return false;
+	const { x: x_box, y: y_box, width, height } = boundingBox;
+	return x >= x_box && x <= x_box + width && y >= y_box && y <= y_box + height;
 }
