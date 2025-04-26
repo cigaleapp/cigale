@@ -35,7 +35,7 @@ async function fillBuiltinData() {
 	if (!builtinProtocol) {
 		try {
 			await fetch(
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.v2.json'
+				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'
 			)
 				.then((res) => res.text())
 				.then(importProtocol);
