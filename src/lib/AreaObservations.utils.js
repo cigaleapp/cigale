@@ -55,7 +55,7 @@ export function toAreaObservationProps(
 						boundingBoxes:
 							showBoundingBoxes(image) && image.metadata[uiState.cropMetadataId]?.value
 								? // @ts-ignore
-									image.metadata[uiState.cropMetadataId].value.map(ToTopLeftCoords)
+									[toTopLeftCoords(image.metadata[uiState.cropMetadataId].value)]
 								: []
 					});
 				}),
@@ -76,7 +76,7 @@ export function toAreaObservationProps(
 					boundingBoxes:
 						showBoundingBoxes(firstImage) && firstImage?.metadata[uiState.cropMetadataId]?.value
 							? // @ts-ignore
-								firstImage.metadata[uiState.cropMetadataId].value.map(ToTopLeftCoords)
+								[toTopLeftCoords(firstImage.metadata[uiState.cropMetadataId].value)]
 							: [],
 					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
 				};
