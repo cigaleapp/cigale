@@ -10,7 +10,7 @@ export class NewBoundingBox {
 		this.createMode = mode;
 	}
 
-	/** @type {{x: number, y: number, width: number, height: number, dragDirection: {x:-1|0|1, y:-1|0|1}}} */
+	/** @type {import('./BoundingBoxes.svelte').Rect & { dragDirection: {x:-1|0|1, y:-1|0|1} }} */
 	clickanddrag = $state({
 		x: 0,
 		y: 0,

@@ -212,7 +212,7 @@
 	const canRevertToInferedCrop = $derived(initialCrop !== undefined && hasConfirmedCrop(image));
 
 	/**
-	 * @param {{x: number, y: number, width: number, height: number}} newBoundingBox
+	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 */
 	async function onConfirmCrop(newBoundingBox, flashConfirmedOverlay = true) {

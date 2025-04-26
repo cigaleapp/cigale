@@ -104,3 +104,14 @@ export function withinBoundingBox(boundingBox, { x, y }) {
 	const { x: x_box, y: y_box, width, height } = boundingBox;
 	return x >= x_box && x <= x_box + width && y >= y_box && y <= y_box + height;
 }
+
+export const rect = type({
+	x: 'number > 0',
+	y: 'number > 0',
+	width: 'number > 0',
+	height: 'number > 0'
+});
+
+/**
+ * @typedef {typeof rect.infer} Rect
+ */
