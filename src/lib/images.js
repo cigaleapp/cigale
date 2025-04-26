@@ -2,6 +2,7 @@ import { uiState } from '$lib/state.svelte';
 import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
+import { unique } from './utils';
 
 /**
  * Retourne un id d'image sous la forme 000001_000001
@@ -9,7 +10,15 @@ import { tables } from './idb.svelte';
  * @param {number} subindex
  */
 export function imageId(index, subindex = 0) {
-	return `${Number.parseInt(index.toString(), 0).toString().padStart(6, '0')}_${subindex.toString().padStart(6, '0')}`;
+	return `${imageFileId(index)}_${subindex.toString().padStart(6, '0')}`;
+}
+
+/**
+ * Retourne un id d'un ImageFile sous la forme 000001
+ * @param {number|string} index
+ */
+export function imageFileId(index) {
+	return Number.parseInt(index.toString(), 0).toString().padStart(6, '0');
 }
 
 /**
@@ -25,12 +34,12 @@ export function imageIdToFileId(id) {
 
 /**
  * @param {import('$lib/database.js').Protocol} protocol
- * @param {import('$lib/database.js').Image} image
+ * @param {string|null} imageFileId
  */
-export function imageIsCropped(protocol, image) {
-	return Boolean(
-		image.metadata[protocol.crop?.metadata ?? 'crop'] || uiState.erroredImages.has(image.id)
-	);
+export function imageIsAnalyzed(protocol, imageFileId) {
+	if (!imageFileId) return false;
+	if (uiState.erroredImages.has(imageFileId)) return true;
+	return tables.Image.state.some((img) => img.fileId === imageFileId);
 }
 
 /**
@@ -46,7 +55,7 @@ export function imageIsClassified(image) {
  * @param {import('$lib/database.js').Image} image
  */
 export function imageBufferWasSaved(image) {
-	return Boolean(image.bufferExists || uiState.erroredImages.has(image.id));
+	return Boolean(image.fileId || uiState.erroredImages.has(image.id));
 }
 
 /**
@@ -99,21 +108,26 @@ export async function deleteImage(id, tx, notFoundOk = true) {
 /**
  *
  * @param {object} param0
- * @param {string} param0.id id of the image to store the bytes for
+ * @param {string} param0.id id of the ImageFile to create
  * @param {ArrayBuffer} param0.originalBytes the image data
  * @param {ArrayBuffer} param0.resizedBytes resized image data
- * @param {string} param0.contentType MIME type of the image
+ * @param {string} param0.contentType the content type of the image
+ * @param {string} param0.filename the filename of the image
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
  */
-export async function storeImageBytes({ id, originalBytes, resizedBytes, contentType, tx }) {
-	await db.openTransaction(['Image', 'ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
-		const image = await tx.objectStore('Image').get(id);
-		if (!image) throw 'Image non trouvée';
-		tx.objectStore('ImageFile').put({ id: imageIdToFileId(id), bytes: originalBytes });
-		tx.objectStore('ImagePreviewFile').put({ id: imageIdToFileId(id), bytes: resizedBytes });
+export async function storeImageBytes({
+	id,
+	originalBytes,
+	resizedBytes,
+	contentType,
+	filename,
+	tx
+}) {
+	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
+		tx.objectStore('ImageFile').put({ id, bytes: originalBytes, contentType, filename });
+		tx.objectStore('ImagePreviewFile').put({ id, bytes: resizedBytes, contentType, filename });
 		const preview = new Blob([resizedBytes], { type: contentType });
-		uiState.setPreviewURL(image, URL.createObjectURL(preview));
-		tx.objectStore('Image').put({ ...image, bufferExists: true });
+		uiState.setPreviewURL(id, URL.createObjectURL(preview));
 	});
 }
 
@@ -155,4 +169,35 @@ export async function resizeToMaxSize({ source }) {
 			resolve(blob.arrayBuffer());
 		}, source.type);
 	});
+}
+
+/**
+ *
+ * @param {string} imageFileId
+ * @returns {import('$lib/database.js').Image[]}
+ */
+export function imagesOfImageFile(imageFileId) {
+	return tables.Image.state.filter((img) => img.fileId === imageFileId);
+}
+
+/**
+ *
+ * @param {string[]} imageFileIds
+ * @returns {Map<string, import('$lib/database.js').Image[]>}
+ */
+export function imagesByImageFile(imageFileIds) {
+	const images = new Map();
+	for (const imageFileId of imageFileIds) {
+		images.set(imageFileId, imagesOfImageFile(imageFileId));
+	}
+	return images;
+}
+
+/**
+ *
+ * @param {import('$lib/database.js').Image[]} images
+ * @returns {string[]}
+ */
+export function imageFileIds(images) {
+	return unique(images.map((image) => image.fileId).filter((id) => id !== undefined));
 }

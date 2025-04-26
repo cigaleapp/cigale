@@ -146,3 +146,41 @@ export function sign(value) {
 export function clamp(value, min, max) {
 	return Math.max(min, Math.min(max, value));
 }
+
+/**
+ * @template {*} T
+ * @typedef {{[K in keyof T]: Iterable<T[K]>}} ToIterables
+ */
+
+/**
+ * @template {any[]} T
+ * @param  {...ToIterables<T>} arrays
+ * @returns {Generator<T>}
+ */
+export function* zip(...arrays) {
+	// Get iterators for all of the iterables.
+	const iterators = arrays.map((i) => i[Symbol.iterator]());
+
+	while (true) {
+		// Advance all of the iterators.
+		const results = iterators.map((i) => i.next());
+
+		// If any of the iterators are done, we should stop.
+		if (results.some(({ done }) => done)) {
+			break;
+		}
+
+		// We can assert the yield type, since we know none
+		// of the iterators are done.
+		yield /**  @type {T}  */ (results.map(({ value }) => value));
+	}
+}
+
+/**
+ * @template {*} T
+ * @param {T[]} array
+ * @returns {T[]}
+ */
+export function unique(array) {
+	return [...new Set(array)];
+}

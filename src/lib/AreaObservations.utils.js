@@ -1,6 +1,8 @@
 import { uiState } from '$lib/state.svelte';
 import { toTopLeftCoords } from './BoundingBoxes.svelte';
 import { idComparator } from './idb.svelte';
+import { imagesByImageFile } from './images';
+import { assertIs } from './metadata';
 
 /**
  * @typedef CardObservation
@@ -24,60 +26,71 @@ import { idComparator } from './idb.svelte';
 
 /**
  *
- * @param {Image[]} images
+ * @param {string[]} imageFileIds
  * @param {Observation[]} observations
  * @param {object} param2
- * @param {(image: Image) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
- * @param {(image: Image|undefined) => string | undefined} [param2.previewURL] show cropped versions of images on cards where possible.
- * @param {(image: Image|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes
+ * @param {(imageFileId: string) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
+ * @param {(imageFileId: string|undefined) => string | undefined} [param2.previewURL] show cropped versions of images on cards where possible.
+ * @param {(imageFileId: string|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes
  * @returns {CardObservation[]}
  */
 export function toAreaObservationProps(
-	images,
+	imageFileIds,
 	observations,
 	{ isLoaded, previewURL, showBoundingBoxes }
 ) {
-	previewURL ??= (image) => uiState.getPreviewURL(image);
+	previewURL ??= (fileId) => uiState.getPreviewURL(fileId);
 	showBoundingBoxes ??= () => true;
+	const images = imagesByImageFile(imageFileIds);
 	return (
 		[
-			...images
+			...imageFileIds
 				// Keep images that aren't part of any observation only
-				.filter(({ id }) => !observations.some((observation) => observation.images.includes(id)))
-				.map((image, i) => {
+				.filter((id) => !observations.some((observation) => observation.images.includes(id)))
+				.map((fileId, i) => {
+					const image = images.get(fileId);
 					return /**  @satisfies {CardObservation} */ ({
-						image: previewURL(image) ?? '',
-						title: image.filename,
-						id: image.id,
+						image: previewURL(fileId) ?? '',
+						title: image?.at(0)?.filename ?? '',
+						id: fileId,
 						index: i,
 						stacksize: 1,
-						loading: isLoaded(image) ? undefined : -1,
+						loading: isLoaded(fileId) ? undefined : -1,
 						boundingBoxes:
-							showBoundingBoxes(image) && image.metadata[uiState.cropMetadataId]?.value
-								? // @ts-ignore
-									[toTopLeftCoords(image.metadata[uiState.cropMetadataId].value)]
+							showBoundingBoxes(fileId) && image
+								? image
+										.filter(({ metadata }) => metadata[uiState.cropMetadataId])
+										.map(({ metadata }) =>
+											toTopLeftCoords(
+												assertIs('boundingbox', metadata[uiState.cropMetadataId].value)
+											)
+										)
 								: []
 					});
 				}),
 			...observations.map((observation, i) => {
-				const imagesOfObservation = images.filter((img) => observation.images.includes(img.id));
+				const imagesOfObservation = [...images.values()]
+					.flat()
+					.filter((img) => observation.images.includes(img.id));
 				const firstImage = imagesOfObservation.find(
 					(i) => i.id === observation.images.toSorted(idComparator)[0]
 				);
+				const boundingBoxes = images
+					.get(firstImage?.fileId ?? '')
+					?.filter(({ metadata }) => metadata[uiState.cropMetadataId]?.value)
+					.map(({ metadata }) =>
+						toTopLeftCoords(assertIs('boundingbox', metadata[uiState.cropMetadataId].value))
+					);
 
 				/**  @satisfies {CardObservation} */
 				return {
-					image: previewURL(firstImage) ?? '',
+					image: previewURL(firstImage?.fileId) ?? '',
 					subimages: observation.images.toSorted(idComparator),
 					title: observation.label ?? `Observation ${firstImage?.filename ?? ''}`,
-					index: images.length + i,
+					index: imageFileIds.length + i,
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
-					boundingBoxes:
-						showBoundingBoxes(firstImage) && firstImage?.metadata[uiState.cropMetadataId]?.value
-							? // @ts-ignore
-								[toTopLeftCoords(firstImage.metadata[uiState.cropMetadataId].value)]
-							: [],
+					boundingBoxes: showBoundingBoxes(firstImage?.fileId) ? (boundingBoxes ?? []) : [],
 					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
 				};
 			})

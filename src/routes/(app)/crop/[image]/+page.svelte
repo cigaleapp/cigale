@@ -14,7 +14,7 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import * as idb from '$lib/idb.svelte.js';
-	import { imageIdToFileId } from '$lib/images';
+	import { imageIdToFileId, imagesOfImageFile } from '$lib/images';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
@@ -36,10 +36,11 @@
 	import IconReset from '~icons/ph/arrow-counter-clockwise';
 	import { pick } from '$lib/utils';
 
-	const imageId = $derived(page.params.image);
-	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
+	const fileId = $derived(page.params.image);
+	const images = $derived(imagesOfImageFile(fileId));
+	const firstImage = $derived(images.at(0));
 
-	$effect(() => seo({ title: `Recadrer ${image?.filename ?? '...'}` }));
+	$effect(() => seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` }));
 
 	// Controls visibility of the checkmark little centered overlay
 	let confirmedOverlayShown = $state(false);
@@ -106,19 +107,12 @@
 		document.body.style.cursor = activeTool.cursor || 'auto';
 	});
 
-	const boundingBox = $derived(
+	const boundingBoxes = $derived(
 		/**
-		 * @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>}
-		 */ (
-			image?.metadata[uiState.cropMetadataId]?.value ?? {
-				x: 0,
-				y: 0,
-				w: 0.5,
-				h: 0.5
-			}
-		)
+		 * @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>[]}
+		 */ (images.map((img) => img.metadata[uiState.cropMetadataId]?.value).filter(Boolean))
 	);
-	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(imageId)));
+	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(fileId)));
 	const sortedImageIds = $derived(
 		idb.tables.Image.state.map((img) => img.id).toSorted(idb.idComparator)
 	);
@@ -129,65 +123,74 @@
 			.toSorted(idb.idComparator)
 	);
 	const previousImageId = $derived.by(() => {
-		const idx = sortedImageIds.indexOf(imageId) - 1;
+		const idx = sortedImageIds.indexOf(fileId) - 1;
 		if (idx < 0) return undefined;
 		return sortedImageIds.at(idx);
 	});
 	const nextImageId = $derived.by(() => {
-		const idx = sortedImageIds.indexOf(imageId) + 1;
+		const idx = sortedImageIds.indexOf(fileId) + 1;
 		if (idx >= sortedImageIds.length) return undefined;
 		return sortedImageIds.at(idx);
 	});
 	const nextUnconfirmedImageId = $derived.by(() => {
-		const idx = unconfirmedCropImagesId.indexOf(imageId) + 1;
+		const idx = unconfirmedCropImagesId.indexOf(fileId) + 1;
 		if (idx >= unconfirmedCropImagesId.length) return undefined;
 		return unconfirmedCropImagesId.at(idx);
 	});
 	const croppedImagesCount = $derived(idb.tables.Image.state.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(idb.tables.Image.state.filter(hasConfirmedCrop).length);
 
-	/** @type {undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }} */
-	const initialCrop = $derived.by(() => {
-		if (!image) return undefined;
+	/** @type {Record<string, undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }>} */
+	const initialCrops = $derived(
+		Object.fromEntries(
+			images.map((image) => {
+				// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
+				if (
+					image.metadata[uiState.cropMetadataId]?.alternatives &&
+					Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
+				) {
+					const [[stringValue, confidence]] = Object.entries(
+						image.metadata[uiState.cropMetadataId].alternatives
+					);
+					return [
+						image.id,
+						{
+							value: JSON.parse(stringValue),
+							confidence
+						}
+					];
+				}
 
-		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
-		if (
-			image.metadata[uiState.cropMetadataId]?.alternatives &&
-			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
-		) {
-			const [[stringValue, confidence]] = Object.entries(
-				image.metadata[uiState.cropMetadataId].alternatives
-			);
-			return {
-				value: JSON.parse(stringValue),
-				confidence
-			};
-		}
-
-		// If this is the first time the user is re-cropping the box, this value will be the main values.
-		return pick(image.metadata[uiState.cropMetadataId], 'value', 'confidence');
-	});
-
-	$inspect({ initialCrop });
+				// If this is the first time the user is re-cropping the box, this value will be the main values.
+				return [image.id, pick(image.metadata[uiState.cropMetadataId], 'value', 'confidence')];
+			})
+		)
+	);
 
 	/**
-	 * @param {import('$lib/database.js').Image} image
+	 * @param {string} imageFileId
 	 */
-	function hasCrop(image) {
-		return (
+	function hasCrop(imageFileId) {
+		return imagesOfImageFile(imageFileId).every(image => 
 			image.metadata[uiState.cropMetadataId] &&
 			boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value)
-		);
+		));
 	}
 
 	/**
-	 * @param {import('$lib/database.js').Image|undefined} image
+	 * @param {string|undefined} imageFileId
 	 */
-	function hasConfirmedCrop(image) {
-		return image && hasCrop(image) && image.metadata[uiState.cropMetadataId].manuallyModified;
+	function hasConfirmedCrop(imageFileId) {
+		if (!imageFileId) return false;
+		if (!hasCrop(imageFileId)) return false;
+		return imagesOfImageFile(imageFileId).every(image => image.metadata[uiState.cropMetadataId].manuallyModified);
 	}
 
-	async function revertToInferedCrop() {
+	/**
+	 * @param {string} imageId
+	 */
+	async function revertToInferedCrop(imageId) {
+		const initialCrop = initialCrops[imageId];
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 		if (!initialCrop) {
 			toasts.error(
@@ -197,7 +200,7 @@
 		}
 
 		await storeMetadataValue({
-			subjectId: imageId,
+			subjectId: fileId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
 			...initialCrop
@@ -205,24 +208,26 @@
 
 		await deleteMetadataValue({
 			metadataId: uiState.classificationMetadataId,
-			subjectId: imageId
+			subjectId: fileId
 		});
 	}
 
-	const canRevertToInferedCrop = $derived(initialCrop !== undefined && hasConfirmedCrop(image));
+	const canRevertToInferedCrop = $derived(Object.fromEntries(
+	images.map(({id}) => [id, id in initialCrops])
+	));
 
 	/**
 	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 */
 	async function onConfirmCrop(newBoundingBox, flashConfirmedOverlay = true) {
-		const image = idb.tables.Image.state.find((image) => image.id === imageId);
+		const image = idb.tables.Image.state.find((image) => image.id === fileId);
 		if (!image) {
-			toasts.error(`Image ${imageId} introuvable, impossible de sauvegarder le recadrage`);
+			toasts.error(`Image ${fileId} introuvable, impossible de sauvegarder le recadrage`);
 			return;
 		}
 
-		const willFlashConfirmedOverlay = flashConfirmedOverlay && !hasConfirmedCrop(image);
+		const willFlashConfirmedOverlay = flashConfirmedOverlay && !hasConfirmedCrop(fileId);
 
 		const willAutoskip =
 			// The user has auto-skip enabled
@@ -230,25 +235,25 @@
 			// We aren't deleting the bounding box
 			boundingBoxIsNonZero(newBoundingBox) &&
 			// in click-and-drag creation mode, auto-skip occurs only when the bounding box did not exist before (since the first creation of the box is much less likely to be the final one)
-			(activeTool.createMode !== 'clickanddrag' || !hasCrop(image));
+			(activeTool.createMode !== 'clickanddrag' || !hasCrop(fileId));
 
 		const species = image.metadata[uiState.classificationMetadataId];
 		if (species && !species.manuallyModified) {
 			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 			await deleteMetadataValue({
 				metadataId: uiState.classificationMetadataId,
-				subjectId: imageId
+				subjectId: fileId
 			});
 		}
 
 		await storeMetadataValue({
 			metadataId: uiState.cropMetadataId,
-			subjectId: imageId,
+			subjectId: fileId,
 			type: 'boundingbox',
 			value: toCenteredCoords(newBoundingBox),
 			confidence: 1,
 			// Put the neural-network-inferred (initial) value in the alternatives as a backup
-			alternatives: initialCrop ? [initialCrop] : [],
+			alternatives: initialCrops[fileId]
 			manuallyModified: true
 		});
 
@@ -269,12 +274,12 @@
 	}
 
 	function goToGallery() {
-		uiState.imagePreviouslyOpenedInCropper = imageId;
+		uiState.imagePreviouslyOpenedInCropper = fileId;
 		goto('#/crop');
 	}
 
 	$effect(() => {
-		uiState.imageOpenedInCropper = imageId;
+		uiState.imageOpenedInCropper = fileId;
 	});
 
 	onMount(() => {
@@ -378,14 +383,14 @@
 				</ButtonInk>
 			</nav>
 			<div class="filename-actions">
-				{#if image}
+				{#if images}
 					<h1>
-						{image.filename}
-						{#if hasConfirmedCrop(image)}
+						{images.filename}
+						{#if hasConfirmedCrop(images)}
 							<div class="status" use:tooltip={'Recadrage confirmé'}>
 								<IconConfirmedCrop />
 							</div>
-						{:else if hasCrop(image)}
+						{:else if hasCrop(images)}
 							<button
 								class="status"
 								use:tooltip={'Marquer le recadrage comme confirmé'}
@@ -448,7 +453,7 @@
 					<IconPrev />
 				</ButtonIcon>
 				<code>
-					{sortedImageIds.indexOf(imageId) + 1}⁄{sortedImageIds.length}
+					{sortedImageIds.indexOf(fileId) + 1}⁄{sortedImageIds.length}
 				</code>
 				<ButtonIcon
 					disabled={!nextImageId}

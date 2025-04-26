@@ -12,11 +12,11 @@ import { matches } from './utils.js';
 /**
  *
  * @param {string} protocolId
- * @param {string} imageId
+ * @param {string} imageFileId
  * @param {ArrayBuffer} imageBytes
  * @param {{ type: string; name: string }} file
  */
-export async function processExifData(protocolId, imageId, imageBytes, file) {
+export async function processExifData(protocolId, imageFileId, imageBytes, file) {
 	const protocol = await db.tables.Protocol.get(protocolId);
 	if (!protocol) {
 		throw new Error(`Protocole ${protocolId} introuvable`);
@@ -53,14 +53,21 @@ export async function processExifData(protocolId, imageId, imageBytes, file) {
 	});
 
 	await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
-		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-			await storeMetadataValue({
-				tx,
-				subjectId: imageId,
-				metadataId: key,
-				value,
-				confidence
-			});
+		const images = await tx
+			.objectStore('Image')
+			.getAll()
+			.then((imgs) => imgs.filter((img) => img.fileId === imageFileId));
+
+		for (const { id: subjectId } of images) {
+			for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+				await storeMetadataValue({
+					tx,
+					subjectId,
+					metadataId: key,
+					value,
+					confidence
+				});
+			}
 		}
 	});
 }

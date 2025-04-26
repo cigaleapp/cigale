@@ -578,6 +578,19 @@ export function isType(testedtyp, metadatatyp, value) {
 }
 
 /**
+ * @template {import('./database').MetadataType} Type
+ * @param {Type} type
+ * @param {unknown} value
+ * @returns {RuntimeValue<Type>}
+ */
+export function assertIs(type, value) {
+	// @ts-ignore
+	if (!isType(type, type, value))
+		throw new Error(`La valeur n'est pas de type ${type}: ${JSON.stringify(value)}`);
+	return value;
+}
+
+/**
  *
  * @param {{metadataOrder?: undefined | string[]}} protocol
  * @returns {(a: { id: string }, b: { id: string }) => number}
