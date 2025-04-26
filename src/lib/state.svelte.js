@@ -1,6 +1,5 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { tables } from './idb.svelte';
-import { imageIdToFileId } from './images';
 
 /**
  * @typedef Keybind
@@ -28,11 +27,11 @@ import { imageIdToFileId } from './images';
  * @property {undefined | ((newSelection: string[]) => void)} setSelection modifier la sélection
  * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
  * @property {Map<string, string>} croppedPreviewURLs url de type blob:// pouvant servir de src à une balise img pour afficher l'image, en version croppée. Map d'un ID d'ImageFile à l'URL
- * @property {(image: import('./database').Image | typeof import('./database').Tables.Image.in.infer, url: string, variant?: 'cropped' | 'full') => void} setPreviewURL
- * @property {(image: import('./database').Image | typeof import('./database').Tables.Image.in.infer | undefined, variant?: 'cropped' | 'full') => boolean} hasPreviewURL
- * @property {(image: import('./database').Image | typeof import('./database').Tables.Image.in.infer | undefined, variant?: 'cropped' | 'full') => string | undefined} getPreviewURL
+ * @property {(imageFileId: string | undefined | null, url: string, variant?: 'cropped' | 'full') => void} setPreviewURL
+ * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => boolean} hasPreviewURL
+ * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => string | undefined} getPreviewURL
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
- * @property {Set<string>} loadingImages liste des IDs d'images en cours de chargement (analyse, écriture en db, etc)
+ * @property {Set<string>} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
  * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
@@ -60,23 +59,18 @@ export const uiState = $state({
 	imagePreviouslyOpenedInCropper: '',
 	previewURLs: new SvelteMap(),
 	croppedPreviewURLs: new SvelteMap(),
-	hasPreviewURL(image, variant = 'full') {
-		if (!image) return false;
-		return (variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).has(
-			imageIdToFileId(image.id)
-		);
+	hasPreviewURL(imageFileId, variant = 'full') {
+		if (!imageFileId) return false;
+		return (variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).has(imageFileId);
 	},
-	setPreviewURL(image, url, variant = 'full') {
-		(variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).set(
-			imageIdToFileId(image.id),
-			url
-		);
+	setPreviewURL(imageFileId, url, variant = 'full') {
+		console.log('setPreviewURL', { imageFileId, url, variant });
+		if (!imageFileId) return;
+		(variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).set(imageFileId, url);
 	},
-	getPreviewURL(image, variant = 'full') {
-		if (!image) return undefined;
-		return (variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).get(
-			imageIdToFileId(image.id)
-		);
+	getPreviewURL(imageFileId, variant = 'full') {
+		if (!imageFileId) return undefined;
+		return (variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).get(imageFileId);
 	},
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),

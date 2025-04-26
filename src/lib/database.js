@@ -149,7 +149,9 @@ const ImageFile = table(
 	type({
 		/** ID of the associated Image object */
 		id: ID,
-		bytes: 'ArrayBuffer'
+		bytes: 'ArrayBuffer',
+		filename: 'string',
+		contentType: /\w+\/\w+/
 	})
 );
 
@@ -158,7 +160,9 @@ const ImagePreviewFile = table(
 	type({
 		/** ID of the associated Image object */
 		id: ID,
-		bytes: 'ArrayBuffer'
+		bytes: 'ArrayBuffer',
+		filename: 'string',
+		contentType: /\w+\/\w+/
 	})
 );
 
@@ -170,7 +174,9 @@ const Image = table(
 		addedAt: 'string.date.iso.parse',
 		metadata: MetadataValues,
 		contentType: /\w+\/\w+/,
-		bufferExists: 'boolean'
+		fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
+		/** Si les boîtes englobantes ont été analysées. Pratique en particulier pour savoir s'il faut calculer les boîtes englobantes pour une image qui n'a aucune observation associée (chaque boudingbox crée une observation) */
+		boundingBoxesAnalyzed: 'boolean = false'
 	})
 );
 
@@ -408,7 +414,7 @@ const Settings = table(
 		language: type.enumerated('fr'),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
-		cropAutoNext: 'boolean = false',
+		cropAutoNext: 'boolean = false'
 	})
 );
 
@@ -555,4 +561,9 @@ function table(keyPaths, schema) {
 /**
  * @typedef MetadataInferOptions
  * @type {typeof MetadataInferOptions.infer}
+ */
+
+/**
+ * @typedef ImageFile
+ * @type {typeof ImageFile.infer}
  */
