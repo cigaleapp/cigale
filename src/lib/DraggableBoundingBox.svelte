@@ -300,7 +300,10 @@
 			{#snippet bb({ x, y, width, height })}
 				({@render point(x, y)}) × [{@render point(width, height)}]
 			{/snippet}
-			bb {@render bb(boudingBoxesPixels)}<br />
+			bbs <br />
+			{#each Object.entries(boudingBoxesPixels) as [imageId, box] (imageId)}
+				@{imageId} {@render bb(box)}<br />
+			{/each}
 			create {newBoundingBox.ready ? 'ready ' : ''}
 			{#if createMode === 'clickanddrag'}
 				{@render bb(newBoundingBox.clickanddrag)}
@@ -333,16 +336,18 @@
 			style:height="{newBoundingBox.height}px"
 		></div>
 	{/if}
-	{#if boundingBoxIsNonZero(boundingBoxes)}
+	{#each Object.entries(boudingBoxesPixels) as [imageId, box] (imageId)}
 		<div
 			class="boundingbox"
+			data-image={imageId}
 			class:movable
 			class:precise={!movable && !transformable}
-			style:left="{boudingBoxesPixels.x}px"
-			style:top="{boudingBoxesPixels.y}px"
-			style:width="{boudingBoxesPixels.width}px"
-			style:height="{boudingBoxesPixels.height}px"
+			style:left="{box.x}px"
+			style:top="{box.y}px"
+			style:width="{box.width}px"
+			style:height="{box.height}px"
 			onmousedown={() => {
+				draggingImageId = imageId;
 				if (movable) draggingCorner.setAll(true);
 			}}
 		>
@@ -380,7 +385,7 @@
 			{@render corner('bottomleft')}
 			{@render corner('bottomright')}
 		</div>
-	{/if}
+	{/each}
 </div>
 
 <style>
