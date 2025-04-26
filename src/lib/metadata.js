@@ -505,7 +505,7 @@ export function metadataPrettyValue(metadata, value) {
 			return `${latitude}, ${longitude}`;
 		}
 
-		case 'boundingbox': {
+		case 'boundingboxes': {
 			const {
 				x: x1,
 				y: y1,
@@ -553,8 +553,7 @@ export function isType(testedtyp, metadatatyp, value) {
 	 * @param {import('arktype').Type} v
 	 * @returns boolean
 	 */
-	const ok = (v) =>
-		metadatatyp === testedtyp && (value === undefined || !(v(value) instanceof type.errors));
+	const ok = (v) => metadatatyp === testedtyp && (value === undefined || v.allows(value));
 
 	switch (testedtyp) {
 		case 'boolean':
@@ -568,8 +567,8 @@ export function isType(testedtyp, metadatatyp, value) {
 			return ok(type('Date'));
 		case 'location':
 			return ok(type({ latitude: 'number', longitude: 'number' }));
-		case 'boundingbox':
-			return ok(type({ x: 'number', y: 'number', w: 'number', h: 'number' }));
+		case 'boundingboxes':
+			return ok(type({ x: 'number', y: 'number', w: 'number', h: 'number' }).array());
 		case 'string':
 			return ok(type('string'));
 		default:
@@ -593,7 +592,7 @@ export function metadataDefinitionComparator(protocol) {
 
 /**
  * @template {import('./database').MetadataType} [Type=import('./database').MetadataType]
- * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, w: number, h: number } : string} RuntimeValue
+ * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingboxes' ? Array<{ x: number, y: number, w: number, h: number }> : string} RuntimeValue
  */
 
 /**
