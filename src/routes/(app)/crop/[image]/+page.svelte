@@ -22,12 +22,16 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { onDestroy, onMount } from 'svelte';
+	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
 	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
-	import IconConfirmedCrop from '~icons/ph/seal-check';
+	import IconFourPointCrop from '~icons/ph/number-circle-four';
+	import IconTwoPointCrop from '~icons/ph/number-circle-two';
 	import IconUnconfirmedCrop from '~icons/ph/seal';
+	import IconConfirmedCrop from '~icons/ph/seal-check';
+	import IconToolDragCrop from '~icons/ph/selection-plus';
 	import IconGallery from '~icons/ph/squares-four';
 	import IconReset from '~icons/ph/arrow-counter-clockwise';
 	import { pick } from '$lib/utils';
@@ -35,10 +39,72 @@
 	const imageId = $derived(page.params.image);
 	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
 
+	$effect(() => seo({ title: `Recadrer ${image?.filename ?? '...'}` }));
+
 	// Controls visibility of the checkmark little centered overlay
 	let confirmedOverlayShown = $state(false);
 
-	$effect(() => seo({ title: `Recadrer ${image?.filename ?? '...'}` }));
+	/** @type {typeof tools[number]['name']} */
+	let activeToolName = $state('Glisser-recadrer');
+	/**
+	 * @typedef {object} Tool
+	 * @property {string} name
+	 * @property {string} help
+	 * @property {import('svelte').Component} icon
+	 * @property {string} shortcut
+	 * @property {boolean} transformable if true, the bounding box's sides or corners can be dragged
+	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
+	 * @property {boolean} movable if true, the bounding box can be moved by dragging in its inside
+	 * @property {string} [cursor]
+	 */
+	const tools = /** @type {const} @satisfies {Tool[]} */ ([
+		{
+			name: 'Glisser-recadrer',
+			help: 'Cliquer et glisser pour créer une boîte de recadrage',
+			icon: IconToolDragCrop,
+			shortcut: 'r',
+			transformable: true,
+			createMode: 'clickanddrag',
+			movable: true,
+			cursor: 'crosshair'
+		},
+		{
+			name: '2 points',
+			help: 'Cliquer sur les deux coins pour créer une boîte de recadrage',
+			icon: IconTwoPointCrop,
+			shortcut: 'z',
+			transformable: false,
+			createMode: '2point',
+			movable: false,
+			cursor: 'crosshair'
+		},
+		{
+			name: '4 points',
+			help: 'Cliquer sur les 4 coins pour créer une boîte de recadrage',
+			icon: IconFourPointCrop,
+			shortcut: 'Shift+z',
+			transformable: false,
+			createMode: '4point',
+			movable: false,
+			cursor: 'crosshair'
+		},
+		{
+			name: 'Déplacer',
+			help: 'Cliquer et glisser pour déplacer la boîte de recadrage',
+			icon: IconToolMove,
+			shortcut: 'v',
+			transformable: false,
+			createMode: 'off',
+			movable: true,
+			cursor: 'move'
+		}
+	]);
+
+	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
+
+	$effect(() => {
+		document.body.style.cursor = activeTool.cursor || 'auto';
+	});
 
 	const boundingBox = $derived(
 		/**
@@ -146,7 +212,7 @@
 	const canRevertToInferedCrop = $derived(initialCrop !== undefined && hasConfirmedCrop(image));
 
 	/**
-	 * @param {{x: number, y: number, width: number, height: number}} newBoundingBox
+	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 */
 	async function onConfirmCrop(newBoundingBox, flashConfirmedOverlay = true) {
@@ -163,8 +229,8 @@
 			getSettings().cropAutoNext &&
 			// We aren't deleting the bounding box
 			boundingBoxIsNonZero(newBoundingBox) &&
-			// Auto-skip occurs when the bounding box did not exist before
-			!hasCrop(image);
+			// in click-and-drag creation mode, auto-skip occurs only when the bounding box did not exist before (since the first creation of the box is much less likely to be the final one)
+			(activeTool.createMode !== 'clickanddrag' || !hasCrop(image));
 
 		const species = image.metadata[uiState.classificationMetadataId];
 		if (species && !species.manuallyModified) {
@@ -241,6 +307,14 @@
 				await toggleSetting('cropAutoNext');
 			}
 		};
+		for (const tool of tools) {
+			uiState.keybinds[tool.shortcut] = {
+				help: `Outil ${tool.name}`,
+				do: () => {
+					activeToolName = tool.name;
+				}
+			};
+		}
 	});
 	onDestroy(() => {
 		// FIXME: allow registering keybinds for a specific page, and show them in a separate category on the keybinds help modal
@@ -249,6 +323,9 @@
 		delete uiState.keybinds['Space'];
 		delete uiState.keybinds['Escape'];
 		delete uiState.keybinds['A'];
+		for (const tool of tools) {
+			delete uiState.keybinds[tool.shortcut];
+		}
 	});
 
 	let imageElement = $state();
@@ -262,10 +339,28 @@
 </div>
 
 <div class="layout">
+	<aside class="toolbar">
+		{#each tools as tool (tool.name)}
+			<button
+				class:active={tool.name === activeToolName}
+				use:tooltip={{
+					text: `${tool.name}: ${tool.help}`,
+					keyboard: tool.shortcut,
+					placement: 'right'
+				}}
+				onclick={() => {
+					activeToolName = tool.name;
+				}}
+			>
+				<tool.icon />
+			</button>
+		{/each}
+	</aside>
 	<main class="crop-surface">
 		<img src={imageSrc} alt="" bind:this={imageElement} />
 		{#if boundingBox && imageElement}
 			<DraggableBoundingBox
+				{...activeTool}
 				{imageElement}
 				boundingBox={toTopLeftCoords(boundingBox)}
 				onchange={(newBox) => {
@@ -399,7 +494,6 @@
 	.layout {
 		display: flex;
 		height: 100%;
-		gap: 1em;
 		overflow: hidden;
 	}
 
@@ -432,12 +526,60 @@
 		margin-bottom: -1rem;
 	}
 
+	.toolbar {
+		--width: 2.5em;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 0.25em;
+	}
+
+	.toolbar button {
+		font-size: 1.2em;
+		width: var(--width);
+		height: var(--width);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: none;
+		background: none;
+		cursor: pointer;
+		position: relative;
+		border-radius: var(--corner-radius);
+	}
+
+	.toolbar button.active {
+		color: var(--fg-primary);
+	}
+
+	.toolbar button::after {
+		content: '';
+		position: absolute;
+		bottom: 5px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0;
+		height: 3px;
+		border-radius: 1000000px;
+		background: var(--bg-primary);
+		transition: width 0.1s;
+	}
+
+	.toolbar button.active::after {
+		width: 40%;
+	}
+
+	.toolbar button:is(:hover, :focus-visible) {
+		color: var(--fg-primary);
+		background: var(--bg-primary-translucent);
+	}
+
 	.crop-surface {
 		overflow: hidden;
 		position: relative;
 		user-select: none;
 		width: 100%;
-		--cell-size: 50px;
+		--cell-size: calc(100% / 16 - 0.125px);
 		background-size: var(--cell-size) var(--cell-size);
 		background-image:
 			linear-gradient(to right, var(--gray) 1px, transparent 1px),

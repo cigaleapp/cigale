@@ -1,6 +1,7 @@
 <script>
 	import { tick } from 'svelte';
-	import { boundingBoxIsNonZero } from './BoundingBoxes.svelte';
+	import { boundingBoxIsNonZero, coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
+	import { NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { getSettings } from './settings.svelte';
 
 	/**
@@ -18,10 +19,20 @@
 	 * @property {Rect} boundingBox bounding box with relative, top-left coordinates
 	 * @property {HTMLImageElement} imageElement
 	 * @property {(box: Rect) => void} onchange
+	 * @property {boolean} transformable if true, the bounding box's sides or corners can be dragged
+	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
+	 * @property {boolean} movable if true, the bounding box can be moved by dragging in its inside
 	 */
 
 	/**  @type {Props} */
-	let { boundingBox: boudingBoxInitial, imageElement, onchange } = $props();
+	let {
+		boundingBox: boudingBoxInitial,
+		imageElement,
+		onchange,
+		transformable,
+		movable,
+		createMode
+	} = $props();
 
 	let boundingBox = $state(boudingBoxInitial);
 	$effect(() => {
@@ -98,26 +109,27 @@
 		};
 	});
 
-	/**
-	 * @type {(imageRect: Rect,  box: Rect) => Rect}
-	 */
-	const toPixel = $derived((imageRect, { x, y, width, height }) => ({
-		x: imageRect.x + x * imageRect.width,
-		y: imageRect.y + y * imageRect.height,
-		width: width * imageRect.width,
-		height: height * imageRect.height
-	}));
+	const toPixel = $derived(
+		coordsScaler({
+			x: imageRect.width,
+			y: imageRect.height
+		})
+	);
 
-	const boudingBoxPixel = $derived(toPixel(imageRect, boundingBox));
+	const fromPixel = $derived(
+		coordsScaler({
+			x: 1 / imageRect.width,
+			y: 1 / imageRect.height
+		})
+	);
+
+	const boudingBoxPixel = $derived(toPixel(boundingBox));
 
 	let creatingBoundingBox = $state(false);
-
-	let newBoundingBox = $state({
-		x: 0,
-		y: 0,
-		width: 0,
-		height: 0
-	});
+	let newBoundingBox = $derived(
+		new NewBoundingBox({ limits: { x: 0, y: 0, width: imageRect.width, height: imageRect.height } })
+	);
+	$effect(() => newBoundingBox.setCreateMode(createMode));
 
 	let draggingCorner = $state({
 		topleft: false,
@@ -171,48 +183,44 @@
 	});
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
 	class="change-area"
 	class:debug={getSettings().showTechnicalMetadata}
+	class:precise={!movable && !transformable}
 	style:left="{imageRect.x}px"
 	style:top="{imageRect.y}px"
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
 	style:cursor={boundingBoxIsNonZero(boundingBox) ? 'unset' : 'crosshair'}
 	onmouseup={() => {
-		if (creatingBoundingBox) {
-			boundingBox = {
-				x: newBoundingBox.x / imageRect.width,
-				y: newBoundingBox.y / imageRect.height,
-				width: newBoundingBox.width / imageRect.width,
-				height: newBoundingBox.height / imageRect.height
-			};
-			newBoundingBox = {
-				x: 0,
-				y: 0,
-				width: 0,
-				height: 0
-			};
-		}
-		creatingBoundingBox = false;
 		draggingCorner.setAll(false);
-		onchange?.(boundingBox);
+		if (creatingBoundingBox && newBoundingBox.ready) {
+			boundingBox = fromPixel(newBoundingBox.rect());
+			onchange?.(boundingBox);
+			newBoundingBox.reset();
+			creatingBoundingBox = false;
+		}
+		if (createMode === 'clickanddrag') {
+			onchange?.(boundingBox);
+			creatingBoundingBox = false;
+		}
 	}}
-	onmousedown={({ offsetX, offsetY }) => {
-		if (boundingBoxIsNonZero(boundingBox)) return;
+	onmousedown={({ clientX, clientY, currentTarget }) => {
+		if (createMode === 'off') return;
+		// Using offset{X,Y} is wrong when pointer is inside the boundingbox, see https://stackoverflow.com/a/35364901
+		const { left, top } = currentTarget.getBoundingClientRect();
+		const [x, y] = [clientX - left, clientY - top];
+		// Don't try registering new bounding box points if we're about to move/transform the existing one
+		if ((movable || transformable) && withinBoundingBox(boudingBoxPixel, { x, y })) return;
 		creatingBoundingBox = true;
-		newBoundingBox.x = offsetX;
-		newBoundingBox.y = offsetY;
-		console.log('newBoundingBox', newBoundingBox);
+		newBoundingBox.registerPoint(x, y);
 	}}
 	onmousemove={({ movementX, movementY }) => {
-		const dx = movementX / imageRect.width;
-		const dy = movementY / imageRect.height;
+		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY });
 
-		if (creatingBoundingBox) {
-			newBoundingBox.width += movementX;
-			newBoundingBox.height += movementY;
-			console.log('newBoundingBox', newBoundingBox);
+		if (creatingBoundingBox && createMode === 'clickanddrag') {
+			newBoundingBox.registerMovement(movementX, movementY);
 			return;
 		}
 
@@ -269,7 +277,39 @@
 		}
 	}}
 >
-	{#if creatingBoundingBox}
+	{#if getSettings().showTechnicalMetadata}
+		<code class="debug" style:color="red">
+			{#snippet point(x, y)}
+				{Math.round(x)} {Math.round(y)}
+			{/snippet}
+			{#snippet bb({ x, y, width, height })}
+				({@render point(x, y)}) × [{@render point(width, height)}]
+			{/snippet}
+			bb {@render bb(boudingBoxPixel)}<br />
+			create {newBoundingBox.ready ? 'ready ' : ''}
+			{#if createMode === 'clickanddrag'}
+				{@render bb(newBoundingBox.clickanddrag)}
+				<br /> &nbsp;&nbsp;&nbsp;dir {@render point(
+					newBoundingBox.clickanddrag.dragDirection.x,
+					newBoundingBox.clickanddrag.dragDirection.y
+				)}
+			{:else if createMode === 'off'}
+				off
+			{:else}
+				<br />
+				{#each newBoundingBox.points as { x, y }, i (i)}
+					#{i} {@render point(x, y)} <br />
+				{/each}
+			{/if}
+		</code>
+	{/if}
+	{#if createMode === '2point' || createMode === '4point'}
+		{#each newBoundingBox.points as { x, y }, i (i)}
+			{#if x !== 0 && y !== 0}
+				<div class="boundingbox-point new" style:left="{x}px" style:top="{y}px"></div>
+			{/if}
+		{/each}
+	{:else if creatingBoundingBox && createMode === 'clickanddrag'}
 		<div
 			class="boundingbox new"
 			style:left="{newBoundingBox.x}px"
@@ -281,19 +321,23 @@
 	{#if boundingBoxIsNonZero(boundingBox)}
 		<div
 			class="boundingbox"
-			style:left="{boudingBoxPixel.x - imageRect.x}px"
-			style:top="{boudingBoxPixel.y - imageRect.y}px"
+			class:movable
+			class:precise={!movable && !transformable}
+			style:left="{boudingBoxPixel.x}px"
+			style:top="{boudingBoxPixel.y}px"
 			style:width="{boudingBoxPixel.width}px"
 			style:height="{boudingBoxPixel.height}px"
 			onmousedown={() => {
-				draggingCorner.setAll(true);
+				if (movable) draggingCorner.setAll(true);
 			}}
 		>
 			{#snippet side(/** @type {'top'|'bottom'|'left'|'right'} */ position)}
 				<div
 					class="side {position}"
+					class:draggable={transformable}
 					class:dragging={draggingCorner[position]}
 					onmousedown={(e) => {
+						if (!transformable) return;
 						draggingCorner[position] = true;
 						e.stopPropagation();
 					}}
@@ -307,8 +351,10 @@
 			{#snippet corner(/** @type {`${'top'|'bottom'}${'left'|'right'}`} */ position)}
 				<div
 					class="corner {position}"
+					class:draggable={transformable}
 					class:dragging={draggingCorner[position]}
 					onmousedown={(e) => {
+						if (!transformable) return;
 						draggingCorner[position] = true;
 						e.stopPropagation();
 					}}
@@ -328,28 +374,43 @@
 	}
 
 	.change-area.debug {
-		border: 5px dashed red;
+		outline: 5px dashed red;
 	}
 
 	.boundingbox {
 		position: absolute;
+		--thick: 5px;
 	}
 
-	.boundingbox:not(.new) {
+	.boundingbox.precise :is(.side, .corner) {
+		display: none;
+	}
+
+	.boundingbox.precise {
+		--thick: 2px;
+		border: var(--thick) solid black;
+		outline: var(--thick) solid white;
+	}
+
+	.boundingbox.movable:not(.new) {
 		cursor: move;
 	}
 
-	.boundingbox:hover:not(:has(:hover)):not(:has(.dragging)) .corner,
-	.boundingbox .side.left:hover:not(.dragging) ~ .corner:is(.bottomleft, .topleft),
-	.boundingbox .side.right:hover:not(.dragging) ~ .corner:is(.topright, .bottomright),
-	.boundingbox .side.top:hover:not(.dragging) ~ .corner:is(.topleft, .topright),
-	.boundingbox .side.bottom:hover:not(.dragging) ~ .corner:is(.bottomleft, .bottomright) {
+	.boundingbox.new {
+		background: color-mix(in srgb, var(--light__bg-primary-translucent) 30%, transparent);
+		border: var(--thick) dashed var(--light__bg-primary);
+	}
+
+	.boundingbox:hover:not(:has(:hover)):not(:has(.dragging)) .corner.draggable,
+	.boundingbox .side.draggable.left:hover:not(.dragging) ~ .corner:is(.bottomleft, .topleft),
+	.boundingbox .side.draggable.right:hover:not(.dragging) ~ .corner:is(.topright, .bottomright),
+	.boundingbox .side.draggable.top:hover:not(.dragging) ~ .corner:is(.topleft, .topright),
+	.boundingbox .side.draggable.bottom:hover:not(.dragging) ~ .corner:is(.bottomleft, .bottomright) {
 		scale: 130%;
 		background: var(--light__bg-primary-translucent);
 	}
 
 	.side {
-		--thick: 5px;
 		position: absolute;
 		background: black;
 		border-style: solid;
@@ -362,6 +423,9 @@
 		top: 0;
 		bottom: 0;
 		width: calc(var(--thick) * 2);
+	}
+
+	.side.draggable:is(.left, .right) {
 		cursor: ew-resize;
 	}
 
@@ -380,6 +444,9 @@
 		left: 0;
 		right: 0;
 		height: calc(var(--thick) * 2);
+	}
+
+	.side.draggable:is(.top, .bottom) {
 		cursor: ns-resize;
 	}
 
@@ -393,7 +460,8 @@
 		border-top-width: var(--thick);
 	}
 
-	.corner {
+	.corner,
+	.boundingbox-point {
 		position: absolute;
 		width: 1.5rem;
 		height: 1.5rem;
@@ -402,7 +470,21 @@
 		transition: scale 80ms;
 	}
 
-	.corner:hover {
+	.boundingbox-point {
+		translate: -50% -50%;
+		background: var(--light__bg-primary);
+	}
+
+	.change-area.precise .boundingbox-point {
+		border: none;
+		width: 10px;
+		height: 10px;
+		border-radius: 10000px;
+		background: white;
+		mix-blend-mode: difference;
+	}
+
+	.corner.draggable:hover {
 		background: var(--light__bg-primary-translucent);
 		scale: 130%;
 	}
@@ -415,24 +497,32 @@
 	.topleft {
 		top: -0.75rem;
 		left: -0.75rem;
+	}
+	.topleft.draggable {
 		cursor: nwse-resize;
 	}
 
 	.topright {
 		top: -0.75rem;
 		right: -0.75rem;
+	}
+	.topright.draggable {
 		cursor: nesw-resize;
 	}
 
 	.bottomleft {
 		bottom: -0.75rem;
 		left: -0.75rem;
+	}
+	.bottomleft.draggable {
 		cursor: nesw-resize;
 	}
 
 	.bottomright {
 		bottom: -0.75rem;
 		right: -0.75rem;
+	}
+	.bottomright.draggable {
 		cursor: nwse-resize;
 	}
 </style>

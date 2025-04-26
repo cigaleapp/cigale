@@ -127,3 +127,22 @@ export function safeJSONParse(str) {
 export function matches(subject, pattern) {
 	return match.case(pattern, () => true).default(() => false)(subject);
 }
+
+/**
+ * See https://github.com/microsoft/TypeScript/issues/19954
+ * @param {number} value
+ * @returns {-1|0|1}
+ */
+export function sign(value) {
+	return Math.sign(value);
+}
+
+/**
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+export function clamp(value, min, max) {
+	return Math.max(min, Math.min(max, value));
+}
