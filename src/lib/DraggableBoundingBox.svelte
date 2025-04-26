@@ -3,6 +3,7 @@
 	import { boundingBoxIsNonZero, coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
 	import { NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { getSettings } from './settings.svelte';
+	import { mapValues } from './utils';
 
 	/**
 	 * @typedef Rect
@@ -16,27 +17,29 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Rect} boundingBox bounding box with relative, top-left coordinates
+	 * @property {Record<string, Rect>} boundingBoxes maps image IDs to bounding boxes with relative, top-left coordinates
 	 * @property {HTMLImageElement} imageElement
-	 * @property {(box: Rect) => void} onchange
-	 * @property {boolean} transformable if true, the bounding box's sides or corners can be dragged
+	 * @property {(imageId: string, box: Rect) => void} onchange - called when a bounding box is changed. The imageId is the ID of the associated Image
+	 * @property {(box: Rect) => Promise<string> | string} oncreate - called when a new bounding box is created. Must return the ID of the new associated Image
+	 * @property {boolean} transformable if true, the bounding boxes' sides or corners can be dragged
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
-	 * @property {boolean} movable if true, the bounding box can be moved by dragging in its inside
+	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
 	 */
 
 	/**  @type {Props} */
 	let {
-		boundingBox: boudingBoxInitial,
+		boundingBoxes: boudingBoxesInitial,
 		imageElement,
 		onchange,
+		oncreate,
 		transformable,
 		movable,
 		createMode
 	} = $props();
 
-	let boundingBox = $state(boudingBoxInitial);
+	let boundingBoxes = $state(boudingBoxesInitial);
 	$effect(() => {
-		boundingBox = boudingBoxInitial;
+		boundingBoxes = boudingBoxesInitial;
 	});
 
 	let clientWidth = $state(imageElement.clientWidth);
@@ -124,7 +127,7 @@
 		})
 	);
 
-	const boudingBoxPixel = $derived(toPixel(boundingBox));
+	const boudingBoxesPixels = $derived(mapValues(boundingBoxes, toPixel));
 
 	let creatingBoundingBox = $state(false);
 	let newBoundingBox = $derived(
@@ -132,6 +135,7 @@
 	);
 	$effect(() => newBoundingBox.setCreateMode(createMode));
 
+	let draggingImageId = $state('');
 	let draggingCorner = $state({
 		topleft: false,
 		topright: false,
@@ -193,17 +197,21 @@
 	style:top="{imageRect.y}px"
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
-	style:cursor={boundingBoxIsNonZero(boundingBox) ? 'unset' : 'crosshair'}
-	onmouseup={() => {
+	style:cursor={boundingBoxIsNonZero(boundingBoxes) ? 'unset' : 'crosshair'}
+	onmouseup={async () => {
 		draggingCorner.setAll(false);
-		if (creatingBoundingBox && newBoundingBox.ready) {
-			boundingBox = fromPixel(newBoundingBox.rect());
-			onchange?.(boundingBox);
+		draggingImageId = '';
+		const relativeBoundingBox = fromPixel(newBoundingBox.rect());
+		if (newBoundingBox.ready) {
+			if (creatingBoundingBox) {
+				const imageId = await oncreate?.(relativeBoundingBox);
+				boundingBoxes[imageId] = relativeBoundingBox;
+			} else {
+				boundingBoxes[draggingImageId] = relativeBoundingBox;
+				onchange?.(draggingImageId, relativeBoundingBox);
+			}
+
 			newBoundingBox.reset();
-			creatingBoundingBox = false;
-		}
-		if (createMode === 'clickanddrag') {
-			onchange?.(boundingBox);
 			creatingBoundingBox = false;
 		}
 	}}
@@ -213,7 +221,11 @@
 		const { left, top } = currentTarget.getBoundingClientRect();
 		const [x, y] = [clientX - left, clientY - top];
 		// Don't try registering new bounding box points if we're about to move/transform the existing one
-		if ((movable || transformable) && withinBoundingBox(boudingBoxPixel, { x, y })) return;
+		if (
+			(movable || transformable) &&
+			Object.values(boudingBoxesPixels).some((box) => withinBoundingBox(box, { x, y }))
+		)
+			return;
 		creatingBoundingBox = true;
 		newBoundingBox.registerPoint(x, y);
 	}}
@@ -224,6 +236,8 @@
 			newBoundingBox.registerMovement(movementX, movementY);
 			return;
 		}
+
+		const boundingBox = boundingBoxes[draggingImageId];
 
 		if (draggingCorner.isAll(true)) {
 			boundingBox.x += dx;
@@ -286,7 +300,7 @@
 			{#snippet bb({ x, y, width, height })}
 				({@render point(x, y)}) × [{@render point(width, height)}]
 			{/snippet}
-			bb {@render bb(boudingBoxPixel)}<br />
+			bb {@render bb(boudingBoxesPixels)}<br />
 			create {newBoundingBox.ready ? 'ready ' : ''}
 			{#if createMode === 'clickanddrag'}
 				{@render bb(newBoundingBox.clickanddrag)}
@@ -319,15 +333,15 @@
 			style:height="{newBoundingBox.height}px"
 		></div>
 	{/if}
-	{#if boundingBoxIsNonZero(boundingBox)}
+	{#if boundingBoxIsNonZero(boundingBoxes)}
 		<div
 			class="boundingbox"
 			class:movable
 			class:precise={!movable && !transformable}
-			style:left="{boudingBoxPixel.x}px"
-			style:top="{boudingBoxPixel.y}px"
-			style:width="{boudingBoxPixel.width}px"
-			style:height="{boudingBoxPixel.height}px"
+			style:left="{boudingBoxesPixels.x}px"
+			style:top="{boudingBoxesPixels.y}px"
+			style:width="{boudingBoxesPixels.width}px"
+			style:height="{boudingBoxesPixels.height}px"
 			onmousedown={() => {
 				if (movable) draggingCorner.setAll(true);
 			}}

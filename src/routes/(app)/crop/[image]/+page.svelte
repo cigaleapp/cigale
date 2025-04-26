@@ -14,8 +14,8 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import * as idb from '$lib/idb.svelte.js';
-	import { imageIdToFileId, imagesOfImageFile } from '$lib/images';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import { imageFileIds, imageIdToFileId, imagesOfImageFile } from '$lib/images';
+	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -107,38 +107,39 @@
 		document.body.style.cursor = activeTool.cursor || 'auto';
 	});
 
+	/**
+	 * @type {Record<string, import('$lib/metadata.js').RuntimeValue<'boundingbox'>>}
+	 */
 	const boundingBoxes = $derived(
-		/**
-		 * @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>[]}
-		 */ (images.map((img) => img.metadata[uiState.cropMetadataId]?.value).filter(Boolean))
+		Object.fromEntries(
+			images
+				.map(({ metadata, id }) => [
+					id,
+					assertIs('boundingbox', metadata[uiState.cropMetadataId]?.value)
+				])
+				.filter(([, value]) => Boolean(value))
+		)
 	);
 	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(fileId)));
-	const sortedImageIds = $derived(
-		idb.tables.Image.state.map((img) => img.id).toSorted(idb.idComparator)
-	);
-	const unconfirmedCropImagesId = $derived(
-		idb.tables.Image.state
-			.filter((img) => !hasConfirmedCrop(img))
-			.map((img) => img.id)
-			.toSorted(idb.idComparator)
-	);
-	const previousImageId = $derived.by(() => {
-		const idx = sortedImageIds.indexOf(fileId) - 1;
+	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idb.idComparator));
+	const unconfirmedCropFileIds = $derived(sortedFileIds.filter((id) => !hasConfirmedCrop(id)));
+	const prevFileId = $derived.by(() => {
+		const idx = sortedFileIds.indexOf(fileId) - 1;
 		if (idx < 0) return undefined;
-		return sortedImageIds.at(idx);
+		return sortedFileIds.at(idx);
 	});
-	const nextImageId = $derived.by(() => {
-		const idx = sortedImageIds.indexOf(fileId) + 1;
-		if (idx >= sortedImageIds.length) return undefined;
-		return sortedImageIds.at(idx);
+	const nextFileId = $derived.by(() => {
+		const idx = sortedFileIds.indexOf(fileId) + 1;
+		if (idx >= sortedFileIds.length) return undefined;
+		return sortedFileIds.at(idx);
 	});
 	const nextUnconfirmedImageId = $derived.by(() => {
-		const idx = unconfirmedCropImagesId.indexOf(fileId) + 1;
-		if (idx >= unconfirmedCropImagesId.length) return undefined;
-		return unconfirmedCropImagesId.at(idx);
+		const idx = unconfirmedCropFileIds.indexOf(fileId) + 1;
+		if (idx >= unconfirmedCropFileIds.length) return undefined;
+		return unconfirmedCropFileIds.at(idx);
 	});
-	const croppedImagesCount = $derived(idb.tables.Image.state.filter(hasCrop).length);
-	const confirmedCropsCount = $derived(idb.tables.Image.state.filter(hasConfirmedCrop).length);
+	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
+	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
 	/** @type {Record<string, undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
@@ -171,10 +172,7 @@
 	 * @param {string} imageFileId
 	 */
 	function hasCrop(imageFileId) {
-		return imagesOfImageFile(imageFileId).every(image => 
-			image.metadata[uiState.cropMetadataId] &&
-			boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value)
-		));
+		return imagesOfImageFile(imageFileId).every((image) => image.metadata[uiState.cropMetadataId]);
 	}
 
 	/**
@@ -183,7 +181,11 @@
 	function hasConfirmedCrop(imageFileId) {
 		if (!imageFileId) return false;
 		if (!hasCrop(imageFileId)) return false;
-		return imagesOfImageFile(imageFileId).every(image => image.metadata[uiState.cropMetadataId].manuallyModified);
+		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
+	}
+
+	function imageHasConfirmedCrop(image) {
+		return image.metadata[uiState.cropMetadataId]?.manuallyModified;
 	}
 
 	/**
@@ -212,23 +214,19 @@
 		});
 	}
 
-	const canRevertToInferedCrop = $derived(Object.fromEntries(
-	images.map(({id}) => [id, id in initialCrops])
-	));
+	const canRevertToInferedCrop = $derived(
+		Object.fromEntries(images.map(({ id }) => [id, id in initialCrops]))
+	);
 
 	/**
+	 * @param {import('$lib/database.js').Image} image the image we're confirming a new crop for
 	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 */
-	async function onConfirmCrop(newBoundingBox, flashConfirmedOverlay = true) {
-		const image = idb.tables.Image.state.find((image) => image.id === fileId);
-		if (!image) {
-			toasts.error(`Image ${fileId} introuvable, impossible de sauvegarder le recadrage`);
-			return;
-		}
-
-		const willFlashConfirmedOverlay = flashConfirmedOverlay && !hasConfirmedCrop(fileId);
-
+	async function onConfirmCrop(image, newBoundingBox, flashConfirmedOverlay = true) {
+		// Flash if the callsite asked for it and this is the last image before the file is considered confirmed
+		const willFlashConfirmedOverlay =
+			flashConfirmedOverlay && images.filter(imageHasConfirmedCrop).length === images.length - 1;
 		const willAutoskip =
 			// The user has auto-skip enabled
 			getSettings().cropAutoNext &&
@@ -253,7 +251,7 @@
 			value: toCenteredCoords(newBoundingBox),
 			confidence: 1,
 			// Put the neural-network-inferred (initial) value in the alternatives as a backup
-			alternatives: initialCrops[fileId]
+			alternatives: initialCrops[fileId] ? [initialCrops[fileId]] : undefined,
 			manuallyModified: true
 		});
 
@@ -264,12 +262,17 @@
 		}
 
 		if (willAutoskip) {
-			await goto(nextImageId ? `#/crop/${nextImageId}` : `#/classify`);
+			await goto(nextFileId ? `#/crop/${nextFileId}` : `#/classify`);
 		}
 	}
 
 	async function moveToNextUnconfirmed() {
-		await onConfirmCrop(toTopLeftCoords(boundingBox));
+		const imagesAndBoxes = images.map((img) => /** @type {const}*/ ([img, boundingBoxes[img.id]]));
+
+		for (const [image, box] of imagesAndBoxes) {
+			await onConfirmCrop(image, toTopLeftCoords(box));
+		}
+
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
 	}
 
@@ -285,18 +288,18 @@
 	onMount(() => {
 		uiState.keybinds['ArrowLeft'] = {
 			help: 'Image précédente',
-			when: () => Boolean(previousImageId),
-			do: () => goto(`#/crop/${previousImageId}`)
+			when: () => Boolean(prevFileId),
+			do: () => goto(`#/crop/${prevFileId}`)
 		};
 		uiState.keybinds['Shift+Space'] = {
 			help: 'Image précédente',
-			when: () => Boolean(previousImageId),
-			do: () => goto(`#/crop/${previousImageId}`)
+			when: () => Boolean(prevFileId),
+			do: () => goto(`#/crop/${prevFileId}`)
 		};
 		uiState.keybinds['ArrowRight'] = {
 			help: 'Image suivante',
-			when: () => Boolean(nextImageId),
-			do: () => goto(`#/crop/${nextImageId}`)
+			when: () => Boolean(nextFileId),
+			do: () => goto(`#/crop/${nextFileId}`)
 		};
 		uiState.keybinds['Space'] = {
 			help: 'Continuer',
@@ -367,7 +370,7 @@
 			<DraggableBoundingBox
 				{...activeTool}
 				{imageElement}
-				boundingBox={toTopLeftCoords(boundingBox)}
+				boundingBoxes={toTopLeftCoords(boundingBox)}
 				onchange={(newBox) => {
 					onConfirmCrop(newBox);
 				}}
@@ -419,7 +422,7 @@
 		<section class="progress">
 			{#snippet percent(/** @type {number} */ value)}
 				<code>
-					{Math.round((value / sortedImageIds.length) * 100)}%
+					{Math.round((value / sortedFileIds.length) * 100)}%
 				</code>
 			{/snippet}
 
@@ -429,7 +432,7 @@
 					Images avec recadrage
 					{@render percent(croppedImagesCount)}
 				</p>
-				<ProgressBar alwaysActive progress={croppedImagesCount / sortedImageIds.length} />
+				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
 			</div>
 			<div class="bar">
 				<p>
@@ -437,30 +440,30 @@
 					Recadrages confirmés
 					{@render percent(confirmedCropsCount)}
 				</p>
-				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedImageIds.length} />
+				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
 			</div>
 		</section>
 		<nav>
 			<div class="navigation">
 				<ButtonIcon
-					disabled={!previousImageId}
+					disabled={!prevFileId}
 					help="Image précédente"
 					keyboard="ArrowLeft"
 					onclick={() => {
-						goto(`#/crop/${previousImageId}`);
+						goto(`#/crop/${prevFileId}`);
 					}}
 				>
 					<IconPrev />
 				</ButtonIcon>
 				<code>
-					{sortedImageIds.indexOf(fileId) + 1}⁄{sortedImageIds.length}
+					{sortedFileIds.indexOf(fileId) + 1}⁄{sortedFileIds.length}
 				</code>
 				<ButtonIcon
-					disabled={!nextImageId}
+					disabled={!nextFileId}
 					help="Image suivante"
 					keyboard="ArrowRight"
 					onclick={() => {
-						goto(`#/crop/${nextImageId}`);
+						goto(`#/crop/${nextFileId}`);
 					}}
 				>
 					<IconNext />
