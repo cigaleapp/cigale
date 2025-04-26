@@ -1,7 +1,18 @@
 import { type } from 'arktype';
-import { sign } from './utils';
+import { clamp, sign } from './utils';
 
 export class NewBoundingBox {
+	/**
+	 * @type {import('./BoundingBoxes.svelte').Rect}
+	 * Limits for the resulting bounding box. Coordinates will be clamped to these values.
+	 */
+	limits = {
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0
+	};
+
 	/** @type {'clickanddrag' | '2point' | '4point'|'off'} */
 	createMode = $state('clickanddrag');
 
@@ -49,6 +60,21 @@ export class NewBoundingBox {
 
 		return false;
 	});
+
+	/**
+	 *
+	 * @param {import('./BoundingBoxes.svelte').Rect} rect
+	 * @returns {import('./BoundingBoxes.svelte').Rect}
+	 */
+	clamp(rect) {
+		console.log('clamping', rect, this.limits);
+		return {
+			x: clamp(rect.x, this.limits.x, this.limits.width),
+			y: clamp(rect.y, this.limits.y, this.limits.height),
+			width: clamp(rect.width, 0, this.limits.width - rect.x),
+			height: clamp(rect.height, 0, this.limits.height - rect.y)
+		};
+	}
 
 	x = $derived.by(() => {
 		if (this.createMode === 'clickanddrag') return this.clickanddrag.x;
@@ -140,12 +166,12 @@ export class NewBoundingBox {
 	}
 
 	rect() {
-		return {
+		return this.clamp({
 			x: this.x,
 			y: this.y,
 			width: this.width,
 			height: this.height
-		};
+		});
 	}
 
 	reset() {
@@ -162,7 +188,13 @@ export class NewBoundingBox {
 		this.points = [];
 	}
 
-	constructor() {
+	/**
+	 *
+	 * @param {object} options
+	 * @param {typeof this.limits} options.limits
+	 */
+	constructor({ limits }) {
+		this.limits = limits;
 		this.clickanddrag = {
 			x: 0,
 			y: 0,

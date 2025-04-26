@@ -126,7 +126,9 @@
 	const boudingBoxPixel = $derived(toPixel(boundingBox));
 
 	let creatingBoundingBox = $state(false);
-	let newBoundingBox = $state(new NewBoundingBox());
+	let newBoundingBox = $derived(
+		new NewBoundingBox({ limits: { x: 0, y: 0, width: imageRect.width, height: imageRect.height } })
+	);
 	$effect(() => newBoundingBox.setCreateMode(createMode));
 
 	let draggingCorner = $state({
