@@ -200,9 +200,9 @@ const MetadataType = type("'string'", '@', 'du texte')
 	.or(type("'location'", '@', 'un objet avec deux nombres, `latitude` et `longitude`'))
 	.or(
 		type(
-			"'boundingboxes'",
+			"'boundingbox'",
 			'@',
-			"une liste d'objets représentants des régions rectangulaires au format YOLO, définies par leur point central avec `x` et `y`, et leur largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
+			"un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
 		)
 	);
 
@@ -217,7 +217,7 @@ export const METADATA_TYPES = {
 	enum: 'énumération',
 	date: 'date',
 	location: 'localisation',
-	boundingboxes: 'boîtes de recadrage'
+	boundingbox: 'boîte de recadrage'
 };
 
 const MetadataMergeMethod = type(
