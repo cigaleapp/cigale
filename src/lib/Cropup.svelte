@@ -14,12 +14,16 @@ show a pop up to crop an image
 	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
 
 	/**
+	 * @typedef {import('$lib/BoundingBoxes.svelte.js').Rect} Rect
+	 */
+
+	/**
 	 * @typedef Props
 	 * @type {object}
 	 * @property {string} key a unique string, used to identify the modal in the page's state.
 	 * @property {() => void} [opener] a function you can bind to, to open the modal
-	 * @property {{x: number, y: number, width: number, height: number}[]} boundingBoxes the bounding boxes to display
-	 * @property {(boundingbox:{x: number, y: number, width: number, height: number}) => void} onconfirm a function to call when the user confirms the crop. the bounding box returned is in absolute pixel coordinates, not relative ones
+	 * @property {Rect[]} boundingBoxes the bounding boxes to display
+	 * @property {(boundingbox: Rect) => void} onconfirm a function to call when the user confirms the crop. the bounding box returned is in absolute pixel coordinates, not relative ones
 	 * @property {string} id the id of the image
 	 */
 
@@ -34,7 +38,7 @@ show a pop up to crop an image
 
 	const image = $derived(uiState.previewURLs.get(imageIdToFileId(id)));
 
-	/** @type {{x: number, y: number, width: number, height: number}[]} */
+	/** @type {Rect[]} */
 	let BBout = [];
 	for (let i = 0; i < boundingBoxes.length; i++) {
 		BBout.push({
