@@ -74,6 +74,7 @@
 			await refreshImageRect();
 		});
 
+		resizeObserver.observe(imageElement);
 		mutationObserver.observe(imageElement, {
 			attributes: true,
 			attributeFilter: ['src']
