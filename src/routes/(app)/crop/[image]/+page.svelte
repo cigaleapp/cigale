@@ -26,11 +26,13 @@
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
+	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { mapValues, pick } from '$lib/utils';
 	import { formatISO } from 'date-fns';
 	import { onDestroy, onMount } from 'svelte';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
+	import IconRevert from '~icons/ph/arrow-arc-left';
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
 	import IconContinue from '~icons/ph/check';
@@ -196,31 +198,41 @@
 		return image.metadata[uiState.cropMetadataId]?.manuallyModified;
 	}
 
-	// /**
-	//  * @param {string} imageId
-	//  */
-	// async function revertToInferedCrop(imageId) {
-	// 	const initialCrop = initialCrops[imageId];
-	// 	// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
-	// 	if (!initialCrop) {
-	// 		toasts.error(
-	// 			`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
-	// 		);
-	// 		return;
-	// 	}
+	/**
+	 * @param {string} imageId
+	 */
+	async function revertToInferedCrop(imageId) {
+		const initialCrop = initialCrops[imageId];
+		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
+		if (!initialCrop) {
+			toasts.error(
+				`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
+			);
+			return;
+		}
 
-	// 	await storeMetadataValue({
-	// 		subjectId: fileId,
-	// 		metadataId: uiState.cropMetadataId,
-	// 		type: 'boundingbox',
-	// 		...initialCrop
-	// 	});
+		await storeMetadataValue({
+			subjectId: imageId,
+			metadataId: uiState.cropMetadataId,
+			type: 'boundingbox',
+			manuallyModified: false,
+			...initialCrop
+		});
 
-	// 	await deleteMetadataValue({
-	// 		metadataId: uiState.classificationMetadataId,
-	// 		subjectId: fileId
-	// 	});
-	// }
+		await deleteMetadataValue({
+			metadataId: uiState.classificationMetadataId,
+			subjectId: imageId
+		});
+	}
+
+	const revertableCrops = $derived(
+		Object.fromEntries(
+			images.map((image) => [
+				image.id,
+				initialCrops[image.id] && image.metadata[uiState.cropMetadataId].manuallyModified
+			])
+		)
+	);
 
 	/**
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
@@ -229,6 +241,7 @@
 	 * @returns {Promise<string>} the ID of the image we just modified/created
 	 */
 	async function onConfirmCrop(imageId, newBoundingBox, flashConfirmedOverlay = true) {
+		console.log('onConfirmCrop', imageId, newBoundingBox);
 		// Flash if the callsite asked for it and this is the last image before the file is considered confirmed
 		const willFlashConfirmedOverlay =
 			flashConfirmedOverlay && images.filter(imageHasConfirmedCrop).length === images.length - 1;
@@ -454,18 +467,13 @@
 			<ul>
 				{#each images.filter(({ id }) => id in boundingBoxes) as image, i (image.id)}
 					{@const box = boundingBoxes[image.id]}
-					{@const { w, h, x, y } = mapValues(
-						toPixelCoords(uiState.currentProtocol)(box),
-						Math.round
-					)}
+					{@const { w, h } = mapValues(toPixelCoords(uiState.currentProtocol)(box), Math.round)}
 					<li class:unfocused={focusedImageId && focusedImageId !== image.id}>
 						<img src={uiState.getPreviewURL(image.fileId)} alt="" class="thumb" />
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
 							<p class="dimensions">
 								<code>{w} × {h}</code>
-								<code use:tooltip={'Coordonnées du centre'}>@</code>
-								<code>{x}, {y}</code>
 							</p>
 						</div>
 						<div class="actions">
@@ -478,6 +486,13 @@
 									<IconFocus />
 								</ButtonIcon>
 							{/if}
+							<ButtonIcon
+								help="Revenir au recadrage d'origine"
+								disabled={!revertableCrops[image.id]}
+								onclick={async () => await revertToInferedCrop(image.id)}
+							>
+								<IconRevert />
+							</ButtonIcon>
 							<ButtonIcon
 								help="Supprimer cette boîte"
 								onclick={async () => {
