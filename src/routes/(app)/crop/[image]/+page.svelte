@@ -575,6 +575,12 @@
 						</div>
 					</li>
 				{/each}
+				<li class="create-hint">
+					<p>
+						Pour créer une nouvelle boîte,<wbr />
+						utilisez les outils <IconToolDragCrop />, <IconTwoPointCrop /> ou <IconFourPointCrop />
+					</p>
+				</li>
 			</ul>
 		</section>
 		<section class="progress">
@@ -816,11 +822,21 @@
 		opacity: 0.5;
 	}
 
-	.boxes img {
+	.boxes li.create-hint {
+		color: var(--gay);
+	}
+
+	.boxes li.create-hint p,
+	.boxes li.create-hint p :global(.icon) {
+		vertical-align: middle;
+	}
+
+	.boxes .thumb {
 		--size: 4rem;
 		width: var(--size);
 		height: var(--size);
 		object-fit: cover;
+		border-radius: var(--corner-radius);
 	}
 
 	.boxes .actions {
