@@ -355,9 +355,10 @@
 				<div
 					class="side {position}"
 					class:draggable={transformable}
-					class:dragging={draggingCorner[position]}
+					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onmousedown={(e) => {
 						if (!transformable) return;
+						draggingImageId = imageId;
 						draggingCorner[position] = true;
 						e.stopPropagation();
 					}}
@@ -372,9 +373,10 @@
 				<div
 					class="corner {position}"
 					class:draggable={transformable}
-					class:dragging={draggingCorner[position]}
+					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onmousedown={(e) => {
 						if (!transformable) return;
+						draggingImageId = imageId;
 						draggingCorner[position] = true;
 						e.stopPropagation();
 					}}

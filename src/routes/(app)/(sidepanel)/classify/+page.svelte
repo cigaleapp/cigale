@@ -34,12 +34,17 @@
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
-		toAreaObservationProps(tables.Image.state, tables.Observation.state, {
-			previewURL: (image) =>
-				uiState.getPreviewURL(image, 'cropped') ?? uiState.getPreviewURL(image, 'full'),
+		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
+			previewURL: (item) =>
+				typeof item === 'string'
+					? uiState.getPreviewURL(item, 'full')
+					: (uiState.getPreviewURL(item?.id, 'cropped') ??
+						uiState.getPreviewURL(item?.fileId, 'full')),
 			showBoundingBoxes: (image) => !uiState.hasPreviewURL(image, 'cropped'),
-			isLoaded: (image) =>
-				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsClassified(image)
+			isLoaded: (item) =>
+				typeof item === 'string'
+					? false
+					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
 		})
 	);
 
@@ -68,7 +73,7 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const inputSettings = uiState.currentProtocol.inference?.detection?.input ?? {
+		const inputSettings = uiState.currentProtocol.crop?.infer?.input ?? {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT
 		};
@@ -85,7 +90,7 @@
 		const nimg = await applyBBOnTensor([x, y, width, height], img);
 
 		// TODO persist after page reload?
-		uiState.croppedPreviewURLs.set(imageIdToFileId(id), nimg.toDataURL());
+		uiState.setPreviewURL(id, nimg.toDataURL(), 'cropped');
 
 		const [[scores]] = await classify(uiState.currentProtocol, [[nimg]], classifmodel, uiState, 0);
 

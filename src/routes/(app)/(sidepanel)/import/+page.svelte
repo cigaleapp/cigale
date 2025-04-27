@@ -27,10 +27,11 @@
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
 	const images = $derived(
-		toAreaObservationProps(fileIds, [], {
+		toAreaObservationProps(fileIds, [], [], {
 			isLoaded: (fileId) =>
 				Boolean(
-					uiState.currentProtocol &&
+					typeof fileId === 'string' &&
+						uiState.currentProtocol &&
 						uiState.hasPreviewURL(fileId) &&
 						imageIsAnalyzed(uiState.currentProtocol, fileId)
 				)
@@ -240,7 +241,7 @@
 	{#if getSettings().showTechnicalMetadata}
 		<section class="debug">
 			{#snippet displayIter(set)}
-				{'{'} {[...$state.snapshot(set)].join(' ')} {'}'}
+				{'{'} {[...$state.snapshot(set)].join(' ')} }
 			{/snippet}
 			<code>
 				loading {@render displayIter(uiState.loadingImages)} <br />
