@@ -35,12 +35,13 @@
 	import IconNext from '~icons/ph/caret-right';
 	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
+	import IconFocus from '~icons/ph/crosshair-simple';
 	import IconFourPointCrop from '~icons/ph/number-circle-four';
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
 	import IconConfirmedCrop from '~icons/ph/seal-check';
 	import IconToolDragCrop from '~icons/ph/selection-plus';
-	import IconDelete from '~icons/ph/trash';
 	import IconGallery from '~icons/ph/squares-four';
+	import IconDelete from '~icons/ph/trash';
 
 	const fileId = $derived(page.params.image);
 	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));
@@ -108,6 +109,8 @@
 	]);
 
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
+
+	let focusedImageId = $state('');
 
 	/**
 	 * @type {Record<string, import('$lib/metadata.js').RuntimeValue<'boundingbox'>>}
@@ -413,7 +416,10 @@
 			<DraggableBoundingBox
 				{...activeTool}
 				{imageElement}
-				boundingBoxes={mapValues(boundingBoxes, toTopLeftCoords)}
+				boundingBoxes={mapValues(
+					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
+					toTopLeftCoords
+				)}
 				onchange={(imageId, box) => onConfirmCrop(imageId, box)}
 				oncreate={(box) => onConfirmCrop(null, box)}
 			/>
@@ -446,13 +452,13 @@
 		</section>
 		<section class="boxes">
 			<ul>
-				{#each images as image, i (image.id)}
+				{#each images.filter(({ id }) => id in boundingBoxes) as image, i (image.id)}
 					{@const box = boundingBoxes[image.id]}
 					{@const { w, h, x, y } = mapValues(
 						toPixelCoords(uiState.currentProtocol)(box),
 						Math.round
 					)}
-					<li>
+					<li class:unfocused={focusedImageId && focusedImageId !== image.id}>
 						<img src={uiState.getPreviewURL(image.fileId)} alt="" class="thumb" />
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
@@ -463,10 +469,26 @@
 							</p>
 						</div>
 						<div class="actions">
+							{#if Object.values(boundingBoxes).length > 1}
+								<ButtonIcon
+									help="Masquer les autres boîtes"
+									onclick={() => (focusedImageId = focusedImageId === image.id ? '' : image.id)}
+									crossout={focusedImageId === image.id}
+								>
+									<IconFocus />
+								</ButtonIcon>
+							{/if}
 							<ButtonIcon
 								help="Supprimer cette boîte"
 								onclick={async () => {
-									await idb.tables.Image.remove(image.id);
+									if (images.length === 1) {
+										await deleteMetadataValue({
+											metadataId: uiState.cropMetadataId,
+											subjectId: image.id
+										});
+									} else {
+										await idb.tables.Image.remove(image.id);
+									}
 								}}
 							>
 								<IconDelete />
@@ -707,6 +729,10 @@
 		gap: 1em;
 		align-items: center;
 		padding: 0 1em;
+	}
+
+	.boxes li.unfocused {
+		opacity: 0.5;
 	}
 
 	.boxes img {
