@@ -1,6 +1,15 @@
 import { type } from 'arktype';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
+export const anyBoundingBox = type({
+	x: 'number',
+	y: 'number'
+}).and(type.or({ width: 'number', height: 'number' }, { w: 'number', h: 'number' }));
+
+/**
+ * @typedef {typeof anyBoundingBox.infer} AnyBoundingBox
+ */
+
 /**
  *
  * @param {object} param0
@@ -10,9 +19,9 @@ import { TARGETHEIGHT, TARGETWIDTH } from './inference';
  */
 export function coordsScaler({ x: xwise, y: ywise }) {
 	/**
-	 * @template {{x: number; y: number} | ({x: number, y: number} & ({w: number; h: number} | {width: number; height: number}))} Shape
-	 * @param {Shape} param0
-	 * @returns {Shape}
+	 * @template {AnyBoundingBox} BoundingBox
+	 * @param {BoundingBox} param0
+	 * @returns {BoundingBox}
 	 */
 	return ({ x, y, ...wh }) => {
 		const [newx, newy] = [x * xwise, y * ywise];
@@ -115,3 +124,31 @@ export const rect = type({
 /**
  * @typedef {typeof rect.infer} Rect
  */
+
+/**
+ *
+ * @param {AnyBoundingBox} a
+ * @param {AnyBoundingBox} b
+ */
+export function coordsDifference(a, b) {
+	let combinedDifference = 0;
+
+	combinedDifference += Math.abs(a.x - b.x);
+	combinedDifference += Math.abs(a.y - b.y);
+	combinedDifference += Math.abs(('width' in a ? a.width : a.w) - ('width' in b ? b.width : b.w));
+	combinedDifference += Math.abs(
+		('height' in a ? a.height : a.h) - ('height' in b ? b.height : b.h)
+	);
+
+	return combinedDifference;
+}
+
+/**
+ *
+ * @param {AnyBoundingBox} a
+ * @param {AnyBoundingBox} b
+ * @param {number} tolerance
+ */
+export function coordsAreEqual(a, b, tolerance = 0) {
+	return coordsDifference(a, b) <= tolerance;
+}

@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
+		coordsAreEqual,
 		toCenteredCoords,
 		toPixelCoords,
 		toTopLeftCoords
@@ -10,6 +11,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -31,15 +33,17 @@
 	import { mapValues, pick } from '$lib/utils';
 	import { formatISO } from 'date-fns';
 	import { onDestroy, onMount } from 'svelte';
-	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconRevert from '~icons/ph/arrow-arc-left';
+	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
 	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFocus from '~icons/ph/crosshair-simple';
+	import IconNeuralNet from '~icons/ph/graph';
 	import IconFourPointCrop from '~icons/ph/number-circle-four';
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
+	import IconUnconfirmedCrop from '~icons/ph/seal';
 	import IconConfirmedCrop from '~icons/ph/seal-check';
 	import IconToolDragCrop from '~icons/ph/selection-plus';
 	import IconGallery from '~icons/ph/squares-four';
@@ -152,14 +156,16 @@
 	const initialCrops = $derived(
 		Object.fromEntries(
 			images.map((image) => {
+				if (!image.metadata[uiState.cropMetadataId]) {
+					return [image.id, undefined];
+				}
+
+				const { alternatives, value, confidence, manuallyModified } =
+					image.metadata[uiState.cropMetadataId];
+
 				// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
-				if (
-					image.metadata[uiState.cropMetadataId]?.alternatives &&
-					Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
-				) {
-					const [[stringValue, confidence]] = Object.entries(
-						image.metadata[uiState.cropMetadataId].alternatives
-					);
+				if (alternatives && Object.entries(alternatives).length > 0) {
+					const [[stringValue, confidence]] = Object.entries(alternatives);
 					return [
 						image.id,
 						{
@@ -169,8 +175,14 @@
 					];
 				}
 
+				// If the main value is manuallyModified, and we have no alternatives,
+				// it means that the box never had a neural network-inferred value (or it was lost somehow)
+				if (manuallyModified) {
+					return [image.id, undefined];
+				}
+
 				// If this is the first time the user is re-cropping the box, this value will be the main values.
-				return [image.id, pick(image.metadata[uiState.cropMetadataId], 'value', 'confidence')];
+				return [image.id, { value, confidence }];
 			})
 		)
 	);
@@ -196,6 +208,26 @@
 	 */
 	function imageHasConfirmedCrop(image) {
 		return image.metadata[uiState.cropMetadataId]?.manuallyModified;
+	}
+
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 * @param {boolean} confirmed
+	 */
+	async function changeCropConfirmedStatus(image, confirmed) {
+		const { value, confidence, alternatives } = image.metadata[uiState.cropMetadataId];
+		await storeMetadataValue({
+			metadataId: uiState.cropMetadataId,
+			subjectId: image.id,
+			type: 'boundingbox',
+			manuallyModified: confirmed,
+			value,
+			confidence,
+			alternatives: Object.entries(alternatives).map(([jsonValue, confidence]) => ({
+				value: JSON.parse(jsonValue),
+				confidence
+			}))
+		});
 	}
 
 	/**
@@ -229,7 +261,11 @@
 		Object.fromEntries(
 			images.map((image) => [
 				image.id,
-				initialCrops[image.id] && image.metadata[uiState.cropMetadataId].manuallyModified
+				initialCrops[image.id] &&
+					!coordsAreEqual(
+						initialCrops[image.id].value,
+						image.metadata[uiState.cropMetadataId].value
+					)
 			])
 		)
 	);
@@ -274,7 +310,7 @@
 				value: toCenteredCoords(newBoundingBox),
 				confidence: 1,
 				// Put the neural-network-inferred (initial) value in the alternatives as a backup
-				alternatives: initialCrops[fileId] ? [initialCrops[fileId]] : undefined,
+				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : undefined,
 				manuallyModified: true
 			});
 		} else if (images.length === 1 && firstImage && !firstImage.metadata[uiState.cropMetadataId]) {
@@ -333,6 +369,11 @@
 		}
 
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
+	}
+
+	function roundedPixelDimensions(box) {
+		const { w, h } = mapValues(toPixelCoords(uiState.currentProtocol)(box), Math.round);
+		return [w, h];
 	}
 
 	function goToGallery() {
@@ -467,27 +508,50 @@
 			<ul>
 				{#each images.filter(({ id }) => id in boundingBoxes) as image, i (image.id)}
 					{@const box = boundingBoxes[image.id]}
-					{@const { w, h } = mapValues(toPixelCoords(uiState.currentProtocol)(box), Math.round)}
+					{@const initBox = initialCrops[image.id]}
+					{@const [w, h] = roundedPixelDimensions(box)}
 					<li class:unfocused={focusedImageId && focusedImageId !== image.id}>
 						<img src={uiState.getPreviewURL(image.fileId)} alt="" class="thumb" />
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
 							<p class="dimensions">
 								<code>{w} × {h}</code>
+								<!-- we have a neural-infered value only, put the confidence next to the value -->
+								{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
+									<sup>
+										<ConfidencePercentage value={initBox.confidence}>
+											<IconNeuralNet />
+										</ConfidencePercentage>
+									</sup>
+								{/if}
 							</p>
 						</div>
 						<div class="actions">
 							{#if Object.values(boundingBoxes).length > 1}
+								{@const isFocused = focusedImageId === image.id}
 								<ButtonIcon
-									help="Masquer les autres boîtes"
-									onclick={() => (focusedImageId = focusedImageId === image.id ? '' : image.id)}
-									crossout={focusedImageId === image.id}
+									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes"
+									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
+									crossout={isFocused}
 								>
 									<IconFocus />
 								</ButtonIcon>
 							{/if}
 							<ButtonIcon
-								help="Revenir au recadrage d'origine"
+								help="Marquer comme {imageHasConfirmedCrop(image) ? 'non' : ''} confirmé"
+								onclick={async () =>
+									changeCropConfirmedStatus(image, !imageHasConfirmedCrop(image))}
+							>
+								{#if imageHasConfirmedCrop(image)}
+									<IconConfirmedCrop />
+								{:else}
+									<IconUnconfirmedCrop />
+								{/if}
+							</ButtonIcon>
+							<ButtonIcon
+								help="Revenir au recadrage d'origine ({initBox
+									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${Math.round(initBox.confidence * 100)}% de confiance`
+									: 'indisponible'})"
 								disabled={!revertableCrops[image.id]}
 								onclick={async () => await revertToInferedCrop(image.id)}
 							>
@@ -757,9 +821,13 @@
 		object-fit: cover;
 	}
 
-	.boxes .dimensions {
+	/* .boxes .dimensions {
 		display: flex;
 		gap: 0.75em;
+	} */
+
+	.boxes .dimensions.initial {
+		font-size: 0.9em;
 	}
 
 	.boxes .actions {
