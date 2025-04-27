@@ -174,10 +174,11 @@ export async function resizeToMaxSize({ source }) {
 /**
  *
  * @param {string} imageFileId
+ * @param {import('$lib/database.js').Image[]} [images] look for images in this array instead of the database
  * @returns {import('$lib/database.js').Image[]}
  */
-export function imagesOfImageFile(imageFileId) {
-	return tables.Image.state.filter((img) => img.fileId === imageFileId);
+export function imagesOfImageFile(imageFileId, images = undefined) {
+	return (images ?? tables.Image.state).filter((img) => img.fileId === imageFileId);
 }
 
 /**
@@ -200,4 +201,16 @@ export function imagesByImageFile(imageFileIds) {
  */
 export function imageFileIds(images) {
 	return unique(images.map((image) => image.fileId).filter((id) => id !== undefined));
+}
+
+/**
+ * @param {string} imageId
+ * @returns {{ fileId: string; subindex: number }}
+ */
+export function parseImageId(imageId) {
+	const [fileId, subindex] = imageId.split('_', 2);
+	return {
+		fileId,
+		subindex: Number.parseInt(subindex, 10)
+	};
 }

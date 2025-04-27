@@ -30,9 +30,9 @@ import { assertIs } from './metadata';
  * @param {Image[]} images
  * @param {Observation[]} observations
  * @param {object} param2
- * @param {(imageFileId: Image | string) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
- * @param {(imageFileId: Image | string|undefined) => string | undefined} [param2.previewURL] show cropped versions of images on cards where possible.
- * @param {(imageFileId: string|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes
+ * @param {(imageOrFileId: Image | string) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
+ * @param {(imageOrFileId: Image | string|undefined) => string | undefined} [param2.previewURL] show cropped versions of images on cards where possible.
+ * @param {(fileId: string|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes
  * @returns {CardObservation[]}
  */
 export function toAreaObservationProps(
@@ -41,7 +41,7 @@ export function toAreaObservationProps(
 	observations,
 	{ isLoaded, previewURL, showBoundingBoxes }
 ) {
-	previewURL ??= (item) => uiState.getPreviewURL(typeof item === 'string' ? item : item.fileId);
+	previewURL ??= (item) => uiState.getPreviewURL(typeof item === 'string' ? item : item?.fileId);
 	showBoundingBoxes ??= () => true;
 	const imagesOfFiles = imagesByImageFile(imageFileIds);
 	return (
