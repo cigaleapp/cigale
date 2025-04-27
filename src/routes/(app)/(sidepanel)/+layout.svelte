@@ -111,7 +111,9 @@
 	);
 
 	const selectedHrefs = $derived(
-		selectedImages.map((image) => uiState.getPreviewURL(image)).filter((url) => url !== undefined)
+		selectedImages
+			.map((image) => uiState.getPreviewURL(image?.fileId))
+			.filter((url) => url !== undefined)
 	);
 
 	/** @type {Awaited<ReturnType<typeof mergeMetadataFromImagesAndObservations>>} */

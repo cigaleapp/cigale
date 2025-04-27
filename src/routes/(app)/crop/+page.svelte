@@ -14,8 +14,8 @@
 	});
 
 	const images = $derived(
-		toAreaObservationProps(imageFileIds(idb.tables.Image.state), [], {
-			isLoaded: uiState.hasPreviewURL.bind(uiState)
+		toAreaObservationProps(imageFileIds(idb.tables.Image.state), [], [], {
+			isLoaded: (item) => typeof item === 'string' && uiState.hasPreviewURL(item)
 		})
 	);
 </script>
