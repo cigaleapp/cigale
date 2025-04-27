@@ -200,18 +200,14 @@
 	style:cursor={boundingBoxIsNonZero(boundingBoxes) ? 'unset' : 'crosshair'}
 	onmouseup={async () => {
 		draggingCorner.setAll(false);
-		const relativeBoundingBox = fromPixel(newBoundingBox.rect());
-		if (newBoundingBox.ready) {
-			if (creatingBoundingBox) {
-				const imageId = await oncreate?.(relativeBoundingBox);
-				boundingBoxes[imageId] = relativeBoundingBox;
-			} else {
-				boundingBoxes[draggingImageId] = relativeBoundingBox;
-				onchange?.(draggingImageId, relativeBoundingBox);
-			}
-
+		if (creatingBoundingBox && newBoundingBox.ready) {
+			const relativeBoundingBox = fromPixel(newBoundingBox.rect());
+			const imageId = await oncreate?.(relativeBoundingBox);
+			boundingBoxes[imageId] = relativeBoundingBox;
 			newBoundingBox.reset();
 			creatingBoundingBox = false;
+		} else {
+			onchange?.(draggingImageId, boundingBoxes[draggingImageId]);
 		}
 		draggingImageId = '';
 	}}
