@@ -4,6 +4,7 @@
 	import {
 		boundingBoxIsNonZero,
 		toCenteredCoords,
+		toPixelCoords,
 		toTopLeftCoords
 	} from '$lib/BoundingBoxes.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -18,7 +19,8 @@
 		imageFileIds,
 		imageIdToFileId,
 		imagesOfImageFile,
-		imageId as makeImageId
+		imageId as makeImageId,
+		parseImageId
 	} from '$lib/images';
 	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
@@ -37,10 +39,11 @@
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
 	import IconConfirmedCrop from '~icons/ph/seal-check';
 	import IconToolDragCrop from '~icons/ph/selection-plus';
+	import IconDelete from '~icons/ph/trash';
 	import IconGallery from '~icons/ph/squares-four';
 
 	const fileId = $derived(page.params.image);
-	const images = $derived(imagesOfImageFile(fileId));
+	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));
 	const firstImage = $derived(images.at(0));
 
 	$effect(() => seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` }));
@@ -105,10 +108,6 @@
 	]);
 
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
-
-	$effect(() => {
-		document.body.style.cursor = activeTool.cursor || 'auto';
-	});
 
 	/**
 	 * @type {Record<string, import('$lib/metadata.js').RuntimeValue<'boundingbox'>>}
@@ -224,6 +223,7 @@
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
 	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
+	 * @returns {Promise<string>} the ID of the image we just modified/created
 	 */
 	async function onConfirmCrop(imageId, newBoundingBox, flashConfirmedOverlay = true) {
 		// Flash if the callsite asked for it and this is the last image before the file is considered confirmed
@@ -249,8 +249,8 @@
 
 		let newImageId = '';
 
-		// We're modifying an existing cropbox
 		if (imageId) {
+			// We're modifying an existing cropbox
 			await storeMetadataValue({
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId,
@@ -261,8 +261,8 @@
 				alternatives: initialCrops[fileId] ? [initialCrops[fileId]] : undefined,
 				manuallyModified: true
 			});
-			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
 		} else if (images.length === 1 && firstImage && !firstImage.metadata[uiState.cropMetadataId]) {
+			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
 			newImageId = firstImage.id;
 			await storeMetadataValue({
 				metadataId: uiState.cropMetadataId,
@@ -273,9 +273,12 @@
 				manuallyModified: true,
 				alternatives: []
 			});
-			// We're creating a 2+nd cropbox
 		} else {
-			newImageId = makeImageId(fileId, images.length);
+			// We're creating a 2+nd cropbox
+			newImageId = makeImageId(
+				fileId,
+				Math.max(...images.map(({ id }) => parseImageId(id).subindex)) + 1
+			);
 			await idb.tables.Image.set({
 				id: newImageId,
 				filename: firstImage?.filename ?? '',
@@ -440,6 +443,38 @@
 					</h1>
 				{/if}
 			</div>
+		</section>
+		<section class="boxes">
+			<ul>
+				{#each images as image, i (image.id)}
+					{@const box = boundingBoxes[image.id]}
+					{@const { w, h, x, y } = mapValues(
+						toPixelCoords(uiState.currentProtocol)(box),
+						Math.round
+					)}
+					<li>
+						<img src={uiState.getPreviewURL(image.fileId)} alt="" class="thumb" />
+						<div class="text">
+							<p class="index">Boîte #{i + 1}</p>
+							<p class="dimensions">
+								<code>{w} × {h}</code>
+								<code use:tooltip={'Coordonnées du centre'}>@</code>
+								<code>{x}, {y}</code>
+							</p>
+						</div>
+						<div class="actions">
+							<ButtonIcon
+								help="Supprimer cette boîte"
+								onclick={async () => {
+									await idb.tables.Image.remove(image.id);
+								}}
+							>
+								<IconDelete />
+							</ButtonIcon>
+						</div>
+					</li>
+				{/each}
+			</ul>
 		</section>
 		<section class="progress">
 			{#snippet percent(/** @type {number} */ value)}
@@ -632,7 +667,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
-		margin-bottom: auto;
 	}
 
 	.info .filename-actions {
@@ -653,6 +687,42 @@
 		font-size: 0.8em;
 		color: var(--fg-primary);
 		align-items: center;
+	}
+
+	.boxes {
+		overflow-y: auto;
+		height: 100%;
+	}
+
+	.boxes ul {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+		list-style: none;
+		padding-left: 0;
+	}
+
+	.boxes li {
+		display: flex;
+		gap: 1em;
+		align-items: center;
+		padding: 0 1em;
+	}
+
+	.boxes img {
+		--size: 4rem;
+		width: var(--size);
+		height: var(--size);
+		object-fit: cover;
+	}
+
+	.boxes .dimensions {
+		display: flex;
+		gap: 0.75em;
+	}
+
+	.boxes .actions {
+		margin-left: auto;
 	}
 
 	.info .progress {

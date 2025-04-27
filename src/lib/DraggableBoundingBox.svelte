@@ -200,7 +200,6 @@
 	style:cursor={boundingBoxIsNonZero(boundingBoxes) ? 'unset' : 'crosshair'}
 	onmouseup={async () => {
 		draggingCorner.setAll(false);
-		draggingImageId = '';
 		const relativeBoundingBox = fromPixel(newBoundingBox.rect());
 		if (newBoundingBox.ready) {
 			if (creatingBoundingBox) {
@@ -214,6 +213,7 @@
 			newBoundingBox.reset();
 			creatingBoundingBox = false;
 		}
+		draggingImageId = '';
 	}}
 	onmousedown={({ clientX, clientY, currentTarget }) => {
 		if (createMode === 'off') return;
