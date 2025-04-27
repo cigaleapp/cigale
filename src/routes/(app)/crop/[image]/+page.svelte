@@ -781,13 +781,15 @@
 		display: flex;
 		align-items: center;
 		gap: 0.25em;
+		/* XXX: account for ButtonInk padding of button above, 
+		so it's visually aligned when the button is not hovered... */
+		padding-left: 0.5em;
 	}
 
 	.info h1 .status {
 		display: flex;
-		font-size: 0.8em;
-		color: var(--fg-primary);
-		align-items: center;
+		font-size: 0.7em;
+		color: var(--fg-success);
 	}
 
 	.boxes {
@@ -819,15 +821,6 @@
 		width: var(--size);
 		height: var(--size);
 		object-fit: cover;
-	}
-
-	/* .boxes .dimensions {
-		display: flex;
-		gap: 0.75em;
-	} */
-
-	.boxes .dimensions.initial {
-		font-size: 0.9em;
 	}
 
 	.boxes .actions {
