@@ -14,13 +14,19 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import * as idb from '$lib/idb.svelte.js';
-	import { imageFileIds, imageIdToFileId, imagesOfImageFile } from '$lib/images';
+	import {
+		imageFileIds,
+		imageIdToFileId,
+		imagesOfImageFile,
+		imageId as makeImageId
+	} from '$lib/images';
 	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { mapValues, pick } from '$lib/utils';
+	import { formatISO } from 'date-fns';
 	import { onDestroy, onMount } from 'svelte';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
@@ -29,12 +35,9 @@
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFourPointCrop from '~icons/ph/number-circle-four';
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
-	import IconUnconfirmedCrop from '~icons/ph/seal';
 	import IconConfirmedCrop from '~icons/ph/seal-check';
 	import IconToolDragCrop from '~icons/ph/selection-plus';
 	import IconGallery from '~icons/ph/squares-four';
-	import IconReset from '~icons/ph/arrow-counter-clockwise';
-	import { pick } from '$lib/utils';
 
 	const fileId = $derived(page.params.image);
 	const images = $derived(imagesOfImageFile(fileId));
@@ -184,46 +187,45 @@
 		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
 	}
 
+	/**
+	 * @param {import('$lib/database.js').Image} image
+	 */
 	function imageHasConfirmedCrop(image) {
 		return image.metadata[uiState.cropMetadataId]?.manuallyModified;
 	}
 
-	/**
-	 * @param {string} imageId
-	 */
-	async function revertToInferedCrop(imageId) {
-		const initialCrop = initialCrops[imageId];
-		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
-		if (!initialCrop) {
-			toasts.error(
-				`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
-			);
-			return;
-		}
+	// /**
+	//  * @param {string} imageId
+	//  */
+	// async function revertToInferedCrop(imageId) {
+	// 	const initialCrop = initialCrops[imageId];
+	// 	// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
+	// 	if (!initialCrop) {
+	// 		toasts.error(
+	// 			`L'image ${imageId} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine`
+	// 		);
+	// 		return;
+	// 	}
 
-		await storeMetadataValue({
-			subjectId: fileId,
-			metadataId: uiState.cropMetadataId,
-			type: 'boundingbox',
-			...initialCrop
-		});
+	// 	await storeMetadataValue({
+	// 		subjectId: fileId,
+	// 		metadataId: uiState.cropMetadataId,
+	// 		type: 'boundingbox',
+	// 		...initialCrop
+	// 	});
 
-		await deleteMetadataValue({
-			metadataId: uiState.classificationMetadataId,
-			subjectId: fileId
-		});
-	}
-
-	const canRevertToInferedCrop = $derived(
-		Object.fromEntries(images.map(({ id }) => [id, id in initialCrops]))
-	);
+	// 	await deleteMetadataValue({
+	// 		metadataId: uiState.classificationMetadataId,
+	// 		subjectId: fileId
+	// 	});
+	// }
 
 	/**
-	 * @param {import('$lib/database.js').Image} image the image we're confirming a new crop for
+	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
 	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 */
-	async function onConfirmCrop(image, newBoundingBox, flashConfirmedOverlay = true) {
+	async function onConfirmCrop(imageId, newBoundingBox, flashConfirmedOverlay = true) {
 		// Flash if the callsite asked for it and this is the last image before the file is considered confirmed
 		const willFlashConfirmedOverlay =
 			flashConfirmedOverlay && images.filter(imageHasConfirmedCrop).length === images.length - 1;
@@ -235,7 +237,8 @@
 			// in click-and-drag creation mode, auto-skip occurs only when the bounding box did not exist before (since the first creation of the box is much less likely to be the final one)
 			(activeTool.createMode !== 'clickanddrag' || !hasCrop(fileId));
 
-		const species = image.metadata[uiState.classificationMetadataId];
+		const image = imageId ? images.find((img) => img.id === imageId) : undefined;
+		const species = image?.metadata[uiState.classificationMetadataId];
 		if (species && !species.manuallyModified) {
 			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 			await deleteMetadataValue({
@@ -244,16 +247,51 @@
 			});
 		}
 
-		await storeMetadataValue({
-			metadataId: uiState.cropMetadataId,
-			subjectId: fileId,
-			type: 'boundingbox',
-			value: toCenteredCoords(newBoundingBox),
-			confidence: 1,
-			// Put the neural-network-inferred (initial) value in the alternatives as a backup
-			alternatives: initialCrops[fileId] ? [initialCrops[fileId]] : undefined,
-			manuallyModified: true
-		});
+		let newImageId = '';
+
+		// We're modifying an existing cropbox
+		if (imageId) {
+			await storeMetadataValue({
+				metadataId: uiState.cropMetadataId,
+				subjectId: imageId,
+				type: 'boundingbox',
+				value: toCenteredCoords(newBoundingBox),
+				confidence: 1,
+				// Put the neural-network-inferred (initial) value in the alternatives as a backup
+				alternatives: initialCrops[fileId] ? [initialCrops[fileId]] : undefined,
+				manuallyModified: true
+			});
+			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
+		} else if (images.length === 1 && firstImage && !firstImage.metadata[uiState.cropMetadataId]) {
+			newImageId = firstImage.id;
+			await storeMetadataValue({
+				metadataId: uiState.cropMetadataId,
+				subjectId: newImageId,
+				type: 'boundingbox',
+				value: toCenteredCoords(newBoundingBox),
+				confidence: 1,
+				manuallyModified: true,
+				alternatives: []
+			});
+			// We're creating a 2+nd cropbox
+		} else {
+			newImageId = makeImageId(fileId, images.length);
+			await idb.tables.Image.set({
+				id: newImageId,
+				filename: firstImage?.filename ?? '',
+				addedAt: formatISO(firstImage?.addedAt ?? new Date()),
+				contentType: firstImage?.contentType ?? '',
+				fileId,
+				metadata: {
+					[uiState.cropMetadataId]: {
+						value: JSON.stringify(toCenteredCoords(newBoundingBox)),
+						confidence: 1,
+						manuallyModified: true,
+						alternatives: {}
+					}
+				}
+			});
+		}
 
 		if (willFlashConfirmedOverlay) {
 			confirmedOverlayShown = true;
@@ -264,13 +302,15 @@
 		if (willAutoskip) {
 			await goto(nextFileId ? `#/crop/${nextFileId}` : `#/classify`);
 		}
+
+		return newImageId;
 	}
 
 	async function moveToNextUnconfirmed() {
 		const imagesAndBoxes = images.map((img) => /** @type {const}*/ ([img, boundingBoxes[img.id]]));
 
 		for (const [image, box] of imagesAndBoxes) {
-			await onConfirmCrop(image, toTopLeftCoords(box));
+			await onConfirmCrop(image.id, toTopLeftCoords(box));
 		}
 
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
@@ -366,14 +406,13 @@
 	</aside>
 	<main class="crop-surface">
 		<img src={imageSrc} alt="" bind:this={imageElement} />
-		{#if boundingBox && imageElement}
+		{#if imageElement}
 			<DraggableBoundingBox
 				{...activeTool}
 				{imageElement}
-				boundingBoxes={toTopLeftCoords(boundingBox)}
-				onchange={(newBox) => {
-					onConfirmCrop(newBox);
-				}}
+				boundingBoxes={mapValues(boundingBoxes, toTopLeftCoords)}
+				onchange={(imageId, box) => onConfirmCrop(imageId, box)}
+				oncreate={(box) => onConfirmCrop(null, box)}
 			/>
 		{/if}
 	</main>
@@ -386,21 +425,13 @@
 				</ButtonInk>
 			</nav>
 			<div class="filename-actions">
-				{#if images}
+				{#if firstImage}
 					<h1>
-						{images.filename}
-						{#if hasConfirmedCrop(images)}
+						{firstImage.filename}
+						{#if hasConfirmedCrop(fileId)}
 							<div class="status" use:tooltip={'Recadrage confirmé'}>
 								<IconConfirmedCrop />
 							</div>
-						{:else if hasCrop(images)}
-							<button
-								class="status"
-								use:tooltip={'Marquer le recadrage comme confirmé'}
-								onclick={() => onConfirmCrop(toTopLeftCoords(boundingBox), false)}
-							>
-								<IconUnconfirmedCrop />
-							</button>
 						{/if}
 					</h1>
 				{:else}
@@ -408,15 +439,6 @@
 						<code>Image introuvable</code>
 					</h1>
 				{/if}
-				<div class="actions">
-					<ButtonInk
-						disabled={!canRevertToInferedCrop}
-						onclick={revertToInferedCrop}
-						help="Revenir au recadrage de départ"
-					>
-						<IconReset /> Annuler
-					</ButtonInk>
-				</div>
 			</div>
 		</section>
 		<section class="progress">
@@ -631,23 +653,6 @@
 		font-size: 0.8em;
 		color: var(--fg-primary);
 		align-items: center;
-	}
-
-	.info button.status {
-		opacity: 0.5;
-		outline: none;
-		border: none;
-		background: none;
-		padding: 0;
-		cursor: pointer;
-	}
-
-	.info button.status:is(:hover, :focus-visible) {
-		opacity: 1;
-	}
-
-	.info button.status:focus-visible {
-		border: 1px solid var(--fg-primary);
 	}
 
 	.info .progress {
