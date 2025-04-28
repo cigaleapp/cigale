@@ -1,6 +1,6 @@
 <script>
 	import { tick } from 'svelte';
-	import { boundingBoxIsNonZero, coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
+	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
 	import { NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { getSettings } from './settings.svelte';
 	import { mapValues } from './utils';
@@ -21,7 +21,9 @@
 	 * @property {HTMLImageElement} imageElement
 	 * @property {(imageId: string, box: Rect) => void} onchange - called when a bounding box is changed. The imageId is the ID of the associated Image
 	 * @property {(box: Rect) => Promise<string> | string} oncreate - called when a new bounding box is created. Must return the ID of the new associated Image
+	 * @property {(boxes: Record<string, Rect>) => void} changeInitialBoundingBoxes - function to call when the user wants to reset the bounding boxes to their initial state
 	 * @property {boolean} transformable if true, the bounding boxes' sides or corners can be dragged
+	 * @property {string} [cursor=unset] - CSS cursor to use when hovering over the change area
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
 	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
 	 */
@@ -29,6 +31,8 @@
 	/**  @type {Props} */
 	let {
 		boundingBoxes: boudingBoxesInitial,
+		cursor,
+		changeInitialBoundingBoxes = $bindable(),
 		imageElement,
 		onchange,
 		oncreate,
@@ -38,8 +42,11 @@
 	} = $props();
 
 	let boundingBoxes = $state(boudingBoxesInitial);
+
 	$effect(() => {
-		boundingBoxes = boudingBoxesInitial;
+		changeInitialBoundingBoxes = (changeTo) => {
+			boundingBoxes = changeTo;
+		};
 	});
 
 	let clientWidth = $state(imageElement.clientWidth);
@@ -197,7 +204,7 @@
 	style:top="{imageRect.y}px"
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
-	style:cursor={boundingBoxIsNonZero(boundingBoxes) ? 'unset' : 'crosshair'}
+	style:cursor
 	onmouseup={async () => {
 		draggingCorner.setAll(false);
 		if (creatingBoundingBox && newBoundingBox.ready) {
