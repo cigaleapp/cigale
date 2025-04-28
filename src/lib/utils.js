@@ -112,6 +112,19 @@ export function pick(subject, ...keys) {
 }
 
 /**
+ * Omit some keys from an object
+ * @template {string} KeysIn
+ * @template {KeysIn} KeysOut
+ * @template {any} V
+ * @param {Record<KeysIn, V>} subject
+ * @param {...KeysOut} keys
+ * @returns {Record<Exclude<KeysIn, KeysOut>, V>}
+ */
+export function omit(subject, ...keys) {
+	return fromEntries(entries(subject).filter(([key]) => !oneOf(key, keys)));
+}
+
+/**
  *
  * @param {*} str
  * @returns

@@ -1,6 +1,7 @@
 import tippy from 'sveltejs-tippy';
 import xss from 'xss';
 import { displayPattern } from './KeyboardHint.svelte';
+import { omit } from './utils';
 
 /**
  * @typedef {object} TooltipParameters
@@ -28,7 +29,7 @@ function props(parameters) {
 	else {
 		return {
 			...base,
-			...parameters,
+			...omit(parameters, 'text', 'keyboard'),
 			delay: [delay, 0],
 			allowHTML: Boolean(parameters.keyboard),
 			content:
