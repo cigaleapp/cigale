@@ -47,7 +47,4 @@ npm run build
 
 ### Organisation de données
 
-> [!WARNING]
-> Sûrement légèrement out of date
-
 ![](./database.png)
