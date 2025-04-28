@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
+  "table": "$ark.object858",
   "properties": {
     "authors": {
       "type": "array",
@@ -11,7 +12,8 @@
           "email": {
             "type": "string",
             "description": "Adresse email",
-            "pattern": "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+            "pattern": "^[\\w%+.-]+@[\\d.A-Za-z-]+\\.[A-Za-z]{2,}$",
+            "format": "email"
           },
           "name": {
             "type": "string",
@@ -39,6 +41,7 @@
         "anyOf": [
           {
             "type": "object",
+            "table": "$ark.object797",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -700,6 +703,7 @@
           },
           {
             "type": "object",
+            "table": "$ark.object797",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -1423,6 +1427,7 @@
           },
           {
             "type": "object",
+            "table": "$ark.object797",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
