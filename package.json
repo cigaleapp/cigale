@@ -69,7 +69,7 @@
 		"handlebars": "^4.7.8",
 		"idb": "^8.0.2",
 		"jimp": "^1.6.0",
-		"marked": "^15.0.8",
+		"marked": "^15.0.11",
 		"onnxruntime-web": "^1.22.0-dev.20250310-fe7634eb6f",
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
