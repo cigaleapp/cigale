@@ -13,6 +13,7 @@ import { assertIs } from './metadata';
  * @property {number} index
  * @property {number} stacksize
  * @property {number|undefined} [loading]
+ * @property {boolean} [selectable=true] - whether the card is selectable
  * @property {object[]} [boundingBoxes] - array of bounding boxes
  * @property {number} boundingBoxes.x
  * @property {number} boundingBoxes.y

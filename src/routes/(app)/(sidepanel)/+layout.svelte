@@ -1,7 +1,7 @@
 <script>
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImage } from '$lib/images';
+	import { deleteImageFile } from '$lib/images';
 	import {
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
@@ -9,13 +9,13 @@
 		storeMetadataValue
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
+	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { seo } from '$lib/seo.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -46,7 +46,7 @@
 			async (tx) => {
 				for (const id of uiState.selection) {
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
-					await deleteImage(id, tx);
+					await deleteImageFile(id, tx, true);
 				}
 			}
 		);
@@ -93,7 +93,7 @@
 		uiState.selection
 			.flatMap((id) => {
 				// Try assuming id === image
-				const image = tables.Image.state.find((i) => i.id === id);
+				const image = tables.Image.state.find((i) => i.fileId === id);
 				if (image) return [image];
 				// Otherwise, get every observation's image
 				return tables.Observation.state

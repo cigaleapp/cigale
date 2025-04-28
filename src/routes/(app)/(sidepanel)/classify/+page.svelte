@@ -5,7 +5,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
-		deleteImage,
+		deleteImageFile,
 		imageBufferWasSaved,
 		imageIdToFileId,
 		imageIsClassified
@@ -190,7 +190,7 @@
 			loadingText="Analyse…"
 			ondelete={async (id) => {
 				await deleteObservation(id);
-				await deleteImage(id);
+				await deleteImageFile(id);
 			}}
 		/>
 		{#if !images.length}
