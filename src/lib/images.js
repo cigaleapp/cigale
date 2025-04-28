@@ -75,32 +75,31 @@ export async function downloadImage(imageId, options) {
 
 /**
  *
- * @param {string} id
+ * @param {string} id ImageFile ID
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
-export async function deleteImage(id, tx, notFoundOk = true) {
+export async function deleteImageFile(id, tx, notFoundOk = true) {
 	await db.openTransaction(['Image', 'ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
-		const image = await tx.objectStore('Image').get(id);
-		if (!image) {
+		try {
+			imagesOfImageFile(id).map(({ id }) => tx.objectStore('Image').delete(id));
+			tx.objectStore('ImageFile').delete(id);
+			tx.objectStore('ImagePreviewFile').delete(id);
+		} catch (error) {
 			if (notFoundOk) return;
-			throw 'Image non trouvée';
+			throw error;
 		}
-
-		tx.objectStore('Image').delete(id);
-		tx.objectStore('ImageFile').delete(imageIdToFileId(id));
-		tx.objectStore('ImagePreviewFile').delete(imageIdToFileId(id));
 		uiState.erroredImages.delete(id);
 		uiState.loadingImages.delete(id);
 		if (uiState.imageOpenedInCropper === id) {
 			uiState.imageOpenedInCropper = '';
 		}
 
-		const previewURL = uiState.previewURLs.get(imageIdToFileId(id));
+		const previewURL = uiState.previewURLs.get(id);
 		if (previewURL) {
 			URL.revokeObjectURL(previewURL);
-			uiState.previewURLs.delete(imageIdToFileId(id));
-			uiState.croppedPreviewURLs.delete(imageIdToFileId(id));
+			uiState.previewURLs.delete(id);
+			uiState.croppedPreviewURLs.delete(id);
 		}
 	});
 }

@@ -7,7 +7,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
-		deleteImage,
+		deleteImageFile,
 		imageFileId,
 		imageFileIds,
 		imageId,
@@ -58,6 +58,7 @@
 		const originalBytes = await file.arrayBuffer();
 		const resizedBytes = await resizeToMaxSize({ source: file });
 
+		filesToProcess.shift();
 		await storeImageBytes({
 			id,
 			resizedBytes,
@@ -170,17 +171,15 @@
 		}
 	});
 
-	/** Counts files that we will process but that aren't loaded in the database yet. Useful to make progress bar more accurate */
-	let filesToProcess = $state(0);
-	$effect(() => {
-		uiState.processing.total = tables.Image.state.length + filesToProcess;
-		uiState.processing.total = tables.Image.state.length;
-		uiState.processing.done = tables.Image.state.filter(
-			(img) => img.metadata[uiState.cropMetadataId]
-		).length;
-	});
+	/**
+	 * Array of filenames to process
+	 * @type {string[]}
+	 */
+	let filesToProcess = $state([]);
 
-	$inspect(uiState.previewURLs);
+	$effect(() => {
+		uiState.processing.done = uiState.processing.total - filesToProcess.length;
+	});
 </script>
 
 {#snippet modelsource()}
@@ -202,14 +201,14 @@
 	<Dropzone
 		clickable={images.length === 0}
 		onfiles={async ({ files }) => {
-			filesToProcess = files.length;
+			filesToProcess = files.map((f) => f.name);
+			uiState.processing.total = files.length;
 			for (const file of files) {
 				const currentLength = tables.Image.state.length;
 				const id = imageFileId(currentLength);
 				try {
 					uiState.loadingImages.add(id);
 					await processImageFile(file, id);
-					filesToProcess--;
 				} catch (error) {
 					console.error(error);
 					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
@@ -222,12 +221,23 @@
 		<section class="observations" class:empty={!images.length}>
 			<AreaObservations
 				bind:selection={uiState.selection}
-				{images}
+				images={[
+					...images,
+					...filesToProcess.map((filename, i) => ({
+						image: '',
+						title: filename,
+						id: `loading_${i}`,
+						index: images.length + i,
+						stacksize: 1,
+						loading: -1,
+						boundingBoxes: []
+					}))
+				]}
 				errors={uiState.erroredImages}
 				loadingText="Analyse…"
 				ondelete={async (id) => {
 					await deleteObservation(id);
-					await deleteImage(id);
+					await deleteImageFile(id);
 				}}
 			/>
 			{#if !images.length}

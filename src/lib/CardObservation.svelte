@@ -18,6 +18,7 @@
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
 	 * @property {boolean} selected
+	 * @property {boolean} [selectable=true] - whether this image can be selected
 	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
@@ -38,6 +39,7 @@
 		image,
 		loading,
 		selected,
+		selectable = true,
 		highlighted,
 		errored = false,
 		statusText = 'Chargement…',
@@ -59,9 +61,11 @@
 <div
 	class="observation"
 	class:selected
+	class:selectable
 	class:highlighted
 	class:loading
 	class:stacked
+	data-selectable={selectable ? '' : undefined}
 	{...rest}
 	use:tooltip={errored ? statusText : undefined}
 >
@@ -156,10 +160,9 @@
 		position: relative;
 		width: var(--card-width);
 		user-select: none;
-		cursor: pointer;
 	}
 
-	.observation:not(.loading) {
+	.observation.selectable {
 		cursor: pointer;
 	}
 
