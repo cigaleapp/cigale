@@ -1,6 +1,5 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { watch } from 'runed';
 	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
@@ -438,15 +437,6 @@
 	});
 
 	let imageElement = $state();
-
-	/**
-	 * @type {(_boxes: Record<string, import('$lib/BoundingBoxes.svelte').Rect>) => void}
-	 */
-	let setBoundingBoxes = $state((_boxes) => {});
-	watch(
-		() => fileId,
-		() => setBoundingBoxes(mapValues(boundingBoxes, toTopLeftCoords))
-	);
 </script>
 
 <div class="confirmed-overlay" class:shown={confirmedOverlayShown}>
@@ -480,7 +470,6 @@
 			<DraggableBoundingBox
 				{...activeTool}
 				{imageElement}
-				bind:changeInitialBoundingBoxes={setBoundingBoxes}
 				boundingBoxes={mapValues(
 					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
 					toTopLeftCoords

@@ -21,7 +21,6 @@
 	 * @property {HTMLImageElement} imageElement
 	 * @property {(imageId: string, box: Rect) => void} onchange - called when a bounding box is changed. The imageId is the ID of the associated Image
 	 * @property {(box: Rect) => Promise<string> | string} oncreate - called when a new bounding box is created. Must return the ID of the new associated Image
-	 * @property {(boxes: Record<string, Rect>) => void} changeInitialBoundingBoxes - function to call when the user wants to reset the bounding boxes to their initial state
 	 * @property {boolean} transformable if true, the bounding boxes' sides or corners can be dragged
 	 * @property {string} [cursor=unset] - CSS cursor to use when hovering over the change area
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
@@ -32,7 +31,6 @@
 	let {
 		boundingBoxes: boudingBoxesInitial,
 		cursor,
-		changeInitialBoundingBoxes = $bindable(),
 		imageElement,
 		onchange,
 		oncreate,
@@ -42,11 +40,8 @@
 	} = $props();
 
 	let boundingBoxes = $state(boudingBoxesInitial);
-
 	$effect(() => {
-		changeInitialBoundingBoxes = (changeTo) => {
-			boundingBoxes = changeTo;
-		};
+		boundingBoxes = boudingBoxesInitial;
 	});
 
 	let clientWidth = $state(imageElement.clientWidth);
