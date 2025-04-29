@@ -386,6 +386,11 @@
 		uiState.imageOpenedInCropper = fileId;
 	});
 
+	/**
+	 * @type {string|null}
+	 */
+	let selectedBoundingBox = $state(null);
+
 	onMount(() => {
 		uiState.keybinds['ArrowLeft'] = {
 			help: 'Image précédente',
@@ -416,11 +421,45 @@
 				await toggleSetting('cropAutoNext');
 			}
 		};
+		uiState.keybinds['Delete'] = {
+			help: 'Supprimer la boîte sélectionnée',
+			when: () => Boolean(selectedBoundingBox),
+			async do() {
+				if (!selectedBoundingBox) return;
+				await deleteMetadataValue({
+					metadataId: uiState.cropMetadataId,
+					subjectId: selectedBoundingBox
+				});
+				selectedBoundingBox = null;
+			}
+		};
+		uiState.keybinds['f'] = {
+			help: 'Cacher les boîtes non sélectionnées',
+			when: () => Boolean(selectedBoundingBox),
+			do() {
+				if (!selectedBoundingBox) return;
+				focusedImageId = focusedImageId === selectedBoundingBox ? '' : selectedBoundingBox;
+			}
+		};
 		for (const tool of tools) {
 			uiState.keybinds[tool.shortcut] = {
 				help: `Outil ${tool.name}`,
 				do: () => {
 					activeToolName = tool.name;
+				}
+			};
+		}
+		for (let i = 1; i <= 9; i++) {
+			uiState.keybinds[`Digit${i}`] = {
+				help: `Sélectionner la boîte #${i}`,
+				when: () => Object.keys(boundingBoxes).length >= i,
+				do() {
+					const imageId = Object.keys(boundingBoxes)[i - 1];
+					if (selectedBoundingBox === imageId) {
+						selectedBoundingBox = null;
+					} else {
+						selectedBoundingBox = imageId;
+					}
 				}
 			};
 		}
@@ -431,9 +470,14 @@
 		delete uiState.keybinds['ArrowRight'];
 		delete uiState.keybinds['Space'];
 		delete uiState.keybinds['Escape'];
-		delete uiState.keybinds['A'];
+		delete uiState.keybinds['a'];
+		delete uiState.keybinds['Delete'];
+		delete uiState.keybinds['f'];
 		for (const tool of tools) {
 			delete uiState.keybinds[tool.shortcut];
+		}
+		for (const i of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+			delete uiState.keybinds[`Digit${i}`];
 		}
 	});
 
@@ -511,7 +555,10 @@
 					{@const box = boundingBoxes[image.id]}
 					{@const initBox = initialCrops[image.id]}
 					{@const [w, h] = roundedPixelDimensions(box)}
-					<li class:unfocused={focusedImageId && focusedImageId !== image.id}>
+					<li
+						class:unfocused={focusedImageId && focusedImageId !== image.id}
+						class:selected={selectedBoundingBox === image.id}
+					>
 						<CroppedImg
 							box={toTopLeftCoords(box)}
 							src={uiState.getPreviewURL(image.fileId)}
@@ -811,7 +858,7 @@
 	.boxes ul {
 		display: flex;
 		flex-direction: column;
-		gap: 1em;
+		gap: 0.5em;
 		list-style: none;
 		padding-left: 0;
 	}
@@ -820,11 +867,15 @@
 		display: flex;
 		gap: 1em;
 		align-items: center;
-		padding: 0 1em;
+		padding: 0.5em 1em;
 	}
 
 	.boxes li.unfocused {
 		opacity: 0.5;
+	}
+
+	.boxes li.selected {
+		background: var(--bg-primary-translucent);
 	}
 
 	.boxes li.create-hint {
