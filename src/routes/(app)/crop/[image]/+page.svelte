@@ -513,7 +513,7 @@
 					{@const [w, h] = roundedPixelDimensions(box)}
 					<li class:unfocused={focusedImageId && focusedImageId !== image.id}>
 						<CroppedImg
-							boundingBox={toTopLeftCoords(box)}
+							box={toTopLeftCoords(box)}
 							src={uiState.getPreviewURL(image.fileId)}
 							class="thumb"
 						/>

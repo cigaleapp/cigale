@@ -152,3 +152,21 @@ export function coordsDifference(a, b) {
 export function coordsAreEqual(a, b, tolerance = 0) {
 	return coordsDifference(a, b) <= tolerance;
 }
+
+/**
+ * Return the 4 corners of a bounding box as (x, y) tuples
+ * @param {AnyBoundingBox} boundingBox
+ * @returns {{ topleft: [number, number], topright: [number, number], bottomleft: [number, number], bottomright: [number, number] }}
+ */
+export function toCorners(boundingBox) {
+	if (!('width' in boundingBox) || !('height' in boundingBox)) {
+		return toCorners(toTopLeftCoords(boundingBox));
+	}
+
+	return {
+		topleft: [boundingBox.x, boundingBox.y],
+		topright: [boundingBox.x + boundingBox.width, boundingBox.y],
+		bottomleft: [boundingBox.x, boundingBox.y + boundingBox.height],
+		bottomright: [boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height]
+	};
+}
