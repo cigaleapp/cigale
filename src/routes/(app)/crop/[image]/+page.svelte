@@ -12,6 +12,7 @@
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -295,7 +296,7 @@
 			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 			await deleteMetadataValue({
 				metadataId: uiState.classificationMetadataId,
-				subjectId: fileId
+				subjectId: image.id
 			});
 		}
 
@@ -511,7 +512,11 @@
 					{@const initBox = initialCrops[image.id]}
 					{@const [w, h] = roundedPixelDimensions(box)}
 					<li class:unfocused={focusedImageId && focusedImageId !== image.id}>
-						<img src={uiState.getPreviewURL(image.fileId)} alt="" class="thumb" />
+						<CroppedImg
+							boundingBox={toTopLeftCoords(box)}
+							src={uiState.getPreviewURL(image.fileId)}
+							class="thumb"
+						/>
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
 							<p class="dimensions">
@@ -831,11 +836,10 @@
 		vertical-align: middle;
 	}
 
-	.boxes .thumb {
+	.boxes :global(.thumb) {
 		--size: 4rem;
 		width: var(--size);
 		height: var(--size);
-		object-fit: cover;
 		border-radius: var(--corner-radius);
 	}
 
