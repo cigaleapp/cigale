@@ -359,9 +359,4 @@ async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) 
 		path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 		JSON.stringify(protocol, null, 2)
 	);
-	protocol.metadata[namespaced('crop')].type = 'boundingboxes';
-	writeFile(
-		path.join(here, '../examples/arthropods.cigaleprotocol.v2.json'),
-		JSON.stringify(protocol, null, 2)
-	);
 }
