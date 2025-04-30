@@ -31,9 +31,13 @@ function props(parameters) {
 			...base,
 			...omit(parameters, 'text', 'keyboard'),
 			delay: [delay, 0],
-			allowHTML: Boolean(parameters.keyboard),
+			allowHTML: true,
 			content:
-				xss(parameters.text) +
+				xss(parameters.text, {
+					allowList: {
+						kbd: ['class']
+					}
+				}) +
 				// XXX: needs :global styling from KeyboardHint.svelte
 				(parameters.keyboard
 					? ' <kbd class=hint>' +
