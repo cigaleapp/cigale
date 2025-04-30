@@ -13,6 +13,15 @@
 	/** @type {Props} */
 	const { src, box, class: klass, ...rest } = $props();
 	const corners = $derived(toCorners(box));
+
+	const scale = $derived.by(() => {
+		const aspectRatio = box.width / box.height;
+		if (aspectRatio > 1) {
+			return `${(1 / box.height) * 100}% ${(1 / box.height) * aspectRatio * 100}%`;
+		} else {
+			return `${(1 / box.width) * 100}% ${(1 / box.width) * aspectRatio * 100}%`;
+		}
+	});
 </script>
 
 <picture class="cropped {klass}">
@@ -27,9 +36,7 @@
 			.join(', ')})"
 		style:translate={corners.topleft.map((c) => `${-c * 100}%`).join(' ')}
 		style:transform-origin={corners.topleft.map((c) => c * 100 + '%').join(' ')}
-		style:scale={box.height > box.width
-			? `${(1 / box.height) * 100}% ${(1 / box.height) * 100}%`
-			: `${(1 / box.width) * 100}% ${(1 / box.width) * 100}%`}
+		style:scale
 		{src}
 		{...rest}
 	/>
@@ -43,6 +50,12 @@
 	img {
 		width: 100%;
 		height: 100%;
-		object-fit: cover;
+	}
+
+	/**
+	Hugely scaled-up image causes global body overflow even though <picture> is set to overflow: hidden.
+	*/
+	:global(body) {
+		overflow: hidden;
 	}
 </style>
