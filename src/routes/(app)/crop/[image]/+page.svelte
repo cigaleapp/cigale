@@ -441,6 +441,14 @@
 				focusedImageId = focusedImageId === selectedBoundingBox ? '' : selectedBoundingBox;
 			}
 		};
+		uiState.keybinds['u'] = {
+			help: "Revenir au recadrage d'origine",
+			when: () => Boolean(revertableCrops[fileId]),
+			do: () => {
+				if (!revertableCrops[fileId]) return;
+				revertToInferedCrop(fileId);
+			}
+		};
 		for (const tool of tools) {
 			uiState.keybinds[tool.shortcut] = {
 				help: `Outil ${tool.name}`,
@@ -473,6 +481,7 @@
 		delete uiState.keybinds['a'];
 		delete uiState.keybinds['Delete'];
 		delete uiState.keybinds['f'];
+		delete uiState.keybinds['u'];
 		for (const tool of tools) {
 			delete uiState.keybinds[tool.shortcut];
 		}
@@ -555,6 +564,10 @@
 					{@const box = boundingBoxes[image.id]}
 					{@const initBox = initialCrops[image.id]}
 					{@const [w, h] = roundedPixelDimensions(box)}
+					{@const keyboardHint = (/** @type {string} */ letter) =>
+						i <= 9
+							? `(<kbd class=hint><kbd>${letter}</kbd></kbd> si sélectionnée, <kbd class=hint><kbd>${i + 1}</kbd></kbd> pour la sélectionner)`
+							: ''}
 					<li
 						class:unfocused={focusedImageId && focusedImageId !== image.id}
 						class:selected={selectedBoundingBox === image.id}
@@ -582,7 +595,10 @@
 							{#if Object.values(boundingBoxes).length > 1}
 								{@const isFocused = focusedImageId === image.id}
 								<ButtonIcon
-									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes"
+									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes {keyboardHint(
+										'F'
+									)}"
+									keyboard=""
 									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
 									crossout={isFocused}
 								>
@@ -603,14 +619,14 @@
 							<ButtonIcon
 								help="Revenir au recadrage d'origine ({initBox
 									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${Math.round(initBox.confidence * 100)}% de confiance`
-									: 'indisponible'})"
-								disabled={!revertableCrops[image.id]}
+									: 'indisponible'}) {keyboardHint('u')}"
+								disabled={!revertableCrops}
 								onclick={async () => await revertToInferedCrop(image.id)}
 							>
 								<IconRevert />
 							</ButtonIcon>
 							<ButtonIcon
-								help="Supprimer cette boîte"
+								help="Supprimer cette boîte {keyboardHint('Suppr')}"
 								onclick={async () => {
 									if (images.length === 1) {
 										await deleteMetadataValue({
