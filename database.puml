@@ -1,4 +1,14 @@
-@startuml
+@startuml database
+
+class ImageFile {
+     id \t\t\t ID 
+     bytes \t\t ArrayBuffer
+}
+
+class ImageFilePreview {
+     id \t\t\t ID 
+     bytes \t\t ArrayBuffer
+}
 
 class Image {
      id \t\t\t ID 
@@ -76,6 +86,8 @@ MetadataValues "*" -- "1" Metadata
 Observation "1" -- "*" MetadataValues
 Image "1" -- "*" MetadataValues
 Metadata "1" -- "*" MetadataEnumVariant
+ImageFile "1" -- "*" Image
+ImageFilePreview "1" -- "*" Image
 
 MetadataType -- Metadata
 MetadataMergeMethod -- Metadata
