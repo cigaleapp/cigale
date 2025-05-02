@@ -378,7 +378,7 @@
 		}
 
 		if (willAutoskip) {
-			await goto(nextFileId ? `#/crop/${nextFileId}` : `#/classify`);
+			await goto(nextFileId ? `#/crop/${nextFileId}` : `#/classify`, { invalidateAll: true });
 		}
 
 		return newImageId;
