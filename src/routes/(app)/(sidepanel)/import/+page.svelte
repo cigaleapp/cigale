@@ -1,45 +1,25 @@
-<script>
+<script module>
 	/**
-	 * @import { DimensionsIn } from '$lib/database.js';
+	 * Import new files and process  them
+	 * @param {File[]} files
 	 */
-	import AreaObservations from '$lib/AreaObservations.svelte';
-	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
-	import Dropzone from '$lib/Dropzone.svelte';
-	import { processExifData } from '$lib/exif';
-	import * as db from '$lib/idb.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import {
-		deleteImageFile,
-		imageFileId,
-		imageFileIds,
-		imageId,
-		imageIdToFileId,
-		imageIsAnalyzed,
-		resizeToMaxSize,
-		storeImageBytes
-	} from '$lib/images';
-	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
-	import Logo from '$lib/Logo.svelte';
-	import { deleteObservation } from '$lib/observations';
-	import { getSettings } from '$lib/settings.svelte';
-	import { uiState } from '$lib/state.svelte.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { formatISO } from 'date-fns';
-
-	const fileIds = $derived(imageFileIds(tables.Image.state));
-
-	const images = $derived(
-		toAreaObservationProps(fileIds, [], [], {
-			isLoaded: (fileId) =>
-				Boolean(
-					typeof fileId === 'string' &&
-						uiState.currentProtocol &&
-						uiState.hasPreviewURL(fileId) &&
-						imageIsAnalyzed(uiState.currentProtocol, fileId)
-				)
-		})
-	);
+	export async function importMore(files) {
+		uiState.processing.files = files.map((f) => f.name);
+		uiState.processing.total = files.length;
+		for (const file of files) {
+			const currentLength = tables.Image.state.length;
+			const id = imageFileId(currentLength);
+			try {
+				uiState.loadingImages.add(id);
+				await processImageFile(file, id);
+			} catch (error) {
+				console.error(error);
+				uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+			} finally {
+				uiState.loadingImages.delete(id);
+			}
+		}
+	}
 
 	let cropperModel = $state();
 	async function loadCropperModel() {
@@ -61,7 +41,7 @@
 		const originalBytes = await file.arrayBuffer();
 		const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
 
-		filesToProcess.shift();
+		uiState.processing.files.shift();
 		await storeImageBytes({
 			id,
 			resizedBytes,
@@ -89,7 +69,7 @@
 	 * @param {string} file.filename
 	 * @param {string} file.contentType
 	 * @param {string} file.id
-	 * @param {DimensionsIn} file.dimensions
+	 * @param {DimensionsInput} file.dimensions
 	 * @returns {Promise<void>}
 	 */
 	async function inferBoundingBoxes(file) {
@@ -154,6 +134,50 @@
 			});
 		}
 	}
+</script>
+
+<script>
+	/**
+	 * @import { DimensionsInput } from '$lib/database.js';
+	 */
+	import AreaObservations from '$lib/AreaObservations.svelte';
+	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
+	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
+	import Dropzone from '$lib/Dropzone.svelte';
+	import { processExifData } from '$lib/exif';
+	import * as db from '$lib/idb.svelte';
+	import { tables } from '$lib/idb.svelte';
+	import {
+		deleteImageFile,
+		imageFileId,
+		imageFileIds,
+		imageId,
+		imageIdToFileId,
+		imageIsAnalyzed,
+		resizeToMaxSize,
+		storeImageBytes
+	} from '$lib/images';
+	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
+	import Logo from '$lib/Logo.svelte';
+	import { deleteObservation } from '$lib/observations';
+	import { getSettings } from '$lib/settings.svelte';
+	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte';
+	import { formatISO } from 'date-fns';
+
+	const fileIds = $derived(imageFileIds(tables.Image.state));
+
+	const images = $derived(
+		toAreaObservationProps(fileIds, [], [], {
+			isLoaded: (fileId) =>
+				Boolean(
+					typeof fileId === 'string' &&
+						uiState.currentProtocol &&
+						uiState.hasPreviewURL(fileId) &&
+						imageIsAnalyzed(uiState.currentProtocol, fileId)
+				)
+		})
+	);
 
 	$effect(() => {
 		if (!cropperModel) return;
@@ -180,14 +204,8 @@
 		}
 	});
 
-	/**
-	 * Array of filenames to process
-	 * @type {string[]}
-	 */
-	let filesToProcess = $state([]);
-
 	$effect(() => {
-		uiState.processing.done = uiState.processing.total - filesToProcess.length;
+		uiState.processing.done = uiState.processing.total - uiState.processing.files.length;
 	});
 </script>
 
@@ -207,32 +225,13 @@
 		<p class="source">{@render modelsource()}</p>
 	</section>
 {:then _}
-	<Dropzone
-		clickable={images.length === 0}
-		onfiles={async ({ files }) => {
-			filesToProcess = files.map((f) => f.name);
-			uiState.processing.total = files.length;
-			for (const file of files) {
-				const currentLength = tables.Image.state.length;
-				const id = imageFileId(currentLength);
-				try {
-					uiState.loadingImages.add(id);
-					await processImageFile(file, id);
-				} catch (error) {
-					console.error(error);
-					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
-				} finally {
-					uiState.loadingImages.delete(id);
-				}
-			}
-		}}
-	>
+	<Dropzone clickable={images.length === 0} onfiles={async ({ files }) => await importMore(files)}>
 		<section class="observations" class:empty={!images.length}>
 			<AreaObservations
 				bind:selection={uiState.selection}
 				images={[
 					...images,
-					...filesToProcess.map((filename, i) => ({
+					...uiState.processing.files.map((filename, i) => ({
 						image: '',
 						title: filename,
 						id: `loading_${i}`,

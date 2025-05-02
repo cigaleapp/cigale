@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { countThings } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
@@ -16,14 +15,16 @@
 	import IconImage from '~icons/ph/image';
 	import IconMerge from '~icons/ph/selection-background';
 	import IconDelete from '~icons/ph/trash';
+	import IconImport from '~icons/ph/upload-simple';
 
 	/**
 	 * @typedef {object} Props
 	 * @property {string[]} images source **href**s of the images/observations we're modifying the metadata on
-	 * @property {() => void} onmerge callback to call when the user wants to merge images or observations into a single one
+	 * @property {(() => void) | undefined} [onmerge] callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown.
 	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
 	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
-	 * @property {() => void} onsplit callback to call when the user wants to split the selected observation(s)
+	 * @property {(() => void) | undefined} [onsplit] callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown.
+	 * @property {(() => void) | undefined} [onimport] callback to call when the user wants to import additional images. If not set, the import button is not shown.
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
 	 * @property {(key: string, value: undefined | import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
@@ -31,8 +32,17 @@
 	 */
 
 	/** @type {Props} */
-	let { images, onmerge, ondelete, onsplit, cansplit, onmetadatachange, canmerge, metadata } =
-		$props();
+	let {
+		images,
+		onmerge,
+		onimport,
+		ondelete,
+		onsplit,
+		cansplit,
+		onmetadatachange,
+		canmerge,
+		metadata
+	} = $props();
 
 	const definitions = $derived.by(() => {
 		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
@@ -114,7 +124,7 @@
 		</section>
 	{/if}
 	<section class="button">
-		{#if page.url.hash === '#/classify'}
+		{#if onmerge && onsplit}
 			<div class="side-by-side">
 				<ButtonSecondary
 					disabled={!canmerge}
@@ -135,6 +145,12 @@
 					Séparer
 				</ButtonSecondary>
 			</div>
+		{/if}
+		{#if onimport}
+			<ButtonSecondary onclick={onimport}>
+				<IconImport />
+				Importer d'autres images
+			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
