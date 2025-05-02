@@ -32,12 +32,7 @@
 		imageId as makeImageId,
 		parseImageId
 	} from '$lib/images';
-	import {
-		assertIs,
-		deleteMetadataValue,
-		getMetadataValueOrThrow,
-		storeMetadataValue
-	} from '$lib/metadata';
+	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -221,7 +216,6 @@
 	 */
 	function hasConfirmedCrop(imageFileId) {
 		if (!imageFileId) return false;
-		if (!hasCrop(imageFileId)) return false;
 		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
 	}
 
@@ -229,7 +223,9 @@
 	 * @param {DB.Image} image
 	 */
 	function imageHasConfirmedCrop(image) {
-		return uiState.cropMetadataValueOf(image)?.manuallyModified;
+		const metadataId = uiState.currentProtocol?.crop?.confirmationMetadata;
+		if (!metadataId) return false;
+		return metadataId in image.metadata && image.metadata[metadataId].value;
 	}
 
 	/**
@@ -237,24 +233,32 @@
 	 * @param {boolean} confirmed
 	 */
 	async function changeCropConfirmedStatus(image, confirmed) {
-		const { value, confidence, alternatives } = getMetadataValueOrThrow(
-			image,
-			'boundingbox',
-			uiState.cropMetadataId
-		);
+		const metadataId = uiState.cropConfirmationMetadataId;
+		if (!metadataId) return;
 
 		await storeMetadataValue({
-			metadataId: uiState.cropMetadataId,
+			metadataId,
 			subjectId: image.id,
-			type: 'boundingbox',
-			manuallyModified: confirmed,
-			value,
-			confidence,
-			alternatives: Object.entries(alternatives).map(([jsonValue, confidence]) => ({
-				value: JSON.parse(jsonValue),
-				confidence
-			}))
+			type: 'boolean',
+			manuallyModified: true,
+			value: confirmed
 		});
+	}
+
+	/**
+	 * @param {boolean} confirmed
+	 */
+	async function changeAllConfirmedStatuses(confirmed) {
+		if (!uiState.cropConfirmationMetadataId) {
+			toasts.error(
+				'Ce protocole ne supported pas la validation des recadrages (voir crop.confirmationMetadata dans la définition du protocole)'
+			);
+			return;
+		}
+
+		for (const image of images) {
+			await changeCropConfirmedStatus(image, confirmed);
+		}
 	}
 
 	/**
@@ -284,6 +288,12 @@
 		});
 	}
 
+	async function revertAll() {
+		for (const { id } of images) {
+			await revertToInferedCrop(id);
+		}
+	}
+
 	const revertableCrops = $derived(
 		Object.fromEntries(
 			images.map((image) => [
@@ -303,7 +313,7 @@
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 * @returns {Promise<string>} the ID of the image we just modified/created
 	 */
-	async function onConfirmCrop(imageId, newBoundingBox, flashConfirmedOverlay = true) {
+	async function onCropChange(imageId, newBoundingBox, flashConfirmedOverlay = true) {
 		console.log('onConfirmCrop', imageId, newBoundingBox);
 		// Flash if the callsite asked for it and this is the last image before the file is considered confirmed
 		const willFlashConfirmedOverlay =
@@ -376,6 +386,8 @@
 			});
 		}
 
+		await changeCropConfirmedStatus(newImageId || imageId, true);
+
 		if (willFlashConfirmedOverlay) {
 			confirmedOverlayShown = true;
 			await new Promise((resolve) => setTimeout(resolve, 500));
@@ -395,7 +407,7 @@
 		const imagesAndBoxes = images.map((img) => /** @type {const}*/ ([img, boundingBoxes[img.id]]));
 
 		for (const [image, box] of imagesAndBoxes) {
-			await onConfirmCrop(image.id, toTopLeftCoords(box));
+			await onCropChange(image.id, toTopLeftCoords(box));
 		}
 
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
@@ -488,6 +500,21 @@
 				revertToInferedCrop(fileId);
 			}
 		};
+		uiState.keybinds['$mod+u'] = {
+			help: "Revenir au recadrage d'origine pour toutes les boîtes",
+			when: () => Object.keys(boundingBoxes).length > 0,
+			do: revertAll
+		};
+		uiState.keybinds['ArrowUp'] = {
+			help: 'Marquer le recadrage comme confirmé',
+			when: () => !hasConfirmedCrop(fileId),
+			do: () => changeAllConfirmedStatuses(true)
+		};
+		uiState.keybinds['ArrowDown'] = {
+			help: 'Marquer le recadrage comme non confirmé',
+			when: () => hasConfirmedCrop(fileId),
+			do: () => changeAllConfirmedStatuses(false)
+		};
 		for (const tool of tools) {
 			uiState.keybinds[tool.shortcut] = {
 				help: `Outil ${tool.name}`,
@@ -521,6 +548,10 @@
 		delete uiState.keybinds['Delete'];
 		delete uiState.keybinds['f'];
 		delete uiState.keybinds['u'];
+		delete uiState.keybinds['$mod+u'];
+		delete uiState.keybinds['Shift+Space'];
+		delete uiState.keybinds['ArrowUp'];
+		delete uiState.keybinds['ArrowDown'];
 		for (const tool of tools) {
 			delete uiState.keybinds[tool.shortcut];
 		}
@@ -567,8 +598,8 @@
 					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
 					toTopLeftCoords
 				)}
-				onchange={(imageId, box) => onConfirmCrop(imageId, box)}
-				oncreate={(box) => onConfirmCrop(null, box)}
+				onchange={(imageId, box) => onCropChange(imageId, box)}
+				oncreate={(box) => onCropChange(null, box)}
 			/>
 		{/if}
 	</main>
@@ -580,7 +611,7 @@
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
 			</nav>
-			<div class="filename-actions">
+			<section class="filename">
 				{#if firstImage}
 					<h1>
 						{firstImage.filename}
@@ -595,7 +626,7 @@
 						<code>Image introuvable</code>
 					</h1>
 				{/if}
-			</div>
+			</section>
 		</section>
 		<section class="boxes">
 			<ul>
@@ -639,23 +670,12 @@
 								</ButtonIcon>
 							{/if}
 							<ButtonIcon
-								help="Marquer comme {imageHasConfirmedCrop(image) ? 'non' : ''} confirmé"
-								onclick={async () =>
-									changeCropConfirmedStatus(image, !imageHasConfirmedCrop(image))}
-							>
-								{#if imageHasConfirmedCrop(image)}
-									<IconConfirmedCrop />
-								{:else}
-									<IconUnconfirmedCrop />
-								{/if}
-							</ButtonIcon>
-							<ButtonIcon
 								help="Revenir au recadrage d'origine ({initBox
 									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${Math.round(initBox.confidence * 100)}% de confiance`
 									: 'indisponible'})"
-								keyboard="U"
-								disabled={!revertableCrops}
-								onclick={async () => await revertToInferedCrop(image.id)}
+								keyboard="u"
+								disabled={!revertableCrops[image.id]}
+								onclick={() => revertToInferedCrop(image.id)}
 							>
 								<IconRevert />
 							</ButtonIcon>
@@ -692,8 +712,6 @@
 							{/snippet}
 						</SentenceJoin>
 					</p>
-				</li>
-				<li class="boxes-list-hint">
 					<p>
 						Sélectionnez une boîte avec
 						<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des raccourcis
@@ -725,6 +743,32 @@
 				</p>
 				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
 			</div>
+		</section>
+		<section class="actions">
+			<ButtonSecondary
+				keyboard="$mod+U"
+				help="Revenir au recadrage d'origine pour toutes les boîtes"
+				onclick={revertAll}
+				disabled={!Object.values(revertableCrops).some(Boolean)}
+			>
+				<IconRevert />
+				Réinit.
+			</ButtonSecondary>
+			{#if uiState.cropConfirmationMetadataId}
+				<ButtonSecondary
+					keyboard="Arrow{hasConfirmedCrop(fileId) ? 'Down' : 'Up'}"
+					onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
+					help="Marquer le recadrage comme {hasConfirmedCrop(fileId) ? 'non confirmé' : 'confirmé'}"
+				>
+					{#if hasConfirmedCrop(fileId)}
+						<IconUnconfirmedCrop />
+						Invalider
+					{:else}
+						<IconConfirmedCrop />
+						Valider
+					{/if}
+				</ButtonSecondary>
+			{/if}
 		</section>
 		<nav>
 			<div class="navigation">
@@ -878,7 +922,7 @@
 	}
 
 	.info {
-		padding: 1em;
+		padding: 1em 1.5em;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
@@ -895,20 +939,11 @@
 		gap: 0.5em;
 	}
 
-	.info .filename-actions {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
 	.info h1 {
 		font-size: 1.5em;
 		display: flex;
 		align-items: center;
 		gap: 0.25em;
-		/* XXX: account for ButtonInk padding of button above, 
-		so it's visually aligned when the button is not hovered... */
-		padding-left: 0.5em;
 	}
 
 	.info h1 .status {
@@ -934,6 +969,9 @@
 		display: flex;
 		gap: 1em;
 		align-items: center;
+	}
+
+	.boxes li:not(.boxes-list-hint) {
 		padding: 0.5em 1em;
 	}
 
@@ -946,7 +984,9 @@
 	}
 
 	.boxes li.boxes-list-hint {
+		margin-top: 1em;
 		color: var(--gay);
+		flex-direction: column;
 	}
 
 	.boxes li.boxes-list-hint p,
@@ -954,7 +994,7 @@
 		vertical-align: middle;
 	}
 
-	.boxes :global(.thumb) {
+	.boxes li :global(.thumb) {
 		--size: 4rem;
 		width: var(--size);
 		height: var(--size);
@@ -962,8 +1002,16 @@
 		background: color-mix(in srgb, var(--gray) 35%, transparent);
 	}
 
-	.boxes .actions {
+	.boxes li .actions {
 		margin-left: auto;
+	}
+
+	.info section.actions {
+		--width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		width: 100%;
 	}
 
 	.info .progress {

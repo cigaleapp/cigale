@@ -2,7 +2,7 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.transects",
 	"name": "Transect d'arthropodes",
-	"source": "https://github.com/cigaleapp/cigale/tree/43c12255cee27cdb6478d711e6a01efe47a9af31/scripts/jessica-joachim-crawler.js#L86",
+	"source": "https://github.com/cigaleapp/cigale/tree/04baf7b7a13245b49352957601be8ac596fb8500/scripts/jessica-joachim-crawler.js#L86",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
 		{
@@ -20,7 +20,8 @@
 		"io.github.cigaleapp.arthropods.transects__class",
 		"io.github.cigaleapp.arthropods.transects__phylum",
 		"io.github.cigaleapp.arthropods.transects__kingdom",
-		"io.github.cigaleapp.arthropods.transects__crop"
+		"io.github.cigaleapp.arthropods.transects__crop",
+		"io.github.cigaleapp.arthropods.transects__crop_is_confirmed"
 	],
 	"metadata": {
 		"io.github.cigaleapp.arthropods.transects__kingdom": {
@@ -549,6 +550,13 @@
 			"description": "",
 			"required": true,
 			"mergeMethod": "average"
+		},
+		"io.github.cigaleapp.arthropods.transects__crop_is_confirmed": {
+			"type": "boolean",
+			"label": "",
+			"description": "",
+			"required": false,
+			"mergeMethod": "max"
 		},
 		"io.github.cigaleapp.arthropods.transects__species": {
 			"type": "enum",
@@ -1157,6 +1165,7 @@
 	},
 	"crop": {
 		"metadata": "io.github.cigaleapp.arthropods.transects__crop",
+		"confirmationMetadata": "io.github.cigaleapp.arthropods.transects__crop_is_confirmed",
 		"infer": {
 			"model": "https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx",
 			"input": {
