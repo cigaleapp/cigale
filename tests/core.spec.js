@@ -51,7 +51,7 @@ test('basic functionality', async ({ page }) => {
 
 	// Check for continuing
 	await page.getByRole('button', { name: /^Continuer/ }).click();
-	await expect(page.getByText('Confirmé', { exact: true })).toBeVisible();
+	await expect(page.getByText('Confirméééé', { exact: true })).toBeVisible();
 
 	// Go to classification view
 	await page.getByText('Classifier').click();
