@@ -1,5 +1,7 @@
 <script>
 	/**
+	 * @import * as Metadata from '$lib/metadata.js';
+	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
 	import { goto } from '$app/navigation';
@@ -30,7 +32,12 @@
 		imageId as makeImageId,
 		parseImageId
 	} from '$lib/images';
-	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import {
+		assertIs,
+		deleteMetadataValue,
+		getMetadataValueOrThrow,
+		storeMetadataValue
+	} from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -127,7 +134,7 @@
 	let focusedImageId = $state('');
 
 	/**
-	 * @type {Record<string, import('$lib/metadata.js').RuntimeValue<'boundingbox'>>}
+	 * @type {Record<string, Metadata.RuntimeValue<'boundingbox'>>}
 	 */
 	const boundingBoxes = $derived(
 		Object.fromEntries(
@@ -160,7 +167,7 @@
 	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
-	/** @type {Record<string, undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }>} */
+	/** @type {Record<string, undefined | { value: Metadata.RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
 		Object.fromEntries(
 			images.map((image) => {
@@ -199,7 +206,9 @@
 	 * @param {string} imageFileId
 	 */
 	function hasCrop(imageFileId) {
-		return imagesOfImageFile(imageFileId).every((image) => image.metadata[uiState.cropMetadataId]);
+		return imagesOfImageFile(imageFileId).every(
+			(image) => uiState.cropMetadataId in image.metadata
+		);
 	}
 
 	/**
@@ -212,18 +221,23 @@
 	}
 
 	/**
-	 * @param {import('$lib/database.js').Image} image
+	 * @param {DB.Image} image
 	 */
 	function imageHasConfirmedCrop(image) {
-		return image.metadata[uiState.cropMetadataId]?.manuallyModified;
+		return uiState.cropMetadataValueOf(image)?.manuallyModified;
 	}
 
 	/**
-	 * @param {import('$lib/database.js').Image} image
+	 * @param {DB.Image} image
 	 * @param {boolean} confirmed
 	 */
 	async function changeCropConfirmedStatus(image, confirmed) {
-		const { value, confidence, alternatives } = image.metadata[uiState.cropMetadataId];
+		const { value, confidence, alternatives } = getMetadataValueOrThrow(
+			image,
+			'boundingbox',
+			uiState.cropMetadataId
+		);
+
 		await storeMetadataValue({
 			metadataId: uiState.cropMetadataId,
 			subjectId: image.id,
