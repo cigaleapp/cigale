@@ -93,17 +93,17 @@ const protocol = {
 		}
 	],
 	metadataOrder: [
-		namespaced('species'),
-		namespaced('genus'),
-		namespaced('family'),
-		namespaced('order'),
-		namespaced('shoot_date'),
-		namespaced('shoot_location'),
-		namespaced('class'),
-		namespaced('phylum'),
-		namespaced('kingdom'),
-		namespaced('crop')
-	],
+		'species',
+		'genus',
+		'family',
+		'order',
+		'shoot_date',
+		'shoot_location',
+		'class',
+		'phylum',
+		'kingdom',
+		'crop'
+	].map(namespaced),
 	metadata: {
 		[namespaced('kingdom')]: {
 			...cladeMetadata('kingdom', 'Règne', {}),
