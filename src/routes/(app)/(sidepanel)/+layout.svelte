@@ -16,10 +16,27 @@
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { page } from '$app/state';
+	import { importMore } from './import/+page.svelte';
 
 	seo({ title: 'Importer' });
 
 	const { children } = $props();
+
+	async function importImages() {
+		const filesInput = document.createElement('input');
+		filesInput.type = 'file';
+		filesInput.multiple = true;
+		filesInput.accept = 'image/*';
+		filesInput.addEventListener('change', async (event) => {
+			if (!(event.currentTarget instanceof HTMLInputElement)) return;
+			if (!event.currentTarget.files) return;
+			const files = Array.from(event.currentTarget.files);
+			if (files.length === 0) return;
+			await importMore(files);
+		});
+		filesInput.click();
+	}
 
 	async function mergeSelection() {
 		const newId = await mergeToObservation(uiState.selection);
@@ -137,9 +154,10 @@
 			images={selectedHrefs}
 			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}
-			onmerge={mergeSelection}
+			onmerge={page.route.id?.endsWith('classify') ? mergeSelection : undefined}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
-			onsplit={splitSelection}
+			onsplit={page.route.id?.endsWith('classify') ? splitSelection : undefined}
+			onimport={page.route.id?.endsWith('import') ? importImages : undefined}
 			ondelete={deleteSelection}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
