@@ -71,6 +71,7 @@
 		>
 			Nettoyer la base de données
 		</ButtonSecondary>
+
 		<ButtonSecondary
 			onclick={() => {
 				window.open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`);
@@ -79,6 +80,17 @@
 		>
 			Voir sur Github
 		</ButtonSecondary>
+
+		{#await fetch( `https://cigaleapp.github.io/cigale/_playwright/pr-${previewingPrNumber}`, { method: 'HEAD' } ) then { status }}
+			{#if status < 400}
+				<ButtonSecondary
+					onclick={() =>
+						window.open(`https://cigaleapp.github.io/cigale/_playwright/pr-${previewingPrNumber}`)}
+				>
+					Résultats de tests E2E
+				</ButtonSecondary>
+			{/if}
+		{/await}
 	{/snippet}
 </Modal>
 
