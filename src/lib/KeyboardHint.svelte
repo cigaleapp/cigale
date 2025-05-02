@@ -42,6 +42,11 @@
 			// so uppercase them cuz its prettier
 			if (part.length === 1) return part.toUpperCase();
 
+			// Handle digits
+			if (part.startsWith('digit')) {
+				return part.replace(/^digit/, '');
+			}
+
 			// Handle arrows, using characters instead of ugly arrowup, arrowdown, etc.
 			if (part.startsWith('arrow')) {
 				switch (part.replace(/^arrow/, '').toLowerCase()) {
