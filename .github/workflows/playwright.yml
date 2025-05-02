@@ -30,7 +30,8 @@ jobs:
         if: always()
         with:
           report-file: test-results.json
-
+          comment-title: End-to-end tests
+          job-summary: true
           report-url: https://cigaleapp.github.io/cigale/_playwright/pr-${{ github.event.number }}/
 
       - name: Deploy results on github pages
