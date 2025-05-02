@@ -104,7 +104,10 @@
 		};
 	});
 
-	const showSidePanel = $derived(tables.Image.state.length + tables.Observation.state.length > 0);
+	const showSidePanel = $derived(
+		tables.Image.state.length + tables.Observation.state.length + uiState.processing.files.length >
+			0
+	);
 
 	const selectedImages = $derived(
 		uiState.selection
