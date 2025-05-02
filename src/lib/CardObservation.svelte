@@ -104,8 +104,7 @@
 				<div class="containbb">
 					{#if image}
 						{#if applyBoundingBoxes && boundingBoxes.length > 0}
-							<img src={image} alt="" class="blur" />
-							<CroppedImg src={image} alt={title} box={boundingBoxes[0]} />
+							<CroppedImg blurfill src={image} alt={title} box={boundingBoxes[0]} />
 						{:else}
 							<img src={image} alt={title} />
 						{/if}
@@ -356,13 +355,6 @@
 		display: inline-block;
 		position: relative;
 		overflow: hidden;
-	}
-
-	img.blur {
-		position: absolute;
-		inset: 0;
-		filter: blur(20px);
-		scale: 1.5;
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
