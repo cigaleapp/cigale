@@ -41,6 +41,7 @@ import { getMetadataValue } from './metadata';
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
  * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
+ * @property {string} cropConfirmationMetadataId ID de la métadonnée à utiliser pour déterminer si le recadrage a été confirmé
  * @property {string} currentProtocolId ID du protocole choisi
  * @property {string | ''} imageOpenedInCropper ID de l'image qu'on est en train de recadrer, ou '' si on est dans la gallerie
  * @property {string | ''} imagePreviouslyOpenedInCropper ID de l'image qu'on était en train de recadrer avant de changer d'image ou de revenir à la gallerie
@@ -99,6 +100,15 @@ export const uiState = $state({
 					this.currentProtocol?.metadata.includes(m.id) &&
 					this.currentProtocol?.crop?.metadata === m.id
 			)?.id ?? 'crop'
+		);
+	},
+	get cropConfirmationMetadataId() {
+		return (
+			tables.Metadata.state.find(
+				(m) =>
+					this.currentProtocol?.metadata.includes(m.id) &&
+					this.currentProtocol?.crop?.confirmationMetadata === m.id
+			)?.id ?? 'crop-confirmation'
 		);
 	},
 	/**

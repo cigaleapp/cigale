@@ -32,7 +32,8 @@ async function fillBuiltinData() {
 
 	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.transects');
 
-	if (!builtinProtocol) {
+	// TODO: at some point, remove the confirmationMetadata check
+	if (!builtinProtocol || !builtinProtocol.crop?.confirmationMetadata) {
 		try {
 			await fetch(
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'

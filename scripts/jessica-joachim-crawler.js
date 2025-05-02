@@ -102,7 +102,8 @@ const protocol = {
 		'class',
 		'phylum',
 		'kingdom',
-		'crop'
+		'crop',
+		'crop_is_confirmed'
 	].map(namespaced),
 	metadata: {
 		[namespaced('kingdom')]: {
@@ -137,6 +138,13 @@ const protocol = {
 			required: true,
 			mergeMethod: 'average'
 		},
+		[namespaced('crop_is_confirmed')]: {
+			type: 'boolean',
+			label: '',
+			description: '',
+			required: false,
+			mergeMethod: 'max'
+		},
 		[namespaced('species')]: {
 			type: 'enum',
 			label: 'Espèce',
@@ -164,6 +172,7 @@ const protocol = {
 	},
 	crop: {
 		metadata: namespaced('crop'),
+		confirmationMetadata: namespaced('crop_is_confirmed'),
 		infer: {
 			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
 			input: {

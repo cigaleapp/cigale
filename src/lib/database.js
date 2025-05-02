@@ -375,6 +375,11 @@ const Protocol = table(
 		),
 		'crop?': type({
 			metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
+			'confirmationMetadata?': [
+				ID,
+				'@',
+				'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée'
+			],
 			infer: type({
 				model: Request.describe(
 					'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
