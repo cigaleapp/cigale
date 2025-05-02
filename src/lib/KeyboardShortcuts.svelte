@@ -29,12 +29,15 @@
 				// Associating every pattern to its handler function...
 				Object.entries(binds)
 					.flatMap(([pattern, bind]) => {
-						// Handle keypad too
-						if (pattern.startsWith('Digit') && !pattern.includes(' '))
+						// Handle shift-number keybindings too
+						if (pattern.startsWith('Digit') && !pattern.includes(' ')) {
+							const number = pattern.replace('Digit', '');
 							return /** @type {const} */ ([
 								[pattern, bind],
-								[pattern.replace('Digit', ''), bind]
+								[number, bind],
+								[`Shift+${number}`, bind]
 							]);
+						}
 
 						return /** @type {const} */ ([[pattern, bind]]);
 					})
