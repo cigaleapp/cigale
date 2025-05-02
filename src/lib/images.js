@@ -111,7 +111,6 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 			if (previewURL) {
 				URL.revokeObjectURL(previewURL);
 				uiState.previewURLs.delete(id);
-				uiState.croppedPreviewURLs.delete(id);
 			}
 		}
 	);

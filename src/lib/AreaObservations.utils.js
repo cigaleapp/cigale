@@ -2,7 +2,6 @@ import { uiState } from '$lib/state.svelte';
 import { toTopLeftCoords } from './BoundingBoxes.svelte';
 import { idComparator } from './idb.svelte';
 import { imagesByImageFile } from './images';
-import { assertIs } from './metadata';
 
 /**
  * @typedef CardObservation
@@ -14,6 +13,7 @@ import { assertIs } from './metadata';
  * @property {number} stacksize
  * @property {number|undefined} [loading]
  * @property {boolean} [selectable=true] - whether the card is selectable
+ * @property {boolean} [applyBoundingBoxes] - whether the bounding boxes should be applied to the image
  * @property {object[]} [boundingBoxes] - array of bounding boxes
  * @property {number} boundingBoxes.x
  * @property {number} boundingBoxes.y
@@ -32,17 +32,22 @@ import { assertIs } from './metadata';
  * @param {Observation[]} observations
  * @param {object} param2
  * @param {(imageOrFileId: Image | string) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
- * @param {(imageOrFileId: Image | string|undefined) => string | undefined} [param2.previewURL] show cropped versions of images on cards where possible.
- * @param {(fileId: string|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes
+ * @param {(fileId: string|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes. If false, the bounding boxes will be applied instead.
  * @returns {CardObservation[]}
  */
 export function toAreaObservationProps(
 	imageFileIds,
 	images,
 	observations,
-	{ isLoaded, previewURL, showBoundingBoxes }
+	{ isLoaded, showBoundingBoxes }
 ) {
-	previewURL ??= (item) => uiState.getPreviewURL(typeof item === 'string' ? item : item?.fileId);
+	/**
+	 *
+	 * @param {Image|string} item
+	 * @returns
+	 */
+	const previewURL = (item) =>
+		uiState.getPreviewURL(typeof item === 'string' ? item : item?.fileId);
 	showBoundingBoxes ??= () => true;
 	const imagesOfFiles = imagesByImageFile(imageFileIds);
 	return (
@@ -51,24 +56,21 @@ export function toAreaObservationProps(
 				// Keep images that aren't part of any observation only
 				.filter((id) => !observations.some((observation) => observation.images.includes(id)))
 				.map((fileId, i) => {
-					const image = imagesOfFiles.get(fileId);
+					const images = imagesOfFiles.get(fileId);
+					const boxes = images
+						?.map((img) => uiState.cropMetadataValueOf(img))
+						.filter((box) => box !== undefined)
+						.map(({ value }) => toTopLeftCoords(value));
+
 					return /**  @satisfies {CardObservation} */ ({
 						image: previewURL(fileId) ?? '',
-						title: image?.at(0)?.filename ?? '',
+						title: images?.at(0)?.filename ?? '',
 						id: fileId,
 						index: i,
 						stacksize: 1,
 						loading: isLoaded(fileId) ? undefined : -1,
-						boundingBoxes:
-							showBoundingBoxes(fileId) && image
-								? image
-										.filter(({ metadata }) => metadata[uiState.cropMetadataId])
-										.map(({ metadata }) =>
-											toTopLeftCoords(
-												assertIs('boundingbox', metadata[uiState.cropMetadataId].value)
-											)
-										)
-								: []
+						applyBoundingBoxes: !showBoundingBoxes(fileId),
+						boundingBoxes: boxes ?? []
 					});
 				}),
 			// Keep images that are not part of any observation and don't have their fileId in imageFileIds
@@ -80,6 +82,7 @@ export function toAreaObservationProps(
 						!observations.some((observation) => observation.images.includes(img.id))
 				)
 				.map((img, i) => {
+					const box = uiState.cropMetadataValueOf(img);
 					return /**  @satisfies {CardObservation} */ ({
 						image: previewURL(img) ?? '',
 						title: img.filename,
@@ -87,14 +90,8 @@ export function toAreaObservationProps(
 						index: imageFileIds.length + i,
 						stacksize: 1,
 						loading: img.fileId && isLoaded(img) ? undefined : -1,
-						boundingBoxes:
-							img.fileId && showBoundingBoxes(img.fileId) && img.metadata[uiState.cropMetadataId]
-								? [
-										toTopLeftCoords(
-											assertIs('boundingbox', img.metadata[uiState.cropMetadataId].value)
-										)
-									]
-								: []
+						applyBoundingBoxes: !showBoundingBoxes(img.fileId ?? undefined),
+						boundingBoxes: box ? [toTopLeftCoords(box.value)] : []
 					});
 				}),
 			...observations.map((observation, i) => {
@@ -105,13 +102,9 @@ export function toAreaObservationProps(
 					(i) => i.id === observation.images.toSorted(idComparator)[0]
 				);
 				const boundingBoxes = imagesOfObservation
-					?.filter(
-						({ metadata, fileId }) =>
-							fileId === firstImage?.fileId && metadata[uiState.cropMetadataId]?.value
-					)
-					.map(({ metadata }) =>
-						toTopLeftCoords(assertIs('boundingbox', metadata[uiState.cropMetadataId].value))
-					);
+					.map((img) => uiState.cropMetadataValueOf(img))
+					.filter((metadata) => metadata !== undefined)
+					.map(({ value }) => toTopLeftCoords(value));
 
 				/**  @satisfies {CardObservation} */
 				return {
@@ -121,10 +114,8 @@ export function toAreaObservationProps(
 					index: imageFileIds.length + images.length + i,
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
-					boundingBoxes:
-						firstImage?.fileId && showBoundingBoxes(firstImage?.fileId)
-							? (boundingBoxes ?? [])
-							: [],
+					applyBoundingBoxes: !showBoundingBoxes(firstImage?.fileId ?? undefined),
+					boundingBoxes: firstImage?.fileId ? (boundingBoxes ?? []) : [],
 					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
 				};
 			})

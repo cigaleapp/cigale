@@ -32,7 +32,6 @@ import { getMetadataValue } from './metadata';
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées. Utiliser setSelection pour modifier
  * @property {undefined | ((newSelection: string[]) => void)} setSelection modifier la sélection
  * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
- * @property {Map<string, string>} croppedPreviewURLs url de type blob:// pouvant servir de src à une balise img pour afficher l'image, en version croppée. Map d'un ID d'ImageFile à l'URL
  * @property {(imageFileId: string | undefined | null, url: string, variant?: 'cropped' | 'full') => void} setPreviewURL
  * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => boolean} hasPreviewURL
  * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => string | undefined} getPreviewURL
@@ -65,19 +64,18 @@ export const uiState = $state({
 	imageOpenedInCropper: '',
 	imagePreviouslyOpenedInCropper: '',
 	previewURLs: new SvelteMap(),
-	croppedPreviewURLs: new SvelteMap(),
-	hasPreviewURL(imageFileId, variant = 'full') {
+	hasPreviewURL(imageFileId) {
 		if (!imageFileId) return false;
-		return (variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).has(imageFileId);
+		return this.previewURLs.has(imageFileId);
 	},
-	setPreviewURL(imageFileId, url, variant = 'full') {
-		console.log('setPreviewURL', { imageFileId, url, variant });
+	setPreviewURL(imageFileId, url) {
+		console.log('setPreviewURL', { imageFileId, url });
 		if (!imageFileId) return;
-		(variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).set(imageFileId, url);
+		this.previewURLs.set(imageFileId, url);
 	},
-	getPreviewURL(imageFileId, variant = 'full') {
+	getPreviewURL(imageFileId) {
 		if (!imageFileId) return undefined;
-		return (variant === 'cropped' ? this.croppedPreviewURLs : this.previewURLs).get(imageFileId);
+		return this.previewURLs.get(imageFileId);
 	},
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
