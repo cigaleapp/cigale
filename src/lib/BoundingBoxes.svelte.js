@@ -1,13 +1,34 @@
 import { type } from 'arktype';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
-export const anyBoundingBox = type({
+export const centeredBoundingBox = type({
 	x: 'number',
-	y: 'number'
-}).and(type.or({ width: 'number', height: 'number' }, { w: 'number', h: 'number' }));
+	y: 'number',
+	w: 'number',
+	h: 'number'
+});
+
+export const topLeftBoundingBox = type({
+	x: 'number',
+	y: 'number',
+	width: 'number',
+	height: 'number'
+});
+
+export const rect = type({
+	x: 'number > 0',
+	y: 'number > 0',
+	width: 'number > 0',
+	height: 'number > 0'
+});
+
+export const anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
 
 /**
  * @typedef {typeof anyBoundingBox.infer} AnyBoundingBox
+ * @typedef {typeof topLeftBoundingBox.infer} TopLeftBoundingBox
+ * @typedef {typeof centeredBoundingBox.infer} CenteredBoundingBox
+ * @typedef {typeof rect.infer} Rect
  */
 
 /**
@@ -113,17 +134,6 @@ export function withinBoundingBox(boundingBox, { x, y }) {
 	const { x: x_box, y: y_box, width, height } = boundingBox;
 	return x >= x_box && x <= x_box + width && y >= y_box && y <= y_box + height;
 }
-
-export const rect = type({
-	x: 'number > 0',
-	y: 'number > 0',
-	width: 'number > 0',
-	height: 'number > 0'
-});
-
-/**
- * @typedef {typeof rect.infer} Rect
- */
 
 /**
  *
