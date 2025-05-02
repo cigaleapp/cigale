@@ -357,6 +357,11 @@
 		overflow: hidden;
 	}
 
+	.containbb :global(picture) {
+		position: absolute;
+		inset: 0;
+	}
+
 	@media (prefers-reduced-motion: no-preference) {
 		.observation:not(.loading):is(:hover, :has(:focus-visible)) .stack-backgroud-card {
 			transform: rotate(3deg);
