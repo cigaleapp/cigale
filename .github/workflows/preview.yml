@@ -40,6 +40,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: playwright.yml
+          ref: ${{ github.event.pull_request.head.ref }}
           inputs: |
             {
               "base_url": "${{ steps.deploy-preview.outputs.preview-url }}"
