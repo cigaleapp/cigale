@@ -14,29 +14,49 @@
 	const { src, box, class: klass, ...rest } = $props();
 	const corners = $derived(toCorners(box));
 
-	const scale = $derived.by(() => {
-		const aspectRatio = box.width / box.height;
+	const aspectRatio = $derived(box.width / box.height);
+
+	/**
+	 *
+	 * @param {[number, number]} param0
+	 */
+	function percents([x, y]) {
+		return [x * 100, y * 100].map((c) => c + '%').join(' ');
+	}
+
+	/**
+	 * @type {number}
+	 */
+	const scale = $derived((1 / box.width) * Math.min(aspectRatio, 1));
+
+	/**
+	 * @type {[number, number]}
+	 */
+	const translate = $derived.by(() => {
+		const [originX, originY] = corners.topleft;
+		const [finalW, finalH] = [scale * box.width, scale * box.height];
+
 		if (aspectRatio > 1) {
-			return `${(1 / box.height) * 100}% ${(1 / box.height) * aspectRatio * 100}%`;
+			return [-originX, -originY + 1 / 2 - finalH / 2];
 		} else {
-			return `${(1 / box.width) * 100}% ${(1 / box.width) * aspectRatio * 100}%`;
+			return [-originX + 1 / 2 - finalW / 2, -originY];
 		}
 	});
 </script>
 
 <picture class="cropped {klass}">
 	<img
+		style:transform-origin={percents(corners.topleft)}
+		style:translate={percents(translate)}
+		style:scale="{scale * 100}%"
 		style:clip-path="polygon({[
 			corners.topleft,
 			corners.topright,
 			corners.bottomright,
 			corners.bottomleft
 		]
-			.map(([x, y]) => `${x * 100}% ${y * 100}%`)
+			.map(percents)
 			.join(', ')})"
-		style:translate={corners.topleft.map((c) => `${-c * 100}%`).join(' ')}
-		style:transform-origin={corners.topleft.map((c) => c * 100 + '%').join(' ')}
-		style:scale
 		{src}
 		{...rest}
 	/>
