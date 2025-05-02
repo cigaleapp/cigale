@@ -31,3 +31,10 @@ public
 static/*.schema.json
 scripts/jessica-joachim.com/
 scripts/jessica-joachim-crawler-report.md
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+tests/results

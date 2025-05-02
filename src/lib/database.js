@@ -408,7 +408,7 @@ const Settings = table(
 		language: type.enumerated('fr'),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
-		cropAutoNext: 'boolean = false',
+		cropAutoNext: 'boolean = false'
 	})
 );
 

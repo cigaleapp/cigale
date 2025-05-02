@@ -43,9 +43,10 @@
 				placeholder="Rechercher..."
 			/>
 		</li>
-		{#each protocols as p (p.id)}
+		{#each protocols as p, i (p.id)}
 			<li>
 				<button
+					data-testid={i === 0 ? 'protocol-to-choose' : undefined}
 					class:selected={p.id === currentProtocol?.id}
 					onclick={() => {
 						uiState.currentProtocolId = p.id;

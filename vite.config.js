@@ -1,9 +1,18 @@
+/// <reference types="vitest" />
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import icons from 'unplugin-icons/vite';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
 
 export default defineConfig({
+	test: {
+		environment: 'jsdom'
+	},
+	resolve: process.env.VITEST
+		? {
+				conditions: ['browser']
+			}
+		: {},
 	plugins: [
 		icons({
 			compiler: 'svelte',
