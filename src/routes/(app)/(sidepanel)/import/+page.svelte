@@ -1,4 +1,7 @@
 <script>
+	/**
+	 * @import { DimensionsIn } from '$lib/database.js';
+	 */
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
@@ -56,7 +59,7 @@
 		}
 
 		const originalBytes = await file.arrayBuffer();
-		const resizedBytes = await resizeToMaxSize({ source: file });
+		const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
 
 		filesToProcess.shift();
 		await storeImageBytes({
@@ -64,14 +67,17 @@
 			resizedBytes,
 			originalBytes,
 			contentType: file.type,
-			filename: file.name
+			filename: file.name,
+			width,
+			height
 		});
 
 		await inferBoundingBoxes({
 			id,
 			bytes: resizedBytes,
 			filename: file.name,
-			contentType: file.type
+			contentType: file.type,
+			dimensions: { width, height }
 		});
 
 		await processExifData(uiState.currentProtocol.id, id, originalBytes, file);
@@ -83,6 +89,7 @@
 	 * @param {string} file.filename
 	 * @param {string} file.contentType
 	 * @param {string} file.id
+	 * @param {DimensionsIn} file.dimensions
 	 * @returns {Promise<void>}
 	 */
 	async function inferBoundingBoxes(file) {
@@ -117,6 +124,7 @@
 				filename: file.filename,
 				addedAt: formatISO(new Date()),
 				contentType: file.contentType,
+				dimensions: file.dimensions,
 				fileId: file.id,
 				metadata: {}
 			});
@@ -134,6 +142,7 @@
 				filename: file.filename,
 				addedAt: formatISO(new Date()),
 				contentType: file.contentType,
+				dimensions: file.dimensions,
 				fileId: file.id,
 				metadata: {
 					[uiState.cropMetadataId]: {

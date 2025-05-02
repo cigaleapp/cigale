@@ -1,11 +1,14 @@
 <script>
+	/**
+	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	 */
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
 		coordsAreEqual,
+		coordsScaler,
 		toCenteredCoords,
-		toPixelCoords,
 		toTopLeftCoords
 	} from '$lib/BoundingBoxes.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -277,7 +280,7 @@
 
 	/**
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
-	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
+	 * @param {Rect} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
 	 * @returns {Promise<string>} the ID of the image we just modified/created
 	 */
@@ -376,8 +379,18 @@
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
 	}
 
+	/**
+	 * @param {CenteredBoundingBox} box
+	 * @returns {[number, number]} pixel dimensions of the box
+	 */
 	function roundedPixelDimensions(box) {
-		const { w, h } = mapValues(toPixelCoords(uiState.currentProtocol)(box), Math.round);
+		if (!firstImage) return [0, 0];
+		const scaler = coordsScaler({
+			x: firstImage.dimensions.width,
+			y: firstImage.dimensions.height
+		});
+
+		const { w, h } = mapValues(scaler(box), Math.round);
 		return [w, h];
 	}
 
@@ -581,7 +594,7 @@
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
 							<p class="dimensions">
-								<code>{w} × {h}</code>
+								<code use:tooltip={"Dimensions de l'image recadrée (en pixels)"}>{w}×{h}</code>
 								<!-- we have a neural-infered value only, put the confidence next to the value -->
 								{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
 									<sup>
