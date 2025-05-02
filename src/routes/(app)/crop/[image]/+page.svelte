@@ -358,6 +358,7 @@
 				filename: firstImage?.filename ?? '',
 				addedAt: formatISO(firstImage?.addedAt ?? new Date()),
 				contentType: firstImage?.contentType ?? '',
+				dimensions: firstImage?.dimensions ?? { width: 0, height: 0 },
 				fileId,
 				metadata: {
 					[uiState.cropMetadataId]: {
