@@ -1,11 +1,11 @@
 <script>
-	import Checkbox from './Checkbox.svelte';
-	import { isType } from './metadata';
-	import MetadataCombobox from './MetadataCombobox.svelte';
-	import IconIncrement from '~icons/ph/plus';
+	import { format, parse } from 'date-fns';
 	import IconError from '~icons/ph/exclamation-mark-fill';
 	import IconDecrement from '~icons/ph/minus';
-	import { format, parse } from 'date-fns';
+	import IconIncrement from '~icons/ph/plus';
+	import { isType } from './metadata';
+	import MetadataCombobox from './MetadataCombobox.svelte';
+	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';
 
@@ -26,7 +26,7 @@
 	const { type, options = [] } = definition;
 </script>
 
-<div class="metadata-input">
+<div class="metadata-input" data-type={type}>
 	{#if isType('enum', type, value)}
 		<MetadataCombobox
 			{id}
@@ -44,13 +44,20 @@
 			}}
 		/>
 	{:else if isType('boolean', type, value)}
-		<Checkbox bind:value {id} {disabled}>
+		<div class="boolean-switch">
+			<Switch
+				{value}
+				onchange={(newValue) => {
+					console.log('onblur', newValue);
+					onblur?.(newValue);
+				}}
+			/>
 			{#if value}
 				Oui
 			{:else if value === false}
 				Non
 			{/if}
-		</Checkbox>
+		</div>
 	{:else if isType('string', type, value)}
 		<input type="text" bind:value {id} {disabled} />
 	{:else if isType('integer', type, value) || isType('float', type, value)}
@@ -127,13 +134,13 @@
 		border: none;
 	}
 
-	.metadata-input:not(:has(.unrepresentable)) {
+	.metadata-input:not([data-type='boolean']):not(:has(.unrepresentable)) {
 		border-bottom: 2px dashed var(--fg-neutral);
 		display: flex;
 		align-items: center;
 	}
 
-	.metadata-input:focus-within {
+	.metadata-input:not([data-type='boolean']):focus-within {
 		border-bottom-style: solid;
 	}
 
@@ -142,5 +149,11 @@
 		align-items: center;
 		gap: 0.5em;
 		color: var(--fg-error);
+	}
+
+	.boolean-switch {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 	}
 </style>
