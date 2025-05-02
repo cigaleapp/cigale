@@ -101,7 +101,7 @@
 						{/if}
 					</div>
 				{/if}
-				<div class="containbb">
+				<div class="containbb" class:has-boxes={!applyBoundingBoxes}>
 					{#if image}
 						{#if applyBoundingBoxes && boundingBoxes.length > 0}
 							<CroppedImg blurfill src={image} alt={title} box={boundingBoxes[0]} />
@@ -353,8 +353,11 @@
 
 	.containbb {
 		display: inline-block;
-		position: relative;
 		overflow: hidden;
+	}
+
+	.containbb:not(.has-boxes) {
+		position: relative;
 	}
 
 	.containbb :global(picture) {
