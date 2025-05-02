@@ -951,6 +951,7 @@
 		width: var(--size);
 		height: var(--size);
 		border-radius: var(--corner-radius);
+		background: color-mix(in srgb, var(--gray) 35%, transparent);
 	}
 
 	.boxes .actions {
