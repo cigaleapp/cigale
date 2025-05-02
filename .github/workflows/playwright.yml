@@ -31,6 +31,8 @@ jobs:
         with:
           report-file: test-results.json
 
+          report-url: https://cigaleapp.github.io/cigale/_playwright/pr-${{ github.event.number }}/
+
       - name: Deploy results on github pages
         if: ${{ !cancelled() }}
         uses: rossjrw/pr-preview-action@v1
