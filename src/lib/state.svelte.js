@@ -108,7 +108,7 @@ export const uiState = $state({
 				(m) =>
 					this.currentProtocol?.metadata.includes(m.id) &&
 					this.currentProtocol?.crop?.confirmationMetadata === m.id
-			)?.id ?? 'crop-confirmation'
+			)?.id ?? ''
 		);
 	},
 	/**

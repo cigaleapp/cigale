@@ -229,16 +229,16 @@
 	}
 
 	/**
-	 * @param {DB.Image} image
+	 * @param {string} imageId
 	 * @param {boolean} confirmed
 	 */
-	async function changeCropConfirmedStatus(image, confirmed) {
+	async function changeCropConfirmedStatus(imageId, confirmed) {
 		const metadataId = uiState.cropConfirmationMetadataId;
 		if (!metadataId) return;
 
 		await storeMetadataValue({
 			metadataId,
-			subjectId: image.id,
+			subjectId: imageId,
 			type: 'boolean',
 			manuallyModified: true,
 			value: confirmed
@@ -257,7 +257,7 @@
 		}
 
 		for (const image of images) {
-			await changeCropConfirmedStatus(image, confirmed);
+			await changeCropConfirmedStatus(image.id, confirmed);
 		}
 	}
 
@@ -314,10 +314,15 @@
 	 * @returns {Promise<string>} the ID of the image we just modified/created
 	 */
 	async function onCropChange(imageId, newBoundingBox, flashConfirmedOverlay = true) {
-		console.log('onConfirmCrop', imageId, newBoundingBox);
-		// Flash if the callsite asked for it and this is the last image before the file is considered confirmed
+		// Flash if
 		const willFlashConfirmedOverlay =
-			flashConfirmedOverlay && images.filter(imageHasConfirmedCrop).length === images.length - 1;
+			// the callsite asked for it,
+			flashConfirmedOverlay &&
+			// we can actually mark crops as confirmed given the current protocol
+			uiState.cropConfirmationMetadataId &&
+			// and this is the last image before the file is considered confirmed
+			images.filter(imageHasConfirmedCrop).length === images.length - 1;
+
 		const willAutoskip =
 			// The user has auto-skip enabled
 			getSettings().cropAutoNext &&
@@ -763,14 +768,16 @@
 				</p>
 				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
 			</div>
-			<div class="bar">
-				<p>
-					<IconConfirmedCrop />
-					Recadrages confirmés
-					{@render percent(confirmedCropsCount)}
-				</p>
-				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
-			</div>
+			{#if uiState.cropConfirmationMetadataId}
+				<div class="bar">
+					<p>
+						<IconConfirmedCrop />
+						Recadrages confirmés
+						{@render percent(confirmedCropsCount)}
+					</p>
+					<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
+				</div>
+			{/if}
 		</section>
 		<nav>
 			<div class="navigation">
