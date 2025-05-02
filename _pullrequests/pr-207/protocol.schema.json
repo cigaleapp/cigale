@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "table": "$ark.object861",
+  "table": "$ark.object866",
   "properties": {
     "authors": {
       "type": "array",
@@ -41,7 +41,7 @@
         "anyOf": [
           {
             "type": "object",
-            "table": "$ark.object800",
+            "table": "$ark.object805",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -703,7 +703,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object800",
+            "table": "$ark.object805",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -1427,7 +1427,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object800",
+            "table": "$ark.object805",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
