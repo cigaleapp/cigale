@@ -9,8 +9,6 @@ import { defineConfig, devices } from '@playwright/test';
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL;
-
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -29,7 +27,7 @@ export default defineConfig({
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. */
-		baseURL: baseURL || (process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173'),
+		baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: 'on-first-retry'
@@ -79,18 +77,16 @@ export default defineConfig({
 	],
 
 	/* Run your local dev server before starting the tests */
-	webServer: baseURL
-		? undefined
-		: {
-				...(process.env.CI
-					? {
-							command: 'npm run build && npm run preview',
-							port: 4173
-						}
-					: {
-							command: 'npm run dev',
-							port: 5173
-						}),
-				reuseExistingServer: !process.env.CI
-			}
+	webServer: {
+		...(process.env.CI
+			? {
+					command: 'npm run build && npm run preview',
+					port: 4173
+				}
+			: {
+					command: 'npm run dev',
+					port: 5173
+				}),
+		reuseExistingServer: !process.env.CI
+	}
 });
