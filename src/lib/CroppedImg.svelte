@@ -6,12 +6,12 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {string|undefined} src - The source URL of the image.
-	 * @property {string} class - Additional classes to apply to the div wrapper.
+	 * @property {string} [class] - Additional classes to apply to the div wrapper.
 	 * @property {import('./BoundingBoxes.svelte').Rect} box - The bounding box to crop the image to, in relative (0-1), top-left coordinates.
 	 */
 
-	/** @type {Props} */
-	const { src, box, class: klass, ...rest } = $props();
+	/** @type {Props & Record<string, unknown>} */
+	const { src, box, class: klass = '', ...rest } = $props();
 	const corners = $derived(toCorners(box));
 
 	const aspectRatio = $derived(box.width / box.height);
@@ -64,7 +64,6 @@
 
 <style>
 	picture {
-		background: var(--gray);
 		overflow: hidden;
 	}
 	img {

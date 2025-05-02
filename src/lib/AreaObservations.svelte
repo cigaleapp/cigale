@@ -137,6 +137,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			highlighted={props.id === highlight}
 			selected={selection.includes(props.id.toString())}
 			boundingBoxes={props.boundingBoxes}
+			applyBoundingBoxes={props.applyBoundingBoxes}
 			{loadingText}
 		/>
 	{/each}

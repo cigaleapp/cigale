@@ -35,12 +35,7 @@
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
-			previewURL: (item) =>
-				typeof item === 'string'
-					? uiState.getPreviewURL(item, 'full')
-					: (uiState.getPreviewURL(item?.id, 'cropped') ??
-						uiState.getPreviewURL(item?.fileId, 'full')),
-			showBoundingBoxes: (image) => !uiState.hasPreviewURL(image, 'cropped'),
+			showBoundingBoxes: () => false,
 			isLoaded: (item) =>
 				typeof item === 'string'
 					? false
