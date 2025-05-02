@@ -40,10 +40,15 @@ export default defineConfig({
 			use: { ...devices['Desktop Chrome'] }
 		},
 
-		{
-			name: 'firefox',
-			use: { ...devices['Desktop Firefox'] }
-		},
+		// Firefox does not work in CI, see https://github.com/microsoft/playwright/issues/11566
+		...(process.env.CI
+			? []
+			: [
+					{
+						name: 'firefox',
+						use: { ...devices['Desktop Firefox'] }
+					}
+				]),
 
 		{
 			name: 'webkit',
