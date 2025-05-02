@@ -1,5 +1,11 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { tables } from './idb.svelte';
+import { getMetadataValue } from './metadata';
+
+/**
+ * @import * as DB from './database';
+ * @import { TypedMetadataValue } from './metadata';
+ */
 
 /**
  * @typedef Keybind
@@ -38,7 +44,8 @@ import { tables } from './idb.svelte';
  * @property {string} currentProtocolId ID du protocole choisi
  * @property {string | ''} imageOpenedInCropper ID de l'image qu'on est en train de recadrer, ou '' si on est dans la gallerie
  * @property {string | ''} imagePreviouslyOpenedInCropper ID de l'image qu'on était en train de recadrer avant de changer d'image ou de revenir à la gallerie
- * @property {import('./database').Protocol | undefined} currentProtocol protocole choisi
+ * @property {DB.Protocol | undefined} currentProtocol protocole choisi
+ * @property {(image: DB.Image) => TypedMetadataValue<'boundingbox'>|undefined} cropMetadataValueOf} récupérer la valeur de la métadonnée de recadrage d'une image, pour le protocole actuel
  */
 
 /**
@@ -93,6 +100,12 @@ export const uiState = $state({
 					this.currentProtocol?.crop?.metadata === m.id
 			)?.id ?? 'crop'
 		);
+	},
+	/**
+	 * Get the bounding box metadata value of an image
+	 */
+	cropMetadataValueOf(image) {
+		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
 	},
 	get currentProtocol() {
 		return tables.Protocol.state.find((p) => p.id === this.currentProtocolId);
