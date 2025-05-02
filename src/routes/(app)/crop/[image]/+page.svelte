@@ -517,7 +517,7 @@
 		};
 		for (const tool of tools) {
 			uiState.keybinds[tool.shortcut] = {
-				help: `Outil ${tool.name}`,
+				help: `Choisir l'outil ${tool.name}`,
 				do: () => {
 					activeToolName = tool.name;
 				}
