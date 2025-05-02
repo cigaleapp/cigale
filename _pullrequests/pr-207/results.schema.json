@@ -58,7 +58,7 @@
     },
     "protocol": {
       "type": "object",
-      "table": "$ark.object866",
+      "table": "$ark.object868",
       "description": "Le protocole utilisé pour cette session d'analyse",
       "properties": {
         "authors": {
@@ -286,6 +286,11 @@
             "metadata": {
               "type": "string",
               "description": "Métadonnée associée à la boîte englobante",
+              "pattern": "[\\w_]+"
+            },
+            "confirmationMetadata": {
+              "type": "string",
+              "description": "Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée",
               "pattern": "[\\w_]+"
             }
           },
