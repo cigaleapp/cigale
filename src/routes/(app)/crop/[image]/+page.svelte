@@ -627,6 +627,34 @@
 					</h1>
 				{/if}
 			</section>
+			<section class="actions">
+				<ButtonSecondary
+					keyboard="$mod+U"
+					help="Revenir au recadrage d'origine pour toutes les boîtes"
+					onclick={revertAll}
+					disabled={!Object.values(revertableCrops).some(Boolean)}
+				>
+					<IconRevert />
+					Réinit.
+				</ButtonSecondary>
+				{#if uiState.cropConfirmationMetadataId}
+					<ButtonSecondary
+						keyboard="Arrow{hasConfirmedCrop(fileId) ? 'Down' : 'Up'}"
+						onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
+						help="Marquer le recadrage comme {hasConfirmedCrop(fileId)
+							? 'non confirmé'
+							: 'confirmé'}"
+					>
+						{#if hasConfirmedCrop(fileId)}
+							<IconUnconfirmedCrop />
+							Invalider
+						{:else}
+							<IconConfirmedCrop />
+							Valider
+						{/if}
+					</ButtonSecondary>
+				{/if}
+			</section>
 		</section>
 		<section class="boxes">
 			<ul>
@@ -743,32 +771,6 @@
 				</p>
 				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
 			</div>
-		</section>
-		<section class="actions">
-			<ButtonSecondary
-				keyboard="$mod+U"
-				help="Revenir au recadrage d'origine pour toutes les boîtes"
-				onclick={revertAll}
-				disabled={!Object.values(revertableCrops).some(Boolean)}
-			>
-				<IconRevert />
-				Réinit.
-			</ButtonSecondary>
-			{#if uiState.cropConfirmationMetadataId}
-				<ButtonSecondary
-					keyboard="Arrow{hasConfirmedCrop(fileId) ? 'Down' : 'Up'}"
-					onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
-					help="Marquer le recadrage comme {hasConfirmedCrop(fileId) ? 'non confirmé' : 'confirmé'}"
-				>
-					{#if hasConfirmedCrop(fileId)}
-						<IconUnconfirmedCrop />
-						Invalider
-					{:else}
-						<IconConfirmedCrop />
-						Valider
-					{/if}
-				</ButtonSecondary>
-			{/if}
 		</section>
 		<nav>
 			<div class="navigation">
@@ -952,6 +954,15 @@
 		color: var(--fg-success);
 	}
 
+	.info section.actions {
+		--width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		width: 100%;
+		margin-top: 0.5em;
+	}
+
 	.boxes {
 		overflow-y: auto;
 		height: 100%;
@@ -1004,14 +1015,6 @@
 
 	.boxes li .actions {
 		margin-left: auto;
-	}
-
-	.info section.actions {
-		--width: 100%;
-		display: flex;
-		align-items: center;
-		gap: 0.75em;
-		width: 100%;
 	}
 
 	.info .progress {
