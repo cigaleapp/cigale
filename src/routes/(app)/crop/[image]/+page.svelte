@@ -16,7 +16,9 @@
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Switch from '$lib/Switch.svelte';
+	import Tooltip from '$lib/Tooltip.svelte';
 	import * as idb from '$lib/idb.svelte.js';
 	import {
 		imageFileIds,
@@ -114,6 +116,8 @@
 			cursor: 'move'
 		}
 	]);
+
+	const creationTools = $derived(tools.filter(({ createMode }) => createMode !== 'off'));
 
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
@@ -564,10 +568,7 @@
 					{@const box = boundingBoxes[image.id]}
 					{@const initBox = initialCrops[image.id]}
 					{@const [w, h] = roundedPixelDimensions(box)}
-					{@const keyboardHint = (/** @type {string} */ letter) =>
-						i <= 9
-							? `(<kbd class=hint><kbd>${letter}</kbd></kbd> si sélectionnée, <kbd class=hint><kbd>${i + 1}</kbd></kbd> pour la sélectionner)`
-							: ''}
+					{@const isFocused = focusedImageId === image.id}
 					<li
 						class:unfocused={focusedImageId && focusedImageId !== image.id}
 						class:selected={selectedBoundingBox === image.id}
@@ -593,12 +594,9 @@
 						</div>
 						<div class="actions">
 							{#if Object.values(boundingBoxes).length > 1}
-								{@const isFocused = focusedImageId === image.id}
 								<ButtonIcon
-									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes {keyboardHint(
-										'F'
-									)}"
-									keyboard=""
+									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes"
+									keyboard="F"
 									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
 									crossout={isFocused}
 								>
@@ -619,14 +617,16 @@
 							<ButtonIcon
 								help="Revenir au recadrage d'origine ({initBox
 									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${Math.round(initBox.confidence * 100)}% de confiance`
-									: 'indisponible'}) {keyboardHint('u')}"
+									: 'indisponible'})"
+								keyboard="U"
 								disabled={!revertableCrops}
 								onclick={async () => await revertToInferedCrop(image.id)}
 							>
 								<IconRevert />
 							</ButtonIcon>
 							<ButtonIcon
-								help="Supprimer cette boîte {keyboardHint('Suppr')}"
+								help="Supprimer cette boîte"
+								keyboard="Delete"
 								onclick={async () => {
 									if (images.length === 1) {
 										await deleteMetadataValue({
@@ -643,10 +643,26 @@
 						</div>
 					</li>
 				{/each}
-				<li class="create-hint">
+				<li class="boxes-list-hint">
 					<p>
-						Pour créer une nouvelle boîte,<wbr />
-						utilisez les outils <IconToolDragCrop />, <IconTwoPointCrop /> ou <IconFourPointCrop />
+						Pour créer une nouvelle boîte,<wbr /> utilisez les outils <SentenceJoin
+							items={creationTools}
+							key={(t) => t.name}
+							final="ou"
+						>
+							{#snippet children({ icon: Icon, help, shortcut })}
+								<Tooltip text={help} keyboard={shortcut}>
+									<Icon />
+								</Tooltip>
+							{/snippet}
+						</SentenceJoin>
+					</p>
+				</li>
+				<li class="boxes-list-hint">
+					<p>
+						Sélectionnez une boîte avec
+						<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des raccourcis
+						clavier
 					</p>
 				</li>
 			</ul>
@@ -894,12 +910,12 @@
 		background: var(--bg-primary-translucent);
 	}
 
-	.boxes li.create-hint {
+	.boxes li.boxes-list-hint {
 		color: var(--gay);
 	}
 
-	.boxes li.create-hint p,
-	.boxes li.create-hint p :global(.icon) {
+	.boxes li.boxes-list-hint p,
+	.boxes li.boxes-list-hint p :global(.icon) {
 		vertical-align: middle;
 	}
 
