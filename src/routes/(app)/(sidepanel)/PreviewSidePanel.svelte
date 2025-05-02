@@ -124,7 +124,7 @@
 							if (deepEqual(v, value?.value)) return;
 							onmetadatachange(definition.id, v);
 						}}
-					></Metadata>
+					/>
 				{/if}
 			{/each}
 		</MetadataList>
