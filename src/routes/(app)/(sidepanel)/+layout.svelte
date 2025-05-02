@@ -18,6 +18,7 @@
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 	import { page } from '$app/state';
 	import { importMore } from './import/+page.svelte';
+	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -130,10 +131,18 @@
 			.filter((o) => o !== undefined)
 	);
 
-	const selectedHrefs = $derived(
+	const selectedHrefsWithCropboxes = $derived(
 		selectedImages
-			.map((image) => uiState.getPreviewURL(image?.fileId))
-			.filter((url) => url !== undefined)
+			.map((image) => {
+				const src = uiState.getPreviewURL(image.fileId);
+				if (!src) return undefined;
+				const box = uiState.cropMetadataValueOf(image)?.value;
+				return {
+					src,
+					box: box ? toTopLeftCoords(box) : undefined
+				};
+			})
+			.filter((i) => i !== undefined)
 	);
 
 	/** @type {Awaited<ReturnType<typeof mergeMetadataFromImagesAndObservations>>} */
@@ -154,7 +163,7 @@
 	<main>{@render children?.()}</main>
 	{#if showSidePanel}
 		<PreviewSidePanel
-			images={selectedHrefs}
+			images={selectedHrefsWithCropboxes}
 			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}
 			onmerge={page.route.id?.endsWith('classify') ? mergeSelection : undefined}

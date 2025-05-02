@@ -1,5 +1,9 @@
 <script>
+	/**
+	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	 */
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { countThings } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -19,7 +23,7 @@
 
 	/**
 	 * @typedef {object} Props
-	 * @property {string[]} images source **href**s of the images/observations we're modifying the metadata on
+	 * @property {Array<{ src: string; box?: undefined | TopLeftBoundingBox }>} images source **href**s of the images/observations we're modifying the metadata on
 	 * @property {(() => void) | undefined} [onmerge] callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown.
 	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
 	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
@@ -79,8 +83,15 @@
 <div class="pannel" class:empty={images.length === 0}>
 	{#if images.length > 0}
 		<div class="images">
-			{#each images as image, i (i)}
-				<img src={image} alt={'image ' + i} />
+			{#each images as { src, box }, i (i)}
+				{@const alt = singleObservationSelected
+					? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
+					: `Image ${i + 1} de la sélection`}
+				{#if box}
+					<CroppedImg blurfill {src} {alt} {box} />
+				{:else}
+					<img {src} {alt} />
+				{/if}
 			{/each}
 		</div>
 		<h2>
@@ -217,7 +228,7 @@
 		overflow-x: hidden;
 	}
 
-	img {
+	.images :global(> *) {
 		height: 50px;
 		border-radius: var(--corner-radius);
 	}
