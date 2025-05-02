@@ -18,7 +18,7 @@ import { mapValues } from './utils.js';
 /**
  * @template {DB.MetadataType} [Type=DB.MetadataType]
  * @typedef TypedMetadataValue
- * @type {DB.MetadataValue & { value: RuntimeValue<Type> }}
+ * @type {Omit<DB.MetadataValue, 'value'> & { value: RuntimeValue<Type> }}
  */
 
 /**
