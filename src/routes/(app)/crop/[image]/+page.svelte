@@ -148,7 +148,6 @@
 	);
 	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(fileId)));
 	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idb.idComparator));
-	const unconfirmedCropFileIds = $derived(sortedFileIds.filter((id) => !hasConfirmedCrop(id)));
 	const prevFileId = $derived.by(() => {
 		const idx = sortedFileIds.indexOf(fileId) - 1;
 		if (idx < 0) return undefined;
@@ -160,9 +159,15 @@
 		return sortedFileIds.at(idx);
 	});
 	const nextUnconfirmedImageId = $derived.by(() => {
-		const idx = unconfirmedCropFileIds.indexOf(fileId) + 1;
-		if (idx >= unconfirmedCropFileIds.length) return undefined;
-		return unconfirmedCropFileIds.at(idx);
+		const forward = sortedFileIds
+			.slice(sortedFileIds.indexOf(fileId) + 1)
+			.filter((fileId) => !hasConfirmedCrop(fileId))
+			.at(0);
+
+		if (forward) return forward;
+
+		// Loop around.
+		return sortedFileIds.find((fileId) => !hasConfirmedCrop(fileId));
 	});
 	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
@@ -378,7 +383,9 @@
 		}
 
 		if (willAutoskip) {
-			await goto(nextFileId ? `#/crop/${nextFileId}` : `#/classify`, { invalidateAll: true });
+			await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`, {
+				invalidateAll: true
+			});
 		}
 
 		return newImageId;
