@@ -112,6 +112,8 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
  * @param {ArrayBuffer} param0.resizedBytes resized image data
  * @param {string} param0.contentType the content type of the image
  * @param {string} param0.filename the filename of the image
+ * @param {number} param0.width the width of the image
+ * @param {number} param0.height the height of the image
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
  */
 export async function storeImageBytes({
@@ -120,11 +122,25 @@ export async function storeImageBytes({
 	resizedBytes,
 	contentType,
 	filename,
+	width,
+	height,
 	tx
 }) {
 	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
-		tx.objectStore('ImageFile').put({ id, bytes: originalBytes, contentType, filename });
-		tx.objectStore('ImagePreviewFile').put({ id, bytes: resizedBytes, contentType, filename });
+		tx.objectStore('ImageFile').put({
+			id,
+			bytes: originalBytes,
+			contentType,
+			filename,
+			dimensions: { width, height }
+		});
+		tx.objectStore('ImagePreviewFile').put({
+			id,
+			bytes: resizedBytes,
+			contentType,
+			filename,
+			dimensions: { width, height }
+		});
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));
 	});
@@ -143,15 +159,16 @@ const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width)
  * Resize an image to fit within MAXWIDTH and MAXHEIGHT
  * @param {object} param0
  * @param {Blob} param0.source
- * @returns {Promise<ArrayBuffer>}
+ * @returns {Promise<[[number, number], ArrayBuffer]>} [[original width, original height], resized image data]
  */
 export async function resizeToMaxSize({ source }) {
 	// For some reason top-level import fails
 	const { resize } = await import('pica-gpu');
 	const originalImage = await createImageBitmap(source);
+	const { width, height } = originalImage;
 	const originalCanvas = document.createElement('canvas');
-	originalCanvas.width = originalImage.width;
-	originalCanvas.height = originalImage.height;
+	originalCanvas.width = width;
+	originalCanvas.height = height;
 	originalCanvas.getContext('2d')?.drawImage(originalImage, 0, 0);
 
 	const resizedCanvas = document.createElement('canvas');
@@ -165,7 +182,7 @@ export async function resizeToMaxSize({ source }) {
 	return new Promise((resolve) => {
 		resizedCanvas.toBlob((blob) => {
 			if (!blob) throw new Error('Failed to resize image');
-			resolve(blob.arrayBuffer());
+			blob.arrayBuffer().then((buf) => resolve([[width, height], buf]));
 		}, source.type);
 	});
 }

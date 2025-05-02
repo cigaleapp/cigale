@@ -10,6 +10,15 @@ const ID = type(/[\w_]+/);
 
 const References = ID.array().pipe((ids) => [...new Set(ids)]);
 
+const Dimensions = type({
+	width: 'number > 0',
+	height: 'number > 0'
+}).pipe(({ width, height }) => ({
+	width,
+	height,
+	aspectRatio: width / height
+}));
+
 /**
  * Add a suffix to a filename, before the extension
  */
@@ -151,7 +160,8 @@ const ImageFile = table(
 		id: ID,
 		bytes: 'ArrayBuffer',
 		filename: 'string',
-		contentType: /\w+\/\w+/
+		contentType: /\w+\/\w+/,
+		dimensions: Dimensions
 	})
 );
 
@@ -162,7 +172,8 @@ const ImagePreviewFile = table(
 		id: ID,
 		bytes: 'ArrayBuffer',
 		filename: 'string',
-		contentType: /\w+\/\w+/
+		contentType: /\w+\/\w+/,
+		dimensions: Dimensions
 	})
 );
 
@@ -172,6 +183,7 @@ const Image = table(
 		id: /\d+(_\d+)*/,
 		filename: 'string',
 		addedAt: 'string.date.iso.parse',
+		dimensions: Dimensions,
 		metadata: MetadataValues,
 		contentType: /\w+\/\w+/,
 		fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
@@ -566,4 +578,12 @@ function table(keyPaths, schema) {
 /**
  * @typedef ImageFile
  * @type {typeof ImageFile.infer}
+ */
+
+/**
+ * @typedef Dimensions
+ * @type {typeof Dimensions.infer}
+ *
+ * @typedef DimensionsInput
+ * @type {typeof Dimensions.inferIn}
  */
