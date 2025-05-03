@@ -38,10 +38,6 @@ export default defineConfig({
 	/* Configure projects for major browsers */
 	projects: [
 		{
-			name: 'wait for db',
-			testMatch: /setup\.js/
-		},
-		{
 			name: 'chromium',
 			use: { ...devices['Desktop Chrome'] }
 		},
