@@ -5,12 +5,8 @@ import { test as base } from '@playwright/test';
  */
 
 /**
- * @type {TestType<PlaywrightTestArgs & PlaywrightTestOptions & { db: {name: string; version: number} }, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
+ * @type {TestType<PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
  */
-export const test = base.extend({
-	db: async ({ page: _page }, use) => {
-		use({ name: 'database', version: 3 });
-	}
-});
+export const test = base.extend({});
 
 export { expect } from '@playwright/test';

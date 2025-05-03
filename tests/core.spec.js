@@ -5,10 +5,10 @@ import * as path from 'node:path';
 import { Analysis } from '../scripts/generate-json-schemas.js';
 import { setSettings } from './utils.js';
 
-test('basic functionality', async ({ page, db }) => {
+test('basic functionality', async ({ page }) => {
 	await page.goto('/');
 
-	await setSettings({ db, page }, { showTechnicalMetadata: false });
+	await setSettings({ page }, { showTechnicalMetadata: false });
 
 	// Choose default protocol
 	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });

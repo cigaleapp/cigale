@@ -1,6 +1,5 @@
-import path from 'node:path';
 import { expect } from '@playwright/test';
-import { openDB } from 'idb';
+import path from 'node:path';
 
 /**
  * @import { Page } from '@playwright/test';
@@ -31,15 +30,30 @@ export async function importPhotos({ page }, ...names) {
  *
  * @param {object} param0
  * @param {Page} param0.page
- * @param {{name: string; version: number}} param0.db
  * @param {Partial<Settings>} newSettings
  */
-export async function setSettings({ page, db: { name, version } }, newSettings) {
-	await page.evaluate(async () => {
-		const db = await openDB(name, version);
-		const settings = await db.get('Settings', 'user');
+export async function setSettings({ page }, newSettings) {
+	await page.evaluate(async ([newSettings]) => {
+		const settings = await window.DB.get('Settings', 'user').then(
+			(settings) => settings ?? window.DB.get('Settings', 'defaults')
+		);
 		if (!settings) throw new Error('Settings not found in the database');
-		await db.put('Settings', { ...settings, ...newSettings });
-		db.close();
+		await window.DB.put('Settings', { ...settings, id: 'user', ...newSettings });
+	}, /** @type {const} */ ([newSettings]));
+}
+
+/**
+ *
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @returns {Promise<Settings>}
+ */
+export async function getSettings({ page }) {
+	return page.evaluate(async () => {
+		const settings = await window.DB.get('Settings', 'user').then(
+			(settings) => settings ?? window.DB.get('Settings', 'defaults')
+		);
+		if (!settings) throw new Error('Settings not found in the database');
+		return settings;
 	});
 }
