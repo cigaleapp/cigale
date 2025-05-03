@@ -14,8 +14,8 @@ test.describe('Cropper view', () => {
 	});
 
 	test.describe('autoskip enabled', () => {
-		test.beforeEach(async ({ db, page }) => {
-			await setSettings({ db, page }, { cropAutoNext: true, showTechnicalMetadata: true });
+		test.beforeEach(async ({ page }) => {
+			await setSettings({ page }, { cropAutoNext: true, showTechnicalMetadata: true });
 		});
 
 		test('should skip on confirm button click', async ({ page }) => {

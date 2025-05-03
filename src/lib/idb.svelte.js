@@ -403,6 +403,8 @@ export async function openDatabase() {
 		}
 	});
 
+	window.DB = _database;
+
 	return _database;
 }
 
