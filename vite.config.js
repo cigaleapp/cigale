@@ -7,7 +7,8 @@ import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
 export default defineConfig({
 	test: {
 		environment: 'jsdom',
-		include: ['src/**/*.{js,ts}'],
+		include: ['src/**/*.{test,spec}.{js,ts}'],
+		includeSource: ['src/**/*.{js,ts,svelte}'],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
