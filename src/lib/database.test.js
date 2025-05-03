@@ -1,6 +1,6 @@
 import { ArkErrors } from 'arktype';
 import { describe, expect, test } from 'vitest';
-import { FilepathTemplate } from './database';
+import { FilepathTemplate, Schemas } from './database';
 
 describe('filepath templates', () => {
 	/**
@@ -81,5 +81,28 @@ describe('filepath templates', () => {
 		expectRendered(template, { filename: 'file.jpg', suf: '_cropped.png' }).toBe(
 			'file_cropped.png.jpg'
 		);
+	});
+});
+
+describe('MetadataValue', () => {
+	test('serialization roundtrip', () => {
+		const value = (/** @type {string} */ val) =>
+			Schemas.MetadataValue.assert({
+				value: val,
+				confidence: 0.5,
+				alternatives: {}
+			});
+
+		expect(() => value('foo')).toThrowErrorMatchingInlineSnapshot(
+			`[TraversalError: value must be a JSON string (SyntaxError: Unexpected token 'o', "foo" is not valid JSON)]`
+		);
+		expect(value('1').value).toBe(1);
+		expect(value('1.5').value).toBe(1.5);
+		expect(value('true').value).toBe(true);
+		expect(value('false').value).toBe(false);
+		expect(value('null').value).toBe(null);
+		expect(value('"foo"').value).toBe('foo');
+		expect(value('-3.14').value).toBe(-3.14);
+		expect(value(''));
 	});
 });
