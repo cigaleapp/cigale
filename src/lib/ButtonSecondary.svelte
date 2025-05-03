@@ -25,15 +25,15 @@ Available CSS variables:
 </script>
 
 <script>
-	import KeyboardHint from './KeyboardHint.svelte';
-
+  import KeyboardHint from './KeyboardHint.svelte';
+	import { sound } from './sound';
 	import { tooltip } from './tooltips';
 
 	/** @type {Props} */
 	let { children, onclick, disabled = false, help, keyboard } = $props();
 </script>
 
-<button {onclick} {disabled} use:tooltip={help ? { text: help, keyboard } : undefined}>
+<button {onclick} {disabled} use:tooltip={help ? { text: help, keyboard } : undefined} use:sound={'vineboom.mp3'}>
 	{@render children()}
 	{#if keyboard}
 		<KeyboardHint shortcut={keyboard} />
