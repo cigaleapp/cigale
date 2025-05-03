@@ -6,7 +6,8 @@ import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
 
 export default defineConfig({
 	test: {
-		environment: 'jsdom'
+		environment: 'jsdom',
+		include: ['src/**/*.{test,spec}.{js,ts}']
 	},
 	resolve: process.env.VITEST
 		? {
