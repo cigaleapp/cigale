@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">17.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/40</span>
+                <span class='fraction'>7/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/1</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">17.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/40</span>
+                <span class='fraction'>7/40</span>
             </div>
         
             
@@ -181,7 +181,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -243,18 +243,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -287,7 +287,7 @@
 	 * @param {string} pattern the raw pattern as given to Tinykeys
 	 * @returns {string[]}
 	 */
-<span class="cstat-no" title="statement not covered" >	export function displayPattern(pattern) {</span>
+	export function <span class="fstat-no" title="function not covered" >displayPattern(pattern) {</span>
 		// Split by spaces: "ctrl+c arrowup" -&gt; ["ctrl+c", "arrowup"]
 <span class="cstat-no" title="statement not covered" >		const chords = pattern.split(' ');</span>
 <span class="cstat-no" title="statement not covered" >		const parts = chords</span>
@@ -349,18 +349,18 @@
 	 */
 &nbsp;
 	/** @type {Props} */
-<span class="cstat-no" title="statement not covered" >	const { shortcut, help = '' } = $props();</span>
+	const { shortcut, help = '' } = $props();
 &lt;/script&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >&lt;kbd class="hint" use:tooltip={help}&gt;</span>
+&lt;kbd class="hint" use:tooltip={help}&gt;
 	&lt;!-- .entries() gives us [[0, a], [1, b], ...] for [a, b, ...] --&gt;
-<span class="cstat-no" title="statement not covered" >	{#each displayPattern(shortcut).entries() as [i, part] (i)}</span>
-<span class="cstat-no" title="statement not covered" >		{#if i % 2 == 0}</span>
+	{#each displayPattern(shortcut).entries() as [i, part] (i)}
+		{#if i % 2 == 0}
 			&lt;!-- Every even part represents a key --&gt;
-<span class="cstat-no" title="statement not covered" >			&lt;kbd&gt;{part}&lt;/kbd&gt;</span>
+			&lt;kbd&gt;{part}&lt;/kbd&gt;
 		{:else}
 			&lt;!-- Every odd part is either "+" or a space --&gt;
-<span class="cstat-no" title="statement not covered" >			&lt;span class="separator"&gt;{part}&lt;/span&gt;</span>
+			&lt;span class="separator"&gt;{part}&lt;/span&gt;
 		{/if}
 	{/each}
 &lt;/kbd&gt;
@@ -388,7 +388,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-03T19:13:43.845Z
+                at 2025-05-03T20:20:39.699Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
