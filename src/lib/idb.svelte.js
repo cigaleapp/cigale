@@ -404,6 +404,12 @@ export async function openDatabase() {
 	});
 
 	window.DB = _database;
+	window.refreshDB = () => {
+		for (const table of tableNames) {
+			if (!isReactiveTable(table)) continue;
+			tables[table].refresh();
+		}
+	};
 
 	return _database;
 }
