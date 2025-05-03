@@ -17,7 +17,7 @@
 		"lintfix": "eslint --fix .",
 		"commit": "gitmoji -c",
 		"postinstall": "merge-drivers install",
-		"test": "vitest run",
+		"test": "vitest --coverage.enabled true",
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest"
 	},
@@ -37,6 +37,7 @@
 		"@sveltejs/kit": "^2.20.7",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@types/piexifjs": "^1.0.0",
+		"@vitest/coverage-v8": "^3.1.2",
 		"@vitest/ui": "^3.1.2",
 		"eslint": "^9.25.1",
 		"eslint-config-prettier": "^10.1.2",
