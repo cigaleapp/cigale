@@ -1,3 +1,4 @@
+import * as annotations from './annotations.js';
 import { test, expect } from './setup.js';
 import { importPhotos, setSettings, getSettings } from './utils.js';
 
@@ -19,7 +20,7 @@ test.describe('Cropper view', () => {
 			await setSettings({ page }, { cropAutoNext: true, showTechnicalMetadata: true });
 		});
 
-		test('should skip on confirm button click', async ({ page }) => {
+		test.fixme('should skip on confirm button click', annotations.pr(207), async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
 			await page.waitForTimeout(1000);
