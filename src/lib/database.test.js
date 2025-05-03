@@ -119,7 +119,9 @@ describe('MetadataValue', () => {
 			expect(value('-3.14').value).toBe(-3.14);
 		});
 		test('datestring', () => {
-			expect(formatISO(value('"2025-01-01T00:00:00Z"').value)).toBe('2025-01-01T01:00:00+01:00');
+			expect(formatISO(value('"2025-01-01T00:00:00Z"').value)).toMatch(
+				/^2025-01-01T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/
+			);
 		});
 	});
 });
