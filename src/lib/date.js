@@ -19,6 +19,23 @@ export function parseISOSafe(maybeDatestring) {
 	);
 }
 
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('parseISOSafe', () => {
+		test('works on sane ISO 8601 datestrings', () => {
+			expect(parseISOSafe('2023-10-01')).toBeInstanceOf(Date);
+			expect(parseISOSafe('2023-10-01T12:00:00')).toBeInstanceOf(Date);
+			expect(parseISOSafe('2023-10-01T12:00:00Z')).toBeInstanceOf(Date);
+			expect(parseISOSafe('2023-10-01T12:00:00+02:00')).toBeInstanceOf(Date);
+		});
+		test('does not parse "61"', () => {
+			// Crazy right??
+			expect(parseISOSafe('61')).toBeUndefined();
+		});
+	});
+}
+
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid,
  * trying the given formats in order
@@ -38,4 +55,23 @@ function tryParse(maybeDatestring, ...formats) {
 		}
 	}
 	return undefined;
+}
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('tryParse', () => {
+		test('works on valid datestrings', () => {
+			expect(tryParse('2023-10-01', 'yyyy-MM-dd')).toBeInstanceOf(Date);
+			expect(tryParse('2023-10-01T12:00:00', "yyyy-MM-dd'T'HH:mm:ss")).toBeInstanceOf(Date);
+			expect(tryParse('2023-10-01T12:00:00Z', "yyyy-MM-dd'T'HH:mm:ssXXX")).toBeInstanceOf(Date);
+		});
+		test('returns undefined for Invalid Date datestrings', () => {
+			expect(tryParse('2019-05-09T08:25:22+0000')).toBeUndefined();
+		});
+		test('returns undefined for malformed datestrings', () => {
+			expect(tryParse('2023_10-01', 'yyyy-MM-dd')).toBeUndefined();
+			expect(tryParse('chicken jockey')).toBeUndefined();
+		});
+	});
 }

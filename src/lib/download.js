@@ -63,6 +63,43 @@ export function stringifyWithToplevelOrdering(format, schema, object, ordering) 
 	return JSON.stringify({ $schema: schema, ...object }, reviver, 2);
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('stringifyWithToplevelOrdering', () => {
+		expect(
+			stringifyWithToplevelOrdering(
+				'json',
+				'http://example.com/schema.json',
+				{ a: 1, b: 2, c: 3 },
+				['a', 'c', 'a', 'b']
+			)
+		).toMatchInlineSnapshot(`
+			"{
+			  "$schema": "http://example.com/schema.json",
+			  "a": 1,
+			  "c": 3,
+			  "b": 2
+			}"
+		`);
+
+		expect(
+			stringifyWithToplevelOrdering(
+				'yaml',
+				'http://example.com/schema.json',
+				{ a: 1, b: 2, c: 3 },
+				['a', 'c', 'a', 'b']
+			)
+		).toMatchInlineSnapshot(`
+			"# yaml-language-server: $schema=http://example.com/schema.json
+
+			a: 1
+			c: 3
+			b: 2
+			"
+		`);
+	});
+}
+
 /**
  * extension is all the last dotted parts: thing.tar.gz is [thing, tar.gz]
  * @param {string} filename
@@ -72,4 +109,13 @@ export function splitFilenameOnExtension(filename) {
 	const match = filename.match(/^([^.]+)\.(.+)$/);
 	if (!match) return [filename, ''];
 	return [match[1], match[2]];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('splitFilenameOnExtension', () => {
+		expect(splitFilenameOnExtension('file.txt')).toEqual(['file', 'txt']);
+		expect(splitFilenameOnExtension('file')).toEqual(['file', '']);
+		expect(splitFilenameOnExtension('file.tar.gz')).toEqual(['file', 'tar.gz']);
+	});
 }
