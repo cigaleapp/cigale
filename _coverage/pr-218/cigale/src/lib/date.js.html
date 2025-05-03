@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">48.71% </span>
+                <span class="strong">89.74% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/39</span>
+                <span class='fraction'>35/39</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">60% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>3/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
-                <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">48.71% </span>
+                <span class="strong">89.74% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>19/39</span>
+                <span class='fraction'>35/39</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -117,13 +117,13 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -132,19 +132,19 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { parse } from 'date-fns';
 &nbsp;
 /**
@@ -157,14 +157,14 @@
  *
  * We don't accept any other [valid, but insane ISO datestring](https://bsky.app/profile/gwen.works/post/3ljvdiur2lc2s)
  */
-export <span class="fstat-no" title="function not covered" >function parseISOSafe(maybeDatestring) {</span>
-<span class="cstat-no" title="statement not covered" >	return tryParse(</span>
-<span class="cstat-no" title="statement not covered" >		maybeDatestring,</span>
-<span class="cstat-no" title="statement not covered" >		'yyyy-MM-dd',</span>
-<span class="cstat-no" title="statement not covered" >		"yyyy-MM-dd'T'HH:mm:ss",</span>
-<span class="cstat-no" title="statement not covered" >		"yyyy-MM-dd'T'HH:mm:ssXXX"</span>
-<span class="cstat-no" title="statement not covered" >	);</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+export function parseISOSafe(maybeDatestring) {
+	return tryParse(
+		maybeDatestring,
+		'yyyy-MM-dd',
+		"yyyy-MM-dd'T'HH:mm:ss",
+		"yyyy-MM-dd'T'HH:mm:ssXXX"
+	);
+}
 &nbsp;
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid,
@@ -173,19 +173,19 @@ export <span class="fstat-no" title="function not covered" >function parseISOSaf
  * @param  {...string} formats
  * @returns {Date|undefined}
  */
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >function tryParse(maybeDatestring, ...formats) {</span></span>
-<span class="cstat-no" title="statement not covered" >	for (const format of formats) {</span>
-<span class="cstat-no" title="statement not covered" >		try {</span>
-<span class="cstat-no" title="statement not covered" >			const date = parse(maybeDatestring, format, new Date());</span>
-<span class="cstat-no" title="statement not covered" >			if (!isNaN(date.getTime())) {</span>
+function tryParse(maybeDatestring, ...formats) {
+	for (const format of formats) {
+		try {
+			const date = parse(maybeDatestring, format, new Date());
+			if (!isNaN(date.getTime())) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
 <span class="cstat-no" title="statement not covered" >				return date;</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
-<span class="cstat-no" title="statement not covered" >		} catch {</span>
+		} <span class="branch-0 cbranch-no" title="branch not covered" >catch {</span>
 <span class="cstat-no" title="statement not covered" >			continue;</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" >	return undefined;</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+	}
+	return undefined;
+}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -193,7 +193,7 @@ export <span class="fstat-no" title="function not covered" >function parseISOSaf
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-03T09:57:51.617Z
+                at 2025-05-03T10:37:01.035Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
