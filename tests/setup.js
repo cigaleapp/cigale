@@ -1,12 +1,6 @@
-import { test as base } from '@playwright/test';
+import { test as setup } from './fixtures.js';
 
-/**
- * @import { TestType, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
- */
-
-/**
- * @type {TestType<PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
- */
-export const test = base.extend({});
-
-export { expect } from '@playwright/test';
+setup('wait for database', async ({ page }) => {
+	await page.goto('/');
+	await page.waitForFunction(() => Boolean(window.DB));
+});

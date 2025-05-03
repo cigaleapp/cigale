@@ -1,5 +1,5 @@
 import * as annotations from './annotations.js';
-import { test, expect } from './setup.js';
+import { test, expect } from './fixtures.js';
 import { importPhotos, setSettings, getSettings } from './utils.js';
 
 test.describe('Cropper view', () => {

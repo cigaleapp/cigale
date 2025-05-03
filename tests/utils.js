@@ -15,7 +15,6 @@ export async function importPhotos({ page }, ...names) {
 	if (!names) throw new Error('No file names provided');
 	names = names.map((name) => (path.extname(name) ? name : `${name}.jpeg`));
 
-	await page.goto('/');
 	await page.getByTestId('protocol-to-choose').click();
 	await page.waitForURL((u) => u.hash === '#/import');
 	await expect(page.getByText(/Cliquer ou déposer des images ici/)).toBeVisible();

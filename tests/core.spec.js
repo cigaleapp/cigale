@@ -1,4 +1,4 @@
-import { expect, test } from './setup.js';
+import { expect, test } from './fixtures.js';
 import extract from 'extract-zip';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -6,8 +6,6 @@ import { Analysis } from '../scripts/generate-json-schemas.js';
 import { setSettings } from './utils.js';
 
 test('basic functionality', async ({ page }) => {
-	await page.goto('/');
-
 	await setSettings({ page }, { showTechnicalMetadata: false });
 
 	// Choose default protocol
