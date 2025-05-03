@@ -11,7 +11,7 @@ export const test = base.extend({
 	forEachTest: [
 		async ({ page }, use) => {
 			await page.goto('/');
-			await page.waitForFunction(() => Boolean(window.DB));
+			await page.waitForFunction(() => Boolean(window.DB && window.refreshDB));
 			await use();
 		},
 		{ auto: true }

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 /**
  * @import { Page } from '@playwright/test';
- * @import { Settings } from '$lib/database.js';
+ * @import { Settings, MetadataValue } from '$lib/database.js';
  */
 
 /**
@@ -38,6 +38,7 @@ export async function setSettings({ page }, newSettings) {
 		);
 		if (!settings) throw new Error('Settings not found in the database');
 		await window.DB.put('Settings', { ...settings, id: 'user', ...newSettings });
+		await window.refreshDB();
 	}, /** @type {const} */ ([newSettings]));
 }
 
@@ -55,4 +56,35 @@ export async function getSettings({ page }) {
 		if (!settings) throw new Error('Settings not found in the database');
 		return settings;
 	});
+}
+
+/**
+ *
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @param {string} id
+ */
+export async function getImage({ page }, id) {
+	const image = await page.evaluate(async ([id]) => {
+		const image = await window.DB.get('Image', id);
+		if (!image) throw new Error(`Image ${id} not found in the database`);
+		return image;
+	}, /** @type {const} */ ([id]));
+	return image;
+}
+
+/**
+ *
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @param {string} id
+ * @param {Record<string, MetadataValue>} metadata
+ */
+export async function setImageMetadata({ page }, id, metadata) {
+	await page.evaluate(async ([id, metadata]) => {
+		const image = await window.DB.get('Image', id);
+		if (!image) throw new Error(`Image ${id} not found in the database`);
+		await window.DB.put('Image', { ...image, metadata: { ...image.metadata, ...metadata } });
+		await window.refreshDB();
+	}, /** @type {const} */ ([id, metadata]));
 }
