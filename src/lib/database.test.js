@@ -86,7 +86,7 @@ describe('filepath templates', () => {
 });
 
 describe('MetadataValue', () => {
-	test('serialization roundtrip', () => {
+	describe('serialization roundtrips', () => {
 		const value = (/** @type {string} */ val) =>
 			Schemas.MetadataValue.assert({
 				value: val,
@@ -94,16 +94,32 @@ describe('MetadataValue', () => {
 				alternatives: {}
 			});
 
-		expect(() => value('foo')).toThrowErrorMatchingInlineSnapshot(
-			`[TraversalError: value must be a JSON string (SyntaxError: Unexpected token 'o', "foo" is not valid JSON)]`
-		);
-		expect(value('1').value).toBe(1);
-		expect(value('1.5').value).toBe(1.5);
-		expect(value('true').value).toBe(true);
-		expect(value('false').value).toBe(false);
-		expect(value('null').value).toBe(null);
-		expect(value('"foo"').value).toBe('foo');
-		expect(value('-3.14').value).toBe(-3.14);
-		expect(formatISO(value('"2025-01-01T00:00:00Z"').value)).toBe('2025-01-01T01:00:00+01:00');
+		test('invalid', () => {
+			expect(() => value('foo')).toThrowErrorMatchingInlineSnapshot(
+				`[TraversalError: value must be a JSON string (SyntaxError: Unexpected token 'o', "foo" is not valid JSON)]`
+			);
+		});
+		test('int', () => {
+			expect(value('1').value).toBe(1);
+		});
+		test('float', () => {
+			expect(value('1.5').value).toBe(1.5);
+		});
+		test('boolean', () => {
+			expect(value('true').value).toBe(true);
+			expect(value('false').value).toBe(false);
+		});
+		test('null', () => {
+			expect(value('null').value).toBe(null);
+		});
+		test('string', () => {
+			expect(value('"foo"').value).toBe('foo');
+		});
+		test('negative float', () => {
+			expect(value('-3.14').value).toBe(-3.14);
+		});
+		test('datestring', () => {
+			expect(formatISO(value('"2025-01-01T00:00:00Z"').value)).toBe('2025-01-01T01:00:00+01:00');
+		});
 	});
 });
