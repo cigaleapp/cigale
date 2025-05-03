@@ -1,21 +1,19 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './setup.js';
 import extract from 'extract-zip';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Analysis } from '../scripts/generate-json-schemas.js';
+import { setSettings } from './utils.js';
 
-test('basic functionality', async ({ page }) => {
+test('basic functionality', async ({ page, db }) => {
 	await page.goto('/');
+
+	await setSettings({ db, page }, { showTechnicalMetadata: false });
 
 	// Choose default protocol
 	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
 	await page.getByTestId('protocol-to-choose').click();
 	await page.waitForURL((u) => u.hash === '#/import');
-
-	// Turn off debug mode
-	await page.getByTestId('settings-button').click();
-	await page.getByTestId('debug-mode').click();
-	await page.getByTestId('settings-button').click();
 
 	// Import fixture image
 	await expect(page.getByText(/Cliquer ou déposer des images ici/)).toBeVisible();
