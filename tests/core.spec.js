@@ -73,12 +73,21 @@ test('basic functionality', async ({ page }) => {
 	const files = fs.readdirSync(resultsDir);
 	expect(files.sort()).toMatchObject(['Cropped', 'Original', 'analysis.json', 'metadata.csv']);
 
+	const csv = fs.readFileSync(path.join(resultsDir, 'metadata.csv'), 'utf8');
+	expect(csv.split('\n')).toHaveLength(2);
+
+	const firstLine = csv.split('\n')[0];
+	expect(firstLine).toBe(
+		`"Identifiant";"Observation";"Date";"Date: Confiance";"";": Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"`
+	);
+
 	const analysis = JSON.parse(fs.readFileSync(path.join(resultsDir, 'analysis.json'), 'utf8'));
 	expect(Analysis.allows(analysis)).toBe(true);
 
+	expect(fs.readdirSync(path.join(resultsDir, 'Original'))).toMatchObject(['Allacma fusca_1.jpeg']);
+
 	const croppedDir = path.join(resultsDir, 'Cropped');
-	const croppedImages = fs.readdirSync(croppedDir);
-	expect(croppedImages).toMatchObject(['Allacma fusca_1.jpeg']);
+	expect(fs.readdirSync(croppedDir)).toMatchObject(['Allacma fusca_1.jpeg']);
 
 	const image = fs.readFileSync(path.join(croppedDir, 'Allacma fusca_1.jpeg'));
 	expect(image).toMatchSnapshot({
