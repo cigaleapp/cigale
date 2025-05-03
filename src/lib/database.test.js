@@ -1,6 +1,7 @@
 import { ArkErrors } from 'arktype';
 import { describe, expect, test } from 'vitest';
 import { FilepathTemplate, Schemas } from './database';
+import { formatISO } from 'date-fns';
 
 describe('filepath templates', () => {
 	/**
@@ -103,6 +104,6 @@ describe('MetadataValue', () => {
 		expect(value('null').value).toBe(null);
 		expect(value('"foo"').value).toBe('foo');
 		expect(value('-3.14').value).toBe(-3.14);
-		expect(value(''));
+		expect(formatISO(value('"2025-01-01T00:00:00Z"').value)).toBe('2025-01-01T01:00:00+01:00');
 	});
 });
