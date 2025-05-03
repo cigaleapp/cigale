@@ -38,3 +38,5 @@ scripts/jessica-joachim-crawler-report.md
 /blob-report/
 /playwright/.cache/
 tests/results
+coverage
+html

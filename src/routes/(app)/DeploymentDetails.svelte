@@ -10,6 +10,23 @@
 
 	/** @type {Props} */
 	let { open = $bindable() } = $props();
+
+	/**
+	 *
+	 * @param {`_${string}`} umbrellaDir
+	 */
+	function pageURL(umbrellaDir) {
+		return `https://cigaleapp.github.io/cigale/${umbrellaDir}/pr-${previewingPrNumber}`;
+	}
+
+	/**
+	 * @param {`_${string}`} umbrellaDir
+	 */
+	async function hasPage(umbrellaDir) {
+		return fetch(pageURL(umbrellaDir), { method: 'HEAD' })
+			.then((res) => res.ok)
+			.catch(() => false);
+	}
 </script>
 
 {#snippet githubUser(
@@ -62,6 +79,10 @@
 		#{previewingPrNumber}
 	{/await}
 	{#snippet footer({ close })}
+		{@const open = (/** @type {string} */ url) => () => {
+			window.open(url);
+			close?.();
+		}}
 		<ButtonSecondary
 			help="Supprime toutes les données pour ce déploiement de preview"
 			onclick={() => {
@@ -73,22 +94,26 @@
 		</ButtonSecondary>
 
 		<ButtonSecondary
-			onclick={() => {
-				window.open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`);
-				close();
-			}}
+			onclick={open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`)}
 		>
 			Voir sur Github
 		</ButtonSecondary>
 
-		{#await fetch( `https://cigaleapp.github.io/cigale/_playwright/pr-${previewingPrNumber}`, { method: 'HEAD' } ) then { status }}
-			{#if status < 400}
-				<ButtonSecondary
-					onclick={() =>
-						window.open(`https://cigaleapp.github.io/cigale/_playwright/pr-${previewingPrNumber}`)}
-				>
-					Résultats de tests E2E
-				</ButtonSecondary>
+		{#await hasPage('_playwright') then ok}
+			{#if ok}
+				<ButtonSecondary onclick={open(pageURL('_playwright'))}>Tests E2E</ButtonSecondary>
+			{/if}
+		{/await}
+
+		{#await hasPage('_vitest') then ok}
+			{#if ok}
+				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary>
+			{/if}
+		{/await}
+
+		{#await hasPage('_coverage') then ok}
+			{#if ok}
+				<ButtonSecondary onclick={open(pageURL('_coverage'))}>Coverage</ButtonSecondary>
 			{/if}
 		{/await}
 	{/snippet}
