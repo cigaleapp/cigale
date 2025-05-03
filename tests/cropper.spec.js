@@ -1,10 +1,11 @@
 import { test, expect } from './setup.js';
-import { importPhotos, setSettings } from './utils.js';
+import { importPhotos, setSettings, getSettings } from './utils.js';
 
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }) => {
 		await importPhotos({ page }, 'lil-fella', 'cyan', 'leaf');
-		await page.goto('/#/crop');
+		await page.getByTestId('goto-crop').click();
+		await page.waitForURL((u) => u.hash === '#/crop/');
 	});
 
 	test('should have all cards visible', async ({ page }) => {
@@ -25,6 +26,18 @@ test.describe('Cropper view', () => {
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000002_000000');
 			await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+		});
+
+		test('should toggle autoskip off on keybind press', async ({ page }) => {
+			await page.getByText('cyan.jpeg', { exact: true }).click();
+			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+
+			const { ...othersBefore } = await getSettings({ page });
+			await page.keyboard.press('a');
+			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
+
+			expect(cropAutoNext).toBe(false);
+			expect(othersBefore).toMatchObject(othersAfter);
 		});
 	});
 });
