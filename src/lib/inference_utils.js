@@ -2,6 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 import { match } from 'arktype';
 import * as Jimp from 'jimp';
 import * as ort from 'onnxruntime-web';
+import { test } from 'vitest';
 
 /**
  * @typedef {import('onnxruntime-web')} ort
@@ -25,6 +26,15 @@ function IoU(bb1, bb2) {
 	let union = bb1[2] * bb1[3] + bb2[2] * bb2[3] - intersection;
 
 	return intersection / union;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('IoU', () => {
+		expect(IoU([0, 0, 10, 10], [5, 5, 10, 10])).toBe(0.14285714285714285);
+		expect(IoU([0, 0, 10, 10], [15, 15, 10, 10])).toBe(0);
+		expect(IoU([0, 0, 10, 10], [5, 5, 5, 5])).toBe(0.25);
+	});
 }
 
 /**
@@ -177,40 +187,20 @@ export async function applyBBsOnTensors(BBs, tensors) {
 	return tobereturned;
 }
 /**
- *
- * @param {number[][][]} boundingboxes
+ * supprime les bounding boxes qui ont un IoU > 0.5. Modifie l'entrée en place!
+ * @param {number[][][]} boundingboxes - [each image [each box [x, y, w, h]]]
  * @param {number} numfiles
  * @returns {number[][][]}
  */
-export function postprocess_BB(boundingboxes, numfiles) {
-	/*supprime les bounding boxes qui ont un IoU > 0.5
-    -------input------- :
-        boundingboxes : liste de bounding boxes
-            forme : [each img [each box [x, y, w, h]]]
-        numfiles : nombre d'images sur lesquelles on a fait l'inférence
-    
-    -------output------- :
-        boundingboxes : liste de bounding boxes après suppression des doublons
-            forme : [each img [each box [x, y, w, h]]]
+export function dedupeBoundingBoxes(boundingboxes, numfiles) {
+	for (let fileIndex = 0; fileIndex < numfiles; fileIndex++) {
+		const boxes = boundingboxes[fileIndex];
 
-    */
-
-	for (let k = 0; k < numfiles; k++) {
-		for (let i = 0; i < boundingboxes[k].length - 1; i++) {
-			let x1 = boundingboxes[k][i][0];
-			let y1 = boundingboxes[k][i][1];
-			let w = boundingboxes[k][i][2];
-			let h = boundingboxes[k][i][3];
-
-			for (let j = i + 1; j < boundingboxes[k].length; j++) {
+		for (let i = 0; i < boundingboxes[fileIndex].length - 1; i++) {
+			for (let j = i + 1; j < boundingboxes[fileIndex].length; j++) {
 				if (i != j) {
-					let x2 = boundingboxes[k][j][0];
-					let y2 = boundingboxes[k][j][1];
-					let w2 = boundingboxes[k][j][2];
-					let h2 = boundingboxes[k][j][3];
-
-					if (IoU([x1, y1, w, h], [x2, y2, w2, h2]) > 0.5) {
-						boundingboxes[k].splice(j, 1);
+					if (IoU(boxes[i], boxes[j]) > 0.5) {
+						boundingboxes[fileIndex].splice(j, 1);
 						j--;
 					}
 				}
@@ -218,6 +208,10 @@ export function postprocess_BB(boundingboxes, numfiles) {
 		}
 	}
 	return boundingboxes;
+}
+
+if (import.meta.vitest) {
+	test.todo('dedupeBoundingBoxes');
 }
 
 /**
