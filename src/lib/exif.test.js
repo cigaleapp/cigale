@@ -1,9 +1,16 @@
 import 'fake-indexeddb/auto';
 
 import { beforeEach, describe, expect, test } from 'vitest';
+import exif from 'exif-parser';
 
 import { readFileSync } from 'node:fs';
-import { coerceExifValue, extractMetadata, processExifData, serializeExifValue } from './exif';
+import {
+	addExifMetadata,
+	coerceExifValue,
+	extractMetadata,
+	processExifData,
+	serializeExifValue
+} from './exif';
 import * as db from './idb.svelte.js';
 import { imageId } from './images';
 
@@ -295,5 +302,96 @@ describe('serializeExifValue', () => {
 		expect(serializeExifValue({ a: 1, b: '2', c: true, v: new Date(7) })).toMatch(
 			/^a=1;b=2;c=true;v=Thu Jan 01 1970 00:00:00/
 		);
+	});
+});
+
+describe('addExifMetadata', () => {
+	const metadataDefs = [
+		{
+			id: 'gps',
+			type: /** @type {const} */ ('location'),
+			description: 'GPS',
+			label: '',
+			mergeMethod: /** @type {const} */ ('none'),
+			required: false,
+			infer: /** @type {const} */ ({
+				latitude: { exif: 'GPSLatitude' },
+				longitude: { exif: 'GPSLongitude' }
+			})
+		},
+		{
+			id: 'date',
+			type: /** @type {const} */ ('date'),
+			description: 'Date',
+			label: '',
+			mergeMethod: /** @type {const} */ ('none'),
+			required: false,
+			infer: /** @type {const} */ ({
+				exif: 'DateTimeOriginal'
+			})
+		},
+		{
+			id: 'non-exif',
+			type: /** @type {const} */ ('string'),
+			description: 'Not a EXIF-infered field',
+			label: '',
+			mergeMethod: /** @type {const} */ ('none'),
+			required: false
+		}
+	];
+	const metadataValues = {
+		gps: {
+			value: {
+				latitude: 43.46715666666389,
+				longitude: 11.885394999997223
+			},
+			manuallyModified: false,
+			confidence: 1,
+			alternatives: {}
+		},
+		date: {
+			value: new Date('2023-10-01T12:00:00Z'),
+			manuallyModified: false,
+			confidence: 1,
+			alternatives: {}
+		},
+		'non-exif': {
+			value: 'test',
+			manuallyModified: false,
+			confidence: 1,
+			alternatives: {}
+		}
+	};
+
+	// FIXME kinda slow, idk why
+	test('without prior GPS location', async () => {
+		const imageBytes = await readImageBytes('cyan.jpeg');
+
+		const resultBytes = addExifMetadata(imageBytes, metadataDefs, metadataValues);
+
+		const { tags } = exif.create(resultBytes.buffer).enableImageSize(false).parse();
+
+		expect(tags).toEqual({
+			GPSLatitude: 43.46715555555556,
+			GPSLatitudeRef: 'N',
+			GPSLongitude: 11.885394444444444,
+			GPSLongitudeRef: 'E',
+			DateTimeOriginal: 1696161600
+		});
+	});
+
+	test('with prior GPS location', async () => {
+		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
+		const resultBytes = addExifMetadata(imageBytes, metadataDefs, metadataValues);
+
+		const { tags } = exif.create(resultBytes.buffer).enableImageSize(false).parse();
+
+		expect(tags).toEqual({
+			GPSLatitude: 43.46715555555556,
+			GPSLatitudeRef: 'N',
+			GPSLongitude: 11.885394444444444,
+			GPSLongitudeRef: 'E',
+			DateTimeOriginal: 1696161600
+		});
 	});
 });
