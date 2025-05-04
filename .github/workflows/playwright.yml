@@ -18,7 +18,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: npx playwright test
+        run: PLAYWRIGHT_TEST_COVERAGE=1 npx playwright test
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -40,4 +40,24 @@ jobs:
         with:
           source-dir: ./playwright-report
           umbrella-dir: _playwright
+          comment: false
+
+      - name: Merge coverage with unit tests'
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p .nyc_output
+          wget -q https://cigaleapp.github.io/cigale/_coverage/pr-${{ github.event.number }}/coverage-final.json -O .nyc_output/coverage-final.json
+          npx nyc merge .nyc_output
+
+      - name: Generate coverage report
+        if: ${{ !cancelled() }}
+        run: |
+          npx nyc report --reporter=html
+
+      - name: Deploy coverage report to Github Pages
+        if: ${{ !cancelled() }}
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./coverage
+          umbrella-dir: _coverage
           comment: false
