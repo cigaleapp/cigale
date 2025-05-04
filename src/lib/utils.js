@@ -14,6 +14,23 @@ export function mapValues(subject, mapper) {
 }
 
 /**
+ * Maps values of an object, and filters out entries with nullable values from the result
+ * @template {string} K
+ * @template {any} VIn
+ * @template {any} VOut
+ * @param {Record<K, VIn>} subject
+ * @param {(value: VIn) => VOut} mapper
+ * @returns {Record<K, NoInfer<NonNullable<VOut>>>}
+ */
+export function mapValuesNoNullables(subject, mapper) {
+	return Object.fromEntries(
+		Object.entries(subject)
+			.map(([key, value]) => [key, mapper(value)])
+			.filter(([, value]) => value !== null && value !== undefined)
+	);
+}
+
+/**
  * @template {string} K
  * @param {Record<K, unknown>} subject
  * @returns {K[]}

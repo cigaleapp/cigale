@@ -1,4 +1,4 @@
-import { parse } from 'date-fns';
+import { parse, isValid } from 'date-fns';
 
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid
@@ -47,9 +47,7 @@ function tryParse(maybeDatestring, ...formats) {
 	for (const format of formats) {
 		try {
 			const date = parse(maybeDatestring, format, new Date());
-			if (!isNaN(date.getTime())) {
-				return date;
-			}
+			if (isValid(date)) return date;
 		} catch {
 			continue;
 		}
