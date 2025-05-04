@@ -10,6 +10,7 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		includeSource: ['src/**/*.{js,ts,svelte}'],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
+		globalSetup: './vitest-timezone.js',
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
 			reportOnFailure: true
