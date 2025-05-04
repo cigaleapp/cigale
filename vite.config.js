@@ -7,7 +7,7 @@ import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
 export default defineConfig({
 	test: {
 		environment: 'jsdom',
-		include: ['src/**/*.{test,spec}.{js,ts}'],
+		include: ['src/**/*.{test,spec}{.svelte,}.{js,ts}'],
 		includeSource: ['src/**/*.{js,ts,svelte}'],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
