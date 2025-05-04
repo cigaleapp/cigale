@@ -190,7 +190,7 @@ export function serializeExifValue(value) {
 
 /**
  * Append EXIF metadata to the image's bytes
- * @param {ArrayBuffer} bytes
+ * @param {ArrayBuffer|Buffer} bytes
  * @param {import('./database.js').Metadata[]} metadataDefs
  * @param {import('./database.js').MetadataValues} metadataValues
  * @returns {Uint8Array} the image with EXIF metadata added
