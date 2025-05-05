@@ -12,6 +12,16 @@ export function imageId(index, subindex = 0) {
 	return `${Number.parseInt(index.toString(), 0).toString().padStart(6, '0')}_${subindex.toString().padStart(6, '0')}`;
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('imageId', () => {
+		expect(imageId(1)).toBe('000001_000000');
+		expect(imageId(1, 2)).toBe('000001_000002');
+		expect(imageId(1234567)).toBe('1234567_000000');
+		expect(imageId(1234567, 1234567)).toBe('1234567_1234567');
+	});
+}
+
 /**
  * Retourne l'id d'un objet ImageFile associé à l'objet Image
  * @template {string|undefined} T
@@ -19,8 +29,25 @@ export function imageId(index, subindex = 0) {
  * @returns {T}
  */
 export function imageIdToFileId(id) {
+	if (id === undefined) return id;
+
+	if (!/^\d+_\d+$/.test(id)) {
+		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${id}`);
+	}
 	// @ts-expect-error
 	return id?.replace(/(_\d+)+$/, '');
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('imageIdToFileId', () => {
+		expect(imageIdToFileId('000001_000000')).toBe('000001');
+		expect(imageIdToFileId('1234567_1234567')).toBe('1234567');
+		expect(() => imageIdToFileId('1234567_1234567_1234567')).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): 1234567_1234567_1234567]`
+		);
+		expect(imageIdToFileId(undefined)).toBeUndefined();
+	});
 }
 
 /**

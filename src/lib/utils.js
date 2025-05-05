@@ -14,6 +14,23 @@ export function mapValues(subject, mapper) {
 }
 
 /**
+ * Maps values of an object, and filters out entries with nullable values from the result
+ * @template {string} K
+ * @template {any} VIn
+ * @template {any} VOut
+ * @param {Record<K, VIn>} subject
+ * @param {(value: VIn) => VOut} mapper
+ * @returns {Record<K, NoInfer<NonNullable<VOut>>>}
+ */
+export function mapValuesNoNullables(subject, mapper) {
+	return Object.fromEntries(
+		Object.entries(subject)
+			.map(([key, value]) => [key, mapper(value)])
+			.filter(([, value]) => value !== null && value !== undefined)
+	);
+}
+
+/**
  * @template {string} K
  * @param {Record<K, unknown>} subject
  * @returns {K[]}
@@ -145,4 +162,28 @@ export function sign(value) {
  */
 export function clamp(value, min, max) {
 	return Math.max(min, Math.min(max, value));
+}
+
+/**
+ *
+ * @param {[number, number]} bounds of the range - can be in any order
+ * @param {number} subject number to test for
+ * @returns {boolean} whether the subject is in the range
+ */
+export function inRange(bounds, subject) {
+	const [min, max] = bounds.sort((a, b) => a - b);
+	return subject >= min && subject <= max;
+}
+
+/**
+ *
+ * @template {string} K
+ * @param {Element} element
+ * @param {K} name
+ * @returns {element is Element & { dataset: Record<NoInfer<K>, string> }}
+ */
+export function hasDatasetKey(element, name) {
+	if (!(element instanceof HTMLElement)) return false;
+	if (!element.dataset) return false;
+	return name in element.dataset;
 }

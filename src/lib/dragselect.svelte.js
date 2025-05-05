@@ -1,4 +1,5 @@
 import { default as _DragSelect } from 'dragselect';
+import { hasDatasetKey, inRange } from '$lib/utils.js';
 
 export class DragSelect {
 	/** @type {HTMLElement|undefined} */
@@ -141,22 +142,12 @@ export class DragSelect {
 				// @ts-ignore
 				selectables
 					// Only keep elements with an index within the range we want
-					.filter((element) =>
-						// @ts-ignore
-						inRange([anchorIndex, targetIndex], Number.parseInt(element.dataset.index))
+					.filter(
+						(element) =>
+							hasDatasetKey(element, 'index') &&
+							inRange([anchorIndex, targetIndex], Number.parseInt(element.dataset.index))
 					)
 			);
 		});
 	}
-}
-
-/**
- *
- * @param {[number, number]} bounds of the range - can be in any order
- * @param {number} subject number to test for
- * @returns {boolean} whether the subject is in the range
- */
-function inRange(bounds, subject) {
-	const [min, max] = bounds.sort((a, b) => a - b);
-	return subject >= min && subject <= max;
 }

@@ -37,7 +37,7 @@ Handlebars.registerHelper('fallback', (subject, fallback) => {
 	return subject ?? fallback;
 });
 
-const FilepathTemplate = type.string
+export const FilepathTemplate = type.string
 	.pipe((t) => {
 		try {
 			return {
@@ -408,7 +408,7 @@ const Settings = table(
 		language: type.enumerated('fr'),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
-		cropAutoNext: 'boolean = false',
+		cropAutoNext: 'boolean = false'
 	})
 );
 

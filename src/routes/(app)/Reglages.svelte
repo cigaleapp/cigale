@@ -37,6 +37,7 @@
 </script>
 
 <ButtonIcon
+	data-testid="settings-button"
 	help={open ? 'Fermer' : 'Réglages'}
 	onclick={() => {
 		open = !open;
@@ -76,6 +77,7 @@
 		<div class="setting">
 			Mode debug
 			<Switch
+				data-testid="debug-mode"
 				value={getSettings().showTechnicalMetadata}
 				onchange={async (show) => {
 					await setSetting('showTechnicalMetadata', show);
