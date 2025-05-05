@@ -1,4 +1,3 @@
-import * as annotations from './annotations.js';
 import { test, expect } from './fixtures.js';
 import { importPhotos, setSettings, getSettings, setImageMetadata, getImage } from './utils.js';
 
@@ -90,7 +89,7 @@ test.describe('Cropper view', () => {
 			await setSettings({ page }, { cropAutoNext: true, showTechnicalMetadata: true });
 		});
 
-		test.fixme('should skip on confirm button click', annotations.pr(207), async ({ page }) => {
+		test('should skip on confirm button click', async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await page.waitForTimeout(1000);
@@ -99,7 +98,7 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 		});
 
-		test.fixme('should skip on confirmation keybind', annotations.pr(207), async ({ page }) => {
+		test('should skip on confirmation keybind', async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await page.waitForTimeout(1000);
