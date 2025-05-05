@@ -11,11 +11,11 @@
 	 * @property {boolean} [disabled]
 	 */
 
-	/** @type {Props} */
-	let { children, onclick, help, keyboard, disabled } = $props();
+	/** @type {Props & Record<string, unknown>} */
+	let { children, onclick, help, keyboard, disabled, ...rest } = $props();
 </script>
 
-<button {disabled} {onclick} use:tooltip={{ text: help, keyboard }}>
+<button {disabled} {onclick} use:tooltip={{ text: help, keyboard }} {...rest}>
 	{@render children()}
 </button>
 

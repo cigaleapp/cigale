@@ -104,6 +104,7 @@
 					{/if}
 					{#each boundingBoxes as bounding, index (index)}
 						<div
+							data-testid="card-observation-bounding-box"
 							class="bb"
 							style="left: {bounding.x * 100}%; top: {bounding.y * 80}%; width: {bounding.width *
 								100}%; height: {80 * bounding.height}%;"

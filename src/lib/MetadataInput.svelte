@@ -26,7 +26,7 @@
 	const { type, options = [] } = definition;
 </script>
 
-<div class="metadata-input">
+<div class="metadata-input" data-metadata-id={definition.id}>
 	{#if isType('enum', type, value)}
 		<MetadataCombobox
 			{id}

@@ -169,8 +169,6 @@ function wrangler(table) {
 		},
 		list: async () => list(table),
 		all: () => iterator(table),
-		/** @param {string} index  */
-		by: (index) => iterator(table, index),
 		/** Do not go through validation or type morphing, manipulate the underlying database values directly. Useful for performance reasons, when changing only a property inside of an object and leaving the others unchanged, for example */
 		raw: {
 			/** @param {typeof Tables[Table]['inferIn']} value */
@@ -259,29 +257,6 @@ export async function list(tableName) {
 }
 
 /**
- * Returns a comparator to sort objects by their id property
- * If both IDs are numeric, they are compared numerically even if they are strings
- * @template {{id: string|number} | string | number} IdOrObject
- * @param {IdOrObject} a
- * @param {IdOrObject} b
- * @returns {number}
- */
-export const idComparator = (a, b) => {
-	// @ts-ignore
-	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
-	// @ts-ignore
-	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
-
-	if (typeof a === 'number' && typeof b === 'number') return a - b;
-
-	if (typeof a === 'number') return -1;
-	if (typeof b === 'number') return 1;
-
-	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
-	return a.localeCompare(b);
-};
-
-/**
  * Delete an entry from a table by key
  * @param {TableName} table
  * @param {string | IDBKeyRange} id
@@ -318,6 +293,29 @@ export async function* iterator(tableName, index = undefined) {
 		yield validator.assert(cursor.value);
 	}
 }
+
+/**
+ * Returns a comparator to sort objects by their id property
+ * If both IDs are numeric, they are compared numerically even if they are strings
+ * @template {{id: string|number} | string | number} IdOrObject
+ * @param {IdOrObject} a
+ * @param {IdOrObject} b
+ * @returns {number}
+ */
+export const idComparator = (a, b) => {
+	// @ts-ignore
+	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
+	// @ts-ignore
+	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
+
+	if (typeof a === 'number' && typeof b === 'number') return a - b;
+
+	if (typeof a === 'number') return -1;
+	if (typeof b === 'number') return 1;
+
+	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
+	return a.localeCompare(b);
+};
 
 /**
  * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you
@@ -402,6 +400,14 @@ export async function openDatabase() {
 			}
 		}
 	});
+
+	window.DB = _database;
+	window.refreshDB = () => {
+		for (const table of tableNames) {
+			if (!isReactiveTable(table)) continue;
+			tables[table].refresh();
+		}
+	};
 
 	return _database;
 }

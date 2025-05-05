@@ -7,6 +7,23 @@
 export function countThings(things, plurals) {
 	return Object.entries(things)
 		.filter(([, count]) => count > 0)
-		.map(([thing, count]) => `${count} ${thing}${count > 1 ? (plurals?.[thing] ?? 's') : ''}`)
+		.map(([thing, count]) => {
+			let counted = thing;
+			if (count > 1) {
+				counted = plurals?.[thing] ?? `${thing}s`;
+			}
+
+			return `${count} ${counted}`;
+		})
 		.join(', ');
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('countThings', () => {
+		expect(countThings({ a: 1, b: 2, c: 0 })).toBe('1 a, 2 bs');
+		expect(countThings({ a: 1, b: 2, c: 0 }, { b: 'foo' })).toBe('1 a, 2 foo');
+		expect(countThings({ a: 1, b: 2, c: 0 }, { a: 'a', b: 'b' })).toBe('1 a, 2 b');
+	});
 }

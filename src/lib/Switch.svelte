@@ -11,12 +11,13 @@
 	 * @property {(value: boolean) => void} [onchange]
 	 */
 
-	/** @type {Props} */
+	/** @type {Props & Record<string, unknown>} */
 	let {
 		value = $bindable(),
 		icons: iconsOverride = undefined,
 		onchange = () => {},
-		label
+		label,
+		...rest
 	} = $props();
 
 	function click() {
@@ -41,6 +42,7 @@
 	aria-checked={value}
 	onclick={click}
 	aria-label={label ?? 'on/off switch'}
+	{...rest}
 >
 	<div class="handle" class:pushed={value}>
 		{#if showHints || iconsOverride}

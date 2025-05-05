@@ -10,10 +10,15 @@ import { toasts } from './toasts.svelte.js';
 import { matches } from './utils.js';
 
 /**
+ * @import { MetadataInferOptions, MetadataType } from './database.js';
+ * @import { RuntimeValue } from './metadata.js';
+ */
+
+/**
  *
  * @param {string} protocolId
  * @param {string} imageId
- * @param {ArrayBuffer} imageBytes
+ * @param {ArrayBuffer|Buffer} imageBytes
  * @param {{ type: string; name: string }} file
  */
 export async function processExifData(protocolId, imageId, imageBytes, file) {
@@ -25,21 +30,21 @@ export async function processExifData(protocolId, imageId, imageBytes, file) {
 		defs.filter((def) => protocol.metadata.includes(def.id))
 	);
 	const metadataFromExif = await extractMetadata(
-		imageBytes,
+		// 2^16 + 100 of margin
+		// see https://www.npmjs.com/package/exif-parser#creating-a-parser
+		imageBytes.slice(0, 65_635),
 		(metadataOfProtocol ?? [])
-			.map((m) =>
+			.map(({ infer, type, id }) =>
 				match
 					.case(
-						{
-							infer: [
-								{ exif: 'string' },
-								'|',
-								{ latitude: { exif: 'string' }, longitude: { exif: 'string' } }
-							]
-						},
-						({ infer }) => /** @type {const} */ ([m.id, infer, m.type])
+						[
+							{ exif: 'string' },
+							'|',
+							{ latitude: { exif: 'string' }, longitude: { exif: 'string' } }
+						],
+						(infer) => /** @type {ExifExtractionPlanItem} */ ({ key: id, infer, type })
 					)
-					.default(() => undefined)(m)
+					.default(() => undefined)(infer)
 			)
 			.filter((entry) => entry !== undefined)
 	).catch((e) => {
@@ -66,8 +71,15 @@ export async function processExifData(protocolId, imageId, imageBytes, file) {
 }
 
 /**
- * @param {ArrayBuffer} buffer buffer of the image to extract EXIF data from
- * @param {Array<readonly [string, import('./database.js').MetadataInferOptions, import('./database.js').MetadataType]>} extractionPlan
+ * @typedef {object} ExifExtractionPlanItem
+ * @property {string} key key in the output object
+ * @property {MetadataInferOptions | { latitude: MetadataInferOptions, longitude: MetadataInferOptions }} infer how to extract the value
+ * @property {MetadataType} type type to coerce the extracted value to
+ */
+
+/**
+ * @param {ArrayBuffer | Buffer} buffer buffer of the image to extract EXIF data from
+ * @param {ExifExtractionPlanItem[]} extractionPlan
  * @returns {Promise<Record<string, { value: unknown; confidence: number; alternatives: Record<string, unknown> }>>}
  */
 export async function extractMetadata(buffer, extractionPlan) {
@@ -76,29 +88,47 @@ export async function extractMetadata(buffer, extractionPlan) {
 	if (!exif) return {};
 	console.log({ extractionPlan, exif });
 
+	const extract = match
+		.case(
+			{
+				type: '"location"',
+				infer: {
+					latitude: { exif: 'string' },
+					longitude: { exif: 'string' }
+				}
+			},
+			({ infer }) => ({
+				confidence: 1,
+				alternatives: {},
+				value: {
+					longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
+					latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float')
+				}
+			})
+		)
+		.case(
+			{
+				type: Schemas.MetadataType,
+				infer: { exif: 'string' }
+			},
+			({ infer, type }) => ({
+				confidence: 1,
+				alternatives: {},
+				value: coerceExifValue(exif.tags[infer.exif], type)
+			})
+		)
+		.default(() => undefined);
+
 	return Object.fromEntries(
 		extractionPlan
-			.map(([id, infer, type]) => {
-				return /** @type {const} */ ([
-					id,
-					{
-						value:
-							type === 'location'
-								? {
-										longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
-										latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float')
-									}
-								: coerceExifValue(exif.tags[infer.exif], type),
-						confidence: 1,
-						alternatives: {}
-					}
-				]);
+			.map(({ key: id, ...option }) => {
+				return /** @type {const} */ ([id, extract(option)]);
 			})
 			.filter(
-				(entry) =>
-					entry !== undefined &&
-					!matches(entry[1].value, { latitude: 'number.NaN', longitude: 'number.NaN' }) &&
-					!Number.isNaN(entry[1].value)
+				([, extracted]) =>
+					extracted !== undefined &&
+					!matches(extracted.value, { latitude: 'number.NaN', longitude: 'number.NaN' }) &&
+					!Number.isNaN(extracted.value)
 			)
 	);
 }
@@ -110,7 +140,7 @@ export async function extractMetadata(buffer, extractionPlan) {
  * @param {T} coerceTo
  * @returns {import('./metadata.js').RuntimeValue<T>}
  */
-function coerceExifValue(value, coerceTo) {
+export function coerceExifValue(value, coerceTo) {
 	switch (coerceTo) {
 		case 'string':
 			return value?.toString() ?? '';
@@ -119,6 +149,8 @@ function coerceExifValue(value, coerceTo) {
 			return Boolean(value);
 
 		case 'date':
+			if (typeof value !== 'number') throw new Error('Date value must be a number');
+			if (Number.isNaN(value)) throw new Error('Date value is invalid');
 			return new Date(value * 1e3);
 
 		case 'boundingbox':
@@ -137,10 +169,17 @@ function coerceExifValue(value, coerceTo) {
 	}
 }
 
-function serializeExifValue(value) {
+/**
+ * Serialize a value to a string for EXIF writing
+ * @param {unknown} value
+ * @returns {string|any[]}
+ */
+export function serializeExifValue(value) {
 	if (value instanceof Date) return format(value, 'yyyy:MM:dd HH:mm:ss');
-	// Let mutlivalued exif entries through
+	// Let multivalued exif entries through
 	if (Array.isArray(value)) return value;
+	if (value === undefined) return 'undefined';
+	if (value === null) return 'null';
 	if (typeof value === 'object' && value !== null) {
 		return Object.entries(value)
 			.map(([key, val]) => `${key}=${val}`)
@@ -151,7 +190,7 @@ function serializeExifValue(value) {
 
 /**
  * Append EXIF metadata to the image's bytes
- * @param {ArrayBuffer} bytes
+ * @param {ArrayBuffer|Buffer} bytes
  * @param {import('./database.js').Metadata[]} metadataDefs
  * @param {import('./database.js').MetadataValues} metadataValues
  * @returns {Uint8Array} the image with EXIF metadata added
