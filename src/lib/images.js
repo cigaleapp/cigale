@@ -3,6 +3,27 @@ import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { unique } from './utils';
+/**
+ * @import { Image, Protocol } from './database.js';
+ * @import { IDBTransactionWithAtLeast } from './idb.svelte';
+ */
+
+/**
+ * Used for tests
+ * @param {string} id
+ * @param {string} fileId
+ * @return {Image}
+ */
+const sampleImage = (id, fileId) => ({
+	id,
+	fileId,
+	addedAt: new Date(667),
+	dimensions: { width: 100, height: 100, aspectRatio: 1 },
+	filename: 'gurt: syubau.jpeg',
+	boundingBoxesAnalyzed: false,
+	contentType: 'image/jpeg',
+	metadata: {}
+});
 
 /**
  * Retourne un id d'image sous la forme 000001_000001
@@ -60,7 +81,7 @@ if (import.meta.vitest) {
 }
 
 /**
- * @param {import('$lib/database.js').Protocol} protocol
+ * @param {Protocol} protocol
  * @param {string|null} imageFileId
  */
 export function imageIsAnalyzed(protocol, imageFileId) {
@@ -70,7 +91,7 @@ export function imageIsAnalyzed(protocol, imageFileId) {
 }
 
 /**
- * @param {import('$lib/database.js').Image} image
+ * @param {Image} image
  */
 export function imageIsClassified(image) {
 	return Boolean(
@@ -79,7 +100,7 @@ export function imageIsClassified(image) {
 }
 
 /**
- * @param {import('$lib/database.js').Image} image
+ * @param {Image} image
  */
 export function imageBufferWasSaved(image) {
 	return Boolean(image.fileId || uiState.erroredImages.has(image.id));
@@ -103,7 +124,7 @@ export async function downloadImage(imageId, options) {
 /**
  *
  * @param {string} id ImageFile ID
- * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
+ * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImageFile(id, tx, notFoundOk = true) {
@@ -153,7 +174,7 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
  * @param {string} param0.filename the filename of the image
  * @param {number} param0.width the width of the image
  * @param {number} param0.height the height of the image
- * @param {import('./idb.svelte').IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
+ * @param {IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
  */
 export async function storeImageBytes({
 	id,
@@ -229,17 +250,35 @@ export async function resizeToMaxSize({ source }) {
 /**
  *
  * @param {string} imageFileId
- * @param {import('$lib/database.js').Image[]} [images] look for images in this array instead of the database
- * @returns {import('$lib/database.js').Image[]}
+ * @param {Image[]} [images] look for images in this array instead of the database
+ * @returns {Image[]}
  */
 export function imagesOfImageFile(imageFileId, images = undefined) {
 	return (images ?? tables.Image.state).filter((img) => img.fileId === imageFileId);
 }
 
+if (import.meta.vitest) {
+	const { _tablesState } = await import('./idb.svelte');
+	const { test, expect } = import.meta.vitest;
+
+	test('imagesOfImageFile', () => {
+		const images = [sampleImage('1', '1'), sampleImage('2', '1'), sampleImage('3', '2')];
+		const [img1, img2] = images;
+
+		expect(imagesOfImageFile('1', images)).toEqual([img1, img2]);
+
+		_tablesState.Image = [];
+		expect(imagesOfImageFile('1')).toEqual([]);
+
+		_tablesState.Image = images;
+		expect(imagesOfImageFile('1')).toEqual([img1, img2]);
+	});
+}
+
 /**
  *
  * @param {string[]} imageFileIds
- * @returns {Map<string, import('$lib/database.js').Image[]>}
+ * @returns {Map<string, Image[]>}
  */
 export function imagesByImageFile(imageFileIds) {
 	const images = new Map();
@@ -249,23 +288,82 @@ export function imagesByImageFile(imageFileIds) {
 	return images;
 }
 
+if (import.meta.vitest) {
+	const { _tablesState } = await import('./idb.svelte');
+	const { test, expect } = import.meta.vitest;
+
+	/**
+	 * @param {string} id
+	 * @param {string} fileId
+	 * @return {Image}
+	 */
+	const img = (id, fileId) => ({
+		id,
+		fileId,
+		addedAt: new Date(),
+		dimensions: { width: 100, height: 100, aspectRatio: 1 },
+		filename: 'gurt: syubau.jpeg',
+		boundingBoxesAnalyzed: false,
+		contentType: 'image/jpeg',
+		metadata: {}
+	});
+
+	test('imagesByImageFile', () => {
+		_tablesState.Image = [img('1', '1'), img('2', '1'), img('3', '2')];
+
+		const [img1, img2, img3] = _tablesState.Image;
+
+		expect(imagesByImageFile(['1', '2'])).toEqual(
+			new Map([
+				['1', [img1, img2]],
+				['2', [img3]]
+			])
+		);
+	});
+}
+
 /**
  *
- * @param {import('$lib/database.js').Image[]} images
+ * @param {Image[]} images
  * @returns {string[]}
  */
 export function imageFileIds(images) {
 	return unique(images.map((image) => image.fileId).filter((id) => id !== undefined));
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('imageFileIds', () => {
+		const images = [sampleImage('1', '1'), sampleImage('2', '1'), sampleImage('3', '2')];
+		expect(imageFileIds(images)).toEqual(['1', '2']);
+	});
+}
+
 /**
  * @param {string} imageId
- * @returns {{ fileId: string; subindex: number }}
+ * @returns {{ fileId: string; subindex: number|null }}
  */
 export function parseImageId(imageId) {
+	if (!/^\d+(_\d+)?$/.test(imageId)) {
+		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${imageId}`);
+	}
+
 	const [fileId, subindex] = imageId.split('_', 2);
+	const subindexNumber = Number.parseInt(subindex, 10);
 	return {
 		fileId,
-		subindex: Number.parseInt(subindex, 10)
+		subindex: Number.isNaN(subindexNumber) ? null : subindexNumber
 	};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('parseImageId', () => {
+		expect(parseImageId('000001_000000')).toEqual({ fileId: '000001', subindex: 0 });
+		expect(parseImageId('1234567_1234567')).toEqual({ fileId: '1234567', subindex: 1234567 });
+		expect(parseImageId('1234567')).toEqual({ fileId: '1234567', subindex: null });
+		expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): coming in hot!!!]`
+		);
+	});
 }
