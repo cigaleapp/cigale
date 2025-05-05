@@ -63,6 +63,7 @@ export async function getSettings({ page }) {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} id
+ * @returns {Promise<typeof import('$lib/database').Schemas.Image.inferIn>}
  */
 export async function getImage({ page }, id) {
 	const image = await page.evaluate(async ([id]) => {

@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures.js';
-import { getSettings, importPhotos, setImageMetadata, setSettings } from './utils.js';
+import { getImage, getSettings, importPhotos, setImageMetadata, setSettings } from './utils.js';
 
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }) => {
@@ -146,4 +146,165 @@ test.describe('Cropper view', () => {
 			expect(page.url()).toMatch(/#\/classify/);
 		});
 	});
+
+	test.describe('creating a new bounding box', () => {
+		test.beforeEach(async ({ page }) => {
+			await page.getByRole('img', { name: 'leaf.jpeg' }).click();
+		});
+
+		/**
+		 * Expects that all the images of leaf.jpeg are marked as confirmed or unconfirmed in the database.
+		 * @param {import('@playwright/test').Page} page
+		 * @param {boolean} confirmed
+		 */
+		async function expectAllImagesConfirmed(page, confirmed) {
+			const boxesCount = await boxesInBoxesList(page).count();
+			for (let i = 0; i < boxesCount; i++) {
+				await expect(isImageConfirmedInDatabase(page, `000002_00000${i}`)).resolves.toBe(confirmed);
+			}
+		}
+
+		test.describe('with 2-point tool', () => {
+			test.beforeEach(async ({ page }) => {
+				await page.getByRole('button', { name: '2 points' }).click();
+			});
+
+			/**
+			 * Make a new cropb box by clicking on two given points. Assumes the 2-point tool is selected.
+			 * @param {import('@playwright/test').Page} page
+			 * @param {number} x1
+			 * @param {number} y1
+			 * @param {number} x2
+			 * @param {number} y2
+			 */
+			async function makeBox(page, x1, y1, x2, y2) {
+				await page.waitForTimeout(500);
+				await page.locator('.change-area').click({
+					position: { x: x1, y: y1 }
+				});
+				await page.locator('.change-area').click({
+					position: { x: x2, y: y2 }
+				});
+			}
+
+			test('should create boxes every 2 clicks', async ({ page }) => {
+				await makeBox(page, 10, 10, 50, 50);
+				await expectBoxInList(page, 2, 14, 14);
+				await makeBox(page, 100, 100, 170, 80);
+				// Wait for overlay from the first box to disappear
+				await page.waitForTimeout(500);
+				await expect(confirmedCropOverlay(page)).not.toBeVisible();
+				await expectBoxInList(page, 3, 24, 7);
+				await expect(boxesInBoxesList(page)).toHaveCount(3);
+			});
+
+			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
+				await expectAllImagesConfirmed(page, false);
+				await makeBox(page, 10, 10, 50, 50);
+				await expectBoxInList(page, 2, 14, 14);
+				await expect(confirmedCropOverlay(page)).toBeVisible();
+				await expect(confirmedCropBadge(page, 'leaf.jpeg')).toBeVisible();
+				await expectAllImagesConfirmed(page, true);
+			});
+		});
+
+		test.describe('with 4-point tool', () => {
+			test.beforeEach(async ({ page }) => {
+				await page.getByRole('button', { name: '4 points' }).click();
+			});
+
+			/**
+			 * Make a new cropb box by clicking on four given points. Assumes the 4-point tool is selected.
+			 * @param {import('@playwright/test').Page} page
+			 * @param {number} x1
+			 * @param {number} y1
+			 * @param {number} x2
+			 * @param {number} y2
+			 * @param {number} x3
+			 * @param {number} y3
+			 * @param {number} x4
+			 * @param {number} y4
+			 */
+			async function makeBox(page, x1, y1, x2, y2, x3, y3, x4, y4) {
+				const changeArea = page.locator('.change-area');
+				await page.waitForTimeout(500);
+				await changeArea.click({ position: { x: x1, y: y1 } });
+				await changeArea.click({ position: { x: x2, y: y2 } });
+				await changeArea.click({ position: { x: x3, y: y3 } });
+				await changeArea.click({ position: { x: x4, y: y4 } });
+			}
+
+			test('should create boxes every 4 clicks', async ({ page }) => {
+				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
+				await expectBoxInList(page, 2, 14, 31);
+				await makeBox(page, 100, 100, 170, 80, 170, 150, 100, 150);
+				await page.waitForTimeout(1000);
+				await expect(confirmedCropOverlay(page)).not.toBeVisible();
+				await expectBoxInList(page, 3, 24, 24);
+				await expect(boxesInBoxesList(page)).toHaveCount(3);
+			});
+
+			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
+				await expectAllImagesConfirmed(page, false);
+				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
+				await expectBoxInList(page, 2, 14, 31);
+				await expect(confirmedCropOverlay(page)).toBeVisible();
+				await expect(confirmedCropBadge(page, 'leaf.jpeg')).toBeVisible();
+				await expectAllImagesConfirmed(page, true);
+			});
+		});
+	});
 });
+
+/**
+ * Asserts that a box with the given number and dimensions is visible in the list of boxes.
+ * @param {import('@playwright/test').Page} page
+ * @param {number} number 1-based
+ * @param {number} width
+ * @param {number} height
+ */
+async function expectBoxInList(page, number, width, height) {
+	await expect(page.locator('aside').getByText(`Boîte #${number}`)).toBeVisible();
+	await expect(page.locator('aside').getByText(`${width}×${height}`)).toBeVisible();
+}
+
+/**
+ * Gets the individual boxes in the list of boxes.
+ * @param {import('@playwright/test').Page} page
+ */
+function boxesInBoxesList(page) {
+	return page
+		.locator('aside')
+		.getByRole('listitem')
+		.filter({ hasText: /Boîte #\d+/ });
+}
+
+/**
+ * Gets the "Confirmé" overlay that appears in the cropper view if the current image has been marked as confirmed through implicit means.
+ * @param {import('@playwright/test').Page} page
+ */
+function confirmedCropOverlay(page) {
+	return page.locator('.confirmed-overlay');
+}
+
+/**
+ * Gets the badge element that appears in the cropper view's header if the current image has been marked as confirmed.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filename
+ */
+function confirmedCropBadge(page, filename) {
+	return page.getByRole('heading', { name: filename }).locator('.status');
+}
+
+/**
+ * Gets the confirmed crop status of the image with the given id in the database.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} id
+ */
+async function isImageConfirmedInDatabase(page, id) {
+	const image = await getImage({ page }, id);
+	return (
+		image?.metadata?.['io.github.cigaleapp.arthropods.transects__crop_is_confirmed']?.value ===
+		'true'
+	);
+}

@@ -567,7 +567,7 @@
 	let imageElement = $state();
 </script>
 
-<div class="confirmed-overlay" class:shown={confirmedOverlayShown}>
+<div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}>
 	<div class="icon">
 		<IconConfirmedCrop />
 	</div>
@@ -578,6 +578,7 @@
 	<aside class="toolbar">
 		{#each tools as tool (tool.name)}
 			<button
+				aria-label="Sélectionner l'outil {tool.name}"
 				class:active={tool.name === activeToolName}
 				use:tooltip={{
 					text: `${tool.name}: ${tool.help}`,
@@ -860,8 +861,10 @@
 		pointer-events: none;
 	}
 
-	.confirmed-overlay:not(.shown) {
+	.confirmed-overlay[aria-hidden='true'] {
 		opacity: 0;
+		/* https://github.com/microsoft/playwright/issues/5129#issuecomment-772746396 */
+		visibility: hidden;
 	}
 
 	.confirmed-overlay .icon {
