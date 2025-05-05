@@ -1,11 +1,13 @@
-import { test, expect } from './fixtures.js';
-import { importPhotos, setSettings, getSettings, setImageMetadata, getImage } from './utils.js';
+import { expect, test } from './fixtures.js';
+import { getSettings, importPhotos, setImageMetadata, setSettings } from './utils.js';
 
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }) => {
 		await importPhotos({ page }, 'lil-fella', 'cyan', 'leaf');
 		await page.getByTestId('goto-crop').click();
 		await page.waitForURL((u) => u.hash === '#/crop/');
+		// Wait for images to load
+		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 	});
 
 	test('should have all cards visible', async ({ page }) => {
@@ -124,23 +126,18 @@ test.describe('Cropper view', () => {
 			 * @param {string} id
 			 */
 			async function markAsConfirmed(id) {
-				const { metadata } = await getImage({ page }, id);
 				await setImageMetadata({ page }, id, {
-					'io.github.cigaleapp.arthropods.transects__crop': {
-						...metadata['io.github.cigaleapp.arthropods.transects__crop'],
+					'io.github.cigaleapp.arthropods.transects__crop_is_confirmed': {
+						value: true,
 						manuallyModified: true,
 						confidence: 1,
-						alternatives: {
-							[JSON.stringify(metadata['io.github.cigaleapp.arthropods.transects__crop'].value)]:
-								0.8273832
-						}
+						alternatives: {}
 					}
 				});
 			}
 
 			await markAsConfirmed('000000_000000');
 			await markAsConfirmed('000001_000000');
-			await markAsConfirmed('000002_000000');
 
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000002');
