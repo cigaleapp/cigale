@@ -27,7 +27,6 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import {
 		imageFileIds,
-		imageIdToFileId,
 		imagesOfImageFile,
 		imageId as makeImageId,
 		parseImageId
@@ -141,7 +140,7 @@
 				.filter(([, value]) => Boolean(value))
 		)
 	);
-	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(fileId)));
+	const imageSrc = $derived(uiState.previewURLs.get(fileId));
 	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idb.idComparator));
 	const prevFileId = $derived.by(() => {
 		const idx = sortedFileIds.indexOf(fileId) - 1;
