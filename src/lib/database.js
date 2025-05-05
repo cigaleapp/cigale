@@ -46,7 +46,7 @@ Handlebars.registerHelper('fallback', (subject, fallback) => {
 	return subject ?? fallback;
 });
 
-const FilepathTemplate = type.string
+export const FilepathTemplate = type.string
 	.pipe((t) => {
 		try {
 			return {
