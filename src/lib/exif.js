@@ -7,7 +7,6 @@ import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { toasts } from './toasts.svelte.js';
-import { matches } from './utils.js';
 
 /**
  * @import { MetadataInferOptions, MetadataType } from './database.js';
@@ -134,7 +133,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 			.filter(
 				([, extracted]) =>
 					extracted !== undefined &&
-					!matches(extracted.value, { latitude: 'number.NaN', longitude: 'number.NaN' }) &&
+					!type({ latitude: 'number.NaN', longitude: 'number.NaN' }).allows(extracted.value) &&
 					!Number.isNaN(extracted.value)
 			)
 	);
@@ -225,8 +224,8 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 		if (value === undefined) continue;
 
 		if (
-			matches(def.infer, { latitude: { exif: 'string' }, longitude: { exif: 'string' } }) &&
-			matches(value, { latitude: 'number', longitude: 'number' })
+			type({ latitude: { exif: 'string' }, longitude: { exif: 'string' } }).allows(def.infer) &&
+			type({ latitude: 'number', longitude: 'number' }).allows(value)
 		) {
 			// XXX harcoded BS :/
 			if (def.infer.latitude.exif === 'GPSLatitude') {
