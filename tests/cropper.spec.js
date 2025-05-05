@@ -23,15 +23,15 @@ test.describe('Cropper view', () => {
 
 			test(`navigate with arrow keys (autoskip ${enabled ? 'on' : 'off'})`, async ({ page }) => {
 				await page.getByText('cyan.jpeg', { exact: true }).click();
-				await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+				await page.waitForURL((u) => u.hash === '#/crop/000001');
 				await page.keyboard.press('ArrowRight');
-				await page.waitForURL((u) => u.hash === '#/crop/000002_000000');
+				await page.waitForURL((u) => u.hash === '#/crop/000002');
 				await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
-				await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+				await page.waitForURL((u) => u.hash === '#/crop/000001');
 				await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
-				await page.waitForURL((u) => u.hash === '#/crop/000000_000000');
+				await page.waitForURL((u) => u.hash === '#/crop/000000');
 				await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 			});
 
@@ -39,7 +39,7 @@ test.describe('Cropper view', () => {
 				page
 			}) => {
 				await page.getByText('cyan.jpeg', { exact: true }).click();
-				await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+				await page.waitForURL((u) => u.hash === '#/crop/000001');
 				await page.keyboard.press('Escape');
 				await page.waitForURL((u) => u.hash === '#/crop');
 				await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
@@ -56,25 +56,25 @@ test.describe('Cropper view', () => {
 
 		test('should not skip on confirm button click', async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should not skip on confirmation keybind', async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should toggle autoskip on on keybind press', async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 
 			const { ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
@@ -92,25 +92,25 @@ test.describe('Cropper view', () => {
 
 		test.fixme('should skip on confirm button click', annotations.pr(207), async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000002_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000002');
 			await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test.fixme('should skip on confirmation keybind', annotations.pr(207), async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await page.waitForURL((u) => u.hash === '#/crop/000002_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000002');
 			await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should toggle autoskip off on keybind press', async ({ page }) => {
 			await page.getByText('cyan.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
 
 			const { ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
@@ -144,7 +144,7 @@ test.describe('Cropper view', () => {
 			await markAsConfirmed('000002_000000');
 
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000002_000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000002');
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await page.waitForTimeout(1000);
 			expect(page.url()).toMatch(/#\/classify/);
