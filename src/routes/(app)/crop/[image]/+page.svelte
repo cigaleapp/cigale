@@ -313,12 +313,17 @@
 	 * @returns {Promise<string>} the ID of the image we just modified/created
 	 */
 	async function onCropChange(imageId, newBoundingBox, flashConfirmedOverlay = true) {
+		if (!newBoundingBox) {
+			// No bounding box, nothing to do
+			return;
+		}
+
 		// Flash if
 		const willFlashConfirmedOverlay =
-			// the callsite asked for it,
+			// the caller asked for it,
 			flashConfirmedOverlay &&
 			// we can actually mark crops as confirmed given the current protocol
-			uiState.cropConfirmationMetadataId &&
+			Boolean(uiState.cropConfirmationMetadataId) &&
 			// and this is the last image before the file is considered confirmed
 			images.filter(imageHasConfirmedCrop).length === images.length - 1;
 
@@ -367,7 +372,7 @@
 				alternatives: []
 			});
 		} else {
-			// We're creating a 2+nd cropbox
+			// We're creating a >1st cropbox
 			newImageId = makeImageId(
 				fileId,
 				Math.max(...images.map(({ id }) => parseImageId(id).subindex)) + 1
@@ -390,7 +395,7 @@
 			});
 		}
 
-		await changeCropConfirmedStatus(newImageId || imageId, true);
+		await changeAllConfirmedStatuses(true);
 
 		if (willFlashConfirmedOverlay) {
 			confirmedOverlayShown = true;
