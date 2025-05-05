@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1076</span>
+                <span class='fraction'>0/1083</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1076</span>
+                <span class='fraction'>0/1083</span>
             </div>
         
             
@@ -1139,7 +1139,21 @@
 <a name='L1074'></a><a href='#L1074'>1074</a>
 <a name='L1075'></a><a href='#L1075'>1075</a>
 <a name='L1076'></a><a href='#L1076'>1076</a>
-<a name='L1077'></a><a href='#L1077'>1077</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L1077'></a><a href='#L1077'>1077</a>
+<a name='L1078'></a><a href='#L1078'>1078</a>
+<a name='L1079'></a><a href='#L1079'>1079</a>
+<a name='L1080'></a><a href='#L1080'>1080</a>
+<a name='L1081'></a><a href='#L1081'>1081</a>
+<a name='L1082'></a><a href='#L1082'>1082</a>
+<a name='L1083'></a><a href='#L1083'>1083</a>
+<a name='L1084'></a><a href='#L1084'>1084</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2530,12 +2544,17 @@
 <span class="cstat-no" title="statement not covered" >	 * @returns {Promise&lt;string&gt;} the ID of the image we just modified/created</span>
 <span class="cstat-no" title="statement not covered" >	 */</span>
 <span class="cstat-no" title="statement not covered" >	async function onCropChange(imageId, newBoundingBox, flashConfirmedOverlay = true) {</span>
+<span class="cstat-no" title="statement not covered" >		if (!newBoundingBox) {</span>
+<span class="cstat-no" title="statement not covered" >			// No bounding box, nothing to do</span>
+<span class="cstat-no" title="statement not covered" >			return;</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
+<span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >		// Flash if</span>
 <span class="cstat-no" title="statement not covered" >		const willFlashConfirmedOverlay =</span>
-<span class="cstat-no" title="statement not covered" >			// the callsite asked for it,</span>
+<span class="cstat-no" title="statement not covered" >			// the caller asked for it,</span>
 <span class="cstat-no" title="statement not covered" >			flashConfirmedOverlay &amp;&amp;</span>
 <span class="cstat-no" title="statement not covered" >			// we can actually mark crops as confirmed given the current protocol</span>
-<span class="cstat-no" title="statement not covered" >			uiState.cropConfirmationMetadataId &amp;&amp;</span>
+<span class="cstat-no" title="statement not covered" >			Boolean(uiState.cropConfirmationMetadataId) &amp;&amp;</span>
 <span class="cstat-no" title="statement not covered" >			// and this is the last image before the file is considered confirmed</span>
 <span class="cstat-no" title="statement not covered" >			images.filter(imageHasConfirmedCrop).length === images.length - 1;</span>
 <span class="cstat-no" title="statement not covered" ></span>
@@ -2584,7 +2603,7 @@
 <span class="cstat-no" title="statement not covered" >				alternatives: []</span>
 <span class="cstat-no" title="statement not covered" >			});</span>
 <span class="cstat-no" title="statement not covered" >		} else {</span>
-<span class="cstat-no" title="statement not covered" >			// We're creating a 2+nd cropbox</span>
+<span class="cstat-no" title="statement not covered" >			// We're creating a &gt;1st cropbox</span>
 <span class="cstat-no" title="statement not covered" >			newImageId = makeImageId(</span>
 <span class="cstat-no" title="statement not covered" >				fileId,</span>
 <span class="cstat-no" title="statement not covered" >				Math.max(...images.map(({ id }) =&gt; parseImageId(id).subindex)) + 1</span>
@@ -2607,7 +2626,7 @@
 <span class="cstat-no" title="statement not covered" >			});</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >		await changeCropConfirmedStatus(newImageId || imageId, true);</span>
+<span class="cstat-no" title="statement not covered" >		await changeAllConfirmedStatuses(true);</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >		if (willFlashConfirmedOverlay) {</span>
 <span class="cstat-no" title="statement not covered" >			confirmedOverlayShown = true;</span>
@@ -2784,7 +2803,7 @@
 <span class="cstat-no" title="statement not covered" >	let imageElement = $state();</span>
 <span class="cstat-no" title="statement not covered" >&lt;/script&gt;</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >&lt;div class="confirmed-overlay" class:shown={confirmedOverlayShown}&gt;</span>
+<span class="cstat-no" title="statement not covered" >&lt;div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}&gt;</span>
 <span class="cstat-no" title="statement not covered" >	&lt;div class="icon"&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;IconConfirmedCrop /&gt;</span>
 <span class="cstat-no" title="statement not covered" >	&lt;/div&gt;</span>
@@ -3078,8 +3097,10 @@
 <span class="cstat-no" title="statement not covered" >		pointer-events: none;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	.confirmed-overlay:not(.shown) {</span>
+<span class="cstat-no" title="statement not covered" >	.confirmed-overlay[aria-hidden='true'] {</span>
 <span class="cstat-no" title="statement not covered" >		opacity: 0;</span>
+<span class="cstat-no" title="statement not covered" >		/* https://github.com/microsoft/playwright/issues/5129#issuecomment-772746396 */</span>
+<span class="cstat-no" title="statement not covered" >		visibility: hidden;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	.confirmed-overlay .icon {</span>
@@ -3298,7 +3319,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-05T20:16:16.717Z
+                at 2025-05-05T20:37:29.597Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
