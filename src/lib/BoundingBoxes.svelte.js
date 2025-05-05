@@ -53,6 +53,19 @@ export function coordsScaler({ x: xwise, y: ywise }) {
 	};
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('coordsScaler', () => {
+		expect(coordsScaler({ x: 2, y: 3 })({ x: 1, y: 2 })).toEqual({ x: 2, y: 6 });
+		expect(coordsScaler({ x: 2, y: 3 })({ x: 1, y: 2, width: 4, height: 5 })).toEqual({
+			x: 2,
+			y: 6,
+			width: 8,
+			height: 15
+		});
+	});
+}
+
 /** @param {undefined | import('./database').Protocol} protocol  */
 export const toPixelCoords = (protocol) => {
 	if (!protocol) throw new Error('No protocol was provided');
@@ -87,6 +100,18 @@ export function toCenteredCoords({ x, y, width, height }) {
 	};
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('toCenteredCoords', () => {
+		expect(toCenteredCoords({ x: 0, y: 0, width: 10, height: 20 })).toEqual({
+			x: 5,
+			y: 10,
+			w: 10,
+			h: 20
+		});
+	});
+}
+
 /**
  * @param {object} param0
  * @param {number} param0.x
@@ -101,6 +126,18 @@ export function toTopLeftCoords({ x, y, w, h }) {
 		width: w,
 		height: h
 	};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('toTopLeftCoords', () => {
+		expect(toTopLeftCoords({ x: 5, y: 10, w: 10, h: 20 })).toEqual({
+			x: 0,
+			y: 0,
+			width: 10,
+			height: 20
+		});
+	});
 }
 
 export function boundingBoxIsNonZero(boundingBox) {
@@ -123,6 +160,19 @@ export function boundingBoxIsNonZero(boundingBox) {
 		.allows(boundingBox);
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('boundingBoxIsNonZero', () => {
+		expect(boundingBoxIsNonZero({ x: 0, y: 0, width: 10, height: 20 })).toBe(false);
+		expect(boundingBoxIsNonZero({ x: 5, y: 10, width: 0, height: 20 })).toBe(false);
+		expect(boundingBoxIsNonZero({ x: 5, y: 10, width: 10, height: 0 })).toBe(false);
+		expect(boundingBoxIsNonZero({ x: 5, y: 10, width: -1, height: -1 })).toBe(false);
+		expect(boundingBoxIsNonZero({ x: 5, y: 10, w: -1, h: -1 })).toBe(false);
+		expect(boundingBoxIsNonZero({ x: 0, y: 0, w: 0, h: 0 })).toBe(false);
+		expect(boundingBoxIsNonZero({ x: 5, y: 10, w: 10, h: 20 })).toBe(true);
+	});
+}
+
 /**
  *
  * @param {{x: number, y: number, width: number, height: number}} boundingBox
@@ -133,6 +183,23 @@ export function withinBoundingBox(boundingBox, { x, y }) {
 	if (!boundingBoxIsNonZero(boundingBox)) return false;
 	const { x: x_box, y: y_box, width, height } = boundingBox;
 	return x >= x_box && x <= x_box + width && y >= y_box && y <= y_box + height;
+}
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+	describe('withinBoundingBox', () => {
+		test('works for points inside', () => {
+			expect(withinBoundingBox({ x: 1, y: 1, width: 10, height: 20 }, { x: 5, y: 10 })).toBe(true);
+		});
+		test('works for points outside', () => {
+			expect(withinBoundingBox({ x: 1, y: 1, width: 10, height: 20 }, { x: -1, y: -1 })).toBe(
+				false
+			);
+		});
+		test('returns false on zero-sized bounding boxes', () => {
+			expect(withinBoundingBox({ x: 4, y: 5, width: 0, height: 0 }, { x: 4, y: 5 })).toBe(false);
+		});
+	});
 }
 
 /**

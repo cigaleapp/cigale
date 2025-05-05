@@ -1,0 +1,35 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.0'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Deploy results to Github Pages
+        if: ${{ !cancelled() }}
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./html
+          umbrella-dir: _vitest
+          comment: false
+      - name: Deploy coverage report to Github Pages
+        if: ${{ !cancelled() }}
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./coverage
+          umbrella-dir: _coverage
+          comment: false

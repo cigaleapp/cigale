@@ -60,7 +60,10 @@
 			dimensions: { width, height }
 		});
 
-		await processExifData(uiState.currentProtocol.id, id, originalBytes, file);
+		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
+			console.error(error);
+			toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
+		});
 	}
 
 	/**

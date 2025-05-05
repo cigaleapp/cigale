@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { Schemas } from './database.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
 import { mapValues } from './utils.js';
@@ -35,7 +35,6 @@ export function getMetadataValue(image, type, metadataId) {
 
 	return {
 		...value,
-		// @ts-expect-error
 		value: assertIs(type, value.value)
 	};
 }
@@ -86,7 +85,7 @@ export async function storeMetadataValue({
 	confidence ??= 1;
 
 	const newValue = {
-		value: JSON.stringify(value instanceof Date ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value),
+		value: JSON.stringify(isValid(value) ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value),
 		confidence,
 		manuallyModified,
 		alternatives: Object.fromEntries(

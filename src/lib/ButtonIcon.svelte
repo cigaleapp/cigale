@@ -12,11 +12,11 @@
 	 * @property {boolean} [crossout] draw a diagonal line through the button's content
 	 */
 
-	/** @type {Props} */
-	let { children, onclick, help, keyboard, disabled, crossout } = $props();
+	/** @type {Props & Record<string, unknown>} */
+	let { children, onclick, help, keyboard, disabled, crossout, ...rest } = $props();
 </script>
 
-<button {disabled} {onclick} class:crossout use:tooltip={{ text: help, keyboard }}>
+<button {disabled} {onclick} class:crossout use:tooltip={{ text: help, keyboard }} {...rest}>
 	{@render children()}
 </button>
 

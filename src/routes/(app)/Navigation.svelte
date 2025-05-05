@@ -77,6 +77,7 @@
 			<Sup></Sup>
 			<a
 				href="#/crop/{uiState.imageOpenedInCropper}"
+				data-testid="goto-crop"
 				aria-disabled={!uiState.currentProtocolId || !hasImages}
 			>
 				Recadrer
