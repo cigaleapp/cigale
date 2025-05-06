@@ -157,11 +157,27 @@ test.describe('Cropper view', () => {
 		 * @param {import('@playwright/test').Page} page
 		 * @param {boolean} confirmed
 		 */
-		async function expectAllImagesConfirmed(page, confirmed) {
+		async function expectAllImagesConfirmedInDatabase(page, confirmed) {
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
 				await expect(isImageConfirmedInDatabase(page, `000002_00000${i}`)).resolves.toBe(confirmed);
 			}
+		}
+
+		/**
+		 * Checks that the ImageFile is confirmed:
+		 * - has the "Confirmé" overlay shown (if `implicit` is true)
+		 * - has the confirmed badge shown
+		 * - has all images marked as confirmed in the database
+		 * - has the "Invalider" button shown
+		 * @param {import('@playwright/test').Page} page
+		 * @param {boolean} implicit also check that the overlay is shown
+		 */
+		async function expectConfirmed(page, implicit = false) {
+			if (implicit) await expect(confirmedCropOverlay(page)).toBeVisible();
+			await expect(confirmedCropBadge(page)).toBeVisible();
+			await expect(page.getByRole('button', { name: 'Invalider' })).toBeVisible();
+			await expectAllImagesConfirmedInDatabase(page, true);
 		}
 
 		test.describe('with click-and-drag tool', () => {
@@ -200,12 +216,10 @@ test.describe('Cropper view', () => {
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
-				await expectAllImagesConfirmed(page, false);
+				await expectAllImagesConfirmedInDatabase(page, false);
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 10, 24);
-				await expect(confirmedCropOverlay(page)).toBeVisible();
-				await expect(confirmedCropBadge(page, 'leaf.jpeg')).toBeVisible();
-				await expectAllImagesConfirmed(page, true);
+				await expectConfirmed(page, true);
 			});
 		});
 
@@ -244,12 +258,10 @@ test.describe('Cropper view', () => {
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
-				await expectAllImagesConfirmed(page, false);
+				await expectAllImagesConfirmedInDatabase(page, false);
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 14, 14);
-				await expect(confirmedCropOverlay(page)).toBeVisible();
-				await expect(confirmedCropBadge(page, 'leaf.jpeg')).toBeVisible();
-				await expectAllImagesConfirmed(page, true);
+				await expectConfirmed(page, true);
 			});
 		});
 
@@ -290,12 +302,10 @@ test.describe('Cropper view', () => {
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
-				await expectAllImagesConfirmed(page, false);
+				await expectAllImagesConfirmedInDatabase(page, false);
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await expectBoxInList(page, 2, 14, 31);
-				await expect(confirmedCropOverlay(page)).toBeVisible();
-				await expect(confirmedCropBadge(page, 'leaf.jpeg')).toBeVisible();
-				await expectAllImagesConfirmed(page, true);
+				await expectConfirmed(page, true);
 			});
 		});
 	});
@@ -335,10 +345,9 @@ function confirmedCropOverlay(page) {
 /**
  * Gets the badge element that appears in the cropper view's header if the current image has been marked as confirmed.
  * @param {import('@playwright/test').Page} page
- * @param {string} filename
  */
-function confirmedCropBadge(page, filename) {
-	return page.getByRole('heading', { name: filename }).locator('.status');
+function confirmedCropBadge(page) {
+	return page.locator('aside').getByRole('heading').locator('.status');
 }
 
 /**
