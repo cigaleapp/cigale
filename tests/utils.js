@@ -189,3 +189,21 @@ export async function importResults(page, filepath) {
 	await expect(page.getByText('Analyse…').first()).toBeVisible();
 	await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
 }
+
+/**
+ *
+ * @param {Page} page
+ * @param {string|RegExp} message
+ * @param {object} options
+ * @param {boolean} [options.exact]
+ * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
+ */
+export function toast(page, message, { exact = false, type = undefined }) {
+	const area = page.getByTestId('toasts-area');
+
+	if (type) {
+		return area.locator(`[data-type='${type}']`).getByText(message, { exact });
+	}
+
+	return area.getByText(message, { exact });
+}

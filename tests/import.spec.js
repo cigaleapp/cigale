@@ -1,7 +1,21 @@
 import extract from 'extract-zip';
 import path from 'node:path';
 import { expect, test } from './fixtures';
-import { chooseDefaultProtocol, readdirTreeSync, setSettings } from './utils';
+import { chooseDefaultProtocol, readdirTreeSync, setSettings, toast } from './utils';
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filepath
+ */
+async function setupImport(page, filepath) {
+	await setSettings({ page }, { showTechnicalMetadata: false });
+	await chooseDefaultProtocol(page);
+	// Import fixture zip
+	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
+	const fileInput = await page.$("input[type='file']");
+	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
+	await page.waitForTimeout(3000);
+}
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -162,5 +176,45 @@ test.describe('correct results.zip', () => {
 			'analysis.json',
 			'metadata.csv'
 		]);
+	});
+});
+
+test.describe('missing original photos', () => {
+	test.beforeEach(async ({ page }) => {
+		await setupImport(page, 'no-originals.zip');
+	});
+
+	test('fails with the appriopriate error message', async ({ page }) => {
+		await expect(toast(page, 'Aucune image trouvée', { type: 'error' })).toBeVisible();
+	});
+});
+
+test.describe('missing analysis file', () => {
+	test.beforeEach(async ({ page }) => {
+		await setupImport(page, 'no-analysis.zip');
+	});
+
+	test('fails with the appriopriate error message', async ({ page }) => {
+		await expect(toast(page, "Aucun fichier d'analyse", { type: 'error' })).toBeVisible();
+	});
+});
+
+test.describe('wrong protocol used', () => {
+	test.beforeEach(async ({ page }) => {
+		await setupImport(page, 'wrong-protocol.zip');
+	});
+
+	test('fails with the appriopriate error message', async ({ page }) => {
+		await expect(toast(page, 'le protocole actuel est', { type: 'error' })).toBeVisible();
+	});
+});
+
+test.describe('invalid json analysis', async () => {
+	test.beforeEach(async ({ page }) => {
+		await setupImport(page, 'invalid-json-analysis.zip');
+	});
+
+	test('fails with the appriopriate error message', async ({ page }) => {
+		await expect(toast(page, 'JSON', { type: 'error' })).toBeVisible();
 	});
 });
