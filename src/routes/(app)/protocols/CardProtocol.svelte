@@ -32,7 +32,7 @@
 	);
 
 	/**
-	 * @param {import('$lib/database').Request} source
+	 * @param {import('$lib/database').HTTPRequest} source
 	 */
 	function inferenceModelUrl(source) {
 		if (typeof source === 'string') return source;
@@ -41,7 +41,7 @@
 </script>
 
 {#snippet modelDetails(
-	/** @type {{ model: import('$lib/database').Request, input: import('$lib/database').ModelInput }} */ params
+	/** @type {{ model: import('$lib/database').HTTPRequest, input: import('$lib/database').ModelInput }} */ params
 )}
 	{#if params}
 		<p>
