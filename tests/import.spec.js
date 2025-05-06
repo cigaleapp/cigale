@@ -1,21 +1,7 @@
 import extract from 'extract-zip';
 import path from 'node:path';
 import { expect, test } from './fixtures';
-import { chooseDefaultProtocol, readdirTreeSync, setSettings, toast } from './utils';
-
-/**
- * @param {import('@playwright/test').Page} page
- * @param {string} filepath
- */
-async function setupImport(page, filepath) {
-	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseDefaultProtocol(page);
-	// Import fixture zip
-	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
-	const fileInput = await page.$("input[type='file']");
-	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
-	await page.waitForTimeout(3000);
-}
+import { importResults, readdirTreeSync, toast } from './utils';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -181,7 +167,7 @@ test.describe('correct results.zip', () => {
 
 test.describe('missing original photos', () => {
 	test.beforeEach(async ({ page }) => {
-		await setupImport(page, 'no-originals.zip');
+		await importResults(page, 'no-originals.zip');
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
@@ -191,7 +177,7 @@ test.describe('missing original photos', () => {
 
 test.describe('missing analysis file', () => {
 	test.beforeEach(async ({ page }) => {
-		await setupImport(page, 'no-analysis.zip');
+		await importResults(page, 'no-analysis.zip');
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
@@ -201,7 +187,7 @@ test.describe('missing analysis file', () => {
 
 test.describe('wrong protocol used', () => {
 	test.beforeEach(async ({ page }) => {
-		await setupImport(page, 'wrong-protocol.zip');
+		await importResults(page, 'wrong-protocol.zip');
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
@@ -211,7 +197,7 @@ test.describe('wrong protocol used', () => {
 
 test.describe('invalid json analysis', async () => {
 	test.beforeEach(async ({ page }) => {
-		await setupImport(page, 'invalid-json-analysis.zip');
+		await importResults(page, 'invalid-json-analysis.zip');
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
