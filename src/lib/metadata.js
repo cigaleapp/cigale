@@ -59,6 +59,15 @@ export function getMetadataValueOrThrow(image, type, metadataId) {
 }
 
 /**
+ * Serialize a metadata value for storing in the database.
+ * @param {*} value
+ * @returns {string}
+ */
+export function serializeMetadataValue(value) {
+	return JSON.stringify(isValid(value) ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value);
+}
+
+/**
  *
  * @template {DB.MetadataType} Type
  * @param {object} options
@@ -85,7 +94,7 @@ export async function storeMetadataValue({
 	confidence ??= 1;
 
 	const newValue = {
-		value: JSON.stringify(isValid(value) ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value),
+		value: serializeMetadataValue(value),
 		confidence,
 		manuallyModified,
 		alternatives: Object.fromEntries(
@@ -185,7 +194,7 @@ export async function deleteMetadataValue({ subjectId, metadataId, recursive = f
 
 /**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
- * @param {DB.Observation} observation
+ * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} observation
  * @returns {Promise<DB.MetadataValues>}
  */
 export async function observationMetadata(observation) {

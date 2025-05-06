@@ -84,7 +84,7 @@ export function classificationInferenceSettings(protocol) {
 				taxonomic: { clade: '"species"' },
 				infer: {
 					neural: {
-						model: Schemas.Request,
+						model: Schemas.HTTPRequest,
 						input: Schemas.ModelInput,
 						'output?': type({
 							'name?': 'string'
