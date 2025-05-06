@@ -195,11 +195,11 @@
 	}
 
 	/* Direction is set to RTL on .pannel to put the resize handle on the left of the container, this sets it back to LTR for every child so that text still has the correction direction (for French) */
-	.pannel :global(> *) {
+	.sidepanel :global(> *) {
 		direction: ltr;
 	}
 
-	.pannel.empty {
+	.sidepanel.empty {
 		grid-template-rows: auto max-content;
 	}
 
