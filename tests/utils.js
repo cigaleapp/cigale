@@ -1,4 +1,6 @@
 import { expect } from '@playwright/test';
+import { match, type } from 'arktype';
+import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
 /**
@@ -99,4 +101,91 @@ export async function setImageMetadata({ page }, id, metadata) {
 		});
 		await window.refreshDB();
 	}, /** @type {const} */ ([id, metadata]));
+}
+
+/**
+ *
+ * @param {Page} page
+ */
+export async function chooseDefaultProtocol(page) {
+	// Choose default protocol
+	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
+	await page.getByTestId('protocol-to-choose').click();
+	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
+ * @template {*} Leaf
+ * @typedef {Array<Leaf | { [dir: string]: ArrayTree<Leaf> }>} ArrayTree
+ */
+
+/**
+ *
+ * @param {string} root
+ * @returns {ArrayTree<string>}
+ */
+export function readdirTreeSync(root) {
+	const result = [];
+	const files = readdirSync(root, { withFileTypes: true });
+	for (const file of files) {
+		if (file.isDirectory()) {
+			result.push({
+				[file.name]: readdirTreeSync(path.join(root, file.name))
+			});
+		} else {
+			result.push(file.name);
+		}
+	}
+
+	const Dir = type({ '[string]': 'unknown' });
+	return result.sort((a, b) => {
+		console.log({ sorting: [a, b] });
+		return (
+			match
+				// Sort directories before files
+				.case(['string', Dir], () => -1)
+				.case([Dir, 'string'], () => 1)
+				.case(['string', 'string'], ([a, b]) => a.localeCompare(b))
+				.case([Dir, Dir], ([a, b]) => {
+					const aName = Object.keys(a)[0];
+					const bName = Object.keys(b)[0];
+					return aName.localeCompare(bName);
+				})
+				.default(() => 0)([a, b])
+		);
+	});
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string|RegExp} message
+ * @param {object} options
+ * @param {boolean} [options.exact]
+ * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
+ */
+export function toast(page, message, { exact = false, type = undefined }) {
+	const area = page.getByTestId('toasts-area');
+
+	if (type) {
+		return area.locator(`[data-type='${type}']`).getByText(message, { exact });
+	}
+
+	return area.getByText(message, { exact });
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filepath to the zip file, relative to tests/fixtures/exports
+ * @param {object} options
+ */
+export async function importResults(page, filepath) {
+	await setSettings({ page }, { showTechnicalMetadata: false });
+	await chooseDefaultProtocol(page);
+	// Import fixture zip
+	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
+	const fileInput = await page.$("input[type='file']");
+	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
+	await expect(page.getByText('Analyse…').first()).toBeVisible();
+	await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
 }

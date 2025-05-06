@@ -80,7 +80,7 @@
 	});
 </script>
 
-<div class="pannel" class:empty={images.length === 0}>
+<aside data-testid="sidepanel" class="sidepanel" class:empty={images.length === 0}>
 	{#if images.length > 0}
 		<div class="images">
 			{#each images as { src, box }, i (i)}
@@ -177,10 +177,10 @@
 			Supprimer {images.length} images
 		</ButtonSecondary>
 	</section>
-</div>
+</aside>
 
 <style>
-	.pannel {
+	.sidepanel {
 		width: 40vw;
 		resize: horizontal;
 		direction: rtl;
