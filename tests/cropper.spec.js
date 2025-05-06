@@ -164,6 +164,51 @@ test.describe('Cropper view', () => {
 			}
 		}
 
+		test.describe('with click-and-drag tool', () => {
+			test.beforeEach(async ({ page }) => {
+				await page.getByRole('button', { name: 'Glisser-recadrer' }).click();
+			});
+
+			/**
+			 * Make a new cropb box by clicking and dragging from the first point to the second. Assumes the click-and-drag tool is selected.
+			 * @param {import('@playwright/test').Page} page
+			 * @param {number} x1
+			 * @param {number} y1
+			 * @param {number} x2
+			 * @param {number} y2
+			 */
+			async function makeBox(page, x1, y1, x2, y2) {
+				await page.waitForTimeout(500);
+				const changeArea = await page.locator('.change-area').boundingBox();
+				if (!changeArea) throw new Error('Change area not found');
+				const { x: x0, y: y0 } = changeArea;
+				await page.mouse.move(x0 + x1, y0 + y1);
+				await page.mouse.down();
+				await page.mouse.move(x0 + (x2 - x1), x0 + (y2 - y1));
+				await page.mouse.up();
+			}
+
+			test('should create boxes on mouseup', async ({ page }) => {
+				await makeBox(page, 10, 10, 50, 50);
+				await expectBoxInList(page, 2, 10, 24);
+				await makeBox(page, 100, 100, 340, 80);
+				// Wait for overlay from the first box to disappear
+				await page.waitForTimeout(500);
+				await expect(confirmedCropOverlay(page)).not.toBeVisible();
+				await expectBoxInList(page, 3, 49, 28);
+				await expect(boxesInBoxesList(page)).toHaveCount(3);
+			});
+
+			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
+				await expectAllImagesConfirmed(page, false);
+				await makeBox(page, 10, 10, 50, 50);
+				await expectBoxInList(page, 2, 10, 24);
+				await expect(confirmedCropOverlay(page)).toBeVisible();
+				await expect(confirmedCropBadge(page, 'leaf.jpeg')).toBeVisible();
+				await expectAllImagesConfirmed(page, true);
+			});
+		});
+
 		test.describe('with 2-point tool', () => {
 			test.beforeEach(async ({ page }) => {
 				await page.getByRole('button', { name: '2 points' }).click();
