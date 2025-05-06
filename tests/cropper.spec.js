@@ -181,7 +181,12 @@ test.describe('Cropper view', () => {
 		}
 
 		test.describe('with click-and-drag tool', () => {
-			test.beforeEach(async ({ page }) => {
+			test.beforeEach(async ({ page, browserName }) => {
+				test.skip(
+					browserName === 'webkit',
+					'No support for click-and-drag, trace viewer shows that the mouse down is seemingly immediately followed by a mouse up, so no dragging occurs'
+				);
+
 				await page.getByRole('button', { name: 'Glisser-recadrer' }).click();
 			});
 
