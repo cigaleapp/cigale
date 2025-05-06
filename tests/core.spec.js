@@ -2,19 +2,15 @@ import { expect, test } from './fixtures.js';
 import extract from 'extract-zip';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Analysis } from '../scripts/generate-json-schemas.js';
-import { setSettings } from './utils.js';
+import { Analysis } from '../src/lib/schemas/results.js';
+import { setSettings, chooseDefaultProtocol, readdirTreeSync } from './utils.js';
 
 test('basic functionality', async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-
-	// Choose default protocol
-	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
-	await page.getByTestId('protocol-to-choose').click();
-	await page.waitForURL((u) => u.hash === '#/import');
+	await chooseDefaultProtocol(page);
 
 	// Import fixture image
-	await expect(page.getByText(/Cliquer ou déposer des images ici/)).toBeVisible();
+	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
 	const fileInput = await page.$('input[type="file"]');
 	await fileInput?.setInputFiles('./tests/fixtures/lil-fella.jpeg');
 	await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
@@ -60,7 +56,7 @@ test('basic functionality', async ({ page }) => {
 
 	// Export results
 	await page.getByRole('button', { name: 'Résultats' }).click();
-	await page.getByText(/et images originales$/i).click();
+	await page.getByText(/et images originales/i).click();
 	await page.getByText('results.zip').click();
 	const download = await page.waitForEvent('download');
 	expect(download.suggestedFilename()).toBe('results.zip');
@@ -70,8 +66,12 @@ test('basic functionality', async ({ page }) => {
 	const resultsDir = path.resolve('./tests/results/lil-fella');
 	await extract('./tests/results/lil-fella.zip', { dir: resultsDir });
 
-	const files = fs.readdirSync(resultsDir);
-	expect(files.sort()).toMatchObject(['Cropped', 'Original', 'analysis.json', 'metadata.csv']);
+	expect(readdirTreeSync(resultsDir)).toMatchObject([
+		{ Cropped: ['lil-fella_1.jpeg'] },
+		{ Original: ['lil-fella_1.jpeg'] },
+		'analysis.json',
+		'metadata.csv'
+	]);
 
 	const csv = fs.readFileSync(path.join(resultsDir, 'metadata.csv'), 'utf8');
 	expect(csv.split('\n')).toHaveLength(2);
@@ -84,12 +84,7 @@ test('basic functionality', async ({ page }) => {
 	const analysis = JSON.parse(fs.readFileSync(path.join(resultsDir, 'analysis.json'), 'utf8'));
 	expect(Analysis.allows(analysis)).toBe(true);
 
-	expect(fs.readdirSync(path.join(resultsDir, 'Original'))).toMatchObject(['Allacma fusca_1.jpeg']);
-
-	const croppedDir = path.join(resultsDir, 'Cropped');
-	expect(fs.readdirSync(croppedDir)).toMatchObject(['Allacma fusca_1.jpeg']);
-
-	const image = fs.readFileSync(path.join(croppedDir, 'Allacma fusca_1.jpeg'));
+	const image = fs.readFileSync(path.join(resultsDir, 'Cropped', 'Allacma fusca_1.jpeg'));
 	expect(image).toMatchSnapshot({
 		maxDiffPixelRatio: 0.01
 	});
