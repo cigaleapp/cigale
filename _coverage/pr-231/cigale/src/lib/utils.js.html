@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99.57% </span>
+                <span class="strong">95.93% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>467/469</span>
+                <span class='fraction'>472/492</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">95.65% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>22/22</span>
+                <span class='fraction'>22/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99.57% </span>
+                <span class="strong">95.93% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>467/469</span>
+                <span class='fraction'>472/492</span>
             </div>
         
             
@@ -579,7 +579,34 @@
 <a name='L514'></a><a href='#L514'>514</a>
 <a name='L515'></a><a href='#L515'>515</a>
 <a name='L516'></a><a href='#L516'>516</a>
-<a name='L517'></a><a href='#L517'>517</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a>
+<a name='L533'></a><a href='#L533'>533</a>
+<a name='L534'></a><a href='#L534'>534</a>
+<a name='L535'></a><a href='#L535'>535</a>
+<a name='L536'></a><a href='#L536'>536</a>
+<a name='L537'></a><a href='#L537'>537</a>
+<a name='L538'></a><a href='#L538'>538</a>
+<a name='L539'></a><a href='#L539'>539</a>
+<a name='L540'></a><a href='#L540'>540</a>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1095,6 +1122,33 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * @template {string} K
  * @template {any} VIn
@@ -1611,6 +1665,33 @@ if (import.meta.vitest) {
 		expect(splitFilenameOnExtension('file.tar.gz')).toEqual(['file', 'tar.gz']);
 	});
 }
+&nbsp;
+/**
+ * @template Item
+ * @param {(item: Item) =&gt; string|number} key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ */
+export <span class="fstat-no" title="function not covered" >function compareBy(key) {</span>
+<span class="cstat-no" title="statement not covered" >	/**</span>
+<span class="cstat-no" title="statement not covered" >	 * @param {Item} a</span>
+<span class="cstat-no" title="statement not covered" >	 * @param {Item} b</span>
+<span class="cstat-no" title="statement not covered" >	 * @returns {number}</span>
+<span class="cstat-no" title="statement not covered" >	 */</span>
+<span class="cstat-no" title="statement not covered" >	return (a, b) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		const aKey = key(a);</span>
+<span class="cstat-no" title="statement not covered" >		const bKey = key(b);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		if (aKey === bKey) return 0;</span>
+<span class="cstat-no" title="statement not covered" >		if (typeof aKey === 'string' &amp;&amp; typeof bKey === 'string') {</span>
+<span class="cstat-no" title="statement not covered" >			return aKey.localeCompare(bKey);</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		if (typeof aKey === 'number' &amp;&amp; typeof bKey === 'number') {</span>
+<span class="cstat-no" title="statement not covered" >			return aKey - bKey;</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		return aKey.toString().localeCompare(bKey.toString());</span>
+<span class="cstat-no" title="statement not covered" >	};</span>
+<span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -1618,7 +1699,7 @@ if (import.meta.vitest) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-07T17:18:16.121Z
+                at 2025-05-07T18:06:54.414Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
