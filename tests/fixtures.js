@@ -1,4 +1,5 @@
 import { test as base } from '@playwright/test';
+import { rm, mkdir } from 'node:fs/promises';
 
 /**
  * @import { Fixtures, TestType, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
@@ -14,7 +15,8 @@ export const test = base.extend(
 	({
 		forEachTest: [
 			async ({ page }, use) => {
-				console.log(`Running `);
+				await rm('./tests/results', { recursive: true, force: true });
+				await mkdir('./tests/results');
 				await page.goto('/');
 				await page.waitForFunction(() => Boolean(window.DB && window.refreshDB));
 				await use();
