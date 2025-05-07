@@ -408,9 +408,10 @@ export async function importResultsZip(file, protocolId) {
 	}
 
 	for (const [name, bytes] of entries(extractedImages)) {
-		const observation = Object.values(observations).find((o) =>
-			o.images.some((i) => i.exportedAs.original === name)
-		);
+		const observation = entries(observations)
+			.map(([id, o]) => ({ id, ...o }))
+			.find((o) => o.images.some((i) => i.exportedAs.original === name));
+
 		if (!observation) {
 			uiState.processing.files = uiState.processing.files.filter((f) => f !== name);
 			continue;
@@ -421,6 +422,18 @@ export async function importResultsZip(file, protocolId) {
 			uiState.processing.files = uiState.processing.files.filter((f) => f !== name);
 			continue;
 		}
+
+		await db.tables.Observation.set({
+			...pick(observation, 'id', 'label'),
+			images: observation.images.map((i) => i.id),
+			addedAt: new Date().toISOString(),
+			metadataOverrides: mapValues(observation.metadata, (v) => ({
+				value: serializeMetadataValue(v.value),
+				confidence: v.confidence,
+				manuallyModified: v.manuallyModified,
+				alternatives: v.alternatives
+			}))
+		});
 
 		const originalBytes = uint8ArrayToArrayBuffer(bytes);
 

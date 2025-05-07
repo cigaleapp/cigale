@@ -143,20 +143,20 @@ test.describe('correct results.zip', () => {
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [
-					'_4.jpeg',
+					'_5.jpeg',
 					'Allacma fusca_1.jpeg',
-					'Allacma fusca_5.jpeg',
-					'Deuterosminthurus bicinctus_3.jpeg',
-					'Seira ferrarii_2.jpeg'
+					'Allacma fusca_4.jpeg',
+					'Deuterosminthurus bicinctus_2.jpeg',
+					'Seira ferrarii_3.jpeg'
 				]
 			},
 			{
 				Original: [
-					'_4.jpeg',
+					'_5.jpeg',
 					'Allacma fusca_1.jpeg',
-					'Allacma fusca_5.jpeg',
-					'Deuterosminthurus bicinctus_3.jpeg',
-					'Seira ferrarii_2.jpeg'
+					'Allacma fusca_4.jpeg',
+					'Deuterosminthurus bicinctus_2.jpeg',
+					'Seira ferrarii_3.jpeg'
 				]
 			},
 			'analysis.json',
