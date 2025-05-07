@@ -1,5 +1,4 @@
 import { expect } from '@playwright/test';
-import { match, type } from 'arktype';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
@@ -152,22 +151,12 @@ export function readdirTreeSync(root) {
 		}
 	}
 
-	const Dir = type({ '[string]': 'unknown' });
 	return result.sort((a, b) => {
-		console.log({ sorting: [a, b] });
-		return (
-			match
-				// Sort directories before files
-				.case(['string', Dir], () => -1)
-				.case([Dir, 'string'], () => 1)
-				.case(['string', 'string'], ([a, b]) => a.localeCompare(b))
-				.case([Dir, Dir], ([a, b]) => {
-					const aName = Object.keys(a)[0];
-					const bName = Object.keys(b)[0];
-					return aName.localeCompare(bName);
-				})
-				.default(() => 0)([a, b])
-		);
+		// Sort folders before files
+		if (typeof a === 'object' && typeof b === 'string') return -1;
+		if (typeof a === 'string' && typeof b === 'object') return 1;
+		if (typeof a === 'string' && typeof b === 'string') return a.localeCompare(b);
+		return Object.keys(a)[0].localeCompare(Object.keys(b)[0]);
 	});
 }
 
