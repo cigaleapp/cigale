@@ -53,6 +53,9 @@ export async function generateResultsZip(
 	 */
 	let exportedObservations = {};
 	let sequence = 1;
+
+	// To have stable sequence numbers, really useful for testing
+	observations.sort((a, b) => a.id.localeCompare(b.id));
 	for (const { id, label, images, metadataOverrides } of observations) {
 		const metadata = await observationMetadata({ images, metadataOverrides }).then(addValueLabels);
 
@@ -63,7 +66,7 @@ export async function generateResultsZip(
 			images: []
 		};
 
-		for (const imageId of images) {
+		for (const imageId of images.sort()) {
 			const imageFromDatabase = db.tables.Image.state.find((i) => i.id === imageId);
 			if (!imageFromDatabase) continue;
 			const metadataValues = addValueLabels(imageFromDatabase.metadata);
