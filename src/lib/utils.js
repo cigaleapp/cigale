@@ -514,3 +514,30 @@ if (import.meta.vitest) {
 		expect(splitFilenameOnExtension('file.tar.gz')).toEqual(['file', 'tar.gz']);
 	});
 }
+
+/**
+ * @template Item
+ * @param {(item: Item) => string|number} key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ */
+export function compareBy(key) {
+	/**
+	 * @param {Item} a
+	 * @param {Item} b
+	 * @returns {number}
+	 */
+	return (a, b) => {
+		const aKey = key(a);
+		const bKey = key(b);
+
+		if (aKey === bKey) return 0;
+		if (typeof aKey === 'string' && typeof bKey === 'string') {
+			return aKey.localeCompare(bKey);
+		}
+
+		if (typeof aKey === 'number' && typeof bKey === 'number') {
+			return aKey - bKey;
+		}
+
+		return aKey.toString().localeCompare(bKey.toString());
+	};
+}

@@ -21,7 +21,14 @@ import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from './protoco
 import { Analysis } from './schemas/results';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
-import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils';
+import {
+	compareBy,
+	entries,
+	mapValues,
+	pick,
+	safeJSONParse,
+	uint8ArrayToArrayBuffer
+} from './utils';
 
 /**
  * @param {DB.Observation[]} observations
@@ -55,7 +62,7 @@ export async function generateResultsZip(
 	let sequence = 1;
 
 	// To have stable sequence numbers, really useful for testing
-	observations.sort((a, b) => a.id.localeCompare(b.id));
+	observations.sort(compareBy((o) => o.label + o.id));
 	for (const { id, label, images, metadataOverrides } of observations) {
 		const metadata = await observationMetadata({ images, metadataOverrides }).then(addValueLabels);
 
