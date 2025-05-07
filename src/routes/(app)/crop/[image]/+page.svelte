@@ -308,14 +308,18 @@
 
 	/**
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
-	 * @param {Rect} newBoundingBox
+	 * @param {Rect|undefined} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
-	 * @returns {Promise<string>} the ID of the image we just modified/created
+	 * @returns {Promise<string|null>} the ID of the image we just modified/created
 	 */
 	async function onCropChange(imageId, newBoundingBox, flashConfirmedOverlay = true) {
 		if (!newBoundingBox) {
-			// No bounding box, nothing to do
-			return;
+			// No bounding box, just mark the image as confirmed and move on
+			if (imageId) {
+				await changeCropConfirmedStatus(imageId, true);
+			}
+
+			return imageId;
 		}
 
 		// Flash if
@@ -416,7 +420,7 @@
 		const imagesAndBoxes = images.map((img) => /** @type {const}*/ ([img, boundingBoxes[img.id]]));
 
 		for (const [image, box] of imagesAndBoxes) {
-			await onCropChange(image.id, toTopLeftCoords(box));
+			await onCropChange(image.id, box ? toTopLeftCoords(box) : undefined);
 		}
 
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
