@@ -167,7 +167,7 @@ test.describe('correct results.zip', () => {
 
 test.describe('missing original photos', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'no-originals.zip');
+		await importResults(page, 'no-originals.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
@@ -177,7 +177,7 @@ test.describe('missing original photos', () => {
 
 test.describe('missing analysis file', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'no-analysis.zip');
+		await importResults(page, 'no-analysis.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
@@ -187,7 +187,7 @@ test.describe('missing analysis file', () => {
 
 test.describe('wrong protocol used', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'wrong-protocol.zip');
+		await importResults(page, 'wrong-protocol.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
@@ -197,7 +197,7 @@ test.describe('wrong protocol used', () => {
 
 test.describe('invalid json analysis', async () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'invalid-json-analysis.zip');
+		await importResults(page, 'invalid-json-analysis.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
