@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/84</span>
+                <span class='fraction'>0/86</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/84</span>
+                <span class='fraction'>0/86</span>
             </div>
         
             
@@ -159,7 +159,10 @@
 <a name='L94'></a><a href='#L94'>94</a>
 <a name='L95'></a><a href='#L95'>95</a>
 <a name='L96'></a><a href='#L96'>96</a>
-<a name='L97'></a><a href='#L97'>97</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -205,23 +208,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -233,6 +219,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -241,6 +228,25 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -257,8 +263,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { JWT } from 'google-auth-library';</span></span></span>
 <span class="cstat-no" title="statement not covered" >import { google } from 'googleapis';</span>
+<span class="cstat-no" title="statement not covered" >import { Jimp } from 'jimp';</span>
 <span class="cstat-no" title="statement not covered" >import { JSDOM } from 'jsdom';</span>
-<span class="cstat-no" title="statement not covered" >import { writeFileSync } from 'node:fs';</span>
 <span class="cstat-no" title="statement not covered" >import { mkdir } from 'node:fs/promises';</span>
 <span class="cstat-no" title="statement not covered" >import path from 'node:path';</span>
 <span class="cstat-no" title="statement not covered" >import odt from 'odt2html';</span>
@@ -297,10 +303,11 @@
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	await pdfToPng(pdf.data, {</span>
-<span class="cstat-no" title="statement not covered" >		pagesToProcess: [1],</span>
-<span class="cstat-no" title="statement not covered" >		outputFolder: path.join('./slides', name)</span>
-<span class="cstat-no" title="statement not covered" >	});</span>
+<span class="cstat-no" title="statement not covered" >	await pdfToPng(pdf.data, { pagesToProcess: [1] })</span>
+<span class="cstat-no" title="statement not covered" >		.then(([{ content }]) =&gt; Jimp.fromBuffer(content))</span>
+<span class="cstat-no" title="statement not covered" >		.then((image) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >			image.autocrop({ tolerance: 0.2 }).write(path.join('./slides', `${name}.png`))</span>
+<span class="cstat-no" title="statement not covered" >		);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const odp = await drive.files.export(</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
@@ -312,32 +319,34 @@
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	// await new Promise((resolve, reject) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	// 	odp.data.on('error', reject).pipe(output).on('error', reject).on('finish', resolve);</span>
-<span class="cstat-no" title="statement not covered" >	// });</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >	const html = await odt</span>
-<span class="cstat-no" title="statement not covered" >		.toHTML({ path: Buffer.from(odp.data) })</span>
+<span class="cstat-no" title="statement not covered" >		.toHTML({</span>
+<span class="cstat-no" title="statement not covered" >			path: Buffer.from(odp.data),</span>
+<span class="cstat-no" title="statement not covered" >			trim: true,</span>
+<span class="cstat-no" title="statement not covered" >			openFilters: {</span>
+<span class="cstat-no" title="statement not covered" >				'draw:page': ({ attributes, name }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >					return {</span>
+<span class="cstat-no" title="statement not covered" >						xml: name,</span>
+<span class="cstat-no" title="statement not covered" >						html: 'section',</span>
+<span class="cstat-no" title="statement not covered" >						attrs: [{ name: 'data-page', value: attributes['draw:name'] }]</span>
+<span class="cstat-no" title="statement not covered" >					};</span>
+<span class="cstat-no" title="statement not covered" >				}</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		})</span>
 <span class="cstat-no" title="statement not covered" >		.then((html) =&gt; new JSDOM(html).window.document);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	writeFileSync(</span>
-<span class="cstat-no" title="statement not covered" >		path.join('./slides', `${name}.json`),</span>
-<span class="cstat-no" title="statement not covered" >		JSON.stringify(</span>
-<span class="cstat-no" title="statement not covered" >			{</span>
-<span class="cstat-no" title="statement not covered" >				fragments: [...html.querySelectorAll('a, p')].map((node) =&gt; ({</span>
-<span class="cstat-no" title="statement not covered" >					tag: node.tagName,</span>
-<span class="cstat-no" title="statement not covered" >					text: node.textContent,</span>
-<span class="cstat-no" title="statement not covered" >					href: node.href,</span>
-<span class="cstat-no" title="statement not covered" >					className: node.className,</span>
-<span class="cstat-no" title="statement not covered" >					style: node.style.cssText</span>
-<span class="cstat-no" title="statement not covered" >				})),</span>
-<span class="cstat-no" title="statement not covered" >				// TODO preserve implicit linebreaks when using &lt;p&gt; tags</span>
-<span class="cstat-no" title="statement not covered" >				text: html.body.textContent</span>
-<span class="cstat-no" title="statement not covered" >			},</span>
-<span class="cstat-no" title="statement not covered" >			null,</span>
-<span class="cstat-no" title="statement not covered" >			2</span>
-<span class="cstat-no" title="statement not covered" >		)</span>
+<span class="cstat-no" title="statement not covered" >	const description = [...html.querySelectorAll('section[data-page="page2"] p')]</span>
+<span class="cstat-no" title="statement not covered" >		.map((node) =&gt; node.textContent)</span>
+<span class="cstat-no" title="statement not covered" >		.filter(Boolean)</span>
+<span class="cstat-no" title="statement not covered" >		.join('\n');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	const links = Object.fromEntries(</span>
+<span class="cstat-no" title="statement not covered" >		[...html.querySelectorAll('section[data-page="page2"] a')]</span>
+<span class="cstat-no" title="statement not covered" >			.map((node) =&gt; [node.href, node.textContent])</span>
+<span class="cstat-no" title="statement not covered" >			.filter(([, text]) =&gt; text &amp;&amp; text !== ' ')</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	console.log({ name, links, description });</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
@@ -358,7 +367,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-07T17:57:13.159Z
+                at 2025-05-07T21:23:45.870Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
