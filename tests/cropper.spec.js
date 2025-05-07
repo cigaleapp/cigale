@@ -323,10 +323,31 @@ test.describe('Cropper view', () => {
  * @param {number} number 1-based
  * @param {number} width
  * @param {number} height
+ * @param {number} [tolerance=0.1] relative tolerance for pixel count differences for the width and height, relative to the expected width and height (between 0 and 1). Mainly used to account for discrepancies between browser engines.
  */
-async function expectBoxInList(page, number, width, height) {
+async function expectBoxInList(page, number, width, height, tolerance = 0.1) {
 	await expect(page.locator('aside').getByText(`Boîte #${number}`)).toBeVisible();
-	await expect(page.locator('aside').getByText(`${width}×${height}`)).toBeVisible();
+
+	const box = page
+		.locator('aside')
+		.locator('.boxes')
+		.locator('li')
+		.filter({ has: page.getByText(`Boîte #${number}`) });
+
+	await expect(box.getByText(/\d+×\d+/)).toBeVisible();
+
+	// @ts-expect-error checked just above
+	const [, actualWidth, actualHeight] = /(\d+)×(\d+)/
+		.exec(
+			await box
+				.locator('.dimensions')
+				.textContent()
+				.then((s) => s ?? '')
+		)
+		.map(Number);
+
+	expect(Math.abs((width - actualWidth) / actualWidth)).toBeLessThan(tolerance);
+	expect(Math.abs((height - actualHeight) / actualHeight)).toBeLessThan(tolerance);
 }
 
 /**
