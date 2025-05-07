@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/258</span>
+                <span class='fraction'>0/268</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/258</span>
+                <span class='fraction'>0/268</span>
             </div>
         
             
@@ -501,7 +501,18 @@
 <a name='L436'></a><a href='#L436'>436</a>
 <a name='L437'></a><a href='#L437'>437</a>
 <a name='L438'></a><a href='#L438'>438</a>
-<a name='L439'></a><a href='#L439'>439</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L439'></a><a href='#L439'>439</a>
+<a name='L440'></a><a href='#L440'>440</a>
+<a name='L441'></a><a href='#L441'>441</a>
+<a name='L442'></a><a href='#L442'>442</a>
+<a name='L443'></a><a href='#L443'>443</a>
+<a name='L444'></a><a href='#L444'>444</a>
+<a name='L445'></a><a href='#L445'>445</a>
+<a name='L446'></a><a href='#L446'>446</a>
+<a name='L447'></a><a href='#L447'>447</a>
+<a name='L448'></a><a href='#L448'>448</a>
+<a name='L449'></a><a href='#L449'>449</a>
+<a name='L450'></a><a href='#L450'>450</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -845,6 +856,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -853,6 +865,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -860,6 +873,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -868,6 +882,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -882,7 +897,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1282,6 +1304,7 @@ import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from
 	});
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	if (Object.keys(results).length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >		uiState.processing.files.pop();</span>
 <span class="cstat-no" title="statement not covered" >		toasts.error(`Aucun fichier d'analyse trouvé dans l'export ${file.name}`);</span>
 		return;
 <span class="cstat-no" title="statement not covered" >	}</span>
@@ -1292,11 +1315,13 @@ import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from
 <span class="cstat-no" title="statement not covered" >		.map((obj) =&gt; (obj ? Analysis(obj) : undefined));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	if (analysis === undefined) {</span>
+<span class="cstat-no" title="statement not covered" >		uiState.processing.files.pop();</span>
 <span class="cstat-no" title="statement not covered" >		toasts.error(`Le fichier d'analyse de ${file.name} n'est pas au format JSON ou est corrompu`);</span>
 		return;
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	if (analysis instanceof ArkErrors) {</span>
+<span class="cstat-no" title="statement not covered" >		uiState.processing.files.pop();</span>
 <span class="cstat-no" title="statement not covered" >		toasts.error(`Fichier d'analyse de ${file.name} invalide: ${analysis.summary}`);</span>
 		return;
 <span class="cstat-no" title="statement not covered" >	}</span>
@@ -1304,6 +1329,7 @@ import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from
 <span class="cstat-no" title="statement not covered" >	const { protocol, observations } = analysis;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	if (protocolId &amp;&amp; protocol.id !== protocolId) {</span>
+<span class="cstat-no" title="statement not covered" >		uiState.processing.files.pop();</span>
 <span class="cstat-no" title="statement not covered" >		toasts.error(</span>
 <span class="cstat-no" title="statement not covered" >			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${protocol.id}, mais le protocole actuel est ${protocolId}`</span>
 		);
@@ -1321,6 +1347,13 @@ import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from
 	});
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	if (Object.keys(extractedImages).length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >		uiState.processing.files = uiState.processing.files.filter(</span>
+<span class="cstat-no" title="statement not covered" >			(f) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >				f !== file.name &amp;&amp;</span>
+<span class="cstat-no" title="statement not covered" >				!Object.values(observations)</span>
+<span class="cstat-no" title="statement not covered" >					.flatMap((o) =&gt; o.images.map((i) =&gt; i.filename))</span>
+<span class="cstat-no" title="statement not covered" >					.includes(f)</span>
+		);
 <span class="cstat-no" title="statement not covered" >		toasts.error(</span>
 <span class="cstat-no" title="statement not covered" >			`Aucune image trouvée dans l'export ${file.name}. L'export doit contenir les images originales, pas seulement les images recadrées`</span>
 		);
@@ -1332,13 +1365,13 @@ import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from
 <span class="cstat-no" title="statement not covered" >			o.images.some((i) =&gt; i.exportedAs.original === name)</span>
 		);
 <span class="cstat-no" title="statement not covered" >		if (!observation) {</span>
-<span class="cstat-no" title="statement not covered" >			uiState.processing.files.shift();</span>
+<span class="cstat-no" title="statement not covered" >			uiState.processing.files = uiState.processing.files.filter((f) =&gt; f !== name);</span>
 			continue;
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		const image = observation.images.find((i) =&gt; i.exportedAs.original === name);</span>
 <span class="cstat-no" title="statement not covered" >		if (!image) {</span>
-<span class="cstat-no" title="statement not covered" >			uiState.processing.files.shift();</span>
+<span class="cstat-no" title="statement not covered" >			uiState.processing.files = uiState.processing.files.filter((f) =&gt; f !== name);</span>
 			continue;
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
@@ -1384,7 +1417,7 @@ import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-07T07:10:48.094Z
+                at 2025-05-07T09:56:55.095Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
