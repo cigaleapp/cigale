@@ -1,9 +1,22 @@
 import { expect, test } from './fixtures.js';
-import { getImage, getSettings, importResults, setImageMetadata, setSettings } from './utils.js';
+import {
+	getImage,
+	getSettings,
+	importResults,
+	listTable,
+	setImageMetadata,
+	setSettings
+} from './utils.js';
 
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }) => {
 		await importResults(page, 'correct.zip');
+		const allImages = await listTable(page, 'Image');
+		await markImagesAsConfirmedInDatabase(
+			page,
+			allImages.map((i) => i.id),
+			false
+		);
 		await page.getByTestId('goto-crop').click();
 		await page.waitForURL((u) => u.hash === '#/crop/');
 	});
@@ -75,7 +88,7 @@ test.describe('Cropper view', () => {
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000001');
 
-			const { ...othersBefore } = await getSettings({ page });
+			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
 			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
 
@@ -120,23 +133,12 @@ test.describe('Cropper view', () => {
 		});
 
 		test('should autoskip to classify when all images are confirmed', async ({ page }) => {
-			/**
-			 * @param {string} id
-			 */
-			async function markAsConfirmed(id) {
-				await setImageMetadata({ page }, id, {
-					'io.github.cigaleapp.arthropods.transects__crop_is_confirmed': {
-						value: true,
-						manuallyModified: true,
-						confidence: 1,
-						alternatives: {}
-					}
-				});
-			}
-
-			await markAsConfirmed('000000_000000');
-			await markAsConfirmed('000001_000000');
-			await markAsConfirmed('000002_000000');
+			await markImagesAsConfirmedInDatabase(
+				page,
+				await listTable(page, 'Image').then((images) =>
+					images.filter(({ fileId }) => fileId !== '000003').map(({ id }) => id)
+				)
+			);
 
 			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000003');
@@ -159,7 +161,7 @@ test.describe('Cropper view', () => {
 		async function expectAllImagesConfirmedInDatabase(page, confirmed) {
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
-				await expect(isImageConfirmedInDatabase(page, `000003_00000${i}`)).resolves.toBe(confirmed);
+				await expect(isImageConfirmedInDatabase(page, `000002_00000${i}`)).resolves.toBe(confirmed);
 			}
 		}
 
@@ -204,25 +206,25 @@ test.describe('Cropper view', () => {
 				const { x: x0, y: y0 } = changeArea;
 				await page.mouse.move(x0 + x1, y0 + y1);
 				await page.mouse.down();
-				await page.mouse.move(x0 + (x2 - x1), x0 + (y2 - y1));
+				await page.mouse.move(x0 + (x2 - x1), y0 + (y2 - y1));
 				await page.mouse.up();
 			}
 
 			test('should create boxes on mouseup', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50);
-				await expectBoxInList(page, 2, 10, 24);
-				await makeBox(page, 100, 100, 340, 80);
+				await expectBoxInList(page, 2, 245, 245);
+				await makeBox(page, 100, 100, 340, 120);
 				// Wait for overlay from the first box to disappear
 				await page.waitForTimeout(500);
 				await expect(confirmedCropOverlay(page)).not.toBeVisible();
-				await expectBoxInList(page, 3, 49, 28);
+				await expectBoxInList(page, 3, 1143, 653);
 				await expect(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
 				await expectAllImagesConfirmedInDatabase(page, false);
 				await makeBox(page, 10, 10, 50, 50);
-				await expectBoxInList(page, 2, 10, 24);
+				await expectBoxInList(page, 2, 245, 245);
 				await expectConfirmed(page, true);
 			});
 		});
@@ -252,19 +254,19 @@ test.describe('Cropper view', () => {
 
 			test('should create boxes every 2 clicks', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50);
-				await expectBoxInList(page, 2, 14, 14);
+				await expectBoxInList(page, 2, 327, 327);
 				await makeBox(page, 100, 100, 170, 80);
 				// Wait for overlay from the first box to disappear
 				await page.waitForTimeout(500);
 				await expect(confirmedCropOverlay(page)).not.toBeVisible();
-				await expectBoxInList(page, 3, 24, 7);
+				await expectBoxInList(page, 3, 572, 163);
 				await expect(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
 				await expectAllImagesConfirmedInDatabase(page, false);
 				await makeBox(page, 10, 10, 50, 50);
-				await expectBoxInList(page, 2, 14, 14);
+				await expectBoxInList(page, 2, 327, 327);
 				await expectConfirmed(page, true);
 			});
 		});
@@ -297,18 +299,18 @@ test.describe('Cropper view', () => {
 
 			test('should create boxes every 4 clicks', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
-				await expectBoxInList(page, 2, 14, 31);
+				await expectBoxInList(page, 2, 327, 735);
 				await makeBox(page, 100, 100, 170, 80, 170, 150, 100, 150);
 				await page.waitForTimeout(1000);
 				await expect(confirmedCropOverlay(page)).not.toBeVisible();
-				await expectBoxInList(page, 3, 24, 24);
+				await expectBoxInList(page, 3, 572, 571);
 				await expect(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
 				await expectAllImagesConfirmedInDatabase(page, false);
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
-				await expectBoxInList(page, 2, 14, 31);
+				await expectBoxInList(page, 2, 327, 735);
 				await expectConfirmed(page, true);
 			});
 		});
@@ -365,4 +367,24 @@ async function isImageConfirmedInDatabase(page, id) {
 		image?.metadata?.['io.github.cigaleapp.arthropods.transects__crop_is_confirmed']?.value ===
 		'true'
 	);
+}
+
+/**
+ *
+ * @import { Page } from '@playwright/test';
+ * @param {Page} page
+ * @param {string[]} ids
+ * @param {boolean} [confirmed=true]
+ */
+async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
+	for (const id of ids) {
+		await setImageMetadata({ page }, id, {
+			'io.github.cigaleapp.arthropods.transects__crop_is_confirmed': {
+				value: confirmed,
+				manuallyModified: true,
+				confidence: 1,
+				alternatives: {}
+			}
+		});
+	}
 }

@@ -78,6 +78,20 @@ export async function getImage({ page }, id) {
 
 /**
  *
+ * @param {Page} page
+ * @param {string} tableName
+ */
+export async function listTable(page, tableName) {
+	const table = await page.evaluate(async ([tableName]) => {
+		const table = await window.DB.getAll(tableName);
+		if (!table) throw new Error(`Table ${tableName} not found in the database`);
+		return table;
+	}, /** @type {const} */ ([tableName]));
+	return table;
+}
+
+/**
+ *
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} id
@@ -99,6 +113,7 @@ export async function setImageMetadata({ page }, id, metadata) {
 				)
 			}
 		});
+		console.log('Image updated, refreshing DB', { id, metadata });
 		await window.refreshDB();
 	}, /** @type {const} */ ([id, metadata]));
 }
@@ -177,15 +192,18 @@ export function toast(page, message, { exact = false, type = undefined }) {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {string} filepath to the zip file, relative to tests/fixtures/exports
- * @param {object} options
+ * @param {object} [options]
+ * @param {boolean} [options.waitForLoading] wait for loading to finish
  */
-export async function importResults(page, filepath) {
+export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await chooseDefaultProtocol(page);
 	// Import fixture zip
 	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
-	await expect(page.getByText('Analyse…').first()).toBeVisible();
-	await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
+	if (waitForLoading) {
+		await expect(page.getByText('Analyse…').first()).toBeVisible();
+		await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
+	}
 }

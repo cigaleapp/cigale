@@ -67,8 +67,8 @@ test('basic functionality', async ({ page }) => {
 	await extract('./tests/results/lil-fella.zip', { dir: resultsDir });
 
 	expect(readdirTreeSync(resultsDir)).toMatchObject([
-		{ Cropped: ['lil-fella_1.jpeg'] },
-		{ Original: ['lil-fella_1.jpeg'] },
+		{ Cropped: ['Allacma fusca_1.jpeg'] },
+		{ Original: ['Allacma fusca_1.jpeg'] },
 		'analysis.json',
 		'metadata.csv'
 	]);
