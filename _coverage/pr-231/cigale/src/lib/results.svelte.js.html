@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/269</span>
+                <span class='fraction'>0/279</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/269</span>
+                <span class='fraction'>0/279</span>
             </div>
         
             
@@ -522,7 +522,20 @@
 <a name='L457'></a><a href='#L457'>457</a>
 <a name='L458'></a><a href='#L458'>458</a>
 <a name='L459'></a><a href='#L459'>459</a>
-<a name='L460'></a><a href='#L460'>460</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L460'></a><a href='#L460'>460</a>
+<a name='L461'></a><a href='#L461'>461</a>
+<a name='L462'></a><a href='#L462'>462</a>
+<a name='L463'></a><a href='#L463'>463</a>
+<a name='L464'></a><a href='#L464'>464</a>
+<a name='L465'></a><a href='#L465'>465</a>
+<a name='L466'></a><a href='#L466'>466</a>
+<a name='L467'></a><a href='#L467'>467</a>
+<a name='L468'></a><a href='#L468'>468</a>
+<a name='L469'></a><a href='#L469'>469</a>
+<a name='L470'></a><a href='#L470'>470</a>
+<a name='L471'></a><a href='#L471'>471</a>
+<a name='L472'></a><a href='#L472'>472</a>
+<a name='L473'></a><a href='#L473'>473</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -934,6 +947,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -942,9 +956,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1391,9 +1417,10 @@ import {
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	for (const [name, bytes] of entries(extractedImages)) {</span>
-<span class="cstat-no" title="statement not covered" >		const observation = Object.values(observations).find((o) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >			o.images.some((i) =&gt; i.exportedAs.original === name)</span>
-		);
+<span class="cstat-no" title="statement not covered" >		const observation = entries(observations)</span>
+<span class="cstat-no" title="statement not covered" >			.map(([id, o]) =&gt; ({ id, ...o }))</span>
+<span class="cstat-no" title="statement not covered" >			.find((o) =&gt; o.images.some((i) =&gt; i.exportedAs.original === name));</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >		if (!observation) {</span>
 <span class="cstat-no" title="statement not covered" >			uiState.processing.files = uiState.processing.files.filter((f) =&gt; f !== name);</span>
 			continue;
@@ -1404,6 +1431,18 @@ import {
 <span class="cstat-no" title="statement not covered" >			uiState.processing.files = uiState.processing.files.filter((f) =&gt; f !== name);</span>
 			continue;
 <span class="cstat-no" title="statement not covered" >		}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		await db.tables.Observation.set({</span>
+<span class="cstat-no" title="statement not covered" >			...pick(observation, 'id', 'label'),</span>
+<span class="cstat-no" title="statement not covered" >			images: observation.images.map((i) =&gt; i.id),</span>
+<span class="cstat-no" title="statement not covered" >			addedAt: new Date().toISOString(),</span>
+<span class="cstat-no" title="statement not covered" >			metadataOverrides: mapValues(observation.metadata, (v) =&gt; ({</span>
+<span class="cstat-no" title="statement not covered" >				value: serializeMetadataValue(v.value),</span>
+<span class="cstat-no" title="statement not covered" >				confidence: v.confidence,</span>
+<span class="cstat-no" title="statement not covered" >				manuallyModified: v.manuallyModified,</span>
+<span class="cstat-no" title="statement not covered" >				alternatives: v.alternatives</span>
+			}))
+		});
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		const originalBytes = uint8ArrayToArrayBuffer(bytes);</span>
 &nbsp;
@@ -1447,7 +1486,7 @@ import {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-07T18:06:54.414Z
+                at 2025-05-07T20:56:25.518Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
