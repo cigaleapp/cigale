@@ -9,13 +9,14 @@
 	 * @property {string} help
 	 * @property {string} [keyboard] keyboard shortcut hint to display in the help tooltip
 	 * @property {boolean} [disabled]
+	 * @property {boolean} [crossout] draw a diagonal line through the button's content
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
-	let { children, onclick, help, keyboard, disabled, ...rest } = $props();
+	let { children, onclick, help, keyboard, disabled, crossout, ...rest } = $props();
 </script>
 
-<button {disabled} {onclick} use:tooltip={{ text: help, keyboard }} {...rest}>
+<button {disabled} {onclick} class:crossout use:tooltip={{ text: help, keyboard }} {...rest}>
 	{@render children()}
 </button>
 
@@ -33,6 +34,7 @@
 		font-weight: bold;
 		font-size: var(--font-size, 1em);
 		border: none;
+		position: relative;
 	}
 
 	button:is(:hover, :focus-visible) {
@@ -43,5 +45,14 @@
 	button:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+
+	button.crossout::after {
+		content: '';
+		position: absolute;
+		width: 75%;
+		height: 1px;
+		background-color: var(--fg, var(--fg-primary));
+		transform: rotate(-45deg);
 	}
 </style>

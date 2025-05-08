@@ -63,6 +63,7 @@ export async function getSettings({ page }) {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} id
+ * @returns {Promise<typeof import('$lib/database').Schemas.Image.inferIn>}
  */
 export async function getImage({ page }, id) {
 	const image = await page.evaluate(async ([id]) => {
@@ -84,7 +85,18 @@ export async function setImageMetadata({ page }, id, metadata) {
 	await page.evaluate(async ([id, metadata]) => {
 		const image = await window.DB.get('Image', id);
 		if (!image) throw new Error(`Image ${id} not found in the database`);
-		await window.DB.put('Image', { ...image, metadata: { ...image.metadata, ...metadata } });
+		await window.DB.put('Image', {
+			...image,
+			metadata: {
+				...image.metadata,
+				...Object.fromEntries(
+					Object.entries(metadata).map(([key, { value, ...rest }]) => [
+						key,
+						{ ...rest, value: JSON.stringify(value) }
+					])
+				)
+			}
+		});
 		await window.refreshDB();
 	}, /** @type {const} */ ([id, metadata]));
 }

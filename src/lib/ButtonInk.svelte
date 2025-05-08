@@ -27,7 +27,7 @@
 		justify-content: center;
 		align-items: center;
 		border: none;
-		padding: 0.5em 0.75em;
+		padding: 0.5em 0;
 		border-radius: var(--corner-radius);
 		text-transform: uppercase;
 		font-weight: bold;

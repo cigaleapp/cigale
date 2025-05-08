@@ -4,10 +4,11 @@ import { beforeEach, describe, expect, test } from 'vitest';
 import { generateId, idComparator, nukeDatabase, openDatabase, tables } from './idb.svelte';
 import * as idb from './idb.svelte.js';
 import { imageId } from './images';
+import { keys } from './utils';
 
 beforeEach(() => {
 	nukeDatabase();
-	for (const key of Object.keys(idb._tablesState)) {
+	for (const key of keys(idb._tablesState)) {
 		idb._tablesState[key] = [];
 	}
 });
@@ -52,7 +53,13 @@ test('openDatabase', async () => {
 
 test('nukeDatabase', async () => {
 	const db = await openDatabase();
-	await db.put('ImageFile', { id: 'flint and steel', bytes: new ArrayBuffer() });
+	await db.put('ImageFile', {
+		id: 'flint and steel',
+		bytes: new ArrayBuffer(),
+		filename: 'ha',
+		contentType: 'image/png',
+		dimensions: { width: 1, height: 1 }
+	});
 	const items = await db.getAll('ImageFile');
 	expect(items).toHaveLength(1);
 	nukeDatabase();
@@ -87,7 +94,8 @@ describe('operations', () => {
 			await idb.set('Image', {
 				id: imageId(0, 0),
 				addedAt: addedAt.toISOString(),
-				bufferExists: false,
+				fileId: 'quoicoubaka',
+				dimensions: { width: 100, height: 100 },
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
 				metadata: {
@@ -104,7 +112,8 @@ describe('operations', () => {
 			expect(serialized).toEqual({
 				id: imageId(0, 0),
 				addedAt: addedAt.toISOString(),
-				bufferExists: false,
+				fileId: 'quoicoubaka',
+				dimensions: { width: 100, height: 100 },
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
 				metadata: {
@@ -121,7 +130,9 @@ describe('operations', () => {
 			expect(deserialized).toEqual({
 				id: imageId(0, 0),
 				addedAt,
-				bufferExists: false,
+				fileId: 'quoicoubaka',
+				boundingBoxesAnalyzed: false,
+				dimensions: { width: 100, height: 100, aspectRatio: 1 },
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
 				metadata: {
@@ -151,7 +162,10 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('ImageFile', {
 				id: `test${i}`,
-				bytes: new ArrayBuffer(0)
+				bytes: new ArrayBuffer(0),
+				filename: 'ha',
+				contentType: 'image/png',
+				dimensions: { width: 1, height: 1 }
 			});
 		}
 
@@ -166,7 +180,8 @@ describe('operations', () => {
 		await db.put('Image', {
 			id: imageId(0, 0),
 			addedAt: addedAt.toISOString(),
-			bufferExists: false,
+			fileId: 'quoicoubaka',
+			dimensions: { width: 100, height: 100 },
 			contentType: 'what/ever',
 			filename: 'THE NETHER',
 			metadata: {
@@ -181,7 +196,8 @@ describe('operations', () => {
 		await db.put('Image', {
 			id: imageId(0, 1),
 			addedAt: addedAt.toISOString(),
-			bufferExists: false,
+			fileId: 'quoicoubaka',
+			dimensions: { width: 100, height: 100 },
 			contentType: 'the ehehhe',
 			filename: 'ogrjoigrejo',
 			metadata: {
@@ -196,7 +212,9 @@ describe('operations', () => {
 		expect(await idb.get('Image', imageId(0, 0))).toEqual({
 			id: imageId(0, 0),
 			addedAt,
-			bufferExists: false,
+			fileId: 'quoicoubaka',
+			boundingBoxesAnalyzed: false,
+			dimensions: { width: 100, height: 100, aspectRatio: 1 },
 			contentType: 'what/ever',
 			filename: 'THE NETHER',
 			metadata: {
@@ -296,7 +314,8 @@ describe('wrangler', () => {
 	const image = (/** @type {number} */ i) => ({
 		id: imageId(0, i),
 		addedAt: addedAt.toISOString(),
-		bufferExists: false,
+		fileId: 'quoicoubaka',
+		dimensions: { width: 100, height: 100 },
 		contentType: 'what/ever',
 		filename: 'THE NETHER',
 		metadata: {
@@ -534,6 +553,8 @@ describe('wrangler', () => {
 				expect(tables.Image.state).toEqual([
 					{
 						...image(0),
+						boundingBoxesAnalyzed: false,
+						dimensions: { width: 100, height: 100, aspectRatio: 1 },
 						addedAt,
 						metadata: {
 							water: {
@@ -548,6 +569,8 @@ describe('wrangler', () => {
 					},
 					{
 						...image(1),
+						boundingBoxesAnalyzed: false,
+						dimensions: { width: 100, height: 100, aspectRatio: 1 },
 						addedAt,
 						metadata: {
 							water: {
@@ -569,6 +592,8 @@ describe('wrangler', () => {
 				expect(await tables.Image.get(imageId(0, 0))).toEqual({
 					...image(0),
 					addedAt,
+					dimensions: { width: 100, height: 100, aspectRatio: 1 },
+					boundingBoxesAnalyzed: false,
 					metadata: {
 						water: {
 							value: 'bucket',

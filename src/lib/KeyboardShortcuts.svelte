@@ -27,21 +27,35 @@
 			// Iterate through the "binds" object we were given...
 			Object.fromEntries(
 				// Associating every pattern to its handler function...
-				Object.entries(binds).map(([pattern, bind]) => [
-					pattern,
-					/** @param {MouseEvent|KeyboardEvent} e */
-					async (e) => {
-						if (hasAnyModalOpen(page)) {
-							console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);
-							return;
+				Object.entries(binds)
+					.flatMap(([pattern, bind]) => {
+						// Handle shift-number keybindings too
+						if (pattern.startsWith('Digit') && !pattern.includes(' ')) {
+							const number = pattern.replace('Digit', '');
+							return /** @type {const} */ ([
+								[pattern, bind],
+								[number, bind],
+								[`Shift+${number}`, bind]
+							]);
 						}
-						if (bind.when && !bind.when(e)) return;
-						// Stick in a call to event.preventDefault()
-						// before calling the handler function if "preventDefault" is true
-						if (preventDefault) e.preventDefault();
-						await bind.do(e);
-					}
-				])
+
+						return /** @type {const} */ ([[pattern, bind]]);
+					})
+					.map(([pattern, bind]) => [
+						pattern,
+						/** @param {MouseEvent|KeyboardEvent} e */
+						async (e) => {
+							if (hasAnyModalOpen(page)) {
+								console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);
+								return;
+							}
+							if (bind.when && !bind.when(e)) return;
+							// Stick in a call to event.preventDefault()
+							// before calling the handler function if "preventDefault" is true
+							if (preventDefault) e.preventDefault();
+							await bind.do(e);
+						}
+					])
 			)
 		)
 	);

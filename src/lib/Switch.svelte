@@ -8,7 +8,7 @@
 	 * @property {boolean} [value]
 	 * @property {{ on: import('svelte').Component, off: import('svelte').Component }} [icons]
 	 * @property {string} [label]
-	 * @property {(value: boolean) => void} [onchange]
+	 * @property {undefined | ((value: boolean) => void)} [onchange]
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
@@ -19,11 +19,6 @@
 		label,
 		...rest
 	} = $props();
-
-	function click() {
-		value = !value;
-		onchange(value);
-	}
 
 	/** @type {boolean} */
 	let showHints = $derived(getSettings().showInputHints);
@@ -40,7 +35,11 @@
 	class="switch"
 	role="switch"
 	aria-checked={value}
-	onclick={click}
+	onclick={() => {
+		console.log('clicked');
+		value = !value;
+		onchange(value);
+	}}
 	aria-label={label ?? 'on/off switch'}
 	{...rest}
 >

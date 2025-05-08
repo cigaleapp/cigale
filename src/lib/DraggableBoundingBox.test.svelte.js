@@ -46,6 +46,19 @@ describe('NewBoundingBox', () => {
 				return bb;
 			};
 
+			test('non-clickanddrag createMode', () => {
+				const bb = createBox('2point');
+				bb.registerPoint(1, 2);
+				bb.registerMovement(3, 4);
+				expect(bb.clickanddrag).toEqual({
+					x: 0,
+					y: 0,
+					width: 0,
+					height: 0,
+					dragDirection: { x: 0, y: 0 }
+				});
+			});
+
 			describe('→↓', () => {
 				test('initializes', () => {
 					const bb = makeBox();
@@ -385,6 +398,125 @@ describe('NewBoundingBox', () => {
 					});
 				});
 			});
+		});
+	});
+
+	describe('.rect', () => {
+		test('clickanddrag, within limits', () => {
+			const bb = createBox('clickanddrag');
+			bb.registerPoint(1, 2);
+			bb.registerMovement(3, 4);
+			expect(bb.rect()).toEqual({
+				x: 1,
+				y: 2,
+				width: 3,
+				height: 4
+			});
+		});
+		test('clickanddrag, outside limits', () => {
+			const bb = createBox('clickanddrag');
+			bb.registerPoint(1, 2);
+			bb.registerMovement(300, 4);
+			expect(bb.rect()).toEqual({
+				x: 1,
+				y: 2,
+				width: 99,
+				height: 4
+			});
+		});
+		test('2-points', () => {
+			const bb = createBox('2point');
+			bb.registerPoint(1, 2);
+			bb.registerPoint(3, 4);
+			expect(bb.rect()).toEqual({
+				x: 1,
+				y: 2,
+				width: 2,
+				height: 2
+			});
+		});
+		test('4-points', () => {
+			const bb = createBox('4point');
+			bb.registerPoint(1, 2);
+			bb.registerPoint(3, 4);
+			bb.registerPoint(5, 6);
+			bb.registerPoint(7, 8);
+			expect(bb.rect()).toEqual({
+				x: 1,
+				y: 2,
+				width: 6,
+				height: 6
+			});
+		});
+		test('createMode off', () => {
+			const bb = createBox('off');
+			bb.registerPoint(1, 2);
+			bb.registerPoint(3, 4);
+			expect(bb.rect()).toEqual({
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0
+			});
+		});
+	});
+	test('.reset', () => {
+		const bb = createBox('clickanddrag');
+		bb.registerPoint(1, 2);
+		bb.registerMovement(3, 4);
+		expect(bb.clickanddrag).toEqual({
+			x: 1,
+			y: 2,
+			width: 3,
+			height: 4,
+			dragDirection: { x: 1, y: 1 }
+		});
+		bb.reset();
+		expect(bb.clickanddrag).toEqual({
+			x: 0,
+			y: 0,
+			width: 0,
+			height: 0,
+			dragDirection: { x: 0, y: 0 }
+		});
+		expect(bb.points).toEqual([]);
+		expect(bb.limits).toEqual({ x: 0, y: 0, width: 100, height: 100 });
+	});
+	describe('.ready', () => {
+		test('createMode off', () => {
+			const bb = createBox('off');
+			expect(bb.ready).toBe(false);
+		});
+		test('clickanddrag', () => {
+			$effect.root(() => {
+				const bb = createBox('clickanddrag');
+				bb.registerPoint(1, 2);
+				expect(bb.ready).toBe(false);
+				bb.registerMovement(3, 4);
+				expect(bb.ready).toBe(true);
+			})();
+		});
+		test('2point', () => {
+			$effect.root(() => {
+				const bb = createBox('2point');
+				bb.registerPoint(1, 2);
+				expect(bb.ready).toBe(false);
+				bb.registerPoint(3, 4);
+				expect(bb.ready).toBe(true);
+			})();
+		});
+		test('4point', () => {
+			$effect.root(() => {
+				const bb = createBox('4point');
+				bb.registerPoint(1, 2);
+				expect(bb.ready).toBe(false);
+				bb.registerPoint(3, 4);
+				expect(bb.ready).toBe(false);
+				bb.registerPoint(5, 6);
+				expect(bb.ready).toBe(false);
+				bb.registerPoint(7, 8);
+				expect(bb.ready).toBe(true);
+			})();
 		});
 	});
 });

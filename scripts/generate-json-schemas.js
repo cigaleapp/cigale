@@ -33,6 +33,11 @@ export const Analysis = type({
 						"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
 					],
 					confidence: ['number', '@', 'Confiance dans la valeur de la métadonnée, entre 0 et 1'],
+					manuallyModified: [
+						'boolean',
+						'@',
+						'La valeur de la métadonnée a été modifiée manuellement'
+					],
 					alternatives: type({
 						'[string]': [
 							'number',

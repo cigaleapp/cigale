@@ -93,17 +93,18 @@ const protocol = {
 		}
 	],
 	metadataOrder: [
-		namespaced('species'),
-		namespaced('genus'),
-		namespaced('family'),
-		namespaced('order'),
-		namespaced('shoot_date'),
-		namespaced('shoot_location'),
-		namespaced('class'),
-		namespaced('phylum'),
-		namespaced('kingdom'),
-		namespaced('crop')
-	],
+		'species',
+		'genus',
+		'family',
+		'order',
+		'shoot_date',
+		'shoot_location',
+		'class',
+		'phylum',
+		'kingdom',
+		'crop',
+		'crop_is_confirmed'
+	].map(namespaced),
 	metadata: {
 		[namespaced('kingdom')]: {
 			...cladeMetadata('kingdom', 'Règne', {}),
@@ -137,6 +138,13 @@ const protocol = {
 			required: true,
 			mergeMethod: 'average'
 		},
+		[namespaced('crop_is_confirmed')]: {
+			type: 'boolean',
+			label: '',
+			description: '',
+			required: false,
+			mergeMethod: 'max'
+		},
 		[namespaced('species')]: {
 			type: 'enum',
 			label: 'Espèce',
@@ -164,6 +172,7 @@ const protocol = {
 	},
 	crop: {
 		metadata: namespaced('crop'),
+		confirmationMetadata: namespaced('crop_is_confirmed'),
 		infer: {
 			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
 			input: {

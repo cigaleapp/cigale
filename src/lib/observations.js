@@ -1,6 +1,6 @@
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
-import { deleteImage } from './images';
+import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
 import { uiState } from './state.svelte';
 
@@ -69,8 +69,8 @@ export async function deleteObservation(
 			tx.objectStore('Observation').delete(id);
 
 			if (recursive) {
-				for (const imageId of observation.images) {
-					deleteImage(imageId, tx, notFoundOk);
+				for (const fileId of imageFileIds(observation.images.map(({ id }) => id))) {
+					deleteImageFile(fileId, tx, notFoundOk);
 				}
 			}
 		}
