@@ -9,6 +9,13 @@ import path from 'node:path';
 import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import keys from '../google-drive-key.json' with { type: 'json' };
+import Turndown from 'turndown';
+
+const _tdown = new Turndown();
+/** @param {string} html  */
+function htmlToMarkdown(html) {
+	return _tdown.turndown(html);
+}
 
 // ANSI control sequences
 const cc = {
@@ -148,10 +155,12 @@ for (const { name, id } of response.data.files) {
 		})
 		.then((html) => new JSDOM(html).window.document);
 
-	const description = [...html.querySelectorAll('section[data-page="page2"] p')]
-		.map((node) => node.textContent)
-		.filter(Boolean)
-		.join('\n');
+	const description = htmlToMarkdown(
+		html
+			.querySelector('section[data-page="page2"]')
+			// Add a space after strong / em tags so that the output markdown does'nt have e.g. "some _link _as well as", which does not render to "some <em>link</em> as well as", but instead "some _link _as well as"
+			.innerHTML.replaceAll(/<\/(strong|em|b|i)>([^,;])/g, '</$1> $2')
+	);
 
 	const links = Object.fromEntries(
 		[...html.querySelectorAll('section[data-page="page2"] a')]
@@ -159,21 +168,22 @@ for (const { name, id } of response.data.files) {
 			.filter(([, text]) => text && text !== ' ')
 	);
 
+	const learnMore =
+		Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))[0] ?? links[0][0];
+
 	for (const [filepath, protocol] of Object.entries(protocols)) {
 		log(`Adding to ${cc.blue}${protocol.id}${cc.reset}`);
+
 		const options = protocol.metadata[`${protocol.id}__species`].options;
+
 		const imagePath = path.join(filepath.replace('.json', '.images'), `${name}.png`);
 		const imageUrl = `https://cigaleapp.github.io/cigale/${path.relative(path.dirname(path.dirname(filepath)).replaceAll('\\', '/'), imagePath)}`;
 
 		log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
 		image.write(imagePath);
 
-		const learnMore =
-			Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))[0] ?? links[0][0];
-
 		if (options.some((o) => o.label === name)) {
 			const option = options.find((o) => o.label === name);
-			option.key = options.length.toString();
 			option.label = name;
 			option.learnMore = learnMore;
 			option.description = description;
