@@ -7,6 +7,7 @@
 	import IconDelete from '~icons/ph/trash';
 	import IconImage from '~icons/ph/image';
 	import { tooltip } from './tooltips';
+	import CroppedImg from './CroppedImg.svelte';
 
 	/**
 	 * @typedef Props
@@ -18,9 +19,11 @@
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
 	 * @property {boolean} selected
+	 * @property {boolean} [selectable=true] - whether this image can be selected
 	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
 	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
 	 * @property {string} [loadingText] - text to show when loading and progress is -1
+	 * @property {boolean} [applyBoundingBoxes] crop the image to the bounding boxes instead of overlaying them on the full image. If boundingBoxes has multiple values, use the first one.
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
 	 * @property {number} boundingBoxes.x
 	 * @property {number} boundingBoxes.y
@@ -38,11 +41,13 @@
 		image,
 		loading,
 		selected,
+		selectable = true,
 		highlighted,
 		errored = false,
 		statusText = 'Chargement…',
 		stacksize = 1,
 		boundingBoxes = [],
+		applyBoundingBoxes = false,
 		ondelete,
 		...rest
 	} = $props();
@@ -59,9 +64,11 @@
 <div
 	class="observation"
 	class:selected
+	class:selectable
 	class:highlighted
 	class:loading
 	class:stacked
+	data-selectable={selectable ? '' : undefined}
 	{...rest}
 	use:tooltip={errored ? statusText : undefined}
 >
@@ -94,22 +101,28 @@
 						{/if}
 					</div>
 				{/if}
-				<div class="containbb">
+				<div class="containbb" class:has-boxes={!applyBoundingBoxes}>
 					{#if image}
-						<img src={image} alt={title} />
+						{#if applyBoundingBoxes && boundingBoxes.length > 0}
+							<CroppedImg blurfill src={image} alt={title} box={boundingBoxes[0]} />
+						{:else}
+							<img src={image} alt={title} />
+						{/if}
 					{:else}
 						<div class="img-placeholder">
 							<IconImage />
 						</div>
 					{/if}
-					{#each boundingBoxes as bounding, index (index)}
-						<div
-							data-testid="card-observation-bounding-box"
-							class="bb"
-							style="left: {bounding.x * 100}%; top: {bounding.y * 80}%; width: {bounding.width *
-								100}%; height: {80 * bounding.height}%;"
-						></div>
-					{/each}
+					{#if !applyBoundingBoxes}
+						{#each boundingBoxes as bounding, index (index)}
+							<div
+								data-testid="card-observation-bounding-box"
+								class="bb"
+								style="left: {bounding.x * 100}%; top: {bounding.y * 80}%; width: {bounding.width *
+									100}%; height: {80 * bounding.height}%;"
+							></div>
+						{/each}
+					{/if}
 				</div>
 
 				<footer>
@@ -157,10 +170,9 @@
 		position: relative;
 		width: var(--card-width);
 		user-select: none;
-		cursor: pointer;
 	}
 
-	.observation:not(.loading) {
+	.observation.selectable {
 		cursor: pointer;
 	}
 
@@ -342,6 +354,16 @@
 
 	.containbb {
 		display: inline-block;
+		overflow: hidden;
+	}
+
+	.containbb:not(.has-boxes) {
+		position: relative;
+	}
+
+	.containbb :global(picture) {
+		position: absolute;
+		inset: 0;
 	}
 
 	@media (prefers-reduced-motion: no-preference) {

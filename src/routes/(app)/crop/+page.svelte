@@ -3,6 +3,7 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import * as idb from '$lib/idb.svelte.js';
+	import { imageFileIds } from '$lib/images';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 
@@ -13,8 +14,8 @@
 	});
 
 	const images = $derived(
-		toAreaObservationProps(idb.tables.Image.state, [], {
-			isLoaded: (image) => image.bufferExists && uiState.hasPreviewURL(image)
+		toAreaObservationProps(imageFileIds(idb.tables.Image.state), [], [], {
+			isLoaded: (item) => typeof item === 'string' && uiState.hasPreviewURL(item)
 		})
 	);
 </script>

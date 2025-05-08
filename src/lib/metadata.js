@@ -1,15 +1,75 @@
 import { type } from 'arktype';
+import { format, isValid } from 'date-fns';
 import { Schemas } from './database.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
-import { format, isValid } from 'date-fns';
 import { mapValues } from './utils.js';
+
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
+ * @import * as DB from './database.js'
  */
 
 /**
+ * @template {DB.MetadataType} [Type=DB.MetadataType]
+ * @typedef  RuntimeValue
+ * @type {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, w: number, h: number } : string}
+ */
+
+/**
+ * @template {DB.MetadataType} [Type=DB.MetadataType]
+ * @typedef TypedMetadataValue
+ * @type {Omit<DB.MetadataValue, 'value'> & { value: RuntimeValue<Type> }}
+ */
+
+/**
+ * Get a strongly-typed metadata value from an image (Image ONLY, not Observation).
+ * @template {DB.MetadataType} Type
+ * @param {DB.Image} image
+ * @param {Type} type
+ * @param {string} metadataId
+ * @returns {TypedMetadataValue<Type> | undefined}
+ */
+export function getMetadataValue(image, type, metadataId) {
+	const value = image.metadata[metadataId];
+	if (value === undefined) return undefined;
+
+	return {
+		...value,
+		value: assertIs(type, value.value)
+	};
+}
+
+/**
+ * Get a strongly-typed metadata value from an image (Image ONLY, not Observation).
+ * Throw if the metadata is not found.
+ * @template {DB.MetadataType} Type
+ * @param {DB.Image} image
+ * @param {Type} type
+ * @param {string} metadataId
+ * @returns {TypedMetadataValue<Type> }
+ */
+export function getMetadataValueOrThrow(image, type, metadataId) {
+	const value = getMetadataValue(image, type, metadataId);
+	if (value === undefined)
+		throw new Error(
+			`Could not get metadata ${metadataId} from image ${image.id}: metadata not found`
+		);
+
+	return value;
+}
+
+/**
+ * Serialize a metadata value for storing in the database.
+ * @param {*} value
+ * @returns {string}
+ */
+export function serializeMetadataValue(value) {
+	return JSON.stringify(isValid(value) ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value);
+}
+
+/**
  *
- * @template {import('./database').MetadataType} Type
+ * @template {DB.MetadataType} Type
  * @param {object} options
  * @param {string} options.subjectId id de l'image ou l'observation
  * @param {string} options.metadataId id de la métadonnée
@@ -34,7 +94,7 @@ export async function storeMetadataValue({
 	confidence ??= 1;
 
 	const newValue = {
-		value: JSON.stringify(isValid(value) ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value),
+		value: serializeMetadataValue(value),
 		confidence,
 		manuallyModified,
 		alternatives: Object.fromEntries(
@@ -134,8 +194,8 @@ export async function deleteMetadataValue({ subjectId, metadataId, recursive = f
 
 /**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
- * @param {import('./database').Observation} observation
- * @returns {Promise<import('./database').MetadataValues>}
+ * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} observation
+ * @returns {Promise<DB.MetadataValues>}
  */
 export async function observationMetadata(observation) {
 	const images = await tables.Image.list().then((images) =>
@@ -152,8 +212,8 @@ export async function observationMetadata(observation) {
 
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
- * @param {import('./database').MetadataValues} values
- * @returns {Record<string, import('./database').MetadataValue & { valueLabel?: string }>}
+ * @param {DB.MetadataValues} values
+ * @returns {Record<string, DB.MetadataValue & { valueLabel?: string }>}
  */
 export function addValueLabels(values) {
 	return Object.fromEntries(
@@ -203,8 +263,8 @@ export async function keyOfEnumLabel(metadataId, label) {
 
 /**
  * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
- * @param {import('./database').Image[]} images
- * @param {import('./database').Observation[]} observations
+ * @param {DB.Image[]} images
+ * @param {DB.Observation[]} observations
  */
 export async function mergeMetadataFromImagesAndObservations(images, observations) {
 	const mergedValues = await mergeMetadataValues(images.map((img) => img.metadata));
@@ -214,7 +274,7 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
 
 	const keys = new Set([...Object.keys(mergedValues), ...Object.keys(mergedOverrides)]);
 
-	/** @type {Record<string, import('./database').MetadataValue & { merged: boolean }>}  */
+	/** @type {Record<string, DB.MetadataValue & { merged: boolean }>}  */
 	const output = {};
 
 	for (const key of keys) {
@@ -227,15 +287,15 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
 
 /**
  *
- * @param {Array<import('./database').MetadataValues>} values
- * @returns {Promise<Record<string, import('./database').MetadataValue & { merged: boolean }>>}
+ * @param {Array<DB.MetadataValues>} values
+ * @returns {Promise<Record<string, DB.MetadataValue & { merged: boolean }>>}
  */
 export async function mergeMetadataValues(values) {
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
 
-	/** @type {Record<string, import('./database').MetadataValue & { merged: boolean }>}  */
+	/** @type {Record<string, DB.MetadataValue & { merged: boolean }>}  */
 	const output = {};
 
 	const keys = new Set(values.flatMap((singleSubjectValues) => Object.keys(singleSubjectValues)));
@@ -267,13 +327,13 @@ export async function mergeMetadataValues(values) {
 
 /**
  *
- * @param {import("./database").Metadata} definition
- * @param {import("./database").MetadataValue[]} values
+ * @param {DB.Metadata} definition
+ * @param {DB.MetadataValue[]} values
  */
 function mergeMetadata(definition, values) {
 	/**
 	 * @param {(probabilities: number[]) => number} merger
-	 * @param {import('./database').MetadataValue[]} values
+	 * @param {DB.MetadataValue[]} values
 	 * Run merger on array of confidences for every probability of each alternative of each values:
 	 * example: [ { alternatives: { a: 0.8, b: 0.2 } }, { alternatives: { a: 0.6, b: 0.4 } } ]
 	 * turns into: { a: merger([0.8, 0.6]), b: merger([0.2, 0.4]) }
@@ -346,7 +406,7 @@ const min = (values) => Math.min(...values);
  * @param {(values: Value[]) => Value} strategy
  * @returns {Value}
  * @template {RuntimeValue<Type>} Value
- * @template {import('./database').MetadataType} Type
+ * @template {DB.MetadataType} Type
  */
 function mergeByMajority(_type, values, strategy) {
 	const bestConfidence = Math.max(...values.map((v) => v.confidence));
@@ -370,7 +430,7 @@ function avg(values) {
  * @param {Value[]} values
  * @returns {Value}
  * @template {RuntimeValue<Type>} Value
- * @template {import('./database').MetadataType} Type
+ * @template {DB.MetadataType} Type
  */
 function mergeAverage(type, values) {
 	/**
@@ -425,7 +485,7 @@ const median = (values) => {
  * @param {Value[]} values
  * @returns {Value}
  * @template {RuntimeValue<Type>} Value
- * @template {import('./database').MetadataType} Type
+ * @template {DB.MetadataType} Type
  */
 function mergeMedian(type, values) {
 	/** @param {typeof values} values */
@@ -467,7 +527,7 @@ function mergeMedian(type, values) {
  * @param {Type} type
  * @param {Value[]} values
  * @template {RuntimeValue<Type>} Value
- * @template {import('./database').MetadataType} Type
+ * @template {DB.MetadataType} Type
  * @returns {number[]}
  */
 function toNumber(type, values) {
@@ -483,8 +543,8 @@ function toNumber(type, values) {
 /**
  * Returns a human-friendly string for a metadata value.
  * Used for e.g. CSV exports.
- * @param {import('./database').Metadata} metadata the metadata definition
- * @param {import('./database').MetadataValue['value']} value the value of the metadata
+ * @param {DB.Metadata} metadata the metadata definition
+ * @param {DB.MetadataValue['value']} value the value of the metadata
  */
 export function metadataPrettyValue(metadata, value) {
 	switch (metadata.type) {
@@ -527,7 +587,7 @@ export function metadataPrettyValue(metadata, value) {
 /**
  * Returns a human-friendly string for a metadata key. Uses the label, and adds useful info about the data format if applicable.
  * To be used with `metadataPrettyValue`.
- * @param {import('./database').Metadata} metadata
+ * @param {DB.Metadata} metadata
  * @returns
  */
 export function metadataPrettyKey(metadata) {
@@ -541,12 +601,12 @@ export function metadataPrettyKey(metadata) {
 
 /**
  * Asserts that a metadata is of a certain type, inferring the correct runtime type for its value
- * @template {import('./database').MetadataType} Type
- * @template {undefined | import('./metadata').RuntimeValue} Value
+ * @template {DB.MetadataType} Type
+ * @template {undefined | RuntimeValue} Value
  * @param {Type} testedtyp
- * @param {import('./metadata').RuntimeValue} metadatatyp
+ * @param {DB.MetadataType} metadatatyp
  * @param {Value} value
- * @returns {value is (Value extends (undefined | import('./metadata').RuntimeValue) ?  RuntimeValue<Type> : (undefined | RuntimeValue<Type>))}
+ * @returns {value is (Value extends RuntimeValue ?  RuntimeValue<Type> : (undefined | RuntimeValue<Type>))}
  */
 export function isType(testedtyp, metadatatyp, value) {
 	/**
@@ -578,6 +638,19 @@ export function isType(testedtyp, metadatatyp, value) {
 }
 
 /**
+ * @template {DB.MetadataType} Type
+ * @param {Type} type
+ * @param {unknown} value
+ * @returns {RuntimeValue<Type>}
+ */
+export function assertIs(type, value) {
+	// @ts-ignore
+	if (!isType(type, type, value))
+		throw new Error(`La valeur n'est pas de type ${type}: ${JSON.stringify(value)}`);
+	return value;
+}
+
+/**
  *
  * @param {{metadataOrder?: undefined | string[]}} protocol
  * @returns {(a: { id: string }, b: { id: string }) => number}
@@ -592,11 +665,6 @@ export function metadataDefinitionComparator(protocol) {
 }
 
 /**
- * @template {import('./database').MetadataType} [Type=import('./database').MetadataType]
- * @typedef {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, w: number, h: number } : string} RuntimeValue
- */
-
-/**
  * @template T
  * @template Undefinable
  * @typedef{ Undefinable extends true ? T | undefined : T } Maybe
@@ -608,3 +676,13 @@ export function metadataDefinitionComparator(protocol) {
 export function metadataById(id) {
 	return tables.Metadata.state.find((m) => m.id === id);
 }
+
+/**
+ * A null-value MetadataValue object
+ */
+export const METADATA_ZERO_VALUE = /** @type {const} */ ({
+	value: null,
+	manuallyModified: false,
+	confidence: 0,
+	alternatives: {}
+});

@@ -32,7 +32,7 @@
 	);
 
 	/**
-	 * @param {import('$lib/database').Request} source
+	 * @param {import('$lib/database').HTTPRequest} source
 	 */
 	function inferenceModelUrl(source) {
 		if (typeof source === 'string') return source;
@@ -41,7 +41,7 @@
 </script>
 
 {#snippet modelDetails(
-	/** @type {{ model: import('$lib/database').Request, input: import('$lib/database').ModelInput }} */ params
+	/** @type {{ model: import('$lib/database').HTTPRequest, input: import('$lib/database').ModelInput }} */ params
 )}
 	{#if params}
 		<p>
@@ -177,10 +177,21 @@
 						<p class="title">
 							Détection &amp; détourage
 							<IconArrow />
-							<code use:tooltip={"Le modèle permet d'inférrer une valeur à cette métadonnée"}>
-								crop
+							<code
+								use:tooltip={`La métadonnée stockant le résultat de la détection: ${crop.metadata}`}
+							>
+								{crop.metadata.replace(`${id}__`, '')}
 							</code>
 						</p>
+						{#if crop.confirmationMetadata}
+							<p class="title">
+								Confirmation du détourage
+								<IconArrow />
+								<code use:tooltip={`La métadonnée stockant si la détection a été confirmée`}>
+									{crop.confirmationMetadata.replace(`${id}__`, '')}
+								</code>
+							</p>
+						{/if}
 						{@render modelDetails(crop.infer)}
 					</div>
 				</li>
@@ -191,6 +202,12 @@
 					<div class="text">
 						<p class="title">
 							{m.label}
+							<IconArrow />
+							<code
+								use:tooltip={`Le métadonnée stockant le résultat de l'inférence: ${m.infer.neural.metadata}`}
+							>
+								{m.infer.neural.metadata.replace(`${id}__`, '')}
+							</code>
 						</p>
 						{@render modelDetails(m.infer.neural)}
 					</div>
