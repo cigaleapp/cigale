@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.5% </span>
+                <span class="strong">93.64% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>216/231</span>
+                <span class='fraction'>221/236</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80.3% </span>
+                <span class="strong">80.88% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>53/66</span>
+                <span class='fraction'>55/68</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.5% </span>
+                <span class="strong">93.64% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>216/231</span>
+                <span class='fraction'>221/236</span>
             </div>
         
             
@@ -316,8 +316,13 @@
 <a name='L251'></a><a href='#L251'>251</a>
 <a name='L252'></a><a href='#L252'>252</a>
 <a name='L253'></a><a href='#L253'>253</a>
-<a name='L254'></a><a href='#L254'>254</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -377,6 +382,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -385,6 +396,7 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -578,7 +590,6 @@ import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { toasts } from './toasts.svelte.js';
-import { matches } from './utils.js';
 &nbsp;
 /**
  * @import { MetadataInferOptions, MetadataType } from './database.js';
@@ -588,11 +599,11 @@ import { matches } from './utils.js';
 /**
  *
  * @param {string} protocolId
- * @param {string} imageId
+ * @param {string} imageFileId
  * @param {ArrayBuffer|Buffer} imageBytes
  * @param {{ type: string; name: string }} file
  */
-export async function processExifData(protocolId, imageId, imageBytes, file) {
+export async function processExifData(protocolId, imageFileId, imageBytes, file) {
 	const protocol = await db.tables.Protocol.get(protocolId);
 	if (!protocol) <span class="branch-0 cbranch-no" title="branch not covered" >{</span>
 <span class="cstat-no" title="statement not covered" >		throw new Error(`Protocole ${protocolId} introuvable`);</span>
@@ -629,14 +640,21 @@ export async function processExifData(protocolId, imageId, imageBytes, file) {
 	});
 &nbsp;
 	await db.openTransaction(['Image', 'Observation'], {}, async (tx) =&gt; {
-		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-			await storeMetadataValue({
-				tx,
-				subjectId: imageId,
-				metadataId: key,
-				value,
-				confidence
-			});
+		const images = await tx
+			.objectStore('Image')
+			.getAll()
+			.then((imgs) =&gt; imgs.filter((img) =&gt; img.fileId === imageFileId));
+&nbsp;
+		for (const { id: subjectId } of images) {
+			for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+				await storeMetadataValue({
+					tx,
+					subjectId,
+					metadataId: key,
+					value,
+					confidence
+				});
+			}
 		}
 	});
 }
@@ -698,7 +716,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 			.filter(
 				([, extracted]) =&gt;
 					extracted !== undefined &amp;&amp;
-					!matches(extracted.value, { latitude: 'number.NaN', longitude: 'number.NaN' }) &amp;&amp;
+					!type({ latitude: 'number.NaN', longitude: 'number.NaN' }).allows(extracted.value) &amp;&amp;
 					!Number.isNaN(extracted.value)
 			)
 	);
@@ -789,8 +807,8 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 		if (value === undefined) <span class="branch-0 cbranch-no" title="branch not covered" >continue;</span>
 &nbsp;
 		if (
-			matches(def.infer, { latitude: { exif: 'string' }, longitude: { exif: 'string' } }) &amp;&amp;
-			matches(value, { latitude: 'number', longitude: 'number' })
+			type({ latitude: { exif: 'string' }, longitude: { exif: 'string' } }).allows(def.infer) &amp;&amp;
+			type({ latitude: 'number', longitude: 'number' }).allows(value)
 		) {
 			// XXX harcoded BS :/
 			if (def.infer.latitude.exif === 'GPSLatitude') {
@@ -829,7 +847,7 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-08T08:50:08.727Z
+                at 2025-05-08T09:31:03.847Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/58</span>
+                <span class='fraction'>0/63</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/58</span>
+                <span class='fraction'>0/63</span>
             </div>
         
             
@@ -366,7 +366,24 @@
 <a name='L301'></a><a href='#L301'>301</a>
 <a name='L302'></a><a href='#L302'>302</a>
 <a name='L303'></a><a href='#L303'>303</a>
-<a name='L304'></a><a href='#L304'>304</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -545,6 +562,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -559,6 +587,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -703,7 +737,7 @@
 	);
 &nbsp;
 	/**
-	 * @param {import('$lib/database').Request} source
+	 * @param {import('$lib/database').HTTPRequest} source
 	 */
 <span class="cstat-no" title="statement not covered" >	function inferenceModelUrl(source) {</span>
 <span class="cstat-no" title="statement not covered" >		if (typeof source === 'string') return source;</span>
@@ -712,7 +746,7 @@
 &lt;/script&gt;
 &nbsp;
 {#snippet modelDetails(
-<span class="cstat-no" title="statement not covered" >	/** @type {{ model: import('$lib/database').Request, input: import('$lib/database').ModelInput }} */ params</span>
+<span class="cstat-no" title="statement not covered" >	/** @type {{ model: import('$lib/database').HTTPRequest, input: import('$lib/database').ModelInput }} */ params</span>
 )}
 <span class="cstat-no" title="statement not covered" >	{#if params}</span>
 		&lt;p&gt;
@@ -848,10 +882,21 @@
 						&lt;p class="title"&gt;
 							Détection &amp;amp; détourage
 							&lt;IconArrow /&gt;
-<span class="cstat-no" title="statement not covered" >							&lt;code use:tooltip={"Le modèle permet d'inférrer une valeur à cette métadonnée"}&gt;</span>
-								crop
+							&lt;code
+<span class="cstat-no" title="statement not covered" >								use:tooltip={`La métadonnée stockant le résultat de la détection: ${crop.metadata}`}</span>
+							&gt;
+<span class="cstat-no" title="statement not covered" >								{crop.metadata.replace(`${id}__`, '')}</span>
 							&lt;/code&gt;
 						&lt;/p&gt;
+<span class="cstat-no" title="statement not covered" >						{#if crop.confirmationMetadata}</span>
+							&lt;p class="title"&gt;
+								Confirmation du détourage
+								&lt;IconArrow /&gt;
+								&lt;code use:tooltip={`La métadonnée stockant si la détection a été confirmée`}&gt;
+<span class="cstat-no" title="statement not covered" >									{crop.confirmationMetadata.replace(`${id}__`, '')}</span>
+								&lt;/code&gt;
+							&lt;/p&gt;
+						{/if}
 <span class="cstat-no" title="statement not covered" >						{@render modelDetails(crop.infer)}</span>
 					&lt;/div&gt;
 				&lt;/li&gt;
@@ -862,6 +907,12 @@
 					&lt;div class="text"&gt;
 						&lt;p class="title"&gt;
 <span class="cstat-no" title="statement not covered" >							{m.label}</span>
+							&lt;IconArrow /&gt;
+							&lt;code
+<span class="cstat-no" title="statement not covered" >								use:tooltip={`Le métadonnée stockant le résultat de l'inférence: ${m.infer.neural.metadata}`}</span>
+							&gt;
+<span class="cstat-no" title="statement not covered" >								{m.infer.neural.metadata.replace(`${id}__`, '')}</span>
+							&lt;/code&gt;
 						&lt;/p&gt;
 <span class="cstat-no" title="statement not covered" >						{@render modelDetails(m.infer.neural)}</span>
 					&lt;/div&gt;
@@ -979,7 +1030,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-08T08:50:08.727Z
+                at 2025-05-08T09:31:03.847Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

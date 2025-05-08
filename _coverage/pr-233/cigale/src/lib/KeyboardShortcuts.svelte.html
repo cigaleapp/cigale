@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/35</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/35</span>
             </div>
         
             
@@ -155,7 +155,21 @@
 <a name='L90'></a><a href='#L90'>90</a>
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
-<a name='L93'></a><a href='#L93'>93</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -184,6 +198,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -276,21 +304,35 @@
 			// Iterate through the "binds" object we were given...
 <span class="cstat-no" title="statement not covered" >			Object.fromEntries(</span>
 				// Associating every pattern to its handler function...
-<span class="cstat-no" title="statement not covered" >				Object.entries(binds).map(([pattern, bind]) =&gt; [</span>
-<span class="cstat-no" title="statement not covered" >					pattern,</span>
-					/** @param {MouseEvent|KeyboardEvent} e */
-<span class="cstat-no" title="statement not covered" >					async (e) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >						if (hasAnyModalOpen(page)) {</span>
-<span class="cstat-no" title="statement not covered" >							console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);</span>
-							return;
+<span class="cstat-no" title="statement not covered" >				Object.entries(binds)</span>
+<span class="cstat-no" title="statement not covered" >					.flatMap(([pattern, bind]) =&gt; {</span>
+						// Handle shift-number keybindings too
+<span class="cstat-no" title="statement not covered" >						if (pattern.startsWith('Digit') &amp;&amp; !pattern.includes(' ')) {</span>
+<span class="cstat-no" title="statement not covered" >							const number = pattern.replace('Digit', '');</span>
+							return /** @type {const} */ ([
+<span class="cstat-no" title="statement not covered" >								[pattern, bind],</span>
+<span class="cstat-no" title="statement not covered" >								[number, bind],</span>
+<span class="cstat-no" title="statement not covered" >								[`Shift+${number}`, bind]</span>
+							]);
 <span class="cstat-no" title="statement not covered" >						}</span>
-<span class="cstat-no" title="statement not covered" >						if (bind.when &amp;&amp; !bind.when(e)) return;</span>
-						// Stick in a call to event.preventDefault()
-						// before calling the handler function if "preventDefault" is true
-<span class="cstat-no" title="statement not covered" >						if (preventDefault) e.preventDefault();</span>
-<span class="cstat-no" title="statement not covered" >						await bind.do(e);</span>
-<span class="cstat-no" title="statement not covered" >					}</span>
-				])
+&nbsp;
+<span class="cstat-no" title="statement not covered" >						return /** @type {const} */ ([[pattern, bind]]);</span>
+<span class="cstat-no" title="statement not covered" >					})</span>
+<span class="cstat-no" title="statement not covered" >					.map(([pattern, bind]) =&gt; [</span>
+<span class="cstat-no" title="statement not covered" >						pattern,</span>
+						/** @param {MouseEvent|KeyboardEvent} e */
+<span class="cstat-no" title="statement not covered" >						async (e) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >							if (hasAnyModalOpen(page)) {</span>
+<span class="cstat-no" title="statement not covered" >								console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);</span>
+								return;
+<span class="cstat-no" title="statement not covered" >							}</span>
+<span class="cstat-no" title="statement not covered" >							if (bind.when &amp;&amp; !bind.when(e)) return;</span>
+							// Stick in a call to event.preventDefault()
+							// before calling the handler function if "preventDefault" is true
+<span class="cstat-no" title="statement not covered" >							if (preventDefault) e.preventDefault();</span>
+<span class="cstat-no" title="statement not covered" >							await bind.do(e);</span>
+<span class="cstat-no" title="statement not covered" >						}</span>
+					])
 			)
 		)
 	);
@@ -346,7 +388,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-08T08:50:08.727Z
+                at 2025-05-08T09:31:03.847Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/52</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/52</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
@@ -209,7 +209,20 @@
 <a name='L144'></a><a href='#L144'>144</a>
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
-<a name='L147'></a><a href='#L147'>147</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -256,6 +269,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -325,6 +345,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -356,13 +382,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;script&gt;
-	import Checkbox from './Checkbox.svelte';
-	import { isType } from './metadata';
-	import MetadataCombobox from './MetadataCombobox.svelte';
-	import IconIncrement from '~icons/ph/plus';
+	import { format, parse } from 'date-fns';
 	import IconError from '~icons/ph/exclamation-mark-fill';
 	import IconDecrement from '~icons/ph/minus';
-	import { format, parse } from 'date-fns';
+	import IconIncrement from '~icons/ph/plus';
+	import { isType } from './metadata';
+	import MetadataCombobox from './MetadataCombobox.svelte';
+	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';
 &nbsp;
@@ -383,7 +409,7 @@
 <span class="cstat-no" title="statement not covered" >	const { type, options = [] } = definition;</span>
 &lt;/script&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >&lt;div class="metadata-input" data-metadata-id={definition.id}&gt;</span>
+<span class="cstat-no" title="statement not covered" >&lt;div class="metadata-input" data-type={type} data-metadata-id={definition.id}&gt;</span>
 <span class="cstat-no" title="statement not covered" >	{#if isType('enum', type, value)}</span>
 		&lt;MetadataCombobox
 			{id}
@@ -401,13 +427,20 @@
 <span class="cstat-no" title="statement not covered" >			}}</span>
 		/&gt;
 <span class="cstat-no" title="statement not covered" >	{:else if isType('boolean', type, value)}</span>
-		&lt;Checkbox bind:value {id} {disabled}&gt;
+		&lt;div class="boolean-switch"&gt;
+			&lt;Switch
+				{value}
+<span class="cstat-no" title="statement not covered" >				onchange={(newValue) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >					console.log('onblur', newValue);</span>
+<span class="cstat-no" title="statement not covered" >					onblur?.(newValue);</span>
+<span class="cstat-no" title="statement not covered" >				}}</span>
+			/&gt;
 <span class="cstat-no" title="statement not covered" >			{#if value}</span>
 				Oui
 <span class="cstat-no" title="statement not covered" >			{:else if value === false}</span>
 				Non
 			{/if}
-		&lt;/Checkbox&gt;
+		&lt;/div&gt;
 <span class="cstat-no" title="statement not covered" >	{:else if isType('string', type, value)}</span>
 		&lt;input type="text" bind:value {id} {disabled} /&gt;
 <span class="cstat-no" title="statement not covered" >	{:else if isType('integer', type, value) || isType('float', type, value)}</span>
@@ -484,13 +517,13 @@
 		border: none;
 	}
 &nbsp;
-	.metadata-input:not(:has(.unrepresentable)) {
+	.metadata-input:not([data-type='boolean']):not(:has(.unrepresentable)) {
 		border-bottom: 2px dashed var(--fg-neutral);
 		display: flex;
 		align-items: center;
 	}
 &nbsp;
-	.metadata-input:focus-within {
+	.metadata-input:not([data-type='boolean']):focus-within {
 		border-bottom-style: solid;
 	}
 &nbsp;
@@ -500,6 +533,12 @@
 		gap: 0.5em;
 		color: var(--fg-error);
 	}
+&nbsp;
+	.boolean-switch {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
 &lt;/style&gt;
 &nbsp;</pre></td></tr></table></pre>
 
@@ -508,7 +547,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-08T08:50:08.727Z
+                at 2025-05-08T09:31:03.847Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

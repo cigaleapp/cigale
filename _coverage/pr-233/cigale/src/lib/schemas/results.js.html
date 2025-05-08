@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for cigale/src/routes/(app)/+layout.js</title>
+    <title>Code coverage report for cigale/src/lib/schemas/results.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../../prettify.css" />
     <link rel="stylesheet" href="../../../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">cigale/src/routes/(app)</a> +layout.js</h1>
+        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">cigale/src/lib/schemas</a> results.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/46</span>
+                <span class='fraction'>0/54</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/46</span>
+                <span class='fraction'>0/54</span>
             </div>
         
             
@@ -113,38 +113,13 @@
 <a name='L48'></a><a href='#L48'>48</a>
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -163,56 +138,99 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { dev } from '$app/environment';<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >import { openTransaction, tables } from '$lib/idb.svelte.js';</span>
-<span class="cstat-no" title="statement not covered" >import { importProtocol } from '$lib/protocols';</span>
-<span class="cstat-no" title="statement not covered" >import { toasts } from '$lib/toasts.svelte';</span>
-<span class="cstat-no" title="statement not covered" >import { error } from '@sveltejs/kit';</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { type } from 'arktype';<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >import { Protocol } from './protocols.js';</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export async function load() {</span>
-<span class="cstat-no" title="statement not covered" >	try {</span>
-<span class="cstat-no" title="statement not covered" >		await tables.initialize();</span>
-<span class="cstat-no" title="statement not covered" >		await fillBuiltinData();</span>
-<span class="cstat-no" title="statement not covered" >		await tables.initialize();</span>
-<span class="cstat-no" title="statement not covered" >	} catch (e) {</span>
-<span class="cstat-no" title="statement not covered" >		console.error(e);</span>
-<span class="cstat-no" title="statement not covered" >		error(400, {</span>
-<span class="cstat-no" title="statement not covered" >			message: e?.toString() ?? 'Erreur inattendue'</span>
-<span class="cstat-no" title="statement not covered" >		});</span>
+<span class="cstat-no" title="statement not covered" >const MetadataRecord = type({</span>
+<span class="cstat-no" title="statement not covered" >	'[string]': {</span>
+<span class="cstat-no" title="statement not covered" >		value: ['unknown', '@', 'Valeur de la métadonnée'],</span>
+<span class="cstat-no" title="statement not covered" >		'valueLabel?': [</span>
+<span class="cstat-no" title="statement not covered" >			'string',</span>
+<span class="cstat-no" title="statement not covered" >			'@',</span>
+<span class="cstat-no" title="statement not covered" >			"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"</span>
+<span class="cstat-no" title="statement not covered" >		],</span>
+<span class="cstat-no" title="statement not covered" >		confidence: ['number', '@', 'Confiance dans la valeur de la métadonnée, entre 0 et 1'],</span>
+<span class="cstat-no" title="statement not covered" >		manuallyModified: ['boolean', '@', 'La valeur de la métadonnée a été modifiée manuellement'],</span>
+<span class="cstat-no" title="statement not covered" >		alternatives: type({</span>
+<span class="cstat-no" title="statement not covered" >			'[string]': [</span>
+<span class="cstat-no" title="statement not covered" >				'number',</span>
+<span class="cstat-no" title="statement not covered" >				'@',</span>
+<span class="cstat-no" title="statement not covered" >				'Confiance dans cette valeur alternative de la métadonnée, entre 0 et 1.'</span>
+<span class="cstat-no" title="statement not covered" >			]</span>
+<span class="cstat-no" title="statement not covered" >		}).describe(</span>
+<span class="cstat-no" title="statement not covered" >			"Autres valeurs possibles. Les clés de l'objet sont les autres valeurs possibles pour cette métadonnée (converties en texte via JSON), les valeurs de l'objet sont les confiances associées à ces alternatives."</span>
+<span class="cstat-no" title="statement not covered" >		)</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >async function fillBuiltinData() {</span>
-<span class="cstat-no" title="statement not covered" >	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >		tx.objectStore('Settings').put({</span>
-<span class="cstat-no" title="statement not covered" >			id: 'defaults',</span>
-<span class="cstat-no" title="statement not covered" >			protocols: [],</span>
-<span class="cstat-no" title="statement not covered" >			theme: 'auto',</span>
-<span class="cstat-no" title="statement not covered" >			gridSize: 10,</span>
-<span class="cstat-no" title="statement not covered" >			language: 'fr',</span>
-<span class="cstat-no" title="statement not covered" >			showInputHints: true,</span>
-<span class="cstat-no" title="statement not covered" >			showTechnicalMetadata: dev</span>
-<span class="cstat-no" title="statement not covered" >		});</span>
-<span class="cstat-no" title="statement not covered" >	});</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.transects');</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	// TODO: at some point, remove the confirmationMetadata check</span>
-<span class="cstat-no" title="statement not covered" >	if (!builtinProtocol || !builtinProtocol.crop?.confirmationMetadata) {</span>
-<span class="cstat-no" title="statement not covered" >		try {</span>
-<span class="cstat-no" title="statement not covered" >			await fetch(</span>
-<span class="cstat-no" title="statement not covered" >				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'</span>
+<span class="cstat-no" title="statement not covered" >export const Analysis = type({</span>
+<span class="cstat-no" title="statement not covered" >	observations: type({</span>
+<span class="cstat-no" title="statement not covered" >		'[string]': {</span>
+<span class="cstat-no" title="statement not covered" >			label: ['string', '@', "Label de l'observation"],</span>
+<span class="cstat-no" title="statement not covered" >			images: type({</span>
+<span class="cstat-no" title="statement not covered" >				id: ['string', '@', "ID de l'image"],</span>
+<span class="cstat-no" title="statement not covered" >				filename: ['string', '@', 'Nom du fichier utilisé pour cette image'],</span>
+<span class="cstat-no" title="statement not covered" >				contentType: [</span>
+<span class="cstat-no" title="statement not covered" >					'string',</span>
+<span class="cstat-no" title="statement not covered" >					'@',</span>
+<span class="cstat-no" title="statement not covered" >					"Type de contenu de l'image, au format MIME (exemple: image/jpeg)"</span>
+<span class="cstat-no" title="statement not covered" >				],</span>
+<span class="cstat-no" title="statement not covered" >				sequence: [</span>
+<span class="cstat-no" title="statement not covered" >					'number',</span>
+<span class="cstat-no" title="statement not covered" >					'@',</span>
+<span class="cstat-no" title="statement not covered" >					"Numéro de séquence de l'image dans l'archive .zip. Unique à l'entièreté de l'export"</span>
+<span class="cstat-no" title="statement not covered" >				],</span>
+<span class="cstat-no" title="statement not covered" >				metadata: MetadataRecord,</span>
+<span class="cstat-no" title="statement not covered" >				exportedAs: type({</span>
+<span class="cstat-no" title="statement not covered" >					original: ['string', '@', "Chemin vers l'image originale"],</span>
+<span class="cstat-no" title="statement not covered" >					cropped: ['string', '@', "Chemin vers l'image recadrée"]</span>
+<span class="cstat-no" title="statement not covered" >				}).describe("Chemins dans l'archive .zip vers l'image exportée")</span>
+<span class="cstat-no" title="statement not covered" >			}).array(),</span>
+<span class="cstat-no" title="statement not covered" >			metadata: MetadataRecord,</span>
+<span class="cstat-no" title="statement not covered" >			protocolMetadata: MetadataRecord.describe(</span>
+<span class="cstat-no" title="statement not covered" >				"Métadonnées définies par le protocole. Les clés de l'objet sont les identifiants des métadonnées, sans le préfixe qui identifie leur protocole de provenance"</span>
 <span class="cstat-no" title="statement not covered" >			)</span>
-<span class="cstat-no" title="statement not covered" >				.then((res) =&gt; res.text())</span>
-<span class="cstat-no" title="statement not covered" >				.then(importProtocol);</span>
-<span class="cstat-no" title="statement not covered" >		} catch (error) {</span>
-<span class="cstat-no" title="statement not covered" >			console.error(error);</span>
-<span class="cstat-no" title="statement not covered" >			toasts.error(</span>
-<span class="cstat-no" title="statement not covered" >				'Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page.'</span>
-<span class="cstat-no" title="statement not covered" >			);</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+<span class="cstat-no" title="statement not covered" >	}).describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),</span>
+<span class="cstat-no" title="statement not covered" >	protocol: Protocol.describe("Le protocole utilisé pour cette session d'analyse")</span>
+<span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

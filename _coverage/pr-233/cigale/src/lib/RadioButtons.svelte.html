@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -110,7 +110,23 @@
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -132,11 +148,27 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,7 +192,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;script generics="OptionKey extends string"&gt;
 	/**
 	 * @template {string} Key
-	 * @typedef {{ key: Key; label: string }} Item
+	 * @typedef {{ key: Key; label: string; subtext?: string }} Item
 	 */
 &nbsp;
 	/**
@@ -179,16 +211,27 @@
 <span class="cstat-no" title="statement not covered" >	});</span>
 &lt;/script&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >{#each options as { key, label } (key)}</span>
-	&lt;div&gt;
+&lt;div class="radio-inputs"&gt;
+<span class="cstat-no" title="statement not covered" >	{#each options as { key, label, ...additional } (key)}</span>
 		&lt;label class="radio"&gt;
 <span class="cstat-no" title="statement not covered" >			&lt;input type="radio" value={key} bind:group={value} /&gt;</span>
 <span class="cstat-no" title="statement not covered" >			{label}</span>
+<span class="cstat-no" title="statement not covered" >			{#if 'subtext' in additional}</span>
+				&lt;p class="subtext"&gt;
+<span class="cstat-no" title="statement not covered" >					{additional.subtext}</span>
+				&lt;/p&gt;
+			{/if}
 		&lt;/label&gt;
-	&lt;/div&gt;
-{/each}
+	{/each}
+&lt;/div&gt;
 &nbsp;
 &lt;style&gt;
+	.radio-inputs {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+	}
+&nbsp;
 	input[type='radio'] {
 		accent-color: var(--bg-primary);
 		color: var(--bg-neutral);
@@ -203,6 +246,11 @@
 	.radio {
 		align-items: center;
 	}
+&nbsp;
+	.subtext {
+		color: var(--gay);
+		padding-left: 1.2em;
+	}
 &lt;/style&gt;
 &nbsp;</pre></td></tr></table></pre>
 
@@ -211,7 +259,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-08T08:50:08.727Z
+                at 2025-05-08T09:31:03.847Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
