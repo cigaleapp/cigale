@@ -6,17 +6,28 @@
 	export async function importMore(files) {
 		uiState.processing.files = files.map((f) => f.name);
 		uiState.processing.total = files.length;
-		for (const file of files) {
-			const currentLength = tables.Image.state.length;
-			const id = imageFileId(currentLength);
-			try {
-				uiState.loadingImages.add(id);
-				await processImageFile(file, id);
-			} catch (error) {
-				console.error(error);
-				uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
-			} finally {
-				uiState.loadingImages.delete(id);
+		for (const [i, file] of files.entries()) {
+			console.log(file);
+			if (['application/zip', 'application/x-zip-compressed'].includes(file.type)) {
+				console.log(`imorting ${file.name} as zip`);
+				try {
+					await importResultsZip(file, uiState.currentProtocolId);
+				} catch {
+					uiState.processing.files.splice(i, 1);
+					uiState.erroredImages.set(file.name, 'Export invalide');
+				}
+			} else {
+				const currentLength = tables.Image.state.length;
+				const id = imageFileId(currentLength);
+				try {
+					uiState.loadingImages.add(id);
+					await processImageFile(file, id);
+				} catch (error) {
+					console.error(error);
+					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+				} finally {
+					uiState.loadingImages.delete(id);
+				}
 			}
 		}
 	}
@@ -163,6 +174,7 @@
 	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
+	import { importResultsZip } from '$lib/results.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
@@ -228,7 +240,22 @@
 		<p class="source">{@render modelsource()}</p>
 	</section>
 {:then _}
-	<Dropzone clickable={images.length === 0} onfiles={async ({ files }) => await importMore(files)}>
+	<Dropzone
+		filetypes={[
+			'image/jpeg',
+			'application/zip',
+			'image/png',
+			'image/tiff',
+			'.cr2',
+			'.rw2',
+			'.dng',
+			'.crw',
+			'.raw',
+			'.cr3'
+		]}
+		clickable={images.length === 0}
+		onfiles={async ({ files }) => await importMore(files)}
+	>
 		<section class="observations" class:empty={!images.length}>
 			<AreaObservations
 				bind:selection={uiState.selection}
@@ -254,7 +281,7 @@
 			{#if !images.length}
 				<div class="empty-state">
 					<Logo variant="empty" />
-					<p>Cliquer ou déposer des images ici</p>
+					<p>Cliquer ou déposer des images, ou un export de résultats (.zip)</p>
 				</div>
 			{/if}
 		</section>
@@ -303,6 +330,8 @@
 		align-items: center;
 		/* Logo size */
 		--size: 5em;
+		max-width: 20em;
+		margin: auto;
 	}
 
 	.loading {

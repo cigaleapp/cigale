@@ -51,6 +51,7 @@
 
 <article
 	class="toast"
+	data-type={type}
 	style:--bg="var(--bg-{style})"
 	style:--fg="var(--fg-{style})"
 	in:slide={{ axis: 'y', duration: 200 }}

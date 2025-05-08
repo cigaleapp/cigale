@@ -1,26 +1,37 @@
 /**
  * @import * as DB from './database';
  */
-import { strToU8, zip } from 'fflate';
+import { ArkErrors } from 'arktype';
+import { strFromU8, strToU8, unzipSync, zip } from 'fflate';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { Schemas } from './database';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download';
+import { addExifMetadata } from './exif';
 import * as db from './idb.svelte';
-import { imageIdToFileId } from './images';
+import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images';
 import {
 	addValueLabels,
 	METADATA_ZERO_VALUE,
 	metadataPrettyKey,
 	metadataPrettyValue,
-	observationMetadata
+	observationMetadata,
+	serializeMetadataValue
 } from './metadata';
+import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from './protocols';
+import { Analysis } from './schemas/results';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
-import { addExifMetadata } from './exif';
-import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from './protocols';
+import {
+	compareBy,
+	entries,
+	mapValues,
+	pick,
+	safeJSONParse,
+	uint8ArrayToArrayBuffer
+} from './utils';
 
 /**
- * @param {Array<DB.Observation>} observations
+ * @param {DB.Observation[]} observations
  * @param {DB.Protocol} protocolUsed
  * @param {object} param2
  * @param {'croppedonly'|'full'|'metadataonly'} param2.include
@@ -31,30 +42,65 @@ export async function generateResultsZip(
 	protocolUsed,
 	{ include = 'croppedonly', base }
 ) {
-	/** @type {Record<string, {label: string; metadata: DB.MetadataValues}>}  */
-	const finalObservationsData = Object.fromEntries(
-		await Promise.all(
-			observations.map(async (o) => {
-				const metadata = await observationMetadata(o).then(addValueLabels);
-				return [
-					o.id,
-					{
-						label: o.label,
-						metadata,
-						protocolMetadata: protocolMetadataValues(protocolUsed, metadata),
-						images: o.images.map((id) => {
-							const image = db.tables.Image.state.find((i) => i.id === id);
-							if (!image) return;
-							return { ...image, metadata: addValueLabels(image.metadata) };
-						})
-					}
-				];
-			})
-		)
-	);
+	const filepaths = protocolUsed.exports ?? {
+		images: {
+			cropped: Schemas.FilepathTemplate.assert('cropped/{{sequence}}.{{extension image.filename}}'),
+			original: Schemas.FilepathTemplate.assert(
+				'original/{{sequence}}.{{extension image.filename}}'
+			)
+		},
+		metadata: {
+			json: 'analysis.json',
+			csv: 'metadata.csv'
+		}
+	};
+
+	/**
+	 * @type {typeof Analysis.inferIn['observations']}
+	 */
+	let exportedObservations = {};
+	let sequence = 1;
+
+	// To have stable sequence numbers, really useful for testing
+	observations.sort(compareBy((o) => o.label + o.id));
+	for (const { id, label, images, metadataOverrides } of observations) {
+		const metadata = await observationMetadata({ images, metadataOverrides }).then(addValueLabels);
+
+		exportedObservations[id] = {
+			label,
+			metadata,
+			protocolMetadata: protocolMetadataValues(protocolUsed, metadata),
+			images: []
+		};
+
+		for (const imageId of images.sort()) {
+			const imageFromDatabase = db.tables.Image.state.find((i) => i.id === imageId);
+			if (!imageFromDatabase) continue;
+			const metadataValues = addValueLabels(imageFromDatabase.metadata);
+
+			const image = {
+				...imageFromDatabase,
+				metadata: metadataValues,
+				protocolMetadata: protocolMetadataValues(protocolUsed, metadataValues)
+			};
+
+			const filepathsData = { observation: exportedObservations[id], image, sequence };
+
+			exportedObservations[id].images.push({
+				...image,
+				sequence,
+				exportedAs: {
+					original: filepaths.images.original.render(filepathsData),
+					cropped: filepaths.images.cropped.render(filepathsData)
+				}
+			});
+
+			sequence++;
+		}
+	}
 
 	const allMetadataKeys = [
-		...new Set(observations.flatMap((o) => Object.keys(finalObservationsData[o.id].metadata)))
+		...new Set(observations.flatMap((o) => Object.keys(exportedObservations[o.id].metadata)))
 	];
 
 	const metadataDefinitions = Object.fromEntries(db.tables.Metadata.state.map((m) => [m.id, m]));
@@ -110,21 +156,6 @@ export async function generateResultsZip(
 		}
 	}
 
-	console.log({ buffersOfImages });
-
-	const filepaths = protocolUsed.exports ?? {
-		images: {
-			cropped: Schemas.FilepathTemplate.assert('cropped/{{sequence}}.{{extension image.filename}}'),
-			original: Schemas.FilepathTemplate.assert(
-				'original/{{sequence}}.{{extension image.filename}}'
-			)
-		},
-		metadata: {
-			json: 'analysis.json',
-			csv: 'metadata.csv'
-		}
-	};
-
 	/**
 	 * @type {Uint8Array<ArrayBufferLike>}
 	 */
@@ -135,10 +166,19 @@ export async function generateResultsZip(
 					stringifyWithToplevelOrdering(
 						'json',
 						`${window.location.origin}${base}/results.schema.json`,
-						{
-							observations: finalObservationsData,
-							protocol: protocolUsed
-						},
+						Analysis.assert({
+							observations: exportedObservations,
+							protocol: {
+								...protocolUsed,
+								exports: {
+									...protocolUsed.exports,
+									images: {
+										original: filepaths.images.original.toJSON(),
+										cropped: filepaths.images.cropped.toJSON()
+									}
+								}
+							}
+						}),
 						['protocol', 'observations']
 					)
 				),
@@ -156,7 +196,7 @@ export async function generateResultsZip(
 							Identifiant: o.id,
 							Observation: o.label,
 							...Object.fromEntries(
-								Object.entries(finalObservationsData[o.id].metadata).flatMap(
+								Object.entries(exportedObservations[o.id].metadata).flatMap(
 									([key, { value, confidence }]) => [
 										[
 											metadataPrettyKey(metadataDefinitions[key]),
@@ -172,41 +212,21 @@ export async function generateResultsZip(
 						}))
 					)
 				),
-				...Object.fromEntries(
-					include === 'metadataonly'
-						? []
-						: observations
-								.flatMap((o) => o.images.map((imageId) => /** @type {const} */ ([o, imageId])))
-								.flatMap(([observation, imageId], index) => {
-									const buffers = buffersOfImages.find((i) => i.imageId === imageId);
+				...(include === 'metadataonly'
+					? {}
+					: Object.fromEntries(
+							Object.values(exportedObservations)
+								.flatMap(({ images }) => images)
+								.flatMap(({ exportedAs, id }) => {
+									const buffers = buffersOfImages.find((i) => i.imageId === id);
 									if (!buffers) return [];
-									const image = db.tables.Image.state.find((i) => i.id === imageId);
-									if (!image) return [];
-
-									const metadataValues = addValueLabels(image.metadata);
-
-									const filepathTemplateData = $state.snapshot({
-										image: {
-											...image,
-											metadata: metadataValues,
-											protocolMetadata: protocolMetadataValues(protocolUsed, metadataValues)
-										},
-										observation,
-										sequence: index + 1
-									});
 
 									return [
-										[
-											filepaths.images.cropped.render(filepathTemplateData),
-											[buffers.croppedBytes, { level: 0 }]
-										],
-										[
-											filepaths.images.original.render(filepathTemplateData),
-											[buffers.originalBytes, { level: 0 }]
-										]
+										[exportedAs.cropped, [buffers.croppedBytes, { level: 0 }]],
+										[exportedAs.original, [buffers.originalBytes, { level: 0 }]]
 									].filter(([, [bytes]]) => bytes !== undefined);
 								})
-				)
+						))
 			},
 			{
 				comment: `Generated by C.i.g.a.l.e on ${new Date().toISOString()} - ${window.location.origin}`
@@ -233,10 +253,12 @@ export async function cropImage(protocol, image) {
 		/** @type {undefined | import("./metadata").RuntimeValue<'boundingbox'>}  */
 		(image.metadata[protocol.crop?.metadata ?? 'crop']?.value);
 
-	if (!centeredBoundingBox) throw "L'image n'a pas d'information de recadrage";
-
 	const bytes = await db.get('ImageFile', imageIdToFileId(image.id)).then((f) => f?.bytes);
 	if (!bytes) throw "L'image n'a pas de fichier associé";
+
+	if (!centeredBoundingBox) {
+		return { cropped: bytes, original: bytes };
+	}
 
 	const bitmap = await createImageBitmap(new Blob([bytes], { type: image.contentType }));
 	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
@@ -312,4 +334,139 @@ function protocolMetadataValues(protocol, values) {
 				}
 			])
 	);
+}
+
+/**
+ * Import back a results zip file.
+ * @param {File} file
+ * @param {string} [protocolId] make sure that the protocolId is the same as the one used to export the zip file
+ */
+export async function importResultsZip(file, protocolId) {
+	const contents = new Uint8Array(await file.arrayBuffer());
+
+	const results = unzipSync(contents, {
+		filter: ({ name }) => {
+			return name === (uiState.currentProtocol?.exports?.metadata.json ?? 'analysis.json');
+		}
+	});
+
+	if (Object.keys(results).length === 0) {
+		uiState.processing.files.pop();
+		toasts.error(`Aucun fichier d'analyse trouvé dans l'export ${file.name}`);
+		return;
+	}
+
+	const [analysis] = Object.values(results)
+		.map((d) => strFromU8(d))
+		.map(safeJSONParse)
+		.map((obj) => (obj ? Analysis(obj) : undefined));
+
+	if (analysis === undefined) {
+		uiState.processing.files.pop();
+		toasts.error(`Le fichier d'analyse de ${file.name} n'est pas au format JSON ou est corrompu`);
+		return;
+	}
+
+	if (analysis instanceof ArkErrors) {
+		uiState.processing.files.pop();
+		toasts.error(`Fichier d'analyse de ${file.name} invalide: ${analysis.summary}`);
+		return;
+	}
+
+	const { protocol, observations } = analysis;
+
+	if (protocolId && protocol.id !== protocolId) {
+		uiState.processing.files.pop();
+		toasts.error(
+			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${protocol.id}, mais le protocole actuel est ${protocolId}`
+		);
+		return;
+	}
+
+	uiState.processing.files = [
+		...uiState.processing.files,
+		...Object.values(observations).flatMap((o) => o.images.map((i) => i.filename))
+	];
+
+	const extractedImages = unzipSync(contents, {
+		filter: ({ name }) =>
+			Object.values(observations).some((o) => o.images.some((i) => i.exportedAs.original === name))
+	});
+
+	if (Object.keys(extractedImages).length === 0) {
+		uiState.processing.files = uiState.processing.files.filter(
+			(f) =>
+				f !== file.name &&
+				!Object.values(observations)
+					.flatMap((o) => o.images.map((i) => i.filename))
+					.includes(f)
+		);
+		toasts.error(
+			`Aucune image trouvée dans l'export ${file.name}. L'export doit contenir les images originales, pas seulement les images recadrées`
+		);
+		return;
+	}
+
+	for (const [name, bytes] of entries(extractedImages)) {
+		const observation = entries(observations)
+			.map(([id, o]) => ({ id, ...o }))
+			.find((o) => o.images.some((i) => i.exportedAs.original === name));
+
+		if (!observation) {
+			uiState.processing.files = uiState.processing.files.filter((f) => f !== name);
+			continue;
+		}
+
+		const image = observation.images.find((i) => i.exportedAs.original === name);
+		if (!image) {
+			uiState.processing.files = uiState.processing.files.filter((f) => f !== name);
+			continue;
+		}
+
+		await db.tables.Observation.set({
+			...pick(observation, 'id', 'label'),
+			images: observation.images.map((i) => i.id),
+			addedAt: new Date().toISOString(),
+			metadataOverrides: mapValues(observation.metadata, (v) => ({
+				value: serializeMetadataValue(v.value),
+				confidence: v.confidence,
+				manuallyModified: v.manuallyModified,
+				alternatives: v.alternatives
+			}))
+		});
+
+		const originalBytes = uint8ArrayToArrayBuffer(bytes);
+
+		const [[width, height], resizedBytes] = await resizeToMaxSize({
+			source: new File([originalBytes], image.filename, { type: image.contentType })
+		});
+
+		uiState.processing.files.shift();
+
+		await storeImageBytes({
+			id: imageIdToFileId(image.id),
+			resizedBytes,
+			originalBytes,
+			contentType: file.type,
+			filename: file.name,
+			width,
+			height
+		});
+
+		await db.tables.Image.set({
+			...pick(image, 'id', 'filename', 'contentType'),
+			dimensions: { width, height },
+			fileId: imageIdToFileId(image.id),
+			boundingBoxesAnalyzed: true,
+			addedAt: new Date().toISOString(),
+			metadata: mapValues(image.metadata, (v) => ({
+				value: serializeMetadataValue(v.value),
+				confidence: v.confidence,
+				manuallyModified: v.manuallyModified,
+				alternatives: v.alternatives
+			}))
+		});
+	}
+
+	uiState.processing.files.shift();
 }

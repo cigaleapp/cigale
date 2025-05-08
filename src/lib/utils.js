@@ -222,14 +222,14 @@ if (import.meta.vitest) {
 
 /**
  * Pick only some keys from an object
- * @template {string} KeysIn
- * @template {KeysIn} KeysOut
- * @template {any} V
- * @param {Record<KeysIn, V>} subject
+ * @template {string} KeysOut
+ * @template {*} Obj
+ * @param {Obj} subject
  * @param {...KeysOut} keys
- * @returns {Record<KeysOut, V>}
+ * @returns {Pick<Obj, KeysOut>}
  */
 export function pick(subject, ...keys) {
+	// @ts-expect-error
 	return fromEntries(entries(subject).filter(([key]) => oneOf(key, keys)));
 }
 
@@ -286,6 +286,27 @@ if (import.meta.vitest) {
 		expect(safeJSONParse('{"a":1')).toBeUndefined();
 		expect(safeJSONParse(null)).toBeUndefined();
 		expect(safeJSONParse(undefined)).toBeUndefined();
+	});
+}
+
+/**
+ * @param {*} value
+ */
+export function safeJSONStringify(value) {
+	try {
+		return JSON.stringify(value);
+	} catch {
+		return undefined;
+	}
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('safeJSONStringify', () => {
+		expect(safeJSONStringify({ a: 1 })).toEqual('{"a":1}');
+		expect(safeJSONStringify(undefined)).toBeUndefined();
+		expect(safeJSONStringify(null)).toBe('null');
+		expect(safeJSONStringify(Symbol('feur'))).toBeUndefined();
 	});
 }
 
@@ -451,4 +472,72 @@ if (import.meta.vitest) {
 		expect(hasDatasetKey(element, 'test')).toBe(true);
 		expect(hasDatasetKey(element, 'nonexistent')).toBe(false);
 	});
+}
+
+/**
+ * @param {Uint8Array} uint8Array
+ * @returns {ArrayBuffer}
+ */
+export function uint8ArrayToArrayBuffer(uint8Array) {
+	return uint8Array.buffer.slice(
+		uint8Array.byteOffset,
+		uint8Array.byteOffset + uint8Array.byteLength
+	);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('uint8ArrayToArrayBuffer', () => {
+		const uint8Array = new Uint8Array([1, 2, 3]);
+		const arrayBuffer = uint8ArrayToArrayBuffer(uint8Array);
+		expect(arrayBuffer).toBeInstanceOf(ArrayBuffer);
+		expect(new Uint8Array(arrayBuffer)).toEqual(uint8Array);
+	});
+}
+
+/**
+ * extension is all the last dotted parts: thing.tar.gz is [thing, tar.gz]
+ * @param {string} filename
+ * @returns [string, string] [filename without extension, extension]
+ */
+export function splitFilenameOnExtension(filename) {
+	const match = filename.match(/^([^.]+)\.(.+)$/);
+	if (!match) return [filename, ''];
+	return [match[1], match[2]];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('splitFilenameOnExtension', () => {
+		expect(splitFilenameOnExtension('file.txt')).toEqual(['file', 'txt']);
+		expect(splitFilenameOnExtension('file')).toEqual(['file', '']);
+		expect(splitFilenameOnExtension('file.tar.gz')).toEqual(['file', 'tar.gz']);
+	});
+}
+
+/**
+ * @template Item
+ * @param {(item: Item) => string|number} key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ */
+export function compareBy(key) {
+	/**
+	 * @param {Item} a
+	 * @param {Item} b
+	 * @returns {number}
+	 */
+	return (a, b) => {
+		const aKey = key(a);
+		const bKey = key(b);
+
+		if (aKey === bKey) return 0;
+		if (typeof aKey === 'string' && typeof bKey === 'string') {
+			return aKey.localeCompare(bKey);
+		}
+
+		if (typeof aKey === 'number' && typeof bKey === 'number') {
+			return aKey - bKey;
+		}
+
+		return aKey.toString().localeCompare(bKey.toString());
+	};
 }

@@ -80,7 +80,7 @@
 	});
 </script>
 
-<div class="pannel" class:empty={images.length === 0}>
+<aside data-testid="sidepanel" class="sidepanel" class:empty={images.length === 0}>
 	{#if images.length > 0}
 		<div class="images">
 			{#each images as { src, box }, i (i)}
@@ -177,10 +177,10 @@
 			Supprimer {images.length} images
 		</ButtonSecondary>
 	</section>
-</div>
+</aside>
 
 <style>
-	.pannel {
+	.sidepanel {
 		width: 40vw;
 		resize: horizontal;
 		direction: rtl;
@@ -195,11 +195,11 @@
 	}
 
 	/* Direction is set to RTL on .pannel to put the resize handle on the left of the container, this sets it back to LTR for every child so that text still has the correction direction (for French) */
-	.pannel :global(> *) {
+	.sidepanel :global(> *) {
 		direction: ltr;
 	}
 
-	.pannel.empty {
+	.sidepanel.empty {
 		grid-template-rows: auto max-content;
 	}
 

@@ -99,23 +99,3 @@ if (import.meta.vitest) {
 		`);
 	});
 }
-
-/**
- * extension is all the last dotted parts: thing.tar.gz is [thing, tar.gz]
- * @param {string} filename
- * @returns [string, string] [filename without extension, extension]
- */
-export function splitFilenameOnExtension(filename) {
-	const match = filename.match(/^([^.]+)\.(.+)$/);
-	if (!match) return [filename, ''];
-	return [match[1], match[2]];
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('splitFilenameOnExtension', () => {
-		expect(splitFilenameOnExtension('file.txt')).toEqual(['file', 'txt']);
-		expect(splitFilenameOnExtension('file')).toEqual(['file', '']);
-		expect(splitFilenameOnExtension('file.tar.gz')).toEqual(['file', 'tar.gz']);
-	});
-}
