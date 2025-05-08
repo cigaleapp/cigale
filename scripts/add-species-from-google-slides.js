@@ -144,23 +144,28 @@ for (const { name, id } of response.data.files) {
 			path: Buffer.from(odp.data),
 			trim: true,
 			openFilters: {
-				'draw:page': ({ attributes, name }) => {
-					return {
-						xml: name,
-						html: 'section',
-						attrs: [{ name: 'data-page', value: attributes['draw:name'] }]
-					};
-				}
+				'draw:page': ({ attributes, name }) => ({
+					xml: name,
+					html: 'section',
+					attrs: [{ name: 'data-page', value: attributes['draw:name'] }]
+				}),
+				'text:s': ({ name }) => ({
+					xml: name,
+					html: 'span',
+					attrs: [{ name: 'data-is-whitespace', value: 'true' }]
+				})
 			}
 		})
-		.then((html) => new JSDOM(html).window.document);
+		.then((html) => {
+			const doc = new JSDOM(html).window.document;
+			// Recover whitespace from text:s tags
+			doc.querySelectorAll('span[data-is-whitespace]').forEach((node) => {
+				node.innerHTML += ' ';
+			});
+			return doc;
+		});
 
-	const description = htmlToMarkdown(
-		html
-			.querySelector('section[data-page="page2"]')
-			// Add a space after strong / em tags so that the output markdown does'nt have e.g. "some _link _as well as", which does not render to "some <em>link</em> as well as", but instead "some _link _as well as"
-			.innerHTML.replaceAll(/<\/(strong|em|b|i)>([^,;])/g, '</$1> $2')
-	);
+	const description = htmlToMarkdown(html.querySelector('section[data-page="page2"]'));
 
 	const links = Object.fromEntries(
 		[...html.querySelectorAll('section[data-page="page2"] a')]
