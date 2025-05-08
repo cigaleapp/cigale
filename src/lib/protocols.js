@@ -1,3 +1,4 @@
+import { type } from 'arktype';
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
@@ -87,7 +88,7 @@ export async function downloadProtocolTemplate(base, format) {
 	downloadProtocol(base, format, {
 		id: 'mon-protocole',
 		name: 'Mon protocole',
-		source: 'https://github.com/moi/mon-protocole',
+		learnMore: 'https://github.com/moi/mon-protocole',
 		authors: [{ name: 'Prénom Nom', email: 'prenom.nom@example.com' }],
 		description: 'Description de mon protocole',
 		metadata: {
@@ -203,4 +204,64 @@ export async function importProtocol(contents) {
 		);
 	});
 	return ExportedProtocol.assert(protocol);
+}
+
+/**
+ *
+ * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
+ * @returns {Promise< { upToDate: boolean; newVersion: number }>}
+ */
+export async function hasUpgradeAvailable({ version, source, id }) {
+	if (!source) throw new Error("Le protocole n'a pas de source");
+	if (!version) throw new Error("Le protocole n'a pas de version");
+	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
+	if (typeof source !== 'string')
+		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
+
+	const response = await fetch(source, {
+		headers: {
+			Accept: 'application/json'
+		}
+	})
+		.then((r) => r.json())
+		.then(
+			type({
+				'version?': 'number',
+				id: 'string'
+			}).assert
+		);
+
+	if (!response.version) throw new Error("Le protocole n'a plus de version");
+	if (response.id !== id) throw new Error("Le protocole a changé d'identifiant");
+	if (response.version > version) {
+		return {
+			upToDate: false,
+			newVersion: response.version
+		};
+	}
+
+	return {
+		upToDate: true,
+		newVersion: response.version
+	};
+}
+
+/**
+ *
+ * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
+ */
+export async function upgradeProtocol({ version, source, id }) {
+	if (!source) throw new Error("Le protocole n'a pas de source");
+	if (!version) throw new Error("Le protocole n'a pas de version");
+	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
+	if (typeof source !== 'string')
+		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
+
+	const response = await fetch(source, {
+		headers: {
+			Accept: 'application/json'
+		}
+	}).then((r) => r.text());
+
+	return importProtocol(response);
 }

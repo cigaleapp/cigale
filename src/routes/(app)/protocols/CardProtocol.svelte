@@ -1,29 +1,41 @@
 <script>
 	import { base } from '$app/paths';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import Card from '$lib/Card.svelte';
+	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { metadataDefinitionComparator } from '$lib/metadata';
 	import { exportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
-	import IconExport from '~icons/ph/share';
-	import IconTaxonomy from '~icons/ph/graph';
-	import IconDelete from '~icons/ph/trash';
-	import IconSource from '~icons/ph/link-simple';
-	import IconForeign from '~icons/ph/diamond';
-	import IconAuthors from '~icons/ph/users';
-	import IconInferred from '~icons/ph/magic-wand';
-	import IconTag from '~icons/ph/tag';
-	import IconTechnical from '~icons/ph/wrench';
-	import IconClassification from '~icons/ph/list-star';
 	import IconArrow from '~icons/ph/arrow-right';
+	import IconForeign from '~icons/ph/diamond';
+	import IconTaxonomy from '~icons/ph/graph';
+	import IconSource from '~icons/ph/link-simple';
+	import IconClassification from '~icons/ph/list-star';
+	import IconInferred from '~icons/ph/magic-wand';
 	import IconDetection from '~icons/ph/magnifying-glass';
-	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { metadataDefinitionComparator } from '$lib/metadata';
+	import IconExport from '~icons/ph/share';
+	import IconTag from '~icons/ph/tag';
+	import IconDelete from '~icons/ph/trash';
+	import IconAuthors from '~icons/ph/users';
+	import IconTechnical from '~icons/ph/wrench';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
-	const { id, name, source, authors, metadata, description, ondelete, crop, metadataOrder } =
-		$props();
+	const {
+		id,
+		name,
+		learnMore,
+		source,
+		version,
+		authors,
+		metadata,
+		description,
+		ondelete,
+		crop,
+		metadataOrder
+	} = $props();
 
 	const metadataOfProtocol = $derived(
 		tables.Metadata.state
@@ -61,15 +73,17 @@
 
 <Card>
 	<header>
-		<h2>{name}</h2>
+		<h2>
+			{name}
+		</h2>
 		<code class="id">{id}</code>
 		<p class="description">
 			{description}
 		</p>
-		{#if source}
+		{#if learnMore}
 			<p class="source">
 				<IconSource />
-				<a href={source}>{source.replace('https://', '')}</a>
+				<a href={learnMore}>{learnMore.replace('https://', '')}</a>
 			</p>
 		{/if}
 		{#if authors.length}
@@ -232,6 +246,8 @@
 			<IconDelete />
 			Supprimer
 		</ButtonSecondary>
+
+		<ButtonUpdateProtocol {version} {source} {id} />
 	</section>
 </Card>
 
