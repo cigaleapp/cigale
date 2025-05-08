@@ -78,7 +78,7 @@ test('basic functionality', async ({ page }) => {
 
 	const firstLine = csv.split('\n')[0];
 	expect(firstLine).toBe(
-		`"Identifiant";"Observation";"Date";"Date: Confiance";"";": Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"`
+		`"Identifiant";"Observation";"";": Confiance";"Date";"Date: Confiance";"";": Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"`
 	);
 
 	const analysis = JSON.parse(fs.readFileSync(path.join(resultsDir, 'analysis.json'), 'utf8'));

@@ -7,7 +7,6 @@ import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { toasts } from './toasts.svelte.js';
-import { matches } from './utils.js';
 
 /**
  * @import { MetadataInferOptions, MetadataType } from './database.js';
@@ -17,11 +16,11 @@ import { matches } from './utils.js';
 /**
  *
  * @param {string} protocolId
- * @param {string} imageId
+ * @param {string} imageFileId
  * @param {ArrayBuffer|Buffer} imageBytes
  * @param {{ type: string; name: string }} file
  */
-export async function processExifData(protocolId, imageId, imageBytes, file) {
+export async function processExifData(protocolId, imageFileId, imageBytes, file) {
 	const protocol = await db.tables.Protocol.get(protocolId);
 	if (!protocol) {
 		throw new Error(`Protocole ${protocolId} introuvable`);
@@ -58,14 +57,21 @@ export async function processExifData(protocolId, imageId, imageBytes, file) {
 	});
 
 	await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
-		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-			await storeMetadataValue({
-				tx,
-				subjectId: imageId,
-				metadataId: key,
-				value,
-				confidence
-			});
+		const images = await tx
+			.objectStore('Image')
+			.getAll()
+			.then((imgs) => imgs.filter((img) => img.fileId === imageFileId));
+
+		for (const { id: subjectId } of images) {
+			for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+				await storeMetadataValue({
+					tx,
+					subjectId,
+					metadataId: key,
+					value,
+					confidence
+				});
+			}
 		}
 	});
 }
@@ -127,7 +133,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 			.filter(
 				([, extracted]) =>
 					extracted !== undefined &&
-					!matches(extracted.value, { latitude: 'number.NaN', longitude: 'number.NaN' }) &&
+					!type({ latitude: 'number.NaN', longitude: 'number.NaN' }).allows(extracted.value) &&
 					!Number.isNaN(extracted.value)
 			)
 	);
@@ -218,8 +224,8 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 		if (value === undefined) continue;
 
 		if (
-			matches(def.infer, { latitude: { exif: 'string' }, longitude: { exif: 'string' } }) &&
-			matches(value, { latitude: 'number', longitude: 'number' })
+			type({ latitude: { exif: 'string' }, longitude: { exif: 'string' } }).allows(def.infer) &&
+			type({ latitude: 'number', longitude: 'number' }).allows(value)
 		) {
 			// XXX harcoded BS :/
 			if (def.infer.latitude.exif === 'GPSLatitude') {

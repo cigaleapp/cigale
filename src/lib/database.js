@@ -10,6 +10,15 @@ const ID = type(/[\w_]+/);
 
 const References = ID.array().pipe((ids) => [...new Set(ids)]);
 
+const Dimensions = type({
+	width: 'number > 0',
+	height: 'number > 0'
+}).pipe(({ width, height }) => ({
+	width,
+	height,
+	aspectRatio: width / height
+}));
+
 /**
  * Add a suffix to a filename, before the extension
  */
@@ -149,7 +158,10 @@ const ImageFile = table(
 	type({
 		/** ID of the associated Image object */
 		id: ID,
-		bytes: 'ArrayBuffer'
+		bytes: 'ArrayBuffer',
+		filename: 'string',
+		contentType: /\w+\/\w+/,
+		dimensions: Dimensions
 	})
 );
 
@@ -158,7 +170,10 @@ const ImagePreviewFile = table(
 	type({
 		/** ID of the associated Image object */
 		id: ID,
-		bytes: 'ArrayBuffer'
+		bytes: 'ArrayBuffer',
+		filename: 'string',
+		contentType: /\w+\/\w+/,
+		dimensions: Dimensions
 	})
 );
 
@@ -168,9 +183,12 @@ const Image = table(
 		id: /\d+(_\d+)*/,
 		filename: 'string',
 		addedAt: 'string.date.iso.parse',
+		dimensions: Dimensions,
 		metadata: MetadataValues,
 		contentType: /\w+\/\w+/,
-		bufferExists: 'boolean'
+		fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
+		/** Si les boîtes englobantes ont été analysées. Pratique en particulier pour savoir s'il faut calculer les boîtes englobantes pour une image qui n'a aucune observation associée (chaque boudingbox crée une observation) */
+		boundingBoxesAnalyzed: 'boolean = false'
 	})
 );
 
@@ -357,6 +375,11 @@ const Protocol = table(
 		),
 		'crop?': type({
 			metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
+			'confirmationMetadata?': [
+				ID,
+				'@',
+				'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée'
+			],
 			infer: type({
 				model: Request.describe(
 					'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
@@ -555,4 +578,17 @@ function table(keyPaths, schema) {
 /**
  * @typedef MetadataInferOptions
  * @type {typeof MetadataInferOptions.infer}
+ */
+
+/**
+ * @typedef ImageFile
+ * @type {typeof ImageFile.infer}
+ */
+
+/**
+ * @typedef Dimensions
+ * @type {typeof Dimensions.infer}
+ *
+ * @typedef DimensionsInput
+ * @type {typeof Dimensions.inferIn}
  */

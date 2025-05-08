@@ -1,3 +1,6 @@
+/**
+ * @import * as DB from './database';
+ */
 import { strToU8, zip } from 'fflate';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { Schemas } from './database';
@@ -6,6 +9,7 @@ import * as db from './idb.svelte';
 import { imageIdToFileId } from './images';
 import {
 	addValueLabels,
+	METADATA_ZERO_VALUE,
 	metadataPrettyKey,
 	metadataPrettyValue,
 	observationMetadata
@@ -16,8 +20,8 @@ import { addExifMetadata } from './exif';
 import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from './protocols';
 
 /**
- * @param {Array<import("./database").Observation>} observations
- * @param {import('./database').Protocol} protocolUsed
+ * @param {Array<DB.Observation>} observations
+ * @param {DB.Protocol} protocolUsed
  * @param {object} param2
  * @param {'croppedonly'|'full'|'metadataonly'} param2.include
  * @param {string} param2.base base path of the app - import `base` from `$app/paths`
@@ -27,26 +31,25 @@ export async function generateResultsZip(
 	protocolUsed,
 	{ include = 'croppedonly', base }
 ) {
-	/** @type {Record<string, {label: string; metadata: import('./database').MetadataValues}>}  */
+	/** @type {Record<string, {label: string; metadata: DB.MetadataValues}>}  */
 	const finalObservationsData = Object.fromEntries(
 		await Promise.all(
-			observations.map(async (o) => [
-				o.id,
-				{
-					label: o.label,
-					metadata: await observationMetadata(o).then(addValueLabels),
-					protocolMetadata: Object.fromEntries(
-						Object.entries(await observationMetadata(o).then(addValueLabels))
-							.filter(([key]) => isNamespacedToProtocol(protocolUsed.id, key))
-							.map(([key, value]) => [removeNamespaceFromMetadataId(key), value])
-					),
-					images: o.images.map((id) => {
-						const image = db.tables.Image.state.find((i) => i.id === id);
-						if (!image) return;
-						return { ...image, metadata: addValueLabels(image.metadata) };
-					})
-				}
-			])
+			observations.map(async (o) => {
+				const metadata = await observationMetadata(o).then(addValueLabels);
+				return [
+					o.id,
+					{
+						label: o.label,
+						metadata,
+						protocolMetadata: protocolMetadataValues(protocolUsed, metadata),
+						images: o.images.map((id) => {
+							const image = db.tables.Image.state.find((i) => i.id === id);
+							if (!image) return;
+							return { ...image, metadata: addValueLabels(image.metadata) };
+						})
+					}
+				];
+			})
 		)
 	);
 
@@ -71,20 +74,38 @@ export async function generateResultsZip(
 			o.images.map((img) => /** @type {const} */ ([o, img]))
 		)) {
 			const image = await db.tables.Image.get(imageId);
-			if (!image) throw 'Image non trouvée';
+			if (!image) continue;
 			const metadata = { ...image.metadata, ...observation.metadataOverrides };
 			const { contentType, filename } = image;
 			const { cropped, original } = await cropImage(protocolUsed, image);
+
+			/** @type {undefined | Uint8Array} */
+			let originalBytes = undefined;
+			/** @type {Uint8Array} */
+			let croppedBytes;
+
+			if (contentType === 'image/jpeg') {
+				croppedBytes = addExifMetadata(cropped, Object.values(metadataDefinitions), metadata);
+			} else {
+				croppedBytes = new Uint8Array(cropped);
+			}
+
+			if (include === 'full') {
+				if (contentType === 'image/jpeg') {
+					originalBytes = addExifMetadata(original, Object.values(metadataDefinitions), metadata);
+				} else {
+					originalBytes = new Uint8Array(original);
+				}
+			}
+
 			buffersOfImages.push({
 				imageId,
-				croppedBytes: addExifMetadata(cropped, Object.values(metadataDefinitions), metadata),
-				originalBytes:
-					include === 'full'
-						? addExifMetadata(original, Object.values(metadataDefinitions), metadata)
-						: undefined,
+				croppedBytes,
+				originalBytes,
 				contentType,
 				filename
 			});
+
 			uiState.processing.done++;
 		}
 	}
@@ -158,19 +179,17 @@ export async function generateResultsZip(
 								.flatMap((o) => o.images.map((imageId) => /** @type {const} */ ([o, imageId])))
 								.flatMap(([observation, imageId], index) => {
 									const buffers = buffersOfImages.find((i) => i.imageId === imageId);
-									if (!buffers) throw 'Image non trouvée';
+									if (!buffers) return [];
 									const image = db.tables.Image.state.find((i) => i.id === imageId);
-									if (!image) throw 'Image non trouvée';
+									if (!image) return [];
+
+									const metadataValues = addValueLabels(image.metadata);
 
 									const filepathTemplateData = $state.snapshot({
 										image: {
 											...image,
-											metadata: addValueLabels(image.metadata),
-											protocolMetadata: Object.fromEntries(
-												Object.entries(addValueLabels(image.metadata))
-													.filter(([key]) => isNamespacedToProtocol(protocolUsed.id, key))
-													.map(([key, value]) => [removeNamespaceFromMetadataId(key), value])
-											)
+											metadata: metadataValues,
+											protocolMetadata: protocolMetadataValues(protocolUsed, metadataValues)
 										},
 										observation,
 										sequence: index + 1
@@ -205,8 +224,8 @@ export async function generateResultsZip(
 }
 
 /**
- * @param {import('./database').Protocol} protocol protocol used
- * @param {import('./database').Image} image
+ * @param {DB.Protocol} protocol protocol used
+ * @param {DB.Image} image
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
 export async function cropImage(protocol, image) {
@@ -273,4 +292,24 @@ function toCSV(header, rows, separator = ';') {
 		header.map(quote).join(separator),
 		...rows.map((row) => header.map((key) => quote(row[key])).join(separator))
 	].join('\n');
+}
+
+/**
+ * Returns a un-namespaced object of all metadata values of the given protocol, given the metadata values object of an image/observation. If a metadata value is absent from the given values, the value is still present, but set to `null`.
+ *
+ * @param {DB.Protocol} protocol
+ * @param {DB.MetadataValues} values
+ */
+function protocolMetadataValues(protocol, values) {
+	return Object.fromEntries(
+		protocol.metadata
+			.filter((key) => isNamespacedToProtocol(protocol.id, key))
+			.map((key) => [
+				removeNamespaceFromMetadataId(key),
+				values[key] ?? {
+					...METADATA_ZERO_VALUE,
+					valueLabel: ''
+				}
+			])
+	);
 }

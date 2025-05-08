@@ -26,12 +26,13 @@
 	// Ensure every image has a preview URL at all times
 	$effect(() => {
 		for (const image of tables.Image.state) {
-			if (uiState.hasPreviewURL(image)) continue;
+			if (uiState.hasPreviewURL(image.fileId)) continue;
+			if (!image.fileId) continue;
 			void (async () => {
 				const file = await db.get('ImagePreviewFile', imageIdToFileId(image.id));
 				if (!file) return;
 				const blob = new Blob([file.bytes], { type: image.contentType });
-				uiState.setPreviewURL(image, URL.createObjectURL(blob));
+				uiState.setPreviewURL(image.fileId, URL.createObjectURL(blob));
 			})();
 		}
 	});

@@ -1,7 +1,7 @@
 <script>
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImage } from '$lib/images';
+	import { deleteImageFile } from '$lib/images';
 	import {
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
@@ -9,17 +9,35 @@
 		storeMetadataValue
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
+	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { seo } from '$lib/seo.svelte';
+	import { page } from '$app/state';
+	import { importMore } from './import/+page.svelte';
+	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 
 	seo({ title: 'Importer' });
 
 	const { children } = $props();
+
+	async function importImages() {
+		const filesInput = document.createElement('input');
+		filesInput.type = 'file';
+		filesInput.multiple = true;
+		filesInput.accept = 'image/*';
+		filesInput.addEventListener('change', async (event) => {
+			if (!(event.currentTarget instanceof HTMLInputElement)) return;
+			if (!event.currentTarget.files) return;
+			const files = Array.from(event.currentTarget.files);
+			if (files.length === 0) return;
+			await importMore(files);
+		});
+		filesInput.click();
+	}
 
 	async function mergeSelection() {
 		const newId = await mergeToObservation(uiState.selection);
@@ -46,7 +64,7 @@
 			async (tx) => {
 				for (const id of uiState.selection) {
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
-					await deleteImage(id, tx);
+					await deleteImageFile(id, tx, true);
 				}
 			}
 		);
@@ -87,13 +105,16 @@
 		};
 	});
 
-	const showSidePanel = $derived(tables.Image.state.length + tables.Observation.state.length > 0);
+	const showSidePanel = $derived(
+		tables.Image.state.length + tables.Observation.state.length + uiState.processing.files.length >
+			0
+	);
 
 	const selectedImages = $derived(
 		uiState.selection
 			.flatMap((id) => {
 				// Try assuming id === image
-				const image = tables.Image.state.find((i) => i.id === id);
+				const image = tables.Image.state.find((i) => i.fileId === id);
 				if (image) return [image];
 				// Otherwise, get every observation's image
 				return tables.Observation.state
@@ -110,8 +131,18 @@
 			.filter((o) => o !== undefined)
 	);
 
-	const selectedHrefs = $derived(
-		selectedImages.map((image) => uiState.getPreviewURL(image)).filter((url) => url !== undefined)
+	const selectedHrefsWithCropboxes = $derived(
+		selectedImages
+			.map((image) => {
+				const src = uiState.getPreviewURL(image.fileId);
+				if (!src) return undefined;
+				const box = uiState.cropMetadataValueOf(image)?.value;
+				return {
+					src,
+					box: box ? toTopLeftCoords(box) : undefined
+				};
+			})
+			.filter((i) => i !== undefined)
 	);
 
 	/** @type {Awaited<ReturnType<typeof mergeMetadataFromImagesAndObservations>>} */
@@ -132,12 +163,13 @@
 	<main>{@render children?.()}</main>
 	{#if showSidePanel}
 		<PreviewSidePanel
-			images={selectedHrefs}
+			images={selectedHrefsWithCropboxes}
 			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}
-			onmerge={mergeSelection}
+			onmerge={page.route.id?.endsWith('classify') ? mergeSelection : undefined}
 			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
-			onsplit={splitSelection}
+			onsplit={page.route.id?.endsWith('classify') ? splitSelection : undefined}
+			onimport={page.route.id?.endsWith('import') ? importImages : undefined}
 			ondelete={deleteSelection}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {

@@ -1,6 +1,7 @@
 import tippy from 'sveltejs-tippy';
 import xss from 'xss';
 import { displayPattern } from './KeyboardHint.svelte';
+import { omit } from './utils';
 
 /**
  * @typedef {object} TooltipParameters
@@ -28,11 +29,15 @@ function props(parameters) {
 	else {
 		return {
 			...base,
-			...parameters,
+			...omit(parameters, 'text', 'keyboard'),
 			delay: [delay, 0],
-			allowHTML: Boolean(parameters.keyboard),
+			allowHTML: true,
 			content:
-				xss(parameters.text) +
+				xss(parameters.text, {
+					allowList: {
+						kbd: ['class']
+					}
+				}) +
 				// XXX: needs :global styling from KeyboardHint.svelte
 				(parameters.keyboard
 					? ' <kbd class=hint>' +

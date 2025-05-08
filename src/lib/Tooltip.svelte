@@ -14,6 +14,12 @@
 	const { text = '', keyboard = '', delay, children } = $props();
 </script>
 
-<div use:tooltip={keyboard ? { text, keyboard, delay } : delay ? [text, delay] : text}>
+<span use:tooltip={keyboard ? { text, keyboard, delay } : delay ? [text, delay] : text}>
 	{@render children?.()}
-</div>
+</span>
+
+<style>
+	span {
+		display: inline-block;
+	}
+</style>

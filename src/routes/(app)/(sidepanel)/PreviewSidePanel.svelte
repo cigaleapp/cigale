@@ -1,6 +1,9 @@
 <script>
-	import { page } from '$app/state';
+	/**
+	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	 */
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { countThings } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -16,14 +19,16 @@
 	import IconImage from '~icons/ph/image';
 	import IconMerge from '~icons/ph/selection-background';
 	import IconDelete from '~icons/ph/trash';
+	import IconImport from '~icons/ph/upload-simple';
 
 	/**
 	 * @typedef {object} Props
-	 * @property {string[]} images source **href**s of the images/observations we're modifying the metadata on
-	 * @property {() => void} onmerge callback to call when the user wants to merge images or observations into a single one
+	 * @property {Array<{ src: string; box?: undefined | TopLeftBoundingBox }>} images source **href**s of the images/observations we're modifying the metadata on
+	 * @property {(() => void) | undefined} [onmerge] callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown.
 	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
 	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
-	 * @property {() => void} onsplit callback to call when the user wants to split the selected observation(s)
+	 * @property {(() => void) | undefined} [onsplit] callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown.
+	 * @property {(() => void) | undefined} [onimport] callback to call when the user wants to import additional images. If not set, the import button is not shown.
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
 	 * @property {(key: string, value: undefined | import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
@@ -31,8 +36,17 @@
 	 */
 
 	/** @type {Props} */
-	let { images, onmerge, ondelete, onsplit, cansplit, onmetadatachange, canmerge, metadata } =
-		$props();
+	let {
+		images,
+		onmerge,
+		onimport,
+		ondelete,
+		onsplit,
+		cansplit,
+		onmetadatachange,
+		canmerge,
+		metadata
+	} = $props();
 
 	const definitions = $derived.by(() => {
 		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
@@ -53,12 +67,13 @@
 
 	const singleImageSelected = $derived(
 		uiState.selection.length === 1
-			? tables.Image.state.find((img) => img.id === uiState.selection[0])
+			? tables.Image.state.find((img) => img.fileId === uiState.selection[0])
 			: undefined
 	);
 
 	const selectionCounts = $derived({
-		image: uiState.selection.filter((id) => tables.Image.state.some((img) => img.id === id)).length,
+		image: uiState.selection.filter((id) => tables.Image.state.some((img) => img.fileId === id))
+			.length,
 		observation: uiState.selection.filter((id) =>
 			tables.Observation.state.some((obs) => obs.id === id)
 		).length
@@ -68,8 +83,15 @@
 <div class="pannel" class:empty={images.length === 0}>
 	{#if images.length > 0}
 		<div class="images">
-			{#each images as image, i (i)}
-				<img src={image} alt={'image ' + i} />
+			{#each images as { src, box }, i (i)}
+				{@const alt = singleObservationSelected
+					? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
+					: `Image ${i + 1} de la sélection`}
+				{#if box}
+					<CroppedImg blurfill {src} {alt} {box} />
+				{:else}
+					<img {src} {alt} />
+				{/if}
 			{/each}
 		</div>
 		<h2>
@@ -102,7 +124,7 @@
 							if (deepEqual(v, value?.value)) return;
 							onmetadatachange(definition.id, v);
 						}}
-					></Metadata>
+					/>
 				{/if}
 			{/each}
 		</MetadataList>
@@ -113,7 +135,7 @@
 		</section>
 	{/if}
 	<section class="button">
-		{#if page.url.hash === '#/classify'}
+		{#if onmerge && onsplit}
 			<div class="side-by-side">
 				<ButtonSecondary
 					disabled={!canmerge}
@@ -134,6 +156,12 @@
 					Séparer
 				</ButtonSecondary>
 			</div>
+		{/if}
+		{#if onimport}
+			<ButtonSecondary onclick={onimport}>
+				<IconImport />
+				Importer d'autres images
+			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
@@ -200,7 +228,7 @@
 		overflow-x: hidden;
 	}
 
-	img {
+	.images :global(> *) {
 		height: 50px;
 		border-radius: var(--corner-radius);
 	}
