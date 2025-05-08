@@ -168,6 +168,7 @@
 		background-color: var(--bg2-neutral);
 		--viewport-padding: 1em;
 		padding: var(--viewport-padding);
+		z-index: 10000;
 	}
 
 	.viewport {
