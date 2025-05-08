@@ -82,7 +82,7 @@ const cladeMetadata = (clade, label, parent) => ({
 const protocol = {
 	$schema: 'https://cigaleapp.github.io/cigale/protocol.schema.json',
 	id: 'io.github.cigaleapp.arthropods.example',
-	name: "Transect d'arthropodes",
+	name: 'Example: arthropodes',
 	learnMore: `https://github.com/cigaleapp/cigale/tree/${await execa`git rev-parse HEAD`.then((result) => result.stdout)}/scripts/README.md#protocoles-arthropodsexample`,
 	version: await readFile(path.join(here, '../examples/arthropods.cigaleprotocol.version'), 'utf-8')
 		.then((v) => JSON.parse(v))
