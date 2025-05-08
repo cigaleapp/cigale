@@ -541,3 +541,48 @@ export function compareBy(key) {
 		return aKey.toString().localeCompare(bKey.toString());
 	};
 }
+
+/**
+ * Add a v= query parameter to the URL to force the browser to reload the resource, using  Date.now() as the value
+ * @template {string|URL} T
+ * @param {T} url
+ * @returns {T}
+ */
+export function cachebust(url) {
+	const parsedUrl = new URL(url);
+	parsedUrl.searchParams.set('v', Date.now().toString());
+	if (typeof url === 'string') {
+		// @ts-expect-error
+		return parsedUrl.toString();
+	}
+	// @ts-expect-error
+	return parsedUrl;
+}
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+	describe('cachebust', () => {
+		test('without any query params', () => {
+			const url = 'https://example.com/resource';
+			const cachebustedUrl = cachebust(url);
+			expect(URL.canParse(cachebustedUrl)).toBeTruthy();
+			expect([...new URL(cachebustedUrl).searchParams.entries()]).toEqual([
+				['v', expect.stringMatching(/^\d+$/)]
+			]);
+		});
+		test('with existing query params', () => {
+			const url = 'https://example.com/resource?param=value';
+			const cachebustedUrl = cachebust(url);
+			expect(URL.canParse(cachebustedUrl)).toBeTruthy();
+			expect(new URL(cachebustedUrl).searchParams.get('param')).toBe('value');
+			expect(new URL(cachebustedUrl).searchParams.get('v')).toMatch(/^\d+$/);
+		});
+		test('with a parsed URL', () => {
+			const url = new URL('https://example.com/resource?param=value');
+			const cachebustedUrl = cachebust(url);
+			expect(cachebustedUrl).toBeInstanceOf(URL);
+			expect(cachebustedUrl.searchParams.get('param')).toBe('value');
+			expect(cachebustedUrl.searchParams.get('v')).toMatch(/^\d+$/);
+		});
+	});
+}
