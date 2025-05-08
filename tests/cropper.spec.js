@@ -124,7 +124,7 @@ test.describe('Cropper view', () => {
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000001');
 
-			const { ...othersBefore } = await getSettings({ page });
+			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
 			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
 
