@@ -41,7 +41,7 @@
         "anyOf": [
           {
             "type": "object",
-            "table": "$ark.object805",
+            "table": "$ark.object866",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -703,7 +703,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object805",
+            "table": "$ark.object866",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -1427,7 +1427,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object805",
+            "table": "$ark.object866",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
