@@ -5,7 +5,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
-		deleteImage,
+		deleteImageFile,
 		imageBufferWasSaved,
 		imageIdToFileId,
 		imageIsClassified
@@ -34,12 +34,12 @@
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
-		toAreaObservationProps(tables.Image.state, tables.Observation.state, {
-			previewURL: (image) =>
-				uiState.getPreviewURL(image, 'cropped') ?? uiState.getPreviewURL(image, 'full'),
-			showBoundingBoxes: (image) => !uiState.hasPreviewURL(image, 'cropped'),
-			isLoaded: (image) =>
-				imageBufferWasSaved(image) && uiState.hasPreviewURL(image) && imageIsClassified(image)
+		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
+			showBoundingBoxes: () => false,
+			isLoaded: (item) =>
+				typeof item === 'string'
+					? false
+					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
 		})
 	);
 
@@ -68,7 +68,7 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const inputSettings = uiState.currentProtocol.inference?.detection?.input ?? {
+		const inputSettings = uiState.currentProtocol.crop?.infer?.input ?? {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT
 		};
@@ -85,7 +85,7 @@
 		const nimg = await applyBBOnTensor([x, y, width, height], img);
 
 		// TODO persist after page reload?
-		uiState.croppedPreviewURLs.set(imageIdToFileId(id), nimg.toDataURL());
+		uiState.setPreviewURL(id, nimg.toDataURL(), 'cropped');
 
 		const [[scores]] = await classify(uiState.currentProtocol, [[nimg]], classifmodel, uiState, 0);
 
@@ -185,7 +185,7 @@
 			loadingText="Analyse…"
 			ondelete={async (id) => {
 				await deleteObservation(id);
-				await deleteImage(id);
+				await deleteImageFile(id);
 			}}
 		/>
 		{#if !images.length}

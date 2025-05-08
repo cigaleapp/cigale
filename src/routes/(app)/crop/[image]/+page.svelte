@@ -1,45 +1,66 @@
 <script>
+	/**
+	 * @import * as Metadata from '$lib/metadata.js';
+	 * @import * as DB from '$lib/database.js';
+	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
+	 */
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
+		coordsAreEqual,
+		coordsScaler,
 		toCenteredCoords,
 		toTopLeftCoords
 	} from '$lib/BoundingBoxes.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Switch from '$lib/Switch.svelte';
+	import Tooltip from '$lib/Tooltip.svelte';
 	import * as idb from '$lib/idb.svelte.js';
-	import { imageIdToFileId } from '$lib/images';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import {
+		imageFileIds,
+		imagesOfImageFile,
+		imageId as makeImageId,
+		parseImageId
+	} from '$lib/images';
+	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { mapValues, pick } from '$lib/utils';
+	import { formatISO } from 'date-fns';
 	import { onDestroy, onMount } from 'svelte';
+	import IconRevert from '~icons/ph/arrow-arc-left';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
 	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
+	import IconFocus from '~icons/ph/crosshair-simple';
+	import IconNeuralNet from '~icons/ph/graph';
 	import IconFourPointCrop from '~icons/ph/number-circle-four';
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
 	import IconUnconfirmedCrop from '~icons/ph/seal';
 	import IconConfirmedCrop from '~icons/ph/seal-check';
 	import IconToolDragCrop from '~icons/ph/selection-plus';
 	import IconGallery from '~icons/ph/squares-four';
-	import IconReset from '~icons/ph/arrow-counter-clockwise';
-	import { pick } from '$lib/utils';
+	import IconDelete from '~icons/ph/trash';
 
-	const imageId = $derived(page.params.image);
-	const image = $derived(idb.tables.Image.state.find((image) => image.id === imageId));
+	const fileId = $derived(page.params.image);
+	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));
+	const firstImage = $derived(images.at(0));
 
-	$effect(() => seo({ title: `Recadrer ${image?.filename ?? '...'}` }));
+	$effect(() => seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` }));
 
 	// Controls visibility of the checkmark little centered overlay
 	let confirmedOverlayShown = $state(false);
@@ -100,94 +121,150 @@
 		}
 	]);
 
+	const creationTools = $derived(tools.filter(({ createMode }) => createMode !== 'off'));
+
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
-	$effect(() => {
-		document.body.style.cursor = activeTool.cursor || 'auto';
-	});
-
-	const boundingBox = $derived(
-		/**
-		 * @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>}
-		 */ (
-			image?.metadata[uiState.cropMetadataId]?.value ?? {
-				x: 0,
-				y: 0,
-				w: 0.5,
-				h: 0.5
-			}
-		)
-	);
-	const imageSrc = $derived(uiState.previewURLs.get(imageIdToFileId(imageId)));
-	const sortedImageIds = $derived(
-		idb.tables.Image.state.map((img) => img.id).toSorted(idb.idComparator)
-	);
-	const unconfirmedCropImagesId = $derived(
-		idb.tables.Image.state
-			.filter((img) => !hasConfirmedCrop(img))
-			.map((img) => img.id)
-			.toSorted(idb.idComparator)
-	);
-	const previousImageId = $derived.by(() => {
-		const idx = sortedImageIds.indexOf(imageId) - 1;
-		if (idx < 0) return undefined;
-		return sortedImageIds.at(idx);
-	});
-	const nextImageId = $derived.by(() => {
-		const idx = sortedImageIds.indexOf(imageId) + 1;
-		if (idx >= sortedImageIds.length) return undefined;
-		return sortedImageIds.at(idx);
-	});
-	const nextUnconfirmedImageId = $derived.by(() => {
-		const idx = unconfirmedCropImagesId.indexOf(imageId) + 1;
-		if (idx >= unconfirmedCropImagesId.length) return undefined;
-		return unconfirmedCropImagesId.at(idx);
-	});
-	const croppedImagesCount = $derived(idb.tables.Image.state.filter(hasCrop).length);
-	const confirmedCropsCount = $derived(idb.tables.Image.state.filter(hasConfirmedCrop).length);
-
-	/** @type {undefined | { value: import('$lib/metadata.js').RuntimeValue<'boundingbox'>, confidence: number }} */
-	const initialCrop = $derived.by(() => {
-		if (!image) return undefined;
-
-		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
-		if (
-			image.metadata[uiState.cropMetadataId]?.alternatives &&
-			Object.entries(image.metadata[uiState.cropMetadataId].alternatives).length > 0
-		) {
-			const [[stringValue, confidence]] = Object.entries(
-				image.metadata[uiState.cropMetadataId].alternatives
-			);
-			return {
-				value: JSON.parse(stringValue),
-				confidence
-			};
-		}
-
-		// If this is the first time the user is re-cropping the box, this value will be the main values.
-		return pick(image.metadata[uiState.cropMetadataId], 'value', 'confidence');
-	});
-
-	$inspect({ initialCrop });
+	let focusedImageId = $state('');
 
 	/**
-	 * @param {import('$lib/database.js').Image} image
+	 * @type {Record<string, Metadata.RuntimeValue<'boundingbox'>>}
 	 */
-	function hasCrop(image) {
-		return (
-			image.metadata[uiState.cropMetadataId] &&
-			boundingBoxIsNonZero(image.metadata[uiState.cropMetadataId].value)
+	const boundingBoxes = $derived(
+		Object.fromEntries(
+			images
+				.map(({ metadata, id }) => [
+					id,
+					assertIs('boundingbox', metadata[uiState.cropMetadataId]?.value)
+				])
+				.filter(([, value]) => Boolean(value))
+		)
+	);
+	const imageSrc = $derived(uiState.previewURLs.get(fileId));
+	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idb.idComparator));
+	const prevFileId = $derived.by(() => {
+		const idx = sortedFileIds.indexOf(fileId) - 1;
+		if (idx < 0) return undefined;
+		return sortedFileIds.at(idx);
+	});
+	const nextFileId = $derived.by(() => {
+		const idx = sortedFileIds.indexOf(fileId) + 1;
+		if (idx >= sortedFileIds.length) return undefined;
+		return sortedFileIds.at(idx);
+	});
+	const nextUnconfirmedImageId = $derived.by(() => {
+		const forward = sortedFileIds
+			.slice(sortedFileIds.indexOf(fileId) + 1)
+			.filter((fileId) => !hasConfirmedCrop(fileId))
+			.at(0);
+
+		if (forward) return forward;
+
+		// Loop around.
+		return sortedFileIds.find((fileId) => !hasConfirmedCrop(fileId));
+	});
+	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
+	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
+
+	/** @type {Record<string, undefined | { value: Metadata.RuntimeValue<'boundingbox'>, confidence: number }>} */
+	const initialCrops = $derived(
+		Object.fromEntries(
+			images.map((image) => {
+				if (!image.metadata[uiState.cropMetadataId]) {
+					return [image.id, undefined];
+				}
+
+				const { alternatives, value, confidence, manuallyModified } =
+					image.metadata[uiState.cropMetadataId];
+
+				// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
+				if (alternatives && Object.entries(alternatives).length > 0) {
+					const [[stringValue, confidence]] = Object.entries(alternatives);
+					return [
+						image.id,
+						{
+							value: JSON.parse(stringValue),
+							confidence
+						}
+					];
+				}
+
+				// If the main value is manuallyModified, and we have no alternatives,
+				// it means that the box never had a neural network-inferred value (or it was lost somehow)
+				if (manuallyModified) {
+					return [image.id, undefined];
+				}
+
+				// If this is the first time the user is re-cropping the box, this value will be the main values.
+				return [image.id, { value, confidence }];
+			})
+		)
+	);
+
+	/**
+	 * @param {string} imageFileId
+	 */
+	function hasCrop(imageFileId) {
+		return imagesOfImageFile(imageFileId).every(
+			(image) => uiState.cropMetadataId in image.metadata
 		);
 	}
 
 	/**
-	 * @param {import('$lib/database.js').Image|undefined} image
+	 * @param {string|undefined} imageFileId
 	 */
-	function hasConfirmedCrop(image) {
-		return image && hasCrop(image) && image.metadata[uiState.cropMetadataId].manuallyModified;
+	function hasConfirmedCrop(imageFileId) {
+		if (!imageFileId) return false;
+		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
 	}
 
-	async function revertToInferedCrop() {
+	/**
+	 * @param {DB.Image} image
+	 */
+	function imageHasConfirmedCrop(image) {
+		const metadataId = uiState.currentProtocol?.crop?.confirmationMetadata;
+		if (!metadataId) return false;
+		return metadataId in image.metadata && image.metadata[metadataId].value;
+	}
+
+	/**
+	 * @param {string} imageId
+	 * @param {boolean} confirmed
+	 */
+	async function changeCropConfirmedStatus(imageId, confirmed) {
+		const metadataId = uiState.cropConfirmationMetadataId;
+		if (!metadataId) return;
+
+		await storeMetadataValue({
+			metadataId,
+			subjectId: imageId,
+			type: 'boolean',
+			manuallyModified: true,
+			value: confirmed
+		});
+	}
+
+	/**
+	 * @param {boolean} confirmed
+	 */
+	async function changeAllConfirmedStatuses(confirmed) {
+		if (!uiState.cropConfirmationMetadataId) {
+			toasts.error(
+				'Ce protocole ne supported pas la validation des recadrages (voir crop.confirmationMetadata dans la définition du protocole)'
+			);
+			return;
+		}
+
+		for (const image of images) {
+			await changeCropConfirmedStatus(image.id, confirmed);
+		}
+	}
+
+	/**
+	 * @param {string} imageId
+	 */
+	async function revertToInferedCrop(imageId) {
+		const initialCrop = initialCrops[imageId];
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 		if (!initialCrop) {
 			toasts.error(
@@ -200,6 +277,7 @@
 			subjectId: imageId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
+			manuallyModified: false,
 			...initialCrop
 		});
 
@@ -209,20 +287,49 @@
 		});
 	}
 
-	const canRevertToInferedCrop = $derived(initialCrop !== undefined && hasConfirmedCrop(image));
+	async function revertAll() {
+		for (const { id } of images) {
+			await revertToInferedCrop(id);
+		}
+	}
+
+	const revertableCrops = $derived(
+		Object.fromEntries(
+			images.map((image) => [
+				image.id,
+				initialCrops[image.id] &&
+					!coordsAreEqual(
+						initialCrops[image.id].value,
+						image.metadata[uiState.cropMetadataId].value
+					)
+			])
+		)
+	);
 
 	/**
-	 * @param {import('$lib/BoundingBoxes.svelte').Rect} newBoundingBox
+	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
+	 * @param {Rect|undefined} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
+	 * @returns {Promise<string|null>} the ID of the image we just modified/created
 	 */
-	async function onConfirmCrop(newBoundingBox, flashConfirmedOverlay = true) {
-		const image = idb.tables.Image.state.find((image) => image.id === imageId);
-		if (!image) {
-			toasts.error(`Image ${imageId} introuvable, impossible de sauvegarder le recadrage`);
-			return;
+	async function onCropChange(imageId, newBoundingBox, flashConfirmedOverlay = true) {
+		if (!newBoundingBox) {
+			// No bounding box, just mark the image as confirmed and move on
+			if (imageId) {
+				await changeCropConfirmedStatus(imageId, true);
+			}
+
+			return imageId;
 		}
 
-		const willFlashConfirmedOverlay = flashConfirmedOverlay && !hasConfirmedCrop(image);
+		// Flash if
+		const willFlashConfirmedOverlay =
+			// the caller asked for it,
+			flashConfirmedOverlay &&
+			// we can actually mark crops as confirmed given the current protocol
+			Boolean(uiState.cropConfirmationMetadataId) &&
+			// and this is the last image before the file is considered confirmed
+			images.filter(imageHasConfirmedCrop).length === images.length - 1;
 
 		const willAutoskip =
 			// The user has auto-skip enabled
@@ -230,27 +337,69 @@
 			// We aren't deleting the bounding box
 			boundingBoxIsNonZero(newBoundingBox) &&
 			// in click-and-drag creation mode, auto-skip occurs only when the bounding box did not exist before (since the first creation of the box is much less likely to be the final one)
-			(activeTool.createMode !== 'clickanddrag' || !hasCrop(image));
+			(activeTool.createMode !== 'clickanddrag' || !hasCrop(fileId));
 
-		const species = image.metadata[uiState.classificationMetadataId];
+		const image = imageId ? images.find((img) => img.id === imageId) : undefined;
+		const species = image?.metadata[uiState.classificationMetadataId];
 		if (species && !species.manuallyModified) {
 			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 			await deleteMetadataValue({
 				metadataId: uiState.classificationMetadataId,
-				subjectId: imageId
+				subjectId: image.id
 			});
 		}
 
-		await storeMetadataValue({
-			metadataId: uiState.cropMetadataId,
-			subjectId: imageId,
-			type: 'boundingbox',
-			value: toCenteredCoords(newBoundingBox),
-			confidence: 1,
-			// Put the neural-network-inferred (initial) value in the alternatives as a backup
-			alternatives: initialCrop ? [initialCrop] : [],
-			manuallyModified: true
-		});
+		let newImageId = '';
+
+		if (imageId) {
+			// We're modifying an existing cropbox
+			await storeMetadataValue({
+				metadataId: uiState.cropMetadataId,
+				subjectId: imageId,
+				type: 'boundingbox',
+				value: toCenteredCoords(newBoundingBox),
+				confidence: 1,
+				// Put the neural-network-inferred (initial) value in the alternatives as a backup
+				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : undefined,
+				manuallyModified: true
+			});
+		} else if (images.length === 1 && firstImage && !firstImage.metadata[uiState.cropMetadataId]) {
+			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
+			newImageId = firstImage.id;
+			await storeMetadataValue({
+				metadataId: uiState.cropMetadataId,
+				subjectId: newImageId,
+				type: 'boundingbox',
+				value: toCenteredCoords(newBoundingBox),
+				confidence: 1,
+				manuallyModified: true,
+				alternatives: []
+			});
+		} else {
+			// We're creating a >1st cropbox
+			newImageId = makeImageId(
+				fileId,
+				Math.max(...images.map(({ id }) => parseImageId(id).subindex)) + 1
+			);
+			await idb.tables.Image.set({
+				id: newImageId,
+				filename: firstImage?.filename ?? '',
+				addedAt: formatISO(firstImage?.addedAt ?? new Date()),
+				contentType: firstImage?.contentType ?? '',
+				dimensions: $state.snapshot(firstImage?.dimensions) ?? { width: 0, height: 0 },
+				fileId,
+				metadata: {
+					[uiState.cropMetadataId]: {
+						value: JSON.stringify(toCenteredCoords(newBoundingBox)),
+						confidence: 1,
+						manuallyModified: true,
+						alternatives: {}
+					}
+				}
+			});
+		}
+
+		await changeAllConfirmedStatuses(true);
 
 		if (willFlashConfirmedOverlay) {
 			confirmedOverlayShown = true;
@@ -259,39 +408,68 @@
 		}
 
 		if (willAutoskip) {
-			await goto(nextImageId ? `#/crop/${nextImageId}` : `#/classify`);
+			await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`, {
+				invalidateAll: true
+			});
 		}
+
+		return newImageId;
 	}
 
 	async function moveToNextUnconfirmed() {
-		await onConfirmCrop(toTopLeftCoords(boundingBox));
+		const imagesAndBoxes = images.map((img) => /** @type {const}*/ ([img, boundingBoxes[img.id]]));
+
+		for (const [image, box] of imagesAndBoxes) {
+			await onCropChange(image.id, box ? toTopLeftCoords(box) : undefined);
+		}
+
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
 	}
 
+	/**
+	 * @param {CenteredBoundingBox} box
+	 * @returns {[number, number]} pixel dimensions of the box
+	 */
+	function roundedPixelDimensions(box) {
+		if (!firstImage) return [0, 0];
+		const scaler = coordsScaler({
+			x: firstImage.dimensions.width,
+			y: firstImage.dimensions.height
+		});
+
+		const { w, h } = mapValues(scaler(box), Math.round);
+		return [w, h];
+	}
+
 	function goToGallery() {
-		uiState.imagePreviouslyOpenedInCropper = imageId;
+		uiState.imagePreviouslyOpenedInCropper = fileId;
 		goto('#/crop');
 	}
 
 	$effect(() => {
-		uiState.imageOpenedInCropper = imageId;
+		uiState.imageOpenedInCropper = fileId;
 	});
+
+	/**
+	 * @type {string|null}
+	 */
+	let selectedBoundingBox = $state(null);
 
 	onMount(() => {
 		uiState.keybinds['ArrowLeft'] = {
 			help: 'Image précédente',
-			when: () => Boolean(previousImageId),
-			do: () => goto(`#/crop/${previousImageId}`)
+			when: () => Boolean(prevFileId),
+			do: () => goto(`#/crop/${prevFileId}`)
 		};
 		uiState.keybinds['Shift+Space'] = {
 			help: 'Image précédente',
-			when: () => Boolean(previousImageId),
-			do: () => goto(`#/crop/${previousImageId}`)
+			when: () => Boolean(prevFileId),
+			do: () => goto(`#/crop/${prevFileId}`)
 		};
 		uiState.keybinds['ArrowRight'] = {
 			help: 'Image suivante',
-			when: () => Boolean(nextImageId),
-			do: () => goto(`#/crop/${nextImageId}`)
+			when: () => Boolean(nextFileId),
+			do: () => goto(`#/crop/${nextFileId}`)
 		};
 		uiState.keybinds['Space'] = {
 			help: 'Continuer',
@@ -307,11 +485,68 @@
 				await toggleSetting('cropAutoNext');
 			}
 		};
+		uiState.keybinds['Delete'] = {
+			help: 'Supprimer la boîte sélectionnée',
+			when: () => Boolean(selectedBoundingBox),
+			async do() {
+				if (!selectedBoundingBox) return;
+				await deleteMetadataValue({
+					metadataId: uiState.cropMetadataId,
+					subjectId: selectedBoundingBox
+				});
+				selectedBoundingBox = null;
+			}
+		};
+		uiState.keybinds['f'] = {
+			help: 'Cacher les boîtes non sélectionnées',
+			when: () => Boolean(selectedBoundingBox),
+			do() {
+				if (!selectedBoundingBox) return;
+				focusedImageId = focusedImageId === selectedBoundingBox ? '' : selectedBoundingBox;
+			}
+		};
+		uiState.keybinds['u'] = {
+			help: "Revenir au recadrage d'origine",
+			when: () => Boolean(revertableCrops[fileId]),
+			do: () => {
+				if (!revertableCrops[fileId]) return;
+				revertToInferedCrop(fileId);
+			}
+		};
+		uiState.keybinds['$mod+u'] = {
+			help: "Revenir au recadrage d'origine pour toutes les boîtes",
+			when: () => Object.keys(boundingBoxes).length > 0,
+			do: revertAll
+		};
+		uiState.keybinds['ArrowUp'] = {
+			help: 'Marquer le recadrage comme confirmé',
+			when: () => !hasConfirmedCrop(fileId),
+			do: () => changeAllConfirmedStatuses(true)
+		};
+		uiState.keybinds['ArrowDown'] = {
+			help: 'Marquer le recadrage comme non confirmé',
+			when: () => hasConfirmedCrop(fileId),
+			do: () => changeAllConfirmedStatuses(false)
+		};
 		for (const tool of tools) {
 			uiState.keybinds[tool.shortcut] = {
-				help: `Outil ${tool.name}`,
+				help: `Choisir l'outil ${tool.name}`,
 				do: () => {
 					activeToolName = tool.name;
+				}
+			};
+		}
+		for (let i = 1; i <= 9; i++) {
+			uiState.keybinds[`Digit${i}`] = {
+				help: `Sélectionner la boîte #${i}`,
+				when: () => Object.keys(boundingBoxes).length >= i,
+				do() {
+					const imageId = Object.keys(boundingBoxes)[i - 1];
+					if (selectedBoundingBox === imageId) {
+						selectedBoundingBox = null;
+					} else {
+						selectedBoundingBox = imageId;
+					}
 				}
 			};
 		}
@@ -322,16 +557,26 @@
 		delete uiState.keybinds['ArrowRight'];
 		delete uiState.keybinds['Space'];
 		delete uiState.keybinds['Escape'];
-		delete uiState.keybinds['A'];
+		delete uiState.keybinds['a'];
+		delete uiState.keybinds['Delete'];
+		delete uiState.keybinds['f'];
+		delete uiState.keybinds['u'];
+		delete uiState.keybinds['$mod+u'];
+		delete uiState.keybinds['Shift+Space'];
+		delete uiState.keybinds['ArrowUp'];
+		delete uiState.keybinds['ArrowDown'];
 		for (const tool of tools) {
 			delete uiState.keybinds[tool.shortcut];
+		}
+		for (const i of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+			delete uiState.keybinds[`Digit${i}`];
 		}
 	});
 
 	let imageElement = $state();
 </script>
 
-<div class="confirmed-overlay" class:shown={confirmedOverlayShown}>
+<div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}>
 	<div class="icon">
 		<IconConfirmedCrop />
 	</div>
@@ -342,6 +587,7 @@
 	<aside class="toolbar">
 		{#each tools as tool (tool.name)}
 			<button
+				aria-label="Sélectionner l'outil {tool.name}"
 				class:active={tool.name === activeToolName}
 				use:tooltip={{
 					text: `${tool.name}: ${tool.help}`,
@@ -358,14 +604,16 @@
 	</aside>
 	<main class="crop-surface">
 		<img src={imageSrc} alt="" bind:this={imageElement} />
-		{#if boundingBox && imageElement}
+		{#if imageElement}
 			<DraggableBoundingBox
 				{...activeTool}
 				{imageElement}
-				boundingBox={toTopLeftCoords(boundingBox)}
-				onchange={(newBox) => {
-					onConfirmCrop(newBox);
-				}}
+				boundingBoxes={mapValues(
+					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
+					toTopLeftCoords
+				)}
+				onchange={(imageId, box) => onCropChange(imageId, box)}
+				oncreate={(box) => onCropChange(null, box)}
 			/>
 		{/if}
 	</main>
@@ -377,22 +625,14 @@
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
 			</nav>
-			<div class="filename-actions">
-				{#if image}
+			<section class="filename">
+				{#if firstImage}
 					<h1>
-						{image.filename}
-						{#if hasConfirmedCrop(image)}
+						{firstImage.filename}
+						{#if hasConfirmedCrop(fileId)}
 							<div class="status" use:tooltip={'Recadrage confirmé'}>
 								<IconConfirmedCrop />
 							</div>
-						{:else if hasCrop(image)}
-							<button
-								class="status"
-								use:tooltip={'Marquer le recadrage comme confirmé'}
-								onclick={() => onConfirmCrop(toTopLeftCoords(boundingBox), false)}
-							>
-								<IconUnconfirmedCrop />
-							</button>
 						{/if}
 					</h1>
 				{:else}
@@ -400,21 +640,132 @@
 						<code>Image introuvable</code>
 					</h1>
 				{/if}
-				<div class="actions">
-					<ButtonInk
-						disabled={!canRevertToInferedCrop}
-						onclick={revertToInferedCrop}
-						help="Revenir au recadrage de départ"
+			</section>
+			<section class="actions">
+				<ButtonSecondary
+					keyboard="$mod+U"
+					help="Revenir au recadrage d'origine pour toutes les boîtes"
+					onclick={revertAll}
+					disabled={!Object.values(revertableCrops).some(Boolean)}
+				>
+					<IconRevert />
+					Réinit.
+				</ButtonSecondary>
+				{#if uiState.cropConfirmationMetadataId}
+					<ButtonSecondary
+						keyboard="Arrow{hasConfirmedCrop(fileId) ? 'Down' : 'Up'}"
+						onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
+						help="Marquer le recadrage comme {hasConfirmedCrop(fileId)
+							? 'non confirmé'
+							: 'confirmé'}"
 					>
-						<IconReset /> Annuler
-					</ButtonInk>
-				</div>
-			</div>
+						{#if hasConfirmedCrop(fileId)}
+							<IconUnconfirmedCrop />
+							Invalider
+						{:else}
+							<IconConfirmedCrop />
+							Valider
+						{/if}
+					</ButtonSecondary>
+				{/if}
+			</section>
+		</section>
+		<section class="boxes">
+			<ul>
+				{#each images.filter(({ id }) => id in boundingBoxes) as image, i (image.id)}
+					{@const box = boundingBoxes[image.id]}
+					{@const initBox = initialCrops[image.id]}
+					{@const [w, h] = roundedPixelDimensions(box)}
+					{@const isFocused = focusedImageId === image.id}
+					<li
+						class:unfocused={focusedImageId && focusedImageId !== image.id}
+						class:selected={selectedBoundingBox === image.id}
+					>
+						<CroppedImg
+							box={toTopLeftCoords(box)}
+							src={uiState.getPreviewURL(image.fileId)}
+							class="thumb"
+						/>
+						<div class="text">
+							<p class="index">Boîte #{i + 1}</p>
+							<p class="dimensions">
+								<code use:tooltip={"Dimensions de l'image recadrée (en pixels)"}>{w}×{h}</code>
+								<!-- we have a neural-infered value only, put the confidence next to the value -->
+								{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
+									<sup>
+										<ConfidencePercentage value={initBox.confidence}>
+											<IconNeuralNet />
+										</ConfidencePercentage>
+									</sup>
+								{/if}
+							</p>
+						</div>
+						<div class="actions">
+							{#if Object.values(boundingBoxes).length > 1}
+								<ButtonIcon
+									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes"
+									keyboard="F"
+									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
+									crossout={isFocused}
+								>
+									<IconFocus />
+								</ButtonIcon>
+							{/if}
+							<ButtonIcon
+								help="Revenir au recadrage d'origine ({initBox
+									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${Math.round(initBox.confidence * 100)}% de confiance`
+									: 'indisponible'})"
+								keyboard="u"
+								disabled={!revertableCrops[image.id]}
+								onclick={() => revertToInferedCrop(image.id)}
+							>
+								<IconRevert />
+							</ButtonIcon>
+							<ButtonIcon
+								help="Supprimer cette boîte"
+								keyboard="Delete"
+								onclick={async () => {
+									if (images.length === 1) {
+										await deleteMetadataValue({
+											metadataId: uiState.cropMetadataId,
+											subjectId: image.id
+										});
+									} else {
+										await idb.tables.Image.remove(image.id);
+									}
+								}}
+							>
+								<IconDelete />
+							</ButtonIcon>
+						</div>
+					</li>
+				{/each}
+				<li class="boxes-list-hint">
+					<p>
+						Pour créer une nouvelle boîte,<wbr /> utilisez les outils <SentenceJoin
+							items={creationTools}
+							key={(t) => t.name}
+							final="ou"
+						>
+							{#snippet children({ icon: Icon, help, shortcut })}
+								<Tooltip text={help} keyboard={shortcut}>
+									<Icon />
+								</Tooltip>
+							{/snippet}
+						</SentenceJoin>
+					</p>
+					<p>
+						Sélectionnez une boîte avec
+						<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des raccourcis
+						clavier
+					</p>
+				</li>
+			</ul>
 		</section>
 		<section class="progress">
 			{#snippet percent(/** @type {number} */ value)}
 				<code>
-					{Math.round((value / sortedImageIds.length) * 100)}%
+					{Math.round((value / sortedFileIds.length) * 100)}%
 				</code>
 			{/snippet}
 
@@ -424,38 +775,40 @@
 					Images avec recadrage
 					{@render percent(croppedImagesCount)}
 				</p>
-				<ProgressBar alwaysActive progress={croppedImagesCount / sortedImageIds.length} />
+				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
 			</div>
-			<div class="bar">
-				<p>
-					<IconConfirmedCrop />
-					Recadrages confirmés
-					{@render percent(confirmedCropsCount)}
-				</p>
-				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedImageIds.length} />
-			</div>
+			{#if uiState.cropConfirmationMetadataId}
+				<div class="bar">
+					<p>
+						<IconConfirmedCrop />
+						Recadrages confirmés
+						{@render percent(confirmedCropsCount)}
+					</p>
+					<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
+				</div>
+			{/if}
 		</section>
 		<nav>
 			<div class="navigation">
 				<ButtonIcon
-					disabled={!previousImageId}
+					disabled={!prevFileId}
 					help="Image précédente"
 					keyboard="ArrowLeft"
 					onclick={() => {
-						goto(`#/crop/${previousImageId}`);
+						goto(`#/crop/${prevFileId}`);
 					}}
 				>
 					<IconPrev />
 				</ButtonIcon>
 				<code>
-					{sortedImageIds.indexOf(imageId) + 1}⁄{sortedImageIds.length}
+					{sortedFileIds.indexOf(fileId) + 1}⁄{sortedFileIds.length}
 				</code>
 				<ButtonIcon
-					disabled={!nextImageId}
+					disabled={!nextFileId}
 					help="Image suivante"
 					keyboard="ArrowRight"
 					onclick={() => {
-						goto(`#/crop/${nextImageId}`);
+						goto(`#/crop/${nextFileId}`);
 					}}
 				>
 					<IconNext />
@@ -517,8 +870,10 @@
 		pointer-events: none;
 	}
 
-	.confirmed-overlay:not(.shown) {
+	.confirmed-overlay[aria-hidden='true'] {
 		opacity: 0;
+		/* https://github.com/microsoft/playwright/issues/5129#issuecomment-772746396 */
+		visibility: hidden;
 	}
 
 	.confirmed-overlay .icon {
@@ -587,7 +942,7 @@
 	}
 
 	.info {
-		padding: 1em;
+		padding: 1em 1.5em;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
@@ -602,13 +957,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
-		margin-bottom: auto;
-	}
-
-	.info .filename-actions {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
 	}
 
 	.info h1 {
@@ -620,26 +968,71 @@
 
 	.info h1 .status {
 		display: flex;
-		font-size: 0.8em;
-		color: var(--fg-primary);
+		font-size: 0.7em;
+		color: var(--fg-success);
+	}
+
+	.info section.actions {
+		--width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+		width: 100%;
+		margin-top: 0.5em;
+	}
+
+	.boxes {
+		overflow-y: auto;
+		height: 100%;
+	}
+
+	.boxes ul {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+		list-style: none;
+		padding-left: 0;
+	}
+
+	.boxes li {
+		display: flex;
+		gap: 1em;
 		align-items: center;
 	}
 
-	.info button.status {
+	.boxes li:not(.boxes-list-hint) {
+		padding: 0.5em 1em;
+	}
+
+	.boxes li.unfocused {
 		opacity: 0.5;
-		outline: none;
-		border: none;
-		background: none;
-		padding: 0;
-		cursor: pointer;
 	}
 
-	.info button.status:is(:hover, :focus-visible) {
-		opacity: 1;
+	.boxes li.selected {
+		background: var(--bg-primary-translucent);
 	}
 
-	.info button.status:focus-visible {
-		border: 1px solid var(--fg-primary);
+	.boxes li.boxes-list-hint {
+		margin-top: 1em;
+		color: var(--gay);
+		flex-direction: column;
+	}
+
+	.boxes li.boxes-list-hint p,
+	.boxes li.boxes-list-hint p :global(.icon) {
+		vertical-align: middle;
+	}
+
+	.boxes li :global(.thumb) {
+		--size: 4rem;
+		width: var(--size);
+		height: var(--size);
+		border-radius: var(--corner-radius);
+		background: color-mix(in srgb, var(--gray) 35%, transparent);
+	}
+
+	.boxes li .actions {
+		margin-left: auto;
 	}
 
 	.info .progress {

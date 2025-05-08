@@ -1,6 +1,36 @@
 import { type } from 'arktype';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
+export const centeredBoundingBox = type({
+	x: 'number',
+	y: 'number',
+	w: 'number',
+	h: 'number'
+});
+
+export const topLeftBoundingBox = type({
+	x: 'number',
+	y: 'number',
+	width: 'number',
+	height: 'number'
+});
+
+export const rect = type({
+	x: 'number > 0',
+	y: 'number > 0',
+	width: 'number > 0',
+	height: 'number > 0'
+});
+
+export const anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
+
+/**
+ * @typedef {typeof anyBoundingBox.infer} AnyBoundingBox
+ * @typedef {typeof topLeftBoundingBox.infer} TopLeftBoundingBox
+ * @typedef {typeof centeredBoundingBox.infer} CenteredBoundingBox
+ * @typedef {typeof rect.infer} Rect
+ */
+
 /**
  *
  * @param {object} param0
@@ -10,9 +40,9 @@ import { TARGETHEIGHT, TARGETWIDTH } from './inference';
  */
 export function coordsScaler({ x: xwise, y: ywise }) {
 	/**
-	 * @template {{x: number; y: number} | ({x: number, y: number} & ({w: number; h: number} | {width: number; height: number}))} Shape
-	 * @param {Shape} param0
-	 * @returns {Shape}
+	 * @template {AnyBoundingBox} BoundingBox
+	 * @param {BoundingBox} param0
+	 * @returns {BoundingBox}
 	 */
 	return ({ x, y, ...wh }) => {
 		const [newx, newy] = [x * xwise, y * ywise];
@@ -172,13 +202,48 @@ if (import.meta.vitest) {
 	});
 }
 
-export const rect = type({
-	x: 'number > 0',
-	y: 'number > 0',
-	width: 'number > 0',
-	height: 'number > 0'
-});
+/**
+ *
+ * @param {AnyBoundingBox} a
+ * @param {AnyBoundingBox} b
+ */
+export function coordsDifference(a, b) {
+	let combinedDifference = 0;
+
+	combinedDifference += Math.abs(a.x - b.x);
+	combinedDifference += Math.abs(a.y - b.y);
+	combinedDifference += Math.abs(('width' in a ? a.width : a.w) - ('width' in b ? b.width : b.w));
+	combinedDifference += Math.abs(
+		('height' in a ? a.height : a.h) - ('height' in b ? b.height : b.h)
+	);
+
+	return combinedDifference;
+}
 
 /**
- * @typedef {typeof rect.infer} Rect
+ *
+ * @param {AnyBoundingBox} a
+ * @param {AnyBoundingBox} b
+ * @param {number} tolerance
  */
+export function coordsAreEqual(a, b, tolerance = 0) {
+	return coordsDifference(a, b) <= tolerance;
+}
+
+/**
+ * Return the 4 corners of a bounding box as (x, y) tuples
+ * @param {AnyBoundingBox} boundingBox
+ * @returns {{ topleft: [number, number], topright: [number, number], bottomleft: [number, number], bottomright: [number, number] }}
+ */
+export function toCorners(boundingBox) {
+	if (!('width' in boundingBox) || !('height' in boundingBox)) {
+		return toCorners(toTopLeftCoords(boundingBox));
+	}
+
+	return {
+		topleft: [boundingBox.x, boundingBox.y],
+		topright: [boundingBox.x + boundingBox.width, boundingBox.y],
+		bottomleft: [boundingBox.x, boundingBox.y + boundingBox.height],
+		bottomright: [boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height]
+	};
+}

@@ -1,7 +1,8 @@
 import { ArkErrors } from 'arktype';
-import { describe, expect, test } from 'vitest';
-import { FilepathTemplate, Schemas } from './database';
 import { formatISO } from 'date-fns';
+import { describe, expect, test } from 'vitest';
+import { Schemas } from './database';
+import { FilepathTemplate } from './schemas/protocols';
 
 describe('filepath templates', () => {
 	/**
