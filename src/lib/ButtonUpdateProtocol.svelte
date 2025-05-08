@@ -40,7 +40,7 @@
 		{:then { upToDate, newVersion }}
 			{#if upToDate}
 				<Btn
-					help="Cliquer pour vérifier à nouveau"
+					help="Le protocole est à sa dernière version (v{newVersion}). Cliquer pour vérifier à nouveau"
 					onclick={() => {
 						checkagain = Date.now();
 					}}
