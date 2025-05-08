@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/188</span>
+                <span class='fraction'>0/193</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/188</span>
+                <span class='fraction'>0/193</span>
             </div>
         
             
@@ -287,7 +287,12 @@
 <a name='L222'></a><a href='#L222'>222</a>
 <a name='L223'></a><a href='#L223'>223</a>
 <a name='L224'></a><a href='#L224'>224</a>
-<a name='L225'></a><a href='#L225'>225</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -443,12 +448,17 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -657,23 +667,28 @@
 <span class="cstat-no" title="statement not covered" >			path: Buffer.from(odp.data),</span>
 <span class="cstat-no" title="statement not covered" >			trim: true,</span>
 <span class="cstat-no" title="statement not covered" >			openFilters: {</span>
-<span class="cstat-no" title="statement not covered" >				'draw:page': ({ attributes, name }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >					return {</span>
-<span class="cstat-no" title="statement not covered" >						xml: name,</span>
-<span class="cstat-no" title="statement not covered" >						html: 'section',</span>
-<span class="cstat-no" title="statement not covered" >						attrs: [{ name: 'data-page', value: attributes['draw:name'] }]</span>
-<span class="cstat-no" title="statement not covered" >					};</span>
-<span class="cstat-no" title="statement not covered" >				}</span>
+<span class="cstat-no" title="statement not covered" >				'draw:page': ({ attributes, name }) =&gt; ({</span>
+<span class="cstat-no" title="statement not covered" >					xml: name,</span>
+<span class="cstat-no" title="statement not covered" >					html: 'section',</span>
+<span class="cstat-no" title="statement not covered" >					attrs: [{ name: 'data-page', value: attributes['draw:name'] }]</span>
+<span class="cstat-no" title="statement not covered" >				}),</span>
+<span class="cstat-no" title="statement not covered" >				'text:s': ({ name }) =&gt; ({</span>
+<span class="cstat-no" title="statement not covered" >					xml: name,</span>
+<span class="cstat-no" title="statement not covered" >					html: 'span',</span>
+<span class="cstat-no" title="statement not covered" >					attrs: [{ name: 'data-is-whitespace', value: 'true' }]</span>
+<span class="cstat-no" title="statement not covered" >				})</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		})</span>
-<span class="cstat-no" title="statement not covered" >		.then((html) =&gt; new JSDOM(html).window.document);</span>
+<span class="cstat-no" title="statement not covered" >		.then((html) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >			const doc = new JSDOM(html).window.document;</span>
+<span class="cstat-no" title="statement not covered" >			// Recover whitespace from text:s tags</span>
+<span class="cstat-no" title="statement not covered" >			doc.querySelectorAll('span[data-is-whitespace]').forEach((node) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >				node.innerHTML += ' ';</span>
+<span class="cstat-no" title="statement not covered" >			});</span>
+<span class="cstat-no" title="statement not covered" >			return doc;</span>
+<span class="cstat-no" title="statement not covered" >		});</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	const description = htmlToMarkdown(</span>
-<span class="cstat-no" title="statement not covered" >		html</span>
-<span class="cstat-no" title="statement not covered" >			.querySelector('section[data-page="page2"]')</span>
-<span class="cstat-no" title="statement not covered" >			// Add a space after strong / em tags so that the output markdown does'nt have e.g. "some _link _as well as", which does not render to "some &lt;em&gt;link&lt;/em&gt; as well as", but instead "some _link _as well as"</span>
-<span class="cstat-no" title="statement not covered" >			.innerHTML.replaceAll(/&lt;\/(strong|em|b|i)&gt;([^,;])/g, '&lt;/$1&gt; $2')</span>
-<span class="cstat-no" title="statement not covered" >	);</span>
+<span class="cstat-no" title="statement not covered" >	const description = htmlToMarkdown(html.querySelector('section[data-page="page2"]'));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const links = Object.fromEntries(</span>
 <span class="cstat-no" title="statement not covered" >		[...html.querySelectorAll('section[data-page="page2"] a')]</span>
@@ -742,7 +757,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-08T09:31:03.847Z
+                at 2025-05-08T10:05:27.641Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
