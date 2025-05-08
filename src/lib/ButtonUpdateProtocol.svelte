@@ -7,6 +7,7 @@
 	import IconCheckAgain from '~icons/ph/arrows-counter-clockwise';
 	import IconUpToDate from '~icons/ph/check-circle';
 	import IconCannotCheckForUpdates from '~icons/ph/warning-circle';
+	import ButtonIcon from './ButtonIcon.svelte';
 
 	/**
 	 * @typedef {object} Props
@@ -23,22 +24,22 @@
 	 * Change value to force re-rendering of the component, and thus re-evaluate the upgrade availability
 	 */
 	let checkagain = $state(0);
+
+	const Btn = $derived(compact ? ButtonIcon : ButtonSecondary);
 </script>
 
 {#if version && source}
 	{#key checkagain}
 		{#await hasUpgradeAvailable({ id, version, source })}
-			<ButtonSecondary disabled onclick={() => {}}>
+			<Btn help="Recherche de mise à jour…" disabled onclick={() => {}}>
 				<IconCheckAgain />
 				{#if !compact}
 					Mettre à jour
-				{:else}
-					v…
 				{/if}
-			</ButtonSecondary>
+			</Btn>
 		{:then { upToDate, newVersion }}
 			{#if upToDate}
-				<ButtonSecondary
+				<Btn
 					help="Cliquer pour vérifier à nouveau"
 					onclick={() => {
 						checkagain = Date.now();
@@ -50,12 +51,14 @@
 							À jour
 						{/if}
 					</span>
-					<span>
-						v{version}
-					</span>
-				</ButtonSecondary>
+					{#if !compact}
+						<span>
+							v{version}
+						</span>
+					{/if}
+				</Btn>
 			{:else}
-				<ButtonSecondary
+				<Btn
 					onclick={async () => {
 						await upgradeProtocol({ version, source, id })
 							.then(({ version }) => {
@@ -67,18 +70,18 @@
 					}}
 					help={`Une mise à jour vers la v${newVersion} est disponible`}
 				>
-					<IconUpgrade />
 					<span class="version-check update-available">
+						<IconUpgrade />
 						{#if !compact}
 							v{version}
 							<IconArrow />
+							v{newVersion}
 						{/if}
-						v{newVersion}
 					</span>
-				</ButtonSecondary>
+				</Btn>
 			{/if}
 		{:catch e}
-			<ButtonSecondary
+			<Btn
 				onclick={() => {
 					checkagain = Date.now();
 				}}
@@ -88,33 +91,32 @@
 					<IconCannotCheckForUpdates />
 					{#if !compact}
 						Rééssayer
-					{:else}
-						v?
 					{/if}
 				</span>
-			</ButtonSecondary>
+			</Btn>
 		{/await}
 	{/key}
 {:else if version}
-	<ButtonSecondary
-		onclick={() => {}}
-		help="Ce protocole ne supporte pas la vérification des mises à jour"
-	>
+	<Btn onclick={() => {}} help="Ce protocole ne supporte pas la vérification des mises à jour">
 		<span class="version-check">
 			<IconCannotCheckForUpdates />
-			v{version}
+			{#if !compact}
+				v{version}
+			{/if}
 		</span>
-	</ButtonSecondary>
+	</Btn>
 {:else}
-	<ButtonSecondary
+	<Btn
 		onclick={() => {}}
 		help="Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
 	>
 		<span class="version-check error">
-			<IconCannotCheckForUpdates />
-			v--
+			{#if !compact}
+				<IconCannotCheckForUpdates />
+				Non versionné
+			{/if}
 		</span>
-	</ButtonSecondary>
+	</Btn>
 {/if}
 
 <style>
