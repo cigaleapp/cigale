@@ -2,7 +2,6 @@ import * as tf from '@tensorflow/tfjs';
 import { match } from 'arktype';
 import * as Jimp from 'jimp';
 import * as ort from 'onnxruntime-web';
-import { test } from 'vitest';
 
 /**
  * @typedef {import('onnxruntime-web')} ort
@@ -211,6 +210,7 @@ export function dedupeBoundingBoxes(boundingboxes, numfiles) {
 }
 
 if (import.meta.vitest) {
+	const { test } = import.meta.vitest;
 	test.todo('dedupeBoundingBoxes');
 }
 
