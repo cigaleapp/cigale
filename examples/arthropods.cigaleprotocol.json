@@ -1,7 +1,7 @@
 {
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
-	"name": "Transect d'arthropodes",
+	"name": "Protocole example",
 	"learnMore": "https://github.com/cigaleapp/cigale/tree/59fefc2315097fb9fdf93f682118cf21eb8c1418/scripts/README.md#protocoles-arthropodsexample",
 	"version": 1,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
