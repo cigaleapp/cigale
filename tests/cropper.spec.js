@@ -385,8 +385,7 @@ function confirmedCropBadge(page) {
 async function isImageConfirmedInDatabase(page, id) {
 	const image = await getImage({ page }, id);
 	return (
-		image?.metadata?.['io.github.cigaleapp.arthropods.transects__crop_is_confirmed']?.value ===
-		'true'
+		image?.metadata?.['io.github.cigaleapp.arthropods.example__crop_is_confirmed']?.value === 'true'
 	);
 }
 
@@ -400,7 +399,7 @@ async function isImageConfirmedInDatabase(page, id) {
 async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 	for (const id of ids) {
 		await setImageMetadata({ page }, id, {
-			'io.github.cigaleapp.arthropods.transects__crop_is_confirmed': {
+			'io.github.cigaleapp.arthropods.example__crop_is_confirmed': {
 				value: confirmed,
 				manuallyModified: true,
 				confidence: 1,

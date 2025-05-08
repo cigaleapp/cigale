@@ -82,8 +82,14 @@ export const Protocol = type({
 	metadata: References,
 	name: ['string', '@', 'Nom du protocole'],
 	description: ['string', '@', 'Description du protocole'],
-	source: URLString.describe(
+	'learnMore?': URLString.describe(
 		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
+	),
+	'version?': ['number', '@', 'Version actuelle du protocole'],
+	'source?': HTTPRequest.describe(
+		`Requête ou URL devant mener à un fichier JSON contenant la version la plus récente du protocole. Permet de proposer des mises à jour.
+		
+		Si le champ "version" n'existe pas (que ce soit dans le protocole local ou distant), aucune mise à jour ne sera proposée.`
 	),
 	authors: type({
 		email: ['string.email', '@', 'Adresse email'],

@@ -1,12 +1,12 @@
 import { execa } from 'execa';
 import { JSDOM } from 'jsdom';
 import { marked } from 'marked';
+import { writeFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import Turndown from 'turndown';
-import getCurrentLine from 'get-current-line';
 import { default as taxonomy } from '../static/taxonomy.json' with { type: 'json' };
-import { writeFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 
 // ANSI control sequences
 const cc = {
@@ -51,7 +51,7 @@ const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:
 console.log({ here });
 
 /** @param {string} id */
-const namespaced = (id) => `io.github.cigaleapp.arthropods.transects__${id}`;
+const namespaced = (id) => `io.github.cigaleapp.arthropods.example__${id}`;
 
 /** @param {string} clade  */
 const cladeEnumOption = (clade) => ({
@@ -81,9 +81,15 @@ const cladeMetadata = (clade, label, parent) => ({
  */
 const protocol = {
 	$schema: 'https://cigaleapp.github.io/cigale/protocol.schema.json',
-	id: 'io.github.cigaleapp.arthropods.transects',
+	id: 'io.github.cigaleapp.arthropods.example',
 	name: "Transect d'arthropodes",
-	source: `https://github.com/cigaleapp/cigale/tree/${await execa`git rev-parse HEAD`.then((result) => result.stdout)}/scripts/jessica-joachim-crawler.js#L${getCurrentLine().line}`,
+	learnMore: `https://github.com/cigaleapp/cigale/tree/${await execa`git rev-parse HEAD`.then((result) => result.stdout)}/scripts/README.md#protocoles-arthropodsexample`,
+	version: await readFile(path.join(here, '../examples/arthropods.cigaleprotocol.version'), 'utf-8')
+		.then((v) => JSON.parse(v))
+		.then((v) => v.version + 1)
+		.catch(() => 1),
+	source:
+		'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
 	description:
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',
 	authors: [
