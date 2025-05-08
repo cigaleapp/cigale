@@ -34,7 +34,7 @@ const ADD_TO_PROTOCOLS = [
 ];
 
 const GOOGLE_DRIVE_FOLDER_URL = folderIdFromUrl(
-	'https://drive.google.com/drive/folders/1MY8H4RUb955JPv5OZHRSjh52G2X66A_z?usp=sharing'
+	'https://drive.google.com/drive/folders/1AVd6T4QT4Jsb5S_5YTdQiForjXMd-yM3'
 );
 
 /**
