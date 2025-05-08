@@ -2,7 +2,7 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.transects",
 	"name": "Transect d'arthropodes",
-	"source": "https://github.com/cigaleapp/cigale/tree/04baf7b7a13245b49352957601be8ac596fb8500/scripts/jessica-joachim-crawler.js#L86",
+	"source": "https://github.com/cigaleapp/cigale/tree/8414ec78c286490318debb67c62b62944d8bb346/scripts/jessica-joachim-crawler.js#L86",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
 		{
@@ -1065,9 +1065,61 @@
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20platani.jpeg"
 				},
 				{
-					"label": "Pyrrhidium sanguineum",
+					"label": "Byturus tomentosus",
 					"key": "79",
-					"image": "https://cigaleapp.github.io/cigale/examples\\arthropods.cigaleprotocol.images\\Pyrrhidium sanguineum.png",
+					"image": "https://cigaleapp.github.io/cigale/examples/arthropods.cigaleprotocol.images/Byturus tomentosus.png",
+					"description": "Nom vernaculaire : Ver des framboises\n\nEspèce(s) semblable(s) : _[Byturus ochraceus](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/)_ dont les yeux sont plus gros ([comparer](https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957)). **Attention** ce critère est parfois difficile à apprécier.\n\nA corriger sur le comparatif : B.aestivus = B.ochraceus\n\nInformation(s) utile(s): Presque uniquement sur fleurs de Rosaceae\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=byturus%20tomentosus)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/222189) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Gilles Carcassès](https://www.galerie-insecte.org/galerie/ref-321918.htm) ; [Fred Chevaillot](https://www.galerie-insecte.org/galerie/ref-255957.htm)",
+					"links": {
+						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/": "Byturus ochraceus",
+						"https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957": "comparer",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=byturus%20tomentosus": "Galerie LMDI ",
+						"https://inpn.mnhn.fr/espece/cd_nom/222189": "INPN",
+						"https://www.insecte.org/forum/index.php": "LMDI",
+						"https://www.galerie-insecte.org/galerie/ref-321918.htm": "Gilles Carcassès",
+						"https://www.galerie-insecte.org/galerie/ref-255957.htm": "Fred Chevaillot"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/222189"
+				},
+				{
+					"label": "Melolontha hippocastani",
+					"key": "80",
+					"image": "https://cigaleapp.github.io/cigale/examples/arthropods.cigaleprotocol.images/Melolontha hippocastani.png",
+					"description": "Nom vernaculaire : Grand hanneton forestier\n\nEspèce(s) semblable(s) : [Melolontha melol](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/)[ontha](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/) (pointe du pygidium plus longue et plus large) ; [Melolontha pectoralis](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis) (pointe du pygidium encore plus courte, seulement présent dans le Nord-Est de la France)\n\nInformation(s) utile(s): Espèce généralement plus forestière que _Melolontha melolontha_. [Comparatif](https://www.galerie-insecte.org/galerie/view.php?ref=8434) des pygidium de _M.melolontha_ et _M.hippocastani_\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/10879) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Florentin Madrolles](https://www.galerie-insecte.org/galerie/ref-64168.htm) ; [Piezo](https://www.galerie-insecte.org/galerie/fiche.php?ref=8434)",
+					"links": {
+						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/": "ontha",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis": "Melolontha pectoralis",
+						"https://www.galerie-insecte.org/galerie/view.php?ref=8434": "Comparatif",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani": "Galerie LMDI",
+						"https://inpn.mnhn.fr/espece/cd_nom/10879": "INPN",
+						"https://www.insecte.org/forum/index.php": "LMDI",
+						"https://www.galerie-insecte.org/galerie/ref-64168.htm": "Florentin Madrolles",
+						"https://www.galerie-insecte.org/galerie/fiche.php?ref=8434": "Piezo"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/10879"
+				},
+				{
+					"label": "Meloe violaceus",
+					"key": "81",
+					"image": "https://cigaleapp.github.io/cigale/examples/arthropods.cigaleprotocol.images/Meloe violaceus.png",
+					"description": "Nom vernaculaire : Meloe enfle-boeufs violet\n\nEspèce(s) semblable(s) : _[Meloe proscarabe](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)__[us](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)_ ; _[Meloe autumnalis](https://www.galerie-insecte.org/galerie/wikige.php?tax=meloe%20autumnalis)_ (apparaît uniquement à automne)\n\nInformation(s) utile(s): Cette espèce est présente uniquement au printemps\n\n[Fiche comparative](https://ressources.shna-ofab.fr/shna-ofab/fichiers__pdf_/3-ressources/3-aides_a_la_determination/note_didentification_e-obs_meloe_printanier_ou_meloe_violace_2021.pdf) des _Meloe_ printaniers\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Meloe_violaceus.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12113) ; [SHNA-OFAB](https://www.shna-ofab.fr/) ; [LMDI](https://www.insecte.org/forum/index.php) ;\n\nCrédit photo : [Renko Usami](https://www.galerie-insecte.org/galerie/ref-159239.htm) ; [Phil](https://www.galerie-insecte.org/galerie/ref-83831.htm) ; [Damien GRILLIERE](https://www.galerie-insecte.org/galerie/ref-321060.htm)",
+					"links": {
+						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/": "us",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=meloe%20autumnalis": "Meloe autumnalis",
+						"https://ressources.shna-ofab.fr/shna-ofab/fichiers__pdf_/3-ressources/3-aides_a_la_determination/note_didentification_e-obs_meloe_printanier_ou_meloe_violace_2021.pdf": "Fiche comparative",
+						"https://www.galerie-insecte.org/galerie/Meloe_violaceus.html": "Galerie LMDI",
+						"https://inpn.mnhn.fr/espece/cd_nom/12113": "INPN",
+						"https://www.shna-ofab.fr/": "SHNA-OFAB",
+						"https://www.insecte.org/forum/index.php": "LMDI",
+						"https://www.galerie-insecte.org/galerie/ref-159239.htm": "Renko Usami",
+						"https://www.galerie-insecte.org/galerie/ref-83831.htm": "Phil",
+						"https://www.galerie-insecte.org/galerie/ref-321060.htm": "Damien GRILLIERE"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/12113"
+				},
+				{
+					"label": "Pyrrhidium sanguineum",
+					"key": "82",
+					"image": "https://cigaleapp.github.io/cigale/examples/arthropods.cigaleprotocol.images/Pyrrhidium sanguineum.png",
 					"description": "Nom vernaculaire : Cardinal imposteur\n\nEspèce(s) semblable(s) : Aucune chez les Cerambycidae, mais attention aux _[Pyrochroa](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/)_ dont les antennes sont dentées.\n\nInformation(s) utile(s): Très précoce (dès février), souvent dans le bois de chauffage\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12357) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Yves Dubois](https://www.galerie-insecte.org/galerie/ref-159923.htm) ; [Pierre Gros](https://www.galerie-insecte.org/galerie/ref-199258.htm)",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/": "Pyrochroa",
