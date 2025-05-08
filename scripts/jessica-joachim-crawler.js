@@ -1,5 +1,6 @@
 import { execa } from 'execa';
 import { JSDOM } from 'jsdom';
+import { type } from 'arktype';
 import { marked } from 'marked';
 import { writeFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -50,6 +51,18 @@ const classmapping = await fetch('https://cigaleapp.github.io/models/class_mappi
 const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:/');
 console.log({ here });
 
+const oldProtocol = await readFile(
+	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
+	'utf-8'
+)
+	.then((v) => JSON.parse(v))
+	.then((v) => type({ version: 'number' }).assert(v))
+	.catch((e) => {
+		console.error('Could not load current protocol declaration:', e);
+		console.error('Version will be set to 1');
+		return undefined;
+	});
+
 /** @param {string} id */
 const namespaced = (id) => `io.github.cigaleapp.arthropods.example__${id}`;
 
@@ -84,10 +97,7 @@ const protocol = {
 	id: 'io.github.cigaleapp.arthropods.example',
 	name: 'Example: arthropodes',
 	learnMore: `https://github.com/cigaleapp/cigale/tree/${await execa`git rev-parse HEAD`.then((result) => result.stdout)}/scripts/README.md#protocoles-arthropodsexample`,
-	version: await readFile(path.join(here, '../examples/arthropods.cigaleprotocol.version'), 'utf-8')
-		.then((v) => JSON.parse(v))
-		.then((v) => v.version + 1)
-		.catch(() => 1),
+	version: (oldProtocol?.version ?? 0) + 1,
 	source:
 		'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
 	description:
@@ -206,6 +216,12 @@ const protocol = {
 		}
 	}
 };
+
+console.log(
+	'===============================================================\n' +
+		`${cc.bold}Generating cigale protocol ${protocol.id} ${cc.blue}v${protocol.version}${cc.reset}\n` +
+		'==============================================================='
+);
 
 const total = Object.keys(classmapping).length;
 let done = 0;
