@@ -368,7 +368,7 @@ async function parseAndAddToProtocol(pageContent, url, name, classmappingIndex) 
 			learnMore: url,
 			...(imagepath
 				? {
-						image: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${encodeURIComponent(name)}.jpeg`
+						image: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${encodeURIComponent(name)}.jpeg?v=${protocol.version}`
 					}
 				: {})
 		})

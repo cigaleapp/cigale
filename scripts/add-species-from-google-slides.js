@@ -182,7 +182,15 @@ for (const { name, id } of response.data.files) {
 		const options = protocol.metadata[`${protocol.id}__species`].options;
 
 		const imagePath = path.join(filepath.replace('.json', '.images'), `${name}.png`);
-		const imageUrl = `https://raw.githubusercontent.com/cigaleapp/cigale/main/${path.relative(path.dirname(path.dirname(filepath)).replaceAll('\\', '/'), imagePath)}`;
+
+		const imageUrl = new URL(
+			'https://raw.githubusercontent.com/cigaleapp/cigale/main/' +
+				path.relative(path.join(filepath, '../..'), imagePath).replaceAll('\\', '/')
+		);
+
+		if (protocol.version) {
+			imageUrl.searchParams.set('v', protocol.version);
+		}
 
 		log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
 		image.write(imagePath);
