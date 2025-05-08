@@ -29,6 +29,10 @@
                   "type": "number",
                   "description": "Confiance dans la valeur de la métadonnée, entre 0 et 1"
                 },
+                "manuallyModified": {
+                  "type": "boolean",
+                  "description": "La valeur de la métadonnée a été modifiée manuellement"
+                },
                 "value": {
                   "description": "Valeur de la métadonnée"
                 },
@@ -40,6 +44,7 @@
               "required": [
                 "alternatives",
                 "confidence",
+                "manuallyModified",
                 "value"
               ]
             }
@@ -53,7 +58,7 @@
     },
     "protocol": {
       "type": "object",
-      "table": "$ark.object858",
+      "table": "$ark.object868",
       "description": "Le protocole utilisé pour cette session d'analyse",
       "properties": {
         "authors": {
@@ -281,6 +286,11 @@
             "metadata": {
               "type": "string",
               "description": "Métadonnée associée à la boîte englobante",
+              "pattern": "[\\w_]+"
+            },
+            "confirmationMetadata": {
+              "type": "string",
+              "description": "Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée",
               "pattern": "[\\w_]+"
             }
           },
