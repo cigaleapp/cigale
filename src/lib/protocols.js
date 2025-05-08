@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
+import { cachebust } from './utils.js';
 
 /**
  *
@@ -218,7 +219,7 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 	if (typeof source !== 'string')
 		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
-	const response = await fetch(source, {
+	const response = await fetch(cachebust(source), {
 		headers: {
 			Accept: 'application/json'
 		}
@@ -265,11 +266,14 @@ if (import.meta.vitest) {
 				id: 'mon-protocole'
 			});
 
-			expect(fetch).toHaveBeenCalledWith('https://example.com/protocol.json', {
-				headers: {
-					Accept: 'application/json'
+			expect(fetch).toHaveBeenCalledWith(
+				expect.stringContaining('https://example.com/protocol.json?v='),
+				{
+					headers: {
+						Accept: 'application/json'
+					}
 				}
-			});
+			);
 			expect(result).toEqual({ upToDate: false, newVersion: 2 });
 		});
 
@@ -289,11 +293,14 @@ if (import.meta.vitest) {
 				id: 'mon-protocole'
 			});
 
-			expect(fetch).toHaveBeenCalledWith('https://example.com/protocol.json', {
-				headers: {
-					Accept: 'application/json'
+			expect(fetch).toHaveBeenCalledWith(
+				expect.stringContaining('https://example.com/protocol.json?v='),
+				{
+					headers: {
+						Accept: 'application/json'
+					}
 				}
-			});
+			);
 			expect(result).toEqual({ upToDate: true, newVersion: 1 });
 		});
 
@@ -307,7 +314,7 @@ if (import.meta.vitest) {
 
 			vi.stubGlobal('fetch', fetch);
 
-			expect(
+			await expect(
 				hasUpgradeAvailable({
 					version: 1,
 					source: 'https://example.com/protocol.json',
@@ -325,7 +332,7 @@ if (import.meta.vitest) {
 
 			vi.stubGlobal('fetch', fetch);
 
-			expect(
+			await expect(
 				hasUpgradeAvailable({
 					version: 1,
 					source: 'https://example.com/protocol.json',
@@ -335,7 +342,7 @@ if (import.meta.vitest) {
 		});
 
 		test('should throw an error if the protocol has no source', async () => {
-			expect(
+			await expect(
 				// @ts-expect-error
 				hasUpgradeAvailable({
 					version: 1,
@@ -346,7 +353,7 @@ if (import.meta.vitest) {
 		});
 
 		test('should throw an error if the local protocol has no version', async () => {
-			expect(
+			await expect(
 				// @ts-expect-error
 				hasUpgradeAvailable({
 					version: undefined,
@@ -357,7 +364,7 @@ if (import.meta.vitest) {
 		});
 
 		test('should throw an error if the protocol has no ID', async () => {
-			expect(
+			await expect(
 				// @ts-expect-error
 				hasUpgradeAvailable({
 					version: 1,
@@ -379,7 +386,7 @@ export async function upgradeProtocol({ version, source, id }) {
 	if (typeof source !== 'string')
 		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
-	const response = await fetch(source, {
+	const response = await fetch(cachebust(source), {
 		headers: {
 			Accept: 'application/json'
 		}
