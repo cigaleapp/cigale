@@ -57,7 +57,6 @@
 		"merge-drivers": "^1.0.3",
 		"odt2html": "^1.0.1",
 		"pdf-to-png-converter": "^3.6.5",
-		"pdfjs-dist": "^5.2.133",
 		"prettier": "^3.5.3",
 		"prettier-plugin-svelte": "^3.3.3",
 		"svelte": "^5.28.2",
