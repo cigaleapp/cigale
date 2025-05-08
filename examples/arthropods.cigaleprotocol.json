@@ -1063,6 +1063,21 @@
 					"description": "Willowsia platani a un pattern sombre rayé de pâle. Sa tête est pâle avec un bandeau noir entre les yeux. Le segment 2 du thorax est clair, le segment 3 sombre. Le segment abdominal 1 est clair, le 2 et le 3 sont plus ou moins sombre, il possède une bande claire à la base et à l’apex du 4. Il a une tache noire à l’apex du fémur 3.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/willowsia-platani/",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20platani.jpeg"
+				},
+				{
+					"label": "Pyrrhidium sanguineum",
+					"key": "79",
+					"image": "https://cigaleapp.github.io/cigale/examples\\arthropods.cigaleprotocol.images\\Pyrrhidium sanguineum.png",
+					"description": "Nom vernaculaire : Cardinal imposteur\n\nEspèce(s) semblable(s) : Aucune chez les Cerambycidae, mais attention aux _[Pyrochroa](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/)_ dont les antennes sont dentées.\n\nInformation(s) utile(s): Très précoce (dès février), souvent dans le bois de chauffage\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12357) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Yves Dubois](https://www.galerie-insecte.org/galerie/ref-159923.htm) ; [Pierre Gros](https://www.galerie-insecte.org/galerie/ref-199258.htm)",
+					"links": {
+						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/": "Pyrochroa",
+						"https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html": "Galerie LMDI ",
+						"https://inpn.mnhn.fr/espece/cd_nom/12357": "INPN",
+						"https://www.insecte.org/forum/index.php": "LMDI",
+						"https://www.galerie-insecte.org/galerie/ref-159923.htm": "Yves Dubois",
+						"https://www.galerie-insecte.org/galerie/ref-199258.htm": "Pierre Gros"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/12357"
 				}
 			],
 			"taxonomic": {

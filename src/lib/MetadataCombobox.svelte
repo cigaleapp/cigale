@@ -1,9 +1,11 @@
 <script>
 	import { Combobox, mergeProps } from 'bits-ui';
+	import { marked } from 'marked';
 	import IconArrowRight from '~icons/ph/arrow-right';
 	import IconCheck from '~icons/ph/check';
 	import Logo from './Logo.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
+	import { getSettings } from './settings.svelte';
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 */
@@ -131,9 +133,15 @@
 					{/if}
 					{#if highlightedOption?.description}
 						<section class="description">
-							{#each highlightedOption.description.split(/\r?\n/) as line, i (i)}
-								<p>{line}</p>
-							{/each}
+							{#await marked(highlightedOption.description) then html}
+								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+								{@html html}
+							{:catch error}
+								{#if getSettings().showTechnicalMetadata}
+									<p class="error">Markdown invalide: {error}</p>
+								{/if}
+								{highlightedOption.description}
+							{/await}
 						</section>
 					{/if}
 					{#if highlightedOption?.learnMore}
