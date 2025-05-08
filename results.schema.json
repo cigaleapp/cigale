@@ -230,11 +230,6 @@
           "type": "string",
           "description": "Nom du protocole"
         },
-        "source": {
-          "type": "string",
-          "description": "Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier",
-          "pattern": "https?:\\/\\/.+"
-        },
         "crop": {
           "type": "object",
           "description": "Configuration de la partie recadrage",
@@ -470,6 +465,11 @@
             "metadata"
           ]
         },
+        "learnMore": {
+          "type": "string",
+          "description": "Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier",
+          "pattern": "https?:\\/\\/.+"
+        },
         "metadataOrder": {
           "type": "array",
           "description": "L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici",
@@ -477,6 +477,62 @@
             "type": "string",
             "pattern": "[\\w_]+"
           }
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "Requête ou URL devant mener à un fichier JSON contenant la version la plus récente du protocole. Permet de proposer des mises à jour.\n\t\t\n\t\tSi le champ \"version\" n'existe pas (que ce soit dans le protocole local ou distant), aucune mise à jour ne sera proposée.",
+              "pattern": "https?:\\/\\/.+"
+            },
+            {
+              "type": "object",
+              "description": "Requête ou URL devant mener à un fichier JSON contenant la version la plus récente du protocole. Permet de proposer des mises à jour.\n\t\t\n\t\tSi le champ \"version\" n'existe pas (que ce soit dans le protocole local ou distant), aucune mise à jour ne sera proposée.",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "L'URL de la requête",
+                  "pattern": "https?:\\/\\/.+"
+                },
+                "headers": {
+                  "type": "object",
+                  "description": "Les en-têtes à ajouter dans la requête",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "method": {
+                  "anyOf": [
+                    {
+                      "const": "DELETE",
+                      "description": "La méthode de la requête (GET par défaut)"
+                    },
+                    {
+                      "const": "GET",
+                      "description": "La méthode de la requête (GET par défaut)"
+                    },
+                    {
+                      "const": "POST",
+                      "description": "La méthode de la requête (GET par défaut)"
+                    },
+                    {
+                      "const": "PUT",
+                      "description": "La méthode de la requête (GET par défaut)"
+                    }
+                  ],
+                  "description": "La méthode de la requête (GET par défaut)"
+                }
+              },
+              "required": [
+                "url"
+              ]
+            }
+          ],
+          "description": "Requête ou URL devant mener à un fichier JSON contenant la version la plus récente du protocole. Permet de proposer des mises à jour.\n\t\t\n\t\tSi le champ \"version\" n'existe pas (que ce soit dans le protocole local ou distant), aucune mise à jour ne sera proposée."
+        },
+        "version": {
+          "type": "number",
+          "description": "Version actuelle du protocole"
         }
       },
       "required": [
@@ -484,8 +540,7 @@
         "description",
         "id",
         "metadata",
-        "name",
-        "source"
+        "name"
       ]
     }
   },
