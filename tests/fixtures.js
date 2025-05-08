@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 import { rm, mkdir } from 'node:fs/promises';
+import exampleProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 
 /**
  * @import { Fixtures, TestType, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
@@ -17,6 +18,10 @@ export const test = base.extend(
 			async ({ page }, use) => {
 				await rm('./tests/results', { recursive: true, force: true });
 				await mkdir('./tests/results');
+				await page.route(
+					'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
+					async (route) => route.fulfill({ json: exampleProtocol })
+				);
 				await page.goto('/');
 				await page.waitForFunction(() => Boolean(window.DB && window.refreshDB));
 				await use();
