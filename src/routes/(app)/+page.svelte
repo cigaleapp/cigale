@@ -122,7 +122,7 @@
 
 	li.has-version-check {
 		display: grid;
-		grid-template-columns: max-content 1fr;
+		grid-template-columns: 1fr min-content;
 	}
 
 	/* li.has-version-check :global(button:first-child) {
