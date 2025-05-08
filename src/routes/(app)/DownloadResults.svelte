@@ -60,7 +60,11 @@
 		options={[
 			{ key: 'metadataonly', label: 'Métadonnées seulement' },
 			{ key: 'croppedonly', label: 'Métadonnées et images recadrées' },
-			{ key: 'full', label: 'Métadonnées, images recadrées et images originales' }
+			{
+				key: 'full',
+				label: 'Métadonnées, images recadrées et images originales',
+				subtext: 'Permet de ré-importer les résultats ultérieurement'
+			}
 		]}
 	>
 		Quoi inclure dans l'export

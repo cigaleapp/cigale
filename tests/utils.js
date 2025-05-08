@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
 /**
@@ -76,6 +77,20 @@ export async function getImage({ page }, id) {
 
 /**
  *
+ * @param {Page} page
+ * @param {string} tableName
+ */
+export async function listTable(page, tableName) {
+	const table = await page.evaluate(async ([tableName]) => {
+		const table = await window.DB.getAll(tableName);
+		if (!table) throw new Error(`Table ${tableName} not found in the database`);
+		return table;
+	}, /** @type {const} */ ([tableName]));
+	return table;
+}
+
+/**
+ *
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} id
@@ -97,6 +112,87 @@ export async function setImageMetadata({ page }, id, metadata) {
 				)
 			}
 		});
+		console.log('Image updated, refreshing DB', { id, metadata });
 		await window.refreshDB();
 	}, /** @type {const} */ ([id, metadata]));
+}
+
+/**
+ *
+ * @param {Page} page
+ */
+export async function chooseDefaultProtocol(page) {
+	// Choose default protocol
+	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
+	await page.getByTestId('protocol-to-choose').click();
+	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
+ * @template {*} Leaf
+ * @typedef {Array<Leaf | { [dir: string]: ArrayTree<Leaf> }>} ArrayTree
+ */
+
+/**
+ *
+ * @param {string} root
+ * @returns {ArrayTree<string>}
+ */
+export function readdirTreeSync(root) {
+	const result = [];
+	const files = readdirSync(root, { withFileTypes: true });
+	for (const file of files) {
+		if (file.isDirectory()) {
+			result.push({
+				[file.name]: readdirTreeSync(path.join(root, file.name))
+			});
+		} else {
+			result.push(file.name);
+		}
+	}
+
+	return result.sort((a, b) => {
+		// Sort folders before files
+		if (typeof a === 'object' && typeof b === 'string') return -1;
+		if (typeof a === 'string' && typeof b === 'object') return 1;
+		if (typeof a === 'string' && typeof b === 'string') return a.localeCompare(b);
+		return Object.keys(a)[0].localeCompare(Object.keys(b)[0]);
+	});
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string|RegExp} message
+ * @param {object} options
+ * @param {boolean} [options.exact]
+ * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
+ */
+export function toast(page, message, { exact = false, type = undefined }) {
+	const area = page.getByTestId('toasts-area');
+
+	if (type) {
+		return area.locator(`[data-type='${type}']`).getByText(message, { exact });
+	}
+
+	return area.getByText(message, { exact });
+}
+
+/**
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filepath to the zip file, relative to tests/fixtures/exports
+ * @param {object} [options]
+ * @param {boolean} [options.waitForLoading] wait for loading to finish
+ */
+export async function importResults(page, filepath, { waitForLoading = true } = {}) {
+	await setSettings({ page }, { showTechnicalMetadata: false });
+	await chooseDefaultProtocol(page);
+	// Import fixture zip
+	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
+	const fileInput = await page.$("input[type='file']");
+	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
+	if (waitForLoading) {
+		await expect(page.getByText('Analyse…').first()).toBeVisible();
+		await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
+	}
 }

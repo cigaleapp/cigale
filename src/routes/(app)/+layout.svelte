@@ -65,7 +65,7 @@
 
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
 
-<section class="toasts">
+<section class="toasts" data-testid="toasts-area">
 	{#each toasts.items as toast (toast.id)}
 		<Toast
 			{...toast}
