@@ -27,6 +27,20 @@ jobs:
       - name: Run crawler
         run: npx node scripts/jessica-joachim-crawler.js
 
+      - name: Set google-drive-key.json
+        uses: mobiledevops/secret-to-file-action@v1
+        with:
+          base64-encoded-secret: ${{ secrets.GOOGLE_DRIVE_KEY_BASE64 }}
+          filename: google-drive-key.json
+          is-executable: false
+          working-directory: ./
+
+      - name: Add species from Google Slides folder
+        run: npx node scripts/add-species-from-google-slides.js
+
+      - name: Unset google-drive-key.json
+        run: rm google-drive-key.json
+
       - name: Store scripts/jessica-joachim-crawler-report.md
         id: get-report
         run: |
