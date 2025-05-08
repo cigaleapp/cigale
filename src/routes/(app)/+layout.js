@@ -30,7 +30,10 @@ async function fillBuiltinData() {
 		});
 	});
 
-	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.transect');
+	// TODO: remove this at some point
+	await tables.Protocol.remove('io.github.cigaleapp.arthropods.transects');
+
+	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.example');
 
 	if (!builtinProtocol) {
 		try {
