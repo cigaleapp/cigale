@@ -11,6 +11,7 @@
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 
 	seo({ title: 'Choisir un protocole' });
 
@@ -44,7 +45,8 @@
 			/>
 		</li>
 		{#each protocols as p, i (p.id)}
-			<li>
+			{@const showVersionCheck = p.version && p.source}
+			<li class:has-version-check={showVersionCheck}>
 				<button
 					data-testid={i === 0 ? 'protocol-to-choose' : undefined}
 					class:selected={p.id === currentProtocol?.id}
@@ -55,6 +57,9 @@
 				>
 					{p.name}
 				</button>
+				{#if showVersionCheck}
+					<ButtonUpdateProtocol compact {...p} />
+				{/if}
 			</li>
 		{/each}
 	</ul>
@@ -112,14 +117,32 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+		width: 100%;
 	}
 
-	button {
+	li.has-version-check {
+		display: grid;
+		grid-template-columns: max-content 1fr;
+	}
+
+	/* li.has-version-check :global(button:first-child) {
+		width: 75%;
+	}
+
+	li.has-version-check :global(button:last-child) {
+		width: 25%;
+		height: 100%;
+	} */
+
+	li:not(.has-version-check) button {
+		width: 100%;
+	}
+
+	li button {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 1rem;
-		width: 100%;
 		border: 1px solid var(--gray);
 		border-radius: var(--corner-radius);
 		font-size: 1em;

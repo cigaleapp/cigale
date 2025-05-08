@@ -1,8 +1,10 @@
 {
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
-	"id": "io.github.cigaleapp.arthropods.transects",
-	"name": "Transect d'arthropodes",
-	"source": "https://github.com/cigaleapp/cigale/tree/d0e18a061bdc260f1f80cd9aeee4dbefb9ecb5ff/scripts/jessica-joachim-crawler.js#L86",
+	"id": "io.github.cigaleapp.arthropods.example",
+	"name": "Protocole example",
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/59fefc2315097fb9fdf93f682118cf21eb8c1418/scripts/README.md#protocoles-arthropodsexample",
+	"version": 1,
+	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
 		{
@@ -11,20 +13,20 @@
 		}
 	],
 	"metadataOrder": [
-		"io.github.cigaleapp.arthropods.transects__species",
-		"io.github.cigaleapp.arthropods.transects__genus",
-		"io.github.cigaleapp.arthropods.transects__family",
-		"io.github.cigaleapp.arthropods.transects__order",
-		"io.github.cigaleapp.arthropods.transects__shoot_date",
-		"io.github.cigaleapp.arthropods.transects__shoot_location",
-		"io.github.cigaleapp.arthropods.transects__class",
-		"io.github.cigaleapp.arthropods.transects__phylum",
-		"io.github.cigaleapp.arthropods.transects__kingdom",
-		"io.github.cigaleapp.arthropods.transects__crop",
-		"io.github.cigaleapp.arthropods.transects__crop_is_confirmed"
+		"io.github.cigaleapp.arthropods.example__species",
+		"io.github.cigaleapp.arthropods.example__genus",
+		"io.github.cigaleapp.arthropods.example__family",
+		"io.github.cigaleapp.arthropods.example__order",
+		"io.github.cigaleapp.arthropods.example__shoot_date",
+		"io.github.cigaleapp.arthropods.example__shoot_location",
+		"io.github.cigaleapp.arthropods.example__class",
+		"io.github.cigaleapp.arthropods.example__phylum",
+		"io.github.cigaleapp.arthropods.example__kingdom",
+		"io.github.cigaleapp.arthropods.example__crop",
+		"io.github.cigaleapp.arthropods.example__crop_is_confirmed"
 	],
 	"metadata": {
-		"io.github.cigaleapp.arthropods.transects__kingdom": {
+		"io.github.cigaleapp.arthropods.example__kingdom": {
 			"type": "enum",
 			"options": [
 				{
@@ -43,7 +45,7 @@
 				"parent": {}
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__phylum": {
+		"io.github.cigaleapp.arthropods.example__phylum": {
 			"type": "enum",
 			"options": [
 				{
@@ -64,7 +66,7 @@
 				}
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__class": {
+		"io.github.cigaleapp.arthropods.example__class": {
 			"type": "enum",
 			"options": [
 				{
@@ -85,7 +87,7 @@
 				}
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__order": {
+		"io.github.cigaleapp.arthropods.example__order": {
 			"type": "enum",
 			"options": [
 				{
@@ -127,7 +129,7 @@
 				}
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__family": {
+		"io.github.cigaleapp.arthropods.example__family": {
 			"type": "enum",
 			"options": [
 				{
@@ -253,7 +255,7 @@
 				}
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__genus": {
+		"io.github.cigaleapp.arthropods.example__genus": {
 			"type": "enum",
 			"options": [
 				{
@@ -519,7 +521,7 @@
 				}
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__shoot_date": {
+		"io.github.cigaleapp.arthropods.example__shoot_date": {
 			"type": "date",
 			"label": "Date",
 			"description": "Moment où la photo a été prise",
@@ -529,7 +531,7 @@
 				"exif": "DateTimeOriginal"
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__shoot_location": {
+		"io.github.cigaleapp.arthropods.example__shoot_location": {
 			"type": "location",
 			"label": "Localisation",
 			"description": "Endroit où la photo a été prise",
@@ -544,21 +546,21 @@
 				}
 			}
 		},
-		"io.github.cigaleapp.arthropods.transects__crop": {
+		"io.github.cigaleapp.arthropods.example__crop": {
 			"type": "boundingbox",
 			"label": "",
 			"description": "",
 			"required": true,
 			"mergeMethod": "average"
 		},
-		"io.github.cigaleapp.arthropods.transects__crop_is_confirmed": {
+		"io.github.cigaleapp.arthropods.example__crop_is_confirmed": {
 			"type": "boolean",
 			"label": "",
 			"description": "",
 			"required": false,
 			"mergeMethod": "max"
 		},
-		"io.github.cigaleapp.arthropods.transects__species": {
+		"io.github.cigaleapp.arthropods.example__species": {
 			"type": "enum",
 			"label": "Espèce",
 			"description": "",
@@ -1219,7 +1221,7 @@
 			"infer": {
 				"neural": {
 					"model": "https://cigaleapp.github.io/models/model_classif.onnx",
-					"metadata": "io.github.cigaleapp.arthropods.transects__species",
+					"metadata": "io.github.cigaleapp.arthropods.example__species",
 					"input": {
 						"height": 224,
 						"width": 224,
@@ -1231,8 +1233,8 @@
 		}
 	},
 	"crop": {
-		"metadata": "io.github.cigaleapp.arthropods.transects__crop",
-		"confirmationMetadata": "io.github.cigaleapp.arthropods.transects__crop_is_confirmed",
+		"metadata": "io.github.cigaleapp.arthropods.example__crop",
+		"confirmationMetadata": "io.github.cigaleapp.arthropods.example__crop_is_confirmed",
 		"infer": {
 			"model": "https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx",
 			"input": {
