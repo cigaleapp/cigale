@@ -19,7 +19,8 @@
 				"/playwright/",
 				"lint-staged",
 				"/gitmoji/",
-				"fake-indexeddb"
+				"fake-indexeddb",
+				"globals"
 			],
 			"automerge": true
 		}
