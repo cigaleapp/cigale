@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "table": "$ark.object858",
+  "table": "$ark.object868",
   "properties": {
     "authors": {
       "type": "array",
@@ -41,7 +41,7 @@
         "anyOf": [
           {
             "type": "object",
-            "table": "$ark.object797",
+            "table": "$ark.object866",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -703,7 +703,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object797",
+            "table": "$ark.object866",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -1427,7 +1427,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object797",
+            "table": "$ark.object866",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -2839,6 +2839,11 @@
         "metadata": {
           "type": "string",
           "description": "Métadonnée associée à la boîte englobante",
+          "pattern": "[\\w_]+"
+        },
+        "confirmationMetadata": {
+          "type": "string",
+          "description": "Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée",
           "pattern": "[\\w_]+"
         }
       },
