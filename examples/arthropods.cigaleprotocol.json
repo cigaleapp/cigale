@@ -1,9 +1,9 @@
 {
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
-	"name": "Protocole example",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/59fefc2315097fb9fdf93f682118cf21eb8c1418/scripts/README.md#protocoles-arthropodsexample",
-	"version": 1,
+	"name": "Example: arthropodes",
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/97f529f93bd5e622099c01d466d60535d9bc2655/scripts/README.md#protocoles-arthropodsexample",
+	"version": 2,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -572,7 +572,7 @@
 					"label": "Allacma fusca",
 					"description": "Allacma fusca est de couleur brun foncé avec des marques brun plus clair sur l’abdomen. L’abdomen possède de grandes soies sur toute sa surface. Le 4ème article antennaire est plus long que le 3ème, ce dernier possédant de longues soies.La variante",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/sminthuridae/allacma-fusca/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Allacma%20fusca.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Allacma%20fusca.jpeg?v=2"
 				},
 				{
 					"key": "1",
@@ -584,7 +584,7 @@
 					"label": "Bilobella aurantiaca",
 					"description": "Bilobella aurantiaca est de couleur jaune citron, d’aspect boudiné avec de petites excroissances rondes sur les segments. Le 6ème segment abdominal est bilobé, le bout des antennes est blanc et les deux ocelles orangés.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neanuridae/bilobella-aurantiaca/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bilobella%20aurantiaca.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bilobella%20aurantiaca.jpeg?v=2"
 				},
 				{
 					"key": "3",
@@ -596,49 +596,49 @@
 					"label": "Bourletiella arvalis",
 					"description": "Bourletiella arvalis est un collembole au corps rond et de couleur jaune vif. Les poils de l’abdomen sont assez courts.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/bourletiella-arvalis/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bourletiella%20arvalis.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bourletiella%20arvalis.jpeg?v=2"
 				},
 				{
 					"key": "5",
 					"label": "Bourletiella hortensis",
 					"description": "Bourletiella hortensis peut être de couleur jaune à orangé plus ou moins maculé de pâle (forme albomaculata), brunâtre plus ou moins foncé à violacé. Il possède une longue soie sur abd 5, les soies de l’abdomen sont assez courtes et denses.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/bourletiella-hortensis/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bourletiella%20hortensis.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bourletiella%20hortensis.jpeg?v=2"
 				},
 				{
 					"key": "6",
 					"label": "Brachystomella parvula",
 					"description": "Brachystomella parvula est un collembole au corps ovale, légèrement élargi en arrière. Il est de couleur violacée à rose. Ses antennes sont courtes. Il possède 8 ocelles. Il n’a pas d’épines anales.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/brachystomellidae/brachystomella-parvula/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Brachystomella%20parvula.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Brachystomella%20parvula.jpeg?v=2"
 				},
 				{
 					"key": "7",
 					"label": "Caprainea marginata",
 					"description": "Caprainea marginata a un corps globuleux avec de longues soies droites et épaisses sur tout l’abdomen. Le 4ème segment antennaire est long. Elle peut-être de différentes couleurs selon les formes.\r\n•",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/sminthuridae/caprainea-marginata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Caprainea%20marginata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Caprainea%20marginata.jpeg?v=2"
 				},
 				{
 					"key": "8",
 					"label": "Ceratophysella denticulata",
 					"description": "• corps allongé\r\n• courtes antennes\r\n• coloration variable, rose, gris bleu ou violet plus ou moins foncé\r\n• 8 ocelles\r\n• corps recouvert de soies de deux types (« microsetae » et « macrosetae »)\r\n• 2 épines anales longues et recourbées (sauf chez l’espèce C. bengtssoni)\nPour identifier les espèces, il faut regarder les soies sur le corps du collembole. Pour cela, il faut une bonne vue dorsale de l’animal.Les soies à examiner dans un premiers temps sont celle de la rangée apicale du 4ème segment abdominal. On peut diviser le genre en deux groupes : le groupe denticulata, chez qui p1<p2. Le « p » signifie « postérieure », en référence à la rangée de soie concernée (généralement, il y a une rangée antérieure, une rangée médiane puis une rangée postérieure par segment). Le chiffre correspond au numéro de la soie, comptée à partir d’une ligne imaginaire coupant le segment abdominal en son milieu. Donc p1 est la soie de la rangée postérieure la plus proche du centre du segment. Chez le **groupe _armata_**, p1>p2. Une fois que l’on a le groupe, il reste d’autres critères à observer (comme par exemple la présence et le nombre d’autres soies), mais je n’ai pas trouvé de clé précise, et ne sait pas à quel groupe appartiennent toutes les espèces notées de France. Et puis cela reste des critères très difficiles à utiliser pour une identification photo.A noter qu’il y a une espèce dans ce genre qui se distingue des autres par ses épines anales courtes : Ceratophysella bengtssoni.Sur collembola.org, Ceratophysella succinea est de coloration jaune à jaunâtre, ce qui semble rare dans ce genre.Ceratophysella granulata se reconnaitrait grâce à la granulation des derniers segments abdominaux : granulation grossière sur abd 6, sur abd 5 granulation grossière sauf une bande de granulation plus fine à la base du segment, 3 zones de granulation grossière sur abd4 (voir ici). Cependant, Ceratophysella denticulata a visiblement une granulation similaire. Ce dernier fait partie du groupe denticulata (p1<p2) alors que _Ceratophysella granulata_ fait partie du groupe _armata_ (p1>p2).\nIl s’agit d’un des genres les plus fournis en espèces de la famille des Hypogastruridae, avec au moins 130 espèces dans le monde\nListe des espèces présentes en France d’après la Catalogue des collemboles de France\n\r\n• Ceratophysella armata\r\n• Ceratophysella bengtssoni : la seule espèce du genre à avoir des épines anales courtes\r\n• Ceratophysella cavicola (espèce cavernicole)\r\n• Ceratophysella cylindrica (trouvé uniquement dans les Hautes-Pyrénées)\r\n• Ceratophysella denticulata\r\n• Ceratophysella engadinensis\r\n• Ceratophysella falcifer (noté uniquement du pic de Néouvielle, Hautes-Pyrénées)\r\n• Ceratophysella gibbosa (noté de Paris uniquement)\r\n• Ceratophysella granulata\r\n• Ceratophysella longispina\r\n• Ceratophysella luteospina\r\n• Ceratophysella norensis\r\n• Ceratophysella penicillifer\r\n• Ceratophysella recta (noté des Hautes-Pyrénées uniquement)\r\n• Ceratophysella sigillata\r\n• Ceratophysella succinea (noté uniquement du Morbihan) : a une coloration jaune/jaunâtre\r\n• Ceratophysella tergilobata (trouvé en Corse)\r\n• Ceratophysella tuberculata",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/hypogastruridae/ceratophysella-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Ceratophysella%20denticulata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Ceratophysella%20denticulata.jpeg?v=2"
 				},
 				{
 					"key": "9",
 					"label": "Ceratophysella longispina",
 					"description": "• corps allongé\r\n• courtes antennes\r\n• coloration variable, rose, gris bleu ou violet plus ou moins foncé\r\n• 8 ocelles\r\n• corps recouvert de soies de deux types (« microsetae » et « macrosetae »)\r\n• 2 épines anales longues et recourbées (sauf chez l’espèce C. bengtssoni)\nPour identifier les espèces, il faut regarder les soies sur le corps du collembole. Pour cela, il faut une bonne vue dorsale de l’animal.Les soies à examiner dans un premiers temps sont celle de la rangée apicale du 4ème segment abdominal. On peut diviser le genre en deux groupes : le groupe denticulata, chez qui p1<p2. Le « p » signifie « postérieure », en référence à la rangée de soie concernée (généralement, il y a une rangée antérieure, une rangée médiane puis une rangée postérieure par segment). Le chiffre correspond au numéro de la soie, comptée à partir d’une ligne imaginaire coupant le segment abdominal en son milieu. Donc p1 est la soie de la rangée postérieure la plus proche du centre du segment. Chez le **groupe _armata_**, p1>p2. Une fois que l’on a le groupe, il reste d’autres critères à observer (comme par exemple la présence et le nombre d’autres soies), mais je n’ai pas trouvé de clé précise, et ne sait pas à quel groupe appartiennent toutes les espèces notées de France. Et puis cela reste des critères très difficiles à utiliser pour une identification photo.A noter qu’il y a une espèce dans ce genre qui se distingue des autres par ses épines anales courtes : Ceratophysella bengtssoni.Sur collembola.org, Ceratophysella succinea est de coloration jaune à jaunâtre, ce qui semble rare dans ce genre.Ceratophysella granulata se reconnaitrait grâce à la granulation des derniers segments abdominaux : granulation grossière sur abd 6, sur abd 5 granulation grossière sauf une bande de granulation plus fine à la base du segment, 3 zones de granulation grossière sur abd4 (voir ici). Cependant, Ceratophysella denticulata a visiblement une granulation similaire. Ce dernier fait partie du groupe denticulata (p1<p2) alors que _Ceratophysella granulata_ fait partie du groupe _armata_ (p1>p2).\nIl s’agit d’un des genres les plus fournis en espèces de la famille des Hypogastruridae, avec au moins 130 espèces dans le monde\nListe des espèces présentes en France d’après la Catalogue des collemboles de France\n\r\n• Ceratophysella armata\r\n• Ceratophysella bengtssoni : la seule espèce du genre à avoir des épines anales courtes\r\n• Ceratophysella cavicola (espèce cavernicole)\r\n• Ceratophysella cylindrica (trouvé uniquement dans les Hautes-Pyrénées)\r\n• Ceratophysella denticulata\r\n• Ceratophysella engadinensis\r\n• Ceratophysella falcifer (noté uniquement du pic de Néouvielle, Hautes-Pyrénées)\r\n• Ceratophysella gibbosa (noté de Paris uniquement)\r\n• Ceratophysella granulata\r\n• Ceratophysella longispina\r\n• Ceratophysella luteospina\r\n• Ceratophysella norensis\r\n• Ceratophysella penicillifer\r\n• Ceratophysella recta (noté des Hautes-Pyrénées uniquement)\r\n• Ceratophysella sigillata\r\n• Ceratophysella succinea (noté uniquement du Morbihan) : a une coloration jaune/jaunâtre\r\n• Ceratophysella tergilobata (trouvé en Corse)\r\n• Ceratophysella tuberculata",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/hypogastruridae/ceratophysella-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Ceratophysella%20longispina.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Ceratophysella%20longispina.jpeg?v=2"
 				},
 				{
 					"key": "10",
 					"label": "Cyphoderus albinus",
 					"description": "Ce genre comprend de petits collemboles blanchâtres ne possédant pas d’yeux. Leur corps est court et ovale, très peu poilu, les antennes assez courtes avec le 3ème article en forme de goutte. L’espèce la plus courante est C.albinus.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/cyphoderus-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Cyphoderus%20albinus.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Cyphoderus%20albinus.jpeg?v=2"
 				},
 				{
 					"key": "11",
@@ -650,56 +650,56 @@
 					"label": "Deuterosminthurus pallipes",
 					"description": "Deuterosminthurus pallipes est un collembole au corps assez allongé et qui a plusieurs formes de couleur. Une",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/deuterosminthurus-pallipes/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Deuterosminthurus%20pallipes.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Deuterosminthurus%20pallipes.jpeg?v=2"
 				},
 				{
 					"key": "13",
 					"label": "Dicyrtoma fusca",
 					"description": "Dicyrtoma fusca est un collembole au corps globuleux avec de longues soies à l’arrière de l’abdomen. Le 4ème segment antennaire est très court. Sa tête est assez grande, avec de grosses joues. Les griffes ne possèdent pas de tunique.\nIl existe plusieurs formes :\r\n• D. fusca forme signata possède des teintes jaunes sur les flancs et le dessus du corps, combinées à une ligne dorsale et des dessins plus sombre (souvent violacés) d’étendue variable. Les yeux sont noirs. C’est peut être une écomorphose d’hiver.\r\n• D. fusca var. rufescens est de couleur assez uniforme, mauve, orangée ou rougeâtre. Les yeux sont jaunes à ocelles noirs. Les segments antennaires 3 et 4 sont souvent plus sombres que les 1 et 2.\r\n• D. fusca var.2 a le segment antennaire 4 et l’apex du 3 blancs, la pointe des pattes blanche et une ligne dorsale pâle. La couleur du corps est souvent brun sombre. Les yeux sont noirs.\r\n• Une autre forme existe, avec un nom étrange : Papirius fusco. Cette forme est de coloration assez uniforme, souvent violacée, avec la ligne dorsale peu visible. Les yeux sont noirs. Il s’agit peut-être en réalité de la forme nominale.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/dicyrtomidae/dicyrtoma-fusca/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtoma%20fusca.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtoma%20fusca.jpeg?v=2"
 				},
 				{
 					"key": "14",
 					"label": "Dicyrtomina flavosignata",
 					"description": "Dicyrtomina flavosignata est de couleur jaune orangé. Elle possède des lignes pouvant être en pointillé sur les côtés de l’abdomen, ainsi que deux petites taches sombres en arrière de ces lignes. L’arrière de l’abdomen ne porte pas de tache sombre.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/dicyrtomidae/dicyrtomina-flavosignata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20flavosignata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20flavosignata.jpeg?v=2"
 				},
 				{
 					"key": "15",
 					"label": "Dicyrtomina minuta",
 					"description": "Dicyrtomina minuta est de couleur jaune plus ou moins vif, avec quelques marques rougeâtres et jaune plus lumineux sur les flancs. Le dos est dépourvu de marques. L’arrière de l’abdomen présente une tache rectangulaire ornée de deux séries de petits points pâles. Parfois, les points sont plus gros et la tache plus étroite, ce qui donne une impression de petite barre d’antenne.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/dicyrtomidae/dicyrtomina-minuta/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20minuta.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20minuta.jpeg?v=2"
 				},
 				{
 					"key": "16",
 					"label": "Dicyrtomina ornata",
 					"description": "• corps globuleux à longues soies à l’arrière\r\n• ligne dorsale claire\r\n• coloration variable, jaune, rougeâtre, mauve\r\n• nombreuses taches irrégulières sur le corps, y compris à proximité immédiate de la ligne dorsale\r\n• antennes de coloration uniforme\r\n• 4ème segment antennaire très court\r\n• plus de 2 soies alignées verticalement sur la face\r\n• bande sombre sur la face, entre les yeux\r\n• yeux composés de 8 ocelles\r\n• tache de forme variable à l’arrière de l’abdomen (elle peut être rectangulaire, plus ou moins étroite, assez allongée, avec ou sans lignes horizontales ; si ces lignes sont présentes, elles sont de même longueur)",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/dicyrtomidae/dicyrtomina-ornata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20ornata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20ornata.jpeg?v=2"
 				},
 				{
 					"key": "17",
 					"label": "Dicyrtomina saundersi",
 					"description": "Dicyrtomina saundersi possède une ligne dorsale en forme de croix à bande transversale épaisse, un dessin en forme d’antenne (alignement de barres) sur le derrière, les articles antennaires 1 et 2 sont un peu plus clairs que les articles 3 et 4 (souvent le deuxième est encore plus clair à l’apex). Il possède de longs poils à l’arrière de l’abdomen, plus de 2 soies alignées en hauteur sur la face, le 4ème article antennaire est bien plus petit que le 3ème.La forme meridionalis a les antennes de couleur uniforme et la tache en antenne possède de grandes barres régulières. De part et d’autre du haut de cette tache, se retrouve souvent deux dessins en forme de L clair inversé.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/dicyrtomidae/dicyrtomina-saundersi/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20saundersi.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20saundersi.jpeg?v=2"
 				},
 				{
 					"key": "18",
 					"label": "Dicyrtomina signata",
 					"description": "Dicyrtomina signata est de couleur générale jaune, avec des marques oranges sur les côtés du corps et parfois aussi sur le dos. La tache à l’arrière de l’abdomen est un spot rond, situé en bas.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/dicyrtomidae/dicyrtomina-signata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20signata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Dicyrtomina%20signata.jpeg?v=2"
 				},
 				{
 					"key": "19",
 					"label": "Entomobrya albocincta",
 					"description": "Entomobrya albocincta a une coloration typique qui permet de la reconnaitre au premier coup d’œil, chose rare chez les collemboles. Son corps est sombre, avec une bande claire thoracique, la première moitié du 4ème segment abdominal claire et l’apex de l’abdomen clair. Les antennes sont plus claires à la base.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-albocincta/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20albocincta.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20albocincta.jpeg?v=2"
 				},
 				{
 					"key": "20",
@@ -716,35 +716,35 @@
 					"label": "Entomobrya marginata",
 					"description": "• corps de couleur verdâtre\r\n• apex des segments thoraciques et abdominaux à bande sombre\r\n• 4ème segment abdominal allongé\r\n• bande sombre entre les antennes",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-marginata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20marginata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20marginata.jpeg?v=2"
 				},
 				{
 					"key": "23",
 					"label": "Entomobrya multifasciata",
 					"description": "Entomobrya multifasciata a un corps allongé de couleur jaunâtre. Il est rayé, les segments thoraciques et le premier segment abdominal (abd1) ont une bande sombre à l’apex. Abd2 et abd3 ont aussi une bande sombre à l’apex, avec en plus deux triangles sur les côtés remontant vers l’avant. Abd4 possède deux taches latérales sombres et deux triangles sombres remontant vers l’avant, le tout pouvant être relié, et également une bande antémédiane en zigzag, pouvant être reliée aux deux taches triangulaires du même segment. Abd5 présente une bande sombre continue à l’apex. Il possède un bandeau sombre reliant les yeux et se prolongeant en arrière de ceux-ci et sur le reste du corps.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-multifasciata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20multifasciata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20multifasciata.jpeg?v=2"
 				},
 				{
 					"key": "24",
 					"label": "Entomobrya muscorum",
 					"description": "Entomobrya muscorum a de longues antennes et le 4ème segment abdominal plus grand que le 3ème. Son corps est densément velu, ses yeux traversés par une ligne sombre. Elle possède sur le dos deux lignes longitudinales. Certains individus peuvent être plus sombres, notamment sur les premiers et le 4ème segment abdominal, avec une ceinture blanche sur le 3ème segment.La forme classique a une grosse taches centrale sombre sur le dernier segment abdominal.La forme postbimaculata possède deux taches sombres latérales sur le dernier segment abdominal.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-muscorum/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20muscorum.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20muscorum.jpeg?v=2"
 				},
 				{
 					"key": "25",
 					"label": "Entomobrya nicoleti",
 					"description": "Entomobrya nicoleti est de couleur jaunâtre pale. Il possède un bandeau sombre reliant les yeux et une bande sombre plus ou moins visible sur les bords inférieur du thorax. Les segments abdominaux 2 et 3 possèdent parfois des taches latérales brun mauve pâle. Le 4ème segment abdominal, allongé, présente deux taches sombres sur chacun de ses côtés au niveau de l’apex. Il peut aussi y avoir une tache latérale centrale plus pâle, reliée aux taches de l’apex par une bande brun mauve pâle. L’apex du segment 5 est bordé de sombre. Les antennes sont longues et le 2ème article n’est pas subdivisé.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-nicoleti/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20nicoleti.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20nicoleti.jpeg?v=2"
 				},
 				{
 					"key": "26",
 					"label": "Entomobrya nigrocincta",
 					"description": "Entomobrya nigrocincta présente un dimorphisme sexuel marqué.Le mâle a le corps clair avec le 2ème segment thoracique et le 1er abdominal sombres, le reste des segments sans ligne sombre. Les jeunes mâles n’ont pas la bande sombre thoracique et sont entièrement jaune orangés.La femelle est pâle avec de nettes bandes sombres à la marge postérieure des tergites, un bandeau facial sombre, une bande transversale sombre et dentée au centre du 4ème segment abdominal, l’apex du 5ème segment abdominal présente deux taches rondes latérales qui ne sont pas nettement reliées entre elles.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/entomobrya-nigrocincta/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20nigrocincta.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya%20nigrocincta.jpeg?v=2"
 				},
 				{
 					"key": "27",
@@ -761,7 +761,7 @@
 					"label": "Fasciosminthurus quinquefasciatus",
 					"description": "Fasciosminthurus quinquefasciatus se reconnait facilement à sa couleur brune pus ou moins claire rayée de bandes blanches. Les flancs et le front présentes des taches blanches.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/bourletiellidae/fasciosminthurus-quinquefasciatus/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Fasciosminthurus%20quinquefasciatus.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Fasciosminthurus%20quinquefasciatus.jpeg?v=2"
 				},
 				{
 					"key": "30",
@@ -778,7 +778,7 @@
 					"label": "Heteromurus major",
 					"description": "Heteromurus major a le corps allongé de couleur grise. Le 4ème segment abdominal est relativement peu allongé par rapport aux Lepidocyrtus ou Entomobrya. Il a un aspect légèrement bossu. Les articles antennaires sont tous de même longueur.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/heteromurus-major/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Heteromurus%20major.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Heteromurus%20major.jpeg?v=2"
 				},
 				{
 					"key": "33",
@@ -790,21 +790,21 @@
 					"label": "Hypogastrura viatica",
 					"description": "• corps allongé, un peu élargi en arrière\r\n• corps recouvert de soies courtes et peu denses\r\n• coloration noir bleuté à violacée\r\n• 8 ocelles\r\n• bouche arrondie\r\n• 2 épines anales très petites, placées sur des papilles\nL’identification des espèces est très complexe sur photo. Il faut pour cela photographier les soies de l’apex des pattes. Le nombre de soies de l’apex du tibiotarse permet de déterminer l’espèce. Ces soies sont appelées « knobbed tenent macrosetae », elles sont spatulées ou élargies en club à l’apex. Il faut compter et voir la disposition de ces soies sur les 3 paires de pattes pour arriver à une identification.\nIl existe 170 espèces dans le monde.\nListe des espèces présentes en France d’après le Catalogue des collemboles de France\n\r\n• Hypogastrura affinis\r\n• Hypogastrura assimilis\r\n• Hypogastrura boldorii\r\n• Hypogastrura capitata\r\n• Hypogastrura chouardi\r\n• Hypogastrura crassaegranulata\r\n• Hypogastrura elevata\r\n• Hypogastrura gisini\r\n• Hypogastrura manubrialis\r\n• Hypogastrura meridionalis\r\n• Hypogastrura monticola\r\n• Hypogastrura neglecta\r\n• Hypogastrura papillata\r\n• Hypogastrura purpurescens\r\n• Hypogastrura pyrenaica\r\n• Hypogastrura ripperi\r\n• Hypogastrura subboldorii\r\n• Hypogastrura tullbergi\r\n• Hypogastrura vernalis\r\n• Hypogastrura viatica",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/hypogastruridae/hypogastrura-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Hypogastrura%20viatica.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Hypogastrura%20viatica.jpeg?v=2"
 				},
 				{
 					"key": "35",
 					"label": "Isotoma riparia",
 					"description": "Le genre Isotoma comprend des espèces au corps allongé et recouvert de longues soies. Les macrosetae sont présentes sur tous les segments abdominaux, ces derniers ayant tous à peu près la même taille. Ils possèdent 8+8 ocelles. La couleur varie du jaune au noir, en passant par le vert et le rougeâtre.\nLes espèces sont pour la plupart difficiles à distinguer, en particulier celles qui sont de couleur uniforme (que ce soit vert, jaune, rougeâtre ou bleuâtre car il y a des variations de ces couleurs au sein d’une même espèce). Pour les séparer, il faut voir l’aspect d’une dent à la base de la furca (simple ou bifide).Isotoma riparia semble être la seule espèce du genre à posséder une ligne médiane sombre sur le dessus du corps.\nVoici la liste des espèces moniale :\r\n• Isotoma acrea : Canada, Alaska\r\n• Isotoma anglicana : Arctique et subarctique, Europe, Asie centrale et de l’ouest, zone méditerranéenne, Canada, Alaska, côte Pacifique de l’Amérique du nord\r\n• Isotoma arctica : Arctique et subarctique, Canada, Alaska\r\n• Isotoma aspera : Côte Pacifique de l’Amérique du nord\r\n• Isotoma burkhardti : Andes\r\n• Isotoma caeca : Europe\r\n• Isotoma caerulea : Europe\r\n• Isotoma crassicornis : ?\r\n• Isotoma decorata : Sahara, désert d’Arabie, désert de Syrie, désert de Lout, désert du Thar\r\n• Isotoma delta : Etats-Unis, Amérique centrale, Caraïbes\r\n• Isotoma diverticula : Himalaya\r\n• Isotoma exiguadentata : Nouvelle-Zélande\r\n• Isotoma finitima : Arctique et subarctique\r\n• Isotoma fulva : Andes\r\n• Isotoma galapagoensis : Andes, Galapagos\r\n• Isotoma gandhi : Andes\r\n• Isotoma glauca : Canada, Alaska\r\n• Isotoma gracilliseta : Chine, Japon, Corée\r\n• Isotoma grana : Chine, Japon, Corée\r\n• Isotoma hibernica : Europe\r\n• Isotoma himalayana : Himalaya, Inde\r\n• Isotoma incerta : Andes\r\n• Isotoma innominata : Europe\r\n• Isotoma iranica : Asie centrale et de l’ouest\r\n• Isotoma kosiana : Europe\r\n• Isotoma littoralis : Chine, Japon, Corée\r\n• Isotoma longispina : Etats-Unis (2/3 est)\r\n• Isotoma mackenziana : Arctique et subarctique, Etats-Unis (2/3 est)\r\n• Isotoma malvinensis : Patagonie\r\n• Isotoma masatierrae : Archipel Juan Fernández\r\n• Isotoma melanocephala : Chine, Japon, Corée\r\n• Isotoma modesta : Europe\r\n• Isotoma nepalica : Himalaya\r\n• Isotoma nishihirai : Asie du sud est continentale\r\n• Isotoma ornata : Patagonie\r\n• Isotoma pallidafasciata : Nouvelle-Zélande\r\n• Isotoma perkinsi : Hawaï\r\n• isotoma pinnata : Chine, Japon, Corée\r\n• Isotoma plumosa : Himalaya\r\n• Isotoma protocinerea : ?\r\n• Isotoma rhopalota : Europe\r\n• Isotoma riparia : Arctique et subarctique, Europe, Eurasie du nord, zone méditerranéenne, (?) Amérique du nord (?)\r\n• Isotoma sarkundensis : Himalaya\r\n• Isotoma schalleri : Amazonie\r\n• Isotoma semenkevitshi : Europe\r\n• Isotoma silvatica : Patagonie\r\n• Isotoma sinensis : Chine, Japon, Corée\r\n• Isotoma spelaea : Europe\r\n• Isotoma spinicauda : Himalaya, Aie centrale et de l’ouest, Inde, (?) Chine, Japon, Corée (?)\r\n• Isotoma subcaerulea : Europe\r\n• Isotoma subviridis : Canada, Alaska, côte Pacifique de l’Amérique du nord, (?) Caraïbes (?)\r\n• Isotoma tahitiensis : Polynésie\r\n• Isotoma termitophila : Sud ouest de l’Australie\r\n• Isotoma tesselata : Pampa\r\n• Isotoma tigrinella : Patagonie\r\n• Isotoma tridenticulata : Chine, Japon, Corée\r\n• Isotoma tridentifera : Malaisie, Cap, Australie\r\n• Isotoma tridentina : Europe\r\n• Isotoma turbotti : Antarctique et subantarctique\r\n• Isotoma vaillanti : zone méditerranéenne\r\n• Isotoma variodentata : Asie centrale et de l’ouest\r\n• Isotoma viridis : Arctique et subarctique, Amérique du nord, Caraïbes, Europe, nord de l’Eurasie, Asie centrale et de l’ouest, Chine, Japon, Corée, zone méditerrannéenne, Macaronésie, Asie du sud est continentale, Sahara, désert d’Arabie, désert de Syrie, désert de Lout, désert du Thar\nEn France, nous n’aurions d’après le « Catalogue des collemboles de France » que Isotoma viridis, mais d’après le site Collembola.org, il pourrait aussi y avoir (espèces notées d’Europe, au moins certaines présentes dans les pays limitrophes) : Isotoma anglicana, Isotoma caeca, Isotoma caerulea, Isotoma hibernica, Isotoma innominata, Isotoma kosiana, Isotoma modesta, Isotoma rhopalota, Isotoma riparia, Isotoma semenkevitshi, Isotoma spelaea, Isotoma subcaerulea, Isotoma tridentina, Isotoma vaillanti",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomidae/isotoma-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotoma%20riparia.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotoma%20riparia.jpeg?v=2"
 				},
 				{
 					"key": "36",
 					"label": "Isotoma viridis",
 					"description": "Le genre Isotoma comprend des espèces au corps allongé et recouvert de longues soies. Les macrosetae sont présentes sur tous les segments abdominaux, ces derniers ayant tous à peu près la même taille. Ils possèdent 8+8 ocelles. La couleur varie du jaune au noir, en passant par le vert et le rougeâtre.\nLes espèces sont pour la plupart difficiles à distinguer, en particulier celles qui sont de couleur uniforme (que ce soit vert, jaune, rougeâtre ou bleuâtre car il y a des variations de ces couleurs au sein d’une même espèce). Pour les séparer, il faut voir l’aspect d’une dent à la base de la furca (simple ou bifide).Isotoma riparia semble être la seule espèce du genre à posséder une ligne médiane sombre sur le dessus du corps.\nVoici la liste des espèces moniale :\r\n• Isotoma acrea : Canada, Alaska\r\n• Isotoma anglicana : Arctique et subarctique, Europe, Asie centrale et de l’ouest, zone méditerranéenne, Canada, Alaska, côte Pacifique de l’Amérique du nord\r\n• Isotoma arctica : Arctique et subarctique, Canada, Alaska\r\n• Isotoma aspera : Côte Pacifique de l’Amérique du nord\r\n• Isotoma burkhardti : Andes\r\n• Isotoma caeca : Europe\r\n• Isotoma caerulea : Europe\r\n• Isotoma crassicornis : ?\r\n• Isotoma decorata : Sahara, désert d’Arabie, désert de Syrie, désert de Lout, désert du Thar\r\n• Isotoma delta : Etats-Unis, Amérique centrale, Caraïbes\r\n• Isotoma diverticula : Himalaya\r\n• Isotoma exiguadentata : Nouvelle-Zélande\r\n• Isotoma finitima : Arctique et subarctique\r\n• Isotoma fulva : Andes\r\n• Isotoma galapagoensis : Andes, Galapagos\r\n• Isotoma gandhi : Andes\r\n• Isotoma glauca : Canada, Alaska\r\n• Isotoma gracilliseta : Chine, Japon, Corée\r\n• Isotoma grana : Chine, Japon, Corée\r\n• Isotoma hibernica : Europe\r\n• Isotoma himalayana : Himalaya, Inde\r\n• Isotoma incerta : Andes\r\n• Isotoma innominata : Europe\r\n• Isotoma iranica : Asie centrale et de l’ouest\r\n• Isotoma kosiana : Europe\r\n• Isotoma littoralis : Chine, Japon, Corée\r\n• Isotoma longispina : Etats-Unis (2/3 est)\r\n• Isotoma mackenziana : Arctique et subarctique, Etats-Unis (2/3 est)\r\n• Isotoma malvinensis : Patagonie\r\n• Isotoma masatierrae : Archipel Juan Fernández\r\n• Isotoma melanocephala : Chine, Japon, Corée\r\n• Isotoma modesta : Europe\r\n• Isotoma nepalica : Himalaya\r\n• Isotoma nishihirai : Asie du sud est continentale\r\n• Isotoma ornata : Patagonie\r\n• Isotoma pallidafasciata : Nouvelle-Zélande\r\n• Isotoma perkinsi : Hawaï\r\n• isotoma pinnata : Chine, Japon, Corée\r\n• Isotoma plumosa : Himalaya\r\n• Isotoma protocinerea : ?\r\n• Isotoma rhopalota : Europe\r\n• Isotoma riparia : Arctique et subarctique, Europe, Eurasie du nord, zone méditerranéenne, (?) Amérique du nord (?)\r\n• Isotoma sarkundensis : Himalaya\r\n• Isotoma schalleri : Amazonie\r\n• Isotoma semenkevitshi : Europe\r\n• Isotoma silvatica : Patagonie\r\n• Isotoma sinensis : Chine, Japon, Corée\r\n• Isotoma spelaea : Europe\r\n• Isotoma spinicauda : Himalaya, Aie centrale et de l’ouest, Inde, (?) Chine, Japon, Corée (?)\r\n• Isotoma subcaerulea : Europe\r\n• Isotoma subviridis : Canada, Alaska, côte Pacifique de l’Amérique du nord, (?) Caraïbes (?)\r\n• Isotoma tahitiensis : Polynésie\r\n• Isotoma termitophila : Sud ouest de l’Australie\r\n• Isotoma tesselata : Pampa\r\n• Isotoma tigrinella : Patagonie\r\n• Isotoma tridenticulata : Chine, Japon, Corée\r\n• Isotoma tridentifera : Malaisie, Cap, Australie\r\n• Isotoma tridentina : Europe\r\n• Isotoma turbotti : Antarctique et subantarctique\r\n• Isotoma vaillanti : zone méditerranéenne\r\n• Isotoma variodentata : Asie centrale et de l’ouest\r\n• Isotoma viridis : Arctique et subarctique, Amérique du nord, Caraïbes, Europe, nord de l’Eurasie, Asie centrale et de l’ouest, Chine, Japon, Corée, zone méditerrannéenne, Macaronésie, Asie du sud est continentale, Sahara, désert d’Arabie, désert de Syrie, désert de Lout, désert du Thar\nEn France, nous n’aurions d’après le « Catalogue des collemboles de France » que Isotoma viridis, mais d’après le site Collembola.org, il pourrait aussi y avoir (espèces notées d’Europe, au moins certaines présentes dans les pays limitrophes) : Isotoma anglicana, Isotoma caeca, Isotoma caerulea, Isotoma hibernica, Isotoma innominata, Isotoma kosiana, Isotoma modesta, Isotoma rhopalota, Isotoma riparia, Isotoma semenkevitshi, Isotoma spelaea, Isotoma subcaerulea, Isotoma tridentina, Isotoma vaillanti",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomidae/isotoma-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotoma%20viridis.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotoma%20viridis.jpeg?v=2"
 				},
 				{
 					"key": "37",
@@ -821,14 +821,14 @@
 					"label": "Isotomurus maculatus",
 					"description": "Ce genre se reconnait à sa forme allongée, Ses articles antennaires plus ou moins tous de même longueur, son 4ème segment abdominal plus ou moins de même longueur que le 3ème, la présence de macrosètes (grandes soies effilées à l’apex et courbées) uniquement sur les segments abdominaux 4 à 6 et la présence de trichobothries (soies cylindriques très fines). Compte tenu de la variabilité du genre et des difficultés d’identification de certains spécimens, je classerais ici tous ceux dont l’identification au delà du genre est incertaine.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomurus-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotomurus%20maculatus.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotomurus%20maculatus.jpeg?v=2"
 				},
 				{
 					"key": "40",
 					"label": "Isotomurus palustris",
 					"description": "Isotomurus palustris est une espèce très variable et présente de nombreuses formes (bande centrale sur le dos plus ou moins fine, souvent assez courte, 2 bandes latérales, toutes 3 pouvant être coupées en pointillés et très peu visibles, avec ou sans une couronne sur abd 4…). Son corps est allongée, ses articles antennaires sont plus ou moins tous de même longueur, son 4ème segment abdominal est plus ou moins de même longueur que le 3ème, il possède des macrosètes (grandes soies effilées à l’apex et courbées) uniquement sur les segments abdominaux 4 à 6 et des trichobothries (soies cylindriques très fines).",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomidae/isotomurus-palustris/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotomurus%20palustris.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotomurus%20palustris.jpeg?v=2"
 				},
 				{
 					"key": "41",
@@ -840,21 +840,21 @@
 					"label": "Kalaphorura burmeisteri",
 					"description": "Kalaphorura burmeisteri a les antennes plus courtes que la tête, le 1er segment thoracique est présent, les pattes sont petites, elle n’a pas d’yeux ni de pigmentation sur le corps. Le corps est plus large au milieu, le premier segment antennaire est élargi, elle possède deux épines anales.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/onychiuridae/kalaphorura-burmeisteri/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Kalaphorura%20burmeisteri.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Kalaphorura%20burmeisteri.jpeg?v=2"
 				},
 				{
 					"key": "43",
 					"label": "Lepidocyrtus curvicollis",
 					"description": "Lepidocyrtus curvicollis est un collembole allongé au corps recouvert d’écailles grises. Les articles antennaires sont tous de même longueur, et le 4ème segment abdominal est allongé. Le thorax en vue de profil forme un angle de 90°., son extrémité en vue de dessus est arrondie. Ses pattes sont généralement grises.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/lepidocyrtus-curvicollis/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus%20curvicollis.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus%20curvicollis.jpeg?v=2"
 				},
 				{
 					"key": "44",
 					"label": "Lepidocyrtus cyaneus",
 					"description": "Lepidocyrtus cyaneus se reconnait à son corps en forme de cône, avec des reflets violets sur les écailles. La base des antennes ne possède pas d’écailles, les pattes non plus. Il possède de grandes soies entre les yeux. Son corps est bleuté derrière les écailles.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/lepidocyrtus-cyaneus/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus%20cyaneus.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus%20cyaneus.jpeg?v=2"
 				},
 				{
 					"key": "45",
@@ -866,7 +866,7 @@
 					"label": "Lepidocyrtus lignorum",
 					"description": "• corps cylindrique\r\n• corps recouvert d’écailles argentées à quelques reflets violets et bleus\r\n• 4ème segment abdominal allongé\r\n• pas d’angle droit marqué sur le thorax au-dessus de la tête\r\n• présence de soies interantennaires\r\n• pas de soies interoculaires\r\n• présence d’écailles sur les deux premiers segments antennaires et les pattes (mais ces dernières peuvent être peu visibles ou disparaitre par frottement)\r\n• articles antennaires 3 et 4 sans écailles",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/lepidocyrtus-lignorum/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus%20lignorum.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus%20lignorum.jpeg?v=2"
 				},
 				{
 					"key": "47",
@@ -883,21 +883,21 @@
 					"label": "Monobella grassei",
 					"description": "Monobella grassei est un collembole au corps allongé et boudiné avec de longues soies. Il est de couleur jaune pâle à orangé avec de petits tubercules discrets à l’apex des segments. Le 6ème segment abdominal est bilobé et caché sous le 5ème. Il possède deux petits ocelles noirs bien séparés, l’apex de ses antennes est blanchâtre.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neanuridae/monobella-grassei/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Monobella%20grassei.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Monobella%20grassei.jpeg?v=2"
 				},
 				{
 					"key": "50",
 					"label": "Neanura muscorum",
 					"description": "Neanura muscorum a un corps allongé et boudiné de couleur bleu-mauve. Ses antennes sont petites et le 1er segment thoracique est présent. Le 6ème segment abdominal possède deux lobes terminaux et il est placé à la suite du 5ème segment, qui lui porte 4 lobes terminaux. La disposition ocellaire est de 2+1 ocelle. Les pièces buccales sont en forme de cône.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neanuridae/neanura-muscorum/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Neanura%20muscorum.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Neanura%20muscorum.jpeg?v=2"
 				},
 				{
 					"key": "51",
 					"label": "Neelus murinus",
 					"description": "Neelus murinus est un collembole sans yeux, avec un corps rond et d’aspect bossu plus ou moins brun orangé. Il possède des soies à l’arrière de l’abdomen. Sa tête est allongée. Ses antennes sont relativement longues et fines. La furca possède des mucrons longs et étroits.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/neelidae/neelus-murinus/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Neelus%20murinus.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Neelus%20murinus.jpeg?v=2"
 				},
 				{
 					"key": "52",
@@ -909,42 +909,42 @@
 					"label": "Orchesella cincta",
 					"description": "Orchesella cincta a un corps allongé avec de grandes antennes. Le 2ème segment est subdivisé en deux parties. Le 1e segment antennaire est brun dans sa première moitié, blanc dans sa deuxième moitié. Les segments 3 et 4 sont bruns sans trop de contraste entre eux. Le 4ème segment de l’abdomen est plus long que le 3ème. Le 3ème segment abdominal est assombri et contraste avec l’apex clair du 2nd segment.Les mâles sont très sombres avec le second article antennaire entièrement noir.Les femelles sont brunes, le second article antennaire est sombre dans sa première subdivision, puis brun clair avec finalement l’apex sombre.Les adultes ont la tête noire.Les jeunes ont la tête claire.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/orchesella-cincta/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20cincta.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20cincta.jpeg?v=2"
 				},
 				{
 					"key": "54",
 					"label": "Orchesella flavescens",
 					"description": "Orchesella flavescens a un corps étroit et allongé, recouvert de longues soies. Le 4ème segment abdominal est allongé. La coloration générale est jaune à cannelle, avec une double bande brune longitudinale sur les côtés du corps. Les antennes sont longues, à articles 1 et 2 subdivisés. Elles sont fragiles, et il n’est pas rare de voir des individus aux antennes asymétriques ou tronquées. Leur couleur varie, mais il n’est pas rare qu’elles soient annelées de noir et de blanc ou de jaunâtre et de rougeâtre.\nIl existe plusieurs formes supplémentaires :\r\n• la var. melanocephala a la tête noire, ainsi que le 4eme segment abdominal et parfois aussi le 3ème segment thoracique. Le second article antennaire est noir, le premier soit tout noir soit noir à la base puis blanc à l’apex. La base du troisième article est très pâle. Les côtés du corps ainsi que l’apex des segments abdominaux 2 et 3 sont plus clairs que le reste du corps. Les pattes sont souvent bariolées, avec l’apex des fémurs plus sombre. Le reste du corps est variablement assombri.\r\n• la forme principalis est un peu plus pâle que la var melanocephala, la tête étant souvent assombrie mais pas noire, ce qui est également le cas pour le 4ème segment abdominal. Le 3ème segment thoracique est encore moins assombri, voire pas du tout.\r\n• la forme medialis possède une vague bande plus sombre sur le dessus du thorax et de l’abdomen.\r\n• la forme rufescens a les bandes dorsales rousses, et le corps plus ou moins orangé.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/orchesella-flavescens/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20flavescens.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20flavescens.jpeg?v=2"
 				},
 				{
 					"key": "55",
 					"label": "Orchesella quinquefasciata",
 					"description": "Orchesella quinquefasciata est un grand collembole au corps recouvert de longues soies dressées, denses surtout sur le thorax. Son deuxième segment antennaire est subdivisé, comme chez toutes les espèces du genre. Il possède 5 lignes longitudinales sur le dessus du corps et un bandeau sombre entre les yeux. Le dessin du 4ème segment abdominal est variable, généralement bien présent.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/orchesella-quinquefasciata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20quinquefasciata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20quinquefasciata.jpeg?v=2"
 				},
 				{
 					"key": "56",
 					"label": "Orchesella villosa",
 					"description": "Orchesella villosa a un corps allongé avec de grandes antennes. Le 4ème segment de l’abdomen est plus long que le 3ème. Il peut être de couleur jaunâtre à brunâtre, avec une forte pilosité. le thorax possède 3 bandes longitudinales : une au centre et deux sur les côtés pratiquement à la marge. Il peut y avoir une bande supplémentaires entre la bande centrale et celle de la marge (5 bandes donc) mais cette dernière n’atteint pas la marge postérieure du segment. L’abdomen possède diverses marques sombres, avec des bandes en « U » partant de la base des segments. les antennes sont fortement marquées de bandes sombre/clair contrastant, en particulier sur les premiers segments. Les eux sont reliés entre eux par un bandeau sombre.Les jeunes sont moins contrastés.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/orchesella-villosa/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20villosa.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella%20villosa.jpeg?v=2"
 				},
 				{
 					"key": "57",
 					"label": "Parisotoma notabilis",
 					"description": "Parisotoma notabilis a un corps allongé et velu, de couleur gris pâle. Ses antennes sont courtes et composées de 4 articles. Il possède un petit carré de 4 ocelles en avant de la tête.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/isotomidae/parisotoma-notabilis/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Parisotoma%20notabilis.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Parisotoma%20notabilis.jpeg?v=2"
 				},
 				{
 					"key": "58",
 					"label": "Podura aquatica",
 					"description": "Podura aquatica a un corps ovale et ramassé. Il est boudiné avec une tête assez imposante et de grosses joues. Il possède un gros repli de peau entre les yeux. Les griffes sont très longues. Il est de couleur gris bleuâtre sombre, avec souvent les pattes et les antennes rosées.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/poduridae/podura-aquatica/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Podura%20aquatica.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Podura%20aquatica.jpeg?v=2"
 				},
 				{
 					"key": "59",
@@ -956,7 +956,7 @@
 					"label": "Pogonognathellus longicornis",
 					"description": "Pogonognathellus longicornis a un corps allongé et recouvert d’écailles grises. Ses antennes sont très longes, plus longues que le corps. Le 3ème segment antennaire est plus long que les autres et effilé à son apex. Il enroule souvent l’extrémité de ses antennes.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/tomoceridae/pogonognathellus-longicornis/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pogonognathellus%20longicornis.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pogonognathellus%20longicornis.jpeg?v=2"
 				},
 				{
 					"key": "61",
@@ -973,14 +973,14 @@
 					"label": "Sminthurides aquaticus",
 					"description": "Sminthurides aquaticus est de couleur jaunâtre avec une pigmentation bleu gris sur le dos et une tache sombre sur le front. Le mucron de la furca est élargi en forme de lamelle.La femelle est plus grande que le mâle et n’a pas le 4ème segment antennaire subdivisé.Le mâle a ‘antenne modifiée en « crochet » pour s’agripper à celles de la femelle.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/sminthurididae/sminthurides-aquaticus/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides%20aquaticus.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides%20aquaticus.jpeg?v=2"
 				},
 				{
 					"key": "64",
 					"label": "Sminthurides malmgreni",
 					"description": "Sminthurides malmgreni est un petit collembole au corps rond, jaune, avec l’abdomen ceintré d’une bande rose prune. Certaines formes possèdent une bande dorsale rose prune plus ou moins large, parfois divisée en deux lignes laissant apparaitre une bande centrale de la couleur du corps. Les antennes sont mauves, surtout le dernier article. La forme principalis est entièrement violette.Le mâle est plus petit que la femelle et a les antennes modifiées.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/sminthurididae/sminthurides-malmgreni/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides%20malmgreni.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides%20malmgreni.jpeg?v=2"
 				},
 				{
 					"key": "65",
@@ -992,21 +992,21 @@
 					"label": "Sminthurinus aureus",
 					"description": "Sminthurinus aureus est de couleur jaune orangé parfois avec des taches plus claires sur le corps et bandes plus sombres sur les flancs. Les sourcils sont plus clairs également. Le 4ème article antennaire est assombri. Le segment abdominal 5 est fusionné avec le reste de l’abdomen dorsalement et ventralement.La forme ochropus a le corps brun noir avec les antennes et les pattes jaunâtres et le sourcil clair.La forme atrata a le corps noir bleuté ainsi que les pattes et les antennes.La forme reticulatus est orange avec une bande grise à brune sur les flancs et des lignes transversales oranges sur le dessus de l’abdomen.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/katiannidae/sminthurinus-aureus/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus%20aureus.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus%20aureus.jpeg?v=2"
 				},
 				{
 					"key": "67",
 					"label": "Sminthurinus elegans",
 					"description": "Sminthurinus elegans est de couleur jaunâtre. Le dessus de sa tête est sombre, avec des « sourcils » clairs. Un bandeau brun traverse la face. L’abdomen est ceinturé au niveau des flancs d’une bande brune. Une deuxième bande brune parcourt les côtés de l’abdomen au-dessus de la première. Le dos peut-être parcouru d’une fine ligne brune. L’étendue de brun peur varier, et certaines formes sont très sombres.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/katiannidae/sminthurinus-elegans/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus%20elegans.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus%20elegans.jpeg?v=2"
 				},
 				{
 					"key": "68",
 					"label": "Sminthurinus lawrencei",
 					"description": "Sminthurinus lawrencei est un collembole de couleur noire plus ou moins bleutée ou violacée. Il possède un court sourcil blanc. L’ocelle D située au centre de l’œil n’est pas visible. Il possède une verrue à la base du 3ème segment antennaire. Le 5ème segment abdominal n’est pas fusionné avec le gros abdomen.Jusque récemment, la plupart des individus étaient nommés S. niger, mais des études récentes ont montré qu’il ‘agit en fait de S. lawrencei et que S. niger était beaucoup plus rare.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/katiannidae/sminthurinus-niger/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus%20lawrencei.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus%20lawrencei.jpeg?v=2"
 				},
 				{
 					"key": "69",
@@ -1023,14 +1023,14 @@
 					"label": "Sminthurus viridis",
 					"description": "Sminthurus viridis a un corps arrondi avec de longues soies sur toute sa surface. Le 4ème segment antennaire est plus long que le 3ème. Elle est de couleur verte à jaune avec parfois des taches d’intensités différentes. La ssp cinereoviridis est beige à taches brun plus sombre, avec une ligne médiane sombre sur l’abdomen.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/sminthuridae/sminthurus-viridis/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurus%20viridis.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurus%20viridis.jpeg?v=2"
 				},
 				{
 					"key": "72",
 					"label": "Tomocerus minor",
 					"description": "• corps allongé, recouvert d’écailles\r\n• coloration gris argenté uniforme\r\n• antennes de 4 articles, longues mais plus courtes que le corps\r\n• le 3ème article antennaire beaucoup plus long que les autres et sans écailles (mais avec de fines soies), de couleur rose ou grise\r\n• collier de soies à la base du thorax\r\n• yeux composés de 6 ocelles\r\n• les 4 ocelles antérieurs forment un carré, la distance entre les ocelles A-C et B-D est à peu près égale",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/tomoceridae/tomocerus-minor/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Tomocerus%20minor.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Tomocerus%20minor.jpeg?v=2"
 				},
 				{
 					"key": "73",
@@ -1057,20 +1057,20 @@
 					"label": "Willowsia nigromaculata",
 					"description": "• coloration brun jaunâtre\r\n• présence d’écailles sur le corps\r\n• bandeau sombre entre les yeux\r\n• anneau sombre à l’apex des fémurs 3, parfois des autres également\r\n• bande latérale sombre sur le corps\r\n• 4ème segment abdominal allongé\r\n• apex du 3ème segment abdominal à bande sombre remontant vers la base du segment sur les côtés\r\n• 4ème segment abdominal à bande centrale en zigzag interrompue en son centre, pouvant ne former que deux taches latérales\r\n• 4ème segment abdominal à apex sombre\r\n• apex des 5ème et 6ème segments abdominaux noirs\r\n• apex des segments thoraciques et des 2 premiers segments abdominaux à bande sombre légère pouvant manquer",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/willowsia-nigromaculata/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20nigromaculata.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20nigromaculata.jpeg?v=2"
 				},
 				{
 					"key": "78",
 					"label": "Willowsia platani",
 					"description": "Willowsia platani a un pattern sombre rayé de pâle. Sa tête est pâle avec un bandeau noir entre les yeux. Le segment 2 du thorax est clair, le segment 3 sombre. Le segment abdominal 1 est clair, le 2 et le 3 sont plus ou moins sombre, il possède une bande claire à la base et à l’apex du 4. Il a une tache noire à l’apex du fémur 3.",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/entomobryidae/willowsia-platani/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20platani.jpeg"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia%20platani.jpeg?v=2"
 				},
 				{
 					"label": "Byturus tomentosus",
 					"key": "79",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Byturus tomentosus.png",
-					"description": "Nom vernaculaire : Ver des framboises\n\nEspèce(s) semblable(s) : _[Byturus ochraceus](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/)_ dont les yeux sont plus gros ([comparer](https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957)). **Attention** ce critère est parfois difficile à apprécier.\n\nA corriger sur le comparatif : B.aestivus = B.ochraceus\n\nInformation(s) utile(s): Presque uniquement sur fleurs de Rosaceae\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=byturus%20tomentosus)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/222189) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Gilles Carcassès](https://www.galerie-insecte.org/galerie/ref-321918.htm) ; [Fred Chevaillot](https://www.galerie-insecte.org/galerie/ref-255957.htm)",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Byturus%20tomentosus.png?v=2",
+					"description": "Nom vernaculaire : Ver des framboises\n\nEspèce(s) semblable(s) : _[Byturus ochraceus](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/)_ dont les yeux sont plus gros ([comparer](https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957)). **Attention** ce critère est parfois difficile à apprécier.\n\nA corriger sur le comparatif : _B.aestivus_ = _B.ochraceus_\n\nInformation(s) utile(s): Presque uniquement sur fleurs de Rosaceae\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=byturus%20tomentosus)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/222189) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Gilles Carcassès](https://www.galerie-insecte.org/galerie/ref-321918.htm) ; [Fred Chevaillot](https://www.galerie-insecte.org/galerie/ref-255957.htm)",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/": "Byturus ochraceus",
 						"https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957": "comparer",
@@ -1085,7 +1085,7 @@
 				{
 					"label": "Melolontha hippocastani",
 					"key": "80",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Melolontha hippocastani.png",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Melolontha%20hippocastani.png?v=2",
 					"description": "Nom vernaculaire : Grand hanneton forestier\n\nEspèce(s) semblable(s) : [Melolontha melol](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/)[ontha](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/) (pointe du pygidium plus longue et plus large) ; [Melolontha pectoralis](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis) (pointe du pygidium encore plus courte, seulement présent dans le Nord-Est de la France)\n\nInformation(s) utile(s): Espèce généralement plus forestière que _Melolontha melolontha_. [Comparatif](https://www.galerie-insecte.org/galerie/view.php?ref=8434) des pygidium de _M.melolontha_ et _M.hippocastani_\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/10879) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Florentin Madrolles](https://www.galerie-insecte.org/galerie/ref-64168.htm) ; [Piezo](https://www.galerie-insecte.org/galerie/fiche.php?ref=8434)",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/": "ontha",
@@ -1102,7 +1102,7 @@
 				{
 					"label": "Meloe violaceus",
 					"key": "81",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Meloe violaceus.png",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Meloe%20violaceus.png?v=2",
 					"description": "Nom vernaculaire : Meloe enfle-boeufs violet\n\nEspèce(s) semblable(s) : _[Meloe proscarabe](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)__[us](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)_ ; _[Meloe autumnalis](https://www.galerie-insecte.org/galerie/wikige.php?tax=meloe%20autumnalis)_ (apparaît uniquement à automne)\n\nInformation(s) utile(s): Cette espèce est présente uniquement au printemps\n\n[Fiche comparative](https://ressources.shna-ofab.fr/shna-ofab/fichiers__pdf_/3-ressources/3-aides_a_la_determination/note_didentification_e-obs_meloe_printanier_ou_meloe_violace_2021.pdf) des _Meloe_ printaniers\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Meloe_violaceus.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12113) ; [SHNA-OFAB](https://www.shna-ofab.fr/) ; [LMDI](https://www.insecte.org/forum/index.php) ;\n\nCrédit photo : [Renko Usami](https://www.galerie-insecte.org/galerie/ref-159239.htm) ; [Phil](https://www.galerie-insecte.org/galerie/ref-83831.htm) ; [Damien GRILLIERE](https://www.galerie-insecte.org/galerie/ref-321060.htm)\n\nMaxime Cauchoix2025-05-07T09:04:11.120000000\n\ncritère(s) principaux différencier de violaceus",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/": "us",
@@ -1121,7 +1121,7 @@
 				{
 					"label": "Pyrrhidium sanguineum",
 					"key": "82",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pyrrhidium sanguineum.png",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pyrrhidium%20sanguineum.png?v=2",
 					"description": "Nom vernaculaire : Cardinal imposteur\n\nEspèce(s) semblable(s) : Aucune chez les Cerambycidae, mais attention aux _[Pyrochroa](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/)_ dont les antennes sont dentées.\n\nInformation(s) utile(s): Très précoce (dès février), souvent dans le bois de chauffage\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12357) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Yves Dubois](https://www.galerie-insecte.org/galerie/ref-159923.htm) ; [Pierre Gros](https://www.galerie-insecte.org/galerie/ref-199258.htm)",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/": "Pyrochroa",
