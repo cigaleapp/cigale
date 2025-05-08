@@ -124,7 +124,7 @@ test.describe('Cropper view', () => {
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === '#/crop/000001');
 
-			const { ...othersBefore } = await getSettings({ page });
+			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
 			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
 
@@ -385,8 +385,7 @@ function confirmedCropBadge(page) {
 async function isImageConfirmedInDatabase(page, id) {
 	const image = await getImage({ page }, id);
 	return (
-		image?.metadata?.['io.github.cigaleapp.arthropods.transects__crop_is_confirmed']?.value ===
-		'true'
+		image?.metadata?.['io.github.cigaleapp.arthropods.example__crop_is_confirmed']?.value === 'true'
 	);
 }
 
@@ -400,7 +399,7 @@ async function isImageConfirmedInDatabase(page, id) {
 async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 	for (const id of ids) {
 		await setImageMetadata({ page }, id, {
-			'io.github.cigaleapp.arthropods.transects__crop_is_confirmed': {
+			'io.github.cigaleapp.arthropods.example__crop_is_confirmed': {
 				value: confirmed,
 				manuallyModified: true,
 				confidence: 1,

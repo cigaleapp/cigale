@@ -30,10 +30,9 @@ async function fillBuiltinData() {
 		});
 	});
 
-	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.transects');
+	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.transect');
 
-	// TODO: at some point, remove the confirmationMetadata check
-	if (!builtinProtocol || !builtinProtocol.crop?.confirmationMetadata) {
+	if (!builtinProtocol) {
 		try {
 			await fetch(
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'

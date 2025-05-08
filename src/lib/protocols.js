@@ -1,3 +1,4 @@
+import { type } from 'arktype';
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
@@ -87,7 +88,7 @@ export async function downloadProtocolTemplate(base, format) {
 	downloadProtocol(base, format, {
 		id: 'mon-protocole',
 		name: 'Mon protocole',
-		source: 'https://github.com/moi/mon-protocole',
+		learnMore: 'https://github.com/moi/mon-protocole',
 		authors: [{ name: 'Prénom Nom', email: 'prenom.nom@example.com' }],
 		description: 'Description de mon protocole',
 		metadata: {
@@ -203,4 +204,186 @@ export async function importProtocol(contents) {
 		);
 	});
 	return ExportedProtocol.assert(protocol);
+}
+
+/**
+ *
+ * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
+ * @returns {Promise< { upToDate: boolean; newVersion: number }>}
+ */
+export async function hasUpgradeAvailable({ version, source, id }) {
+	if (!source) throw new Error("Le protocole n'a pas de source");
+	if (!version) throw new Error("Le protocole n'a pas de version");
+	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
+	if (typeof source !== 'string')
+		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
+
+	const response = await fetch(source, {
+		headers: {
+			Accept: 'application/json'
+		}
+	})
+		.then((r) => r.json())
+		.then(
+			type({
+				'version?': 'number',
+				id: 'string'
+			}).assert
+		);
+
+	if (!response.version) throw new Error("Le protocole n'a plus de version");
+	if (response.id !== id) throw new Error("Le protocole a changé d'identifiant");
+	if (response.version > version) {
+		return {
+			upToDate: false,
+			newVersion: response.version
+		};
+	}
+
+	return {
+		upToDate: true,
+		newVersion: response.version
+	};
+}
+
+if (import.meta.vitest) {
+	const { vi, describe, test, expect } = import.meta.vitest;
+	describe('hasUpgradeAvailable', () => {
+		test('should return upToDate: false if the version is lower', async () => {
+			const fetch = vi.fn(async () => ({
+				json: async () => ({
+					version: 2,
+					id: 'mon-protocole'
+				})
+			}));
+
+			vi.stubGlobal('fetch', fetch);
+
+			const result = await hasUpgradeAvailable({
+				version: 1,
+				source: 'https://example.com/protocol.json',
+				id: 'mon-protocole'
+			});
+
+			expect(fetch).toHaveBeenCalledWith('https://example.com/protocol.json', {
+				headers: {
+					Accept: 'application/json'
+				}
+			});
+			expect(result).toEqual({ upToDate: false, newVersion: 2 });
+		});
+
+		test('should return upToDate: true if the version is the same', async () => {
+			const fetch = vi.fn(async () => ({
+				json: async () => ({
+					version: 1,
+					id: 'mon-protocole'
+				})
+			}));
+
+			vi.stubGlobal('fetch', fetch);
+
+			const result = await hasUpgradeAvailable({
+				version: 1,
+				source: 'https://example.com/protocol.json',
+				id: 'mon-protocole'
+			});
+
+			expect(fetch).toHaveBeenCalledWith('https://example.com/protocol.json', {
+				headers: {
+					Accept: 'application/json'
+				}
+			});
+			expect(result).toEqual({ upToDate: true, newVersion: 1 });
+		});
+
+		test('should throw an error if the protocol ID is different', async () => {
+			const fetch = vi.fn(async () => ({
+				json: async () => ({
+					version: 2,
+					id: 'autre-protocole'
+				})
+			}));
+
+			vi.stubGlobal('fetch', fetch);
+
+			expect(
+				hasUpgradeAvailable({
+					version: 1,
+					source: 'https://example.com/protocol.json',
+					id: 'mon-protocole'
+				})
+			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole a changé d'identifiant]`);
+		});
+
+		test('should throw an error if the remote protocol has no version', async () => {
+			const fetch = vi.fn(async () => ({
+				json: async () => ({
+					id: 'mon-protocole'
+				})
+			}));
+
+			vi.stubGlobal('fetch', fetch);
+
+			expect(
+				hasUpgradeAvailable({
+					version: 1,
+					source: 'https://example.com/protocol.json',
+					id: 'mon-protocole'
+				})
+			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a plus de version]`);
+		});
+
+		test('should throw an error if the protocol has no source', async () => {
+			expect(
+				// @ts-expect-error
+				hasUpgradeAvailable({
+					version: 1,
+					source: undefined,
+					id: 'mon-protocole'
+				})
+			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas de source]`);
+		});
+
+		test('should throw an error if the local protocol has no version', async () => {
+			expect(
+				// @ts-expect-error
+				hasUpgradeAvailable({
+					version: undefined,
+					source: 'https://example.com/protocol.json',
+					id: 'mon-protocole'
+				})
+			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas de version]`);
+		});
+
+		test('should throw an error if the protocol has no ID', async () => {
+			expect(
+				// @ts-expect-error
+				hasUpgradeAvailable({
+					version: 1,
+					source: 'https://example.com/protocol.json'
+				})
+			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas d'identifiant]`);
+		});
+	});
+}
+
+/**
+ *
+ * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
+ */
+export async function upgradeProtocol({ version, source, id }) {
+	if (!source) throw new Error("Le protocole n'a pas de source");
+	if (!version) throw new Error("Le protocole n'a pas de version");
+	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
+	if (typeof source !== 'string')
+		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
+
+	const response = await fetch(source, {
+		headers: {
+			Accept: 'application/json'
+		}
+	}).then((r) => r.text());
+
+	return importProtocol(response);
 }
