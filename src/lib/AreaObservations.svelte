@@ -17,6 +17,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { onMount } from 'svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
+	import { defineKeyboardShortcuts } from './keyboard.svelte';
 	import { mutationobserver } from './mutations';
 
 	/**
@@ -74,27 +75,24 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		selection = [...new Set(dragselect?.selection ?? [])];
 	});
 
-	onMount(() => {
-		uiState.keybinds = {
-			...uiState.keybinds,
-			// Also register Ctrl-A to select all
-			'$mod+a': {
-				help: 'Tout sélectionner',
-				when: ({ target }) => !(target instanceof HTMLInputElement),
-				do: () => {
-					dragselect?.setSelection(images.map((img) => img.id));
-				}
-			},
-			// And Ctrl-D to deselect all
-			'$mod+d': {
-				help: 'Tout désélectionner',
-				when: ({ target }) => !(target instanceof HTMLInputElement),
-				do: () => {
-					selection = [];
-					dragselect?.setSelection([]);
-				}
+	defineKeyboardShortcuts({
+		// Also register Ctrl-A to select all
+		'$mod+a': {
+			help: 'Tout sélectionner',
+			when: ({ target }) => !(target instanceof HTMLInputElement),
+			do: () => {
+				dragselect?.setSelection(images.map((img) => img.id));
 			}
-		};
+		},
+		// And Ctrl-D to deselect all
+		'$mod+d': {
+			help: 'Tout désélectionner',
+			when: ({ target }) => !(target instanceof HTMLInputElement),
+			do: () => {
+				selection = [];
+				dragselect?.setSelection([]);
+			}
+		}
 	});
 
 	$effect(() => {

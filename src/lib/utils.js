@@ -586,3 +586,27 @@ if (import.meta.vitest) {
 		});
 	});
 }
+
+/**
+ *
+ * @param {number} startOrEnd
+ * @param {number|undefined} [end]
+ * @returns {number[]}
+ */
+export function range(startOrEnd, end = undefined) {
+	if (end === undefined) {
+		return Array.from({ length: startOrEnd }, (_, i) => i);
+	}
+	return Array.from({ length: end - startOrEnd }, (_, i) => i + startOrEnd);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('range', () => {
+		expect(range(5)).toEqual([0, 1, 2, 3, 4]);
+		expect(range(2, 5)).toEqual([2, 3, 4]);
+		expect(range(5, 2)).toEqual([]);
+		expect(range(3, 3)).toEqual([]);
+		expect(range(3, 4)).toEqual([3]);
+	});
+}

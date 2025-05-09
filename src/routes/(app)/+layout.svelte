@@ -6,6 +6,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { imageIdToFileId } from '$lib/images';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -37,14 +38,14 @@
 		}
 	});
 
-	$effect(() => {
-		uiState.keybinds['$mod+s'] = {
+	defineKeyboardShortcuts({
+		'$mod+s': {
 			help: '',
 			hidden: true,
 			do: () => {
 				toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎');
 			}
-		};
+		}
 	});
 
 	const settings = $derived(getSettings());

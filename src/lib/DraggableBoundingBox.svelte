@@ -20,7 +20,7 @@
 	 * @property {Record<string, Rect>} boundingBoxes maps image IDs to bounding boxes with relative, top-left coordinates
 	 * @property {HTMLImageElement} imageElement
 	 * @property {(imageId: string, box: Rect) => void} onchange - called when a bounding box is changed. The imageId is the ID of the associated Image
-	 * @property {(box: Rect) => Promise<string> | string} oncreate - called when a new bounding box is created. Must return the ID of the new associated Image
+	 * @property {(box: Rect) => Promise<string|null> | string|null} oncreate - called when a new bounding box is created. Must return the ID of the new associated Image
 	 * @property {boolean} transformable if true, the bounding boxes' sides or corners can be dragged
 	 * @property {string} [cursor=unset] - CSS cursor to use when hovering over the change area
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
@@ -205,6 +205,7 @@
 		if (creatingBoundingBox && newBoundingBox.ready) {
 			const relativeBoundingBox = fromPixel(newBoundingBox.rect());
 			const imageId = await oncreate?.(relativeBoundingBox);
+			if (!imageId) return;
 			boundingBoxes[imageId] = relativeBoundingBox;
 			newBoundingBox.reset();
 			creatingBoundingBox = false;

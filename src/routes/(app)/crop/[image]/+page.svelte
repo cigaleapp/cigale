@@ -31,15 +31,15 @@
 		imageId as makeImageId,
 		parseImageId
 	} from '$lib/images';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
-	import { mapValues, pick } from '$lib/utils';
+	import { fromEntries, mapValues, pick, range } from '$lib/utils';
 	import { formatISO } from 'date-fns';
-	import { onDestroy, onMount } from 'svelte';
 	import IconRevert from '~icons/ph/arrow-arc-left';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
@@ -455,37 +455,35 @@
 	 */
 	let selectedBoundingBox = $state(null);
 
-	onMount(() => {
-		uiState.keybinds['ArrowLeft'] = {
+	defineKeyboardShortcuts({
+		ArrowLeft: {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
 			do: () => goto(`#/crop/${prevFileId}`)
-		};
-		uiState.keybinds['Shift+Space'] = {
+		},
+		'Shift+Space': {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
 			do: () => goto(`#/crop/${prevFileId}`)
-		};
-		uiState.keybinds['ArrowRight'] = {
+		},
+		ArrowRight: {
 			help: 'Image suivante',
 			when: () => Boolean(nextFileId),
 			do: () => goto(`#/crop/${nextFileId}`)
-		};
-		uiState.keybinds['Space'] = {
+		},
+		Space: {
 			help: 'Continuer',
 			do: moveToNextUnconfirmed
-		};
-		uiState.keybinds['Escape'] = {
+		},
+		Escape: {
 			help: 'Quitter le recadrage',
 			do: goToGallery
-		};
-		uiState.keybinds['a'] = {
+		},
+		a: {
 			help: 'Activer/désactiver la continuation automatique',
-			async do() {
-				await toggleSetting('cropAutoNext');
-			}
-		};
-		uiState.keybinds['Delete'] = {
+			do: async () => toggleSetting('cropAutoNext')
+		},
+		Delete: {
 			help: 'Supprimer la boîte sélectionnée',
 			when: () => Boolean(selectedBoundingBox),
 			async do() {
@@ -496,81 +494,66 @@
 				});
 				selectedBoundingBox = null;
 			}
-		};
-		uiState.keybinds['f'] = {
+		},
+		f: {
 			help: 'Cacher les boîtes non sélectionnées',
 			when: () => Boolean(selectedBoundingBox),
 			do() {
 				if (!selectedBoundingBox) return;
 				focusedImageId = focusedImageId === selectedBoundingBox ? '' : selectedBoundingBox;
 			}
-		};
-		uiState.keybinds['u'] = {
+		},
+		u: {
 			help: "Revenir au recadrage d'origine",
 			when: () => Boolean(revertableCrops[fileId]),
 			do: () => {
 				if (!revertableCrops[fileId]) return;
 				revertToInferedCrop(fileId);
 			}
-		};
-		uiState.keybinds['$mod+u'] = {
+		},
+		'$mod+u': {
 			help: "Revenir au recadrage d'origine pour toutes les boîtes",
 			when: () => Object.keys(boundingBoxes).length > 0,
 			do: revertAll
-		};
-		uiState.keybinds['ArrowUp'] = {
+		},
+		ArrowUp: {
 			help: 'Marquer le recadrage comme confirmé',
 			when: () => !hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(true)
-		};
-		uiState.keybinds['ArrowDown'] = {
+		},
+		ArrowDown: {
 			help: 'Marquer le recadrage comme non confirmé',
 			when: () => hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(false)
-		};
-		for (const tool of tools) {
-			uiState.keybinds[tool.shortcut] = {
-				help: `Choisir l'outil ${tool.name}`,
-				do: () => {
-					activeToolName = tool.name;
-				}
-			};
-		}
-		for (let i = 1; i <= 9; i++) {
-			uiState.keybinds[`Digit${i}`] = {
-				help: `Sélectionner la boîte #${i}`,
-				when: () => Object.keys(boundingBoxes).length >= i,
-				do() {
-					const imageId = Object.keys(boundingBoxes)[i - 1];
-					if (selectedBoundingBox === imageId) {
-						selectedBoundingBox = null;
-					} else {
-						selectedBoundingBox = imageId;
+		},
+		...fromEntries(
+			tools.map((tool) => [
+				tool.shortcut,
+				{
+					help: `Choisir l'outil ${tool.name}`,
+					do: () => {
+						activeToolName = tool.name;
 					}
 				}
-			};
-		}
-	});
-	onDestroy(() => {
-		// FIXME: allow registering keybinds for a specific page, and show them in a separate category on the keybinds help modal
-		delete uiState.keybinds['ArrowLeft'];
-		delete uiState.keybinds['ArrowRight'];
-		delete uiState.keybinds['Space'];
-		delete uiState.keybinds['Escape'];
-		delete uiState.keybinds['a'];
-		delete uiState.keybinds['Delete'];
-		delete uiState.keybinds['f'];
-		delete uiState.keybinds['u'];
-		delete uiState.keybinds['$mod+u'];
-		delete uiState.keybinds['Shift+Space'];
-		delete uiState.keybinds['ArrowUp'];
-		delete uiState.keybinds['ArrowDown'];
-		for (const tool of tools) {
-			delete uiState.keybinds[tool.shortcut];
-		}
-		for (const i of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
-			delete uiState.keybinds[`Digit${i}`];
-		}
+			])
+		),
+		...fromEntries(
+			range(1, 10).map((i) => [
+				`Digit${i}`,
+				{
+					help: `Sélectionner la boîte #${i}`,
+					when: () => Object.keys(boundingBoxes).length >= i,
+					do: () => {
+						const imageId = Object.keys(boundingBoxes)[i - 1];
+						if (selectedBoundingBox === imageId) {
+							selectedBoundingBox = null;
+						} else {
+							selectedBoundingBox = imageId;
+						}
+					}
+				}
+			])
+		)
 	});
 
 	let imageElement = $state();
