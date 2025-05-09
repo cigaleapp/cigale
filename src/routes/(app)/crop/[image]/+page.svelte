@@ -19,6 +19,7 @@
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
+	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
@@ -40,6 +41,7 @@
 	import { tooltip } from '$lib/tooltips';
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import { formatISO } from 'date-fns';
+	import { watch } from 'runed';
 	import IconRevert from '~icons/ph/arrow-arc-left';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
@@ -610,19 +612,16 @@
 
 	let imageElement = $state();
 
-	/**
-	 * Zoom state.
-	 * Most logic goes to https://stackoverflow.com/a/70251437
-	 */
-	let zoom = $state({
-		/**
-		 * From 0 to 1, relative to topleft of the image
-		 */
-		origin: { x: 0, y: 0 },
-		scale: 1,
-		panning: false,
-		panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
-	});
+	watch(
+		() => fileId,
+		(newFileId, oldFileId) => {
+			if (oldFileId) uiState.cropperZoomStates.set(oldFileId, $state.snapshot(zoom));
+			console.log('Chaning zoom state, of ', fileId);
+			zoom = $state.snapshot(uiState.cropperZoomStates.get(newFileId)) ?? INITIAL_ZOOM_STATE;
+		}
+	);
+
+	let zoom = $state({ ...INITIAL_ZOOM_STATE });
 
 	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
@@ -683,6 +682,7 @@
 		}}
 		onwheel={async (e) => {
 			e.preventDefault();
+			// Most logic is thanks to https://stackoverflow.com/a/70251437
 			let imageBounds = imageElement.getBoundingClientRect();
 			let x = (e.clientX - imageBounds.x) / zoom.scale;
 			let y = (e.clientY - imageBounds.y) / zoom.scale;
@@ -708,14 +708,13 @@
 			<DraggableBoundingBox
 				{...activeTool}
 				{imageElement}
+				{zoom}
 				boundingBoxes={mapValues(
 					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
 					toTopLeftCoords
 				)}
 				disabled={zoom.panning}
 				cursor={zoom.panning ? 'move' : activeTool.cursor}
-				zoomScale={zoom.scale}
-				zoomOrigin={zoom.origin}
 				onchange={(imageId, box) => onCropChange(imageId, box)}
 				oncreate={(box) => onCropChange(null, box)}
 			/>

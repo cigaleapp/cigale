@@ -6,6 +6,10 @@
 	import { mapValues } from './utils';
 
 	/**
+	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
+	 */
+
+	/**
 	 * @typedef Rect
 	 * @type {object}
 	 * @property {number} x
@@ -26,8 +30,7 @@
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
 	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
 	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
-	 * @property {number} zoomScale - the current zoom scale of the image
-	 * @property {{x: number, y: number}} zoomOrigin - the current zoom origin of the image, in pixels of the resized, post-object-fit but pre-zoom image
+	 * @property {ZoomState} zoom - current zoom&pan state
 	 */
 
 	/**  @type {Props} */
@@ -41,8 +44,7 @@
 		disabled = false,
 		movable,
 		createMode,
-		zoomScale = 1,
-		zoomOrigin = { x: 0, y: 0 }
+		zoom
 	} = $props();
 
 	let boundingBoxes = $state(boudingBoxesInitial);
@@ -114,12 +116,12 @@
 			width = clientWidth;
 		}
 
-		width *= zoomScale;
-		height *= zoomScale;
+		width *= zoom.scale;
+		height *= zoom.scale;
 
 		return {
-			x: zoomOrigin.x + clientLeft + (clientWidth - width) / 2,
-			y: zoomOrigin.y + clientTop + (clientHeight - height) / 2,
+			x: zoom.origin.x + clientLeft + (clientWidth - width) / 2,
+			y: zoom.origin.y + clientTop + (clientHeight - height) / 2,
 			width,
 			height
 		};
@@ -219,8 +221,7 @@
 		if (creatingBoundingBox && newBoundingBox.ready) {
 			const relativeBoundingBox = fromPixel(newBoundingBox.rect());
 			const imageId = await oncreate?.(relativeBoundingBox);
-			if (!imageId) return;
-			boundingBoxes[imageId] = relativeBoundingBox;
+			if (imageId) boundingBoxes[imageId] = relativeBoundingBox;
 			newBoundingBox.reset();
 			creatingBoundingBox = false;
 		} else {

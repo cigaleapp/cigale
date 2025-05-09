@@ -435,6 +435,22 @@ test.describe('Cropper view', () => {
 			// Make sure no box was created
 			await expect(page.getByText(/Boîte #\d+/)).toHaveCount(1);
 		});
+
+		test('recalls zoom and pan between image changes', async ({ page }) => {
+			await zoomAt(page, 120, 100, 100);
+			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+
+			await page.keyboard.press('ArrowRight');
+			await page.waitForURL((u) => u.hash === '#/crop/000003');
+
+			await zoomAt(page, 40, 150, 150);
+			await checkImageTransforms(page, 1.44, 124.723, 73.3824);
+
+			await page.keyboard.press('ArrowLeft');
+			await page.waitForURL((u) => u.hash === '#/crop/000002');
+
+			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+		});
 	});
 });
 
