@@ -50,6 +50,7 @@
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFocus from '~icons/ph/crosshair-simple';
 	import IconNeuralNet from '~icons/ph/graph';
+	import IconToolZoom from '~icons/ph/magnifying-glass';
 	import IconFourPointCrop from '~icons/ph/number-circle-four';
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
 	import IconUnconfirmedCrop from '~icons/ph/seal';
@@ -120,10 +121,22 @@
 			createMode: 'off',
 			movable: true,
 			cursor: 'grab'
+		},
+		{
+			name: 'Zoomer',
+			help: "Cliquer et glisser pour zoomer sur une section de l'image",
+			icon: IconToolZoom,
+			shortcut: 'w',
+			transformable: false,
+			createMode: 'clickanddrag',
+			movable: false,
+			cursor: 'zoom-in'
 		}
 	]);
 
-	const creationTools = $derived(tools.filter(({ createMode }) => createMode !== 'off'));
+	const creationTools = $derived(
+		tools.filter(({ createMode, name }) => createMode !== 'off' && name !== 'Zoomer')
+	);
 
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
@@ -307,6 +320,23 @@
 			])
 		)
 	);
+
+	/**
+	 * @param {Rect} regionBox
+	 */
+	async function onZoomToRegion(regionBox) {
+		if (!firstImage) return;
+		const { x, y, w } = toCenteredCoords(
+			coordsScaler({
+				x: firstImage.dimensions.width / imageElement.width,
+				y: firstImage.dimensions.height / imageElement.height
+			})(regionBox)
+		);
+
+		zoom.origin.x = x;
+		zoom.origin.y = y;
+		zoom.scale = clamp(1, 1 / w, Infinity);
+	}
 
 	/**
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
@@ -716,7 +746,14 @@
 				disabled={zoom.panning}
 				cursor={zoom.panning ? 'move' : activeTool.cursor}
 				onchange={(imageId, box) => onCropChange(imageId, box)}
-				oncreate={(box) => onCropChange(null, box)}
+				oncreate={async (box) => {
+					if (activeTool.name === 'Zoomer') {
+						onZoomToRegion(box);
+						return null;
+					} else {
+						return onCropChange(null, box);
+					}
+				}}
 			/>
 		{/if}
 	</main>
