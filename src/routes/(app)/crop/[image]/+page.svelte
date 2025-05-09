@@ -117,7 +117,7 @@
 			transformable: false,
 			createMode: 'off',
 			movable: true,
-			cursor: 'move'
+			cursor: 'grab'
 		}
 	]);
 
@@ -610,13 +610,20 @@
 
 	let imageElement = $state();
 
+	/**
+	 * Zoom state.
+	 * Most logic goes to https://stackoverflow.com/a/70251437
+	 */
 	let zoom = $state({
 		/**
 		 * From 0 to 1, relative to topleft of the image
 		 */
 		origin: { x: 0, y: 0 },
-		scale: 1
+		scale: 1,
+		panning: false,
+		panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
 	});
+
 	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
 
@@ -646,8 +653,34 @@
 			</button>
 		{/each}
 	</aside>
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<main
 		class="crop-surface"
+		onmousedown={async ({ button, clientX, clientY }) => {
+			// Pan on mousewhell button hold
+			if (button !== 1) return;
+
+			// TODO: hide autoscroll indicator on Firefox
+			// see https://stackoverflow.com/q/79614190/9943464
+
+			zoom.panning = true;
+			zoom.panStart = {
+				x: clientX,
+				y: clientY,
+				zoomOrigin: $state.snapshot(zoom.origin)
+			};
+		}}
+		onmouseup={async ({ button }) => {
+			// Pan on mousewhell button release
+			if (button !== 1) return;
+			zoom.panning = false;
+		}}
+		onmousemove={async ({ clientX, clientY }) => {
+			if (!zoom.panning) return;
+
+			zoom.origin.x = zoom.panStart.zoomOrigin.x + (clientX - zoom.panStart.x);
+			zoom.origin.y = zoom.panStart.zoomOrigin.y + (clientY - zoom.panStart.y);
+		}}
 		onwheel={async (e) => {
 			e.preventDefault();
 			let imageBounds = imageElement.getBoundingClientRect();
@@ -679,6 +712,8 @@
 					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
 					toTopLeftCoords
 				)}
+				disabled={zoom.panning}
+				cursor={zoom.panning ? 'move' : activeTool.cursor}
 				onchange={(imageId, box) => onCropChange(imageId, box)}
 				oncreate={(box) => onCropChange(null, box)}
 			/>
