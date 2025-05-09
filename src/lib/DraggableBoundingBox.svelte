@@ -26,6 +26,8 @@
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
 	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
 	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
+	 * @property {number} zoomScale - the current zoom scale of the image
+	 * @property {{x: number, y: number}} zoomOrigin - the current zoom origin of the image, in pixels of the resized, post-object-fit but pre-zoom image
 	 */
 
 	/**  @type {Props} */
@@ -38,7 +40,9 @@
 		transformable,
 		disabled = false,
 		movable,
-		createMode
+		createMode,
+		zoomScale = 1,
+		zoomOrigin = { x: 0, y: 0 }
 	} = $props();
 
 	let boundingBoxes = $state(boudingBoxesInitial);
@@ -95,6 +99,7 @@
 
 	const imageRect = $derived.by(() => {
 		// The image has object-fit: contain, so the boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size
+		// This also accounts for current panning and zooming
 
 		const naturalRatio = naturalWidth / naturalHeight;
 		const clientRatio = clientWidth / clientHeight;
@@ -109,9 +114,12 @@
 			width = clientWidth;
 		}
 
+		width *= zoomScale;
+		height *= zoomScale;
+
 		return {
-			x: clientLeft + (clientWidth - width) / 2,
-			y: clientTop + (clientHeight - height) / 2,
+			x: zoomOrigin.x + clientLeft + (clientWidth - width) / 2,
+			y: zoomOrigin.y + clientTop + (clientHeight - height) / 2,
 			width,
 			height
 		};
@@ -243,7 +251,7 @@
 		// React to left mouse button only
 		if (button !== 0) return;
 
-		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY });
+		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY, w: 0, h: 0 });
 
 		if (creatingBoundingBox && createMode === 'clickanddrag') {
 			newBoundingBox.registerMovement(movementX, movementY);

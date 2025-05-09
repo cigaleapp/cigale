@@ -714,6 +714,8 @@
 				)}
 				disabled={zoom.panning}
 				cursor={zoom.panning ? 'move' : activeTool.cursor}
+				zoomScale={zoom.scale}
+				zoomOrigin={zoom.origin}
 				onchange={(imageId, box) => onCropChange(imageId, box)}
 				oncreate={(box) => onCropChange(null, box)}
 			/>
