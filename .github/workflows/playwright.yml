@@ -14,6 +14,9 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    environment:
+      name: 'End-to-end tests report for #${{ github.event.number }}'
+      url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,6 +45,7 @@ jobs:
 
       - name: Deploy results on github pages
         if: ${{ !cancelled() }}
+        id: deploy-preview
         uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./playwright-report
