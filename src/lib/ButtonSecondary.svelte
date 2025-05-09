@@ -21,6 +21,7 @@ Available CSS variables:
 	 * @property {boolean} [disabled=false]
 	 * @property {string} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
+	 * @property {string|undefined} [testid] add a data-testid attribute to the button
 	 */
 </script>
 
@@ -30,10 +31,15 @@ Available CSS variables:
 	import { tooltip } from './tooltips';
 
 	/** @type {Props} */
-	let { children, onclick, disabled = false, help, keyboard } = $props();
+	let { children, onclick, disabled = false, help, keyboard, testid } = $props();
 </script>
 
-<button {onclick} {disabled} use:tooltip={help ? { text: help, keyboard } : undefined}>
+<button
+	{onclick}
+	{disabled}
+	use:tooltip={help ? { text: help, keyboard } : undefined}
+	data-testid={testid || undefined}
+>
 	{@render children()}
 	{#if keyboard}
 		<KeyboardHint shortcut={keyboard} />
