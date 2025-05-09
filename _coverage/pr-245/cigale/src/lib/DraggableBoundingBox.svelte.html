@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/255</span>
+                <span class='fraction'>0/252</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/255</span>
+                <span class='fraction'>0/252</span>
             </div>
         
             
@@ -634,7 +634,8 @@
 <a name='L569'></a><a href='#L569'>569</a>
 <a name='L570'></a><a href='#L570'>570</a>
 <a name='L571'></a><a href='#L571'>571</a>
-<a name='L572'></a><a href='#L572'>572</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -674,13 +675,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -851,7 +854,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1213,6 +1215,10 @@
 	import { mapValues } from './utils';
 &nbsp;
 	/**
+	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
+	 */
+&nbsp;
+	/**
 	 * @typedef Rect
 	 * @type {object}
 	 * @property {number} x
@@ -1233,8 +1239,7 @@
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
 	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
 	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
-	 * @property {number} zoomScale - the current zoom scale of the image
-	 * @property {{x: number, y: number}} zoomOrigin - the current zoom origin of the image, in pixels of the resized, post-object-fit but pre-zoom image
+	 * @property {ZoomState} zoom - current zoom&amp;pan state
 	 */
 &nbsp;
 	/**  @type {Props} */
@@ -1248,8 +1253,7 @@
 <span class="cstat-no" title="statement not covered" >		disabled = false,</span>
 		movable,
 		createMode,
-<span class="cstat-no" title="statement not covered" >		zoomScale = 1,</span>
-<span class="cstat-no" title="statement not covered" >		zoomOrigin = { x: 0, y: 0 }</span>
+		zoom
 	} = $props();
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	let boundingBoxes = $state(boudingBoxesInitial);</span>
@@ -1321,12 +1325,12 @@
 <span class="cstat-no" title="statement not covered" >			width = clientWidth;</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		width *= zoomScale;</span>
-<span class="cstat-no" title="statement not covered" >		height *= zoomScale;</span>
+<span class="cstat-no" title="statement not covered" >		width *= zoom.scale;</span>
+<span class="cstat-no" title="statement not covered" >		height *= zoom.scale;</span>
 &nbsp;
 		return {
-<span class="cstat-no" title="statement not covered" >			x: zoomOrigin.x + clientLeft + (clientWidth - width) / 2,</span>
-<span class="cstat-no" title="statement not covered" >			y: zoomOrigin.y + clientTop + (clientHeight - height) / 2,</span>
+<span class="cstat-no" title="statement not covered" >			x: zoom.origin.x + clientLeft + (clientWidth - width) / 2,</span>
+<span class="cstat-no" title="statement not covered" >			y: zoom.origin.y + clientTop + (clientHeight - height) / 2,</span>
 <span class="cstat-no" title="statement not covered" >			width,</span>
 <span class="cstat-no" title="statement not covered" >			height</span>
 		};
@@ -1426,8 +1430,7 @@
 <span class="cstat-no" title="statement not covered" >		if (creatingBoundingBox &amp;&amp; newBoundingBox.ready) {</span>
 <span class="cstat-no" title="statement not covered" >			const relativeBoundingBox = fromPixel(newBoundingBox.rect());</span>
 <span class="cstat-no" title="statement not covered" >			const imageId = await oncreate?.(relativeBoundingBox);</span>
-<span class="cstat-no" title="statement not covered" >			if (!imageId) return;</span>
-<span class="cstat-no" title="statement not covered" >			boundingBoxes[imageId] = relativeBoundingBox;</span>
+<span class="cstat-no" title="statement not covered" >			if (imageId) boundingBoxes[imageId] = relativeBoundingBox;</span>
 <span class="cstat-no" title="statement not covered" >			newBoundingBox.reset();</span>
 <span class="cstat-no" title="statement not covered" >			creatingBoundingBox = false;</span>
 <span class="cstat-no" title="statement not covered" >		} else {</span>
@@ -1783,7 +1786,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-09T16:55:53.869Z
+                at 2025-05-09T21:55:09.063Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

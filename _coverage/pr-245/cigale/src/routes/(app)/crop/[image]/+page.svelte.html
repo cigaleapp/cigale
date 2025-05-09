@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1191</span>
+                <span class='fraction'>0/1190</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1191</span>
+                <span class='fraction'>0/1190</span>
             </div>
         
             
@@ -1253,9 +1253,7 @@
 <a name='L1188'></a><a href='#L1188'>1188</a>
 <a name='L1189'></a><a href='#L1189'>1189</a>
 <a name='L1190'></a><a href='#L1190'>1190</a>
-<a name='L1191'></a><a href='#L1191'>1191</a>
-<a name='L1192'></a><a href='#L1192'>1192</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L1191'></a><a href='#L1191'>1191</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2466,6 +2464,7 @@
 <span class="cstat-no" title="statement not covered" >	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import CroppedImg from '$lib/CroppedImg.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';</span>
+<span class="cstat-no" title="statement not covered" >	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';</span>
 <span class="cstat-no" title="statement not covered" >	import KeyboardHint from '$lib/KeyboardHint.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import ProgressBar from '$lib/ProgressBar.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import SentenceJoin from '$lib/SentenceJoin.svelte';</span>
@@ -2487,6 +2486,7 @@
 <span class="cstat-no" title="statement not covered" >	import { tooltip } from '$lib/tooltips';</span>
 <span class="cstat-no" title="statement not covered" >	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';</span>
 <span class="cstat-no" title="statement not covered" >	import { formatISO } from 'date-fns';</span>
+<span class="cstat-no" title="statement not covered" >	import { watch } from 'runed';</span>
 <span class="cstat-no" title="statement not covered" >	import IconRevert from '~icons/ph/arrow-arc-left';</span>
 <span class="cstat-no" title="statement not covered" >	import IconToolMove from '~icons/ph/arrows-out-cardinal';</span>
 <span class="cstat-no" title="statement not covered" >	import IconPrev from '~icons/ph/caret-left';</span>
@@ -3057,19 +3057,16 @@
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	let imageElement = $state();</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	/**</span>
-<span class="cstat-no" title="statement not covered" >	 * Zoom state.</span>
-<span class="cstat-no" title="statement not covered" >	 * Most logic goes to https://stackoverflow.com/a/70251437</span>
-<span class="cstat-no" title="statement not covered" >	 */</span>
-<span class="cstat-no" title="statement not covered" >	let zoom = $state({</span>
-<span class="cstat-no" title="statement not covered" >		/**</span>
-<span class="cstat-no" title="statement not covered" >		 * From 0 to 1, relative to topleft of the image</span>
-<span class="cstat-no" title="statement not covered" >		 */</span>
-<span class="cstat-no" title="statement not covered" >		origin: { x: 0, y: 0 },</span>
-<span class="cstat-no" title="statement not covered" >		scale: 1,</span>
-<span class="cstat-no" title="statement not covered" >		panning: false,</span>
-<span class="cstat-no" title="statement not covered" >		panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }</span>
-<span class="cstat-no" title="statement not covered" >	});</span>
+<span class="cstat-no" title="statement not covered" >	watch(</span>
+<span class="cstat-no" title="statement not covered" >		() =&gt; fileId,</span>
+<span class="cstat-no" title="statement not covered" >		(newFileId, oldFileId) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >			if (oldFileId) uiState.cropperZoomStates.set(oldFileId, $state.snapshot(zoom));</span>
+<span class="cstat-no" title="statement not covered" >			console.log('Chaning zoom state, of ', fileId);</span>
+<span class="cstat-no" title="statement not covered" >			zoom = $state.snapshot(uiState.cropperZoomStates.get(newFileId)) ?? INITIAL_ZOOM_STATE;</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	let zoom = $state({ ...INITIAL_ZOOM_STATE });</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	const zoomSpeed = $derived(zoom.scale * 0.1);</span>
 <span class="cstat-no" title="statement not covered" >&lt;/script&gt;</span>
@@ -3130,6 +3127,7 @@
 <span class="cstat-no" title="statement not covered" >		}}</span>
 <span class="cstat-no" title="statement not covered" >		onwheel={async (e) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >			e.preventDefault();</span>
+<span class="cstat-no" title="statement not covered" >			// Most logic is thanks to https://stackoverflow.com/a/70251437</span>
 <span class="cstat-no" title="statement not covered" >			let imageBounds = imageElement.getBoundingClientRect();</span>
 <span class="cstat-no" title="statement not covered" >			let x = (e.clientX - imageBounds.x) / zoom.scale;</span>
 <span class="cstat-no" title="statement not covered" >			let y = (e.clientY - imageBounds.y) / zoom.scale;</span>
@@ -3155,14 +3153,13 @@
 <span class="cstat-no" title="statement not covered" >			&lt;DraggableBoundingBox</span>
 <span class="cstat-no" title="statement not covered" >				{...activeTool}</span>
 <span class="cstat-no" title="statement not covered" >				{imageElement}</span>
+<span class="cstat-no" title="statement not covered" >				{zoom}</span>
 <span class="cstat-no" title="statement not covered" >				boundingBoxes={mapValues(</span>
 <span class="cstat-no" title="statement not covered" >					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,</span>
 <span class="cstat-no" title="statement not covered" >					toTopLeftCoords</span>
 <span class="cstat-no" title="statement not covered" >				)}</span>
 <span class="cstat-no" title="statement not covered" >				disabled={zoom.panning}</span>
 <span class="cstat-no" title="statement not covered" >				cursor={zoom.panning ? 'move' : activeTool.cursor}</span>
-<span class="cstat-no" title="statement not covered" >				zoomScale={zoom.scale}</span>
-<span class="cstat-no" title="statement not covered" >				zoomOrigin={zoom.origin}</span>
 <span class="cstat-no" title="statement not covered" >				onchange={(imageId, box) =&gt; onCropChange(imageId, box)}</span>
 <span class="cstat-no" title="statement not covered" >				oncreate={(box) =&gt; onCropChange(null, box)}</span>
 <span class="cstat-no" title="statement not covered" >			/&gt;</span>
@@ -3643,7 +3640,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-09T16:55:53.869Z
+                at 2025-05-09T21:55:09.063Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
