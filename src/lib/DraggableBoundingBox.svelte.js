@@ -1,6 +1,33 @@
 import { type } from 'arktype';
 import { clamp, sign } from './utils';
 
+/**
+ * Represents the zoom state of the image.
+ * x & y coordinates are in pixels of the resized, post-object-fit but pre-zoom image
+ * @typedef {object} ZoomState
+ * @property {object} origin
+ * @property {number} origin.x
+ * @property {number} origin.y
+ * @property {number} scale
+ * @property {boolean} panning
+ * @property {object} panStart
+ * @property {number} panStart.x
+ * @property {number} panStart.y
+ * @property {object} panStart.zoomOrigin
+ * @property {number} panStart.zoomOrigin.x
+ * @property {number} panStart.zoomOrigin.y
+ */
+
+/**
+ * @type {ZoomState}
+ */
+export const INITIAL_ZOOM_STATE = {
+	origin: { x: 0, y: 0 },
+	scale: 1,
+	panning: false,
+	panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+};
+
 export class NewBoundingBox {
 	/**
 	 * @type {import('./BoundingBoxes.svelte').Rect}
