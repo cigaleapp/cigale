@@ -394,6 +394,13 @@
 						confidence: 1,
 						manuallyModified: true,
 						alternatives: {}
+					},
+					// Set it right now to prevent confirmed crop indicators flickering
+					[uiState.cropConfirmationMetadataId]: {
+						value: 'true',
+						confidence: 1,
+						manuallyModified: true,
+						alternatives: {}
 					}
 				}
 			});
