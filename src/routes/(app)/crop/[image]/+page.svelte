@@ -408,6 +408,11 @@
 
 		await changeAllConfirmedStatuses(true);
 
+		// Select cropbox
+		if (!selectedBox.manual) {
+			selectedBox.imageId = newImageId || imageId;
+		}
+
 		if (willFlashConfirmedOverlay) {
 			confirmedOverlayShown = true;
 			await new Promise((resolve) => setTimeout(resolve, 500));
@@ -458,9 +463,17 @@
 	});
 
 	/**
-	 * @type {string|null}
+	 * @typedef {object} SelectedBox
+	 * @property {string|null} imageId
+	 * @property {boolean} manual was selected manually instead of by modifying/creating a new box
 	 */
-	let selectedBoundingBox = $state(null);
+	/** The imageID of the currently selected bounding box.
+	 * @type {SelectedBox}
+	 */
+	let selectedBox = $state({
+		imageId: null,
+		manual: false
+	});
 
 	defineKeyboardShortcuts({
 		ArrowLeft: {
@@ -492,22 +505,33 @@
 		},
 		Delete: {
 			help: 'Supprimer la boîte sélectionnée',
-			when: () => Boolean(selectedBoundingBox),
+			when: () => Boolean(selectedBox.imageId),
 			async do() {
-				if (!selectedBoundingBox) return;
+				if (!selectedBox.imageId) return;
 				await deleteMetadataValue({
 					metadataId: uiState.cropMetadataId,
-					subjectId: selectedBoundingBox
+					subjectId: selectedBox.imageId
 				});
-				selectedBoundingBox = null;
+				if (selectedBox.manual) {
+					selectedBox.imageId = null;
+				} else {
+					// Select previous box in list
+					console.log(images.toReversed(), selectedBox);
+					selectedBox.imageId =
+						images.toReversed().find((image) => image.id in boundingBoxes)?.id ?? null;
+				}
 			}
 		},
 		f: {
 			help: 'Cacher les boîtes non sélectionnées',
-			when: () => Boolean(selectedBoundingBox),
+			when: () => Boolean(selectedBox),
 			do() {
-				if (!selectedBoundingBox) return;
-				focusedImageId = focusedImageId === selectedBoundingBox ? '' : selectedBoundingBox;
+				if (!selectedBox) return;
+				if (selectedBox.imageId === focusedImageId) {
+					focusedImageId = '';
+				} else if (selectedBox.imageId) {
+					focusedImageId = selectedBox.imageId;
+				}
 			}
 		},
 		u: {
@@ -552,10 +576,12 @@
 					when: () => Object.keys(boundingBoxes).length >= i,
 					do: () => {
 						const imageId = Object.keys(boundingBoxes)[i - 1];
-						if (selectedBoundingBox === imageId) {
-							selectedBoundingBox = null;
+						if (selectedBox.imageId === imageId) {
+							selectedBox.imageId = null;
+							selectedBox.manual = false;
 						} else {
-							selectedBoundingBox = imageId;
+							selectedBox.imageId = imageId;
+							selectedBox.manual = true;
 						}
 					}
 				}
@@ -669,7 +695,7 @@
 					{@const isFocused = focusedImageId === image.id}
 					<li
 						class:unfocused={focusedImageId && focusedImageId !== image.id}
-						class:selected={selectedBoundingBox === image.id}
+						class:selected={selectedBox.imageId === image.id}
 					>
 						<CroppedImg
 							box={toTopLeftCoords(box)}
