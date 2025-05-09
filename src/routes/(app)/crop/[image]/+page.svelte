@@ -557,6 +557,25 @@
 			when: () => hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(false)
 		},
+		'+': {
+			help: 'Zoomer',
+			do: () => {
+				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed, 10);
+			}
+		},
+		'-': {
+			help: 'Dézoomer',
+			do: () => {
+				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed, 10);
+			}
+		},
+		Digit0: {
+			help: 'Réinitialiser le zoom',
+			do: () => {
+				zoom.origin = { x: 0, y: 0 };
+				zoom.scale = 1;
+			}
+		},
 		...fromEntries(
 			tools.map((tool) => [
 				tool.shortcut,
@@ -598,6 +617,7 @@
 		origin: { x: 0, y: 0 },
 		scale: 1
 	});
+	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
 
 <div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}>
@@ -630,16 +650,15 @@
 		class="crop-surface"
 		onwheel={async (e) => {
 			e.preventDefault();
-			const scrollSpeed = 0.1 * zoom.scale;
 			let imageBounds = imageElement.getBoundingClientRect();
 			let x = (e.clientX - imageBounds.x) / zoom.scale;
 			let y = (e.clientY - imageBounds.y) / zoom.scale;
 
-			zoom.scale = clamp(1, zoom.scale - sign(e.deltaY) * 2 * scrollSpeed, 10);
+			zoom.scale = clamp(1, zoom.scale - sign(e.deltaY) * 2 * zoomSpeed, 10);
 
 			if (zoom.scale > 1) {
-				zoom.origin.x += sign(e.deltaY) * scrollSpeed * (x * 2 - imageElement.offsetWidth);
-				zoom.origin.y += sign(e.deltaY) * scrollSpeed * (y * 2 - imageElement.offsetHeight);
+				zoom.origin.x += sign(e.deltaY) * zoomSpeed * (x * 2 - imageElement.offsetWidth);
+				zoom.origin.y += sign(e.deltaY) * zoomSpeed * (y * 2 - imageElement.offsetHeight);
 			} else {
 				zoom.origin = { x: 0, y: 0 };
 			}
