@@ -4,6 +4,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import IconSearch from '~icons/ph/magnifying-glass';
+	import IconCheck from '~icons/ph/check';
 	import IconImport from '~icons/ph/download';
 	import { uiState } from '$lib/state.svelte';
 	import IconManage from '~icons/ph/gear';
@@ -12,6 +13,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
+	import Tooltip from '$lib/Tooltip.svelte';
 
 	seo({ title: 'Choisir un protocole' });
 
@@ -47,7 +49,7 @@
 		{#each protocols as p, i (p.id)}
 			{@const showVersionCheck = p.version && p.source}
 			<li class:has-version-check={showVersionCheck}>
-				<button
+				<!-- <button
 					data-testid={i === 0 ? 'protocol-to-choose' : undefined}
 					class:selected={p.id === currentProtocol?.id}
 					onclick={() => {
@@ -56,7 +58,22 @@
 					}}
 				>
 					{p.name}
-				</button>
+				</button> -->
+				<ButtonSecondary
+					testid={i === 0 ? 'protocol-to-choose' : undefined}
+					onclick={() => {
+						uiState.currentProtocolId = p.id;
+						goto('#/import');
+					}}
+				>
+					{#if p.id === currentProtocol?.id}
+						<Tooltip text="Protocole sélectionné">
+							<IconCheck />
+						</Tooltip>
+					{/if}
+
+					{p.name}
+				</ButtonSecondary>
 				{#if showVersionCheck}
 					<ButtonUpdateProtocol compact {...p} />
 				{/if}
@@ -118,45 +135,12 @@
 		align-items: center;
 		gap: 0.5em;
 		width: 100%;
+		--width: 100%;
 	}
 
 	li.has-version-check {
 		display: grid;
 		grid-template-columns: 1fr min-content;
-	}
-
-	/* li.has-version-check :global(button:first-child) {
-		width: 75%;
-	}
-
-	li.has-version-check :global(button:last-child) {
-		width: 25%;
-		height: 100%;
-	} */
-
-	li:not(.has-version-check) button {
-		width: 100%;
-	}
-
-	li button {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 1rem;
-		border: 1px solid var(--gray);
-		border-radius: var(--corner-radius);
-		font-size: 1em;
-	}
-
-	button:is(:hover, :focus-visible) {
-		background-color: var(--bg-primary);
-		color: var(--fg-primary);
-		cursor: pointer;
-	}
-
-	button.selected {
-		background-color: var(--bg-primary);
-		color: var(--fg-primary);
 	}
 
 	section.manage {
