@@ -25,6 +25,7 @@
 	 * @property {string} [cursor=unset] - CSS cursor to use when hovering over the change area
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
 	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
+	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
 	 */
 
 	/**  @type {Props} */
@@ -35,6 +36,7 @@
 		onchange,
 		oncreate,
 		transformable,
+		disabled = false,
 		movable,
 		createMode
 	} = $props();
@@ -200,7 +202,11 @@
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
 	style:cursor
-	onmouseup={async () => {
+	onmouseup={async ({ button }) => {
+		if (disabled) return;
+		// React to left mouse button only
+		if (button !== 0) return;
+
 		draggingCorner.setAll(false);
 		if (creatingBoundingBox && newBoundingBox.ready) {
 			const relativeBoundingBox = fromPixel(newBoundingBox.rect());
@@ -214,7 +220,11 @@
 		}
 		draggingImageId = '';
 	}}
-	onmousedown={({ clientX, clientY, currentTarget }) => {
+	onmousedown={({ clientX, clientY, currentTarget, button }) => {
+		if (disabled) return;
+		// React to left mouse button only
+		if (button !== 0) return;
+
 		if (createMode === 'off') return;
 		// Using offset{X,Y} is wrong when pointer is inside the boundingbox, see https://stackoverflow.com/a/35364901
 		const { left, top } = currentTarget.getBoundingClientRect();
@@ -228,7 +238,11 @@
 		creatingBoundingBox = true;
 		newBoundingBox.registerPoint(x, y);
 	}}
-	onmousemove={({ movementX, movementY }) => {
+	onmousemove={({ movementX, movementY, button }) => {
+		if (disabled) return;
+		// React to left mouse button only
+		if (button !== 0) return;
+
 		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY });
 
 		if (creatingBoundingBox && createMode === 'clickanddrag') {
