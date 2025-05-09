@@ -656,17 +656,17 @@
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<main
 		class="crop-surface"
-		onmousedown={async ({ button, clientX, clientY }) => {
+		onmousedown={async (e) => {
 			// Pan on mousewhell button hold
-			if (button !== 1) return;
+			if (e.button !== 1) return;
 
-			// TODO: hide autoscroll indicator on Firefox
-			// see https://stackoverflow.com/q/79614190/9943464
+			// Hide autoscroll indicator on Firefox
+			e.preventDefault();
 
 			zoom.panning = true;
 			zoom.panStart = {
-				x: clientX,
-				y: clientY,
+				x: e.clientX,
+				y: e.clientY,
 				zoomOrigin: $state.snapshot(zoom.origin)
 			};
 		}}
