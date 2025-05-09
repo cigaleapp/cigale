@@ -1,7 +1,10 @@
 <script>
+	import { page } from '$app/state';
+	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImageFile } from '$lib/images';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
@@ -13,12 +16,9 @@
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
-	import { onMount } from 'svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { page } from '$app/state';
 	import { importMore } from './import/+page.svelte';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -71,8 +71,8 @@
 		uiState.setSelection?.([]);
 	}
 
-	onMount(() => {
-		uiState.keybinds['$mod+u'] = {
+	defineKeyboardShortcuts({
+		'$mod+u': {
 			help: 'Supprimer toutes les images et observations',
 			async do() {
 				toasts.warn('Suppression de toutes les images et observations…');
@@ -90,19 +90,19 @@
 					}
 				);
 			}
-		};
-		uiState.keybinds['$mod+g'] = {
+		},
+		'$mod+g': {
 			help: 'Fusionner des observations ou images',
 			do: mergeSelection
-		};
-		uiState.keybinds['$mod+Shift+g'] = {
+		},
+		'$mod+Shift+g': {
 			help: 'Séparer toutes les observations sélectionnées en images seules',
 			do: splitSelection
-		};
-		uiState.keybinds['Delete'] = {
+		},
+		Delete: {
 			help: 'Supprimer les images et observations sélectionnées',
 			do: deleteSelection
-		};
+		}
 	});
 
 	const showSidePanel = $derived(
