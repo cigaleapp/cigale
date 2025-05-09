@@ -38,7 +38,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
-	import { fromEntries, mapValues, pick, range } from '$lib/utils';
+	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import { formatISO } from 'date-fns';
 	import IconRevert from '~icons/ph/arrow-arc-left';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
@@ -590,6 +590,14 @@
 	});
 
 	let imageElement = $state();
+
+	let zoom = $state({
+		/**
+		 * From 0 to 1, relative to topleft of the image
+		 */
+		origin: { x: 0, y: 0 },
+		scale: 1
+	});
 </script>
 
 <div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}>
@@ -618,8 +626,32 @@
 			</button>
 		{/each}
 	</aside>
-	<main class="crop-surface">
-		<img src={imageSrc} alt="" bind:this={imageElement} />
+	<main
+		class="crop-surface"
+		onwheel={async (e) => {
+			e.preventDefault();
+			const scrollSpeed = 0.1 * zoom.scale;
+			let imageBounds = imageElement.getBoundingClientRect();
+			let x = (e.clientX - imageBounds.x) / zoom.scale;
+			let y = (e.clientY - imageBounds.y) / zoom.scale;
+
+			zoom.scale = clamp(1, zoom.scale - sign(e.deltaY) * 2 * scrollSpeed, 10);
+
+			if (zoom.scale > 1) {
+				zoom.origin.x += sign(e.deltaY) * scrollSpeed * (x * 2 - imageElement.offsetWidth);
+				zoom.origin.y += sign(e.deltaY) * scrollSpeed * (y * 2 - imageElement.offsetHeight);
+			} else {
+				zoom.origin = { x: 0, y: 0 };
+			}
+		}}
+	>
+		<img
+			src={imageSrc}
+			alt=""
+			bind:this={imageElement}
+			style:scale={zoom.scale}
+			style:translate="{zoom.origin.x}px {zoom.origin.y}px"
+		/>
 		{#if imageElement}
 			<DraggableBoundingBox
 				{...activeTool}
