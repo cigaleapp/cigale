@@ -1,1 +1,0 @@
-import{u as r}from"./D229NaU0.js";import{u as n}from"./BgWRhVtE.js";import{e as t,k as f}from"./B7CJx4-d.js";function y(o){r(()=>{for(const[e,i]of t(o)){if(e in n.keybinds){console.warn(`Keybind ${e} already defined, not overriding.`);continue}n.keybinds[e]=i}return()=>{for(const e of f(o))delete n.keybinds[e]}})}export{y as d};
