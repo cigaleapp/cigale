@@ -42,3 +42,7 @@ coverage
 html
 google-drive*.json
 slides
+scripts/treedump.json
+examples/arthropods.cigaleprotocol.json.bak
+examples/arthropods.cigaleprotocol.json.bak.bak
+scripts/gbif *.json
