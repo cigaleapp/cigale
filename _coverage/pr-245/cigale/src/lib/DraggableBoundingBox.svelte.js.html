@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.24% </span>
+                <span class="strong">95.85% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>139/169</span>
+                <span class='fraction'>162/169</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>59/59</span>
+                <span class='fraction'>67/67</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">90% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/10</span>
+                <span class='fraction'>9/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.24% </span>
+                <span class="strong">95.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>139/169</span>
+                <span class='fraction'>162/169</span>
             </div>
         
             
@@ -422,35 +422,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -719,36 +719,36 @@ export function <span class="fstat-no" title="function not covered" >zoomBoxFrom
  * @param {Pick&lt;HTMLImageElement, `${'natural'|'client'}${'Width'|'Height'}` | `client${'Top'|'Left'}`&gt;} imageElement
  * @param {ZoomState} [zoomState] take into account the zoom state of the image
  */
-export function <span class="fstat-no" title="function not covered" >fittedImageRect(</span>
-<span class="cstat-no" title="statement not covered" >	{ naturalWidth, naturalHeight, clientWidth, clientHeight, clientTop, clientLeft },</span>
-<span class="cstat-no" title="statement not covered" >	zoomState</span>
-<span class="cstat-no" title="statement not covered" >) {</span>
-<span class="cstat-no" title="statement not covered" >	const naturalRatio = naturalWidth / naturalHeight;</span>
-<span class="cstat-no" title="statement not covered" >	const clientRatio = clientWidth / clientHeight;</span>
+export function fittedImageRect(
+	{ naturalWidth, naturalHeight, clientWidth, clientHeight, clientTop, clientLeft },
+	zoomState
+) {
+	const naturalRatio = naturalWidth / naturalHeight;
+	const clientRatio = clientWidth / clientHeight;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	let width = 0;</span>
-<span class="cstat-no" title="statement not covered" >	let height = 0;</span>
+	let width = 0;
+	let height = 0;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	if (naturalRatio &lt; clientRatio) {</span>
-<span class="cstat-no" title="statement not covered" >		width = clientHeight * naturalRatio;</span>
-<span class="cstat-no" title="statement not covered" >		height = clientHeight;</span>
-<span class="cstat-no" title="statement not covered" >	} else {</span>
-<span class="cstat-no" title="statement not covered" >		height = clientWidth / naturalRatio;</span>
-<span class="cstat-no" title="statement not covered" >		width = clientWidth;</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
+	if (naturalRatio &lt; clientRatio) {
+		width = clientHeight * naturalRatio;
+		height = clientHeight;
+	} else {
+		height = clientWidth / naturalRatio;
+		width = clientWidth;
+	}
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	if (zoomState) {</span>
-<span class="cstat-no" title="statement not covered" >		width *= zoomState.scale;</span>
-<span class="cstat-no" title="statement not covered" >		height *= zoomState.scale;</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
+	if (zoomState) {
+		width *= zoomState.scale;
+		height *= zoomState.scale;
+	}
 &nbsp;
 	return {
-<span class="cstat-no" title="statement not covered" >		width,</span>
-<span class="cstat-no" title="statement not covered" >		height,</span>
-<span class="cstat-no" title="statement not covered" >		x: (zoomState?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,</span>
-<span class="cstat-no" title="statement not covered" >		y: (zoomState?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2</span>
+		width,
+		height,
+		x: (zoomState?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
+		y: (zoomState?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2
 	};
-<span class="cstat-no" title="statement not covered" >}</span>
+}
 &nbsp;
 export class NewBoundingBox {
 	/**
@@ -964,7 +964,7 @@ export class NewBoundingBox {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-10T13:49:02.135Z
+                at 2025-05-10T13:55:31.153Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
