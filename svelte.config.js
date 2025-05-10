@@ -1,5 +1,4 @@
 import adapter from '@sveltejs/adapter-static';
-import { mdsvex } from 'mdsvex';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -25,7 +24,6 @@ const config = {
 		}
 	},
 
-	preprocess: [mdsvex()],
 	extensions: ['.svelte', '.svx']
 };
 
