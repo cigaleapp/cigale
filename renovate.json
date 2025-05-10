@@ -20,7 +20,8 @@
 				"lint-staged",
 				"/gitmoji/",
 				"fake-indexeddb",
-				"globals"
+				"globals",
+				"execa"
 			],
 			"automerge": true
 		}
