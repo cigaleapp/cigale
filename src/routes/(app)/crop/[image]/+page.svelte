@@ -602,6 +602,24 @@
 				}
 			])
 		),
+		',': {
+			help: `Sélectionner la boîte précédente`,
+			do: () => {
+				const imageIds = Object.keys(boundingBoxes);
+				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
+				const prevIndex = (currentIndex - 1 + imageIds.length) % imageIds.length;
+				selectedBox.imageId = imageIds[prevIndex];
+			}
+		},
+		';': {
+			help: `Sélectionner la boîte suivante`,
+			do: () => {
+				const imageIds = Object.keys(boundingBoxes);
+				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
+				const nextIndex = (currentIndex + 1) % imageIds.length;
+				selectedBox.imageId = imageIds[nextIndex];
+			}
+		},
 		...fromEntries(
 			range(1, 10).map((i) => [
 				`Digit${i}`,
