@@ -1,5 +1,172 @@
 import { describe, expect, it, test } from 'vitest';
-import { NewBoundingBox } from './DraggableBoundingBox.svelte.js';
+import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
+
+describe('fittedImageRect', () => {
+	test('naturalWidth < naturalHeight', () => {
+		const rect = fittedImageRect(
+			{
+				naturalWidth: 100,
+				naturalHeight: 200,
+				clientWidth: 100,
+				clientHeight: 200,
+				clientTop: 0,
+				clientLeft: 0
+			},
+			undefined
+		);
+		expect(rect).toEqual({
+			width: 100,
+			height: 200,
+			x: 0,
+			y: 0
+		});
+	});
+
+	test('naturalWidth > naturalHeight', () => {
+		const rect = fittedImageRect(
+			{
+				naturalWidth: 200,
+				naturalHeight: 100,
+				clientWidth: 200,
+				clientHeight: 100,
+				clientTop: 0,
+				clientLeft: 0
+			},
+			undefined
+		);
+		expect(rect).toEqual({
+			width: 200,
+			height: 100,
+			x: 0,
+			y: 0
+		});
+	});
+
+	test('portrait image without zoom', () => {
+		const rect = fittedImageRect(
+			{
+				naturalWidth: 100,
+				naturalHeight: 200,
+				clientWidth: 200,
+				clientHeight: 100,
+				clientTop: 0,
+				clientLeft: 0
+			},
+			undefined
+		);
+		expect(rect).toMatchInlineSnapshot(`
+				{
+				  "height": 100,
+				  "width": 50,
+				  "x": 75,
+				  "y": 0,
+				}
+			`);
+	});
+
+	test('landscape image without zoom', () => {
+		const rect = fittedImageRect(
+			{
+				naturalWidth: 200,
+				naturalHeight: 100,
+				clientWidth: 100,
+				clientHeight: 200,
+				clientTop: 0,
+				clientLeft: 0
+			},
+			undefined
+		);
+		expect(rect).toMatchInlineSnapshot(`
+				{
+				  "height": 50,
+				  "width": 100,
+				  "x": 0,
+				  "y": 75,
+				}
+			`);
+	});
+
+	test('portrait image with zoom', () => {
+		const rect = fittedImageRect(
+			{
+				naturalWidth: 100,
+				naturalHeight: 200,
+				clientWidth: 200,
+				clientHeight: 100,
+				clientTop: 0,
+				clientLeft: 0
+			},
+			{
+				origin: { x: 0, y: 0 },
+				scale: 2,
+				panning: false,
+				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+			}
+		);
+		expect(rect).toMatchInlineSnapshot(`
+				{
+				  "height": 200,
+				  "width": 100,
+				  "x": 50,
+				  "y": -50,
+				}
+			`);
+	});
+
+	test('landscape image with zoom', () => {
+		const rect = fittedImageRect(
+			{
+				naturalWidth: 200,
+				naturalHeight: 100,
+				clientWidth: 100,
+				clientHeight: 200,
+				clientTop: 0,
+				clientLeft: 0
+			},
+			{
+				origin: { x: 0, y: 0 },
+				scale: 2,
+				panning: false,
+				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+			}
+		);
+		expect(rect).toMatchInlineSnapshot(`
+				{
+				  "height": 100,
+				  "width": 200,
+				  "x": -50,
+				  "y": 50,
+				}
+			`);
+	});
+
+	test('nonzero clientTop and clientLeft', () => {
+		const rect = fittedImageRect(
+			{
+				naturalWidth: 200,
+				naturalHeight: 100,
+				clientWidth: 100,
+				clientHeight: 200,
+				clientTop: 10,
+				clientLeft: 20
+			},
+			{
+				origin: { x: 0, y: 0 },
+				scale: 2,
+				panning: false,
+				panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+			}
+		);
+		expect(rect).toMatchInlineSnapshot(`
+				{
+				  "height": 100,
+				  "width": 200,
+				  "x": -30,
+				  "y": 60,
+				}
+			`);
+	});
+});
 
 describe('NewBoundingBox', () => {
 	/**

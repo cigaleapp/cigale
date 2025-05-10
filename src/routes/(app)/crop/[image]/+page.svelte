@@ -19,7 +19,13 @@
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
+	import {
+		fittedImageRect,
+		INITIAL_ZOOM_STATE,
+		zoomBoxFromState
+	} from '$lib/DraggableBoundingBox.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -38,8 +44,9 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
-	import { fromEntries, mapValues, pick, range } from '$lib/utils';
+	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import { formatISO } from 'date-fns';
+	import { watch } from 'runed';
 	import IconRevert from '~icons/ph/arrow-arc-left';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
@@ -48,6 +55,7 @@
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFocus from '~icons/ph/crosshair-simple';
 	import IconNeuralNet from '~icons/ph/graph';
+	import IconToolHand from '~icons/ph/hand';
 	import IconFourPointCrop from '~icons/ph/number-circle-four';
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
 	import IconUnconfirmedCrop from '~icons/ph/seal';
@@ -117,7 +125,17 @@
 			transformable: false,
 			createMode: 'off',
 			movable: true,
-			cursor: 'move'
+			cursor: 'pointer'
+		},
+		{
+			name: 'Main',
+			help: "Cliquer et glisser pour se déplacer dans l'image",
+			icon: IconToolHand,
+			shortcut: 'h',
+			transformable: false,
+			createMode: 'off',
+			movable: false,
+			cursor: 'grab'
 		}
 	]);
 
@@ -406,6 +424,8 @@
 			});
 		}
 
+		showBoxesListHint = false;
+
 		await changeAllConfirmedStatuses(true);
 
 		// Select cropbox
@@ -557,6 +577,25 @@
 			when: () => hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(false)
 		},
+		'+': {
+			help: 'Zoomer',
+			do: () => {
+				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed, 10);
+			}
+		},
+		'-': {
+			help: 'Dézoomer',
+			do: () => {
+				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed, 10);
+			}
+		},
+		Digit0: {
+			help: 'Réinitialiser le zoom',
+			do: () => {
+				zoom.origin = { x: 0, y: 0 };
+				zoom.scale = 1;
+			}
+		},
 		...fromEntries(
 			tools.map((tool) => [
 				tool.shortcut,
@@ -568,6 +607,24 @@
 				}
 			])
 		),
+		',': {
+			help: `Sélectionner la boîte précédente`,
+			do: () => {
+				const imageIds = Object.keys(boundingBoxes);
+				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
+				const prevIndex = (currentIndex - 1 + imageIds.length) % imageIds.length;
+				selectedBox.imageId = imageIds[prevIndex];
+			}
+		},
+		';': {
+			help: `Sélectionner la boîte suivante`,
+			do: () => {
+				const imageIds = Object.keys(boundingBoxes);
+				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
+				const nextIndex = (currentIndex + 1) % imageIds.length;
+				selectedBox.imageId = imageIds[nextIndex];
+			}
+		},
 		...fromEntries(
 			range(1, 10).map((i) => [
 				`Digit${i}`,
@@ -589,7 +646,35 @@
 		)
 	});
 
+	// Scroll to selected box
+	$effect(() => {
+		if (!selectedBox.imageId) return;
+		document.querySelector(`.boxes li.selected`)?.scrollIntoView({
+			behavior: 'smooth',
+			block: 'nearest',
+			inline: 'nearest'
+		});
+	});
+
 	let imageElement = $state();
+	let imageIsLoading = $state(true);
+
+	watch(
+		() => fileId,
+		(newFileId, oldFileId) => {
+			if (oldFileId) uiState.cropperZoomStates.set(oldFileId, $state.snapshot(zoom));
+			console.log('Chaning zoom state, of ', fileId);
+			zoom = $state.snapshot(uiState.cropperZoomStates.get(newFileId)) ?? INITIAL_ZOOM_STATE;
+		}
+	);
+
+	let zoom = $state({ ...INITIAL_ZOOM_STATE });
+
+	let showBoxesListHint = $derived(
+		images.every(({ metadata }) => !metadata[uiState.cropMetadataId]?.manuallyModified)
+	);
+
+	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
 
 <div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}>
@@ -618,16 +703,103 @@
 			</button>
 		{/each}
 	</aside>
-	<main class="crop-surface">
-		<img src={imageSrc} alt="" bind:this={imageElement} />
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<main
+		class="crop-surface"
+		onmousedown={async (e) => {
+			// Pan on mousewhell button hold or hand tool
+			if (activeTool.name !== 'Main' && e.button !== 1) return;
+
+			// Hide autoscroll indicator on Firefox
+			e.preventDefault();
+
+			zoom.panning = true;
+			zoom.panStart = {
+				x: e.clientX,
+				y: e.clientY,
+				zoomOrigin: $state.snapshot(zoom.origin)
+			};
+		}}
+		onmouseup={async ({ button }) => {
+			// Pan on mousewheel button release or hand tool
+			if (activeTool.name !== 'Main' && button !== 1) return;
+			zoom.panning = false;
+		}}
+		onmousemove={async ({ clientX, clientY }) => {
+			if (!zoom.panning) return;
+
+			zoom.origin.x = zoom.panStart.zoomOrigin.x + (clientX - zoom.panStart.x);
+			zoom.origin.y = zoom.panStart.zoomOrigin.y + (clientY - zoom.panStart.y);
+		}}
+		onwheel={async (e) => {
+			e.preventDefault();
+			// Most logic is thanks to https://stackoverflow.com/a/70251437
+			let imageBounds = imageElement.getBoundingClientRect();
+			let x = (e.clientX - imageBounds.x) / zoom.scale;
+			let y = (e.clientY - imageBounds.y) / zoom.scale;
+
+			zoom.scale = clamp(1, zoom.scale - sign(e.deltaY) * 2 * zoomSpeed, 10);
+
+			if (zoom.scale > 1) {
+				zoom.origin.x += sign(e.deltaY) * zoomSpeed * (x * 2 - imageElement.offsetWidth);
+				zoom.origin.y += sign(e.deltaY) * zoomSpeed * (y * 2 - imageElement.offsetHeight);
+			} else {
+				zoom.origin = { x: 0, y: 0 };
+			}
+		}}
+	>
+		<div class="behind-image">
+			{#if imageIsLoading}
+				<LoadingSpinner --size="2em" />
+				<p class="loading">Chargement de l'image…</p>
+			{:else}
+				<p class="coucou" aria-hidden="true">
+					coucou toi :)
+					<br />
+					passes une bonne journée ! 💖💖
+				</p>
+			{/if}
+		</div>
+		<img
+			data-testid="crop-subject-image"
+			src={imageSrc}
+			alt=""
+			bind:this={imageElement}
+			style:scale={zoom.scale}
+			style:translate="{zoom.origin.x}px {zoom.origin.y}px"
+			onload={() => {
+				imageIsLoading = false;
+			}}
+		/>
+		{#if zoom.scale > 1}
+			{@const imageRect = fittedImageRect(imageElement)}
+			{@const zoombox = zoomBoxFromState(zoom, imageRect)}
+			<aside class="zoom-window">
+				<div
+					class="zoombox"
+					style:top="{zoombox.y * 100}%"
+					style:left="{zoombox.x * 100}%"
+					style:width="{zoombox.width * 100}%"
+					style:height="{zoombox.height * 100}%"
+				></div>
+				<img src={imageSrc} alt="" aria-hidden="true" />
+			</aside>
+		{/if}
 		{#if imageElement}
 			<DraggableBoundingBox
 				{...activeTool}
 				{imageElement}
+				{zoom}
 				boundingBoxes={mapValues(
 					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
 					toTopLeftCoords
 				)}
+				disabled={zoom.panning}
+				cursor={zoom.panning
+					? activeTool.name === 'Main'
+						? 'grabbing'
+						: 'move'
+					: activeTool.cursor}
 				onchange={(imageId, box) => onCropChange(imageId, box)}
 				oncreate={(box) => onCropChange(null, box)}
 			/>
@@ -756,26 +928,28 @@
 						</div>
 					</li>
 				{/each}
-				<li class="boxes-list-hint">
-					<p>
-						Pour créer une nouvelle boîte,<wbr /> utilisez les outils <SentenceJoin
-							items={creationTools}
-							key={(t) => t.name}
-							final="ou"
-						>
-							{#snippet children({ icon: Icon, help, shortcut })}
-								<Tooltip text={help} keyboard={shortcut}>
-									<Icon />
-								</Tooltip>
-							{/snippet}
-						</SentenceJoin>
-					</p>
-					<p>
-						Sélectionnez une boîte avec
-						<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des raccourcis
-						clavier
-					</p>
-				</li>
+				{#if showBoxesListHint}
+					<li class="boxes-list-hint">
+						<p>
+							Pour créer une nouvelle boîte,<wbr /> utilisez les outils <SentenceJoin
+								items={creationTools}
+								key={(t) => t.name}
+								final="ou"
+							>
+								{#snippet children({ icon: Icon, help, shortcut })}
+									<Tooltip text={help} keyboard={shortcut}>
+										<Icon />
+									</Tooltip>
+								{/snippet}
+							</SentenceJoin>
+						</p>
+						<p>
+							Sélectionnez une boîte avec
+							<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des
+							raccourcis clavier
+						</p>
+					</li>
+				{/if}
 			</ul>
 		</section>
 		<section class="progress">
@@ -955,6 +1129,51 @@
 		background-image:
 			linear-gradient(to right, var(--gray) 1px, transparent 1px),
 			linear-gradient(to bottom, var(--gray) 1px, transparent 1px);
+	}
+
+	.zoom-window {
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		height: 10rem;
+		pointer-events: none;
+		overflow: hidden;
+	}
+
+	.zoom-window img {
+		filter: brightness(0.5);
+	}
+
+	.zoom-window .zoombox {
+		position: absolute;
+		border: 2px solid white;
+		outline: 2px solid black;
+		backdrop-filter: brightness(2);
+		transition: all 0.1s;
+		z-index: 10;
+	}
+
+	.behind-image {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.behind-image .loading {
+		margin-top: 1em;
+		font-size: 1.2em;
+	}
+
+	.behind-image .coucou {
+		text-align: center;
+		font-size: 0.9em;
+		color: var(--fg-primary);
 	}
 
 	.info {

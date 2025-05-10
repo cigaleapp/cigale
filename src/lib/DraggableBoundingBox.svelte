@@ -1,9 +1,13 @@
 <script>
 	import { tick } from 'svelte';
 	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
-	import { NewBoundingBox } from './DraggableBoundingBox.svelte.js';
+	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { getSettings } from './settings.svelte';
 	import { mapValues } from './utils';
+
+	/**
+	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
+	 */
 
 	/**
 	 * @typedef Rect
@@ -25,6 +29,8 @@
 	 * @property {string} [cursor=unset] - CSS cursor to use when hovering over the change area
 	 * @property {'clickanddrag'|'2point'|'4point'|'off'} createMode
 	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
+	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
+	 * @property {ZoomState} zoom - current zoom&pan state
 	 */
 
 	/**  @type {Props} */
@@ -35,8 +41,10 @@
 		onchange,
 		oncreate,
 		transformable,
+		disabled = false,
 		movable,
-		createMode
+		createMode,
+		zoom
 	} = $props();
 
 	let boundingBoxes = $state(boudingBoxesInitial);
@@ -91,29 +99,12 @@
 		};
 	});
 
-	const imageRect = $derived.by(() => {
-		// The image has object-fit: contain, so the boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size
-
-		const naturalRatio = naturalWidth / naturalHeight;
-		const clientRatio = clientWidth / clientHeight;
-
-		let width = 0,
-			height = 0;
-		if (naturalRatio < clientRatio) {
-			width = clientHeight * naturalRatio;
-			height = clientHeight;
-		} else {
-			height = clientWidth / naturalRatio;
-			width = clientWidth;
-		}
-
-		return {
-			x: clientLeft + (clientWidth - width) / 2,
-			y: clientTop + (clientHeight - height) / 2,
-			width,
-			height
-		};
-	});
+	const imageRect = $derived(
+		fittedImageRect(
+			{ clientHeight, clientWidth, naturalHeight, naturalWidth, clientTop, clientLeft },
+			zoom
+		)
+	);
 
 	const toPixel = $derived(
 		coordsScaler({
@@ -200,13 +191,16 @@
 	style:width="{imageRect.width}px"
 	style:height="{imageRect.height}px"
 	style:cursor
-	onmouseup={async () => {
+	onmouseup={async ({ button }) => {
+		if (disabled) return;
+		// React to left mouse button only
+		if (button !== 0) return;
+
 		draggingCorner.setAll(false);
 		if (creatingBoundingBox && newBoundingBox.ready) {
 			const relativeBoundingBox = fromPixel(newBoundingBox.rect());
 			const imageId = await oncreate?.(relativeBoundingBox);
-			if (!imageId) return;
-			boundingBoxes[imageId] = relativeBoundingBox;
+			if (imageId) boundingBoxes[imageId] = relativeBoundingBox;
 			newBoundingBox.reset();
 			creatingBoundingBox = false;
 		} else {
@@ -214,7 +208,11 @@
 		}
 		draggingImageId = '';
 	}}
-	onmousedown={({ clientX, clientY, currentTarget }) => {
+	onmousedown={({ clientX, clientY, currentTarget, button }) => {
+		if (disabled) return;
+		// React to left mouse button only
+		if (button !== 0) return;
+
 		if (createMode === 'off') return;
 		// Using offset{X,Y} is wrong when pointer is inside the boundingbox, see https://stackoverflow.com/a/35364901
 		const { left, top } = currentTarget.getBoundingClientRect();
@@ -228,8 +226,12 @@
 		creatingBoundingBox = true;
 		newBoundingBox.registerPoint(x, y);
 	}}
-	onmousemove={({ movementX, movementY }) => {
-		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY });
+	onmousemove={({ movementX, movementY, button }) => {
+		if (disabled) return;
+		// React to left mouse button only
+		if (button !== 0) return;
+
+		const { x: dx, y: dy } = fromPixel({ x: movementX, y: movementY, w: 0, h: 0 });
 
 		if (creatingBoundingBox && createMode === 'clickanddrag') {
 			newBoundingBox.registerMovement(movementX, movementY);
@@ -345,7 +347,9 @@
 			style:top="{box.y}px"
 			style:width="{box.width}px"
 			style:height="{box.height}px"
-			onmousedown={() => {
+			onmousedown={({ button }) => {
+				if (button !== 0) return;
+				if (disabled) return;
 				draggingImageId = imageId;
 				if (movable) draggingCorner.setAll(true);
 			}}
@@ -356,6 +360,8 @@
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onmousedown={(e) => {
+						if (e.button !== 0) return;
+						if (disabled) return;
 						if (!transformable) return;
 						draggingImageId = imageId;
 						draggingCorner[position] = true;
@@ -374,6 +380,8 @@
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onmousedown={(e) => {
+						if (e.button !== 0) return;
+						if (disabled) return;
 						if (!transformable) return;
 						draggingImageId = imageId;
 						draggingCorner[position] = true;

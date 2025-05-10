@@ -5,6 +5,7 @@ import { getMetadataValue } from './metadata';
 /**
  * @import * as DB from './database';
  * @import { TypedMetadataValue } from './metadata';
+ * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
  */
 
 /**
@@ -39,6 +40,7 @@ import { getMetadataValue } from './metadata';
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
  * @property {Set<string>} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
+ * @property {Map<string, ZoomState>} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
  * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
  * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
  * @property {string} cropConfirmationMetadataId ID de la métadonnée à utiliser pour déterminer si le recadrage a été confirmé
@@ -83,6 +85,7 @@ export const uiState = $state({
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
 	keybinds: {},
+	cropperZoomStates: new SvelteMap(),
 	get classificationMetadataId() {
 		return (
 			tables.Metadata.state.find(

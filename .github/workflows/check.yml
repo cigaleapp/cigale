@@ -15,7 +15,7 @@ jobs:
     name: Unit tests
     runs-on: ubuntu-latest
     environment:
-      name: 'Unit tests report for #${{ github.event.number }}'
+      name: '#${{ github.event.number }}: Unit tests report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
     name: Coverage
     runs-on: ubuntu-latest
     environment:
-      name: 'Coverage report for #${{ github.event.number }}'
+      name: '#${{ github.event.number }}: Test coverage report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
       - uses: actions/checkout@v4

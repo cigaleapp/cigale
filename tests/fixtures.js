@@ -7,11 +7,11 @@ import exampleProtocol from '../examples/arthropods.cigaleprotocol.json' with { 
  */
 
 /**
- * @type {TestType<{ forEachTest: void } & PlaywrightTestArgs, PlaywrightWorkerArgs >}
+ * @type {TestType<{ forEachTest: void } & PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions >}
  */
 export const test = base.extend(
 	/**
-	 * @type {Fixtures<{forEachTest: void}, {}, PlaywrightTestArgs, PlaywrightWorkerArgs>}
+	 * @type {Fixtures<{forEachTest: void}, {}, PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
 	 */
 	({
 		forEachTest: [
@@ -23,6 +23,7 @@ export const test = base.extend(
 					async (route) => route.fulfill({ json: exampleProtocol })
 				);
 				await page.goto('/');
+				// @ts-expect-error
 				await page.waitForFunction(() => Boolean(window.DB && window.refreshDB));
 				await use();
 			},

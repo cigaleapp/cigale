@@ -22,6 +22,7 @@
 
 	/** @param {DragEvent} event */
 	function handleDrop(event) {
+		console.log('handleDrop', event);
 		dragging = false;
 		if (!event.dataTransfer) return;
 		event.preventDefault();
