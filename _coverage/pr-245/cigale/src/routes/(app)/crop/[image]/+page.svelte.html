@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1190</span>
+                <span class='fraction'>0/1205</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1190</span>
+                <span class='fraction'>0/1205</span>
             </div>
         
             
@@ -1253,7 +1253,37 @@
 <a name='L1188'></a><a href='#L1188'>1188</a>
 <a name='L1189'></a><a href='#L1189'>1189</a>
 <a name='L1190'></a><a href='#L1190'>1190</a>
-<a name='L1191'></a><a href='#L1191'>1191</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L1191'></a><a href='#L1191'>1191</a>
+<a name='L1192'></a><a href='#L1192'>1192</a>
+<a name='L1193'></a><a href='#L1193'>1193</a>
+<a name='L1194'></a><a href='#L1194'>1194</a>
+<a name='L1195'></a><a href='#L1195'>1195</a>
+<a name='L1196'></a><a href='#L1196'>1196</a>
+<a name='L1197'></a><a href='#L1197'>1197</a>
+<a name='L1198'></a><a href='#L1198'>1198</a>
+<a name='L1199'></a><a href='#L1199'>1199</a>
+<a name='L1200'></a><a href='#L1200'>1200</a>
+<a name='L1201'></a><a href='#L1201'>1201</a>
+<a name='L1202'></a><a href='#L1202'>1202</a>
+<a name='L1203'></a><a href='#L1203'>1203</a>
+<a name='L1204'></a><a href='#L1204'>1204</a>
+<a name='L1205'></a><a href='#L1205'>1205</a>
+<a name='L1206'></a><a href='#L1206'>1206</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2492,6 +2522,7 @@
 <span class="cstat-no" title="statement not covered" >	import IconPrev from '~icons/ph/caret-left';</span>
 <span class="cstat-no" title="statement not covered" >	import IconNext from '~icons/ph/caret-right';</span>
 <span class="cstat-no" title="statement not covered" >	import IconContinue from '~icons/ph/check';</span>
+<span class="cstat-no" title="statement not covered" >	import IconToolHand from '~icons/ph/hand';</span>
 <span class="cstat-no" title="statement not covered" >	import IconHasCrop from '~icons/ph/crop';</span>
 <span class="cstat-no" title="statement not covered" >	import IconFocus from '~icons/ph/crosshair-simple';</span>
 <span class="cstat-no" title="statement not covered" >	import IconNeuralNet from '~icons/ph/graph';</span>
@@ -2564,6 +2595,16 @@
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
 <span class="cstat-no" title="statement not covered" >			createMode: 'off',</span>
 <span class="cstat-no" title="statement not covered" >			movable: true,</span>
+<span class="cstat-no" title="statement not covered" >			cursor: 'pointer'</span>
+<span class="cstat-no" title="statement not covered" >		},</span>
+<span class="cstat-no" title="statement not covered" >		{</span>
+<span class="cstat-no" title="statement not covered" >			name: 'Main',</span>
+<span class="cstat-no" title="statement not covered" >			help: "Cliquer et glisser pour se déplacer dans l'image",</span>
+<span class="cstat-no" title="statement not covered" >			icon: IconToolHand,</span>
+<span class="cstat-no" title="statement not covered" >			shortcut: 'h',</span>
+<span class="cstat-no" title="statement not covered" >			transformable: false,</span>
+<span class="cstat-no" title="statement not covered" >			createMode: 'off',</span>
+<span class="cstat-no" title="statement not covered" >			movable: false,</span>
 <span class="cstat-no" title="statement not covered" >			cursor: 'grab'</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	]);</span>
@@ -3101,8 +3142,8 @@
 <span class="cstat-no" title="statement not covered" >	&lt;main</span>
 <span class="cstat-no" title="statement not covered" >		class="crop-surface"</span>
 <span class="cstat-no" title="statement not covered" >		onmousedown={async (e) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >			// Pan on mousewhell button hold</span>
-<span class="cstat-no" title="statement not covered" >			if (e.button !== 1) return;</span>
+<span class="cstat-no" title="statement not covered" >			// Pan on mousewhell button hold or hand tool</span>
+<span class="cstat-no" title="statement not covered" >			if (activeTool.name !== 'Main' &amp;&amp; e.button !== 1) return;</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >			// Hide autoscroll indicator on Firefox</span>
 <span class="cstat-no" title="statement not covered" >			e.preventDefault();</span>
@@ -3115,8 +3156,8 @@
 <span class="cstat-no" title="statement not covered" >			};</span>
 <span class="cstat-no" title="statement not covered" >		}}</span>
 <span class="cstat-no" title="statement not covered" >		onmouseup={async ({ button }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >			// Pan on mousewhell button release</span>
-<span class="cstat-no" title="statement not covered" >			if (button !== 1) return;</span>
+<span class="cstat-no" title="statement not covered" >			// Pan on mousewheel button release or hand tool</span>
+<span class="cstat-no" title="statement not covered" >			if (activeTool.name !== 'Main' &amp;&amp; button !== 1) return;</span>
 <span class="cstat-no" title="statement not covered" >			zoom.panning = false;</span>
 <span class="cstat-no" title="statement not covered" >		}}</span>
 <span class="cstat-no" title="statement not covered" >		onmousemove={async ({ clientX, clientY }) =&gt; {</span>
@@ -3159,7 +3200,11 @@
 <span class="cstat-no" title="statement not covered" >					toTopLeftCoords</span>
 <span class="cstat-no" title="statement not covered" >				)}</span>
 <span class="cstat-no" title="statement not covered" >				disabled={zoom.panning}</span>
-<span class="cstat-no" title="statement not covered" >				cursor={zoom.panning ? 'move' : activeTool.cursor}</span>
+<span class="cstat-no" title="statement not covered" >				cursor={zoom.panning</span>
+<span class="cstat-no" title="statement not covered" >					? activeTool.name === 'Main'</span>
+<span class="cstat-no" title="statement not covered" >						? 'grabbing'</span>
+<span class="cstat-no" title="statement not covered" >						: 'move'</span>
+<span class="cstat-no" title="statement not covered" >					: activeTool.cursor}</span>
 <span class="cstat-no" title="statement not covered" >				onchange={(imageId, box) =&gt; onCropChange(imageId, box)}</span>
 <span class="cstat-no" title="statement not covered" >				oncreate={(box) =&gt; onCropChange(null, box)}</span>
 <span class="cstat-no" title="statement not covered" >			/&gt;</span>
@@ -3640,7 +3685,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-10T10:08:23.579Z
+                at 2025-05-10T10:32:00.586Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
