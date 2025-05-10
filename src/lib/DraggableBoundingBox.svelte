@@ -1,7 +1,7 @@
 <script>
 	import { tick } from 'svelte';
 	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
-	import { NewBoundingBox } from './DraggableBoundingBox.svelte.js';
+	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { getSettings } from './settings.svelte';
 	import { mapValues } from './utils';
 
@@ -99,33 +99,12 @@
 		};
 	});
 
-	const imageRect = $derived.by(() => {
-		// The image has object-fit: contain, so the boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size
-		// This also accounts for current panning and zooming
-
-		const naturalRatio = naturalWidth / naturalHeight;
-		const clientRatio = clientWidth / clientHeight;
-
-		let width = 0,
-			height = 0;
-		if (naturalRatio < clientRatio) {
-			width = clientHeight * naturalRatio;
-			height = clientHeight;
-		} else {
-			height = clientWidth / naturalRatio;
-			width = clientWidth;
-		}
-
-		width *= zoom.scale;
-		height *= zoom.scale;
-
-		return {
-			x: zoom.origin.x + clientLeft + (clientWidth - width) / 2,
-			y: zoom.origin.y + clientTop + (clientHeight - height) / 2,
-			width,
-			height
-		};
-	});
+	const imageRect = $derived(
+		fittedImageRect(
+			{ clientHeight, clientWidth, naturalHeight, naturalWidth, clientTop, clientLeft },
+			zoom
+		)
+	);
 
 	const toPixel = $derived(
 		coordsScaler({
