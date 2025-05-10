@@ -419,6 +419,8 @@
 			});
 		}
 
+		showBoxesListHint = false;
+
 		await changeAllConfirmedStatuses(true);
 
 		// Select cropbox
@@ -633,6 +635,10 @@
 	);
 
 	let zoom = $state({ ...INITIAL_ZOOM_STATE });
+
+	let showBoxesListHint = $derived(
+		images.every(({ metadata }) => !metadata[uiState.cropMetadataId]?.manuallyModified)
+	);
 
 	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
@@ -858,26 +864,28 @@
 						</div>
 					</li>
 				{/each}
-				<li class="boxes-list-hint">
-					<p>
-						Pour créer une nouvelle boîte,<wbr /> utilisez les outils <SentenceJoin
-							items={creationTools}
-							key={(t) => t.name}
-							final="ou"
-						>
-							{#snippet children({ icon: Icon, help, shortcut })}
-								<Tooltip text={help} keyboard={shortcut}>
-									<Icon />
-								</Tooltip>
-							{/snippet}
-						</SentenceJoin>
-					</p>
-					<p>
-						Sélectionnez une boîte avec
-						<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des raccourcis
-						clavier
-					</p>
-				</li>
+				{#if showBoxesListHint}
+					<li class="boxes-list-hint">
+						<p>
+							Pour créer une nouvelle boîte,<wbr /> utilisez les outils <SentenceJoin
+								items={creationTools}
+								key={(t) => t.name}
+								final="ou"
+							>
+								{#snippet children({ icon: Icon, help, shortcut })}
+									<Tooltip text={help} keyboard={shortcut}>
+										<Icon />
+									</Tooltip>
+								{/snippet}
+							</SentenceJoin>
+						</p>
+						<p>
+							Sélectionnez une boîte avec
+							<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des
+							raccourcis clavier
+						</p>
+					</li>
+				{/if}
 			</ul>
 		</section>
 		<section class="progress">
