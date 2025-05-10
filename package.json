@@ -42,7 +42,7 @@
 		"eslint": "^9.26.0",
 		"eslint-config-prettier": "^10.1.5",
 		"eslint-plugin-svelte": "^3.5.1",
-		"execa": "^9.5.2",
+		"execa": "^9.5.3",
 		"extract-zip": "^2.0.1",
 		"fake-indexeddb": "^6.0.1",
 		"get-current-line": "^7.4.0",
