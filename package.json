@@ -83,7 +83,7 @@
 		"idb": "^8.0.3",
 		"jimp": "^1.6.0",
 		"marked": "^15.0.11",
-		"onnxruntime-web": "^1.22.0-dev.20250310-fe7634eb6f",
+		"onnxruntime-web": "^1.22.0",
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
 		"sveltejs-tippy": "^3.0.0",
