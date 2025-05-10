@@ -21,6 +21,7 @@
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -47,10 +48,10 @@
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
 	import IconContinue from '~icons/ph/check';
-	import IconToolHand from '~icons/ph/hand';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFocus from '~icons/ph/crosshair-simple';
 	import IconNeuralNet from '~icons/ph/graph';
+	import IconToolHand from '~icons/ph/hand';
 	import IconFourPointCrop from '~icons/ph/number-circle-four';
 	import IconTwoPointCrop from '~icons/ph/number-circle-two';
 	import IconUnconfirmedCrop from '~icons/ph/seal';
@@ -652,6 +653,7 @@
 	});
 
 	let imageElement = $state();
+	let imageIsLoading = $state(true);
 
 	watch(
 		() => fileId,
@@ -742,12 +744,27 @@
 			}
 		}}
 	>
+		<div class="behind-image">
+			{#if imageIsLoading}
+				<LoadingSpinner --size="2em" />
+				<p class="loading">Chargement de l'image…</p>
+			{:else}
+				<p class="coucou" aria-hidden="true">
+					coucou toi :)
+					<br />
+					passes une bonne journée ! 💖💖
+				</p>
+			{/if}
+		</div>
 		<img
 			src={imageSrc}
 			alt=""
 			bind:this={imageElement}
 			style:scale={zoom.scale}
 			style:translate="{zoom.origin.x}px {zoom.origin.y}px"
+			onload={() => {
+				imageIsLoading = false;
+			}}
 		/>
 		{#if imageElement}
 			<DraggableBoundingBox
@@ -1093,6 +1110,29 @@
 		background-image:
 			linear-gradient(to right, var(--gray) 1px, transparent 1px),
 			linear-gradient(to bottom, var(--gray) 1px, transparent 1px);
+	}
+
+	.behind-image {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.behind-image .loading {
+		margin-top: 1em;
+		font-size: 1.2em;
+	}
+
+	.behind-image .coucou {
+		text-align: center;
+		font-size: 0.9em;
+		color: var(--fg-primary);
 	}
 
 	.info {
