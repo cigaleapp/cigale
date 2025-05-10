@@ -11,7 +11,7 @@
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to dev tooling (linters, formatters, etc)",
-   "matchDepTypes": ["devDependencies"],
+			"matchDepTypes": ["devDependencies"],
 			"matchPackageNames": ["!@sveltejs/*", "!svelte", "!vite"],
 			"automerge": true
 		}
