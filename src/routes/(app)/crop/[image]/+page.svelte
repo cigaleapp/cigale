@@ -47,6 +47,7 @@
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
 	import IconContinue from '~icons/ph/check';
+	import IconToolHand from '~icons/ph/hand';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFocus from '~icons/ph/crosshair-simple';
 	import IconNeuralNet from '~icons/ph/graph';
@@ -119,6 +120,16 @@
 			transformable: false,
 			createMode: 'off',
 			movable: true,
+			cursor: 'pointer'
+		},
+		{
+			name: 'Main',
+			help: "Cliquer et glisser pour se déplacer dans l'image",
+			icon: IconToolHand,
+			shortcut: 'h',
+			transformable: false,
+			createMode: 'off',
+			movable: false,
 			cursor: 'grab'
 		}
 	]);
@@ -656,8 +667,8 @@
 	<main
 		class="crop-surface"
 		onmousedown={async (e) => {
-			// Pan on mousewhell button hold
-			if (e.button !== 1) return;
+			// Pan on mousewhell button hold or hand tool
+			if (activeTool.name !== 'Main' && e.button !== 1) return;
 
 			// Hide autoscroll indicator on Firefox
 			e.preventDefault();
@@ -670,8 +681,8 @@
 			};
 		}}
 		onmouseup={async ({ button }) => {
-			// Pan on mousewhell button release
-			if (button !== 1) return;
+			// Pan on mousewheel button release or hand tool
+			if (activeTool.name !== 'Main' && button !== 1) return;
 			zoom.panning = false;
 		}}
 		onmousemove={async ({ clientX, clientY }) => {
@@ -714,7 +725,11 @@
 					toTopLeftCoords
 				)}
 				disabled={zoom.panning}
-				cursor={zoom.panning ? 'move' : activeTool.cursor}
+				cursor={zoom.panning
+					? activeTool.name === 'Main'
+						? 'grabbing'
+						: 'move'
+					: activeTool.cursor}
 				onchange={(imageId, box) => onCropChange(imageId, box)}
 				oncreate={(box) => onCropChange(null, box)}
 			/>
