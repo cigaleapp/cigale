@@ -35,14 +35,6 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-      - uses: daun/playwright-report-summary@v3
-        if: always()
-        with:
-          report-file: test-results.json
-          comment-title: End-to-end tests
-          job-summary: true
-          report-url: https://cigaleapp.github.io/cigale/_playwright/pr-${{ github.event.number }}/
-
       - name: Deploy results on github pages
         if: ${{ !cancelled() }}
         id: deploy-preview
