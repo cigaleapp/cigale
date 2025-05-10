@@ -623,6 +623,16 @@
 		)
 	});
 
+	// Scroll to selected box
+	$effect(() => {
+		if (!selectedBox.imageId) return;
+		document.querySelector(`.boxes li.selected`)?.scrollIntoView({
+			behavior: 'smooth',
+			block: 'nearest',
+			inline: 'nearest'
+		});
+	});
+
 	let imageElement = $state();
 
 	watch(
