@@ -25,26 +25,24 @@ export const MetadataValues = scope({ ID }).type({
 	'[ID]': MetadataValue
 });
 
-export const MetadataType = type("'string'", '@', 'du texte')
-	.or(type("'boolean'", '@', 'un booléen (vrai ou faux)'))
-	.or(type("'integer'", '@', 'un entier'))
-	.or(type("'float'", '@', 'un nombre, potentiellement à virgule'))
-	.or(
-		type(
-			"'enum'",
-			'@',
-			"un ensemble de valeur fixes. Utiliser 'options' sur la définition d'une métadonnée pour préciser les valeurs possibles"
-		)
-	)
-	.or(type("'date'", '@', 'une date'))
-	.or(type("'location'", '@', 'un objet avec deux nombres, `latitude` et `longitude`'))
-	.or(
-		type(
-			"'boundingbox'",
-			'@',
-			"un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
-		)
-	);
+export const MetadataType = type.or(
+	["'string'", '@', 'du texte'],
+	["'boolean'", '@', 'un booléen (vrai ou faux)'],
+	["'integer'", '@', 'un entier'],
+	["'float'", '@', 'un nombre, potentiellement à virgule'],
+	[
+		"'enum'",
+		'@',
+		"un ensemble de valeur fixes. Utiliser 'options' sur la définition d'une métadonnée pour préciser les valeurs possibles"
+	],
+	["'date'", '@', 'une date'],
+	["'location'", '@', 'un objet avec deux nombres, `latitude` et `longitude`'],
+	[
+		"'boundingbox'",
+		'@',
+		"un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
+	]
+);
 
 /**
  * @type { Record<typeof MetadataType.infer, string> }
@@ -60,21 +58,21 @@ export const METADATA_TYPES = {
 	boundingbox: 'boîte de recadrage'
 };
 
-export const MetadataMergeMethod = type(
-	'"min"',
-	'@',
-	"Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
-)
-	.or(
-		type(
-			'"max"',
-			'@',
-			"Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
-		)
-	)
-	.or(type('"average"', '@', 'Prendre la moyenne des valeurs'))
-	.or(type('"median"', '@', 'Prendre la médiane des valeurs'))
-	.or(type('"none"', '@', 'Ne pas fusionner'));
+export const MetadataMergeMethod = type.or(
+	[
+		'"min"',
+		'@',
+		"Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+	],
+	[
+		'"max"',
+		'@',
+		"Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+	],
+	['"average"', '@', 'Prendre la moyenne des valeurs'],
+	['"median"', '@', 'Prendre la médiane des valeurs'],
+	['"none"', '@', 'Ne pas fusionner']
+);
 
 /**
  * @type { Record<typeof MetadataMergeMethod.infer, { label: string; help: string }> }
@@ -129,11 +127,22 @@ export const MetadataInferOptions = type
 			}
 		}).describe('Inférer depuis un modèle de réseau de neurones', 'self')
 	)
-	.describe('Comment inférer la valeur de cette métadonnée', 'self');
+	.describe(
+		'Comment inférer la valeur de cette métadonnée. Ignoré si la métadonnée a un scope différent de "item"',
+		'self'
+	);
+
+export const MetadataScope = type.or(
+	['"session"', '@', 'La métadonnée est associée à une session entière.'],
+	['"item"', '@', 'La métadonnée est associée à une observation ou une image']
+);
 
 export const Metadata = type({
 	id: ID.describe(
 		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
+	),
+	scope: MetadataScope.configure('À quoi peut-on appliquer cette métadonnée?', 'self').default(
+		'item'
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
 	mergeMethod: MetadataMergeMethod.configure(
