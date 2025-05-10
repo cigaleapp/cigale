@@ -187,10 +187,13 @@ export async function generateResultsZip(
 						[
 							'Identifiant',
 							'Observation',
-							...allMetadataKeys.flatMap((k) => [
-								metadataPrettyKey(metadataDefinitions[k]),
-								`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
-							])
+							// 2 columns for each metadata: for the value itself, and for the confidence in the value
+							...allMetadataKeys
+								.filter((k) => Boolean(metadataDefinitions[k]?.label))
+								.flatMap((k) => [
+									metadataPrettyKey(metadataDefinitions[k]),
+									`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
+								])
 						],
 						observations.map((o) => ({
 							Identifiant: o.id,
