@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1213</span>
+                <span class='fraction'>0/1241</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1213</span>
+                <span class='fraction'>0/1241</span>
             </div>
         
             
@@ -1276,7 +1276,63 @@
 <a name='L1211'></a><a href='#L1211'>1211</a>
 <a name='L1212'></a><a href='#L1212'>1212</a>
 <a name='L1213'></a><a href='#L1213'>1213</a>
-<a name='L1214'></a><a href='#L1214'>1214</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L1214'></a><a href='#L1214'>1214</a>
+<a name='L1215'></a><a href='#L1215'>1215</a>
+<a name='L1216'></a><a href='#L1216'>1216</a>
+<a name='L1217'></a><a href='#L1217'>1217</a>
+<a name='L1218'></a><a href='#L1218'>1218</a>
+<a name='L1219'></a><a href='#L1219'>1219</a>
+<a name='L1220'></a><a href='#L1220'>1220</a>
+<a name='L1221'></a><a href='#L1221'>1221</a>
+<a name='L1222'></a><a href='#L1222'>1222</a>
+<a name='L1223'></a><a href='#L1223'>1223</a>
+<a name='L1224'></a><a href='#L1224'>1224</a>
+<a name='L1225'></a><a href='#L1225'>1225</a>
+<a name='L1226'></a><a href='#L1226'>1226</a>
+<a name='L1227'></a><a href='#L1227'>1227</a>
+<a name='L1228'></a><a href='#L1228'>1228</a>
+<a name='L1229'></a><a href='#L1229'>1229</a>
+<a name='L1230'></a><a href='#L1230'>1230</a>
+<a name='L1231'></a><a href='#L1231'>1231</a>
+<a name='L1232'></a><a href='#L1232'>1232</a>
+<a name='L1233'></a><a href='#L1233'>1233</a>
+<a name='L1234'></a><a href='#L1234'>1234</a>
+<a name='L1235'></a><a href='#L1235'>1235</a>
+<a name='L1236'></a><a href='#L1236'>1236</a>
+<a name='L1237'></a><a href='#L1237'>1237</a>
+<a name='L1238'></a><a href='#L1238'>1238</a>
+<a name='L1239'></a><a href='#L1239'>1239</a>
+<a name='L1240'></a><a href='#L1240'>1240</a>
+<a name='L1241'></a><a href='#L1241'>1241</a>
+<a name='L1242'></a><a href='#L1242'>1242</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -3093,6 +3149,24 @@
 <span class="cstat-no" title="statement not covered" >				}</span>
 <span class="cstat-no" title="statement not covered" >			])</span>
 <span class="cstat-no" title="statement not covered" >		),</span>
+<span class="cstat-no" title="statement not covered" >		'&gt;': {</span>
+<span class="cstat-no" title="statement not covered" >			help: `Sélectionner la boîte suivante`,</span>
+<span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >				const imageIds = Object.keys(boundingBoxes);</span>
+<span class="cstat-no" title="statement not covered" >				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');</span>
+<span class="cstat-no" title="statement not covered" >				const nextIndex = (currentIndex + 1) % imageIds.length;</span>
+<span class="cstat-no" title="statement not covered" >				selectedBox.imageId = imageIds[nextIndex];</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		},</span>
+<span class="cstat-no" title="statement not covered" >		'&lt;': {</span>
+<span class="cstat-no" title="statement not covered" >			help: `Sélectionner la boîte précédente`,</span>
+<span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >				const imageIds = Object.keys(boundingBoxes);</span>
+<span class="cstat-no" title="statement not covered" >				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');</span>
+<span class="cstat-no" title="statement not covered" >				const prevIndex = (currentIndex - 1 + imageIds.length) % imageIds.length;</span>
+<span class="cstat-no" title="statement not covered" >				selectedBox.imageId = imageIds[prevIndex];</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		...fromEntries(</span>
 <span class="cstat-no" title="statement not covered" >			range(1, 10).map((i) =&gt; [</span>
 <span class="cstat-no" title="statement not covered" >				`Digit${i}`,</span>
@@ -3112,6 +3186,16 @@
 <span class="cstat-no" title="statement not covered" >				}</span>
 <span class="cstat-no" title="statement not covered" >			])</span>
 <span class="cstat-no" title="statement not covered" >		)</span>
+<span class="cstat-no" title="statement not covered" >	});</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	// Scroll to selected box</span>
+<span class="cstat-no" title="statement not covered" >	$effect(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		if (!selectedBox.imageId) return;</span>
+<span class="cstat-no" title="statement not covered" >		document.querySelector(`.boxes li.selected`)?.scrollIntoView({</span>
+<span class="cstat-no" title="statement not covered" >			behavior: 'smooth',</span>
+<span class="cstat-no" title="statement not covered" >			block: 'nearest',</span>
+<span class="cstat-no" title="statement not covered" >			inline: 'nearest'</span>
+<span class="cstat-no" title="statement not covered" >		});</span>
 <span class="cstat-no" title="statement not covered" >	});</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	let imageElement = $state();</span>
@@ -3709,7 +3793,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-10T10:47:57.180Z
+                at 2025-05-10T10:53:10.047Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
