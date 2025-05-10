@@ -1,4 +1,4 @@
-const CLASSMAPPING_URL = 'https://cigaleapp.github.io/models/class_mapping.txt';
+import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 
 async function fetchTaxon(taxon) {
 	const response = await fetch(
@@ -8,15 +8,9 @@ async function fetchTaxon(taxon) {
 	return data.results[0];
 }
 
-process.stderr.write(`Fetching species list from ${CLASSMAPPING_URL}...\r`);
-const species = await fetch(CLASSMAPPING_URL)
-	.then((response) => response.text())
-	.then((text) =>
-		text
-			.split('\n')
-			.map((sp) => sp.trim())
-			.filter(Boolean)
-	);
+const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.map(
+	(o) => o.label
+);
 
 const out = {
 	phyla: {},
