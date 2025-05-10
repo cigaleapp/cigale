@@ -356,7 +356,7 @@ test.describe('Cropper view', () => {
 		 * @param {number} [translateY]
 		 */
 		async function checkImageTransforms(page, scale, translateX, translateY) {
-			const image = page.locator('main').locator('img');
+			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
 			await expect.soft(image).toHaveCSS('scale', /[0-9]+(\.[0-9]+)?/);
@@ -373,7 +373,7 @@ test.describe('Cropper view', () => {
 		}
 
 		test('should zoom in and out with the mouse wheel', async ({ page }) => {
-			const image = page.locator('main').locator('img');
+			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
 			await expect(image).toHaveCSS('scale', '1');
@@ -389,7 +389,7 @@ test.describe('Cropper view', () => {
 		});
 
 		test('should zoom in and out with the keyboard', async ({ page }) => {
-			const image = page.locator('main').locator('img');
+			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
 			await expect(image).toHaveCSS('scale', '1');
@@ -417,7 +417,7 @@ test.describe('Cropper view', () => {
 		});
 
 		test('should pan with the mouse', async ({ page }) => {
-			const image = page.locator('main').locator('img');
+			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
 			await expect(image).toHaveCSS('scale', '1');
