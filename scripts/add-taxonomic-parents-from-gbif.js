@@ -33,6 +33,7 @@ async function fetchPhoto(gbifId) {
 				m.type === 'StillImage' &&
 				[
 					'http://creativecommons.org/licenses/by/4.0/',
+					'http://creativecommons.org/licenses/by-nc/4.0/',
 					'https://creativecommons.org/publicdomain/zero/1.0/'
 				].includes(m.license)
 		);
@@ -45,12 +46,19 @@ async function fetchPhoto(gbifId) {
 		credit: image.rightsHolder
 	};
 
+	const licenseName =
+		'CC' +
+		(photo.license.includes('publicdomain')
+			? '0'
+			: photo.license.includes('/by-nc/')
+				? '-BY-NC-4.0'
+				: '-BY-4.0');
+
 	return {
 		...photo,
-		attribution:
-			photo.credit && photo.source
-				? `\n\n\nPhoto par ${photo.credit} [sur ${new URL(photo.source).hostname}](${photo.source}) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC ${photo.license.includes('publicdomain') ? '0' : 'BY 4.0'}](${photo.license})`
-				: ''
+		attribution: photo.credit
+			? `\n\n\nPhoto par ${photo.credit} ${photo.source ? `[sur ${new URL(photo.source).hostname}](${photo.source}) (_via_ [GBIF.org](https://gbif.org/)),` : ''} sous [license ${licenseName}](${photo.license})`
+			: ''
 	};
 }
 
