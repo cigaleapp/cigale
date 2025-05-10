@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     environment:
-      name: 'End-to-end tests report for #${{ github.event.number }}'
+      name: '#${{ github.event.number }}: End-to-end tests report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
       - uses: actions/checkout@v4
