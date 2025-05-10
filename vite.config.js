@@ -8,7 +8,7 @@ export default defineConfig({
 	test: {
 		environment: 'jsdom',
 		include: ['src/**/*.{test,spec}{.svelte,}.{js,ts}'],
-		includeSource: ['src/**/*.{js,ts,svelte}'],
+		includeSource: ['src/**/*.{js,ts}'],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
 		coverage: {
