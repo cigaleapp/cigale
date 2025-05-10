@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { toTopLeftCoords } from './BoundingBoxes.svelte';
 import { clamp, sign } from './utils';
 
 /**
@@ -27,6 +28,29 @@ export const INITIAL_ZOOM_STATE = {
 	panning: false,
 	panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
 };
+
+/**
+ *
+ * @param {ZoomState} state
+ * @param {{width: number, height: number}} imageSize
+ * @returns {import('./BoundingBoxes.svelte').Rect} in normalized (0-1) coordinates
+ */
+export function zoomBoxFromState({ origin: { x, y }, scale }, { width, height }) {
+	// const { w, h, x, y } = coordsScaler({ x: 1 / (width * scale), y: 1 / (height * scale) })({
+	// 	h: height,
+	// 	w: width,
+	// 	...origin
+	// });
+
+	console.log('zoomBoxFromState', { x, y, scale, height, width });
+
+	return toTopLeftCoords({
+		x: x / width, //- Math.abs(0.5 - x),
+		y: y / height, // - Math.abs(0.5 - y),
+		w: 1 / scale,
+		h: 1 / scale
+	});
+}
 
 /**
  * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
