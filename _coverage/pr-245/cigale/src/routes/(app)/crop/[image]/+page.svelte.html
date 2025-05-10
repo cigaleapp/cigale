@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1205</span>
+                <span class='fraction'>0/1213</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1205</span>
+                <span class='fraction'>0/1213</span>
             </div>
         
             
@@ -1268,7 +1268,23 @@
 <a name='L1203'></a><a href='#L1203'>1203</a>
 <a name='L1204'></a><a href='#L1204'>1204</a>
 <a name='L1205'></a><a href='#L1205'>1205</a>
-<a name='L1206'></a><a href='#L1206'>1206</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L1206'></a><a href='#L1206'>1206</a>
+<a name='L1207'></a><a href='#L1207'>1207</a>
+<a name='L1208'></a><a href='#L1208'>1208</a>
+<a name='L1209'></a><a href='#L1209'>1209</a>
+<a name='L1210'></a><a href='#L1210'>1210</a>
+<a name='L1211'></a><a href='#L1211'>1211</a>
+<a name='L1212'></a><a href='#L1212'>1212</a>
+<a name='L1213'></a><a href='#L1213'>1213</a>
+<a name='L1214'></a><a href='#L1214'>1214</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2894,6 +2910,8 @@
 <span class="cstat-no" title="statement not covered" >			});</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >		showBoxesListHint = false;</span>
+<span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >		await changeAllConfirmedStatuses(true);</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >		// Select cropbox</span>
@@ -3108,6 +3126,10 @@
 <span class="cstat-no" title="statement not covered" >	);</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	let zoom = $state({ ...INITIAL_ZOOM_STATE });</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	let showBoxesListHint = $derived(</span>
+<span class="cstat-no" title="statement not covered" >		images.every(({ metadata }) =&gt; !metadata[uiState.cropMetadataId]?.manuallyModified)</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	const zoomSpeed = $derived(zoom.scale * 0.1);</span>
 <span class="cstat-no" title="statement not covered" >&lt;/script&gt;</span>
@@ -3333,26 +3355,28 @@
 <span class="cstat-no" title="statement not covered" >						&lt;/div&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;/li&gt;</span>
 <span class="cstat-no" title="statement not covered" >				{/each}</span>
-<span class="cstat-no" title="statement not covered" >				&lt;li class="boxes-list-hint"&gt;</span>
-<span class="cstat-no" title="statement not covered" >					&lt;p&gt;</span>
-<span class="cstat-no" title="statement not covered" >						Pour créer une nouvelle boîte,&lt;wbr /&gt; utilisez les outils &lt;SentenceJoin</span>
-<span class="cstat-no" title="statement not covered" >							items={creationTools}</span>
-<span class="cstat-no" title="statement not covered" >							key={(t) =&gt; t.name}</span>
-<span class="cstat-no" title="statement not covered" >							final="ou"</span>
-<span class="cstat-no" title="statement not covered" >						&gt;</span>
-<span class="cstat-no" title="statement not covered" >							{#snippet children({ icon: Icon, help, shortcut })}</span>
-<span class="cstat-no" title="statement not covered" >								&lt;Tooltip text={help} keyboard={shortcut}&gt;</span>
-<span class="cstat-no" title="statement not covered" >									&lt;Icon /&gt;</span>
-<span class="cstat-no" title="statement not covered" >								&lt;/Tooltip&gt;</span>
-<span class="cstat-no" title="statement not covered" >							{/snippet}</span>
-<span class="cstat-no" title="statement not covered" >						&lt;/SentenceJoin&gt;</span>
-<span class="cstat-no" title="statement not covered" >					&lt;/p&gt;</span>
-<span class="cstat-no" title="statement not covered" >					&lt;p&gt;</span>
-<span class="cstat-no" title="statement not covered" >						Sélectionnez une boîte avec</span>
-<span class="cstat-no" title="statement not covered" >						&lt;KeyboardHint shortcut="1" /&gt; à &lt;KeyboardHint shortcut="9" /&gt; pour la modifier avec des raccourcis</span>
-<span class="cstat-no" title="statement not covered" >						clavier</span>
-<span class="cstat-no" title="statement not covered" >					&lt;/p&gt;</span>
-<span class="cstat-no" title="statement not covered" >				&lt;/li&gt;</span>
+<span class="cstat-no" title="statement not covered" >				{#if showBoxesListHint}</span>
+<span class="cstat-no" title="statement not covered" >					&lt;li class="boxes-list-hint"&gt;</span>
+<span class="cstat-no" title="statement not covered" >						&lt;p&gt;</span>
+<span class="cstat-no" title="statement not covered" >							Pour créer une nouvelle boîte,&lt;wbr /&gt; utilisez les outils &lt;SentenceJoin</span>
+<span class="cstat-no" title="statement not covered" >								items={creationTools}</span>
+<span class="cstat-no" title="statement not covered" >								key={(t) =&gt; t.name}</span>
+<span class="cstat-no" title="statement not covered" >								final="ou"</span>
+<span class="cstat-no" title="statement not covered" >							&gt;</span>
+<span class="cstat-no" title="statement not covered" >								{#snippet children({ icon: Icon, help, shortcut })}</span>
+<span class="cstat-no" title="statement not covered" >									&lt;Tooltip text={help} keyboard={shortcut}&gt;</span>
+<span class="cstat-no" title="statement not covered" >										&lt;Icon /&gt;</span>
+<span class="cstat-no" title="statement not covered" >									&lt;/Tooltip&gt;</span>
+<span class="cstat-no" title="statement not covered" >								{/snippet}</span>
+<span class="cstat-no" title="statement not covered" >							&lt;/SentenceJoin&gt;</span>
+<span class="cstat-no" title="statement not covered" >						&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >						&lt;p&gt;</span>
+<span class="cstat-no" title="statement not covered" >							Sélectionnez une boîte avec</span>
+<span class="cstat-no" title="statement not covered" >							&lt;KeyboardHint shortcut="1" /&gt; à &lt;KeyboardHint shortcut="9" /&gt; pour la modifier avec des</span>
+<span class="cstat-no" title="statement not covered" >							raccourcis clavier</span>
+<span class="cstat-no" title="statement not covered" >						&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >					&lt;/li&gt;</span>
+<span class="cstat-no" title="statement not covered" >				{/if}</span>
 <span class="cstat-no" title="statement not covered" >			&lt;/ul&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;/section&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;section class="progress"&gt;</span>
@@ -3685,7 +3709,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-10T10:32:00.586Z
+                at 2025-05-10T10:47:57.180Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
