@@ -18,7 +18,7 @@ async function fetchTaxon(taxon) {
 }
 
 async function fetchPhoto(gbifId) {
-	const url = `https://api.gbif.org/v1/occurrence/search?taxonKey=${gbifId}&limit=1`;
+	const url = `https://api.gbif.org/v1/occurrence/search?taxonKey=${gbifId}`;
 	const response = await fetch(url).then((r) => {
 		if (!r.ok) throw new Error(`Error fetching ${url}: ${r.status} ${r.statusText}`);
 		return r.json();
@@ -27,8 +27,8 @@ async function fetchPhoto(gbifId) {
 	if (!response.results?.length) return undefined;
 
 	const image = response.results
-		.find((r) => r.media?.length > 0)
-		?.media.find(
+		.flatMap((r) => r.media)
+		.find(
 			(m) =>
 				m.type === 'StillImage' &&
 				[
@@ -41,13 +41,16 @@ async function fetchPhoto(gbifId) {
 	const photo = {
 		url: image.identifier,
 		license: image.license,
-		source: image.references.toString(),
+		source: image.references?.toString(),
 		credit: image.rightsHolder
 	};
 
 	return {
 		...photo,
-		attribution: `\n\n\nPhoto par ${photo.credit} [sur ${new URL(photo.source).hostname}](${photo.source}) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC ${photo.license.includes('publicdomain') ? '0' : 'BY 4.0'}](${photo.license})`
+		attribution:
+			photo.credit && photo.source
+				? `\n\n\nPhoto par ${photo.credit} [sur ${new URL(photo.source).hostname}](${photo.source}) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC ${photo.license.includes('publicdomain') ? '0' : 'BY 4.0'}](${photo.license})`
+				: ''
 	};
 }
 
@@ -168,7 +171,8 @@ if (existsSync('treedump.json')) {
 			genusKey,
 			description: [
 				frenchVernacular ? `Nom vernaculaire : ${frenchVernacular}` : '',
-				descriptions.sort((a, b) => a.description.length - b.description.length).at(-1)?.description
+				descriptions.find((d) => d.description?.startsWith('Description. '))?.description ??
+					descriptions.find((d) => d.description)?.description
 			]
 				.map((s) => s?.trim())
 				.filter(Boolean)
