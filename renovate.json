@@ -11,18 +11,8 @@
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to dev tooling (linters, formatters, etc)",
-			"matchPackageNames": [
-				"/eslint/",
-				"prettier",
-				"svelte-check",
-				"/vitest/",
-				"/playwright/",
-				"lint-staged",
-				"/gitmoji/",
-				"fake-indexeddb",
-				"globals",
-				"execa"
-			],
+   "matchDepType": "devDependencies",
+			"matchPackageNames": ["!@sveltejs/*", "!svelte"],
 			"automerge": true
 		}
 	]
