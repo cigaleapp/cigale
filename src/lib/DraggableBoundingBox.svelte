@@ -368,7 +368,9 @@
 			style:top="{box.y}px"
 			style:width="{box.width}px"
 			style:height="{box.height}px"
-			onmousedown={() => {
+			onmousedown={({ button }) => {
+				if (button !== 0) return;
+				if (disabled) return;
 				draggingImageId = imageId;
 				if (movable) draggingCorner.setAll(true);
 			}}
@@ -379,6 +381,8 @@
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onmousedown={(e) => {
+						if (e.button !== 0) return;
+						if (disabled) return;
 						if (!transformable) return;
 						draggingImageId = imageId;
 						draggingCorner[position] = true;
@@ -397,6 +401,8 @@
 					class:draggable={transformable}
 					class:dragging={draggingCorner[position] && draggingImageId === imageId}
 					onmousedown={(e) => {
+						if (e.button !== 0) return;
+						if (disabled) return;
 						if (!transformable) return;
 						draggingImageId = imageId;
 						draggingCorner[position] = true;
