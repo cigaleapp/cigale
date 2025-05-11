@@ -74,7 +74,7 @@ await mkdir('./slides', { recursive: true });
 
 const longestNameLength = Math.max(...response.data.files.map((file) => file.name.length));
 
-for (const { name, id } of response.data.files) {
+for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompare(b.name))) {
 	const log = (...items) =>
 		console.info(`${cc.bold}${cc.cyan}[${name.padStart(longestNameLength)}]${cc.reset}`, ...items);
 
