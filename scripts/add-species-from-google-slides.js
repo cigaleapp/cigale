@@ -10,6 +10,7 @@ import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
 import keys from '../google-drive-key.json' with { type: 'json' };
 import Turndown from 'turndown';
+import { decodePhoto, photoChanged } from './utils.js';
 
 const _tdown = new Turndown();
 /** @param {string} html  */
@@ -184,17 +185,23 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 
 			const imagePath = path.join(filepath.replace('.json', '.images'), `${name}.png`);
 
+			const oldPhoto = decodePhoto(imagePath);
+
+			log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
+			image.write(imagePath);
+
 			const imageUrl = new URL(
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/' +
 					path.relative(path.join(filepath, '../..'), imagePath).replaceAll('\\', '/')
 			);
 
 			if (protocol.version) {
-				imageUrl.searchParams.set('v', protocol.version);
+				if (!photoChanged(imagePath, oldPhoto)) {
+					imageUrl.searchParams.set('v', protocol.version);
+				} else {
+					imageUrl.searchParams.set('v', protocol.version - 1);
+				}
 			}
-
-			log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
-			image.write(imagePath);
 
 			if (options.some((o) => o.label === name)) {
 				const option = options.find((o) => o.label === name);

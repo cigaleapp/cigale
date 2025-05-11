@@ -1,4 +1,5 @@
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import { decodePhoto, photoChanged } from './utils.js';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -38,11 +39,12 @@ async function fetchPhoto(gbifId, name) {
 		.find(
 			(m) =>
 				m.type === 'StillImage' &&
-				[
-					'http://creativecommons.org/licenses/by/4.0/',
-					'http://creativecommons.org/licenses/by-nc/4.0/',
-					'https://creativecommons.org/publicdomain/zero/1.0/'
-				].includes(m.license)
+				['image/jpeg', 'image/png'].includes(m.format) &&
+				URL.canParse(m.license) &&
+				new URL(m.license).hostname === 'creativecommons.org' &&
+				['/licenses/by/4.0/', '/licenses/by-nc/4.0/', '/publicdomain/zero/1.0/'].includes(
+					new URL(m.license).pathname
+				)
 		);
 	if (!image) return undefined;
 
@@ -61,17 +63,28 @@ async function fetchPhoto(gbifId, name) {
 				? '-BY-NC-4.0'
 				: '-BY-4.0');
 
+	const photoPath = path.join(
+		here,
+		'../examples/arthropods.cigaleprotocol.images',
+		`${name}.${image.format.replace('image/', '')}`
+	);
+
+	const existingPhoto = decodePhoto(photoPath);
+
 	await fetch(photo.url)
 		.then((r) => r.arrayBuffer())
 		.then((buffer) => {
-			sharp(buffer)
-				.resize(1080, null, { withoutEnlargement: true })
-				.toFile(path.join(here, '../examples/arthropods.cigaleprotocol.images', `${name}.jpg`));
+			sharp(buffer).resize(1080, null, { withoutEnlargement: true }).toFile(photoPath);
 		});
+
+	let cachebuster = newProtocol.version - 1;
+	if (photoChanged(photoPath, existingPhoto)) {
+		cachebuster++;
+	}
 
 	return {
 		...photo,
-		url: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${name}.jpg?v=${newProtocol.version}`,
+		url: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${name}.jpeg?v=${cachebuster}`,
 		attribution: photo.credit
 			? `\n\n\nPhoto par ${photo.credit} ${photo.source ? `[sur ${new URL(photo.source).hostname}](${photo.source}) (_via_ [GBIF.org](https://gbif.org/)),` : ''} sous [license ${licenseName}](${photo.license})`
 			: ''
@@ -223,7 +236,7 @@ for (const [sp, instead] of notfounds.entries()) {
  * @param {number} arg.childGbifId gbif id of the parent value
  * @param {string} arg.child label of the child value
  * @param {string} arg.childDecsription description of the child value
- * @returns {string|undefined} id of the metadata found
+ * @returns {Promise<string|undefined>} id of the metadata found
  */
 async function setParent({
 	parentMetadataId,

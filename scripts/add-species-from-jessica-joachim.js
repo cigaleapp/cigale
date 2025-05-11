@@ -5,6 +5,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import { decodePhoto, photoChanged } from './utils.js';
 
 // ANSI control sequences
 const cc = {
@@ -138,12 +139,14 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 			// eslint-disable no-empty
 		}
 	}
+
 	const cleaneddom = new JSDOM(markdownToHtml(identificationHints || '<body></body>'));
 
 	const text = cleaneddom.window.document.documentElement.textContent
 		.replaceAll('\u00a0', ' ')
 		.replaceAll('• ', '\r\n• ')
 		.trim();
+
 	const images = [...main.querySelectorAll('img')].map(({ src }) => src);
 
 	if (!text) {
@@ -151,11 +154,15 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 		console.error(markdown.replaceAll('\n', '\n\t'));
 		console.error();
 	}
+
+	let cachebuster = protocol.version - 1;
+
 	// Download image since CORP prevents us from using them directly
 	let imagepath = '';
 	if (images.length) {
 		const image = images[0];
 		imagepath = path.join(here, '../examples/arthropods.cigaleprotocol.images', `${name}.jpeg`);
+		const oldPhoto = decodePhoto(imagepath);
 		await mkdir(path.dirname(imagepath), { recursive: true });
 		// await execa`wget -O ${imagepath} ${image}`;
 		await fetch(image)
@@ -164,7 +171,12 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 				writeFileSync(imagepath, Buffer.from(buf));
 			});
 		images[0] = imagepath;
+
+		if (photoChanged(imagepath, oldPhoto)) {
+			cachebuster++;
+		}
 	}
+
 	describedSpecies[classmappingIndex] =
 		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
 			key: classmappingIndex.toString(),
@@ -173,7 +185,7 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 			learnMore: url,
 			...(imagepath
 				? {
-						image: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${encodeURIComponent(name)}.jpeg?v=${protocol.version}`
+						image: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${encodeURIComponent(name)}.jpeg?v=${cachebuster}`
 					}
 				: {})
 		});
