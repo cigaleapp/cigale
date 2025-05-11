@@ -1,6 +1,7 @@
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 
 const here = import.meta.dirname;
 
@@ -17,7 +18,13 @@ async function fetchTaxon(taxon) {
 	return data.results.find((r) => r.species === taxon) ?? data.results[0];
 }
 
-async function fetchPhoto(gbifId) {
+/**
+ *
+ * @param {number} gbifId
+ * @param {string} name
+ * @returns
+ */
+async function fetchPhoto(gbifId, name) {
 	const url = `https://api.gbif.org/v1/occurrence/search?taxonKey=${gbifId}`;
 	const response = await fetch(url).then((r) => {
 		if (!r.ok) throw new Error(`Error fetching ${url}: ${r.status} ${r.statusText}`);
@@ -54,8 +61,17 @@ async function fetchPhoto(gbifId) {
 				? '-BY-NC-4.0'
 				: '-BY-4.0');
 
+	await fetch(photo.url)
+		.then((r) => r.arrayBuffer())
+		.then((buffer) => {
+			sharp(buffer)
+				.resize(1080, null, { withoutEnlargement: true })
+				.toFile(path.join(here, '../examples/arthropods.cigaleprotocol.images', `${name}.jpg`));
+		});
+
 	return {
 		...photo,
+		url: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${name}.jpg?v=${newProtocol.version}`,
 		attribution: photo.credit
 			? `\n\n\nPhoto par ${photo.credit} ${photo.source ? `[sur ${new URL(photo.source).hostname}](${photo.source}) (_via_ [GBIF.org](https://gbif.org/)),` : ''} sous [license ${licenseName}](${photo.license})`
 			: ''
@@ -238,7 +254,7 @@ async function setParent({
 		newProtocol.metadata[mid].options[i].learnMore ||= `https://gbif.org/species/${childGbifId}`;
 		newProtocol.metadata[mid].options[i].description ||= childDecsription;
 		if (childMetadataId === 'species' && !newProtocol.metadata[mid].options[i].image) {
-			const photo = await fetchPhoto(childGbifId);
+			const photo = await fetchPhoto(childGbifId, child);
 			if (photo) {
 				newProtocol.metadata[mid].options[i].image = photo.url;
 				newProtocol.metadata[mid].options[i].description += photo.attribution;
@@ -247,7 +263,7 @@ async function setParent({
 	} else {
 		let photo;
 		if (childMetadataId === 'species') {
-			photo = await fetchPhoto(childGbifId);
+			photo = await fetchPhoto(childGbifId, child);
 		}
 
 		newProtocol.metadata[`${protocol.id}__${childMetadataId}`].options.push(
