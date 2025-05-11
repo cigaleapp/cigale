@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/166fdd4a69c7b7c34c5153c1e22d6a9ab782feed/scripts/README.md#protocoles-arthropodsexample",
-	"version": 6,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/c42218c9e4f90a059dc4d91c47474eb0df02a7d9/scripts/README.md#protocoles-arthropodsexample",
+	"version": 7,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -642,7 +642,7 @@
 					"label": "Anurida maritima",
 					"description": "Records from Rio de Janeiro State: Baía de Sepetiba, Dona Luísa beach (22 º 59 ’ 11.44 ” S; 43 º 41 ’ 35.50 ” W), in very thin sediment and between small algae at the base on the sea (Arlé 1966 b). Occurrence in Brazil: Pernambuco, Rio Grande do Norte, Espírito Santo, São Paulo and Rio de Janeiro.\n\n\nPhoto par gracefulgarcia [sur www.inaturalist.org](https://www.inaturalist.org/photos/461219874) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2121989",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Anurida maritima.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Anurida maritima.jpeg?v=7"
 				},
 				{
 					"key": "2",
@@ -656,7 +656,7 @@
 					"label": "Bilobella braunerae",
 					"description": "\n\n\nPhoto par MurderSpagurder [sur www.inaturalist.org](https://www.inaturalist.org/photos/466970900) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4537282",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bilobella braunerae.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bilobella braunerae.jpeg?v=7"
 				},
 				{
 					"key": "4",
@@ -712,7 +712,7 @@
 					"label": "Deuterosminthurus bicinctus",
 					"description": "\n\n\nPhoto par Tobias Polzer [sur www.inaturalist.org](https://www.inaturalist.org/photos/487945004) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537006",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Deuterosminthurus bicinctus.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Deuterosminthurus bicinctus.jpeg?v=7"
 				},
 				{
 					"key": "12",
@@ -775,14 +775,14 @@
 					"label": "Entomobrya atrocincta",
 					"description": "Description. Body shape and color pattern. Sexually dimorphic in color pattern and body shape. Males and females with variable but characteristically different color patterns (Fig. 9). Male body relatively cylindrical, slender, with bright orange background with black pigment usually forming a thick and complete transverse dorsal band covering posterior margin of Th. 2 and all of Th. 3 and Abd. 1, band sometimes absent. Male light form without dark pigment on Th. 2 through Abd. 6 (except sometimes along anterior margin of Th. 2). Male dark form with band covering Th. 2 through Abd. 2, irregular pigment patterns sometimes forming 1 + 1 orange spots on Abd. 3, and two narrow longitudinal stripes connected by transverse band on posterior margin of Abd. 4 (Fig. 9 A-D). Females with slightly dorso-ventrally flattened body and slightly larger than males. Female color pattern strikingly different from males, white or light yellow background with black, dark blue or purple pigment forming transverse bands across the posterior margins of Th. 2 through Abd. 4. All females with two longitudinal stripes or triangular extensions connected by two transverse bands on Abd. 4; one incomplete medial band and another complete band on posterior margin of Abd 5 (Fig. 9 E-I). Mesonotum white in both sexes, lacking pigment except for a small irregular band across anterior margin. Medial area of Th. 2 relatively transparent and fat bodies visible through cuticle under a dissecting microscope. Both males and females with purple pigment usually extending from apical end of 2 nd antennal segment through apex of 4 th antennal segment. Head. Apical bulb of 4 th antennal segment located in deep pit, usually simple, sometimes with up to four distinct lobes. Long differentiated smooth setae on ventral side of 1 st antennal segment ≈ 2.5 x short setae. Prelabral setae ciliate. Ornamentation of distal margin of labral papillae with 3 - 4 small seta or spine-like projections (Fig. 2). Dorsal head chaetotaxy variable (Fig. 10 A); macrosetae An' 0, An 3 a 2, An 3 a 3, S' 0, S 6, Ps 3, Pi 1, Pa 3, and Pm 1 i always absent; S 0 usually present, M 3 i usually absent, A 6 present in roughly half of observed specimens. Eyes G and H small and subequal; eye patch with 5 setae. Thorax. Chaetotaxy of Th. 2 stable, without variation in number of macrosetae. A row of microsetae occurs along entire posterior margin of Th. 2 (not displayed in figure); a 5, m 1, m 2, m 4, m 4 p, and all posterior macrosetae (series Pi, Pa, Pm, and Pp) present (Fig. 10 B). Chaetotaxy of Th. 3 variable: 8 macrosetae always present in zone M, 5 in zone L, and 3 in zone Pl (Fig. 3 B); macroseta a 5 e, m 4, a 6 i, and p 1 i usually present (Fig. 10 C). Legs. Trochanteral organ with triangular setal pattern and up to 30 setae. Unguis with 4 internal teeth; basal teeth located approximately middle of inner claw length. Abdomen. Abdominal chaetotaxy variable. Abd. 1, with 4 - 8 macroseta (Fig. 10 D), row of microsetae present along entire posterior margin (not displayed in figure). Abd. 2 with 4 - 6 macrosetae (Fig. 10 E): a 2, m 3, m 3 e, and m 5 always present; a 3 and m 3 ep polymorphic. Abd. 3 chaetotaxy stable, with 7 macrosetae: a 1, a 2, a 3, m 3, am 6, pm 6, and p 6 (Fig. 10 F). Abd. 4 inner macrosetae varying from 8 - 11 (Fig. 10 G). Basal mucronal tooth slightly larger.\n\n\nPhoto par Damon Tighe [sur www.inaturalist.org](https://www.inaturalist.org/photos/460991713) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2120794",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya atrocincta.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya atrocincta.jpeg?v=7"
 				},
 				{
 					"key": "21",
 					"label": "Entomobrya corticalis",
 					"description": "Ecology and habitat in Iran: soil and leaf litter. General distribution: this species is widespread throught the North and Central Palaearctic (Jordana 2012).\n\n\nPhoto par Axel Gosseries [sur www.inaturalist.org](https://www.inaturalist.org/photos/466138547) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4539597",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya corticalis.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya corticalis.jpeg?v=7"
 				},
 				{
 					"key": "22",
@@ -824,14 +824,14 @@
 					"label": "Entomobrya nivalis",
 					"description": "Description. Body shape and color pattern. Body cylindrical. One primary, but variable, color form (Fig. 31): yellow or white background with black, dark brown or purple pigment always forming thin transverse bands along the posterior margin of Th. 3, and Abd. 2 through Abd. 6. Additional transverse bands present or absent on Th. 2 and Abd. 1. Abd. 4 usually with U-shaped or \" 11 \" - shaped pattern connecting basally with band along posterior margin. Antennae usually lack dark pigmentation, sometimes with light brown or purple pigment, darkening near the apex. Head. Apical bulb of 4 th antennal segment usually bi- or trilobed. Long differentiated smooth setae on ventral side of 1 st antennal segment ≈ 3 x short setae. Ornamentation of the distal margin of the labral papillae with 3 - 4 small seta or spine-like projections per papilla (Fig. 2). Labial lateral appendage slightly curved, relatively thick, nearly reaching tip of papilla. Labial triangle chaetotaxy normal, one specimen with a supplemental ciliate seta internal to M 1 (one side only). Dorsal head chaetotaxy (Fig. 32 A) with macrosetae An' 0, A 3 a 2, A 3 a 3, M 3 i, S' 0, Ps 3, Pi 2, Pi 3, Pm 1 i, and Pm 2 absent; S 1 usually present, A 6, S 6, Ps 3, and Pa 2 sometimes present. Eyes G and H small and subequal. Eye patch with 5 or 6 setae. Legs. Trochanteral organ with triangular setal pattern and up to 34 setae. Unguis with 4 internal teeth; basal teeth located approximately 60 % of inner claw length. Unguiculus acuminate with small serrations on internal edge. Thorax. Th. 2 macrosetae a 5, m 1, m 2, m 4, m 4 i, m 4 pi, and m 5 present (Fig. 32 B); m 2 i and m 2 i 2 usually present; m 1 i and m 4 p sometimes present; all posterior macrosetae (series P) are present. Th. 3 macrosetae a 1, a 2, a 3, a 4, a 4 i, a 5, a 6, a 7, m 5, m 5 i, m 6, and m 7 present (Fig. 32 C); most posterior macrosetae (series P) present, p 3 present or absent. Both thoracic segments with a moderate number of supplemental macrosetae in zone Pm (Fig. 32 B, C). Abdomen. Abd. 1 with 7 - 10 macrosetae (Fig. 32 D). Abd. 2 macroseta a 2, a 3, m 3, m 3 e, m 3 ep, and m 5 present; m 3 ei and m 3 ea usually absent (Fig. 32 E). Abd. 3 macroseta a 1, m 3, am 6, pm 6, and p 6 present (Fig. 32 F); a 3 usually absent. Abd. 4 with 7 - 8 inner macrosetae (Fig. 32 G). Mucronal teeth subequal.\n\n\nPhoto par Pete Lypkie [sur www.inaturalist.org](https://www.inaturalist.org/photos/461584506) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/10915874",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya nivalis.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya nivalis.jpeg?v=7"
 				},
 				{
 					"key": "28",
 					"label": "Entomobrya superba",
 					"description": "\n\n\nPhoto par Иван Матершев [sur www.inaturalist.org](https://www.inaturalist.org/photos/463966959) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4539594",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya superba.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya superba.jpeg?v=7"
 				},
 				{
 					"key": "29",
@@ -845,7 +845,7 @@
 					"label": "Folsomia candida",
 					"description": "Remarks: Cox (1982) reported this species as Folsomia litsteri Bagnall, 1939 that is considered as a junior synonym of F. candida. General distribution: cosmopolitan (Potapov 2001; Fjellberg 2007).\n\n\nPhoto par mycomutant [sur www.inaturalist.org](https://www.inaturalist.org/photos/361917425) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/2120383",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Folsomia candida.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Folsomia candida.jpeg?v=7"
 				},
 				{
 					"key": "31",
@@ -865,7 +865,7 @@
 					"label": "Heteromurus nitidus",
 					"description": "\n\n\nPhoto par Marie Lou Legrand [sur www.inaturalist.org](https://www.inaturalist.org/photos/466012633) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2121008",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Heteromurus nitidus.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Heteromurus nitidus.jpeg?v=7"
 				},
 				{
 					"key": "34",
@@ -919,7 +919,7 @@
 					"label": "Isotomurus unifasciatus",
 					"description": "\n\n\nPhoto par Joeb [sur www.inaturalist.org](https://www.inaturalist.org/photos/465403076) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4539049",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotomurus unifasciatus.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotomurus unifasciatus.jpeg?v=7"
 				},
 				{
 					"key": "42",
@@ -947,7 +947,7 @@
 					"label": "Lepidocyrtus fimetarius",
 					"description": "Material examined. NEW SOUTH WALES. Three specimens, Auscott Warren, cotton fields, 31.47 S 147.46 E, 173 m asl, 6. iii – 13. iv. 1994 and 24. ii – 6. iii. 1994, J. Lytton Hitchens (slide codes SAM 017 and SAM 023); one specimen, Sydney Markets, on Pleurotus fungus for sale, 33.887399 S 151.229992 E, 24 m asl, 29. iv. 1998, C. Grigurinovic (slide code SAM 018); one specimen, Jenolan Caves, Paradox Cave, 33.816665 S 150.016690 E, 829 m asl, 4. iv. 1984, G. Smitt, E. Holland (slide code SAM 021); WESTERN AUSTRALIA. One specimen, Perth, 31.942163 S 115.761490 E, 14 m asl, 26. iii. 1931, H. Womersley (slide code SAM 032). Introduced in Australia.",
 					"learnMore": "https://gbif.org/species/4539244",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus fimetarius.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus fimetarius.jpeg?v=7"
 				},
 				{
 					"key": "46",
@@ -961,14 +961,14 @@
 					"label": "Lepidocyrtus paradoxus",
 					"description": "Type locality. Czech Republic.\n\n\nPhoto par Zeke Blankenship [sur www.inaturalist.org](https://www.inaturalist.org/photos/476357824) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2120899",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus paradoxus.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lepidocyrtus paradoxus.jpeg?v=7"
 				},
 				{
 					"key": "48",
 					"label": "Megalothorax minimus",
 					"description": "Description. Addendum to Schneider & D’Haese (2013). Adult. Th. I in one part, with neck vestigial. Th. I with (i) a posterior transversal fold reaching laterally the limit of Th. I – Th. II; (ii) an anterior pair of oblique folds that is the posterior limit of the vestigial neck (Fig. 16 A, B). Total length of antenna ~ 78.4 µm; max width (Ant. III) ~ 18.7 µm; ratio width: length ~ 0.24; ratio length of Ant. I: Ant. II: Ant. III: Ant. IV ~ 0.22: 0.36: 0.6: 1. Correction from Schneider & D’Haese (2013): only seven ordinary chaetae on Ant. IV (Fig. 14 G, H); a simple channel present on Th. II – Th. III sterna, not reaching the terga. Juvenile. Size. Length from labrum to anus ~ 225 µm. Body shape and segmentation. Orthognathous. Ratio height: length of head ~ 0.80. Total length of antenna ~ 50 µm; max width (Ant. III) ~ 17 µm; ratio width: length ~ 0.34; ratio length of Ant. I: Ant. II: Ant. III: Ant. IV ~ 0.25: 0.35: 0.75: 1. On each leg, length of coxa> tibiotarsus ~ femur ~ trochanter. Length of manubrium: dp: dd: mucro ~ 0.81: 0.73: 0.86: 1. Pigmentation. White (in ethanol). Granulation. Secondary granulation present. Dorsal protuberance T present at the posterior extremity of the dorso-median line (Fig. 17 C). Integumentary channels. Not precisely observed, present dorsally on head but apparently less developed than adult, and present ventrally on Th. II – Th. III as the adult. Chaetae. The chaetotaxic pattern and morphology are very similar to the adult though the absence of some specific chaetae and wrc (Figs 8 A, 17 A, C). Wax secretory rods and sensory fields. With 6 + 6 sensory fields as the adult (Figs 8 A, 17 C). Smaller inner chaeta of sf 5 absent (the bigger present), inner chaetotaxy of the other sensory fields as the adult (Figs 8 A, 17 C). Labium, maxilla outer lobe, oral fold, labrum. All chaetae observed on the adult present. Head chaetotaxy. Postero-dorsal area with 9 + 9 chaetae (the 2 + 2 most anterior chaetae missing in regard to adult); antero-dorsal area with 9 + 9 chaetae and two unpaired chaetae (2 + 2 chaetae missing near the dorsal edge of sf 1, a 0 present), antero-lateral areas with 1 + 1 chaetae (L; Fig. 17 A). Ventral area with 3 + 3 post-labial chaetae (Fig. 4 E). Antenna chaetotaxy. Ant. I with one chaeta, Ant II with four chaetae, Ant III with nine ordinary chaetae, two long S-chaetae (S 1, S 4) and two short, swollen S-chaetae (S 2, S 3), as in the adult (Figs 6, 17 B). Ant. IV with seven ordinary chaetae as in the adult; eight S-chaetae including six thin and long (S, four missing in regard to adult), a short and thin (Sx) and a long and thick (Sy); two apical and sub-apical sensory rods (a, sa) and a short organite Or (Figs 6, 17 B). Th. II – Abd. V terga chaetotaxy. Th. II – Abd. V terga with a total of 26 + 26 ordinary chaetae (16 + 16 missing in regard to adult), τ-chaetae not observed but maybe present, 2 + 2 s-chaetae (s 1, s 2), 4 + 4 sensory fields and 5 + 5 wrc (3 + 3 missing in regard to adult; Figs 8 A, 17 C). Dorso-lateral areas of Th. II with 5 + 5 chaetae (a 3, p 2, p 3 missing in regard to adult; Figs 8 A, 17 C). Precoxal areas of Th. II with 1 + 1 s-chaetae (s 1) and 2 + 2 chaetae (a 7, a 8 missing in regard to adult; Figs 8 A, 17 C). Dorso-lateral area of Th. III – anterior abdomen with 7 + 7 chaetae (a 5, p 2, 3, 4, α 1, 2, β 1, 2, 3 missing in regard to adult) and 3 + 3 wrc (wrc 2, wrc 7 missing in regard to adult; Figs 8 A, 17 C). Precoxal areas of Th. III with 2 + 2 chaetae (a 8 missing) and 1 + 1 wrc (wrc 5 missing; Figs 8 A, 17 C). Posterior area of the abdomen (until Abd. V included) with 10 + 10 chaetae (η 2 missing in regard to adult), 1 + 1 wrc and 1 + 1 s-chaetae (s 2; Figs 8 A, 17 C). s 1 curved, tubular with rounded apex, s 2 spherical. Legs chaetotaxy. With two chaetae on trochanter I (one missing in regard to adult), no chaeta on coxa II and III (one missing on each in regard to adult) and seven chaetae on femur III (one missing in regard to adult; Figs 18 A – C, Tables 9, 10, 11). Claws morphology. Similar to the adult (Fig. 18 A – C). Abd. VI. Tergum anterior row with 2 + 2 chaetae and an unpaired chaeta, posterior row with 2 + 2 chaetae, anal valve with a chaeta, as the adult (Figs 8 A, 17 C). Sternum with 6 + 6 chaetae including one on each anal valve. Abd. IV sternum. With 2 + 2 chaetae and 2 + 2 neosminthuroid chaetae (as the adult). Abdominal appendages. Similar to the adult: manubrium with 2 + 2 posterior chaetae; dens proximal part with a posterior chaeta, distal part with a posterior chaeta, four posterior spines and three anterior spines; tenaculum with 3 + 3 apical teeth, ventral tube with 2 + 2 apical chaetae. B C\n\n\nPhoto par Marie Lou Legrand [sur www.inaturalist.org](https://www.inaturalist.org/photos/472722570) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2122151",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Megalothorax minimus.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Megalothorax minimus.jpeg?v=7"
 				},
 				{
 					"key": "49",
@@ -996,7 +996,7 @@
 					"label": "Orchesella bifasciata",
 					"description": "\n\n\nPhoto par Иван Матершев [sur www.inaturalist.org](https://www.inaturalist.org/photos/463168599) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/10038254",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella bifasciata.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella bifasciata.jpeg?v=7"
 				},
 				{
 					"key": "53",
@@ -1045,7 +1045,7 @@
 					"label": "Pogonognathellus flavescens",
 					"description": "Ecology and habitat in Iran: soil and leaf litter. General distribution: Palaearctic and Nearctic (Babenko et al. 2019). Genus Tomocerina Yosii, 1955\n\n\nPhoto par Вотинцевы Елена и Сергей [sur www.inaturalist.org](https://www.inaturalist.org/photos/476162509) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4538730",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pogonognathellus flavescens.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pogonognathellus flavescens.jpeg?v=7"
 				},
 				{
 					"key": "60",
@@ -1059,14 +1059,14 @@
 					"label": "Seira ferrarii",
 					"description": "Examined material. 5 females on slides and 2 specimens in alcohol (EAL 0055 - 6 / INPA and JIAP): Spain, Alméria Province, Adra municipality (36 ° 46 ' 33 '' N; 03 ° 06 ' 43 '' W), in mountain, 566 m, 9 ‒ 22. x. 2015, light-trap, F. Rodríguez coll. 1 female on slide (EGE 0041 / JIAP): Gerona Province, Lloret of Mar (41 ° 41 ' 15 '' N; 02 ° 49 ' 04 '' E), in beach, 4 m, 14. iv. 2015, pitfall-traps, E. Ariza coll. 1 female on slide (EGE 0047 / JIAP): idem, except “ Tossa de Mar ” (41 ° 43 ' 19 '' N; 02 ° 56 ' 19 '' E), in beach “ Menuda ”, 3 m. 1 female on slide (FCNyM-UNLP): Argentina, Bahía Blanca, 23. v. 1963, E Bianco coll. Description based on the listed specimens. Total length (head + trunk) of specimens 1.43 ‒ 1.92 mm (n = 4). Alive specimens with Ant I ‒ IV, head, Th II, Abd V, leg I, and tibiotarsus II ‒ III brownish; Th III to Abd IV dark, with one silvery transversal band on Abd III and IV (Fig. 2 C). Fixed specimens pale white with dark blue pigment on Ant I ‒ IV, anterior and posterior margins of Th II to Abd III, all Abd IV, femora II ‒ III and manubrium; eyepatches black (Fig. 2 D). Scales present on Ant I to apex of Ant II, ventral and dorsal head, thorax and abdomen dorsally, legs (except empodia), and manubrium and dentes ventrally. Collophore without scales (Fig. 17 E). Head. Antennae shorter than body length, antennal ratio as I: II: III: IV = 1: 1.6 1 ‒ 2.08: 1.81 ‒ 2.08: 2.48 ‒ 2.83 (n = 4) (Figs 2 C ‒ D). Ant IV not annulated, with apical bulb apically bilobed and blunt sens (as in Fig. 26 A). Ant III apical organ with two rod-like sens, 3 guard sens and 4 blunt sens of different sizes (Fig. 14 A). Clypeal formula with 4 (l 1 ‒ 2), 4 (f), 3 (pf 0 ‒ 1) ciliate chaetae, l 1 acuminate, l 2 largest, and 2 frontal smaller (Fig. 14 B). Two inner labral papillae conical, outer papillae reduced to large pointed projections (Fig. 14 C). Maxillary palp with smooth apical appendage (a. a.) and basal chaeta (b. c.) weakly ciliate, thicker, and 1.16 longer than the apical. Eyes A, B and C slightly larger, F and G slightly smaller, with 4 interocular chaetae (v, p, r, t); head dorsal chaetotaxy as in S. domestica (Fig. 5 F) but with interocular chaeta q always absent. Basomedian and basolateral labial fields with M 1 ‒ 2, R, E, L 1 ‒ 2, R subequal to the others. Postlabial ventral chaetotaxy with about 15 ciliate chaetae, postlabial formula 4 (G 1 ‒ 4), 2 (H 3 ‒ 4), 4 (J 1 ‒ 4), J 2 smaller, basal chaeta (b. c.) largest (Fig. 14 D). Thorax chaetotaxy (Figs 15 A ‒ B). Th II, series ‘ a’ with 4 mac (a 5 ip ‒ 5 p); series ‘ m’ with 7 mac (m 1 i ‒ 1, m 2 i ‒ 2, m 4 i ‒ 4 p); series ‘ p’ with 13 ‒ 15 mac (p 1 i 2 ‒ 1 p, p 2 a ‒ 2 ep 2, p 3, p 5), p 1 i 2 generally as mac, p 2 ep 2 rarely absent. Th III, series ‘ a’ with 7 mac (a 1 i ‒ 6); series ‘ m’ with 1 mac (m 6); series ‘ p’ with 10 mac (p 1 i ‒ 1 p, p 2 a ‒ 2 ea, p 3, p 5 ‒ 6). Th ratio as II: III = 1: 0.5 5 ‒ 0.74 (n = 4).\n\n\nPhoto par Axel Gosseries [sur www.inaturalist.org](https://www.inaturalist.org/photos/463400435) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4539297",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Seira ferrarii.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Seira ferrarii.jpeg?v=7"
 				},
 				{
 					"key": "62",
 					"label": "Seira musarum",
 					"description": "\n\n\nPhoto par David Pereira [sur www.inaturalist.org](https://www.inaturalist.org/photos/466985850) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/10848695",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Seira musarum.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Seira musarum.jpeg?v=7"
 				},
 				{
 					"key": "63",
@@ -1087,7 +1087,7 @@
 					"label": "Sminthurides penicillifer",
 					"description": "\n\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/375165100) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4537112",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides penicillifer.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides penicillifer.jpeg?v=7"
 				},
 				{
 					"key": "66",
@@ -1115,14 +1115,14 @@
 					"label": "Sminthurinus niger",
 					"description": "Type locality. London (England).\n\n\nPhoto par Gertjan Kamsteeg  sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2122217",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus niger.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus niger.jpeg?v=7"
 				},
 				{
 					"key": "70",
 					"label": "Sminthurinus trinotatus",
 					"description": "Type locality. Oulu (Finland).\n\n\nPhoto par David Kaliss [sur www.inaturalist.org](https://www.inaturalist.org/photos/482182199) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537152",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus trinotatus.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurinus trinotatus.jpeg?v=7"
 				},
 				{
 					"key": "71",
@@ -1143,28 +1143,28 @@
 					"label": "Tomocerus vulgaris",
 					"description": "Ecology and habitat in Iran: leaf litter in forest and near the river. General distribution: Holarctic (Babenko et al. 2019). Order Neelipleona\n\n\nPhoto par Patrick Le Mao [sur www.inaturalist.org](https://www.inaturalist.org/photos/463132665) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2121897",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Tomocerus vulgaris.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Tomocerus vulgaris.jpeg?v=7"
 				},
 				{
 					"key": "74",
 					"label": "Vertagopus asiaticus",
 					"description": "Description. 8 + 8 ommatidia of which G and H much smaller (Fig. 9). PAO elliptical, about twice as long as nearest ommatidium and shorter (0.6 – 0.7) than Ant. I width. Maxillary outer lobe with 4 sublobal hairs and bifurcate palp. Labrum with 4 prelabral chaetae, labral edge with four sharp ridges. Labial palp with all usual papillae and 15 guards (e 7 absent), 4 proximal, 4 basomedian and 5 basolateral chaetae. Ventral side of head with 4 – 5 + 4 – 5 postlabial chaetae. Maxillary head with unmodified lamellae. Ant. I with 2 ventral bms at base and 4 – 5 ventral s of which 1 – 2 short in distal row (Fig. 9). Ant. III with several sens, one of which in lateral position thick. Ant. IV with bifurcate subapical pin-chaeta and very small peg-like organite. Body with almost smooth, sometimes indistinctly serrated, macrochaetae. Macrochaetae on Abd. V longer than this segment length (1.05 – 1.35, Fig. 21). Number of macrosens in full grown specimens as 4,4 / 3,3,3,4,6 (Figs 19, 21). Th. II – III with 2 accp - sens and 2 al - sens. On all segments accp - sens in p - row. On Abd. V six sens arranges as two in anterior position and four in p - row. Microsens 1,0 / 0,0,1 in number, on Abd. III ms associated with p - row. First instar has principally the same sensillar chaetotaxy (Fig. 20). Th. III without ventral chaetae, Abd. II without ventromedial group of chaetae. Legs with claws of normal shape, with two lateral and one inner tooth. Empodium with minute inner tooth. Tibiotarsi with 9 chaetae in distal whorl, T 2 and T 3 chaetae absent, T 1 and T 4 present (Figs 12, 13). Clavate tenent hairs present, usually 1 (2), 2,2 in number: A 1 on tibiotarsus 1, A 1 and A 7 on tibiotarsus 2, and A 1 and A 2 on tibiotarsus 3. Tenent hairs on tibiotarsi 2 and 3 clearly different in size, A 1 always being longer and more distinctly clavated. Length of A 1 about as long as inner edge of claw (0.8 – 1.2). Retinaculum with 4 + 4 teeth and 6 – 9 chaetae. Ventral tube (Fig. 10) with 4 + 4 (5 + 5) laterodistal, without anterior and with 5 posterior chaetae (4 in distal transversal row and one at base). Furca rather long, 1.05 – 1.30 times longer than length of antennae. Manubrium with 21 – 26 chaetae on anterior side (Fig. 14), with \" single \" row of chaetae on lateral sides (Fig. 11). Manubrial thickening simple. Dens continuously narrowed, crenulated, with 8 chaetae on posterior side (4 basal and 2 + 2 di- de), rarely 3 on one side in middle group (Fig. 15). Anterior side of dens strongly chitinized, with more than 50 chaetae (up to 70 in large individuals). Mucro with four teeth, \" apical \" tooth very small (Figs 16, 17). Ratio dens: manubrium as 1.8 – 2.2. Body size up to 1.6 mm. Regularly bluish, sometimes dark (Fig. 27).\n\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/461601841) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/9616579",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vertagopus asiaticus.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vertagopus asiaticus.jpeg?v=7"
 				},
 				{
 					"key": "75",
 					"label": "Vitronura giselae",
 					"description": "Type locality. Geneva (Switzerland).\n\n\nPhoto par Walker [sur www.inaturalist.org](https://www.inaturalist.org/photos/486137159) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537269",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vitronura giselae.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vitronura giselae.jpeg?v=7"
 				},
 				{
 					"key": "76",
 					"label": "Willowsia buski",
 					"description": "\n\n\nPhoto par Tom Kirschey [sur www.inaturalist.org](https://www.inaturalist.org/photos/464287001) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2120828",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia buski.jpg?v=6"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia buski.jpeg?v=7"
 				},
 				{
 					"key": "77",
@@ -1183,7 +1183,7 @@
 				{
 					"label": "Byturus tomentosus",
 					"key": "79",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Byturus%20tomentosus.png?v=6",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Byturus%20tomentosus.png?v=7",
 					"description": "Nom vernaculaire : Ver des framboises\n\nEspèce(s) semblable(s) : _[Byturus ochraceus](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/)_ dont les yeux sont plus gros ([comparer](https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957)). **Attention** ce critère est parfois difficile à apprécier.\n\nA corriger sur le comparatif : _B.aestivus_ = _B.ochraceus_\n\nInformation(s) utile(s): Presque uniquement sur fleurs de Rosaceae\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=byturus%20tomentosus)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/222189) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Gilles Carcassès](https://www.galerie-insecte.org/galerie/ref-321918.htm) ; [Fred Chevaillot](https://www.galerie-insecte.org/galerie/ref-255957.htm)",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/": "Byturus ochraceus",
@@ -1199,7 +1199,7 @@
 				{
 					"label": "Melolontha hippocastani",
 					"key": "80",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Melolontha%20hippocastani.png?v=6",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Melolontha%20hippocastani.png?v=7",
 					"description": "Nom vernaculaire : Grand hanneton forestier\n\nEspèce(s) semblable(s) : [Melolontha melol](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/)[ontha](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/) (pointe du pygidium plus longue et plus large) ; [Melolontha pectoralis](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis) (pointe du pygidium encore plus courte, seulement présent dans le Nord-Est de la France)\n\nInformation(s) utile(s): Espèce généralement plus forestière que _Melolontha melolontha_. [Comparatif](https://www.galerie-insecte.org/galerie/view.php?ref=8434) des pygidium de _M.melolontha_ et _M.hippocastani_\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/10879) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Florentin Madrolles](https://www.galerie-insecte.org/galerie/ref-64168.htm) ; [Piezo](https://www.galerie-insecte.org/galerie/fiche.php?ref=8434)",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/": "ontha",
@@ -1216,7 +1216,7 @@
 				{
 					"label": "Pyrrhidium sanguineum",
 					"key": "81",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pyrrhidium%20sanguineum.png?v=6",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pyrrhidium%20sanguineum.png?v=7",
 					"description": "Nom vernaculaire : Cardinal imposteur\n\nEspèce(s) semblable(s) : Aucune chez les Cerambycidae, mais attention aux _[Pyrochroa](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/)_ dont les antennes sont dentées.\n\nInformation(s) utile(s): Très précoce (dès février), souvent dans le bois de chauffage\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12357) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Yves Dubois](https://www.galerie-insecte.org/galerie/ref-159923.htm) ; [Pierre Gros](https://www.galerie-insecte.org/galerie/ref-199258.htm)",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/": "Pyrochroa",
