@@ -207,6 +207,8 @@ if (existsSync('treedump.json')) {
 	}
 }
 
+tree.items.sort((a, b) => a.species.localeCompare(b.species));
+
 for (const [sp, instead] of notfounds.entries()) {
 	console.error(`\x1b[31m${sp} not found, GBIF gave ${instead} instead\x1b[0m`);
 }
