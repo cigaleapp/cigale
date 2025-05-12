@@ -77,9 +77,15 @@ async function fetchPhoto(gbifId, name) {
 			sharp(buffer).resize(1080, null, { withoutEnlargement: true }).toFile(photoPath);
 		});
 
-	let cachebuster = newProtocol.version - 1;
+	let cachebuster =
+		new URL(
+			protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.find(
+				(o) => o.label === name
+			)?.image ?? `https://example.com?v=${protocol.version}`
+		).searchParams.get('v') ?? protocol.version;
+
 	if (photoChanged(photoPath, existingPhoto)) {
-		cachebuster++;
+		cachebuster = protocol.version;
 	}
 
 	return {

@@ -195,12 +195,12 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 					path.relative(path.join(filepath, '../..'), imagePath).replaceAll('\\', '/')
 			);
 
-			if (protocol.version) {
-				if (photoChanged(imagePath, oldPhoto)) {
-					imageUrl.searchParams.set('v', protocol.version);
-				} else {
-					imageUrl.searchParams.set('v', protocol.version - 1);
-				}
+			const oldOption = options.find((o) => o.label === name);
+
+			if (protocol.version && photoChanged(imagePath, oldPhoto)) {
+				imageUrl.searchParams.set('v', protocol.version);
+			} else if (oldOption) {
+				imageUrl.searchParams.set('v', new URL(oldOption.image).searchParams.get('v'));
 			}
 
 			if (options.some((o) => o.label === name)) {

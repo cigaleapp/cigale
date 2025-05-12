@@ -155,7 +155,12 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 		console.error();
 	}
 
-	let cachebuster = protocol.version - 1;
+	let cachebuster =
+		new URL(
+			protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[
+				classmappingIndex
+			]?.image ?? `https://example.com?v=${protocol.version}`
+		).searchParams.get('v') ?? '0';
 
 	// Download image since CORP prevents us from using them directly
 	let imagepath = '';
@@ -173,7 +178,7 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 		images[0] = imagepath;
 
 		if (photoChanged(imagepath, oldPhoto)) {
-			cachebuster++;
+			cachebuster = protocol.version;
 		}
 	}
 
