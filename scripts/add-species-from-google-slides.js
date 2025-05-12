@@ -196,7 +196,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			);
 
 			if (protocol.version) {
-				if (!photoChanged(imagePath, oldPhoto)) {
+				if (photoChanged(imagePath, oldPhoto)) {
 					imageUrl.searchParams.set('v', protocol.version);
 				} else {
 					imageUrl.searchParams.set('v', protocol.version - 1);
