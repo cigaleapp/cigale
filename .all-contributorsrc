@@ -1,0 +1,81 @@
+{
+	"$schema": "https://json.schemastore.org/all-contributors.json",
+	"projectName": "cigale",
+	"projectOwner": "cigaleapp",
+	"repoType": "github",
+	"commitConvention": "angular",
+	"contributors": [
+		{
+			"login": "gwennlbh",
+			"name": "Gwenn Le Bihan",
+			"avatar_url": "https://avatars.githubusercontent.com/u/39094199?v=4",
+			"profile": "https://gwen.works/",
+			"contributions": [
+				"code",
+				"infra",
+				"maintenance",
+				"projectManagement",
+				"test",
+				"design",
+				"talk"
+			]
+		},
+		{
+			"login": "",
+			"name": "Jessica Joachim",
+			"avatar_url": "https://i0.wp.com/jessica-joachim.com/wp-content/uploads/2023/11/cropped-Paon-du-jour-2.png",
+			"profile": "https://jessica-joachim.com/qui-suis-je/",
+			"contributions": ["content"]
+		},
+		{
+			"login": "edgaremy",
+			"name": "Edgar Remy",
+			"avatar_url": "https://avatars.githubusercontent.com/u/83783043?v=4",
+			"profile": "https://github.com/edgaremy",
+			"contributions": ["bug", "userTesting", "data", "ideas", "projectManagement"]
+		},
+		{
+			"login": "mcauchoix",
+			"name": "mcauchoix",
+			"avatar_url": "https://avatars.githubusercontent.com/u/727164?v=4",
+			"profile": "https://github.com/mcauchoix",
+			"contributions": [
+				"bug",
+				"userTesting",
+				"promotion",
+				"fundingFinding",
+				"ideas",
+				"content",
+				"projectManagement"
+			]
+		},
+		{
+			"login": "WhiSp00n",
+			"name": "whisp00n",
+			"avatar_url": "https://avatars.githubusercontent.com/u/125924054?v=4",
+			"profile": "https://github.com/WhiSp00n",
+			"contributions": ["code", "design", "talk"]
+		},
+		{
+			"login": "CceceLaPlante",
+			"name": "CeceLaPlante",
+			"avatar_url": "https://avatars.githubusercontent.com/u/103273947?v=4",
+			"profile": "https://github.com/CceceLaPlante",
+			"contributions": ["code", "talk"]
+		},
+		{
+			"login": "InesCharles",
+			"name": "inescharles",
+			"avatar_url": "https://avatars.githubusercontent.com/u/128176927?v=4",
+			"profile": "https://github.com/InesCharles",
+			"contributions": ["code", "talk", "design"]
+		},
+		{
+			"login": "axelcarlier",
+			"name": "axelcarlier",
+			"avatar_url": "https://avatars.githubusercontent.com/u/32259135?v=4",
+			"profile": "https://github.com/axelcarlier",
+			"contributions": ["projectManagement"]
+		}
+	]
+}
