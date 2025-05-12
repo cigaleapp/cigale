@@ -100,6 +100,7 @@ async function fetchPhoto(gbifId, name) {
 
 console.log(await fetchTaxon('Allacma fusca'));
 
+console.log({ protocol });
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.map(
 	(o) => o.label
 );
