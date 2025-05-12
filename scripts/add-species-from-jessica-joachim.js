@@ -5,6 +5,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 import { decodePhoto, photoChanged } from './utils.js';
 
 // ANSI control sequences
@@ -157,7 +158,7 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 
 	let cachebuster =
 		new URL(
-			protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[
+			oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[
 				classmappingIndex
 			]?.image ?? `https://example.com?v=${protocol.version}`
 		).searchParams.get('v') ?? '0';
