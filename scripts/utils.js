@@ -1,5 +1,5 @@
 import * as JPEG from 'jpeg-js';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
@@ -13,16 +13,25 @@ import { PNG } from 'pngjs';
 export function photoChanged(filepath, oldDecodedPhoto) {
 	if (!oldDecodedPhoto) return true;
 	const newPhoto = decodePhoto(filepath);
-	return (
+	const diffPhoto = new PNG({
+		width: oldDecodedPhoto.width,
+		height: oldDecodedPhoto.height
+	});
+	const changed =
 		pixelmatch(
 			oldDecodedPhoto.data,
 			newPhoto.data,
-			null,
+			diffPhoto.data,
 			oldDecodedPhoto.width,
 			oldDecodedPhoto.height,
 			{ threshold: 0.1 }
-		) > 0
-	);
+		) > 0;
+
+	if (changed) {
+		diffPhoto.pack().pipe(writeFileSync(filepath.replace('.jpeg', '.diff.png')));
+	}
+
+	return changed;
 }
 
 /**
