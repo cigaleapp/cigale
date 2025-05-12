@@ -1,4 +1,5 @@
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 import { decodePhoto, photoChanged } from './utils.js';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -79,7 +80,7 @@ async function fetchPhoto(gbifId, name) {
 
 	let cachebuster =
 		new URL(
-			protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.find(
+			oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.find(
 				(o) => o.label === name
 			)?.image ?? `https://example.com?v=${protocol.version}`
 		).searchParams.get('v') ?? protocol.version;

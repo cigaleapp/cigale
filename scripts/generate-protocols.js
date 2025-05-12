@@ -181,6 +181,12 @@ const protocol = {
 };
 
 writeFileSync(
+	here,
+	'../examples/old-arthropods.cigaleprotocol.json',
+	JSON.stringify(oldProtocol, null, 2)
+);
+
+writeFileSync(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 	JSON.stringify(protocol, null, 2)
 );

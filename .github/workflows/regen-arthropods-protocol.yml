@@ -47,6 +47,9 @@ jobs:
       - name: Add data from GBIF
         run: npx node scripts/add-taxonomic-parents-from-gbif.js
 
+      - name: Clean old protocol
+        run: rm examples/old-*.json
+
       - name: Store scripts/jessica-joachim-crawler-report.md
         id: get-report
         run: |
