@@ -235,7 +235,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			}
 
 			log(`Writing protocol to ${cc.blue}${filepath}${cc.reset}`);
-			writeFileSync(filepath, JSON.stringify(protocol, null, 2));
+			writeFileSync(filepath, JSON.stringify(protocol.fresh, null, 2));
 		}
 	} catch (error) {
 		log('An error occured:', error);
