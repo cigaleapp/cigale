@@ -19,11 +19,7 @@
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
-	import {
-		fittedImageRect,
-		INITIAL_ZOOM_STATE,
-		zoomBoxFromState
-	} from '$lib/DraggableBoundingBox.svelte.js';
+	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -771,20 +767,6 @@
 				imageIsLoading = false;
 			}}
 		/>
-		{#if zoom.scale > 1}
-			{@const imageRect = fittedImageRect(imageElement)}
-			{@const zoombox = zoomBoxFromState(zoom, imageRect)}
-			<aside class="zoom-window">
-				<div
-					class="zoombox"
-					style:top="{zoombox.y * 100}%"
-					style:left="{zoombox.x * 100}%"
-					style:width="{zoombox.width * 100}%"
-					style:height="{zoombox.height * 100}%"
-				></div>
-				<img src={imageSrc} alt="" aria-hidden="true" />
-			</aside>
-		{/if}
 		{#if imageElement}
 			<DraggableBoundingBox
 				{...activeTool}
@@ -1129,28 +1111,6 @@
 		background-image:
 			linear-gradient(to right, var(--gray) 1px, transparent 1px),
 			linear-gradient(to bottom, var(--gray) 1px, transparent 1px);
-	}
-
-	.zoom-window {
-		position: absolute;
-		bottom: 0;
-		right: 0;
-		height: 10rem;
-		pointer-events: none;
-		overflow: hidden;
-	}
-
-	.zoom-window img {
-		filter: brightness(0.5);
-	}
-
-	.zoom-window .zoombox {
-		position: absolute;
-		border: 2px solid white;
-		outline: 2px solid black;
-		backdrop-filter: brightness(2);
-		transition: all 0.1s;
-		z-index: 10;
 	}
 
 	.behind-image {
