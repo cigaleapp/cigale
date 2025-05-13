@@ -80,6 +80,11 @@
 				<KeyboardHint --size="1.2em" {shortcut} {help} />
 			</dt>
 			<dd>{help}</dd>
+		{:else}
+			<div class="empty">
+				<div class="sad">¯\_(ツ)_/¯</div>
+				<p>Aucun raccouci clavier pour cette page</p>
+			</div>
 		{/each}
 	</dl>
 </Modal>
@@ -102,5 +107,19 @@
 		grid-template-columns: max-content 1fr;
 		gap: 1em 1.5em;
 		align-items: center;
+		flex-grow: 1;
+	}
+
+	.empty {
+		grid-column: 1 / -1;
+		text-align: center;
+		color: var(--fg-secondary);
+	}
+
+	.sad {
+		font-size: 2em;
+		margin-bottom: 0.5em;
+		font-weight: bold;
+		color: var(--gray);
 	}
 </style>
