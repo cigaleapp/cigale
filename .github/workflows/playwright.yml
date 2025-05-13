@@ -3,8 +3,10 @@ name: End-to-end tests
 on:
   push:
     branches: [main]
+    paths: [src/**, tests/**, static/**, '*']
   pull_request:
     branches: [main]
+    paths: [src/**, tests/**, static/**, '*']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
