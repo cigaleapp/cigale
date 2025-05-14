@@ -1,6 +1,70 @@
 import { type } from 'arktype';
 import { clamp, sign } from './utils';
 
+/**
+ * Represents the zoom state of the image.
+ * x & y coordinates are in pixels of the resized, post-object-fit but pre-zoom image
+ * @typedef {object} ZoomState
+ * @property {object} origin
+ * @property {number} origin.x
+ * @property {number} origin.y
+ * @property {number} scale
+ * @property {boolean} panning
+ * @property {object} panStart
+ * @property {number} panStart.x
+ * @property {number} panStart.y
+ * @property {object} panStart.zoomOrigin
+ * @property {number} panStart.zoomOrigin.x
+ * @property {number} panStart.zoomOrigin.y
+ */
+
+/**
+ * @type {ZoomState}
+ */
+export const INITIAL_ZOOM_STATE = {
+	origin: { x: 0, y: 0 },
+	scale: 1,
+	panning: false,
+	panStart: { x: 0, y: 0, zoomOrigin: { x: 0, y: 0 } }
+};
+
+/**
+ * Calculate bounding rect for an image element that has object-fit: contain. The boundingClientRect is not the same as the actual, displayed image. We use both natural{Width,Height} and client{Width,Height} to calculate the displayed image size.
+ * You can also provide the zoom state to take it into account.
+ * @param {Pick<HTMLImageElement, `${'natural'|'client'}${'Width'|'Height'}` | `client${'Top'|'Left'}`>} imageElement
+ * @param {ZoomState} [zoomState] take into account the zoom state of the image
+ */
+export function fittedImageRect(
+	{ naturalWidth, naturalHeight, clientWidth, clientHeight, clientTop, clientLeft },
+	zoomState
+) {
+	const naturalRatio = naturalWidth / naturalHeight;
+	const clientRatio = clientWidth / clientHeight;
+
+	let width = 0;
+	let height = 0;
+
+	if (naturalRatio < clientRatio) {
+		width = clientHeight * naturalRatio;
+		height = clientHeight;
+	} else {
+		height = clientWidth / naturalRatio;
+		width = clientWidth;
+	}
+
+	if (zoomState) {
+		width *= zoomState.scale;
+		height *= zoomState.scale;
+	}
+
+	return {
+		width,
+		height,
+		x: (zoomState?.origin.x ?? 0) + clientLeft + (clientWidth - width) / 2,
+		y: (zoomState?.origin.y ?? 0) + clientTop + (clientHeight - height) / 2
+	};
+}
+
 export class NewBoundingBox {
 	/**
 	 * @type {import('./BoundingBoxes.svelte').Rect}
