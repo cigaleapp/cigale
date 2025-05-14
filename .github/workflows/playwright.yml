@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     environment:
-      name: 'End-to-end tests report for #${{ github.event.number }}'
+      name: '#${{ github.event.number }}: End-to-end tests report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
       - uses: actions/checkout@v4
@@ -36,14 +36,6 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-
-      - uses: daun/playwright-report-summary@v3
-        if: always()
-        with:
-          report-file: test-results.json
-          comment-title: End-to-end tests
-          job-summary: true
-          report-url: https://cigaleapp.github.io/cigale/_playwright/pr-${{ github.event.number }}/
 
       - name: Deploy results on github pages
         if: ${{ !cancelled() }}

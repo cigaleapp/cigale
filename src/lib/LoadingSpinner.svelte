@@ -36,8 +36,8 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		width: 1em;
-		height: 1em;
+		width: var(--size, 1em);
+		height: var(--size, 1em);
 	}
 
 	.loading-spinner:not(.infinite) {

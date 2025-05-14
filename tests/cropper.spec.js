@@ -315,6 +315,143 @@ test.describe('Cropper view', () => {
 			});
 		});
 	});
+
+	test.describe('zooming and panning', () => {
+		test.beforeEach(async ({ page, browserName }) => {
+			test.skip(browserName === 'webkit', 'Coordinates are wildly different in webkit');
+			await page.getByRole('img', { name: 'lil-fella.jpeg' }).click();
+			await page.waitForTimeout(1000);
+		});
+
+		/**
+		 *
+		 * @param {Page} page
+		 * @param {number} zoom mouse -deltaY
+		 * @param {number} [x]
+		 * @param {number} [y]
+		 * @param {number} [stepsize=100]
+		 */
+		async function zoomAt(page, zoom, x, y, stepsize = 100) {
+			if (x && y) {
+				const changeArea = await page.locator('.change-area').boundingBox();
+				if (!changeArea) throw new Error('Change area not found');
+				const { x: x0, y: y0 } = changeArea;
+				await page.mouse.move(x0 + x, y0 + y);
+			}
+
+			for (let step = 0; step < Math.abs(zoom); step += stepsize) {
+				await page.mouse.wheel(0, -Math.sign(zoom) * stepsize);
+			}
+
+			await page.mouse.wheel(0, -Math.sign(zoom) * (Math.abs(zoom) % stepsize));
+
+			await page.waitForTimeout(200);
+		}
+
+		/**
+		 *
+		 * @param {Page} page
+		 * @param {number} scale
+		 * @param {number} [translateX]
+		 * @param {number} [translateY]
+		 */
+		async function checkImageTransforms(page, scale, translateX, translateY) {
+			const image = page.getByTestId('crop-subject-image');
+			expect(image).toBeVisible();
+
+			await expect.soft(image).toHaveCSS('scale', /[0-9]+(\.[0-9]+)?/);
+
+			expect.soft(await image.evaluate((i) => Number(i.style.scale))).toBeCloseTo(scale, 3);
+
+			if (translateX !== undefined && translateY !== undefined) {
+				await expect.soft(image).toHaveCSS('translate', /.+px .+px/);
+
+				expect
+					.soft(await image.evaluate((i) => i.style.translate.split(' ').map(Number.parseFloat)))
+					.toEqual([expect.closeTo(translateX, 2), expect.closeTo(translateY, 2)]);
+			}
+		}
+
+		test('should zoom in and out with the mouse wheel', async ({ page }) => {
+			const image = page.getByTestId('crop-subject-image');
+			expect(image).toBeVisible();
+
+			await expect(image).toHaveCSS('scale', '1');
+
+			await zoomAt(page, 120, 100, 100);
+			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+
+			await zoomAt(page, -70);
+			await checkImageTransforms(page, 1.10592, 97.3785, 53.6963);
+
+			await zoomAt(page, 500, 400, 400);
+			await checkImageTransforms(page, 2.75188, 142.537, -173.856);
+		});
+
+		test('should zoom in and out with the keyboard', async ({ page }) => {
+			const image = page.getByTestId('crop-subject-image');
+			expect(image).toBeVisible();
+
+			await expect(image).toHaveCSS('scale', '1');
+
+			await page.keyboard.press('+');
+			await checkImageTransforms(page, 1.4);
+
+			await page.keyboard.press('-');
+			await checkImageTransforms(page, 1);
+
+			await page.keyboard.press('-');
+			await checkImageTransforms(page, 1);
+
+			await page.keyboard.press('+');
+			await checkImageTransforms(page, 1.4);
+
+			await page.keyboard.press('+');
+			await checkImageTransforms(page, 1.96);
+
+			await page.keyboard.press('+');
+			await checkImageTransforms(page, 2.744);
+
+			await page.keyboard.press('Digit0');
+			await checkImageTransforms(page, 1);
+		});
+
+		test('should pan with the mouse', async ({ page }) => {
+			const image = page.getByTestId('crop-subject-image');
+			expect(image).toBeVisible();
+
+			await expect(image).toHaveCSS('scale', '1');
+
+			await zoomAt(page, 120, 100, 100);
+			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+
+			await page.mouse.down({ button: 'middle' });
+			await zoomAt(page, 0, 50, 50);
+			await page.mouse.up({ button: 'middle' });
+			await page.waitForTimeout(200);
+
+			await checkImageTransforms(page, 1.728, 182.668, 46.98);
+
+			// Make sure no box was created
+			await expect(page.getByText(/Boîte #\d+/)).toHaveCount(1);
+		});
+
+		test('recalls zoom and pan between image changes', async ({ page }) => {
+			await zoomAt(page, 120, 100, 100);
+			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+
+			await page.keyboard.press('ArrowRight');
+			await page.waitForURL((u) => u.hash === '#/crop/000003');
+
+			await zoomAt(page, 40, 150, 150);
+			await checkImageTransforms(page, 1.44, 124.723, 73.3824);
+
+			await page.keyboard.press('ArrowLeft');
+			await page.waitForURL((u) => u.hash === '#/crop/000002');
+
+			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+		});
+	});
 });
 
 /**
