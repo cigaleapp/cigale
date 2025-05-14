@@ -1,4 +1,5 @@
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 import { decodePhoto, photoChanged } from './utils.js';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -77,9 +78,15 @@ async function fetchPhoto(gbifId, name) {
 			sharp(buffer).resize(1080, null, { withoutEnlargement: true }).toFile(photoPath);
 		});
 
-	let cachebuster = newProtocol.version - 1;
+	let cachebuster =
+		new URL(
+			oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.find(
+				(o) => o.label === name
+			)?.image ?? `https://example.com?v=${protocol.version}`
+		).searchParams.get('v') ?? protocol.version;
+
 	if (photoChanged(photoPath, existingPhoto)) {
-		cachebuster++;
+		cachebuster = protocol.version;
 	}
 
 	return {
@@ -93,6 +100,7 @@ async function fetchPhoto(gbifId, name) {
 
 console.log(await fetchTaxon('Allacma fusca'));
 
+console.log({ protocol });
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.map(
 	(o) => o.label
 );

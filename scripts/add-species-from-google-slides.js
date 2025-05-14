@@ -40,10 +40,16 @@ const GOOGLE_DRIVE_FOLDER_URL = folderIdFromUrl(
 
 /**
  * @import { Protocol } from '../src/lib/database.js';
- * @type {Record<string, Protocol>}
+ * @type {Record<string, {fresh: Protocol, old: Protocol}>}
  */
 const protocols = Object.fromEntries(
-	ADD_TO_PROTOCOLS.map((file) => [file, JSON.parse(readFileSync(file, 'utf8'))])
+	ADD_TO_PROTOCOLS.map((file) => [
+		file,
+		{
+			fresh: JSON.parse(readFileSync(file, 'utf8')),
+			old: JSON.parse(readFileSync(file.replace('arthropods', 'old-arthropods'), 'utf8'))
+		}
+	])
 );
 
 console.info(
@@ -179,9 +185,9 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))[0] ?? links[0][0];
 
 		for (const [filepath, protocol] of Object.entries(protocols)) {
-			log(`Adding to ${cc.blue}${protocol.id}${cc.reset}`);
+			log(`Adding to ${cc.blue}${protocol.fresh.id}${cc.reset}`);
 
-			const options = protocol.metadata[`${protocol.id}__species`].options;
+			const options = protocol.fresh.metadata[`${protocol.fresh.id}__species`].options;
 
 			const imagePath = path.join(filepath.replace('.json', '.images'), `${name}.png`);
 
@@ -195,12 +201,19 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 					path.relative(path.join(filepath, '../..'), imagePath).replaceAll('\\', '/')
 			);
 
-			if (protocol.version) {
-				if (photoChanged(imagePath, oldPhoto)) {
-					imageUrl.searchParams.set('v', protocol.version);
-				} else {
-					imageUrl.searchParams.set('v', protocol.version - 1);
-				}
+			const oldOption = protocol.old.metadata[`${protocol.old.id}__species`].options.find(
+				(o) => o.label === name
+			);
+
+			if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
+				imageUrl.searchParams.set('v', protocol.fresh.version.toString());
+			} else if (oldOption) {
+				imageUrl.searchParams.set(
+					'v',
+					new URL(oldOption.image).searchParams.get('v') ??
+						protocol.fresh.version?.toString() ??
+						'0'
+				);
 			}
 
 			if (options.some((o) => o.label === name)) {
@@ -222,7 +235,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			}
 
 			log(`Writing protocol to ${cc.blue}${filepath}${cc.reset}`);
-			writeFileSync(filepath, JSON.stringify(protocol, null, 2));
+			writeFileSync(filepath, JSON.stringify(protocol.fresh, null, 2));
 		}
 	} catch (error) {
 		log('An error occured:', error);

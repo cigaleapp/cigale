@@ -28,7 +28,12 @@ export function photoChanged(filepath, oldDecodedPhoto) {
 		) > 0;
 
 	if (changed) {
-		diffPhoto.pack().pipe(writeFileSync(filepath.replace('.jpeg', '.diff.png')));
+		writeFileSync(
+			filepath.replace(/\.(jpeg|png)$/, '.diff.png'),
+			PNG.sync.write(diffPhoto, {
+				colorType: 6
+			})
+		);
 	}
 
 	return changed;

@@ -3,7 +3,7 @@ name: Regenerate arthropods protocol
 on:
   schedule:
     # Runs at 00:00 UTC every Monday
-    - cron: '0 0 * * 1'
+    - cron: '0 0 * * 1,4'
   # Allow manual triggering from the Actions tab
   workflow_dispatch:
 
@@ -46,6 +46,9 @@ jobs:
 
       - name: Add data from GBIF
         run: npx node scripts/add-taxonomic-parents-from-gbif.js
+
+      - name: Clean old protocol
+        run: rm examples/old-*.json
 
       - name: Store scripts/jessica-joachim-crawler-report.md
         id: get-report
