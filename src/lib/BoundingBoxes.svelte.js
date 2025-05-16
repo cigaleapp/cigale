@@ -220,6 +220,19 @@ export function coordsDifference(a, b) {
 	return combinedDifference;
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('coordsDifference', () => {
+		expect(
+			coordsDifference(
+				{ x: 1, y: 1, width: 10, height: 20 },
+				{ x: 5, y: 10, width: 10, height: 20 }
+			)
+		).toBe(13);
+		expect(coordsDifference({ x: 1, y: 1, w: 10, h: 20 }, { x: 5, y: 10, w: 10, h: 20 })).toBe(13);
+	});
+}
+
 /**
  *
  * @param {AnyBoundingBox} a
@@ -228,6 +241,19 @@ export function coordsDifference(a, b) {
  */
 export function coordsAreEqual(a, b, tolerance = 0) {
 	return coordsDifference(a, b) <= tolerance;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('coordsAreEqual', () => {
+		expect(
+			coordsAreEqual({ x: 1, y: 1, width: 10, height: 20 }, { x: 5, y: 10, width: 10, height: 20 })
+		).toBe(false);
+		expect(coordsAreEqual({ x: 1, y: 1, w: 10, h: 20 }, { x: 5, y: 10, w: 10, h: 20 })).toBe(false);
+		expect(
+			coordsAreEqual({ x: 1, y: 1, w: 10, h: 20 }, { x: 1.01, y: 1.01, w: 10.01, h: 20.01 }, 0.05)
+		).toBe(true);
+	});
 }
 
 /**
@@ -246,4 +272,22 @@ export function toCorners(boundingBox) {
 		bottomleft: [boundingBox.x, boundingBox.y + boundingBox.height],
 		bottomright: [boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height]
 	};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('toCorners', () => {
+		expect(toCorners({ x: 1, y: 1, width: 10, height: 20 })).toEqual({
+			topleft: [1, 1],
+			topright: [11, 1],
+			bottomleft: [1, 21],
+			bottomright: [11, 21]
+		});
+		expect(toCorners({ x: 5, y: 10, w: 10, h: 20 })).toEqual({
+			topleft: [0, 0],
+			topright: [10, 0],
+			bottomleft: [0, 20],
+			bottomright: [10, 20]
+		});
+	});
 }
