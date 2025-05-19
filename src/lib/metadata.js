@@ -338,6 +338,8 @@ function mergeMetadata(definition, values) {
 	 * example: [ { alternatives: { a: 0.8, b: 0.2 } }, { alternatives: { a: 0.6, b: 0.4 } } ]
 	 * turns into: { a: merger([0.8, 0.6]), b: merger([0.2, 0.4]) }
 	 */
+	console.log('Merging metadata', definition, values);
+
 	const mergeAlternatives = (merger, values) =>
 		Object.fromEntries(
 			values
@@ -382,6 +384,16 @@ function mergeMetadata(definition, values) {
 				manuallyModified: values.some((v) => v.manuallyModified),
 				confidence: median(values.map((v) => v.confidence)),
 				alternatives: mergeAlternatives(median, values)
+			};
+		case 'union':
+			return {
+				value: mergeByUnion(
+					definition.type,
+					values.map((v) => v.value)
+				),
+				manuallyModified: values.some((v) => v.manuallyModified),
+				confidence: avg(values.map((v) => v.confidence)),
+				alternatives: mergeAlternatives(avg, values)
 			};
 		case 'none':
 			return null;
@@ -523,6 +535,30 @@ function mergeMedian(type, values) {
 }
 
 /**
+ * Merge values by union.
+ * @param {import('./database.js').MetadataType} type
+ * @param {Array<RuntimeValue>} values
+ * @returns {RuntimeValue<"boundingbox">}
+ */
+function mergeByUnion(type, values) {
+	if (!areType('boundingbox', type, values)) {
+		throw new Error(`Impossible de fusionner en mode union des valeurs de type ${type}`);
+	}
+
+	const xStart = Math.min(...values.map((v) => v.x));
+	const yStart = Math.min(...values.map((v) => v.y));
+	const xEnd = Math.max(...values.map((v) => v.x + v.w));
+	const yEnd = Math.max(...values.map((v) => v.y + v.h));
+
+	return {
+		x: xStart,
+		y: yStart,
+		w: xEnd - xStart,
+		h: yEnd - yStart
+	};
+}
+
+/**
  * Convert series of values to an output number
  * @param {Type} type
  * @param {Value[]} values
@@ -635,6 +671,19 @@ export function isType(testedtyp, metadatatyp, value) {
 		default:
 			throw new Error(`Type inconnu: ${testedtyp}`);
 	}
+}
+
+/**
+ * Just like `isType`, but for an array of values
+ * @template {DB.MetadataType} Type
+ * @template {undefined | RuntimeValue} Value
+ * @param {Type} testedtyp
+ * @param {DB.MetadataType} metadatatyp
+ * @param {Value[]} value
+ * @returns {value is (Value extends RuntimeValue ?  RuntimeValue<Type>[] : (undefined | RuntimeValue<Type>[]))}
+ */
+export function areType(testedtyp, metadatatyp, value) {
+	return value.every((v) => isType(testedtyp, metadatatyp, v));
 }
 
 /**

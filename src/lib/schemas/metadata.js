@@ -96,6 +96,10 @@ export const METADATA_MERGE_METHODS = {
 		label: 'Médiane',
 		help: 'Prend la médiane des valeurs'
 	},
+	union: {
+		label: 'Union',
+		help: 'Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes'
+	},
 	none: {
 		label: 'Aucune',
 		help: 'Ne pas fusionner'

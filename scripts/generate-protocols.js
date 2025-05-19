@@ -109,7 +109,7 @@ const protocol = {
 			label: '',
 			description: '',
 			required: true,
-			mergeMethod: 'average'
+			mergeMethod: 'union'
 		},
 		[namespaced('crop_is_confirmed')]: {
 			type: 'boolean',
