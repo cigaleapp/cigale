@@ -24,6 +24,9 @@
 	/** @type {'metadataonly'|'croppedonly'|'full'} */
 	let include = $state('croppedonly');
 
+	/**
+	 *
+	 */
 	async function generateExport() {
 		exporting = true;
 		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);

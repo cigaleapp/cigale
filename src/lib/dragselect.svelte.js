@@ -17,7 +17,6 @@ export class DragSelect {
 	 * needed to properly do shift-click selection
 	 *
 	 * See https://stackoverflow.com/a/16530782
-	 *
 	 * @type {string|undefined}
 	 */
 	shiftSelectionAnchor;

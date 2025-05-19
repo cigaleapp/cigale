@@ -6,7 +6,6 @@
 	 * ```
 	 *
 	 * Also handles showing nicer characters for stuff like arrows, the $mod (Cmd or Ctrl), etc.
-	 *
 	 * @param {string} pattern the raw pattern as given to Tinykeys
 	 * @returns {string[]}
 	 */

@@ -8,15 +8,15 @@ import { nanoid } from 'nanoid';
 
 /**
  * @template T
- * @typedef {Object} Toast
+ * @typedef {object} Toast
  * @property {Date} addedAt
  * @property {string} id
  * @property {string} message
  * @property {'info' | 'success' | 'error' | 'warning' | 'debug'} type
- * @property {Object} labels
+ * @property {object} labels
  * @property {string} [labels.action]
  * @property {string} [labels.close]
- * @property {Object} callbacks
+ * @property {object} callbacks
  * @property {(toast: Toast<T>) => MaybePromise<void>} [callbacks.action]
  * @property {(toast: Toast<T>) => MaybePromise<void>} [callbacks.closed]
  * @property {boolean} [showLifetime]
@@ -30,7 +30,7 @@ export const TOAST_LIFETIME_MS = 3000;
 
 /**
  * @template T
- * @typedef {Object} ToastOptions
+ * @typedef {object} ToastOptions
  * @property {T} [data]
  * @property {Toast<T>['labels']} [labels]
  * @property {boolean} [showLifetime]

@@ -301,6 +301,9 @@
 		});
 	}
 
+	/**
+	 *
+	 */
 	async function revertAll() {
 		for (const { id } of images) {
 			await revertToInferedCrop(id);
@@ -444,6 +447,9 @@
 		return newImageId;
 	}
 
+	/**
+	 *
+	 */
 	async function moveToNextUnconfirmed() {
 		const imagesAndBoxes = images.map((img) => /** @type {const}*/ ([img, boundingBoxes[img.id]]));
 
@@ -469,6 +475,9 @@
 		return [w, h];
 	}
 
+	/**
+	 *
+	 */
 	function goToGallery() {
 		uiState.imagePreviouslyOpenedInCropper = fileId;
 		goto('#/crop');
@@ -483,7 +492,8 @@
 	 * @property {string|null} imageId
 	 * @property {boolean} manual was selected manually instead of by modifying/creating a new box
 	 */
-	/** The imageID of the currently selected bounding box.
+	/**
+	 * The imageID of the currently selected bounding box.
 	 * @type {SelectedBox}
 	 */
 	let selectedBox = $state({

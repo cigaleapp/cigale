@@ -25,6 +25,10 @@ function htmlToMarkdown(html) {
 	return _tdown.turndown(html);
 }
 
+/**
+ * Convert markdown to HTML
+ * @param {string} markdown
+ */
 function markdownToHtml(markdown) {
 	return marked.parse(markdown);
 }
@@ -32,6 +36,9 @@ function markdownToHtml(markdown) {
 /** @type {Array<{ name: string; url: string; found: Array<{ name: string; url: string }> }>}  */
 const reportTable = [];
 
+/**
+ * Render the report table
+ */
 function renderReportTable() {
 	return `Recherche effectuée | Résultats\n-----------------|------------------\n${reportTable.map(({ name, url, found }) => `[${name}](${url}) | ${found.map(({ name, url }) => `[${name}](${url})`).join(', ')}`).join('\n')}`;
 }

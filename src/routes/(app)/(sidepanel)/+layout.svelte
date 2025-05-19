@@ -24,6 +24,9 @@
 
 	const { children } = $props();
 
+	/**
+	 *
+	 */
 	async function importImages() {
 		const filesInput = document.createElement('input');
 		filesInput.type = 'file';
@@ -39,11 +42,17 @@
 		filesInput.click();
 	}
 
+	/**
+	 *
+	 */
 	async function mergeSelection() {
 		const newId = await mergeToObservation(uiState.selection);
 		uiState.setSelection?.([newId]);
 	}
 
+	/**
+	 *
+	 */
 	async function splitSelection() {
 		// Find IDs of all images in selected observations
 		const toselect = uiState.selection.flatMap((id) => {
@@ -57,6 +66,9 @@
 		uiState.setSelection?.(toselect);
 	}
 
+	/**
+	 *
+	 */
 	async function deleteSelection() {
 		await openTransaction(
 			['Image', 'Observation', 'ImageFile', 'ImagePreviewFile'],

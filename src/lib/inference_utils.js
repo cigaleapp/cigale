@@ -5,6 +5,8 @@ import * as ort from 'onnxruntime-web';
 
 /**
  * @typedef {import('onnxruntime-web')} ort
+ * @import { BB } from './inference.js';
+ * @import { MetadataNeuralInference } from './database.js';
  */
 
 /**
@@ -143,13 +145,12 @@ export async function applyBBOnTensor(BB, tensor, marge = 10) {
 }
 
 /**
- *
- * @param {number[][]} BBs
+ * Apply bounding boxes on an image's tensor
+ * @param {BB[]} BBs
  * @param {ort.Tensor} tensor
  * @param {number} marge
  * @returns {Promise<ort.Tensor[]>}
  */
-
 export async function applyBBsOnTensor(BBs, tensor, marge = 10) {
 	/*Applique les bounding boxes sur UN tenseur :
     -------input------- :
@@ -170,9 +171,10 @@ export async function applyBBsOnTensor(BBs, tensor, marge = 10) {
 	}
 	return croppedTensors;
 }
+
 /**
- *
- * @param {number[][][]} BBs
+ * Apply bounding boxes to a list of images' tensors
+ * @param {BB[][]} BBs
  * @param {ort.Tensor[][]} tensors
  * @returns {Promise<ort.Tensor[][]>}
  */
@@ -185,8 +187,9 @@ export async function applyBBsOnTensors(BBs, tensors) {
 	let tobereturned = await Promise.all(croppedTensorPromises);
 	return tobereturned;
 }
+
 /**
- * supprime les bounding boxes qui ont un IoU > 0.5. Modifie l'entrée en place!
+ * Supprime les bounding boxes qui ont un IoU > 0.5. Modifie l'entrée en place!
  * @param {number[][][]} boundingboxes - [each image [each box [x, y, w, h]]]
  * @param {number} numfiles
  * @returns {number[][][]}
@@ -215,19 +218,20 @@ if (import.meta.vitest) {
 }
 
 /**
- *
- * @param {import('./database.js').Protocol} protocol
+ * Preprocesses a list of tensors for classification
+ * @param {MetadataNeuralInference|undefined} params
  * @param {ort.Tensor[]} tensor
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-async function map_preprocess_for_classification(protocol, tensor, mean, std) {
-	const { width, height, normalized } = protocol.inference?.classification?.input ?? {
+async function map_preprocess_for_classification(params, tensor, mean, std) {
+	const { width, height, normalized } = params?.input ?? {
 		width: 224,
 		height: 224,
 		normalized: true
 	};
+
 	let c = tensor;
 	c = await normalizeTensors(c, mean, std, !normalized);
 	c = await resizeTensors(c, width, height);
@@ -236,13 +240,13 @@ async function map_preprocess_for_classification(protocol, tensor, mean, std) {
 }
 /**
  *
- * @param {import('./database.js').Protocol} protocol
+ * @param {MetadataNeuralInference|undefined} params
  * @param {ort.Tensor} tensors
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function preprocess_for_classification(protocol, tensors, mean, std) {
+export async function preprocess_for_classification(params, tensors, mean, std) {
 	/*preprocess les tenseurs pour la classification
     -------input------- :
         tensors : liste de tenseurs à prétraiter
@@ -258,7 +262,7 @@ export async function preprocess_for_classification(protocol, tensors, mean, std
     */
 	// @ts-ignore
 	let new_ctensorsPromise = tensors.map((tensor) =>
-		map_preprocess_for_classification(protocol, tensor, mean, std)
+		map_preprocess_for_classification(params, tensor, mean, std)
 	);
 	let new_ctensors = await Promise.all(new_ctensorsPromise);
 

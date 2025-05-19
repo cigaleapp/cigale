@@ -116,6 +116,7 @@ export const uiState = $state({
 	},
 	/**
 	 * Get the bounding box metadata value of an image
+	 * @param image
 	 */
 	cropMetadataValueOf(image) {
 		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);

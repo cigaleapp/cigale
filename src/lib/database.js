@@ -5,6 +5,7 @@ import {
 	MetadataEnumVariant,
 	MetadataInferOptions,
 	MetadataMergeMethod,
+	MetadataNeuralInference,
 	Metadata as MetadataSchema,
 	MetadataType,
 	MetadataValue,
@@ -235,6 +236,11 @@ function table(keyPaths, schema) {
  */
 
 /**
+ * @typedef MetadataNeuralInference
+ * @type {typeof MetadataNeuralInference.infer}
+ */
+
+/**
  * @typedef ImageFile
  * @type {typeof ImageFile.infer}
  */
@@ -242,7 +248,6 @@ function table(keyPaths, schema) {
 /**
  * @typedef Dimensions
  * @type {typeof Dimensions.infer}
- *
  * @typedef DimensionsInput
  * @type {typeof Dimensions.inferIn}
  */

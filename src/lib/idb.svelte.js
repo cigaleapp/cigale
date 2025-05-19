@@ -362,6 +362,10 @@ export async function openTransaction(tableNames, { mode }, actions) {
 	}
 }
 
+/**
+ * Open the database, creating it if it doesn't exist
+ * @returns {Promise<import('idb').IDBPDatabase<IDBDatabaseType>>}
+ */
 export async function openDatabase() {
 	if (_database) return _database;
 
@@ -412,6 +416,9 @@ export async function openDatabase() {
 	return _database;
 }
 
+/**
+ * Close the database and delete it
+ */
 export function nukeDatabase() {
 	if (_database) {
 		_database.close();

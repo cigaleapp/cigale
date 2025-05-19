@@ -321,7 +321,6 @@ function toCSV(header, rows, separator = ';') {
 
 /**
  * Returns a un-namespaced object of all metadata values of the given protocol, given the metadata values object of an image/observation. If a metadata value is absent from the given values, the value is still present, but set to `null`.
- *
  * @param {DB.Protocol} protocol
  * @param {DB.MetadataValues} values
  */
