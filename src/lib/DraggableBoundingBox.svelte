@@ -47,10 +47,8 @@
 		zoom
 	} = $props();
 
-	let boundingBoxes = $state(boudingBoxesInitial);
-	$effect(() => {
-		boundingBoxes = boudingBoxesInitial;
-	});
+	// $derived can be written to since Svelte 5.25
+	let boundingBoxes = $derived(boudingBoxesInitial);
 
 	let clientWidth = $state(imageElement.clientWidth);
 	let clientHeight = $state(imageElement.clientHeight);

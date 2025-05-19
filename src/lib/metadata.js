@@ -318,7 +318,7 @@ export async function mergeMetadataValues(values) {
 		if (merged !== null && merged !== undefined)
 			output[key] = {
 				...merged,
-				merged: [...new Set(valuesOfKey.map((v) => JSON.stringify(v.value)))].length > 1
+				merged: new Set(valuesOfKey.map((v) => JSON.stringify(v.value))).size > 1
 			};
 	}
 
