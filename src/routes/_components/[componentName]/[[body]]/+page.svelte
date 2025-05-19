@@ -1,6 +1,8 @@
 <script>
+	import { dev } from '$app/environment';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
+	import { toasts } from '$lib/toasts.svelte';
 
 	let componentName = $derived(page.params['componentName']);
 	let slotContent = $derived(page.params['body']);
@@ -9,7 +11,13 @@
 			Array(...page.url.searchParams.entries()).map(([k, v]) => {
 				let value;
 				if (v.startsWith('{') && v.endsWith('}')) {
-					value = eval(`(${v.replace(/^{/, '').replace(/}$/, '')})`);
+					// okay because this page is dev-mode-only
+					if (dev) {
+						value = eval(`(${v.replace(/^{/, '').replace(/}$/, '')})`);
+					} else {
+						toasts.error('Arbitrary code expressions in props are only allowed in dev mode');
+						value = v;
+					}
 				} else if (v === '') {
 					value = true;
 				} else {
