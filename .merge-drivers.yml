@@ -1,4 +1,0 @@
-merge-drivers:
-  npm-lockfile:
-    name: regenerate npm lockfile
-    driver: npm install && cp package-lock.json %A
