@@ -3,6 +3,7 @@ import js from '@eslint/js';
 import { includeIgnoreFile } from '@eslint/compat';
 import oxlint from 'eslint-plugin-oxlint';
 import svelte from 'eslint-plugin-svelte';
+import jsdoc from 'eslint-plugin-jsdoc';
 import globals from 'globals';
 import { fileURLToPath } from 'node:url';
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
@@ -14,6 +15,7 @@ export default [
 	...svelte.configs['flat/recommended'],
 	prettier,
 	...svelte.configs['flat/prettier'],
+	jsdoc.configs['flat/recommended'],
 	{
 		languageOptions: {
 			globals: {
