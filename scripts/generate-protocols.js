@@ -42,7 +42,7 @@ const cladeMetadata = (clade, label) => ({
 	label,
 	required: false,
 	description: '',
-	mergeMethod: 'average',
+	mergeMethod: 'max',
 	taxonomic: {
 		clade,
 		parent: {}
