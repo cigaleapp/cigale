@@ -5,7 +5,6 @@ import {
 	MetadataEnumVariant,
 	MetadataInferOptions,
 	MetadataMergeMethod,
-	MetadataNeuralInference,
 	Metadata as MetadataSchema,
 	MetadataType,
 	MetadataValue,
@@ -236,6 +235,7 @@ function table(keyPaths, schema) {
  */
 
 /**
+ * @import { MetadataNeuralInference } from './schemas/metadata.js'
  * @typedef MetadataNeuralInference
  * @type {typeof MetadataNeuralInference.infer}
  */

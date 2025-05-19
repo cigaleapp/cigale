@@ -13,6 +13,7 @@
 				if (v.startsWith('{') && v.endsWith('}')) {
 					// okay because this page is dev-mode-only
 					if (dev) {
+						// oxlint-disable-next-line eslint/no-eval
 						value = eval(`(${v.replace(/^{/, '').replace(/}$/, '')})`);
 					} else {
 						toasts.error('Arbitrary code expressions in props are only allowed in dev mode');
