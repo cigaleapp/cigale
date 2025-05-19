@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "table": "$ark.object871",
+  "table": "$ark.object872",
   "properties": {
     "authors": {
       "type": "array",
@@ -41,7 +41,7 @@
         "anyOf": [
           {
             "type": "object",
-            "table": "$ark.object869",
+            "table": "$ark.object870",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -73,6 +73,10 @@
                   {
                     "const": "none",
                     "description": "Ne pas fusionner"
+                  },
+                  {
+                    "const": "union",
+                    "description": "Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes"
                   }
                 ],
                 "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
@@ -703,7 +707,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object869",
+            "table": "$ark.object870",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -735,6 +739,10 @@
                   {
                     "const": "none",
                     "description": "Ne pas fusionner"
+                  },
+                  {
+                    "const": "union",
+                    "description": "Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes"
                   }
                 ],
                 "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
@@ -1427,7 +1435,7 @@
           },
           {
             "type": "object",
-            "table": "$ark.object869",
+            "table": "$ark.object870",
             "description": "Métadonnée du protocole",
             "properties": {
               "description": {
@@ -1459,6 +1467,10 @@
                   {
                     "const": "none",
                     "description": "Ne pas fusionner"
+                  },
+                  {
+                    "const": "union",
+                    "description": "Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes"
                   }
                 ],
                 "description": "Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images"
