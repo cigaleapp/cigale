@@ -60,21 +60,26 @@ export const METADATA_TYPES = {
 	boundingbox: 'boîte de recadrage'
 };
 
-export const MetadataMergeMethod = type(
-	'"min"',
-	'@',
-	"Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
-)
-	.or(
-		type(
-			'"max"',
-			'@',
-			"Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
-		)
+export const MetadataMergeMethod = type.or(
+	type(
+		'"min"',
+		'@',
+		"Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
+	),
+	type(
+		'"max"',
+		'@',
+		"Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
+	),
+	type('"average"', '@', 'Prendre la moyenne des valeurs'),
+	type('"median"', '@', 'Prendre la médiane des valeurs'),
+	type('"none"', '@', 'Ne pas fusionner'),
+	type(
+		'"union"',
+		'@',
+		'Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes'
 	)
-	.or(type('"average"', '@', 'Prendre la moyenne des valeurs'))
-	.or(type('"median"', '@', 'Prendre la médiane des valeurs'))
-	.or(type('"none"', '@', 'Ne pas fusionner'));
+);
 
 /**
  * @type { Record<typeof MetadataMergeMethod.infer, { label: string; help: string }> }
