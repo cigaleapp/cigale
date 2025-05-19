@@ -16,7 +16,6 @@
 		"lint": "eslint .",
 		"lintfix": "eslint --fix .",
 		"commit": "gitmoji -c",
-		"postinstall": "merge-drivers install",
 		"test": "vitest --coverage.enabled true",
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest"
@@ -54,7 +53,6 @@
 		"jpeg-js": "^0.4.4",
 		"jsdom": "^26.1.0",
 		"lint-staged": "^16.0.0",
-		"merge-drivers": "^1.0.3",
 		"odt2html": "^1.0.1",
 		"pdf-to-png-converter": "^3.6.5",
 		"pixelmatch": "^7.1.0",
