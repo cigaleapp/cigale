@@ -140,6 +140,11 @@ if (import.meta.vitest) {
 	});
 }
 
+/**
+ * Check if a bounding box is non-zero
+ * @param {AnyBoundingBox} boundingBox
+ * @returns {boolean}
+ */
 export function boundingBoxIsNonZero(boundingBox) {
 	return type({
 		x: 'number > 0',

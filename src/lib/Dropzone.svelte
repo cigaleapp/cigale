@@ -40,7 +40,11 @@
 					}
 				})
 				.filter(
-					/** @returns {item is File} */
+					/**
+					 * Ensures that the item is a File
+					 * @param {*} item
+					 * @returns {item is File}
+					 */
 					(item) => Boolean(item)
 				);
 		} else {

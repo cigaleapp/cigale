@@ -33,6 +33,9 @@
 	}
 
 	let cropperModel = $state();
+	/**
+	 *
+	 */
 	async function loadCropperModel() {
 		if (!uiState.currentProtocol) return;
 		cropperModel = await loadModel(uiState.currentProtocol, 'detection');

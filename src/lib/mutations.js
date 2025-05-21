@@ -10,6 +10,10 @@ export function mutationobserver(node, options) {
 	/** @type {MutationObserver|null}  */
 	let observer = null;
 
+	/**
+	 *
+	 * @param options
+	 */
 	function update(options = {}) {
 		destroy();
 		observer = new MutationObserver((mutations) => {
@@ -19,6 +23,9 @@ export function mutationobserver(node, options) {
 		observer.observe(node, options);
 	}
 
+	/**
+	 *
+	 */
 	function destroy() {
 		observer && observer.disconnect();
 		observer = null;

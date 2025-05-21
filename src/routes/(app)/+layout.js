@@ -4,6 +4,9 @@ import { importProtocol } from '$lib/protocols';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
 
+/**
+ *
+ */
 export async function load() {
 	try {
 		await tables.initialize();
@@ -17,6 +20,9 @@ export async function load() {
 	}
 }
 
+/**
+ *
+ */
 async function fillBuiltinData() {
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
 		tx.objectStore('Settings').put({

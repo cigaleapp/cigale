@@ -235,6 +235,12 @@ function table(keyPaths, schema) {
  */
 
 /**
+ * @import { MetadataNeuralInference } from './schemas/metadata.js'
+ * @typedef MetadataNeuralInference
+ * @type {typeof MetadataNeuralInference.infer}
+ */
+
+/**
  * @typedef ImageFile
  * @type {typeof ImageFile.infer}
  */
@@ -242,7 +248,6 @@ function table(keyPaths, schema) {
 /**
  * @typedef Dimensions
  * @type {typeof Dimensions.infer}
- *
  * @typedef DimensionsInput
  * @type {typeof Dimensions.inferIn}
  */

@@ -11,6 +11,10 @@ const here = import.meta.dirname;
  * @import {MetadataEnumVariant} from '../src/lib/database.js';
  */
 
+/**
+ * Fetch a taxon from the GBIF API
+ * @param {string} taxon The taxon to search for
+ */
 async function fetchTaxon(taxon) {
 	const response = await fetch(
 		`https://api.gbif.org/v1/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&q=${encodeURIComponent(taxon)}`
@@ -21,10 +25,10 @@ async function fetchTaxon(taxon) {
 }
 
 /**
- *
- * @param {number} gbifId
- * @param {string} name
- * @returns
+ * Fetch a photo from the GBIF API
+ * @param {number} gbifId GBIF ID (key) of the species
+ * @param {string} name name of the species
+ * @returns {Promise<{url: string, attribution: string}>}
  */
 async function fetchPhoto(gbifId, name) {
 	const url = `https://api.gbif.org/v1/occurrence/search?taxonKey=${gbifId}`;
@@ -236,7 +240,7 @@ for (const [sp, instead] of notfounds.entries()) {
 
 // writeFileSync(path.join(here, 'treedump.json'), JSON.stringify(tree, null, 2));
 
-/***
+/**
  * @param {object} arg
  * @param {string} arg.parentMetadataId id of metadata to search for the parent label in
  * @param {string} arg.childMetadataId  id of metadata to set a taxonomic parent in (without the namespace, the function will add it)

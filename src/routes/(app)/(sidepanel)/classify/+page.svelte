@@ -44,6 +44,9 @@
 	);
 
 	let classifmodel = $state();
+	/**
+	 *
+	 */
 	async function loadClassifModel() {
 		if (!uiState.currentProtocol) return;
 		classifmodel = await loadModel(uiState.currentProtocol, 'classification');
@@ -87,7 +90,14 @@
 		// TODO persist after page reload?
 		uiState.setPreviewURL(id, nimg.toDataURL(), 'cropped');
 
-		const [[scores]] = await classify(uiState.currentProtocol, [[nimg]], classifmodel, uiState, 0);
+		if (!uiState.currentProtocol) return;
+		const inferParams = tables.Metadata.state.find(
+			({ id }) => id === uiState.classificationMetadataId
+		)?.infer;
+		if (!inferParams) return;
+		if (!('neural' in inferParams)) return;
+
+		const [[scores]] = await classify(inferParams.neural, [[nimg]], classifmodel, uiState, 0);
 
 		const results = scores
 			.map((score, i) => ({

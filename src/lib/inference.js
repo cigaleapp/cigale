@@ -6,6 +6,7 @@ import { imload, output2BB, preprocess_for_classification } from './inference_ut
 
 /**
  * @typedef {[number, number, number, number]} BB [x,y,w,h]
+ * @import { MetadataNeuralInference } from './database.js';
  */
 
 /* 
@@ -345,14 +346,14 @@ export async function inferSequentialyConcurrent(files, model, uiState) {
 }
 /**
  *
- * @param {import('./database.js').Protocol} protocol
+ * @param {MetadataNeuralInference|undefined} params
  * @param {ort.Tensor[][]} images
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {typeof import('./state.svelte.js').uiState} uiState
  * @param {number} start
  * @returns {Promise<Array<Array<number[]>>>} scores pour chaque tensor de chaque image: [each image [each tensor [score classe 0, score classe 1, …]]]
  */
-export async function classify(protocol, images, model, uiState, start) {
+export async function classify(params, images, model, uiState, start) {
 	/*Effectue une inférence de classification sur une ou plusieurs images.
     -------------inputs----------------
         images : liste d'images prétraitées
@@ -375,13 +376,13 @@ export async function classify(protocol, images, model, uiState, start) {
 
 	uiState.processing.done = 0;
 
-	const inputName = protocol.inference?.classification?.input?.name ?? model.inputNames[0];
+	const inputName = params?.input?.name ?? model.inputNames[0];
 
 	/** @type {number[][][]}  */
 	const scores = [];
 	uiState.processing.state = 'preprocessing';
 	// @ts-ignore
-	images = await preprocess_for_classification(protocol, images, MEAN, STD);
+	images = await preprocess_for_classification(params, images, MEAN, STD);
 	uiState.processing.state = 'classification';
 	console.log(images);
 

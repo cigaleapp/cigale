@@ -19,6 +19,9 @@ const MODELS = [
 
 self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
+	/**
+	 *
+	 */
 	async function addFilesToCache() {
 		const cache = await caches.open(CACHE);
 		await cache.addAll(ASSETS);
@@ -32,6 +35,9 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
 	console.info(`Actinvating sw version ${version}`);
 	// Remove previous cached data from disk
+	/**
+	 *
+	 */
 	async function deleteOldCaches() {
 		for (const key of await caches.keys()) {
 			if (![CACHE, MODELS_CACHE].includes(key)) await caches.delete(key);
@@ -45,6 +51,9 @@ self.addEventListener('fetch', (event) => {
 	// ignore POST requests etc
 	if (event.request.method !== 'GET') return;
 
+	/**
+	 *
+	 */
 	async function respond() {
 		const url = new URL(event.request.url);
 
