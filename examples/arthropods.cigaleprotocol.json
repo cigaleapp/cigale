@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/2eef8dc9becfb682ee97bf754da7332e2584ae1b/scripts/README.md#protocoles-arthropodsexample",
-	"version": 8,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/6d2d60e1f7041cb8b554d25894a1d646bcede600/scripts/README.md#protocoles-arthropodsexample",
+	"version": 9,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -39,7 +39,7 @@
 			"label": "Règne",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "kingdom",
 				"parent": {}
@@ -58,7 +58,7 @@
 			"label": "Phylum",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "phylum",
 				"parent": {
@@ -85,7 +85,7 @@
 			"label": "Classe",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "class",
 				"parent": {
@@ -131,7 +131,7 @@
 			"label": "Ordre",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "order",
 				"parent": {
@@ -225,6 +225,12 @@
 					"learnMore": "https://gbif.org/species/3690"
 				},
 				{
+					"label": "Meloidae",
+					"key": "meloidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4742"
+				},
+				{
 					"label": "Scarabaeidae",
 					"key": "scarabaeidae",
 					"description": "",
@@ -264,7 +270,7 @@
 			"label": "Famille",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "family",
 				"parent": {
@@ -281,6 +287,7 @@
 					"orchesellidae": "entomobryomorpha",
 					"onychiuridae": "poduromorpha",
 					"neelidae": "neelipleona",
+					"meloidae": "coleoptera",
 					"scarabaeidae": "coleoptera",
 					"poduridae": "poduromorpha",
 					"tomoceridae": "entomobryomorpha",
@@ -432,6 +439,12 @@
 					"learnMore": "https://gbif.org/species/2122150"
 				},
 				{
+					"label": "Meloe",
+					"key": "meloe",
+					"description": "",
+					"learnMore": "https://gbif.org/species/1046316"
+				},
+				{
 					"label": "Melolontha",
 					"key": "melolontha",
 					"description": "",
@@ -537,7 +550,7 @@
 			"label": "Genre",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "genus",
 				"parent": {
@@ -564,6 +577,7 @@
 					"kalaphorura": "onychiuridae",
 					"lepidocyrtus": "entomobryidae",
 					"megalothorax": "neelidae",
+					"meloe": "meloidae",
 					"melolontha": "scarabaeidae",
 					"monobella": "neanuridae",
 					"neanura": "neanuridae",
@@ -614,7 +628,7 @@
 			"label": "",
 			"description": "",
 			"required": true,
-			"mergeMethod": "average"
+			"mergeMethod": "union"
 		},
 		"io.github.cigaleapp.arthropods.example__crop_is_confirmed": {
 			"type": "boolean",
@@ -1085,7 +1099,7 @@
 				{
 					"key": "65",
 					"label": "Sminthurides penicillifer",
-					"description": "\n\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/375165100) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
+					"description": "\n\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/497608502) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4537112",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides penicillifer.jpeg?v=7"
 				},
@@ -1155,7 +1169,7 @@
 				{
 					"key": "75",
 					"label": "Vitronura giselae",
-					"description": "Type locality. Geneva (Switzerland).\n\n\nPhoto par Walker [sur www.inaturalist.org](https://www.inaturalist.org/photos/486137159) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\n\nPhoto par Zeke Blankenship [sur www.inaturalist.org](https://www.inaturalist.org/photos/483116807) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537269",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vitronura giselae.jpeg?v=7"
 				},
@@ -1197,8 +1211,27 @@
 					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/222189"
 				},
 				{
-					"label": "Melolontha hippocastani",
+					"label": "Meloe violaceus",
 					"key": "80",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Meloe%20violaceus.png",
+					"description": "**Nom vernaculaire :** Meloe enfle-boeufs violet\n\n**Espèce(s) semblable(s) :** _[Meloe proscarabe](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)__[us](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)_ ; _[Meloe autumnalis](https://www.galerie-insecte.org/galerie/wikige.php?tax=meloe%20autumnalis)_ (apparaît uniquement à automne)\n\n**Information(s) utile(s):** Cette espèce est présente uniquement au printemps\n\n[Fiche comparative](https://ressources.shna-ofab.fr/shna-ofab/fichiers__pdf_/3-ressources/3-aides_a_la_determination/note_didentification_e-obs_meloe_printanier_ou_meloe_violace_2021.pdf) des _Meloe_ printaniers\n\n**Plus de photos :** [Galerie LMDI](https://www.galerie-insecte.org/galerie/Meloe_violaceus.html)\n\n**Complément d’informations et sources :** [INPN](https://inpn.mnhn.fr/espece/cd_nom/12113) ; [SHNA-OFAB](https://www.shna-ofab.fr/) ; [LMDI](https://www.insecte.org/forum/index.php) ;\n\n**Crédit photo :** [Renko Usami](https://www.galerie-insecte.org/galerie/ref-159239.htm) ; [Phil](https://www.galerie-insecte.org/galerie/ref-83831.htm) ; [Damien GRILLIERE](https://www.galerie-insecte.org/galerie/ref-321060.htm)\n\n**Auteur(s):**\n\nMaxime Cauchoix2025-05-07T09:04:11.120000000\n\ncritère(s) principaux différencier de violaceus",
+					"links": {
+						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/": "us",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=meloe%20autumnalis": "Meloe autumnalis",
+						"https://ressources.shna-ofab.fr/shna-ofab/fichiers__pdf_/3-ressources/3-aides_a_la_determination/note_didentification_e-obs_meloe_printanier_ou_meloe_violace_2021.pdf": "Fiche comparative",
+						"https://www.galerie-insecte.org/galerie/Meloe_violaceus.html": "Galerie LMDI",
+						"https://inpn.mnhn.fr/espece/cd_nom/12113": "INPN",
+						"https://www.shna-ofab.fr/": "SHNA-OFAB",
+						"https://www.insecte.org/forum/index.php": "LMDI",
+						"https://www.galerie-insecte.org/galerie/ref-159239.htm": "Renko Usami",
+						"https://www.galerie-insecte.org/galerie/ref-83831.htm": "Phil",
+						"https://www.galerie-insecte.org/galerie/ref-321060.htm": "Damien GRILLIERE"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/12113"
+				},
+				{
+					"label": "Melolontha hippocastani",
+					"key": "81",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Melolontha%20hippocastani.png?v=7",
 					"description": "Nom vernaculaire : Grand hanneton forestier\n\nEspèce(s) semblable(s) : [Melolontha melol](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/)[ontha](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/) (pointe du pygidium plus longue et plus large) ; [Melolontha pectoralis](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis) (pointe du pygidium encore plus courte, seulement présent dans le Nord-Est de la France)\n\nInformation(s) utile(s): Espèce généralement plus forestière que _Melolontha melolontha_. [Comparatif](https://www.galerie-insecte.org/galerie/view.php?ref=8434) des pygidium de _M.melolontha_ et _M.hippocastani_\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/10879) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Florentin Madrolles](https://www.galerie-insecte.org/galerie/ref-64168.htm) ; [Piezo](https://www.galerie-insecte.org/galerie/fiche.php?ref=8434)",
 					"links": {
@@ -1215,7 +1248,7 @@
 				},
 				{
 					"label": "Pyrrhidium sanguineum",
-					"key": "81",
+					"key": "82",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pyrrhidium%20sanguineum.png?v=7",
 					"description": "Nom vernaculaire : Cardinal imposteur\n\nEspèce(s) semblable(s) : Aucune chez les Cerambycidae, mais attention aux _[Pyrochroa](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/)_ dont les antennes sont dentées.\n\nInformation(s) utile(s): Très précoce (dès février), souvent dans le bois de chauffage\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12357) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Yves Dubois](https://www.galerie-insecte.org/galerie/ref-159923.htm) ; [Pierre Gros](https://www.galerie-insecte.org/galerie/ref-199258.htm)",
 					"links": {
@@ -1312,8 +1345,9 @@
 					"77": "willowsia",
 					"78": "willowsia",
 					"79": "byturus",
-					"80": "melolontha",
-					"81": "pyrrhidium"
+					"80": "meloe",
+					"81": "melolontha",
+					"82": "pyrrhidium"
 				}
 			},
 			"infer": {
