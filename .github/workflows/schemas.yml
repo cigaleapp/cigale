@@ -1,0 +1,27 @@
+name: Schemas
+
+on:
+  push:
+    paths: ['*.yaml', '*.yml', '*.json']
+  pull_request:
+    paths: ['*.yaml', '*.yml', '*.json']
+  workflow_dispatch:
+
+jobs:
+  Validate-example-protocols:
+    name: Validate example protocols
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.1'
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate JSON schema
+        run: node scripts/generate-json-schemas.js
+      - name: Validate protocols with JSON schema
+        uses: GrantBirki/json-yaml-validate@v3.3.0
+        with:
+          json_schema: static/protocol.schema.json
+          files: examples/*.cigaleprotocol.json
