@@ -1,0 +1,1 @@
+.progress-bar.inactive.svelte-6ev6pn{opacity:0;transition:opacity 1s}.progress-bar.svelte-6ev6pn{width:100%;height:.25rem;border-radius:var(--corners, 0);background:var(--inactive-bg);overflow:hidden}.progress-bar.svelte-6ev6pn .completed:where(.svelte-6ev6pn){height:100%;background:var(--fg-primary);transition:width .5s}
