@@ -3,12 +3,6 @@
 	"extends": ["config:recommended", "schedule:weekly"],
 	"commitMessagePrefix": "⬆️ ",
 	"rangeStrategy": "bump",
-	"lockFileMaintenance": {
-		"enabled": true,
-		"automerge": true,
-		"automergeType": "branch",
-  "schedule": "* 4-6 * * 1"
-	},
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to dev tooling (linters, formatters, etc)",
