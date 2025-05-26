@@ -62,7 +62,7 @@
 		"pngjs": "^7.0.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-svelte": "^3.4.0",
-		"sharp": "^0.34.1",
+		"sharp": "^0.34.2",
 		"svelte": "^5.33.2",
 		"svelte-check": "^4.2.1",
 		"turndown": "^7.2.0",
