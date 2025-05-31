@@ -1,0 +1,1 @@
+import{Q as e,ac as f,v as i,z as c,V as d}from"./D516n8vX.js";function _(r,o){i&&c(d(r)),e(()=>{var t=o();for(var s in t){var a=t[s];a?r.style.setProperty(s,a):r.style.removeProperty(s)}}),f(()=>{r.remove()})}export{_ as c};
