@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/2eef8dc9becfb682ee97bf754da7332e2584ae1b/scripts/README.md#protocoles-arthropodsexample",
-	"version": 8,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/5e7b5794c297e71656e8020efee6d42848818101/scripts/README.md#protocoles-arthropodsexample",
+	"version": 9,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -39,7 +39,7 @@
 			"label": "Règne",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "kingdom",
 				"parent": {}
@@ -58,7 +58,7 @@
 			"label": "Phylum",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "phylum",
 				"parent": {
@@ -85,7 +85,7 @@
 			"label": "Classe",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "class",
 				"parent": {
@@ -131,7 +131,7 @@
 			"label": "Ordre",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "order",
 				"parent": {
@@ -219,10 +219,22 @@
 					"learnMore": "https://gbif.org/species/2982"
 				},
 				{
+					"label": "Cerambycidae",
+					"key": "cerambycidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/5602"
+				},
+				{
 					"label": "Neelidae",
 					"key": "neelidae",
 					"description": "",
 					"learnMore": "https://gbif.org/species/3690"
+				},
+				{
+					"label": "Meloidae",
+					"key": "meloidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4742"
 				},
 				{
 					"label": "Scarabaeidae",
@@ -243,12 +255,6 @@
 					"learnMore": "https://gbif.org/species/5843"
 				},
 				{
-					"label": "Cerambycidae",
-					"key": "cerambycidae",
-					"description": "",
-					"learnMore": "https://gbif.org/species/5602"
-				},
-				{
 					"label": "Sminthurididae",
 					"key": "sminthurididae",
 					"description": "",
@@ -264,7 +270,7 @@
 			"label": "Famille",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "family",
 				"parent": {
@@ -280,11 +286,12 @@
 					"isotomidae": "entomobryomorpha",
 					"orchesellidae": "entomobryomorpha",
 					"onychiuridae": "poduromorpha",
+					"cerambycidae": "coleoptera",
 					"neelidae": "neelipleona",
+					"meloidae": "coleoptera",
 					"scarabaeidae": "coleoptera",
 					"poduridae": "poduromorpha",
 					"tomoceridae": "entomobryomorpha",
-					"cerambycidae": "coleoptera",
 					"sminthurididae": "symphypleona",
 					"katiannidae": "symphypleona"
 				}
@@ -420,6 +427,12 @@
 					"learnMore": "https://gbif.org/species/4405240"
 				},
 				{
+					"label": "Lamia",
+					"key": "lamia",
+					"description": "",
+					"learnMore": "https://gbif.org/species/8380413"
+				},
+				{
 					"label": "Lepidocyrtus",
 					"key": "lepidocyrtus",
 					"description": "",
@@ -430,6 +443,12 @@
 					"key": "megalothorax",
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122150"
+				},
+				{
+					"label": "Meloe",
+					"key": "meloe",
+					"description": "",
+					"learnMore": "https://gbif.org/species/1046316"
 				},
 				{
 					"label": "Melolontha",
@@ -486,6 +505,12 @@
 					"learnMore": "https://gbif.org/species/1143383"
 				},
 				{
+					"label": "Rosalia",
+					"key": "rosalia",
+					"description": "",
+					"learnMore": "https://gbif.org/species/1159831"
+				},
+				{
 					"label": "Seira",
 					"key": "seira",
 					"description": "",
@@ -537,7 +562,7 @@
 			"label": "Genre",
 			"required": false,
 			"description": "",
-			"mergeMethod": "average",
+			"mergeMethod": "max",
 			"taxonomic": {
 				"clade": "genus",
 				"parent": {
@@ -562,8 +587,10 @@
 					"isotomiella": "isotomidae",
 					"isotomurus": "isotomidae",
 					"kalaphorura": "onychiuridae",
+					"lamia": "cerambycidae",
 					"lepidocyrtus": "entomobryidae",
 					"megalothorax": "neelidae",
+					"meloe": "meloidae",
 					"melolontha": "scarabaeidae",
 					"monobella": "neanuridae",
 					"neanura": "neanuridae",
@@ -573,6 +600,7 @@
 					"podura": "poduridae",
 					"pogonognathellus": "tomoceridae",
 					"pyrrhidium": "cerambycidae",
+					"rosalia": "cerambycidae",
 					"seira": "entomobryidae",
 					"sminthurides": "sminthurididae",
 					"sminthurinus": "katiannidae",
@@ -614,7 +642,7 @@
 			"label": "",
 			"description": "",
 			"required": true,
-			"mergeMethod": "average"
+			"mergeMethod": "union"
 		},
 		"io.github.cigaleapp.arthropods.example__crop_is_confirmed": {
 			"type": "boolean",
@@ -1085,7 +1113,7 @@
 				{
 					"key": "65",
 					"label": "Sminthurides penicillifer",
-					"description": "\n\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/375165100) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
+					"description": "\n\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/497608502) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4537112",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides penicillifer.jpeg?v=7"
 				},
@@ -1155,7 +1183,7 @@
 				{
 					"key": "75",
 					"label": "Vitronura giselae",
-					"description": "Type locality. Geneva (Switzerland).\n\n\nPhoto par Walker [sur www.inaturalist.org](https://www.inaturalist.org/photos/486137159) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\n\nPhoto par Zeke Blankenship [sur www.inaturalist.org](https://www.inaturalist.org/photos/483116807) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537269",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vitronura giselae.jpeg?v=7"
 				},
@@ -1184,7 +1212,7 @@
 					"label": "Byturus tomentosus",
 					"key": "79",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Byturus%20tomentosus.png?v=7",
-					"description": "Nom vernaculaire : Ver des framboises\n\nEspèce(s) semblable(s) : _[Byturus ochraceus](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/)_ dont les yeux sont plus gros ([comparer](https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957)). **Attention** ce critère est parfois difficile à apprécier.\n\nA corriger sur le comparatif : _B.aestivus_ = _B.ochraceus_\n\nInformation(s) utile(s): Presque uniquement sur fleurs de Rosaceae\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=byturus%20tomentosus)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/222189) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Gilles Carcassès](https://www.galerie-insecte.org/galerie/ref-321918.htm) ; [Fred Chevaillot](https://www.galerie-insecte.org/galerie/ref-255957.htm)",
+					"description": "**Nom vernaculaire :** Ver des framboises\n\n**Espèce(s) semblable(s) :** _[Byturus ochraceus](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/)_ dont les yeux sont plus gros ([comparer](https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957)). **Attention** ce critère est parfois difficile à apprécier.\n\nA corriger sur le comparatif : _B.aestivus_ = _B.ochraceus_\n\n**Identification :** Assez difficile\n\n**Information(s) utile(s):** Presque uniquement sur fleurs de Rosaceae\n\n**Plus de photos :** [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=byturus%20tomentosus)\n\n**Complément d’informations et sources :** [INPN](https://inpn.mnhn.fr/espece/cd_nom/222189) ; [LMDI](https://www.insecte.org/forum/index.php)\n\n**Crédit photo :** [Gilles Carcassès](https://www.galerie-insecte.org/galerie/ref-321918.htm) ; [Fred Chevaillot](https://www.galerie-insecte.org/galerie/ref-255957.htm)\n\n**Auteur(s) :**",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/byturidae/byturus-ochraceus/": "Byturus ochraceus",
 						"https://www.galerie-insecte.org/galerie/viewfull.php?ref=255957": "comparer",
@@ -1200,14 +1228,13 @@
 					"label": "Melolontha hippocastani",
 					"key": "80",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Melolontha%20hippocastani.png?v=7",
-					"description": "Nom vernaculaire : Grand hanneton forestier\n\nEspèce(s) semblable(s) : [Melolontha melol](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/)[ontha](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/) (pointe du pygidium plus longue et plus large) ; [Melolontha pectoralis](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis) (pointe du pygidium encore plus courte, seulement présent dans le Nord-Est de la France)\n\nInformation(s) utile(s): Espèce généralement plus forestière que _Melolontha melolontha_. [Comparatif](https://www.galerie-insecte.org/galerie/view.php?ref=8434) des pygidium de _M.melolontha_ et _M.hippocastani_\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/10879) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Florentin Madrolles](https://www.galerie-insecte.org/galerie/ref-64168.htm) ; [Piezo](https://www.galerie-insecte.org/galerie/fiche.php?ref=8434)",
+					"description": "**Nom vernaculaire :** Grand hanneton forestier\n\n**Espèce(s) semblable(s) :** [Melolontha melol](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/)[ontha](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/) (pointe du pygidium plus longue et plus large: [comparer](https://www.galerie-insecte.org/galerie/view.php?ref=8434)) ; [Melolontha pectoralis](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis) (pointe du pygidium encore plus courte, seulement présent dans le Nord-Est de la France)\n\n**Identification :** Assez délicate, il faut parfois manipuler l’insecte pour observer le pygidium.\n\n**Information(s) utile(s):** Espèce généralement plus forestière que _Melolontha melolontha_. [Comparatif](https://www.galerie-insecte.org/galerie/view.php?ref=8434) des pygidium de _M.melolontha_ et _M.hippocastani_\n\n**Plus de photos :** [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani)\n\n**Complément d’informations et sources :** [INPN](https://inpn.mnhn.fr/espece/cd_nom/10879) ;\n\n**Crédit photo :** [Florentin Madrolles](https://www.galerie-insecte.org/galerie/ref-64168.htm) ; [Piezo](https://www.galerie-insecte.org/galerie/fiche.php?ref=8434)\n\n**Auteur(s):**",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/scarabaeidae/hanneton-commun-melolontha-melolontha/": "ontha",
-						"https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis": "Melolontha pectoralis",
 						"https://www.galerie-insecte.org/galerie/view.php?ref=8434": "Comparatif",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20pectoralis": "Melolontha pectoralis",
 						"https://www.galerie-insecte.org/galerie/wikige.php?tax=melolontha%20hippocastani": "Galerie LMDI",
 						"https://inpn.mnhn.fr/espece/cd_nom/10879": "INPN",
-						"https://www.insecte.org/forum/index.php": "LMDI",
 						"https://www.galerie-insecte.org/galerie/ref-64168.htm": "Florentin Madrolles",
 						"https://www.galerie-insecte.org/galerie/fiche.php?ref=8434": "Piezo"
 					},
@@ -1217,16 +1244,60 @@
 					"label": "Pyrrhidium sanguineum",
 					"key": "81",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Pyrrhidium%20sanguineum.png?v=7",
-					"description": "Nom vernaculaire : Cardinal imposteur\n\nEspèce(s) semblable(s) : Aucune chez les Cerambycidae, mais attention aux _[Pyrochroa](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/)_ dont les antennes sont dentées.\n\nInformation(s) utile(s): Très précoce (dès février), souvent dans le bois de chauffage\n\nPlus de photos : [Galerie LMDI](https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html)\n\nComplément d’informations et sources : [INPN](https://inpn.mnhn.fr/espece/cd_nom/12357) ; [LMDI](https://www.insecte.org/forum/index.php)\n\nCrédit photo : [Yves Dubois](https://www.galerie-insecte.org/galerie/ref-159923.htm) ; [Pierre Gros](https://www.galerie-insecte.org/galerie/ref-199258.htm)",
+					"description": "**Nom vernaculaire :** Cardinal imposteur\n\n**Espèce(s) semblable(s) :** Aucune chez les Cerambycidae, mais attention aux _[Pyrochroa](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/)_ dont les antennes sont dentées.\n\n**Identification :** Assez facile, aspect unique chez les Cerambycidae et antennes filiformes contrairement aux Pyrochroidae.\n\n**Information(s) utile(s):** Très précoce (dès février), souvent dans le bois de chauffage\n\n**Plus de photos :** [Galerie LMDI](https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html)\n\n**Complément d’informations et sources :** [INPN](https://inpn.mnhn.fr/espece/cd_nom/12357) ; COLÉOPTÈRES CERAMBYCIDAE DE LA FAUNE DE FRANCE CONTINENTALE ET DE CORSE, Pierre Berger (2012) ;\n\n**Crédit photo :** [Yves Dubois](https://www.galerie-insecte.org/galerie/ref-159923.htm) ; [Pierre Gros](https://www.galerie-insecte.org/galerie/ref-199258.htm)\n\nLéo Chekir2025-05-23T15:53:57.483000000\n\nEst ce que l'IA fait la diff avec Purpuricenus ? https://www.galerie-insecte.org/galerie/view.php?ref=304271\n\nRajouter un commentaire sur ce genre",
 					"links": {
 						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/pyrochroidae/": "Pyrochroa",
 						"https://www.galerie-insecte.org/galerie/Pyrrhidium_sanguineum.html": "Galerie LMDI ",
 						"https://inpn.mnhn.fr/espece/cd_nom/12357": "INPN",
-						"https://www.insecte.org/forum/index.php": "LMDI",
 						"https://www.galerie-insecte.org/galerie/ref-159923.htm": "Yves Dubois",
 						"https://www.galerie-insecte.org/galerie/ref-199258.htm": "Pierre Gros"
 					},
 					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/12357"
+				},
+				{
+					"label": "Lamia textor",
+					"key": "82",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Lamia%20textor.png?v=9",
+					"description": "**Nom vernaculaire :** Lamie tisserand\n\n**Espèce(s) semblable(s) :** _[Morimus asper](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/cerambycidae/morime-rugueux/)_ dont les antennes sont nettement plus longues que le corps chez le mâle et un peu plus longues chez la femelle. Ses elytres sont plus “arrondis”.\n\n**Identification :** Assez facile à difficile selon l’angle de prise de vue. Aspect trapu, antennes courtes\n\n**Plus de photos :** [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=lamia%20textor)\n\n**Complément d’informations et sources :** [INPN](https://inpn.mnhn.fr/espece/cd_nom/11777) ; COLÉOPTÈRES CERAMBYCIDAE DE LA FAUNE DE FRANCE CONTINENTALE\n\nET DE CORSE, Pierre Berger (2012) ;\n\n**Crédit photo :** [Arnaud Jean Pierre](https://www.galerie-insecte.org/galerie/fiche.php?ref=43657) ; [Michel Ehrhardt](https://www.galerie-insecte.org/galerie/ref-56267.htm)",
+					"links": {
+						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/cerambycidae/morime-rugueux/": "Morimus asper",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=lamia%20textor": "Galerie LMDI",
+						"https://inpn.mnhn.fr/espece/cd_nom/11777": "INPN",
+						"https://www.galerie-insecte.org/galerie/fiche.php?ref=43657": "Arnaud Jean Pierre",
+						"https://www.galerie-insecte.org/galerie/ref-56267.htm": "Michel Ehrhardt"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/11777"
+				},
+				{
+					"label": "Meloe violaceus",
+					"key": "83",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Meloe%20violaceus.png",
+					"description": "**Nom vernaculaire :** Meloe enfle-boeufs violet\n\n**Espèce(s) semblable(s) :** _[Meloe proscarabe](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)__[us](https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/)_ ne possède ni impression ni petite corne ; _[Meloe autumnalis](https://www.galerie-insecte.org/galerie/wikige.php?tax=meloe%20autumnalis)_ (apparaît uniquement à l’automne). Les autres _Meloe_ ne possèdent pas d’antennes épaissies ou coudées.\n\n**Identification :** Très délicate, le seul critère sûr est la présence d’une petite corne sur le mésonotum, mais elle est parfois difficile à discerner. L’impression à la base du pronotum est un critère assez variable.\n\n**Information(s) utile(s):** Cette espèce est présente uniquement au printemps\n\n[Fiche comparative](https://ressources.shna-ofab.fr/shna-ofab/fichiers__pdf_/3-ressources/3-aides_a_la_determination/note_didentification_e-obs_meloe_printanier_ou_meloe_violace_2021.pdf) des _Meloe_ printaniers\n\n**Plus de photos :** [Galerie LMDI](https://www.galerie-insecte.org/galerie/Meloe_violaceus.html)\n\n**Complément d’informations et sources :** [INPN](https://inpn.mnhn.fr/espece/cd_nom/12113) ; [SHNA-OFAB](https://www.shna-ofab.fr/) ; [LMDI](https://www.insecte.org/forum/index.php) ;\n\n**Crédit photo :** [Renko Usami](https://www.galerie-insecte.org/galerie/ref-159239.htm) ; [Phil](https://www.galerie-insecte.org/galerie/ref-83831.htm) ; [Damien GRILLIERE](https://www.galerie-insecte.org/galerie/ref-321060.htm)\n\n**Auteur(s):** Léo Chekir",
+					"links": {
+						"https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/meloidae/meloe-printanier-meloe-proscarabaeus/": "us",
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=meloe%20autumnalis": "Meloe autumnalis",
+						"https://ressources.shna-ofab.fr/shna-ofab/fichiers__pdf_/3-ressources/3-aides_a_la_determination/note_didentification_e-obs_meloe_printanier_ou_meloe_violace_2021.pdf": "Fiche comparative",
+						"https://www.galerie-insecte.org/galerie/Meloe_violaceus.html": "Galerie LMDI",
+						"https://inpn.mnhn.fr/espece/cd_nom/12113": "INPN",
+						"https://www.shna-ofab.fr/": "SHNA-OFAB",
+						"https://www.insecte.org/forum/index.php": "LMDI",
+						"https://www.galerie-insecte.org/galerie/ref-159239.htm": "Renko Usami",
+						"https://www.galerie-insecte.org/galerie/ref-83831.htm": "Phil",
+						"https://www.galerie-insecte.org/galerie/ref-321060.htm": "Damien GRILLIERE"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/12113"
+				},
+				{
+					"label": "Rosalia alpina",
+					"key": "84",
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Rosalia%20alpina.png?v=9",
+					"description": "**Nom vernaculaire :** Rosalie des Alpes\n\n**Espèce(s) semblable(s) :** Aucune, aspect unique en France.\n\n**Identification :** Trés facile, aucun risque de confusion. En revanche la forme des taches noires est extrêmement variable.\n\n**Information(s) utile(s):** Espèce protégée en France\n\n**Plus de photos :** [Galerie LMDI](https://www.galerie-insecte.org/galerie/wikige.php?tax=rosalia%20alpina)\n\n**Complément d’informations et sources :** [INPN](https://inpn.mnhn.fr/espece/cd_nom/12348) , COLÉOPTÈRES CERAMBYCIDAE DE LA FAUNE DE FRANCE CONTINENTALE ET DE CORSE, Pierre Berger (2012) ;\n\n**Crédit photo :** [Bobgaia](https://www.galerie-insecte.org/galerie/ref-3000.htm)\n\n**Auteur(s):**",
+					"links": {
+						"https://www.galerie-insecte.org/galerie/wikige.php?tax=rosalia%20alpina": "Galerie LMDI",
+						"https://inpn.mnhn.fr/espece/cd_nom/12348": "INPN",
+						"https://www.galerie-insecte.org/galerie/ref-3000.htm": "Bobgaia"
+					},
+					"learnMore": "https://inpn.mnhn.fr/espece/cd_nom/12348"
 				}
 			],
 			"taxonomic": {
@@ -1313,7 +1384,10 @@
 					"78": "willowsia",
 					"79": "byturus",
 					"80": "melolontha",
-					"81": "pyrrhidium"
+					"81": "pyrrhidium",
+					"82": "lamia",
+					"83": "meloe",
+					"84": "rosalia"
 				}
 			},
 			"infer": {
