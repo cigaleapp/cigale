@@ -5,7 +5,7 @@
 	 * @property {string} value
 	 * @property {boolean} [discreet=false] don't show bottom border until hover/focus
 	 * @property {string} [placeholder]
-	 * @property {(newValue: string) => void | Promise<void>} onblur also triggered on component unmount
+	 * @property {(newValue: string, setValueTo: (v: string) => void) => void | Promise<void>} onblur also triggered on component unmount
 	 */
 
 	/** @type {Props} */
@@ -20,7 +20,7 @@
 	class="inline-input"
 	class:discreet
 	bind:value
-	onblur={({ currentTarget }) => onblur(currentTarget.value)}
+	onblur={({ currentTarget }) => onblur(currentTarget.value, (v) => (value = v))}
 	{placeholder}
 />
 

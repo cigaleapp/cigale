@@ -87,6 +87,11 @@
 		height: 100%;
 	}
 
+	main {
+		overflow: auto;
+		width: 100%;
+	}
+
 	aside {
 		display: flex;
 		flex-direction: column;
