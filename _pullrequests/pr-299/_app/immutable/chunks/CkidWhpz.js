@@ -1,0 +1,1 @@
+import{e as n,g as s,p as a,G as c,I as f,a8 as u}from"./TQiT2WDP.js";import{i as o}from"./DasVTxzP.js";function d(i){let r=0,t=a(0),e;return()=>{n()&&(s(t),c(()=>(r===0&&(e=f(()=>i(()=>o(t)))),r+=1,()=>{u().then(()=>{r-=1,r===0&&(e==null||e(),e=void 0)})})))}}export{d as c};

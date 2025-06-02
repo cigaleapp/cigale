@@ -1,0 +1,1 @@
+import{d as c,J as s,v as i,D as h,h as r,j as d,x as p}from"./TQiT2WDP.js";function u(t,f,o){r&&d();var n=t,a,e;c(()=>{a!==(a=f())&&(e&&(h(e),e=null),a&&(e=i(()=>o(n,a))))},s),r&&(n=p)}export{u as c};
