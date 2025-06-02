@@ -39,7 +39,8 @@ const GOOGLE_DRIVE_FOLDER_URL = folderIdFromUrl(
 );
 
 /**
- * @import { Protocol } from '../src/lib/database.js';
+ * @import { ExportedProtocol } from '../src/lib/protocols.js';
+ * @typedef {typeof ExportedProtocol.infer} Protocol
  * @type {Record<string, {fresh: Protocol, old: Protocol}>}
  */
 const protocols = Object.fromEntries(
@@ -228,8 +229,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 					label: name,
 					key:
 						// ensure keys of options that were present in the old protocol are preserved
-						protocol.old.options.find((o) => o.label === name)?.key ??
-						(Math.max(...options.map((o) => Number(o.key))) + 1).toString(),
+						oldOption?.key ?? (Math.max(...options.map((o) => Number(o.key))) + 1).toString(),
 					image: imageUrl,
 					description,
 					links,
