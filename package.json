@@ -76,7 +76,7 @@
 		"@tensorflow-models/mobilenet": "^2.1.1",
 		"@tensorflow/tfjs": "^4.22.0",
 		"arktype": "^2.1.20",
-		"bits-ui": "^1.8.0",
+		"bits-ui": "^2.4.1",
 		"date-fns": "^4.1.0",
 		"deep-equal": "^2.2.3",
 		"dragselect": "^3.1.1",
