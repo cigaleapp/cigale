@@ -6,6 +6,15 @@ on:
     - cron: '0 0 * * 1,4'
   # Allow manual triggering from the Actions tab
   workflow_dispatch:
+  # Run when scripts or the job itself are modified on main branch
+  push:
+    branches: [main]
+    paths:
+      - scripts/generate-protocols.js
+      - scripts/add-species-from-jessica-joachim.js
+      - scripts/add-species-from-google-slides.js
+      - scripts/add-taxonomic-parents-from-gbif.js
+      - .github/workflows/regen-arthropods-protocol.yml
 
 jobs:
   generate-arthropods-protocol:
