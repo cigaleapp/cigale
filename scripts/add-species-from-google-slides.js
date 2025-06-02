@@ -225,11 +225,18 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				option.links = links;
 				option.image = imageUrl;
 			} else {
+				const optionKeys = (options) => options.map((o) => Number(o.key));
 				options.push({
 					label: name,
 					key:
 						// ensure keys of options that were present in the old protocol are preserved
-						oldOption?.key ?? (Math.max(...options.map((o) => Number(o.key))) + 1).toString(),
+						oldOption?.key ??
+						(
+							Math.max(
+								...optionKeys(options),
+								...optionKeys(protocol.old.metadata[`${protocol.old.id}__metadata`].options)
+							) + 1
+						).toString(),
 					image: imageUrl,
 					description,
 					links,
