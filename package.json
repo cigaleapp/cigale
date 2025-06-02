@@ -21,7 +21,10 @@
 		"test:watch": "vitest"
 	},
 	"lint-staged": {
-		"*.{js,ts,svelte}": [
+		"*!(.svelte).{js,ts}": [
+			"oxlint --fix"
+		],
+		"*.{svelte,svelte.{js,ts}}": [
 			"oxlint --fix",
 			"eslint --fix"
 		],
