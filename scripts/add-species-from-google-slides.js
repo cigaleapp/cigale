@@ -244,6 +244,8 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				});
 			}
 
+			options.sort((a, b) => a.key.localeCompare(b.key));
+
 			log(`Writing protocol to ${cc.blue}${filepath}${cc.reset}`);
 			writeFileSync(filepath, JSON.stringify(protocol.fresh, null, 2));
 		}
