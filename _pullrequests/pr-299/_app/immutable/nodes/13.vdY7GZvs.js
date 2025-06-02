@@ -1,1 +1,0 @@
-import"../chunks/CWj6FrbW.js";import"../chunks/69_IOA4Y.js";import{p,a as r}from"../chunks/D516n8vX.js";import{i as t}from"../chunks/CIqOuy7_.js";import{p as a}from"../chunks/C1J8QjId.js";import{s as i}from"../chunks/B0qYfdhd.js";function $(m,o){p(o,!1),i({title:`Protocole ${a.params.id}: Export`}),t(),r()}export{$ as component};
