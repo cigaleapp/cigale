@@ -234,7 +234,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 						(
 							Math.max(
 								...optionKeys(options),
-								...optionKeys(protocol.old.metadata[`${protocol.old.id}__metadata`].options)
+								...optionKeys(protocol.old.metadata[`${protocol.old.id}__species`].options)
 							) + 1
 						).toString(),
 					image: imageUrl,
