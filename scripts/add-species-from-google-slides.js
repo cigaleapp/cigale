@@ -226,7 +226,10 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			} else {
 				options.push({
 					label: name,
-					key: options.length.toString(),
+					key:
+						// ensure keys of options that were present in the old protocol are preserved
+						protocol.old.options.find((o) => o.label === name)?.key ??
+						(Math.max(...options.map((o) => Number(o.key))) + 1).toString(),
 					image: imageUrl,
 					description,
 					links,
