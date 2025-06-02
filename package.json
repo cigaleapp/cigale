@@ -63,7 +63,7 @@
 		"prettier": "^3.5.3",
 		"prettier-plugin-svelte": "^3.4.0",
 		"sharp": "^0.34.2",
-		"svelte": "^5.33.2",
+		"svelte": "^5.33.13",
 		"svelte-check": "^4.2.1",
 		"turndown": "^7.2.0",
 		"typescript": "^5.8.3",
