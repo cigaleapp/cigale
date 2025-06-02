@@ -244,7 +244,14 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				});
 			}
 
-			options.sort((a, b) => a.key.localeCompare(b.key));
+			options.sort(({ key: aKey }, { key: bKey }) => {
+				const a = Number(aKey);
+				const b = Number(bKey);
+				if (isNaN(a) || isNaN(b)) {
+					return aKey.localeCompare(bKey);
+				}
+				return a - b;
+			});
 
 			log(`Writing protocol to ${cc.blue}${filepath}${cc.reset}`);
 			writeFileSync(filepath, JSON.stringify(protocol.fresh, null, 2));
