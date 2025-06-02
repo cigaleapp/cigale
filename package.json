@@ -54,7 +54,7 @@
 		"husky": "^9.1.7",
 		"jpeg-js": "^0.4.4",
 		"jsdom": "^26.1.0",
-		"lint-staged": "^16.0.0",
+		"lint-staged": "^16.1.0",
 		"odt2html": "^1.0.1",
 		"oxlint": "^0.16.12",
 		"pdf-to-png-converter": "^3.6.5",
