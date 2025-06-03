@@ -11,6 +11,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
+	import { untrack } from 'svelte';
 
 	/**
 	 * @typedef Props
@@ -32,7 +33,7 @@
 	let openExportModal = $state();
 
 	$effect(() => {
-		if (!page.route.id?.includes('/protocols/')) {
+		if (!untrack(() => page).route.id?.includes('/protocols/')) {
 			if (!uiState.currentProtocolId) goto('#/');
 			if (uiState.currentProtocolId && !hasImages) goto('#/import');
 		}
