@@ -52,7 +52,12 @@
 			<nav class="metadata">
 				{#each data.metadata as key (key)}
 					{#await tables.Metadata.get(key) then def}
-						<a href="#/protocols/{id}/metadata/{key}">
+						<a
+							href="#/protocols/{id}/metadata/{removeNamespaceFromMetadataId(key)}/infos"
+							class:active={page.url.hash.includes(
+								`metadata/${removeNamespaceFromMetadataId(key)}/`
+							)}
+						>
 							<div class="icon-standin"></div>
 							{#if def?.label}
 								{def.label}
@@ -75,7 +80,11 @@
 	/** @type {string} */ href,
 	/** @type {import('svelte').Component} */ Icon
 )}
-	<a href="#/protocols/{id}/{href}" class="navlink" class:active={page.route.id?.endsWith(href)}>
+	<a
+		href="#/protocols/{id}/{href}"
+		class="navlink"
+		class:active={page.route.id?.includes(`/protocols/[id]/${href}`)}
+	>
 		<Icon />
 		{name}
 	</a>
