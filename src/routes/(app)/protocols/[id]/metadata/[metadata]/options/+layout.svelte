@@ -1,5 +1,5 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -37,6 +37,7 @@
 					};
 					options = [newOption, ...options];
 					await tables.Metadata.update(data.metadata.id, 'options', $state.snapshot(options));
+					await invalidateAll();
 					setValue('');
 					await goto(
 						`#/protocols/${data.protocol.id}/metadata/${removeNamespaceFromMetadataId(
