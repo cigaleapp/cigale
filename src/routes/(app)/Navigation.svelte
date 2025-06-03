@@ -32,8 +32,10 @@
 	let openExportModal = $state();
 
 	$effect(() => {
-		if (!uiState.currentProtocolId) goto('#/');
-		if (uiState.currentProtocolId && !hasImages) goto('#/import');
+		if (!page.route.id?.includes('/protocols/')) {
+			if (!uiState.currentProtocolId) goto('#/');
+			if (uiState.currentProtocolId && !hasImages) goto('#/import');
+		}
 	});
 
 	/** @type {undefined | (() => void)} */
