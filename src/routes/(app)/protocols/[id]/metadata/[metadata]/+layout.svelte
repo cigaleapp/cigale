@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/state';
+	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { removeNamespaceFromMetadataId } from '$lib/protocols.js';
 	import IconTaxonomy from '~icons/ph/graph';
 	import IconInfo from '~icons/ph/info';
@@ -7,14 +8,19 @@
 	import IconInference from '~icons/ph/magic-wand';
 
 	const { children, data } = $props();
-	const { id, label } = $derived(data.metadata);
+	const { id, label, type } = $derived(data.metadata);
 </script>
 
 <div class="header-and-scrollable">
 	<header>
 		<h2>
 			<span class="supertitle">Métadonnée</span>
-			<span class="title">{label || removeNamespaceFromMetadataId(id)}</span>
+			<span class="title">
+				{label || removeNamespaceFromMetadataId(id)}
+				<div class="icon-datatype">
+					<IconDatatype {type} />
+				</div>
+			</span>
 			<code class="id">{id}</code>
 		</h2>
 
@@ -52,6 +58,7 @@
 
 	.scrollable {
 		overflow: auto;
+		height: 100%;
 	}
 
 	header {
@@ -82,6 +89,16 @@
 	h2 .title {
 		font-weight: normal;
 		font-size: 2.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	h2 .icon-datatype {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.2rem;
 	}
 
 	h2 .id {
