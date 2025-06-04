@@ -76,7 +76,7 @@
 		<h2>
 			{name}
 		</h2>
-		<code class="id">{id}</code>
+		<a href="#/protocols/{id}/exports"> <code class="id">{id}</code></a>
 		<p class="description">
 			{description}
 		</p>
