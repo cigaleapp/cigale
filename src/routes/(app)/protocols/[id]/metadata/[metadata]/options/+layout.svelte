@@ -17,6 +17,14 @@
 
 	const searcher = $derived(new Fuse(options, { keys: ['label', 'key', 'description'] }));
 	let searchResults = $derived(q ? searcher.search(q).map((result) => result.item) : options);
+
+	/**
+	 *
+	 * @param {string} key
+	 */
+	function optionUrl(key) {
+		return `#/protocols/${data.protocol.id}/metadata/${removeNamespaceFromMetadataId(data.metadata.id)}/options/${key}`;
+	}
 </script>
 
 <div class="aside-and-main">
@@ -39,11 +47,7 @@
 					await tables.Metadata.update(data.metadata.id, 'options', $state.snapshot(options));
 					await invalidateAll();
 					setValue('');
-					await goto(
-						`#/protocols/${data.protocol.id}/metadata/${removeNamespaceFromMetadataId(
-							data.metadata.id
-						)}/options/${newOption.key}`
-					);
+					await goto(optionUrl(newOption.key));
 				}}
 			/>
 		</div>
@@ -62,12 +66,7 @@
 		</search>
 		<nav>
 			{#each searchResults as { key, label } (key)}
-				<a
-					href="#/protocols/{data.protocol.id}/metadata/{removeNamespaceFromMetadataId(
-						data.metadata.id
-					)}/options/{key}"
-					class:active={page.url.hash.includes(`/options/${key}`)}
-				>
+				<a href={optionUrl(key)} class:active={page.url.hash.startsWith(optionUrl(key))}>
 					{label}
 				</a>
 			{/each}
