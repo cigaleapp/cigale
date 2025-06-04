@@ -1,0 +1,1 @@
+import{K as S,L as h,M as k,B,S as L}from"./DtJ30XL-.js";function t(r,i){return r===i||(r==null?void 0:r[L])===i}function c(r={},i,a,M){return S(()=>{var f,s;return h(()=>{f=s,s=[],k(()=>{r!==a(...s)&&(i(r,...s),f&&t(a(...f),r)&&i(null,...f))})}),()=>{B(()=>{s&&t(a(...s),r)&&i(null,...s)})}}),r}export{c as b};

@@ -1,1 +1,0 @@
-import{K as e,a8 as f,k as i,p,P as d}from"./DBBKlXjN.js";function c(r,o){i&&p(d(r)),e(()=>{var t=o();for(var s in t){var a=t[s];a?r.style.setProperty(s,a):r.style.removeProperty(s)}}),f(()=>{r.remove()})}export{c};
