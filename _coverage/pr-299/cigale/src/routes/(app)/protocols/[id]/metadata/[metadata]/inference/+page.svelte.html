@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for cigale/src/routes/(app)/protocols/[id]/+layout.svelte</title>
+    <title>Code coverage report for cigale/src/routes/(app)/protocols/[id]/metadata/[metadata]/inference/+page.svelte</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../../../../prettify.css" />
-    <link rel="stylesheet" href="../../../../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../../../../favicon.png" />
+    <link rel="stylesheet" href="../../../../../../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../../../../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../../../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../../../../sort-arrow-sprite.png);
+            background-image: url(../../../../../../../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../../../../index.html">All files</a> / <a href="index.html">cigale/src/routes/(app)/protocols/[id]</a> +layout.svelte</h1>
+        <h1><a href="../../../../../../../../../index.html">All files</a> / <a href="index.html">cigale/src/routes/(app)/protocols/[id]/metadata/[metadata]/inference</a> +page.svelte</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/163</span>
+                <span class='fraction'>0/168</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/163</span>
+                <span class='fraction'>0/168</span>
             </div>
         
             
@@ -226,7 +226,17 @@
 <a name='L161'></a><a href='#L161'>161</a>
 <a name='L162'></a><a href='#L162'>162</a>
 <a name='L163'></a><a href='#L163'>163</a>
-<a name='L164'></a><a href='#L164'>164</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -390,166 +400,171 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >&lt;script&gt;</span></span></span>
-<span class="cstat-no" title="statement not covered" >	import { page } from '$app/state';</span>
+<span class="cstat-no" title="statement not covered" >	import { invalidateAll } from '$app/navigation';</span>
+<span class="cstat-no" title="statement not covered" >	import { EXIF_FIELDS } from '$lib/exiffields';</span>
+<span class="cstat-no" title="statement not covered" >	import { tables } from '$lib/idb.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import InlineTextInput from '$lib/InlineTextInput.svelte';</span>
-<span class="cstat-no" title="statement not covered" >	import { tables } from '$lib/idb.svelte.js';</span>
-<span class="cstat-no" title="statement not covered" >	import { removeNamespaceFromMetadataId } from '$lib/protocols';</span>
-<span class="cstat-no" title="statement not covered" >	import { seo } from '$lib/seo.svelte';</span>
-<span class="cstat-no" title="statement not covered" >	import IconVersioning from '~icons/ph/arrow-circle-up';</span>
-<span class="cstat-no" title="statement not covered" >	import IconCropping from '~icons/ph/crop';</span>
-<span class="cstat-no" title="statement not covered" >	import IconExports from '~icons/ph/file-archive';</span>
-<span class="cstat-no" title="statement not covered" >	import IconInfo from '~icons/ph/info';</span>
-<span class="cstat-no" title="statement not covered" >	import IconMetadata from '~icons/ph/list-bullets';</span>
+<span class="cstat-no" title="statement not covered" >	import RadioButtons from '$lib/RadioButtons.svelte';</span>
+<span class="cstat-no" title="statement not covered" >	import SelectWithSearch from '$lib/SelectWithSearch.svelte';</span>
+<span class="cstat-no" title="statement not covered" >	import { keys, omit } from '$lib/utils';</span>
+<span class="cstat-no" title="statement not covered" >	import IconCheck from '~icons/ph/check';</span>
+<span class="cstat-no" title="statement not covered" >	import IconFail from '~icons/ph/x';</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	seo({ title: `Protocole ${page.params.id}` });</span>
+<span class="cstat-no" title="statement not covered" >	const { data } = $props();</span>
+<span class="cstat-no" title="statement not covered" >	const { infer, id } = $derived(data.metadata);</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	const { children, data } = $props();</span>
-<span class="cstat-no" title="statement not covered" >	let { id, name } = $derived(data);</span>
+<span class="cstat-no" title="statement not covered" >	const inferenceTypes = /** @type {const} */ ([</span>
+<span class="cstat-no" title="statement not covered" >		{ key: 'none', label: "Pas d'inférence" },</span>
+<span class="cstat-no" title="statement not covered" >		{ key: 'neural', label: 'Réseau neuronal' },</span>
+<span class="cstat-no" title="statement not covered" >		{ key: 'exif', label: 'EXIF' }</span>
+<span class="cstat-no" title="statement not covered" >	]);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	const modelUrl = $derived.by(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		if (!infer) return '';</span>
+<span class="cstat-no" title="statement not covered" >		if (!('neural' in infer)) return '';</span>
+<span class="cstat-no" title="statement not covered" >		if (!infer.neural.model) return '';</span>
+<span class="cstat-no" title="statement not covered" >		if (typeof infer.neural.model === 'string') return infer.neural.model;</span>
+<span class="cstat-no" title="statement not covered" >		return infer.neural.model.url;</span>
+<span class="cstat-no" title="statement not covered" >	});</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	const placeholderNeuralSettings = {</span>
+<span class="cstat-no" title="statement not covered" >		model: 'http://example.com/model.onnx',</span>
+<span class="cstat-no" title="statement not covered" >		input: {</span>
+<span class="cstat-no" title="statement not covered" >			width: 224,</span>
+<span class="cstat-no" title="statement not covered" >			height: 224,</span>
+<span class="cstat-no" title="statement not covered" >			normalized: true</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
+<span class="cstat-no" title="statement not covered" >	};</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	const currentInferenceType = $derived(</span>
+<span class="cstat-no" title="statement not covered" >		infer ? ('exif' in infer ? 'exif' : 'neural' in infer ? 'neural' : 'none') : 'none'</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
 <span class="cstat-no" title="statement not covered" >&lt;/script&gt;</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >&lt;div class="sidebar-and-main"&gt;</span>
-<span class="cstat-no" title="statement not covered" >	&lt;aside&gt;</span>
-<span class="cstat-no" title="statement not covered" >		&lt;heading&gt;</span>
-<span class="cstat-no" title="statement not covered" >			&lt;h1&gt;</span>
-<span class="cstat-no" title="statement not covered" >				&lt;InlineTextInput</span>
-<span class="cstat-no" title="statement not covered" >					label="Nom du protocole"</span>
-<span class="cstat-no" title="statement not covered" >					discreet</span>
-<span class="cstat-no" title="statement not covered" >					value={name}</span>
-<span class="cstat-no" title="statement not covered" >					onblur={async (newname) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >						await tables.Protocol.update(id, 'name', newname);</span>
-<span class="cstat-no" title="statement not covered" >						name = newname;</span>
-<span class="cstat-no" title="statement not covered" >					}}</span>
-<span class="cstat-no" title="statement not covered" >				/&gt;</span>
-<span class="cstat-no" title="statement not covered" >			&lt;/h1&gt;</span>
-<span class="cstat-no" title="statement not covered" >			&lt;code class="subtitle"&gt;</span>
-<span class="cstat-no" title="statement not covered" >				&lt;InlineTextInput</span>
-<span class="cstat-no" title="statement not covered" >					label="ID du protocole"</span>
-<span class="cstat-no" title="statement not covered" >					discreet</span>
-<span class="cstat-no" title="statement not covered" >					value={id}</span>
-<span class="cstat-no" title="statement not covered" >					onblur={async (newid) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >						await tables.Protocol.update(id, 'id', newid);</span>
-<span class="cstat-no" title="statement not covered" >						id = newid;</span>
-<span class="cstat-no" title="statement not covered" >					}}</span>
-<span class="cstat-no" title="statement not covered" >				/&gt;</span>
-<span class="cstat-no" title="statement not covered" >			&lt;/code&gt;</span>
-<span class="cstat-no" title="statement not covered" >		&lt;/heading&gt;</span>
+<span class="cstat-no" title="statement not covered" >&lt;div class="content"&gt;</span>
+<span class="cstat-no" title="statement not covered" >	&lt;RadioButtons</span>
+<span class="cstat-no" title="statement not covered" >		options={inferenceTypes}</span>
+<span class="cstat-no" title="statement not covered" >		value={currentInferenceType}</span>
+<span class="cstat-no" title="statement not covered" >		onchange={async (key) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >			if (key === 'none' &amp;&amp; currentInferenceType !== 'none') {</span>
+<span class="cstat-no" title="statement not covered" >				await tables.Metadata.set(omit(data.metadata, 'infer'));</span>
+<span class="cstat-no" title="statement not covered" >				await invalidateAll();</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		}}</span>
+<span class="cstat-no" title="statement not covered" >	&gt;</span>
+<span class="cstat-no" title="statement not covered" >		{#snippet children({ key, label })}</span>
+<span class="cstat-no" title="statement not covered" >			&lt;h3&gt;{label}&lt;/h3&gt;</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >		&lt;nav&gt;</span>
-<span class="cstat-no" title="statement not covered" >			{@render navlink('Informations', 'infos', IconInfo)}</span>
-<span class="cstat-no" title="statement not covered" >			{@render navlink('Versioning', 'versioning', IconVersioning)}</span>
-<span class="cstat-no" title="statement not covered" >			{@render navlink('Exports', 'exports', IconExports)}</span>
-<span class="cstat-no" title="statement not covered" >			{@render navlink('Recadrage', 'cropping', IconCropping)}</span>
-<span class="cstat-no" title="statement not covered" >			{@render navlink('Métadonnées', 'metadata', IconMetadata)}</span>
-<span class="cstat-no" title="statement not covered" >			&lt;nav class="metadata"&gt;</span>
-<span class="cstat-no" title="statement not covered" >				{#each data.metadata as key (key)}</span>
-<span class="cstat-no" title="statement not covered" >					{#await tables.Metadata.get(key) then def}</span>
-<span class="cstat-no" title="statement not covered" >						&lt;a</span>
-<span class="cstat-no" title="statement not covered" >							href="#/protocols/{id}/metadata/{removeNamespaceFromMetadataId(key)}/infos"</span>
-<span class="cstat-no" title="statement not covered" >							class:active={page.url.hash.includes(</span>
-<span class="cstat-no" title="statement not covered" >								`metadata/${removeNamespaceFromMetadataId(key)}/`</span>
-<span class="cstat-no" title="statement not covered" >							)}</span>
-<span class="cstat-no" title="statement not covered" >						&gt;</span>
-<span class="cstat-no" title="statement not covered" >							&lt;div class="icon-standin"&gt;&lt;/div&gt;</span>
-<span class="cstat-no" title="statement not covered" >							{#if def?.label}</span>
-<span class="cstat-no" title="statement not covered" >								{def.label}</span>
+<span class="cstat-no" title="statement not covered" >			{#if key === 'neural'}</span>
+<span class="cstat-no" title="statement not covered" >				&lt;div class="field"&gt;</span>
+<span class="cstat-no" title="statement not covered" >					&lt;label&gt;</span>
+<span class="cstat-no" title="statement not covered" >						&lt;span class="label"&gt;URL vers le modèle .onnx&lt;/span&gt;</span>
+<span class="cstat-no" title="statement not covered" >						&lt;InlineTextInput</span>
+<span class="cstat-no" title="statement not covered" >							label="URL du modèle"</span>
+<span class="cstat-no" title="statement not covered" >							value={modelUrl}</span>
+<span class="cstat-no" title="statement not covered" >							onblur={async (newModel) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >								if (!newModel) {</span>
+<span class="cstat-no" title="statement not covered" >									return;</span>
+<span class="cstat-no" title="statement not covered" >								}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >								const currentNeuralSettings = $state.snapshot(</span>
+<span class="cstat-no" title="statement not covered" >									infer &amp;&amp; 'neural' in infer &amp;&amp; infer.neural ? infer.neural : {}</span>
+<span class="cstat-no" title="statement not covered" >								);</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >								await tables.Metadata.update(id, 'infer', {</span>
+<span class="cstat-no" title="statement not covered" >									neural: {</span>
+<span class="cstat-no" title="statement not covered" >										...placeholderNeuralSettings,</span>
+<span class="cstat-no" title="statement not covered" >										...currentNeuralSettings,</span>
+<span class="cstat-no" title="statement not covered" >										model: newModel</span>
+<span class="cstat-no" title="statement not covered" >									}</span>
+<span class="cstat-no" title="statement not covered" >								});</span>
+<span class="cstat-no" title="statement not covered" >								await invalidateAll();</span>
+<span class="cstat-no" title="statement not covered" >							}}</span>
+<span class="cstat-no" title="statement not covered" >						/&gt;</span>
+<span class="cstat-no" title="statement not covered" >					&lt;/label&gt;</span>
+<span class="cstat-no" title="statement not covered" >					{#if modelUrl}</span>
+<span class="cstat-no" title="statement not covered" >						{#await fetch(modelUrl, { method: 'HEAD' }) then { ok, status, text }}</span>
+<span class="cstat-no" title="statement not covered" >							{#if ok}</span>
+<span class="cstat-no" title="statement not covered" >								&lt;div class="check ok"&gt;</span>
+<span class="cstat-no" title="statement not covered" >									&lt;IconCheck /&gt;</span>
+<span class="cstat-no" title="statement not covered" >									Modèle accessible</span>
+<span class="cstat-no" title="statement not covered" >								&lt;/div&gt;</span>
 <span class="cstat-no" title="statement not covered" >							{:else}</span>
-<span class="cstat-no" title="statement not covered" >								&lt;code&gt;{removeNamespaceFromMetadataId(key)}&lt;/code&gt;</span>
+<span class="cstat-no" title="statement not covered" >								&lt;div class="check fail"&gt;</span>
+<span class="cstat-no" title="statement not covered" >									&lt;IconFail /&gt;</span>
+<span class="cstat-no" title="statement not covered" >									Impossible de charger le modèle: HTTP {status}</span>
+<span class="cstat-no" title="statement not covered" >									{#await text() then text}{text}{/await}</span>
+<span class="cstat-no" title="statement not covered" >								&lt;/div&gt;</span>
 <span class="cstat-no" title="statement not covered" >							{/if}</span>
-<span class="cstat-no" title="statement not covered" >						&lt;/a&gt;</span>
-<span class="cstat-no" title="statement not covered" >					{/await}</span>
-<span class="cstat-no" title="statement not covered" >				{/each}</span>
-<span class="cstat-no" title="statement not covered" >			&lt;/nav&gt;</span>
-<span class="cstat-no" title="statement not covered" >		&lt;/nav&gt;</span>
-<span class="cstat-no" title="statement not covered" >	&lt;/aside&gt;</span>
-<span class="cstat-no" title="statement not covered" >	&lt;main&gt;</span>
-<span class="cstat-no" title="statement not covered" >		{@render children()}</span>
-<span class="cstat-no" title="statement not covered" >	&lt;/main&gt;</span>
+<span class="cstat-no" title="statement not covered" >						{:catch error}</span>
+<span class="cstat-no" title="statement not covered" >							&lt;div class="check fail"&gt;</span>
+<span class="cstat-no" title="statement not covered" >								&lt;IconFail /&gt;</span>
+<span class="cstat-no" title="statement not covered" >								Impossible de charger le modèle: {error}</span>
+<span class="cstat-no" title="statement not covered" >							&lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >						{/await}</span>
+<span class="cstat-no" title="statement not covered" >					{/if}</span>
+<span class="cstat-no" title="statement not covered" >				&lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >			{:else if key === 'exif'}</span>
+<span class="cstat-no" title="statement not covered" >				&lt;div class="field"&gt;</span>
+<span class="cstat-no" title="statement not covered" >					&lt;label&gt;</span>
+<span class="cstat-no" title="statement not covered" >						&lt;span class="label"&gt;Champ EXIF à utiliser&lt;/span&gt;</span>
+<span class="cstat-no" title="statement not covered" >						&lt;SelectWithSearch</span>
+<span class="cstat-no" title="statement not covered" >							options={keys(EXIF_FIELDS)}</span>
+<span class="cstat-no" title="statement not covered" >							searchQuery={infer &amp;&amp; 'exif' in infer ? infer.exif : ''}</span>
+<span class="cstat-no" title="statement not covered" >							selectedValue={infer &amp;&amp; 'exif' in infer ? infer.exif : ''}</span>
+<span class="cstat-no" title="statement not covered" >							onblur={async (newExif) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >								console.log('updatewithexif', newExif);</span>
+<span class="cstat-no" title="statement not covered" >								if (!newExif) return;</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >								await tables.Metadata.update(id, 'infer', { exif: newExif });</span>
+<span class="cstat-no" title="statement not covered" >								await invalidateAll();</span>
+<span class="cstat-no" title="statement not covered" >							}}</span>
+<span class="cstat-no" title="statement not covered" >						/&gt;</span>
+<span class="cstat-no" title="statement not covered" >					&lt;/label&gt;</span>
+<span class="cstat-no" title="statement not covered" >				&lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >			{/if}</span>
+<span class="cstat-no" title="statement not covered" >		{/snippet}</span>
+<span class="cstat-no" title="statement not covered" >	&lt;/RadioButtons&gt;</span>
 <span class="cstat-no" title="statement not covered" >&lt;/div&gt;</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >{#snippet navlink(</span>
-<span class="cstat-no" title="statement not covered" >	/** @type {string} */ name,</span>
-<span class="cstat-no" title="statement not covered" >	/** @type {string} */ href,</span>
-<span class="cstat-no" title="statement not covered" >	/** @type {import('svelte').Component} */ Icon</span>
-<span class="cstat-no" title="statement not covered" >)}</span>
-<span class="cstat-no" title="statement not covered" >	&lt;a</span>
-<span class="cstat-no" title="statement not covered" >		href="#/protocols/{id}/{href}"</span>
-<span class="cstat-no" title="statement not covered" >		class="navlink"</span>
-<span class="cstat-no" title="statement not covered" >		class:active={page.route.id?.includes(`/protocols/[id]/${href}`)}</span>
-<span class="cstat-no" title="statement not covered" >	&gt;</span>
-<span class="cstat-no" title="statement not covered" >		&lt;Icon /&gt;</span>
-<span class="cstat-no" title="statement not covered" >		{name}</span>
-<span class="cstat-no" title="statement not covered" >	&lt;/a&gt;</span>
-<span class="cstat-no" title="statement not covered" >{/snippet}</span>
-<span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >&lt;style&gt;</span>
-<span class="cstat-no" title="statement not covered" >	.sidebar-and-main {</span>
-<span class="cstat-no" title="statement not covered" >		display: flex;</span>
-<span class="cstat-no" title="statement not covered" >		height: 100%;</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	main {</span>
-<span class="cstat-no" title="statement not covered" >		overflow: auto;</span>
-<span class="cstat-no" title="statement not covered" >		width: 100%;</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	aside {</span>
-<span class="cstat-no" title="statement not covered" >		display: flex;</span>
-<span class="cstat-no" title="statement not covered" >		flex-direction: column;</span>
-<span class="cstat-no" title="statement not covered" >		gap: 2rem;</span>
-<span class="cstat-no" title="statement not covered" >		height: 100%;</span>
-<span class="cstat-no" title="statement not covered" >		border-right: 1px solid var(--gray);</span>
-<span class="cstat-no" title="statement not covered" >		padding: 1.2em;</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	h1 {</span>
+<span class="cstat-no" title="statement not covered" >	h3 {</span>
+<span class="cstat-no" title="statement not covered" >		display: inline-block;</span>
 <span class="cstat-no" title="statement not covered" >		font-weight: normal;</span>
-<span class="cstat-no" title="statement not covered" >		font-size: 2em;</span>
-<span class="cstat-no" title="statement not covered" >		line-height: 1;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	.subtitle {</span>
-<span class="cstat-no" title="statement not covered" >		color: var(--gray);</span>
+<span class="cstat-no" title="statement not covered" >	.content {</span>
+<span class="cstat-no" title="statement not covered" >		padding: 2rem;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	nav {</span>
-<span class="cstat-no" title="statement not covered" >		display: flex;</span>
-<span class="cstat-no" title="statement not covered" >		flex-direction: column;</span>
-<span class="cstat-no" title="statement not covered" >		gap: 0.75em;</span>
+<span class="cstat-no" title="statement not covered" >	.field {</span>
+<span class="cstat-no" title="statement not covered" >		margin-top: 1rem;</span>
+<span class="cstat-no" title="statement not covered" >		padding-left: 1rem;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	nav a {</span>
-<span class="cstat-no" title="statement not covered" >		position: relative;</span>
+<span class="cstat-no" title="statement not covered" >	.field:last-child {</span>
+<span class="cstat-no" title="statement not covered" >		margin-bottom: 1rem;</span>
+<span class="cstat-no" title="statement not covered" >	}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	.field .label {</span>
+<span class="cstat-no" title="statement not covered" >		text-transform: uppercase;</span>
+<span class="cstat-no" title="statement not covered" >		letter-spacing: 1px;</span>
+<span class="cstat-no" title="statement not covered" >		font-weight: bold;</span>
+<span class="cstat-no" title="statement not covered" >		font-size: 0.9em;</span>
+<span class="cstat-no" title="statement not covered" >	}</span>
+<span class="cstat-no" title="statement not covered" ></span>
+<span class="cstat-no" title="statement not covered" >	.check {</span>
 <span class="cstat-no" title="statement not covered" >		display: flex;</span>
 <span class="cstat-no" title="statement not covered" >		align-items: center;</span>
-<span class="cstat-no" title="statement not covered" >		gap: 0.5em;</span>
-<span class="cstat-no" title="statement not covered" >		text-decoration: none;</span>
+<span class="cstat-no" title="statement not covered" >		gap: 0.25em;</span>
+<span class="cstat-no" title="statement not covered" >		font-size: 0.9em;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	:global(svg),</span>
-<span class="cstat-no" title="statement not covered" >	.icon-standin {</span>
-<span class="cstat-no" title="statement not covered" >		width: 1.5em;</span>
-<span class="cstat-no" title="statement not covered" >		height: 1.5em;</span>
-<span class="cstat-no" title="statement not covered" >		flex-shrink: 0;</span>
+<span class="cstat-no" title="statement not covered" >	.check.ok {</span>
+<span class="cstat-no" title="statement not covered" >		color: var(--fg-success);</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	nav a :global(:is(svg, .icon-standin)) {</span>
-<span class="cstat-no" title="statement not covered" >		margin-left: calc(0.5em + 4px);</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	nav a::before {</span>
-<span class="cstat-no" title="statement not covered" >		content: '';</span>
-<span class="cstat-no" title="statement not covered" >		position: absolute;</span>
-<span class="cstat-no" title="statement not covered" >		height: 100%;</span>
-<span class="cstat-no" title="statement not covered" >		width: 4px;</span>
-<span class="cstat-no" title="statement not covered" >		border-radius: 10000px;</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	nav a.active::before {</span>
-<span class="cstat-no" title="statement not covered" >		background-color: var(--bg-primary);</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >	nav a:not(.active):is(:hover, :focus-visible)::before {</span>
-<span class="cstat-no" title="statement not covered" >		background-color: var(--bg-primary-translucent);</span>
+<span class="cstat-no" title="statement not covered" >	.check.fail {</span>
+<span class="cstat-no" title="statement not covered" >		color: var(--fg-error);</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" >&lt;/style&gt;</span>
 &nbsp;</pre></td></tr></table></pre>
@@ -561,14 +576,14 @@
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-06-04T20:29:28.235Z
             </div>
-        <script src="../../../../../../prettify.js"></script>
+        <script src="../../../../../../../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../../../../sorter.js"></script>
-        <script src="../../../../../../block-navigation.js"></script>
+        <script src="../../../../../../../../../sorter.js"></script>
+        <script src="../../../../../../../../../block-navigation.js"></script>
     </body>
 </html>
     
