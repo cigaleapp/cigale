@@ -66,7 +66,7 @@
 		</search>
 		<nav>
 			{#each searchResults as { key, label } (key)}
-				<a href={optionUrl(key)} class:active={page.url.hash.startsWith(optionUrl(key))}>
+				<a href={optionUrl(key)} class:active={page.params.option === key}>
 					{label}
 				</a>
 			{/each}
