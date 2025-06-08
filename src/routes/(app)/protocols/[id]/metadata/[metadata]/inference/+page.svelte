@@ -1,13 +1,11 @@
 <script>
 	import { invalidateAll } from '$app/navigation';
 	import { EXIF_FIELDS } from '$lib/exiffields';
+	import FieldUrl from '$lib/FieldURL.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SelectWithSearch from '$lib/SelectWithSearch.svelte';
 	import { keys, omit } from '$lib/utils';
-	import IconCheck from '~icons/ph/check';
-	import IconFail from '~icons/ph/x';
 
 	const { data } = $props();
 	const { infer, id } = $derived(data.metadata);
@@ -55,54 +53,28 @@
 			<h3>{label}</h3>
 
 			{#if key === 'neural'}
-				<div class="field">
-					<label>
-						<span class="label">URL vers le modèle .onnx</span>
-						<InlineTextInput
-							label="URL du modèle"
-							value={modelUrl}
-							onblur={async (newModel) => {
-								if (!newModel) {
-									return;
-								}
+				<FieldUrl
+					label="URL du modèle"
+					value={modelUrl}
+					onblur={async (newModel) => {
+						if (!newModel) {
+							return;
+						}
 
-								const currentNeuralSettings = $state.snapshot(
-									infer && 'neural' in infer && infer.neural ? infer.neural : {}
-								);
+						const currentNeuralSettings = $state.snapshot(
+							infer && 'neural' in infer && infer.neural ? infer.neural : {}
+						);
 
-								await tables.Metadata.update(id, 'infer', {
-									neural: {
-										...placeholderNeuralSettings,
-										...currentNeuralSettings,
-										model: newModel
-									}
-								});
-								await invalidateAll();
-							}}
-						/>
-					</label>
-					{#if modelUrl}
-						{#await fetch(modelUrl, { method: 'HEAD' }) then { ok, status, text }}
-							{#if ok}
-								<div class="check ok">
-									<IconCheck />
-									Modèle accessible
-								</div>
-							{:else}
-								<div class="check fail">
-									<IconFail />
-									Impossible de charger le modèle: HTTP {status}
-									{#await text() then text}{text}{/await}
-								</div>
-							{/if}
-						{:catch error}
-							<div class="check fail">
-								<IconFail />
-								Impossible de charger le modèle: {error}
-							</div>
-						{/await}
-					{/if}
-				</div>
+						await tables.Metadata.update(id, 'infer', {
+							neural: {
+								...placeholderNeuralSettings,
+								...currentNeuralSettings,
+								model: newModel
+							}
+						});
+						await invalidateAll();
+					}}
+				/>
 			{:else if key === 'exif'}
 				<div class="field">
 					<label>
@@ -143,26 +115,5 @@
 
 	.field:last-child {
 		margin-bottom: 1rem;
-	}
-
-	.field .label {
-		text-transform: uppercase;
-		letter-spacing: 1px;
-		font-weight: bold;
-		font-size: 0.9em;
-	}
-
-	.check {
-		display: flex;
-		align-items: center;
-		gap: 0.25em;
-		font-size: 0.9em;
-	}
-
-	.check.ok {
-		color: var(--fg-success);
-	}
-	.check.fail {
-		color: var(--fg-error);
 	}
 </style>
