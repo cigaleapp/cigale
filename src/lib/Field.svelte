@@ -5,15 +5,16 @@
 	 * @typedef {object} Props
 	 * @property {string | Snippet} label
 	 * @property {string | Snippet} [hint]
+	 * @property {boolean} [composite=false] if true, the children will not be wrapped in a label element. useful when the children is composed of multiple inputs.
 	 * @property {Snippet} children
 	 */
 
 	/** @type {Props} */
-	const { label, hint, children } = $props();
+	const { label, hint, children, composite } = $props();
 </script>
 
 <div class="field">
-	<label>
+	<svelte:element this={composite ? 'div' : 'label'}>
 		<div class="label">
 			{#if typeof label === 'string'}
 				{label}
@@ -22,7 +23,7 @@
 			{/if}
 		</div>
 		{@render children()}
-	</label>
+	</svelte:element>
 	{#if hint}
 		<div class="hint">
 			{#if typeof hint === 'string'}
