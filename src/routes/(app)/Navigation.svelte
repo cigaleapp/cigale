@@ -1,5 +1,4 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
@@ -11,7 +10,6 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
-	import { untrack } from 'svelte';
 
 	/**
 	 * @typedef Props
@@ -31,13 +29,6 @@
 	let height = $state();
 
 	let openExportModal = $state();
-
-	$effect(() => {
-		if (!untrack(() => page).route.id?.includes('/protocols/')) {
-			if (!uiState.currentProtocolId) goto('#/');
-			if (uiState.currentProtocolId && !hasImages) goto('#/import');
-		}
-	});
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
