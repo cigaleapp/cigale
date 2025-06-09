@@ -59,7 +59,7 @@
 		"jsdom": "^26.1.0",
 		"lint-staged": "^16.1.0",
 		"odt2html": "^1.0.1",
-		"oxlint": "^0.17.0",
+		"oxlint": "^0.18.0",
 		"pdf-to-png-converter": "^3.6.5",
 		"pixelmatch": "^7.1.0",
 		"pngjs": "^7.0.0",
