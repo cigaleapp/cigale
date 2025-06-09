@@ -44,7 +44,7 @@
 		"@vitest/ui": "^3.2.3",
 		"eslint": "^9.28.0",
 		"eslint-config-prettier": "^10.1.5",
-		"eslint-plugin-oxlint": "^0.17.0",
+		"eslint-plugin-oxlint": "^0.18.0",
 		"eslint-plugin-svelte": "^3.5.1",
 		"execa": "^9.6.0",
 		"extract-zip": "^2.0.1",
