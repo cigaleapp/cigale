@@ -9,6 +9,11 @@
 			"matchDepTypes": ["devDependencies"],
 			"matchPackageNames": ["!@sveltejs/*", "!svelte", "!vite"],
 			"automerge": true
+		},
+		{
+			"description": "Oxlint",
+			"groupName": "oxlint",
+			"matchPackageNames": ["oxlint", "eslint-plugin-oxlint"]
 		}
 	]
 }
