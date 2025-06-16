@@ -1,0 +1,1 @@
+import{h as r,j as c,d as s,F as i,v as h,D as d,x as p}from"./BAdFa1i7.js";function u(t,f,o){r&&c();var n=t,a,e;s(()=>{a!==(a=f())&&(e&&(d(e),e=null),a&&(e=h(()=>o(n,a))))},i),r&&(n=p)}export{u as c};
