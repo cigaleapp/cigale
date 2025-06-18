@@ -1,1 +1,2 @@
 package-lock.json merge=npm-lockfile
+*.svelte.js linguist-language=svelte
