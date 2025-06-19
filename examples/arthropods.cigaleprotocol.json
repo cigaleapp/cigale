@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/396a14e63c58ac4b5dfcb78d6ba4ae606a2309c6/scripts/README.md#protocoles-arthropodsexample",
-	"version": 10,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/7d23743899c467b8cf8297827c4c1df08235b33d/scripts/README.md#protocoles-arthropodsexample",
+	"version": 11,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -1183,7 +1183,7 @@
 				{
 					"key": "75",
 					"label": "Vitronura giselae",
-					"description": "Type locality. Geneva (Switzerland).\n\n\nPhoto par Zeke Blankenship [sur www.inaturalist.org](https://www.inaturalist.org/photos/483116807) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\n\nPhoto par Zeke Blankenship [sur www.inaturalist.org](https://www.inaturalist.org/photos/483116807) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537269",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vitronura giselae.jpeg?v=7"
 				},
