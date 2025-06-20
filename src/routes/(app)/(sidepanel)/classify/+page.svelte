@@ -22,6 +22,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { metadataById, storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
@@ -43,10 +44,20 @@
 		})
 	);
 
+	/** loaded and total bytes counts, set and updated by loadModel() */
+	let modelLoadingProgress = $state(0);
+
 	let classifmodel = $state();
 	async function loadClassifModel() {
 		if (!uiState.currentProtocol) return;
-		classifmodel = await loadModel(uiState.currentProtocol, 'classification');
+		classifmodel = await loadModel(
+			uiState.currentProtocol,
+			'classification',
+			({ transferred, total }) => {
+				if (total === 0) return;
+				modelLoadingProgress = transferred / total;
+			}
+		);
 		toasts.success('Modèle de classification chargé');
 	}
 	/**
@@ -175,6 +186,9 @@
 		<Logo loading />
 		<p>Chargement du modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
+		<div class="progressbar">
+			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
+		</div>
 	</section>
 {:then _}
 	<section class="observations" class:empty={!images.length}>
@@ -224,6 +238,15 @@
 		height: 100vh;
 		/* Logo size */
 		--size: 5em;
+	}
+
+	.loading .progressbar {
+		width: 100%;
+		max-width: 20em;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+		align-items: center;
 	}
 
 	.loading .source {

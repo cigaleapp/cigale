@@ -1,5 +1,6 @@
 import { match, type } from 'arktype';
 import * as ort from 'onnxruntime-web';
+import fetchProgress from 'fetch-progress';
 import { Schemas } from './database.js';
 import { tables } from './idb.svelte.js';
 import { imload, output2BB, preprocess_for_classification } from './inference_utils.js';
@@ -107,10 +108,13 @@ export function classificationInferenceSettings(protocol) {
  * @param {import('./database.js').Protocol} protocol
  * @param { 'classification'|'detection' } task
  * @param {boolean} webgpu
+ * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [onProgress] called everytime the progress changes
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
-export async function loadModel(protocol, task, webgpu = false) {
+export async function loadModel(protocol, task, onProgress, webgpu = false) {
 	// load un modèle ONNX, soit de classification, soit de détection.
+
+	onProgress ??= () => {};
 
 	let modelUrl = '';
 
@@ -147,8 +151,13 @@ export async function loadModel(protocol, task, webgpu = false) {
 		throw new Error('Model not found');
 	}
 
-	return ort.InferenceSession.create(modelUrl, {
-		executionProviders: webgpu ? ['webgpu'] : undefined
+	const model = await fetch(modelUrl)
+		.then(fetchProgress({ onProgress }))
+		.then((response) => response.arrayBuffer())
+		.then((buffer) => new Uint8Array(buffer));
+
+	return ort.InferenceSession.create(model, {
+		executionProviders: webgpu ? ['webgpu'] : []
 	});
 }
 /**
