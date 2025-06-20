@@ -32,10 +32,18 @@
 		}
 	}
 
+	let modelLoadingProgress = $state(0);
 	let cropperModel = $state();
 	async function loadCropperModel() {
 		if (!uiState.currentProtocol) return;
-		cropperModel = await loadModel(uiState.currentProtocol, 'detection');
+		cropperModel = await loadModel(
+			uiState.currentProtocol,
+			'detection',
+			({ transferred, total }) => {
+				if (total === 0) return;
+				modelLoadingProgress = transferred / total;
+			}
+		);
 		toasts.success('Modèle de recadrage chargé');
 	}
 
@@ -174,6 +182,7 @@
 	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
+	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { importResultsZip } from '$lib/results.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
@@ -238,6 +247,9 @@
 		<Logo loading />
 		<p>Chargement du modèle de recadrage…</p>
 		<p class="source">{@render modelsource()}</p>
+		<div class="progressbar">
+			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
+		</div>
 	</section>
 {:then _}
 	<Dropzone
@@ -340,6 +352,15 @@
 
 	.loading .source {
 		font-size: 0.8em;
+	}
+
+	.loading .progressbar {
+		width: 100%;
+		max-width: 20em;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+		align-items: center;
 	}
 
 	.loading.errored {
