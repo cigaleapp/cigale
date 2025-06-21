@@ -11,6 +11,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { pick } from '$lib/utils';
+	import { watch } from 'runed';
 	import Navigation from './Navigation.svelte';
 
 	const { children } = $props();
@@ -36,6 +37,18 @@
 				uiState.setPreviewURL(image.fileId, URL.createObjectURL(blob));
 			})();
 		}
+	});
+
+	watch([() => page.url], ([url]) => {
+		const preselectedProtocol = url.searchParams.get('protocol');
+		if (!preselectedProtocol) return;
+		if (uiState.currentProtocolId === preselectedProtocol) return;
+		if (!tables.Protocol.state.some((p) => p.id === preselectedProtocol)) {
+			toasts.error(`Le protocole "${preselectedProtocol}" n'existe pas.`);
+			return;
+		}
+
+		uiState.currentProtocolId = preselectedProtocol;
 	});
 
 	defineKeyboardShortcuts({
