@@ -1,10 +1,11 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { promptAndImportProtocol } from '$lib/protocols';
+	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { importProtocol, promptAndImportProtocol } from '$lib/protocols';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -27,7 +28,21 @@
 	const preselectedClassificationModel = queryParam('classificationModel', ssp.number());
 	const preselectedCropModel = queryParam('cropModel', ssp.number());
 
+	let openImportRemoteProtocol = $state();
+	const preselectedProtocolIsRemote = $derived(
+		$preselectedProtocol &&
+			$preselectedProtocol.startsWith('https:') &&
+			URL.canParse($preselectedProtocol)
+	);
+
+	afterNavigate(() => {
+		if (preselectedProtocolIsRemote && openImportRemoteProtocol) {
+			openImportRemoteProtocol();
+		}
+	});
+
 	$effect(() => {
+		if (preselectedProtocolIsRemote) return;
 		if ($preselectedProtocol) {
 			uiState.currentProtocolId = $preselectedProtocol;
 			$preselectedProtocol = null;
@@ -66,6 +81,49 @@
 		];
 	}
 </script>
+
+<ModalConfirm
+	title="Importer le protocole distant?"
+	key="modal_import_remote_protocol"
+	bind:open={openImportRemoteProtocol}
+	oncancel={() => {
+		$preselectedProtocol = null;
+	}}
+	onconfirm={async () => {
+		if (!$preselectedProtocol) return;
+		const raw = await fetch($preselectedProtocol)
+			.then((res) => res.text())
+			.catch((e) => {
+				toasts.error(`Erreur lors de l'import du protocole distant: ${e}`);
+				return null;
+			});
+
+		if (!raw) return;
+
+		try {
+			const { id } = await importProtocol(raw);
+			uiState.currentProtocolId = id;
+			$preselectedProtocol = null;
+		} catch (error) {
+			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
+		}
+	}}
+>
+	Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'addresse
+	suivante:
+
+	{#if $preselectedProtocol && preselectedProtocolIsRemote}
+		<a href={$preselectedProtocol}>
+			{@render highlightHostname($preselectedProtocol)}
+		</a>
+	{/if}
+
+	{#snippet highlightHostname(/** @type {string} */ url)}
+		{url.split(new URL(url).hostname, 2)[0]}
+		<strong>{new URL(url).hostname}</strong>
+		{url.split(new URL(url).hostname, 2)[1]}
+	{/snippet}
+</ModalConfirm>
 
 <div class="content">
 	<h1>Choisir un protocole</h1>
