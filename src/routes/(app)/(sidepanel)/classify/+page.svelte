@@ -38,9 +38,10 @@
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
 			isLoaded: (item) =>
-				typeof item === 'string'
+				!uiState.classificationMetadataId ||
+				(typeof item === 'string'
 					? false
-					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
+					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item))
 		})
 	);
 
@@ -50,6 +51,8 @@
 	let classifmodel = $state();
 	async function loadClassifModel() {
 		if (!uiState.currentProtocol) return;
+		if (!uiState.classificationMetadataId) return;
+
 		classifmodel = await loadModel(
 			uiState.currentProtocol,
 			'classification',
@@ -71,6 +74,14 @@
 		if (!uiState.currentProtocol) {
 			throw new Error('Aucun protocole sélectionné');
 		}
+
+		if (!uiState.classificationMetadataId) {
+			console.warn(
+				'No metadata with neural inference defined, not analyzing image. Configure neural inference on a enum metadata (set metadata.<your metadata id>.infer.neural) if this was not intentional.'
+			);
+			return;
+		}
+
 		if (!classifmodel) {
 			throw new Error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -168,9 +179,10 @@
 	);
 
 	$effect(() => {
+		if (!uiState.classificationMetadataId) return;
 		uiState.processing.total = tables.Image.state.length;
 		uiState.processing.done = tables.Image.state.filter(
-			(img) => img.metadata[uiState.classificationMetadataId]
+			(img) => img.metadata[uiState.classificationMetadataId ?? '']
 		).length;
 	});
 </script>

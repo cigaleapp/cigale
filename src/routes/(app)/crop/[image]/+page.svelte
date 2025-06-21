@@ -295,10 +295,12 @@
 			...initialCrop
 		});
 
-		await deleteMetadataValue({
-			metadataId: uiState.classificationMetadataId,
-			subjectId: imageId
-		});
+		if (uiState.classificationMetadataId) {
+			await deleteMetadataValue({
+				metadataId: uiState.classificationMetadataId,
+				subjectId: imageId
+			});
+		}
 	}
 
 	async function revertAll() {

@@ -35,7 +35,7 @@
 	let modelLoadingProgress = $state(0);
 	let cropperModel = $state();
 	async function loadCropperModel() {
-		if (!uiState.currentProtocol) return;
+		if (!uiState.currentProtocol?.crop.infer) return;
 		cropperModel = await loadModel(
 			uiState.currentProtocol,
 			'detection',
@@ -71,13 +71,25 @@
 			height
 		});
 
-		await inferBoundingBoxes({
-			id,
-			bytes: resizedBytes,
-			filename: file.name,
-			contentType: file.type,
-			dimensions: { width, height }
-		});
+		if (uiState.cropInferenceAvailable) {
+			await inferBoundingBoxes({
+				id,
+				bytes: resizedBytes,
+				filename: file.name,
+				contentType: file.type,
+				dimensions: { width, height }
+			});
+		} else {
+			await tables.Image.set({
+				id: imageId(id, 0),
+				filename: file.name,
+				addedAt: formatISO(new Date()),
+				contentType: file.type,
+				dimensions: { width, height },
+				fileId: id,
+				metadata: {}
+			});
+		}
 
 		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
 			console.error(error);
@@ -97,6 +109,13 @@
 	async function inferBoundingBoxes(file) {
 		if (!uiState.currentProtocol) {
 			toasts.error('Aucun protocole sélectionné');
+			return;
+		}
+
+		if (!uiState.currentProtocol.crop.infer) {
+			console.warn(
+				'No crop inference defined, not analyzing image. Configure crop inference in the protocol (crop.infer) if this was not intentional.'
+			);
 			return;
 		}
 
