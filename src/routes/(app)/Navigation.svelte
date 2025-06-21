@@ -1,5 +1,4 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
@@ -32,11 +31,6 @@
 	let height = $state();
 
 	let openExportModal = $state();
-
-	$effect(() => {
-		if (!uiState.currentProtocolId) goto('#/');
-		if (uiState.currentProtocolId && !hasImages) goto('#/import');
-	});
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
