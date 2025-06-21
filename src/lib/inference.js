@@ -118,14 +118,20 @@ export async function loadModel(protocol, task, onProgress, webgpu = false) {
 
 	let modelUrl = '';
 
+	/**
+	 * @type {RequestInit}
+	 */
+	let requestOptions = {};
+
 	if (task === 'detection') {
-		switch (typeof protocol.crop?.infer.model) {
+		switch (typeof protocol.crop.infer?.model) {
 			case 'string': {
 				modelUrl = protocol.crop.infer.model;
 				break;
 			}
 			case 'object': {
-				throw 'Les requetes ne sont pas encore supportées pour le modèle de détection, utilisez une URL';
+				modelUrl = protocol.crop.infer.model.url;
+				requestOptions = protocol.crop.infer.model;
 			}
 			default: {
 				throw "Le modèle de détection n'est pas spécifié";
@@ -139,7 +145,8 @@ export async function loadModel(protocol, task, onProgress, webgpu = false) {
 				break;
 			}
 			case 'object': {
-				throw 'Les requetes ne sont pas encore supportées pour le modèle de détection, utilisez une URL';
+				modelUrl = settings.model.url;
+				requestOptions = settings.model;
 			}
 			default: {
 				throw "Le modèle de détection n'est pas spécifié";
@@ -151,7 +158,7 @@ export async function loadModel(protocol, task, onProgress, webgpu = false) {
 		throw new Error('Model not found');
 	}
 
-	const model = await fetch(modelUrl)
+	const model = await fetch(modelUrl, requestOptions)
 		.then(fetchProgress({ onProgress }))
 		.then((response) => response.arrayBuffer())
 		.then((buffer) => new Uint8Array(buffer));
