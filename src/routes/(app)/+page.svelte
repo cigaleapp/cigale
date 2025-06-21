@@ -1,25 +1,28 @@
 <script>
 	import { goto } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import IconSearch from '~icons/ph/magnifying-glass';
+	import { promptAndImportProtocol } from '$lib/protocols';
+	import { seo } from '$lib/seo.svelte';
+	import { uiState } from '$lib/state.svelte';
+	import { toasts } from '$lib/toasts.svelte';
+	import Tooltip from '$lib/Tooltip.svelte';
+	import Fuse from 'fuse.js';
+	import { queryParam } from 'sveltekit-search-params';
 	import IconCheck from '~icons/ph/check';
 	import IconImport from '~icons/ph/download';
-	import { uiState } from '$lib/state.svelte';
 	import IconManage from '~icons/ph/gear';
-	import Fuse from 'fuse.js';
-	import { promptAndImportProtocol } from '$lib/protocols';
-	import { toasts } from '$lib/toasts.svelte';
-	import { seo } from '$lib/seo.svelte';
-	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
-	import Tooltip from '$lib/Tooltip.svelte';
+	import IconSearch from '~icons/ph/magnifying-glass';
 
 	seo({ title: 'Choisir un protocole' });
 
 	const currentProtocol = $derived(
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
 	);
+
+	const preselectedProtocol = queryParam('protocol');
 
 	let searchQuery = $state('');
 	const searcher = $derived(
@@ -61,9 +64,10 @@
 				</button> -->
 				<ButtonSecondary
 					testid={i === 0 ? 'protocol-to-choose' : undefined}
-					onclick={() => {
+					onclick={async () => {
 						uiState.currentProtocolId = p.id;
-						goto('#/import');
+						$preselectedProtocol = null;
+						await goto('#/import');
 					}}
 				>
 					{#if p.id === currentProtocol?.id}
