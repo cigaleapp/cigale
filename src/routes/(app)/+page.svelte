@@ -5,12 +5,13 @@
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { promptAndImportProtocol } from '$lib/protocols';
+	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import Fuse from 'fuse.js';
-	import { queryParam } from 'sveltekit-search-params';
+	import { queryParam, ssp } from 'sveltekit-search-params';
 	import IconCheck from '~icons/ph/check';
 	import IconImport from '~icons/ph/download';
 	import IconManage from '~icons/ph/gear';
@@ -23,6 +24,23 @@
 	);
 
 	const preselectedProtocol = queryParam('protocol');
+	const preselectedClassificationModel = queryParam('classificationModel', ssp.number());
+	const preselectedCropModel = queryParam('cropModel', ssp.number());
+
+	$effect(() => {
+		if ($preselectedProtocol) {
+			uiState.currentProtocolId = $preselectedProtocol;
+			$preselectedProtocol = null;
+		}
+		if ($preselectedClassificationModel !== null) {
+			uiState.selectedClassificationModel = $preselectedClassificationModel;
+			$preselectedClassificationModel = null;
+		}
+		if ($preselectedCropModel !== null) {
+			uiState.selectedCropModel = $preselectedCropModel;
+			$preselectedCropModel = null;
+		}
+	});
 
 	let searchQuery = $state('');
 	const searcher = $derived(
@@ -34,6 +52,19 @@
 	const protocols = $derived(
 		searchQuery ? searcher.search(searchQuery).map((r) => r.item) : tables.Protocol.state
 	);
+
+	/**
+	 * @param {typeof uiState.classificationModels | typeof uiState.cropModels} models
+	 */
+	function radioOptions(models) {
+		return models.map(({ model, name }, key) => {
+			const url = typeof model === 'string' ? model : model.url;
+			/** @type {{key: number, label: string, subtext?: string }} */
+			const option = { key, label: name ?? url };
+			if (name) option.subtext = url;
+			return option;
+		});
+	}
 </script>
 
 <div class="content">
@@ -52,34 +83,57 @@
 		{#each protocols as p, i (p.id)}
 			{@const showVersionCheck = p.version && p.source}
 			<li class:has-version-check={showVersionCheck}>
-				<!-- <button
-					data-testid={i === 0 ? 'protocol-to-choose' : undefined}
-					class:selected={p.id === currentProtocol?.id}
-					onclick={() => {
-						uiState.currentProtocolId = p.id;
-						goto('#/import');
-					}}
-				>
-					{p.name}
-				</button> -->
-				<ButtonSecondary
-					testid={i === 0 ? 'protocol-to-choose' : undefined}
-					onclick={async () => {
-						uiState.currentProtocolId = p.id;
-						$preselectedProtocol = null;
-						await goto('#/import');
-					}}
-				>
-					{#if p.id === currentProtocol?.id}
-						<Tooltip text="Protocole sélectionné">
-							<IconCheck />
-						</Tooltip>
+				<div class="select-and-version">
+					<ButtonSecondary
+						testid={i === 0 ? 'protocol-to-choose' : undefined}
+						onclick={async () => {
+							uiState.currentProtocolId = p.id;
+							$preselectedProtocol = null;
+							$preselectedClassificationModel = null;
+							$preselectedCropModel = null;
+							await goto('#/import');
+						}}
+					>
+						{#if p.id === currentProtocol?.id}
+							<Tooltip text="Protocole sélectionné">
+								<IconCheck />
+							</Tooltip>
+						{/if}
+						{p.name}
+					</ButtonSecondary>
+					{#if showVersionCheck}
+						<ButtonUpdateProtocol compact {...p} />
 					{/if}
-
-					{p.name}
-				</ButtonSecondary>
-				{#if showVersionCheck}
-					<ButtonUpdateProtocol compact {...p} />
+				</div>
+				{#if p.id === uiState.currentProtocolId}
+					{#if uiState.classificationModels.length > 1}
+						<div class="model-select">
+							<p>
+								Modèle d'inférence pour {tables.Metadata.state.find(
+									(m) => m.id === uiState.classificationMetadataId
+								)?.label ?? 'classification'}
+							</p>
+							<RadioButtons
+								value={uiState.selectedClassificationModel}
+								onchange={(value) => {
+									uiState.selectedClassificationModel = value ?? 0;
+								}}
+								options={radioOptions(uiState.classificationModels)}
+							/>
+						</div>
+					{/if}
+					{#if uiState.cropModels.length > 1}
+						<div class="model-select">
+							<p>Modèle d'inférence pour la détection</p>
+							<RadioButtons
+								value={uiState.selectedCropModel}
+								onchange={(value) => {
+									uiState.selectedCropModel = value ?? 0;
+								}}
+								options={radioOptions(uiState.cropModels)}
+							/>
+						</div>
+					{/if}
 				{/if}
 			</li>
 		{/each}
@@ -134,7 +188,7 @@
 		width: 100%;
 	}
 
-	li {
+	li .select-and-version {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
@@ -142,9 +196,8 @@
 		--width: 100%;
 	}
 
-	li.has-version-check {
-		display: grid;
-		grid-template-columns: 1fr min-content;
+	li .model-select {
+		margin-top: 0.5rem;
 	}
 
 	section.manage {

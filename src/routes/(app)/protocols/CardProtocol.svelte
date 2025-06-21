@@ -53,10 +53,13 @@
 </script>
 
 {#snippet modelDetails(
-	/** @type {{ model: import('$lib/database').HTTPRequest, input: import('$lib/database').ModelInput }} */ params
+	/** @type {{ model: import('$lib/database').HTTPRequest, input: import('$lib/database').ModelInput, name?: string }} */ params
 )}
 	{#if params}
 		<p>
+			{#if params.name}
+				{params.name}:
+			{/if}
 			<a href={inferenceModelUrl(params.model)}>
 				{inferenceModelUrl(params.model).split('/').at(-1)}
 			</a>
@@ -206,7 +209,9 @@
 								</code>
 							</p>
 						{/if}
-						{@render modelDetails(crop.infer)}
+						{#each crop.infer ?? [] as model (model.name ?? model.model.toString())}
+							{@render modelDetails(model)}
+						{/each}
 					</div>
 				</li>
 			{/if}
@@ -217,13 +222,13 @@
 						<p class="title">
 							{m.label}
 							<IconArrow />
-							<code
-								use:tooltip={`Le métadonnée stockant le résultat de l'inférence: ${m.infer.neural.metadata}`}
-							>
-								{m.infer.neural.metadata.replace(`${id}__`, '')}
+							<code use:tooltip={`Le métadonnée stockant le résultat de l'inférence: ${m.id}`}>
+								{m.id.replace(`${id}__`, '')}
 							</code>
 						</p>
-						{@render modelDetails(m.infer.neural)}
+						{#each m.infer.neural ?? [] as model (model.model.toString())}
+							{@render modelDetails(model)}
+						{/each}
 					</div>
 				</li>
 			{/each}
@@ -247,7 +252,9 @@
 			Supprimer
 		</ButtonSecondary>
 
-		<ButtonUpdateProtocol {version} {source} {id} />
+		{#if version && source}
+			<ButtonUpdateProtocol {version} {source} {id} />
+		{/if}
 	</section>
 </Card>
 
