@@ -124,15 +124,20 @@ export const MetadataEnumVariant = type({
 export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 
 export const MetadataInferOptionsNeural = type({
-	neural: {
+	neural: type({
 		model: HTTPRequest.describe(
 			'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
 		),
+		'name?': [
+			'string',
+			'@',
+			"Nom du réseau à afficher dans l'interface. Particulièrement utile si il y a plusieurs réseaux"
+		],
 		input: ModelInput.describe("Configuration de l'entrée des modèles"),
 		'output?': type({
 			'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
 		})
-	}
+	}).array()
 }).describe('Inférer depuis un modèle de réseau de neurones', 'self');
 
 export const MetadataInferOptionsEXIF = type({ exif: EXIFField }).describe(

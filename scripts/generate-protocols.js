@@ -136,35 +136,51 @@ const protocol = {
 				parent: {}
 			},
 			infer: {
-				neural: {
-					model: 'https://cigaleapp.github.io/models/model_classif.onnx',
-					metadata: namespaced('species'),
-					input: {
-						height: 224,
-						width: 224,
-						disposition: 'CHW',
-						normalized: true
+				neural: [
+					{
+						name: 'Léger (~80 classes)',
+						model: 'https://cigaleapp.github.io/models/model_classif.onnx',
+						input: {
+							height: 224,
+							width: 224,
+							disposition: 'CHW',
+							normalized: true
+						}
+					},
+					{
+						name: 'Complet (~17000 classes)',
+						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
+						model:
+							'https://corsproxy.io/?url=github.com/cigaleapp/models/releases/download/classification-polymny-2025-06/classification-collembola-polymny-2025-04-11.onnx',
+						input: {
+							height: 224,
+							width: 224,
+							disposition: 'CHW',
+							normalized: true
+						}
 					}
-				}
+				]
 			}
 		}
 	},
 	crop: {
 		metadata: namespaced('crop'),
 		confirmationMetadata: namespaced('crop_is_confirmed'),
-		infer: {
-			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
-			input: {
-				height: 640,
-				width: 640,
-				disposition: '1CHW',
-				normalized: true
-			},
-			output: {
-				normalized: true,
-				shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
+		infer: [
+			{
+				model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
+				input: {
+					height: 640,
+					width: 640,
+					disposition: '1CHW',
+					normalized: true
+				},
+				output: {
+					normalized: true,
+					shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
+				}
 			}
-		}
+		]
 	},
 	exports: {
 		images: {

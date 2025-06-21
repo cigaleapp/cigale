@@ -1,9 +1,8 @@
 {
-	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
 	"learnMore": "https://github.com/cigaleapp/cigale/tree/396a14e63c58ac4b5dfcb78d6ba4ae606a2309c6/scripts/README.md#protocoles-arthropodsexample",
-	"version": 10,
+	"version": 11,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -682,7 +681,7 @@
 				{
 					"key": "3",
 					"label": "Bilobella braunerae",
-					"description": "\n\n\nPhoto par MurderSpagurder [sur www.inaturalist.org](https://www.inaturalist.org/photos/466970900) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
+					"description": "\n\nPhoto par MurderSpagurder [sur www.inaturalist.org](https://www.inaturalist.org/photos/466970900) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4537282",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Bilobella braunerae.jpeg?v=7"
 				},
@@ -738,7 +737,7 @@
 				{
 					"key": "11",
 					"label": "Deuterosminthurus bicinctus",
-					"description": "\n\n\nPhoto par Tobias Polzer [sur www.inaturalist.org](https://www.inaturalist.org/photos/487945004) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\nPhoto par Tobias Polzer [sur www.inaturalist.org](https://www.inaturalist.org/photos/487945004) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537006",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Deuterosminthurus bicinctus.jpeg?v=7"
 				},
@@ -857,7 +856,7 @@
 				{
 					"key": "28",
 					"label": "Entomobrya superba",
-					"description": "\n\n\nPhoto par Иван Матершев [sur www.inaturalist.org](https://www.inaturalist.org/photos/463966959) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\nPhoto par Иван Матершев [sur www.inaturalist.org](https://www.inaturalist.org/photos/463966959) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4539594",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Entomobrya superba.jpeg?v=7"
 				},
@@ -891,7 +890,7 @@
 				{
 					"key": "33",
 					"label": "Heteromurus nitidus",
-					"description": "\n\n\nPhoto par Marie Lou Legrand [sur www.inaturalist.org](https://www.inaturalist.org/photos/466012633) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\nPhoto par Marie Lou Legrand [sur www.inaturalist.org](https://www.inaturalist.org/photos/466012633) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2121008",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Heteromurus nitidus.jpeg?v=7"
 				},
@@ -945,7 +944,7 @@
 				{
 					"key": "41",
 					"label": "Isotomurus unifasciatus",
-					"description": "\n\n\nPhoto par Joeb [sur www.inaturalist.org](https://www.inaturalist.org/photos/465403076) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
+					"description": "\n\nPhoto par Joeb [sur www.inaturalist.org](https://www.inaturalist.org/photos/465403076) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4539049",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Isotomurus unifasciatus.jpeg?v=7"
 				},
@@ -1022,7 +1021,7 @@
 				{
 					"key": "52",
 					"label": "Orchesella bifasciata",
-					"description": "\n\n\nPhoto par Иван Матершев [sur www.inaturalist.org](https://www.inaturalist.org/photos/463168599) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\nPhoto par Иван Матершев [sur www.inaturalist.org](https://www.inaturalist.org/photos/463168599) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/10038254",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Orchesella bifasciata.jpeg?v=7"
 				},
@@ -1092,7 +1091,7 @@
 				{
 					"key": "62",
 					"label": "Seira musarum",
-					"description": "\n\n\nPhoto par David Pereira [sur www.inaturalist.org](https://www.inaturalist.org/photos/466985850) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
+					"description": "\n\nPhoto par David Pereira [sur www.inaturalist.org](https://www.inaturalist.org/photos/466985850) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/10848695",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Seira musarum.jpeg?v=7"
 				},
@@ -1113,7 +1112,7 @@
 				{
 					"key": "65",
 					"label": "Sminthurides penicillifer",
-					"description": "\n\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/497608502) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
+					"description": "\n\nPhoto par Alexis Tinker-Tsavalas [sur www.inaturalist.org](https://www.inaturalist.org/photos/497608502) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)",
 					"learnMore": "https://gbif.org/species/4537112",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Sminthurides penicillifer.jpeg?v=7"
 				},
@@ -1190,7 +1189,7 @@
 				{
 					"key": "76",
 					"label": "Willowsia buski",
-					"description": "\n\n\nPhoto par Tom Kirschey [sur www.inaturalist.org](https://www.inaturalist.org/photos/464287001) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\nPhoto par Tom Kirschey [sur www.inaturalist.org](https://www.inaturalist.org/photos/464287001) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/2120828",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Willowsia buski.jpeg?v=7"
 				},
@@ -1391,35 +1390,49 @@
 				}
 			},
 			"infer": {
-				"neural": {
-					"model": "https://cigaleapp.github.io/models/model_classif.onnx",
-					"metadata": "io.github.cigaleapp.arthropods.example__species",
-					"input": {
-						"height": 224,
-						"width": 224,
-						"disposition": "CHW",
-						"normalized": true
+				"neural": [
+					{
+						"model": "https://cigaleapp.github.io/models/model_classif.onnx",
+						"name": "Léger (~80 classes)",
+						"input": {
+							"height": 224,
+							"width": 224,
+							"disposition": "CHW",
+							"normalized": true
+						}
+					},
+					{
+						"model": "https://corsproxy.io/?url=https://github.com/cigaleapp/models/releases/download/classification-polymny-2025-06/classification-collembola-polymny-2025-04-11.onnx",
+						"name": "Complet (~17 000 classes)",
+						"input": {
+							"height": 224,
+							"width": 224,
+							"disposition": "CHW",
+							"normalized": true
+						}
 					}
-				}
+				]
 			}
 		}
 	},
 	"crop": {
 		"metadata": "io.github.cigaleapp.arthropods.example__crop",
 		"confirmationMetadata": "io.github.cigaleapp.arthropods.example__crop_is_confirmed",
-		"infer": {
-			"model": "https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx",
-			"input": {
-				"height": 640,
-				"width": 640,
-				"disposition": "1CHW",
-				"normalized": true
-			},
-			"output": {
-				"normalized": true,
-				"shape": ["sx", "sy", "ex", "ey", "score", "_"]
+		"infer": [
+			{
+				"model": "https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx",
+				"input": {
+					"height": 640,
+					"width": 640,
+					"disposition": "1CHW",
+					"normalized": true
+				},
+				"output": {
+					"normalized": true,
+					"shape": ["sx", "sy", "ex", "ey", "score", "_"]
+				}
 			}
-		}
+		]
 	},
 	"exports": {
 		"images": {

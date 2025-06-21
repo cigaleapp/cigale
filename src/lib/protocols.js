@@ -216,14 +216,17 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
-	if (typeof source !== 'string')
-		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
-	const response = await fetch(cachebust(source), {
-		headers: {
-			Accept: 'application/json'
-		}
-	})
+	const response = await fetch(
+		cachebust(typeof source === 'string' ? source : source.url),
+		typeof source !== 'string'
+			? source
+			: {
+					headers: {
+						Accept: 'application/json'
+					}
+				}
+	)
 		.then((r) => r.json())
 		.then(
 			type({

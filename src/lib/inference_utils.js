@@ -216,18 +216,14 @@ if (import.meta.vitest) {
 
 /**
  *
- * @param {import('./database.js').Protocol} protocol
+ * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
  * @param {ort.Tensor[]} tensor
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-async function map_preprocess_for_classification(protocol, tensor, mean, std) {
-	const { width, height, normalized } = protocol.inference?.classification?.input ?? {
-		width: 224,
-		height: 224,
-		normalized: true
-	};
+async function map_preprocess_for_classification(settings, tensor, mean, std) {
+	const { width, height, normalized } = settings.input;
 	let c = tensor;
 	c = await normalizeTensors(c, mean, std, !normalized);
 	c = await resizeTensors(c, width, height);
@@ -236,13 +232,13 @@ async function map_preprocess_for_classification(protocol, tensor, mean, std) {
 }
 /**
  *
- * @param {import('./database.js').Protocol} protocol
+ * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
  * @param {ort.Tensor} tensors
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function preprocess_for_classification(protocol, tensors, mean, std) {
+export async function preprocess_for_classification(settings, tensors, mean, std) {
 	/*preprocess les tenseurs pour la classification
     -------input------- :
         tensors : liste de tenseurs à prétraiter
@@ -258,7 +254,7 @@ export async function preprocess_for_classification(protocol, tensors, mean, std
     */
 	// @ts-ignore
 	let new_ctensorsPromise = tensors.map((tensor) =>
-		map_preprocess_for_classification(protocol, tensor, mean, std)
+		map_preprocess_for_classification(settings, tensor, mean, std)
 	);
 	let new_ctensors = await Promise.all(new_ctensorsPromise);
 
@@ -399,12 +395,13 @@ export async function normalizeTensors(tensors, mean, std, denormalize = false) 
 /**
  *
  * @param {import('./database.js').Protocol} protocol
+ * @param {number} modelIndex index du modèle de classification dans la liste des modèles de classification du protocole
  * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
  * @returns {[import('./inference.js').BB[][], number[][]]}
  */
-export function output2BB(protocol, output, numImages, minConfidence) {
+export function output2BB(protocol, modelIndex, output, numImages, minConfidence) {
 	/*reshape les bounding boxes obtenues par le modèle d'inférence
     -------input------- :
         output : liste de bounding boxes obtenues par le modèle d'inférence
@@ -427,7 +424,14 @@ export function output2BB(protocol, output, numImages, minConfidence) {
 
 	console.log(output);
 
-	const outputShape = protocol.crop?.infer.output?.shape ?? ['sx', 'sy', 'w', 'h', 'score', '_'];
+	const outputShape = protocol.crop?.infer?.[modelIndex].output?.shape ?? [
+		'sx',
+		'sy',
+		'w',
+		'h',
+		'score',
+		'_'
+	];
 
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;

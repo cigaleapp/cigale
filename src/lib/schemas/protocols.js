@@ -108,6 +108,11 @@ export const Protocol = type({
 			'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée'
 		],
 		'infer?': type({
+			'name?': [
+				'string',
+				'@',
+				"Nom du réseau à afficher dans l'interface. Particulièrement utile si il y a plusieurs réseaux"
+			],
 			model: HTTPRequest.describe(
 				'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
 			),
@@ -125,7 +130,9 @@ export const Protocol = type({
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
-		}).describe("Configuration de l'inférence des boîtes englobantes")
+		})
+			.array()
+			.describe("Configuration de l'inférence des boîtes englobantes")
 	}).describe('Configuration de la partie recadrage'),
 	exports: type({
 		images: type({
