@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.25% </span>
+                <span class="strong">31.2% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>160/512</span>
+                <span class='fraction'>161/516</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.25% </span>
+                <span class="strong">31.2% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>160/512</span>
+                <span class='fraction'>161/516</span>
             </div>
         
             
@@ -632,7 +632,11 @@
 <a name='L567'></a><a href='#L567'>567</a>
 <a name='L568'></a><a href='#L568'>568</a>
 <a name='L569'></a><a href='#L569'>569</a>
-<a name='L570'></a><a href='#L570'>570</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L570'></a><a href='#L570'>570</a>
+<a name='L571'></a><a href='#L571'>571</a>
+<a name='L572'></a><a href='#L572'>572</a>
+<a name='L573'></a><a href='#L573'>573</a>
+<a name='L574'></a><a href='#L574'>574</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -861,10 +865,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1039,6 +1039,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1061,6 +1062,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1419,18 +1427,14 @@ if (import.meta.vitest) {
 &nbsp;
 /**
  *
- * @param {import('./database.js').Protocol} protocol
+ * @param {NonNullable&lt;typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']&gt;[number] } settings
  * @param {ort.Tensor[]} tensor
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise&lt;ort.Tensor[]&gt;}
  */
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async function map_preprocess_for_classification(protocol, tensor, mean, std) {</span></span>
-<span class="cstat-no" title="statement not covered" >	const { width, height, normalized } = protocol.inference?.classification?.input ?? {</span>
-<span class="cstat-no" title="statement not covered" >		width: 224,</span>
-<span class="cstat-no" title="statement not covered" >		height: 224,</span>
-<span class="cstat-no" title="statement not covered" >		normalized: true</span>
-<span class="cstat-no" title="statement not covered" >	};</span>
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async function map_preprocess_for_classification(settings, tensor, mean, std) {</span></span>
+<span class="cstat-no" title="statement not covered" >	const { width, height, normalized } = settings.input;</span>
 <span class="cstat-no" title="statement not covered" >	let c = tensor;</span>
 <span class="cstat-no" title="statement not covered" >	c = await normalizeTensors(c, mean, std, !normalized);</span>
 <span class="cstat-no" title="statement not covered" >	c = await resizeTensors(c, width, height);</span>
@@ -1439,13 +1443,13 @@ if (import.meta.vitest) {
 <span class="cstat-no" title="statement not covered" >}</span>
 /**
  *
- * @param {import('./database.js').Protocol} protocol
+ * @param {NonNullable&lt;typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']&gt;[number] } settings
  * @param {ort.Tensor} tensors
  * @param {number[]} mean
  * @param {number[]} std
  * @returns {Promise&lt;ort.Tensor[]&gt;}
  */
-export <span class="fstat-no" title="function not covered" >async function preprocess_for_classification(protocol, tensors, mean, std) {</span>
+export <span class="fstat-no" title="function not covered" >async function preprocess_for_classification(settings, tensors, mean, std) {</span>
 <span class="cstat-no" title="statement not covered" >	/*preprocess les tenseurs pour la classification</span>
 <span class="cstat-no" title="statement not covered" >    -------input------- :</span>
 <span class="cstat-no" title="statement not covered" >        tensors : liste de tenseurs à prétraiter</span>
@@ -1461,7 +1465,7 @@ export <span class="fstat-no" title="function not covered" >async function prepr
 <span class="cstat-no" title="statement not covered" >    */</span>
 <span class="cstat-no" title="statement not covered" >	// @ts-ignore</span>
 <span class="cstat-no" title="statement not covered" >	let new_ctensorsPromise = tensors.map((tensor) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >		map_preprocess_for_classification(protocol, tensor, mean, std)</span>
+<span class="cstat-no" title="statement not covered" >		map_preprocess_for_classification(settings, tensor, mean, std)</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
 <span class="cstat-no" title="statement not covered" >	let new_ctensors = await Promise.all(new_ctensorsPromise);</span>
 &nbsp;
@@ -1602,12 +1606,13 @@ export <span class="fstat-no" title="function not covered" >async function norma
 /**
  *
  * @param {import('./database.js').Protocol} protocol
+ * @param {number} modelIndex index du modèle de classification dans la liste des modèles de classification du protocole
  * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
  * @returns {[import('./inference.js').BB[][], number[][]]}
  */
-export <span class="fstat-no" title="function not covered" >function output2BB(protocol, output, numImages, minConfidence) {</span>
+export <span class="fstat-no" title="function not covered" >function output2BB(protocol, modelIndex, output, numImages, minConfidence) {</span>
 <span class="cstat-no" title="statement not covered" >	/*reshape les bounding boxes obtenues par le modèle d'inférence</span>
 <span class="cstat-no" title="statement not covered" >    -------input------- :</span>
 <span class="cstat-no" title="statement not covered" >        output : liste de bounding boxes obtenues par le modèle d'inférence</span>
@@ -1630,7 +1635,14 @@ export <span class="fstat-no" title="function not covered" >function output2BB(p
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	console.log(output);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	const outputShape = protocol.crop?.infer.output?.shape ?? ['sx', 'sy', 'w', 'h', 'score', '_'];</span>
+<span class="cstat-no" title="statement not covered" >	const outputShape = protocol.crop?.infer?.[modelIndex].output?.shape ?? [</span>
+<span class="cstat-no" title="statement not covered" >		'sx',</span>
+<span class="cstat-no" title="statement not covered" >		'sy',</span>
+<span class="cstat-no" title="statement not covered" >		'w',</span>
+<span class="cstat-no" title="statement not covered" >		'h',</span>
+<span class="cstat-no" title="statement not covered" >		'score',</span>
+<span class="cstat-no" title="statement not covered" >		'_'</span>
+<span class="cstat-no" title="statement not covered" >	];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const suboutputSize = outputShape.length;</span>
 <span class="cstat-no" title="statement not covered" >	let boundingBoxesCount = output.length / suboutputSize;</span>
@@ -1777,7 +1789,7 @@ export <span class="fstat-no" title="function not covered" >async function resiz
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-21T09:35:12.286Z
+                at 2025-06-21T13:02:47.851Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

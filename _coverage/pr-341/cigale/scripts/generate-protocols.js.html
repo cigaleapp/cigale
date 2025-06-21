@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/188</span>
+                <span class='fraction'>0/204</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/188</span>
+                <span class='fraction'>0/204</span>
             </div>
         
             
@@ -260,7 +260,23 @@
 <a name='L195'></a><a href='#L195'>195</a>
 <a name='L196'></a><a href='#L196'>196</a>
 <a name='L197'></a><a href='#L197'>197</a>
-<a name='L198'></a><a href='#L198'>198</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -311,6 +327,22 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -595,35 +627,51 @@
 <span class="cstat-no" title="statement not covered" >				parent: {}</span>
 <span class="cstat-no" title="statement not covered" >			},</span>
 <span class="cstat-no" title="statement not covered" >			infer: {</span>
-<span class="cstat-no" title="statement not covered" >				neural: {</span>
-<span class="cstat-no" title="statement not covered" >					model: 'https://cigaleapp.github.io/models/model_classif.onnx',</span>
-<span class="cstat-no" title="statement not covered" >					metadata: namespaced('species'),</span>
-<span class="cstat-no" title="statement not covered" >					input: {</span>
-<span class="cstat-no" title="statement not covered" >						height: 224,</span>
-<span class="cstat-no" title="statement not covered" >						width: 224,</span>
-<span class="cstat-no" title="statement not covered" >						disposition: 'CHW',</span>
-<span class="cstat-no" title="statement not covered" >						normalized: true</span>
+<span class="cstat-no" title="statement not covered" >				neural: [</span>
+<span class="cstat-no" title="statement not covered" >					{</span>
+<span class="cstat-no" title="statement not covered" >						name: 'Léger (~80 classes)',</span>
+<span class="cstat-no" title="statement not covered" >						model: 'https://cigaleapp.github.io/models/model_classif.onnx',</span>
+<span class="cstat-no" title="statement not covered" >						input: {</span>
+<span class="cstat-no" title="statement not covered" >							height: 224,</span>
+<span class="cstat-no" title="statement not covered" >							width: 224,</span>
+<span class="cstat-no" title="statement not covered" >							disposition: 'CHW',</span>
+<span class="cstat-no" title="statement not covered" >							normalized: true</span>
+<span class="cstat-no" title="statement not covered" >						}</span>
+<span class="cstat-no" title="statement not covered" >					},</span>
+<span class="cstat-no" title="statement not covered" >					{</span>
+<span class="cstat-no" title="statement not covered" >						name: 'Complet (~17000 classes)',</span>
+<span class="cstat-no" title="statement not covered" >						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?</span>
+<span class="cstat-no" title="statement not covered" >						model:</span>
+<span class="cstat-no" title="statement not covered" >							'https://corsproxy.io/?url=github.com/cigaleapp/models/releases/download/classification-polymny-2025-06/classification-collembola-polymny-2025-04-11.onnx',</span>
+<span class="cstat-no" title="statement not covered" >						input: {</span>
+<span class="cstat-no" title="statement not covered" >							height: 224,</span>
+<span class="cstat-no" title="statement not covered" >							width: 224,</span>
+<span class="cstat-no" title="statement not covered" >							disposition: 'CHW',</span>
+<span class="cstat-no" title="statement not covered" >							normalized: true</span>
+<span class="cstat-no" title="statement not covered" >						}</span>
 <span class="cstat-no" title="statement not covered" >					}</span>
-<span class="cstat-no" title="statement not covered" >				}</span>
+<span class="cstat-no" title="statement not covered" >				]</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	},</span>
 <span class="cstat-no" title="statement not covered" >	crop: {</span>
 <span class="cstat-no" title="statement not covered" >		metadata: namespaced('crop'),</span>
 <span class="cstat-no" title="statement not covered" >		confirmationMetadata: namespaced('crop_is_confirmed'),</span>
-<span class="cstat-no" title="statement not covered" >		infer: {</span>
-<span class="cstat-no" title="statement not covered" >			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',</span>
-<span class="cstat-no" title="statement not covered" >			input: {</span>
-<span class="cstat-no" title="statement not covered" >				height: 640,</span>
-<span class="cstat-no" title="statement not covered" >				width: 640,</span>
-<span class="cstat-no" title="statement not covered" >				disposition: '1CHW',</span>
-<span class="cstat-no" title="statement not covered" >				normalized: true</span>
-<span class="cstat-no" title="statement not covered" >			},</span>
-<span class="cstat-no" title="statement not covered" >			output: {</span>
-<span class="cstat-no" title="statement not covered" >				normalized: true,</span>
-<span class="cstat-no" title="statement not covered" >				shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']</span>
+<span class="cstat-no" title="statement not covered" >		infer: [</span>
+<span class="cstat-no" title="statement not covered" >			{</span>
+<span class="cstat-no" title="statement not covered" >				model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',</span>
+<span class="cstat-no" title="statement not covered" >				input: {</span>
+<span class="cstat-no" title="statement not covered" >					height: 640,</span>
+<span class="cstat-no" title="statement not covered" >					width: 640,</span>
+<span class="cstat-no" title="statement not covered" >					disposition: '1CHW',</span>
+<span class="cstat-no" title="statement not covered" >					normalized: true</span>
+<span class="cstat-no" title="statement not covered" >				},</span>
+<span class="cstat-no" title="statement not covered" >				output: {</span>
+<span class="cstat-no" title="statement not covered" >					normalized: true,</span>
+<span class="cstat-no" title="statement not covered" >					shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']</span>
+<span class="cstat-no" title="statement not covered" >				}</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
-<span class="cstat-no" title="statement not covered" >		}</span>
+<span class="cstat-no" title="statement not covered" >		]</span>
 <span class="cstat-no" title="statement not covered" >	},</span>
 <span class="cstat-no" title="statement not covered" >	exports: {</span>
 <span class="cstat-no" title="statement not covered" >		images: {</span>
@@ -661,7 +709,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-21T09:35:12.286Z
+                at 2025-06-21T13:02:47.851Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
