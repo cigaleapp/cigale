@@ -89,7 +89,7 @@
 					{/if}
 				</a>
 				{@render noInferenceIndicator(
-					Boolean(uiState.currentProtocol?.crop.infer),
+					uiState.cropInferenceAvailable,
 					"Le protocole ne définit pas d'inférence automatique pour la détection"
 				)}
 			</div>
@@ -102,7 +102,7 @@
 					{/if}
 				</a>
 				{@render noInferenceIndicator(
-					Boolean(uiState.classificationMetadataId),
+					uiState.classificationInferenceAvailable,
 					"Le protocole ne définit pas d'inférence automatique pour la classification"
 				)}
 			</div>
