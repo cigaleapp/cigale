@@ -61,7 +61,10 @@ describe('processExifData', () => {
 			metadata: ['date', 'location', 'no-exif'],
 			authors: [],
 			description: 'Test Protocol',
-			learnMore: 'https://example.com'
+			learnMore: 'https://example.com',
+			crop: {
+				metadata: 'test-protocol.crop'
+			}
 		});
 
 		await db.tables.Image.set({
