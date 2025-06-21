@@ -38,9 +38,10 @@
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
 			isLoaded: (item) =>
-				typeof item === 'string'
+				!uiState.classificationMetadataId ||
+				(typeof item === 'string'
 					? false
-					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
+					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item))
 		})
 	);
 
@@ -50,8 +51,10 @@
 	let classifmodel = $state();
 	async function loadClassifModel() {
 		if (!uiState.currentProtocol) return;
+		if (!uiState.classificationInferenceAvailable) return;
 		classifmodel = await loadModel(
 			uiState.currentProtocol,
+			uiState.selectedClassificationModel,
 			'classification',
 			({ transferred, total }) => {
 				if (total === 0) return;
@@ -71,6 +74,14 @@
 		if (!uiState.currentProtocol) {
 			throw new Error('Aucun protocole sélectionné');
 		}
+
+		if (!uiState.classificationMetadataId) {
+			console.warn(
+				'No metadata with neural inference defined, not analyzing image. Configure neural inference on a enum metadata (set metadata.<your metadata id>.infer.neural) if this was not intentional.'
+			);
+			return;
+		}
+
 		if (!classifmodel) {
 			throw new Error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -79,7 +90,8 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const inputSettings = uiState.currentProtocol.crop?.infer?.input ?? {
+		const inputSettings = uiState.currentProtocol.crop?.infer?.[uiState.selectedCropModel]
+			.input ?? {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT
 		};
@@ -98,7 +110,18 @@
 		// TODO persist after page reload?
 		uiState.setPreviewURL(id, nimg.toDataURL(), 'cropped');
 
-		const [[scores]] = await classify(uiState.currentProtocol, [[nimg]], classifmodel, uiState, 0);
+		const targetMetadata = await tables.Metadata.get(uiState.classificationMetadataId);
+
+		// @ts-ignore
+		const inferenceSettings = targetMetadata?.infer?.neural?.[uiState.selectedClassificationModel];
+
+		if (!inferenceSettings) {
+			throw new Error(
+				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur la métadonnée ${uiState.classificationMetadataId}`
+			);
+		}
+
+		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodel, uiState, 0);
 
 		const results = scores
 			.map((score, i) => ({
@@ -168,9 +191,11 @@
 	);
 
 	$effect(() => {
+		if (!uiState.classificationMetadataId) return;
+		if (!uiState.classificationInferenceAvailable) return;
 		uiState.processing.total = tables.Image.state.length;
 		uiState.processing.done = tables.Image.state.filter(
-			(img) => img.metadata[uiState.classificationMetadataId]
+			(img) => img.metadata[uiState.classificationMetadataId ?? '']
 		).length;
 	});
 </script>

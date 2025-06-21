@@ -36,8 +36,10 @@
 	let cropperModel = $state();
 	async function loadCropperModel() {
 		if (!uiState.currentProtocol) return;
+		if (!uiState.cropInferenceAvailable) return;
 		cropperModel = await loadModel(
 			uiState.currentProtocol,
+			uiState.selectedCropModel,
 			'detection',
 			({ transferred, total }) => {
 				if (total === 0) return;
@@ -71,13 +73,25 @@
 			height
 		});
 
-		await inferBoundingBoxes({
-			id,
-			bytes: resizedBytes,
-			filename: file.name,
-			contentType: file.type,
-			dimensions: { width, height }
-		});
+		if (uiState.cropInferenceAvailable) {
+			await inferBoundingBoxes({
+				id,
+				bytes: resizedBytes,
+				filename: file.name,
+				contentType: file.type,
+				dimensions: { width, height }
+			});
+		} else {
+			await tables.Image.set({
+				id: imageId(id, 0),
+				filename: file.name,
+				addedAt: formatISO(new Date()),
+				contentType: file.type,
+				dimensions: { width, height },
+				fileId: id,
+				metadata: {}
+			});
+		}
 
 		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
 			console.error(error);
@@ -100,6 +114,17 @@
 			return;
 		}
 
+		if (!uiState.currentProtocol.crop.infer) {
+			console.warn(
+				'No crop inference defined, not analyzing image. Configure crop inference in the protocol (crop.infer) if this was not intentional.'
+			);
+			return;
+		}
+
+		if (!uiState.cropInferenceAvailable) {
+			return;
+		}
+
 		if (!cropperModel) {
 			toasts.error(
 				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -111,6 +136,7 @@
 
 		const [[boundingBoxes], [scores]] = await inferSequentialy(
 			uiState.currentProtocol,
+			uiState.selectedCropModel,
 			[file.bytes],
 			cropperModel
 		);
