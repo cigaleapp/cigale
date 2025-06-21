@@ -57,13 +57,13 @@
 	 * @param {typeof uiState.classificationModels | typeof uiState.cropModels} models
 	 */
 	function radioOptions(models) {
-		return models.map(({ model, name }, key) => {
-			const url = typeof model === 'string' ? model : model.url;
-			/** @type {{key: number, label: string, subtext?: string }} */
-			const option = { key, label: name ?? url };
-			if (name) option.subtext = url;
-			return option;
-		});
+		return [
+			{ key: -1, label: 'Aucune inférence' },
+			...models.map(({ model, name }, key) => {
+				const url = typeof model === 'string' ? model : model.url;
+				return { key, label: name ?? url };
+			})
+		];
 	}
 </script>
 
@@ -106,7 +106,7 @@
 					{/if}
 				</div>
 				{#if p.id === uiState.currentProtocolId}
-					{#if uiState.classificationModels.length > 1}
+					{#if uiState.classificationModels.length > 0}
 						<div class="model-select">
 							<p>
 								Modèle d'inférence pour {tables.Metadata.state.find(
@@ -122,7 +122,7 @@
 							/>
 						</div>
 					{/if}
-					{#if uiState.cropModels.length > 1}
+					{#if uiState.cropModels.length > 0}
 						<div class="model-select">
 							<p>Modèle d'inférence pour la détection</p>
 							<RadioButtons
@@ -198,6 +198,11 @@
 
 	li .model-select {
 		margin-top: 0.5rem;
+	}
+
+	li .model-select p {
+		margin-bottom: 0.25rem;
+		color: var(--gay);
 	}
 
 	section.manage {

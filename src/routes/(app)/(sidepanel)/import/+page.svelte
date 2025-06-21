@@ -35,7 +35,8 @@
 	let modelLoadingProgress = $state(0);
 	let cropperModel = $state();
 	async function loadCropperModel() {
-		if (!uiState.currentProtocol?.crop.infer) return;
+		if (!uiState.currentProtocol) return;
+		if (!uiState.cropInferenceAvailable) return;
 		cropperModel = await loadModel(
 			uiState.currentProtocol,
 			uiState.selectedCropModel,
@@ -117,6 +118,10 @@
 			console.warn(
 				'No crop inference defined, not analyzing image. Configure crop inference in the protocol (crop.infer) if this was not intentional.'
 			);
+			return;
+		}
+
+		if (!uiState.cropInferenceAvailable) {
 			return;
 		}
 

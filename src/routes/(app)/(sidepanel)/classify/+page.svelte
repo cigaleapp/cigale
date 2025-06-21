@@ -51,8 +51,7 @@
 	let classifmodel = $state();
 	async function loadClassifModel() {
 		if (!uiState.currentProtocol) return;
-		if (!uiState.classificationMetadataId) return;
-
+		if (!uiState.classificationInferenceAvailable) return;
 		classifmodel = await loadModel(
 			uiState.currentProtocol,
 			uiState.selectedClassificationModel,
@@ -193,6 +192,7 @@
 
 	$effect(() => {
 		if (!uiState.classificationMetadataId) return;
+		if (!uiState.classificationInferenceAvailable) return;
 		uiState.processing.total = tables.Image.state.length;
 		uiState.processing.done = tables.Image.state.filter(
 			(img) => img.metadata[uiState.classificationMetadataId ?? '']
