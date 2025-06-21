@@ -169,6 +169,7 @@ const protocol = {
 		infer: [
 			{
 				model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
+				name: 'YOLO11',
 				input: {
 					height: 640,
 					width: 640,
