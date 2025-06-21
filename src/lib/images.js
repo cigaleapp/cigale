@@ -329,7 +329,7 @@ if (import.meta.vitest) {
  * @returns {string[]}
  */
 export function imageFileIds(images) {
-	return unique(images.map((image) => image.fileId).filter((id) => id !== undefined));
+	return unique(images.map((image) => image.fileId).filter((id) => id !== null));
 }
 
 if (import.meta.vitest) {

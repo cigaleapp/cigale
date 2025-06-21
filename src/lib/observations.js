@@ -68,8 +68,13 @@ export async function deleteObservation(
 
 			tx.objectStore('Observation').delete(id);
 
+			const images = await tx
+				.objectStore('Image')
+				.getAll()
+				.then((images) => images.filter((i) => observation.images.includes(i.id)));
+
 			if (recursive) {
-				for (const fileId of imageFileIds(observation.images.map(({ id }) => id))) {
+				for (const fileId of imageFileIds(images)) {
 					deleteImageFile(fileId, tx, notFoundOk);
 				}
 			}
