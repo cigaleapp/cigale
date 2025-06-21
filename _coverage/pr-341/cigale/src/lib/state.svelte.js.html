@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">56.41% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>44/78</span>
+                <span class='fraction'>48/84</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">56.41% </span>
+                <span class="strong">57.14% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>44/78</span>
+                <span class='fraction'>48/84</span>
             </div>
         
             
@@ -219,7 +219,17 @@
 <a name='L154'></a><a href='#L154'>154</a>
 <a name='L155'></a><a href='#L155'>155</a>
 <a name='L156'></a><a href='#L156'>156</a>
-<a name='L157'></a><a href='#L157'>157</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -317,6 +327,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -420,10 +436,12 @@ import { getMetadataValue } from './metadata';
  * @property {Set&lt;string&gt;} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {Map&lt;string, ZoomState&gt;} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
- * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné
- * @property {number} selectedCropModel index du modèle de recadrage sélectionné dans la liste des modèles de recadrage du protocole sélectionné
+ * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné. -1 pour désactiver l'inférence
+ * @property {number} selectedCropModel index du modèle de recadrage sélectionné dans la liste des modèles de recadrage du protocole sélectionné. -1 pour désactiver l'inférence
  * @property {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} classificationModels liste des modèles de classification disponibles pour le protocole sélectionné
  * @property {NonNullable&lt;typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']&gt;} cropModels liste des modèles de recadrage disponibles pour le protocole sélectionné
+ * @property {boolean} cropInferenceAvailable true si le protocole sélectionné a un modèle de recadrage (qui n'a pas été désactivé)
+ * @property {boolean} classificationInferenceAvailable true si le protocole sélectionné a un modèle de classification (qui n'a pas été désactivé)
  * @property {string|undefined} classificationMetadataId ID de la métadonnée à utiliser pour la classification
  * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
  * @property {string} cropConfirmationMetadataId ID de la métadonnée à utiliser pour déterminer si le recadrage a été confirmé
@@ -476,6 +494,12 @@ export const uiState = $state({
 	},
 	get <span class="fstat-no" title="function not covered" >cropModels() {</span>
 <span class="cstat-no" title="statement not covered" >		return this.currentProtocol?.crop?.infer ?? [];</span>
+	},
+	get <span class="fstat-no" title="function not covered" >cropInferenceAvailable() {</span>
+<span class="cstat-no" title="statement not covered" >		return this.cropModels.length &gt; 0 &amp;&amp; this.selectedCropModel !== -1;</span>
+	},
+	get <span class="fstat-no" title="function not covered" >classificationInferenceAvailable() {</span>
+<span class="cstat-no" title="statement not covered" >		return this.classificationModels.length &gt; 0 &amp;&amp; this.selectedClassificationModel !== -1;</span>
 	},
 	selectedClassificationModel: 0,
 	selectedCropModel: 0,
@@ -538,7 +562,7 @@ export const uiState = $state({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-21T13:02:47.851Z
+                at 2025-06-21T13:30:56.400Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
