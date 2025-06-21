@@ -132,6 +132,7 @@ export async function loadModel(protocol, task, onProgress, webgpu = false) {
 			case 'object': {
 				modelUrl = protocol.crop.infer.model.url;
 				requestOptions = protocol.crop.infer.model;
+				break;
 			}
 			default: {
 				throw "Le modèle de détection n'est pas spécifié";
@@ -147,6 +148,7 @@ export async function loadModel(protocol, task, onProgress, webgpu = false) {
 			case 'object': {
 				modelUrl = settings.model.url;
 				requestOptions = settings.model;
+				break;
 			}
 			default: {
 				throw "Le modèle de détection n'est pas spécifié";
