@@ -38,6 +38,7 @@
 		if (!uiState.currentProtocol?.crop.infer) return;
 		cropperModel = await loadModel(
 			uiState.currentProtocol,
+			uiState.selectedCropModel,
 			'detection',
 			({ transferred, total }) => {
 				if (total === 0) return;
@@ -130,6 +131,7 @@
 
 		const [[boundingBoxes], [scores]] = await inferSequentialy(
 			uiState.currentProtocol,
+			uiState.selectedCropModel,
 			[file.bytes],
 			cropperModel
 		);

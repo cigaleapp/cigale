@@ -55,6 +55,7 @@
 
 		classifmodel = await loadModel(
 			uiState.currentProtocol,
+			uiState.selectedClassificationModel,
 			'classification',
 			({ transferred, total }) => {
 				if (total === 0) return;
@@ -90,7 +91,8 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const inputSettings = uiState.currentProtocol.crop?.infer?.input ?? {
+		const inputSettings = uiState.currentProtocol.crop?.infer?.[uiState.selectedCropModel]
+			.input ?? {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT
 		};
@@ -109,7 +111,18 @@
 		// TODO persist after page reload?
 		uiState.setPreviewURL(id, nimg.toDataURL(), 'cropped');
 
-		const [[scores]] = await classify(uiState.currentProtocol, [[nimg]], classifmodel, uiState, 0);
+		const targetMetadata = await tables.Metadata.get(uiState.classificationMetadataId);
+
+		// @ts-ignore
+		const inferenceSettings = targetMetadata?.infer?.neural?.[uiState.selectedClassificationModel];
+
+		if (!inferenceSettings) {
+			throw new Error(
+				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur la métadonnée ${uiState.classificationMetadataId}`
+			);
+		}
+
+		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodel, uiState, 0);
 
 		const results = scores
 			.map((score, i) => ({
