@@ -17,6 +17,7 @@ export async function importPhotos({ page }, ...names) {
 	names = names.map((name) => (path.extname(name) ? name : `${name}.jpeg`));
 
 	await page.getByTestId('protocol-to-choose').click();
+	await page.getByRole('link', { name: 'Importer' }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
 	await expect(page.getByText(/Cliquer ou déposer des images ici/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
@@ -125,6 +126,7 @@ export async function chooseDefaultProtocol(page) {
 	// Choose default protocol
 	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
 	await page.getByTestId('protocol-to-choose').click();
+	await page.getByRole('link', { name: 'Importer' }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
 }
 
