@@ -90,10 +90,12 @@
 			</p>
 		{/if}
 		{#if authors.length}
-			{#snippet author(/** @type {{name: string; email: string}} */ a)}
+			{#snippet author(/** @type {{name: string; email?: string}} */ a)}
 				{a.name}
-				<br />
-				<a href="mailto:{a.email}">{a.email}</a>
+				{#if a.email}
+					<br />
+					<a href="mailto:{a.email}">{a.email}</a>
+				{/if}
 			{/snippet}
 
 			<div class="authors">

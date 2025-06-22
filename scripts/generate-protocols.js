@@ -6,16 +6,47 @@ import { writeFileSync } from 'node:fs';
 
 const here = import.meta.dirname;
 
-const classmapping = await fetch('https://cigaleapp.github.io/models/class_mapping.txt')
-	.then((r) => r.text())
+const gbifIds = await fetch('https://cigaleapp.github.io/models/polymny-17k-classmapping.txt')
+	.then((res) => res.text())
 	.then((text) =>
-		Object.fromEntries(
-			text
-				.split('\n')
-				.filter((x) => x.trim())
-				.map((line, i) => [line, i])
+		text
+			.split('\n')
+			.map((line) => line.trim())
+			.filter((line) => Boolean(line))
+			.filter((line) => !Number.isNaN(Number.parseInt(line)))
+	);
+
+const gbifIdToCanonicalName = await fetch(
+	'https://raw.githubusercontent.com/cigaleapp/models/main/gbif-id-to-canonical-name.json'
+)
+	.then((res) => res.json())
+	.catch((e) =>
+		console.error(
+			'Could not fetch GBIF ID to canonical name mapping:',
+			e,
+			'will use GBIF API instead (slow!)'
 		)
 	);
+
+/**
+ * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}
+ */
+const options = [];
+for (const gbifId of gbifIds) {
+	const name =
+		gbifIdToCanonicalName[Number.parseInt(gbifId)] ??
+		(await fetch(`https://api.gbif.org/v1/species/${gbifId}/name`)
+			.then((res) => res.json())
+			.then((data) => data.canonicalName));
+	process.stdout.write(`\x1b[2K\r[${options.length}/${gbifIds.length}] ${gbifId} -> ${name}`);
+	options.push({
+		key: gbifId,
+		label: name,
+		description: ''
+	});
+}
+
+console.log('');
 
 const oldProtocol = await readFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
@@ -64,8 +95,22 @@ const protocol = {
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',
 	authors: [
 		{
-			name: 'Jessica Joachim (photos et descriptions des espèces)',
+			name: 'GBIF Contributors',
+			email: 'info@gbif.org'
+		},
+		{
+			name: 'Jessica Joachim',
 			email: 'tifaeriis@gmail.com'
+		},
+		{
+			name: 'Gwenn Le Bihan',
+			email: 'gwenn.lebihan7@gmail.com'
+		},
+		{
+			name: 'Maxime Cauchoix'
+		},
+		{
+			name: 'Léo Chekir'
 		}
 	],
 	metadataOrder: [
@@ -124,13 +169,7 @@ const protocol = {
 			description: '',
 			required: true,
 			mergeMethod: 'max',
-			options: Object.entries(classmapping)
-				.map(([name, index]) => ({
-					key: index.toString(),
-					label: name,
-					description: ''
-				}))
-				.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
+			options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
 			taxonomic: {
 				clade: 'species',
 				parent: {}
@@ -139,7 +178,9 @@ const protocol = {
 				neural: [
 					{
 						name: 'Léger (~80 classes)',
-						model: 'https://cigaleapp.github.io/models/model_classif.onnx',
+						model: 'https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx',
+						classmapping:
+							'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt',
 						input: {
 							height: 224,
 							width: 224,
@@ -151,7 +192,9 @@ const protocol = {
 						name: 'Complet (~17000 classes)',
 						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
 						model:
-							'https://corsproxy.io/?url=github.com/cigaleapp/models/releases/download/classification-polymny-2025-06/classification-collembola-polymny-2025-04-11.onnx',
+							'https://media.gwen.works/cigale/classification-collembola-polymny-2025-04-11.onnx',
+						classmapping:
+							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
 						input: {
 							height: 224,
 							width: 224,
@@ -168,7 +211,8 @@ const protocol = {
 		confirmationMetadata: namespaced('crop_is_confirmed'),
 		infer: [
 			{
-				model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
+				model:
+					'https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx',
 				name: 'YOLO11',
 				input: {
 					height: 640,

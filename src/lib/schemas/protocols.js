@@ -92,7 +92,7 @@ export const Protocol = type({
 		Si le champ "version" n'existe pas (que ce soit dans le protocole local ou distant), aucune mise à jour ne sera proposée.`
 	),
 	authors: type({
-		email: ['string.email', '@', 'Adresse email'],
+		'email?': ['string.email', '@', 'Adresse email'],
 		name: ['string', '@', 'Prénom Nom']
 	})
 		.array()

@@ -128,6 +128,9 @@ export const MetadataInferOptionsNeural = type({
 		model: HTTPRequest.describe(
 			'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
 		),
+		classmapping: HTTPRequest.describe(
+			'Fichier texte contenant une clé de la métadonnée par ligne, dans le même ordre que les neurones de sortie du modèle.'
+		),
 		'name?': [
 			'string',
 			'@',

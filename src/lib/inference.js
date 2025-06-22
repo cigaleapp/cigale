@@ -1,9 +1,9 @@
 import { match, type } from 'arktype';
-import fetchProgress from 'fetch-progress';
 import * as ort from 'onnxruntime-web';
 import { tables } from './idb.svelte.js';
 import { imload, output2BB, preprocess_for_classification } from './inference_utils.js';
 import { MetadataInferOptionsNeural } from './schemas/metadata.js';
+import { fetchHttpRequest } from './utils.js';
 
 /**
  * @typedef {[number, number, number, number]} BB [x,y,w,h]
@@ -59,20 +59,9 @@ ort.env.wasm.wasmPaths = {
 
 export const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
 export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de détection
-export let MODELDETECTPATH = 'arthropod_detector_yolo11n_conf0.437.onnx'; // chemin du modèle de détection
-export let MODELCLASSIFPATH = 'model_classif.onnx'; // chemin du modèle de classification
 export const NUMCONF = 0.437; // seuil de confiance pour la détection
 export const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
-/**
- *
- * @param {string} path
- * @returns {string}
- */
-export function torawpath(path) {
-	return `https://cigaleapp.github.io/models/${path}`;
-}
-
 /**
  *
  * @param {import('./database.js').Protocol} protocol
@@ -110,54 +99,21 @@ export async function loadModel(protocol, modelIndex, task, onProgress, webgpu =
 
 	onProgress ??= () => {};
 
-	const modelOptions = protocol.crop.infer?.[modelIndex];
+	const modelRequest =
+		task === 'detection'
+			? protocol.crop?.infer?.[modelIndex]?.model
+			: classificationInferenceSettings(protocol, modelIndex)?.model;
 
-	let modelUrl = '';
-
-	/**
-	 * @type {RequestInit}
-	 */
-	let requestOptions = {};
-
-	if (task === 'detection') {
-		switch (typeof modelOptions?.model) {
-			case 'string': {
-				modelUrl = modelOptions.model;
-				break;
-			}
-			case 'object': {
-				modelUrl = modelOptions.model.url;
-				requestOptions = modelOptions.model;
-				break;
-			}
-			default: {
-				throw "Le modèle de détection n'est pas spécifié";
-			}
-		}
-	} else {
-		const settings = classificationInferenceSettings(protocol, modelIndex);
-		switch (typeof settings?.model) {
-			case 'string': {
-				modelUrl = settings.model;
-				break;
-			}
-			case 'object': {
-				modelUrl = settings.model.url;
-				requestOptions = settings.model;
-				break;
-			}
-			default: {
-				throw "Le modèle de détection n'est pas spécifié";
-			}
-		}
+	if (!modelRequest) {
+		throw new Error(
+			`No model found for task "${task}" and model index ${modelIndex} in protocol "${protocol.id}"`
+		);
 	}
 
-	if (!modelUrl) {
-		throw new Error('Model not found');
-	}
-
-	const model = await fetch(modelUrl, requestOptions)
-		.then(fetchProgress({ onProgress }))
+	const model = await fetchHttpRequest(modelRequest, {
+		cacheAs: 'model',
+		onProgress
+	})
 		.then((response) => response.arrayBuffer())
 		.then((buffer) => new Uint8Array(buffer));
 
@@ -232,6 +188,7 @@ export async function infer(
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT,
 			name: model.inputNames[0],
+			normalized: true,
 			...taskSettings?.input
 		},
 		output: {
