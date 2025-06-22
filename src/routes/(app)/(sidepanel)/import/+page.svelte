@@ -205,7 +205,7 @@
 		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
-	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
+	import { inferSequentialy, loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -260,11 +260,10 @@
 </script>
 
 {#snippet modelsource()}
-	<a
-		href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/tree/main/models/{MODELDETECTPATH}"
-		target="_blank"
-	>
-		<code>{MODELDETECTPATH}</code>
+	{@const { model } = uiState.cropModels[uiState.selectedCropModel]}
+	{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+	<a href={url.toString()} target="_blank">
+		<code>{url.pathname.split('/').at(-1)}</code>
 	</a>
 {/snippet}
 
