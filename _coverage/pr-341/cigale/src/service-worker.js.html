@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>0/80</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>0/80</span>
             </div>
         
             
@@ -156,20 +156,11 @@
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
 <a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -179,11 +170,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -202,10 +197,23 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -250,6 +258,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >/// &lt;reference types="@sveltejs/kit" /&gt;<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >/// &lt;reference no-default-lib="true"/&gt;</span>
+<span class="cstat-no" title="statement not covered" >/// &lt;reference lib="esnext" /&gt;</span>
+<span class="cstat-no" title="statement not covered" >/// &lt;reference lib="webworker" /&gt;</span>
 <span class="cstat-no" title="statement not covered" >import { build, files, version } from '$service-worker';</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >// Create a unique cache name for this deployment</span>
@@ -292,14 +303,15 @@
 <span class="cstat-no" title="statement not covered" >	event.waitUntil(deleteOldCaches());</span>
 <span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >self.addEventListener('fetch', (event) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	// ignore POST requests etc</span>
+<span class="cstat-no" title="statement not covered" >self.addEventListener('fetch', (/** @type {FetchEvent} */ event) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	// ignore POST requests etc.</span>
 <span class="cstat-no" title="statement not covered" >	if (event.request.method !== 'GET') return;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	async function respond() {</span>
-<span class="cstat-no" title="statement not covered" >		const url = new URL(event.request.url);</span>
+<span class="cstat-no" title="statement not covered" >		let url = new URL(event.request.url);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		if (MODELS.includes(url.href)) {</span>
+<span class="cstat-no" title="statement not covered" >		if (MODELS.includes(url.href) || url.searchParams.get('x-cigale-cache-as') === 'model') {</span>
+<span class="cstat-no" title="statement not covered" >			url.searchParams.delete('x-cigale-cache-as');</span>
 <span class="cstat-no" title="statement not covered" >			const cache = await caches.open(MODELS_CACHE);</span>
 <span class="cstat-no" title="statement not covered" >			console.log(`Serving ${url} from models cache`);</span>
 <span class="cstat-no" title="statement not covered" >			const response = await cache.match(url.href);</span>
@@ -349,7 +361,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-22T08:20:21.573Z
+                at 2025-06-22T20:23:03.434Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
