@@ -1,0 +1,1 @@
+import{b as i,a as e}from"./DYfRgkdf.js";import{c as o,r as d}from"./LT6dbl4R.js";import{s as v}from"./Ds9p0ioF.js";var m=i('<div class="liste svelte-5vvu5i"><!></div>');function n(r,t){var a=m(),s=o(a);v(s,()=>t.children),d(a),e(r,a)}export{n as default};
