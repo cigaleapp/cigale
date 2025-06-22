@@ -10,14 +10,7 @@
 		imageIdToFileId,
 		imageIsClassified
 	} from '$lib/images';
-	import {
-		classify,
-		loadModel,
-		MODELCLASSIFPATH,
-		TARGETHEIGHT,
-		TARGETWIDTH,
-		torawpath
-	} from '$lib/inference';
+	import { classify, loadModel, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
 	import { metadataById, storeMetadataValue } from '$lib/metadata.js';
@@ -27,6 +20,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
+	import { fetchHttpRequest } from '$lib/utils';
 
 	seo({ title: 'Classification' });
 
@@ -49,16 +43,33 @@
 	let modelLoadingProgress = $state(0);
 
 	let classifmodel = $state();
+	let classmapping = $state([]);
 	async function loadClassifModel() {
 		if (!uiState.currentProtocol) return;
 		if (!uiState.classificationInferenceAvailable) return;
+		const classmappingRequest = await tables.Metadata.get(
+			uiState.classificationMetadataId ?? ''
+		).then(
+			(metadata) => metadata?.infer?.neural?.[uiState.selectedClassificationModel]?.classmapping
+		);
+
+		classmapping = await fetchHttpRequest(classmappingRequest, {
+			cacheAs: 'model',
+			onProgress({ transferred, total }) {
+				if (total === 0) return;
+				modelLoadingProgress = 0.25 * (transferred / total);
+			}
+		})
+			.then((res) => res.text())
+			.then((text) => text.split(/\r?\n/).filter(Boolean));
+
 		classifmodel = await loadModel(
 			uiState.currentProtocol,
 			uiState.selectedClassificationModel,
 			'classification',
 			({ transferred, total }) => {
 				if (total === 0) return;
-				modelLoadingProgress = transferred / total;
+				modelLoadingProgress = 0.25 + 0.75 * (transferred / total);
 			}
 		);
 		toasts.success('Modèle de classification chargé');
@@ -126,7 +137,7 @@
 		const results = scores
 			.map((score, i) => ({
 				confidence: score,
-				value: i.toString()
+				value: classmapping[i]
 			}))
 			.sort((a, b) => b.confidence - a.confidence)
 			.slice(0, 3)
@@ -201,8 +212,10 @@
 </script>
 
 {#snippet modelsource()}
-	<a href={torawpath(MODELCLASSIFPATH)} target="_blank">
-		<code>{MODELCLASSIFPATH}</code>
+	{@const { model } = uiState.classificationModels[uiState.selectedClassificationModel]}
+	{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+	<a href={url.toString()} target="_blank">
+		<code>{url.pathname.split('/').at(-1)}</code>
 	</a>
 {/snippet}
 
