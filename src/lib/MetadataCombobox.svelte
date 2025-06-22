@@ -2,6 +2,7 @@
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { marked } from 'marked';
 	import IconArrowRight from '~icons/ph/arrow-right';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import IconCheck from '~icons/ph/check';
 	import Logo from './Logo.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
@@ -101,29 +102,31 @@
 		>
 			<div class="viewport">
 				<div class="items">
-					{#each filteredItems as item, i (i + item.value)}
-						<Combobox.Item
-							value={item.value}
-							label={item.label}
-							onHighlight={() => {
-								highlightedOption = options.find((opt) => opt.key === item.value);
-							}}
-						>
-							{#snippet children({ selected })}
-								<div class="item" class:selected>
-									<div class="check">
-										<IconCheck />
+					<VirtualList items={filteredItems} let:item>
+						{#if filteredItems.length > 0}
+							<Combobox.Item
+								value={item.value}
+								label={item.label}
+								onHighlight={() => {
+									highlightedOption = options.find((opt) => opt.key === item.value);
+								}}
+							>
+								{#snippet children({ selected })}
+									<div class="item" class:selected>
+										<div class="check">
+											<IconCheck />
+										</div>
+										<span class="label">{item.label}</span>
+										<div class="confidence">
+											<ConfidencePercentage value={confidences[item.value]} />
+										</div>
 									</div>
-									<span class="label">{item.label}</span>
-									<div class="confidence">
-										<ConfidencePercentage value={confidences[item.value]} />
-									</div>
-								</div>
-							{/snippet}
-						</Combobox.Item>
-					{:else}
-						<span class="no-results">Aucun résultat :/</span>
-					{/each}
+								{/snippet}
+							</Combobox.Item>
+						{:else}
+							<span class="no-results">Aucun résultat :/</span>
+						{/if}
+					</VirtualList>
 				</div>
 				<div class="docs">
 					{#if highlightedOption?.image}
