@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example",
 	"name": "Example: arthropodes",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/396a14e63c58ac4b5dfcb78d6ba4ae606a2309c6/scripts/README.md#protocoles-arthropodsexample",
-	"version": 10,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/ef383d2367fae8b6baf5c77da7d5ecdb9b8aae1f/scripts/README.md#protocoles-arthropodsexample",
+	"version": 11,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -878,7 +878,7 @@
 				{
 					"key": "31",
 					"label": "Folsomia quadrioculata",
-					"description": "Ecology and habitat in Iran: soil and leaf litter under walnut orchad, oak trees and pastureland. General distribution: Holarctic (Babenko et al. 2019).",
+					"description": "",
 					"learnMore": "https://gbif.org/species/2120372"
 				},
 				{
@@ -900,7 +900,7 @@
 					"label": "Hypogastrura viatica",
 					"description": "• corps allongé, un peu élargi en arrière\r\n• corps recouvert de soies courtes et peu denses\r\n• coloration noir bleuté à violacée\r\n• 8 ocelles\r\n• bouche arrondie\r\n• 2 épines anales très petites, placées sur des papilles\nL’identification des espèces est très complexe sur photo. Il faut pour cela photographier les soies de l’apex des pattes. Le nombre de soies de l’apex du tibiotarse permet de déterminer l’espèce. Ces soies sont appelées « knobbed tenent macrosetae », elles sont spatulées ou élargies en club à l’apex. Il faut compter et voir la disposition de ces soies sur les 3 paires de pattes pour arriver à une identification.\nIl existe 170 espèces dans le monde.\nListe des espèces présentes en France d’après le Catalogue des collemboles de France\n\r\n• Hypogastrura affinis\r\n• Hypogastrura assimilis\r\n• Hypogastrura boldorii\r\n• Hypogastrura capitata\r\n• Hypogastrura chouardi\r\n• Hypogastrura crassaegranulata\r\n• Hypogastrura elevata\r\n• Hypogastrura gisini\r\n• Hypogastrura manubrialis\r\n• Hypogastrura meridionalis\r\n• Hypogastrura monticola\r\n• Hypogastrura neglecta\r\n• Hypogastrura papillata\r\n• Hypogastrura purpurescens\r\n• Hypogastrura pyrenaica\r\n• Hypogastrura ripperi\r\n• Hypogastrura subboldorii\r\n• Hypogastrura tullbergi\r\n• Hypogastrura vernalis\r\n• Hypogastrura viatica",
 					"learnMore": "https://jessica-joachim.com/entognathes/collemboles/hypogastruridae/hypogastrura-sp/",
-					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Hypogastrura%20viatica.jpeg?v=7"
+					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Hypogastrura%20viatica.jpeg?v=11"
 				},
 				{
 					"key": "35",
@@ -1183,7 +1183,7 @@
 				{
 					"key": "75",
 					"label": "Vitronura giselae",
-					"description": "Type locality. Geneva (Switzerland).\n\n\nPhoto par Zeke Blankenship [sur www.inaturalist.org](https://www.inaturalist.org/photos/483116807) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
+					"description": "\n\n\nPhoto par Zeke Blankenship [sur www.inaturalist.org](https://www.inaturalist.org/photos/483116807) (_via_ [GBIF.org](https://gbif.org/)), sous [license CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/)",
 					"learnMore": "https://gbif.org/species/4537269",
 					"image": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/Vitronura giselae.jpeg?v=7"
 				},
