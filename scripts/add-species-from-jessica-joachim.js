@@ -56,6 +56,7 @@ function renderReportTable() {
 const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:/');
 console.log({ here });
 
+const newProtocol = { ...protocol };
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options;
 const total = Object.keys(species).length;
 let done = 0;
@@ -71,6 +72,7 @@ for (const [index, { label: name, key }] of species.entries()) {
 	const progressHeaderLength = `[${done}/${total}]`.length;
 	const searchedName = name.trim().toLowerCase();
 	const searchurl = `https://jessica-joachim.com/?s=${encodeURIComponent(searchedName).replaceAll('%20', '+')}`;
+
 	// Do a search
 	const searchPage = await fetch(searchurl)
 		.then((r) => r.text())
@@ -82,6 +84,7 @@ for (const [index, { label: name, key }] of species.entries()) {
 		if (name.includes(` (${searchedName})`)) return true;
 		return false;
 	})?.href;
+
 	if (!speciesPageUrl) {
 		// Try <gender name> sp. instead of matching full binomial species name
 		const [genus] = searchedName.split(' ');
@@ -95,6 +98,7 @@ for (const [index, { label: name, key }] of species.entries()) {
 			);
 		}
 	}
+
 	if (!speciesPageUrl) {
 		let linksFound = [...searchPage.querySelector('main').querySelectorAll('a')]
 			.filter((a) => a.textContent.trim())
@@ -209,10 +213,9 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 		}
 	}
 
-	describedSpecies[optionIndex] =
+	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[optionIndex] =
 		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
-			key: optionIndex.toString(),
-			label: name,
+			...species[optionIndex],
 			description: text,
 			learnMore: url,
 			...(imagepath
@@ -230,19 +233,6 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 	await mkdir(path.join(here, '../examples'), { recursive: true });
 	writeFile(
 		path.join(here, '../examples/arthropods.cigaleprotocol.json'),
-		JSON.stringify(
-			{
-				...protocol,
-				metadata: {
-					...protocol.metadata,
-					'io.github.cigaleapp.arthropods.example__species': {
-						...protocol.metadata['io.github.cigaleapp.arthropods.example__species'],
-						options: describedSpecies
-					}
-				}
-			},
-			null,
-			2
-		)
+		JSON.stringify(newProtocol, null, 2)
 	);
 }
