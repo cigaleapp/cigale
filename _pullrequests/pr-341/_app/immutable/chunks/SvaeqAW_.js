@@ -1,1 +1,0 @@
-import{e as n,g as s,p as a,I as c,J as f,af as u}from"./LT6dbl4R.js";import{i as o}from"./Daa-kyNp.js";function d(i){let r=0,t=a(0),e;return()=>{n()&&(s(t),c(()=>(r===0&&(e=f(()=>i(()=>o(t)))),r+=1,()=>{u().then(()=>{r-=1,r===0&&(e==null||e(),e=void 0)})})))}}export{d as c};
