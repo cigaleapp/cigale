@@ -8,6 +8,23 @@ import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: '
 import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 import { decodePhoto, photoChanged } from './utils.js';
 
+// Doing the 17k species would be wayyy too long, so we only do these ones. They correspond to the ones that exist in the old ("lightweight") ~80-classes model
+/**
+ * GBIF IDs of the species that we will crawl for
+ */
+const speciesAllowlist = await fetch(
+	'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt'
+)
+	.then((r) => r.text())
+	.then((text) =>
+		text
+			.split(/\r?\n/)
+			.map((line) => Number(line.trim()))
+			.filter((n) => !isNaN(n))
+	);
+
+console.log(speciesAllowlist.length, 'species to crawl for');
+
 // ANSI control sequences
 const cc = {
 	clearline: '\x1b[2K',
@@ -45,7 +62,11 @@ let done = 0;
 
 const describedSpecies = [...species];
 
-for (const [index, { label: name }] of species.entries()) {
+for (const [index, { label: name, key }] of species.entries()) {
+	if (!speciesAllowlist.includes(Number(key))) {
+		continue;
+	}
+
 	const progressHeader = `[${cc.blue}${index}/${total}${cc.reset} ${cc.dim}| ${done}${cc.reset}]`;
 	const progressHeaderLength = `[${done}/${total}]`.length;
 	const searchedName = name.trim().toLowerCase();
