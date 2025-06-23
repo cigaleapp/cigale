@@ -1,0 +1,1 @@
+let e=(o=21)=>crypto.getRandomValues(new Uint8Array(o)).reduce((n,s)=>(s&=63,s<36?n+=s.toString(36):s<62?n+=(s-26).toString(36).toUpperCase():s>62?n+="-":n+="_",n),"");const c=6048e5,t=864e5,l=6e4,r=36e5,a=1e3,i=Symbol.for("constructDateFrom");export{t as a,c as b,i as c,r as d,a as e,l as m,e as n};
