@@ -15,7 +15,7 @@ npm run build
 1. Cloner le repo
 
    ```
-   git clone https://github.com/cigaleapp/cigale --single-branch main
+   git clone https://github.com/cigaleapp/cigale --single-branch
    ```
 
    Le `--single-branch` est utile pour ne pas cloner la branche `gh-pages`, qui est assez lourde
