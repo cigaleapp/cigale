@@ -1,0 +1,1 @@
+import{e as a,a as n,D as s,q as c,v as f,ab as u}from"./J3ipbGPF.js";import{i as o}from"./Bkjd3GAQ.js";function d(i){let r=0,t=s(0),e;return()=>{a()&&(n(t),c(()=>(r===0&&(e=f(()=>i(()=>o(t)))),r+=1,()=>{u().then(()=>{r-=1,r===0&&(e==null||e(),e=void 0)})})))}}export{d as c};
