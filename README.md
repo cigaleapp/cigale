@@ -13,7 +13,6 @@ npm run build
 ## Développement
 
 1. Cloner le repo
-
    ```
    git clone https://github.com/cigaleapp/cigale --single-branch main
    ```
