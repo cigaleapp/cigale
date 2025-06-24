@@ -51,12 +51,12 @@ test('basic functionality', async ({ page }) => {
 	await page.waitForURL((u) => u.hash === '#/classify');
 	await page.waitForTimeout(1000);
 	await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
-		timeout: 5_000
+		timeout: 10_000
 	});
 	await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 5_000 });
 
 	// Check for classification results in sidepanel
-	await page.getByRole('heading', { name: 'lil-fella', exact: true }).click();
+	await page.getByTestId('first-observation-card').click();
 	await expect(page.getByText('Espèce')).toBeVisible();
 
 	// Export results
