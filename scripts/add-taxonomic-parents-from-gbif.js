@@ -1,6 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 import path from 'node:path';
 
 const here = import.meta.dirname;

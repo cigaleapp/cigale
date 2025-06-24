@@ -61,8 +61,6 @@ const species = protocol.metadata['io.github.cigaleapp.arthropods.example__speci
 const total = Object.keys(species).length;
 let done = 0;
 
-const describedSpecies = [...species];
-
 for (const [index, { label: name, key }] of species.entries()) {
 	if (!speciesAllowlist.includes(Number(key))) {
 		continue;
