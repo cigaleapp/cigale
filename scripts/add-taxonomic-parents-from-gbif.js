@@ -112,11 +112,14 @@ async function addToOptions(id, key, label, description = '') {
 		console.warn(`${id} / ${key} has empty label`);
 	}
 
-	opts.push({
-		key,
-		label,
-		description
-	});
+	opts.push(
+		/** @type {import('$lib/database.js').MetadataEnumVariant} */ ({
+			key,
+			label,
+			description,
+			learnMore: `https://gbif.org/species/${key}`
+		})
+	);
 }
 
 /**

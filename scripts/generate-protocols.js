@@ -42,7 +42,8 @@ for (const gbifId of gbifIds) {
 	options.push({
 		key: gbifId,
 		label: name,
-		description: ''
+		description: '',
+		learnMore: `https://gbif.org/species/${gbifId}`
 	});
 }
 
