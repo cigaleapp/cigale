@@ -5,6 +5,14 @@ import { Clade } from '../taxonomy.js';
 import { keys } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
 
+/**
+ * @param {string} metadataId
+ * @param {string} key
+ */
+export function metadataOptionId(metadataId, key) {
+	return `${metadataId}:${key}`;
+}
+
 export const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
 		/** @type {import('../metadata').RuntimeValue<typeof MetadataType.infer>}  */
@@ -165,7 +173,10 @@ export const Metadata = type({
 	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
-	).optional()
+	).optional(),
+	'options?': MetadataEnumVariant.array().describe(
+		'Les options valides. Uniquement utile pour une métadonnée de type "enum"'
+	)
 }).and(
 	type.or(
 		{
@@ -175,9 +186,6 @@ export const Metadata = type({
 		{
 			type: "'enum'",
 			'infer?': MetadataInferOptions,
-			'options?': MetadataEnumVariant.array()
-				.atLeastLength(1)
-				.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
 			'taxonomic?': type({
 				clade: Clade.describe('La clade représentée par cette métadonnée.'),
 				// taxonomy: Request.describe(

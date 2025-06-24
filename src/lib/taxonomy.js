@@ -120,15 +120,9 @@ export async function setTaxonAndInferParents({
 		throw new Error(`No metadata definition for ${parentCladeName}`);
 	}
 
-	if (!('options' in parentCladeDef)) {
-		throw new Error(`No options for ${parentCladeName} metadata`);
-	}
-
 	const parentKey = metadata.taxonomic.parent[value];
 	if (!parentKey) {
-		toasts.warn(
-			`Impossible d'inférer lea ${parentCladeName} de ${metadata.options?.find((o) => o.key === value)?.label ?? value}`
-		);
+		toasts.warn(`Impossible d'inférer lea ${parentCladeName} de ${value}`);
 		throw new Error(`parent of ${value} not found in taxonomy`);
 	}
 

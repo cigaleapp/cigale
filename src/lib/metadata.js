@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { format, isValid } from 'date-fns';
 import { Schemas } from './database.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
+import * as idb from './idb.svelte.js';
 import { mapValues } from './utils.js';
 
 /**
@@ -213,9 +214,10 @@ export async function observationMetadata(observation) {
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
  * @param {DB.MetadataValues} values
- * @returns {Record<string, DB.MetadataValue & { valueLabel?: string }>}
+ * @returns {Promise<Record<string, DB.MetadataValue & { valueLabel?: string }>>}
  */
-export function addValueLabels(values) {
+export async function addValueLabels(values) {
+	const metadataOptions = await idb.list('MetadataOption');
 	return Object.fromEntries(
 		Object.entries(values).map(([key, value]) => {
 			const definition = tables.Metadata.state.find((m) => m.id === key);
@@ -226,7 +228,7 @@ export function addValueLabels(values) {
 				key,
 				{
 					...value,
-					valueLabel: definition.options?.find((o) => o.key === value.value.toString())?.label
+					valueLabel: metadataOptions?.find((o) => o.key === value.value.toString())?.label
 				}
 			];
 		})
@@ -244,7 +246,7 @@ export async function labelOfEnumKey(metadataId, key) {
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
 	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
 
-	return metadata.options?.find((o) => o.key === key)?.label;
+	return idb.get('MetadataOption');
 }
 
 /**

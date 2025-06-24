@@ -2,7 +2,8 @@ import { type } from 'arktype';
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { cachebust } from './utils.js';
+import { cachebust, omit } from './utils.js';
+import { metadataOptionId } from './schemas/metadata.js';
 
 /**
  *
@@ -65,16 +66,28 @@ export const ExportedProtocol = Schemas.Protocol.omit('metadata')
  */
 export async function exportProtocol(base, id, format = 'json') {
 	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
-	const { tables } = await import('./idb.svelte.js');
+	const { tables, ...idb } = await import('./idb.svelte.js');
 
 	const protocol = await tables.Protocol.raw.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
+
+	const allMetadataOptions = await idb.list('MetadataOption');
 
 	downloadProtocol(base, format, {
 		...protocol,
 		metadata: Object.fromEntries(
 			await tables.Metadata.list().then((defs) =>
-				defs.filter((def) => protocol?.metadata.includes(def.id)).map(({ id, ...def }) => [id, def])
+				defs
+					.filter((def) => protocol?.metadata.includes(def.id))
+					.map(({ id, ...def }) => [
+						id,
+						{
+							...def,
+							options: allMetadataOptions
+								.filter((opt) => opt.id.startsWith(namespacedMetadataId(protocol.id, id) + ':'))
+								.map(({ id: _, ...opt }) => opt)
+						}
+					])
 			)
 		)
 	});
@@ -194,15 +207,23 @@ export async function importProtocol(contents) {
 
 	const protocol = ExportedProtocol.in.assert(parsed);
 
-	await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
+	await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
 		tx.objectStore('Protocol').put({
 			...protocol,
 			metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
 		});
-		Object.entries(protocol.metadata).map(
-			([id, metadata]) =>
-				typeof metadata === 'string' || tx.objectStore('Metadata').put({ id, ...metadata })
-		);
+		for (const [id, metadata] of Object.entries(protocol.metadata)) {
+			if (typeof metadata === 'string') continue;
+
+			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
+
+			for (const option of metadata.options ?? []) {
+				tx.objectStore('MetadataOption').put({
+					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
+					...option
+				});
+			}
+		}
 	});
 	return ExportedProtocol.assert(protocol);
 }

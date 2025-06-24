@@ -76,7 +76,7 @@ export async function generateResultsZip(
 		for (const imageId of images.sort()) {
 			const imageFromDatabase = db.tables.Image.state.find((i) => i.id === imageId);
 			if (!imageFromDatabase) continue;
-			const metadataValues = addValueLabels(imageFromDatabase.metadata);
+			const metadataValues = await addValueLabels(imageFromDatabase.metadata);
 
 			const image = {
 				...imageFromDatabase,
