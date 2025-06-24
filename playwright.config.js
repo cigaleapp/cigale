@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
+import { minutesToMilliseconds } from 'date-fns';
 
 /**
  * Read environment variables from file.
@@ -13,8 +14,8 @@ import { defineConfig, devices } from '@playwright/test';
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-	/* Leave some time before github actions makes the job time out, so the report can be deployed */
-	globalTimeout: 3_600_000 - 10 * 60 * 100,
+	/* Leave some time before github actions makes the job time out (1 hour), so the report can be deployed */
+	globalTimeout: minutesToMilliseconds(50),
 	testDir: './tests',
 	/* Run tests in files in parallel */
 	fullyParallel: true,
