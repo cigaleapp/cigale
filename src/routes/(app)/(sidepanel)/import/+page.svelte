@@ -35,6 +35,8 @@
 	let modelLoadingProgress = $state(0);
 	let cropperModel = $state();
 	async function loadCropperModel() {
+		// Prevent multiple loads
+		if (cropperModel) return;
 		if (!uiState.currentProtocol) return;
 		if (!uiState.cropInferenceAvailable) return;
 		cropperModel = await loadModel(

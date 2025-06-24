@@ -45,6 +45,8 @@
 	let classifmodel = $state();
 	let classmapping = $state([]);
 	async function loadClassifModel() {
+		// If the model is already loaded, we don't need to load it again
+		if (classifmodel) return;
 		if (!uiState.currentProtocol) return;
 		if (!uiState.classificationInferenceAvailable) return;
 		const classmappingRequest = await tables.Metadata.get(
