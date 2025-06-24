@@ -14,7 +14,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
 	/* Leave some time before github actions makes the job time out, so the report can be deployed */
-	globalTimeout: 3_600_000 - 10 * 60,
+	globalTimeout: 3_600_000 - 10 * 60 * 100,
 	testDir: './tests',
 	/* Run tests in files in parallel */
 	fullyParallel: true,
