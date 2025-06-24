@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">63.02% </span>
+                <span class="strong">60.37% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>225/357</span>
+                <span class='fraction'>227/376</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">63.02% </span>
+                <span class="strong">60.37% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>225/357</span>
+                <span class='fraction'>227/376</span>
             </div>
         
             
@@ -462,7 +462,31 @@
 <a name='L397'></a><a href='#L397'>397</a>
 <a name='L398'></a><a href='#L398'>398</a>
 <a name='L399'></a><a href='#L399'>399</a>
-<a name='L400'></a><a href='#L400'>400</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a>
+<a name='L402'></a><a href='#L402'>402</a>
+<a name='L403'></a><a href='#L403'>403</a>
+<a name='L404'></a><a href='#L404'>404</a>
+<a name='L405'></a><a href='#L405'>405</a>
+<a name='L406'></a><a href='#L406'>406</a>
+<a name='L407'></a><a href='#L407'>407</a>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -535,6 +559,18 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -660,6 +696,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -865,7 +909,9 @@
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { cachebust } from './utils.js';
+import { cachebust, omit } from './utils.js';
+import * as idb from './idb.svelte.js';
+import { metadataOptionId } from './schemas/metadata.js';
 &nbsp;
 /**
  *
@@ -933,11 +979,23 @@ export <span class="fstat-no" title="function not covered" >async function expor
 <span class="cstat-no" title="statement not covered" >	const protocol = await tables.Protocol.raw.get(id);</span>
 <span class="cstat-no" title="statement not covered" >	if (!protocol) throw new Error(`Protocole ${id} introuvable`);</span>
 &nbsp;
+<span class="cstat-no" title="statement not covered" >	const allMetadataOptions = await idb.list('MetadataOption');</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >	downloadProtocol(base, format, {</span>
 <span class="cstat-no" title="statement not covered" >		...protocol,</span>
 <span class="cstat-no" title="statement not covered" >		metadata: Object.fromEntries(</span>
 <span class="cstat-no" title="statement not covered" >			await tables.Metadata.list().then((defs) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >				defs.filter((def) =&gt; protocol?.metadata.includes(def.id)).map(({ id, ...def }) =&gt; [id, def])</span>
+<span class="cstat-no" title="statement not covered" >				defs</span>
+<span class="cstat-no" title="statement not covered" >					.filter((def) =&gt; protocol?.metadata.includes(def.id))</span>
+<span class="cstat-no" title="statement not covered" >					.map(({ id, ...def }) =&gt; [</span>
+<span class="cstat-no" title="statement not covered" >						id,</span>
+<span class="cstat-no" title="statement not covered" >						{</span>
+<span class="cstat-no" title="statement not covered" >							...def,</span>
+<span class="cstat-no" title="statement not covered" >							options: allMetadataOptions</span>
+<span class="cstat-no" title="statement not covered" >								.filter((opt) =&gt; opt.id.startsWith(namespacedMetadataId(protocol.id, id) + ':'))</span>
+<span class="cstat-no" title="statement not covered" >								.map(({ id: _, ...opt }) =&gt; opt)</span>
+<span class="cstat-no" title="statement not covered" >						}</span>
+<span class="cstat-no" title="statement not covered" >					])</span>
 <span class="cstat-no" title="statement not covered" >			)</span>
 <span class="cstat-no" title="statement not covered" >		)</span>
 <span class="cstat-no" title="statement not covered" >	});</span>
@@ -1057,15 +1115,23 @@ export <span class="fstat-no" title="function not covered" >async function impor
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const protocol = ExportedProtocol.in.assert(parsed);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	await openTransaction(['Protocol', 'Metadata'], {}, (tx) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >		tx.objectStore('Protocol').put({</span>
 <span class="cstat-no" title="statement not covered" >			...protocol,</span>
 <span class="cstat-no" title="statement not covered" >			metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]</span>
 <span class="cstat-no" title="statement not covered" >		});</span>
-<span class="cstat-no" title="statement not covered" >		Object.entries(protocol.metadata).map(</span>
-<span class="cstat-no" title="statement not covered" >			([id, metadata]) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >				typeof metadata === 'string' || tx.objectStore('Metadata').put({ id, ...metadata })</span>
-<span class="cstat-no" title="statement not covered" >		);</span>
+<span class="cstat-no" title="statement not covered" >		for (const [id, metadata] of Object.entries(protocol.metadata)) {</span>
+<span class="cstat-no" title="statement not covered" >			if (typeof metadata === 'string') continue;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >			for (const option of metadata.options ?? []) {</span>
+<span class="cstat-no" title="statement not covered" >				tx.objectStore('MetadataOption').put({</span>
+<span class="cstat-no" title="statement not covered" >					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),</span>
+<span class="cstat-no" title="statement not covered" >					...option</span>
+<span class="cstat-no" title="statement not covered" >				});</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	});</span>
 <span class="cstat-no" title="statement not covered" >	return ExportedProtocol.assert(protocol);</span>
 <span class="cstat-no" title="statement not covered" >}</span>
@@ -1267,7 +1333,7 @@ export <span class="fstat-no" title="function not covered" >async function upgra
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-24T19:22:26.600Z
+                at 2025-06-24T20:05:11.528Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
