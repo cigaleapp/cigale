@@ -96,9 +96,11 @@ export async function listTable(page, tableName) {
  * @param {Page} param0.page
  * @param {string} id
  * @param {Record<string, MetadataValue>} metadata
+ * @param {object} options
+ * @param {boolean} [options.refreshDB=true] whether to refresh the database after updating
  */
-export async function setImageMetadata({ page }, id, metadata) {
-	await page.evaluate(async ([id, metadata]) => {
+export async function setImageMetadata({ page }, id, metadata, { refreshDB = true } = {}) {
+	await page.evaluate(async ([id, metadata, refreshDB]) => {
 		const image = await window.DB.get('Image', id);
 		if (!image) throw new Error(`Image ${id} not found in the database`);
 		await window.DB.put('Image', {
@@ -114,8 +116,8 @@ export async function setImageMetadata({ page }, id, metadata) {
 			}
 		});
 		console.log('Image updated, refreshing DB', { id, metadata });
-		await window.refreshDB();
-	}, /** @type {const} */ ([id, metadata]));
+		if (refreshDB) await window.refreshDB();
+	}, /** @type {const} */ ([id, metadata, refreshDB]));
 }
 
 /**

@@ -536,14 +536,21 @@ async function isImageConfirmedInDatabase(page, id) {
  * @param {boolean} [confirmed=true]
  */
 async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
-	for (const id of ids) {
-		await setImageMetadata({ page }, id, {
-			'io.github.cigaleapp.arthropods.example__crop_is_confirmed': {
-				value: confirmed,
-				manuallyModified: true,
-				confidence: 1,
-				alternatives: {}
+	for (const [i, id] of ids.entries()) {
+		await setImageMetadata(
+			{ page },
+			id,
+			{
+				'io.github.cigaleapp.arthropods.example__crop_is_confirmed': {
+					value: confirmed,
+					manuallyModified: true,
+					confidence: 1,
+					alternatives: {}
+				}
+			},
+			{
+				refreshDB: i === ids.length - 1 // Only refresh the DB after the last image to avoid unnecessary refreshes
 			}
-		});
+		);
 	}
 }
