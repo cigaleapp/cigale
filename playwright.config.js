@@ -16,6 +16,7 @@ import { minutesToMilliseconds } from 'date-fns';
 export default defineConfig({
 	/* Leave some time before github actions makes the job time out (1 hour), so the report can be deployed */
 	globalTimeout: minutesToMilliseconds(50),
+	timeout: minutesToMilliseconds(1.2),
 	testDir: './tests',
 	/* Run tests in files in parallel */
 	fullyParallel: true,

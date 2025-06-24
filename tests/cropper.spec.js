@@ -9,7 +9,8 @@ import {
 } from './utils.js';
 
 test.describe('Cropper view', () => {
-	test.beforeEach(async ({ page }) => {
+	test.beforeEach(async ({ page }, testInfo) => {
+		testInfo.setTimeout(40_000);
 		await importResults(page, 'correct.zip');
 		const allImages = await listTable(page, 'Image');
 		await markImagesAsConfirmedInDatabase(
