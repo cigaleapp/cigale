@@ -1,0 +1,1 @@
+import{e as i,g as a,p as n,I as c,J as f,aa as o}from"./wBip90Z-.js";import{i as u}from"./BmMLnu2_.js";function b(s){let e=0,t=n(0),r;return()=>{i()&&(a(t),c(()=>(e===0&&(r=f(()=>s(()=>u(t)))),e+=1,()=>{o().then(()=>{e-=1,e===0&&(r?.(),r=void 0)})})))}}export{b as c};

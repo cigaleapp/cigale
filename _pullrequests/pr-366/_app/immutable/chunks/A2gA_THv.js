@@ -1,0 +1,1 @@
+import{K as e,u as a,B as t,L as l,J as u}from"./wBip90Z-.js";function c(n){t===null&&e(),l&&t.l!==null?s(t).m.push(n):a(()=>{const o=u(n);if(typeof o=="function")return o})}function i(n){t===null&&e(),c(()=>()=>u(n))}function s(n){var o=n.l;return o.u??={a:[],b:[],m:[]}}export{i as a,c as o};
