@@ -1,1 +1,0 @@
-import{l as r,m as c,k as s,J as i,y as h,G as m,A as p}from"./B6I-9nlg.js";function l(t,f,o){r&&c();var n=t,a,e;s(()=>{a!==(a=f())&&(e&&(m(e),e=null),a&&(e=h(()=>o(n,a))))},i),r&&(n=p)}export{l as c};
