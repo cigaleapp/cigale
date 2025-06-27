@@ -45,7 +45,7 @@
 		"eslint": "^9.29.0",
 		"eslint-config-prettier": "^10.1.5",
 		"eslint-plugin-oxlint": "^1.2.0",
-		"eslint-plugin-svelte": "^3.9.3",
+		"eslint-plugin-svelte": "^3.10.1",
 		"execa": "^9.6.0",
 		"extract-zip": "^2.0.1",
 		"fake-indexeddb": "^6.0.1",
