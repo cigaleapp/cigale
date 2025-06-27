@@ -1,1 +1,0 @@
-import"./CWj6FrbW.js";import{am as o,b as m,a as p,an as s}from"./DeQRW9tW.js";import{a as l}from"./CpNlKsWZ.js";import{b as i}from"./DvfNwFSb.js";import{p as f}from"./B3jv-U6Q.js";var u=m('<textarea class="svelte-1b2j42c"></textarea>');function d(t,e){o(e,!0);let r=f(e,"value",15);var a=u();l(a),i(a,r),p(t,a),s()}export{d as default};
