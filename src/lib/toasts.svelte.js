@@ -24,9 +24,8 @@ import { nanoid } from 'nanoid';
  * @property {?T} data
  */
 
-export const MAX_TOASTS_COUNT = 3;
-
-export const TOAST_LIFETIME_MS = 3000;
+const MAX_TOASTS_COUNT = 3;
+const TOAST_LIFETIME_MS = 3000;
 
 /**
  * @template T
@@ -39,7 +38,7 @@ export const TOAST_LIFETIME_MS = 3000;
  * @property {Toast<T>['callbacks']['closed']} [closed]
  */
 
-export class Toasts {
+class Toasts {
 	/** @type {Toast<any>[]} */
 	items = $state([]);
 
@@ -70,7 +69,10 @@ export class Toasts {
 			// @ts-ignore
 			callbacks,
 			data: data ?? null,
-			lifetime: lifetime === 'inferred' ? 3000 + minutesToMilliseconds(wordsCount / 300) : lifetime,
+			lifetime:
+				lifetime === 'inferred'
+					? TOAST_LIFETIME_MS + minutesToMilliseconds(wordsCount / 300)
+					: lifetime,
 			...rest
 		};
 

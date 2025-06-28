@@ -86,7 +86,7 @@ export async function deleteObservation(
  * @param {Array<{ label: string } | { filename: string }>} parts
  * @return {string} computed default label for the new observation
  */
-export function defaultObservationLabel(parts) {
+function defaultObservationLabel(parts) {
 	// TODO allow user to provide a template string here
 	for (const part of parts) {
 		if ('label' in part) return part.label;
