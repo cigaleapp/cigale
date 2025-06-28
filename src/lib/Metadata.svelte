@@ -87,7 +87,7 @@
 				{#each Object.entries(value.alternatives).sort(([, a], [, b]) => b - a) as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
 					{@const enumVariant = isType('enum', definition.type, stringValue)
-						? definition.options?.find(({ key }) => key === stringValue)
+						? options?.find(({ key }) => key === stringValue)
 						: undefined}
 					<li>
 						<div class="value" use:tooltip={enumVariant?.description}>
