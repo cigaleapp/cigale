@@ -44,16 +44,15 @@
 	const items = $derived(options.map((opt) => ({ value: opt.key, label: opt.label })));
 
 	const filteredItems = $derived.by(() => {
-		if (searchValue === '')
-			return items.toSorted((a, b) => {
-				// Sort selected item first, then items with confidences (from high to low), then the rest, alphabetically
-				const confidence = (/** @type {string} */ key) => confidences[key] ?? -1;
-				if (a.value === value) return -1;
-				if (b.value === value) return 1;
-				const confidenceDiff = confidence(b.value) - confidence(a.value);
-				if (confidenceDiff !== 0) return confidenceDiff;
-				return a.label.localeCompare(b.label);
-			});
+		if (searchValue === '') {
+			return [
+				...items
+					.filter(({ value }) => value in confidences)
+					.toSorted((a, b) => confidences[b.value] - confidences[a.value]),
+				...items.filter(({ value }) => !(value in confidences))
+			];
+		}
+
 		return items.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()));
 	});
 
