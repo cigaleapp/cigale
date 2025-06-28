@@ -5,8 +5,10 @@
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import Sup from '~icons/ph/caret-right';
-	import Download from '~icons/ph/download-simple';
+	import { tooltip } from '$lib/tooltips';
+	import IconNext from '~icons/ph/caret-right';
+	import IconDownload from '~icons/ph/download-simple';
+	import IconNoInference from '~icons/ph/lightning-slash';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
@@ -61,34 +63,46 @@
 					<div class="line"></div>
 				{/if}
 			</a>
-			<Sup></Sup>
+			<IconNext></IconNext>
 			<a href="#/import" aria-disabled={!uiState.currentProtocolId}>
 				Importer
 				{#if path == '/import'}
 					<div class="line"></div>
 				{/if}
 			</a>
-			<Sup></Sup>
-			<a
-				href="#/crop/{uiState.imageOpenedInCropper}"
-				data-testid="goto-crop"
-				aria-disabled={!uiState.currentProtocolId || !hasImages}
-			>
-				Recadrer
-				{#if path.startsWith('/crop')}
-					<div class="line"></div>
-				{/if}
-			</a>
-			<Sup></Sup>
-			<a href="#/classify" aria-disabled={!uiState.currentProtocolId || !hasImages}>
-				Classifier
-				{#if path == '/classify'}
-					<div class="line"></div>
-				{/if}
-			</a>
-			<Sup></Sup>
+			<IconNext></IconNext>
+			<div class="with-inference-indicator">
+				<a
+					href="#/crop/{uiState.imageOpenedInCropper}"
+					data-testid="goto-crop"
+					aria-disabled={!uiState.currentProtocolId || !hasImages}
+				>
+					Recadrer
+					{#if path.startsWith('/crop')}
+						<div class="line"></div>
+					{/if}
+				</a>
+				{@render noInferenceIndicator(
+					uiState.cropInferenceAvailable,
+					"Le protocole ne définit pas d'inférence automatique pour la détection"
+				)}
+			</div>
+			<IconNext></IconNext>
+			<div class="with-inference-indicator">
+				<a href="#/classify" aria-disabled={!uiState.currentProtocolId || !hasImages}>
+					Classifier
+					{#if path == '/classify'}
+						<div class="line"></div>
+					{/if}
+				</a>
+				{@render noInferenceIndicator(
+					uiState.classificationInferenceAvailable,
+					"Le protocole ne définit pas d'inférence automatique pour la classification"
+				)}
+			</div>
+			<IconNext></IconNext>
 			<ButtonSecondary onclick={openExportModal}>
-				<Download />
+				<IconDownload />
 				Résultats
 			</ButtonSecondary>
 		</div>
@@ -102,6 +116,14 @@
 	<ProgressBar progress={uiState.processing.state === 'generating-zip' ? 0 : progress} />
 </header>
 
+{#snippet noInferenceIndicator(/** @type {boolean} */ available, /** @type {string} */ help)}
+	<div class="inference-indicator" use:tooltip={help}>
+		{#if !available}
+			<IconNoInference />
+		{/if}
+	</div>
+{/snippet}
+
 <style>
 	nav {
 		background-color: var(--bg-primary-translucent);
@@ -112,6 +134,20 @@
 		padding: 0.5rem 1rem;
 		resize: vertical;
 		position: relative;
+	}
+
+	nav .with-inference-indicator {
+		display: flex;
+		align-items: center;
+	}
+
+	nav .inference-indicator {
+		color: var(--fg-warning);
+		display: flex;
+		align-items: center;
+		font-size: 0.9em;
+		width: 1ch;
+		margin-left: -1ch;
 	}
 
 	nav a {

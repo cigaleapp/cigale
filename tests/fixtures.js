@@ -1,6 +1,10 @@
 import { test as base } from '@playwright/test';
 import { rm, mkdir } from 'node:fs/promises';
-import exampleProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import exampleProtocol from '../examples/arthropods.cigaleprotocol.light.json' with { type: 'json' };
+
+export { exampleProtocol };
+
+// Make exampleProtocol lightweight by cutting out 90% of metadata options
 
 /**
  * @import { Fixtures, TestType, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';

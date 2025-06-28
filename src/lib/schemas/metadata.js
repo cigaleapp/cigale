@@ -1,9 +1,16 @@
 import { scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
-import { Clade } from '../taxonomy.js';
 import { keys } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
+
+/**
+ * @param {string} metadataId
+ * @param {string} key
+ */
+export function metadataOptionId(metadataId, key) {
+	return `${metadataId}:${key}`;
+}
 
 export const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
@@ -118,26 +125,43 @@ export const MetadataEnumVariant = type({
 	'image?': URLString,
 	'learnMore?': URLString.describe(
 		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
-	)
+	),
+	'cascade?': scope({ ID })
+		.type({ '[ID]': 'ID' })
+		.describe(
+			'Objet contenant pour clés des identifiants d\'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: "1", cascade: { genus: "2" } }`, une métadonnée genus ayant une option `{ key: "2", cascade: { family: "3" } }`. Si l\'option "1" de la métadonnée species est choisie, la métadonnée genus sera définie sur l\'option "2" et la métadonnée family sera à son tour définie sur l\'option "3".'
+		)
 });
 
 export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 
+export const MetadataInferOptionsNeural = type({
+	neural: type({
+		model: HTTPRequest.describe(
+			'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
+		),
+		classmapping: HTTPRequest.describe(
+			'Fichier texte contenant une clé de la métadonnée par ligne, dans le même ordre que les neurones de sortie du modèle.'
+		),
+		'name?': [
+			'string',
+			'@',
+			"Nom du réseau à afficher dans l'interface. Particulièrement utile si il y a plusieurs réseaux"
+		],
+		input: ModelInput.describe("Configuration de l'entrée des modèles"),
+		'output?': type({
+			'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
+		})
+	}).array()
+}).describe('Inférer depuis un modèle de réseau de neurones', 'self');
+
+export const MetadataInferOptionsEXIF = type({ exif: EXIFField }).describe(
+	'Inférer depuis un champ EXIF',
+	'self'
+);
+
 export const MetadataInferOptions = type
-	.or(
-		type({ exif: EXIFField }).describe('Inférer depuis un champ EXIF', 'self'),
-		type({
-			neural: {
-				model: HTTPRequest.describe(
-					'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
-				),
-				input: ModelInput.describe("Configuration de l'entrée des modèles"),
-				'output?': type({
-					'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
-				})
-			}
-		}).describe('Inférer depuis un modèle de réseau de neurones', 'self')
-	)
+	.or(MetadataInferOptionsEXIF, MetadataInferOptionsNeural)
 	.describe('Comment inférer la valeur de cette métadonnée', 'self');
 
 export const Metadata = type({
@@ -153,7 +177,10 @@ export const Metadata = type({
 	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
-	).optional()
+	).optional(),
+	'options?': MetadataEnumVariant.array().describe(
+		'Les options valides. Uniquement utile pour une métadonnée de type "enum"'
+	)
 }).and(
 	type.or(
 		{
@@ -161,23 +188,8 @@ export const Metadata = type({
 			'infer?': { latitude: MetadataInferOptions, longitude: MetadataInferOptions }
 		},
 		{
-			type: "'enum'",
-			'infer?': MetadataInferOptions,
-			'options?': MetadataEnumVariant.array()
-				.atLeastLength(1)
-				.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
-			'taxonomic?': type({
-				clade: Clade.describe('La clade représentée par cette métadonnée.'),
-				// taxonomy: Request.describe(
-				// 	"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
-				// )
-				parent: type({ '[string]': 'string' }).describe(
-					'Associe les valeurs (key) possibles de cette métadonnée aux valeurs (key) de la métadonnée représentant la clade parente'
-				)
-			}).describe(
-				"Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles. Bien penser à définir toutes les autres métadonnées représentant les clades supérieures avec `taxonomic.clade`"
-			)
-		},
-		{ type: MetadataType.exclude('"location" | "enum"'), 'infer?': MetadataInferOptions }
+			type: MetadataType.exclude('"location"'),
+			'infer?': MetadataInferOptions
+		}
 	)
 );

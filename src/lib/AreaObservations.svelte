@@ -122,8 +122,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each images as props (props.id)}
+	{#each images as props, i (props.id)}
 		<CardObservation
+			data-testid={i === 0 ? 'first-observation-card' : undefined}
 			data-id={props.id}
 			data-loading={props.loading}
 			data-index={props.index}

@@ -10,3 +10,7 @@ Généré ainsi:
 4. [`add-taxonomic-parents-from-gbif.js`](./add-taxonomic-parents-from-gbif.js): Ajout des données hiérarchiques pour l'inférence taxonomique, et remplissage des listes d'options pour les métadonnées de clades supérieures (ordre, famille, genre, etc) depuis [GBIF](https://gbif.org/). Il remplit aussi les liens, descriptions et images pour les espèces qui n'en aurait toujours pas eu après les étapes précédentes.
 
 Ces divers scripts sont lancés chaque semaine par [un workflow Github Actions](https://github.com/cigaleapp/cigale/actions/workflows/regen-arthropods-protocol.yml)
+
+## Protocoles: arthropods.example.light
+
+Généré comme [`arthropods.example`](#protocoles-arthropodsexample), mais avec seulement les métadonnées pouvant être inférées par le réseau neuronal de classification "léger" (~80 espèces). Le fichier est bien plus petit (~40 ko contre ~4.5 Mo pour `arthropods.example`), et est par exemple utilisé pour accélérer les [tests d'intégration](../.github/workflows/playwright.yml)

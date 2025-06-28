@@ -13,7 +13,7 @@
 	 * @typedef {object} Props
 	 * @property {string} id
 	 * @property {number} version
-	 * @property {string} source
+	 * @property {typeof import('$lib/schemas/common').HTTPRequest.infer} source
 	 * @property {boolean} [compact=false]
 	 */
 

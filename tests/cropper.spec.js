@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures.js';
+import { expect, test, exampleProtocol } from './fixtures.js';
 import {
 	getImage,
 	getSettings,
@@ -9,7 +9,8 @@ import {
 } from './utils.js';
 
 test.describe('Cropper view', () => {
-	test.beforeEach(async ({ page }) => {
+	test.beforeEach(async ({ page }, testInfo) => {
+		testInfo.setTimeout(40_000);
 		await importResults(page, 'correct.zip');
 		const allImages = await listTable(page, 'Image');
 		await markImagesAsConfirmedInDatabase(
@@ -126,6 +127,7 @@ test.describe('Cropper view', () => {
 
 			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
+			await page.waitForTimeout(1000);
 			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
 
 			expect(cropAutoNext).toBe(false);
@@ -521,9 +523,7 @@ function confirmedCropBadge(page) {
  */
 async function isImageConfirmedInDatabase(page, id) {
 	const image = await getImage({ page }, id);
-	return (
-		image?.metadata?.['io.github.cigaleapp.arthropods.example__crop_is_confirmed']?.value === 'true'
-	);
+	return image?.metadata?.[exampleProtocol.crop.confirmationMetadata]?.value === 'true';
 }
 
 /**
@@ -534,14 +534,21 @@ async function isImageConfirmedInDatabase(page, id) {
  * @param {boolean} [confirmed=true]
  */
 async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
-	for (const id of ids) {
-		await setImageMetadata({ page }, id, {
-			'io.github.cigaleapp.arthropods.example__crop_is_confirmed': {
-				value: confirmed,
-				manuallyModified: true,
-				confidence: 1,
-				alternatives: {}
+	for (const [i, id] of ids.entries()) {
+		await setImageMetadata(
+			{ page },
+			id,
+			{
+				[exampleProtocol.crop.confirmationMetadata]: {
+					value: confirmed,
+					manuallyModified: true,
+					confidence: 1,
+					alternatives: {}
+				}
+			},
+			{
+				refreshDB: i === ids.length - 1 // Only refresh the DB after the last image to avoid unnecessary refreshes
 			}
-		});
+		);
 	}
 }
