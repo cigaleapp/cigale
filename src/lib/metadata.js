@@ -25,17 +25,6 @@ import { ensureNamespacedMetadataId, namespaceOfMetadataId } from './protocols.j
  */
 
 /**
- *
- * @param {string} metadataId
- */
-export function metadataOptionsKeyRange(metadataId) {
-	return IDBKeyRange.bound(
-		metadataOptionId(metadataId, ''),
-		metadataOptionId(metadataId, '\uffff')
-	);
-}
-
-/**
  * Get a strongly-typed metadata value from an image (Image ONLY, not Observation).
  * @template {DB.MetadataType} Type
  * @param {DB.Image} image
@@ -51,25 +40,6 @@ export function getMetadataValue(image, type, metadataId) {
 		...value,
 		value: assertIs(type, value.value)
 	};
-}
-
-/**
- * Get a strongly-typed metadata value from an image (Image ONLY, not Observation).
- * Throw if the metadata is not found.
- * @template {DB.MetadataType} Type
- * @param {DB.Image} image
- * @param {Type} type
- * @param {string} metadataId
- * @returns {TypedMetadataValue<Type> }
- */
-export function getMetadataValueOrThrow(image, type, metadataId) {
-	const value = getMetadataValue(image, type, metadataId);
-	if (value === undefined)
-		throw new Error(
-			`Could not get metadata ${metadataId} from image ${image.id}: metadata not found`
-		);
-
-	return value;
 }
 
 /**
@@ -275,34 +245,6 @@ export async function addValueLabels(values) {
 			];
 		})
 	);
-}
-
-/**
- * Get the label of a enum metadata given its key.
- * @param {string} metadataId
- * @param {string} key
- * @returns {Promise<string|undefined>}
- */
-export async function labelOfEnumKey(metadataId, key) {
-	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
-	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
-	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
-
-	return idb.get('MetadataOption');
-}
-
-/**
- * Get the key of a enum metadata given its label.
- * @param {string} metadataId
- * @param {string} label
- * @returns {Promise<string|undefined>}
- */
-export async function keyOfEnumLabel(metadataId, label) {
-	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
-	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
-	if (metadata.type !== 'enum') throw new Error(`Métadonnée ${metadataId} n'est pas de type enum`);
-
-	return metadata.options?.find((o) => o.label === label)?.key;
 }
 
 /**
@@ -721,7 +663,7 @@ export function isType(testedtyp, metadatatyp, value) {
  * @param {Value[]} value
  * @returns {value is (Value extends RuntimeValue ?  RuntimeValue<Type>[] : (undefined | RuntimeValue<Type>[]))}
  */
-export function areType(testedtyp, metadatatyp, value) {
+function areType(testedtyp, metadatatyp, value) {
 	return value.every((v) => isType(testedtyp, metadatatyp, v));
 }
 
@@ -757,13 +699,6 @@ export function metadataDefinitionComparator(protocol) {
  * @template Undefinable
  * @typedef{ Undefinable extends true ? T | undefined : T } Maybe
  */
-
-/**
- * @param {string} id
- */
-export function metadataById(id) {
-	return tables.Metadata.state.find((m) => m.id === id);
-}
 
 /**
  * A null-value MetadataValue object

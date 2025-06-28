@@ -1,0 +1,20 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"ignore": [
+		"src/lib/schemas/*",
+		"src/lib/utils.js",
+		"src/lib/exiffields.js",
+		"tests/**",
+		"src/service-worker.js",
+		"src/app.d.ts",
+		"src/lib/Checkbox.svelte",
+		"src/lib/Dropzone.svelte",
+		"src/lib/FloatingButton.svelte",
+		"src/lib/SelectWithSearch.svelte"
+	],
+	"ignoreDependencies": ["@iconify-json/.+"],
+	"paths": {
+		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
+		"$lib/*": ["src/lib/*"]
+	}
+}

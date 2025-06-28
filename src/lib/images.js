@@ -108,21 +108,6 @@ export function imageBufferWasSaved(image) {
 }
 
 /**
- * Download an image
- * @param {string} imageId database id for the Image object
- * @param {object} [options]
- * @param {string} [options.as] save as -- defaults to the image object's filename
- */
-export async function downloadImage(imageId, options) {
-	const image = await tables.Image.get(imageId);
-	if (!image) throw 'Image non trouvée';
-	const file = await db.get('ImageFile', imageIdToFileId(imageId));
-	if (!file) throw "L'image n'a pas de fichier associé";
-
-	downloadAsFile(file.bytes, options?.as || image.filename, image.contentType);
-}
-
-/**
  *
  * @param {string} id ImageFile ID
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]

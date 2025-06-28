@@ -59,15 +59,15 @@ ort.env.wasm.wasmPaths = {
 
 export const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
 export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de détection
-export const NUMCONF = 0.437; // seuil de confiance pour la détection
-export const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
-export const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
+const NUMCONF = 0.437; // seuil de confiance pour la détection
+const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
+const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
 /**
  *
  * @param {import('./database.js').Protocol} protocol
  * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
  */
-export function classificationInferenceSettings(protocol, modelIndex) {
+function classificationInferenceSettings(protocol, modelIndex) {
 	const matcher = match
 		.case(
 			{
@@ -133,7 +133,7 @@ export async function loadModel(protocol, modelIndex, task, onProgress, webgpu =
  * @param {boolean} webgpu
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
  */
-export async function infer(
+async function infer(
 	protocol,
 	modelIndex,
 	task,

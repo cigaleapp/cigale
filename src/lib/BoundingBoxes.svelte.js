@@ -1,28 +1,28 @@
 import { type } from 'arktype';
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
-export const centeredBoundingBox = type({
+const centeredBoundingBox = type({
 	x: 'number',
 	y: 'number',
 	w: 'number',
 	h: 'number'
 });
 
-export const topLeftBoundingBox = type({
+const topLeftBoundingBox = type({
 	x: 'number',
 	y: 'number',
 	width: 'number',
 	height: 'number'
 });
 
-export const rect = type({
+const rect = type({
 	x: 'number > 0',
 	y: 'number > 0',
 	width: 'number > 0',
 	height: 'number > 0'
 });
 
-export const anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
+const anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
 
 /**
  * @typedef {typeof anyBoundingBox.infer} AnyBoundingBox
@@ -207,7 +207,7 @@ if (import.meta.vitest) {
  * @param {AnyBoundingBox} a
  * @param {AnyBoundingBox} b
  */
-export function coordsDifference(a, b) {
+function coordsDifference(a, b) {
 	let combinedDifference = 0;
 
 	combinedDifference += Math.abs(a.x - b.x);
