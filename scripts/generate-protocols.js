@@ -8,6 +8,13 @@ const here = import.meta.dirname;
 
 const gbifIds = await fetch('https://cigaleapp.github.io/models/polymny-17k-classmapping.txt')
 	.then((res) => res.text())
+	.then(async (text) => {
+		const otherText = await fetch(
+			'https://cigaleapp.github.io/models/lightweight-80-classmapping.txt'
+		).then((res) => res.text());
+
+		return text + '\n' + otherText;
+	})
 	.then((text) =>
 		text
 			.split('\n')
