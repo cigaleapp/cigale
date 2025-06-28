@@ -74,11 +74,7 @@ const cladeMetadata = (clade, label) => ({
 	label,
 	required: false,
 	description: '',
-	mergeMethod: 'max',
-	taxonomic: {
-		clade,
-		parent: {}
-	}
+	mergeMethod: 'max'
 });
 
 /**
@@ -171,10 +167,6 @@ const protocol = {
 			required: true,
 			mergeMethod: 'max',
 			options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
-			taxonomic: {
-				clade: 'species',
-				parent: {}
-			},
 			infer: {
 				neural: [
 					{

@@ -63,30 +63,27 @@ for (const [i, { key }] of protocol.metadata[
 		);
 	}
 
-	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].taxonomic.parent[key] =
-		keys.genus;
-	newProtocol.metadata['io.github.cigaleapp.arthropods.example__genus'].taxonomic.parent[
-		keys.genus
-	] = keys.family;
-	newProtocol.metadata['io.github.cigaleapp.arthropods.example__family'].taxonomic.parent[
-		keys.family
-	] = keys.order;
-	newProtocol.metadata['io.github.cigaleapp.arthropods.example__order'].taxonomic.parent[
-		keys.order
-	] = keys.class;
-	newProtocol.metadata['io.github.cigaleapp.arthropods.example__class'].taxonomic.parent[
-		keys.class
-	] = keys.phylum;
-	newProtocol.metadata['io.github.cigaleapp.arthropods.example__phylum'].taxonomic.parent[
-		keys.phylum
-	] = keys.kingdom;
-
 	await addToOptions('genus', keys.genus, species.genus);
 	await addToOptions('family', keys.family, species.family);
 	await addToOptions('order', keys.order, species.order);
 	await addToOptions('class', keys.class, species['class']);
 	await addToOptions('phylum', keys.phylum, species.phylum);
 	await addToOptions('kingdom', keys.kingdom, species.kingdom);
+
+	await setCascadeOnOption('species', key, 'genus', keys.genus);
+	await setCascadeOnOption('genus', keys.genus, 'family', keys.family);
+	await setCascadeOnOption('family', keys.family, 'order', keys.order);
+	await setCascadeOnOption('order', keys.order, 'class', keys.class);
+	await setCascadeOnOption('class', keys.class, 'phylum', keys.phylum);
+	await setCascadeOnOption('phylum', keys.phylum, 'kingdom', keys.kingdom);
+
+	if (i % 100 === 0) {
+		await writeFile(path.join(here, './gbif.json'), JSON.stringify(cachedGbifData, null, 2));
+		await writeFile(
+			path.join(here, '../examples/arthropods.cigaleprotocol.json'),
+			JSON.stringify(newProtocol, null, 2)
+		);
+	}
 
 	process.stdout.write(
 		`\x1b[1K\rProcessed ${i + 1}/${protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.length} species: ${species.scientificName}`
@@ -97,6 +94,28 @@ await writeFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 	JSON.stringify(newProtocol, null, 2)
 );
+
+async function setCascadeOnOption(id, key, parentId, parentKey) {
+	const opts = newProtocol.metadata['io.github.cigaleapp.arthropods.example__' + id].options;
+	const opt = opts.find((o) => o.key === key);
+	if (!opt) {
+		console.warn(`Option ${id} with key ${key} not found`);
+		return;
+	}
+
+	if (!opt.cascade) {
+		opt.cascade = {};
+	}
+
+	if (opt.cascade[parentId] && opt.cascade[parentId] !== parentKey) {
+		console.warn(
+			`Option ${id} with key ${key} already has a cascade for ${parentId} with value ${opt.cascade[parentId]}, but trying to set it to ${parentKey}`
+		);
+		return;
+	}
+
+	opt.cascade[parentId] = parentKey;
+}
 
 async function addToOptions(id, key, label, description = '') {
 	const opts = newProtocol.metadata['io.github.cigaleapp.arthropods.example__' + id].options;

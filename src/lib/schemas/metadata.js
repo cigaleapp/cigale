@@ -1,7 +1,6 @@
 import { scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
-import { Clade } from '../taxonomy.js';
 import { keys } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
 
@@ -126,7 +125,12 @@ export const MetadataEnumVariant = type({
 	'image?': URLString,
 	'learnMore?': URLString.describe(
 		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
-	)
+	),
+	'cascade?': scope({ ID })
+		.type({ '[ID]': 'ID' })
+		.describe(
+			'Objet contenant pour clés des identifiants d\'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: "1", cascade: { genus: "2" } }`, une métadonnée genus ayant une option `{ key: "2", cascade: { family: "3" } }`. Si l\'option "1" de la métadonnée species est choisie, la métadonnée genus sera définie sur l\'option "2" et la métadonnée family sera à son tour définie sur l\'option "3".'
+		)
 });
 
 export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
@@ -184,20 +188,8 @@ export const Metadata = type({
 			'infer?': { latitude: MetadataInferOptions, longitude: MetadataInferOptions }
 		},
 		{
-			type: "'enum'",
-			'infer?': MetadataInferOptions,
-			'taxonomic?': type({
-				clade: Clade.describe('La clade représentée par cette métadonnée.'),
-				// taxonomy: Request.describe(
-				// 	"Fichier JSON contenant l'arbre taxonomique. Un schéma JSON décrivant ce fichier est disponible à https://cigaleapp.github.io/cigale/taxonomy.schema.json"
-				// )
-				parent: type({ '[string]': 'string' }).describe(
-					'Associe les valeurs (key) possibles de cette métadonnée aux valeurs (key) de la métadonnée représentant la clade parente'
-				)
-			}).describe(
-				"Configuration si la métadonnée inférée par le modèle est taxonomique, ce qui permet d'inférer les clades supérieures dans des métadonnées additionnelles. Bien penser à définir toutes les autres métadonnées représentant les clades supérieures avec `taxonomic.clade`"
-			)
-		},
-		{ type: MetadataType.exclude('"location" | "enum"'), 'infer?': MetadataInferOptions }
+			type: MetadataType.exclude('"location"'),
+			'infer?': MetadataInferOptions
+		}
 	)
 );

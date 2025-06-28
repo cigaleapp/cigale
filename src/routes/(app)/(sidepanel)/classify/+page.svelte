@@ -13,12 +13,11 @@
 	import { classify, loadModel, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
-	import { metadataById, storeMetadataValue } from '$lib/metadata.js';
+	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
 
@@ -156,18 +155,10 @@
 				alternatives
 			});
 
-			if ('taxonomic' in (metadataById(uiState.classificationMetadataId) ?? {})) {
-				await setTaxonAndInferParents({
-					...metadataValue,
-					protocol: uiState.currentProtocol,
-					metadataId: uiState.classificationMetadataId
-				});
-			} else {
-				await storeMetadataValue({
-					...metadataValue,
-					metadataId: uiState.classificationMetadataId
-				});
-			}
+			await storeMetadataValue({
+				...metadataValue,
+				metadataId: uiState.classificationMetadataId
+			});
 		}
 	}
 

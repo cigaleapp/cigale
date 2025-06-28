@@ -4,6 +4,8 @@ import { Schemas } from './database.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
 import * as idb from './idb.svelte.js';
 import { mapValues } from './utils.js';
+import { metadataOptionId } from './schemas/metadata.js';
+import { ensureNamespacedMetadataId, namespaceOfMetadataId } from './protocols.js';
 
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
@@ -21,6 +23,17 @@ import { mapValues } from './utils.js';
  * @typedef TypedMetadataValue
  * @type {Omit<DB.MetadataValue, 'value'> & { value: RuntimeValue<Type> }}
  */
+
+/**
+ *
+ * @param {string} metadataId
+ */
+export function metadataOptionsKeyRange(metadataId) {
+	return IDBKeyRange.bound(
+		metadataOptionId(metadataId, ''),
+		metadataOptionId(metadataId, '\uffff')
+	);
+}
 
 /**
  * Get a strongly-typed metadata value from an image (Image ONLY, not Observation).
@@ -80,19 +93,22 @@ export function serializeMetadataValue(value) {
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
  * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
+ * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  */
 export async function storeMetadataValue({
 	subjectId,
 	metadataId,
 	type,
 	value,
-	confidence,
-	alternatives,
+	confidence = 1,
+	alternatives = [],
 	manuallyModified = false,
-	tx = undefined
+	tx = undefined,
+	cascadedFrom = []
 }) {
-	alternatives ??= [];
-	confidence ??= 1;
+	if (!namespaceOfMetadataId(metadataId)) {
+		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
+	}
 
 	const newValue = {
 		value: serializeMetadataValue(value),
@@ -147,6 +163,32 @@ export async function storeMetadataValue({
 		].metadataOverrides[metadataId] = newValue;
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+	}
+
+	// Execute cascades if any
+	const cascades = await idb
+		.get('MetadataOption', metadataOptionId(metadataId, value.toString()))
+		.then((o) => o?.cascade ?? {});
+
+	for (const [cascadedMetadataId, cascadedValue] of Object.entries(cascades)) {
+		if (cascadedFrom.includes(cascadedMetadataId)) {
+			throw new Error(
+				`Boucle infinie de cascade détectée pour ${cascadedMetadataId} avec ${cascadedValue}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascadedMetadataId}`
+			);
+		}
+
+		console.info(
+			`Cascading metadata ${metadataId} @ ${value} -> ${cascadedMetadataId}  = ${cascadedValue}`
+		);
+		await storeMetadataValue({
+			subjectId,
+			metadataId: ensureNamespacedMetadataId(cascadedMetadataId, namespaceOfMetadataId(metadataId)),
+			value: cascadedValue,
+			confidence: 1, // TODO maybe improve that?
+			manuallyModified,
+			tx,
+			cascadedFrom: [...cascadedFrom, metadataId]
+		});
 	}
 }
 
@@ -639,7 +681,7 @@ export function metadataPrettyKey(metadata) {
 
 /**
  * Asserts that a metadata is of a certain type, inferring the correct runtime type for its value
- * @template {DB.MetadataType} Type
+ * @template {DB.} Type
  * @template {undefined | RuntimeValue} Value
  * @param {Type} testedtyp
  * @param {DB.MetadataType} metadatatyp
