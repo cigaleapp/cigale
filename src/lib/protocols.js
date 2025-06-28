@@ -158,12 +158,14 @@ export async function promptAndImportProtocol({ allowMultiple } = {}) {
 			/** @type {Array<typeof ExportedProtocol.infer>}  */
 			const output = await Promise.all(
 				[...input.files].map(async (file) => {
+					console.time(`Reading file ${file.name}`);
 					const reader = new FileReader();
 					return new Promise((resolve) => {
 						reader.onload = async () => {
 							if (!reader.result) throw new Error('Fichier vide');
 							if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-							importProtocol(reader.result)
+							console.timeEnd(`Reading file ${file.name}`);
+							importProtocol(reader.result, { json: file.name.endsWith('.json') })
 								.then(resolve)
 								.catch((err) =>
 									reject(
@@ -187,12 +189,16 @@ export async function promptAndImportProtocol({ allowMultiple } = {}) {
 /**
  *
  * @param {string} contents
+ * @param {Object} [options]
+ * @param {boolean} [options.json=false] parse as JSON instead of YAML, useful for performance if you're usre the contents represents JSON and not just YAML
  */
-export async function importProtocol(contents) {
+export async function importProtocol(contents, { json = false } = {}) {
 	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
 	// (Node does not like .svelte.js files' runes)
 	const { openTransaction } = await import('./idb.svelte.js');
-	let parsed = YAML.parse(contents);
+	console.time('Parsing protocol');
+	let parsed = json ? JSON.parse(contents) : YAML.parse(contents);
+	console.timeEnd('Parsing protocol');
 
 	console.info(`Importing protocol ${parsed.id}`);
 	console.info(parsed);
@@ -205,27 +211,41 @@ export async function importProtocol(contents) {
 		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
 	);
 
+	console.time('Validating protocol');
 	const protocol = ExportedProtocol.in.assert(parsed);
+	console.timeEnd('Validating protocol');
 
 	await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
+		console.time('Storing Protocol');
 		tx.objectStore('Protocol').put({
 			...protocol,
 			metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
 		});
+		console.timeEnd('Storing Protocol');
+
 		for (const [id, metadata] of Object.entries(protocol.metadata)) {
 			if (typeof metadata === 'string') continue;
 
+			console.time(`Storing Metadata ${id}`);
 			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
+			console.timeEnd(`Storing Metadata ${id}`);
 
+			console.time(`Storing Metadata Options for ${id}`);
 			for (const option of metadata.options ?? []) {
 				tx.objectStore('MetadataOption').put({
 					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
 					...option
 				});
 			}
+			console.timeEnd(`Storing Metadata Options for ${id}`);
 		}
 	});
-	return ExportedProtocol.assert(protocol);
+
+	console.time('Validating protocol after storing');
+	const validated = ExportedProtocol.assert(protocol);
+	console.timeEnd('Validating protocol after storing');
+
+	return validated;
 }
 
 /**
