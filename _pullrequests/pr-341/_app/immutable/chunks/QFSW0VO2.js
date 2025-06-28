@@ -1,0 +1,1 @@
+import"./CWj6FrbW.js";import{b as n,i as s,r as c,a as l}from"./DoAsd3Kp.js";import{d as m}from"./wjwwJQst.js";import{s as p}from"./DJxznbdt.js";var f=n('<button class="svelte-fgecze"><!></button>');function v(e,o){var t=f();t.__click=function(...r){var a;(a=o.onclick)==null||a.apply(this,r)};var i=s(t);p(i,()=>o.children),c(t),l(e,t)}m(["click"]);export{v as default};
