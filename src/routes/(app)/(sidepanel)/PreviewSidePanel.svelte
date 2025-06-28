@@ -81,6 +81,9 @@
 			for (const { metadataId, key, ...rest } of result) {
 				options[metadataId].push({ key: key.toString(), ...rest });
 			}
+			for (const metadataId of Object.keys(options)) {
+				options[metadataId].sort((a, b) => a.label.localeCompare(b.label));
+			}
 			loadingOptions = false;
 		});
 	});
