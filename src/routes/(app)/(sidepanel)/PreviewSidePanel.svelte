@@ -6,6 +6,7 @@
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { countThings } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
+	import * as idb from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { metadataDefinitionComparator } from '$lib/metadata';
@@ -14,6 +15,7 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import deepEqual from 'deep-equal';
+	import { watch } from 'runed';
 	import IconSplit from '~icons/ph/arrows-out-light';
 	import IconObservation from '~icons/ph/bug-beetle';
 	import IconImage from '~icons/ph/image';
@@ -57,6 +59,25 @@
 			.toSorted(metadataDefinitionComparator(protocol));
 	});
 
+	/**
+	 * Contains EVERY options for every metadata.
+	 * This is a SHALLOW $state, otherwise it makes the browser lag the hell out cuz Svelte's runtime tries to deeply proxify everything (some metadata can have tens of thousands of options).
+	 * @type {Record<string, import('$lib/database').MetadataEnumVariant[]>} */
+	const options = $state.raw({});
+
+	let loadingOptions = $state(true);
+	watch([() => definitions], () => {
+		for (const definition of definitions) {
+			options[definition.id] = [];
+		}
+		idb.list('MetadataOption').then((result) => {
+			for (const { metadataId, key, ...rest } of result) {
+				options[metadataId].push({ key: key.toString(), ...rest });
+			}
+			loadingOptions = false;
+		});
+	});
+
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
 
 	const singleObservationSelected = $derived(
@@ -80,8 +101,12 @@
 	});
 </script>
 
-<aside data-testid="sidepanel" class="sidepanel" class:empty={images.length === 0}>
-	{#if images.length > 0}
+<aside
+	data-testid="sidepanel"
+	class="sidepanel"
+	class:empty={images.length === 0 || loadingOptions}
+>
+	{#if images.length > 0 && !loadingOptions}
 		<div class="images">
 			{#each images as { src, box }, i (i)}
 				{@const alt = singleObservationSelected
@@ -120,6 +145,7 @@
 						merged={value?.merged}
 						{definition}
 						{value}
+						options={options[definition.id]}
 						onchange={async (v) => {
 							if (deepEqual(v, value?.value)) return;
 							onmetadatachange(definition.id, v);
@@ -128,6 +154,11 @@
 				{/if}
 			{/each}
 		</MetadataList>
+	{:else if loadingOptions}
+		<section class="empty-selection">
+			<Logo variant="empty" />
+			<p>Chargement des options…</p>
+		</section>
 	{:else}
 		<section class="empty-selection">
 			<Logo variant="empty" />
