@@ -73,12 +73,9 @@
 			return;
 		}
 
-		for (const definition of definitions) {
-			options[definition.id] = [];
-		}
-
 		idb.list('MetadataOption').then((result) => {
 			for (const { metadataId, key, ...rest } of result) {
+				options[metadataId] ??= [];
 				options[metadataId].push({ key: key.toString(), ...rest });
 			}
 			for (const metadataId of Object.keys(options)) {
