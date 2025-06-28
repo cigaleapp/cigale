@@ -9,6 +9,16 @@ const here = import.meta.dirname;
  */
 const cachedGbifData = await readFile(path.join(here, './gbif.json'), 'utf-8')
 	.then((v) => JSON.parse(v))
+	.catch(() =>
+		fetch('https://github.com/cigaleapp/models/raw/refs/heads/main/gbif.json')
+			.then((res) => res.json())
+			.then((json) => {
+				void (async () => {
+					writeFile(path.join(here, './gbif.json'), JSON.stringify(json, null, 2));
+				})();
+				return json;
+			})
+	)
 	.catch(() => ({}));
 
 /**
@@ -77,19 +87,12 @@ for (const [i, { key }] of protocol.metadata[
 	await setCascadeOnOption('class', keys.class, 'phylum', keys.phylum);
 	await setCascadeOnOption('phylum', keys.phylum, 'kingdom', keys.kingdom);
 
-	if (i % 100 === 0) {
-		await writeFile(path.join(here, './gbif.json'), JSON.stringify(cachedGbifData, null, 2));
-		await writeFile(
-			path.join(here, '../examples/arthropods.cigaleprotocol.json'),
-			JSON.stringify(newProtocol, null, 2)
-		);
-	}
-
 	process.stdout.write(
 		`\x1b[1K\rProcessed ${i + 1}/${protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.length} species: ${species.scientificName}`
 	);
 }
 
+await writeFile(path.join(here, './gbif.json'), JSON.stringify(cachedGbifData, null, 2));
 await writeFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 	JSON.stringify(newProtocol, null, 2)
