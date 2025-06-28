@@ -1,6 +1,7 @@
 <script>
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { marked } from 'marked';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import IconArrowRight from '~icons/ph/arrow-right';
 	import IconCheck from '~icons/ph/check';
 	import Logo from './Logo.svelte';
@@ -101,7 +102,7 @@
 		>
 			<div class="viewport">
 				<div class="items">
-					{#each filteredItems as item, i (i + item.value)}
+					<VirtualList items={filteredItems} let:item>
 						<Combobox.Item
 							value={item.value}
 							label={item.label}
@@ -121,9 +122,10 @@
 								</div>
 							{/snippet}
 						</Combobox.Item>
-					{:else}
+					</VirtualList>
+					{#if filteredItems.length === 0}
 						<span class="no-results">Aucun résultat :/</span>
-					{/each}
+					{/if}
 				</div>
 				<div class="docs">
 					{#if highlightedOption?.image}
