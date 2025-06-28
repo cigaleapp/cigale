@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.37% </span>
+                <span class="strong">93.56% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>218/236</span>
+                <span class='fraction'>218/233</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">78.26% </span>
+                <span class="strong">80.59% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>54/69</span>
+                <span class='fraction'>54/67</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.37% </span>
+                <span class="strong">93.56% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>218/236</span>
+                <span class='fraction'>218/233</span>
             </div>
         
             
@@ -319,10 +319,8 @@
 <a name='L254'></a><a href='#L254'>254</a>
 <a name='L255'></a><a href='#L255'>255</a>
 <a name='L256'></a><a href='#L256'>256</a>
-<a name='L257'></a><a href='#L257'>257</a>
-<a name='L258'></a><a href='#L258'>258</a>
-<a name='L259'></a><a href='#L259'>259</a>
-<a name='L260'></a><a href='#L260'>260</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L257'></a><a href='#L257'>257</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -383,22 +381,18 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -589,6 +583,7 @@ import { Schemas } from './database.js';
 import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
+import { ensureNamespacedMetadataId } from './protocols.js';
 import { toasts } from './toasts.svelte.js';
 &nbsp;
 /**
@@ -639,25 +634,21 @@ export async function processExifData(protocolId, imageFileId, imageBytes, file)
 <span class="cstat-no" title="statement not covered" >		return {};</span>
 	});
 &nbsp;
-	await db.openTransaction(['Image', 'Observation'], {}, async (tx) =&gt; {
-		const images = await tx
-			.objectStore('Image')
-			.getAll()
-			.then((imgs) =&gt; imgs.filter((img) =&gt; img.fileId === imageFileId));
+	const images = await db
+		.list('Image')
+		.then((imgs) =&gt; imgs.filter((img) =&gt; img.fileId === imageFileId));
 &nbsp;
-		for (const { id: subjectId } of images) {
-			for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: key,
-					value,
-					confidence
-				})<span class="branch-0 cbranch-no" title="branch not covered" >;</span>
-<span class="cstat-no" title="statement not covered" >			}</span>
-<span class="cstat-no" title="statement not covered" >		}</span>
-	})<span class="branch-0 cbranch-no" title="branch not covered" >;</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+	for (const { id: subjectId } of images) {
+		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+			await storeMetadataValue({
+				subjectId,
+				metadataId: ensureNamespacedMetadataId(key, protocolId),
+				value,
+				confidence
+			});
+		}
+	}
+}
 &nbsp;
 /**
  * @typedef {object} ExifExtractionPlanItem
@@ -847,7 +838,7 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-28T16:18:21.000Z
+                at 2025-06-28T16:37:35.901Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

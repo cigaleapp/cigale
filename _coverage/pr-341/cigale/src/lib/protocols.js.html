@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">59.09% </span>
+                <span class="strong">61% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>247/418</span>
+                <span class='fraction'>255/418</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.66% </span>
+                <span class="strong">90% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>33/36</span>
+                <span class='fraction'>36/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">35.29% </span>
+                <span class="strong">52.94% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>6/17</span>
+                <span class='fraction'>9/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">59.09% </span>
+                <span class="strong">61% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>247/418</span>
+                <span class='fraction'>255/418</span>
             </div>
         
             
@@ -555,7 +555,17 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -565,20 +575,10 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -595,10 +595,10 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1022,18 +1022,18 @@ export <span class="fstat-no" title="function not covered" >function jsonSchemaU
  * @param {string} metadataId
  * @returns {`${ProtocolID}__${string}`}
  */
-export <span class="fstat-no" title="function not covered" >function namespacedMetadataId(protocolId, metadataId) {</span>
-<span class="cstat-no" title="statement not covered" >	metadataId = metadataId.replace(/^.+__/, '');</span>
-<span class="cstat-no" title="statement not covered" >	return `${protocolId}__${metadataId}`;</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+export function namespacedMetadataId(protocolId, metadataId) {
+	metadataId = metadataId.replace(/^.+__/, '');
+	return `${protocolId}__${metadataId}`;
+}
 &nbsp;
 /**
  * Ensures a metadata ID is namespaced to the given protocol ID. If the metadata ID is not namespaced, it will be prefixed with the protocol ID. If it already is namespaced, it will stay as is.
  * @param {string} metadataId the metadata ID to ensure is namespaced
  * @param {string} fallbackProtocolId the protocol ID to use if the metadata ID is not namespaced
  */
-export <span class="fstat-no" title="function not covered" >function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {</span>
-<span class="cstat-no" title="statement not covered" >	if (isNamespacedToProtocol(fallbackProtocolId, metadataId)) return metadataId;</span>
+export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
+	if (isNamespacedToProtocol(fallbackProtocolId, metadataId)) return metadataId<span class="branch-0 cbranch-no" title="branch not covered" >;</span>
 <span class="cstat-no" title="statement not covered" >	return namespacedMetadataId(fallbackProtocolId, metadataId);</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
@@ -1044,9 +1044,9 @@ export <span class="fstat-no" title="function not covered" >function ensureNames
  * @param {string} metadataId
  * @returns {metadataId is `${ProtocolID}__${string}` }
  */
-export <span class="fstat-no" title="function not covered" >function isNamespacedToProtocol(protocolId, metadataId) {</span>
-<span class="cstat-no" title="statement not covered" >	return metadataId.startsWith(`${protocolId}__`);</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+export function isNamespacedToProtocol(protocolId, metadataId) {
+	return metadataId.startsWith(`${protocolId}__`);
+}
 &nbsp;
 /**
  *
@@ -1064,9 +1064,9 @@ export <span class="fstat-no" title="function not covered" >function removeNames
  */
 export function namespaceOfMetadataId(metadataId) {
 	const parts = metadataId.split('__');
-	if (parts.length &lt; 2) return undefined<span class="branch-0 cbranch-no" title="branch not covered" >;</span>
-<span class="cstat-no" title="statement not covered" >	return parts.slice(0, -1).join('__');</span>
-<span class="cstat-no" title="statement not covered" >}</span>
+	if (parts.length &lt; 2) <span class="branch-0 cbranch-no" title="branch not covered" >return undefined;</span>
+	return parts.slice(0, -1).join('__');
+}
 &nbsp;
 export const ExportedProtocol = Schemas.Protocol.omit('metadata')
 	.in.and({
@@ -1474,7 +1474,7 @@ export <span class="fstat-no" title="function not covered" >async function upgra
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-28T16:18:21.000Z
+                at 2025-06-28T16:37:35.901Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
