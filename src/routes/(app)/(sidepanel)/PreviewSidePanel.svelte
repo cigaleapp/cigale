@@ -67,9 +67,16 @@
 
 	let loadingOptions = $state(true);
 	watch([() => definitions], () => {
+		// Prevent double-load
+		if (Object.keys(options).length > 0) {
+			loadingOptions = false;
+			return;
+		}
+
 		for (const definition of definitions) {
 			options[definition.id] = [];
 		}
+
 		idb.list('MetadataOption').then((result) => {
 			for (const { metadataId, key, ...rest } of result) {
 				options[metadataId].push({ key: key.toString(), ...rest });
