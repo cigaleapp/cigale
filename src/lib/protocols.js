@@ -144,10 +144,11 @@ function downloadProtocol(base, format, exportedProtocol) {
  * Asks the user to select files, then imports the protocols from those files.
  * @template {boolean|undefined} Multiple
  * @param {object} param0
- * @param {Multiple} [param0.allowMultiple=true] allow the user to select multiple files
+ * @param {Multiple} [param0.allowMultiple] allow the user to select multiple files
+ * @param {() => void} [param0.onInput] callback to call when the user selected files
  * @returns {Promise<Multiple extends true ? Array<typeof ExportedProtocol.infer> : typeof ExportedProtocol.infer>}
  */
-export async function promptAndImportProtocol({ allowMultiple } = {}) {
+export async function promptAndImportProtocol({ allowMultiple, onInput = () => {} } = {}) {
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
@@ -155,6 +156,7 @@ export async function promptAndImportProtocol({ allowMultiple } = {}) {
 		input.accept = ['.json', '.yaml', 'application/json'].join(',');
 		input.onchange = async () => {
 			if (!input.files || !input.files[0]) return;
+			onInput();
 			/** @type {Array<typeof ExportedProtocol.infer>}  */
 			const output = await Promise.all(
 				[...input.files].map(async (file) => {

@@ -204,18 +204,25 @@
 			Gérer les protocoles
 		</ButtonSecondary>
 		<ButtonSecondary
-			onclick={async () => {
-				const protocol = await promptAndImportProtocol({ allowMultiple: false }).catch((e) =>
-					toasts.error(e)
-				);
+			loading
+			onclick={async (_, signals) => {
+				const protocol = await promptAndImportProtocol({
+					allowMultiple: false,
+					onInput: signals.loadingStarted
+				}).catch((e) => toasts.error(e));
 				if (!protocol || typeof protocol === 'string') return;
 				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);
 				uiState.currentProtocolId = protocol.id;
 				goto('#/import');
 			}}
 		>
-			<IconImport />
-			Importer un protocole
+			{#snippet children({ loading })}
+				{#if !loading}
+					<IconImport />
+				{/if}
+
+				Importer un protocole
+			{/snippet}
 		</ButtonSecondary>
 	</section>
 </div>
