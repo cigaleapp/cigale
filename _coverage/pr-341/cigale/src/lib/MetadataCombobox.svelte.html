@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/62</span>
+                <span class='fraction'>0/60</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/62</span>
+                <span class='fraction'>0/60</span>
             </div>
         
             
@@ -361,7 +361,8 @@
 <a name='L296'></a><a href='#L296'>296</a>
 <a name='L297'></a><a href='#L297'>297</a>
 <a name='L298'></a><a href='#L298'>298</a>
-<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -388,15 +389,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -405,7 +397,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -413,16 +414,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -433,6 +427,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -485,6 +486,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -662,6 +664,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;script&gt;
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { marked } from 'marked';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import IconArrowRight from '~icons/ph/arrow-right';
 	import IconCheck from '~icons/ph/check';
 	import Logo from './Logo.svelte';
@@ -704,16 +707,15 @@
 <span class="cstat-no" title="statement not covered" >	const items = $derived(options.map((opt) =&gt; ({ value: opt.key, label: opt.label })));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const filteredItems = $derived.by(() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >		if (searchValue === '')</span>
-<span class="cstat-no" title="statement not covered" >			return items.toSorted((a, b) =&gt; {</span>
-				// Sort selected item first, then items with confidences (from high to low), then the rest, alphabetically
-<span class="cstat-no" title="statement not covered" >				const confidence = (/** @type {string} */ key) =&gt; confidences[key] ?? -1;</span>
-<span class="cstat-no" title="statement not covered" >				if (a.value === value) return -1;</span>
-<span class="cstat-no" title="statement not covered" >				if (b.value === value) return 1;</span>
-<span class="cstat-no" title="statement not covered" >				const confidenceDiff = confidence(b.value) - confidence(a.value);</span>
-<span class="cstat-no" title="statement not covered" >				if (confidenceDiff !== 0) return confidenceDiff;</span>
-<span class="cstat-no" title="statement not covered" >				return a.label.localeCompare(b.label);</span>
-<span class="cstat-no" title="statement not covered" >			});</span>
+<span class="cstat-no" title="statement not covered" >		if (searchValue === '') {</span>
+			return [
+<span class="cstat-no" title="statement not covered" >				...items</span>
+<span class="cstat-no" title="statement not covered" >					.filter(({ value }) =&gt; value in confidences)</span>
+<span class="cstat-no" title="statement not covered" >					.toSorted((a, b) =&gt; confidences[b.value] - confidences[a.value]),</span>
+<span class="cstat-no" title="statement not covered" >				...items.filter(({ value }) =&gt; !(value in confidences))</span>
+			];
+<span class="cstat-no" title="statement not covered" >		}</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >		return items.filter((item) =&gt; item.label.toLowerCase().includes(searchValue.toLowerCase()));</span>
 <span class="cstat-no" title="statement not covered" >	});</span>
 &nbsp;
@@ -762,7 +764,7 @@
 		&gt;
 			&lt;div class="viewport"&gt;
 				&lt;div class="items"&gt;
-<span class="cstat-no" title="statement not covered" >					{#each filteredItems as item, i (i + item.value)}</span>
+<span class="cstat-no" title="statement not covered" >					&lt;VirtualList items={filteredItems} let:item&gt;</span>
 						&lt;Combobox.Item
 <span class="cstat-no" title="statement not covered" >							value={item.value}</span>
 <span class="cstat-no" title="statement not covered" >							label={item.label}</span>
@@ -782,9 +784,10 @@
 								&lt;/div&gt;
 							{/snippet}
 						&lt;/Combobox.Item&gt;
-					{:else}
+					&lt;/VirtualList&gt;
+<span class="cstat-no" title="statement not covered" >					{#if filteredItems.length === 0}</span>
 						&lt;span class="no-results"&gt;Aucun résultat :/&lt;/span&gt;
-					{/each}
+					{/if}
 				&lt;/div&gt;
 				&lt;div class="docs"&gt;
 <span class="cstat-no" title="statement not covered" >					{#if highlightedOption?.image}</span>
@@ -964,7 +967,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-28T12:15:29.192Z
+                at 2025-06-28T16:04:29.386Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

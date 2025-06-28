@@ -263,7 +263,9 @@
 <a name='L198'></a><a href='#L198'>198</a>
 <a name='L199'></a><a href='#L199'>199</a>
 <a name='L200'></a><a href='#L200'>200</a>
-<a name='L201'></a><a href='#L201'>201</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -279,6 +281,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -286,26 +310,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -478,13 +482,14 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {import('./database').Metadata} definition
+	 * @property {import('./database').MetadataEnumVariant[]} [options]
 	 * @property {undefined | import('./database').MetadataValue} value
 	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
 	 * @property {(value: undefined | import('./metadata').RuntimeValue) =&gt; void} [onchange]
 	 */
 &nbsp;
 	/** @type {Props} */
-<span class="cstat-no" title="statement not covered" >	let { value, merged, definition, onchange = () =&gt; {} } = $props();</span>
+<span class="cstat-no" title="statement not covered" >	let { value, merged, definition, options = [], onchange = () =&gt; {} } = $props();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const _id = $props.id();</span>
 &lt;/script&gt;
@@ -507,6 +512,7 @@
 			&lt;MetadataInput
 <span class="cstat-no" title="statement not covered" >				id={_id}</span>
 				{definition}
+				{options}
 <span class="cstat-no" title="statement not covered" >				value={value?.value}</span>
 <span class="cstat-no" title="statement not covered" >				onblur={onchange}</span>
 				{merged}
@@ -550,7 +556,7 @@
 <span class="cstat-no" title="statement not covered" >				{#each Object.entries(value.alternatives).sort(([, a], [, b]) =&gt; b - a) as [jsonValue, confidence] (jsonValue)}</span>
 <span class="cstat-no" title="statement not covered" >					{@const stringValue = safeJSONParse(jsonValue)?.toString()}</span>
 <span class="cstat-no" title="statement not covered" >					{@const enumVariant = isType('enum', definition.type, stringValue)</span>
-<span class="cstat-no" title="statement not covered" >						? definition.options?.find(({ key }) =&gt; key === stringValue)</span>
+<span class="cstat-no" title="statement not covered" >						? options?.find(({ key }) =&gt; key === stringValue)</span>
 <span class="cstat-no" title="statement not covered" >						: undefined}</span>
 					&lt;li&gt;
 <span class="cstat-no" title="statement not covered" >						&lt;div class="value" use:tooltip={enumVariant?.description}&gt;</span>
@@ -670,7 +676,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-28T12:15:29.192Z
+                at 2025-06-28T16:04:29.386Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
