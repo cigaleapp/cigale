@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import lightProtocol from '../examples/arthropods.cigaleprotocol.light.json' with { type: 'json' };
 import path from 'node:path';
 
 const here = import.meta.dirname;
@@ -43,6 +44,7 @@ async function getSpecies(gbifId) {
 }
 
 const newProtocol = { ...protocol };
+const newLightProtocol = { ...lightProtocol };
 
 for (const [i, { key }] of protocol.metadata[
 	'io.github.cigaleapp.arthropods.example__species'
@@ -52,6 +54,12 @@ for (const [i, { key }] of protocol.metadata[
 		console.warn(`No species found for GBIF ID ${key}`);
 		continue;
 	}
+
+	const addToLight = newLightProtocol.metadata[
+		'io.github.cigaleapp.arthropods.example.light__species'
+	].options.find((o) => o.key === key);
+
+	const protocols = addToLight ? [newLightProtocol, newProtocol] : [newProtocol];
 
 	const keys = {
 		genus: species.genusKey?.toString(),
@@ -73,19 +81,19 @@ for (const [i, { key }] of protocol.metadata[
 		);
 	}
 
-	await addToOptions('genus', keys.genus, species.genus);
-	await addToOptions('family', keys.family, species.family);
-	await addToOptions('order', keys.order, species.order);
-	await addToOptions('class', keys.class, species['class']);
-	await addToOptions('phylum', keys.phylum, species.phylum);
-	await addToOptions('kingdom', keys.kingdom, species.kingdom);
+	await addToOptions(protocols, 'genus', keys.genus, species.genus);
+	await addToOptions(protocols, 'family', keys.family, species.family);
+	await addToOptions(protocols, 'order', keys.order, species.order);
+	await addToOptions(protocols, 'class', keys.class, species['class']);
+	await addToOptions(protocols, 'phylum', keys.phylum, species.phylum);
+	await addToOptions(protocols, 'kingdom', keys.kingdom, species.kingdom);
 
-	await setCascadeOnOption('species', key, 'genus', keys.genus);
-	await setCascadeOnOption('genus', keys.genus, 'family', keys.family);
-	await setCascadeOnOption('family', keys.family, 'order', keys.order);
-	await setCascadeOnOption('order', keys.order, 'class', keys.class);
-	await setCascadeOnOption('class', keys.class, 'phylum', keys.phylum);
-	await setCascadeOnOption('phylum', keys.phylum, 'kingdom', keys.kingdom);
+	await setCascadeOnOption(protocols, 'species', key, 'genus', keys.genus);
+	await setCascadeOnOption(protocols, 'genus', keys.genus, 'family', keys.family);
+	await setCascadeOnOption(protocols, 'family', keys.family, 'order', keys.order);
+	await setCascadeOnOption(protocols, 'order', keys.order, 'class', keys.class);
+	await setCascadeOnOption(protocols, 'class', keys.class, 'phylum', keys.phylum);
+	await setCascadeOnOption(protocols, 'phylum', keys.phylum, 'kingdom', keys.kingdom);
 
 	process.stdout.write(
 		`\x1b[1K\rProcessed ${i + 1}/${protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.length} species: ${species.scientificName}`
@@ -101,9 +109,14 @@ await writeFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 	JSON.stringify(newProtocol, null, 2)
 );
+await writeFile(
+	path.join(here, '../examples/arthropods.cigaleprotocol.light.json'),
+	JSON.stringify(newLightProtocol, null, 2)
+);
 
-async function setCascadeOnOption(id, key, parentId, parentKey) {
-	const opts = newProtocol.metadata['io.github.cigaleapp.arthropods.example__' + id].options;
+async function setCascadeOnOption(protocols, id, key, parentId, parentKey) {
+	const [protocol, ...rest] = protocols;
+	const opts = protocol.metadata[`${protocol.id}__${id}`].options;
 	const opt = opts.find((o) => o.key === key);
 	if (!opt) {
 		console.warn(`Option ${id} with key ${key} not found`);
@@ -122,10 +135,15 @@ async function setCascadeOnOption(id, key, parentId, parentKey) {
 	}
 
 	opt.cascade[parentId] = parentKey;
+
+	if (rest.length > 0) {
+		await setCascadeOnOption(rest, id, key, parentId, parentKey);
+	}
 }
 
-async function addToOptions(id, key, label, description = '') {
-	const opts = newProtocol.metadata['io.github.cigaleapp.arthropods.example__' + id].options;
+async function addToOptions(protocols, id, key, label, description = '') {
+	const [protocol, ...rest] = protocols;
+	const opts = protocol.metadata[`${protocol.id}__${id}`].options;
 	if (opts.some((o) => o.key === key)) return;
 
 	if (!key) {
@@ -145,6 +163,10 @@ async function addToOptions(id, key, label, description = '') {
 			learnMore: `https://gbif.org/species/${key}`
 		})
 	);
+
+	if (rest.length > 0) {
+		await addToOptions(rest, id, key, label, description);
+	}
 }
 
 /**

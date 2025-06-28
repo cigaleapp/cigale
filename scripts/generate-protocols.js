@@ -6,22 +6,26 @@ import { writeFileSync } from 'node:fs';
 
 const here = import.meta.dirname;
 
-const gbifIds = await fetch('https://cigaleapp.github.io/models/polymny-17k-classmapping.txt')
-	.then((res) => res.text())
-	.then(async (text) => {
-		const otherText = await fetch(
-			'https://cigaleapp.github.io/models/lightweight-80-classmapping.txt'
-		).then((res) => res.text());
+async function gbifIds(url) {
+	return fetch(url)
+		.then((res) => res.text())
+		.then((text) =>
+			text
+				.split('\n')
+				.map((line) => line.trim())
+				.filter((line) => Boolean(line))
+				.filter((line) => !Number.isNaN(Number.parseInt(line)))
+		);
+}
 
-		return text + '\n' + otherText;
-	})
-	.then((text) =>
-		text
-			.split('\n')
-			.map((line) => line.trim())
-			.filter((line) => Boolean(line))
-			.filter((line) => !Number.isNaN(Number.parseInt(line)))
-	);
+const lightweightModelGbifIds = await gbifIds(
+	'https://cigaleapp.github.io/models/lightweight-80-classmapping.txt'
+);
+
+const allGbifIds = new Set([
+	...(await gbifIds('https://cigaleapp.github.io/models/polymny-17k-classmapping.txt')),
+	...lightweightModelGbifIds
+]);
 
 const gbifIdToCanonicalName = await fetch(
 	'https://raw.githubusercontent.com/cigaleapp/models/main/gbif-id-to-canonical-name.json'
@@ -39,13 +43,13 @@ const gbifIdToCanonicalName = await fetch(
  * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}
  */
 const options = [];
-for (const gbifId of gbifIds) {
+for (const gbifId of allGbifIds) {
 	const name =
 		gbifIdToCanonicalName[Number.parseInt(gbifId)] ??
 		(await fetch(`https://api.gbif.org/v1/species/${gbifId}/name`)
 			.then((res) => res.json())
 			.then((data) => data.canonicalName));
-	process.stdout.write(`\x1b[2K\r[${options.length}/${gbifIds.length}] ${gbifId} -> ${name}`);
+	process.stdout.write(`\x1b[2K\r[${options.length}/${allGbifIds.size}] ${gbifId} -> ${name}`);
 	options.push({
 		key: gbifId,
 		label: name,
@@ -251,6 +255,41 @@ writeFileSync(
 writeFileSync(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 	JSON.stringify(protocol, null, 2)
+);
+
+writeFileSync(
+	path.join(here, '../examples/arthropods.cigaleprotocol.light.json'),
+	JSON.stringify(
+		{
+			...protocol,
+			id: 'io.github.cigaleapp.arthropods.example.light',
+			name: `Example: arthropodes (lightweight)`,
+			source: protocol.source.replace(
+				'arthropods.cigaleprotocol.json',
+				'arthropods.cigaleprotocol.light.json'
+			),
+			learnMore: protocol.learnMore.replace('arthropodsexample', 'arthropodsexamplelight'),
+			metadata: {
+				...protocol.metadata,
+				[namespaced('species')]: {
+					...protocol.metadata[namespaced('species')],
+					options: protocol.metadata[namespaced('species')].options.filter((o) =>
+						lightweightModelGbifIds.includes(o.key)
+					),
+					infer: {
+						neural: protocol.metadata[namespaced('species')].infer.neural.filter(
+							(model) => model.name === 'Léger (~80 classes)'
+						)
+					}
+				}
+			}
+		},
+		null,
+		2
+	).replaceAll(
+		'io.github.cigaleapp.arthropods.example__',
+		'io.github.cigaleapp.arthropods.example.light__'
+	)
 );
 
 console.log(

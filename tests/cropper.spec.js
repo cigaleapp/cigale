@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures.js';
+import { expect, test, exampleProtocol } from './fixtures.js';
 import {
 	getImage,
 	getSettings,
@@ -523,9 +523,7 @@ function confirmedCropBadge(page) {
  */
 async function isImageConfirmedInDatabase(page, id) {
 	const image = await getImage({ page }, id);
-	return (
-		image?.metadata?.['io.github.cigaleapp.arthropods.example__crop_is_confirmed']?.value === 'true'
-	);
+	return image?.metadata?.[exampleProtocol.crop.confirmationMetadata]?.value === 'true';
 }
 
 /**
@@ -541,7 +539,7 @@ async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 			{ page },
 			id,
 			{
-				'io.github.cigaleapp.arthropods.example__crop_is_confirmed': {
+				[exampleProtocol.crop.confirmationMetadata]: {
 					value: confirmed,
 					manuallyModified: true,
 					confidence: 1,
