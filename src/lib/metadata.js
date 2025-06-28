@@ -3,7 +3,7 @@ import { format, isValid } from 'date-fns';
 import { Schemas } from './database.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
 import * as idb from './idb.svelte.js';
-import { mapValues } from './utils.js';
+import { avg, mapValues } from './utils.js';
 import { metadataOptionId } from './schemas/metadata.js';
 import { ensureNamespacedMetadataId, namespaceOfMetadataId } from './protocols.js';
 
@@ -473,11 +473,6 @@ function mergeByMajority(_type, values, strategy) {
 		console.error(error);
 		return bestValues[0].value;
 	}
-}
-
-/** @param {number[]} values  */
-function avg(values) {
-	return values.reduce((acc, cur) => acc + cur, 0) / values.length;
 }
 
 /**
