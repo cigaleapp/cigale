@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test';
 import { rm, mkdir } from 'node:fs/promises';
-import exampleProtocol from '../examples/arthropods.cigaleprotocol.light.json' with { type: 'json' };
+import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
 export { exampleProtocol };
 
