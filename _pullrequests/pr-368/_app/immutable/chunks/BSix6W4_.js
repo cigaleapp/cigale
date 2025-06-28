@@ -1,0 +1,1 @@
+const t="useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";let e=(n=21)=>{let s="",o=crypto.getRandomValues(new Uint8Array(n|=0));for(;n--;)s+=t[o[n]&63];return s};const c=6048e5,l=864e5,a=6e4,i=36e5,r=1e3,m=Symbol.for("constructDateFrom");export{l as a,c as b,m as c,i as d,r as e,a as m,e as n};
