@@ -54,6 +54,8 @@ for (const gbifId of gbifIds) {
 	});
 }
 
+options.sort((a, b) => a.label.localeCompare(b.label));
+
 console.log('');
 
 const oldProtocol = await readFile(

@@ -244,11 +244,11 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				});
 			}
 
-			options.sort(({ key: aKey }, { key: bKey }) => {
-				const a = Number(aKey);
-				const b = Number(bKey);
+			options.sort(({ label: aLabel }, { label: bLabel }) => {
+				const a = Number(aLabel);
+				const b = Number(bLabel);
 				if (isNaN(a) || isNaN(b)) {
-					return aKey.localeCompare(bKey);
+					return aLabel.localeCompare(bLabel);
 				}
 				return a - b;
 			});

@@ -92,6 +92,10 @@ for (const [i, { key }] of protocol.metadata[
 	);
 }
 
+Object.keys(protocol.metadata).forEach((id) => {
+	protocol.metadata[id].options?.sort((a, b) => a.label.localeCompare(b.label));
+});
+
 await writeFile(path.join(here, './gbif.json'), JSON.stringify(cachedGbifData, null, 2));
 await writeFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),

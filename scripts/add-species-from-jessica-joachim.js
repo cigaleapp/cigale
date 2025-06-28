@@ -227,6 +227,10 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 	// Erase previous line, print current progress
 	process.stdout.write(`${progressHeader} Added ${cc.bold}${name}${cc.reset}`);
 
+	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.sort((a, b) =>
+		a.label.localeCompare(b.label)
+	);
+
 	// writeFile(path.join(here, 'species.json'), JSON.stringify(species, null, 2));
 	await mkdir(path.join(here, '../examples'), { recursive: true });
 	writeFile(
