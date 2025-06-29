@@ -67,7 +67,7 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
  * @param {import('./database.js').Protocol} protocol
  * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
  */
-function classificationInferenceSettings(protocol, modelIndex) {
+export function classificationInferenceSettings(protocol, modelIndex) {
 	const matcher = match
 		.case(
 			{
@@ -87,30 +87,17 @@ function classificationInferenceSettings(protocol, modelIndex) {
 
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index of the model to use in the list of models for the current protocol
- * @param { 'classification'|'detection' } task
+ * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} request
  * @param {boolean} webgpu
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [onProgress] called everytime the progress changes
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
-export async function loadModel(protocol, modelIndex, task, onProgress, webgpu = false) {
+export async function loadModel(request, onProgress, webgpu = false) {
 	// load un modèle ONNX, soit de classification, soit de détection.
 
 	onProgress ??= () => {};
 
-	const modelRequest =
-		task === 'detection'
-			? protocol.crop?.infer?.[modelIndex]?.model
-			: classificationInferenceSettings(protocol, modelIndex)?.model;
-
-	if (!modelRequest) {
-		throw new Error(
-			`No model found for task "${task}" and model index ${modelIndex} in protocol "${protocol.id}"`
-		);
-	}
-
-	const model = await fetchHttpRequest(modelRequest, {
+	const model = await fetchHttpRequest(request, {
 		cacheAs: 'model',
 		onProgress
 	})
