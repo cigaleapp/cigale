@@ -1,58 +1,51 @@
-# CIGALE
+<div align=center>
+   <h1>
+      <img src="./static/favicon.png" height="70">
+      CIGALE
+   </h1>
+   <em>
+			Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
+   </em>
+</div>
 
-Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
+---
 
-## Déploiement
+Une application web pour aider à la classification de photos d'arthropodes, avec recadrage et classification semi-automatique par réseaux de neurones.
 
-```
-npm i
-npm run build
-# le site est dans public/
-```
+Fonctionne hors-connexion (il suffit d'aller sur le site une seule fois pour qu'il soit disponible hors ligne).
 
-## Développement
+## Fonctionnement
 
-1. Cloner le repo
+### 1. Choisissez un protocole
 
-   ```
-   git clone https://github.com/cigaleapp/cigale --single-branch
-   ```
+![](./static/screenshot-choose-protocol.png)
 
-   Le `--single-branch` est utile pour ne pas cloner la branche `gh-pages`, qui est assez lourde
+CIGALE dispose d'un système avancé de définition de protocoles pour coller au mieux à vos besoins et à votre protocole scientifique. Un protocole de classification d'arthropodes avec informations taxonomiques et classification par espèce est fourni de base avec l'application.
 
-1. Installer Volta
+### 2. Importez vos photos
 
-   Linux / MacOS / Windows (WSL)
+![](./static/screenshot-import.png)
 
-   ```
-   curl https://get.volta.sh | bash
-   ```
+Importez vos photos, et laissez faire le réseau neuronal de détection qui va trouver un (ou plusieurs) arthropodes par photo, et définir des boîtes englobantes autour d'eux.
 
-   Windows
+### 3. Confirmez les recadrages
 
-   ```
-   winget install Volta.Volta
-   ```
+![](./static/screenshot-crop.png)
 
-1. Installer les dépendances
-   Dans le dossier du Projet
+L'onglet suivant permet de passer sur chaque photo afin d'ajuster les boîtes englobantes détectées par le réseau neuronal. Vous pouvez les ajuster, les supprimer ou en ajouter de nouvelles.
 
-   ```
-   npm i
-   ```
+### 4. Classifiez et annotez les arthropodes
 
-1. Lancer le serveur de développement
+![](./static/screenshot-classify.png)
 
-   ```
-   npm run dev
-   ```
+L'onglet "Classification" lance une inférence du réseau neuronal de classification, qui permet d'identifier l'espèce pour chaque boîte englobante trouvée. Vous pouvez alors confirmer ou modifier la classification, à l'aide d'image et de descriptions utiles sourcées depuis [les Carnets de Jessica](https://jessica-joachim.fr), [GBIF](https://gbif.org) et d'autres sources.
 
-1. Pour respecter la convention de nommage des commits:
-   ```
-   # au lieu de git commit
-   npm run commit
-   ```
+Les appartenances aux clades taxonomiques supérieures (genre, famille, ordre, classe, phylum, etc) sont déduites automatiquement à partir de l'espèce choisie.
 
-### Organisation de données
+### 5. Exportez vos données
 
-![](./database.png)
+![](./static/screenshot-exports-csv.png)
+
+Enfin, il est possible d'exporter les données en .zip, avec les photos recadrées, les métadonnées (annotations) associées et (optionnellement) les photos originales.
+
+Les métadonnées sont exportées au format CSV pour utilisation facile dans un tableur, et au format JSON pour une utilisation programmatique dans un script Python par exemple.
