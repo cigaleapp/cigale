@@ -27,9 +27,13 @@ let rssParser = new RSSParser();
 
 const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:/');
 
+/**
+ * Maps species names that were not found to list of titles in the corresponding  search results (for troubleshooting).
+ * @type {Record<string, Array<{ text: string; url: string }>>}
+ */
 const notFoundCache = await readFile(path.join(here, 'jessica-joachim-404cache.json'), 'utf8')
 	.then((data) => JSON.parse(data))
-	.catch(() => []);
+	.catch(() => ({}));
 
 const newProtocol = { ...protocol };
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options;
@@ -61,7 +65,7 @@ for (const [index, { label: name }] of species.entries()) {
 		newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[index] =
 			candidates[0];
 		done++;
-	} else if (process.argv.includes('--force') && !notFoundCache.includes(name)) {
+	} else if (process.argv.includes('--force') && !(name in notFoundCache)) {
 		// Otherwise, search for it (only if --force is used)
 		// The not found cache is used to avoid searching for the same species multiple times,
 		// which is useful for continuation of the script after a failure or interruption
@@ -83,16 +87,24 @@ async function searchForSpecies(index, logHeader, name) {
 	const searchedName = name.trim().toLowerCase();
 	const searchurl = `https://jessica-joachim.com/?s=${encodeURIComponent(searchedName).replaceAll('%20', '+')}`;
 
+	const synonyms = {
+		'Lochmaea capreae': ['Lochmaea caprea']
+	};
+
 	// Do a search
 	const searchPage = await fetch(searchurl)
 		.then((r) => r.text())
 		.then((text) => new JSDOM(text).window.document);
 
 	let speciesPageUrl = [...searchPage.querySelectorAll('a')].find((a) => {
-		const name = a.textContent.trim().toLowerCase();
-		if (name === searchedName) return true;
-		if (name.includes(`(${searchedName})`)) return true;
-		return false;
+		const names = [a.textContent.trim().toLowerCase(), ...(synonyms[name] || [])];
+
+		return names.some((name) => {
+			if (new URL(a.href, 'https://jessica-joachim.com').pathname.match(/^\/?20\d\d/)) return false;
+			if (name === searchedName) return true;
+			if (name.includes(`(${searchedName})`)) return true;
+			return false;
+		});
 	})?.href;
 
 	if (!speciesPageUrl) {
@@ -134,7 +146,7 @@ async function searchForSpecies(index, logHeader, name) {
 			url: searchurl,
 			found: linksFound.map((a) => ({ name: a.textContent, url: a.href }))
 		});
-		notFoundCache.push(name);
+		notFoundCache[name] = linksFound.map((a) => ({ text: a.textContent.trim(), url: a.href }));
 		writeFileSync(
 			path.join(here, 'jessica-joachim-404cache.json'),
 			JSON.stringify(notFoundCache, null, 2)
@@ -162,17 +174,24 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 	// const text = main.textContent;
 	const markdown = htmlToMarkdown(main.innerHTML).replaceAll('\u00a0', ' ');
 
+	// sometimes there's an image WITHIN the <strong> of Identification; colon can be inside or outside the bold text
+	const boldTextSplitPattern = /\*\*.*Identification.*(?:\*\* _?: | _?:\s*\*\*)/;
+	const headingSplitPattern = /#### (?:\*\*)?Identification(?:\*\*)?/;
+
 	// console.log(`Adding ${name} to the species, from ${file}`);
 	let identificationHints = '';
 	try {
-		identificationHints = markdown.split('**Identification** : ')[1]?.split('**')[0];
+		const parts = markdown.split(boldTextSplitPattern);
+		if (parts.length >= 2) {
+			identificationHints = markdown.split(boldTextSplitPattern)[1]?.split('**')[0];
+		}
 	} catch {
 		// eslint-disable no-empty
 	}
 
 	if (!identificationHints) {
 		try {
-			identificationHints = markdown.split('#### Identification')[1]?.split('####')[0];
+			identificationHints = markdown.split(headingSplitPattern)[1]?.split('####')[0];
 		} catch {
 			// eslint-disable no-empty
 		}
@@ -187,9 +206,20 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 
 	const images = [...main.querySelectorAll('img')].map(({ src }) => src);
 
-	if (!text) {
+	if (
+		!text &&
+		!markdown.trim().startsWith(`${name.split(' ')[0]} sp`) &&
+		!markdown.includes('Fiche en cours de création') &&
+		!markdown.includes('Fiche à compléter')
+	) {
 		console.error(`\n\x1b[31mNo text found, main page content was:\x1b[0m`);
 		console.error(markdown.replaceAll('\n', '\n\t'));
+		console.error();
+		console.error('Splitted parts (via bold text):');
+		console.error(markdown.split(boldTextSplitPattern));
+		console.error();
+		console.error('Splitted parts (via header):');
+		console.error(markdown.split(headingSplitPattern));
 		console.error();
 	}
 

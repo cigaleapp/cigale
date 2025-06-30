@@ -1,0 +1,1439 @@
+{
+	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
+	"id": "io.github.cigaleapp.arthropods.example.light",
+	"name": "Example: arthropodes (lightweight)",
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/d9f9cb2b815fac719440bf7bd20185caf832cb92/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 15,
+	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.light.json",
+	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
+	"authors": [
+		{
+			"name": "GBIF Contributors",
+			"email": "info@gbif.org"
+		},
+		{
+			"name": "Jessica Joachim",
+			"email": "tifaeriis@gmail.com"
+		},
+		{
+			"name": "Gwenn Le Bihan",
+			"email": "gwenn.lebihan7@gmail.com"
+		},
+		{
+			"name": "Maxime Cauchoix"
+		},
+		{
+			"name": "Léo Chekir"
+		}
+	],
+	"metadataOrder": [
+		"io.github.cigaleapp.arthropods.example.light__species",
+		"io.github.cigaleapp.arthropods.example.light__genus",
+		"io.github.cigaleapp.arthropods.example.light__family",
+		"io.github.cigaleapp.arthropods.example.light__order",
+		"io.github.cigaleapp.arthropods.example.light__shoot_date",
+		"io.github.cigaleapp.arthropods.example.light__shoot_location",
+		"io.github.cigaleapp.arthropods.example.light__class",
+		"io.github.cigaleapp.arthropods.example.light__phylum",
+		"io.github.cigaleapp.arthropods.example.light__kingdom",
+		"io.github.cigaleapp.arthropods.example.light__crop",
+		"io.github.cigaleapp.arthropods.example.light__crop_is_confirmed"
+	],
+	"metadata": {
+		"io.github.cigaleapp.arthropods.example.light__kingdom": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "1",
+					"label": "Animalia",
+					"description": "",
+					"learnMore": "https://gbif.org/species/1"
+				}
+			],
+			"label": "Règne",
+			"required": false,
+			"description": "",
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__phylum": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "54",
+					"label": "Arthropoda",
+					"description": "",
+					"learnMore": "https://gbif.org/species/54",
+					"cascade": {
+						"kingdom": "1"
+					}
+				}
+			],
+			"label": "Phylum",
+			"required": false,
+			"description": "",
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__class": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "10713444",
+					"label": "Collembola",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10713444",
+					"cascade": {
+						"phylum": "54"
+					}
+				}
+			],
+			"label": "Classe",
+			"required": false,
+			"description": "",
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__order": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "10730025",
+					"label": "Symphypleona",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10730025",
+					"cascade": {
+						"class": "10713444"
+					}
+				},
+				{
+					"key": "10802062",
+					"label": "Poduromorpha",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10802062",
+					"cascade": {
+						"class": "10713444"
+					}
+				},
+				{
+					"key": "11776269",
+					"label": "Entomobryomorpha",
+					"description": "",
+					"learnMore": "https://gbif.org/species/11776269",
+					"cascade": {
+						"class": "10713444"
+					}
+				},
+				{
+					"key": "10724469",
+					"label": "Neelipleona",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10724469",
+					"cascade": {
+						"class": "10713444"
+					}
+				}
+			],
+			"label": "Ordre",
+			"required": false,
+			"description": "",
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__family": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "5844",
+					"label": "Sminthuridae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/5844",
+					"cascade": {
+						"order": "10730025"
+					}
+				},
+				{
+					"key": "7212",
+					"label": "Neanuridae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7212",
+					"cascade": {
+						"order": "10802062"
+					}
+				},
+				{
+					"key": "2991",
+					"label": "Bourletiellidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2991",
+					"cascade": {
+						"order": "10730025"
+					}
+				},
+				{
+					"key": "2990",
+					"label": "Brachystomellidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2990",
+					"cascade": {
+						"order": "10802062"
+					}
+				},
+				{
+					"key": "7215",
+					"label": "Hypogastruridae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7215",
+					"cascade": {
+						"order": "10802062"
+					}
+				},
+				{
+					"key": "7099",
+					"label": "Paronellidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7099",
+					"cascade": {
+						"order": "11776269"
+					}
+				},
+				{
+					"key": "7217",
+					"label": "Dicyrtomidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7217",
+					"cascade": {
+						"order": "10730025"
+					}
+				},
+				{
+					"key": "7216",
+					"label": "Entomobryidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7216",
+					"cascade": {
+						"order": "11776269"
+					}
+				},
+				{
+					"key": "7214",
+					"label": "Isotomidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7214",
+					"cascade": {
+						"order": "11776269"
+					}
+				},
+				{
+					"key": "10874078",
+					"label": "Orchesellidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10874078",
+					"cascade": {
+						"order": "11776269"
+					}
+				},
+				{
+					"key": "2982",
+					"label": "Onychiuridae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2982",
+					"cascade": {
+						"order": "10802062"
+					}
+				},
+				{
+					"key": "3690",
+					"label": "Neelidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/3690",
+					"cascade": {
+						"order": "10724469"
+					}
+				},
+				{
+					"key": "2876",
+					"label": "Poduridae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2876",
+					"cascade": {
+						"order": "10802062"
+					}
+				},
+				{
+					"key": "5843",
+					"label": "Tomoceridae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/5843",
+					"cascade": {
+						"order": "11776269"
+					}
+				},
+				{
+					"key": "2151",
+					"label": "Sminthurididae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2151",
+					"cascade": {
+						"order": "10730025"
+					}
+				},
+				{
+					"key": "2983",
+					"label": "Katiannidae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2983",
+					"cascade": {
+						"order": "10730025"
+					}
+				}
+			],
+			"label": "Famille",
+			"required": false,
+			"description": "",
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__genus": {
+			"type": "enum",
+			"options": [
+				{
+					"key": "4537242",
+					"label": "Allacma",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537242",
+					"cascade": {
+						"family": "5844"
+					}
+				},
+				{
+					"key": "2121987",
+					"label": "Anurida",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121987",
+					"cascade": {
+						"family": "7212"
+					}
+				},
+				{
+					"key": "8955505",
+					"label": "Bilobella",
+					"description": "",
+					"learnMore": "https://gbif.org/species/8955505",
+					"cascade": {
+						"family": "7212"
+					}
+				},
+				{
+					"key": "2120610",
+					"label": "Bourletiella",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120610",
+					"cascade": {
+						"family": "2991"
+					}
+				},
+				{
+					"key": "2121929",
+					"label": "Brachystomella",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121929",
+					"cascade": {
+						"family": "2990"
+					}
+				},
+				{
+					"key": "4405759",
+					"label": "Caprainea",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4405759",
+					"cascade": {
+						"family": "5844"
+					}
+				},
+				{
+					"key": "2121254",
+					"label": "Ceratophysella",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121254",
+					"cascade": {
+						"family": "7215"
+					}
+				},
+				{
+					"key": "2120700",
+					"label": "Cyphoderus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120700",
+					"cascade": {
+						"family": "7099"
+					}
+				},
+				{
+					"key": "8102545",
+					"label": "Deuterosminthurus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/8102545",
+					"cascade": {
+						"family": "2991"
+					}
+				},
+				{
+					"key": "2122259",
+					"label": "Dicyrtoma",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122259",
+					"cascade": {
+						"family": "7217"
+					}
+				},
+				{
+					"key": "2122281",
+					"label": "Dicyrtomina",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122281",
+					"cascade": {
+						"family": "7217"
+					}
+				},
+				{
+					"key": "2120412",
+					"label": "Entomobrya",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120412",
+					"cascade": {
+						"family": "7216"
+					}
+				},
+				{
+					"key": "9442786",
+					"label": "Fasciosminthurus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/9442786",
+					"cascade": {
+						"family": "2991"
+					}
+				},
+				{
+					"key": "2120344",
+					"label": "Folsomia",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120344",
+					"cascade": {
+						"family": "7214"
+					}
+				},
+				{
+					"key": "2121005",
+					"label": "Heteromurus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121005",
+					"cascade": {
+						"family": "10874078"
+					}
+				},
+				{
+					"key": "2121434",
+					"label": "Hypogastrura",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121434",
+					"cascade": {
+						"family": "7215"
+					}
+				},
+				{
+					"key": "2120091",
+					"label": "Isotoma",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120091",
+					"cascade": {
+						"family": "7214"
+					}
+				},
+				{
+					"key": "2120341",
+					"label": "Isotomiella",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120341",
+					"cascade": {
+						"family": "7214"
+					}
+				},
+				{
+					"key": "2119898",
+					"label": "Isotomurus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2119898",
+					"cascade": {
+						"family": "7214"
+					}
+				},
+				{
+					"key": "4405240",
+					"label": "Kalaphorura",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4405240",
+					"cascade": {
+						"family": "2982"
+					}
+				},
+				{
+					"key": "2120880",
+					"label": "Lepidocyrtus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120880",
+					"cascade": {
+						"family": "7216"
+					}
+				},
+				{
+					"key": "2122150",
+					"label": "Megalothorax",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122150",
+					"cascade": {
+						"family": "3690"
+					}
+				},
+				{
+					"key": "4407870",
+					"label": "Monobella",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4407870",
+					"cascade": {
+						"family": "7212"
+					}
+				},
+				{
+					"key": "2122073",
+					"label": "Neanura",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122073",
+					"cascade": {
+						"family": "7212"
+					}
+				},
+				{
+					"key": "2122154",
+					"label": "Neelus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122154",
+					"cascade": {
+						"family": "3690"
+					}
+				},
+				{
+					"key": "2120960",
+					"label": "Orchesella",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120960",
+					"cascade": {
+						"family": "10874078"
+					}
+				},
+				{
+					"key": "2120415",
+					"label": "Parisotoma",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120415",
+					"cascade": {
+						"family": "7214"
+					}
+				},
+				{
+					"key": "2120438",
+					"label": "Podura",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120438",
+					"cascade": {
+						"family": "2876"
+					}
+				},
+				{
+					"key": "8359469",
+					"label": "Pogonognathellus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/8359469",
+					"cascade": {
+						"family": "5843"
+					}
+				},
+				{
+					"key": "2120985",
+					"label": "Seira",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120985",
+					"cascade": {
+						"family": "7216"
+					}
+				},
+				{
+					"key": "2120564",
+					"label": "Sminthurides",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120564",
+					"cascade": {
+						"family": "2151"
+					}
+				},
+				{
+					"key": "2122202",
+					"label": "Sminthurinus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122202",
+					"cascade": {
+						"family": "2983"
+					}
+				},
+				{
+					"key": "7573560",
+					"label": "Sminthurus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7573560",
+					"cascade": {
+						"family": "5844"
+					}
+				},
+				{
+					"key": "2121882",
+					"label": "Tomocerus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121882",
+					"cascade": {
+						"family": "5843"
+					}
+				},
+				{
+					"key": "7737552",
+					"label": "Vertagopus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7737552",
+					"cascade": {
+						"family": "7214"
+					}
+				},
+				{
+					"key": "4405768",
+					"label": "Vitronura",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4405768",
+					"cascade": {
+						"family": "7212"
+					}
+				},
+				{
+					"key": "2120827",
+					"label": "Willowsia",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120827",
+					"cascade": {
+						"family": "7216"
+					}
+				}
+			],
+			"label": "Genre",
+			"required": false,
+			"description": "",
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__shoot_date": {
+			"type": "date",
+			"label": "Date",
+			"description": "Moment où la photo a été prise",
+			"required": false,
+			"mergeMethod": "average",
+			"infer": {
+				"exif": "DateTimeOriginal"
+			}
+		},
+		"io.github.cigaleapp.arthropods.example.light__shoot_location": {
+			"type": "location",
+			"label": "Localisation",
+			"description": "Endroit où la photo a été prise",
+			"required": false,
+			"mergeMethod": "average",
+			"infer": {
+				"latitude": {
+					"exif": "GPSLatitude"
+				},
+				"longitude": {
+					"exif": "GPSLongitude"
+				}
+			}
+		},
+		"io.github.cigaleapp.arthropods.example.light__crop": {
+			"type": "boundingbox",
+			"label": "",
+			"description": "",
+			"required": true,
+			"mergeMethod": "union"
+		},
+		"io.github.cigaleapp.arthropods.example.light__crop_is_confirmed": {
+			"type": "boolean",
+			"label": "",
+			"description": "",
+			"required": false,
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__species": {
+			"type": "enum",
+			"label": "Espèce",
+			"description": "",
+			"required": true,
+			"mergeMethod": "max",
+			"options": [
+				{
+					"key": "2119903",
+					"label": "Isotomurus maculatus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2119903",
+					"cascade": {
+						"genus": "2119898"
+					}
+				},
+				{
+					"key": "2120343",
+					"label": "Isotomiella minor",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120343",
+					"cascade": {
+						"genus": "2120341"
+					}
+				},
+				{
+					"key": "2120372",
+					"label": "Folsomia quadrioculata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120372",
+					"cascade": {
+						"genus": "2120344"
+					}
+				},
+				{
+					"key": "2120383",
+					"label": "Folsomia candida",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120383",
+					"cascade": {
+						"genus": "2120344"
+					}
+				},
+				{
+					"key": "2120418",
+					"label": "Parisotoma notabilis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120418",
+					"cascade": {
+						"genus": "2120415"
+					}
+				},
+				{
+					"key": "2120565",
+					"label": "Sminthurides malmgreni",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120565",
+					"cascade": {
+						"genus": "2120564"
+					}
+				},
+				{
+					"key": "2120616",
+					"label": "Bourletiella hortensis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120616",
+					"cascade": {
+						"genus": "2120610"
+					}
+				},
+				{
+					"key": "2120633",
+					"label": "Bourletiella arvalis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120633",
+					"cascade": {
+						"genus": "2120610"
+					}
+				},
+				{
+					"key": "2120704",
+					"label": "Cyphoderus albinus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120704",
+					"cascade": {
+						"genus": "2120700"
+					}
+				},
+				{
+					"key": "2120749",
+					"label": "Entomobrya muscorum",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120749",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "2120754",
+					"label": "Entomobrya multifasciata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120754",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "2120794",
+					"label": "Entomobrya atrocincta",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120794",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "2120796",
+					"label": "Entomobrya nigrocincta",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120796",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "2120805",
+					"label": "Entomobrya albocincta",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120805",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "2120806",
+					"label": "Entomobrya marginata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120806",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "2120828",
+					"label": "Willowsia buski",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120828",
+					"cascade": {
+						"genus": "2120827"
+					}
+				},
+				{
+					"key": "2120833",
+					"label": "Willowsia platani",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120833",
+					"cascade": {
+						"genus": "2120827"
+					}
+				},
+				{
+					"key": "2120836",
+					"label": "Willowsia nigromaculata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120836",
+					"cascade": {
+						"genus": "2120827"
+					}
+				},
+				{
+					"key": "2120892",
+					"label": "Lepidocyrtus curvicollis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120892",
+					"cascade": {
+						"genus": "2120880"
+					}
+				},
+				{
+					"key": "2120899",
+					"label": "Lepidocyrtus paradoxus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120899",
+					"cascade": {
+						"genus": "2120880"
+					}
+				},
+				{
+					"key": "2120911",
+					"label": "Lepidocyrtus lignorum",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120911",
+					"cascade": {
+						"genus": "2120880"
+					}
+				},
+				{
+					"key": "2120918",
+					"label": "Lepidocyrtus cyaneus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120918",
+					"cascade": {
+						"genus": "2120880"
+					}
+				},
+				{
+					"key": "2120964",
+					"label": "Orchesella cincta",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2120964",
+					"cascade": {
+						"genus": "2120960"
+					}
+				},
+				{
+					"key": "2121008",
+					"label": "Heteromurus nitidus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121008",
+					"cascade": {
+						"genus": "2121005"
+					}
+				},
+				{
+					"key": "2121271",
+					"label": "Ceratophysella denticulata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121271",
+					"cascade": {
+						"genus": "2121254"
+					}
+				},
+				{
+					"key": "2121303",
+					"label": "Ceratophysella longispina",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121303",
+					"cascade": {
+						"genus": "2121254"
+					}
+				},
+				{
+					"key": "2121447",
+					"label": "Hypogastrura viatica",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121447",
+					"cascade": {
+						"genus": "2121434"
+					}
+				},
+				{
+					"key": "2121891",
+					"label": "Tomocerus minor",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121891",
+					"cascade": {
+						"genus": "2121882"
+					}
+				},
+				{
+					"key": "2121897",
+					"label": "Tomocerus vulgaris",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121897",
+					"cascade": {
+						"genus": "2121882"
+					}
+				},
+				{
+					"key": "2121936",
+					"label": "Brachystomella parvula",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121936",
+					"cascade": {
+						"genus": "2121929"
+					}
+				},
+				{
+					"key": "2121989",
+					"label": "Anurida maritima",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2121989",
+					"cascade": {
+						"genus": "2121987"
+					}
+				},
+				{
+					"key": "2122079",
+					"label": "Neanura muscorum",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122079",
+					"cascade": {
+						"genus": "2122073"
+					}
+				},
+				{
+					"key": "2122146",
+					"label": "Podura aquatica",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122146",
+					"cascade": {
+						"genus": "2120438"
+					}
+				},
+				{
+					"key": "2122151",
+					"label": "Megalothorax minimus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122151",
+					"cascade": {
+						"genus": "2122150"
+					}
+				},
+				{
+					"key": "2122157",
+					"label": "Neelus murinus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122157",
+					"cascade": {
+						"genus": "2122154"
+					}
+				},
+				{
+					"key": "2122214",
+					"label": "Sminthurinus elegans",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122214",
+					"cascade": {
+						"genus": "2122202"
+					}
+				},
+				{
+					"key": "2122217",
+					"label": "Sminthurinus niger",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122217",
+					"cascade": {
+						"genus": "2122202"
+					}
+				},
+				{
+					"key": "2122282",
+					"label": "Dicyrtomina minuta",
+					"description": "",
+					"learnMore": "https://gbif.org/species/2122282",
+					"cascade": {
+						"genus": "2122281"
+					}
+				},
+				{
+					"key": "4536978",
+					"label": "Dicyrtomina saundersi",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4536978",
+					"cascade": {
+						"genus": "2122281"
+					}
+				},
+				{
+					"key": "4536981",
+					"label": "Dicyrtomina ornata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4536981",
+					"cascade": {
+						"genus": "2122281"
+					}
+				},
+				{
+					"key": "4536992",
+					"label": "Dicyrtoma fusca",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4536992",
+					"cascade": {
+						"genus": "2122259"
+					}
+				},
+				{
+					"key": "4537006",
+					"label": "Deuterosminthurus bicinctus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537006",
+					"cascade": {
+						"genus": "8102545"
+					}
+				},
+				{
+					"key": "4537010",
+					"label": "Deuterosminthurus pallipes",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537010",
+					"cascade": {
+						"genus": "8102545"
+					}
+				},
+				{
+					"key": "4537070",
+					"label": "Fasciosminthurus quinquefasciatus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537070",
+					"cascade": {
+						"genus": "9442786"
+					}
+				},
+				{
+					"key": "4537098",
+					"label": "Sminthurides aquaticus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537098",
+					"cascade": {
+						"genus": "2120564"
+					}
+				},
+				{
+					"key": "4537112",
+					"label": "Sminthurides penicillifer",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537112",
+					"cascade": {
+						"genus": "2120564"
+					}
+				},
+				{
+					"key": "4537137",
+					"label": "Sminthurinus lawrencei",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537137",
+					"cascade": {
+						"genus": "2122202"
+					}
+				},
+				{
+					"key": "4537152",
+					"label": "Sminthurinus trinotatus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537152",
+					"cascade": {
+						"genus": "2122202"
+					}
+				},
+				{
+					"key": "4537246",
+					"label": "Allacma fusca",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537246",
+					"cascade": {
+						"genus": "4537242"
+					}
+				},
+				{
+					"key": "4537257",
+					"label": "Caprainea marginata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537257",
+					"cascade": {
+						"genus": "4405759"
+					}
+				},
+				{
+					"key": "4537269",
+					"label": "Vitronura giselae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537269",
+					"cascade": {
+						"genus": "4405768"
+					}
+				},
+				{
+					"key": "4537275",
+					"label": "Bilobella aurantiaca",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537275",
+					"cascade": {
+						"genus": "8955505"
+					}
+				},
+				{
+					"key": "4537282",
+					"label": "Bilobella braunerae",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537282",
+					"cascade": {
+						"genus": "8955505"
+					}
+				},
+				{
+					"key": "4537334",
+					"label": "Monobella grassei",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4537334",
+					"cascade": {
+						"genus": "4407870"
+					}
+				},
+				{
+					"key": "4538009",
+					"label": "Kalaphorura burmeisteri",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4538009",
+					"cascade": {
+						"genus": "4405240"
+					}
+				},
+				{
+					"key": "4538730",
+					"label": "Pogonognathellus flavescens",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4538730",
+					"cascade": {
+						"genus": "8359469"
+					}
+				},
+				{
+					"key": "4538732",
+					"label": "Pogonognathellus longicornis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4538732",
+					"cascade": {
+						"genus": "8359469"
+					}
+				},
+				{
+					"key": "4539043",
+					"label": "Isotomurus gallicus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539043",
+					"cascade": {
+						"genus": "2119898"
+					}
+				},
+				{
+					"key": "4539049",
+					"label": "Isotomurus unifasciatus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539049",
+					"cascade": {
+						"genus": "2119898"
+					}
+				},
+				{
+					"key": "4539244",
+					"label": "Lepidocyrtus fimetarius",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539244",
+					"cascade": {
+						"genus": "2120880"
+					}
+				},
+				{
+					"key": "4539297",
+					"label": "Seira ferrarii",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539297",
+					"cascade": {
+						"genus": "2120985"
+					}
+				},
+				{
+					"key": "4539584",
+					"label": "Entomobrya nicoleti",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539584",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "4539594",
+					"label": "Entomobrya superba",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539594",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "4539597",
+					"label": "Entomobrya corticalis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539597",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "4539661",
+					"label": "Orchesella flavescens",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539661",
+					"cascade": {
+						"genus": "2120960"
+					}
+				},
+				{
+					"key": "4539682",
+					"label": "Orchesella quinquefasciata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539682",
+					"cascade": {
+						"genus": "2120960"
+					}
+				},
+				{
+					"key": "4539722",
+					"label": "Heteromurus major",
+					"description": "",
+					"learnMore": "https://gbif.org/species/4539722",
+					"cascade": {
+						"genus": "2121005"
+					}
+				},
+				{
+					"key": "5166886",
+					"label": "Isotoma viridis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/5166886",
+					"cascade": {
+						"genus": "2120091"
+					}
+				},
+				{
+					"key": "5167064",
+					"label": "Sminthurus viridis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/5167064",
+					"cascade": {
+						"genus": "7573560"
+					}
+				},
+				{
+					"key": "7446310",
+					"label": "Dicyrtomina flavosignata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7446310",
+					"cascade": {
+						"genus": "2122281"
+					}
+				},
+				{
+					"key": "7641902",
+					"label": "Isotoma riparia",
+					"description": "",
+					"learnMore": "https://gbif.org/species/7641902",
+					"cascade": {
+						"genus": "2120091"
+					}
+				},
+				{
+					"key": "9217813",
+					"label": "Orchesella villosa",
+					"description": "",
+					"learnMore": "https://gbif.org/species/9217813",
+					"cascade": {
+						"genus": "2120960"
+					}
+				},
+				{
+					"key": "9616579",
+					"label": "Vertagopus asiaticus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/9616579",
+					"cascade": {
+						"genus": "7737552"
+					}
+				},
+				{
+					"key": "10038254",
+					"label": "Orchesella bifasciata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10038254",
+					"cascade": {
+						"genus": "2120960"
+					}
+				},
+				{
+					"key": "10765511",
+					"label": "Dicyrtomina signata",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10765511",
+					"cascade": {
+						"genus": "2122281"
+					}
+				},
+				{
+					"key": "10848695",
+					"label": "Seira musarum",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10848695",
+					"cascade": {
+						"genus": "2120985"
+					}
+				},
+				{
+					"key": "10915874",
+					"label": "Entomobrya nivalis",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10915874",
+					"cascade": {
+						"genus": "2120412"
+					}
+				},
+				{
+					"key": "10934196",
+					"label": "Isotomurus palustris",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10934196",
+					"cascade": {
+						"genus": "2119898"
+					}
+				},
+				{
+					"key": "10990673",
+					"label": "Sminthurinus aureus",
+					"description": "",
+					"learnMore": "https://gbif.org/species/10990673",
+					"cascade": {
+						"genus": "2122202"
+					}
+				}
+			],
+			"infer": {
+				"neural": [
+					{
+						"name": "Léger (~80 classes)",
+						"model": "https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx",
+						"classmapping": "https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt",
+						"input": {
+							"height": 224,
+							"width": 224,
+							"disposition": "CHW",
+							"normalized": true
+						}
+					}
+				]
+			}
+		}
+	},
+	"crop": {
+		"metadata": "io.github.cigaleapp.arthropods.example.light__crop",
+		"confirmationMetadata": "io.github.cigaleapp.arthropods.example.light__crop_is_confirmed",
+		"infer": [
+			{
+				"model": "https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx",
+				"name": "YOLO11",
+				"input": {
+					"height": 640,
+					"width": 640,
+					"disposition": "1CHW",
+					"normalized": true
+				},
+				"output": {
+					"normalized": true,
+					"shape": ["sx", "sy", "ex", "ey", "score", "_"]
+				}
+			}
+		]
+	},
+	"exports": {
+		"images": {
+			"cropped": "Cropped/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}",
+			"original": "Original/{{ fallback image.protocolMetadata.species.valueLabel \"(Unknown)\" }}_{{ sequence }}.{{ extension image.filename }}"
+		},
+		"metadata": {
+			"json": "analysis.json",
+			"csv": "metadata.csv"
+		}
+	}
+}
