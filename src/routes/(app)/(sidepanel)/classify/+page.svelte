@@ -10,7 +10,12 @@
 		imageIdToFileId,
 		imageIsClassified
 	} from '$lib/images';
-	import { classify, loadModel, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
+	import {
+		classificationInferenceSettings,
+		classify,
+		TARGETHEIGHT,
+		TARGETWIDTH
+	} from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata.js';
@@ -41,11 +46,11 @@
 	/** loaded and total bytes counts, set and updated by loadModel() */
 	let modelLoadingProgress = $state(0);
 
-	let classifmodel = $state();
+	let classifmodelLoaded = $state(false);
 	let classmapping = $state([]);
 	async function loadClassifModel() {
 		// If the model is already loaded, we don't need to load it again
-		if (classifmodel) return;
+		if (classifmodelLoaded) return;
 		if (!uiState.currentProtocol) return;
 		if (!uiState.classificationInferenceAvailable) return;
 		const classmappingRequest = await tables.Metadata.get(
@@ -64,16 +69,36 @@
 			.then((res) => res.text())
 			.then((text) => text.split(/\r?\n/).filter(Boolean));
 
-		classifmodel = await loadModel(
+		const request = classificationInferenceSettings(
 			uiState.currentProtocol,
-			uiState.selectedClassificationModel,
-			'classification',
-			({ transferred, total }) => {
-				if (total === 0) return;
-				modelLoadingProgress = 0.25 + 0.75 * (transferred / total);
-			}
-		);
-		toasts.success('Modèle de classification chargé');
+			uiState.selectedClassificationModel
+		)?.model;
+
+		navigator.serviceWorker.controller?.postMessage({
+			action: 'loadModel',
+			task: 'classification',
+			request
+		});
+
+		return new Promise((resolve, _reject) => {
+			navigator.serviceWorker.addEventListener(
+				'message',
+				({ data: { action, task, progress, done } }) => {
+					if (action !== 'loadModel') return;
+					if (task !== 'classification') return;
+
+					if (progress !== undefined) {
+						modelLoadingProgress = 0.25 + 0.75 * (progress.transferred / progress.total);
+					}
+
+					if (done) {
+						toasts.success('Modèle de classification chargé');
+						classifmodelLoaded = true;
+						resolve();
+					}
+				}
+			);
+		});
 	}
 	/**
 	 * @param {ArrayBuffer} buffer
@@ -94,7 +119,7 @@
 			return;
 		}
 
-		if (!classifmodel) {
+		if (!classifmodelLoaded) {
 			throw new Error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
 			);
@@ -133,7 +158,7 @@
 			);
 		}
 
-		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodel, uiState, 0);
+		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodelLoaded, uiState, 0);
 
 		const results = scores
 			.map((score, i) => ({
@@ -170,7 +195,7 @@
 	$effect(
 		() =>
 			void (async () => {
-				if (!classifmodel) return;
+				if (!classifmodelLoaded) return;
 				for (const image of tables.Image.state) {
 					if (
 						imageBufferWasSaved(image) &&
