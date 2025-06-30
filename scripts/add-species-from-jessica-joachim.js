@@ -1,29 +1,12 @@
 import { JSDOM } from 'jsdom';
 import { marked } from 'marked';
+import RSSParser from 'rss-parser';
 import { writeFileSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
-import { decodePhoto, photoChanged } from './utils.js';
-
-// Doing the 17k species would be wayyy too long, so we only do these ones. They correspond to the ones that exist in the old ("lightweight") ~80-classes model
-/**
- * GBIF IDs of the species that we will crawl for
- */
-const speciesAllowlist = await fetch(
-	'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt'
-)
-	.then((r) => r.text())
-	.then((text) =>
-		text
-			.split(/\r?\n/)
-			.map((line) => Number(line.trim()))
-			.filter((n) => !isNaN(n))
-	);
-
-console.log(speciesAllowlist.length, 'species to crawl for');
 
 // ANSI control sequences
 const cc = {
@@ -36,38 +19,67 @@ const cc = {
 	yellow: '\x1b[33m'
 };
 
-const _tdown = new Turndown();
-/** @param {string} html  */
-function htmlToMarkdown(html) {
-	return _tdown.turndown(html);
-}
-
-function markdownToHtml(markdown) {
-	return marked.parse(markdown);
-}
-
 /** @type {Array<{ name: string; url: string; found: Array<{ name: string; url: string }> }>}  */
 const reportTable = [];
 
-function renderReportTable() {
-	return `Recherche effectuée | Résultats\n-----------------|------------------\n${reportTable.map(({ name, url, found }) => `[${name}](${url}) | ${found.map(({ name, url }) => `[${name}](${url})`).join(', ')}`).join('\n')}`;
-}
+const _tdown = new Turndown();
+let rssParser = new RSSParser();
 
 const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:/');
-console.log({ here });
+
+const notFoundCache = await readFile(path.join(here, 'jessica-joachim-404cache.json'), 'utf8')
+	.then((data) => JSON.parse(data))
+	.catch(() => []);
 
 const newProtocol = { ...protocol };
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options;
+const oldSpecies = oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options;
 const total = Object.keys(species).length;
 let done = 0;
 
-for (const [index, { label: name, key }] of species.entries()) {
-	if (!speciesAllowlist.includes(Number(key))) {
-		continue;
-	}
+// Get combined content of all articles in the "Mises à jour" category from the RSS feed
+const { items: newsfeed } = await rssParser.parseURL('https://jessica-joachim.com/feed/');
+const updates = newsfeed
+	.filter(({ categories }) => categories.includes('Mises à jour'))
+	.map(({ content }) => htmlToMarkdown(content).replaceAll('&#160;', ' '))
+	.join('\n');
 
+// For every species in the protocol:
+for (const [index, { label: name }] of species.entries()) {
 	const progressHeader = `[${cc.blue}${index}/${total}${cc.reset} ${cc.dim}| ${done}${cc.reset}]`;
-	const progressHeaderLength = `[${done}/${total}]`.length;
+	// Get existing descriptions of the species from the old protocol, and the current one
+	// (which will not be empty when running the script in multiple passes, e.g. when using --force)
+	const candidates = [...oldSpecies, ...species].filter(
+		(s) => s.label === name && s.description.trim() && s.learnMore.trim()
+	);
+
+	if (updates.includes(name)) {
+		// Check if it's mentioned in the updates, in that case, search for it
+		await searchForSpecies(index, progressHeader, name);
+	} else if (candidates.length > 0) {
+		// Otherwise, use the existing species if it has a description and a learnMore link
+		newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[index] =
+			candidates[0];
+		done++;
+	} else if (process.argv.includes('--force') && !notFoundCache.includes(name)) {
+		// Otherwise, search for it (only if --force is used)
+		// The not found cache is used to avoid searching for the same species multiple times,
+		// which is useful for continuation of the script after a failure or interruption
+		// when the --force option is used
+		// Considering the 17k species in the protocol, --force is not used in CI but
+		// is used for the initial filling of the descriptions of the protocol
+		await searchForSpecies(index, progressHeader, name);
+	}
+}
+
+if (reportTable.length) {
+	await writeFile(path.join(here, 'jessica-joachim-crawler-report.md'), renderReportTable());
+	console.error(
+		`\n${cc.bold}${cc.blue}Report written to ${here}/jessica-joachim-crawler-report.md${cc.reset}`
+	);
+}
+
+async function searchForSpecies(index, logHeader, name) {
 	const searchedName = name.trim().toLowerCase();
 	const searchurl = `https://jessica-joachim.com/?s=${encodeURIComponent(searchedName).replaceAll('%20', '+')}`;
 
@@ -79,7 +91,7 @@ for (const [index, { label: name, key }] of species.entries()) {
 	let speciesPageUrl = [...searchPage.querySelectorAll('a')].find((a) => {
 		const name = a.textContent.trim().toLowerCase();
 		if (name === searchedName) return true;
-		if (name.includes(` (${searchedName})`)) return true;
+		if (name.includes(`(${searchedName})`)) return true;
 		return false;
 	})?.href;
 
@@ -92,7 +104,7 @@ for (const [index, { label: name, key }] of species.entries()) {
 
 		if (speciesPageUrl) {
 			console.error(
-				`${cc.clearline}\r${progressHeader} ${cc.yellow}Using ${genus} sp. instead of ${name}${cc.reset}`
+				`${cc.clearline}\r${logHeader} ${cc.yellow}Using ${genus} sp. instead of ${name}${cc.reset}`
 			);
 		}
 	}
@@ -106,13 +118,13 @@ for (const [index, { label: name, key }] of species.entries()) {
 		const uniqueLinks = new Map(linksFound.map((a) => [a.href, a]));
 		linksFound = [...uniqueLinks.values()];
 		console.error(
-			`${cc.clearline}\r${progressHeader} ${cc.red}${name}: not found (out of ${linksFound.length} links)${cc.reset}`
+			`${cc.clearline}\r${logHeader} ${cc.red}${name}: not found (out of ${linksFound.length} links)${cc.reset}`
 		);
 		if (linksFound.length) {
 			console.error(`Links found on ${cc.dim}${cc.blue}${searchurl}${cc.reset}`);
 			for (const link of linksFound) {
 				console.error(
-					`${' '.repeat(progressHeaderLength)} ${cc.dim}${cc.bold}·${cc.reset} ${cc.bold}${cc.blue}${link.textContent}${cc.reset} ${cc.dim}${link.href}${cc.reset}`
+					`${' '.repeat(logHeader.length)} ${cc.dim}${cc.bold}·${cc.reset} ${cc.bold}${cc.blue}${link.textContent}${cc.reset} ${cc.dim}${link.href}${cc.reset}`
 				);
 			}
 		}
@@ -122,21 +134,17 @@ for (const [index, { label: name, key }] of species.entries()) {
 			url: searchurl,
 			found: linksFound.map((a) => ({ name: a.textContent, url: a.href }))
 		});
-		continue;
+		notFoundCache.push(name);
+		writeFileSync(
+			path.join(here, 'jessica-joachim-404cache.json'),
+			JSON.stringify(notFoundCache, null, 2)
+		);
+		return;
 	}
 
 	await fetch(speciesPageUrl)
 		.then((r) => r.text())
-		.then((content) =>
-			parseAndDescribeSpecies(content, speciesPageUrl, name, progressHeader, index)
-		);
-}
-
-if (reportTable.length) {
-	await writeFile(path.join(here, 'jessica-joachim-crawler-report.md'), renderReportTable());
-	console.error(
-		`\n${cc.bold}${cc.blue}Report written to ${here}/jessica-joachim-crawler-report.md${cc.reset}`
-	);
+		.then((content) => parseAndDescribeSpecies(content, speciesPageUrl, name, logHeader, index));
 }
 
 /**
@@ -192,35 +200,31 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 		).searchParams.get('v') ?? '0';
 
 	// Download image since CORP prevents us from using them directly
-	let imagepath = '';
-	if (images.length) {
-		const image = images[0];
-		imagepath = path.join(here, '../examples/arthropods.cigaleprotocol.images', `${name}.jpeg`);
-		const oldPhoto = decodePhoto(imagepath);
-		await mkdir(path.dirname(imagepath), { recursive: true });
-		// await execa`wget -O ${imagepath} ${image}`;
-		await fetch(image)
-			.then((r) => r.arrayBuffer())
-			.then((buf) => {
-				writeFileSync(imagepath, Buffer.from(buf));
-			});
-		images[0] = imagepath;
+	const image = images.length > 0 ? images[0] : '';
+	// if (images.length) {
+	// 	const image = images[0];
+	// 	imagepath = path.join(here, '../examples/arthropods.cigaleprotocol.images', `${name}.jpeg`);
+	// 	const oldPhoto = decodePhoto(imagepath);
+	// 	await mkdir(path.dirname(imagepath), { recursive: true });
+	// 	// await execa`wget -O ${imagepath} ${image}`;
+	// 	await fetch(image)
+	// 		.then((r) => r.arrayBuffer())
+	// 		.then((buf) => {
+	// 			writeFileSync(imagepath, Buffer.from(buf));
+	// 		});
+	// 	images[0] = imagepath;
 
-		if (photoChanged(imagepath, oldPhoto)) {
-			cachebuster = protocol.version;
-		}
-	}
+	// 	if (photoChanged(imagepath, oldPhoto)) {
+	// 		cachebuster = protocol.version;
+	// 	}
+	// }
 
 	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[optionIndex] =
 		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
 			...species[optionIndex],
 			description: text,
 			learnMore: url,
-			...(imagepath
-				? {
-						image: `https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.images/${encodeURIComponent(name)}.jpeg?v=${cachebuster}`
-					}
-				: {})
+			image
 		});
 
 	done++;
@@ -237,4 +241,17 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 		path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 		JSON.stringify(newProtocol, null, 2)
 	);
+}
+
+/** @param {string} html  */
+function htmlToMarkdown(html) {
+	return _tdown.turndown(html);
+}
+
+function markdownToHtml(markdown) {
+	return marked.parse(markdown);
+}
+
+function renderReportTable() {
+	return `Recherche effectuée | Résultats\n-----------------|------------------\n${reportTable.map(({ name, url, found }) => `[${name}](${url}) | ${found.map(({ name, url }) => `[${name}](${url})`).join(', ')}`).join('\n')}`;
 }
