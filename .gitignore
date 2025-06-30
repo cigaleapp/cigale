@@ -31,6 +31,7 @@ public
 static/*.schema.json
 scripts/jessica-joachim.com/
 scripts/jessica-joachim-crawler-report.md
+scripts/jessica-joachim-404cache.json
 
 # Playwright
 /test-results/
