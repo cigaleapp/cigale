@@ -2,7 +2,8 @@ import { type } from 'arktype';
 import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { cachebust } from './utils.js';
+import { cachebust, omit } from './utils.js';
+import { metadataOptionId } from './schemas/metadata.js';
 
 /**
  *
@@ -15,8 +16,10 @@ export function jsonSchemaURL(base) {
 /**
  * Ensures a metadata ID is namespaced to the given protocol ID
  * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
- * @param {string} protocolId
+ * @template {string} ProtocolID
+ * @param {ProtocolID} protocolId
  * @param {string} metadataId
+ * @returns {`${ProtocolID}__${string}`}
  */
 export function namespacedMetadataId(protocolId, metadataId) {
 	metadataId = metadataId.replace(/^.+__/, '');
@@ -24,9 +27,21 @@ export function namespacedMetadataId(protocolId, metadataId) {
 }
 
 /**
+ * Ensures a metadata ID is namespaced to the given protocol ID. If the metadata ID is not namespaced, it will be prefixed with the protocol ID. If it already is namespaced, it will stay as is.
+ * @param {string} metadataId the metadata ID to ensure is namespaced
+ * @param {string} fallbackProtocolId the protocol ID to use if the metadata ID is not namespaced
+ */
+export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
+	if (isNamespacedToProtocol(fallbackProtocolId, metadataId)) return metadataId;
+	return namespacedMetadataId(fallbackProtocolId, metadataId);
+}
+
+/**
  * Checks if a given metadata ID is namespaced to a given protocol ID
- * @param {string} protocolId
+ * @template {string} ProtocolID
+ * @param {ProtocolID} protocolId
  * @param {string} metadataId
+ * @returns {metadataId is `${ProtocolID}__${string}` }
  */
 export function isNamespacedToProtocol(protocolId, metadataId) {
 	return metadataId.startsWith(`${protocolId}__`);
@@ -39,6 +54,17 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
  */
 export function removeNamespaceFromMetadataId(metadataId) {
 	return metadataId.replace(/^.+__/, '');
+}
+
+/**
+ *
+ * @param {string} metadataId
+ * @returns
+ */
+export function namespaceOfMetadataId(metadataId) {
+	const parts = metadataId.split('__');
+	if (parts.length < 2) return undefined;
+	return parts.slice(0, -1).join('__');
 }
 
 export const ExportedProtocol = Schemas.Protocol.omit('metadata')
@@ -65,16 +91,28 @@ export const ExportedProtocol = Schemas.Protocol.omit('metadata')
  */
 export async function exportProtocol(base, id, format = 'json') {
 	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
-	const { tables } = await import('./idb.svelte.js');
+	const { tables, ...idb } = await import('./idb.svelte.js');
 
 	const protocol = await tables.Protocol.raw.get(id);
 	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
+
+	const allMetadataOptions = await idb.list('MetadataOption');
 
 	downloadProtocol(base, format, {
 		...protocol,
 		metadata: Object.fromEntries(
 			await tables.Metadata.list().then((defs) =>
-				defs.filter((def) => protocol?.metadata.includes(def.id)).map(({ id, ...def }) => [id, def])
+				defs
+					.filter((def) => protocol?.metadata.includes(def.id))
+					.map(({ id, ...def }) => [
+						id,
+						{
+							...def,
+							options: allMetadataOptions
+								.filter((opt) => opt.id.startsWith(namespacedMetadataId(protocol.id, id) + ':'))
+								.map(({ id: _, ...opt }) => opt)
+						}
+					])
 			)
 		)
 	});
@@ -131,10 +169,11 @@ function downloadProtocol(base, format, exportedProtocol) {
  * Asks the user to select files, then imports the protocols from those files.
  * @template {boolean|undefined} Multiple
  * @param {object} param0
- * @param {Multiple} [param0.allowMultiple=true] allow the user to select multiple files
+ * @param {Multiple} [param0.allowMultiple] allow the user to select multiple files
+ * @param {() => void} [param0.onInput] callback to call when the user selected files
  * @returns {Promise<Multiple extends true ? Array<typeof ExportedProtocol.infer> : typeof ExportedProtocol.infer>}
  */
-export async function promptAndImportProtocol({ allowMultiple } = {}) {
+export async function promptAndImportProtocol({ allowMultiple, onInput = () => {} } = {}) {
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
@@ -142,15 +181,18 @@ export async function promptAndImportProtocol({ allowMultiple } = {}) {
 		input.accept = ['.json', '.yaml', 'application/json'].join(',');
 		input.onchange = async () => {
 			if (!input.files || !input.files[0]) return;
+			onInput();
 			/** @type {Array<typeof ExportedProtocol.infer>}  */
 			const output = await Promise.all(
 				[...input.files].map(async (file) => {
+					console.time(`Reading file ${file.name}`);
 					const reader = new FileReader();
 					return new Promise((resolve) => {
 						reader.onload = async () => {
 							if (!reader.result) throw new Error('Fichier vide');
 							if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-							importProtocol(reader.result)
+							console.timeEnd(`Reading file ${file.name}`);
+							importProtocol(reader.result, { json: file.name.endsWith('.json') })
 								.then(resolve)
 								.catch((err) =>
 									reject(
@@ -174,12 +216,16 @@ export async function promptAndImportProtocol({ allowMultiple } = {}) {
 /**
  *
  * @param {string} contents
+ * @param {Object} [options]
+ * @param {boolean} [options.json=false] parse as JSON instead of YAML, useful for performance if you're usre the contents represents JSON and not just YAML
  */
-export async function importProtocol(contents) {
+export async function importProtocol(contents, { json = false } = {}) {
 	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
 	// (Node does not like .svelte.js files' runes)
 	const { openTransaction } = await import('./idb.svelte.js');
-	let parsed = YAML.parse(contents);
+	console.time('Parsing protocol');
+	let parsed = json ? JSON.parse(contents) : YAML.parse(contents);
+	console.timeEnd('Parsing protocol');
 
 	console.info(`Importing protocol ${parsed.id}`);
 	console.info(parsed);
@@ -192,19 +238,42 @@ export async function importProtocol(contents) {
 		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
 	);
 
+	console.time('Validating protocol');
 	const protocol = ExportedProtocol.in.assert(parsed);
+	console.timeEnd('Validating protocol');
 
-	await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
+	await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
+		console.time('Storing Protocol');
 		tx.objectStore('Protocol').put({
 			...protocol,
 			metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
 		});
-		Object.entries(protocol.metadata).map(
-			([id, metadata]) =>
-				typeof metadata === 'string' || tx.objectStore('Metadata').put({ id, ...metadata })
-		);
+		console.timeEnd('Storing Protocol');
+
+		for (const [id, metadata] of Object.entries(protocol.metadata)) {
+			if (typeof metadata === 'string') continue;
+
+			console.time(`Storing Metadata ${id}`);
+			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
+			console.timeEnd(`Storing Metadata ${id}`);
+
+			console.time(`Storing Metadata Options for ${id}`);
+			for (const option of metadata.options ?? []) {
+				tx.objectStore('MetadataOption').put({
+					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
+					metadataId: namespacedMetadataId(protocol.id, id),
+					...option
+				});
+			}
+			console.timeEnd(`Storing Metadata Options for ${id}`);
+		}
 	});
-	return ExportedProtocol.assert(protocol);
+
+	console.time('Validating protocol after storing');
+	const validated = ExportedProtocol.assert(protocol);
+	console.timeEnd('Validating protocol after storing');
+
+	return validated;
 }
 
 /**
@@ -216,14 +285,17 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
-	if (typeof source !== 'string')
-		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
-	const response = await fetch(cachebust(source), {
-		headers: {
-			Accept: 'application/json'
-		}
-	})
+	const response = await fetch(
+		cachebust(typeof source === 'string' ? source : source.url),
+		typeof source !== 'string'
+			? source
+			: {
+					headers: {
+						Accept: 'application/json'
+					}
+				}
+	)
 		.then((r) => r.json())
 		.then(
 			type({

@@ -1,4 +1,7 @@
 /// <reference types="@sveltejs/kit" />
+/// <reference no-default-lib="true"/>
+/// <reference lib="esnext" />
+/// <reference lib="webworker" />
 import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
@@ -41,14 +44,15 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(deleteOldCaches());
 });
 
-self.addEventListener('fetch', (event) => {
-	// ignore POST requests etc
+self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
+	// ignore POST requests etc.
 	if (event.request.method !== 'GET') return;
 
 	async function respond() {
-		const url = new URL(event.request.url);
+		let url = new URL(event.request.url);
 
-		if (MODELS.includes(url.href)) {
+		if (MODELS.includes(url.href) || url.searchParams.get('x-cigale-cache-as') === 'model') {
+			url.searchParams.delete('x-cigale-cache-as');
 			const cache = await caches.open(MODELS_CACHE);
 			console.log(`Serving ${url} from models cache`);
 			const response = await cache.match(url.href);

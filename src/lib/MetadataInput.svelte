@@ -17,13 +17,22 @@
 	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onblur]
 	 * @property {string} [id]
 	 * @property {boolean} [disabled]
+	 * @property {import('./database').MetadataEnumVariant[]} [options]
 	 * @property {Record<string, number>} [confidences]
 	 */
 
 	/** @type {Props} */
-	let { value = $bindable(), confidences = {}, id, disabled, definition, onblur } = $props();
+	let {
+		value = $bindable(),
+		confidences = {},
+		id,
+		disabled,
+		definition,
+		options = [],
+		onblur
+	} = $props();
 
-	const { type, options = [] } = definition;
+	const { type } = definition;
 </script>
 
 <div class="metadata-input" data-type={type} data-metadata-id={definition.id}>
@@ -31,7 +40,7 @@
 		<MetadataCombobox
 			{id}
 			{disabled}
-			options={options.map(({ key, ...rest }) => ({ key: key.toString(), ...rest }))}
+			{options}
 			{confidences}
 			type="single"
 			value={safeJSONParse(value?.toString())?.toString() ?? value}

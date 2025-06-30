@@ -8,6 +8,23 @@ import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: '
 import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 import { decodePhoto, photoChanged } from './utils.js';
 
+// Doing the 17k species would be wayyy too long, so we only do these ones. They correspond to the ones that exist in the old ("lightweight") ~80-classes model
+/**
+ * GBIF IDs of the species that we will crawl for
+ */
+const speciesAllowlist = await fetch(
+	'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt'
+)
+	.then((r) => r.text())
+	.then((text) =>
+		text
+			.split(/\r?\n/)
+			.map((line) => Number(line.trim()))
+			.filter((n) => !isNaN(n))
+	);
+
+console.log(speciesAllowlist.length, 'species to crawl for');
+
 // ANSI control sequences
 const cc = {
 	clearline: '\x1b[2K',
@@ -39,25 +56,33 @@ function renderReportTable() {
 const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:/');
 console.log({ here });
 
+const newProtocol = { ...protocol };
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options;
 const total = Object.keys(species).length;
 let done = 0;
 
-const describedSpecies = [...species];
+for (const [index, { label: name, key }] of species.entries()) {
+	if (!speciesAllowlist.includes(Number(key))) {
+		continue;
+	}
 
-for (const [index, { label: name }] of species.entries()) {
-	const progressHeader = `[${cc.blue}${done}/${total}${cc.reset}]`;
+	const progressHeader = `[${cc.blue}${index}/${total}${cc.reset} ${cc.dim}| ${done}${cc.reset}]`;
 	const progressHeaderLength = `[${done}/${total}]`.length;
 	const searchedName = name.trim().toLowerCase();
 	const searchurl = `https://jessica-joachim.com/?s=${encodeURIComponent(searchedName).replaceAll('%20', '+')}`;
+
 	// Do a search
 	const searchPage = await fetch(searchurl)
 		.then((r) => r.text())
 		.then((text) => new JSDOM(text).window.document);
 
-	let speciesPageUrl = [...searchPage.querySelectorAll('a')].find(
-		(a) => a.textContent.trim().toLowerCase() === searchedName
-	)?.href;
+	let speciesPageUrl = [...searchPage.querySelectorAll('a')].find((a) => {
+		const name = a.textContent.trim().toLowerCase();
+		if (name === searchedName) return true;
+		if (name.includes(` (${searchedName})`)) return true;
+		return false;
+	})?.href;
+
 	if (!speciesPageUrl) {
 		// Try <gender name> sp. instead of matching full binomial species name
 		const [genus] = searchedName.split(' ');
@@ -71,6 +96,7 @@ for (const [index, { label: name }] of species.entries()) {
 			);
 		}
 	}
+
 	if (!speciesPageUrl) {
 		let linksFound = [...searchPage.querySelector('main').querySelectorAll('a')]
 			.filter((a) => a.textContent.trim())
@@ -101,7 +127,9 @@ for (const [index, { label: name }] of species.entries()) {
 
 	await fetch(speciesPageUrl)
 		.then((r) => r.text())
-		.then((content) => parseAndDescribeSpecies(content, speciesPageUrl, name, index));
+		.then((content) =>
+			parseAndDescribeSpecies(content, speciesPageUrl, name, progressHeader, index)
+		);
 }
 
 if (reportTable.length) {
@@ -116,9 +144,10 @@ if (reportTable.length) {
  * @param {string} pageContent
  * @param {string} url
  * @param {string} name
- * @param {number} classmappingIndex
+ * @param {string} progressHeader
+ * @param {number} optionIndex
  */
-async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex) {
+async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, optionIndex) {
 	const dom = new JSDOM(pageContent);
 	const main = dom.window.document.querySelector('main');
 	if (!main) return;
@@ -158,9 +187,8 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 
 	let cachebuster =
 		new URL(
-			oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[
-				classmappingIndex
-			]?.image ?? `https://example.com?v=${protocol.version}`
+			oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[optionIndex]
+				?.image ?? `https://example.com?v=${protocol.version}`
 		).searchParams.get('v') ?? '0';
 
 	// Download image since CORP prevents us from using them directly
@@ -183,10 +211,9 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 		}
 	}
 
-	describedSpecies[classmappingIndex] =
+	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[optionIndex] =
 		/** @satisfies {NonNullable<import('../src/lib/database').Metadata['options']>[number]} */ ({
-			key: classmappingIndex.toString(),
-			label: name,
+			...species[optionIndex],
 			description: text,
 			learnMore: url,
 			...(imagepath
@@ -198,27 +225,16 @@ async function parseAndDescribeSpecies(pageContent, url, name, classmappingIndex
 
 	done++;
 	// Erase previous line, print current progress
-	process.stdout.write(
-		`${cc.clearline}\r[${cc.blue}${done}/${total}${cc.reset}] Added ${cc.bold}${name}${cc.reset}`
+	process.stdout.write(`${progressHeader} Added ${cc.bold}${name}${cc.reset}`);
+
+	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.sort((a, b) =>
+		a.label.localeCompare(b.label)
 	);
 
 	// writeFile(path.join(here, 'species.json'), JSON.stringify(species, null, 2));
 	await mkdir(path.join(here, '../examples'), { recursive: true });
 	writeFile(
 		path.join(here, '../examples/arthropods.cigaleprotocol.json'),
-		JSON.stringify(
-			{
-				...protocol,
-				metadata: {
-					...protocol.metadata,
-					'io.github.cigaleapp.arthropods.example__species': {
-						...protocol.metadata['io.github.cigaleapp.arthropods.example__species'],
-						options: describedSpecies
-					}
-				}
-			},
-			null,
-			2
-		)
+		JSON.stringify(newProtocol, null, 2)
 	);
 }

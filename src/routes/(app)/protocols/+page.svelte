@@ -106,8 +106,9 @@
 	<h1>Protocoles</h1>
 	<section class="actions">
 		<ButtonSecondary
-			onclick={async () => {
-				await promptAndImportProtocol({ allowMultiple: true })
+			loading
+			onclick={async (_, signals) => {
+				await promptAndImportProtocol({ allowMultiple: true, onInput: signals.loadingStarted })
 					.catch((e) => toasts.error(e))
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;
@@ -116,8 +117,10 @@
 					});
 			}}
 		>
-			<IconImport />
-			Importer
+			{#snippet children({ loading })}
+				{#if !loading}<IconImport />{/if}
+				Importer
+			{/snippet}
 		</ButtonSecondary>
 		<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
 			<IconCreate />

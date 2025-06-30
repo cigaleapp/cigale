@@ -610,3 +610,27 @@ if (import.meta.vitest) {
 		expect(range(3, 4)).toEqual([3]);
 	});
 }
+
+/**
+ * @param {typeof import('$lib/schemas/common.js').HTTPRequest.infer} request
+ * @param {object} options
+ * @param {''|'model'} [options.cacheAs=""]
+ * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
+ */
+export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
+	const { default: fetchProgress } = await import('fetch-progress');
+	let url = new URL(typeof request === 'string' ? request : request.url);
+	const options = typeof request === 'string' ? { headers: {} } : request;
+	if (cacheAs) {
+		url.searchParams.set('x-cigale-cache-as', cacheAs);
+	}
+
+	// const promise = fetch(url, options);
+	// if (onProgress) promise.then(fetchProgress({ onProgress }));
+
+	// return promise;
+
+	if (onProgress) return fetch(url, options).then(fetchProgress({ onProgress }));
+
+	return fetch(url, options);
+}

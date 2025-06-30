@@ -71,7 +71,14 @@ const Observation = table(
 	})
 );
 
-const Metadata = table('id', MetadataSchema);
+const Metadata = table('id', MetadataSchema.omit('options'));
+const MetadataOption = table(
+	['id'],
+	MetadataEnumVariant.and({
+		id: [/\w+:\w+/, '@', 'ID of the form metadata_id:key'],
+		metadataId: ID
+	})
+);
 const Protocol = table('id', ProtocolSchema);
 
 const Settings = table(
@@ -108,7 +115,11 @@ export const Schemas = {
 	HTTPRequest
 };
 
-export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ (['ImageFile', 'ImagePreviewFile']);
+export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
+	'ImageFile',
+	'ImagePreviewFile',
+	'MetadataOption'
+]);
 
 /**
  *
@@ -126,6 +137,7 @@ export const Tables = {
 	ImagePreviewFile,
 	Observation,
 	Metadata,
+	MetadataOption,
 	Protocol,
 	Settings
 };

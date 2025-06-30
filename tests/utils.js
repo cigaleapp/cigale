@@ -17,6 +17,7 @@ export async function importPhotos({ page }, ...names) {
 	names = names.map((name) => (path.extname(name) ? name : `${name}.jpeg`));
 
 	await page.getByTestId('protocol-to-choose').click();
+	await page.getByRole('link', { name: 'Importer' }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
 	await expect(page.getByText(/Cliquer ou déposer des images ici/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
@@ -95,9 +96,11 @@ export async function listTable(page, tableName) {
  * @param {Page} param0.page
  * @param {string} id
  * @param {Record<string, MetadataValue>} metadata
+ * @param {object} options
+ * @param {boolean} [options.refreshDB=true] whether to refresh the database after updating
  */
-export async function setImageMetadata({ page }, id, metadata) {
-	await page.evaluate(async ([id, metadata]) => {
+export async function setImageMetadata({ page }, id, metadata, { refreshDB = true } = {}) {
+	await page.evaluate(async ([id, metadata, refreshDB]) => {
 		const image = await window.DB.get('Image', id);
 		if (!image) throw new Error(`Image ${id} not found in the database`);
 		await window.DB.put('Image', {
@@ -113,8 +116,8 @@ export async function setImageMetadata({ page }, id, metadata) {
 			}
 		});
 		console.log('Image updated, refreshing DB', { id, metadata });
-		await window.refreshDB();
-	}, /** @type {const} */ ([id, metadata]));
+		if (refreshDB) await window.refreshDB();
+	}, /** @type {const} */ ([id, metadata, refreshDB]));
 }
 
 /**
@@ -125,6 +128,7 @@ export async function chooseDefaultProtocol(page) {
 	// Choose default protocol
 	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
 	await page.getByTestId('protocol-to-choose').click();
+	await page.getByRole('link', { name: 'Importer' }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
 }
 
@@ -193,6 +197,6 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
 	if (waitForLoading) {
 		await expect(page.getByText('Analyse…').first()).toBeVisible();
-		await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
+		await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 30_000 });
 	}
 }

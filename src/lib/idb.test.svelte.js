@@ -33,16 +33,17 @@ test('openDatabase', async () => {
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
 	expect(db.version).toMatchInlineSnapshot(`3`);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
-      FakeDOMStringList [
-        "Image",
-        "ImageFile",
-        "ImagePreviewFile",
-        "Metadata",
-        "Observation",
-        "Protocol",
-        "Settings",
-      ]
-    `);
+		FakeDOMStringList [
+		  "Image",
+		  "ImageFile",
+		  "ImagePreviewFile",
+		  "Metadata",
+		  "MetadataOption",
+		  "Observation",
+		  "Protocol",
+		  "Settings",
+		]
+	`);
 
 	const count = await Promise.all([...db.objectStoreNames].map((name) => db.count(name))).then(
 		(counts) => counts.reduce((total, count) => total + count, 0)

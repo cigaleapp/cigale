@@ -13,13 +13,14 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {import('./database').Metadata} definition
+	 * @property {import('./database').MetadataEnumVariant[]} [options]
 	 * @property {undefined | import('./database').MetadataValue} value
 	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
 	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onchange]
 	 */
 
 	/** @type {Props} */
-	let { value, merged, definition, onchange = () => {} } = $props();
+	let { value, merged, definition, options = [], onchange = () => {} } = $props();
 
 	const _id = $props.id();
 </script>
@@ -42,6 +43,7 @@
 			<MetadataInput
 				id={_id}
 				{definition}
+				{options}
 				value={value?.value}
 				onblur={onchange}
 				{merged}
@@ -85,7 +87,7 @@
 				{#each Object.entries(value.alternatives).sort(([, a], [, b]) => b - a) as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
 					{@const enumVariant = isType('enum', definition.type, stringValue)
-						? definition.options?.find(({ key }) => key === stringValue)
+						? options?.find(({ key }) => key === stringValue)
 						: undefined}
 					<li>
 						<div class="value" use:tooltip={enumVariant?.description}>
