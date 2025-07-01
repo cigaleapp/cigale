@@ -110,22 +110,26 @@ export async function loadModel(request, onProgress, webgpu = false) {
 }
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index of the model to use in the list of models for the current protocol
- * @param {'classification'|'detection'} task
+ * @param {object} taskSettings
+ * @param {object} taskSettings.input
+ * @param {number} taskSettings.input.width
+ * @param {number} taskSettings.input.height
+ * @param {string} taskSettings.input.name
+ * @param {boolean} taskSettings.input.normalized
+ * @param {object} taskSettings.output
+ * @param {string} taskSettings.output.name
+ * @param {import('./database.js').ModelDetectionOutputShape} taskSettings.output.shape
  * @param {ArrayBuffer[]} buffers
- * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {import('onnxruntime-web').InferenceSession} session
  * @param {typeof import('./state.svelte.js').uiState} [uiState]
  * @param {boolean} sequence
  * @param {boolean} webgpu
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
  */
-async function infer(
-	protocol,
-	modelIndex,
-	task,
+export async function infer(
+	taskSettings,
 	buffers,
-	model,
+	session,
 	uiState,
 	sequence = false,
 	webgpu = true
@@ -156,7 +160,7 @@ async function infer(
 	if (webgpu) {
 		console.log('webgpu not implemented yet, using wasm');
 	}
-	if (!model) {
+	if (!session) {
 		throw new Error('Model not loaded');
 	}
 	let start = -1;
@@ -164,17 +168,13 @@ async function infer(
 		start = Date.now();
 		if (uiState) uiState.processing.state = 'inference';
 	}
-	let taskSettings =
-		task === 'detection'
-			? protocol.crop?.infer?.[modelIndex]
-			: classificationInferenceSettings(protocol, modelIndex);
 
 	taskSettings = {
 		...taskSettings,
 		input: {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT,
-			name: model.inputNames[0],
+			name: session.inputNames[0],
 			normalized: true,
 			...taskSettings?.input
 		},
@@ -189,14 +189,13 @@ async function infer(
 	inputTensor = await imload(buffers, taskSettings.input);
 
 	console.log('inference...');
-	const outputTensor = await model.run({ [taskSettings.input.name]: inputTensor });
+	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });
 	console.log('done !');
 	console.log('output tensor: ', outputTensor);
 
 	console.log('post proc...');
 	const bbs = output2BB(
-		protocol,
-		modelIndex,
+		taskSettings.output.shape,
 		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),
 		buffers.length,
 		NUMCONF
