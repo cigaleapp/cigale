@@ -48,12 +48,14 @@
 			$preselectedProtocol = null;
 		}
 		if ($preselectedClassificationModel !== null) {
-			uiState.selectedClassificationModel = $preselectedClassificationModel;
-			$preselectedClassificationModel = null;
+			void uiState.setSelectedClassificationModel($preselectedClassificationModel).then(() => {
+				$preselectedClassificationModel = null;
+			});
 		}
 		if ($preselectedCropModel !== null) {
-			uiState.selectedCropModel = $preselectedCropModel;
-			$preselectedCropModel = null;
+			void uiState.setSelectedCropModel($preselectedCropModel).then(() => {
+				$preselectedCropModel = null;
+			});
 		}
 	});
 
@@ -173,8 +175,8 @@
 							</p>
 							<RadioButtons
 								value={uiState.selectedClassificationModel}
-								onchange={(value) => {
-									uiState.selectedClassificationModel = value ?? 0;
+								onchange={async (value) => {
+									await uiState.setSelectedClassificationModel(value ?? 0);
 								}}
 								options={radioOptions(uiState.classificationModels)}
 							/>
@@ -185,8 +187,8 @@
 							<p>Modèle d'inférence pour la détection</p>
 							<RadioButtons
 								value={uiState.selectedCropModel}
-								onchange={(value) => {
-									uiState.selectedCropModel = value ?? 0;
+								onchange={async (value) => {
+									await uiState.setSelectedCropModel(value ?? 0);
 								}}
 								options={radioOptions(uiState.cropModels)}
 							/>
