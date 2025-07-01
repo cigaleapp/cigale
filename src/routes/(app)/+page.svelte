@@ -24,6 +24,7 @@
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
 	);
 
+	let importingPreselectedProtocol = $state(false);
 	const preselectedProtocol = queryParam('protocol');
 	const preselectedClassificationModel = queryParam('classificationModel', ssp.number());
 	const preselectedCropModel = queryParam('cropModel', ssp.number());
@@ -36,7 +37,7 @@
 	);
 
 	afterNavigate(() => {
-		if (preselectedProtocolIsRemote && openImportRemoteProtocol) {
+		if (preselectedProtocolIsRemote && openImportRemoteProtocol && !importingPreselectedProtocol) {
 			openImportRemoteProtocol();
 		}
 	});
@@ -87,12 +88,14 @@
 <ModalConfirm
 	title="Importer le protocole distant?"
 	key="modal_import_remote_protocol"
+	confirm="Importer"
 	bind:open={openImportRemoteProtocol}
 	oncancel={() => {
 		$preselectedProtocol = null;
 	}}
 	onconfirm={async () => {
 		if (!$preselectedProtocol) return;
+		importingPreselectedProtocol = true;
 		const raw = await fetch($preselectedProtocol)
 			.then((res) => res.text())
 			.catch((e) => {
@@ -108,6 +111,8 @@
 			$preselectedProtocol = null;
 		} catch (error) {
 			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
+		} finally {
+			importingPreselectedProtocol = false;
 		}
 	}}
 >
@@ -119,6 +124,12 @@
 			{@render highlightHostname($preselectedProtocol)}
 		</a>
 	{/if}
+
+	<section class="modal-import-loading">
+		{#if importingPreselectedProtocol}
+			<p>Importation en cours...</p>
+		{/if}
+	</section>
 
 	{#snippet highlightHostname(/** @type {string} */ url)}
 		{url.split(new URL(url).hostname, 2)[0]}
@@ -238,6 +249,13 @@
 		margin: 3rem auto;
 		max-width: 400px;
 		gap: 3rem;
+	}
+
+	.modal-import-loading {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 3rem;
 	}
 
 	h1 {
