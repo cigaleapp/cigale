@@ -49,7 +49,7 @@ de plus ça se lance que sur chrome, avec la commande linux mettant les flags :
 */
 
 // nombre de threads pour wasm
-ort.env.wasm.numThreads = -1;
+ort.env.wasm.numThreads = 1;
 // nécéssaire sinon ça casse
 
 ort.env.wasm.wasmPaths = {
