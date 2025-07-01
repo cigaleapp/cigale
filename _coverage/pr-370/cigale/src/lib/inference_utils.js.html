@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">29.49% </span>
+                <span class="strong">29.83% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>146/495</span>
+                <span class='fraction'>145/486</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">29.49% </span>
+                <span class="strong">29.83% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>146/495</span>
+                <span class='fraction'>145/486</span>
             </div>
         
             
@@ -605,17 +605,7 @@
 <a name='L540'></a><a href='#L540'>540</a>
 <a name='L541'></a><a href='#L541'>541</a>
 <a name='L542'></a><a href='#L542'>542</a>
-<a name='L543'></a><a href='#L543'>543</a>
-<a name='L544'></a><a href='#L544'>544</a>
-<a name='L545'></a><a href='#L545'>545</a>
-<a name='L546'></a><a href='#L546'>546</a>
-<a name='L547'></a><a href='#L547'>547</a>
-<a name='L548'></a><a href='#L548'>548</a>
-<a name='L549'></a><a href='#L549'>549</a>
-<a name='L550'></a><a href='#L550'>550</a>
-<a name='L551'></a><a href='#L551'>551</a>
-<a name='L552'></a><a href='#L552'>552</a>
-<a name='L553'></a><a href='#L553'>553</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L543'></a><a href='#L543'>543</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -997,7 +987,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1018,15 +1007,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1542,14 +1522,13 @@ export <span class="fstat-no" title="function not covered" >async function imloa
 &nbsp;
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index du modèle de classification dans la liste des modèles de classification du protocole
+ * @param {import('./database.js').ModelDetectionOutputShape} outputShape
  * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
  * @returns {[import('./inference.js').BB[][], number[][]]}
  */
-export <span class="fstat-no" title="function not covered" >function output2BB(protocol, modelIndex, output, numImages, minConfidence) {</span>
+export <span class="fstat-no" title="function not covered" >function output2BB(outputShape, output, numImages, minConfidence) {</span>
 <span class="cstat-no" title="statement not covered" >	/*reshape les bounding boxes obtenues par le modèle d'inférence</span>
 <span class="cstat-no" title="statement not covered" >    -------input------- :</span>
 <span class="cstat-no" title="statement not covered" >        output : liste de bounding boxes obtenues par le modèle d'inférence</span>
@@ -1571,15 +1550,6 @@ export <span class="fstat-no" title="function not covered" >function output2BB(p
 <span class="cstat-no" title="statement not covered" >	let bestScores = [];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	console.log(output);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	const outputShape = protocol.crop?.infer?.[modelIndex].output?.shape ?? [</span>
-<span class="cstat-no" title="statement not covered" >		'sx',</span>
-<span class="cstat-no" title="statement not covered" >		'sy',</span>
-<span class="cstat-no" title="statement not covered" >		'w',</span>
-<span class="cstat-no" title="statement not covered" >		'h',</span>
-<span class="cstat-no" title="statement not covered" >		'score',</span>
-<span class="cstat-no" title="statement not covered" >		'_'</span>
-<span class="cstat-no" title="statement not covered" >	];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const suboutputSize = outputShape.length;</span>
 <span class="cstat-no" title="statement not covered" >	let boundingBoxesCount = output.length / suboutputSize;</span>
@@ -1726,7 +1696,7 @@ export <span class="fstat-no" title="function not covered" >function output2BB(p
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-30T00:10:34.346Z
+                at 2025-07-01T17:16:41.114Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
