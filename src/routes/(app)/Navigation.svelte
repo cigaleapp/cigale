@@ -118,7 +118,7 @@
 
 {#snippet noInferenceIndicator(/** @type {boolean} */ available, /** @type {string} */ help)}
 	<div class="inference-indicator" use:tooltip={help}>
-		{#if !available}
+		{#if !available && uiState.currentProtocol}
 			<IconNoInference />
 		{/if}
 	</div>
