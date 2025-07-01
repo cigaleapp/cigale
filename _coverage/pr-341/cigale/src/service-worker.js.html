@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/80</span>
+                <span class='fraction'>0/74</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/80</span>
+                <span class='fraction'>0/74</span>
             </div>
         
             
@@ -155,12 +155,7 @@
 <a name='L90'></a><a href='#L90'>90</a>
 <a name='L91'></a><a href='#L91'>91</a>
 <a name='L92'></a><a href='#L92'>92</a>
-<a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a>
-<a name='L95'></a><a href='#L95'>95</a>
-<a name='L96'></a><a href='#L96'>96</a>
-<a name='L97'></a><a href='#L97'>97</a>
-<a name='L98'></a><a href='#L98'>98</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L93'></a><a href='#L93'>93</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -175,15 +170,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -214,11 +201,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -272,20 +262,12 @@
 <span class="cstat-no" title="statement not covered" >	...build, // the app itself</span>
 <span class="cstat-no" title="statement not covered" >	...files // everything in `static`</span>
 <span class="cstat-no" title="statement not covered" >];</span>
-<span class="cstat-no" title="statement not covered" >const MODELS = [</span>
-<span class="cstat-no" title="statement not covered" >	// Neural network models</span>
-<span class="cstat-no" title="statement not covered" >	'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',</span>
-<span class="cstat-no" title="statement not covered" >	'https://cigaleapp.github.io/models/model_classif.onnx',</span>
-<span class="cstat-no" title="statement not covered" >	'https://cigaleapp.github.io/models/class_mapping.txt'</span>
-<span class="cstat-no" title="statement not covered" >];</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >self.addEventListener('install', (event) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	// Create a new cache and add all files to it</span>
 <span class="cstat-no" title="statement not covered" >	async function addFilesToCache() {</span>
 <span class="cstat-no" title="statement not covered" >		const cache = await caches.open(CACHE);</span>
 <span class="cstat-no" title="statement not covered" >		await cache.addAll(ASSETS);</span>
-<span class="cstat-no" title="statement not covered" >		const modelsCache = await caches.open(MODELS_CACHE);</span>
-<span class="cstat-no" title="statement not covered" >		await modelsCache.addAll(MODELS);</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	event.waitUntil(addFilesToCache());</span>
@@ -310,14 +292,17 @@
 <span class="cstat-no" title="statement not covered" >	async function respond() {</span>
 <span class="cstat-no" title="statement not covered" >		let url = new URL(event.request.url);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		if (MODELS.includes(url.href) || url.searchParams.get('x-cigale-cache-as') === 'model') {</span>
-<span class="cstat-no" title="statement not covered" >			url.searchParams.delete('x-cigale-cache-as');</span>
+<span class="cstat-no" title="statement not covered" >		const cacheName = url.searchParams.get('x-cigale-cache-as') ? MODELS_CACHE : CACHE;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		if (cacheName === MODELS_CACHE) {</span>
 <span class="cstat-no" title="statement not covered" >			const cache = await caches.open(MODELS_CACHE);</span>
 <span class="cstat-no" title="statement not covered" >			console.log(`Serving ${url} from models cache`);</span>
 <span class="cstat-no" title="statement not covered" >			const response = await cache.match(url.href);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >			if (response) {</span>
 <span class="cstat-no" title="statement not covered" >				return response;</span>
+<span class="cstat-no" title="statement not covered" >			} else {</span>
+<span class="cstat-no" title="statement not covered" >				console.warn(`Model ${url} not found in cache, fetching from network`);</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
@@ -333,7 +318,7 @@
 <span class="cstat-no" title="statement not covered" >			}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >			if (response.status === 200) {</span>
-<span class="cstat-no" title="statement not covered" >				const cache = await caches.open(CACHE);</span>
+<span class="cstat-no" title="statement not covered" >				const cache = await caches.open(cacheName);</span>
 <span class="cstat-no" title="statement not covered" >				cache.put(event.request, response.clone());</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
 &nbsp;
@@ -361,7 +346,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-30T13:31:34.385Z
+                at 2025-07-01T11:02:49.958Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

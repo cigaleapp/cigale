@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/118</span>
+                <span class='fraction'>0/120</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/118</span>
+                <span class='fraction'>0/120</span>
             </div>
         
             
@@ -345,7 +345,9 @@
 <a name='L280'></a><a href='#L280'>280</a>
 <a name='L281'></a><a href='#L281'>281</a>
 <a name='L282'></a><a href='#L282'>282</a>
-<a name='L283'></a><a href='#L283'>283</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -388,6 +390,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -677,12 +681,14 @@
 <span class="cstat-no" title="statement not covered" >			$preselectedProtocol = null;</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >		if ($preselectedClassificationModel !== null) {</span>
-<span class="cstat-no" title="statement not covered" >			uiState.selectedClassificationModel = $preselectedClassificationModel;</span>
-<span class="cstat-no" title="statement not covered" >			$preselectedClassificationModel = null;</span>
+<span class="cstat-no" title="statement not covered" >			void uiState.setSelectedClassificationModel($preselectedClassificationModel).then(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >				$preselectedClassificationModel = null;</span>
+<span class="cstat-no" title="statement not covered" >			});</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >		if ($preselectedCropModel !== null) {</span>
-<span class="cstat-no" title="statement not covered" >			uiState.selectedCropModel = $preselectedCropModel;</span>
-<span class="cstat-no" title="statement not covered" >			$preselectedCropModel = null;</span>
+<span class="cstat-no" title="statement not covered" >			void uiState.setSelectedCropModel($preselectedCropModel).then(() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >				$preselectedCropModel = null;</span>
+<span class="cstat-no" title="statement not covered" >			});</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	});</span>
 &nbsp;
@@ -802,8 +808,8 @@
 							&lt;/p&gt;
 							&lt;RadioButtons
 <span class="cstat-no" title="statement not covered" >								value={uiState.selectedClassificationModel}</span>
-<span class="cstat-no" title="statement not covered" >								onchange={(value) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >									uiState.selectedClassificationModel = value ?? 0;</span>
+<span class="cstat-no" title="statement not covered" >								onchange={async (value) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >									await uiState.setSelectedClassificationModel(value ?? 0);</span>
 <span class="cstat-no" title="statement not covered" >								}}</span>
 <span class="cstat-no" title="statement not covered" >								options={radioOptions(uiState.classificationModels)}</span>
 							/&gt;
@@ -814,8 +820,8 @@
 							&lt;p&gt;Modèle d'inférence pour la détection&lt;/p&gt;
 							&lt;RadioButtons
 <span class="cstat-no" title="statement not covered" >								value={uiState.selectedCropModel}</span>
-<span class="cstat-no" title="statement not covered" >								onchange={(value) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >									uiState.selectedCropModel = value ?? 0;</span>
+<span class="cstat-no" title="statement not covered" >								onchange={async (value) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >									await uiState.setSelectedCropModel(value ?? 0);</span>
 <span class="cstat-no" title="statement not covered" >								}}</span>
 <span class="cstat-no" title="statement not covered" >								options={radioOptions(uiState.cropModels)}</span>
 							/&gt;
@@ -916,7 +922,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-30T13:31:34.385Z
+                at 2025-07-01T11:02:49.958Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
