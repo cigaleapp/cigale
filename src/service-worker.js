@@ -3,11 +3,9 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 import { build, files, version } from '$service-worker';
-import { infer, loadModel } from './lib/inference.js';
-import { Schemas } from './lib/database.js';
-import { type } from 'arktype';
-import * as Swarp from './lib/swarp.js';
-import { PROCEDURES } from './service-worker-procedures.js';
+import * as Swarp from 'swarpc';
+import { loadModel } from './lib/inference.js';
+import { PROCEDURES } from './lib/service-worker-procedures.js';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;

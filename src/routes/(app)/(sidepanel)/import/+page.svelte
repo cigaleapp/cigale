@@ -197,10 +197,10 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
-	import * as Swarp from '$lib/swarp.js';
-	import { PROCEDURES } from '$lib/../service-worker-procedures.js';
+	import * as Swarpc from 'swarpc';
+	import { PROCEDURES } from '$lib/service-worker-procedures.js';
 
-	const swarp = Swarp.Client(PROCEDURES);
+	const swarp = Swarpc.Client(PROCEDURES);
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 

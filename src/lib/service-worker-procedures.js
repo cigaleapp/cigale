@@ -1,5 +1,5 @@
 /**
- * @import { ProceduresMap } from './lib/swarp.js';
+ * @import { ProceduresMap } from 'swarpc';
  */
 
 import { Schemas } from '$lib/database';

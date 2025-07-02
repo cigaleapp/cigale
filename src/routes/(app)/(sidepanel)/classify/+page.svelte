@@ -25,12 +25,12 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
-	import * as Swarp from '$lib/swarp.js';
-	import { PROCEDURES } from '$lib/../service-worker-procedures.js';
+	import * as Swarpc from 'swarpc';
+	import { PROCEDURES } from '$lib/service-worker-procedures.js';
 
 	seo({ title: 'Classification' });
 
-	const swarp = Swarp.Client(PROCEDURES);
+	const swarp = Swarpc.Client(PROCEDURES);
 
 	const erroredImages = $derived(uiState.erroredImages);
 	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
