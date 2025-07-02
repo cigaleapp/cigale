@@ -33,13 +33,7 @@ export default defineConfig({
 		crossOriginIsolation()
 	],
 	optimizeDeps: {
-		exclude: [
-			'onnxruntime-web',
-			'turbo_exif',
-			'fetch-progress',
-			'@tensorflow/tfjs',
-			'@tensorflow/tfjs-backend-webgl'
-		]
+		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
 	},
 	assetsInclude: ['**/*.wasm']
 });
