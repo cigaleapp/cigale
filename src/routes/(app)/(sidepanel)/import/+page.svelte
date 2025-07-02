@@ -32,42 +32,6 @@
 		}
 	}
 
-	let modelLoadingProgress = $state(0);
-	let cropperModelLoaded = $state(false);
-	async function loadCropperModel() {
-		// Prevent multiple loads
-		if (cropperModelLoaded) return;
-		if (!uiState.currentProtocol) return;
-		if (!uiState.cropInferenceAvailable) return;
-		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
-		if (!cropModel) return;
-		navigator.serviceWorker.controller?.postMessage({
-			action: 'loadModel',
-			task: 'detection',
-			request: cropModel
-		});
-
-		return new Promise((resolve, _reject) => {
-			navigator.serviceWorker.addEventListener(
-				'message',
-				({ data: { action, task, progress, done } }) => {
-					if (action !== 'loadModel') return;
-					if (task !== 'detection') return;
-
-					if (progress !== undefined) {
-						modelLoadingProgress = progress.transferred / progress.total;
-					}
-
-					if (done) {
-						toasts.success('Modèle de détection chargé');
-						cropperModelLoaded = true;
-						resolve();
-					}
-				}
-			);
-		});
-	}
-
 	/**
 	 * @param {File} file
 	 * @param {string} id
@@ -233,6 +197,10 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
+	import * as Swarp from '$lib/swarp.js';
+	import { PROCEDURES } from '$lib/../service-worker-procedures.js';
+
+	const swarp = Swarp.Client(PROCEDURES);
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
@@ -247,6 +215,37 @@
 				)
 		})
 	);
+
+	let modelLoadingProgress = $state(0);
+	let cropperModelLoaded = $state(false);
+	async function loadCropperModel() {
+		// Prevent multiple loads
+		if (cropperModelLoaded) return;
+		if (!uiState.currentProtocol) return;
+		if (!uiState.cropInferenceAvailable) return;
+		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
+		if (!cropModel) return;
+
+		await swarp
+			.loadModel(
+				{
+					request: cropModel,
+					task: 'detection'
+				},
+				({ transferred, total }) => {
+					modelLoadingProgress = transferred / total;
+				}
+			)
+			.then(() => {
+				toasts.success('Modèle de détection chargé');
+			})
+			.catch((error) => {
+				console.error(error);
+				toasts.error('Erreur lors du chargement du modèle de détection');
+			});
+
+		cropperModelLoaded = true;
+	}
 
 	$effect(() => {
 		if (!cropperModelLoaded) return;

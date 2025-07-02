@@ -10,7 +10,11 @@ import {
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
-import { FilepathTemplate, Protocol as ProtocolSchema } from './schemas/protocols.js';
+import {
+	FilepathTemplate,
+	Protocol as ProtocolSchema,
+	ModelDetectionOutputShape
+} from './schemas/protocols.js';
 
 const Dimensions = type({
 	width: 'number > 0',
@@ -103,6 +107,7 @@ export const Schemas = {
 	MetadataValue,
 	Image,
 	ModelInput,
+	ModelDetectionOutputShape,
 	Observation,
 	MetadataInferOptions,
 	MetadataType,
@@ -221,7 +226,6 @@ function table(keyPaths, schema) {
  */
 
 /**
- * @import { ModelDetectionOutputShape } from './schemas/protocols.js'
  * @typedef  ModelDetectionOutputShape
  * @type {typeof ModelDetectionOutputShape.infer}
  */

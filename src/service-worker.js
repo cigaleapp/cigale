@@ -3,9 +3,11 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 import { build, files, version } from '$service-worker';
-import { loadModel } from './lib/inference.js';
+import { infer, loadModel } from './lib/inference.js';
 import { Schemas } from './lib/database.js';
 import { type } from 'arktype';
+import * as Swarp from './lib/swarp.js';
+import { PROCEDURES } from './service-worker-procedures.js';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
@@ -23,81 +25,27 @@ const MODELS = [
 	'https://cigaleapp.github.io/models/class_mapping.txt'
 ];
 
+const swarp = Swarp.Server(PROCEDURES);
+
+console.log(swarp);
+
 /**
  * @type {Map<string, import('onnxruntime-web').InferenceSession>}
  */
 let inferenceSessions = new Map();
 
-const MessageData = type.or(
-	{
-		action: '"loadModel"',
-		request: Schemas.HTTPRequest,
-		webgpu: 'boolean = false',
-		task: '"classification" | "detection"'
-	},
-	{
-		action: '"ping"'
-	},
-	{
-		action: '"infer"',
-		protocol: Schemas.Protocol,
-		modelIndex: 'number >= 0',
-		webgpu: 'boolean = true',
-		task: '"classification" | "detection"',
-		buffers: 'ArrayBuffer[]',
-		sequence: 'boolean = false'
-	}
-);
-
-self.addEventListener('message', async (/** @type {MessageEvent} */ event) => {
-	const payload = MessageData.assert(event.data);
-	console.info(`Received message from client:`, payload);
-	const postMessage = async (data) => {
-		await self.clients
-			.matchAll()
-			.then((clients) => clients.forEach((client) => client.postMessage(data)));
-	};
-
-	switch (payload.action) {
-		case 'loadModel': {
-			inferenceSessions.set(
-				payload.task,
-				await loadModel(
-					payload.request,
-					async (progress) => {
-						console.info(`Model loading progress:`, progress);
-						await postMessage({
-							action: 'loadModel',
-							task: payload.task,
-							progress,
-							done: false
-						});
-					},
-					payload.webgpu
-				)
-			);
-			await postMessage({
-				action: 'loadModel',
-				task: payload.task,
-				progress: undefined,
-				done: true
-			});
-			console.log({ inferenceSessions });
-			break;
-		}
-		case 'ping': {
-			console.info(`Received ping from client`);
-			await postMessage({
-				action: 'ping',
-				answer: 'pong'
-			});
-			break;
-		}
-		case 'infer': {
-			break;
-		}
-	}
+swarp.loadModel(async ({ task, request, webgpu }, onProgress) => {
+	inferenceSessions.set(task, await loadModel(request, onProgress, webgpu));
+	return true;
 });
+
+swarp.isModelLoaded((task) => inferenceSessions.has(task));
+
+swarp.inferBoundingBoxes(async ({ fileId, taskSettings, webgpu }) => {
+	// const results = await infer(taskSettings, )
+});
+
+swarp.start(self);
 
 self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
@@ -124,6 +72,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
+	console.log({ event });
 	// ignore POST requests etc.
 	if (event.request.method !== 'GET') return;
 

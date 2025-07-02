@@ -25,8 +25,12 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
+	import * as Swarp from '$lib/swarp.js';
+	import { PROCEDURES } from '$lib/../service-worker-procedures.js';
 
 	seo({ title: 'Classification' });
+
+	const swarp = Swarp.Client(PROCEDURES);
 
 	const erroredImages = $derived(uiState.erroredImages);
 	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
@@ -53,13 +57,19 @@
 		if (classifmodelLoaded) return;
 		if (!uiState.currentProtocol) return;
 		if (!uiState.classificationInferenceAvailable) return;
-		const classmappingRequest = await tables.Metadata.get(
-			uiState.classificationMetadataId ?? ''
-		).then(
-			(metadata) => metadata?.infer?.neural?.[uiState.selectedClassificationModel]?.classmapping
-		);
 
-		classmapping = await fetchHttpRequest(classmappingRequest, {
+		const settings = classificationInferenceSettings(
+			uiState.currentProtocol,
+			uiState.selectedClassificationModel
+		);
+		if (!settings) {
+			toasts.error(
+				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur le protocole ${uiState.currentProtocol.name}`
+			);
+			return;
+		}
+
+		classmapping = await fetchHttpRequest(settings.classmapping, {
 			cacheAs: 'model',
 			onProgress({ transferred, total }) {
 				if (total === 0) return;
@@ -69,36 +79,28 @@
 			.then((res) => res.text())
 			.then((text) => text.split(/\r?\n/).filter(Boolean));
 
-		const request = classificationInferenceSettings(
-			uiState.currentProtocol,
-			uiState.selectedClassificationModel
-		)?.model;
-
-		navigator.serviceWorker.controller?.postMessage({
-			action: 'loadModel',
-			task: 'classification',
-			request
-		});
-
-		return new Promise((resolve, _reject) => {
-			navigator.serviceWorker.addEventListener(
-				'message',
-				({ data: { action, task, progress, done } }) => {
-					if (action !== 'loadModel') return;
-					if (task !== 'classification') return;
-
-					if (progress !== undefined) {
-						modelLoadingProgress = 0.25 + 0.75 * (progress.transferred / progress.total);
-					}
-
-					if (done) {
-						toasts.success('Modèle de classification chargé');
-						classifmodelLoaded = true;
-						resolve();
-					}
+		await swarp
+			.loadModel(
+				{
+					request: settings.model,
+					task: 'classification'
+				},
+				(progress) => {
+					modelLoadingProgress = 0.25 + 0.75 * (progress.transferred / progress.total);
 				}
-			);
-		});
+			)
+			.then(() => {
+				toasts.success('Modèle de classification chargé');
+			})
+			.catch((error) => {
+				console.error(error);
+				toasts.error('Erreur lors du chargement du modèle de classification');
+			})
+			.finally(() => {
+				classifmodelLoaded = true;
+			});
+
+		classifmodelLoaded = true;
 	}
 	/**
 	 * @param {ArrayBuffer} buffer
