@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for cigale/src/lib/schemas/results.js</title>
+    <title>Code coverage report for cigale/src/service-worker-procedures.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../../prettify.css" />
-    <link rel="stylesheet" href="../../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">cigale/src/lib/schemas</a> results.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">cigale/src</a> service-worker-procedures.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/54</span>
+                <span class='fraction'>0/58</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/54</span>
+                <span class='fraction'>0/58</span>
             </div>
         
             
@@ -119,7 +119,15 @@
 <a name='L54'></a><a href='#L54'>54</a>
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -143,7 +151,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -175,61 +182,66 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { type } from 'arktype';<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >import { Protocol } from './protocols.js';</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >/**<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" > * @import { ProceduresMap } from './lib/swarp.js';</span>
+<span class="cstat-no" title="statement not covered" > */</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >const MetadataRecord = type({</span>
-<span class="cstat-no" title="statement not covered" >	'[string]': {</span>
-<span class="cstat-no" title="statement not covered" >		value: ['unknown', '@', 'Valeur de la métadonnée'],</span>
-<span class="cstat-no" title="statement not covered" >		'valueLabel?': [</span>
-<span class="cstat-no" title="statement not covered" >			'string',</span>
-<span class="cstat-no" title="statement not covered" >			'@',</span>
-<span class="cstat-no" title="statement not covered" >			"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"</span>
-<span class="cstat-no" title="statement not covered" >		],</span>
-<span class="cstat-no" title="statement not covered" >		confidence: ['number', '@', 'Confiance dans la valeur de la métadonnée, entre 0 et 1'],</span>
-<span class="cstat-no" title="statement not covered" >		manuallyModified: ['boolean', '@', 'La valeur de la métadonnée a été modifiée manuellement'],</span>
-<span class="cstat-no" title="statement not covered" >		alternatives: type({</span>
-<span class="cstat-no" title="statement not covered" >			'[string]': [</span>
-<span class="cstat-no" title="statement not covered" >				'number',</span>
-<span class="cstat-no" title="statement not covered" >				'@',</span>
-<span class="cstat-no" title="statement not covered" >				'Confiance dans cette valeur alternative de la métadonnée, entre 0 et 1.'</span>
-<span class="cstat-no" title="statement not covered" >			]</span>
-<span class="cstat-no" title="statement not covered" >		}).describe(</span>
-<span class="cstat-no" title="statement not covered" >			"Autres valeurs possibles. Les clés de l'objet sont les autres valeurs possibles pour cette métadonnée (converties en texte via JSON), les valeurs de l'objet sont les confiances associées à ces alternatives."</span>
-<span class="cstat-no" title="statement not covered" >		)</span>
+<span class="cstat-no" title="statement not covered" >import { Schemas } from '$lib/database';</span>
+<span class="cstat-no" title="statement not covered" >import { type } from 'arktype';</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({</span>
+<span class="cstat-no" title="statement not covered" >	loadModel: {</span>
+<span class="cstat-no" title="statement not covered" >		input: type({</span>
+<span class="cstat-no" title="statement not covered" >			request: Schemas.HTTPRequest,</span>
+<span class="cstat-no" title="statement not covered" >			task: '"classification" | "detection"',</span>
+<span class="cstat-no" title="statement not covered" >			'webgpu?': 'boolean'</span>
+<span class="cstat-no" title="statement not covered" >		}),</span>
+<span class="cstat-no" title="statement not covered" >		progress: type({</span>
+<span class="cstat-no" title="statement not covered" >			total: 'number',</span>
+<span class="cstat-no" title="statement not covered" >			transferred: 'number',</span>
+<span class="cstat-no" title="statement not covered" >			speed: 'number',</span>
+<span class="cstat-no" title="statement not covered" >			eta: 'number'</span>
+<span class="cstat-no" title="statement not covered" >		}),</span>
+<span class="cstat-no" title="statement not covered" >		success: type('true')</span>
+<span class="cstat-no" title="statement not covered" >	},</span>
+<span class="cstat-no" title="statement not covered" >	isModelLoaded: {</span>
+<span class="cstat-no" title="statement not covered" >		input: type('"classification" | "detection"'),</span>
+<span class="cstat-no" title="statement not covered" >		progress: type({}),</span>
+<span class="cstat-no" title="statement not covered" >		success: type('boolean')</span>
+<span class="cstat-no" title="statement not covered" >	},</span>
+<span class="cstat-no" title="statement not covered" >	inferBoundingBoxes: {</span>
+<span class="cstat-no" title="statement not covered" >		input: type({</span>
+<span class="cstat-no" title="statement not covered" >			fileId: 'string',</span>
+<span class="cstat-no" title="statement not covered" >			webgpu: 'boolean = false',</span>
+<span class="cstat-no" title="statement not covered" >			taskSettings: {</span>
+<span class="cstat-no" title="statement not covered" >				input: Schemas.ModelInput,</span>
+<span class="cstat-no" title="statement not covered" >				output: {</span>
+<span class="cstat-no" title="statement not covered" >					name: 'string',</span>
+<span class="cstat-no" title="statement not covered" >					shape: Schemas.ModelDetectionOutputShape</span>
+<span class="cstat-no" title="statement not covered" >				}</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		}),</span>
+<span class="cstat-no" title="statement not covered" >		progress: type({}),</span>
+<span class="cstat-no" title="statement not covered" >		success: type({</span>
+<span class="cstat-no" title="statement not covered" >			boxes: type(['number', 'number', 'number', 'number']).array(),</span>
+<span class="cstat-no" title="statement not covered" >			scores: type.number.array()</span>
+<span class="cstat-no" title="statement not covered" >		})</span>
+<span class="cstat-no" title="statement not covered" >	},</span>
+<span class="cstat-no" title="statement not covered" >	classify: {</span>
+<span class="cstat-no" title="statement not covered" >		input: type({</span>
+<span class="cstat-no" title="statement not covered" >			fileId: 'string',</span>
+<span class="cstat-no" title="statement not covered" >			'webgpu?': 'boolean',</span>
+<span class="cstat-no" title="statement not covered" >			taskSettings: {</span>
+<span class="cstat-no" title="statement not covered" >				input: Schemas.ModelInput,</span>
+<span class="cstat-no" title="statement not covered" >				output: { name: 'string' }</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		}),</span>
+<span class="cstat-no" title="statement not covered" >		progress: type({}),</span>
+<span class="cstat-no" title="statement not covered" >		success: type({</span>
+<span class="cstat-no" title="statement not covered" >			scores: type.number.array()</span>
+<span class="cstat-no" title="statement not covered" >		})</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" >});</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >export const Analysis = type({</span>
-<span class="cstat-no" title="statement not covered" >	observations: type({</span>
-<span class="cstat-no" title="statement not covered" >		'[string]': {</span>
-<span class="cstat-no" title="statement not covered" >			label: ['string', '@', "Label de l'observation"],</span>
-<span class="cstat-no" title="statement not covered" >			images: type({</span>
-<span class="cstat-no" title="statement not covered" >				id: ['string', '@', "ID de l'image"],</span>
-<span class="cstat-no" title="statement not covered" >				filename: ['string', '@', 'Nom du fichier utilisé pour cette image'],</span>
-<span class="cstat-no" title="statement not covered" >				contentType: [</span>
-<span class="cstat-no" title="statement not covered" >					'string',</span>
-<span class="cstat-no" title="statement not covered" >					'@',</span>
-<span class="cstat-no" title="statement not covered" >					"Type de contenu de l'image, au format MIME (exemple: image/jpeg)"</span>
-<span class="cstat-no" title="statement not covered" >				],</span>
-<span class="cstat-no" title="statement not covered" >				sequence: [</span>
-<span class="cstat-no" title="statement not covered" >					'number',</span>
-<span class="cstat-no" title="statement not covered" >					'@',</span>
-<span class="cstat-no" title="statement not covered" >					"Numéro de séquence de l'image dans l'archive .zip. Unique à l'entièreté de l'export"</span>
-<span class="cstat-no" title="statement not covered" >				],</span>
-<span class="cstat-no" title="statement not covered" >				metadata: MetadataRecord,</span>
-<span class="cstat-no" title="statement not covered" >				exportedAs: type({</span>
-<span class="cstat-no" title="statement not covered" >					original: ['string', '@', "Chemin vers l'image originale"],</span>
-<span class="cstat-no" title="statement not covered" >					cropped: ['string', '@', "Chemin vers l'image recadrée"]</span>
-<span class="cstat-no" title="statement not covered" >				}).describe("Chemins dans l'archive .zip vers l'image exportée")</span>
-<span class="cstat-no" title="statement not covered" >			}).array(),</span>
-<span class="cstat-no" title="statement not covered" >			metadata: MetadataRecord,</span>
-<span class="cstat-no" title="statement not covered" >			protocolMetadata: MetadataRecord.describe(</span>
-<span class="cstat-no" title="statement not covered" >				"Métadonnées définies par le protocole. Les clés de l'objet sont les identifiants des métadonnées, sans le préfixe qui identifie leur protocole de provenance"</span>
-<span class="cstat-no" title="statement not covered" >			)</span>
-<span class="cstat-no" title="statement not covered" >		}</span>
-<span class="cstat-no" title="statement not covered" >	}).describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),</span>
-<span class="cstat-no" title="statement not covered" >	protocol: Protocol.describe("Le protocole utilisé pour cette session d'analyse")</span>
 <span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;</pre></td></tr></table></pre>
 
@@ -240,14 +252,14 @@
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-07-02T15:16:43.886Z
             </div>
-        <script src="../../../../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../../sorter.js"></script>
-        <script src="../../../../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     
