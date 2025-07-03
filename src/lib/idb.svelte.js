@@ -239,16 +239,17 @@ export async function get(tableName, key) {
 /**
  *
  * @param {TableName} tableName
+ * @param {IDBKeyRange} [keyRange]
  * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
  * @template {keyof typeof Tables} TableName
  */
-export async function list(tableName) {
+export async function list(tableName, keyRange = undefined) {
 	console.time(`ls ${tableName}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	// @ts-ignore
 	return await db
-		.getAll(tableName)
+		.getAll(tableName, keyRange)
 		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
 		.then((result) => {
 			console.timeEnd(`ls ${tableName}`);

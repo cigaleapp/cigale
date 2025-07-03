@@ -1,4 +1,7 @@
 /// <reference types="@sveltejs/kit" />
+/// <reference no-default-lib="true"/>
+/// <reference lib="esnext" />
+/// <reference lib="webworker" />
 import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
@@ -10,20 +13,12 @@ const ASSETS = [
 	...build, // the app itself
 	...files // everything in `static`
 ];
-const MODELS = [
-	// Neural network models
-	'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
-	'https://cigaleapp.github.io/models/model_classif.onnx',
-	'https://cigaleapp.github.io/models/class_mapping.txt'
-];
 
 self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
 	async function addFilesToCache() {
 		const cache = await caches.open(CACHE);
 		await cache.addAll(ASSETS);
-		const modelsCache = await caches.open(MODELS_CACHE);
-		await modelsCache.addAll(MODELS);
 	}
 
 	event.waitUntil(addFilesToCache());
@@ -41,20 +36,24 @@ self.addEventListener('activate', (event) => {
 	event.waitUntil(deleteOldCaches());
 });
 
-self.addEventListener('fetch', (event) => {
-	// ignore POST requests etc
+self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
+	// ignore POST requests etc.
 	if (event.request.method !== 'GET') return;
 
 	async function respond() {
-		const url = new URL(event.request.url);
+		let url = new URL(event.request.url);
 
-		if (MODELS.includes(url.href)) {
+		const cacheName = url.searchParams.get('x-cigale-cache-as') ? MODELS_CACHE : CACHE;
+
+		if (cacheName === MODELS_CACHE) {
 			const cache = await caches.open(MODELS_CACHE);
 			console.log(`Serving ${url} from models cache`);
 			const response = await cache.match(url.href);
 
 			if (response) {
 				return response;
+			} else {
+				console.warn(`Model ${url} not found in cache, fetching from network`);
 			}
 		}
 
@@ -70,7 +69,7 @@ self.addEventListener('fetch', (event) => {
 			}
 
 			if (response.status === 200) {
-				const cache = await caches.open(CACHE);
+				const cache = await caches.open(cacheName);
 				cache.put(event.request, response.clone());
 			}
 

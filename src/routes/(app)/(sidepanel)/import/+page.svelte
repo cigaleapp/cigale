@@ -35,9 +35,13 @@
 	let modelLoadingProgress = $state(0);
 	let cropperModel = $state();
 	async function loadCropperModel() {
+		// Prevent multiple loads
+		if (cropperModel) return;
 		if (!uiState.currentProtocol) return;
+		if (!uiState.cropInferenceAvailable) return;
 		cropperModel = await loadModel(
 			uiState.currentProtocol,
+			uiState.selectedCropModel,
 			'detection',
 			({ transferred, total }) => {
 				if (total === 0) return;
@@ -71,13 +75,25 @@
 			height
 		});
 
-		await inferBoundingBoxes({
-			id,
-			bytes: resizedBytes,
-			filename: file.name,
-			contentType: file.type,
-			dimensions: { width, height }
-		});
+		if (uiState.cropInferenceAvailable) {
+			await inferBoundingBoxes({
+				id,
+				bytes: resizedBytes,
+				filename: file.name,
+				contentType: file.type,
+				dimensions: { width, height }
+			});
+		} else {
+			await tables.Image.set({
+				id: imageId(id, 0),
+				filename: file.name,
+				addedAt: formatISO(new Date()),
+				contentType: file.type,
+				dimensions: { width, height },
+				fileId: id,
+				metadata: {}
+			});
+		}
 
 		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
 			console.error(error);
@@ -100,6 +116,17 @@
 			return;
 		}
 
+		if (!uiState.currentProtocol.crop.infer) {
+			console.warn(
+				'No crop inference defined, not analyzing image. Configure crop inference in the protocol (crop.infer) if this was not intentional.'
+			);
+			return;
+		}
+
+		if (!uiState.cropInferenceAvailable) {
+			return;
+		}
+
 		if (!cropperModel) {
 			toasts.error(
 				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -111,6 +138,7 @@
 
 		const [[boundingBoxes], [scores]] = await inferSequentialy(
 			uiState.currentProtocol,
+			uiState.selectedCropModel,
 			[file.bytes],
 			cropperModel
 		);
@@ -179,7 +207,7 @@
 		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
-	import { inferSequentialy, loadModel, MODELDETECTPATH } from '$lib/inference.js';
+	import { inferSequentialy, loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -234,11 +262,10 @@
 </script>
 
 {#snippet modelsource()}
-	<a
-		href="https://git.inpt.fr/cigale/cigale.pages.inpt.fr/-/tree/main/models/{MODELDETECTPATH}"
-		target="_blank"
-	>
-		<code>{MODELDETECTPATH}</code>
+	{@const { model } = uiState.cropModels[uiState.selectedCropModel]}
+	{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+	<a href={url.toString()} target="_blank">
+		<code>{url.pathname.split('/').at(-1)}</code>
 	</a>
 {/snippet}
 

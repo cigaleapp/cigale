@@ -6,6 +6,7 @@ import { Schemas } from './database.js';
 import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
+import { ensureNamespacedMetadataId } from './protocols.js';
 import { toasts } from './toasts.svelte.js';
 
 /**
@@ -56,24 +57,20 @@ export async function processExifData(protocolId, imageFileId, imageBytes, file)
 		return {};
 	});
 
-	await db.openTransaction(['Image', 'Observation'], {}, async (tx) => {
-		const images = await tx
-			.objectStore('Image')
-			.getAll()
-			.then((imgs) => imgs.filter((img) => img.fileId === imageFileId));
+	const images = await db
+		.list('Image')
+		.then((imgs) => imgs.filter((img) => img.fileId === imageFileId));
 
-		for (const { id: subjectId } of images) {
-			for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-				await storeMetadataValue({
-					tx,
-					subjectId,
-					metadataId: key,
-					value,
-					confidence
-				});
-			}
+	for (const { id: subjectId } of images) {
+		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
+			await storeMetadataValue({
+				subjectId,
+				metadataId: ensureNamespacedMetadataId(key, protocolId),
+				value,
+				confidence
+			});
 		}
-	});
+	}
 }
 
 /**

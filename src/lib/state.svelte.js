@@ -1,6 +1,9 @@
+import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
+import { match } from 'arktype';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { tables } from './idb.svelte';
 import { getMetadataValue } from './metadata';
+import { getSetting, getSettings, setSetting } from './settings.svelte';
 
 /**
  * @import * as DB from './database';
@@ -41,7 +44,15 @@ import { getMetadataValue } from './metadata';
  * @property {Set<string>} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {Map<string, ZoomState>} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
- * @property {string} classificationMetadataId ID de la métadonnée à utiliser pour la classification
+ * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné. -1 pour désactiver l'inférence
+ * @property {(index: number) => Promise<void>} setSelectedClassificationModel changer le modèle de classification sélectionné
+ * @property {number} selectedCropModel index du modèle de recadrage sélectionné dans la liste des modèles de recadrage du protocole sélectionné. -1 pour désactiver l'inférence
+ * @property {(index: number) => Promise<void>} setSelectedCropModel changer le modèle de recadrage sélectionné
+ * @property {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} classificationModels liste des modèles de classification disponibles pour le protocole sélectionné
+ * @property {NonNullable<typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']>} cropModels liste des modèles de recadrage disponibles pour le protocole sélectionné
+ * @property {boolean} cropInferenceAvailable true si le protocole sélectionné a un modèle de recadrage (qui n'a pas été désactivé)
+ * @property {boolean} classificationInferenceAvailable true si le protocole sélectionné a un modèle de classification (qui n'a pas été désactivé)
+ * @property {string|undefined} classificationMetadataId ID de la métadonnée à utiliser pour la classification
  * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
  * @property {string} cropConfirmationMetadataId ID de la métadonnée à utiliser pour déterminer si le recadrage a été confirmé
  * @property {string} currentProtocolId ID du protocole choisi
@@ -86,15 +97,75 @@ export const uiState = $state({
 	loadingImages: new SvelteSet(),
 	keybinds: {},
 	cropperZoomStates: new SvelteMap(),
-	get classificationMetadataId() {
+	get classificationModels() {
 		return (
-			tables.Metadata.state.find(
-				(m) =>
-					this.currentProtocol?.metadata.includes(m.id) &&
-					'taxonomic' in m &&
-					m.taxonomic.clade === 'species'
-			)?.id ?? 'species'
+			tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer?.neural ?? []
 		);
+	},
+	get cropModels() {
+		return this.currentProtocol?.crop?.infer ?? [];
+	},
+	get cropInferenceAvailable() {
+		return this.cropModels.length > 0 && this.selectedCropModel !== -1;
+	},
+	get classificationInferenceAvailable() {
+		return this.classificationModels.length > 0 && this.selectedClassificationModel !== -1;
+	},
+	get selectedClassificationModel() {
+		const metadataId = this.classificationMetadataId;
+		if (!metadataId) return -1;
+		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
+	},
+	/**
+	 * @param {number} index
+	 */
+	async setSelectedClassificationModel(index) {
+		if (index === this.selectedClassificationModel) return; // no change
+		const metadataId = this.classificationMetadataId;
+		if (!metadataId) return;
+		const current = await getSetting('protocolModelSelections');
+		await setSetting('protocolModelSelections', {
+			...current,
+			[this.currentProtocolId]: {
+				...current[this.currentProtocolId],
+				[metadataId]: index
+			}
+		});
+	},
+	get selectedCropModel() {
+		const metadataId = this.cropMetadataId;
+		if (!metadataId) return -1;
+		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
+	},
+	/**
+	 * @param {number} index
+	 */
+	async setSelectedCropModel(index) {
+		if (index === this.selectedCropModel) return; // no change
+		const metadataId = this.cropMetadataId;
+		if (!metadataId) return;
+		const current = await getSetting('protocolModelSelections');
+		await setSetting('protocolModelSelections', {
+			...current,
+			[this.currentProtocolId]: {
+				...current[this.currentProtocolId],
+				[metadataId]: index
+			}
+		});
+	},
+	get classificationMetadataId() {
+		const isCandidate = match
+			.case(
+				{
+					id: 'string',
+					type: '"enum"',
+					infer: MetadataInferOptionsNeural
+				},
+				({ id }) => this.currentProtocol?.metadata.includes(id)
+			)
+			.default(() => false);
+
+		return tables.Metadata.state.find((m) => isCandidate(m))?.id;
 	},
 	get cropMetadataId() {
 		return (

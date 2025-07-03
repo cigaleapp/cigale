@@ -42,3 +42,4 @@ coverage
 html
 google-drive*.json
 slides
+scripts/gbif.json

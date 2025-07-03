@@ -10,23 +10,16 @@
 		imageIdToFileId,
 		imageIsClassified
 	} from '$lib/images';
-	import {
-		classify,
-		loadModel,
-		MODELCLASSIFPATH,
-		TARGETHEIGHT,
-		TARGETWIDTH,
-		torawpath
-	} from '$lib/inference';
+	import { classify, loadModel, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
-	import { metadataById, storeMetadataValue } from '$lib/metadata.js';
+	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import { setTaxonAndInferParents } from '$lib/taxonomy';
 	import { toasts } from '$lib/toasts.svelte';
+	import { fetchHttpRequest } from '$lib/utils';
 
 	seo({ title: 'Classification' });
 
@@ -38,9 +31,10 @@
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
 			isLoaded: (item) =>
-				typeof item === 'string'
+				!uiState.classificationMetadataId ||
+				(typeof item === 'string'
 					? false
-					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
+					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item))
 		})
 	);
 
@@ -48,14 +42,35 @@
 	let modelLoadingProgress = $state(0);
 
 	let classifmodel = $state();
+	let classmapping = $state([]);
 	async function loadClassifModel() {
+		// If the model is already loaded, we don't need to load it again
+		if (classifmodel) return;
 		if (!uiState.currentProtocol) return;
+		if (!uiState.classificationInferenceAvailable) return;
+		const classmappingRequest = await tables.Metadata.get(
+			uiState.classificationMetadataId ?? ''
+		).then(
+			(metadata) => metadata?.infer?.neural?.[uiState.selectedClassificationModel]?.classmapping
+		);
+
+		classmapping = await fetchHttpRequest(classmappingRequest, {
+			cacheAs: 'model',
+			onProgress({ transferred, total }) {
+				if (total === 0) return;
+				modelLoadingProgress = 0.25 * (transferred / total);
+			}
+		})
+			.then((res) => res.text())
+			.then((text) => text.split(/\r?\n/).filter(Boolean));
+
 		classifmodel = await loadModel(
 			uiState.currentProtocol,
+			uiState.selectedClassificationModel,
 			'classification',
 			({ transferred, total }) => {
 				if (total === 0) return;
-				modelLoadingProgress = transferred / total;
+				modelLoadingProgress = 0.25 + 0.75 * (transferred / total);
 			}
 		);
 		toasts.success('Modèle de classification chargé');
@@ -71,6 +86,14 @@
 		if (!uiState.currentProtocol) {
 			throw new Error('Aucun protocole sélectionné');
 		}
+
+		if (!uiState.classificationMetadataId) {
+			console.warn(
+				'No metadata with neural inference defined, not analyzing image. Configure neural inference on a enum metadata (set metadata.<your metadata id>.infer.neural) if this was not intentional.'
+			);
+			return;
+		}
+
 		if (!classifmodel) {
 			throw new Error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
@@ -79,7 +102,8 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const inputSettings = uiState.currentProtocol.crop?.infer?.input ?? {
+		const inputSettings = uiState.currentProtocol.crop?.infer?.[uiState.selectedCropModel]
+			.input ?? {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT
 		};
@@ -98,12 +122,23 @@
 		// TODO persist after page reload?
 		uiState.setPreviewURL(id, nimg.toDataURL(), 'cropped');
 
-		const [[scores]] = await classify(uiState.currentProtocol, [[nimg]], classifmodel, uiState, 0);
+		const targetMetadata = await tables.Metadata.get(uiState.classificationMetadataId);
+
+		// @ts-ignore
+		const inferenceSettings = targetMetadata?.infer?.neural?.[uiState.selectedClassificationModel];
+
+		if (!inferenceSettings) {
+			throw new Error(
+				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur la métadonnée ${uiState.classificationMetadataId}`
+			);
+		}
+
+		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodel, uiState, 0);
 
 		const results = scores
 			.map((score, i) => ({
 				confidence: score,
-				value: i.toString()
+				value: classmapping[i]
 			}))
 			.sort((a, b) => b.confidence - a.confidence)
 			.slice(0, 3)
@@ -120,18 +155,10 @@
 				alternatives
 			});
 
-			if ('taxonomic' in (metadataById(uiState.classificationMetadataId) ?? {})) {
-				await setTaxonAndInferParents({
-					...metadataValue,
-					protocol: uiState.currentProtocol,
-					metadataId: uiState.classificationMetadataId
-				});
-			} else {
-				await storeMetadataValue({
-					...metadataValue,
-					metadataId: uiState.classificationMetadataId
-				});
-			}
+			await storeMetadataValue({
+				...metadataValue,
+				metadataId: uiState.classificationMetadataId
+			});
 		}
 	}
 
@@ -168,16 +195,20 @@
 	);
 
 	$effect(() => {
+		if (!uiState.classificationMetadataId) return;
+		if (!uiState.classificationInferenceAvailable) return;
 		uiState.processing.total = tables.Image.state.length;
 		uiState.processing.done = tables.Image.state.filter(
-			(img) => img.metadata[uiState.classificationMetadataId]
+			(img) => img.metadata[uiState.classificationMetadataId ?? '']
 		).length;
 	});
 </script>
 
 {#snippet modelsource()}
-	<a href={torawpath(MODELCLASSIFPATH)} target="_blank">
-		<code>{MODELCLASSIFPATH}</code>
+	{@const { model } = uiState.classificationModels[uiState.selectedClassificationModel]}
+	{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+	<a href={url.toString()} target="_blank">
+		<code>{url.pathname.split('/').at(-1)}</code>
 	</a>
 {/snippet}
 

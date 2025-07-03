@@ -29,63 +29,49 @@ test.describe('correct results.zip', () => {
 		}
 
 		await expectBoundingBoxesCount('000000', 1);
-		await expectBoundingBoxesCount('000001', 2);
+		await expectBoundingBoxesCount('000001', 1);
 		await expectBoundingBoxesCount('000002', 1);
 		await expectBoundingBoxesCount('000003', 0);
 	});
 
 	test('does not re-analyze when going to classify tab', async ({ page }) => {
 		await page.getByRole('link', { name: 'Classifier' }).click();
-		await page.getByText('cyan', { exact: true }).click({
-			timeout: 3_000
+		await page.getByText('Bilobella braunerae', { exact: true }).click({
+			timeout: 5_000
 		});
 		await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
 		  - complementary:
-		    - img "Image 1 de l'observation cyan"
-		    - heading "cyan" [level=2]:
+		    - img "Image 1 de l'observation Bilobella braunerae"
+		    - heading "Bilobella braunerae" [level=2]:
 		      - img
 		      - textbox "Nom de l'observation"
 		    - text: Espèce
-		    - combobox: Allacma fusca
-		    - code: 26%
+		    - combobox: Lepidocyrtus fimetarius
+		    - code: /\\d+%/
 		    - button:
 		      - img
 		    - text: Alternatives
 		    - list:
 		      - listitem:
-		        - text: Sminthurus viridis
-		        - code: 12%
+		        - text: Entomobrya atrocincta
+		        - code: 5%
 		        - button:
 		          - img
 		      - listitem:
-		        - text: Caprainea marginata
-		        - code: 9%
+		        - text: Ceratophysella longispina
+		        - code: 4%
 		        - button:
 		          - img
 		    - text: Genre
-		    - combobox: Allacma
-		    - code: 26%
+		    - combobox: Lepidocyrtus
 		    - button:
 		      - img
-		    - text: Alternatives
-		    - list:
-		      - listitem:
-		        - code: 12%
-		        - button:
-		          - img
-		      - listitem:
-		        - text: Caprainea
-		        - code: 9%
-		        - button:
-		          - img
 		    - text: Famille
-		    - combobox: Sminthuridae
-		    - code: 17%
+		    - combobox: Entomobryidae
 		    - button:
 		      - img
 		    - text: Ordre
-		    - combobox: Symphypleona
-		    - code: 17%
+		    - combobox: Entomobryomorpha
 		    - button:
 		      - img
 		    - text: Date
@@ -100,17 +86,14 @@ test.describe('correct results.zip', () => {
 		    - paragraph: Endroit où la photo a été prise
 		    - text: Classe
 		    - combobox: Collembola
-		    - code: 17%
 		    - button:
 		      - img
 		    - text: Phylum
 		    - combobox: Arthropoda
-		    - code: 17%
 		    - button:
 		      - img
 		    - text: Règne
 		    - combobox: Animalia
-		    - code: 17%
 		    - button:
 		      - img
 		    - button "Regrouper Ctrl + G":
@@ -140,23 +123,22 @@ test.describe('correct results.zip', () => {
 		const resultsDir = path.resolve('./tests/results/correct');
 		await download.saveAs('./tests/results/correct.zip');
 		await extract('./tests/results/correct.zip', { dir: resultsDir });
+		console.log(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [
-					'_5.jpeg',
-					'Allacma fusca_1.jpeg',
-					'Allacma fusca_4.jpeg',
-					'Deuterosminthurus bicinctus_2.jpeg',
-					'Seira ferrarii_3.jpeg'
+					'_4.jpeg',
+					'Allacma fusca_3.jpeg',
+					'Lepidocyrtus fimetarius_1.jpeg',
+					'Seira ferrarii_2.jpeg'
 				]
 			},
 			{
 				Original: [
-					'_5.jpeg',
-					'Allacma fusca_1.jpeg',
-					'Allacma fusca_4.jpeg',
-					'Deuterosminthurus bicinctus_2.jpeg',
-					'Seira ferrarii_3.jpeg'
+					'_4.jpeg',
+					'Allacma fusca_3.jpeg',
+					'Lepidocyrtus fimetarius_1.jpeg',
+					'Seira ferrarii_2.jpeg'
 				]
 			},
 			'analysis.json',

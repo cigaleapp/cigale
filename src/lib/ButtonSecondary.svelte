@@ -16,31 +16,57 @@ Available CSS variables:
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {import('svelte').Snippet} children
-	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {import('svelte').Snippet<[{loading: boolean}]>} children
+	 * @property {(e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void} onclick
 	 * @property {boolean} [disabled=false]
 	 * @property {string} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 * @property {string|undefined} [testid] add a data-testid attribute to the button
+	 * @property {boolean} [loading] show a loading state while the onlick handler is running
 	 */
 </script>
 
 <script>
 	import KeyboardHint from './KeyboardHint.svelte';
+	import IconSpinner from '~icons/ph/spinner-ball';
 
 	import { tooltip } from './tooltips';
 
 	/** @type {Props} */
-	let { children, onclick, disabled = false, help, keyboard, testid } = $props();
+	let { children, onclick, disabled = false, help, keyboard, testid, loading = false } = $props();
+
+	let isLoading = $state(false);
 </script>
 
 <button
-	{onclick}
-	{disabled}
+	disabled={disabled || isLoading}
+	onclick={async (e) => {
+		// Only set isLoading here if the onclick handler does not define its own loadingStarted signal.
+		// This is kinda crude but you cant reflect a function object's args in JS, see https://stackoverflow.com/q/6921588/9943464 (well you can, but by uhhhh parsing the source code, yeah.)
+		if (loading && !onclick.toString().includes('loadingStarted')) isLoading = true;
+
+		try {
+			await onclick(e, {
+				loadingStarted: () => {
+					isLoading = true;
+				},
+				loadingEnded: () => {
+					isLoading = false;
+				}
+			});
+		} finally {
+			if (loading) isLoading = false;
+		}
+	}}
 	use:tooltip={help ? { text: help, keyboard } : undefined}
 	data-testid={testid || undefined}
 >
-	{@render children()}
+	{#if isLoading}
+		<div class="loading-spinner">
+			<IconSpinner />
+		</div>
+	{/if}
+	{@render children({ loading: isLoading && loading })}
 	{#if keyboard}
 		<KeyboardHint shortcut={keyboard} />
 	{/if}
@@ -72,5 +98,23 @@ Available CSS variables:
 		background-color: var(--bg-hover, var(--bg-primary-translucent));
 		color: var(--fg-hover, var(--fg-primary));
 		border-color: var(--fg-hover, var(--bg-primary));
+	}
+
+	.loading-spinner {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1em;
+		height: 1em;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		from {
+			rotate: 0deg;
+		}
+		to {
+			rotate: 360deg;
+		}
 	}
 </style>

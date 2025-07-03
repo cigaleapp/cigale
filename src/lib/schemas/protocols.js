@@ -92,7 +92,7 @@ export const Protocol = type({
 		Si le champ "version" n'existe pas (que ce soit dans le protocole local ou distant), aucune mise à jour ne sera proposée.`
 	),
 	authors: type({
-		email: ['string.email', '@', 'Adresse email'],
+		'email?': ['string.email', '@', 'Adresse email'],
 		name: ['string', '@', 'Prénom Nom']
 	})
 		.array()
@@ -100,14 +100,19 @@ export const Protocol = type({
 	'metadataOrder?': type(ID.array()).describe(
 		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 	),
-	'crop?': type({
+	crop: type({
 		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
 		'confirmationMetadata?': [
 			ID,
 			'@',
 			'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée'
 		],
-		infer: type({
+		'infer?': type({
+			'name?': [
+				'string',
+				'@',
+				"Nom du réseau à afficher dans l'interface. Particulièrement utile si il y a plusieurs réseaux"
+			],
 			model: HTTPRequest.describe(
 				'Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment.'
 			),
@@ -125,7 +130,9 @@ export const Protocol = type({
 			}).describe(
 				'Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO'
 			)
-		}).describe("Configuration de l'inférence des boîtes englobantes")
+		})
+			.array()
+			.describe("Configuration de l'inférence des boîtes englobantes")
 	}).describe('Configuration de la partie recadrage'),
 	exports: type({
 		images: type({

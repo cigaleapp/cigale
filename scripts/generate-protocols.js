@@ -6,16 +6,61 @@ import { writeFileSync } from 'node:fs';
 
 const here = import.meta.dirname;
 
-const classmapping = await fetch('https://cigaleapp.github.io/models/class_mapping.txt')
-	.then((r) => r.text())
-	.then((text) =>
-		Object.fromEntries(
+async function gbifIds(url) {
+	return fetch(url)
+		.then((res) => res.text())
+		.then((text) =>
 			text
 				.split('\n')
-				.filter((x) => x.trim())
-				.map((line, i) => [line, i])
+				.map((line) => line.trim())
+				.filter((line) => Boolean(line))
+				.filter((line) => !Number.isNaN(Number.parseInt(line)))
+		);
+}
+
+const lightweightModelGbifIds = await gbifIds(
+	'https://cigaleapp.github.io/models/lightweight-80-classmapping.txt'
+);
+
+const allGbifIds = new Set([
+	...(await gbifIds('https://cigaleapp.github.io/models/polymny-17k-classmapping.txt')),
+	...lightweightModelGbifIds
+]);
+
+const gbifIdToCanonicalName = await fetch(
+	'https://raw.githubusercontent.com/cigaleapp/models/main/gbif-id-to-canonical-name.json'
+)
+	.then((res) => res.json())
+	.catch((e) =>
+		console.error(
+			'Could not fetch GBIF ID to canonical name mapping:',
+			e,
+			'will use GBIF API instead (slow!)'
 		)
 	);
+
+/**
+ * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}
+ */
+const options = [];
+for (const gbifId of allGbifIds) {
+	const name =
+		gbifIdToCanonicalName[Number.parseInt(gbifId)] ??
+		(await fetch(`https://api.gbif.org/v1/species/${gbifId}/name`)
+			.then((res) => res.json())
+			.then((data) => data.canonicalName));
+	process.stdout.write(`\x1b[2K\r[${options.length}/${allGbifIds.size}] ${gbifId} -> ${name}`);
+	options.push({
+		key: gbifId,
+		label: name,
+		description: '',
+		learnMore: `https://gbif.org/species/${gbifId}`
+	});
+}
+
+options.sort((a, b) => a.label.localeCompare(b.label));
+
+console.log('');
 
 const oldProtocol = await readFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
@@ -42,11 +87,7 @@ const cladeMetadata = (clade, label) => ({
 	label,
 	required: false,
 	description: '',
-	mergeMethod: 'max',
-	taxonomic: {
-		clade,
-		parent: {}
-	}
+	mergeMethod: 'max'
 });
 
 /**
@@ -64,8 +105,22 @@ const protocol = {
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',
 	authors: [
 		{
-			name: 'Jessica Joachim (photos et descriptions des espèces)',
+			name: 'GBIF Contributors',
+			email: 'info@gbif.org'
+		},
+		{
+			name: 'Jessica Joachim',
 			email: 'tifaeriis@gmail.com'
+		},
+		{
+			name: 'Gwenn Le Bihan',
+			email: 'gwenn.lebihan7@gmail.com'
+		},
+		{
+			name: 'Maxime Cauchoix'
+		},
+		{
+			name: 'Léo Chekir'
 		}
 	],
 	metadataOrder: [
@@ -124,47 +179,59 @@ const protocol = {
 			description: '',
 			required: true,
 			mergeMethod: 'max',
-			options: Object.entries(classmapping)
-				.map(([name, index]) => ({
-					key: index.toString(),
-					label: name,
-					description: ''
-				}))
-				.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
-			taxonomic: {
-				clade: 'species',
-				parent: {}
-			},
+			options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
 			infer: {
-				neural: {
-					model: 'https://cigaleapp.github.io/models/model_classif.onnx',
-					metadata: namespaced('species'),
-					input: {
-						height: 224,
-						width: 224,
-						disposition: 'CHW',
-						normalized: true
+				neural: [
+					{
+						name: 'Léger (~80 classes)',
+						model: 'https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx',
+						classmapping:
+							'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt',
+						input: {
+							height: 224,
+							width: 224,
+							disposition: 'CHW',
+							normalized: true
+						}
+					},
+					{
+						name: 'Complet (~17000 classes)',
+						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
+						model:
+							'https://media.gwen.works/cigale/models/classification-collembola-polymny-2025-04-11.onnx',
+						classmapping:
+							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
+						input: {
+							height: 224,
+							width: 224,
+							disposition: 'CHW',
+							normalized: true
+						}
 					}
-				}
+				]
 			}
 		}
 	},
 	crop: {
 		metadata: namespaced('crop'),
 		confirmationMetadata: namespaced('crop_is_confirmed'),
-		infer: {
-			model: 'https://cigaleapp.github.io/models/arthropod_detector_yolo11n_conf0.437.onnx',
-			input: {
-				height: 640,
-				width: 640,
-				disposition: '1CHW',
-				normalized: true
-			},
-			output: {
-				normalized: true,
-				shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
+		infer: [
+			{
+				model:
+					'https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx',
+				name: 'YOLO11',
+				input: {
+					height: 640,
+					width: 640,
+					disposition: '1CHW',
+					normalized: true
+				},
+				output: {
+					normalized: true,
+					shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
+				}
 			}
-		}
+		]
 	},
 	exports: {
 		images: {
@@ -188,6 +255,41 @@ writeFileSync(
 writeFileSync(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
 	JSON.stringify(protocol, null, 2)
+);
+
+writeFileSync(
+	path.join(here, '../examples/arthropods.cigaleprotocol.light.json'),
+	JSON.stringify(
+		{
+			...protocol,
+			id: 'io.github.cigaleapp.arthropods.example.light',
+			name: `Example: arthropodes (lightweight)`,
+			source: protocol.source.replace(
+				'arthropods.cigaleprotocol.json',
+				'arthropods.cigaleprotocol.light.json'
+			),
+			learnMore: protocol.learnMore.replace('arthropodsexample', 'arthropodsexamplelight'),
+			metadata: {
+				...protocol.metadata,
+				[namespaced('species')]: {
+					...protocol.metadata[namespaced('species')],
+					options: protocol.metadata[namespaced('species')].options.filter((o) =>
+						lightweightModelGbifIds.includes(o.key)
+					),
+					infer: {
+						neural: protocol.metadata[namespaced('species')].infer.neural.filter(
+							(model) => model.name === 'Léger (~80 classes)'
+						)
+					}
+				}
+			}
+		},
+		null,
+		2
+	).replaceAll(
+		'io.github.cigaleapp.arthropods.example__',
+		'io.github.cigaleapp.arthropods.example.light__'
+	)
 );
 
 console.log(
