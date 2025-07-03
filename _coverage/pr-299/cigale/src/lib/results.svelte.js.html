@@ -538,7 +538,10 @@
 <a name='L473'></a><a href='#L473'>473</a>
 <a name='L474'></a><a href='#L474'>474</a>
 <a name='L475'></a><a href='#L475'>475</a>
-<a name='L476'></a><a href='#L476'>476</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L476'></a><a href='#L476'>476</a>
+<a name='L477'></a><a href='#L477'>477</a>
+<a name='L478'></a><a href='#L478'>478</a>
+<a name='L479'></a><a href='#L479'>479</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -577,6 +580,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -785,6 +790,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1037,6 +1043,7 @@ import { Analysis } from './schemas/results';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
 import {
+	clamp,
 	compareBy,
 	entries,
 	mapValues,
@@ -1051,11 +1058,12 @@ import {
  * @param {object} param2
  * @param {'croppedonly'|'full'|'metadataonly'} param2.include
  * @param {string} param2.base base path of the app - import `base` from `$app/paths`
+ * @param {number} [param2.cropPadding] padding to add around the bounding box when cropping images
  */
 <span class="cstat-no" title="statement not covered" >export async function generateResultsZip(</span>
 <span class="cstat-no" title="statement not covered" >	observations,</span>
 <span class="cstat-no" title="statement not covered" >	protocolUsed,</span>
-<span class="cstat-no" title="statement not covered" >	{ include = 'croppedonly', base }</span>
+<span class="cstat-no" title="statement not covered" >	{ include = 'croppedonly', base, cropPadding }</span>
 <span class="cstat-no" title="statement not covered" >) {</span>
 <span class="cstat-no" title="statement not covered" >	const filepaths = protocolUsed.exports ?? {</span>
 <span class="cstat-no" title="statement not covered" >		images: {</span>
@@ -1091,7 +1099,7 @@ import {
 <span class="cstat-no" title="statement not covered" >		for (const imageId of images.sort()) {</span>
 <span class="cstat-no" title="statement not covered" >			const imageFromDatabase = db.tables.Image.state.find((i) =&gt; i.id === imageId);</span>
 <span class="cstat-no" title="statement not covered" >			if (!imageFromDatabase) continue;</span>
-<span class="cstat-no" title="statement not covered" >			const metadataValues = addValueLabels(imageFromDatabase.metadata);</span>
+<span class="cstat-no" title="statement not covered" >			const metadataValues = await addValueLabels(imageFromDatabase.metadata);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >			const image = {</span>
 <span class="cstat-no" title="statement not covered" >				...imageFromDatabase,</span>
@@ -1138,7 +1146,7 @@ import {
 <span class="cstat-no" title="statement not covered" >			if (!image) continue;</span>
 <span class="cstat-no" title="statement not covered" >			const metadata = { ...image.metadata, ...observation.metadataOverrides };</span>
 <span class="cstat-no" title="statement not covered" >			const { contentType, filename } = image;</span>
-<span class="cstat-no" title="statement not covered" >			const { cropped, original } = await cropImage(protocolUsed, image);</span>
+<span class="cstat-no" title="statement not covered" >			const { cropped, original } = await cropImage(protocolUsed, image, cropPadding);</span>
 &nbsp;
 			/** @type {undefined | Uint8Array} */
 <span class="cstat-no" title="statement not covered" >			let originalBytes = undefined;</span>
@@ -1264,9 +1272,10 @@ import {
 /**
  * @param {DB.Protocol} protocol protocol used
  * @param {DB.Image} image
+ * @param {number} [padding=protocol.crop.padding] padding to add around the bounding box
  * @returns {Promise&lt;{ cropped: ArrayBuffer, original: ArrayBuffer }&gt;}
  */
-<span class="cstat-no" title="statement not covered" >export async function cropImage(protocol, image) {</span>
+<span class="cstat-no" title="statement not covered" >async function cropImage(protocol, image, padding = protocol.crop.padding) {</span>
 <span class="cstat-no" title="statement not covered" >	const centeredBoundingBox =</span>
 		/** @type {undefined | import("./metadata").RuntimeValue&lt;'boundingbox'&gt;}  */
 <span class="cstat-no" title="statement not covered" >		(image.metadata[protocol.crop?.metadata ?? 'crop']?.value);</span>
@@ -1285,10 +1294,10 @@ import {
 <span class="cstat-no" title="statement not covered" >	try {</span>
 <span class="cstat-no" title="statement not covered" >		const croppedBitmap = await createImageBitmap(</span>
 <span class="cstat-no" title="statement not covered" >			bitmap,</span>
-<span class="cstat-no" title="statement not covered" >			boundingBox.x,</span>
-<span class="cstat-no" title="statement not covered" >			boundingBox.y,</span>
-<span class="cstat-no" title="statement not covered" >			boundingBox.width,</span>
-<span class="cstat-no" title="statement not covered" >			boundingBox.height</span>
+<span class="cstat-no" title="statement not covered" >			clamp(boundingBox.x - padding, 0, bitmap.width),</span>
+<span class="cstat-no" title="statement not covered" >			clamp(boundingBox.y - padding, 0, bitmap.height),</span>
+<span class="cstat-no" title="statement not covered" >			clamp(boundingBox.width + padding, 1, bitmap.width),</span>
+<span class="cstat-no" title="statement not covered" >			clamp(boundingBox.height + padding, 1, bitmap.height)</span>
 		);
 <span class="cstat-no" title="statement not covered" >		const canvas = document.createElement('canvas');</span>
 <span class="cstat-no" title="statement not covered" >		canvas.width = croppedBitmap.width;</span>
@@ -1495,7 +1504,7 @@ import {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-23T22:29:20.089Z
+                at 2025-07-03T13:05:41.858Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

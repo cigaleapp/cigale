@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.76% </span>
+                <span class="strong">70.18% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>233/334</span>
+                <span class='fraction'>226/322</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">52.94% </span>
+                <span class="strong">56.25% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>9/17</span>
+                <span class='fraction'>9/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.76% </span>
+                <span class="strong">70.18% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>233/334</span>
+                <span class='fraction'>226/322</span>
             </div>
         
             
@@ -418,21 +418,7 @@
 <a name='L353'></a><a href='#L353'>353</a>
 <a name='L354'></a><a href='#L354'>354</a>
 <a name='L355'></a><a href='#L355'>355</a>
-<a name='L356'></a><a href='#L356'>356</a>
-<a name='L357'></a><a href='#L357'>357</a>
-<a name='L358'></a><a href='#L358'>358</a>
-<a name='L359'></a><a href='#L359'>359</a>
-<a name='L360'></a><a href='#L360'>360</a>
-<a name='L361'></a><a href='#L361'>361</a>
-<a name='L362'></a><a href='#L362'>362</a>
-<a name='L363'></a><a href='#L363'>363</a>
-<a name='L364'></a><a href='#L364'>364</a>
-<a name='L365'></a><a href='#L365'>365</a>
-<a name='L366'></a><a href='#L366'>366</a>
-<a name='L367'></a><a href='#L367'>367</a>
-<a name='L368'></a><a href='#L368'>368</a>
-<a name='L369'></a><a href='#L369'>369</a>
-<a name='L370'></a><a href='#L370'>370</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L356'></a><a href='#L356'>356</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -532,26 +518,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -898,7 +870,8 @@ export <span class="fstat-no" title="function not covered" >function imageIsAnal
  */
 export <span class="fstat-no" title="function not covered" >function imageIsClassified(image) {</span>
 <span class="cstat-no" title="statement not covered" >	return Boolean(</span>
-<span class="cstat-no" title="statement not covered" >		image.metadata[uiState.classificationMetadataId] || uiState.erroredImages.has(image.id)</span>
+<span class="cstat-no" title="statement not covered" >		(uiState.classificationMetadataId &amp;&amp; image.metadata[uiState.classificationMetadataId]) ||</span>
+<span class="cstat-no" title="statement not covered" >			uiState.erroredImages.has(image.id)</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
@@ -907,21 +880,6 @@ export <span class="fstat-no" title="function not covered" >function imageIsClas
  */
 export <span class="fstat-no" title="function not covered" >function imageBufferWasSaved(image) {</span>
 <span class="cstat-no" title="statement not covered" >	return Boolean(image.fileId || uiState.erroredImages.has(image.id));</span>
-<span class="cstat-no" title="statement not covered" >}</span>
-&nbsp;
-/**
- * Download an image
- * @param {string} imageId database id for the Image object
- * @param {object} [options]
- * @param {string} [options.as] save as -- defaults to the image object's filename
- */
-export <span class="fstat-no" title="function not covered" >async function downloadImage(imageId, options) {</span>
-<span class="cstat-no" title="statement not covered" >	const image = await tables.Image.get(imageId);</span>
-<span class="cstat-no" title="statement not covered" >	if (!image) throw 'Image non trouvée';</span>
-<span class="cstat-no" title="statement not covered" >	const file = await db.get('ImageFile', imageIdToFileId(imageId));</span>
-<span class="cstat-no" title="statement not covered" >	if (!file) throw "L'image n'a pas de fichier associé";</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	downloadAsFile(file.bytes, options?.as || image.filename, image.contentType);</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
 /**
@@ -1131,7 +1089,7 @@ if (import.meta.vitest) {
  * @returns {string[]}
  */
 export function imageFileIds(images) {
-	return unique(images.map((image) =&gt; image.fileId).filter((id) =&gt; id !== undefined));
+	return unique(images.map((image) =&gt; image.fileId).filter((id) =&gt; id !== null));
 }
 &nbsp;
 if (import.meta.vitest) {
@@ -1177,7 +1135,7 @@ if (import.meta.vitest) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-23T22:29:20.089Z
+                at 2025-07-03T13:05:41.858Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
