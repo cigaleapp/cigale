@@ -59,7 +59,8 @@
 		<div class="steps">
 			<a href="#/">
 				Protocole
-				{#if path == '/'}
+				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
+				{#if path == '/' || path == ''}
 					<div class="line"></div>
 				{/if}
 			</a>
