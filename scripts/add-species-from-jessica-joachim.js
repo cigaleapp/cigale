@@ -67,7 +67,9 @@ for (const [index, { label: name }] of species.entries()) {
 			s.description.trim() &&
 			s.learnMore.trim() &&
 			// Images from jessica-joachim are not downloaded anymore
-			!s.image.startsWith('https://raw.githubusercontent.com/cigaleapp/cigale')
+			!s.image.startsWith('https://raw.githubusercontent.com/cigaleapp/cigale') &&
+			// We don't use "sp" genus pages anymore
+			!s.learnMore.endsWith('-sp')
 	);
 
 	if (updates.includes(name)) {
@@ -124,20 +126,6 @@ async function searchForSpecies(index, logHeader, name) {
 			return false;
 		});
 	})?.href;
-
-	if (!speciesPageUrl) {
-		// Try <gender name> sp. instead of matching full binomial species name
-		const [genus] = searchedName.split(' ');
-		speciesPageUrl = [...searchPage.querySelectorAll('a')].find(
-			(a) => a.textContent.trim().toLowerCase() === `${genus} sp`
-		)?.href;
-
-		if (speciesPageUrl) {
-			console.error(
-				`${cc.clearline}\r${logHeader} ${cc.yellow}Using ${genus} sp. instead of ${name}${cc.reset}`
-			);
-		}
-	}
 
 	if (!speciesPageUrl) {
 		let linksFound = [...searchPage.querySelector('main').querySelectorAll('a')]
