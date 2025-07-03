@@ -29,11 +29,16 @@ const here = path.dirname(new URL(import.meta.url).pathname).replace('/C:/', 'C:
 
 /**
  * Maps species names that were not found to list of titles in the corresponding  search results (for troubleshooting).
- * @type {Record<string, Array<{ text: string; url: string }>>}
+ * @type {string[]}
  */
-const notFoundCache = await readFile(path.join(here, 'jessica-joachim-404cache.json'), 'utf8')
-	.then((data) => JSON.parse(data))
-	.catch(() => ({}));
+const notFoundCache = await fetch(
+	'https://raw.githubusercontent.com/cigaleapp/models/main/jessica-joachim-404cache.json'
+)
+	.then((response) => response.json())
+	.then((data) => (Array.isArray(data) ? data : Object.keys(data)))
+	.catch(() => []);
+
+console.log(`Using not found cache with ${notFoundCache.length} entries.`);
 
 const newProtocol = { ...protocol };
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options;
@@ -46,6 +51,7 @@ const { items: newsfeed } = await rssParser.parseURL('https://jessica-joachim.co
 const updates = newsfeed
 	.filter(({ categories }) => categories.includes('Mises à jour'))
 	.map(({ content }) => htmlToMarkdown(content).replaceAll('&#160;', ' '))
+	.slice(0, 3)
 	.join('\n');
 
 // For every species in the protocol:
@@ -65,7 +71,7 @@ for (const [index, { label: name }] of species.entries()) {
 		newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[index] =
 			candidates[0];
 		done++;
-	} else if (process.argv.includes('--force') && !(name in notFoundCache)) {
+	} else if (process.argv.includes('--force') && !notFoundCache.includes(name)) {
 		// Otherwise, search for it (only if --force is used)
 		// The not found cache is used to avoid searching for the same species multiple times,
 		// which is useful for continuation of the script after a failure or interruption
@@ -88,7 +94,7 @@ async function searchForSpecies(index, logHeader, name) {
 	const searchurl = `https://jessica-joachim.com/?s=${encodeURIComponent(searchedName).replaceAll('%20', '+')}`;
 
 	const synonyms = {
-		'Lochmaea capreae': ['Lochmaea caprea']
+		'Lochmaea caprea': ['Lochmaea capreae']
 	};
 
 	// Do a search
@@ -146,7 +152,7 @@ async function searchForSpecies(index, logHeader, name) {
 			url: searchurl,
 			found: linksFound.map((a) => ({ name: a.textContent, url: a.href }))
 		});
-		notFoundCache[name] = linksFound.map((a) => ({ text: a.textContent.trim(), url: a.href }));
+		notFoundCache.push(name);
 		writeFileSync(
 			path.join(here, 'jessica-joachim-404cache.json'),
 			JSON.stringify(notFoundCache, null, 2)
@@ -156,7 +162,9 @@ async function searchForSpecies(index, logHeader, name) {
 
 	await fetch(speciesPageUrl)
 		.then((r) => r.text())
-		.then((content) => parseAndDescribeSpecies(content, speciesPageUrl, name, logHeader, index));
+		.then((content) =>
+			parseAndDescribeSpecies(content, speciesPageUrl, name, logHeader, index, index % 1000 === 0)
+		);
 }
 
 /**
@@ -166,8 +174,16 @@ async function searchForSpecies(index, logHeader, name) {
  * @param {string} name
  * @param {string} progressHeader
  * @param {number} optionIndex
+ * @param {boolean} writeFiles
  */
-async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, optionIndex) {
+async function parseAndDescribeSpecies(
+	pageContent,
+	url,
+	name,
+	progressHeader,
+	optionIndex,
+	writeFiles
+) {
 	const dom = new JSDOM(pageContent);
 	const main = dom.window.document.querySelector('main');
 	if (!main) return;
@@ -259,18 +275,20 @@ async function parseAndDescribeSpecies(pageContent, url, name, progressHeader, o
 
 	done++;
 	// Erase previous line, print current progress
-	process.stdout.write(`${progressHeader} Added ${cc.bold}${name}${cc.reset}`);
+	process.stdout.write(`${cc.clearline}\r${progressHeader} Added ${cc.bold}${name}${cc.reset}`);
 
 	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.sort((a, b) =>
 		a.label.localeCompare(b.label)
 	);
 
 	// writeFile(path.join(here, 'species.json'), JSON.stringify(species, null, 2));
-	await mkdir(path.join(here, '../examples'), { recursive: true });
-	writeFile(
-		path.join(here, '../examples/arthropods.cigaleprotocol.json'),
-		JSON.stringify(newProtocol, null, 2)
-	);
+	if (writeFiles) {
+		await mkdir(path.join(here, '../examples'), { recursive: true });
+		writeFile(
+			path.join(here, '../examples/arthropods.cigaleprotocol.json'),
+			JSON.stringify(newProtocol, null, 2)
+		);
+	}
 }
 
 /** @param {string} html  */

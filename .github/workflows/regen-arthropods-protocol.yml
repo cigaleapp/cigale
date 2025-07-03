@@ -44,7 +44,8 @@ jobs:
         run: npx node scripts/generate-protocols.js
 
       - name: Add data from Jessica Joachim
-        run: npx node scripts/add-species-from-jessica-joachim.js
+        # TODO: remove --force
+        run: npx node scripts/add-species-from-jessica-joachim.js --force
 
       - name: Set google-drive-key.json
         uses: mobiledevops/secret-to-file-action@v1
