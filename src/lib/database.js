@@ -1,4 +1,4 @@
-import { type } from 'arktype';
+import { scope, type } from 'arktype';
 import { HTTPRequest, ID, ModelInput, Probability, References } from './schemas/common.js';
 import {
 	EXIFField,
@@ -91,7 +91,15 @@ const Settings = table(
 		language: type.enumerated('fr'),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
-		cropAutoNext: 'boolean = false'
+		cropAutoNext: 'boolean = false',
+		protocolModelSelections: scope({ ID })
+			.type({
+				'[ID]': {
+					// -1 is for none selected
+					'[ID]': 'number.integer >= -1'
+				}
+			})
+			.default(() => ({}))
 	})
 );
 

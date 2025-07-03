@@ -254,7 +254,7 @@ export async function generateResultsZip(
  * @param {number} [padding=protocol.crop.padding] padding to add around the bounding box
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
-async function cropImage(protocol, image, padding = protocol.crop.padding) {
+export async function cropImage(protocol, image, padding = protocol.crop.padding) {
 	const centeredBoundingBox =
 		/** @type {undefined | import("./metadata").RuntimeValue<'boundingbox'>}  */
 		(image.metadata[protocol.crop?.metadata ?? 'crop']?.value);

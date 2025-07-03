@@ -8,8 +8,8 @@
 	 * @type {object}
 	 * @property {`modal_${string}`} key a unique string, used to identify the modal in the page's state.
 	 * @property {string} title the title used in the header
-	 * @property {() => void} onconfirm what to do when the user confirms
-	 * @property {undefined | (() => void)} [oncancel] what to do when the user cancels
+	 * @property {() => void | Promise<void>} onconfirm what to do when the user confirms. If the function returns a promise, the modal will wait for it to resolve before closing.
+	 * @property {undefined | (() => void | Promise<void>)} [oncancel] what to do when the user cancels. If the function returns a promise, the modal will wait for it to resolve before closing.
 	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
 	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {import('svelte').Snippet} [children] the content of the modal
@@ -35,17 +35,19 @@
 	{#snippet footer()}
 		<div class="actions">
 			<ButtonSecondary
-				onclick={() => {
+				loading
+				onclick={async () => {
+					await oncancel?.();
 					close?.();
-					oncancel?.();
 				}}
 			>
 				{cancel}
 			</ButtonSecondary>
 			<ButtonPrimary
-				onclick={() => {
+				loading
+				onclick={async () => {
+					await onconfirm();
 					close?.();
-					onconfirm();
 				}}
 			>
 				{confirm}
