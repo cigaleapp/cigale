@@ -8,6 +8,8 @@ import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 
+const forced = true; // TODO: process.argv.includes('--force')
+
 // ANSI control sequences
 const cc = {
 	clearline: '\x1b[2K',
@@ -76,7 +78,7 @@ for (const [index, { label: name }] of species.entries()) {
 		newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[index] =
 			candidates[0];
 		done++;
-	} else if (process.argv.includes('--force') && !notFoundCache.includes(name)) {
+	} else if (forced && !notFoundCache.includes(name)) {
 		// Otherwise, search for it (only if --force is used)
 		// The not found cache is used to avoid searching for the same species multiple times,
 		// which is useful for continuation of the script after a failure or interruption
