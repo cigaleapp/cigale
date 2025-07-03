@@ -26,7 +26,8 @@ async function fillBuiltinData() {
 			gridSize: 10,
 			language: 'fr',
 			showInputHints: true,
-			showTechnicalMetadata: dev
+			showTechnicalMetadata: dev,
+			protocolModelSelections: {}
 		});
 	});
 

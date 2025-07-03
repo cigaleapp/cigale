@@ -91,6 +91,7 @@ test.describe('Cropper view', () => {
 
 			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
+			await page.waitForTimeout(500);
 			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
 
 			expect(cropAutoNext).toBe(true);
@@ -127,7 +128,7 @@ test.describe('Cropper view', () => {
 
 			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
-			await page.waitForTimeout(1000);
+			await page.waitForTimeout(500);
 			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
 
 			expect(cropAutoNext).toBe(false);

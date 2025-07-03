@@ -59,7 +59,8 @@
 		<div class="steps">
 			<a href="#/">
 				Protocole
-				{#if path == '/'}
+				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
+				{#if path == '/' || path == ''}
 					<div class="line"></div>
 				{/if}
 			</a>
@@ -118,7 +119,7 @@
 
 {#snippet noInferenceIndicator(/** @type {boolean} */ available, /** @type {string} */ help)}
 	<div class="inference-indicator" use:tooltip={help}>
-		{#if !available}
+		{#if !available && uiState.currentProtocol}
 			<IconNoInference />
 		{/if}
 	</div>
