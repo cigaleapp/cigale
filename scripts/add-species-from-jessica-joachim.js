@@ -63,7 +63,7 @@ for (const [index, { label: name }] of species.entries()) {
 	// (which will not be empty when running the script in multiple passes, e.g. when using --force)
 	const candidates = [...oldSpecies, ...species].filter(
 		(s) =>
-			s.label === name &&
+			s.label.toLowerCase().trim() === name.toLowerCase().trim() &&
 			s.description.trim() &&
 			s.learnMore.trim() &&
 			// Images from jessica-joachim are not downloaded anymore
@@ -95,6 +95,11 @@ if (reportTable.length) {
 		`\n${cc.bold}${cc.blue}Report written to ${here}/jessica-joachim-crawler-report.md${cc.reset}`
 	);
 }
+
+newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.sort((a, b) =>
+	a.label.localeCompare(b.label)
+);
+await updateFiles();
 
 async function searchForSpecies(index, logHeader, name) {
 	const searchedName = name.trim().toLowerCase();
@@ -284,18 +289,18 @@ async function parseAndDescribeSpecies(
 	// Erase previous line, print current progress
 	process.stdout.write(`${cc.clearline}\r${progressHeader} Added ${cc.bold}${name}${cc.reset}`);
 
-	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.sort((a, b) =>
-		a.label.localeCompare(b.label)
-	);
-
 	// writeFile(path.join(here, 'species.json'), JSON.stringify(species, null, 2));
 	if (writeFiles) {
-		await mkdir(path.join(here, '../examples'), { recursive: true });
-		writeFile(
-			path.join(here, '../examples/arthropods.cigaleprotocol.json'),
-			JSON.stringify(newProtocol, null, 2)
-		);
+		await updateFiles();
 	}
+}
+
+async function updateFiles() {
+	await mkdir(path.join(here, '../examples'), { recursive: true });
+	writeFile(
+		path.join(here, '../examples/arthropods.cigaleprotocol.json'),
+		JSON.stringify(newProtocol, null, 2)
+	);
 }
 
 /** @param {string} html  */
