@@ -12,6 +12,10 @@ import keys from '../google-drive-key.json' with { type: 'json' };
 import Turndown from 'turndown';
 import { decodePhoto, photoChanged } from './utils.js';
 
+await mkdir(path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.images'), {
+	recursive: true
+});
+
 const _tdown = new Turndown();
 /** @param {string} html  */
 function htmlToMarkdown(html) {
