@@ -200,7 +200,7 @@ const protocol = {
 						name: 'Complet (~17000 classes)',
 						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
 						model:
-							'https://media.gwen.works/cigale/classification-collembola-polymny-2025-04-11.onnx',
+							'https://media.gwen.works/cigale/models/classification-collembola-polymny-2025-04-11.onnx',
 						classmapping:
 							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
 						input: {

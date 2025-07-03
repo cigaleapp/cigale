@@ -24,6 +24,7 @@
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
 	);
 
+	let importingPreselectedProtocol = $state(false);
 	const preselectedProtocol = queryParam('protocol');
 	const preselectedClassificationModel = queryParam('classificationModel', ssp.number());
 	const preselectedCropModel = queryParam('cropModel', ssp.number());
@@ -36,7 +37,7 @@
 	);
 
 	afterNavigate(() => {
-		if (preselectedProtocolIsRemote && openImportRemoteProtocol) {
+		if (preselectedProtocolIsRemote && openImportRemoteProtocol && !importingPreselectedProtocol) {
 			openImportRemoteProtocol();
 		}
 	});
@@ -48,12 +49,14 @@
 			$preselectedProtocol = null;
 		}
 		if ($preselectedClassificationModel !== null) {
-			uiState.selectedClassificationModel = $preselectedClassificationModel;
-			$preselectedClassificationModel = null;
+			void uiState.setSelectedClassificationModel($preselectedClassificationModel).then(() => {
+				$preselectedClassificationModel = null;
+			});
 		}
 		if ($preselectedCropModel !== null) {
-			uiState.selectedCropModel = $preselectedCropModel;
-			$preselectedCropModel = null;
+			void uiState.setSelectedCropModel($preselectedCropModel).then(() => {
+				$preselectedCropModel = null;
+			});
 		}
 	});
 
@@ -85,12 +88,14 @@
 <ModalConfirm
 	title="Importer le protocole distant?"
 	key="modal_import_remote_protocol"
+	confirm="Importer"
 	bind:open={openImportRemoteProtocol}
 	oncancel={() => {
 		$preselectedProtocol = null;
 	}}
 	onconfirm={async () => {
 		if (!$preselectedProtocol) return;
+		importingPreselectedProtocol = true;
 		const raw = await fetch($preselectedProtocol)
 			.then((res) => res.text())
 			.catch((e) => {
@@ -106,6 +111,8 @@
 			$preselectedProtocol = null;
 		} catch (error) {
 			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
+		} finally {
+			importingPreselectedProtocol = false;
 		}
 	}}
 >
@@ -117,6 +124,12 @@
 			{@render highlightHostname($preselectedProtocol)}
 		</a>
 	{/if}
+
+	<section class="modal-import-loading">
+		{#if importingPreselectedProtocol}
+			<p>Importation en cours...</p>
+		{/if}
+	</section>
 
 	{#snippet highlightHostname(/** @type {string} */ url)}
 		{url.split(new URL(url).hostname, 2)[0]}
@@ -173,8 +186,8 @@
 							</p>
 							<RadioButtons
 								value={uiState.selectedClassificationModel}
-								onchange={(value) => {
-									uiState.selectedClassificationModel = value ?? 0;
+								onchange={async (value) => {
+									await uiState.setSelectedClassificationModel(value ?? 0);
 								}}
 								options={radioOptions(uiState.classificationModels)}
 							/>
@@ -185,8 +198,8 @@
 							<p>Modèle d'inférence pour la détection</p>
 							<RadioButtons
 								value={uiState.selectedCropModel}
-								onchange={(value) => {
-									uiState.selectedCropModel = value ?? 0;
+								onchange={async (value) => {
+									await uiState.setSelectedCropModel(value ?? 0);
 								}}
 								options={radioOptions(uiState.cropModels)}
 							/>
@@ -236,6 +249,13 @@
 		margin: 3rem auto;
 		max-width: 400px;
 		gap: 3rem;
+	}
+
+	.modal-import-loading {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-top: 3rem;
 	}
 
 	h1 {
