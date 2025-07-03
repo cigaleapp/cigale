@@ -60,7 +60,12 @@ for (const [index, { label: name }] of species.entries()) {
 	// Get existing descriptions of the species from the old protocol, and the current one
 	// (which will not be empty when running the script in multiple passes, e.g. when using --force)
 	const candidates = [...oldSpecies, ...species].filter(
-		(s) => s.label === name && s.description.trim() && s.learnMore.trim()
+		(s) =>
+			s.label === name &&
+			s.description.trim() &&
+			s.learnMore.trim() &&
+			// Images from jessica-joachim are not downloaded anymore
+			!s.image.startsWith('https://raw.githubusercontent.com/cigaleapp/cigale')
 	);
 
 	if (updates.includes(name)) {
