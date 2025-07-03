@@ -634,3 +634,8 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
 
 	return fetch(url, options);
 }
+
+/** @param {number[]} values  */
+export function avg(values) {
+	return values.reduce((acc, cur) => acc + cur, 0) / values.length;
+}

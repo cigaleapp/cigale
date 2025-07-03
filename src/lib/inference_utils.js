@@ -44,7 +44,7 @@ if (import.meta.vitest) {
  * @param {number} y2
  * @returns {Promise<ort.Tensor>}
  */
-export async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
+async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
 	// Convert ONNX tensor to tf.Tensor
 	// @ts-ignore
 	const tfTensor = tf.tensor(tensor.data, tensor.dims);
@@ -69,7 +69,7 @@ export async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
  * @param {number} y2
  * @returns {Promise<ort.Tensor>}
  */
-export async function cropTensor(tensor, x1, y1, x2, y2) {
+async function cropTensor(tensor, x1, y1, x2, y2) {
 	/*Crop tensor : 
     -------input------- :
         tensor : tensor à cropper 
@@ -150,7 +150,7 @@ export async function applyBBOnTensor(BB, tensor, marge = 10) {
  * @returns {Promise<ort.Tensor[]>}
  */
 
-export async function applyBBsOnTensor(BBs, tensor, marge = 10) {
+async function applyBBsOnTensor(BBs, tensor, marge = 10) {
 	/*Applique les bounding boxes sur UN tenseur :
     -------input------- :
         BBs : liste de bounding boxes
@@ -176,7 +176,7 @@ export async function applyBBsOnTensor(BBs, tensor, marge = 10) {
  * @param {ort.Tensor[][]} tensors
  * @returns {Promise<ort.Tensor[][]>}
  */
-export async function applyBBsOnTensors(BBs, tensors) {
+async function applyBBsOnTensors(BBs, tensors) {
 	// Create an array of promises using map
 	// @ts-ignore
 	const croppedTensorPromises = tensors.map((tensor, i) => applyBBsOnTensor(BBs[i], tensor));
@@ -191,7 +191,7 @@ export async function applyBBsOnTensors(BBs, tensors) {
  * @param {number} numfiles
  * @returns {number[][][]}
  */
-export function dedupeBoundingBoxes(boundingboxes, numfiles) {
+function dedupeBoundingBoxes(boundingboxes, numfiles) {
 	for (let fileIndex = 0; fileIndex < numfiles; fileIndex++) {
 		const boxes = boundingboxes[fileIndex];
 
@@ -263,27 +263,6 @@ export async function preprocess_for_classification(settings, tensors, mean, std
 
 /**
  *
- * @param {number[][][]} output
- * @param {string[]} classmap
- * @returns {[string[][], number[][]]}
- */
-export function labelize(output, classmap) {
-	// à partir de la sortie du inference/classif, renvoie les labels des classes
-	let labels_inter = [];
-	console.log('output : ', output);
-	for (let i = 0; i < output[0].length; i++) {
-		let l = [];
-		for (let j = 0; j < output[0][i].length; j++) {
-			let index = output[0][i][j];
-			console.log('index : ', index);
-			l.push(classmap[index]);
-		}
-		labels_inter.push(l);
-	}
-	return [labels_inter, output[1]];
-}
-/**
- *
  * @param {ArrayBuffer[]} buffers
  * @param {object} settings
  * @param {number} settings.height
@@ -349,7 +328,7 @@ export async function imload(buffers, { width: targetWidth, height: targetHeight
  * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
  * @returns {Promise<ort.Tensor>}
  */
-export async function normalizeTensor(tensor, mean, std, denormalize = false) {
+async function normalizeTensor(tensor, mean, std, denormalize = false) {
 	const data = await tensor.getData();
 	const dims = tensor.dims;
 
@@ -378,7 +357,7 @@ export async function normalizeTensor(tensor, mean, std, denormalize = false) {
  * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function normalizeTensors(tensors, mean, std, denormalize = false) {
+async function normalizeTensors(tensors, mean, std, denormalize = false) {
 	let newTensors = [];
 	for (let i = 0; i < tensors.length; i++) {
 		let newtsr = await normalizeTensor(tensors[i], mean, std, denormalize);
@@ -526,7 +505,7 @@ export function output2BB(protocol, modelIndex, output, numImages, minConfidence
  * @param {number} targetHeight
  * @returns {Promise<ort.Tensor[]>}
  */
-export async function resizeTensors(tensors, targetWidth, targetHeight) {
+async function resizeTensors(tensors, targetWidth, targetHeight) {
 	let resizedTensors = [];
 	for (let i = 0; i < tensors.length; i++) {
 		let resizedTensor = await resizeTensor(tensors[i], targetWidth, targetHeight);

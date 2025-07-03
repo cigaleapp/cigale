@@ -22,6 +22,7 @@ import { Analysis } from './schemas/results';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
 import {
+	clamp,
 	compareBy,
 	entries,
 	mapValues,
@@ -36,11 +37,12 @@ import {
  * @param {object} param2
  * @param {'croppedonly'|'full'|'metadataonly'} param2.include
  * @param {string} param2.base base path of the app - import `base` from `$app/paths`
+ * @param {number} [param2.cropPadding] padding to add around the bounding box when cropping images
  */
 export async function generateResultsZip(
 	observations,
 	protocolUsed,
-	{ include = 'croppedonly', base }
+	{ include = 'croppedonly', base, cropPadding }
 ) {
 	const filepaths = protocolUsed.exports ?? {
 		images: {
@@ -123,7 +125,7 @@ export async function generateResultsZip(
 			if (!image) continue;
 			const metadata = { ...image.metadata, ...observation.metadataOverrides };
 			const { contentType, filename } = image;
-			const { cropped, original } = await cropImage(protocolUsed, image);
+			const { cropped, original } = await cropImage(protocolUsed, image, cropPadding);
 
 			/** @type {undefined | Uint8Array} */
 			let originalBytes = undefined;
@@ -249,9 +251,10 @@ export async function generateResultsZip(
 /**
  * @param {DB.Protocol} protocol protocol used
  * @param {DB.Image} image
+ * @param {number} [padding=protocol.crop.padding] padding to add around the bounding box
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
-export async function cropImage(protocol, image) {
+async function cropImage(protocol, image, padding = protocol.crop.padding) {
 	const centeredBoundingBox =
 		/** @type {undefined | import("./metadata").RuntimeValue<'boundingbox'>}  */
 		(image.metadata[protocol.crop?.metadata ?? 'crop']?.value);
@@ -270,10 +273,10 @@ export async function cropImage(protocol, image) {
 	try {
 		const croppedBitmap = await createImageBitmap(
 			bitmap,
-			boundingBox.x,
-			boundingBox.y,
-			boundingBox.width,
-			boundingBox.height
+			clamp(boundingBox.x - padding, 0, bitmap.width),
+			clamp(boundingBox.y - padding, 0, bitmap.height),
+			clamp(boundingBox.width + padding, 1, bitmap.width),
+			clamp(boundingBox.height + padding, 1, bitmap.height)
 		);
 		const canvas = document.createElement('canvas');
 		canvas.width = croppedBitmap.width;
