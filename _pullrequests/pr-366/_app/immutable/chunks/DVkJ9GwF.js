@@ -1,0 +1,1 @@
+import"./NZTpNUN0.js";import{b as o,i as l,r as d,t as m,a as v}from"./DUjzHYwH.js";import{s as f}from"./CWb0OoYE.js";import{c}from"./CGL8VuY1.js";var p=o('<div class="radial-indicator svelte-ivr0l0"> </div>');function x(r,a){var t=p();let e;var s=l(t,!0);d(t),m(i=>{e=c(t,"",e,{"--progress":`${a.value*100}%`}),f(s,i)},[()=>Math.round(a.value*100)]),v(r,t)}export{x as default};
