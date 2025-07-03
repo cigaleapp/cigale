@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/272</span>
+                <span class='fraction'>0/276</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/272</span>
+                <span class='fraction'>0/276</span>
             </div>
         
             
@@ -375,7 +375,12 @@
 <a name='L310'></a><a href='#L310'>310</a>
 <a name='L311'></a><a href='#L311'>311</a>
 <a name='L312'></a><a href='#L312'>312</a>
-<a name='L313'></a><a href='#L313'>313</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -476,6 +481,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -664,9 +674,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -752,7 +762,7 @@
 <span class="cstat-no" title="statement not covered" >	// (which will not be empty when running the script in multiple passes, e.g. when using --force)</span>
 <span class="cstat-no" title="statement not covered" >	const candidates = [...oldSpecies, ...species].filter(</span>
 <span class="cstat-no" title="statement not covered" >		(s) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >			s.label === name &amp;&amp;</span>
+<span class="cstat-no" title="statement not covered" >			s.label.toLowerCase().trim() === name.toLowerCase().trim() &amp;&amp;</span>
 <span class="cstat-no" title="statement not covered" >			s.description.trim() &amp;&amp;</span>
 <span class="cstat-no" title="statement not covered" >			s.learnMore.trim() &amp;&amp;</span>
 <span class="cstat-no" title="statement not covered" >			// Images from jessica-joachim are not downloaded anymore</span>
@@ -784,6 +794,11 @@
 <span class="cstat-no" title="statement not covered" >		`\n${cc.bold}${cc.blue}Report written to ${here}/jessica-joachim-crawler-report.md${cc.reset}`</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
 <span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.sort((a, b) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >	a.label.localeCompare(b.label)</span>
+<span class="cstat-no" title="statement not covered" >);</span>
+<span class="cstat-no" title="statement not covered" >await updateFiles();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >async function searchForSpecies(index, logHeader, name) {</span>
 <span class="cstat-no" title="statement not covered" >	const searchedName = name.trim().toLowerCase();</span>
@@ -973,18 +988,18 @@
 <span class="cstat-no" title="statement not covered" >	// Erase previous line, print current progress</span>
 <span class="cstat-no" title="statement not covered" >	process.stdout.write(`${cc.clearline}\r${progressHeader} Added ${cc.bold}${name}${cc.reset}`);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	newProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.sort((a, b) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >		a.label.localeCompare(b.label)</span>
-<span class="cstat-no" title="statement not covered" >	);</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >	// writeFile(path.join(here, 'species.json'), JSON.stringify(species, null, 2));</span>
 <span class="cstat-no" title="statement not covered" >	if (writeFiles) {</span>
-<span class="cstat-no" title="statement not covered" >		await mkdir(path.join(here, '../examples'), { recursive: true });</span>
-<span class="cstat-no" title="statement not covered" >		writeFile(</span>
-<span class="cstat-no" title="statement not covered" >			path.join(here, '../examples/arthropods.cigaleprotocol.json'),</span>
-<span class="cstat-no" title="statement not covered" >			JSON.stringify(newProtocol, null, 2)</span>
-<span class="cstat-no" title="statement not covered" >		);</span>
+<span class="cstat-no" title="statement not covered" >		await updateFiles();</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >async function updateFiles() {</span>
+<span class="cstat-no" title="statement not covered" >	await mkdir(path.join(here, '../examples'), { recursive: true });</span>
+<span class="cstat-no" title="statement not covered" >	writeFile(</span>
+<span class="cstat-no" title="statement not covered" >		path.join(here, '../examples/arthropods.cigaleprotocol.json'),</span>
+<span class="cstat-no" title="statement not covered" >		JSON.stringify(newProtocol, null, 2)</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/** @param {string} html  */</span>
@@ -1006,7 +1021,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-03T14:30:14.613Z
+                at 2025-07-03T15:30:45.430Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
