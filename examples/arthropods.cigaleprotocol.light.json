@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/5a9e97520047292faa68a259fd23aeba2d79937a/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 16,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/a60a4dea679355c4de7ccdef5a68387550af8b2b/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 17,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.light.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
