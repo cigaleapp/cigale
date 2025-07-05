@@ -32,25 +32,6 @@
 		}
 	}
 
-	let modelLoadingProgress = $state(0);
-	let cropperModel = $state();
-	async function loadCropperModel() {
-		// Prevent multiple loads
-		if (cropperModel) return;
-		if (!uiState.currentProtocol) return;
-		if (!uiState.cropInferenceAvailable) return;
-		cropperModel = await loadModel(
-			uiState.currentProtocol,
-			uiState.selectedCropModel,
-			'detection',
-			({ transferred, total }) => {
-				if (total === 0) return;
-				modelLoadingProgress = transferred / total;
-			}
-		);
-		toasts.success('Modèle de recadrage chargé');
-	}
-
 	/**
 	 * @param {File} file
 	 * @param {string} id
@@ -127,7 +108,7 @@
 			return;
 		}
 
-		if (!cropperModel) {
+		if (!cropperModelLoaded) {
 			toasts.error(
 				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
 			);
@@ -140,7 +121,7 @@
 			uiState.currentProtocol,
 			uiState.selectedCropModel,
 			[file.bytes],
-			cropperModel
+			cropperModelLoaded
 		);
 
 		console.log('Bounding boxes:', boundingBoxes);
@@ -207,7 +188,7 @@
 		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
-	import { inferSequentialy, loadModel } from '$lib/inference.js';
+	import { inferSequentialy } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -216,6 +197,10 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
+	import * as Swarpc from 'swarpc';
+	import { PROCEDURES } from '$lib/service-worker-procedures.js';
+
+	const swarp = Swarpc.Client(PROCEDURES);
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
@@ -231,8 +216,39 @@
 		})
 	);
 
+	let modelLoadingProgress = $state(0);
+	let cropperModelLoaded = $state(false);
+	async function loadCropperModel() {
+		// Prevent multiple loads
+		if (cropperModelLoaded) return;
+		if (!uiState.currentProtocol) return;
+		if (!uiState.cropInferenceAvailable) return;
+		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
+		if (!cropModel) return;
+
+		await swarp
+			.loadModel(
+				{
+					request: cropModel,
+					task: 'detection'
+				},
+				({ transferred, total }) => {
+					modelLoadingProgress = transferred / total;
+				}
+			)
+			.then(() => {
+				toasts.success('Modèle de détection chargé');
+			})
+			.catch((error) => {
+				console.error(error);
+				toasts.error('Erreur lors du chargement du modèle de détection');
+			});
+
+		cropperModelLoaded = true;
+	}
+
 	$effect(() => {
-		if (!cropperModel) return;
+		if (!cropperModelLoaded) return;
 		if (!uiState.currentProtocol) return;
 		for (const imageFileId of fileIds) {
 			if (

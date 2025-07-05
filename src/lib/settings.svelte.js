@@ -43,24 +43,6 @@ export async function setSetting(key, value) {
 }
 
 /**
- *
- * @param {Key} key
- * @template {keyof import("./database.js").Settings} Key
- */
-export async function getSetting(key) {
-	const out =
-		_settings[key] ??
-		(await tables.Settings.get('user')) ??
-		(await tables.Settings.get('defaults'));
-
-	if (!out) {
-		throw new Error("Les réglages par défaut n'ont pas été initialisés. Rechargez la page.");
-	}
-
-	return out;
-}
-
-/**
  * @typedef {import('./database.js').Settings} Settings
  */
 

@@ -3,6 +3,9 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 import { build, files, version } from '$service-worker';
+import * as Swarp from 'swarpc';
+import { loadModel } from './lib/inference.js';
+import { PROCEDURES } from './lib/service-worker-procedures.js';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
@@ -13,6 +16,28 @@ const ASSETS = [
 	...build, // the app itself
 	...files // everything in `static`
 ];
+
+const swarp = Swarp.Server(PROCEDURES);
+
+console.log(swarp);
+
+/**
+ * @type {Map<string, import('onnxruntime-web').InferenceSession>}
+ */
+let inferenceSessions = new Map();
+
+swarp.loadModel(async ({ task, request, webgpu }, onProgress) => {
+	inferenceSessions.set(task, await loadModel(request, onProgress, webgpu));
+	return true;
+});
+
+swarp.isModelLoaded((task) => inferenceSessions.has(task));
+
+swarp.inferBoundingBoxes(async ({ fileId, taskSettings, webgpu }) => {
+	// const results = await infer(taskSettings, )
+});
+
+swarp.start(self);
 
 self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
@@ -37,6 +62,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
+	console.log({ event });
 	// ignore POST requests etc.
 	if (event.request.method !== 'GET') return;
 

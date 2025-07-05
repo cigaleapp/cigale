@@ -10,7 +10,12 @@
 		imageIdToFileId,
 		imageIsClassified
 	} from '$lib/images';
-	import { classify, loadModel, TARGETHEIGHT, TARGETWIDTH } from '$lib/inference';
+	import {
+		classificationInferenceSettings,
+		classify,
+		TARGETHEIGHT,
+		TARGETWIDTH
+	} from '$lib/inference';
 	import { applyBBOnTensor, imload } from '$lib/inference_utils';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata.js';
@@ -20,8 +25,12 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
+	import * as Swarpc from 'swarpc';
+	import { PROCEDURES } from '$lib/service-worker-procedures.js';
 
 	seo({ title: 'Classification' });
+
+	const swarp = Swarpc.Client(PROCEDURES);
 
 	const erroredImages = $derived(uiState.erroredImages);
 	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
@@ -41,20 +50,26 @@
 	/** loaded and total bytes counts, set and updated by loadModel() */
 	let modelLoadingProgress = $state(0);
 
-	let classifmodel = $state();
+	let classifmodelLoaded = $state(false);
 	let classmapping = $state([]);
 	async function loadClassifModel() {
 		// If the model is already loaded, we don't need to load it again
-		if (classifmodel) return;
+		if (classifmodelLoaded) return;
 		if (!uiState.currentProtocol) return;
 		if (!uiState.classificationInferenceAvailable) return;
-		const classmappingRequest = await tables.Metadata.get(
-			uiState.classificationMetadataId ?? ''
-		).then(
-			(metadata) => metadata?.infer?.neural?.[uiState.selectedClassificationModel]?.classmapping
-		);
 
-		classmapping = await fetchHttpRequest(classmappingRequest, {
+		const settings = classificationInferenceSettings(
+			uiState.currentProtocol,
+			uiState.selectedClassificationModel
+		);
+		if (!settings) {
+			toasts.error(
+				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur le protocole ${uiState.currentProtocol.name}`
+			);
+			return;
+		}
+
+		classmapping = await fetchHttpRequest(settings.classmapping, {
 			cacheAs: 'model',
 			onProgress({ transferred, total }) {
 				if (total === 0) return;
@@ -64,16 +79,28 @@
 			.then((res) => res.text())
 			.then((text) => text.split(/\r?\n/).filter(Boolean));
 
-		classifmodel = await loadModel(
-			uiState.currentProtocol,
-			uiState.selectedClassificationModel,
-			'classification',
-			({ transferred, total }) => {
-				if (total === 0) return;
-				modelLoadingProgress = 0.25 + 0.75 * (transferred / total);
-			}
-		);
-		toasts.success('Modèle de classification chargé');
+		await swarp
+			.loadModel(
+				{
+					request: settings.model,
+					task: 'classification'
+				},
+				(progress) => {
+					modelLoadingProgress = 0.25 + 0.75 * (progress.transferred / progress.total);
+				}
+			)
+			.then(() => {
+				toasts.success('Modèle de classification chargé');
+			})
+			.catch((error) => {
+				console.error(error);
+				toasts.error('Erreur lors du chargement du modèle de classification');
+			})
+			.finally(() => {
+				classifmodelLoaded = true;
+			});
+
+		classifmodelLoaded = true;
 	}
 	/**
 	 * @param {ArrayBuffer} buffer
@@ -94,7 +121,7 @@
 			return;
 		}
 
-		if (!classifmodel) {
+		if (!classifmodelLoaded) {
 			throw new Error(
 				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
 			);
@@ -134,7 +161,7 @@
 			);
 		}
 
-		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodel, uiState, 0);
+		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodelLoaded, uiState, 0);
 
 		const results = scores
 			.map((score, i) => ({
@@ -171,7 +198,7 @@
 	$effect(
 		() =>
 			void (async () => {
-				if (!classifmodel) return;
+				if (!classifmodelLoaded) return;
 				for (const image of tables.Image.state) {
 					if (
 						imageBufferWasSaved(image) &&

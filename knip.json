@@ -5,7 +5,6 @@
 		"src/lib/utils.js",
 		"src/lib/exiffields.js",
 		"tests/**",
-		"src/service-worker.js",
 		"src/app.d.ts",
 		"src/lib/Checkbox.svelte",
 		"src/lib/Dropzone.svelte",
@@ -15,6 +14,17 @@
 	"ignoreDependencies": ["@iconify-json/.+"],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
-		"$lib/*": ["src/lib/*"]
+		"$lib/*": ["src/lib/*"],
+		"$service-worker": ["node_modules/@sveltejs/kit/types/index.d.ts"]
+	},
+	"svelte": {
+		"entry": [
+			"svelte.config.js",
+			"vite.config.{js,mjs,ts,cjs,mts,cts}",
+			"src/routes/**/+{page,server,page.server,error,layout,layout.server}{,@*}.{js,ts,svelte}",
+			"src/hooks.{server,client}.{js,ts}",
+			"src/params/*.{js,ts}",
+			"src/service-worker.{js,ts}"
+		]
 	}
 }

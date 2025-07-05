@@ -373,14 +373,13 @@ async function normalizeTensors(tensors, mean, std, denormalize = false) {
 
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index du modèle de classification dans la liste des modèles de classification du protocole
+ * @param {import('./database.js').ModelDetectionOutputShape} outputShape
  * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
  * @returns {[import('./inference.js').BB[][], number[][]]}
  */
-export function output2BB(protocol, modelIndex, output, numImages, minConfidence) {
+export function output2BB(outputShape, output, numImages, minConfidence) {
 	/*reshape les bounding boxes obtenues par le modèle d'inférence
     -------input------- :
         output : liste de bounding boxes obtenues par le modèle d'inférence
@@ -402,15 +401,6 @@ export function output2BB(protocol, modelIndex, output, numImages, minConfidence
 	let bestScores = [];
 
 	console.log(output);
-
-	const outputShape = protocol.crop?.infer?.[modelIndex].output?.shape ?? [
-		'sx',
-		'sy',
-		'w',
-		'h',
-		'score',
-		'_'
-	];
 
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;
