@@ -39,6 +39,8 @@ const gbifIdToCanonicalName = await fetch(
 		)
 	);
 
+console.info(`Protocol has ${allGbifIds.size} species options`);
+
 /**
  * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}
  */
