@@ -32,9 +32,41 @@ if (process.argv[1] === import.meta.filename) {
 }
 
 function deleteKeys(obj, pred) {
+	if (typeof obj !== 'object') return obj;
+	if (Array.isArray(obj)) return obj.map((item) => deleteKeys(item, pred));
+
 	return Object.fromEntries(
 		Object.entries(obj)
-			.filter((entry) => pred(entry))
-			.map((entry) => deleteKeys(entry, pred))
+			.filter((entry) => !pred(entry))
+			.map(([key, value]) => [key, deleteKeys(value, pred)])
 	);
+}
+
+if (import.meta.vitest) {
+	const { it, expect, describe } = import.meta.vitest;
+
+	describe('deleteKeys', () => {
+		it('should remove keys that match the predicate', () => {
+			const input = {
+				a: 1,
+				b: { $ark: { object1: true } },
+				c: 3,
+				d: { $ark: { object2: true } }
+			};
+			const result = deleteKeys(input, ([, value]) => typeof value === 'object' && value.$ark);
+			expect(result).toEqual({ a: 1, c: 3 });
+		});
+
+		it('should return an empty object if all keys match the predicate', () => {
+			const input = { $ark: { object1: true } };
+			const result = deleteKeys(input, ([, value]) => typeof value === 'object' && value.object1);
+			expect(result).toEqual({});
+		});
+
+		it('should return the same object if no keys match the predicate', () => {
+			const input = { a: 1, b: 2 };
+			const result = deleteKeys(input, ([, value]) => typeof value === 'object' && value.$ark);
+			expect(result).toEqual(input);
+		});
+	});
 }
