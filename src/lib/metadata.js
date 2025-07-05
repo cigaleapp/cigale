@@ -326,6 +326,10 @@ function mergeMetadata(definition, values) {
 	 */
 	console.log('Merging metadata', definition, values);
 
+	/**
+	 * @param {(probabilities: number[]) => number} merger
+	 * @param {DB.MetadataValue[]} values
+	 */
 	const mergeAlternatives = (merger, values) =>
 		Object.fromEntries(
 			values
