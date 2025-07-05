@@ -16,5 +16,6 @@
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
 		"$lib/*": ["src/lib/*"]
-	}
+	},
+	"entry": ["scripts/*.js"]
 }
