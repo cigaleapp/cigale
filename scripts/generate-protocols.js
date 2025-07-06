@@ -281,7 +281,7 @@ writeFileSync(
 					),
 					infer: {
 						neural: protocol.metadata[namespaced('species')].infer.neural.filter(
-							(model) => model.name === 'Léger (~80 classes)'
+							(model) => model.name === 'Collemboles (~80 classes)'
 						)
 					}
 				}
