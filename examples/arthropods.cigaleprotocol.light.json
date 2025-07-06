@@ -2,7 +2,7 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/5a9e97520047292faa68a259fd23aeba2d79937a/scripts/README.md#protocoles-arthropodsexamplelight",
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/548de5dadf41af928de83ae91334ebf13109aa98/scripts/README.md#protocoles-arthropodsexamplelight",
 	"version": 16,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.light.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
@@ -1389,7 +1389,7 @@
 			"infer": {
 				"neural": [
 					{
-						"name": "Léger (~80 classes)",
+						"name": "Collemboles (~80 classes)",
 						"model": "https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx",
 						"classmapping": "https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt",
 						"input": {
