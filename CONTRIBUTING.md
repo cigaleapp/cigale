@@ -309,7 +309,7 @@ _path: #_
             - _Lien vers le modèle de détection utilisé pour inférer les boîtes englobantes. Au format ONNX (.onnx) seulement, pour le moment._
             - <i id="propertiescroppropertiesinferitemspropertiesmodel">path: #/properties/crop/properties/infer/items/properties/model</i>
           - <b id="propertiescroppropertiesinferitemspropertiesoutput">output</b> `required`
-            - _Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO_
+            - _Forme de la sortie du modèle de classification. Par exemple, shape: [cx, cy, w, h, score, _] et normalized: true correspond à un modèle YOLO11 COCO\_
             - Type: `object`
             - <i id="propertiescroppropertiesinferitemspropertiesoutput">path: #/properties/crop/properties/infer/items/properties/output</i>
             - **_Properties_**
