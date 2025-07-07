@@ -39,6 +39,8 @@ const gbifIdToCanonicalName = await fetch(
 		)
 	);
 
+console.info(`Protocol has ${allGbifIds.size} species options`);
+
 /**
  * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}
  */
@@ -183,7 +185,7 @@ const protocol = {
 			infer: {
 				neural: [
 					{
-						name: 'Léger (~80 classes)',
+						name: 'Collemboles (~80 classes)',
 						model: 'https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx',
 						classmapping:
 							'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt',
@@ -195,10 +197,11 @@ const protocol = {
 						}
 					},
 					{
-						name: 'Complet (~17000 classes)',
+						name: 'Arthropodes (~17000 classes)',
+						description: 'Terrestres, France métropolitaine', // TODO
 						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
 						model:
-							'https://media.gwen.works/cigale/models/classification-collembola-polymny-2025-04-11.onnx',
+							'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx',
 						classmapping:
 							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
 						input: {
@@ -278,7 +281,7 @@ writeFileSync(
 					),
 					infer: {
 						neural: protocol.metadata[namespaced('species')].infer.neural.filter(
-							(model) => model.name === 'Léger (~80 classes)'
+							(model) => model.name === 'Collemboles (~80 classes)'
 						)
 					}
 				}

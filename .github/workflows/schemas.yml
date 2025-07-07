@@ -3,8 +3,6 @@ name: Schemas
 on:
   push:
     paths: ['*.yaml', '*.yml', '*.json']
-  pull_request:
-    paths: ['*.yaml', '*.yml', '*.json']
   workflow_dispatch:
 
 jobs:

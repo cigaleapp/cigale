@@ -326,6 +326,10 @@ function mergeMetadata(definition, values) {
 	 */
 	console.log('Merging metadata', definition, values);
 
+	/**
+	 * @param {(probabilities: number[]) => number} merger
+	 * @param {DB.MetadataValue[]} values
+	 */
 	const mergeAlternatives = (merger, values) =>
 		Object.fromEntries(
 			values
@@ -562,8 +566,9 @@ function toNumber(type, values) {
  * Used for e.g. CSV exports.
  * @param {DB.Metadata} metadata the metadata definition
  * @param {DB.MetadataValue['value']} value the value of the metadata
+ * @param {string} [valueLabel] the label of the value, if applicable (e.g. for enums)
  */
-export function metadataPrettyValue(metadata, value) {
+export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 	switch (metadata.type) {
 		case 'boolean':
 			return value ? 'Oui' : 'Non';
@@ -572,7 +577,7 @@ export function metadataPrettyValue(metadata, value) {
 			return value instanceof Date ? Intl.DateTimeFormat('fr-FR').format(value) : value.toString();
 
 		case 'enum':
-			return metadata.options?.find((o) => o.key === value.toString())?.label ?? value.toString();
+			return valueLabel || value.toString();
 
 		case 'location': {
 			const { latitude, longitude } = type({ latitude: 'number', longitude: 'number' }).assert(

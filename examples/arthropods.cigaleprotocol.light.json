@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/1151986244c5dbf7d4ffa894270ae8140df1bed9/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 14,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/548de5dadf41af928de83ae91334ebf13109aa98/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 16,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.light.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -1320,10 +1320,7 @@
 					"key": "9217813",
 					"label": "Orchesella villosa",
 					"description": "",
-					"learnMore": "https://gbif.org/species/9217813",
-					"cascade": {
-						"genus": "2120960"
-					}
+					"learnMore": "https://gbif.org/species/9217813"
 				},
 				{
 					"key": "9616579",
@@ -1392,7 +1389,7 @@
 			"infer": {
 				"neural": [
 					{
-						"name": "Léger (~80 classes)",
+						"name": "Collemboles (~80 classes)",
 						"model": "https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx",
 						"classmapping": "https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt",
 						"input": {

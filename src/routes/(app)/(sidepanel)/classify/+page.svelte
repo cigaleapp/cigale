@@ -135,13 +135,14 @@
 			height: TARGETHEIGHT
 		};
 
+		const cropbox =
+			/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
+			(metadata[uiState.cropMetadataId]?.value);
+
 		// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
 		let img = await imload([buffer], { ...inputSettings, normalized: true });
 		const { x, y, width, height } = toPixelCoords(
-			toTopLeftCoords(
-				/** @type {import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-				(metadata[uiState.cropMetadataId].value)
-			)
+			toTopLeftCoords(cropbox ?? { x: 0, y: 0, w: 1, h: 1 })
 		);
 
 		const nimg = await applyBBOnTensor([x, y, width, height], img);

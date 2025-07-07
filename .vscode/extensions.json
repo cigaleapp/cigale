@@ -6,6 +6,7 @@
 		"stylelint.vscode-stylelint",
 		"svelte.svelte-vscode",
 		"antfu.iconify",
-		"arktypeio.arkdark"
+		"arktypeio.arkdark",
+		"ms-playwright.playwright"
 	]
 }

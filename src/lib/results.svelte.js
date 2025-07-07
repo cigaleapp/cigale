@@ -202,10 +202,10 @@ export async function generateResultsZip(
 							Observation: o.label,
 							...Object.fromEntries(
 								Object.entries(exportedObservations[o.id].metadata).flatMap(
-									([key, { value, confidence }]) => [
+									([key, { value, confidence, valueLabel }]) => [
 										[
 											metadataPrettyKey(metadataDefinitions[key]),
-											metadataPrettyValue(metadataDefinitions[key], value)
+											metadataPrettyValue(metadataDefinitions[key], value, valueLabel)
 										],
 										[
 											`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
