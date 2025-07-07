@@ -2,7 +2,7 @@
 	import Fuse from 'fuse.js';
 
 	/**
-	 * @typedef {{  key: string, label: string }} Option
+	 * @typedef {string | {  key: string, label: string }} Option
 	 */
 
 	/**
@@ -49,8 +49,9 @@
 			activeIndex = (activeIndex - 1 + itemCount) % itemCount; // Loop to last item
 		} else if (event.key === 'Enter' && itemCount > 0) {
 			event.preventDefault();
-			searchQuery = filteredItems[activeIndex].label; // Select active item
-			selectedValue = filteredItems[activeIndex].key;
+			const selectedItem = filteredItems[activeIndex];
+			searchQuery = typeof selectedItem === 'string' ? selectedItem : selectedItem.label;
+			selectedValue = typeof selectedItem === 'string' ? selectedItem : selectedItem.key;
 			listRef.blur();
 			InputRef.blur();
 		}
@@ -81,19 +82,19 @@
 	/>
 
 	<ul class="container" bind:this={listRef}>
-		{#each filteredItems as { key, label }, i (key)}
+		{#each filteredItems as item, i (typeof item === 'string' ? item : item.key)}
 			<li>
 				<button
 					class="button"
 					class:highlighted={i === activeIndex}
 					onclick={(e) => {
-						selectedValue = key;
-						searchQuery = label;
+						selectedValue = typeof item === 'string' ? item : item.key;
+						searchQuery = typeof item === 'string' ? item : item.label;
 						e.currentTarget.blur();
 					}}
 					tabindex="-1"
 				>
-					{label}
+					{typeof item === 'string' ? item : item.label}
 				</button>
 			</li>
 		{/each}
