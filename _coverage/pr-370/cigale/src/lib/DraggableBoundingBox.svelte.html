@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/239</span>
+                <span class='fraction'>0/244</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/239</span>
+                <span class='fraction'>0/244</span>
             </div>
         
             
@@ -618,7 +618,14 @@
 <a name='L553'></a><a href='#L553'>553</a>
 <a name='L554'></a><a href='#L554'>554</a>
 <a name='L555'></a><a href='#L555'>555</a>
-<a name='L556'></a><a href='#L556'>556</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -661,14 +668,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1173,12 +1187,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&lt;script&gt;
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >&lt;script&gt;<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
 	import { tick } from 'svelte';
 	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { getSettings } from './settings.svelte';
 	import { mapValues } from './utils';
+	import { watch } from 'runed';
 &nbsp;
 	/**
 	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
@@ -1222,8 +1237,14 @@
 		zoom
 	} = $props();
 &nbsp;
-	// $derived can be written to since Svelte 5.25
-<span class="cstat-no" title="statement not covered" >	let boundingBoxes = $derived(boudingBoxesInitial);</span>
+	// Using a writable $derived here causes the state to not update until onmouseup, idk why
+<span class="cstat-no" title="statement not covered" >	let boundingBoxes = $state(boudingBoxesInitial);</span>
+<span class="cstat-no" title="statement not covered" >	watch(</span>
+		() =&gt; boudingBoxesInitial,
+<span class="cstat-no" title="statement not covered" >		(newBoxes) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >			boundingBoxes = newBoxes;</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
+	);
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	let clientWidth = $state(imageElement.clientWidth);</span>
 <span class="cstat-no" title="statement not covered" >	let clientHeight = $state(imageElement.clientHeight);</span>
@@ -1735,7 +1756,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-03T13:01:42.736Z
+                at 2025-07-07T16:06:19.115Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

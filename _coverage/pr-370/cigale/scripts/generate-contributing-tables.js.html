@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for cigale/src/lib/mutations.js</title>
+    <title>Code coverage report for cigale/scripts/generate-contributing-tables.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../prettify.css" />
-    <link rel="stylesheet" href="../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">cigale/src/lib</a> mutations.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">cigale/scripts</a> generate-contributing-tables.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/28</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/28</span>
             </div>
         
             
@@ -93,14 +93,9 @@
 <a name='L28'></a><a href='#L28'>28</a>
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -113,46 +108,57 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >// https://github.com/PaulMaly/svelte-actions-mutation/blob/master/src/index.js<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { Tables } from '../src/lib/database.js';</span></span></span>
+<span class="cstat-no" title="statement not covered" >import { readFile, writeFile } from 'node:fs/promises';</span>
+<span class="cstat-no" title="statement not covered" >import { JSONSchemaMarkdownDoc } from 'json-schema-doc-ts';</span>
+<span class="cstat-no" title="statement not covered" >import path from 'node:path';</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
 <span class="cstat-no" title="statement not covered" > *</span>
-<span class="cstat-no" title="statement not covered" > * @param {HTMLElement} node</span>
-<span class="cstat-no" title="statement not covered" > * @param {MutationObserverInit &amp; Partial&lt;Record&lt;`on${MutationRecordType}`, (m: MutationRecord) =&gt; void&gt;&gt;} options</span>
-<span class="cstat-no" title="statement not covered" > * @returns</span>
+<span class="cstat-no" title="statement not covered" > * @param {string} name</span>
+<span class="cstat-no" title="statement not covered" > * @param {import('arktype').Type} typ</span>
 <span class="cstat-no" title="statement not covered" > */</span>
-<span class="cstat-no" title="statement not covered" >export function mutationobserver(node, options) {</span>
-<span class="cstat-no" title="statement not covered" >	/** @type {MutationObserver|null}  */</span>
-<span class="cstat-no" title="statement not covered" >	let observer = null;</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	function update(options = {}) {</span>
-<span class="cstat-no" title="statement not covered" >		destroy();</span>
-<span class="cstat-no" title="statement not covered" >		observer = new MutationObserver((mutations) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >			// @ts-ignore</span>
-<span class="cstat-no" title="statement not covered" >			mutations.forEach((m) =&gt; options[`on${m.type}`]?.(m));</span>
-<span class="cstat-no" title="statement not covered" >		});</span>
-<span class="cstat-no" title="statement not covered" >		observer.observe(node, options);</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	function destroy() {</span>
-<span class="cstat-no" title="statement not covered" >		observer &amp;&amp; observer.disconnect();</span>
-<span class="cstat-no" title="statement not covered" >		observer = null;</span>
-<span class="cstat-no" title="statement not covered" >	}</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	update(options);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	return { update, destroy };</span>
+<span class="cstat-no" title="statement not covered" >function documentTable(name, typ) {</span>
+<span class="cstat-no" title="statement not covered" >	console.log(`Documenting table: ${name}`);</span>
+<span class="cstat-no" title="statement not covered" >	return `### ${name}\n\n${new JSONSchemaMarkdownDoc(typ.out.toJsonSchema()).generate()}`;</span>
 <span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >const here = path.dirname(new URL(import.meta.url).pathname);</span>
+<span class="cstat-no" title="statement not covered" >const contributingPath = path.join(here, '../CONTRIBUTING.md').replace('\\C:', 'C:');</span>
+<span class="cstat-no" title="statement not covered" >let content = await readFile(contributingPath, 'utf-8');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// Content is to be inserted between a start:marker and an end:marker comment</span>
+<span class="cstat-no" title="statement not covered" >const markerComment = 'jsonschema-tables';</span>
+<span class="cstat-no" title="statement not covered" >content = content.replace(</span>
+<span class="cstat-no" title="statement not covered" >	new RegExp(</span>
+<span class="cstat-no" title="statement not covered" >		`(&lt;!--\\s*${markerComment}\\s*start\\s*--&gt;)[\\s\\S]*?(&lt;!--\\s*${markerComment}\\s*end\\s*--&gt;)`</span>
+<span class="cstat-no" title="statement not covered" >	),</span>
+<span class="cstat-no" title="statement not covered" >	(_, start, end) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >		`${start}\n\n${Object.entries(Tables)</span>
+<span class="cstat-no" title="statement not covered" >			.map(([name, typ]) =&gt; documentTable(name, typ))</span>
+<span class="cstat-no" title="statement not covered" >			.join('\n\n')}\n\n${end}`</span>
+<span class="cstat-no" title="statement not covered" >);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >await writeFile(contributingPath, content, 'utf-8');</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -162,14 +168,14 @@
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-07-07T16:06:19.115Z
             </div>
-        <script src="../../../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../sorter.js"></script>
-        <script src="../../../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     

@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/283</span>
+                <span class='fraction'>0/285</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/283</span>
+                <span class='fraction'>0/285</span>
             </div>
         
             
@@ -362,7 +362,10 @@
 <a name='L297'></a><a href='#L297'>297</a>
 <a name='L298'></a><a href='#L298'>298</a>
 <a name='L299'></a><a href='#L299'>299</a>
-<a name='L300'></a><a href='#L300'>300</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -404,6 +407,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -454,6 +459,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -702,6 +708,8 @@
 <span class="cstat-no" title="statement not covered" >		)</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
 &nbsp;
+<span class="cstat-no" title="statement not covered" >console.info(`Protocol has ${allGbifIds.size} species options`);</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
 <span class="cstat-no" title="statement not covered" > * @type {Array&lt;typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer&gt;}</span>
 <span class="cstat-no" title="statement not covered" > */</span>
@@ -846,7 +854,7 @@
 <span class="cstat-no" title="statement not covered" >			infer: {</span>
 <span class="cstat-no" title="statement not covered" >				neural: [</span>
 <span class="cstat-no" title="statement not covered" >					{</span>
-<span class="cstat-no" title="statement not covered" >						name: 'Léger (~80 classes)',</span>
+<span class="cstat-no" title="statement not covered" >						name: 'Collemboles (~80 classes)',</span>
 <span class="cstat-no" title="statement not covered" >						model: 'https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx',</span>
 <span class="cstat-no" title="statement not covered" >						classmapping:</span>
 <span class="cstat-no" title="statement not covered" >							'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt',</span>
@@ -858,10 +866,11 @@
 <span class="cstat-no" title="statement not covered" >						}</span>
 <span class="cstat-no" title="statement not covered" >					},</span>
 <span class="cstat-no" title="statement not covered" >					{</span>
-<span class="cstat-no" title="statement not covered" >						name: 'Complet (~17000 classes)',</span>
+<span class="cstat-no" title="statement not covered" >						name: 'Arthropodes (~17000 classes)',</span>
+<span class="cstat-no" title="statement not covered" >						description: 'Terrestres, France métropolitaine', // TODO</span>
 <span class="cstat-no" title="statement not covered" >						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?</span>
 <span class="cstat-no" title="statement not covered" >						model:</span>
-<span class="cstat-no" title="statement not covered" >							'https://media.gwen.works/cigale/models/classification-collembola-polymny-2025-04-11.onnx',</span>
+<span class="cstat-no" title="statement not covered" >							'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx',</span>
 <span class="cstat-no" title="statement not covered" >						classmapping:</span>
 <span class="cstat-no" title="statement not covered" >							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',</span>
 <span class="cstat-no" title="statement not covered" >						input: {</span>
@@ -941,7 +950,7 @@
 <span class="cstat-no" title="statement not covered" >					),</span>
 <span class="cstat-no" title="statement not covered" >					infer: {</span>
 <span class="cstat-no" title="statement not covered" >						neural: protocol.metadata[namespaced('species')].infer.neural.filter(</span>
-<span class="cstat-no" title="statement not covered" >							(model) =&gt; model.name === 'Léger (~80 classes)'</span>
+<span class="cstat-no" title="statement not covered" >							(model) =&gt; model.name === 'Collemboles (~80 classes)'</span>
 <span class="cstat-no" title="statement not covered" >						)</span>
 <span class="cstat-no" title="statement not covered" >					}</span>
 <span class="cstat-no" title="statement not covered" >				}</span>
@@ -967,7 +976,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-03T13:01:42.736Z
+                at 2025-07-07T16:06:19.115Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
