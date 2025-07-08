@@ -1,7 +1,7 @@
 import { uiState } from '$lib/state.svelte';
-import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
+import dcraw from './vendored/dcraw.js';
 import { unique } from './utils';
 /**
  * @import { Image, Protocol } from './database.js';
@@ -210,8 +210,13 @@ const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width)
 export async function resizeToMaxSize({ source }) {
 	// For some reason top-level import fails
 	const { resize } = await import('pica-gpu');
-	const originalImage = await createImageBitmap(source);
+	const originalImage = await createImageBitmap(
+		source.type === 'image/cr2' ? await decodeCR2Blob(source) : source
+	).catch((error) => {
+		throw new Error(`Failed to create image bitmap from source: ${error.message}`);
+	});
 	const { width, height } = originalImage;
+	console.log('Resizing', source, 'got image with', { width, height });
 	const originalCanvas = document.createElement('canvas');
 	originalCanvas.width = width;
 	originalCanvas.height = height;
@@ -230,6 +235,20 @@ export async function resizeToMaxSize({ source }) {
 			if (!blob) throw new Error('Failed to resize image');
 			blob.arrayBuffer().then((buf) => resolve([[width, height], buf]));
 		}, source.type);
+	});
+}
+
+/**
+ *
+ * @param {Blob} cr2Blob
+ * @returns {Promise<Blob>}
+ */
+async function decodeCR2Blob(cr2Blob) {
+	const buf = await cr2Blob.arrayBuffer();
+	const ppmFile = dcraw(buf, {});
+
+	return new Blob([ppmFile], {
+		type: 'image/ppm'
 	});
 }
 

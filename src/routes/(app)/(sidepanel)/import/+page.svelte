@@ -21,6 +21,7 @@
 				const id = imageFileId(currentLength);
 				try {
 					uiState.loadingImages.add(id);
+					uiState.processing.files.shift();
 					await processImageFile(file, id);
 				} catch (error) {
 					console.error(error);
@@ -62,9 +63,13 @@
 		}
 
 		const originalBytes = await file.arrayBuffer();
-		const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
+		const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file }).catch(
+			(error) => {
+				toasts.error(`Erreur lors du redimensionnement de ${file.name}`);
+				throw new Error(`Redimensionnement échoué pour ${file.name}: ${error.message}`);
+			}
+		);
 
-		uiState.processing.files.shift();
 		await storeImageBytes({
 			id,
 			resizedBytes,

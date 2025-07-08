@@ -26,7 +26,7 @@
 		const filesInput = document.createElement('input');
 		filesInput.type = 'file';
 		filesInput.multiple = true;
-		filesInput.accept = 'image/*';
+		filesInput.accept = 'image/*,.cr2';
 		filesInput.addEventListener('change', async (event) => {
 			if (!(event.currentTarget instanceof HTMLInputElement)) return;
 			if (!event.currentTarget.files) return;
