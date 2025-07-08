@@ -32,7 +32,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			taskSettings: {
 				input: Schemas.ModelInput,
 				output: {
-					name: 'string',
+					'name?': 'string',
 					shape: Schemas.ModelDetectionOutputShape
 				}
 			}

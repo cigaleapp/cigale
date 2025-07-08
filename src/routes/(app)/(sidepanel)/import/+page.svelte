@@ -1,4 +1,6 @@
 <script module>
+	const swarp = Swarpc.Client(PROCEDURES);
+
 	/**
 	 * Import new files and process  them
 	 * @param {File[]} files
@@ -45,7 +47,6 @@
 		const originalBytes = await file.arrayBuffer();
 		const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
 
-		uiState.processing.files.shift();
 		await storeImageBytes({
 			id,
 			resizedBytes,
@@ -63,6 +64,8 @@
 				filename: file.name,
 				contentType: file.type,
 				dimensions: { width, height }
+			}).finally(() => {
+				uiState.processing.files.shift();
 			});
 		} else {
 			await tables.Image.set({
@@ -108,25 +111,16 @@
 			return;
 		}
 
-		if (!cropperModelLoaded) {
-			toasts.error(
-				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
-			);
-			return;
-		}
-
 		console.log('Inferring bounding boxes for', file.filename);
 
-		const [[boundingBoxes], [scores]] = await inferSequentialy(
-			uiState.currentProtocol,
-			uiState.selectedCropModel,
-			[file.bytes],
-			cropperModelLoaded
-		);
+		const { boxes, scores } = await swarp.inferBoundingBoxes({
+			fileId: file.id,
+			taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
+		});
 
-		console.log('Bounding boxes:', boundingBoxes);
+		console.log('Bounding boxes:', boxes);
 
-		let [firstBoundingBox] = boundingBoxes;
+		let [firstBoundingBox] = boxes;
 		let [firstScore] = scores;
 
 		if (!firstBoundingBox || !firstScore) {
@@ -147,7 +141,7 @@
 		 */
 		const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
 
-		for (let i = 0; i < boundingBoxes.length; i++) {
+		for (let i = 0; i < boxes.length; i++) {
 			await tables.Image.set({
 				id: imageId(file.id, i),
 				filename: file.filename,
@@ -157,7 +151,7 @@
 				fileId: file.id,
 				metadata: {
 					[uiState.cropMetadataId]: {
-						value: JSON.stringify(toCropBox(boundingBoxes[i])),
+						value: JSON.stringify(toCropBox(boxes[i])),
 						confidence: scores[i],
 						alternatives: {}
 					}
@@ -188,7 +182,6 @@
 		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
-	import { inferSequentialy } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -199,8 +192,6 @@
 	import { formatISO } from 'date-fns';
 	import * as Swarpc from 'swarpc';
 	import { PROCEDURES } from '$lib/service-worker-procedures.js';
-
-	const swarp = Swarpc.Client(PROCEDURES);
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
