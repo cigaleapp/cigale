@@ -67,7 +67,7 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
  * @param {import('./database.js').Protocol} protocol
  * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
  */
-function classificationInferenceSettings(protocol, modelIndex) {
+export function classificationInferenceSettings(protocol, modelIndex) {
 	const matcher = match
 		.case(
 			{
@@ -261,11 +261,9 @@ export async function inferSequentialy(protocol, modelIndex, buffers, model, uiS
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
  * @param {ort.Tensor[][]} images
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').uiState} uiState
- * @param {number} start
  * @returns {Promise<Array<Array<number[]>>>} scores pour chaque tensor de chaque image: [each image [each tensor [score classe 0, score classe 1, …]]]
  */
-export async function classify(settings, images, model, uiState, start) {
+export async function classify(settings, images, model) {
 	/*Effectue une inférence de classification sur une ou plusieurs images.
     -------------inputs----------------
         images : liste d'images prétraitées
@@ -286,16 +284,12 @@ export async function classify(settings, images, model, uiState, start) {
             forme : [each image [each class
     */
 
-	uiState.processing.done = 0;
-
 	const inputName = settings.input.name ?? model.inputNames[0];
 
 	/** @type {number[][][]}  */
 	const scores = [];
-	uiState.processing.state = 'preprocessing';
 	// @ts-ignore
 	images = await preprocess_for_classification(settings, images, MEAN, STD);
-	uiState.processing.state = 'classification';
 	console.log(images);
 
 	for (let i = 0; i < images.length; i++) {
@@ -314,11 +308,9 @@ export async function classify(settings, images, model, uiState, start) {
 			);
 
 			images[i][j].dispose();
-			uiState.processing.time = (Date.now() - start) / 1000;
 		}
 
 		scores.push(imageScores);
-		uiState.processing.done = i + 1;
 	}
 
 	return scores;

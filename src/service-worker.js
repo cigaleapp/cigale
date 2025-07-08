@@ -4,7 +4,8 @@
 /// <reference lib="webworker" />
 import { build, files, version } from '$service-worker';
 import * as Swarp from 'swarpc';
-import { infer, loadModel } from './lib/inference.js';
+import { classify, infer, loadModel } from './lib/inference.js';
+import { applyBBOnTensor, imload } from './lib/inference_utils.js';
 import { PROCEDURES } from './lib/service-worker-procedures.js';
 import { openDB } from 'idb';
 
@@ -46,7 +47,7 @@ function inferenceModelId(request) {
 		request.method,
 		request.url,
 		Object.entries(request.headers)
-			.sort(([a], [b]) => a[0].localeCompare(b[0]))
+			.sort(([a], [b]) => a.localeCompare(b))
 			.map(([k, v]) => `${k}:${v}`)
 	].join('|');
 }
@@ -65,7 +66,7 @@ swarp.loadModel(async ({ task, request, webgpu }, onProgress) => {
 
 swarp.isModelLoaded((task) => inferenceSessions.has(task));
 
-swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
+swarp.inferBoundingBoxes(async ({ fileId, cropbox, taskSettings }) => {
 	const session = inferenceSessions.get('detection')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
@@ -80,6 +81,37 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
 	const [[boxes], [scores]] = await infer(taskSettings, [file.bytes], session);
 
 	return { boxes, scores };
+});
+
+swarp.classify(async ({ fileId, cropbox: { x, y, width, height }, taskSettings }) => {
+	const session = inferenceSessions.get('classification')?.onnx;
+	if (!session) {
+		throw new Error('Modèle de classification non chargé');
+	}
+
+	await openDatabase();
+	const file = await db.get('ImageFile', fileId);
+	if (!file) {
+		throw new Error(`Fichier avec l'ID ${fileId} non trouvé`);
+	}
+
+	console.log('Classifying file', fileId, 'with cropbox', { x, y, width, height });
+
+	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
+	let img = await imload([file.bytes], {
+		...taskSettings.input,
+		normalized: true
+	});
+
+	console.log('Image loaded for classification', img);
+
+	const nimg = await applyBBOnTensor([x, y, width, height], img);
+
+	console.log('Image after applying cropbox', nimg);
+
+	const [[scores]] = await classify(taskSettings, [[nimg]], session);
+
+	return { scores };
 });
 
 swarp.start(self);

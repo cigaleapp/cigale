@@ -2,7 +2,6 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import { toPixelCoords as _toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
-	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
 		deleteImageFile,
@@ -10,23 +9,18 @@
 		imageIdToFileId,
 		imageIsClassified
 	} from '$lib/images';
-	import {
-		classificationInferenceSettings,
-		classify,
-		TARGETHEIGHT,
-		TARGETWIDTH
-	} from '$lib/inference';
-	import { applyBBOnTensor, imload } from '$lib/inference_utils';
+	import { classificationInferenceSettings } from '$lib/inference';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import { PROCEDURES } from '$lib/service-worker-procedures.js';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
+	import { onMount } from 'svelte';
 	import * as Swarpc from 'swarpc';
-	import { PROCEDURES } from '$lib/service-worker-procedures.js';
 
 	seo({ title: 'Classification' });
 
@@ -40,10 +34,9 @@
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
 			isLoaded: (item) =>
-				!uiState.classificationMetadataId ||
-				(typeof item === 'string'
+				typeof item === 'string'
 					? false
-					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item))
+					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
 		})
 	);
 
@@ -51,6 +44,7 @@
 	let modelLoadingProgress = $state(0);
 
 	let classifmodelLoaded = $state(false);
+	let classifModelLoadingError = $state(null);
 	let classmapping = $state([]);
 	async function loadClassifModel() {
 		// If the model is already loaded, we don't need to load it again
@@ -91,25 +85,20 @@
 			)
 			.then(() => {
 				toasts.success('Modèle de classification chargé');
+				classifmodelLoaded = true;
 			})
 			.catch((error) => {
 				console.error(error);
 				toasts.error('Erreur lors du chargement du modèle de classification');
-			})
-			.finally(() => {
-				classifmodelLoaded = true;
 			});
-
-		classifmodelLoaded = true;
 	}
 	/**
-	 * @param {ArrayBuffer} buffer
 	 * @param {string} id
 	 * @param {object} image
 	 * @param {string} image.filename
 	 * @param {import('$lib/database').MetadataValues} image.metadata
 	 */
-	async function analyzeImage(buffer, id, { filename, metadata }) {
+	async function analyzeImage(id, { filename, metadata }) {
 		if (!uiState.currentProtocol) {
 			throw new Error('Aucun protocole sélectionné');
 		}
@@ -121,47 +110,23 @@
 			return;
 		}
 
-		if (!classifmodelLoaded) {
-			throw new Error(
-				'Modèle de classification non chargé, patentiez ou rechargez la page avant de rééssayer'
-			);
-		}
-
 		console.log('Analyzing image', id, filename);
 
-		const inputSettings = uiState.currentProtocol.crop?.infer?.[uiState.selectedCropModel]
-			.input ?? {
-			width: TARGETWIDTH,
-			height: TARGETHEIGHT
-		};
+		const { scores } = await swarp.classify({
+			fileId: imageIdToFileId(id),
+			taskSettings: classificationInferenceSettings(
+				uiState.currentProtocol,
+				uiState.selectedClassificationModel
+			),
+			cropbox: toPixelCoords(
+				toTopLeftCoords(
+					/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
+					(metadata[uiState.cropMetadataId]?.value) ?? { x: 0, y: 0, w: 1, h: 1 }
+				)
+			)
+		});
 
-		const cropbox =
-			/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-			(metadata[uiState.cropMetadataId]?.value);
-
-		// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
-		let img = await imload([buffer], { ...inputSettings, normalized: true });
-		const { x, y, width, height } = toPixelCoords(
-			toTopLeftCoords(cropbox ?? { x: 0, y: 0, w: 1, h: 1 })
-		);
-
-		const nimg = await applyBBOnTensor([x, y, width, height], img);
-
-		// TODO persist after page reload?
-		uiState.setPreviewURL(id, nimg.toDataURL(), 'cropped');
-
-		const targetMetadata = await tables.Metadata.get(uiState.classificationMetadataId);
-
-		// @ts-ignore
-		const inferenceSettings = targetMetadata?.infer?.neural?.[uiState.selectedClassificationModel];
-
-		if (!inferenceSettings) {
-			throw new Error(
-				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur la métadonnée ${uiState.classificationMetadataId}`
-			);
-		}
-
-		const [[scores]] = await classify(inferenceSettings, [[nimg]], classifmodelLoaded, uiState, 0);
+		console.log('Scores for image', id, scores);
 
 		const results = scores
 			.map((score, i) => ({
@@ -190,37 +155,48 @@
 		}
 	}
 
+	async function analyzeAllImages() {
+		for (const image of tables.Image.state) {
+			if (
+				imageBufferWasSaved(image) &&
+				!imageIsClassified(image) &&
+				!uiState.loadingImages.has(image.id)
+			) {
+				uiState.loadingImages.add(image.id);
+
+				await analyzeImage(image.id, image)
+					.catch((error) => {
+						console.error(error);
+						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
+					})
+					.finally(() => {
+						uiState.loadingImages.delete(image.id);
+					});
+			}
+		}
+	}
+
+	$effect(() => {
+		if (!uiState.classificationInferenceAvailable) return;
+		if (!classifmodelLoaded) return;
+		if (classifModelLoadingError) return;
+		void analyzeAllImages();
+	});
+
+	onMount(() => {
+		void loadClassifModel()
+			.catch((error) => {
+				classifModelLoadingError = error?.toString() ?? 'Erreur inattendue';
+			})
+			.finally(() => {
+				classifmodelLoaded = true;
+			});
+	});
+
 	$effect(() => {
 		if (!uiState.setSelection) return;
 		void ensureNoLoneImages();
 	});
-
-	$effect(
-		() =>
-			void (async () => {
-				if (!classifmodelLoaded) return;
-				for (const image of tables.Image.state) {
-					if (
-						imageBufferWasSaved(image) &&
-						!imageIsClassified(image) &&
-						!uiState.loadingImages.has(image.id)
-					) {
-						uiState.loadingImages.add(image.id);
-
-						try {
-							const file = await db.get('ImagePreviewFile', imageIdToFileId(image.id));
-							if (!file) throw new Error('No file ..?');
-							await analyzeImage(file.bytes, image.id, image);
-						} catch (error) {
-							console.error(error);
-							erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
-						} finally {
-							uiState.loadingImages.delete(image.id);
-						}
-					}
-				}
-			})()
-	);
 
 	$effect(() => {
 		if (!uiState.classificationMetadataId) return;
@@ -240,7 +216,7 @@
 	</a>
 {/snippet}
 
-{#await loadClassifModel()}
+{#if !classifmodelLoaded}
 	<section class="loading">
 		<Logo loading />
 		<p>Chargement du modèle de classification</p>
@@ -249,7 +225,7 @@
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
 		</div>
 	</section>
-{:then _}
+{:else if !classifModelLoadingError}
 	<section class="observations" class:empty={!images.length}>
 		<AreaObservations
 			bind:selection={uiState.selection}
@@ -265,15 +241,15 @@
 			<p>Cliquer ou déposer des images ici</p>
 		{/if}
 	</section>
-{:catch error}
+{:else}
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
 		<p>Impossible de charger le modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
-		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
+		<p class="message">{classifModelLoadingError}</p>
 	</section>
-{/await}
+{/if}
 
 <style>
 	.observations {

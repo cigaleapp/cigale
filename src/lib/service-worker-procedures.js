@@ -49,7 +49,13 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			'webgpu?': 'boolean',
 			taskSettings: {
 				input: Schemas.ModelInput,
-				output: { name: 'string' }
+				'output?': { name: 'string' }
+			},
+			cropbox: {
+				x: 'number',
+				y: 'number',
+				width: 'number',
+				height: 'number'
 			}
 		}),
 		progress: type({}),

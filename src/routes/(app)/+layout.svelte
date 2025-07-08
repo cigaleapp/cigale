@@ -5,12 +5,11 @@
 	import Toast from '$lib/Toast.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import { imageIdToFileId } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { pick } from '$lib/utils';
+	import { nonnull, pick } from '$lib/utils';
 	import Navigation from './Navigation.svelte';
 
 	const { children } = $props();
@@ -24,16 +23,18 @@
 		}
 	};
 
+	const imageFileIds = $derived(tables.Image.state.map((image) => image.fileId).filter(nonnull));
+
 	// Ensure every image has a preview URL at all times
 	$effect(() => {
-		for (const image of tables.Image.state) {
-			if (uiState.hasPreviewURL(image.fileId)) continue;
-			if (!image.fileId) continue;
+		// https://github.com/sveltejs/svelte/issues/9520#issuecomment-1817092724
+		for (const fileId of imageFileIds) {
 			void (async () => {
-				const file = await db.get('ImagePreviewFile', imageIdToFileId(image.id));
+				if (uiState.hasPreviewURL(fileId)) return;
+				const file = await db.get('ImagePreviewFile', fileId);
 				if (!file) return;
-				const blob = new Blob([file.bytes], { type: image.contentType });
-				uiState.setPreviewURL(image.fileId, URL.createObjectURL(blob));
+				const blob = new Blob([file.bytes], { type: file.contentType });
+				uiState.setPreviewURL(fileId, URL.createObjectURL(blob));
 			})();
 		}
 	});

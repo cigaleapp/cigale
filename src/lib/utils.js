@@ -640,3 +640,12 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
 export function avg(values) {
 	return values.reduce((acc, cur) => acc + cur, 0) / values.length;
 }
+
+/**
+ * @template {any} T
+ * @param {T} value
+ * @returns {value is NonNullable<T>}
+ */
+export function nonnull(value) {
+	return value !== null && value !== undefined;
+}
