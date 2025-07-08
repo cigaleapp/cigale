@@ -155,7 +155,12 @@
 		}
 	}
 
+	let analyzingAllImages = $state(false);
+
 	async function analyzeAllImages() {
+		if (analyzingAllImages) return;
+		analyzingAllImages = true;
+		console.log('analyzeAllImages', tables.Image.state.length);
 		for (const image of tables.Image.state) {
 			if (
 				imageBufferWasSaved(image) &&
@@ -174,6 +179,8 @@
 					});
 			}
 		}
+
+		analyzingAllImages = false;
 	}
 
 	$effect(() => {
