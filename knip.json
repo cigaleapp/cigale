@@ -12,6 +12,7 @@
 		"src/lib/SelectWithSearch.svelte"
 	],
 	"ignoreDependencies": ["@iconify-json/.+"],
+	"entry": ["scripts/*.js"],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
 		"$lib/*": ["src/lib/*"],
@@ -27,7 +28,4 @@
 			"src/service-worker.{js,ts}"
 		]
 	}
-		"$lib/*": ["src/lib/*"]
-	},
-	"entry": ["scripts/*.js"]
 }
