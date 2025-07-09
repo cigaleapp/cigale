@@ -1,0 +1,1 @@
+var n=1,v=65535,i=4,h=function(){n=n+1&v},s=setInterval(h,1e3/i|0);s.unref&&s.unref();function m(c){var t=i*c,e=[0],r=1,f=n-1&v;return function(o){var a=n-f&v;for(a>t&&(a=t),f=n;a--;)r===t&&(r=0),e[r]=e[r===0?t-1:r-1],r++;o&&(e[r-1]+=o);var u=e[r-1],l=e.length<t?0:e[r===t?0:r];return e.length<i?u:(u-l)*i/e.length}}export{m as s};
