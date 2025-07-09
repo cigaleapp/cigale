@@ -1,8 +1,5 @@
-import { match, type } from 'arktype';
 import * as ort from 'onnxruntime-web';
-import { tables } from './idb.svelte.js';
 import { imload, output2BB, preprocess_for_classification } from './inference_utils.js';
-import { MetadataInferOptionsNeural } from './schemas/metadata.js';
 import { fetchHttpRequest } from './utils.js';
 
 /**
@@ -62,28 +59,6 @@ export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de d�
 const NUMCONF = 0.437; // seuil de confiance pour la détection
 const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
-/**
- *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
- */
-export function classificationInferenceSettings(protocol, modelIndex) {
-	const matcher = match
-		.case(
-			{
-				id: type.string.narrow((id) => protocol.metadata.includes(id)),
-				type: '"enum"',
-				infer: MetadataInferOptionsNeural
-			},
-			(m) => m.infer.neural[modelIndex]
-		)
-		.default(() => undefined);
-
-	return tables.Metadata.state
-		.map((m) => matcher(m))
-		.filter(Boolean)
-		.at(0);
-}
 
 /**
  *

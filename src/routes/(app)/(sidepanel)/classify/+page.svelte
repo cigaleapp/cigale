@@ -9,7 +9,6 @@
 		imageIdToFileId,
 		imageIsClassified
 	} from '$lib/images';
-	import { classificationInferenceSettings } from '$lib/inference';
 	import Logo from '$lib/Logo.svelte';
 	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
@@ -19,8 +18,10 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
+	import { match, type } from 'arktype';
 	import { onMount } from 'svelte';
 	import * as Swarpc from 'swarpc';
+	import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
 	seo({ title: 'Classification' });
 
@@ -153,6 +154,29 @@
 				metadataId: uiState.classificationMetadataId
 			});
 		}
+	}
+
+	/**
+	 *
+	 * @param {import('$lib/database.js').Protocol} protocol
+	 * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
+	 */
+	function classificationInferenceSettings(protocol, modelIndex) {
+		const matcher = match
+			.case(
+				{
+					id: type.string.narrow((id) => protocol.metadata.includes(id)),
+					type: '"enum"',
+					infer: MetadataInferOptionsNeural
+				},
+				(m) => m.infer.neural[modelIndex]
+			)
+			.default(() => undefined);
+
+		return tables.Metadata.state
+			.map((m) => matcher(m))
+			.filter(Boolean)
+			.at(0);
 	}
 
 	let analyzingAllImages = $state(false);
