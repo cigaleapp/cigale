@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/46</span>
+                <span class='fraction'>0/48</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/46</span>
+                <span class='fraction'>0/48</span>
             </div>
         
             
@@ -185,7 +185,11 @@
 <a name='L120'></a><a href='#L120'>120</a>
 <a name='L121'></a><a href='#L121'>121</a>
 <a name='L122'></a><a href='#L122'>122</a>
-<a name='L123'></a><a href='#L123'>123</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -201,19 +205,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -222,9 +213,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -311,6 +319,7 @@
 	import { base } from '$app/paths';
 	import { page } from '$app/state';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { watch } from 'runed';
 	import Toast from '$lib/Toast.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
@@ -335,18 +344,21 @@
 <span class="cstat-no" title="statement not covered" >	const imageFileIds = $derived(tables.Image.state.map((image) =&gt; image.fileId).filter(nonnull));</span>
 &nbsp;
 	// Ensure every image has a preview URL at all times
-<span class="cstat-no" title="statement not covered" >	$effect(() =&gt; {</span>
-		// https://github.com/sveltejs/svelte/issues/9520#issuecomment-1817092724
-<span class="cstat-no" title="statement not covered" >		for (const fileId of imageFileIds) {</span>
-<span class="cstat-no" title="statement not covered" >			void (async () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >				if (uiState.hasPreviewURL(fileId)) return;</span>
-<span class="cstat-no" title="statement not covered" >				const file = await db.get('ImagePreviewFile', fileId);</span>
-<span class="cstat-no" title="statement not covered" >				if (!file) return;</span>
-<span class="cstat-no" title="statement not covered" >				const blob = new Blob([file.bytes], { type: file.contentType });</span>
-<span class="cstat-no" title="statement not covered" >				uiState.setPreviewURL(fileId, URL.createObjectURL(blob));</span>
-<span class="cstat-no" title="statement not covered" >			})();</span>
+<span class="cstat-no" title="statement not covered" >	watch(</span>
+<span class="cstat-no" title="statement not covered" >		() =&gt; imageFileIds,</span>
+<span class="cstat-no" title="statement not covered" >		(imageFileIds) =&gt; {</span>
+			// https://github.com/sveltejs/svelte/issues/9520#issuecomment-1817092724
+<span class="cstat-no" title="statement not covered" >			for (const fileId of imageFileIds) {</span>
+<span class="cstat-no" title="statement not covered" >				void (async () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >					if (uiState.hasPreviewURL(fileId)) return;</span>
+<span class="cstat-no" title="statement not covered" >					const file = await db.get('ImagePreviewFile', fileId);</span>
+<span class="cstat-no" title="statement not covered" >					if (!file) return;</span>
+<span class="cstat-no" title="statement not covered" >					const blob = new Blob([file.bytes], { type: file.contentType });</span>
+<span class="cstat-no" title="statement not covered" >					uiState.setPreviewURL(fileId, URL.createObjectURL(blob));</span>
+<span class="cstat-no" title="statement not covered" >				})();</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
-<span class="cstat-no" title="statement not covered" >	});</span>
+	);
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	defineKeyboardShortcuts({</span>
 <span class="cstat-no" title="statement not covered" >		'$mod+s': {</span>
@@ -436,7 +448,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-08T23:43:00.615Z
+                at 2025-07-09T00:00:38.729Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
