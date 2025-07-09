@@ -187,52 +187,6 @@ export async function infer(
 
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index of the model to use in the list of models for the current protocol
- * @param {ArrayBuffer[]} buffers
- * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').uiState} [uiState]
- * @returns {Promise<[BB[][], number[][], number, ort.Tensor[][]]>}
- */
-export async function inferSequentialy(protocol, modelIndex, buffers, model, uiState) {
-	/*Effectue une inférence de détection sur une ou plusieurs images.
-    Cette fonction est similaire à infer, mais permet l'inférence une à une 
-    et affiche les informations sur l'avancement de l'inférence
-    au fur et à mesure.
-    */
-
-	if (!model) {
-		throw new Error('Model not loaded');
-	}
-
-	let boundingboxes = [];
-	let bestScores = [];
-	let start = Date.now();
-	let inputTensors = [];
-
-	for (let i = 0; i < buffers.length; i++) {
-		let imfile = buffers[i];
-		var BandB = await infer(protocol, modelIndex, 'detection', [imfile], model, uiState, false);
-		console.log({ BandB });
-		let boundingboxe = BandB[0];
-		let bestScore = BandB[1];
-		let inputTensor = BandB[3];
-		// @ts-ignore
-		boundingboxes.push(boundingboxe[0]);
-		// @ts-ignore
-		bestScores.push(bestScore[0]);
-		inputTensors.push(inputTensor);
-
-		if (uiState) {
-			uiState.processing.done = i + 1;
-			uiState.processing.time = (Date.now() - start) / 1000;
-		}
-	}
-	return [boundingboxes, bestScores, start, inputTensors];
-}
-
-/**
- *
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
  * @param {ort.Tensor[][]} images
  * @param {import('onnxruntime-web').InferenceSession} model
