@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/153</span>
+                <span class='fraction'>0/160</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/153</span>
+                <span class='fraction'>0/160</span>
             </div>
         
             
@@ -257,7 +257,14 @@
 <a name='L192'></a><a href='#L192'>192</a>
 <a name='L193'></a><a href='#L193'>193</a>
 <a name='L194'></a><a href='#L194'>194</a>
-<a name='L195'></a><a href='#L195'>195</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -322,24 +329,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -358,6 +350,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -365,9 +366,22 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -512,7 +526,9 @@
 <span class="cstat-no" title="statement not covered" >		return true; // Model is already loaded</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
+<span class="cstat-no" title="statement not covered" >	console.log(`Loading model for task ${task} with ID ${id}`);</span>
 <span class="cstat-no" title="statement not covered" >	const session = await loadModel(request, onProgress, webgpu);</span>
+<span class="cstat-no" title="statement not covered" >	console.log(`Model ${task} loaded successfully with ID ${id}`);</span>
 <span class="cstat-no" title="statement not covered" >	inferenceSessions.set(task, { onnx: session, id });</span>
 <span class="cstat-no" title="statement not covered" >	return true;</span>
 <span class="cstat-no" title="statement not covered" >});</span>
@@ -551,18 +567,23 @@
 <span class="cstat-no" title="statement not covered" >	console.log('Classifying file', fileId, 'with cropbox', { x, y, width, height });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol</span>
-<span class="cstat-no" title="statement not covered" >	let img = await imload([file.bytes], {</span>
-<span class="cstat-no" title="statement not covered" >		...taskSettings.input,</span>
-<span class="cstat-no" title="statement not covered" >		normalized: true</span>
-<span class="cstat-no" title="statement not covered" >	});</span>
+<span class="cstat-no" title="statement not covered" >	const img = await imload([file.bytes], { ...taskSettings.input, normalized: true }).catch(</span>
+<span class="cstat-no" title="statement not covered" >		(err) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >			throw new Error(`Failed to load image for classification: ${err.message}`);</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	console.log('Image loaded for classification', img);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	const nimg = await applyBBOnTensor([x, y, width, height], img);</span>
+<span class="cstat-no" title="statement not covered" >	const nimg = await applyBBOnTensor([x, y, width, height], img).catch((err) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		throw new Error(`Failed to apply cropbox ${x} ${y} ${width} ${height}: ${err.message}`);</span>
+<span class="cstat-no" title="statement not covered" >	});</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	console.log('Image after applying cropbox', nimg);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	const [[scores]] = await classify(taskSettings, [[nimg]], session);</span>
+<span class="cstat-no" title="statement not covered" >	const [[scores]] = await classify(taskSettings, [[nimg]], session).catch((err) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		throw new Error(`Failed to classify image: ${err.message}`);</span>
+<span class="cstat-no" title="statement not covered" >	});</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	return { scores };</span>
 <span class="cstat-no" title="statement not covered" >});</span>
@@ -576,7 +597,7 @@
 <span class="cstat-no" title="statement not covered" >		await cache.addAll(ASSETS);</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	event.waitUntil(addFilesToCache());</span>
+<span class="cstat-no" title="statement not covered" >	event.waitUntil(addFilesToCache().then(skipWaiting()));</span>
 <span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >self.addEventListener('activate', (event) =&gt; {</span>
@@ -588,7 +609,7 @@
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	event.waitUntil(deleteOldCaches());</span>
+<span class="cstat-no" title="statement not covered" >	event.waitUntil(deleteOldCaches().then(clients.claim()));</span>
 <span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >self.addEventListener('fetch', (/** @type {FetchEvent} */ event) =&gt; {</span>
@@ -652,7 +673,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-10T13:02:44.272Z
+                at 2025-07-10T22:23:20.636Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
