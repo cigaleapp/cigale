@@ -211,6 +211,10 @@
 		if (!uiState.classificationInferenceAvailable) return;
 		if (!classifmodelLoaded) return;
 		if (classifModelLoadingError) return;
+		if (
+			tables.Image.state.every((img) => imageIsClassified(img) || uiState.erroredImages.has(img.id))
+		)
+			return;
 		void analyzeAllImages();
 	});
 

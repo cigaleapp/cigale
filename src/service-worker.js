@@ -59,7 +59,9 @@ swarp.loadModel(async ({ task, request, webgpu }, onProgress) => {
 		return true; // Model is already loaded
 	}
 
+	console.log(`Loading model for task ${task} with ID ${id}`);
 	const session = await loadModel(request, onProgress, webgpu);
+	console.log(`Model ${task} loaded successfully with ID ${id}`);
 	inferenceSessions.set(task, { onnx: session, id });
 	return true;
 });
@@ -98,18 +100,23 @@ swarp.classify(async ({ fileId, cropbox: { x, y, width, height }, taskSettings }
 	console.log('Classifying file', fileId, 'with cropbox', { x, y, width, height });
 
 	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
-	let img = await imload([file.bytes], {
-		...taskSettings.input,
-		normalized: true
-	});
+	const img = await imload([file.bytes], { ...taskSettings.input, normalized: true }).catch(
+		(err) => {
+			throw new Error(`Failed to load image for classification: ${err.message}`);
+		}
+	);
 
 	console.log('Image loaded for classification', img);
 
-	const nimg = await applyBBOnTensor([x, y, width, height], img);
+	const nimg = await applyBBOnTensor([x, y, width, height], img).catch((err) => {
+		throw new Error(`Failed to apply cropbox ${x} ${y} ${width} ${height}: ${err.message}`);
+	});
 
 	console.log('Image after applying cropbox', nimg);
 
-	const [[scores]] = await classify(taskSettings, [[nimg]], session);
+	const [[scores]] = await classify(taskSettings, [[nimg]], session).catch((err) => {
+		throw new Error(`Failed to classify image: ${err.message}`);
+	});
 
 	return { scores };
 });
@@ -123,7 +130,7 @@ self.addEventListener('install', (event) => {
 		await cache.addAll(ASSETS);
 	}
 
-	event.waitUntil(addFilesToCache());
+	event.waitUntil(addFilesToCache().then(skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
@@ -135,7 +142,7 @@ self.addEventListener('activate', (event) => {
 		}
 	}
 
-	event.waitUntil(deleteOldCaches());
+	event.waitUntil(deleteOldCaches().then(clients.claim()));
 });
 
 self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
