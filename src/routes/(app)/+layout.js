@@ -5,6 +5,12 @@ import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
 
 export async function load() {
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('/service-worker.js', {
+			type: 'module'
+		});
+	}
+
 	try {
 		await tables.initialize();
 		await fillBuiltinData();

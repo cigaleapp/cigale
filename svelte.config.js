@@ -15,6 +15,9 @@ const config = {
 		router: {
 			type: 'hash'
 		},
+		serviceWorker: {
+			register: false
+		},
 		paths: {
 			base:
 				process.env.BASE_PATH ||
