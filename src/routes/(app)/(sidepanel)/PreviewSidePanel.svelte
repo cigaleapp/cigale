@@ -74,6 +74,11 @@
 		}
 
 		idb.list('MetadataOption').then((result) => {
+			// Prevent double-load even if both promises resolved at the same time
+			if (Object.keys(options).length > 0) {
+				loadingOptions = false;
+				return;
+			}
 			for (const { metadataId, key, ...rest } of result) {
 				options[metadataId] ??= [];
 				options[metadataId].push({ key: key.toString(), ...rest });

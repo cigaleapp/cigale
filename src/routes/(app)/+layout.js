@@ -1,15 +1,16 @@
 import { dev } from '$app/environment';
 import { openTransaction, tables } from '$lib/idb.svelte.js';
 import { importProtocol } from '$lib/protocols';
+import { PROCEDURES } from '$lib/service-worker-procedures';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
+import * as Swarpc from 'swarpc';
+import NeuralWorker from '$lib/../neural-worker.js?worker';
 
 export async function load() {
-	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('/service-worker.js', {
-			type: 'module'
-		});
-	}
+	const swarpc = Swarpc.Client(PROCEDURES, {
+		worker: new NeuralWorker()
+	});
 
 	try {
 		await tables.initialize();
@@ -21,6 +22,8 @@ export async function load() {
 			message: e?.toString() ?? 'Erreur inattendue'
 		});
 	}
+
+	return { swarpc };
 }
 
 async function fillBuiltinData() {

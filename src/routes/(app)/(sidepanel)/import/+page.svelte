@@ -1,11 +1,10 @@
 <script module>
-	const swarp = Swarpc.Client(PROCEDURES);
-
 	/**
 	 * Import new files and process  them
+	 * @param {import('swarpc').SwarpcClient<typeof import('$lib/service-worker-procedures').PROCEDURES>} swarpc
 	 * @param {File[]} files
 	 */
-	export async function importMore(files) {
+	export async function importMore(swarpc, files) {
 		uiState.processing.files = files.map((f) => f.name);
 		uiState.processing.total = files.length;
 		for (const [i, file] of files.entries()) {
@@ -23,7 +22,7 @@
 				const id = imageFileId(currentLength);
 				try {
 					uiState.loadingImages.add(id);
-					await processImageFile(file, id);
+					await processImageFile(swarpc, file, id);
 				} catch (error) {
 					console.error(error);
 					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
@@ -35,10 +34,11 @@
 	}
 
 	/**
+	 * @param {import('swarpc').SwarpcClient<typeof import('$lib/service-worker-procedures').PROCEDURES>} swarpc
 	 * @param {File} file
 	 * @param {string} id
 	 */
-	async function processImageFile(file, id) {
+	async function processImageFile(swarpc, file, id) {
 		if (!uiState.currentProtocol) {
 			toasts.error('Aucun protocole sélectionné');
 			return;
@@ -58,7 +58,7 @@
 		});
 
 		if (uiState.cropInferenceAvailable) {
-			await inferBoundingBoxes({
+			await inferBoundingBoxes(swarpc, {
 				id,
 				bytes: resizedBytes,
 				filename: file.name,
@@ -86,6 +86,7 @@
 	}
 
 	/**
+	 * @param {import('swarpc').SwarpcClient<typeof import('$lib/service-worker-procedures').PROCEDURES>} swarp
 	 * @param {object} file
 	 * @param {ArrayBuffer} file.bytes
 	 * @param {string} file.filename
@@ -94,7 +95,7 @@
 	 * @param {DimensionsInput} file.dimensions
 	 * @returns {Promise<void>}
 	 */
-	async function inferBoundingBoxes(file) {
+	async function inferBoundingBoxes(swarp, file) {
 		if (!uiState.currentProtocol) {
 			toasts.error('Aucun protocole sélectionné');
 			return;
@@ -190,8 +191,8 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
-	import * as Swarpc from 'swarpc';
-	import { PROCEDURES } from '$lib/service-worker-procedures.js';
+
+	const { data } = $props();
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
@@ -217,9 +218,10 @@
 		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
 		if (!cropModel) return;
 
-		await swarp
+		await data.swarpc
 			.loadModel(
 				{
+					protocolId: uiState.currentProtocol.id,
 					request: cropModel,
 					task: 'detection'
 				},
@@ -251,7 +253,7 @@
 						const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));
 						if (!file) return;
 						uiState.loadingImages.add(imageFileId);
-						await inferBoundingBoxes(file);
+						await inferBoundingBoxes(data.swarpc, file);
 					} catch (error) {
 						console.error(error);
 						uiState.erroredImages.set(imageFileId, error?.toString() ?? 'Erreur inattendue');
@@ -300,7 +302,7 @@
 			'.cr3'
 		]}
 		clickable={images.length === 0}
-		onfiles={async ({ files }) => await importMore(files)}
+		onfiles={async ({ files }) => await importMore(data.swarpc, files)}
 	>
 		<section class="observations" class:empty={!images.length}>
 			<AreaObservations
@@ -351,6 +353,11 @@
 		<p>Impossible de charger le modèle de recadrage</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
+		{#if getSettings().showTechnicalMetadata}
+			<pre>
+				{error?.stack ?? '(no stack trace available)'}
+			</pre>
+		{/if}
 	</section>
 {/await}
 

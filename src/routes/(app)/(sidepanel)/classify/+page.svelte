@@ -14,18 +14,16 @@
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { seo } from '$lib/seo.svelte';
-	import { PROCEDURES } from '$lib/service-worker-procedures.js';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
 	import { match, type } from 'arktype';
 	import { onMount } from 'svelte';
-	import * as Swarpc from 'swarpc';
 	import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
 	seo({ title: 'Classification' });
 
-	const swarp = Swarpc.Client(PROCEDURES);
+	const { data } = $props();
 
 	const erroredImages = $derived(uiState.erroredImages);
 	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
@@ -74,9 +72,10 @@
 			.then((res) => res.text())
 			.then((text) => text.split(/\r?\n/).filter(Boolean));
 
-		await swarp
+		await data.swarpc
 			.loadModel(
 				{
+					protocolId: uiState.currentProtocol.id,
 					request: settings.model,
 					task: 'classification'
 				},
@@ -113,7 +112,7 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const { scores } = await swarp.classify({
+		const { scores } = await data.swarpc.classify({
 			fileId: imageIdToFileId(id),
 			taskSettings: classificationInferenceSettings(
 				uiState.currentProtocol,

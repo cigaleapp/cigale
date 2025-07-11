@@ -8,6 +8,7 @@ import { type } from 'arktype';
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	loadModel: {
 		input: type({
+			protocolId: 'string',
 			request: Schemas.HTTPRequest,
 			task: '"classification" | "detection"',
 			'webgpu?': 'boolean'

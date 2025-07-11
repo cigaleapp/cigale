@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import { match } from 'arktype';
+import { clamp } from '$lib/utils.js';
 import * as Jimp from 'jimp';
 import * as ort from 'onnxruntime-web';
 
@@ -39,8 +40,10 @@ async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
 	// Convert ONNX tensor to tf.Tensor
 	// @ts-ignore
 	const tfTensor = tf.tensor(tensor.data, tensor.dims);
-	let w = Math.abs(x1 - x2);
-	let h = Math.abs(y1 - y2);
+	const [__, _, tensorH, tensorW] = tfTensor.shape;
+	// -1 <== off-by-one error somewhere
+	let w = clamp(1, Math.abs(x1 - x2), tensorW - x1 - 1);
+	let h = clamp(1, Math.abs(y1 - y2), tensorH - y1 - 1);
 	// Slice: [batch, channel, row, col]
 	const croppedTfTensor = tf.slice(tfTensor, [0, 0, y1, x1], [1, 3, h, w]);
 	const croppedData = croppedTfTensor.dataSync();
@@ -60,37 +63,28 @@ async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
  * @returns {Promise<import('onnxruntime-web').Tensor>}
  */
 export async function applyBBOnTensor(BB, tensor, marge = 10) {
-	/*Applique une bounding box sur UN tenseur :
-    -------input------- :
-        BB : bounding box
-            forme : [x, y, w, h]
-        tensor : tensor à cropper
-            forme : [1, C, H, W]
-        marge : marge à ajouter autour de la bounding box
-    
-    -------output------- :
-        croppedTensor : tenseur croppé
-            forme : [1, C, h+2*marge, w+2*marge]
-    */
 	let [x, y, w, h] = BB;
 	const [, , tsrheight, tsrwidth] = tensor.dims;
 
+	// Expand box by margin
 	x = x - marge;
 	y = y - marge;
 	w = w + 2 * marge;
 	h = h + 2 * marge;
 
-	x = Math.max(0, x);
-	y = Math.max(0, y);
-	w = Math.min(tsrwidth - x, w);
-	h = Math.min(tsrheight - y, h);
+	// Clamp start, round
+	x = Math.max(0, Math.round(x));
+	y = Math.max(0, Math.round(y));
 
-	x = Math.round(x);
-	y = Math.round(y);
-	w = Math.round(w);
-	h = Math.round(h);
+	// Calculate width/height, clamp so we never overflow
+	let wClamped = Math.max(1, Math.min(Math.round(w), tsrwidth - x));
+	let hClamped = Math.max(1, Math.min(Math.round(h), tsrheight - y));
 
-	let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x + w, y + h);
+	// End coordinates (exclusive)
+	let x2 = x + wClamped;
+	let y2 = y + hClamped;
+
+	let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x2, y2);
 	return croppedTensor;
 }
 
@@ -147,10 +141,14 @@ export async function preprocess_for_classification(settings, tensors, mean, std
  * @param {object} settings
  * @param {number} settings.height
  * @param {number} settings.width
+ * @param {import('./BoundingBoxes.svelte.js').Rect} [settings.crop]
  * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @returns {Promise<import('onnxruntime-web').TypedTensor<'float32'>>}
  */
-export async function imload(buffers, { width: targetWidth, height: targetHeight, normalized }) {
+export async function imload(
+	buffers,
+	{ width: targetWidth, height: targetHeight, crop, normalized }
+) {
 	/*
     charge les images et les resize
     -------input------- :
@@ -168,6 +166,7 @@ export async function imload(buffers, { width: targetWidth, height: targetHeight
 		let buffer = buffers[f];
 
 		var img_tensor = await Jimp.Jimp.read(buffer);
+		if (crop) img_tensor.crop({ ...crop, w: crop.width, h: crop.height });
 		img_tensor.resize({ w: targetWidth, h: targetHeight });
 
 		var imageBufferData = img_tensor.bitmap.data;

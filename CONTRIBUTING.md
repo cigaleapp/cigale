@@ -5,7 +5,6 @@
 - Node.JS
 - NPM
 - [Volta](https://volta.sh) (optional, but recommended, ensures that the right Node & NPM version are used, and installs the correct ones for you when you run any `npm` command)
-- Chrome / Chromium-based browser (unfortunately, Firefox doesn't work well with service workers on localhost, tell me if you manage to make it work)
 
 ## Setup
 
