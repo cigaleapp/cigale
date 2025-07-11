@@ -13,7 +13,7 @@ import * as ort from 'onnxruntime-web';
  * @param {number[]} bb2
  * @returns
  */
-function IoU(bb1, bb2) {
+export function IoU(bb1, bb2) {
 	// Intersection over Union
 	// bb1 et bb2 sont des bounding boxes de la forme : [x, y, w, h]
 	let x1 = Math.max(bb1[0], bb2[0]);
@@ -26,7 +26,6 @@ function IoU(bb1, bb2) {
 
 	return intersection / union;
 }
-
 
 /**
  * @param {ort.Tensor} tensor
@@ -53,45 +52,6 @@ async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
 	return croppedOnnxTensor;
 }
 
-/**
- * @param {ort.Tensor} tensor
- * @param {number} x1
- * @param {number} y1
- * @param {number} x2
- * @param {number} y2
- * @returns {Promise<ort.Tensor>}
- */
-async function cropTensor(tensor, x1, y1, x2, y2) {
-	/*Crop tensor : 
-    -------input------- :
-        tensor : tensor à cropper 
-            forme : [1, C, H, W]
-        x1, y1, x2, y2 : coordonnées de la bounding box
-
-    -------output------- :
-        croppedTensor : tensor croppé
-            forme : [1, C, y2-y1, x2-x1]
-    */
-	let data = await tensor.getData();
-	let dims = tensor.dims;
-
-	let newDims = [1, dims[1], y2 - y1, x2 - x1]; // NCHW
-	let newData = new Float32Array(1 * newDims[1] * newDims[2] * newDims[3]);
-
-	for (let x = x1; x < x2; x++) {
-		for (let y = y1; y < y2; y++) {
-			for (let c = 0; c < dims[1]; c++) {
-				//   --- /!\ si ça marche pas, faut ptet inverser x et y---
-				let i = c * dims[2] * dims[3] + y * dims[3] + x;
-				let newI = c * newDims[2] * newDims[3] + (y - y1) * newDims[3] + (x - x1);
-				// @ts-ignore
-				newData[newI] = data[i];
-			}
-		}
-	}
-	tensor.dispose();
-	return new ort.Tensor(tensor.type, newData, newDims);
-}
 /**
  *
  * @param {number[]} BB
@@ -132,73 +92,6 @@ export async function applyBBOnTensor(BB, tensor, marge = 10) {
 
 	let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x + w, y + h);
 	return croppedTensor;
-}
-
-/**
- *
- * @param {number[][]} BBs
- * @param {ort.Tensor} tensor
- * @param {number} marge
- * @returns {Promise<ort.Tensor[]>}
- */
-
-async function applyBBsOnTensor(BBs, tensor, marge = 10) {
-	/*Applique les bounding boxes sur UN tenseur :
-    -------input------- :
-        BBs : liste de bounding boxes
-            forme : [each bounding boxes : [x, y, w, h]]
-        tensor : tensor à cropper
-            forme : [1, C, H, W]
-        marge : marge à ajouter autour de la bounding box
-    
-    -------output------- :
-        croppedTensors : liste de tenseurs croppés
-            forme : [1, C, h+2*marge, w+2*marge]
-    */
-	let croppedTensors = [];
-	for (let i = 0; i < BBs.length; i++) {
-		let croppedTensor = await applyBBOnTensor(BBs[i], tensor, marge);
-		croppedTensors.push(croppedTensor);
-	}
-	return croppedTensors;
-}
-/**
- *
- * @param {number[][][]} BBs
- * @param {ort.Tensor[][]} tensors
- * @returns {Promise<ort.Tensor[][]>}
- */
-async function applyBBsOnTensors(BBs, tensors) {
-	// Create an array of promises using map
-	// @ts-ignore
-	const croppedTensorPromises = tensors.map((tensor, i) => applyBBsOnTensor(BBs[i], tensor));
-
-	// Wait for all promises to resolve concurrently
-	let tobereturned = await Promise.all(croppedTensorPromises);
-	return tobereturned;
-}
-/**
- * supprime les bounding boxes qui ont un IoU > 0.5. Modifie l'entrée en place!
- * @param {number[][][]} boundingboxes - [each image [each box [x, y, w, h]]]
- * @param {number} numfiles
- * @returns {number[][][]}
- */
-function dedupeBoundingBoxes(boundingboxes, numfiles) {
-	for (let fileIndex = 0; fileIndex < numfiles; fileIndex++) {
-		const boxes = boundingboxes[fileIndex];
-
-		for (let i = 0; i < boundingboxes[fileIndex].length - 1; i++) {
-			for (let j = i + 1; j < boundingboxes[fileIndex].length; j++) {
-				if (i != j) {
-					if (IoU(boxes[i], boxes[j]) > 0.5) {
-						boundingboxes[fileIndex].splice(j, 1);
-						j--;
-					}
-				}
-			}
-		}
-	}
-	return boundingboxes;
 }
 
 /**

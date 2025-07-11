@@ -15,20 +15,20 @@ const topLeftBoundingBox = type({
 	height: 'number'
 });
 
-const rect = type({
+const _rect = type({
 	x: 'number > 0',
 	y: 'number > 0',
 	width: 'number > 0',
 	height: 'number > 0'
 });
 
-const anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
+const _anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
 
 /**
- * @typedef {typeof anyBoundingBox.infer} AnyBoundingBox
+ * @typedef {typeof _anyBoundingBox.infer} AnyBoundingBox
  * @typedef {typeof topLeftBoundingBox.infer} TopLeftBoundingBox
  * @typedef {typeof centeredBoundingBox.infer} CenteredBoundingBox
- * @typedef {typeof rect.infer} Rect
+ * @typedef {typeof _rect.infer} Rect
  */
 
 /**

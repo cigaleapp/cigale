@@ -68,7 +68,7 @@ swarp.loadModel(async ({ task, request, webgpu }, onProgress) => {
 
 swarp.isModelLoaded((task) => inferenceSessions.has(task));
 
-swarp.inferBoundingBoxes(async ({ fileId, cropbox, taskSettings }) => {
+swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
 	const session = inferenceSessions.get('detection')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
@@ -130,7 +130,7 @@ self.addEventListener('install', (event) => {
 		await cache.addAll(ASSETS);
 	}
 
-	event.waitUntil(addFilesToCache().then(skipWaiting()));
+	event.waitUntil(addFilesToCache().then(self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
@@ -142,7 +142,7 @@ self.addEventListener('activate', (event) => {
 		}
 	}
 
-	event.waitUntil(deleteOldCaches().then(clients.claim()));
+	event.waitUntil(deleteOldCaches().then(self.clients.claim()));
 });
 
 self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
