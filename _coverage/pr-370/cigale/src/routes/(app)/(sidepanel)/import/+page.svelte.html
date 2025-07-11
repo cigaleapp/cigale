@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/217</span>
+                <span class='fraction'>0/219</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/217</span>
+                <span class='fraction'>0/219</span>
             </div>
         
             
@@ -470,8 +470,14 @@
 <a name='L405'></a><a href='#L405'>405</a>
 <a name='L406'></a><a href='#L406'>406</a>
 <a name='L407'></a><a href='#L407'>407</a>
-<a name='L408'></a><a href='#L408'>408</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L408'></a><a href='#L408'>408</a>
+<a name='L409'></a><a href='#L409'>409</a>
+<a name='L410'></a><a href='#L410'>410</a>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -505,6 +511,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -566,6 +573,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -692,6 +700,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -823,6 +832,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -878,13 +892,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >&lt;script module&gt;<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >	const swarp = Swarpc.Client(PROCEDURES);</span>
-&nbsp;
 	/**
 	 * Import new files and process  them
+	 * @param {import('swarpc').SwarpcClient&lt;typeof import('$lib/service-worker-procedures').PROCEDURES&gt;} swarpc
 	 * @param {File[]} files
 	 */
-<span class="cstat-no" title="statement not covered" >	export async function importMore(files) {</span>
+<span class="cstat-no" title="statement not covered" >	export async function importMore(swarpc, files) {</span>
 <span class="cstat-no" title="statement not covered" >		uiState.processing.files = files.map((f) =&gt; f.name);</span>
 <span class="cstat-no" title="statement not covered" >		uiState.processing.total = files.length;</span>
 <span class="cstat-no" title="statement not covered" >		for (const [i, file] of files.entries()) {</span>
@@ -902,7 +915,7 @@
 <span class="cstat-no" title="statement not covered" >				const id = imageFileId(currentLength);</span>
 <span class="cstat-no" title="statement not covered" >				try {</span>
 <span class="cstat-no" title="statement not covered" >					uiState.loadingImages.add(id);</span>
-<span class="cstat-no" title="statement not covered" >					await processImageFile(file, id);</span>
+<span class="cstat-no" title="statement not covered" >					await processImageFile(swarpc, file, id);</span>
 <span class="cstat-no" title="statement not covered" >				} catch (error) {</span>
 <span class="cstat-no" title="statement not covered" >					console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');</span>
@@ -914,10 +927,11 @@
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 	/**
+	 * @param {import('swarpc').SwarpcClient&lt;typeof import('$lib/service-worker-procedures').PROCEDURES&gt;} swarpc
 	 * @param {File} file
 	 * @param {string} id
 	 */
-<span class="cstat-no" title="statement not covered" >	async function processImageFile(file, id) {</span>
+<span class="cstat-no" title="statement not covered" >	async function processImageFile(swarpc, file, id) {</span>
 <span class="cstat-no" title="statement not covered" >		if (!uiState.currentProtocol) {</span>
 <span class="cstat-no" title="statement not covered" >			toasts.error('Aucun protocole sélectionné');</span>
 			return;
@@ -937,7 +951,7 @@
 		});
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		if (uiState.cropInferenceAvailable) {</span>
-<span class="cstat-no" title="statement not covered" >			await inferBoundingBoxes({</span>
+<span class="cstat-no" title="statement not covered" >			await inferBoundingBoxes(swarpc, {</span>
 <span class="cstat-no" title="statement not covered" >				id,</span>
 <span class="cstat-no" title="statement not covered" >				bytes: resizedBytes,</span>
 <span class="cstat-no" title="statement not covered" >				filename: file.name,</span>
@@ -965,6 +979,7 @@
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 	/**
+	 * @param {import('swarpc').SwarpcClient&lt;typeof import('$lib/service-worker-procedures').PROCEDURES&gt;} swarp
 	 * @param {object} file
 	 * @param {ArrayBuffer} file.bytes
 	 * @param {string} file.filename
@@ -973,7 +988,7 @@
 	 * @param {DimensionsInput} file.dimensions
 	 * @returns {Promise&lt;void&gt;}
 	 */
-<span class="cstat-no" title="statement not covered" >	async function inferBoundingBoxes(file) {</span>
+<span class="cstat-no" title="statement not covered" >	async function inferBoundingBoxes(swarp, file) {</span>
 <span class="cstat-no" title="statement not covered" >		if (!uiState.currentProtocol) {</span>
 <span class="cstat-no" title="statement not covered" >			toasts.error('Aucun protocole sélectionné');</span>
 			return;
@@ -1069,8 +1084,8 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
-	import * as Swarpc from 'swarpc';
-	import { PROCEDURES } from '$lib/service-worker-procedures.js';
+&nbsp;
+	const { data } = $props();
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const fileIds = $derived(imageFileIds(tables.Image.state));</span>
 &nbsp;
@@ -1096,9 +1111,10 @@
 <span class="cstat-no" title="statement not covered" >		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;</span>
 <span class="cstat-no" title="statement not covered" >		if (!cropModel) return;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		await swarp</span>
+<span class="cstat-no" title="statement not covered" >		await data.swarpc</span>
 <span class="cstat-no" title="statement not covered" >			.loadModel(</span>
 				{
+<span class="cstat-no" title="statement not covered" >					protocolId: uiState.currentProtocol.id,</span>
 <span class="cstat-no" title="statement not covered" >					request: cropModel,</span>
 <span class="cstat-no" title="statement not covered" >					task: 'detection'</span>
 				},
@@ -1130,7 +1146,7 @@
 <span class="cstat-no" title="statement not covered" >						const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));</span>
 <span class="cstat-no" title="statement not covered" >						if (!file) return;</span>
 <span class="cstat-no" title="statement not covered" >						uiState.loadingImages.add(imageFileId);</span>
-<span class="cstat-no" title="statement not covered" >						await inferBoundingBoxes(file);</span>
+<span class="cstat-no" title="statement not covered" >						await inferBoundingBoxes(data.swarpc, file);</span>
 <span class="cstat-no" title="statement not covered" >					} catch (error) {</span>
 <span class="cstat-no" title="statement not covered" >						console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >						uiState.erroredImages.set(imageFileId, error?.toString() ?? 'Erreur inattendue');</span>
@@ -1179,7 +1195,7 @@
 <span class="cstat-no" title="statement not covered" >			'.cr3'</span>
 		]}
 <span class="cstat-no" title="statement not covered" >		clickable={images.length === 0}</span>
-<span class="cstat-no" title="statement not covered" >		onfiles={async ({ files }) =&gt; await importMore(files)}</span>
+<span class="cstat-no" title="statement not covered" >		onfiles={async ({ files }) =&gt; await importMore(data.swarpc, files)}</span>
 	&gt;
 <span class="cstat-no" title="statement not covered" >		&lt;section class="observations" class:empty={!images.length}&gt;</span>
 			&lt;AreaObservations
@@ -1230,6 +1246,11 @@
 		&lt;p&gt;Impossible de charger le modèle de recadrage&lt;/p&gt;
 <span class="cstat-no" title="statement not covered" >		&lt;p class="source"&gt;{@render modelsource()}&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;p class="message"&gt;{error?.toString() ?? 'Erreur inattendue'}&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >		{#if getSettings().showTechnicalMetadata}</span>
+			&lt;pre&gt;
+<span class="cstat-no" title="statement not covered" >				{error?.stack ?? '(no stack trace available)'}</span>
+			&lt;/pre&gt;
+		{/if}
 	&lt;/section&gt;
 {/await}
 &nbsp;
@@ -1291,7 +1312,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-11T14:48:03.585Z
+                at 2025-07-11T18:38:11.927Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
