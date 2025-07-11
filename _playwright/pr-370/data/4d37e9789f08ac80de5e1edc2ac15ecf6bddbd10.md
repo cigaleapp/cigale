@@ -1,0 +1,159 @@
+# Page snapshot
+
+```yaml
+- dialog:
+  - banner:
+    - heading "Exporter les résultats" [level=1]
+    - button:
+      - img
+  - main:
+    - radio "Métadonnées seulement"
+    - text: Métadonnées seulement
+    - radio "Métadonnées et images recadrées"
+    - text: Métadonnées et images recadrées
+    - radio "Métadonnées, images recadrées et images originales Permet de ré-importer les résultats ultérieurement" [checked]
+    - text: Métadonnées, images recadrées et images originales
+    - paragraph: Permet de ré-importer les résultats ultérieurement
+    - text: Marge autour des images recadrées
+    - slider "Marge autour des images recadrées 0 px ~0% de la taille moyenne des images": "0"
+    - textbox "valeur en pixels": "0"
+    - text: px
+    - paragraph:
+      - strong: ~0%
+      - text: de la taille moyenne des images
+  - contentinfo:
+    - button "results.zip":
+      - img
+      - text: results.zip
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer":
+      - /url: "#/crop/000000"
+    - img
+    - link "Classifier":
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: C.i.g.a.l.e vDEV ·
+      - link "À propos":
+        - /url: "#/about"
+- dialog:
+  - banner:
+    - heading "Raccourcis clavier" [level=1]
+    - button:
+      - img
+  - main:
+    - term: Ctrl + U
+    - definition: Supprimer toutes les images et observations
+    - term: Ctrl + G
+    - definition: Fusionner des observations ou images
+    - term: Ctrl + Shift + G
+    - definition: Séparer toutes les observations sélectionnées en images seules
+    - term: Suppr
+    - definition: Supprimer les images et observations sélectionnées
+    - term: Ctrl + A
+    - definition: Tout sélectionner
+    - term: Ctrl + D
+    - definition: Tout désélectionner
+- article:
+  - img
+  - paragraph: Modèle de classification chargé
+  - button:
+    - img
+- main:
+  - article:
+    - img "lil-fella"
+    - img
+    - heading "lil-fella" [level=2]
+- complementary:
+  - img "Image 1 de l'observation lil-fella"
+  - heading "lil-fella" [level=2]:
+    - img
+    - textbox "Nom de l'observation": lil-fella
+  - text: Espèce
+  - combobox: Deuterosminthurus pallipes
+  - code: 12%
+  - button:
+    - img
+  - text: Alternatives
+  - list:
+    - listitem:
+      - text: Deuterosminthurus bicinctus
+      - code: 5%
+      - button:
+        - img
+    - listitem:
+      - text: Sminthurinus aureus
+      - code: 4%
+      - button:
+        - img
+  - text: Genre
+  - combobox: Deuterosminthurus
+  - button:
+    - img
+  - text: Famille
+  - combobox: Bourletiellidae
+  - button:
+    - img
+  - text: Ordre
+  - combobox: Symphypleona
+  - button:
+    - img
+  - text: Date
+  - textbox "Date": 2025-04-25
+  - button:
+    - img
+  - paragraph: Moment où la photo a été prise
+  - text: Localisation
+  - textbox "Localisation"
+  - button [disabled]:
+    - img
+  - paragraph: Endroit où la photo a été prise
+  - text: Classe
+  - combobox: Collembola
+  - button:
+    - img
+  - text: Phylum
+  - combobox: Arthropoda
+  - button:
+    - img
+  - text: Règne
+  - combobox: Animalia
+  - button:
+    - img
+  - button "Regrouper Ctrl + G":
+    - img
+    - text: Regrouper Ctrl + G
+  - button "Séparer Ctrl + Shift + G":
+    - img
+    - text: Séparer Ctrl + Shift + G
+  - button "Supprimer 1 images Suppr":
+    - img
+    - text: Supprimer 1 images Suppr
+- text: Importer · Cigale
+```
