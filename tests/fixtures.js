@@ -20,16 +20,21 @@ export const test = base.extend(
 	 */
 	({
 		forEachTest: [
-			async ({ page }, use) => {
+			async ({ page, context }, use) => {
+				// https://playwright.dev/docs/service-workers-experimental
+				process.env.PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS = '1';
+
 				await rm('./tests/results', { recursive: true, force: true });
 				await mkdir('./tests/results');
-				await page.route(
+
+				await context.route(
 					(u) => {
 						u.searchParams.delete('v');
 						return u.toString() === defaultProtocol.source;
 					},
 					async (route) => route.fulfill({ json: exampleProtocol })
 				);
+
 				await page.goto('/');
 				// @ts-expect-error
 				await page.waitForFunction(() => Boolean(window.DB && window.refreshDB));

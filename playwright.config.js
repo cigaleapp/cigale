@@ -43,13 +43,7 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: {
-				...devices['Desktop Chrome'],
-				contextOptions: {
-					// See https://github.com/microsoft/playwright/issues/1090
-					serviceWorkers: 'block'
-				}
-			}
+			use: { ...devices['Desktop Chrome'] }
 		},
 
 		// Firefox does not work in CI, see https://github.com/microsoft/playwright/issues/11566
@@ -64,13 +58,7 @@ export default defineConfig({
 
 		{
 			name: 'webkit',
-			use: {
-				...devices['Desktop Safari'],
-				contextOptions: {
-					// See https://github.com/microsoft/playwright/issues/1090
-					serviceWorkers: 'block'
-				}
-			}
+			use: { ...devices['Desktop Safari'] }
 		}
 
 		/* Test against mobile viewports. */
