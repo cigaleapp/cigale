@@ -51,7 +51,7 @@ async function fillBuiltinData() {
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'
 			)
 				.then((res) => res.text())
-				.then(importProtocol);
+				.then((txt) => importProtocol(txt, { json: true }));
 		} catch (error) {
 			console.error(error);
 			toasts.error(
