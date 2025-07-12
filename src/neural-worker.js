@@ -79,7 +79,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
 	return { boxes, scores };
 });
 
-swarp.classify(async ({ fileId, cropbox, taskSettings, returnImageUsed }) => {
+swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 	const session = inferenceSessions.get('classification')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de classification non chargé');
@@ -102,21 +102,11 @@ swarp.classify(async ({ fileId, cropbox, taskSettings, returnImageUsed }) => {
 		throw new Error(`Failed to load image for classification: ${err.message}`);
 	});
 
-	/**
-	 * @type {ImageBitmap | undefined}
-	 */
-	let imageUsed;
-
-	if (returnImageUsed) {
-		console.log('Image after applying cropbox', img);
-		imageUsed = await createImageBitmap(img.toImageData());
-	}
-
 	const [[scores]] = await classify(taskSettings, [[img]], session).catch((err) => {
 		throw new Error(`Failed to classify image: ${err.message}`);
 	});
 
-	return imageUsed ? { scores, imageUsed } : { scores };
+	return { scores };
 });
 
 swarp.start(ww);

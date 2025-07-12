@@ -48,7 +48,6 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		input: type({
 			fileId: 'string',
 			'webgpu?': 'boolean',
-			'returnImageUsed?': 'boolean',
 			taskSettings: {
 				input: Schemas.ModelInput,
 				'output?': { name: 'string' }
@@ -62,8 +61,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		}),
 		progress: type({}),
 		success: type({
-			scores: type.number.array(),
-			'imageUsed?': type.instanceOf(ImageBitmap)
+			scores: type.number.array()
 		})
 	}
 });

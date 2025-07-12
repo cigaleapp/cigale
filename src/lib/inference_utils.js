@@ -53,7 +53,7 @@ export async function preprocessTensor(settings, tensor, mean, std) {
 }
 
 /**
- *
+ * _If you need to get back the actual image the model ran on, see commit 682e3fb8849ac3f96005f71a486eefa3c932753a_
  * @param {ArrayBuffer[]} buffers
  * @param {object} settings
  * @param {number} settings.height

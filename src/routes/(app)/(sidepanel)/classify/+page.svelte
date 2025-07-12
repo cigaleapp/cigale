@@ -14,7 +14,6 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
@@ -111,8 +110,7 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const { scores, imageUsed } = await data.swarpc.classify({
-			returnImageUsed: getSettings().showTechnicalMetadata,
+		const { scores } = await data.swarpc.classify({
 			fileId: imageIdToFileId(id),
 			taskSettings: classificationInferenceSettings(
 				uiState.currentProtocol,
@@ -123,21 +121,6 @@
 				(metadata[uiState.cropMetadataId]?.value) ?? { x: 0, y: 0, w: 1, h: 1 }
 			)
 		});
-
-		if (imageUsed) {
-			const debugimg = document.createElement('canvas');
-			debugimg.width = imageUsed.width;
-			debugimg.height = imageUsed.height;
-			const ctx = debugimg.getContext('2d');
-			if (!ctx) {
-				throw new Error('Failed to get canvas context for debug image');
-			}
-			ctx.drawImage(imageUsed, 0, 0);
-
-			const debugimgurl = debugimg.toDataURL('image/png');
-			document.querySelector(`[subimages="${id}"] picture`).innerHTML =
-				`<img src="${debugimgurl}" alt="Debug image for ${filename}" />`;
-		}
 
 		const results = scores
 			.map((score, i) => ({
