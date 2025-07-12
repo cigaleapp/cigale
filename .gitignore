@@ -45,3 +45,4 @@ google-drive*.json
 slides
 scripts/gbif.json
 examples/old-arthropods.cigaleprotocol.json
+.vite/build
