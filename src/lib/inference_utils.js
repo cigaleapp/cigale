@@ -146,7 +146,7 @@ export async function preprocess_for_classification(settings, tensors, mean, std
  * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @returns {Promise<import('onnxruntime-web').TypedTensor<'float32'>>}
  */
-export async function imload(
+export async function loadToTensor(
 	buffers,
 	{ width: targetWidth, height: targetHeight, crop, normalized }
 ) {

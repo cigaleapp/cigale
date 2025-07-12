@@ -6,7 +6,7 @@
 import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 import { classify, infer, loadModel } from './lib/inference.js';
-import { imload as imload } from './lib/inference_utils.js';
+import { loadToTensor as loadToTensor } from './lib/inference_utils.js';
 import { PROCEDURES } from './neural-worker-procedures.js';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
@@ -94,7 +94,7 @@ swarp.classify(async ({ fileId, cropbox, taskSettings, returnImageUsed }) => {
 	console.log('Classifying file', fileId, 'with cropbox', cropbox);
 
 	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
-	const img = await imload([file.bytes], {
+	const img = await loadToTensor([file.bytes], {
 		...taskSettings.input,
 		normalized: true,
 		crop: cropbox

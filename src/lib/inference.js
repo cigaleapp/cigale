@@ -1,5 +1,5 @@
 import * as ort from 'onnxruntime-web';
-import { imload, output2BB, preprocess_for_classification } from './inference_utils.js';
+import { loadToTensor, output2BB, preprocess_for_classification } from './inference_utils.js';
 import { fetchHttpRequest } from './utils.js';
 
 /**
@@ -161,7 +161,7 @@ export async function infer(
 	let inputTensor;
 
 	console.log('loading images...');
-	inputTensor = await imload(buffers, taskSettings.input);
+	inputTensor = await loadToTensor(buffers, taskSettings.input);
 
 	console.log('inference...');
 	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });
