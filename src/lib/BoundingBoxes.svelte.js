@@ -67,15 +67,6 @@ if (import.meta.vitest) {
 }
 
 /** @param {undefined | import('./database').Protocol} protocol  */
-export const toPixelCoords = (protocol) => {
-	if (!protocol) throw new Error('No protocol was provided');
-	return coordsScaler({
-		x: protocol.crop?.infer?.input?.width ?? TARGETWIDTH,
-		y: protocol.crop?.infer?.input?.height ?? TARGETHEIGHT
-	});
-};
-
-/** @param {undefined | import('./database').Protocol} protocol  */
 export const toRelativeCoords = (protocol) => {
 	if (!protocol) throw new Error('No protocol was provided');
 	return coordsScaler({

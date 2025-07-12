@@ -1,6 +1,4 @@
-import * as tf from '@tensorflow/tfjs';
 import { match } from 'arktype';
-import { clamp } from '$lib/utils.js';
 import * as Jimp from 'jimp';
 import * as ort from 'onnxruntime-web';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
@@ -27,66 +25,6 @@ export function IoU(bb1, bb2) {
 	let union = bb1[2] * bb1[3] + bb2[2] * bb2[3] - intersection;
 
 	return intersection / union;
-}
-
-/**
- * @param {ort.Tensor} tensor
- * @param {number} x1
- * @param {number} y1
- * @param {number} x2
- * @param {number} y2
- * @returns {Promise<ort.Tensor>}
- */
-async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
-	// Convert ONNX tensor to tf.Tensor
-	// @ts-ignore
-	const tfTensor = tf.tensor(tensor.data, tensor.dims);
-	const [__, _, tensorH, tensorW] = tfTensor.shape;
-	// -1 <== off-by-one error somewhere
-	let w = clamp(1, Math.abs(x1 - x2), tensorW - x1 - 1);
-	let h = clamp(1, Math.abs(y1 - y2), tensorH - y1 - 1);
-	// Slice: [batch, channel, row, col]
-	const croppedTfTensor = tf.slice(tfTensor, [0, 0, y1, x1], [1, 3, h, w]);
-	const croppedData = croppedTfTensor.dataSync();
-	// Create new ONNX tensor
-	const croppedOnnxTensor = new ort.Tensor(tensor.type, croppedData, [1, 3, h, w]);
-	tfTensor.dispose();
-	croppedTfTensor.dispose();
-
-	return croppedOnnxTensor;
-}
-
-/**
- *
- * @param {number[]} BB
- * @param {ort.Tensor} tensor
- * @param {number} marge
- * @returns {Promise<import('onnxruntime-web').Tensor>}
- */
-export async function applyBBOnTensor(BB, tensor, marge = 10) {
-	let [x, y, w, h] = BB;
-	const [, , tsrheight, tsrwidth] = tensor.dims;
-
-	// Expand box by margin
-	x = x - marge;
-	y = y - marge;
-	w = w + 2 * marge;
-	h = h + 2 * marge;
-
-	// Clamp start, round
-	x = Math.max(0, Math.round(x));
-	y = Math.max(0, Math.round(y));
-
-	// Calculate width/height, clamp so we never overflow
-	let wClamped = Math.max(1, Math.min(Math.round(w), tsrwidth - x));
-	let hClamped = Math.max(1, Math.min(Math.round(h), tsrheight - y));
-
-	// End coordinates (exclusive)
-	let x2 = x + wClamped;
-	let y2 = y + hClamped;
-
-	let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x2, y2);
-	return croppedTensor;
 }
 
 /**
