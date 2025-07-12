@@ -35,43 +35,13 @@ export function IoU(bb1, bb2) {
  * @param {number[]} std
  * @returns {Promise<ort.Tensor[]>}
  */
-async function map_preprocess_for_classification(settings, tensor, mean, std) {
+export async function preprocessTensor(settings, tensor, mean, std) {
 	const { width, height, normalized } = settings.input;
 	let c = tensor;
 	c = await normalizeTensors(c, mean, std, !normalized);
 	c = await resizeTensors(c, width, height);
 
 	return c;
-}
-/**
- *
- * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
- * @param {ort.Tensor} tensors
- * @param {number[]} mean
- * @param {number[]} std
- * @returns {Promise<ort.Tensor[]>}
- */
-export async function preprocess_for_classification(settings, tensors, mean, std) {
-	/*preprocess les tenseurs pour la classification
-    -------input------- :
-        tensors : liste de tenseurs à prétraiter
-            forme : [each img [1, C, H, W]]
-        mean : liste des moyennes pour chaque canal
-        std : liste des écarts-types pour chaque canal
-
-    -------output------- :
-        new_ctensors : liste de tenseurs prétraités
-            forme : [each img [1, C, 224, 224]]
-
-    les tenseurs sont resized au format [3,224,224] et normalisés
-    */
-	// @ts-ignore
-	let new_ctensorsPromise = tensors.map((tensor) =>
-		map_preprocess_for_classification(settings, tensor, mean, std)
-	);
-	let new_ctensors = await Promise.all(new_ctensorsPromise);
-
-	return new_ctensors;
 }
 
 /**

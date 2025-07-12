@@ -1,5 +1,5 @@
 import * as ort from 'onnxruntime-web';
-import { loadToTensor, output2BB, preprocess_for_classification } from './inference_utils.js';
+import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
 import { fetchHttpRequest } from './utils.js';
 
 /**
@@ -218,7 +218,8 @@ export async function classify(settings, images, model) {
 	/** @type {number[][][]}  */
 	const scores = [];
 	// @ts-ignore
-	images = await preprocess_for_classification(settings, images, MEAN, STD);
+	images = await Promise.all(images.map((tensor) => preprocessTensor(settings, tensor, MEAN, STD)));
+
 	console.log(images);
 
 	for (let i = 0; i < images.length; i++) {
