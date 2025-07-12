@@ -1,10 +1,17 @@
 import { dev } from '$app/environment';
+import { PROCEDURES } from '$lib/../neural-worker-procedures';
+import NeuralWorker from '$lib/../neural-worker.js?worker';
 import { openTransaction, tables } from '$lib/idb.svelte.js';
 import { importProtocol } from '$lib/protocols';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
+import * as Swarpc from 'swarpc';
 
 export async function load() {
+	const swarpc = Swarpc.Client(PROCEDURES, {
+		worker: new NeuralWorker({ name: 'SWARPC Neural Worker' })
+	});
+
 	try {
 		await tables.initialize();
 		await fillBuiltinData();
@@ -15,6 +22,8 @@ export async function load() {
 			message: e?.toString() ?? 'Erreur inattendue'
 		});
 	}
+
+	return { swarpc };
 }
 
 async function fillBuiltinData() {
@@ -42,7 +51,7 @@ async function fillBuiltinData() {
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'
 			)
 				.then((res) => res.text())
-				.then(importProtocol);
+				.then((txt) => importProtocol(txt, { json: true }));
 		} catch (error) {
 			console.error(error);
 			toasts.error(

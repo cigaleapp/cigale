@@ -1,3 +1,5 @@
+import fetchProgress from 'fetch-progress';
+
 /**
  * @template {string} K
  * @template {any} VIn
@@ -618,7 +620,6 @@ if (import.meta.vitest) {
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
  */
 export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
-	const { default: fetchProgress } = await import('fetch-progress');
 	let url = new URL(typeof request === 'string' ? request : request.url);
 	const options = typeof request === 'string' ? { headers: {} } : request;
 	if (cacheAs) {
@@ -638,4 +639,13 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
 /** @param {number[]} values  */
 export function avg(values) {
 	return values.reduce((acc, cur) => acc + cur, 0) / values.length;
+}
+
+/**
+ * @template {any} T
+ * @param {T} value
+ * @returns {value is NonNullable<T>}
+ */
+export function nonnull(value) {
+	return value !== null && value !== undefined;
 }

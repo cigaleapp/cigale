@@ -1,8 +1,5 @@
-import { match, type } from 'arktype';
 import * as ort from 'onnxruntime-web';
-import { tables } from './idb.svelte.js';
-import { imload, output2BB, preprocess_for_classification } from './inference_utils.js';
-import { MetadataInferOptionsNeural } from './schemas/metadata.js';
+import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
 import { fetchHttpRequest } from './utils.js';
 
 /**
@@ -49,7 +46,7 @@ de plus ça se lance que sur chrome, avec la commande linux mettant les flags :
 */
 
 // nombre de threads pour wasm
-ort.env.wasm.numThreads = -1;
+ort.env.wasm.numThreads = 1;
 // nécéssaire sinon ça casse
 
 ort.env.wasm.wasmPaths = {
@@ -62,55 +59,20 @@ export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de d�
 const NUMCONF = 0.437; // seuil de confiance pour la détection
 const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification
-/**
- *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
- */
-function classificationInferenceSettings(protocol, modelIndex) {
-	const matcher = match
-		.case(
-			{
-				id: type.string.narrow((id) => protocol.metadata.includes(id)),
-				type: '"enum"',
-				infer: MetadataInferOptionsNeural
-			},
-			(m) => m.infer.neural[modelIndex]
-		)
-		.default(() => undefined);
-
-	return tables.Metadata.state
-		.map((m) => matcher(m))
-		.filter(Boolean)
-		.at(0);
-}
 
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index of the model to use in the list of models for the current protocol
- * @param { 'classification'|'detection' } task
+ * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} request
  * @param {boolean} webgpu
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [onProgress] called everytime the progress changes
  * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
  */
-export async function loadModel(protocol, modelIndex, task, onProgress, webgpu = false) {
+export async function loadModel(request, onProgress, webgpu = false) {
 	// load un modèle ONNX, soit de classification, soit de détection.
 
 	onProgress ??= () => {};
 
-	const modelRequest =
-		task === 'detection'
-			? protocol.crop?.infer?.[modelIndex]?.model
-			: classificationInferenceSettings(protocol, modelIndex)?.model;
-
-	if (!modelRequest) {
-		throw new Error(
-			`No model found for task "${task}" and model index ${modelIndex} in protocol "${protocol.id}"`
-		);
-	}
-
-	const model = await fetchHttpRequest(modelRequest, {
+	const model = await fetchHttpRequest(request, {
 		cacheAs: 'model',
 		onProgress
 	})
@@ -123,22 +85,26 @@ export async function loadModel(protocol, modelIndex, task, onProgress, webgpu =
 }
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index of the model to use in the list of models for the current protocol
- * @param {'classification'|'detection'} task
+ * @param {object} taskSettings
+ * @param {object} taskSettings.input
+ * @param {number} taskSettings.input.width
+ * @param {number} taskSettings.input.height
+ * @param {string} taskSettings.input.name
+ * @param {boolean} taskSettings.input.normalized
+ * @param {object} taskSettings.output
+ * @param {string} taskSettings.output.name
+ * @param {import('./database.js').ModelDetectionOutputShape} taskSettings.output.shape
  * @param {ArrayBuffer[]} buffers
- * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {import('onnxruntime-web').InferenceSession} session
  * @param {typeof import('./state.svelte.js').uiState} [uiState]
  * @param {boolean} sequence
  * @param {boolean} webgpu
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
  */
-async function infer(
-	protocol,
-	modelIndex,
-	task,
+export async function infer(
+	taskSettings,
 	buffers,
-	model,
+	session,
 	uiState,
 	sequence = false,
 	webgpu = true
@@ -169,7 +135,7 @@ async function infer(
 	if (webgpu) {
 		console.log('webgpu not implemented yet, using wasm');
 	}
-	if (!model) {
+	if (!session) {
 		throw new Error('Model not loaded');
 	}
 	let start = -1;
@@ -177,17 +143,13 @@ async function infer(
 		start = Date.now();
 		if (uiState) uiState.processing.state = 'inference';
 	}
-	let taskSettings =
-		task === 'detection'
-			? protocol.crop?.infer?.[modelIndex]
-			: classificationInferenceSettings(protocol, modelIndex);
 
 	taskSettings = {
 		...taskSettings,
 		input: {
 			width: TARGETWIDTH,
 			height: TARGETHEIGHT,
-			name: model.inputNames[0],
+			name: session.inputNames[0],
 			normalized: true,
 			...taskSettings?.input
 		},
@@ -199,17 +161,16 @@ async function infer(
 	let inputTensor;
 
 	console.log('loading images...');
-	inputTensor = await imload(buffers, taskSettings.input);
+	inputTensor = await loadToTensor(buffers, taskSettings.input);
 
 	console.log('inference...');
-	const outputTensor = await model.run({ [taskSettings.input.name]: inputTensor });
+	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });
 	console.log('done !');
 	console.log('output tensor: ', outputTensor);
 
 	console.log('post proc...');
 	const bbs = output2BB(
-		protocol,
-		modelIndex,
+		taskSettings.output.shape,
 		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),
 		buffers.length,
 		NUMCONF
@@ -226,114 +187,22 @@ async function infer(
 
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index of the model to use in the list of models for the current protocol
- * @param {ArrayBuffer[]} buffers
- * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').uiState} [uiState]
- * @returns {Promise<[BB[][], number[][], number, ort.Tensor[][]]>}
- */
-export async function inferSequentialy(protocol, modelIndex, buffers, model, uiState) {
-	/*Effectue une inférence de détection sur une ou plusieurs images.
-    Cette fonction est similaire à infer, mais permet l'inférence une à une 
-    et affiche les informations sur l'avancement de l'inférence
-    au fur et à mesure.
-    */
-
-	if (!model) {
-		throw new Error('Model not loaded');
-	}
-
-	let boundingboxes = [];
-	let bestScores = [];
-	let start = Date.now();
-	let inputTensors = [];
-
-	for (let i = 0; i < buffers.length; i++) {
-		let imfile = buffers[i];
-		var BandB = await infer(protocol, modelIndex, 'detection', [imfile], model, uiState, false);
-		console.log({ BandB });
-		let boundingboxe = BandB[0];
-		let bestScore = BandB[1];
-		let inputTensor = BandB[3];
-		// @ts-ignore
-		boundingboxes.push(boundingboxe[0]);
-		// @ts-ignore
-		bestScores.push(bestScore[0]);
-		inputTensors.push(inputTensor);
-
-		if (uiState) {
-			uiState.processing.done = i + 1;
-			uiState.processing.time = (Date.now() - start) / 1000;
-		}
-	}
-	return [boundingboxes, bestScores, start, inputTensors];
-}
-
-/**
- *
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
- * @param {ort.Tensor[][]} images
+ * @param {ort.Tensor} image
  * @param {import('onnxruntime-web').InferenceSession} model
- * @param {typeof import('./state.svelte.js').uiState} uiState
- * @param {number} start
- * @returns {Promise<Array<Array<number[]>>>} scores pour chaque tensor de chaque image: [each image [each tensor [score classe 0, score classe 1, …]]]
+ * @returns {Promise<number[]>} scores for each class
  */
-export async function classify(settings, images, model, uiState, start) {
-	/*Effectue une inférence de classification sur une ou plusieurs images.
-    -------------inputs----------------
-        images : liste d'images prétraitées
-            forme : [each image [each tensor]]
-            enfaite, le plus interessant est limite d'utiliser *presque* directement les images de l'inférence de détection
-            (le presque c'est parce qu'il faut d'abord faire un crop des tenseur de détection (cf apply BBsOnTensor dans utils) )
-        model : model onnx de classif 
-            in: [batch,3,224,224]
-            out: [batch*n_classes]
-            dans ce code, qui est opti pour un cpu, batch = 1.
-        img_proceed : objet contenant les informations sur l'avancement de l'inférence
-        start : temps de départ de l'inférence
-
-    -------------outputs----------------
-        argmaxs : liste des indices des classes prédites
-            forme : [each image [each class index]]
-        bestScores : liste des meilleurs scores pour chaque classe
-            forme : [each image [each class
-    */
-
-	uiState.processing.done = 0;
-
+export async function classify(settings, image, model) {
 	const inputName = settings.input.name ?? model.inputNames[0];
 
-	/** @type {number[][][]}  */
-	const scores = [];
-	uiState.processing.state = 'preprocessing';
-	// @ts-ignore
-	images = await preprocess_for_classification(settings, images, MEAN, STD);
-	uiState.processing.state = 'classification';
-	console.log(images);
+	const input = await preprocessTensor(settings, image, MEAN, STD);
 
-	for (let i = 0; i < images.length; i++) {
-		/** @type {number[][]}  */
-		const imageScores = [];
-		for (let j = 0; j < images[i].length; j++) {
-			let inputTensor = images[i][j];
-			const outputTensor = await model.run({ [inputName]: inputTensor });
+	const output = await model.run({ [inputName]: input });
 
-			console.log('outputs', Object.keys(outputTensor));
+	const scores = await output[Object.keys(output)[0]]
+		.getData(true)
+		.then((scores) => /** @type {number[]} */ ([...scores.values()]));
 
-			imageScores.push(
-				await outputTensor[Object.keys(outputTensor)[0]]
-					.getData(true)
-					.then((scores) => /** @type {number[]} */ ([...scores.values()]))
-			);
-
-			images[i][j].dispose();
-			uiState.processing.time = (Date.now() - start) / 1000;
-		}
-
-		scores.push(imageScores);
-		uiState.processing.done = i + 1;
-	}
-
+	image.dispose();
 	return scores;
 }

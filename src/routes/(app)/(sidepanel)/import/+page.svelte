@@ -1,9 +1,10 @@
 <script module>
 	/**
 	 * Import new files and process  them
+	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarpc
 	 * @param {File[]} files
 	 */
-	export async function importMore(files) {
+	export async function importMore(swarpc, files) {
 		uiState.processing.files = files.map((f) => f.name);
 		uiState.processing.total = files.length;
 		for (const [i, file] of files.entries()) {
@@ -21,7 +22,7 @@
 				const id = imageFileId(currentLength);
 				try {
 					uiState.loadingImages.add(id);
-					await processImageFile(file, id);
+					await processImageFile(swarpc, file, id);
 				} catch (error) {
 					console.error(error);
 					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
@@ -32,30 +33,12 @@
 		}
 	}
 
-	let modelLoadingProgress = $state(0);
-	let cropperModel = $state();
-	async function loadCropperModel() {
-		// Prevent multiple loads
-		if (cropperModel) return;
-		if (!uiState.currentProtocol) return;
-		if (!uiState.cropInferenceAvailable) return;
-		cropperModel = await loadModel(
-			uiState.currentProtocol,
-			uiState.selectedCropModel,
-			'detection',
-			({ transferred, total }) => {
-				if (total === 0) return;
-				modelLoadingProgress = transferred / total;
-			}
-		);
-		toasts.success('Modèle de recadrage chargé');
-	}
-
 	/**
+	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarpc
 	 * @param {File} file
 	 * @param {string} id
 	 */
-	async function processImageFile(file, id) {
+	async function processImageFile(swarpc, file, id) {
 		if (!uiState.currentProtocol) {
 			toasts.error('Aucun protocole sélectionné');
 			return;
@@ -64,7 +47,6 @@
 		const originalBytes = await file.arrayBuffer();
 		const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
 
-		uiState.processing.files.shift();
 		await storeImageBytes({
 			id,
 			resizedBytes,
@@ -76,12 +58,14 @@
 		});
 
 		if (uiState.cropInferenceAvailable) {
-			await inferBoundingBoxes({
+			await inferBoundingBoxes(swarpc, {
 				id,
 				bytes: resizedBytes,
 				filename: file.name,
 				contentType: file.type,
 				dimensions: { width, height }
+			}).finally(() => {
+				uiState.processing.files.shift();
 			});
 		} else {
 			await tables.Image.set({
@@ -102,6 +86,7 @@
 	}
 
 	/**
+	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarp
 	 * @param {object} file
 	 * @param {ArrayBuffer} file.bytes
 	 * @param {string} file.filename
@@ -110,7 +95,7 @@
 	 * @param {DimensionsInput} file.dimensions
 	 * @returns {Promise<void>}
 	 */
-	async function inferBoundingBoxes(file) {
+	async function inferBoundingBoxes(swarp, file) {
 		if (!uiState.currentProtocol) {
 			toasts.error('Aucun protocole sélectionné');
 			return;
@@ -127,25 +112,16 @@
 			return;
 		}
 
-		if (!cropperModel) {
-			toasts.error(
-				'Modèle de recadrage non chargé, patentiez ou rechargez la page avant de rééssayer'
-			);
-			return;
-		}
-
 		console.log('Inferring bounding boxes for', file.filename);
 
-		const [[boundingBoxes], [scores]] = await inferSequentialy(
-			uiState.currentProtocol,
-			uiState.selectedCropModel,
-			[file.bytes],
-			cropperModel
-		);
+		const { boxes, scores } = await swarp.inferBoundingBoxes({
+			fileId: file.id,
+			taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
+		});
 
-		console.log('Bounding boxes:', boundingBoxes);
+		console.log('Bounding boxes:', boxes);
 
-		let [firstBoundingBox] = boundingBoxes;
+		let [firstBoundingBox] = boxes;
 		let [firstScore] = scores;
 
 		if (!firstBoundingBox || !firstScore) {
@@ -166,7 +142,7 @@
 		 */
 		const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
 
-		for (let i = 0; i < boundingBoxes.length; i++) {
+		for (let i = 0; i < boxes.length; i++) {
 			await tables.Image.set({
 				id: imageId(file.id, i),
 				filename: file.filename,
@@ -176,7 +152,7 @@
 				fileId: file.id,
 				metadata: {
 					[uiState.cropMetadataId]: {
-						value: JSON.stringify(toCropBox(boundingBoxes[i])),
+						value: JSON.stringify(toCropBox(boxes[i])),
 						confidence: scores[i],
 						alternatives: {}
 					}
@@ -207,7 +183,6 @@
 		resizeToMaxSize,
 		storeImageBytes
 	} from '$lib/images';
-	import { inferSequentialy, loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
@@ -216,6 +191,8 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
+
+	const { data } = $props();
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
@@ -231,8 +208,40 @@
 		})
 	);
 
+	let modelLoadingProgress = $state(0);
+	let cropperModelLoaded = $state(false);
+	async function loadCropperModel() {
+		// Prevent multiple loads
+		if (cropperModelLoaded) return;
+		if (!uiState.currentProtocol) return;
+		if (!uiState.cropInferenceAvailable) return;
+		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
+		if (!cropModel) return;
+
+		await data.swarpc
+			.loadModel(
+				{
+					protocolId: uiState.currentProtocol.id,
+					request: cropModel,
+					task: 'detection'
+				},
+				({ transferred, total }) => {
+					modelLoadingProgress = transferred / total;
+				}
+			)
+			.then(() => {
+				toasts.success('Modèle de détection chargé');
+			})
+			.catch((error) => {
+				console.error(error);
+				toasts.error('Erreur lors du chargement du modèle de détection');
+			});
+
+		cropperModelLoaded = true;
+	}
+
 	$effect(() => {
-		if (!cropperModel) return;
+		if (!cropperModelLoaded) return;
 		if (!uiState.currentProtocol) return;
 		for (const imageFileId of fileIds) {
 			if (
@@ -244,7 +253,7 @@
 						const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));
 						if (!file) return;
 						uiState.loadingImages.add(imageFileId);
-						await inferBoundingBoxes(file);
+						await inferBoundingBoxes(data.swarpc, file);
 					} catch (error) {
 						console.error(error);
 						uiState.erroredImages.set(imageFileId, error?.toString() ?? 'Erreur inattendue');
@@ -293,7 +302,7 @@
 			'.cr3'
 		]}
 		clickable={images.length === 0}
-		onfiles={async ({ files }) => await importMore(files)}
+		onfiles={async ({ files }) => await importMore(data.swarpc, files)}
 	>
 		<section class="observations" class:empty={!images.length}>
 			<AreaObservations
@@ -344,6 +353,11 @@
 		<p>Impossible de charger le modèle de recadrage</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
+		{#if getSettings().showTechnicalMetadata}
+			<pre>
+				{error?.stack ?? '(no stack trace available)'}
+			</pre>
+		{/if}
 	</section>
 {/await}
 

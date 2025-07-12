@@ -1,5 +1,4 @@
 import { uiState } from '$lib/state.svelte';
-import { downloadAsFile } from './download';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { unique } from './utils';

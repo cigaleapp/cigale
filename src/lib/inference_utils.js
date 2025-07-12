@@ -1,7 +1,7 @@
-import * as tf from '@tensorflow/tfjs';
 import { match } from 'arktype';
 import * as Jimp from 'jimp';
 import * as ort from 'onnxruntime-web';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 
 /**
  * @typedef {import('onnxruntime-web')} ort
@@ -35,242 +35,37 @@ if (import.meta.vitest) {
 		expect(IoU([0, 0, 10, 10], [5, 5, 5, 5])).toBe(0.25);
 	});
 }
-
-/**
- * @param {ort.Tensor} tensor
- * @param {number} x1
- * @param {number} y1
- * @param {number} x2
- * @param {number} y2
- * @returns {Promise<ort.Tensor>}
- */
-async function cropTensorUsingTFJS(tensor, x1, y1, x2, y2) {
-	// Convert ONNX tensor to tf.Tensor
-	// @ts-ignore
-	const tfTensor = tf.tensor(tensor.data, tensor.dims);
-	let w = Math.abs(x1 - x2);
-	let h = Math.abs(y1 - y2);
-	// Slice: [batch, channel, row, col]
-	const croppedTfTensor = tf.slice(tfTensor, [0, 0, y1, x1], [1, 3, h, w]);
-	const croppedData = croppedTfTensor.dataSync();
-	// Create new ONNX tensor
-	const croppedOnnxTensor = new ort.Tensor(tensor.type, croppedData, [1, 3, h, w]);
-	tfTensor.dispose();
-	croppedTfTensor.dispose();
-
-	return croppedOnnxTensor;
-}
-
-/**
- * @param {ort.Tensor} tensor
- * @param {number} x1
- * @param {number} y1
- * @param {number} x2
- * @param {number} y2
- * @returns {Promise<ort.Tensor>}
- */
-async function cropTensor(tensor, x1, y1, x2, y2) {
-	/*Crop tensor : 
-    -------input------- :
-        tensor : tensor à cropper 
-            forme : [1, C, H, W]
-        x1, y1, x2, y2 : coordonnées de la bounding box
-
-    -------output------- :
-        croppedTensor : tensor croppé
-            forme : [1, C, y2-y1, x2-x1]
-    */
-	let data = await tensor.getData();
-	let dims = tensor.dims;
-
-	let newDims = [1, dims[1], y2 - y1, x2 - x1]; // NCHW
-	let newData = new Float32Array(1 * newDims[1] * newDims[2] * newDims[3]);
-
-	for (let x = x1; x < x2; x++) {
-		for (let y = y1; y < y2; y++) {
-			for (let c = 0; c < dims[1]; c++) {
-				//   --- /!\ si ça marche pas, faut ptet inverser x et y---
-				let i = c * dims[2] * dims[3] + y * dims[3] + x;
-				let newI = c * newDims[2] * newDims[3] + (y - y1) * newDims[3] + (x - x1);
-				// @ts-ignore
-				newData[newI] = data[i];
-			}
-		}
-	}
-	tensor.dispose();
-	return new ort.Tensor(tensor.type, newData, newDims);
-}
-/**
- *
- * @param {number[]} BB
- * @param {ort.Tensor} tensor
- * @param {number} marge
- * @returns {Promise<import('onnxruntime-web').Tensor>}
- */
-export async function applyBBOnTensor(BB, tensor, marge = 10) {
-	/*Applique une bounding box sur UN tenseur :
-    -------input------- :
-        BB : bounding box
-            forme : [x, y, w, h]
-        tensor : tensor à cropper
-            forme : [1, C, H, W]
-        marge : marge à ajouter autour de la bounding box
-    
-    -------output------- :
-        croppedTensor : tenseur croppé
-            forme : [1, C, h+2*marge, w+2*marge]
-    */
-	let [x, y, w, h] = BB;
-	const [, , tsrheight, tsrwidth] = tensor.dims;
-
-	x = x - marge;
-	y = y - marge;
-	w = w + 2 * marge;
-	h = h + 2 * marge;
-
-	x = Math.max(0, x);
-	y = Math.max(0, y);
-	w = Math.min(tsrwidth - x, w);
-	h = Math.min(tsrheight - y, h);
-
-	x = Math.round(x);
-	y = Math.round(y);
-	w = Math.round(w);
-	h = Math.round(h);
-
-	let croppedTensor = await cropTensorUsingTFJS(tensor, x, y, x + w, y + h);
-	return croppedTensor;
-}
-
-/**
- *
- * @param {number[][]} BBs
- * @param {ort.Tensor} tensor
- * @param {number} marge
- * @returns {Promise<ort.Tensor[]>}
- */
-
-async function applyBBsOnTensor(BBs, tensor, marge = 10) {
-	/*Applique les bounding boxes sur UN tenseur :
-    -------input------- :
-        BBs : liste de bounding boxes
-            forme : [each bounding boxes : [x, y, w, h]]
-        tensor : tensor à cropper
-            forme : [1, C, H, W]
-        marge : marge à ajouter autour de la bounding box
-    
-    -------output------- :
-        croppedTensors : liste de tenseurs croppés
-            forme : [1, C, h+2*marge, w+2*marge]
-    */
-	let croppedTensors = [];
-	for (let i = 0; i < BBs.length; i++) {
-		let croppedTensor = await applyBBOnTensor(BBs[i], tensor, marge);
-		croppedTensors.push(croppedTensor);
-	}
-	return croppedTensors;
-}
-/**
- *
- * @param {number[][][]} BBs
- * @param {ort.Tensor[][]} tensors
- * @returns {Promise<ort.Tensor[][]>}
- */
-async function applyBBsOnTensors(BBs, tensors) {
-	// Create an array of promises using map
-	// @ts-ignore
-	const croppedTensorPromises = tensors.map((tensor, i) => applyBBsOnTensor(BBs[i], tensor));
-
-	// Wait for all promises to resolve concurrently
-	let tobereturned = await Promise.all(croppedTensorPromises);
-	return tobereturned;
-}
-/**
- * supprime les bounding boxes qui ont un IoU > 0.5. Modifie l'entrée en place!
- * @param {number[][][]} boundingboxes - [each image [each box [x, y, w, h]]]
- * @param {number} numfiles
- * @returns {number[][][]}
- */
-function dedupeBoundingBoxes(boundingboxes, numfiles) {
-	for (let fileIndex = 0; fileIndex < numfiles; fileIndex++) {
-		const boxes = boundingboxes[fileIndex];
-
-		for (let i = 0; i < boundingboxes[fileIndex].length - 1; i++) {
-			for (let j = i + 1; j < boundingboxes[fileIndex].length; j++) {
-				if (i != j) {
-					if (IoU(boxes[i], boxes[j]) > 0.5) {
-						boundingboxes[fileIndex].splice(j, 1);
-						j--;
-					}
-				}
-			}
-		}
-	}
-	return boundingboxes;
-}
-
-if (import.meta.vitest) {
-	const { test } = import.meta.vitest;
-	test.todo('dedupeBoundingBoxes');
-}
-
 /**
  *
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
- * @param {ort.Tensor[]} tensor
+ * @param {ort.Tensor} tensor
  * @param {number[]} mean
  * @param {number[]} std
- * @returns {Promise<ort.Tensor[]>}
+ * @returns {Promise<ort.Tensor>}
  */
-async function map_preprocess_for_classification(settings, tensor, mean, std) {
+export async function preprocessTensor(settings, tensor, mean, std) {
 	const { width, height, normalized } = settings.input;
 	let c = tensor;
-	c = await normalizeTensors(c, mean, std, !normalized);
-	c = await resizeTensors(c, width, height);
+	c = await normalizeTensor(c, mean, std, !normalized);
+	c = await resizeTensor(c, width, height);
 
 	return c;
 }
-/**
- *
- * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
- * @param {ort.Tensor} tensors
- * @param {number[]} mean
- * @param {number[]} std
- * @returns {Promise<ort.Tensor[]>}
- */
-export async function preprocess_for_classification(settings, tensors, mean, std) {
-	/*preprocess les tenseurs pour la classification
-    -------input------- :
-        tensors : liste de tenseurs à prétraiter
-            forme : [each img [1, C, H, W]]
-        mean : liste des moyennes pour chaque canal
-        std : liste des écarts-types pour chaque canal
-
-    -------output------- :
-        new_ctensors : liste de tenseurs prétraités
-            forme : [each img [1, C, 224, 224]]
-
-    les tenseurs sont resized au format [3,224,224] et normalisés
-    */
-	// @ts-ignore
-	let new_ctensorsPromise = tensors.map((tensor) =>
-		map_preprocess_for_classification(settings, tensor, mean, std)
-	);
-	let new_ctensors = await Promise.all(new_ctensorsPromise);
-
-	return new_ctensors;
-}
 
 /**
- *
+ * _If you need to get back the actual image the model ran on, see commit 682e3fb8849ac3f96005f71a486eefa3c932753a_
  * @param {ArrayBuffer[]} buffers
  * @param {object} settings
  * @param {number} settings.height
  * @param {number} settings.width
+ * @param {import('./BoundingBoxes.svelte.js').CenteredBoundingBox} [settings.crop]
  * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @returns {Promise<import('onnxruntime-web').TypedTensor<'float32'>>}
  */
-export async function imload(buffers, { width: targetWidth, height: targetHeight, normalized }) {
+export async function loadToTensor(
+	buffers,
+	{ width: targetWidth, height: targetHeight, crop, normalized }
+) {
 	/*
     charge les images et les resize
     -------input------- :
@@ -288,6 +83,12 @@ export async function imload(buffers, { width: targetWidth, height: targetHeight
 		let buffer = buffers[f];
 
 		var img_tensor = await Jimp.Jimp.read(buffer);
+		if (crop) {
+			const scaler = coordsScaler({ x: img_tensor.width, y: img_tensor.height });
+			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));
+			img_tensor.crop({ x, y, w, h });
+		}
+
 		img_tensor.resize({ w: targetWidth, h: targetHeight });
 
 		var imageBufferData = img_tensor.bitmap.data;
@@ -317,6 +118,7 @@ export async function imload(buffers, { width: targetWidth, height: targetHeight
 		targetHeight,
 		targetWidth
 	]);
+
 	float32Data = new Float32Array(0);
 	return tensor;
 }
@@ -349,38 +151,16 @@ async function normalizeTensor(tensor, mean, std, denormalize = false) {
 	tensor.dispose();
 	return newTensor;
 }
-/**
- *
- * @param {ort.Tensor[]} tensors
- * @param {number[]} mean
- * @param {number[]} std
- * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
- * @returns {Promise<ort.Tensor[]>}
- */
-async function normalizeTensors(tensors, mean, std, denormalize = false) {
-	let newTensors = [];
-	for (let i = 0; i < tensors.length; i++) {
-		let newtsr = await normalizeTensor(tensors[i], mean, std, denormalize);
-		newTensors.push(newtsr);
-	}
-
-	for (let i = 0; i < tensors.length; i++) {
-		tensors[i].dispose();
-	}
-
-	return newTensors;
-}
 
 /**
  *
- * @param {import('./database.js').Protocol} protocol
- * @param {number} modelIndex index du modèle de classification dans la liste des modèles de classification du protocole
+ * @param {import('./database.js').ModelDetectionOutputShape} outputShape
  * @param {Float32Array} output
  * @param {number} numImages
  * @param {number} minConfidence
  * @returns {[import('./inference.js').BB[][], number[][]]}
  */
-export function output2BB(protocol, modelIndex, output, numImages, minConfidence) {
+export function output2BB(outputShape, output, numImages, minConfidence) {
 	/*reshape les bounding boxes obtenues par le modèle d'inférence
     -------input------- :
         output : liste de bounding boxes obtenues par le modèle d'inférence
@@ -402,15 +182,6 @@ export function output2BB(protocol, modelIndex, output, numImages, minConfidence
 	let bestScores = [];
 
 	console.log(output);
-
-	const outputShape = protocol.crop?.infer?.[modelIndex].output?.shape ?? [
-		'sx',
-		'sy',
-		'w',
-		'h',
-		'score',
-		'_'
-	];
 
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;
@@ -498,22 +269,7 @@ export function output2BB(protocol, modelIndex, output, numImages, minConfidence
 	}
 	return [bestBoxes, bestScores];
 }
-/**
- *
- * @param {ort.Tensor[]} tensors
- * @param {number} targetWidth
- * @param {number} targetHeight
- * @returns {Promise<ort.Tensor[]>}
- */
-async function resizeTensors(tensors, targetWidth, targetHeight) {
-	let resizedTensors = [];
-	for (let i = 0; i < tensors.length; i++) {
-		let resizedTensor = await resizeTensor(tensors[i], targetWidth, targetHeight);
-		resizedTensors.push(resizedTensor);
-	}
 
-	return resizedTensors;
-}
 /**
  *
  * @param {ort.Tensor} tensor
