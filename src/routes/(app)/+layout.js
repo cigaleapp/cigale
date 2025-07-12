@@ -9,7 +9,7 @@ import * as Swarpc from 'swarpc';
 
 export async function load() {
 	const swarpc = Swarpc.Client(PROCEDURES, {
-		worker: new NeuralWorker()
+		worker: new NeuralWorker({ name: 'SWARPC Neural Worker' })
 	});
 
 	try {

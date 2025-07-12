@@ -3,11 +3,11 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 import { classify, infer, loadModel } from './lib/inference.js';
-import { imload } from './lib/inference_utils.js';
+import { imload as imload } from './lib/inference_utils.js';
 import { PROCEDURES } from './neural-worker-procedures.js';
-import { openDB } from 'idb';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
 
@@ -79,7 +79,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
 	return { boxes, scores };
 });
 
-swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
+swarp.classify(async ({ fileId, cropbox, taskSettings, returnImageUsed }) => {
 	const session = inferenceSessions.get('classification')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de classification non chargé');
@@ -102,13 +102,21 @@ swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 		throw new Error(`Failed to load image for classification: ${err.message}`);
 	});
 
-	console.log('Image after applying cropbox', img);
+	/**
+	 * @type {ImageBitmap | undefined}
+	 */
+	let imageUsed;
+
+	if (returnImageUsed) {
+		console.log('Image after applying cropbox', img);
+		imageUsed = await createImageBitmap(img.toImageData());
+	}
 
 	const [[scores]] = await classify(taskSettings, [[img]], session).catch((err) => {
 		throw new Error(`Failed to classify image: ${err.message}`);
 	});
 
-	return { scores };
+	return imageUsed ? { scores, imageUsed } : { scores };
 });
 
 swarp.start(ww);

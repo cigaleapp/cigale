@@ -48,20 +48,22 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		input: type({
 			fileId: 'string',
 			'webgpu?': 'boolean',
+			'returnImageUsed?': 'boolean',
 			taskSettings: {
 				input: Schemas.ModelInput,
 				'output?': { name: 'string' }
 			},
 			cropbox: {
-				x: 'number',
-				y: 'number',
-				width: 'number',
-				height: 'number'
+				x: '0 <= number <= 1',
+				y: '0 <= number <= 1',
+				w: '0 <= number <= 1',
+				h: '0 <= number <= 1'
 			}
 		}),
 		progress: type({}),
 		success: type({
-			scores: type.number.array()
+			scores: type.number.array(),
+			'imageUsed?': type.instanceOf(ImageBitmap)
 		})
 	}
 });

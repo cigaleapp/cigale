@@ -1,7 +1,6 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toPixelCoords as _toPixelCoords, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {
 		deleteImageFile,
@@ -13,20 +12,20 @@
 	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 	import { seo } from '$lib/seo.svelte';
+	import { getSettings } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { fetchHttpRequest } from '$lib/utils';
 	import { match, type } from 'arktype';
 	import { onMount } from 'svelte';
-	import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
 	seo({ title: 'Classification' });
 
 	const { data } = $props();
 
 	const erroredImages = $derived(uiState.erroredImages);
-	const toPixelCoords = $derived(_toPixelCoords(uiState.currentProtocol));
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
@@ -112,21 +111,33 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const { scores } = await data.swarpc.classify({
+		const { scores, imageUsed } = await data.swarpc.classify({
+			returnImageUsed: getSettings().showTechnicalMetadata,
 			fileId: imageIdToFileId(id),
 			taskSettings: classificationInferenceSettings(
 				uiState.currentProtocol,
 				uiState.selectedClassificationModel
 			),
-			cropbox: toPixelCoords(
-				toTopLeftCoords(
-					/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-					(metadata[uiState.cropMetadataId]?.value) ?? { x: 0, y: 0, w: 1, h: 1 }
-				)
+			cropbox: $state.snapshot(
+				/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
+				(metadata[uiState.cropMetadataId]?.value) ?? { x: 0, y: 0, w: 1, h: 1 }
 			)
 		});
 
-		console.log('Scores for image', id, scores);
+		if (imageUsed) {
+			const debugimg = document.createElement('canvas');
+			debugimg.width = imageUsed.width;
+			debugimg.height = imageUsed.height;
+			const ctx = debugimg.getContext('2d');
+			if (!ctx) {
+				throw new Error('Failed to get canvas context for debug image');
+			}
+			ctx.drawImage(imageUsed, 0, 0);
+
+			const debugimgurl = debugimg.toDataURL('image/png');
+			document.querySelector(`[subimages="${id}"] picture`).innerHTML =
+				`<img src="${debugimgurl}" alt="Debug image for ${filename}" />`;
+		}
 
 		const results = scores
 			.map((score, i) => ({

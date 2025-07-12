@@ -3,6 +3,7 @@ import { match } from 'arktype';
 import { clamp } from '$lib/utils.js';
 import * as Jimp from 'jimp';
 import * as ort from 'onnxruntime-web';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 
 /**
  * @typedef {import('onnxruntime-web')} ort
@@ -141,7 +142,7 @@ export async function preprocess_for_classification(settings, tensors, mean, std
  * @param {object} settings
  * @param {number} settings.height
  * @param {number} settings.width
- * @param {import('./BoundingBoxes.svelte.js').Rect} [settings.crop]
+ * @param {import('./BoundingBoxes.svelte.js').CenteredBoundingBox} [settings.crop]
  * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @returns {Promise<import('onnxruntime-web').TypedTensor<'float32'>>}
  */
@@ -166,7 +167,12 @@ export async function imload(
 		let buffer = buffers[f];
 
 		var img_tensor = await Jimp.Jimp.read(buffer);
-		if (crop) img_tensor.crop({ ...crop, w: crop.width, h: crop.height });
+		if (crop) {
+			const scaler = coordsScaler({ x: img_tensor.width, y: img_tensor.height });
+			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));
+			img_tensor.crop({ x, y, w, h });
+		}
+
 		img_tensor.resize({ w: targetWidth, h: targetHeight });
 
 		var imageBufferData = img_tensor.bitmap.data;
@@ -196,6 +202,7 @@ export async function imload(
 		targetHeight,
 		targetWidth
 	]);
+
 	float32Data = new Float32Array(0);
 	return tensor;
 }
