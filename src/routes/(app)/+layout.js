@@ -1,7 +1,7 @@
 import { dev } from '$app/environment';
 import { PROCEDURES } from '$lib/../neural-worker-procedures';
 import NeuralWorker from '$lib/../neural-worker.js?worker';
-import { openTransaction, tables } from '$lib/idb.svelte.js';
+import { openTransaction, tables, databaseName, databaseRevision } from '$lib/idb.svelte.js';
 import { importProtocol } from '$lib/protocols';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
@@ -10,6 +10,11 @@ import * as Swarpc from 'swarpc';
 export async function load() {
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: new NeuralWorker({ name: 'SWARPC Neural Worker' })
+	});
+
+	await swarpc.init({
+		databaseName,
+		databaseRevision
 	});
 
 	try {

@@ -6,6 +6,14 @@ import { Schemas } from '$lib/database';
 import { type } from 'arktype';
 
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
+	init: {
+		input: type({
+			databaseName: 'string',
+			databaseRevision: 'number.integer >= 1'
+		}),
+		progress: type('undefined'),
+		success: type('undefined')
+	},
 	loadModel: {
 		input: type({
 			protocolId: 'string',
