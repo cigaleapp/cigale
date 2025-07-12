@@ -6,8 +6,10 @@
 import * as Swarp from 'swarpc';
 import { classify, infer, loadModel } from './lib/inference.js';
 import { imload } from './lib/inference_utils.js';
-import { PROCEDURES } from './lib/service-worker-procedures.js';
+import { PROCEDURES } from './neural-worker-procedures.js';
 import { openDB } from 'idb';
+
+const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
 
 /**
  * @type {import('idb').IDBPDatabase<import('./lib/idb.svelte.js').IDBDatabaseType> | undefined}
@@ -19,7 +21,7 @@ async function openDatabase() {
 	db = await openDB('database', 3);
 }
 
-const swarp = Swarp.Server(PROCEDURES, { worker: self });
+const swarp = Swarp.Server(PROCEDURES, { worker: ww });
 
 /**
  * @type {Map<string, { onnx: import('onnxruntime-web').InferenceSession, id: string }>}
@@ -109,4 +111,4 @@ swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 	return { scores };
 });
 
-swarp.start(self);
+swarp.start(ww);
