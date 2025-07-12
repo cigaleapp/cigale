@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test';
 import { rm, mkdir } from 'node:fs/promises';
 import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 
 export { exampleProtocol };
 
@@ -23,7 +24,10 @@ export const test = base.extend(
 				await rm('./tests/results', { recursive: true, force: true });
 				await mkdir('./tests/results');
 				await page.route(
-					'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
+					(u) => {
+						u.searchParams.delete('v');
+						return u.toString() === defaultProtocol.source;
+					},
 					async (route) => route.fulfill({ json: exampleProtocol })
 				);
 				await page.goto('/');
