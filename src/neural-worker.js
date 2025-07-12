@@ -6,7 +6,7 @@
 import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 import { classify, infer, loadModel } from './lib/inference.js';
-import { loadToTensor as loadToTensor } from './lib/inference_utils.js';
+import { loadToTensor } from './lib/inference_utils.js';
 import { PROCEDURES } from './neural-worker-procedures.js';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
@@ -16,9 +16,15 @@ const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
  */
 let db;
 
+/** @type {undefined | { name: string , revision: number }} */
+let databaseParams;
+
 async function openDatabase() {
+	if (!databaseParams) {
+		throw new Error('Database parameters not set, call swarp.init() first');
+	}
 	if (db) return db;
-	db = await openDB('database', 3);
+	db = await openDB(databaseParams.name, databaseParams.revision);
 }
 
 const swarp = Swarp.Server(PROCEDURES, { worker: ww });
@@ -45,6 +51,10 @@ function inferenceModelId(protocolId, request) {
 			.map(([k, v]) => `${k}:${v}`)
 	].join('|');
 }
+
+swarp.init(async ({ databaseName, databaseRevision }) => {
+	databaseParams = { name: databaseName, revision: databaseRevision };
+});
 
 swarp.loadModel(async ({ task, request, protocolId, webgpu }, onProgress) => {
 	const id = inferenceModelId(protocolId, request);

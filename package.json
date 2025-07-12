@@ -98,7 +98,7 @@
 		"piexifjs": "^1.0.6",
 		"runed": "^0.29.1",
 		"sveltejs-tippy": "^3.0.0",
-		"swarpc": "^0.2.4",
+		"swarpc": "^0.4.0",
 		"tinykeys": "^3.0.0",
 		"unplugin-icons": "^22.1.0",
 		"xss": "^1.0.15",

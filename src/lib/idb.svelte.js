@@ -7,7 +7,8 @@ console.info(`Base path is ${base}`);
 
 export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
 
-const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
+export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
+export const databaseRevision = 3;
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -370,10 +371,9 @@ export async function openDatabase() {
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
-	_database = await openDB(databaseName, 3, {
+	_database = await openDB(databaseName, databaseRevision, {
 		upgrade(db, oldVersion) {
 			/**
-			 *
 			 * @param {keyof typeof Tables} tableName
 			 * @param {import('arktype').Type} schema
 			 */
