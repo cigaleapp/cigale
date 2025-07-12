@@ -13,7 +13,7 @@ import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
  * @param {number[]} bb2
  * @returns
  */
-export function IoU(bb1, bb2) {
+function IoU(bb1, bb2) {
 	// Intersection over Union
 	// bb1 et bb2 sont des bounding boxes de la forme : [x, y, w, h]
 	let x1 = Math.max(bb1[0], bb2[0]);
@@ -27,19 +27,27 @@ export function IoU(bb1, bb2) {
 	return intersection / union;
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('IoU', () => {
+		expect(IoU([0, 0, 10, 10], [5, 5, 10, 10])).toBe(0.14285714285714285);
+		expect(IoU([0, 0, 10, 10], [15, 15, 10, 10])).toBe(0);
+		expect(IoU([0, 0, 10, 10], [5, 5, 5, 5])).toBe(0.25);
+	});
+}
 /**
  *
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
- * @param {ort.Tensor[]} tensor
+ * @param {ort.Tensor} tensor
  * @param {number[]} mean
  * @param {number[]} std
- * @returns {Promise<ort.Tensor[]>}
+ * @returns {Promise<ort.Tensor>}
  */
 export async function preprocessTensor(settings, tensor, mean, std) {
 	const { width, height, normalized } = settings.input;
 	let c = tensor;
-	c = await normalizeTensors(c, mean, std, !normalized);
-	c = await resizeTensors(c, width, height);
+	c = await normalizeTensor(c, mean, std, !normalized);
+	c = await resizeTensor(c, width, height);
 
 	return c;
 }
@@ -142,27 +150,6 @@ async function normalizeTensor(tensor, mean, std, denormalize = false) {
 	const newTensor = new ort.Tensor(tensor.type, data, dims);
 	tensor.dispose();
 	return newTensor;
-}
-/**
- *
- * @param {ort.Tensor[]} tensors
- * @param {number[]} mean
- * @param {number[]} std
- * @param {boolean} [denormalize=false] denormalize the pixel values from [0, 1] to [0, 255]
- * @returns {Promise<ort.Tensor[]>}
- */
-async function normalizeTensors(tensors, mean, std, denormalize = false) {
-	let newTensors = [];
-	for (let i = 0; i < tensors.length; i++) {
-		let newtsr = await normalizeTensor(tensors[i], mean, std, denormalize);
-		newTensors.push(newtsr);
-	}
-
-	for (let i = 0; i < tensors.length; i++) {
-		tensors[i].dispose();
-	}
-
-	return newTensors;
 }
 
 /**
@@ -282,22 +269,7 @@ export function output2BB(outputShape, output, numImages, minConfidence) {
 	}
 	return [bestBoxes, bestScores];
 }
-/**
- *
- * @param {ort.Tensor[]} tensors
- * @param {number} targetWidth
- * @param {number} targetHeight
- * @returns {Promise<ort.Tensor[]>}
- */
-async function resizeTensors(tensors, targetWidth, targetHeight) {
-	let resizedTensors = [];
-	for (let i = 0; i < tensors.length; i++) {
-		let resizedTensor = await resizeTensor(tensors[i], targetWidth, targetHeight);
-		resizedTensors.push(resizedTensor);
-	}
 
-	return resizedTensors;
-}
 /**
  *
  * @param {ort.Tensor} tensor
