@@ -27,12 +27,17 @@ export const test = base.extend(
 				await rm('./tests/results', { recursive: true, force: true });
 				await mkdir('./tests/results');
 
-				await context.route(
-					(u) => {
-						u.searchParams.delete('v');
-						return u.toString() === defaultProtocol.source;
-					},
-					async (route) => route.fulfill({ json: exampleProtocol })
+				// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
+				await Promise.all(
+					[context, page].map(async (target) =>
+						target.route(
+							(u) => {
+								u.searchParams.delete('v');
+								return u.toString() === defaultProtocol.source;
+							},
+							async (route) => route.fulfill({ json: exampleProtocol })
+						)
+					)
 				);
 
 				await page.goto('/');
