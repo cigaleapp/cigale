@@ -188,60 +188,21 @@ export async function infer(
 /**
  *
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
- * @param {ort.Tensor[][]} images
+ * @param {ort.Tensor} image
  * @param {import('onnxruntime-web').InferenceSession} model
- * @returns {Promise<Array<Array<number[]>>>} scores pour chaque tensor de chaque image: [each image [each tensor [score classe 0, score classe 1, …]]]
+ * @returns {Promise<number[]>} scores for each class
  */
-export async function classify(settings, images, model) {
-	/*Effectue une inférence de classification sur une ou plusieurs images.
-    -------------inputs----------------
-        images : liste d'images prétraitées
-            forme : [each image [each tensor]]
-            enfaite, le plus interessant est limite d'utiliser *presque* directement les images de l'inférence de détection
-            (le presque c'est parce qu'il faut d'abord faire un crop des tenseur de détection (cf apply BBsOnTensor dans utils) )
-        model : model onnx de classif 
-            in: [batch,3,224,224]
-            out: [batch*n_classes]
-            dans ce code, qui est opti pour un cpu, batch = 1.
-        img_proceed : objet contenant les informations sur l'avancement de l'inférence
-        start : temps de départ de l'inférence
-
-    -------------outputs----------------
-        argmaxs : liste des indices des classes prédites
-            forme : [each image [each class index]]
-        bestScores : liste des meilleurs scores pour chaque classe
-            forme : [each image [each class
-    */
-
+export async function classify(settings, image, model) {
 	const inputName = settings.input.name ?? model.inputNames[0];
 
-	/** @type {number[][][]}  */
-	const scores = [];
-	// @ts-ignore
-	images = await Promise.all(images.map((tensor) => preprocessTensor(settings, tensor, MEAN, STD)));
+	const input = await preprocessTensor(settings, image, MEAN, STD);
 
-	console.log(images);
+	const output = await model.run({ [inputName]: input });
 
-	for (let i = 0; i < images.length; i++) {
-		/** @type {number[][]}  */
-		const imageScores = [];
-		for (let j = 0; j < images[i].length; j++) {
-			let inputTensor = images[i][j];
-			const outputTensor = await model.run({ [inputName]: inputTensor });
+	const scores = await output[Object.keys(output)[0]]
+		.getData(true)
+		.then((scores) => /** @type {number[]} */ ([...scores.values()]));
 
-			console.log('outputs', Object.keys(outputTensor));
-
-			imageScores.push(
-				await outputTensor[Object.keys(outputTensor)[0]]
-					.getData(true)
-					.then((scores) => /** @type {number[]} */ ([...scores.values()]))
-			);
-
-			images[i][j].dispose();
-		}
-
-		scores.push(imageScores);
-	}
-
+	image.dispose();
 	return scores;
 }

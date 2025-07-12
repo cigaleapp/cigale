@@ -102,7 +102,7 @@ swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 		throw new Error(`Failed to load image for classification: ${err.message}`);
 	});
 
-	const [[scores]] = await classify(taskSettings, [[img]], session).catch((err) => {
+	const scores = await classify(taskSettings, img, session).catch((err) => {
 		throw new Error(`Failed to classify image: ${err.message}`);
 	});
 
