@@ -5,6 +5,37 @@
 	"version": "0.0.1",
 	"type": "module",
 	"main": ".vite/build/main.js",
+	"authors": [
+		{
+			"name": "Gwenn Le Bihan",
+			"email": "gwenn.lebihan7@gmail.com"
+		},
+		{
+			"name": "Maxime Cauchoix"
+		},
+		{
+			"name": "Rémy Edgard"
+		},
+		{
+			"name": "Céleste Tiano"
+		},
+		{
+			"name": "Jessica Joachim",
+			"email": "tifaeriis@gmail.com"
+		},
+		{
+			"name": "Léo Chekir"
+		},
+		{
+			"name": "Gaetan Laumonier"
+		},
+		{
+			"name": "Olivier Lamothe"
+		},
+		{
+			"name": "Ines Charles"
+		}
+	],
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
