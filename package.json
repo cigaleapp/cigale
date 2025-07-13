@@ -5,6 +5,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"main": ".vite/build/main.js",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Gwenn Le Bihan",
