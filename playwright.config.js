@@ -58,7 +58,13 @@ export default defineConfig({
 
 		{
 			name: 'webkit',
-			use: { ...devices['Desktop Safari'] }
+			use: {
+				...devices['Desktop Safari'],
+				contextOptions: {
+					// See https://github.com/microsoft/playwright/issues/1090
+					serviceWorkers: 'block'
+				}
+			}
 		}
 
 		/* Test against mobile viewports. */
