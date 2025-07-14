@@ -3,6 +3,10 @@ name: Draft a desktop app release
 on:
   workflow_dispatch:
 
+# https://www.electronforge.io/config/publishers/github#authentication
+permissions:
+  contents: write
+
 jobs:
   draft_release:
     runs-on: windows-latest
