@@ -6,6 +6,7 @@
 	"type": "module",
 	"main": ".vite/build/main.js",
 	"license": "MIT",
+	"repository": "https://github.com/cigaleapp/cigale",
 	"authors": [
 		{
 			"name": "Gwenn Le Bihan",
