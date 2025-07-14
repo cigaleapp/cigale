@@ -5,6 +5,21 @@
 
 	seo({ title: 'À propos' });
 
+	/**
+	 * @type {undefined | { node: string; chrome: string; electron: string }}
+	 */
+	let electronVersions = $state();
+
+	$effect(() => {
+		if (window.versions) {
+			electronVersions = {
+				node: window.versions.node(),
+				chrome: window.versions.chrome(),
+				electron: window.versions.electron()
+			};
+		}
+	});
+
 	let logoDrawPercent = $state(0);
 	$effect(() => {
 		const interval = setInterval(() => {
@@ -85,6 +100,19 @@
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>
+	{#if electronVersions}
+		<dt>Versions</dt>
+		<dd>
+			<dl>
+				<dt>Node.js</dt>
+				<dd><code>{electronVersions.node}</code></dd>
+				<dt>Chrome</dt>
+				<dd><code>{electronVersions.chrome}</code></dd>
+				<dt>Electron</dt>
+				<dd><code>{electronVersions.electron}</code></dd>
+			</dl>
+		</dd>
+	{/if}
 	<dt>Code source</dt>
 	<dd>
 		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a>
