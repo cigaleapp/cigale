@@ -1,6 +1,9 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import serve from 'electron-serve';
+
+const builtFileserver = serve({ directory: import.meta.dirname });
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -25,9 +28,8 @@ const createWindow = () => {
 			mainWindow.webContents.openDevTools({ mode: 'detach' });
 		});
 	} else {
-		mainWindow.loadFile(
-			path.join(import.meta.dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
-		);
+		// mainWindow.loadFile(path.join(import.meta.dirname, 'index.html'));
+		builtFileserver(mainWindow);
 	}
 };
 
