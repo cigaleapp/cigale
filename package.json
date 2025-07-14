@@ -4,6 +4,39 @@
 	"description": "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune",
 	"version": "0.0.1",
 	"type": "module",
+	"main": ".vite/build/main.js",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Gwenn Le Bihan",
+			"email": "gwenn.lebihan7@gmail.com"
+		},
+		{
+			"name": "Maxime Cauchoix"
+		},
+		{
+			"name": "Rémy Edgard"
+		},
+		{
+			"name": "Céleste Tiano"
+		},
+		{
+			"name": "Jessica Joachim",
+			"email": "tifaeriis@gmail.com"
+		},
+		{
+			"name": "Léo Chekir"
+		},
+		{
+			"name": "Gaetan Laumonier"
+		},
+		{
+			"name": "Olivier Lamothe"
+		},
+		{
+			"name": "Ines Charles"
+		}
+	],
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -33,6 +66,16 @@
 		]
 	},
 	"devDependencies": {
+		"@electron-forge/cli": "^7.8.1",
+		"@electron-forge/maker-deb": "^7.8.1",
+		"@electron-forge/maker-rpm": "^7.8.1",
+		"@electron-forge/maker-squirrel": "^7.8.1",
+		"@electron-forge/maker-zip": "^7.8.1",
+		"@electron-forge/plugin-fuses": "^7.8.1",
+		"@electron-forge/plugin-vite": "^7.8.1",
+		"@electron-forge/publisher-github": "^7.8.1",
+		"@electron-forge/shared-types": "^7.8.1",
+		"@electron/fuses": "^1.8.0",
 		"@eslint/compat": "^1.3.1",
 		"@eslint/js": "^9.31.0",
 		"@playwright/test": "^1.54.1",
@@ -42,6 +85,7 @@
 		"@types/piexifjs": "^1.0.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
+		"electron": "^37.2.1",
 		"eslint": "^9.31.0",
 		"eslint-config-prettier": "^10.1.5",
 		"eslint-plugin-oxlint": "^1.6.0",
@@ -84,6 +128,8 @@
 		"date-fns": "^4.1.0",
 		"deep-equal": "^2.2.3",
 		"dragselect": "^3.1.1",
+		"electron-serve": "^2.1.1",
+		"electron-squirrel-startup": "^1.0.1",
 		"exif-parser": "^0.1.12",
 		"fetch-progress": "git+https://github.com/gwennlbh/fetch-progress#explicit-import-extensions",
 		"fflate": "^0.8.2",
@@ -101,6 +147,7 @@
 		"swarpc": "^0.4.0",
 		"tinykeys": "^3.0.0",
 		"unplugin-icons": "^22.1.0",
+		"update-electron-app": "^3.1.1",
 		"xss": "^1.0.15",
 		"yaml": "^2.8.0"
 	},

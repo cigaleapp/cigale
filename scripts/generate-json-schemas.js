@@ -23,7 +23,10 @@ async function exportJsonSchema(name, schema) {
 	schemaObject = deleteKeys(schemaObject, isArkObject);
 
 	const json = JSON.stringify(schemaObject, null, 2);
-	await writeFile(path.resolve(outputDir, `${name}.schema.json`).replace('C:\\C:\\', 'C:\\'), json);
+	await writeFile(
+		path.resolve(outputDir, `${name}.schema.json`).replace(/([A-Z]):\\\1:\\/, '$1:\\'),
+		json
+	);
 }
 
 if (process.argv[1] === import.meta.filename) {

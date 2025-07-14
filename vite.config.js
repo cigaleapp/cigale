@@ -16,6 +16,11 @@ export default defineConfig({
 			reportOnFailure: true
 		}
 	},
+	server: {
+		fs: {
+			allow: ['./package-lock.json']
+		}
+	},
 	define: {
 		'import.meta.vitest': 'undefined'
 	},

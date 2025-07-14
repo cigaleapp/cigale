@@ -1,0 +1,35 @@
+name: Desktop app
+
+on:
+  push:
+
+# https://www.electronforge.io/config/publishers/github#authentication
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - { os: windows, name: Windows, artifacts: out/make/squirrel.windows/*/*Setup.exe }
+          - { os: macos, name: macOS, artifacts: out/make/ }
+          - { os: ubuntu, name: Linux, artifacts: out/make/ }
+
+    name: Build for ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build & package app
+        run: npm run prebuild; npx electron-forge make
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cigale-desktop-${{ matrix.os }}
+          path: ${{ matrix.artifacts }}
