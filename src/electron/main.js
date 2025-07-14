@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import serve from 'electron-serve';
@@ -10,11 +10,15 @@ if (started) {
 	app.quit();
 }
 
+Menu.setApplicationMenu(null);
+
 const createWindow = () => {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
 		width: 800,
 		height: 600,
+		titleBarStyle: 'hidden',
+		...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
 		webPreferences: {
 			preload: path.join(import.meta.dirname, 'preload.js'),
 			webSecurity: false

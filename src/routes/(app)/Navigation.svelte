@@ -135,6 +135,14 @@
 {/snippet}
 
 <style>
+	header {
+		app-region: drag;
+	}
+
+	header :global(:is(a, button)) {
+		app-region: no-drag;
+	}
+
 	nav {
 		background-color: var(--bg-primary-translucent);
 		display: flex;
