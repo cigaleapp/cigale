@@ -1,6 +1,7 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import lockfile from '$lib/../../package-lock.json' with { type: 'json' };
 
 	seo({ title: 'À propos' });
 
@@ -37,20 +38,15 @@
 	 * @returns {Promise<Array<[string, string]>>} Array of [package name, version used]
 	 */
 	async function showDependencies() {
-		// Fetch package.json text
-		const response = await fetch(
-			'https://git.inpt.fr/api/v4/projects/cigale%2Fcigale.pages.inpt.fr/repository/files/package.json/raw'
-		)
-			.then((res) => res.text())
-			.then((text) => JSON.parse(text))
-			.then((pkg) =>
-				[...Object.entries(pkg.dependencies), ...Object.entries(pkg.devDependencies)].map(
-					([name, version]) => [name, version.replace('^', '')]
-				)
-			);
+		// Get list of package names
+		const pkgs = [
+			...Object.keys(lockfile.packages[''].dependencies),
+			...Object.keys(lockfile.packages[''].devDependencies)
+		];
 
+		// Get resolved versions for each package
 		// @ts-expect-error
-		return response;
+		return pkgs.map((name) => [name, lockfile.packages[`node_modules/${name}`].version]);
 	}
 </script>
 
