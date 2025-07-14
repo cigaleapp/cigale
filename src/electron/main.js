@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import serve from 'electron-serve';
@@ -19,6 +19,18 @@ const createWindow = () => {
 			preload: path.join(import.meta.dirname, 'preload.js'),
 			webSecurity: false
 		}
+	});
+
+	ipcMain.on('progressBar:set', (_event, /** @type {number} */ value) => {
+		mainWindow.setProgressBar(value);
+	});
+
+	ipcMain.on('nativeWindow:startCallingAttention', () => {
+		mainWindow.flashFrame(true);
+	});
+
+	ipcMain.on('nativeWindow:stopCallingAttention', () => {
+		mainWindow.flashFrame(false);
 	});
 
 	// and load the index.html of the app.

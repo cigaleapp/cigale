@@ -12,6 +12,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Reglages from './Reglages.svelte';
+	import { clamp } from '$lib/utils';
 
 	/**
 	 * @typedef Props
@@ -34,6 +35,14 @@
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
+
+	$effect(() => {
+		window.nativeWindow?.setProgress(clamp(progress, 0, 1));
+
+		if (progress >= 1) {
+			window.nativeWindow?.startCallingAttention();
+		}
+	});
 </script>
 
 <DownloadResults {progress} bind:open={openExportModal} />
