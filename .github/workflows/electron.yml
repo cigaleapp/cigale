@@ -3,6 +3,10 @@ name: Desktop app
 on:
   push:
 
+# https://www.electronforge.io/config/publishers/github#authentication
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:

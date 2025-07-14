@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
+import { updateElectronApp } from 'update-electron-app';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import serve from 'electron-serve';
@@ -6,6 +7,12 @@ import serve from 'electron-serve';
 /* global MAIN_WINDOW_VITE_DEV_SERVER_URL */
 
 const builtFileserver = serve({ directory: import.meta.dirname });
+
+try {
+	updateElectronApp();
+} catch (error) {
+	console.error('Failed to update Electron app:', error);
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -20,8 +27,7 @@ const createWindow = () => {
 		titleBarStyle: 'hidden',
 		...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
 		webPreferences: {
-			preload: path.join(import.meta.dirname, 'preload.js'),
-			webSecurity: false
+			preload: path.join(import.meta.dirname, 'preload.js')
 		}
 	});
 
