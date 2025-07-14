@@ -12,7 +12,14 @@
 		"src/lib/SelectWithSearch.svelte"
 	],
 	"ignoreDependencies": ["@iconify-json/.+"],
-	"entry": ["scripts/*.js"],
+	"entry": [
+		"scripts/*.js",
+		"src/electron/main.{d.ts,js}",
+		"src/electron/preload.js",
+		"forge.config.js",
+		"forge.env.d.ts",
+		"vite.electron*.config.js"
+	],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
 		"$lib/*": ["src/lib/*"],
