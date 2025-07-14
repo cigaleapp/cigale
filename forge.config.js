@@ -12,10 +12,23 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
  */
 const config = {
 	packagerConfig: {
-		asar: true
+		asar: true,
+		icon: './static/icon'
 	},
 	rebuildConfig: {},
-	makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+	makers: [
+		new MakerSquirrel({
+			iconUrl: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/static/icon.ico',
+			setupIcon: './static/setup-icon.ico'
+		}),
+		new MakerZIP({}, ['darwin']),
+		new MakerRpm({
+			options: { icon: './static/icon.png' }
+		}),
+		new MakerDeb({
+			options: { icon: './static/icon.png' }
+		})
+	],
 	publishers: [
 		new PublisherGithub({
 			prerelease: true,

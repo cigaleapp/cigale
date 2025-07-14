@@ -19,9 +19,12 @@ if (started) {
 	app.quit();
 }
 
+const isLinux = ['freebsd', 'linux', 'openbsd', 'haiku', 'sunos'].includes(process.platform);
+
 const createWindow = () => {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
+		icon: isLinux ? path.join(import.meta.dirname, 'icon.png') : undefined,
 		width: 1200,
 		height: 800,
 		titleBarStyle: 'hidden',
