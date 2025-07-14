@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import serve from 'electron-serve';
@@ -11,8 +11,6 @@ const builtFileserver = serve({ directory: import.meta.dirname });
 if (started) {
 	app.quit();
 }
-
-Menu.setApplicationMenu(null);
 
 const createWindow = () => {
 	// Create the browser window.
