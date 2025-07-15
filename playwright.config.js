@@ -43,7 +43,12 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: { ...devices['Desktop Chrome'] }
+			use: {
+				...devices['Desktop Chrome'],
+				contextOptions: {
+					serviceWorkers: process.env.CI ? 'allow' : 'block'
+				}
+			}
 		},
 
 		// Firefox does not work in CI, see https://github.com/microsoft/playwright/issues/11566
