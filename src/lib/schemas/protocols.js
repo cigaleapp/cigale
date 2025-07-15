@@ -19,32 +19,35 @@ export const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du poi
 	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
 	.array();
 
-/**
- * Add a suffix to a filename, before the extension
- */
-Handlebars.registerHelper('suffix', (subject, suffix) => {
-	type('string').assert(subject);
-	type('string').assert(suffix);
+export const HANDLEBARS_HELPERS = {
+	suffix: {
+		documentation: "Ajoute un suffixe à un nom de fichier, avant l'extension",
+		implementation: (subject, suffix) => {
+			type('string').assert(subject);
+			type('string').assert(suffix);
 
-	const [stem, ext] = splitFilenameOnExtension(subject);
-	return `${stem}${suffix}.${ext}`;
-});
+			const [stem, ext] = splitFilenameOnExtension(subject);
+			return `${stem}${suffix}.${ext}`;
+		}
+	},
+	extension: {
+		documentation: 'Récupère l’extension d’un nom de fichier',
+		implementation: (subject) => {
+			type('string').assert(subject);
+			return splitFilenameOnExtension(subject)[1];
+		}
+	},
+	fallback: {
+		documentation: 'Fournit une valeur de repli si la première est indéfinie',
+		implementation: (subject, fallback) => {
+			return subject ?? fallback;
+		}
+	}
+};
 
-/**
- * Get the extension part from a filename
- */
-Handlebars.registerHelper('extension', (subject) => {
-	type('string').assert(subject);
-
-	return splitFilenameOnExtension(subject)[1];
-});
-
-/**
- * Provide a default, akin to a ?? b
- */
-Handlebars.registerHelper('fallback', (subject, fallback) => {
-	return subject ?? fallback;
-});
+for (const [name, { implementation }] of Object.entries(HANDLEBARS_HELPERS)) {
+	Handlebars.registerHelper(name, implementation);
+}
 
 export const FilepathTemplate = type.string
 	.pipe((t) => {
