@@ -78,8 +78,10 @@ export async function getImage({ page }, id) {
 
 /**
  *
+ * @template {keyof typeof import('$lib/idb.svelte.js').tables} Table
  * @param {Page} page
- * @param {string} tableName
+ * @param {Table} tableName
+ * @returns {Promise<typeof import('$lib/idb.svelte.js').tables[Table]['state']>}
  */
 export async function listTable(page, tableName) {
 	const table = await page.evaluate(async ([tableName]) => {
