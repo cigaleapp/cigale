@@ -35,5 +35,5 @@ jobs:
         with:
           folder: public # The folder the action should deploy.
           force: yes
-          clean: no
+          clean: yes
           clean-exclude: _pullrequests/
