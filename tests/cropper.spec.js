@@ -151,6 +151,40 @@ test.describe('Cropper view', () => {
 		});
 	});
 
+	test.describe('deleting an image', () => {
+		/**
+		 * @param {import('@playwright/test').Page} page
+		 * @param {(page: import('@playwright/test').Page) => Promise<void>} deleteAction
+		 */
+		async function navigateThenAssert(page, deleteAction) {
+			const imagesBefore = await listTable(page, 'Image');
+
+			await page.getByText('leaf.jpeg', { exact: true }).click();
+			await page.waitForURL((u) => u.hash === '#/crop/000001');
+
+			await deleteAction(page);
+
+			await page.waitForURL((u) => u.hash === '#/crop/000000');
+
+			await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
+			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
+
+			expect(await listTable(page, 'Image')).toEqual(
+				imagesBefore.filter(({ fileId }) => fileId !== '000001')
+			);
+		}
+
+		test('should delete the image on ctrl-delete and go to the next image', async ({ page }) => {
+			await navigateThenAssert(page, async (page) => page.keyboard.press('Control+Delete'));
+		});
+
+		test('should delete the image via delete button and go to the next image', async ({ page }) => {
+			await navigateThenAssert(page, async (page) => {
+				await page.getByRole('button', { name: 'Supprimer' }).click();
+			});
+		});
+	});
+
 	test.describe('creating a new bounding box', () => {
 		test.beforeEach(async ({ page }) => {
 			await page.getByRole('img', { name: 'lil-fella.jpeg' }).click();

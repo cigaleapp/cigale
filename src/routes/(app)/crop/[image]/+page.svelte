@@ -28,6 +28,7 @@
 	import Tooltip from '$lib/Tooltip.svelte';
 	import * as idb from '$lib/idb.svelte.js';
 	import {
+		deleteImageFile,
 		imageFileIds,
 		imagesOfImageFile,
 		imageId as makeImageId,
@@ -456,6 +457,11 @@
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
 	}
 
+	async function deleteImage() {
+		await deleteImageFile(fileId);
+		await moveToNextUnconfirmed();
+	}
+
 	/**
 	 * @param {CenteredBoundingBox} box
 	 * @returns {[number, number]} pixel dimensions of the box
@@ -512,6 +518,10 @@
 		Space: {
 			help: 'Continuer',
 			do: moveToNextUnconfirmed
+		},
+		'$mod+Delete': {
+			help: 'Supprimer l’image',
+			do: deleteImage
 		},
 		Escape: {
 			help: 'Quitter le recadrage',
@@ -791,12 +801,19 @@
 	</main>
 	<aside class="info">
 		<section class="top">
-			<nav class="back">
+			<section class="preactions">
 				<ButtonInk onclick={goToGallery}>
-					<IconGallery /> Toutes les photos
+					<IconGallery /> Autres photos
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
-			</nav>
+				<ButtonInk
+					dangerous
+					onclick={deleteImage}
+					help={{ text: 'Supprimer cette image et passer à la suivante', keyboard: '$mod+Delete' }}
+				>
+					<IconDelete /> Supprimer
+				</ButtonInk>
+			</section>
 			<section class="filename">
 				{#if firstImage}
 					<h1>
@@ -1153,6 +1170,13 @@
 	.info .top {
 		display: flex;
 		flex-direction: column;
+		gap: 0.5em;
+	}
+
+	.info .top .preactions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		gap: 0.5em;
 	}
 
