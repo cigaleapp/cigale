@@ -217,18 +217,22 @@ export async function promptAndImportProtocol({ allowMultiple, onInput = () => {
  *
  * @param {string} contents
  * @param {Object} [options]
- * @param {boolean} [options.json=false] parse as JSON instead of YAML, useful for performance if you're usre the contents represents JSON and not just YAML
+ * @param {boolean} [options.json=false] parse as JSON instead of YAML, useful for performance if you're sure the contents represents JSON and not just YAML
+ * @param {(state: 'parsing'|'filtering-builtin-metadata'|'input-validation'|'write-protocol'|'write-metadata'|'write-metadata-options'|'output-validation', detail?: string) => void} [options.onLoadingState] callback to call when the protocol is being parsed, useful for showing a loading message
  */
-export async function importProtocol(contents, { json = false } = {}) {
+export async function importProtocol(contents, { json = false, onLoadingState } = {}) {
 	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
 	// (Node does not like .svelte.js files' runes)
 	const { openTransaction } = await import('./idb.svelte.js');
+
+	onLoadingState?.('parsing');
 	console.time('Parsing protocol');
 	let parsed = json ? JSON.parse(contents) : YAML.parse(contents);
 	console.timeEnd('Parsing protocol');
 
 	console.info(`Importing protocol ${parsed.id}`);
 	console.info(parsed);
+	onLoadingState?.('filtering-builtin-metadata');
 
 	const builtinMetadata = Object.entries(parsed.metadata ?? {})
 		.filter(([, value]) => value === 'builtin')
@@ -238,11 +242,13 @@ export async function importProtocol(contents, { json = false } = {}) {
 		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
 	);
 
+	onLoadingState?.('input-validation');
 	console.time('Validating protocol');
 	const protocol = ExportedProtocol.in.assert(parsed);
 	console.timeEnd('Validating protocol');
 
 	await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
+		onLoadingState?.('write-protocol');
 		console.time('Storing Protocol');
 		tx.objectStore('Protocol').put({
 			...protocol,
@@ -253,12 +259,14 @@ export async function importProtocol(contents, { json = false } = {}) {
 		for (const [id, metadata] of Object.entries(protocol.metadata)) {
 			if (typeof metadata === 'string') continue;
 
+			onLoadingState?.('write-metadata', id);
 			console.time(`Storing Metadata ${id}`);
 			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
 			console.timeEnd(`Storing Metadata ${id}`);
 
 			console.time(`Storing Metadata Options for ${id}`);
 			for (const option of metadata.options ?? []) {
+				onLoadingState?.('write-metadata-options', `${id} > ${option.key}`);
 				tx.objectStore('MetadataOption').put({
 					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
 					metadataId: namespacedMetadataId(protocol.id, id),
@@ -269,6 +277,7 @@ export async function importProtocol(contents, { json = false } = {}) {
 		}
 	});
 
+	onLoadingState?.('output-validation');
 	console.time('Validating protocol after storing');
 	const validated = ExportedProtocol.assert(protocol);
 	console.timeEnd('Validating protocol after storing');

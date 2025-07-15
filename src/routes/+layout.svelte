@@ -3,6 +3,10 @@
 	import '$lib/tippy-svg-arrow.css';
 
 	const { children } = $props();
+
+	$effect(() => {
+		document.querySelector('#loading')?.remove();
+	});
 </script>
 
 {@render children?.()}

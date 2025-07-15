@@ -1,0 +1,24 @@
+name: Draft a desktop app release
+
+on:
+  workflow_dispatch:
+
+# https://www.electronforge.io/config/publishers/github#authentication
+permissions:
+  contents: write
+
+jobs:
+  draft_release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build, package and publish app
+        run: npm run prebuild; npx electron-forge publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

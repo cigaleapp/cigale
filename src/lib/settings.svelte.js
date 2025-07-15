@@ -1,6 +1,10 @@
 import { tables } from './idb.svelte.js';
 
-/** @type {import('./database.js').Settings}  */
+/**
+ * @import {Settings} from './database.js';
+ */
+
+/** @type {Settings}  */
 // @ts-expect-error could be undefined too, but not useful for us
 const _settings = $derived(
 	tables.Settings.state.find((s) => s.id === 'user') ??
@@ -15,7 +19,7 @@ const _settings = $derived(
  *   const settings = $derived(getSettings());
  * </script>
  * ```
- * @returns {import('./database.js').Settings} a reactive object that will update when the database changes. Read-only. Use `setSetting` to change values.
+ * @returns {Settings} a reactive object that will update when the database changes. Read-only. Use `setSetting` to change values.
  */
 export function getSettings() {
 	return _settings;
@@ -24,8 +28,8 @@ export function getSettings() {
 /**
  *
  * @param {Key} key
- * @param {import("./database.js").Settings[Key]} value
- * @template {keyof import("./database.js").Settings} Key
+ * @param {Settings[Key]} value
+ * @template {keyof Settings} Key
  */
 export async function setSetting(key, value) {
 	console.log('setSetting', key, value);
@@ -43,26 +47,17 @@ export async function setSetting(key, value) {
 }
 
 /**
- *
+ * @template {keyof Settings} Key
  * @param {Key} key
- * @template {keyof import("./database.js").Settings} Key
+ * @returns {Promise<Settings[Key]>} the current value of the setting
  */
 export async function getSetting(key) {
-	const out =
-		_settings[key] ??
-		(await tables.Settings.get('user')) ??
-		(await tables.Settings.get('defaults'));
-
-	if (!out) {
+	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
+	if (!current) {
 		throw new Error("Les réglages par défaut n'ont pas été initialisés. Rechargez la page.");
 	}
-
-	return out;
+	return current[key];
 }
-
-/**
- * @typedef {import('./database.js').Settings} Settings
- */
 
 /**
  * Toggle a boolean setting

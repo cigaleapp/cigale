@@ -8,12 +8,17 @@ export default defineConfig({
 	test: {
 		environment: 'jsdom',
 		include: ['src/**/*.{test,spec}{.svelte,}.{js,ts}'],
-		includeSource: ['src/**/*.{js,ts}'],
+		includeSource: ['src/**/*.{js,ts}', 'scripts/generate-json-schemas.js'],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
 			reportOnFailure: true
+		}
+	},
+	server: {
+		fs: {
+			allow: ['./package-lock.json']
 		}
 	},
 	define: {
@@ -33,7 +38,7 @@ export default defineConfig({
 		crossOriginIsolation()
 	],
 	optimizeDeps: {
-		exclude: ['onnxruntime-web', 'turbo_exif']
+		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
 	},
 	assetsInclude: ['**/*.wasm']
 });

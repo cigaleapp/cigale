@@ -4,6 +4,7 @@
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { getSettings } from './settings.svelte';
 	import { mapValues } from './utils';
+	import { watch } from 'runed';
 
 	/**
 	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
@@ -47,8 +48,14 @@
 		zoom
 	} = $props();
 
-	// $derived can be written to since Svelte 5.25
-	let boundingBoxes = $derived(boudingBoxesInitial);
+	// Using a writable $derived here causes the state to not update until onmouseup, idk why
+	let boundingBoxes = $state(boudingBoxesInitial);
+	watch(
+		() => boudingBoxesInitial,
+		(newBoxes) => {
+			boundingBoxes = newBoxes;
+		}
+	);
 
 	let clientWidth = $state(imageElement.clientWidth);
 	let clientHeight = $state(imageElement.clientHeight);

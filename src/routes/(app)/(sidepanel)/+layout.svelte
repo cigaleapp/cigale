@@ -20,7 +20,7 @@
 
 	seo({ title: 'Importer' });
 
-	const { children } = $props();
+	const { children, data } = $props();
 
 	async function importImages() {
 		const filesInput = document.createElement('input');
@@ -32,7 +32,7 @@
 			if (!event.currentTarget.files) return;
 			const files = Array.from(event.currentTarget.files);
 			if (files.length === 0) return;
-			await importMore(files);
+			await importMore(data.swarpc, files);
 		});
 		filesInput.click();
 	}

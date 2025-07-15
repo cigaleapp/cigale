@@ -2,7 +2,7 @@ import { JSDOM } from 'jsdom';
 import { marked } from 'marked';
 import RSSParser from 'rss-parser';
 import { writeFileSync } from 'node:fs';
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
@@ -239,11 +239,11 @@ async function parseAndDescribeSpecies(
 		console.error();
 	}
 
-	let cachebuster =
-		new URL(
-			oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[optionIndex]
-				?.image ?? `https://example.com?v=${protocol.version}`
-		).searchParams.get('v') ?? '0';
+	// let cachebuster =
+	// 	new URL(
+	// 		oldProtocol.metadata['io.github.cigaleapp.arthropods.example__species'].options[optionIndex]
+	// 			?.image ?? `https://example.com?v=${protocol.version}`
+	// 	).searchParams.get('v') ?? '0';
 
 	// Download image since CORP prevents us from using them directly
 	const image = images.length > 0 ? images[0] : '';
