@@ -1,6 +1,7 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 import { isReactiveTable, Tables } from './database.js';
+import * as devalue from 'devalue';
 import { base } from '$app/paths';
 
 console.info(`Base path is ${base}`);
@@ -402,6 +403,11 @@ export async function openDatabase() {
 		}
 	});
 
+	// Needed for E2E tests, to send non-[Serializable] values between browser and test runner
+	window.devalue = {
+		stringify: devalue.stringify,
+		parse: devalue.parse
+	};
 	window.DB = _database;
 	window.refreshDB = () => {
 		for (const table of tableNames) {

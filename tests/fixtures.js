@@ -42,7 +42,7 @@ export const test = base.extend(
 
 				await page.goto('/');
 				// @ts-expect-error
-				await page.waitForFunction(() => Boolean(window.DB && window.refreshDB));
+				await page.waitForFunction(() => Boolean(window.devalue && window.DB && window.refreshDB));
 				await use();
 			},
 			{ auto: true }

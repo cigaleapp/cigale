@@ -1,5 +1,7 @@
+import * as devalue from 'devalue';
 import { expect } from '@playwright/test';
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 /**
@@ -201,4 +203,47 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 		await expect(page.getByText('Analyse…').first()).toBeVisible();
 		await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 30_000 });
 	}
+}
+
+/**
+ * Store a database dump in the fixtures/db directory
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filepath relative to tests/fixtures/db
+ */
+export async function dumpDatabase(page, filepath) {
+	const dest = path.join(import.meta.dirname, './fixtures/db/', filepath);
+
+	const encodedDump = await page.evaluate(async () => {
+		const tableNames = window.DB.objectStoreNames;
+		const dump = {};
+		for (const tableName of tableNames) {
+			dump[tableName] = await window.DB.getAll(tableName);
+		}
+		return window.devalue.stringify(dump);
+	});
+
+	await mkdir(path.dirname(dest), { recursive: true });
+	await writeFile(dest, encodedDump, 'utf-8');
+}
+
+/**
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filepath relative to tests/fixtures/db
+ */
+export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
+	const location = path.join(import.meta.dirname, './fixtures/db/', filepath);
+
+	await page.evaluate(
+		async (dump) => {
+			const decoded = window.devalue.parse(dump);
+			for (const [tableName, entries] of Object.entries(decoded)) {
+				for (const entry of entries) {
+					await window.DB.put(tableName, entry);
+				}
+			}
+			await window.refreshDB();
+		},
+		readFileSync(location, 'utf-8')
+	);
 }

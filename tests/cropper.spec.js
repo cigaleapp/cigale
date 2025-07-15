@@ -1,9 +1,11 @@
 import { expect, test, exampleProtocol } from './fixtures.js';
 import {
+	chooseDefaultProtocol,
 	getImage,
 	getSettings,
 	importResults,
 	listTable,
+	loadDatabaseDump,
 	setImageMetadata,
 	setSettings
 } from './utils.js';
@@ -11,7 +13,8 @@ import {
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }, testInfo) => {
 		testInfo.setTimeout(40_000);
-		await importResults(page, 'correct.zip');
+		await loadDatabaseDump(page);
+		await chooseDefaultProtocol(page);
 		const allImages = await listTable(page, 'Image');
 		await markImagesAsConfirmedInDatabase(
 			page,
