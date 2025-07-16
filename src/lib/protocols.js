@@ -167,13 +167,19 @@ function downloadProtocol(base, format, exportedProtocol) {
 /**
  * Imports protocol(s) from JSON file(s).
  * Asks the user to select files, then imports the protocols from those files.
+ * @template {{id: string, name: string, version?: number}} Out
  * @template {boolean|undefined} Multiple
  * @param {object} param0
  * @param {Multiple} [param0.allowMultiple] allow the user to select multiple files
  * @param {() => void} [param0.onInput] callback to call when the user selected files
- * @returns {Promise<Multiple extends true ? Array<typeof ExportedProtocol.infer> : typeof ExportedProtocol.infer>}
+ * @param {((input: {contents: string, isJSON: boolean}) => Promise<{id: string, name: string, version: number|undefined}>)} param0.importProtocol
+ * @returns {Promise<Multiple extends true ? NoInfer<Out>[] : NoInfer<Out>>}
  */
-export async function promptAndImportProtocol({ allowMultiple, onInput = () => {} } = {}) {
+export async function promptAndImportProtocol({
+	allowMultiple,
+	onInput = () => {},
+	importProtocol
+}) {
 	return new Promise((resolve, reject) => {
 		const input = document.createElement('input');
 		input.type = 'file';
@@ -182,7 +188,7 @@ export async function promptAndImportProtocol({ allowMultiple, onInput = () => {
 		input.onchange = async () => {
 			if (!input.files || !input.files[0]) return;
 			onInput();
-			/** @type {Array<typeof ExportedProtocol.infer>}  */
+			/** @type {Array<{id: string, name: string, version?: number}>}  */
 			const output = await Promise.all(
 				[...input.files].map(async (file) => {
 					console.time(`Reading file ${file.name}`);
@@ -192,15 +198,20 @@ export async function promptAndImportProtocol({ allowMultiple, onInput = () => {
 							if (!reader.result) throw new Error('Fichier vide');
 							if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
 							console.timeEnd(`Reading file ${file.name}`);
-							importProtocol(reader.result, { json: file.name.endsWith('.json') })
-								.then(resolve)
-								.catch((err) =>
-									reject(
-										new Error(
-											`Protocole invalide: ${err?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`
-										)
+							const result = await importProtocol({
+								contents: reader.result,
+								isJSON: file.name.endsWith('.json')
+							}).catch((err) =>
+								reject(
+									new Error(
+										`Protocole invalide: ${err?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`
 									)
-								);
+								)
+							);
+							const { tables } = await import('./idb.svelte.js');
+							await tables.Protocol.refresh();
+							await tables.Metadata.refresh();
+							resolve(result);
 						};
 						reader.readAsText(file);
 					});
@@ -213,17 +224,30 @@ export async function promptAndImportProtocol({ allowMultiple, onInput = () => {
 	});
 }
 
+export const ProtocolImportPhase = type.enumerated(
+	'parsing',
+	'filtering-builtin-metadata',
+	'input-validation',
+	'write-protocol',
+	'write-metadata',
+	'write-metadata-options',
+	'output-validation'
+);
+
 /**
  *
  * @param {string} contents
  * @param {Object} [options]
  * @param {boolean} [options.json=false] parse as JSON instead of YAML, useful for performance if you're sure the contents represents JSON and not just YAML
- * @param {(state: 'parsing'|'filtering-builtin-metadata'|'input-validation'|'write-protocol'|'write-metadata'|'write-metadata-options'|'output-validation', detail?: string) => void} [options.onLoadingState] callback to call when the protocol is being parsed, useful for showing a loading message
+ * @param {(state: typeof ProtocolImportPhase.infer, detail?: string) => void} [options.onLoadingState] callback to call when the protocol is being parsed, useful for showing a loading message
+ * @param {typeof import('./idb.svelte.js').openTransaction} [options.openTransaction] function to use to open a transaction, defaults to the one from the IDB module
  */
-export async function importProtocol(contents, { json = false, onLoadingState } = {}) {
-	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
-	// (Node does not like .svelte.js files' runes)
-	const { openTransaction } = await import('./idb.svelte.js');
+export async function importProtocol(
+	contents,
+	{ json = false, onLoadingState, openTransaction } = {}
+) {
+	// Use the provided openTransaction or import the default one
+	openTransaction ??= (await import('./idb.svelte.js')).openTransaction;
 
 	onLoadingState?.('parsing');
 	console.time('Parsing protocol');
@@ -259,14 +283,22 @@ export async function importProtocol(contents, { json = false, onLoadingState } 
 		for (const [id, metadata] of Object.entries(protocol.metadata)) {
 			if (typeof metadata === 'string') continue;
 
-			onLoadingState?.('write-metadata', id);
+			onLoadingState?.('write-metadata', metadata.label || id);
 			console.time(`Storing Metadata ${id}`);
 			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
 			console.timeEnd(`Storing Metadata ${id}`);
 
 			console.time(`Storing Metadata Options for ${id}`);
+			const total = metadata.options?.length ?? 0;
+			let done = 0;
 			for (const option of metadata.options ?? []) {
-				onLoadingState?.('write-metadata-options', `${id} > ${option.key}`);
+				done++;
+				if (done % 1000 === 0) {
+					onLoadingState?.(
+						'write-metadata-options',
+						`${metadata.label || id} > ${option.label || option.key} (${done}/${total})`
+					);
+				}
 				tx.objectStore('MetadataOption').put({
 					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
 					metadataId: namespacedMetadataId(protocol.id, id),

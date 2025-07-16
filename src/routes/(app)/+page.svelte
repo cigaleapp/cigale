@@ -5,7 +5,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { importProtocol, promptAndImportProtocol } from '$lib/protocols';
+	import { promptAndImportProtocol } from '$lib/protocols';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -17,6 +17,8 @@
 	import IconImport from '~icons/ph/download';
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
+
+	const { data } = $props();
 
 	seo({ title: 'Choisir un protocole' });
 
@@ -106,7 +108,10 @@
 		if (!raw) return;
 
 		try {
-			const { id } = await importProtocol(raw);
+			const { id } = await data.swarpc.importProtocol({ contents: raw });
+			await tables.Protocol.refresh();
+			await tables.Metadata.refresh();
+
 			uiState.currentProtocolId = id;
 			$preselectedProtocol = null;
 		} catch (error) {
@@ -221,7 +226,8 @@
 			onclick={async (_, signals) => {
 				const protocol = await promptAndImportProtocol({
 					allowMultiple: false,
-					onInput: signals.loadingStarted
+					onInput: signals.loadingStarted,
+					importProtocol: data.swarpc.importProtocol
 				}).catch((e) => toasts.error(e));
 				if (!protocol || typeof protocol === 'string') return;
 				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);

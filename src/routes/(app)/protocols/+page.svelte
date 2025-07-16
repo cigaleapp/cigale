@@ -17,6 +17,8 @@
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
 
+	const { data } = $props();
+
 	/**
 	 * Protocol we're confirming deletion for
 	 * @type {undefined | import('$lib/database').Protocol}
@@ -108,7 +110,11 @@
 		<ButtonSecondary
 			loading
 			onclick={async (_, signals) => {
-				await promptAndImportProtocol({ allowMultiple: true, onInput: signals.loadingStarted })
+				await promptAndImportProtocol({
+					allowMultiple: true,
+					onInput: signals.loadingStarted,
+					importProtocol: data.swarpc.importProtocol
+				})
 					.catch((e) => toasts.error(e))
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;

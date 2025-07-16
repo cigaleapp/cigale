@@ -5,9 +5,10 @@
 
 import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
-import { classify, infer, loadModel } from './lib/inference.js';
-import { loadToTensor } from './lib/inference_utils.js';
+import { classify, infer, loadModel } from '$lib/inference.js';
+import { loadToTensor } from '$lib/inference_utils.js';
 import { PROCEDURES } from './neural-worker-procedures.js';
+import { importProtocol } from '$lib/protocols.js';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
 
@@ -113,6 +114,26 @@ swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 	const scores = await classify(taskSettings, img, session);
 
 	return { scores };
+});
+
+swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
+	const { id, name, version } = await importProtocol(contents, {
+		json: isJSON,
+		onLoadingState(phase, detail) {
+			onProgress(detail ? { phase, detail } : { phase });
+		},
+		/** @type {typeof import('$lib/idb.svelte.js').openTransaction} */
+		async openTransaction(tableNames, { mode = 'readwrite' }, actions) {
+			await openDatabase();
+			if (!db) throw new Error('Database not initialized');
+			console.log('loading transaction', tableNames, mode);
+			const tx = db.transaction(tableNames, mode);
+			await actions(tx);
+			tx.commit();
+		}
+	});
+
+	return { id, name, version };
 });
 
 swarp.start(ww);
