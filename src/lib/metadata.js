@@ -1,11 +1,14 @@
 import { type } from 'arktype';
 import { format, isValid } from 'date-fns';
 import { Schemas } from './database.js';
-import { _tablesState, idComparator, tables } from './idb.svelte.js';
 import * as idb from './idb.svelte.js';
+import { _tablesState, idComparator, tables } from './idb.svelte.js';
+import {
+	ensureNamespacedMetadataId,
+	metadataOptionId,
+	namespaceOfMetadataId
+} from './schemas/metadata.js';
 import { avg, mapValues } from './utils.js';
-import { metadataOptionId } from './schemas/metadata.js';
-import { ensureNamespacedMetadataId, namespaceOfMetadataId } from './protocols.js';
 
 /**
  * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'

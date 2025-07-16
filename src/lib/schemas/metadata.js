@@ -193,3 +193,57 @@ export const Metadata = type({
 		}
 	)
 );
+
+/**
+ * Ensures a metadata ID is namespaced to the given protocol ID
+ * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
+ * @template {string} ProtocolID
+ * @param {ProtocolID} protocolId
+ * @param {string} metadataId
+ * @returns {`${ProtocolID}__${string}`}
+ */
+export function namespacedMetadataId(protocolId, metadataId) {
+	metadataId = metadataId.replace(/^.+__/, '');
+	return `${protocolId}__${metadataId}`;
+}
+
+/**
+ * Ensures a metadata ID is namespaced to the given protocol ID. If the metadata ID is not namespaced, it will be prefixed with the protocol ID. If it already is namespaced, it will stay as is.
+ * @param {string} metadataId the metadata ID to ensure is namespaced
+ * @param {string} fallbackProtocolId the protocol ID to use if the metadata ID is not namespaced
+ */
+export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
+	if (isNamespacedToProtocol(fallbackProtocolId, metadataId)) return metadataId;
+	return namespacedMetadataId(fallbackProtocolId, metadataId);
+}
+
+/**
+ * Checks if a given metadata ID is namespaced to a given protocol ID
+ * @template {string} ProtocolID
+ * @param {ProtocolID} protocolId
+ * @param {string} metadataId
+ * @returns {metadataId is `${ProtocolID}__${string}` }
+ */
+export function isNamespacedToProtocol(protocolId, metadataId) {
+	return metadataId.startsWith(`${protocolId}__`);
+}
+
+/**
+ *
+ * @param {string} metadataId
+ * @returns {string}
+ */
+export function removeNamespaceFromMetadataId(metadataId) {
+	return metadataId.replace(/^.+__/, '');
+}
+
+/**
+ *
+ * @param {string} metadataId
+ * @returns
+ */
+export function namespaceOfMetadataId(metadataId) {
+	const parts = metadataId.split('__');
+	if (parts.length < 2) return undefined;
+	return parts.slice(0, -1).join('__');
+}

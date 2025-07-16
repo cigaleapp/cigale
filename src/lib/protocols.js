@@ -1,9 +1,8 @@
 import { type } from 'arktype';
-import YAML from 'yaml';
 import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { cachebust, omit } from './utils.js';
-import { metadataOptionId } from './schemas/metadata.js';
+import { cachebust } from './utils.js';
+import { namespacedMetadataId } from './schemas/metadata.js';
 
 /**
  *
@@ -12,76 +11,6 @@ import { metadataOptionId } from './schemas/metadata.js';
 export function jsonSchemaURL(base) {
 	return `${window.location.origin}${base}/protocol.schema.json`;
 }
-
-/**
- * Ensures a metadata ID is namespaced to the given protocol ID
- * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
- * @template {string} ProtocolID
- * @param {ProtocolID} protocolId
- * @param {string} metadataId
- * @returns {`${ProtocolID}__${string}`}
- */
-export function namespacedMetadataId(protocolId, metadataId) {
-	metadataId = metadataId.replace(/^.+__/, '');
-	return `${protocolId}__${metadataId}`;
-}
-
-/**
- * Ensures a metadata ID is namespaced to the given protocol ID. If the metadata ID is not namespaced, it will be prefixed with the protocol ID. If it already is namespaced, it will stay as is.
- * @param {string} metadataId the metadata ID to ensure is namespaced
- * @param {string} fallbackProtocolId the protocol ID to use if the metadata ID is not namespaced
- */
-export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
-	if (isNamespacedToProtocol(fallbackProtocolId, metadataId)) return metadataId;
-	return namespacedMetadataId(fallbackProtocolId, metadataId);
-}
-
-/**
- * Checks if a given metadata ID is namespaced to a given protocol ID
- * @template {string} ProtocolID
- * @param {ProtocolID} protocolId
- * @param {string} metadataId
- * @returns {metadataId is `${ProtocolID}__${string}` }
- */
-export function isNamespacedToProtocol(protocolId, metadataId) {
-	return metadataId.startsWith(`${protocolId}__`);
-}
-
-/**
- *
- * @param {string} metadataId
- * @returns {string}
- */
-export function removeNamespaceFromMetadataId(metadataId) {
-	return metadataId.replace(/^.+__/, '');
-}
-
-/**
- *
- * @param {string} metadataId
- * @returns
- */
-export function namespaceOfMetadataId(metadataId) {
-	const parts = metadataId.split('__');
-	if (parts.length < 2) return undefined;
-	return parts.slice(0, -1).join('__');
-}
-
-export const ExportedProtocol = Schemas.Protocol.omit('metadata')
-	.in.and({
-		metadata: {
-			'[string]': Schemas.Metadata.omit('id').describe('Métadonnée du protocole')
-		}
-	})
-	.pipe((protocol) => ({
-		...protocol,
-		metadata: Object.fromEntries(
-			Object.entries(protocol.metadata).map(([id, metadata]) => [
-				namespacedMetadataId(protocol.id, id),
-				metadata
-			])
-		)
-	}));
 
 /**
  * Exports a protocol by ID into a JSON file, and triggers a download of that file.
@@ -147,7 +76,7 @@ export async function downloadProtocolTemplate(base, format) {
  * Downloads a protocol as a JSON file
  * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {'yaml'|'json'} format
- * @param {typeof ExportedProtocol.infer} exportedProtocol
+ * @param {typeof import('./schemas/protocols.js').ExportedProtocol.infer} exportedProtocol
  */
 function downloadProtocol(base, format, exportedProtocol) {
 	let jsoned = stringifyWithToplevelOrdering(format, jsonSchemaURL(base), exportedProtocol, [
@@ -222,99 +151,6 @@ export async function promptAndImportProtocol({
 		};
 		input.click();
 	});
-}
-
-export const ProtocolImportPhase = type.enumerated(
-	'parsing',
-	'filtering-builtin-metadata',
-	'input-validation',
-	'write-protocol',
-	'write-metadata',
-	'write-metadata-options',
-	'output-validation'
-);
-
-/**
- *
- * @param {string} contents
- * @param {Object} [options]
- * @param {boolean} [options.json=false] parse as JSON instead of YAML, useful for performance if you're sure the contents represents JSON and not just YAML
- * @param {(state: typeof ProtocolImportPhase.infer, detail?: string) => void} [options.onLoadingState] callback to call when the protocol is being parsed, useful for showing a loading message
- * @param {typeof import('./idb.svelte.js').openTransaction} [options.openTransaction] function to use to open a transaction, defaults to the one from the IDB module
- */
-export async function importProtocol(
-	contents,
-	{ json = false, onLoadingState, openTransaction } = {}
-) {
-	// Use the provided openTransaction or import the default one
-	openTransaction ??= (await import('./idb.svelte.js')).openTransaction;
-
-	onLoadingState?.('parsing');
-	console.time('Parsing protocol');
-	let parsed = json ? JSON.parse(contents) : YAML.parse(contents);
-	console.timeEnd('Parsing protocol');
-
-	console.info(`Importing protocol ${parsed.id}`);
-	console.info(parsed);
-	onLoadingState?.('filtering-builtin-metadata');
-
-	const builtinMetadata = Object.entries(parsed.metadata ?? {})
-		.filter(([, value]) => value === 'builtin')
-		.map(([id]) => id);
-
-	parsed.metadata = Object.fromEntries(
-		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
-	);
-
-	onLoadingState?.('input-validation');
-	console.time('Validating protocol');
-	const protocol = ExportedProtocol.in.assert(parsed);
-	console.timeEnd('Validating protocol');
-
-	await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
-		onLoadingState?.('write-protocol');
-		console.time('Storing Protocol');
-		tx.objectStore('Protocol').put({
-			...protocol,
-			metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
-		});
-		console.timeEnd('Storing Protocol');
-
-		for (const [id, metadata] of Object.entries(protocol.metadata)) {
-			if (typeof metadata === 'string') continue;
-
-			onLoadingState?.('write-metadata', metadata.label || id);
-			console.time(`Storing Metadata ${id}`);
-			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
-			console.timeEnd(`Storing Metadata ${id}`);
-
-			console.time(`Storing Metadata Options for ${id}`);
-			const total = metadata.options?.length ?? 0;
-			let done = 0;
-			for (const option of metadata.options ?? []) {
-				done++;
-				if (done % 1000 === 0) {
-					onLoadingState?.(
-						'write-metadata-options',
-						`${metadata.label || id} > ${option.label || option.key} (${done}/${total})`
-					);
-				}
-				tx.objectStore('MetadataOption').put({
-					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
-					metadataId: namespacedMetadataId(protocol.id, id),
-					...option
-				});
-			}
-			console.timeEnd(`Storing Metadata Options for ${id}`);
-		}
-	});
-
-	onLoadingState?.('output-validation');
-	console.time('Validating protocol after storing');
-	const validated = ExportedProtocol.assert(protocol);
-	console.timeEnd('Validating protocol after storing');
-
-	return validated;
 }
 
 /**

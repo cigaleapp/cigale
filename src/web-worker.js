@@ -3,12 +3,15 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import { openDB } from 'idb';
-import * as Swarp from 'swarpc';
 import { classify, infer, loadModel } from '$lib/inference.js';
 import { loadToTensor } from '$lib/inference_utils.js';
+import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
+import { ExportedProtocol } from '$lib/schemas/protocols.js';
+import { omit, pick } from '$lib/utils.js';
+import { openDB } from 'idb';
+import * as Swarp from 'swarpc';
+import YAML from 'yaml';
 import { PROCEDURES } from './web-worker-procedures.js';
-import { importProtocol } from '$lib/protocols.js';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
 
@@ -117,23 +120,81 @@ swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 });
 
 swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
-	const { id, name, version } = await importProtocol(contents, {
-		json: isJSON,
-		onLoadingState(phase, detail) {
-			onProgress(detail ? { phase, detail } : { phase });
-		},
-		/** @type {typeof import('$lib/idb.svelte.js').openTransaction} */
-		async openTransaction(tableNames, { mode = 'readwrite' }, actions) {
-			await openDatabase();
-			if (!db) throw new Error('Database not initialized');
-			console.log('loading transaction', tableNames, mode);
-			const tx = db.transaction(tableNames, mode);
-			await actions(tx);
-			tx.commit();
-		}
-	});
+	/**
+	 * @param {typeof import('./web-worker-procedures.js').PROCEDURES.importProtocol.progress.infer.phase} phase
+	 * @param {string} [detail]
+	 */
+	const onLoadingState = (phase, detail) => {
+		onProgress(detail ? { phase, detail } : { phase });
+	};
 
-	return { id, name, version };
+	onLoadingState('parsing');
+	console.time('Parsing protocol');
+	let parsed = isJSON ? JSON.parse(contents) : YAML.parse(contents);
+	console.timeEnd('Parsing protocol');
+
+	console.info(`Importing protocol ${parsed.id}`);
+	console.info(parsed);
+	onLoadingState('filtering-builtin-metadata');
+
+	const builtinMetadata = Object.entries(parsed.metadata ?? {})
+		.filter(([, value]) => value === 'builtin')
+		.map(([id]) => id);
+
+	parsed.metadata = Object.fromEntries(
+		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
+	);
+
+	onLoadingState('input-validation');
+	console.time('Validating protocol');
+	const protocol = ExportedProtocol.in.assert(parsed);
+	console.timeEnd('Validating protocol');
+
+	// await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
+	if (!db) throw new Error('Database not initialized');
+	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
+	onLoadingState('write-protocol');
+	console.time('Storing Protocol');
+	tx.objectStore('Protocol').put({
+		...protocol,
+		metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
+	});
+	console.timeEnd('Storing Protocol');
+
+	for (const [id, metadata] of Object.entries(protocol.metadata)) {
+		if (typeof metadata === 'string') continue;
+
+		onLoadingState('write-metadata', metadata.label || id);
+		console.time(`Storing Metadata ${id}`);
+		tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
+		console.timeEnd(`Storing Metadata ${id}`);
+
+		console.time(`Storing Metadata Options for ${id}`);
+		const total = metadata.options?.length ?? 0;
+		let done = 0;
+		for (const option of metadata.options ?? []) {
+			done++;
+			if (done % 1000 === 0) {
+				onLoadingState(
+					'write-metadata-options',
+					`${metadata.label || id} > ${option.label || option.key} (${done}/${total})`
+				);
+			}
+			tx.objectStore('MetadataOption').put({
+				id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
+				metadataId: namespacedMetadataId(protocol.id, id),
+				...option
+			});
+		}
+		console.timeEnd(`Storing Metadata Options for ${id}`);
+	}
+
+	onLoadingState('output-validation');
+	console.time('Validating protocol after storing');
+	const validated = ExportedProtocol.assert(protocol);
+	console.timeEnd('Validating protocol after storing');
+
+	return pick(validated, 'id', 'name', 'version');
 });
 
 swarp.start(ww);

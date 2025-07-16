@@ -6,7 +6,7 @@ import { Schemas } from './database.js';
 import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
-import { ensureNamespacedMetadataId } from './protocols.js';
+import { ensureNamespacedMetadataId } from './schemas/metadata.js';
 import { toasts } from './toasts.svelte.js';
 
 /**

@@ -3,7 +3,6 @@
  */
 
 import { Schemas } from '$lib/database.js';
-import { ProtocolImportPhase } from '$lib/protocols.js';
 import { type } from 'arktype';
 
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
@@ -79,7 +78,15 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			isJSON: 'boolean = false'
 		}),
 		progress: type({
-			phase: ProtocolImportPhase,
+			phase: type.enumerated(
+				'parsing',
+				'filtering-builtin-metadata',
+				'input-validation',
+				'write-protocol',
+				'write-metadata',
+				'write-metadata-options',
+				'output-validation'
+			),
 			'detail?': 'string'
 		}),
 		success: type({

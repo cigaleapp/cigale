@@ -17,7 +17,7 @@ import {
 	observationMetadata,
 	serializeMetadataValue
 } from './metadata';
-import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from './protocols';
+import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from './schemas/metadata';
 import { Analysis } from './schemas/results';
 import { uiState } from './state.svelte';
 import { toasts } from './toasts.svelte';
