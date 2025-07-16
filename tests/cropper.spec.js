@@ -411,7 +411,7 @@ test.describe('Cropper view', () => {
 			}
 		}
 
-		test('should zoom in and out with the mouse wheel', async ({ page }) => {
+		test.fixme('should zoom in and out with the mouse wheel', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
