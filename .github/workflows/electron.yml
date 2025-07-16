@@ -27,7 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build & package app
-        run: npm run prebuild; ELECTRON_BUILD=1 npx electron-forge make
+        run: npm run prebuild;  npx electron-forge make
+        env: { ELECTRON_BUILD: '1' }
       - name: see output
         uses: jaywcjlove/github-action-folder-tree@main
         with:
