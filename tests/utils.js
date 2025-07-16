@@ -1,4 +1,3 @@
-import * as devalue from 'devalue';
 import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';

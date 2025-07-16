@@ -1,8 +1,11 @@
 import { type } from 'arktype';
-import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { cachebust } from './utils.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
+import { cachebust } from './utils.js';
+
+/**
+ * @import { Schemas } from './database.js';
+ */
 
 /**
  *
