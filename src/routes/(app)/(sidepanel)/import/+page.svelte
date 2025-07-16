@@ -1,7 +1,7 @@
 <script module>
 	/**
 	 * Import new files and process  them
-	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarpc
+	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../web-worker-procedures.js').PROCEDURES>} swarpc
 	 * @param {File[]} files
 	 */
 	export async function importMore(swarpc, files) {
@@ -34,7 +34,7 @@
 	}
 
 	/**
-	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarpc
+	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../web-worker-procedures.js').PROCEDURES>} swarpc
 	 * @param {File} file
 	 * @param {string} id
 	 */
@@ -86,7 +86,7 @@
 	}
 
 	/**
-	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarp
+	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../web-worker-procedures.js').PROCEDURES>} swarp
 	 * @param {object} file
 	 * @param {ArrayBuffer} file.bytes
 	 * @param {string} file.filename

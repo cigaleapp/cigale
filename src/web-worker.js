@@ -7,7 +7,7 @@ import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 import { classify, infer, loadModel } from '$lib/inference.js';
 import { loadToTensor } from '$lib/inference_utils.js';
-import { PROCEDURES } from './neural-worker-procedures.js';
+import { PROCEDURES } from './web-worker-procedures.js';
 import { importProtocol } from '$lib/protocols.js';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
