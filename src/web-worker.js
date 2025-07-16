@@ -150,7 +150,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	const protocol = ExportedProtocol.in.assert(parsed);
 	console.timeEnd('Validating protocol');
 
-	// await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
+	await openDatabase();
 	if (!db) throw new Error('Database not initialized');
 	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
 	onLoadingState('write-protocol');
