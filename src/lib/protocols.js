@@ -328,21 +328,24 @@ if (import.meta.vitest) {
 }
 
 /**
- *
- * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
+ * @param {object} param0
+ * @param {number} [param0.version]
+ * @param {import('$lib/database.js').HTTPRequest} param0.source
+ * @param {string} param0.id
+ * @param {import('swarpc').SwarpcClient<typeof import('../web-worker-procedures.js').PROCEDURES>} param0.swarpc
  */
-export async function upgradeProtocol({ version, source, id }) {
+export async function upgradeProtocol({ version, source, id, swarpc }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
 	if (typeof source !== 'string')
 		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
-	const response = await fetch(cachebust(source), {
+	const contents = await fetch(cachebust(source), {
 		headers: {
 			Accept: 'application/json'
 		}
 	}).then((r) => r.text());
 
-	return importProtocol(response);
+	return swarpc.importProtocol({ contents });
 }

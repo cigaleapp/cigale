@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { hasUpgradeAvailable, upgradeProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
@@ -19,6 +20,8 @@
 
 	/**  @type {Props}*/
 	const { id, version, source, compact } = $props();
+
+	const swarpc = $derived(page.data.swarpc);
 
 	/**
 	 * Change value to force re-rendering of the component, and thus re-evaluate the upgrade availability
@@ -60,7 +63,7 @@
 			{:else}
 				<Btn
 					onclick={async () => {
-						await upgradeProtocol({ version, source, id })
+						await upgradeProtocol({ version, source, id, swarpc })
 							.then(({ version }) => {
 								toasts.success(`Protocole mis à jour vers la v${version}`);
 							})
