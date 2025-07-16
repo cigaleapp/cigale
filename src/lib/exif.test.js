@@ -13,7 +13,7 @@ import {
 } from './exif';
 import * as db from './idb.svelte.js';
 import { imageId } from './images';
-import { namespacedMetadataId } from './protocols';
+import { namespacedMetadataId } from './schemas/metadata.js';
 
 /**
  * Read a file from ./tests/fixtures

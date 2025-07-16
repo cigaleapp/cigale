@@ -101,7 +101,7 @@
 			<div class="authors">
 				<IconAuthors />
 				<ul>
-					{#each authors as a (a.email)}
+					{#each authors as a (a.email + a.name)}
 						<li>{@render author(a)}</li>
 					{/each}
 				</ul>

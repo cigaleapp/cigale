@@ -43,7 +43,7 @@ const GOOGLE_DRIVE_FOLDER_URL = folderIdFromUrl(
 );
 
 /**
- * @import { ExportedProtocol } from '../src/lib/protocols.js';
+ * @import { ExportedProtocol } from '../src/lib/schemas/protocols.js';
  * @typedef {typeof ExportedProtocol.infer} Protocol
  * @type {Record<string, {fresh: Protocol, old: Protocol}>}
  */

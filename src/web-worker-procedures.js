@@ -2,7 +2,7 @@
  * @import { ProceduresMap } from 'swarpc';
  */
 
-import { Schemas } from '$lib/database';
+import { Schemas } from '$lib/database.js';
 import { type } from 'arktype';
 
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
@@ -70,6 +70,29 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		progress: type({}),
 		success: type({
 			scores: type.number.array()
+		})
+	},
+	importProtocol: {
+		input: type({
+			contents: 'string',
+			isJSON: 'boolean = false'
+		}),
+		progress: type({
+			phase: type.enumerated(
+				'parsing',
+				'filtering-builtin-metadata',
+				'input-validation',
+				'write-protocol',
+				'write-metadata',
+				'write-metadata-options',
+				'output-validation'
+			),
+			'detail?': 'string'
+		}),
+		success: type({
+			id: 'string',
+			name: 'string',
+			version: 'number | undefined'
 		})
 	}
 });

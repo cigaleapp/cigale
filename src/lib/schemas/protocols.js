@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import Handlebars from 'handlebars';
 import { safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, References, URLString } from './common.js';
+import { Metadata, namespacedMetadataId } from './metadata.js';
 
 /**
  * @import { Analysis } from './results';
@@ -158,3 +159,19 @@ export const Protocol = type({
 		.describe("La structure du fichier .zip d'export pour ce protocole.")
 		.optional()
 });
+
+export const ExportedProtocol = Protocol.omit('metadata')
+	.in.and({
+		metadata: {
+			'[string]': Metadata.omit('id').describe('Métadonnée du protocole')
+		}
+	})
+	.pipe((protocol) => ({
+		...protocol,
+		metadata: Object.fromEntries(
+			Object.entries(protocol.metadata).map(([id, metadata]) => [
+				namespacedMetadataId(protocol.id, id),
+				metadata
+			])
+		)
+	}));

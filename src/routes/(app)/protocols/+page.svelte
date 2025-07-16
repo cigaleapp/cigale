@@ -6,16 +6,15 @@
 	import Modal from '$lib/Modal.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { promptAndImportProtocol } from '$lib/protocols';
-	import {
-		downloadProtocolTemplate,
-		isNamespacedToProtocol,
-		jsonSchemaURL
-	} from '$lib/protocols.js';
+	import { downloadProtocolTemplate, jsonSchemaURL } from '$lib/protocols.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import IconImport from '~icons/ph/download';
 	import IconDownload from '~icons/ph/download-simple';
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
+	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
+
+	const { data } = $props();
 
 	/**
 	 * Protocol we're confirming deletion for
@@ -87,9 +86,8 @@
 
 			tx.objectStore('Protocol').delete(removingProtocol.id);
 
-			const toRemove = removingProtocol.metadata.filter((id) =>
-				// @ts-ignore that shit is pretty dumb, of course removingProtocol is not undefined
-				isNamespacedToProtocol(removingProtocol.id, id)
+			const toRemove = removingProtocol.metadata.filter(
+				(id) => removingProtocol && isNamespacedToProtocol(removingProtocol.id, id)
 			);
 
 			for (const metadata of toRemove) {
@@ -108,7 +106,11 @@
 		<ButtonSecondary
 			loading
 			onclick={async (_, signals) => {
-				await promptAndImportProtocol({ allowMultiple: true, onInput: signals.loadingStarted })
+				await promptAndImportProtocol({
+					allowMultiple: true,
+					onInput: signals.loadingStarted,
+					importProtocol: data.swarpc.importProtocol
+				})
 					.catch((e) => toasts.error(e))
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;

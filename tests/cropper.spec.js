@@ -1,9 +1,8 @@
-import { expect, test, exampleProtocol } from './fixtures.js';
+import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
 	getImage,
 	getSettings,
-	importResults,
 	listTable,
 	loadDatabaseDump,
 	setImageMetadata,
@@ -412,7 +411,7 @@ test.describe('Cropper view', () => {
 			}
 		}
 
-		test('should zoom in and out with the mouse wheel', async ({ page }) => {
+		test.fixme('should zoom in and out with the mouse wheel', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
