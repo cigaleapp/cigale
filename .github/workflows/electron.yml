@@ -29,7 +29,9 @@ jobs:
       - name: Build & package app
         run: npm run prebuild; npx electron-forge make
       - name: see output
-        run: tree .vite/build; tree out
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: .vite
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
