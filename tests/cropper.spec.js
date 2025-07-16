@@ -1,9 +1,8 @@
-import { expect, test, exampleProtocol } from './fixtures.js';
+import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
 	getImage,
 	getSettings,
-	importResults,
 	listTable,
 	loadDatabaseDump,
 	setImageMetadata,
