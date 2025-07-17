@@ -25,15 +25,12 @@ jobs:
         with:
           node-version: '22.17.0'
 
-      # Install flatpak & snapcraft for Linux builds
+      # Install flatpak for Linux builds
       - name: Install flatpak
         if: matrix.os == 'ubuntu'
         run: |
           sudo apt-get update
           sudo apt-get install -y flatpak flatpak-builder
-      - name: Install snapcraft
-        if: matrix.os == 'ubuntu'
-        uses: samuelmeuli/action-snapcraft@v3
 
       - name: Install dependencies
         run: npm ci
