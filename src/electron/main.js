@@ -27,7 +27,9 @@ const createWindow = () => {
 	const mainWindow = new BrowserWindow({
 		icon: isLinux ? path.join(import.meta.dirname, 'icon.png') : undefined,
 		width: 1200,
+		minWidth: 1000,
 		height: 800,
+		minHeight: 500,
 		titleBarStyle: 'hidden',
 		// Make title bar overlay background transparent
 		titleBarOverlay: process.platform !== 'darwin' ? { color: '#0000' } : undefined,
