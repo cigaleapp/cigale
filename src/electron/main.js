@@ -3,6 +3,7 @@ import { updateElectronApp } from 'update-electron-app';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import serve from 'electron-serve';
+import os from 'node:os';
 
 /* global MAIN_WINDOW_VITE_DEV_SERVER_URL */
 
@@ -45,6 +46,27 @@ const createWindow = () => {
 	ipcMain.on('nativeWindow:stopCallingAttention', () => {
 		mainWindow.flashFrame(false);
 	});
+
+	ipcMain.on('nativeWindow:setControlsColor', (_event, /** @type {string} */ color) => {
+		if (process.platform === 'darwin') return;
+		try {
+			mainWindow.setTitleBarOverlay({ symbolColor: color });
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+	ipcMain.on('nativeWindow:setControlsHeight', (_event, /** @type {number} */ height) => {
+		if (process.platform === 'darwin') return;
+		mainWindow.setTitleBarOverlay({ height });
+	});
+
+	ipcMain.handle('osinfo', () => ({
+		name: os.type().replace('Windows_NT', 'Windows').replace('Darwin', 'macOS'),
+		version: os.release(),
+		architecture: os.arch(),
+		archIsUnusual: !usualArchs[os.platform()]?.includes(os.arch())
+	}));
 
 	// and load the index.html of the app.
 	if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

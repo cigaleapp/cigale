@@ -1,5 +1,4 @@
 const { contextBridge, ipcRenderer } = require('electron');
-const os = require('node:os');
 
 /** @type {Partial<Record<NodeJS.Platform, string[]>>} */
 const usualArchs = {
@@ -12,12 +11,7 @@ contextBridge.exposeInMainWorld('versions', {
 	node: () => process.versions.node,
 	chrome: () => process.versions.chrome,
 	electron: () => process.versions.electron,
-	os: () => ({
-		name: os.type().replace('Windows_NT', 'Windows').replace('Darwin', 'macOS'),
-		version: os.release(),
-		architecture: os.arch(),
-		archIsUnusual: !usualArchs[os.platform()]?.includes(os.arch())
-	})
+	os: async () => ipcRenderer.invoke('osinfo')
 });
 
 contextBridge.exposeInMainWorld('nativeWindow', {
