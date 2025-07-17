@@ -11,7 +11,7 @@
 	import IconNoInference from '~icons/ph/lightning-slash';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
-	import Reglages from './Reglages.svelte';
+	import Settings from './Settings.svelte';
 	import { clamp } from '$lib/utils';
 
 	/**
@@ -118,7 +118,7 @@
 		</div>
 
 		<div class="settings">
-			<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
+			<Settings {openKeyboardShortcuts} --navbar-height="{height}px" />
 		</div>
 	</nav>
 

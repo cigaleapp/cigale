@@ -1,8 +1,9 @@
 /// <reference types="vitest" />
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vitest/config';
+import { execSync } from 'node:child_process';
 import icons from 'unplugin-icons/vite';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	test: {
@@ -22,7 +23,8 @@ export default defineConfig({
 		}
 	},
 	define: {
-		'import.meta.vitest': 'undefined'
+		'import.meta.vitest': 'undefined',
+		'import.meta.env.buildCommit': JSON.stringify(execSync('git rev-parse HEAD').toString().trim())
 	},
 	resolve: process.env.VITEST
 		? {

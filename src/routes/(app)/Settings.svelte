@@ -104,7 +104,11 @@
 			</ButtonSecondary>
 		</div>
 		<footer>
-			C.i.g.a.l.e vDEV · <a
+			CIGALE ver. <a href="https://github.com/cigaleapp/cigale/tree/{import.meta.env.buildCommit}">
+				{import.meta.env.buildCommit.slice(0, 7)}
+			</a>
+			·
+			<a
 				onclick={() => {
 					open = false;
 				}}
