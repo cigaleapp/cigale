@@ -64,6 +64,13 @@ const createWindow = () => {
 		mainWindow.setTitleBarOverlay({ height });
 	});
 
+	/** @type {Partial<Record<NodeJS.Platform, string[]>>} */
+	const usualArchs = {
+		win32: ['x64'],
+		darwin: ['arm64', 'x64'],
+		linux: ['x64']
+	};
+
 	ipcMain.handle('osinfo', () => ({
 		name: os.type().replace('Windows_NT', 'Windows').replace('Darwin', 'macOS'),
 		version: os.release(),

@@ -1,12 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-/** @type {Partial<Record<NodeJS.Platform, string[]>>} */
-const usualArchs = {
-	win32: ['x64'],
-	darwin: ['arm64', 'x64'],
-	linux: ['x64']
-};
-
 contextBridge.exposeInMainWorld('versions', {
 	node: () => process.versions.node,
 	chrome: () => process.versions.chrome,
