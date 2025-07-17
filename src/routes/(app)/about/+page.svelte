@@ -6,7 +6,7 @@
 	seo({ title: 'À propos' });
 
 	/**
-	 * @type {undefined | { node: string; chrome: string; electron: string }}
+	 * @type {undefined | { node: string; chrome: string; electron: string; os: { name: string; version: string; architecture: string; archIsUnusual: boolean } }}
 	 */
 	let electronVersions = $state();
 
@@ -15,7 +15,8 @@
 			electronVersions = {
 				node: window.versions.node(),
 				chrome: window.versions.chrome(),
-				electron: window.versions.electron()
+				electron: window.versions.electron(),
+				os: window.versions.os()
 			};
 		}
 	});
@@ -110,6 +111,11 @@
 				<dd><code>{electronVersions.chrome}</code></dd>
 				<dt>Electron</dt>
 				<dd><code>{electronVersions.electron}</code></dd>
+				<dt>{electronVersions.os.name}</dt>
+				<dd><code>{electronVersions.os.version}</code></dd>
+				{#if electronVersions.os.archIsUnusual}
+					<dd><code>{electronVersions.os.architecture}</code></dd>
+				{/if}
 			</dl>
 		</dd>
 	{/if}
