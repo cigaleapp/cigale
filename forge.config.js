@@ -7,6 +7,7 @@ import { MakerZIP } from '@electron-forge/maker-zip';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { PublisherGithub } from '@electron-forge/publisher-github';
+import { PublisherSnapcraft } from '@electron-forge/publisher-snapcraft';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 const opts = /** @type {const} */ ({ options: { icon: './static/icon.png' } });
@@ -36,6 +37,9 @@ const config = {
 			prerelease: true,
 			draft: true,
 			repository: { owner: 'cigaleapp', name: 'cigale' }
+		}),
+		new PublisherSnapcraft({
+			release: '[latest/edge, insider/stable]'
 		})
 	],
 	plugins: [
