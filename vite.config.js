@@ -41,5 +41,5 @@ export default defineConfig({
 		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
 	},
 	assetsInclude: ['**/*.wasm'],
- build: { outDir: process.env.ELECTRON_BUILD ? '.vite/build' : undefined }
+	build: { outDir: process.env.ELECTRON_BUILD ? '.vite/build' : undefined }
 });
