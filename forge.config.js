@@ -1,7 +1,6 @@
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerFlatpak } from '@electron-forge/maker-flatpak';
 import { MakerRpm } from '@electron-forge/maker-rpm';
-import { MakerSnap } from '@electron-forge/maker-snap';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
@@ -28,8 +27,7 @@ const config = {
 		new MakerZIP({}, ['darwin']),
 		new MakerRpm(opts),
 		new MakerDeb(opts),
-		new MakerFlatpak(opts),
-		new MakerSnap(opts)
+		new MakerFlatpak(opts)
 	],
 	publishers: [
 		new PublisherGithub({
