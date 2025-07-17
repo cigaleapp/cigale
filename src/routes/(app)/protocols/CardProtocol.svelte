@@ -331,7 +331,6 @@
 	}
 
 	.metadata li code,
-	.taxonomy,
 	.name,
 	.inference .title {
 		display: flex;
