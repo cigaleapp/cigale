@@ -199,6 +199,7 @@
 	const images = $derived(
 		toAreaObservationProps(fileIds, [], [], {
 			isLoaded: (fileId) =>
+				!uiState.cropInferenceAvailable ||
 				Boolean(
 					typeof fileId === 'string' &&
 						uiState.currentProtocol &&
@@ -271,11 +272,13 @@
 </script>
 
 {#snippet modelsource()}
-	{@const { model } = uiState.cropModels[uiState.selectedCropModel]}
-	{@const url = new URL(typeof model === 'string' ? model : model?.url)}
-	<a href={url.toString()} target="_blank">
-		<code>{url.pathname.split('/').at(-1)}</code>
-	</a>
+	{#if uiState.cropInferenceAvailable}
+		{@const { model } = uiState.cropModels[uiState.selectedCropModel]}
+		{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+		<a href={url.toString()} target="_blank">
+			<code>{url.pathname.split('/').at(-1)}</code>
+		</a>
+	{/if}
 {/snippet}
 
 {#await loadCropperModel()}
