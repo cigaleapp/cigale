@@ -31,9 +31,11 @@
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
 			isLoaded: (item) =>
-				typeof item === 'string'
-					? false
-					: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
+				uiState.classificationInferenceAvailable
+					? typeof item === 'string'
+						? false
+						: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
+					: true
 		})
 	);
 
@@ -237,11 +239,13 @@
 </script>
 
 {#snippet modelsource()}
-	{@const { model } = uiState.classificationModels[uiState.selectedClassificationModel]}
-	{@const url = new URL(typeof model === 'string' ? model : model?.url)}
-	<a href={url.toString()} target="_blank">
-		<code>{url.pathname.split('/').at(-1)}</code>
-	</a>
+	{#if uiState.classificationInferenceAvailable}
+		{@const { model } = uiState.classificationModels[uiState.selectedClassificationModel]}
+		{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+		<a href={url.toString()} target="_blank">
+			<code>{url.pathname.split('/').at(-1)}</code>
+		</a>
+	{/if}
 {/snippet}
 
 {#if !classifmodelLoaded}
