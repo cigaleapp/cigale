@@ -1,11 +1,15 @@
+import { MakerDeb } from '@electron-forge/maker-deb';
+import { MakerFlatpak } from '@electron-forge/maker-flatpak';
+import { MakerRpm } from '@electron-forge/maker-rpm';
+import { MakerSnap } from '@electron-forge/maker-snap';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
-import { MakerDeb } from '@electron-forge/maker-deb';
-import { MakerRpm } from '@electron-forge/maker-rpm';
+import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { PublisherGithub } from '@electron-forge/publisher-github';
-import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+
+const opts = /** @type {const} */ ({ options: { icon: './static/icon.png' } });
 
 /**
  * @type {import("@electron-forge/shared-types").ForgeConfig}
@@ -22,12 +26,10 @@ const config = {
 			setupIcon: './static/setup-icon.ico'
 		}),
 		new MakerZIP({}, ['darwin']),
-		new MakerRpm({
-			options: { icon: './static/icon.png' }
-		}),
-		new MakerDeb({
-			options: { icon: './static/icon.png' }
-		})
+		new MakerRpm(opts),
+		new MakerDeb(opts),
+		new MakerFlatpak(opts),
+		new MakerSnap(opts)
 	],
 	publishers: [
 		new PublisherGithub({
