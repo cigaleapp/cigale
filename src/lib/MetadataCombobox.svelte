@@ -7,6 +7,11 @@
 	import Logo from './Logo.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { getSettings } from './settings.svelte';
+	import { tables } from './idb.svelte.js';
+	import * as idb from './idb.svelte.js';
+	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
+	import { uiState } from './state.svelte';
+
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 */
@@ -81,6 +86,83 @@
 
 	/** @type {undefined | import('./database').MetadataEnumVariant} */
 	let highlightedOption = $state();
+
+	/**
+	 * @type {Record<string, Record<string, { value: string; metadata: string; depth: number }>>}
+	 */
+	let cascadeLabelsCache = $state({});
+	$effect(() => {
+		// Halve cache when its size reaches 4000
+		if (Object.keys(cascadeLabelsCache).length > 4000) {
+			console.log('Halving cascadeLabels cache');
+			cascadeLabelsCache = Object.fromEntries(Object.entries(cascadeLabelsCache).slice(2000));
+		}
+	});
+
+	async function cascadeLabels() {
+		const protocolId = uiState.currentProtocol?.id;
+		if (!protocolId) return {};
+		if (!highlightedOption) return {};
+
+		if (highlightedOption.key in cascadeLabelsCache) {
+			return cascadeLabelsCache[highlightedOption.key];
+		}
+
+		/**
+		 * Subfunction to recursively collect cascades.
+		 * Base case: at some point all options will have no cascades
+		 * @param {string} protocolId
+		 * @param {Record<string, string>} cascade - The cascade we're collecting from
+		 * @param {Set<string>} seen id of metadata already seen, to avoid cycles
+		 * @param {number} [depth=0] - Current depth in the cascade
+		 */
+		async function collect(protocolId, cascade, seen, depth = 0) {
+			/**
+			 * @type {typeof cascadeLabelsCache[string]} labels
+			 */
+			const labels = {};
+			for (const [metadataId, value] of Object.entries(cascade ?? {})) {
+				if (seen.has(metadataId)) continue; // Avoid cycles
+				seen.add(metadataId); // Mark this metadataId as seen
+				const metadata = await tables.Metadata.get(namespacedMetadataId(protocolId, metadataId));
+				if (!metadata) continue;
+
+				// If the cascaded metadata value is from an enum, use label instead of the key,
+				// and see if there are nested cascades further down
+				if (metadata.type === 'enum') {
+					const option = await idb.get(
+						'MetadataOption',
+						metadataOptionId(namespacedMetadataId(protocolId, metadata.id), value)
+					);
+					if (!option) continue;
+					labels[metadata.id] = { value: option.label, metadata: metadata.label, depth };
+
+					if (Object.keys(option.cascade ?? {}).length > 0) {
+						await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then((nested) => {
+							Object.assign(labels, nested);
+						});
+					}
+				} else {
+					// For other types, just show the value directly
+					labels[metadata.id] = {
+						value: value,
+						metadata: metadata.label,
+						depth
+					};
+				}
+			}
+
+			return labels;
+		}
+
+		cascadeLabelsCache[highlightedOption.key] = await collect(
+			protocolId,
+			highlightedOption.cascade ?? {},
+			new Set()
+		);
+
+		return cascadeLabelsCache[highlightedOption.key];
+	}
 </script>
 
 <Combobox.Root {value} bind:open {...mergedRootProps} {items}>
@@ -154,6 +236,32 @@
 							</div>
 						</a>
 					{/if}
+					<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
+					{#await cascadeLabels() then labels}
+						{@const maxdepth = Math.max(...Object.values(labels).map((l) => l.depth))}
+						<table>
+							<tbody>
+								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, depth }] (metadataId)}
+									{@const revdepth = maxdepth - depth}
+									<tr>
+										<td>
+											{#if revdepth > 0}
+												<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+												{@html '&nbsp;'.repeat((revdepth - 1) * 3) + '└─'}
+											{/if}
+											{metadata}
+										</td>
+										<td>{value}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+						{#if Object.keys(labels).length > 0}
+							<p><em>Métadonées mise à jour à la sélection de cette option</em></p>
+						{/if}
+					{:catch error}
+						<p class="error">Erreur lors de la récupération des étiquettes en cascade: {error}</p>
+					{/await}
 					{#if !highlightedOption?.description && !highlightedOption?.learnMore && !highlightedOption?.image}
 						<section class="empty">
 							<Logo variant="empty" />
