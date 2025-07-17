@@ -7,7 +7,7 @@ const config = {
 			name: process.env.BUILD_COMMIT || 'dev'
 		},
 		adapter: adapter({
-			pages: process.env.ELECTRON_BUILD ? '.vite/build' : 'public',
+			pages: process.env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',
 			strict: false,
 			fallback: '404.html'
 		}),

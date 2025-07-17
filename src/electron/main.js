@@ -6,7 +6,7 @@ import serve from 'electron-serve';
 
 /* global MAIN_WINDOW_VITE_DEV_SERVER_URL */
 
-const builtFileserver = serve({ directory: import.meta.dirname });
+const builtFileserver = serve({ directory: path.join(import.meta.dirname, 'sveltekit') });
 
 try {
 	updateElectronApp();
