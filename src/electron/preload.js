@@ -16,7 +16,7 @@ contextBridge.exposeInMainWorld('versions', {
 		name: os.type().replace('Windows_NT', 'Windows').replace('Darwin', 'macOS'),
 		version: os.release(),
 		architecture: os.arch(),
-		archIsUnusual: usualArchs[os.platform()]?.includes(os.arch()) ?? true
+		archIsUnusual: !usualArchs[os.platform()]?.includes(os.arch())
 	})
 });
 
