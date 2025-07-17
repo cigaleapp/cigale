@@ -15,11 +15,12 @@ contextBridge.exposeInMainWorld('versions', {
 });
 
 contextBridge.exposeInMainWorld('nativeWindow', {
-	/**
-	 * @param {number} value
-	 * @returns
-	 */
+	/** @param {number} value */
 	setProgress: (value) => ipcRenderer.send('progressBar:set', value === 1 ? 0 : value),
 	startCallingAttention: () => ipcRenderer.send('nativeWindow:startCallingAttention'),
-	stopCallingAttention: () => ipcRenderer.send('nativeWindow:stopCallingAttention')
+	stopCallingAttention: () => ipcRenderer.send('nativeWindow:stopCallingAttention'),
+	/** @param {string} color */
+	setControlsColor: (color) => ipcRenderer.send('nativeWindow:setControlsColor', color),
+	/** @param {number} height */
+	setControlsHeight: (height) => ipcRenderer.send('nativeWindow:setControlsHeight', height)
 });

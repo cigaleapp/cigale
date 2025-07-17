@@ -6,13 +6,13 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { clamp } from '$lib/utils';
 	import IconNext from '~icons/ph/caret-right';
 	import IconDownload from '~icons/ph/download-simple';
 	import IconNoInference from '~icons/ph/lightning-slash';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
-	import { clamp } from '$lib/utils';
 
 	/**
 	 * @typedef Props
@@ -31,10 +31,26 @@
 	/** @type {number|undefined} */
 	let height = $state();
 
+	/** @type {number|undefined} */
+	let navHeight = $state();
+
 	let openExportModal = $state();
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
+
+	/* eslint-disable svelte/prefer-writable-derived */
+	// The window object is not reactive
+	let isNativeWindow = $state(false);
+	$effect(() => {
+		isNativeWindow = 'nativeWindow' in window;
+	});
+	/* eslint-enable svelte/prefer-writable-derived */
+
+	$effect(() => {
+		if (!navHeight) return;
+		window.nativeWindow?.setControlsHeight(navHeight);
+	});
 
 	$effect(() => {
 		window.nativeWindow?.setProgress(clamp(progress, 0, 1));
@@ -51,8 +67,8 @@
 	<DeploymentDetails bind:open={openPreviewPRDetails} />
 {/if}
 
-<header bind:clientHeight={height}>
-	<nav>
+<header bind:clientHeight={height} class:native-window={isNativeWindow}>
+	<nav bind:clientHeight={navHeight}>
 		<div class="logo">
 			<a href="#/">
 				<Logo --fill="var(--bg-primary)" />
@@ -111,13 +127,13 @@
 				)}
 			</div>
 			<IconNext></IconNext>
-			<ButtonSecondary onclick={openExportModal}>
+			<ButtonSecondary tight onclick={openExportModal}>
 				<IconDownload />
 				Résultats
 			</ButtonSecondary>
 		</div>
 
-		<div class="settings">
+		<div class="settings" class:native={isNativeWindow}>
 			<Settings {openKeyboardShortcuts} --navbar-height="{height}px" />
 		</div>
 	</nav>
@@ -154,6 +170,10 @@
 		position: relative;
 	}
 
+	header.native-window nav {
+		height: 50px;
+	}
+
 	nav .with-inference-indicator {
 		display: flex;
 		align-items: center;
@@ -171,9 +191,7 @@
 	nav a {
 		background: none;
 		border: none;
-		padding: 7.5px;
-		padding-left: 15px;
-		padding-right: 15px;
+		padding: 7.5px 15px;
 		text-decoration: none;
 		color: var(--fg-neutral);
 	}
@@ -181,11 +199,15 @@
 	.steps {
 		display: flex;
 		align-items: center;
-		justify-content: center;
 		justify-content: space-between;
 		width: 100%;
 		margin: 0 2rem;
 		max-width: 800px;
+	}
+
+	header.native-window .steps {
+		justify-content: center;
+		gap: 1rem;
 	}
 
 	nav a[aria-disabled='true'] {
@@ -206,6 +228,10 @@
 		gap: 0.5em;
 	}
 
+	header.native-window .logo {
+		--size: 25px;
+	}
+
 	.logo a:first-child {
 		display: flex;
 		align-items: center;
@@ -214,6 +240,10 @@
 
 	.settings {
 		--hover-bg: var(--bg-neutral);
+	}
+
+	header.native-window .settings {
+		margin-right: 130px;
 	}
 
 	.pr-number {

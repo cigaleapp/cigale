@@ -1,14 +1,15 @@
 <script>
+	import { goto } from '$app/navigation';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import Switch from '$lib/Switch.svelte';
-	import Gears from '~icons/ph/gear-light';
-	import Sun from '~icons/ph/sun-light';
-	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
-	import Moon from '~icons/ph/moon-light';
-	import Cross from '~icons/ph/x-circle-light';
-	import { goto } from '$app/navigation';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
+	import Switch from '$lib/Switch.svelte';
+	import { watch } from 'runed';
+	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
+	import Gears from '~icons/ph/gear-light';
+	import Moon from '~icons/ph/moon-light';
+	import Sun from '~icons/ph/sun-light';
+	import Cross from '~icons/ph/x-circle-light';
 
 	/**
 	 * @type {{openKeyboardShortcuts?: (() => void) | undefined}}
@@ -34,6 +35,21 @@
 			systemIsLight = !e.matches;
 		});
 	});
+
+	const effectiveTheme = $derived.by(() => {
+		const theme = getSettings().theme;
+		if (theme === 'auto') return systemIsLight ? 'light' : 'dark';
+		return theme;
+	});
+
+	watch(
+		() => effectiveTheme,
+		(theme) => {
+			window.nativeWindow?.setControlsColor(
+				getComputedStyle(document.documentElement).getPropertyValue(`--${theme}__fg-primary`)
+			);
+		}
+	);
 </script>
 
 <ButtonIcon

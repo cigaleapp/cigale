@@ -7,6 +7,12 @@
 	$effect(() => {
 		document.querySelector('#loading')?.remove();
 	});
+
+	$effect(() => {
+		window.nativeWindow?.setControlsColor(
+			getComputedStyle(document.documentElement).getPropertyValue('--fg-primary')
+		);
+	});
 </script>
 
 {@render children?.()}

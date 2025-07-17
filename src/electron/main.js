@@ -29,7 +29,8 @@ const createWindow = () => {
 		width: 1200,
 		height: 800,
 		titleBarStyle: 'hidden',
-		...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+		// Make title bar overlay background transparent
+		titleBarOverlay: process.platform !== 'darwin' ? { color: '#0000' } : undefined,
 		webPreferences: {
 			preload: path.join(import.meta.dirname, 'preload.js')
 		}
