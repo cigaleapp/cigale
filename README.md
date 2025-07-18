@@ -49,3 +49,16 @@ Les appartenances aux clades taxonomiques supérieures (genre, famille, ordre, c
 Enfin, il est possible d'exporter les données en .zip, avec les photos recadrées, les métadonnées (annotations) associées et (optionnellement) les photos originales.
 
 Les métadonnées sont exportées au format CSV pour utilisation facile dans un tableur, et au format JSON pour une utilisation programmatique dans un script Python par exemple.
+
+<p align="center">
+  <a href="https://www.gbif.org/species/165599324">🐞</a>
+  <a href="https://www.gbif.org/species/4342">🐜</a>
+  <a href="https://www.gbif.org/species/797">🦋</a>
+  <a href="https://www.gbif.org/species/1718308">🦗</a>
+  <a href="https://www.gbif.org/species/1341976">🐝</a>
+  <a href="https://www.gbif.org/species/1496">🕷️</a>
+  <a href="https://www.gbif.org/species/797">🐛</a>
+  <a href="https://www.gbif.org/species/1524843">🪰</a>
+  <a href="https://www.gbif.org/species/1043502">🪲</a>
+</p>
+
