@@ -35,6 +35,9 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: public # The folder the action should deploy.
-          force: yes
-          clean: yes
-          clean-exclude: _pullrequests/
+          force: false
+          clean-exclude: |
+            _pullrequests
+            _playwright
+            _vitest
+            _coverage
