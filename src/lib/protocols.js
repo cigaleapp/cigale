@@ -341,11 +341,17 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 	if (typeof source !== 'string')
 		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
+	const { tables } = await import('./idb.svelte.js');
+
 	const contents = await fetch(cachebust(source), {
 		headers: {
 			Accept: 'application/json'
 		}
 	}).then((r) => r.text());
 
-	return swarpc.importProtocol({ contents });
+	const result = await swarpc.importProtocol({ contents });
+	tables.Protocol.refresh();
+	tables.Metadata.refresh();
+
+	return result;
 }
