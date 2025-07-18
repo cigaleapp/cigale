@@ -94,5 +94,16 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			name: 'string',
 			version: 'number | undefined'
 		})
+	},
+	generateResultsZip: {
+		input: type({
+			protocolId: 'string',
+			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
+			cropPadding: 'number = 0',
+			jsonSchemaURL: 'string.url.parse'
+		}),
+		progress: type('number'),
+		// TODO(swarpc): allow transfering objects, see https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects#transferring_objects_between_threads
+		success: type('ArrayBuffer')
 	}
 });
