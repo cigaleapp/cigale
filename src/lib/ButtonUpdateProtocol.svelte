@@ -7,6 +7,7 @@
 	import IconArrow from '~icons/ph/arrow-right';
 	import IconCheckAgain from '~icons/ph/arrows-counter-clockwise';
 	import IconUpToDate from '~icons/ph/check-circle';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import IconCannotCheckForUpdates from '~icons/ph/warning-circle';
 	import ButtonIcon from './ButtonIcon.svelte';
 
@@ -27,6 +28,8 @@
 	 * Change value to force re-rendering of the component, and thus re-evaluate the upgrade availability
 	 */
 	let checkagain = $state(0);
+
+	let upgrading = $state(false);
 
 	const Btn = $derived(compact ? ButtonIcon : ButtonSecondary);
 </script>
@@ -63,22 +66,34 @@
 			{:else}
 				<Btn
 					onclick={async () => {
+						upgrading = true;
 						await upgradeProtocol({ version, source, id, swarpc })
 							.then(({ version }) => {
 								toasts.success(`Protocole mis à jour vers la v${version}`);
 							})
 							.catch((e) => {
 								toasts.error(`Impossible de mettre à jour le protocole: ${e}`);
+							})
+							.finally(() => {
+								upgrading = false;
 							});
 					}}
 					help={`Une mise à jour vers la v${newVersion} est disponible`}
 				>
-					<span class="version-check update-available">
-						<IconUpgrade />
+					<span class="version-check" class:update-available={!upgrading}>
+						{#if upgrading}
+							<LoadingSpinner />
+						{:else}
+							<IconUpgrade />
+						{/if}
 						{#if !compact}
-							v{version}
-							<IconArrow />
-							v{newVersion}
+							{#if upgrading}
+								Mise à jour…
+							{:else}
+								v{version}
+								<IconArrow />
+								v{newVersion}
+							{/if}
 						{/if}
 					</span>
 				</Btn>
