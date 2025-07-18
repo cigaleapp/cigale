@@ -114,7 +114,7 @@
 		"prettier-plugin-svelte": "^3.4.0",
 		"rss-parser": "^3.13.0",
 		"svelte": "^5.36.8",
-		"svelte-check": "^4.2.2",
+		"svelte-check": "^4.3.0",
 		"sveltekit-search-params": "^3.0.0",
 		"turndown": "^7.2.0",
 		"typescript": "^5.8.3",
