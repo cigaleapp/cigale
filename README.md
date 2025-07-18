@@ -61,4 +61,3 @@ Les métadonnées sont exportées au format CSV pour utilisation facile dans un 
   <a href="https://www.gbif.org/species/1524843">🪰</a>
   <a href="https://www.gbif.org/species/1043502">🪲</a>
 </p>
-
