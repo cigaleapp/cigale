@@ -103,7 +103,7 @@
 		"jpeg-js": "^0.4.4",
 		"jsdom": "^26.1.0",
 		"json-schema-doc-ts": "^2.0.0",
-		"knip": "^5.61.3",
+		"knip": "^5.62.0",
 		"lint-staged": "^16.1.2",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.6.0",
