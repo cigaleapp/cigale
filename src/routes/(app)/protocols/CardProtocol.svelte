@@ -7,6 +7,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import { metadataDefinitionComparator } from '$lib/metadata';
 	import { exportProtocol } from '$lib/protocols';
+	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import IconArrow from '~icons/ph/arrow-right';
@@ -246,6 +247,7 @@
 			Exporter
 		</ButtonSecondary>
 		<ButtonSecondary
+			disabled={id === uiState.currentProtocolId}
 			onclick={() => {
 				ondelete();
 			}}
