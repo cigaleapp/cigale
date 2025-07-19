@@ -276,7 +276,7 @@ if (import.meta.vitest) {
 
 		const [img1, img2, img3] = _tablesState.Image;
 
-		expect(imagesByImageFile(['1', '2'])).toEqual(
+		expect(imagesByImageFile(['1', '2'], _tablesState.Image)).toEqual(
 			new Map([
 				['1', [img1, img2]],
 				['2', [img3]]
