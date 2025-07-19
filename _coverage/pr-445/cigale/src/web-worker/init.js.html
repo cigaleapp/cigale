@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for cigale/src/lib/mutations.js</title>
+    <title>Code coverage report for cigale/src/web-worker/init.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">cigale/src/lib</a> mutations.js</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">cigale/src/web-worker</a> init.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
@@ -93,7 +93,30 @@
 <a name='L28'></a><a href='#L28'>28</a>
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -104,18 +127,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -123,36 +134,43 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >// https://github.com/PaulMaly/svelte-actions-mutation/blob/master/src/index.js<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >/// &lt;reference types="@sveltejs/kit" /&gt;<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >/// &lt;reference no-default-lib="true"/&gt;</span>
+<span class="cstat-no" title="statement not covered" >/// &lt;reference lib="esnext" /&gt;</span>
+<span class="cstat-no" title="statement not covered" >/// &lt;reference lib="webworker" /&gt;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >import { openDB } from 'idb';</span>
+<span class="cstat-no" title="statement not covered" >import * as Swarp from 'swarpc';</span>
+<span class="cstat-no" title="statement not covered" >import { PROCEDURES } from './procedures.js';</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const ww = /** @type {Worker} */ (/** @type {unknown} */ self);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
-<span class="cstat-no" title="statement not covered" > *</span>
-<span class="cstat-no" title="statement not covered" > * @param {HTMLElement} node</span>
-<span class="cstat-no" title="statement not covered" > * @param {MutationObserverInit &amp; Partial&lt;Record&lt;`on${MutationRecordType}`, (m: MutationRecord) =&gt; void&gt;&gt;} options</span>
-<span class="cstat-no" title="statement not covered" > * @returns</span>
+<span class="cstat-no" title="statement not covered" > * @type {import('idb').IDBPDatabase&lt;import('../lib/idb.svelte.js').IDBDatabaseType&gt; | undefined}</span>
 <span class="cstat-no" title="statement not covered" > */</span>
-<span class="cstat-no" title="statement not covered" >export function mutationobserver(node, options) {</span>
-<span class="cstat-no" title="statement not covered" >	/** @type {MutationObserver|null}  */</span>
-<span class="cstat-no" title="statement not covered" >	let observer = null;</span>
+<span class="cstat-no" title="statement not covered" >let db;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	function update(options = {}) {</span>
-<span class="cstat-no" title="statement not covered" >		destroy();</span>
-<span class="cstat-no" title="statement not covered" >		observer = new MutationObserver((mutations) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >			// @ts-ignore</span>
-<span class="cstat-no" title="statement not covered" >			mutations.forEach((m) =&gt; options[`on${m.type}`]?.(m));</span>
-<span class="cstat-no" title="statement not covered" >		});</span>
-<span class="cstat-no" title="statement not covered" >		observer.observe(node, options);</span>
+<span class="cstat-no" title="statement not covered" >/** @type {undefined | { name: string , revision: number }} */</span>
+<span class="cstat-no" title="statement not covered" >let databaseParams;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export async function openDatabase() {</span>
+<span class="cstat-no" title="statement not covered" >	if (!databaseParams) {</span>
+<span class="cstat-no" title="statement not covered" >		throw new Error('Database parameters not set, call swarp.init() first');</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	function destroy() {</span>
-<span class="cstat-no" title="statement not covered" >		observer &amp;&amp; observer.disconnect();</span>
-<span class="cstat-no" title="statement not covered" >		observer = null;</span>
+<span class="cstat-no" title="statement not covered" >	if (db) return db;</span>
+<span class="cstat-no" title="statement not covered" >	db = await openDB(databaseParams.name, databaseParams.revision);</span>
+<span class="cstat-no" title="statement not covered" >	if (!db) {</span>
+<span class="cstat-no" title="statement not covered" >		throw new Error(`Failed to open database ${databaseParams.name}`);</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	update(options);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	return { update, destroy };</span>
+<span class="cstat-no" title="statement not covered" >	return db;</span>
 <span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const swarp = Swarp.Server(PROCEDURES, { worker: ww });</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >swarp.init(async ({ databaseName, databaseRevision }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	databaseParams = { name: databaseName, revision: databaseRevision };</span>
+<span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
