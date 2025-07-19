@@ -1,9 +1,9 @@
+import { Schemas } from '$lib/database';
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
 import { cropImage } from '$lib/images';
 import {
 	addValueLabels,
-	isType,
 	METADATA_ZERO_VALUE,
 	metadataPrettyKey,
 	metadataPrettyValue,
@@ -17,10 +17,8 @@ import {
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { Analysis } from '$lib/schemas/results';
 import { compareBy } from '$lib/utils';
-import { base } from '$service-worker';
 import { strToU8, zip } from 'fflate';
 import { openDatabase, swarp } from './init';
-import { Schemas } from '$lib/database';
 
 swarp.generateResultsZip(async ({ include, protocolId, jsonSchemaURL, cropPadding }, notify) => {
 	const db = await openDatabase();
@@ -181,7 +179,7 @@ swarp.generateResultsZip(async ({ include, protocolId, jsonSchemaURL, cropPaddin
 				[filepaths.metadata.json]: strToU8(
 					stringifyWithToplevelOrdering(
 						'json',
-						`${window.location.origin}${base}/results.schema.json`,
+						jsonSchemaURL.toString(),
 						Analysis.assert({
 							observations: exportedObservations,
 							protocol: {
