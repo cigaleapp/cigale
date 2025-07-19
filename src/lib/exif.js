@@ -4,7 +4,6 @@ import * as exifParser from 'exif-parser';
 import piexif from 'piexifjs';
 import { Schemas } from './database.js';
 import { EXIF_GPS_FIELDS } from './exiffields.js';
-import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
 import { ensureNamespacedMetadataId } from './schemas/metadata.js';
 import { toasts } from './toasts.svelte.js';
@@ -22,6 +21,7 @@ import { toasts } from './toasts.svelte.js';
  * @param {{ type: string; name: string }} file
  */
 export async function processExifData(protocolId, imageFileId, imageBytes, file) {
+	const db = await import('./idb.svelte.js');
 	const protocol = await db.tables.Protocol.get(protocolId);
 	if (!protocol) {
 		throw new Error(`Protocole ${protocolId} introuvable`);
