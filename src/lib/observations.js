@@ -1,5 +1,3 @@
-import * as db from './idb.svelte';
-import { tables } from './idb.svelte';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
 import { uiState } from './state.svelte';
@@ -9,6 +7,9 @@ import { uiState } from './state.svelte';
  * @returns {Promise<string>} the ID of the new observation
  */
 export async function mergeToObservation(parts) {
+	const db = await import('./idb.svelte.js');
+	const { tables } = await import('./idb.svelte.js');
+
 	const observations = parts
 		.map((part) => tables.Observation.state.find((o) => o.id === part))
 		.filter((o) => o !== undefined);
@@ -56,6 +57,8 @@ export async function deleteObservation(
 	id,
 	{ recursive = false, notFoundOk = true, tx = undefined } = {}
 ) {
+	const db = await import('./idb.svelte.js');
+
 	await db.openTransaction(
 		['Observation', 'Image', 'ImageFile', 'ImagePreviewFile'],
 		{ tx },
@@ -100,6 +103,8 @@ function defaultObservationLabel(parts) {
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
 export async function ensureNoLoneImages(tx) {
+	const db = await import('./idb.svelte.js');
+
 	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
 		const images = await tx.objectStore('Image').getAll();
 		const observations = await tx.objectStore('Observation').getAll();
