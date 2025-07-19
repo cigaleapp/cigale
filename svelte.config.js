@@ -14,6 +14,9 @@ const config = {
 		router: {
 			type: 'hash'
 		},
+		alias: {
+			$ww: './src/web-worker'
+		},
 		paths: {
 			base:
 				process.env.BASE_PATH ||

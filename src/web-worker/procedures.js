@@ -27,7 +27,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			speed: 'number',
 			eta: 'number'
 		}),
-		success: type('true')
+		success: type('undefined')
 	},
 	isModelLoaded: {
 		input: type('"classification" | "detection"'),
