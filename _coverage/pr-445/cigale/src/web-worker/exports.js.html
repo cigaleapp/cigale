@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/257</span>
+                <span class='fraction'>0/256</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/257</span>
+                <span class='fraction'>0/256</span>
             </div>
         
             
@@ -359,13 +359,11 @@
 <a name='L294'></a><a href='#L294'>294</a>
 <a name='L295'></a><a href='#L295'>295</a>
 <a name='L296'></a><a href='#L296'>296</a>
-<a name='L297'></a><a href='#L297'>297</a>
-<a name='L298'></a><a href='#L298'>298</a>
-<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L297'></a><a href='#L297'>297</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -377,8 +375,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -659,12 +655,12 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { stringifyWithToplevelOrdering } from '$lib/download';</span></span></span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { Schemas } from '$lib/database';</span></span></span>
+<span class="cstat-no" title="statement not covered" >import { stringifyWithToplevelOrdering } from '$lib/download';</span>
 <span class="cstat-no" title="statement not covered" >import { addExifMetadata } from '$lib/exif';</span>
 <span class="cstat-no" title="statement not covered" >import { cropImage } from '$lib/images';</span>
 <span class="cstat-no" title="statement not covered" >import {</span>
 	addValueLabels,
-	isType,
 	METADATA_ZERO_VALUE,
 	metadataPrettyKey,
 	metadataPrettyValue,
@@ -678,10 +674,8 @@
 <span class="cstat-no" title="statement not covered" >import { FilepathTemplate } from '$lib/schemas/protocols';</span>
 <span class="cstat-no" title="statement not covered" >import { Analysis } from '$lib/schemas/results';</span>
 <span class="cstat-no" title="statement not covered" >import { compareBy } from '$lib/utils';</span>
-<span class="cstat-no" title="statement not covered" >import { base } from '$service-worker';</span>
 <span class="cstat-no" title="statement not covered" >import { strToU8, zip } from 'fflate';</span>
 <span class="cstat-no" title="statement not covered" >import { openDatabase, swarp } from './init';</span>
-<span class="cstat-no" title="statement not covered" >import { Schemas } from '$lib/database';</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >swarp.generateResultsZip(async ({ include, protocolId, jsonSchemaURL, cropPadding }, notify) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	const db = await openDatabase();</span>
@@ -842,7 +836,7 @@
 <span class="cstat-no" title="statement not covered" >				[filepaths.metadata.json]: strToU8(</span>
 <span class="cstat-no" title="statement not covered" >					stringifyWithToplevelOrdering(</span>
 <span class="cstat-no" title="statement not covered" >						'json',</span>
-<span class="cstat-no" title="statement not covered" >						`${window.location.origin}${base}/results.schema.json`,</span>
+<span class="cstat-no" title="statement not covered" >						jsonSchemaURL.toString(),</span>
 <span class="cstat-no" title="statement not covered" >						Analysis.assert({</span>
 <span class="cstat-no" title="statement not covered" >							observations: exportedObservations,</span>
 <span class="cstat-no" title="statement not covered" >							protocol: {</span>
@@ -964,7 +958,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-19T17:14:03.896Z
+                at 2025-07-19T17:16:00.482Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
