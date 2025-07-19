@@ -205,3 +205,30 @@ export const uiState = $state({
 	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
 	setSelection: undefined
 });
+
+/**
+ * @param {import('$lib/database').Protocol} protocol
+ * @param {string|null} imageFileId
+ */
+export function imageIsAnalyzed(protocol, imageFileId) {
+	if (!imageFileId) return false;
+	if (uiState.erroredImages.has(imageFileId)) return true;
+	return tables.Image.state.some((img) => img.fileId === imageFileId);
+}
+
+/**
+ * @param {import('$lib/database').Image} image
+ */
+export function imageIsClassified(image) {
+	return Boolean(
+		(uiState.classificationMetadataId && image.metadata[uiState.classificationMetadataId]) ||
+			uiState.erroredImages.has(image.id)
+	);
+}
+
+/**
+ * @param {import('$lib/database').Image} image
+ */
+export function imageBufferWasSaved(image) {
+	return Boolean(image.fileId || uiState.erroredImages.has(image.id));
+}

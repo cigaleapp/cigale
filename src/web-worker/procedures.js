@@ -102,7 +102,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			cropPadding: 'number = 0',
 			jsonSchemaURL: 'string.url.parse'
 		}),
-		progress: type('number'),
+		progress: type.or({ progress: 'number' }, { warning: 'string' }),
 		success: type('ArrayBuffer')
 	}
 });

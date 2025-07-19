@@ -220,7 +220,7 @@
 	 * @param {string} imageFileId
 	 */
 	function hasCrop(imageFileId) {
-		return imagesOfImageFile(imageFileId).every(
+		return imagesOfImageFile(imageFileId, idb.tables.Image.state).every(
 			(image) => uiState.cropMetadataId in image.metadata
 		);
 	}
@@ -230,7 +230,7 @@
 	 */
 	function hasConfirmedCrop(imageFileId) {
 		if (!imageFileId) return false;
-		return imagesOfImageFile(imageFileId).every(imageHasConfirmedCrop);
+		return imagesOfImageFile(imageFileId, idb.tables.Image.state).every(imageHasConfirmedCrop);
 	}
 
 	/**

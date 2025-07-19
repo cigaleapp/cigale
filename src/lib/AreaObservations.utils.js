@@ -1,6 +1,7 @@
 import { uiState } from '$lib/state.svelte';
 import { toTopLeftCoords } from './BoundingBoxes.svelte';
-import { idComparator } from './idb.svelte';
+import { tables } from './idb.svelte';
+import { idComparator } from './database.js';
 import { imagesByImageFile } from './images';
 
 /**
@@ -49,7 +50,7 @@ export function toAreaObservationProps(
 	const previewURL = (item) =>
 		uiState.getPreviewURL(typeof item === 'string' ? item : item?.fileId);
 	showBoundingBoxes ??= () => true;
-	const imagesOfFiles = imagesByImageFile(imageFileIds);
+	const imagesOfFiles = imagesByImageFile(imageFileIds, tables.Image.state);
 	return (
 		[
 			...imageFileIds

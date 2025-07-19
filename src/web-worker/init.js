@@ -33,4 +33,5 @@ export const swarp = Swarp.Server(PROCEDURES, { worker: ww });
 
 swarp.init(async ({ databaseName, databaseRevision }) => {
 	databaseParams = { name: databaseName, revision: databaseRevision };
+	console.log('done init db');
 });

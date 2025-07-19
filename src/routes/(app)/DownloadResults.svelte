@@ -1,5 +1,6 @@
 <script>
 	import { base } from '$app/paths';
+	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -8,8 +9,8 @@
 	import { ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import { generateResultsZip } from '$lib/results.svelte';
 	import { uiState } from '$lib/state.svelte';
+	import { downloadAsFile } from '$lib/download.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { avg } from '$lib/utils';
 	import Download from '~icons/ph/download-simple';
@@ -44,11 +45,14 @@
 		}
 		try {
 			await ensureNoLoneImages();
-			await generateResultsZip(tables.Observation.state, chosenProtocol, {
-				base,
+			const zipbytes = await page.data.swarpc.generateResultsZip({
+				protocolId: chosenProtocol.id,
 				include,
-				cropPadding
+				cropPadding,
+				jsonSchemaURL: new URL(`${base}/results.schema.json`, window.location.origin).toString()
 			});
+
+			downloadAsFile(zipbytes, 'results.zip', 'application/zip');
 		} catch (error) {
 			console.error(error);
 			toasts.error(

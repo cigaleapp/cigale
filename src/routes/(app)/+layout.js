@@ -4,7 +4,7 @@ import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
 import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '$ww/procedures.js';
-import WebWorker from '$ww?worker';
+import WebWorker from '$ww/index.js?worker';
 
 export async function load() {
 	setLoadingMessage('Chargement du worker neuronal…');

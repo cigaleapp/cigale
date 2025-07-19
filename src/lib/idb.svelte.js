@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { isReactiveTable, Tables } from './database.js';
+import { idComparator, isReactiveTable, Tables } from './database.js';
 import * as devalue from 'devalue';
 import { base } from '$app/paths';
 
@@ -296,29 +296,6 @@ export async function* iterator(tableName, index = undefined) {
 		yield validator.assert(cursor.value);
 	}
 }
-
-/**
- * Returns a comparator to sort objects by their id property
- * If both IDs are numeric, they are compared numerically even if they are strings
- * @template {{id: string|number} | string | number} IdOrObject
- * @param {IdOrObject} a
- * @param {IdOrObject} b
- * @returns {number}
- */
-export const idComparator = (a, b) => {
-	// @ts-ignore
-	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
-	// @ts-ignore
-	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
-
-	if (typeof a === 'number' && typeof b === 'number') return a - b;
-
-	if (typeof a === 'number') return -1;
-	if (typeof b === 'number') return 1;
-
-	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
-	return a.localeCompare(b);
-};
 
 /**
  * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you

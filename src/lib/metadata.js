@@ -1,8 +1,6 @@
 import { type } from 'arktype';
 import { format, isValid } from 'date-fns';
-import { Schemas } from './database.js';
-import * as idb from './idb.svelte.js';
-import { _tablesState, idComparator, tables } from './idb.svelte.js';
+import { idComparator, Schemas } from './database.js';
 import {
 	ensureNamespacedMetadataId,
 	metadataOptionId,
@@ -79,6 +77,9 @@ export async function storeMetadataValue({
 	tx = undefined,
 	cascadedFrom = []
 }) {
+	const idb = await import('./idb.svelte.js');
+	const { _tablesState, tables } = idb;
+
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
@@ -174,6 +175,9 @@ export async function storeMetadataValue({
  * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  */
 export async function deleteMetadataValue({ subjectId, metadataId, recursive = false, tx }) {
+	const idb = await import('./idb.svelte.js');
+	const { _tablesState, tables } = idb;
+
 	const image = tx
 		? await tx.objectStore('Image').get(subjectId)
 		: await tables.Image.raw.get(subjectId);
@@ -211,14 +215,13 @@ export async function deleteMetadataValue({ subjectId, metadataId, recursive = f
 /**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
  * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} observation
+ * @param {DB.Image[]} images
  * @returns {Promise<DB.MetadataValues>}
  */
-export async function observationMetadata(observation) {
-	const images = await tables.Image.list().then((images) =>
-		images.filter((img) => observation.images.includes(img.id))
+export async function observationMetadata(observation, images) {
+	const metadataFromImages = await mergeMetadataValues(
+		images.filter((img) => observation.images.includes(img.id)).map((img) => img.metadata)
 	);
-
-	const metadataFromImages = await mergeMetadataValues(images.map((img) => img.metadata));
 
 	return {
 		...metadataFromImages,
@@ -229,13 +232,14 @@ export async function observationMetadata(observation) {
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
  * @param {DB.MetadataValues} values
+ * @param {DB.MetadataEnumVariant[]} metadataOptions
+ * @param {DB.Metadata[]} metadataDefinitions
  * @returns {Promise<Record<string, DB.MetadataValue & { valueLabel?: string }>>}
  */
-export async function addValueLabels(values) {
-	const metadataOptions = await idb.list('MetadataOption');
+export async function addValueLabels(values, metadataOptions, metadataDefinitions) {
 	return Object.fromEntries(
 		Object.entries(values).map(([key, value]) => {
-			const definition = tables.Metadata.state.find((m) => m.id === key);
+			const definition = metadataDefinitions.find((m) => m.id === key);
 			if (!definition) return [key, value];
 			if (definition.type !== 'enum') return [key, value];
 
@@ -280,6 +284,8 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
  * @returns {Promise<Record<string, DB.MetadataValue & { merged: boolean }>>}
  */
 export async function mergeMetadataValues(values) {
+	const { tables } = await import('./idb.svelte.js');
+
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
@@ -626,7 +632,7 @@ export function metadataPrettyKey(metadata) {
 
 /**
  * Asserts that a metadata is of a certain type, inferring the correct runtime type for its value
- * @template {DB.} Type
+ * @template {DB.MetadataType} Type
  * @template {undefined | RuntimeValue} Value
  * @param {Type} testedtyp
  * @param {DB.MetadataType} metadatatyp

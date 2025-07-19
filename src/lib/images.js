@@ -1,7 +1,5 @@
-import { uiState } from '$lib/state.svelte';
-import * as db from './idb.svelte';
-import { tables } from './idb.svelte';
-import { unique } from './utils';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
+import { clamp, unique } from './utils';
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
@@ -80,39 +78,15 @@ if (import.meta.vitest) {
 }
 
 /**
- * @param {Protocol} protocol
- * @param {string|null} imageFileId
- */
-export function imageIsAnalyzed(protocol, imageFileId) {
-	if (!imageFileId) return false;
-	if (uiState.erroredImages.has(imageFileId)) return true;
-	return tables.Image.state.some((img) => img.fileId === imageFileId);
-}
-
-/**
- * @param {Image} image
- */
-export function imageIsClassified(image) {
-	return Boolean(
-		(uiState.classificationMetadataId && image.metadata[uiState.classificationMetadataId]) ||
-			uiState.erroredImages.has(image.id)
-	);
-}
-
-/**
- * @param {Image} image
- */
-export function imageBufferWasSaved(image) {
-	return Boolean(image.fileId || uiState.erroredImages.has(image.id));
-}
-
-/**
  *
  * @param {string} id ImageFile ID
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImageFile(id, tx, notFoundOk = true) {
+	const { uiState } = await import('$lib/state.svelte');
+	const db = await import('./idb.svelte');
+
 	await db.openTransaction(
 		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
 		{ tx },
@@ -171,6 +145,9 @@ export async function storeImageBytes({
 	height,
 	tx
 }) {
+	const { uiState } = await import('$lib/state.svelte');
+	const db = await import('./idb.svelte');
+
 	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		tx.objectStore('ImageFile').put({
 			id,
@@ -235,15 +212,15 @@ export async function resizeToMaxSize({ source }) {
 /**
  *
  * @param {string} imageFileId
- * @param {Image[]} [images] look for images in this array instead of the database
+ * @param {Image[]} images look for images in this array
  * @returns {Image[]}
  */
-export function imagesOfImageFile(imageFileId, images = undefined) {
-	return (images ?? tables.Image.state).filter((img) => img.fileId === imageFileId);
+export function imagesOfImageFile(imageFileId, images) {
+	return images.filter((img) => img.fileId === imageFileId);
 }
 
 if (import.meta.vitest) {
-	const { _tablesState } = await import('./idb.svelte');
+	const { _tablesState, tables } = await import('./idb.svelte');
 	const { test, expect } = import.meta.vitest;
 
 	test('imagesOfImageFile', () => {
@@ -253,24 +230,25 @@ if (import.meta.vitest) {
 		expect(imagesOfImageFile('1', images)).toEqual([img1, img2]);
 
 		_tablesState.Image = [];
-		expect(imagesOfImageFile('1')).toEqual([]);
+		expect(imagesOfImageFile('1', tables.Image.state)).toEqual([]);
 
 		_tablesState.Image = images;
-		expect(imagesOfImageFile('1')).toEqual([img1, img2]);
+		expect(imagesOfImageFile('1', tables.Image.state)).toEqual([img1, img2]);
 	});
 }
 
 /**
  *
  * @param {string[]} imageFileIds
+ * @param {Image[]} images look for images in this array
  * @returns {Map<string, Image[]>}
  */
-export function imagesByImageFile(imageFileIds) {
-	const images = new Map();
+export function imagesByImageFile(imageFileIds, images) {
+	const result = new Map();
 	for (const imageFileId of imageFileIds) {
-		images.set(imageFileId, imagesOfImageFile(imageFileId));
+		result.set(imageFileId, imagesOfImageFile(imageFileId, images));
 	}
-	return images;
+	return result;
 }
 
 if (import.meta.vitest) {
@@ -351,4 +329,46 @@ if (import.meta.vitest) {
 			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): coming in hot!!!]`
 		);
 	});
+}
+
+/**
+ * @param {ArrayBuffer} bytes image bytes
+ * @param {string} contentType content type of the image
+ * @param {import('./metadata').RuntimeValue<'boundingbox'>} centeredBoundingBox
+ * @param {number} padding padding to add around the bounding box
+ * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
+ */
+export async function cropImage(bytes, contentType, centeredBoundingBox, padding = 0) {
+	const bitmap = await createImageBitmap(new Blob([bytes], { type: contentType }));
+	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
+		toTopLeftCoords(centeredBoundingBox)
+	);
+	try {
+		const croppedBitmap = await createImageBitmap(
+			bitmap,
+			clamp(boundingBox.x - padding, 0, bitmap.width),
+			clamp(boundingBox.y - padding, 0, bitmap.height),
+			clamp(boundingBox.width + padding, 1, bitmap.width),
+			clamp(boundingBox.height + padding, 1, bitmap.height)
+		);
+		const canvas = document.createElement('canvas');
+		canvas.width = croppedBitmap.width;
+		canvas.height = croppedBitmap.height;
+		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
+		const croppedBytes = await new Promise((resolve) =>
+			canvas.toBlob(
+				resolve,
+				['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png'
+			)
+		).then((blob) => blob.arrayBuffer());
+
+		// @ts-ignore
+		return { cropped: croppedBytes, original: bytes };
+	} catch (error) {
+		throw new Error(`Couldn't crop with ${JSON.stringify({ boundingBox, padding })}: ${error}`, {
+			cause: error
+		});
+	} finally {
+		bitmap.close();
+	}
 }
