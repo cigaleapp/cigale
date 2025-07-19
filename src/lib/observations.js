@@ -1,6 +1,5 @@
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
-import { uiState } from './state.svelte';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge
@@ -104,6 +103,7 @@ function defaultObservationLabel(parts) {
  */
 export async function ensureNoLoneImages(tx) {
 	const db = await import('./idb.svelte.js');
+	const { uiState } = await import('./state.svelte.js');
 
 	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
 		const images = await tx.objectStore('Image').getAll();
