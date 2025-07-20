@@ -52,10 +52,10 @@ swarp.generateResultsZip(async ({ include, protocolId, jsonSchemaURL, cropPaddin
 	// To have stable sequence numbers, really useful for testing
 	observations.sort(compareBy((o) => o.label + o.id));
 	for (const { id, label, images, metadataOverrides } of observations) {
-		const metadata = await observationMetadata(
-			{ images, metadataOverrides: MetadataValues.assert(metadataOverrides) },
-			imagesFromDatabase.map((img) => Schemas.Image.assert(img))
-		).then((obsm) => addValueLabels(obsm, metadataOptions, Object.values(metadataDefinitions)));
+		const metadata = await observationMetadata({
+			images,
+			metadataOverrides: MetadataValues.assert(metadataOverrides)
+		}).then((obsm) => addValueLabels(obsm, metadataOptions));
 
 		exportedObservations[id] = {
 			label,
@@ -71,11 +71,7 @@ swarp.generateResultsZip(async ({ include, protocolId, jsonSchemaURL, cropPaddin
 				imagesFromDatabase.find((i) => i.id === imageId)
 			);
 
-			const metadataValues = await addValueLabels(
-				imageFromDatabase.metadata,
-				metadataOptions,
-				Object.values(metadataDefinitions)
-			);
+			const metadataValues = await addValueLabels(imageFromDatabase.metadata, metadataOptions);
 
 			const image = {
 				...imageFromDatabase,
