@@ -171,6 +171,10 @@ function wrangler(table) {
 		},
 		list: async () => list(table),
 		all: () => iterator(table),
+		count: async () => {
+			const db = await openDatabase();
+			return await db.count(table);
+		},
 		/** Do not go through validation or type morphing, manipulate the underlying database values directly. Useful for performance reasons, when changing only a property inside of an object and leaving the others unchanged, for example */
 		raw: {
 			/** @param {typeof Tables[Table]['inferIn']} value */

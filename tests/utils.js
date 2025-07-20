@@ -1,3 +1,4 @@
+import { safeJSONParse } from '$lib/utils';
 import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -10,7 +11,8 @@ import path from 'node:path';
 
 /**
  *
- * @param {{page: Page}} ctx
+ * @param {object} ctx
+ * @param {Page} ctx.page
  * @param {...string} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used
  */
 export async function importPhotos({ page }, ...names) {
@@ -72,6 +74,26 @@ export async function getImage({ page }, id) {
 		return image;
 	}, /** @type {const} */ ([id]));
 	return image;
+}
+
+/**
+ * Returns object mapping metadata keys to their (runtime, deserialized) values
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @param {string} [param0.protocolId] keep only metadata from this protocol, strip the prefix (namespace) from the keys in the returned object
+ * @param {string} param0.image id of the image to get metadata from
+ * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
+ */
+export async function getMetadataValuesOfImage({ page, protocolId, image }) {
+	const { metadata } = await getImage({ page }, image);
+	return Object.fromEntries(
+		Object.entries(metadata)
+			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
+			.map(([id, { value }]) => [
+				protocolId ? id.replace(`${protocolId}__`, '') : id,
+				safeJSONParse(value)
+			])
+	);
 }
 
 /**
@@ -142,6 +164,19 @@ export async function chooseDefaultProtocol(page, models = {}) {
 	}
 	await page.getByRole('link', { name: 'Importer' }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string} filepath relative to tests/fixtures/
+ */
+export async function importProtocol(page, filepath) {
+	const fileChooser = page.waitForEvent('filechooser');
+	await page.getByRole('button', { name: 'Importer un protocole' }).click();
+	await fileChooser.then((chooser) =>
+		chooser.setFiles(path.join(import.meta.dirname, './fixtures', filepath))
+	);
 }
 
 /**
@@ -246,7 +281,9 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 		async (dump) => {
 			const decoded = window.devalue.parse(dump);
 			for (const [tableName, entries] of Object.entries(decoded)) {
+				await window.DB.clear(tableName);
 				for (const entry of entries) {
+					console.log('[loadDatabaseDump] Adding entry to', tableName, entry);
 					await window.DB.put(tableName, entry);
 				}
 			}

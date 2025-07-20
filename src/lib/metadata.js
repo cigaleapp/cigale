@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { format, isValid } from 'date-fns';
+import * as datefns from 'date-fns';
 import { Schemas } from './database.js';
 import * as idb from './idb.svelte.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
@@ -51,7 +51,9 @@ export function getMetadataValue(image, type, metadataId) {
  * @returns {string}
  */
 export function serializeMetadataValue(value) {
-	return JSON.stringify(isValid(value) ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value);
+	return JSON.stringify(
+		datefns.isValid(value) ? datefns.format(value, "yyyy-MM-dd'T'HH:mm:ss") : value
+	);
 }
 
 /**
@@ -256,6 +258,7 @@ export async function addValueLabels(values) {
  * @param {DB.Observation[]} observations
  */
 export async function mergeMetadataFromImagesAndObservations(images, observations) {
+	console.log('merging metadata from', { images, observations });
 	const mergedValues = await mergeMetadataValues(images.map((img) => img.metadata));
 	const mergedOverrides = await mergeMetadataValues(
 		observations.map((obs) => obs.metadataOverrides)
@@ -271,6 +274,8 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
 		if (value) output[key] = value;
 	}
 
+	console.log('merged to', output);
+
 	return output;
 }
 
@@ -280,6 +285,7 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
  * @returns {Promise<Record<string, DB.MetadataValue & { merged: boolean }>>}
  */
 export async function mergeMetadataValues(values) {
+	console.log('merging metadata values from', values);
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
@@ -310,6 +316,8 @@ export async function mergeMetadataValues(values) {
 				merged: new Set(valuesOfKey.map((v) => JSON.stringify(v.value))).size > 1
 			};
 	}
+
+	console.log('merged metadata values to', output);
 
 	return output;
 }

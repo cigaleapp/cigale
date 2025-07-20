@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
+id: io.github.cigaleapp.kitchensink
+name: Kitchen sink
+description: Made to demo all of the available data types and features that are supported by CIGALE protocols.
+authors:
+  - name: Gwenn Le Bihan
+
+metadata:
+  crop:
+    type: boundingbox
+    description: ''
+    label: 'crop'
+    mergeMethod: union
+    required: false
+
+  bool:
+    description: boolean metadata
+    label: bool
+    mergeMethod: average
+    required: false
+    type: boolean
+
+  date:
+    description: date metadata
+    label: date
+    mergeMethod: average
+    required: false
+    type: date
+
+  enum:
+    description: enum metadata
+    label: enum
+    mergeMethod: average
+    required: false
+    type: enum
+    options:
+      - description: Option 1
+        key: one
+        label: One
+      - description: Option 2
+        key: two
+        label: Two
+
+  float:
+    description: float metadata
+    label: float
+    mergeMethod: average
+    required: false
+    type: float
+
+  integer:
+    description: integer metadata
+    label: integer
+    mergeMethod: average
+    required: false
+    type: integer
+
+  string:
+    description: string metadata
+    label: string
+    mergeMethod: average
+    required: false
+    type: string
+
+  location:
+    description: location metadata
+    label: location
+    mergeMethod: average
+    required: false
+    type: location
+
+crop:
+  metadata: crop
+  padding: 0
