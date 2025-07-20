@@ -2,13 +2,26 @@ import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 import { idComparator, isReactiveTable, Tables } from './database.js';
 import * as devalue from 'devalue';
-import { base } from '$app/paths';
 
-console.info(`Base path is ${base}`);
+/**
+ * @type {string}
+ */
+let _deploymentBasePath;
+/**
+ *
+ * @param {string} path
+ */
+export function setDeploymentBasePath(path) {
+	_deploymentBasePath = path;
+}
 
-export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
+/** @param {string} base */
+export const previewingPrNumber = (base) => /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
 
-export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
+/** @param {string} base */
+export const databaseName = (base) =>
+	previewingPrNumber(base) ? `previews/pr-${previewingPrNumber(base)}` : 'database';
+
 export const databaseRevision = 3;
 
 /**
@@ -343,13 +356,18 @@ export async function openTransaction(tableNames, { mode }, actions) {
 }
 
 export async function openDatabase() {
+	if (!_deploymentBasePath) {
+		console.warn('No deployment base path set, using default ""');
+		_deploymentBasePath = '';
+	}
+
 	if (_database) return _database;
 
 	/** @type {Array<{[K in keyof typeof Tables]: [K, typeof Tables[K]]}[keyof typeof Tables]>} */
 	// @ts-ignore
 	const tablesByName = Object.entries(Tables);
 
-	_database = await openDB(databaseName, databaseRevision, {
+	_database = await openDB(databaseName(_deploymentBasePath), databaseRevision, {
 		upgrade(db, oldVersion) {
 			/**
 			 * @param {keyof typeof Tables} tableName
