@@ -1,12 +1,21 @@
 import { dev } from '$app/environment';
-import { databaseName, databaseRevision, openTransaction, tables } from '$lib/idb.svelte.js';
+import {
+	databaseName,
+	databaseRevision,
+	openTransaction,
+	setDeploymentBasePath,
+	tables
+} from '$lib/idb.svelte.js';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
 import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '$ww/procedures.js';
-import WebWorker from '$ww?worker';
+import WebWorker from '$ww/index.js?worker';
+import { base } from '$app/paths';
 
 export async function load() {
+	setDeploymentBasePath(base);
+
 	setLoadingMessage('Chargement du worker neuronal…');
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: new WebWorker({ name: 'SWARPC Worker' })
@@ -14,7 +23,7 @@ export async function load() {
 
 	setLoadingMessage('Initialisation DB du worker neuronal…');
 	await swarpc.init({
-		databaseName,
+		databaseName: databaseName(base),
 		databaseRevision
 	});
 
