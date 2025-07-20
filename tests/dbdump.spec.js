@@ -7,7 +7,12 @@ import {
 	importResults
 } from './utils.js';
 
-test.describe.skip('Database dumps', () => {
+test.describe('Database dumps', () => {
+	test.skip(
+		Boolean(process.env.CI),
+		'Skipping database dumps on CI, these are meant as easy way to (re)create dump fixtures locally only.'
+	);
+
 	test('basic', async ({ page }) => {
 		await importResults(page, 'correct.zip');
 		await dumpDatabase(page, 'basic.devalue');
