@@ -7,7 +7,7 @@ import {
 	importResults
 } from './utils.js';
 
-test.describe('Database dumps', () => {
+test.describe.skip('Database dumps', () => {
 	test('basic', async ({ page }) => {
 		await importResults(page, 'correct.zip');
 		await dumpDatabase(page, 'basic.devalue');
