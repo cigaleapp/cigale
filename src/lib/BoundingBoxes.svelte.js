@@ -1,5 +1,4 @@
 import { type } from 'arktype';
-import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
 const centeredBoundingBox = type({
 	x: 'number',
@@ -66,12 +65,21 @@ if (import.meta.vitest) {
 	});
 }
 
-/** @param {undefined | import('./database').Protocol} protocol  */
-export const toRelativeCoords = (protocol) => {
+/**
+ * @param {undefined | import('./database').Protocol} protocol
+ * @param {number} modelindex
+ */
+export const toRelativeCoords = (protocol, modelindex) => {
 	if (!protocol) throw new Error('No protocol was provided');
+	const { width, height } = protocol.crop?.infer?.[modelindex]?.input ?? {};
+	if (!width || !height) {
+		throw new Error(
+			`No crop input found for model index ${modelindex} in protocol ${protocol.name}`
+		);
+	}
 	return coordsScaler({
-		x: 1 / (protocol.crop?.infer?.input?.width ?? TARGETWIDTH),
-		y: 1 / (protocol.crop?.infer?.input?.height ?? TARGETHEIGHT)
+		x: 1 / width,
+		y: 1 / height
 	});
 };
 

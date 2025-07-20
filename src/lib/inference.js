@@ -54,8 +54,6 @@ ort.env.wasm.wasmPaths = {
 	'ort-wasm-simd-threaded.wasm': '/ort-wasm-simd-threaded.wasm'
 };
 
-export const TARGETWIDTH = 640; // taille de l'image d'entrée du modèle de détection
-export const TARGETHEIGHT = 640; // taille de l'image d'entrée du modèle de détection
 const NUMCONF = 0.437; // seuil de confiance pour la détection
 const STD = [0.229, 0.224, 0.225]; // valeurs de normalisation pour la classification
 const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classification

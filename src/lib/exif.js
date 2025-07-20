@@ -4,75 +4,11 @@ import * as exifParser from 'exif-parser';
 import piexif from 'piexifjs';
 import { Schemas } from './database.js';
 import { EXIF_GPS_FIELDS } from './exiffields.js';
-import { storeMetadataValue } from './metadata.js';
-import { ensureNamespacedMetadataId } from './schemas/metadata.js';
 
 /**
  * @import { MetadataInferOptions, MetadataType } from './database.js';
  * @import { RuntimeValue } from './metadata.js';
  */
-
-/**
- *
- * @param {string} protocolId
- * @param {string} imageFileId
- * @param {ArrayBuffer|Buffer} imageBytes
- * @param {{ type: string; name: string }} file
- */
-export async function processExifData(protocolId, imageFileId, imageBytes, file) {
-	const db = await import('./idb.svelte.js');
-	const { toasts } = await import('./toasts.svelte.js');
-
-	const protocol = await db.tables.Protocol.get(protocolId);
-	if (!protocol) {
-		throw new Error(`Protocole ${protocolId} introuvable`);
-	}
-	const metadataOfProtocol = await db.tables.Metadata.list().then((defs) =>
-		defs.filter((def) => protocol.metadata.includes(def.id))
-	);
-	const metadataFromExif = await extractMetadata(
-		// 2^16 + 100 of margin
-		// see https://www.npmjs.com/package/exif-parser#creating-a-parser
-		imageBytes.slice(0, 65_635),
-		(metadataOfProtocol ?? [])
-			.map(({ infer, type, id }) =>
-				match
-					.case(
-						[
-							{ exif: 'string' },
-							'|',
-							{ latitude: { exif: 'string' }, longitude: { exif: 'string' } }
-						],
-						(infer) => /** @type {ExifExtractionPlanItem} */ ({ key: id, infer, type })
-					)
-					.default(() => undefined)(infer)
-			)
-			.filter((entry) => entry !== undefined)
-	).catch((e) => {
-		console.warn(e);
-		if (file.type === 'image/jpeg') {
-			toasts.warn(
-				`Impossible d'extraire les métadonnées EXIF de ${file.name}: ${e?.toString() ?? 'Erreur inattendue'}`
-			);
-		}
-		return {};
-	});
-
-	const images = await db
-		.list('Image')
-		.then((imgs) => imgs.filter((img) => img.fileId === imageFileId));
-
-	for (const { id: subjectId } of images) {
-		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
-			await storeMetadataValue({
-				subjectId,
-				metadataId: ensureNamespacedMetadataId(key, protocolId),
-				value,
-				confidence
-			});
-		}
-	}
-}
 
 /**
  * @typedef {object} ExifExtractionPlanItem

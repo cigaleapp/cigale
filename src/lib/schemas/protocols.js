@@ -5,7 +5,7 @@ import { HTTPRequest, ID, ModelInput, References, URLString } from './common.js'
 import { Metadata, namespacedMetadataId } from './metadata.js';
 
 /**
- * @import { Analysis } from './results';
+ * @import { Analysis } from './results.js';
  */
 
 export const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du point central'])

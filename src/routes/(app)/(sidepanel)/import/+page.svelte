@@ -140,7 +140,8 @@
 		/**
 		 * @param {[number, number, number, number]} param0
 		 */
-		const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
+		const toCropBox = ([x, y, w, h]) =>
+			toRelativeCoords(uiState.currentProtocol, uiState.selectedCropModel)({ x, y, w, h });
 
 		for (let i = 0; i < boxes.length; i++) {
 			await tables.Image.set({
@@ -170,7 +171,7 @@
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
-	import { processExifData } from '$lib/exif';
+	import { processExifData } from '$lib/stateful/exif.js';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import {

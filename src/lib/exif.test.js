@@ -1,19 +1,10 @@
 import 'fake-indexeddb/auto';
 
 import exif from 'exif-parser';
-import { beforeEach, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import { readFileSync } from 'node:fs';
-import {
-	addExifMetadata,
-	coerceExifValue,
-	extractMetadata,
-	processExifData,
-	serializeExifValue
-} from './exif';
-import * as db from './idb.svelte.js';
-import { imageId } from './images';
-import { namespacedMetadataId } from './schemas/metadata.js';
+import { addExifMetadata, coerceExifValue, extractMetadata, serializeExifValue } from './exif';
 
 /**
  * Read a file from ./tests/fixtures
@@ -23,111 +14,6 @@ import { namespacedMetadataId } from './schemas/metadata.js';
 async function readImageBytes(filename) {
 	return readFileSync(`./tests/fixtures/${filename}`);
 }
-
-describe('processExifData', () => {
-	beforeEach(async () => {
-		db.nukeDatabase();
-
-		const metadataField = /** @type {const} */ ({
-			description: '',
-			mergeMethod: 'none',
-			required: false,
-			learnMore: 'https://example.com',
-			label: ''
-		});
-
-		await db.tables.Metadata.set({
-			...metadataField,
-			id: namespacedMetadataId('test-protocol', 'date'),
-			type: 'date',
-			infer: { exif: 'DateTimeOriginal' }
-		});
-
-		await db.tables.Metadata.set({
-			...metadataField,
-			id: namespacedMetadataId('test-protocol', 'location'),
-			type: 'location',
-			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }
-		});
-
-		await db.tables.Metadata.set({
-			...metadataField,
-			id: namespacedMetadataId('test-protocol', 'no-exif'),
-			type: 'string'
-		});
-
-		await db.tables.Protocol.set({
-			id: 'test-protocol',
-			name: 'Test Protocol',
-			metadata: ['date', 'location', 'no-exif'].map((id) =>
-				namespacedMetadataId('test-protocol', id)
-			),
-			authors: [],
-			description: 'Test Protocol',
-			learnMore: 'https://example.com',
-			crop: {
-				metadata: 'test-protocol.crop'
-			}
-		});
-
-		await db.tables.Image.set({
-			id: imageId(0, 0),
-			addedAt: '2023-10-01T00:00:00Z',
-			fileId: 'quoicoubaka',
-			dimensions: { width: 100, height: 100 },
-			contentType: 'image/jpeg',
-			filename: 'test.jpg',
-			metadata: {}
-		});
-	});
-
-	test('extracts from image without GPS', async () => {
-		const imageBytes = await readImageBytes('lil-fella.jpeg');
-
-		await processExifData('test-protocol', 'quoicoubaka', imageBytes, {
-			type: 'image/jpeg',
-			name: 'test.jpg'
-		});
-
-		const image = await db.tables.Image.get(imageId(0, 0));
-		expect(image?.metadata).toEqual({
-			[namespacedMetadataId('test-protocol', 'date')]: {
-				value: new Date('2025-04-25T12:38:36.000Z'),
-				manuallyModified: false,
-				confidence: 1,
-				alternatives: {}
-			}
-		});
-	});
-
-	test('extracts from image with GPS', async () => {
-		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
-
-		await processExifData('test-protocol', 'quoicoubaka', imageBytes, {
-			type: 'image/jpeg',
-			name: 'test.jpg'
-		});
-
-		const image = await db.tables.Image.get(imageId(0, 0));
-		expect(image?.metadata).toEqual({
-			[namespacedMetadataId('test-protocol', 'date')]: {
-				value: new Date('2008-10-22T16:29:49.000Z'),
-				manuallyModified: false,
-				confidence: 1,
-				alternatives: {}
-			},
-			[namespacedMetadataId('test-protocol', 'location')]: {
-				value: {
-					latitude: 43.46715666666389,
-					longitude: 11.885394999997223
-				},
-				manuallyModified: false,
-				confidence: 1,
-				alternatives: {}
-			}
-		});
-	});
-});
 
 describe('extractMetadata', () => {
 	const plan = /** @type {const} */ ([

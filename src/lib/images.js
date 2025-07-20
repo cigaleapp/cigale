@@ -1,5 +1,5 @@
-import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
-import { clamp, unique } from './utils';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
+import { clamp, unique } from './utils.js';
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
@@ -84,8 +84,8 @@ if (import.meta.vitest) {
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImageFile(id, tx, notFoundOk = true) {
-	const { uiState } = await import('$lib/state.svelte');
-	const db = await import('./idb.svelte');
+	const { uiState } = await import('$lib/state.svelte.js');
+	const db = await import('./idb.svelte.js');
 
 	await db.openTransaction(
 		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
@@ -145,8 +145,8 @@ export async function storeImageBytes({
 	height,
 	tx
 }) {
-	const { uiState } = await import('$lib/state.svelte');
-	const db = await import('./idb.svelte');
+	const { uiState } = await import('$lib/state.svelte.js');
+	const db = await import('./idb.svelte.js');
 
 	await db.openTransaction(['ImageFile', 'ImagePreviewFile'], { tx }, async (tx) => {
 		tx.objectStore('ImageFile').put({
@@ -220,7 +220,7 @@ export function imagesOfImageFile(imageFileId, images) {
 }
 
 if (import.meta.vitest) {
-	const { _tablesState, tables } = await import('./idb.svelte');
+	const { _tablesState, tables } = await import('./idb.svelte.js');
 	const { test, expect } = import.meta.vitest;
 
 	test('imagesOfImageFile', () => {
@@ -252,7 +252,7 @@ export function imagesByImageFile(imageFileIds, images) {
 }
 
 if (import.meta.vitest) {
-	const { _tablesState } = await import('./idb.svelte');
+	const { _tablesState } = await import('./idb.svelte.js');
 	const { test, expect } = import.meta.vitest;
 
 	/**
