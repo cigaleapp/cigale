@@ -1,8 +1,19 @@
-import { safeJSONParse } from '$lib/utils';
 import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+
+/**
+ * @param {unknown} value
+ */
+function safeJSONParse(value) {
+	try {
+		return JSON.parse(value);
+	} catch (e) {
+		console.warn('Failed to parse JSON value:', value, e);
+		return undefined; // Return the original value if parsing fails
+	}
+}
 
 /**
  * @import { Page } from '@playwright/test';
