@@ -37,6 +37,7 @@ jobs:
           folder: public # The folder the action should deploy.
           force: false
           clean-exclude: |
+            .nojekyll
             _pullrequests
             _playwright
             _vitest
