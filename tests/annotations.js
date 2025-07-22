@@ -3,7 +3,7 @@
  */
 export function pr(number) {
 	return {
-		tag: `@issue-${number}`,
+		tag: `@pr`,
 		annotation: {
 			type: 'pullrequest',
 			description: `https://github.com/cigaleapp/cigale/pull/${number}`
@@ -13,13 +13,14 @@ export function pr(number) {
 
 /**
  * @param {number} number
+ * @param {...number} otherNumbers
  */
-export function issue(number) {
+export function issue(number, ...otherNumbers) {
 	return {
-		tag: `@pr-${number}`,
-		annotation: {
+		tag: '@issue',
+		annotation: [number, ...otherNumbers].map((n) => ({
 			type: 'issue',
-			description: `https://github.com/cigaleapp/cigale/issues/${number}`
-		}
+			description: `https://github.com/cigaleapp/cigale/issues/${n}`
+		}))
 	};
 }
