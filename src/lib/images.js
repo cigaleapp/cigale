@@ -1,7 +1,8 @@
 import { uiState } from '$lib/state.svelte';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import * as db from './idb.svelte';
-import { tables } from './idb.svelte';
-import { unique } from './utils';
+import { _tablesState, tables } from './idb.svelte';
+import { clamp, unique } from './utils';
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
@@ -243,7 +244,6 @@ export function imagesOfImageFile(imageFileId, images = undefined) {
 }
 
 if (import.meta.vitest) {
-	const { _tablesState } = await import('./idb.svelte');
 	const { test, expect } = import.meta.vitest;
 
 	test('imagesOfImageFile', () => {
@@ -274,7 +274,6 @@ export function imagesByImageFile(imageFileIds) {
 }
 
 if (import.meta.vitest) {
-	const { _tablesState } = await import('./idb.svelte');
 	const { test, expect } = import.meta.vitest;
 
 	/**
@@ -351,4 +350,46 @@ if (import.meta.vitest) {
 			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): coming in hot!!!]`
 		);
 	});
+}
+
+/**
+ * @param {ArrayBuffer} bytes image bytes
+ * @param {string} contentType content type of the image
+ * @param {import('./metadata').RuntimeValue<'boundingbox'>} centeredBoundingBox
+ * @param {number} padding padding to add around the bounding box
+ * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
+ */
+export async function cropImage(bytes, contentType, centeredBoundingBox, padding = 0) {
+	const bitmap = await createImageBitmap(new Blob([bytes], { type: contentType }));
+	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
+		toTopLeftCoords(centeredBoundingBox)
+	);
+	try {
+		const croppedBitmap = await createImageBitmap(
+			bitmap,
+			clamp(boundingBox.x - padding, 0, bitmap.width),
+			clamp(boundingBox.y - padding, 0, bitmap.height),
+			clamp(boundingBox.width + padding, 1, bitmap.width),
+			clamp(boundingBox.height + padding, 1, bitmap.height)
+		);
+		const canvas = document.createElement('canvas');
+		canvas.width = croppedBitmap.width;
+		canvas.height = croppedBitmap.height;
+		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
+		const croppedBytes = await new Promise((resolve) =>
+			canvas.toBlob(
+				resolve,
+				['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png'
+			)
+		).then((blob) => blob.arrayBuffer());
+
+		// @ts-ignore
+		return { cropped: croppedBytes, original: bytes };
+	} catch (error) {
+		throw new Error(`Couldn't crop with ${JSON.stringify({ boundingBox, padding })}: ${error}`, {
+			cause: error
+		});
+	} finally {
+		bitmap.close();
+	}
 }

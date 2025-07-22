@@ -229,10 +229,10 @@ export async function observationMetadata(observation) {
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
  * @param {DB.MetadataValues} values
+ * @param {DB.MetadataEnumVariant[]} metadataOptions
  * @returns {Promise<Record<string, DB.MetadataValue & { valueLabel?: string }>>}
  */
-export async function addValueLabels(values) {
-	const metadataOptions = await idb.list('MetadataOption');
+export async function addValueLabels(values, metadataOptions) {
 	return Object.fromEntries(
 		Object.entries(values).map(([key, value]) => {
 			const definition = tables.Metadata.state.find((m) => m.id === key);

@@ -332,7 +332,7 @@ if (import.meta.vitest) {
  * @param {number} [param0.version]
  * @param {import('$lib/database.js').HTTPRequest} param0.source
  * @param {string} param0.id
- * @param {import('swarpc').SwarpcClient<typeof import('../web-worker-procedures.js').PROCEDURES>} param0.swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('$ww/procedures.js').PROCEDURES>} param0.swarpc
  */
 export async function upgradeProtocol({ version, source, id, swarpc }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");

@@ -27,7 +27,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			speed: 'number',
 			eta: 'number'
 		}),
-		success: type('true')
+		success: type('undefined')
 	},
 	isModelLoaded: {
 		input: type('"classification" | "detection"'),
@@ -94,5 +94,15 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			name: 'string',
 			version: 'number | undefined'
 		})
+	},
+	generateResultsZip: {
+		input: type({
+			protocolId: 'string',
+			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
+			cropPadding: 'number = 0',
+			jsonSchemaURL: 'string.url.parse'
+		}),
+		progress: type.or({ progress: 'number' }, { warning: 'string' }),
+		success: type('ArrayBuffer')
 	}
 });
