@@ -8,10 +8,11 @@
 	import { ensureNoLoneImages } from '$lib/observations';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import { generateResultsZip } from '$lib/results.svelte';
+	import { generateResultsZip, parseCropPadding } from '$lib/results.svelte';
+	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { avg } from '$lib/utils';
+	import { tick } from 'svelte';
 	import Download from '~icons/ph/download-simple';
 
 	// TODO show download size estimates
@@ -26,13 +27,29 @@
 	/** @type {'metadataonly'|'croppedonly'|'full'} */
 	let include = $state('croppedonly');
 
-	let cropPadding = $derived(uiState.currentProtocol?.crop.padding ?? 0);
-	const cropPaddingRangeMax = $derived(
-		Math.floor(
-			0.1 * avg(tables.Image.state.map((i) => avg([i.dimensions?.width, i.dimensions?.height])))
-		)
-	);
-	const cropPaddingRangeStep = $derived(Math.floor(cropPaddingRangeMax / 100));
+	let cropPadding = $derived(parseCropPadding(uiState.currentProtocol?.crop.padding ?? '0px'));
+	/**
+	 * @type {'none'|'small'|'medium'|'customPercent'|'customPixels'|undefined}
+	 */
+	let cropPaddingPreset = $state('none');
+	$effect(() => {
+		switch (cropPaddingPreset) {
+			case 'none':
+				cropPadding = parseCropPadding('0px');
+				break;
+
+			case 'small':
+				cropPadding = parseCropPadding('5%');
+				break;
+
+			case 'medium':
+				cropPadding = parseCropPadding('10%');
+				break;
+
+			default:
+				break;
+		}
+	});
 
 	async function generateExport() {
 		exporting = true;
@@ -47,7 +64,7 @@
 			await generateResultsZip(tables.Observation.state, chosenProtocol, {
 				base,
 				include,
-				cropPadding
+				cropPadding: cropPadding.withUnit
 			});
 		} catch (error) {
 			console.error(error);
@@ -83,35 +100,42 @@
 		</RadioButtons>
 	</div>
 
-	<label class="crop-padding">
+	<section class="crop-padding">
 		<div class="label">Marge autour des images recadrées</div>
-		<div class="side-by-side">
-			<input
-				type="range"
-				min="0"
-				max={cropPaddingRangeMax}
-				step={cropPaddingRangeStep}
-				bind:value={cropPadding}
-			/>
-			<div class="numeric">
-				<InlineTextInput
-					label="valeur en pixels"
-					value={cropPadding.toString()}
-					onblur={(newValue) => {
-						const parsed = Number.parseInt(newValue, 10);
-						if (!isNaN(parsed) && parsed > 0) {
-							cropPadding = parsed;
-						}
-					}}
-				/>
-			</div>
-			px
-		</div>
-		<p class="proportion">
-			<strong>~{Math.round((cropPadding / cropPaddingRangeMax) * 0.1 * 100)}%</strong> de la taille moyenne
-			des images
-		</p>
-	</label>
+
+		<SegmentedGroup
+			options={['none', 'small', 'medium', 'customPercent', 'customPixels']}
+			labels={{ none: 'Aucune', small: '5%', medium: '10%' }}
+			bind:value={cropPaddingPreset}
+		>
+			{#snippet customOption(option)}
+				{@const unit = option === 'customPercent' ? '%' : 'px'}
+				<div class="numeric" style:--width={unit === '%' ? '3ch' : '4ch'}>
+					<InlineTextInput
+						label={option === 'customPercent'
+							? "en pourcentage des dimensions de l'image"
+							: 'en pixels'}
+						value={cropPadding.unitless === 0
+							? '0'
+							: cropPadding.unit === unit
+								? cropPadding.unitless.toString()
+								: '?'}
+						onblur={async (newValue) => {
+							// otherwise, the input value updates to a '?' too quickly when changing value but not unit
+							await tick();
+							const parsed = Number.parseInt(newValue, 10);
+							if (!isNaN(parsed) && parsed > 0) {
+								cropPadding = parseCropPadding(parsed + unit);
+								cropPaddingPreset = option;
+							}
+						}}
+					/>
+					{unit}
+				</div>
+			{/snippet}
+		</SegmentedGroup>
+		<p class="fineprint">Les valeurs en % sont relatives aux dimensions de chaque image</p>
+	</section>
 
 	{#snippet footer()}
 		<section class="progress">
@@ -151,24 +175,28 @@
 		accent-color: var(--fg-primary);
 	}
 
+	.crop-padding {
+		margin-top: 1.5em;
+	}
+
 	.crop-padding .label {
 		margin-bottom: 0.5em;
 	}
 
 	.crop-padding .numeric {
-		display: inline-flex;
+		display: flex;
 		align-items: center;
 		gap: 0.5em;
-		width: 4ch;
 		overflow: hidden;
 	}
 
-	.crop-padding .proportion {
-		margin-top: 0.5em;
-		color: var(--gay);
+	.crop-padding .numeric :global(input) {
+		width: var(--width, 3ch);
 	}
 
-	.crop-padding .proportion strong {
-		color: var(--fg-neutral);
+	.crop-padding .fineprint {
+		font-size: 0.9em;
+		color: var(--gy);
+		margin-top: 0.75em;
 	}
 </style>
