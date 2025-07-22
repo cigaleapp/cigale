@@ -17,10 +17,7 @@ export async function importPhotos({ page }, ...names) {
 	if (!names) throw new Error('No file names provided');
 	names = names.map((name) => (path.extname(name) ? name : `${name}.jpeg`));
 
-	await page.getByTestId('protocol-to-choose').click();
-	await page.getByRole('link', { name: 'Importer' }).click();
-	await page.waitForURL((u) => u.hash === '#/import');
-	await expect(page.getByText(/Cliquer ou déposer des images ici/)).toBeVisible();
+	await expect(page.getByText(/Cliquer ou déposer des images/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(names.map((f) => path.join('./tests/fixtures', f)));
 	await expect(page.getByText(names.at(-1), { exact: true })).toBeVisible({
@@ -126,11 +123,23 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 /**
  *
  * @param {Page} page
+ * @param {Record<string, string>} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
-export async function chooseDefaultProtocol(page) {
+export async function chooseDefaultProtocol(page, models = {}) {
 	// Choose default protocol
 	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
 	await page.getByTestId('protocol-to-choose').click();
+	if (models) {
+		for (const [task, model] of Object.entries(models)) {
+			await page
+				.locator('.model-select', {
+					hasText: `Modèle d'inférence pour ${task}`,
+					has: page.locator('input[type="radio"]')
+				})
+				.getByRole('radio', { name: model })
+				.check();
+		}
+	}
 	await page.getByRole('link', { name: 'Importer' }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
 }
