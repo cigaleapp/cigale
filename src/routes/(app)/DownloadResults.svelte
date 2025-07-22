@@ -31,7 +31,14 @@
 	/**
 	 * @type {'none'|'small'|'medium'|'customPercent'|'customPixels'|undefined}
 	 */
-	let cropPaddingPreset = $state('none');
+	let cropPaddingPreset = $derived.by(() => {
+		if (cropPadding.unitless === 0) return 'none';
+		if (cropPadding.unit === 'px') return 'customPixels';
+		if (cropPadding.unitless === 5) return 'small';
+		if (cropPadding.unitless === 10) return 'medium';
+		return 'customPercent';
+	});
+
 	$effect(() => {
 		switch (cropPaddingPreset) {
 			case 'none':
