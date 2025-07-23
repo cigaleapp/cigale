@@ -20,11 +20,13 @@ jobs:
         with:
           node-version: '22.17.1'
       - name: Cache Node Modules
+        id: cache-node-modules
         uses: actions/cache@v3
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
       - name: Lint
         run: npm run lint
@@ -37,11 +39,13 @@ jobs:
         with:
           node-version: '22.17.1'
       - name: Cache Node Modules
+        id: cache-node-modules
         uses: actions/cache@v3
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
       - name: Check formatting
         run: npx prettier --check .
@@ -57,12 +61,13 @@ jobs:
         with:
           node-version: '22.17.1'
       - name: Cache Node Modules
+        id: cache-node-modules
         uses: actions/cache@v3
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-
       - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
       - name: Run tests
         run: npm test
@@ -76,7 +81,7 @@ jobs:
           comment: false
 
   clutter:
-    name: Check for clutter (unused stuff)
+    name: Check for clutter
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -84,11 +89,13 @@ jobs:
         with:
           node-version: '22.17.1'
       - name: Cache Node Modules
+        id: cache-node-modules
         uses: actions/cache@v3
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
       - name: Check for clutter
         run: npx knip
@@ -104,11 +111,13 @@ jobs:
         with:
           node-version: '22.17.1'
       - name: Cache Node Modules
+        id: cache-node-modules
         uses: actions/cache@v3
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
       - name: Install Dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
       - name: Run tests
         run: npm test
