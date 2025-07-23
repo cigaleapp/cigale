@@ -107,7 +107,7 @@
 		</RadioButtons>
 	</div>
 
-	<section class="crop-padding">
+	<section class="crop-padding" class:irrelevant={include === 'metadataonly'}>
 		<div class="label">Marge autour des images recadrées</div>
 
 		<SegmentedGroup
@@ -184,6 +184,11 @@
 
 	.crop-padding {
 		margin-top: 1.5em;
+	}
+
+	.crop-padding.irrelevant {
+		opacity: 0.5;
+		pointer-events: none;
 	}
 
 	.crop-padding .label {
