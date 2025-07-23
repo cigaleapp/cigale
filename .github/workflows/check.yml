@@ -71,6 +71,18 @@ jobs:
         run: npm ci
       - name: Check for clutter
         run: npm run check:clutter
+  i18n:
+    name: Check for untranslated messages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+      - name: Install dependencies
+        run: npm ci
+      - name: Check for untranslated messages
+        run: npx @inlang/cli lint
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
