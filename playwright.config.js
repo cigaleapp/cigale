@@ -36,7 +36,10 @@ export default defineConfig({
 		baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-		trace: 'on-first-retry'
+		trace: 'on-first-retry',
+
+		// Right now, all tests assume French language.
+		locale: 'fr-FR'
 	},
 
 	/* Configure projects for major browsers */
