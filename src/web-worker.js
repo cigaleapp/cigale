@@ -12,7 +12,7 @@ import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 import YAML from 'yaml';
 import { PROCEDURES } from './web-worker-procedures.js';
-import { m } from '$lib/paraglide/messages.js';
+import { m } from '$lib/simple-messages.js';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
 
