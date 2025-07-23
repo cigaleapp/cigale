@@ -14,7 +14,7 @@
 	import Fuse from 'fuse.js';
 	import { queryParam, ssp } from 'sveltekit-search-params';
 	import IconCheck from '~icons/ph/check';
-	import IconImport from '~icons/ph/download';
+	import IconImport from '~icons/ph/upload-simple';
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
 
