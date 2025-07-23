@@ -23,7 +23,7 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 
 	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
 
-	await page.getByRole('textbox', { name: 'valeur en pixels' }).fill('40');
+	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
 
 	const resultsDir = path.resolve('./tests/results/crop-padding');
 	await page.getByRole('button', { name: 'results.zip' }).click();

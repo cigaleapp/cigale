@@ -37,7 +37,7 @@ import {
  * @param {object} param2
  * @param {'croppedonly'|'full'|'metadataonly'} param2.include
  * @param {string} param2.base base path of the app - import `base` from `$app/paths`
- * @param {number} [param2.cropPadding] padding to add around the bounding box when cropping images
+ * @param {string} [param2.cropPadding] padding to add around the bounding box when cropping images. string of the form "npx" or "n%"
  */
 export async function generateResultsZip(
 	observations,
@@ -253,7 +253,8 @@ export async function generateResultsZip(
 /**
  * @param {DB.Protocol} protocol protocol used
  * @param {DB.Image} image
- * @param {number} [padding=protocol.crop.padding] padding to add around the bounding box
+ * @param {string} [padding=protocol.crop.padding] padding to add around the bounding box when cropping images. string of the form "npx" or "n%"
+
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
 async function cropImage(protocol, image, padding = protocol.crop.padding) {
@@ -272,13 +273,17 @@ async function cropImage(protocol, image, padding = protocol.crop.padding) {
 	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
 		toTopLeftCoords(centeredBoundingBox)
 	);
+
+	const { inPixels } = parseCropPadding(padding);
+	const paddingPixels = { x: inPixels(bitmap.width), y: inPixels(bitmap.height) };
+
 	try {
 		const croppedBitmap = await createImageBitmap(
 			bitmap,
-			clamp(boundingBox.x - padding, 0, bitmap.width),
-			clamp(boundingBox.y - padding, 0, bitmap.height),
-			clamp(boundingBox.width + 2 * padding, 1, bitmap.width),
-			clamp(boundingBox.height + 2 * padding, 1, bitmap.height)
+			clamp(boundingBox.x - paddingPixels.x, 0, bitmap.width),
+			clamp(boundingBox.y - paddingPixels.y, 0, bitmap.height),
+			clamp(boundingBox.width + 2 * paddingPixels.x, 1, bitmap.width),
+			clamp(boundingBox.height + 2 * paddingPixels.y, 1, bitmap.height)
 		);
 		const canvas = document.createElement('canvas');
 		canvas.width = croppedBitmap.width;
@@ -306,6 +311,23 @@ async function cropImage(protocol, image, padding = protocol.crop.padding) {
 	}
 
 	return { cropped: bytes, original: bytes };
+}
+
+/**
+ *
+ * @param {string} padding
+ * @returns {{ withUnit: string, unitless: number, unit: 'px' | '%', inPixels: (axis: number) => number }}
+ */
+export function parseCropPadding(padding) {
+	const match = padding.match(/(\d+)(px|%)/);
+	if (!match) throw new Error(`Invalid crop padding: ${padding}`);
+	const [value, unit] = [Number.parseInt(match[1], 10), /** @type {'%'|'px'} */ (match[2])];
+	return {
+		withUnit: padding,
+		unitless: value,
+		unit,
+		inPixels: (axis) => (unit === 'px' ? value : Math.round((axis * value) / 100))
+	};
 }
 
 /**

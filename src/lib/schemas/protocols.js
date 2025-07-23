@@ -108,11 +108,11 @@ export const Protocol = type({
 			'@',
 			'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée'
 		],
-		padding: type('number.integer >= 0')
+		padding: type(/^\d+(%|px)$/)
 			.describe(
-				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées"
+				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées. Nombre suivi de 'px' pour un nombre de pixels fixe, ou de '%' pour un pourcentage des dimensions de chaque image."
 			)
-			.default(0),
+			.default('0px'),
 		'infer?': type({
 			'name?': [
 				'string',
