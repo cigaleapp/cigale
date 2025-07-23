@@ -186,9 +186,11 @@
 					{#if uiState.classificationModels.length > 0}
 						<div class="model-select">
 							<p>
-								Modèle d'inférence pour {tables.Metadata.state.find(
-									(m) => m.id === uiState.classificationMetadataId
-								)?.label ?? 'classification'}
+								{m.inference_model_for({
+									target:
+										tables.Metadata.state.find((m) => m.id === uiState.classificationMetadataId)
+											?.label ?? 'classification'
+								})}
 							</p>
 							<RadioButtons
 								value={uiState.selectedClassificationModel}
@@ -201,7 +203,7 @@
 					{/if}
 					{#if uiState.cropModels.length > 0}
 						<div class="model-select">
-							<p>Modèle d'inférence pour la détection</p>
+							<p>{m.inference_model_for_detection()}</p>
 							<RadioButtons
 								value={uiState.selectedCropModel}
 								onchange={async (value) => {
@@ -220,7 +222,7 @@
 		<p>Le protocole que vous souhaitez n'est pas disponible?</p>
 		<ButtonSecondary onclick={() => goto('#/protocols')}>
 			<IconManage />
-			Gérer les protocoles
+			{m.manage_protocols()}
 		</ButtonSecondary>
 		<ButtonSecondary
 			loading
@@ -231,7 +233,7 @@
 					importProtocol: data.swarpc.importProtocol
 				}).catch((e) => toasts.error(e));
 				if (!protocol || typeof protocol === 'string') return;
-				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);
+				toasts.success(m.protocol_imported_and_selected({ protocolName: protocol.name }));
 				uiState.currentProtocolId = protocol.id;
 				goto('#/import');
 			}}

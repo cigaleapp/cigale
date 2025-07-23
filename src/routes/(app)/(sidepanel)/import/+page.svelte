@@ -40,7 +40,7 @@
 	 */
 	async function processImageFile(swarpc, file, id) {
 		if (!uiState.currentProtocol) {
-			toasts.error('Aucun protocole sélectionné');
+			toasts.error(m.no_protocol_selected());
 			return;
 		}
 
@@ -81,7 +81,7 @@
 
 		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
 			console.error(error);
-			toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
+			toasts.error(m.error_extracting_exif_metadata({ fileName: file.name }));
 		});
 	}
 
@@ -97,7 +97,7 @@
 	 */
 	async function inferBoundingBoxes(swarp, file) {
 		if (!uiState.currentProtocol) {
-			toasts.error('Aucun protocole sélectionné');
+			toasts.error(m.no_protocol_selected());
 			return;
 		}
 
@@ -191,6 +191,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
@@ -231,11 +232,11 @@
 				}
 			)
 			.then(() => {
-				toasts.success('Modèle de détection chargé');
+				toasts.success(m.detection_model_loaded());
 			})
 			.catch((error) => {
 				console.error(error);
-				toasts.error('Erreur lors du chargement du modèle de détection');
+				toasts.error(m.error_loading_detection_model());
 			});
 
 		cropperModelLoaded = true;
@@ -284,7 +285,7 @@
 {#await loadCropperModel()}
 	<section class="loading">
 		<Logo loading />
-		<p>Chargement du modèle de recadrage…</p>
+		<p>{m.loading_cropping_model()}</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
@@ -332,7 +333,7 @@
 			{#if !images.length}
 				<div class="empty-state">
 					<Logo variant="empty" />
-					<p>Cliquer ou déposer des images, ou un export de résultats (.zip)</p>
+					<p>{m.click_or_drop_images_or_export()}</p>
 				</div>
 			{/if}
 		</section>
@@ -353,7 +354,7 @@
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
-		<p>Impossible de charger le modèle de recadrage</p>
+		<p>{m.cannot_load_cropping_model()}</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
 		{#if getSettings().showTechnicalMetadata}
