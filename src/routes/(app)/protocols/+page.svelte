@@ -13,7 +13,7 @@
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
 	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '$lib/simple-messages.js';
 
 	const { data } = $props();
 

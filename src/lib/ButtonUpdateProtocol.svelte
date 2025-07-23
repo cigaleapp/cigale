@@ -10,7 +10,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import IconCannotCheckForUpdates from '~icons/ph/warning-circle';
 	import ButtonIcon from './ButtonIcon.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '$lib/simple-messages.js';
 
 	/**
 	 * @typedef {object} Props

@@ -19,7 +19,7 @@
 	import { fetchHttpRequest } from '$lib/utils';
 	import { match, type } from 'arktype';
 	import { onMount } from 'svelte';
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '$lib/simple-messages.js';
 
 	seo({ title: 'Classification' });
 

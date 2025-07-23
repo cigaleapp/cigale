@@ -191,7 +191,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '$lib/simple-messages.js';
 
 	const { data } = $props();
 

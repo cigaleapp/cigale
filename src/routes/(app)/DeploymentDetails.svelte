@@ -2,7 +2,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { m } from '$lib/paraglide/messages';
+	import { m } from '$lib/simple-messages';
 
 	/**
 	 * @typedef {object} Props

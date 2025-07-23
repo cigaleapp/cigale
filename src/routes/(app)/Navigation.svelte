@@ -13,7 +13,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+	import { m } from '$lib/simple-messages.js';
 
 	/**
 	 * @typedef Props
