@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/52</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/52</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
@@ -432,32 +432,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -468,9 +455,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -699,7 +699,7 @@
 &nbsp;
 		&lt;div class="steps"&gt;
 			&lt;a href="#/"&gt;
-<span class="cstat-no" title="statement not covered" >				{m.protocol()}</span>
+<span class="cstat-no" title="statement not covered" >				{m.protocol_tab()}</span>
 				&lt;!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check --&gt;
 <span class="cstat-no" title="statement not covered" >				{#if path == '/' || path == ''}</span>
 					&lt;div class="line"&gt;&lt;/div&gt;
@@ -707,7 +707,7 @@
 			&lt;/a&gt;
 			&lt;IconNext&gt;&lt;/IconNext&gt;
 <span class="cstat-no" title="statement not covered" >			&lt;a href="#/import" aria-disabled={!uiState.currentProtocolId}&gt;</span>
-				Importer
+<span class="cstat-no" title="statement not covered" >				{m.import_tab()}</span>
 <span class="cstat-no" title="statement not covered" >				{#if path == '/import'}</span>
 					&lt;div class="line"&gt;&lt;/div&gt;
 				{/if}
@@ -719,7 +719,7 @@
 					data-testid="goto-crop"
 <span class="cstat-no" title="statement not covered" >					aria-disabled={!uiState.currentProtocolId || !hasImages}</span>
 				&gt;
-					Recadrer
+<span class="cstat-no" title="statement not covered" >					{m.crop_tab()}</span>
 <span class="cstat-no" title="statement not covered" >					{#if path.startsWith('/crop')}</span>
 						&lt;div class="line"&gt;&lt;/div&gt;
 					{/if}
@@ -732,7 +732,7 @@
 			&lt;IconNext&gt;&lt;/IconNext&gt;
 			&lt;div class="with-inference-indicator"&gt;
 <span class="cstat-no" title="statement not covered" >				&lt;a href="#/classify" aria-disabled={!uiState.currentProtocolId || !hasImages}&gt;</span>
-					Classifier
+<span class="cstat-no" title="statement not covered" >					{m.classify_tab()}</span>
 <span class="cstat-no" title="statement not covered" >					{#if path == '/classify'}</span>
 						&lt;div class="line"&gt;&lt;/div&gt;
 					{/if}
@@ -745,7 +745,7 @@
 			&lt;IconNext&gt;&lt;/IconNext&gt;
 <span class="cstat-no" title="statement not covered" >			&lt;ButtonSecondary tight onclick={openExportModal}&gt;</span>
 				&lt;IconDownload /&gt;
-				Résultats
+<span class="cstat-no" title="statement not covered" >				{m.results()}</span>
 			&lt;/ButtonSecondary&gt;
 		&lt;/div&gt;
 &nbsp;
@@ -895,7 +895,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-23T18:33:37.021Z
+                at 2025-07-23T18:35:54.243Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

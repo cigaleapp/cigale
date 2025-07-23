@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>0/77</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/76</span>
+                <span class='fraction'>0/77</span>
             </div>
         
             
@@ -271,13 +271,7 @@
 <a name='L206'></a><a href='#L206'>206</a>
 <a name='L207'></a><a href='#L207'>207</a>
 <a name='L208'></a><a href='#L208'>208</a>
-<a name='L209'></a><a href='#L209'>209</a>
-<a name='L210'></a><a href='#L210'>210</a>
-<a name='L211'></a><a href='#L211'>211</a>
-<a name='L212'></a><a href='#L212'>212</a>
-<a name='L213'></a><a href='#L213'>213</a>
-<a name='L214'></a><a href='#L214'>214</a>
-<a name='L215'></a><a href='#L215'>215</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L209'></a><a href='#L209'>209</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,6 +295,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -361,14 +356,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -387,7 +377,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -405,8 +395,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -420,7 +408,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -499,6 +487,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { ensureNoLoneImages } from '$lib/observations';
+	import { m } from '$lib/paraglide/messages';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { generateResultsZip, parseCropPadding } from '$lib/results.svelte';
@@ -555,7 +544,7 @@
 <span class="cstat-no" title="statement not covered" >		exporting = true;</span>
 <span class="cstat-no" title="statement not covered" >		const chosenProtocol = tables.Protocol.state.find((p) =&gt; p.id === uiState.currentProtocolId);</span>
 <span class="cstat-no" title="statement not covered" >		if (!chosenProtocol) {</span>
-<span class="cstat-no" title="statement not covered" >			toasts.error('Aucun protocole sélectionné');</span>
+<span class="cstat-no" title="statement not covered" >			toasts.error(m.no_protocol_selected());</span>
 <span class="cstat-no" title="statement not covered" >			exporting = false;</span>
 			return;
 <span class="cstat-no" title="statement not covered" >		}</span>
@@ -569,7 +558,7 @@
 <span class="cstat-no" title="statement not covered" >		} catch (error) {</span>
 <span class="cstat-no" title="statement not covered" >			console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >			toasts.error(</span>
-<span class="cstat-no" title="statement not covered" >				`Erreur lors de l'exportation des résultats: ${error?.toString() ?? 'Erreur inattendue'}`</span>
+<span class="cstat-no" title="statement not covered" >				m.error_while_exporting_results({ error: error?.toString() ?? m.unexpected_error() })</span>
 			);
 <span class="cstat-no" title="statement not covered" >		} finally {</span>
 <span class="cstat-no" title="statement not covered" >			exporting = false;</span>
@@ -577,22 +566,17 @@
 <span class="cstat-no" title="statement not covered" >	}</span>
 &lt;/script&gt;
 &nbsp;
-&lt;Modal
-	--footer-direction="column"
-	key="modal_export_results"
-	bind:open
-	title="Exporter les résultats"
-&gt;
+<span class="cstat-no" title="statement not covered" >&lt;Modal --footer-direction="column" key="modal_export_results" bind:open title={m.export_results()}&gt;</span>
 	&lt;div class="include"&gt;
 		&lt;RadioButtons
 <span class="cstat-no" title="statement not covered" >			bind:value={include}</span>
 			options={[
-<span class="cstat-no" title="statement not covered" >				{ key: 'metadataonly', label: 'Métadonnées seulement' },</span>
-<span class="cstat-no" title="statement not covered" >				{ key: 'croppedonly', label: 'Métadonnées et images recadrées' },</span>
+<span class="cstat-no" title="statement not covered" >				{ key: 'metadataonly', label: m.metadata_only() },</span>
+<span class="cstat-no" title="statement not covered" >				{ key: 'croppedonly', label: m.metadata_and_cropped_images() },</span>
 				{
 <span class="cstat-no" title="statement not covered" >					key: 'full',</span>
-<span class="cstat-no" title="statement not covered" >					label: 'Métadonnées, images recadrées et images originales',</span>
-<span class="cstat-no" title="statement not covered" >					subtext: 'Permet de ré-importer les résultats ultérieurement'</span>
+<span class="cstat-no" title="statement not covered" >					label: m.metadata_cropped_and_full_images(),</span>
+<span class="cstat-no" title="statement not covered" >					subtext: m.allows_reusing_export_later()</span>
 				}
 			]}
 		&gt;
@@ -601,7 +585,7 @@
 	&lt;/div&gt;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	&lt;section class="crop-padding" class:irrelevant={include === 'metadataonly'}&gt;</span>
-		&lt;div class="label"&gt;Marge autour des images recadrées&lt;/div&gt;
+<span class="cstat-no" title="statement not covered" >		&lt;div class="label"&gt;{m.padding_around_cropped_images()}&lt;/div&gt;</span>
 &nbsp;
 		&lt;SegmentedGroup
 <span class="cstat-no" title="statement not covered" >			options={['none', 'small', 'medium', 'customPercent', 'customPixels']}</span>
@@ -612,9 +596,7 @@
 <span class="cstat-no" title="statement not covered" >				{@const unit = option === 'customPercent' ? '%' : 'px'}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;div class="numeric" style:--width={unit === '%' ? '3ch' : '4ch'}&gt;</span>
 					&lt;InlineTextInput
-<span class="cstat-no" title="statement not covered" >						label={option === 'customPercent'</span>
-<span class="cstat-no" title="statement not covered" >							? "en pourcentage des dimensions de l'image"</span>
-<span class="cstat-no" title="statement not covered" >							: 'en pixels'}</span>
+<span class="cstat-no" title="statement not covered" >						label={option === 'customPercent' ? m.in_percent_of_image_dimensions() : m.in_pixels()}</span>
 <span class="cstat-no" title="statement not covered" >						value={cropPadding.unitless === 0</span>
 <span class="cstat-no" title="statement not covered" >							? '0'</span>
 <span class="cstat-no" title="statement not covered" >							: cropPadding.unit === unit</span>
@@ -634,7 +616,7 @@
 				&lt;/div&gt;
 			{/snippet}
 		&lt;/SegmentedGroup&gt;
-		&lt;p class="fineprint"&gt;Les valeurs en % sont relatives aux dimensions de chaque image&lt;/p&gt;
+<span class="cstat-no" title="statement not covered" >		&lt;p class="fineprint"&gt;{m['crop_padding.relative_values_explainer']()}&lt;/p&gt;</span>
 	&lt;/section&gt;
 &nbsp;
 	{#snippet footer()}
@@ -712,7 +694,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-23T18:33:37.021Z
+                at 2025-07-23T18:35:54.243Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
