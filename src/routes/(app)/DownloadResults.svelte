@@ -6,6 +6,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { ensureNoLoneImages } from '$lib/observations';
+	import { m } from '$lib/paraglide/messages';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { generateResultsZip, parseCropPadding } from '$lib/results.svelte';
@@ -62,7 +63,7 @@
 		exporting = true;
 		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!chosenProtocol) {
-			toasts.error('Aucun protocole sélectionné');
+			toasts.error(m.no_protocol_selected());
 			exporting = false;
 			return;
 		}
@@ -76,7 +77,7 @@
 		} catch (error) {
 			console.error(error);
 			toasts.error(
-				`Erreur lors de l'exportation des résultats: ${error?.toString() ?? 'Erreur inattendue'}`
+				m.error_while_exporting_results({ error: error?.toString() ?? m.unexpected_error() })
 			);
 		} finally {
 			exporting = false;
@@ -84,22 +85,17 @@
 	}
 </script>
 
-<Modal
-	--footer-direction="column"
-	key="modal_export_results"
-	bind:open
-	title="Exporter les résultats"
->
+<Modal --footer-direction="column" key="modal_export_results" bind:open title={m.export_results()}>
 	<div class="include">
 		<RadioButtons
 			bind:value={include}
 			options={[
-				{ key: 'metadataonly', label: 'Métadonnées seulement' },
-				{ key: 'croppedonly', label: 'Métadonnées et images recadrées' },
+				{ key: 'metadataonly', label: m.metadata_only() },
+				{ key: 'croppedonly', label: m.metadata_and_cropped_images() },
 				{
 					key: 'full',
-					label: 'Métadonnées, images recadrées et images originales',
-					subtext: 'Permet de ré-importer les résultats ultérieurement'
+					label: m.metadata_cropped_and_full_images(),
+					subtext: m.allows_reusing_export_later()
 				}
 			]}
 		>
@@ -108,7 +104,7 @@
 	</div>
 
 	<section class="crop-padding" class:irrelevant={include === 'metadataonly'}>
-		<div class="label">Marge autour des images recadrées</div>
+		<div class="label">{m.padding_around_cropped_images()}</div>
 
 		<SegmentedGroup
 			options={['none', 'small', 'medium', 'customPercent', 'customPixels']}
@@ -119,9 +115,7 @@
 				{@const unit = option === 'customPercent' ? '%' : 'px'}
 				<div class="numeric" style:--width={unit === '%' ? '3ch' : '4ch'}>
 					<InlineTextInput
-						label={option === 'customPercent'
-							? "en pourcentage des dimensions de l'image"
-							: 'en pixels'}
+						label={option === 'customPercent' ? m.in_percent_of_image_dimensions() : m.in_pixels()}
 						value={cropPadding.unitless === 0
 							? '0'
 							: cropPadding.unit === unit
@@ -141,7 +135,7 @@
 				</div>
 			{/snippet}
 		</SegmentedGroup>
-		<p class="fineprint">Les valeurs en % sont relatives aux dimensions de chaque image</p>
+		<p class="fineprint">{m['crop_padding.relative_values_explainer']()}</p>
 	</section>
 
 	{#snippet footer()}

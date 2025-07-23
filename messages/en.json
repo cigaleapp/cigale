@@ -2,5 +2,5 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"home": "Home",
 	"preview_pr_number": "Preview #{number}",
-	"protocol": "Protocol"
+	"protocol_tab": "Protocol"
 }

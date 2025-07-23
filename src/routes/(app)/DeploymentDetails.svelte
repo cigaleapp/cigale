@@ -2,6 +2,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
+	import { m } from '$lib/paraglide/messages';
 
 	/**
 	 * @typedef {object} Props
@@ -48,25 +49,22 @@
 	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
-			Ceci est un déploiement de preview pour la PR
-			<a href={prLink}>
-				#{previewingPrNumber}
-			</a>
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+			{@html m.preview_deployment_for_pr_no({ number: previewingPrNumber, prLink })}
 		</p>
 	{:then { title, user, body }}
 		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
-		<p>Ceci est un déploiement de preview</p>
+		<p>{m.preview_deployment_is_for_loaded_first_part()}</p>
 		<ul>
 			<li>
-				pour la PR
-				<a href={prLink}>{title}</a>
-				de
+				{m.preview_deployment_is_for_loaded_second_part({ title, prLink })}
 				{@render githubUser(user)}
 			</li>
 			{#if issueNumber}
 				<li>
 					{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/issues/${issueNumber}`).then( (res) => res.json() ) then { title, number, user, html_url }}
-						pour l'issue <a href={html_url}>#{number} {title}</a> de {@render githubUser(user)}
+						{m.preview_deployment_for_issue_no({ html_url, number, title })}
+						{@render githubUser(user)}
 					{/await}
 				</li>
 			{/if}
@@ -90,7 +88,7 @@
 				window.location.reload();
 			}}
 		>
-			Nettoyer la base de données
+			{m.cleanup_database()}
 		</ButtonSecondary>
 
 		<ButtonSecondary
