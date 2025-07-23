@@ -19,7 +19,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22.17.1'
-      - name: Install dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Install Dependencies
         run: npm ci
       - name: Lint
         run: npm run lint
@@ -31,7 +36,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22.17.1'
-      - name: Install dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Install Dependencies
         run: npm ci
       - name: Check formatting
         run: npx prettier --check .
@@ -46,7 +56,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22.17.1'
-      - name: Install dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Dependencies
         run: npm ci
       - name: Run tests
         run: npm test
@@ -67,7 +83,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22.17.1'
-      - name: Install dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Install Dependencies
         run: npm ci
       - name: Check for clutter
         run: npx knip
@@ -82,7 +103,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22.17.1'
-      - name: Install dependencies
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+      - name: Install Dependencies
         run: npm ci
       - name: Run tests
         run: npm test

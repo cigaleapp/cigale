@@ -20,13 +20,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install and Build
-        if: github.event.action != 'closed' # You might want to skip the build if the PR has been closed
-        run: |
-          npm install
-          BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale/_pullrequests/pr-$PR_NUMBER npm run build
+      - name: Cache Node Modules
+        uses: actions/cache@v3
+        if: github.event.action != 'closed' 
+        with:
+          path: ~/.npm
+          key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Dependencies
+        if: github.event.action != 'closed'
+        run: npm ci
+
+      - name: Build
+        if: github.event.action != 'closed'
+        run: npm run build
         env:
           PR_NUMBER: ${{ github.event.number }}
+          BUILD_COMMIT: ${{ github.sha }}
+          BASE_PATH: /cigale/_pullrequests/pr-${{ github.event.number }}
 
       - name: Deploy preview
         id: deploy-preview
