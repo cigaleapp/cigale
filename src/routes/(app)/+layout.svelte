@@ -2,15 +2,16 @@
 	import { base } from '$app/paths';
 	import { page } from '$app/state';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
-	import { watch } from 'runed';
 	import Toast from '$lib/Toast.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	import { m } from '$lib/paraglide/messages';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { nonnull, pick } from '$lib/utils';
+	import { watch } from 'runed';
 	import Navigation from './Navigation.svelte';
 
 	const { children } = $props();
@@ -47,9 +48,7 @@
 		'$mod+s': {
 			help: '',
 			hidden: true,
-			do: () => {
-				toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎');
-			}
+			do: () => toasts.info(m.no_need_for_ctrl_s())
 		}
 	});
 

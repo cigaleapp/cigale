@@ -45,25 +45,28 @@
 	</a>
 {/snippet}
 
-<Modal key="modal_preview_pr" bind:open title="Preview de la PR #{previewingPrNumber}">
+<Modal
+	key="modal_preview_pr"
+	bind:open
+	title={m.preview_deployment_for_pr_no({ number: previewingPrNumber })}
+>
 	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
-			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-			{@html m.preview_deployment_for_pr_no({ number: previewingPrNumber, prLink })}
+			{@html m.preview_deployment_for_pr_no__html({ number: previewingPrNumber, prLink })}
 		</p>
 	{:then { title, user, body }}
 		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
 		<p>{m.preview_deployment_is_for_loaded_first_part()}</p>
 		<ul>
 			<li>
-				{m.preview_deployment_is_for_loaded_second_part({ title, prLink })}
+				{@html m.preview_deployment_is_for_loaded_second_part__html({ title, prLink })}
 				{@render githubUser(user)}
 			</li>
 			{#if issueNumber}
 				<li>
 					{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/issues/${issueNumber}`).then( (res) => res.json() ) then { title, number, user, html_url }}
-						{m.preview_deployment_for_issue_no({ html_url, number, title })}
+						{@html m.preview_deployment_for_issue_no__html({ html_url, number, title })}
 						{@render githubUser(user)}
 					{/await}
 				</li>

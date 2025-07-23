@@ -18,15 +18,17 @@
 	"padding_around_cropped_images": "Padding around cropped images",
 	"in_percent_of_image_dimensions": "in percent of image dimensions",
 	"in_pixels": "in pixels",
-	"preview_deployment_for_pr_no": "Preview deployment for <a href={prLink}>PR #{number}</a>",
-	"preview_deployment_for_issue_no": "for issue <a href={html_url}>#{number} {title}</a> by",
+	"preview_deployment_for_pr_no": "Preview deployment for PR #{number}",
+	"preview_deployment_for_pr_no__html": "Preview deployment for <a href={prLink}>PR #{number}</a>",
+	"preview_deployment_for_issue_no__html": "for issue <a href={html_url}>#{number} {title}</a> by",
 	"preview_deployment_is_for_loaded_first_part": "This is a preview deployment",
-	"preview_deployment_is_for_loaded_second_part": "for PR <a href={prLink}>{title}</a> by",
+	"preview_deployment_is_for_loaded_second_part__html": "for PR <a href={prLink}>{title}</a> by",
 	"preview_deployment_cleanup_database": "Clean up database",
 	"preview_deployment_cleanup_database_help": "Deletes all data for this preview deployment",
 	"preview_deployment_view_on_github": "View on Github",
 	"preview_deployment_e2e_tests": "E2E tests",
 	"preview_deployment_unit_tests": "Unit tests",
 	"preview_deployment_coverage": "Coverage",
-	"crop_padding_relative_values_explainer": "A % value means that the padding is relative to the dimensions of each image"
+	"crop_padding_relative_values_explainer": "A % value means that the padding is relative to the dimensions of each image",
+	"no_need_for_ctrl_s": "No need for Ctrl-S, your changes are saved automatically 😎"
 }

@@ -217,7 +217,6 @@
 					{#if highlightedOption?.description}
 						<section class="description">
 							{#await marked(highlightedOption.description) then html}
-								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 								{@html html}
 							{:catch error}
 								{#if getSettings().showTechnicalMetadata}
@@ -246,7 +245,6 @@
 									<tr>
 										<td>
 											{#if revdepth > 0}
-												<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 												{@html '&nbsp;'.repeat((revdepth - 1) * 3) + '└─'}
 											{/if}
 											{metadata}

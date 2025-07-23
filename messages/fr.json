@@ -18,15 +18,17 @@
 	"padding_around_cropped_images": "Marge autour des images recadrées",
 	"in_percent_of_image_dimensions": "en pourcentage des dimensions de l'image",
 	"in_pixels": "en pixels",
-	"preview_deployment_for_pr_no": "Déploiement de preview pour la <a href={prLink}>PR #{number}</a>",
-	"preview_deployment_for_issue_no": "pour l'issue <a href={html_url}>#{number} {title}</a> de",
+	"preview_deployment_for_pr_no": "Déploiement de preview pour la PR #{number}",
+	"preview_deployment_for_pr_no__html": "Déploiement de preview pour la <a href={prLink}>PR #{number}</a>",
+	"preview_deployment_for_issue_no__html": "pour l'issue <a href={html_url}>#{number} {title}</a> de",
 	"preview_deployment_is_for_loaded_first_part": "Ceci est un déploiement de preview",
-	"preview_deployment_is_for_loaded_second_part": "pour la PR <a href={prLink}>{title}</a> de",
+	"preview_deployment_is_for_loaded_second_part__html": "pour la PR <a href={prLink}>{title}</a> de",
 	"preview_deployment_cleanup_database": "Nettoyer la base de données",
 	"preview_deployment_cleanup_database_help": "Supprime toutes les données pour ce déploiement de preview",
 	"preview_deployment_view_on_github": "Voir sur Github",
 	"preview_deployment_e2e_tests": "Tests E2E",
 	"preview_deployment_unit_tests": "Tests unitaires",
 	"preview_deployment_coverage": "Coverage",
-	"crop_padding_relative_values_explainer": "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
+	"crop_padding_relative_values_explainer": "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images",
+	"no_need_for_ctrl_s": "Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎"
 }
