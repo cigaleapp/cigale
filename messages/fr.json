@@ -22,5 +22,10 @@
 	"preview_deployment_for_issue_no": "pour l'issue <a href={html_url}>#{number} {title}</a> de",
 	"preview_deployment_is_for_loaded_first_part": "Ceci est un déploiement de preview",
 	"preview_deployment_is_for_loaded_second_part": "pour la PR <a href={prLink}>{title}</a> de",
-	"cleanup_database": "Nettoyer la base de données"
+	"preview_deployment_cleanup_database": "Nettoyer la base de données",
+	"preview_deployment_cleanup_database_help": "Supprime toutes les données pour ce déploiement de preview",
+	"preview_deployment_view_on_github": "Voir sur Github",
+	"preview_deployment_e2e_tests": "Tests E2E",
+	"preview_deployment_unit_tests": "Tests unitaires",
+	"preview_deployment_coverage": "Coverage"
 }

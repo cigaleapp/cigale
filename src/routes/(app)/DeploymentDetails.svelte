@@ -82,36 +82,42 @@
 			close?.();
 		}}
 		<ButtonSecondary
-			help="Supprime toutes les données pour ce déploiement de preview"
+			help={m.preview_deployment_cleanup_database_help()}
 			onclick={() => {
 				nukeDatabase();
 				window.location.reload();
 			}}
 		>
-			{m.cleanup_database()}
+			{m.preview_deployment_cleanup_database()}
 		</ButtonSecondary>
 
 		<ButtonSecondary
 			onclick={open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`)}
 		>
-			Voir sur Github
+			{m.preview_deployment_view_on_github()}
 		</ButtonSecondary>
 
 		{#await hasPage('_playwright') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_playwright'))}>Tests E2E</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_playwright'))}>
+					{m.preview_deployment_e2e_tests()}
+				</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_vitest') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_vitest'))}>
+					{m.preview_deployment_unit_tests()}
+				</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_coverage') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_coverage'))}>Coverage</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_coverage'))}>
+					{m.preview_deployment_coverage()}
+				</ButtonSecondary>
 			{/if}
 		{/await}
 	{/snippet}
