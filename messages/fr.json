@@ -27,5 +27,6 @@
 	"preview_deployment_view_on_github": "Voir sur Github",
 	"preview_deployment_e2e_tests": "Tests E2E",
 	"preview_deployment_unit_tests": "Tests unitaires",
-	"preview_deployment_coverage": "Coverage"
+	"preview_deployment_coverage": "Coverage",
+	"crop_padding_relative_values_explainer": "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
 }

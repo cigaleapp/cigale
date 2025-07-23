@@ -27,5 +27,6 @@
 	"preview_deployment_view_on_github": "View on Github",
 	"preview_deployment_e2e_tests": "E2E tests",
 	"preview_deployment_unit_tests": "Unit tests",
-	"preview_deployment_coverage": "Coverage"
+	"preview_deployment_coverage": "Coverage",
+	"crop_padding_relative_values_explainer": "A % value means that the padding is relative to the dimensions of each image"
 }

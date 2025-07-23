@@ -135,7 +135,7 @@
 				</div>
 			{/snippet}
 		</SegmentedGroup>
-		<p class="fineprint">{m['crop_padding.relative_values_explainer']()}</p>
+		<p class="fineprint">{m.crop_padding_relative_values_explainer()}</p>
 	</section>
 
 	{#snippet footer()}
