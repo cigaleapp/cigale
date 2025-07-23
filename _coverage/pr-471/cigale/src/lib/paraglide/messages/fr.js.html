@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/97</span>
+                <span class='fraction'>0/96</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/97</span>
+                <span class='fraction'>0/96</span>
             </div>
         
             
@@ -268,13 +268,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -392,19 +392,23 @@
 <span class="cstat-no" title="statement not covered" >	return `en pixels`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export const preview_deployment_for_pr_no = /** @type {(inputs: { number: NonNullable&lt;unknown&gt;, prLink: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >export const preview_deployment_for_pr_no = /** @type {(inputs: { number: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	return `Déploiement de preview pour la PR #${i.number}`</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const preview_deployment_for_pr_no__html = /** @type {(inputs: { prLink: NonNullable&lt;unknown&gt;, number: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	return `Déploiement de preview pour la &lt;a href=${i.prLink}&gt;PR #${i.number}&lt;/a&gt;`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
-<span class="cstat-no" title="statement not covered" >/** @type {(inputs: { prLink: NonNullable&lt;unknown&gt;, number: NonNullable&lt;unknown&gt; }) =&gt; string} */</span>
-<span class="cstat-no" title="statement not covered" >export const preview_deployment_for_pr_no__html = () =&gt; 'preview_deployment_for_pr_no__html'</span>
 <span class="cstat-no" title="statement not covered" >/** @type {(inputs: { html_url: NonNullable&lt;unknown&gt;, number: NonNullable&lt;unknown&gt;, title: NonNullable&lt;unknown&gt; }) =&gt; string} */</span>
 <span class="cstat-no" title="statement not covered" >export const preview_deployment_for_issue_no__html = () =&gt; 'preview_deployment_for_issue_no__html'</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const preview_deployment_is_for_loaded_first_part = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	return `Ceci est un déploiement de preview`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
-<span class="cstat-no" title="statement not covered" >/** @type {(inputs: { prLink: NonNullable&lt;unknown&gt;, title: NonNullable&lt;unknown&gt; }) =&gt; string} */</span>
-<span class="cstat-no" title="statement not covered" >export const preview_deployment_is_for_loaded_second_part__html = () =&gt; 'preview_deployment_is_for_loaded_second_part__html'</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >export const preview_deployment_is_for_loaded_second_part__html = /** @type {(inputs: { prLink: NonNullable&lt;unknown&gt;, title: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	return `pour la PR &lt;a href=${i.prLink}&gt;${i.title}&lt;/a&gt; de`</span>
+<span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const preview_deployment_cleanup_database = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	return `Nettoyer la base de données`</span>
@@ -440,10 +444,6 @@
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const preview_deployment_for_issue_no = /** @type {(inputs: { html_url: NonNullable&lt;unknown&gt;, number: NonNullable&lt;unknown&gt;, title: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	return `pour l'issue &lt;a href=${i.html_url}&gt;#${i.number} ${i.title}&lt;/a&gt; de`</span>
-<span class="cstat-no" title="statement not covered" >};</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >export const preview_deployment_is_for_loaded_second_part = /** @type {(inputs: { prLink: NonNullable&lt;unknown&gt;, title: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `pour la PR &lt;a href=${i.prLink}&gt;${i.title}&lt;/a&gt; de`</span>
 <span class="cstat-no" title="statement not covered" >};</span></pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -451,7 +451,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-23T19:13:38.643Z
+                at 2025-07-23T19:15:19.272Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
