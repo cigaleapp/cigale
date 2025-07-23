@@ -1,4 +1,4 @@
-import { paraglideMiddleware } from '$lib/paraglide/server';
+import { paraglideMiddleware } from '$lib/paraglide/server.js';
 
 /** @type {import('@sveltejs/kit').Handle} */
 const paraglideHandle = ({ event, resolve }) =>
