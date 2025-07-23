@@ -13,6 +13,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
+	import { m } from '$lib/paraglide/messages';
 
 	/**
 	 * @typedef Props
@@ -76,14 +77,14 @@
 			</a>
 			{#if previewingPrNumber}
 				<button class="pr-number" onclick={openPreviewPRDetails}>
-					Preview #{previewingPrNumber}
+					{m.preview_pr_number({ number: previewingPrNumber })}
 				</button>
 			{/if}
 		</div>
 
 		<div class="steps">
 			<a href="#/">
-				Protocole
+				{m.protocol()}
 				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
 				{#if path == '/' || path == ''}
 					<div class="line"></div>

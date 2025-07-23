@@ -1,0 +1,6 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"home": "Accueil",
+	"preview_pr_number": "Preview #{number}",
+	"protocol": "Protocole"
+}
