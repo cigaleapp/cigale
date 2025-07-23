@@ -277,8 +277,8 @@ async function cropImage(protocol, image, padding = protocol.crop.padding) {
 			bitmap,
 			clamp(boundingBox.x - padding, 0, bitmap.width),
 			clamp(boundingBox.y - padding, 0, bitmap.height),
-			clamp(boundingBox.width + padding, 1, bitmap.width),
-			clamp(boundingBox.height + padding, 1, bitmap.height)
+			clamp(boundingBox.width + 2 * padding, 1, bitmap.width),
+			clamp(boundingBox.height + 2 * padding, 1, bitmap.height)
 		);
 		const canvas = document.createElement('canvas');
 		canvas.width = croppedBitmap.width;
