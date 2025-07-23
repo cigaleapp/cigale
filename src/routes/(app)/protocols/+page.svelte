@@ -13,6 +13,7 @@
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
 	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
@@ -126,7 +127,7 @@
 		</ButtonSecondary>
 		<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
 			<IconCreate />
-			Créer
+			{m.create()}
 		</ButtonSecondary>
 	</section>
 </header>

@@ -17,6 +17,7 @@
 	import IconImport from '~icons/ph/upload-simple';
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
@@ -78,7 +79,7 @@
 	 */
 	function radioOptions(models) {
 		return [
-			{ key: -1, label: 'Aucune inférence' },
+			{ key: -1, label: m.no_inference() },
 			...models.map(({ model, name }, key) => {
 				const url = typeof model === 'string' ? model : model.url;
 				return { key, label: name ?? url };
@@ -121,7 +122,7 @@
 		}
 	}}
 >
-	Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'addresse
+	{m.remote_protocol_import_confirm()}
 	suivante:
 
 	{#if $preselectedProtocol && preselectedProtocolIsRemote}
@@ -171,7 +172,7 @@
 						}}
 					>
 						{#if p.id === currentProtocol?.id}
-							<Tooltip text="Protocole sélectionné">
+							<Tooltip text={m.selected_protocol()}>
 								<IconCheck />
 							</Tooltip>
 						{/if}

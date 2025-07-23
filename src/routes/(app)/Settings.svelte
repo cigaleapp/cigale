@@ -7,6 +7,7 @@
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { watch } from 'runed';
+	import { m } from '$lib/paraglide/messages.js';
 	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
 	import Gears from '~icons/ph/gear-light';
 	import Moon from '~icons/ph/moon-light';
@@ -56,7 +57,7 @@
 
 <ButtonIcon
 	data-testid="settings-button"
-	help={open ? 'Fermer' : 'Réglages'}
+	help={open ? m.close() : m.settings()}
 	onclick={() => {
 		open = !open;
 	}}
@@ -76,7 +77,7 @@
 >
 	<div class="listParam">
 		<div class="setting">
-			Thème
+			{m.theme()}
 			<Switch
 				value={getSettings().theme === 'auto' ? systemIsLight : getSettings().theme === 'light'}
 				onchange={async (isLight) => {
@@ -87,7 +88,7 @@
 			<ButtonIcon
 				disabled={getSettings().theme === 'auto'}
 				onclick={async () => await setSetting('theme', 'auto')}
-				help="Synchroniser avec le thème du système"
+				help={m.sync_with_system_theme()}
 			>
 				<IconSyncWithSystemTheme />
 			</ButtonIcon>
@@ -105,7 +106,7 @@
 		<div class="setting">
 			<SegmentedGroup
 				options={[...locales]}
-				labels={{ en: 'English', fr: 'Français' }}
+				labels={{ en: 'English', fr: m.french() }}
 				bind:value={getLocale, setLocale}
 			/>
 		</div>
@@ -116,7 +117,7 @@
 					await goto('#/protocols');
 				}}
 			>
-				Gérer les protocoles
+				{m.manage_protocols()}
 			</ButtonSecondary>
 		</div>
 		<div class="setting">
@@ -137,7 +138,7 @@
 				onclick={() => {
 					open = false;
 				}}
-				href="#/about">À propos</a
+				href="#/about">{m.about()}</a
 			>
 		</footer>
 	</div>
