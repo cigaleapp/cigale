@@ -7,7 +7,6 @@
 		"svelte.svelte-vscode",
 		"antfu.iconify",
 		"arktypeio.arkdark",
-		"ms-playwright.playwright",
-		"inlang.vs-code-extension"
+		"ms-playwright.playwright"
 	]
 }
