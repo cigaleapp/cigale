@@ -24,7 +24,7 @@ jobs:
         uses: actions/cache@v3
         if: github.event.action != 'closed' 
         with:
-          path: ~/.npm
+          path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
 
       - name: Install Dependencies
