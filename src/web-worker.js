@@ -12,7 +12,6 @@ import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 import YAML from 'yaml';
 import { PROCEDURES } from './web-worker-procedures.js';
-import { m } from '$lib/simple-messages.js';
 
 const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
 
@@ -80,13 +79,13 @@ swarp.isModelLoaded((task) => inferenceSessions.has(task));
 swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
 	const session = inferenceSessions.get('detection')?.onnx;
 	if (!session) {
-		throw new Error(m.detection_model_not_loaded());
+		throw new Error('Modèle de détection non chargé');
 	}
 
 	await openDatabase();
 	const file = await db.get('ImageFile', fileId);
 	if (!file) {
-		throw new Error(m.file_not_found({ fileId }));
+		throw new Error(`Fichier avec l'ID ${fileId} non trouvé`);
 	}
 
 	const [[boxes], [scores]] = await infer(taskSettings, [file.bytes], session);
@@ -97,13 +96,13 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
 swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 	const session = inferenceSessions.get('classification')?.onnx;
 	if (!session) {
-		throw new Error(m.classification_model_not_loaded());
+		throw new Error('Modèle de classification non chargé');
 	}
 
 	await openDatabase();
 	const file = await db.get('ImageFile', fileId);
 	if (!file) {
-		throw new Error(m.file_not_found({ fileId }));
+		throw new Error(`Fichier avec l'ID ${fileId} non trouvé`);
 	}
 
 	console.log('Classifying file', fileId, 'with cropbox', cropbox);

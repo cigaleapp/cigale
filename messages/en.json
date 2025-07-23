@@ -4,6 +4,7 @@
 	"preview_pr_number": "Preview #{number}",
 	"protocol_tab": "Protocol",
 	"classify_tab": "Classify",
+	"classification": "Classification",
 	"results": "Results",
 	"no_protocol_selected": "No protocol selected",
 	"import_tab": "Import",
@@ -90,5 +91,16 @@
 	"cannot_load_cropping_model": "Cannot load cropping model",
 	"warning_deletes_all_data": "WARNING: DELETES ALL YOUR DATA",
 	"reset_database": "Reset database",
-	"create": "Create"
+	"create": "Create",
+	"reset_zoom": "Reset zoom",
+	"zoom_out": "Zoom out",
+	"zoom_in": "Zoom in",
+	"select_tool": "Select tool {tool}",
+	"technical_metadata_tooltip": "Technical metadata, not visible in the interface",
+	"taxonomic_metadata_tooltip": "Taxonomic metadata, inferred from the value of another metadata representing the lower clade",
+	"inferred_metadata_tooltip": "Auto-detected metadata by inference",
+	"inferred_from_single_exif": "Auto-detected metadata from EXIF metadata \"{exif}\" of the image",
+	"inferred_from_two_exif": "Auto-detected metadata from EXIF metadata \"{latitude}\" and \"{longitude}\" of the image",
+	"separate_all_selected_help": "Separate all selected observations into individual images",
+	"create_protocol": "Create protocol"
 }

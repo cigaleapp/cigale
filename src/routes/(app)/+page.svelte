@@ -17,7 +17,7 @@
 	import IconImport from '~icons/ph/upload-simple';
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
-	import { m } from '$lib/simple-messages.js';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 

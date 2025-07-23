@@ -13,7 +13,7 @@
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
 	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
-	import { m } from '$lib/simple-messages.js';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
@@ -32,7 +32,7 @@
 
 <Modal
 	key="modal_download_protocol_template"
-	title="Créer un protocole"
+	title={m.create_protocol()}
 	bind:open={downloadNewProtocolTemplate}
 >
 	<p>

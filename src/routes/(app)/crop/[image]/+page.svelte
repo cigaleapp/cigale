@@ -60,6 +60,7 @@
 	import IconToolDragCrop from '~icons/ph/selection-plus';
 	import IconGallery from '~icons/ph/squares-four';
 	import IconDelete from '~icons/ph/trash';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const fileId = $derived(page.params.image);
 	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));
@@ -586,19 +587,19 @@
 			do: () => changeAllConfirmedStatuses(false)
 		},
 		'+': {
-			help: 'Zoomer',
+			help: m.zoom_in(),
 			do: () => {
 				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed, 10);
 			}
 		},
 		'-': {
-			help: 'Dézoomer',
+			help: m.zoom_out(),
 			do: () => {
 				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed, 10);
 			}
 		},
 		Digit0: {
-			help: 'Réinitialiser le zoom',
+			help: m.reset_zoom(),
 			do: () => {
 				zoom.origin = { x: 0, y: 0 };
 				zoom.scale = 1;
@@ -696,7 +697,7 @@
 	<aside class="toolbar">
 		{#each tools as tool (tool.name)}
 			<button
-				aria-label="Sélectionner l'outil {tool.name}"
+				aria-label={m.select_tool({ tool: tool.name })}
 				class:active={tool.name === activeToolName}
 				use:tooltip={{
 					text: `${tool.name}: ${tool.help}`,

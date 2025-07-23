@@ -6,7 +6,7 @@
 	import { nukeDatabase } from '$lib/idb.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import { goto } from '$app/navigation';
-	import { m } from '$lib/simple-messages.js';
+	import { m } from '$lib/paraglide/messages.js';
 </script>
 
 <main>
@@ -33,7 +33,7 @@
 		</p>
 		{#if page.status !== 404}
 			<ButtonInk
-				help="ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
+				help={m.warning_deletes_all_data()}
 				onclick={async () => {
 					nukeDatabase();
 					window.location.reload();
@@ -43,7 +43,7 @@
 					<IconReset />
 				</div>
 
-				Réinitialiser la base de données
+				{m.reset_database()}
 			</ButtonInk>
 		{/if}
 	</section>

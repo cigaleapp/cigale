@@ -14,6 +14,7 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+	import { m } from '$lib/paraglide/messages.js';
 	import deepEqual from 'deep-equal';
 	import { watch } from 'runed';
 	import IconSplit from '~icons/ph/arrows-out-light';
@@ -193,7 +194,7 @@
 					disabled={!cansplit}
 					onclick={onsplit}
 					keyboard="$mod+Shift+g"
-					help="Séparer toutes les observations sélectionnées en images seules"
+					help={m.separate_all_selected_help()}
 				>
 					<IconSplit />
 					Séparer

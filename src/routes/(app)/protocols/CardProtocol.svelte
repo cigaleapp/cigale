@@ -10,6 +10,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { m as messages } from '$lib/paraglide/messages.js';
 	import IconArrow from '~icons/ph/arrow-right';
 	import IconForeign from '~icons/ph/diamond';
 	import IconTaxonomy from '~icons/ph/graph';
@@ -139,7 +140,7 @@
 							{/if}
 							{#if !m.label}
 								<sup
-									use:tooltip={"Métadonnée technique, non visible dans l'interface"}
+									use:tooltip={messages.technical_metadata_tooltip()}
 									style:color="var(--fg-error)"
 								>
 									<IconTechnical />
@@ -147,7 +148,7 @@
 							{/if}
 							{#if 'taxonomic' in m}
 								<sup
-									use:tooltip={"Métadonnée taxonomique, déduite de la valeur de d'une autre métadonnée représentant la clade inférieure"}
+									use:tooltip={messages.taxonomic_metadata_tooltip()}
 									style:color="var(--fg-warning)"
 								>
 									<IconTaxonomy />
@@ -155,7 +156,7 @@
 							{/if}
 							{#if m.id === crop?.metadata || (m.infer && 'neural' in m.infer)}
 								<sup
-									use:tooltip={'Métadonnée auto-détectée par inférence'}
+									use:tooltip={messages.inferred_metadata_tooltip()}
 									style:color="var(--fg-primary)"
 								>
 									<IconInferred />
@@ -163,8 +164,11 @@
 							{:else if m.infer && ('exif' in m.infer || ('latitude' in m.infer && 'exif' in m.infer.latitude))}
 								<sup
 									use:tooltip={'exif' in m.infer
-										? `Métadonnée auto-détectée à partir de la métadonnée EXIF "${m.infer.exif}" de l'image`
-										: `Métadonnée auto-détectée à partir des métadonnées EXIF "${m.infer.latitude.exif}" et "${m.infer.longitude.exif}" de l'image`}
+										? messages.inferred_from_single_exif({ exif: m.infer.exif })
+										: messages.inferred_from_two_exif({
+												latitude: m.infer.latitude.exif,
+												longitude: m.infer.longitude.exif
+											})}
 									style:color="var(--fg-primary)"
 								>
 									<IconTag />

@@ -6,7 +6,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { ensureNoLoneImages } from '$lib/observations';
-	import { m } from '$lib/simple-messages';
+	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { generateResultsZip, parseCropPadding } from '$lib/results.svelte';

@@ -7,7 +7,7 @@
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { watch } from 'runed';
-	import { m } from '$lib/simple-messages.js';
+	import { m } from '$lib/paraglide/messages.js';
 	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
 	import Gears from '~icons/ph/gear-light';
 	import Moon from '~icons/ph/moon-light';
