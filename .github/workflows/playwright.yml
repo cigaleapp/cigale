@@ -28,6 +28,8 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: debug export snapshots (to remove)
+        run: ls -la tests/export.spec.js-snapshots
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v4
