@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/55</span>
+                <span class='fraction'>0/60</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/55</span>
+                <span class='fraction'>0/60</span>
             </div>
         
             
@@ -200,7 +200,13 @@
 <a name='L135'></a><a href='#L135'>135</a>
 <a name='L136'></a><a href='#L136'>136</a>
 <a name='L137'></a><a href='#L137'>137</a>
-<a name='L138'></a><a href='#L138'>138</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -284,36 +290,42 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -421,36 +433,42 @@
 <span class="cstat-no" title="statement not covered" >			close?.();</span>
 <span class="cstat-no" title="statement not covered" >		}}</span>
 		&lt;ButtonSecondary
-			help="Supprime toutes les données pour ce déploiement de preview"
+<span class="cstat-no" title="statement not covered" >			help={m.preview_deployment_cleanup_database_help()}</span>
 <span class="cstat-no" title="statement not covered" >			onclick={() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				nukeDatabase();</span>
 <span class="cstat-no" title="statement not covered" >				window.location.reload();</span>
 <span class="cstat-no" title="statement not covered" >			}}</span>
 		&gt;
-<span class="cstat-no" title="statement not covered" >			{m.cleanup_database()}</span>
+<span class="cstat-no" title="statement not covered" >			{m.preview_deployment_cleanup_database()}</span>
 		&lt;/ButtonSecondary&gt;
 &nbsp;
 		&lt;ButtonSecondary
 <span class="cstat-no" title="statement not covered" >			onclick={open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`)}</span>
 		&gt;
-			Voir sur Github
+<span class="cstat-no" title="statement not covered" >			{m.preview_deployment_view_on_github()}</span>
 		&lt;/ButtonSecondary&gt;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		{#await hasPage('_playwright') then ok}</span>
 <span class="cstat-no" title="statement not covered" >			{#if ok}</span>
-<span class="cstat-no" title="statement not covered" >				&lt;ButtonSecondary onclick={open(pageURL('_playwright'))}&gt;Tests E2E&lt;/ButtonSecondary&gt;</span>
+<span class="cstat-no" title="statement not covered" >				&lt;ButtonSecondary onclick={open(pageURL('_playwright'))}&gt;</span>
+<span class="cstat-no" title="statement not covered" >					{m.preview_deployment_e2e_tests()}</span>
+				&lt;/ButtonSecondary&gt;
 			{/if}
 		{/await}
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		{#await hasPage('_vitest') then ok}</span>
 <span class="cstat-no" title="statement not covered" >			{#if ok}</span>
-<span class="cstat-no" title="statement not covered" >				&lt;ButtonSecondary onclick={open(pageURL('_vitest'))}&gt;Tests unitaires&lt;/ButtonSecondary&gt;</span>
+<span class="cstat-no" title="statement not covered" >				&lt;ButtonSecondary onclick={open(pageURL('_vitest'))}&gt;</span>
+<span class="cstat-no" title="statement not covered" >					{m.preview_deployment_unit_tests()}</span>
+				&lt;/ButtonSecondary&gt;
 			{/if}
 		{/await}
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		{#await hasPage('_coverage') then ok}</span>
 <span class="cstat-no" title="statement not covered" >			{#if ok}</span>
-<span class="cstat-no" title="statement not covered" >				&lt;ButtonSecondary onclick={open(pageURL('_coverage'))}&gt;Coverage&lt;/ButtonSecondary&gt;</span>
+<span class="cstat-no" title="statement not covered" >				&lt;ButtonSecondary onclick={open(pageURL('_coverage'))}&gt;</span>
+<span class="cstat-no" title="statement not covered" >					{m.preview_deployment_coverage()}</span>
+				&lt;/ButtonSecondary&gt;
 			{/if}
 		{/await}
 	{/snippet}
@@ -481,7 +499,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-23T18:35:54.243Z
+                at 2025-07-23T18:42:08.649Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
