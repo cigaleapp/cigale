@@ -82,7 +82,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Check for untranslated messages
-        run: npx @inlang/cli lint
+        run: |
+          node -e "
+          const fs = require('fs');
+          const fr = JSON.parse(fs.readFileSync('messages/fr.json', 'utf8'));
+          const en = JSON.parse(fs.readFileSync('messages/en.json', 'utf8'));
+          const missing = Object.keys(fr).filter(key => !en[key]?.trim());
+          if (missing.length) {
+            console.error('Missing or empty keys in en.json:');
+            missing.forEach(key => console.error(`- ${key}: "${fr[key]}"`));
+            process.exit(1);
+          } else {
+            console.log('All fr.json keys are present and non-empty in en.json');
+          }
+          "
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
