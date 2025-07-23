@@ -3,10 +3,10 @@ name: End-to-end tests
 on:
   push:
     branches: [main]
-    paths: [src/**, tests/**, static/**, '*']
+    paths: [src/**, tests/**, static/**, '*', .github/workflows/playwright.yml]
   pull_request:
     branches: [main]
-    paths: [src/**, tests/**, static/**, '*']
+    paths: [src/**, tests/**, static/**, '*', .github/workflows/playwright.yml]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
