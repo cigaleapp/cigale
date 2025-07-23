@@ -6,6 +6,7 @@
 	import { nukeDatabase } from '$lib/idb.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import { goto } from '$app/navigation';
+	import { m } from '$lib/paraglide/messages.js';
 </script>
 
 <main>
@@ -17,7 +18,7 @@
 					goto('#/');
 				}}
 			>
-				Accueil
+				{m.home}
 			</ButtonPrimary>
 		{/if}
 	</section>

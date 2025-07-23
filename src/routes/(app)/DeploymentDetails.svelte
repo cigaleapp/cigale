@@ -2,6 +2,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
+	import { m } from '$lib/paraglide/messages';
 
 	/**
 	 * @typedef {object} Props
@@ -44,29 +45,29 @@
 	</a>
 {/snippet}
 
-<Modal key="modal_preview_pr" bind:open title="Preview de la PR #{previewingPrNumber}">
+<Modal
+	key="modal_preview_pr"
+	bind:open
+	title={m.preview_deployment_for_pr_no({ number: previewingPrNumber })}
+>
 	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
-			Ceci est un déploiement de preview pour la PR
-			<a href={prLink}>
-				#{previewingPrNumber}
-			</a>
+			{@html m.preview_deployment_for_pr_no__html({ number: previewingPrNumber, prLink })}
 		</p>
 	{:then { title, user, body }}
 		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
-		<p>Ceci est un déploiement de preview</p>
+		<p>{m.preview_deployment_is_for_loaded_first_part()}</p>
 		<ul>
 			<li>
-				pour la PR
-				<a href={prLink}>{title}</a>
-				de
+				{@html m.preview_deployment_is_for_loaded_second_part__html({ title, prLink })}
 				{@render githubUser(user)}
 			</li>
 			{#if issueNumber}
 				<li>
 					{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/issues/${issueNumber}`).then( (res) => res.json() ) then { title, number, user, html_url }}
-						pour l'issue <a href={html_url}>#{number} {title}</a> de {@render githubUser(user)}
+						{@html m.preview_deployment_for_issue_no__html({ html_url, number, title })}
+						{@render githubUser(user)}
 					{/await}
 				</li>
 			{/if}
@@ -84,36 +85,42 @@
 			close?.();
 		}}
 		<ButtonSecondary
-			help="Supprime toutes les données pour ce déploiement de preview"
+			help={m.preview_deployment_cleanup_database_help()}
 			onclick={() => {
 				nukeDatabase();
 				window.location.reload();
 			}}
 		>
-			Nettoyer la base de données
+			{m.preview_deployment_cleanup_database()}
 		</ButtonSecondary>
 
 		<ButtonSecondary
 			onclick={open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`)}
 		>
-			Voir sur Github
+			{m.preview_deployment_view_on_github()}
 		</ButtonSecondary>
 
 		{#await hasPage('_playwright') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_playwright'))}>Tests E2E</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_playwright'))}>
+					{m.preview_deployment_e2e_tests()}
+				</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_vitest') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_vitest'))}>
+					{m.preview_deployment_unit_tests()}
+				</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_coverage') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_coverage'))}>Coverage</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_coverage'))}>
+					{m.preview_deployment_coverage()}
+				</ButtonSecondary>
 			{/if}
 		{/await}
 	{/snippet}

@@ -13,6 +13,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 
 	/**
 	 * @typedef Props
@@ -76,14 +77,14 @@
 			</a>
 			{#if previewingPrNumber}
 				<button class="pr-number" onclick={openPreviewPRDetails}>
-					Preview #{previewingPrNumber}
+					{m.preview_pr_number({ number: previewingPrNumber })}
 				</button>
 			{/if}
 		</div>
 
 		<div class="steps">
 			<a href="#/">
-				Protocole
+				{m.protocol_tab()}
 				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
 				{#if path == '/' || path == ''}
 					<div class="line"></div>
@@ -91,7 +92,7 @@
 			</a>
 			<IconNext></IconNext>
 			<a href="#/import" aria-disabled={!uiState.currentProtocolId}>
-				Importer
+				{m.import_tab()}
 				{#if path == '/import'}
 					<div class="line"></div>
 				{/if}
@@ -103,7 +104,7 @@
 					data-testid="goto-crop"
 					aria-disabled={!uiState.currentProtocolId || !hasImages}
 				>
-					Recadrer
+					{m.crop_tab()}
 					{#if path.startsWith('/crop')}
 						<div class="line"></div>
 					{/if}
@@ -116,7 +117,7 @@
 			<IconNext></IconNext>
 			<div class="with-inference-indicator">
 				<a href="#/classify" aria-disabled={!uiState.currentProtocolId || !hasImages}>
-					Classifier
+					{m.classify_tab()}
 					{#if path == '/classify'}
 						<div class="line"></div>
 					{/if}
@@ -129,7 +130,7 @@
 			<IconNext></IconNext>
 			<ButtonSecondary tight onclick={openExportModal}>
 				<IconDownload />
-				Résultats
+				{m.results()}
 			</ButtonSecondary>
 		</div>
 

@@ -1,3 +1,4 @@
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 /// <reference types="vitest" />
 import { sveltekit } from '@sveltejs/kit/vite';
 import { execSync } from 'node:child_process';
@@ -37,6 +38,11 @@ export default defineConfig({
 			defaultClass: 'icon'
 		}),
 		sveltekit(),
+		paraglideVitePlugin({
+			project: './project.inlang',
+			outdir: './src/lib/paraglide',
+			strategy: ['localStorage', 'preferredLanguage', 'baseLocale']
+		}),
 		crossOriginIsolation()
 	],
 	optimizeDeps: {

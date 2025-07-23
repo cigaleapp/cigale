@@ -2,6 +2,8 @@
 	import { goto } from '$app/navigation';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { getLocale, locales, setLocale } from '$lib/paraglide/runtime.js';
+	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { watch } from 'runed';
@@ -98,6 +100,13 @@
 				onchange={async (show) => {
 					await setSetting('showTechnicalMetadata', show);
 				}}
+			/>
+		</div>
+		<div class="setting">
+			<SegmentedGroup
+				options={[...locales]}
+				labels={{ en: 'English', fr: 'Français' }}
+				bind:value={getLocale, setLocale}
 			/>
 		</div>
 		<div class="setting">
