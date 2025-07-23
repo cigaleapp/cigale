@@ -90,7 +90,7 @@ jobs:
           const missing = Object.keys(fr).filter(key => !en[key]?.trim());
           if (missing.length) {
             console.error('Missing or empty keys in en.json:');
-            missing.forEach(key => console.error(`- ${key}: "${fr[key]}"`));
+            missing.forEach(key => console.error(`- ${key}: ${fr[key]}`));
             process.exit(1);
           } else {
             console.log('All fr.json keys are present and non-empty in en.json');
