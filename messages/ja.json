@@ -1,1 +1,6 @@
-{}
+{
+				"$schema": "https://inlang.com/schema/inlang-message-format",
+				"home": "ホム",
+				"preview_pr_number": "プリヴィう",
+				"protocol_tab": "プロトコル"
+}
