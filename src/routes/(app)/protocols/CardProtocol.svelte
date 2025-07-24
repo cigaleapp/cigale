@@ -191,7 +191,7 @@
 		</ul>
 	</section>
 	<section class="inference">
-		<p class="subtitle">Inférence</p>
+		<p class="subtitle">{messages.inference()}</p>
 
 		<ul>
 			{#if crop}
@@ -199,7 +199,7 @@
 					<IconDetection />
 					<div class="text">
 						<p class="title">
-							Détection &amp; détourage
+							{messages.detection_and_cropping()}
 							<IconArrow />
 							<code
 								use:tooltip={`La métadonnée stockant le résultat de la détection: ${crop.metadata}`}
@@ -248,7 +248,7 @@
 			}}
 		>
 			<IconExport />
-			Exporter
+			{messages.export()}
 		</ButtonSecondary>
 		<ButtonSecondary
 			disabled={id === uiState.currentProtocolId}
@@ -257,7 +257,7 @@
 			}}
 		>
 			<IconDelete />
-			Supprimer
+			{messages.delete()}
 		</ButtonSecondary>
 
 		{#if version && source}

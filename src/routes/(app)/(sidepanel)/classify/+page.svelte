@@ -267,7 +267,7 @@
 			bind:selection={uiState.selection}
 			{images}
 			errors={erroredImages}
-			loadingText="Analyse…"
+			loadingText={m.analyzing()}
 			ondelete={async (id) => {
 				await deleteObservation(id);
 				await deleteImageFile(id);

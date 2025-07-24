@@ -102,7 +102,7 @@
 </ModalConfirm>
 
 <header>
-	<h1>Protocoles</h1>
+	<h1>{m.protocols()}</h1>
 	<section class="actions">
 		<ButtonSecondary
 			loading

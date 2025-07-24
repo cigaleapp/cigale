@@ -5,29 +5,30 @@ import { error } from '@sveltejs/kit';
 import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '../../web-worker-procedures';
 import WebWorker from '../../web-worker.js?worker';
+import { m } from '$lib/paraglide/messages.js';
 
 export async function load() {
-	setLoadingMessage('Chargement du worker neuronal…');
+	setLoadingMessage(m.loading_neural_worker());
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: new WebWorker({ name: 'SWARPC Worker' })
 	});
 
-	setLoadingMessage('Initialisation DB du worker neuronal…');
+	setLoadingMessage(m.initializing_worker_db());
 	await swarpc.init({
 		databaseName,
 		databaseRevision
 	});
 
 	try {
-		setLoadingMessage('Initialisation de la base de données…');
+		setLoadingMessage(m.initializing_database());
 		await tables.initialize();
-		setLoadingMessage('Chargement des données intégrées…');
+		setLoadingMessage(m.loading_builtin_data());
 		await fillBuiltinData(swarpc);
 		await tables.initialize();
 	} catch (e) {
 		console.error(e);
 		error(400, {
-			message: e?.toString() ?? 'Erreur inattendue'
+			message: e?.toString() ?? m.unexpected_error()
 		});
 	}
 
@@ -39,7 +40,7 @@ export async function load() {
  * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
  */
 async function fillBuiltinData(swarpc) {
-	setLoadingMessage('Initialisation des réglages par défaut…');
+	setLoadingMessage(m.initializing_default_settings());
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
 		await tx.objectStore('Settings').put({
 			id: 'defaults',
@@ -53,7 +54,7 @@ async function fillBuiltinData(swarpc) {
 		});
 	});
 
-	setLoadingMessage('Chargement du protocole intégré');
+	setLoadingMessage(m.loading_builtin_protocol());
 	// TODO: remove this at some point
 	await tables.Protocol.remove('io.github.cigaleapp.arthropods.transects');
 
@@ -80,7 +81,7 @@ async function fillBuiltinData(swarpc) {
 						break;
 
 					case 'write-protocol':
-						secondLine = 'Écriture du protocole';
+						secondLine = m.writing_protocol();
 						break;
 
 					case 'write-metadata':
@@ -99,7 +100,7 @@ async function fillBuiltinData(swarpc) {
 						break;
 				}
 
-				setLoadingMessage(`Chargement du protocole intégré<br>${secondLine}`);
+				setLoadingMessage(`${m.loading_builtin_protocol()}<br>${secondLine}`);
 			});
 		} catch (error) {
 			console.error(error);

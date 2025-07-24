@@ -94,7 +94,7 @@
 			</ButtonIcon>
 		</div>
 		<div class="setting">
-			Mode debug
+			{m.debug_mode()}
 			<Switch
 				data-testid="debug-mode"
 				value={getSettings().showTechnicalMetadata}
@@ -126,7 +126,7 @@
 					openKeyboardShortcuts?.();
 				}}
 			>
-				Raccourcis clavier
+				{m.keyboard_shortcuts()}
 			</ButtonSecondary>
 		</div>
 		<footer>

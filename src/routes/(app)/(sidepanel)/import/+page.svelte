@@ -324,7 +324,7 @@
 					}))
 				]}
 				errors={uiState.erroredImages}
-				loadingText="Analyse…"
+				loadingText={m.analyzing()}
 				ondelete={async (id) => {
 					await deleteObservation(id);
 					await deleteImageFile(id);

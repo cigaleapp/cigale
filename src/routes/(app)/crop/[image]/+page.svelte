@@ -502,22 +502,22 @@
 
 	defineKeyboardShortcuts({
 		ArrowLeft: {
-			help: 'Image précédente',
+			help: m.previous_image(),
 			when: () => Boolean(prevFileId),
 			do: () => goto(`#/crop/${prevFileId}`)
 		},
 		'Shift+Space': {
-			help: 'Image précédente',
+			help: m.previous_image(),
 			when: () => Boolean(prevFileId),
 			do: () => goto(`#/crop/${prevFileId}`)
 		},
 		ArrowRight: {
-			help: 'Image suivante',
+			help: m.next_image(),
 			when: () => Boolean(nextFileId),
 			do: () => goto(`#/crop/${nextFileId}`)
 		},
 		Space: {
-			help: 'Continuer',
+			help: m.continue(),
 			do: moveToNextUnconfirmed
 		},
 		'$mod+Delete': {
@@ -525,15 +525,15 @@
 			do: deleteImage
 		},
 		Escape: {
-			help: 'Quitter le recadrage',
+			help: m.exit_cropping(),
 			do: goToGallery
 		},
 		a: {
-			help: 'Activer/désactiver la continuation automatique',
+			help: m.toggle_auto_continue(),
 			do: async () => toggleSetting('cropAutoNext')
 		},
 		Delete: {
-			help: 'Supprimer la boîte sélectionnée',
+			help: m.delete_selected_box_help(),
 			when: () => Boolean(selectedBox.imageId),
 			async do() {
 				if (!selectedBox.imageId) return;
@@ -552,7 +552,7 @@
 			}
 		},
 		f: {
-			help: 'Cacher les boîtes non sélectionnées',
+			help: m.hide_unselected_boxes(),
 			when: () => Boolean(selectedBox),
 			do() {
 				if (!selectedBox) return;
@@ -564,7 +564,7 @@
 			}
 		},
 		u: {
-			help: "Revenir au recadrage d'origine",
+			help: m.revert_to_original_crop(),
 			when: () => Boolean(revertableCrops[fileId]),
 			do: () => {
 				if (!revertableCrops[fileId]) return;
@@ -572,17 +572,17 @@
 			}
 		},
 		'$mod+u': {
-			help: "Revenir au recadrage d'origine pour toutes les boîtes",
+			help: m.revert_all_to_original(),
 			when: () => Object.keys(boundingBoxes).length > 0,
 			do: revertAll
 		},
 		ArrowUp: {
-			help: 'Marquer le recadrage comme confirmé',
+			help: m.mark_crop_confirmed(),
 			when: () => !hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(true)
 		},
 		ArrowDown: {
-			help: 'Marquer le recadrage comme non confirmé',
+			help: m.mark_crop_unconfirmed(),
 			when: () => hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(false)
 		},
@@ -609,7 +609,7 @@
 			tools.map((tool) => [
 				tool.shortcut,
 				{
-					help: `Choisir l'outil ${tool.name}`,
+					help: m.choose_tool({ name: tool.name }),
 					do: () => {
 						activeToolName = tool.name;
 					}
@@ -617,7 +617,7 @@
 			])
 		),
 		',': {
-			help: `Sélectionner la boîte précédente`,
+			help: m.select_previous_box(),
 			do: () => {
 				const imageIds = Object.keys(boundingBoxes);
 				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
@@ -626,7 +626,7 @@
 			}
 		},
 		';': {
-			help: `Sélectionner la boîte suivante`,
+			help: m.select_next_box(),
 			do: () => {
 				const imageIds = Object.keys(boundingBoxes);
 				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
@@ -638,7 +638,7 @@
 			range(1, 10).map((i) => [
 				`Digit${i}`,
 				{
-					help: `Sélectionner la boîte #${i}`,
+					help: m.select_box_number({ number: i }),
 					when: () => Object.keys(boundingBoxes).length >= i,
 					do: () => {
 						const imageId = Object.keys(boundingBoxes)[i - 1];
@@ -804,15 +804,17 @@
 		<section class="top">
 			<section class="preactions">
 				<ButtonInk onclick={goToGallery}>
-					<IconGallery /> Autres photos
+					<IconGallery />
+					{m.other_photos()}
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
 				<ButtonInk
 					dangerous
 					onclick={deleteImage}
-					help={{ text: 'Supprimer cette image et passer à la suivante', keyboard: '$mod+Delete' }}
+					help={{ text: m.delete_image_help(), keyboard: '$mod+Delete' }}
 				>
-					<IconDelete /> Supprimer
+					<IconDelete />
+					{m.delete()}
 				</ButtonInk>
 			</section>
 			<section class="filename">
@@ -839,7 +841,7 @@
 					disabled={!Object.values(revertableCrops).some(Boolean)}
 				>
 					<IconRevert />
-					Réinit.
+					{m.reset()}
 				</ButtonSecondary>
 				{#if uiState.cropConfirmationMetadataId}
 					<ButtonSecondary
@@ -854,7 +856,7 @@
 							Invalider
 						{:else}
 							<IconConfirmedCrop />
-							Valider
+							{m.validate()}
 						{/if}
 					</ButtonSecondary>
 				{/if}
@@ -893,7 +895,7 @@
 						<div class="actions">
 							{#if Object.values(boundingBoxes).length > 1}
 								<ButtonIcon
-									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes"
+									help={m.show_hide_other_boxes({ action: isFocused ? m.show() : m.hide() })}
 									keyboard="F"
 									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
 									crossout={isFocused}
@@ -912,7 +914,7 @@
 								<IconRevert />
 							</ButtonIcon>
 							<ButtonIcon
-								help="Supprimer cette boîte"
+								help={m.delete_selected_box_help()}
 								keyboard="Delete"
 								onclick={async () => {
 									if (images.length === 1) {
@@ -933,11 +935,8 @@
 				{#if showBoxesListHint}
 					<li class="boxes-list-hint">
 						<p>
-							Pour créer une nouvelle boîte,<wbr /> utilisez les outils <SentenceJoin
-								items={creationTools}
-								key={(t) => t.name}
-								final="ou"
-							>
+							{m.create_new_box_with_tools()}
+							<SentenceJoin items={creationTools} key={(t) => t.name} final="ou">
 								{#snippet children({ icon: Icon, help, shortcut })}
 									<Tooltip text={help} keyboard={shortcut}>
 										<Icon />
@@ -946,9 +945,7 @@
 							</SentenceJoin>
 						</p>
 						<p>
-							Sélectionnez une boîte avec
-							<KeyboardHint shortcut="1" /> à <KeyboardHint shortcut="9" /> pour la modifier avec des
-							raccourcis clavier
+							{m.select_box_with_numbers()}
 						</p>
 					</li>
 				{/if}
@@ -964,7 +961,7 @@
 			<div class="bar">
 				<p>
 					<IconHasCrop />
-					Images avec recadrage
+					{m.images_with_cropping()}
 					{@render percent(croppedImagesCount)}
 				</p>
 				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
@@ -973,7 +970,7 @@
 				<div class="bar">
 					<p>
 						<IconConfirmedCrop />
-						Recadrages confirmés
+						{m.confirmed_crops()}
 						{@render percent(confirmedCropsCount)}
 					</p>
 					<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
@@ -1028,7 +1025,7 @@
 					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
 				>
 					<IconContinue />
-					Continuer
+					{m.continue()}
 				</ButtonSecondary>
 			</div>
 		</nav>

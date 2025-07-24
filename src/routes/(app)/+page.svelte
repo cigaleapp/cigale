@@ -21,7 +21,7 @@
 
 	const { data } = $props();
 
-	seo({ title: 'Choisir un protocole' });
+	seo({ title: m.choose_protocol() });
 
 	const currentProtocol = $derived(
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
@@ -144,16 +144,16 @@
 </ModalConfirm>
 
 <div class="content">
-	<h1>Choisir un protocole</h1>
+	<h1>{m.choose_protocol()}</h1>
 
 	<ul>
 		<li class="search">
 			<IconSearch />
 			<InlineTextInput
 				onblur={() => {}}
-				label="Recherche"
+				label={m.search()}
 				bind:value={searchQuery}
-				placeholder="Rechercher..."
+				placeholder={m.search_placeholder()}
 			/>
 		</li>
 		{#each protocols as p, i (p.id)}
@@ -242,7 +242,7 @@
 					<IconImport />
 				{/if}
 
-				Importer un protocole
+				{m.import_protocol()}
 			{/snippet}
 		</ButtonSecondary>
 	</section>

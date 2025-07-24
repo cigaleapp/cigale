@@ -94,15 +94,15 @@
 </header>
 
 <dl>
-	<dt>Développé par</dt>
+	<dt>{m.developed_by()}</dt>
 	<dd>
 		{@render peoplelinks(authors)}
 	</dd>
-	<dt>Sous la supervision de</dt>
+	<dt>{m.supervised_by()}</dt>
 	<dd>
 		{@render peoplelinks(supervisors)}
 	</dd>
-	<dt>Dans le cadre d'un</dt>
+	<dt>{m.part_of_project()}</dt>
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>

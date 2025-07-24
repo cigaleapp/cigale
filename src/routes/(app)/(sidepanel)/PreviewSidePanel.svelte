@@ -218,7 +218,7 @@
 			--fg-hover={images.length > 0 ? 'var(--fg-error)' : ''}
 		>
 			<IconDelete />
-			Supprimer {images.length} images
+			{m.delete_n_images({ count: images.length })}
 		</ButtonSecondary>
 	</section>
 </aside>
