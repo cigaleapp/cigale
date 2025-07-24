@@ -116,13 +116,13 @@
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;
 						if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
-						else toasts.success(`${ps.length} protocoles importés`);
+						else toasts.success(m.protocols_imported_multiple({ count: ps.length }));
 					});
 			}}
 		>
 			{#snippet children({ loading })}
 				{#if !loading}<IconImport />{/if}
-				Importer
+				{m.import()}
 			{/snippet}
 		</ButtonSecondary>
 		<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>

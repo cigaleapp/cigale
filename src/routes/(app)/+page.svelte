@@ -89,9 +89,9 @@
 </script>
 
 <ModalConfirm
-	title="Importer le protocole distant?"
+	title={m.import_remote_protocol_title()}
 	key="modal_import_remote_protocol"
-	confirm="Importer"
+	confirm={m.import()}
 	bind:open={openImportRemoteProtocol}
 	oncancel={() => {
 		$preselectedProtocol = null;
@@ -102,7 +102,7 @@
 		const raw = await fetch($preselectedProtocol)
 			.then((res) => res.text())
 			.catch((e) => {
-				toasts.error(`Erreur lors de l'import du protocole distant: ${e}`);
+				toasts.error(m.error_importing_remote_protocol({ error: e }));
 				return null;
 			});
 
@@ -116,14 +116,13 @@
 			uiState.currentProtocolId = id;
 			$preselectedProtocol = null;
 		} catch (error) {
-			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
+			toasts.error(m.error_importing_remote_protocol({ error }));
 		} finally {
 			importingPreselectedProtocol = false;
 		}
 	}}
 >
-	{m.remote_protocol_import_confirm()}
-	suivante:
+	{m.remote_protocol_import_confirm_following()}
 
 	{#if $preselectedProtocol && preselectedProtocolIsRemote}
 		<a href={$preselectedProtocol}>
@@ -133,7 +132,7 @@
 
 	<section class="modal-import-loading">
 		{#if importingPreselectedProtocol}
-			<p>Importation en cours...</p>
+			<p>{m.importing_in_progress()}</p>
 		{/if}
 	</section>
 

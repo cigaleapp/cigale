@@ -42,6 +42,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
+	import { m } from '$lib/paraglide/messages.js';
 	import { formatISO } from 'date-fns';
 	import { watch } from 'runed';
 	import IconRevert from '~icons/ph/arrow-arc-left';
@@ -60,7 +61,6 @@
 	import IconToolDragCrop from '~icons/ph/selection-plus';
 	import IconGallery from '~icons/ph/squares-four';
 	import IconDelete from '~icons/ph/trash';
-	import { m } from '$lib/paraglide/messages.js';
 
 	const fileId = $derived(page.params.image);
 	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));
@@ -86,8 +86,8 @@
 	 */
 	const tools = /** @type {const} @satisfies {Tool[]} */ ([
 		{
-			name: 'Glisser-recadrer',
-			help: 'Cliquer et glisser pour créer une boîte de recadrage',
+			name: m.crop_tool_drag_crop(),
+			help: m.crop_tool_drag_crop_help(),
 			icon: IconToolDragCrop,
 			shortcut: 'r',
 			transformable: true,
@@ -96,8 +96,8 @@
 			cursor: 'crosshair'
 		},
 		{
-			name: '2 points',
-			help: 'Cliquer sur les deux coins pour créer une boîte de recadrage',
+			name: m.crop_tool_2_points(),
+			help: m.crop_tool_2_points_help(),
 			icon: IconTwoPointCrop,
 			shortcut: 'z',
 			transformable: false,
@@ -106,8 +106,8 @@
 			cursor: 'crosshair'
 		},
 		{
-			name: '4 points',
-			help: 'Cliquer sur les 4 coins pour créer une boîte de recadrage',
+			name: m.crop_tool_4_points(),
+			help: m.crop_tool_4_points_help(),
 			icon: IconFourPointCrop,
 			shortcut: 'Shift+z',
 			transformable: false,
@@ -116,8 +116,8 @@
 			cursor: 'crosshair'
 		},
 		{
-			name: 'Déplacer',
-			help: 'Cliquer et glisser pour déplacer la boîte de recadrage',
+			name: m.crop_tool_move(),
+			help: m.crop_tool_move_help(),
 			icon: IconToolMove,
 			shortcut: 'v',
 			transformable: false,
@@ -126,8 +126,8 @@
 			cursor: 'pointer'
 		},
 		{
-			name: 'Main',
-			help: "Cliquer et glisser pour se déplacer dans l'image",
+			name: m.crop_tool_hand(),
+			help: m.crop_tool_hand_help(),
 			icon: IconToolHand,
 			shortcut: 'h',
 			transformable: false,

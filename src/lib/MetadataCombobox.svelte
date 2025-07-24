@@ -11,6 +11,7 @@
 	import * as idb from './idb.svelte.js';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
 	import { uiState } from './state.svelte';
+	import { m } from './paraglide/messages.js';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
@@ -230,7 +231,7 @@
 						<a href={highlightedOption.learnMore} target="_blank" class="learn-more">
 							<IconArrowRight />
 							<div class="text">
-								<span>En savoir plus</span>
+								<span>{m.learn_more()}</span>
 								<code class="domain">{new URL(highlightedOption.learnMore).hostname}</code>
 							</div>
 						</a>

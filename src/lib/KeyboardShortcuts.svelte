@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import { page } from '$app/state';
+	import { m } from './paraglide/messages.js';
 
 	/**
 	 * @typedef Props
@@ -71,7 +72,7 @@
 	});
 </script>
 
-<Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title="Raccourcis clavier">
+<Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title={m.keyboard_shortcuts()}>
 	<dl>
 		<!-- Object.entries({a: 1, b: 2}) gives [["a", 1], ["b", 2]] -->
 		<!-- Then we filter out keybindings that are marked as hidden -->
@@ -83,7 +84,7 @@
 		{:else}
 			<div class="empty">
 				<div class="sad">¯\_(ツ)_/¯</div>
-				<p>Aucun raccouci clavier pour cette page</p>
+				<p>{m.no_keyboard_shortcuts_for_page()}</p>
 			</div>
 		{/each}
 	</dl>

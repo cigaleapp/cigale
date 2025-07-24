@@ -1,9 +1,10 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 	import lockfile from '$lib/../../package-lock.json' with { type: 'json' };
 
-	seo({ title: 'À propos' });
+	seo({ title: m.about_page_title() });
 
 	/**
 	 * @type {undefined | { node: string; chrome: string; electron: string; os?: { name: string; version: string; architecture: string; archIsUnusual: boolean } }}
