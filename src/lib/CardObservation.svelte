@@ -8,6 +8,7 @@
 	import IconImage from '~icons/ph/image';
 	import { tooltip } from './tooltips';
 	import CroppedImg from './CroppedImg.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 
 	/**
 	 * @typedef Props
@@ -44,7 +45,7 @@
 		selectable = true,
 		highlighted,
 		errored = false,
-		statusText = 'Chargement…',
+		statusText = m.loading_text(),
 		stacksize = 1,
 		boundingBoxes = [],
 		applyBoundingBoxes = false,
@@ -85,7 +86,7 @@
 						{/if}
 						<span class="text" class:smol={errored || loading === -1}>
 							{#if errored || loading === undefined}
-								Erreur
+								{m.error_text()}
 							{:else if loading === -1}
 								{statusText}
 							{:else}
@@ -95,7 +96,8 @@
 						{#if ondelete}
 							<section class="errored-actions">
 								<ButtonInk onclick={ondelete}>
-									<IconDelete /> Supprimer
+									<IconDelete />
+									{m.delete()}
 								</ButtonInk>
 							</section>
 						{/if}
@@ -139,7 +141,7 @@
 					<button
 						disabled={loading}
 						class="stack-count"
-						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
+						use:tooltip={`${m.observation_tooltip({ stacksize })}`}
 						onclick={(/** @type {MouseEvent} */ e) => {
 							e.stopPropagation();
 							onstacksizeclick?.();

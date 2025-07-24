@@ -17,10 +17,11 @@
 	import IconImport from '~icons/ph/upload-simple';
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
-	seo({ title: 'Choisir un protocole' });
+	seo({ title: m.choose_protocol() });
 
 	const currentProtocol = $derived(
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
@@ -78,7 +79,7 @@
 	 */
 	function radioOptions(models) {
 		return [
-			{ key: -1, label: 'Aucune inférence' },
+			{ key: -1, label: m.no_inference() },
 			...models.map(({ model, name }, key) => {
 				const url = typeof model === 'string' ? model : model.url;
 				return { key, label: name ?? url };
@@ -88,9 +89,9 @@
 </script>
 
 <ModalConfirm
-	title="Importer le protocole distant?"
+	title={m.import_remote_protocol_title()}
 	key="modal_import_remote_protocol"
-	confirm="Importer"
+	confirm={m.import()}
 	bind:open={openImportRemoteProtocol}
 	oncancel={() => {
 		$preselectedProtocol = null;
@@ -101,7 +102,7 @@
 		const raw = await fetch($preselectedProtocol)
 			.then((res) => res.text())
 			.catch((e) => {
-				toasts.error(`Erreur lors de l'import du protocole distant: ${e}`);
+				toasts.error(m.error_importing_remote_protocol({ error: e }));
 				return null;
 			});
 
@@ -115,14 +116,13 @@
 			uiState.currentProtocolId = id;
 			$preselectedProtocol = null;
 		} catch (error) {
-			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
+			toasts.error(m.error_importing_remote_protocol({ error }));
 		} finally {
 			importingPreselectedProtocol = false;
 		}
 	}}
 >
-	Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'addresse
-	suivante:
+	{m.remote_protocol_import_confirm_following()}
 
 	{#if $preselectedProtocol && preselectedProtocolIsRemote}
 		<a href={$preselectedProtocol}>
@@ -132,7 +132,7 @@
 
 	<section class="modal-import-loading">
 		{#if importingPreselectedProtocol}
-			<p>Importation en cours...</p>
+			<p>{m.importing_in_progress()}</p>
 		{/if}
 	</section>
 
@@ -144,16 +144,16 @@
 </ModalConfirm>
 
 <div class="content">
-	<h1>Choisir un protocole</h1>
+	<h1>{m.choose_protocol()}</h1>
 
 	<ul>
 		<li class="search">
 			<IconSearch />
 			<InlineTextInput
 				onblur={() => {}}
-				label="Recherche"
+				label={m.search()}
 				bind:value={searchQuery}
-				placeholder="Rechercher..."
+				placeholder={m.search_placeholder()}
 			/>
 		</li>
 		{#each protocols as p, i (p.id)}
@@ -171,7 +171,7 @@
 						}}
 					>
 						{#if p.id === currentProtocol?.id}
-							<Tooltip text="Protocole sélectionné">
+							<Tooltip text={m.selected_protocol()}>
 								<IconCheck />
 							</Tooltip>
 						{/if}
@@ -185,9 +185,11 @@
 					{#if uiState.classificationModels.length > 0}
 						<div class="model-select">
 							<p>
-								Modèle d'inférence pour {tables.Metadata.state.find(
-									(m) => m.id === uiState.classificationMetadataId
-								)?.label ?? 'classification'}
+								{m.inference_model_for({
+									target:
+										tables.Metadata.state.find((m) => m.id === uiState.classificationMetadataId)
+											?.label ?? 'classification'
+								})}
 							</p>
 							<RadioButtons
 								value={uiState.selectedClassificationModel}
@@ -200,7 +202,7 @@
 					{/if}
 					{#if uiState.cropModels.length > 0}
 						<div class="model-select">
-							<p>Modèle d'inférence pour la détection</p>
+							<p>{m.inference_model_for_detection()}</p>
 							<RadioButtons
 								value={uiState.selectedCropModel}
 								onchange={async (value) => {
@@ -219,7 +221,7 @@
 		<p>Le protocole que vous souhaitez n'est pas disponible?</p>
 		<ButtonSecondary onclick={() => goto('#/protocols')}>
 			<IconManage />
-			Gérer les protocoles
+			{m.manage_protocols()}
 		</ButtonSecondary>
 		<ButtonSecondary
 			loading
@@ -230,7 +232,7 @@
 					importProtocol: data.swarpc.importProtocol
 				}).catch((e) => toasts.error(e));
 				if (!protocol || typeof protocol === 'string') return;
-				toasts.success(`Protocole “${protocol.name}” importé et sélectionné`);
+				toasts.success(m.protocol_imported_and_selected({ protocolName: protocol.name }));
 				uiState.currentProtocolId = protocol.id;
 				goto('#/import');
 			}}
@@ -240,7 +242,7 @@
 					<IconImport />
 				{/if}
 
-				Importer un protocole
+				{m.import_protocol()}
 			{/snippet}
 		</ButtonSecondary>
 	</section>

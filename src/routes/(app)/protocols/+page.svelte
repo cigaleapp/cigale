@@ -13,6 +13,7 @@
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
 	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
+	import { m } from '$lib/paraglide/messages.js';
 
 	const { data } = $props();
 
@@ -31,7 +32,7 @@
 
 <Modal
 	key="modal_download_protocol_template"
-	title="Créer un protocole"
+	title={m.create_protocol()}
 	bind:open={downloadNewProtocolTemplate}
 >
 	<p>
@@ -101,7 +102,7 @@
 </ModalConfirm>
 
 <header>
-	<h1>Protocoles</h1>
+	<h1>{m.protocols()}</h1>
 	<section class="actions">
 		<ButtonSecondary
 			loading
@@ -115,18 +116,18 @@
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;
 						if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
-						else toasts.success(`${ps.length} protocoles importés`);
+						else toasts.success(m.protocols_imported_multiple({ count: ps.length }));
 					});
 			}}
 		>
 			{#snippet children({ loading })}
 				{#if !loading}<IconImport />{/if}
-				Importer
+				{m.import()}
 			{/snippet}
 		</ButtonSecondary>
 		<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
 			<IconCreate />
-			Créer
+			{m.create()}
 		</ButtonSecondary>
 	</section>
 </header>

@@ -33,7 +33,7 @@
 		</p>
 		{#if page.status !== 404}
 			<ButtonInk
-				help="ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
+				help={m.warning_deletes_all_data()}
 				onclick={async () => {
 					nukeDatabase();
 					window.location.reload();
@@ -43,7 +43,7 @@
 					<IconReset />
 				</div>
 
-				Réinitialiser la base de données
+				{m.reset_database()}
 			</ButtonInk>
 		{/if}
 	</section>

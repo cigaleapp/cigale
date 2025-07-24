@@ -9,6 +9,7 @@
 	import { getSettings } from './settings.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';
+	import { m } from './paraglide/messages.js';
 
 	/**
 	 * @typedef {object} Props
@@ -118,7 +119,7 @@
 				<p>{definition.description}</p>
 			{/if}
 			{#if definition.learnMore}
-				<a href={definition.learnMore} target="_blank">En savoir plus</a>
+				<a href={definition.learnMore} target="_blank">{m.learn_more()}</a>
 			{/if}
 		</section>
 	{/if}

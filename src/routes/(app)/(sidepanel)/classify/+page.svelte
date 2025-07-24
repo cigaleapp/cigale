@@ -19,8 +19,9 @@
 	import { fetchHttpRequest } from '$lib/utils';
 	import { match, type } from 'arktype';
 	import { onMount } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
 
-	seo({ title: 'Classification' });
+	seo({ title: m.classification() });
 
 	const { data } = $props();
 
@@ -57,7 +58,10 @@
 		);
 		if (!settings) {
 			toasts.error(
-				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur le protocole ${uiState.currentProtocol.name}`
+				m.no_inference_params_defined({
+					modelName: uiState.selectedClassificationModel,
+					protocolName: uiState.currentProtocol.name
+				})
 			);
 			return;
 		}
@@ -84,12 +88,12 @@
 				}
 			)
 			.then(() => {
-				toasts.success('Modèle de classification chargé');
+				toasts.success(m.classification_model_loaded());
 				classifmodelLoaded = true;
 			})
 			.catch((error) => {
 				console.error(error);
-				toasts.error('Erreur lors du chargement du modèle de classification');
+				toasts.error(m.error_loading_classification_model());
 			});
 	}
 	/**
@@ -100,7 +104,7 @@
 	 */
 	async function analyzeImage(id, { filename, metadata }) {
 		if (!uiState.currentProtocol) {
-			throw new Error('Aucun protocole sélectionné');
+			throw new Error(m.no_protocol_selected());
 		}
 
 		if (!uiState.classificationMetadataId) {
@@ -251,7 +255,7 @@
 {#if !classifmodelLoaded}
 	<section class="loading">
 		<Logo loading />
-		<p>Chargement du modèle de classification</p>
+		<p>{m.loading_classification_model()}</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
@@ -263,21 +267,21 @@
 			bind:selection={uiState.selection}
 			{images}
 			errors={erroredImages}
-			loadingText="Analyse…"
+			loadingText={m.analyzing()}
 			ondelete={async (id) => {
 				await deleteObservation(id);
 				await deleteImageFile(id);
 			}}
 		/>
 		{#if !images.length}
-			<p>Cliquer ou déposer des images ici</p>
+			<p>{m.click_or_drop_images_here()}</p>
 		{/if}
 	</section>
 {:else}
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
-		<p>Impossible de charger le modèle de classification</p>
+		<p>{m.cannot_load_classification_model()}</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{classifModelLoadingError}</p>
 	</section>

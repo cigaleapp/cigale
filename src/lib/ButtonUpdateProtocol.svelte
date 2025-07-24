@@ -10,6 +10,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import IconCannotCheckForUpdates from '~icons/ph/warning-circle';
 	import ButtonIcon from './ButtonIcon.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 
 	/**
 	 * @typedef {object} Props
@@ -37,16 +38,16 @@
 {#if version && source}
 	{#key checkagain}
 		{#await hasUpgradeAvailable({ id, version, source })}
-			<Btn help="Recherche de mise à jour…" disabled onclick={() => {}}>
+			<Btn help={m.checking_for_updates()} disabled onclick={() => {}}>
 				<IconCheckAgain />
 				{#if !compact}
-					Mettre à jour
+					{m.update()}
 				{/if}
 			</Btn>
 		{:then { upToDate, newVersion }}
 			{#if upToDate}
 				<Btn
-					help="Le protocole est à sa dernière version (v{newVersion}). Cliquer pour vérifier à nouveau"
+					help={m.protocol_up_to_date_click_to_check_again({ newVersion })}
 					onclick={() => {
 						checkagain = Date.now();
 					}}
@@ -54,7 +55,7 @@
 					<span class="version-check up-to-date">
 						<IconUpToDate />
 						{#if !compact}
-							À jour
+							{m.up_to_date()}
 						{/if}
 					</span>
 					{#if !compact}
@@ -69,16 +70,16 @@
 						upgrading = true;
 						await upgradeProtocol({ version, source, id, swarpc })
 							.then(({ version }) => {
-								toasts.success(`Protocole mis à jour vers la v${version}`);
+								toasts.success(m.protocol_updated_to_version({ version }));
 							})
 							.catch((e) => {
-								toasts.error(`Impossible de mettre à jour le protocole: ${e}`);
+								toasts.error(m.cannot_update_protocol({ error: e }));
 							})
 							.finally(() => {
 								upgrading = false;
 							});
 					}}
-					help={`Une mise à jour vers la v${newVersion} est disponible`}
+					help={m.update_available_to_version({ newVersion })}
 				>
 					<span class="version-check" class:update-available={!upgrading}>
 						{#if upgrading}
@@ -88,7 +89,7 @@
 						{/if}
 						{#if !compact}
 							{#if upgrading}
-								Mise à jour…
+								{m.updating()}
 							{:else}
 								v{version}
 								<IconArrow />
@@ -103,19 +104,19 @@
 				onclick={() => {
 					checkagain = Date.now();
 				}}
-				help={`Impossible de vérifier les mises à jour: ${e}`}
+				help={m.cannot_check_for_updates({ error: e })}
 			>
 				<span class="version-check error">
 					<IconCannotCheckForUpdates />
 					{#if !compact}
-						Rééssayer
+						{m.retry()}
 					{/if}
 				</span>
 			</Btn>
 		{/await}
 	{/key}
 {:else if version}
-	<Btn onclick={() => {}} help="Ce protocole ne supporte pas la vérification des mises à jour">
+	<Btn onclick={() => {}} help={m.protocol_does_not_support_update_check()}>
 		<span class="version-check">
 			<IconCannotCheckForUpdates />
 			{#if !compact}
@@ -124,14 +125,11 @@
 		</span>
 	</Btn>
 {:else}
-	<Btn
-		onclick={() => {}}
-		help="Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
-	>
+	<Btn onclick={() => {}} help={m.protocol_not_versioned_help()}>
 		<span class="version-check error">
 			{#if !compact}
 				<IconCannotCheckForUpdates />
-				Non versionné
+				{m.not_versioned()}
 			{/if}
 		</span>
 	</Btn>

@@ -1,9 +1,10 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 	import lockfile from '$lib/../../package-lock.json' with { type: 'json' };
 
-	seo({ title: 'À propos' });
+	seo({ title: m.about_page_title() });
 
 	/**
 	 * @type {undefined | { node: string; chrome: string; electron: string; os?: { name: string; version: string; architecture: string; archIsUnusual: boolean } }}
@@ -93,15 +94,15 @@
 </header>
 
 <dl>
-	<dt>Développé par</dt>
+	<dt>{m.developed_by()}</dt>
 	<dd>
 		{@render peoplelinks(authors)}
 	</dd>
-	<dt>Sous la supervision de</dt>
+	<dt>{m.supervised_by()}</dt>
 	<dd>
 		{@render peoplelinks(supervisors)}
 	</dd>
-	<dt>Dans le cadre d'un</dt>
+	<dt>{m.part_of_project()}</dt>
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>
