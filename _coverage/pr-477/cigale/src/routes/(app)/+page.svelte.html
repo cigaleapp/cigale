@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/134</span>
+                <span class='fraction'>0/137</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/134</span>
+                <span class='fraction'>0/137</span>
             </div>
         
             
@@ -373,8 +373,7 @@
 <a name='L308'></a><a href='#L308'>308</a>
 <a name='L309'></a><a href='#L309'>309</a>
 <a name='L310'></a><a href='#L310'>310</a>
-<a name='L311'></a><a href='#L311'>311</a>
-<a name='L312'></a><a href='#L312'>312</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L311'></a><a href='#L311'>311</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -465,30 +464,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -500,6 +483,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -509,7 +507,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -776,9 +774,9 @@
 &lt;/script&gt;
 &nbsp;
 &lt;ModalConfirm
-	title="Importer le protocole distant?"
+<span class="cstat-no" title="statement not covered" >	title={m.import_remote_protocol_title()}</span>
 	key="modal_import_remote_protocol"
-	confirm="Importer"
+<span class="cstat-no" title="statement not covered" >	confirm={m.import()}</span>
 <span class="cstat-no" title="statement not covered" >	bind:open={openImportRemoteProtocol}</span>
 <span class="cstat-no" title="statement not covered" >	oncancel={() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >		$preselectedProtocol = null;</span>
@@ -789,7 +787,7 @@
 <span class="cstat-no" title="statement not covered" >		const raw = await fetch($preselectedProtocol)</span>
 <span class="cstat-no" title="statement not covered" >			.then((res) =&gt; res.text())</span>
 <span class="cstat-no" title="statement not covered" >			.catch((e) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >				toasts.error(`Erreur lors de l'import du protocole distant: ${e}`);</span>
+<span class="cstat-no" title="statement not covered" >				toasts.error(m.error_importing_remote_protocol({ error: e }));</span>
 <span class="cstat-no" title="statement not covered" >				return null;</span>
 <span class="cstat-no" title="statement not covered" >			});</span>
 &nbsp;
@@ -803,14 +801,13 @@
 <span class="cstat-no" title="statement not covered" >			uiState.currentProtocolId = id;</span>
 <span class="cstat-no" title="statement not covered" >			$preselectedProtocol = null;</span>
 <span class="cstat-no" title="statement not covered" >		} catch (error) {</span>
-<span class="cstat-no" title="statement not covered" >			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);</span>
+<span class="cstat-no" title="statement not covered" >			toasts.error(m.error_importing_remote_protocol({ error }));</span>
 <span class="cstat-no" title="statement not covered" >		} finally {</span>
 <span class="cstat-no" title="statement not covered" >			importingPreselectedProtocol = false;</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	}}</span>
 &gt;
-<span class="cstat-no" title="statement not covered" >	{m.remote_protocol_import_confirm()}</span>
-	suivante:
+<span class="cstat-no" title="statement not covered" >	{m.remote_protocol_import_confirm_following()}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	{#if $preselectedProtocol &amp;&amp; preselectedProtocolIsRemote}</span>
 <span class="cstat-no" title="statement not covered" >		&lt;a href={$preselectedProtocol}&gt;</span>
@@ -820,7 +817,7 @@
 &nbsp;
 	&lt;section class="modal-import-loading"&gt;
 <span class="cstat-no" title="statement not covered" >		{#if importingPreselectedProtocol}</span>
-			&lt;p&gt;Importation en cours...&lt;/p&gt;
+<span class="cstat-no" title="statement not covered" >			&lt;p&gt;{m.importing_in_progress()}&lt;/p&gt;</span>
 		{/if}
 	&lt;/section&gt;
 &nbsp;
@@ -1003,7 +1000,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-23T21:37:49.393Z
+                at 2025-07-24T11:16:18.823Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

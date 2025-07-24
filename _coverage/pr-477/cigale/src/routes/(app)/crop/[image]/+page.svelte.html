@@ -2725,6 +2725,7 @@
 <span class="cstat-no" title="statement not covered" >	import { toasts } from '$lib/toasts.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { tooltip } from '$lib/tooltips';</span>
 <span class="cstat-no" title="statement not covered" >	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';</span>
+<span class="cstat-no" title="statement not covered" >	import { m } from '$lib/paraglide/messages.js';</span>
 <span class="cstat-no" title="statement not covered" >	import { formatISO } from 'date-fns';</span>
 <span class="cstat-no" title="statement not covered" >	import { watch } from 'runed';</span>
 <span class="cstat-no" title="statement not covered" >	import IconRevert from '~icons/ph/arrow-arc-left';</span>
@@ -2743,7 +2744,6 @@
 <span class="cstat-no" title="statement not covered" >	import IconToolDragCrop from '~icons/ph/selection-plus';</span>
 <span class="cstat-no" title="statement not covered" >	import IconGallery from '~icons/ph/squares-four';</span>
 <span class="cstat-no" title="statement not covered" >	import IconDelete from '~icons/ph/trash';</span>
-<span class="cstat-no" title="statement not covered" >	import { m } from '$lib/paraglide/messages.js';</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	const fileId = $derived(page.params.image);</span>
 <span class="cstat-no" title="statement not covered" >	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));</span>
@@ -2769,8 +2769,8 @@
 <span class="cstat-no" title="statement not covered" >	 */</span>
 <span class="cstat-no" title="statement not covered" >	const tools = /** @type {const} @satisfies {Tool[]} */ ([</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: 'Glisser-recadrer',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer et glisser pour créer une boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_drag_crop(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_drag_crop_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconToolDragCrop,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'r',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: true,</span>
@@ -2779,8 +2779,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'crosshair'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: '2 points',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer sur les deux coins pour créer une boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_2_points(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_2_points_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconTwoPointCrop,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'z',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -2789,8 +2789,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'crosshair'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: '4 points',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer sur les 4 coins pour créer une boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_4_points(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_4_points_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconFourPointCrop,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'Shift+z',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -2799,8 +2799,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'crosshair'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: 'Déplacer',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer et glisser pour déplacer la boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_move(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_move_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconToolMove,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'v',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -2809,8 +2809,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'pointer'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: 'Main',</span>
-<span class="cstat-no" title="statement not covered" >			help: "Cliquer et glisser pour se déplacer dans l'image",</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_hand(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_hand_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconToolHand,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'h',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -3997,7 +3997,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-23T21:37:49.393Z
+                at 2025-07-24T11:16:18.823Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
