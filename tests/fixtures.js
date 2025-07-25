@@ -20,25 +20,27 @@ export const test = base.extend(
 	 */
 	({
 		forEachTest: [
-			async ({ page, context }, use) => {
+			async ({ page, context }, use, { tags }) => {
 				// https://playwright.dev/docs/service-workers-experimental
 				process.env.PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS = '1';
 
 				await rm('./tests/results', { recursive: true, force: true });
 				await mkdir('./tests/results', { recursive: true });
 
-				// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
-				await Promise.all(
-					[context, page].map(async (target) =>
-						target.route(
-							(u) => {
-								u.searchParams.delete('v');
-								return u.toString() === defaultProtocol.source;
-							},
-							async (route) => route.fulfill({ json: exampleProtocol })
+				if (!tags.includes('@real-protocol')) {
+					// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
+					await Promise.all(
+						[context, page].map(async (target) =>
+							target.route(
+								(u) => {
+									u.searchParams.delete('v');
+									return u.toString() === defaultProtocol.source;
+								},
+								async (route) => route.fulfill({ json: exampleProtocol })
+							)
 						)
-					)
-				);
+					);
+				}
 
 				await page.goto('/');
 				// @ts-expect-error
