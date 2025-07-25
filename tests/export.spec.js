@@ -3,7 +3,7 @@ import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import { chooseDefaultProtocol, importPhotos, setSettings } from './utils';
+import { chooseDefaultProtocol, goToTab, importPhotos, setSettings } from './utils';
 
 test('correctly applies crop padding', issue(463), async ({ page }) => {
 	// Disable inference to go faster
@@ -13,6 +13,7 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 		Espèce: 'Aucune inférence'
 	});
 
+	await goToTab(page, 'import');
 	await importPhotos({ page }, 'debugsquare.png');
 
 	await page.locator('nav').getByRole('link', { name: 'Recadrer' }).click();
