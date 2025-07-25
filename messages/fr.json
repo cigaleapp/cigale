@@ -177,5 +177,6 @@
 	"loading_builtin_data": "Chargement des données intégrées…",
 	"initializing_default_settings": "Initialisation des réglages par défaut…",
 	"loading_builtin_protocol": "Chargement du protocole intégré",
-	"writing_protocol": "Écriture du protocole"
+	"writing_protocol": "Écriture du protocole",
+	"confidence_percentage": "Confiance: {percentage}"
 }
