@@ -26,6 +26,7 @@
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
+	import { percent } from '$lib/i18n';
 	import * as idb from '$lib/idb.svelte.js';
 	import {
 		deleteImageFile,
@@ -36,13 +37,13 @@
 	} from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import { m } from '$lib/paraglide/messages.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
-	import { m } from '$lib/paraglide/messages.js';
 	import { formatISO } from 'date-fns';
 	import { watch } from 'runed';
 	import IconRevert from '~icons/ph/arrow-arc-left';
@@ -905,7 +906,7 @@
 							{/if}
 							<ButtonIcon
 								help="Revenir au recadrage d'origine ({initBox
-									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${Math.round(initBox.confidence * 100)}% de confiance`
+									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${percent(initBox.confidence)} de confiance`
 									: 'indisponible'})"
 								keyboard="u"
 								disabled={!revertableCrops[image.id]}
@@ -952,9 +953,9 @@
 			</ul>
 		</section>
 		<section class="progress">
-			{#snippet percent(/** @type {number} */ value)}
+			{#snippet percentage(/** @type {number} */ value)}
 				<code>
-					{Math.round((value / sortedFileIds.length) * 100)}%
+					{percent(value / sortedFileIds.length)}
 				</code>
 			{/snippet}
 
@@ -962,7 +963,7 @@
 				<p>
 					<IconHasCrop />
 					{m.images_with_cropping()}
-					{@render percent(croppedImagesCount)}
+					{@render percentage(croppedImagesCount)}
 				</p>
 				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
 			</div>
@@ -971,7 +972,7 @@
 					<p>
 						<IconConfirmedCrop />
 						{m.confirmed_crops()}
-						{@render percent(confirmedCropsCount)}
+						{@render percentage(confirmedCropsCount)}
 					</p>
 					<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
 				</div>

@@ -27,3 +27,25 @@ if (import.meta.vitest) {
 		expect(countThings({ a: 1, b: 2, c: 0 }, { a: 'a', b: 'b' })).toBe('1 a, 2 b');
 	});
 }
+
+/**
+ * Converts a number between 0 and 1 to a percentage string.
+ * @param {number} value Number between 0 and 1
+ * @param {number} [decimals=0] Number of decimal places to include in the output
+ * @param {object} [options] Additional options
+ * @param {'none'|'nbsp'|'zeros'} [options.pad=none] Whether to pad the percentage with leading non-breaking spaces
+ * @returns {`${number}%`} Percentage string
+ */
+export function percent(value, decimals = 0, { pad = 'none' } = {}) {
+	let result = (value * 100).toFixed(decimals);
+
+	// Remove trailing zeros and decimal point if not needed
+	if (decimals > 0) result = result.replace(/\.?0+$/, '');
+
+	if (pad !== 'none') {
+		result = result.padStart(2 + decimals, pad === 'nbsp' ? '\u00A0' : '0');
+	}
+
+	// @ts-expect-error
+	return result + '%';
+}
