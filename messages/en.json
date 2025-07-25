@@ -15,7 +15,7 @@
 	"metadata_only": "Only metadata",
 	"metadata_and_cropped_images": "Metadata and cropped images",
 	"metadata_cropped_and_full_images": "Metadata, cropped images and original images",
-	"allows_reusing_export_later": "Allows importing results back later",
+	"allows_reusing_export_later": "Allows re-importing results",
 	"padding_around_cropped_images": "Padding around cropped images",
 	"in_percent_of_image_dimensions": "as a percentage of image dimensions",
 	"in_pixels": "in pixels",
