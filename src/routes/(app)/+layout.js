@@ -6,8 +6,11 @@ import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '../../web-worker-procedures';
 import WebWorker from '../../web-worker.js?worker';
 import { m } from '$lib/paraglide/messages.js';
+import { getLocale } from '$lib/paraglide/runtime';
 
 export async function load() {
+	document.documentElement.lang = getLocale();
+
 	setLoadingMessage(m.loading_neural_worker());
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: new WebWorker({ name: 'SWARPC Worker' })
@@ -115,6 +118,15 @@ async function fillBuiltinData(swarpc) {
  * @param {string} message
  */
 function setLoadingMessage(message) {
-	const loadingMessage = document.getElementById('loading-message');
-	if (loadingMessage) loadingMessage.innerHTML = message;
+	/**
+	 * @param {string} id
+	 * @param {string} html
+	 */
+	const setHTML = (id, html) => {
+		const element = document.getElementById(id);
+		if (element) element.innerHTML = html;
+	};
+
+	setHTML('loading-title', m.loading_text());
+	setHTML('loading-message', message);
 }
