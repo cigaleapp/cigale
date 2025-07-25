@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1308</span>
+                <span class='fraction'>0/1306</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1308</span>
+                <span class='fraction'>0/1306</span>
             </div>
         
             
@@ -1369,11 +1369,7 @@
 <a name='L1304'></a><a href='#L1304'>1304</a>
 <a name='L1305'></a><a href='#L1305'>1305</a>
 <a name='L1306'></a><a href='#L1306'>1306</a>
-<a name='L1307'></a><a href='#L1307'>1307</a>
-<a name='L1308'></a><a href='#L1308'>1308</a>
-<a name='L1309'></a><a href='#L1309'>1309</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L1307'></a><a href='#L1307'>1307</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2723,6 +2719,7 @@
 <span class="cstat-no" title="statement not covered" >	import { toasts } from '$lib/toasts.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { tooltip } from '$lib/tooltips';</span>
 <span class="cstat-no" title="statement not covered" >	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';</span>
+<span class="cstat-no" title="statement not covered" >	import { m } from '$lib/paraglide/messages.js';</span>
 <span class="cstat-no" title="statement not covered" >	import { formatISO } from 'date-fns';</span>
 <span class="cstat-no" title="statement not covered" >	import { watch } from 'runed';</span>
 <span class="cstat-no" title="statement not covered" >	import IconRevert from '~icons/ph/arrow-arc-left';</span>
@@ -2766,8 +2763,8 @@
 <span class="cstat-no" title="statement not covered" >	 */</span>
 <span class="cstat-no" title="statement not covered" >	const tools = /** @type {const} @satisfies {Tool[]} */ ([</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: 'Glisser-recadrer',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer et glisser pour créer une boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_drag_crop(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_drag_crop_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconToolDragCrop,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'r',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: true,</span>
@@ -2776,8 +2773,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'crosshair'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: '2 points',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer sur les deux coins pour créer une boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_2_points(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_2_points_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconTwoPointCrop,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'z',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -2786,8 +2783,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'crosshair'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: '4 points',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer sur les 4 coins pour créer une boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_4_points(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_4_points_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconFourPointCrop,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'Shift+z',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -2796,8 +2793,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'crosshair'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: 'Déplacer',</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cliquer et glisser pour déplacer la boîte de recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_move(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_move_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconToolMove,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'v',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -2806,8 +2803,8 @@
 <span class="cstat-no" title="statement not covered" >			cursor: 'pointer'</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		{</span>
-<span class="cstat-no" title="statement not covered" >			name: 'Main',</span>
-<span class="cstat-no" title="statement not covered" >			help: "Cliquer et glisser pour se déplacer dans l'image",</span>
+<span class="cstat-no" title="statement not covered" >			name: m.crop_tool_hand(),</span>
+<span class="cstat-no" title="statement not covered" >			help: m.crop_tool_hand_help(),</span>
 <span class="cstat-no" title="statement not covered" >			icon: IconToolHand,</span>
 <span class="cstat-no" title="statement not covered" >			shortcut: 'h',</span>
 <span class="cstat-no" title="statement not covered" >			transformable: false,</span>
@@ -3182,22 +3179,22 @@
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >	defineKeyboardShortcuts({</span>
 <span class="cstat-no" title="statement not covered" >		ArrowLeft: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Image précédente',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.previous_image(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; Boolean(prevFileId),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; goto(`#/crop/${prevFileId}`)</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		'Shift+Space': {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Image précédente',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.previous_image(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; Boolean(prevFileId),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; goto(`#/crop/${prevFileId}`)</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		ArrowRight: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Image suivante',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.next_image(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; Boolean(nextFileId),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; goto(`#/crop/${nextFileId}`)</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		Space: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Continuer',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.continue(),</span>
 <span class="cstat-no" title="statement not covered" >			do: moveToNextUnconfirmed</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		'$mod+Delete': {</span>
@@ -3205,15 +3202,15 @@
 <span class="cstat-no" title="statement not covered" >			do: deleteImage</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		Escape: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Quitter le recadrage',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.exit_cropping(),</span>
 <span class="cstat-no" title="statement not covered" >			do: goToGallery</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		a: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Activer/désactiver la continuation automatique',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.toggle_auto_continue(),</span>
 <span class="cstat-no" title="statement not covered" >			do: async () =&gt; toggleSetting('cropAutoNext')</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		Delete: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Supprimer la boîte sélectionnée',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.delete_selected_box_help(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; Boolean(selectedBox.imageId),</span>
 <span class="cstat-no" title="statement not covered" >			async do() {</span>
 <span class="cstat-no" title="statement not covered" >				if (!selectedBox.imageId) return;</span>
@@ -3232,7 +3229,7 @@
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		f: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Cacher les boîtes non sélectionnées',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.hide_unselected_boxes(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; Boolean(selectedBox),</span>
 <span class="cstat-no" title="statement not covered" >			do() {</span>
 <span class="cstat-no" title="statement not covered" >				if (!selectedBox) return;</span>
@@ -3244,7 +3241,7 @@
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		u: {</span>
-<span class="cstat-no" title="statement not covered" >			help: "Revenir au recadrage d'origine",</span>
+<span class="cstat-no" title="statement not covered" >			help: m.revert_to_original_crop(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; Boolean(revertableCrops[fileId]),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				if (!revertableCrops[fileId]) return;</span>
@@ -3252,34 +3249,34 @@
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		'$mod+u': {</span>
-<span class="cstat-no" title="statement not covered" >			help: "Revenir au recadrage d'origine pour toutes les boîtes",</span>
+<span class="cstat-no" title="statement not covered" >			help: m.revert_all_to_original(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; Object.keys(boundingBoxes).length &gt; 0,</span>
 <span class="cstat-no" title="statement not covered" >			do: revertAll</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		ArrowUp: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Marquer le recadrage comme confirmé',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.mark_crop_confirmed(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; !hasConfirmedCrop(fileId),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; changeAllConfirmedStatuses(true)</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		ArrowDown: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Marquer le recadrage comme non confirmé',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.mark_crop_unconfirmed(),</span>
 <span class="cstat-no" title="statement not covered" >			when: () =&gt; hasConfirmedCrop(fileId),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; changeAllConfirmedStatuses(false)</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		'+': {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Zoomer',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.zoom_in(),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed, 10);</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		'-': {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Dézoomer',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.zoom_out(),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed, 10);</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		Digit0: {</span>
-<span class="cstat-no" title="statement not covered" >			help: 'Réinitialiser le zoom',</span>
+<span class="cstat-no" title="statement not covered" >			help: m.reset_zoom(),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				zoom.origin = { x: 0, y: 0 };</span>
 <span class="cstat-no" title="statement not covered" >				zoom.scale = 1;</span>
@@ -3289,7 +3286,7 @@
 <span class="cstat-no" title="statement not covered" >			tools.map((tool) =&gt; [</span>
 <span class="cstat-no" title="statement not covered" >				tool.shortcut,</span>
 <span class="cstat-no" title="statement not covered" >				{</span>
-<span class="cstat-no" title="statement not covered" >					help: `Choisir l'outil ${tool.name}`,</span>
+<span class="cstat-no" title="statement not covered" >					help: m.choose_tool({ name: tool.name }),</span>
 <span class="cstat-no" title="statement not covered" >					do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >						activeToolName = tool.name;</span>
 <span class="cstat-no" title="statement not covered" >					}</span>
@@ -3297,7 +3294,7 @@
 <span class="cstat-no" title="statement not covered" >			])</span>
 <span class="cstat-no" title="statement not covered" >		),</span>
 <span class="cstat-no" title="statement not covered" >		',': {</span>
-<span class="cstat-no" title="statement not covered" >			help: `Sélectionner la boîte précédente`,</span>
+<span class="cstat-no" title="statement not covered" >			help: m.select_previous_box(),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				const imageIds = Object.keys(boundingBoxes);</span>
 <span class="cstat-no" title="statement not covered" >				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');</span>
@@ -3306,7 +3303,7 @@
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		},</span>
 <span class="cstat-no" title="statement not covered" >		';': {</span>
-<span class="cstat-no" title="statement not covered" >			help: `Sélectionner la boîte suivante`,</span>
+<span class="cstat-no" title="statement not covered" >			help: m.select_next_box(),</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				const imageIds = Object.keys(boundingBoxes);</span>
 <span class="cstat-no" title="statement not covered" >				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');</span>
@@ -3318,7 +3315,7 @@
 <span class="cstat-no" title="statement not covered" >			range(1, 10).map((i) =&gt; [</span>
 <span class="cstat-no" title="statement not covered" >				`Digit${i}`,</span>
 <span class="cstat-no" title="statement not covered" >				{</span>
-<span class="cstat-no" title="statement not covered" >					help: `Sélectionner la boîte #${i}`,</span>
+<span class="cstat-no" title="statement not covered" >					help: m.select_box_number({ number: i }),</span>
 <span class="cstat-no" title="statement not covered" >					when: () =&gt; Object.keys(boundingBoxes).length &gt;= i,</span>
 <span class="cstat-no" title="statement not covered" >					do: () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >						const imageId = Object.keys(boundingBoxes)[i - 1];</span>
@@ -3377,7 +3374,7 @@
 <span class="cstat-no" title="statement not covered" >	&lt;aside class="toolbar"&gt;</span>
 <span class="cstat-no" title="statement not covered" >		{#each tools as tool (tool.name)}</span>
 <span class="cstat-no" title="statement not covered" >			&lt;button</span>
-<span class="cstat-no" title="statement not covered" >				aria-label="Sélectionner l'outil {tool.name}"</span>
+<span class="cstat-no" title="statement not covered" >				aria-label={m.select_tool({ tool: tool.name })}</span>
 <span class="cstat-no" title="statement not covered" >				class:active={tool.name === activeToolName}</span>
 <span class="cstat-no" title="statement not covered" >				use:tooltip={{</span>
 <span class="cstat-no" title="statement not covered" >					text: `${tool.name}: ${tool.help}`,</span>
@@ -3484,15 +3481,17 @@
 <span class="cstat-no" title="statement not covered" >		&lt;section class="top"&gt;</span>
 <span class="cstat-no" title="statement not covered" >			&lt;section class="preactions"&gt;</span>
 <span class="cstat-no" title="statement not covered" >				&lt;ButtonInk onclick={goToGallery}&gt;</span>
-<span class="cstat-no" title="statement not covered" >					&lt;IconGallery /&gt; Autres photos</span>
+<span class="cstat-no" title="statement not covered" >					&lt;IconGallery /&gt;</span>
+<span class="cstat-no" title="statement not covered" >					{m.other_photos()}</span>
 <span class="cstat-no" title="statement not covered" >					&lt;KeyboardHint shortcut="Escape" /&gt;</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/ButtonInk&gt;</span>
 <span class="cstat-no" title="statement not covered" >				&lt;ButtonInk</span>
 <span class="cstat-no" title="statement not covered" >					dangerous</span>
 <span class="cstat-no" title="statement not covered" >					onclick={deleteImage}</span>
-<span class="cstat-no" title="statement not covered" >					help={{ text: 'Supprimer cette image et passer à la suivante', keyboard: '$mod+Delete' }}</span>
+<span class="cstat-no" title="statement not covered" >					help={{ text: m.delete_image_help(), keyboard: '$mod+Delete' }}</span>
 <span class="cstat-no" title="statement not covered" >				&gt;</span>
-<span class="cstat-no" title="statement not covered" >					&lt;IconDelete /&gt; Supprimer</span>
+<span class="cstat-no" title="statement not covered" >					&lt;IconDelete /&gt;</span>
+<span class="cstat-no" title="statement not covered" >					{m.delete()}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/ButtonInk&gt;</span>
 <span class="cstat-no" title="statement not covered" >			&lt;/section&gt;</span>
 <span class="cstat-no" title="statement not covered" >			&lt;section class="filename"&gt;</span>
@@ -3519,7 +3518,7 @@
 <span class="cstat-no" title="statement not covered" >					disabled={!Object.values(revertableCrops).some(Boolean)}</span>
 <span class="cstat-no" title="statement not covered" >				&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;IconRevert /&gt;</span>
-<span class="cstat-no" title="statement not covered" >					Réinit.</span>
+<span class="cstat-no" title="statement not covered" >					{m.reset()}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/ButtonSecondary&gt;</span>
 <span class="cstat-no" title="statement not covered" >				{#if uiState.cropConfirmationMetadataId}</span>
 <span class="cstat-no" title="statement not covered" >					&lt;ButtonSecondary</span>
@@ -3534,7 +3533,7 @@
 <span class="cstat-no" title="statement not covered" >							Invalider</span>
 <span class="cstat-no" title="statement not covered" >						{:else}</span>
 <span class="cstat-no" title="statement not covered" >							&lt;IconConfirmedCrop /&gt;</span>
-<span class="cstat-no" title="statement not covered" >							Valider</span>
+<span class="cstat-no" title="statement not covered" >							{m.validate()}</span>
 <span class="cstat-no" title="statement not covered" >						{/if}</span>
 <span class="cstat-no" title="statement not covered" >					&lt;/ButtonSecondary&gt;</span>
 <span class="cstat-no" title="statement not covered" >				{/if}</span>
@@ -3573,7 +3572,7 @@
 <span class="cstat-no" title="statement not covered" >						&lt;div class="actions"&gt;</span>
 <span class="cstat-no" title="statement not covered" >							{#if Object.values(boundingBoxes).length &gt; 1}</span>
 <span class="cstat-no" title="statement not covered" >								&lt;ButtonIcon</span>
-<span class="cstat-no" title="statement not covered" >									help="{isFocused ? 'Réafficher' : 'Masquer'} les autres boîtes"</span>
+<span class="cstat-no" title="statement not covered" >									help={m.show_hide_other_boxes({ action: isFocused ? m.show() : m.hide() })}</span>
 <span class="cstat-no" title="statement not covered" >									keyboard="F"</span>
 <span class="cstat-no" title="statement not covered" >									onclick={() =&gt; (focusedImageId = isFocused ? '' : image.id)}</span>
 <span class="cstat-no" title="statement not covered" >									crossout={isFocused}</span>
@@ -3592,7 +3591,7 @@
 <span class="cstat-no" title="statement not covered" >								&lt;IconRevert /&gt;</span>
 <span class="cstat-no" title="statement not covered" >							&lt;/ButtonIcon&gt;</span>
 <span class="cstat-no" title="statement not covered" >							&lt;ButtonIcon</span>
-<span class="cstat-no" title="statement not covered" >								help="Supprimer cette boîte"</span>
+<span class="cstat-no" title="statement not covered" >								help={m.delete_selected_box_help()}</span>
 <span class="cstat-no" title="statement not covered" >								keyboard="Delete"</span>
 <span class="cstat-no" title="statement not covered" >								onclick={async () =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >									if (images.length === 1) {</span>
@@ -3613,11 +3612,8 @@
 <span class="cstat-no" title="statement not covered" >				{#if showBoxesListHint}</span>
 <span class="cstat-no" title="statement not covered" >					&lt;li class="boxes-list-hint"&gt;</span>
 <span class="cstat-no" title="statement not covered" >						&lt;p&gt;</span>
-<span class="cstat-no" title="statement not covered" >							Pour créer une nouvelle boîte,&lt;wbr /&gt; utilisez les outils &lt;SentenceJoin</span>
-<span class="cstat-no" title="statement not covered" >								items={creationTools}</span>
-<span class="cstat-no" title="statement not covered" >								key={(t) =&gt; t.name}</span>
-<span class="cstat-no" title="statement not covered" >								final="ou"</span>
-<span class="cstat-no" title="statement not covered" >							&gt;</span>
+<span class="cstat-no" title="statement not covered" >							{m.create_new_box_with_tools()}</span>
+<span class="cstat-no" title="statement not covered" >							&lt;SentenceJoin items={creationTools} key={(t) =&gt; t.name} final="ou"&gt;</span>
 <span class="cstat-no" title="statement not covered" >								{#snippet children({ icon: Icon, help, shortcut })}</span>
 <span class="cstat-no" title="statement not covered" >									&lt;Tooltip text={help} keyboard={shortcut}&gt;</span>
 <span class="cstat-no" title="statement not covered" >										&lt;Icon /&gt;</span>
@@ -3626,9 +3622,7 @@
 <span class="cstat-no" title="statement not covered" >							&lt;/SentenceJoin&gt;</span>
 <span class="cstat-no" title="statement not covered" >						&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >						&lt;p&gt;</span>
-<span class="cstat-no" title="statement not covered" >							Sélectionnez une boîte avec</span>
-<span class="cstat-no" title="statement not covered" >							&lt;KeyboardHint shortcut="1" /&gt; à &lt;KeyboardHint shortcut="9" /&gt; pour la modifier avec des</span>
-<span class="cstat-no" title="statement not covered" >							raccourcis clavier</span>
+<span class="cstat-no" title="statement not covered" >							{m.select_box_with_numbers()}</span>
 <span class="cstat-no" title="statement not covered" >						&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;/li&gt;</span>
 <span class="cstat-no" title="statement not covered" >				{/if}</span>
@@ -3644,7 +3638,7 @@
 <span class="cstat-no" title="statement not covered" >			&lt;div class="bar"&gt;</span>
 <span class="cstat-no" title="statement not covered" >				&lt;p&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;IconHasCrop /&gt;</span>
-<span class="cstat-no" title="statement not covered" >					Images avec recadrage</span>
+<span class="cstat-no" title="statement not covered" >					{m.images_with_cropping()}</span>
 <span class="cstat-no" title="statement not covered" >					{@render percent(croppedImagesCount)}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >				&lt;ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} /&gt;</span>
@@ -3653,7 +3647,7 @@
 <span class="cstat-no" title="statement not covered" >				&lt;div class="bar"&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;p&gt;</span>
 <span class="cstat-no" title="statement not covered" >						&lt;IconConfirmedCrop /&gt;</span>
-<span class="cstat-no" title="statement not covered" >						Recadrages confirmés</span>
+<span class="cstat-no" title="statement not covered" >						{m.confirmed_crops()}</span>
 <span class="cstat-no" title="statement not covered" >						{@render percent(confirmedCropsCount)}</span>
 <span class="cstat-no" title="statement not covered" >					&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} /&gt;</span>
@@ -3708,7 +3702,7 @@
 <span class="cstat-no" title="statement not covered" >					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"</span>
 <span class="cstat-no" title="statement not covered" >				&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;IconContinue /&gt;</span>
-<span class="cstat-no" title="statement not covered" >					Continuer</span>
+<span class="cstat-no" title="statement not covered" >					{m.continue()}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/ButtonSecondary&gt;</span>
 <span class="cstat-no" title="statement not covered" >			&lt;/div&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;/nav&gt;</span>
@@ -3994,7 +3988,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-23T16:19:50.253Z
+                at 2025-07-25T21:18:41.770Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
