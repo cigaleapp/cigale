@@ -1,3 +1,5 @@
+import { type } from 'arktype';
+
 /**
  * Return a ", "-separated list of "{count} {thing}" strings, with thing set to plural.
  * If thing is found in plurals, use that, otherwise use "{thing}s".
@@ -26,4 +28,71 @@ if (import.meta.vitest) {
 		expect(countThings({ a: 1, b: 2, c: 0 }, { b: 'foo' })).toBe('1 a, 2 foo');
 		expect(countThings({ a: 1, b: 2, c: 0 }, { a: 'a', b: 'b' })).toBe('1 a, 2 b');
 	});
+}
+
+/**
+ * Converts a number between 0 and 1 to a percentage string.
+ * @param {number} value Number between 0 and 1
+ * @param {number} [decimals=0] Number of decimal places to include in the output
+ * @param {object} [options] Additional options
+ * @param {'none'|'nbsp'|'zeros'} [options.pad=none] Whether to pad the percentage with leading non-breaking spaces
+ * @returns {`${number}%`} Percentage string
+ */
+export function percent(value, decimals = 0, { pad = 'none' } = {}) {
+	let result = (value * 100).toFixed(decimals);
+
+	// Remove trailing zeros and decimal point if not needed
+	if (decimals > 0) result = result.replace(/\.?0+$/, '');
+
+	if (pad !== 'none') {
+		result = result.padStart(2 + decimals, pad === 'nbsp' ? '\u00A0' : '0');
+	}
+
+	// @ts-expect-error
+	return result + '%';
+}
+
+/**
+ * Get the completion percentage of each language in the CIGALE project on Weblate.
+ * Stores in localStorage, and only fetches from Weblate once the cached localStorage entry is stale, which has a stale date set according to the response's X-RateLimit-Reset header.
+ * @returns {Promise<Record<string, number>>} map of language codes to number in [0, 1] indicating the completion percentage
+ */
+export async function languagesCompletions() {
+	const cached = localStorage.getItem('languagesCompletions');
+	if (cached) {
+		const { data, expiresAt } = type({
+			data: { '[string==2]': '0<=number<=1' },
+			expiresAt: 'number.epoch'
+		}).assert(JSON.parse(cached));
+
+		if (expiresAt > Date.now()) return data;
+	}
+
+	const response = await fetch('https://weblate.gwen.works/api/projects/cigale/languages/');
+	if (!response.ok) {
+		throw new Error(`Failed to fetch languages completions: ${response.statusText}`);
+	}
+
+	const data = type({ code: 'string==2', translated_words_percent: '0 <= number <= 100' })
+		.array()
+		.assert(await response.json());
+
+	const completions = Object.fromEntries(
+		data.map(({ code, translated_words_percent }) => [code, translated_words_percent / 100])
+	);
+
+	let expiresInSeconds = parseInt(response.headers.get('X-RateLimit-Reset') ?? '0');
+	if (isNaN(expiresInSeconds)) {
+		expiresInSeconds = 0;
+	}
+
+	localStorage.setItem(
+		'languagesCompletions',
+		JSON.stringify({
+			data: completions,
+			expiresAt: Date.now() + expiresInSeconds * 1000
+		})
+	);
+
+	return completions;
 }

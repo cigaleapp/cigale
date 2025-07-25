@@ -177,5 +177,7 @@
 	"loading_builtin_data": "Loading built-in data…",
 	"initializing_default_settings": "Initializing default settings…",
 	"loading_builtin_protocol": "Loading built-in protocol",
-	"writing_protocol": "Writing protocol"
+	"writing_protocol": "Writing protocol",
+	"confidence_percentage": "Confidence: {percentage}",
+	"language_translation_completion": "Translation is {percentage} done"
 }

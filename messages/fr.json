@@ -52,7 +52,6 @@
 	"settings": "Réglages",
 	"theme": "Thème",
 	"sync_with_system_theme": "Synchroniser avec le thème du système",
-	"french": "Français",
 	"manage_protocols": "Gérer les protocoles",
 	"about": "À propos",
 	"no_inference": "Aucune inférence",
@@ -177,5 +176,7 @@
 	"loading_builtin_data": "Chargement des données intégrées…",
 	"initializing_default_settings": "Initialisation des réglages par défaut…",
 	"loading_builtin_protocol": "Chargement du protocole intégré",
-	"writing_protocol": "Écriture du protocole"
+	"writing_protocol": "Écriture du protocole",
+	"language_translation_completion": "Traduit à {percentage}",
+	"confidence_percentage": "Confiance: {percentage}"
 }

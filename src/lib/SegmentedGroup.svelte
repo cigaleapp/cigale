@@ -8,13 +8,20 @@
 	 * @property {Key[]} options
 	 * @property {Partial<{[K in Key]: string}>} [labels] labels for the options
 	 * @property {NoInfer<Key> | undefined} [value] which option is selected
-	 * @property {import('svelte').Snippet<[Key, boolean, Key|undefined]>} [customOption] snippets to render for each option. called for every option in `options` that is not in `labels`. arguments: option, the option is selected, current value
+	 * @property {import('svelte').Snippet<[Key]>} [customOption] snippets to render for each option. called for every option in `options` that is not in `labels`. arguments: option
+	 * @property {boolean} [clickable-custom-options=false] whether the custom options should be clickable. If true, the onclick function will be called when the option is clicked.
 	 */
 
 	/**
 	 * @type {Props}
 	 */
-	let { options, labels, value = $bindable(), customOption } = $props();
+	let {
+		options,
+		labels,
+		value = $bindable(),
+		customOption,
+		'clickable-custom-options': clickableCustomOptions
+	} = $props();
 </script>
 
 <div class="segmented-group">
@@ -31,9 +38,18 @@
 				{labels?.[option] ?? option}
 			</button>
 		{:else}
-			<div role="radio" aria-checked={option === value} class="option">
-				{@render customOption(option, option === value, value)}
-			</div>
+			<!-- svelte-ignore a11y_interactive_supports_focus -->
+			<svelte:element
+				this={clickableCustomOptions ? 'button' : 'div'}
+				role="radio"
+				aria-checked={option === value}
+				class="option"
+				onclick={() => {
+					if (clickableCustomOptions) value = option;
+				}}
+			>
+				{@render customOption(option)}
+			</svelte:element>
 		{/if}
 	{/each}
 </div>

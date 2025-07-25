@@ -9,6 +9,7 @@
 	import { tooltip } from './tooltips';
 	import CroppedImg from './CroppedImg.svelte';
 	import { m } from '$lib/paraglide/messages.js';
+	import { percent } from './i18n';
 
 	/**
 	 * @typedef Props
@@ -90,7 +91,7 @@
 							{:else if loading === -1}
 								{statusText}
 							{:else}
-								{Math.round(loading * 100)}%
+								{percent(loading)}
 							{/if}
 						</span>
 						{#if ondelete}
