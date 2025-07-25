@@ -67,7 +67,7 @@
 	"with_models": "With models",
 	"detection_and_cropping": "Detection & cropping",
 	"icons": "Icons",
-	"thanks_to_libraries": "Thanks to following libraries",
+	"thanks_to_libraries": "Thanks to these libraries",
 	"loading_dependencies": "Loading dependencies…",
 	"cannot_load_dependencies": "Cannot load dependencies",
 	"image_n_of_selection": "Image {imageNumber} of selection",
