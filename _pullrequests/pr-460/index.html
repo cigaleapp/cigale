@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr" dir="ltr">
+<html dir="ltr">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="manifest" href="manifest.json" />
@@ -61,6 +61,16 @@
 				text-align: center;
 			}
 
+			#loading .app-version {
+				position: fixed;
+				bottom: 1.5rem;
+				text-align: center;
+				left: 0;
+				right: 0;
+				font-size: 0.8rem;
+				color: gray;
+			}
+
 			@keyframes spinner {
 				0% {
 					rotate: 0deg;
@@ -77,19 +87,19 @@
 			}
 		</style>
 		
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/entry/start.DIM7X0XT.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/DXKAQzvY.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/CIvqwxWI.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/BCxJT8AV.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/qAwaxIRn.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/B5pXt8-J.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/B3pHwC0j.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/DSYMF8h1.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/entry/app.B9qG4FBp.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/BL1OiNu1.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/entry/start.DzfKEP2P.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/DDXmyVWc.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/C2X74NZx.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/C5L8G6Av.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/DXVxC_U9.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/BEXummMG.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/Db1sukAJ.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/BDvhLCP3.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/entry/app.DkofY-g1.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/CiqeNHxk.js">
 		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/NZTpNUN0.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/dAWdfpv4.js">
-		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/DabNtX4t.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/BVw88yoE.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-460/_app/immutable/chunks/C9aFXG89.js">
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div id="loading">
@@ -97,14 +107,16 @@
 				<circle cx="20" cy="20" r="18"></circle>
 			</svg>
 			<p>
-				Chargement…
+				<!-- Set dynamically because i18n -->
+				<span id="loading-title"></span>
 				<code id="loading-message"></code>
 			</p>
+			<code class="app-version">6e63f373a0f5710919c4528358697b9ccc3a1cd6</code>
 		</div>
 		<div style="display: contents">
 			<script>
 				{
-					__sveltekit_r71grr = {
+					__sveltekit_16j42gz = {
 						base: new URL('.', location).pathname.slice(0, -1),
 						assets: "/cigale/_pullrequests/pr-460"
 					};
@@ -112,8 +124,8 @@
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("/cigale/_pullrequests/pr-460/_app/immutable/entry/start.DIM7X0XT.js"),
-						import("/cigale/_pullrequests/pr-460/_app/immutable/entry/app.B9qG4FBp.js")
+						import("/cigale/_pullrequests/pr-460/_app/immutable/entry/start.DzfKEP2P.js"),
+						import("/cigale/_pullrequests/pr-460/_app/immutable/entry/app.DkofY-g1.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element);
 					});
