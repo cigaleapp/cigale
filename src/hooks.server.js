@@ -6,7 +6,16 @@ const paraglideHandle = ({ event, resolve }) =>
 		event.request = localizedRequest;
 		return resolve(event, {
 			transformPageChunk: ({ html }) => {
-				return html.replace('%lang%', locale);
+				const replacements = {
+					lang: locale,
+					buildcommit: import.meta.env.buildCommit
+				};
+
+				for (const [key, value] of Object.entries(replacements)) {
+					html = html.replace(`%${key}%`, value);
+				}
+
+				return html;
 			}
 		});
 	});

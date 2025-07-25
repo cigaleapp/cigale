@@ -61,6 +61,16 @@
 				text-align: center;
 			}
 
+			#loading .app-version {
+				position: fixed;
+				bottom: 1.5rem;
+				text-align: center;
+				left: 0;
+				right: 0;
+				font-size: 0.8rem;
+				color: gray;
+			}
+
 			@keyframes spinner {
 				0% {
 					rotate: 0deg;
@@ -87,6 +97,7 @@
 				Chargement…
 				<code id="loading-message"></code>
 			</p>
+			<code class="app-version">%buildcommit%</code>
 		</div>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
