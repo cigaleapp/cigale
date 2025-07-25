@@ -2,12 +2,14 @@
 	import { goto } from '$app/navigation';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
+	import { languagesCompletions } from '$lib/i18n';
+	import { m } from '$lib/paraglide/messages.js';
 	import { getLocale, locales, setLocale } from '$lib/paraglide/runtime.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { watch } from 'runed';
-	import { m } from '$lib/paraglide/messages.js';
 	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
 	import Gears from '~icons/ph/gear-light';
 	import Moon from '~icons/ph/moon-light';
@@ -105,10 +107,23 @@
 		</div>
 		<div class="setting">
 			<SegmentedGroup
+				clickable-custom-options
 				options={[...locales]}
-				labels={{ en: 'English', fr: m.french() }}
 				bind:value={getLocale, setLocale}
-			/>
+			>
+				{#snippet customOption(code)}
+					{@const names = { en: 'English', fr: 'Français', ja: '日本語' }}
+					{names[code] || code}
+					{#await languagesCompletions() then completions}
+						{#if completions[code] < 0.85}
+							<ConfidencePercentage
+								tooltip={(percentage) => m.language_translation_completion({ percentage })}
+								value={completions[code]}
+							/>
+						{/if}
+					{/await}
+				{/snippet}
+			</SegmentedGroup>
 		</div>
 		<div class="setting">
 			<ButtonSecondary

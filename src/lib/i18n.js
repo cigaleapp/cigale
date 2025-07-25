@@ -1,3 +1,5 @@
+import { type } from 'arktype';
+
 /**
  * Return a ", "-separated list of "{count} {thing}" strings, with thing set to plural.
  * If thing is found in plurals, use that, otherwise use "{thing}s".
@@ -48,4 +50,49 @@ export function percent(value, decimals = 0, { pad = 'none' } = {}) {
 
 	// @ts-expect-error
 	return result + '%';
+}
+
+/**
+ * Get the completion percentage of each language in the CIGALE project on Weblate.
+ * Stores in localStorage, and only fetches from Weblate once the cached localStorage entry is stale, which has a stale date set according to the response's X-RateLimit-Reset header.
+ * @returns {Promise<Record<string, number>>} map of language codes to number in [0, 1] indicating the completion percentage
+ */
+export async function languagesCompletions() {
+	const cached = localStorage.getItem('languagesCompletions');
+	if (cached) {
+		const { data, expiresAt } = type({
+			data: { '[string==2]': '0<=number<=1' },
+			expiresAt: 'number.epoch'
+		}).assert(JSON.parse(cached));
+
+		if (expiresAt > Date.now()) return data;
+	}
+
+	const response = await fetch('https://weblate.gwen.works/api/projects/cigale/languages/');
+	if (!response.ok) {
+		throw new Error(`Failed to fetch languages completions: ${response.statusText}`);
+	}
+
+	const data = type({ code: 'string==2', translated_words_percent: '0 <= number <= 100' })
+		.array()
+		.assert(await response.json());
+
+	const completions = Object.fromEntries(
+		data.map(({ code, translated_words_percent }) => [code, translated_words_percent / 100])
+	);
+
+	let expiresInSeconds = parseInt(response.headers.get('X-RateLimit-Reset') ?? '0');
+	if (isNaN(expiresInSeconds)) {
+		expiresInSeconds = 0;
+	}
+
+	localStorage.setItem(
+		'languagesCompletions',
+		JSON.stringify({
+			data: completions,
+			expiresAt: Date.now() + expiresInSeconds * 1000
+		})
+	);
+
+	return completions;
 }
