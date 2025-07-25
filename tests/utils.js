@@ -30,7 +30,7 @@ export async function importPhotos({ page }, ...names) {
 	if (!names) throw new Error('No file names provided');
 	names = names.map((name) => (path.extname(name) ? name : `${name}.jpeg`));
 
-	await expect(page.getByText(/Cliquer ou déposer des images/)).toBeVisible();
+	await expect(page.getByText('(.zip)')).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(names.map((f) => path.join('./tests/fixtures', f)));
 	await expect(page.getByText(names.at(-1), { exact: true })).toBeVisible({
@@ -209,8 +209,26 @@ export async function chooseDefaultProtocol(page, models = {}) {
 				.check();
 		}
 	}
-	await page.getByRole('link', { name: 'Importer' }).click();
-	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {'protocol'|'import'|'crop'|'classify'} tabName
+ */
+export async function goToTab(page, tabName) {
+	const tabs = {
+		protocol: { name: 'Protocole', hash: '#/protocol' },
+		import: { name: 'Importer', hash: '#/import' },
+		crop: { name: 'Rogner', hash: '#/crop' },
+		classify: { name: 'Classer', hash: '#/classify' }
+	};
+
+	const tab = tabs[tabName];
+	if (!tab) throw new Error(`Unknown tab: ${tabName}`);
+
+	await page.getByRole('link', { name: tab.name }).click();
+	await page.waitForURL((u) => u.hash === tab.hash);
 }
 
 /**

@@ -4,6 +4,7 @@ import {
 	chooseDefaultProtocol,
 	getImage,
 	getSettings,
+	goToTab,
 	listTable,
 	loadDatabaseDump,
 	setImageMetadata,
@@ -15,6 +16,7 @@ test.describe('Cropper view', () => {
 		testInfo.setTimeout(40_000);
 		await loadDatabaseDump(page);
 		await chooseDefaultProtocol(page);
+		await goToTab(page, 'import');
 		const allImages = await listTable(page, 'Image');
 		await markImagesAsConfirmedInDatabase(
 			page,

@@ -3,7 +3,7 @@ import extract from 'extract-zip';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Analysis } from '../src/lib/schemas/results.js';
-import { setSettings, chooseDefaultProtocol, readdirTreeSync } from './utils.js';
+import { setSettings, chooseDefaultProtocol, readdirTreeSync, goToTab } from './utils.js';
 
 for (const offline of [false, true]) {
 	test(
@@ -16,6 +16,7 @@ for (const offline of [false, true]) {
 
 			await setSettings({ page }, { showTechnicalMetadata: false });
 			await chooseDefaultProtocol(page);
+			await goToTab(page, 'import');
 
 			// Import fixture image
 			await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
