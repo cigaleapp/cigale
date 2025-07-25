@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/1306</span>
+                <span class='fraction'>0/1307</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/1306</span>
+                <span class='fraction'>0/1307</span>
             </div>
         
             
@@ -1369,7 +1369,9 @@
 <a name='L1304'></a><a href='#L1304'>1304</a>
 <a name='L1305'></a><a href='#L1305'>1305</a>
 <a name='L1306'></a><a href='#L1306'>1306</a>
-<a name='L1307'></a><a href='#L1307'>1307</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L1307'></a><a href='#L1307'>1307</a>
+<a name='L1308'></a><a href='#L1308'>1308</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2703,6 +2705,7 @@
 <span class="cstat-no" title="statement not covered" >	import SentenceJoin from '$lib/SentenceJoin.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import Switch from '$lib/Switch.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import Tooltip from '$lib/Tooltip.svelte';</span>
+<span class="cstat-no" title="statement not covered" >	import { percent } from '$lib/i18n';</span>
 <span class="cstat-no" title="statement not covered" >	import * as idb from '$lib/idb.svelte.js';</span>
 <span class="cstat-no" title="statement not covered" >	import {</span>
 <span class="cstat-no" title="statement not covered" >		deleteImageFile,</span>
@@ -2713,13 +2716,13 @@
 <span class="cstat-no" title="statement not covered" >	} from '$lib/images';</span>
 <span class="cstat-no" title="statement not covered" >	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';</span>
+<span class="cstat-no" title="statement not covered" >	import { m } from '$lib/paraglide/messages.js';</span>
 <span class="cstat-no" title="statement not covered" >	import { seo } from '$lib/seo.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { uiState } from '$lib/state.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { toasts } from '$lib/toasts.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { tooltip } from '$lib/tooltips';</span>
 <span class="cstat-no" title="statement not covered" >	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';</span>
-<span class="cstat-no" title="statement not covered" >	import { m } from '$lib/paraglide/messages.js';</span>
 <span class="cstat-no" title="statement not covered" >	import { formatISO } from 'date-fns';</span>
 <span class="cstat-no" title="statement not covered" >	import { watch } from 'runed';</span>
 <span class="cstat-no" title="statement not covered" >	import IconRevert from '~icons/ph/arrow-arc-left';</span>
@@ -3582,7 +3585,7 @@
 <span class="cstat-no" title="statement not covered" >							{/if}</span>
 <span class="cstat-no" title="statement not covered" >							&lt;ButtonIcon</span>
 <span class="cstat-no" title="statement not covered" >								help="Revenir au recadrage d'origine ({initBox</span>
-<span class="cstat-no" title="statement not covered" >									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${Math.round(initBox.confidence * 100)}% de confiance`</span>
+<span class="cstat-no" title="statement not covered" >									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${percent(initBox.confidence)} de confiance`</span>
 <span class="cstat-no" title="statement not covered" >									: 'indisponible'})"</span>
 <span class="cstat-no" title="statement not covered" >								keyboard="u"</span>
 <span class="cstat-no" title="statement not covered" >								disabled={!revertableCrops[image.id]}</span>
@@ -3629,9 +3632,9 @@
 <span class="cstat-no" title="statement not covered" >			&lt;/ul&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;/section&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;section class="progress"&gt;</span>
-<span class="cstat-no" title="statement not covered" >			{#snippet percent(/** @type {number} */ value)}</span>
+<span class="cstat-no" title="statement not covered" >			{#snippet percentage(/** @type {number} */ value)}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;code&gt;</span>
-<span class="cstat-no" title="statement not covered" >					{Math.round((value / sortedFileIds.length) * 100)}%</span>
+<span class="cstat-no" title="statement not covered" >					{percent(value / sortedFileIds.length)}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/code&gt;</span>
 <span class="cstat-no" title="statement not covered" >			{/snippet}</span>
 <span class="cstat-no" title="statement not covered" ></span>
@@ -3639,7 +3642,7 @@
 <span class="cstat-no" title="statement not covered" >				&lt;p&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;IconHasCrop /&gt;</span>
 <span class="cstat-no" title="statement not covered" >					{m.images_with_cropping()}</span>
-<span class="cstat-no" title="statement not covered" >					{@render percent(croppedImagesCount)}</span>
+<span class="cstat-no" title="statement not covered" >					{@render percentage(croppedImagesCount)}</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >				&lt;ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} /&gt;</span>
 <span class="cstat-no" title="statement not covered" >			&lt;/div&gt;</span>
@@ -3648,7 +3651,7 @@
 <span class="cstat-no" title="statement not covered" >					&lt;p&gt;</span>
 <span class="cstat-no" title="statement not covered" >						&lt;IconConfirmedCrop /&gt;</span>
 <span class="cstat-no" title="statement not covered" >						{m.confirmed_crops()}</span>
-<span class="cstat-no" title="statement not covered" >						{@render percent(confirmedCropsCount)}</span>
+<span class="cstat-no" title="statement not covered" >						{@render percentage(confirmedCropsCount)}</span>
 <span class="cstat-no" title="statement not covered" >					&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >					&lt;ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} /&gt;</span>
 <span class="cstat-no" title="statement not covered" >				&lt;/div&gt;</span>
@@ -3988,7 +3991,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-25T21:18:41.770Z
+                at 2025-07-25T21:36:19.066Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
