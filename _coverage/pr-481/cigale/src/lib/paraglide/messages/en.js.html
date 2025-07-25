@@ -1901,7 +1901,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const create_protocol = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Create protocol`</span>
+<span class="cstat-no" title="statement not covered" >	return `Create a protocol`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const remote_protocol_import_confirm_following = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -1909,7 +1909,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const import_remote_protocol_title = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Import remote protocol?`</span>
+<span class="cstat-no" title="statement not covered" >	return `Import remote protocol ?`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const _import = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -1917,11 +1917,11 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const importing_in_progress = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Importing in progress...`</span>
+<span class="cstat-no" title="statement not covered" >	return `Importing...`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const error_importing_remote_protocol = /** @type {(inputs: { error: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Error importing remote protocol: ${i.error}`</span>
+<span class="cstat-no" title="statement not covered" >	return `Error while importing remote protocol: ${i.error}`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const learn_more = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -1961,15 +1961,15 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const crop_tool_2_points_help = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Click on two corners to create a crop box`</span>
+<span class="cstat-no" title="statement not covered" >	return `Click on 2 corners to create a bounding box`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const crop_tool_4_points_help = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Click on four corners to create a crop box`</span>
+<span class="cstat-no" title="statement not covered" >	return `Click on four edges to create a bounding box`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const crop_tool_move_help = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Click and drag to move the crop box`</span>
+<span class="cstat-no" title="statement not covered" >	return `Click and drag to move the bounding box`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const crop_tool_hand_help = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -1981,7 +1981,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const crop_tool_drag_crop_help = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Click and drag to create a crop box`</span>
+<span class="cstat-no" title="statement not covered" >	return `Click and drag to create a bounding box`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const group_selected_items_help = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -2037,7 +2037,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const observation_tooltip = /** @type {(inputs: { stacksize: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `This observation groups ${i.stacksize} images. Click to see them all.`</span>
+<span class="cstat-no" title="statement not covered" >	return `This observation contains ${i.stacksize} images. Click to see them all.`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const reset = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -2117,7 +2117,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const exit_cropping = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Exit cropping`</span>
+<span class="cstat-no" title="statement not covered" >	return `Exit cropping mode`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const toggle_auto_continue = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -2137,15 +2137,15 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const mark_crop_confirmed = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Mark crop as confirmed`</span>
+<span class="cstat-no" title="statement not covered" >	return `Mark image crop as confirmed`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const mark_crop_unconfirmed = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Mark crop as unconfirmed`</span>
+<span class="cstat-no" title="statement not covered" >	return `Mark image crop as not confirmed`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const choose_tool = /** @type {(inputs: { name: NonNullable&lt;unknown&gt; }) =&gt; string} */ (i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Choose tool ${i.name}`</span>
+<span class="cstat-no" title="statement not covered" >	return `Choose ${i.name} tool`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const select_previous_box = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -2181,7 +2181,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const initializing_worker_db = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Initializing worker DB…`</span>
+<span class="cstat-no" title="statement not covered" >	return `Initializing neural worker's DB…`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const initializing_database = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -2189,7 +2189,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const loading_builtin_data = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Loading builtin data…`</span>
+<span class="cstat-no" title="statement not covered" >	return `Loading built-in data…`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const initializing_default_settings = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -2197,7 +2197,7 @@
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const loading_builtin_protocol = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Loading builtin protocol`</span>
+<span class="cstat-no" title="statement not covered" >	return `Loading built-in protocol`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >export const writing_protocol = /** @type {(inputs: {}) =&gt; string} */ () =&gt; {</span>
@@ -2209,7 +2209,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-25T14:29:05.008Z
+                at 2025-07-25T16:29:09.748Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
