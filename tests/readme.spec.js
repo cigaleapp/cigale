@@ -13,6 +13,18 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 		test.describe(language, () => {
 			const messages = language === 'fr' ? français : english;
 
+			/**
+			 * @param {import('@playwright/test').Page} page
+			 */
+			async function waitForAnalysis(page) {
+				await expect(page.getByTestId('first-observation-card')).not.toHaveText(
+					new RegExp(messages.analyzing),
+					{
+						timeout: 20_000
+					}
+				);
+			}
+
 			test.beforeEach(async ({ page, browserName }) => {
 				test.skip(browserName !== 'chromium', 'Only taking screenshots in one browser');
 
@@ -39,8 +51,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				await chooseDefaultProtocol(page);
 				await page.getByRole('navigation').getByRole('link', { name: messages.import_tab }).click();
 				await importPhotos({ page }, 'lil-fella.jpeg');
-				await expect(page.getByTestId('first-observation-card')).not.toHaveText(messages.analyzing);
-				await page.waitForTimeout(10_000);
+				await waitForAnalysis(page);
 				await expect(page).toHaveScreenshot();
 			});
 
@@ -48,8 +59,8 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				await chooseDefaultProtocol(page);
 				await page.getByRole('navigation').getByRole('link', { name: messages.import_tab }).click();
 				await importPhotos({ page }, 'lil-fella.jpeg');
-				await expect(page.getByTestId('first-observation-card')).not.toHaveText(messages.analyzing);
-				await page.waitForTimeout(3_000);
+				await waitForAnalysis(page);
+
 				await page.getByRole('navigation').getByRole('link', { name: messages.crop_tab }).click();
 				await page.getByTestId('first-observation-card').click();
 				await expect(page).toHaveScreenshot();
@@ -58,22 +69,23 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			test('classify', async ({ page }) => {
 				await chooseDefaultProtocol(page);
 				await page.getByRole('navigation').getByRole('link', { name: messages.import_tab }).click();
+
 				await importPhotos({ page }, 'lil-fella.jpeg');
-				await expect(page.getByTestId('first-observation-card')).not.toHaveText(messages.analyzing);
-				await page.waitForTimeout(3_000);
+				await waitForAnalysis(page);
+
 				await page
 					.getByRole('navigation')
 					.getByRole('link', { name: messages.classify_tab })
 					.click();
-				await expect(page.getByTestId('first-observation-card')).not.toHaveText(messages.analyzing);
-				await page.waitForTimeout(10_000);
+
+				await waitForAnalysis(page);
 				await page.getByText('lil-fella', { exact: true }).first().click();
 				await page.getByTestId('sidepanel').getByRole('combobox').first().click();
 				await page
 					.getByTestId('metadata-combobox-viewport')
 					.getByRole('option', { name: 'Allacma fusca' })
 					.hover();
-				await page.waitForTimeout(2_000);
+
 				await expect(page).toHaveScreenshot();
 			});
 		});
