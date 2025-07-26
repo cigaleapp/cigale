@@ -167,9 +167,9 @@ test.describe('Cropper view', () => {
 
 			await deleteAction(page);
 
-			await page.waitForURL((u) => u.hash === '#/crop/000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000002');
 
-			await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
+			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 
 			expect(await listTable(page, 'Image')).toEqual(
