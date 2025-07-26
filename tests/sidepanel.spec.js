@@ -271,19 +271,25 @@ test('can update a boolean-type metadata', issue(216), async ({ page }) => {
 });
 
 test('shows crop-type metadata as non representable', async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol', observation: 'crop' });
+	await initialize({ page, dump: 'kitchensink-protocol' });
 
-	await expect(metadataSectionFor(page, 'crop')).toMatchAriaSnapshot('');
+	await expect(metadataSectionFor(page, 'crop')).toMatchAriaSnapshot(`
+	  - text: crop
+	  - img
+	  - paragraph: Irreprésentable
+	  - button [disabled]:
+	    - img
+	`);
 });
 
 test('can update a date-type metadata', async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol', observation: 'crop' });
+	await initialize({ page, dump: 'kitchensink-protocol' });
 
 	const dateSection = metadataSectionFor(page, 'date');
 	await expect(dateSection.getByRole('textbox')).toHaveValue('');
 
-	await dateSection.getByRole('textbox').fill('2025-05-01T12:00:00.000Z');
+	await dateSection.getByRole('textbox').fill('2025-05-01');
 
-	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01T12:00:00.000Z');
-	expect(await metadataValue(page, 'date')).toBe('2025-05-01T12:00:00.000Z');
+	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
+	expect(await metadataValue(page, 'date')).toBe('2025-05-01T00:00:00');
 });
