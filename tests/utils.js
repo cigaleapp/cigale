@@ -215,20 +215,21 @@ export async function chooseDefaultProtocol(page, models = {}) {
  *
  * @param {Page} page
  * @param {'protocol'|'import'|'crop'|'classify'} tabName
+ * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
  */
-export async function goToTab(page, tabName) {
+export async function goToTab(page, tabName, m = undefined) {
 	const tabs = {
-		protocol: { name: 'Protocole', hash: '#/protocol' },
-		import: { name: 'Importer', hash: '#/import' },
-		crop: { name: 'Rogner', hash: '#/crop' },
-		classify: { name: 'Classer', hash: '#/classify' }
+		protocol: { name: m?.protocol_tab ?? 'Protocole', hash: '#/protocol' },
+		import: { name: m?.import_tab ?? 'Importer', hash: '#/import' },
+		crop: { name: m?.crop_tab ?? 'Recadrer', hash: '#/crop' },
+		classify: { name: m?.classify_tab ?? 'Classifier', hash: '#/classify' }
 	};
 
 	const tab = tabs[tabName];
 	if (!tab) throw new Error(`Unknown tab: ${tabName}`);
 
-	await page.getByRole('link', { name: tab.name }).click();
-	await page.waitForURL((u) => u.hash === tab.hash);
+	await page.getByTestId('app-nav').getByRole('link', { name: tab.name }).click();
+	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
 }
 
 /**
