@@ -238,7 +238,7 @@ async function metadataValue(page, key) {
 	}).then((values) => values[key]);
 }
 
-test('can update a boolean-type metadata', async ({ page }) => {
+test('can update a boolean-type metadata', issue(216), async ({ page }) => {
 	await initialize({
 		page,
 		dump: 'kitchensink-protocol',

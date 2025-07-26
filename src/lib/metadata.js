@@ -135,7 +135,7 @@ export async function storeMetadataValue({
 
 		_tablesState.Observation[
 			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
-		].metadataOverrides[metadataId] = newValue;
+		].metadataOverrides[metadataId] = Schemas.MetadataValue.assert(newValue);
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
