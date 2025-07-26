@@ -69,7 +69,7 @@
 {/if}
 
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
-	<nav bind:clientHeight={navHeight}>
+	<nav bind:clientHeight={navHeight} data-testid="app-nav">
 		<div class="logo">
 			<a href="#/">
 				<Logo --fill="var(--bg-primary)" />

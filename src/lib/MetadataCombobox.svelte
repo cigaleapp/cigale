@@ -182,7 +182,7 @@
 			sideOffset={8}
 			data-wide-docs={hasImages ? true : undefined}
 		>
-			<div class="viewport">
+			<div class="viewport" data-testid="metadata-combobox-viewport">
 				<div class="items">
 					<VirtualList items={filteredItems} let:item>
 						<Combobox.Item
