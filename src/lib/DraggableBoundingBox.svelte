@@ -5,6 +5,7 @@
 	import { getSettings } from './settings.svelte';
 	import { mapValues } from './utils';
 	import { watch } from 'runed';
+	import { imageIdToFileId } from './images';
 
 	/**
 	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
@@ -32,11 +33,12 @@
 	 * @property {boolean} movable if true, the bounding boxes can be moved by dragging in its inside
 	 * @property {boolean} [disabled=false] - if true, the bounding boxes are inert. Useful while panning
 	 * @property {ZoomState} zoom - current zoom&pan state
+	 * @property {string} [imageFileID] only keep bounding boxes tied to images from this ImageFile
 	 */
 
 	/**  @type {Props} */
 	let {
-		boundingBoxes: boudingBoxesInitial,
+		boundingBoxes: boundingBoxesInitial,
 		cursor,
 		imageElement,
 		onchange,
@@ -45,13 +47,14 @@
 		disabled = false,
 		movable,
 		createMode,
-		zoom
+		zoom,
+		imageFileID
 	} = $props();
 
 	// Using a writable $derived here causes the state to not update until onmouseup, idk why
-	let boundingBoxes = $state(boudingBoxesInitial);
+	let boundingBoxes = $state(boundingBoxesInitial);
 	watch(
-		() => boudingBoxesInitial,
+		() => boundingBoxesInitial,
 		(newBoxes) => {
 			boundingBoxes = newBoxes;
 		}
@@ -125,7 +128,7 @@
 		})
 	);
 
-	const boudingBoxesPixels = $derived(mapValues(boundingBoxes, toPixel));
+	const boundingBoxesPixels = $derived(mapValues(boundingBoxes, toPixel));
 
 	let creatingBoundingBox = $state(false);
 	let newBoundingBox = $derived(
@@ -225,7 +228,7 @@
 		// Don't try registering new bounding box points if we're about to move/transform the existing one
 		if (
 			(movable || transformable) &&
-			Object.values(boudingBoxesPixels).some((box) => withinBoundingBox(box, { x, y }))
+			Object.values(boundingBoxesPixels).some((box) => withinBoundingBox(box, { x, y }))
 		)
 			return;
 		creatingBoundingBox = true;
@@ -307,7 +310,7 @@
 				({@render point(x, y)}) × [{@render point(width, height)}]
 			{/snippet}
 			bbs <br />
-			{#each Object.entries(boudingBoxesPixels) as [imageId, box] (imageId)}
+			{#each Object.entries(boundingBoxesPixels) as [imageId, box] (imageId)}
 				@{imageId} {@render bb(box)}<br />
 			{/each}
 			create {newBoundingBox.ready ? 'ready ' : ''}
@@ -342,7 +345,7 @@
 			style:height="{newBoundingBox.height}px"
 		></div>
 	{/if}
-	{#each Object.entries(boudingBoxesPixels) as [imageId, box] (imageId)}
+	{#each Object.entries(boundingBoxesPixels).filter(([imageId]) => imageIdToFileId(imageId) === imageFileID) as [imageId, box] (imageId)}
 		<div
 			class="boundingbox"
 			data-image={imageId}

@@ -786,6 +786,7 @@
 				{...activeTool}
 				{imageElement}
 				{zoom}
+				imageFileID={fileId}
 				boundingBoxes={mapValues(
 					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
 					toTopLeftCoords

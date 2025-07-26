@@ -1,3 +1,4 @@
+import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
@@ -351,6 +352,21 @@ test.describe('Cropper view', () => {
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await expectBoxInList(page, 2, 327, 735);
 				await expectConfirmed(page, true);
+			});
+
+			test('does not leave ghost boxes', issue(462), async ({ page }) => {
+				await page.keyboard.press('1');
+				await page.keyboard.press('Delete');
+				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
+				await page.keyboard.press('ArrowRight');
+				await page.waitForURL((u) => u.hash === '#/crop/000003');
+
+				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms
+				for (const _ of Array.from({ length: 10 })) {
+					await expect(page.locator('.boundingbox')).toHaveCount(0);
+					await page.waitForTimeout(100);
+					await expect(page.locator('.boundingbox')).toHaveCount(0);
+				}
 			});
 		});
 	});
