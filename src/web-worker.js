@@ -135,19 +135,10 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 	console.info(`Importing protocol ${parsed.id}`);
 	console.info(parsed);
-	onLoadingState('filtering-builtin-metadata');
-
-	const builtinMetadata = Object.entries(parsed.metadata ?? {})
-		.filter(([, value]) => value === 'builtin')
-		.map(([id]) => id);
-
-	parsed.metadata = Object.fromEntries(
-		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
-	);
 
 	onLoadingState('input-validation');
 	console.time('Validating protocol');
-	const protocol = ExportedProtocol.in.assert(parsed);
+	const protocol = ExportedProtocol.assert(parsed);
 	console.timeEnd('Validating protocol');
 
 	await openDatabase();
@@ -157,7 +148,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	console.time('Storing Protocol');
 	tx.objectStore('Protocol').put({
 		...protocol,
-		metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
+		metadata: Object.keys(protocol.metadata)
 	});
 	console.timeEnd('Storing Protocol');
 

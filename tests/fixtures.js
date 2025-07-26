@@ -25,7 +25,7 @@ export const test = base.extend(
 				process.env.PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS = '1';
 
 				await rm('./tests/results', { recursive: true, force: true });
-				await mkdir('./tests/results');
+				await mkdir('./tests/results', { recursive: true });
 
 				// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
 				await Promise.all(

@@ -58,12 +58,10 @@ async function fillBuiltinData(swarpc) {
 	});
 
 	setLoadingMessage(m.loading_builtin_protocol());
-	// TODO: remove this at some point
-	await tables.Protocol.remove('io.github.cigaleapp.arthropods.transects');
 
-	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.example');
+	const protocolsCount = await tables.Protocol.count();
 
-	if (!builtinProtocol) {
+	if (protocolsCount === 0) {
 		try {
 			const contents = await fetch(
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'

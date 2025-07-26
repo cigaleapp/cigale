@@ -116,7 +116,11 @@
 			</div>
 			<IconNext></IconNext>
 			<div class="with-inference-indicator">
-				<a href="#/classify" aria-disabled={!uiState.currentProtocolId || !hasImages}>
+				<a
+					href="#/classify"
+					aria-disabled={!uiState.currentProtocolId || !hasImages}
+					data-testid="goto-classify"
+				>
 					{m.classify_tab()}
 					{#if path == '/classify'}
 						<div class="line"></div>
