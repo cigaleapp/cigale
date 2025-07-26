@@ -38,6 +38,54 @@ async function initialize({
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }
 
+test('allows changing metadata values on import page', issue(440), async ({ page }) => {
+	await initialize({ page, dump: 'kitchensink-protocol' });
+
+	await page.getByTestId('goto-import').click();
+	await page.waitForURL((u) => u.hash === '#/import');
+	await page.getByTestId('first-observation-card').click();
+	await expect(page.getByTestId('sidepanel')).toBeVisible();
+
+	// Set to True on image itself
+	await expect(metadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
+	  - text: bool
+	  - switch "on/off switch":
+	    - img
+	  - button [disabled]:
+	    - img
+	`);
+	await metadataSectionFor(page, 'bool').getByRole('switch').click();
+	await expect(metadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	  - switch "on/off switch" [checked]:
+	    - img
+	`);
+
+	// Set to False on observation
+	await page.getByTestId('goto-classify').click();
+	await page.waitForURL((u) => u.hash === '#/classify');
+	await page.getByTestId('first-observation-card').click();
+	await metadataSectionFor(page, 'bool').getByRole('switch').click();
+	await metadataSectionFor(page, 'bool').getByRole('switch').click();
+	await metadataSectionFor(page, 'bool').getByRole('switch').click();
+	await expect(metadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	  - switch "on/off switch":
+	    - img
+	`);
+
+	// Expect image to be still True
+	await page.getByTestId('goto-import').click();
+	await page.waitForURL((u) => u.hash === '#/import');
+	await page.getByTestId('first-observation-card').click();
+	await expect(metadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
+	  - text: bool
+	  - switch "on/off switch" [checked]:
+	    - img
+	  - text: Oui
+	  - button:
+	    - img
+	`);
+});
+
 test('does not show technical metadata ', async ({ page }) => {
 	await initialize({ page });
 	await expect(

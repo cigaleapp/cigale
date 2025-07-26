@@ -66,7 +66,7 @@ export function serializeMetadataValue(value) {
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
  * @param {boolean} [options.manuallyModified=false] si la valeur a été modifiée manuellement
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
- * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
+ * @param {IDBTransactionWithAtLeast<["Image", "Observation", "ImageFile"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  */
@@ -115,6 +115,9 @@ export async function storeMetadataValue({
 	const observation = tx
 		? await tx.objectStore('Observation').get(subjectId)
 		: await tables.Observation.raw.get(subjectId);
+	const imagesFromImageFile = await (
+		tx ? tx.objectStore('Image').getAll() : idb.list('Image')
+	).then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
 	if (image) {
 		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
@@ -136,6 +139,17 @@ export async function storeMetadataValue({
 		_tablesState.Observation[
 			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
 		].metadataOverrides[metadataId] = Schemas.MetadataValue.assert(newValue);
+	} else if (imagesFromImageFile) {
+		for (const { id } of imagesFromImageFile) {
+			await storeMetadataValue({
+				subjectId: id,
+				metadataId,
+				value,
+				confidence,
+				manuallyModified,
+				tx
+			});
+		}
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
