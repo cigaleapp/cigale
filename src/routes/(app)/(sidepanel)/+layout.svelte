@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/state';
+	import { watch } from 'runed';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
@@ -146,9 +147,8 @@
 	/** @type {Awaited<ReturnType<typeof mergeMetadataFromImagesAndObservations>>} */
 	let mergedMetadataValues = $state({});
 
-	$effect(() => {
+	watch([() => selectedImages, () => selectedObservations], () => {
 		// FIXME needed to force refresh when selectedObservations' metadataOverrides change values, this isn't picked up by Svelte for some reason. I tried reproducing but couldn't yet, see https://svelte.dev/playground/eef37e409ca04fa888badd3e7588f461?version=5.25.0
-		[selectedImages, selectedObservations];
 		void mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations)
 			.then((values) => {
 				mergedMetadataValues = values;
@@ -185,6 +185,12 @@
 						});
 					}
 				}
+
+				await mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations)
+					.then((values) => {
+						mergedMetadataValues = values;
+					})
+					.catch((e) => toasts.error(e));
 			}}
 		/>
 	{/if}

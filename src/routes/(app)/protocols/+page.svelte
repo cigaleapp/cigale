@@ -82,7 +82,7 @@
 	cancel="Annuler"
 	confirm="Oui, supprimer"
 	onconfirm={async () => {
-		await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
+		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {
 			if (!removingProtocol) return;
 
 			tx.objectStore('Protocol').delete(removingProtocol.id);
@@ -91,8 +91,13 @@
 				(id) => removingProtocol && isNamespacedToProtocol(removingProtocol.id, id)
 			);
 
+			const options = await tx.objectStore('MetadataOption').getAll();
+
 			for (const metadata of toRemove) {
 				tx.objectStore('Metadata').delete(metadata);
+				options
+					.filter((o) => o.id.startsWith(`${metadata}:`))
+					.forEach((o) => tx.objectStore('MetadataOption').delete(o.id));
 			}
 		});
 		toasts.success('Protocole supprimé');

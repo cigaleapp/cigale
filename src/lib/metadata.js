@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { format, isValid } from 'date-fns';
+import * as datefns from 'date-fns';
 import { Schemas } from './database.js';
 import * as idb from './idb.svelte.js';
 import { _tablesState, idComparator, tables } from './idb.svelte.js';
@@ -51,7 +51,11 @@ export function getMetadataValue(image, type, metadataId) {
  * @returns {string}
  */
 export function serializeMetadataValue(value) {
-	return JSON.stringify(isValid(value) ? format(value, "yyyy-MM-dd'T'HH:mm:ss") : value);
+	return JSON.stringify(
+		value instanceof Date && datefns.isValid(value)
+			? datefns.format(value, "yyyy-MM-dd'T'HH:mm:ss")
+			: value
+	);
 }
 
 /**
@@ -64,7 +68,7 @@ export function serializeMetadataValue(value) {
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
  * @param {boolean} [options.manuallyModified=false] si la valeur a été modifiée manuellement
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
- * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
+ * @param {IDBTransactionWithAtLeast<["Image", "Observation", "ImageFile"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  */
@@ -98,7 +102,9 @@ export async function storeMetadataValue({
 	);
 
 	console.log(
-		`Store metadata ${metadataId} in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
+		`Store metadata ${metadataId} = `,
+		value,
+		` in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
 		newValue
 	);
 
@@ -113,6 +119,9 @@ export async function storeMetadataValue({
 	const observation = tx
 		? await tx.objectStore('Observation').get(subjectId)
 		: await tables.Observation.raw.get(subjectId);
+	const imagesFromImageFile = await (
+		tx ? tx.objectStore('Image').getAll() : idb.list('Image')
+	).then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
 	if (image) {
 		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
@@ -133,7 +142,18 @@ export async function storeMetadataValue({
 
 		_tablesState.Observation[
 			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
-		].metadataOverrides[metadataId] = newValue;
+		].metadataOverrides[metadataId] = Schemas.MetadataValue.assert(newValue);
+	} else if (imagesFromImageFile) {
+		for (const { id } of imagesFromImageFile) {
+			await storeMetadataValue({
+				subjectId: id,
+				metadataId,
+				value,
+				confidence,
+				manuallyModified,
+				tx
+			});
+		}
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
@@ -256,6 +276,7 @@ export async function addValueLabels(values) {
  * @param {DB.Observation[]} observations
  */
 export async function mergeMetadataFromImagesAndObservations(images, observations) {
+	console.log('merging metadata from', { images, observations });
 	const mergedValues = await mergeMetadataValues(images.map((img) => img.metadata));
 	const mergedOverrides = await mergeMetadataValues(
 		observations.map((obs) => obs.metadataOverrides)
@@ -271,6 +292,8 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
 		if (value) output[key] = value;
 	}
 
+	console.log('merged to', output);
+
 	return output;
 }
 
@@ -280,6 +303,7 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
  * @returns {Promise<Record<string, DB.MetadataValue & { merged: boolean }>>}
  */
 export async function mergeMetadataValues(values) {
+	console.log('merging metadata values from', values);
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
@@ -310,6 +334,8 @@ export async function mergeMetadataValues(values) {
 				merged: new Set(valuesOfKey.map((v) => JSON.stringify(v.value))).size > 1
 			};
 	}
+
+	console.log('merged metadata values to', output);
 
 	return output;
 }

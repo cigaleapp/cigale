@@ -180,5 +180,7 @@
 	"writing_protocol": "Writing protocol",
 	"confidence_percentage": "Confidence: {percentage}",
 	"language_translation_completion": "Translation is {percentage} done",
+	"input_increment_value": "Increment",
+	"input_decrement_value": "Decrement",
 	"confirmed": "Confirmed"
 }
