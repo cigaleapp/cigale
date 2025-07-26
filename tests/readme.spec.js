@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures';
-import { chooseDefaultProtocol, importPhotos, setSettings } from './utils';
+import { chooseDefaultProtocol, goToTab, importPhotos, setSettings } from './utils';
 import français from '../messages/fr.json' with { type: 'json' };
 import english from '../messages/en.json' with { type: 'json' };
 
@@ -49,7 +49,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 			test('import', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await page.getByRole('navigation').getByRole('link', { name: messages.import_tab }).click();
+				await goToTab(page, 'import', messages);
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 				await expect(page).toHaveScreenshot();
@@ -57,26 +57,23 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 			test('crop', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await page.getByRole('navigation').getByRole('link', { name: messages.import_tab }).click();
+				await goToTab(page, 'import', messages);
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await page.getByRole('navigation').getByRole('link', { name: messages.crop_tab }).click();
+				await goToTab(page, 'crop', messages);
 				await page.getByTestId('first-observation-card').click();
 				await expect(page).toHaveScreenshot();
 			});
 
 			test('classify', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await page.getByRole('navigation').getByRole('link', { name: messages.import_tab }).click();
+				await goToTab(page, 'import', messages);
 
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await page
-					.getByRole('navigation')
-					.getByRole('link', { name: messages.classify_tab })
-					.click();
+				await goToTab(page, 'classify', messages);
 
 				await waitForAnalysis(page);
 				await page.getByText('lil-fella', { exact: true }).first().click();
