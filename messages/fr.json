@@ -178,5 +178,6 @@
 	"loading_builtin_protocol": "Chargement du protocole intégré",
 	"writing_protocol": "Écriture du protocole",
 	"language_translation_completion": "Traduit à {percentage}",
-	"confidence_percentage": "Confiance: {percentage}"
+	"confidence_percentage": "Confiance: {percentage}",
+	"confirmed": "Confirmé"
 }

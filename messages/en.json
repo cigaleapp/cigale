@@ -179,5 +179,6 @@
 	"loading_builtin_protocol": "Loading built-in protocol",
 	"writing_protocol": "Writing protocol",
 	"confidence_percentage": "Confidence: {percentage}",
-	"language_translation_completion": "Translation is {percentage} done"
+	"language_translation_completion": "Translation is {percentage} done",
+	"confirmed": "Confirmed"
 }
