@@ -1,3 +1,4 @@
+import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
@@ -162,12 +163,24 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 		);
 
 	// Check the cascades
-	await expect.soft(nthCombobox(2)).toHaveText('Dicrytomina');
-	await expect.soft(nthCombobox(3)).toHaveText('Dicrytomidae');
-	await expect.soft(nthCombobox(4)).toHaveText('Symphypleona');
-	await expect.soft(nthCombobox(5)).toHaveText('Collembola');
-	await expect.soft(nthCombobox(6)).toHaveText('Arthropoda');
-	await expect.soft(nthCombobox(7)).toHaveText('Animalia');
+	await expect.soft(nthCombobox(2)).toMatchAriaSnapshot(`
+	  - combobox: Dicyrtomina
+	`);
+	await expect.soft(nthCombobox(3)).toMatchAriaSnapshot(`
+	  - combobox: Dicyrtomidae
+	`);
+	await expect.soft(nthCombobox(4)).toMatchAriaSnapshot(`
+	  - combobox: Symphypleona
+	`);
+	await expect.soft(nthCombobox(5)).toMatchAriaSnapshot(`
+	  - combobox: Collembola
+	`);
+	await expect.soft(nthCombobox(6)).toMatchAriaSnapshot(`
+	  - combobox: Arthropoda
+	`);
+	await expect.soft(nthCombobox(7)).toMatchAriaSnapshot(`
+	  - combobox: Animalia
+	`);
 
 	// Click out and back again
 	await page.locator('section').filter({ hasText: 'with-exif-gps' }).first().click();
@@ -190,9 +203,9 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 
 	expect(metadata).toEqual({
 		...metadata,
-		species: '4536978',
-		genus: '2122281',
-		family: '7217',
+		species: '4537246',
+		genus: '4537242',
+		family: '5844',
 		order: '10730025',
 		shoot_date: '2025-04-25T12:38:36.000Z',
 		class: '10713444',
