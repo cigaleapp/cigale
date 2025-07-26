@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">39.68% </span>
+                <span class="strong">39.3% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>256/645</span>
+                <span class='fraction'>259/659</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.88% </span>
+                <span class="strong">42.85% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/18</span>
+                <span class='fraction'>9/21</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">39.68% </span>
+                <span class="strong">39.3% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>256/645</span>
+                <span class='fraction'>259/659</span>
             </div>
         
             
@@ -790,7 +790,21 @@
 <a name='L725'></a><a href='#L725'>725</a>
 <a name='L726'></a><a href='#L726'>726</a>
 <a name='L727'></a><a href='#L727'>727</a>
-<a name='L728'></a><a href='#L728'>728</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L728'></a><a href='#L728'>728</a>
+<a name='L729'></a><a href='#L729'>729</a>
+<a name='L730'></a><a href='#L730'>730</a>
+<a name='L731'></a><a href='#L731'>731</a>
+<a name='L732'></a><a href='#L732'>732</a>
+<a name='L733'></a><a href='#L733'>733</a>
+<a name='L734'></a><a href='#L734'>734</a>
+<a name='L735'></a><a href='#L735'>735</a>
+<a name='L736'></a><a href='#L736'>736</a>
+<a name='L737'></a><a href='#L737'>737</a>
+<a name='L738'></a><a href='#L738'>738</a>
+<a name='L739'></a><a href='#L739'>739</a>
+<a name='L740'></a><a href='#L740'>740</a>
+<a name='L741'></a><a href='#L741'>741</a>
+<a name='L742'></a><a href='#L742'>742</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -907,6 +921,9 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -925,6 +942,17 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1585,7 +1613,7 @@ export function serializeMetadataValue(value) {
  * @param {RuntimeValue&lt;Type&gt;} options.value la valeur de la métadonnée
  * @param {boolean} [options.manuallyModified=false] si la valeur a été modifiée manuellement
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
- * @param {IDBTransactionWithAtLeast&lt;["Image", "Observation"]&gt;} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
+ * @param {IDBTransactionWithAtLeast&lt;["Image", "Observation", "ImageFile"]&gt;} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array&lt;{ value: RuntimeValue&lt;Type&gt;; confidence: number }&gt;} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  */
@@ -1634,6 +1662,9 @@ export async function storeMetadataValue({
 	const observation = tx
 <span class="branch-0 cbranch-no" title="branch not covered" >		? await tx.objectStore('Observation').get(subjectId)</span>
 		: await tables.Observation.raw.get(subjectId);
+	const imagesFromImageFile = await (
+		tx <span class="branch-0 cbranch-no" title="branch not covered" >? tx.objectStore('Image').getAll() </span>: idb.list('Image')
+	).then((imgs) =&gt; imgs.filter(({ fileId }) =&gt; fileId === subjectId));
 &nbsp;
 	if (image) {
 		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
@@ -1655,6 +1686,17 @@ export async function storeMetadataValue({
 <span class="cstat-no" title="statement not covered" >		_tablesState.Observation[</span>
 <span class="cstat-no" title="statement not covered" >			_tablesState.Observation.findIndex((img) =&gt; img.id.toString() === subjectId)</span>
 <span class="cstat-no" title="statement not covered" >		].metadataOverrides[metadataId] = Schemas.MetadataValue.assert(newValue);</span>
+<span class="cstat-no" title="statement not covered" >	} else if (imagesFromImageFile) {</span>
+<span class="cstat-no" title="statement not covered" >		for (const { id } of imagesFromImageFile) {</span>
+<span class="cstat-no" title="statement not covered" >			await storeMetadataValue({</span>
+<span class="cstat-no" title="statement not covered" >				subjectId: id,</span>
+<span class="cstat-no" title="statement not covered" >				metadataId,</span>
+<span class="cstat-no" title="statement not covered" >				value,</span>
+<span class="cstat-no" title="statement not covered" >				confidence,</span>
+<span class="cstat-no" title="statement not covered" >				manuallyModified,</span>
+<span class="cstat-no" title="statement not covered" >				tx</span>
+<span class="cstat-no" title="statement not covered" >			});</span>
+<span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	} else {</span>
 <span class="cstat-no" title="statement not covered" >		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
@@ -2251,7 +2293,7 @@ export const METADATA_ZERO_VALUE = /** @type {const} */ ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-26T15:16:16.260Z
+                at 2025-07-26T15:43:48.900Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
