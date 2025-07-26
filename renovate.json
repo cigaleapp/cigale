@@ -14,11 +14,6 @@
 			"description": "Auto-merge svelte(kit) upgrades (E2E tests should validate that nothing catastrophic happens)",
 			"matchPackageNames": ["@sveltejs/kit", "svelte"],
 			"automerge": true
-		},
-		{
-			"description": "Oxlint",
-			"groupName": "oxlint",
-			"matchPackageNames": ["oxlint", "eslint-plugin-oxlint"]
 		}
 	]
 }

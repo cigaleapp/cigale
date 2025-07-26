@@ -691,7 +691,7 @@
 	<div class="icon">
 		<IconConfirmedCrop />
 	</div>
-	<p>Confirmé</p>
+	<p>{m.confirmed()}</p>
 </div>
 
 <div class="layout">

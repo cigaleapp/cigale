@@ -180,5 +180,6 @@
 	"language_translation_completion": "Traduit à {percentage}",
 	"confidence_percentage": "Confiance: {percentage}",
 	"input_increment_value": "Incrémenter",
-	"input_decrement_value": "Décrémenter"
+	"input_decrement_value": "Décrémenter",
+	"confirmed": "Confirmé"
 }
