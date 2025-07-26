@@ -58,6 +58,9 @@ export function percent(value, decimals = 0, { pad = 'none' } = {}) {
  * @returns {Promise<Record<string, number>>} map of language codes to number in [0, 1] indicating the completion percentage
  */
 export async function languagesCompletions() {
+	const { browser } = await import('$app/environment');
+	if (!browser) return {};
+
 	const cached = localStorage.getItem('languagesCompletions');
 	if (cached) {
 		const { data, expiresAt } = type({
