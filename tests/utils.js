@@ -88,6 +88,22 @@ export async function getImage({ page }, id) {
 }
 
 /**
+ *
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @param {string} param0.label
+ * @returns {Promise<typeof import('$lib/database').Schemas.Observation.inferIn>}
+ */
+export async function getObservation({ page, label }) {
+	const observation = await page.evaluate(async ([label]) => {
+		const observations = await window.DB.getAll('Observation');
+		return observations.find((obs) => obs.label === label);
+	}, /** @type {const} */ ([label]));
+	if (!observation) throw new Error(`Observation ${label} not found in the database`);
+	return observation;
+}
+
+/**
  * Returns object mapping metadata keys to their (runtime, deserialized) values
  * @param {object} param0
  * @param {Page} param0.page
@@ -99,6 +115,26 @@ export async function getMetadataValuesOfImage({ page, protocolId, image }) {
 	const { metadata } = await getImage({ page }, image);
 	return Object.fromEntries(
 		Object.entries(metadata)
+			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
+			.map(([id, { value }]) => [
+				protocolId ? id.replace(`${protocolId}__`, '') : id,
+				safeJSONParse(value)
+			])
+	);
+}
+
+/**
+ *
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @param {string} param0.protocolId
+ * @param {string} param0.observation
+ * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
+ */
+export async function getMetadataOverridesOfObservation({ page, protocolId, observation }) {
+	const { metadataOverrides } = await getObservation({ page, label: observation });
+	return Object.fromEntries(
+		Object.entries(metadataOverrides)
 			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
 			.map(([id, { value }]) => [
 				protocolId ? id.replace(`${protocolId}__`, '') : id,

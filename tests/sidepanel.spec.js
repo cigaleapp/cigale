@@ -2,6 +2,7 @@ import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
+	getMetadataOverridesOfObservation,
 	getMetadataValuesOfImage,
 	loadDatabaseDump,
 	setSettings
@@ -16,10 +17,15 @@ import {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {'basic'|'kitchensink-protocol'} [param0.dump=basic] name of the database dump to load, without extension
- * @param {string} [param0.observation="lil-fella"] name of the observation to open
+ * @param {string} [param0.observation] name of the observation to open
  * @param {string} [param0.protocol] protocol to choose, if not the default one
  */
-async function initialize({ page, dump = 'basic', protocol, observation = 'lil-fella' }) {
+async function initialize({
+	page,
+	dump = 'basic',
+	protocol,
+	observation = dump === 'basic' ? 'lil-fella' : 'leaf'
+}) {
 	await loadDatabaseDump(page, `${dump}.devalue`);
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	if (protocol) {
@@ -229,22 +235,18 @@ function metadataSectionFor(page, nameOrDescription) {
 /**
  * @param {Page} page
  * @param {string} key
+ * @param {string} [observationLabel='leaf']
  */
-async function metadataValue(page, key) {
-	return await getMetadataValuesOfImage({
-		image: '000001_000000',
+async function metadataValue(page, key, observationLabel = 'leaf') {
+	return await getMetadataOverridesOfObservation({
 		page,
-		protocolId: 'io.github.cigaleapp.kitchensink'
+		protocolId: 'io.github.cigaleapp.kitchensink',
+		observation: observationLabel
 	}).then((values) => values[key]);
 }
 
 test('can update a boolean-type metadata', issue(216), async ({ page }) => {
-	await initialize({
-		page,
-		dump: 'kitchensink-protocol',
-		protocol: 'Kitchen sink',
-		observation: 'leaf'
-	});
+	await initialize({ page, dump: 'kitchensink-protocol' });
 
 	expect.soft(await metadataValue(page, 'bool')).toBeUndefined();
 	await expect
