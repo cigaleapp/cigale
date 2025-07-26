@@ -649,3 +649,14 @@ export function avg(values) {
 export function nonnull(value) {
 	return value !== null && value !== undefined;
 }
+
+/**
+ * @param {number} value
+ * @param {number} decimals
+ * @returns {number}
+ */
+export function round(value, decimals = 0) {
+	if (decimals < 0) throw new Error('decimals must be non-negative');
+	const factor = Math.pow(10, decimals);
+	return Math.round(value * factor) / factor;
+}

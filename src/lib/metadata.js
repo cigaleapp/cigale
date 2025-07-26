@@ -52,7 +52,9 @@ export function getMetadataValue(image, type, metadataId) {
  */
 export function serializeMetadataValue(value) {
 	return JSON.stringify(
-		datefns.isValid(value) ? datefns.format(value, "yyyy-MM-dd'T'HH:mm:ss") : value
+		value instanceof Date && datefns.isValid(value)
+			? datefns.format(value, "yyyy-MM-dd'T'HH:mm:ss")
+			: value
 	);
 }
 
@@ -100,7 +102,9 @@ export async function storeMetadataValue({
 	);
 
 	console.log(
-		`Store metadata ${metadataId} in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
+		`Store metadata ${metadataId} = `,
+		value,
+		` in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
 		newValue
 	);
 

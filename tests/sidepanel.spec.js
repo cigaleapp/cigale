@@ -268,6 +268,49 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	});
 });
 
+test('can search in a enum-type metadata combobox', async ({ page }) => {
+	await initialize({ page });
+	await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
+
+	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+	  - option "Dicyrtoma fusca"
+	  - option "Dicyrtomina flavosignata"
+	  - option "Dicyrtomina minuta"
+	  - option "Dicyrtomina ornata 8%":
+	    - code: 8%
+	  - option /Dicyrtomina saundersi \\d+%/:
+	    - code: /\\d+%/
+	  - option "Dicyrtomina signata"
+	  - heading "Allacma fusca" [level=2]
+	  - link "En savoir plus gbif.org":
+	    - /url: https://gbif.org/species/4537246
+	    - img
+	    - code: gbif.org
+	  - table:
+	    - rowgroup:
+	      - row "Règne Animalia":
+	        - cell "Règne"
+	        - cell "Animalia"
+	      - row "└─ Phylum Arthropoda":
+	        - cell "└─ Phylum"
+	        - cell "Arthropoda"
+	      - row "└─ Classe Collembola":
+	        - cell "└─ Classe"
+	        - cell "Collembola"
+	      - row "└─ Ordre Symphypleona":
+	        - cell "└─ Ordre"
+	        - cell "Symphypleona"
+	      - row "└─ Famille Sminthuridae":
+	        - cell "└─ Famille"
+	        - cell "Sminthuridae"
+	      - row "└─ Genre Allacma":
+	        - cell "└─ Genre"
+	        - cell "Allacma"
+	  - paragraph:
+	    - emphasis: Métadonées mise à jour à la sélection de cette option
+	`);
+});
+
 /**
  * @param {Page} page
  * @param {string} nameOrDescription
@@ -340,4 +383,45 @@ test('can update a date-type metadata', async ({ page }) => {
 
 	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
 	expect(await metadataValue(page, 'date')).toBe('2025-05-01T00:00:00');
+});
+
+test('can update a float-type metadata', async ({ page }) => {
+	await initialize({ page, dump: 'kitchensink-protocol' });
+
+	const floatSection = metadataSectionFor(page, 'float');
+	await expect(floatSection.getByRole('textbox')).toHaveValue('');
+
+	await floatSection.getByRole('textbox').fill('3.14');
+	await floatSection.getByRole('textbox').blur();
+	await floatSection.getByRole('button', { name: 'Incrémenter' }).click();
+
+	await expect(floatSection.getByRole('textbox')).toHaveValue('4.14');
+	expect(await metadataValue(page, 'float')).toBe(4.14);
+});
+
+test('can update a integer-type metadata', async ({ page }) => {
+	await initialize({ page, dump: 'kitchensink-protocol' });
+
+	const integerSection = metadataSectionFor(page, 'integer');
+	await expect(integerSection.getByRole('textbox')).toHaveValue('');
+
+	await integerSection.getByRole('textbox').fill('42');
+	await integerSection.getByRole('textbox').blur();
+	await integerSection.getByRole('button', { name: 'Décrémenter' }).click();
+
+	await expect(integerSection.getByRole('textbox')).toHaveValue('41');
+	expect(await metadataValue(page, 'integer')).toBe(41);
+});
+
+test('can update a string-type metadata', async ({ page }) => {
+	await initialize({ page, dump: 'kitchensink-protocol' });
+
+	const stringSection = metadataSectionFor(page, 'string');
+	await expect(stringSection.getByRole('textbox')).toHaveValue('');
+
+	await stringSection.getByRole('textbox').fill('Hello world');
+	await stringSection.getByRole('textbox').blur();
+
+	await expect(stringSection.getByRole('textbox')).toHaveValue('Hello world');
+	expect(await metadataValue(page, 'string')).toBe('Hello world');
 });

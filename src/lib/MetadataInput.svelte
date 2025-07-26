@@ -7,7 +7,8 @@
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
-	import { safeJSONParse } from './utils';
+	import { safeJSONParse, round } from './utils';
+	import { m } from './paraglide/messages.js';
 
 	/**
 	 * @typedef {object} Props
@@ -33,6 +34,8 @@
 	} = $props();
 
 	const { type } = definition;
+
+	$inspect({ MetadataInput: value });
 </script>
 
 <div class="metadata-input" data-type={type} data-metadata-id={definition.id}>
@@ -68,14 +71,59 @@
 			{/if}
 		</div>
 	{:else if isType('string', type, value)}
-		<input type="text" bind:value {id} {disabled} />
+		<input type="text" bind:value {id} {disabled} onblur={() => onblur?.(value)} />
 	{:else if isType('integer', type, value) || isType('float', type, value)}
-		<button class="increment">
-			<IconIncrement />
-		</button>
-		<input type="text" inputmode="numeric" bind:value {id} {disabled} />
-		<button class="decrement">
+		<input
+			{id}
+			{disabled}
+			type="text"
+			inputmode="numeric"
+			onblur={({ currentTarget }) => {
+				if (!(currentTarget instanceof HTMLInputElement)) return;
+				const newValue = currentTarget.value;
+				if (!newValue) {
+					onblur?.(undefined);
+					return;
+				}
+
+				let parsedValue =
+					type === 'integer' ? Number.parseInt(newValue, 10) : Number.parseFloat(newValue);
+
+				if (Number.isNaN(parsedValue)) {
+					parsedValue = undefined;
+				}
+
+				onblur?.(parsedValue);
+			}}
+			value={value?.toString() ?? ''}
+		/>
+		<button
+			class="decrement"
+			aria-label={m.input_decrement_value()}
+			onclick={() => {
+				if (value === undefined || value === null) {
+					value = 0;
+				}
+				value--;
+				value = round(value, 5);
+				onblur?.(value);
+			}}
+		>
 			<IconDecrement />
+		</button>
+		<button
+			class="increment"
+			aria-label={m.input_increment_value()}
+			onclick={() => {
+				if (value === undefined || value === null) {
+					value = 0;
+				}
+				value++;
+				value = round(value, 5);
+				onblur?.(value);
+			}}
+		>
+			<IconIncrement />
 		</button>
 	{:else if isType('date', type, value)}
 		<!-- TODO use bits-ui datepicker -->
@@ -86,13 +134,11 @@
 			onblur={() => onblur?.(value)}
 			bind:value={
 				() => {
-					console.log(' () => { ');
 					if (!isType('date', type, value)) return undefined;
 					if (value === undefined) return undefined;
 					return format(value, 'yyyy-MM-dd');
 				},
 				(newValue) => {
-					console.log(' (newValue) => { ', newValue);
 					if (newValue === undefined) {
 						onblur?.(undefined);
 						return undefined;

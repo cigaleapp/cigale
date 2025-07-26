@@ -91,7 +91,7 @@
 				{/if}
 			</a>
 			<IconNext></IconNext>
-			<a href="#/import" aria-disabled={!uiState.currentProtocolId}>
+			<a href="#/import" data-testid="goto-import" aria-disabled={!uiState.currentProtocolId}>
 				{m.import_tab()}
 				{#if path == '/import'}
 					<div class="line"></div>
