@@ -660,3 +660,21 @@ export function round(value, decimals = 0) {
 	const factor = Math.pow(10, decimals);
 	return Math.round(value * factor) / factor;
 }
+
+/**
+ *
+ * @param {object} param0  offset coords from the given rect
+ * @param {number} param0.offsetX
+ * @param {number} param0.offsetY
+ * @param {DOMRect} rect
+ * @param {number} leeway how many pixels to consider still "inside" the rect even if it's outside
+ * @returns
+ */
+export function insideBoundingClientRect({ offsetX, offsetY }, rect, leeway = 0) {
+	return (
+		offsetX >= -leeway &&
+		offsetX <= rect.width + leeway &&
+		offsetY >= -leeway &&
+		offsetY <= rect.height + leeway
+	);
+}

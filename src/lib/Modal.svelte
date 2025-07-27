@@ -20,6 +20,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	import IconClose from '~icons/ph/x';
 	import ButtonIcon from './ButtonIcon.svelte';
 	import { getSettings } from './settings.svelte';
+	import { insideBoundingClientRect } from './utils';
 
 	/**
 	 * @typedef Props
@@ -66,13 +67,18 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 </script>
 
 <dialog
+	aria-hidden={!page.state[stateKey]}
 	data-theme={theme}
 	bind:this={modalElement}
 	onclose={() => {
 		// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
 		pushState('', { [stateKey]: false });
 	}}
-	onmousedown={({ target, currentTarget }) => {
+	onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
+		// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
+		if (insideBoundingClientRect({ offsetX, offsetY }, currentTarget.getBoundingClientRect(), 20)) {
+			return;
+		}
 		// Close on backdrop click
 		if (target === currentTarget) close?.();
 	}}
