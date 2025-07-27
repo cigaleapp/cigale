@@ -17,6 +17,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         shard-index: [1, 2, 3, 4]
         shard-count: [4]
