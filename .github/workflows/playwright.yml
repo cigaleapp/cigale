@@ -20,6 +20,7 @@ jobs:
       matrix:
         shard-index: [1, 2, 3, 4]
         shard-count: [4]
+    name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,8 +31,9 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }} --reporter=blob
-
+        run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
+        env:
+          SHARDING: '1'
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
@@ -49,7 +51,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          path: playwright-report-shards
+          path: ./playwright-report-shards
           pattern: playwright-report-shard-*
           merge-multiple: true
 
