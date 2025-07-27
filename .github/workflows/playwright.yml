@@ -44,9 +44,12 @@ jobs:
   combine-reports:
     runs-on: ubuntu-latest
     needs: test
+    # run even if tests fail
+    if: always()
     environment:
       name: '#${{ github.event.number }}: End-to-end tests report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
+    name: Combine reports
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
