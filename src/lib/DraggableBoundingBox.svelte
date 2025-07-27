@@ -67,6 +67,11 @@
 	let naturalWidth = $state(imageElement.naturalWidth);
 	let naturalHeight = $state(imageElement.naturalHeight);
 
+	/**
+	 * @type {HTMLDivElement}
+	 */
+	let changeAreaRef = $state();
+
 	const refreshImageRect = async () => {
 		if (!imageElement) return;
 		({ clientWidth, clientHeight, clientLeft, clientTop, naturalWidth, naturalHeight } =
@@ -189,8 +194,25 @@
 	});
 </script>
 
+<svelte:window
+	onmousemove={({ target }) => {
+		if (!(target instanceof Element)) return;
+		if (!creatingBoundingBox) return;
+		if (createMode !== 'clickanddrag') return;
+
+		if (target.closest('.change-area') !== changeAreaRef) {
+			// Bail out if we were dragging a new bounding box, but we left the image (change area)
+			console.log('Dragging has gone outside change area, bailing out. Target is', target);
+			draggingCorner.setAll(false);
+			creatingBoundingBox = false;
+			newBoundingBox.reset();
+		}
+	}}
+/>
+
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
+	bind:this={changeAreaRef}
 	class="change-area"
 	class:debug={getSettings().showTechnicalMetadata}
 	class:precise={!movable && !transformable}

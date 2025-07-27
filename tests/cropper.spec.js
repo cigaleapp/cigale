@@ -267,6 +267,27 @@ test.describe('Cropper view', () => {
 				await expectBoxInList(page, 2, 245, 245);
 				await expectConfirmed(page, true);
 			});
+
+			test('dragging outside the crop surface cancels', issue(431), async ({ page }) => {
+				await setSettings({ page }, { showTechnicalMetadata: true });
+				await makeBox(page, 10, 10, 50, -30);
+				await expect(page.locator('.change-area .debug')).toHaveText(/create  \(0 0\) × \[0 0\]/);
+				await expect(page.locator('.change-area .debug')).not.toHaveText(/ready/);
+				await expect(boxesInBoxesList(page)).toMatchAriaSnapshot(`
+				  - listitem:
+				    - img
+				    - paragraph: "Boîte #1"
+				    - paragraph:
+				      - code: /\\d+×\\d+/
+				      - superscript:
+				        - img
+				        - code: /\\d+%/
+				    - button [disabled]:
+				      - img
+				    - button:
+				      - img
+				`);
+			});
 		});
 
 		test.describe('with 2-point tool', () => {
