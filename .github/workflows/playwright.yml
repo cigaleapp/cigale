@@ -16,9 +16,10 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    environment:
-      name: '#${{ github.event.number }}: End-to-end tests report'
-      url: ${{ steps.deploy-preview.outputs.preview-url }}
+    strategy:
+      matrix:
+        shard-index: [1, 2, 3, 4]
+        shard-count: [4]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,13 +30,31 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }} --reporter=blob
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-report-shard-${{ matrix.shard-index }}
           path: playwright-report/
           retention-days: 30
+
+  combine-reports:
+    runs-on: ubuntu-latest
+    needs: test
+    environment:
+      name: '#${{ github.event.number }}: End-to-end tests report'
+      url: ${{ steps.deploy-preview.outputs.preview-url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: playwright-report-shards
+          pattern: playwright-report-shard-*
+          merge-multiple: true
+
+      - name: Merge sharded reports into HTML
+        run: npx playwright merge-reports --reporter html ./playwright-report-shards
 
       - name: Deploy results on github pages
         if: ${{ !cancelled() }}
