@@ -34,8 +34,6 @@
 	} = $props();
 
 	const { type } = definition;
-
-	$inspect({ MetadataInput: value });
 </script>
 
 <div class="metadata-input" data-type={type} data-metadata-id={definition.id}>
