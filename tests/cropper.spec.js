@@ -1,3 +1,4 @@
+import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
@@ -166,9 +167,9 @@ test.describe('Cropper view', () => {
 
 			await deleteAction(page);
 
-			await page.waitForURL((u) => u.hash === '#/crop/000000');
+			await page.waitForURL((u) => u.hash === '#/crop/000002');
 
-			await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
+			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 
 			expect(await listTable(page, 'Image')).toEqual(
@@ -266,6 +267,27 @@ test.describe('Cropper view', () => {
 				await expectBoxInList(page, 2, 245, 245);
 				await expectConfirmed(page, true);
 			});
+
+			test('dragging outside the crop surface cancels', issue(431), async ({ page }) => {
+				await setSettings({ page }, { showTechnicalMetadata: true });
+				await makeBox(page, 10, 10, 50, -30);
+				await expect(page.locator('.change-area .debug')).toHaveText(/create {2}\(0 0\) × \[0 0\]/);
+				await expect(page.locator('.change-area .debug')).not.toHaveText(/ready/);
+				await expect(boxesInBoxesList(page)).toMatchAriaSnapshot(`
+				  - listitem:
+				    - img
+				    - paragraph: "Boîte #1"
+				    - paragraph:
+				      - code: /\\d+×\\d+/
+				      - superscript:
+				        - img
+				        - code: /\\d+%/
+				    - button [disabled]:
+				      - img
+				    - button:
+				      - img
+				`);
+			});
 		});
 
 		test.describe('with 2-point tool', () => {
@@ -351,6 +373,21 @@ test.describe('Cropper view', () => {
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await expectBoxInList(page, 2, 327, 735);
 				await expectConfirmed(page, true);
+			});
+
+			test('does not leave ghost boxes', issue(462), async ({ page }) => {
+				await page.keyboard.press('1');
+				await page.keyboard.press('Delete');
+				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
+				await page.keyboard.press('ArrowRight');
+				await page.waitForURL((u) => u.hash === '#/crop/000003');
+
+				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms
+				for (const _ of Array.from({ length: 10 })) {
+					await expect(page.locator('.boundingbox')).toHaveCount(0);
+					await page.waitForTimeout(100);
+					await expect(page.locator('.boundingbox')).toHaveCount(0);
+				}
 			});
 		});
 	});

@@ -460,8 +460,11 @@
 	}
 
 	async function deleteImage() {
+		const nextFileIdBeforeDelete = $state.snapshot(nextFileId);
 		await deleteImageFile(fileId);
-		await moveToNextUnconfirmed();
+		// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
+		// it means we just deleted the last image; so we go back to the import tab
+		await goto(nextFileId ? `#/crop/${nextFileIdBeforeDelete}` : '#/import');
 	}
 
 	/**
@@ -786,6 +789,7 @@
 				{...activeTool}
 				{imageElement}
 				{zoom}
+				imageFileID={fileId}
 				boundingBoxes={mapValues(
 					focusedImageId ? pick(boundingBoxes, focusedImageId) : boundingBoxes,
 					toTopLeftCoords
