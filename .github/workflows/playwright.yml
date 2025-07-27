@@ -34,13 +34,11 @@ jobs:
         run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
           SHARDING: '1'
-      - name: Inspect directory
-        run: ls -la *
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-shard-${{ matrix.shard-index }}
-          path: playwright-report/
+          path: blob-report/
           retention-days: 30
 
   combine-reports:
