@@ -219,10 +219,10 @@
               "pattern": "[\\w_]+"
             },
             "padding": {
-              "type": "integer",
-              "description": "Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées",
-              "minimum": 0,
-              "default": 0
+              "type": "string",
+              "description": "Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées. Nombre suivi de 'px' pour un nombre de pixels fixe, ou de '%' pour un pourcentage des dimensions de chaque image.",
+              "pattern": "^\\d+(%|px)$",
+              "default": "0px"
             },
             "confirmationMetadata": {
               "type": "string",
