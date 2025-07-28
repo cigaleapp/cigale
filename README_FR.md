@@ -6,6 +6,9 @@
    <em>
 			Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
    </em>
+
+<a href="./README.md">English</a> · Français
+
 </div>
 
 ---
