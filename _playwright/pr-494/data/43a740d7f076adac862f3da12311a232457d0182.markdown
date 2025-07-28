@@ -1,0 +1,109 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer":
+      - /url: "#/crop/"
+    - img
+    - link "Classifier":
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "be4c5b9":
+        - /url: https://github.com/cigaleapp/cigale/tree/be4c5b9f0e94941e7363b5cd2758d3196764016c
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- main:
+  - form:
+    - article:
+      - img "cyan.jpeg"
+      - img
+      - heading "cyan.jpeg" [level=2]
+    - article:
+      - img "leaf.jpeg"
+      - img
+      - heading "leaf.jpeg" [level=2]
+- complementary:
+  - img "Image 1 de la sélection"
+  - heading "cyan.jpeg" [level=2]:
+    - img
+    - text: cyan.jpeg
+  - text: Espèce
+  - combobox
+  - button [disabled]:
+    - img
+  - text: Genre
+  - combobox
+  - button [disabled]:
+    - img
+  - text: Famille
+  - combobox
+  - button [disabled]:
+    - img
+  - text: Ordre
+  - combobox
+  - button [disabled]:
+    - img
+  - text: Date
+  - textbox "Date"
+  - button [disabled]:
+    - img
+  - paragraph: Moment où la photo a été prise
+  - text: Localisation
+  - textbox "Localisation"
+  - button [disabled]:
+    - img
+  - paragraph: Endroit où la photo a été prise
+  - text: Classe
+  - combobox
+  - button [disabled]:
+    - img
+  - text: Phylum
+  - combobox
+  - button [disabled]:
+    - img
+  - text: Règne
+  - combobox
+  - button [disabled]:
+    - img
+  - button "Importer d'autres images":
+    - img
+    - text: Importer d'autres images
+  - button "Supprimer 1 images Suppr":
+    - img
+    - text: Supprimer 1 images Suppr
+- text: Classification · Cigale
+```
