@@ -21,7 +21,10 @@ jobs:
         run: npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: |
+          sudo debconf-set man-db/auto-update false
+          sudo rm /var/lib/man-db/auto-update
+          npx playwright install --with-deps
 
       - name: Run Playwright readme.spec.js and update screenshots
         run: npx playwright test tests/readme.spec.js --update-snapshots
