@@ -304,6 +304,7 @@ export function toast(page, message, { exact = false, type = undefined }) {
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
 	// Import fixture zip
 	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
