@@ -100,7 +100,7 @@
 		"gitmoji-cli": "^9.7.0",
 		"globals": "^16.3.0",
 		"google-auth-library": "^10.2.0",
-		"googleapis": "^153.0.0",
+		"googleapis": "^154.0.0",
 		"husky": "^9.1.7",
 		"jpeg-js": "^0.4.4",
 		"jsdom": "^26.1.0",
