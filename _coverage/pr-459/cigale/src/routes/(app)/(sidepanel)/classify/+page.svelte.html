@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/172</span>
+                <span class='fraction'>0/178</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/172</span>
+                <span class='fraction'>0/178</span>
             </div>
         
             
@@ -393,7 +393,11 @@
 <a name='L328'></a><a href='#L328'>328</a>
 <a name='L329'></a><a href='#L329'>329</a>
 <a name='L330'></a><a href='#L330'>330</a>
-<a name='L331'></a><a href='#L331'>331</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -415,6 +419,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -450,11 +455,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -646,7 +654,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -658,21 +666,21 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -744,8 +752,9 @@
 	import { fetchHttpRequest } from '$lib/utils';
 	import { match, type } from 'arktype';
 	import { onMount } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	seo({ title: 'Classification' });</span>
+<span class="cstat-no" title="statement not covered" >	seo({ title: m.classification() });</span>
 &nbsp;
 	const { data } = $props();
 &nbsp;
@@ -782,7 +791,10 @@
 		);
 <span class="cstat-no" title="statement not covered" >		if (!settings) {</span>
 <span class="cstat-no" title="statement not covered" >			toasts.error(</span>
-<span class="cstat-no" title="statement not covered" >				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur le protocole ${uiState.currentProtocol.name}`</span>
+<span class="cstat-no" title="statement not covered" >				m.no_inference_params_defined({</span>
+<span class="cstat-no" title="statement not covered" >					modelName: uiState.selectedClassificationModel,</span>
+<span class="cstat-no" title="statement not covered" >					protocolName: uiState.currentProtocol.name</span>
+				})
 			);
 			return;
 <span class="cstat-no" title="statement not covered" >		}</span>
@@ -809,12 +821,12 @@
 <span class="cstat-no" title="statement not covered" >				}</span>
 			)
 <span class="cstat-no" title="statement not covered" >			.then(() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >				toasts.success('Modèle de classification chargé');</span>
+<span class="cstat-no" title="statement not covered" >				toasts.success(m.classification_model_loaded());</span>
 <span class="cstat-no" title="statement not covered" >				classifmodelLoaded = true;</span>
 <span class="cstat-no" title="statement not covered" >			})</span>
 <span class="cstat-no" title="statement not covered" >			.catch((error) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				console.error(error);</span>
-<span class="cstat-no" title="statement not covered" >				toasts.error('Erreur lors du chargement du modèle de classification');</span>
+<span class="cstat-no" title="statement not covered" >				toasts.error(m.error_loading_classification_model());</span>
 <span class="cstat-no" title="statement not covered" >			});</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 	/**
@@ -825,7 +837,7 @@
 	 */
 <span class="cstat-no" title="statement not covered" >	async function analyzeImage(id, { filename, metadata }) {</span>
 <span class="cstat-no" title="statement not covered" >		if (!uiState.currentProtocol) {</span>
-<span class="cstat-no" title="statement not covered" >			throw new Error('Aucun protocole sélectionné');</span>
+<span class="cstat-no" title="statement not covered" >			throw new Error(m.no_protocol_selected());</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		if (!uiState.classificationMetadataId) {</span>
@@ -976,7 +988,7 @@
 <span class="cstat-no" title="statement not covered" >{#if !classifmodelLoaded}</span>
 	&lt;section class="loading"&gt;
 		&lt;Logo loading /&gt;
-		&lt;p&gt;Chargement du modèle de classification&lt;/p&gt;
+<span class="cstat-no" title="statement not covered" >		&lt;p&gt;{m.loading_classification_model()}&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;p class="source"&gt;{@render modelsource()}&lt;/p&gt;</span>
 		&lt;div class="progressbar"&gt;
 <span class="cstat-no" title="statement not covered" >			&lt;ProgressBar percentage alwaysActive progress={modelLoadingProgress} /&gt;</span>
@@ -988,21 +1000,21 @@
 <span class="cstat-no" title="statement not covered" >			bind:selection={uiState.selection}</span>
 			{images}
 <span class="cstat-no" title="statement not covered" >			errors={erroredImages}</span>
-			loadingText="Analyse…"
+<span class="cstat-no" title="statement not covered" >			loadingText={m.analyzing()}</span>
 <span class="cstat-no" title="statement not covered" >			ondelete={async (id) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				await deleteObservation(id);</span>
 <span class="cstat-no" title="statement not covered" >				await deleteImageFile(id);</span>
 <span class="cstat-no" title="statement not covered" >			}}</span>
 		/&gt;
 <span class="cstat-no" title="statement not covered" >		{#if !images.length}</span>
-			&lt;p&gt;Cliquer ou déposer des images ici&lt;/p&gt;
+<span class="cstat-no" title="statement not covered" >			&lt;p&gt;{m.click_or_drop_images_here()}&lt;/p&gt;</span>
 		{/if}
 	&lt;/section&gt;
 {:else}
 	&lt;section class="loading errored"&gt;
 		&lt;Logo variant="error" /&gt;
 		&lt;h2&gt;Oops!&lt;/h2&gt;
-		&lt;p&gt;Impossible de charger le modèle de classification&lt;/p&gt;
+<span class="cstat-no" title="statement not covered" >		&lt;p&gt;{m.cannot_load_classification_model()}&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;p class="source"&gt;{@render modelsource()}&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >		&lt;p class="message"&gt;{classifModelLoadingError}&lt;/p&gt;</span>
 	&lt;/section&gt;
@@ -1060,7 +1072,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-19T17:29:50.748Z
+                at 2025-07-28T14:59:27.373Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
