@@ -89,7 +89,7 @@
 		"@types/piexifjs": "^1.0.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
-		"electron": "^37.2.3",
+		"electron": "^37.2.4",
 		"eslint": "^9.31.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-oxlint": "^1.7.0",
