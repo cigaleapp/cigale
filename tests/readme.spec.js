@@ -5,8 +5,8 @@ import english from '../messages/en.json' with { type: 'json' };
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
-		Boolean(process.env.CI),
-		"Skipping these in CI, they're meant for automated README screenshots updates"
+		Boolean(process.env.CI && !process.env.RUN_README_TESTS),
+		"Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates"
 	);
 
 	for (const language of /** @type {const} */ (['en', 'fr'])) {
