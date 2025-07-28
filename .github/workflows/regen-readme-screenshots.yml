@@ -28,6 +28,9 @@ jobs:
         env:
           RUN_README_TESTS: '1'
 
+      - name: Remove test-results.json
+        run: rm test-results.json || true
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:

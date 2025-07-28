@@ -21,25 +21,25 @@ Fonctionne hors-connexion (il suffit d'aller sur le site une seule fois pour qu'
 
 ### 1. Choisissez un protocole
 
-![](./tests/readme.spec.js-snapshots/screenshots-fr-protocol-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-fr-protocol-1-chromium-linux.png)
 
 CIGALE dispose d'un système avancé de définition de protocoles pour coller au mieux à vos besoins et à votre protocole scientifique. Un protocole de classification d'arthropodes avec informations taxonomiques et classification par espèce est fourni de base avec l'application.
 
 ### 2. Importez vos photos
 
-![](./tests/readme.spec.js-snapshots/screenshots-fr-import-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-fr-import-1-chromium-linux.png)
 
 Importez vos photos, et laissez faire le réseau neuronal de détection qui va trouver un (ou plusieurs) arthropodes par photo, et définir des boîtes englobantes autour d'eux.
 
 ### 3. Confirmez les recadrages
 
-![](./tests/readme.spec.js-snapshots/screenshots-fr-crop-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-fr-crop-1-chromium-linux.png)
 
 L'onglet suivant permet de passer sur chaque photo afin d'ajuster les boîtes englobantes détectées par le réseau neuronal. Vous pouvez les ajuster, les supprimer ou en ajouter de nouvelles.
 
 ### 4. Classifiez et annotez les arthropodes
 
-![](./tests/readme.spec.js-snapshots/screenshots-fr-classify-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-fr-classify-1-chromium-linux.png)
 
 L'onglet "Classification" lance une inférence du réseau neuronal de classification, qui permet d'identifier l'espèce pour chaque boîte englobante trouvée. Vous pouvez alors confirmer ou modifier la classification, à l'aide d'image et de descriptions utiles. Pour le protocole par défaut, elles sont tirées de [les Carnets de Jessica](https://jessica-joachim.fr), [GBIF](https://gbif.org) et d'autres sources.
 
