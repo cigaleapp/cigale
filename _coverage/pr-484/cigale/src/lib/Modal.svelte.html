@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/40</span>
+                <span class='fraction'>0/43</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/40</span>
+                <span class='fraction'>0/43</span>
             </div>
         
             
@@ -230,7 +230,13 @@
 <a name='L165'></a><a href='#L165'>165</a>
 <a name='L166'></a><a href='#L166'>166</a>
 <a name='L167'></a><a href='#L167'>167</a>
-<a name='L168'></a><a href='#L168'>168</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -268,6 +274,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -277,15 +284,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -294,6 +292,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,9 +308,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -419,6 +431,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	import IconClose from '~icons/ph/x';
 	import ButtonIcon from './ButtonIcon.svelte';
 	import { getSettings } from './settings.svelte';
+	import { insideBoundingClientRect } from './utils';
 &nbsp;
 	/**
 	 * @typedef Props
@@ -465,13 +478,18 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 &lt;/script&gt;
 &nbsp;
 &lt;dialog
+<span class="cstat-no" title="statement not covered" >	aria-hidden={!page.state[stateKey]}</span>
 <span class="cstat-no" title="statement not covered" >	data-theme={theme}</span>
 <span class="cstat-no" title="statement not covered" >	bind:this={modalElement}</span>
 <span class="cstat-no" title="statement not covered" >	onclose={() =&gt; {</span>
 		// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
 <span class="cstat-no" title="statement not covered" >		pushState('', { [stateKey]: false });</span>
 <span class="cstat-no" title="statement not covered" >	}}</span>
-<span class="cstat-no" title="statement not covered" >	onmousedown={({ target, currentTarget }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	onmousedown={({ target, currentTarget, offsetX, offsetY }) =&gt; {</span>
+		// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
+<span class="cstat-no" title="statement not covered" >		if (insideBoundingClientRect({ offsetX, offsetY }, currentTarget.getBoundingClientRect(), 20)) {</span>
+			return;
+<span class="cstat-no" title="statement not covered" >		}</span>
 		// Close on backdrop click
 <span class="cstat-no" title="statement not covered" >		if (target === currentTarget) close?.();</span>
 <span class="cstat-no" title="statement not covered" >	}}</span>
@@ -571,7 +589,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-27T19:55:36.133Z
+                at 2025-07-28T15:06:40.983Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.47% </span>
+                <span class="strong">92.52% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>559/598</span>
+                <span class='fraction'>569/615</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.75% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>24/29</span>
+                <span class='fraction'>24/30</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.47% </span>
+                <span class="strong">92.52% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>559/598</span>
+                <span class='fraction'>569/615</span>
             </div>
         
             
@@ -725,7 +725,25 @@
 <a name='L660'></a><a href='#L660'>660</a>
 <a name='L661'></a><a href='#L661'>661</a>
 <a name='L662'></a><a href='#L662'>662</a>
-<a name='L663'></a><a href='#L663'>663</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L663'></a><a href='#L663'>663</a>
+<a name='L664'></a><a href='#L664'>664</a>
+<a name='L665'></a><a href='#L665'>665</a>
+<a name='L666'></a><a href='#L666'>666</a>
+<a name='L667'></a><a href='#L667'>667</a>
+<a name='L668'></a><a href='#L668'>668</a>
+<a name='L669'></a><a href='#L669'>669</a>
+<a name='L670'></a><a href='#L670'>670</a>
+<a name='L671'></a><a href='#L671'>671</a>
+<a name='L672'></a><a href='#L672'>672</a>
+<a name='L673'></a><a href='#L673'>673</a>
+<a name='L674'></a><a href='#L674'>674</a>
+<a name='L675'></a><a href='#L675'>675</a>
+<a name='L676'></a><a href='#L676'>676</a>
+<a name='L677'></a><a href='#L677'>677</a>
+<a name='L678'></a><a href='#L678'>678</a>
+<a name='L679'></a><a href='#L679'>679</a>
+<a name='L680'></a><a href='#L680'>680</a>
+<a name='L681'></a><a href='#L681'>681</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1383,6 +1401,24 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2049,6 +2085,24 @@ export <span class="fstat-no" title="function not covered" >function round(value
 <span class="cstat-no" title="statement not covered" >	const factor = Math.pow(10, decimals);</span>
 <span class="cstat-no" title="statement not covered" >	return Math.round(value * factor) / factor;</span>
 <span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+/**
+ *
+ * @param {object} param0  offset coords from the given rect
+ * @param {number} param0.offsetX
+ * @param {number} param0.offsetY
+ * @param {DOMRect} rect
+ * @param {number} leeway how many pixels to consider still "inside" the rect even if it's outside
+ * @returns
+ */
+export <span class="fstat-no" title="function not covered" >function insideBoundingClientRect({ offsetX, offsetY }, rect, leeway = 0) {</span>
+<span class="cstat-no" title="statement not covered" >	return (</span>
+<span class="cstat-no" title="statement not covered" >		offsetX &gt;= -leeway &amp;&amp;</span>
+<span class="cstat-no" title="statement not covered" >		offsetX &lt;= rect.width + leeway &amp;&amp;</span>
+<span class="cstat-no" title="statement not covered" >		offsetY &gt;= -leeway &amp;&amp;</span>
+<span class="cstat-no" title="statement not covered" >		offsetY &lt;= rect.height + leeway</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -2056,7 +2110,7 @@ export <span class="fstat-no" title="function not covered" >function round(value
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-27T19:55:36.133Z
+                at 2025-07-28T15:06:40.983Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
