@@ -30,10 +30,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Install Playwright Browsers
-        run: |
-          sudo debconf-set man-db/auto-update false
-          sudo rm /var/lib/man-db/auto-update
-          npx playwright install --with-deps
+        run: npx playwright install --with-deps
       - name: Run Playwright tests
         run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
