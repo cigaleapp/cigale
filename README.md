@@ -21,25 +21,25 @@ Works offline (just visit the site once for it to be available without an Intern
 
 ### 1. Choose a protocol
 
-![](./tests/readme.spec.js-snapshots/screenshots-en-protocol-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-protocol-1-chromium-linux.png)
 
 CIGALE has an advanced protocol definition system to best fit your needs and scientific protocol. A example protocol, to classify arthropods with taxonomic information and species classification, is provided by default with the application.
 
 ### 2. Import your photos
 
-![](./tests/readme.spec.js-snapshots/screenshots-en-import-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-import-1-chromium-linux.png)
 
 Import your photos, and let the detection neural network find one (or more) arthropods per photo. Define bounding boxes around them.
 
 ### 3. Confirm the bounding boxes
 
-![](./tests/readme.spec.js-snapshots/screenshots-en-crop-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-crop-1-chromium-linux.png)
 
 The next tab allows you to go through each photo to adjust the bounding boxes detected by the neural network. You can adjust them, delete them, or add new ones.
 
 ### 4. Classify and annotate the arthropods
 
-![](./tests/readme.spec.js-snapshots/screenshots-en-classify-1-chromium-win32.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-classify-1-chromium-linux.png)
 
 The "Classification" tab launches an inference from the classification neural network, which identifies the species for each detected bounding box. You can then confirm or modify the classification using helpful images and descriptions. For the default protocol, they come from [les Carnets de Jessica](https://jessica-joachim.fr), [GBIF](https://gbif.org), and other sources.
 
