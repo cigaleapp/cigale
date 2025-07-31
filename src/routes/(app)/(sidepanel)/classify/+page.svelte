@@ -124,7 +124,7 @@
 			),
 			cropbox: $state.snapshot(
 				/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-				(metadata[uiState.cropMetadataId]?.value) ?? { x: 0, y: 0, w: 1, h: 1 }
+				(metadata[uiState.cropMetadataId]?.value) ?? { x: 0.5, y: 0.5, w: 1, h: 1 }
 			)
 		});
 

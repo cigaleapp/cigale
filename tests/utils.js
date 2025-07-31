@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' assert { type: 'json' };
 
 /**
  * @param {unknown} value
@@ -141,6 +142,37 @@ export async function getMetadataOverridesOfObservation({ page, protocolId, obse
 				safeJSONParse(value)
 			])
 	);
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string} observationLabelOrImageId
+ * @param {string} metadataKey
+ * @param {string} [protocolId]
+ */
+export async function getMetadataValue(
+	page,
+	observationLabelOrImageId,
+	metadataKey,
+	protocolId = defaultProtocol.id
+) {
+	if (/\d{6}_\d{6}/.test(observationLabelOrImageId)) {
+		const metadata = await getMetadataValuesOfImage({
+			page,
+			image: observationLabelOrImageId,
+			protocolId
+		});
+		return metadata[metadataKey];
+	}
+
+	const metadataOverrides = await getMetadataOverridesOfObservation({
+		page,
+		protocolId,
+		observation: observationLabelOrImageId
+	});
+
+	return metadataOverrides[metadataKey];
 }
 
 /**
