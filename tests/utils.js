@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' assert { type: 'json' };
+import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
 /**
  * @param {unknown} value
