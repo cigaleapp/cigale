@@ -1,5 +1,5 @@
 import { uiState } from '$lib/state.svelte';
-import { humanFormatName } from './i18n';
+import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { m } from './paraglide/messages';
@@ -201,6 +201,8 @@ const MAXWIDTH = 1024;
  */
 const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
 
+const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
+
 /**
  * Resize an image to fit within MAXWIDTH and MAXHEIGHT
  * @param {object} param0
@@ -212,9 +214,11 @@ export async function resizeToMaxSize({ source }) {
 	const { resize } = await import('pica-gpu');
 	const originalImage = await createImageBitmap(source).catch((error) => {
 		throw new Error(
-			source.type === 'image/CR2'
-				? m.file_format_not_supported_yet({ format: '.CR2' })
-				: m.file_format_not_supported({ format: humanFormatName(source.type) })
+			ALWAYS_SUPPORTED_TYPES.includes(source.type)
+				? errorMessage(error)
+				: source.type === 'image/CR2'
+					? m.file_format_not_supported_yet({ format: '.CR2' })
+					: m.file_format_not_supported({ format: humanFormatName(source.type) })
 		);
 	});
 	const { width, height } = originalImage;

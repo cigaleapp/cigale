@@ -126,6 +126,7 @@ export function errorMessage(error) {
 	let defaultMessage = 'Unexpected error';
 	try {
 		defaultMessage = m.unexpected_error();
+		// eslint-disable-next-line no-empty
 	} catch {}
 
 	let result = defaultMessage;
