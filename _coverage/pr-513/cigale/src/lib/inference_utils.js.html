@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.04% </span>
+                <span class="strong">27.63% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>76/271</span>
+                <span class='fraction'>76/275</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.04% </span>
+                <span class="strong">27.63% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>76/271</span>
+                <span class='fraction'>76/275</span>
             </div>
         
             
@@ -371,7 +371,12 @@
 <a name='L306'></a><a href='#L306'>306</a>
 <a name='L307'></a><a href='#L307'>307</a>
 <a name='L308'></a><a href='#L308'>308</a>
-<a name='L309'></a><a href='#L309'>309</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -456,6 +461,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -680,7 +690,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { match } from 'arktype';
-import * as Jimp from 'jimp';
+import { Jimp } from 'jimp';
 import * as ort from 'onnxruntime-web';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 &nbsp;
@@ -763,16 +773,21 @@ export <span class="fstat-no" title="function not covered" >async function loadT
 <span class="cstat-no" title="statement not covered" >	for (let f = 0; f &lt; buffers.length; f++) {</span>
 <span class="cstat-no" title="statement not covered" >		let buffer = buffers[f];</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		var img_tensor = await Jimp.Jimp.read(buffer);</span>
+<span class="cstat-no" title="statement not covered" >		const imageTensor = await Jimp.fromBuffer(buffer, {</span>
+<span class="cstat-no" title="statement not covered" >			'image/jpeg': {</span>
+<span class="cstat-no" title="statement not covered" >				maxMemoryUsageInMB: 1024</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >		});</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >		if (crop) {</span>
-<span class="cstat-no" title="statement not covered" >			const scaler = coordsScaler({ x: img_tensor.width, y: img_tensor.height });</span>
+<span class="cstat-no" title="statement not covered" >			const scaler = coordsScaler({ x: imageTensor.width, y: imageTensor.height });</span>
 <span class="cstat-no" title="statement not covered" >			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));</span>
-<span class="cstat-no" title="statement not covered" >			img_tensor.crop({ x, y, w, h });</span>
+<span class="cstat-no" title="statement not covered" >			imageTensor.crop({ x, y, w, h });</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		img_tensor.resize({ w: targetWidth, h: targetHeight });</span>
+<span class="cstat-no" title="statement not covered" >		imageTensor.resize({ w: targetWidth, h: targetHeight });</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		var imageBufferData = img_tensor.bitmap.data;</span>
+<span class="cstat-no" title="statement not covered" >		var imageBufferData = imageTensor.bitmap.data;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		const [redArray, greenArray, blueArray] = new Array(new Array(), new Array(), new Array());</span>
 <span class="cstat-no" title="statement not covered" >		for (let i = 0; i &lt; imageBufferData.length; i += 4) {</span>
@@ -994,7 +1009,7 @@ export <span class="fstat-no" title="function not covered" >function output2BB(o
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-02T19:01:45.100Z
+                at 2025-08-02T20:21:40.558Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
