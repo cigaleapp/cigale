@@ -98,7 +98,7 @@ async function processImageFile(swarpc, file, id) {
 		await tables.Image.set({
 			id: imageId(id, 0),
 			filename: file.name,
-			addedAt: formatISO(new Date()),
+			addedAt: formatISO(Date.now()),
 			contentType: file.type,
 			dimensions: { width, height },
 			fileId: id,
@@ -163,7 +163,7 @@ export async function inferBoundingBoxes(swarp, file) {
 		await tables.Image.set({
 			id: imageId(file.id, 0),
 			filename: file.filename,
-			addedAt: formatISO(new Date()),
+			addedAt: formatISO(Date.now()),
 			contentType: file.contentType,
 			dimensions: file.dimensions,
 			fileId: file.id,
@@ -181,7 +181,7 @@ export async function inferBoundingBoxes(swarp, file) {
 		await tables.Image.set({
 			id: imageId(file.id, i),
 			filename: file.filename,
-			addedAt: formatISO(new Date()),
+			addedAt: formatISO(Date.now()),
 			contentType: file.contentType,
 			dimensions: file.dimensions,
 			fileId: file.id,

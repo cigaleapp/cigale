@@ -13,7 +13,7 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
-	import { importMore, inferBoundingBoxes } from './lib.js';
+	import { importMore, inferBoundingBoxes } from './lib.svelte.js';
 
 	const { data } = $props();
 
