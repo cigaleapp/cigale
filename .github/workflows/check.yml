@@ -18,7 +18,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version-file: package.json
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Lint
@@ -30,7 +31,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version-file: package.json
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Check formatting
@@ -45,7 +47,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version-file: package.json
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Run tests
@@ -66,7 +69,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version-file: package.json
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Check for clutter
@@ -78,7 +82,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version-file: package.json
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Check for untranslated messages
@@ -110,7 +115,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version-file: package.json
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Run tests
