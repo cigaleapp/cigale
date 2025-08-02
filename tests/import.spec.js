@@ -203,3 +203,16 @@ test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
 		toast(page, 'Les fichiers .CR2 ne sont pas encore supportés', { type: 'error' })
 	).toBeVisible();
 });
+
+test('can import a large image', issue(412, 415), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'large-image.jpeg');
+	await expect(page.getByText('large-image.jpeg')).toBeVisible({
+		timeout: 10_000
+	});
+	await goToTab(page, 'classify');
+	await expect(page.getByText('large-image')).toBeVisible({
+		timeout: 10_000
+	});
+});
