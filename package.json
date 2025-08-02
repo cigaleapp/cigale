@@ -151,7 +151,7 @@
 		"sveltejs-tippy": "^3.0.0",
 		"swarpc": "^0.6.1",
 		"tinykeys": "^3.0.0",
-		"unplugin-icons": "^22.1.0",
+		"unplugin-icons": "^22.2.0",
 		"update-electron-app": "^3.1.1",
 		"xss": "^1.0.15",
 		"yaml": "^2.8.0"
