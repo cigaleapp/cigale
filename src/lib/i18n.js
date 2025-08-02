@@ -99,3 +99,19 @@ export async function languagesCompletions() {
 
 	return completions;
 }
+
+/**
+ * Returns a human-readable name for a content type.
+ * @param {string} contentType Content type, of the form type/subtype
+ */
+export function humanFormatName(contentType) {
+	const [supertype, subtype] = contentType.split('/', 2);
+
+	let result = subtype.replace(/^x-/, '');
+
+	if (['image', 'video', 'audio'].includes(supertype)) {
+		result = result.toUpperCase();
+	}
+
+	return result;
+}

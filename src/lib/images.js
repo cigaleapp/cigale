@@ -1,6 +1,8 @@
 import { uiState } from '$lib/state.svelte';
+import { humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
+import { m } from './paraglide/messages';
 import { unique } from './utils';
 /**
  * @import { Image, Protocol } from './database.js';
@@ -131,8 +133,7 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 						})
 					);
 			} catch (error) {
-				if (notFoundOk) return;
-				throw error;
+				if (!notFoundOk) throw error;
 			}
 			uiState.erroredImages.delete(id);
 			uiState.loadingImages.delete(id);
@@ -209,7 +210,13 @@ const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width)
 export async function resizeToMaxSize({ source }) {
 	// For some reason top-level import fails
 	const { resize } = await import('pica-gpu');
-	const originalImage = await createImageBitmap(source);
+	const originalImage = await createImageBitmap(source).catch((error) => {
+		throw new Error(
+			source.type === 'image/CR2'
+				? m.file_format_not_supported_yet({ format: '.CR2' })
+				: m.file_format_not_supported({ format: humanFormatName(source.type) })
+		);
+	});
 	const { width, height } = originalImage;
 	const originalCanvas = document.createElement('canvas');
 	originalCanvas.width = width;

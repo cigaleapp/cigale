@@ -1,7 +1,15 @@
 import extract from 'extract-zip';
 import path from 'node:path';
 import { expect, test } from './fixtures';
-import { importResults, readdirTreeSync, toast } from './utils';
+import {
+	chooseDefaultProtocol,
+	goToTab,
+	importPhotos,
+	importResults,
+	readdirTreeSync,
+	toast
+} from './utils';
+import { issue } from './annotations';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -185,4 +193,13 @@ test.describe('invalid json analysis', async () => {
 	test('fails with the appriopriate error message', async ({ page }) => {
 		await expect(toast(page, 'JSON', { type: 'error' })).toBeVisible();
 	});
+});
+
+test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'sample.cr2');
+	await expect(
+		toast(page, 'Les fichiers .CR2 ne sont pas encore supportés', { type: 'error' })
+	).toBeVisible();
 });

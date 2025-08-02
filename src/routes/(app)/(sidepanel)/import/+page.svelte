@@ -25,7 +25,21 @@
 					await processImageFile(swarpc, file, id);
 				} catch (error) {
 					console.error(error);
-					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
+
+					if (tables.Image.state.some((img) => img.fileId === id)) {
+						// ImageFile was created (so setting erroredImages makes sense)
+						uiState.erroredImages.set(id, error?.toString() ?? m.unexpected_error());
+					} else {
+						// no ImageFile was created (the CardObservation's id is still loading_n), so erroredImages is useless.
+						// We just remove the file from the processing list, and surface the error with a toast.
+						uiState.processing.files.splice(i, 1);
+						toasts.error(
+							m.error_importing_file({
+								filename: file.name,
+								error: error?.toString() ?? m.unexpected_error()
+							})
+						);
+					}
 				} finally {
 					uiState.loadingImages.delete(id);
 				}

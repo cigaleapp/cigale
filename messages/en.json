@@ -182,5 +182,8 @@
 	"language_translation_completion": "Translation is {percentage} done",
 	"input_increment_value": "Increment",
 	"input_decrement_value": "Decrement",
-	"confirmed": "Confirmed"
+	"confirmed": "Confirmed",
+	"error_importing_file": "Error importing file {filename}: {error}",
+	"file_format_not_supported_yet": "{format} files are not yet supported",
+	"file_format_not_supported": "File format {format} is not supported"
 }
