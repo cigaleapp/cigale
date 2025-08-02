@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { m } from './paraglide/messages';
 
 /**
  * Return a ", "-separated list of "{count} {thing}" strings, with thing set to plural.
@@ -114,4 +115,35 @@ export function humanFormatName(contentType) {
 	}
 
 	return result;
+}
+
+/**
+ *
+ * @param {unknown} error
+ * @returns {string}
+ */
+export function errorMessage(error) {
+	let defaultMessage = 'Unexpected error';
+	try {
+		defaultMessage = m.unexpected_error();
+	} catch {}
+
+	let result = defaultMessage;
+
+	if (error instanceof Error) {
+		if ('message' in error && error.message) {
+			result = error.message || defaultMessage;
+		}
+		if ('cause' in error && error.cause) {
+			result = errorMessage(error.cause);
+		}
+	}
+
+	result = error?.toString() || defaultMessage;
+
+	while (result.startsWith('Error: ')) {
+		result = result.slice('Error: '.length);
+	}
+
+	return result || defaultMessage;
 }

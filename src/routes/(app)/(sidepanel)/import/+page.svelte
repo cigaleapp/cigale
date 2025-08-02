@@ -36,7 +36,7 @@
 						toasts.error(
 							m.error_importing_file({
 								filename: file.name,
-								error: error?.toString() ?? m.unexpected_error()
+								error: errorMessage(error)
 							})
 						);
 					}
@@ -128,10 +128,18 @@
 
 		console.log('Inferring bounding boxes for', file.filename);
 
-		const { boxes, scores } = await swarp.inferBoundingBoxes({
-			fileId: file.id,
-			taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
-		});
+		const { boxes, scores } = await swarp
+			.inferBoundingBoxes({
+				fileId: file.id,
+				taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
+			})
+			.catch((error) => {
+				if (/(maxMemoryUsageInMB|maxResolutionInMP) limit exceeded/.test(error?.toString())) {
+					throw new Error(m.image_too_large());
+				}
+
+				throw error;
+			});
 
 		console.log('Bounding boxes:', boxes);
 
@@ -206,6 +214,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { formatISO } from 'date-fns';
 	import { m } from '$lib/paraglide/messages.js';
+	import { errorMessage } from '$lib/i18n.js';
 
 	const { data } = $props();
 
@@ -272,7 +281,7 @@
 						await inferBoundingBoxes(data.swarpc, file);
 					} catch (error) {
 						console.error(error);
-						uiState.erroredImages.set(imageFileId, error?.toString() ?? 'Erreur inattendue');
+						uiState.erroredImages.set(imageFileId, errorMessage(error));
 					} finally {
 						uiState.loadingImages.delete(imageFileId);
 					}

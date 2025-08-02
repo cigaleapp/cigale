@@ -216,3 +216,12 @@ test('can import a large image', issue(412, 415), async ({ page }) => {
 		timeout: 10_000
 	});
 });
+
+test('cannot import an extremely large image', issue(412, 414), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, '20K-gray.jpeg');
+	await expect(
+		toast(page, "L'image est trop grande pour être traitée", { type: 'error' })
+	).toBeVisible();
+});
