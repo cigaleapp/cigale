@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer" [disabled]:
+      - /url: "#/crop/"
+    - img
+    - link "Classifier" [disabled]:
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "6ea3d1c":
+        - /url: https://github.com/cigaleapp/cigale/tree/6ea3d1ceccb41ab77b7ff4cb7f85335e9fcc5b79
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- article:
+  - img
+  - paragraph: "Erreur lors de l'importation du fichier sample.cr2: Error: Le format de fichier CANON-CR2 n'est pas supporté"
+  - button:
+    - img
+- main:
+  - form:
+    - img
+    - paragraph: Cliquer ou déposer des images, ou un export de résultats (.zip)
+    - button "Choose File"
+- text: Importer · Cigale
+```
