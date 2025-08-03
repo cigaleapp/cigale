@@ -8,9 +8,6 @@ on:
     branches: [main]
     paths: [.github/workflows/update-changelog.yml, scripts/user-facing-changelog.js, CHANGELOG.md]
 
-permissions:
-  contents: write
-
 jobs:
   update-changelog:
     runs-on: ubuntu-latest
@@ -37,3 +34,4 @@ jobs:
           branch: update-changelog
           title: '📝 Update CHANGELOG.md'
           commit-message: '📝 Update CHANGELOG.md'
+          base: main
