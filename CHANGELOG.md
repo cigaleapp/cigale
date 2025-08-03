@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Display proper .cr2 import error toast on linux
 - Handle too-large image errors gracefully
 - Raise memory limit for JPEG image decoding
 
