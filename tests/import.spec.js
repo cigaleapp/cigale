@@ -1,7 +1,15 @@
 import extract from 'extract-zip';
 import path from 'node:path';
 import { expect, test } from './fixtures';
-import { importResults, readdirTreeSync, toast } from './utils';
+import {
+	chooseDefaultProtocol,
+	goToTab,
+	importPhotos,
+	importResults,
+	readdirTreeSync,
+	toast
+} from './utils';
+import { issue } from './annotations';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -185,4 +193,35 @@ test.describe('invalid json analysis', async () => {
 	test('fails with the appriopriate error message', async ({ page }) => {
 		await expect(toast(page, 'JSON', { type: 'error' })).toBeVisible();
 	});
+});
+
+test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'sample.cr2');
+	await expect(
+		toast(page, /Les fichiers .+? ne sont pas (encore )?supportés/, { type: 'error' })
+	).toBeVisible();
+});
+
+test('can import a large image', issue(412, 415), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'large-image.jpeg');
+	await expect(page.getByText('large-image.jpeg')).toBeVisible({
+		timeout: 10_000
+	});
+	await goToTab(page, 'classify');
+	await expect(page.getByText('large-image')).toBeVisible({
+		timeout: 10_000
+	});
+});
+
+test('cannot import an extremely large image', issue(412, 414), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, '20K-gray.jpeg');
+	await expect(
+		toast(page, "L'image est trop grande pour être traitée", { type: 'error' })
+	).toBeVisible();
 });

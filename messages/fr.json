@@ -181,5 +181,9 @@
 	"confidence_percentage": "Confiance: {percentage}",
 	"input_increment_value": "Incrémenter",
 	"input_decrement_value": "Décrémenter",
-	"confirmed": "Confirmé"
+	"confirmed": "Confirmé",
+	"error_importing_file": "Erreur lors de l'importation du fichier {filename}: {error}",
+	"file_format_not_supported_yet": "Les fichiers {format} ne sont pas encore supportés",
+	"file_format_not_supported": "Le format de fichier {format} n'est pas supporté",
+	"image_too_large": "L'image est trop grande pour être traitée"
 }

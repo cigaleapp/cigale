@@ -1,5 +1,5 @@
 import { match } from 'arktype';
-import * as Jimp from 'jimp';
+import { Jimp } from 'jimp';
 import * as ort from 'onnxruntime-web';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 
@@ -82,16 +82,21 @@ export async function loadToTensor(
 	for (let f = 0; f < buffers.length; f++) {
 		let buffer = buffers[f];
 
-		var img_tensor = await Jimp.Jimp.read(buffer);
+		const imageTensor = await Jimp.fromBuffer(buffer, {
+			'image/jpeg': {
+				maxMemoryUsageInMB: 1024
+			}
+		});
+
 		if (crop) {
-			const scaler = coordsScaler({ x: img_tensor.width, y: img_tensor.height });
+			const scaler = coordsScaler({ x: imageTensor.width, y: imageTensor.height });
 			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));
-			img_tensor.crop({ x, y, w, h });
+			imageTensor.crop({ x, y, w, h });
 		}
 
-		img_tensor.resize({ w: targetWidth, h: targetHeight });
+		imageTensor.resize({ w: targetWidth, h: targetHeight });
 
-		var imageBufferData = img_tensor.bitmap.data;
+		var imageBufferData = imageTensor.bitmap.data;
 
 		const [redArray, greenArray, blueArray] = new Array(new Array(), new Array(), new Array());
 		for (let i = 0; i < imageBufferData.length; i += 4) {

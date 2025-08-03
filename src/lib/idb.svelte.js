@@ -345,7 +345,7 @@ export async function openTransaction(tableNames, { mode }, actions) {
 	// @ts-ignore
 	console.debug(`txn commit ${txid} `);
 
-	newTx.commit();
+	await newTx.done;
 
 	for (const table of tableNames.filter(isReactiveTable)) {
 		await tables[table].refresh();

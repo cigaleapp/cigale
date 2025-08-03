@@ -16,7 +16,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-	import { importMore } from './import/+page.svelte';
+	import { importMore } from './import/lib.svelte.js';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });

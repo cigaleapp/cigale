@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { m } from './paraglide/messages';
 
 /**
  * Return a ", "-separated list of "{count} {thing}" strings, with thing set to plural.
@@ -98,4 +99,52 @@ export async function languagesCompletions() {
 	);
 
 	return completions;
+}
+
+/**
+ * Returns a human-readable name for a content type.
+ * @param {string} contentType Content type, of the form type/subtype
+ */
+export function humanFormatName(contentType) {
+	const [supertype, subtype] = contentType.split('/', 2);
+
+	let result = subtype.replace(/^x-/, '');
+
+	if (['image', 'video', 'audio'].includes(supertype)) {
+		result = result.toUpperCase();
+	}
+
+	return result;
+}
+
+/**
+ *
+ * @param {unknown} error
+ * @returns {string}
+ */
+export function errorMessage(error) {
+	let defaultMessage = 'Unexpected error';
+	try {
+		defaultMessage = m.unexpected_error();
+		// eslint-disable-next-line no-empty
+	} catch {}
+
+	let result = defaultMessage;
+
+	if (error instanceof Error) {
+		if ('message' in error && error.message) {
+			result = error.message || defaultMessage;
+		}
+		if ('cause' in error && error.cause) {
+			result = errorMessage(error.cause);
+		}
+	}
+
+	result = error?.toString() || defaultMessage;
+
+	while (result.startsWith('Error: ')) {
+		result = result.slice('Error: '.length);
+	}
+
+	return result || defaultMessage;
 }
