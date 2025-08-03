@@ -25,18 +25,21 @@ function safeJSONParse(value) {
  *
  * @param {object} ctx
  * @param {Page} ctx.page
+ * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
  * @param {...string} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used
  */
-export async function importPhotos({ page }, ...names) {
+export async function importPhotos({ page, wait = true }, ...names) {
 	if (!names) throw new Error('No file names provided');
 	names = names.map((name) => (path.extname(name) ? name : `${name}.jpeg`));
 
 	await expect(page.getByText('(.zip)')).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(names.map((f) => path.join('./tests/fixtures', f)));
-	await expect(page.getByText(names.at(-1), { exact: true })).toBeVisible({
-		timeout: 20_000
-	});
+	if (wait) {
+		await expect(page.getByText(names.at(-1), { exact: true })).toBeVisible({
+			timeout: 20_000
+		});
+	}
 }
 
 /**
