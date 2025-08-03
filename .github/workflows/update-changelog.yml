@@ -3,10 +3,11 @@ name: Update Changelog
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0' # Every Sunday at midnight
+    # Every 28th of the month at 00:00 UTC
+    - cron: '0 0 28 * *'
   push:
     branches: [main]
-    paths: [.github/workflows/update-changelog.yml, scripts/user-facing-changelog.js, CHANGELOG.md]
+    paths: [.github/workflows/update-changelog.yml, scripts/generate-changelog.js, CHANGELOG.md]
 
 jobs:
   update-changelog:
@@ -26,7 +27,7 @@ jobs:
       - name: Update CHANGELOG.md
         run: |
           npm ci
-          node scripts/user-facing-changelog.js 2024-01-01
+          node scripts/generate-changelog.js 2024-01-01
 
       - name: Commit and push changes
         uses: peter-evans/create-pull-request@v7

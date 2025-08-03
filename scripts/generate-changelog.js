@@ -42,13 +42,13 @@ const commits = gitlog
 	);
 
 const SECTIONS = /** @type {const} */ ([
-	'Bug Fixes',
 	'Improvements',
 	'Performance Improvements',
+	'Accessibility Improvements',
+	'Bug Fixes',
 	'Data Updates',
 	'Translation Updates',
-	'Legal Changes',
-	'Accessibility Improvements'
+	'Legal Changes'
 ]);
 
 /**
@@ -117,6 +117,7 @@ All notable changes to this project will be documented in this file, on a monthl
 rendered += Object.entries(months)
 	.map(([month, sections]) => {
 		const renderedSections = Object.entries(sections)
+			.sort(([a], [b]) => SECTIONS.indexOf(a) - SECTIONS.indexOf(b))
 			.map(([section, commits]) => {
 				const commitsList = Array.from(new Set(commits.map((c) => c.title)))
 					.sort()
