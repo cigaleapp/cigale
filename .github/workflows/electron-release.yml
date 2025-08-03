@@ -1,7 +1,14 @@
 name: Draft a desktop app release
 
 on:
+  push:
+    branches: [main]
+    tags: [v202*.*.*]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag for the release'
+        required: true
 
 # https://www.electronforge.io/config/publishers/github#authentication
 permissions:
@@ -19,8 +26,24 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Get release notes
+        id: release_notes
+        run: |
+          # Get get everything between first h2 we see and until the next h2
+
+          release_notes=$(sed -n '/^## /,/^## /p' CHANGELOG.md | sed '$d')
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$release_notes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Build, package and publish app
         run: npm run prebuild; npx electron-forge publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ELECTRON_BUILD: '1'
+
+      - name: Set release notes on release draft
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.release_notes.outputs.release_notes }}
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          draft: true

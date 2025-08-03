@@ -31,7 +31,6 @@ const config = {
 	],
 	publishers: [
 		new PublisherGithub({
-			prerelease: true,
 			draft: true,
 			repository: { owner: 'cigaleapp', name: 'cigale' }
 		})
