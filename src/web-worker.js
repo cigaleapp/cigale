@@ -203,4 +203,4 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	return pick(validated, 'id', 'name', 'version');
 });
 
-await swarp.start();
+void swarp.start();
