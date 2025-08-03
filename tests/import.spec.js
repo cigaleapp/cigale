@@ -225,3 +225,19 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 		toast(page, "L'image est trop grande pour être traitée", { type: 'error' })
 	).toBeVisible();
 });
+
+test('can cancel import', issue(430), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'lil-fella', 'cyan', 'leaf', 'with-exif-gps');
+	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…/, {
+		timeout: 10_000
+	});
+	await page
+		.getByTestId('first-observation-card')
+		.getByRole('button', { name: 'Supprimer' })
+		.click();
+	await expect(page.getByText('lil-fella.jpeg').first()).not.toBeVisible({
+		timeout: 500
+	});
+});
