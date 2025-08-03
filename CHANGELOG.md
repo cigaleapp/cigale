@@ -18,6 +18,37 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## July 2025
 
+### Improvements
+
+- Add initial loading screen
+- Add links to README in other languages
+- Add messages to make initial load screen more interesting
+- Allow deleting images from cropper view (Closes #389)
+- Disable crop padding UI when export doesnt include cropped images
+- Don't close import URL-preselected protocol modal until import finishes
+- Don't throw inside a catch handler
+- Hide "no inference" indicator icons in navbar when no protocol is selected
+- Hide native titlebar
+- Improve default native window dimensions
+- Improve title bar integration for native app
+- Introduce relative crop paddings (#466)
+- Make protocol import button's icon consistent with the upload more photos one
+- Make whole native window draggable during initial load
+- Persist selected protocol models
+- Prevent deleting active protocol
+- Run bounding box inference on service worker
+- Set minimum window size for native app
+- Set native progress bar for electron app
+- Show Electron versions in /about
+- Show OS info in /about for Electron builds
+- Show cascades on metadata enum combobox (Closes #373)
+- Show feedback when protocol upgrade is in progress
+- Show translation completion on languages switch
+
+### Performance Improvements
+
+- Cache npm i and playwright browsers
+
 ### Bug Fixes
 
 - Cancel box creation when dragging outside crop surface
@@ -56,32 +87,13 @@ All notable changes to this project will be documented in this file, on a monthl
 - Update merged metadata values passed to sidepanel on metadata changes
 - Use a dedicated Worker instead of the SW for off-thread computation
 
-### Improvements
+### Data Updates
 
-- Add initial loading screen
-- Add links to README in other languages
-- Add messages to make initial load screen more interesting
-- Allow deleting images from cropper view (Closes #389)
-- Disable crop padding UI when export doesnt include cropped images
-- Don't close import URL-preselected protocol modal until import finishes
-- Don't throw inside a catch handler
-- Hide "no inference" indicator icons in navbar when no protocol is selected
-- Hide native titlebar
-- Improve default native window dimensions
-- Improve title bar integration for native app
-- Introduce relative crop paddings (#466)
-- Make protocol import button's icon consistent with the upload more photos one
-- Make whole native window draggable during initial load
-- Persist selected protocol models
-- Prevent deleting active protocol
-- Run bounding box inference on service worker
-- Set minimum window size for native app
-- Set native progress bar for electron app
-- Show Electron versions in /about
-- Show OS info in /about for Electron builds
-- Show cascades on metadata enum combobox (Closes #373)
-- Show feedback when protocol upgrade is in progress
-- Show translation completion on languages switch
+- Add icons for Electron app
+- Fix large classification model name
+- Fix wait-for-analysis logic
+- Regenerate arthropods protocol
+- Use real protocol in screenshots
 
 ### Translation Updates
 
@@ -92,18 +104,6 @@ All notable changes to this project will be documented in this file, on a monthl
 - Translate initial loading text
 - Translate new strings to English
 - Translate readme
-
-### Data Updates
-
-- Add icons for Electron app
-- Fix large classification model name
-- Fix wait-for-analysis logic
-- Regenerate arthropods protocol
-- Use real protocol in screenshots
-
-### Performance Improvements
-
-- Cache npm i and playwright browsers
 
 ### Legal Changes
 
@@ -130,12 +130,6 @@ All notable changes to this project will be documented in this file, on a monthl
 - Sort options by label after loading on sidepanel
 - Support full HTTPRequest instead of just URLs for protocol models
 
-### Data Updates
-
-- Also include lightweight-protocol-only species
-- Regenerate arthropods protocol
-- Sort options by label in example protocol
-
 ### Bug Fixes
 
 - Fix 17k model URL in example protocol
@@ -150,37 +144,13 @@ All notable changes to this project will be documented in this file, on a monthl
 - Limit add-species-from-jessica-joachim to lightweight model's classes
 - Protocol generation: sort options with numerical keys correctly
 
+### Data Updates
+
+- Also include lightweight-protocol-only species
+- Regenerate arthropods protocol
+- Sort options by label in example protocol
+
 ## May 2025
-
-### Bug Fixes
-
-- Fix various zip export errors, use jsdoc @import in some places
-- Add missing manuallyModified prop in results json schema
-- Also delete references to image in observations when deleting image
-- Cachebust protocol update checks and upgrades
-- Fix Digit\* keybinds not triggering with shift-row
-- Fix blurfill on CardObservation being short
-- Fix bounding boxes on CardObservation misaligned
-- Fix cannot create new boxes
-- Fix cannot mark as confirmed when no bounding boxes
-- Fix cannot mark as confirmed when no bounding boxes on image
-- Fix i18n
-- Fix invalid URL for arthropods protocol species URLs from Google Slides
-- Fix metadata combobox displayed under selected card (Fixes #234)
-- Fix missing dimensions property when creating new Image of new bounding box
-- Fix renovate config
-- Fix stretched bounding box thumbnails
-- Fix version incrementation for example protocol generation
-- Handle cropConfirmation-less protocols
-- Hide autoscroll indicator on Firefox
-- Mark whole ImageFile as confirmed when creating a new box
-- Maybe fix ghost box from pervious image when autoskipping
-- Prevent moving/resizing boxes with mousewheel click or while panning
-- Remove $ark.object table keys from generate json schemas
-- Restore observation IDs when importing a results zip file
-- Show sidepanel even when there are only files that aren't imported yet
-- Try fixing sequence numbers still not stable-ordered by changing ordering key
-- Use max instead of average for enum metadata in example protocol
 
 ### Improvements
 
@@ -215,6 +185,36 @@ All notable changes to this project will be documented in this file, on a monthl
 - Support markdown in metadata option descriptions (Closes #115)
 - Surface metadata merging errors
 - Use markdown in description
+
+### Bug Fixes
+
+- Fix various zip export errors, use jsdoc @import in some places
+- Add missing manuallyModified prop in results json schema
+- Also delete references to image in observations when deleting image
+- Cachebust protocol update checks and upgrades
+- Fix Digit\* keybinds not triggering with shift-row
+- Fix blurfill on CardObservation being short
+- Fix bounding boxes on CardObservation misaligned
+- Fix cannot create new boxes
+- Fix cannot mark as confirmed when no bounding boxes
+- Fix cannot mark as confirmed when no bounding boxes on image
+- Fix i18n
+- Fix invalid URL for arthropods protocol species URLs from Google Slides
+- Fix metadata combobox displayed under selected card (Fixes #234)
+- Fix missing dimensions property when creating new Image of new bounding box
+- Fix renovate config
+- Fix stretched bounding box thumbnails
+- Fix version incrementation for example protocol generation
+- Handle cropConfirmation-less protocols
+- Hide autoscroll indicator on Firefox
+- Mark whole ImageFile as confirmed when creating a new box
+- Maybe fix ghost box from pervious image when autoskipping
+- Prevent moving/resizing boxes with mousewheel click or while panning
+- Remove $ark.object table keys from generate json schemas
+- Restore observation IDs when importing a results zip file
+- Show sidepanel even when there are only files that aren't imported yet
+- Try fixing sequence numbers still not stable-ordered by changing ordering key
+- Use max instead of average for enum metadata in example protocol
 
 ### Data Updates
 
@@ -311,60 +311,6 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## March 2025
 
-### Bug Fixes
-
-- Fix empty or out of date combobox
-- Fix scrollbars lookin horrible on Chrome, and various other small things
-- Add missing clade class in taxonomy
-- Correctly namespace protocol metadata defs on import
-- Define isLoading in crop page
-- Don't include learnMore: null in generated protocol
-- Don't trigger custom handling for Ctrl+A when inside an input
-- Fix 0-key species displayed as (Unknown) in exported folder
-- Fix asset URLs for model files in service worker
-- Fix bounding box not showing on observation cards
-- Fix csv export not showing enum labels for number-like enum keys
-- Fix db state initialization
-- Fix deletion not worky
-- Fix deployment details modal not showing anything next to user picture if they have no displayname
-- Fix disabled states for navigation tabs
-- Fix excessive toRelativeCoords translation when storing inferred crop box
-- Fix extracted exif date is incredibly wrong (closes #49)
-- Fix ghost items left in selection after lone images fix when exporting
-- Fix keyboard handlers executing more than once
-- Fix logo size broked in Chrome
-- Fix metadata display in sidepanel for observations
-- Fix metadata merging logic
-- Fix metadata values sometimes deserialized as dates because ISO 8601 is fucking insane
-- Fix modal not centered, and could be closed by clicking on empty content inside
-- Fix model input dimensions were switched around for jessica joachim
-- Fix nav links
-- Fix nav links not working on preview deployments
-- Fix problems when opening new versions of the site since db schema changed
-- Fix progress bar set total early when dropping new files (closes #50)
-- Fix redirect to protocol choice page
-- Fix some bugs, make date input work
-- Fix split observation keybind (closes #62)
-- Fix sw not actually using cache-models when matching a model request
-- Fix taxonomy.json path on non-root-base deployments
-- Fix various cute bugs
-- Fix weird glitches when cards change
-- Fix weird state desync on selection
-- Fix weird things when merging observations
-- Fix wide-docs combobox style
-- Fix wrong bounding box when editing it
-- Fix wrong details for related issue in DeploymentDetails
-- Huuuuuuuuuuuuuuh fix some stuff ig
-- Include images' metadata in analysis.json (closes #66)
-- Loading spinner is way bigger than button icon when downloading results (closes #52)
-- Maybe fix max/min strategy merging
-- Only serve model files from cache when online
-- Prevent badly shrinking images in combobox
-- Prevent error when exporting results if an observation has less metadata than another
-- Run classification on correct bounding box coords
-- Shown crop box did not always match chosen thumbnail for stacked cards (closes #63)
-- Turn lone images into 1-image observations before exporting
-
 ### Improvements
 
 - Allow ey and ex output tokens for detection model
@@ -443,6 +389,70 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use transaction for ctrl-u
 - le preview pannel la o
 
+### Performance Improvements
+
+- Rendre le site installable et dispo offline (#92)
+
+### Accessibility Improvements
+
+- Add tooltip to settings nav button
+- Ensure all ButtonIcon have a tooltip
+- Make crop box & handles more visible in Cropup
+
+### Bug Fixes
+
+- Fix empty or out of date combobox
+- Fix scrollbars lookin horrible on Chrome, and various other small things
+- Add missing clade class in taxonomy
+- Correctly namespace protocol metadata defs on import
+- Define isLoading in crop page
+- Don't include learnMore: null in generated protocol
+- Don't trigger custom handling for Ctrl+A when inside an input
+- Fix 0-key species displayed as (Unknown) in exported folder
+- Fix asset URLs for model files in service worker
+- Fix bounding box not showing on observation cards
+- Fix csv export not showing enum labels for number-like enum keys
+- Fix db state initialization
+- Fix deletion not worky
+- Fix deployment details modal not showing anything next to user picture if they have no displayname
+- Fix disabled states for navigation tabs
+- Fix excessive toRelativeCoords translation when storing inferred crop box
+- Fix extracted exif date is incredibly wrong (closes #49)
+- Fix ghost items left in selection after lone images fix when exporting
+- Fix keyboard handlers executing more than once
+- Fix logo size broked in Chrome
+- Fix metadata display in sidepanel for observations
+- Fix metadata merging logic
+- Fix metadata values sometimes deserialized as dates because ISO 8601 is fucking insane
+- Fix modal not centered, and could be closed by clicking on empty content inside
+- Fix model input dimensions were switched around for jessica joachim
+- Fix nav links
+- Fix nav links not working on preview deployments
+- Fix problems when opening new versions of the site since db schema changed
+- Fix progress bar set total early when dropping new files (closes #50)
+- Fix redirect to protocol choice page
+- Fix some bugs, make date input work
+- Fix split observation keybind (closes #62)
+- Fix sw not actually using cache-models when matching a model request
+- Fix taxonomy.json path on non-root-base deployments
+- Fix various cute bugs
+- Fix weird glitches when cards change
+- Fix weird state desync on selection
+- Fix weird things when merging observations
+- Fix wide-docs combobox style
+- Fix wrong bounding box when editing it
+- Fix wrong details for related issue in DeploymentDetails
+- Huuuuuuuuuuuuuuh fix some stuff ig
+- Include images' metadata in analysis.json (closes #66)
+- Loading spinner is way bigger than button icon when downloading results (closes #52)
+- Maybe fix max/min strategy merging
+- Only serve model files from cache when online
+- Prevent badly shrinking images in combobox
+- Prevent error when exporting results if an observation has less metadata than another
+- Run classification on correct bounding box coords
+- Shown crop box did not always match chosen thumbnail for stacked cards (closes #63)
+- Turn lone images into 1-image observations before exporting
+
 ### Data Updates
 
 - Add model declarations
@@ -455,16 +465,6 @@ All notable changes to this project will be documented in this file, on a monthl
 - Regenerate arthropods protocol
 - Reglages ok ?
 - Use CNRS drive URLs for hosting model files
-
-### Performance Improvements
-
-- Rendre le site installable et dispo offline (#92)
-
-### Accessibility Improvements
-
-- Add tooltip to settings nav button
-- Ensure all ButtonIcon have a tooltip
-- Make crop box & handles more visible in Cropup
 
 ## February 2025
 
@@ -509,6 +509,10 @@ All notable changes to this project will be documented in this file, on a monthl
 - Use parent element of component for selection zone
 - Use real colors for TextArea
 
+### Accessibility Improvements
+
+- Support prefers-reduced-motion
+
 ### Bug Fixes
 
 - Balise Div qui manquait
@@ -546,7 +550,3 @@ All notable changes to this project will be documented in this file, on a monthl
 - Radio button + Global CSS Color
 - Radio button but better
 - Réglages 2.0
-
-### Accessibility Improvements
-
-- Support prefers-reduced-motion
