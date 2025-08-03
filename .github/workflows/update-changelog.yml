@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '22.18.0'
-          cache: npm
 
       - name: Update CHANGELOG.md
         run: |
