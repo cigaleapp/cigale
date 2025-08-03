@@ -149,7 +149,7 @@
 		"piexifjs": "^1.0.6",
 		"runed": "^0.31.1",
 		"sveltejs-tippy": "^3.0.0",
-		"swarpc": "^0.7.1",
+		"swarpc": "^0.9.0",
 		"tinykeys": "^3.0.0",
 		"unplugin-icons": "^22.2.0",
 		"update-electron-app": "^3.1.1",
