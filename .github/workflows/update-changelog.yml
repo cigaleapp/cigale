@@ -26,7 +26,7 @@ jobs:
       - name: Update CHANGELOG.md
         run: |
           npm ci
-          node scripts/user-facing-changelog.js 2025-05-03
+          node scripts/user-facing-changelog.js 2024-01-01
 
       - name: Commit and push changes
         uses: peter-evans/create-pull-request@v7
