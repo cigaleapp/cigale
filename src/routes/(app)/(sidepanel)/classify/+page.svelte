@@ -2,6 +2,7 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import { tables } from '$lib/idb.svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import {
 		deleteImageFile,
 		imageBufferWasSaved,
@@ -42,6 +43,9 @@
 
 	/** loaded and total bytes counts, set and updated by loadModel() */
 	let modelLoadingProgress = $state(0);
+
+	/** @type {Map<string, import("swarpc").CancelablePromise["cancel"]>} */
+	let classificationCancellers = new SvelteMap();
 
 	let classifmodelLoaded = $state(false);
 	let classifModelLoadingError = $state(null);
@@ -96,6 +100,22 @@
 				toasts.error(m.error_loading_classification_model());
 			});
 	}
+
+	/**
+	 * @type {Map<string, AbortController>}
+	 */
+	const abortControllers = new SvelteMap();
+
+	/**
+	 * @param {string} id
+	 */
+	function abortAnalysis(id) {
+		console.log('Aborting analysis for image', id);
+		abortControllers.get(id)?.abort();
+		classificationCancellers.get(id)?.('Cancelled by user');
+		classificationCancellers.delete(id);
+	}
+
 	/**
 	 * @param {string} id
 	 * @param {object} image
@@ -116,7 +136,7 @@
 
 		console.log('Analyzing image', id, filename);
 
-		const { scores } = await data.swarpc.classify({
+		const classification = data.swarpc.classify.cancelable({
 			fileId: imageIdToFileId(id),
 			taskSettings: classificationInferenceSettings(
 				uiState.currentProtocol,
@@ -128,7 +148,9 @@
 			)
 		});
 
-		const results = scores
+		classificationCancellers.set(id, classification.cancel);
+
+		const results = (await classification.request).scores
 			.map((score, i) => ({
 				confidence: score,
 				value: classmapping[i]
@@ -150,7 +172,8 @@
 
 			await storeMetadataValue({
 				...metadataValue,
-				metadataId: uiState.classificationMetadataId
+				metadataId: uiState.classificationMetadataId,
+				abortSignal: abortControllers.get(id)?.signal
 			});
 		}
 	}
@@ -205,6 +228,8 @@
 
 		analyzingAllImages = false;
 	}
+
+	$inspect('cancellers', classificationCancellers);
 
 	$effect(() => {
 		if (!uiState.classificationInferenceAvailable) return;
@@ -269,6 +294,8 @@
 			errors={erroredImages}
 			loadingText={m.analyzing()}
 			ondelete={async (id) => {
+				console.log('Deleting image', id);
+				abortAnalysis(id);
 				await deleteObservation(id);
 				await deleteImageFile(id);
 			}}

@@ -40,6 +40,7 @@
 	],
 	"scripts": {
 		"dev": "vite dev",
+		"dev:native": "electron-forge start",
 		"build": "vite build",
 		"prebuild": "node scripts/generate-json-schemas.js",
 		"preview": "vite preview",
@@ -149,7 +150,7 @@
 		"piexifjs": "^1.0.6",
 		"runed": "^0.31.1",
 		"sveltejs-tippy": "^3.0.0",
-		"swarpc": "^0.9.0",
+		"swarpc": "file:../swarpc",
 		"tinykeys": "^3.0.0",
 		"unplugin-icons": "^22.2.0",
 		"update-electron-app": "^3.1.1",

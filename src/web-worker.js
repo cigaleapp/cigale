@@ -13,8 +13,6 @@ import * as Swarp from 'swarpc';
 import YAML from 'yaml';
 import { PROCEDURES } from './web-worker-procedures.js';
 
-const ww = /** @type {Worker} */ (/** @type {unknown} */ self);
-
 /**
  * @type {import('idb').IDBPDatabase<import('./lib/idb.svelte.js').IDBDatabaseType> | undefined}
  */
@@ -31,7 +29,7 @@ async function openDatabase() {
 	db = await openDB(databaseParams.name, databaseParams.revision);
 }
 
-const swarp = Swarp.Server(PROCEDURES, { worker: ww });
+const swarp = Swarp.Server(PROCEDURES);
 
 /**
  * @type {Map<string, { onnx: import('onnxruntime-web').InferenceSession, id: string }>}
@@ -76,24 +74,40 @@ swarp.loadModel(async ({ task, request, protocolId, webgpu }, onProgress) => {
 
 swarp.isModelLoaded((task) => inferenceSessions.has(task));
 
-swarp.inferBoundingBoxes(async ({ fileId, taskSettings }) => {
+swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
+	let aborted = false;
+	tools.abortSignal?.addEventListener('abort', () => {
+		aborted = true;
+	});
+
 	const session = inferenceSessions.get('detection')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
 	}
 
 	await openDatabase();
+	if (aborted) return { boxes: [], scores: [] };
+
 	const file = await db.get('ImageFile', fileId);
 	if (!file) {
 		throw new Error(`Fichier avec l'ID ${fileId} non trouvé`);
 	}
 
-	const [[boxes], [scores]] = await infer(taskSettings, [file.bytes], session);
+	const [[boxes], [scores]] = await infer(
+		{
+			...taskSettings,
+			abortSignal: tools.abortSignal
+		},
+		[file.bytes],
+		session
+	);
 
 	return { boxes, scores };
 });
 
-swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
+swarp.classify(async ({ fileId, cropbox, taskSettings }, _, tools) => {
+	tools.abortSignal?.addEventListener('abort', () => {});
+
 	const session = inferenceSessions.get('classification')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de classification non chargé');
@@ -111,10 +125,11 @@ swarp.classify(async ({ fileId, cropbox, taskSettings }) => {
 	const img = await loadToTensor([file.bytes], {
 		...taskSettings.input,
 		normalized: true,
-		crop: cropbox
+		crop: cropbox,
+		abortSignal: tools.abortSignal
 	});
 
-	const scores = await classify(taskSettings, img, session);
+	const scores = await classify(taskSettings, img, session, tools.abortSignal);
 
 	return { scores };
 });
@@ -188,4 +203,4 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	return pick(validated, 'id', 'name', 'version');
 });
 
-swarp.start(ww);
+await swarp.start();

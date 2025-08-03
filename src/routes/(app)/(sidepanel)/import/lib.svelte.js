@@ -15,10 +15,11 @@ import { formatISO } from 'date-fns';
 /**
  * Import new files and process  them
  * @param {import('swarpc').SwarpcClient<typeof import('../../../../web-worker-procedures.js').PROCEDURES>} swarpc
+ * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
  * @param {File[]} files
  */
-export async function importMore(swarpc, files) {
-	uiState.processing.files = files.map((f) => f.name);
+export async function importMore(swarpc, files, cancellers) {
+	uiState.processing.files = files.map(({ name }, i) => ({ name, id: `loading_${i}` }));
 	uiState.processing.total = files.length;
 	for (const [i, file] of files.entries()) {
 		console.log(file);
@@ -35,7 +36,7 @@ export async function importMore(swarpc, files) {
 			const id = imageFileId(currentLength);
 			try {
 				uiState.loadingImages.add(id);
-				await processImageFile(swarpc, file, id);
+				await processImageFile(swarpc, file, id, `loading_${i}`, cancellers);
 			} catch (error) {
 				console.error(error);
 
@@ -64,8 +65,10 @@ export async function importMore(swarpc, files) {
  * @param {import('swarpc').SwarpcClient<typeof import('../../../../web-worker-procedures.js').PROCEDURES>} swarpc
  * @param {File} file
  * @param {string} id
+ * @param {`loading_${number}`} [temporaryId] ID of the form `loading_n`, used to identify the file in the UI while it is being processed, and set cancellers for it
+ * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
  */
-async function processImageFile(swarpc, file, id) {
+async function processImageFile(swarpc, file, id, temporaryId, cancellers) {
 	if (!uiState.currentProtocol) {
 		toasts.error(m.no_protocol_selected());
 		return;
@@ -85,8 +88,9 @@ async function processImageFile(swarpc, file, id) {
 	});
 
 	if (uiState.cropInferenceAvailable) {
-		await inferBoundingBoxes(swarpc, {
+		await inferBoundingBoxes(swarpc, cancellers, {
 			id,
+			temporaryId,
 			bytes: resizedBytes,
 			filename: file.name,
 			contentType: file.type,
@@ -114,15 +118,17 @@ async function processImageFile(swarpc, file, id) {
 
 /**
  * @param {import('swarpc').SwarpcClient<typeof import('../../../../web-worker-procedures.js').PROCEDURES>} swarp
+ * @param {undefined | Map<string, import("swarpc").CancelablePromise["cancel"]>} cancellers
  * @param {object} file
  * @param {ArrayBuffer} file.bytes
  * @param {string} file.filename
  * @param {string} file.contentType
  * @param {string} file.id
  * @param {DimensionsInput} file.dimensions
+ * @param {`loading_${number}`} [file.temporaryId] ID of the form `loading_n`, used to identify the file in the UI while it is being processed, and set cancellers for it
  * @returns {Promise<void>}
  */
-export async function inferBoundingBoxes(swarp, file) {
+export async function inferBoundingBoxes(swarp, cancellers, file) {
 	if (!uiState.currentProtocol) {
 		toasts.error(m.no_protocol_selected());
 		return;
@@ -141,18 +147,21 @@ export async function inferBoundingBoxes(swarp, file) {
 
 	console.log('Inferring bounding boxes for', file.filename);
 
-	const { boxes, scores } = await swarp
-		.inferBoundingBoxes({
-			fileId: file.id,
-			taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
-		})
-		.catch((error) => {
-			if (/(maxMemoryUsageInMB|maxResolutionInMP) limit exceeded/.test(error?.toString())) {
-				throw new Error(m.image_too_large());
-			}
+	const inference = swarp.inferBoundingBoxes.cancelable({
+		fileId: file.id,
+		taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
+	});
 
-			throw error;
-		});
+	cancellers?.set(file.id, inference.cancel);
+	if (file.temporaryId) cancellers?.set(file.temporaryId, inference.cancel);
+
+	const { boxes, scores } = await inference.request.catch((error) => {
+		if (/(maxMemoryUsageInMB|maxResolutionInMP) limit exceeded/.test(error?.toString())) {
+			throw new Error(m.image_too_large());
+		}
+
+		throw error;
+	});
 
 	console.log('Bounding boxes:', boxes);
 

@@ -94,6 +94,7 @@ export async function loadModel(request, onProgress, webgpu = false) {
  * @param {object} taskSettings.output
  * @param {string} taskSettings.output.name
  * @param {import('./database.js').ModelDetectionOutputShape} taskSettings.output.shape
+ * @param {AbortSignal} [taskSettings.abortSignal]
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} session
  * @param {typeof import('./state.svelte.js').uiState} [uiState]
@@ -102,7 +103,7 @@ export async function loadModel(request, onProgress, webgpu = false) {
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
  */
 export async function infer(
-	taskSettings,
+	{ abortSignal, ...taskSettings },
 	buffers,
 	session,
 	uiState,
@@ -161,9 +162,10 @@ export async function infer(
 	let inputTensor;
 
 	console.log('loading images...');
-	inputTensor = await loadToTensor(buffers, taskSettings.input);
+	inputTensor = await loadToTensor(buffers, { ...taskSettings.input, abortSignal });
 
 	console.log('inference...');
+	// TODO figure out a way to use the abortSignal while running the inference
 	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });
 	console.log('done !');
 	console.log('output tensor: ', outputTensor);
@@ -173,7 +175,8 @@ export async function infer(
 		taskSettings.output.shape,
 		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),
 		buffers.length,
-		NUMCONF
+		NUMCONF,
+		abortSignal
 	);
 	console.log('done !');
 	const [boundingboxes, bestScores] = bbs;
@@ -190,9 +193,10 @@ export async function infer(
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
  * @param {ort.Tensor} image
  * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {AbortSignal} [abortSignal]
  * @returns {Promise<number[]>} scores for each class
  */
-export async function classify(settings, image, model) {
+export async function classify(settings, image, model, abortSignal) {
 	const inputName = settings.input.name ?? model.inputNames[0];
 
 	const input = await preprocessTensor(settings, image, MEAN, STD);

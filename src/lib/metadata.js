@@ -71,6 +71,7 @@ export function serializeMetadataValue(value) {
  * @param {IDBTransactionWithAtLeast<["Image", "Observation", "ImageFile"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
+ * @param {AbortSignal} [options.abortSignal] signal d'abandon pour annuler la requête
  */
 export async function storeMetadataValue({
 	subjectId,
@@ -81,12 +82,19 @@ export async function storeMetadataValue({
 	alternatives = [],
 	manuallyModified = false,
 	tx = undefined,
-	cascadedFrom = []
+	cascadedFrom = [],
+	abortSignal
 }) {
+	let aborted = false;
+	abortSignal?.addEventListener('abort', () => {
+		aborted = true;
+	});
+
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
 
+	if (aborted) throw new Error('Operation aborted');
 	const newValue = {
 		value: serializeMetadataValue(value),
 		confidence,
@@ -113,6 +121,7 @@ export async function storeMetadataValue({
 	if (type && metadata.type !== type)
 		throw new Error(`Type de métadonnée incorrect: ${metadata.type} !== ${type}`);
 
+	if (aborted) throw new Error('Operation aborted');
 	const image = tx
 		? await tx.objectStore('Image').get(subjectId)
 		: await tables.Image.raw.get(subjectId);
@@ -123,6 +132,7 @@ export async function storeMetadataValue({
 		tx ? tx.objectStore('Image').getAll() : idb.list('Image')
 	).then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
+	if (aborted) throw new Error('Operation aborted');
 	if (image) {
 		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
 		image.metadata[metadataId] = newValue;
@@ -151,12 +161,15 @@ export async function storeMetadataValue({
 				value,
 				confidence,
 				manuallyModified,
-				tx
+				tx,
+				abortSignal
 			});
 		}
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
+
+	if (aborted) throw new Error('Operation aborted');
 
 	// Execute cascades if any
 	const cascades = await idb
@@ -164,6 +177,8 @@ export async function storeMetadataValue({
 		.then((o) => o?.cascade ?? {});
 
 	for (const [cascadedMetadataId, cascadedValue] of Object.entries(cascades)) {
+		if (aborted) throw new Error('Operation aborted');
+
 		if (cascadedFrom.includes(cascadedMetadataId)) {
 			throw new Error(
 				`Boucle infinie de cascade détectée pour ${cascadedMetadataId} avec ${cascadedValue}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascadedMetadataId}`
@@ -173,6 +188,7 @@ export async function storeMetadataValue({
 		console.info(
 			`Cascading metadata ${metadataId} @ ${value} -> ${cascadedMetadataId}  = ${cascadedValue}`
 		);
+
 		await storeMetadataValue({
 			subjectId,
 			metadataId: ensureNamespacedMetadataId(cascadedMetadataId, namespaceOfMetadataId(metadataId)),
@@ -180,7 +196,8 @@ export async function storeMetadataValue({
 			confidence: 1, // TODO maybe improve that?
 			manuallyModified,
 			tx,
-			cascadedFrom: [...cascadedFrom, metadataId]
+			cascadedFrom: [...cascadedFrom, metadataId],
+			abortSignal
 		});
 	}
 }

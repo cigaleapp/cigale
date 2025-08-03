@@ -13,11 +13,17 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { importMore, inferBoundingBoxes } from './lib.svelte.js';
 
 	const { data } = $props();
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
+
+	/**
+	 * @type {Map<string, import("swarpc").CancelablePromise["cancel"]>}
+	 */
+	const cancellers = new SvelteMap();
 
 	const images = $derived(
 		toAreaObservationProps(fileIds, [], [], {
@@ -77,7 +83,7 @@
 						const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));
 						if (!file) return;
 						uiState.loadingImages.add(imageFileId);
-						await inferBoundingBoxes(data.swarpc, file);
+						await inferBoundingBoxes(data.swarpc, cancellers, file);
 					} catch (error) {
 						console.error(error);
 						uiState.erroredImages.set(imageFileId, errorMessage(error));
@@ -128,17 +134,17 @@
 			'.cr3'
 		]}
 		clickable={images.length === 0}
-		onfiles={async ({ files }) => await importMore(data.swarpc, files)}
+		onfiles={async ({ files }) => await importMore(data.swarpc, files, cancellers)}
 	>
 		<section class="observations" class:empty={!images.length}>
 			<AreaObservations
 				bind:selection={uiState.selection}
 				images={[
 					...images,
-					...uiState.processing.files.map((filename, i) => ({
+					...uiState.processing.files.map(({ name, id }, i) => ({
+						id,
 						image: '',
-						title: filename,
-						id: `loading_${i}`,
+						title: name,
 						index: images.length + i,
 						stacksize: 1,
 						loading: -1,
@@ -148,6 +154,11 @@
 				errors={uiState.erroredImages}
 				loadingText={m.analyzing()}
 				ondelete={async (id) => {
+					cancellers.get(id)?.('Cancelled by user');
+					uiState.processing.files.splice(
+						uiState.processing.files.findIndex((f) => f.id === id),
+						1
+					);
 					await deleteObservation(id);
 					await deleteImageFile(id);
 				}}
