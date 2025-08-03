@@ -1,6 +1,5 @@
 <script>
 	import { page } from '$app/state';
-	import { watch } from 'runed';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
@@ -12,16 +11,17 @@
 		storeMetadataValue
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
+	import { importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-	import { importMore } from './import/lib.svelte.js';
+	import { watch } from 'runed';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { cancellers } from '../+layout.svelte';
 
 	seo({ title: 'Importer' });
 
-	const { children, data } = $props();
+	const { children } = $props();
 
 	async function importImages() {
 		const filesInput = document.createElement('input');
@@ -33,7 +33,7 @@
 			if (!event.currentTarget.files) return;
 			const files = Array.from(event.currentTarget.files);
 			if (files.length === 0) return;
-			await importMore(data.swarpc, files);
+			await importMore(files);
 		});
 		filesInput.click();
 	}
@@ -81,11 +81,14 @@
 					(tx) => {
 						tx.objectStore('Observation').clear();
 						tx.objectStore('ImageFile').clear();
-						uiState.previewURLs = new SvelteMap();
+						uiState.previewURLs.clear();
 						tx.objectStore('Image').clear();
-						uiState.erroredImages = new SvelteMap();
-						uiState.loadingImages = new SvelteSet();
+						uiState.erroredImages.clear();
+						uiState.loadingImages.clear();
+						uiState.processing.files = [];
 						uiState.setSelection?.([]);
+						cancellers.forEach((cancel) => cancel('Cancelled by user'));
+						cancellers.clear();
 					}
 				);
 			}
@@ -104,10 +107,17 @@
 		}
 	});
 
-	const showSidePanel = $derived(
-		tables.Image.state.length + tables.Observation.state.length + uiState.processing.files.length >
-			0
-	);
+	// Start off with sidepanel hidden
+	// Open it forever on first selection, if on import tab
+	// Keep it open no matter what on other tabs
+	let showSidePanel = $state(false);
+	$effect(() => {
+		if (page.route.id === '/(app)/(sidepanel)/import') {
+			if (uiState.selection.length > 0) showSidePanel = true;
+		} else {
+			showSidePanel = true;
+		}
+	});
 
 	const selectedImages = $derived(
 		uiState.selection

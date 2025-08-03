@@ -2,6 +2,7 @@ import { uiState } from '$lib/state.svelte';
 import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
+import { ulid } from 'ulid';
 import { m } from './paraglide/messages';
 import { unique } from './utils';
 /**
@@ -27,29 +28,30 @@ const sampleImage = (id, fileId) => ({
 });
 
 /**
- * Retourne un id d'image sous la forme 000001_000001
- * @param {number|string} index
+ * Retourne un id d'image
+ * @example "01ARZ3NDEKTSV4RRFFQ69G5FAV_000001"
+ * @param {string} fileId
  * @param {number} subindex
  */
-export function imageId(index, subindex = 0) {
-	return `${imageFileId(index)}_${subindex.toString().padStart(6, '0')}`;
+export function imageId(fileId, subindex = 0) {
+	return `${fileId}_${subindex.toString().padStart(6, '0')}`;
 }
 
 /**
- * Retourne un id d'un ImageFile sous la forme 000001
- * @param {number|string} index
+ * Retourne un id d'un ImageFile
+ * @example "01ARZ3NDEKTSV4RRFFQ69G5FAV"
  */
-export function imageFileId(index) {
-	return Number.parseInt(index.toString(), 0).toString().padStart(6, '0');
+export function imageFileId() {
+	return ulid();
 }
 
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('imageId', () => {
-		expect(imageId(1)).toBe('000001_000000');
-		expect(imageId(1, 2)).toBe('000001_000002');
-		expect(imageId(1234567)).toBe('1234567_000000');
-		expect(imageId(1234567, 1234567)).toBe('1234567_1234567');
+		const id = imageFileId();
+		expect(imageId(id)).toBe(id + '_000000');
+		expect(imageId(id, 2)).toBe(id + '_000002');
+		expect(imageId(id, 1234567)).toBe(id + '_1234567');
 	});
 }
 
@@ -62,8 +64,10 @@ if (import.meta.vitest) {
 export function imageIdToFileId(id) {
 	if (id === undefined) return id;
 
-	if (!/^\d+_\d+$/.test(id)) {
-		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${id}`);
+	if (!/[0-9A-Z]{26}_\d+$/.test(id)) {
+		throw new Error(
+			`Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): ${id}`
+		);
 	}
 	// @ts-expect-error
 	return id?.replace(/(_\d+)+$/, '');
@@ -72,11 +76,10 @@ export function imageIdToFileId(id) {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('imageIdToFileId', () => {
-		expect(imageIdToFileId('000001_000000')).toBe('000001');
-		expect(imageIdToFileId('1234567_1234567')).toBe('1234567');
-		expect(() => imageIdToFileId('1234567_1234567_1234567')).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): 1234567_1234567_1234567]`
-		);
+		const id = imageFileId();
+		expect(imageIdToFileId(`${id}_000000`)).toBe(id);
+		expect(imageIdToFileId(`${id}_1234567`)).toBe(id);
+		expect(() => imageIdToFileId(`${id}_${id}_123456`)).toThrowErrorMatchingInlineSnapshot();
 		expect(imageIdToFileId(undefined)).toBeUndefined();
 	});
 }

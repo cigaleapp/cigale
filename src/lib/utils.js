@@ -185,7 +185,7 @@ if (import.meta.vitest) {
 export function xor(...args) {
 	if (args.length === 0) return false;
 	const [first, ...rest] = args;
-	return xor(...rest) !== first;
+	return xor(...rest) !== Boolean(first);
 }
 
 if (import.meta.vitest) {
@@ -676,5 +676,18 @@ export function insideBoundingClientRect({ offsetX, offsetY }, rect, leeway = 0)
 		offsetX <= rect.width + leeway &&
 		offsetY >= -leeway &&
 		offsetY <= rect.height + leeway
+	);
+}
+
+/**
+ *
+ * @param {string} contentType
+ * @returns {contentType is 'application/zip' | 'application/x-zip-compressed' | 'application/x-zip' }
+ */
+export function isZip(contentType) {
+	return (
+		contentType === 'application/zip' ||
+		contentType === 'application/x-zip-compressed' ||
+		contentType === 'application/x-zip'
 	);
 }

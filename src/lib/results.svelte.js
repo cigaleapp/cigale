@@ -369,9 +369,10 @@ function protocolMetadataValues(protocol, values) {
 /**
  * Import back a results zip file.
  * @param {File} file
+ * @param {string} id
  * @param {string} [protocolId] make sure that the protocolId is the same as the one used to export the zip file
  */
-export async function importResultsZip(file, protocolId) {
+export async function importResultsZip(file, id, protocolId) {
 	const contents = new Uint8Array(await file.arrayBuffer());
 
 	const results = unzipSync(contents, {
@@ -381,7 +382,7 @@ export async function importResultsZip(file, protocolId) {
 	});
 
 	if (Object.keys(results).length === 0) {
-		uiState.processing.files.pop();
+		uiState.processing.removeFile(id);
 		toasts.error(`Aucun fichier d'analyse trouvé dans l'export ${file.name}`);
 		return;
 	}
@@ -392,13 +393,13 @@ export async function importResultsZip(file, protocolId) {
 		.map((obj) => (obj ? Analysis(obj) : undefined));
 
 	if (analysis === undefined) {
-		uiState.processing.files.pop();
+		uiState.processing.removeFile(id);
 		toasts.error(`Le fichier d'analyse de ${file.name} n'est pas au format JSON ou est corrompu`);
 		return;
 	}
 
 	if (analysis instanceof ArkErrors) {
-		uiState.processing.files.pop();
+		uiState.processing.removeFile(id);
 		toasts.error(`Fichier d'analyse de ${file.name} invalide: ${analysis.summary}`);
 		return;
 	}
@@ -406,30 +407,28 @@ export async function importResultsZip(file, protocolId) {
 	const { protocol, observations } = analysis;
 
 	if (protocolId && protocol.id !== protocolId) {
-		uiState.processing.files.pop();
+		uiState.processing.removeFile(id);
 		toasts.error(
 			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${protocol.id}, mais le protocole actuel est ${protocolId}`
 		);
 		return;
 	}
 
-	uiState.processing.files = [
-		...uiState.processing.files,
-		...Object.values(observations).flatMap((o) => o.images.map((i) => i.filename))
-	];
+	const files = Object.values(observations)
+		.flatMap((o) => o.images)
+		.map((i) => ({ id: i.id, name: i.filename }));
+
+	uiState.processing.files.push(...files);
 
 	const extractedImages = unzipSync(contents, {
-		filter: ({ name }) =>
-			Object.values(observations).some((o) => o.images.some((i) => i.exportedAs.original === name))
+		filter: ({ name }) => files.some((f) => f.name === name)
 	});
 
 	if (Object.keys(extractedImages).length === 0) {
+		uiState.processing.removeFile(id);
+		// Remove our files from the processing queue
 		uiState.processing.files = uiState.processing.files.filter(
-			(f) =>
-				f !== file.name &&
-				!Object.values(observations)
-					.flatMap((o) => o.images.map((i) => i.filename))
-					.includes(f)
+			(f) => !files.find((file) => file.id === f.id)
 		);
 		toasts.error(
 			`Aucune image trouvée dans l'export ${file.name}. L'export doit contenir les images originales, pas seulement les images recadrées`
@@ -443,13 +442,13 @@ export async function importResultsZip(file, protocolId) {
 			.find((o) => o.images.some((i) => i.exportedAs.original === name));
 
 		if (!observation) {
-			uiState.processing.files = uiState.processing.files.filter((f) => f !== name);
+			uiState.processing.files = uiState.processing.files.filter((f) => f.name !== name);
 			continue;
 		}
 
 		const image = observation.images.find((i) => i.exportedAs.original === name);
 		if (!image) {
-			uiState.processing.files = uiState.processing.files.filter((f) => f !== name);
+			uiState.processing.files = uiState.processing.files.filter((f) => f.name !== name);
 			continue;
 		}
 
@@ -500,5 +499,5 @@ export async function importResultsZip(file, protocolId) {
 		});
 	}
 
-	uiState.processing.files.shift();
+	uiState.processing.removeFile(id);
 }

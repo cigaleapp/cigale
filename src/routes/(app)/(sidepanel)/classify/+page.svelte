@@ -229,8 +229,6 @@
 		analyzingAllImages = false;
 	}
 
-	$inspect('cancellers', classificationCancellers);
-
 	$effect(() => {
 		if (!uiState.classificationInferenceAvailable) return;
 		if (!classifmodelLoaded) return;

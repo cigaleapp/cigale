@@ -9,6 +9,7 @@ import { imagesByImageFile } from './images';
  * @property {string[]} [subimages]
  * @property {string} title
  * @property {string} id
+ * @property {boolean} [virtual=false] whether the observation/image is virtual, ie not stored in the database yet. This causes us to append a `_virtual` suffix to the {#each} block's key, without changing the ID itself. Needed because we have a brief moment where both the in-DB newly created image exists _and_ the virtual one hasn't been removed yet. Not differentiating the key results in a Svelte error (duplicate key in {#each} block)
  * @property {number} index
  * @property {number} stacksize
  * @property {number|undefined} [loading]

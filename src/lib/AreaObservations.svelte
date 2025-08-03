@@ -95,6 +95,17 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	});
 
+	/**
+	 * Virtualizes the key for the {#each} block, if needed. See doc for the `virtual` property on `images` prop's type
+	 * @param {object} param0
+	 * @param {string} param0.id
+	 * @param {boolean} [param0.virtual=false] whether the image is virtual (not yet stored in the database)
+	 */
+	function virtualizeKey({ id, virtual = false }) {
+		if (!virtual) return id;
+		return `${id}_virtual`;
+	}
+
 	$effect(() => {
 		const scrollTo = imagesContainer?.querySelector(`[data-id="${highlight}"]`);
 		if (!scrollTo) return;
@@ -122,7 +133,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each images as props, i (props.id)}
+	{#each images as props, i (virtualizeKey(props))}
 		<CardObservation
 			data-testid={i === 0 ? 'first-observation-card' : undefined}
 			data-id={props.id}

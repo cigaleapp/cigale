@@ -2,28 +2,21 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import Dropzone from '$lib/Dropzone.svelte';
-	import { errorMessage } from '$lib/i18n.js';
-	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import { deleteImageFile, imageFileIds, imageIdToFileId, imageIsAnalyzed } from '$lib/images';
+	import { deleteImageFile, imageFileIds, imageIsAnalyzed } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
-	import { SvelteMap } from 'svelte/reactivity';
-	import { importMore, inferBoundingBoxes } from './lib.svelte.js';
+	import { cancellers } from '$lib/../routes/(app)/+layout.svelte';
 
 	const { data } = $props();
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
-
-	/**
-	 * @type {Map<string, import("swarpc").CancelablePromise["cancel"]>}
-	 */
-	const cancellers = new SvelteMap();
 
 	const images = $derived(
 		toAreaObservationProps(fileIds, [], [], {
@@ -37,6 +30,28 @@
 				)
 		})
 	);
+
+	const allImages = $derived(
+		[
+			...images,
+			...uiState.processing.files.map(({ name, id }) => ({
+				id,
+				virtual: true,
+				image: '',
+				title: name,
+				stacksize: 1,
+				loading: -1,
+				boundingBoxes: []
+			}))
+		]
+			.toSorted((a, b) => a.id.localeCompare(b.id))
+			.map((props, i) => ({
+				...props,
+				index: i
+			}))
+	);
+
+	const empty = $derived(allImages.length === 0);
 
 	let modelLoadingProgress = $state(0);
 	let cropperModelLoaded = $state(false);
@@ -70,34 +85,30 @@
 		cropperModelLoaded = true;
 	}
 
-	$effect(() => {
-		if (!cropperModelLoaded) return;
-		if (!uiState.currentProtocol) return;
-		for (const imageFileId of fileIds) {
-			if (
-				!imageIsAnalyzed(uiState.currentProtocol, imageFileId) &&
-				!uiState.loadingImages.has(imageFileId)
-			) {
-				void (async () => {
-					try {
-						const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));
-						if (!file) return;
-						uiState.loadingImages.add(imageFileId);
-						await inferBoundingBoxes(data.swarpc, cancellers, file);
-					} catch (error) {
-						console.error(error);
-						uiState.erroredImages.set(imageFileId, errorMessage(error));
-					} finally {
-						uiState.loadingImages.delete(imageFileId);
-					}
-				})();
-			}
-		}
-	});
-
-	$effect(() => {
-		uiState.processing.done = uiState.processing.total - uiState.processing.files.length;
-	});
+	// $effect(() => {
+	// 	if (!cropperModelLoaded) return;
+	// 	if (!uiState.currentProtocol) return;
+	// 	for (const imageFileId of fileIds) {
+	// 		if (
+	// 			!imageIsAnalyzed(uiState.currentProtocol, imageFileId) &&
+	// 			!uiState.loadingImages.has(imageFileId)
+	// 		) {
+	// 			void (async () => {
+	// 				try {
+	// 					const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));
+	// 					if (!file) return;
+	// 					uiState.loadingImages.add(imageFileId);
+	// 					await inferBoundingBoxes(data.swarpc, cancellers, file);
+	// 				} catch (error) {
+	// 					console.error(error);
+	// 					uiState.erroredImages.set(imageFileId, errorMessage(error));
+	// 				} finally {
+	// 					uiState.loadingImages.delete(imageFileId);
+	// 				}
+	// 			})();
+	// 		}
+	// 	}
+	// });
 </script>
 
 {#snippet modelsource()}
@@ -134,36 +145,22 @@
 			'.cr3'
 		]}
 		clickable={images.length === 0}
-		onfiles={async ({ files }) => await importMore(data.swarpc, files, cancellers)}
+		onfiles={async ({ files }) => await importMore(files)}
 	>
-		<section class="observations" class:empty={!images.length}>
+		<section class="observations" class:empty>
 			<AreaObservations
 				bind:selection={uiState.selection}
-				images={[
-					...images,
-					...uiState.processing.files.map(({ name, id }, i) => ({
-						id,
-						image: '',
-						title: name,
-						index: images.length + i,
-						stacksize: 1,
-						loading: -1,
-						boundingBoxes: []
-					}))
-				]}
+				images={allImages}
 				errors={uiState.erroredImages}
 				loadingText={m.analyzing()}
 				ondelete={async (id) => {
 					cancellers.get(id)?.('Cancelled by user');
-					uiState.processing.files.splice(
-						uiState.processing.files.findIndex((f) => f.id === id),
-						1
-					);
+					uiState.processing.removeFile(id);
 					await deleteObservation(id);
 					await deleteImageFile(id);
 				}}
 			/>
-			{#if !images.length}
+			{#if empty}
 				<div class="empty-state">
 					<Logo variant="empty" />
 					<p>{m.click_or_drop_images_or_export()}</p>

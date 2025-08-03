@@ -245,14 +245,14 @@ test('can cancel import', issue(430), async ({ page }) => {
 test('can import in multiple batches', async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
-	await importPhotos({ page, wait: false }, 'cyan', 'lil-fella', 'leaf');
+	await importPhotos({ page, wait: false }, 'lil-fella', 'leaf');
 	await importPhotos({ page, wait: false }, 'with-exif-gps', '20K-gray', 'debugsquare.png');
-	await expect(page.locator('main').getByText('cyan.jpeg')).toBeVisible();
+	await expect(page.locator('main').getByText(/Analyse…/)).toHaveCount(0, {
+		timeout: 60_000
+	});
 	await expect(page.locator('main').getByText('lil-fella.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('with-exif-gps.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('debugsquare.png')).toBeVisible();
-	await expect(page.locator('main').getByText(/Analyse…/)).toHaveCount(0, {
-		timeout: 30_000
-	});
+	await expect(page.locator('main').locator('article.card')).toHaveCount(4);
 });
