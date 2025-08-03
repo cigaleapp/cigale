@@ -1,0 +1,122 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer":
+      - /url: "#/crop/"
+    - img
+    - link "Classifier":
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "baad62c":
+        - /url: https://github.com/cigaleapp/cigale/tree/baad62c88e4ac042b3ad395a5c871de5dc4fdc60
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- main:
+  - form:
+    - article:
+      - img "cyan.jpeg"
+      - img
+      - heading "cyan.jpeg" [level=2]
+    - article:
+      - img "leaf.jpeg"
+      - img
+      - heading "leaf.jpeg" [level=2]
+- complementary:
+  - img "Image 1 de la sélection"
+  - heading "cyan.jpeg" [level=2]:
+    - img
+    - text: cyan.jpeg
+  - text: Espèce
+  - combobox: Bourletiella hortensis
+  - code: 21%
+  - button:
+    - img
+  - text: Alternatives
+  - list:
+    - listitem:
+      - text: Allacma fusca
+      - code: 18%
+      - button:
+        - img
+    - listitem:
+      - text: Sminthurus viridis
+      - code: 18%
+      - button:
+        - img
+  - text: Genre
+  - combobox: Bourletiella
+  - button:
+    - img
+  - text: Famille
+  - combobox: Bourletiellidae
+  - button:
+    - img
+  - text: Ordre
+  - combobox: Symphypleona
+  - button:
+    - img
+  - text: Date
+  - textbox "Date"
+  - button [disabled]:
+    - img
+  - paragraph: Moment où la photo a été prise
+  - text: Localisation
+  - textbox "Localisation"
+  - button [disabled]:
+    - img
+  - paragraph: Endroit où la photo a été prise
+  - text: Classe
+  - combobox: Collembola
+  - button:
+    - img
+  - text: Phylum
+  - combobox: Arthropoda
+  - button:
+    - img
+  - text: Règne
+  - combobox: Animalia
+  - button:
+    - img
+  - button "Importer d'autres images":
+    - img
+    - text: Importer d'autres images
+  - button "Supprimer 1 images Suppr":
+    - img
+    - text: Supprimer 1 images Suppr
+- text: Importer · Cigale
+```

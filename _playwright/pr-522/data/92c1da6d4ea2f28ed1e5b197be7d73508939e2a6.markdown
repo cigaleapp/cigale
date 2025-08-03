@@ -1,0 +1,78 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer" [disabled]:
+      - /url: "#/crop/"
+    - img
+    - link "Classifier" [disabled]:
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "baad62c":
+        - /url: https://github.com/cigaleapp/cigale/tree/baad62c88e4ac042b3ad395a5c871de5dc4fdc60
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- article:
+  - img
+  - paragraph: Modèle de détection chargé
+  - button:
+    - img
+- main:
+  - form:
+    - article:
+      - img
+      - text: Analyse…
+      - button "Supprimer":
+        - img
+        - text: Supprimer
+      - img
+      - img
+      - heading "correct.zip" [level=2]
+    - img
+    - paragraph: Cliquer ou déposer des images, ou un export de résultats (.zip)
+    - button "Choose File"
+- complementary:
+  - img
+  - paragraph: Chargement des options…
+  - button "Importer d'autres images":
+    - img
+    - text: Importer d'autres images
+  - button "Supprimer 0 images Suppr" [disabled]:
+    - img
+    - text: Supprimer 0 images Suppr
+- text: Importer · Cigale
+```
