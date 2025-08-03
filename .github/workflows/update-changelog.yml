@@ -32,9 +32,8 @@ jobs:
           node scripts/user-facing-changelog.js 2025-05-03
 
       - name: Commit and push changes
-        uses: EndBug/add-and-commit@v7
+        uses: peter-evans/create-pull-request@v7
         with:
-          author_name: github-actions
-          author_email: github-actions@users.noreply.github.com
-          message: '📝 Update changelog'
-          add: 'CHANGELOG.md'
+          branch: update-changelog
+          title: '📝 Update CHANGELOG.md'
+          commit-message: '📝 Update CHANGELOG.md'
