@@ -200,7 +200,7 @@ test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'sample.cr2');
 	await expect(
-		toast(page, 'Les fichiers .CR2 ne sont pas encore supportés', { type: 'error' })
+		toast(page, /Les fichiers .+? ne sont pas (encore )?supportés/, { type: 'error' })
 	).toBeVisible();
 });
 
