@@ -216,7 +216,7 @@ export async function resizeToMaxSize({ source }) {
 		throw new Error(
 			ALWAYS_SUPPORTED_TYPES.includes(source.type)
 				? errorMessage(error)
-				: source.type === 'image/CR2'
+				: ['image/CR2', 'image/x-canon-cr2']
 					? m.file_format_not_supported_yet({ format: '.CR2' })
 					: m.file_format_not_supported({ format: humanFormatName(source.type) })
 		);
