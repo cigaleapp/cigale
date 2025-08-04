@@ -19,6 +19,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { DragSelect } from './dragselect.svelte';
 	import { defineKeyboardShortcuts } from './keyboard.svelte';
 	import { mutationobserver } from './mutations';
+	import { getSettings } from './settings.svelte';
+	import { m } from './paraglide/messages';
 
 	/**
 	 * @typedef Props
@@ -143,22 +145,49 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			onclick={oncardclick ? () => oncardclick(props.id) : undefined}
 			ondelete={ondelete ? () => ondelete(props.id) : undefined}
 			errored={errors?.has(props.id)}
-			statusText={errors?.get(props.id) ?? loadingText}
+			statusText={errors?.get(props.id) ?? (props.loading === -Infinity ? m.queued() : loadingText)}
 			highlighted={props.id === highlight}
 			selected={selection.includes(props.id.toString())}
 			boundingBoxes={props.boundingBoxes}
 			applyBoundingBoxes={props.applyBoundingBoxes}
-			{loadingText}
 		/>
 	{/each}
+
+	{#if getSettings().showTechnicalMetadata}
+		<div class="debug">
+			{#snippet displayIter(set)}
+				{'{'}
+				{[...$state.snapshot(set)]
+					.map((item) => (item.length > 10 ? '…' : '') + item.slice(-10))
+					.join(' ')}
+				}
+			{/snippet}
+			<code>
+				queued {@render displayIter(uiState.queuedImages)} <br />
+				loading {@render displayIter(uiState.loadingImages)} <br />
+				errored {@render displayIter(uiState.erroredImages.keys())} <br />
+				preview urls {@render displayIter(uiState.previewURLs.keys())} <br />
+			</code>
+		</div>
+	{/if}
 </section>
 
 <style>
+	section {
+		gap: 1.5em 1em;
+	}
+
 	section.images {
 		display: flex;
 		flex-wrap: wrap;
 		align-content: flex-start;
 		justify-content: space-around;
-		gap: 1.5em 1em;
+	}
+
+	.debug {
+		min-width: 20ch;
+		width: 100%;
+		flex-grow: 1;
+		margin-top: 2rem;
 	}
 </style>

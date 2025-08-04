@@ -65,9 +65,9 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
  * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} request
  * @param {boolean} webgpu
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [onProgress] called everytime the progress changes
- * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
+ * @returns {Promise<import('onnxruntime-web').InferenceSession > }
  */
-export async function loadModel(request, onProgress, webgpu = false) {
+export async function loadModel(request, webgpu = false, onProgress) {
 	// load un modèle ONNX, soit de classification, soit de détection.
 
 	onProgress ??= () => {};
@@ -79,9 +79,12 @@ export async function loadModel(request, onProgress, webgpu = false) {
 		.then((response) => response.arrayBuffer())
 		.then((buffer) => new Uint8Array(buffer));
 
-	return ort.InferenceSession.create(model, {
+	const session = ort.InferenceSession.create(model, {
 		executionProviders: webgpu ? ['webgpu'] : []
 	});
+
+	if (!session) throw new Error('Impossible de charger le modèle ONNX');
+	return session;
 }
 /**
  *

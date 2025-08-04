@@ -33,7 +33,7 @@
 			if (!event.currentTarget.files) return;
 			const files = Array.from(event.currentTarget.files);
 			if (files.length === 0) return;
-			await importMore(files);
+			importMore(files);
 		});
 		filesInput.click();
 	}
@@ -83,6 +83,7 @@
 						tx.objectStore('ImageFile').clear();
 						uiState.previewURLs.clear();
 						tx.objectStore('Image').clear();
+						uiState.queuedImages.clear();
 						uiState.erroredImages.clear();
 						uiState.loadingImages.clear();
 						uiState.processing.files = [];
@@ -107,17 +108,10 @@
 		}
 	});
 
-	// Start off with sidepanel hidden
-	// Open it forever on first selection, if on import tab
-	// Keep it open no matter what on other tabs
-	let showSidePanel = $state(false);
-	$effect(() => {
-		if (page.route.id === '/(app)/(sidepanel)/import') {
-			if (uiState.selection.length > 0) showSidePanel = true;
-		} else {
-			showSidePanel = true;
-		}
-	});
+	let showSidePanel = $derived(
+		uiState.processing.files.length + tables.Observation.state.length + tables.Image.state.length >
+			0
+	);
 
 	const selectedImages = $derived(
 		uiState.selection
@@ -159,7 +153,11 @@
 
 	watch([() => selectedImages, () => selectedObservations], () => {
 		// FIXME needed to force refresh when selectedObservations' metadataOverrides change values, this isn't picked up by Svelte for some reason. I tried reproducing but couldn't yet, see https://svelte.dev/playground/eef37e409ca04fa888badd3e7588f461?version=5.25.0
-		void mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations)
+		void mergeMetadataFromImagesAndObservations(
+			db.databaseHandle(),
+			selectedImages,
+			selectedObservations
+		)
 			.then((values) => {
 				mergedMetadataValues = values;
 			})
@@ -184,9 +182,15 @@
 				if (!uiState.currentProtocol) return;
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
-						await deleteMetadataValue({ subjectId, metadataId: id, recursive: true });
+						await deleteMetadataValue({
+							db: db.databaseHandle(),
+							subjectId,
+							metadataId: id,
+							recursive: true
+						});
 					} else {
 						await storeMetadataValue({
+							db: db.databaseHandle(),
 							subjectId,
 							metadataId: id,
 							confidence: 1,
@@ -196,7 +200,11 @@
 					}
 				}
 
-				await mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations)
+				await mergeMetadataFromImagesAndObservations(
+					db.databaseHandle(),
+					selectedImages,
+					selectedObservations
+				)
 					.then((values) => {
 						mergedMetadataValues = values;
 					})

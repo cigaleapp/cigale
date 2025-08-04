@@ -8,11 +8,10 @@
 	import { deleteObservation } from '$lib/observations';
 	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { importMore } from '$lib/queue.svelte.js';
+	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
-	import { cancellers } from '$lib/../routes/(app)/+layout.svelte';
 
 	const { data } = $props();
 
@@ -20,6 +19,7 @@
 
 	const images = $derived(
 		toAreaObservationProps(fileIds, [], [], {
+			isQueued: (fileId) => typeof fileId === 'string' && uiState.queuedImages.has(fileId),
 			isLoaded: (fileId) =>
 				!uiState.cropInferenceAvailable ||
 				Boolean(
@@ -40,7 +40,7 @@
 				image: '',
 				title: name,
 				stacksize: 1,
-				loading: -1,
+				loading: uiState.loadingImages.has(id) ? +Infinity : -Infinity,
 				boundingBoxes: []
 			}))
 		]
@@ -70,8 +70,8 @@
 					request: cropModel,
 					task: 'detection'
 				},
-				({ transferred, total }) => {
-					modelLoadingProgress = transferred / total;
+				(progress) => {
+					modelLoadingProgress = progress;
 				}
 			)
 			.then(() => {
@@ -84,31 +84,6 @@
 
 		cropperModelLoaded = true;
 	}
-
-	// $effect(() => {
-	// 	if (!cropperModelLoaded) return;
-	// 	if (!uiState.currentProtocol) return;
-	// 	for (const imageFileId of fileIds) {
-	// 		if (
-	// 			!imageIsAnalyzed(uiState.currentProtocol, imageFileId) &&
-	// 			!uiState.loadingImages.has(imageFileId)
-	// 		) {
-	// 			void (async () => {
-	// 				try {
-	// 					const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));
-	// 					if (!file) return;
-	// 					uiState.loadingImages.add(imageFileId);
-	// 					await inferBoundingBoxes(data.swarpc, cancellers, file);
-	// 				} catch (error) {
-	// 					console.error(error);
-	// 					uiState.erroredImages.set(imageFileId, errorMessage(error));
-	// 				} finally {
-	// 					uiState.loadingImages.delete(imageFileId);
-	// 				}
-	// 			})();
-	// 		}
-	// 	}
-	// });
 </script>
 
 {#snippet modelsource()}
@@ -145,7 +120,7 @@
 			'.cr3'
 		]}
 		clickable={images.length === 0}
-		onfiles={async ({ files }) => await importMore(files)}
+		onfiles={({ files }) => importMore(files)}
 	>
 		<section class="observations" class:empty>
 			<AreaObservations
@@ -154,7 +129,7 @@
 				errors={uiState.erroredImages}
 				loadingText={m.analyzing()}
 				ondelete={async (id) => {
-					cancellers.get(id)?.('Cancelled by user');
+					cancelTask(id, 'Cancelled by user');
 					uiState.processing.removeFile(id);
 					await deleteObservation(id);
 					await deleteImageFile(id);
@@ -168,18 +143,6 @@
 			{/if}
 		</section>
 	</Dropzone>
-	{#if getSettings().showTechnicalMetadata}
-		<section class="debug">
-			{#snippet displayIter(set)}
-				{'{'} {[...$state.snapshot(set)].join(' ')} }
-			{/snippet}
-			<code>
-				loading {@render displayIter(uiState.loadingImages)} <br />
-				errored {@render displayIter(uiState.erroredImages.keys())} <br />
-				preview urls {@render displayIter(uiState.previewURLs.keys())} <br />
-			</code>
-		</section>
-	{/if}
 {:catch error}
 	<section class="loading errored">
 		<Logo variant="error" />

@@ -64,6 +64,7 @@ export async function processExifData(protocolId, imageFileId, imageBytes, file)
 	for (const { id: subjectId } of images) {
 		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
 			await storeMetadataValue({
+				db: db.databaseHandle(),
 				subjectId,
 				metadataId: ensureNamespacedMetadataId(key, protocolId),
 				value,

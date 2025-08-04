@@ -1,42 +1,57 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
+	import { classificationInferenceSettings } from '$lib/classification.svelte.js';
+	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
-	import { SvelteMap } from 'svelte/reactivity';
 	import {
 		deleteImageFile,
 		imageBufferWasSaved,
 		imageIdToFileId,
-		imageIsClassified
+		imageIsClassified,
+		isValidImageId
 	} from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
-	import { storeMetadataValue } from '$lib/metadata.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
+	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
+	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
+	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { fetchHttpRequest } from '$lib/utils';
-	import { match, type } from 'arktype';
 	import { onMount } from 'svelte';
-	import { m } from '$lib/paraglide/messages.js';
 
 	seo({ title: m.classification() });
 
 	const { data } = $props();
 
-	const erroredImages = $derived(uiState.erroredImages);
+	const errors = $derived.by(() => {
+		/** @type {typeof uiState.erroredImages} */
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
+		const errors = new Map();
+		for (const [imageId, error] of uiState.erroredImages.entries()) {
+			errors.set(imageId, error);
+			for (const obs of tables.Observation.state) {
+				if (obs.images.includes(imageId)) errors.set(obs.id, error);
+			}
+		}
+		return errors;
+	});
 
 	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
 	const images = $derived(
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
+			isQueued: (item) =>
+				typeof item === 'string'
+					? uiState.queuedImages.has(item)
+					: uiState.queuedImages.has(item.id),
 			isLoaded: (item) =>
 				uiState.classificationInferenceAvailable
 					? typeof item === 'string'
 						? false
-						: uiState.hasPreviewURL(item.fileId) && imageIsClassified(item)
+						: uiState.hasPreviewURL(item.fileId) && !uiState.loadingImages.has(item.id)
 					: true
 		})
 	);
@@ -44,12 +59,9 @@
 	/** loaded and total bytes counts, set and updated by loadModel() */
 	let modelLoadingProgress = $state(0);
 
-	/** @type {Map<string, import("swarpc").CancelablePromise["cancel"]>} */
-	let classificationCancellers = new SvelteMap();
-
 	let classifmodelLoaded = $state(false);
-	let classifModelLoadingError = $state(null);
-	let classmapping = $state([]);
+	/** @type {Error|undefined}*/
+	let classifModelLoadingError = $state();
 	async function loadClassifModel() {
 		// If the model is already loaded, we don't need to load it again
 		if (classifmodelLoaded) return;
@@ -70,25 +82,16 @@
 			return;
 		}
 
-		classmapping = await fetchHttpRequest(settings.classmapping, {
-			cacheAs: 'model',
-			onProgress({ transferred, total }) {
-				if (total === 0) return;
-				modelLoadingProgress = 0.25 * (transferred / total);
-			}
-		})
-			.then((res) => res.text())
-			.then((text) => text.split(/\r?\n/).filter(Boolean));
-
 		await data.swarpc
 			.loadModel(
 				{
 					protocolId: uiState.currentProtocol.id,
 					request: settings.model,
+					classmapping: settings.classmapping,
 					task: 'classification'
 				},
 				(progress) => {
-					modelLoadingProgress = 0.25 + 0.75 * (progress.transferred / progress.total);
+					modelLoadingProgress = progress;
 				}
 			)
 			.then(() => {
@@ -101,149 +104,25 @@
 			});
 	}
 
-	/**
-	 * @type {Map<string, AbortController>}
-	 */
-	const abortControllers = new SvelteMap();
-
-	/**
-	 * @param {string} id
-	 */
-	function abortAnalysis(id) {
-		console.log('Aborting analysis for image', id);
-		abortControllers.get(id)?.abort();
-		classificationCancellers.get(id)?.('Cancelled by user');
-		classificationCancellers.delete(id);
-	}
-
-	/**
-	 * @param {string} id
-	 * @param {object} image
-	 * @param {string} image.filename
-	 * @param {import('$lib/database').MetadataValues} image.metadata
-	 */
-	async function analyzeImage(id, { filename, metadata }) {
-		if (!uiState.currentProtocol) {
-			throw new Error(m.no_protocol_selected());
-		}
-
-		if (!uiState.classificationMetadataId) {
-			console.warn(
-				'No metadata with neural inference defined, not analyzing image. Configure neural inference on a enum metadata (set metadata.<your metadata id>.infer.neural) if this was not intentional.'
-			);
-			return;
-		}
-
-		console.log('Analyzing image', id, filename);
-
-		const classification = data.swarpc.classify.cancelable({
-			fileId: imageIdToFileId(id),
-			taskSettings: classificationInferenceSettings(
-				uiState.currentProtocol,
-				uiState.selectedClassificationModel
-			),
-			cropbox: $state.snapshot(
-				/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */
-				(metadata[uiState.cropMetadataId]?.value) ?? { x: 0.5, y: 0.5, w: 1, h: 1 }
-			)
-		});
-
-		classificationCancellers.set(id, classification.cancel);
-
-		const results = (await classification.request).scores
-			.map((score, i) => ({
-				confidence: score,
-				value: classmapping[i]
-			}))
-			.sort((a, b) => b.confidence - a.confidence)
-			.slice(0, 3)
-			.filter(({ confidence }) => confidence > 0.005);
-
-		if (!results.length) {
-			throw new Error('No species detected');
-		} else {
-			const [firstChoice, ...alternatives] = results;
-			if (!uiState.currentProtocol) return;
-			const metadataValue = /** @type {const} */ ({
-				subjectId: id,
-				...firstChoice,
-				alternatives
-			});
-
-			await storeMetadataValue({
-				...metadataValue,
-				metadataId: uiState.classificationMetadataId,
-				abortSignal: abortControllers.get(id)?.signal
-			});
-		}
-	}
-
-	/**
-	 *
-	 * @param {import('$lib/database.js').Protocol} protocol
-	 * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
-	 */
-	function classificationInferenceSettings(protocol, modelIndex) {
-		const matcher = match
-			.case(
-				{
-					id: type.string.narrow((id) => protocol.metadata.includes(id)),
-					type: '"enum"',
-					infer: MetadataInferOptionsNeural
-				},
-				(m) => m.infer.neural[modelIndex]
-			)
-			.default(() => undefined);
-
-		return tables.Metadata.state
-			.map((m) => matcher(m))
-			.filter(Boolean)
-			.at(0);
-	}
-
-	let analyzingAllImages = $state(false);
-
-	async function analyzeAllImages() {
-		if (analyzingAllImages) return;
-		analyzingAllImages = true;
-		console.log('analyzeAllImages', tables.Image.state.length);
-		for (const image of tables.Image.state) {
-			if (
-				imageBufferWasSaved(image) &&
-				!imageIsClassified(image) &&
-				!uiState.loadingImages.has(image.id)
-			) {
-				uiState.loadingImages.add(image.id);
-
-				await analyzeImage(image.id, image)
-					.catch((error) => {
-						console.error(error);
-						erroredImages.set(image.id, error?.toString() ?? 'Erreur inattendue');
-					})
-					.finally(() => {
-						uiState.loadingImages.delete(image.id);
-					});
-			}
-		}
-
-		analyzingAllImages = false;
-	}
-
 	$effect(() => {
 		if (!uiState.classificationInferenceAvailable) return;
 		if (!classifmodelLoaded) return;
 		if (classifModelLoadingError) return;
-		if (
-			tables.Image.state.every((img) => imageIsClassified(img) || uiState.erroredImages.has(img.id))
-		)
-			return;
-		void analyzeAllImages();
+
+		const toClassify = tables.Image.state.filter(
+			(image) =>
+				imageBufferWasSaved(image) &&
+				!imageIsClassified(image) &&
+				!uiState.loadingImages.has(image.id)
+		);
+
+		classifyMore(toClassify.map((i) => i.id));
 	});
 
 	onMount(() => {
 		void loadClassifModel()
 			.catch((error) => {
-				classifModelLoadingError = error?.toString() ?? 'Erreur inattendue';
+				classifModelLoadingError = error;
 			})
 			.finally(() => {
 				classifmodelLoaded = true;
@@ -253,15 +132,6 @@
 	$effect(() => {
 		if (!uiState.setSelection) return;
 		void ensureNoLoneImages();
-	});
-
-	$effect(() => {
-		if (!uiState.classificationMetadataId) return;
-		if (!uiState.classificationInferenceAvailable) return;
-		uiState.processing.total = tables.Image.state.length;
-		uiState.processing.done = tables.Image.state.filter(
-			(img) => img.metadata[uiState.classificationMetadataId ?? '']
-		).length;
 	});
 </script>
 
@@ -289,13 +159,13 @@
 		<AreaObservations
 			bind:selection={uiState.selection}
 			{images}
-			errors={erroredImages}
+			{errors}
 			loadingText={m.analyzing()}
 			ondelete={async (id) => {
-				console.log('Deleting image', id);
-				abortAnalysis(id);
-				await deleteObservation(id);
-				await deleteImageFile(id);
+				const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
+				imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
+				if (isValidImageId(id)) await deleteImageFile(imageIdToFileId(id));
+				await deleteObservation(id, { notFoundOk: true, recursive: true });
 			}}
 		/>
 		{#if !images.length}
@@ -308,7 +178,10 @@
 		<h2>Oops!</h2>
 		<p>{m.cannot_load_classification_model()}</p>
 		<p class="source">{@render modelsource()}</p>
-		<p class="message">{classifModelLoadingError}</p>
+		<p class="message">{errorMessage(classifModelLoadingError)}</p>
+		{#if getSettings().showTechnicalMetadata}
+			<pre class="trace">{classifModelLoadingError?.stack}</pre>
+		{/if}
 	</section>
 {/if}
 
@@ -355,5 +228,11 @@
 
 	.loading.errored *:not(p.message) {
 		color: var(--fg-error);
+	}
+
+	.loading.errored .trace {
+		max-width: 80%;
+		overflow-x: auto;
+		font-size: 0.8em;
 	}
 </style>

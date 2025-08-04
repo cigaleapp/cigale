@@ -56,6 +56,13 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @param {string} id
+ */
+export function isValidImageId(id) {
+	return /^[0-9A-Z]{26}_\d+$/.test(id);
+}
+
+/**
  * Retourne l'id d'un objet ImageFile associé à l'objet Image
  * @template {string|undefined} T
  * @param {T} id
@@ -64,7 +71,7 @@ if (import.meta.vitest) {
 export function imageIdToFileId(id) {
 	if (id === undefined) return id;
 
-	if (!/[0-9A-Z]{26}_\d+$/.test(id)) {
+	if (!isValidImageId(id)) {
 		throw new Error(
 			`Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): ${id}`
 		);
@@ -79,7 +86,9 @@ if (import.meta.vitest) {
 		const id = imageFileId();
 		expect(imageIdToFileId(`${id}_000000`)).toBe(id);
 		expect(imageIdToFileId(`${id}_1234567`)).toBe(id);
-		expect(() => imageIdToFileId(`${id}_${id}_123456`)).toThrowErrorMatchingInlineSnapshot();
+		expect(() => imageIdToFileId(`${id}_${id}_123456`)).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 01K1TQ1TTM0B95ZN49E1ZE1DAW_01K1TQ1TTM0B95ZN49E1ZE1DAW_123456]`
+		);
 		expect(imageIdToFileId(undefined)).toBeUndefined();
 	});
 }
@@ -136,21 +145,23 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 						})
 					);
 			} catch (error) {
-				if (!notFoundOk) throw error;
-			}
-			uiState.erroredImages.delete(id);
-			uiState.loadingImages.delete(id);
-			if (uiState.imageOpenedInCropper === id) {
-				uiState.imageOpenedInCropper = '';
-			}
-
-			const previewURL = uiState.previewURLs.get(id);
-			if (previewURL) {
-				URL.revokeObjectURL(previewURL);
-				uiState.previewURLs.delete(id);
+				if (!notFoundOk) return Promise.reject(error);
 			}
 		}
 	);
+
+	uiState.erroredImages.delete(id);
+	uiState.loadingImages.delete(id);
+	uiState.queuedImages.delete(id);
+	if (uiState.imageOpenedInCropper === id) {
+		uiState.imageOpenedInCropper = '';
+	}
+
+	const previewURL = uiState.previewURLs.get(id);
+	if (previewURL) {
+		URL.revokeObjectURL(previewURL);
+		uiState.previewURLs.delete(id);
+	}
 }
 
 /**

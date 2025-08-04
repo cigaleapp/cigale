@@ -43,6 +43,7 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => string | undefined} getPreviewURL
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
  * @property {Set<string>} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
+ * @property {Set<string>} queuedImages liste d'IDs d'images ou de ImageFiles en attente de traitement
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {Map<string, ZoomState>} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
  * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné. -1 pour désactiver l'inférence
@@ -105,6 +106,7 @@ export const uiState = $state({
 	},
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
+	queuedImages: new SvelteSet(),
 	keybinds: {},
 	cropperZoomStates: new SvelteMap(),
 	get classificationModels() {

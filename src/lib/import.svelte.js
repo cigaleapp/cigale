@@ -110,8 +110,6 @@ export async function inferBoundingBoxes(swarpc, cancellers, file) {
 		return Promise.reject(error);
 	});
 
-	console.log('rethrow didnt work');
-
 	console.log('Bounding boxes:', boxes);
 
 	let [firstBoundingBox] = boxes;

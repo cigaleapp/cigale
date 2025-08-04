@@ -7,16 +7,18 @@ import { classify, infer, loadModel } from '$lib/inference.js';
 import { loadToTensor } from '$lib/inference_utils.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
-import { omit, pick } from '$lib/utils.js';
+import { fetchHttpRequest, omit, pick } from '$lib/utils.js';
 import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
 import YAML from 'yaml';
+import { Schemas } from './lib/database.js';
 import { PROCEDURES } from './web-worker-procedures.js';
+import { storeMetadataValue } from '$lib/metadata.js';
 
 /**
  * @type {import('idb').IDBPDatabase<import('./lib/idb.svelte.js').IDBDatabaseType> | undefined}
  */
-let db;
+let _db;
 
 /** @type {undefined | { name: string , revision: number }} */
 let databaseParams;
@@ -25,14 +27,19 @@ async function openDatabase() {
 	if (!databaseParams) {
 		throw new Error('Database parameters not set, call swarp.init() first');
 	}
-	if (db) return db;
-	db = await openDB(databaseParams.name, databaseParams.revision);
+	if (_db) return _db;
+	_db = await openDB(databaseParams.name, databaseParams.revision);
+	return _db;
 }
 
 const swarp = Swarp.Server(PROCEDURES);
 
 /**
- * @type {Map<string, { onnx: import('onnxruntime-web').InferenceSession, id: string }>}
+ * @typedef {{ onnx: import('onnxruntime-web').InferenceSession, id: string, classmapping?: string[] }} InferenceSession
+ */
+
+/**
+ * @type {Map<string, InferenceSession>}
  */
 let inferenceSessions = new Map();
 
@@ -58,21 +65,43 @@ swarp.init(async ({ databaseName, databaseRevision }) => {
 	databaseParams = { name: databaseName, revision: databaseRevision };
 });
 
-swarp.loadModel(async ({ task, request, protocolId, webgpu }, onProgress) => {
+swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onProgress) => {
 	const id = inferenceModelId(protocolId, request);
-	if (inferenceSessions.has(task) && inferenceSessions.get(task).id === id) {
+	const existingSession = inferenceSessions.get(task);
+	if (existingSession && existingSession.id === id) {
 		console.log(`Model ${task} already loaded with ID ${id}`);
 		return true; // Model is already loaded
 	}
 
 	console.log(`Loading model for task ${task} with ID ${id}`);
-	const session = await loadModel(request, onProgress, webgpu);
+	/** @type {InferenceSession} */
+	const session = {
+		id,
+		onnx: await loadModel(request, webgpu, ({ transferred, total }) => {
+			// Account for the fact that the model loading is 75% of the total progress, if we have to load a classmapping next.
+			onProgress((classmapping ? 0.75 : 1) * (transferred / total));
+		})
+	};
+
+	if (classmapping) {
+		session.classmapping = await fetchHttpRequest(classmapping, {
+			cacheAs: 'model',
+			onProgress({ transferred, total }) {
+				// Account for progress being already 0.75 of the way there because of the model loading
+				onProgress(0.75 + 0.25 * (transferred / total));
+			}
+		})
+			.then((res) => res.text())
+			.then((text) => text.split(/\r?\n/).filter(Boolean));
+	}
+
 	console.log(`Model ${task} loaded successfully with ID ${id}`);
-	inferenceSessions.set(task, { onnx: session, id });
+
+	inferenceSessions.set(task, session);
 	return true;
 });
 
-swarp.isModelLoaded((task) => inferenceSessions.has(task));
+swarp.isModelLoaded(async (task) => inferenceSessions.has(task));
 
 swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	let aborted = false;
@@ -85,7 +114,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 		throw new Error('Modèle de détection non chargé');
 	}
 
-	await openDatabase();
+	const db = await openDatabase();
 	if (aborted) return { boxes: [], scores: [] };
 
 	const file = await db.get('ImageFile', fileId);
@@ -105,21 +134,31 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	return { boxes, scores };
 });
 
-swarp.classify(async ({ fileId, cropbox, taskSettings }, _, tools) => {
-	tools.abortSignal?.addEventListener('abort', () => {});
+swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
+	tools.abortSignal?.throwIfAborted();
 
-	const session = inferenceSessions.get('classification')?.onnx;
-	if (!session) {
-		throw new Error('Modèle de classification non chargé');
-	}
+	const db = await openDatabase();
+	const image = Schemas.Image.assert(await db.get('Image', imageId));
 
-	await openDatabase();
-	const file = await db.get('ImageFile', fileId);
+	tools.abortSignal?.throwIfAborted();
+	const session = inferenceSessions.get('classification');
+	if (!session) throw new Error('Modèle de classification non chargé');
+	const { classmapping, onnx } = session;
+	if (!classmapping) throw new Error("Le modèle de classification n'a pas de classmapping associé");
+
+	tools.abortSignal?.throwIfAborted();
+	if (!image.fileId) throw new Error(`Image ${imageId} has no ImageFile`);
+	const file = await db.get('ImageFile', image.fileId);
 	if (!file) {
-		throw new Error(`Fichier avec l'ID ${fileId} non trouvé`);
+		throw new Error(`Fichier avec l'ID ${image.fileId} non trouvé`);
 	}
 
-	console.log('Classifying file', fileId, 'with cropbox', cropbox);
+	const cropbox =
+		/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */ (
+			image.metadata[metadataIds.cropbox]?.value ?? { x: 0.5, y: 0.5, w: 1, h: 1 }
+		);
+
+	console.log('Classifying image', image.id, 'with cropbox', cropbox);
 
 	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
 	const img = await loadToTensor([file.bytes], {
@@ -129,7 +168,36 @@ swarp.classify(async ({ fileId, cropbox, taskSettings }, _, tools) => {
 		abortSignal: tools.abortSignal
 	});
 
-	const scores = await classify(taskSettings, img, session, tools.abortSignal);
+	const scores = await classify(taskSettings, img, onnx, tools.abortSignal);
+
+	tools.abortSignal?.throwIfAborted();
+	const results = scores
+		.map((score, i) => ({
+			confidence: score,
+			value: classmapping[i]
+		}))
+		.sort((a, b) => b.confidence - a.confidence)
+		.slice(0, 3)
+		.filter(({ confidence }) => confidence > 0.005);
+
+	tools.abortSignal?.throwIfAborted();
+	if (!results.length) {
+		throw new Error('No species detected');
+	} else {
+		const [firstChoice, ...alternatives] = results;
+		const metadataValue = /** @type {const} */ ({
+			subjectId: imageId,
+			...firstChoice,
+			alternatives
+		});
+
+		await storeMetadataValue({
+			db,
+			...metadataValue,
+			metadataId: metadataIds.target,
+			abortSignal: tools.abortSignal
+		});
+	}
 
 	return { scores };
 });
@@ -156,8 +224,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	const protocol = ExportedProtocol.assert(parsed);
 	console.timeEnd('Validating protocol');
 
-	await openDatabase();
-	if (!db) throw new Error('Database not initialized');
+	const db = await openDatabase();
 	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
 	onLoadingState('write-protocol');
 	console.time('Storing Protocol');

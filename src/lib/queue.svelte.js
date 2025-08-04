@@ -1,3 +1,4 @@
+import { classifyImage } from './classification.svelte';
 import { errorMessage } from './i18n';
 import { imageFileId } from './images';
 import { processImageFile } from './import.svelte';
@@ -30,33 +31,69 @@ class ProcessingQueue {
 		/**
 		 * @type {ProcessingQueueTask[]}
 		 */
-		this.tasks = $state([]);
+		this.tasks = [];
+		this.taskIds = new Set();
+
+		this.abortController = new AbortController();
 
 		$effect(() => {
-			uiState.processing.total = this.tasks.length;
-		});
-
-		$effect(() => {
-			/**
-			 *
-			 * @param {ProcessingQueueTask[]} tasks
-			 * @param {() => Promise<void>} pop
-			 * @returns
-			 */
-			function step(tasks, pop) {
-				if (!tasks.length) return;
-				pop().then(() => step(tasks, pop));
-			}
-
-			step(this.tasks, this.pop.bind(this));
+			this.start().finally(() => this.logWarning(null, 'Processing queue mainloop exited'));
 		});
 	}
 
+	async start() {
+		this.log(null, 'Starting processing queue mainloop');
+		while (true) {
+			while (this.tasks.length > 0) {
+				await new Promise((resolve, reject) => {
+					this.abortController.signal.addEventListener('abort', () => {
+						resolve(undefined);
+					});
+					this.pop().then(resolve).catch(reject);
+				});
+			}
+
+			// Once queue empty, busywait for new tasks with 100ms delay.
+			await new Promise((resolve) => setTimeout(resolve, 100));
+		}
+	}
+
 	/**
-	 *
+	 * Log a message with a prefix.
+	 * @param {string|null} id
+	 * @param {string} message
+	 * @param {...any} args
+	 */
+	log(id, message, ...args) {
+		console.log(`[ProcessingQueue] ${id ? id + ': ' : ''}${message}`, ...args);
+	}
+
+	/**
+	 * Log a warning message with a prefix.
+	 * @param {string|null} id
+	 * @param {string} message
+	 * @param {...any} args
+	 */
+	logWarning(id, message, ...args) {
+		console.warn(`[ProcessingQueue] ${id ? id + ': ' : ''}${message}`, ...args);
+	}
+
+	/**
+	 * To be called when queue is drained (when all tasks have been done)
+	 */
+	#drained() {
+		this.log(null, 'Queue was drained');
+		uiState.processing.done = 0;
+		uiState.processing.total = 0;
+		uiState.loadingImages.clear();
+		uiState.queuedImages.clear();
+	}
+
+	/**
+	 * Get ID of Image or ImageFile processed by the task.
 	 * @param {ProcessingQueueTask} task
 	 */
-	taskId(task) {
+	taskSubjectId(task) {
 		if (task.detection) {
 			return task.detection.id;
 		}
@@ -69,33 +106,74 @@ class ProcessingQueue {
 	}
 
 	/**
+	 * @param {ProcessingQueueTask} task
+	 */
+	taskId(task) {
+		// TODO for now, we only support one task per subject.
+		return this.taskSubjectId(task);
+	}
+
+	/**
 	 *
 	 * @param {ProcessingQueueTask} task
 	 */
 	push(task) {
-		uiState.loadingImages.add(this.taskId(task));
+		const id = this.taskId(task);
+		if (this.taskIds.has(id)) {
+			this.logWarning(id, 'Task already in queue, skipping.', task);
+			return;
+		}
+
+		this.log(id, 'push', task);
+
+		this.tasks.push(task);
+		this.taskIds.add(this.taskId(task));
+
+		uiState.processing.total++;
+
+		uiState.queuedImages.add(this.taskSubjectId(task));
 
 		if (task.detection)
 			uiState.processing.files.push({
 				name: task.detection.file.name,
 				id: task.detection.id
 			});
+	}
 
-		this.tasks.push(task);
+	/**
+	 * Cancel a task in the processing queue.
+	 * @param {string} taskSubjectId
+	 * @param {string} reason
+	 * @returns
+	 */
+	cancel(taskSubjectId, reason) {
+		this.log(taskSubjectId, 'cancel', reason);
+
+		this.abortController.abort(taskSubjectId);
+
+		const cancel = this.cancellers?.get(taskSubjectId);
+
+		cancel?.(reason);
+		this.tasks = this.tasks.filter((t) => this.taskSubjectId(t) !== taskSubjectId);
+		uiState.processing.removeFile(taskSubjectId);
+		uiState.queuedImages.delete(taskSubjectId);
+		uiState.loadingImages.delete(taskSubjectId);
+		uiState.processing.total--;
 	}
 
 	async pop() {
 		const task = this.tasks.shift();
-		console.log('Popping task', task);
-
 		if (!task) {
-			// Queue was drained
-			uiState.processing.done = 0;
-			uiState.processing.total = 0;
-			uiState.loadingImages.clear();
-			uiState.processing.files = [];
+			this.logWarning(null, 'No task to pop, queue is empty');
 			return;
 		}
+
+		this.log(this.taskId(task), 'pop', $state.snapshot(task));
+
+		this.taskIds.delete(this.taskId(task));
+
+		uiState.queuedImages.delete(this.taskSubjectId(task));
+		uiState.loadingImages.add(this.taskSubjectId(task));
 
 		const { detection, classification } = task;
 
@@ -108,15 +186,19 @@ class ProcessingQueue {
 					await processImageFile(this.swarpc, file, id, this.cancellers);
 				}
 			} else if (classification) {
-				// TODO
+				await classifyImage(this.swarpc, classification.imageId, this.cancellers);
 			}
 
-			uiState.processing.removeFile(this.taskId(task));
+			uiState.processing.removeFile(this.taskSubjectId(task));
 		} catch (error) {
-			uiState.erroredImages.set(this.taskId(task), errorMessage(error));
+			uiState.erroredImages.set(this.taskSubjectId(task), errorMessage(error));
 		} finally {
-			uiState.loadingImages.delete(this.taskId(task));
+			uiState.loadingImages.delete(this.taskSubjectId(task));
 			uiState.processing.done++;
+		}
+
+		if (this.tasks.length === 0) {
+			this.#drained();
 		}
 	}
 }
@@ -131,33 +213,42 @@ export function initializeProcessingQueue(swarpc, cancellers) {
 }
 
 /**
+ * Cancel a task in the processing queue.
+ * @param {string} subjectId
+ * @param {string} reason
+ * @throws {Error} if the processing queue is not initialized
+ */
+export function cancelTask(subjectId, reason) {
+	if (!processingQueue)
+		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
+
+	processingQueue.cancel(subjectId, reason);
+}
+
+/**
  * Import new files and add them to the processing queue.
  * @param {File[]} files
  */
-export async function importMore(files) {
+export function importMore(files) {
 	if (!processingQueue)
 		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
 
 	for (const file of files) {
-		const id = imageFileId();
-		processingQueue.push({ detection: { file, id } });
-		// .on('queued', () => {
-		// 	uiState.processing.files.push({ name: file.name, id });
-		// })
-		// .on('failed', (error) => {
-		// 	if (tables.Image.state.some((img) => img.fileId === id)) {
-		// 		// ImageFile was created (so setting erroredImages makes sense)
-		// 		uiState.erroredImages.set(id, errorMessage(error));
-		// 	} else {
-		// 		// no ImageFile was created (the CardObservation's id is still loading_n), so erroredImages is useless.
-		// 		// We just remove the file from the processing list, and surface the error with a toast.
-		// 		toasts.error(
-		// 			m.error_importing_file({
-		// 				filename: file.name,
-		// 				error: errorMessage(error)
-		// 			})
-		// 		);
-		// 	}
-		// });
+		processingQueue.push({ detection: { file, id: imageFileId() } });
+	}
+}
+
+/**
+ * Add classification tasks to the processing queue.
+ * @param  {string[]} imageIds
+ */
+export function classifyMore(imageIds) {
+	if (!processingQueue)
+		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
+
+	for (const imageId of imageIds) {
+		processingQueue.push({
+			classification: { imageId }
+		});
 	}
 }
