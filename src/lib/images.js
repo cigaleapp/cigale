@@ -75,6 +75,15 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @param {string} id
+ */
+function invalidImageIdError(id) {
+	return new Error(
+		`Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): ${id}`
+	);
+}
+
+/**
  * Retourne l'id d'un objet ImageFile associé à l'objet Image
  * @template {string|undefined} T
  * @param {T} id
@@ -84,9 +93,7 @@ export function imageIdToFileId(id) {
 	if (id === undefined) return id;
 
 	if (!isValidImageId(id)) {
-		throw new Error(
-			`Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): ${id}`
-		);
+		throw invalidImageIdError(id);
 	}
 	// @ts-expect-error
 	return id?.replace(/(_\d+)+$/, '');
@@ -369,8 +376,8 @@ if (import.meta.vitest) {
  * @returns {{ fileId: string; subindex: number|null }}
  */
 export function parseImageId(imageId) {
-	if (!/^\d+(_\d+)?$/.test(imageId)) {
-		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${imageId}`);
+	if (!isValidImageId(imageId) && !isValidImageId(`${imageId}_000000`)) {
+		throw invalidImageIdError(imageId);
 	}
 
 	const [fileId, subindex] = imageId.split('_', 2);
@@ -382,13 +389,29 @@ export function parseImageId(imageId) {
 }
 
 if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('parseImageId', () => {
-		expect(parseImageId('000001_000000')).toEqual({ fileId: '000001', subindex: 0 });
-		expect(parseImageId('1234567_1234567')).toEqual({ fileId: '1234567', subindex: 1234567 });
-		expect(parseImageId('1234567')).toEqual({ fileId: '1234567', subindex: null });
-		expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): coming in hot!!!]`
-		);
+	const { test, expect, describe } = import.meta.vitest;
+	describe('parseImageId', () => {
+		test('parses regular IDs', () => {
+			const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+			expect(parseImageId(`${id}_000000`)).toEqual({ fileId: id, subindex: 0 });
+			expect(parseImageId(`${id}_1234567`)).toEqual({ fileId: id, subindex: 1234567 });
+		});
+		test('parses ImageFile IDs', () => {
+			const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+			expect(parseImageId(id)).toEqual({ fileId: id, subindex: null });
+		});
+		test('throws on malformed IDs', () => {
+			expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
+				`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): coming in hot!!!]`
+			);
+		});
+
+		test('roundtrip', () => {
+			const id = imageFileId();
+			expect(parseImageId(imageId(id, 1234567))).toStrictEqual({
+				fileId: id,
+				subindex: 1234567
+			});
+		});
 	});
 }

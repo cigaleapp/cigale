@@ -1,6 +1,7 @@
 import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
+	browserConsole,
 	chooseDefaultProtocol,
 	getImage,
 	getSettings,
@@ -23,8 +24,7 @@ test.describe('Cropper view', () => {
 			allImages.map((i) => i.id),
 			false
 		);
-		await page.getByTestId('goto-crop').click();
-		await page.waitForURL((u) => u.hash === '#/crop/');
+		await goToTab(page, 'crop');
 	});
 
 	/**
@@ -226,9 +226,9 @@ test.describe('Cropper view', () => {
 			const { leaf } = await imagesByName(page);
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
-				await expect(isImageConfirmedInDatabase(page, `${leaf.fileId}_00000${i}`)).resolves.toBe(
-					confirmed
-				);
+				await expect(
+					isImageConfirmedInDatabase(page, `${leaf.fileId}_${i.toString().padStart(6, '0')}`)
+				).resolves.toBe(confirmed);
 			}
 		}
 
@@ -245,6 +245,7 @@ test.describe('Cropper view', () => {
 			if (implicit) await expect(confirmedCropOverlay(page)).toBeVisible();
 			await expect(confirmedCropBadge(page)).toBeVisible();
 			await expect(page.getByRole('button', { name: 'Invalider' })).toBeVisible();
+			await page.waitForTimeout(500);
 			await expectAllImagesConfirmedInDatabase(page, true);
 		}
 
@@ -625,8 +626,16 @@ function confirmedCropBadge(page) {
  * @param {string} id
  */
 async function isImageConfirmedInDatabase(page, id) {
-	const image = await getImage({ page }, id);
-	return image?.metadata?.[exampleProtocol.crop.confirmationMetadata]?.value === 'true';
+	const image = await getImage({ page, id });
+	if (!image) throw new Error(`Image with id ${id} not found in the database`);
+	if (!image.metadata) throw new Error(`Image with id ${id} has no metadata`);
+	await browserConsole.log(
+		page,
+		`Checking if image ${id} is confirmed`,
+		exampleProtocol.crop.confirmationMetadata,
+		image.metadata[exampleProtocol.crop.confirmationMetadata]
+	);
+	return image.metadata[exampleProtocol.crop.confirmationMetadata]?.value === 'true';
 }
 
 /**
@@ -638,6 +647,10 @@ async function isImageConfirmedInDatabase(page, id) {
  */
 async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 	for (const [i, id] of ids.entries()) {
+		await browserConsole.log(
+			page,
+			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.confirmationMetadata}) (${i + 1}/${ids.length})`
+		);
 		await setImageMetadata(
 			{ page },
 			id,

@@ -88,7 +88,7 @@ export async function getImage({ page, ...query }) {
 	const image = await page.evaluate(async ([query]) => {
 		if ('id' in query) {
 			const image = await window.DB.get('Image', query.id);
-			if (!image) throw new Error(`Image ${JSON.stringify(query)} not found in the database`);
+			if (!image) throw new Error(`Image ${query.id} not found in the database`);
 			return image;
 		} else {
 			const images = await window.DB.getAll('Image');
@@ -394,7 +394,11 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 	await page.evaluate(
 		async (dump) => {
 			const decoded = window.devalue.parse(dump);
-			for (const [tableName, entries] of Object.entries(decoded)) {
+			const orderedTables = Object.entries(decoded).sort(([a], [b]) =>
+				// Load Protocol before everything else so that the default protocol does not start importing
+				a === 'Protocol' ? -1 : b === 'Protocol' ? 1 : a.localeCompare(b)
+			);
+			for (const [tableName, entries] of orderedTables) {
 				await window.DB.clear(tableName);
 				for (const entry of entries) {
 					console.log('[loadDatabaseDump] Adding entry to', tableName, entry);
@@ -406,3 +410,17 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 		readFileSync(location, 'utf-8')
 	);
 }
+
+export const browserConsole = {
+	/**
+	 * Log messages to the browser console
+	 * @param {import('@playwright/test').Page} page
+	 * @param {...any} args
+	 */
+	async log(page, ...args) {
+		await page.evaluate(
+			(args) => console.log(...args),
+			args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg))
+		);
+	}
+};

@@ -138,8 +138,8 @@ test.describe('Exports', () => {
 		if (!analysisFile) throw new Error('analysis.json not found in zip');
 		const analysisContent = await analysisFile.async('string');
 		const modifiedContent = analysisContent.replace(
-			'"protocolId": "io.github.cigaleapp.arthropods.example.light"',
-			'"protocolId": "io.github.cigaleapp.arthropods.example.wrong"'
+			'"id": "io.github.cigaleapp.arthropods.example.light"',
+			'"id": "io.github.cigaleapp.arthropods.example.wrong"'
 		);
 		zip.file('analysis.json', modifiedContent);
 		const newZipData = await zip.generateAsync({ type: 'nodebuffer' });

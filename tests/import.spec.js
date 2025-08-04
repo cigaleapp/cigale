@@ -45,47 +45,47 @@ test.describe('correct results.zip', () => {
 		await expectBoundingBoxesCount(images[0].fileId ?? '', 1);
 		await expectBoundingBoxesCount(images[1].fileId ?? '', 1);
 		await expectBoundingBoxesCount(images[2].fileId ?? '', 1);
-		await expectBoundingBoxesCount(images[3].fileId ?? '', 0);
+		await expectBoundingBoxesCount(images[3].fileId ?? '', 1);
 	});
 
 	test('does not re-analyze when going to classify tab', async ({ page }) => {
 		await page.getByRole('link', { name: 'Classifier' }).click();
-		await page.getByText('Bilobella braunerae', { exact: true }).click({
+		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
 		});
 		await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
 		  - complementary:
-		    - img "Image 1 de l'observation Bilobella braunerae"
-		    - heading "Bilobella braunerae" [level=2]:
+		    - img "Image 1 de l'observation cyan"
+		    - heading "cyan" [level=2]:
 		      - img
 		      - textbox "Nom de l'observation"
 		    - text: Espèce
-		    - combobox: Lepidocyrtus fimetarius
+		    - combobox: Allacma fusca
 		    - code: /\\d+%/
 		    - button:
 		      - img
 		    - text: Alternatives
 		    - list:
 		      - listitem:
-		        - text: Entomobrya atrocincta
-		        - code: 5%
+		        - text: Sminthurus viridis
+		        - code: /\\d+%/
 		        - button:
 		          - img
 		      - listitem:
-		        - text: Ceratophysella longispina
-		        - code: 4%
+		        - text: Bourletiella hortensis
+		        - code: /\\d+%/
 		        - button:
 		          - img
 		    - text: Genre
-		    - combobox: Lepidocyrtus
+		    - combobox: Allacma
 		    - button:
 		      - img
 		    - text: Famille
-		    - combobox: Entomobryidae
+		    - combobox: Sminthuridae
 		    - button:
 		      - img
 		    - text: Ordre
-		    - combobox: Entomobryomorpha
+		    - combobox: Symphypleona
 		    - button:
 		      - img
 		    - text: Date
@@ -142,17 +142,17 @@ test.describe('correct results.zip', () => {
 			{
 				Cropped: [
 					'_4.jpeg',
-					'Allacma fusca_3.jpeg',
-					'Lepidocyrtus fimetarius_1.jpeg',
-					'Seira ferrarii_2.jpeg'
+					'Allacma fusca_1.jpeg',
+					'Entomobrya muscorum_3.jpeg',
+					'Orchesella cincta_2.jpeg'
 				]
 			},
 			{
 				Original: [
 					'_4.jpeg',
-					'Allacma fusca_3.jpeg',
-					'Lepidocyrtus fimetarius_1.jpeg',
-					'Seira ferrarii_2.jpeg'
+					'Allacma fusca_1.jpeg',
+					'Entomobrya muscorum_3.jpeg',
+					'Orchesella cincta_2.jpeg'
 				]
 			},
 			'analysis.json',

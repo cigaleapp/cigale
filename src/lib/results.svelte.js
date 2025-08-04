@@ -478,8 +478,8 @@ export async function importResultsZip(file, id, protocolId) {
 			id: imageIdToFileId(image.id),
 			resizedBytes,
 			originalBytes,
-			contentType: file.type,
-			filename: file.name,
+			contentType: image.contentType,
+			filename: image.filename,
 			width,
 			height
 		});
