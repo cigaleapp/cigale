@@ -817,7 +817,7 @@
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">
-				<ButtonInk onclick={goToGallery}>
+				<ButtonInk inline onclick={goToGallery}>
 					<IconGallery />
 					{m.other_photos()}
 					<KeyboardHint shortcut="Escape" />
