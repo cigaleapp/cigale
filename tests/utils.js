@@ -347,12 +347,14 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	// Import fixture zip
-	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
+	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
 	if (waitForLoading) {
-		await expect(page.getByText(/Analyse…/).first()).toBeVisible();
-		await expect(page.getByText(/Analyse…/)).toHaveCount(0, { timeout: 30_000 });
+		await expect(page.getByText(/Analyse|En attente…/).first()).toBeVisible({
+			timeout: 30_000
+		});
+		await expect(page.getByText(/Analyse|En attente…/)).toHaveCount(0, { timeout: 30_000 });
 	}
 }
 
