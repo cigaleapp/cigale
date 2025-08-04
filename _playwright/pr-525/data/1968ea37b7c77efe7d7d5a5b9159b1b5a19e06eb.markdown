@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer" [disabled]:
+      - /url: "#/crop/"
+    - img
+    - link "Classifier" [disabled]:
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "04a3b8c":
+        - /url: https://github.com/cigaleapp/cigale/tree/04a3b8cc7cccd0fadcf49cdea51b3f3f8f5ff6da
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- main:
+  - paragraph: Cliquer ou déposer des images ici
+- text: Classification · Cigale
+```
