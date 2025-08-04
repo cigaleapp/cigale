@@ -1,0 +1,65 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer":
+      - /url: "#/crop/"
+    - img
+    - link "Classifier":
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語"
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "e0e0fd6":
+        - /url: https://github.com/cigaleapp/cigale/tree/e0e0fd6333cef81c07cdd9bbc016929966fc8dbb
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- main:
+  - article:
+    - img "issue-435"
+    - img
+    - heading "issue-435" [level=2]
+- complementary:
+  - img
+  - paragraph: Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées
+  - button "Regrouper Ctrl + G" [disabled]:
+    - img
+    - text: Regrouper Ctrl + G
+  - button "Séparer Ctrl + Shift + G" [disabled]:
+    - img
+    - text: Séparer Ctrl + Shift + G
+  - button "Supprimer 0 images Suppr" [disabled]:
+    - img
+    - text: Supprimer 0 images Suppr
+- text: Classification · Cigale
+```
