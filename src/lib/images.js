@@ -62,6 +62,18 @@ export function isValidImageId(id) {
 	return /^[0-9A-Z]{26}_\d+$/.test(id);
 }
 
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+	describe('isValidImageId', () => {
+		test('imageId() generates a valid ID', () => {
+			expect(isValidImageId(imageId(imageFileId(), 0))).toBe(true);
+		});
+		test('imageFileId() is not a valid image ID by itself', () => {
+			expect(isValidImageId(imageFileId())).toBe(false);
+		});
+	});
+}
+
 /**
  * Retourne l'id d'un objet ImageFile associé à l'objet Image
  * @template {string|undefined} T
@@ -83,13 +95,16 @@ export function imageIdToFileId(id) {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('imageIdToFileId', () => {
-		const id = imageFileId();
+		const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
 		expect(imageIdToFileId(`${id}_000000`)).toBe(id);
 		expect(imageIdToFileId(`${id}_1234567`)).toBe(id);
 		expect(() => imageIdToFileId(`${id}_${id}_123456`)).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 01K1TQ1TTM0B95ZN49E1ZE1DAW_01K1TQ1TTM0B95ZN49E1ZE1DAW_123456]`
+			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 0001KVE9TGKVKZ3GG307YQ70CZ_0001KVE9TGKVKZ3GG307YQ70CZ_123456]`
 		);
 		expect(imageIdToFileId(undefined)).toBeUndefined();
+		expect(() => imageIdToFileId('000001')).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 000001]`
+		);
 	});
 }
 

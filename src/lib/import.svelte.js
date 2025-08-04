@@ -75,7 +75,7 @@ export async function processImageFile(swarpc, file, id, cancellers) {
  * @param {DimensionsInput} file.dimensions
  * @returns {Promise<void>}
  */
-export async function inferBoundingBoxes(swarpc, cancellers, file) {
+async function inferBoundingBoxes(swarpc, cancellers, file) {
 	if (!uiState.currentProtocol) {
 		toasts.error(m.no_protocol_selected());
 		return;
