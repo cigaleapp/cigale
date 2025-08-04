@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/289</span>
+                <span class='fraction'>0/291</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/289</span>
+                <span class='fraction'>0/291</span>
             </div>
         
             
@@ -566,7 +566,10 @@
 <a name='L501'></a><a href='#L501'>501</a>
 <a name='L502'></a><a href='#L502'>502</a>
 <a name='L503'></a><a href='#L503'>503</a>
-<a name='L504'></a><a href='#L504'>504</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L504'></a><a href='#L504'>504</a>
+<a name='L505'></a><a href='#L505'>505</a>
+<a name='L506'></a><a href='#L506'>506</a>
+<a name='L507'></a><a href='#L507'>507</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1007,6 +1010,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1040,8 +1046,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1065,6 +1069,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1487,7 +1493,7 @@ import {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const files = Object.values(observations)</span>
 <span class="cstat-no" title="statement not covered" >		.flatMap((o) =&gt; o.images)</span>
-<span class="cstat-no" title="statement not covered" >		.map((i) =&gt; ({ id: i.id, name: i.filename }));</span>
+<span class="cstat-no" title="statement not covered" >		.map((i) =&gt; ({ id: i.id, name: i.exportedAs.original }));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	uiState.processing.files.push(...files);</span>
 &nbsp;
@@ -1508,18 +1514,21 @@ import {
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	for (const [name, bytes] of entries(extractedImages)) {</span>
+<span class="cstat-no" title="statement not covered" >		const id = files.find((f) =&gt; f.name === name)?.id;</span>
+<span class="cstat-no" title="statement not covered" >		if (!id) continue;</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >		const observation = entries(observations)</span>
 <span class="cstat-no" title="statement not covered" >			.map(([id, o]) =&gt; ({ id, ...o }))</span>
 <span class="cstat-no" title="statement not covered" >			.find((o) =&gt; o.images.some((i) =&gt; i.exportedAs.original === name));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		if (!observation) {</span>
-<span class="cstat-no" title="statement not covered" >			uiState.processing.files = uiState.processing.files.filter((f) =&gt; f.name !== name);</span>
+<span class="cstat-no" title="statement not covered" >			uiState.processing.removeFile(id);</span>
 			continue;
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		const image = observation.images.find((i) =&gt; i.exportedAs.original === name);</span>
 <span class="cstat-no" title="statement not covered" >		if (!image) {</span>
-<span class="cstat-no" title="statement not covered" >			uiState.processing.files = uiState.processing.files.filter((f) =&gt; f.name !== name);</span>
+<span class="cstat-no" title="statement not covered" >			uiState.processing.removeFile(id);</span>
 			continue;
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
@@ -1541,8 +1550,6 @@ import {
 <span class="cstat-no" title="statement not covered" >		const [[width, height], resizedBytes] = await resizeToMaxSize({</span>
 <span class="cstat-no" title="statement not covered" >			source: new File([originalBytes], image.filename, { type: image.contentType })</span>
 		});
-&nbsp;
-<span class="cstat-no" title="statement not covered" >		uiState.processing.files.shift();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		await storeImageBytes({</span>
 <span class="cstat-no" title="statement not covered" >			id: imageIdToFileId(image.id),</span>
@@ -1568,6 +1575,8 @@ import {
 <span class="cstat-no" title="statement not covered" >				alternatives: v.alternatives</span>
 			}))
 		});
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		uiState.processing.removeFile(image.id);</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	uiState.processing.removeFile(id);</span>
@@ -1579,7 +1588,7 @@ import {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-04T16:37:17.731Z
+                at 2025-08-04T17:46:21.337Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
