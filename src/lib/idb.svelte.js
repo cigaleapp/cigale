@@ -2,11 +2,9 @@ import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 import { idComparator, isReactiveTable, Tables } from './database.js';
 import * as devalue from 'devalue';
-import { base } from '$app/paths';
 
-console.info(`Base path is ${base}`);
-
-export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
+export const previewingPrNumber =
+	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 export const databaseRevision = 3;
