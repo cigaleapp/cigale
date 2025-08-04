@@ -106,7 +106,7 @@
 		"jsdom": "^26.1.0",
 		"json-schema-doc-ts": "^2.0.0",
 		"knip": "^5.62.0",
-		"lint-staged": "^16.1.2",
+		"lint-staged": "^16.1.4",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.9.0",
 		"pdf-to-png-converter": "^3.7.1",
