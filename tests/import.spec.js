@@ -253,7 +253,7 @@ test('can import in multiple batches', async ({ page }) => {
 	await goToTab(page, 'import');
 	await importPhotos({ page, wait: false }, 'lil-fella', 'leaf');
 	await importPhotos({ page, wait: false }, 'with-exif-gps', '20K-gray', 'debugsquare.png');
-	await expect(page.locator('main').getByText(/Analyse…/)).toHaveCount(0, {
+	await expect(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 60_000
 	});
 	await expect(page.locator('main').getByText('lil-fella.jpeg')).toBeVisible();

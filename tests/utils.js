@@ -351,8 +351,8 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
 	if (waitForLoading) {
-		await expect(page.getByText('Analyse…').first()).toBeVisible();
-		await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 30_000 });
+		await expect(page.getByText(/Analyse…/).first()).toBeVisible();
+		await expect(page.getByText(/Analyse…/)).toHaveCount(0, { timeout: 30_000 });
 	}
 }
 
