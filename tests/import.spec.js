@@ -236,7 +236,7 @@ test('can cancel import', issue(430), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella', 'cyan', 'leaf', 'with-exif-gps');
-	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…/, {
+	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
 	});
 	await page

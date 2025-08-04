@@ -34,7 +34,11 @@ export async function importPhotos({ page, wait = true }, ...names) {
 
 	await expect(page.getByText('(.zip)')).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
-	await fileInput?.setInputFiles(names.map((f) => path.join('./tests/fixtures', f)));
+	// In case import order matters
+	for (const name of names) {
+		await fileInput?.setInputFiles(path.join('./tests/fixtures', name));
+	}
+
 	if (wait) {
 		await expect(page.getByText(names.at(-1), { exact: true })).toBeVisible({
 			timeout: 20_000
