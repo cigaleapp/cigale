@@ -77,17 +77,23 @@ export async function getSettings({ page }) {
 
 /**
  *
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} id
+ * @param {{ page: Page }  & ({ id: string } | { filename: string })} param0
  * @returns {Promise<typeof import('$lib/database').Schemas.Image.inferIn>}
  */
-export async function getImage({ page }, id) {
-	const image = await page.evaluate(async ([id]) => {
-		const image = await window.DB.get('Image', id);
-		if (!image) throw new Error(`Image ${id} not found in the database`);
-		return image;
-	}, /** @type {const} */ ([id]));
+export async function getImage({ page, ...query }) {
+	const image = await page.evaluate(async ([query]) => {
+		if ('id' in query) {
+			const image = await window.DB.get('Image', query.id);
+			if (!image) throw new Error(`Image ${JSON.stringify(query)} not found in the database`);
+			return image;
+		} else {
+			const images = await window.DB.getAll('Image');
+			const image = images.find((i) => i.filename === query.filename);
+			if (!image)
+				throw new Error(`Image with filename ${query.filename} not found in the database`);
+			return image;
+		}
+	}, /** @type {const} */ ([query]));
 	return image;
 }
 

@@ -6,10 +6,12 @@ import {
 	goToTab,
 	importPhotos,
 	importResults,
+	listTable,
 	readdirTreeSync,
 	toast
 } from './utils';
 import { issue } from './annotations';
+import { compareAsc } from 'date-fns';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -36,10 +38,14 @@ test.describe('correct results.zip', () => {
 			).toHaveCount(count);
 		}
 
-		await expectBoundingBoxesCount('000000', 1);
-		await expectBoundingBoxesCount('000001', 1);
-		await expectBoundingBoxesCount('000002', 1);
-		await expectBoundingBoxesCount('000003', 0);
+		const images = await listTable(page, 'Image').then((images) =>
+			images.sort((a, b) => compareAsc(a.addedAt, b.addedAt))
+		);
+
+		await expectBoundingBoxesCount(images[0].fileId ?? '', 1);
+		await expectBoundingBoxesCount(images[1].fileId ?? '', 1);
+		await expectBoundingBoxesCount(images[2].fileId ?? '', 1);
+		await expectBoundingBoxesCount(images[3].fileId ?? '', 0);
 	});
 
 	test('does not re-analyze when going to classify tab', async ({ page }) => {
