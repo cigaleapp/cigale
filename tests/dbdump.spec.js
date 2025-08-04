@@ -2,6 +2,7 @@ import { expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
 	dumpDatabase,
+	goToTab,
 	importPhotos,
 	importProtocol,
 	importResults
@@ -30,6 +31,7 @@ test.describe('Database dumps', () => {
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
 		await page.locator('nav').getByRole('link', { name: 'Protocole' }).click();
 		await chooseDefaultProtocol(page);
+		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
 		await page.waitForTimeout(2_000);
 		await dumpDatabase(page, 'kitchensink-protocol.devalue');
