@@ -416,7 +416,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 	const files = Object.values(observations)
 		.flatMap((o) => o.images)
-		.map((i) => ({ id: i.id, name: i.filename }));
+		.map((i) => ({ id: i.id, name: i.exportedAs.original }));
 
 	uiState.processing.files.push(...files);
 
@@ -437,18 +437,21 @@ export async function importResultsZip(file, id, protocolId) {
 	}
 
 	for (const [name, bytes] of entries(extractedImages)) {
+		const id = files.find((f) => f.name === name)?.id;
+		if (!id) continue;
+
 		const observation = entries(observations)
 			.map(([id, o]) => ({ id, ...o }))
 			.find((o) => o.images.some((i) => i.exportedAs.original === name));
 
 		if (!observation) {
-			uiState.processing.files = uiState.processing.files.filter((f) => f.name !== name);
+			uiState.processing.removeFile(id);
 			continue;
 		}
 
 		const image = observation.images.find((i) => i.exportedAs.original === name);
 		if (!image) {
-			uiState.processing.files = uiState.processing.files.filter((f) => f.name !== name);
+			uiState.processing.removeFile(id);
 			continue;
 		}
 
@@ -470,8 +473,6 @@ export async function importResultsZip(file, id, protocolId) {
 		const [[width, height], resizedBytes] = await resizeToMaxSize({
 			source: new File([originalBytes], image.filename, { type: image.contentType })
 		});
-
-		uiState.processing.files.shift();
 
 		await storeImageBytes({
 			id: imageIdToFileId(image.id),
@@ -497,6 +498,8 @@ export async function importResultsZip(file, id, protocolId) {
 				alternatives: v.alternatives
 			}))
 		});
+
+		uiState.processing.removeFile(image.id);
 	}
 
 	uiState.processing.removeFile(id);
