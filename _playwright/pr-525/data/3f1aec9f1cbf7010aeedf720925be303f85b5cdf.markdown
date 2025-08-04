@@ -1,0 +1,9 @@
+# Page snapshot
+
+```yaml
+- img
+- paragraph:
+  - text: Chargement…
+  - code: Chargement du protocole intégré Post-validation
+- code: 4423948f1ddd78297785e114a72107296463c396
+```
