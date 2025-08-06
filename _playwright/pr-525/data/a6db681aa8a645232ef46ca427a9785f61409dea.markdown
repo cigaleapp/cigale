@@ -1,0 +1,67 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer":
+      - /url: "#/crop/01K1ZGWZE89TNAVRD6YGSSA0A7"
+    - img
+    - link "Classifier":
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "93222ee":
+        - /url: https://github.com/cigaleapp/cigale/tree/93222ee1e78c2d4e18c238bbca3a84111dd3a6f8
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- main:
+  - article:
+    - img "lil-fella"
+    - img
+    - heading "lil-fella" [level=2]
+- complementary:
+  - img
+  - paragraph: Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées
+  - button "Regrouper Ctrl + G" [disabled]:
+    - img
+    - text: Regrouper Ctrl + G
+  - button "Séparer Ctrl + Shift + G" [disabled]:
+    - img
+    - text: Séparer Ctrl + Shift + G
+  - button "Supprimer 0 images Suppr" [disabled]:
+    - img
+    - text: Supprimer 0 images Suppr
+- text: Importer · Cigale
+```

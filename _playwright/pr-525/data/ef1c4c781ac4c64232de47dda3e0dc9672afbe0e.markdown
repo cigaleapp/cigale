@@ -1,0 +1,135 @@
+# Page snapshot
+
+```yaml
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer":
+      - /url: "#/crop/01K1V53QQEBJF3EWECQ9YP3QQ6"
+    - img
+    - link "Classifier":
+      - /url: "#/classify"
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English"
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "93222ee":
+        - /url: https://github.com/cigaleapp/cigale/tree/93222ee1e78c2d4e18c238bbca3a84111dd3a6f8
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- article:
+  - img
+  - paragraph: Modèle de détection chargé
+  - button:
+    - img
+- article:
+  - img
+  - paragraph: Modèle de détection chargé
+  - button:
+    - img
+- article:
+  - img
+  - paragraph: Modèle de détection chargé
+  - button:
+    - img
+- complementary:
+  - button "Sélectionner l'outil Glisser-recadrer":
+    - img
+  - button "Sélectionner l'outil 2 points":
+    - img
+  - button "Sélectionner l'outil 4 points":
+    - img
+  - button "Sélectionner l'outil Déplacer":
+    - img
+  - button "Sélectionner l'outil Main":
+    - img
+- main
+- complementary:
+  - button "Autres photos Esc":
+    - img
+    - text: Autres photos Esc
+  - button "Supprimer":
+    - img
+    - text: Supprimer
+  - heading "with-exif-gps.jpeg" [level=1]:
+    - text: with-exif-gps.jpeg
+    - img
+  - button "Réinit. Ctrl + U" [disabled]:
+    - img
+    - text: Réinit. Ctrl + U
+  - button "Invalider ↓":
+    - img
+    - text: Invalider ↓
+  - list:
+    - listitem:
+      - img
+      - paragraph: "Boîte #1"
+      - paragraph:
+        - code: 637×305
+        - superscript:
+          - img
+          - code: 57%
+      - button [disabled]:
+        - img
+      - button:
+        - img
+    - listitem:
+      - paragraph:
+        - text: Pour créer une nouvelle boîte,<wbr /> utilisez les outils
+        - img
+        - text: ","
+        - img
+        - text: ou
+        - img
+      - paragraph: Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier
+  - paragraph:
+    - img
+    - text: Images avec recadrage
+    - code: 100%
+  - paragraph:
+    - img
+    - text: Recadrages confirmés
+    - code: 25%
+  - navigation:
+    - button:
+      - img
+    - code: 4⁄4
+    - button [disabled]:
+      - img
+    - switch "Auto":
+      - img
+    - text: Auto
+    - button "Continuer ␣":
+      - img
+      - text: Continuer ␣
+- text: Recadrer with-exif-gps.jpeg · Cigale
+```
