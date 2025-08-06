@@ -1,8 +1,10 @@
 <script>
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
@@ -13,7 +15,6 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 
 	/**
 	 * @typedef Props
@@ -40,6 +41,9 @@
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
 
+	let browserTabFocused = $state(true);
+	let showingOKInTabTitle = $state(false);
+
 	/* eslint-disable svelte/prefer-writable-derived */
 	// The window object is not reactive
 	let isNativeWindow = $state(false);
@@ -59,6 +63,34 @@
 		if (progress >= 1) {
 			window.nativeWindow?.startCallingAttention();
 		}
+	});
+
+	$effect(() => {
+		if (isNativeWindow) return;
+		const actualTitle = document.title.replace(/^(⏳ \d+% ·|🆗) /, '');
+
+		if (progress >= 1 || showingOKInTabTitle) {
+			document.title = `🆗 ${actualTitle}`;
+		} else if (progress === 0) {
+			document.title = actualTitle;
+		} else {
+			document.title = `⏳ ${percent(progress)} · ${actualTitle}`;
+		}
+	});
+
+	$effect(() => {
+		document.addEventListener('processing-queue-drained', () => {
+			if (!browserTabFocused) {
+				showingOKInTabTitle = true;
+			}
+		});
+		window.addEventListener('focus', () => {
+			showingOKInTabTitle = false;
+			browserTabFocused = true;
+		});
+		window.addEventListener('blur', () => {
+			browserTabFocused = false;
+		});
 	});
 </script>
 

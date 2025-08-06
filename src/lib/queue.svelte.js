@@ -83,10 +83,13 @@ class ProcessingQueue {
 	 */
 	#drained() {
 		this.log(null, 'Queue was drained');
-		uiState.processing.done = 0;
-		uiState.processing.total = 0;
 		uiState.loadingImages.clear();
 		uiState.queuedImages.clear();
+		document.dispatchEvent(new CustomEvent('processing-queue-drained'));
+		setTimeout(() => {
+			uiState.processing.done = 0;
+			uiState.processing.total = 0;
+		}, 500);
 	}
 
 	/**
