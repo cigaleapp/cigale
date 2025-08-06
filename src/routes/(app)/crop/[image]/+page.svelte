@@ -26,6 +26,7 @@
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
+	import { idComparator } from '$lib/database.js';
 	import { percent } from '$lib/i18n';
 	import * as idb from '$lib/idb.svelte.js';
 	import {
@@ -36,7 +37,7 @@
 		parseImageId
 	} from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { assertIs, deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import { assertIs, deleteMetadataValue, hasRuntimeType, storeMetadataValue } from '$lib/metadata';
 	import { m } from '$lib/paraglide/messages.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
@@ -63,7 +64,8 @@
 	import IconGallery from '~icons/ph/squares-four';
 	import IconDelete from '~icons/ph/trash';
 
-	const fileId = $derived(page.params.image);
+	// TODO figure out why the [image] route param is nullable
+	const fileId = $derived(page.params.image || '');
 	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));
 	const firstImage = $derived(images.at(0));
 
@@ -158,7 +160,7 @@
 		)
 	);
 	const imageSrc = $derived(uiState.previewURLs.get(fileId));
-	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idb.idComparator));
+	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idComparator));
 	const prevFileId = $derived.by(() => {
 		const idx = sortedFileIds.indexOf(fileId) - 1;
 		if (idx < 0) return undefined;
@@ -253,6 +255,7 @@
 		if (!metadataId) return;
 
 		await storeMetadataValue({
+			db: idb.databaseHandle(),
 			metadataId,
 			subjectId: imageId,
 			type: 'boolean',
@@ -291,6 +294,7 @@
 		}
 
 		await storeMetadataValue({
+			db: idb.databaseHandle(),
 			subjectId: imageId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
@@ -300,6 +304,7 @@
 
 		if (uiState.classificationMetadataId) {
 			await deleteMetadataValue({
+				db: idb.databaseHandle(),
 				metadataId: uiState.classificationMetadataId,
 				subjectId: imageId
 			});
@@ -314,14 +319,14 @@
 
 	const revertableCrops = $derived(
 		Object.fromEntries(
-			images.map((image) => [
-				image.id,
-				initialCrops[image.id] &&
-					!coordsAreEqual(
-						initialCrops[image.id].value,
-						image.metadata[uiState.cropMetadataId].value
-					)
-			])
+			images.map((image) => {
+				const initial = initialCrops[image.id]?.value;
+				const current = image.metadata[uiState.cropMetadataId]?.value;
+				return [
+					image.id,
+					initial && hasRuntimeType('boundingbox', current) && !coordsAreEqual(initial, current)
+				];
+			})
 		)
 	);
 
@@ -363,6 +368,7 @@
 		if (species && !species.manuallyModified) {
 			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 			await deleteMetadataValue({
+				db: idb.databaseHandle(),
 				metadataId: uiState.classificationMetadataId,
 				subjectId: image.id
 			});
@@ -373,6 +379,7 @@
 		if (imageId) {
 			// We're modifying an existing cropbox
 			await storeMetadataValue({
+				db: idb.databaseHandle(),
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId,
 				type: 'boundingbox',
@@ -386,6 +393,7 @@
 			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
 			newImageId = firstImage.id;
 			await storeMetadataValue({
+				db: idb.databaseHandle(),
 				metadataId: uiState.cropMetadataId,
 				subjectId: newImageId,
 				type: 'boundingbox',
@@ -542,6 +550,7 @@
 			async do() {
 				if (!selectedBox.imageId) return;
 				await deleteMetadataValue({
+					db: idb.databaseHandle(),
 					metadataId: uiState.cropMetadataId,
 					subjectId: selectedBox.imageId
 				});
@@ -808,7 +817,7 @@
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">
-				<ButtonInk onclick={goToGallery}>
+				<ButtonInk inline onclick={goToGallery}>
 					<IconGallery />
 					{m.other_photos()}
 					<KeyboardHint shortcut="Escape" />
@@ -924,6 +933,7 @@
 								onclick={async () => {
 									if (images.length === 1) {
 										await deleteMetadataValue({
+											db: idb.databaseHandle(),
 											metadataId: uiState.cropMetadataId,
 											subjectId: image.id
 										});

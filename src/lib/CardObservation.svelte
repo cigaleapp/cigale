@@ -23,8 +23,7 @@
 	 * @property {boolean} selected
 	 * @property {boolean} [selectable=true] - whether this image can be selected
 	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
-	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
-	 * @property {string} [loadingText] - text to show when loading and progress is -1
+	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -Infinity for a pending image (not started processig yet) and +Infinity to show the spinner without progress (infinite).
 	 * @property {boolean} [applyBoundingBoxes] crop the image to the bounding boxes instead of overlaying them on the full image. If boundingBoxes has multiple values, use the first one.
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
 	 * @property {number} boundingBoxes.x
@@ -55,6 +54,7 @@
 	} = $props();
 
 	const stacked = $derived(stacksize > 1);
+	const indeterminateLoading = $derived(Boolean(loading && Math.abs(loading) === Infinity));
 
 	// TODO: extract logic to tooltip.js
 	// https://stackoverflow.com/a/10017343/9943464
@@ -76,19 +76,23 @@
 >
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
-		<Card onclick={loading || errored ? undefined : (onclick ?? (() => {}))}>
+		<Card onclick={onclick && !loading && !errored ? onclick : () => {}}>
 			<div class="inner">
 				{#if loading !== undefined || errored}
 					<div class="loading-overlay">
 						{#if errored}
 							<Logo --size="1.5em" variant="error" />
-						{:else}
-							<LoadingSpinner progress={loading === -1 ? undefined : loading} />
+						{:else if loading === +Infinity}
+							<LoadingSpinner />
+						{:else if loading === -Infinity}
+							<LoadingSpinner waiting />
+						{:else if loading !== undefined}
+							<LoadingSpinner progress={loading} />
 						{/if}
-						<span class="text" class:smol={errored || loading === -1}>
+						<span class="text" class:smol={errored || indeterminateLoading}>
 							{#if errored || loading === undefined}
 								{m.error_text()}
-							{:else if loading === -1}
+							{:else if indeterminateLoading}
 								{statusText}
 							{:else}
 								{percent(loading)}

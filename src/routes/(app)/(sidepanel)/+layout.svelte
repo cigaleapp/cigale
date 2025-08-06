@@ -1,6 +1,5 @@
 <script>
 	import { page } from '$app/state';
-	import { watch } from 'runed';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
@@ -12,16 +11,17 @@
 		storeMetadataValue
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation } from '$lib/observations';
+	import { importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-	import { importMore } from './import/lib.svelte.js';
+	import { watch } from 'runed';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { cancellers } from '../+layout.svelte';
 
 	seo({ title: 'Importer' });
 
-	const { children, data } = $props();
+	const { children } = $props();
 
 	async function importImages() {
 		const filesInput = document.createElement('input');
@@ -33,7 +33,7 @@
 			if (!event.currentTarget.files) return;
 			const files = Array.from(event.currentTarget.files);
 			if (files.length === 0) return;
-			await importMore(data.swarpc, files);
+			importMore(files);
 		});
 		filesInput.click();
 	}
@@ -81,11 +81,15 @@
 					(tx) => {
 						tx.objectStore('Observation').clear();
 						tx.objectStore('ImageFile').clear();
-						uiState.previewURLs = new SvelteMap();
+						uiState.previewURLs.clear();
 						tx.objectStore('Image').clear();
-						uiState.erroredImages = new SvelteMap();
-						uiState.loadingImages = new SvelteSet();
+						uiState.queuedImages.clear();
+						uiState.erroredImages.clear();
+						uiState.loadingImages.clear();
+						uiState.processing.files = [];
 						uiState.setSelection?.([]);
+						cancellers.forEach((cancel) => cancel('Cancelled by user'));
+						cancellers.clear();
 					}
 				);
 			}
@@ -104,8 +108,8 @@
 		}
 	});
 
-	const showSidePanel = $derived(
-		tables.Image.state.length + tables.Observation.state.length + uiState.processing.files.length >
+	let showSidePanel = $derived(
+		uiState.processing.files.length + tables.Observation.state.length + tables.Image.state.length >
 			0
 	);
 
@@ -149,7 +153,11 @@
 
 	watch([() => selectedImages, () => selectedObservations], () => {
 		// FIXME needed to force refresh when selectedObservations' metadataOverrides change values, this isn't picked up by Svelte for some reason. I tried reproducing but couldn't yet, see https://svelte.dev/playground/eef37e409ca04fa888badd3e7588f461?version=5.25.0
-		void mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations)
+		void mergeMetadataFromImagesAndObservations(
+			db.databaseHandle(),
+			selectedImages,
+			selectedObservations
+		)
 			.then((values) => {
 				mergedMetadataValues = values;
 			})
@@ -174,9 +182,15 @@
 				if (!uiState.currentProtocol) return;
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
-						await deleteMetadataValue({ subjectId, metadataId: id, recursive: true });
+						await deleteMetadataValue({
+							db: db.databaseHandle(),
+							subjectId,
+							metadataId: id,
+							recursive: true
+						});
 					} else {
 						await storeMetadataValue({
+							db: db.databaseHandle(),
 							subjectId,
 							metadataId: id,
 							confidence: 1,
@@ -186,7 +200,11 @@
 					}
 				}
 
-				await mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations)
+				await mergeMetadataFromImagesAndObservations(
+					db.databaseHandle(),
+					selectedImages,
+					selectedObservations
+				)
 					.then((values) => {
 						mergedMetadataValues = values;
 					})

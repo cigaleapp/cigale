@@ -7,6 +7,7 @@ import { PROCEDURES } from '../../web-worker-procedures';
 import WebWorker from '../../web-worker.js?worker';
 import { m } from '$lib/paraglide/messages.js';
 import { getLocale } from '$lib/paraglide/runtime';
+import { initializeProcessingQueue } from '$lib/queue.svelte';
 
 export async function load() {
 	document.documentElement.lang = getLocale();

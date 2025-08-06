@@ -1,7 +1,7 @@
 import { ArkErrors } from 'arktype';
 import { formatISO } from 'date-fns';
 import { describe, expect, test } from 'vitest';
-import { Schemas } from './database';
+import { Schemas, idComparator } from './database';
 import { FilepathTemplate } from './schemas/protocols';
 
 describe('filepath templates', () => {
@@ -124,5 +124,28 @@ describe('MetadataValue', () => {
 				/^2025-01-01T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/
 			);
 		});
+	});
+});
+
+describe('idComparator', () => {
+	test('works on pairs of strings', () => {
+		expect(idComparator('a', 'b')).toBeLessThan(0);
+		expect(idComparator('b', 'a')).toBeGreaterThan(0);
+		expect(idComparator('a', 'a')).toBe(0);
+	});
+	test('works on numeric strings', () => {
+		expect(idComparator('1', '11')).toBeLessThan(0);
+		expect(idComparator('11', '1')).toBeGreaterThan(0);
+		expect(idComparator('0001', '1')).toBe(0);
+	});
+	test('works on pairs of numbers', () => {
+		expect(idComparator(1, 2)).toBeLessThan(0);
+		expect(idComparator(2, 1)).toBeGreaterThan(0);
+		expect(idComparator(1, 1)).toBe(0);
+	});
+	test('works on pairs of objects', () => {
+		expect(idComparator({ id: '1' }, { id: '11' })).toBeLessThan(0);
+		expect(idComparator({ id: 'a' }, { id: '11' })).toBeGreaterThan(0);
+		expect(idComparator({ id: '0001' }, { id: '1' })).toBe(0);
 	});
 });

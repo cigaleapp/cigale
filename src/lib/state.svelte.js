@@ -32,8 +32,9 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {number} processing.done éléments traités
  * @property {number} processing.time temps écoulé depuis le début du processus, en
  * @property {number} processing.progress pourcentage entre 0 et 1 de l'avancement du processus
+ * @property {(id: string) => void} processing.removeFile supprimer un fichier de la liste des fichiers en cours de traitement
  * @property {'inference'|'preprocessing'|'classification'|'loading'|'postprocessing'|'finished'|'visualizing'|'generating-zip'|''} processing.state état actuel du processus
- * @property {string[]} processing.files liste de noms de fichiers en cours d'importations
+ * @property {Array<{name: string; id: string}>} processing.files liste de noms de fichiers en cours d'importations, qui n'ont pas encore de ImageFile en base de données
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées. Utiliser setSelection pour modifier
  * @property {undefined | ((newSelection: string[]) => void)} setSelection modifier la sélection
  * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
@@ -42,6 +43,7 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => string | undefined} getPreviewURL
  * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
  * @property {Set<string>} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
+ * @property {Set<string>} queuedImages liste d'IDs d'images ou de ImageFiles en attente de traitement
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {Map<string, ZoomState>} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
  * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné. -1 pour désactiver l'inférence
@@ -74,6 +76,15 @@ export const uiState = $state({
 		state: '',
 		get progress() {
 			return this.total ? this.done / this.total : 0;
+		},
+		/**
+		 *
+		 * @param {string} id
+		 */
+		removeFile(id) {
+			const idx = this.files.findIndex((f) => f.id === id);
+			if (idx === -1) return;
+			this.files.splice(idx, 1);
 		}
 	},
 	selection: [],
@@ -95,6 +106,7 @@ export const uiState = $state({
 	},
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
+	queuedImages: new SvelteSet(),
 	keybinds: {},
 	cropperZoomStates: new SvelteMap(),
 	get classificationModels() {

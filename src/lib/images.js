@@ -2,6 +2,7 @@ import { uiState } from '$lib/state.svelte';
 import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
+import { ulid } from 'ulid';
 import { m } from './paraglide/messages';
 import { unique } from './utils';
 /**
@@ -27,30 +28,59 @@ const sampleImage = (id, fileId) => ({
 });
 
 /**
- * Retourne un id d'image sous la forme 000001_000001
- * @param {number|string} index
+ * Retourne un id d'image
+ * @example "01ARZ3NDEKTSV4RRFFQ69G5FAV_000001"
+ * @param {string} fileId
  * @param {number} subindex
  */
-export function imageId(index, subindex = 0) {
-	return `${imageFileId(index)}_${subindex.toString().padStart(6, '0')}`;
+export function imageId(fileId, subindex = 0) {
+	return `${fileId}_${subindex.toString().padStart(6, '0')}`;
 }
 
 /**
- * Retourne un id d'un ImageFile sous la forme 000001
- * @param {number|string} index
+ * Retourne un id d'un ImageFile
+ * @example "01ARZ3NDEKTSV4RRFFQ69G5FAV"
  */
-export function imageFileId(index) {
-	return Number.parseInt(index.toString(), 0).toString().padStart(6, '0');
+export function imageFileId() {
+	return ulid();
 }
 
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('imageId', () => {
-		expect(imageId(1)).toBe('000001_000000');
-		expect(imageId(1, 2)).toBe('000001_000002');
-		expect(imageId(1234567)).toBe('1234567_000000');
-		expect(imageId(1234567, 1234567)).toBe('1234567_1234567');
+		const id = imageFileId();
+		expect(imageId(id)).toBe(id + '_000000');
+		expect(imageId(id, 2)).toBe(id + '_000002');
+		expect(imageId(id, 1234567)).toBe(id + '_1234567');
 	});
+}
+
+/**
+ * @param {string} id
+ */
+export function isValidImageId(id) {
+	return /^[0-9A-Z]{26}_\d+$/.test(id);
+}
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+	describe('isValidImageId', () => {
+		test('imageId() generates a valid ID', () => {
+			expect(isValidImageId(imageId(imageFileId(), 0))).toBe(true);
+		});
+		test('imageFileId() is not a valid image ID by itself', () => {
+			expect(isValidImageId(imageFileId())).toBe(false);
+		});
+	});
+}
+
+/**
+ * @param {string} id
+ */
+function invalidImageIdError(id) {
+	return new Error(
+		`Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): ${id}`
+	);
 }
 
 /**
@@ -62,8 +92,8 @@ if (import.meta.vitest) {
 export function imageIdToFileId(id) {
 	if (id === undefined) return id;
 
-	if (!/^\d+_\d+$/.test(id)) {
-		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${id}`);
+	if (!isValidImageId(id)) {
+		throw invalidImageIdError(id);
 	}
 	// @ts-expect-error
 	return id?.replace(/(_\d+)+$/, '');
@@ -72,12 +102,16 @@ export function imageIdToFileId(id) {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('imageIdToFileId', () => {
-		expect(imageIdToFileId('000001_000000')).toBe('000001');
-		expect(imageIdToFileId('1234567_1234567')).toBe('1234567');
-		expect(() => imageIdToFileId('1234567_1234567_1234567')).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): 1234567_1234567_1234567]`
+		const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+		expect(imageIdToFileId(`${id}_000000`)).toBe(id);
+		expect(imageIdToFileId(`${id}_1234567`)).toBe(id);
+		expect(() => imageIdToFileId(`${id}_${id}_123456`)).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 0001KVE9TGKVKZ3GG307YQ70CZ_0001KVE9TGKVKZ3GG307YQ70CZ_123456]`
 		);
 		expect(imageIdToFileId(undefined)).toBeUndefined();
+		expect(() => imageIdToFileId('000001')).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 000001]`
+		);
 	});
 }
 
@@ -133,21 +167,23 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 						})
 					);
 			} catch (error) {
-				if (!notFoundOk) throw error;
-			}
-			uiState.erroredImages.delete(id);
-			uiState.loadingImages.delete(id);
-			if (uiState.imageOpenedInCropper === id) {
-				uiState.imageOpenedInCropper = '';
-			}
-
-			const previewURL = uiState.previewURLs.get(id);
-			if (previewURL) {
-				URL.revokeObjectURL(previewURL);
-				uiState.previewURLs.delete(id);
+				if (!notFoundOk) return Promise.reject(error);
 			}
 		}
 	);
+
+	uiState.erroredImages.delete(id);
+	uiState.loadingImages.delete(id);
+	uiState.queuedImages.delete(id);
+	if (uiState.imageOpenedInCropper === id) {
+		uiState.imageOpenedInCropper = '';
+	}
+
+	const previewURL = uiState.previewURLs.get(id);
+	if (previewURL) {
+		URL.revokeObjectURL(previewURL);
+		uiState.previewURLs.delete(id);
+	}
 }
 
 /**
@@ -340,8 +376,8 @@ if (import.meta.vitest) {
  * @returns {{ fileId: string; subindex: number|null }}
  */
 export function parseImageId(imageId) {
-	if (!/^\d+(_\d+)?$/.test(imageId)) {
-		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${imageId}`);
+	if (!isValidImageId(imageId) && !isValidImageId(`${imageId}_000000`)) {
+		throw invalidImageIdError(imageId);
 	}
 
 	const [fileId, subindex] = imageId.split('_', 2);
@@ -353,13 +389,29 @@ export function parseImageId(imageId) {
 }
 
 if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('parseImageId', () => {
-		expect(parseImageId('000001_000000')).toEqual({ fileId: '000001', subindex: 0 });
-		expect(parseImageId('1234567_1234567')).toEqual({ fileId: '1234567', subindex: 1234567 });
-		expect(parseImageId('1234567')).toEqual({ fileId: '1234567', subindex: null });
-		expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): coming in hot!!!]`
-		);
+	const { test, expect, describe } = import.meta.vitest;
+	describe('parseImageId', () => {
+		test('parses regular IDs', () => {
+			const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+			expect(parseImageId(`${id}_000000`)).toEqual({ fileId: id, subindex: 0 });
+			expect(parseImageId(`${id}_1234567`)).toEqual({ fileId: id, subindex: 1234567 });
+		});
+		test('parses ImageFile IDs', () => {
+			const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+			expect(parseImageId(id)).toEqual({ fileId: id, subindex: null });
+		});
+		test('throws on malformed IDs', () => {
+			expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
+				`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): coming in hot!!!]`
+			);
+		});
+
+		test('roundtrip', () => {
+			const id = imageFileId();
+			expect(parseImageId(imageId(id, 1234567))).toStrictEqual({
+				fileId: id,
+				subindex: 1234567
+			});
+		});
 	});
 }

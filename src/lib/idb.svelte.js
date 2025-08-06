@@ -1,12 +1,10 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { isReactiveTable, Tables } from './database.js';
+import { idComparator, isReactiveTable, Tables } from './database.js';
 import * as devalue from 'devalue';
-import { base } from '$app/paths';
 
-console.info(`Base path is ${base}`);
-
-export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
+export const previewingPrNumber =
+	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 export const databaseRevision = 3;
@@ -70,11 +68,14 @@ function wrangler(table) {
 			return _tablesState[table];
 		},
 		async refresh() {
+			console.info(`refresh ${table}`);
 			// @ts-ignore
 			_tablesState[table] = await this.list();
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
+		/** @param {string} key  */
+		getFromState: (key) => _tablesState[table].find((item) => item.id === key),
 		/** @param {typeof Tables[Table]['inferIn']} value */
 		async set(value) {
 			await set(table, value);
@@ -285,29 +286,6 @@ export async function* iterator(tableName, index = undefined) {
 }
 
 /**
- * Returns a comparator to sort objects by their id property
- * If both IDs are numeric, they are compared numerically even if they are strings
- * @template {{id: string|number} | string | number} IdOrObject
- * @param {IdOrObject} a
- * @param {IdOrObject} b
- * @returns {number}
- */
-export const idComparator = (a, b) => {
-	// @ts-ignore
-	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
-	// @ts-ignore
-	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
-
-	if (typeof a === 'number' && typeof b === 'number') return a - b;
-
-	if (typeof a === 'number') return -1;
-	if (typeof b === 'number') return 1;
-
-	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
-	return a.localeCompare(b);
-};
-
-/**
  * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you
  * @template {Array<keyof typeof Tables>} Tables
  * @template {IDBTransactionMode} [Mode="readwrite"]
@@ -350,6 +328,14 @@ export async function openTransaction(tableNames, { mode }, actions) {
 	for (const table of tableNames.filter(isReactiveTable)) {
 		await tables[table].refresh();
 	}
+}
+
+export function databaseHandle() {
+	if (!_database) {
+		throw new Error('Database not initialized. Call openDatabase() first.');
+	}
+
+	return _database;
 }
 
 export async function openDatabase() {

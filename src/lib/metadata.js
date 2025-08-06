@@ -1,8 +1,6 @@
 import { type } from 'arktype';
 import * as datefns from 'date-fns';
-import { Schemas } from './database.js';
-import * as idb from './idb.svelte.js';
-import { _tablesState, idComparator, tables } from './idb.svelte.js';
+import { idComparator, Schemas } from './database.js';
 import {
 	ensureNamespacedMetadataId,
 	metadataOptionId,
@@ -11,8 +9,9 @@ import {
 import { avg, mapValues } from './utils.js';
 
 /**
- * @import { IDBTransactionWithAtLeast } from './idb.svelte.js'
+ * @import { IDBDatabaseType, IDBTransactionWithAtLeast, ReactiveTableNames } from './idb.svelte.js'
  * @import * as DB from './database.js'
+ * @typedef {import('idb').IDBPDatabase<IDBDatabaseType>} DatabaseHandle
  */
 
 /**
@@ -26,6 +25,20 @@ import { avg, mapValues } from './utils.js';
  * @typedef TypedMetadataValue
  * @type {Omit<DB.MetadataValue, 'value'> & { value: RuntimeValue<Type> }}
  */
+
+/**
+ * Refresh the specified table. Does nothing if we can't import idb.svelte.js.
+ * We do it this way so that this file can be imported in the web worker.
+ * @param {...ReactiveTableNames} tableNames
+ */
+async function refreshTables(...tableNames) {
+	try {
+		const idb = await import('$lib/idb.svelte.js');
+		await Promise.all(tableNames.map((name) => idb.tables[name].refresh()));
+	} catch (error) {
+		console.warn(`Cannot refresh tables ${tableNames}:`, error);
+	}
+}
 
 /**
  * Get a strongly-typed metadata value from an image (Image ONLY, not Observation).
@@ -68,11 +81,13 @@ export function serializeMetadataValue(value) {
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
  * @param {boolean} [options.manuallyModified=false] si la valeur a été modifiée manuellement
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
- * @param {IDBTransactionWithAtLeast<["Image", "Observation", "ImageFile"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
+ * @param {DatabaseHandle} options.db BDD à modifier
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
+ * @param {AbortSignal} [options.abortSignal] signal d'abandon pour annuler la requête
  */
 export async function storeMetadataValue({
+	db,
 	subjectId,
 	metadataId,
 	type,
@@ -80,13 +95,19 @@ export async function storeMetadataValue({
 	confidence = 1,
 	alternatives = [],
 	manuallyModified = false,
-	tx = undefined,
-	cascadedFrom = []
+	cascadedFrom = [],
+	abortSignal
 }) {
+	let aborted = false;
+	abortSignal?.addEventListener('abort', () => {
+		aborted = true;
+	});
+
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
 
+	if (aborted) throw new Error('Operation aborted');
 	const newValue = {
 		value: serializeMetadataValue(value),
 		confidence,
@@ -101,69 +122,53 @@ export async function storeMetadataValue({
 		Object.entries(newValue.alternatives).filter(([key]) => key !== newValue.value)
 	);
 
-	console.log(
-		`Store metadata ${metadataId} = `,
-		value,
-		` in ${subjectId}${tx ? ` using tx ${tx.id}` : ''}`,
-		newValue
-	);
+	console.log(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
 
-	const metadata = tables.Metadata.state.find((m) => m.id === metadataId);
+	const metadata = await db.get('Metadata', metadataId);
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
 	if (type && metadata.type !== type)
 		throw new Error(`Type de métadonnée incorrect: ${metadata.type} !== ${type}`);
 
-	const image = tx
-		? await tx.objectStore('Image').get(subjectId)
-		: await tables.Image.raw.get(subjectId);
-	const observation = tx
-		? await tx.objectStore('Observation').get(subjectId)
-		: await tables.Observation.raw.get(subjectId);
-	const imagesFromImageFile = await (
-		tx ? tx.objectStore('Image').getAll() : idb.list('Image')
-	).then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+	if (aborted) throw new Error('Operation aborted');
+	const image = await db.get('Image', subjectId);
+	const observation = await db.get('Observation', subjectId);
+	const imagesFromImageFile = await db
+		.getAll('Image')
+		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
+	if (aborted) throw new Error('Operation aborted');
 	if (image) {
-		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, image);
 		image.metadata[metadataId] = newValue;
-
-		if (tx) tx.objectStore('Image').put(image);
-		else await tables.Image.raw.set(image);
-
-		_tablesState.Image[
-			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
-		].metadata[metadataId] = Schemas.MetadataValue.assert(newValue);
+		db.put('Image', image);
 	} else if (observation) {
-		// console.log(`Store metadata ${metadataId} in ${subjectId}: found`, observation);
 		observation.metadataOverrides[metadataId] = newValue;
-
-		if (tx) tx.objectStore('Observation').put(observation);
-		else await tables.Observation.raw.set(observation);
-
-		_tablesState.Observation[
-			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
-		].metadataOverrides[metadataId] = Schemas.MetadataValue.assert(newValue);
+		db.put('Observation', observation);
 	} else if (imagesFromImageFile) {
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
+				db,
 				subjectId: id,
 				metadataId,
 				value,
 				confidence,
 				manuallyModified,
-				tx
+				abortSignal
 			});
 		}
 	} else {
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
 
+	if (aborted) throw new Error('Operation aborted');
+
 	// Execute cascades if any
-	const cascades = await idb
+	const cascades = await db
 		.get('MetadataOption', metadataOptionId(metadataId, value.toString()))
 		.then((o) => o?.cascade ?? {});
 
 	for (const [cascadedMetadataId, cascadedValue] of Object.entries(cascades)) {
+		if (aborted) throw new Error('Operation aborted');
+
 		if (cascadedFrom.includes(cascadedMetadataId)) {
 			throw new Error(
 				`Boucle infinie de cascade détectée pour ${cascadedMetadataId} avec ${cascadedValue}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascadedMetadataId}`
@@ -173,15 +178,28 @@ export async function storeMetadataValue({
 		console.info(
 			`Cascading metadata ${metadataId} @ ${value} -> ${cascadedMetadataId}  = ${cascadedValue}`
 		);
+
+		const metadataNamespace = namespaceOfMetadataId(metadataId);
+		if (!metadataNamespace)
+			throw new Error(
+				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascadedMetadataId}`
+			);
 		await storeMetadataValue({
+			db,
 			subjectId,
-			metadataId: ensureNamespacedMetadataId(cascadedMetadataId, namespaceOfMetadataId(metadataId)),
+			metadataId: ensureNamespacedMetadataId(cascadedMetadataId, metadataNamespace),
 			value: cascadedValue,
 			confidence: 1, // TODO maybe improve that?
 			manuallyModified,
-			tx,
-			cascadedFrom: [...cascadedFrom, metadataId]
+
+			cascadedFrom: [...cascadedFrom, metadataId],
+			abortSignal
 		});
+	}
+
+	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
+	if (cascadedFrom.length === 0) {
+		await refreshTables(image ? 'Image' : 'Observation');
 	}
 }
 
@@ -191,39 +209,43 @@ export async function storeMetadataValue({
  * @param {string} options.subjectId id de l'image ou l'observation
  * @param {string} options.metadataId id de la métadonnée
  * @param {boolean} [options.recursive=false] si true, supprime la métadonnée de toutes les images composant l'observation
- * @param {IDBTransactionWithAtLeast<["Image", "Observation"]>} [options.tx] transaction IDB pour effectuer plusieurs opérations d'un coup
+ * @param {DatabaseHandle} options.db BDD à modifier
+ * @param {boolean} [options.reactive=true] refresh reactive table state if possible
  */
-export async function deleteMetadataValue({ subjectId, metadataId, recursive = false, tx }) {
-	const image = tx
-		? await tx.objectStore('Image').get(subjectId)
-		: await tables.Image.raw.get(subjectId);
-	const observation = tx
-		? await tx.objectStore('Observation').get(subjectId)
-		: await tables.Observation.raw.get(subjectId);
+export async function deleteMetadataValue({
+	db,
+	subjectId,
+	metadataId,
+	recursive = false,
+	reactive = true
+}) {
+	const image = await db.get('Image', subjectId);
+	const observation = await db.get('Observation', subjectId);
 
 	if (!image && !observation) throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 
 	console.log(`Delete metadata ${metadataId} in ${subjectId}`);
 	if (image) {
 		delete image.metadata[metadataId];
-		if (tx) tx.objectStore('Image').put(image);
-		else await tables.Image.raw.set(image);
-		delete _tablesState.Image[
-			_tablesState.Image.findIndex((img) => img.id.toString() === subjectId)
-		].metadata[metadataId];
+		db.put('Image', image);
 	} else if (observation) {
 		delete observation.metadataOverrides[metadataId];
-		if (tx) tx.objectStore('Observation').put(observation);
-		else await tables.Observation.raw.set(observation);
-		delete _tablesState.Observation[
-			_tablesState.Observation.findIndex((img) => img.id.toString() === subjectId)
-		].metadataOverrides[metadataId];
+		db.put('Observation', observation);
 		if (recursive) {
 			for (const imageId of observation.images) {
-				await deleteMetadataValue({ subjectId: imageId, recursive: false, metadataId, tx });
+				await deleteMetadataValue({
+					db,
+					subjectId: imageId,
+					recursive: false,
+					metadataId,
+					// Don't refresh table state on recursive calls, we just have to do it once
+					reactive: false
+				});
 			}
 		}
 	}
+
+	if (reactive) await refreshTables('Image', 'Observation');
 
 	return;
 }
@@ -234,11 +256,15 @@ export async function deleteMetadataValue({ subjectId, metadataId, recursive = f
  * @returns {Promise<DB.MetadataValues>}
  */
 export async function observationMetadata(observation) {
+	const { tables, databaseHandle } = await import('$lib/idb.svelte.js');
 	const images = await tables.Image.list().then((images) =>
 		images.filter((img) => observation.images.includes(img.id))
 	);
 
-	const metadataFromImages = await mergeMetadataValues(images.map((img) => img.metadata));
+	const metadataFromImages = await mergeMetadataValues(
+		databaseHandle(),
+		images.map((img) => img.metadata)
+	);
 
 	return {
 		...metadataFromImages,
@@ -252,6 +278,7 @@ export async function observationMetadata(observation) {
  * @returns {Promise<Record<string, DB.MetadataValue & { valueLabel?: string }>>}
  */
 export async function addValueLabels(values) {
+	const { tables, ...idb } = await import('$lib/idb.svelte.js');
 	const metadataOptions = await idb.list('MetadataOption');
 	return Object.fromEntries(
 		Object.entries(values).map(([key, value]) => {
@@ -272,13 +299,18 @@ export async function addValueLabels(values) {
 
 /**
  * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
+ * @param {DatabaseHandle} db
  * @param {DB.Image[]} images
  * @param {DB.Observation[]} observations
  */
-export async function mergeMetadataFromImagesAndObservations(images, observations) {
+export async function mergeMetadataFromImagesAndObservations(db, images, observations) {
 	console.log('merging metadata from', { images, observations });
-	const mergedValues = await mergeMetadataValues(images.map((img) => img.metadata));
+	const mergedValues = await mergeMetadataValues(
+		db,
+		images.map((img) => img.metadata)
+	);
 	const mergedOverrides = await mergeMetadataValues(
+		db,
 		observations.map((obs) => obs.metadataOverrides)
 	);
 
@@ -292,18 +324,15 @@ export async function mergeMetadataFromImagesAndObservations(images, observation
 		if (value) output[key] = value;
 	}
 
-	console.log('merged to', output);
-
 	return output;
 }
 
 /**
- *
+ * @param {DatabaseHandle} db
  * @param {Array<DB.MetadataValues>} values
  * @returns {Promise<Record<string, DB.MetadataValue & { merged: boolean }>>}
  */
-export async function mergeMetadataValues(values) {
-	console.log('merging metadata values from', values);
+export async function mergeMetadataValues(db, values) {
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
@@ -314,7 +343,7 @@ export async function mergeMetadataValues(values) {
 	const keys = new Set(values.flatMap((singleSubjectValues) => Object.keys(singleSubjectValues)));
 
 	for (const key of keys) {
-		const definition = await tables.Metadata.get(key);
+		const definition = Schemas.Metadata.assert(await db.get('Metadata', key));
 		if (!definition) {
 			console.warn(`Cannot merge metadata values for unknown key ${key}`);
 			continue;
@@ -699,6 +728,17 @@ export function isType(testedtyp, metadatatyp, value) {
  */
 function areType(testedtyp, metadatatyp, value) {
 	return value.every((v) => isType(testedtyp, metadatatyp, v));
+}
+
+/**
+ *
+ * @template {DB.MetadataType} Type
+ * @param {Type} type
+ * @param {any} value
+ * @returns {value is RuntimeValue<Type>}
+ */
+export function hasRuntimeType(type, value) {
+	return isType(type, type, value);
 }
 
 /**

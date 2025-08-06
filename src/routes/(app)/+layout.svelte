@@ -1,3 +1,10 @@
+<script module>
+	/**
+	 * @type {Map<string, import("swarpc").CancelablePromise["cancel"]>}
+	 */
+	export const cancellers = new SvelteMap();
+</script>
+
 <script>
 	import { base } from '$app/paths';
 	import { page } from '$app/state';
@@ -13,8 +20,12 @@
 	import { nonnull, pick } from '$lib/utils';
 	import { watch } from 'runed';
 	import Navigation from './Navigation.svelte';
+	import { SvelteMap } from 'svelte/reactivity';
+	import { initializeProcessingQueue } from '$lib/queue.svelte';
 
-	const { children } = $props();
+	const { children, data } = $props();
+
+	initializeProcessingQueue(data.swarpc, cancellers);
 
 	export const snapshot = {
 		capture() {

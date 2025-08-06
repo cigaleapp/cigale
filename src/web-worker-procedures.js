@@ -18,15 +18,11 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		input: type({
 			protocolId: 'string',
 			request: Schemas.HTTPRequest,
+			'classmapping?': Schemas.HTTPRequest,
 			task: '"classification" | "detection"',
 			'webgpu?': 'boolean'
 		}),
-		progress: type({
-			total: 'number',
-			transferred: 'number',
-			speed: 'number',
-			eta: 'number'
-		}),
+		progress: type('0 <= number <= 1'),
 		success: type('true')
 	},
 	isModelLoaded: {
@@ -54,17 +50,15 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	},
 	classify: {
 		input: type({
-			fileId: 'string',
+			imageId: 'string',
 			'webgpu?': 'boolean',
+			metadataIds: {
+				cropbox: 'string',
+				target: 'string'
+			},
 			taskSettings: {
 				input: Schemas.ModelInput,
 				'output?': { name: 'string' }
-			},
-			cropbox: {
-				x: '0 <= number <= 1',
-				y: '0 <= number <= 1',
-				w: '0 <= number <= 1',
-				h: '0 <= number <= 1'
 			}
 		}),
 		progress: type({}),

@@ -25,18 +25,35 @@ function safeJSONParse(value) {
  *
  * @param {object} ctx
  * @param {Page} ctx.page
- * @param {...string} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used
+ * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
+ * @param {...(string|string[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
  */
-export async function importPhotos({ page }, ...names) {
+export async function importPhotos({ page, wait = true }, ...names) {
 	if (!names) throw new Error('No file names provided');
-	names = names.map((name) => (path.extname(name) ? name : `${name}.jpeg`));
+
+	/** @param {string} name */
+	const addDotJpeg = (name) => (path.extname(name) ? name : `${name}.jpeg`);
+
+	/** @param {string} name */
+	const nameToPath = (name) => path.join('./tests/fixtures', addDotJpeg(name));
 
 	await expect(page.getByText('(.zip)')).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
-	await fileInput?.setInputFiles(names.map((f) => path.join('./tests/fixtures', f)));
-	await expect(page.getByText(names.at(-1), { exact: true })).toBeVisible({
-		timeout: 20_000
-	});
+
+	// In case import order matters
+	for (const name of names) {
+		await fileInput?.setInputFiles(Array.isArray(name) ? name.map(nameToPath) : nameToPath(name));
+	}
+
+	if (wait) {
+		let lastItem = names.at(-1);
+		if (Array.isArray(lastItem)) lastItem = lastItem.at(-1);
+		if (!lastItem) throw new Error('No last item to wait for');
+
+		await expect(page.getByText(addDotJpeg(lastItem), { exact: true })).toBeVisible({
+			timeout: 20_000
+		});
+	}
 }
 
 /**
@@ -64,6 +81,7 @@ export async function setSettings({ page }, newSettings) {
  */
 export async function getSettings({ page }) {
 	return page.evaluate(async () => {
+		window.refreshDB();
 		const settings = await window.DB.get('Settings', 'user').then(
 			(settings) => settings ?? window.DB.get('Settings', 'defaults')
 		);
@@ -74,17 +92,23 @@ export async function getSettings({ page }) {
 
 /**
  *
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} id
+ * @param {{ page: Page }  & ({ id: string } | { filename: string })} param0
  * @returns {Promise<typeof import('$lib/database').Schemas.Image.inferIn>}
  */
-export async function getImage({ page }, id) {
-	const image = await page.evaluate(async ([id]) => {
-		const image = await window.DB.get('Image', id);
-		if (!image) throw new Error(`Image ${id} not found in the database`);
-		return image;
-	}, /** @type {const} */ ([id]));
+export async function getImage({ page, ...query }) {
+	const image = await page.evaluate(async ([query]) => {
+		if ('id' in query) {
+			const image = await window.DB.get('Image', query.id);
+			if (!image) throw new Error(`Image ${query.id} not found in the database`);
+			return image;
+		} else {
+			const images = await window.DB.getAll('Image');
+			const image = images.find((i) => i.filename === query.filename);
+			if (!image)
+				throw new Error(`Image with filename ${query.filename} not found in the database`);
+			return image;
+		}
+	}, /** @type {const} */ ([query]));
 	return image;
 }
 
@@ -109,11 +133,14 @@ export async function getObservation({ page, label }) {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} [param0.protocolId] keep only metadata from this protocol, strip the prefix (namespace) from the keys in the returned object
- * @param {string} param0.image id of the image to get metadata from
+ * @param {string | {id: string} | {filename: string}} param0.image id of the image to get metadata from
  * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
  */
 export async function getMetadataValuesOfImage({ page, protocolId, image }) {
-	const { metadata } = await getImage({ page }, image);
+	const { metadata } = await getImage({
+		page,
+		...(typeof image === 'string' ? { id: image } : image)
+	});
 	return Object.fromEntries(
 		Object.entries(metadata)
 			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
@@ -129,11 +156,12 @@ export async function getMetadataValuesOfImage({ page, protocolId, image }) {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} param0.protocolId
- * @param {string} param0.observation
+ * @param {string} param0.observation label
  * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
  */
 export async function getMetadataOverridesOfObservation({ page, protocolId, observation }) {
 	const { metadataOverrides } = await getObservation({ page, label: observation });
+
 	return Object.fromEntries(
 		Object.entries(metadataOverrides)
 			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
@@ -147,29 +175,32 @@ export async function getMetadataOverridesOfObservation({ page, protocolId, obse
 /**
  *
  * @param {Page} page
- * @param {string} observationLabelOrImageId
+ * @param {{image: {id: string} | {filename: string}} | {observation: string}} query
  * @param {string} metadataKey
  * @param {string} [protocolId]
  */
-export async function getMetadataValue(
-	page,
-	observationLabelOrImageId,
-	metadataKey,
-	protocolId = defaultProtocol.id
-) {
-	if (/\d{6}_\d{6}/.test(observationLabelOrImageId)) {
+export async function getMetadataValue(page, query, metadataKey, protocolId = defaultProtocol.id) {
+	if ('image' in query) {
 		const metadata = await getMetadataValuesOfImage({
 			page,
-			image: observationLabelOrImageId,
+			image: query.image,
 			protocolId
 		});
+		await browserConsole.log(
+			page,
+			'Metadata of image',
+			query.image,
+			'for protocol',
+			protocolId,
+			metadata
+		);
 		return metadata[metadataKey];
 	}
 
 	const metadataOverrides = await getMetadataOverridesOfObservation({
 		page,
 		protocolId,
-		observation: observationLabelOrImageId
+		observation: query.observation
 	});
 
 	return metadataOverrides[metadataKey];
@@ -184,6 +215,7 @@ export async function getMetadataValue(
  */
 export async function listTable(page, tableName) {
 	const table = await page.evaluate(async ([tableName]) => {
+		window.refreshDB();
 		const table = await window.DB.getAll(tableName);
 		if (!table) throw new Error(`Table ${tableName} not found in the database`);
 		return table;
@@ -338,12 +370,14 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	// Import fixture zip
-	await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
+	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
 	if (waitForLoading) {
-		await expect(page.getByText('Analyse…').first()).toBeVisible();
-		await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 30_000 });
+		await expect(page.getByText(/Analyse|En attente…/).first()).toBeVisible({
+			timeout: 30_000
+		});
+		await expect(page.getByText(/Analyse|En attente…/)).toHaveCount(0, { timeout: 30_000 });
 	}
 }
 
@@ -379,7 +413,11 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 	await page.evaluate(
 		async (dump) => {
 			const decoded = window.devalue.parse(dump);
-			for (const [tableName, entries] of Object.entries(decoded)) {
+			const orderedTables = Object.entries(decoded).sort(([a], [b]) =>
+				// Load Protocol before everything else so that the default protocol does not start importing
+				a === 'Protocol' ? -1 : b === 'Protocol' ? 1 : a.localeCompare(b)
+			);
+			for (const [tableName, entries] of orderedTables) {
 				await window.DB.clear(tableName);
 				for (const entry of entries) {
 					console.log('[loadDatabaseDump] Adding entry to', tableName, entry);
@@ -390,4 +428,28 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 		},
 		readFileSync(location, 'utf-8')
 	);
+}
+
+export const browserConsole = {
+	/**
+	 * Log messages to the browser console
+	 * @param {import('@playwright/test').Page} page
+	 * @param {...any} args
+	 */
+	async log(page, ...args) {
+		await page.evaluate(
+			(args) => console.log(...args),
+			args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg))
+		);
+	}
+};
+
+/**
+ * @param {Page} page
+ * @param {import('@playwright/test').Locator} locator
+ */
+export async function tooltipOf(page, locator) {
+	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, { timeout: 1_000 });
+	const tippyId = await locator.getAttribute('aria-describedby');
+	return page.locator(`#${tippyId}`);
 }

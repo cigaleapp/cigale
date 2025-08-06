@@ -30,9 +30,12 @@ export async function mergeToObservation(parts) {
 			addedAt: new Date().toISOString(),
 			label: defaultObservationLabel([...observations, ...images]),
 			metadataOverrides: Object.fromEntries(
-				Object.entries(await mergeMetadataValues(observations.map((o) => o.metadataOverrides))).map(
-					([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }]
-				)
+				Object.entries(
+					await mergeMetadataValues(
+						db.databaseHandle(),
+						observations.map((o) => o.metadataOverrides)
+					)
+				).map(([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }])
 			)
 		});
 
@@ -67,22 +70,19 @@ export async function deleteObservation(
 			}
 
 			tx.objectStore('Observation').delete(id);
-			uiState.erroredImages.delete(id);
 
 			const images = await tx
 				.objectStore('Image')
 				.getAll()
 				.then((images) => images.filter((i) => observation.images.includes(i.id)));
 
-			for (const image of images) {
-				uiState.erroredImages.delete(image.id);
-			}
-
 			if (recursive) {
 				for (const fileId of imageFileIds(images)) {
 					await deleteImageFile(fileId, tx, notFoundOk);
 				}
 			}
+
+			uiState.erroredImages.delete(id);
 		}
 	);
 }

@@ -1,6 +1,6 @@
 import { uiState } from '$lib/state.svelte';
 import { toTopLeftCoords } from './BoundingBoxes.svelte';
-import { idComparator } from './idb.svelte';
+import { idComparator } from './database';
 import { imagesByImageFile } from './images';
 
 /**
@@ -9,6 +9,7 @@ import { imagesByImageFile } from './images';
  * @property {string[]} [subimages]
  * @property {string} title
  * @property {string} id
+ * @property {boolean} [virtual=false] whether the observation/image is virtual, ie not stored in the database yet. This causes us to append a `_virtual` suffix to the {#each} block's key, without changing the ID itself. Needed because we have a brief moment where both the in-DB newly created image exists _and_ the virtual one hasn't been removed yet. Not differentiating the key results in a Svelte error (duplicate key in {#each} block)
  * @property {number} index
  * @property {number} stacksize
  * @property {number|undefined} [loading]
@@ -32,6 +33,7 @@ import { imagesByImageFile } from './images';
  * @param {Observation[]} observations
  * @param {object} param2
  * @param {(imageOrFileId: Image | string) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
+ * @param {(imageOrFileId: Image | string) => boolean} param2.isQueued function to determine if an item is waiting on the processing queue. For observations, they are queued iff all their images are loaded.
  * @param {(fileId: string|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes. If false, the bounding boxes will be applied instead.
  * @returns {CardObservation[]}
  */
@@ -39,7 +41,7 @@ export function toAreaObservationProps(
 	imageFileIds,
 	images,
 	observations,
-	{ isLoaded, showBoundingBoxes }
+	{ isLoaded, isQueued, showBoundingBoxes }
 ) {
 	/**
 	 *
@@ -68,7 +70,7 @@ export function toAreaObservationProps(
 						id: fileId,
 						index: i,
 						stacksize: 1,
-						loading: isLoaded(fileId) ? undefined : -1,
+						loading: isLoaded(fileId) ? undefined : isQueued(fileId) ? -Infinity : +Infinity,
 						applyBoundingBoxes: !showBoundingBoxes(fileId),
 						boundingBoxes: boxes ?? []
 					});
@@ -89,7 +91,7 @@ export function toAreaObservationProps(
 						id: img.id,
 						index: imageFileIds.length + i,
 						stacksize: 1,
-						loading: img.fileId && isLoaded(img) ? undefined : -1,
+						loading: isLoaded(img) ? undefined : isQueued(img) ? -Infinity : +Infinity,
 						applyBoundingBoxes: !showBoundingBoxes(img.fileId ?? undefined),
 						boundingBoxes: box ? [toTopLeftCoords(box.value)] : []
 					});
@@ -116,7 +118,11 @@ export function toAreaObservationProps(
 					stacksize: imagesOfObservation.length,
 					applyBoundingBoxes: !showBoundingBoxes(firstImage?.fileId ?? undefined),
 					boundingBoxes: firstImage?.fileId ? (boundingBoxes ?? []) : [],
-					loading: imagesOfObservation.every(isLoaded) ? undefined : -1
+					loading: imagesOfObservation.every(isLoaded)
+						? undefined
+						: imagesOfObservation.every(isQueued)
+							? -Infinity
+							: +Infinity
 				};
 			})
 		]
