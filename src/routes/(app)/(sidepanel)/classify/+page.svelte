@@ -95,7 +95,6 @@
 				}
 			)
 			.then(() => {
-				toasts.success(m.classification_model_loaded());
 				classifmodelLoaded = true;
 			})
 			.catch((error) => {

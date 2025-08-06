@@ -74,9 +74,6 @@
 					modelLoadingProgress = progress;
 				}
 			)
-			.then(() => {
-				toasts.success(m.detection_model_loaded());
-			})
 			.catch((error) => {
 				console.error(error);
 				toasts.error(m.error_loading_detection_model());
