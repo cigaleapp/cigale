@@ -46,5 +46,5 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await expect(page.getByTestId('first-observation-card')).not.toBeVisible({
 		timeout: 5_000
 	});
-	expect(async () => getObservation({ page, label: 'lil-fella' })).toThrow();
+	expect(async () => getObservation({ page, label: 'lil-fella' })).rejects.toThrow();
 });

@@ -4,6 +4,7 @@ import {
 	browserConsole,
 	chooseDefaultProtocol,
 	getImage,
+	getMetadataValue,
 	getSettings,
 	goToTab,
 	listTable,
@@ -223,11 +224,11 @@ test.describe('Cropper view', () => {
 		 * @param {boolean} confirmed
 		 */
 		async function expectAllImagesConfirmedInDatabase(page, confirmed) {
-			const { leaf } = await imagesByName(page);
+			const { lilFella: image } = await imagesByName(page);
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
 				await expect(
-					isImageConfirmedInDatabase(page, `${leaf.fileId}_${i.toString().padStart(6, '0')}`)
+					isImageConfirmedInDatabase(page, `${image.fileId}_${i.toString().padStart(6, '0')}`)
 				).resolves.toBe(confirmed);
 			}
 		}
@@ -623,16 +624,9 @@ function confirmedCropBadge(page) {
  * @param {string} id
  */
 async function isImageConfirmedInDatabase(page, id) {
-	const image = await getImage({ page, id });
-	if (!image) throw new Error(`Image with id ${id} not found in the database`);
-	if (!image.metadata) throw new Error(`Image with id ${id} has no metadata`);
-	await browserConsole.log(
-		page,
-		`Checking if image ${id} is confirmed`,
-		exampleProtocol.crop.confirmationMetadata,
-		image.metadata[exampleProtocol.crop.confirmationMetadata]
+	return Boolean(
+		await getMetadataValue(page, { image: { id } }, exampleProtocol.crop.confirmationMetadata, '')
 	);
-	return image.metadata[exampleProtocol.crop.confirmationMetadata]?.value === 'true';
 }
 
 /**

@@ -186,6 +186,14 @@ export async function getMetadataValue(page, query, metadataKey, protocolId = de
 			image: query.image,
 			protocolId
 		});
+		await browserConsole.log(
+			page,
+			'Metadata of image',
+			query.image,
+			'for protocol',
+			protocolId,
+			metadata
+		);
 		return metadata[metadataKey];
 	}
 
