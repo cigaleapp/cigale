@@ -1,9 +1,10 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
+	browserConsole,
 	chooseDefaultProtocol,
 	getMetadataOverridesOfObservation,
-	getMetadataValuesOfImage,
+	getObservation,
 	loadDatabaseDump,
 	setSettings
 } from './utils';
@@ -23,10 +24,11 @@ import {
 async function initialize({
 	page,
 	dump = 'basic',
-	protocol,
+	protocol = dump === 'basic' ? undefined : 'Kitchen sink',
 	observation = dump === 'basic' ? 'lil-fella' : 'leaf'
 }) {
 	await loadDatabaseDump(page, `${dump}.devalue`);
+
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	if (protocol) {
 		await page.getByRole('button', { name: protocol, exact: true }).click();
@@ -94,7 +96,7 @@ test('does not show technical metadata ', async ({ page }) => {
 });
 
 test('can update a enum-type metadata with cascades', async ({ page }) => {
-	initialize({ page });
+	await initialize({ page });
 
 	const nthCombobox = (/** @type {number} */ n) =>
 		page
@@ -106,13 +108,13 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	await nthCombobox(1).click();
 	await expect(page.getByTestId('metadata-combobox-viewport')).toBeVisible();
 	await expect.soft(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-	  - option /Allacma fusca \\d+%/ [selected]:
+	  - option /Entomobrya muscorum \\d+%/ [selected]:
 	    - img
 	    - code: /\\d+%/
 	  - option /Dicyrtomina saundersi \\d+%/:
 	    - code: /\\d+%/
-	  - option "Dicyrtomina ornata 8%":
-	    - code: 8%
+	  - option "Allacma fusca 9%":
+	    - code: 9%
 	  - option "Anurida maritima"
 	  - option "Bilobella aurantiaca"
 	  - option "Bilobella braunerae"
@@ -120,10 +122,9 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	  - option "Bourletiella hortensis"
 	  - option "Brachystomella parvula"
 	  - option "Caprainea marginata"
-	  - option "Ceratophysella denticulata"
-	  - heading "Allacma fusca" [level=2]
+	  - heading "Entomobrya muscorum" [level=2]
 	  - link "En savoir plus gbif.org":
-	    - /url: https://gbif.org/species/4537246
+	    - /url: https://gbif.org/species/2120749
 	    - img
 	    - code: gbif.org
 	  - table:
@@ -137,15 +138,15 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	      - row "└─ Classe Collembola":
 	        - cell "└─ Classe"
 	        - cell "Collembola"
-	      - row "└─ Ordre Symphypleona":
+	      - row "└─ Ordre Entomobryomorpha":
 	        - cell "└─ Ordre"
-	        - cell "Symphypleona"
-	      - row "└─ Famille Sminthuridae":
+	        - cell "Entomobryomorpha"
+	      - row "└─ Famille Entomobryidae":
 	        - cell "└─ Famille"
-	        - cell "Sminthuridae"
-	      - row "└─ Genre Allacma":
+	        - cell "Entomobryidae"
+	      - row "└─ Genre Entomobrya":
 	        - cell "└─ Genre"
-	        - cell "Allacma"
+	        - cell "Entomobrya"
 	  - paragraph:
 	    - emphasis: Métadonées mise à jour à la sélection de cette option
 	`);
@@ -153,16 +154,16 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	// Hovering over another option
 	await page
 		.getByTestId('metadata-combobox-viewport')
-		.getByText('Dicyrtomina saundersi 26%')
+		.getByText('Dicyrtomina saundersi 18%')
 		.hover();
 	await expect.soft(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-	  - option /Allacma fusca \\d+%/ [selected]:
+	  - option /Entomobrya muscorum \\d+%/ [selected]:
 	    - img
 	    - code: /\\d+%/
 	  - option /Dicyrtomina saundersi \\d+%/:
 	    - code: /\\d+%/
-	  - option "Dicyrtomina ornata 8%":
-	    - code: 8%
+	  - option "Allacma fusca 9%":
+	    - code: 9%
 	  - option "Anurida maritima"
 	  - option "Bilobella aurantiaca"
 	  - option "Bilobella braunerae"
@@ -170,7 +171,6 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	  - option "Bourletiella hortensis"
 	  - option "Brachystomella parvula"
 	  - option "Caprainea marginata"
-	  - option "Ceratophysella denticulata"
 	  - heading "Dicyrtomina saundersi" [level=2]
 	  - link "En savoir plus gbif.org":
 	    - /url: https://gbif.org/species/4536978
@@ -203,18 +203,15 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	// Selecting the other option
 	await page
 		.getByTestId('metadata-combobox-viewport')
-		.getByText('Dicyrtomina saundersi 26%')
+		.getByText('Dicyrtomina saundersi 18%')
 		.click();
-	await expect
-		.soft(page.locator('[data-testid="sidepanel"] .metadata:first-child'))
-		.toMatchAriaSnapshot(
-			`
-	  - text: Espèce
-	  - combobox: Dicyrtomina saundersi
-	  - button:
-	    - img
-	`
-		);
+	await expect.soft(page.locator('[data-testid="sidepanel"] .metadata:first-child'))
+		.toMatchAriaSnapshot(`
+		  - text: Espèce
+		  - combobox: Dicyrtomina saundersi
+		  - button:
+		    - img
+		`);
 
 	// Check the cascades
 	await expect.soft(nthCombobox(2)).toMatchAriaSnapshot(`
@@ -249,17 +246,17 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	);
 
 	// Check database
-	const metadata = await getMetadataValuesOfImage({
+	const metadata = await getMetadataOverridesOfObservation({
 		page,
 		protocolId: 'io.github.cigaleapp.arthropods.example.light',
-		image: '000002_000000'
+		observation: 'lil-fella'
 	});
 
 	expect(metadata).toEqual({
 		...metadata,
-		species: '4537246',
-		genus: '4537242',
-		family: '5844',
+		species: '4536978',
+		genus: '2122281',
+		family: '7217',
 		order: '10730025',
 		shoot_date: '2025-04-25T12:38:36.000Z',
 		class: '10713444',
@@ -276,14 +273,13 @@ test('can search in a enum-type metadata combobox', async ({ page }) => {
 	  - option "Dicyrtoma fusca"
 	  - option "Dicyrtomina flavosignata"
 	  - option "Dicyrtomina minuta"
-	  - option "Dicyrtomina ornata 8%":
-	    - code: 8%
+	  - option "Dicyrtomina ornata"
 	  - option /Dicyrtomina saundersi \\d+%/:
 	    - code: /\\d+%/
 	  - option "Dicyrtomina signata"
-	  - heading "Allacma fusca" [level=2]
+	  - heading "Entomobrya muscorum" [level=2]
 	  - link "En savoir plus gbif.org":
-	    - /url: https://gbif.org/species/4537246
+	    - /url: https://gbif.org/species/2120749
 	    - img
 	    - code: gbif.org
 	  - table:
@@ -297,15 +293,15 @@ test('can search in a enum-type metadata combobox', async ({ page }) => {
 	      - row "└─ Classe Collembola":
 	        - cell "└─ Classe"
 	        - cell "Collembola"
-	      - row "└─ Ordre Symphypleona":
+	      - row "└─ Ordre Entomobryomorpha":
 	        - cell "└─ Ordre"
-	        - cell "Symphypleona"
-	      - row "└─ Famille Sminthuridae":
+	        - cell "Entomobryomorpha"
+	      - row "└─ Famille Entomobryidae":
 	        - cell "└─ Famille"
-	        - cell "Sminthuridae"
-	      - row "└─ Genre Allacma":
+	        - cell "Entomobryidae"
+	      - row "└─ Genre Entomobrya":
 	        - cell "└─ Genre"
-	        - cell "Allacma"
+	        - cell "Entomobrya"
 	  - paragraph:
 	    - emphasis: Métadonées mise à jour à la sélection de cette option
 	`);

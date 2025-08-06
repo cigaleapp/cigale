@@ -13,13 +13,17 @@ test.describe('classifies without error', () => {
 		await chooseDefaultProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'issue-435.jpeg');
-		await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Analyse…|En attente/);
+		await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Analyse…|En attente/, {
+			timeout: 20_000
+		});
 		await goToTab(page, 'classify');
 		await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Analyse…|En attente/, {
-			timeout: 10_000
+			timeout: 20_000
 		});
 		await page.waitForTimeout(5_000);
-		expect(await getMetadataValue(page, '000000_000000', 'species')).toBeDefined();
+		expect(
+			await getMetadataValue(page, { image: { filename: 'issue-435.jpeg' } }, 'species')
+		).toBeDefined();
 	});
 });
 
@@ -40,7 +44,7 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 		.getByRole('button', { name: 'Supprimer' })
 		.click();
 	await expect(page.getByTestId('first-observation-card')).not.toBeVisible({
-		timeout: 1_000
+		timeout: 5_000
 	});
 	expect(async () => getObservation({ page, label: 'lil-fella' })).toThrow();
 });

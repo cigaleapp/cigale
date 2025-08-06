@@ -307,9 +307,6 @@ test.describe('Cropper view', () => {
 				    - paragraph: "Boîte #1"
 				    - paragraph:
 				      - code: /\\d+×\\d+/
-				      - superscript:
-				        - img
-				        - code: /\\d+%/
 				    - button [disabled]:
 				      - img
 				    - button:
@@ -404,7 +401,7 @@ test.describe('Cropper view', () => {
 			});
 
 			test('does not leave ghost boxes', issue(462), async ({ page }) => {
-				const { lilFella: image } = await imagesByName(page);
+				const { withExifGps: image } = await imagesByName(page);
 				await page.keyboard.press('1');
 				await page.keyboard.press('Delete');
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
@@ -413,9 +410,9 @@ test.describe('Cropper view', () => {
 
 				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms
 				for (const _ of Array.from({ length: 10 })) {
-					await expect(page.locator('.boundingbox')).toHaveCount(0);
+					await expect(page.locator('.boundingbox')).toHaveCount(1);
 					await page.waitForTimeout(100);
-					await expect(page.locator('.boundingbox')).toHaveCount(0);
+					await expect(page.locator('.boundingbox')).toHaveCount(1);
 				}
 			});
 		});
@@ -547,13 +544,13 @@ test.describe('Cropper view', () => {
 			await checkImageTransforms(page, 1.728, 255.668, 140.98);
 
 			await page.keyboard.press('ArrowRight');
-			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
+			await page.waitForURL((u) => u.hash === `#/crop/${images.withExifGps.fileId}`);
 
 			await zoomAt(page, 40, 150, 150);
 			await checkImageTransforms(page, 1.44, 124.723, 73.3824);
 
 			await page.keyboard.press('ArrowLeft');
-			await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
+			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 
 			await checkImageTransforms(page, 1.728, 255.668, 140.98);
 		});

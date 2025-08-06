@@ -8,7 +8,8 @@ import {
 	importResults,
 	listTable,
 	readdirTreeSync,
-	toast
+	toast,
+	tooltipOf
 } from './utils';
 import { issue } from './annotations';
 import { compareAsc } from 'date-fns';
@@ -205,9 +206,12 @@ test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'sample.cr2');
-	await expect(
-		toast(page, /Les fichiers .+? ne sont pas (encore )?supportés/, { type: 'error' })
-	).toBeVisible();
+	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
+		timeout: 5_000
+	});
+	await page.getByTestId('first-observation-card').hover({ force: true });
+	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
+	await expect(tooltip).toHaveText(/Les fichiers .+? ne sont pas (encore )?supportés/);
 });
 
 test('can import a large image', issue(412, 415), async ({ page }) => {
@@ -227,9 +231,12 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, '20K-gray.jpeg');
-	await expect(
-		toast(page, "L'image est trop grande pour être traitée", { type: 'error' })
-	).toBeVisible();
+	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
+		timeout: 30_000
+	});
+	await page.getByTestId('first-observation-card').hover();
+	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
+	await expect(tooltip).toHaveText(/L'image est trop grande pour être traitée/);
 });
 
 test('can cancel import', issue(430), async ({ page }) => {
@@ -251,8 +258,11 @@ test('can cancel import', issue(430), async ({ page }) => {
 test('can import in multiple batches', async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
-	await importPhotos({ page, wait: false }, 'lil-fella', 'leaf');
-	await importPhotos({ page, wait: false }, 'with-exif-gps', '20K-gray', 'debugsquare.png');
+	await importPhotos(
+		{ page, wait: false },
+		['lil-fella', 'leaf'],
+		['with-exif-gps', '20K-gray', 'debugsquare.png']
+	);
 	await expect(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 60_000
 	});
@@ -260,5 +270,5 @@ test('can import in multiple batches', async ({ page }) => {
 	await expect(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('with-exif-gps.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('debugsquare.png')).toBeVisible();
-	await expect(page.locator('main').locator('article.card')).toHaveCount(4);
+	await expect(page.locator('main').locator('article.card')).toHaveCount(5);
 });
