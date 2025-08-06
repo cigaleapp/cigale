@@ -8,7 +8,7 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Option[]} options possible options. Each option is a tuple of [value, label]. The double-array allows you to explicitly specify the order of the options.
+	 * @property {Option[]} options possible options. Each option is a {key, label} object. The array allows you to explicitly specify the order of the options.
 	 * @property {string} searchQuery the string we're searching for
 	 * @property {string} [placeholder="Rechercher…"] the placeholder text for the search bar
 	 * @property {string|undefined} selectedValue the option selected by the user

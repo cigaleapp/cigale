@@ -5,6 +5,7 @@ import { imagesByImageFile } from './images';
 
 /**
  * @typedef CardObservation
+ * @property {Date} addedAt
  * @property {string} image
  * @property {string[]} [subimages]
  * @property {string} title
@@ -65,6 +66,7 @@ export function toAreaObservationProps(
 						.map(({ value }) => toTopLeftCoords(value));
 
 					return /**  @satisfies {CardObservation} */ ({
+						addedAt: images?.[0]?.addedAt ?? new Date(),
 						image: previewURL(fileId) ?? '',
 						title: images?.at(0)?.filename ?? '',
 						id: fileId,
@@ -87,6 +89,7 @@ export function toAreaObservationProps(
 					const box = uiState.cropMetadataValueOf(img);
 					return /**  @satisfies {CardObservation} */ ({
 						image: previewURL(img) ?? '',
+						addedAt: img.addedAt,
 						title: img.filename,
 						id: img.id,
 						index: imageFileIds.length + i,
@@ -110,6 +113,7 @@ export function toAreaObservationProps(
 
 				/**  @satisfies {CardObservation} */
 				return {
+					addedAt: observation.addedAt,
 					image: firstImage?.fileId ? (previewURL(firstImage?.fileId) ?? '') : '',
 					subimages: observation.images.toSorted(idComparator),
 					title: observation.label ?? `Observation ${firstImage?.filename ?? ''}`,

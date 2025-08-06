@@ -15,12 +15,16 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 <script>
 	import { uiState } from '$lib/state.svelte';
 	import { onMount } from 'svelte';
+	import IconSortAsc from '~icons/ph/sort-ascending';
+	import IconSortDesc from '~icons/ph/sort-descending';
+	import ButtonIcon from './ButtonIcon.svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import { defineKeyboardShortcuts } from './keyboard.svelte';
 	import { mutationobserver } from './mutations';
-	import { getSettings } from './settings.svelte';
 	import { m } from './paraglide/messages';
+	import * as datefns from 'date-fns';
+	import { getSettings } from './settings.svelte';
 
 	/**
 	 * @typedef Props
@@ -118,7 +122,54 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			inline: 'nearest'
 		});
 	});
+
+	/** @type {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} */
+	let sort = $state({
+		direction: 'asc',
+		key: 'filename'
+	});
+
+	const sortedImages = $derived(
+		images.toSorted((a, b) => {
+			if (sort.direction === 'desc') {
+				[a, b] = [b, a];
+			}
+
+			switch (sort.key) {
+				case 'id':
+					return a.id.localeCompare(b.id);
+				case 'filename':
+					return a.title.localeCompare(b.title);
+				case 'date':
+					return datefns.compareAsc(a.addedAt, b.addedAt);
+			}
+		})
+	);
 </script>
+
+<header class="sort">
+	<ButtonIcon
+		data-testid="toggle-sort-direction"
+		help={sort.direction === 'asc'
+			? m.change_sort_direction_to_desc()
+			: m.change_sort_direction_to_asc()}
+		onclick={() => {
+			sort.direction = sort.direction === 'asc' ? 'desc' : 'asc';
+		}}
+	>
+		{#if sort.direction === 'asc'}
+			<IconSortAsc />
+		{:else}
+			<IconSortDesc />
+		{/if}
+	</ButtonIcon>
+
+	<select bind:value={sort.key} aria-label={m.sort_by()}>
+		<option value="filename">{m.sort_key_filename()}</option>
+		<option value="date">{m.sort_key_date()}</option>
+		<option value="id">{m.sort_key_id()}</option>
+	</select>
+</header>
 
 <section
 	class="images"
@@ -135,7 +186,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each images as props, i (virtualizeKey(props))}
+	{#each sortedImages as props, i (virtualizeKey(props))}
 		<CardObservation
 			data-testid={i === 0 ? 'first-observation-card' : undefined}
 			data-id={props.id}
@@ -189,5 +240,12 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		width: 100%;
 		flex-grow: 1;
 		margin-top: 2rem;
+	}
+
+	header.sort {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		margin-bottom: 1em;
 	}
 </style>
