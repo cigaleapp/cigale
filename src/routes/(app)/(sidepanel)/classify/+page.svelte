@@ -51,7 +51,9 @@
 				uiState.classificationInferenceAvailable
 					? typeof item === 'string'
 						? false
-						: uiState.hasPreviewURL(item.fileId) && !uiState.loadingImages.has(item.id)
+						: uiState.hasPreviewURL(item.fileId) &&
+							!uiState.loadingImages.has(item.id) &&
+							!uiState.queuedImages.has(item.id)
 					: true
 		})
 	);
@@ -188,6 +190,7 @@
 	.observations {
 		padding: 2.5em;
 		display: flex;
+		flex-direction: column;
 		flex-grow: 1;
 	}
 

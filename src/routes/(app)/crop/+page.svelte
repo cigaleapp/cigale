@@ -36,6 +36,7 @@
 	.observations {
 		padding: 2.5em;
 		display: flex;
+		flex-direction: column;
 		flex-grow: 1;
 	}
 </style>

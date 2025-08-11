@@ -184,5 +184,12 @@
 	"file_format_not_supported_yet": "Les fichiers {format} ne sont pas encore supportés",
 	"file_format_not_supported": "Le format de fichier {format} n'est pas supporté",
 	"image_too_large": "L'image est trop grande pour être traitée",
-	"queued": "En attente"
+	"queued": "En attente",
+	"change_sort_direction_to_asc": "Trier par ordre croissant",
+	"change_sort_direction_to_desc": "Trier par ordre décroissant",
+	"sort_key_id": "Identifiant",
+	"sort_key_filename": "Nom de fichier",
+	"sort_key_date": "Date",
+	"sort_key_size": "Taille",
+	"sort_by": "Trier par"
 }
