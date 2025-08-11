@@ -15,6 +15,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 <script>
 	import { uiState } from '$lib/state.svelte';
 	import { onMount } from 'svelte';
+	import IconSortId from '~icons/ph/wrench';
+	import IconSortDate from '~icons/ph/calendar-blank';
+	import IconSortFilename from '~icons/ph/file-text';
 	import IconSortAsc from '~icons/ph/sort-ascending';
 	import IconSortDesc from '~icons/ph/sort-descending';
 	import ButtonIcon from './ButtonIcon.svelte';
@@ -165,9 +168,24 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	</ButtonIcon>
 
 	<select bind:value={sort.key} aria-label={m.sort_by()}>
-		<option value="filename">{m.sort_key_filename()}</option>
-		<option value="date">{m.sort_key_date()}</option>
-		<option value="id">{m.sort_key_id()}</option>
+		{#snippet btn()}
+			<button>
+				<selectedoption></selectedoption>
+			</button>
+		{/snippet}
+		{@render btn()}
+		<option value="filename">
+			<IconSortFilename />
+			{m.sort_key_filename()}
+		</option>
+		<option value="date">
+			<IconSortDate />
+			{m.sort_key_date()}
+		</option>
+		<option value="id">
+			<IconSortId />
+			{m.sort_key_id()}
+		</option>
 	</select>
 </header>
 
@@ -204,7 +222,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		/>
 	{/each}
 
-	{#if getSettings().showTechnicalMetadata}
+	{#if getSettings().showTechnicalMetadata && sortedImages.length > 0}
 		<div class="debug">
 			{#snippet displayIter(set)}
 				{'{'}
@@ -247,5 +265,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		align-items: center;
 		gap: 0.5em;
 		margin-bottom: 1em;
+		width: 100%;
+		padding: 0.5rem;
+		border-radius: var(--corner-radius);
+		background: color-mix(in srgb, var(--bg-primary) 25%, transparent);
+		z-index: 10;
 	}
 </style>
