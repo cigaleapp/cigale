@@ -1,9 +1,0 @@
-# Page snapshot
-
-```yaml
-- img
-- paragraph:
-  - text: Chargement…
-  - code: Chargement du protocole intégré
-- code: 7ff76fee37c27f7354369875115e96fcdb974da7
-```
