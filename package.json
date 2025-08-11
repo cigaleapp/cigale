@@ -86,7 +86,7 @@
 		"@playwright/test": "^1.54.2",
 		"@sveltejs/adapter-static": "^3.0.9",
 		"@sveltejs/kit": "^2.27.3",
-		"@sveltejs/vite-plugin-svelte": "^6.1.0",
+		"@sveltejs/vite-plugin-svelte": "^6.1.1",
 		"@types/piexifjs": "^1.0.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
