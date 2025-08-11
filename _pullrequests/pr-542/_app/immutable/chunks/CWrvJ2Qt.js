@@ -17,7 +17,7 @@ ${e}${s.slice(k+1,N)}`)}return w}function $t(s,e,t){let n=e,i=e+1,r=s[i];for(;r=
 ${t}`)+"'";return e.implicitKey?n:Fe(n,t,Xt,Ve(e,!1))}function le(s,e){const{singleQuote:t}=e.options;let n;if(t===!1)n=Se;else{const i=s.includes('"'),r=s.includes("'");i&&!r?n=ct:r&&!i?n=Se:n=t?ct:Se}return n(s,e)}let ft;try{ft=new RegExp(`(^|(?<!
 ))
 +(?!
-|$)`,"g")}catch{ft=/\n+(?!\n|$)/g}function Me({comment:s,type:e,value:t},n,i,r){const{blockQuote:o,commentString:l,lineWidth:a}=n.options;if(!o||/\n[\t ]+$/.test(t)||/^\s*$/.test(t))return le(t,n);const c=n.indent||(n.forceBlockIndent||Je(t)?"  ":""),d=o==="literal"?!0:o==="folded"||e===O.BLOCK_FOLDED?!1:e===O.BLOCK_LITERAL?!0:!qs(t,a,c.length);if(!t)return d?`|
+|$)`,"g")}catch{ft=/\n+(?!\n|$)/g}function Me({comment:s,type:e,value:t},n,i,r){const{blockQuote:o,commentString:l,lineWidth:a}=n.options;if(!o||/\n[\t ]+$/.test(t))return le(t,n);const c=n.indent||(n.forceBlockIndent||Je(t)?"  ":""),d=o==="literal"?!0:o==="folded"||e===O.BLOCK_FOLDED?!1:e===O.BLOCK_LITERAL?!0:!qs(t,a,c.length);if(!t)return d?`|
 `:`>
 `;let f,u;for(u=t.length;u>0;--u){const N=t[u-1];if(N!==`
 `&&N!=="	"&&N!==" ")break}let m=t.substring(u);const y=m.indexOf(`
