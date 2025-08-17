@@ -122,7 +122,7 @@
 		"sveltekit-search-params": "^3.0.0",
 		"turndown": "^7.2.1",
 		"typescript": "^5.9.2",
-		"vite": "^7.1.1",
+		"vite": "^7.1.2",
 		"vite-plugin-cross-origin-isolation": "^0.1.6",
 		"vitest": "^3.2.4"
 	},
