@@ -6,13 +6,17 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add progress percentage in browser tab title
 - Display proper .cr2 import error toast on linux
 - Handle too-large image errors gracefully
+- Improve appearance of small delete buttons
 - Raise memory limit for JPEG image decoding
+- Remove "model loaded" toast
 
 ### Bug Fixes
 
 - Correctly await transaction end in openTransaction
+- Fix results import
 - Fix some jankyness in error displaying when deleting ImageFiles
 - Surface errors in toast when ImageFile could not be created
 
