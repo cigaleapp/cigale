@@ -145,7 +145,8 @@ async function inferBoundingBoxes(swarpc, cancellers, file) {
 				[uiState.cropMetadataId]: {
 					value: JSON.stringify(toCropBox(boxes[i])),
 					confidence: scores[i],
-					alternatives: {}
+					alternatives: {},
+					manuallyModified: false
 				}
 			}
 		});

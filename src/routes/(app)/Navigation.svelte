@@ -20,11 +20,12 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number} [progress=0]
-	 * @property {() => void} [openKeyboardShortcuts]
+	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
 	 */
 
 	/** @type {Props} */
-	let { openKeyboardShortcuts, progress = 0 } = $props();
+	let { openKeyboardShortcuts, progress = 0, swarpc } = $props();
 
 	const path = $derived(page.url.hash.replace(/^#/, ''));
 
@@ -94,7 +95,7 @@
 	});
 </script>
 
-<DownloadResults {progress} bind:open={openExportModal} />
+<DownloadResults {swarpc} bind:open={openExportModal} />
 
 {#if previewingPrNumber}
 	<DeploymentDetails bind:open={openPreviewPRDetails} />

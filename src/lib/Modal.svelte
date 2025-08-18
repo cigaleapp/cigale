@@ -55,7 +55,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	});
 
 	/** @type {HTMLDialogElement | undefined} */
-	let modalElement;
+	let modalElement = $state();
 	$effect(() => {
 		if (!modalElement) return;
 		console.log(page.state[stateKey]);

@@ -247,9 +247,10 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 
 	// Piexif wants bytes _as a string_. why??? idk. but it seems like npm has no decent EXIF libraries that both support browsers and writing exif data.
 	let bytesstr = '';
-	// Build bytesstr in chunks, since String.fromCharCode is limited to ≥65535 characters (see https://stackoverflow.com/q/76857530 and https://stackoverflow.com/a/22747272)
-	for (let i = 0; i < bytes.byteLength; i += 65_000) {
-		const chunk = bytes.slice(i, i + 65_000);
+	// Build bytesstr in chunks, since String.fromCharCode is limited in characters size (see https://stackoverflow.com/q/76857530 and https://stackoverflow.com/a/22747272)
+	let chunksize = 32_000;
+	for (let i = 0; i < bytes.byteLength; i += chunksize) {
+		const chunk = bytes.slice(i, i + chunksize);
 		bytesstr += String.fromCharCode(...new Uint8Array(chunk));
 	}
 	const outputstr = piexif.insert(piexif.dump(exifDict), bytesstr);

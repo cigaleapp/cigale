@@ -1,10 +1,8 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
-	browserConsole,
 	chooseDefaultProtocol,
 	getMetadataOverridesOfObservation,
-	getObservation,
 	loadDatabaseDump,
 	setSettings
 } from './utils';
