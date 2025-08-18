@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.36% </span>
+                <span class="strong">47.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>54/114</span>
+                <span class='fraction'>57/120</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.36% </span>
+                <span class="strong">47.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>54/114</span>
+                <span class='fraction'>57/120</span>
             </div>
         
             
@@ -270,7 +270,21 @@
 <a name='L205'></a><a href='#L205'>205</a>
 <a name='L206'></a><a href='#L206'>206</a>
 <a name='L207'></a><a href='#L207'>207</a>
-<a name='L208'></a><a href='#L208'>208</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -346,6 +360,15 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -364,6 +387,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -511,8 +535,9 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {number} processing.done éléments traités
  * @property {number} processing.time temps écoulé depuis le début du processus, en
  * @property {number} processing.progress pourcentage entre 0 et 1 de l'avancement du processus
+ * @property {(id: string) =&gt; void} processing.removeFile supprimer un fichier de la liste des fichiers en cours de traitement
  * @property {'inference'|'preprocessing'|'classification'|'loading'|'postprocessing'|'finished'|'visualizing'|'generating-zip'|''} processing.state état actuel du processus
- * @property {string[]} processing.files liste de noms de fichiers en cours d'importations
+ * @property {Array&lt;{name: string; id: string}&gt;} processing.files liste de noms de fichiers en cours d'importations, qui n'ont pas encore de ImageFile en base de données
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées. Utiliser setSelection pour modifier
  * @property {undefined | ((newSelection: string[]) =&gt; void)} setSelection modifier la sélection
  * @property {Map&lt;string, string&gt;} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
@@ -521,6 +546,7 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') =&gt; string | undefined} getPreviewURL
  * @property {Map&lt;string, string&gt;} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
  * @property {Set&lt;string&gt;} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
+ * @property {Set&lt;string&gt;} queuedImages liste d'IDs d'images ou de ImageFiles en attente de traitement
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {Map&lt;string, ZoomState&gt;} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
  * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné. -1 pour désactiver l'inférence
@@ -553,6 +579,15 @@ export const uiState = $state({
 		state: '',
 		get <span class="fstat-no" title="function not covered" >progress() {</span>
 <span class="cstat-no" title="statement not covered" >			return this.total ? this.done / this.total : 0;</span>
+		},
+		/**
+		 *
+		 * @param {string} id
+		 */
+<span class="fstat-no" title="function not covered" >		removeFile(id) {</span>
+<span class="cstat-no" title="statement not covered" >			const idx = this.files.findIndex((f) =&gt; f.id === id);</span>
+<span class="cstat-no" title="statement not covered" >			if (idx === -1) return;</span>
+<span class="cstat-no" title="statement not covered" >			this.files.splice(idx, 1);</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 	},
 	selection: [],
@@ -574,6 +609,7 @@ export const uiState = $state({
 	},
 	erroredImages: new SvelteMap(),
 	loadingImages: new SvelteSet(),
+	queuedImages: new SvelteSet(),
 	keybinds: {},
 	cropperZoomStates: new SvelteMap(),
 	get <span class="fstat-no" title="function not covered" >classificationModels() {</span>
@@ -691,7 +727,7 @@ export const uiState = $state({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-20T14:40:23.585Z
+                at 2025-08-18T18:44:01.785Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

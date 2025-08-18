@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/119</span>
+                <span class='fraction'>0/120</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/119</span>
+                <span class='fraction'>0/120</span>
             </div>
         
             
@@ -469,8 +469,7 @@
 <a name='L404'></a><a href='#L404'>404</a>
 <a name='L405'></a><a href='#L405'>405</a>
 <a name='L406'></a><a href='#L406'>406</a>
-<a name='L407'></a><a href='#L407'>407</a>
-<a name='L408'></a><a href='#L408'>408</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L407'></a><a href='#L407'>407</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -503,6 +502,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -689,7 +689,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -703,8 +702,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -718,7 +717,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -890,6 +888,7 @@
 	import * as idb from './idb.svelte.js';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
 	import { uiState } from './state.svelte';
+	import { m } from './paraglide/messages.js';
 &nbsp;
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
@@ -1060,7 +1059,7 @@
 <span class="cstat-no" title="statement not covered" >			sideOffset={8}</span>
 <span class="cstat-no" title="statement not covered" >			data-wide-docs={hasImages ? true : undefined}</span>
 		&gt;
-			&lt;div class="viewport"&gt;
+			&lt;div class="viewport" data-testid="metadata-combobox-viewport"&gt;
 				&lt;div class="items"&gt;
 <span class="cstat-no" title="statement not covered" >					&lt;VirtualList items={filteredItems} let:item&gt;</span>
 						&lt;Combobox.Item
@@ -1096,7 +1095,6 @@
 <span class="cstat-no" title="statement not covered" >					{#if highlightedOption?.description}</span>
 						&lt;section class="description"&gt;
 <span class="cstat-no" title="statement not covered" >							{#await marked(highlightedOption.description) then html}</span>
-								&lt;!-- eslint-disable-next-line svelte/no-at-html-tags --&gt;
 <span class="cstat-no" title="statement not covered" >								{@html html}</span>
 <span class="cstat-no" title="statement not covered" >							{:catch error}</span>
 <span class="cstat-no" title="statement not covered" >								{#if getSettings().showTechnicalMetadata}</span>
@@ -1110,7 +1108,7 @@
 <span class="cstat-no" title="statement not covered" >						&lt;a href={highlightedOption.learnMore} target="_blank" class="learn-more"&gt;</span>
 							&lt;IconArrowRight /&gt;
 							&lt;div class="text"&gt;
-								&lt;span&gt;En savoir plus&lt;/span&gt;
+<span class="cstat-no" title="statement not covered" >								&lt;span&gt;{m.learn_more()}&lt;/span&gt;</span>
 <span class="cstat-no" title="statement not covered" >								&lt;code class="domain"&gt;{new URL(highlightedOption.learnMore).hostname}&lt;/code&gt;</span>
 							&lt;/div&gt;
 						&lt;/a&gt;
@@ -1125,7 +1123,6 @@
 									&lt;tr&gt;
 										&lt;td&gt;
 <span class="cstat-no" title="statement not covered" >											{#if revdepth &gt; 0}</span>
-												&lt;!-- eslint-disable-next-line svelte/no-at-html-tags --&gt;
 <span class="cstat-no" title="statement not covered" >												{@html '&amp;nbsp;'.repeat((revdepth - 1) * 3) + '└─'}</span>
 											{/if}
 <span class="cstat-no" title="statement not covered" >											{metadata}</span>
@@ -1291,7 +1288,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-07-20T14:40:23.585Z
+                at 2025-08-18T18:44:01.785Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
