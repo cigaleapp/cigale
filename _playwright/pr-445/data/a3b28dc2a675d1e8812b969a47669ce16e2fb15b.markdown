@@ -1,0 +1,140 @@
+# Page snapshot
+
+```yaml
+- dialog:
+  - banner:
+    - heading "Exporter les résultats" [level=1]
+    - button:
+      - img
+  - main:
+    - radio "Métadonnées seulement"
+    - text: Métadonnées seulement
+    - radio "Métadonnées et images recadrées" [checked]
+    - text: Métadonnées et images recadrées
+    - radio "Métadonnées, images recadrées et images originales Permet de ré-importer les résultats ultérieurement"
+    - text: Métadonnées, images recadrées et images originales
+    - paragraph: Permet de ré-importer les résultats ultérieurement
+    - text: Marge autour des images recadrées
+    - radio "Aucune"
+    - radio "5%"
+    - radio "10%"
+    - radio "? %":
+      - textbox "en pourcentage des dimensions de l'image": "?"
+      - text: "%"
+    - radio "40 px" [checked]:
+      - textbox "en pixels": "40"
+      - text: px
+    - paragraph: Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
+  - contentinfo:
+    - button "results.zip":
+      - img
+      - text: results.zip
+- banner:
+  - navigation:
+    - link "C.i.g.a.l.e.":
+      - /url: "#/"
+      - img
+      - text: C.i.g.a.l.e.
+    - link "Protocole":
+      - /url: "#/"
+    - img
+    - link "Importer":
+      - /url: "#/import"
+    - img
+    - link "Recadrer":
+      - /url: "#/crop/01K2ZBKKAVP4XEV347JR5FY6TB"
+    - img
+    - img
+    - link "Classifier":
+      - /url: "#/classify"
+    - img
+    - img
+    - button "Résultats":
+      - img
+      - text: Résultats
+    - button:
+      - img
+    - dialog:
+      - text: Thème
+      - switch "on/off switch" [checked]:
+        - img
+      - button [disabled]:
+        - img
+      - text: Mode debug
+      - switch "on/off switch":
+        - img
+      - radio "English 1%":
+        - text: English
+        - code: 1%
+      - radio "Français" [checked]
+      - radio "日本語 1%":
+        - text: 日本語
+        - code: 1%
+      - button "Gérer les protocoles"
+      - button "Raccourcis clavier"
+      - text: CIGALE ver.
+      - link "a23dea8":
+        - /url: https://github.com/cigaleapp/cigale/tree/a23dea8a1d0097bb730d3dcfc22e1b26bf73f845
+      - text: ·
+      - link "À propos":
+        - /url: "#/about"
+- complementary:
+  - button "Sélectionner l'outil Glisser-recadrer":
+    - img
+  - button "Sélectionner l'outil 2 points":
+    - img
+  - button "Sélectionner l'outil 4 points":
+    - img
+  - button "Sélectionner l'outil Déplacer":
+    - img
+  - button "Sélectionner l'outil Main":
+    - img
+- main
+- complementary:
+  - button "Autres photos Esc":
+    - img
+    - text: Autres photos Esc
+  - button "Supprimer":
+    - img
+    - text: Supprimer
+  - heading "debugsquare.png" [level=1]:
+    - text: debugsquare.png
+    - img
+  - button "Réinit. Ctrl + U" [disabled]:
+    - img
+    - text: Réinit. Ctrl + U
+  - button "Invalider ↓":
+    - img
+    - text: Invalider ↓
+  - list:
+    - listitem:
+      - img
+      - paragraph: "Boîte #1"
+      - paragraph:
+        - code: 518×518
+      - button [disabled]:
+        - img
+      - button:
+        - img
+  - paragraph:
+    - img
+    - text: Images avec recadrage
+    - code: 100%
+  - paragraph:
+    - img
+    - text: Recadrages confirmés
+    - code: 100%
+  - navigation:
+    - button [disabled]:
+      - img
+    - code: 1⁄1
+    - button [disabled]:
+      - img
+    - switch "Auto":
+      - img
+    - text: Auto
+    - button "Continuer ␣":
+      - img
+      - text: Continuer ␣
+- text: Recadrer debugsquare.png · Cigale
+```
