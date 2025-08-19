@@ -21,6 +21,7 @@ jobs:
       - name: Remove dirs in _vitest, _playwright, etc. for PRs that are no longer open
         env:
           REPO_PR_URL: ${{ github.event.repository.html_url }}/pulls
+          GH_TOKEN: ${{ github.token }}
         run: |
           open_prs=$(gh pr list --state open --json number --jq '.[].number')
           echo Open PRs: $open_prs
