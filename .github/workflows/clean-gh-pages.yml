@@ -20,7 +20,7 @@ jobs:
           sudo apt-get install gh -y
       - name: Remove dirs in _vitest, _playwright, etc. for PRs that are no longer open
         env:
-          REPO_PR_URL: ${{ github.event.repository.html_url }}/pulls
+          REPO_PR_URL: ${{ github.event.repository.html_url }}/pull
           GH_TOKEN: ${{ github.token }}
         run: |
           open_prs=$(gh pr list --state open --json number --jq '.[].number')
