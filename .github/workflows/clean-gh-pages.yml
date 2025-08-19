@@ -8,6 +8,8 @@ on:
 jobs:
   clean-gh-pages:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout gh-pages branch
         uses: actions/checkout@v2
@@ -34,3 +36,11 @@ jobs:
               fi
             done
           done
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Cleanup: Remove stale PR directories"
+          git push
