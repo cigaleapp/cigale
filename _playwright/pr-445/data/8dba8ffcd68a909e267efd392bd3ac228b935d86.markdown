@@ -1,0 +1,299 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Exporter les résultats
+        - button:
+          - img
+      - main:
+        - generic:
+          - radiogroup:
+            - generic:
+              - radio
+              - text: Métadonnées seulement
+            - generic:
+              - radio [checked]
+              - text: Métadonnées et images recadrées
+            - generic:
+              - radio
+              - text: Métadonnées, images recadrées et images originales
+              - paragraph: Permet de ré-importer les résultats ultérieurement
+        - generic:
+          - generic: Marge autour des images recadrées
+          - generic:
+            - radio [checked]: Aucune
+            - radio: 5%
+            - radio: 10%
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: "%"
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: px
+          - paragraph: Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
+      - contentinfo:
+        - button:
+          - img
+          - text: results.zip
+  - banner [ref=e4]:
+    - navigation [ref=e5]:
+      - link "C.i.g.a.l.e." [ref=e7]:
+        - /url: "#/"
+        - img [ref=e9]
+        - text: C.i.g.a.l.e.
+      - generic [ref=e18]:
+        - link "Protocole" [ref=e19]:
+          - /url: "#/"
+        - img [ref=e20]
+        - link "Importer" [ref=e22]:
+          - /url: "#/import"
+        - img [ref=e23]
+        - link "Recadrer" [ref=e26]:
+          - /url: "#/crop/"
+        - img [ref=e27]
+        - link "Classifier" [ref=e30]:
+          - /url: "#/classify"
+          - text: Classifier
+        - img [ref=e32]
+        - button "Résultats" [ref=e34] [cursor=pointer]:
+          - img [ref=e35] [cursor=pointer]
+          - text: Résultats
+      - generic [ref=e38]:
+        - button [ref=e39] [cursor=pointer]:
+          - img [ref=e40] [cursor=pointer]
+        - dialog:
+          - generic:
+            - generic:
+              - text: Thème
+              - switch "on/off switch" [checked]:
+                - generic:
+                  - img
+              - button [disabled]:
+                - img
+            - generic:
+              - text: Mode debug
+              - switch "on/off switch":
+                - generic:
+                  - img
+            - generic:
+              - generic:
+                - radio "English 1%":
+                  - text: English
+                  - generic:
+                    - code: 1%
+                - radio "Français" [checked]
+                - radio "日本語 1%":
+                  - text: 日本語
+                  - generic:
+                    - code: 1%
+            - generic:
+              - button "Gérer les protocoles"
+            - generic:
+              - button "Raccourcis clavier"
+            - generic:
+              - text: CIGALE ver.
+              - link "eded2f5":
+                - /url: https://github.com/cigaleapp/cigale/tree/eded2f54fc41b978d1f6a06d49515352234c0493
+              - text: ·
+              - link "À propos":
+                - /url: "#/about"
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: U
+        - definition: Supprimer toutes les images et observations
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: G
+        - definition: Fusionner des observations ou images
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: G
+        - definition: Séparer toutes les observations sélectionnées en images seules
+        - term:
+          - generic:
+            - generic:
+              - generic: Suppr
+        - definition: Supprimer les images et observations sélectionnées
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: A
+        - definition: Tout sélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: D
+        - definition: Tout désélectionner
+  - generic [ref=e44]:
+    - main [ref=e45]:
+      - generic [ref=e47]:
+        - article [active] [ref=e50] [cursor=pointer]:
+          - generic [ref=e51] [cursor=pointer]:
+            - generic [ref=e53] [cursor=pointer]:
+              - img [ref=e54] [cursor=pointer]
+              - img "cyan" [ref=e55] [cursor=pointer]
+            - generic [ref=e56] [cursor=pointer]:
+              - img [ref=e58] [cursor=pointer]
+              - heading "cyan" [level=2] [ref=e60] [cursor=pointer]
+        - article [ref=e63] [cursor=pointer]:
+          - generic [ref=e64] [cursor=pointer]:
+            - generic [ref=e66] [cursor=pointer]:
+              - img [ref=e67] [cursor=pointer]
+              - img "leaf" [ref=e68] [cursor=pointer]
+            - generic [ref=e69] [cursor=pointer]:
+              - img [ref=e70] [cursor=pointer]
+              - heading "leaf" [level=2] [ref=e72] [cursor=pointer]
+        - article [ref=e75] [cursor=pointer]:
+          - generic [ref=e76] [cursor=pointer]:
+            - generic [ref=e78] [cursor=pointer]:
+              - img [ref=e79] [cursor=pointer]
+              - img "lil-fella" [ref=e80] [cursor=pointer]
+            - generic [ref=e81] [cursor=pointer]:
+              - img [ref=e82] [cursor=pointer]
+              - heading "lil-fella" [level=2] [ref=e84] [cursor=pointer]
+        - article [ref=e87] [cursor=pointer]:
+          - generic [ref=e88] [cursor=pointer]:
+            - generic [ref=e89] [cursor=pointer]:
+              - img [ref=e91] [cursor=pointer]
+              - generic [ref=e95] [cursor=pointer]: Erreur
+              - button "Supprimer" [ref=e97] [cursor=pointer]:
+                - img [ref=e98] [cursor=pointer]
+                - text: Supprimer
+            - generic [ref=e101] [cursor=pointer]:
+              - img [ref=e102] [cursor=pointer]
+              - img "with-exif-gps" [ref=e103] [cursor=pointer]
+            - generic [ref=e104] [cursor=pointer]:
+              - img [ref=e105] [cursor=pointer]
+              - heading "with-exif-gps" [level=2] [ref=e107] [cursor=pointer]
+    - complementary [ref=e108]:
+      - generic [ref=e110]:
+        - img [ref=e111]
+        - img "Image 1 de l'observation cyan" [ref=e112]
+      - heading "cyan" [level=2] [ref=e113]:
+        - img [ref=e114]
+        - textbox "Nom de l'observation" [ref=e116]: cyan
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - generic [ref=e120]: Espèce
+            - generic [ref=e121]:
+              - combobox [ref=e123]: Allacma fusca
+              - code [ref=e125]: 18%
+              - button [ref=e126] [cursor=pointer]:
+                - img [ref=e127] [cursor=pointer]
+          - generic [ref=e129]:
+            - generic [ref=e130]: Alternatives
+            - list [ref=e131]:
+              - listitem [ref=e132]:
+                - generic [ref=e133]: Sminthurus viridis
+                - code [ref=e135]: 11%
+                - button [ref=e136] [cursor=pointer]:
+                  - img [ref=e137] [cursor=pointer]
+              - listitem [ref=e139]:
+                - generic [ref=e140]: Bourletiella hortensis
+                - code [ref=e142]: 10%
+                - button [ref=e143] [cursor=pointer]:
+                  - img [ref=e144] [cursor=pointer]
+        - generic [ref=e147]:
+          - generic [ref=e148]: Genre
+          - generic [ref=e149]:
+            - combobox [ref=e151]: Allacma
+            - button [ref=e152] [cursor=pointer]:
+              - img [ref=e153] [cursor=pointer]
+        - generic [ref=e156]:
+          - generic [ref=e157]: Famille
+          - generic [ref=e158]:
+            - combobox [ref=e160]: Sminthuridae
+            - button [ref=e161] [cursor=pointer]:
+              - img [ref=e162] [cursor=pointer]
+        - generic [ref=e165]:
+          - generic [ref=e166]: Ordre
+          - generic [ref=e167]:
+            - combobox [ref=e169]: Symphypleona
+            - button [ref=e170] [cursor=pointer]:
+              - img [ref=e171] [cursor=pointer]
+        - generic [ref=e173]:
+          - generic [ref=e174]:
+            - generic [ref=e175]: Date
+            - generic [ref=e176]:
+              - textbox "Date" [ref=e178]
+              - button [disabled] [ref=e179] [cursor=pointer]:
+                - img [ref=e180] [cursor=pointer]
+          - paragraph [ref=e183]: Moment où la photo a été prise
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - generic [ref=e186]: Localisation
+            - generic [ref=e187]:
+              - textbox "Localisation" [ref=e189]
+              - button [disabled] [ref=e190] [cursor=pointer]:
+                - img [ref=e191] [cursor=pointer]
+          - paragraph [ref=e194]: Endroit où la photo a été prise
+        - generic [ref=e196]:
+          - generic [ref=e197]: Classe
+          - generic [ref=e198]:
+            - combobox [ref=e200]: Collembola
+            - button [ref=e201] [cursor=pointer]:
+              - img [ref=e202] [cursor=pointer]
+        - generic [ref=e205]:
+          - generic [ref=e206]: Phylum
+          - generic [ref=e207]:
+            - combobox [ref=e209]: Arthropoda
+            - button [ref=e210] [cursor=pointer]:
+              - img [ref=e211] [cursor=pointer]
+        - generic [ref=e214]:
+          - generic [ref=e215]: Règne
+          - generic [ref=e216]:
+            - combobox [ref=e218]: Animalia
+            - button [ref=e219] [cursor=pointer]:
+              - img [ref=e220] [cursor=pointer]
+      - generic [ref=e222]:
+        - generic [ref=e223]:
+          - button "Regrouper Ctrl + G" [ref=e224] [cursor=pointer]:
+            - img [ref=e225] [cursor=pointer]
+            - text: Regrouper
+            - generic [ref=e227] [cursor=pointer]:
+              - generic [ref=e228] [cursor=pointer]: Ctrl
+              - generic [ref=e229] [cursor=pointer]: +
+              - generic [ref=e230] [cursor=pointer]: G
+          - button "Séparer Ctrl + Shift + G" [ref=e231] [cursor=pointer]:
+            - img [ref=e232] [cursor=pointer]
+            - text: Séparer
+            - generic [ref=e234] [cursor=pointer]:
+              - generic [ref=e235] [cursor=pointer]: Ctrl
+              - generic [ref=e236] [cursor=pointer]: +
+              - generic [ref=e237] [cursor=pointer]: Shift
+              - generic [ref=e238] [cursor=pointer]: +
+              - generic [ref=e239] [cursor=pointer]: G
+        - button "Supprimer 1 images Suppr" [ref=e241] [cursor=pointer]:
+          - img [ref=e242] [cursor=pointer]
+          - text: Supprimer 1 images
+          - generic [ref=e245] [cursor=pointer]: Suppr
+  - generic [ref=e246]: Classification · Cigale
+```
