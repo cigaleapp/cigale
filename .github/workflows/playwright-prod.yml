@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run Playwright tests
-        run: npx playwright test --reporter=html
+        run: npx playwright test
         env:
           BASE_URL: https://cigaleapp.github.io/cigale/
       - name: Deploy results on github pages
