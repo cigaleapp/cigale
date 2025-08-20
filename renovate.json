@@ -14,6 +14,12 @@
 			"description": "Auto-merge svelte(kit) upgrades (E2E tests should validate that nothing catastrophic happens)",
 			"matchPackageNames": ["@sveltejs/kit", "svelte"],
 			"automerge": true
+		},
+		{
+			"description": "Group playwright docker image & npm package",
+			"matchPackageNames": ["@playwright/test", "mcr.microsoft.com/playwright"],
+			"groupName": "Playwright",
+			"automerge": true
 		}
 	]
 }
