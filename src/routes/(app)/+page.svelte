@@ -12,7 +12,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import Fuse from 'fuse.js';
-	import { queryParam, ssp } from 'sveltekit-search-params';
+	import { queryParameters, ssp } from 'sveltekit-search-params';
 	import IconCheck from '~icons/ph/check';
 	import IconImport from '~icons/ph/upload-simple';
 	import IconManage from '~icons/ph/gear';
@@ -28,15 +28,15 @@
 	);
 
 	let importingPreselectedProtocol = $state(false);
-	const preselectedProtocol = queryParam('protocol');
-	const preselectedClassificationModel = queryParam('classificationModel', ssp.number());
-	const preselectedCropModel = queryParam('cropModel', ssp.number());
+	const preselection = queryParameters({
+		protocol: ssp.string(),
+		classificationModel: ssp.number(),
+		cropModel: ssp.number()
+	});
 
 	let openImportRemoteProtocol = $state();
 	const preselectedProtocolIsRemote = $derived(
-		$preselectedProtocol &&
-			$preselectedProtocol.startsWith('https:') &&
-			URL.canParse($preselectedProtocol)
+		Boolean(preselection.protocol?.startsWith('https:') && URL.canParse(preselection.protocol))
 	);
 
 	afterNavigate(() => {
@@ -47,18 +47,18 @@
 
 	$effect(() => {
 		if (preselectedProtocolIsRemote) return;
-		if ($preselectedProtocol) {
-			uiState.currentProtocolId = $preselectedProtocol;
-			$preselectedProtocol = null;
+		if (preselection.protocol) {
+			uiState.currentProtocolId = preselection.protocol;
+			preselection.protocol = null;
 		}
-		if ($preselectedClassificationModel !== null) {
-			void uiState.setSelectedClassificationModel($preselectedClassificationModel).then(() => {
-				$preselectedClassificationModel = null;
+		if (preselection.classificationModel !== null) {
+			void uiState.setSelectedClassificationModel(preselection.classificationModel).then(() => {
+				preselection.classificationModel = null;
 			});
 		}
-		if ($preselectedCropModel !== null) {
-			void uiState.setSelectedCropModel($preselectedCropModel).then(() => {
-				$preselectedCropModel = null;
+		if (preselection.cropModel !== null) {
+			void uiState.setSelectedCropModel(preselection.cropModel).then(() => {
+				preselection.cropModel = null;
 			});
 		}
 	});
@@ -94,12 +94,12 @@
 	confirm={m.import()}
 	bind:open={openImportRemoteProtocol}
 	oncancel={() => {
-		$preselectedProtocol = null;
+		preselection.protocol = null;
 	}}
 	onconfirm={async () => {
-		if (!$preselectedProtocol) return;
+		if (!preselection.protocol) return;
 		importingPreselectedProtocol = true;
-		const raw = await fetch($preselectedProtocol)
+		const raw = await fetch(preselection.protocol)
 			.then((res) => res.text())
 			.catch((e) => {
 				toasts.error(m.error_importing_remote_protocol({ error: e }));
@@ -114,7 +114,7 @@
 			await tables.Metadata.refresh();
 
 			uiState.currentProtocolId = id;
-			$preselectedProtocol = null;
+			preselection.protocol = null;
 		} catch (error) {
 			toasts.error(m.error_importing_remote_protocol({ error }));
 		} finally {
@@ -124,9 +124,9 @@
 >
 	{m.remote_protocol_import_confirm_following()}
 
-	{#if $preselectedProtocol && preselectedProtocolIsRemote}
-		<a href={$preselectedProtocol}>
-			{@render highlightHostname($preselectedProtocol)}
+	{#if preselection.protocol && preselectedProtocolIsRemote}
+		<a href={preselection.protocol}>
+			{@render highlightHostname(preselection.protocol)}
 		</a>
 	{/if}
 
@@ -164,9 +164,9 @@
 						testid={i === 0 ? 'protocol-to-choose' : undefined}
 						onclick={async () => {
 							uiState.currentProtocolId = p.id;
-							$preselectedProtocol = null;
-							$preselectedClassificationModel = null;
-							$preselectedCropModel = null;
+							preselection.protocol = null;
+							preselection.classificationModel = null;
+							preselection.cropModel = null;
 							await goto('#/import');
 						}}
 					>
