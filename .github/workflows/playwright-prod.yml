@@ -13,7 +13,7 @@ jobs:
       name: Live tests
       url: https://cigaleapp.github.io/cigale/playwright-report
     container:
-      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      image: mcr.microsoft.com/playwright:v1.54.2-noble
       options: --user 1001
     steps:
       - uses: actions/checkout@v5
