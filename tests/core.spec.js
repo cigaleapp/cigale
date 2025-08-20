@@ -127,7 +127,7 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 		)
 	});
 
-	await page.goto(`/?protocol=${encodeURIComponent(protocolUrl)}`);
+	await page.goto(`?protocol=${encodeURIComponent(protocolUrl)}`);
 	await expect(modal(page, 'Importer le protocole distant ?')).toBeVisible();
 	await expect(modal(page, 'Importer le protocole distant ?').getByRole('link')).toHaveAttribute(
 		'href',
@@ -236,7 +236,7 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 		.click();
 
 	await page.goto(
-		`/?protocol=${encodeURIComponent(defaultProtocol.source)}&classificationModel=0&cropModel=0`
+		`?protocol=${encodeURIComponent(defaultProtocol.source)}&classificationModel=0&cropModel=0`
 	);
 	await modal(page, 'Importer le protocole distant ?')
 		.getByRole('button', { name: 'Importer' })
