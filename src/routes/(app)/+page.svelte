@@ -5,6 +5,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { seo } from '$lib/seo.svelte';
@@ -14,10 +15,9 @@
 	import Fuse from 'fuse.js';
 	import { queryParameters, ssp } from 'sveltekit-search-params';
 	import IconCheck from '~icons/ph/check';
-	import IconImport from '~icons/ph/upload-simple';
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
-	import { m } from '$lib/paraglide/messages.js';
+	import IconImport from '~icons/ph/upload-simple';
 
 	const { data } = $props();
 
@@ -28,10 +28,14 @@
 	);
 
 	let importingPreselectedProtocol = $state(false);
+	const numberToIndex = {
+		encode: (/** @type {unknown} */ v) => (v === null ? undefined : (Number(v) + 1).toString()),
+		decode: (/** @type {unknown} */ v) => (v === null ? null : Number(v) - 1)
+	};
 	const preselection = queryParameters({
 		protocol: ssp.string(),
-		classificationModel: ssp.number(),
-		cropModel: ssp.number()
+		classificationModel: numberToIndex,
+		cropModel: numberToIndex
 	});
 
 	let openImportRemoteProtocol = $state();
