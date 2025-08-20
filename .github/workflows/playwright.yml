@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     container:
-      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      image: mcr.microsoft.com/playwright:v1.54.2-noble
       options: --user 1001
     strategy:
       fail-fast: false
