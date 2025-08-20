@@ -15,6 +15,8 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.55.0-noble
       options: --user 1001
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
@@ -29,5 +31,11 @@ jobs:
           BASE_URL: https://cigaleapp.github.io/cigale/
       - name: Deploy results on github pages
         if: ${{ !cancelled() }}
+        env:
+          NODE_DEBUG: gh-pages
+          ORIGIN: https://git:${{ github.token }}@github.com/${{ github.repository }}.git
         run: |
-          npx --yes gh-pages --dist=playwright-report --dest=./playwright --branch=gh-pages --message="Deploy Playwright report for ${{ github.event_name }} #${{ github.run_number }}"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+          git remote set-url origin $ORIGIN
+          npx --yes gh-pages --dist=playwright-report --dest=./playwright --branch=gh-pages --message="Deploy Playwright report for prod, run #${{ github.run_number }}\n\nSee logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{ github.job }}"
