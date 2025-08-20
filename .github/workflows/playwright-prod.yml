@@ -1,0 +1,32 @@
+name: End-to-end tests on production
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0' # Every week
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: Live tests
+      url: https://cigaleapp.github.io/cigale/playwright-report
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test --reporter=html
+        env:
+          BASE_URL: https://cigaleapp.github.io/cigale/
+      - name: Deploy results on github pages
+        if: ${{ !cancelled() }}
+        run: |
+          npx --yes gh-pages --dist=playwright-report --dest=./playwright --branch=gh-pages --message="Deploy Playwright report for ${{ github.event_name }} #${{ github.run_number }}"
