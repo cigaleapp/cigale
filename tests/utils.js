@@ -453,3 +453,40 @@ export async function tooltipOf(page, locator) {
 	const tippyId = await locator.getAttribute('aria-describedby');
 	return page.locator(`#${tippyId}`);
 }
+
+/**
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {string} source
+ * @param {{json: object} | {body: string | Buffer}} mockedResult
+ */
+export async function mockProtocolSourceURL(page, context, source, mockedResult) {
+	await Promise.all(
+		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
+		[context, page].map(async (target) =>
+			target.route(
+				(u) => {
+					u.searchParams.delete('v');
+					return u.toString() === source;
+				},
+				async (route) => route.fulfill(mockedResult)
+			)
+		)
+	);
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string} modalTitle
+ */
+export function modal(page, modalTitle) {
+	return page.getByRole('dialog').filter({
+		has: page.getByRole('banner').getByRole('heading', {
+			name: modalTitle,
+			exact: true
+		})
+	});
+}
