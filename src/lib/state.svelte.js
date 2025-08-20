@@ -47,9 +47,8 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {Keymap} keybinds liste des raccourcis clavier
  * @property {Map<string, ZoomState>} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
  * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné. -1 pour désactiver l'inférence
- * @property {(index: number) => Promise<void>} setSelectedClassificationModel changer le modèle de classification sélectionné
  * @property {number} selectedCropModel index du modèle de recadrage sélectionné dans la liste des modèles de recadrage du protocole sélectionné. -1 pour désactiver l'inférence
- * @property {(index: number) => Promise<void>} setSelectedCropModel changer le modèle de recadrage sélectionné
+ * @property {(indices: { classification?: number | null, crop?: number | null }) => Promise<void>} setModelSelections changer les modèles sélectionnés pour le protocole courant
  * @property {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} classificationModels liste des modèles de classification disponibles pour le protocole sélectionné
  * @property {NonNullable<typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']>} cropModels liste des modèles de recadrage disponibles pour le protocole sélectionné
  * @property {boolean} cropInferenceAvailable true si le protocole sélectionné a un modèle de recadrage (qui n'a pas été désactivé)
@@ -128,19 +127,39 @@ export const uiState = $state({
 		if (!metadataId) return -1;
 		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
 	},
-	/**
-	 * @param {number} index
-	 */
-	async setSelectedClassificationModel(index) {
-		if (index === this.selectedClassificationModel) return; // no change
-		const metadataId = this.classificationMetadataId;
-		if (!metadataId) return;
+	async setModelSelections({ classification = null, crop = null }) {
+		if (classification === null && crop === null) return; // no change
+
+		const metadataIds = {
+			classification: this.classificationMetadataId,
+			crop: this.cropMetadataId
+		};
+
+		if (!metadataIds.classification || !metadataIds.crop) return;
+
 		const current = await getSetting('protocolModelSelections');
+
+		/**
+		 * @type {Record<string, number>}
+		 */
+		const changes = {};
+
+		if (classification !== null && classification !== this.selectedClassificationModel) {
+			changes[metadataIds.classification] = classification;
+		}
+		if (crop !== null && crop !== this.selectedCropModel) {
+			changes[metadataIds.crop] = crop;
+		}
+
+		if (Object.keys(changes).length === 0) {
+			return; // no change
+		}
+
 		await setSetting('protocolModelSelections', {
 			...current,
 			[this.currentProtocolId]: {
 				...current[this.currentProtocolId],
-				[metadataId]: index
+				...changes
 			}
 		});
 	},
@@ -148,22 +167,6 @@ export const uiState = $state({
 		const metadataId = this.cropMetadataId;
 		if (!metadataId) return -1;
 		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
-	},
-	/**
-	 * @param {number} index
-	 */
-	async setSelectedCropModel(index) {
-		if (index === this.selectedCropModel) return; // no change
-		const metadataId = this.cropMetadataId;
-		if (!metadataId) return;
-		const current = await getSetting('protocolModelSelections');
-		await setSetting('protocolModelSelections', {
-			...current,
-			[this.currentProtocolId]: {
-				...current[this.currentProtocolId],
-				[metadataId]: index
-			}
-		});
 	},
 	get classificationMetadataId() {
 		const isCandidate = match

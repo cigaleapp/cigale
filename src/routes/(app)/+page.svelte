@@ -51,16 +51,16 @@
 			uiState.currentProtocolId = preselection.protocol;
 			preselection.protocol = null;
 		}
-		if (preselection.classificationModel !== null) {
-			void uiState.setSelectedClassificationModel(preselection.classificationModel).then(() => {
-				preselection.classificationModel = null;
+
+		void uiState
+			.setModelSelections({
+				classification: preselection.classificationModel,
+				crop: preselection.cropModel
+			})
+			.then(() => {
+				if (preselection.classificationModel !== null) preselection.classificationModel = null;
+				if (preselection.cropModel !== null) preselection.cropModel = null;
 			});
-		}
-		if (preselection.cropModel !== null) {
-			void uiState.setSelectedCropModel(preselection.cropModel).then(() => {
-				preselection.cropModel = null;
-			});
-		}
 	});
 
 	let searchQuery = $state('');
@@ -194,7 +194,7 @@
 							<RadioButtons
 								value={uiState.selectedClassificationModel}
 								onchange={async (value) => {
-									await uiState.setSelectedClassificationModel(value ?? 0);
+									await uiState.setModelSelections({ classification: value ?? 0 });
 								}}
 								options={radioOptions(uiState.classificationModels)}
 							/>
@@ -206,7 +206,7 @@
 							<RadioButtons
 								value={uiState.selectedCropModel}
 								onchange={async (value) => {
-									await uiState.setSelectedCropModel(value ?? 0);
+									await uiState.setModelSelections({ crop: value ?? 0 });
 								}}
 								options={radioOptions(uiState.cropModels)}
 							/>
