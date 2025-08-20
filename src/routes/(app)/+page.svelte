@@ -162,6 +162,7 @@
 				<div class="select-and-version">
 					<ButtonSecondary
 						testid={i === 0 ? 'protocol-to-choose' : undefined}
+						aria-pressed={p.id === uiState.currentProtocolId}
 						onclick={async () => {
 							uiState.currentProtocolId = p.id;
 							preselection.protocol = null;
@@ -184,14 +185,12 @@
 				{#if p.id === uiState.currentProtocolId}
 					{#if uiState.classificationModels.length > 0}
 						<div class="model-select">
-							<p>
-								{m.inference_model_for({
+							<RadioButtons
+								label={m.inference_model_for({
 									target:
 										tables.Metadata.state.find((m) => m.id === uiState.classificationMetadataId)
 											?.label ?? 'classification'
 								})}
-							</p>
-							<RadioButtons
 								value={uiState.selectedClassificationModel}
 								onchange={async (value) => {
 									await uiState.setModelSelections({ classification: value ?? 0 });
@@ -202,8 +201,8 @@
 					{/if}
 					{#if uiState.cropModels.length > 0}
 						<div class="model-select">
-							<p>{m.inference_model_for_detection()}</p>
 							<RadioButtons
+								label={m.inference_model_for_detection()}
 								value={uiState.selectedCropModel}
 								onchange={async (value) => {
 									await uiState.setModelSelections({ crop: value ?? 0 });
@@ -291,11 +290,6 @@
 
 	li .model-select {
 		margin-top: 0.5rem;
-	}
-
-	li .model-select p {
-		margin-bottom: 0.25rem;
-		color: var(--gay);
 	}
 
 	section.manage {

@@ -23,6 +23,7 @@ Available CSS variables:
 	 * @property {string} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 * @property {string|undefined} [testid] add a data-testid attribute to the button
+	 * @property {boolean} [aria-pressed]
 	 * @property {boolean} [loading] show a loading state while the onlick handler is running
 	 */
 </script>
@@ -42,7 +43,8 @@ Available CSS variables:
 		keyboard,
 		testid,
 		loading = false,
-		tight = false
+		tight = false,
+		'aria-pressed': ariaPressed
 	} = $props();
 
 	let isLoading = $state(false);
@@ -51,6 +53,7 @@ Available CSS variables:
 <button
 	disabled={disabled || isLoading}
 	class:tight
+	aria-pressed={ariaPressed}
 	onclick={async (e) => {
 		// Only set isLoading here if the onclick handler does not define its own loadingStarted signal.
 		// This is kinda crude but you cant reflect a function object's args in JS, see https://stackoverflow.com/q/6921588/9943464 (well you can, but by uhhhh parsing the source code, yeah.)
