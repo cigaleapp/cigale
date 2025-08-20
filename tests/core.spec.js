@@ -160,7 +160,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 		await cropModel.getByRole('radio', { name: 'YOLO11' }).click();
 	}
 
-	await page.goto('/?classificationModel=0');
+	await page.goto('?classificationModel=0');
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence" [checked]
@@ -173,7 +173,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	`);
 	await reset();
 
-	await page.goto('/?cropModel=0');
+	await page.goto('?cropModel=0');
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence"
@@ -186,7 +186,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	`);
 	await reset();
 
-	await page.goto('/?classificationModel=0&cropModel=0');
+	await page.goto('?classificationModel=0&cropModel=0');
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence" [checked]
@@ -199,7 +199,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	`);
 	await reset();
 
-	await page.goto('/?classificationModel=1');
+	await page.goto('?classificationModel=1');
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence"
@@ -212,7 +212,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	`);
 	await reset();
 
-	await page.goto('/?cropModel=1');
+	await page.goto('?cropModel=1');
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence"

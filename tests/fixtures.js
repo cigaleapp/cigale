@@ -34,7 +34,7 @@ export const test = base.extend(
 					});
 				}
 
-				await page.goto('/');
+				await page.goto('./');
 				await page.waitForFunction(() => Boolean(window.devalue && window.DB && window.refreshDB));
 				await use();
 			},
