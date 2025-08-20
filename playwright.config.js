@@ -66,6 +66,14 @@ export default defineConfig({
 			dev: 'http://localhost:5173',
 			built: 'http://localhost:4173'
 		}),
+
+		// See https://github.com/microsoft/playwright/issues/16357
+		bypassCSP: dependsOnTarget({
+			live: true,
+			dev: false,
+			built: false
+		}),
+
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: 'on-first-retry',
 
