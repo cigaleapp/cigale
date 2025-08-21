@@ -412,18 +412,26 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 			let originalBytes = undefined;
 			/** @type {Uint8Array} */
 			let croppedBytes;
-			if (contentType === 'image/jpeg') {
-				croppedBytes = addExifMetadata(cropped, Object.values(metadataDefinitions), metadata);
-			} else {
-				croppedBytes = new Uint8Array(cropped);
-			}
 
-			if (include === 'full') {
+			try {
 				if (contentType === 'image/jpeg') {
-					originalBytes = addExifMetadata(original, Object.values(metadataDefinitions), metadata);
+					croppedBytes = addExifMetadata(cropped, Object.values(metadataDefinitions), metadata);
 				} else {
-					originalBytes = new Uint8Array(original);
+					croppedBytes = new Uint8Array(cropped);
 				}
+
+				if (include === 'full') {
+					if (contentType === 'image/jpeg') {
+						originalBytes = addExifMetadata(original, Object.values(metadataDefinitions), metadata);
+					} else {
+						originalBytes = new Uint8Array(original);
+					}
+				}
+			} catch (error) {
+				console.error(error);
+				notify({ warning: 'Cannot add EXIF metadata' });
+				originalBytes = new Uint8Array(original);
+				croppedBytes = new Uint8Array(cropped);
 			}
 
 			buffersOfImages.push({
