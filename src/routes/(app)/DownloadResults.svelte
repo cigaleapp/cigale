@@ -1,7 +1,10 @@
 <script>
-	import { base } from '$app/paths';
+	import { asset } from '$app/paths';
+	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { downloadAsFile } from '$lib/download';
 	import { tables } from '$lib/idb.svelte';
+	import { parseCropPadding } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
@@ -9,7 +12,6 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import { generateResultsZip, parseCropPadding } from '$lib/results.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -21,9 +23,14 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {() => void} open
-	 * @property {number} [progress] progress bar to in the modal content
+	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
 	 */
-	let { open = $bindable(), progress } = $props();
+
+	/** @type {Props} */
+	let { open = $bindable(), swarpc } = $props();
+
+	const progress = $derived(uiState.processing.progress);
+
 	let exporting = $state(false);
 	/** @type {'metadataonly'|'croppedonly'|'full'} */
 	let include = $state('croppedonly');
@@ -69,11 +76,26 @@
 		}
 		try {
 			await ensureNoLoneImages();
-			await generateResultsZip(tables.Observation.state, chosenProtocol, {
-				base,
-				include,
-				cropPadding: cropPadding.withUnit
-			});
+			uiState.processing.total = 1;
+			uiState.processing.done = 0;
+			const zipfileBytes = await swarpc.generateResultsZip(
+				{
+					include,
+					protocolId: chosenProtocol.id,
+					cropPadding: cropPadding.withUnit,
+					jsonSchemaURL: new URL(asset('/results.schema.json'), page.url.origin).toString()
+				},
+				({ warning, progress }) => {
+					if (warning) toasts.warn(warning);
+					if (progress) uiState.processing.done = progress;
+				}
+			);
+
+			downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
+			setTimeout(() => {
+				uiState.processing.done = 0;
+				uiState.processing.total = 0;
+			}, 2_000);
 		} catch (error) {
 			console.error(error);
 			toasts.error(
@@ -98,9 +120,7 @@
 					subtext: m.allows_reusing_export_later()
 				}
 			]}
-		>
-			Quoi inclure dans l'export
-		</RadioButtons>
+		/>
 	</div>
 
 	<section class="crop-padding" class:irrelevant={include === 'metadataonly'}>
@@ -140,9 +160,9 @@
 
 	{#snippet footer()}
 		<section class="progress">
-			{#if ![0, 1].includes(progress)}
+			{#if progress > 0}
 				<code>{Math.floor(progress * 100)}%</code>
-				<ProgressBar {progress} />
+				<ProgressBar alwaysActive {progress} />
 			{/if}
 		</section>
 		<ButtonSecondary onclick={generateExport}>

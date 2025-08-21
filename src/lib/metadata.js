@@ -3,8 +3,10 @@ import * as datefns from 'date-fns';
 import { idComparator, Schemas } from './database.js';
 import {
 	ensureNamespacedMetadataId,
+	isNamespacedToProtocol,
 	metadataOptionId,
-	namespaceOfMetadataId
+	namespaceOfMetadataId,
+	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
 import { avg, mapValues } from './utils.js';
 
@@ -253,17 +255,17 @@ export async function deleteMetadataValue({
 /**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
  * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} observation
+ * @param {DatabaseHandle} db
  * @returns {Promise<DB.MetadataValues>}
  */
-export async function observationMetadata(observation) {
-	const { tables, databaseHandle } = await import('$lib/idb.svelte.js');
-	const images = await tables.Image.list().then((images) =>
-		images.filter((img) => observation.images.includes(img.id))
-	);
+export async function observationMetadata(db, observation) {
+	const images = await db
+		.getAll('Image')
+		.then((images) => images.filter((img) => observation.images.includes(img.id)));
 
 	const metadataFromImages = await mergeMetadataValues(
-		databaseHandle(),
-		images.map((img) => img.metadata)
+		db,
+		images.map((img) => Schemas.MetadataValues.assert(img.metadata))
 	);
 
 	return {
@@ -275,22 +277,20 @@ export async function observationMetadata(observation) {
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
  * @param {DB.MetadataValues} values
+ * @param {Record<string, DB.MetadataEnumVariant[]>} metadataOptions
  * @returns {Promise<Record<string, DB.MetadataValue & { valueLabel?: string }>>}
  */
-export async function addValueLabels(values) {
-	const { tables, ...idb } = await import('$lib/idb.svelte.js');
-	const metadataOptions = await idb.list('MetadataOption');
+export async function addValueLabels(values, metadataOptions) {
 	return Object.fromEntries(
 		Object.entries(values).map(([key, value]) => {
-			const definition = tables.Metadata.state.find((m) => m.id === key);
-			if (!definition) return [key, value];
-			if (definition.type !== 'enum') return [key, value];
+			const opts = metadataOptions[key];
+			if (!opts) return [key, value];
 
 			return [
 				key,
 				{
 					...value,
-					valueLabel: metadataOptions?.find((o) => o.key === value.value.toString())?.label
+					valueLabel: opts?.find((o) => o.key === value.value.toString())?.label
 				}
 			];
 		})
@@ -777,9 +777,29 @@ export function metadataDefinitionComparator(protocol) {
 /**
  * A null-value MetadataValue object
  */
-export const METADATA_ZERO_VALUE = /** @type {const} */ ({
+const METADATA_ZERO_VALUE = /** @type {const} */ ({
 	value: null,
 	manuallyModified: false,
 	confidence: 0,
 	alternatives: {}
 });
+
+/**
+ * Returns a un-namespaced object of all metadata values of the given protocol, given the metadata values object of an image/observation. If a metadata value is absent from the given values, the value is still present, but set to `null`.
+ *
+ * @param {DB.Protocol} protocol
+ * @param {DB.MetadataValues} values
+ */
+export function protocolMetadataValues(protocol, values) {
+	return Object.fromEntries(
+		protocol.metadata
+			.filter((key) => isNamespacedToProtocol(protocol.id, key))
+			.map((key) => [
+				removeNamespaceFromMetadataId(key),
+				values[key] ?? {
+					...METADATA_ZERO_VALUE,
+					valueLabel: ''
+				}
+			])
+	);
+}

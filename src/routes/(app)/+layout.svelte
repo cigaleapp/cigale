@@ -73,7 +73,7 @@
 	let openKeyboardShortcuts = $state();
 </script>
 
-<Navigation {openKeyboardShortcuts} progress={uiState.processing.progress} />
+<Navigation swarpc={data.swarpc} {openKeyboardShortcuts} progress={uiState.processing.progress} />
 
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
