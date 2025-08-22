@@ -177,15 +177,4 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	h1 {
 		margin: 0;
 	}
-
-	.toasts {
-		display: flex;
-		flex-direction: column;
-		margin: 0 auto;
-	}
-
-	/* FIXME gap doesn't work here for some reason */
-	.toasts > :global(article) {
-		margin-top: 0.5em;
-	}
 </style>
