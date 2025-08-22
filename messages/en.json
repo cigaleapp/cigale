@@ -188,5 +188,7 @@
 	"queued": "Queued",
 	"toasts_count": "{count} messages",
 	"cannot_add_exif_metadata_to_image": "Cannot add EXIF metadata to image {filename}",
-	"wait_for_detection_to_finish_before_classifying": "Please wait for bounding box detection to finish before classifying"
+	"wait_for_detection_to_finish_before_classifying": "Please wait for bounding box detection to finish before classifying",
+	"classification_is_disabled_or_unavailable": "Classification is disabled or unavailable",
+	"detection_is_disabled_or_unavailable": "Detection is disabled or unavailable"
 }

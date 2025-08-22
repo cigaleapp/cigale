@@ -144,7 +144,7 @@
 				</a>
 				{@render noInferenceIndicator(
 					uiState.cropInferenceAvailable,
-					"Le protocole ne définit pas d'inférence automatique pour la détection"
+					m.detection_is_disabled_or_unavailable()
 				)}
 			</div>
 			<IconNext></IconNext>
@@ -168,7 +168,7 @@
 				</a>
 				{@render noInferenceIndicator(
 					uiState.classificationInferenceAvailable,
-					"Le protocole ne définit pas d'inférence automatique pour la classification"
+					m.classification_is_disabled_or_unavailable()
 				)}
 			</div>
 			<IconNext></IconNext>
