@@ -35,7 +35,7 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {number} processing.progress pourcentage entre 0 et 1 de l'avancement du processus
  * @property {() => void} processing.reset réinitialiser l'état de traitement
  * @property {(id: string) => void} processing.removeFile supprimer un fichier de la liste des fichiers en cours de traitement
- * @property {'inference'|'preprocessing'|'classification'|'loading'|'postprocessing'|'finished'|'visualizing'|'generating-zip'|''} processing.state état actuel du processus
+ * @property {''|'detection'|'classification'|'export'} processing.task tâche en cours
  * @property {Array<{name: string; id: string}>} processing.files liste de noms de fichiers en cours d'importations, qui n'ont pas encore de ImageFile en base de données
  * @property {string[]} selection liste des IDs d'images ou observations sélectionnées. Utiliser setSelection pour modifier
  * @property {undefined | ((newSelection: string[]) => void)} setSelection modifier la sélection
@@ -74,7 +74,7 @@ export const uiState = $state({
 		total: 0,
 		done: 0,
 		time: 0,
-		state: '',
+		task: '',
 		get progress() {
 			return this.total ? this.done / this.total : 0;
 		},
@@ -88,11 +88,10 @@ export const uiState = $state({
 			this.files.splice(idx, 1);
 		},
 		reset() {
-			this.files = [];
 			this.total = 0;
 			this.done = 0;
 			this.time = 0;
-			this.state = '';
+			this.task = '';
 		}
 	},
 	selection: [],

@@ -276,24 +276,38 @@ export async function chooseDefaultProtocol(page, models = {}) {
 }
 
 /**
+ * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
+ */
+const appNavTabs = (m) => ({
+	protocol: { name: m?.protocol_tab ?? 'Protocole', hash: '#/protocol' },
+	import: { name: m?.import_tab ?? 'Importer', hash: '#/import' },
+	crop: { name: m?.crop_tab ?? 'Recadrer', hash: '#/crop' },
+	classify: { name: m?.classify_tab ?? 'Classifier', hash: '#/classify' }
+});
+
+/**
  *
  * @param {Page} page
  * @param {'protocol'|'import'|'crop'|'classify'} tabName
  * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
  */
 export async function goToTab(page, tabName, m = undefined) {
-	const tabs = {
-		protocol: { name: m?.protocol_tab ?? 'Protocole', hash: '#/protocol' },
-		import: { name: m?.import_tab ?? 'Importer', hash: '#/import' },
-		crop: { name: m?.crop_tab ?? 'Recadrer', hash: '#/crop' },
-		classify: { name: m?.classify_tab ?? 'Classifier', hash: '#/classify' }
-	};
+	getTab(page, tabName, m).click();
+	const tab = appNavTabs(m)[tabName];
+	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
+}
 
-	const tab = tabs[tabName];
+/**
+ *
+ * @param {Page} page
+ * @param {'protocol'|'import'|'crop'|'classify'} tabName
+ * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
+ */
+export function getTab(page, tabName, m = undefined) {
+	const tab = appNavTabs(m)[tabName];
 	if (!tab) throw new Error(`Unknown tab: ${tabName}`);
 
-	await page.getByTestId('app-nav').getByRole('link', { name: tab.name }).click();
-	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
+	return page.getByTestId('app-nav').getByRole('link', { name: tab.name });
 }
 
 /**

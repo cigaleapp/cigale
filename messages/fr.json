@@ -186,5 +186,8 @@
 	"image_too_large": "L'image est trop grande pour être traitée",
 	"queued": "En attente",
 	"toasts_count": "{count} messages",
-	"cannot_add_exif_metadata_to_image": "Impossible d'ajouter les métadonnées EXIF à l'image {filename}"
+	"cannot_add_exif_metadata_to_image": "Impossible d'ajouter les métadonnées EXIF à l'image {filename}",
+	"wait_for_detection_to_finish_before_classifying": "Veuillez attendre la fin de l'analyse des images avant de les classifier",
+	"classification_is_disabled_or_unavailable": "La classification est désactivée ou indisponible",
+	"detection_is_disabled_or_unavailable": "La détection est désactivée ou indisponible"
 }
