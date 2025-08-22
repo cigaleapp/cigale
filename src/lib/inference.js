@@ -145,7 +145,6 @@ export async function infer(
 	let start = -1;
 	if (!sequence) {
 		start = Date.now();
-		if (uiState) uiState.processing.state = 'inference';
 	}
 
 	taskSettings = {

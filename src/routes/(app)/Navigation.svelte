@@ -148,10 +148,17 @@
 				)}
 			</div>
 			<IconNext></IconNext>
-			<div class="with-inference-indicator">
+			<div
+				class="with-inference-indicator"
+				use:tooltip={uiState.processing.task === 'detection' && uiState.processing.progress < 1
+					? m.wait_for_detection_to_finish_before_classifying()
+					: undefined}
+			>
 				<a
 					href="#/classify"
-					aria-disabled={!uiState.currentProtocolId || !hasImages}
+					aria-disabled={!uiState.currentProtocolId ||
+						!hasImages ||
+						(uiState.processing.task === 'detection' && uiState.processing.progress < 1)}
 					data-testid="goto-classify"
 				>
 					{m.classify_tab()}
@@ -177,7 +184,7 @@
 	</nav>
 
 	<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
-	<ProgressBar progress={uiState.processing.state === 'generating-zip' ? 0 : progress} />
+	<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
 </header>
 
 {#snippet noInferenceIndicator(/** @type {boolean} */ available, /** @type {string} */ help)}

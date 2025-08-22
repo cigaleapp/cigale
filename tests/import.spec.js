@@ -3,6 +3,7 @@ import path from 'node:path';
 import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
+	getTab,
 	goToTab,
 	importPhotos,
 	importResults,
@@ -305,3 +306,29 @@ test(
 		await expect(page.getByRole('main').locator('article.card')).toHaveCount(1);
 	}
 );
+
+test('cannot go to classify tab while import analysis is ongoing', issue(437), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'lil-fella', 'cyan');
+	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
+		timeout: 10_000
+	});
+	await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Analyse…|En attente/, {
+		timeout: 30_000
+	});
+
+	// Now, we have at least one image loaded (so technically the classify tab should be accessible),
+	// but the other image is still being analyzed.
+
+	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
+
+	// Once everything is done, make sure that we can go to the classify tab
+
+	await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, {
+		timeout: 30_000
+	});
+
+	await expect(getTab(page, 'classify')).toBeEnabled({ timeout: 1_000 });
+	await goToTab(page, 'classify');
+});

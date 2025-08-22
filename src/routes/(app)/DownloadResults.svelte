@@ -80,6 +80,7 @@
 		}
 		try {
 			await ensureNoLoneImages();
+			uiState.processing.task = 'export';
 			uiState.processing.total = 1;
 			uiState.processing.done = 0;
 			const zipfileBytes = await swarpc.generateResultsZip(
