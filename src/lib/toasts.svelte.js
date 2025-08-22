@@ -1,5 +1,11 @@
 import { minutesToMilliseconds } from 'date-fns';
 import { nanoid } from 'nanoid';
+import { entries, mapValues } from './utils';
+import IconDebug from '~icons/ph/bug';
+import IconSuccess from '~icons/ph/check';
+import IconInfo from '~icons/ph/info';
+import IconWarning from '~icons/ph/warning';
+import IconError from '~icons/ph/x';
 
 /**
  * @template T
@@ -21,11 +27,27 @@ import { nanoid } from 'nanoid';
  * @property {(toast: Toast<T>) => MaybePromise<void>} [callbacks.closed]
  * @property {boolean} [showLifetime]
  * @property {number} [lifetime]
+ * @property {number|NodeJS.Timeout} [timeoutHandle]
  * @property {?T} data
  */
 
-const MAX_TOASTS_COUNT = 3;
-const TOAST_LIFETIME_MS = 3000;
+/**
+ * @typedef {object} ToastPool
+ * @property {Toast<any>[]} items
+ * @property {number} capacity maximum number of toasts to show in this pool
+ * @property {number} lifetime default lifetime for toasts in this pool (in ms).
+ */
+
+const TOAST_POOLS = /** @type {const} @satisfies {Record<string, Omit<ToastPool, 'items'>>} */ ({
+	default: {
+		lifetime: 3_000,
+		capacity: 3
+	},
+	exporter: {
+		lifetime: Infinity,
+		capacity: Infinity
+	}
+});
 
 /**
  * @template T
@@ -38,9 +60,61 @@ const TOAST_LIFETIME_MS = 3000;
  * @property {Toast<T>['callbacks']['closed']} [closed]
  */
 
+/**
+ * @template {string} PoolNames
+ * @template {{[Name in PoolNames]: ToastPool}} Pools
+ */
 class Toasts {
-	/** @type {Toast<any>[]} */
-	items = $state([]);
+	/** @type {Pools} */
+	// @ts-expect-error
+	pools = $state();
+
+	/** @type {keyof Pools & string} */
+	// @ts-expect-error
+	currentPoolName = $state();
+
+	/**
+	 *
+	 * @param { {[Key in PoolNames]: Omit<Pools[Key], 'items'> } } poolsConfig
+	 * @param {NoInfer<PoolNames>} initialPool
+	 */
+	constructor(poolsConfig, initialPool) {
+		this.currentPoolName = initialPool;
+		// @ts-expect-error
+		this.pools = mapValues(poolsConfig, (pool) => ({ items: [], ...pool }));
+	}
+
+	get pool() {
+		return this.pools[this.currentPoolName];
+	}
+
+	/**
+	 * Sets the current toast pool. Freezes toasts of the previously active pool, and unfreezes toasts of the newly active pool.
+	 * @param {PoolNames} name
+	 */
+	setCurrentPool(name) {
+		this.#ensurePoolName(name);
+		this.freeze(this.currentPoolName);
+		this.currentPoolName = name;
+		this.unfreeze(this.currentPoolName);
+	}
+
+	/**
+	 * Return the toasts of the given pool, or of the current pool if none is specified.
+	 * @param {undefined | (keyof Pools & string)} pool
+	 */
+	items(pool = undefined) {
+		if (pool) this.#ensurePoolName(pool);
+		return this.pools[pool ?? this.currentPoolName].items;
+	}
+
+	/**
+	 *
+	 * @param {keyof Pools & string} name
+	 */
+	#ensurePoolName(name) {
+		if (!this.pools[name]) throw new Error(`Toast pool ${name} does not exist`);
+	}
 
 	/**
 	 * Adds a toast notification.
@@ -60,6 +134,7 @@ class Toasts {
 		const id = nanoid();
 		const wordsCount = message.split(' ').length + message.split(' ').length;
 
+		/** @type {Toast<typeof data>} */
 		const newToast = {
 			addedAt: new Date(),
 			id,
@@ -71,18 +146,19 @@ class Toasts {
 			data: data ?? null,
 			lifetime:
 				lifetime === 'inferred'
-					? TOAST_LIFETIME_MS + minutesToMilliseconds(wordsCount / 300)
+					? this.pool.lifetime + minutesToMilliseconds(wordsCount / 300)
 					: lifetime,
 			...rest
 		};
 
 		if (Number.isFinite(newToast.lifetime)) {
-			setTimeout(() => {
-				this.remove(id);
-			}, newToast.lifetime);
+			this.#armTimeout(newToast);
 		}
 
-		this.items = [...this.items.slice(0, MAX_TOASTS_COUNT - 1), newToast];
+		this.pools[this.currentPoolName].items = [
+			...this.items().slice(0, this.pool.capacity - 1),
+			newToast
+		];
 		return id;
 	}
 
@@ -136,14 +212,97 @@ class Toasts {
 	/**
 	 * Removes a toast by ID.
 	 * @param {string} id
+	 * @param {keyof Pools} [pool] only search in this pool, defaults to all pools
 	 * @returns {Promise<void>}
 	 */
-	async remove(id) {
-		const toast = this.items.find((t) => t.id === id);
-		if (!toast) return;
-		if (toast.callbacks?.closed) await toast.callbacks.closed(toast);
-		this.items = this.items.filter((t) => t.id !== id);
+	async remove(id, pool) {
+		for (const [poolName, { items }] of entries(this.pools)) {
+			if (pool && pool !== poolName) continue;
+
+			const toast = items.find((t) => t.id === id);
+			if (!toast) return;
+			if (toast.callbacks?.closed) await toast.callbacks.closed(toast);
+
+			this.pools[poolName].items = this.items(poolName).filter((t) => t.id !== id);
+		}
+	}
+
+	/**
+	 * @param {keyof Pools & string} pool
+	 */
+	async clear(pool = this.currentPoolName) {
+		const items = this.items(pool);
+		await Promise.all(
+			items.map((t) => (t.callbacks?.closed ? t.callbacks.closed(t) : Promise.resolve()))
+		);
+		this.pools[pool].items = [];
+	}
+
+	/**
+	 * Freeze timeouts for all toasts of pool
+	 * @param {keyof Pools & string} pool
+	 */
+	freeze(pool = this.currentPoolName) {
+		for (const toast of this.items(pool).filter((t) => t.timeoutHandle)) {
+			clearTimeout(toast.timeoutHandle);
+		}
+	}
+
+	/**
+	 * Restores timeouts for all toasts of pool
+	 * @param {keyof Pools & string} pool
+	 */
+	unfreeze(pool = this.currentPoolName) {
+		for (const toast of this.items(pool).filter((t) => t.timeoutHandle)) {
+			this.#armTimeout(toast);
+		}
+	}
+
+	/**
+	 *
+	 * @param {Toast<any>} toast
+	 */
+	#armTimeout(toast) {
+		toast.timeoutHandle = setTimeout(() => {
+			this.remove(toast.id);
+		}, toast.lifetime);
 	}
 }
 
-export const toasts = new Toasts();
+export const toasts = new Toasts(TOAST_POOLS, 'default');
+
+/**
+ * @param {Toast<any>['type']} type
+ */
+export function toastIcon(type) {
+	switch (type) {
+		case 'info':
+			return IconInfo;
+		case 'success':
+			return IconSuccess;
+		case 'warning':
+			return IconWarning;
+		case 'error':
+			return IconError;
+		case 'debug':
+			return IconDebug;
+	}
+}
+
+/**
+ * @param {Toast<any>['type']} type
+ */
+export function toastTheme(type) {
+	switch (type) {
+		case 'info':
+			return 'primary';
+		case 'success':
+			return 'success';
+		case 'warning':
+			return 'warning';
+		case 'error':
+			return 'danger';
+		case 'debug':
+			return 'secondary';
+	}
+}

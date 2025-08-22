@@ -3,13 +3,10 @@
 -->
 
 <script generics="T">
-	import IconDebug from '~icons/ph/bug';
-	import IconSuccess from '~icons/ph/check';
-	import IconInfo from '~icons/ph/info';
-	import IconWarning from '~icons/ph/warning';
-	import { default as IconClose, default as IconError } from '~icons/ph/x';
-	import ButtonInk from './ButtonInk.svelte';
+	import { toastIcon, toastTheme } from '$lib/toasts.svelte';
 	import { fade, slide } from 'svelte/transition';
+	import IconClose from '~icons/ph/x';
+	import ButtonInk from './ButtonInk.svelte';
 
 	/**
 	 * @typedef Toast
@@ -28,32 +25,14 @@
 
 	/** @type {Props} */
 	const { type, message, action, onaction, dismiss, ondismiss } = $props();
-	const Icon = $derived(
-		{
-			warning: IconWarning,
-			error: IconError,
-			success: IconSuccess,
-			info: IconInfo,
-			debug: IconDebug
-		}[type]
-	);
-	const style = $derived.by(() => {
-		switch (type) {
-			case 'debug':
-				return 'neutral';
-			case 'info':
-				return 'primary';
-			default:
-				return type;
-		}
-	});
+	const Icon = $derived(toastIcon(type));
 </script>
 
 <article
 	class="toast"
 	data-type={type}
-	style:--bg="var(--bg-{style})"
-	style:--fg="var(--fg-{style})"
+	style:--bg="var(--bg-{toastTheme(type)})"
+	style:--fg="var(--fg-{toastTheme(type)})"
 	in:slide={{ axis: 'y', duration: 200 }}
 	out:fade={{ duration: 200 }}
 >

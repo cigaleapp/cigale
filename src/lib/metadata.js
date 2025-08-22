@@ -681,7 +681,7 @@ export function metadataPrettyKey(metadata) {
 
 /**
  * Asserts that a metadata is of a certain type, inferring the correct runtime type for its value
- * @template {DB.} Type
+ * @template {DB.MetadataType} Type
  * @template {undefined | RuntimeValue} Value
  * @param {Type} testedtyp
  * @param {DB.MetadataType} metadatatyp

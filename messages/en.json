@@ -185,5 +185,7 @@
 	"file_format_not_supported_yet": "{format} files are not yet supported",
 	"file_format_not_supported": "File format {format} is not supported",
 	"image_too_large": "Image is too large to be processed",
-	"queued": "Queued"
+	"queued": "Queued",
+	"toasts_count": "{count} messages",
+	"cannot_add_exif_metadata_to_image": "Cannot add EXIF metadata to image {filename}"
 }
