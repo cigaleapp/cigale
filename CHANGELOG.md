@@ -6,19 +6,37 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add a separate pool for toasts originating in modals
 - Add progress percentage in browser tab title
 - Display proper .cr2 import error toast on linux
+- Don't abort results zip generation if EXIF write fails
 - Handle too-large image errors gracefully
 - Improve appearance of small delete buttons
+- Model preselect URL params: Use 0 instead of -1, and 1-based indices
+- Prevent going to classification tab while detection analysis is ongoing
 - Raise memory limit for JPEG image decoding
 - Remove "model loaded" toast
+
+### Accessibility Improvements
+
+- Improve accessiblity of RadioButtons and protocol selection UI
 
 ### Bug Fixes
 
 - Correctly await transaction end in openTransaction
+- Fix cannot set classification & crop models at the same time via URL parameters
 - Fix results import
 - Fix some jankyness in error displaying when deleting ImageFiles
+- Prevent empty observations from being created when deleting an image in the import tab
 - Surface errors in toast when ImageFile could not be created
+
+### Data Updates
+
+- Regenerate arthropods protocol
+
+### Translation Updates
+
+- Translate inference unavailable tooltips
 
 ## July 2025
 
