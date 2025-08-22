@@ -2,8 +2,51 @@
 @component Displays a notification message to the user above the page.
 -->
 
+<script module>
+	import IconDebug from '~icons/ph/bug';
+	import IconSuccess from '~icons/ph/check';
+	import IconInfo from '~icons/ph/info';
+	import IconWarning from '~icons/ph/warning';
+	import IconError from '~icons/ph/x';
+
+	/**
+	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
+	 */
+	export function toastIcon(type) {
+		switch (type) {
+			case 'info':
+				return IconInfo;
+			case 'success':
+				return IconSuccess;
+			case 'warning':
+				return IconWarning;
+			case 'error':
+				return IconError;
+			case 'debug':
+				return IconDebug;
+		}
+	}
+
+	/**
+	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
+	 */
+	export function toastTheme(type) {
+		switch (type) {
+			case 'info':
+				return 'primary';
+			case 'success':
+				return 'success';
+			case 'warning':
+				return 'warning';
+			case 'error':
+				return 'danger';
+			case 'debug':
+				return 'secondary';
+		}
+	}
+</script>
+
 <script generics="T">
-	import { toastIcon, toastTheme } from '$lib/toasts.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import IconClose from '~icons/ph/x';
 	import ButtonInk from './ButtonInk.svelte';

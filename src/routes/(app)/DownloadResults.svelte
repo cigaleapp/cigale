@@ -14,7 +14,8 @@
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import { toastIcon, toasts, toastTheme } from '$lib/toasts.svelte';
+	import { toastIcon, toastTheme } from '$lib/Toast.svelte';
+	import { toasts } from '$lib/toasts.svelte';
 	import { tick } from 'svelte';
 	import Download from '~icons/ph/download-simple';
 
