@@ -157,18 +157,26 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 		{ tx },
 		async (tx) => {
 			const observations = await tx.objectStore('Observation').getAll();
+			const imagesOfFile = imagesOfImageFile(id);
 			try {
-				imagesOfImageFile(id).map(({ id }) => tx.objectStore('Image').delete(id));
+				imagesOfFile.map(({ id }) => tx.objectStore('Image').delete(id));
 				tx.objectStore('ImageFile').delete(id);
 				tx.objectStore('ImagePreviewFile').delete(id);
 				observations
-					.filter(({ images }) => images.includes(id))
-					.map(({ images, ...rest }) =>
-						tx.objectStore('Observation').put({
-							...rest,
-							images: images.filter((imageId) => imageId !== id)
-						})
-					);
+					.filter(({ images }) => imagesOfFile.some(({ id }) => images.includes(id)))
+					.map(({ images, ...rest }) => {
+						const remainingImages = images.filter(
+							(imageId) => !imagesOfFile.some(({ id }) => id === imageId)
+						);
+						if (remainingImages.length > 0) {
+							tx.objectStore('Observation').put({
+								...rest,
+								images: remainingImages
+							});
+						} else {
+							tx.objectStore('Observation').delete(rest.id);
+						}
+					});
 			} catch (error) {
 				if (!notFoundOk) return Promise.reject(error);
 			}

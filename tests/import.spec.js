@@ -272,3 +272,36 @@ test('can import in multiple batches', async ({ page }) => {
 	await expect(page.locator('main').getByText('debugsquare.png')).toBeVisible();
 	await expect(page.locator('main').locator('article.card')).toHaveCount(5);
 });
+
+test(
+	'deleting an image in the import tab does not create ghost observation cards',
+	issue(439),
+	async ({ page }) => {
+		await chooseDefaultProtocol(page);
+		await goToTab(page, 'import');
+		await importPhotos({ page }, 'lil-fella', 'cyan');
+		await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
+			timeout: 10_000
+		});
+		await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, { timeout: 10_000 });
+		await goToTab(page, 'classify');
+		await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
+			timeout: 10_000
+		});
+		await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, { timeout: 10_000 });
+		await goToTab(page, 'import');
+		await page.getByTestId('first-observation-card').click();
+		await page
+			.getByTestId('sidepanel')
+			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
+			.click();
+		await goToTab(page, 'classify');
+		await expect(page.getByTestId('first-observation-card')).toMatchAriaSnapshot(`
+		  - article:
+		    - img
+		    - img
+		    - heading "cyan" [level=2]
+		`);
+		await expect(page.getByRole('main').locator('article.card')).toHaveCount(1);
+	}
+);
