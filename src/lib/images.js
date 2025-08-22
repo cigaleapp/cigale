@@ -157,26 +157,28 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 		{ tx },
 		async (tx) => {
 			const observations = await tx.objectStore('Observation').getAll();
+			// Store there cuz imagesOfImageFile() reads from reactive state.
 			const imagesOfFile = imagesOfImageFile(id);
 			try {
-				imagesOfFile.map(({ id }) => tx.objectStore('Image').delete(id));
 				tx.objectStore('ImageFile').delete(id);
 				tx.objectStore('ImagePreviewFile').delete(id);
-				observations
-					.filter(({ images }) => imagesOfFile.some(({ id }) => images.includes(id)))
-					.map(({ images, ...rest }) => {
-						const remainingImages = images.filter(
-							(imageId) => !imagesOfFile.some(({ id }) => id === imageId)
-						);
-						if (remainingImages.length > 0) {
+
+				for (const image of imagesOfFile) {
+					tx.objectStore('Image').delete(image.id);
+
+					for (const observation of observations) {
+						const remainingImages = observation.images.filter((imageId) => imageId !== image.id);
+
+						if (remainingImages.length === 0) {
+							tx.objectStore('Observation').delete(observation.id);
+						} else if (remainingImages.length < observation.images.length) {
 							tx.objectStore('Observation').put({
-								...rest,
+								...observation,
 								images: remainingImages
 							});
-						} else {
-							tx.objectStore('Observation').delete(rest.id);
 						}
-					});
+					}
+				}
 			} catch (error) {
 				if (!notFoundOk) return Promise.reject(error);
 			}
