@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">65.46% </span>
+                <span class="strong">65.31% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>290/443</span>
+                <span class='fraction'>290/444</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">65.46% </span>
+                <span class="strong">65.31% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>290/443</span>
+                <span class='fraction'>290/444</span>
             </div>
         
             
@@ -552,7 +552,11 @@
 <a name='L487'></a><a href='#L487'>487</a>
 <a name='L488'></a><a href='#L488'>488</a>
 <a name='L489'></a><a href='#L489'>489</a>
-<a name='L490'></a><a href='#L490'>490</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -716,11 +720,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1200,26 +1208,30 @@ export <span class="fstat-no" title="function not covered" >async function delet
 <span class="cstat-no" title="statement not covered" >		{ tx },</span>
 <span class="cstat-no" title="statement not covered" >		async (tx) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >			const observations = await tx.objectStore('Observation').getAll();</span>
+<span class="cstat-no" title="statement not covered" >			// Store there cuz imagesOfImageFile() reads from reactive state.</span>
 <span class="cstat-no" title="statement not covered" >			const imagesOfFile = imagesOfImageFile(id);</span>
 <span class="cstat-no" title="statement not covered" >			try {</span>
-<span class="cstat-no" title="statement not covered" >				imagesOfFile.map(({ id }) =&gt; tx.objectStore('Image').delete(id));</span>
 <span class="cstat-no" title="statement not covered" >				tx.objectStore('ImageFile').delete(id);</span>
 <span class="cstat-no" title="statement not covered" >				tx.objectStore('ImagePreviewFile').delete(id);</span>
-<span class="cstat-no" title="statement not covered" >				observations</span>
-<span class="cstat-no" title="statement not covered" >					.filter(({ images }) =&gt; imagesOfFile.some(({ id }) =&gt; images.includes(id)))</span>
-<span class="cstat-no" title="statement not covered" >					.map(({ images, ...rest }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >						const remainingImages = images.filter(</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >				for (const image of imagesOfFile) {</span>
+<span class="cstat-no" title="statement not covered" >					tx.objectStore('Image').delete(image.id);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >					for (const observation of observations) {</span>
+<span class="cstat-no" title="statement not covered" >						const remainingImages = observation.images.filter(</span>
 <span class="cstat-no" title="statement not covered" >							(imageId) =&gt; !imagesOfFile.some(({ id }) =&gt; id === imageId)</span>
 <span class="cstat-no" title="statement not covered" >						);</span>
-<span class="cstat-no" title="statement not covered" >						if (remainingImages.length &gt; 0) {</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >						if (remainingImages.length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >							tx.objectStore('Observation').delete(observation.id);</span>
+<span class="cstat-no" title="statement not covered" >						} else if (remainingImages.length &lt; observation.images.length) {</span>
 <span class="cstat-no" title="statement not covered" >							tx.objectStore('Observation').put({</span>
-<span class="cstat-no" title="statement not covered" >								...rest,</span>
+<span class="cstat-no" title="statement not covered" >								...observation,</span>
 <span class="cstat-no" title="statement not covered" >								images: remainingImages</span>
 <span class="cstat-no" title="statement not covered" >							});</span>
-<span class="cstat-no" title="statement not covered" >						} else {</span>
-<span class="cstat-no" title="statement not covered" >							tx.objectStore('Observation').delete(rest.id);</span>
 <span class="cstat-no" title="statement not covered" >						}</span>
-<span class="cstat-no" title="statement not covered" >					});</span>
+<span class="cstat-no" title="statement not covered" >					}</span>
+<span class="cstat-no" title="statement not covered" >				}</span>
 <span class="cstat-no" title="statement not covered" >			} catch (error) {</span>
 <span class="cstat-no" title="statement not covered" >				if (!notFoundOk) return Promise.reject(error);</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
@@ -1537,7 +1549,7 @@ export <span class="fstat-no" title="function not covered" >function parseCropPa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-22T22:24:01.470Z
+                at 2025-08-22T22:29:57.301Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
