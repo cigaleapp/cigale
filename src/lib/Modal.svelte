@@ -29,6 +29,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	 * @property {string} title the title used in the header
 	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
 	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
+	 * @property {(() => void) | undefined} [onclose] a function that will be called when the modal is closed, either via the close button or by clicking outside the modal
+	 * @property {(() => void) | undefined} [onopen] a function that will be called when the modal is opened
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} children the content of the modal
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} [footer] the content of the footer
 	 */
@@ -39,6 +41,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		title,
 		open = $bindable(undefined),
 		close = $bindable(undefined),
+		onclose = undefined,
+		onopen = undefined,
 		footer = undefined,
 		children
 	} = $props();
@@ -47,9 +51,11 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	$effect(() => {
 		console.log(`Binding functions to ${stateKey} `);
 		open = () => {
+			onopen?.();
 			pushState('', { [stateKey]: true });
 		};
 		close = () => {
+			onclose?.();
 			pushState('', { [stateKey]: false });
 		};
 	});
@@ -97,6 +103,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	<main>
 		{@render children({ close })}
 	</main>
+
 	{#if footer}
 		<footer>
 			{@render footer({ close })}

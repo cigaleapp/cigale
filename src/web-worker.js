@@ -412,6 +412,7 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 			let originalBytes = undefined;
 			/** @type {Uint8Array} */
 			let croppedBytes;
+			notify({ warning: ['exif-write-error', { filename: file.filename }] });
 
 			try {
 				if (contentType === 'image/jpeg') {
@@ -429,7 +430,7 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 				}
 			} catch (error) {
 				console.error(error);
-				notify({ warning: 'Cannot add EXIF metadata' });
+				notify({ warning: ['exif-write-error', { filename: file.filename }] });
 				originalBytes = new Uint8Array(original);
 				croppedBytes = new Uint8Array(cropped);
 			}

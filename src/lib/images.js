@@ -5,7 +5,6 @@ import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { m } from './paraglide/messages';
-import { toasts } from './toasts.svelte';
 import { clamp, unique } from './utils';
 
 /**

@@ -14,6 +14,7 @@
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
+	import { toastIcon, toastTheme } from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tick } from 'svelte';
 	import Download from '~icons/ph/download-simple';
@@ -67,7 +68,10 @@
 	});
 
 	async function generateExport() {
+		await toasts.clear('exporter');
+		uiState.processing.reset();
 		exporting = true;
+
 		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!chosenProtocol) {
 			toasts.error(m.no_protocol_selected());
@@ -86,16 +90,21 @@
 					jsonSchemaURL: new URL(asset('/results.schema.json'), page.url.origin).toString()
 				},
 				({ warning, progress }) => {
-					if (warning) toasts.warn(warning);
+					if (warning) {
+						const [message, args] = warning;
+
+						switch (message) {
+							case 'exif-write-error':
+								toasts.warn(m.cannot_add_exif_metadata_to_image(args));
+								break;
+						}
+					}
+
 					if (progress) uiState.processing.done = progress;
 				}
 			);
 
 			downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
-			setTimeout(() => {
-				uiState.processing.done = 0;
-				uiState.processing.total = 0;
-			}, 2_000);
 		} catch (error) {
 			console.error(error);
 			toasts.error(
@@ -107,7 +116,19 @@
 	}
 </script>
 
-<Modal --footer-direction="column" key="modal_export_results" bind:open title={m.export_results()}>
+<Modal
+	--footer-direction="column"
+	key="modal_export_results"
+	bind:open
+	title={m.export_results()}
+	onopen={() => {
+		toasts.setCurrentPool('exporter');
+	}}
+	onclose={() => {
+		toasts.setCurrentPool('default');
+		uiState.processing.reset();
+	}}
+>
 	<div class="include">
 		<RadioButtons
 			bind:value={include}
@@ -159,12 +180,22 @@
 	</section>
 
 	{#snippet footer()}
-		<section class="progress">
-			{#if progress > 0}
-				<code>{Math.floor(progress * 100)}%</code>
-				<ProgressBar alwaysActive {progress} />
-			{/if}
+		<section class="errors">
+			<ul>
+				{#each toasts.items('exporter') as toast (toast.id)}
+					<li style:color="var(--fg-{toastTheme(toast.type)})">
+						{#await toastIcon(toast.type) then Icon}
+							<Icon />
+						{/await}
+						{toast.message}
+					</li>
+				{/each}
+			</ul>
 		</section>
+		<section class="progress">
+			<ProgressBar percentage alwaysActive {progress} />
+		</section>
+
 		<ButtonSecondary onclick={generateExport}>
 			{#if exporting}
 				<LoadingSpinner />
@@ -224,5 +255,25 @@
 		font-size: 0.9em;
 		color: var(--gy);
 		margin-top: 0.75em;
+	}
+
+	.errors {
+		margin-top: 1em;
+		overflow-y: auto;
+		height: 5lh;
+	}
+
+	.errors ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.errors li {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		color: var(--fg-secondary);
+		min-width: 30ch;
 	}
 </style>

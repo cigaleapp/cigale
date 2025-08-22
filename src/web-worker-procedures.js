@@ -97,7 +97,10 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			jsonSchemaURL: 'string.url.parse'
 		}),
 		progress: type
-			.or({ progress: 'number' }, { warning: 'string' })
+			.or(
+				{ progress: 'number' },
+				{ warning: type.or(['"exif-write-error"', { filename: 'string' }]) }
+			)
 			.pipe((o) =>
 				'progress' in o
 					? { progress: o.progress, warning: undefined }
