@@ -25,7 +25,6 @@
 
 	/** @type {Props} */
 	const { type, message, action, onaction, dismiss, ondismiss } = $props();
-	const Icon = $derived(toastIcon(type));
 </script>
 
 <article
@@ -36,7 +35,11 @@
 	in:slide={{ axis: 'y', duration: 200 }}
 	out:fade={{ duration: 200 }}
 >
-	<div class="icon"><Icon /></div>
+	<div class="icon">
+		{#await toastIcon(type) then Icon}
+			<Icon />
+		{/await}
+	</div>
 	<p>{message}</p>
 	<section class="actions">
 		{#if action && onaction}

@@ -182,10 +182,10 @@
 		<section class="errors">
 			<ul>
 				{#each toasts.items('exporter') as toast (toast.id)}
-					{@const Icon = toastIcon(toast.type)}
-
 					<li style:color="var(--fg-{toastTheme(toast.type)})">
-						<Icon />
+						{#await toastIcon(toast.type) then Icon}
+							<Icon />
+						{/await}
 						{toast.message}
 					</li>
 				{/each}

@@ -1,11 +1,6 @@
 import { minutesToMilliseconds } from 'date-fns';
 import { nanoid } from 'nanoid';
 import { entries, mapValues } from './utils';
-import IconDebug from '~icons/ph/bug';
-import IconSuccess from '~icons/ph/check';
-import IconInfo from '~icons/ph/info';
-import IconWarning from '~icons/ph/warning';
-import IconError from '~icons/ph/x';
 
 /**
  * @template T
@@ -274,7 +269,13 @@ export const toasts = new Toasts(TOAST_POOLS, 'default');
 /**
  * @param {Toast<any>['type']} type
  */
-export function toastIcon(type) {
+export async function toastIcon(type) {
+	const { default: IconDebug } = await import('~icons/ph/bug');
+	const { default: IconSuccess } = await import('~icons/ph/check');
+	const { default: IconInfo } = await import('~icons/ph/info');
+	const { default: IconWarning } = await import('~icons/ph/warning');
+	const { default: IconError } = await import('~icons/ph/x');
+
 	switch (type) {
 		case 'info':
 			return IconInfo;
