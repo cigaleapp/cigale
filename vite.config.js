@@ -1,6 +1,7 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 /// <reference types="vitest" />
 import { sveltekit } from '@sveltejs/kit/vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { execSync } from 'node:child_process';
 import icons from 'unplugin-icons/vite';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
@@ -29,7 +30,8 @@ export default defineConfig({
 		'import.meta.env.previewingPrNumber': process.env.PR_NUMBER ?? 'null'
 	},
 	worker: {
-		format: 'es'
+		format: 'es',
+		plugins: () => [svelte()]
 	},
 	resolve: process.env.VITEST
 		? {

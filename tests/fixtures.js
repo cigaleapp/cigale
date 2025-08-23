@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 import { rm, mkdir } from 'node:fs/promises';
 import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import { mockProtocolSourceURL } from './utils';
 
 export { exampleProtocol };
 
@@ -28,22 +29,12 @@ export const test = base.extend(
 				await mkdir('./tests/results', { recursive: true });
 
 				if (!tags.includes('@real-protocol')) {
-					// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
-					await Promise.all(
-						[context, page].map(async (target) =>
-							target.route(
-								(u) => {
-									u.searchParams.delete('v');
-									return u.toString() === defaultProtocol.source;
-								},
-								async (route) => route.fulfill({ json: exampleProtocol })
-							)
-						)
-					);
+					await mockProtocolSourceURL(page, context, defaultProtocol.source, {
+						json: exampleProtocol
+					});
 				}
 
-				await page.goto('/');
-				// @ts-expect-error
+				await page.goto('./');
 				await page.waitForFunction(() => Boolean(window.devalue && window.DB && window.refreshDB));
 				await use();
 			},

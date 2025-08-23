@@ -8,8 +8,7 @@
 		"src/app.d.ts",
 		"src/lib/Checkbox.svelte",
 		"src/lib/Dropzone.svelte",
-		"src/lib/FloatingButton.svelte",
-		"src/lib/SelectWithSearch.svelte"
+		"src/lib/FloatingButton.svelte"
 	],
 	"ignoreDependencies": ["@iconify-json/.+"],
 	"entry": [

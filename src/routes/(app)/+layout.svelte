@@ -60,7 +60,28 @@
 			help: '',
 			hidden: true,
 			do: () => toasts.info(m.no_need_for_ctrl_s())
-		}
+		},
+		...Object.fromEntries(
+			/**@type{const}*/ (['w', 'e', 'i', 'd', 's']).map((type) => {
+				const toastFns = {
+					w: () => toasts.warn('Example warning toast'),
+					e: () => toasts.error('Example error toast'),
+					i: () => toasts.info('Example info toast'),
+					d: () => toasts.add('debug', 'Example debug toast'),
+					s: () => toasts.success('Example success toast')
+				};
+				return [
+					`t t ${type}`,
+					{
+						help: '',
+						hidden: true,
+						allowInModals: true,
+						when: () => getSettings().showTechnicalMetadata,
+						do: toastFns[type]
+					}
+				];
+			})
+		)
 	});
 
 	const settings = $derived(getSettings());
@@ -73,7 +94,7 @@
 	let openKeyboardShortcuts = $state();
 </script>
 
-<Navigation {openKeyboardShortcuts} progress={uiState.processing.progress} />
+<Navigation swarpc={data.swarpc} {openKeyboardShortcuts} progress={uiState.processing.progress} />
 
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
@@ -82,7 +103,7 @@
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
 
 <section class="toasts" data-testid="toasts-area">
-	{#each toasts.items as toast (toast.id)}
+	{#each toasts.items('default') as toast (toast.id)}
 		<Toast
 			{...toast}
 			action={toast.labels.action}

@@ -87,8 +87,7 @@ class ProcessingQueue {
 		uiState.queuedImages.clear();
 		document.dispatchEvent(new CustomEvent('processing-queue-drained'));
 		setTimeout(() => {
-			uiState.processing.done = 0;
-			uiState.processing.total = 0;
+			uiState.processing.reset();
 		}, 500);
 	}
 
@@ -179,6 +178,8 @@ class ProcessingQueue {
 		uiState.loadingImages.add(this.taskSubjectId(task));
 
 		const { detection, classification } = task;
+
+		uiState.processing.task = detection ? 'detection' : 'classification';
 
 		try {
 			if (detection) {

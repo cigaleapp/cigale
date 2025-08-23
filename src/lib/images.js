@@ -1,13 +1,16 @@
 import { uiState } from '$lib/state.svelte';
+import { ulid } from 'ulid';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
-import { ulid } from 'ulid';
 import { m } from './paraglide/messages';
-import { unique } from './utils';
+import { clamp, unique } from './utils';
+
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
+ * @import * as DB from './database';
  */
 
 /**
@@ -154,18 +157,28 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 		{ tx },
 		async (tx) => {
 			const observations = await tx.objectStore('Observation').getAll();
+			// Store there cuz imagesOfImageFile() reads from reactive state.
+			const imagesOfFile = imagesOfImageFile(id);
 			try {
-				imagesOfImageFile(id).map(({ id }) => tx.objectStore('Image').delete(id));
 				tx.objectStore('ImageFile').delete(id);
 				tx.objectStore('ImagePreviewFile').delete(id);
-				observations
-					.filter(({ images }) => images.includes(id))
-					.map(({ images, ...rest }) =>
-						tx.objectStore('Observation').put({
-							...rest,
-							images: images.filter((imageId) => imageId !== id)
-						})
-					);
+
+				for (const image of imagesOfFile) {
+					tx.objectStore('Image').delete(image.id);
+
+					for (const observation of observations) {
+						const remainingImages = observation.images.filter((imageId) => imageId !== image.id);
+
+						if (remainingImages.length === 0) {
+							tx.objectStore('Observation').delete(observation.id);
+						} else if (remainingImages.length < observation.images.length) {
+							tx.objectStore('Observation').put({
+								...observation,
+								images: remainingImages
+							});
+						}
+					}
+				}
 			} catch (error) {
 				if (!notFoundOk) return Promise.reject(error);
 			}
@@ -252,7 +265,7 @@ export async function resizeToMaxSize({ source }) {
 		throw new Error(
 			ALWAYS_SUPPORTED_TYPES.includes(source.type)
 				? errorMessage(error)
-				: ['image/CR2', 'image/x-canon-cr2']
+				: ['image/CR2', 'image/x-canon-cr2'].includes(source.type)
 					? m.file_format_not_supported_yet({ format: '.CR2' })
 					: m.file_format_not_supported({ format: humanFormatName(source.type) })
 		);
@@ -414,4 +427,65 @@ if (import.meta.vitest) {
 			});
 		});
 	});
+}
+
+/**
+ * @param {ArrayBuffer} bytes image bytes
+ * @param {string} contentType content type of the image
+ * @param {import('./metadata').RuntimeValue<'boundingbox'>} centeredBoundingBox
+ * @param {string} [padding] padding to add around the bounding box when cropping images. string of the form "npx" or "n%"
+ * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
+ */
+export async function cropImage(bytes, contentType, centeredBoundingBox, padding = '0px') {
+	const bitmap = await createImageBitmap(new Blob([bytes], { type: contentType }));
+	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
+		toTopLeftCoords(centeredBoundingBox)
+	);
+
+	const { inPixels } = parseCropPadding(padding);
+	const paddingPixels = { x: inPixels(bitmap.width), y: inPixels(bitmap.height) };
+
+	try {
+		const croppedBitmap = await createImageBitmap(
+			bitmap,
+			clamp(boundingBox.x - paddingPixels.x, 0, bitmap.width),
+			clamp(boundingBox.y - paddingPixels.y, 0, bitmap.height),
+			clamp(boundingBox.width + 2 * paddingPixels.x, 1, bitmap.width),
+			clamp(boundingBox.height + 2 * paddingPixels.y, 1, bitmap.height)
+		);
+
+		const canvas = new OffscreenCanvas(croppedBitmap.width, croppedBitmap.height);
+		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
+		const croppedBytes = await canvas
+			.convertToBlob({
+				type: ['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png'
+			})
+			.then((blob) => blob.arrayBuffer());
+
+		// @ts-ignore
+		return { cropped: croppedBytes, original: bytes };
+	} catch (error) {
+		throw new Error(`Couldn't crop with ${JSON.stringify({ boundingBox, padding })}: ${error}`, {
+			cause: error
+		});
+	} finally {
+		bitmap.close();
+	}
+}
+
+/**
+ *
+ * @param {string} padding
+ * @returns {{ withUnit: string, unitless: number, unit: 'px' | '%', inPixels: (basis: number) => number }}
+ */
+export function parseCropPadding(padding) {
+	const match = padding.match(/(\d+)(px|%)/);
+	if (!match) throw new Error(`Invalid crop padding: ${padding}`);
+	const [value, unit] = [Number.parseInt(match[1], 10), /** @type {'%'|'px'} */ (match[2])];
+	return {
+		withUnit: padding,
+		unitless: value,
+		unit,
+		inPixels: (axis) => (unit === 'px' ? value : Math.round((axis * value) / 100))
+	};
 }

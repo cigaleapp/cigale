@@ -1,0 +1,47 @@
+name: Clean gh-pages branch
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Every day at midnight
+  workflow_dispatch:
+
+jobs:
+  clean-gh-pages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+      - name: Install gh CLI
+        run: |
+          sudo apt-get install gh -y
+      - name: Remove dirs in _vitest, _playwright, etc. for PRs that are no longer open
+        env:
+          REPO_PR_URL: ${{ github.event.repository.html_url }}/pull
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open_prs=$(gh pr list --state open --json number --jq '.[].number')
+          echo Open PRs: $open_prs
+          for dir in _vitest _playwright _coverage _pullrequests; do
+            echo Checking $dir
+            for pr in $dir/*; do
+              number=$(basename "$pr" | sed 's/^pr-//')
+              if ! echo "$open_prs" | grep -q "$number"; then
+                echo "Removing $pr, $number does not match any open PR: $REPO_PR_URL/$number"
+                rm -rf "$pr"
+              else
+                echo "Keeping $pr as $number is still open: $REPO_PR_URL/$number"
+              fi
+            done
+          done
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Cleanup: Remove stale PR directories"
+          git push

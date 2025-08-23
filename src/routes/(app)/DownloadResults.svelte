@@ -1,7 +1,10 @@
 <script>
-	import { base } from '$app/paths';
+	import { asset } from '$app/paths';
+	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { downloadAsFile } from '$lib/download';
 	import { tables } from '$lib/idb.svelte';
+	import { parseCropPadding } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
@@ -9,9 +12,9 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import { generateResultsZip, parseCropPadding } from '$lib/results.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
+	import { toastIcon, toastTheme } from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tick } from 'svelte';
 	import Download from '~icons/ph/download-simple';
@@ -21,9 +24,14 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {() => void} open
-	 * @property {number} [progress] progress bar to in the modal content
+	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
 	 */
-	let { open = $bindable(), progress } = $props();
+
+	/** @type {Props} */
+	let { open = $bindable(), swarpc } = $props();
+
+	const progress = $derived(uiState.processing.progress);
+
 	let exporting = $state(false);
 	/** @type {'metadataonly'|'croppedonly'|'full'} */
 	let include = $state('croppedonly');
@@ -60,7 +68,10 @@
 	});
 
 	async function generateExport() {
+		await toasts.clear('exporter');
+		uiState.processing.reset();
 		exporting = true;
+
 		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!chosenProtocol) {
 			toasts.error(m.no_protocol_selected());
@@ -69,11 +80,32 @@
 		}
 		try {
 			await ensureNoLoneImages();
-			await generateResultsZip(tables.Observation.state, chosenProtocol, {
-				base,
-				include,
-				cropPadding: cropPadding.withUnit
-			});
+			uiState.processing.task = 'export';
+			uiState.processing.total = 1;
+			uiState.processing.done = 0;
+			const zipfileBytes = await swarpc.generateResultsZip(
+				{
+					include,
+					protocolId: chosenProtocol.id,
+					cropPadding: cropPadding.withUnit,
+					jsonSchemaURL: new URL(asset('/results.schema.json'), page.url.origin).toString()
+				},
+				({ warning, progress }) => {
+					if (warning) {
+						const [message, args] = warning;
+
+						switch (message) {
+							case 'exif-write-error':
+								toasts.warn(m.cannot_add_exif_metadata_to_image(args));
+								break;
+						}
+					}
+
+					if (progress) uiState.processing.done = progress;
+				}
+			);
+
+			downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
 		} catch (error) {
 			console.error(error);
 			toasts.error(
@@ -85,7 +117,19 @@
 	}
 </script>
 
-<Modal --footer-direction="column" key="modal_export_results" bind:open title={m.export_results()}>
+<Modal
+	--footer-direction="column"
+	key="modal_export_results"
+	bind:open
+	title={m.export_results()}
+	onopen={() => {
+		toasts.setCurrentPool('exporter');
+	}}
+	onclose={() => {
+		toasts.setCurrentPool('default');
+		uiState.processing.reset();
+	}}
+>
 	<div class="include">
 		<RadioButtons
 			bind:value={include}
@@ -98,9 +142,7 @@
 					subtext: m.allows_reusing_export_later()
 				}
 			]}
-		>
-			Quoi inclure dans l'export
-		</RadioButtons>
+		/>
 	</div>
 
 	<section class="crop-padding" class:irrelevant={include === 'metadataonly'}>
@@ -139,12 +181,22 @@
 	</section>
 
 	{#snippet footer()}
-		<section class="progress">
-			{#if ![0, 1].includes(progress)}
-				<code>{Math.floor(progress * 100)}%</code>
-				<ProgressBar {progress} />
-			{/if}
+		<section class="errors">
+			<ul>
+				{#each toasts.items('exporter') as toast (toast.id)}
+					<li style:color="var(--fg-{toastTheme(toast.type)})">
+						{#await toastIcon(toast.type) then Icon}
+							<Icon />
+						{/await}
+						{toast.message}
+					</li>
+				{/each}
+			</ul>
 		</section>
+		<section class="progress">
+			<ProgressBar percentage alwaysActive {progress} />
+		</section>
+
 		<ButtonSecondary onclick={generateExport}>
 			{#if exporting}
 				<LoadingSpinner />
@@ -204,5 +256,25 @@
 		font-size: 0.9em;
 		color: var(--gy);
 		margin-top: 0.75em;
+	}
+
+	.errors {
+		margin-top: 1em;
+		overflow-y: auto;
+		height: 5lh;
+	}
+
+	.errors ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.errors li {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		color: var(--fg-secondary);
+		min-width: 30ch;
 	}
 </style>

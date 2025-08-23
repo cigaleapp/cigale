@@ -122,7 +122,6 @@ select,
 	appearance: base-select;
 }
 
-
 select option::before {
 	display: none;
 }

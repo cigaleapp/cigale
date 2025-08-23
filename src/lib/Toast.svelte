@@ -2,14 +2,54 @@
 @component Displays a notification message to the user above the page.
 -->
 
-<script generics="T">
+<script module>
 	import IconDebug from '~icons/ph/bug';
 	import IconSuccess from '~icons/ph/check';
 	import IconInfo from '~icons/ph/info';
 	import IconWarning from '~icons/ph/warning';
-	import { default as IconClose, default as IconError } from '~icons/ph/x';
-	import ButtonInk from './ButtonInk.svelte';
+	import IconError from '~icons/ph/x';
+
+	/**
+	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
+	 */
+	export function toastIcon(type) {
+		switch (type) {
+			case 'info':
+				return IconInfo;
+			case 'success':
+				return IconSuccess;
+			case 'warning':
+				return IconWarning;
+			case 'error':
+				return IconError;
+			case 'debug':
+				return IconDebug;
+		}
+	}
+
+	/**
+	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
+	 */
+	export function toastTheme(type) {
+		switch (type) {
+			case 'info':
+				return 'primary';
+			case 'success':
+				return 'success';
+			case 'warning':
+				return 'warning';
+			case 'error':
+				return 'danger';
+			case 'debug':
+				return 'secondary';
+		}
+	}
+</script>
+
+<script generics="T">
 	import { fade, slide } from 'svelte/transition';
+	import IconClose from '~icons/ph/x';
+	import ButtonInk from './ButtonInk.svelte';
 
 	/**
 	 * @typedef Toast
@@ -21,43 +61,28 @@
 	 * @property {string} message the toast to display
 	 * @property {Toast['type']} type the type of toast to display
 	 * @property {?() => void} onaction the action to perform when the user interacts with the toast
-	 * @property {string} [action] the text to use for the action button
+	 * @property {string|undefined} [action] the text to use for the action button
 	 * @property {?() => void} ondismiss the action to perform when the user dismisses the toast
-	 * @property {string} [dismiss] the text to use for the dismiss button. If not set, a close icon will be used instead
+	 * @property {string|undefined} [dismiss] the text to use for the dismiss button. If not set, a close icon will be used instead
 	 */
 
 	/** @type {Props} */
 	const { type, message, action, onaction, dismiss, ondismiss } = $props();
-	const Icon = $derived(
-		{
-			warning: IconWarning,
-			error: IconError,
-			success: IconSuccess,
-			info: IconInfo,
-			debug: IconDebug
-		}[type]
-	);
-	const style = $derived.by(() => {
-		switch (type) {
-			case 'debug':
-				return 'neutral';
-			case 'info':
-				return 'primary';
-			default:
-				return type;
-		}
-	});
 </script>
 
 <article
 	class="toast"
 	data-type={type}
-	style:--bg="var(--bg-{style})"
-	style:--fg="var(--fg-{style})"
+	style:--bg="var(--bg-{toastTheme(type)})"
+	style:--fg="var(--fg-{toastTheme(type)})"
 	in:slide={{ axis: 'y', duration: 200 }}
 	out:fade={{ duration: 200 }}
 >
-	<div class="icon"><Icon /></div>
+	<div class="icon">
+		{#await toastIcon(type) then Icon}
+			<Icon />
+		{/await}
+	</div>
 	<p>{message}</p>
 	<section class="actions">
 		{#if action && onaction}

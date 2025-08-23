@@ -16,22 +16,23 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      options: --user 1001
     strategy:
       fail-fast: false
       matrix:
-        shard-index: [1, 2, 3, 4]
-        shard-count: [4]
-    name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
+        shard-index: [1, 2, 3, 4, 5, 6]
+        shard-count: [6]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version-file: package.json
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
       - name: Run Playwright tests
         run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
@@ -53,8 +54,8 @@ jobs:
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     name: Combine reports
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
         with:
           path: ./playwright-report-shards
           pattern: playwright-report-shard-*

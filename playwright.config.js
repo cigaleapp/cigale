@@ -2,13 +2,36 @@
 import { defineConfig, devices } from '@playwright/test';
 import { minutesToMilliseconds } from 'date-fns';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+/** @typedef {NonNullable<import('@playwright/test').PlaywrightTestConfig['projects']>[number]} Project */
+
+/** @type {Project} */
+const chromium = {
+	name: 'chromium',
+	use: {
+		...devices['Desktop Chrome'],
+		contextOptions: {
+			serviceWorkers: process.env.CI ? 'allow' : 'block'
+		}
+	}
+};
+
+/** @type {Project} */
+const firefox = {
+	name: 'firefox',
+	use: { ...devices['Desktop Firefox'] }
+};
+
+/** @type {Project} */
+const webkit = {
+	name: 'webkit',
+	use: {
+		...devices['Desktop Safari'],
+		contextOptions: {
+			// See https://github.com/microsoft/playwright/issues/1090
+			serviceWorkers: 'block'
+		}
+	}
+};
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -38,7 +61,18 @@ export default defineConfig({
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. */
-		baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
+		baseURL: dependsOnTarget({
+			live: process.env.BASE_URL,
+			dev: 'http://localhost:5173',
+			built: 'http://localhost:4173'
+		}),
+
+		// See https://github.com/microsoft/playwright/issues/16357
+		bypassCSP: dependsOnTarget({
+			live: true,
+			dev: false,
+			built: false
+		}),
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: 'on-first-retry',
@@ -48,70 +82,39 @@ export default defineConfig({
 	},
 
 	/* Configure projects for major browsers */
-	projects: [
-		{
-			name: 'chromium',
-			use: {
-				...devices['Desktop Chrome'],
-				contextOptions: {
-					serviceWorkers: process.env.CI ? 'allow' : 'block'
-				}
-			}
-		},
-
-		// Firefox does not work in CI, see https://github.com/microsoft/playwright/issues/11566
-		...(process.env.CI
-			? []
-			: [
-					{
-						name: 'firefox',
-						use: { ...devices['Desktop Firefox'] }
-					}
-				]),
-
-		{
-			name: 'webkit',
-			use: {
-				...devices['Desktop Safari'],
-				contextOptions: {
-					// See https://github.com/microsoft/playwright/issues/1090
-					serviceWorkers: 'block'
-				}
-			}
-		}
-
-		/* Test against mobile viewports. */
-		// {
-		//   name: 'Mobile Chrome',
-		//   use: { ...devices['Pixel 5'] },
-		// },
-		// {
-		//   name: 'Mobile Safari',
-		//   use: { ...devices['iPhone 12'] },
-		// },
-
-		/* Test against branded browsers. */
-		// {
-		//   name: 'Microsoft Edge',
-		//   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-		// },
-		// {
-		//   name: 'Google Chrome',
-		//   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-		// },
-	],
+	projects: dependsOnTarget({
+		live: [chromium],
+		dev: [chromium, firefox, webkit],
+		built: [chromium, webkit]
+	}),
 
 	/* Run your local dev server before starting the tests */
-	webServer: {
-		...(process.env.CI
-			? {
-					command: 'npm run build && npm run preview',
-					port: 4173
-				}
-			: {
-					command: 'npm run dev',
-					port: 5173
-				}),
-		reuseExistingServer: !process.env.CI
-	}
+	webServer: dependsOnTarget({
+		live: undefined,
+		dev: {
+			command: 'npm run dev',
+			port: 5173,
+			reuseExistingServer: true
+		},
+		built: {
+			command: 'npm run build && npm run preview',
+			port: 4173,
+			reuseExistingServer: false
+		}
+	})
 });
+
+/**
+ *
+ * @template L, D, B
+ * @param {object} param0
+ * @param {L} param0.live - Value to return if we're checking against a live URL (meaning $BASE_URL is set)
+ * @param {D} param0.dev - Value to return if we're checking against a dev server (meaning $CI is not set)
+ * @param {B} param0.built - Value to return if we're checking against a built version (meaning $CI is set)
+ * @returns {L | D | B}
+ */
+function dependsOnTarget({ live, dev, built }) {
+	if (process.env.BASE_URL) return live;
+	if (process.env.CI) return built;
+	return dev;
+}

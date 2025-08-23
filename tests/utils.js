@@ -276,24 +276,38 @@ export async function chooseDefaultProtocol(page, models = {}) {
 }
 
 /**
+ * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
+ */
+const appNavTabs = (m) => ({
+	protocol: { name: m?.protocol_tab ?? 'Protocole', hash: '#/protocol' },
+	import: { name: m?.import_tab ?? 'Importer', hash: '#/import' },
+	crop: { name: m?.crop_tab ?? 'Recadrer', hash: '#/crop' },
+	classify: { name: m?.classify_tab ?? 'Classifier', hash: '#/classify' }
+});
+
+/**
  *
  * @param {Page} page
  * @param {'protocol'|'import'|'crop'|'classify'} tabName
  * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
  */
 export async function goToTab(page, tabName, m = undefined) {
-	const tabs = {
-		protocol: { name: m?.protocol_tab ?? 'Protocole', hash: '#/protocol' },
-		import: { name: m?.import_tab ?? 'Importer', hash: '#/import' },
-		crop: { name: m?.crop_tab ?? 'Recadrer', hash: '#/crop' },
-		classify: { name: m?.classify_tab ?? 'Classifier', hash: '#/classify' }
-	};
+	getTab(page, tabName, m).click();
+	const tab = appNavTabs(m)[tabName];
+	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
+}
 
-	const tab = tabs[tabName];
+/**
+ *
+ * @param {Page} page
+ * @param {'protocol'|'import'|'crop'|'classify'} tabName
+ * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
+ */
+export function getTab(page, tabName, m = undefined) {
+	const tab = appNavTabs(m)[tabName];
 	if (!tab) throw new Error(`Unknown tab: ${tabName}`);
 
-	await page.getByTestId('app-nav').getByRole('link', { name: tab.name }).click();
-	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
+	return page.getByTestId('app-nav').getByRole('link', { name: tab.name });
 }
 
 /**
@@ -452,4 +466,41 @@ export async function tooltipOf(page, locator) {
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, { timeout: 1_000 });
 	const tippyId = await locator.getAttribute('aria-describedby');
 	return page.locator(`#${tippyId}`);
+}
+
+/**
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {string} source
+ * @param {{json: object} | {body: string | Buffer}} mockedResult
+ */
+export async function mockProtocolSourceURL(page, context, source, mockedResult) {
+	await Promise.all(
+		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
+		[context, page].map(async (target) =>
+			target.route(
+				(u) => {
+					u.searchParams.delete('v');
+					return u.toString() === source;
+				},
+				async (route) => route.fulfill(mockedResult)
+			)
+		)
+	);
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string} modalTitle
+ */
+export function modal(page, modalTitle) {
+	return page.getByRole('dialog').filter({
+		has: page.getByRole('banner').getByRole('heading', {
+			name: modalTitle,
+			exact: true
+		})
+	});
 }

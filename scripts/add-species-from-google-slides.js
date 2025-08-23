@@ -17,6 +17,7 @@ await mkdir(path.join(import.meta.dirname, '../examples/arthropods.cigaleprotoco
 });
 
 const _tdown = new Turndown();
+_tdown.remove('slides-comment');
 /** @param {string} html  */
 function htmlToMarkdown(html) {
 	return _tdown.turndown(html);
@@ -157,6 +158,11 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				path: Buffer.from(odp.data),
 				trim: true,
 				openFilters: {
+					// Remove comments (see #308). For some reason, returning null doesnt work, so we turn it into a <slides-comment> tag and let Turndown remove it
+					'officeooo:annotation': ({ name }) => ({
+						xml: name,
+						html: 'slides-comment'
+					}),
 					'draw:page': ({ attributes, name }) => ({
 						xml: name,
 						html: 'section',
@@ -212,7 +218,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 
 			if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
 				imageUrl.searchParams.set('v', protocol.fresh.version.toString());
-			} else if (oldOption) {
+			} else if (oldOption && URL.canParse(oldOption.image)) {
 				imageUrl.searchParams.set(
 					'v',
 					new URL(oldOption.image).searchParams.get('v') ??

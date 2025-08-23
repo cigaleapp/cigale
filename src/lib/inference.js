@@ -145,7 +145,6 @@ export async function infer(
 	let start = -1;
 	if (!sequence) {
 		start = Date.now();
-		if (uiState) uiState.processing.state = 'inference';
 	}
 
 	taskSettings = {
@@ -202,9 +201,11 @@ export async function infer(
 export async function classify(settings, image, model, abortSignal) {
 	const inputName = settings.input.name ?? model.inputNames[0];
 
-	const input = await preprocessTensor(settings, image, MEAN, STD);
+	const input = await preprocessTensor(settings, image, MEAN, STD, abortSignal);
 
 	const output = await model.run({ [inputName]: input });
+
+	abortSignal?.throwIfAborted();
 
 	const scores = await output[Object.keys(output)[0]]
 		.getData(true)

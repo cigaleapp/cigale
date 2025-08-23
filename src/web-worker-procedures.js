@@ -86,7 +86,26 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		success: type({
 			id: 'string',
 			name: 'string',
-			version: 'number | undefined'
+			'version?': 'number | undefined'
 		})
+	},
+	generateResultsZip: {
+		input: type({
+			protocolId: 'string',
+			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
+			cropPadding: /^\d+(px|%)$/,
+			jsonSchemaURL: 'string.url.parse'
+		}),
+		progress: type
+			.or(
+				{ progress: 'number' },
+				{ warning: type.or(['"exif-write-error"', { filename: 'string' }]) }
+			)
+			.pipe((o) =>
+				'progress' in o
+					? { progress: o.progress, warning: undefined }
+					: { progress: undefined, warning: o.warning }
+			),
+		success: type('ArrayBuffer')
 	}
 });

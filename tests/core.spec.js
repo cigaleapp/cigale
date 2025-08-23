@@ -3,7 +3,18 @@ import extract from 'extract-zip';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Analysis } from '../src/lib/schemas/results.js';
-import { setSettings, chooseDefaultProtocol, readdirTreeSync, goToTab } from './utils.js';
+import {
+	setSettings,
+	chooseDefaultProtocol,
+	readdirTreeSync,
+	goToTab,
+	mockProtocolSourceURL,
+	modal,
+	importProtocol
+} from './utils.js';
+import { readFile } from 'node:fs/promises';
+import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
 for (const offline of [false, true]) {
 	test(
@@ -105,3 +116,151 @@ for (const offline of [false, true]) {
 		}
 	);
 }
+
+test('can import a protocol via ?protocol', async ({ page, context }) => {
+	await setSettings({ page }, { showTechnicalMetadata: false });
+	const protocolUrl = 'https://example.com/kitchensink.cigaleprotocol.yaml';
+	await mockProtocolSourceURL(page, context, protocolUrl, {
+		body: await readFile(
+			path.join(import.meta.dirname, '..', 'examples', 'kitchensink.cigaleprotocol.yaml'),
+			'utf8'
+		)
+	});
+
+	await page.goto(`?protocol=${encodeURIComponent(protocolUrl)}`);
+	await expect(modal(page, 'Importer le protocole distant ?')).toBeVisible();
+	await expect(modal(page, 'Importer le protocole distant ?').getByRole('link')).toHaveAttribute(
+		'href',
+		protocolUrl
+	);
+
+	await modal(page, 'Importer le protocole distant ?')
+		.getByRole('button', { name: 'Importer' })
+		.click();
+
+	await expect(
+		page.getByRole('button', {
+			name: 'Kitchen sink',
+			exact: true
+		})
+	).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('can pre-set models via ?classificationModel and ?cropModel', async ({ page }) => {
+	await setSettings({ page }, { showTechnicalMetadata: false });
+	await chooseDefaultProtocol(page);
+
+	const classificationModel = page.getByRole('radiogroup', {
+		name: "Modèle d'inférence pour Espèce"
+	});
+	const cropModel = page.getByRole('radiogroup', { name: "Modèle d'inférence pour la détection" });
+
+	async function reset() {
+		await classificationModel.getByRole('radio', { name: 'Léger' }).click();
+		await cropModel.getByRole('radio', { name: 'YOLO11' }).click();
+	}
+
+	await page.goto('?classificationModel=0');
+	await expect(classificationModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour Espèce":
+	    - radio "Aucune inférence" [checked]
+	    - radio /Léger/
+	`);
+	await expect(cropModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour la détection":
+	    - radio "Aucune inférence"
+	    - radio "YOLO11" [checked]
+	`);
+	await reset();
+
+	await page.goto('?cropModel=0');
+	await expect(classificationModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour Espèce":
+	    - radio "Aucune inférence"
+	    - radio /Léger/ [checked]
+	`);
+	await expect(cropModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour la détection":
+	    - radio "Aucune inférence" [checked]
+	    - radio "YOLO11"
+	`);
+	await reset();
+
+	await page.goto('?classificationModel=0&cropModel=0');
+	await expect(classificationModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour Espèce":
+	    - radio "Aucune inférence" [checked]
+	    - radio /Léger/
+	`);
+	await expect(cropModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour la détection":
+	    - radio "Aucune inférence" [checked]
+	    - radio "YOLO11"
+	`);
+	await reset();
+
+	await page.goto('?classificationModel=1');
+	await expect(classificationModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour Espèce":
+	    - radio "Aucune inférence"
+	    - radio /Léger/ [checked]
+	`);
+	await expect(cropModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour la détection":
+	    - radio "Aucune inférence"
+	    - radio "YOLO11" [checked]
+	`);
+	await reset();
+
+	await page.goto('?cropModel=1');
+	await expect(classificationModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour Espèce":
+	    - radio "Aucune inférence"
+	    - radio /Léger/ [checked]
+	`);
+	await expect(cropModel).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour la détection":
+	    - radio "Aucune inférence"
+	    - radio "YOLO11" [checked]
+	`);
+});
+
+test('can import a protocol and pre-set models via URL parameters', async ({ page }) => {
+	await setSettings({ page }, { showTechnicalMetadata: false });
+	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
+	await page.goto('#/protocols');
+	await page
+		.locator('article')
+		.filter({ hasText: lightweightProtocol.id })
+		.getByRole('button', { name: 'Supprimer' })
+		.click();
+
+	await page.goto(
+		`?protocol=${encodeURIComponent(defaultProtocol.source)}&classificationModel=0&cropModel=0`
+	);
+	await modal(page, 'Importer le protocole distant ?')
+		.getByRole('button', { name: 'Importer' })
+		.click();
+	await expect(
+		page.getByRole('button', {
+			name: lightweightProtocol.name,
+			exact: true
+		})
+	).toHaveAttribute('aria-pressed', 'true');
+
+	await expect(
+		page.getByRole('radiogroup', {
+			name: "Modèle d'inférence pour Espèce"
+		})
+	).toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour Espèce":
+	    - radio "Aucune inférence" [checked]
+	    - radio /Léger/
+	`);
+	await expect(page.getByRole('radiogroup', { name: "Modèle d'inférence pour la détection" }))
+		.toMatchAriaSnapshot(`
+	  - radiogroup "Modèle d'inférence pour la détection":
+	    - radio "Aucune inférence" [checked]
+	    - radio "YOLO11"
+	`);
+});

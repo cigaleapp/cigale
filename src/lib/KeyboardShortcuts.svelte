@@ -12,7 +12,7 @@
 	 * @type {object}
 	 * @property {import('$lib/state.svelte.js').Keymap} binds
 	 * @property {boolean} [preventDefault=false] call e.preventDefault() before calling the handlers
-	 * @property {() => void} [openHelp] open modal listing all keybindings
+	 * @property {(() => void) | undefined} [openHelp] open modal listing all keybindings
 	 */
 
 	/** @type {Props} */
@@ -46,7 +46,7 @@
 						pattern,
 						/** @param {MouseEvent|KeyboardEvent} e */
 						async (e) => {
-							if (hasAnyModalOpen(page)) {
+							if (!bind?.allowInModals && hasAnyModalOpen(page)) {
 								console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);
 								return;
 							}
