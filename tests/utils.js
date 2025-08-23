@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { Schemas } from '../src/lib/database.js';
 import path from 'node:path';
 import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
@@ -80,7 +81,7 @@ export async function setSettings({ page }, newSettings) {
  * @returns {Promise<Settings>}
  */
 export async function getSettings({ page }) {
-	return page.evaluate(async () => {
+	const raw = await page.evaluate(async () => {
 		window.refreshDB();
 		const settings = await window.DB.get('Settings', 'user').then(
 			(settings) => settings ?? window.DB.get('Settings', 'defaults')
@@ -88,6 +89,8 @@ export async function getSettings({ page }) {
 		if (!settings) throw new Error('Settings not found in the database');
 		return settings;
 	});
+
+	return Schemas.Settings.assert(raw);
 }
 
 /**
@@ -503,4 +506,12 @@ export function modal(page, modalTitle) {
 			exact: true
 		})
 	});
+}
+
+/**
+ *
+ * @param {Page} page
+ */
+export function openSettings(page) {
+	return page.getByTestId('settings-button').click();
 }

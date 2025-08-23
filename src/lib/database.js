@@ -96,6 +96,13 @@ const Settings = table(
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
 		cropAutoNext: 'boolean = false',
+		gallerySort: type({
+			direction: type.enumerated('asc', 'desc'),
+			key: type.enumerated('filename', 'date')
+		}).default(() => ({
+			direction: 'asc',
+			key: 'date'
+		})),
 		protocolModelSelections: scope({ ID })
 			.type({
 				'[ID]': {

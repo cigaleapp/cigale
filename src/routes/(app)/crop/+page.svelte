@@ -5,6 +5,7 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import { imageFileIds } from '$lib/images';
 	import { seo } from '$lib/seo.svelte';
+	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 
 	seo({ title: 'Recadrer' });
@@ -24,6 +25,7 @@
 <section class="observations">
 	<AreaObservations
 		{images}
+		sort={getSettings().gallerySort}
 		highlight={uiState.imagePreviouslyOpenedInCropper}
 		loadingText="Chargement…"
 		oncardclick={(id) => {
@@ -36,6 +38,7 @@
 	.observations {
 		padding: 2.5em;
 		display: flex;
+		flex-direction: column;
 		flex-grow: 1;
 	}
 </style>

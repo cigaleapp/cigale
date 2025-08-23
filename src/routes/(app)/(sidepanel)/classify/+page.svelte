@@ -39,7 +39,7 @@
 		return errors;
 	});
 
-	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
+	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number, addedAt: Date }>} */
 	const images = $derived(
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
@@ -51,7 +51,9 @@
 				uiState.classificationInferenceAvailable
 					? typeof item === 'string'
 						? false
-						: uiState.hasPreviewURL(item.fileId) && !uiState.loadingImages.has(item.id)
+						: uiState.hasPreviewURL(item.fileId) &&
+							!uiState.loadingImages.has(item.id) &&
+							!uiState.queuedImages.has(item.id)
 					: true
 		})
 	);
@@ -159,6 +161,7 @@
 			bind:selection={uiState.selection}
 			{images}
 			{errors}
+			sort={getSettings().gallerySort}
 			loadingText={m.analyzing()}
 			ondelete={async (id) => {
 				const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
@@ -188,6 +191,7 @@
 	.observations {
 		padding: 2.5em;
 		display: flex;
+		flex-direction: column;
 		flex-grow: 1;
 	}
 

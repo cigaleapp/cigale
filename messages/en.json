@@ -186,9 +186,16 @@
 	"file_format_not_supported": "File format {format} is not supported",
 	"image_too_large": "Image is too large to be processed",
 	"queued": "Queued",
+	"change_sort_direction_to_asc": "Change sort direction to ascending",
+	"change_sort_direction_to_desc": "Change sort direction to descending",
+	"sort_key_filename": "File name",
+	"sort_key_id": "ID",
+	"sort_key_date": "Date",
+	"sort_gallery_by": "Sort images by",
 	"toasts_count": "{count} messages",
 	"cannot_add_exif_metadata_to_image": "Cannot add EXIF metadata to image {filename}",
 	"wait_for_detection_to_finish_before_classifying": "Please wait for bounding box detection to finish before classifying",
 	"classification_is_disabled_or_unavailable": "Classification is disabled or unavailable",
-	"detection_is_disabled_or_unavailable": "Detection is disabled or unavailable"
+	"detection_is_disabled_or_unavailable": "Detection is disabled or unavailable",
+	"language": "Language"
 }

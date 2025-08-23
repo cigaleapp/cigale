@@ -14,13 +14,14 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <script>
 	import { uiState } from '$lib/state.svelte';
+	import * as datefns from 'date-fns';
 	import { onMount } from 'svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import { defineKeyboardShortcuts } from './keyboard.svelte';
 	import { mutationobserver } from './mutations';
-	import { getSettings } from './settings.svelte';
 	import { m } from './paraglide/messages';
+	import { getSettings } from './settings.svelte';
 
 	/**
 	 * @typedef Props
@@ -32,6 +33,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {string} [loadingText]
 	 * @property {(id: string) => void} [ondelete] callback the user wants to delete an image or observation.
 	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
+	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
 	 */
 
 	/** @type {Props } */
@@ -42,6 +44,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		errors,
 		highlight,
 		loadingText,
+		sort,
 		selection = $bindable([])
 	} = $props();
 
@@ -118,6 +121,23 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			inline: 'nearest'
 		});
 	});
+
+	const sortedImages = $derived(
+		images.toSorted((a, b) => {
+			if (sort.direction === 'desc') {
+				[a, b] = [b, a];
+			}
+
+			switch (sort.key) {
+				case 'id':
+					return a.id.localeCompare(b.id);
+				case 'filename':
+					return a.title.localeCompare(b.title);
+				case 'date':
+					return datefns.compareAsc(a.addedAt, b.addedAt);
+			}
+		})
+	);
 </script>
 
 <section
@@ -135,7 +155,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each images as props, i (virtualizeKey(props))}
+	{#each sortedImages as props, i (virtualizeKey(props))}
 		<CardObservation
 			data-testid={i === 0 ? 'first-observation-card' : undefined}
 			data-id={props.id}
@@ -153,7 +173,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		/>
 	{/each}
 
-	{#if getSettings().showTechnicalMetadata}
+	{#if getSettings().showTechnicalMetadata && sortedImages.length > 0}
 		<div class="debug">
 			{#snippet displayIter(set)}
 				{'{'}

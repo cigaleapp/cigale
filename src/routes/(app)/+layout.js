@@ -53,7 +53,9 @@ async function fillBuiltinData(swarpc) {
 			language: 'fr',
 			showInputHints: true,
 			showTechnicalMetadata: dev,
-			protocolModelSelections: {}
+			protocolModelSelections: {},
+			cropAutoNext: false,
+			gallerySort: { key: 'date', direction: 'asc' }
 		});
 	});
 
