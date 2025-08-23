@@ -24,7 +24,7 @@
 	} = $props();
 </script>
 
-<div class="segmented-group">
+<div class="segmented-group" role="radiogroup">
 	{#each options as option (option)}
 		{#if !customOption || labels?.[option]}
 			<button

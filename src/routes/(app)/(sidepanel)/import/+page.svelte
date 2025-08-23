@@ -41,7 +41,8 @@
 				title: name,
 				stacksize: 1,
 				loading: uiState.loadingImages.has(id) ? +Infinity : -Infinity,
-				boundingBoxes: []
+				boundingBoxes: [],
+				addedAt: new Date()
 			}))
 		]
 			.toSorted((a, b) => a.id.localeCompare(b.id))
@@ -124,6 +125,7 @@
 				bind:selection={uiState.selection}
 				images={allImages}
 				errors={uiState.erroredImages}
+				sort={getSettings().gallerySort}
 				loadingText={m.analyzing()}
 				ondelete={async (id) => {
 					cancelTask(id, 'Cancelled by user');

@@ -504,3 +504,11 @@ export function modal(page, modalTitle) {
 		})
 	});
 }
+
+/**
+ *
+ * @param {Page} page
+ */
+export function openSettings(page) {
+	return page.getByTestId('settings-button').click();
+}

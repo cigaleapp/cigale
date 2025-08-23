@@ -39,7 +39,7 @@
 		return errors;
 	});
 
-	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number }>} */
+	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number, addedAt: Date }>} */
 	const images = $derived(
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
@@ -161,6 +161,7 @@
 			bind:selection={uiState.selection}
 			{images}
 			{errors}
+			sort={getSettings().gallerySort}
 			loadingText={m.analyzing()}
 			ondelete={async (id) => {
 				const imageIds = tables.Observation.getFromState(id)?.images ?? [id];

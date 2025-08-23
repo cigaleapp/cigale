@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { chooseDefaultProtocol, goToTab, importPhotos } from './utils';
+import { chooseDefaultProtocol, goToTab, importPhotos, openSettings } from './utils';
 import fr from '../messages/fr.json' with { type: 'json' };
 
 test.describe('sorting', () => {
@@ -22,13 +22,21 @@ test.describe('sorting', () => {
 	 */
 	async function assertCardsOrder(sortKey, order) {
 		test(`by ${sortKey}`, async ({ page }) => {
-			await page.getByRole('combobox', { name: fr.sort_by }).selectOption({ value: sortKey });
+			await openSettings(page);
+			const optionLabel = fr[`sort_key_${sortKey}`];
+
+			await page
+				.getByTestId('app-settings')
+				.getByRole('radiogroup')
+				.filter({ hasText: optionLabel })
+				.getByRole('radio', { name: optionLabel })
+				.click();
 
 			await expect
 				.poll(async () => page.locator('main article.card footer').allInnerTexts())
 				.toStrictEqual(order);
 
-			await page.getByTestId('toggle-sort-direction').click();
+			await page.getByTestId('app-settings').getByTestId('toggle-sort-direction').click();
 
 			await expect
 				.poll(async () => page.locator('main article.card footer').allInnerTexts())

@@ -13,6 +13,8 @@
 	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
 	import Gears from '~icons/ph/gear-light';
 	import Moon from '~icons/ph/moon-light';
+	import IconSortAsc from '~icons/ph/sort-ascending';
+	import IconSortDesc from '~icons/ph/sort-descending';
 	import Sun from '~icons/ph/sun-light';
 	import Cross from '~icons/ph/x-circle-light';
 
@@ -74,12 +76,14 @@
 <dialog
 	data-theme={getSettings().theme}
 	class="container"
+	data-testid="app-settings"
 	open={open ? true : undefined}
 	bind:this={dialogElement}
 >
+	<header>{m.settings()}</header>
 	<div class="listParam">
+		<div class="label">{m.theme()}</div>
 		<div class="setting">
-			{m.theme()}
 			<Switch
 				value={getSettings().theme === 'auto' ? systemIsLight : getSettings().theme === 'light'}
 				onchange={async (isLight) => {
@@ -95,8 +99,8 @@
 				<IconSyncWithSystemTheme />
 			</ButtonIcon>
 		</div>
+		<div class="label">{m.debug_mode()}</div>
 		<div class="setting">
-			{m.debug_mode()}
 			<Switch
 				data-testid="debug-mode"
 				value={getSettings().showTechnicalMetadata}
@@ -105,6 +109,35 @@
 				}}
 			/>
 		</div>
+		<div class="label">{m.sort_gallery_by()}</div>
+		<div class="setting">
+			<SegmentedGroup
+				options={['filename', 'date']}
+				bind:value={
+					() => getSettings().gallerySort.key,
+					(key) => setSetting('gallerySort', { ...getSettings().gallerySort, key })
+				}
+				labels={{ filename: m.sort_key_filename(), date: m.sort_key_date() }}
+			/>
+			<ButtonIcon
+				data-testid="toggle-sort-direction"
+				onclick={async () =>
+					await setSetting('gallerySort', {
+						...getSettings().gallerySort,
+						direction: getSettings().gallerySort.direction === 'asc' ? 'desc' : 'asc'
+					})}
+				help={getSettings().gallerySort.direction === 'asc'
+					? m.change_sort_direction_to_desc()
+					: m.change_sort_direction_to_asc()}
+			>
+				{#if getSettings().gallerySort.direction === 'asc'}
+					<IconSortAsc />
+				{:else}
+					<IconSortDesc />
+				{/if}
+			</ButtonIcon>
+		</div>
+		<div class="label">{m.language()}</div>
 		<div class="setting">
 			<SegmentedGroup
 				clickable-custom-options
@@ -125,38 +158,36 @@
 				{/snippet}
 			</SegmentedGroup>
 		</div>
-		<div class="setting">
-			<ButtonSecondary
-				onclick={async () => {
-					open = false;
-					await goto('#/protocols');
-				}}
-			>
-				{m.manage_protocols()}
-			</ButtonSecondary>
-		</div>
-		<div class="setting">
-			<ButtonSecondary
-				onclick={() => {
-					openKeyboardShortcuts?.();
-				}}
-			>
-				{m.keyboard_shortcuts()}
-			</ButtonSecondary>
-		</div>
-		<footer>
-			CIGALE ver. <a href="https://github.com/cigaleapp/cigale/tree/{import.meta.env.buildCommit}">
-				{import.meta.env.buildCommit.slice(0, 7)}
-			</a>
-			·
-			<a
-				onclick={() => {
-					open = false;
-				}}
-				href="#/about">{m.about()}</a
-			>
-		</footer>
 	</div>
+	<section class="actions">
+		<ButtonSecondary
+			onclick={async () => {
+				open = false;
+				await goto('#/protocols');
+			}}
+		>
+			{m.manage_protocols()}
+		</ButtonSecondary>
+		<ButtonSecondary
+			onclick={() => {
+				openKeyboardShortcuts?.();
+			}}
+		>
+			{m.keyboard_shortcuts()}
+		</ButtonSecondary>
+	</section>
+	<footer>
+		CIGALE ver. <a href="https://github.com/cigaleapp/cigale/tree/{import.meta.env.buildCommit}">
+			{import.meta.env.buildCommit.slice(0, 7)}
+		</a>
+		·
+		<a
+			onclick={() => {
+				open = false;
+			}}
+			href="#/about">{m.about()}</a
+		>
+	</footer>
 </dialog>
 
 <style>
@@ -179,31 +210,43 @@
 		z-index: 2;
 		background-color: var(--bg-primary-translucent);
 		border-bottom-left-radius: 5px;
+		font-size: smaller;
 	}
 
-	.listParam {
-		margin: inherit;
-		flex-direction: column;
-		flex-grow: 1;
-		display: flex;
-		gap: 1em;
-		align-items: center;
-		padding-left: 10px;
-		padding-right: 20px;
-		padding-top: 10px;
-		padding-bottom: 10px;
-		border-width: 3px;
-		border-color: var(--gay);
-		font-size: smaller;
+	header {
+		font-size: 1.5em;
 		font-weight: bold;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
 		color: var(--fg-primary);
 	}
 
-	.setting {
-		width: 100%;
+	.listParam {
+		display: grid;
+		grid-template-columns: max-content auto;
+		gap: 1em;
+	}
+
+	.listParam > div {
 		display: flex;
-		flex-direction: row;
 		align-items: center;
 		gap: 1em;
+	}
+
+	.listParam .label {
+		font-weight: bold;
+	}
+
+	.actions {
+		display: flex;
+		justify-content: center;
+		gap: 1em;
+		margin-top: 2em;
+		margin-bottom: 1em;
+	}
+
+	footer {
+		font-weight: bold;
+		text-align: center;
 	}
 </style>

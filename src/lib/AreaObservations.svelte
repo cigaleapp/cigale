@@ -14,19 +14,13 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <script>
 	import { uiState } from '$lib/state.svelte';
+	import * as datefns from 'date-fns';
 	import { onMount } from 'svelte';
-	import IconSortId from '~icons/ph/wrench';
-	import IconSortDate from '~icons/ph/calendar-blank';
-	import IconSortFilename from '~icons/ph/file-text';
-	import IconSortAsc from '~icons/ph/sort-ascending';
-	import IconSortDesc from '~icons/ph/sort-descending';
-	import ButtonIcon from './ButtonIcon.svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
 	import { defineKeyboardShortcuts } from './keyboard.svelte';
 	import { mutationobserver } from './mutations';
 	import { m } from './paraglide/messages';
-	import * as datefns from 'date-fns';
 	import { getSettings } from './settings.svelte';
 
 	/**
@@ -39,6 +33,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {string} [loadingText]
 	 * @property {(id: string) => void} [ondelete] callback the user wants to delete an image or observation.
 	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
+	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
 	 */
 
 	/** @type {Props } */
@@ -49,6 +44,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		errors,
 		highlight,
 		loadingText,
+		sort,
 		selection = $bindable([])
 	} = $props();
 
@@ -126,12 +122,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		});
 	});
 
-	/** @type {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} */
-	let sort = $state({
-		direction: 'asc',
-		key: 'filename'
-	});
-
 	const sortedImages = $derived(
 		images.toSorted((a, b) => {
 			if (sort.direction === 'desc') {
@@ -149,45 +139,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		})
 	);
 </script>
-
-<header class="sort">
-	<ButtonIcon
-		data-testid="toggle-sort-direction"
-		help={sort.direction === 'asc'
-			? m.change_sort_direction_to_desc()
-			: m.change_sort_direction_to_asc()}
-		onclick={() => {
-			sort.direction = sort.direction === 'asc' ? 'desc' : 'asc';
-		}}
-	>
-		{#if sort.direction === 'asc'}
-			<IconSortAsc />
-		{:else}
-			<IconSortDesc />
-		{/if}
-	</ButtonIcon>
-
-	<select bind:value={sort.key} aria-label={m.sort_by()}>
-		{#snippet btn()}
-			<button>
-				<selectedoption></selectedoption>
-			</button>
-		{/snippet}
-		{@render btn()}
-		<option value="filename">
-			<IconSortFilename />
-			{m.sort_key_filename()}
-		</option>
-		<option value="date">
-			<IconSortDate />
-			{m.sort_key_date()}
-		</option>
-		<option value="id">
-			<IconSortId />
-			{m.sort_key_id()}
-		</option>
-	</select>
-</header>
 
 <section
 	class="images"
@@ -258,17 +209,5 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		width: 100%;
 		flex-grow: 1;
 		margin-top: 2rem;
-	}
-
-	header.sort {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-		margin-bottom: 1em;
-		width: 100%;
-		padding: 0.5rem;
-		border-radius: var(--corner-radius);
-		background: color-mix(in srgb, var(--bg-primary) 25%, transparent);
-		z-index: 10;
 	}
 </style>
