@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.67% </span>
+                <span class="strong">33.66% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>200/594</span>
+                <span class='fraction'>201/597</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/198</span>
+                <span class='fraction'>0/199</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.67% </span>
+                <span class="strong">33.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>200/594</span>
+                <span class='fraction'>201/597</span>
             </div>
         
             
@@ -854,7 +854,11 @@
 <a name='L789'></a><a href='#L789'>789</a>
 <a name='L790'></a><a href='#L790'>790</a>
 <a name='L791'></a><a href='#L791'>791</a>
-<a name='L792'></a><a href='#L792'>792</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L792'></a><a href='#L792'>792</a>
+<a name='L793'></a><a href='#L793'>793</a>
+<a name='L794'></a><a href='#L794'>794</a>
+<a name='L795'></a><a href='#L795'>795</a>
+<a name='L796'></a><a href='#L796'>796</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1066,6 +1070,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2399,7 +2407,7 @@ export const change_sort_direction_to_desc = /** @type {(inputs: {}) =&gt; strin
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 export const sort_key_filename = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Nom de fichier`</span>
+<span class="cstat-no" title="statement not covered" >	return `Fichier`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 export const sort_key_id = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
@@ -2408,6 +2416,10 @@ export const sort_key_id = /** @type {(inputs: {}) =&gt; string} */ <span class=
 &nbsp;
 export const sort_key_date = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	return `Date`</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+export const sort_gallery_by = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	return `Trier les images par`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 export const toasts_count = /** @type {(inputs: { count: NonNullable&lt;unknown&gt; }) =&gt; string} */ <span class="fstat-no" title="function not covered" >(i) =&gt; {</span>
@@ -2430,12 +2442,12 @@ export const detection_is_disabled_or_unavailable = /** @type {(inputs: {}) =&gt
 <span class="cstat-no" title="statement not covered" >	return `La détection est désactivée ou indisponible`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
-export const sort_key_size = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Taille`</span>
+export const language = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	return `Langue`</span>
 <span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
-export const sort_by = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	return `Trier par`</span>
+export const sort_key_size = /** @type {(inputs: {}) =&gt; string} */ <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	return `Taille`</span>
 <span class="cstat-no" title="statement not covered" >};</span></pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -2443,7 +2455,7 @@ export const sort_by = /** @type {(inputs: {}) =&gt; string} */ <span class="fst
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-23T11:24:15.997Z
+                at 2025-08-23T11:59:06.151Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
