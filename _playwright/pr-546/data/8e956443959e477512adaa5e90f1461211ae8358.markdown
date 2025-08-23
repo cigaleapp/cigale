@@ -1,0 +1,222 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Exporter les résultats
+        - button:
+          - img
+      - main:
+        - generic:
+          - radiogroup:
+            - generic:
+              - radio
+              - text: Métadonnées seulement
+            - generic:
+              - radio [checked]
+              - text: Métadonnées et images recadrées
+            - generic:
+              - radio
+              - text: Métadonnées, images recadrées et images originales
+              - paragraph: Permet de ré-importer les résultats ultérieurement
+        - generic:
+          - generic: Marge autour des images recadrées
+          - generic:
+            - radio [checked]: Aucune
+            - radio: 5%
+            - radio: 10%
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: "%"
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: px
+          - paragraph: Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
+      - contentinfo:
+        - generic:
+          - paragraph:
+            - code: 0%
+        - button:
+          - img
+          - text: results.zip
+  - banner [ref=e4]:
+    - navigation [ref=e5]:
+      - link "C.i.g.a.l.e." [ref=e7] [cursor=pointer]:
+        - /url: "#/"
+        - img [ref=e9] [cursor=pointer]
+        - text: C.i.g.a.l.e.
+      - generic [ref=e18]:
+        - link "Protocole" [ref=e19] [cursor=pointer]:
+          - /url: "#/"
+        - img [ref=e20]
+        - link "Importer" [ref=e22] [cursor=pointer]:
+          - /url: "#/import"
+          - text: Importer
+        - img [ref=e24]
+        - generic [ref=e26]:
+          - link "Recadrer" [disabled]:
+            - /url: "#/crop/"
+        - img [ref=e27]
+        - generic [ref=e29]:
+          - link "Classifier" [disabled]:
+            - /url: "#/classify"
+        - img [ref=e30]
+        - button "Résultats" [ref=e32] [cursor=pointer]:
+          - img [ref=e33] [cursor=pointer]
+          - text: Résultats
+      - generic [ref=e36]:
+        - button [ref=e37] [cursor=pointer]:
+          - img [ref=e38] [cursor=pointer]
+        - dialog:
+          - generic:
+            - generic:
+              - text: Thème
+              - switch "on/off switch" [checked]:
+                - generic:
+                  - img
+              - button [disabled]:
+                - img
+            - generic:
+              - text: Mode debug
+              - switch "on/off switch":
+                - generic:
+                  - img
+            - generic:
+              - generic:
+                - radio "English 1%":
+                  - text: English
+                  - generic:
+                    - code: 1%
+                - radio "Français" [checked]
+                - radio "日本語 1%":
+                  - text: 日本語
+                  - generic:
+                    - code: 1%
+            - generic:
+              - button "Gérer les protocoles"
+            - generic:
+              - button "Raccourcis clavier"
+            - generic:
+              - text: CIGALE ver.
+              - link "39f8838":
+                - /url: https://github.com/cigaleapp/cigale/tree/39f8838359d5d2680db9bd9c14307a5c42595237
+              - text: ·
+              - link "À propos":
+                - /url: "#/about"
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: U
+        - definition: Supprimer toutes les images et observations
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: G
+        - definition: Fusionner des observations ou images
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: G
+        - definition: Séparer toutes les observations sélectionnées en images seules
+        - term:
+          - generic:
+            - generic:
+              - generic: Suppr
+        - definition: Supprimer les images et observations sélectionnées
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: A
+        - definition: Tout sélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: D
+        - definition: Tout désélectionner
+  - generic [ref=e42]:
+    - main [ref=e43]:
+      - form [ref=e44] [cursor=pointer]:
+        - generic [ref=e45] [cursor=pointer]:
+          - generic [ref=e46] [cursor=pointer]:
+            - button [ref=e47] [cursor=pointer]:
+              - img [ref=e48] [cursor=pointer]
+            - combobox "Trier par" [ref=e50] [cursor=pointer]:
+              - button
+              - option "Nom de fichier" [selected]
+              - option "Date"
+              - option "Identifiant"
+          - generic [ref=e51] [cursor=pointer]:
+            - article [ref=e54] [cursor=pointer]:
+              - generic [ref=e55] [cursor=pointer]:
+                - generic [ref=e56] [cursor=pointer]:
+                  - img [ref=e58] [cursor=pointer]
+                  - generic [ref=e60] [cursor=pointer]: Analyse…
+                  - button "Supprimer" [ref=e62] [cursor=pointer]:
+                    - img [ref=e63] [cursor=pointer]
+                    - text: Supprimer
+                - img [ref=e67] [cursor=pointer]
+                - generic [ref=e69] [cursor=pointer]:
+                  - img [ref=e70] [cursor=pointer]
+                  - heading "leaf.jpeg" [level=2] [ref=e72] [cursor=pointer]
+            - article [ref=e75] [cursor=pointer]:
+              - generic [ref=e76] [cursor=pointer]:
+                - generic [ref=e77] [cursor=pointer]:
+                  - img [ref=e79] [cursor=pointer]
+                  - generic [ref=e81] [cursor=pointer]: Analyse…
+                  - button "Supprimer" [ref=e83] [cursor=pointer]:
+                    - img [ref=e84] [cursor=pointer]
+                    - text: Supprimer
+                - img [ref=e88] [cursor=pointer]
+                - generic [ref=e90] [cursor=pointer]:
+                  - img [ref=e91] [cursor=pointer]
+                  - heading "lil-fella.jpeg" [level=2] [ref=e93] [cursor=pointer]
+            - article [ref=e96] [cursor=pointer]:
+              - generic [ref=e97] [cursor=pointer]:
+                - generic [ref=e98] [cursor=pointer]:
+                  - img [ref=e100] [cursor=pointer]
+                  - generic [ref=e102] [cursor=pointer]: En attente
+                  - button "Supprimer" [ref=e104] [cursor=pointer]:
+                    - img [ref=e105] [cursor=pointer]
+                    - text: Supprimer
+                - img [ref=e109] [cursor=pointer]
+                - generic [ref=e111] [cursor=pointer]:
+                  - img [ref=e112] [cursor=pointer]
+                  - heading "with-exif-gps.jpeg" [level=2] [ref=e114] [cursor=pointer]
+        - button "Choose File" [ref=e115]
+    - complementary [ref=e116]:
+      - generic [ref=e117]:
+        - img [ref=e118]
+        - paragraph [ref=e127]: Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées
+      - generic [ref=e128]:
+        - button "Importer d'autres images" [ref=e129] [cursor=pointer]:
+          - img [ref=e130] [cursor=pointer]
+          - text: Importer d'autres images
+        - button "Supprimer 0 images Suppr" [disabled] [ref=e133]:
+          - img [ref=e134]
+          - text: Supprimer 0 images
+          - generic [ref=e137]: Suppr
+  - generic [ref=e138]: Importer · Cigale
+```
