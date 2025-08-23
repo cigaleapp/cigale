@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/48</span>
+                <span class='fraction'>0/63</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/48</span>
+                <span class='fraction'>0/63</span>
             </div>
         
             
@@ -199,7 +199,28 @@
 <a name='L134'></a><a href='#L134'>134</a>
 <a name='L135'></a><a href='#L135'>135</a>
 <a name='L136'></a><a href='#L136'>136</a>
-<a name='L137'></a><a href='#L137'>137</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -260,6 +281,27 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -397,7 +439,28 @@
 <span class="cstat-no" title="statement not covered" >			help: '',</span>
 <span class="cstat-no" title="statement not covered" >			hidden: true,</span>
 <span class="cstat-no" title="statement not covered" >			do: () =&gt; toasts.info(m.no_need_for_ctrl_s())</span>
-		}
+		},
+<span class="cstat-no" title="statement not covered" >		...Object.fromEntries(</span>
+<span class="cstat-no" title="statement not covered" >			/**@type{const}*/ (['w', 'e', 'i', 'd', 's']).map((type) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >				const toastFns = {</span>
+<span class="cstat-no" title="statement not covered" >					w: () =&gt; toasts.warn('Example warning toast'),</span>
+<span class="cstat-no" title="statement not covered" >					e: () =&gt; toasts.error('Example error toast'),</span>
+<span class="cstat-no" title="statement not covered" >					i: () =&gt; toasts.info('Example info toast'),</span>
+<span class="cstat-no" title="statement not covered" >					d: () =&gt; toasts.add('debug', 'Example debug toast'),</span>
+<span class="cstat-no" title="statement not covered" >					s: () =&gt; toasts.success('Example success toast')</span>
+				};
+				return [
+<span class="cstat-no" title="statement not covered" >					`t t ${type}`,</span>
+					{
+<span class="cstat-no" title="statement not covered" >						help: '',</span>
+<span class="cstat-no" title="statement not covered" >						hidden: true,</span>
+<span class="cstat-no" title="statement not covered" >						allowInModals: true,</span>
+<span class="cstat-no" title="statement not covered" >						when: () =&gt; getSettings().showTechnicalMetadata,</span>
+<span class="cstat-no" title="statement not covered" >						do: toastFns[type]</span>
+					}
+				];
+<span class="cstat-no" title="statement not covered" >			})</span>
+		)
 	});
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const settings = $derived(getSettings());</span>
@@ -410,7 +473,7 @@
 <span class="cstat-no" title="statement not covered" >	let openKeyboardShortcuts = $state();</span>
 &lt;/script&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >&lt;Navigation {openKeyboardShortcuts} progress={uiState.processing.progress} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >&lt;Navigation swarpc={data.swarpc} {openKeyboardShortcuts} progress={uiState.processing.progress} /&gt;</span>
 &nbsp;
 &lt;svelte:head&gt;
 <span class="cstat-no" title="statement not covered" >	&lt;base href={base ? `${base}/index.html` : ''} /&gt;</span>
@@ -419,7 +482,7 @@
 <span class="cstat-no" title="statement not covered" >&lt;KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} /&gt;</span>
 &nbsp;
 &lt;section class="toasts" data-testid="toasts-area"&gt;
-<span class="cstat-no" title="statement not covered" >	{#each toasts.items as toast (toast.id)}</span>
+<span class="cstat-no" title="statement not covered" >	{#each toasts.items('default') as toast (toast.id)}</span>
 		&lt;Toast
 <span class="cstat-no" title="statement not covered" >			{...toast}</span>
 <span class="cstat-no" title="statement not covered" >			action={toast.labels.action}</span>
@@ -478,7 +541,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-11T17:51:13.492Z
+                at 2025-08-23T11:24:15.997Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

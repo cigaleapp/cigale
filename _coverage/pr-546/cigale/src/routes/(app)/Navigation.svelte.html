@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/83</span>
+                <span class='fraction'>0/88</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/83</span>
+                <span class='fraction'>0/88</span>
             </div>
         
             
@@ -374,7 +374,15 @@
 <a name='L309'></a><a href='#L309'>309</a>
 <a name='L310'></a><a href='#L310'>310</a>
 <a name='L311'></a><a href='#L311'>311</a>
-<a name='L312'></a><a href='#L312'>312</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -400,6 +408,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -520,12 +529,19 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -707,11 +723,12 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number} [progress=0]
-	 * @property {() =&gt; void} [openKeyboardShortcuts]
+	 * @property {import('swarpc').SwarpcClient&lt;typeof import('$lib/../web-worker-procedures.js').PROCEDURES&gt;} swarpc
+	 * @property {(() =&gt; void) | undefined} [openKeyboardShortcuts]
 	 */
 &nbsp;
 	/** @type {Props} */
-<span class="cstat-no" title="statement not covered" >	let { openKeyboardShortcuts, progress = 0 } = $props();</span>
+<span class="cstat-no" title="statement not covered" >	let { openKeyboardShortcuts, progress = 0, swarpc } = $props();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const path = $derived(page.url.hash.replace(/^#/, ''));</span>
 &nbsp;
@@ -781,7 +798,7 @@
 <span class="cstat-no" title="statement not covered" >	});</span>
 &lt;/script&gt;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >&lt;DownloadResults {progress} bind:open={openExportModal} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >&lt;DownloadResults {swarpc} bind:open={openExportModal} /&gt;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >{#if previewingPrNumber}</span>
 <span class="cstat-no" title="statement not covered" >	&lt;DeploymentDetails bind:open={openPreviewPRDetails} /&gt;</span>
@@ -830,14 +847,21 @@
 				&lt;/a&gt;
 <span class="cstat-no" title="statement not covered" >				{@render noInferenceIndicator(</span>
 <span class="cstat-no" title="statement not covered" >					uiState.cropInferenceAvailable,</span>
-<span class="cstat-no" title="statement not covered" >					"Le protocole ne définit pas d'inférence automatique pour la détection"</span>
+<span class="cstat-no" title="statement not covered" >					m.detection_is_disabled_or_unavailable()</span>
 				)}
 			&lt;/div&gt;
 			&lt;IconNext&gt;&lt;/IconNext&gt;
-			&lt;div class="with-inference-indicator"&gt;
+			&lt;div
+				class="with-inference-indicator"
+<span class="cstat-no" title="statement not covered" >				use:tooltip={uiState.processing.task === 'detection' &amp;&amp; uiState.processing.progress &lt; 1</span>
+<span class="cstat-no" title="statement not covered" >					? m.wait_for_detection_to_finish_before_classifying()</span>
+<span class="cstat-no" title="statement not covered" >					: undefined}</span>
+			&gt;
 				&lt;a
 					href="#/classify"
-<span class="cstat-no" title="statement not covered" >					aria-disabled={!uiState.currentProtocolId || !hasImages}</span>
+<span class="cstat-no" title="statement not covered" >					aria-disabled={!uiState.currentProtocolId ||</span>
+<span class="cstat-no" title="statement not covered" >						!hasImages ||</span>
+<span class="cstat-no" title="statement not covered" >						(uiState.processing.task === 'detection' &amp;&amp; uiState.processing.progress &lt; 1)}</span>
 					data-testid="goto-classify"
 				&gt;
 <span class="cstat-no" title="statement not covered" >					{m.classify_tab()}</span>
@@ -847,7 +871,7 @@
 				&lt;/a&gt;
 <span class="cstat-no" title="statement not covered" >				{@render noInferenceIndicator(</span>
 <span class="cstat-no" title="statement not covered" >					uiState.classificationInferenceAvailable,</span>
-<span class="cstat-no" title="statement not covered" >					"Le protocole ne définit pas d'inférence automatique pour la classification"</span>
+<span class="cstat-no" title="statement not covered" >					m.classification_is_disabled_or_unavailable()</span>
 				)}
 			&lt;/div&gt;
 			&lt;IconNext&gt;&lt;/IconNext&gt;
@@ -863,7 +887,7 @@
 	&lt;/nav&gt;
 &nbsp;
 	&lt;!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird &amp; distracting --&gt;
-<span class="cstat-no" title="statement not covered" >	&lt;ProgressBar progress={uiState.processing.state === 'generating-zip' ? 0 : progress} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >	&lt;ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} /&gt;</span>
 &lt;/header&gt;
 &nbsp;
 <span class="cstat-no" title="statement not covered" >{#snippet noInferenceIndicator(/** @type {boolean} */ available, /** @type {string} */ help)}</span>
@@ -1003,7 +1027,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-11T17:51:13.492Z
+                at 2025-08-23T11:24:15.997Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
