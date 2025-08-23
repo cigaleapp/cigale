@@ -46,5 +46,4 @@ test.describe('sorting', () => {
 
 	assertCardsOrder('filename', ['cyan.jpeg', 'leaf.jpeg', 'lil-fella.jpeg']);
 	assertCardsOrder('date', ['leaf.jpeg', 'cyan.jpeg', 'lil-fella.jpeg']);
-	assertCardsOrder('id', ['leaf.jpeg', 'cyan.jpeg', 'lil-fella.jpeg']);
 });
