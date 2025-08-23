@@ -32,15 +32,17 @@ test.describe('sorting', () => {
 				.getByRole('radio', { name: optionLabel })
 				.click();
 
-			await expect
-				.poll(async () => page.locator('main article.card footer').allInnerTexts())
-				.toStrictEqual(order);
+			const getActualOrder = async () =>
+				page
+					.locator('main article.card footer')
+					.allInnerTexts()
+					.then((texts) => texts.map((t) => t.trim()));
+
+			await expect.poll(getActualOrder).toStrictEqual(order);
 
 			await page.getByTestId('app-settings').getByTestId('toggle-sort-direction').click();
 
-			await expect
-				.poll(async () => page.locator('main article.card footer').allInnerTexts())
-				.toStrictEqual(order.toReversed());
+			await expect.poll(getActualOrder).toStrictEqual(order.toReversed());
 		});
 	}
 
