@@ -1,5 +1,6 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
 /// <reference types="vitest" />
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { sentrySvelteKit } from '@sentry/sveltekit';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { execSync } from 'node:child_process';
@@ -39,6 +40,12 @@ export default defineConfig({
 			}
 		: {},
 	plugins: [
+		sentrySvelteKit({
+			sourceMapsUploadOptions: {
+				org: 'cigale',
+				project: 'cigale'
+			}
+		}),
 		icons({
 			compiler: 'svelte',
 			defaultClass: 'icon'

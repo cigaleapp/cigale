@@ -48,3 +48,6 @@ examples/old-arthropods.cigaleprotocol.json
 .vite/build
 
 out/
+
+# Sentry Config File
+.env.sentry-build-plugin
