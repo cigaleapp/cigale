@@ -2,11 +2,13 @@ import { sequence } from '@sveltejs/kit/hooks';
 import * as Sentry from '@sentry/sveltekit';
 import { paraglideMiddleware } from '$lib/paraglide/server.js';
 
-Sentry.init({
-	dsn: 'https://37bb5c00dde50e2bc0dd0d4243db086d@o4509894523551744.ingest.de.sentry.io/4509894524731472',
-	tracesSampleRate: 1,
-	enableLogs: true
-});
+if (import.meta.env.sentry === 'enabled') {
+	Sentry.init({
+		dsn: 'https://37bb5c00dde50e2bc0dd0d4243db086d@o4509894523551744.ingest.de.sentry.io/4509894524731472',
+		tracesSampleRate: 1,
+		enableLogs: true
+	});
+}
 
 /** @type {import('@sveltejs/kit').Handle} */
 const paraglideHandle = ({ event, resolve }) =>
