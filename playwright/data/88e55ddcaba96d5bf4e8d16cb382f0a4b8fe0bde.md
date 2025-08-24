@@ -1,0 +1,180 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Exporter les résultats
+        - button:
+          - img
+      - main:
+        - generic:
+          - radiogroup:
+            - generic:
+              - radio
+              - text: Métadonnées seulement
+            - generic:
+              - radio [checked]
+              - text: Métadonnées et images recadrées
+            - generic:
+              - radio
+              - text: Métadonnées, images recadrées et images originales
+              - paragraph: Permet de ré-importer les résultats ultérieurement
+        - generic:
+          - generic: Marge autour des images recadrées
+          - radiogroup:
+            - radio [checked]: Aucune
+            - radio: 5%
+            - radio: 10%
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: "%"
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: px
+          - paragraph: Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
+      - contentinfo:
+        - generic:
+          - paragraph:
+            - code: 0%
+        - button:
+          - img
+          - text: results.zip
+  - banner [ref=e4]:
+    - navigation [ref=e5]:
+      - link "C.i.g.a.l.e." [ref=e7] [cursor=pointer]:
+        - /url: "#/"
+        - img [ref=e9] [cursor=pointer]
+        - text: C.i.g.a.l.e.
+      - generic [ref=e18]:
+        - link "Protocole" [ref=e19] [cursor=pointer]:
+          - /url: "#/"
+          - text: Protocole
+        - img [ref=e21]
+        - link "Importer" [ref=e23] [cursor=pointer]:
+          - /url: "#/import"
+        - img [ref=e24]
+        - generic [ref=e26]:
+          - link "Recadrer" [disabled]:
+            - /url: "#/crop/"
+        - img [ref=e27]
+        - generic [ref=e29]:
+          - link "Classifier" [disabled]:
+            - /url: "#/classify"
+        - img [ref=e30]
+        - button "Résultats" [ref=e32] [cursor=pointer]:
+          - img [ref=e33] [cursor=pointer]
+          - text: Résultats
+      - generic [ref=e36]:
+        - button [ref=e37] [cursor=pointer]:
+          - img [ref=e38] [cursor=pointer]
+        - dialog:
+          - generic: Réglages
+          - generic:
+            - generic: Thème
+            - generic:
+              - switch "on/off switch" [checked]:
+                - generic:
+                  - img
+              - button [disabled]:
+                - img
+            - generic: Mode debug
+            - generic:
+              - switch "on/off switch":
+                - generic:
+                  - img
+            - generic: Trier les images par
+            - generic:
+              - radiogroup:
+                - radio "Fichier"
+                - radio "Date" [checked]
+              - button:
+                - img
+            - generic: Langue
+            - generic:
+              - radiogroup:
+                - radio "English 1%":
+                  - text: English
+                  - generic:
+                    - code: 1%
+                - radio "Français" [checked]
+                - radio "日本語 1%":
+                  - text: 日本語
+                  - generic:
+                    - code: 1%
+          - generic:
+            - button "Gérer les protocoles"
+            - button "Raccourcis clavier"
+          - generic:
+            - text: CIGALE ver.
+            - link "f85b620":
+              - /url: https://github.com/cigaleapp/cigale/tree/f85b6202cc36a52ec65d5e6c19f312ec8c5873db
+            - text: ·
+            - link "À propos":
+              - /url: "#/about"
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - generic:
+        - generic:
+          - generic: ¯\_(ツ)_/¯
+          - paragraph: Aucun raccouci clavier pour cette page
+  - generic [ref=e41]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Importer le protocole distant ?
+        - button:
+          - img
+      - main: "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse suivante:"
+      - contentinfo:
+        - generic:
+          - button: Annuler
+          - generic:
+            - button: Importer
+    - generic [ref=e42]:
+      - heading "Choisir un protocole" [level=1] [ref=e43]
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - img [ref=e46]
+          - textbox "Recherche" [ref=e48]
+        - listitem [ref=e49]:
+          - generic [ref=e50]:
+            - 'button "Example: arthropodes (lightweight)" [pressed] [ref=e51] [cursor=pointer]':
+              - img [ref=e53] [cursor=pointer]
+              - text: "Example: arthropodes (lightweight)"
+            - button [ref=e55] [cursor=pointer]:
+              - img [ref=e57] [cursor=pointer]
+          - radiogroup "Modèle d'inférence pour Espèce" [ref=e60]:
+            - generic [ref=e61]: Modèle d'inférence pour Espèce
+            - generic [ref=e62]:
+              - radio "Aucune inférence" [ref=e63]
+              - text: Aucune inférence
+            - generic [ref=e64]:
+              - radio "Léger (~80 classes)" [checked] [ref=e65]
+              - text: Léger (~80 classes)
+          - radiogroup "Modèle d'inférence pour la détection" [ref=e67]:
+            - generic [ref=e68]: Modèle d'inférence pour la détection
+            - generic [ref=e69]:
+              - radio "Aucune inférence" [ref=e70]
+              - text: Aucune inférence
+            - generic [ref=e71]:
+              - radio "YOLO11" [checked] [ref=e72]
+              - text: YOLO11
+        - listitem [ref=e73]:
+          - button "Kitchen sink" [ref=e75] [cursor=pointer]
+      - generic [ref=e76]:
+        - paragraph [ref=e77]: Le protocole que vous souhaitez n'est pas disponible?
+        - button "Gérer les protocoles" [ref=e78] [cursor=pointer]:
+          - img [ref=e79] [cursor=pointer]
+          - text: Gérer les protocoles
+        - button "Importer un protocole" [ref=e81] [cursor=pointer]:
+          - img [ref=e82] [cursor=pointer]
+          - text: Importer un protocole
+  - generic [ref=e84]: Choisir un protocole · Cigale
+```
