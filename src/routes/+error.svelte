@@ -18,7 +18,7 @@
 					goto('#/');
 				}}
 			>
-				{m.home}
+				{m.home()}
 			</ButtonPrimary>
 		{/if}
 	</section>

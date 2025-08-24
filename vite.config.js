@@ -1,5 +1,5 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
 /// <reference types="vitest" />
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { execSync } from 'node:child_process';
@@ -27,7 +27,8 @@ export default defineConfig({
 	define: {
 		'import.meta.vitest': 'undefined',
 		'import.meta.env.buildCommit': JSON.stringify(execSync('git rev-parse HEAD').toString().trim()),
-		'import.meta.env.previewingPrNumber': process.env.PR_NUMBER ?? 'null'
+		'import.meta.env.previewingPrNumber': process.env.PR_NUMBER ?? 'null',
+		'import.meta.env.sentry': process.env.SENTRY ?? 'null'
 	},
 	worker: {
 		format: 'es',
