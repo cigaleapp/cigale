@@ -107,7 +107,7 @@
 		"jsdom": "^26.1.0",
 		"json-schema-doc-ts": "^2.0.0",
 		"jszip": "^3.10.1",
-		"knip": "^5.62.0",
+		"knip": "^5.63.0",
 		"lint-staged": "^16.1.5",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.12.0",
