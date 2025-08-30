@@ -6,11 +6,16 @@
 	import KeyboardHint from './KeyboardHint.svelte';
 	import { page } from '$app/state';
 	import { m } from './paraglide/messages.js';
+	import { entries } from './utils';
+
+	/**
+	 * @import { Keybind, Keymap } from '$lib/state.svelte.js'
+	 */
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {import('$lib/state.svelte.js').Keymap} binds
+	 * @property {Keymap} binds
 	 * @property {boolean} [preventDefault=false] call e.preventDefault() before calling the handlers
 	 * @property {(() => void) | undefined} [openHelp] open modal listing all keybindings
 	 */
@@ -61,6 +66,25 @@
 		)
 	);
 
+	const GROUPS_ORDER = [
+		m.keyboard_shortcuts_group_cropping(),
+		m.keyboard_shortcuts_group_observations(),
+		m.keyboard_shortcuts_group_general(),
+		m.keyboard_shortcuts_group_navigation()
+	];
+
+	const bindsByGroup = $derived(
+		entries(
+			entries(binds).reduce((acc, [key, bind]) => {
+				if (bind.hidden) return acc;
+				const group = bind.group ?? m.keyboard_shortcuts_group_general();
+				if (!acc[group]) acc[group] = [];
+				acc[group].push([key, bind]);
+				return acc;
+			}, /** @type {Record<string, Array<[string, Keybind]>>} */ ({}))
+		).toSorted(([a], [b]) => GROUPS_ORDER.indexOf(a) - GROUPS_ORDER.indexOf(b))
+	);
+
 	onMount(() => {
 		// "?" doesnt work with tinykeys, see https://github.com/jamiebuilds/tinykeys/issues/130
 		window.addEventListener('keyup', (e) => {
@@ -73,21 +97,26 @@
 </script>
 
 <Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title={m.keyboard_shortcuts()}>
-	<dl>
-		<!-- Object.entries({a: 1, b: 2}) gives [["a", 1], ["b", 2]] -->
-		<!-- Then we filter out keybindings that are marked as hidden -->
-		{#each Object.entries(binds).filter(([_, { hidden }]) => !hidden) as [shortcut, { help }] (shortcut)}
-			<dt>
-				<KeyboardHint --size="1.2em" {shortcut} {help} />
-			</dt>
-			<dd>{help}</dd>
-		{:else}
+	{#each bindsByGroup as [group, binds] (group)}
+		{#if bindsByGroup.length >= 2}
+			<h2>{group}</h2>
+		{/if}
+		<dl>
+			{#each binds as [shortcut, { help }] (shortcut)}
+				<dt>
+					<KeyboardHint --size="1.2em" {shortcut} {help} />
+				</dt>
+				<dd>{help}</dd>
+			{/each}
+		</dl>
+	{:else}
+		<dl>
 			<div class="empty">
 				<div class="sad">¯\_(ツ)_/¯</div>
 				<p>{m.no_keyboard_shortcuts_for_page()}</p>
 			</div>
-		{/each}
-	</dl>
+		</dl>
+	{/each}
 </Modal>
 
 <style>
@@ -122,5 +151,15 @@
 		margin-bottom: 0.5em;
 		font-weight: bold;
 		color: var(--gray);
+	}
+
+	h2 {
+		font-size: 1.2rem;
+		font-weight: normal;
+		color: var(--gray);
+	}
+
+	h2:not(:first-child) {
+		margin-top: 0.5em;
 	}
 </style>

@@ -512,7 +512,7 @@
 		manual: false
 	});
 
-	defineKeyboardShortcuts({
+	defineKeyboardShortcuts('cropping', {
 		ArrowLeft: {
 			help: m.previous_image(),
 			when: () => Boolean(prevFileId),

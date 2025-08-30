@@ -12,8 +12,10 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  */
 
 /**
+ * @template {string} [Groups=string]
  * @typedef Keybind
  * @type {object}
+ * @property {Groups} [group] used to group keybinds together in help dialogs
  * @property {string} help
  * @property {(e: MouseEvent|KeyboardEvent) => unknown} do
  * @property {boolean} [hidden=false] hide the keybinding from help
@@ -22,8 +24,9 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  */
 
 /**
+ * @template {string} [Groups=string]
  * @typedef Keymap
- * @type {Record<string, Keybind>}
+ * @type {Record<string, Keybind<Groups>>}
  */
 
 /**

@@ -14,14 +14,14 @@
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { m } from '$lib/paraglide/messages.js';
+	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { nonnull, pick } from '$lib/utils';
 	import { watch } from 'runed';
-	import Navigation from './Navigation.svelte';
 	import { SvelteMap } from 'svelte/reactivity';
-	import { initializeProcessingQueue } from '$lib/queue.svelte';
+	import Navigation from './Navigation.svelte';
 
 	const { children, data } = $props();
 
@@ -55,7 +55,7 @@
 		}
 	);
 
-	defineKeyboardShortcuts({
+	defineKeyboardShortcuts('general', {
 		'$mod+s': {
 			help: '',
 			hidden: true,

@@ -196,5 +196,9 @@
 	"wait_for_detection_to_finish_before_classifying": "Veuillez attendre la fin de l'analyse des images avant de les classifier",
 	"classification_is_disabled_or_unavailable": "La classification est désactivée ou indisponible",
 	"detection_is_disabled_or_unavailable": "La détection est désactivée ou indisponible",
-	"language": "Langue"
+	"language": "Langue",
+	"keyboard_shortcuts_group_general": "Général",
+	"keyboard_shortcuts_group_observations": "Observations",
+	"keyboard_shortcuts_group_navigation": "Navigation",
+	"keyboard_shortcuts_group_cropping": "Recadrage"
 }
