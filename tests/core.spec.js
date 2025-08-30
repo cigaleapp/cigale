@@ -58,7 +58,7 @@ for (const offline of [false, true]) {
 			expect(boundingBoxStyle.height).toBeCloseTo(36.4674, 0);
 
 			// Go to crop view
-			await page.getByText('Recadrer').click();
+			await goToTab(page, 'crop');
 			await page.getByText('lil-fella.jpeg').click();
 
 			// Check for continuing
@@ -66,9 +66,8 @@ for (const offline of [false, true]) {
 			await expect(page.getByText('Confirmé', { exact: true })).toBeVisible();
 
 			// Go to classification view
-			await page.getByText('Classifier').click();
+			await goToTab(page, 'classify');
 			// Wait for inference
-			await page.waitForURL((u) => u.hash === '#/classify');
 			await page.waitForTimeout(1000);
 			await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
 				timeout: 10_000
@@ -80,7 +79,7 @@ for (const offline of [false, true]) {
 			await expect(page.getByText('Espèce')).toBeVisible();
 
 			// Export results
-			await page.getByRole('button', { name: 'Résultats' }).click();
+			await page.getByTestId('app-nav').getByRole('button', { name: 'Résultats' }).click();
 			await page.getByText(/et images originales/i).click();
 			await page.getByText('results.zip').click();
 			const download = await page.waitForEvent('download');
