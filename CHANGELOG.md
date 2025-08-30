@@ -7,9 +7,11 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add a separate pool for toasts originating in modals
+- Add keyboard shortcuts for navbar
 - Add progress percentage in browser tab title
 - Display proper .cr2 import error toast on linux
 - Don't abort results zip generation if EXIF write fails
+- Group keyboard shortcuts in help modal
 - Handle too-large image errors gracefully
 - Improve appearance of small delete buttons
 - Model preselect URL params: Use 0 instead of -1, and 1-based indices
