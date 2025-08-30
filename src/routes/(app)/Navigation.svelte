@@ -15,6 +15,8 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
+	import { goto } from '$app/navigation';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 
 	/**
 	 * @typedef Props
@@ -92,6 +94,39 @@
 		window.addEventListener('blur', () => {
 			browserTabFocused = false;
 		});
+	});
+
+	defineKeyboardShortcuts('navigation', {
+		// Choose [P]rotocol
+		'g p': {
+			do: () => goto('#/'),
+			help: m.goto_protocol_tab()
+		},
+		// [I]mport images
+		'g i': {
+			do: () => goto('#/import'),
+			help: m.goto_import_tab()
+		},
+		// Adjust C[r]ops
+		'g r': {
+			do: () => goto('#/crop'),
+			help: m.goto_crop_tab()
+		},
+		// A[n]notate images
+		'g n': {
+			do: () => goto('#/classify'),
+			help: m.goto_classify_tab()
+		},
+		// E[x]port results
+		'g x': {
+			do: () => openExportModal(),
+			help: m.export_results()
+		},
+		// [M]anage protocols
+		'g m': {
+			do: () => goto('#/manage'),
+			help: m.goto_protocol_management()
+		}
 	});
 </script>
 
