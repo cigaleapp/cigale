@@ -145,7 +145,7 @@
 		"handlebars": "^4.7.8",
 		"idb": "^8.0.3",
 		"jimp": "^1.6.0",
-		"marked": "^16.2.0",
+		"marked": "^16.2.1",
 		"nanoid": "^5.1.5",
 		"onnxruntime-web": "^1.22.0",
 		"pica-gpu": "^0.2.0",
