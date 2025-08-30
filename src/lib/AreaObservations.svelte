@@ -80,7 +80,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		selection = [...new Set(dragselect?.selection ?? [])];
 	});
 
-	defineKeyboardShortcuts({
+	defineKeyboardShortcuts('observations', {
 		// Also register Ctrl-A to select all
 		'$mod+a': {
 			help: 'Tout sélectionner',

@@ -16,8 +16,8 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { watch } from 'runed';
-	import PreviewSidePanel from './PreviewSidePanel.svelte';
 	import { cancellers } from '../+layout.svelte';
+	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -70,7 +70,7 @@
 		uiState.setSelection?.([]);
 	}
 
-	defineKeyboardShortcuts({
+	defineKeyboardShortcuts('observations', {
 		'$mod+u': {
 			help: 'Supprimer toutes les images et observations',
 			async do() {
