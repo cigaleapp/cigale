@@ -121,7 +121,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Get coverage report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: vitest-report
           path: ./coverage
