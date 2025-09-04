@@ -19,9 +19,9 @@
 	import Cross from '~icons/ph/x-circle-light';
 
 	/**
-	 * @type {{openKeyboardShortcuts?: (() => void) | undefined}}
+	 * @type {{openKeyboardShortcuts?: (() => void) | undefined, openPrepareForOfflineUse?: (() => void) | undefined}}
 	 */
-	const { openKeyboardShortcuts } = $props();
+	const { openKeyboardShortcuts, openPrepareForOfflineUse } = $props();
 
 	let open = $state(false);
 	/** @type {HTMLDialogElement|undefined} */
@@ -174,6 +174,14 @@
 			}}
 		>
 			{m.keyboard_shortcuts()}
+		</ButtonSecondary>
+		<ButtonSecondary
+			help={m.prepare_for_offline_help()}
+			onclick={() => {
+				openPrepareForOfflineUse?.();
+			}}
+		>
+			{m.prepare_for_offline()}
 		</ButtonSecondary>
 	</section>
 	<footer>

@@ -86,6 +86,16 @@ export async function loadModel(request, webgpu = false, onProgress) {
 	if (!session) throw new Error('Impossible de charger le modèle ONNX');
 	return session;
 }
+
+/**
+ * @param {import('$lib/database').HTTPRequest} model
+ * @returns {string}
+ */
+export function modelUrl(model) {
+	if (typeof model === 'string') return model;
+	return model.url;
+}
+
 /**
  *
  * @param {object} taskSettings

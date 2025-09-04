@@ -23,6 +23,7 @@
 	import IconDelete from '~icons/ph/trash';
 	import IconAuthors from '~icons/ph/users';
 	import IconTechnical from '~icons/ph/wrench';
+	import { modelUrl } from '$lib/inference';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
 	const {
@@ -44,14 +45,6 @@
 			.filter(({ id }) => metadata.includes(id))
 			.toSorted(metadataDefinitionComparator({ metadataOrder }))
 	);
-
-	/**
-	 * @param {import('$lib/database').HTTPRequest} source
-	 */
-	function inferenceModelUrl(source) {
-		if (typeof source === 'string') return source;
-		return source.url;
-	}
 </script>
 
 {#snippet modelDetails(
@@ -62,8 +55,8 @@
 			{#if params.name}
 				{params.name}:
 			{/if}
-			<a href={inferenceModelUrl(params.model)}>
-				{inferenceModelUrl(params.model).split('/').at(-1)}
+			<a href={modelUrl(params.model)}>
+				{modelUrl(params.model).split('/').at(-1)}
 			</a>
 		</p>
 		<p class="id">

@@ -22,6 +22,7 @@
 	import { watch } from 'runed';
 	import { SvelteMap } from 'svelte/reactivity';
 	import Navigation from './Navigation.svelte';
+	import PrepareForOffline from './PrepareForOffline.svelte';
 
 	const { children, data } = $props();
 
@@ -92,15 +93,23 @@
 
 	/** @type {undefined|(() => void)} */
 	let openKeyboardShortcuts = $state();
+	/** @type {undefined|(() => void)} */
+	let openPrepareForOfflineUse = $state();
 </script>
-
-<Navigation swarpc={data.swarpc} {openKeyboardShortcuts} progress={uiState.processing.progress} />
 
 <svelte:head>
 	<base href={base ? `${base}/index.html` : ''} />
 </svelte:head>
 
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
+<PrepareForOffline bind:open={openPrepareForOfflineUse} />
+
+<Navigation
+	swarpc={data.swarpc}
+	{openKeyboardShortcuts}
+	{openPrepareForOfflineUse}
+	progress={uiState.processing.progress}
+/>
 
 <section class="toasts" data-testid="toasts-area">
 	{#each toasts.items('default') as toast (toast.id)}

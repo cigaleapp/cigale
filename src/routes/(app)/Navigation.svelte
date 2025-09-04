@@ -24,10 +24,11 @@
 	 * @property {number} [progress=0]
 	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
 	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
+	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
 	 */
 
 	/** @type {Props} */
-	let { openKeyboardShortcuts, progress = 0, swarpc } = $props();
+	let { openKeyboardShortcuts, openPrepareForOfflineUse, progress = 0, swarpc } = $props();
 
 	const path = $derived(page.url.hash.replace(/^#/, ''));
 
@@ -214,7 +215,7 @@
 		</div>
 
 		<div class="settings" class:native={isNativeWindow}>
-			<Settings {openKeyboardShortcuts} --navbar-height="{height}px" />
+			<Settings {openPrepareForOfflineUse} {openKeyboardShortcuts} --navbar-height="{height}px" />
 		</div>
 	</nav>
 

@@ -13,6 +13,7 @@ import {
 	importProtocol
 } from './utils.js';
 import { readFile } from 'node:fs/promises';
+import fr from '../messages/fr.json' with { type: 'json' };
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
@@ -22,6 +23,21 @@ for (const offline of [false, true]) {
 		async ({ page, context }) => {
 			if (offline) {
 				test.skip(context.serviceWorkers().length === 0, "No sw, can't test offline");
+
+				// Open settings and prepare for offline use
+				await page.getByTestId('settings-button').click();
+				await page
+					.getByTestId('app-settings')
+					.getByRole('button', { name: fr.prepare_for_offline })
+					.click();
+				await modal(page, fr.prepare_for_offline).getByRole('button', { name: 'Démarrer' }).click();
+
+				await expect(modal(page, fr.prepare_for_offline)).toHaveText(/OK!/, {
+					timeout: 10_000
+				});
+
+				await modal(page, fr.prepare_for_offline).getByRole('button', { name: 'Fermer' }).click();
+
 				context.setOffline(true);
 			}
 

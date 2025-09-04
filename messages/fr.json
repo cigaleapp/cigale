@@ -205,5 +205,8 @@
 	"keyboard_shortcuts_group_general": "Général",
 	"keyboard_shortcuts_group_observations": "Observations",
 	"keyboard_shortcuts_group_navigation": "Navigation",
-	"keyboard_shortcuts_group_cropping": "Recadrage"
+	"keyboard_shortcuts_group_cropping": "Recadrage",
+	"prepare_for_offline": "Préparation hors-ligne",
+	"prepare_for_offline_help": "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.",
+	"start": "Démarrer"
 }
