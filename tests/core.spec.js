@@ -27,7 +27,24 @@ for (const offline of [false, true]) {
 
 			await setSettings({ page }, { showTechnicalMetadata: false });
 			await chooseDefaultProtocol(page);
-			await goToTab(page, 'import');
+
+			if (offline) {
+				// First, load both models
+				context.setOffline(false);
+
+				await goToTab(page, 'import');
+				await expect(page.getByText('Chargement du modèle de détection')).toHaveCount(0, {
+					timeout: 10_000
+				});
+				await goToTab(page, 'classify');
+				await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
+					timeout: 10_000
+				});
+
+				// Then, come back to import tab and continue test
+				context.setOffline(true);
+				await goToTab(page, 'import');
+			}
 
 			// Import fixture image
 			await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
