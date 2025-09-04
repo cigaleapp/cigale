@@ -32,7 +32,7 @@
 			return pick(uiState, 'currentProtocolId');
 		},
 		restore({ currentProtocolId }) {
-			uiState.currentProtocolId = currentProtocolId;
+			uiState.setCurrentProtocolId(currentProtocolId);
 		}
 	};
 

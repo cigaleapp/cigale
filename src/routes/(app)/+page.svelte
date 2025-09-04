@@ -52,7 +52,7 @@
 	$effect(() => {
 		if (preselectedProtocolIsRemote) return;
 		if (preselection.protocol) {
-			uiState.currentProtocolId = preselection.protocol;
+			uiState.setCurrentProtocolId(preselection.protocol);
 			preselection.protocol = null;
 		}
 
@@ -117,7 +117,7 @@
 			await tables.Protocol.refresh();
 			await tables.Metadata.refresh();
 
-			uiState.currentProtocolId = id;
+			uiState.setCurrentProtocolId(id);
 			preselection.protocol = null;
 		} catch (error) {
 			toasts.error(m.error_importing_remote_protocol({ error }));
@@ -168,7 +168,7 @@
 						testid={i === 0 ? 'protocol-to-choose' : undefined}
 						aria-pressed={p.id === uiState.currentProtocolId}
 						onclick={async () => {
-							uiState.currentProtocolId = p.id;
+							uiState.setCurrentProtocolId(p.id);
 							preselection.protocol = null;
 							preselection.classificationModel = null;
 							preselection.cropModel = null;
@@ -236,7 +236,7 @@
 				}).catch((e) => toasts.error(e));
 				if (!protocol || typeof protocol === 'string') return;
 				toasts.success(m.protocol_imported_and_selected({ protocolName: protocol.name }));
-				uiState.currentProtocolId = protocol.id;
+				uiState.setCurrentProtocolId(protocol.id);
 				goto('#/import');
 			}}
 		>
