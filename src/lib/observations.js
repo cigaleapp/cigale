@@ -101,6 +101,22 @@ function defaultObservationLabel(parts) {
 }
 
 /**
+ *
+ * @param {{ id: string, filename: string }} image
+ * @returns
+ */
+export function newObservation(image) {
+	const observationId = db.generateId('Observation');
+	return {
+		id: observationId,
+		images: [image.id],
+		addedAt: new Date().toISOString(),
+		label: defaultObservationLabel([image]),
+		metadataOverrides: {}
+	};
+}
+
+/**
  * If there are any images that are not inside any observation, create an observation with a single image for each
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
@@ -111,17 +127,11 @@ export async function ensureNoLoneImages(tx) {
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
-				const observationId = db.generateId('Observation');
-				tx.objectStore('Observation').add({
-					id: observationId,
-					images: [image.id],
-					addedAt: new Date().toISOString(),
-					label: defaultObservationLabel([image]),
-					metadataOverrides: {}
-				});
+				const newObs = newObservation(image);
+				tx.objectStore('Observation').add(newObs);
 				// Update ui selection so we don't have ghosts in preview side panel
 				uiState.setSelection?.(
-					uiState.selection.map((sel) => (sel === image.id ? observationId : sel))
+					uiState.selection.map((sel) => (sel === image.id ? newObs.id : sel))
 				);
 			}
 		}

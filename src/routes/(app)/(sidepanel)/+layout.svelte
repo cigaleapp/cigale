@@ -10,7 +10,7 @@
 		mergeMetadataFromImagesAndObservations,
 		storeMetadataValue
 	} from '$lib/metadata';
-	import { deleteObservation, mergeToObservation } from '$lib/observations';
+	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -44,15 +44,25 @@
 	}
 
 	async function splitSelection() {
-		// Find IDs of all images in selected observations
-		const toselect = uiState.selection.flatMap((id) => {
-			const obs = tables.Observation.state.find((o) => o.id === id);
-			if (!obs) return [];
-			return obs.images;
-		});
+		/** @type {string[]} */
+		const toselect = [];
+
 		await tables.Observation.do((tx) => {
-			uiState.selection.map((id) => tx.delete(id));
+			for (const id of uiState.selection) {
+				const obs = tables.Observation.state.find((o) => o.id === id);
+				if (!obs) continue;
+
+				tx.delete(id);
+				for (const imageId of obs.images) {
+					const image = tables.Image.state.find((i) => i.id === imageId);
+					if (!image) continue;
+					const obs = newObservation(image);
+					tx.add(obs);
+					toselect.push(obs.id);
+				}
+			}
 		});
+
 		uiState.setSelection?.(toselect);
 	}
 
