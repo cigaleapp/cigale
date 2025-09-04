@@ -29,115 +29,160 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @type {Record<string, Keybind<Groups>>}
  */
 
-/**
- * @typedef {object} UIState
- * @property {object} processing état actuel du processus de traitement
- * @property {number} processing.total nombre total d'éléments à traiter
- * @property {number} processing.done éléments traités
- * @property {number} processing.time temps écoulé depuis le début du processus, en
- * @property {number} processing.progress pourcentage entre 0 et 1 de l'avancement du processus
- * @property {() => void} processing.reset réinitialiser l'état de traitement
- * @property {(id: string) => void} processing.removeFile supprimer un fichier de la liste des fichiers en cours de traitement
- * @property {''|'detection'|'classification'|'export'} processing.task tâche en cours
- * @property {Array<{name: string; id: string}>} processing.files liste de noms de fichiers en cours d'importations, qui n'ont pas encore de ImageFile en base de données
- * @property {string[]} selection liste des IDs d'images ou observations sélectionnées. Utiliser setSelection pour modifier
- * @property {undefined | ((newSelection: string[]) => void)} setSelection modifier la sélection
- * @property {Map<string, string>} previewURLs url de type blob:// pouvant servir de src à une balise img pour afficher une image. Map d'un ID d'ImageFile à l'URL
- * @property {(imageFileId: string | undefined | null, url: string, variant?: 'cropped' | 'full') => void} setPreviewURL
- * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => boolean} hasPreviewURL
- * @property {(imageFileId: string | undefined | null, variant?: 'cropped' | 'full') => string | undefined} getPreviewURL
- * @property {Map<string, string>} erroredImages liste des IDs d'images qui ont rencontré une erreur lors du traitement
- * @property {Set<string>} loadingImages liste d'IDs d'images ou de ImageFiles en cours de chargement (analyse, écriture en db, etc)
- * @property {Set<string>} queuedImages liste d'IDs d'images ou de ImageFiles en attente de traitement
- * @property {Keymap} keybinds liste des raccourcis clavier
- * @property {Map<string, ZoomState>} cropperZoomStates états de zoom pour les différentes images, dans /crop/[image]. Les clés sont les IDs d'ImageFile
- * @property {number} selectedClassificationModel index du modèle de classification sélectionné dans la liste des modèles de classification du protocole sélectionné. -1 pour désactiver l'inférence
- * @property {number} selectedCropModel index du modèle de recadrage sélectionné dans la liste des modèles de recadrage du protocole sélectionné. -1 pour désactiver l'inférence
- * @property {(indices: { classification?: number | null, crop?: number | null }) => Promise<void>} setModelSelections changer les modèles sélectionnés pour le protocole courant
- * @property {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} classificationModels liste des modèles de classification disponibles pour le protocole sélectionné
- * @property {NonNullable<typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']>} cropModels liste des modèles de recadrage disponibles pour le protocole sélectionné
- * @property {boolean} cropInferenceAvailable true si le protocole sélectionné a un modèle de recadrage (qui n'a pas été désactivé)
- * @property {boolean} classificationInferenceAvailable true si le protocole sélectionné a un modèle de classification (qui n'a pas été désactivé)
- * @property {string|undefined} classificationMetadataId ID de la métadonnée à utiliser pour la classification
- * @property {string} cropMetadataId ID de la métadonnée à utiliser pour le recadrage
- * @property {string} cropConfirmationMetadataId ID de la métadonnée à utiliser pour déterminer si le recadrage a été confirmé
- * @property {string} currentProtocolId ID du protocole choisi
- * @property {string | ''} imageOpenedInCropper ID de l'image qu'on est en train de recadrer, ou '' si on est dans la gallerie
- * @property {string | ''} imagePreviouslyOpenedInCropper ID de l'image qu'on était en train de recadrer avant de changer d'image ou de revenir à la gallerie
- * @property {DB.Protocol | undefined} currentProtocol protocole choisi
- * @property {(image: DB.Image) => TypedMetadataValue<'boundingbox'>|undefined} cropMetadataValueOf} récupérer la valeur de la métadonnée de recadrage d'une image, pour le protocole actuel
- */
-
-/**
- * @type {UIState}
- */
-export const uiState = $state({
-	processing: {
+// UIState class fields and methods are annotated with @type for documentation and IDE support
+class UIState {
+	processing = $state({
+		/** @type {Array<{name: string; id: string}>} */
 		files: [],
+		/** @type {number} */
 		total: 0,
+		/** @type {number} */
 		done: 0,
+		/** @type {number} */
 		time: 0,
+		/** @type {''|'detection'|'classification'|'export'} */
 		task: '',
+		/** @type {number} */
 		get progress() {
 			return this.total ? this.done / this.total : 0;
 		},
-		/**
-		 *
-		 * @param {string} id
-		 */
+		/** @type {(id: string) => void} */
 		removeFile(id) {
 			const idx = this.files.findIndex((f) => f.id === id);
 			if (idx === -1) return;
 			this.files.splice(idx, 1);
 		},
+		/** @type {() => void} */
 		reset() {
 			this.total = 0;
 			this.done = 0;
 			this.time = 0;
 			this.task = '';
 		}
-	},
-	selection: [],
-	imageOpenedInCropper: '',
-	imagePreviouslyOpenedInCropper: '',
-	previewURLs: new SvelteMap(),
+	});
+	/** @type {string[]} */
+	selection = $state([]);
+	/** @type {string | ''} */
+	imageOpenedInCropper = $state('');
+	/** @type {string | ''} */
+	imagePreviouslyOpenedInCropper = $state('');
+	/** @type {Map<string, string>} */
+	previewURLs = new SvelteMap();
+	/** @type {Map<string, string>} */
+	erroredImages = new SvelteMap();
+	/** @type {Set<string>} */
+	loadingImages = new SvelteSet();
+	/** @type {Set<string>} */
+	queuedImages = new SvelteSet();
+	/** @type {Keymap} */
+	keybinds = $state({});
+	/** @type {Map<string, import('./DraggableBoundingBox.svelte.js').ZoomState>} */
+	cropperZoomStates = new SvelteMap();
+	/** @type {undefined | ((newSelection: string[]) => void)} */
+	setSelection = $state(undefined);
+	/** @type {string} */
+	_currentProtocolId = $state('');
+
+	/**
+	 * @param {import('./database').Image} image
+	 * @returns {import('./metadata').TypedMetadataValue<'boundingbox'>|undefined}
+	 */
+	cropMetadataValueOf(image) {
+		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
+	}
+
+	/** @type {import('./database').Protocol | undefined} */
+	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
+
+	/** @type {string} */
+	currentProtocolId = $derived(
+		this._currentProtocolId || localStorage.getItem('currentProtocolId') || ''
+	);
+
+	/**
+	 * @param {string} id
+	 */
+	setCurrentProtocolId(id) {
+		localStorage.setItem('currentProtocolId', id);
+		this._currentProtocolId = id;
+	}
+
+	/** @type {string} */
+	cropMetadataId = $derived(
+		tables.Metadata.state.find(
+			(m) =>
+				this.currentProtocol?.metadata.includes(m.id) &&
+				this.currentProtocol?.crop?.metadata === m.id
+		)?.id ?? 'crop'
+	);
+
+	/** @type {string} */
+	cropConfirmationMetadataId = $derived(
+		tables.Metadata.state.find(
+			(m) =>
+				this.currentProtocol?.metadata.includes(m.id) &&
+				this.currentProtocol?.crop?.confirmationMetadata === m.id
+		)?.id ?? ''
+	);
+
+	/**
+	 * @param {string | undefined | null} imageFileId
+	 * @returns {boolean}
+	 */
 	hasPreviewURL(imageFileId) {
 		if (!imageFileId) return false;
 		return this.previewURLs.has(imageFileId);
-	},
+	}
+	/**
+	 * @param {string | undefined | null} imageFileId
+	 * @param {string} url
+	 */
 	setPreviewURL(imageFileId, url) {
 		console.log('setPreviewURL', { imageFileId, url });
 		if (!imageFileId) return;
 		this.previewURLs.set(imageFileId, url);
-	},
+	}
+	/**
+	 * @param {string | undefined | null} imageFileId
+	 * @returns {string | undefined}
+	 */
 	getPreviewURL(imageFileId) {
 		if (!imageFileId) return undefined;
 		return this.previewURLs.get(imageFileId);
-	},
-	erroredImages: new SvelteMap(),
-	loadingImages: new SvelteSet(),
-	queuedImages: new SvelteSet(),
-	keybinds: {},
-	cropperZoomStates: new SvelteMap(),
-	get classificationModels() {
-		return (
-			tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer?.neural ?? []
-		);
-	},
-	get cropModels() {
-		return this.currentProtocol?.crop?.infer ?? [];
-	},
-	get cropInferenceAvailable() {
-		return this.cropModels.length > 0 && this.selectedCropModel !== -1;
-	},
-	get classificationInferenceAvailable() {
-		return this.classificationModels.length > 0 && this.selectedClassificationModel !== -1;
-	},
-	get selectedClassificationModel() {
+	}
+
+	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */
+	classificationModels = $derived(
+		tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer?.neural ?? []
+	);
+	/** @type {NonNullable<typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']>} */
+	cropModels = $derived(this.currentProtocol?.crop?.infer ?? []);
+
+	/** @type {number} */
+	selectedCropModel = $derived.by(() => {
+		const metadataId = this.cropMetadataId;
+		if (!metadataId) return -1;
+		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
+	});
+
+	/** @type {number} */
+	selectedClassificationModel = $derived.by(() => {
 		const metadataId = this.classificationMetadataId;
 		if (!metadataId) return -1;
 		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
-	},
+	});
+
+	/** @type {boolean} */
+	cropInferenceAvailable = $derived(this.cropModels.length > 0 && this.selectedCropModel !== -1);
+	/** @type {boolean} */
+	classificationInferenceAvailable = $derived(
+		this.classificationModels.length > 0 && this.selectedClassificationModel !== -1
+	);
+
+	/**
+	 * @param {{ classification?: number | null, crop?: number | null }} indices
+	 * @returns {Promise<void>}
+	 */
 	async setModelSelections({ classification = null, crop = null }) {
 		if (classification === null && crop === null) return; // no change
 
@@ -149,10 +194,7 @@ export const uiState = $state({
 		if (!metadataIds.classification || !metadataIds.crop) return;
 
 		const current = await getSetting('protocolModelSelections');
-
-		/**
-		 * @type {Record<string, number>}
-		 */
+		/** @type {Record<string, number>} */
 		const changes = {};
 
 		if (classification !== null && classification !== this.selectedClassificationModel) {
@@ -173,13 +215,10 @@ export const uiState = $state({
 				...changes
 			}
 		});
-	},
-	get selectedCropModel() {
-		const metadataId = this.cropMetadataId;
-		if (!metadataId) return -1;
-		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
-	},
-	get classificationMetadataId() {
+	}
+
+	/** @type {string|undefined} */
+	classificationMetadataId = $derived.by(() => {
 		const isCandidate = match
 			.case(
 				{
@@ -190,44 +229,8 @@ export const uiState = $state({
 				({ id }) => this.currentProtocol?.metadata.includes(id)
 			)
 			.default(() => false);
-
 		return tables.Metadata.state.find((m) => isCandidate(m))?.id;
-	},
-	get cropMetadataId() {
-		return (
-			tables.Metadata.state.find(
-				(m) =>
-					this.currentProtocol?.metadata.includes(m.id) &&
-					this.currentProtocol?.crop?.metadata === m.id
-			)?.id ?? 'crop'
-		);
-	},
-	get cropConfirmationMetadataId() {
-		return (
-			tables.Metadata.state.find(
-				(m) =>
-					this.currentProtocol?.metadata.includes(m.id) &&
-					this.currentProtocol?.crop?.confirmationMetadata === m.id
-			)?.id ?? ''
-		);
-	},
-	/**
-	 * Get the bounding box metadata value of an image
-	 */
-	cropMetadataValueOf(image) {
-		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
-	},
-	get currentProtocol() {
-		return tables.Protocol.state.find((p) => p.id === this.currentProtocolId);
-	},
-	_currentProtocolId: '',
-	get currentProtocolId() {
-		return this._currentProtocolId || localStorage.getItem('currentProtocolId') || '';
-	},
-	set currentProtocolId(id) {
-		localStorage.setItem('currentProtocolId', id);
-		this._currentProtocolId = id;
-	},
-	// needs to be set in AreaObservations.svelte, since it only the component has access to its DragSelect instance
-	setSelection: undefined
-});
+	});
+}
+
+export const uiState = new UIState();
