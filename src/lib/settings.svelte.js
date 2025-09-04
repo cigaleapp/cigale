@@ -77,3 +77,7 @@ export async function toggleSetting(key) {
 		[key]: !current[key]
 	});
 }
+
+export function isDebugMode() {
+	return getSettings().showTechnicalMetadata;
+}

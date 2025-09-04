@@ -17,7 +17,7 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte';
+	import { getSettings, isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
@@ -181,7 +181,7 @@
 		<p>{m.cannot_load_classification_model()}</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{errorMessage(classifModelLoadingError)}</p>
-		{#if getSettings().showTechnicalMetadata}
+		{#if isDebugMode()}
 			<pre class="trace">{classifModelLoadingError?.stack}</pre>
 		{/if}
 	</section>

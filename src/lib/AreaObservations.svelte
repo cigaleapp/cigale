@@ -21,7 +21,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { defineKeyboardShortcuts } from './keyboard.svelte';
 	import { mutationobserver } from './mutations';
 	import { m } from './paraglide/messages';
-	import { getSettings } from './settings.svelte';
+	import { isDebugMode } from './settings.svelte';
 
 	/**
 	 * @typedef Props
@@ -173,7 +173,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		/>
 	{/each}
 
-	{#if getSettings().showTechnicalMetadata && sortedImages.length > 0}
+	{#if isDebugMode() && sortedImages.length > 0}
 		<div class="debug">
 			{#snippet displayIter(set)}
 				{'{'}

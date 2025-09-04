@@ -15,7 +15,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
-	import { getSettings } from '$lib/settings.svelte';
+	import { getSettings, isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { nonnull, pick } from '$lib/utils';
@@ -76,7 +76,7 @@
 						help: '',
 						hidden: true,
 						allowInModals: true,
-						when: () => getSettings().showTechnicalMetadata,
+						when: isDebugMode,
 						do: toastFns[type]
 					}
 				];

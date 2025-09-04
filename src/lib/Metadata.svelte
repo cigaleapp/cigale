@@ -6,10 +6,10 @@
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { isType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';
-	import { getSettings } from './settings.svelte';
+	import { m } from './paraglide/messages.js';
+	import { isDebugMode } from './settings.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';
-	import { m } from './paraglide/messages.js';
 
 	/**
 	 * @typedef {object} Props
@@ -123,7 +123,7 @@
 			{/if}
 		</section>
 	{/if}
-	{#if getSettings().showTechnicalMetadata}
+	{#if isDebugMode()}
 		<pre>{JSON.stringify({ id: definition.id, value }, null, 2)}</pre>
 	{/if}
 </div>

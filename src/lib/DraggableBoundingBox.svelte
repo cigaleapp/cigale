@@ -1,11 +1,11 @@
 <script>
+	import { watch } from 'runed';
 	import { tick } from 'svelte';
 	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
-	import { getSettings } from './settings.svelte';
-	import { mapValues } from './utils';
-	import { watch } from 'runed';
 	import { imageIdToFileId } from './images';
+	import { isDebugMode } from './settings.svelte';
+	import { mapValues } from './utils';
 
 	/**
 	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
@@ -214,7 +214,7 @@
 <div
 	bind:this={changeAreaRef}
 	class="change-area"
-	class:debug={getSettings().showTechnicalMetadata}
+	class:debug={isDebugMode()}
 	class:precise={!movable && !transformable}
 	style:left="{imageRect.x}px"
 	style:top="{imageRect.y}px"
@@ -323,7 +323,7 @@
 		}
 	}}
 >
-	{#if getSettings().showTechnicalMetadata}
+	{#if isDebugMode()}
 		<code class="debug" style:color="red">
 			{#snippet point(x, y)}
 				{Math.round(x)} {Math.round(y)}

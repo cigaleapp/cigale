@@ -1,17 +1,17 @@
 <script>
+	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { marked } from 'marked';
-	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import IconArrowRight from '~icons/ph/arrow-right';
 	import IconCheck from '~icons/ph/check';
-	import Logo from './Logo.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { getSettings } from './settings.svelte';
-	import { tables } from './idb.svelte.js';
 	import * as idb from './idb.svelte.js';
-	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
-	import { uiState } from './state.svelte';
+	import { tables } from './idb.svelte.js';
+	import Logo from './Logo.svelte';
 	import { m } from './paraglide/messages.js';
+	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
+	import { isDebugMode } from './settings.svelte';
+	import { uiState } from './state.svelte';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
@@ -220,7 +220,7 @@
 							{#await marked(highlightedOption.description) then html}
 								{@html html}
 							{:catch error}
-								{#if getSettings().showTechnicalMetadata}
+								{#if isDebugMode()}
 									<p class="error">Markdown invalide: {error}</p>
 								{/if}
 								{highlightedOption.description}

@@ -9,7 +9,7 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
-	import { getSettings } from '$lib/settings.svelte';
+	import { getSettings, isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 
@@ -149,7 +149,7 @@
 		<p>{m.cannot_load_cropping_model()}</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
-		{#if getSettings().showTechnicalMetadata}
+		{#if isDebugMode()}
 			<pre>
 				{error?.stack ?? '(no stack trace available)'}
 			</pre>
