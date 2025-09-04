@@ -39,7 +39,7 @@
 			case 'warning':
 				return 'warning';
 			case 'error':
-				return 'danger';
+				return 'error';
 			case 'debug':
 				return 'secondary';
 		}
