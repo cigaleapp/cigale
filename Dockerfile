@@ -1,4 +1,4 @@
-FROM busybox:1.35
+FROM busybox:1.37
 
 # Create a non-root user to own the files and run our server
 RUN adduser -D static
