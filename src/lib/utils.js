@@ -691,3 +691,14 @@ export function isZip(contentType) {
 		contentType === 'application/x-zip'
 	);
 }
+
+/**
+ * @template T
+ * @param {string} tag
+ * @param {T} expr
+ * @returns {T}
+ */
+export function logexpr(tag, expr) {
+	console.log(`{${tag}}`, expr);
+	return expr;
+}
