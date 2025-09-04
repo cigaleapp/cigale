@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## September 2025
+
+### Performance Improvements
+
+- Improve general performance
+
+### Bug Fixes
+
+- Fix cards unselectable after ungrouping
+- Fix error toasts were not red anymore
+
 ## August 2025
 
 ### Improvements
