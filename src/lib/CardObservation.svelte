@@ -10,6 +10,7 @@
 	import CroppedImg from './CroppedImg.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { percent } from './i18n';
+	import { isDebugMode } from './settings.svelte';
 
 	/**
 	 * @typedef Props
@@ -32,6 +33,7 @@
 	 * @property {number} boundingBoxes.height
 	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
 	 * @property {string} [statusText] - text to show when loading and progress is -1
+	 * @property {string} [id]
 	 */
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
@@ -72,7 +74,7 @@
 	class:stacked
 	data-selectable={selectable ? '' : undefined}
 	{...rest}
-	use:tooltip={errored ? statusText : undefined}
+	use:tooltip={errored ? statusText : isDebugMode() ? rest.id : undefined}
 >
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
