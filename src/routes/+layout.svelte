@@ -69,4 +69,8 @@
 		stroke: var(--fg-neutral);
 		stroke-width: 1px;
 	}
+
+	:global(input[type='range']) {
+		accent-color: var(--fg-primary);
+	}
 </style>

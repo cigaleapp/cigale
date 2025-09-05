@@ -49,7 +49,7 @@ async function fillBuiltinData(swarpc) {
 			id: 'defaults',
 			protocols: [],
 			theme: 'auto',
-			gridSize: 10,
+			gridSize: 1,
 			language: 'fr',
 			showInputHints: true,
 			showTechnicalMetadata: dev,

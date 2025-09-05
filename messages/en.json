@@ -209,5 +209,6 @@
 	"keyboard_shortcuts_group_cropping": "Cropping",
 	"prepare_for_offline": "Prepare for offline use",
 	"prepare_for_offline_help": "Download everything needed to use the application offline. Downloads all models for all currently installed protocols.",
-	"start": "Start"
+	"start": "Start",
+	"card_size": "Images size"
 }
