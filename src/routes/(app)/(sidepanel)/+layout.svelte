@@ -18,6 +18,7 @@
 	import { watch } from 'runed';
 	import { cancellers } from '../+layout.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import Error from '../../+error.svelte';
 
 	seo({ title: 'Importer' });
 
@@ -47,16 +48,19 @@
 		/** @type {string[]} */
 		const toselect = [];
 
-		await tables.Observation.do((tx) => {
+		const protocol = uiState.currentProtocol;
+		if (!protocol) throw new Error('No protocol selected');
+
+		await tables.Observation.do(async (tx) => {
 			for (const id of uiState.selection) {
-				const obs = tables.Observation.state.find((o) => o.id === id);
+				const obs = tables.Observation.getFromState(id);
 				if (!obs) continue;
 
 				tx.delete(id);
 				for (const imageId of obs.images) {
-					const image = tables.Image.state.find((i) => i.id === imageId);
+					const image = await tables.Image.raw.get(imageId);
 					if (!image) continue;
-					const obs = newObservation(image);
+					const obs = newObservation(image, protocol);
 					tx.add(obs);
 					toselect.push(obs.id);
 				}

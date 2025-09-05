@@ -47,3 +47,12 @@ export const ModelInput = type({
 		"Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
 	]
 });
+
+export const Dimensions = type({
+	width: 'number > 0',
+	height: 'number > 0'
+}).pipe(({ width, height }) => ({
+	width,
+	height,
+	aspectRatio: width / height
+}));

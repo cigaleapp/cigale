@@ -3,6 +3,7 @@ import Handlebars from 'handlebars';
 import { safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, References, URLString } from './common.js';
 import { Metadata, namespacedMetadataId } from './metadata.js';
+import { Image, Observation } from './observations.js';
 
 /**
  * @import { Analysis } from './results';
@@ -47,6 +48,41 @@ Handlebars.registerHelper('fallback', (subject, fallback) => {
 	return subject ?? fallback;
 });
 
+/**
+ * @template {import('arktype').Type} T
+ * @param {T} Input
+ */
+export const TemplatedString = (Input) =>
+	type.string
+		.pipe((t) => {
+			try {
+				return {
+					source: t,
+					template: Handlebars.compile(t, {
+						noEscape: true,
+						assumeObjects: true,
+						knownHelpersOnly: true,
+						knownHelpers: {
+							suffix: true,
+							extension: true,
+							fallback: true
+						}
+					})
+				};
+			} catch (e) {
+				throw new Error(`Invalid template ${safeJSONStringify(t)}: ${e}`);
+			}
+		})
+		.pipe(({ source, template }) => ({
+			/** @param {typeof Input.inferIn} data  */
+			render(data) {
+				data = Input.assert(data);
+				console.log('Applying template', source, 'on', data);
+				return template(data);
+			},
+			toJSON: () => source
+		}));
+
 export const FilepathTemplate = type.string
 	.pipe((t) => {
 		try {
@@ -71,7 +107,7 @@ export const FilepathTemplate = type.string
 		/** @param {{ observation: Omit<typeof Analysis.inferIn['observations'][number], 'images'>, image: typeof Analysis.inferIn['observations'][number]['images'][number], sequence: number }} data */
 		render(data) {
 			console.log('Applying template', source, 'on', data);
-			return template(data, {}).replaceAll('\\', '/');
+			return template(data).replaceAll('\\', '/');
 		},
 		toJSON: () => source
 	}));
@@ -101,6 +137,16 @@ export const Protocol = type({
 	'metadataOrder?': type(ID.array()).describe(
 		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 	),
+	'observations?': {
+		'defaultLabel?': TemplatedString(
+			type({
+				images: Image.array(),
+				observation: Observation
+			})
+		).describe(
+			"Label par défaut pour les observations. Template Handlebars, recevant une liste des images de l'observation à crééer (clé images) et l'observation elle-même (clé observation)"
+		)
+	},
 	crop: type({
 		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
 		'confirmationMetadata?': [
