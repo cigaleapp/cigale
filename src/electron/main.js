@@ -6,7 +6,6 @@ import serve from 'electron-serve';
 import os from 'node:os';
 
 /* global MAIN_WINDOW_VITE_DEV_SERVER_URL */
-
 const builtFileserver = serve({ directory: path.join(import.meta.dirname, 'sveltekit') });
 
 try {
