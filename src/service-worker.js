@@ -12,7 +12,10 @@ const MODELS_CACHE = `cache-models`;
 const ASSETS = [
 	...build, // the app itself
 	...files // everything in `static`
-];
+].filter((u) =>
+	// Prevent trying to cache app://-/ URLs when running with Electron
+	/^https?:\/\//.test(u)
+);
 
 self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it

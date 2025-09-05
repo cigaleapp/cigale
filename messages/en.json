@@ -206,5 +206,8 @@
 	"keyboard_shortcuts_group_general": "General",
 	"keyboard_shortcuts_group_observations": "Observations",
 	"keyboard_shortcuts_group_navigation": "Navigation",
-	"keyboard_shortcuts_group_cropping": "Cropping"
+	"keyboard_shortcuts_group_cropping": "Cropping",
+	"prepare_for_offline": "Prepare for offline use",
+	"prepare_for_offline_help": "Download everything needed to use the application offline. Downloads all models for all currently installed protocols.",
+	"start": "Start"
 }

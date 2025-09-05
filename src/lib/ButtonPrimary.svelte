@@ -2,7 +2,7 @@
 	import ButtonSecondary from './ButtonSecondary.svelte';
 
 	/** @type {import ('./ButtonSecondary.svelte').Props} */
-	const { children, ...props } = $props();
+	const { children: grandchildren, ...props } = $props();
 </script>
 
 <ButtonSecondary
@@ -12,5 +12,7 @@
 	--bg-hover="var(--bg-dark-primary)"
 	--fg-hover="var(--fg-dark-primary)"
 >
-	{@render children()}
+	{#snippet children(params)}
+		{@render grandchildren(params)}
+	{/snippet}
 </ButtonSecondary>
