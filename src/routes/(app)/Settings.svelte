@@ -137,6 +137,20 @@
 				{/if}
 			</ButtonIcon>
 		</div>
+		<div class="label">{m.card_size()}</div>
+		<div class="setting">
+			<input
+				type="range"
+				min="0.5"
+				max="2"
+				step="0.01"
+				list="gridsize-marks"
+				bind:value={() => getSettings().gridSize, (value) => setSetting('gridSize', value)}
+			/>
+			<datalist id="gridsize-marks">
+				<option value="1"></option>
+			</datalist>
+		</div>
 		<div class="label">{m.language()}</div>
 		<div class="setting">
 			<SegmentedGroup

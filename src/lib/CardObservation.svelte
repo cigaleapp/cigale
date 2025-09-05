@@ -170,8 +170,8 @@
 
 <style>
 	.observation {
-		--card-width: 200px;
-		--card-height: 250px;
+		--card-width: calc(var(--card-size-factor, 1) * 200px);
+		--card-height: calc(var(--card-size-factor, 1) * 250px);
 		--card-padding: 0; /* since the image kisses the corners */
 		--stack-offset: 0.25em;
 		--transition-duration: 0.3s;
@@ -202,7 +202,7 @@
 
 	.inner {
 		display: grid;
-		grid-template-rows: 200px 1fr;
+		grid-template-rows: calc(var(--card-size-factor, 1) * 200px) 1fr;
 		grid-template-columns: 100%;
 		width: 100%;
 		height: 100%;
@@ -236,8 +236,7 @@
 	img,
 	.img-placeholder {
 		width: 100%;
-		height: 200px;
-		/*object-fit: cover;*/
+		height: calc(var(--card-size-factor, 1) * 200px);
 	}
 
 	.img-placeholder {

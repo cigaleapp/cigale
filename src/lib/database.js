@@ -23,6 +23,7 @@ import {
 	ModelDetectionOutputShape,
 	Protocol as ProtocolSchema
 } from './schemas/protocols.js';
+import { clamp } from './utils.js';
 
 const ImageFile = table(
 	['id'],
@@ -68,7 +69,8 @@ const Settings = table(
 		id: '"defaults" | "user"',
 		protocols: References,
 		theme: type.enumerated('dark', 'light', 'auto'),
-		gridSize: 'number',
+		// TODO(2025-09-05): remove n===10 after a while
+		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),
 		language: type.enumerated('fr'),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',

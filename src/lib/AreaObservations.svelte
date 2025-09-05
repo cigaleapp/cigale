@@ -21,7 +21,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { defineKeyboardShortcuts } from './keyboard.svelte';
 	import { mutationobserver } from './mutations';
 	import { m } from './paraglide/messages';
-	import { isDebugMode } from './settings.svelte';
+	import { getSettings, isDebugMode } from './settings.svelte';
 
 	/**
 	 * @typedef Props
@@ -157,6 +157,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 >
 	{#each sortedImages as props, i (virtualizeKey(props))}
 		<CardObservation
+			--card-size-factor={getSettings().gridSize}
 			data-testid={i === 0 ? 'first-observation-card' : undefined}
 			data-id={props.id}
 			data-loading={props.loading}
