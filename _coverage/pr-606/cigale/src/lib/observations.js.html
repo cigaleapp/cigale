@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/151</span>
+                <span class='fraction'>0/148</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/151</span>
+                <span class='fraction'>0/148</span>
             </div>
         
             
@@ -231,10 +231,8 @@
 <a name='L166'></a><a href='#L166'>166</a>
 <a name='L167'></a><a href='#L167'>167</a>
 <a name='L168'></a><a href='#L168'>168</a>
-<a name='L169'></a><a href='#L169'>169</a>
-<a name='L170'></a><a href='#L170'>170</a>
-<a name='L171'></a><a href='#L171'>171</a>
-<a name='L172'></a><a href='#L172'>172</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L169'></a><a href='#L169'>169</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -249,8 +247,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -279,7 +275,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -375,7 +370,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -411,6 +405,7 @@
 <span class="cstat-no" title="statement not covered" >import { deleteImageFile, imageFileIds } from './images';</span>
 <span class="cstat-no" title="statement not covered" >import { mergeMetadataValues } from './metadata';</span>
 <span class="cstat-no" title="statement not covered" >import { uiState } from './state.svelte';</span>
+<span class="cstat-no" title="statement not covered" >import { nonnull } from './utils';</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
 <span class="cstat-no" title="statement not covered" > * @param {string[]} parts IDs of observations or images to merge</span>
@@ -420,13 +415,11 @@
 <span class="cstat-no" title="statement not covered" >	const protocol = uiState.currentProtocol;</span>
 <span class="cstat-no" title="statement not covered" >	if (!protocol) throw new Error('No protocol selected');</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	const observations = parts</span>
-<span class="cstat-no" title="statement not covered" >		.map((part) =&gt; tables.Observation.state.find((o) =&gt; o.id === part))</span>
-<span class="cstat-no" title="statement not covered" >		.filter((o) =&gt; o !== undefined);</span>
+<span class="cstat-no" title="statement not covered" >	const observations = parts.map((part) =&gt; tables.Observation.getFromState(part)).filter(nonnull);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	const images = parts</span>
-<span class="cstat-no" title="statement not covered" >		.map((part) =&gt; tables.Image.state.find((i) =&gt; i.id === part))</span>
-<span class="cstat-no" title="statement not covered" >		.filter((i) =&gt; i !== undefined);</span>
+<span class="cstat-no" title="statement not covered" >	const images = await Promise.all(parts.map(async (part) =&gt; tables.Image.raw.get(part))).then(</span>
+<span class="cstat-no" title="statement not covered" >		(imgs) =&gt; imgs.filter(nonnull)</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const imageIds = new Set(observations.flatMap((o) =&gt; o.images)).union(</span>
 <span class="cstat-no" title="statement not covered" >		new Set(images.map((i) =&gt; i.id))</span>
@@ -438,7 +431,7 @@
 <span class="cstat-no" title="statement not covered" >		const observation = {</span>
 <span class="cstat-no" title="statement not covered" >			id: newId,</span>
 <span class="cstat-no" title="statement not covered" >			images: [...imageIds],</span>
-<span class="cstat-no" title="statement not covered" >			addedAt: new Date(),</span>
+<span class="cstat-no" title="statement not covered" >			addedAt: new Date().toISOString(),</span>
 <span class="cstat-no" title="statement not covered" >			label: fallbackObservationLabel([...observations, ...images]),</span>
 <span class="cstat-no" title="statement not covered" >			metadataOverrides: Object.fromEntries(</span>
 <span class="cstat-no" title="statement not covered" >				Object.entries(</span>
@@ -452,7 +445,6 @@
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		tx.add({</span>
 <span class="cstat-no" title="statement not covered" >			...observation,</span>
-<span class="cstat-no" title="statement not covered" >			addedAt: observation.addedAt.toISOString(),</span>
 <span class="cstat-no" title="statement not covered" >			label: defaultObservationLabel({ protocol, images, observation })</span>
 <span class="cstat-no" title="statement not covered" >		});</span>
 &nbsp;
@@ -506,8 +498,8 @@
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
 <span class="cstat-no" title="statement not covered" > * @param {object} arg0</span>
-<span class="cstat-no" title="statement not covered" > * @param {import('$lib/database').Image[]} arg0.images</span>
-<span class="cstat-no" title="statement not covered" > * @param {import('$lib/database').Observation} arg0.observation</span>
+<span class="cstat-no" title="statement not covered" > * @param {Array&lt;typeof import('$lib/database').Schemas.Image.inferIn&gt;} arg0.images</span>
+<span class="cstat-no" title="statement not covered" > * @param {typeof import('$lib/database').Schemas.Observation.inferIn} arg0.observation</span>
 <span class="cstat-no" title="statement not covered" > * @param {import('$lib/database').Protocol} arg0.protocol</span>
 <span class="cstat-no" title="statement not covered" > * @return {string} computed default label for the new observation</span>
 <span class="cstat-no" title="statement not covered" > */</span>
@@ -532,7 +524,7 @@
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
 <span class="cstat-no" title="statement not covered" > *</span>
-<span class="cstat-no" title="statement not covered" > * @param {import('$lib/database').Image} image</span>
+<span class="cstat-no" title="statement not covered" > * @param {typeof import('$lib/database').Schemas.Image.inferIn} image</span>
 <span class="cstat-no" title="statement not covered" > * @param {import('$lib/database').Protocol} protocol</span>
 <span class="cstat-no" title="statement not covered" > * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}</span>
 <span class="cstat-no" title="statement not covered" > */</span>
@@ -541,15 +533,14 @@
 <span class="cstat-no" title="statement not covered" >	const newObs = {</span>
 <span class="cstat-no" title="statement not covered" >		id: observationId,</span>
 <span class="cstat-no" title="statement not covered" >		images: [image.id],</span>
-<span class="cstat-no" title="statement not covered" >		addedAt: new Date(),</span>
+<span class="cstat-no" title="statement not covered" >		addedAt: new Date().toISOString(),</span>
 <span class="cstat-no" title="statement not covered" >		label: fallbackObservationLabel([image]),</span>
 <span class="cstat-no" title="statement not covered" >		metadataOverrides: {}</span>
 <span class="cstat-no" title="statement not covered" >	};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	return {</span>
 <span class="cstat-no" title="statement not covered" >		...newObs,</span>
-<span class="cstat-no" title="statement not covered" >		label: defaultObservationLabel({ images: [image], observation: newObs, protocol }),</span>
-<span class="cstat-no" title="statement not covered" >		addedAt: newObs.addedAt.toISOString()</span>
+<span class="cstat-no" title="statement not covered" >		label: defaultObservationLabel({ images: [image], observation: newObs, protocol })</span>
 <span class="cstat-no" title="statement not covered" >	};</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
@@ -566,7 +557,7 @@
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		for (const image of images) {</span>
 <span class="cstat-no" title="statement not covered" >			if (!observations.some((o) =&gt; o.images.includes(image.id))) {</span>
-<span class="cstat-no" title="statement not covered" >				const newObs = newObservation(Schemas.Image.assert(image), protocol);</span>
+<span class="cstat-no" title="statement not covered" >				const newObs = newObservation(image, protocol);</span>
 <span class="cstat-no" title="statement not covered" >				tx.objectStore('Observation').add(newObs);</span>
 <span class="cstat-no" title="statement not covered" >				// Update ui selection so we don't have ghosts in preview side panel</span>
 <span class="cstat-no" title="statement not covered" >				uiState.setSelection?.(</span>
@@ -583,7 +574,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-05T10:17:37.809Z
+                at 2025-09-05T10:33:00.147Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
