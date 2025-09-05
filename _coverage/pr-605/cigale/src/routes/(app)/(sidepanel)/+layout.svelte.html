@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/157</span>
+                <span class='fraction'>0/159</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/157</span>
+                <span class='fraction'>0/159</span>
             </div>
         
             
@@ -316,7 +316,12 @@
 <a name='L251'></a><a href='#L251'>251</a>
 <a name='L252'></a><a href='#L252'>252</a>
 <a name='L253'></a><a href='#L253'>253</a>
-<a name='L254'></a><a href='#L254'>254</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -341,13 +346,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -355,6 +353,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -363,6 +368,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -589,6 +597,7 @@
 	import { watch } from 'runed';
 	import { cancellers } from '../+layout.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import Error from '../../+error.svelte';
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	seo({ title: 'Importer' });</span>
 &nbsp;
@@ -618,16 +627,19 @@
 		/** @type {string[]} */
 <span class="cstat-no" title="statement not covered" >		const toselect = [];</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		await tables.Observation.do((tx) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		const protocol = uiState.currentProtocol;</span>
+<span class="cstat-no" title="statement not covered" >		if (!protocol) throw new Error('No protocol selected');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >		await tables.Observation.do(async (tx) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >			for (const id of uiState.selection) {</span>
-<span class="cstat-no" title="statement not covered" >				const obs = tables.Observation.state.find((o) =&gt; o.id === id);</span>
+<span class="cstat-no" title="statement not covered" >				const obs = tables.Observation.getFromState(id);</span>
 <span class="cstat-no" title="statement not covered" >				if (!obs) continue;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >				tx.delete(id);</span>
 <span class="cstat-no" title="statement not covered" >				for (const imageId of obs.images) {</span>
-<span class="cstat-no" title="statement not covered" >					const image = tables.Image.state.find((i) =&gt; i.id === imageId);</span>
+<span class="cstat-no" title="statement not covered" >					const image = await tables.Image.raw.get(imageId);</span>
 <span class="cstat-no" title="statement not covered" >					if (!image) continue;</span>
-<span class="cstat-no" title="statement not covered" >					const obs = newObservation(image);</span>
+<span class="cstat-no" title="statement not covered" >					const obs = newObservation(image, protocol);</span>
 <span class="cstat-no" title="statement not covered" >					tx.add(obs);</span>
 <span class="cstat-no" title="statement not covered" >					toselect.push(obs.id);</span>
 <span class="cstat-no" title="statement not covered" >				}</span>
@@ -829,7 +841,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-05T10:50:48.204Z
+                at 2025-09-05T11:30:42.547Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
