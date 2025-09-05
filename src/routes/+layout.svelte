@@ -1,6 +1,7 @@
 <script>
 	import './style.css';
 	import '$lib/tippy-svg-arrow.css';
+	import '$lib/range-inputs.css';
 
 	const { children } = $props();
 
@@ -72,5 +73,6 @@
 
 	:global(input[type='range']) {
 		accent-color: var(--fg-primary);
+		--track-height: 0.5em;
 	}
 </style>
