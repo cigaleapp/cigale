@@ -7,7 +7,7 @@
 	seo({ title: m.about_page_title() });
 
 	/**
-	 * @type {undefined | { node: string; chrome: string; electron: string; os?: { name: string; version: string; architecture: string; archIsUnusual: boolean } }}
+	 * @type {undefined | { node: string; chrome: string; electron: string; os?: { name: string; version: string; architecture: string; archIsUnusual: boolean }; sw: string[] }}
 	 */
 	let electronVersions = $state();
 
@@ -22,6 +22,7 @@
 			void window.versions.os().then((os) => {
 				if (!electronVersions) return;
 				electronVersions.os = os;
+				electronVersions.sw = os.serviceWorkers;
 			});
 		}
 	});
@@ -122,6 +123,17 @@
 					{#if electronVersions.os.archIsUnusual}
 						<dd><code>{electronVersions.os.architecture}</code></dd>
 					{/if}
+					<dt>Service workers</dt>
+					<dd>
+						{#each electronVersions.sw as swurl, i (swurl)}
+							{#if i > 0}
+								,
+							{/if}
+							<code>{swurl}</code>
+						{:else}
+							(none)
+						{/each}
+					</dd>
 				{/if}
 			</dl>
 		</dd>
