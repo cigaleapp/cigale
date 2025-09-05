@@ -1,5 +1,12 @@
 import { scope, type } from 'arktype';
-import { HTTPRequest, ID, ModelInput, Probability, References } from './schemas/common.js';
+import {
+	Dimensions,
+	HTTPRequest,
+	ID,
+	ModelInput,
+	Probability,
+	References
+} from './schemas/common.js';
 import {
 	EXIFField,
 	MetadataEnumVariant,
@@ -10,20 +17,12 @@ import {
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
+import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
 	FilepathTemplate,
-	Protocol as ProtocolSchema,
-	ModelDetectionOutputShape
+	ModelDetectionOutputShape,
+	Protocol as ProtocolSchema
 } from './schemas/protocols.js';
-
-const Dimensions = type({
-	width: 'number > 0',
-	height: 'number > 0'
-}).pipe(({ width, height }) => ({
-	width,
-	height,
-	aspectRatio: width / height
-}));
 
 const ImageFile = table(
 	['id'],
@@ -49,31 +48,9 @@ const ImagePreviewFile = table(
 	})
 );
 
-const Image = table(
-	['id', 'addedAt'],
-	type({
-		id: /\d+(_\d+)*/,
-		filename: 'string',
-		addedAt: 'string.date.iso.parse',
-		dimensions: Dimensions,
-		metadata: MetadataValues,
-		contentType: /\w+\/\w+/,
-		fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
-		/** Si les boîtes englobantes ont été analysées. Pratique en particulier pour savoir s'il faut calculer les boîtes englobantes pour une image qui n'a aucune observation associée (chaque boudingbox crée une observation) */
-		boundingBoxesAnalyzed: 'boolean = false'
-	})
-);
+const Image = table(['id', 'addedAt'], ImageSchema);
 
-const Observation = table(
-	['id', 'addedAt'],
-	type({
-		id: ID,
-		label: 'string',
-		addedAt: 'string.date.iso.parse',
-		metadataOverrides: MetadataValues,
-		images: References
-	})
-);
+const Observation = table(['id', 'addedAt'], ObservationSchema);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
