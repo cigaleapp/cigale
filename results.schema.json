@@ -489,6 +489,15 @@
             "pattern": "[\\w_]+"
           }
         },
+        "observations": {
+          "type": "object",
+          "properties": {
+            "defaultLabel": {
+              "type": "string",
+              "description": "Label par défaut pour les observations. Template Handlebars, recevant une liste des images de l'observation à crééer (clé images) et l'observation elle-même (clé observation)"
+            }
+          }
+        },
         "source": {
           "anyOf": [
             {
