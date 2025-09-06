@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/462</span>
+                <span class='fraction'>0/468</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/462</span>
+                <span class='fraction'>0/468</span>
             </div>
         
             
@@ -603,7 +603,14 @@
 <a name='L538'></a><a href='#L538'>538</a>
 <a name='L539'></a><a href='#L539'>539</a>
 <a name='L540'></a><a href='#L540'>540</a>
-<a name='L541'></a><a href='#L541'>541</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L541'></a><a href='#L541'>541</a>
+<a name='L542'></a><a href='#L542'>542</a>
+<a name='L543'></a><a href='#L543'>543</a>
+<a name='L544'></a><a href='#L544'>544</a>
+<a name='L545'></a><a href='#L545'>545</a>
+<a name='L546'></a><a href='#L546'>546</a>
+<a name='L547'></a><a href='#L547'>547</a>
+<a name='L548'></a><a href='#L548'>548</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -658,6 +665,18 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -685,6 +704,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -724,16 +744,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1013,7 +1028,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1193,6 +1207,18 @@
 <span class="cstat-no" title="statement not covered" >	return _db;</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
+<span class="cstat-no" title="statement not covered" >let locale = 'fr';</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >// TODO: remove once https://github.com/gwennlbh/swarpc/issues/32 is resolved</span>
+<span class="cstat-no" title="statement not covered" >// @ts-expect-error</span>
+<span class="cstat-no" title="statement not covered" >globalThis.localStorage = {</span>
+<span class="cstat-no" title="statement not covered" >	/** @param {string} key */</span>
+<span class="cstat-no" title="statement not covered" >	getItem(key) {</span>
+<span class="cstat-no" title="statement not covered" >		if (key === 'PARAGLIDE_LOCALE') return locale;</span>
+<span class="cstat-no" title="statement not covered" >		throw new Error(`Cannot get ${key} from virtual localStorage`);</span>
+<span class="cstat-no" title="statement not covered" >	}</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >const swarp = Swarp.Server(PROCEDURES);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
@@ -1222,7 +1248,8 @@
 <span class="cstat-no" title="statement not covered" >	].join('|');</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >swarp.init(async ({ databaseName, databaseRevision }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >swarp.init(async ({ databaseName, databaseRevision, locale: loc }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	locale = loc;</span>
 <span class="cstat-no" title="statement not covered" >	databaseParams = { name: databaseName, revision: databaseRevision };</span>
 <span class="cstat-no" title="statement not covered" >});</span>
 &nbsp;
@@ -1265,18 +1292,13 @@
 <span class="cstat-no" title="statement not covered" >swarp.isModelLoaded(async (task) =&gt; inferenceSessions.has(task));</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >	let aborted = false;</span>
-<span class="cstat-no" title="statement not covered" >	tools.abortSignal?.addEventListener('abort', () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >		aborted = true;</span>
-<span class="cstat-no" title="statement not covered" >	});</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >	const session = inferenceSessions.get('detection')?.onnx;</span>
 <span class="cstat-no" title="statement not covered" >	if (!session) {</span>
 <span class="cstat-no" title="statement not covered" >		throw new Error('Modèle de détection non chargé');</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const db = await openDatabase();</span>
-<span class="cstat-no" title="statement not covered" >	if (aborted) return { boxes: [], scores: [] };</span>
+<span class="cstat-no" title="statement not covered" >	tools.abortSignal?.throwIfAborted();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	const file = await db.get('ImageFile', fileId);</span>
 <span class="cstat-no" title="statement not covered" >	if (!file) {</span>
@@ -1557,7 +1579,6 @@
 <span class="cstat-no" title="statement not covered" >			let originalBytes = undefined;</span>
 <span class="cstat-no" title="statement not covered" >			/** @type {Uint8Array} */</span>
 <span class="cstat-no" title="statement not covered" >			let croppedBytes;</span>
-<span class="cstat-no" title="statement not covered" >			notify({ warning: ['exif-write-error', { filename: file.filename }] });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >			try {</span>
 <span class="cstat-no" title="statement not covered" >				if (contentType === 'image/jpeg') {</span>
@@ -1690,7 +1711,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-06T18:02:36.034Z
+                at 2025-09-06T19:14:04.283Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
