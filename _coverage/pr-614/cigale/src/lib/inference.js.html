@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.47% </span>
+                <span class="strong">48.95% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>94/198</span>
+                <span class='fraction'>94/192</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.47% </span>
+                <span class="strong">48.95% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>94/198</span>
+                <span class='fraction'>94/192</span>
             </div>
         
             
@@ -284,12 +284,7 @@
 <a name='L219'></a><a href='#L219'>219</a>
 <a name='L220'></a><a href='#L220'>220</a>
 <a name='L221'></a><a href='#L221'>221</a>
-<a name='L222'></a><a href='#L222'>222</a>
-<a name='L223'></a><a href='#L223'>223</a>
-<a name='L224'></a><a href='#L224'>224</a>
-<a name='L225'></a><a href='#L225'>225</a>
-<a name='L226'></a><a href='#L226'>226</a>
-<a name='L227'></a><a href='#L227'>227</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L222'></a><a href='#L222'>222</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -465,6 +460,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -472,16 +469,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -664,7 +654,7 @@ export <span class="fstat-no" title="function not covered" >async function infer
 <span class="cstat-no" title="statement not covered" >    */</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	if (webgpu) {</span>
-<span class="cstat-no" title="statement not covered" >		console.log('webgpu not implemented yet, using wasm');</span>
+<span class="cstat-no" title="statement not covered" >		console.warn('webgpu not implemented yet, using wasm');</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" >	if (!session) {</span>
 <span class="cstat-no" title="statement not covered" >		throw new Error('Model not loaded');</span>
@@ -690,16 +680,11 @@ export <span class="fstat-no" title="function not covered" >async function infer
 <span class="cstat-no" title="statement not covered" >	};</span>
 <span class="cstat-no" title="statement not covered" >	let inputTensor;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	console.log('loading images...');</span>
 <span class="cstat-no" title="statement not covered" >	inputTensor = await loadToTensor(buffers, { ...taskSettings.input, abortSignal });</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	console.log('inference...');</span>
 <span class="cstat-no" title="statement not covered" >	// TODO figure out a way to use the abortSignal while running the inference</span>
 <span class="cstat-no" title="statement not covered" >	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });</span>
-<span class="cstat-no" title="statement not covered" >	console.log('done !');</span>
-<span class="cstat-no" title="statement not covered" >	console.log('output tensor: ', outputTensor);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	console.log('post proc...');</span>
 <span class="cstat-no" title="statement not covered" >	const bbs = output2BB(</span>
 <span class="cstat-no" title="statement not covered" >		taskSettings.output.shape,</span>
 <span class="cstat-no" title="statement not covered" >		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),</span>
@@ -707,7 +692,7 @@ export <span class="fstat-no" title="function not covered" >async function infer
 <span class="cstat-no" title="statement not covered" >		NUMCONF,</span>
 <span class="cstat-no" title="statement not covered" >		abortSignal</span>
 <span class="cstat-no" title="statement not covered" >	);</span>
-<span class="cstat-no" title="statement not covered" >	console.log('done !');</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >	const [boundingboxes, bestScores] = bbs;</span>
 <span class="cstat-no" title="statement not covered" >	if (!sequence &amp;&amp; uiState) {</span>
 <span class="cstat-no" title="statement not covered" >		uiState.processing.done = buffers.length;</span>
@@ -748,7 +733,7 @@ export <span class="fstat-no" title="function not covered" >async function class
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-06T19:54:27.734Z
+                at 2025-09-06T20:20:09.263Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

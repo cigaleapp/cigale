@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">49.37% </span>
+                <span class="strong">49.55% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>392/794</span>
+                <span class='fraction'>392/791</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">49.37% </span>
+                <span class="strong">49.55% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>392/794</span>
+                <span class='fraction'>392/791</span>
             </div>
         
             
@@ -957,11 +957,7 @@
 <a name='L892'></a><a href='#L892'>892</a>
 <a name='L893'></a><a href='#L893'>893</a>
 <a name='L894'></a><a href='#L894'>894</a>
-<a name='L895'></a><a href='#L895'>895</a>
-<a name='L896'></a><a href='#L896'>896</a>
-<a name='L897'></a><a href='#L897'>897</a>
-<a name='L898'></a><a href='#L898'>898</a>
-<a name='L899'></a><a href='#L899'>899</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L895'></a><a href='#L895'>895</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1289,7 +1285,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1342,8 +1337,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1351,7 +1344,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1999,7 +1991,7 @@ export async function storeMetadataValue({
 		Object.entries(newValue.alternatives).filter(([key]) =&gt; key !== newValue.value)
 	);
 &nbsp;
-	console.log(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
+	console.debug(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
 &nbsp;
 	const metadata = await db.get('Metadata', metadataId);
 	if (!metadata) <span class="branch-0 cbranch-no" title="branch not covered" >throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);</span>
@@ -2101,7 +2093,7 @@ export <span class="fstat-no" title="function not covered" >async function delet
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	if (!image &amp;&amp; !observation) throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	console.log(`Delete metadata ${metadataId} in ${subjectId}`);</span>
+<span class="cstat-no" title="statement not covered" >	console.debug(`Delete metadata ${metadataId} in ${subjectId}`);</span>
 <span class="cstat-no" title="statement not covered" >	if (image) {</span>
 <span class="cstat-no" title="statement not covered" >		delete image.metadata[metadataId];</span>
 <span class="cstat-no" title="statement not covered" >		db.put('Image', image);</span>
@@ -2179,7 +2171,6 @@ export <span class="fstat-no" title="function not covered" >async function addVa
  * @param {DB.Observation[]} observations
  */
 export <span class="fstat-no" title="function not covered" >async function mergeMetadataFromImagesAndObservations(db, images, observations) {</span>
-<span class="cstat-no" title="statement not covered" >	console.log('merging metadata from', { images, observations });</span>
 <span class="cstat-no" title="statement not covered" >	const mergedValues = await mergeMetadataValues(</span>
 <span class="cstat-no" title="statement not covered" >		db,</span>
 <span class="cstat-no" title="statement not covered" >		images.map((img) =&gt; img.metadata)</span>
@@ -2239,8 +2230,6 @@ export <span class="fstat-no" title="function not covered" >async function merge
 <span class="cstat-no" title="statement not covered" >			};</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	console.log('merged metadata values to', output);</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >	return output;</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
@@ -2257,7 +2246,6 @@ export <span class="fstat-no" title="function not covered" >async function merge
 <span class="cstat-no" title="statement not covered" >	 * example: [ { alternatives: { a: 0.8, b: 0.2 } }, { alternatives: { a: 0.6, b: 0.4 } } ]</span>
 <span class="cstat-no" title="statement not covered" >	 * turns into: { a: merger([0.8, 0.6]), b: merger([0.2, 0.4]) }</span>
 <span class="cstat-no" title="statement not covered" >	 */</span>
-<span class="cstat-no" title="statement not covered" >	console.log('Merging metadata', definition, values);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	/**</span>
 <span class="cstat-no" title="statement not covered" >	 * @param {(probabilities: number[]) =&gt; number} merger</span>
@@ -2764,7 +2752,7 @@ export <span class="fstat-no" title="function not covered" >function protocolMet
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-06T19:54:27.734Z
+                at 2025-09-06T20:20:09.263Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
