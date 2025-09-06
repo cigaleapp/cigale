@@ -1,6 +1,7 @@
 import * as dates from 'date-fns';
 import extract from 'extract-zip';
 import path from 'node:path';
+import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
@@ -12,14 +13,12 @@ import {
 	importResults,
 	listTable,
 	loadingText,
-	metadataValueInDatabase,
 	readdirTreeSync,
 	sidepanelMetadataSectionFor,
 	toast,
 	tooltipOf,
 	waitForLoadingEnd
 } from './utils';
-import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {

@@ -1,6 +1,5 @@
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
-import { Schemas } from './database';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
 import { uiState } from './state.svelte';
