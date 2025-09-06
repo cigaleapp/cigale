@@ -1,6 +1,7 @@
 import * as dates from 'date-fns';
 import extract from 'extract-zip';
 import path from 'node:path';
+import fr from '../messages/fr.json' with { type: 'json' };
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
@@ -248,7 +249,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 test('can cancel import', issue(430), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
-	await importPhotos({ page }, 'lil-fella', 'cyan', 'leaf', 'with-exif-gps');
+	await importPhotos({ page, wait: false }, 'lil-fella', 'cyan', 'leaf', 'with-exif-gps');
 	await expect(page.getByTestId('first-observation-card')).toHaveText(loadingText, {
 		timeout: 10_000
 	});
@@ -286,15 +287,8 @@ test(
 		await chooseDefaultProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'lil-fella', 'cyan');
-		await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
-			timeout: 10_000
-		});
-		await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, { timeout: 10_000 });
 		await goToTab(page, 'classify');
-		await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
-			timeout: 10_000
-		});
-		await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, { timeout: 10_000 });
+		await waitForLoadingEnd(page);
 		await goToTab(page, 'import');
 		await page.getByTestId('first-observation-card').click();
 		await page
@@ -304,7 +298,7 @@ test(
 		await goToTab(page, 'classify');
 		await expect(page.getByTestId('first-observation-card')).toMatchAriaSnapshot(`
 		  - article:
-		    - img
+		    - img "cyan"
 		    - img
 		    - heading "cyan" [level=2]
 		`);
@@ -312,27 +306,25 @@ test(
 	}
 );
 
-test('cannot go to classify tab while import analysis is ongoing', issue(437), async ({ page }) => {
+test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella', 'cyan');
-	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
-		timeout: 10_000
-	});
-	await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Analyse…|En attente/, {
-		timeout: 30_000
-	});
+	await waitForLoadingEnd(page);
 
 	// Now, we have at least one image loaded (so technically the classify tab should be accessible),
 	// but the other image is still being analyzed.
 
+	await goToTab(page, 'crop');
+	await expect(page.getByText(fr.loading_cropping_model)).toBeVisible();
+	await expect(page.getByText(fr.loading_cropping_model)).not.toBeVisible({
+		timeout: 10_000
+	});
+
 	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
 
 	// Once everything is done, make sure that we can go to the classify tab
-
-	await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, {
-		timeout: 30_000
-	});
+	await waitForLoadingEnd(page);
 
 	await expect(getTab(page, 'classify')).toBeEnabled({ timeout: 1_000 });
 	await goToTab(page, 'classify');

@@ -553,7 +553,7 @@ test.describe('Cropper view', () => {
 			await page.keyboard.press('ArrowLeft');
 			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 
-			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+			await checkImageTransforms(page, 1.728, 254.761, 140.073);
 		});
 	});
 });

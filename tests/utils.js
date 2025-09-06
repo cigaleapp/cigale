@@ -1,10 +1,10 @@
 import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { Schemas } from '../src/lib/database.js';
 import path from 'node:path';
-import fr from '../messages/fr.json' with { type: 'json' };
 import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import fr from '../messages/fr.json' with { type: 'json' };
+import { Schemas } from '../src/lib/database.js';
 
 /**
  * @param {unknown} value
@@ -40,11 +40,26 @@ export async function importPhotos({ page, wait = true }, ...names) {
 	const nameToPath = (name) => path.join('./tests/fixtures', addDotJpeg(name));
 
 	await expect(page.getByText('(.zip)')).toBeVisible();
-	const fileInput = await page.$("input[type='file']");
 
 	// In case import order matters
+	let i = -1;
 	for (const name of names) {
-		await fileInput?.setInputFiles(Array.isArray(name) ? name.map(nameToPath) : nameToPath(name));
+		i++;
+
+		const batch = Array.isArray(name) ? name.map(nameToPath) : nameToPath(name);
+
+		// Once we have at least a card, the file input from the dropzone disappears
+		if (i === 0) {
+			const fileInput = await page.$("input[type='file']");
+			await fileInput?.setInputFiles(batch);
+		} else {
+			const filePicker = page.waitForEvent('filechooser');
+			await page.getByRole('button', { name: fr.import_other_images }).click();
+			await filePicker.then((picker) => {
+				picker.setFiles(batch);
+			});
+		}
+
 		if (wait) await waitUntilLastAppears(name);
 	}
 
@@ -62,7 +77,11 @@ export async function importPhotos({ page, wait = true }, ...names) {
 			if (!lastItem) throw new Error('No last item to wait for');
 		}
 
-		await expect(page.getByText(addDotJpeg(lastItem), { exact: true })).toBeVisible({
+		const element = page.getByText(addDotJpeg(lastItem), { exact: true });
+		await expect(element).toBeVisible({
+			timeout: 20_000
+		});
+		await expect(element).not.toHaveText(loadingText, {
 			timeout: 20_000
 		});
 	}
