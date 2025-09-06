@@ -6,7 +6,7 @@
 </script>
 
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import Toast from '$lib/Toast.svelte';
@@ -98,7 +98,7 @@
 </script>
 
 <svelte:head>
-	<base href={base ? `${base}/index.html` : ''} />
+	<base href={resolve('/') === '/' ? '' : resolve('/') + 'index.html'} />
 </svelte:head>
 
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
