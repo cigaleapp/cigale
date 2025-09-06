@@ -10,6 +10,7 @@ import {
 	importPhotos,
 	importResults,
 	listTable,
+	loadingText,
 	readdirTreeSync,
 	toast,
 	tooltipOf,
@@ -31,7 +32,6 @@ test.describe('correct results.zip', () => {
 
 	test('has the correct bounding boxes', async ({ page }) => {
 		await goToTab(page, 'crop');
-		await waitForLoadingEnd(page);
 
 		/**
 		 *
@@ -246,7 +246,7 @@ test('can cancel import', issue(430), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella', 'cyan', 'leaf', 'with-exif-gps');
-	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
+	await expect(page.getByTestId('first-observation-card')).toHaveText(loadingText, {
 		timeout: 10_000
 	});
 	await page
