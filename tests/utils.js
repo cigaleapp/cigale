@@ -522,6 +522,10 @@ export function openSettings(page) {
 	return page.getByTestId('settings-button').click();
 }
 
+export const loadingText = new RegExp(
+	[fr.loading_text, fr.queued, fr.analyzing].map(RegExp.escape).join('|')
+);
+
 /**
  *
  * @param {Page} page
@@ -533,10 +537,9 @@ export async function waitForLoadingEnd(page, timeout = 30_000) {
 			? { begin: timeout, finish: timeout }
 			: { begin: 30_000, finish: 120_000, ...timeout };
 
-	const loadingPattern = new RegExp([fr.loading_text, fr.queued, fr.analyzing].join('|'));
-	await expect(page.getByText(loadingPattern).first()).toBeVisible({
+	await expect(page.getByText(loadingText).first()).toBeVisible({
 		timeout: timeouts.begin
 	});
 
-	await expect(page.getByText(loadingPattern)).toHaveCount(0, { timeout: timeouts.finish });
+	await expect(page.getByText(loadingText)).toHaveCount(0, { timeout: timeouts.finish });
 }
