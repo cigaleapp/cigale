@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import * as dates from 'date-fns';
 import { idComparator, Schemas } from './database.js';
 import { getLocale } from './paraglide/runtime.js';
+import { m } from './paraglide/messages.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -642,7 +643,7 @@ function toNumber(type, values) {
 export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 	switch (metadata.type) {
 		case 'boolean':
-			return value ? 'Oui' : 'Non';
+			return value ? m.metadata_value_yes() : m.metadata_value_no();
 
 		case 'date':
 			return value instanceof Date ? dates.format(value, 'Ppp') : value.toString();
@@ -666,7 +667,7 @@ export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 				h
 			} = type({ x: 'number', y: 'number', h: 'number', w: 'number' }).assert(value);
 
-			return `Boîte de (${x1}, ${y1}) à (${x1 + w}, ${y1 + h})`;
+			return m.metadata_value_boundingbox({ x1, y1, x2: x1 + w, y2: y1 + h });
 		}
 
 		case 'float':

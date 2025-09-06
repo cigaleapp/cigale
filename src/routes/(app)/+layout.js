@@ -27,6 +27,7 @@ export async function load() {
 
 	setLoadingMessage(m.initializing_worker_db());
 	await swarpc.init({
+		locale: getLocale(),
 		databaseName,
 		databaseRevision
 	});

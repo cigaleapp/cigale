@@ -48,6 +48,18 @@ async function openDatabase() {
 	return _db;
 }
 
+let locale = 'fr';
+
+// TODO: remove once https://github.com/gwennlbh/swarpc/issues/32 is resolved
+// @ts-expect-error
+globalThis.localStorage = {
+	/** @param {string} key */
+	getItem(key) {
+		if (key === 'PARAGLIDE_LOCALE') return locale;
+		throw new Error(`Cannot get ${key} from virtual localStorage`);
+	}
+};
+
 const swarp = Swarp.Server(PROCEDURES);
 
 /**
@@ -77,7 +89,8 @@ function inferenceModelId(protocolId, request) {
 	].join('|');
 }
 
-swarp.init(async ({ databaseName, databaseRevision }) => {
+swarp.init(async ({ databaseName, databaseRevision, locale: loc }) => {
+	locale = loc;
 	databaseParams = { name: databaseName, revision: databaseRevision };
 });
 
@@ -120,18 +133,13 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 swarp.isModelLoaded(async (task) => inferenceSessions.has(task));
 
 swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
-	let aborted = false;
-	tools.abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
 	const session = inferenceSessions.get('detection')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
 	}
 
 	const db = await openDatabase();
-	if (aborted) return { boxes: [], scores: [] };
+	tools.abortSignal?.throwIfAborted();
 
 	const file = await db.get('ImageFile', fileId);
 	if (!file) {
@@ -412,7 +420,6 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 			let originalBytes = undefined;
 			/** @type {Uint8Array} */
 			let croppedBytes;
-			notify({ warning: ['exif-write-error', { filename: file.filename }] });
 
 			try {
 				if (contentType === 'image/jpeg') {

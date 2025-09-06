@@ -213,5 +213,8 @@
 	"card_size": "Images size",
 	"sentence_join_or": "or",
 	"sentence_join_and": "and",
-	"toggle_debug_mode": "Toggle debug mode"
+	"toggle_debug_mode": "Toggle debug mode",
+	"metadata_value_yes": "Yes",
+	"metadata_value_no": "No",
+	"metadata_value_boundingbox": "Box from ({x1}, {y1}) to ({x2}, {y2})"
 }
