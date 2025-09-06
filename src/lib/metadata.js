@@ -1,6 +1,7 @@
 import { type } from 'arktype';
-import * as datefns from 'date-fns';
+import * as dates from 'date-fns';
 import { idComparator, Schemas } from './database.js';
+import { getLocale } from './paraglide/runtime.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -67,8 +68,8 @@ export function getMetadataValue(image, type, metadataId) {
  */
 export function serializeMetadataValue(value) {
 	return JSON.stringify(
-		value instanceof Date && datefns.isValid(value)
-			? datefns.format(value, "yyyy-MM-dd'T'HH:mm:ss")
+		value instanceof Date && dates.isValid(value)
+			? dates.format(value, "yyyy-MM-dd'T'HH:mm:ss")
 			: value
 	);
 }
@@ -644,7 +645,7 @@ export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 			return value ? 'Oui' : 'Non';
 
 		case 'date':
-			return value instanceof Date ? Intl.DateTimeFormat('fr-FR').format(value) : value.toString();
+			return value instanceof Date ? dates.format(value, 'Ppp') : value.toString();
 
 		case 'enum':
 			return valueLabel || value.toString();
@@ -669,7 +670,7 @@ export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 		}
 
 		case 'float':
-			return Intl.NumberFormat('fr-FR').format(type('number').assert(value));
+			return Intl.NumberFormat(getLocale()).format(type('number').assert(value));
 
 		default:
 			return value.toString();
