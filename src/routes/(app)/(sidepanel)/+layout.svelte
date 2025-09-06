@@ -85,6 +85,24 @@
 	}
 
 	defineKeyboardShortcuts('observations', {
+		'x x': {
+			help: 'Error out selected cards',
+			debug: true,
+			do() {
+				for (const id of uiState.selection) {
+					if (!uiState.erroredImages.has(id)) uiState.erroredImages.set(id, 'Errored!');
+				}
+			}
+		},
+		'x u': {
+			help: 'Un-error selection',
+			debug: true,
+			do() {
+				for (const id of uiState.selection) {
+					uiState.erroredImages.delete(id);
+				}
+			}
+		},
 		'$mod+u': {
 			help: 'Supprimer toutes les images et observations',
 			async do() {

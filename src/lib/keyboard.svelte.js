@@ -7,7 +7,8 @@ const GROUPS = {
 	general: m.keyboard_shortcuts_group_general(),
 	observations: m.keyboard_shortcuts_group_observations(),
 	navigation: m.keyboard_shortcuts_group_navigation(),
-	cropping: m.keyboard_shortcuts_group_cropping()
+	cropping: m.keyboard_shortcuts_group_cropping(),
+	debugmode: 'Debug mode'
 };
 
 /**
@@ -27,7 +28,10 @@ export function defineKeyboardShortcuts(group, shortcuts) {
 				continue;
 			}
 
-			uiState.keybinds[key] = { group: GROUPS[group], ...definition };
+			uiState.keybinds[key] = {
+				group: GROUPS[definition.debug ? 'debugmode' : group],
+				...definition
+			};
 		}
 	});
 	onDestroy(() => {

@@ -1,11 +1,12 @@
 <script>
 	// @ts-ignore
-	import { tinykeys } from 'tinykeys';
-	import Modal, { hasAnyModalOpen } from './Modal.svelte';
-	import { onMount } from 'svelte';
-	import KeyboardHint from './KeyboardHint.svelte';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
+	import { tinykeys } from 'tinykeys';
+	import KeyboardHint from './KeyboardHint.svelte';
+	import Modal, { hasAnyModalOpen } from './Modal.svelte';
 	import { m } from './paraglide/messages.js';
+	import { isDebugMode } from './settings.svelte';
 	import { entries } from './utils';
 
 	/**
@@ -56,6 +57,7 @@
 								return;
 							}
 							if (bind.when && !bind.when(e)) return;
+							if (bind.debug && !isDebugMode()) return;
 							// Stick in a call to event.preventDefault()
 							// before calling the handler function if "preventDefault" is true
 							if (preventDefault) e.preventDefault();
@@ -70,13 +72,15 @@
 		m.keyboard_shortcuts_group_cropping(),
 		m.keyboard_shortcuts_group_observations(),
 		m.keyboard_shortcuts_group_general(),
-		m.keyboard_shortcuts_group_navigation()
+		m.keyboard_shortcuts_group_navigation(),
+		'Debug mode'
 	];
 
 	const bindsByGroup = $derived(
 		entries(
 			entries(binds).reduce((acc, [key, bind]) => {
 				if (bind.hidden) return acc;
+				if (bind.debug && !isDebugMode()) return acc;
 				const group = bind.group ?? m.keyboard_shortcuts_group_general();
 				if (!acc[group]) acc[group] = [];
 				acc[group].push([key, bind]);

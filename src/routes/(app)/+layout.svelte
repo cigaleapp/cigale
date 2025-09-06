@@ -61,21 +61,25 @@
 			help: '',
 			hidden: true,
 			do: () => toasts.info(m.no_need_for_ctrl_s())
-		},
-		...Object.fromEntries(
-			/**@type{const}*/ (['w', 'e', 'i', 'd', 's']).map((type) => {
+		}
+	});
+
+	defineKeyboardShortcuts(
+		'debugmode',
+		Object.fromEntries(
+			/**@type{const}*/ (['warn', 'error', 'info', 'debug', 'success']).map((type) => {
 				const toastFns = {
-					w: () => toasts.warn('Example warning toast'),
-					e: () => toasts.error('Example error toast'),
-					i: () => toasts.info('Example info toast'),
-					d: () => toasts.add('debug', 'Example debug toast'),
-					s: () => toasts.success('Example success toast')
+					warn: () => toasts.warn('Example warning toast'),
+					error: () => toasts.error('Example error toast'),
+					info: () => toasts.info('Example info toast'),
+					debug: () => toasts.add('debug', 'Example debug toast'),
+					success: () => toasts.success('Example success toast')
 				};
 				return [
-					`t t ${type}`,
+					`t t ${type.charAt(0)}`,
 					{
-						help: '',
-						hidden: true,
+						help: `Summon a ${type} toast`,
+						debug: true,
 						allowInModals: true,
 						when: isDebugMode,
 						do: toastFns[type]
@@ -83,7 +87,7 @@
 				];
 			})
 		)
-	});
+	);
 
 	const settings = $derived(getSettings());
 
