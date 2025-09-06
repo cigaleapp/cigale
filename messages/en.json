@@ -212,5 +212,6 @@
 	"start": "Start",
 	"card_size": "Images size",
 	"sentence_join_or": "or",
-	"sentence_join_and": "and"
+	"sentence_join_and": "and",
+	"toggle_debug_mode": "Toggle debug mode"
 }
