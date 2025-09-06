@@ -224,15 +224,21 @@ if (import.meta.vitest) {
 
 /**
  * Pick only some keys from an object
- * @template {string} KeysOut
+ * @template {string & keyof Obj} KeysOut
  * @template {*} Obj
  * @param {Obj} subject
  * @param {...KeysOut} keys
  * @returns {Pick<Obj, KeysOut>}
  */
 export function pick(subject, ...keys) {
-	// @ts-expect-error
-	return fromEntries(entries(subject).filter(([key]) => oneOf(key, keys)));
+	// We're not using fromEntries and entries with a filter, because Object.fromEntries does not return $derived or $state fields from classes
+	// see https://svelte.dev/playground/32a7d1c8995f45b49f01b7ae86fef7bd?version=5.38.7
+
+	const result = /** @type {Pick<Obj, KeysOut>} */ ({});
+	for (const key of keys) {
+		result[key] = subject[key];
+	}
+	return result;
 }
 
 if (import.meta.vitest) {
@@ -241,7 +247,23 @@ if (import.meta.vitest) {
 		expect(pick({ a: 1, b: 2 }, 'a')).toEqual({ a: 1 });
 		expect(pick({ a: 1, b: 2 }, 'b')).toEqual({ b: 2 });
 		expect(pick({ a: 1, b: 2 }, 'a', 'b')).toEqual({ a: 1, b: 2 });
+		// @ts-expect-error
 		expect(pick({ a: 1, b: 2 }, 'c')).toEqual({});
+
+		class Test {
+			/** @type {number} */
+			id = 0;
+			/** @type {string} */
+			name = '';
+		}
+
+		const testZero = new Test();
+		const testOne = new Test();
+		testOne.id = 1;
+
+		expect(pick(testZero, 'id')).toEqual({ id: 0 });
+		expect(pick(testOne, 'id')).toEqual({ id: 1 });
+		expect(pick(testOne, 'name')).toEqual({ name: '' });
 	});
 }
 
