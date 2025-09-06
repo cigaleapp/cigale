@@ -17,8 +17,8 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { watch } from 'runed';
 	import { cancellers } from '../+layout.svelte';
-	import PreviewSidePanel from './PreviewSidePanel.svelte';
 	import Error from '../../+error.svelte';
+	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });
 

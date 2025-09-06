@@ -19,6 +19,7 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
  * @property {string} help
  * @property {(e: MouseEvent|KeyboardEvent) => unknown} do
  * @property {boolean} [hidden=false] hide the keybinding from help
+ * @property {boolean} [debug=false] only activate the keybinding in debug mode, hide it from help otherwise
  * @property {(e: MouseEvent|KeyboardEvent) => boolean} [when=() => true] condition to check before executing the keybind
  * @property {boolean} [allowInModals=false] allow the keybind to be active even when a modal is open
  */
@@ -40,7 +41,7 @@ class UIState {
 		done: 0,
 		/** @type {number} */
 		time: 0,
-		/** @type {''|'detection'|'classification'|'export'} */
+		/** @type {''|'import'|'detection'|'classification'|'export'} */
 		task: '',
 		/** @type {number} */
 		get progress() {

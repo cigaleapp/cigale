@@ -74,6 +74,18 @@ export function serializeMetadataValue(value) {
 }
 
 /**
+ * Serialize a record of metadata values for storing in the database.
+ * @param {DB.MetadataValues} values
+ * @returns {typeof import('$lib/database').Schemas.MetadataValues.inferIn}
+ */
+export function serializeMetadataValues(values) {
+	return mapValues(values, ({ value, ...rest }) => ({
+		...rest,
+		value: serializeMetadataValue(value)
+	}));
+}
+
+/**
  *
  * @template {DB.MetadataType} Type
  * @param {object} options

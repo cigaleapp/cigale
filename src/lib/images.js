@@ -126,7 +126,7 @@ export function imageIsAnalyzed(protocol, imageFileId) {
 	if (!protocol) return false;
 	if (!imageFileId) return false;
 	if (uiState.erroredImages.has(imageFileId)) return true;
-	return tables.Image.state.some((img) => img.fileId === imageFileId);
+	return tables.Image.state.some((img) => img.fileId === imageFileId && img.boundingBoxesAnalyzed);
 }
 
 /**

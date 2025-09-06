@@ -3,10 +3,15 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import * as idb from '$lib/idb.svelte.js';
-	import { imageFileIds } from '$lib/images';
+	import { deleteImageFile, imageFileIds, imageIsAnalyzed } from '$lib/images';
+	import { deleteObservation } from '$lib/observations.js';
+	import { m } from '$lib/paraglide/messages.js';
+	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';
-	import { uiState } from '$lib/state.svelte';
+	import { uiState } from '$lib/state.svelte.js';
+	import { nonnull } from '$lib/utils.js';
+	import { onMount } from 'svelte';
 
 	seo({ title: 'Recadrer' });
 
@@ -16,10 +21,25 @@
 
 	const images = $derived(
 		toAreaObservationProps(imageFileIds(idb.tables.Image.state), [], [], {
-			isLoaded: (item) => typeof item === 'string' && uiState.hasPreviewURL(item),
-			isQueued: () => false
+			isLoaded: (fileId) =>
+				!uiState.cropInferenceAvailable ||
+				Boolean(
+					typeof fileId === 'string' &&
+						uiState.hasPreviewURL(fileId) &&
+						imageIsAnalyzed(uiState.currentProtocol, fileId)
+				),
+			isQueued: (fileId) => typeof fileId === 'string' && uiState.queuedImages.has(fileId)
 		})
 	);
+
+	onMount(() => {
+		detectMore(
+			idb.tables.Image.state
+				.map(({ fileId }) => fileId)
+				.filter(nonnull)
+				.filter((fileId) => !imageIsAnalyzed(uiState.currentProtocol, fileId))
+		);
+	});
 </script>
 
 <section class="observations">
@@ -27,7 +47,14 @@
 		{images}
 		sort={getSettings().gallerySort}
 		highlight={uiState.imagePreviouslyOpenedInCropper}
-		loadingText="Chargement…"
+		loadingText={m.analyzing()}
+		errors={uiState.erroredImages}
+		ondelete={async (id) => {
+			cancelTask(id, 'Cancelled by user');
+			uiState.processing.removeFile(id);
+			await deleteObservation(id);
+			await deleteImageFile(id);
+		}}
 		oncardclick={(id) => {
 			goto(`#/crop/${id}`);
 		}}
