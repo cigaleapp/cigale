@@ -63,8 +63,6 @@ export async function importPhotos({ page, wait = true }, ...names) {
 		if (wait) await waitUntilLastAppears(name);
 	}
 
-	if (wait) await waitUntilLastAppears(names);
-
 	/**
 	 *
 	 * @param {string | Array<string | string[]>} names

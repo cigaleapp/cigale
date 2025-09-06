@@ -249,12 +249,12 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 test('can cancel import', issue(430), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
-	await importPhotos({ page, wait: false }, 'lil-fella', 'cyan', 'leaf', 'with-exif-gps');
+	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);
 	await expect(page.getByTestId('first-observation-card')).toHaveText(loadingText, {
 		timeout: 10_000
 	});
 	await page
-		.getByTestId('first-observation-card')
+		.locator('article', { hasText: 'lil-fella.jpeg' })
 		.getByRole('button', { name: 'Supprimer' })
 		.click();
 	await expect(page.getByText('lil-fella.jpeg').first()).not.toBeVisible({
@@ -310,7 +310,6 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella', 'cyan');
-	await waitForLoadingEnd(page);
 
 	// Now, we have at least one image loaded (so technically the classify tab should be accessible),
 	// but the other image is still being analyzed.
