@@ -39,7 +39,7 @@
 		return errors;
 	});
 
-	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number, addedAt: Date }>} */
+	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number|undefined, addedAt: Date }>} */
 	const images = $derived(
 		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
 			showBoundingBoxes: () => false,
