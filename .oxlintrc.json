@@ -1,6 +1,12 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
 	"rules": {
+		"no-console": [
+			"error",
+			{
+				"allow": ["warn", "error", "info", "dir", "time", "timeEnd", "debug"]
+			}
+		],
 		"no-restricted-imports": [
 			"error",
 			{

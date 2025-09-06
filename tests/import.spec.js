@@ -146,7 +146,7 @@ test.describe('correct results.zip', () => {
 		const resultsDir = path.resolve('./tests/results/correct');
 		await download.saveAs('./tests/results/correct.zip');
 		await extract('./tests/results/correct.zip', { dir: resultsDir });
-		console.log(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
+		console.info(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [

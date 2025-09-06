@@ -4,7 +4,9 @@ import { writeFile } from 'node:fs/promises';
 
 const upTo = process.argv[2];
 
-console.log(`Generating user-facing changelog up to ${date.parse(upTo, 'yyyy-MM-dd', new Date())}`);
+console.info(
+	`Generating user-facing changelog up to ${date.parse(upTo, 'yyyy-MM-dd', new Date())}`
+);
 
 const gitlog = await execa('git', [
 	'log',

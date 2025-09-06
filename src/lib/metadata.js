@@ -138,7 +138,7 @@ export async function storeMetadataValue({
 		Object.entries(newValue.alternatives).filter(([key]) => key !== newValue.value)
 	);
 
-	console.log(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
+	console.debug(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
 
 	const metadata = await db.get('Metadata', metadataId);
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
@@ -240,7 +240,7 @@ export async function deleteMetadataValue({
 
 	if (!image && !observation) throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 
-	console.log(`Delete metadata ${metadataId} in ${subjectId}`);
+	console.debug(`Delete metadata ${metadataId} in ${subjectId}`);
 	if (image) {
 		delete image.metadata[metadataId];
 		db.put('Image', image);
@@ -318,7 +318,6 @@ export async function addValueLabels(values, metadataOptions) {
  * @param {DB.Observation[]} observations
  */
 export async function mergeMetadataFromImagesAndObservations(db, images, observations) {
-	console.log('merging metadata from', { images, observations });
 	const mergedValues = await mergeMetadataValues(
 		db,
 		images.map((img) => img.metadata)
@@ -378,8 +377,6 @@ export async function mergeMetadataValues(db, values) {
 			};
 	}
 
-	console.log('merged metadata values to', output);
-
 	return output;
 }
 
@@ -396,7 +393,6 @@ function mergeMetadata(definition, values) {
 	 * example: [ { alternatives: { a: 0.8, b: 0.2 } }, { alternatives: { a: 0.6, b: 0.4 } } ]
 	 * turns into: { a: merger([0.8, 0.6]), b: merger([0.2, 0.4]) }
 	 */
-	console.log('Merging metadata', definition, values);
 
 	/**
 	 * @param {(probabilities: number[]) => number} merger

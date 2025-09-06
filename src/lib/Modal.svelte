@@ -49,7 +49,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 
 	// Initialize and update close/update functions when stateKey changes
 	$effect(() => {
-		console.log(`Binding functions to ${stateKey} `);
+		console.debug(`Binding functions to ${stateKey} `);
+
 		open = () => {
 			onopen?.();
 			pushState('', { [stateKey]: true });
@@ -64,7 +65,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	let modalElement = $state();
 	$effect(() => {
 		if (!modalElement) return;
-		console.log(page.state[stateKey]);
+
 		if (page.state[stateKey]) modalElement.showModal();
 		else modalElement.close();
 	});

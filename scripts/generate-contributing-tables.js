@@ -9,7 +9,7 @@ import path from 'node:path';
  * @param {import('arktype').Type} typ
  */
 function documentTable(name, typ) {
-	console.log(`Documenting table: ${name}`);
+	console.info(`Documenting table: ${name}`);
 	return `### ${name}\n\n${new JSONSchemaMarkdownDoc(typ.out.toJsonSchema()).generate()}`;
 }
 

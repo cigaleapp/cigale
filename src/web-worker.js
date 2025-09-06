@@ -98,11 +98,11 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 	const id = inferenceModelId(protocolId, request);
 	const existingSession = inferenceSessions.get(task);
 	if (existingSession && existingSession.id === id) {
-		console.log(`Model ${task} already loaded with ID ${id}`);
+		console.debug(`Model ${task} already loaded with ID ${id}`);
 		return true; // Model is already loaded
 	}
 
-	console.log(`Loading model for task ${task} with ID ${id}`);
+	console.debug(`Loading model for task ${task} with ID ${id}`);
 	/** @type {InferenceSession} */
 	const session = {
 		id,
@@ -124,7 +124,7 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 			.then((text) => text.split(/\r?\n/).filter(Boolean));
 	}
 
-	console.log(`Model ${task} loaded successfully with ID ${id}`);
+	console.debug(`Model ${task} loaded successfully with ID ${id}`);
 
 	inferenceSessions.set(task, session);
 	return true;
@@ -182,7 +182,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 			image.metadata[metadataIds.cropbox]?.value ?? { x: 0.5, y: 0.5, w: 1, h: 1 }
 		);
 
-	console.log('Classifying image', image.id, 'with cropbox', cropbox);
+	console.debug('Classifying image', image.id, 'with cropbox', cropbox);
 
 	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
 	const img = await loadToTensor([file.bytes], {

@@ -58,7 +58,6 @@
 			<Switch
 				{value}
 				onchange={(newValue) => {
-					console.log('onblur', newValue);
 					onblur?.(newValue);
 				}}
 			/>

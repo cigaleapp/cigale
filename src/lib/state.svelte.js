@@ -139,7 +139,7 @@ class UIState {
 	 * @param {string} url
 	 */
 	setPreviewURL(imageFileId, url) {
-		console.log('setPreviewURL', { imageFileId, url });
+		console.debug('setPreviewURL', { imageFileId, url });
 		if (!imageFileId) return;
 		this.previewURLs.set(imageFileId, url);
 	}

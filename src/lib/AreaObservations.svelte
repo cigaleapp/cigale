@@ -58,7 +58,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	onMount(() => {
 		if (oncardclick) return;
 		if (!imagesContainer) return;
-		console.log('setting up dragselect');
+
 		dragselect?.destroy();
 		dragselect = new DragSelect(imagesContainer, selection);
 		dragselect.setSelection(selection);
@@ -71,7 +71,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		};
 
 		return () => {
-			console.log('destroying dragselect');
 			dragselect?.destroy();
 			uiState.setSelection = undefined;
 		};

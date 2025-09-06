@@ -90,7 +90,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 	const exif = exifParser.create(buffer).enableImageSize(false).parse();
 
 	if (!exif) return {};
-	console.log({ extractionPlan, exif });
+	console.debug('Starting EXIF Extraction', { extractionPlan, exif });
 
 	const extract = match
 		.case(

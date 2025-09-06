@@ -135,7 +135,6 @@ export async function loadToTensor(
 		}
 	}
 
-	console.log('done !');
 	if (aborted) throw new Error('Operation aborted');
 	var tensor = new ort.Tensor('float32', float32Data, [
 		buffers.length,
@@ -223,8 +222,6 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
 	let bestBoxes = [];
 	/** @type {number[][]}  */
 	let bestScores = [];
-
-	console.log(output);
 
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;

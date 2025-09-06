@@ -147,7 +147,7 @@ export async function infer(
     */
 
 	if (webgpu) {
-		console.log('webgpu not implemented yet, using wasm');
+		console.warn('webgpu not implemented yet, using wasm');
 	}
 	if (!session) {
 		throw new Error('Model not loaded');
@@ -173,16 +173,11 @@ export async function infer(
 	};
 	let inputTensor;
 
-	console.log('loading images...');
 	inputTensor = await loadToTensor(buffers, { ...taskSettings.input, abortSignal });
 
-	console.log('inference...');
 	// TODO figure out a way to use the abortSignal while running the inference
 	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });
-	console.log('done !');
-	console.log('output tensor: ', outputTensor);
 
-	console.log('post proc...');
 	const bbs = output2BB(
 		taskSettings.output.shape,
 		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),
@@ -190,7 +185,7 @@ export async function infer(
 		NUMCONF,
 		abortSignal
 	);
-	console.log('done !');
+
 	const [boundingboxes, bestScores] = bbs;
 	if (!sequence && uiState) {
 		uiState.processing.done = buffers.length;

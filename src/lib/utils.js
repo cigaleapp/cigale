@@ -721,6 +721,7 @@ export function isZip(contentType) {
  * @returns {T}
  */
 export function logexpr(tag, expr) {
+	// oxlint-disable-next-line no-console
 	console.log(`{${tag}}`, expr);
 	return expr;
 }

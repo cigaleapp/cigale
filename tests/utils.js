@@ -262,7 +262,7 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 				)
 			}
 		});
-		console.log('Image updated, refreshing DB', { id, metadata });
+		console.info('Image updated, refreshing DB', { id, metadata });
 		if (refreshDB) await window.refreshDB();
 	}, /** @type {const} */ ([id, metadata, refreshDB]));
 }
@@ -443,7 +443,7 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 			for (const [tableName, entries] of orderedTables) {
 				await window.DB.clear(tableName);
 				for (const entry of entries) {
-					console.log('[loadDatabaseDump] Adding entry to', tableName, entry);
+					console.info('[loadDatabaseDump] Adding entry to', tableName, entry);
 					await window.DB.put(tableName, entry);
 				}
 			}
@@ -461,6 +461,7 @@ export const browserConsole = {
 	 */
 	async log(page, ...args) {
 		await page.evaluate(
+			// oxlint-disable-next-line no-console
 			(args) => console.log(...args),
 			args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg))
 		);

@@ -202,7 +202,7 @@
 
 		if (target.closest('.change-area') !== changeAreaRef) {
 			// Bail out if we were dragging a new bounding box, but we left the image (change area)
-			console.log('Dragging has gone outside change area, bailing out. Target is', target);
+			console.warn('Dragging has gone outside change area, bailing out. Target is', target);
 			draggingCorner.setAll(false);
 			creatingBoundingBox = false;
 			newBoundingBox.reset();

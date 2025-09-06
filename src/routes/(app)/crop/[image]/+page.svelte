@@ -558,7 +558,7 @@
 					selectedBox.imageId = null;
 				} else {
 					// Select previous box in list
-					console.log(images.toReversed(), selectedBox);
+
 					selectedBox.imageId =
 						images.toReversed().find((image) => image.id in boundingBoxes)?.id ?? null;
 				}
@@ -685,7 +685,7 @@
 		() => fileId,
 		(newFileId, oldFileId) => {
 			if (oldFileId) uiState.cropperZoomStates.set(oldFileId, $state.snapshot(zoom));
-			console.log('Chaning zoom state, of ', fileId);
+
 			zoom = $state.snapshot(uiState.cropperZoomStates.get(newFileId)) ?? INITIAL_ZOOM_STATE;
 		}
 	);

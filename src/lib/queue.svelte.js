@@ -67,7 +67,7 @@ class ProcessingQueue {
 	 * @param {...any} args
 	 */
 	log(id, message, ...args) {
-		console.log(`[ProcessingQueue] ${id ? id + ': ' : ''}${message}`, ...args);
+		console.debug(`[ProcessingQueue] ${id ? id + ': ' : ''}${message}`, ...args);
 	}
 
 	/**

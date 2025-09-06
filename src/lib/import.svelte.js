@@ -91,8 +91,6 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 		throw new Error(`Image ${fileId} has no associated ImageFile in database`);
 	}
 
-	console.log('Inferring bounding boxes for', image.filename);
-
 	const inference = swarpc.inferBoundingBoxes.cancelable({
 		fileId: image.fileId,
 		taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
@@ -101,15 +99,12 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	cancellers?.set(image.fileId, inference.cancel);
 
 	const { boxes, scores } = await inference.request.catch((error) => {
-		console.log('handling remote error', error);
 		if (/(maxMemoryUsageInMB|maxResolutionInMP) limit exceeded/.test(error?.toString())) {
 			return Promise.reject(new Error(m.image_too_large(imageLimits)));
 		}
 
 		return Promise.reject(error);
 	});
-
-	console.log('Bounding boxes:', boxes);
 
 	let [firstBoundingBox] = boxes;
 	let [firstScore] = scores;
