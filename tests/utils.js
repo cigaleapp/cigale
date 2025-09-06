@@ -543,3 +543,28 @@ export async function waitForLoadingEnd(page, timeout = 30_000) {
 
 	await expect(page.getByText(loadingText)).toHaveCount(0, { timeout: timeouts.finish });
 }
+
+/**
+ * @param {Page} page
+ * @param {string} nameOrDescription
+ */
+export function sidepanelMetadataSectionFor(page, nameOrDescription) {
+	return page
+		.getByTestId('sidepanel')
+		.locator('section')
+		.filter({ hasText: nameOrDescription })
+		.first();
+}
+
+/**
+ * @param {Page} page
+ * @param {string} key
+ * @param {string} [observationLabel='leaf']
+ */
+export async function metadataValueInDatabase(page, key, observationLabel = 'leaf') {
+	return await getMetadataOverridesOfObservation({
+		page,
+		protocolId: 'io.github.cigaleapp.kitchensink',
+		observation: observationLabel
+	}).then((values) => values[key]);
+}

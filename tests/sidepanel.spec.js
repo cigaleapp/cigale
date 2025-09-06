@@ -4,6 +4,8 @@ import {
 	chooseDefaultProtocol,
 	getMetadataOverridesOfObservation,
 	loadDatabaseDump,
+	sidepanelMetadataSectionFor,
+	metadataValueInDatabase,
 	setSettings
 } from './utils';
 
@@ -47,15 +49,15 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await expect(page.getByTestId('sidepanel')).toBeVisible();
 
 	// Set to True on image itself
-	await expect(metadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
+	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "on/off switch":
 	    - img
 	  - button [disabled]:
 	    - img
 	`);
-	await metadataSectionFor(page, 'bool').getByRole('switch').click();
-	await expect(metadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
+	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
 	  - switch "on/off switch" [checked]:
 	    - img
 	`);
@@ -64,10 +66,10 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await page.getByTestId('goto-classify').click();
 	await page.waitForURL((u) => u.hash === '#/classify');
 	await page.getByTestId('first-observation-card').click();
-	await metadataSectionFor(page, 'bool').getByRole('switch').click();
-	await metadataSectionFor(page, 'bool').getByRole('switch').click();
-	await metadataSectionFor(page, 'bool').getByRole('switch').click();
-	await expect(metadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
+	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
+	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
+	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
 	  - switch "on/off switch":
 	    - img
 	`);
@@ -76,7 +78,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await page.getByTestId('goto-import').click();
 	await page.waitForURL((u) => u.hash === '#/import');
 	await page.getByTestId('first-observation-card').click();
-	await expect(metadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
+	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "on/off switch" [checked]:
 	    - img
@@ -305,60 +307,37 @@ test('can search in a enum-type metadata combobox', async ({ page }) => {
 	`);
 });
 
-/**
- * @param {Page} page
- * @param {string} nameOrDescription
- */
-function metadataSectionFor(page, nameOrDescription) {
-	return page
-		.getByTestId('sidepanel')
-		.locator('section')
-		.filter({ hasText: nameOrDescription })
-		.first();
-}
-
-/**
- * @param {Page} page
- * @param {string} key
- * @param {string} [observationLabel='leaf']
- */
-async function metadataValue(page, key, observationLabel = 'leaf') {
-	return await getMetadataOverridesOfObservation({
-		page,
-		protocolId: 'io.github.cigaleapp.kitchensink',
-		observation: observationLabel
-	}).then((values) => values[key]);
-}
-
 test('can update a boolean-type metadata', issue(216), async ({ page }) => {
 	await initialize({ page, dump: 'kitchensink-protocol' });
 
-	expect.soft(await metadataValue(page, 'bool')).toBeUndefined();
+	expect.soft(await metadataValueInDatabase(page, 'bool')).toBeUndefined();
 	await expect
-		.soft(metadataSectionFor(page, 'bool').getByRole('switch'))
+		.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
 		.not.toHaveAttribute('aria-checked');
 
-	await metadataSectionFor(page, 'bool').getByRole('switch').click();
+	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 
-	await expect.soft(metadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await expect.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
+		.toMatchAriaSnapshot(`
 	  - switch "on/off switch" [checked]:
 	    - img
 	`);
-	expect.soft(await metadataValue(page, 'bool')).toBe(true);
+	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(true);
 
-	await metadataSectionFor(page, 'bool').getByRole('switch').click();
+	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 
-	await expect.soft(metadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await expect.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
+		.toMatchAriaSnapshot(`
 	  - switch "on/off switch":
 	    - img
 	`);
-	expect.soft(await metadataValue(page, 'bool')).toBe(false);
+	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(false);
 });
 
 test('shows crop-type metadata as non representable', async ({ page }) => {
 	await initialize({ page, dump: 'kitchensink-protocol' });
 
-	await expect(metadataSectionFor(page, 'crop')).toMatchAriaSnapshot(`
+	await expect(sidepanelMetadataSectionFor(page, 'crop')).toMatchAriaSnapshot(`
 	  - text: crop
 	  - img
 	  - paragraph: Irreprésentable
@@ -370,19 +349,19 @@ test('shows crop-type metadata as non representable', async ({ page }) => {
 test('can update a date-type metadata', async ({ page }) => {
 	await initialize({ page, dump: 'kitchensink-protocol' });
 
-	const dateSection = metadataSectionFor(page, 'date');
+	const dateSection = sidepanelMetadataSectionFor(page, 'date');
 	await expect(dateSection.getByRole('textbox')).toHaveValue('');
 
 	await dateSection.getByRole('textbox').fill('2025-05-01');
 
 	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
-	expect(await metadataValue(page, 'date')).toBe('2025-05-01T00:00:00');
+	expect(await metadataValueInDatabase(page, 'date')).toBe('2025-05-01T00:00:00');
 });
 
 test('can update a float-type metadata', async ({ page }) => {
 	await initialize({ page, dump: 'kitchensink-protocol' });
 
-	const floatSection = metadataSectionFor(page, 'float');
+	const floatSection = sidepanelMetadataSectionFor(page, 'float');
 	await expect(floatSection.getByRole('textbox')).toHaveValue('');
 
 	await floatSection.getByRole('textbox').fill('3.14');
@@ -390,13 +369,13 @@ test('can update a float-type metadata', async ({ page }) => {
 	await floatSection.getByRole('button', { name: 'Incrémenter' }).click();
 
 	await expect(floatSection.getByRole('textbox')).toHaveValue('4.14');
-	expect(await metadataValue(page, 'float')).toBe(4.14);
+	expect(await metadataValueInDatabase(page, 'float')).toBe(4.14);
 });
 
 test('can update a integer-type metadata', async ({ page }) => {
 	await initialize({ page, dump: 'kitchensink-protocol' });
 
-	const integerSection = metadataSectionFor(page, 'integer');
+	const integerSection = sidepanelMetadataSectionFor(page, 'integer');
 	await expect(integerSection.getByRole('textbox')).toHaveValue('');
 
 	await integerSection.getByRole('textbox').fill('42');
@@ -404,18 +383,18 @@ test('can update a integer-type metadata', async ({ page }) => {
 	await integerSection.getByRole('button', { name: 'Décrémenter' }).click();
 
 	await expect(integerSection.getByRole('textbox')).toHaveValue('41');
-	expect(await metadataValue(page, 'integer')).toBe(41);
+	expect(await metadataValueInDatabase(page, 'integer')).toBe(41);
 });
 
 test('can update a string-type metadata', async ({ page }) => {
 	await initialize({ page, dump: 'kitchensink-protocol' });
 
-	const stringSection = metadataSectionFor(page, 'string');
+	const stringSection = sidepanelMetadataSectionFor(page, 'string');
 	await expect(stringSection.getByRole('textbox')).toHaveValue('');
 
 	await stringSection.getByRole('textbox').fill('Hello world');
 	await stringSection.getByRole('textbox').blur();
 
 	await expect(stringSection.getByRole('textbox')).toHaveValue('Hello world');
-	expect(await metadataValue(page, 'string')).toBe('Hello world');
+	expect(await metadataValueInDatabase(page, 'string')).toBe('Hello world');
 });

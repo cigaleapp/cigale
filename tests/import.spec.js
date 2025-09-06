@@ -5,17 +5,21 @@ import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
+	getMetadataValuesOfImage,
 	getTab,
 	goToTab,
 	importPhotos,
 	importResults,
 	listTable,
 	loadingText,
+	metadataValueInDatabase,
 	readdirTreeSync,
+	sidepanelMetadataSectionFor,
 	toast,
 	tooltipOf,
 	waitForLoadingEnd
 } from './utils';
+import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -333,4 +337,55 @@ test('cannot go to classify tab while import analysis is ongoing', issue(437), a
 
 	await expect(getTab(page, 'classify')).toBeEnabled({ timeout: 1_000 });
 	await goToTab(page, 'classify');
+});
+
+test('can extract EXIF date from an image', async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'lil-fella');
+	await waitForLoadingEnd(page);
+	await page.getByTestId('first-observation-card').click();
+	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+		'2025-04-25'
+	);
+
+	const metadataValues = await getMetadataValuesOfImage({
+		page,
+		protocolId: lightweightProtocol.id,
+		image: { filename: 'lil-fella.jpeg' }
+	});
+
+	expect(metadataValues).toMatchObject({
+		...metadataValues,
+		shoot_date: '2025-04-25T14:38:36'
+	});
+});
+
+test('can extract EXIF GPS data from an image', async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'with-exif-gps');
+	await waitForLoadingEnd(page);
+	await page.getByTestId('first-observation-card').click();
+	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+		'2008-10-22'
+	);
+	await expect(sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')).toHaveValue(
+		'43.46715666666389, 11.885394999997223'
+	);
+
+	const metadataValues = await getMetadataValuesOfImage({
+		page,
+		protocolId: lightweightProtocol.id,
+		image: { filename: 'with-exif-gps.jpeg' }
+	});
+
+	expect(metadataValues).toMatchObject({
+		...metadataValues,
+		shoot_date: '2008-10-22T18:29:49',
+		shoot_location: {
+			latitude: 43.46715666666389,
+			longitude: 11.885394999997223
+		}
+	});
 });
