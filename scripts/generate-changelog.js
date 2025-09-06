@@ -1,5 +1,5 @@
-import { execa } from 'execa';
 import * as date from 'date-fns';
+import { execa } from 'execa';
 import { writeFile } from 'node:fs/promises';
 
 const upTo = process.argv[2];

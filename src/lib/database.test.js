@@ -1,5 +1,5 @@
 import { ArkErrors } from 'arktype';
-import { formatISO } from 'date-fns';
+import * as dates from 'date-fns';
 import { describe, expect, test } from 'vitest';
 import { Schemas, idComparator } from './database';
 import { FilepathTemplate } from './schemas/protocols';
@@ -120,7 +120,7 @@ describe('MetadataValue', () => {
 			expect(value('-3.14').value).toBe(-3.14);
 		});
 		test('datestring', () => {
-			expect(formatISO(value('"2025-01-01T00:00:00Z"').value)).toMatch(
+			expect(dates.formatISO(value('"2025-01-01T00:00:00Z"').value)).toMatch(
 				/^2025-01-01T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/
 			);
 		});

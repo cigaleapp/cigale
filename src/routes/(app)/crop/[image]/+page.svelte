@@ -45,7 +45,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
-	import { formatISO } from 'date-fns';
+	import * as dates from 'date-fns';
 	import { watch } from 'runed';
 	import IconRevert from '~icons/ph/arrow-arc-left';
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
@@ -411,7 +411,7 @@
 			await idb.tables.Image.set({
 				id: newImageId,
 				filename: firstImage?.filename ?? '',
-				addedAt: formatISO(firstImage?.addedAt ?? new Date()),
+				addedAt: dates.formatISO(firstImage?.addedAt ?? new Date()),
 				contentType: firstImage?.contentType ?? '',
 				dimensions: $state.snapshot(firstImage?.dimensions) ?? { width: 0, height: 0 },
 				fileId,

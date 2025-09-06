@@ -38,7 +38,7 @@ export async function processImageFile(file, id) {
 	await tables.Image.set({
 		id: imageId(id, 0),
 		filename: file.name,
-		addedAt: formatISO(Date.now()),
+		addedAt: dates.formatISO(Date.now()),
 		contentType: file.type,
 		dimensions: { width, height },
 		fileId: id,
@@ -121,7 +121,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 		await tables.Image.set({
 			...image,
 			id: imageId(image.fileId, i),
-			addedAt: formatISO(i === 0 ? image.addedAt : Date.now()),
+			addedAt: dates.formatISO(i === 0 ? image.addedAt : Date.now()),
 			boundingBoxesAnalyzed: true,
 			metadata: {
 				...serializeMetadataValues(image.metadata),
