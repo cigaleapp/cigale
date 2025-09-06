@@ -7,9 +7,18 @@ import { error } from '@sveltejs/kit';
 import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '../../web-worker-procedures';
 import WebWorker from '../../web-worker.js?worker';
+import * as dateFnsLocales from 'date-fns/locale';
+import * as dateFns from 'date-fns';
 
 export async function load() {
 	document.documentElement.lang = getLocale();
+	dateFns.setDefaultOptions({
+		locale: {
+			fr: dateFnsLocales.fr,
+			en: dateFnsLocales.enUS,
+			ja: dateFnsLocales.ja
+		}[getLocale()]
+	});
 
 	setLoadingMessage(m.loading_neural_worker());
 	const swarpc = Swarpc.Client(PROCEDURES, {
