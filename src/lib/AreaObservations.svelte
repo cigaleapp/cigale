@@ -31,7 +31,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [highlight] id of image to highlight and scroll to
 	 * @property {string} [loadingText]
-	 * @property {(id: string) => void} [ondelete] callback the user wants to delete an image or observation.
+	 * @property {(id: string) => void} [ondelete] callback the user wants to delete a card
+	 * @property {(id: string) => void} [onretry] callback the user wants to retry an errored card
 	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
 	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
 	 */
@@ -40,6 +41,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	let {
 		images = $bindable(),
 		ondelete,
+		onretry,
 		oncardclick,
 		errors,
 		highlight,
@@ -165,6 +167,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			{...props}
 			onclick={oncardclick ? () => oncardclick(props.id) : undefined}
 			ondelete={ondelete ? () => ondelete(props.id) : undefined}
+			onretry={onretry ? () => onretry(props.id) : undefined}
 			errored={errors?.has(props.id)}
 			statusText={errors?.get(props.id) ?? (props.loading === -Infinity ? m.queued() : loadingText)}
 			highlighted={props.id === highlight}
@@ -184,6 +187,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				}
 			{/snippet}
 			<code>
+				selection {@render displayIter(uiState.selection)} <br />
 				queued {@render displayIter(uiState.queuedImages)} <br />
 				loading {@render displayIter(uiState.loadingImages)} <br />
 				errored {@render displayIter(uiState.erroredImages.keys())} <br />

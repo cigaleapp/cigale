@@ -5,6 +5,7 @@
 	import Logo from './Logo.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import IconDelete from '~icons/ph/trash';
+	import IconRetry from '~icons/ph/arrow-counter-clockwise';
 	import IconImage from '~icons/ph/image';
 	import { tooltip } from './tooltips';
 	import CroppedImg from './CroppedImg.svelte';
@@ -18,6 +19,7 @@
 	 * @property {() => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
 	 * @property {() => void} [ondelete]
+	 * @property {() => void} [onretry]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
@@ -40,6 +42,8 @@
 	const {
 		onclick,
 		onstacksizeclick,
+		ondelete,
+		onretry,
 		title,
 		image,
 		loading,
@@ -51,7 +55,6 @@
 		stacksize = 1,
 		boundingBoxes = [],
 		applyBoundingBoxes = false,
-		ondelete,
 		...rest
 	} = $props();
 
@@ -100,12 +103,20 @@
 								{percent(loading)}
 							{/if}
 						</span>
-						{#if ondelete}
+						{#if ondelete || onretry}
 							<section class="errored-actions">
-								<ButtonInk onclick={ondelete}>
-									<IconDelete />
-									{m.delete()}
-								</ButtonInk>
+								{#if ondelete}
+									<ButtonInk dangerous onclick={ondelete}>
+										<IconDelete />
+										{m.delete()}
+									</ButtonInk>
+								{/if}
+								{#if !loading && onretry}
+									<ButtonInk onclick={onretry}>
+										<IconRetry />
+										{m.retry()}
+									</ButtonInk>
+								{/if}
 							</section>
 						{/if}
 					</div>
@@ -383,7 +394,9 @@
 	.errored-actions {
 		margin-top: 0.75em;
 		font-size: 0.4em;
-		--fg: var(--fg-error);
-		--bg-hover: var(--bg-error);
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5em;
 	}
 </style>

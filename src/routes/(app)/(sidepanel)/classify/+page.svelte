@@ -163,6 +163,15 @@
 			{errors}
 			sort={getSettings().gallerySort}
 			loadingText={m.analyzing()}
+			onretry={(id) => {
+				uiState.erroredImages.delete(id);
+				const imageIds = tables.Observation.getFromState(id)?.images;
+				if (imageIds) {
+					classifyMore(imageIds);
+				} else {
+					toasts.error('Observation is empty (should not happen)');
+				}
+			}}
 			ondelete={async (id) => {
 				const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
 				imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
