@@ -210,5 +210,7 @@
 	"prepare_for_offline": "Prepare for offline use",
 	"prepare_for_offline_help": "Download everything needed to use the application offline. Downloads all models for all currently installed protocols.",
 	"start": "Start",
-	"card_size": "Images size"
+	"card_size": "Images size",
+	"sentence_join_or": "or",
+	"sentence_join_and": "and"
 }

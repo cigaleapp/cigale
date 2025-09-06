@@ -950,8 +950,8 @@
 				{#if showBoxesListHint}
 					<li class="boxes-list-hint">
 						<p>
-							{m.create_new_box_with_tools()}
-							<SentenceJoin items={creationTools} key={(t) => t.name} final="ou">
+							{@html m.create_new_box_with_tools()}
+							<SentenceJoin items={creationTools} key={(t) => t.name} final={m.sentence_join_or()}>
 								{#snippet children({ icon: Icon, help, shortcut })}
 									<Tooltip text={help} keyboard={shortcut}>
 										<Icon />
@@ -1231,11 +1231,11 @@
 	.boxes li {
 		display: flex;
 		gap: 1em;
-		align-items: center;
 	}
 
 	.boxes li:not(.boxes-list-hint) {
 		padding: 0.5em 1em;
+		align-items: center;
 	}
 
 	.boxes li.unfocused {

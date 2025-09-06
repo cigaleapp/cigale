@@ -1,4 +1,6 @@
 <script generics="T">
+	import { m } from './paraglide/messages';
+
 	/**
 	 * @typedef Props
 	 * @type {object}
@@ -9,7 +11,7 @@
 	 */
 
 	/** @type {Props} */
-	const { final = 'et', items, children, key = (_, i) => i } = $props();
+	const { final = m.sentence_join_and(), items, children, key = (_, i) => i } = $props();
 </script>
 
 {#each items as item, i (key(item, i))}

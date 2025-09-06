@@ -209,5 +209,7 @@
 	"prepare_for_offline": "Préparation hors-ligne",
 	"prepare_for_offline_help": "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.",
 	"start": "Démarrer",
-	"card_size": "Taille des images"
+	"card_size": "Taille des images",
+	"sentence_join_or": "ou",
+	"sentence_join_and": "et"
 }
