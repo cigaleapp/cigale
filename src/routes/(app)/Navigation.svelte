@@ -160,7 +160,7 @@
 				{/if}
 			</a>
 			<IconNext></IconNext>
-			<a href="#/import" data-testid="goto-import" aria-disabled={!uiState.currentProtocolId}>
+			<a href="#/import" data-testid="goto-import" aria-disabled={!uiState.currentProtocol}>
 				{m.import_tab()}
 				{#if path == '/import'}
 					<div class="line"></div>
@@ -169,9 +169,11 @@
 			<IconNext></IconNext>
 			<div class="with-inference-indicator">
 				<a
-					href="#/crop/{uiState.imageOpenedInCropper}"
+					href="#/crop/{page.route.id === '/(app)/crop/[image]'
+						? ''
+						: uiState.imageOpenedInCropper}"
 					data-testid="goto-crop"
-					aria-disabled={!uiState.currentProtocolId || !hasImages}
+					aria-disabled={!uiState.currentProtocol || !hasImages}
 				>
 					{m.crop_tab()}
 					{#if path.startsWith('/crop')}
@@ -192,7 +194,7 @@
 			>
 				<a
 					href="#/classify"
-					aria-disabled={!uiState.currentProtocolId ||
+					aria-disabled={!uiState.currentProtocol ||
 						!hasImages ||
 						(uiState.processing.task === 'detection' && uiState.processing.progress < 1)}
 					data-testid="goto-classify"
