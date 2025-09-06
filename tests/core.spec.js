@@ -88,11 +88,7 @@ for (const offline of [false, true]) {
 			// Go to classification view
 			await goToTab(page, 'classify');
 			// Wait for inference
-			await page.waitForTimeout(1000);
-			await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
-				timeout: 10_000
-			});
-			await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
+			await waitForLoadingEnd(page);
 
 			// Check for classification results in sidepanel
 			await page.getByTestId('first-observation-card').click();
