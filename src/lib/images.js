@@ -119,10 +119,11 @@ if (import.meta.vitest) {
 }
 
 /**
- * @param {Protocol} protocol
+ * @param {Protocol|undefined} protocol
  * @param {string|null} imageFileId
  */
 export function imageIsAnalyzed(protocol, imageFileId) {
+	if (!protocol) return false;
 	if (!imageFileId) return false;
 	if (uiState.erroredImages.has(imageFileId)) return true;
 	return tables.Image.state.some((img) => img.fileId === imageFileId);
