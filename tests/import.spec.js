@@ -356,7 +356,7 @@ test('can extract EXIF date from an image', async ({ page }) => {
 
 	expect(metadataValues).toMatchObject({
 		...metadataValues,
-		shoot_date: '2025-04-25T14:38:36'
+		shoot_date: '2025-04-25T12:38:36'
 	});
 });
 
@@ -381,7 +381,7 @@ test('can extract EXIF GPS data from an image', async ({ page }) => {
 
 	expect(metadataValues).toMatchObject({
 		...metadataValues,
-		shoot_date: '2008-10-22T18:29:49',
+		shoot_date: '2008-10-22T16:29:49',
 		shoot_location: {
 			latitude: 43.46715666666389,
 			longitude: 11.885394999997223

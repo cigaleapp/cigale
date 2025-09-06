@@ -78,7 +78,10 @@ export default defineConfig({
 		trace: 'on-first-retry',
 
 		// Right now, all tests assume French language.
-		locale: 'fr-FR'
+		locale: 'fr-FR',
+
+		// Ensure no TZ issues for assertions that depend on time
+		timezoneId: 'Etc/UTC'
 	},
 
 	/* Configure projects for major browsers */
