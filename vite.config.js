@@ -14,6 +14,7 @@ export default defineConfig({
 		includeSource: ['src/**/*.{js,ts}', 'scripts/generate-json-schemas.js'],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
+		setupFiles: ['./vitest-setup.js'],
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
 			reportOnFailure: true

@@ -1,8 +1,8 @@
 import { type } from 'arktype';
 import * as dates from 'date-fns';
 import { idComparator, Schemas } from './database.js';
-import { getLocale } from './paraglide/runtime.js';
 import { m } from './paraglide/messages.js';
+import { getLocale, setLocale } from './paraglide/runtime.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -636,7 +636,7 @@ function toNumber(type, values) {
 /**
  * Returns a human-friendly string for a metadata value.
  * Used for e.g. CSV exports.
- * @param {DB.Metadata} metadata the metadata definition
+ * @param {Pick<DB.Metadata, 'type'>} metadata the metadata definition
  * @param {DB.MetadataValue['value']} value the value of the metadata
  * @param {string} [valueLabel] the label of the value, if applicable (e.g. for enums)
  */
@@ -676,6 +676,85 @@ export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 		default:
 			return value.toString();
 	}
+}
+
+if (import.meta.vitest) {
+	const { expect, test, describe, beforeEach } = import.meta.vitest;
+
+	describe('metadataPrettyValue', () => {
+		describe('in french', () => {
+			beforeEach(async () => {
+				const { fr } = await import('date-fns/locale');
+				dates.setDefaultOptions({ locale: fr });
+				setLocale('fr', { reload: false });
+			});
+
+			test('booleans', () => {
+				expect(metadataPrettyValue({ type: 'boolean' }, true)).toBe('Oui');
+				expect(metadataPrettyValue({ type: 'boolean' }, false)).toBe('Non');
+			});
+
+			test('dates', () => {
+				expect(metadataPrettyValue({ type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
+					'01/02/2023, 15:04:05'
+				);
+			});
+
+			test('floats', () => {
+				expect(metadataPrettyValue({ type: 'float' }, 12012.34)).toBe('12 012,34');
+			});
+
+			test('bounding boxes', () => {
+				expect(metadataPrettyValue({ type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
+					'Boîte de (1, 2) à (4, 6)'
+				);
+			});
+		});
+
+		describe('in english', () => {
+			beforeEach(async () => {
+				const { enUS } = await import('date-fns/locale');
+				dates.setDefaultOptions({ locale: enUS });
+				setLocale('en', { reload: false });
+			});
+
+			test('booleans', () => {
+				expect(metadataPrettyValue({ type: 'boolean' }, true)).toBe('Yes');
+				expect(metadataPrettyValue({ type: 'boolean' }, false)).toBe('No');
+			});
+
+			test('dates', () => {
+				expect(metadataPrettyValue({ type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
+					'02/01/2023, 3:04:05 PM'
+				);
+			});
+
+			test('bounding boxes', () => {
+				expect(metadataPrettyValue({ type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
+					'Box from (1, 2) to (4, 6)'
+				);
+			});
+
+			test('floats', () => {
+				expect(metadataPrettyValue({ type: 'float' }, 12012.34)).toBe('12,012.34');
+			});
+		});
+
+		test('enums', () => {
+			expect(metadataPrettyValue({ type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
+			expect(metadataPrettyValue({ type: 'enum' }, 'value2')).toBe('value2');
+		});
+
+		test('locations', () => {
+			expect(metadataPrettyValue({ type: 'location' }, { latitude: 12.34, longitude: 56.78 })).toBe(
+				'12.34, 56.78'
+			);
+		});
+
+		test('integers', () => {
+			expect(metadataPrettyValue({ type: 'integer' }, 12012)).toBe('12012');
+		});
+	});
 }
 
 /**
