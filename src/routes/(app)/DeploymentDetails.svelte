@@ -1,8 +1,11 @@
 <script>
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import Datetime from '$lib/Datetime.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { m } from '$lib/paraglide/messages.js';
+
+	const buildCommit = import.meta.env.buildCommit;
 
 	/**
 	 * @typedef {object} Props
@@ -57,6 +60,13 @@
 		</p>
 	{:then { title, user, body }}
 		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
+		{#if buildCommit}
+			{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/commits/${buildCommit}`).then( (res) => res.json() )}
+				<span class="build-date">{m.loading_text()}</span>
+			{:then { commit: { committer: { date } } }}
+				<Datetime value={date} show="both" />
+			{/await}
+		{/if}
 		<p>{m.preview_deployment_is_for_loaded_first_part()}</p>
 		<ul>
 			<li>
