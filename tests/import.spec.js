@@ -12,7 +12,8 @@ import {
 	listTable,
 	readdirTreeSync,
 	toast,
-	tooltipOf
+	tooltipOf,
+	waitForLoadingEnd
 } from './utils';
 
 test.describe('correct results.zip', () => {
@@ -29,6 +30,9 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('has the correct bounding boxes', async ({ page }) => {
+		await goToTab(page, 'crop');
+		await waitForLoadingEnd(page);
+
 		/**
 		 *
 		 * @param {string} id
@@ -51,7 +55,7 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('does not re-analyze when going to classify tab', async ({ page }) => {
-		await page.getByRole('link', { name: 'Classifier' }).click();
+		await goToTab(page, 'classify');
 		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
 		});
@@ -232,9 +236,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, '20K-gray.jpeg');
-	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 30_000
-	});
+	await waitForLoadingEnd(page);
 	await page.getByTestId('first-observation-card').hover();
 	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
 	await expect(tooltip).toHaveText(/L'image est trop grande pour être traitée/);
