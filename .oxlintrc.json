@@ -1,0 +1,32 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"rules": {
+		"no-restricted-imports": [
+			"error",
+			{
+				"paths": [
+					{
+						"name": "$lib/utils.js",
+						"importNames": ["logexpr"],
+						"message": "You left out a debug log"
+					},
+					{
+						"name": "src/lib/utils.js",
+						"importNames": ["logexpr"],
+						"message": "You left out a debug log"
+					},
+					{
+						"name": "./utils.js",
+						"importNames": ["logexpr"],
+						"message": "You left out a debug log"
+					},
+					{
+						"name": "./lib/utils.js",
+						"importNames": ["logexpr"],
+						"message": "You left out a debug log"
+					}
+				]
+			}
+		]
+	}
+}
