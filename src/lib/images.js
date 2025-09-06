@@ -6,6 +6,7 @@ import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { m } from './paraglide/messages';
 import { clamp, unique } from './utils';
+import { imageLimits } from './inference_utils';
 
 /**
  * @import { Image, Protocol } from './database.js';
@@ -272,6 +273,11 @@ export async function resizeToMaxSize({ source }) {
 		);
 	});
 	const { width, height } = originalImage;
+
+	if (width * height > imageLimits.maxResolutionInMP * 1e6) {
+		throw new Error(m.image_too_large(imageLimits));
+	}
+
 	const originalCanvas = document.createElement('canvas');
 	originalCanvas.width = width;
 	originalCanvas.height = height;

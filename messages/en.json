@@ -184,7 +184,7 @@
 	"error_importing_file": "Error importing file {filename}: {error}",
 	"file_format_not_supported_yet": "{format} files are not yet supported",
 	"file_format_not_supported": "File format {format} is not supported",
-	"image_too_large": "Image is too large to be processed",
+	"image_too_large": "Image is too large to be processed. Image must be less than {maxResolutionInMP} Megapixels and {maxMemoryUsageInMB} MB.",
 	"queued": "Queued",
 	"change_sort_direction_to_asc": "Change sort direction to ascending",
 	"change_sort_direction_to_desc": "Change sort direction to descending",

@@ -4,6 +4,14 @@ import * as ort from 'onnxruntime-web';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 
 /**
+ * @satisfies {import('@jimp/js-jpeg').DecodeJpegOptions}
+ */
+export const imageLimits = /** @type {const} */ ({
+	maxMemoryUsageInMB: 1024,
+	maxResolutionInMP: 100
+});
+
+/**
  * @typedef {import('onnxruntime-web')} ort
  */
 
@@ -92,9 +100,7 @@ export async function loadToTensor(
 		let buffer = buffers[f];
 
 		const imageTensor = await Jimp.fromBuffer(buffer, {
-			'image/jpeg': {
-				maxMemoryUsageInMB: 1024
-			}
+			'image/jpeg': imageLimits
 		});
 
 		if (crop) {

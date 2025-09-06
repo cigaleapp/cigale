@@ -23,6 +23,12 @@ export async function processImageFile(file, id) {
 	}
 
 	const originalBytes = await file.arrayBuffer();
+
+	if (originalBytes.byteLength > imageLimits.maxMemoryUsageInMB * Math.pow(2, 20)) {
+		toasts.error(m.image_too_large(imageLimits));
+		return;
+	}
+
 	const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
 
 	await storeImageBytes({
