@@ -99,7 +99,7 @@ export async function deleteObservation(
  * @param {Array<typeof import('$lib/database').Schemas.Image.inferIn>} arg0.images
  * @param {typeof import('$lib/database').Schemas.Observation.inferIn} arg0.observation
  * @param {import('$lib/database').Protocol} arg0.protocol
- * @return {string} computed default label for the new observation
+ * @returns {string} computed default label for the new observation
  */
 function defaultObservationLabel({ images, observation, protocol }) {
 	return (
@@ -110,7 +110,7 @@ function defaultObservationLabel({ images, observation, protocol }) {
 
 /**
  * @param {Array<{ filename: string} | {label: string}>} parts
- * @return {string} computed fallback label for the new observation
+ * @returns {string} computed fallback label for the new observation
  */
 function fallbackObservationLabel(parts) {
 	for (const part of parts) {

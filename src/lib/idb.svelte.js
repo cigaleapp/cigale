@@ -272,8 +272,8 @@ export async function drop(table, id) {
  *
  * @param {TableName} tableName
  * @param {string} [index]
- * @returns {AsyncGenerator<typeof Tables[TableName]['infer'], void, unknown>}
  * @template {keyof typeof Tables} TableName
+ * @yields {typeof Tables[TableName]['infer']}
  */
 export async function* iterator(tableName, index = undefined) {
 	const db = await openDatabase();

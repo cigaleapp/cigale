@@ -11,13 +11,16 @@ describe('filepath templates', () => {
 	 * @returns
 	 */
 	function expectRendered(template, data) {
+		// oxlint-disable valid-expect
 		if (template instanceof ArkErrors) {
+			// oxlint-disable-next-line no-conditional-expect
 			return expect(template);
 		}
 
 		// TODO we should use fakerjs to generate fake Image data and pass that to template.render instead of using any object
 		// @ts-expect-error
 		return expect(template.render(data));
+		// oxlint-enable valid-expect
 	}
 
 	test('renders simple variables', () => {
@@ -26,7 +29,7 @@ describe('filepath templates', () => {
 		expectRendered(template, { id: '123' }).toBe('123.jpg');
 	});
 
-	test.skip('fails with malformed templates', () => {
+	test.todo('fails with malformed templates', () => {
 		const template = FilepathTemplate('{{id}');
 		expect(template).toBeInstanceOf(ArkErrors);
 		expect(template).toHaveProperty('message', 'Invalid template: {{id}');

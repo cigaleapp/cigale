@@ -8,6 +8,7 @@ import * as dates from 'date-fns';
 import * as dateFnsLocales from 'date-fns/locale';
 import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '../../web-worker-procedures';
+// oxlint-disable-next-line import/default
 import WebWorker from '../../web-worker.js?worker';
 
 export async function load() {

@@ -18,7 +18,7 @@ import { imageLimits } from './inference_utils';
  * Used for tests
  * @param {string} id
  * @param {string} fileId
- * @return {Image}
+ * @returns {Image}
  */
 const sampleImage = (id, fileId) => ({
 	id,
@@ -347,7 +347,7 @@ if (import.meta.vitest) {
 	/**
 	 * @param {string} id
 	 * @param {string} fileId
-	 * @return {Image}
+	 * @returns {Image}
 	 */
 	const img = (id, fileId) => ({
 		id,

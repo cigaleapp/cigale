@@ -388,7 +388,7 @@ if (import.meta.vitest) {
 /**
  * @template {any[]} T
  * @param  {...ToIterables<T>} arrays
- * @returns {Generator<T>}
+ * @yields {T}
  */
 export function* zip(...arrays) {
 	// Get iterators for all of the iterables.

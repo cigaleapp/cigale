@@ -1,6 +1,10 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["import", "jsdoc", "node", "promise", "vitest"],
 	"rules": {
+		"jsdoc/check-tag-names": "off",
+		"require-property-description": "off",
+		"no-defaults": "off",
 		"no-console": [
 			"error",
 			{
