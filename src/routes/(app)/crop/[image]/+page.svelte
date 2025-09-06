@@ -1138,11 +1138,8 @@
 		position: relative;
 		user-select: none;
 		width: 100%;
-		--cell-size: calc(100% / 16 - 0.125px);
-		background-size: var(--cell-size) var(--cell-size);
-		background-image:
-			linear-gradient(to right, var(--gray) 1px, transparent 1px),
-			linear-gradient(to bottom, var(--gray) 1px, transparent 1px);
+		border-right: 1px solid var(--gray);
+		border-left: 1px solid var(--gray);
 	}
 
 	.behind-image {
