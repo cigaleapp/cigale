@@ -211,5 +211,6 @@
 	"start": "Démarrer",
 	"card_size": "Taille des images",
 	"sentence_join_or": "ou",
-	"sentence_join_and": "et"
+	"sentence_join_and": "et",
+	"toggle_debug_mode": "Activer/Désactiver le debug mode"
 }

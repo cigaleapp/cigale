@@ -8,15 +8,13 @@ import { imageId, resizeToMaxSize, storeImageBytes } from '$lib/images';
 import { m } from '$lib/paraglide/messages.js';
 import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte';
-import { formatISO } from 'date-fns';
+import * as dates from 'date-fns';
 
 /**
- * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
  * @param {File} file
  * @param {string} id
- * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
  */
-export async function processImageFile(swarpc, file, id, cancellers) {
+export async function processImageFile(file, id) {
 	if (!uiState.currentProtocol) {
 		toasts.error(m.no_protocol_selected());
 		return;
@@ -35,27 +33,17 @@ export async function processImageFile(swarpc, file, id, cancellers) {
 		height
 	});
 
-	if (uiState.cropInferenceAvailable) {
-		await inferBoundingBoxes(swarpc, cancellers, {
-			id,
-			bytes: resizedBytes,
-			filename: file.name,
-			contentType: file.type,
-			dimensions: { width, height }
-		});
-	} else {
-		await tables.Image.set({
-			id: imageId(id, 0),
-			filename: file.name,
-			addedAt: formatISO(Date.now()),
-			contentType: file.type,
-			dimensions: { width, height },
-			fileId: id,
-			metadata: {}
-		});
-	}
+	await tables.Image.set({
+		id: imageId(id, 0),
+		filename: file.name,
+		addedAt: dates.formatISO(Date.now()),
+		contentType: file.type,
+		dimensions: { width, height },
+		fileId: id,
+		metadata: {}
+	});
 
-	// We have to remove the file from the processing files list once the Image database object has been created, which happens inside inferBoundingBoxes() (inference available) or directly here (inference unavailable).
+	// We have to remove the file from the processing files list once the Image database object has been created
 	uiState.processing.removeFile(id);
 
 	await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
@@ -67,15 +55,10 @@ export async function processImageFile(swarpc, file, id, cancellers) {
 /**
  * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
  * @param {undefined | Map<string, import("swarpc").CancelablePromise["cancel"]>} cancellers
- * @param {object} file
- * @param {ArrayBuffer} file.bytes
- * @param {string} file.filename
- * @param {string} file.contentType
- * @param {string} file.id
- * @param {DimensionsInput} file.dimensions
+ * @param {string} fileId
  * @returns {Promise<void>}
  */
-async function inferBoundingBoxes(swarpc, cancellers, file) {
+export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	if (!uiState.currentProtocol) {
 		toasts.error(m.no_protocol_selected());
 		return;
@@ -92,14 +75,22 @@ async function inferBoundingBoxes(swarpc, cancellers, file) {
 		return;
 	}
 
-	console.log('Inferring bounding boxes for', file.filename);
+	const image = await tables.Image.get(imageId(fileId, 0));
+	if (!image) {
+		throw new Error(`Image ${fileId} not found in database`);
+	}
+	if (!image.fileId) {
+		throw new Error(`Image ${fileId} has no associated ImageFile in database`);
+	}
+
+	console.log('Inferring bounding boxes for', image.filename);
 
 	const inference = swarpc.inferBoundingBoxes.cancelable({
-		fileId: file.id,
+		fileId: image.fileId,
 		taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
 	});
 
-	cancellers?.set(file.id, inference.cancel);
+	cancellers?.set(image.fileId, inference.cancel);
 
 	const { boxes, scores } = await inference.request.catch((error) => {
 		console.log('handling remote error', error);
@@ -116,15 +107,6 @@ async function inferBoundingBoxes(swarpc, cancellers, file) {
 	let [firstScore] = scores;
 
 	if (!firstBoundingBox || !firstScore) {
-		await tables.Image.set({
-			id: imageId(file.id, 0),
-			filename: file.filename,
-			addedAt: formatISO(Date.now()),
-			contentType: file.contentType,
-			dimensions: file.dimensions,
-			fileId: file.id,
-			metadata: {}
-		});
 		return;
 	}
 
@@ -135,12 +117,10 @@ async function inferBoundingBoxes(swarpc, cancellers, file) {
 
 	for (let i = 0; i < boxes.length; i++) {
 		await tables.Image.set({
-			id: imageId(file.id, i),
-			filename: file.filename,
-			addedAt: formatISO(Date.now()),
-			contentType: file.contentType,
-			dimensions: file.dimensions,
-			fileId: file.id,
+			...image,
+			id: imageId(image.fileId, i),
+			addedAt: dates.formatISO(i === 0 ? image.addedAt : Date.now()),
+			boundingBoxesAnalyzed: true,
 			metadata: {
 				[uiState.cropMetadataId]: {
 					value: JSON.stringify(toCropBox(boxes[i])),

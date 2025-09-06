@@ -1,5 +1,7 @@
+import * as dates from 'date-fns';
 import extract from 'extract-zip';
 import path from 'node:path';
+import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
@@ -10,10 +12,9 @@ import {
 	listTable,
 	readdirTreeSync,
 	toast,
-	tooltipOf
+	tooltipOf,
+	waitForLoadingEnd
 } from './utils';
-import { issue } from './annotations';
-import { compareAsc } from 'date-fns';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -29,6 +30,9 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('has the correct bounding boxes', async ({ page }) => {
+		await goToTab(page, 'crop');
+		await waitForLoadingEnd(page);
+
 		/**
 		 *
 		 * @param {string} id
@@ -41,7 +45,7 @@ test.describe('correct results.zip', () => {
 		}
 
 		const images = await listTable(page, 'Image').then((images) =>
-			images.sort((a, b) => compareAsc(a.addedAt, b.addedAt))
+			images.sort((a, b) => dates.compareAsc(a.addedAt, b.addedAt))
 		);
 
 		await expectBoundingBoxesCount(images[0].fileId ?? '', 1);
@@ -51,7 +55,7 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('does not re-analyze when going to classify tab', async ({ page }) => {
-		await page.getByRole('link', { name: 'Classifier' }).click();
+		await goToTab(page, 'classify');
 		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
 		});
@@ -232,9 +236,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, '20K-gray.jpeg');
-	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 30_000
-	});
+	await waitForLoadingEnd(page);
 	await page.getByTestId('first-observation-card').hover();
 	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
 	await expect(tooltip).toHaveText(/L'image est trop grande pour être traitée/);

@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { Schemas } from '../src/lib/database.js';
 import path from 'node:path';
+import fr from '../messages/fr.json' with { type: 'json' };
 import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 
 /**
@@ -44,12 +45,22 @@ export async function importPhotos({ page, wait = true }, ...names) {
 	// In case import order matters
 	for (const name of names) {
 		await fileInput?.setInputFiles(Array.isArray(name) ? name.map(nameToPath) : nameToPath(name));
+		if (wait) await waitUntilLastAppears(name);
 	}
 
-	if (wait) {
-		let lastItem = names.at(-1);
-		if (Array.isArray(lastItem)) lastItem = lastItem.at(-1);
-		if (!lastItem) throw new Error('No last item to wait for');
+	if (wait) await waitUntilLastAppears(names);
+
+	/**
+	 *
+	 * @param {string | Array<string | string[]>} names
+	 */
+	async function waitUntilLastAppears(names) {
+		let lastItem = names;
+		while (Array.isArray(lastItem)) {
+			// @ts-expect-error
+			lastItem = lastItem.at(-1);
+			if (!lastItem) throw new Error('No last item to wait for');
+		}
 
 		await expect(page.getByText(addDotJpeg(lastItem), { exact: true })).toBeVisible({
 			timeout: 20_000
@@ -390,12 +401,7 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
-	if (waitForLoading) {
-		await expect(page.getByText(/Analyse|En attente…/).first()).toBeVisible({
-			timeout: 30_000
-		});
-		await expect(page.getByText(/Analyse|En attente…/)).toHaveCount(0, { timeout: 30_000 });
-	}
+	if (waitForLoading) await waitForLoadingEnd(page);
 }
 
 /**
@@ -514,4 +520,23 @@ export function modal(page, modalTitle) {
  */
 export function openSettings(page) {
 	return page.getByTestId('settings-button').click();
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {{ begin?: number, finish?: number } | number} [timeout]
+ */
+export async function waitForLoadingEnd(page, timeout = 30_000) {
+	const timeouts =
+		typeof timeout === 'number'
+			? { begin: timeout, finish: timeout }
+			: { begin: 30_000, finish: 120_000, ...timeout };
+
+	const loadingPattern = new RegExp([fr.loading_text, fr.queued, fr.analyzing].join('|'));
+	await expect(page.getByText(loadingPattern).first()).toBeVisible({
+		timeout: timeouts.begin
+	});
+
+	await expect(page.getByText(loadingPattern)).toHaveCount(0, { timeout: timeouts.finish });
 }
