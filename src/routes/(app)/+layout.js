@@ -4,15 +4,15 @@ import { m } from '$lib/paraglide/messages.js';
 import { getLocale } from '$lib/paraglide/runtime';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
+import * as dates from 'date-fns';
+import * as dateFnsLocales from 'date-fns/locale';
 import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '../../web-worker-procedures';
 import WebWorker from '../../web-worker.js?worker';
-import * as dateFnsLocales from 'date-fns/locale';
-import * as dateFns from 'date-fns';
 
 export async function load() {
 	document.documentElement.lang = getLocale();
-	dateFns.setDefaultOptions({
+	dates.setDefaultOptions({
 		locale: {
 			fr: dateFnsLocales.fr,
 			en: dateFnsLocales.enUS,

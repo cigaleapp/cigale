@@ -1,14 +1,14 @@
 <script>
-	import { format, parse } from 'date-fns';
+	import * as dates from 'date-fns';
 	import IconError from '~icons/ph/exclamation-mark-fill';
 	import IconDecrement from '~icons/ph/minus';
 	import IconIncrement from '~icons/ph/plus';
 	import { isType } from './metadata';
 	import MetadataCombobox from './MetadataCombobox.svelte';
+	import { m } from './paraglide/messages.js';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
-	import { safeJSONParse, round } from './utils';
-	import { m } from './paraglide/messages.js';
+	import { round, safeJSONParse } from './utils';
 
 	/**
 	 * @typedef {object} Props
@@ -134,14 +134,14 @@
 				() => {
 					if (!isType('date', type, value)) return undefined;
 					if (value === undefined) return undefined;
-					return format(value, 'yyyy-MM-dd');
+					return dates.format(value, 'yyyy-MM-dd');
 				},
 				(newValue) => {
 					if (newValue === undefined) {
 						onblur?.(undefined);
 						return undefined;
 					}
-					onblur?.(parse(newValue, 'yyyy-MM-dd', new Date()));
+					onblur?.(dates.parse(newValue, 'yyyy-MM-dd', new Date()));
 					return newValue;
 				}
 			}

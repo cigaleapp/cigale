@@ -1,5 +1,7 @@
+import * as dates from 'date-fns';
 import extract from 'extract-zip';
 import path from 'node:path';
+import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
@@ -12,8 +14,6 @@ import {
 	toast,
 	tooltipOf
 } from './utils';
-import { issue } from './annotations';
-import { compareAsc } from 'date-fns';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -41,7 +41,7 @@ test.describe('correct results.zip', () => {
 		}
 
 		const images = await listTable(page, 'Image').then((images) =>
-			images.sort((a, b) => compareAsc(a.addedAt, b.addedAt))
+			images.sort((a, b) => dates.compareAsc(a.addedAt, b.addedAt))
 		);
 
 		await expectBoundingBoxesCount(images[0].fileId ?? '', 1);

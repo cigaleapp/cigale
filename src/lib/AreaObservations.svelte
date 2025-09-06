@@ -14,7 +14,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 <script>
 	import { uiState } from '$lib/state.svelte';
-	import * as datefns from 'date-fns';
+	import * as dates from 'date-fns';
 	import { onMount } from 'svelte';
 	import CardObservation from './CardObservation.svelte';
 	import { DragSelect } from './dragselect.svelte';
@@ -136,7 +136,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				case 'filename':
 					return a.title.localeCompare(b.title);
 				case 'date':
-					return datefns.compareAsc(a.addedAt, b.addedAt);
+					return dates.compareAsc(a.addedAt, b.addedAt);
 			}
 		})
 	);
