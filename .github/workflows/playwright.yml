@@ -60,6 +60,8 @@ jobs:
         with:
           name: build
           path: ./
+      - name: Remove skipped tests for better sharding balance
+        run: rm tests/dbdump.spec.js tests/readme.spec.js
       - name: Run Playwright tests
         run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
