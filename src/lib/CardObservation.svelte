@@ -111,13 +111,24 @@
 						{#if ondelete || onretry}
 							<section class="errored-actions">
 								{#if ondelete}
-									<ButtonInk dangerous onclick={ondelete}>
+									<ButtonInk
+										dangerous
+										onclick={(e) => {
+											e.stopPropagation();
+											ondelete();
+										}}
+									>
 										<IconDelete />
 										{m.delete()}
 									</ButtonInk>
 								{/if}
 								{#if !loading && onretry}
-									<ButtonInk onclick={onretry}>
+									<ButtonInk
+										onclick={(e) => {
+											e.stopPropagation();
+											onretry();
+										}}
+									>
 										<IconRetry />
 										{m.retry()}
 									</ButtonInk>

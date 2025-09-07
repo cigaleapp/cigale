@@ -3,7 +3,7 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import * as idb from '$lib/idb.svelte.js';
-	import { deleteImageFile, imageFileIds, imageIdToFileId, imageIsAnalyzed } from '$lib/images';
+	import { deleteImageFile, imageFileIds, imageIsAnalyzed } from '$lib/images';
 	import { deleteObservation } from '$lib/observations.js';
 	import { m } from '$lib/paraglide/messages.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
@@ -58,7 +58,8 @@
 		loadingText={m.analyzing()}
 		errors={uiState.erroredImages}
 		onretry={(id) => {
-			detectMore([imageIdToFileId(id)]);
+			uiState.erroredImages.delete(id);
+			detectMore([id]);
 		}}
 		ondelete={async (id) => {
 			cancelTask(id, 'Cancelled by user');
