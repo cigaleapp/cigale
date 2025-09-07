@@ -86,8 +86,8 @@
 			return;
 		}
 
-		await data.swarpc
-			.loadModel(
+		await data.swarpc.loadModel
+			.broadcast(
 				{
 					protocolId: uiState.currentProtocol.id,
 					request: settings.model,

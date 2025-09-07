@@ -21,20 +21,19 @@ export async function load() {
 		}[getLocale()]
 	});
 
+	const parallelism = Math.ceil(navigator.hardwareConcurrency / 3);
+
 	setLoadingMessage(m.loading_neural_worker());
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
-		nodes: 1,
+		nodes: parallelism,
 		localStorage: {
 			PARAGLIDE_LOCALE: getLocale()
 		}
 	});
 
 	setLoadingMessage(m.initializing_worker_db());
-	await swarpc.init({
-		databaseName,
-		databaseRevision
-	});
+	await swarpc.init.broadcast({ databaseName, databaseRevision });
 
 	try {
 		setLoadingMessage(m.initializing_database());
@@ -49,7 +48,7 @@ export async function load() {
 		});
 	}
 
-	return { swarpc };
+	return { swarpc, parallelism };
 }
 
 /**

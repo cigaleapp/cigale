@@ -565,7 +565,7 @@ if (import.meta.vitest) {
 }
 
 /**
- *
+ * Semi-open range [start=0, end)
  * @param {number} startOrEnd
  * @param {number|undefined} [end]
  * @returns {number[]}

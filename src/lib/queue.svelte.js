@@ -1,10 +1,10 @@
 import { classifyImage } from './classification.svelte';
-import { errorMessage } from './i18n';
+import { countThing, errorMessage } from './i18n';
 import { imageFileId } from './images';
 import { inferBoundingBoxes, processImageFile } from './import.svelte';
 import { importResultsZip } from './results.svelte';
 import { uiState } from './state.svelte';
-import { isZip } from './utils';
+import { isZip, range } from './utils.js';
 
 /**
  * @type {undefined | ProcessingQueue}
@@ -24,12 +24,15 @@ let processingQueue;
 
 class ProcessingQueue {
 	/**
-	 * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
-	 * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
+	 * @param {object} param0
+	 * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} param0.swarpc
+	 * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [param0.cancellers]
+	 * @param {number} [param0.parallelism]
 	 */
-	constructor(swarpc, cancellers) {
+	constructor({ swarpc, cancellers, parallelism = 1 }) {
 		this.swarpc = swarpc;
 		this.cancellers = cancellers;
+		this.parallelism = parallelism;
 		/**
 		 * @type {ProcessingQueueTask[]}
 		 */
@@ -41,17 +44,44 @@ class ProcessingQueue {
 		$effect(() => {
 			this.start().finally(() => this.logWarning(null, 'Processing queue mainloop exited'));
 		});
+
+		$effect(() => {
+			this.log(null, 'Progress is', uiState.processing.done, '/', uiState.processing.total);
+		});
 	}
 
 	async start() {
-		this.log(null, 'Starting processing queue mainloop');
+		this.log(
+			null,
+			'Starting processing queue mainloop with up to',
+			countThing('concurrent task', this.parallelism)
+		);
 		while (true) {
 			while (this.tasks.length > 0) {
 				await new Promise((resolve, reject) => {
 					this.abortController.signal.addEventListener('abort', () => {
 						resolve(undefined);
 					});
-					this.pop().then(resolve).catch(reject);
+
+					Promise.allSettled(range(this.parallelism).map(async () => this.pop())).then(
+						(results) => {
+							if (results.some((r) => r.status === 'rejected')) {
+								reject(results.filter((r) => r.status === 'rejected').map((r) => r.reason));
+							} else {
+								resolve(undefined);
+							}
+
+							// TODO do this granularly at each this.pop(),
+							// without triggering race conditions.
+							// Might require using an atomic int, but the int has
+							// to be Svelte-reactive too? hmmm...
+							uiState.processing.done += results.length;
+
+							if (this.tasks.length === 0) {
+								this.#drained();
+							}
+						}
+					);
 				});
 			}
 
@@ -206,22 +236,21 @@ class ProcessingQueue {
 			uiState.erroredImages.set(this.taskSubjectId(task), errorMessage(error));
 		} finally {
 			uiState.loadingImages.delete(this.taskSubjectId(task));
-			uiState.processing.done++;
-		}
-
-		if (this.tasks.length === 0) {
-			this.#drained();
 		}
 	}
 }
 
 /**
  * Initialize the processing queue. Must be called in a root $effect (during component initialization).
- * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
- * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
+ * @param {object} arg0
+ * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} arg0.swarpc
+ * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [arg0.cancellers]
  */
-export function initializeProcessingQueue(swarpc, cancellers) {
-	processingQueue ??= new ProcessingQueue(swarpc, cancellers);
+export function initializeProcessingQueue(arg0) {
+	processingQueue ??= new ProcessingQueue({
+		parallelism: Math.ceil(navigator.hardwareConcurrency / 2),
+		...arg0
+	});
 }
 
 /**

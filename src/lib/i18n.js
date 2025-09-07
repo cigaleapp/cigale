@@ -32,6 +32,16 @@ if (import.meta.vitest) {
 }
 
 /**
+ *
+ * @param {string} name
+ * @param {number} count
+ * @param {Record<string, string>} [plurals]
+ */
+export function countThing(name, count, plurals) {
+	return countThings({ [name]: count }, plurals);
+}
+
+/**
  * Converts a number between 0 and 1 to a percentage string.
  * @param {number} value Number between 0 and 1
  * @param {number} [decimals=0] Number of decimal places to include in the output

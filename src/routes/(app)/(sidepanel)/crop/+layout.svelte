@@ -18,8 +18,8 @@
 		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
 		if (!cropModel) return;
 
-		await data.swarpc
-			.loadModel(
+		await data.swarpc.loadModel
+			.broadcast(
 				{
 					protocolId: uiState.currentProtocol.id,
 					request: cropModel,

@@ -25,8 +25,9 @@
 	import PrepareForOffline from './PrepareForOffline.svelte';
 
 	const { children, data } = $props();
+	const { swarpc, parallelism } = $derived(data);
 
-	initializeProcessingQueue(data.swarpc, cancellers);
+	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
 	export const snapshot = {
 		capture() {
@@ -115,7 +116,7 @@
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
 
 <Navigation
-	swarpc={data.swarpc}
+	{swarpc}
 	{openKeyboardShortcuts}
 	{openPrepareForOfflineUse}
 	progress={uiState.processing.progress}
