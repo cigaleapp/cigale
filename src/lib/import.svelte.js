@@ -110,6 +110,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	let [firstScore] = scores;
 
 	if (!firstBoundingBox || !firstScore) {
+		await tables.Image.update(image.id, 'boundingBoxesAnalyzed', true);
 		return;
 	}
 
