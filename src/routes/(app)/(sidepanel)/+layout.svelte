@@ -3,7 +3,7 @@
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImageFile } from '$lib/images';
+	import { deleteImageFile, imageFileId } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
@@ -11,7 +11,7 @@
 		storeMetadataValue
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
-	import { importMore } from '$lib/queue.svelte.js';
+	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -76,6 +76,7 @@
 			{},
 			async (tx) => {
 				for (const id of uiState.selection) {
+					cancelTask(id, 'Cancelled by user');
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
 					await deleteImageFile(id, tx, true);
 				}
@@ -101,6 +102,16 @@
 				for (const id of uiState.selection) {
 					uiState.erroredImages.delete(id);
 				}
+			}
+		},
+		'x f': {
+			help: 'Spawn a loading image',
+			debug: true,
+			do() {
+				uiState.processing.files.push({
+					id: imageFileId(),
+					name: 'Debug image.jpeg'
+				});
 			}
 		},
 		'$mod+u': {
