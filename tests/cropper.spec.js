@@ -75,9 +75,11 @@ test.describe('Cropper view', () => {
 				await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 				await page.keyboard.press('Escape');
 				await page.waitForURL((u) => u.hash === '#/crop');
-				await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
-				await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
-				await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+				await expect(
+					page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
+				).toBeVisible();
+				await expect(page.getByRole('main').getByText('cyan.jpeg', { exact: true })).toBeVisible();
+				await expect(page.getByRole('main').getByText('leaf.jpeg', { exact: true })).toBeVisible();
 			});
 		}
 	});

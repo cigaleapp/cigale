@@ -56,7 +56,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	let dragselect;
 
 	onMount(() => {
-		if (oncardclick) return;
 		if (!imagesContainer) return;
 
 		dragselect?.destroy();
@@ -77,7 +76,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	});
 
 	$effect(() => {
-		if (oncardclick) return;
 		selection = [...new Set(dragselect?.selection ?? [])];
 	});
 

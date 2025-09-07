@@ -11,6 +11,7 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { nonnull } from '$lib/utils.js';
+	import { watch } from 'runed';
 	import { onMount } from 'svelte';
 
 	seo({ title: 'Recadrer' });
@@ -40,13 +41,20 @@
 				.filter((fileId) => !imageIsAnalyzed(uiState.currentProtocol, fileId))
 		);
 	});
+
+	watch(
+		() => uiState.imagePreviouslyOpenedInCropper,
+		() => {
+			uiState.setSelection?.([uiState.imagePreviouslyOpenedInCropper]);
+		}
+	);
 </script>
 
 <section class="observations">
 	<AreaObservations
 		{images}
+		bind:selection={uiState.selection}
 		sort={getSettings().gallerySort}
-		highlight={uiState.imagePreviouslyOpenedInCropper}
 		loadingText={m.analyzing()}
 		errors={uiState.erroredImages}
 		onretry={(id) => {
