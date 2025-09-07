@@ -1,19 +1,21 @@
 import { test, expect } from './fixtures';
-import { chooseDefaultProtocol, goToTab, importPhotos, openSettings } from './utils';
+import { chooseDefaultProtocol, goToTab, importPhotos, openSettings, setSettings } from './utils';
 import fr from '../messages/fr.json' with { type: 'json' };
 
 test.describe('sorting', () => {
 	test.beforeEach(async ({ page }) => {
 		await chooseDefaultProtocol(page);
 		await goToTab(page, 'import');
+		await setSettings({ page }, { showTechnicalMetadata: true });
 
 		// Import real images from fixtures (these files must exist)
-		await importPhotos({ page }, 'leaf.jpeg', 'cyan.jpeg', 'lil-fella.jpeg');
-
-		// Wait for the images to appear
-		await expect(page.getByText('leaf.jpeg')).toBeVisible();
-		await expect(page.getByText('cyan.jpeg')).toBeVisible();
-		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
+		await importPhotos(
+			// wait two seconds between each photo to ensure unique values for addedAt
+			{ page, additionalWaitTime: 1_100 },
+			'leaf.jpeg',
+			'cyan.jpeg',
+			'lil-fella.jpeg'
+		);
 	});
 
 	/**

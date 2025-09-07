@@ -75,9 +75,11 @@ test.describe('Cropper view', () => {
 				await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 				await page.keyboard.press('Escape');
 				await page.waitForURL((u) => u.hash === '#/crop');
-				await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
-				await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
-				await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+				await expect(
+					page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
+				).toBeVisible();
+				await expect(page.getByRole('main').getByText('cyan.jpeg', { exact: true })).toBeVisible();
+				await expect(page.getByRole('main').getByText('leaf.jpeg', { exact: true })).toBeVisible();
 			});
 		}
 	});
@@ -526,14 +528,14 @@ test.describe('Cropper view', () => {
 			await expect(image).toHaveCSS('scale', '1');
 
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+			await checkImageTransforms(page, 1.728, 254.761, 140.073);
 
 			await page.mouse.down({ button: 'middle' });
 			await zoomAt(page, 0, 50, 50);
 			await page.mouse.up({ button: 'middle' });
 			await page.waitForTimeout(200);
 
-			await checkImageTransforms(page, 1.728, 182.668, 46.98);
+			await checkImageTransforms(page, 1.728, 181.761, 45.0734);
 
 			// Make sure no box was created
 			await expect(page.getByText(/Boîte #\d+/)).toHaveCount(1);
@@ -542,18 +544,18 @@ test.describe('Cropper view', () => {
 		test('recalls zoom and pan between image changes', async ({ page }) => {
 			const images = await imagesByName(page);
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+			await checkImageTransforms(page, 1.728, 254.761, 140.073);
 
 			await page.keyboard.press('ArrowRight');
 			await page.waitForURL((u) => u.hash === `#/crop/${images.withExifGps.fileId}`);
 
 			await zoomAt(page, 40, 150, 150);
-			await checkImageTransforms(page, 1.44, 124.723, 73.3824);
+			await checkImageTransforms(page, 1.44, 124.186, 73.3824);
 
 			await page.keyboard.press('ArrowLeft');
 			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 
-			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+			await checkImageTransforms(page, 1.728, 254.761, 140.073);
 		});
 	});
 });

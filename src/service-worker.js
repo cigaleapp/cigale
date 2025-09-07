@@ -50,7 +50,7 @@ self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 
 		if (cacheName === MODELS_CACHE) {
 			const cache = await caches.open(MODELS_CACHE);
-			console.log(`Serving ${url} from models cache`);
+			console.debug(`Serving ${url} from models cache`);
 			const response = await cache.match(url.href);
 
 			if (response) {

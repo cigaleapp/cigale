@@ -5,6 +5,7 @@
 	import Logo from './Logo.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import IconDelete from '~icons/ph/trash';
+	import IconRetry from '~icons/ph/arrow-counter-clockwise';
 	import IconImage from '~icons/ph/image';
 	import { tooltip } from './tooltips';
 	import CroppedImg from './CroppedImg.svelte';
@@ -18,6 +19,7 @@
 	 * @property {() => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
 	 * @property {() => void} [ondelete]
+	 * @property {() => void} [onretry]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
@@ -34,12 +36,15 @@
 	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
 	 * @property {string} [statusText] - text to show when loading and progress is -1
 	 * @property {string} [id]
+	 * @property {Date} [addedAt]
 	 */
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
 	const {
 		onclick,
 		onstacksizeclick,
+		ondelete,
+		onretry,
 		title,
 		image,
 		loading,
@@ -51,7 +56,6 @@
 		stacksize = 1,
 		boundingBoxes = [],
 		applyBoundingBoxes = false,
-		ondelete,
 		...rest
 	} = $props();
 
@@ -74,7 +78,11 @@
 	class:stacked
 	data-selectable={selectable ? '' : undefined}
 	{...rest}
-	use:tooltip={errored ? statusText : isDebugMode() ? rest.id : undefined}
+	use:tooltip={errored
+		? statusText
+		: isDebugMode()
+			? `${rest.id} @ ${rest.addedAt?.toISOString()}`
+			: undefined}
 >
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
@@ -100,12 +108,31 @@
 								{percent(loading)}
 							{/if}
 						</span>
-						{#if ondelete}
+						{#if ondelete || onretry}
 							<section class="errored-actions">
-								<ButtonInk onclick={ondelete}>
-									<IconDelete />
-									{m.delete()}
-								</ButtonInk>
+								{#if ondelete}
+									<ButtonInk
+										dangerous
+										onclick={(e) => {
+											e.stopPropagation();
+											ondelete();
+										}}
+									>
+										<IconDelete />
+										{m.delete()}
+									</ButtonInk>
+								{/if}
+								{#if !loading && onretry}
+									<ButtonInk
+										onclick={(e) => {
+											e.stopPropagation();
+											onretry();
+										}}
+									>
+										<IconRetry />
+										{m.retry()}
+									</ButtonInk>
+								{/if}
 							</section>
 						{/if}
 					</div>
@@ -383,7 +410,9 @@
 	.errored-actions {
 		margin-top: 0.75em;
 		font-size: 0.4em;
-		--fg: var(--fg-error);
-		--bg-hover: var(--bg-error);
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5em;
 	}
 </style>

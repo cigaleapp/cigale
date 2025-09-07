@@ -1,7 +1,7 @@
 import { classifyImage } from './classification.svelte';
 import { errorMessage } from './i18n';
 import { imageFileId } from './images';
-import { processImageFile } from './import.svelte';
+import { inferBoundingBoxes, processImageFile } from './import.svelte';
 import { importResultsZip } from './results.svelte';
 import { uiState } from './state.svelte';
 import { isZip } from './utils';
@@ -13,9 +13,11 @@ let processingQueue;
 
 /**
  * @typedef {object} ProcessingQueueTask
+ * @property {object} [importing]
+ * @property {File} importing.file
+ * @property {string} importing.id
  * @property {object} [detection]
- * @property {File} detection.file
- * @property {string} detection.id
+ * @property {string} detection.fileId
  * @property {object} [classification]
  * @property {string} classification.imageId
  */
@@ -65,7 +67,7 @@ class ProcessingQueue {
 	 * @param {...any} args
 	 */
 	log(id, message, ...args) {
-		console.log(`[ProcessingQueue] ${id ? id + ': ' : ''}${message}`, ...args);
+		console.debug(`[ProcessingQueue] ${id ? id + ': ' : ''}${message}`, ...args);
 	}
 
 	/**
@@ -96,15 +98,19 @@ class ProcessingQueue {
 	 * @param {ProcessingQueueTask} task
 	 */
 	taskSubjectId(task) {
+		if (task.importing) {
+			return task.importing.id;
+		}
+
 		if (task.detection) {
-			return task.detection.id;
+			return task.detection.fileId;
 		}
 
 		if (task.classification) {
 			return task.classification.imageId;
 		}
 
-		throw new Error('Task must have either detection or classification');
+		throw new Error('Task must have either importing, detection or classification');
 	}
 
 	/**
@@ -135,10 +141,10 @@ class ProcessingQueue {
 
 		uiState.queuedImages.add(this.taskSubjectId(task));
 
-		if (task.detection)
+		if (task.importing)
 			uiState.processing.files.push({
-				name: task.detection.file.name,
-				id: task.detection.id
+				name: task.importing.file.name,
+				id: task.importing.id
 			});
 	}
 
@@ -177,18 +183,20 @@ class ProcessingQueue {
 		uiState.queuedImages.delete(this.taskSubjectId(task));
 		uiState.loadingImages.add(this.taskSubjectId(task));
 
-		const { detection, classification } = task;
+		const { detection, classification, importing } = task;
 
-		uiState.processing.task = detection ? 'detection' : 'classification';
+		uiState.processing.task = importing ? 'import' : detection ? 'detection' : 'classification';
 
 		try {
-			if (detection) {
-				const { file, id } = detection;
+			if (importing) {
+				const { file, id } = importing;
 				if (isZip(file.type)) {
 					await importResultsZip(file, id, uiState.currentProtocolId);
 				} else {
-					await processImageFile(this.swarpc, file, id, this.cancellers);
+					await processImageFile(file, id);
 				}
+			} else if (detection) {
+				await inferBoundingBoxes(this.swarpc, this.cancellers, detection.fileId);
 			} else if (classification) {
 				await classifyImage(this.swarpc, classification.imageId, this.cancellers);
 			}
@@ -223,8 +231,7 @@ export function initializeProcessingQueue(swarpc, cancellers) {
  * @throws {Error} if the processing queue is not initialized
  */
 export function cancelTask(subjectId, reason) {
-	if (!processingQueue)
-		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
+	assertQueueInitiliazed(processingQueue);
 
 	processingQueue.cancel(subjectId, reason);
 }
@@ -234,11 +241,22 @@ export function cancelTask(subjectId, reason) {
  * @param {File[]} files
  */
 export function importMore(files) {
-	if (!processingQueue)
-		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
+	assertQueueInitiliazed(processingQueue);
 
 	for (const file of files) {
-		processingQueue.push({ detection: { file, id: imageFileId() } });
+		processingQueue.push({ importing: { file, id: imageFileId() } });
+	}
+}
+
+/**
+ * Add detection tasks to the processing queue.
+ * @param {string[]} fileIds
+ */
+export function detectMore(fileIds) {
+	assertQueueInitiliazed(processingQueue);
+
+	for (const fileId of fileIds) {
+		processingQueue.push({ detection: { fileId } });
 	}
 }
 
@@ -247,12 +265,21 @@ export function importMore(files) {
  * @param  {string[]} imageIds
  */
 export function classifyMore(imageIds) {
-	if (!processingQueue)
-		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
+	assertQueueInitiliazed(processingQueue);
 
 	for (const imageId of imageIds) {
 		processingQueue.push({
 			classification: { imageId }
 		});
 	}
+}
+
+/**
+ *
+ * @param {ProcessingQueue | undefined} queue
+ * @returns {asserts queue is ProcessingQueue}
+ */
+function assertQueueInitiliazed(queue) {
+	if (!queue)
+		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
 }

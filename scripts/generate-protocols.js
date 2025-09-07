@@ -62,7 +62,7 @@ for (const gbifId of allGbifIds) {
 
 options.sort((a, b) => a.label.localeCompare(b.label));
 
-console.log('');
+console.info('');
 
 const oldProtocol = await readFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
@@ -295,7 +295,7 @@ writeFileSync(
 	)
 );
 
-console.log(
+console.info(
 	'===============================================================\n' +
 		`Generated cigale protocol ${protocol.id} v${protocol.version}\n` +
 		'==============================================================='

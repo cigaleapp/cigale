@@ -202,11 +202,11 @@ async function addToOptions(protocols, id, key, label, description = '') {
  * @property {string} rank
  * @property {string} origin
  * @property {string} taxonomicStatus
- * @property {} nomenclaturalStatus
+ * @property {unknown} nomenclaturalStatus
  * @property {string} remarks
  * @property {number} numDescendants
  * @property {string} lastCrawled
  * @property {string} lastInterpreted
- * @property {} issues
+ * @property {unknown} issues
  * @property {string} class
  */

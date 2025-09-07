@@ -650,6 +650,7 @@ describe('NewBoundingBox', () => {
 		expect(bb.limits).toEqual({ x: 0, y: 0, width: 100, height: 100 });
 	});
 	describe('.ready', () => {
+		// oxlint-disable no-standalone-expect
 		test('createMode off', () => {
 			const bb = createBox('off');
 			expect(bb.ready).toBe(false);
@@ -685,5 +686,6 @@ describe('NewBoundingBox', () => {
 				expect(bb.ready).toBe(true);
 			})();
 		});
+		// oxlint-enable no-standalone-expect
 	});
 });

@@ -1,6 +1,8 @@
 import { type } from 'arktype';
-import * as datefns from 'date-fns';
+import * as dates from 'date-fns';
 import { idComparator, Schemas } from './database.js';
+import { m } from './paraglide/messages.js';
+import { getLocale, setLocale } from './paraglide/runtime.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -67,10 +69,22 @@ export function getMetadataValue(image, type, metadataId) {
  */
 export function serializeMetadataValue(value) {
 	return JSON.stringify(
-		value instanceof Date && datefns.isValid(value)
-			? datefns.format(value, "yyyy-MM-dd'T'HH:mm:ss")
+		value instanceof Date && dates.isValid(value)
+			? dates.format(value, "yyyy-MM-dd'T'HH:mm:ss")
 			: value
 	);
+}
+
+/**
+ * Serialize a record of metadata values for storing in the database.
+ * @param {DB.MetadataValues} values
+ * @returns {typeof import('$lib/database').Schemas.MetadataValues.inferIn}
+ */
+export function serializeMetadataValues(values) {
+	return mapValues(values, ({ value, ...rest }) => ({
+		...rest,
+		value: serializeMetadataValue(value)
+	}));
 }
 
 /**
@@ -124,7 +138,7 @@ export async function storeMetadataValue({
 		Object.entries(newValue.alternatives).filter(([key]) => key !== newValue.value)
 	);
 
-	console.log(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
+	console.debug(`Store metadata ${metadataId} = `, value, ` in ${subjectId}`, newValue);
 
 	const metadata = await db.get('Metadata', metadataId);
 	if (!metadata) throw new Error(`Métadonnée inconnue avec l'ID ${metadataId}`);
@@ -226,7 +240,7 @@ export async function deleteMetadataValue({
 
 	if (!image && !observation) throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 
-	console.log(`Delete metadata ${metadataId} in ${subjectId}`);
+	console.debug(`Delete metadata ${metadataId} in ${subjectId}`);
 	if (image) {
 		delete image.metadata[metadataId];
 		db.put('Image', image);
@@ -304,7 +318,6 @@ export async function addValueLabels(values, metadataOptions) {
  * @param {DB.Observation[]} observations
  */
 export async function mergeMetadataFromImagesAndObservations(db, images, observations) {
-	console.log('merging metadata from', { images, observations });
 	const mergedValues = await mergeMetadataValues(
 		db,
 		images.map((img) => img.metadata)
@@ -364,8 +377,6 @@ export async function mergeMetadataValues(db, values) {
 			};
 	}
 
-	console.log('merged metadata values to', output);
-
 	return output;
 }
 
@@ -382,7 +393,6 @@ function mergeMetadata(definition, values) {
 	 * example: [ { alternatives: { a: 0.8, b: 0.2 } }, { alternatives: { a: 0.6, b: 0.4 } } ]
 	 * turns into: { a: merger([0.8, 0.6]), b: merger([0.2, 0.4]) }
 	 */
-	console.log('Merging metadata', definition, values);
 
 	/**
 	 * @param {(probabilities: number[]) => number} merger
@@ -622,17 +632,17 @@ function toNumber(type, values) {
 /**
  * Returns a human-friendly string for a metadata value.
  * Used for e.g. CSV exports.
- * @param {DB.Metadata} metadata the metadata definition
+ * @param {Pick<DB.Metadata, 'type'>} metadata the metadata definition
  * @param {DB.MetadataValue['value']} value the value of the metadata
  * @param {string} [valueLabel] the label of the value, if applicable (e.g. for enums)
  */
 export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 	switch (metadata.type) {
 		case 'boolean':
-			return value ? 'Oui' : 'Non';
+			return value ? m.metadata_value_yes() : m.metadata_value_no();
 
 		case 'date':
-			return value instanceof Date ? Intl.DateTimeFormat('fr-FR').format(value) : value.toString();
+			return value instanceof Date ? dates.format(value, 'Ppp') : value.toString();
 
 		case 'enum':
 			return valueLabel || value.toString();
@@ -653,15 +663,94 @@ export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 				h
 			} = type({ x: 'number', y: 'number', h: 'number', w: 'number' }).assert(value);
 
-			return `Boîte de (${x1}, ${y1}) à (${x1 + w}, ${y1 + h})`;
+			return m.metadata_value_boundingbox({ x1, y1, x2: x1 + w, y2: y1 + h });
 		}
 
 		case 'float':
-			return Intl.NumberFormat('fr-FR').format(type('number').assert(value));
+			return Intl.NumberFormat(getLocale()).format(type('number').assert(value));
 
 		default:
 			return value.toString();
 	}
+}
+
+if (import.meta.vitest) {
+	const { expect, test, describe, beforeEach } = import.meta.vitest;
+
+	describe('metadataPrettyValue', () => {
+		describe('in french', () => {
+			beforeEach(async () => {
+				const { fr } = await import('date-fns/locale');
+				dates.setDefaultOptions({ locale: fr });
+				setLocale('fr', { reload: false });
+			});
+
+			test('booleans', () => {
+				expect(metadataPrettyValue({ type: 'boolean' }, true)).toBe('Oui');
+				expect(metadataPrettyValue({ type: 'boolean' }, false)).toBe('Non');
+			});
+
+			test('dates', () => {
+				expect(metadataPrettyValue({ type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
+					'01/02/2023, 15:04:05'
+				);
+			});
+
+			test('floats', () => {
+				expect(metadataPrettyValue({ type: 'float' }, 12012.34)).toBe('12 012,34');
+			});
+
+			test('bounding boxes', () => {
+				expect(metadataPrettyValue({ type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
+					'Boîte de (1, 2) à (4, 6)'
+				);
+			});
+		});
+
+		describe('in english', () => {
+			beforeEach(async () => {
+				const { enUS } = await import('date-fns/locale');
+				dates.setDefaultOptions({ locale: enUS });
+				setLocale('en', { reload: false });
+			});
+
+			test('booleans', () => {
+				expect(metadataPrettyValue({ type: 'boolean' }, true)).toBe('Yes');
+				expect(metadataPrettyValue({ type: 'boolean' }, false)).toBe('No');
+			});
+
+			test('dates', () => {
+				expect(metadataPrettyValue({ type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
+					'02/01/2023, 3:04:05 PM'
+				);
+			});
+
+			test('bounding boxes', () => {
+				expect(metadataPrettyValue({ type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
+					'Box from (1, 2) to (4, 6)'
+				);
+			});
+
+			test('floats', () => {
+				expect(metadataPrettyValue({ type: 'float' }, 12012.34)).toBe('12,012.34');
+			});
+		});
+
+		test('enums', () => {
+			expect(metadataPrettyValue({ type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
+			expect(metadataPrettyValue({ type: 'enum' }, 'value2')).toBe('value2');
+		});
+
+		test('locations', () => {
+			expect(metadataPrettyValue({ type: 'location' }, { latitude: 12.34, longitude: 56.78 })).toBe(
+				'12.34, 56.78'
+			);
+		});
+
+		test('integers', () => {
+			expect(metadataPrettyValue({ type: 'integer' }, 12012)).toBe('12012');
+		});
+	});
 }
 
 /**

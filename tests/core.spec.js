@@ -1,21 +1,22 @@
-import { expect, test } from './fixtures.js';
 import extract from 'extract-zip';
 import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { Analysis } from '../src/lib/schemas/results.js';
-import {
-	setSettings,
-	chooseDefaultProtocol,
-	readdirTreeSync,
-	goToTab,
-	mockProtocolSourceURL,
-	modal,
-	importProtocol
-} from './utils.js';
 import { readFile } from 'node:fs/promises';
-import fr from '../messages/fr.json' with { type: 'json' };
+import * as path from 'node:path';
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import fr from '../messages/fr.json' with { type: 'json' };
+import { Analysis } from '../src/lib/schemas/results.js';
+import { expect, test } from './fixtures.js';
+import {
+	chooseDefaultProtocol,
+	goToTab,
+	importProtocol,
+	mockProtocolSourceURL,
+	modal,
+	readdirTreeSync,
+	setSettings,
+	waitForLoadingEnd
+} from './utils.js';
 
 for (const offline of [false, true]) {
 	test(
@@ -51,6 +52,9 @@ for (const offline of [false, true]) {
 			await fileInput?.setInputFiles('./tests/fixtures/lil-fella.jpeg');
 			await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
+			await goToTab(page, 'crop');
+			await waitForLoadingEnd(page);
+
 			// Check for inferred bounding box
 			const boundingBoxStyle = Object.fromEntries(
 				await page
@@ -84,11 +88,7 @@ for (const offline of [false, true]) {
 			// Go to classification view
 			await goToTab(page, 'classify');
 			// Wait for inference
-			await page.waitForTimeout(1000);
-			await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
-				timeout: 10_000
-			});
-			await expect(page.getByText('Analyse…')).toHaveCount(0, { timeout: 10_000 });
+			await waitForLoadingEnd(page);
 
 			// Check for classification results in sidepanel
 			await page.getByTestId('first-observation-card').click();

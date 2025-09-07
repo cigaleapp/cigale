@@ -48,6 +48,18 @@ async function openDatabase() {
 	return _db;
 }
 
+let locale = 'fr';
+
+// TODO: remove once https://github.com/gwennlbh/swarpc/issues/32 is resolved
+// @ts-expect-error
+globalThis.localStorage = {
+	/** @param {string} key */
+	getItem(key) {
+		if (key === 'PARAGLIDE_LOCALE') return locale;
+		throw new Error(`Cannot get ${key} from virtual localStorage`);
+	}
+};
+
 const swarp = Swarp.Server(PROCEDURES);
 
 /**
@@ -77,7 +89,8 @@ function inferenceModelId(protocolId, request) {
 	].join('|');
 }
 
-swarp.init(async ({ databaseName, databaseRevision }) => {
+swarp.init(async ({ databaseName, databaseRevision, locale: loc }) => {
+	locale = loc;
 	databaseParams = { name: databaseName, revision: databaseRevision };
 });
 
@@ -85,11 +98,11 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 	const id = inferenceModelId(protocolId, request);
 	const existingSession = inferenceSessions.get(task);
 	if (existingSession && existingSession.id === id) {
-		console.log(`Model ${task} already loaded with ID ${id}`);
+		console.debug(`Model ${task} already loaded with ID ${id}`);
 		return true; // Model is already loaded
 	}
 
-	console.log(`Loading model for task ${task} with ID ${id}`);
+	console.debug(`Loading model for task ${task} with ID ${id}`);
 	/** @type {InferenceSession} */
 	const session = {
 		id,
@@ -111,7 +124,7 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 			.then((text) => text.split(/\r?\n/).filter(Boolean));
 	}
 
-	console.log(`Model ${task} loaded successfully with ID ${id}`);
+	console.debug(`Model ${task} loaded successfully with ID ${id}`);
 
 	inferenceSessions.set(task, session);
 	return true;
@@ -120,18 +133,13 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 swarp.isModelLoaded(async (task) => inferenceSessions.has(task));
 
 swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
-	let aborted = false;
-	tools.abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
 	const session = inferenceSessions.get('detection')?.onnx;
 	if (!session) {
 		throw new Error('Modèle de détection non chargé');
 	}
 
 	const db = await openDatabase();
-	if (aborted) return { boxes: [], scores: [] };
+	tools.abortSignal?.throwIfAborted();
 
 	const file = await db.get('ImageFile', fileId);
 	if (!file) {
@@ -174,7 +182,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 			image.metadata[metadataIds.cropbox]?.value ?? { x: 0.5, y: 0.5, w: 1, h: 1 }
 		);
 
-	console.log('Classifying image', image.id, 'with cropbox', cropbox);
+	console.debug('Classifying image', image.id, 'with cropbox', cropbox);
 
 	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
 	const img = await loadToTensor([file.bytes], {
@@ -412,7 +420,6 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 			let originalBytes = undefined;
 			/** @type {Uint8Array} */
 			let croppedBytes;
-			notify({ warning: ['exif-write-error', { filename: file.filename }] });
 
 			try {
 				if (contentType === 'image/jpeg') {

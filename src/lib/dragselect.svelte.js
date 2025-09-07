@@ -85,8 +85,6 @@ export class DragSelect {
 		this.#instance.subscribe('DS:select', ({ item }) => {
 			// If it doesn't have a [data-id], we can't add it to the selection, do nothing
 			if (!item.dataset.id) return;
-			// If it's loading (has [data-loading]), do nothing: can't select a non-loaded item
-			if (item.dataset.loading) return;
 			// Add the id of the selected item to the selection
 			this.selection.push(item.dataset.id);
 		});

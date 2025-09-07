@@ -32,7 +32,7 @@ export function getSettings() {
  * @template {keyof Settings} Key
  */
 export async function setSetting(key, value) {
-	console.log('setSetting', key, value);
+	console.debug('setSetting', key, value);
 	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
 
 	if (!current) {

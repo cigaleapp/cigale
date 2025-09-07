@@ -1,9 +1,10 @@
 import { expect } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { Schemas } from '../src/lib/database.js';
 import path from 'node:path';
 import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import fr from '../messages/fr.json' with { type: 'json' };
+import { Schemas } from '../src/lib/database.js';
 
 /**
  * @param {unknown} value
@@ -27,9 +28,10 @@ function safeJSONParse(value) {
  * @param {object} ctx
  * @param {Page} ctx.page
  * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
+ * @param {number} [ctx.additionalWaitTime] wait additional milliseconds between each import (when names.length > 1)
  * @param {...(string|string[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
  */
-export async function importPhotos({ page, wait = true }, ...names) {
+export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }, ...names) {
 	if (!names) throw new Error('No file names provided');
 
 	/** @param {string} name */
@@ -39,21 +41,52 @@ export async function importPhotos({ page, wait = true }, ...names) {
 	const nameToPath = (name) => path.join('./tests/fixtures', addDotJpeg(name));
 
 	await expect(page.getByText('(.zip)')).toBeVisible();
-	const fileInput = await page.$("input[type='file']");
 
 	// In case import order matters
+	let i = -1;
 	for (const name of names) {
-		await fileInput?.setInputFiles(Array.isArray(name) ? name.map(nameToPath) : nameToPath(name));
+		i++;
+
+		const batch = Array.isArray(name) ? name.map(nameToPath) : nameToPath(name);
+
+		// Once we have at least a card, the file input from the dropzone disappears
+		if (i === 0) {
+			const fileInput = await page.$("input[type='file']");
+			await fileInput?.setInputFiles(batch);
+		} else {
+			const filePicker = page.waitForEvent('filechooser');
+			await page.getByRole('button', { name: fr.import_other_images }).click();
+			await filePicker.then((picker) => {
+				picker.setFiles(batch);
+			});
+		}
+
+		if (wait) await waitUntilLastAppears(name);
 	}
 
-	if (wait) {
-		let lastItem = names.at(-1);
-		if (Array.isArray(lastItem)) lastItem = lastItem.at(-1);
-		if (!lastItem) throw new Error('No last item to wait for');
+	/**
+	 *
+	 * @param {string | Array<string | string[]>} names
+	 */
+	async function waitUntilLastAppears(names) {
+		let lastItem = names;
+		while (Array.isArray(lastItem)) {
+			// @ts-expect-error
+			lastItem = lastItem.at(-1);
+			if (!lastItem) throw new Error('No last item to wait for');
+		}
 
-		await expect(page.getByText(addDotJpeg(lastItem), { exact: true })).toBeVisible({
+		const element = page.getByText(addDotJpeg(lastItem), { exact: true });
+		await expect(element).toBeVisible({
 			timeout: 20_000
 		});
+		await expect(element).not.toHaveText(loadingText, {
+			timeout: 20_000
+		});
+
+		if (additionalWaitTime) {
+			await page.waitForTimeout(additionalWaitTime);
+		}
 	}
 }
 
@@ -251,7 +284,7 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 				)
 			}
 		});
-		console.log('Image updated, refreshing DB', { id, metadata });
+		console.info('Image updated, refreshing DB', { id, metadata });
 		if (refreshDB) await window.refreshDB();
 	}, /** @type {const} */ ([id, metadata, refreshDB]));
 }
@@ -390,12 +423,7 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
 	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
-	if (waitForLoading) {
-		await expect(page.getByText(/Analyse|En attente…/).first()).toBeVisible({
-			timeout: 30_000
-		});
-		await expect(page.getByText(/Analyse|En attente…/)).toHaveCount(0, { timeout: 30_000 });
-	}
+	if (waitForLoading) await waitForLoadingEnd(page);
 }
 
 /**
@@ -437,7 +465,7 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 			for (const [tableName, entries] of orderedTables) {
 				await window.DB.clear(tableName);
 				for (const entry of entries) {
-					console.log('[loadDatabaseDump] Adding entry to', tableName, entry);
+					console.info('[loadDatabaseDump] Adding entry to', tableName, entry);
 					await window.DB.put(tableName, entry);
 				}
 			}
@@ -455,6 +483,7 @@ export const browserConsole = {
 	 */
 	async log(page, ...args) {
 		await page.evaluate(
+			// oxlint-disable-next-line no-console
 			(args) => console.log(...args),
 			args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg))
 		);
@@ -469,6 +498,23 @@ export async function tooltipOf(page, locator) {
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, { timeout: 1_000 });
 	const tippyId = await locator.getAttribute('aria-describedby');
 	return page.locator(`#${tippyId}`);
+}
+
+/**
+ * Hovers the locator, then asserts that it has a tooltip with content matching `content`.
+ * Falls back to the element's data-tooltip-content attribute if the tooltip is not found.
+ * @param {Page} page
+ * @param {import('@playwright/test').Locator} locator
+ * @param {string|RegExp} content
+ */
+export async function expectTooltipContent(page, locator, content) {
+	await locator.hover({ force: true });
+	try {
+		const tooltip = await tooltipOf(page, locator);
+		await expect(tooltip).toHaveText(content);
+	} catch {
+		await expect(locator).toHaveAttribute('data-tooltip-content', content);
+	}
 }
 
 /**
@@ -514,4 +560,51 @@ export function modal(page, modalTitle) {
  */
 export function openSettings(page) {
 	return page.getByTestId('settings-button').click();
+}
+
+export const loadingText = new RegExp(
+	[fr.loading_text, fr.queued, fr.analyzing].map(RegExp.escape).join('|')
+);
+
+/**
+ *
+ * @param {Page} page
+ * @param {{ begin?: number, finish?: number } | number} [timeout]
+ */
+export async function waitForLoadingEnd(page, timeout = 30_000) {
+	const timeouts =
+		typeof timeout === 'number'
+			? { begin: timeout, finish: timeout }
+			: { begin: 30_000, finish: 120_000, ...timeout };
+
+	await expect(page.getByText(loadingText).first()).toBeVisible({
+		timeout: timeouts.begin
+	});
+
+	await expect(page.getByText(loadingText)).toHaveCount(0, { timeout: timeouts.finish });
+}
+
+/**
+ * @param {Page} page
+ * @param {string} nameOrDescription
+ */
+export function sidepanelMetadataSectionFor(page, nameOrDescription) {
+	return page
+		.getByTestId('sidepanel')
+		.locator('section')
+		.filter({ hasText: nameOrDescription })
+		.first();
+}
+
+/**
+ * @param {Page} page
+ * @param {string} key
+ * @param {string} [observationLabel='leaf']
+ */
+export async function metadataValueInDatabase(page, key, observationLabel = 'leaf') {
+	return await getMetadataOverridesOfObservation({
+		page,
+		protocolId: 'io.github.cigaleapp.kitchensink',
+		observation: observationLabel
+	}).then((values) => values[key]);
 }

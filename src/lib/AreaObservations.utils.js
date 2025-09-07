@@ -36,13 +36,14 @@ import { imagesByImageFile } from './images';
  * @param {(imageOrFileId: Image | string) => boolean} param2.isLoaded function to determine if an item has been loaded. For observations, they are loaded iff all their images are loaded.
  * @param {(imageOrFileId: Image | string) => boolean} param2.isQueued function to determine if an item is waiting on the processing queue. For observations, they are queued iff all their images are loaded.
  * @param {(fileId: string|undefined) => boolean} [param2.showBoundingBoxes] show bounding boxes. If false, the bounding boxes will be applied instead.
+ * @param {(fileId: string|undefined) => boolean} [param2.applyBoundingBoxes] apply bounding boxes.
  * @returns {CardObservation[]}
  */
 export function toAreaObservationProps(
 	imageFileIds,
 	images,
 	observations,
-	{ isLoaded, isQueued, showBoundingBoxes }
+	{ isLoaded, isQueued, showBoundingBoxes, applyBoundingBoxes }
 ) {
 	/**
 	 *
@@ -52,6 +53,7 @@ export function toAreaObservationProps(
 	const previewURL = (item) =>
 		uiState.getPreviewURL(typeof item === 'string' ? item : item?.fileId);
 	showBoundingBoxes ??= () => true;
+	applyBoundingBoxes ??= () => true;
 	const imagesOfFiles = imagesByImageFile(imageFileIds);
 	return (
 		[
@@ -73,8 +75,9 @@ export function toAreaObservationProps(
 						index: i,
 						stacksize: 1,
 						loading: isLoaded(fileId) ? undefined : isQueued(fileId) ? -Infinity : +Infinity,
-						applyBoundingBoxes: !showBoundingBoxes(fileId),
-						boundingBoxes: boxes ?? []
+						applyBoundingBoxes: !showBoundingBoxes(fileId) && applyBoundingBoxes(fileId),
+						boundingBoxes:
+							showBoundingBoxes(fileId) || applyBoundingBoxes(fileId) ? (boxes ?? []) : []
 					});
 				}),
 			// Keep images that are not part of any observation and don't have their fileId in imageFileIds
@@ -86,6 +89,12 @@ export function toAreaObservationProps(
 						!observations.some((observation) => observation.images.includes(img.id))
 				)
 				.map((img, i) => {
+					const boxes = applyBoundingBoxes(img.fileId ?? undefined)
+						? 'apply'
+						: showBoundingBoxes(img.fileId ?? undefined)
+							? 'show'
+							: 'none';
+
 					const box = uiState.cropMetadataValueOf(img);
 					return /**  @satisfies {CardObservation} */ ({
 						image: previewURL(img) ?? '',
@@ -95,8 +104,8 @@ export function toAreaObservationProps(
 						index: imageFileIds.length + i,
 						stacksize: 1,
 						loading: isLoaded(img) ? undefined : isQueued(img) ? -Infinity : +Infinity,
-						applyBoundingBoxes: !showBoundingBoxes(img.fileId ?? undefined),
-						boundingBoxes: box ? [toTopLeftCoords(box.value)] : []
+						applyBoundingBoxes: boxes === 'apply',
+						boundingBoxes: box && boxes !== 'none' ? [toTopLeftCoords(box.value)] : []
 					});
 				}),
 			...observations.map((observation, i) => {
@@ -111,6 +120,12 @@ export function toAreaObservationProps(
 					.filter((metadata) => metadata !== undefined)
 					.map(({ value }) => toTopLeftCoords(value));
 
+				const boxes = applyBoundingBoxes(firstImage?.fileId ?? undefined)
+					? 'apply'
+					: showBoundingBoxes(firstImage?.fileId ?? undefined)
+						? 'show'
+						: 'none';
+
 				/**  @satisfies {CardObservation} */
 				return {
 					addedAt: observation.addedAt,
@@ -120,8 +135,8 @@ export function toAreaObservationProps(
 					index: imageFileIds.length + images.length + i,
 					id: observation.id,
 					stacksize: imagesOfObservation.length,
-					applyBoundingBoxes: !showBoundingBoxes(firstImage?.fileId ?? undefined),
-					boundingBoxes: firstImage?.fileId ? (boundingBoxes ?? []) : [],
+					applyBoundingBoxes: boxes === 'apply',
+					boundingBoxes: boxes !== 'none' && firstImage?.fileId ? (boundingBoxes ?? []) : [],
 					loading: imagesOfObservation.every(isLoaded)
 						? undefined
 						: imagesOfObservation.every(isQueued)

@@ -4,6 +4,14 @@ import * as ort from 'onnxruntime-web';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 
 /**
+ * @satisfies {import('@jimp/js-jpeg').DecodeJpegOptions}
+ */
+export const imageLimits = /** @type {const} */ ({
+	maxMemoryUsageInMB: 1024,
+	maxResolutionInMP: 100
+});
+
+/**
  * @typedef {import('onnxruntime-web')} ort
  */
 
@@ -92,9 +100,7 @@ export async function loadToTensor(
 		let buffer = buffers[f];
 
 		const imageTensor = await Jimp.fromBuffer(buffer, {
-			'image/jpeg': {
-				maxMemoryUsageInMB: 1024
-			}
+			'image/jpeg': imageLimits
 		});
 
 		if (crop) {
@@ -129,7 +135,6 @@ export async function loadToTensor(
 		}
 	}
 
-	console.log('done !');
 	if (aborted) throw new Error('Operation aborted');
 	var tensor = new ort.Tensor('float32', float32Data, [
 		buffers.length,
@@ -217,8 +222,6 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
 	let bestBoxes = [];
 	/** @type {number[][]}  */
 	let bestScores = [];
-
-	console.log(output);
 
 	const suboutputSize = outputShape.length;
 	let boundingBoxesCount = output.length / suboutputSize;

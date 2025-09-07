@@ -388,7 +388,7 @@ if (import.meta.vitest) {
 /**
  * @template {any[]} T
  * @param  {...ToIterables<T>} arrays
- * @returns {Generator<T>}
+ * @yields {T}
  */
 export function* zip(...arrays) {
 	// Get iterators for all of the iterables.
@@ -721,6 +721,7 @@ export function isZip(contentType) {
  * @returns {T}
  */
 export function logexpr(tag, expr) {
+	// oxlint-disable-next-line no-console
 	console.log(`{${tag}}`, expr);
 	return expr;
 }

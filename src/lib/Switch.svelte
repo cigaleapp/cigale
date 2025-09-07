@@ -36,7 +36,6 @@
 	role="switch"
 	aria-checked={value}
 	onclick={() => {
-		console.log('clicked');
 		value = !value;
 		onchange(value);
 	}}

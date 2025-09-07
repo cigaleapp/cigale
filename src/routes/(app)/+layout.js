@@ -4,12 +4,22 @@ import { m } from '$lib/paraglide/messages.js';
 import { getLocale } from '$lib/paraglide/runtime';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
+import * as dates from 'date-fns';
+import * as dateFnsLocales from 'date-fns/locale';
 import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '../../web-worker-procedures';
+// oxlint-disable-next-line import/default
 import WebWorker from '../../web-worker.js?worker';
 
 export async function load() {
 	document.documentElement.lang = getLocale();
+	dates.setDefaultOptions({
+		locale: {
+			fr: dateFnsLocales.fr,
+			en: dateFnsLocales.enUS,
+			ja: dateFnsLocales.ja
+		}[getLocale()]
+	});
 
 	setLoadingMessage(m.loading_neural_worker());
 	const swarpc = Swarpc.Client(PROCEDURES, {
@@ -18,6 +28,7 @@ export async function load() {
 
 	setLoadingMessage(m.initializing_worker_db());
 	await swarpc.init({
+		locale: getLocale(),
 		databaseName,
 		databaseRevision
 	});

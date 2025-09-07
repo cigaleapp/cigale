@@ -10,4 +10,10 @@ declare global {
 			deserialize: (value: string) => any;
 		};
 	}
+
+	interface RegExpConstructor {
+		// Available since Node 24
+		// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/escape#browser_compatibility
+		escape: (str: string) => string;
+	}
 }

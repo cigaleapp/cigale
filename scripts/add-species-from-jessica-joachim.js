@@ -40,7 +40,7 @@ const notFoundCache = await fetch(
 	.then((data) => (Array.isArray(data) ? data : Object.keys(data)))
 	.catch(() => []);
 
-console.log(`Using not found cache with ${notFoundCache.length} entries.`);
+console.info(`Using not found cache with ${notFoundCache.length} entries.`);
 
 const newProtocol = { ...protocol };
 const species = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options;
@@ -194,7 +194,7 @@ async function parseAndDescribeSpecies(
 	const boldTextSplitPattern = /\*\*.*Identification.*(?:\*\* _?: | _?:\s*\*\*)/;
 	const headingSplitPattern = /#### (?:\*\*)?Identification(?:\*\*)?/;
 
-	// console.log(`Adding ${name} to the species, from ${file}`);
+	// console.info(`Adding ${name} to the species, from ${file}`);
 	let identificationHints = '';
 	try {
 		const parts = markdown.split(boldTextSplitPattern);

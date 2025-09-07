@@ -1,5 +1,5 @@
 import { match, type } from 'arktype';
-import { format } from 'date-fns';
+import * as dates from 'date-fns';
 import * as exifParser from 'exif-parser';
 import piexif from 'piexifjs';
 import { Schemas } from './database.js';
@@ -90,7 +90,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 	const exif = exifParser.create(buffer).enableImageSize(false).parse();
 
 	if (!exif) return {};
-	console.log({ extractionPlan, exif });
+	console.debug('Starting EXIF Extraction', { extractionPlan, exif });
 
 	const extract = match
 		.case(
@@ -179,7 +179,7 @@ export function coerceExifValue(value, coerceTo) {
  * @returns {string|any[]}
  */
 export function serializeExifValue(value) {
-	if (value instanceof Date) return format(value, 'yyyy:MM:dd HH:mm:ss');
+	if (value instanceof Date) return dates.format(value, 'yyyy:MM:dd HH:mm:ss');
 	// Let multivalued exif entries through
 	if (Array.isArray(value)) return value;
 	if (value === undefined) return 'undefined';

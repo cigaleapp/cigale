@@ -6,6 +6,7 @@ import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { m } from './paraglide/messages';
 import { clamp, unique } from './utils';
+import { imageLimits } from './inference_utils';
 
 /**
  * @import { Image, Protocol } from './database.js';
@@ -17,7 +18,7 @@ import { clamp, unique } from './utils';
  * Used for tests
  * @param {string} id
  * @param {string} fileId
- * @return {Image}
+ * @returns {Image}
  */
 const sampleImage = (id, fileId) => ({
 	id,
@@ -126,7 +127,7 @@ export function imageIsAnalyzed(protocol, imageFileId) {
 	if (!protocol) return false;
 	if (!imageFileId) return false;
 	if (uiState.erroredImages.has(imageFileId)) return true;
-	return tables.Image.state.some((img) => img.fileId === imageFileId);
+	return tables.Image.state.some((img) => img.fileId === imageFileId && img.boundingBoxesAnalyzed);
 }
 
 /**
@@ -272,6 +273,11 @@ export async function resizeToMaxSize({ source }) {
 		);
 	});
 	const { width, height } = originalImage;
+
+	if (width * height > imageLimits.maxResolutionInMP * 1e6) {
+		throw new Error(m.image_too_large(imageLimits));
+	}
+
 	const originalCanvas = document.createElement('canvas');
 	originalCanvas.width = width;
 	originalCanvas.height = height;
@@ -341,7 +347,7 @@ if (import.meta.vitest) {
 	/**
 	 * @param {string} id
 	 * @param {string} fileId
-	 * @return {Image}
+	 * @returns {Image}
 	 */
 	const img = (id, fileId) => ({
 		id,

@@ -131,7 +131,6 @@ export class NewBoundingBox {
 	 * @returns {import('./BoundingBoxes.svelte').Rect}
 	 */
 	clamp(rect) {
-		console.log('clamping', rect, this.limits);
 		return {
 			x: clamp(rect.x, this.limits.x, this.limits.width),
 			y: clamp(rect.y, this.limits.y, this.limits.height),

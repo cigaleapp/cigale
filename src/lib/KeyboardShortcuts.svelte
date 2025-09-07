@@ -53,7 +53,7 @@
 						/** @param {MouseEvent|KeyboardEvent} e */
 						async (e) => {
 							if (!bind?.allowInModals && hasAnyModalOpen(page)) {
-								console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);
+								console.warn(`a modal is open, ignoring keybinding ${pattern}`, page.state);
 								return;
 							}
 							if (bind.when && !bind.when(e)) return;

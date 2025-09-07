@@ -1,19 +1,26 @@
+import * as dates from 'date-fns';
 import extract from 'extract-zip';
 import path from 'node:path';
+import fr from '../messages/fr.json' with { type: 'json' };
+import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
+	expectTooltipContent,
+	getMetadataValuesOfImage,
 	getTab,
 	goToTab,
 	importPhotos,
 	importResults,
 	listTable,
+	loadingText,
 	readdirTreeSync,
+	sidepanelMetadataSectionFor,
 	toast,
-	tooltipOf
+	tooltipOf,
+	waitForLoadingEnd
 } from './utils';
-import { issue } from './annotations';
-import { compareAsc } from 'date-fns';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -29,6 +36,8 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('has the correct bounding boxes', async ({ page }) => {
+		await goToTab(page, 'crop');
+
 		/**
 		 *
 		 * @param {string} id
@@ -41,7 +50,7 @@ test.describe('correct results.zip', () => {
 		}
 
 		const images = await listTable(page, 'Image').then((images) =>
-			images.sort((a, b) => compareAsc(a.addedAt, b.addedAt))
+			images.sort((a, b) => dates.compareAsc(a.addedAt, b.addedAt))
 		);
 
 		await expectBoundingBoxesCount(images[0].fileId ?? '', 1);
@@ -51,7 +60,7 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('does not re-analyze when going to classify tab', async ({ page }) => {
-		await page.getByRole('link', { name: 'Classifier' }).click();
+		await goToTab(page, 'classify');
 		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
 		});
@@ -139,7 +148,7 @@ test.describe('correct results.zip', () => {
 		const resultsDir = path.resolve('./tests/results/correct');
 		await download.saveAs('./tests/results/correct.zip');
 		await extract('./tests/results/correct.zip', { dir: resultsDir });
-		console.log(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
+		console.info(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [
@@ -210,9 +219,11 @@ test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
 	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 5_000
 	});
-	await page.getByTestId('first-observation-card').hover({ force: true });
-	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
-	await expect(tooltip).toHaveText(/Les fichiers .+? ne sont pas (encore )?supportés/);
+	await expectTooltipContent(
+		page,
+		page.getByTestId('first-observation-card'),
+		/Les fichiers .+? ne sont pas (encore )?supportés/
+	);
 });
 
 test('can import a large image', issue(412, 415), async ({ page }) => {
@@ -232,23 +243,23 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, '20K-gray.jpeg');
-	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 30_000
-	});
-	await page.getByTestId('first-observation-card').hover();
-	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
-	await expect(tooltip).toHaveText(/L'image est trop grande pour être traitée/);
+	await waitForLoadingEnd(page);
+	await expectTooltipContent(
+		page,
+		page.getByTestId('first-observation-card'),
+		/L'image est trop grande pour être traitée/
+	);
 });
 
 test('can cancel import', issue(430), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
-	await importPhotos({ page }, 'lil-fella', 'cyan', 'leaf', 'with-exif-gps');
-	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
+	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);
+	await expect(page.getByTestId('first-observation-card')).toHaveText(loadingText, {
 		timeout: 10_000
 	});
 	await page
-		.getByTestId('first-observation-card')
+		.locator('article', { hasText: 'lil-fella.jpeg' })
 		.getByRole('button', { name: 'Supprimer' })
 		.click();
 	await expect(page.getByText('lil-fella.jpeg').first()).not.toBeVisible({
@@ -281,15 +292,8 @@ test(
 		await chooseDefaultProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'lil-fella', 'cyan');
-		await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
-			timeout: 10_000
-		});
-		await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, { timeout: 10_000 });
 		await goToTab(page, 'classify');
-		await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
-			timeout: 10_000
-		});
-		await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, { timeout: 10_000 });
+		await waitForLoadingEnd(page);
 		await goToTab(page, 'import');
 		await page.getByTestId('first-observation-card').click();
 		await page
@@ -299,7 +303,7 @@ test(
 		await goToTab(page, 'classify');
 		await expect(page.getByTestId('first-observation-card')).toMatchAriaSnapshot(`
 		  - article:
-		    - img
+		    - img "cyan"
 		    - img
 		    - heading "cyan" [level=2]
 		`);
@@ -307,28 +311,76 @@ test(
 	}
 );
 
-test('cannot go to classify tab while import analysis is ongoing', issue(437), async ({ page }) => {
+test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella', 'cyan');
-	await expect(page.getByTestId('first-observation-card')).toHaveText(/Analyse…|En attente/, {
-		timeout: 10_000
-	});
-	await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Analyse…|En attente/, {
-		timeout: 30_000
-	});
 
 	// Now, we have at least one image loaded (so technically the classify tab should be accessible),
 	// but the other image is still being analyzed.
 
+	await goToTab(page, 'crop');
+	await expect(page.getByText(fr.loading_cropping_model)).toBeVisible();
+	await expect(page.getByText(fr.loading_cropping_model)).not.toBeVisible({
+		timeout: 10_000
+	});
+
 	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
 
 	// Once everything is done, make sure that we can go to the classify tab
-
-	await expect(page.getByRole('main')).not.toHaveText(/Analyse…|En attente/, {
-		timeout: 30_000
-	});
+	await waitForLoadingEnd(page);
 
 	await expect(getTab(page, 'classify')).toBeEnabled({ timeout: 1_000 });
 	await goToTab(page, 'classify');
+});
+
+test('can extract EXIF date from an image', async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'lil-fella');
+	await waitForLoadingEnd(page);
+	await page.getByTestId('first-observation-card').click();
+	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+		'2025-04-25'
+	);
+
+	const metadataValues = await getMetadataValuesOfImage({
+		page,
+		protocolId: lightweightProtocol.id,
+		image: { filename: 'lil-fella.jpeg' }
+	});
+
+	expect(metadataValues).toMatchObject({
+		...metadataValues,
+		shoot_date: '2025-04-25T12:38:36'
+	});
+});
+
+test('can extract EXIF GPS data from an image', async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'with-exif-gps');
+	await waitForLoadingEnd(page);
+	await page.getByTestId('first-observation-card').click();
+	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+		'2008-10-22'
+	);
+	await expect(sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')).toHaveValue(
+		'43.46715666666389, 11.885394999997223'
+	);
+
+	const metadataValues = await getMetadataValuesOfImage({
+		page,
+		protocolId: lightweightProtocol.id,
+		image: { filename: 'with-exif-gps.jpeg' }
+	});
+
+	expect(metadataValues).toMatchObject({
+		...metadataValues,
+		shoot_date: '2008-10-22T16:29:49',
+		shoot_location: {
+			latitude: 43.46715666666389,
+			longitude: 11.885394999997223
+		}
+	});
 });

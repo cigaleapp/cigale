@@ -366,7 +366,7 @@ describe('wrangler', () => {
 		expect(tables.Observation.state).toHaveLength(3);
 	});
 
-	describe('individual tables', async () => {
+	describe('individual tables', () => {
 		beforeEach(async () => {
 			await tables.initialize();
 		});

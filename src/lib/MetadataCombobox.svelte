@@ -95,7 +95,7 @@
 	$effect(() => {
 		// Halve cache when its size reaches 4000
 		if (Object.keys(cascadeLabelsCache).length > 4000) {
-			console.log('Halving cascadeLabels cache');
+			console.debug('Halving cascadeLabels cache');
 			cascadeLabelsCache = Object.fromEntries(Object.entries(cascadeLabelsCache).slice(2000));
 		}
 	});

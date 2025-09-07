@@ -44,8 +44,6 @@ export async function prepareForOfflineUse(protocolIds, onProgress) {
 		)
 	);
 
-	console.log(results);
-
 	if (results.some((r) => r.status === 'rejected')) {
 		throw new Error(
 			'Could not download all models: ' +

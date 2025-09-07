@@ -87,7 +87,7 @@ export const TemplatedString = (Input) =>
 			/** @param {typeof Input.inferIn} data  */
 			render(data) {
 				data = Input.assert(data);
-				console.log('Applying template', source, 'on', data);
+
 				return template(data);
 			},
 			toJSON: () => source
@@ -116,7 +116,6 @@ export const FilepathTemplate = type.string
 	.pipe(({ source, template }) => ({
 		/** @param {{ observation: Omit<typeof Analysis.inferIn['observations'][number], 'images'>, image: typeof Analysis.inferIn['observations'][number]['images'][number], sequence: number }} data */
 		render(data) {
-			console.log('Applying template', source, 'on', data);
 			return template(data).replaceAll('\\', '/');
 		},
 		toJSON: () => source
