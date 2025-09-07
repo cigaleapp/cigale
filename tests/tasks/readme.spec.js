@@ -1,7 +1,7 @@
-import { expect, test } from './fixtures';
-import { chooseDefaultProtocol, goToTab, importPhotos, setSettings } from './utils';
-import français from '../messages/fr.json' with { type: 'json' };
-import english from '../messages/en.json' with { type: 'json' };
+import { expect, test } from '../fixtures';
+import { chooseDefaultProtocol, goToTab, importPhotos, setSettings } from '../utils';
+import français from '../../messages/fr.json' with { type: 'json' };
+import english from '../../messages/en.json' with { type: 'json' };
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(

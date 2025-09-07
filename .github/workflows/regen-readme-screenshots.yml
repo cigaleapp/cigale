@@ -25,7 +25,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright readme.spec.js and update screenshots
-        run: npx playwright test tests/readme.spec.js --update-snapshots
+        run: npx playwright test tests/tasks/readme.spec.js --update-snapshots
         env:
           RUN_README_TESTS: '1'
 

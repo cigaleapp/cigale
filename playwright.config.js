@@ -100,7 +100,7 @@ export default defineConfig({
 			reuseExistingServer: true
 		},
 		built: {
-			command: 'npm run build && npm run preview',
+			command: 'npm run preview',
 			port: 4173,
 			reuseExistingServer: false
 		}

@@ -13,10 +13,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: package.json
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Upload build as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          include-hidden-files: true
+          path: |
+            public
+            .svelte-kit
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
+    needs: prepare
     container:
       image: mcr.microsoft.com/playwright:v1.55.0-noble
       options: --user 1001
@@ -33,6 +55,13 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Download built app
+        uses: actions/download-artifact@v5
+        with:
+          name: build
+          path: ./
+      - name: Remove task-type spec files for better sharding balance
+        run: rm tests/tasks/*
       - name: Run Playwright tests
         run: npx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:

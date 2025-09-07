@@ -1,5 +1,5 @@
-import { expect, test } from './fixtures.js';
-import fr from '../messages/fr.json' with { type: 'json' };
+import { expect, test } from '../fixtures.js';
+import fr from '../../messages/fr.json' with { type: 'json' };
 import {
 	chooseDefaultProtocol,
 	dumpDatabase,
@@ -7,7 +7,7 @@ import {
 	importPhotos,
 	importProtocol,
 	importResults
-} from './utils.js';
+} from '../utils.js';
 import JSZip from 'jszip';
 import { readFile, writeFile } from 'node:fs/promises';
 
