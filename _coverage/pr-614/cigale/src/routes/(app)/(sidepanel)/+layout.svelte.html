@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/175</span>
+                <span class='fraction'>0/184</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/175</span>
+                <span class='fraction'>0/184</span>
             </div>
         
             
@@ -338,7 +338,18 @@
 <a name='L273'></a><a href='#L273'>273</a>
 <a name='L274'></a><a href='#L274'>274</a>
 <a name='L275'></a><a href='#L275'>275</a>
-<a name='L276'></a><a href='#L276'>276</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -420,17 +431,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -441,6 +443,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -618,7 +640,7 @@
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImageFile } from '$lib/images';
+	import { deleteImageFile, imageFileId } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
@@ -626,7 +648,7 @@
 		storeMetadataValue
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
-	import { importMore } from '$lib/queue.svelte.js';
+	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -691,6 +713,7 @@
 			{},
 <span class="cstat-no" title="statement not covered" >			async (tx) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >				for (const id of uiState.selection) {</span>
+<span class="cstat-no" title="statement not covered" >					cancelTask(id, 'Cancelled by user');</span>
 <span class="cstat-no" title="statement not covered" >					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });</span>
 <span class="cstat-no" title="statement not covered" >					await deleteImageFile(id, tx, true);</span>
 <span class="cstat-no" title="statement not covered" >				}</span>
@@ -716,6 +739,16 @@
 <span class="cstat-no" title="statement not covered" >				for (const id of uiState.selection) {</span>
 <span class="cstat-no" title="statement not covered" >					uiState.erroredImages.delete(id);</span>
 <span class="cstat-no" title="statement not covered" >				}</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
+		},
+<span class="cstat-no" title="statement not covered" >		'x f': {</span>
+<span class="cstat-no" title="statement not covered" >			help: 'Spawn a loading image',</span>
+<span class="cstat-no" title="statement not covered" >			debug: true,</span>
+<span class="cstat-no" title="statement not covered" >			do() {</span>
+<span class="cstat-no" title="statement not covered" >				uiState.processing.files.push({</span>
+<span class="cstat-no" title="statement not covered" >					id: imageFileId(),</span>
+<span class="cstat-no" title="statement not covered" >					name: 'Debug image.jpeg'</span>
+				});
 <span class="cstat-no" title="statement not covered" >			}</span>
 		},
 <span class="cstat-no" title="statement not covered" >		'$mod+u': {</span>
@@ -895,7 +928,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-07T00:41:19.428Z
+                at 2025-09-07T10:05:59.787Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
