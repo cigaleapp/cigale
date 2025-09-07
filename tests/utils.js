@@ -28,9 +28,10 @@ function safeJSONParse(value) {
  * @param {object} ctx
  * @param {Page} ctx.page
  * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
+ * @param {number} [ctx.additionalWaitTime] wait additional milliseconds between each import (when names.length > 1)
  * @param {...(string|string[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
  */
-export async function importPhotos({ page, wait = true }, ...names) {
+export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }, ...names) {
 	if (!names) throw new Error('No file names provided');
 
 	/** @param {string} name */
@@ -82,6 +83,10 @@ export async function importPhotos({ page, wait = true }, ...names) {
 		await expect(element).not.toHaveText(loadingText, {
 			timeout: 20_000
 		});
+
+		if (additionalWaitTime) {
+			await page.waitForTimeout(additionalWaitTime);
+		}
 	}
 }
 

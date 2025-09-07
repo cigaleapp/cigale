@@ -9,7 +9,13 @@ test.describe('sorting', () => {
 		await setSettings({ page }, { showTechnicalMetadata: true });
 
 		// Import real images from fixtures (these files must exist)
-		await importPhotos({ page }, 'leaf.jpeg', 'cyan.jpeg', 'lil-fella.jpeg');
+		await importPhotos(
+			// wait two seconds between each photo to ensure unique values for addedAt
+			{ page, additionalWaitTime: 1_100 },
+			'leaf.jpeg',
+			'cyan.jpeg',
+			'lil-fella.jpeg'
+		);
 	});
 
 	/**

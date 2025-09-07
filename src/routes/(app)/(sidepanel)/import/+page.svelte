@@ -34,12 +34,7 @@
 				boundingBoxes: [],
 				addedAt: new Date()
 			}))
-		]
-			.toSorted((a, b) => a.id.localeCompare(b.id))
-			.map((props, i) => ({
-				...props,
-				index: i
-			}))
+		].map((props, i) => ({ ...props, index: i }))
 	);
 
 	const empty = $derived(allImages.length === 0);

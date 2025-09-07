@@ -36,6 +36,7 @@
 	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
 	 * @property {string} [statusText] - text to show when loading and progress is -1
 	 * @property {string} [id]
+	 * @property {Date} [addedAt]
 	 */
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
@@ -77,7 +78,11 @@
 	class:stacked
 	data-selectable={selectable ? '' : undefined}
 	{...rest}
-	use:tooltip={errored ? statusText : isDebugMode() ? rest.id : undefined}
+	use:tooltip={errored
+		? statusText
+		: isDebugMode()
+			? `${rest.id} @ ${rest.addedAt?.toISOString()}`
+			: undefined}
 >
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
