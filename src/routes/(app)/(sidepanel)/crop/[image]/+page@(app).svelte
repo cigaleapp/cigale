@@ -311,12 +311,6 @@
 		}
 	}
 
-	async function revertAll() {
-		for (const { id } of images) {
-			await revertToInferedCrop(id);
-		}
-	}
-
 	const revertableCrops = $derived(
 		Object.fromEntries(
 			images.map((image) => {
@@ -329,6 +323,40 @@
 			})
 		)
 	);
+
+	// We can revertAll() if either we have no initial crops at all, or at least some of them are revertable
+	const canRevertAll = $derived(
+		Object.values(initialCrops).every((c) => !c) || Object.values(revertableCrops).some(Boolean)
+	);
+
+	async function revertAll() {
+		// Either we have no initial crop: reverting means removing all boxes
+		if (Object.values(initialCrops).every((c) => !c)) {
+			for (const { id } of images) {
+				await deleteBoundingBox(id);
+			}
+		} else {
+			// Or we have at least one: revert all boxes to their initial positions
+			for (const { id } of images) {
+				await revertToInferedCrop(id);
+			}
+		}
+	}
+
+	/**
+	 * @param {string} imageId
+	 */
+	async function deleteBoundingBox(imageId) {
+		if (images.length === 1) {
+			await deleteMetadataValue({
+				db: idb.databaseHandle(),
+				metadataId: uiState.cropMetadataId,
+				subjectId: imageId
+			});
+		} else {
+			await idb.tables.Image.remove(imageId);
+		}
+	}
 
 	/**
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
@@ -467,7 +495,7 @@
 		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
 	}
 
-	async function deleteImage() {
+	async function deleteImageFileAndGotoNext() {
 		const nextFileIdBeforeDelete = $state.snapshot(nextFileId);
 		await deleteImageFile(fileId);
 		// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
@@ -534,7 +562,7 @@
 		},
 		'$mod+Delete': {
 			help: 'Supprimer l’image',
-			do: deleteImage
+			do: deleteImageFileAndGotoNext
 		},
 		Escape: {
 			help: m.exit_cropping(),
@@ -549,16 +577,12 @@
 			when: () => Boolean(selectedBox.imageId),
 			async do() {
 				if (!selectedBox.imageId) return;
-				await deleteMetadataValue({
-					db: idb.databaseHandle(),
-					metadataId: uiState.cropMetadataId,
-					subjectId: selectedBox.imageId
-				});
+				await deleteBoundingBox(selectedBox.imageId);
+
 				if (selectedBox.manual) {
 					selectedBox.imageId = null;
 				} else {
 					// Select previous box in list
-
 					selectedBox.imageId =
 						images.toReversed().find((image) => image.id in boundingBoxes)?.id ?? null;
 				}
@@ -824,7 +848,7 @@
 				</ButtonInk>
 				<ButtonInk
 					dangerous
-					onclick={deleteImage}
+					onclick={deleteImageFileAndGotoNext}
 					help={{ text: m.delete_image_help(), keyboard: '$mod+Delete' }}
 				>
 					<IconDelete />
@@ -852,7 +876,7 @@
 					keyboard="$mod+U"
 					help="Revenir au recadrage d'origine pour toutes les boîtes"
 					onclick={revertAll}
-					disabled={!Object.values(revertableCrops).some(Boolean)}
+					disabled={!canRevertAll}
 				>
 					<IconRevert />
 					{m.reset()}
@@ -930,17 +954,7 @@
 							<ButtonIcon
 								help={m.delete_selected_box_help()}
 								keyboard="Delete"
-								onclick={async () => {
-									if (images.length === 1) {
-										await deleteMetadataValue({
-											db: idb.databaseHandle(),
-											metadataId: uiState.cropMetadataId,
-											subjectId: image.id
-										});
-									} else {
-										await idb.tables.Image.remove(image.id);
-									}
-								}}
+								onclick={async () => deleteBoundingBox(image.id)}
 							>
 								<IconDelete />
 							</ButtonIcon>
