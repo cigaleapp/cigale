@@ -169,6 +169,7 @@
 				uiState.erroredImages.delete(id);
 				const imageIds = tables.Observation.getFromState(id)?.images;
 				if (imageIds) {
+					imageIds.forEach((id) => uiState.erroredImages.delete(id));
 					classifyMore(imageIds);
 				} else {
 					toasts.error('Observation is empty (should not happen)');
