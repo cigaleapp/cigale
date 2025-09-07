@@ -16,6 +16,7 @@
 	const images = $derived(
 		toAreaObservationProps(fileIds, [], [], {
 			showBoundingBoxes: () => false,
+			applyBoundingBoxes: () => false,
 			isQueued: (fileId) => typeof fileId === 'string' && uiState.queuedImages.has(fileId),
 			isLoaded: (fileId) => typeof fileId === 'string' && uiState.hasPreviewURL(fileId)
 		})
