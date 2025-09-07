@@ -161,9 +161,9 @@
 		"xss": "^1.0.15",
 		"yaml": "^2.8.1"
 	},
-	"packageManager": "npm@11.5.1",
+	"packageManager": "npm@11.6.0",
 	"volta": {
 		"node": "24.7.0",
-		"npm": "11.5.1"
+		"npm": "11.6.0"
 	}
 }
