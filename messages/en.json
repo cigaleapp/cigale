@@ -216,5 +216,6 @@
 	"toggle_debug_mode": "Toggle debug mode",
 	"metadata_value_yes": "Yes",
 	"metadata_value_no": "No",
-	"metadata_value_boundingbox": "Box from ({x1}, {y1}) to ({x2}, {y2})"
+	"metadata_value_boundingbox": "Box from ({x1}, {y1}) to ({x2}, {y2})",
+	"no_images": "No images"
 }

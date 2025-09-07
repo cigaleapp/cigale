@@ -21,6 +21,8 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { goto } from '$app/navigation';
 
 	seo({ title: m.classification() });
 
@@ -180,7 +182,13 @@
 			}}
 		/>
 		{#if !images.length}
-			<p>{m.click_or_drop_images_here()}</p>
+			<div class="empty">
+				<Logo variant="empty" --size="6em" />
+				<p>{m.no_images()}</p>
+				<ButtonSecondary onclick={() => goto('#/import')}>
+					{m.import_tab()}
+				</ButtonSecondary>
+			</div>
 		{/if}
 	</section>
 {:else}
@@ -246,5 +254,11 @@
 		max-width: 80%;
 		overflow-x: auto;
 		font-size: 0.8em;
+	}
+
+	.empty {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
 	}
 </style>

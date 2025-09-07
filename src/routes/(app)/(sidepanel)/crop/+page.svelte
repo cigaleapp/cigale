@@ -13,6 +13,8 @@
 	import { nonnull } from '$lib/utils.js';
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
+	import Logo from '$lib/Logo.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 
 	seo({ title: 'Recadrer' });
 
@@ -71,6 +73,15 @@
 			goto(`#/crop/${id}`);
 		}}
 	/>
+	{#if !images.length}
+		<div class="empty">
+			<Logo variant="empty" --size="6em" />
+			<p>{m.no_images()}</p>
+			<ButtonSecondary onclick={() => goto('#/import')}>
+				{m.import_tab()}
+			</ButtonSecondary>
+		</div>
+	{/if}
 </section>
 
 <style>
@@ -79,5 +90,15 @@
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
+	}
+
+	.empty {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+		max-width: 400px;
+		justify-content: center;
+		align-items: center;
+		margin: auto;
 	}
 </style>
