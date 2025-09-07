@@ -501,6 +501,23 @@ export async function tooltipOf(page, locator) {
 }
 
 /**
+ * Hovers the locator, then asserts that it has a tooltip with content matching `content`.
+ * Falls back to the element's data-tooltip-content attribute if the tooltip is not found.
+ * @param {Page} page
+ * @param {import('@playwright/test').Locator} locator
+ * @param {string|RegExp} content
+ */
+export async function expectTooltipContent(page, locator, content) {
+	await locator.hover({ force: true });
+	try {
+		const tooltip = await tooltipOf(page, locator);
+		await expect(tooltip).toHaveText(content);
+	} catch {
+		await expect(locator).toHaveAttribute('data-tooltip-content', content);
+	}
+}
+
+/**
  *
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Page} page

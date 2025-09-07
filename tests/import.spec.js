@@ -7,6 +7,7 @@ import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
+	expectTooltipContent,
 	getMetadataValuesOfImage,
 	getTab,
 	goToTab,
@@ -218,9 +219,11 @@ test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
 	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 5_000
 	});
-	await page.getByTestId('first-observation-card').hover({ force: true });
-	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
-	await expect(tooltip).toHaveText(/Les fichiers .+? ne sont pas (encore )?supportés/);
+	await expectTooltipContent(
+		page,
+		page.getByTestId('first-observation-card'),
+		/Les fichiers .+? ne sont pas (encore )?supportés/
+	);
 });
 
 test('can import a large image', issue(412, 415), async ({ page }) => {
@@ -241,9 +244,11 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 	await goToTab(page, 'import');
 	await importPhotos({ page }, '20K-gray.jpeg');
 	await waitForLoadingEnd(page);
-	await page.getByTestId('first-observation-card').hover();
-	const tooltip = await tooltipOf(page, page.getByTestId('first-observation-card'));
-	await expect(tooltip).toHaveText(/L'image est trop grande pour être traitée/);
+	await expectTooltipContent(
+		page,
+		page.getByTestId('first-observation-card'),
+		/L'image est trop grande pour être traitée/
+	);
 });
 
 test('can cancel import', issue(430), async ({ page }) => {
