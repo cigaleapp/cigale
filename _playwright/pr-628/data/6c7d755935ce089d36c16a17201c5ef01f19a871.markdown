@@ -223,8 +223,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "6844d77":
-              - /url: https://github.com/cigaleapp/cigale/tree/6844d77c9806d220243531d7cccde8ad2250ae3f
+            - link "0ed4c0d":
+              - /url: https://github.com/cigaleapp/cigale/tree/0ed4c0d3ea0ba450b69c749ea7fc82beabb01def
             - text: ·
             - link "À propos":
               - /url: "#/about"
