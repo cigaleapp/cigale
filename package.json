@@ -131,7 +131,7 @@
 		"@iconify-json/ph": "^1.2.2",
 		"@sentry/sveltekit": "^10.10.0",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
-		"arktype": "^2.1.20",
+		"arktype": "^2.1.22",
 		"bits-ui": "^1.8.0",
 		"date-fns": "^4.1.0",
 		"deep-equal": "^2.2.3",
