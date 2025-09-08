@@ -208,10 +208,7 @@
             - generic: Langue
             - generic:
               - radiogroup:
-                - radio "English 1%":
-                  - text: English
-                  - generic:
-                    - code: 1%
+                - radio "English"
                 - radio "Français" [checked]
                 - radio "日本語 1%":
                   - text: 日本語
@@ -223,8 +220,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "4b6f80d":
-              - /url: https://github.com/cigaleapp/cigale/tree/4b6f80d6a5d69888ee8e3626df00a22d31edbadf
+            - link "0c8269d":
+              - /url: https://github.com/cigaleapp/cigale/tree/0c8269da8be3333dd833e6ed8696a471adc8ae2c
             - text: ·
             - link "À propos":
               - /url: "#/about"
