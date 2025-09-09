@@ -15,7 +15,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, href } from '$lib/paths.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 
 	/**
@@ -100,22 +100,22 @@
 	defineKeyboardShortcuts('navigation', {
 		// Choose [P]rotocol
 		'g p': {
-			do: () => goto('#/'),
+			do: () => goto('/'),
 			help: m.goto_protocol_tab()
 		},
 		// [I]mport images
 		'g i': {
-			do: () => goto('#/import'),
+			do: () => goto('/import'),
 			help: m.goto_import_tab()
 		},
 		// Adjust C[r]ops
 		'g r': {
-			do: () => goto('#/crop'),
+			do: () => goto('/crop'),
 			help: m.goto_crop_tab()
 		},
 		// A[n]notate images
 		'g n': {
-			do: () => goto('#/classify'),
+			do: () => goto('/classify'),
 			help: m.goto_classify_tab()
 		},
 		// E[x]port results
@@ -125,7 +125,7 @@
 		},
 		// [M]anage protocols
 		'g m': {
-			do: () => goto('#/manage'),
+			do: () => goto('/manage'),
 			help: m.goto_protocol_management()
 		}
 	});
@@ -140,7 +140,7 @@
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
 	<nav bind:clientHeight={navHeight} data-testid="app-nav">
 		<div class="logo">
-			<a href="#/">
+			<a href={href('/')}>
 				<Logo --fill="var(--bg-primary)" />
 				C.i.g.a.l.e.
 			</a>
@@ -152,7 +152,7 @@
 		</div>
 
 		<div class="steps">
-			<a href="#/">
+			<a href={href('/')}>
 				{m.protocol_tab()}
 				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
 				{#if path == '/' || path == ''}
@@ -160,7 +160,7 @@
 				{/if}
 			</a>
 			<IconNext></IconNext>
-			<a href="#/import" data-testid="goto-import" aria-disabled={!uiState.currentProtocol}>
+			<a href={href('/import')} data-testid="goto-import" aria-disabled={!uiState.currentProtocol}>
 				{m.import_tab()}
 				{#if path == '/import'}
 					<div class="line"></div>
@@ -169,9 +169,11 @@
 			<IconNext></IconNext>
 			<div class="with-inference-indicator">
 				<a
-					href="#/crop/{page.route.id === '/(app)/crop/[image]'
-						? ''
-						: uiState.imageOpenedInCropper}"
+					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' && uiState.imageOpenedInCropper
+						? href('/(app)/(sidepanel)/crop/[image]', {
+								image: uiState.imageOpenedInCropper
+							})
+						: href('/crop')}
 					data-testid="goto-crop"
 					aria-disabled={!uiState.currentProtocol || !hasImages}
 				>
@@ -193,7 +195,7 @@
 					: undefined}
 			>
 				<a
-					href="#/classify"
+					href={href('/classify')}
 					aria-disabled={!uiState.currentProtocol ||
 						!hasImages ||
 						(uiState.processing.task === 'detection' && uiState.processing.progress < 1)}

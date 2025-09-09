@@ -4,7 +4,7 @@
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
-	import { goto } from '$app/navigation';
+	import { goto } from '$lib/paths.js';
 	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
@@ -520,7 +520,7 @@
 
 	function goToGallery() {
 		uiState.imagePreviouslyOpenedInCropper = fileId;
-		goto('#/crop');
+		goto('/crop');
 	}
 
 	$effect(() => {

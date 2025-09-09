@@ -1,5 +1,5 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte.js';
@@ -43,8 +43,9 @@
 	</p>
 	<p>Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche</p>
 	<p>
-		Sachant qu'un <a href={jsonSchemaURL(base)}>JSON Schema</a> est déclaré dans ces fichiers, la plupart
-		des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+		Sachant qu'un <a href={jsonSchemaURL(resolve('/'))}>JSON Schema</a> est déclaré dans ces fichiers,
+		la plupart des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
 	</p>
 	<p>
 		Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il
@@ -55,7 +56,7 @@
 		<section class="actions">
 			<ButtonPrimary
 				onclick={async () => {
-					await downloadProtocolTemplate(base, 'json');
+					await downloadProtocolTemplate(resolve('/'), 'json');
 					close?.();
 				}}
 			>
@@ -64,7 +65,7 @@
 			</ButtonPrimary>
 			<ButtonSecondary
 				onclick={async () => {
-					await downloadProtocolTemplate(base, 'yaml');
+					await downloadProtocolTemplate(resolve('/'), 'yaml');
 					close?.();
 				}}
 			>

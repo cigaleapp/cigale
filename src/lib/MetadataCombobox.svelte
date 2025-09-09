@@ -228,6 +228,7 @@
 						</section>
 					{/if}
 					{#if highlightedOption?.learnMore}
+						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 						<a href={highlightedOption.learnMore} target="_blank" class="learn-more">
 							<IconArrowRight />
 							<div class="text">

@@ -1,5 +1,5 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { goto, href } from '$lib/paths.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
@@ -177,7 +177,7 @@
 		<ButtonSecondary
 			onclick={async () => {
 				open = false;
-				await goto('#/protocols');
+				await goto('/protocols');
 			}}
 		>
 			{m.manage_protocols()}
@@ -207,7 +207,7 @@
 			onclick={() => {
 				open = false;
 			}}
-			href="#/about">{m.about()}</a
+			href={href('/about')}>{m.about()}</a
 		>
 	</footer>
 </dialog>

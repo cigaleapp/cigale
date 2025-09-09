@@ -1,11 +1,12 @@
 <script>
-	import { afterNavigate, goto } from '$app/navigation';
+	import { afterNavigate } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { m } from '$lib/paraglide/messages.js';
+	import { goto } from '$lib/paths.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { seo } from '$lib/seo.svelte';
@@ -129,6 +130,7 @@
 	{m.remote_protocol_import_confirm_following()}
 
 	{#if preselection.protocol && preselectedProtocolIsRemote}
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a href={preselection.protocol}>
 			{@render highlightHostname(preselection.protocol)}
 		</a>
@@ -172,7 +174,7 @@
 							preselection.protocol = null;
 							preselection.classificationModel = null;
 							preselection.cropModel = null;
-							await goto('#/import');
+							await goto('/import');
 						}}
 					>
 						{#if p.id === currentProtocol?.id}
@@ -222,7 +224,7 @@
 
 	<section class="manage">
 		<p>Le protocole que vous souhaitez n'est pas disponible?</p>
-		<ButtonSecondary onclick={() => goto('#/protocols')}>
+		<ButtonSecondary onclick={() => goto('/protocols')}>
 			<IconManage />
 			{m.manage_protocols()}
 		</ButtonSecondary>
@@ -237,7 +239,7 @@
 				if (!protocol || typeof protocol === 'string') return;
 				toasts.success(m.protocol_imported_and_selected({ protocolName: protocol.name }));
 				uiState.setCurrentProtocolId(protocol.id);
-				goto('#/import');
+				goto('/import');
 			}}
 		>
 			{#snippet children({ loading })}
