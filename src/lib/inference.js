@@ -109,6 +109,7 @@ export function modelUrl(model) {
  * @param {import('./database.js').ModelDetectionOutputShape} taskSettings.output.shape
  * @param {AbortSignal} [taskSettings.abortSignal]
  * @param {ArrayBuffer[]} buffers
+ * @param {{ dimensions: {width:number, height: number}, contentType: string }} bitmapParams
  * @param {import('onnxruntime-web').InferenceSession} session
  * @param {typeof import('./state.svelte.js').uiState} [uiState]
  * @param {boolean} sequence
@@ -118,6 +119,7 @@ export function modelUrl(model) {
 export async function infer(
 	{ abortSignal, ...taskSettings },
 	buffers,
+	bitmapParams,
 	session,
 	uiState,
 	sequence = false,
@@ -173,7 +175,11 @@ export async function infer(
 	};
 	let inputTensor;
 
-	inputTensor = await loadToTensor(buffers, { ...taskSettings.input, abortSignal });
+	inputTensor = await loadToTensor(buffers, {
+		...taskSettings.input,
+		...bitmapParams,
+		abortSignal
+	});
 
 	// TODO figure out a way to use the abortSignal while running the inference
 	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });

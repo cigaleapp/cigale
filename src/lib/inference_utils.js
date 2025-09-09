@@ -67,6 +67,8 @@ export async function preprocessTensor(settings, tensor, mean, std, abortSignal)
  * @param {object} settings
  * @param {number} settings.height
  * @param {number} settings.width
+ * @param {string} settings.contentType if it's image/x-bitmap, load the bitmap data instead of trying to load it as encoded image data
+ * @param {{width: number, height: number}} settings.dimensions dimensions of the given images. Used when contentType == image/x-bitmap
  * @param {import('./BoundingBoxes.svelte.js').CenteredBoundingBox} [settings.crop]
  * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @param {AbortSignal} [settings.abortSignal] signal to abort the operation
@@ -74,7 +76,15 @@ export async function preprocessTensor(settings, tensor, mean, std, abortSignal)
  */
 export async function loadToTensor(
 	buffers,
-	{ width: targetWidth, height: targetHeight, crop, normalized, abortSignal }
+	{
+		width: targetWidth,
+		height: targetHeight,
+		crop,
+		normalized,
+		abortSignal,
+		contentType,
+		dimensions
+	}
 ) {
 	/*
     charge les images et les resize
@@ -94,9 +104,15 @@ export async function loadToTensor(
 
 		let buffer = buffers[f];
 
-		const imageTensor = await Jimp.fromBuffer(buffer, {
-			'image/jpeg': imageLimits
-		});
+		const imageTensor =
+			contentType === 'image/x-bitmap'
+				? await Jimp.fromBitmap({
+						...dimensions,
+						data: new Uint8ClampedArray(buffer)
+					})
+				: await Jimp.fromBuffer(buffer, {
+						'image/jpeg': imageLimits
+					});
 
 		if (crop) {
 			const scaler = coordsScaler({ x: imageTensor.width, y: imageTensor.height });
