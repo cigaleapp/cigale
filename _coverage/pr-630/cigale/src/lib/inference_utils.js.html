@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.2% </span>
+                <span class="strong">27.77% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>88/312</span>
+                <span class='fraction'>90/324</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.2% </span>
+                <span class="strong">27.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>88/312</span>
+                <span class='fraction'>90/324</span>
             </div>
         
             
@@ -422,7 +422,18 @@
 <a name='L357'></a><a href='#L357'>357</a>
 <a name='L358'></a><a href='#L358'>358</a>
 <a name='L359'></a><a href='#L359'>359</a>
-<a name='L360'></a><a href='#L360'>360</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -497,6 +508,23 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -508,21 +536,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -850,6 +872,8 @@ export <span class="fstat-no" title="function not covered" >async function prepr
  * @param {object} settings
  * @param {number} settings.height
  * @param {number} settings.width
+ * @param {string} settings.contentType if it's image/x-bitmap, load the bitmap data instead of trying to load it as encoded image data
+ * @param {{width: number, height: number}} settings.dimensions dimensions of the given images. Used when contentType == image/x-bitmap
  * @param {import('./BoundingBoxes.svelte.js').CenteredBoundingBox} [settings.crop]
  * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @param {AbortSignal} [settings.abortSignal] signal to abort the operation
@@ -857,13 +881,16 @@ export <span class="fstat-no" title="function not covered" >async function prepr
  */
 export <span class="fstat-no" title="function not covered" >async function loadToTensor(</span>
 <span class="cstat-no" title="statement not covered" >	buffers,</span>
-<span class="cstat-no" title="statement not covered" >	{ width: targetWidth, height: targetHeight, crop, normalized, abortSignal }</span>
+<span class="cstat-no" title="statement not covered" >	{</span>
+<span class="cstat-no" title="statement not covered" >		width: targetWidth,</span>
+<span class="cstat-no" title="statement not covered" >		height: targetHeight,</span>
+<span class="cstat-no" title="statement not covered" >		crop,</span>
+<span class="cstat-no" title="statement not covered" >		normalized,</span>
+<span class="cstat-no" title="statement not covered" >		abortSignal,</span>
+<span class="cstat-no" title="statement not covered" >		contentType,</span>
+<span class="cstat-no" title="statement not covered" >		dimensions</span>
+<span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" >) {</span>
-<span class="cstat-no" title="statement not covered" >	let aborted = false;</span>
-<span class="cstat-no" title="statement not covered" >	abortSignal?.addEventListener('abort', () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >		aborted = true;</span>
-<span class="cstat-no" title="statement not covered" >	});</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >	/*</span>
 <span class="cstat-no" title="statement not covered" >    charge les images et les resize</span>
 <span class="cstat-no" title="statement not covered" >    -------input------- :</span>
@@ -878,29 +905,35 @@ export <span class="fstat-no" title="function not covered" >async function loadT
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	var float32Data = new Float32Array(targetHeight * targetWidth * 3 * buffers.length);</span>
 <span class="cstat-no" title="statement not covered" >	for (let f = 0; f &lt; buffers.length; f++) {</span>
-<span class="cstat-no" title="statement not covered" >		if (aborted) throw new Error('Operation aborted');</span>
+<span class="cstat-no" title="statement not covered" >		abortSignal?.throwIfAborted();</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		let buffer = buffers[f];</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		const imageTensor = await Jimp.fromBuffer(buffer, {</span>
-<span class="cstat-no" title="statement not covered" >			'image/jpeg': imageLimits</span>
-<span class="cstat-no" title="statement not covered" >		});</span>
+<span class="cstat-no" title="statement not covered" >		const imageTensor =</span>
+<span class="cstat-no" title="statement not covered" >			contentType === 'image/x-bitmap'</span>
+<span class="cstat-no" title="statement not covered" >				? await Jimp.fromBitmap({</span>
+<span class="cstat-no" title="statement not covered" >						...dimensions,</span>
+<span class="cstat-no" title="statement not covered" >						data: new Uint8ClampedArray(buffer)</span>
+<span class="cstat-no" title="statement not covered" >					})</span>
+<span class="cstat-no" title="statement not covered" >				: await Jimp.fromBuffer(buffer, {</span>
+<span class="cstat-no" title="statement not covered" >						'image/jpeg': imageLimits</span>
+<span class="cstat-no" title="statement not covered" >					});</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		if (crop) {</span>
 <span class="cstat-no" title="statement not covered" >			const scaler = coordsScaler({ x: imageTensor.width, y: imageTensor.height });</span>
 <span class="cstat-no" title="statement not covered" >			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));</span>
-<span class="cstat-no" title="statement not covered" >			if (aborted) throw new Error('Operation aborted');</span>
+<span class="cstat-no" title="statement not covered" >			abortSignal?.throwIfAborted();</span>
 <span class="cstat-no" title="statement not covered" >			imageTensor.crop({ x, y, w, h });</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		if (aborted) throw new Error('Operation aborted');</span>
+<span class="cstat-no" title="statement not covered" >		abortSignal?.throwIfAborted();</span>
 <span class="cstat-no" title="statement not covered" >		imageTensor.resize({ w: targetWidth, h: targetHeight });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		var imageBufferData = imageTensor.bitmap.data;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		const [redArray, greenArray, blueArray] = new Array(new Array(), new Array(), new Array());</span>
 <span class="cstat-no" title="statement not covered" >		for (let i = 0; i &lt; imageBufferData.length; i += 4) {</span>
-<span class="cstat-no" title="statement not covered" >			if (aborted) throw new Error('Operation aborted');</span>
+<span class="cstat-no" title="statement not covered" >			abortSignal?.throwIfAborted();</span>
 <span class="cstat-no" title="statement not covered" >			redArray.push(imageBufferData[i]);</span>
 <span class="cstat-no" title="statement not covered" >			greenArray.push(imageBufferData[i + 1]);</span>
 <span class="cstat-no" title="statement not covered" >			blueArray.push(imageBufferData[i + 2]);</span>
@@ -912,13 +945,13 @@ export <span class="fstat-no" title="function not covered" >async function loadT
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		if (normalized) {</span>
 <span class="cstat-no" title="statement not covered" >			for (i = 0; i &lt; l; i++) {</span>
-<span class="cstat-no" title="statement not covered" >				if (aborted) throw new Error('Operation aborted');</span>
+<span class="cstat-no" title="statement not covered" >				abortSignal?.throwIfAborted();</span>
 <span class="cstat-no" title="statement not covered" >				float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float</span>
 <span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	if (aborted) throw new Error('Operation aborted');</span>
+<span class="cstat-no" title="statement not covered" >	abortSignal?.throwIfAborted();</span>
 <span class="cstat-no" title="statement not covered" >	var tensor = new ort.Tensor('float32', float32Data, [</span>
 <span class="cstat-no" title="statement not covered" >		buffers.length,</span>
 <span class="cstat-no" title="statement not covered" >		3,</span>
@@ -1147,7 +1180,7 @@ export <span class="fstat-no" title="function not covered" >function output2BB(o
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-09T13:33:11.877Z
+                at 2025-09-09T13:48:49.795Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
