@@ -4,6 +4,7 @@
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileIds } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import { m } from '$lib/paraglide/messages.js';
@@ -42,18 +43,7 @@
 </script>
 
 <Dropzone
-	filetypes={[
-		'image/jpeg',
-		'application/zip',
-		'image/png',
-		'image/tiff',
-		'.cr2',
-		'.rw2',
-		'.dng',
-		'.crw',
-		'.raw',
-		'.cr3'
-	]}
+	filetypes={ACCEPTED_IMPORT_TYPES}
 	clickable={images.length === 0}
 	onfiles={({ files }) => importMore(files)}
 >
