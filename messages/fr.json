@@ -154,7 +154,6 @@
 	"input_increment_value": "Incrémenter",
 	"input_decrement_value": "Décrémenter",
 	"confirmed": "Confirmé",
-	"file_format_not_supported_yet": "Les fichiers {format} ne sont pas encore supportés",
 	"file_format_not_supported": "Le format de fichier {format} n'est pas supporté",
 	"image_too_large": "L'image est trop grande pour être traitée. Elle doit faire moins de {maxResolutionInMP} Megapixels et {maxMemoryUsageInMB} Mo",
 	"queued": "En attente",
