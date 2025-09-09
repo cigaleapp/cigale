@@ -155,7 +155,6 @@
 	"input_increment_value": "Increment",
 	"input_decrement_value": "Decrement",
 	"confirmed": "Confirmed",
-	"file_format_not_supported_yet": "{format} files are not yet supported",
 	"file_format_not_supported": "File format {format} is not supported",
 	"image_too_large": "Image is too large to be processed. Image must be less than {maxResolutionInMP} Megapixels and {maxMemoryUsageInMB} MB.",
 	"queued": "Queued",
