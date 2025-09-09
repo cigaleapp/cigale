@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">61.25% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2680/4375</span>
+                <span class='fraction'>2694/4398</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">1.57% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/190</span>
+                <span class='fraction'>3/191</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">61.25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2680/4375</span>
+                <span class='fraction'>2694/4398</span>
             </div>
         
             
@@ -4441,11 +4441,57 @@
 <a name='L4376'></a><a href='#L4376'>4376</a>
 <a name='L4377'></a><a href='#L4377'>4377</a>
 <a name='L4378'></a><a href='#L4378'>4378</a>
-<a name='L4379'></a><a href='#L4379'>4379</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L4379'></a><a href='#L4379'>4379</a>
+<a name='L4380'></a><a href='#L4380'>4380</a>
+<a name='L4381'></a><a href='#L4381'>4381</a>
+<a name='L4382'></a><a href='#L4382'>4382</a>
+<a name='L4383'></a><a href='#L4383'>4383</a>
+<a name='L4384'></a><a href='#L4384'>4384</a>
+<a name='L4385'></a><a href='#L4385'>4385</a>
+<a name='L4386'></a><a href='#L4386'>4386</a>
+<a name='L4387'></a><a href='#L4387'>4387</a>
+<a name='L4388'></a><a href='#L4388'>4388</a>
+<a name='L4389'></a><a href='#L4389'>4389</a>
+<a name='L4390'></a><a href='#L4390'>4390</a>
+<a name='L4391'></a><a href='#L4391'>4391</a>
+<a name='L4392'></a><a href='#L4392'>4392</a>
+<a name='L4393'></a><a href='#L4393'>4393</a>
+<a name='L4394'></a><a href='#L4394'>4394</a>
+<a name='L4395'></a><a href='#L4395'>4395</a>
+<a name='L4396'></a><a href='#L4396'>4396</a>
+<a name='L4397'></a><a href='#L4397'>4397</a>
+<a name='L4398'></a><a href='#L4398'>4398</a>
+<a name='L4399'></a><a href='#L4399'>4399</a>
+<a name='L4400'></a><a href='#L4400'>4400</a>
+<a name='L4401'></a><a href='#L4401'>4401</a>
+<a name='L4402'></a><a href='#L4402'>4402</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -10194,6 +10240,29 @@ export const developed_by = <span class="fstat-no" title="function not covered" 
 * @returns {string}
 */
 /* @__NO_SIDE_EFFECTS__ */
+export const detection_and_cropping = <span class="fstat-no" title="function not covered" >(inputs = {}, options = {}) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >	if (experimentalMiddlewareLocaleSplitting &amp;&amp; isServer === false) {</span>
+<span class="cstat-no" title="statement not covered" >		return /** @type {any} */ (globalThis).__paraglide_ssr.detection_and_cropping(inputs) </span>
+<span class="cstat-no" title="statement not covered" >	}</span>
+<span class="cstat-no" title="statement not covered" >	const locale = options.locale ?? getLocale()</span>
+<span class="cstat-no" title="statement not covered" >	trackMessageCall("detection_and_cropping", locale)</span>
+<span class="cstat-no" title="statement not covered" >	if (locale === "en") return en.detection_and_cropping(inputs)</span>
+<span class="cstat-no" title="statement not covered" >	if (locale === "fr") return fr.detection_and_cropping(inputs)</span>
+<span class="cstat-no" title="statement not covered" >	return ja.detection_and_cropping(inputs)</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+/**
+* This function has been compiled by [Paraglide JS](https://inlang.com/m/gerre34r).
+*
+* - Changing this function will be over-written by the next build.
+*
+* - If you want to change the translations, you can either edit the source files e.g. `en.json`, or
+* use another inlang app like [Fink](https://inlang.com/m/tdozzpar) or the [VSCode extension Sherlock](https://inlang.com/m/r7kp499g).
+* 
+* @param {{}} inputs
+* @param {{ locale?: "en" | "fr" | "ja" }} options
+* @returns {string}
+*/
+/* @__NO_SIDE_EFFECTS__ */
 export const group_selected_items = <span class="fstat-no" title="function not covered" >(inputs = {}, options = {}) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >	if (experimentalMiddlewareLocaleSplitting &amp;&amp; isServer === false) {</span>
 <span class="cstat-no" title="statement not covered" >		return /** @type {any} */ (globalThis).__paraglide_ssr.group_selected_items(inputs) </span>
@@ -13204,7 +13273,7 @@ export const no_images = <span class="fstat-no" title="function not covered" >(i
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-09T16:13:14.288Z
+                at 2025-09-09T16:40:06.738Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
