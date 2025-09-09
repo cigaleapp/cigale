@@ -8,6 +8,7 @@ import {
 	chooseDefaultProtocol,
 	expectTooltipContent,
 	firstObservationCard,
+	exportResults,
 	getMetadataValuesOfImage,
 	getTab,
 	goToTab,
@@ -15,11 +16,13 @@ import {
 	importResults,
 	listTable,
 	loadingText,
+	parseCsv,
 	readdirTreeSync,
 	sidepanelMetadataSectionFor,
 	toast,
 	waitForLoadingEnd
 } from './utils';
+import { readFileSync } from 'node:fs';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -213,18 +216,67 @@ test.describe('invalid json analysis', async () => {
 	});
 });
 
-test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
+test('can import a .CR2 image', issue(114, 384), async ({ page }) => {
 	await chooseDefaultProtocol(page);
+
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'sample.cr2');
-	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 5_000
+	// Decoding RAW images is slow, which is to be expected
+	await waitForLoadingEnd(page, { finish: 60_000 });
+
+	await goToTab(page, 'crop');
+	await waitForLoadingEnd(page);
+
+	await goToTab(page, 'classify');
+	await waitForLoadingEnd(page);
+
+	const resultsDir = await exportResults(page, 'CR2', {
+		kind: 'full'
 	});
-	await expectTooltipContent(
-		page,
-		firstObservationCard(page),
-		/Les fichiers .+? ne sont pas (encore )?supportés/
-	);
+
+	for (const dir of ['Cropped', 'Original']) {
+		expect
+			.soft(readFileSync(path.join(resultsDir, dir, 'Fasciosminthurus quinquefasciatus_1.jpeg')))
+			.toMatchSnapshot();
+	}
+	expect(parseCsv(readFileSync(path.join(resultsDir, 'metadata.csv'), 'utf-8'))).toMatchObject([
+		[
+			'Identifiant',
+			'Observation',
+			'Espèce',
+			'Espèce: Confiance',
+			'Genre',
+			'Genre: Confiance',
+			'Famille',
+			'Famille: Confiance',
+			'Ordre',
+			'Ordre: Confiance',
+			'Classe',
+			'Classe: Confiance',
+			'Phylum',
+			'Phylum: Confiance',
+			'Règne',
+			'Règne: Confiance'
+		],
+		[
+			expect.any(String),
+			'sample',
+			'Fasciosminthurus quinquefasciatus',
+			expect.stringMatching(/^0\.11/),
+			'Fasciosminthurus',
+			'1',
+			'Bourletiellidae',
+			'1',
+			'Symphypleona',
+			'1',
+			'Collembola',
+			'1',
+			'Arthropoda',
+			'1',
+			'Animalia',
+			'1'
+		]
+	]);
 });
 
 test('can import a large image', issue(412, 415), async ({ page }) => {

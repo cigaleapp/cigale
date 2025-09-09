@@ -1,10 +1,10 @@
-import extract from 'extract-zip';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
+	exportResults,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
@@ -31,14 +31,9 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await page.mouse.click(334, 292);
 	await page.mouse.click(543, 501);
 
-	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
-
-	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
-
-	const resultsDir = path.resolve('./tests/results/crop-padding');
-	await page.getByRole('button', { name: 'results.zip' }).click();
-	await page.waitForEvent('download').then((e) => e.saveAs(resultsDir + '.zip'));
-	await extract(resultsDir + '.zip', { dir: resultsDir });
+	const resultsDir = await exportResults(page, 'crop-padding', {
+		cropPadding: '40px'
+	});
 
 	expect(await readFile(path.join(resultsDir, 'Cropped/_1.png'))).toMatchSnapshot();
 });
