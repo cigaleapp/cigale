@@ -5,12 +5,13 @@
 	import Card from '$lib/Card.svelte';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { modelUrl } from '$lib/inference';
 	import { metadataDefinitionComparator } from '$lib/metadata';
+	import { m } from '$lib/paraglide/messages.js';
 	import { exportProtocol } from '$lib/protocols';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
-	import { m as messages } from '$lib/paraglide/messages.js';
 	import IconArrow from '~icons/ph/arrow-right';
 	import IconForeign from '~icons/ph/diamond';
 	import IconTaxonomy from '~icons/ph/graph';
@@ -23,7 +24,6 @@
 	import IconDelete from '~icons/ph/trash';
 	import IconAuthors from '~icons/ph/users';
 	import IconTechnical from '~icons/ph/wrench';
-	import { modelUrl } from '$lib/inference';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
 	const {
@@ -106,61 +106,52 @@
 	<section class="metadata">
 		<p class="subtitle">{metadata.length} métadonnées</p>
 		<ul>
-			{#each metadataOfProtocol as m (m.id)}
+			{#each metadataOfProtocol as meta (meta.id)}
 				<li>
-					<IconDatatype type={m.type} />
+					<IconDatatype type={meta.type} />
 					<div class="text">
 						<p class="name">
-							{#if m.label}
-								{m.label}
+							{#if meta.label}
+								{meta.label}
 							{:else}
-								<code>{m.id.replace(`${id}__`, '')}</code>
+								<code>{meta.id.replace(`${id}__`, '')}</code>
 							{/if}
-							{#if m.type === 'enum' && m.options}
+							{#if meta.type === 'enum' && meta.options}
 								<span
 									class="enum-options"
 									use:tooltip={[
-										...m.options.slice(0, 10),
-										{ label: m.options.length > 10 ? '…' : '' }
+										...meta.options.slice(0, 10),
+										{ label: meta.options.length > 10 ? '…' : '' }
 									]
 
 										.map((o) => o.label)
 										.filter(Boolean)
 										.join(', ')}
 								>
-									({m.options.length} options)
+									({meta.options.length} options)
 								</span>
 							{/if}
-							{#if !m.label}
-								<sup
-									use:tooltip={messages.technical_metadata_tooltip()}
-									style:color="var(--fg-error)"
-								>
+							{#if !meta.label}
+								<sup use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
 									<IconTechnical />
 								</sup>
 							{/if}
-							{#if 'taxonomic' in m}
-								<sup
-									use:tooltip={messages.taxonomic_metadata_tooltip()}
-									style:color="var(--fg-warning)"
-								>
+							{#if 'taxonomic' in meta}
+								<sup use:tooltip={m.taxonomic_metadata_tooltip()} style:color="var(--fg-warning)">
 									<IconTaxonomy />
 								</sup>
 							{/if}
-							{#if m.id === crop?.metadata || (m.infer && 'neural' in m.infer)}
-								<sup
-									use:tooltip={messages.inferred_metadata_tooltip()}
-									style:color="var(--fg-primary)"
-								>
+							{#if meta.id === crop?.metadata || (meta.infer && 'neural' in meta.infer)}
+								<sup use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
 									<IconInferred />
 								</sup>
-							{:else if m.infer && ('exif' in m.infer || ('latitude' in m.infer && 'exif' in m.infer.latitude))}
+							{:else if meta.infer && ('exif' in meta.infer || ('latitude' in meta.infer && 'exif' in meta.infer.latitude))}
 								<sup
-									use:tooltip={'exif' in m.infer
-										? messages.inferred_from_single_exif({ exif: m.infer.exif })
-										: messages.inferred_from_two_exif({
-												latitude: m.infer.latitude.exif,
-												longitude: m.infer.longitude.exif
+									use:tooltip={'exif' in meta.infer
+										? m.inferred_from_single_exif({ exif: meta.infer.exif })
+										: m.inferred_from_two_exif({
+												latitude: meta.infer.latitude.exif,
+												longitude: meta.infer.longitude.exif
 											})}
 									style:color="var(--fg-primary)"
 								>
@@ -169,13 +160,13 @@
 							{/if}
 						</p>
 						<code class="id">
-							{#if m.id.startsWith(`${id}__`)}
-								{m.id.replace(`${id}__`, '')}
+							{#if meta.id.startsWith(`${id}__`)}
+								{meta.id.replace(`${id}__`, '')}
 							{:else}
 								<span use:tooltip={"Cette métadonnée n'est pas définie par ce protocole"}>
 									<IconForeign />
 								</span>
-								{m.id}
+								{meta.id}
 							{/if}
 						</code>
 					</div>
@@ -184,7 +175,7 @@
 		</ul>
 	</section>
 	<section class="inference">
-		<p class="subtitle">{messages.inference()}</p>
+		<p class="subtitle">{m.inference()}</p>
 
 		<ul>
 			{#if crop}
@@ -192,7 +183,7 @@
 					<IconDetection />
 					<div class="text">
 						<p class="title">
-							{messages.detection_and_cropping()}
+							{m.detection_and_cropping()}
 							<IconArrow />
 							<code
 								use:tooltip={`La métadonnée stockant le résultat de la détection: ${crop.metadata}`}
@@ -241,7 +232,7 @@
 			}}
 		>
 			<IconExport />
-			{messages.export()}
+			{m.export()}
 		</ButtonSecondary>
 		<ButtonSecondary
 			disabled={id === uiState.currentProtocolId}
@@ -250,7 +241,7 @@
 			}}
 		>
 			<IconDelete />
-			{messages.delete()}
+			{m.delete()}
 		</ButtonSecondary>
 
 		{#if version && source}

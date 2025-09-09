@@ -111,6 +111,28 @@ jobs:
           else
             echo "All fr.json keys are present and non-empty in en.json"
           fi
+      - name: Check for unused messages
+        run: |
+          shopt -s globstar
+          unused=()
+          echo Unused keys in fr.json:
+          for key in $(jq -r 'keys[]' messages/fr.json); do
+            if [ "$key" == '$schema' ]; then
+              continue
+            fi
+            count=$(grep "m\.$key" src/**/*.{svelte,js} | wc -l)
+            if [ "$count" -eq 0 ]; then
+              unused+=("$key")
+              fr_value=$(jq -r --arg k "$key" '.[$k]' messages/fr.json)
+              echo "- $key: $fr_value"
+            fi
+          done
+          if [ ${#unused[@]} -ne 0 ]; then
+            echo "${#unused[@]} unused keys in fr.json"
+            exit 1
+          else
+            echo "All fr.json keys are used in the codebase"
+          fi
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
