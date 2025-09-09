@@ -9,10 +9,10 @@
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
-
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte';
 
 	const allImages = $derived([
 		...tables.Image.state.map(({ filename, id, addedAt, fileId }) => ({
@@ -38,6 +38,8 @@
 	filetypes={ACCEPTED_IMPORT_TYPES}
 	clickable={allImages.length === 0}
 	onfiles={({ files }) => importMore(files)}
+	onunacceptable={() =>
+		toasts.error('Certaines images ont un format de fichier non pris en charge')}
 >
 	<section class="observations" class:empty>
 		<AreaObservations
