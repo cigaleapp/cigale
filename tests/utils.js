@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import extractZip from 'extract-zip';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
