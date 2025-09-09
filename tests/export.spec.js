@@ -1,9 +1,9 @@
-import extract from 'extract-zip';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import { chooseProtocol, firstObservationCard, goToTab, importPhotos, setSettings } from './utils';
+import { chooseProtocol,
+	exportResults, firstObservationCard, goToTab, importPhotos, setSettings } from './utils';
 
 test('correctly applies crop padding', issue(463), async ({ page }) => {
 	// Disable inference to go faster
@@ -25,14 +25,9 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await page.mouse.click(278, 255);
 	await page.mouse.click(487, 464);
 
-	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
-
-	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
-
-	const resultsDir = path.resolve('./tests/results/crop-padding');
-	await page.getByRole('button', { name: 'results.zip' }).click();
-	await page.waitForEvent('download').then((e) => e.saveAs(resultsDir + '.zip'));
-	await extract(resultsDir + '.zip', { dir: resultsDir });
+	const resultsDir = await exportResults(page, 'crop-padding', {
+		cropPadding: '40px'
+	});
 
 	expect(await readFile(path.join(resultsDir, 'Cropped/(Unknown)_1.png'))).toMatchSnapshot();
 });
