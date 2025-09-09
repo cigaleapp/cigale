@@ -9,6 +9,7 @@ import { Analysis } from '../src/lib/schemas/results.js';
 import { expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
+	exportResults,
 	goToTab,
 	importProtocol,
 	mockProtocolSourceURL,
@@ -94,17 +95,10 @@ for (const offline of [false, true]) {
 			await page.getByTestId('first-observation-card').click();
 			await expect(page.getByText('Espèce')).toBeVisible();
 
-			// Export results
-			await page.getByTestId('app-nav').getByRole('button', { name: 'Résultats' }).click();
-			await page.getByText(/et images originales/i).click();
-			await page.getByText('results.zip').click();
-			const download = await page.waitForEvent('download');
-			expect(download.suggestedFilename()).toBe('results.zip');
-			await download.saveAs('./tests/results/lil-fella.zip');
-
-			// Inspect results
-			const resultsDir = path.resolve('./tests/results/lil-fella');
-			await extract('./tests/results/lil-fella.zip', { dir: resultsDir });
+			// Results
+			const resultsDir = await exportResults(page, 'lil-fella', {
+				kind: 'full'
+			});
 
 			expect(readdirTreeSync(resultsDir)).toMatchObject([
 				{ Cropped: ['Entomobrya muscorum_1.jpeg'] },
