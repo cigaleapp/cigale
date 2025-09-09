@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64.56% </span>
+                <span class="strong">63.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>297/460</span>
+                <span class='fraction'>302/475</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64.56% </span>
+                <span class="strong">63.57% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>297/460</span>
+                <span class='fraction'>302/475</span>
             </div>
         
             
@@ -576,7 +576,26 @@
 <a name='L511'></a><a href='#L511'>511</a>
 <a name='L512'></a><a href='#L512'>512</a>
 <a name='L513'></a><a href='#L513'>513</a>
-<a name='L514'></a><a href='#L514'>514</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L514'></a><a href='#L514'>514</a>
+<a name='L515'></a><a href='#L515'>515</a>
+<a name='L516'></a><a href='#L516'>516</a>
+<a name='L517'></a><a href='#L517'>517</a>
+<a name='L518'></a><a href='#L518'>518</a>
+<a name='L519'></a><a href='#L519'>519</a>
+<a name='L520'></a><a href='#L520'>520</a>
+<a name='L521'></a><a href='#L521'>521</a>
+<a name='L522'></a><a href='#L522'>522</a>
+<a name='L523'></a><a href='#L523'>523</a>
+<a name='L524'></a><a href='#L524'>524</a>
+<a name='L525'></a><a href='#L525'>525</a>
+<a name='L526'></a><a href='#L526'>526</a>
+<a name='L527'></a><a href='#L527'>527</a>
+<a name='L528'></a><a href='#L528'>528</a>
+<a name='L529'></a><a href='#L529'>529</a>
+<a name='L530'></a><a href='#L530'>530</a>
+<a name='L531'></a><a href='#L531'>531</a>
+<a name='L532'></a><a href='#L532'>532</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1082,15 +1101,33 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { uiState } from '$lib/state.svelte';
 import { ulid } from 'ulid';
+import LibRaw from 'libraw-wasm';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
@@ -1589,6 +1626,28 @@ export <span class="fstat-no" title="function not covered" >function parseCropPa
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
 /**
+ *
+ * @param {ArrayBuffer} bytes
+ */
+export <span class="fstat-no" title="function not covered" >async function decodeRawPhoto(bytes) {</span>
+<span class="cstat-no" title="statement not covered" >	const raw = new LibRaw();</span>
+<span class="cstat-no" title="statement not covered" >	await raw.open(new Uint8Array(bytes));</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	const { width, height, data: pixels } = await raw.imageData();</span>
+<span class="cstat-no" title="statement not covered" >	const imageData = new ImageData(width, height);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	// Fill imageData. Note that pixels stores in the following order: R/G/B first -&gt; height -&gt; width</span>
+<span class="cstat-no" title="statement not covered" >	for (let i = 0; i &lt; pixels.length / 3; i++) {</span>
+<span class="cstat-no" title="statement not covered" >		imageData.data[i * 4 + 0] = pixels[i * 3 + 0];</span>
+<span class="cstat-no" title="statement not covered" >		imageData.data[i * 4 + 1] = pixels[i * 3 + 1];</span>
+<span class="cstat-no" title="statement not covered" >		imageData.data[i * 4 + 2] = pixels[i * 3 + 2];</span>
+<span class="cstat-no" title="statement not covered" >		imageData.data[i * 4 + 3] = 255;</span>
+<span class="cstat-no" title="statement not covered" >	}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	return imageData;</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+/**
  * @param {ImageData} imageData
  * @returns {Promise&lt;string&gt;}
  */
@@ -1597,11 +1656,6 @@ export <span class="fstat-no" title="function not covered" >async function image
 <span class="cstat-no" title="statement not covered" >	canvas.getContext('2d')?.putImageData(imageData, 0, 0);</span>
 <span class="cstat-no" title="statement not covered" >	return canvas.convertToBlob().then((blob) =&gt; URL.createObjectURL(blob));</span>
 <span class="cstat-no" title="statement not covered" >}</span>
-&nbsp;
-export <span class="fstat-no" title="function not covered" >async function uint8ArrayToImageBlobURL(uint8Array, width, height) {</span>
-<span class="cstat-no" title="statement not covered" >	const img = new ImageData(new Uint8ClampedArray(uint8Array), width, height);</span>
-<span class="cstat-no" title="statement not covered" >	return imageDataToBlobURL(img);</span>
-<span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -1609,7 +1663,7 @@ export <span class="fstat-no" title="function not covered" >async function uint8
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-09T12:45:03.998Z
+                at 2025-09-09T13:03:31.086Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
