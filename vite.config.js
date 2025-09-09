@@ -54,7 +54,7 @@ export default defineConfig({
 		: {},
 	assetsInclude: ['**/*.wasm'],
 	optimizeDeps: {
-		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
+		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress', 'libraw-wasm']
 	},
 	build: {
 		minify: process.env.MINIFICATION !== 'off'

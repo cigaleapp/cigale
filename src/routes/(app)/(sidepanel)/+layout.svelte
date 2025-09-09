@@ -4,6 +4,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileId } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
@@ -19,7 +20,6 @@
 	import { cancellers } from '../+layout.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 	import { promptForFiles } from '$lib/files';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { fade } from 'svelte/transition';
 
 	seo({ title: 'Importer' });
