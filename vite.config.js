@@ -64,7 +64,7 @@ export default defineConfig({
 		crossOriginIsolation()
 	],
 	optimizeDeps: {
-		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
+		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress', 'libraw-wasm']
 	},
 	assetsInclude: ['**/*.wasm']
 });

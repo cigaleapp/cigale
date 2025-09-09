@@ -4,7 +4,7 @@
 import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 import { processExifData } from '$lib/exif';
 import { tables } from '$lib/idb.svelte';
-import { imageId, resizeToMaxSize, storeImageBytes } from '$lib/images';
+import { decodeRawPhoto, imageId, isRawImage, resizeToMaxSize, storeImageBytes } from '$lib/images';
 import { m } from '$lib/paraglide/messages.js';
 import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte';
@@ -35,20 +35,42 @@ export async function processImageFile(file, id) {
 		return;
 	}
 
-	const originalBytes = await file.arrayBuffer();
+	let originalBytes = await file.arrayBuffer();
 
 	if (originalBytes.byteLength > imageLimits.maxMemoryUsageInMB * Math.pow(2, 20)) {
 		toasts.error(m.image_too_large(imageLimits));
 		return;
 	}
 
-	const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
+	/** @type {ArrayBuffer} */
+	let resizedBytes;
+	/** @type {number} */
+	let width, height;
+	/** @type {string} */
+	let contentType;
+
+	if (isRawImage(file)) {
+		const decoded = await decodeRawPhoto(originalBytes);
+		originalBytes = decoded.data.buffer;
+		contentType = 'image/x-bitmap';
+
+		[[width, height], resizedBytes] = await resizeToMaxSize({
+			source: decoded,
+			type: 'image/jpeg'
+		});
+	} else {
+		contentType = file.type;
+		[[width, height], resizedBytes] = await resizeToMaxSize({
+			source: file,
+			type: file.type
+		});
+	}
 
 	await storeImageBytes({
 		id,
 		resizedBytes,
 		originalBytes,
-		contentType: file.type,
+		contentType,
 		filename: file.name,
 		width,
 		height
@@ -67,10 +89,12 @@ export async function processImageFile(file, id) {
 	// We have to remove the file from the processing files list once the Image database object has been created
 	uiState.processing.removeFile(id);
 
-	await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
-		console.error(error);
-		toasts.error(m.error_extracting_exif_metadata({ fileName: file.name }));
-	});
+	if (!isRawImage(file)) {
+		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
+			console.error(error);
+			toasts.error(m.error_extracting_exif_metadata({ fileName: file.name }));
+		});
+	}
 }
 
 /**
