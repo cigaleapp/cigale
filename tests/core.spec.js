@@ -173,6 +173,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	async function reset() {
 		await classificationModel.getByRole('radio', { name: 'Léger' }).click();
 		await cropModel.getByRole('radio', { name: 'YOLO11' }).click();
+		await page.waitForTimeout(500);
 	}
 
 	await page.goto('?classificationModel=0');
