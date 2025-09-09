@@ -140,6 +140,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 			abortSignal: tools.abortSignal
 		},
 		[file.bytes],
+		pick(file, 'contentType', 'dimensions'),
 		session
 	);
 
@@ -175,6 +176,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, protocol }, _, tools
 	// We gotta normalize since this img will be used to set a cropped Preview URL -- classify() itself takes care of normalizing (or not) depending on the protocol
 	const img = await loadToTensor([file.bytes], {
 		...taskSettings.input,
+		...pick(file, 'dimensions', 'contentType'),
 		normalized: true,
 		crop: cropbox,
 		abortSignal: tools.abortSignal

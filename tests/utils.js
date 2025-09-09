@@ -682,3 +682,55 @@ export async function setHardwareConcurrency(page, value) {
 export function firstObservationCard(page) {
 	return page.getByTestId('observations-area').getByRole('article').first();
 }
+
+/**
+ * Exports the results of the analysis.
+ * @param {Page} page
+ * @param {string} destination
+ * @param {{ cropPadding?: string, kind?: 'metadata' | 'cropped' | 'full' }} options
+ */
+export async function exportResults(
+	page,
+	destination,
+	{ cropPadding = '0px', kind = 'cropped' } = {}
+) {
+	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
+
+	if (cropPadding.endsWith('px')) {
+		await page
+			.getByRole('radio', { name: '0 px' })
+			.getByRole('textbox')
+			.fill(cropPadding.replace(/px$/, ''));
+	} else {
+		await page.getByRole('radio', { name: cropPadding }).check();
+	}
+
+	await page
+		.getByText(
+			{
+				metadata: 'Métadonnées seulement',
+				cropped: 'Métadonnées et images recadrées',
+				full: 'Métadonnées, images recadrées et images originales'
+			}[kind]
+		)
+		.click();
+
+	const resultsDir = path.resolve(`./tests/results/${destination}`);
+	await page.getByRole('button', { name: 'results.zip' }).click();
+	const download = await page.waitForEvent('download');
+	expect(download.suggestedFilename()).toBe('results.zip');
+	await download.saveAs(`./tests/results/${destination}.zip`);
+	await extractZip(`${resultsDir}.zip`, { dir: resultsDir });
+
+	return resultsDir;
+}
+
+/**
+ *
+ * @param {string} contents
+ */
+export function parseCsv(contents) {
+	return contents
+		.split('\n')
+		.map((row) => row.split(';').map((cell) => cell.replace(/^"(.+)"$/, '$1')));
+}

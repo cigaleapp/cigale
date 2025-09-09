@@ -1,4 +1,5 @@
 import { uiState } from '$lib/state.svelte';
+import LibRaw from 'libraw-wasm';
 import { ulid } from 'ulid';
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { errorMessage, humanFormatName } from './i18n';
@@ -271,6 +272,52 @@ const RAW_IMAGE_MEDIA_TYPES = [
 	'image/x-sigma-x3f'
 ];
 
+const RAW_IMAGE_FILE_EXTENSIONS = [
+	'.3fr',
+	'.ari',
+	'.arw',
+	'.bay',
+	'.braw',
+	'.crw',
+	'.cr2',
+	'.cr3',
+	'.cap',
+	'.data',
+	'.dcs',
+	'.dcr',
+	'.dng',
+	'.drf',
+	'.eip',
+	'.erf',
+	'.fff',
+	'.gpr',
+	'.iiq',
+	'.k25',
+	'.kdc',
+	'.mdc',
+	'.mef',
+	'.mos',
+	'.mrw',
+	'.nef',
+	'.nrw',
+	'.obm',
+	'.orf',
+	'.pef',
+	'.ptx',
+	'.pxn',
+	'.r3d',
+	'.raf',
+	'.raw',
+	'.rwl',
+	'.rw2',
+	'.rwz',
+	'.sr2',
+	'.srf',
+	'.srw',
+	'.tif',
+	'.x3f'
+];
+
 const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
 const SUPPORT_PLANNED_TYPES = [...RAW_IMAGE_MEDIA_TYPES];
 
@@ -281,15 +328,16 @@ export function errorMessageImageTooLarge() {
 /**
  * Resize an image to fit within MAXWIDTH and MAXHEIGHT
  * @param {object} param0
- * @param {Blob} param0.source
+ * @param {ImageBitmapSource} param0.source
+ * @param {string} param0.type
  * @returns {Promise<[[number, number], ArrayBuffer]>} [[original width, original height], resized image data]
  */
-export async function resizeToMaxSize({ source }) {
+export async function resizeToMaxSize({ source, type }) {
 	// For some reason top-level import fails
 	const { resize } = await import('pica-gpu');
 	const originalImage = await createImageBitmap(source).catch((error) => {
 		throw new Error(
-			ALWAYS_SUPPORTED_TYPES.includes(source.type)
+			ALWAYS_SUPPORTED_TYPES.includes(type)
 				? errorMessage(error)
 				: SUPPORT_PLANNED_TYPES.includes(source.type)
 					? `Les fichiers ${humanFormatName(source.type)} ne sont pas encore supportés`
@@ -319,7 +367,7 @@ export async function resizeToMaxSize({ source }) {
 		resizedCanvas.toBlob((blob) => {
 			if (!blob) throw new Error('Failed to resize image');
 			blob.arrayBuffer().then((buf) => resolve([[width, height], buf]));
-		}, source.type);
+		}, type);
 	});
 }
 
@@ -472,4 +520,47 @@ export function parseCropPadding(padding) {
 		unit,
 		inPixels: (axis) => (unit === 'px' ? value : Math.round((axis * value) / 100))
 	};
+}
+
+/**
+ *
+ * @param {File} file
+ */
+export function isRawImage(file) {
+	return (
+		RAW_IMAGE_MEDIA_TYPES.includes(file.type) ||
+		RAW_IMAGE_FILE_EXTENSIONS.some((ext) => file.name.toLocaleLowerCase().endsWith(ext))
+	);
+}
+
+/**
+ *
+ * @param {ArrayBuffer} bytes
+ */
+export async function decodeRawPhoto(bytes) {
+	const raw = new LibRaw();
+	await raw.open(new Uint8Array(bytes));
+
+	const { width, height, data: pixels } = await raw.imageData();
+	const imageData = new ImageData(width, height);
+
+	// Fill imageData. Note that pixels stores in the following order: R/G/B first -> height -> width
+	for (let i = 0; i < pixels.length / 3; i++) {
+		imageData.data[i * 4 + 0] = pixels[i * 3 + 0];
+		imageData.data[i * 4 + 1] = pixels[i * 3 + 1];
+		imageData.data[i * 4 + 2] = pixels[i * 3 + 2];
+		imageData.data[i * 4 + 3] = 255;
+	}
+
+	return imageData;
+}
+
+/**
+ * @param {ImageData} imageData
+ * @returns {Promise<string>}
+ */
+export async function imageDataToBlobURL(imageData) {
+	const canvas = new OffscreenCanvas(imageData.width, imageData.height);
+	canvas.getContext('2d')?.putImageData(imageData, 0, 0);
+	return canvas.convertToBlob().then((blob) => URL.createObjectURL(blob));
 }
