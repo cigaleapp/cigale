@@ -397,16 +397,7 @@
 <a name='L332'></a><a href='#L332'>332</a>
 <a name='L333'></a><a href='#L333'>333</a>
 <a name='L334'></a><a href='#L334'>334</a>
-<a name='L335'></a><a href='#L335'>335</a>
-<a name='L336'></a><a href='#L336'>336</a>
-<a name='L337'></a><a href='#L337'>337</a>
-<a name='L338'></a><a href='#L338'>338</a>
-<a name='L339'></a><a href='#L339'>339</a>
-<a name='L340'></a><a href='#L340'>340</a>
-<a name='L341'></a><a href='#L341'>341</a>
-<a name='L342'></a><a href='#L342'>342</a>
-<a name='L343'></a><a href='#L343'>343</a>
-<a name='L344'></a><a href='#L344'>344</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L335'></a><a href='#L335'>335</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -540,26 +531,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -756,12 +738,13 @@
 	import Card from '$lib/Card.svelte';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { modelUrl } from '$lib/inference';
 	import { metadataDefinitionComparator } from '$lib/metadata';
+	import { m } from '$lib/paraglide/messages.js';
 	import { exportProtocol } from '$lib/protocols';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
-	import { m as messages } from '$lib/paraglide/messages.js';
 	import IconArrow from '~icons/ph/arrow-right';
 	import IconForeign from '~icons/ph/diamond';
 	import IconTaxonomy from '~icons/ph/graph';
@@ -774,7 +757,6 @@
 	import IconDelete from '~icons/ph/trash';
 	import IconAuthors from '~icons/ph/users';
 	import IconTechnical from '~icons/ph/wrench';
-	import { modelUrl } from '$lib/inference';
 &nbsp;
 	/** @type {import('$lib/database').Protocol &amp; { ondelete: () =&gt; void }} */
 	const {
@@ -857,61 +839,52 @@
 	&lt;section class="metadata"&gt;
 <span class="cstat-no" title="statement not covered" >		&lt;p class="subtitle"&gt;{metadata.length} métadonnées&lt;/p&gt;</span>
 		&lt;ul&gt;
-<span class="cstat-no" title="statement not covered" >			{#each metadataOfProtocol as m (m.id)}</span>
+<span class="cstat-no" title="statement not covered" >			{#each metadataOfProtocol as meta (meta.id)}</span>
 				&lt;li&gt;
-<span class="cstat-no" title="statement not covered" >					&lt;IconDatatype type={m.type} /&gt;</span>
+<span class="cstat-no" title="statement not covered" >					&lt;IconDatatype type={meta.type} /&gt;</span>
 					&lt;div class="text"&gt;
 						&lt;p class="name"&gt;
-<span class="cstat-no" title="statement not covered" >							{#if m.label}</span>
-<span class="cstat-no" title="statement not covered" >								{m.label}</span>
+<span class="cstat-no" title="statement not covered" >							{#if meta.label}</span>
+<span class="cstat-no" title="statement not covered" >								{meta.label}</span>
 							{:else}
-<span class="cstat-no" title="statement not covered" >								&lt;code&gt;{m.id.replace(`${id}__`, '')}&lt;/code&gt;</span>
+<span class="cstat-no" title="statement not covered" >								&lt;code&gt;{meta.id.replace(`${id}__`, '')}&lt;/code&gt;</span>
 							{/if}
-<span class="cstat-no" title="statement not covered" >							{#if m.type === 'enum' &amp;&amp; m.options}</span>
+<span class="cstat-no" title="statement not covered" >							{#if meta.type === 'enum' &amp;&amp; meta.options}</span>
 								&lt;span
 									class="enum-options"
 									use:tooltip={[
-<span class="cstat-no" title="statement not covered" >										...m.options.slice(0, 10),</span>
-<span class="cstat-no" title="statement not covered" >										{ label: m.options.length &gt; 10 ? '…' : '' }</span>
+<span class="cstat-no" title="statement not covered" >										...meta.options.slice(0, 10),</span>
+<span class="cstat-no" title="statement not covered" >										{ label: meta.options.length &gt; 10 ? '…' : '' }</span>
 									]
 &nbsp;
 <span class="cstat-no" title="statement not covered" >										.map((o) =&gt; o.label)</span>
 <span class="cstat-no" title="statement not covered" >										.filter(Boolean)</span>
 <span class="cstat-no" title="statement not covered" >										.join(', ')}</span>
 								&gt;
-<span class="cstat-no" title="statement not covered" >									({m.options.length} options)</span>
+<span class="cstat-no" title="statement not covered" >									({meta.options.length} options)</span>
 								&lt;/span&gt;
 							{/if}
-<span class="cstat-no" title="statement not covered" >							{#if !m.label}</span>
-								&lt;sup
-<span class="cstat-no" title="statement not covered" >									use:tooltip={messages.technical_metadata_tooltip()}</span>
-									style:color="var(--fg-error)"
-								&gt;
+<span class="cstat-no" title="statement not covered" >							{#if !meta.label}</span>
+<span class="cstat-no" title="statement not covered" >								&lt;sup use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)"&gt;</span>
 									&lt;IconTechnical /&gt;
 								&lt;/sup&gt;
 							{/if}
-<span class="cstat-no" title="statement not covered" >							{#if 'taxonomic' in m}</span>
-								&lt;sup
-<span class="cstat-no" title="statement not covered" >									use:tooltip={messages.taxonomic_metadata_tooltip()}</span>
-									style:color="var(--fg-warning)"
-								&gt;
+<span class="cstat-no" title="statement not covered" >							{#if 'taxonomic' in meta}</span>
+<span class="cstat-no" title="statement not covered" >								&lt;sup use:tooltip={m.taxonomic_metadata_tooltip()} style:color="var(--fg-warning)"&gt;</span>
 									&lt;IconTaxonomy /&gt;
 								&lt;/sup&gt;
 							{/if}
-<span class="cstat-no" title="statement not covered" >							{#if m.id === crop?.metadata || (m.infer &amp;&amp; 'neural' in m.infer)}</span>
-								&lt;sup
-<span class="cstat-no" title="statement not covered" >									use:tooltip={messages.inferred_metadata_tooltip()}</span>
-									style:color="var(--fg-primary)"
-								&gt;
+<span class="cstat-no" title="statement not covered" >							{#if meta.id === crop?.metadata || (meta.infer &amp;&amp; 'neural' in meta.infer)}</span>
+<span class="cstat-no" title="statement not covered" >								&lt;sup use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)"&gt;</span>
 									&lt;IconInferred /&gt;
 								&lt;/sup&gt;
-<span class="cstat-no" title="statement not covered" >							{:else if m.infer &amp;&amp; ('exif' in m.infer || ('latitude' in m.infer &amp;&amp; 'exif' in m.infer.latitude))}</span>
+<span class="cstat-no" title="statement not covered" >							{:else if meta.infer &amp;&amp; ('exif' in meta.infer || ('latitude' in meta.infer &amp;&amp; 'exif' in meta.infer.latitude))}</span>
 								&lt;sup
-<span class="cstat-no" title="statement not covered" >									use:tooltip={'exif' in m.infer</span>
-<span class="cstat-no" title="statement not covered" >										? messages.inferred_from_single_exif({ exif: m.infer.exif })</span>
-<span class="cstat-no" title="statement not covered" >										: messages.inferred_from_two_exif({</span>
-<span class="cstat-no" title="statement not covered" >												latitude: m.infer.latitude.exif,</span>
-<span class="cstat-no" title="statement not covered" >												longitude: m.infer.longitude.exif</span>
+<span class="cstat-no" title="statement not covered" >									use:tooltip={'exif' in meta.infer</span>
+<span class="cstat-no" title="statement not covered" >										? m.inferred_from_single_exif({ exif: meta.infer.exif })</span>
+<span class="cstat-no" title="statement not covered" >										: m.inferred_from_two_exif({</span>
+<span class="cstat-no" title="statement not covered" >												latitude: meta.infer.latitude.exif,</span>
+<span class="cstat-no" title="statement not covered" >												longitude: meta.infer.longitude.exif</span>
 											})}
 									style:color="var(--fg-primary)"
 								&gt;
@@ -920,13 +893,13 @@
 							{/if}
 						&lt;/p&gt;
 						&lt;code class="id"&gt;
-<span class="cstat-no" title="statement not covered" >							{#if m.id.startsWith(`${id}__`)}</span>
-<span class="cstat-no" title="statement not covered" >								{m.id.replace(`${id}__`, '')}</span>
+<span class="cstat-no" title="statement not covered" >							{#if meta.id.startsWith(`${id}__`)}</span>
+<span class="cstat-no" title="statement not covered" >								{meta.id.replace(`${id}__`, '')}</span>
 							{:else}
 <span class="cstat-no" title="statement not covered" >								&lt;span use:tooltip={"Cette métadonnée n'est pas définie par ce protocole"}&gt;</span>
 									&lt;IconForeign /&gt;
 								&lt;/span&gt;
-<span class="cstat-no" title="statement not covered" >								{m.id}</span>
+<span class="cstat-no" title="statement not covered" >								{meta.id}</span>
 							{/if}
 						&lt;/code&gt;
 					&lt;/div&gt;
@@ -935,7 +908,7 @@
 		&lt;/ul&gt;
 	&lt;/section&gt;
 	&lt;section class="inference"&gt;
-<span class="cstat-no" title="statement not covered" >		&lt;p class="subtitle"&gt;{messages.inference()}&lt;/p&gt;</span>
+<span class="cstat-no" title="statement not covered" >		&lt;p class="subtitle"&gt;{m.inference()}&lt;/p&gt;</span>
 &nbsp;
 		&lt;ul&gt;
 			{#if crop}
@@ -943,7 +916,7 @@
 					&lt;IconDetection /&gt;
 					&lt;div class="text"&gt;
 						&lt;p class="title"&gt;
-<span class="cstat-no" title="statement not covered" >							{messages.detection_and_cropping()}</span>
+<span class="cstat-no" title="statement not covered" >							{m.detection_and_cropping()}</span>
 							&lt;IconArrow /&gt;
 							&lt;code
 <span class="cstat-no" title="statement not covered" >								use:tooltip={`La métadonnée stockant le résultat de la détection: ${crop.metadata}`}</span>
@@ -992,7 +965,7 @@
 <span class="cstat-no" title="statement not covered" >			}}</span>
 		&gt;
 			&lt;IconExport /&gt;
-<span class="cstat-no" title="statement not covered" >			{messages.export()}</span>
+<span class="cstat-no" title="statement not covered" >			{m.export()}</span>
 		&lt;/ButtonSecondary&gt;
 		&lt;ButtonSecondary
 <span class="cstat-no" title="statement not covered" >			disabled={id === uiState.currentProtocolId}</span>
@@ -1001,7 +974,7 @@
 <span class="cstat-no" title="statement not covered" >			}}</span>
 		&gt;
 			&lt;IconDelete /&gt;
-<span class="cstat-no" title="statement not covered" >			{messages.delete()}</span>
+<span class="cstat-no" title="statement not covered" >			{m.delete()}</span>
 		&lt;/ButtonSecondary&gt;
 &nbsp;
 		{#if version &amp;&amp; source}
@@ -1099,7 +1072,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-09T14:18:46.910Z
+                at 2025-09-09T16:52:02.721Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
