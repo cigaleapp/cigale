@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for cigale/src/lib/paraglide/registry.js</title>
+    <title>Code coverage report for cigale/src/lib/paths.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../../prettify.css" />
-    <link rel="stylesheet" href="../../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">cigale/src/lib/paraglide</a> registry.js</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">cigale/src/lib</a> paths.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/28</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/28</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -91,25 +91,13 @@
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -123,37 +111,43 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >// eslint-disable<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import * as navigation from '$app/navigation';<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cstat-no" title="statement not covered" >import { resolve } from '$app/paths';</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
-<span class="cstat-no" title="statement not covered" > * @param {import("./runtime.js").Locale} locale</span>
-<span class="cstat-no" title="statement not covered" > * @param {unknown} input</span>
-<span class="cstat-no" title="statement not covered" > * @param {Intl.PluralRulesOptions} [options]</span>
-<span class="cstat-no" title="statement not covered" > * @returns {string}</span>
+<span class="cstat-no" title="statement not covered" > * @import { RouteId, Pathname, RouteParams } from '$app/types';</span>
 <span class="cstat-no" title="statement not covered" > */</span>
-<span class="cstat-no" title="statement not covered" >export function plural(locale, input, options) { </span>
-<span class="cstat-no" title="statement not covered" >	return new Intl.PluralRules(locale, options).select(Number(input))</span>
-<span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
-<span class="cstat-no" title="statement not covered" > * @param {import("./runtime.js").Locale} locale</span>
-<span class="cstat-no" title="statement not covered" > * @param {unknown} input</span>
-<span class="cstat-no" title="statement not covered" > * @param {Intl.NumberFormatOptions} [options]</span>
-<span class="cstat-no" title="statement not covered" > * @returns {string}</span>
+<span class="cstat-no" title="statement not covered" > * @template {RouteId | Pathname} T</span>
+<span class="cstat-no" title="statement not covered" > * @typedef { T extends RouteId ? RouteParams&lt;T&gt; extends Record&lt;string, never&gt; ? [route: T] : [route: T, params: RouteParams&lt;T&gt;] : [route: T] } ResolveArgs</span>
 <span class="cstat-no" title="statement not covered" > */</span>
-<span class="cstat-no" title="statement not covered" >export function number(locale, input, options) {</span>
-<span class="cstat-no" title="statement not covered" >	return new Intl.NumberFormat(locale, options).format(Number(input))</span>
-<span class="cstat-no" title="statement not covered" >};</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >/**</span>
-<span class="cstat-no" title="statement not covered" > * @param {import("./runtime.js").Locale} locale</span>
-<span class="cstat-no" title="statement not covered" > * @param {unknown} input</span>
-<span class="cstat-no" title="statement not covered" > * @param {Intl.DateTimeFormatOptions} [options]</span>
-<span class="cstat-no" title="statement not covered" > * @returns {string}</span>
+<span class="cstat-no" title="statement not covered" > * @template {RouteId | Pathname} T</span>
+<span class="cstat-no" title="statement not covered" > * @param {ResolveArgs&lt;T&gt;} args</span>
 <span class="cstat-no" title="statement not covered" > */</span>
-<span class="cstat-no" title="statement not covered" >export function datetime(locale, input, options) {</span>
-<span class="cstat-no" title="statement not covered" >	return new Intl.DateTimeFormat(locale, options).format(new Date(/** @type {string} */ (input)))</span>
-<span class="cstat-no" title="statement not covered" >};</span></pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >export async function goto(...args) {</span>
+<span class="cstat-no" title="statement not covered" >	// eslint-disable-next-line svelte/no-navigation-without-resolve</span>
+<span class="cstat-no" title="statement not covered" >	await navigation.goto('#' + resolve(...args));</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >/**</span>
+<span class="cstat-no" title="statement not covered" > * @template {RouteId | Pathname} T</span>
+<span class="cstat-no" title="statement not covered" > * @param {ResolveArgs&lt;T&gt;} args</span>
+<span class="cstat-no" title="statement not covered" > */</span>
+<span class="cstat-no" title="statement not covered" >export function href(...args) {</span>
+<span class="cstat-no" title="statement not covered" >	return '#' + resolve(...args);</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
@@ -162,14 +156,14 @@
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-09-09T20:49:05.652Z
             </div>
-        <script src="../../../../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../../sorter.js"></script>
-        <script src="../../../../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     
