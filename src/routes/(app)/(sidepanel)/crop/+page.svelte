@@ -1,5 +1,5 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { goto } from '$lib/paths.js';
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import * as idb from '$lib/idb.svelte.js';
@@ -77,7 +77,7 @@
 		<div class="empty">
 			<Logo variant="empty" --size="6em" />
 			<p>{m.no_images()}</p>
-			<ButtonSecondary onclick={() => goto('#/import')}>
+			<ButtonSecondary onclick={() => goto('/import')}>
 				{m.import_tab()}
 			</ButtonSecondary>
 		</div>

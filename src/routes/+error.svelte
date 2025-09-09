@@ -5,7 +5,7 @@
 	import IconReset from '~icons/ph/arrows-counter-clockwise-light';
 	import { nukeDatabase } from '$lib/idb.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
-	import { goto } from '$app/navigation';
+	import { goto } from '$lib/paths.js';
 	import { m } from '$lib/paraglide/messages.js';
 </script>
 
@@ -13,11 +13,7 @@
 	<Logo --size="6em" variant="error" />
 	<section class="notfound">
 		{#if page.status === 404}
-			<ButtonPrimary
-				onclick={() => {
-					goto('#/');
-				}}
-			>
+			<ButtonPrimary onclick={() => goto('/')}>
 				{m.home()}
 			</ButtonPrimary>
 		{/if}
@@ -28,7 +24,7 @@
 			<code>HTTP {page.status}</code>
 			<br />
 			<code class="message">
-				{page.error?.message ?? '<No diagonstic>'}
+				{page.error?.message ?? '<No diagnostic>'}
 			</code>
 		</p>
 		{#if page.status !== 404}

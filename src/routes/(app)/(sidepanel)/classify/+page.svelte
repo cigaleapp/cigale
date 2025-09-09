@@ -1,6 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { classificationInferenceSettings } from '$lib/classification.svelte.js';
 	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
@@ -14,6 +15,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { m } from '$lib/paraglide/messages.js';
+	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
@@ -21,8 +23,6 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { onMount } from 'svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { goto } from '$app/navigation';
 
 	seo({ title: m.classification() });
 
@@ -142,6 +142,7 @@
 	{#if uiState.classificationInferenceAvailable}
 		{@const { model } = uiState.classificationModels[uiState.selectedClassificationModel]}
 		{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a href={url.toString()} target="_blank">
 			<code>{url.pathname.split('/').at(-1)}</code>
 		</a>
@@ -186,7 +187,7 @@
 			<div class="empty">
 				<Logo variant="empty" --size="6em" />
 				<p>{m.no_images()}</p>
-				<ButtonSecondary onclick={() => goto('#/import')}>
+				<ButtonSecondary onclick={() => goto('/import')}>
 					{m.import_tab()}
 				</ButtonSecondary>
 			</div>

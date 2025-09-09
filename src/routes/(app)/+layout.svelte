@@ -137,10 +137,7 @@
 	{/each}
 </section>
 
-<div
-	class="contents"
-	class:padded={!page.route.id?.includes('/(sidepanel)') && page.route.id !== '/(app)/crop/[image]'}
->
+<div class="contents" class:padded={!page.route.id?.includes('/(sidepanel)')}>
 	{@render children?.()}
 </div>
 

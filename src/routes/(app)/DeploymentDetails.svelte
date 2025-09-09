@@ -36,6 +36,7 @@
 {#snippet githubUser(
 	/** @type {{ url: string; html_url: string; login: string; avatar_url: string }} */ user
 )}
+	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 	<a class="github-user" href={user.html_url} title={`@${user.login}`}>
 		<img src={user.avatar_url} alt="Avatar de {user.login}" />
 		{#await fetch(user.url).then((res) => res.json())}

@@ -77,6 +77,7 @@
 		{#if i > 0},
 		{/if}
 		{#if url}
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a target="_blank" href={url}>{name}</a>
 		{:else}
 			{name}

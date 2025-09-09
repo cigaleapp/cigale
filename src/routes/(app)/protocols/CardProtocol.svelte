@@ -1,5 +1,5 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import Card from '$lib/Card.svelte';
@@ -55,6 +55,7 @@
 			{#if params.name}
 				{params.name}:
 			{/if}
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a href={modelUrl(params.model)}>
 				{modelUrl(params.model).split('/').at(-1)}
 			</a>
@@ -81,6 +82,7 @@
 		{#if learnMore}
 			<p class="source">
 				<IconSource />
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={learnMore}>{learnMore.replace('https://', '')}</a>
 			</p>
 		{/if}
@@ -228,7 +230,7 @@
 	<section class="actions">
 		<ButtonSecondary
 			onclick={async () => {
-				await exportProtocol(base, id).catch((e) => toasts.error(e));
+				await exportProtocol(resolve('/'), id).catch((e) => toasts.error(e));
 			}}
 		>
 			<IconExport />

@@ -42,6 +42,7 @@
 	{#if uiState.cropInferenceAvailable}
 		{@const { model } = uiState.cropModels[uiState.selectedCropModel]}
 		{@const url = new URL(typeof model === 'string' ? model : model?.url)}
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a href={url.toString()} target="_blank">
 			<code>{url.pathname.split('/').at(-1)}</code>
 		</a>
