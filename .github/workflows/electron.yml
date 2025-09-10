@@ -1,7 +1,9 @@
 name: Desktop app
 
 on:
+  workflow_dispatch:
   push:
+    tags: [v*]
 
 # https://www.electronforge.io/config/publishers/github#authentication
 permissions:
