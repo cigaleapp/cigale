@@ -48,18 +48,6 @@ async function openDatabase() {
 	return _db;
 }
 
-let locale = 'fr';
-
-// TODO: remove once https://github.com/gwennlbh/swarpc/issues/32 is resolved
-// @ts-expect-error
-globalThis.localStorage = {
-	/** @param {string} key */
-	getItem(key) {
-		if (key === 'PARAGLIDE_LOCALE') return locale;
-		throw new Error(`Cannot get ${key} from virtual localStorage`);
-	}
-};
-
 const swarp = Swarp.Server(PROCEDURES);
 
 /**
@@ -89,8 +77,7 @@ function inferenceModelId(protocolId, request) {
 	].join('|');
 }
 
-swarp.init(async ({ databaseName, databaseRevision, locale: loc }) => {
-	locale = loc;
+swarp.init(async ({ databaseName, databaseRevision }) => {
 	databaseParams = { name: databaseName, revision: databaseRevision };
 });
 

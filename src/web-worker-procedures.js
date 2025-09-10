@@ -9,8 +9,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	init: {
 		input: type({
 			databaseName: 'string',
-			databaseRevision: 'number.integer >= 1',
-			locale: type.enumerated('fr', 'en', 'ja')
+			databaseRevision: 'number.integer >= 1'
 		}),
 		progress: type('undefined'),
 		success: type('undefined')
