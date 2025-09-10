@@ -1,0 +1,1 @@
+.progress-bar.inactive.svelte-2dd888{opacity:0;transition:opacity 1s}.progress-bar.svelte-2dd888{width:100%;height:.25rem;border-radius:var(--corners, 0);background:var(--inactive-bg);overflow:hidden}.progress-bar.svelte-2dd888 .completed:where(.svelte-2dd888){height:100%;background:var(--fg-primary);transition:width .5s}.progress-percentage.svelte-2dd888{text-align:center}
