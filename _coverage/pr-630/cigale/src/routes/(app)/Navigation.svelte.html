@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/109</span>
+                <span class='fraction'>0/113</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/109</span>
+                <span class='fraction'>0/113</span>
             </div>
         
             
@@ -420,7 +420,9 @@
 <a name='L355'></a><a href='#L355'>355</a>
 <a name='L356'></a><a href='#L356'>356</a>
 <a name='L357'></a><a href='#L357'>357</a>
-<a name='L358'></a><a href='#L358'>358</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -562,7 +564,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -574,7 +576,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -598,6 +600,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -615,7 +619,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -794,7 +798,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, href } from '$lib/paths.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 &nbsp;
 	/**
@@ -879,22 +883,22 @@
 <span class="cstat-no" title="statement not covered" >	defineKeyboardShortcuts('navigation', {</span>
 		// Choose [P]rotocol
 <span class="cstat-no" title="statement not covered" >		'g p': {</span>
-<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('#/'),</span>
+<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('/'),</span>
 <span class="cstat-no" title="statement not covered" >			help: m.goto_protocol_tab()</span>
 		},
 		// [I]mport images
 <span class="cstat-no" title="statement not covered" >		'g i': {</span>
-<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('#/import'),</span>
+<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('/import'),</span>
 <span class="cstat-no" title="statement not covered" >			help: m.goto_import_tab()</span>
 		},
 		// Adjust C[r]ops
 <span class="cstat-no" title="statement not covered" >		'g r': {</span>
-<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('#/crop'),</span>
+<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('/crop'),</span>
 <span class="cstat-no" title="statement not covered" >			help: m.goto_crop_tab()</span>
 		},
 		// A[n]notate images
 <span class="cstat-no" title="statement not covered" >		'g n': {</span>
-<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('#/classify'),</span>
+<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('/classify'),</span>
 <span class="cstat-no" title="statement not covered" >			help: m.goto_classify_tab()</span>
 		},
 		// E[x]port results
@@ -904,7 +908,7 @@
 		},
 		// [M]anage protocols
 <span class="cstat-no" title="statement not covered" >		'g m': {</span>
-<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('#/manage'),</span>
+<span class="cstat-no" title="statement not covered" >			do: () =&gt; goto('/manage'),</span>
 <span class="cstat-no" title="statement not covered" >			help: m.goto_protocol_management()</span>
 		}
 	});
@@ -919,7 +923,7 @@
 <span class="cstat-no" title="statement not covered" >&lt;header bind:clientHeight={height} class:native-window={isNativeWindow}&gt;</span>
 <span class="cstat-no" title="statement not covered" >	&lt;nav bind:clientHeight={navHeight} data-testid="app-nav"&gt;</span>
 		&lt;div class="logo"&gt;
-			&lt;a href="#/"&gt;
+<span class="cstat-no" title="statement not covered" >			&lt;a href={href('/')}&gt;</span>
 				&lt;Logo --fill="var(--bg-primary)" /&gt;
 				C.i.g.a.l.e.
 			&lt;/a&gt;
@@ -931,7 +935,7 @@
 		&lt;/div&gt;
 &nbsp;
 		&lt;div class="steps"&gt;
-			&lt;a href="#/"&gt;
+<span class="cstat-no" title="statement not covered" >			&lt;a href={href('/')}&gt;</span>
 <span class="cstat-no" title="statement not covered" >				{m.protocol_tab()}</span>
 				&lt;!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check --&gt;
 <span class="cstat-no" title="statement not covered" >				{#if path == '/' || path == ''}</span>
@@ -939,7 +943,7 @@
 				{/if}
 			&lt;/a&gt;
 			&lt;IconNext&gt;&lt;/IconNext&gt;
-<span class="cstat-no" title="statement not covered" >			&lt;a href="#/import" data-testid="goto-import" aria-disabled={!uiState.currentProtocol}&gt;</span>
+<span class="cstat-no" title="statement not covered" >			&lt;a href={href('/import')} data-testid="goto-import" aria-disabled={!uiState.currentProtocol}&gt;</span>
 <span class="cstat-no" title="statement not covered" >				{m.import_tab()}</span>
 <span class="cstat-no" title="statement not covered" >				{#if path == '/import'}</span>
 					&lt;div class="line"&gt;&lt;/div&gt;
@@ -948,9 +952,11 @@
 			&lt;IconNext&gt;&lt;/IconNext&gt;
 			&lt;div class="with-inference-indicator"&gt;
 				&lt;a
-<span class="cstat-no" title="statement not covered" >					href="#/crop/{page.route.id === '/(app)/crop/[image]'</span>
-<span class="cstat-no" title="statement not covered" >						? ''</span>
-<span class="cstat-no" title="statement not covered" >						: uiState.imageOpenedInCropper}"</span>
+<span class="cstat-no" title="statement not covered" >					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &amp;&amp; uiState.imageOpenedInCropper</span>
+<span class="cstat-no" title="statement not covered" >						? href('/(app)/(sidepanel)/crop/[image]', {</span>
+<span class="cstat-no" title="statement not covered" >								image: uiState.imageOpenedInCropper</span>
+							})
+<span class="cstat-no" title="statement not covered" >						: href('/crop')}</span>
 					data-testid="goto-crop"
 <span class="cstat-no" title="statement not covered" >					aria-disabled={!uiState.currentProtocol || !hasImages}</span>
 				&gt;
@@ -972,7 +978,7 @@
 <span class="cstat-no" title="statement not covered" >					: undefined}</span>
 			&gt;
 				&lt;a
-					href="#/classify"
+<span class="cstat-no" title="statement not covered" >					href={href('/classify')}</span>
 <span class="cstat-no" title="statement not covered" >					aria-disabled={!uiState.currentProtocol ||</span>
 <span class="cstat-no" title="statement not covered" >						!hasImages ||</span>
 <span class="cstat-no" title="statement not covered" >						(uiState.processing.task === 'detection' &amp;&amp; uiState.processing.progress &lt; 1)}</span>
@@ -1141,7 +1147,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-09T17:40:30.043Z
+                at 2025-09-10T14:12:21.910Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
