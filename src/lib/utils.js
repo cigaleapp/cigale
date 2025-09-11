@@ -452,53 +452,6 @@ if (import.meta.vitest) {
 }
 
 /**
- *
- * @param {[number, number]} bounds of the range - can be in any order
- * @param {number} subject number to test for
- * @returns {boolean} whether the subject is in the range
- */
-export function inRange(bounds, subject) {
-	const [min, max] = bounds.sort((a, b) => a - b);
-	return subject >= min && subject <= max;
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('inRange', () => {
-		expect(inRange([1, 2], 1)).toBe(true);
-		expect(inRange([1, 2], 2)).toBe(true);
-		expect(inRange([1, 2], 3)).toBe(false);
-		expect(inRange([2, 5], 6)).toBe(false);
-		expect(inRange([2, 5], -4)).toBe(false);
-		expect(inRange([-10, 1], 3)).toBe(false);
-		expect(inRange([1, -10], -3)).toBe(true);
-	});
-}
-
-/**
- *
- * @template {string} K
- * @param {Element} element
- * @param {K} name
- * @returns {element is Element & { dataset: Record<NoInfer<K>, string> }}
- */
-export function hasDatasetKey(element, name) {
-	if (!(element instanceof HTMLElement)) return false;
-	if (!element.dataset) return false;
-	return name in element.dataset;
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('hasDatasetKey', () => {
-		const element = document.createElement('div');
-		element.dataset.test = 'value';
-		expect(hasDatasetKey(element, 'test')).toBe(true);
-		expect(hasDatasetKey(element, 'nonexistent')).toBe(false);
-	});
-}
-
-/**
  * @param {Uint8Array} uint8Array
  * @returns {ArrayBuffer}
  */

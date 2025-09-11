@@ -234,7 +234,7 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	`);
 
 	// Click out and back again
-	await page.locator('section').filter({ hasText: 'with-exif-gps' }).first().click();
+	await page.getByRole('main').click({ position: { x: 10, y: 10 } });
 	await page.getByText('lil-fella', { exact: true }).click();
 	await expect(page.locator('[data-testid="sidepanel"] .metadata:first-child')).toMatchAriaSnapshot(
 		`

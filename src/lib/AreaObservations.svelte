@@ -148,8 +148,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		onchildList() {
 			if (oncardclick) return;
 			if (!imagesContainer) return;
-			const items = [...imagesContainer.querySelectorAll('[data-selectable]')];
-			dragselect?.setItems(items);
+			dragselect?.refreshSelectables();
 			dragselect?.setSelection(selection);
 		}
 	}}
