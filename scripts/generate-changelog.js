@@ -1,6 +1,6 @@
 import * as date from 'date-fns';
-import { execa } from 'execa';
 import { writeFile } from 'node:fs/promises';
+import { x } from 'tinyexec';
 
 const upTo = process.argv[2];
 
@@ -8,7 +8,7 @@ console.info(
 	`Generating user-facing changelog up to ${date.parse(upTo, 'yyyy-MM-dd', new Date())}`
 );
 
-const gitlog = await execa('git', [
+const gitlog = await x('git', [
 	'log',
 	`--since=${upTo}`,
 	`--until=${date.format(Date.now(), 'yyyy-MM-dd')}`

@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { execa } from 'execa';
+import { x } from 'tinyexec';
 import { type } from 'arktype';
 import path from 'node:path';
 import { writeFileSync } from 'node:fs';
@@ -99,7 +99,7 @@ const protocol = {
 	$schema: 'https://cigaleapp.github.io/cigale/protocol.schema.json',
 	id: 'io.github.cigaleapp.arthropods.example',
 	name: 'Example: arthropodes',
-	learnMore: `https://github.com/cigaleapp/cigale/tree/${await execa`git rev-parse HEAD`.then((result) => result.stdout)}/scripts/README.md#protocoles-arthropodsexample`,
+	learnMore: `https://github.com/cigaleapp/cigale/tree/${await x('git', ['rev-parse', 'HEAD']).then((result) => result.stdout)}/scripts/README.md#protocoles-arthropodsexample`,
 	version: (oldProtocol?.version ?? 0) + 1,
 	source:
 		'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
