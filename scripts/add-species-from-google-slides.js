@@ -1,4 +1,4 @@
-import { execaSync } from 'execa';
+import { x } from 'tinyexec';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 import { Jimp } from 'jimp';
@@ -275,7 +275,7 @@ console.info(
 	`Formatting protocols ${cc.blue}${cc.dim}$${cc.reset} ${cc.blue}npm run format ${Object.keys(protocols).join(' ')}${cc.reset}`
 );
 
-execaSync`npm run format ${Object.keys(protocols)}`;
+await x('npm', ['run', 'format', ...Object.keys(protocols)]);
 
 /**
  *

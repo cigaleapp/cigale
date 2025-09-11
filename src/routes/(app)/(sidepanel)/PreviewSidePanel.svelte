@@ -15,7 +15,7 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { m } from '$lib/paraglide/messages.js';
-	import deepEqual from 'deep-equal';
+	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 	import IconSplit from '~icons/ph/arrows-out-light';
 	import IconObservation from '~icons/ph/bug-beetle';
@@ -160,7 +160,7 @@
 						{value}
 						options={options[definition.id]}
 						onchange={async (v) => {
-							if (deepEqual(v, value?.value)) return;
+							if (dequal(v, value?.value)) return;
 							onmetadatachange(definition.id, v);
 						}}
 					/>
