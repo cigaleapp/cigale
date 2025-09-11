@@ -138,7 +138,7 @@
 {/if}
 
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
-	<nav bind:clientHeight={navHeight} data-testid="app-nav">
+	<nav bind:clientHeight={navHeight} data-testid="app-nav" data-sveltekit-preload-data="viewport">
 		<div class="logo">
 			<a href={href('/')}>
 				<Logo --fill="var(--bg-primary)" />
