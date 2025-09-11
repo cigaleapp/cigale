@@ -44,7 +44,7 @@
 		"build": "vite build",
 		"prebuild": "node scripts/download-google-fonts.js && node scripts/generate-json-schemas.js",
 		"preview": "vite preview",
-		"prepare": "husky && npm run prebuild",
+		"prepare": "husky",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
 		"check:clutter": "svelte-kit sync && npx @inlang/paraglide-js compile --outdir src/lib/paraglide && npx knip",
@@ -126,6 +126,7 @@
 		"turndown": "^7.2.1",
 		"typescript": "^5.9.2",
 		"vite": "^7.1.5",
+		"vite-bundle-analyzer": "^1.2.3",
 		"vite-plugin-cross-origin-isolation": "^0.1.6",
 		"vitest": "^3.2.4"
 	},
