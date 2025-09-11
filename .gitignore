@@ -51,3 +51,8 @@ out/
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Fonts: managed by scripts/download-google-fonts.js so that they're up-to-date
+# Runs on prebuild
+static/fonts
+static/fonts.css
