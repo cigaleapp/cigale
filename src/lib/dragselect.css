@@ -1,0 +1,6 @@
+/* file://./dragselect.svelte.js / new DragSelect / new Viselect:selectionAreaClass */
+.viselect-selection-area {
+	background: color-mix(in srgb, var(--bg-primary-translucent) 15%, transparent);
+	border: 1px solid var(--bg-primary);
+	border-radius: var(--corner-radius);
+}
