@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for cigale/svelte.config.js</title>
+    <title>Code coverage report for cigale/scripts/download-google-fonts.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../prettify.css" />
-    <link rel="stylesheet" href="../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">cigale</a> svelte.config.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">cigale/scripts</a> download-google-fonts.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/26</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/26</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
@@ -88,68 +88,56 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import adapter from '@sveltejs/adapter-static';<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { download, constructURL } from 'google-fonts-helper';</span></span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >/** @type {import('@sveltejs/kit').Config} */</span>
-<span class="cstat-no" title="statement not covered" >const config = {</span>
-<span class="cstat-no" title="statement not covered" >	kit: {</span>
-<span class="cstat-no" title="statement not covered" >		version: {</span>
-<span class="cstat-no" title="statement not covered" >			name: process.env.BUILD_COMMIT || 'dev'</span>
-<span class="cstat-no" title="statement not covered" >		},</span>
-<span class="cstat-no" title="statement not covered" >		adapter: adapter({</span>
-<span class="cstat-no" title="statement not covered" >			pages: process.env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',</span>
-<span class="cstat-no" title="statement not covered" >			strict: false,</span>
-<span class="cstat-no" title="statement not covered" >			fallback: '404.html'</span>
-<span class="cstat-no" title="statement not covered" >		}),</span>
-<span class="cstat-no" title="statement not covered" >		router: {</span>
-<span class="cstat-no" title="statement not covered" >			type: 'hash'</span>
-<span class="cstat-no" title="statement not covered" >		},</span>
-<span class="cstat-no" title="statement not covered" >		paths: {</span>
-<span class="cstat-no" title="statement not covered" >			base:</span>
-<span class="cstat-no" title="statement not covered" >				process.env.BASE_PATH ||</span>
-<span class="cstat-no" title="statement not covered" >				(process.env.ENVIRONMENT_URL</span>
-<span class="cstat-no" title="statement not covered" >					? new URL(process.env.ENVIRONMENT_URL).pathname.replace(/\/index\.html$/, '')</span>
-<span class="cstat-no" title="statement not covered" >					: '')</span>
+<span class="cstat-no" title="statement not covered" >import path from 'node:path';</span>
+<span class="cstat-no" title="statement not covered" >const here = import.meta.dirname;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >await download(</span>
+<span class="cstat-no" title="statement not covered" >	constructURL({</span>
+<span class="cstat-no" title="statement not covered" >		display: 'swap',</span>
+<span class="cstat-no" title="statement not covered" >		families: {</span>
+<span class="cstat-no" title="statement not covered" >			'Host Grotesk': {</span>
+<span class="cstat-no" title="statement not covered" >				wght: '300..800',</span>
+<span class="cstat-no" title="statement not covered" >				ital: '300..800'</span>
+<span class="cstat-no" title="statement not covered" >			},</span>
+<span class="cstat-no" title="statement not covered" >			'Fragment Mono': {</span>
+<span class="cstat-no" title="statement not covered" >				ital: true</span>
+<span class="cstat-no" title="statement not covered" >			}</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
-<span class="cstat-no" title="statement not covered" >	},</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	extensions: ['.svelte', '.svx']</span>
-<span class="cstat-no" title="statement not covered" >};</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >export default config;</span>
+<span class="cstat-no" title="statement not covered" >	}),</span>
+<span class="cstat-no" title="statement not covered" >	{</span>
+<span class="cstat-no" title="statement not covered" >		outputDir: path.join(here, '../static'),</span>
+<span class="cstat-no" title="statement not covered" >		fontsDir: 'fonts',</span>
+<span class="cstat-no" title="statement not covered" >		stylePath: 'fonts.css',</span>
+<span class="cstat-no" title="statement not covered" >		fontsPath: '/fonts'</span>
+<span class="cstat-no" title="statement not covered" >	}</span>
+<span class="cstat-no" title="statement not covered" >).execute();</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -159,14 +147,14 @@
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-09-11T13:04:18.546Z
             </div>
-        <script src="../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../sorter.js"></script>
-        <script src="../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     
