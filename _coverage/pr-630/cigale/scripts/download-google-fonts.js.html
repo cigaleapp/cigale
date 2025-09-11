@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/23</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/23</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -88,7 +88,10 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -107,6 +110,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -118,26 +124,29 @@
 <span class="cstat-no" title="statement not covered" >import path from 'node:path';</span>
 <span class="cstat-no" title="statement not covered" >const here = import.meta.dirname;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >await download(</span>
-<span class="cstat-no" title="statement not covered" >	constructURL({</span>
-<span class="cstat-no" title="statement not covered" >		display: 'swap',</span>
-<span class="cstat-no" title="statement not covered" >		families: {</span>
-<span class="cstat-no" title="statement not covered" >			'Host Grotesk': {</span>
-<span class="cstat-no" title="statement not covered" >				wght: '300..800',</span>
-<span class="cstat-no" title="statement not covered" >				ital: '300..800'</span>
-<span class="cstat-no" title="statement not covered" >			},</span>
-<span class="cstat-no" title="statement not covered" >			'Fragment Mono': {</span>
-<span class="cstat-no" title="statement not covered" >				ital: true</span>
-<span class="cstat-no" title="statement not covered" >			}</span>
+<span class="cstat-no" title="statement not covered" >const url = constructURL({</span>
+<span class="cstat-no" title="statement not covered" >	display: 'swap',</span>
+<span class="cstat-no" title="statement not covered" >	families: {</span>
+<span class="cstat-no" title="statement not covered" >		'Host Grotesk': {</span>
+<span class="cstat-no" title="statement not covered" >			wght: '300..800',</span>
+<span class="cstat-no" title="statement not covered" >			ital: '300..800'</span>
+<span class="cstat-no" title="statement not covered" >		},</span>
+<span class="cstat-no" title="statement not covered" >		'Fragment Mono': {</span>
+<span class="cstat-no" title="statement not covered" >			ital: true</span>
 <span class="cstat-no" title="statement not covered" >		}</span>
-<span class="cstat-no" title="statement not covered" >	}),</span>
-<span class="cstat-no" title="statement not covered" >	{</span>
-<span class="cstat-no" title="statement not covered" >		outputDir: path.join(here, '../static'),</span>
-<span class="cstat-no" title="statement not covered" >		fontsDir: 'fonts',</span>
-<span class="cstat-no" title="statement not covered" >		stylePath: 'fonts.css',</span>
-<span class="cstat-no" title="statement not covered" >		fontsPath: '/fonts'</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
-<span class="cstat-no" title="statement not covered" >).execute();</span>
+<span class="cstat-no" title="statement not covered" >})</span>
+<span class="cstat-no" title="statement not covered" >	// See https://github.com/datalogix/google-fonts-helper/issues/79</span>
+<span class="cstat-no" title="statement not covered" >	.replace(':ital@1', ':ital@0;1');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >console.info('Downloading', url);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >await download(url, {</span>
+<span class="cstat-no" title="statement not covered" >	outputDir: path.join(here, '../static'),</span>
+<span class="cstat-no" title="statement not covered" >	fontsDir: 'fonts',</span>
+<span class="cstat-no" title="statement not covered" >	stylePath: 'fonts.css',</span>
+<span class="cstat-no" title="statement not covered" >	fontsPath: '/fonts'</span>
+<span class="cstat-no" title="statement not covered" >}).execute();</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -145,7 +154,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-11T13:11:54.219Z
+                at 2025-09-11T15:04:27.156Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
