@@ -1,7 +1,7 @@
 name: Build bun-compatible Playwright Docker image
 
 on:
-  push:
+  pull_request:
     paths:
       - .github/workflows/playwright.dockerfile
       - .github/workflows/playwright-docker-image.yml
