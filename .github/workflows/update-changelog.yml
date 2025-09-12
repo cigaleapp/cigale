@@ -20,15 +20,14 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version-file: package.json
-          cache: npm
+          bun-version: '1.2.21'
 
       - name: Update CHANGELOG.md
         run: |
-          npm ci
-          node scripts/generate-changelog.js 2024-01-01
+          bun install --frozen-lockfile
+          bun run scripts/generate-changelog.js 2024-01-01
 
       - name: Commit and push changes
         uses: peter-evans/create-pull-request@v7

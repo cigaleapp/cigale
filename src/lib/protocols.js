@@ -22,7 +22,7 @@ export function jsonSchemaURL(base) {
  * @param {'json' | 'yaml'} [format='json']
  */
 export async function exportProtocol(base, id, format = 'json') {
-	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
+	// Importing is done here so that ./generate-json-schemas can be invoked with bun run (otherwise we get a '$state not defined' error)
 	const { tables, ...idb } = await import('./idb.svelte.js');
 
 	const protocol = await tables.Protocol.raw.get(id);

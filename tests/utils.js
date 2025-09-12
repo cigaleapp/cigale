@@ -563,7 +563,17 @@ export function openSettings(page) {
 }
 
 export const loadingText = new RegExp(
-	[fr.loading_text, fr.queued, fr.analyzing].map(RegExp.escape).join('|')
+	[fr.loading_text, fr.queued, fr.analyzing]
+		.filter((t) => {
+			if (!/^[\w …]+$/.test(t)) {
+				throw new Error(
+					`The loading text "${t}" contains special characters and cannot be used in a RegExp`
+				);
+			}
+
+			return true;
+		})
+		.join('|')
 );
 
 /**

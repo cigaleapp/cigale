@@ -29,7 +29,7 @@ export default defineConfig({
 	},
 	server: {
 		fs: {
-			allow: ['./package-lock.json']
+			allow: ['./bun.lock']
 		}
 	},
 	define: {

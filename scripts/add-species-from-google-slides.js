@@ -272,7 +272,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 }
 
 console.info(
-	`Formatting protocols ${cc.blue}${cc.dim}$${cc.reset} ${cc.blue}npm run format ${Object.keys(protocols).join(' ')}${cc.reset}`
+	`Formatting protocols ${cc.blue}${cc.dim}$${cc.reset} ${cc.blue}bun run format ${Object.keys(protocols).join(' ')}${cc.reset}`
 );
 
 await x('npm', ['run', 'format', ...Object.keys(protocols)]);

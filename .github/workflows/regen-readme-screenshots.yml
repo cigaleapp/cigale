@@ -13,19 +13,18 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version-file: package.json
-          cache: npm
+          bun-version: '1.2.21'
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: bunx playwright install --with-deps
 
       - name: Run Playwright readme.spec.js and update screenshots
-        run: npx playwright test tests/tasks/readme.spec.js --update-snapshots
+        run: bunx playwright test tests/tasks/readme.spec.js --update-snapshots
         env:
           RUN_README_TESTS: '1'
 
