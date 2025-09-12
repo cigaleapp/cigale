@@ -96,7 +96,7 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-depend": "^1.2.0",
 		"eslint-plugin-oxlint": "^1.14.0",
-		"eslint-plugin-svelte": "^3.12.2",
+		"eslint-plugin-svelte": "^3.12.3",
 		"extract-zip": "^2.0.1",
 		"fake-indexeddb": "^6.2.2",
 		"gitmoji-cli": "^9.7.0",
