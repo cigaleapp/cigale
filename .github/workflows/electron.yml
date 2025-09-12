@@ -23,10 +23,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version-file: package.json
-          cache: npm
+          bun-version: '1.2.21'
 
       # Install flatpak for Linux builds
       - name: Install flatpak
@@ -37,9 +36,9 @@ jobs:
           flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
       - name: Build & package app
-        run: npm run prebuild; npx electron-forge make
+        run: bun run prebuild; bunx electron-forge make
         env: { ELECTRON_BUILD: '1' }
       - name: see output
         uses: jaywcjlove/github-action-folder-tree@main

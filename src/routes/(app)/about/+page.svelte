@@ -1,8 +1,9 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
+	import JSONC from 'tiny-jsonc';
 	import { seo } from '$lib/seo.svelte';
 	import { m } from '$lib/paraglide/messages.js';
-	import lockfile from '$lib/../../package-lock.json' with { type: 'json' };
+	import lockfile from '$lib/../../bun.lock?raw';
 
 	seo({ title: m.about_page_title() });
 
@@ -60,15 +61,16 @@
 	 * @returns {Promise<Array<[string, string]>>} Array of [package name, version used]
 	 */
 	async function showDependencies() {
+		const { workspaces, packages } = JSONC.parse(lockfile);
+
 		// Get list of package names
 		const pkgs = [
-			...Object.keys(lockfile.packages[''].dependencies),
-			...Object.keys(lockfile.packages[''].devDependencies)
+			...Object.keys(workspaces[''].dependencies),
+			...Object.keys(workspaces[''].devDependencies)
 		];
 
 		// Get resolved versions for each package
-		// @ts-expect-error
-		return pkgs.map((name) => [name, lockfile.packages[`node_modules/${name}`].version]);
+		return pkgs.map((name) => [name, packages[name][0].replace(`${name}@`, '')]);
 	}
 </script>
 

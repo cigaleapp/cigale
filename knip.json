@@ -1,5 +1,5 @@
 {
-	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"$schema": "./node_modules/knip/schema.json",
 	"ignore": [
 		"src/lib/schemas/*",
 		"src/lib/utils.js",
@@ -10,7 +10,7 @@
 		"src/lib/Dropzone.svelte",
 		"src/lib/FloatingButton.svelte"
 	],
-	"ignoreDependencies": ["@iconify-json/.+"],
+	"ignoreDependencies": ["@iconify-json/.+", "bun"],
 	"entry": [
 		"scripts/*.js",
 		"src/electron/main.{d.ts,js}",

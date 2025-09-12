@@ -2,17 +2,15 @@
 
 ## Pre-requisites
 
-- Node.JS
-- NPM
-- [Volta](https://volta.sh) (optional, but recommended, ensures that the right Node & NPM version are used, and installs the correct ones for you when you run any `npm` command)
+- [Bun](https://bun.com)
 
 ## Setup
 
 ```
 git clone https://github.com/cigaleapp/cigale --single-branch
 cd cigale
-npm i
-npm run dev
+bun i
+bun run dev
 ```
 
 The `--single-branch` option reduces the amount of data downloaded, as it only fetches the `main` branch (the `gh-pages` branch is used for deployment, and is quite large)
@@ -23,12 +21,12 @@ The `--single-branch` option reduces the amount of data downloaded, as it only f
 
 ## Scripts
 
-- `npm run dev`: Start the development server
-- `npm run build`: Build the application for production
-- `npm run preview`: Preview the production build
-- `npm run format`: Format code (pre-commit hooks should ensure you only commit formatted code, but you can run this manually)
-- `npm run lintfix`: Lint code and auto-fix some errors (pre-commit hooks should ensure you only commit code that passes the linter, but you can run this manually)
-- `npm commit`: Commit using Gitmoji conventions (you can also use [gitmoji-rs](https://github.com/gwennlbh/gitmoji-rs), which is the same but way faster (written in Rust). You'll have to install it separately, though, as it's not available on NPM).
+- `bun run dev`: Start the development server
+- `bun run build`: Build the application for production
+- `bun run preview`: Preview the production build
+- `bun run format`: Format code (pre-commit hooks should ensure you only commit formatted code, but you can run this manually)
+- `bun run lintfix`: Lint code and auto-fix some errors (pre-commit hooks should ensure you only commit code that passes the linter, but you can run this manually)
+- `bun run commit`: Commit using Gitmoji conventions (you can also use [gitmoji-rs](https://github.com/gwennlbh/gitmoji-rs), which is the same but way faster (written in Rust). You'll have to install it separately, though, as it's not available on NPM).
 
 ## Tables
 

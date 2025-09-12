@@ -95,12 +95,12 @@ export default defineConfig({
 	webServer: dependsOnTarget({
 		live: undefined,
 		dev: {
-			command: 'npm run dev',
+			command: 'bun run dev',
 			port: 5173,
 			reuseExistingServer: true
 		},
 		built: {
-			command: 'npm run preview',
+			command: 'bun run preview',
 			port: 4173,
 			reuseExistingServer: false
 		}
