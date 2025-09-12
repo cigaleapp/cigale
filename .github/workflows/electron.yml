@@ -4,6 +4,14 @@ on:
   workflow_dispatch:
   push:
     tags: [v*]
+  pull_request:
+    paths:
+      - .github/workflows/electron.yml
+      - src/electron/
+      - vite.electron*
+      - forge.*
+      - package.json
+      - package-lock.json
 
 # https://www.electronforge.io/config/publishers/github#authentication
 permissions:
