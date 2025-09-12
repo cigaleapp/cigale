@@ -159,7 +159,7 @@
 		"swarpc": "^0.11.0",
 		"tinykeys": "^3.0.0",
 		"ulid": "^3.0.1",
-		"unplugin-icons": "^22.2.0",
+		"unplugin-icons": "^22.3.0",
 		"update-electron-app": "^3.1.1",
 		"xss": "^1.0.15",
 		"yaml": "^2.8.1"
