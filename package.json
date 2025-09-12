@@ -132,7 +132,7 @@
 	},
 	"dependencies": {
 		"@iconify-json/ph": "^1.2.2",
-		"@sentry/sveltekit": "^10.10.0",
+		"@sentry/sveltekit": "^10.11.0",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
 		"arktype": "^2.1.22",
