@@ -23,7 +23,8 @@ export async function load() {
 
 	setLoadingMessage(m.loading_neural_worker());
 	const swarpc = Swarpc.Client(PROCEDURES, {
-		worker: new WebWorker({ name: 'SWARPC Worker' }),
+		worker: WebWorker,
+		nodes: 1,
 		localStorage: {
 			PARAGLIDE_LOCALE: getLocale()
 		}
