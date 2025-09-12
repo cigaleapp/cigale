@@ -28,7 +28,11 @@
 		},
 		{
 			"description": "Group playwright docker image & npm package",
-			"matchPackageNames": ["@playwright/test", "mcr.microsoft.com/playwright"],
+			"matchPackageNames": [
+				"@playwright/test",
+				"mcr.microsoft.com/playwright",
+				"ghcr.io/gwennlbh/playwright-bun"
+			],
 			"groupName": "Playwright",
 			"automerge": true
 		}
