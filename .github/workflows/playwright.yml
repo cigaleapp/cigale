@@ -39,7 +39,7 @@ jobs:
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: prepare
     container:
-      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      image: ghcr.io/cigaleapp/cigale/playwright-bun:latest
       options: --user 1001
     strategy:
       fail-fast: false

@@ -11,9 +11,9 @@ jobs:
     timeout-minutes: 60
     environment:
       name: Live tests
-      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright-report
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright
     container:
-      image: mcr.microsoft.com/playwright:v1.55.0-noble
+      image: ghcr.io/cigaleapp/cigale/playwright-bun:latest
       options: --user 1001
     permissions:
       contents: write
