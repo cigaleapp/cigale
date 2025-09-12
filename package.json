@@ -86,7 +86,7 @@
 		"@jimp/js-jpeg": "^1.6.0",
 		"@playwright/test": "^1.55.0",
 		"@sveltejs/adapter-static": "^3.0.9",
-		"@sveltejs/kit": "^2.37.1",
+		"@sveltejs/kit": "^2.39.0",
 		"@sveltejs/vite-plugin-svelte": "^6.1.4",
 		"@types/piexifjs": "^1.0.0",
 		"@vitest/coverage-v8": "^3.2.4",
