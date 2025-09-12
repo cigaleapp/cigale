@@ -24,5 +24,5 @@ await download(url, {
 	outputDir: path.join(here, '../static'),
 	fontsDir: 'fonts',
 	stylePath: 'fonts.css',
-	fontsPath: '/fonts'
+	fontsPath: `${process.env.BASE_PATH ?? ''}/fonts`
 }).execute();
