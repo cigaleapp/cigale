@@ -4,12 +4,14 @@
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileIds } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import { m } from '$lib/paraglide/messages.js';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte';
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
@@ -42,20 +44,10 @@
 </script>
 
 <Dropzone
-	filetypes={[
-		'image/jpeg',
-		'application/zip',
-		'image/png',
-		'image/tiff',
-		'.cr2',
-		'.rw2',
-		'.dng',
-		'.crw',
-		'.raw',
-		'.cr3'
-	]}
+	filetypes={ACCEPTED_IMPORT_TYPES}
 	clickable={images.length === 0}
 	onfiles={({ files }) => importMore(files)}
+	onunacceptable={() => toasts.error(m.file_format_not_supported({ format: '' }))}
 >
 	<section class="observations" class:empty>
 		<AreaObservations

@@ -4,6 +4,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileId } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
@@ -28,7 +29,7 @@
 		const filesInput = document.createElement('input');
 		filesInput.type = 'file';
 		filesInput.multiple = true;
-		filesInput.accept = 'image/*';
+		filesInput.accept = ACCEPTED_IMPORT_TYPES.join(',');
 		filesInput.addEventListener('change', async (event) => {
 			if (!(event.currentTarget instanceof HTMLInputElement)) return;
 			if (!event.currentTarget.files) return;
