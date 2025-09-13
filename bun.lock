@@ -29,7 +29,7 @@
         "piexifjs": "^1.0.6",
         "runed": "^0.31.1",
         "sveltejs-tippy": "^3.0.0",
-        "swarpc": "^0.12.0",
+        "swarpc": "^0.14.0",
         "tiny-jsonc": "^1.0.2",
         "tinykeys": "^3.0.0",
         "ulid": "^3.0.1",
@@ -2104,7 +2104,7 @@
 
     "sveltekit-search-params": ["sveltekit-search-params@4.0.0-next.0", "", { "peerDependencies": { "@sveltejs/kit": "^2.0.0", "svelte": "^5.0.0" } }, "sha512-haFr5seakusriPePAv2F5/lsOa37rr9AOGDa5JOZ9CaB0Vrl8V8PdtqNWfh/kF0jlANdkdqz5gKK66nhhHT8tg=="],
 
-    "swarpc": ["swarpc@0.12.0", "", { "dependencies": { "arktype": "^2.1.22" } }, "sha512-wSmNXsfzDg51452aIMW6/9Gf3+TiEJniKG/UQydVhdmHs6dnY86cwPRLUGRNMI1T0Fn3qrrfXKfYV6DO/70eyQ=="],
+    "swarpc": ["swarpc@0.14.0", "", { "peerDependencies": { "arktype": "^2.1.22" } }, "sha512-uKmRd68wglC/ibr9M21yVIw6+iJTqZyA41os/p76vgpqLwmPE6jz56W0tPGeBqsi2l0fHKZMLePzkeSkE+B0ew=="],
 
     "symbol-tree": ["symbol-tree@3.2.4", "", {}, "sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw=="],
 

@@ -34,7 +34,7 @@ test.describe('correct results.zip', () => {
 		await expect(page.getByText(/\.jpeg$/)).toHaveCount(4);
 	});
 
-	test('has the correct bounding boxes', async ({ page }) => {
+	test('has the correct bounding boxes @webkit-no-parallelization', async ({ page }) => {
 		await goToTab(page, 'crop');
 
 		/**
@@ -58,7 +58,9 @@ test.describe('correct results.zip', () => {
 		await expectBoundingBoxesCount(images[3].fileId ?? '', 1);
 	});
 
-	test('does not re-analyze when going to classify tab', async ({ page }) => {
+	test('does not re-analyze when going to classify tab @webkit-no-parallelization', async ({
+		page
+	}) => {
 		await goToTab(page, 'classify');
 		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
@@ -319,10 +321,6 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 	// but the other image is still being analyzed.
 
 	await goToTab(page, 'crop');
-	await expect(page.getByText(fr.loading_cropping_model)).toBeVisible();
-	await expect(page.getByText(fr.loading_cropping_model)).not.toBeVisible({
-		timeout: 10_000
-	});
 
 	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
 

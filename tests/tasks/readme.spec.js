@@ -49,7 +49,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 			test('import', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await goToTab(page, 'import', messages);
+				await goToTab(page, 'import', { messages });
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 				await expect(page).toHaveScreenshot();
@@ -57,23 +57,23 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 			test('crop', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await goToTab(page, 'import', messages);
+				await goToTab(page, 'import', { messages });
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'crop', messages);
+				await goToTab(page, 'crop', { messages });
 				await page.getByTestId('first-observation-card').click();
 				await expect(page).toHaveScreenshot();
 			});
 
 			test('classify', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await goToTab(page, 'import', messages);
+				await goToTab(page, 'import', { messages });
 
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'classify', messages);
+				await goToTab(page, 'classify', { messages });
 
 				await waitForAnalysis(page);
 				await page.getByText('lil-fella', { exact: true }).first().click();

@@ -21,7 +21,7 @@ import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { Analysis } from '$lib/schemas/results';
-import { compareBy } from '$lib/utils';
+import { compareBy, progressSplitter } from '$lib/utils';
 import { fetchHttpRequest, omit, pick } from '$lib/utils.js';
 import { strToU8, zip } from 'fflate';
 import { openDB } from 'idb';
@@ -82,6 +82,8 @@ swarp.init(async ({ databaseName, databaseRevision }) => {
 });
 
 swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onProgress) => {
+	const splitProgress = progressSplitter('model', 0.9, 'classmapping');
+
 	const id = inferenceModelId(protocolId, request);
 	const existingSession = inferenceSessions.get(task);
 	if (existingSession && existingSession.id === id) {
@@ -94,8 +96,7 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 	const session = {
 		id,
 		onnx: await loadModel(request, webgpu, ({ transferred, total }) => {
-			// Account for the fact that the model loading is 75% of the total progress, if we have to load a classmapping next.
-			onProgress((classmapping ? 0.75 : 1) * (transferred / total));
+			onProgress(splitProgress('model', transferred / total));
 		})
 	};
 
@@ -103,8 +104,7 @@ swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onPr
 		session.classmapping = await fetchHttpRequest(classmapping, {
 			cacheAs: 'model',
 			onProgress({ transferred, total }) {
-				// Account for progress being already 0.75 of the way there because of the model loading
-				onProgress(0.75 + 0.25 * (transferred / total));
+				onProgress(splitProgress('classmapping', transferred / total));
 			}
 		})
 			.then((res) => res.text())

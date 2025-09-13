@@ -10,6 +10,7 @@ import { expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
 	goToTab,
+	importPhotos,
 	importProtocol,
 	mockProtocolSourceURL,
 	modal,
@@ -17,6 +18,7 @@ import {
 	setSettings,
 	waitForLoadingEnd
 } from './utils.js';
+import { withParallelism } from './annotations';
 
 for (const offline of [false, true]) {
 	test(
@@ -131,6 +133,45 @@ for (const offline of [false, true]) {
 		}
 	);
 }
+
+test('can handle a bunch of images at once', withParallelism(4), async ({ page }) => {
+	const imagesCount = 10;
+
+	const timeouts = { begin: 500, finish: imagesCount * 0.4 * 60_000 };
+	test.setTimeout(3 * timeouts.finish);
+
+	await setSettings(
+		{ page },
+		{
+			showTechnicalMetadata: false
+		}
+	);
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+
+	const observations = page.getByTestId('observations-area');
+
+	const images = ['cyan.jpeg', 'lil-fella.jpeg', 'leaf.jpeg', 'large-image.jpeg'];
+	const randomImage = () => images[Math.floor(Math.random() * images.length)];
+	await importPhotos({ page, wait: false }, Array.from({ length: imagesCount }, randomImage));
+
+	await waitForLoadingEnd(observations, { ...timeouts, concurrency: 4 });
+
+	// Makes the test really slow
+
+	// await goToTab(page, 'crop');
+	// await waitForLoadingEnd(observations, timeouts);
+
+	// await goToTab(page, 'classify');
+	// await waitForLoadingEnd(observations, timeouts);
+
+	await page.keyboard.press('Control+A');
+	// await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('sidepanel').getByRole('heading', { level: 2 })).toHaveText(
+		`${imagesCount} images`
+	);
+	await expect(observations).not.toHaveText(new RegExp(fr.retry));
+});
 
 test('can import a protocol via ?protocol', async ({ page, context }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });

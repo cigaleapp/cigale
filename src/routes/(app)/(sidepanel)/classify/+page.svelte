@@ -22,6 +22,7 @@
 	import { getSettings, isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { sum } from '$lib/utils.js';
 	import { onMount } from 'svelte';
 
 	seo({ title: m.classification() });
@@ -60,7 +61,9 @@
 		})
 	);
 
-	/** loaded and total bytes counts, set and updated by loadModel() */
+	/**
+	 * loaded and total bytes counts, set and updated by loadModel()
+	 */
 	let modelLoadingProgress = $state(0);
 
 	let classifmodelLoaded = $state(false);
@@ -86,16 +89,16 @@
 			return;
 		}
 
-		await data.swarpc
-			.loadModel(
+		await data.swarpc.loadModel
+			.broadcast(
 				{
 					protocolId: uiState.currentProtocol.id,
 					request: settings.model,
 					classmapping: settings.classmapping,
 					task: 'classification'
 				},
-				(progress) => {
-					modelLoadingProgress = progress;
+				(progresses) => {
+					modelLoadingProgress = sum(progresses.values()) / data.parallelism;
 				}
 			)
 			.then(() => {

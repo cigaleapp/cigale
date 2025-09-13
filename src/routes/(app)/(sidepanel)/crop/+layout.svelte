@@ -5,6 +5,7 @@
 	import { isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
+	import { sum } from '$lib/utils.js';
 
 	const { data, children } = $props();
 
@@ -18,15 +19,15 @@
 		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
 		if (!cropModel) return;
 
-		await data.swarpc
-			.loadModel(
+		await data.swarpc.loadModel
+			.broadcast(
 				{
 					protocolId: uiState.currentProtocol.id,
 					request: cropModel,
 					task: 'detection'
 				},
-				(progress) => {
-					modelLoadingProgress = progress;
+				(progresses) => {
+					modelLoadingProgress = sum(progresses.values()) / data.parallelism;
 				}
 			)
 			.catch((error) => {
