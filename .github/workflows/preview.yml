@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: '1.2.21'
+          bun-version-file: .bun-version
 
       - name: Install and Build
         if: github.event.action != 'closed' # You might want to skip the build if the PR has been closed
