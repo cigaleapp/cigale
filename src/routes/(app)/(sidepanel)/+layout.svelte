@@ -209,7 +209,7 @@
 </script>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
-	<main>{@render children?.()}</main>
+	<main data-testid="app-main">{@render children?.()}</main>
 	{#if showSidePanel}
 		<PreviewSidePanel
 			images={selectedHrefsWithCropboxes}

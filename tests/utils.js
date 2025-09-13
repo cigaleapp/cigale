@@ -19,7 +19,7 @@ function safeJSONParse(value) {
 }
 
 /**
- * @import { Page } from '@playwright/test';
+ * @import { Page, Locator } from '@playwright/test';
  * @import { Settings, MetadataValue } from '$lib/database.js';
  */
 
@@ -76,7 +76,7 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 			if (!lastItem) throw new Error('No last item to wait for');
 		}
 
-		const element = page.getByText(addDotJpeg(lastItem), { exact: true });
+		const element = page.getByText(addDotJpeg(lastItem), { exact: true }).last();
 		await expect(element).toBeVisible({
 			timeout: 20_000
 		});
@@ -335,8 +335,10 @@ export async function goToTab(page, tabName, { messages: m, waitForModel = true 
 	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
 
 	if (waitForModel && (tabName === 'crop' || tabName === 'classify')) {
-		await expect(page.getByRole('main')).not.toHaveText(
-			tabName === 'crop' ? fr.loading_cropping_model : fr.loading_classification_model,
+		await expect(page.getByTestId('app-main')).not.toHaveText(
+			makeRegexpUnion(
+				tabName === 'crop' ? fr.loading_cropping_model : fr.loading_classification_model
+			),
 			{
 				timeout: 20_000
 			}
@@ -573,36 +575,51 @@ export function openSettings(page) {
 	return page.getByTestId('settings-button').click();
 }
 
-export const loadingText = new RegExp(
-	[fr.loading_text, fr.queued, fr.analyzing]
-		.filter((t) => {
-			if (!/^[\w …]+$/.test(t)) {
-				throw new Error(
-					`The loading text "${t}" contains special characters and cannot be used in a RegExp`
-				);
-			}
+/**
+ * @param {...string} parts
+ */
+function makeRegexpUnion(...parts) {
+	return new RegExp(
+		parts
+			.filter((t) => {
+				if (!/^[\p{Letter} …]+$/u.test(t)) {
+					throw new Error(
+						`The loading text "${t}" contains special characters and cannot be used in a RegExp`
+					);
+				}
 
-			return true;
-		})
-		.join('|')
-);
+				return true;
+			})
+			.join('|')
+	);
+}
+
+export const loadingText = makeRegexpUnion(fr.loading_text, fr.analyzing, fr.queued);
+
+export const loadingNotQueuedText = makeRegexpUnion(fr.loading_text, fr.analyzing);
 
 /**
  *
- * @param {Page} page
- * @param {{ begin?: number, finish?: number } | number} [timeout]
+ * @param {Locator | Page} area
+ * @param {{ begin?: number, finish?: number, concurrency?: number } | number} [timeout]
  */
-export async function waitForLoadingEnd(page, timeout = 30_000) {
+export async function waitForLoadingEnd(area, timeout = 30_000) {
+	const concurrency = typeof timeout === 'number' ? 1 : (timeout.concurrency ?? 1);
 	const timeouts =
 		typeof timeout === 'number'
 			? { begin: timeout, finish: timeout }
 			: { begin: 30_000, finish: 120_000, ...timeout };
 
-	await expect(page.getByText(loadingText).first()).toBeVisible({
-		timeout: timeouts.begin
-	});
+	await expect(area.getByText(loadingText).first()).toBeVisible({ timeout: timeouts.begin });
 
-	await expect(page.getByText(loadingText)).toHaveCount(0, { timeout: timeouts.finish });
+	if (concurrency > 1) {
+		// Ensure we have multiple (concurrency amount) loading items occurring at once (really loading, not just queued)
+		await expect(area.getByText(loadingNotQueuedText)).toHaveCount(concurrency, {
+			timeout: timeouts.begin
+		});
+	}
+
+	await expect(area.getByText(loadingText)).toHaveCount(0, { timeout: timeouts.finish });
 }
 
 /**

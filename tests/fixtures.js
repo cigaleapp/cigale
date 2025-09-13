@@ -21,7 +21,7 @@ export const test = base.extend(
 	 */
 	({
 		forEachTest: [
-			async ({ page, context }, use, { tags }) => {
+			async ({ page, context }, use, { tags, annotations }) => {
 				// https://playwright.dev/docs/service-workers-experimental
 				process.env.PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS = '1';
 
@@ -32,6 +32,11 @@ export const test = base.extend(
 					await mockProtocolSourceURL(page, context, defaultProtocol.source, {
 						json: exampleProtocol
 					});
+				}
+
+				const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;
+				if (concurrency) {
+					await setHardwareConcurrency(page, Number.parseInt(concurrency));
 				}
 
 				if (
