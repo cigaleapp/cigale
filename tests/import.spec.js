@@ -319,10 +319,6 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 	// but the other image is still being analyzed.
 
 	await goToTab(page, 'crop');
-	await expect(page.getByText(fr.loading_cropping_model)).toBeVisible();
-	await expect(page.getByText(fr.loading_cropping_model)).not.toBeVisible({
-		timeout: 10_000
-	});
 
 	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
 

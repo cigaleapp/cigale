@@ -325,12 +325,23 @@ const appNavTabs = (m) => ({
  *
  * @param {Page} page
  * @param {'protocol'|'import'|'crop'|'classify'} tabName
- * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
+ * @param {object} [options]
+ * @param {typeof import('../messages/fr.json')} [options.messages] translations for the tab displayed names
+ * @param {boolean} [options.waitForModel=true] wait for the model to be loaded (only for crop and classify)
  */
-export async function goToTab(page, tabName, m = undefined) {
+export async function goToTab(page, tabName, { messages: m, waitForModel = true } = {}) {
 	getTab(page, tabName, m).click();
 	const tab = appNavTabs(m)[tabName];
 	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
+
+	if (waitForModel && (tabName === 'crop' || tabName === 'classify')) {
+		await expect(page.getByRole('main')).not.toHaveText(
+			tabName === 'crop' ? fr.loading_cropping_model : fr.loading_classification_model,
+			{
+				timeout: 20_000
+			}
+		);
+	}
 }
 
 /**
