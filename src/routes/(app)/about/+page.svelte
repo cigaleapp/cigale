@@ -5,6 +5,8 @@
 	import { m } from '$lib/paraglide/messages.js';
 	import lockfile from '$lib/../../bun.lock?raw';
 
+	const { data } = $props();
+
 	seo({ title: m.about_page_title() });
 
 	/**
@@ -141,6 +143,17 @@
 			</dl>
 		</dd>
 	{/if}
+	<dt>Parallélisme</dt>
+	<dd>
+		<dl>
+			<dt>Task queue</dt>
+			<dd><code>{data.parallelism}</code> max.</dd>
+			<dt>sw&rpc</dt>
+			<dd><code>{data.parallelism}</code> nodes</dd>
+			<dt>Hardware</dt>
+			<dd><code>{navigator.hardwareConcurrency}</code> threads</dd>
+		</dl>
+	</dd>
 	<dt>Code source</dt>
 	<dd>
 		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a>
