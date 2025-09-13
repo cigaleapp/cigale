@@ -6,5 +6,5 @@
   - paragraph [ref=e5]:
     - generic [ref=e6]: Chargement…
     - code [ref=e7]: Chargement du protocole intégré
-  - code [ref=e8]: 2ee8dd1a2d6d3c4258bcd27505b97280f74365f0
+  - code [ref=e8]: 6fe000c0be91b222a383ce0cfb1c32fc0c21deab
 ```

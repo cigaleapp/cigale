@@ -208,23 +208,17 @@
             - generic: Langue
             - generic:
               - radiogroup:
-                - radio "English 1%":
-                  - text: English
-                  - generic:
-                    - code: 1%
+                - radio "English"
                 - radio "Français" [checked]
-                - radio "日本語 1%":
-                  - text: 日本語
-                  - generic:
-                    - code: 1%
+                - radio "日本語"
           - generic:
             - button "Gérer les protocoles"
             - button "Raccourcis clavier"
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "2ee8dd1":
-              - /url: https://github.com/cigaleapp/cigale/tree/2ee8dd1a2d6d3c4258bcd27505b97280f74365f0
+            - link "6fe000c":
+              - /url: https://github.com/cigaleapp/cigale/tree/6fe000c0be91b222a383ce0cfb1c32fc0c21deab
             - text: ·
             - link "À propos":
               - /url: "#/about"
@@ -253,9 +247,11 @@
           - generic [ref=e86]:
             - generic [ref=e87]: bool
             - generic [ref=e88]:
-              - switch "on/off switch" [ref=e91] [cursor=pointer]:
-                - img [ref=e93] [cursor=pointer]
-              - button [disabled] [ref=e95] [cursor=pointer]:
+              - generic [ref=e90]:
+                - switch "on/off switch" [active] [ref=e91] [cursor=pointer]:
+                  - img [ref=e93] [cursor=pointer]
+                - text: Non
+              - button [ref=e95] [cursor=pointer]:
                 - img [ref=e96] [cursor=pointer]
           - paragraph [ref=e99]: boolean metadata
         - generic [ref=e101]:
@@ -300,12 +296,12 @@
             - generic [ref=e153]: integer
             - generic [ref=e154]:
               - generic [ref=e155]:
-                - textbox "integer" [ref=e156]: "41"
-                - button "Décrémenter" [active] [ref=e157]:
+                - textbox "integer" [ref=e156]
+                - button "Décrémenter" [ref=e157]:
                   - img [ref=e158]
                 - button "Incrémenter" [ref=e160]:
                   - img [ref=e161]
-              - button [ref=e163] [cursor=pointer]:
+              - button [disabled] [ref=e163] [cursor=pointer]:
                 - img [ref=e164] [cursor=pointer]
           - paragraph [ref=e167]: integer metadata
         - generic [ref=e168]:
