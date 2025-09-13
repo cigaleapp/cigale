@@ -683,3 +683,48 @@ export function logexpr(tag, expr) {
 	console.log(`{${tag}}`, expr);
 	return expr;
 }
+
+/**
+ * Outputs a [0, 1] progress value based on the progress of several weighted ordered parts. A value for a part assumes that all other parts defined beforehand have completed. Weights are in [0, 1], and the last part can let the weight be what sums with the rest to 1
+ *
+ * @example
+ * ```
+ * // download part represents 70% of the total time, decompression 20%, and parsing the rest
+ * const splitProgress = progressSplitter('download', 0.7, 'decompression', 0.2, 'parsing');
+ *
+ * // Download halfway there
+ * splitProgress('download', 0.5) // 0.35
+ * // Download finished, decompression 10% there
+ * splitProgress('decompression', 0.1) // 0.72 = 0.7 + 0.2 * 0.1
+ * // Decompression finished, parsing 50% there
+ * splitProgress('parsing', 0.5) // 0.85 = 0.7 + 0.2 + 0.1 * 0.5  = 0.7 + 0.2 + (0.7 + 0.2 - 1) * 0.5
+ * // Parsing finished
+ * splitProgress('parsing', 1) // 1 = 0.7 + 0.2 + 0.1 * 1 = 0.7 + 0.2 + (0.7 + 0.2 - 1) * 1
+ * ```
+ * @template {string} PartName
+ * @param {...(PartName | number)} layout
+ * @returns {(part: PartName, progress: number) => number}
+ */
+export function progressSplitter(...layout) {
+	/** @type {Array<[PartName, number]>} */
+	let parts = [];
+
+	for (let i = 0; i < layout.length; i += 2) {
+		const name = /** @type {PartName} */ (layout[i]);
+		const weight = /** @type {number} */ (layout[i + 1] ?? 1 - sum(parts.map(([, w]) => w)));
+
+		// @ts-expect-error
+		parts.push([name, weight]);
+	}
+
+	return (part, progress) => {
+		let total = 0;
+		const partIndex = parts.findIndex(([name]) => name === part);
+		for (const [i, [_, weight]] of parts.entries()) {
+			if (i < partIndex) total += weight;
+			if (i === partIndex) total += weight * progress;
+		}
+
+		return total / parts.length;
+	};
+}
