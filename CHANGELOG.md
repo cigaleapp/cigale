@@ -4,14 +4,44 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## September 2025
 
+### Improvements
+
+- Add prepare for offline use feature
+- Add retry button on cards in classify & crop tabs
+- Add selection and sidepanel to crop tab
+- Allow reverting crops even when no initial boxes exist
+- Allow selecting loading cards, cancel tasks when hitting Delete on selection
+- Don't apply bounding boxes to cards on import tab
+- Error on too-large images in the import tab
+- Improve no images state when on crop or classify tabs
+- Make default observation label customizable (#606)
+- Make grid size customizable
+- Move detection analysis to crop tab
+- Remove grid lines background in cropper view
+- Style the range input
+
 ### Performance Improvements
 
 - Improve general performance
 
 ### Bug Fixes
 
+- Don't preconnect to google fonts domain, fix font loading on preview builds
+- Fix all monospace text is in italics
 - Fix cards unselectable after ungrouping
+- Fix current protocol was lost on page reload
 - Fix error toasts were not red anymore
+- Fix fonts not loading
+- Fix href(...)
+- Fix loading state never disappearing on crop tab cards
+- Fix retry button in classify tab
+- Fix retry button on crop tab cards
+- Prevent caching attempts on non-HTTP schemes
+
+### Translation Updates
+
+- Localize metadataPrettyValue
+- Translate date- and number-related formatting
 
 ## August 2025
 
