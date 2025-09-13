@@ -2,7 +2,7 @@ import { test as base } from '@playwright/test';
 import { rm, mkdir } from 'node:fs/promises';
 import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import { mockProtocolSourceURL } from './utils';
+import { mockProtocolSourceURL, setHardwareConcurrency } from './utils';
 
 export { exampleProtocol };
 
@@ -32,6 +32,13 @@ export const test = base.extend(
 					await mockProtocolSourceURL(page, context, defaultProtocol.source, {
 						json: exampleProtocol
 					});
+				}
+
+				if (
+					tags.includes('@webkit-no-parallelization') &&
+					context.browser()?.browserType().name() === 'webkit'
+				) {
+					await setHardwareConcurrency(page, 1);
 				}
 
 				await page.goto('./');

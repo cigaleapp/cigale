@@ -40,7 +40,7 @@ test.describe('Cropper view', () => {
 		};
 	}
 
-	test('should have all cards visible', async ({ page }) => {
+	test('should have all cards visible @webkit-no-parallelization', async ({ page }) => {
 		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();

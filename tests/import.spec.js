@@ -34,7 +34,7 @@ test.describe('correct results.zip', () => {
 		await expect(page.getByText(/\.jpeg$/)).toHaveCount(4);
 	});
 
-	test('has the correct bounding boxes', async ({ page }) => {
+	test('has the correct bounding boxes @webkit-no-parallelization', async ({ page }) => {
 		await goToTab(page, 'crop');
 
 		/**
@@ -58,7 +58,9 @@ test.describe('correct results.zip', () => {
 		await expectBoundingBoxesCount(images[3].fileId ?? '', 1);
 	});
 
-	test('does not re-analyze when going to classify tab', async ({ page }) => {
+	test('does not re-analyze when going to classify tab @webkit-no-parallelization', async ({
+		page
+	}) => {
 		await goToTab(page, 'classify');
 		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000

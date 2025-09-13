@@ -629,3 +629,18 @@ export async function metadataValueInDatabase(page, key, observationLabel = 'lea
 		observation: observationLabel
 	}).then((values) => values[key]);
 }
+
+/**
+ * ⚠️ **Needs a navigation before taking effect**
+ * @param {Page} page
+ * @param {number} value
+ */
+export async function setHardwareConcurrency(page, value) {
+	await page.addInitScript((value) => {
+		const proto = Object.getPrototypeOf(navigator);
+		Object.defineProperty(proto, 'hardwareConcurrency', {
+			value,
+			writable: false
+		});
+	}, value);
+}
