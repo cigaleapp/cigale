@@ -82,7 +82,7 @@ swarp.init(async ({ databaseName, databaseRevision }) => {
 });
 
 swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onProgress) => {
-	const splitProgress = progressSplitter('model', 0.85, 'classmapping');
+	const splitProgress = progressSplitter('model', 0.9, 'classmapping');
 
 	const id = inferenceModelId(protocolId, request);
 	const existingSession = inferenceSessions.get(task);
