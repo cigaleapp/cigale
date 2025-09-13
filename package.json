@@ -3,7 +3,7 @@
 	"private": true,
 	"description": "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune",
 	"version": "2025.8.0",
-	"packageManager": "bun@1.2.21",
+	"packageManager": "bun@1.0.20",
 	"type": "module",
 	"main": ".vite/build/main.js",
 	"license": "MIT",
@@ -40,12 +40,12 @@
 		}
 	],
 	"scripts": {
-		"dev": "vite dev",
-		"dev:native": "electron-forge start",
+		"dev": "bun ensure-bun-version && vite dev",
+		"dev:native": "bun ensure-bun-version && electron-forge start",
 		"build": "vite build",
 		"prebuild": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js",
 		"preview": "vite preview",
-		"prepare": "husky",
+		"prepare": "husky && bun ensure-bun-version",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
 		"check:clutter": "svelte-kit sync && bunx @inlang/paraglide-js compile --outdir src/lib/paraglide && bunx knip",
@@ -55,7 +55,8 @@
 		"commit": "gitmoji -c",
 		"test": "vitest --coverage.enabled true",
 		"test:ui": "vitest --ui",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"ensure-bun-version": "bun run scripts/ensure-bun-version.js"
 	},
 	"lint-staged": {
 		"*!(.svelte).{js,ts}": [
@@ -92,7 +93,7 @@
 		"@types/piexifjs": "^1.0.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
-		"bun": "^1.2.21",
+		"bun": "^1.2.2",
 		"electron": "^38.1.0",
 		"eslint": "^9.35.0",
 		"eslint-config-prettier": "^10.1.8",
