@@ -611,9 +611,14 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
 	return fetch(url, options);
 }
 
+/** @param {Iterable<number>} values */
+export function sum(values) {
+	return values.reduce((acc, cur) => acc + cur, 0);
+}
+
 /** @param {number[]} values  */
 export function avg(values) {
-	return values.reduce((acc, cur) => acc + cur, 0) / values.length;
+	return sum(values) / values.length;
 }
 
 /**
