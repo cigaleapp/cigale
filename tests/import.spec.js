@@ -2,7 +2,6 @@ import * as dates from 'date-fns';
 import extract from 'extract-zip';
 import path from 'node:path';
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import fr from '../messages/fr.json' with { type: 'json' };
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {

@@ -1,4 +1,3 @@
-import { type } from 'arktype';
 import { m } from './paraglide/messages';
 
 /**
