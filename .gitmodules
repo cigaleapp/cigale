@@ -1,0 +1,3 @@
+[submodule "paperasse"]
+	path = paperasse
+	url = https://github.com/cigaleapp/paperasse
