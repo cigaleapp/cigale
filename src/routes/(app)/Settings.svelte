@@ -1,11 +1,9 @@
 <script>
-	import { goto, href } from '$lib/paths.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import { languagesCompletions } from '$lib/i18n';
 	import { m } from '$lib/paraglide/messages.js';
 	import { getLocale, locales, setLocale } from '$lib/paraglide/runtime.js';
+	import { goto, href } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -161,14 +159,6 @@
 				{#snippet customOption(code)}
 					{@const names = { en: 'English', fr: 'Français', ja: '日本語' }}
 					{names[code] || code}
-					{#await languagesCompletions() then completions}
-						{#if completions[code] < 0.85}
-							<ConfidencePercentage
-								tooltip={(percentage) => m.language_translation_completion({ percentage })}
-								value={completions[code]}
-							/>
-						{/if}
-					{/await}
 				{/snippet}
 			</SegmentedGroup>
 		</div>
