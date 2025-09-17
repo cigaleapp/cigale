@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>0/36</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/39</span>
+                <span class='fraction'>0/36</span>
             </div>
         
             
@@ -188,24 +188,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -213,6 +199,20 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,13 +301,15 @@
 	const { data, children } = $props();
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	let modelLoadingProgress = $state(0);</span>
-<span class="cstat-no" title="statement not covered" >	let cropperModelLoaded = $state(false);</span>
-<span class="cstat-no" title="statement not covered" >	async function loadCropperModel() {</span>
+&nbsp;
+	/**
+	 * @param {number} selectedModel
+	 */
+<span class="cstat-no" title="statement not covered" >	async function loadCropperModel(selectedModel) {</span>
 		// Prevent multiple loads
-<span class="cstat-no" title="statement not covered" >		if (cropperModelLoaded) return;</span>
 <span class="cstat-no" title="statement not covered" >		if (!uiState.currentProtocol) return;</span>
 <span class="cstat-no" title="statement not covered" >		if (!uiState.cropInferenceAvailable) return;</span>
-<span class="cstat-no" title="statement not covered" >		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;</span>
+<span class="cstat-no" title="statement not covered" >		const cropModel = uiState.currentProtocol.crop.infer?.[selectedModel]?.model;</span>
 <span class="cstat-no" title="statement not covered" >		if (!cropModel) return;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >		await data.swarpc.loadModel</span>
@@ -325,8 +327,6 @@
 <span class="cstat-no" title="statement not covered" >				console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >				toasts.error(m.error_loading_detection_model());</span>
 <span class="cstat-no" title="statement not covered" >			});</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >		cropperModelLoaded = true;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 &lt;/script&gt;
 &nbsp;
@@ -341,7 +341,7 @@
 	{/if}
 {/snippet}
 &nbsp;
-<span class="cstat-no" title="statement not covered" >{#await loadCropperModel()}</span>
+<span class="cstat-no" title="statement not covered" >{#await loadCropperModel(uiState.selectedCropModel)}</span>
 	&lt;section class="loading"&gt;
 		&lt;Logo loading /&gt;
 <span class="cstat-no" title="statement not covered" >		&lt;p&gt;{m.loading_cropping_model()}&lt;/p&gt;</span>
@@ -361,8 +361,8 @@
 <span class="cstat-no" title="statement not covered" >		&lt;p class="message"&gt;{error?.toString() ?? 'Erreur inattendue'}&lt;/p&gt;</span>
 <span class="cstat-no" title="statement not covered" >		{#if isDebugMode()}</span>
 			&lt;pre&gt;
-<span class="cstat-no" title="statement not covered" >				{error?.stack ?? '(no stack trace available)'}</span>
-			&lt;/pre&gt;
+<span class="cstat-no" title="statement not covered" >					{error?.stack ?? '(no stack trace available)'}</span>
+				&lt;/pre&gt;
 		{/if}
 	&lt;/section&gt;
 {/await}
@@ -409,7 +409,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-16T03:14:57.855Z
+                at 2025-09-17T21:57:48.182Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>
