@@ -6,19 +6,20 @@ import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import fr from '../messages/fr.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/results.js';
+import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
 	goToTab,
 	importPhotos,
 	importProtocol,
+	makeRegexpUnion,
 	mockProtocolSourceURL,
 	modal,
 	readdirTreeSync,
 	setSettings,
 	waitForLoadingEnd
 } from './utils.js';
-import { withParallelism } from './annotations';
 
 for (const offline of [false, true]) {
 	test(
@@ -320,4 +321,56 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 	    - radio "Aucune inférence" [checked]
 	    - radio "YOLO11"
 	`);
+});
+
+test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page }) => {
+	await setSettings({ page }, { showTechnicalMetadata: false });
+	await chooseDefaultProtocol(page);
+
+	await goToTab(page, 'import');
+	await importPhotos({ page }, ['cyan.jpeg']);
+	await waitForLoadingEnd(page);
+
+	/**
+	 *
+	 * @param {'crop'|'classify'} tab
+	 * @param {string|RegExp} name
+	 */
+	async function setModel(tab, name) {
+		const button = page.getByTestId(`${tab}-model-select`);
+		await button.click();
+
+		const modalId = await button.getAttribute('aria-controls');
+		await page.locator(`#${modalId}`).getByRole('menuitem', { name }).click();
+	}
+
+	/**
+	 * @param {boolean} toBePresent
+	 * @param {string} text
+	 */
+	async function expectLoadingText(toBePresent, text) {
+		let expector = expect(page.getByTestId('app-main'));
+		if (!toBePresent) expector = expector.not;
+		await expector.toHaveText(makeRegexpUnion(text));
+	}
+
+	await setModel('crop', fr.no_inference);
+	await goToTab(page, 'crop');
+	await expectLoadingText(false, fr.loading_cropping_model);
+
+	await setModel('crop', 'YOLO11');
+	await expectLoadingText(true, fr.loading_cropping_model);
+	await waitForLoadingEnd(page);
+
+	await setModel('classify', fr.no_inference);
+	await goToTab(page, 'classify');
+	await expectLoadingText(false, fr.loading_classification_model);
+
+	await setModel('classify', /80 classes/);
+	await expectLoadingText(true, fr.loading_classification_model);
+	await waitForLoadingEnd(page);
+	await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Erreur/);
+
+	await setModel('classify', /17000 classes/);
+	await expectLoadingText(true, fr.loading_classification_model);
 });

@@ -1,22 +1,26 @@
 <script>
 	import { page } from '$app/state';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { m } from '$lib/paraglide/messages.js';
+	import { goto, href } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp } from '$lib/utils';
+	import IconSelect from '~icons/ph/caret-down';
 	import IconNext from '~icons/ph/caret-right';
+	import IconCheck from '~icons/ph/check';
 	import IconDownload from '~icons/ph/download-simple';
 	import IconNoInference from '~icons/ph/lightning-slash';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
-	import { goto, href } from '$lib/paths.js';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 
 	/**
 	 * @typedef Props
@@ -125,7 +129,7 @@
 		},
 		// [M]anage protocols
 		'g m': {
-			do: () => goto('/manage'),
+			do: () => goto('/protocols/'),
 			help: m.goto_protocol_management()
 		}
 	});
@@ -182,9 +186,13 @@
 						<div class="line"></div>
 					{/if}
 				</a>
-				{@render noInferenceIndicator(
+				{@render inferenceSettings(
+					'crop',
 					uiState.cropInferenceAvailable,
-					m.detection_is_disabled_or_unavailable()
+					m.detection_is_disabled_or_unavailable(),
+					uiState.cropModels,
+					uiState.selectedCropModel,
+					(i) => uiState.setModelSelections({ crop: i })
 				)}
 			</div>
 			<IconNext></IconNext>
@@ -206,9 +214,13 @@
 						<div class="line"></div>
 					{/if}
 				</a>
-				{@render noInferenceIndicator(
+				{@render inferenceSettings(
+					'classify',
 					uiState.classificationInferenceAvailable,
-					m.classification_is_disabled_or_unavailable()
+					m.classification_is_disabled_or_unavailable(),
+					uiState.classificationModels,
+					uiState.selectedClassificationModel,
+					(i) => uiState.setModelSelections({ classification: i })
 				)}
 			</div>
 			<IconNext></IconNext>
@@ -227,10 +239,51 @@
 	<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
 </header>
 
-{#snippet noInferenceIndicator(/** @type {boolean} */ available, /** @type {string} */ help)}
-	<div class="inference-indicator" use:tooltip={help}>
-		{#if !available && uiState.currentProtocol}
-			<IconNoInference />
+{#snippet inferenceSettings(
+	/** @type {'crop'|'classify'} */ tab,
+	/** @type {boolean} */ available,
+	/** @type {string} */ help,
+	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */ models,
+	/** @type {number} */ currentModelIndex,
+	/** @type {(i: number) => void }*/ setSelection
+)}
+	<div class="inference" use:tooltip={models.length > 0 ? undefined : help}>
+		{#if uiState.currentProtocol}
+			{#if models.length > 0}
+				<DropdownMenu
+					data-testid="{tab}-model-select"
+					help="Modèle d'inférence"
+					items={[
+						{
+							i: -1,
+							label: m.no_inference(),
+							onclick: () => setSelection(-1)
+						},
+						...models.map((model, i) => ({
+							i,
+							label: model.name ?? '',
+							onclick: () => setSelection(i)
+						}))
+					]}
+				>
+					{#snippet trigger(props)}
+						<!-- {JSON.stringify(props)} -->
+						<ButtonIcon help="" {...props}>
+							<IconSelect />
+						</ButtonIcon>
+					{/snippet}
+					{#snippet item({ label, i })}
+						<div class="selected-model-indicator">
+							{#if i === currentModelIndex}
+								<IconCheck />
+							{/if}
+						</div>
+						{label}
+					{/snippet}
+				</DropdownMenu>
+			{:else if !available}
+				<IconNoInference />
+			{/if}
 		{/if}
 	</div>
 {/snippet}
@@ -264,13 +317,18 @@
 		align-items: center;
 	}
 
-	nav .inference-indicator {
+	nav .inference {
 		color: var(--fg-warning);
 		display: flex;
 		align-items: center;
 		font-size: 0.9em;
-		width: 1ch;
-		margin-left: -1ch;
+	}
+
+	.selected-model-indicator {
+		width: 1.5em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	nav a {

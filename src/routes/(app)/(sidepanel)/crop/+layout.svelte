@@ -10,13 +10,15 @@
 	const { data, children } = $props();
 
 	let modelLoadingProgress = $state(0);
-	let cropperModelLoaded = $state(false);
-	async function loadCropperModel() {
+
+	/**
+	 * @param {number} selectedModel
+	 */
+	async function loadCropperModel(selectedModel) {
 		// Prevent multiple loads
-		if (cropperModelLoaded) return;
 		if (!uiState.currentProtocol) return;
 		if (!uiState.cropInferenceAvailable) return;
-		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
+		const cropModel = uiState.currentProtocol.crop.infer?.[selectedModel]?.model;
 		if (!cropModel) return;
 
 		await data.swarpc.loadModel
@@ -34,8 +36,6 @@
 				console.error(error);
 				toasts.error(m.error_loading_detection_model());
 			});
-
-		cropperModelLoaded = true;
 	}
 </script>
 
@@ -50,7 +50,7 @@
 	{/if}
 {/snippet}
 
-{#await loadCropperModel()}
+{#await loadCropperModel(uiState.selectedCropModel)}
 	<section class="loading">
 		<Logo loading />
 		<p>{m.loading_cropping_model()}</p>
@@ -70,8 +70,8 @@
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
 		{#if isDebugMode()}
 			<pre>
-				{error?.stack ?? '(no stack trace available)'}
-			</pre>
+					{error?.stack ?? '(no stack trace available)'}
+				</pre>
 		{/if}
 	</section>
 {/await}

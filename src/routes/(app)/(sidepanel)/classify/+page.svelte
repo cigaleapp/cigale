@@ -23,7 +23,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { sum } from '$lib/utils.js';
-	import { onMount } from 'svelte';
+	import { watch } from 'runed';
 
 	seo({ title: m.classification() });
 
@@ -125,15 +125,19 @@
 		classifyMore(toClassify.map((i) => i.id));
 	});
 
-	onMount(() => {
-		void loadClassifModel()
-			.catch((error) => {
-				classifModelLoadingError = error;
-			})
-			.finally(() => {
-				classifmodelLoaded = true;
-			});
-	});
+	watch(
+		() => uiState.selectedClassificationModel,
+		() => {
+			classifmodelLoaded = false;
+			void loadClassifModel()
+				.catch((error) => {
+					classifModelLoadingError = error;
+				})
+				.finally(() => {
+					classifmodelLoaded = true;
+				});
+		}
+	);
 
 	$effect(() => {
 		if (!uiState.setSelection) return;

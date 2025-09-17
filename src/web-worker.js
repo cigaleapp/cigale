@@ -153,7 +153,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 
 	tools.abortSignal?.throwIfAborted();
 	const session = inferenceSessions.get('classification');
-	if (!session) throw new Error('Modèle de classification non chargé');
+	if (!session) return { scores: [] };
 	const { classmapping, onnx } = session;
 	if (!classmapping) throw new Error("Le modèle de classification n'a pas de classmapping associé");
 
