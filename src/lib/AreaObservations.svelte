@@ -34,6 +34,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @property {(id: string) => void} [ondelete] callback the user wants to delete a card
 	 * @property {(id: string) => void} [onretry] callback the user wants to retry an errored card
 	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
+	 * @property {(e: MouseEvent|TouchEvent|null) => void} [onemptyclick] callback when the user clicks on the empty area
 	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
 	 */
 
@@ -43,6 +44,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		ondelete,
 		onretry,
 		oncardclick,
+		onemptyclick,
 		errors,
 		highlight,
 		loadingText,
@@ -59,7 +61,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		if (!imagesContainer) return;
 
 		dragselect?.destroy();
-		dragselect = new DragSelect(imagesContainer, selection);
+		dragselect = new DragSelect(imagesContainer, selection, {
+			ondeadclick: onemptyclick
+		});
 		dragselect.setSelection(selection);
 		uiState.setSelection = (newSelection) => {
 			if (!dragselect) {
