@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.61% </span>
+                <span class="strong">65.48% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>201/321</span>
+                <span class='fraction'>203/310</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">62.61% </span>
+                <span class="strong">65.48% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>201/321</span>
+                <span class='fraction'>203/310</span>
             </div>
         
             
@@ -415,12 +415,9 @@
 <a name='L350'></a><a href='#L350'>350</a>
 <a name='L351'></a><a href='#L351'>351</a>
 <a name='L352'></a><a href='#L352'>352</a>
-<a name='L353'></a><a href='#L353'>353</a>
-<a name='L354'></a><a href='#L354'>354</a>
-<a name='L355'></a><a href='#L355'>355</a>
-<a name='L356'></a><a href='#L356'>356</a>
-<a name='L357'></a><a href='#L357'>357</a>
-<a name='L358'></a><a href='#L358'>358</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L353'></a><a href='#L353'>353</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -538,6 +535,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -547,34 +547,24 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -781,6 +771,8 @@
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
 import { cachebust } from './utils.js';
+import { promptForFiles } from './files.js';
+import { errorMessage } from './i18n.js';
 &nbsp;
 /**
  * @import { Schemas } from './database.js';
@@ -878,10 +870,10 @@ export <span class="fstat-no" title="function not covered" >async function downl
 /**
  * Imports protocol(s) from JSON file(s).
  * Asks the user to select files, then imports the protocols from those files.
- * @template {{id: string, name: string, version?: number}} Out
+ * @template {{id: string, name: string, version: number|undefined}} Out
  * @template {boolean|undefined} Multiple
  * @param {object} param0
- * @param {Multiple} [param0.allowMultiple] allow the user to select multiple files
+ * @param {Multiple} param0.allowMultiple allow the user to select multiple files
  * @param {() =&gt; void} [param0.onInput] callback to call when the user selected files
  * @param {((input: {contents: string, isJSON: boolean}) =&gt; Promise&lt;{id: string, name: string, version: number|undefined}&gt;)} param0.importProtocol
  * @returns {Promise&lt;Multiple extends true ? NoInfer&lt;Out&gt;[] : NoInfer&lt;Out&gt;&gt;}
@@ -891,48 +883,41 @@ export <span class="fstat-no" title="function not covered" >async function promp
 <span class="cstat-no" title="statement not covered" >	onInput = () =&gt; {},</span>
 <span class="cstat-no" title="statement not covered" >	importProtocol</span>
 <span class="cstat-no" title="statement not covered" >}) {</span>
-<span class="cstat-no" title="statement not covered" >	return new Promise((resolve, reject) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >		const input = document.createElement('input');</span>
-<span class="cstat-no" title="statement not covered" >		input.type = 'file';</span>
-<span class="cstat-no" title="statement not covered" >		input.multiple = allowMultiple ?? false;</span>
-<span class="cstat-no" title="statement not covered" >		input.accept = ['.json', '.yaml', 'application/json'].join(',');</span>
-<span class="cstat-no" title="statement not covered" >		input.onchange = async () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >			if (!input.files || !input.files[0]) return;</span>
-<span class="cstat-no" title="statement not covered" >			onInput();</span>
-<span class="cstat-no" title="statement not covered" >			/** @type {Array&lt;{id: string, name: string, version?: number}&gt;}  */</span>
-<span class="cstat-no" title="statement not covered" >			const output = await Promise.all(</span>
-<span class="cstat-no" title="statement not covered" >				[...input.files].map(async (file) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >					console.time(`Reading file ${file.name}`);</span>
-<span class="cstat-no" title="statement not covered" >					const reader = new FileReader();</span>
-<span class="cstat-no" title="statement not covered" >					return new Promise((resolve) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >						reader.onload = async () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >							if (!reader.result) throw new Error('Fichier vide');</span>
-<span class="cstat-no" title="statement not covered" >							if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');</span>
-<span class="cstat-no" title="statement not covered" >							console.timeEnd(`Reading file ${file.name}`);</span>
-<span class="cstat-no" title="statement not covered" >							const result = await importProtocol({</span>
-<span class="cstat-no" title="statement not covered" >								contents: reader.result,</span>
-<span class="cstat-no" title="statement not covered" >								isJSON: file.name.endsWith('.json')</span>
-<span class="cstat-no" title="statement not covered" >							}).catch((err) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >								reject(</span>
-<span class="cstat-no" title="statement not covered" >									new Error(</span>
-<span class="cstat-no" title="statement not covered" >										`Protocole invalide: ${err?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`</span>
-<span class="cstat-no" title="statement not covered" >									)</span>
-<span class="cstat-no" title="statement not covered" >								)</span>
-<span class="cstat-no" title="statement not covered" >							);</span>
-<span class="cstat-no" title="statement not covered" >							const { tables } = await import('./idb.svelte.js');</span>
-<span class="cstat-no" title="statement not covered" >							await tables.Protocol.refresh();</span>
-<span class="cstat-no" title="statement not covered" >							await tables.Metadata.refresh();</span>
-<span class="cstat-no" title="statement not covered" >							resolve(result);</span>
-<span class="cstat-no" title="statement not covered" >						};</span>
-<span class="cstat-no" title="statement not covered" >						reader.readAsText(file);</span>
-<span class="cstat-no" title="statement not covered" >					});</span>
-<span class="cstat-no" title="statement not covered" >				})</span>
-<span class="cstat-no" title="statement not covered" >			);</span>
-<span class="cstat-no" title="statement not covered" >			if (allowMultiple) resolve(output);</span>
-<span class="cstat-no" title="statement not covered" >			else resolve(output[0]);</span>
-<span class="cstat-no" title="statement not covered" >		};</span>
-<span class="cstat-no" title="statement not covered" >		input.click();</span>
+<span class="cstat-no" title="statement not covered" >	const files = await promptForFiles({</span>
+<span class="cstat-no" title="statement not covered" >		multiple: allowMultiple,</span>
+<span class="cstat-no" title="statement not covered" >		accept: '.json,.yaml,application/json'</span>
 <span class="cstat-no" title="statement not covered" >	});</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	onInput();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	/** @type {Array&lt;{id: string, name: string, version: number | undefined}&gt;}  */</span>
+<span class="cstat-no" title="statement not covered" >	const output = await Promise.all(</span>
+<span class="cstat-no" title="statement not covered" >		[...files].map(async (file) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >			console.time(`Reading file ${file.name}`);</span>
+<span class="cstat-no" title="statement not covered" >			const reader = new FileReader();</span>
+<span class="cstat-no" title="statement not covered" >			return new Promise((resolve) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >				reader.onload = async () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >					if (!reader.result) throw new Error('Fichier vide');</span>
+<span class="cstat-no" title="statement not covered" >					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >					console.timeEnd(`Reading file ${file.name}`);</span>
+<span class="cstat-no" title="statement not covered" >					const result = await importProtocol({</span>
+<span class="cstat-no" title="statement not covered" >						contents: reader.result,</span>
+<span class="cstat-no" title="statement not covered" >						isJSON: file.name.endsWith('.json')</span>
+<span class="cstat-no" title="statement not covered" >					}).catch((err) =&gt; Promise.reject(new Error(errorMessage(err))));</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >					const { tables } = await import('./idb.svelte.js');</span>
+<span class="cstat-no" title="statement not covered" >					await tables.Protocol.refresh();</span>
+<span class="cstat-no" title="statement not covered" >					await tables.Metadata.refresh();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >					resolve(result);</span>
+<span class="cstat-no" title="statement not covered" >				};</span>
+<span class="cstat-no" title="statement not covered" >				reader.readAsText(file);</span>
+<span class="cstat-no" title="statement not covered" >			});</span>
+<span class="cstat-no" title="statement not covered" >		})</span>
+<span class="cstat-no" title="statement not covered" >	);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	return allowMultiple ? output : output[0];</span>
 <span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;
 /**
@@ -1141,7 +1126,7 @@ export <span class="fstat-no" title="function not covered" >async function upgra
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-17T21:57:48.182Z
+                at 2025-09-17T22:58:43.746Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
