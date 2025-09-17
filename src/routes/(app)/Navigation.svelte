@@ -187,6 +187,7 @@
 					{/if}
 				</a>
 				{@render inferenceSettings(
+					'crop',
 					uiState.cropInferenceAvailable,
 					m.detection_is_disabled_or_unavailable(),
 					uiState.cropModels,
@@ -214,6 +215,7 @@
 					{/if}
 				</a>
 				{@render inferenceSettings(
+					'classify',
 					uiState.classificationInferenceAvailable,
 					m.classification_is_disabled_or_unavailable(),
 					uiState.classificationModels,
@@ -238,6 +240,7 @@
 </header>
 
 {#snippet inferenceSettings(
+	/** @type {'crop'|'classify'} */ tab,
 	/** @type {boolean} */ available,
 	/** @type {string} */ help,
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */ models,
@@ -248,6 +251,7 @@
 		{#if uiState.currentProtocol}
 			{#if models.length > 0}
 				<DropdownMenu
+					data-testid="{tab}-model-select"
 					help="Modèle d'inférence"
 					items={[
 						{

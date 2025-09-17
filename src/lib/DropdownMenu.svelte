@@ -20,13 +20,13 @@
 	 */
 
 	/** @type {Props} */
-	const { items, item, trigger, help = '' } = $props();
+	const { items, item, trigger, help = '', ...rest } = $props();
 
 	let open = $state(false);
 </script>
 
 <DropdownMenu.Root {open}>
-	<DropdownMenu.Trigger>
+	<DropdownMenu.Trigger {...rest}>
 		{#snippet child({ props })}
 			{@render trigger({
 				...props,

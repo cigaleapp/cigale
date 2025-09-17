@@ -578,7 +578,7 @@ export function openSettings(page) {
 /**
  * @param {...string} parts
  */
-function makeRegexpUnion(...parts) {
+export function makeRegexpUnion(...parts) {
 	return new RegExp(
 		parts
 			.filter((t) => {
