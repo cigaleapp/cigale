@@ -2,8 +2,10 @@
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import Dropzone from '$lib/Dropzone.svelte';
+	import { promptForFiles } from '$lib/files';
 	import { tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileIds } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import { m } from '$lib/paraglide/messages.js';
@@ -42,18 +44,7 @@
 </script>
 
 <Dropzone
-	filetypes={[
-		'image/jpeg',
-		'application/zip',
-		'image/png',
-		'image/tiff',
-		'.cr2',
-		'.rw2',
-		'.dng',
-		'.crw',
-		'.raw',
-		'.cr3'
-	]}
+	filetypes={ACCEPTED_IMPORT_TYPES}
 	clickable={images.length === 0}
 	onfiles={({ files }) => importMore(files)}
 >
@@ -64,6 +55,10 @@
 			errors={uiState.erroredImages}
 			sort={getSettings().gallerySort}
 			loadingText={m.loading_text()}
+			onemptyclick={async () => {
+				if (uiState.selection.length > 0) return;
+				importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
+			}}
 			ondelete={async (id) => {
 				cancelTask(id, 'Cancelled by user');
 				uiState.processing.removeFile(id);

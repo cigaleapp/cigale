@@ -54,8 +54,10 @@ export class DragSelect {
 	 *
 	 * @param {HTMLElement} container the container where all the [data-selectable] elements are. Selection square will be available in the parent of this container.
 	 * @param {string[]} [initialSelection]
+	 * @param {object} [options]
+	 * @param {(e: MouseEvent|TouchEvent|null) => void} [options.ondeadclick] callback when the user clicks on an empty area, and does not do so in order to unselect everything (i.e. the click did not result in a selection change)
 	 */
-	constructor(container, initialSelection = []) {
+	constructor(container, initialSelection = [], { ondeadclick } = {}) {
 		// Save the container element on the class instance
 		this.selection = initialSelection;
 		this.imagesContainer = container;
@@ -95,6 +97,12 @@ export class DragSelect {
 			const added = idsOfElements(changed.added);
 
 			this.selection = [...this.selection.filter((id) => !removed.includes(id)), ...added];
+		});
+
+		this.#instance.on('stop', ({ event, store: { changed } }) => {
+			if (changed.added.length > 0) return;
+			if (changed.removed.length > 0) return;
+			ondeadclick?.(event);
 		});
 	}
 }
