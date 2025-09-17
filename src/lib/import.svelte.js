@@ -12,6 +12,19 @@ import * as dates from 'date-fns';
 import { imageLimits } from './inference_utils';
 import { serializeMetadataValues } from './metadata';
 
+export const ACCEPTED_IMPORT_TYPES = [
+	'image/jpeg',
+	'application/zip',
+	'image/png',
+	'image/tiff',
+	'.cr2',
+	'.rw2',
+	'.dng',
+	'.crw',
+	'.raw',
+	'.cr3'
+];
+
 /**
  * @param {File} file
  * @param {string} id

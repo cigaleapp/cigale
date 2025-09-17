@@ -19,24 +19,15 @@
 	import { cancellers } from '../+layout.svelte';
 	import Error from '../../+error.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { promptForFiles } from '$lib/files';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 
 	seo({ title: 'Importer' });
 
 	const { children } = $props();
 
 	async function importImages() {
-		const filesInput = document.createElement('input');
-		filesInput.type = 'file';
-		filesInput.multiple = true;
-		filesInput.accept = 'image/*';
-		filesInput.addEventListener('change', async (event) => {
-			if (!(event.currentTarget instanceof HTMLInputElement)) return;
-			if (!event.currentTarget.files) return;
-			const files = Array.from(event.currentTarget.files);
-			if (files.length === 0) return;
-			importMore(files);
-		});
-		filesInput.click();
+		importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
 	}
 
 	async function mergeSelection() {

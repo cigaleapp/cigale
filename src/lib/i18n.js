@@ -81,9 +81,10 @@ export function humanFormatName(contentType) {
 /**
  *
  * @param {unknown} error
+ * @param {string} [prefix]
  * @returns {string}
  */
-export function errorMessage(error) {
+export function errorMessage(error, prefix = '') {
 	let defaultMessage = 'Unexpected error';
 	try {
 		defaultMessage = m.unexpected_error();
@@ -107,5 +108,7 @@ export function errorMessage(error) {
 		result = result.slice('Error: '.length);
 	}
 
-	return result || defaultMessage;
+	result ||= defaultMessage;
+
+	return prefix ? `${prefix}: ${result}` : result;
 }
