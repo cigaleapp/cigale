@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/137</span>
+                <span class='fraction'>0/141</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/137</span>
+                <span class='fraction'>0/141</span>
             </div>
         
             
@@ -476,7 +476,11 @@
 <a name='L411'></a><a href='#L411'>411</a>
 <a name='L412'></a><a href='#L412'>412</a>
 <a name='L413'></a><a href='#L413'>413</a>
-<a name='L414'></a><a href='#L414'>414</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -670,6 +674,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -691,6 +696,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -721,11 +727,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1078,6 +1086,7 @@
 					{/if}
 				&lt;/a&gt;
 <span class="cstat-no" title="statement not covered" >				{@render inferenceSettings(</span>
+<span class="cstat-no" title="statement not covered" >					'crop',</span>
 <span class="cstat-no" title="statement not covered" >					uiState.cropInferenceAvailable,</span>
 <span class="cstat-no" title="statement not covered" >					m.detection_is_disabled_or_unavailable(),</span>
 <span class="cstat-no" title="statement not covered" >					uiState.cropModels,</span>
@@ -1105,6 +1114,7 @@
 					{/if}
 				&lt;/a&gt;
 <span class="cstat-no" title="statement not covered" >				{@render inferenceSettings(</span>
+<span class="cstat-no" title="statement not covered" >					'classify',</span>
 <span class="cstat-no" title="statement not covered" >					uiState.classificationInferenceAvailable,</span>
 <span class="cstat-no" title="statement not covered" >					m.classification_is_disabled_or_unavailable(),</span>
 <span class="cstat-no" title="statement not covered" >					uiState.classificationModels,</span>
@@ -1129,16 +1139,18 @@
 &lt;/header&gt;
 &nbsp;
 {#snippet inferenceSettings(
+<span class="cstat-no" title="statement not covered" >	/** @type {'crop'|'classify'} */ tab,</span>
 <span class="cstat-no" title="statement not covered" >	/** @type {boolean} */ available,</span>
 <span class="cstat-no" title="statement not covered" >	/** @type {string} */ help,</span>
 <span class="cstat-no" title="statement not covered" >	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */ models,</span>
 <span class="cstat-no" title="statement not covered" >	/** @type {number} */ currentModelIndex,</span>
 <span class="cstat-no" title="statement not covered" >	/** @type {(i: number) =&gt; void }*/ setSelection</span>
 )}
-<span class="cstat-no" title="statement not covered" >	&lt;div class="inference-indicator" use:tooltip={models.length &gt; 0 ? undefined : help}&gt;</span>
+<span class="cstat-no" title="statement not covered" >	&lt;div class="inference" use:tooltip={models.length &gt; 0 ? undefined : help}&gt;</span>
 <span class="cstat-no" title="statement not covered" >		{#if uiState.currentProtocol}</span>
 <span class="cstat-no" title="statement not covered" >			{#if models.length &gt; 0}</span>
 				&lt;DropdownMenu
+<span class="cstat-no" title="statement not covered" >					data-testid="{tab}-model-select"</span>
 					help="Modèle d'inférence"
 					items={[
 						{
@@ -1204,7 +1216,7 @@
 		align-items: center;
 	}
 &nbsp;
-	nav .inference-indicator {
+	nav .inference {
 		color: var(--fg-warning);
 		display: flex;
 		align-items: center;
@@ -1309,7 +1321,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-17T20:36:45.474Z
+                at 2025-09-17T21:49:10.149Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
