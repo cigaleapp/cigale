@@ -25,7 +25,7 @@ jobs:
         run: |
           open_prs=$(gh pr list --state open --json number --jq '.[].number')
           echo Open PRs: $open_prs
-          for dir in _vitest _playwright _coverage _pullrequests; do
+          for dir in _nodemodules _vitest _playwright _coverage _pullrequests; do
             echo Checking $dir
             for pr in $dir/*; do
               number=$(basename "$pr" | sed 's/^pr-//')
