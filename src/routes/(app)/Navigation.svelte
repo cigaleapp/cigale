@@ -1,28 +1,38 @@
 <script>
 	import { page } from '$app/state';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import DropdownMenu from '$lib/DropdownMenu.svelte';
+	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { goto, href } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { clamp } from '$lib/utils';
+	import IconSelect from '~icons/ph/caret-down';
 	import IconNext from '~icons/ph/caret-right';
+	import IconCheck from '~icons/ph/check';
 	import IconDownload from '~icons/ph/download-simple';
 	import IconNoInference from '~icons/ph/lightning-slash';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
-	import Reglages from './Reglages.svelte';
-	import { clamp } from '$lib/utils';
+	import Settings from './Settings.svelte';
 
 	/**
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number} [progress=0]
-	 * @property {() => void} [openKeyboardShortcuts]
+	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
+	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
 	 */
 
 	/** @type {Props} */
-	let { openKeyboardShortcuts, progress = 0 } = $props();
+	let { openKeyboardShortcuts, openPrepareForOfflineUse, progress = 0, swarpc } = $props();
 
 	const path = $derived(page.url.hash.replace(/^#/, ''));
 
@@ -31,10 +41,29 @@
 	/** @type {number|undefined} */
 	let height = $state();
 
+	/** @type {number|undefined} */
+	let navHeight = $state();
+
 	let openExportModal = $state();
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
+
+	let browserTabFocused = $state(true);
+	let showingOKInTabTitle = $state(false);
+
+	/* eslint-disable svelte/prefer-writable-derived */
+	// The window object is not reactive
+	let isNativeWindow = $state(false);
+	$effect(() => {
+		isNativeWindow = 'nativeWindow' in window;
+	});
+	/* eslint-enable svelte/prefer-writable-derived */
+
+	$effect(() => {
+		if (!navHeight) return;
+		window.nativeWindow?.setControlsHeight(navHeight);
+	});
 
 	$effect(() => {
 		window.nativeWindow?.setProgress(clamp(progress, 0, 1));
@@ -43,39 +72,100 @@
 			window.nativeWindow?.startCallingAttention();
 		}
 	});
+
+	$effect(() => {
+		if (isNativeWindow) return;
+		const actualTitle = document.title.replace(/^(⏳ \d+% ·|🆗) /, '');
+
+		if (progress >= 1 || showingOKInTabTitle) {
+			document.title = `🆗 ${actualTitle}`;
+		} else if (progress === 0) {
+			document.title = actualTitle;
+		} else {
+			document.title = `⏳ ${percent(progress)} · ${actualTitle}`;
+		}
+	});
+
+	$effect(() => {
+		document.addEventListener('processing-queue-drained', () => {
+			if (!browserTabFocused) {
+				showingOKInTabTitle = true;
+			}
+		});
+		window.addEventListener('focus', () => {
+			showingOKInTabTitle = false;
+			browserTabFocused = true;
+		});
+		window.addEventListener('blur', () => {
+			browserTabFocused = false;
+		});
+	});
+
+	defineKeyboardShortcuts('navigation', {
+		// Choose [P]rotocol
+		'g p': {
+			do: () => goto('/'),
+			help: m.goto_protocol_tab()
+		},
+		// [I]mport images
+		'g i': {
+			do: () => goto('/import'),
+			help: m.goto_import_tab()
+		},
+		// Adjust C[r]ops
+		'g r': {
+			do: () => goto('/crop'),
+			help: m.goto_crop_tab()
+		},
+		// A[n]notate images
+		'g n': {
+			do: () => goto('/classify'),
+			help: m.goto_classify_tab()
+		},
+		// E[x]port results
+		'g x': {
+			do: () => openExportModal(),
+			help: m.export_results()
+		},
+		// [M]anage protocols
+		'g m': {
+			do: () => goto('/protocols/'),
+			help: m.goto_protocol_management()
+		}
+	});
 </script>
 
-<DownloadResults {progress} bind:open={openExportModal} />
+<DownloadResults {swarpc} bind:open={openExportModal} />
 
 {#if previewingPrNumber}
 	<DeploymentDetails bind:open={openPreviewPRDetails} />
 {/if}
 
-<header bind:clientHeight={height}>
-	<nav>
+<header bind:clientHeight={height} class:native-window={isNativeWindow}>
+	<nav bind:clientHeight={navHeight} data-testid="app-nav" data-sveltekit-preload-data="viewport">
 		<div class="logo">
-			<a href="#/">
+			<a href={href('/')}>
 				<Logo --fill="var(--bg-primary)" />
 				C.i.g.a.l.e.
 			</a>
 			{#if previewingPrNumber}
 				<button class="pr-number" onclick={openPreviewPRDetails}>
-					Preview #{previewingPrNumber}
+					{m.preview_pr_number({ number: previewingPrNumber })}
 				</button>
 			{/if}
 		</div>
 
 		<div class="steps">
-			<a href="#/">
-				Protocole
+			<a href={href('/')}>
+				{m.protocol_tab()}
 				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
 				{#if path == '/' || path == ''}
 					<div class="line"></div>
 				{/if}
 			</a>
 			<IconNext></IconNext>
-			<a href="#/import" aria-disabled={!uiState.currentProtocolId}>
-				Importer
+			<a href={href('/import')} data-testid="goto-import" aria-disabled={!uiState.currentProtocol}>
+				{m.import_tab()}
 				{#if path == '/import'}
 					<div class="line"></div>
 				{/if}
@@ -83,53 +173,117 @@
 			<IconNext></IconNext>
 			<div class="with-inference-indicator">
 				<a
-					href="#/crop/{uiState.imageOpenedInCropper}"
+					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' && uiState.imageOpenedInCropper
+						? href('/(app)/(sidepanel)/crop/[image]', {
+								image: uiState.imageOpenedInCropper
+							})
+						: href('/crop')}
 					data-testid="goto-crop"
-					aria-disabled={!uiState.currentProtocolId || !hasImages}
+					aria-disabled={!uiState.currentProtocol || !hasImages}
 				>
-					Recadrer
+					{m.crop_tab()}
 					{#if path.startsWith('/crop')}
 						<div class="line"></div>
 					{/if}
 				</a>
-				{@render noInferenceIndicator(
+				{@render inferenceSettings(
+					'crop',
 					uiState.cropInferenceAvailable,
-					"Le protocole ne définit pas d'inférence automatique pour la détection"
+					m.detection_is_disabled_or_unavailable(),
+					uiState.cropModels,
+					uiState.selectedCropModel,
+					(i) => uiState.setModelSelections({ crop: i })
 				)}
 			</div>
 			<IconNext></IconNext>
-			<div class="with-inference-indicator">
-				<a href="#/classify" aria-disabled={!uiState.currentProtocolId || !hasImages}>
-					Classifier
+			<div
+				class="with-inference-indicator"
+				use:tooltip={uiState.processing.task === 'detection' && uiState.processing.progress < 1
+					? m.wait_for_detection_to_finish_before_classifying()
+					: undefined}
+			>
+				<a
+					href={href('/classify')}
+					aria-disabled={!uiState.currentProtocol ||
+						!hasImages ||
+						(uiState.processing.task === 'detection' && uiState.processing.progress < 1)}
+					data-testid="goto-classify"
+				>
+					{m.classify_tab()}
 					{#if path == '/classify'}
 						<div class="line"></div>
 					{/if}
 				</a>
-				{@render noInferenceIndicator(
+				{@render inferenceSettings(
+					'classify',
 					uiState.classificationInferenceAvailable,
-					"Le protocole ne définit pas d'inférence automatique pour la classification"
+					m.classification_is_disabled_or_unavailable(),
+					uiState.classificationModels,
+					uiState.selectedClassificationModel,
+					(i) => uiState.setModelSelections({ classification: i })
 				)}
 			</div>
 			<IconNext></IconNext>
-			<ButtonSecondary onclick={openExportModal}>
+			<ButtonSecondary tight onclick={openExportModal}>
 				<IconDownload />
-				Résultats
+				{m.results()}
 			</ButtonSecondary>
 		</div>
 
-		<div class="settings">
-			<Reglages {openKeyboardShortcuts} --navbar-height="{height}px" />
+		<div class="settings" class:native={isNativeWindow}>
+			<Settings {openPrepareForOfflineUse} {openKeyboardShortcuts} --navbar-height="{height}px" />
 		</div>
 	</nav>
 
 	<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
-	<ProgressBar progress={uiState.processing.state === 'generating-zip' ? 0 : progress} />
+	<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
 </header>
 
-{#snippet noInferenceIndicator(/** @type {boolean} */ available, /** @type {string} */ help)}
-	<div class="inference-indicator" use:tooltip={help}>
-		{#if !available && uiState.currentProtocol}
-			<IconNoInference />
+{#snippet inferenceSettings(
+	/** @type {'crop'|'classify'} */ tab,
+	/** @type {boolean} */ available,
+	/** @type {string} */ help,
+	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */ models,
+	/** @type {number} */ currentModelIndex,
+	/** @type {(i: number) => void }*/ setSelection
+)}
+	<div class="inference" use:tooltip={models.length > 0 ? undefined : help}>
+		{#if uiState.currentProtocol}
+			{#if models.length > 0}
+				<DropdownMenu
+					data-testid="{tab}-model-select"
+					help="Modèle d'inférence"
+					items={[
+						{
+							i: -1,
+							label: m.no_inference(),
+							onclick: () => setSelection(-1)
+						},
+						...models.map((model, i) => ({
+							i,
+							label: model.name ?? '',
+							onclick: () => setSelection(i)
+						}))
+					]}
+				>
+					{#snippet trigger(props)}
+						<!-- {JSON.stringify(props)} -->
+						<ButtonIcon help="" {...props}>
+							<IconSelect />
+						</ButtonIcon>
+					{/snippet}
+					{#snippet item({ label, i })}
+						<div class="selected-model-indicator">
+							{#if i === currentModelIndex}
+								<IconCheck />
+							{/if}
+						</div>
+						{label}
+					{/snippet}
+				</DropdownMenu>
+			{:else if !available}
+				<IconNoInference />
+			{/if}
 		{/if}
 	</div>
 {/snippet}
@@ -154,26 +308,33 @@
 		position: relative;
 	}
 
+	header.native-window nav {
+		height: 50px;
+	}
+
 	nav .with-inference-indicator {
 		display: flex;
 		align-items: center;
 	}
 
-	nav .inference-indicator {
+	nav .inference {
 		color: var(--fg-warning);
 		display: flex;
 		align-items: center;
 		font-size: 0.9em;
-		width: 1ch;
-		margin-left: -1ch;
+	}
+
+	.selected-model-indicator {
+		width: 1.5em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	nav a {
 		background: none;
 		border: none;
-		padding: 7.5px;
-		padding-left: 15px;
-		padding-right: 15px;
+		padding: 7.5px 15px;
 		text-decoration: none;
 		color: var(--fg-neutral);
 	}
@@ -181,11 +342,15 @@
 	.steps {
 		display: flex;
 		align-items: center;
-		justify-content: center;
 		justify-content: space-between;
 		width: 100%;
 		margin: 0 2rem;
 		max-width: 800px;
+	}
+
+	header.native-window .steps {
+		justify-content: center;
+		gap: 1rem;
 	}
 
 	nav a[aria-disabled='true'] {
@@ -206,6 +371,10 @@
 		gap: 0.5em;
 	}
 
+	header.native-window .logo {
+		--size: 25px;
+	}
+
 	.logo a:first-child {
 		display: flex;
 		align-items: center;
@@ -214,6 +383,10 @@
 
 	.settings {
 		--hover-bg: var(--bg-neutral);
+	}
+
+	header.native-window .settings {
+		margin-right: 130px;
 	}
 
 	.pr-number {

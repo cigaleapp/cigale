@@ -185,7 +185,7 @@ if (import.meta.vitest) {
 export function xor(...args) {
 	if (args.length === 0) return false;
 	const [first, ...rest] = args;
-	return xor(...rest) !== first;
+	return xor(...rest) !== Boolean(first);
 }
 
 if (import.meta.vitest) {
@@ -224,15 +224,21 @@ if (import.meta.vitest) {
 
 /**
  * Pick only some keys from an object
- * @template {string} KeysOut
+ * @template {string & keyof Obj} KeysOut
  * @template {*} Obj
  * @param {Obj} subject
  * @param {...KeysOut} keys
  * @returns {Pick<Obj, KeysOut>}
  */
 export function pick(subject, ...keys) {
-	// @ts-expect-error
-	return fromEntries(entries(subject).filter(([key]) => oneOf(key, keys)));
+	// We're not using fromEntries and entries with a filter, because Object.fromEntries does not return $derived or $state fields from classes
+	// see https://svelte.dev/playground/32a7d1c8995f45b49f01b7ae86fef7bd?version=5.38.7
+
+	const result = /** @type {Pick<Obj, KeysOut>} */ ({});
+	for (const key of keys) {
+		result[key] = subject[key];
+	}
+	return result;
 }
 
 if (import.meta.vitest) {
@@ -241,7 +247,23 @@ if (import.meta.vitest) {
 		expect(pick({ a: 1, b: 2 }, 'a')).toEqual({ a: 1 });
 		expect(pick({ a: 1, b: 2 }, 'b')).toEqual({ b: 2 });
 		expect(pick({ a: 1, b: 2 }, 'a', 'b')).toEqual({ a: 1, b: 2 });
+		// @ts-expect-error
 		expect(pick({ a: 1, b: 2 }, 'c')).toEqual({});
+
+		class Test {
+			/** @type {number} */
+			id = 0;
+			/** @type {string} */
+			name = '';
+		}
+
+		const testZero = new Test();
+		const testOne = new Test();
+		testOne.id = 1;
+
+		expect(pick(testZero, 'id')).toEqual({ id: 0 });
+		expect(pick(testOne, 'id')).toEqual({ id: 1 });
+		expect(pick(testOne, 'name')).toEqual({ name: '' });
 	});
 }
 
@@ -366,7 +388,7 @@ if (import.meta.vitest) {
 /**
  * @template {any[]} T
  * @param  {...ToIterables<T>} arrays
- * @returns {Generator<T>}
+ * @yields {T}
  */
 export function* zip(...arrays) {
 	// Get iterators for all of the iterables.
@@ -426,53 +448,6 @@ if (import.meta.vitest) {
 		expect(unique([1, 2, 3, 1, 2])).toEqual([1, 2, 3]);
 		expect(unique(['a', 'b', 'c', 'a', 'b'])).toEqual(['a', 'b', 'c']);
 		expect(unique([])).toEqual([]);
-	});
-}
-
-/**
- *
- * @param {[number, number]} bounds of the range - can be in any order
- * @param {number} subject number to test for
- * @returns {boolean} whether the subject is in the range
- */
-export function inRange(bounds, subject) {
-	const [min, max] = bounds.sort((a, b) => a - b);
-	return subject >= min && subject <= max;
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('inRange', () => {
-		expect(inRange([1, 2], 1)).toBe(true);
-		expect(inRange([1, 2], 2)).toBe(true);
-		expect(inRange([1, 2], 3)).toBe(false);
-		expect(inRange([2, 5], 6)).toBe(false);
-		expect(inRange([2, 5], -4)).toBe(false);
-		expect(inRange([-10, 1], 3)).toBe(false);
-		expect(inRange([1, -10], -3)).toBe(true);
-	});
-}
-
-/**
- *
- * @template {string} K
- * @param {Element} element
- * @param {K} name
- * @returns {element is Element & { dataset: Record<NoInfer<K>, string> }}
- */
-export function hasDatasetKey(element, name) {
-	if (!(element instanceof HTMLElement)) return false;
-	if (!element.dataset) return false;
-	return name in element.dataset;
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('hasDatasetKey', () => {
-		const element = document.createElement('div');
-		element.dataset.test = 'value';
-		expect(hasDatasetKey(element, 'test')).toBe(true);
-		expect(hasDatasetKey(element, 'nonexistent')).toBe(false);
 	});
 }
 
@@ -590,7 +565,7 @@ if (import.meta.vitest) {
 }
 
 /**
- *
+ * Semi-open range [start=0, end)
  * @param {number} startOrEnd
  * @param {number|undefined} [end]
  * @returns {number[]}
@@ -636,9 +611,14 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
 	return fetch(url, options);
 }
 
+/** @param {Iterable<number>} values */
+export function sum(values) {
+	return values.reduce((acc, cur) => acc + cur, 0);
+}
+
 /** @param {number[]} values  */
 export function avg(values) {
-	return values.reduce((acc, cur) => acc + cur, 0) / values.length;
+	return sum(values) / values.length;
 }
 
 /**
@@ -648,4 +628,103 @@ export function avg(values) {
  */
 export function nonnull(value) {
 	return value !== null && value !== undefined;
+}
+
+/**
+ * @param {number} value
+ * @param {number} decimals
+ * @returns {number}
+ */
+export function round(value, decimals = 0) {
+	if (decimals < 0) throw new Error('decimals must be non-negative');
+	const factor = Math.pow(10, decimals);
+	return Math.round(value * factor) / factor;
+}
+
+/**
+ *
+ * @param {object} param0  offset coords from the given rect
+ * @param {number} param0.offsetX
+ * @param {number} param0.offsetY
+ * @param {DOMRect} rect
+ * @param {number} leeway how many pixels to consider still "inside" the rect even if it's outside
+ * @returns
+ */
+export function insideBoundingClientRect({ offsetX, offsetY }, rect, leeway = 0) {
+	return (
+		offsetX >= -leeway &&
+		offsetX <= rect.width + leeway &&
+		offsetY >= -leeway &&
+		offsetY <= rect.height + leeway
+	);
+}
+
+/**
+ *
+ * @param {string} contentType
+ * @returns {contentType is 'application/zip' | 'application/x-zip-compressed' | 'application/x-zip' }
+ */
+export function isZip(contentType) {
+	return (
+		contentType === 'application/zip' ||
+		contentType === 'application/x-zip-compressed' ||
+		contentType === 'application/x-zip'
+	);
+}
+
+/**
+ * @template T
+ * @param {string} tag
+ * @param {T} expr
+ * @returns {T}
+ */
+export function logexpr(tag, expr) {
+	// oxlint-disable-next-line no-console
+	console.log(`{${tag}}`, expr);
+	return expr;
+}
+
+/**
+ * Outputs a [0, 1] progress value based on the progress of several weighted ordered parts. A value for a part assumes that all other parts defined beforehand have completed. Weights are in [0, 1], and the last part can let the weight be what sums with the rest to 1
+ *
+ * @example
+ * ```
+ * // download part represents 70% of the total time, decompression 20%, and parsing the rest
+ * const splitProgress = progressSplitter('download', 0.7, 'decompression', 0.2, 'parsing');
+ *
+ * // Download halfway there
+ * splitProgress('download', 0.5) // 0.35
+ * // Download finished, decompression 10% there
+ * splitProgress('decompression', 0.1) // 0.72 = 0.7 + 0.2 * 0.1
+ * // Decompression finished, parsing 50% there
+ * splitProgress('parsing', 0.5) // 0.85 = 0.7 + 0.2 + 0.1 * 0.5  = 0.7 + 0.2 + (0.7 + 0.2 - 1) * 0.5
+ * // Parsing finished
+ * splitProgress('parsing', 1) // 1 = 0.7 + 0.2 + 0.1 * 1 = 0.7 + 0.2 + (0.7 + 0.2 - 1) * 1
+ * ```
+ * @template {string} PartName
+ * @param {...(PartName | number)} layout
+ * @returns {(part: PartName, progress: number) => number}
+ */
+export function progressSplitter(...layout) {
+	/** @type {Array<[PartName, number]>} */
+	let parts = [];
+
+	for (let i = 0; i < layout.length; i += 2) {
+		const name = /** @type {PartName} */ (layout[i]);
+		const weight = /** @type {number} */ (layout[i + 1] ?? 1 - sum(parts.map(([, w]) => w)));
+
+		// @ts-expect-error
+		parts.push([name, weight]);
+	}
+
+	return (part, progress) => {
+		let total = 0;
+		const partIndex = parts.findIndex(([name]) => name === part);
+		for (const [i, [_, weight]] of parts.entries()) {
+			if (i < partIndex) total += weight;
+			if (i === partIndex) total += weight * progress;
+		}
+
+		return total / parts.length;
+	};
 }

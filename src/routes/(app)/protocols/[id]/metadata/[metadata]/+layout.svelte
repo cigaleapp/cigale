@@ -1,7 +1,7 @@
 <script>
 	import { page } from '$app/state';
 	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { removeNamespaceFromMetadataId } from '$lib/protocols.js';
+	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import IconTaxonomy from '~icons/ph/graph';
 	import IconInfo from '~icons/ph/info';
 	import IconOptions from '~icons/ph/list-dashes';

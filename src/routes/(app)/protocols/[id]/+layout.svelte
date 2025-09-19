@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { tables } from '$lib/idb.svelte.js';
-	import { removeNamespaceFromMetadataId } from '$lib/protocols';
+	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { seo } from '$lib/seo.svelte';
 	import IconVersioning from '~icons/ph/arrow-circle-up';
 	import IconCropping from '~icons/ph/crop';

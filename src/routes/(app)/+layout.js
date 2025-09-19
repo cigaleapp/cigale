@@ -1,109 +1,123 @@
 import { dev } from '$app/environment';
-import { PROCEDURES } from '$lib/../neural-worker-procedures';
-import NeuralWorker from '$lib/../neural-worker.js?worker';
-import { openTransaction, tables, databaseName, databaseRevision } from '$lib/idb.svelte.js';
-import { importProtocol } from '$lib/protocols';
+import { databaseName, databaseRevision, openTransaction, tables } from '$lib/idb.svelte.js';
+import { m } from '$lib/paraglide/messages.js';
+import { getLocale } from '$lib/paraglide/runtime';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
+import * as dates from 'date-fns';
+import * as dateFnsLocales from 'date-fns/locale';
 import * as Swarpc from 'swarpc';
+import { PROCEDURES } from '../../web-worker-procedures';
+// oxlint-disable-next-line import/default
+import WebWorker from '../../web-worker.js?worker';
 
 export async function load() {
-	setLoadingMessage('Chargement du worker neuronal…');
-	const swarpc = Swarpc.Client(PROCEDURES, {
-		worker: new NeuralWorker({ name: 'SWARPC Neural Worker' })
+	document.documentElement.lang = getLocale();
+	dates.setDefaultOptions({
+		locale: {
+			fr: dateFnsLocales.fr,
+			en: dateFnsLocales.enUS,
+			ja: dateFnsLocales.ja
+		}[getLocale()]
 	});
 
-	setLoadingMessage('Initialisation DB du worker neuronal…');
-	await swarpc.init({
-		databaseName,
-		databaseRevision
+	const parallelism = Math.ceil(navigator.hardwareConcurrency / 3);
+
+	setLoadingMessage(m.loading_neural_worker());
+	const swarpc = Swarpc.Client(PROCEDURES, {
+		worker: WebWorker,
+		nodes: parallelism,
+		localStorage: {
+			PARAGLIDE_LOCALE: getLocale()
+		}
 	});
+
+	setLoadingMessage(m.initializing_worker_db());
+	await swarpc.init.broadcast({ databaseName, databaseRevision });
 
 	try {
-		setLoadingMessage('Initialisation de la base de données…');
+		setLoadingMessage(m.initializing_database());
 		await tables.initialize();
-		setLoadingMessage('Chargement des données intégrées…');
-		await fillBuiltinData();
+		setLoadingMessage(m.loading_builtin_data());
+		await fillBuiltinData(swarpc);
 		await tables.initialize();
 	} catch (e) {
 		console.error(e);
 		error(400, {
-			message: e?.toString() ?? 'Erreur inattendue'
+			message: e?.toString() ?? m.unexpected_error()
 		});
 	}
 
-	return { swarpc };
+	return { swarpc, parallelism };
 }
 
-async function fillBuiltinData() {
-	setLoadingMessage('Initialisation des réglages par défaut…');
+/**
+ *
+ * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
+ */
+async function fillBuiltinData(swarpc) {
+	setLoadingMessage(m.initializing_default_settings());
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
-		tx.objectStore('Settings').put({
+		await tx.objectStore('Settings').put({
 			id: 'defaults',
 			protocols: [],
 			theme: 'auto',
-			gridSize: 10,
+			gridSize: 1,
 			language: 'fr',
 			showInputHints: true,
 			showTechnicalMetadata: dev,
-			protocolModelSelections: {}
+			protocolModelSelections: {},
+			cropAutoNext: false,
+			gallerySort: { key: 'date', direction: 'asc' }
 		});
 	});
 
-	setLoadingMessage('Chargement des protocoles intégrés…');
-	// TODO: remove this at some point
-	await tables.Protocol.remove('io.github.cigaleapp.arthropods.transects');
+	setLoadingMessage(m.loading_builtin_protocol());
 
-	const builtinProtocol = await tables.Protocol.get('io.github.cigaleapp.arthropods.example');
+	const protocolsCount = await tables.Protocol.count();
 
-	if (!builtinProtocol) {
+	if (protocolsCount === 0) {
 		try {
-			await fetch(
+			const contents = await fetch(
 				'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json'
-			)
-				.then((res) => res.text())
-				.then((txt) =>
-					importProtocol(txt, {
-						json: true,
-						onLoadingState(state, detail) {
-							let secondLine = '';
-							switch (state) {
-								case 'parsing':
-									secondLine = 'Analyse';
-									break;
+			).then((res) => res.text());
+			await swarpc.importProtocol({ contents, isJSON: true }, ({ phase, detail }) => {
+				let secondLine = '';
+				switch (phase) {
+					case 'parsing':
+						secondLine = 'Analyse';
+						break;
 
-								case 'filtering-builtin-metadata':
-									secondLine = 'Filtrage des métadonnées intégrées';
-									break;
+					case 'filtering-builtin-metadata':
+						secondLine = 'Filtrage des métadonnées intégrées';
+						break;
 
-								case 'input-validation':
-									secondLine = 'Validation';
-									break;
+					case 'input-validation':
+						secondLine = 'Validation';
+						break;
 
-								case 'write-protocol':
-									secondLine = 'Écriture du protocole';
-									break;
+					case 'write-protocol':
+						secondLine = m.writing_protocol();
+						break;
 
-								case 'write-metadata':
-									secondLine = `Écriture de la métadonnée ${detail}`;
-									break;
+					case 'write-metadata':
+						secondLine = `Écriture de la métadonnée<br>${detail}`;
+						break;
 
-								case 'write-metadata-options':
-									secondLine = `Écriture des options de la métadonnée ${detail}`;
-									break;
+					case 'write-metadata-options':
+						secondLine = `Écriture des options de la métadonnée<br>${detail}`;
+						break;
 
-								case 'output-validation':
-									secondLine = 'Post-validation';
-									break;
+					case 'output-validation':
+						secondLine = 'Post-validation';
+						break;
 
-								default:
-									break;
-							}
+					default:
+						break;
+				}
 
-							setLoadingMessage(`Chargement du protocole intégré<br>${secondLine}`);
-						}
-					})
-				);
+				setLoadingMessage(`${m.loading_builtin_protocol()}<br>${secondLine}`);
+			});
 		} catch (error) {
 			console.error(error);
 			toasts.error(
@@ -117,6 +131,15 @@ async function fillBuiltinData() {
  * @param {string} message
  */
 function setLoadingMessage(message) {
-	const loadingMessage = document.getElementById('loading-message');
-	if (loadingMessage) loadingMessage.innerHTML = message;
+	/**
+	 * @param {string} id
+	 * @param {string} html
+	 */
+	const setHTML = (id, html) => {
+		const element = document.getElementById(id);
+		if (element) element.innerHTML = html;
+	};
+
+	setHTML('loading-title', m.loading_text());
+	setHTML('loading-message', message);
 }

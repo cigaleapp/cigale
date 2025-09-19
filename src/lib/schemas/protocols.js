@@ -2,6 +2,8 @@ import { type } from 'arktype';
 import Handlebars from 'handlebars';
 import { safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, References, URLString } from './common.js';
+import { Metadata, namespacedMetadataId } from './metadata.js';
+import { Image, Observation } from './observations.js';
 
 /**
  * @import { Analysis } from './results';
@@ -19,26 +21,33 @@ export const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du poi
 	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
 	.array();
 
-export const HANDLEBARS_HELPERS = {
+const HANDLEBARS_HELPERS = {
 	suffix: {
 		documentation: "Ajoute un suffixe à un nom de fichier, avant l'extension",
+		/**
+		 * @param {string} subject
+		 * @param {string} suffix
+		 */
 		implementation: (subject, suffix) => {
-			type('string').assert(subject);
-			type('string').assert(suffix);
-
 			const [stem, ext] = splitFilenameOnExtension(subject);
 			return `${stem}${suffix}.${ext}`;
 		}
 	},
 	extension: {
 		documentation: 'Récupère l’extension d’un nom de fichier',
+		/**
+		 * @param {string} subject
+		 */
 		implementation: (subject) => {
-			type('string').assert(subject);
 			return splitFilenameOnExtension(subject)[1];
 		}
 	},
 	fallback: {
 		documentation: 'Fournit une valeur de repli si la première est indéfinie',
+		/**
+		 * @param {string} subject
+		 * @param {string} fallback
+		 */
 		implementation: (subject, fallback) => {
 			return subject ?? fallback;
 		}
@@ -48,6 +57,41 @@ export const HANDLEBARS_HELPERS = {
 for (const [name, { implementation }] of Object.entries(HANDLEBARS_HELPERS)) {
 	Handlebars.registerHelper(name, implementation);
 }
+
+/**
+ * @template {import('arktype').Type} T
+ * @param {T} Input
+ */
+export const TemplatedString = (Input) =>
+	type.string
+		.pipe((t) => {
+			try {
+				return {
+					source: t,
+					template: Handlebars.compile(t, {
+						noEscape: true,
+						assumeObjects: true,
+						knownHelpersOnly: true,
+						knownHelpers: {
+							suffix: true,
+							extension: true,
+							fallback: true
+						}
+					})
+				};
+			} catch (e) {
+				throw new Error(`Invalid template ${safeJSONStringify(t)}: ${e}`);
+			}
+		})
+		.pipe(({ source, template }) => ({
+			/** @param {typeof Input.inferIn} data  */
+			render(data) {
+				data = Input.assert(data);
+
+				return template(data);
+			},
+			toJSON: () => source
+		}));
 
 export const FilepathTemplate = type.string
 	.pipe((t) => {
@@ -72,8 +116,7 @@ export const FilepathTemplate = type.string
 	.pipe(({ source, template }) => ({
 		/** @param {{ observation: Omit<typeof Analysis.inferIn['observations'][number], 'images'>, image: typeof Analysis.inferIn['observations'][number]['images'][number], sequence: number }} data */
 		render(data) {
-			console.log('Applying template', source, 'on', data);
-			return template(data, {}).replaceAll('\\', '/');
+			return template(data).replaceAll('\\', '/');
 		},
 		toJSON: () => source
 	}));
@@ -103,6 +146,16 @@ export const Protocol = type({
 	'metadataOrder?': type(ID.array()).describe(
 		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 	),
+	'observations?': {
+		'defaultLabel?': TemplatedString(
+			type({
+				images: Image.array(),
+				observation: Observation
+			})
+		).describe(
+			"Label par défaut pour les observations. Template Handlebars, recevant une liste des images de l'observation à crééer (clé images) et l'observation elle-même (clé observation)"
+		)
+	},
 	crop: type({
 		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
 		'confirmationMetadata?': [
@@ -110,11 +163,11 @@ export const Protocol = type({
 			'@',
 			'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée'
 		],
-		padding: type('number.integer >= 0')
+		padding: type(/^\d+(%|px)$/)
 			.describe(
-				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées"
+				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées. Nombre suivi de 'px' pour un nombre de pixels fixe, ou de '%' pour un pourcentage des dimensions de chaque image."
 			)
-			.default(0),
+			.default('0px'),
 		'infer?': type({
 			'name?': [
 				'string',
@@ -161,3 +214,19 @@ export const Protocol = type({
 		.describe("La structure du fichier .zip d'export pour ce protocole.")
 		.optional()
 });
+
+export const ExportedProtocol = Protocol.omit('metadata')
+	.in.and({
+		metadata: {
+			'[string]': Metadata.omit('id').describe('Métadonnée du protocole')
+		}
+	})
+	.pipe((protocol) => ({
+		...protocol,
+		metadata: Object.fromEntries(
+			Object.entries(protocol.metadata).map(([id, metadata]) => [
+				namespacedMetadataId(protocol.id, id),
+				metadata
+			])
+		)
+	}));

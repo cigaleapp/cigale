@@ -4,8 +4,10 @@
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import SelectWithSearch from '$lib/SelectWithSearch.svelte';
+	import { EXIFField } from '$lib/schemas/metadata.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { keys, omit } from '$lib/utils';
+	import { ArkErrors } from 'arktype';
 
 	const { data } = $props();
 	const { infer, id } = $derived(data.metadata);
@@ -79,19 +81,27 @@
 				<div class="field">
 					<label>
 						<span class="label">Champ EXIF à utiliser</span>
-						<SelectWithSearch
-							options={keys(EXIF_FIELDS)}
-							searchQuery={infer && 'exif' in infer ? infer.exif : ''}
-							selectedValue={infer && 'exif' in infer ? infer.exif : ''}
-							onblur={async (newExif) => {
-								console.log('updatewithexif', newExif);
-								if (!newExif) return;
+						<input
+							type="text"
+							value={infer && 'exif' in infer ? infer.exif : ''}
+							list="exif-fields"
+							onblur={async ({ currentTarget }) => {
+								const newExif = EXIFField(currentTarget.value);
+								if (newExif instanceof ArkErrors) {
+									toasts.error(`Champ EXIF invalide: ${newExif.summary}`);
+									return;
+								}
 
 								await tables.Metadata.update(id, 'infer', { exif: newExif });
 								await invalidateAll();
 							}}
 						/>
-					</label>
+						<datalist id="exif-fields">
+							{#each keys(EXIF_FIELDS) as field}
+								<option value={field}>{EXIF_FIELDS[field]}</option>
+							{/each}
+						</datalist></label
+					>
 				</div>
 			{/if}
 		{/snippet}

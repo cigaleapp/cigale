@@ -1,11 +1,18 @@
 <script>
 	import './style.css';
 	import '$lib/tippy-svg-arrow.css';
+	import '$lib/range-inputs.css';
 
 	const { children } = $props();
 
 	$effect(() => {
 		document.querySelector('#loading')?.remove();
+	});
+
+	$effect(() => {
+		window.nativeWindow?.setControlsColor(
+			getComputedStyle(document.documentElement).getPropertyValue('--fg-primary')
+		);
 	});
 </script>
 
@@ -62,5 +69,10 @@
 		fill: var(--bg-neutral) !important;
 		stroke: var(--fg-neutral);
 		stroke-width: 1px;
+	}
+
+	:global(input[type='range']) {
+		accent-color: var(--fg-primary);
+		--track-height: 0.5em;
 	}
 </style>

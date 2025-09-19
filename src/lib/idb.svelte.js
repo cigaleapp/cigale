@@ -1,11 +1,10 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { isReactiveTable, Tables } from './database.js';
-import { base } from '$app/paths';
+import { idComparator, isReactiveTable, Tables } from './database.js';
+import * as devalue from 'devalue';
 
-console.info(`Base path is ${base}`);
-
-export const previewingPrNumber = /cigale\/_pullrequests\/pr-(\d+)$/.exec(base)?.[1];
+export const previewingPrNumber =
+	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 export const databaseRevision = 3;
@@ -43,12 +42,10 @@ export const _tablesState = $state({
 export const tables = {
 	...Object.fromEntries(tableNames.filter(isReactiveTable).map((name) => [name, wrangler(name)])),
 	async initialize() {
-		console.time('*db initialize');
 		for (const name of tableNames) {
 			if (!isReactiveTable(name)) continue;
 			await tables[name].refresh();
 		}
-		console.timeEnd('*db initialize');
 	}
 };
 
@@ -71,17 +68,20 @@ function wrangler(table) {
 			return _tablesState[table];
 		},
 		async refresh() {
+			console.info(`refresh ${table}`);
 			// @ts-ignore
 			_tablesState[table] = await this.list();
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
+		/** @param {string} key  */
+		getFromState: (key) => _tablesState[table].find((item) => item.id === key),
 		/** @param {typeof Tables[Table]['inferIn']} value */
 		async set(value) {
 			await set(table, value);
 			const output = Tables[table].assert(value);
 			const index = _tablesState[table].findIndex((item) => item.id === value.id);
-			console.log(`indexof ${table} ${value.id} = ${index}`);
+			console.debug(`indexof ${table} ${value.id} = ${index}`);
 			if (index !== -1) _tablesState[table][index] = output;
 			else {
 				_tablesState[table].push(output);
@@ -99,14 +99,12 @@ function wrangler(table) {
 		 */
 		async update(key, property, value) {
 			const logLabel = `upd ${table} ${key} ${typeof property === 'string' ? property : '<Symbol>'} = ${value}`;
-			console.time(logLabel);
 
 			// Get item from DB
 			const item = await this.raw.get(key);
 
 			// Handle not found
 			if (!item) {
-				console.timeEnd(logLabel);
 				console.error(`${logLabel}: item not found`);
 				return false;
 			}
@@ -118,15 +116,14 @@ function wrangler(table) {
 			// Update reactive state
 			const index = _tablesState[table].findIndex((item) => item.id === key);
 			if (index === -1) {
-				console.log(`${logLabel}: item not found in reactive state, refetching entire list`);
+				console.debug(`${logLabel}: item not found in reactive state, refetching entire list`);
 				// @ts-ignore
 				_tablesState[table] = await this.list();
 			} else {
-				console.log(`${logLabel}: updating state @ ${table}[${index}]`);
+				console.debug(`${logLabel}: updating state @ ${table}[${index}]`);
 				_tablesState[table][index] = Tables[table].assert(item);
 			}
 
-			console.timeEnd(logLabel);
 			return true;
 		},
 		/** @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value */
@@ -161,15 +158,17 @@ function wrangler(table) {
 		 */
 		async do(actions) {
 			const loglabel = `do ${table} #${nanoid()}`;
-			console.info(loglabel);
-			console.time(loglabel);
+			console.debug(loglabel);
 			await openTransaction([table], {}, async (tx) => {
 				await actions(tx.objectStore(table));
 			});
-			console.timeEnd(loglabel);
 		},
 		list: async () => list(table),
 		all: () => iterator(table),
+		count: async () => {
+			const db = await openDatabase();
+			return await db.count(table);
+		},
 		/** Do not go through validation or type morphing, manipulate the underlying database values directly. Useful for performance reasons, when changing only a property inside of an object and leaving the others unchanged, for example */
 		raw: {
 			/** @param {typeof Tables[Table]['inferIn']} value */
@@ -196,12 +195,10 @@ function wrangler(table) {
  * @template {keyof typeof Tables} TableName
  */
 export async function set(tableName, value) {
-	console.time(`set ${tableName} ${value.id}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	validator.assert(value);
 	return await db.put(tableName, value).then((result) => {
-		console.timeEnd(`set ${tableName} ${value.id}`);
 		return result;
 	});
 }
@@ -211,10 +208,8 @@ export async function set(tableName, value) {
  * @template {keyof typeof Tables} TableName
  */
 export async function clear(table) {
-	console.time(`clr ${table}`);
 	const db = await openDatabase();
 	await db.clear(table).then((result) => {
-		console.timeEnd(`clr ${table}`);
 		return result;
 	});
 }
@@ -227,12 +222,10 @@ export async function clear(table) {
  * @template {keyof typeof Tables} TableName
  */
 export async function get(tableName, key) {
-	console.time(`get ${tableName} ${key}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	return await db.get(tableName, key).then((value) => {
 		const out = value ? validator.assert(value) : undefined;
-		console.timeEnd(`get ${tableName} ${key}`);
 		return out;
 	});
 }
@@ -245,7 +238,6 @@ export async function get(tableName, key) {
  * @template {keyof typeof Tables} TableName
  */
 export async function list(tableName, keyRange = undefined) {
-	console.time(`ls ${tableName}`);
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	// @ts-ignore
@@ -253,7 +245,6 @@ export async function list(tableName, keyRange = undefined) {
 		.getAll(tableName, keyRange)
 		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
 		.then((result) => {
-			console.timeEnd(`ls ${tableName}`);
 			return result;
 		});
 }
@@ -266,16 +257,14 @@ export async function list(tableName, keyRange = undefined) {
  * @template {keyof typeof Tables} TableName
  */
 export async function drop(table, id) {
-	console.time(`delete ${table} ${id}`);
 	const db = await openDatabase();
 	return await db
 		.delete(table, id)
 		.then(() => {
-			console.timeEnd(`delete ${table} ${id}`);
 			return list(table);
 		})
 		.then((list) => {
-			console.log(`delete ${table} ${id}: objects are now ${list.map((o) => o.id).join(', ')}`);
+			console.debug(`delete ${table} ${id}: objects are now ${list.map((o) => o.id).join(', ')}`);
 		});
 }
 
@@ -283,8 +272,8 @@ export async function drop(table, id) {
  *
  * @param {TableName} tableName
  * @param {string} [index]
- * @returns {AsyncGenerator<typeof Tables[TableName]['infer'], void, unknown>}
  * @template {keyof typeof Tables} TableName
+ * @yields {typeof Tables[TableName]['infer']}
  */
 export async function* iterator(tableName, index = undefined) {
 	const db = await openDatabase();
@@ -295,29 +284,6 @@ export async function* iterator(tableName, index = undefined) {
 		yield validator.assert(cursor.value);
 	}
 }
-
-/**
- * Returns a comparator to sort objects by their id property
- * If both IDs are numeric, they are compared numerically even if they are strings
- * @template {{id: string|number} | string | number} IdOrObject
- * @param {IdOrObject} a
- * @param {IdOrObject} b
- * @returns {number}
- */
-export const idComparator = (a, b) => {
-	// @ts-ignore
-	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
-	// @ts-ignore
-	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
-
-	if (typeof a === 'number' && typeof b === 'number') return a - b;
-
-	if (typeof a === 'number') return -1;
-	if (typeof b === 'number') return 1;
-
-	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
-	return a.localeCompare(b);
-};
 
 /**
  * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you
@@ -336,14 +302,14 @@ export async function openTransaction(tableNames, { mode }, actions) {
 	// IndexedDB transactions are auto-comitted, so we can't reuse them reliably. will maybe find a fix for this.
 	// if (tx) {
 	// 	// @ts-ignore
-	// 	console.log(`txn reuse ${tx.id}`);
+	// 	console.debug(`txn reuse ${tx.id}`);
 	// 	await actions(tx);
 	// 	return
 	// }
 
 	const txid = nanoid(8);
 
-	console.log(`txn open ${txid} tables ${tableNames} mode ${mode}`);
+	console.debug(`txn open ${txid} tables ${tableNames} mode ${mode}`);
 
 	const db = await openDatabase();
 	const newTx = db.transaction(tableNames, mode);
@@ -355,13 +321,21 @@ export async function openTransaction(tableNames, { mode }, actions) {
 	await actions(newTx);
 
 	// @ts-ignore
-	console.log(`txn commit ${txid} `);
+	console.debug(`txn commit ${txid} `);
 
-	newTx.commit();
+	await newTx.done;
 
 	for (const table of tableNames.filter(isReactiveTable)) {
 		await tables[table].refresh();
 	}
+}
+
+export function databaseHandle() {
+	if (!_database) {
+		throw new Error('Database not initialized. Call openDatabase() first.');
+	}
+
+	return _database;
 }
 
 export async function openDatabase() {
@@ -402,6 +376,11 @@ export async function openDatabase() {
 		}
 	});
 
+	// Needed for E2E tests, to send non-[Serializable] values between browser and test runner
+	window.devalue = {
+		stringify: devalue.stringify,
+		parse: devalue.parse
+	};
 	window.DB = _database;
 	window.refreshDB = () => {
 		for (const table of tableNames) {

@@ -6,15 +6,17 @@
 	 * @type {object}
 	 * @property {import('svelte').Snippet} children
 	 * @property {(e: MouseEvent) => void} onclick
+	 * @property {boolean} [inline=false] removes horizontal padding so that it its neatly with other inline elements
+	 * @property {boolean} [dangerous=false]
 	 * @property {boolean} [disabled=false]
-	 * @property {string} [help]
+	 * @property {string | { text: string; keyboard: string }} [help]
 	 */
 
 	/** @type {Props} */
-	let { children, onclick, help, disabled = false } = $props();
+	let { children, onclick, help, dangerous, disabled = false, inline = false } = $props();
 </script>
 
-<button {onclick} use:tooltip={help} {disabled}>
+<button {onclick} use:tooltip={help} {disabled} class:dangerous class:inline>
 	{@render children()}
 </button>
 
@@ -27,12 +29,17 @@
 		justify-content: center;
 		align-items: center;
 		border: none;
-		padding: 0.5em 0;
+		padding: 0.5em;
 		border-radius: var(--corner-radius);
 		text-transform: uppercase;
 		font-weight: bold;
 		letter-spacing: 0.05em;
 		cursor: pointer;
+	}
+
+	button.inline {
+		padding-left: 0;
+		padding-right: 0;
 	}
 
 	button:is(:hover, :focus-visible) {
@@ -42,5 +49,13 @@
 	button:disabled {
 		color: var(--gay);
 		cursor: not-allowed;
+	}
+
+	button.dangerous {
+		color: var(--fg-error);
+	}
+
+	button.dangerous:is(:hover, :focus-visible) {
+		background-color: var(--bg-error-hover, var(--bg-error));
 	}
 </style>

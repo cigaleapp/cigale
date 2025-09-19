@@ -1,9 +1,13 @@
 import { type } from 'arktype';
-import YAML from 'yaml';
-import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { cachebust, omit } from './utils.js';
-import { metadataOptionId } from './schemas/metadata.js';
+import { namespacedMetadataId } from './schemas/metadata.js';
+import { cachebust } from './utils.js';
+import { promptForFiles } from './files.js';
+import { errorMessage } from './i18n.js';
+
+/**
+ * @import { Schemas } from './database.js';
+ */
 
 /**
  *
@@ -14,83 +18,13 @@ export function jsonSchemaURL(base) {
 }
 
 /**
- * Ensures a metadata ID is namespaced to the given protocol ID
- * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
- * @template {string} ProtocolID
- * @param {ProtocolID} protocolId
- * @param {string} metadataId
- * @returns {`${ProtocolID}__${string}`}
- */
-export function namespacedMetadataId(protocolId, metadataId) {
-	metadataId = metadataId.replace(/^.+__/, '');
-	return `${protocolId}__${metadataId}`;
-}
-
-/**
- * Ensures a metadata ID is namespaced to the given protocol ID. If the metadata ID is not namespaced, it will be prefixed with the protocol ID. If it already is namespaced, it will stay as is.
- * @param {string} metadataId the metadata ID to ensure is namespaced
- * @param {string} fallbackProtocolId the protocol ID to use if the metadata ID is not namespaced
- */
-export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
-	if (isNamespacedToProtocol(fallbackProtocolId, metadataId)) return metadataId;
-	return namespacedMetadataId(fallbackProtocolId, metadataId);
-}
-
-/**
- * Checks if a given metadata ID is namespaced to a given protocol ID
- * @template {string} ProtocolID
- * @param {ProtocolID} protocolId
- * @param {string} metadataId
- * @returns {metadataId is `${ProtocolID}__${string}` }
- */
-export function isNamespacedToProtocol(protocolId, metadataId) {
-	return metadataId.startsWith(`${protocolId}__`);
-}
-
-/**
- *
- * @param {string} metadataId
- * @returns {string}
- */
-export function removeNamespaceFromMetadataId(metadataId) {
-	return metadataId.replace(/^.+__/, '');
-}
-
-/**
- *
- * @param {string} metadataId
- * @returns
- */
-export function namespaceOfMetadataId(metadataId) {
-	const parts = metadataId.split('__');
-	if (parts.length < 2) return undefined;
-	return parts.slice(0, -1).join('__');
-}
-
-export const ExportedProtocol = Schemas.Protocol.omit('metadata')
-	.in.and({
-		metadata: {
-			'[string]': Schemas.Metadata.omit('id').describe('Métadonnée du protocole')
-		}
-	})
-	.pipe((protocol) => ({
-		...protocol,
-		metadata: Object.fromEntries(
-			Object.entries(protocol.metadata).map(([id, metadata]) => [
-				namespacedMetadataId(protocol.id, id),
-				metadata
-			])
-		)
-	}));
-
-/**
  * Exports a protocol by ID into a JSON file, and triggers a download of that file.
  * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {import("./database").ID} id
  * @param {'json' | 'yaml'} [format='json']
  */
 export async function exportProtocol(base, id, format = 'json') {
-	// Importing is done here so that ./generate-json-schemas can be invoked with node (otherwise we get a '$state not defined' error)
+	// Importing is done here so that ./generate-json-schemas can be invoked with bun run (otherwise we get a '$state not defined' error)
 	const { tables, ...idb } = await import('./idb.svelte.js');
 
 	const protocol = await tables.Protocol.raw.get(id);
@@ -147,7 +81,7 @@ export async function downloadProtocolTemplate(base, format) {
  * Downloads a protocol as a JSON file
  * @param {string} base base path of the app - import `base` from `$app/paths`
  * @param {'yaml'|'json'} format
- * @param {typeof ExportedProtocol.infer} exportedProtocol
+ * @param {typeof import('./schemas/protocols.js').ExportedProtocol.infer} exportedProtocol
  */
 function downloadProtocol(base, format, exportedProtocol) {
 	let jsoned = stringifyWithToplevelOrdering(format, jsonSchemaURL(base), exportedProtocol, [
@@ -167,122 +101,54 @@ function downloadProtocol(base, format, exportedProtocol) {
 /**
  * Imports protocol(s) from JSON file(s).
  * Asks the user to select files, then imports the protocols from those files.
+ * @template {{id: string, name: string, version: number|undefined}} Out
  * @template {boolean|undefined} Multiple
  * @param {object} param0
- * @param {Multiple} [param0.allowMultiple] allow the user to select multiple files
+ * @param {Multiple} param0.allowMultiple allow the user to select multiple files
  * @param {() => void} [param0.onInput] callback to call when the user selected files
- * @returns {Promise<Multiple extends true ? Array<typeof ExportedProtocol.infer> : typeof ExportedProtocol.infer>}
+ * @param {((input: {contents: string, isJSON: boolean}) => Promise<{id: string, name: string, version: number|undefined}>)} param0.importProtocol
+ * @returns {Promise<Multiple extends true ? NoInfer<Out>[] : NoInfer<Out>>}
  */
-export async function promptAndImportProtocol({ allowMultiple, onInput = () => {} } = {}) {
-	return new Promise((resolve, reject) => {
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.multiple = allowMultiple ?? false;
-		input.accept = ['.json', '.yaml', 'application/json'].join(',');
-		input.onchange = async () => {
-			if (!input.files || !input.files[0]) return;
-			onInput();
-			/** @type {Array<typeof ExportedProtocol.infer>}  */
-			const output = await Promise.all(
-				[...input.files].map(async (file) => {
-					console.time(`Reading file ${file.name}`);
-					const reader = new FileReader();
-					return new Promise((resolve) => {
-						reader.onload = async () => {
-							if (!reader.result) throw new Error('Fichier vide');
-							if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
-							console.timeEnd(`Reading file ${file.name}`);
-							importProtocol(reader.result, { json: file.name.endsWith('.json') })
-								.then(resolve)
-								.catch((err) =>
-									reject(
-										new Error(
-											`Protocole invalide: ${err?.toString()?.replace(/^Traversal Error: /, '') ?? 'Erreur inattendue'}`
-										)
-									)
-								);
-						};
-						reader.readAsText(file);
-					});
-				})
-			);
-			if (allowMultiple) resolve(output);
-			else resolve(output[0]);
-		};
-		input.click();
+export async function promptAndImportProtocol({
+	allowMultiple,
+	onInput = () => {},
+	importProtocol
+}) {
+	const files = await promptForFiles({
+		multiple: allowMultiple,
+		accept: '.json,.yaml,application/json'
 	});
-}
 
-/**
- *
- * @param {string} contents
- * @param {Object} [options]
- * @param {boolean} [options.json=false] parse as JSON instead of YAML, useful for performance if you're sure the contents represents JSON and not just YAML
- * @param {(state: 'parsing'|'filtering-builtin-metadata'|'input-validation'|'write-protocol'|'write-metadata'|'write-metadata-options'|'output-validation', detail?: string) => void} [options.onLoadingState] callback to call when the protocol is being parsed, useful for showing a loading message
- */
-export async function importProtocol(contents, { json = false, onLoadingState } = {}) {
-	// Imported here so that importing protocols.js from the JSON schema generator doesn't fail
-	// (Node does not like .svelte.js files' runes)
-	const { openTransaction } = await import('./idb.svelte.js');
+	onInput();
 
-	onLoadingState?.('parsing');
-	console.time('Parsing protocol');
-	let parsed = json ? JSON.parse(contents) : YAML.parse(contents);
-	console.timeEnd('Parsing protocol');
+	/** @type {Array<{id: string, name: string, version: number | undefined}>}  */
+	const output = await Promise.all(
+		[...files].map(async (file) => {
+			console.time(`Reading file ${file.name}`);
+			const reader = new FileReader();
+			return new Promise((resolve) => {
+				reader.onload = async () => {
+					if (!reader.result) throw new Error('Fichier vide');
+					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
 
-	console.info(`Importing protocol ${parsed.id}`);
-	console.info(parsed);
-	onLoadingState?.('filtering-builtin-metadata');
+					console.timeEnd(`Reading file ${file.name}`);
+					const result = await importProtocol({
+						contents: reader.result,
+						isJSON: file.name.endsWith('.json')
+					}).catch((err) => Promise.reject(new Error(errorMessage(err))));
 
-	const builtinMetadata = Object.entries(parsed.metadata ?? {})
-		.filter(([, value]) => value === 'builtin')
-		.map(([id]) => id);
+					const { tables } = await import('./idb.svelte.js');
+					await tables.Protocol.refresh();
+					await tables.Metadata.refresh();
 
-	parsed.metadata = Object.fromEntries(
-		Object.entries(parsed.metadata ?? {}).filter(([, value]) => value !== 'builtin')
+					resolve(result);
+				};
+				reader.readAsText(file);
+			});
+		})
 	);
 
-	onLoadingState?.('input-validation');
-	console.time('Validating protocol');
-	const protocol = ExportedProtocol.in.assert(parsed);
-	console.timeEnd('Validating protocol');
-
-	await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, (tx) => {
-		onLoadingState?.('write-protocol');
-		console.time('Storing Protocol');
-		tx.objectStore('Protocol').put({
-			...protocol,
-			metadata: [...Object.keys(protocol.metadata), ...builtinMetadata]
-		});
-		console.timeEnd('Storing Protocol');
-
-		for (const [id, metadata] of Object.entries(protocol.metadata)) {
-			if (typeof metadata === 'string') continue;
-
-			onLoadingState?.('write-metadata', id);
-			console.time(`Storing Metadata ${id}`);
-			tx.objectStore('Metadata').put({ id, ...omit(metadata, 'options') });
-			console.timeEnd(`Storing Metadata ${id}`);
-
-			console.time(`Storing Metadata Options for ${id}`);
-			for (const option of metadata.options ?? []) {
-				onLoadingState?.('write-metadata-options', `${id} > ${option.key}`);
-				tx.objectStore('MetadataOption').put({
-					id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
-					metadataId: namespacedMetadataId(protocol.id, id),
-					...option
-				});
-			}
-			console.timeEnd(`Storing Metadata Options for ${id}`);
-		}
-	});
-
-	onLoadingState?.('output-validation');
-	console.time('Validating protocol after storing');
-	const validated = ExportedProtocol.assert(protocol);
-	console.timeEnd('Validating protocol after storing');
-
-	return validated;
+	return allowMultiple ? output : output[0];
 }
 
 /**
@@ -457,21 +323,30 @@ if (import.meta.vitest) {
 }
 
 /**
- *
- * @param {Pick<typeof Schemas.Protocol.infer, 'version'|'source'|'id'>} protocol
+ * @param {object} param0
+ * @param {number} [param0.version]
+ * @param {import('$lib/database.js').HTTPRequest} param0.source
+ * @param {string} param0.id
+ * @param {import('swarpc').SwarpcClient<typeof import('../web-worker-procedures.js').PROCEDURES>} param0.swarpc
  */
-export async function upgradeProtocol({ version, source, id }) {
+export async function upgradeProtocol({ version, source, id, swarpc }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");
 	if (!version) throw new Error("Le protocole n'a pas de version");
 	if (!id) throw new Error("Le protocole n'a pas d'identifiant");
 	if (typeof source !== 'string')
 		throw new Error('Les requêtes HTTP ne sont pas encore supportées, utilisez une URL');
 
-	const response = await fetch(cachebust(source), {
+	const { tables } = await import('./idb.svelte.js');
+
+	const contents = await fetch(cachebust(source), {
 		headers: {
 			Accept: 'application/json'
 		}
 	}).then((r) => r.text());
 
-	return importProtocol(response);
+	const result = await swarpc.importProtocol({ contents });
+	tables.Protocol.refresh();
+	tables.Metadata.refresh();
+
+	return result;
 }

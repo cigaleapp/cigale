@@ -1,9 +1,10 @@
 name: Deploy to GitHub Pages
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
-    paths: [src/**, static/**, '*']
+    paths: [src/**, static/**, '*', .github/workflows/deploy.yml]
 
 permissions:
   contents: write
@@ -17,23 +18,28 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22.17.0'
+          bun-version-file: .bun-version
 
       - name: Install dependencies
-        run: npm install
+        run: bun install
 
       - name: Build project
-        run: BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale npm run build
+        run: BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale bun run build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: public # The folder the action should deploy.
-          force: yes
-          clean: no
-          clean-exclude: _pullrequests/
+          force: false
+          clean-exclude: |
+            .nojekyll
+            _pullrequests
+            _playwright
+            _vitest
+            _coverage
+            playwright-report

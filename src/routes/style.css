@@ -11,7 +11,7 @@ dialog {
 	--light__fg-dark-primary: #2f3040;
 	--light__bg-warning: #fff7b3;
 	--light__fg-warning: #a85400;
-	--light__bg-error: #ffa08f;
+	--light__bg-error: #ffcdc4;
 	--light__fg-error: #940000;
 	--light__bg-success: #6bff6b;
 	--light__fg-success: #006600;
@@ -32,7 +32,7 @@ dialog {
 	--dark__bg-dark-primary: #2f3040;
 	--dark__fg-warning: #fff7b3;
 	--dark__bg-warning: #a85400;
-	--dark__fg-error: #ffa08f;
+	--dark__fg-error: #ffb4a7;
 	--dark__bg-error: #940000;
 	--dark__fg-success: #6bff6b;
 	--dark__bg-success: #006600;

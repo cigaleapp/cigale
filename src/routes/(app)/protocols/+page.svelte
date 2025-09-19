@@ -1,21 +1,21 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte.js';
 	import Modal from '$lib/Modal.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { promptAndImportProtocol } from '$lib/protocols';
-	import {
-		downloadProtocolTemplate,
-		isNamespacedToProtocol,
-		jsonSchemaURL
-	} from '$lib/protocols.js';
+	import { downloadProtocolTemplate, jsonSchemaURL } from '$lib/protocols.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import IconImport from '~icons/ph/download';
 	import IconDownload from '~icons/ph/download-simple';
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
+	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
+	import { m } from '$lib/paraglide/messages.js';
+
+	const { data } = $props();
 
 	/**
 	 * Protocol we're confirming deletion for
@@ -32,7 +32,7 @@
 
 <Modal
 	key="modal_download_protocol_template"
-	title="Créer un protocole"
+	title={m.create_protocol()}
 	bind:open={downloadNewProtocolTemplate}
 >
 	<p>
@@ -43,8 +43,9 @@
 	</p>
 	<p>Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche</p>
 	<p>
-		Sachant qu'un <a href={jsonSchemaURL(base)}>JSON Schema</a> est déclaré dans ces fichiers, la plupart
-		des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+		Sachant qu'un <a href={jsonSchemaURL(resolve('/'))}>JSON Schema</a> est déclaré dans ces fichiers,
+		la plupart des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
 	</p>
 	<p>
 		Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il
@@ -55,7 +56,7 @@
 		<section class="actions">
 			<ButtonPrimary
 				onclick={async () => {
-					await downloadProtocolTemplate(base, 'json');
+					await downloadProtocolTemplate(resolve('/'), 'json');
 					close?.();
 				}}
 			>
@@ -64,7 +65,7 @@
 			</ButtonPrimary>
 			<ButtonSecondary
 				onclick={async () => {
-					await downloadProtocolTemplate(base, 'yaml');
+					await downloadProtocolTemplate(resolve('/'), 'yaml');
 					close?.();
 				}}
 			>
@@ -82,18 +83,22 @@
 	cancel="Annuler"
 	confirm="Oui, supprimer"
 	onconfirm={async () => {
-		await openTransaction(['Protocol', 'Metadata'], {}, (tx) => {
+		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {
 			if (!removingProtocol) return;
 
 			tx.objectStore('Protocol').delete(removingProtocol.id);
 
-			const toRemove = removingProtocol.metadata.filter((id) =>
-				// @ts-ignore that shit is pretty dumb, of course removingProtocol is not undefined
-				isNamespacedToProtocol(removingProtocol.id, id)
+			const toRemove = removingProtocol.metadata.filter(
+				(id) => removingProtocol && isNamespacedToProtocol(removingProtocol.id, id)
 			);
+
+			const options = await tx.objectStore('MetadataOption').getAll();
 
 			for (const metadata of toRemove) {
 				tx.objectStore('Metadata').delete(metadata);
+				options
+					.filter((o) => o.id.startsWith(`${metadata}:`))
+					.forEach((o) => tx.objectStore('MetadataOption').delete(o.id));
 			}
 		});
 		toasts.success('Protocole supprimé');
@@ -103,28 +108,32 @@
 </ModalConfirm>
 
 <header>
-	<h1>Protocoles</h1>
+	<h1>{m.protocols()}</h1>
 	<section class="actions">
 		<ButtonSecondary
 			loading
 			onclick={async (_, signals) => {
-				await promptAndImportProtocol({ allowMultiple: true, onInput: signals.loadingStarted })
+				await promptAndImportProtocol({
+					allowMultiple: true,
+					onInput: signals.loadingStarted,
+					importProtocol: data.swarpc.importProtocol
+				})
 					.catch((e) => toasts.error(e))
 					.then((ps) => {
 						if (!ps || typeof ps === 'string' || ps.length === 0) return;
 						if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
-						else toasts.success(`${ps.length} protocoles importés`);
+						else toasts.success(m.protocols_imported_multiple({ count: ps.length }));
 					});
 			}}
 		>
 			{#snippet children({ loading })}
 				{#if !loading}<IconImport />{/if}
-				Importer
+				{m.import()}
 			{/snippet}
 		</ButtonSecondary>
 		<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
 			<IconCreate />
-			Créer
+			{m.create()}
 		</ButtonSecondary>
 	</section>
 </header>

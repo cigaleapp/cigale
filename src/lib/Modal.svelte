@@ -20,6 +20,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	import IconClose from '~icons/ph/x';
 	import ButtonIcon from './ButtonIcon.svelte';
 	import { getSettings } from './settings.svelte';
+	import { insideBoundingClientRect } from './utils';
 
 	/**
 	 * @typedef Props
@@ -28,6 +29,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	 * @property {string} title the title used in the header
 	 * @property {undefined | (() => void)} [open] a function you can bind to, to open the modal
 	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
+	 * @property {(() => void) | undefined} [onclose] a function that will be called when the modal is closed, either via the close button or by clicking outside the modal
+	 * @property {(() => void) | undefined} [onopen] a function that will be called when the modal is opened
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} children the content of the modal
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} [footer] the content of the footer
 	 */
@@ -38,26 +41,31 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		title,
 		open = $bindable(undefined),
 		close = $bindable(undefined),
+		onclose = undefined,
+		onopen = undefined,
 		footer = undefined,
 		children
 	} = $props();
 
 	// Initialize and update close/update functions when stateKey changes
 	$effect(() => {
-		console.log(`Binding functions to ${stateKey} `);
+		console.debug(`Binding functions to ${stateKey} `);
+
 		open = () => {
+			onopen?.();
 			pushState('', { [stateKey]: true });
 		};
 		close = () => {
+			onclose?.();
 			pushState('', { [stateKey]: false });
 		};
 	});
 
 	/** @type {HTMLDialogElement | undefined} */
-	let modalElement;
+	let modalElement = $state();
 	$effect(() => {
 		if (!modalElement) return;
-		console.log(page.state[stateKey]);
+
 		if (page.state[stateKey]) modalElement.showModal();
 		else modalElement.close();
 	});
@@ -66,13 +74,18 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 </script>
 
 <dialog
+	aria-hidden={!page.state[stateKey]}
 	data-theme={theme}
 	bind:this={modalElement}
 	onclose={() => {
 		// Update state when dialog is closed via browser-controlled means (e.g. Esc key)
 		pushState('', { [stateKey]: false });
 	}}
-	onmousedown={({ target, currentTarget }) => {
+	onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
+		// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
+		if (insideBoundingClientRect({ offsetX, offsetY }, currentTarget.getBoundingClientRect(), 20)) {
+			return;
+		}
 		// Close on backdrop click
 		if (target === currentTarget) close?.();
 	}}
@@ -91,6 +104,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	<main>
 		{@render children({ close })}
 	</main>
+
 	{#if footer}
 		<footer>
 			{@render footer({ close })}

@@ -1,370 +1,85 @@
-<script module>
-	/**
-	 * Import new files and process  them
-	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarpc
-	 * @param {File[]} files
-	 */
-	export async function importMore(swarpc, files) {
-		uiState.processing.files = files.map((f) => f.name);
-		uiState.processing.total = files.length;
-		for (const [i, file] of files.entries()) {
-			console.log(file);
-			if (['application/zip', 'application/x-zip-compressed'].includes(file.type)) {
-				console.log(`imorting ${file.name} as zip`);
-				try {
-					await importResultsZip(file, uiState.currentProtocolId);
-				} catch {
-					uiState.processing.files.splice(i, 1);
-					uiState.erroredImages.set(file.name, 'Export invalide');
-				}
-			} else {
-				const currentLength = tables.Image.state.length;
-				const id = imageFileId(currentLength);
-				try {
-					uiState.loadingImages.add(id);
-					await processImageFile(swarpc, file, id);
-				} catch (error) {
-					console.error(error);
-					uiState.erroredImages.set(id, error?.toString() ?? 'Erreur inattendue');
-				} finally {
-					uiState.loadingImages.delete(id);
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarpc
-	 * @param {File} file
-	 * @param {string} id
-	 */
-	async function processImageFile(swarpc, file, id) {
-		if (!uiState.currentProtocol) {
-			toasts.error('Aucun protocole sélectionné');
-			return;
-		}
-
-		const originalBytes = await file.arrayBuffer();
-		const [[width, height], resizedBytes] = await resizeToMaxSize({ source: file });
-
-		await storeImageBytes({
-			id,
-			resizedBytes,
-			originalBytes,
-			contentType: file.type,
-			filename: file.name,
-			width,
-			height
-		});
-
-		if (uiState.cropInferenceAvailable) {
-			await inferBoundingBoxes(swarpc, {
-				id,
-				bytes: resizedBytes,
-				filename: file.name,
-				contentType: file.type,
-				dimensions: { width, height }
-			}).finally(() => {
-				uiState.processing.files.shift();
-			});
-		} else {
-			await tables.Image.set({
-				id: imageId(id, 0),
-				filename: file.name,
-				addedAt: formatISO(new Date()),
-				contentType: file.type,
-				dimensions: { width, height },
-				fileId: id,
-				metadata: {}
-			});
-		}
-
-		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
-			console.error(error);
-			toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
-		});
-	}
-
-	/**
-	 * @param {import('swarpc').SwarpcClient<typeof import('../../../../neural-worker-procedures.js').PROCEDURES>} swarp
-	 * @param {object} file
-	 * @param {ArrayBuffer} file.bytes
-	 * @param {string} file.filename
-	 * @param {string} file.contentType
-	 * @param {string} file.id
-	 * @param {DimensionsInput} file.dimensions
-	 * @returns {Promise<void>}
-	 */
-	async function inferBoundingBoxes(swarp, file) {
-		if (!uiState.currentProtocol) {
-			toasts.error('Aucun protocole sélectionné');
-			return;
-		}
-
-		if (!uiState.currentProtocol.crop.infer) {
-			console.warn(
-				'No crop inference defined, not analyzing image. Configure crop inference in the protocol (crop.infer) if this was not intentional.'
-			);
-			return;
-		}
-
-		if (!uiState.cropInferenceAvailable) {
-			return;
-		}
-
-		console.log('Inferring bounding boxes for', file.filename);
-
-		const { boxes, scores } = await swarp.inferBoundingBoxes({
-			fileId: file.id,
-			taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
-		});
-
-		console.log('Bounding boxes:', boxes);
-
-		let [firstBoundingBox] = boxes;
-		let [firstScore] = scores;
-
-		if (!firstBoundingBox || !firstScore) {
-			await tables.Image.set({
-				id: imageId(file.id, 0),
-				filename: file.filename,
-				addedAt: formatISO(new Date()),
-				contentType: file.contentType,
-				dimensions: file.dimensions,
-				fileId: file.id,
-				metadata: {}
-			});
-			return;
-		}
-
-		/**
-		 * @param {[number, number, number, number]} param0
-		 */
-		const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
-
-		for (let i = 0; i < boxes.length; i++) {
-			await tables.Image.set({
-				id: imageId(file.id, i),
-				filename: file.filename,
-				addedAt: formatISO(new Date()),
-				contentType: file.contentType,
-				dimensions: file.dimensions,
-				fileId: file.id,
-				metadata: {
-					[uiState.cropMetadataId]: {
-						value: JSON.stringify(toCropBox(boxes[i])),
-						confidence: scores[i],
-						alternatives: {}
-					}
-				}
-			});
-		}
-	}
-</script>
-
 <script>
-	/**
-	 * @import { DimensionsInput } from '$lib/database.js';
-	 */
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
-	import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
-	import { processExifData } from '$lib/exif';
-	import * as db from '$lib/idb.svelte';
+	import { promptForFiles } from '$lib/files';
 	import { tables } from '$lib/idb.svelte';
-	import {
-		deleteImageFile,
-		imageFileId,
-		imageFileIds,
-		imageId,
-		imageIdToFileId,
-		imageIsAnalyzed,
-		resizeToMaxSize,
-		storeImageBytes
-	} from '$lib/images';
+	import { deleteImageFile, imageFileIds } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { importResultsZip } from '$lib/results.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { toasts } from '$lib/toasts.svelte';
-	import { formatISO } from 'date-fns';
-
-	const { data } = $props();
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
 	const images = $derived(
 		toAreaObservationProps(fileIds, [], [], {
-			isLoaded: (fileId) =>
-				Boolean(
-					typeof fileId === 'string' &&
-						uiState.currentProtocol &&
-						uiState.hasPreviewURL(fileId) &&
-						imageIsAnalyzed(uiState.currentProtocol, fileId)
-				)
+			showBoundingBoxes: () => false,
+			applyBoundingBoxes: () => false,
+			isQueued: (fileId) => typeof fileId === 'string' && uiState.queuedImages.has(fileId),
+			isLoaded: (fileId) => typeof fileId === 'string' && uiState.hasPreviewURL(fileId)
 		})
 	);
 
-	let modelLoadingProgress = $state(0);
-	let cropperModelLoaded = $state(false);
-	async function loadCropperModel() {
-		// Prevent multiple loads
-		if (cropperModelLoaded) return;
-		if (!uiState.currentProtocol) return;
-		if (!uiState.cropInferenceAvailable) return;
-		const cropModel = uiState.currentProtocol.crop.infer?.[uiState.selectedCropModel]?.model;
-		if (!cropModel) return;
+	const allImages = $derived(
+		[
+			...images,
+			...uiState.processing.files.map(({ name, id }) => ({
+				id,
+				virtual: true,
+				image: '',
+				title: name,
+				stacksize: 1,
+				loading: uiState.loadingImages.has(id) ? +Infinity : -Infinity,
+				boundingBoxes: [],
+				addedAt: new Date()
+			}))
+		].map((props, i) => ({ ...props, index: i }))
+	);
 
-		await data.swarpc
-			.loadModel(
-				{
-					protocolId: uiState.currentProtocol.id,
-					request: cropModel,
-					task: 'detection'
-				},
-				({ transferred, total }) => {
-					modelLoadingProgress = transferred / total;
-				}
-			)
-			.then(() => {
-				toasts.success('Modèle de détection chargé');
-			})
-			.catch((error) => {
-				console.error(error);
-				toasts.error('Erreur lors du chargement du modèle de détection');
-			});
-
-		cropperModelLoaded = true;
-	}
-
-	$effect(() => {
-		if (!cropperModelLoaded) return;
-		if (!uiState.currentProtocol) return;
-		for (const imageFileId of fileIds) {
-			if (
-				!imageIsAnalyzed(uiState.currentProtocol, imageFileId) &&
-				!uiState.loadingImages.has(imageFileId)
-			) {
-				void (async () => {
-					try {
-						const file = await db.get('ImagePreviewFile', imageIdToFileId(imageFileId));
-						if (!file) return;
-						uiState.loadingImages.add(imageFileId);
-						await inferBoundingBoxes(data.swarpc, file);
-					} catch (error) {
-						console.error(error);
-						uiState.erroredImages.set(imageFileId, error?.toString() ?? 'Erreur inattendue');
-					} finally {
-						uiState.loadingImages.delete(imageFileId);
-					}
-				})();
-			}
-		}
-	});
-
-	$effect(() => {
-		uiState.processing.done = uiState.processing.total - uiState.processing.files.length;
-	});
+	const empty = $derived(allImages.length === 0);
 </script>
 
-{#snippet modelsource()}
-	{@const { model } = uiState.cropModels[uiState.selectedCropModel]}
-	{@const url = new URL(typeof model === 'string' ? model : model?.url)}
-	<a href={url.toString()} target="_blank">
-		<code>{url.pathname.split('/').at(-1)}</code>
-	</a>
-{/snippet}
-
-{#await loadCropperModel()}
-	<section class="loading">
-		<Logo loading />
-		<p>Chargement du modèle de recadrage…</p>
-		<p class="source">{@render modelsource()}</p>
-		<div class="progressbar">
-			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
-		</div>
-	</section>
-{:then _}
-	<Dropzone
-		filetypes={[
-			'image/jpeg',
-			'application/zip',
-			'image/png',
-			'image/tiff',
-			'.cr2',
-			'.rw2',
-			'.dng',
-			'.crw',
-			'.raw',
-			'.cr3'
-		]}
-		clickable={images.length === 0}
-		onfiles={async ({ files }) => await importMore(data.swarpc, files)}
-	>
-		<section class="observations" class:empty={!images.length}>
-			<AreaObservations
-				bind:selection={uiState.selection}
-				images={[
-					...images,
-					...uiState.processing.files.map((filename, i) => ({
-						image: '',
-						title: filename,
-						id: `loading_${i}`,
-						index: images.length + i,
-						stacksize: 1,
-						loading: -1,
-						boundingBoxes: []
-					}))
-				]}
-				errors={uiState.erroredImages}
-				loadingText="Analyse…"
-				ondelete={async (id) => {
-					await deleteObservation(id);
-					await deleteImageFile(id);
-				}}
-			/>
-			{#if !images.length}
-				<div class="empty-state">
-					<Logo variant="empty" />
-					<p>Cliquer ou déposer des images, ou un export de résultats (.zip)</p>
-				</div>
-			{/if}
-		</section>
-	</Dropzone>
-	{#if getSettings().showTechnicalMetadata}
-		<section class="debug">
-			{#snippet displayIter(set)}
-				{'{'} {[...$state.snapshot(set)].join(' ')} }
-			{/snippet}
-			<code>
-				loading {@render displayIter(uiState.loadingImages)} <br />
-				errored {@render displayIter(uiState.erroredImages.keys())} <br />
-				preview urls {@render displayIter(uiState.previewURLs.keys())} <br />
-			</code>
-		</section>
-	{/if}
-{:catch error}
-	<section class="loading errored">
-		<Logo variant="error" />
-		<h2>Oops!</h2>
-		<p>Impossible de charger le modèle de recadrage</p>
-		<p class="source">{@render modelsource()}</p>
-		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
-		{#if getSettings().showTechnicalMetadata}
-			<pre>
-				{error?.stack ?? '(no stack trace available)'}
-			</pre>
+<Dropzone
+	filetypes={ACCEPTED_IMPORT_TYPES}
+	clickable={images.length === 0}
+	onfiles={({ files }) => importMore(files)}
+>
+	<section class="observations" class:empty>
+		<AreaObservations
+			bind:selection={uiState.selection}
+			images={allImages}
+			errors={uiState.erroredImages}
+			sort={getSettings().gallerySort}
+			loadingText={m.loading_text()}
+			onemptyclick={async () => {
+				if (uiState.selection.length > 0) return;
+				importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
+			}}
+			ondelete={async (id) => {
+				cancelTask(id, 'Cancelled by user');
+				uiState.processing.removeFile(id);
+				await deleteObservation(id);
+				await deleteImageFile(id);
+			}}
+		/>
+		{#if empty}
+			<div class="empty-state">
+				<Logo variant="empty" />
+				<p>{m.click_or_drop_images_or_export()}</p>
+			</div>
 		{/if}
 	</section>
-{/await}
+</Dropzone>
 
 <style>
 	.observations {
 		padding: 2.5em;
 		display: flex;
+		flex-direction: column;
 		flex-grow: 1;
 	}
 
@@ -374,7 +89,6 @@
 		text-align: center;
 	}
 
-	.loading,
 	.empty-state {
 		display: flex;
 		flex-direction: column;
@@ -385,30 +99,5 @@
 		--size: 5em;
 		max-width: 20em;
 		margin: auto;
-	}
-
-	.loading {
-		height: 100vh;
-	}
-
-	.loading .source {
-		font-size: 0.8em;
-	}
-
-	.loading .progressbar {
-		width: 100%;
-		max-width: 20em;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5em;
-		align-items: center;
-	}
-
-	.loading.errored {
-		gap: 0.5em;
-	}
-
-	.loading.errored *:not(p.message) {
-		color: var(--fg-error);
 	}
 </style>

@@ -5,9 +5,13 @@
 	import Logo from './Logo.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import IconDelete from '~icons/ph/trash';
+	import IconRetry from '~icons/ph/arrow-counter-clockwise';
 	import IconImage from '~icons/ph/image';
 	import { tooltip } from './tooltips';
 	import CroppedImg from './CroppedImg.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { percent } from './i18n';
+	import { isDebugMode } from './settings.svelte';
 
 	/**
 	 * @typedef Props
@@ -15,14 +19,14 @@
 	 * @property {() => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
 	 * @property {() => void} [ondelete]
+	 * @property {() => void} [onretry]
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string} image - image url
 	 * @property {boolean} selected
 	 * @property {boolean} [selectable=true] - whether this image can be selected
 	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
-	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -1 to show the spinner without progress (infinite).
-	 * @property {string} [loadingText] - text to show when loading and progress is -1
+	 * @property {number} [loading] - progress (between 0 and 1) of loading the image. Use -Infinity for a pending image (not started processig yet) and +Infinity to show the spinner without progress (infinite).
 	 * @property {boolean} [applyBoundingBoxes] crop the image to the bounding boxes instead of overlaying them on the full image. If boundingBoxes has multiple values, use the first one.
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
 	 * @property {number} boundingBoxes.x
@@ -31,12 +35,16 @@
 	 * @property {number} boundingBoxes.height
 	 * @property {boolean} [errored=false] - statusText is an error message, and the image processing failed
 	 * @property {string} [statusText] - text to show when loading and progress is -1
+	 * @property {string} [id]
+	 * @property {Date} [addedAt]
 	 */
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
 	const {
 		onclick,
 		onstacksizeclick,
+		ondelete,
+		onretry,
 		title,
 		image,
 		loading,
@@ -44,15 +52,15 @@
 		selectable = true,
 		highlighted,
 		errored = false,
-		statusText = 'Chargement…',
+		statusText = m.loading_text(),
 		stacksize = 1,
 		boundingBoxes = [],
 		applyBoundingBoxes = false,
-		ondelete,
 		...rest
 	} = $props();
 
 	const stacked = $derived(stacksize > 1);
+	const indeterminateLoading = $derived(Boolean(loading && Math.abs(loading) === Infinity));
 
 	// TODO: extract logic to tooltip.js
 	// https://stackoverflow.com/a/10017343/9943464
@@ -70,33 +78,61 @@
 	class:stacked
 	data-selectable={selectable ? '' : undefined}
 	{...rest}
-	use:tooltip={errored ? statusText : undefined}
+	use:tooltip={errored
+		? statusText
+		: isDebugMode()
+			? `${rest.id} @ ${rest.addedAt?.toISOString()}`
+			: undefined}
 >
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
-		<Card onclick={loading || errored ? undefined : (onclick ?? (() => {}))}>
+		<Card onclick={onclick && !loading && !errored ? onclick : () => {}}>
 			<div class="inner">
 				{#if loading !== undefined || errored}
 					<div class="loading-overlay">
 						{#if errored}
 							<Logo --size="1.5em" variant="error" />
-						{:else}
-							<LoadingSpinner progress={loading === -1 ? undefined : loading} />
+						{:else if loading === +Infinity}
+							<LoadingSpinner />
+						{:else if loading === -Infinity}
+							<LoadingSpinner waiting />
+						{:else if loading !== undefined}
+							<LoadingSpinner progress={loading} />
 						{/if}
-						<span class="text" class:smol={errored || loading === -1}>
+						<span class="text" class:smol={errored || indeterminateLoading}>
 							{#if errored || loading === undefined}
-								Erreur
-							{:else if loading === -1}
+								{m.error_text()}
+							{:else if indeterminateLoading}
 								{statusText}
 							{:else}
-								{Math.round(loading * 100)}%
+								{percent(loading)}
 							{/if}
 						</span>
-						{#if ondelete}
+						{#if ondelete || onretry}
 							<section class="errored-actions">
-								<ButtonInk onclick={ondelete}>
-									<IconDelete /> Supprimer
-								</ButtonInk>
+								{#if ondelete}
+									<ButtonInk
+										dangerous
+										onclick={(e) => {
+											e.stopPropagation();
+											ondelete();
+										}}
+									>
+										<IconDelete />
+										{m.delete()}
+									</ButtonInk>
+								{/if}
+								{#if !loading && onretry}
+									<ButtonInk
+										onclick={(e) => {
+											e.stopPropagation();
+											onretry();
+										}}
+									>
+										<IconRetry />
+										{m.retry()}
+									</ButtonInk>
+								{/if}
 							</section>
 						{/if}
 					</div>
@@ -139,7 +175,7 @@
 					<button
 						disabled={loading}
 						class="stack-count"
-						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
+						use:tooltip={`${m.observation_tooltip({ stacksize })}`}
 						onclick={(/** @type {MouseEvent} */ e) => {
 							e.stopPropagation();
 							onstacksizeclick?.();
@@ -161,8 +197,8 @@
 
 <style>
 	.observation {
-		--card-width: 200px;
-		--card-height: 250px;
+		--card-width: calc(var(--card-size-factor, 1) * 200px);
+		--card-height: calc(var(--card-size-factor, 1) * 250px);
 		--card-padding: 0; /* since the image kisses the corners */
 		--stack-offset: 0.25em;
 		--transition-duration: 0.3s;
@@ -193,7 +229,7 @@
 
 	.inner {
 		display: grid;
-		grid-template-rows: 200px 1fr;
+		grid-template-rows: calc(var(--card-size-factor, 1) * 200px) 1fr;
 		grid-template-columns: 100%;
 		width: 100%;
 		height: 100%;
@@ -227,8 +263,7 @@
 	img,
 	.img-placeholder {
 		width: 100%;
-		height: 200px;
-		/*object-fit: cover;*/
+		height: calc(var(--card-size-factor, 1) * 200px);
 	}
 
 	.img-placeholder {
@@ -375,7 +410,9 @@
 	.errored-actions {
 		margin-top: 0.75em;
 		font-size: 0.4em;
-		--fg: var(--fg-error);
-		--bg-hover: var(--bg-error);
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.5em;
 	}
 </style>

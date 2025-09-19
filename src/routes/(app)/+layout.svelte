@@ -1,26 +1,40 @@
+<script module>
+	/**
+	 * @type {Map<string, import("swarpc").CancelablePromise["cancel"]>}
+	 */
+	export const cancellers = new SvelteMap();
+</script>
+
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
-	import { watch } from 'runed';
 	import Toast from '$lib/Toast.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { getSettings } from '$lib/settings.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { initializeProcessingQueue } from '$lib/queue.svelte';
+	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { nonnull, pick } from '$lib/utils';
+	import { watch } from 'runed';
+	import { SvelteMap } from 'svelte/reactivity';
 	import Navigation from './Navigation.svelte';
+	import PrepareForOffline from './PrepareForOffline.svelte';
 
-	const { children } = $props();
+	const { children, data } = $props();
+	const { swarpc, parallelism } = $derived(data);
+
+	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
 	export const snapshot = {
 		capture() {
 			return pick(uiState, 'currentProtocolId');
 		},
 		restore({ currentProtocolId }) {
-			uiState.currentProtocolId = currentProtocolId;
+			uiState.setCurrentProtocolId(currentProtocolId);
 		}
 	};
 
@@ -43,15 +57,44 @@
 		}
 	);
 
-	defineKeyboardShortcuts({
+	defineKeyboardShortcuts('general', {
 		'$mod+s': {
 			help: '',
 			hidden: true,
-			do: () => {
-				toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎');
+			do: () => toasts.info(m.no_need_for_ctrl_s())
+		},
+		'i d e v': {
+			help: m.toggle_debug_mode(),
+			do: async () => {
+				await setSetting('showTechnicalMetadata', isDebugMode() ? false : true);
 			}
 		}
 	});
+
+	defineKeyboardShortcuts(
+		'debugmode',
+		Object.fromEntries(
+			/**@type{const}*/ (['warn', 'error', 'info', 'debug', 'success']).map((type) => {
+				const toastFns = {
+					warn: () => toasts.warn('Example warning toast'),
+					error: () => toasts.error('Example error toast'),
+					info: () => toasts.info('Example info toast'),
+					debug: () => toasts.add('debug', 'Example debug toast'),
+					success: () => toasts.success('Example success toast')
+				};
+				return [
+					`t t ${type.charAt(0)}`,
+					{
+						help: `Summon a ${type} toast`,
+						debug: true,
+						allowInModals: true,
+						when: isDebugMode,
+						do: toastFns[type]
+					}
+				];
+			})
+		)
+	);
 
 	const settings = $derived(getSettings());
 
@@ -61,18 +104,26 @@
 
 	/** @type {undefined|(() => void)} */
 	let openKeyboardShortcuts = $state();
+	/** @type {undefined|(() => void)} */
+	let openPrepareForOfflineUse = $state();
 </script>
 
-<Navigation {openKeyboardShortcuts} progress={uiState.processing.progress} />
-
 <svelte:head>
-	<base href={base ? `${base}/index.html` : ''} />
+	<base href={resolve('/') === '/' ? '' : resolve('/') + 'index.html'} />
 </svelte:head>
 
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
+<PrepareForOffline bind:open={openPrepareForOfflineUse} />
+
+<Navigation
+	{swarpc}
+	{openKeyboardShortcuts}
+	{openPrepareForOfflineUse}
+	progress={uiState.processing.progress}
+/>
 
 <section class="toasts" data-testid="toasts-area">
-	{#each toasts.items as toast (toast.id)}
+	{#each toasts.items('default') as toast (toast.id)}
 		<Toast
 			{...toast}
 			action={toast.labels.action}
@@ -90,7 +141,6 @@
 <div
 	class="contents"
 	class:padded={!page.route.id?.includes('/(sidepanel)') &&
-		page.route.id !== '/(app)/crop/[image]' &&
 		!page.route.id?.includes('protocols/[id]/')}
 >
 	{@render children?.()}

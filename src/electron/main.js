@@ -1,12 +1,12 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
 import { updateElectronApp } from 'update-electron-app';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import serve from 'electron-serve';
+import os from 'node:os';
 
 /* global MAIN_WINDOW_VITE_DEV_SERVER_URL */
-
-const builtFileserver = serve({ directory: import.meta.dirname });
+const builtFileserver = serve({ directory: path.join(import.meta.dirname, 'sveltekit') });
 
 try {
 	updateElectronApp();
@@ -26,9 +26,12 @@ const createWindow = () => {
 	const mainWindow = new BrowserWindow({
 		icon: isLinux ? path.join(import.meta.dirname, 'icon.png') : undefined,
 		width: 1200,
+		minWidth: 1000,
 		height: 800,
+		minHeight: 500,
 		titleBarStyle: 'hidden',
-		...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+		// Make title bar overlay background transparent
+		titleBarOverlay: process.platform !== 'darwin' ? { color: '#0000' } : undefined,
 		webPreferences: {
 			preload: path.join(import.meta.dirname, 'preload.js')
 		}
@@ -45,6 +48,37 @@ const createWindow = () => {
 	ipcMain.on('nativeWindow:stopCallingAttention', () => {
 		mainWindow.flashFrame(false);
 	});
+
+	ipcMain.on('nativeWindow:setControlsColor', (_event, /** @type {string} */ color) => {
+		if (process.platform === 'darwin') return;
+		try {
+			mainWindow.setTitleBarOverlay({ symbolColor: color });
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+	ipcMain.on('nativeWindow:setControlsHeight', (_event, /** @type {number} */ height) => {
+		if (process.platform === 'darwin') return;
+		mainWindow.setTitleBarOverlay({ height });
+	});
+
+	/** @type {Partial<Record<NodeJS.Platform, string[]>>} */
+	const usualArchs = {
+		win32: ['x64'],
+		darwin: ['arm64', 'x64'],
+		linux: ['x64']
+	};
+
+	ipcMain.handle('osinfo', () => ({
+		name: os.type().replace('Windows_NT', 'Windows').replace('Darwin', 'macOS'),
+		version: os.release(),
+		architecture: os.arch(),
+		archIsUnusual: !usualArchs[os.platform()]?.includes(os.arch()),
+		serviceWorkers: Object.values(session.defaultSession.serviceWorkers.getAllRunning()).map(
+			(sw) => sw.scriptUrl
+		)
+	}));
 
 	// and load the index.html of the app.
 	if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

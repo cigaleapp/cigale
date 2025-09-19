@@ -5,20 +5,36 @@
 	"rangeStrategy": "bump",
 	"packageRules": [
 		{
-			"description": "Auto-merge updates to dev tooling (linters, formatters, etc)",
+			"description": "Auto-merge updates to linters and formatters",
 			"matchDepTypes": ["devDependencies"],
-			"matchPackageNames": ["!@sveltejs/*", "!svelte", "!vite"],
+			"matchPackageNames": [
+				"eslint",
+				"@eslint/*",
+				"eslint-*",
+				"oxlint",
+				"oxlint-*",
+				"knip",
+				"prettier",
+				"prettier-*",
+				"lint-staged",
+				"svelte-check"
+			],
 			"automerge": true
 		},
 		{
-			"description": "Auto-merge svelte(kit) upgrades (E2E tests should validate that nothing catastrophic happens)",
-			"matchPackageNames": ["@sveltejs/kit", "svelte"],
+			"description": "Auto-merge patch upgrades (E2E tests should validate that nothing catastrophic happens)",
+			"matchUpdateTypes": ["patch"],
 			"automerge": true
 		},
 		{
-			"description": "Oxlint",
-			"groupName": "oxlint",
-			"matchPackageNames": ["oxlint", "eslint-plugin-oxlint"]
+			"description": "Group playwright docker image & npm package",
+			"matchPackageNames": [
+				"@playwright/test",
+				"mcr.microsoft.com/playwright",
+				"ghcr.io/gwennlbh/playwright-bun"
+			],
+			"groupName": "Playwright",
+			"automerge": true
 		}
 	]
 }

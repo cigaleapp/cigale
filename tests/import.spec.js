@@ -1,7 +1,24 @@
+import * as dates from 'date-fns';
 import extract from 'extract-zip';
 import path from 'node:path';
+import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import { importResults, readdirTreeSync, toast } from './utils';
+import {
+	chooseDefaultProtocol,
+	expectTooltipContent,
+	getMetadataValuesOfImage,
+	getTab,
+	goToTab,
+	importPhotos,
+	importResults,
+	listTable,
+	loadingText,
+	readdirTreeSync,
+	sidepanelMetadataSectionFor,
+	toast,
+	waitForLoadingEnd
+} from './utils';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
@@ -16,7 +33,9 @@ test.describe('correct results.zip', () => {
 		await expect(page.getByText(/\.jpeg$/)).toHaveCount(4);
 	});
 
-	test('has the correct bounding boxes', async ({ page }) => {
+	test('has the correct bounding boxes @webkit-no-parallelization', async ({ page }) => {
+		await goToTab(page, 'crop');
+
 		/**
 		 *
 		 * @param {string} id
@@ -28,50 +47,56 @@ test.describe('correct results.zip', () => {
 			).toHaveCount(count);
 		}
 
-		await expectBoundingBoxesCount('000000', 1);
-		await expectBoundingBoxesCount('000001', 1);
-		await expectBoundingBoxesCount('000002', 1);
-		await expectBoundingBoxesCount('000003', 0);
+		const images = await listTable(page, 'Image').then((images) =>
+			images.sort((a, b) => dates.compareAsc(a.addedAt, b.addedAt))
+		);
+
+		await expectBoundingBoxesCount(images[0].fileId ?? '', 1);
+		await expectBoundingBoxesCount(images[1].fileId ?? '', 1);
+		await expectBoundingBoxesCount(images[2].fileId ?? '', 1);
+		await expectBoundingBoxesCount(images[3].fileId ?? '', 1);
 	});
 
-	test('does not re-analyze when going to classify tab', async ({ page }) => {
-		await page.getByRole('link', { name: 'Classifier' }).click();
-		await page.getByText('Bilobella braunerae', { exact: true }).click({
+	test('does not re-analyze when going to classify tab @webkit-no-parallelization', async ({
+		page
+	}) => {
+		await goToTab(page, 'classify');
+		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
 		});
 		await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
 		  - complementary:
-		    - img "Image 1 de l'observation Bilobella braunerae"
-		    - heading "Bilobella braunerae" [level=2]:
+		    - img "Image 1 de l'observation cyan"
+		    - heading "cyan" [level=2]:
 		      - img
 		      - textbox "Nom de l'observation"
 		    - text: Espèce
-		    - combobox: Lepidocyrtus fimetarius
+		    - combobox: Allacma fusca
 		    - code: /\\d+%/
 		    - button:
 		      - img
 		    - text: Alternatives
 		    - list:
 		      - listitem:
-		        - text: Entomobrya atrocincta
-		        - code: 5%
+		        - text: Sminthurus viridis
+		        - code: /\\d+%/
 		        - button:
 		          - img
 		      - listitem:
-		        - text: Ceratophysella longispina
-		        - code: 4%
+		        - text: Bourletiella hortensis
+		        - code: /\\d+%/
 		        - button:
 		          - img
 		    - text: Genre
-		    - combobox: Lepidocyrtus
+		    - combobox: Allacma
 		    - button:
 		      - img
 		    - text: Famille
-		    - combobox: Entomobryidae
+		    - combobox: Sminthuridae
 		    - button:
 		      - img
 		    - text: Ordre
-		    - combobox: Entomobryomorpha
+		    - combobox: Symphypleona
 		    - button:
 		      - img
 		    - text: Date
@@ -123,22 +148,22 @@ test.describe('correct results.zip', () => {
 		const resultsDir = path.resolve('./tests/results/correct');
 		await download.saveAs('./tests/results/correct.zip');
 		await extract('./tests/results/correct.zip', { dir: resultsDir });
-		console.log(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
+		console.info(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [
 					'_4.jpeg',
-					'Allacma fusca_3.jpeg',
-					'Lepidocyrtus fimetarius_1.jpeg',
-					'Seira ferrarii_2.jpeg'
+					'Allacma fusca_1.jpeg',
+					'Entomobrya muscorum_3.jpeg',
+					'Orchesella cincta_2.jpeg'
 				]
 			},
 			{
 				Original: [
 					'_4.jpeg',
-					'Allacma fusca_3.jpeg',
-					'Lepidocyrtus fimetarius_1.jpeg',
-					'Seira ferrarii_2.jpeg'
+					'Allacma fusca_1.jpeg',
+					'Entomobrya muscorum_3.jpeg',
+					'Orchesella cincta_2.jpeg'
 				]
 			},
 			'analysis.json',
@@ -184,5 +209,174 @@ test.describe('invalid json analysis', async () => {
 
 	test('fails with the appriopriate error message', async ({ page }) => {
 		await expect(toast(page, 'JSON', { type: 'error' })).toBeVisible();
+	});
+});
+
+test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'sample.cr2');
+	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
+		timeout: 5_000
+	});
+	await expectTooltipContent(
+		page,
+		page.getByTestId('first-observation-card'),
+		/Les fichiers .+? ne sont pas (encore )?supportés/
+	);
+});
+
+test('can import a large image', issue(412, 415), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'large-image.jpeg');
+	await expect(page.getByText('large-image.jpeg')).toBeVisible({
+		timeout: 10_000
+	});
+	await goToTab(page, 'classify');
+	await expect(page.getByText('large-image')).toBeVisible({
+		timeout: 10_000
+	});
+});
+
+test('cannot import an extremely large image', issue(412, 414), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, '20K-gray.jpeg');
+	await waitForLoadingEnd(page);
+	await expectTooltipContent(
+		page,
+		page.getByTestId('first-observation-card'),
+		/L'image est trop grande pour être traitée/
+	);
+});
+
+test('can cancel import', issue(430), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);
+	await expect(page.getByTestId('first-observation-card')).toHaveText(loadingText, {
+		timeout: 10_000
+	});
+	await page
+		.locator('article', { hasText: 'lil-fella.jpeg' })
+		.getByRole('button', { name: 'Supprimer' })
+		.click();
+	await expect(page.getByText('lil-fella.jpeg').first()).not.toBeVisible({
+		timeout: 500
+	});
+});
+
+test('can import in multiple batches', async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos(
+		{ page, wait: false },
+		['lil-fella', 'leaf'],
+		['with-exif-gps', '20K-gray', 'debugsquare.png']
+	);
+	await expect(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
+		timeout: 60_000
+	});
+	await expect(page.locator('main').getByText('lil-fella.jpeg')).toBeVisible();
+	await expect(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
+	await expect(page.locator('main').getByText('with-exif-gps.jpeg')).toBeVisible();
+	await expect(page.locator('main').getByText('debugsquare.png')).toBeVisible();
+	await expect(page.locator('main').locator('article.card')).toHaveCount(5);
+});
+
+test(
+	'deleting an image in the import tab does not create ghost observation cards',
+	issue(439),
+	async ({ page }) => {
+		await chooseDefaultProtocol(page);
+		await goToTab(page, 'import');
+		await importPhotos({ page }, 'lil-fella', 'cyan');
+		await goToTab(page, 'classify');
+		await waitForLoadingEnd(page);
+		await goToTab(page, 'import');
+		await page.getByTestId('first-observation-card').click();
+		await page
+			.getByTestId('sidepanel')
+			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
+			.click();
+		await goToTab(page, 'classify');
+		await expect(page.getByTestId('first-observation-card')).toMatchAriaSnapshot(`
+		  - article:
+		    - img "cyan"
+		    - img
+		    - heading "cyan" [level=2]
+		`);
+		await expect(page.getByRole('main').locator('article.card')).toHaveCount(1);
+	}
+);
+
+test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'lil-fella', 'cyan');
+
+	// Now, we have at least one image loaded (so technically the classify tab should be accessible),
+	// but the other image is still being analyzed.
+
+	await goToTab(page, 'crop');
+
+	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
+
+	// Once everything is done, make sure that we can go to the classify tab
+	await waitForLoadingEnd(page);
+
+	await expect(getTab(page, 'classify')).toBeEnabled({ timeout: 1_000 });
+	await goToTab(page, 'classify');
+});
+
+test('can extract EXIF date from an image', async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'lil-fella');
+	await waitForLoadingEnd(page);
+	await page.getByTestId('first-observation-card').click();
+	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+		'2025-04-25'
+	);
+
+	const metadataValues = await getMetadataValuesOfImage({
+		page,
+		protocolId: lightweightProtocol.id,
+		image: { filename: 'lil-fella.jpeg' }
+	});
+
+	expect(metadataValues).toMatchObject({
+		...metadataValues,
+		shoot_date: '2025-04-25T12:38:36'
+	});
+});
+
+test('can extract EXIF GPS data from an image', async ({ page }) => {
+	await chooseDefaultProtocol(page);
+	await goToTab(page, 'import');
+	await importPhotos({ page }, 'with-exif-gps');
+	await waitForLoadingEnd(page);
+	await page.getByTestId('first-observation-card').click();
+	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+		'2008-10-22'
+	);
+	await expect(sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')).toHaveValue(
+		'43.46715666666389, 11.885394999997223'
+	);
+
+	const metadataValues = await getMetadataValuesOfImage({
+		page,
+		protocolId: lightweightProtocol.id,
+		image: { filename: 'with-exif-gps.jpeg' }
+	});
+
+	expect(metadataValues).toMatchObject({
+		...metadataValues,
+		shoot_date: '2008-10-22T16:29:49',
+		shoot_location: {
+			latitude: 43.46715666666389,
+			longitude: 11.885394999997223
+		}
 	});
 });

@@ -1,5 +1,5 @@
 import { tables } from '$lib/idb.svelte.js';
-import { namespacedMetadataId } from '$lib/protocols';
+import { namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, parent }) {

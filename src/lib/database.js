@@ -1,5 +1,12 @@
 import { scope, type } from 'arktype';
-import { HTTPRequest, ID, ModelInput, Probability, References } from './schemas/common.js';
+import {
+	Dimensions,
+	HTTPRequest,
+	ID,
+	ModelInput,
+	Probability,
+	References
+} from './schemas/common.js';
 import {
 	EXIFField,
 	MetadataEnumVariant,
@@ -10,20 +17,13 @@ import {
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
+import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
 	FilepathTemplate,
-	Protocol as ProtocolSchema,
-	ModelDetectionOutputShape
+	ModelDetectionOutputShape,
+	Protocol as ProtocolSchema
 } from './schemas/protocols.js';
-
-const Dimensions = type({
-	width: 'number > 0',
-	height: 'number > 0'
-}).pipe(({ width, height }) => ({
-	width,
-	height,
-	aspectRatio: width / height
-}));
+import { clamp } from './utils.js';
 
 const ImageFile = table(
 	['id'],
@@ -49,31 +49,9 @@ const ImagePreviewFile = table(
 	})
 );
 
-const Image = table(
-	['id', 'addedAt'],
-	type({
-		id: /\d+(_\d+)*/,
-		filename: 'string',
-		addedAt: 'string.date.iso.parse',
-		dimensions: Dimensions,
-		metadata: MetadataValues,
-		contentType: /\w+\/\w+/,
-		fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
-		/** Si les boîtes englobantes ont été analysées. Pratique en particulier pour savoir s'il faut calculer les boîtes englobantes pour une image qui n'a aucune observation associée (chaque boudingbox crée une observation) */
-		boundingBoxesAnalyzed: 'boolean = false'
-	})
-);
+const Image = table(['id', 'addedAt'], ImageSchema);
 
-const Observation = table(
-	['id', 'addedAt'],
-	type({
-		id: ID,
-		label: 'string',
-		addedAt: 'string.date.iso.parse',
-		metadataOverrides: MetadataValues,
-		images: References
-	})
-);
+const Observation = table(['id', 'addedAt'], ObservationSchema);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
@@ -91,11 +69,19 @@ const Settings = table(
 		id: '"defaults" | "user"',
 		protocols: References,
 		theme: type.enumerated('dark', 'light', 'auto'),
-		gridSize: 'number',
+		// TODO(2025-09-05): remove n===10 after a while
+		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),
 		language: type.enumerated('fr'),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
 		cropAutoNext: 'boolean = false',
+		gallerySort: type({
+			direction: type.enumerated('asc', 'desc'),
+			key: type.enumerated('filename', 'date')
+		}).default(() => ({
+			direction: 'asc',
+			key: 'date'
+		})),
 		protocolModelSelections: scope({ ID })
 			.type({
 				'[ID]': {
@@ -172,6 +158,29 @@ function table(keyPaths, schema) {
 
 	return schema.configure({ table: { indexes: expandedKeyPaths } });
 }
+
+/**
+ * Returns a comparator to sort objects by their id property
+ * If both IDs are numeric, they are compared numerically even if they are strings
+ * @template {{id: string|number} | string | number} IdOrObject
+ * @param {IdOrObject} a
+ * @param {IdOrObject} b
+ * @returns {number}
+ */
+export const idComparator = (a, b) => {
+	// @ts-ignore
+	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
+	// @ts-ignore
+	if (typeof b === 'object' && 'id' in b) return idComparator(a.id, b.id);
+
+	if (typeof a === 'number' && typeof b === 'number') return a - b;
+
+	if (typeof a === 'number') return -1;
+	if (typeof b === 'number') return 1;
+
+	if (/^\d+$/.test(a) && /^\d+$/.test(b)) return Number(a) - Number(b);
+	return a.localeCompare(b);
+};
 
 /**
  * @typedef  ID

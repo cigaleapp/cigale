@@ -6,46 +6,61 @@
    <em>
 			Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune
    </em>
+
+English · <a href="./README_FR.md">Français</a>
+
 </div>
 
 ---
 
-Une application web pour aider à la classification de photos d'arthropodes, avec recadrage et classification semi-automatique par réseaux de neurones.
+A web application to assist in classifying photos of arthropods, with cropping and semi-automatic classification via neural networks.
 
-Fonctionne hors-connexion (il suffit d'aller sur le site une seule fois pour qu'il soit disponible hors ligne).
+Works offline (just visit the site once for it to be available without an Internet connection).
 
-## Fonctionnement
+## How it works
 
-### 1. Choisissez un protocole
+### 1. Choose a protocol
 
-![](./static/screenshot-choose-protocol.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-protocol-1-chromium-linux.png)
 
-CIGALE dispose d'un système avancé de définition de protocoles pour coller au mieux à vos besoins et à votre protocole scientifique. Un protocole de classification d'arthropodes avec informations taxonomiques et classification par espèce est fourni de base avec l'application.
+CIGALE has an advanced protocol definition system to best fit your needs and scientific protocol. A example protocol, to classify arthropods with taxonomic information and species classification, is provided by default with the application.
 
-### 2. Importez vos photos
+### 2. Import your photos
 
-![](./static/screenshot-import.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-import-1-chromium-linux.png)
 
-Importez vos photos, et laissez faire le réseau neuronal de détection qui va trouver un (ou plusieurs) arthropodes par photo, et définir des boîtes englobantes autour d'eux.
+Import your photos, and let the detection neural network find one (or more) arthropods per photo. Define bounding boxes around them.
 
-### 3. Confirmez les recadrages
+### 3. Confirm the bounding boxes
 
-![](./static/screenshot-crop.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-crop-1-chromium-linux.png)
 
-L'onglet suivant permet de passer sur chaque photo afin d'ajuster les boîtes englobantes détectées par le réseau neuronal. Vous pouvez les ajuster, les supprimer ou en ajouter de nouvelles.
+The next tab allows you to go through each photo to adjust the bounding boxes detected by the neural network. You can adjust them, delete them, or add new ones.
 
-### 4. Classifiez et annotez les arthropodes
+### 4. Classify and annotate the arthropods
 
-![](./static/screenshot-classify.png)
+![](./tests/readme.spec.js-snapshots/screenshots-en-classify-1-chromium-linux.png)
 
-L'onglet "Classification" lance une inférence du réseau neuronal de classification, qui permet d'identifier l'espèce pour chaque boîte englobante trouvée. Vous pouvez alors confirmer ou modifier la classification, à l'aide d'image et de descriptions utiles sourcées depuis [les Carnets de Jessica](https://jessica-joachim.fr), [GBIF](https://gbif.org) et d'autres sources.
+The "Classification" tab launches an inference from the classification neural network, which identifies the species for each detected bounding box. You can then confirm or modify the classification using helpful images and descriptions. For the default protocol, they come from [les Carnets de Jessica](https://jessica-joachim.fr), [GBIF](https://gbif.org), and other sources.
 
-Les appartenances aux clades taxonomiques supérieures (genre, famille, ordre, classe, phylum, etc) sont déduites automatiquement à partir de l'espèce choisie.
+Parent taxonomic affiliations (genus, family, order, class, phylum, etc.) are automatically deduced from the chosen species.
 
-### 5. Exportez vos données
+### 5. Export your results
 
 ![](./static/screenshot-exports-csv.png)
 
-Enfin, il est possible d'exporter les données en .zip, avec les photos recadrées, les métadonnées (annotations) associées et (optionnellement) les photos originales.
+Finally, it is possible to export the data as a .zip file, containing the cropped photos, the associated metadata (annotations), and (optionally) the original photos.
 
-Les métadonnées sont exportées au format CSV pour utilisation facile dans un tableur, et au format JSON pour une utilisation programmatique dans un script Python par exemple.
+Metadata is exported in CSV format for easy use in a spreadsheet, and in JSON format for programmatic use (in a Python script, for example).
+
+<p align="center">
+  <a href="https://www.gbif.org/species/165599324">🐞</a>
+  <a href="https://www.gbif.org/species/4342">🐜</a>
+  <a href="https://www.gbif.org/species/797">🦋</a>
+  <a href="https://www.gbif.org/species/1718308">🦗</a>
+  <a href="https://www.gbif.org/species/1341976">🐝</a>
+  <a href="https://www.gbif.org/species/1496">🕷️</a>
+  <a href="https://www.gbif.org/species/797">🐛</a>
+  <a href="https://www.gbif.org/species/1524843">🪰</a>
+  <a href="https://www.gbif.org/species/1043502">🪲</a>
+</p>

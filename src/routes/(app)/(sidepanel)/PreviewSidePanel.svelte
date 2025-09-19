@@ -14,7 +14,8 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import deepEqual from 'deep-equal';
+	import { m } from '$lib/paraglide/messages.js';
+	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 	import IconSplit from '~icons/ph/arrows-out-light';
 	import IconObservation from '~icons/ph/bug-beetle';
@@ -159,7 +160,7 @@
 						{value}
 						options={options[definition.id]}
 						onchange={async (v) => {
-							if (deepEqual(v, value?.value)) return;
+							if (dequal(v, value?.value)) return;
 							onmetadatachange(definition.id, v);
 						}}
 					/>
@@ -184,40 +185,40 @@
 					disabled={!canmerge}
 					onclick={onmerge}
 					keyboard="$mod+g"
-					help="Regrouper les images et/ou observations sélectionnées en une observation"
+					help={m.group_selected_items()}
 				>
 					<IconMerge />
-					Regrouper
+					{m.group()}
 				</ButtonSecondary>
 				<ButtonSecondary
 					disabled={!cansplit}
 					onclick={onsplit}
 					keyboard="$mod+Shift+g"
-					help="Séparer toutes les observations sélectionnées en images seules"
+					help={m.separate_all_selected_help()}
 				>
 					<IconSplit />
-					Séparer
+					{m.separate()}
 				</ButtonSecondary>
 			</div>
 		{/if}
 		{#if onimport}
 			<ButtonSecondary onclick={onimport}>
 				<IconImport />
-				Importer d'autres images
+				{m.import_other_images()}
 			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}
 			keyboard="Delete"
-			help="Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
+			help={m.delete_selected_images_warning()}
 			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
 			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
 			--bg-hover={images.length > 0 ? 'var(--bg-error)' : ''}
 			--fg-hover={images.length > 0 ? 'var(--fg-error)' : ''}
 		>
 			<IconDelete />
-			Supprimer {images.length} images
+			{m.delete_n_images({ count: images.length })}
 		</ButtonSecondary>
 	</section>
 </aside>
@@ -235,6 +236,7 @@
 		height: 100%;
 		flex-shrink: 0;
 		gap: 30px;
+		min-width: 470px;
 	}
 
 	/* Direction is set to RTL on .pannel to put the resize handle on the left of the container, this sets it back to LTR for every child so that text still has the correction direction (for French) */

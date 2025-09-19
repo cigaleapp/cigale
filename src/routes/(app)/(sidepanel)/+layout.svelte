@@ -3,38 +3,31 @@
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImageFile } from '$lib/images';
+	import { deleteImageFile, imageFileId } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
 		storeMetadataValue
 	} from '$lib/metadata';
-	import { deleteObservation, mergeToObservation } from '$lib/observations';
+	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
+	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-	import { importMore } from './import/+page.svelte';
+	import { watch } from 'runed';
+	import { cancellers } from '../+layout.svelte';
+	import Error from '../../+error.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
+	import { promptForFiles } from '$lib/files';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 
 	seo({ title: 'Importer' });
 
-	const { children, data } = $props();
+	const { children } = $props();
 
 	async function importImages() {
-		const filesInput = document.createElement('input');
-		filesInput.type = 'file';
-		filesInput.multiple = true;
-		filesInput.accept = 'image/*';
-		filesInput.addEventListener('change', async (event) => {
-			if (!(event.currentTarget instanceof HTMLInputElement)) return;
-			if (!event.currentTarget.files) return;
-			const files = Array.from(event.currentTarget.files);
-			if (files.length === 0) return;
-			await importMore(data.swarpc, files);
-		});
-		filesInput.click();
+		importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
 	}
 
 	async function mergeSelection() {
@@ -43,15 +36,28 @@
 	}
 
 	async function splitSelection() {
-		// Find IDs of all images in selected observations
-		const toselect = uiState.selection.flatMap((id) => {
-			const obs = tables.Observation.state.find((o) => o.id === id);
-			if (!obs) return [];
-			return obs.images;
+		/** @type {string[]} */
+		const toselect = [];
+
+		const protocol = uiState.currentProtocol;
+		if (!protocol) throw new Error('No protocol selected');
+
+		await tables.Observation.do(async (tx) => {
+			for (const id of uiState.selection) {
+				const obs = tables.Observation.getFromState(id);
+				if (!obs) continue;
+
+				tx.delete(id);
+				for (const imageId of obs.images) {
+					const image = await tables.Image.raw.get(imageId);
+					if (!image) continue;
+					const obs = newObservation(image, protocol);
+					tx.add(obs);
+					toselect.push(obs.id);
+				}
+			}
 		});
-		await tables.Observation.do((tx) => {
-			uiState.selection.map((id) => tx.delete(id));
-		});
+
 		uiState.setSelection?.(toselect);
 	}
 
@@ -61,6 +67,7 @@
 			{},
 			async (tx) => {
 				for (const id of uiState.selection) {
+					cancelTask(id, 'Cancelled by user');
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
 					await deleteImageFile(id, tx, true);
 				}
@@ -69,7 +76,35 @@
 		uiState.setSelection?.([]);
 	}
 
-	defineKeyboardShortcuts({
+	defineKeyboardShortcuts('observations', {
+		'x x': {
+			help: 'Error out selected cards',
+			debug: true,
+			do() {
+				for (const id of uiState.selection) {
+					if (!uiState.erroredImages.has(id)) uiState.erroredImages.set(id, 'Errored!');
+				}
+			}
+		},
+		'x u': {
+			help: 'Un-error selection',
+			debug: true,
+			do() {
+				for (const id of uiState.selection) {
+					uiState.erroredImages.delete(id);
+				}
+			}
+		},
+		'x f': {
+			help: 'Spawn a loading image',
+			debug: true,
+			do() {
+				uiState.processing.files.push({
+					id: imageFileId(),
+					name: 'Debug image.jpeg'
+				});
+			}
+		},
 		'$mod+u': {
 			help: 'Supprimer toutes les images et observations',
 			async do() {
@@ -80,11 +115,15 @@
 					(tx) => {
 						tx.objectStore('Observation').clear();
 						tx.objectStore('ImageFile').clear();
-						uiState.previewURLs = new SvelteMap();
+						uiState.previewURLs.clear();
 						tx.objectStore('Image').clear();
-						uiState.erroredImages = new SvelteMap();
-						uiState.loadingImages = new SvelteSet();
+						uiState.queuedImages.clear();
+						uiState.erroredImages.clear();
+						uiState.loadingImages.clear();
+						uiState.processing.files = [];
 						uiState.setSelection?.([]);
+						cancellers.forEach((cancel) => cancel('Cancelled by user'));
+						cancellers.clear();
 					}
 				);
 			}
@@ -103,8 +142,8 @@
 		}
 	});
 
-	const showSidePanel = $derived(
-		tables.Image.state.length + tables.Observation.state.length + uiState.processing.files.length >
+	let showSidePanel = $derived(
+		uiState.processing.files.length + tables.Observation.state.length + tables.Image.state.length >
 			0
 	);
 
@@ -146,10 +185,13 @@
 	/** @type {Awaited<ReturnType<typeof mergeMetadataFromImagesAndObservations>>} */
 	let mergedMetadataValues = $state({});
 
-	$effect(() => {
+	watch([() => selectedImages, () => selectedObservations], () => {
 		// FIXME needed to force refresh when selectedObservations' metadataOverrides change values, this isn't picked up by Svelte for some reason. I tried reproducing but couldn't yet, see https://svelte.dev/playground/eef37e409ca04fa888badd3e7588f461?version=5.25.0
-		[selectedImages, selectedObservations];
-		void mergeMetadataFromImagesAndObservations(selectedImages, selectedObservations)
+		void mergeMetadataFromImagesAndObservations(
+			db.databaseHandle(),
+			selectedImages,
+			selectedObservations
+		)
 			.then((values) => {
 				mergedMetadataValues = values;
 			})
@@ -158,7 +200,7 @@
 </script>
 
 <div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
-	<main>{@render children?.()}</main>
+	<main data-testid="app-main">{@render children?.()}</main>
 	{#if showSidePanel}
 		<PreviewSidePanel
 			images={selectedHrefsWithCropboxes}
@@ -174,9 +216,15 @@
 				if (!uiState.currentProtocol) return;
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
-						await deleteMetadataValue({ subjectId, metadataId: id, recursive: true });
+						await deleteMetadataValue({
+							db: db.databaseHandle(),
+							subjectId,
+							metadataId: id,
+							recursive: true
+						});
 					} else {
 						await storeMetadataValue({
+							db: db.databaseHandle(),
 							subjectId,
 							metadataId: id,
 							confidence: 1,
@@ -185,6 +233,16 @@
 						});
 					}
 				}
+
+				await mergeMetadataFromImagesAndObservations(
+					db.databaseHandle(),
+					selectedImages,
+					selectedObservations
+				)
+					.then((values) => {
+						mergedMetadataValues = values;
+					})
+					.catch((e) => toasts.error(e));
 			}}
 		/>
 	{/if}

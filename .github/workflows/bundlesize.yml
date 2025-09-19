@@ -1,0 +1,55 @@
+name: Bundle size
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    name: Compare
+    needs: build
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Download stats.json files
+        uses: actions/download-artifact@v5
+
+      - name: Compare bundle size
+        uses: wojtekmaj/vite-compare-bundle-size@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          current-stats-json-path: ./head-stats/stats.json
+          base-stats-json-path: ./base-stats/stats.json
+          describe-assets: changed-only
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - { name: head, ref: '${{ github.event.pull_request.head.ref }}' }
+          - { name: base, ref: '${{ github.base_ref }}' }
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ matrix.ref }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - run: bun install
+      - run: bun run build
+        env:
+          BUNDLE_ANALYZER: json
+
+      - name: Upload stats.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-stats
+          path: ./public/stats.json

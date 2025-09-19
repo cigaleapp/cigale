@@ -3,39 +3,97 @@ name: End-to-end tests
 on:
   push:
     branches: [main]
-    paths: [src/**, tests/**, static/**, '*']
+    paths: [src/**, tests/**, static/**, '*', messages/fr.json, .github/workflows/playwright.yml]
   pull_request:
     branches: [main]
-    paths: [src/**, tests/**, static/**, '*']
+    paths: [src/**, tests/**, static/**, '*', messages/fr.json, .github/workflows/playwright.yml]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Build
+        run: bun run build
+      - name: Upload build as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          include-hidden-files: true
+          path: |
+            public
+            .svelte-kit
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    environment:
-      name: '#${{ github.event.number }}: End-to-end tests report'
-      url: ${{ steps.deploy-preview.outputs.preview-url }}
+    name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
+    needs: prepare
+    container:
+      image: ghcr.io/gwennlbh/playwright-bun:v1.55.0
+      options: --user 1001
+    strategy:
+      fail-fast: false
+      matrix:
+        shard-index: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard-count: [8]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: lts/*
+          bun-version-file: .bun-version
       - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: bun install --frozen-lockfile
+      - name: Download built app
+        uses: actions/download-artifact@v5
+        with:
+          name: build
+          path: ./
+      - name: Remove task-type spec files for better sharding balance
+        run: rm tests/tasks/*
       - name: Run Playwright tests
-        run: npx playwright test
+        run: bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
+        env:
+          SHARDING: '1'
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-report-shard-${{ matrix.shard-index }}
+          path: blob-report/
           retention-days: 30
+
+  combine-reports:
+    runs-on: ubuntu-latest
+    needs: test
+    # run even if tests fail
+    if: always()
+    environment:
+      name: '#${{ github.event.number }}: End-to-end tests report'
+      url: ${{ steps.deploy-preview.outputs.preview-url }}
+    name: Combine reports
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
+        with:
+          path: ./playwright-report-shards
+          pattern: playwright-report-shard-*
+          merge-multiple: true
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Merge sharded reports into HTML
+        run: bunx playwright merge-reports --reporter html ./playwright-report-shards
 
       - name: Deploy results on github pages
         if: ${{ !cancelled() }}

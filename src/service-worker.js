@@ -12,7 +12,10 @@ const MODELS_CACHE = `cache-models`;
 const ASSETS = [
 	...build, // the app itself
 	...files // everything in `static`
-];
+].filter((u) =>
+	// Prevent trying to cache app://-/ URLs when running with Electron
+	/^https?:\/\//.test(u)
+);
 
 self.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
@@ -47,7 +50,7 @@ self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 
 		if (cacheName === MODELS_CACHE) {
 			const cache = await caches.open(MODELS_CACHE);
-			console.log(`Serving ${url} from models cache`);
+			console.debug(`Serving ${url} from models cache`);
 			const response = await cache.match(url.href);
 
 			if (response) {

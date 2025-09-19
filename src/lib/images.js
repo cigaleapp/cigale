@@ -1,17 +1,24 @@
 import { uiState } from '$lib/state.svelte';
+import { ulid } from 'ulid';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
+import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
-import { unique } from './utils';
+import { m } from './paraglide/messages';
+import { clamp, unique } from './utils';
+import { imageLimits } from './inference_utils';
+
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
+ * @import * as DB from './database';
  */
 
 /**
  * Used for tests
  * @param {string} id
  * @param {string} fileId
- * @return {Image}
+ * @returns {Image}
  */
 const sampleImage = (id, fileId) => ({
 	id,
@@ -25,30 +32,59 @@ const sampleImage = (id, fileId) => ({
 });
 
 /**
- * Retourne un id d'image sous la forme 000001_000001
- * @param {number|string} index
+ * Retourne un id d'image
+ * @example "01ARZ3NDEKTSV4RRFFQ69G5FAV_000001"
+ * @param {string} fileId
  * @param {number} subindex
  */
-export function imageId(index, subindex = 0) {
-	return `${imageFileId(index)}_${subindex.toString().padStart(6, '0')}`;
+export function imageId(fileId, subindex = 0) {
+	return `${fileId}_${subindex.toString().padStart(6, '0')}`;
 }
 
 /**
- * Retourne un id d'un ImageFile sous la forme 000001
- * @param {number|string} index
+ * Retourne un id d'un ImageFile
+ * @example "01ARZ3NDEKTSV4RRFFQ69G5FAV"
  */
-export function imageFileId(index) {
-	return Number.parseInt(index.toString(), 0).toString().padStart(6, '0');
+export function imageFileId() {
+	return ulid();
 }
 
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('imageId', () => {
-		expect(imageId(1)).toBe('000001_000000');
-		expect(imageId(1, 2)).toBe('000001_000002');
-		expect(imageId(1234567)).toBe('1234567_000000');
-		expect(imageId(1234567, 1234567)).toBe('1234567_1234567');
+		const id = imageFileId();
+		expect(imageId(id)).toBe(id + '_000000');
+		expect(imageId(id, 2)).toBe(id + '_000002');
+		expect(imageId(id, 1234567)).toBe(id + '_1234567');
 	});
+}
+
+/**
+ * @param {string} id
+ */
+export function isValidImageId(id) {
+	return /^[0-9A-Z]{26}_\d+$/.test(id);
+}
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+	describe('isValidImageId', () => {
+		test('imageId() generates a valid ID', () => {
+			expect(isValidImageId(imageId(imageFileId(), 0))).toBe(true);
+		});
+		test('imageFileId() is not a valid image ID by itself', () => {
+			expect(isValidImageId(imageFileId())).toBe(false);
+		});
+	});
+}
+
+/**
+ * @param {string} id
+ */
+function invalidImageIdError(id) {
+	return new Error(
+		`Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): ${id}`
+	);
 }
 
 /**
@@ -60,8 +96,8 @@ if (import.meta.vitest) {
 export function imageIdToFileId(id) {
 	if (id === undefined) return id;
 
-	if (!/^\d+_\d+$/.test(id)) {
-		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${id}`);
+	if (!isValidImageId(id)) {
+		throw invalidImageIdError(id);
 	}
 	// @ts-expect-error
 	return id?.replace(/(_\d+)+$/, '');
@@ -70,23 +106,28 @@ export function imageIdToFileId(id) {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('imageIdToFileId', () => {
-		expect(imageIdToFileId('000001_000000')).toBe('000001');
-		expect(imageIdToFileId('1234567_1234567')).toBe('1234567');
-		expect(() => imageIdToFileId('1234567_1234567_1234567')).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): 1234567_1234567_1234567]`
+		const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+		expect(imageIdToFileId(`${id}_000000`)).toBe(id);
+		expect(imageIdToFileId(`${id}_1234567`)).toBe(id);
+		expect(() => imageIdToFileId(`${id}_${id}_123456`)).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 0001KVE9TGKVKZ3GG307YQ70CZ_0001KVE9TGKVKZ3GG307YQ70CZ_123456]`
 		);
 		expect(imageIdToFileId(undefined)).toBeUndefined();
+		expect(() => imageIdToFileId('000001')).toThrowErrorMatchingInlineSnapshot(
+			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 000001]`
+		);
 	});
 }
 
 /**
- * @param {Protocol} protocol
+ * @param {Protocol|undefined} protocol
  * @param {string|null} imageFileId
  */
 export function imageIsAnalyzed(protocol, imageFileId) {
+	if (!protocol) return false;
 	if (!imageFileId) return false;
 	if (uiState.erroredImages.has(imageFileId)) return true;
-	return tables.Image.state.some((img) => img.fileId === imageFileId);
+	return tables.Image.state.some((img) => img.fileId === imageFileId && img.boundingBoxesAnalyzed);
 }
 
 /**
@@ -118,35 +159,46 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 		{ tx },
 		async (tx) => {
 			const observations = await tx.objectStore('Observation').getAll();
+			// Store there cuz imagesOfImageFile() reads from reactive state.
+			const imagesOfFile = imagesOfImageFile(id);
 			try {
-				imagesOfImageFile(id).map(({ id }) => tx.objectStore('Image').delete(id));
 				tx.objectStore('ImageFile').delete(id);
 				tx.objectStore('ImagePreviewFile').delete(id);
-				observations
-					.filter(({ images }) => images.includes(id))
-					.map(({ images, ...rest }) =>
-						tx.objectStore('Observation').put({
-							...rest,
-							images: images.filter((imageId) => imageId !== id)
-						})
-					);
-			} catch (error) {
-				if (notFoundOk) return;
-				throw error;
-			}
-			uiState.erroredImages.delete(id);
-			uiState.loadingImages.delete(id);
-			if (uiState.imageOpenedInCropper === id) {
-				uiState.imageOpenedInCropper = '';
-			}
 
-			const previewURL = uiState.previewURLs.get(id);
-			if (previewURL) {
-				URL.revokeObjectURL(previewURL);
-				uiState.previewURLs.delete(id);
+				for (const image of imagesOfFile) {
+					tx.objectStore('Image').delete(image.id);
+
+					for (const observation of observations) {
+						const remainingImages = observation.images.filter((imageId) => imageId !== image.id);
+
+						if (remainingImages.length === 0) {
+							tx.objectStore('Observation').delete(observation.id);
+						} else if (remainingImages.length < observation.images.length) {
+							tx.objectStore('Observation').put({
+								...observation,
+								images: remainingImages
+							});
+						}
+					}
+				}
+			} catch (error) {
+				if (!notFoundOk) return Promise.reject(error);
 			}
 		}
 	);
+
+	uiState.erroredImages.delete(id);
+	uiState.loadingImages.delete(id);
+	uiState.queuedImages.delete(id);
+	if (uiState.imageOpenedInCropper === id) {
+		uiState.imageOpenedInCropper = '';
+	}
+
+	const previewURL = uiState.previewURLs.get(id);
+	if (previewURL) {
+		URL.revokeObjectURL(previewURL);
+		uiState.previewURLs.delete(id);
+	}
 }
 
 /**
@@ -200,6 +252,8 @@ const MAXWIDTH = 1024;
  */
 const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
 
+const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
+
 /**
  * Resize an image to fit within MAXWIDTH and MAXHEIGHT
  * @param {object} param0
@@ -209,8 +263,21 @@ const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width)
 export async function resizeToMaxSize({ source }) {
 	// For some reason top-level import fails
 	const { resize } = await import('pica-gpu');
-	const originalImage = await createImageBitmap(source);
+	const originalImage = await createImageBitmap(source).catch((error) => {
+		throw new Error(
+			ALWAYS_SUPPORTED_TYPES.includes(source.type)
+				? errorMessage(error)
+				: ['image/CR2', 'image/x-canon-cr2'].includes(source.type)
+					? m.file_format_not_supported_yet({ format: '.CR2' })
+					: m.file_format_not_supported({ format: humanFormatName(source.type) })
+		);
+	});
 	const { width, height } = originalImage;
+
+	if (width * height > imageLimits.maxResolutionInMP * 1e6) {
+		throw new Error(m.image_too_large(imageLimits));
+	}
+
 	const originalCanvas = document.createElement('canvas');
 	originalCanvas.width = width;
 	originalCanvas.height = height;
@@ -280,7 +347,7 @@ if (import.meta.vitest) {
 	/**
 	 * @param {string} id
 	 * @param {string} fileId
-	 * @return {Image}
+	 * @returns {Image}
 	 */
 	const img = (id, fileId) => ({
 		id,
@@ -329,8 +396,8 @@ if (import.meta.vitest) {
  * @returns {{ fileId: string; subindex: number|null }}
  */
 export function parseImageId(imageId) {
-	if (!/^\d+(_\d+)?$/.test(imageId)) {
-		throw new Error(`Malformed image id (correct format is XXXXXX_XXXXXX): ${imageId}`);
+	if (!isValidImageId(imageId) && !isValidImageId(`${imageId}_000000`)) {
+		throw invalidImageIdError(imageId);
 	}
 
 	const [fileId, subindex] = imageId.split('_', 2);
@@ -342,13 +409,90 @@ export function parseImageId(imageId) {
 }
 
 if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('parseImageId', () => {
-		expect(parseImageId('000001_000000')).toEqual({ fileId: '000001', subindex: 0 });
-		expect(parseImageId('1234567_1234567')).toEqual({ fileId: '1234567', subindex: 1234567 });
-		expect(parseImageId('1234567')).toEqual({ fileId: '1234567', subindex: null });
-		expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is XXXXXX_XXXXXX): coming in hot!!!]`
-		);
+	const { test, expect, describe } = import.meta.vitest;
+	describe('parseImageId', () => {
+		test('parses regular IDs', () => {
+			const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+			expect(parseImageId(`${id}_000000`)).toEqual({ fileId: id, subindex: 0 });
+			expect(parseImageId(`${id}_1234567`)).toEqual({ fileId: id, subindex: 1234567 });
+		});
+		test('parses ImageFile IDs', () => {
+			const id = '0001KVE9TGKVKZ3GG307YQ70CZ';
+			expect(parseImageId(id)).toEqual({ fileId: id, subindex: null });
+		});
+		test('throws on malformed IDs', () => {
+			expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
+				`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): coming in hot!!!]`
+			);
+		});
+
+		test('roundtrip', () => {
+			const id = imageFileId();
+			expect(parseImageId(imageId(id, 1234567))).toStrictEqual({
+				fileId: id,
+				subindex: 1234567
+			});
+		});
 	});
+}
+
+/**
+ * @param {ArrayBuffer} bytes image bytes
+ * @param {string} contentType content type of the image
+ * @param {import('./metadata').RuntimeValue<'boundingbox'>} centeredBoundingBox
+ * @param {string} [padding] padding to add around the bounding box when cropping images. string of the form "npx" or "n%"
+ * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
+ */
+export async function cropImage(bytes, contentType, centeredBoundingBox, padding = '0px') {
+	const bitmap = await createImageBitmap(new Blob([bytes], { type: contentType }));
+	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
+		toTopLeftCoords(centeredBoundingBox)
+	);
+
+	const { inPixels } = parseCropPadding(padding);
+	const paddingPixels = { x: inPixels(bitmap.width), y: inPixels(bitmap.height) };
+
+	try {
+		const croppedBitmap = await createImageBitmap(
+			bitmap,
+			clamp(boundingBox.x - paddingPixels.x, 0, bitmap.width),
+			clamp(boundingBox.y - paddingPixels.y, 0, bitmap.height),
+			clamp(boundingBox.width + 2 * paddingPixels.x, 1, bitmap.width),
+			clamp(boundingBox.height + 2 * paddingPixels.y, 1, bitmap.height)
+		);
+
+		const canvas = new OffscreenCanvas(croppedBitmap.width, croppedBitmap.height);
+		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
+		const croppedBytes = await canvas
+			.convertToBlob({
+				type: ['image/png', 'image/jpeg'].includes(contentType) ? contentType : 'image/png'
+			})
+			.then((blob) => blob.arrayBuffer());
+
+		// @ts-ignore
+		return { cropped: croppedBytes, original: bytes };
+	} catch (error) {
+		throw new Error(`Couldn't crop with ${JSON.stringify({ boundingBox, padding })}: ${error}`, {
+			cause: error
+		});
+	} finally {
+		bitmap.close();
+	}
+}
+
+/**
+ *
+ * @param {string} padding
+ * @returns {{ withUnit: string, unitless: number, unit: 'px' | '%', inPixels: (basis: number) => number }}
+ */
+export function parseCropPadding(padding) {
+	const match = padding.match(/(\d+)(px|%)/);
+	if (!match) throw new Error(`Invalid crop padding: ${padding}`);
+	const [value, unit] = [Number.parseInt(match[1], 10), /** @type {'%'|'px'} */ (match[2])];
+	return {
+		withUnit: padding,
+		unitless: value,
+		unit,
+		inPixels: (axis) => (unit === 'px' ? value : Math.round((axis * value) / 100))
+	};
 }

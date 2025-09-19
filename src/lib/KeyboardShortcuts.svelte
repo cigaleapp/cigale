@@ -1,17 +1,24 @@
 <script>
 	// @ts-ignore
-	import { tinykeys } from 'tinykeys';
-	import Modal, { hasAnyModalOpen } from './Modal.svelte';
-	import { onMount } from 'svelte';
-	import KeyboardHint from './KeyboardHint.svelte';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
+	import { tinykeys } from 'tinykeys';
+	import KeyboardHint from './KeyboardHint.svelte';
+	import Modal, { hasAnyModalOpen } from './Modal.svelte';
+	import { m } from './paraglide/messages.js';
+	import { isDebugMode } from './settings.svelte';
+	import { entries } from './utils';
+
+	/**
+	 * @import { Keybind, Keymap } from '$lib/state.svelte.js'
+	 */
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {import('$lib/state.svelte.js').Keymap} binds
+	 * @property {Keymap} binds
 	 * @property {boolean} [preventDefault=false] call e.preventDefault() before calling the handlers
-	 * @property {() => void} [openHelp] open modal listing all keybindings
+	 * @property {(() => void) | undefined} [openHelp] open modal listing all keybindings
 	 */
 
 	/** @type {Props} */
@@ -45,11 +52,12 @@
 						pattern,
 						/** @param {MouseEvent|KeyboardEvent} e */
 						async (e) => {
-							if (hasAnyModalOpen(page)) {
-								console.log(`a modal is open, ignoring keybinding ${pattern}`, page.state);
+							if (!bind?.allowInModals && hasAnyModalOpen(page)) {
+								console.warn(`a modal is open, ignoring keybinding ${pattern}`, page.state);
 								return;
 							}
 							if (bind.when && !bind.when(e)) return;
+							if (bind.debug && !isDebugMode()) return;
 							// Stick in a call to event.preventDefault()
 							// before calling the handler function if "preventDefault" is true
 							if (preventDefault) e.preventDefault();
@@ -58,6 +66,27 @@
 					])
 			)
 		)
+	);
+
+	const GROUPS_ORDER = [
+		m.keyboard_shortcuts_group_cropping(),
+		m.keyboard_shortcuts_group_observations(),
+		m.keyboard_shortcuts_group_general(),
+		m.keyboard_shortcuts_group_navigation(),
+		'Debug mode'
+	];
+
+	const bindsByGroup = $derived(
+		entries(
+			entries(binds).reduce((acc, [key, bind]) => {
+				if (bind.hidden) return acc;
+				if (bind.debug && !isDebugMode()) return acc;
+				const group = bind.group ?? m.keyboard_shortcuts_group_general();
+				if (!acc[group]) acc[group] = [];
+				acc[group].push([key, bind]);
+				return acc;
+			}, /** @type {Record<string, Array<[string, Keybind]>>} */ ({}))
+		).toSorted(([a], [b]) => GROUPS_ORDER.indexOf(a) - GROUPS_ORDER.indexOf(b))
 	);
 
 	onMount(() => {
@@ -71,22 +100,27 @@
 	});
 </script>
 
-<Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title="Raccourcis clavier">
-	<dl>
-		<!-- Object.entries({a: 1, b: 2}) gives [["a", 1], ["b", 2]] -->
-		<!-- Then we filter out keybindings that are marked as hidden -->
-		{#each Object.entries(binds).filter(([_, { hidden }]) => !hidden) as [shortcut, { help }] (shortcut)}
-			<dt>
-				<KeyboardHint --size="1.2em" {shortcut} {help} />
-			</dt>
-			<dd>{help}</dd>
-		{:else}
+<Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title={m.keyboard_shortcuts()}>
+	{#each bindsByGroup as [group, binds] (group)}
+		{#if bindsByGroup.length >= 2}
+			<h2>{group}</h2>
+		{/if}
+		<dl>
+			{#each binds as [shortcut, { help }] (shortcut)}
+				<dt>
+					<KeyboardHint --size="1.2em" {shortcut} {help} />
+				</dt>
+				<dd>{help}</dd>
+			{/each}
+		</dl>
+	{:else}
+		<dl>
 			<div class="empty">
 				<div class="sad">¯\_(ツ)_/¯</div>
-				<p>Aucun raccouci clavier pour cette page</p>
+				<p>{m.no_keyboard_shortcuts_for_page()}</p>
 			</div>
-		{/each}
-	</dl>
+		</dl>
+	{/each}
 </Modal>
 
 <style>
@@ -121,5 +155,15 @@
 		margin-bottom: 0.5em;
 		font-weight: bold;
 		color: var(--gray);
+	}
+
+	h2 {
+		font-size: 1.2rem;
+		font-weight: normal;
+		color: var(--gray);
+	}
+
+	h2:not(:first-child) {
+		margin-top: 0.5em;
 	}
 </style>

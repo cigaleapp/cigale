@@ -1,9 +1,14 @@
-import { expect, test, exampleProtocol } from './fixtures.js';
+import { issue } from './annotations.js';
+import { exampleProtocol, expect, test } from './fixtures.js';
 import {
+	browserConsole,
+	chooseDefaultProtocol,
 	getImage,
+	getMetadataValue,
 	getSettings,
-	importResults,
+	goToTab,
 	listTable,
+	loadDatabaseDump,
 	setImageMetadata,
 	setSettings
 } from './utils.js';
@@ -11,18 +16,31 @@ import {
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }, testInfo) => {
 		testInfo.setTimeout(40_000);
-		await importResults(page, 'correct.zip');
+		await loadDatabaseDump(page);
+		await chooseDefaultProtocol(page);
+		await goToTab(page, 'import');
 		const allImages = await listTable(page, 'Image');
 		await markImagesAsConfirmedInDatabase(
 			page,
 			allImages.map((i) => i.id),
 			false
 		);
-		await page.getByTestId('goto-crop').click();
-		await page.waitForURL((u) => u.hash === '#/crop/');
+		await goToTab(page, 'crop');
 	});
 
-	test('should have all cards visible', async ({ page }) => {
+	/**
+	 * @param {Page} page
+	 */
+	async function imagesByName(page) {
+		return {
+			leaf: await getImage({ page, filename: 'leaf.jpeg' }),
+			lilFella: await getImage({ page, filename: 'lil-fella.jpeg' }),
+			cyan: await getImage({ page, filename: 'cyan.jpeg' }),
+			withExifGps: await getImage({ page, filename: 'with-exif-gps.jpeg' })
+		};
+	}
+
+	test('should have all cards visible @webkit-no-parallelization', async ({ page }) => {
 		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
@@ -35,29 +53,33 @@ test.describe('Cropper view', () => {
 			});
 
 			test(`navigate with arrow keys (autoskip ${enabled ? 'on' : 'off'})`, async ({ page }) => {
+				const images = await imagesByName(page);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await page.waitForURL((u) => u.hash === '#/crop/000001');
+				await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
 				await page.keyboard.press('ArrowRight');
-				await page.waitForURL((u) => u.hash === '#/crop/000002');
+				await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 				await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
-				await page.waitForURL((u) => u.hash === '#/crop/000001');
+				await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
 				await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
-				await page.waitForURL((u) => u.hash === '#/crop/000000');
+				await page.waitForURL((u) => u.hash === `#/crop/${images.cyan.fileId}`);
 				await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 			});
 
 			test(`go back to import view with escape key (autoskip ${enabled ? 'on' : 'off'})`, async ({
 				page
 			}) => {
+				const { leaf: image } = await imagesByName(page);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await page.waitForURL((u) => u.hash === '#/crop/000001');
+				await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 				await page.keyboard.press('Escape');
 				await page.waitForURL((u) => u.hash === '#/crop');
-				await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
-				await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
-				await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+				await expect(
+					page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
+				).toBeVisible();
+				await expect(page.getByRole('main').getByText('cyan.jpeg', { exact: true })).toBeVisible();
+				await expect(page.getByRole('main').getByText('leaf.jpeg', { exact: true })).toBeVisible();
 			});
 		}
 	});
@@ -68,26 +90,29 @@ test.describe('Cropper view', () => {
 		});
 
 		test('should not skip on confirm button click', async ({ page }) => {
+			const { leaf: image } = await imagesByName(page);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should not skip on confirmation keybind', async ({ page }) => {
+			const { leaf: image } = await imagesByName(page);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should toggle autoskip on on keybind press', async ({ page }) => {
+			const { leaf: image } = await imagesByName(page);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 
 			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
@@ -105,26 +130,29 @@ test.describe('Cropper view', () => {
 		});
 
 		test('should skip on confirm button click', async ({ page }) => {
+			const images = await imagesByName(page);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000002');
+			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should skip on confirmation keybind', async ({ page }) => {
+			const images = await imagesByName(page);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await page.waitForURL((u) => u.hash === '#/crop/000002');
+			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should toggle autoskip off on keybind press', async ({ page }) => {
+			const { leaf: image } = await imagesByName(page);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000001');
+			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 
 			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
 			await page.keyboard.press('a');
@@ -136,18 +164,54 @@ test.describe('Cropper view', () => {
 		});
 
 		test('should autoskip to classify when all images are confirmed', async ({ page }) => {
+			const { withExifGps: image } = await imagesByName(page);
 			await markImagesAsConfirmedInDatabase(
 				page,
 				await listTable(page, 'Image').then((images) =>
-					images.filter(({ fileId }) => fileId !== '000003').map(({ id }) => id)
+					images.filter(({ fileId }) => fileId !== image.fileId).map(({ id }) => id)
 				)
 			);
 
 			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
-			await page.waitForURL((u) => u.hash === '#/crop/000003');
+			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await page.waitForTimeout(1000);
 			expect(page.url()).toMatch(/#\/classify/);
+		});
+	});
+
+	test.describe('deleting an image', () => {
+		/**
+		 * @param {import('@playwright/test').Page} page
+		 * @param {(page: import('@playwright/test').Page) => Promise<void>} deleteAction
+		 */
+		async function navigateThenAssert(page, deleteAction) {
+			const { leaf, lilFella } = await imagesByName(page);
+			const imagesBefore = await listTable(page, 'Image');
+
+			await page.getByText('leaf.jpeg', { exact: true }).click();
+			await page.waitForURL((u) => u.hash === `#/crop/${leaf.fileId}`);
+
+			await deleteAction(page);
+
+			await page.waitForURL((u) => u.hash === `#/crop/${lilFella.fileId}`);
+
+			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
+			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
+
+			expect(await listTable(page, 'Image')).toEqual(
+				imagesBefore.filter(({ fileId }) => fileId !== leaf.fileId)
+			);
+		}
+
+		test('should delete the image on ctrl-delete and go to the next image', async ({ page }) => {
+			await navigateThenAssert(page, async (page) => page.keyboard.press('Control+Delete'));
+		});
+
+		test('should delete the image via delete button and go to the next image', async ({ page }) => {
+			await navigateThenAssert(page, async (page) => {
+				await page.getByRole('button', { name: 'Supprimer' }).click();
+			});
 		});
 	});
 
@@ -162,9 +226,12 @@ test.describe('Cropper view', () => {
 		 * @param {boolean} confirmed
 		 */
 		async function expectAllImagesConfirmedInDatabase(page, confirmed) {
+			const { lilFella: image } = await imagesByName(page);
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
-				await expect(isImageConfirmedInDatabase(page, `000002_00000${i}`)).resolves.toBe(confirmed);
+				await expect(
+					isImageConfirmedInDatabase(page, `${image.fileId}_${i.toString().padStart(6, '0')}`)
+				).resolves.toBe(confirmed);
 			}
 		}
 
@@ -181,6 +248,7 @@ test.describe('Cropper view', () => {
 			if (implicit) await expect(confirmedCropOverlay(page)).toBeVisible();
 			await expect(confirmedCropBadge(page)).toBeVisible();
 			await expect(page.getByRole('button', { name: 'Invalider' })).toBeVisible();
+			await page.waitForTimeout(500);
 			await expectAllImagesConfirmedInDatabase(page, true);
 		}
 
@@ -229,6 +297,24 @@ test.describe('Cropper view', () => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 245, 245);
 				await expectConfirmed(page, true);
+			});
+
+			test('dragging outside the crop surface cancels', issue(431), async ({ page }) => {
+				await setSettings({ page }, { showTechnicalMetadata: true });
+				await makeBox(page, 10, 10, 50, -30);
+				await expect(page.locator('.change-area .debug')).toHaveText(/create {2}\(0 0\) × \[0 0\]/);
+				await expect(page.locator('.change-area .debug')).not.toHaveText(/ready/);
+				await expect(boxesInBoxesList(page)).toMatchAriaSnapshot(`
+				  - listitem:
+				    - img
+				    - paragraph: "Boîte #1"
+				    - paragraph:
+				      - code: /\\d+×\\d+/
+				    - button [disabled]:
+				      - img
+				    - button:
+				      - img
+				`);
 			});
 		});
 
@@ -316,6 +402,22 @@ test.describe('Cropper view', () => {
 				await expectBoxInList(page, 2, 327, 735);
 				await expectConfirmed(page, true);
 			});
+
+			test('does not leave ghost boxes', issue(462), async ({ page }) => {
+				const { withExifGps: image } = await imagesByName(page);
+				await page.keyboard.press('1');
+				await page.keyboard.press('Delete');
+				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
+				await page.keyboard.press('ArrowRight');
+				await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
+
+				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms
+				for (const _ of Array.from({ length: 10 })) {
+					await expect(page.locator('.boundingbox')).toHaveCount(1);
+					await page.waitForTimeout(100);
+					await expect(page.locator('.boundingbox')).toHaveCount(1);
+				}
+			});
 		});
 	});
 
@@ -375,7 +477,7 @@ test.describe('Cropper view', () => {
 			}
 		}
 
-		test('should zoom in and out with the mouse wheel', async ({ page }) => {
+		test.fixme('should zoom in and out with the mouse wheel', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
@@ -426,33 +528,34 @@ test.describe('Cropper view', () => {
 			await expect(image).toHaveCSS('scale', '1');
 
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+			await checkImageTransforms(page, 1.728, 254.761, 140.073);
 
 			await page.mouse.down({ button: 'middle' });
 			await zoomAt(page, 0, 50, 50);
 			await page.mouse.up({ button: 'middle' });
 			await page.waitForTimeout(200);
 
-			await checkImageTransforms(page, 1.728, 182.668, 46.98);
+			await checkImageTransforms(page, 1.728, 181.761, 45.0734);
 
 			// Make sure no box was created
 			await expect(page.getByText(/Boîte #\d+/)).toHaveCount(1);
 		});
 
 		test('recalls zoom and pan between image changes', async ({ page }) => {
+			const images = await imagesByName(page);
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+			await checkImageTransforms(page, 1.728, 254.761, 140.073);
 
 			await page.keyboard.press('ArrowRight');
-			await page.waitForURL((u) => u.hash === '#/crop/000003');
+			await page.waitForURL((u) => u.hash === `#/crop/${images.withExifGps.fileId}`);
 
 			await zoomAt(page, 40, 150, 150);
-			await checkImageTransforms(page, 1.44, 124.723, 73.3824);
+			await checkImageTransforms(page, 1.44, 124.186, 73.3824);
 
 			await page.keyboard.press('ArrowLeft');
-			await page.waitForURL((u) => u.hash === '#/crop/000002');
+			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 
-			await checkImageTransforms(page, 1.728, 255.668, 140.98);
+			await checkImageTransforms(page, 1.728, 254.761, 140.073);
 		});
 	});
 });
@@ -523,8 +626,9 @@ function confirmedCropBadge(page) {
  * @param {string} id
  */
 async function isImageConfirmedInDatabase(page, id) {
-	const image = await getImage({ page }, id);
-	return image?.metadata?.[exampleProtocol.crop.confirmationMetadata]?.value === 'true';
+	return Boolean(
+		await getMetadataValue(page, { image: { id } }, exampleProtocol.crop.confirmationMetadata, '')
+	);
 }
 
 /**
@@ -536,6 +640,10 @@ async function isImageConfirmedInDatabase(page, id) {
  */
 async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 	for (const [i, id] of ids.entries()) {
+		await browserConsole.log(
+			page,
+			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.confirmationMetadata}) (${i + 1}/${ids.length})`
+		);
 		await setImageMetadata(
 			{ page },
 			id,

@@ -65,9 +65,9 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
  * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} request
  * @param {boolean} webgpu
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [onProgress] called everytime the progress changes
- * @returns {Promise<import('onnxruntime-web').InferenceSession | undefined> }
+ * @returns {Promise<import('onnxruntime-web').InferenceSession > }
  */
-export async function loadModel(request, onProgress, webgpu = false) {
+export async function loadModel(request, webgpu = false, onProgress) {
 	// load un modèle ONNX, soit de classification, soit de détection.
 
 	onProgress ??= () => {};
@@ -79,10 +79,23 @@ export async function loadModel(request, onProgress, webgpu = false) {
 		.then((response) => response.arrayBuffer())
 		.then((buffer) => new Uint8Array(buffer));
 
-	return ort.InferenceSession.create(model, {
+	const session = ort.InferenceSession.create(model, {
 		executionProviders: webgpu ? ['webgpu'] : []
 	});
+
+	if (!session) throw new Error('Impossible de charger le modèle ONNX');
+	return session;
 }
+
+/**
+ * @param {import('$lib/database').HTTPRequest} model
+ * @returns {string}
+ */
+export function modelUrl(model) {
+	if (typeof model === 'string') return model;
+	return model.url;
+}
+
 /**
  *
  * @param {object} taskSettings
@@ -94,6 +107,7 @@ export async function loadModel(request, onProgress, webgpu = false) {
  * @param {object} taskSettings.output
  * @param {string} taskSettings.output.name
  * @param {import('./database.js').ModelDetectionOutputShape} taskSettings.output.shape
+ * @param {AbortSignal} [taskSettings.abortSignal]
  * @param {ArrayBuffer[]} buffers
  * @param {import('onnxruntime-web').InferenceSession} session
  * @param {typeof import('./state.svelte.js').uiState} [uiState]
@@ -102,7 +116,7 @@ export async function loadModel(request, onProgress, webgpu = false) {
  * @returns {Promise<[BB[][], number[][], number, ort.Tensor[]]>}
  */
 export async function infer(
-	taskSettings,
+	{ abortSignal, ...taskSettings },
 	buffers,
 	session,
 	uiState,
@@ -133,7 +147,7 @@ export async function infer(
     */
 
 	if (webgpu) {
-		console.log('webgpu not implemented yet, using wasm');
+		console.warn('webgpu not implemented yet, using wasm');
 	}
 	if (!session) {
 		throw new Error('Model not loaded');
@@ -141,7 +155,6 @@ export async function infer(
 	let start = -1;
 	if (!sequence) {
 		start = Date.now();
-		if (uiState) uiState.processing.state = 'inference';
 	}
 
 	taskSettings = {
@@ -160,22 +173,19 @@ export async function infer(
 	};
 	let inputTensor;
 
-	console.log('loading images...');
-	inputTensor = await loadToTensor(buffers, taskSettings.input);
+	inputTensor = await loadToTensor(buffers, { ...taskSettings.input, abortSignal });
 
-	console.log('inference...');
+	// TODO figure out a way to use the abortSignal while running the inference
 	const outputTensor = await session.run({ [taskSettings.input.name]: inputTensor });
-	console.log('done !');
-	console.log('output tensor: ', outputTensor);
 
-	console.log('post proc...');
 	const bbs = output2BB(
 		taskSettings.output.shape,
 		/** @type {Float32Array} */ (outputTensor[taskSettings.output.name].data),
 		buffers.length,
-		NUMCONF
+		NUMCONF,
+		abortSignal
 	);
-	console.log('done !');
+
 	const [boundingboxes, bestScores] = bbs;
 	if (!sequence && uiState) {
 		uiState.processing.done = buffers.length;
@@ -190,14 +200,17 @@ export async function infer(
  * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
  * @param {ort.Tensor} image
  * @param {import('onnxruntime-web').InferenceSession} model
+ * @param {AbortSignal} [abortSignal]
  * @returns {Promise<number[]>} scores for each class
  */
-export async function classify(settings, image, model) {
+export async function classify(settings, image, model, abortSignal) {
 	const inputName = settings.input.name ?? model.inputNames[0];
 
-	const input = await preprocessTensor(settings, image, MEAN, STD);
+	const input = await preprocessTensor(settings, image, MEAN, STD, abortSignal);
 
 	const output = await model.run({ [inputName]: input });
+
+	abortSignal?.throwIfAborted();
 
 	const scores = await output[Object.keys(output)[0]]
 		.getData(true)

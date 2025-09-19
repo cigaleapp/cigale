@@ -1,7 +1,17 @@
 name: Desktop app
 
 on:
+  workflow_dispatch:
   push:
+    tags: [v*]
+  pull_request:
+    paths:
+      - .github/workflows/electron.yml
+      - src/electron/
+      - vite.electron*
+      - forge.*
+      - package.json
+      - package-lock.json
 
 # https://www.electronforge.io/config/publishers/github#authentication
 permissions:
@@ -19,15 +29,29 @@ jobs:
     name: Build for ${{ matrix.name }}
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '20'
+          bun-version-file: .bun-version
+
+      # Install flatpak for Linux builds
+      - name: Install flatpak
+        if: matrix.os == 'ubuntu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
       - name: Build & package app
-        run: npm run prebuild; npx electron-forge make
+        run: bun run prebuild; bunx electron-forge make
+        env: { ELECTRON_BUILD: '1' }
+      - name: see output
+        uses: jaywcjlove/github-action-folder-tree@main
+        with:
+          path: .vite
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

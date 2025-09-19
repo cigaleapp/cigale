@@ -1,12 +1,12 @@
 import { match, type } from 'arktype';
-import { format } from 'date-fns';
+import * as dates from 'date-fns';
 import * as exifParser from 'exif-parser';
 import piexif from 'piexifjs';
 import { Schemas } from './database.js';
 import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
 import { storeMetadataValue } from './metadata.js';
-import { ensureNamespacedMetadataId } from './protocols.js';
+import { ensureNamespacedMetadataId } from './schemas/metadata.js';
 import { toasts } from './toasts.svelte.js';
 
 /**
@@ -64,6 +64,7 @@ export async function processExifData(protocolId, imageFileId, imageBytes, file)
 	for (const { id: subjectId } of images) {
 		for (const [key, { value, confidence }] of Object.entries(metadataFromExif)) {
 			await storeMetadataValue({
+				db: db.databaseHandle(),
 				subjectId,
 				metadataId: ensureNamespacedMetadataId(key, protocolId),
 				value,
@@ -89,7 +90,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 	const exif = exifParser.create(buffer).enableImageSize(false).parse();
 
 	if (!exif) return {};
-	console.log({ extractionPlan, exif });
+	console.debug('Starting EXIF Extraction', { extractionPlan, exif });
 
 	const extract = match
 		.case(
@@ -178,7 +179,7 @@ export function coerceExifValue(value, coerceTo) {
  * @returns {string|any[]}
  */
 export function serializeExifValue(value) {
-	if (value instanceof Date) return format(value, 'yyyy:MM:dd HH:mm:ss');
+	if (value instanceof Date) return dates.format(value, 'yyyy:MM:dd HH:mm:ss');
 	// Let multivalued exif entries through
 	if (Array.isArray(value)) return value;
 	if (value === undefined) return 'undefined';
@@ -246,9 +247,10 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 
 	// Piexif wants bytes _as a string_. why??? idk. but it seems like npm has no decent EXIF libraries that both support browsers and writing exif data.
 	let bytesstr = '';
-	// Build bytesstr in chunks, since String.fromCharCode is limited to ≥65535 characters (see https://stackoverflow.com/q/76857530 and https://stackoverflow.com/a/22747272)
-	for (let i = 0; i < bytes.byteLength; i += 65_000) {
-		const chunk = bytes.slice(i, i + 65_000);
+	// Build bytesstr in chunks, since String.fromCharCode is limited in characters size (see https://stackoverflow.com/q/76857530 and https://stackoverflow.com/a/22747272)
+	let chunksize = 32_000;
+	for (let i = 0; i < bytes.byteLength; i += chunksize) {
+		const chunk = bytes.slice(i, i + chunksize);
 		bytesstr += String.fromCharCode(...new Uint8Array(chunk));
 	}
 	const outputstr = piexif.insert(piexif.dump(exifDict), bytesstr);

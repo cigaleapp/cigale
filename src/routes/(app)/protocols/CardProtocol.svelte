@@ -1,12 +1,15 @@
 <script>
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import Card from '$lib/Card.svelte';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { modelUrl } from '$lib/inference';
 	import { metadataDefinitionComparator } from '$lib/metadata';
+	import { m } from '$lib/paraglide/messages.js';
 	import { exportProtocol } from '$lib/protocols';
+	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import IconArrow from '~icons/ph/arrow-right';
@@ -42,14 +45,6 @@
 			.filter(({ id }) => metadata.includes(id))
 			.toSorted(metadataDefinitionComparator({ metadataOrder }))
 	);
-
-	/**
-	 * @param {import('$lib/database').HTTPRequest} source
-	 */
-	function inferenceModelUrl(source) {
-		if (typeof source === 'string') return source;
-		return source.url;
-	}
 </script>
 
 {#snippet modelDetails(
@@ -60,8 +55,9 @@
 			{#if params.name}
 				{params.name}:
 			{/if}
-			<a href={inferenceModelUrl(params.model)}>
-				{inferenceModelUrl(params.model).split('/').at(-1)}
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+			<a href={modelUrl(params.model)}>
+				{modelUrl(params.model).split('/').at(-1)}
 			</a>
 		</p>
 		<p class="id">
@@ -86,6 +82,7 @@
 		{#if learnMore}
 			<p class="source">
 				<IconSource />
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={learnMore}>{learnMore.replace('https://', '')}</a>
 			</p>
 		{/if}
@@ -101,7 +98,7 @@
 			<div class="authors">
 				<IconAuthors />
 				<ul>
-					{#each authors as a (a.email)}
+					{#each authors as a (a.email + a.name)}
 						<li>{@render author(a)}</li>
 					{/each}
 				</ul>
@@ -111,59 +108,53 @@
 	<section class="metadata">
 		<p class="subtitle">{metadata.length} métadonnées</p>
 		<ul>
-			{#each metadataOfProtocol as m (m.id)}
+			{#each metadataOfProtocol as meta (meta.id)}
 				<li>
-					<IconDatatype type={m.type} />
+					<IconDatatype type={meta.type} />
 					<div class="text">
 						<p class="name">
-							{#if m.label}
-								{m.label}
+							{#if meta.label}
+								{meta.label}
 							{:else}
-								<code>{m.id.replace(`${id}__`, '')}</code>
+								<code>{meta.id.replace(`${id}__`, '')}</code>
 							{/if}
-							{#if m.type === 'enum' && m.options}
+							{#if meta.type === 'enum' && meta.options}
 								<span
 									class="enum-options"
 									use:tooltip={[
-										...m.options.slice(0, 10),
-										{ label: m.options.length > 10 ? '…' : '' }
+										...meta.options.slice(0, 10),
+										{ label: meta.options.length > 10 ? '…' : '' }
 									]
 
 										.map((o) => o.label)
 										.filter(Boolean)
 										.join(', ')}
 								>
-									({m.options.length} options)
+									({meta.options.length} options)
 								</span>
 							{/if}
-							{#if !m.label}
-								<sup
-									use:tooltip={"Métadonnée technique, non visible dans l'interface"}
-									style:color="var(--fg-error)"
-								>
+							{#if !meta.label}
+								<sup use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
 									<IconTechnical />
 								</sup>
 							{/if}
-							{#if 'taxonomic' in m}
-								<sup
-									use:tooltip={"Métadonnée taxonomique, déduite de la valeur de d'une autre métadonnée représentant la clade inférieure"}
-									style:color="var(--fg-warning)"
-								>
+							{#if 'taxonomic' in meta}
+								<sup use:tooltip={m.taxonomic_metadata_tooltip()} style:color="var(--fg-warning)">
 									<IconTaxonomy />
 								</sup>
 							{/if}
-							{#if m.id === crop?.metadata || (m.infer && 'neural' in m.infer)}
-								<sup
-									use:tooltip={'Métadonnée auto-détectée par inférence'}
-									style:color="var(--fg-primary)"
-								>
+							{#if meta.id === crop?.metadata || (meta.infer && 'neural' in meta.infer)}
+								<sup use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
 									<IconInferred />
 								</sup>
-							{:else if m.infer && ('exif' in m.infer || ('latitude' in m.infer && 'exif' in m.infer.latitude))}
+							{:else if meta.infer && ('exif' in meta.infer || ('latitude' in meta.infer && 'exif' in meta.infer.latitude))}
 								<sup
-									use:tooltip={'exif' in m.infer
-										? `Métadonnée auto-détectée à partir de la métadonnée EXIF "${m.infer.exif}" de l'image`
-										: `Métadonnée auto-détectée à partir des métadonnées EXIF "${m.infer.latitude.exif}" et "${m.infer.longitude.exif}" de l'image`}
+									use:tooltip={'exif' in meta.infer
+										? m.inferred_from_single_exif({ exif: meta.infer.exif })
+										: m.inferred_from_two_exif({
+												latitude: meta.infer.latitude.exif,
+												longitude: meta.infer.longitude.exif
+											})}
 									style:color="var(--fg-primary)"
 								>
 									<IconTag />
@@ -171,13 +162,13 @@
 							{/if}
 						</p>
 						<code class="id">
-							{#if m.id.startsWith(`${id}__`)}
-								{m.id.replace(`${id}__`, '')}
+							{#if meta.id.startsWith(`${id}__`)}
+								{meta.id.replace(`${id}__`, '')}
 							{:else}
 								<span use:tooltip={"Cette métadonnée n'est pas définie par ce protocole"}>
 									<IconForeign />
 								</span>
-								{m.id}
+								{meta.id}
 							{/if}
 						</code>
 					</div>
@@ -186,7 +177,7 @@
 		</ul>
 	</section>
 	<section class="inference">
-		<p class="subtitle">Inférence</p>
+		<p class="subtitle">{m.inference()}</p>
 
 		<ul>
 			{#if crop}
@@ -194,7 +185,7 @@
 					<IconDetection />
 					<div class="text">
 						<p class="title">
-							Détection &amp; détourage
+							{m.detection_and_cropping()}
 							<IconArrow />
 							<code
 								use:tooltip={`La métadonnée stockant le résultat de la détection: ${crop.metadata}`}
@@ -239,19 +230,20 @@
 	<section class="actions">
 		<ButtonSecondary
 			onclick={async () => {
-				await exportProtocol(base, id).catch((e) => toasts.error(e));
+				await exportProtocol(resolve('/'), id).catch((e) => toasts.error(e));
 			}}
 		>
 			<IconExport />
-			Exporter
+			{m.export()}
 		</ButtonSecondary>
 		<ButtonSecondary
+			disabled={id === uiState.currentProtocolId}
 			onclick={() => {
 				ondelete();
 			}}
 		>
 			<IconDelete />
-			Supprimer
+			{m.delete()}
 		</ButtonSecondary>
 
 		{#if version && source}
@@ -331,7 +323,6 @@
 	}
 
 	.metadata li code,
-	.taxonomy,
 	.name,
 	.inference .title {
 		display: flex;

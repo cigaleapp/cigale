@@ -3,23 +3,25 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number|undefined} [progress] - The progress of the loading spinner (between 0 and 1). Leave undefined to show the spinner without progress (infinite).
+	 * @property {boolean} [waiting=false] - Whether the spinner is in a waiting state (e.g. for a pending image). If true, the spinner will not show progress.
 	 */
 
 	/** @type {Props} */
-	const { progress = undefined } = $props();
+	const { progress = undefined, waiting = false } = $props();
 
 	const dashOffsetScale = [-125, 0];
 	const dashOffset = $derived.by(() => {
-		if (progress === undefined) return undefined;
+		if (waiting) return undefined;
+		if (progress === undefined) return -30;
 		return Math.ceil(dashOffsetScale[0] + progress * (dashOffsetScale[1] - dashOffsetScale[0]));
 	});
 </script>
 
-<div class="loading-spinner" class:infinite={progress === undefined}>
+<div class="loading-spinner" class:infinite={!waiting && progress === undefined} class:waiting>
 	<svg class="circular-loader" viewBox="25 25 50 50" width="50" height="50">
 		<circle
 			class="loader-path"
-			stroke-dashoffset={dashOffset ?? '-30'}
+			stroke-dashoffset={dashOffset}
 			cx="50"
 			cy="50"
 			r="20"
@@ -38,6 +40,15 @@
 		align-items: center;
 		width: var(--size, 1em);
 		height: var(--size, 1em);
+	}
+
+	.loading-spinner.waiting {
+		animation: pulse 1.5s ease-in-out infinite;
+	}
+
+	.waiting .loader-path {
+		stroke-dasharray: 5, 13;
+		stroke-dashoffset: 0;
 	}
 
 	.loading-spinner:not(.infinite) {
@@ -90,6 +101,18 @@
 		100% {
 			stroke-dasharray: 89, 200;
 			stroke-dashoffset: -124;
+		}
+	}
+
+	@keyframes pulse {
+		0% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.25;
+		}
+		100% {
+			opacity: 1;
 		}
 	}
 </style>

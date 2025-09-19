@@ -1,6 +1,15 @@
 import { onDestroy, onMount } from 'svelte';
 import { uiState } from './state.svelte';
 import { entries, keys } from './utils';
+import { m } from './paraglide/messages';
+
+const GROUPS = {
+	general: m.keyboard_shortcuts_group_general(),
+	observations: m.keyboard_shortcuts_group_observations(),
+	navigation: m.keyboard_shortcuts_group_navigation(),
+	cropping: m.keyboard_shortcuts_group_cropping(),
+	debugmode: 'Debug mode'
+};
 
 /**
  * Keyboard shortcuts to define while the component is mounted. These keyboards will be unset when the component is unmounted.
@@ -8,9 +17,10 @@ import { entries, keys } from './utils';
  * To be called during a component initialization phase (so, not inside a $effect / $derived etc, but in the <script> tag).
  *
  * This function will _not_ override any keybind that already has an existing key shortcut defined.
- * @param {import("./state.svelte").Keymap} shortcuts
+ * @param {keyof typeof GROUPS} group used to group keybinds together in help dialogs, applied to all keybinds defined here, unless they override it themselves
+ * @param {import("./state.svelte").Keymap<keyof typeof GROUPS>} shortcuts
  */
-export function defineKeyboardShortcuts(shortcuts) {
+export function defineKeyboardShortcuts(group, shortcuts) {
 	onMount(() => {
 		for (const [key, definition] of entries(shortcuts)) {
 			if (key in uiState.keybinds) {
@@ -18,7 +28,10 @@ export function defineKeyboardShortcuts(shortcuts) {
 				continue;
 			}
 
-			uiState.keybinds[key] = definition;
+			uiState.keybinds[key] = {
+				group: GROUPS[definition.debug ? 'debugmode' : group],
+				...definition
+			};
 		}
 	});
 	onDestroy(() => {

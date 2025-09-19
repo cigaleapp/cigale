@@ -6,7 +6,8 @@
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { isType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';
-	import { getSettings } from './settings.svelte';
+	import { m } from './paraglide/messages.js';
+	import { isDebugMode } from './settings.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';
 
@@ -118,11 +119,12 @@
 				<p>{definition.description}</p>
 			{/if}
 			{#if definition.learnMore}
-				<a href={definition.learnMore} target="_blank">En savoir plus</a>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<a href={definition.learnMore} target="_blank">{m.learn_more()}</a>
 			{/if}
 		</section>
 	{/if}
-	{#if getSettings().showTechnicalMetadata}
+	{#if isDebugMode()}
 		<pre>{JSON.stringify({ id: definition.id, value }, null, 2)}</pre>
 	{/if}
 </div>

@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 
 import { beforeEach, describe, expect, test } from 'vitest';
-import { generateId, idComparator, nukeDatabase, openDatabase, tables } from './idb.svelte';
+import { generateId, nukeDatabase, openDatabase, tables } from './idb.svelte';
 import * as idb from './idb.svelte.js';
 import { imageId } from './images';
 import { keys } from './utils';
@@ -33,16 +33,26 @@ test('openDatabase', async () => {
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
 	expect(db.version).toMatchInlineSnapshot(`3`);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
-		FakeDOMStringList [
-		  "Image",
-		  "ImageFile",
-		  "ImagePreviewFile",
-		  "Metadata",
-		  "MetadataOption",
-		  "Observation",
-		  "Protocol",
-		  "Settings",
-		]
+		FakeDOMStringList {
+		  "0": "Image",
+		  "1": "ImageFile",
+		  "2": "ImagePreviewFile",
+		  "3": "Metadata",
+		  "4": "MetadataOption",
+		  "5": "Observation",
+		  "6": "Protocol",
+		  "7": "Settings",
+		  "_values": [
+		    "Image",
+		    "ImageFile",
+		    "ImagePreviewFile",
+		    "Metadata",
+		    "MetadataOption",
+		    "Observation",
+		    "Protocol",
+		    "Settings",
+		  ],
+		}
 	`);
 
 	const count = await Promise.all([...db.objectStoreNames].map((name) => db.count(name))).then(
@@ -356,7 +366,7 @@ describe('wrangler', () => {
 		expect(tables.Observation.state).toHaveLength(3);
 	});
 
-	describe('individual tables', async () => {
+	describe('individual tables', () => {
 		beforeEach(async () => {
 			await tables.initialize();
 		});
@@ -620,28 +630,5 @@ describe('wrangler', () => {
 				});
 			});
 		});
-	});
-});
-
-describe('idComparator', () => {
-	test('works on pairs of strings', () => {
-		expect(idComparator('a', 'b')).toBeLessThan(0);
-		expect(idComparator('b', 'a')).toBeGreaterThan(0);
-		expect(idComparator('a', 'a')).toBe(0);
-	});
-	test('works on numeric strings', () => {
-		expect(idComparator('1', '11')).toBeLessThan(0);
-		expect(idComparator('11', '1')).toBeGreaterThan(0);
-		expect(idComparator('0001', '1')).toBe(0);
-	});
-	test('works on pairs of numbers', () => {
-		expect(idComparator(1, 2)).toBeLessThan(0);
-		expect(idComparator(2, 1)).toBeGreaterThan(0);
-		expect(idComparator(1, 1)).toBe(0);
-	});
-	test('works on pairs of objects', () => {
-		expect(idComparator({ id: '1' }, { id: '11' })).toBeLessThan(0);
-		expect(idComparator({ id: 'a' }, { id: '11' })).toBeGreaterThan(0);
-		expect(idComparator({ id: '0001' }, { id: '1' })).toBe(0);
 	});
 });

@@ -1,0 +1,38 @@
+name: Update Changelog
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every 28th of the month at 00:00 UTC
+    - cron: '0 0 28 * *'
+  push:
+    branches: [main]
+    paths: [.github/workflows/update-changelog.yml, scripts/generate-changelog.js, CHANGELOG.md]
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          # Fetch all history for accurate changelog generation
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Update CHANGELOG.md
+        run: |
+          bun install --frozen-lockfile
+          bun run scripts/generate-changelog.js 2024-01-01
+
+      - name: Commit and push changes
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update-changelog
+          title: '📝 Update CHANGELOG.md'
+          commit-message: '📝 Update CHANGELOG.md'
+          base: main

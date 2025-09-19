@@ -27,24 +27,23 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.inputs.ref || 'main' }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22.17.0'
-          cache: 'npm'
+          bun-version-file: .bun-version
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Initialize protocol
-        run: npx node scripts/generate-protocols.js
+        run: bun run scripts/generate-protocols.js
 
       - name: Add data from Jessica Joachim
-        run: npx node scripts/add-species-from-jessica-joachim.js
+        run: bun run scripts/add-species-from-jessica-joachim.js
 
       - name: Set google-drive-key.json
         uses: mobiledevops/secret-to-file-action@v1
@@ -55,13 +54,13 @@ jobs:
           working-directory: ./
 
       - name: Add data from Google Slides folder
-        run: npx node scripts/add-species-from-google-slides.js
+        run: bun run scripts/add-species-from-google-slides.js
 
       - name: Unset google-drive-key.json
         run: rm google-drive-key.json
 
       - name: Add data from GBIF
-        run: npx node scripts/add-taxonomic-parents-from-gbif.js
+        run: bun run scripts/add-taxonomic-parents-from-gbif.js
 
       - name: Clean old protocol
         run: rm examples/old-*.json
@@ -78,7 +77,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Format & lintfix
-        run: npm run format && npm run lintfix
+        run: bun run format && bun run lintfix
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

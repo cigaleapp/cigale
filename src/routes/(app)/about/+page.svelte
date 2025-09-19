@@ -1,12 +1,16 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
+	import JSONC from 'tiny-jsonc';
 	import { seo } from '$lib/seo.svelte';
-	import lockfile from '$lib/../../package-lock.json' with { type: 'json' };
+	import { m } from '$lib/paraglide/messages.js';
+	import lockfile from '$lib/../../bun.lock?raw';
 
-	seo({ title: 'À propos' });
+	const { data } = $props();
+
+	seo({ title: m.about_page_title() });
 
 	/**
-	 * @type {undefined | { node: string; chrome: string; electron: string }}
+	 * @type {undefined | { node: string; chrome: string; electron: string; os?: { name: string; version: string; architecture: string; archIsUnusual: boolean }; sw: string[] }}
 	 */
 	let electronVersions = $state();
 
@@ -17,6 +21,12 @@
 				chrome: window.versions.chrome(),
 				electron: window.versions.electron()
 			};
+
+			void window.versions.os().then((os) => {
+				if (!electronVersions) return;
+				electronVersions.os = os;
+				electronVersions.sw = os.serviceWorkers;
+			});
 		}
 	});
 
@@ -53,15 +63,16 @@
 	 * @returns {Promise<Array<[string, string]>>} Array of [package name, version used]
 	 */
 	async function showDependencies() {
+		const { workspaces, packages } = JSONC.parse(lockfile);
+
 		// Get list of package names
 		const pkgs = [
-			...Object.keys(lockfile.packages[''].dependencies),
-			...Object.keys(lockfile.packages[''].devDependencies)
+			...Object.keys(workspaces[''].dependencies),
+			...Object.keys(workspaces[''].devDependencies)
 		];
 
 		// Get resolved versions for each package
-		// @ts-expect-error
-		return pkgs.map((name) => [name, lockfile.packages[`node_modules/${name}`].version]);
+		return pkgs.map((name) => [name, packages[name][0].replace(`${name}@`, '')]);
 	}
 </script>
 
@@ -70,6 +81,7 @@
 		{#if i > 0},
 		{/if}
 		{#if url}
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a target="_blank" href={url}>{name}</a>
 		{:else}
 			{name}
@@ -88,15 +100,15 @@
 </header>
 
 <dl>
-	<dt>Développé par</dt>
+	<dt>{m.developed_by()}</dt>
 	<dd>
 		{@render peoplelinks(authors)}
 	</dd>
-	<dt>Sous la supervision de</dt>
+	<dt>{m.supervised_by()}</dt>
 	<dd>
 		{@render peoplelinks(supervisors)}
 	</dd>
-	<dt>Dans le cadre d'un</dt>
+	<dt>{m.part_of_project()}</dt>
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>
@@ -110,9 +122,38 @@
 				<dd><code>{electronVersions.chrome}</code></dd>
 				<dt>Electron</dt>
 				<dd><code>{electronVersions.electron}</code></dd>
+				{#if 'os' in electronVersions}
+					<dt>{electronVersions.os.name}</dt>
+					<dd><code>{electronVersions.os.version}</code></dd>
+					{#if electronVersions.os.archIsUnusual}
+						<dd><code>{electronVersions.os.architecture}</code></dd>
+					{/if}
+					<dt>Service workers</dt>
+					<dd>
+						{#each electronVersions.sw as swurl, i (swurl)}
+							{#if i > 0}
+								,
+							{/if}
+							<code>{swurl}</code>
+						{:else}
+							(none)
+						{/each}
+					</dd>
+				{/if}
 			</dl>
 		</dd>
 	{/if}
+	<dt>Parallélisme</dt>
+	<dd>
+		<dl>
+			<dt>Task queue</dt>
+			<dd><code>{data.parallelism}</code> max.</dd>
+			<dt>sw&rpc</dt>
+			<dd><code>{data.parallelism}</code> nodes</dd>
+			<dt>Hardware</dt>
+			<dd><code>{navigator.hardwareConcurrency}</code> threads</dd>
+		</dl>
+	</dd>
 	<dt>Code source</dt>
 	<dd>
 		<a href="https://github.com/cigaleapp/cigale">github.com/cigaleapp/cigale</a>

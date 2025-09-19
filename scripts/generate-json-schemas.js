@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { type } from 'arktype';
-import { ExportedProtocol } from '../src/lib/protocols.js';
+import { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 import { Analysis } from '../src/lib/schemas/results.js';
 
 const here = path.dirname(new URL(import.meta.url).pathname);

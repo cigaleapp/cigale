@@ -64,17 +64,23 @@ function props(parameters) {
 export function tooltip(node, parameters) {
 	const properties = props(parameters);
 	tippy(node, properties);
-	if (properties.content.length <= 0) node._tippy?.destroy();
+
+	if (properties.content.length <= 0) {
+		delete node.dataset.tooltipContent;
+		node._tippy?.destroy();
+	}
 
 	return {
 		/** @param {string | [string, number] | TooltipParameters | undefined} parameters */
 		update(parameters) {
 			const properties = props(parameters);
+			node.dataset.tooltipContent = properties.content;
 			if (!node._tippy) tippy(node, properties);
 			if (properties.content.length <= 0) node._tippy?.destroy();
 			node._tippy?.setProps(properties);
 		},
 		destroy() {
+			delete node.dataset.tooltipContent;
 			node._tippy?.destroy();
 		}
 	};

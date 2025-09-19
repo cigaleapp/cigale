@@ -1,19 +1,10 @@
 <!doctype html>
-<html lang="fr" dir="ltr">
+<html dir="ltr">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="manifest" href="manifest.json" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap"
-			rel="stylesheet"
-		/>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&display=swap"
-			rel="stylesheet"
-		/>
+		<link rel="stylesheet" href="%sveltekit.assets%/fonts.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Cigale</title>
 		<style>
@@ -22,6 +13,7 @@
 			}
 
 			#loading {
+				app-region: drag;
 				display: flex;
 				height: 100vh;
 				justify-content: center;
@@ -60,6 +52,16 @@
 				text-align: center;
 			}
 
+			#loading .app-version {
+				position: fixed;
+				bottom: 1.5rem;
+				text-align: center;
+				left: 0;
+				right: 0;
+				font-size: 0.8rem;
+				color: gray;
+			}
+
 			@keyframes spinner {
 				0% {
 					rotate: 0deg;
@@ -83,9 +85,11 @@
 				<circle cx="20" cy="20" r="18"></circle>
 			</svg>
 			<p>
-				Chargement…
+				<!-- Set dynamically because i18n -->
+				<span id="loading-title"></span>
 				<code id="loading-message"></code>
 			</p>
+			<code class="app-version">%buildcommit%</code>
 		</div>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>

@@ -48,3 +48,8 @@ examples/old-arthropods.cigaleprotocol.json
 .vite/build
 
 out/
+
+# Fonts: managed by scripts/download-google-fonts.js so that they're up-to-date
+# Runs on prebuild
+static/fonts
+static/fonts.css

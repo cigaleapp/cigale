@@ -1,10 +1,11 @@
 <script>
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
+	import { href } from '$lib/paths.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { tables } from '$lib/idb.svelte.js';
-	import { removeNamespaceFromMetadataId } from '$lib/protocols.js';
+	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import Fuse from 'fuse.js';
 	import slugify from 'slugify';
 	import IconSearch from '~icons/ph/magnifying-glass';
@@ -23,7 +24,11 @@
 	 * @param {string} key
 	 */
 	function optionUrl(key) {
-		return `#/protocols/${data.protocol.id}/metadata/${removeNamespaceFromMetadataId(data.metadata.id)}/options/${key}`;
+		return href('/protocols/[id]/metadata/[metadata]/options/[option]', {
+			id: data.protocol.id,
+			metadata: removeNamespaceFromMetadataId(data.metadata.id),
+			option: key
+		});
 	}
 </script>
 
@@ -47,6 +52,7 @@
 					await tables.Metadata.update(data.metadata.id, 'options', $state.snapshot(options));
 					await invalidateAll();
 					setValue('');
+					// eslint-disable-next-line svelte/no-navigation-without-resolve
 					await goto(optionUrl(newOption.key));
 				}}
 			/>

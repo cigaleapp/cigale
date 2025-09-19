@@ -3,19 +3,21 @@ import { tables } from './idb.svelte';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
 import { uiState } from './state.svelte';
+import { nonnull } from './utils';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge
  * @returns {Promise<string>} the ID of the new observation
  */
 export async function mergeToObservation(parts) {
-	const observations = parts
-		.map((part) => tables.Observation.state.find((o) => o.id === part))
-		.filter((o) => o !== undefined);
+	const protocol = uiState.currentProtocol;
+	if (!protocol) throw new Error('No protocol selected');
 
-	const images = parts
-		.map((part) => tables.Image.state.find((i) => i.id === part))
-		.filter((i) => i !== undefined);
+	const observations = parts.map((part) => tables.Observation.getFromState(part)).filter(nonnull);
+
+	const images = await Promise.all(parts.map(async (part) => tables.Image.raw.get(part))).then(
+		(imgs) => imgs.filter(nonnull)
+	);
 
 	const imageIds = new Set(observations.flatMap((o) => o.images)).union(
 		new Set(images.map((i) => i.id))
@@ -24,16 +26,24 @@ export async function mergeToObservation(parts) {
 	const newId = db.generateId('Observation');
 
 	await tables.Observation.do(async (tx) => {
-		tx.add({
+		const observation = {
 			id: newId,
 			images: [...imageIds],
 			addedAt: new Date().toISOString(),
-			label: defaultObservationLabel([...observations, ...images]),
+			label: fallbackObservationLabel([...observations, ...images]),
 			metadataOverrides: Object.fromEntries(
-				Object.entries(await mergeMetadataValues(observations.map((o) => o.metadataOverrides))).map(
-					([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }]
-				)
+				Object.entries(
+					await mergeMetadataValues(
+						db.databaseHandle(),
+						observations.map((o) => o.metadataOverrides)
+					)
+				).map(([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }])
 			)
+		};
+
+		tx.add({
+			...observation,
+			label: defaultObservationLabel({ protocol, images, observation })
 		});
 
 		for (const { id } of observations) {
@@ -75,19 +85,34 @@ export async function deleteObservation(
 
 			if (recursive) {
 				for (const fileId of imageFileIds(images)) {
-					deleteImageFile(fileId, tx, notFoundOk);
+					await deleteImageFile(fileId, tx, notFoundOk);
 				}
 			}
+
+			uiState.erroredImages.delete(id);
 		}
 	);
 }
 
 /**
- * @param {Array<{ label: string } | { filename: string }>} parts
- * @return {string} computed default label for the new observation
+ * @param {object} arg0
+ * @param {Array<typeof import('$lib/database').Schemas.Image.inferIn>} arg0.images
+ * @param {typeof import('$lib/database').Schemas.Observation.inferIn} arg0.observation
+ * @param {import('$lib/database').Protocol} arg0.protocol
+ * @returns {string} computed default label for the new observation
  */
-function defaultObservationLabel(parts) {
-	// TODO allow user to provide a template string here
+function defaultObservationLabel({ images, observation, protocol }) {
+	return (
+		protocol?.observations?.defaultLabel?.render({ images, observation }) ??
+		fallbackObservationLabel([observation, ...images])
+	);
+}
+
+/**
+ * @param {Array<{ filename: string} | {label: string}>} parts
+ * @returns {string} computed fallback label for the new observation
+ */
+function fallbackObservationLabel(parts) {
 	for (const part of parts) {
 		if ('label' in part) return part.label;
 		if ('filename' in part) return part.filename.replace(/\.[^.]+$/, '');
@@ -96,27 +121,45 @@ function defaultObservationLabel(parts) {
 }
 
 /**
+ *
+ * @param {typeof import('$lib/database').Schemas.Image.inferIn} image
+ * @param {import('$lib/database').Protocol} protocol
+ * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
+ */
+export function newObservation(image, protocol) {
+	const observationId = db.generateId('Observation');
+	const newObs = {
+		id: observationId,
+		images: [image.id],
+		addedAt: new Date().toISOString(),
+		label: fallbackObservationLabel([image]),
+		metadataOverrides: {}
+	};
+
+	return {
+		...newObs,
+		label: defaultObservationLabel({ images: [image], observation: newObs, protocol })
+	};
+}
+
+/**
  * If there are any images that are not inside any observation, create an observation with a single image for each
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
 export async function ensureNoLoneImages(tx) {
+	const protocol = uiState.currentProtocol;
+	if (!protocol) throw new Error('No protocol selected');
 	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
 		const images = await tx.objectStore('Image').getAll();
 		const observations = await tx.objectStore('Observation').getAll();
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
-				const observationId = db.generateId('Observation');
-				tx.objectStore('Observation').add({
-					id: observationId,
-					images: [image.id],
-					addedAt: new Date().toISOString(),
-					label: defaultObservationLabel([image]),
-					metadataOverrides: {}
-				});
+				const newObs = newObservation(image, protocol);
+				tx.objectStore('Observation').add(newObs);
 				// Update ui selection so we don't have ghosts in preview side panel
 				uiState.setSelection?.(
-					uiState.selection.map((sel) => (sel === image.id ? observationId : sel))
+					uiState.selection.map((sel) => (sel === image.id ? newObs.id : sel))
 				);
 			}
 		}
