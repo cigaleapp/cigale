@@ -9,11 +9,12 @@
 	 * @property {Array<Item<OptionKey>>} options possible options
 	 * @property {NoInfer<OptionKey>} [value] the value of the selected radio button
 	 * @property {(value: OptionKey|undefined) => void} [onchange] callback to call when the user selects a radio button
+	 * @property {import('svelte').Snippet<[Item<NoInfer<OptionKey>>]>} children
 	 * @property {string} [label] label for the radio group
 	 */
 
 	/** @type {Props} */
-	let { options, value = $bindable(), onchange = () => {}, label } = $props();
+	let { options, value = $bindable(), children, onchange = () => {}, label } = $props();
 
 	$effect(() => {
 		onchange(value);
@@ -24,14 +25,19 @@
 	{#if label}
 		<legend>{label}</legend>
 	{/if}
-	{#each options as { key, label, ...additional } (key)}
+	{#each options as option (option.key)}
+		{@const { key, label } = option}
 		<label class="radio">
 			<input type="radio" value={key} bind:group={value} />
-			{label}
-			{#if 'subtext' in additional}
-				<p class="subtext">
-					{additional.subtext}
-				</p>
+			{#if children}
+				{@render children(option)}
+			{:else}
+				{label}
+				{#if 'subtext' in option}
+					<p class="subtext">
+						{option.subtext}
+					</p>
+				{/if}
 			{/if}
 		</label>
 	{/each}
