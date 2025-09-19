@@ -2,26 +2,25 @@
 	import { resolve } from '$app/paths';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { openTransaction, tables } from '$lib/idb.svelte.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import Modal from '$lib/Modal.svelte';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { downloadProtocolTemplate, jsonSchemaURL } from '$lib/protocols.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import IconImport from '~icons/ph/download';
 	import IconDownload from '~icons/ph/download-simple';
 	import IconCreate from '~icons/ph/plus-circle';
-	import CardProtocol from './CardProtocol.svelte';
-	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
-	import { m } from '$lib/paraglide/messages.js';
+	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
+	import RowProtocol from './RowProtocol.svelte';
 
 	const { data } = $props();
 
 	/**
 	 * Protocol we're confirming deletion for
-	 * @type {undefined | import('$lib/database').Protocol}
+	 * @type {string}
 	 */
-	let removingProtocol = $state(undefined);
+	let removingProtocol = $state('');
 
 	/** @type {undefined | (() => void)} */
 	let confirmDelete = $state();
@@ -29,6 +28,8 @@
 	/** @type {undefined | (() => void)} */
 	let downloadNewProtocolTemplate = $state();
 </script>
+
+<ModalDeleteProtocol id={removingProtocol} bind:open={confirmDelete} />
 
 <Modal
 	key="modal_download_protocol_template"
@@ -76,106 +77,87 @@
 	{/snippet}
 </Modal>
 
-<ModalConfirm
-	title="Êtes-vous sûr·e?"
-	key="modal_delete_protocol"
-	bind:open={confirmDelete}
-	cancel="Annuler"
-	confirm="Oui, supprimer"
-	onconfirm={async () => {
-		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {
-			if (!removingProtocol) return;
+<div class="page">
+	<header>
+		<h1>{m.protocols()}</h1>
+		<section class="actions">
+			<ButtonSecondary
+				loading
+				onclick={async (_, signals) => {
+					await promptAndImportProtocol({
+						allowMultiple: true,
+						onInput: signals.loadingStarted,
+						importProtocol: data.swarpc.importProtocol
+					})
+						.catch((e) => toasts.error(e))
+						.then((ps) => {
+							if (!ps || typeof ps === 'string' || ps.length === 0) return;
+							if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
+							else toasts.success(m.protocols_imported_multiple({ count: ps.length }));
+						});
+				}}
+			>
+				{#snippet children({ loading })}
+					{#if !loading}<IconImport />{/if}
+					{m.import()}
+				{/snippet}
+			</ButtonSecondary>
+			<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
+				<IconCreate />
+				{m.create()}
+			</ButtonSecondary>
+		</section>
+	</header>
 
-			tx.objectStore('Protocol').delete(removingProtocol.id);
-
-			const toRemove = removingProtocol.metadata.filter(
-				(id) => removingProtocol && isNamespacedToProtocol(removingProtocol.id, id)
-			);
-
-			const options = await tx.objectStore('MetadataOption').getAll();
-
-			for (const metadata of toRemove) {
-				tx.objectStore('Metadata').delete(metadata);
-				options
-					.filter((o) => o.id.startsWith(`${metadata}:`))
-					.forEach((o) => tx.objectStore('MetadataOption').delete(o.id));
-			}
-		});
-		toasts.success('Protocole supprimé');
-	}}
->
-	Il est impossible de revenir en arrière après avoir supprimé un protocole.
-</ModalConfirm>
-
-<header>
-	<h1>{m.protocols()}</h1>
-	<section class="actions">
-		<ButtonSecondary
-			loading
-			onclick={async (_, signals) => {
-				await promptAndImportProtocol({
-					allowMultiple: true,
-					onInput: signals.loadingStarted,
-					importProtocol: data.swarpc.importProtocol
-				})
-					.catch((e) => toasts.error(e))
-					.then((ps) => {
-						if (!ps || typeof ps === 'string' || ps.length === 0) return;
-						if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
-						else toasts.success(m.protocols_imported_multiple({ count: ps.length }));
-					});
-			}}
-		>
-			{#snippet children({ loading })}
-				{#if !loading}<IconImport />{/if}
-				{m.import()}
-			{/snippet}
-		</ButtonSecondary>
-		<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
-			<IconCreate />
-			{m.create()}
-		</ButtonSecondary>
-	</section>
-</header>
-
-<ul class="protocoles">
-	{#each tables.Protocol.state as p (p.id)}
-		<li>
-			<CardProtocol
+	<ul class="protocols">
+		{#each tables.Protocol.state as p (p.id)}
+			<RowProtocol
 				{...p}
 				ondelete={() => {
-					removingProtocol = { ...p };
+					removingProtocol = p.id;
 					confirmDelete?.();
 				}}
 			/>
-		</li>
-	{/each}
-</ul>
+		{/each}
+	</ul>
+</div>
 
 <style>
 	h1 {
 		padding-top: 40px;
 		color: var(--fg-primary);
 	}
-	.protocoles {
-		list-style: none;
-		display: flex;
-		--card-padding: 1em;
-		gap: 1em;
-		flex-wrap: wrap;
+
+	.page {
+		max-width: 600px;
+		width: 100%;
+		margin: 3rem auto;
 	}
 
-	ul {
+	.protocols {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+		width: 100%;
 		list-style-position: inside;
 		padding-left: 0;
+		padding: 0;
 	}
 
 	header {
 		margin-bottom: 2rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+	}
+
+	header h1 {
+		padding: 0;
 	}
 
 	section.actions {
-		margin-top: 1rem;
 		display: flex;
 		align-items: center;
 		gap: 1em;

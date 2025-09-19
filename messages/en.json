@@ -80,7 +80,6 @@
 	"zoom_in": "Zoom in",
 	"select_tool": "Select tool {tool}",
 	"technical_metadata_tooltip": "Technical metadata, not visible in the interface",
-	"taxonomic_metadata_tooltip": "Taxonomic metadata, inferred from the value of another metadata representing the lower class",
 	"inferred_metadata_tooltip": "Auto-detected metadata by inference",
 	"inferred_from_single_exif": "Auto-detected metadata from EXIF metadata \"{exif}\" of the image",
 	"inferred_from_two_exif": "Auto-detected metadata from EXIF metadata \"{latitude}\" and \"{longitude}\" of the image",
@@ -194,5 +193,7 @@
 	"metadata_value_yes": "Yes",
 	"metadata_value_no": "No",
 	"metadata_value_boundingbox": "Box from ({x1}, {y1}) to ({x2}, {y2})",
-	"no_images": "No images"
+	"no_images": "No images",
+	"edit": "Edit",
+	"back": "Back"
 }
