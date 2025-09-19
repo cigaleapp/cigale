@@ -26,6 +26,5 @@ export async function goto(...args) {
  */
 export function href(...args) {
 	// @ts-expect-error
-	// eslint-disable-next-line svelte/no-navigation-without-resolve
 	return '#' + resolve(...args).replace(resolve('/'), '/');
 }
