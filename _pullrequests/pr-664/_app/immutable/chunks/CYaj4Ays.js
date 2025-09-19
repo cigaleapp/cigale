@@ -1,1 +1,0 @@
-import{b as r,r as t,a as o,g as n}from"./B912mgtB.js";function f(a){return(o||r)+a}function s(a,e){return r+t(a,e)}async function i(...a){await n(u(...a))}function u(...a){return"#"+s(...a).replace(s("/"),"/")}export{f as a,i as g,u as h,s as r};
