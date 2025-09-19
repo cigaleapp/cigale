@@ -30,8 +30,6 @@ jobs:
 
       - name: Build project
         run: BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale bun run build
-        env:
-          SENTRY: enabled
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
