@@ -1,0 +1,28 @@
+name: Auto-rebase PRs on main
+
+on:
+  schedule:
+    - cron: '0 */4 * * *' # every 4 hours
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  autorebase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - name: Auto-rebase PRs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          to_update=$(gh pr list --label autorebase --json number --jq '.[].number')
+
+          for pr in $to_update; do
+            echo "Rebasing PR #$pr https://github.com/${{ github.repository }}/pull/$pr"
+            gh pr update-branch $pr --rebase || true
+          done
