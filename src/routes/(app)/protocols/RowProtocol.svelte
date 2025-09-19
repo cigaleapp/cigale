@@ -2,11 +2,12 @@
 	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
-
+	import { goto } from '$lib/paths';
 	import { exportProtocol } from '$lib/protocols';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import IconUpgrade from '~icons/ph/arrow-circle-up';
+	import IconEdit from '~icons/ph/pencil';
 	import IconExport from '~icons/ph/share';
 	import IconDelete from '~icons/ph/trash';
 
@@ -29,6 +30,10 @@
 			}}
 		>
 			<IconDelete />
+		</ButtonIcon>
+
+		<ButtonIcon help="Modifier" onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+			<IconEdit />
 		</ButtonIcon>
 
 		<ButtonIcon
