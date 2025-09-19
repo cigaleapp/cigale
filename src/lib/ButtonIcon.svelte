@@ -16,7 +16,14 @@
 	let { children, onclick, help, keyboard, disabled, crossout, ...rest } = $props();
 </script>
 
-<button {disabled} {onclick} class:crossout use:tooltip={{ text: help, keyboard }} {...rest}>
+<button
+	{disabled}
+	{onclick}
+	class:crossout
+	use:tooltip={{ text: help, keyboard }}
+	aria-label={help}
+	{...rest}
+>
 	{@render children()}
 </button>
 

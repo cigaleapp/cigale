@@ -40,7 +40,10 @@ for (const offline of [false, true]) {
 					timeout: 10_000
 				});
 
-				await modal(page, fr.prepare_for_offline).getByRole('button', { name: 'Fermer' }).click();
+				await modal(page, fr.prepare_for_offline)
+					.getByRole('button', { name: 'Fermer' })
+					.first()
+					.click();
 
 				context.setOffline(true);
 			}

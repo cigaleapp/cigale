@@ -210,7 +210,7 @@ test.describe('Cropper view', () => {
 
 		test('should delete the image via delete button and go to the next image', async ({ page }) => {
 			await navigateThenAssert(page, async (page) => {
-				await page.getByRole('button', { name: 'Supprimer' }).click();
+				await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
 			});
 		});
 	});
