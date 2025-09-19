@@ -1,4 +1,3 @@
-<!-- ici mettre class:checked={value} pour avoir la classe checked seulement quand c'est coché -->
 <script>
 	//export let value = false;
 	import Icon from '~icons/ph/check-light';
@@ -70,6 +69,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		position: relative;
 	}
 
 	/* Mettre la boite et le texte à coté */
