@@ -1,1 +1,0 @@
-import{g as o}from"./DgtYXTMU.js";const s=()=>"Manage protocols",r=()=>"Gérer les protocoles",a=r,_=(c={},e={})=>{const n=e.locale??o();return n==="en"?s():n==="fr"?r():a()},l=()=>"No inference",t=()=>"Aucune inférence",f=t,i=(c={},e={})=>{const n=e.locale??o();return n==="en"?l():n==="fr"?t():f()};export{_ as m,i as n};
