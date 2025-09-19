@@ -10,16 +10,18 @@
 	 * @property {string} [keyboard] keyboard shortcut hint to display in the help tooltip
 	 * @property {boolean} [disabled]
 	 * @property {boolean} [crossout] draw a diagonal line through the button's content
+	 * @property {boolean} [dangerous] style the button to indicate a dangerous action
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
-	let { children, onclick, help, keyboard, disabled, crossout, ...rest } = $props();
+	let { children, onclick, help, keyboard, disabled, crossout, dangerous, ...rest } = $props();
 </script>
 
 <button
 	{disabled}
 	{onclick}
 	class:crossout
+	class:dangerous
 	use:tooltip={{ text: help, keyboard }}
 	aria-label={help}
 	{...rest}
@@ -42,11 +44,20 @@
 		font-size: var(--font-size, 1em);
 		border: none;
 		position: relative;
+
+		&.dangerous {
+			color: var(--fg-error);
+		}
 	}
 
 	button:is(:hover, :focus-visible) {
 		background-color: var(--hover-bg, var(--bg-primary-translucent));
 		color: var(--hover-fg, var(--fg-neutral));
+	}
+
+	button.dangerous:is(:hover, :focus-visible) {
+		background-color: var(--bg-error);
+		color: var(--fg-neutral);
 	}
 
 	button:disabled {

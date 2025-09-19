@@ -78,6 +78,10 @@
 	"zoom_out": "Zoom out",
 	"zoom_in": "Zoom in",
 	"select_tool": "Select tool {tool}",
+	"technical_metadata_tooltip": "Technical metadata, not visible in the interface",
+	"inferred_metadata_tooltip": "Auto-detected metadata by inference",
+	"inferred_from_single_exif": "Auto-detected metadata from EXIF metadata \"{exif}\" of the image",
+	"inferred_from_two_exif": "Auto-detected metadata from EXIF metadata \"{latitude}\" and \"{longitude}\" of the image",
 	"separate_all_selected_help": "Separate all selected observations into individual images",
 	"create_protocol": "Create a protocol",
 	"remote_protocol_import_confirm_following": "This link points to a remote protocol. Do you want to import it? It is located at the following address:",
@@ -192,5 +196,7 @@
 	"with_detections": "With detections",
 	"without_detections": "Without detections",
 	"cropped_items": "Cropped",
-	"uncropped_items": "Uncropped"
+	"uncropped_items": "Uncropped",
+	"edit": "Edit",
+	"back": "Back"
 }
