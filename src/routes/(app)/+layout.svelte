@@ -141,7 +141,11 @@
 	{/each}
 </section>
 
-<div class="contents" class:padded={!page.route.id?.includes('/(sidepanel)')}>
+<div
+	class="contents"
+	class:padded={!page.route.id?.includes('/(sidepanel)') &&
+		!page.route.id?.includes('protocols/[id]/')}
+>
 	{@render children?.()}
 </div>
 
