@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/149</span>
+                <span class='fraction'>0/155</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/149</span>
+                <span class='fraction'>0/155</span>
             </div>
         
             
@@ -212,7 +212,19 @@
 <a name='L147'></a><a href='#L147'>147</a>
 <a name='L148'></a><a href='#L148'>148</a>
 <a name='L149'></a><a href='#L149'>149</a>
-<a name='L150'></a><a href='#L150'>150</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -364,10 +376,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >&lt;script&gt;</span></span></span>
 <span class="cstat-no" title="statement not covered" >	import { goto, invalidateAll } from '$app/navigation';</span>
 <span class="cstat-no" title="statement not covered" >	import { page } from '$app/state';</span>
+<span class="cstat-no" title="statement not covered" >	import { href } from '$lib/paths.js';</span>
 <span class="cstat-no" title="statement not covered" >	import ButtonIcon from '$lib/ButtonIcon.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import InlineTextInput from '$lib/InlineTextInput.svelte';</span>
 <span class="cstat-no" title="statement not covered" >	import { tables } from '$lib/idb.svelte.js';</span>
-<span class="cstat-no" title="statement not covered" >	import { removeNamespaceFromMetadataId } from '$lib/protocols.js';</span>
+<span class="cstat-no" title="statement not covered" >	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';</span>
 <span class="cstat-no" title="statement not covered" >	import Fuse from 'fuse.js';</span>
 <span class="cstat-no" title="statement not covered" >	import slugify from 'slugify';</span>
 <span class="cstat-no" title="statement not covered" >	import IconSearch from '~icons/ph/magnifying-glass';</span>
@@ -386,7 +399,11 @@
 <span class="cstat-no" title="statement not covered" >	 * @param {string} key</span>
 <span class="cstat-no" title="statement not covered" >	 */</span>
 <span class="cstat-no" title="statement not covered" >	function optionUrl(key) {</span>
-<span class="cstat-no" title="statement not covered" >		return `#/protocols/${data.protocol.id}/metadata/${removeNamespaceFromMetadataId(data.metadata.id)}/options/${key}`;</span>
+<span class="cstat-no" title="statement not covered" >		return href('/protocols/[id]/metadata/[metadata]/options/[option]', {</span>
+<span class="cstat-no" title="statement not covered" >			id: data.protocol.id,</span>
+<span class="cstat-no" title="statement not covered" >			metadata: removeNamespaceFromMetadataId(data.metadata.id),</span>
+<span class="cstat-no" title="statement not covered" >			option: key</span>
+<span class="cstat-no" title="statement not covered" >		});</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" >&lt;/script&gt;</span>
 <span class="cstat-no" title="statement not covered" ></span>
@@ -410,6 +427,7 @@
 <span class="cstat-no" title="statement not covered" >					await tables.Metadata.update(data.metadata.id, 'options', $state.snapshot(options));</span>
 <span class="cstat-no" title="statement not covered" >					await invalidateAll();</span>
 <span class="cstat-no" title="statement not covered" >					setValue('');</span>
+<span class="cstat-no" title="statement not covered" >					// eslint-disable-next-line svelte/no-navigation-without-resolve</span>
 <span class="cstat-no" title="statement not covered" >					await goto(optionUrl(newOption.key));</span>
 <span class="cstat-no" title="statement not covered" >				}}</span>
 <span class="cstat-no" title="statement not covered" >			/&gt;</span>
@@ -517,7 +535,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-19T18:14:13.536Z
+                at 2025-09-19T18:20:33.603Z
             </div>
         <script src="../../../../../../../../../prettify.js"></script>
         <script>
