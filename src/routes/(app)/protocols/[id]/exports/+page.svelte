@@ -20,7 +20,7 @@
 	/**
 	 *
 	 * @param {NodeProvenance} provenance
-	 * @return {import('svelte').Component}
+	 * @returns {import('svelte').Component}
 	 */
 	const iconOfNode = (provenance) => {
 		switch (provenance) {

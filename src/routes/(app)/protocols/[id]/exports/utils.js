@@ -20,7 +20,6 @@
  * @param {NodeProvenance} arg.provenance
  */
 export function gatherToTree({ tree, path, provenance, isDirectory = false, help = '' }) {
-	console.log('gatherToTree', { tree, path, provenance, isDirectory, help });
 	const [current, ...deeper] = splitPath(path);
 	if (deeper.length === 0) {
 		if (isDirectory) {
@@ -54,7 +53,7 @@ export function gatherToTree({ tree, path, provenance, isDirectory = false, help
  * @param {string} path
  * @returns {string[]} fragments
  */
-export function splitPath(path) {
+function splitPath(path) {
 	let fragments = [];
 	let fragment = '';
 	let chars = path.split('');

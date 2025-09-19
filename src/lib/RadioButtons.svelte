@@ -25,7 +25,8 @@
 	{#if label}
 		<legend>{label}</legend>
 	{/if}
-	{#each options as { key, label, ...additional } (key)}
+	{#each options as option (option.key)}
+		{@const { key, label } = option}
 		<label class="radio">
 			<input type="radio" value={key} bind:group={value} />
 			{#if children}

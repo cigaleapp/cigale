@@ -3,7 +3,7 @@ import { gatherToTree } from './utils.js';
  * @import { TreeNode } from './utils.js';
  */
 
-export async function load({ params, parent }) {
+export async function load({ parent }) {
 	const protocol = await parent();
 
 	/**
