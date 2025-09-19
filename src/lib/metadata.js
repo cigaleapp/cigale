@@ -903,10 +903,13 @@ export function assertIs(type, value) {
 /**
  *
  * @param {{metadataOrder?: undefined | string[]}} protocol
- * @returns {(a: { id: string }, b: { id: string }) => number}
+ * @returns {(a: string | { id: string }, b: string | { id: string }) => number}
  */
 export function metadataDefinitionComparator(protocol) {
-	return ({ id: a }, { id: b }) => {
+	return (a, b) => {
+		if (typeof a !== 'string') a = a.id;
+		if (typeof b !== 'string') b = b.id;
+
 		if (protocol.metadataOrder) {
 			return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
 		}
