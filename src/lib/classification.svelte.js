@@ -2,6 +2,7 @@ import { match, type } from 'arktype';
 import { uiState } from './state.svelte.js';
 import { MetadataInferOptionsNeural } from './schemas/metadata.js';
 import { tables } from './idb.svelte.js';
+import { propOrNothing } from './utils.js';
 
 /**
  * Classifies an image using the current protocol and selected model.
@@ -24,9 +25,9 @@ export async function classifyImage(swarpc, id, cancellers) {
 
 	const { cancel, request: done } = swarpc.classify.cancelable({
 		protocol: {
-			beamup: $state.snapshot(protocol.beamup),
 			id: protocol.id,
-			version: protocol.version ?? '?'
+			version: protocol.version ?? '?',
+			...propOrNothing('beamup', $state.snapshot(protocol.beamup))
 		},
 		imageId: id,
 		metadataIds: {

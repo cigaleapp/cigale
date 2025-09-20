@@ -1084,6 +1084,20 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Prevents having to do the ugly `...(something ? { key: something } : {})` pattern
+ * @template {string} Key
+ * @template Value
+ * @param {Key} key
+ * @param {Value} value
+ * @returns {Partial<Record<Key, NonNullable<Value>>>}
+ */
+export function propOrNothing(key, value) {
+	// @ts-expect-error
+	if (nonnull(value)) return { [key]: value };
+	return {};
+}
+
+/**
  * Fades out an element matching the given selector over the given duration, then removes it from the DOM.
  * If it's the first time the app is started (determined by checking localStorage), uses firstTimeDuration instead of duration if provided.
  * @param {string} selector
