@@ -12,6 +12,7 @@
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte';
 
 	const fileIds = $derived(imageFileIds(tables.Image.state));
 
@@ -47,6 +48,7 @@
 	filetypes={ACCEPTED_IMPORT_TYPES}
 	clickable={images.length === 0}
 	onfiles={({ files }) => importMore(files)}
+	onunacceptable={() => toasts.error(m.file_format_not_supported({ format: '' }))}
 >
 	<section class="observations" class:empty>
 		<AreaObservations

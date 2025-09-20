@@ -67,6 +67,8 @@ export async function preprocessTensor(settings, tensor, mean, std, abortSignal)
  * @param {object} settings
  * @param {number} settings.height
  * @param {number} settings.width
+ * @param {string} settings.contentType if it's image/x-bitmap, load the bitmap data instead of trying to load it as encoded image data
+ * @param {{width: number, height: number}} settings.dimensions dimensions of the given images. Used when contentType == image/x-bitmap
  * @param {import('./BoundingBoxes.svelte.js').CenteredBoundingBox} [settings.crop]
  * @param {boolean} [settings.normalized] normalize pixel channel values to [0, 1] instead of [0, 255]
  * @param {AbortSignal} [settings.abortSignal] signal to abort the operation
@@ -74,13 +76,16 @@ export async function preprocessTensor(settings, tensor, mean, std, abortSignal)
  */
 export async function loadToTensor(
 	buffers,
-	{ width: targetWidth, height: targetHeight, crop, normalized, abortSignal }
+	{
+		width: targetWidth,
+		height: targetHeight,
+		crop,
+		normalized,
+		abortSignal,
+		contentType,
+		dimensions
+	}
 ) {
-	let aborted = false;
-	abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
 	/*
     charge les images et les resize
     -------input------- :
@@ -95,29 +100,35 @@ export async function loadToTensor(
 
 	var float32Data = new Float32Array(targetHeight * targetWidth * 3 * buffers.length);
 	for (let f = 0; f < buffers.length; f++) {
-		if (aborted) throw new Error('Operation aborted');
+		abortSignal?.throwIfAborted();
 
 		let buffer = buffers[f];
 
-		const imageTensor = await Jimp.fromBuffer(buffer, {
-			'image/jpeg': imageLimits
-		});
+		const imageTensor =
+			contentType === 'image/x-bitmap'
+				? await Jimp.fromBitmap({
+						...dimensions,
+						data: new Uint8ClampedArray(buffer)
+					})
+				: await Jimp.fromBuffer(buffer, {
+						'image/jpeg': imageLimits
+					});
 
 		if (crop) {
 			const scaler = coordsScaler({ x: imageTensor.width, y: imageTensor.height });
 			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));
-			if (aborted) throw new Error('Operation aborted');
+			abortSignal?.throwIfAborted();
 			imageTensor.crop({ x, y, w, h });
 		}
 
-		if (aborted) throw new Error('Operation aborted');
+		abortSignal?.throwIfAborted();
 		imageTensor.resize({ w: targetWidth, h: targetHeight });
 
 		var imageBufferData = imageTensor.bitmap.data;
 
 		const [redArray, greenArray, blueArray] = new Array(new Array(), new Array(), new Array());
 		for (let i = 0; i < imageBufferData.length; i += 4) {
-			if (aborted) throw new Error('Operation aborted');
+			abortSignal?.throwIfAborted();
 			redArray.push(imageBufferData[i]);
 			greenArray.push(imageBufferData[i + 1]);
 			blueArray.push(imageBufferData[i + 2]);
@@ -129,13 +140,13 @@ export async function loadToTensor(
 
 		if (normalized) {
 			for (i = 0; i < l; i++) {
-				if (aborted) throw new Error('Operation aborted');
+				abortSignal?.throwIfAborted();
 				float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
 			}
 		}
 	}
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	var tensor = new ort.Tensor('float32', float32Data, [
 		buffers.length,
 		3,
