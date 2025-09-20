@@ -10,7 +10,8 @@ import { tables } from './idb.svelte.js';
  * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
  */
 export async function classifyImage(swarpc, id, cancellers) {
-	if (!uiState.currentProtocol) {
+	const protocol = uiState.currentProtocol;
+	if (!protocol) {
 		throw new Error('Aucun protocole sélectionné');
 	}
 
@@ -22,6 +23,11 @@ export async function classifyImage(swarpc, id, cancellers) {
 	}
 
 	const { cancel, request: done } = swarpc.classify.cancelable({
+		protocol: {
+			beamup: $state.snapshot(protocol.beamup),
+			id: protocol.id,
+			version: protocol.version ?? '?'
+		},
 		imageId: id,
 		metadataIds: {
 			cropbox: uiState.cropMetadataId,
