@@ -133,6 +133,7 @@
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
+		"@cigale/beamup": "^0.2.1",
 		"@iconify-json/ph": "^1.2.2",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",

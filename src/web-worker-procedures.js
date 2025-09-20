@@ -59,6 +59,13 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			taskSettings: {
 				input: Schemas.ModelInput,
 				'output?': { name: 'string' }
+			},
+			protocol: {
+				id: 'string',
+				version: 'number | string',
+				'beamup?': {
+					origin: 'string.url'
+				}
 			}
 		}),
 		progress: type({}),

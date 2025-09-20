@@ -145,7 +145,7 @@ swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	return { boxes, scores };
 });
 
-swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
+swarp.classify(async ({ imageId, metadataIds, taskSettings, protocol }, _, tools) => {
 	tools.abortSignal?.throwIfAborted();
 
 	const db = await openDatabase();
@@ -203,6 +203,8 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 
 		await storeMetadataValue({
 			db,
+			protocol,
+			beamup: protocol.beamup,
 			...metadataValue,
 			metadataId: metadataIds.target,
 			abortSignal: tools.abortSignal

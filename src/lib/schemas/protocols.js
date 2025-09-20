@@ -156,6 +156,9 @@ export const Protocol = type({
 			"Label par défaut pour les observations. Template Handlebars, recevant une liste des images de l'observation à crééer (clé images) et l'observation elle-même (clé observation)"
 		)
 	},
+	'beamup?': {
+		origin: URLString.describe("URL de l'instance BeamUp d'où proviennent les données")
+	},
 	crop: type({
 		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
 		'confirmationMetadata?': [
