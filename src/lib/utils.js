@@ -728,3 +728,23 @@ export function progressSplitter(...layout) {
 		return total / parts.length;
 	};
 }
+
+/**
+ * Replaces accents and punctuations with dashes, lowercases, and replaces accents with ASCII equivalents.
+ * Throws if the result is still not ASCII (e.g. CJK characters, we don't have transliteration tables for everything)
+ * @param {string} text
+ */
+export function slugify(text) {
+	const result = text
+		.normalize('NFD') // separate accent from letter
+		.replace(/[\u0300-\u036f]/g, '') // remove all accents
+		.replace(/[^\w\s-]/g, '') // remove all non-word characters (except spaces and dashes)
+		.trim()
+		.replace(/[\s_-]+/g, '-') // replace spaces and underscores with a single dash
+		.replace(/^-+|-+$/g, '') // remove leading and trailing dashes
+		.toLowerCase();
+
+	if (!result) throw new Error(`Cannot slugify "${text}" (result is empty)`);
+
+	return result;
+}
