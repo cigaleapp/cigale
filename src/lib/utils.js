@@ -1082,3 +1082,17 @@ if (import.meta.vitest) {
 		});
 	});
 }
+
+/**
+ * Prevents having to do the ugly `...(something ? { key: something } : {})` pattern
+ * @template {string} Key
+ * @template Value
+ * @param {Key} key
+ * @param {Value} value
+ * @returns {Partial<Record<Key, NonNullable<Value>>>}
+ */
+export function propOrNothing(key, value) {
+	// @ts-expect-error
+	if (nonnull(value)) return { [key]: value };
+	return {};
+}
