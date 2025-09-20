@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { sendCorrection } from '@cigale/beamup';
 import * as dates from 'date-fns';
 import { computeCascades } from './cascades.js';
 import { idComparator, Schemas } from './database.js';
@@ -11,7 +12,7 @@ import {
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
-import { avg, mapValues } from './utils.js';
+import { avg, entries, mapValues } from './utils.js';
 
 /**
  * @import { IDBDatabaseType, ReactiveTableNames } from './idb.svelte.js'
@@ -122,6 +123,8 @@ export function serializeMetadataValues(values) {
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  * @param {AbortSignal} [options.abortSignal] signal d'abandon pour annuler la requête
+ * @param {typeof import('$lib/schemas/protocols.js').Protocol.infer.beamup} [options.beamup] informations sur l'instance BeamUp où envoyer la correction, telle que définie par le protocole courant
+ * @param {{ id: string; version: number | string }} options.protocol le protocole courant, utilisé pour BeamUp
  */
 export async function storeMetadataValue({
 	db,
@@ -133,7 +136,9 @@ export async function storeMetadataValue({
 	alternatives = [],
 	manuallyModified = false,
 	cascadedFrom = [],
-	abortSignal
+	abortSignal,
+	beamup: beamupSettings,
+	protocol
 }) {
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
@@ -173,9 +178,34 @@ export async function storeMetadataValue({
 
 	abortSignal?.throwIfAborted();
 	if (image) {
+		subjectIs = 'image';
+		if (metadataId in image.metadata) {
+			oldValue = structuredClone(image.metadata[metadataId]);
+		}
 		image.metadata[metadataId] = newValue;
 		db.put('Image', image);
 	} else if (observation) {
+		subjectIs = 'observation';
+		if (metadataId in observation.metadataOverrides) {
+			oldValue = structuredClone(observation.metadataOverrides[metadataId]);
+		} else if (beamupSettings && observation.images.length > 0) {
+			const images = await db
+				.getAll('Image')
+				.then((imgs) => imgs.filter((img) => observation.images.includes(img.id)));
+			const merged = mergeMetadata(
+				metadata,
+				images
+					.filter((img) => img.metadata[metadataId])
+					.map((img) => img.metadata[metadataId])
+					.map(Schemas.MetadataValue.assert)
+			);
+			if (merged) {
+				oldValue = {
+					...merged,
+					value: serializeMetadataValue(merged.value)
+				};
+			}
+		}
 		observation.metadataOverrides[metadataId] = newValue;
 		db.put('Observation', observation);
 	} else if (imagesFromImageFile) {
@@ -187,7 +217,9 @@ export async function storeMetadataValue({
 				value,
 				confidence,
 				manuallyModified,
-				abortSignal
+				abortSignal,
+				protocol,
+				beamup: beamupSettings
 			});
 		}
 	} else {
@@ -231,8 +263,44 @@ export async function storeMetadataValue({
 			manuallyModified,
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
+			protocol,
+			beamup: beamupSettings,
 			...cascade
 		});
+	}
+
+	if (beamupSettings && oldValue && !oldValue.manuallyModified && manuallyModified) {
+		console.info(`Sending correction to BeamUp for metadata ${metadataId} in ${subjectId}`);
+		await sendCorrection({
+			...beamupSettings,
+			metadata: metadataId,
+			subject: subjectId,
+			subject_type: subjectIs,
+			client_name: 'CIGALE',
+			client_version: import.meta.env.buildCommit,
+			subject_content_hash: null, // TODO store hash in ImageFile
+			comment: null,
+			done_at: storedAt.toISOString(),
+			protocol_id: protocol.id,
+			protocol_version: protocol.version.toString(),
+			user: null,
+			before: {
+				type: metadata.type,
+				value: oldValue.value,
+				alternatives: entries(oldValue.alternatives).map(([value, confidence]) => ({
+					value,
+					confidence
+				}))
+			},
+			after: {
+				type: metadata.type,
+				value: serializeMetadataValue(value),
+				alternatives: alternatives.map((a) => ({
+					value: serializeMetadataValue(a.value),
+					confidence: a.confidence
+				}))
+			}
+		}).catch(console.error);
 	}
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
