@@ -254,13 +254,18 @@
 		const metadataId = uiState.cropConfirmationMetadataId;
 		if (!metadataId) return;
 
+		const protocol = uiState.currentProtocol;
+		if (!protocol) throw new Error('No protocol selected');
+
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
 			metadataId,
 			subjectId: imageId,
 			type: 'boolean',
 			manuallyModified: true,
-			value: confirmed
+			value: confirmed,
+			protocol,
+			beamup: protocol.beamup
 		});
 	}
 
@@ -293,12 +298,17 @@
 			return;
 		}
 
+		const protocol = uiState.currentProtocol;
+		if (!protocol) throw new Error('No protocol selected');
+
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
 			subjectId: imageId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
 			manuallyModified: false,
+			protocol,
+			beamup: protocol.beamup,
 			...initialCrop
 		});
 
@@ -404,10 +414,15 @@
 
 		let newImageId = '';
 
+		const protocol = uiState.currentProtocol;
+		if (!protocol) throw new Error('No protocol selected');
+
 		if (imageId) {
 			// We're modifying an existing cropbox
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
+				protocol,
+				beamup: protocol.beamup,
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId,
 				type: 'boundingbox',
@@ -421,6 +436,8 @@
 			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
 			newImageId = firstImage.id;
 			await storeMetadataValue({
+				protocol,
+				beamup: protocol.beamup,
 				db: idb.databaseHandle(),
 				metadataId: uiState.cropMetadataId,
 				subjectId: newImageId,
