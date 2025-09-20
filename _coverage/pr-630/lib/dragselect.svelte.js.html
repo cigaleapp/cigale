@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/58</span>
+                <span class='fraction'>0/60</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/58</span>
+                <span class='fraction'>0/60</span>
             </div>
         
             
@@ -179,7 +179,10 @@
 <a name='L114'></a><a href='#L114'>114</a>
 <a name='L115'></a><a href='#L115'>115</a>
 <a name='L116'></a><a href='#L116'>116</a>
-<a name='L117'></a><a href='#L117'>117</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -245,6 +248,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -253,6 +258,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -332,8 +338,8 @@ import { nonnull } from './utils';
 <span class="cstat-no" title="statement not covered" >			.map((id) =&gt; this.imagesContainer?.querySelector(`[data-selectable][data-id="${id}"]`))</span>
 <span class="cstat-no" title="statement not covered" >			.filter((el) =&gt; el !== null &amp;&amp; el !== undefined);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		this.#instance.clearSelection();</span>
-<span class="cstat-no" title="statement not covered" >		const result = /** @type {HTMLElement[]} */ (this.#instance.select(elements));</span>
+<span class="cstat-no" title="statement not covered" >		this.#instance.clearSelection(true, true);</span>
+<span class="cstat-no" title="statement not covered" >		const result = /** @type {HTMLElement[]} */ (this.#instance.select(elements, true));</span>
 <span class="cstat-no" title="statement not covered" >		this.selection = result.map((e) =&gt; e.dataset.id).filter((id) =&gt; id !== undefined);</span>
 <span class="cstat-no" title="statement not covered" >		return result;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
@@ -361,6 +367,8 @@ import { nonnull } from './utils';
 		// If the container doesn't exist, we can't do anything
 <span class="cstat-no" title="statement not covered" >		if (!this.imagesContainer) return;</span>
 &nbsp;
+<span class="cstat-no" title="statement not covered" >		const boundary = this.imagesContainer.parentElement ?? this.imagesContainer;</span>
+&nbsp;
 		// Create a new Viselect instance: this comes from the dragselect package
 		// It manages the selection of items in a container by dragging or clicking
 <span class="cstat-no" title="statement not covered" >		this.#instance = new Viselect({</span>
@@ -369,7 +377,8 @@ import { nonnull } from './utils';
 			// Tell it where it should take over mouse dragging and stuff: the parent of the images container
 			// We use the parent to allow users of the AreaObservations component to decide how much padding they want around the images
 			// Using the parent, we can let the user start their selection in the padding area, and still select the images
-<span class="cstat-no" title="statement not covered" >			boundaries: this.imagesContainer.parentElement ?? this.imagesContainer,</span>
+<span class="cstat-no" title="statement not covered" >			boundaries: boundary,</span>
+<span class="cstat-no" title="statement not covered" >			startAreas: boundary,</span>
 			// file://./dragselect.css
 <span class="cstat-no" title="statement not covered" >			selectionAreaClass: 'viselect-selection-area',</span>
 <span class="cstat-no" title="statement not covered" >			behaviour: {</span>
@@ -418,7 +427,7 @@ import { nonnull } from './utils';
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-19T22:24:27.631Z
+                at 2025-09-20T22:08:39.403Z
             </div>
         <script src="../prettify.js"></script>
         <script>
