@@ -215,7 +215,9 @@
 			ondelete={deleteSelection}
 			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
-				if (!uiState.currentProtocol) return;
+				const protocol = uiState.currentProtocol;
+				if (!protocol) return;
+
 				for (const subjectId of uiState.selection) {
 					if (value === undefined) {
 						await deleteMetadataValue({
@@ -227,6 +229,8 @@
 					} else {
 						await storeMetadataValue({
 							db: db.databaseHandle(),
+							protocol,
+							beamup: protocol.beamup,
 							subjectId,
 							metadataId: id,
 							confidence: 1,
