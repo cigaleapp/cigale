@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+import { sendCorrection } from '@cigale/beamup';
 import * as dates from 'date-fns';
 import { computeCascades } from './cascades.js';
 import { storeCorrection } from './beamup.svelte.js';
@@ -14,7 +15,7 @@ import {
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
-import { avg, mapValues } from './utils.js';
+import { avg, entries, mapValues } from './utils.js';
 
 /**
  * @import { IDBDatabaseType, ReactiveTableNames } from './idb.svelte.js'
