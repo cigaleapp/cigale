@@ -35,8 +35,8 @@ export class DragSelect {
 			.map((id) => this.imagesContainer?.querySelector(`[data-selectable][data-id="${id}"]`))
 			.filter((el) => el !== null && el !== undefined);
 
-		this.#instance.clearSelection();
-		const result = /** @type {HTMLElement[]} */ (this.#instance.select(elements));
+		this.#instance.clearSelection(true, true);
+		const result = /** @type {HTMLElement[]} */ (this.#instance.select(elements, true));
 		this.selection = result.map((e) => e.dataset.id).filter((id) => id !== undefined);
 		return result;
 	}
@@ -64,6 +64,8 @@ export class DragSelect {
 		// If the container doesn't exist, we can't do anything
 		if (!this.imagesContainer) return;
 
+		const boundary = this.imagesContainer.parentElement ?? this.imagesContainer;
+
 		// Create a new Viselect instance: this comes from the dragselect package
 		// It manages the selection of items in a container by dragging or clicking
 		this.#instance = new Viselect({
@@ -72,7 +74,8 @@ export class DragSelect {
 			// Tell it where it should take over mouse dragging and stuff: the parent of the images container
 			// We use the parent to allow users of the AreaObservations component to decide how much padding they want around the images
 			// Using the parent, we can let the user start their selection in the padding area, and still select the images
-			boundaries: this.imagesContainer.parentElement ?? this.imagesContainer,
+			boundaries: boundary,
+			startAreas: boundary,
 			// file://./dragselect.css
 			selectionAreaClass: 'viselect-selection-area',
 			behaviour: {
