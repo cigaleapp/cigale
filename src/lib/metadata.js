@@ -1,18 +1,20 @@
 import { type } from 'arktype';
-import { sendCorrection } from '@cigale/beamup';
 import * as dates from 'date-fns';
 import { computeCascades } from './cascades.js';
+import { storeCorrection } from './beamup.svelte.js';
 import { idComparator, Schemas } from './database.js';
+import { databaseHandle } from './idb.svelte.js';
 import { m } from './paraglide/messages.js';
 import { getLocale, setLocale } from './paraglide/runtime.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
 	namespacedMetadataId,
+	MetadataValue,
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
-import { avg, entries, mapValues } from './utils.js';
+import { avg, mapValues } from './utils.js';
 
 /**
  * @import { IDBDatabaseType, ReactiveTableNames } from './idb.svelte.js'
@@ -138,6 +140,14 @@ export async function storeMetadataValue({
 	abortSignal,
 	protocol
 }) {
+	const storedAt = new Date();
+	/**
+	 * Guaranteed to be set only if beamupSettings is set (for performance reasons: calculating
+	 * the old value can be a bit expensive in the observation subject case)
+	 * @type {null | typeof import('./database.js').Schemas.MetadataValue.inferIn}
+	 */
+	let oldValue = null;
+
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
@@ -176,14 +186,12 @@ export async function storeMetadataValue({
 
 	abortSignal?.throwIfAborted();
 	if (image) {
-		subjectIs = 'image';
 		if (metadataId in image.metadata) {
 			oldValue = structuredClone(image.metadata[metadataId]);
 		}
 		image.metadata[metadataId] = newValue;
 		db.put('Image', image);
 	} else if (observation) {
-		subjectIs = 'observation';
 		if (metadataId in observation.metadataOverrides) {
 			oldValue = structuredClone(observation.metadataOverrides[metadataId]);
 		} else if (observation.images.length > 0) {
@@ -265,38 +273,16 @@ export async function storeMetadataValue({
 		});
 	}
 
-	if (protocol.beamup && oldValue && !oldValue.manuallyModified && manuallyModified) {
-		console.info(`Sending correction to BeamUp for metadata ${metadataId} in ${subjectId}`);
-		await sendCorrection({
-			...protocol.beamup,
-			metadata: metadataId,
-			subject: subjectId,
-			subject_type: subjectIs,
-			client_name: 'CIGALE',
-			client_version: import.meta.env.buildCommit,
-			subject_content_hash: null, // TODO store hash in ImageFile
-			comment: null,
-			done_at: storedAt.toISOString(),
-			protocol_id: protocol.id,
-			protocol_version: protocol.version?.toString() ?? '?',
-			user: null,
-			before: {
-				type: metadata.type,
-				value: oldValue.value,
-				alternatives: entries(oldValue.alternatives).map(([value, confidence]) => ({
-					value,
-					confidence
-				}))
-			},
-			after: {
-				type: metadata.type,
-				value: serializeMetadataValue(value),
-				alternatives: alternatives.map((a) => ({
-					value: serializeMetadataValue(a.value),
-					confidence: a.confidence
-				}))
-			}
-		}).catch(console.error);
+	if ('beamup' in protocol && oldValue && !oldValue.manuallyModified && manuallyModified) {
+		await storeCorrection(
+			databaseHandle(),
+			// @ts-expect-error TS doesn't understand we checked beamup exists
+			protocol,
+			subjectId,
+			metadata,
+			MetadataValue.assert(oldValue),
+			newValue
+		).catch(console.error);
 	}
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
