@@ -25,11 +25,17 @@
 	import IconDelete from '~icons/ph/trash';
 	import IconTechnical from '~icons/ph/wrench';
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
+	import { setContext } from 'svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
 	const { children, data } = $props();
 	let { id, name, version } = $derived(data);
+
+	setContext('setSidebarVersion', (/** @type {number} */ newVersion) => {
+		version = newVersion;
+		data.version = newVersion;
+	});
 
 	/** @type {undefined | (() => void)}*/
 	let deleteProtocol = $state(undefined);
@@ -184,6 +190,9 @@
 		width: 100%;
 		&.padded {
 			padding: 1.5em;
+		}
+		&.padded > :global(*) {
+			max-width: 45rem;
 		}
 	}
 
