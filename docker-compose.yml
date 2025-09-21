@@ -1,0 +1,19 @@
+services:
+  beamup:
+    image: ghcr.io/cigaleapp/beamup:v0.2.2
+    ports:
+      - 3000:3000
+    environment:
+      - DB_FILE_NAME=/app/database/db.sqlite3
+      - ALLOWED_ORIGINS=http://localhost:5173
+      - PROD=true
+    volumes:
+      - ${PWD}/beamup-db/:/app/database/:rw
+    develop:
+      watch:
+        - path: src/
+          target: /app/src/
+          action: sync+restart
+        - path: drizzle/
+          target: /app/drizzle/
+          action: sync+restart
