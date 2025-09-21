@@ -91,7 +91,6 @@
         "rss-parser": "^3.13.0",
         "svelte": "^5.39.3",
         "svelte-check": "^4.3.1",
-        "sveltekit-search-params": "^4.0.0-next.0",
         "tinyexec": "^1.0.1",
         "turndown": "^7.2.1",
         "typescript": "^5.9.2",
@@ -1900,8 +1899,6 @@
     "svelte-toolbelt": ["svelte-toolbelt@0.7.1", "", { "dependencies": { "clsx": "^2.1.1", "runed": "^0.23.2", "style-to-object": "^1.0.8" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ=="],
 
     "sveltejs-tippy": ["sveltejs-tippy@3.0.0", "", { "dependencies": { "tippy.js": "~6.0.1" } }, "sha512-LAfQikm61AeqZW1hCFWUsmGEMmhMHDvrPV0JhbT38Ell9SqBjmFaY//+YKUxaJvx6nLMxGQdlcHA1rDg2Ml8tQ=="],
-
-    "sveltekit-search-params": ["sveltekit-search-params@4.0.0-next.0", "", { "peerDependencies": { "@sveltejs/kit": "^2.0.0", "svelte": "^5.0.0" } }, "sha512-haFr5seakusriPePAv2F5/lsOa37rr9AOGDa5JOZ9CaB0Vrl8V8PdtqNWfh/kF0jlANdkdqz5gKK66nhhHT8tg=="],
 
     "swarpc": ["swarpc@0.14.0", "", { "peerDependencies": { "arktype": "^2.1.22" } }, "sha512-uKmRd68wglC/ibr9M21yVIw6+iJTqZyA41os/p76vgpqLwmPE6jz56W0tPGeBqsi2l0fHKZMLePzkeSkE+B0ew=="],
 
