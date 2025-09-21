@@ -217,8 +217,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "8b5b716":
-              - /url: https://github.com/cigaleapp/cigale/tree/8b5b7166efb85fa0a072e94ef9bca540d9dfa4db
+            - link "9e5027f":
+              - /url: https://github.com/cigaleapp/cigale/tree/9e5027fd59c32c50188f3bbc9cfe6e8702a02da1
             - text: ·
             - link "À propos":
               - /url: "#/about"
@@ -281,12 +281,12 @@
             - generic [ref=e136]: float
             - generic [ref=e137]:
               - generic [ref=e138]:
-                - textbox "float" [ref=e139]
+                - textbox "float" [ref=e139]: "4.14"
                 - button "Décrémenter" [ref=e140]:
                   - img [ref=e141]
-                - button "Incrémenter" [ref=e143]:
+                - button "Incrémenter" [active] [ref=e143]:
                   - img [ref=e144]
-              - button [disabled] [ref=e146] [cursor=pointer]:
+              - button [ref=e146] [cursor=pointer]:
                 - img [ref=e147] [cursor=pointer]
           - paragraph [ref=e150]: float metadata
         - generic [ref=e151]:
@@ -314,7 +314,7 @@
           - generic [ref=e180]:
             - generic [ref=e181]: string
             - generic [ref=e182]:
-              - textbox "string" [ref=e184]: Hello world
+              - textbox "string" [ref=e184]
               - button [disabled] [ref=e185] [cursor=pointer]:
                 - img [ref=e186] [cursor=pointer]
           - paragraph [ref=e189]: string metadata

@@ -217,8 +217,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "8b5b716":
-              - /url: https://github.com/cigaleapp/cigale/tree/8b5b7166efb85fa0a072e94ef9bca540d9dfa4db
+            - link "9e5027f":
+              - /url: https://github.com/cigaleapp/cigale/tree/9e5027fd59c32c50188f3bbc9cfe6e8702a02da1
             - text: ·
             - link "À propos":
               - /url: "#/about"
@@ -247,11 +247,9 @@
           - generic [ref=e86]:
             - generic [ref=e87]: bool
             - generic [ref=e88]:
-              - generic [ref=e90]:
-                - switch "on/off switch" [active] [ref=e91] [cursor=pointer]:
-                  - img [ref=e93] [cursor=pointer]
-                - text: Non
-              - button [ref=e95] [cursor=pointer]:
+              - switch "on/off switch" [ref=e91] [cursor=pointer]:
+                - img [ref=e93] [cursor=pointer]
+              - button [disabled] [ref=e95] [cursor=pointer]:
                 - img [ref=e96] [cursor=pointer]
           - paragraph [ref=e99]: boolean metadata
         - generic [ref=e101]:
@@ -316,7 +314,7 @@
           - generic [ref=e180]:
             - generic [ref=e181]: string
             - generic [ref=e182]:
-              - textbox "string" [ref=e184]
+              - textbox "string" [ref=e184]: Hello world
               - button [disabled] [ref=e185] [cursor=pointer]:
                 - img [ref=e186] [cursor=pointer]
           - paragraph [ref=e189]: string metadata
