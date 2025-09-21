@@ -1,18 +1,22 @@
 <script>
+	import Field from '$lib/Field.svelte';
+	import FieldUrl from '$lib/FieldURL.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { modelUrl } from '$lib/inference';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { metadataDefinitionComparator } from '$lib/metadata';
 	import { m } from '$lib/paraglide/messages.js';
 	import { tooltip } from '$lib/tooltips';
 	import IconArrow from '~icons/ph/arrow-right';
-	import IconSource from '~icons/ph/link-simple';
+	import IconLearnMore from '~icons/ph/info';
 	import IconClassification from '~icons/ph/list-star';
 	import IconDetection from '~icons/ph/magnifying-glass';
 	import IconAuthors from '~icons/ph/users';
+	import { updater } from '../updater.svelte.js';
 
 	const { data } = $props();
 
-	const { id, learnMore, authors, metadata, description, crop, metadataOrder } = $derived(data);
+	let { id, learnMore, authors, metadata, description, crop, metadataOrder } = $derived(data);
 
 	const metadataOfProtocol = $derived(
 		tables.Metadata.state
@@ -50,28 +54,53 @@
 	</p>
 	{#if learnMore}
 		<p class="source">
-			<IconSource />
-			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-			<a href={learnMore}>{learnMore.replace('https://', '')}</a>
+			<FieldUrl
+				Icon={IconLearnMore}
+				value={learnMore}
+				label="Site du protocole"
+				onblur={updater((p, value) => {
+					learnMore = value;
+					p.learnMore = value;
+				})}
+			/>
 		</p>
 	{/if}
 	{#if authors.length}
-		{#snippet author(/** @type {{name: string; email?: string}} */ a)}
-			{a.name}
-			{#if a.email}
-				<br />
-				<a href="mailto:{a.email}">{a.email}</a>
-			{/if}
+		{#snippet author(/** @type {{name: string; email?: string}} */ a, /** @type {number} */ i)}
+			<InlineTextInput
+				label="Nom"
+				discreet
+				value={a.name}
+				onblur={updater((p, value) => {
+					a.name = value;
+					p.authors[i].name = value;
+				})}
+			/>
+			<br />
+			<InlineTextInput
+				label="Email"
+				discreet
+				placeholder="Pas d'email"
+				value={a.email ?? ''}
+				onblur={updater((p, value) => {
+					if (value) {
+						a.email = value;
+						p.authors[i].email = value;
+					} else {
+						delete a.email;
+						delete p.authors[i].email;
+					}
+				})}
+			/>
 		{/snippet}
 
-		<div class="authors">
-			<IconAuthors />
+		<Field composite Icon={IconAuthors} label="Auteurices">
 			<ul>
-				{#each authors as a (a.email + a.name)}
-					<li>{@render author(a)}</li>
+				{#each authors as a, i (a.email + a.name)}
+					<li>{@render author(a, i)}</li>
 				{/each}
 			</ul>
-		</div>
+		</Field>
 	{/if}
 </header>
 
@@ -129,19 +158,14 @@
 
 <style>
 	header,
-	section {
-		max-width: 35rem;
-	}
-
-	header,
 	section:not(:last-child) {
-		margin-bottom: 1em;
+		margin-bottom: 2em;
 	}
 
 	header {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5em;
+		gap: 1.5em;
 	}
 
 	.id {
@@ -154,7 +178,12 @@
 	.authors {
 		display: flex;
 		gap: 0.5em;
-		align-items: center;
+	}
+
+	.authors ul {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+		width: 100%;
 	}
 
 	.source a {

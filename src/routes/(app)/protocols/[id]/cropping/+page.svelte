@@ -82,6 +82,7 @@
 			</Field>
 
 			<FieldUrl
+				check
 				label="URL du modèle .onnx"
 				value={typeof model === 'string' ? model : ''}
 				onblur={async (newModel) => {

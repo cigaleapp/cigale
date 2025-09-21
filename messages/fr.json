@@ -193,5 +193,7 @@
 	"metadata_value_boundingbox": "Boîte de ({x1}, {y1}) à ({x2}, {y2})",
 	"no_images": "Aucune image",
 	"edit": "Modifier",
-	"back": "Retour"
+	"back": "Retour",
+	"unable_to_save_changes": "Impossible de sauvegarder les changements: {error}",
+	"invalid_value": "Valeur invalide: {error}"
 }
