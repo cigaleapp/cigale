@@ -47,6 +47,12 @@ export async function load() {
 	setLoadingMessage('Initialisation DB du worker neuronal…');
 	await swarpc.init.broadcast({ databaseName, databaseRevision });
 
+	void swarpc.syncStoredCorrections({}, (progress) => {
+		console.info(
+			`Sending corrections to protocols' beamup servers: ${Math.round(progress * 100)}%`
+		);
+	});
+
 	try {
 		setLoadingMessage('Initialisation de la base de données…');
 		await tables.initialize();

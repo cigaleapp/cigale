@@ -3,6 +3,7 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import { syncCorrections } from '$lib/beamup.svelte.js';
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
 import { cropImage } from '$lib/images.js';
@@ -530,6 +531,33 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 
 	notify({ progress: 1 });
 	return zipfile.buffer;
+});
+
+swarp.syncStoredCorrections(async (_, onProgress) => {
+	const db = await openDatabase();
+	if (!db.objectStoreNames.contains('BeamupCorrection')) {
+		throw new Error('Database does not support Beamup corrections');
+	}
+
+	/** @type {Array<{why: string, id: string}>} */
+	let failed = [];
+	let succeeded = 0;
+	const total = await db.count('BeamupCorrection');
+	if (total === 0) {
+		return { total, failed, succeeded };
+	}
+
+	await syncCorrections(db, (id, error) => {
+		if (error) {
+			failed.push({ why: error, id });
+		} else {
+			succeeded++;
+		}
+
+		onProgress((failed.length + succeeded) / total);
+	});
+
+	return { total, failed, succeeded };
 });
 
 void swarp.start();
