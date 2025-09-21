@@ -62,7 +62,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			},
 			protocol: {
 				id: 'string',
-				version: 'number | string',
+				'version?': 'number',
 				'beamup?': {
 					origin: 'string.url'
 				}
@@ -94,6 +94,15 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			id: 'string',
 			name: 'string',
 			'version?': 'number | undefined'
+		})
+	},
+	syncStoredCorrections: {
+		input: type('object'),
+		progress: type('number'),
+		success: type({
+			total: 'number',
+			failed: type({ why: 'string', id: 'string' }).array(),
+			succeeded: 'number'
 		})
 	},
 	generateResultsZip: {
