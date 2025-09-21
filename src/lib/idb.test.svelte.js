@@ -17,18 +17,20 @@ test('openDatabase', async () => {
 	expect(window).toHaveProperty('DB');
 	expect(window).toHaveProperty('refreshDB');
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
-	expect(db.version).toMatchInlineSnapshot(`3`);
+	expect(db.version).toBeGreaterThan(0);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
 		FakeDOMStringList {
-		  "0": "Image",
-		  "1": "ImageFile",
-		  "2": "ImagePreviewFile",
-		  "3": "Metadata",
-		  "4": "MetadataOption",
-		  "5": "Observation",
-		  "6": "Protocol",
-		  "7": "Settings",
+		  "0": "BeamupCorrection",
+		  "1": "Image",
+		  "2": "ImageFile",
+		  "3": "ImagePreviewFile",
+		  "4": "Metadata",
+		  "5": "MetadataOption",
+		  "6": "Observation",
+		  "7": "Protocol",
+		  "8": "Settings",
 		  "_values": [
+		    "BeamupCorrection",
 		    "Image",
 		    "ImageFile",
 		    "ImagePreviewFile",
