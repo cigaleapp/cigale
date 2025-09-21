@@ -83,7 +83,7 @@
         "lint-staged": "^16.1.6",
         "odt2html": "^1.0.1",
         "oxlint": "^1.16.0",
-        "pdf-to-png-converter": "^3.8.0",
+        "pdf-to-png-converter": "^3.10.0",
         "pixelmatch": "^7.1.0",
         "pngjs": "^7.0.0",
         "prettier": "^3.6.2",
@@ -1625,7 +1625,7 @@
 
     "pathval": ["pathval@2.0.1", "", {}, "sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ=="],
 
-    "pdf-to-png-converter": ["pdf-to-png-converter@3.8.0", "", { "dependencies": { "@napi-rs/canvas": "~0.1.80", "pdfjs-dist": "~5.4.149" } }, "sha512-7usuMvb14vYPomFZnA2CB9jdrtgAYctzLLfIJhlYBh4Ddx/9K5YnSNVtJZzm4r7ta66x2GA7FtlwsdGaMQTlqQ=="],
+    "pdf-to-png-converter": ["pdf-to-png-converter@3.10.0", "", { "dependencies": { "@napi-rs/canvas": "~0.1.80", "pdfjs-dist": "~5.4.149" } }, "sha512-kRRoacnX88gvpRPQWtPd9igsSXnyItXnPy8hIKBDmhOauCImHjP7+3DClKsVZc2PR4/u9p2cJmXJ4Ry1g6U2Xw=="],
 
     "pdfjs-dist": ["pdfjs-dist@5.4.149", "", { "optionalDependencies": { "@napi-rs/canvas": "^0.1.77" } }, "sha512-Xe8/1FMJEQPUVSti25AlDpwpUm2QAVmNOpFP0SIahaPIOKBKICaefbzogLdwey3XGGoaP4Lb9wqiw2e9Jqp0LA=="],
 
