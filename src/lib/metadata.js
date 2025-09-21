@@ -123,8 +123,7 @@ export function serializeMetadataValues(values) {
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  * @param {AbortSignal} [options.abortSignal] signal d'abandon pour annuler la requête
- * @param {typeof import('$lib/schemas/protocols.js').Protocol.infer.beamup} [options.beamup] informations sur l'instance BeamUp où envoyer la correction, telle que définie par le protocole courant
- * @param {{ id: string; version: number | string }} options.protocol le protocole courant, utilisé pour BeamUp
+ * @param {Pick<DB.Protocol, 'id' | 'version' | 'beamup'>} options.protocol le protocole courant, utilisé pour BeamUp
  */
 export async function storeMetadataValue({
 	db,
@@ -137,7 +136,6 @@ export async function storeMetadataValue({
 	manuallyModified = false,
 	cascadedFrom = [],
 	abortSignal,
-	beamup: beamupSettings,
 	protocol
 }) {
 	if (!namespaceOfMetadataId(metadataId)) {
@@ -188,7 +186,7 @@ export async function storeMetadataValue({
 		subjectIs = 'observation';
 		if (metadataId in observation.metadataOverrides) {
 			oldValue = structuredClone(observation.metadataOverrides[metadataId]);
-		} else if (beamupSettings && observation.images.length > 0) {
+		} else if (observation.images.length > 0) {
 			const images = await db
 				.getAll('Image')
 				.then((imgs) => imgs.filter((img) => observation.images.includes(img.id)));
@@ -218,8 +216,7 @@ export async function storeMetadataValue({
 				confidence,
 				manuallyModified,
 				abortSignal,
-				protocol,
-				beamup: beamupSettings
+				protocol
 			});
 		}
 	} else {
@@ -264,15 +261,14 @@ export async function storeMetadataValue({
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
 			protocol,
-			beamup: beamupSettings,
 			...cascade
 		});
 	}
 
-	if (beamupSettings && oldValue && !oldValue.manuallyModified && manuallyModified) {
+	if (protocol.beamup && oldValue && !oldValue.manuallyModified && manuallyModified) {
 		console.info(`Sending correction to BeamUp for metadata ${metadataId} in ${subjectId}`);
 		await sendCorrection({
-			...beamupSettings,
+			...protocol.beamup,
 			metadata: metadataId,
 			subject: subjectId,
 			subject_type: subjectIs,
@@ -282,7 +278,7 @@ export async function storeMetadataValue({
 			comment: null,
 			done_at: storedAt.toISOString(),
 			protocol_id: protocol.id,
-			protocol_version: protocol.version.toString(),
+			protocol_version: protocol.version?.toString() ?? '?',
 			user: null,
 			before: {
 				type: metadata.type,
