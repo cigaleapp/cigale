@@ -19,6 +19,7 @@ import {
 } from './schemas/metadata.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
+	BeamupSettings,
 	FilepathTemplate,
 	ModelDetectionOutputShape,
 	Protocol as ProtocolSchema
@@ -151,6 +152,28 @@ const Settings = table(
 	})
 );
 
+const BeamupCorrection = table(
+	['id'],
+	type({
+		id: ID,
+		client: { version: 'string' },
+		protocol: Protocol.pick('id', 'version').and({
+			beamup: BeamupSettings
+		}),
+		metadata: Metadata.pick('id', 'type'),
+		subject: { 'image?': Image.pick('id'), 'observation?': Observation.pick('id') },
+		'file?': ImageFile.pick(
+			'id',
+			/* TODO  'contentHash', */ 'filename',
+			'contentType',
+			'dimensions'
+		),
+		before: MetadataValue,
+		after: MetadataValue,
+		occurredAt: 'string.date.iso.parse'
+	})
+);
+
 export const Schemas = {
 	ID,
 	FilepathTemplate,
@@ -169,13 +192,15 @@ export const Schemas = {
 	Protocol,
 	Settings,
 	EXIFField,
-	HTTPRequest
+	HTTPRequest,
+	BeamupCorrection
 };
 
 export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 	'ImageFile',
 	'ImagePreviewFile',
-	'MetadataOption'
+	'MetadataOption',
+	'BeamupCorrection'
 ]);
 
 /**
@@ -196,7 +221,8 @@ export const Tables = {
 	Metadata,
 	MetadataOption,
 	Protocol,
-	Settings
+	Settings,
+	BeamupCorrection
 };
 
 /**
