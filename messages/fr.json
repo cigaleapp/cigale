@@ -197,5 +197,7 @@
 	"cropped_items": "Recadrées",
 	"uncropped_items": "Non recadrées",
 	"edit": "Modifier",
-	"back": "Retour"
+	"back": "Retour",
+	"unable_to_save_changes": "Impossible de sauvegarder les changements: {error}",
+	"invalid_value": "Valeur invalide: {error}"
 }

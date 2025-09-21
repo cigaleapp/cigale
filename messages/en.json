@@ -198,5 +198,7 @@
 	"cropped_items": "Cropped",
 	"uncropped_items": "Uncropped",
 	"edit": "Edit",
-	"back": "Back"
+	"back": "Back",
+	"unable_to_save_changes": "Unable to save changes: {error}",
+	"invalid_value": "Invalid value: {error}"
 }
