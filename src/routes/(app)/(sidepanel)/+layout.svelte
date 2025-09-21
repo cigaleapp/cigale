@@ -231,7 +231,6 @@
 						await storeMetadataValue({
 							db: db.databaseHandle(),
 							protocol,
-							beamup: protocol.beamup,
 							subjectId,
 							metadataId: id,
 							confidence: 1,

@@ -204,7 +204,6 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings, protocol }, _, tools
 		await storeMetadataValue({
 			db,
 			protocol,
-			beamup: protocol.beamup,
 			...metadataValue,
 			metadataId: metadataIds.target,
 			abortSignal: tools.abortSignal
