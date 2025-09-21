@@ -1,8 +1,9 @@
 import { match, type } from 'arktype';
-import { uiState } from './state.svelte.js';
-import { MetadataInferOptionsNeural } from './schemas/metadata.js';
 import { tables } from './idb.svelte.js';
-import { propOrNothing } from './utils.js';
+import { m } from './paraglide/messages.js';
+import { MetadataInferOptionsNeural } from './schemas/metadata.js';
+import { uiState } from './state.svelte.js';
+import { pick, propOrNothing } from './utils.js';
 
 /**
  * Classifies an image using the current protocol and selected model.
@@ -25,8 +26,7 @@ export async function classifyImage(swarpc, id, cancellers) {
 
 	const { cancel, request: done } = swarpc.classify.cancelable({
 		protocol: {
-			id: protocol.id,
-			version: protocol.version ?? '?',
+			...pick(protocol, 'id', 'version'),
 			...propOrNothing('beamup', $state.snapshot(protocol.beamup))
 		},
 		imageId: id,
@@ -34,10 +34,7 @@ export async function classifyImage(swarpc, id, cancellers) {
 			cropbox: uiState.cropMetadataId,
 			target: uiState.classificationMetadataId
 		},
-		taskSettings: classificationInferenceSettings(
-			uiState.currentProtocol,
-			uiState.selectedClassificationModel
-		)
+		taskSettings: classificationInferenceSettings(protocol, uiState.selectedClassificationModel)
 	});
 
 	cancellers?.set(id, cancel);
