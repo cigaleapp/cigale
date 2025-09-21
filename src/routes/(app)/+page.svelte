@@ -4,7 +4,6 @@
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { type } from 'arktype';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { goto } from '$lib/paths.js';
@@ -15,7 +14,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import Fuse from 'fuse.js';
-	import { useSearchParams } from 'runed/kit';
+	import { queryParameters, ssp } from 'sveltekit-search-params';
 	import IconCheck from '~icons/ph/check';
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
@@ -30,18 +29,15 @@
 	);
 
 	let importingPreselectedProtocol = $state(false);
-
-	const preselection = useSearchParams(
-		type({
-			protocol: 'string = ""',
-			classificationModel: 'number = -1',
-			cropModel: 'number = -1'
-		}),
-		{
-			updateURL: true,
-			pushHistory: false
-		}
-	);
+	const numberToIndex = {
+		encode: (/** @type {unknown} */ v) => (v === null ? undefined : (Number(v) + 1).toString()),
+		decode: (/** @type {unknown} */ v) => (v === null ? null : Number(v) - 1)
+	};
+	const preselection = queryParameters({
+		protocol: ssp.string(),
+		classificationModel: numberToIndex,
+		cropModel: numberToIndex
+	});
 
 	let openImportRemoteProtocol = $state();
 	const preselectedProtocolIsRemote = $derived(
@@ -58,21 +54,17 @@
 		if (preselectedProtocolIsRemote) return;
 		if (preselection.protocol) {
 			uiState.setCurrentProtocolId(preselection.protocol);
-			preselection.protocol = '';
+			preselection.protocol = null;
 		}
-
-		// URL params are 1-based, internal state is 0-based
-		// In Search params, -1 means "don't change", 0 means "no inference"
-		const toIndex = (/** @type {number} */ n) => (n === -1 ? null : n - 1);
 
 		void uiState
 			.setModelSelections({
-				classification: toIndex(preselection.classificationModel),
-				crop: toIndex(preselection.cropModel)
+				classification: preselection.classificationModel,
+				crop: preselection.cropModel
 			})
 			.then(() => {
-				if (preselection.classificationModel !== -1) preselection.classificationModel = -1;
-				if (preselection.cropModel !== -1) preselection.cropModel = -1;
+				if (preselection.classificationModel !== null) preselection.classificationModel = null;
+				if (preselection.cropModel !== null) preselection.cropModel = null;
 			});
 	});
 
