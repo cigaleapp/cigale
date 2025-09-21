@@ -121,6 +121,10 @@ export const FilepathTemplate = type.string
 		toJSON: () => source
 	}));
 
+export const BeamupSettings = type({
+	origin: URLString.describe("URL de l'instance BeamUp d'où proviennent les données")
+});
+
 export const Protocol = type({
 	id: ID.describe(
 		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
@@ -156,9 +160,7 @@ export const Protocol = type({
 			"Label par défaut pour les observations. Template Handlebars, recevant une liste des images de l'observation à crééer (clé images) et l'observation elle-même (clé observation)"
 		)
 	},
-	'beamup?': {
-		origin: URLString.describe("URL de l'instance BeamUp d'où proviennent les données")
-	},
+	'beamup?': BeamupSettings,
 	crop: type({
 		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
 		'confirmationMetadata?': [
