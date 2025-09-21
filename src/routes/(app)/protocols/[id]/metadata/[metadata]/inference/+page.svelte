@@ -56,6 +56,7 @@
 
 			{#if key === 'neural'}
 				<FieldUrl
+					check
 					label="URL du modèle"
 					value={modelUrl}
 					onblur={async (newModel) => {
