@@ -69,8 +69,7 @@ export async function processExifData(protocolId, imageFileId, imageBytes, file)
 				metadataId: ensureNamespacedMetadataId(key, protocolId),
 				value,
 				confidence,
-				protocol,
-				beamup: protocol.beamup
+				protocol
 			});
 		}
 	}

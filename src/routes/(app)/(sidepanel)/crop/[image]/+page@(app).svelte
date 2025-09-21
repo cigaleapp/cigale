@@ -264,8 +264,7 @@
 			type: 'boolean',
 			manuallyModified: true,
 			value: confirmed,
-			protocol,
-			beamup: protocol.beamup
+			protocol
 		});
 	}
 
@@ -308,7 +307,6 @@
 			type: 'boundingbox',
 			manuallyModified: false,
 			protocol,
-			beamup: protocol.beamup,
 			...initialCrop
 		});
 
@@ -422,7 +420,6 @@
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
 				protocol,
-				beamup: protocol.beamup,
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId,
 				type: 'boundingbox',
@@ -437,7 +434,6 @@
 			newImageId = firstImage.id;
 			await storeMetadataValue({
 				protocol,
-				beamup: protocol.beamup,
 				db: idb.databaseHandle(),
 				metadataId: uiState.cropMetadataId,
 				subjectId: newImageId,
