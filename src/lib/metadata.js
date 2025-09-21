@@ -270,7 +270,7 @@ export async function storeMetadataValue({
 	}
 
 	if ('beamup' in protocol && oldValue && !oldValue.manuallyModified && manuallyModified) {
-		await storeCorrection(
+		void storeCorrection(
 			databaseHandle(),
 			// @ts-expect-error TS doesn't understand we checked beamup exists
 			protocol,
