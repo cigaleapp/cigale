@@ -1,8 +1,21 @@
 import { ArkErrors } from 'arktype';
 import * as dates from 'date-fns';
 import { describe, expect, test } from 'vitest';
-import { Schemas, idComparator } from './database';
+import { Schemas, generateId, idComparator } from './database';
 import { FilepathTemplate } from './schemas/protocols';
+
+describe('generateId', () => {
+	test('should generate a unique ID', () => {
+		const id1 = generateId('Image');
+		const id2 = generateId('Image');
+		expect(id1).not.toBe(id2);
+	});
+
+	test("should start with the table name's initial letter", () => {
+		expect(generateId('Image').charAt(0)).toBe('i');
+		expect(generateId('Observation').charAt(0)).toBe('o');
+	});
+});
 
 describe('filepath templates', () => {
 	/**

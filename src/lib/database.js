@@ -25,6 +25,14 @@ import {
 } from './schemas/protocols.js';
 import { clamp } from './utils.js';
 
+/**
+ * Generate an ID for a given table
+ * @param {keyof typeof Tables} table
+ */
+export function generateId(table) {
+	return table.slice(0, 1).toLowerCase() + Math.random().toString(36).slice(2, 9);
+}
+
 const ImageFile = table(
 	['id'],
 	type({

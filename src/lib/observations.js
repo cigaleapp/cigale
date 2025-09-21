@@ -1,4 +1,5 @@
 import * as db from './idb.svelte';
+import { generateId } from '$lib/database.js';
 import { tables } from './idb.svelte';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
@@ -23,7 +24,7 @@ export async function mergeToObservation(parts) {
 		new Set(images.map((i) => i.id))
 	);
 
-	const newId = db.generateId('Observation');
+	const newId = generateId('Observation');
 
 	await tables.Observation.do(async (tx) => {
 		const observation = {
@@ -127,7 +128,7 @@ function fallbackObservationLabel(parts) {
  * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
  */
 export function newObservation(image, protocol) {
-	const observationId = db.generateId('Observation');
+	const observationId = generateId('Observation');
 	const newObs = {
 		id: observationId,
 		images: [image.id],

@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { idComparator, isReactiveTable, Tables } from './database.js';
+import { idComparator, isReactiveTable, Tables, generateId } from './database.js';
 import * as devalue from 'devalue';
 
 export const previewingPrNumber =
@@ -48,14 +48,6 @@ export const tables = {
 		}
 	}
 };
-
-/**
- * Generate an ID for a given table
- * @param {keyof typeof Tables} table
- */
-export function generateId(table) {
-	return table.slice(0, 1).toLowerCase() + Math.random().toString(36).slice(2, 9);
-}
 
 /**
  *

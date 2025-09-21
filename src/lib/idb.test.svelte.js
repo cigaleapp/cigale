@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 
 import { beforeEach, describe, expect, test } from 'vitest';
-import { generateId, nukeDatabase, openDatabase, tables } from './idb.svelte';
+import { nukeDatabase, openDatabase, tables } from './idb.svelte';
 import * as idb from './idb.svelte.js';
 import { imageId } from './images';
 import { keys } from './utils';
@@ -12,20 +12,6 @@ beforeEach(() => {
 		idb._tablesState[key] = [];
 	}
 });
-
-describe('generateId', () => {
-	test('should generate a unique ID', () => {
-		const id1 = generateId('Image');
-		const id2 = generateId('Image');
-		expect(id1).not.toBe(id2);
-	});
-
-	test("should start with the table name's initial letter", () => {
-		expect(generateId('Image').charAt(0)).toBe('i');
-		expect(generateId('Observation').charAt(0)).toBe('o');
-	});
-});
-
 test('openDatabase', async () => {
 	const db = await openDatabase();
 	expect(window).toHaveProperty('DB');
