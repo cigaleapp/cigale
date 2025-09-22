@@ -116,23 +116,25 @@
         - link "Protocole" [ref=e19] [cursor=pointer]:
           - /url: "#/"
         - img [ref=e20]
-        - link "Importer" [disabled]:
+        - link "Importer" [ref=e22] [cursor=pointer]:
           - /url: "#/import"
-        - img [ref=e22]
-        - generic [ref=e24]:
+        - img [ref=e23]
+        - generic [ref=e25]:
           - link "Recadrer" [disabled]:
             - /url: "#/crop"
-        - img [ref=e25]
-        - generic [ref=e27]:
+          - img [ref=e27]
+        - img [ref=e29]
+        - generic [ref=e31]:
           - link "Classifier" [disabled]:
             - /url: "#/classify"
-        - img [ref=e28]
-        - button "Résultats" [ref=e30] [cursor=pointer]:
-          - img [ref=e31] [cursor=pointer]
+          - img [ref=e33]
+        - img [ref=e35]
+        - button "Résultats" [ref=e37] [cursor=pointer]:
+          - img [ref=e38] [cursor=pointer]
           - text: Résultats
-      - generic [ref=e34]:
-        - button "Réglages" [ref=e35] [cursor=pointer]:
-          - img [ref=e36] [cursor=pointer]
+      - generic [ref=e41]:
+        - button "Réglages" [ref=e42] [cursor=pointer]:
+          - img [ref=e43] [cursor=pointer]
         - dialog:
           - generic: Réglages
           - generic:
@@ -172,12 +174,12 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "9710e53":
-              - /url: https://github.com/cigaleapp/cigale/tree/9710e5328c88687e1aacb4187c50b740ae308aeb
+            - link "b25ca1a":
+              - /url: https://github.com/cigaleapp/cigale/tree/b25ca1a070d267b78d90df9a90aa3528b534789a
             - text: ·
             - link "À propos":
               - /url: "#/about"
-  - generic [ref=e39]:
+  - generic [ref=e46]:
     - dialog:
       - banner:
         - heading [level=1]: Êtes-vous sûr·e?
@@ -214,28 +216,41 @@
           - button:
             - img
             - text: Format YAML
-    - generic [ref=e40]:
-      - banner [ref=e41]:
-        - heading "Protocoles" [level=1] [ref=e42]
-        - generic [ref=e43]:
-          - button "Importer" [ref=e44] [cursor=pointer]:
-            - img [ref=e45] [cursor=pointer]
+    - generic [ref=e47]:
+      - banner [ref=e48]:
+        - heading "Protocoles" [level=1] [ref=e49]
+        - generic [ref=e50]:
+          - button "Importer" [ref=e51] [cursor=pointer]:
+            - img [ref=e52] [cursor=pointer]
             - text: Importer
-          - button "Créer" [ref=e47] [cursor=pointer]:
-            - img [ref=e48] [cursor=pointer]
+          - button "Créer" [ref=e54] [cursor=pointer]:
+            - img [ref=e55] [cursor=pointer]
             - text: Créer
-      - list [ref=e50]:
-        - listitem [ref=e51]:
-          - generic [ref=e52]:
-            - 'heading "Example: arthropodes (lightweight)" [level=3] [ref=e53]'
-            - code [ref=e55]: io.github.cigaleapp.arthropods.example.light
-          - generic [ref=e56]:
-            - button "Supprimer" [ref=e57] [cursor=pointer]:
-              - img [ref=e58] [cursor=pointer]
-            - button "Modifier" [ref=e60] [cursor=pointer]:
-              - img [ref=e61] [cursor=pointer]
-            - button "Exporter" [ref=e63] [cursor=pointer]:
-              - img [ref=e64] [cursor=pointer]
-            - button "Le protocole est à jour (v17). Cliquer pour vérifier à nouveau" [ref=e66] [cursor=pointer]:
+      - list [ref=e57]:
+        - listitem [ref=e58]:
+          - generic [ref=e59]:
+            - 'heading "Example: arthropodes (lightweight)" [level=3] [ref=e60]'
+            - code [ref=e62]: io.github.cigaleapp.arthropods.example.light
+          - generic [ref=e63]:
+            - button "Supprimer" [ref=e64] [cursor=pointer]:
+              - img [ref=e65] [cursor=pointer]
+            - button "Modifier" [ref=e67] [cursor=pointer]:
               - img [ref=e68] [cursor=pointer]
+            - button "Exporter" [ref=e70] [cursor=pointer]:
+              - img [ref=e71] [cursor=pointer]
+            - button "Le protocole est à jour (v17). Cliquer pour vérifier à nouveau" [ref=e73] [cursor=pointer]:
+              - img [ref=e75] [cursor=pointer]
+        - listitem [ref=e77]:
+          - generic [ref=e78]:
+            - heading "Kitchen sink" [level=3] [ref=e79]
+            - code [ref=e81]: io.github.cigaleapp.kitchensink
+          - generic [ref=e82]:
+            - button "Supprimer" [ref=e83] [cursor=pointer]:
+              - img [ref=e84] [cursor=pointer]
+            - button "Modifier" [ref=e86] [cursor=pointer]:
+              - img [ref=e87] [cursor=pointer]
+            - button "Exporter" [ref=e89] [cursor=pointer]:
+              - img [ref=e90] [cursor=pointer]
+            - button "Ce protocole ne supporte pas la vérification des mises à jour" [ref=e92] [cursor=pointer]:
+              - img [ref=e93] [cursor=pointer]
 ```

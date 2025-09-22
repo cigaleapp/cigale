@@ -152,25 +152,25 @@
           - text: results.zip
   - banner [ref=e4]:
     - navigation [ref=e5]:
-      - link "C.i.g.a.l.e." [ref=e7]:
+      - link "C.i.g.a.l.e." [ref=e7] [cursor=pointer]:
         - /url: "#/"
-        - img [ref=e9]
+        - img [ref=e9] [cursor=pointer]
         - text: C.i.g.a.l.e.
       - generic [ref=e18]:
-        - link "Protocole" [ref=e19]:
+        - link "Protocole" [ref=e19] [cursor=pointer]:
           - /url: "#/"
         - img [ref=e20]
-        - link "Importer" [ref=e22]:
+        - link "Importer" [ref=e22] [cursor=pointer]:
           - /url: "#/import"
           - text: Importer
         - img [ref=e24]
         - generic [ref=e26]:
-          - link "Recadrer" [ref=e27]:
+          - link "Recadrer" [ref=e27] [cursor=pointer]:
             - /url: "#/crop"
           - img [ref=e29]
         - img [ref=e31]
         - generic [ref=e33]:
-          - link "Classifier" [ref=e34]:
+          - link "Classifier" [ref=e34] [cursor=pointer]:
             - /url: "#/classify"
           - img [ref=e36]
         - img [ref=e38]
@@ -219,8 +219,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "9710e53":
-              - /url: https://github.com/cigaleapp/cigale/tree/9710e5328c88687e1aacb4187c50b740ae308aeb
+            - link "b25ca1a":
+              - /url: https://github.com/cigaleapp/cigale/tree/b25ca1a070d267b78d90df9a90aa3528b534789a
             - text: ·
             - link "À propos":
               - /url: "#/about"

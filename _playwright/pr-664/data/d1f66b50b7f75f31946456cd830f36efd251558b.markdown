@@ -172,8 +172,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "9710e53":
-              - /url: https://github.com/cigaleapp/cigale/tree/9710e5328c88687e1aacb4187c50b740ae308aeb
+            - link "b25ca1a":
+              - /url: https://github.com/cigaleapp/cigale/tree/b25ca1a070d267b78d90df9a90aa3528b534789a
             - text: ·
             - link "À propos":
               - /url: "#/about"
@@ -238,17 +238,4 @@
               - img [ref=e64] [cursor=pointer]
             - button "Le protocole est à jour (v17). Cliquer pour vérifier à nouveau" [ref=e66] [cursor=pointer]:
               - img [ref=e68] [cursor=pointer]
-        - listitem [ref=e70]:
-          - generic [ref=e71]:
-            - heading "Kitchen sink" [level=3] [ref=e72]
-            - code [ref=e74]: io.github.cigaleapp.kitchensink
-          - generic [ref=e75]:
-            - button "Supprimer" [ref=e76] [cursor=pointer]:
-              - img [ref=e77] [cursor=pointer]
-            - button "Modifier" [ref=e79] [cursor=pointer]:
-              - img [ref=e80] [cursor=pointer]
-            - button "Exporter" [ref=e82] [cursor=pointer]:
-              - img [ref=e83] [cursor=pointer]
-            - button "Ce protocole ne supporte pas la vérification des mises à jour" [ref=e85] [cursor=pointer]:
-              - img [ref=e86] [cursor=pointer]
 ```

@@ -152,24 +152,24 @@
           - text: results.zip
   - banner [ref=e4]:
     - navigation [ref=e5]:
-      - link "C.i.g.a.l.e." [ref=e7]:
+      - link "C.i.g.a.l.e." [ref=e7] [cursor=pointer]:
         - /url: "#/"
-        - img [ref=e9]
+        - img [ref=e9] [cursor=pointer]
         - text: C.i.g.a.l.e.
       - generic [ref=e18]:
-        - link "Protocole" [ref=e19]:
+        - link "Protocole" [ref=e19] [cursor=pointer]:
           - /url: "#/"
         - img [ref=e20]
-        - link "Importer" [ref=e22]:
+        - link "Importer" [ref=e22] [cursor=pointer]:
           - /url: "#/import"
         - img [ref=e23]
         - generic [ref=e25]:
-          - link "Recadrer" [ref=e26]:
+          - link "Recadrer" [ref=e26] [cursor=pointer]:
             - /url: "#/crop"
           - img [ref=e28]
         - img [ref=e30]
         - generic [ref=e32]:
-          - link "Classifier" [ref=e33]:
+          - link "Classifier" [ref=e33] [cursor=pointer]:
             - /url: "#/classify"
             - text: Classifier
           - img [ref=e36]
@@ -219,8 +219,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "9710e53":
-              - /url: https://github.com/cigaleapp/cigale/tree/9710e5328c88687e1aacb4187c50b740ae308aeb
+            - link "b25ca1a":
+              - /url: https://github.com/cigaleapp/cigale/tree/b25ca1a070d267b78d90df9a90aa3528b534789a
             - text: ·
             - link "À propos":
               - /url: "#/about"
@@ -249,11 +249,9 @@
           - generic [ref=e86]:
             - generic [ref=e87]: bool
             - generic [ref=e88]:
-              - generic [ref=e90]:
-                - switch [active] [ref=e92] [cursor=pointer]:
-                  - img [ref=e94] [cursor=pointer]
-                - text: Non
-              - button [ref=e96] [cursor=pointer]:
+              - switch [ref=e92] [cursor=pointer]:
+                - img [ref=e94] [cursor=pointer]
+              - button [disabled] [ref=e96] [cursor=pointer]:
                 - img [ref=e97] [cursor=pointer]
           - paragraph [ref=e100]: boolean metadata
         - generic [ref=e102]:
@@ -298,12 +296,12 @@
             - generic [ref=e154]: integer
             - generic [ref=e155]:
               - generic [ref=e156]:
-                - textbox "integer" [ref=e157]
-                - button "Décrémenter" [ref=e158]:
+                - textbox "integer" [ref=e157]: "41"
+                - button "Décrémenter" [active] [ref=e158]:
                   - img [ref=e159]
                 - button "Incrémenter" [ref=e161]:
                   - img [ref=e162]
-              - button [disabled] [ref=e164] [cursor=pointer]:
+              - button [ref=e164] [cursor=pointer]:
                 - img [ref=e165] [cursor=pointer]
           - paragraph [ref=e168]: integer metadata
         - generic [ref=e169]:
