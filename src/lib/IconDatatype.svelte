@@ -1,5 +1,14 @@
 <script>
+	import IconRaw from '~icons/ph/brackets-curly';
+	import IconDate from '~icons/ph/calendar-blank';
+	import IconBoolean from '~icons/ph/check-square';
+	import IconBoundingbox from '~icons/ph/corners-out';
 	import IconCube from '~icons/ph/cube';
+	import IconEnum from '~icons/ph/list-magnifying-glass';
+	import IconLocation from '~icons/ph/map-pin';
+	import IconInteger from '~icons/ph/number-one';
+	import IconFloat from '~icons/ph/ruler';
+	import IconString from '~icons/ph/text-aa';
 	import { tooltip } from './tooltips';
 
 	/**
@@ -9,16 +18,16 @@
 
 	const IconComponent = $derived(
 		{
-			string: import('~icons/ph/text-aa'),
-			boolean: import('~icons/ph/check-square'),
-			location: import('~icons/ph/map-pin'),
-			date: import('~icons/ph/calendar-blank'),
-			integer: import('~icons/ph/number-one'),
-			float: import('~icons/ph/ruler'),
-			enum: import('~icons/ph/list-magnifying-glass'),
-			boundingbox: import('~icons/ph/corners-out'),
-			raw: import('~icons/ph/brackets-curly')
-		}[kind].then((c) => c.default)
+			string: IconString,
+			boolean: IconBoolean,
+			location: IconLocation,
+			date: IconDate,
+			integer: IconInteger,
+			float: IconFloat,
+			enum: IconEnum,
+			boundingbox: IconBoundingbox,
+			raw: IconRaw
+		}[kind] ?? IconCube
 	);
 
 	const descriptions = {
@@ -35,11 +44,5 @@
 </script>
 
 <span use:tooltip={descriptions[kind]}>
-	{#await IconComponent}
-		<IconCube />
-	{:then Icon}
-		<Icon />
-	{:catch _}
-		<IconCube />
-	{/await}
+	<IconComponent />
 </span>
