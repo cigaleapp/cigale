@@ -1,18 +1,22 @@
 <script>
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte.js';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { metadataDefinitionComparator } from '$lib/metadata.js';
 	import { m } from '$lib/paraglide/messages.js';
 	import { goto, href } from '$lib/paths.js';
 	import { exportProtocol } from '$lib/protocols';
-	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+	import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { seo } from '$lib/seo.svelte.js';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips.js';
+	import { slugify } from '$lib/utils';
+	import { setContext } from 'svelte';
 	import IconVersioning from '~icons/ph/arrow-circle-up';
 	import IconBack from '~icons/ph/arrow-left';
 	import IconCropping from '~icons/ph/crop';
@@ -20,17 +24,18 @@
 	import IconInfo from '~icons/ph/info';
 	import IconMetadata from '~icons/ph/list-bullets';
 	import IconInferred from '~icons/ph/magic-wand';
+	import IconAdd from '~icons/ph/plus';
 	import IconExport from '~icons/ph/share';
 	import IconTag from '~icons/ph/tag';
 	import IconDelete from '~icons/ph/trash';
 	import IconTechnical from '~icons/ph/wrench';
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
-	import { setContext } from 'svelte';
+	import { updater } from './updater.svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
 	const { children, data } = $props();
-	let { id, name, version } = $derived(data);
+	let { id, name, version, metadata, metadataOrder } = $derived(data);
 
 	setContext('setSidebarVersion', (/** @type {number} */ newVersion) => {
 		version = newVersion;
@@ -39,6 +44,40 @@
 
 	/** @type {undefined | (() => void)}*/
 	let deleteProtocol = $state(undefined);
+
+	/** @type {HTMLElement|null} */
+	let metadataNav;
+
+	const displayedMetadata = $derived(
+		metadata
+			.filter((k) => ![data.crop.metadata, data.crop.confirmationMetadata].includes(k))
+			.toSorted(metadataDefinitionComparator({ metadataOrder }))
+	);
+
+	/**
+	 *
+	 * @param {string} name
+	 * @returns {Promise<string>} the new metadata ID
+	 */
+	async function createMetadata(name) {
+		let newId = namespacedMetadataId(id, slugify(name).replaceAll('-', '_'));
+		if (metadata.includes(newId))
+			newId += `_${metadata.filter((k) => k.startsWith(newId)).length + 1}`;
+
+		await tables.Metadata.set({
+			id: newId,
+			label: name,
+			description: '',
+			type: 'string',
+			mergeMethod: 'none',
+			required: false
+		});
+
+		await tables.Protocol.update(id, 'metadata', $state.snapshot(metadata));
+		await tables.Protocol.update(id, 'metadataOrder', $state.snapshot(metadataOrder));
+
+		return newId;
+	}
 </script>
 
 <div class="sidebar-and-main">
@@ -105,48 +144,114 @@
 			)}
 			{@render navlink('Exports', 'exports', IconExports)}
 			{@render navlink('Recadrage', 'cropping', IconCropping)}
-			{@render navlink('Métadonnées', 'metadata', IconMetadata, data.metadata.length)}
-			<nav class="metadata">
-				{#each data.metadata.toSorted(metadataDefinitionComparator(data)) as key (key)}
+			{@render navlink('Métadonnées', '', IconMetadata, displayedMetadata.length)}
+			<form
+				class="navlink"
+				onsubmit={async (e) => {
+					e.preventDefault();
+					const nameInput = /** @type {HTMLInputElement|null} */ (e.currentTarget.elements.item(0));
+					if (!nameInput?.value) return;
+
+					try {
+						const metadataId = await createMetadata(nameInput.value);
+
+						metadata.push(metadataId);
+						metadataOrder?.push(metadataId);
+
+						const shortId = removeNamespaceFromMetadataId(metadataId);
+
+						nameInput.value = '';
+						metadataNav?.children
+							.item(metadata.length - 1)
+							?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+						toasts.success(`Métadonnée ${shortId} créée`);
+						await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+							id,
+							metadata: shortId
+						});
+					} catch (error) {
+						toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
+					}
+				}}
+			>
+				<div class="menu-icon standin"></div>
+				<InlineTextInput
+					label="Nom de la métadonnée"
+					value=""
+					discreet
+					placeholder={{ idle: 'Nouvelle métadonnée…', focused: 'Nom de la métadonnée' }}
+					onblur={() => {}}
+				/>
+				<ButtonIcon help="Créer la métadonnée" submits onclick={() => {}}>
+					<IconAdd />
+				</ButtonIcon>
+			</form>
+			<nav class="metadata" bind:this={metadataNav}>
+				{#each displayedMetadata as key (key)}
 					{#await tables.Metadata.get(key) then def}
 						{#if def}
-							<a
-								href={href('/protocols/[id]/metadata/[metadata]/infos', {
-									id,
-									metadata: removeNamespaceFromMetadataId(key)
-								})}
+							<div
+								class="navlink"
 								class:active={page.url.hash.includes(
 									`metadata/${removeNamespaceFromMetadataId(key)}/`
 								)}
 							>
 								<div class="menu-icon standin"></div>
-								{#if def?.label}
-									{def.label}
-								{:else}
-									<code>{removeNamespaceFromMetadataId(key)}</code>
-									<span use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
-										<IconTechnical />
-									</span>
-								{/if}
+								<a
+									href={href('/protocols/[id]/metadata/[metadata]/infos', {
+										id,
+										metadata: removeNamespaceFromMetadataId(key)
+									})}
+								>
+									{#if def?.label}
+										{def.label}
+									{:else}
+										<code>{removeNamespaceFromMetadataId(key)}</code>
+										<span
+											use:tooltip={m.technical_metadata_tooltip()}
+											style:color="var(--fg-error)"
+										>
+											<IconTechnical />
+										</span>
+									{/if}
+									{#if def.id === data.crop?.metadata || (def.infer && 'neural' in def.infer)}
+										<span
+											use:tooltip={m.inferred_metadata_tooltip()}
+											style:color="var(--fg-primary)"
+										>
+											<IconInferred />
+										</span>
+									{:else if def.infer && ('exif' in def.infer || ('latitude' in def.infer && 'exif' in def.infer.latitude))}
+										<span
+											use:tooltip={'exif' in def.infer
+												? m.inferred_from_single_exif({ exif: def.infer.exif })
+												: m.inferred_from_two_exif({
+														latitude: def.infer.latitude.exif,
+														longitude: def.infer.longitude.exif
+													})}
+											style:color="var(--fg-primary)"
+										>
+											<IconTag />
+										</span>
+									{/if}
+								</a>
 
-								{#if def.id === data.crop?.metadata || (def.infer && 'neural' in def.infer)}
-									<sup use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
-										<IconInferred />
-									</sup>
-								{:else if def.infer && ('exif' in def.infer || ('latitude' in def.infer && 'exif' in def.infer.latitude))}
-									<sup
-										use:tooltip={'exif' in def.infer
-											? m.inferred_from_single_exif({ exif: def.infer.exif })
-											: m.inferred_from_two_exif({
-													latitude: def.infer.latitude.exif,
-													longitude: def.infer.longitude.exif
-												})}
-										style:color="var(--fg-primary)"
+								<div class="action">
+									<ButtonIcon
+										dangerous
+										help="Supprimer la métadonnée"
+										onclick={updater(async (p) => {
+											p.metadata = p.metadata.filter((k) => k !== def.id);
+											if (p.metadataOrder)
+												p.metadataOrder = p.metadataOrder.filter((k) => k !== def.id);
+											await tables.Metadata.remove(def.id);
+										})}
 									>
-										<IconTag />
-									</sup>
-								{/if}
-							</a>
+										<IconDelete />
+									</ButtonIcon>
+								</div>
+							</div>
 						{/if}
 					{/await}
 				{/each}
@@ -160,14 +265,15 @@
 
 {#snippet navlink(
 	/** @type {string} */ name,
-	/** @type {string} */ href,
+	/** @type {string} */ path,
 	/** @type {import('svelte').Component} */ Icon,
 	/** @type {string|number|undefined} */ badge = undefined
 )}
-	<a
-		href="#/protocols/{id}/{href}"
+	<svelte:element
+		this={path ? 'a' : 'span'}
+		href={path ? `#/protocols/${id}/${path}` : undefined}
 		class="navlink"
-		class:active={page.route.id?.includes(`/protocols/[id]/${href}`)}
+		class:active={path && page.route.id?.includes(`/protocols/[id]/${path}`)}
 	>
 		<div class="menu-icon">
 			<Icon />
@@ -176,7 +282,7 @@
 		{#if badge !== undefined}
 			<span class="badge">{badge}</span>
 		{/if}
-	</a>
+	</svelte:element>
 {/snippet}
 
 <style>
@@ -190,6 +296,9 @@
 		width: 100%;
 		&.padded {
 			padding: 1.5em;
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
 		}
 		&.padded > :global(*) {
 			max-width: 45rem;
@@ -234,14 +343,34 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.75em;
+		overflow: auto;
 	}
 
-	nav a {
+	.navlink {
 		position: relative;
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
 		text-decoration: none;
+		/* Height is fixed for consistency since some navlinks have ButtonIcons in them that changes the content height */
+		height: 1.75em;
+		flex-shrink: 0;
+	}
+
+	.navlink a {
+		text-decoration: none;
+		display: flex;
+		align-items: center;
+		gap: 0.25em;
+	}
+
+	.navlink .action {
+		margin-left: auto;
+		opacity: 0;
+	}
+
+	.navlink:is(.active, :hover, :focus-visible) .action {
+		opacity: 1;
 	}
 
 	.menu-icon {
@@ -252,13 +381,10 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
-
-	nav a .menu-icon {
 		margin-left: calc(0.25em + 4px);
 	}
 
-	nav a::before {
+	.navlink::before {
 		content: '';
 		position: absolute;
 		height: 100%;
@@ -266,11 +392,12 @@
 		border-radius: 10000px;
 	}
 
-	nav a.active::before {
+	.navlink.active::before {
 		background-color: var(--bg-primary);
 	}
 
-	nav a:not(.active):is(:hover, :focus-visible)::before {
+	a.navlink:not(.active):is(:hover, :focus-visible)::before,
+	.navlink:not(.active):has(a):is(:hover, :focus-visible)::before {
 		background-color: var(--bg-primary-translucent);
 	}
 </style>
