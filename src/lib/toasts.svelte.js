@@ -41,6 +41,10 @@ const TOAST_POOLS = /** @type {const} @satisfies {Record<string, Omit<ToastPool,
 	exporter: {
 		lifetime: Infinity,
 		capacity: Infinity
+	},
+	protocolcreator: {
+		lifetime: Infinity,
+		capacity: Infinity
 	}
 });
 
