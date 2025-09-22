@@ -51,14 +51,14 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	// Set to True on image itself
 	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
 	  - text: bool
-	  - switch "on/off switch":
+	  - switch "":
 	    - img
 	  - button [disabled]:
 	    - img
 	`);
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
-	  - switch "on/off switch" [checked]:
+	  - switch "" [checked]:
 	    - img
 	`);
 
@@ -70,7 +70,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
-	  - switch "on/off switch":
+	  - switch "":
 	    - img
 	`);
 
@@ -80,7 +80,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await page.getByTestId('first-observation-card').click();
 	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
 	  - text: bool
-	  - switch "on/off switch" [checked]:
+	  - switch "" [checked]:
 	    - img
 	  - text: Oui
 	  - button:
@@ -319,7 +319,7 @@ test('can update a boolean-type metadata', issue(216), async ({ page }) => {
 
 	await expect.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
 		.toMatchAriaSnapshot(`
-	  - switch "on/off switch" [checked]:
+	  - switch "" [checked]:
 	    - img
 	`);
 	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(true);
@@ -328,7 +328,7 @@ test('can update a boolean-type metadata', issue(216), async ({ page }) => {
 
 	await expect.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
 		.toMatchAriaSnapshot(`
-	  - switch "on/off switch":
+	  - switch "":
 	    - img
 	`);
 	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(false);

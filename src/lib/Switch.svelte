@@ -39,7 +39,7 @@
 		value = !value;
 		onchange(value);
 	}}
-	aria-label={label ?? 'on/off switch'}
+	aria-label={label}
 	{...rest}
 >
 	<div class="handle" class:pushed={value}>
