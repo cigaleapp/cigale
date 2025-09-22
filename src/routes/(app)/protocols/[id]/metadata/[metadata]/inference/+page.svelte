@@ -115,10 +115,6 @@
 		font-weight: normal;
 	}
 
-	.content {
-		padding: 2rem;
-	}
-
 	.field {
 		margin-top: 1rem;
 		padding-left: 1rem;

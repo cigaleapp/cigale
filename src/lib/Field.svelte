@@ -52,6 +52,9 @@
 	.field {
 		width: 100%;
 		display: flex;
+	}
+
+	.field.has-icon {
 		gap: 0.5em;
 	}
 
@@ -65,5 +68,12 @@
 		font-weight: bold;
 		font-size: 0.9em;
 		margin-bottom: 0.5em;
+	}
+
+	.field .label :global(p) {
+		text-transform: none;
+		letter-spacing: normal;
+		font-weight: normal;
+		font-size: 1rem;
 	}
 </style>

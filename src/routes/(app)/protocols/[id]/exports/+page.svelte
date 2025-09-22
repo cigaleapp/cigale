@@ -149,6 +149,8 @@
 	</ul>
 {/snippet}
 
+<h2>Structure des exports .zip</h2>
+
 <ul class="tree">
 	<li>
 		<IconZipFile />

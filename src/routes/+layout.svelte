@@ -75,4 +75,13 @@
 		accent-color: var(--fg-primary);
 		--track-height: 0.5em;
 	}
+
+	:global(textarea) {
+		resize: vertical;
+		border: 1px solid var(--gay);
+		border-radius: var(--corner-radius);
+		padding: 0.5em;
+		width: 100%;
+		max-width: 70rem;
+	}
 </style>
