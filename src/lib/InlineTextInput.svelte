@@ -25,11 +25,14 @@
 <style>
 	.inline-input {
 		display: inline-flex;
+		width: 100%;
 		border: none;
 		background-color: transparent;
-		color: var(--fg-neutral);
+		/* color: var(--fg-neutral); */
+		color: inherit;
 		font-size: 1em;
 		font-weight: inherit;
+		font-family: inherit;
 		border-bottom: 2px solid var(--fg-primary);
 	}
 

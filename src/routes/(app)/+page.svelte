@@ -286,6 +286,13 @@
 		width: 100%;
 	}
 
+	li.search {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
 	li .select-and-version {
 		display: flex;
 		align-items: center;
