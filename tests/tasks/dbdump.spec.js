@@ -26,7 +26,7 @@ test.describe('Database dumps', () => {
 		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 		await page.goto('#/protocols');
 		await page
-			.locator('article')
+			.getByRole('listitem')
 			.filter({ hasText: 'io.github.cigaleapp.arthropods.example.light' })
 			.getByRole('button', { name: 'Supprimer' })
 			.click();
