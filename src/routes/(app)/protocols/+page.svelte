@@ -1,20 +1,15 @@
 <script>
-	import { resolve } from '$app/paths';
-	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte.js';
-	import Modal from '$lib/Modal.svelte';
-
 	import { promptAndImportProtocol } from '$lib/protocols';
-	import { downloadProtocolTemplate, jsonSchemaURL } from '$lib/protocols.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import IconImport from '~icons/ph/download';
-	import IconDownload from '~icons/ph/download-simple';
 	import IconCreate from '~icons/ph/plus-circle';
 	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
 	import RowProtocol from './RowProtocol.svelte';
 	import { plural } from '$lib/i18n';
 	import { fade } from 'svelte/transition';
+	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
 
 	const { data } = $props();
 
@@ -28,57 +23,12 @@
 	let confirmDelete = $state();
 
 	/** @type {undefined | (() => void)} */
-	let downloadNewProtocolTemplate = $state();
+	let openProtocolCreation = $state();
 </script>
 
 <ModalDeleteProtocol id={removingProtocol} bind:open={confirmDelete} />
 
-<Modal
-	key="modal_download_protocol_template"
-	title="Créer un protocole"
-	bind:open={downloadNewProtocolTemplate}
->
-	<p>
-		Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans
-		l'interface
-	</p>
-	<p>
-		Cependant, les protocoles sont représentables par des fichiers de configuration JSON ou YAML
-	</p>
-	<p>Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche</p>
-	<p>
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-		Sachant qu'un <a href={jsonSchemaURL(resolve('/'))}>JSON Schema</a> est déclaré dans ces fichiers,
-		la plupart des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
-	</p>
-	<p>
-		Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite,
-		il suffit de l'exporter, modifier le fichier, et réimporter
-	</p>
-
-	{#snippet footer({ close })}
-		<section class="actions">
-			<ButtonPrimary
-				onclick={async () => {
-					await downloadProtocolTemplate(resolve('/'), 'json');
-					close?.();
-				}}
-			>
-				<IconDownload />
-				Format JSON
-			</ButtonPrimary>
-			<ButtonSecondary
-				onclick={async () => {
-					await downloadProtocolTemplate(resolve('/'), 'yaml');
-					close?.();
-				}}
-			>
-				<IconDownload />
-				Format YAML
-			</ButtonSecondary>
-		</section>
-	{/snippet}
-</Modal>
+<ModalCreateProtocol bind:open={openProtocolCreation} />
 
 <div class="page" in:fade={{ duration: 100 }}>
 	<header>
@@ -112,7 +62,7 @@
 					Importer
 				{/snippet}
 			</ButtonSecondary>
-			<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
+			<ButtonSecondary onclick={() => openProtocolCreation?.()}>
 				<IconCreate />
 				Créer
 			</ButtonSecondary>
