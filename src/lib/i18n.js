@@ -169,3 +169,13 @@ if (import.meta.vitest) {
 		expect(errorMessage(errorWithCause)).toBe('Main error');
 	});
 }
+
+/**
+ * Uppercase the first letter of a string
+ * @param {string} str
+ * @returns {string}
+ */
+export function uppercaseFirst(str) {
+	if (!str) return str;
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}

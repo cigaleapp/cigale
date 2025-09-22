@@ -1,23 +1,29 @@
 <script>
-	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
-	import { href } from '$lib/paths.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { tables } from '$lib/idb.svelte.js';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import { href } from '$lib/paths.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-	import Fuse from 'fuse.js';
+	import { slugify } from '$lib/utils.js';
 	import IconSearch from '~icons/ph/magnifying-glass';
 	import IconClose from '~icons/ph/x';
-	import { slugify } from '$lib/utils.js';
+	import { updater } from '../updater.svelte.js';
+	import { set } from '$lib/idb.svelte.js';
 
 	const { data, children } = $props();
-	let options = $derived(data.metadata.options ?? []);
+	let options = $derived(data.options ?? []);
 
 	let q = $state('');
 
-	const searcher = $derived(new Fuse(options, { keys: ['label', 'key', 'description'] }));
-	let searchResults = $derived(q ? searcher.search(q).map((result) => result.item) : options);
+	let searchResults = $derived(
+		q
+			? // Using Fuse would be very expensive for metadata with 10k+ options
+				options.filter((o) =>
+					[o.key, o.label].some((field) => field.toLowerCase().includes(q.toLowerCase()))
+				)
+			: options
+	);
 
 	/**
 	 *
@@ -41,20 +47,22 @@
 				label="Nom de la nouvelle option"
 				placeholder="Nouvelle option…"
 				value=""
-				onblur={async (label, setValue) => {
+				onblur={updater(async (m, label) => {
 					if (!label) return;
-					const newOption = {
+
+					let key = slugify(label);
+					if (options.find((o) => o.key === key)) {
+						key += '_' + options.filter((o) => o.key.startsWith(key)).length;
+					}
+
+					await set('MetadataOption', {
+						id: `${data.metadata.id}:${key}`,
+						metadataId: data.metadata.id,
+						key,
 						label,
-						description: '',
-						key: slugify(label)
-					};
-					options = [newOption, ...options];
-					await tables.Metadata.update(data.metadata.id, 'options', $state.snapshot(options));
-					await invalidateAll();
-					setValue('');
-					// eslint-disable-next-line svelte/no-navigation-without-resolve
-					await goto(optionUrl(newOption.key));
-				}}
+						description: ''
+					});
+				})}
 			/>
 		</div>
 		<search>
@@ -71,11 +79,12 @@
 			</ButtonIcon>
 		</search>
 		<nav>
-			{#each searchResults as { key, label } (key)}
+			<VirtualList items={searchResults} let:item>
+				{@const { key, label } = item}
 				<a href={optionUrl(key)} class:active={page.params.option === key}>
 					{label}
 				</a>
-			{/each}
+			</VirtualList>
 		</nav>
 	</aside>
 	<div class="content">
@@ -85,7 +94,8 @@
 
 <style>
 	.aside-and-main {
-		display: flex;
+		display: grid;
+		grid-template-columns: 300px 1fr;
 		height: 100%;
 		overflow: hidden;
 	}
@@ -93,19 +103,15 @@
 	aside {
 		padding: 2rem;
 		border-right: 1px solid var(--gay);
-		overflow-y: scroll;
+		display: grid;
+		grid-template-rows: max-content max-content 1fr;
+		overflow: hidden;
 	}
 
 	.content {
 		flex-grow: 1;
 		overflow: auto;
 		padding: 2rem;
-	}
-
-	nav {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
 	}
 
 	search {
@@ -125,6 +131,17 @@
 		margin-bottom: 1rem;
 	}
 
+	nav {
+		display: flex;
+		height: 100%;
+		width: 100%;
+		min-height: 0;
+	}
+
+	nav :global(svelte-virtual-list-viewport) {
+		width: 100%;
+	}
+
 	nav a {
 		display: flex;
 		align-items: center;
@@ -133,6 +150,7 @@
 		text-decoration: none;
 		position: relative;
 		margin-left: 8px;
+		padding: 0.25em 0;
 	}
 
 	nav a:is(:hover, :focus-visible) {

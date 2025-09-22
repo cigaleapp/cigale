@@ -6,27 +6,27 @@ import { toasts } from '$lib/toasts.svelte';
 import { ArkErrors } from 'arktype';
 
 /**
- * Update the protocol information, save it to the database.
+ * Update the metadata information, save it to the database.
  * @template T
- * @param {(p: typeof import('$lib/database').Tables.Protocol.inferIn, v: T) => void | Promise<void>} changes
+ * @param {(p: typeof import('$lib/database').Tables.Metadata.inferIn, v: T) => void | Promise<void>} changes
  * @returns {(value: T) => Promise<void>} updater for InlineTextInput
  */
 export function updater(changes) {
 	return async (value) => {
-		if (!page.params.id) return;
+		if (!page.params.metadata) return;
 
-		const protocol = await tables.Protocol.raw.get(page.params.id);
-		if (!protocol) return;
+		const metadata = await tables.Metadata.raw.get(page.params.metadata);
+		if (!metadata) return;
 
 		try {
-			await changes(protocol, value);
+			await changes(metadata, value);
 		} catch (err) {
 			if (err instanceof ArkErrors) {
 				toasts.error(m.invalid_value({ error: err.summary }));
 			}
 		}
 
-		await tables.Protocol.set(protocol).catch((err) => {
+		await tables.Metadata.set(metadata).catch((err) => {
 			toasts.error(m.unable_to_save_changes({ error: err.message }));
 		});
 
