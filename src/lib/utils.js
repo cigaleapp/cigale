@@ -436,10 +436,18 @@ if (import.meta.vitest) {
 /**
  * @template {*} T
  * @param {T[]} array
+ * @param {(item: T) => string|number} [key]
  * @returns {T[]}
  */
-export function unique(array) {
-	return [...new Set(array)];
+// @ts-expect-error key should be non-optional if T is not string|number
+export function unique(array, key = (x) => x) {
+	const seen = new Set();
+	return array.filter((item) => {
+		const k = key(item);
+		if (seen.has(k)) return false;
+		seen.add(k);
+		return true;
+	});
 }
 
 if (import.meta.vitest) {
@@ -448,6 +456,11 @@ if (import.meta.vitest) {
 		expect(unique([1, 2, 3, 1, 2])).toEqual([1, 2, 3]);
 		expect(unique(['a', 'b', 'c', 'a', 'b'])).toEqual(['a', 'b', 'c']);
 		expect(unique([])).toEqual([]);
+		expect(unique([{ id: 1 }, { id: 2 }, { id: 1 }], (o) => o.id)).toEqual([{ id: 1 }, { id: 2 }]);
+		expect(unique([{ id: 1 }, { id: 2 }, { id: 1 }], (o) => o.id.toString())).toEqual([
+			{ id: 1 },
+			{ id: 2 }
+		]);
 	});
 }
 
@@ -727,4 +740,24 @@ export function progressSplitter(...layout) {
 
 		return total / parts.length;
 	};
+}
+
+/**
+ * Replaces accents and punctuations with dashes, lowercases, and replaces accents with ASCII equivalents.
+ * Throws if the result is still not ASCII (e.g. CJK characters, we don't have transliteration tables for everything)
+ * @param {string} text
+ */
+export function slugify(text) {
+	const result = text
+		.normalize('NFD') // separate accent from letter
+		.replace(/[\u0300-\u036f]/g, '') // remove all accents
+		.replace(/[^\w\s-]/g, '') // remove all non-word characters (except spaces and dashes)
+		.trim()
+		.replace(/[\s_-]+/g, '-') // replace spaces and underscores with a single dash
+		.replace(/^-+|-+$/g, '') // remove leading and trailing dashes
+		.toLowerCase();
+
+	if (!result) throw new Error(`Cannot slugify "${text}" (result is empty)`);
+
+	return result;
 }

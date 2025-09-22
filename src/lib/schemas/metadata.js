@@ -1,7 +1,7 @@
 import { scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
-import { keys } from '../utils.js';
+import { keys, unique } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
 
 /**
@@ -162,9 +162,9 @@ export const Metadata = type({
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
 	).optional(),
-	'options?': MetadataEnumVariant.array().describe(
-		'Les options valides. Uniquement utile pour une métadonnée de type "enum"'
-	)
+	'options?': MetadataEnumVariant.array()
+		.pipe((opts) => unique(opts, (o) => o.key))
+		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
 }).and(
 	type.or(
 		{
