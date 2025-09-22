@@ -4,8 +4,9 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {() => void} onclick
+	 * @property {(e: MouseEvent) => void} onclick
 	 * @property {import('svelte').Snippet} children
+	 * @property {boolean} [submits] whether this button submits a form
 	 * @property {string} help
 	 * @property {string} [keyboard] keyboard shortcut hint to display in the help tooltip
 	 * @property {boolean} [disabled]
@@ -14,7 +15,8 @@
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
-	let { children, onclick, help, keyboard, disabled, crossout, dangerous, ...rest } = $props();
+	let { children, onclick, help, keyboard, disabled, crossout, dangerous, submits, ...rest } =
+		$props();
 </script>
 
 <button
@@ -24,6 +26,7 @@
 	class:dangerous
 	use:tooltip={{ text: help, keyboard }}
 	aria-label={help}
+	type={submits ? 'submit' : 'button'}
 	{...rest}
 >
 	{@render children()}

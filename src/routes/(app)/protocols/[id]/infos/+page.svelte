@@ -48,6 +48,8 @@
 	{/if}
 {/snippet}
 
+<h2>Informations sur le protocole</h2>
+
 <header>
 	<p class="description">
 		{description}

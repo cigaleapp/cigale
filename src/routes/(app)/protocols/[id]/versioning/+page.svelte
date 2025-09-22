@@ -36,6 +36,8 @@
 </script>
 
 <main>
+	<h2>Versionnage</h2>
+
 	<FieldUrl
 		check
 		label="URL de téléchargement du protocole"
