@@ -2,9 +2,9 @@
 	import { resolve } from '$app/paths';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { openTransaction, tables } from '$lib/idb.svelte.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import Modal from '$lib/Modal.svelte';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { m } from '$lib/paraglide/messages.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { downloadProtocolTemplate, jsonSchemaURL } from '$lib/protocols.js';
 	import { toasts } from '$lib/toasts.svelte';
@@ -12,16 +12,15 @@
 	import IconDownload from '~icons/ph/download-simple';
 	import IconCreate from '~icons/ph/plus-circle';
 	import CardProtocol from './CardProtocol.svelte';
-	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
-	import { m } from '$lib/paraglide/messages.js';
+	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
 
 	const { data } = $props();
 
 	/**
 	 * Protocol we're confirming deletion for
-	 * @type {undefined | import('$lib/database').Protocol}
+	 * @type {string}
 	 */
-	let removingProtocol = $state(undefined);
+	let removingProtocol = $state('');
 
 	/** @type {undefined | (() => void)} */
 	let confirmDelete = $state();
@@ -29,6 +28,8 @@
 	/** @type {undefined | (() => void)} */
 	let downloadNewProtocolTemplate = $state();
 </script>
+
+<ModalDeleteProtocol id={removingProtocol} bind:open={confirmDelete} />
 
 <Modal
 	key="modal_download_protocol_template"
@@ -76,37 +77,6 @@
 	{/snippet}
 </Modal>
 
-<ModalConfirm
-	title="Êtes-vous sûr·e?"
-	key="modal_delete_protocol"
-	bind:open={confirmDelete}
-	cancel="Annuler"
-	confirm="Oui, supprimer"
-	onconfirm={async () => {
-		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {
-			if (!removingProtocol) return;
-
-			tx.objectStore('Protocol').delete(removingProtocol.id);
-
-			const toRemove = removingProtocol.metadata.filter(
-				(id) => removingProtocol && isNamespacedToProtocol(removingProtocol.id, id)
-			);
-
-			const options = await tx.objectStore('MetadataOption').getAll();
-
-			for (const metadata of toRemove) {
-				tx.objectStore('Metadata').delete(metadata);
-				options
-					.filter((o) => o.id.startsWith(`${metadata}:`))
-					.forEach((o) => tx.objectStore('MetadataOption').delete(o.id));
-			}
-		});
-		toasts.success('Protocole supprimé');
-	}}
->
-	Il est impossible de revenir en arrière après avoir supprimé un protocole.
-</ModalConfirm>
-
 <header>
 	<h1>{m.protocols()}</h1>
 	<section class="actions">
@@ -144,7 +114,7 @@
 			<CardProtocol
 				{...p}
 				ondelete={() => {
-					removingProtocol = { ...p };
+					removingProtocol = p.id;
 					confirmDelete?.();
 				}}
 			/>
