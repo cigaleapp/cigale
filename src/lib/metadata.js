@@ -7,6 +7,7 @@ import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
 	metadataOptionId,
+	namespacedMetadataId,
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
@@ -891,4 +892,22 @@ export function protocolMetadataValues(protocol, values) {
 				}
 			])
 	);
+}
+
+/**
+ *
+ * @param {string} protocolId
+ * @param {string|null} metadataId null to get options of all metadata of the protocol
+ * @returns {IDBKeyRange}
+ */
+export function metadataOptionsKeyRange(protocolId, metadataId) {
+	if (metadataId) {
+		const fullMetadataId = ensureNamespacedMetadataId(metadataId, protocolId);
+		return IDBKeyRange.bound(fullMetadataId + ':', fullMetadataId + ':\uffff');
+	} else {
+		return IDBKeyRange.bound(
+			namespacedMetadataId('', protocolId),
+			namespacedMetadataId('\uffff', protocolId)
+		);
+	}
 }

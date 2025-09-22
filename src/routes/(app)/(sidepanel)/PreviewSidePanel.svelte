@@ -9,7 +9,7 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { metadataDefinitionComparator } from '$lib/metadata';
+	import { metadataDefinitionComparator, metadataOptionsKeyRange } from '$lib/metadata';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
@@ -74,21 +74,23 @@
 			return;
 		}
 
-		idb.list('MetadataOption').then((result) => {
-			// Prevent double-load even if both promises resolved at the same time
-			if (Object.keys(options).length > 0) {
+		idb
+			.list('MetadataOption', metadataOptionsKeyRange(uiState.currentProtocolId, null))
+			.then((result) => {
+				// Prevent double-load even if both promises resolved at the same time
+				if (Object.keys(options).length > 0) {
+					loadingOptions = false;
+					return;
+				}
+				for (const { metadataId, key, ...rest } of result) {
+					options[metadataId] ??= [];
+					options[metadataId].push({ key: key.toString(), ...rest });
+				}
+				for (const metadataId of Object.keys(options)) {
+					options[metadataId].sort((a, b) => a.label.localeCompare(b.label));
+				}
 				loadingOptions = false;
-				return;
-			}
-			for (const { metadataId, key, ...rest } of result) {
-				options[metadataId] ??= [];
-				options[metadataId].push({ key: key.toString(), ...rest });
-			}
-			for (const metadataId of Object.keys(options)) {
-				options[metadataId].sort((a, b) => a.label.localeCompare(b.label));
-			}
-			loadingOptions = false;
-		});
+			});
 	});
 
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
