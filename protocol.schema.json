@@ -2407,8 +2407,7 @@
               "type"
             ]
           }
-        ],
-        "description": "Métadonnée du protocole"
+        ]
       }
     },
     "name": {
