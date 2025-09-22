@@ -8,6 +8,7 @@
 	 * @property {boolean} [value]
 	 * @property {{ on: import('svelte').Component, off: import('svelte').Component }} [icons]
 	 * @property {string} [label]
+	 * @property {boolean} [show-label] show the label next to the switch instead of having it as an aria-label
 	 * @property {undefined | ((value: boolean) => void)} [onchange]
 	 */
 
@@ -17,6 +18,7 @@
 		icons: iconsOverride = undefined,
 		onchange = () => {},
 		label,
+		'show-label': showLabel = false,
 		...rest
 	} = $props();
 
@@ -31,29 +33,42 @@
 	);
 </script>
 
-<button
-	class="switch"
-	role="switch"
-	aria-checked={value}
-	onclick={() => {
-		value = !value;
-		onchange(value);
-	}}
-	aria-label={label}
-	{...rest}
->
-	<div class="handle" class:pushed={value}>
-		{#if showHints || iconsOverride}
-			{#if value}
-				<icons.on />
-			{:else}
-				<icons.off />
+<div class="switch-and-label">
+	<button
+		class="switch"
+		role="switch"
+		aria-checked={value}
+		onclick={() => {
+			value = !value;
+			onchange(value);
+		}}
+		aria-label={showLabel ? undefined : label}
+		{...rest}
+	>
+		<div class="handle" class:pushed={value}>
+			{#if showHints || iconsOverride}
+				{#if value}
+					<icons.on />
+				{:else}
+					<icons.off />
+				{/if}
 			{/if}
-		{/if}
-	</div>
-</button>
+		</div>
+	</button>
+	{#if showLabel}
+		{label}
+	{/if}
+</div>
 
 <style>
+	.switch-and-label {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		font-size: 0.9em;
+		cursor: pointer;
+	}
+
 	.switch {
 		cursor: pointer;
 		--handle-size: 1.5rem;

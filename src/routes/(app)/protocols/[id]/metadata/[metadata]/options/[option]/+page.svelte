@@ -1,78 +1,234 @@
 <script>
-	import { invalidateAll } from '$app/navigation';
-	import { tables } from '$lib/idb.svelte';
+	import { page } from '$app/state';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import IconCascadesFrom from '~icons/ph/arrows-split';
+	import IconCascadesTo from '~icons/ph/arrow-bend-down-right';
+	import IconImage from '~icons/ph/image';
+	import Field from '$lib/Field.svelte';
+	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { goto } from '$lib/paths.js';
+	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+	import IconArrow from '~icons/ph/arrow-right';
+	import IconOpenInExternal from '~icons/ph/arrow-square-out';
+	import { updater } from './updater.svelte.js';
 
 	const { data } = $props();
-	const { metadata, option } = $derived(data);
-
-	/**
-	 * @import { MetadataEnumVariant } from '$lib/schemas/metadata.js';
-	 * @param {Partial<typeof MetadataEnumVariant.infer>} newData
-	 */
-	async function updateOption(newData) {
-		await tables.Metadata.update(
-			metadata.id,
-			'options',
-			$state.snapshot(
-				metadata.options?.map((opt) => (opt.key === option.key ? { ...opt, ...newData } : opt))
-			)
-		);
-		await invalidateAll();
-		// TODO figure ts out 🥀
-		// await invalidate((url) => {
-		// 	console.log(`invalidate?`, url);
-		// 	return url.hash.startsWith(
-		// 		`#/protocols/${protocol.id}/metadata/${removeNamespaceFromMetadataId(metadata.id)}/options`
-		// 	);
-		// });
-	}
+	const { cascades, reverseCascades, metadata } = $derived(data);
+	const { key, label, description, learnMore, image } = $derived(data.option);
 </script>
 
-<div class="inputs">
-	<label>
-		<span class="label">Clé</span>
-		<InlineTextInput
-			value={option.key}
-			label="Clé de l'option"
-			discreet
-			onblur={async (newKey) => {
-				await updateOption({ key: newKey });
-			}}
+<div class="split">
+	<div class="left">
+		<Field label="Clé">
+			<InlineTextInput
+				value={key}
+				label="Clé de l'option"
+				discreet
+				onblur={updater((o, value) => {
+					o.key = value;
+				})}
+			/>
+		</Field>
+		<Field label="Label">
+			<InlineTextInput
+				value={label}
+				label="Label de l'option"
+				discreet
+				onblur={updater((o, value) => {
+					o.label = value;
+				})}
+			/>
+		</Field>
+		<Field label="Description">
+			<textarea
+				rows="10"
+				value={description}
+				onblur={updater((o, { currentTarget }) => {
+					o.description = currentTarget.value;
+				})}
+			></textarea>
+		</Field>
+		<FieldUrl
+			label="En savoir plus"
+			value={learnMore ?? ''}
+			onblur={updater((o, value) => {
+				if (value) {
+					o.learnMore = value;
+				} else {
+					delete o.learnMore;
+				}
+			})}
 		/>
-	</label>
+	</div>
 
-	<label>
-		<span class="label">Label</span>
-		<InlineTextInput
-			value={option.label}
-			label="Label de l'option"
-			discreet
-			onblur={async (newLabel) => {
-				await updateOption({ label: newLabel });
-			}}
+	<div class="right">
+		<FieldUrl
+			Icon={IconImage}
+			check
+			label="Lien vers une image"
+			value={image ?? ''}
+			onblur={updater((o, value) => {
+				if (value) {
+					o.image = value;
+				} else {
+					delete o.image;
+				}
+			})}
 		/>
-	</label>
+
+		{#if image}
+			<!-- svelte-ignore a11y_missing_attribute -->
+			<img src={image} />
+		{/if}
+	</div>
+</div>
+
+<h3>Cascades</h3>
+<p>
+	Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être
+	pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc.
+</p>
+
+<div class="split">
+	<div class="left">
+		<Field Icon={IconCascadesFrom} composite>
+			{#snippet label()}
+				Depuis cette option
+				<p class="label-help">
+					Change la valeur d'autres métadonnées quand {data.metadata.label} = {data.option.label}
+				</p>
+			{/snippet}
+			<!-- TODO allow modifying -->
+			<dl class="cascades">
+				{#each cascades as { metadataId, metadata, option, value } (metadataId)}
+					<div class="row">
+						<dt>
+							{metadata?.label || removeNamespaceFromMetadataId(metadataId)}
+						</dt>
+						<IconArrow />
+						<dd>
+							{option?.label || option?.key || value}
+						</dd>
+						{#if option}
+							<ButtonIcon
+								help="Voir {option.label || option.key}"
+								onclick={() =>
+									goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+										id: page.params.id ?? '',
+										metadata: removeNamespaceFromMetadataId(metadataId),
+										option: option.key
+									})}
+							>
+								<IconOpenInExternal />
+							</ButtonIcon>
+						{/if}
+					</div>
+				{:else}
+					<p class="empty">Aucune cascade</p>
+				{/each}
+			</dl>
+		</Field>
+	</div>
+
+	<div class="right">
+		<Field Icon={IconCascadesTo} composite>
+			{#snippet label()}
+				Vers cette option
+				<p class="label-help">
+					Autres métadonnées qui change {metadata.label} à {data.option.label}
+				</p>
+			{/snippet}
+			<ul class="reverse-cascades">
+				<VirtualList items={reverseCascades} let:item>
+					{@const { metadataId, metadata, option, value } = item}
+					<li>
+						Si
+						{metadata?.label || removeNamespaceFromMetadataId(metadataId)} =
+						{#if option}
+							{option.label || option.key}
+							<ButtonIcon
+								help="Voir {option.label || option.key}"
+								onclick={() =>
+									goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+										id: page.params.id ?? '',
+										metadata: removeNamespaceFromMetadataId(metadataId),
+										option: option.key
+									})}
+							>
+								<IconOpenInExternal />
+							</ButtonIcon>
+						{:else}
+							{value}
+						{/if}
+					</li>
+				</VirtualList>
+			</ul>
+		</Field>
+	</div>
 </div>
 
 <style>
-	.inputs {
+	.split {
+		display: grid;
+		grid-template-columns: 1fr 450px;
+		gap: 2em;
+		width: 100%;
+		overflow: hidden;
+	}
+
+	h3 {
+		margin-top: 3rem;
+	}
+	h3 + p {
+		margin-bottom: 2rem;
+	}
+
+	.left,
+	.right {
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 	}
 
-	label {
-		display: flex;
-		flex-direction: column;
-		font-size: 1.2rem;
+	.right img {
+		border-radius: var(--corner-radius);
+		overflow: hidden;
 	}
 
-	.label {
-		font-weight: bold;
-		text-transform: uppercase;
-		letter-spacing: 2px;
-		font-size: 0.8em;
-		margin-bottom: 0.5rem;
+	p.empty {
+		color: var(--gray);
+	}
+
+	.label-help {
+		font-size: 0.85rem;
+		color: var(--gay);
+	}
+
+	dl.cascades .row {
+		display: grid;
+		grid-template-columns: 1fr max-content 1fr max-content;
+		gap: 2em;
+		align-items: center;
+	}
+
+	dl.cascades .row * {
+		display: flex;
+		align-items: center;
+	}
+
+	ul.reverse-cascades {
+		list-style: none;
+		padding: 0;
+		height: 300px;
+		max-height: 100%;
+	}
+
+	ul.reverse-cascades li {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		justify-content: space-between;
 	}
 </style>
