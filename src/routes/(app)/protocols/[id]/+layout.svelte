@@ -104,9 +104,22 @@
 					label="ID du protocole"
 					discreet
 					value={id}
-					onblur={async (newid) => {
+					onblur={async (newid, setValue) => {
+						if (!newid) {
+							setValue(id);
+							return;
+						}
+
 						await tables.Protocol.update(id, 'id', newid);
+						await tables.Protocol.remove(id);
 						id = newid;
+
+						if (!page.route?.id) return;
+						// @ts-expect-error
+						await goto(page.route.id, {
+							...page.params,
+							id: newid
+						});
 					}}
 				/>
 			</code>

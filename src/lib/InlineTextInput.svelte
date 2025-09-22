@@ -1,6 +1,7 @@
 <script generics="T extends import('arktype').Type = typeof import('arktype').type.string">
 	import { type } from 'arktype';
 	import { tooltip } from './tooltips';
+	import { errorMessage } from './i18n';
 
 	/**
 	 * @typedef {object} Props
@@ -9,7 +10,7 @@
 	 * @property {boolean} [discreet=false] don't show bottom border until hover/focus
 	 * @property {string | { idle: string; focused: string }} [placeholder] give an object to have a different placeholder when focused
 	 * @property {T} [Type=type.string] arktype Type for the value
-	 * @property {(newValue: T['infer'] extends string ? string : (T['infer'] | import('arktype').ArkErrors), setValueTo: (v: string) => void) => void | Promise<void>} onblur also triggered on component unmount
+	 * @property {(newValue: T['infer'], setValueTo: (v: string) => void) => void | Promise<void>} onblur also triggered on component unmount
 	 * @property {(err: unknown) => void} [onerror] called if onblur throws
 	 */
 
@@ -41,9 +42,9 @@
 	onblur={async ({ currentTarget }) => {
 		focused = false;
 		try {
-			await onblur(Type(currentTarget.value), (v) => (value = v));
+			await onblur(Type.assert(currentTarget.value), (v) => (value = v));
 		} catch (err) {
-			onerror?.(err);
+			onerror?.(errorMessage(err));
 		}
 	}}
 />

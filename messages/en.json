@@ -46,6 +46,7 @@
 	"protocol_not_versioned_help": "This protocol is not versioned. To update it, delete it and import the new version",
 	"not_versioned": "Not versioned",
 	"close": "Close",
+	"cancel": "Cancel",
 	"settings": "Settings",
 	"theme": "Theme",
 	"sync_with_system_theme": "Sync with system theme",
@@ -200,5 +201,6 @@
 	"edit": "Edit",
 	"back": "Back",
 	"unable_to_save_changes": "Unable to save changes: {error}",
-	"invalid_value": "Invalid value: {error}"
+	"invalid_value": "Invalid value: {error}",
+	"detection_and_cropping": "Detection and cropping"
 }

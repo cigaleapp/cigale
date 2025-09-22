@@ -13,7 +13,7 @@ import { errorMessage } from './i18n.js';
  *
  * @param {string} base base path of the app - import `base` from `$app/paths`
  */
-export function jsonSchemaURL(base) {
+function jsonSchemaURL(base) {
 	return `${window.location.origin}${base}/protocol.schema.json`;
 }
 
@@ -71,31 +71,6 @@ export async function exportProtocol(base, id, format = 'json') {
 					])
 			)
 		)
-	});
-}
-
-/**
- *
- * @param {string} base base path of the app - import `base` from `$app/paths`
- * @param {'json' | 'yaml'} format
- */
-export async function downloadProtocolTemplate(base, format) {
-	downloadProtocol(base, format, {
-		id: 'mon-protocole',
-		name: 'Mon protocole',
-		learnMore: 'https://github.com/moi/mon-protocole',
-		authors: [{ name: 'Prénom Nom', email: 'prenom.nom@example.com' }],
-		description: 'Description de mon protocole',
-		metadata: {
-			'une-metadonnee': {
-				label: 'Une métadonnée',
-				description: 'Description de la métadonnée',
-				learnMore: 'https://example.com',
-				type: 'float',
-				required: false,
-				mergeMethod: 'average'
-			}
-		}
 	});
 }
 

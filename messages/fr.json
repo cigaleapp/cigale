@@ -46,6 +46,7 @@
 	"protocol_not_versioned_help": "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version",
 	"not_versioned": "Non versionné",
 	"close": "Fermer",
+	"cancel": "Annuler",
 	"settings": "Réglages",
 	"theme": "Thème",
 	"sync_with_system_theme": "Synchroniser avec le thème du système",
@@ -199,5 +200,6 @@
 	"edit": "Modifier",
 	"back": "Retour",
 	"unable_to_save_changes": "Impossible de sauvegarder les changements: {error}",
-	"invalid_value": "Valeur invalide: {error}"
+	"invalid_value": "Valeur invalide: {error}",
+	"detection_and_cropping": "Détection et recadrage"
 }
