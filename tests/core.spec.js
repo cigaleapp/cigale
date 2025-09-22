@@ -291,7 +291,7 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 	await page.goto('#/protocols');
 	await page
-		.locator('article')
+		.getByRole('listitem')
 		.filter({ hasText: lightweightProtocol.id })
 		.getByRole('button', { name: 'Supprimer' })
 		.click();
