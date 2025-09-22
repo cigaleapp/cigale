@@ -32,66 +32,41 @@ export const MetadataValues = scope({ ID }).type({
 	'[ID]': MetadataValue
 });
 
-export const MetadataType = type("'string'", '@', 'du texte')
-	.or(type("'boolean'", '@', 'un booléen (vrai ou faux)'))
-	.or(type("'integer'", '@', 'un entier'))
-	.or(type("'float'", '@', 'un nombre, potentiellement à virgule'))
-	.or(
-		type(
-			"'enum'",
-			'@',
-			"un ensemble de valeur fixes. Utiliser 'options' sur la définition d'une métadonnée pour préciser les valeurs possibles"
-		)
-	)
-	.or(type("'date'", '@', 'une date'))
-	.or(type("'location'", '@', 'un objet avec deux nombres, `latitude` et `longitude`'))
-	.or(
-		type(
-			"'boundingbox'",
-			'@',
-			"un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
-		)
-	);
-
 /**
- * @type { Record<typeof MetadataType.infer, string> }
+ * @satisfies { Record<string, {label: string, help: string}> }
  */
-export const METADATA_TYPES = {
-	string: 'texte',
-	boolean: 'booléen',
-	integer: 'entier',
-	float: 'nombre',
-	enum: 'énumération',
-	date: 'date',
-	location: 'localisation',
-	boundingbox: 'boîte de recadrage'
-};
+export const METADATA_TYPES = /** @type {const} */ ({
+	string: { label: 'texte', help: 'du texte' },
+	boolean: { label: 'booléen', help: 'vrai ou faux' },
+	integer: { label: 'entier', help: 'un entier' },
+	float: { label: 'nombre', help: 'un nombre, potentiellement à virgule' },
+	enum: { label: 'énumération', help: 'un ensemble de valeur fixes' },
+	date: { label: 'date', help: 'une date' },
+	location: {
+		label: 'localisation',
+		help: 'un objet avec deux nombres, `latitude` et `longitude`'
+	},
+	boundingbox: {
+		label: "région d'image",
+		help: 'un objet représentant une région rectangulaire au format YOLO'
+	}
+});
 
-export const MetadataMergeMethod = type.or(
-	type(
-		'"min"',
-		'@',
-		"Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
-	),
-	type(
-		'"max"',
-		'@',
-		"Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
-	),
-	type('"average"', '@', 'Prendre la moyenne des valeurs'),
-	type('"median"', '@', 'Prendre la médiane des valeurs'),
-	type('"none"', '@', 'Ne pas fusionner'),
-	type(
-		'"union"',
-		'@',
-		'Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes'
-	)
+export const MetadataType = type.or(
+	type("'string'", '@', METADATA_TYPES.string.help),
+	type("'boolean'", '@', METADATA_TYPES.boolean.help),
+	type("'integer'", '@', METADATA_TYPES.integer.help),
+	type("'float'", '@', METADATA_TYPES.float.help),
+	type("'enum'", '@', METADATA_TYPES.enum.help),
+	type("'date'", '@', METADATA_TYPES.date.help),
+	type("'location'", '@', METADATA_TYPES.location.help),
+	type("'boundingbox'", '@', METADATA_TYPES.boundingbox.help)
 );
 
 /**
- * @type { Record<typeof MetadataMergeMethod.infer, { label: string; help: string }> }
+ * @satisfies { Record<string, { label: string; help: string }> }
  */
-export const METADATA_MERGE_METHODS = {
+export const METADATA_MERGE_METHODS = /** @type {const} */ ({
 	min: {
 		label: 'Minimum',
 		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
@@ -116,7 +91,16 @@ export const METADATA_MERGE_METHODS = {
 		label: 'Aucune',
 		help: 'Ne pas fusionner'
 	}
-};
+});
+
+export const MetadataMergeMethod = type.or(
+	type('"min"', '@', METADATA_MERGE_METHODS.min.help),
+	type('"max"', '@', METADATA_MERGE_METHODS.max.help),
+	type('"average"', '@', METADATA_MERGE_METHODS.average.help),
+	type('"median"', '@', METADATA_MERGE_METHODS.median.help),
+	type('"none"', '@', METADATA_MERGE_METHODS.none.help),
+	type('"union"', '@', METADATA_MERGE_METHODS.union.help)
+);
 
 export const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
