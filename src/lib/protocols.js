@@ -348,5 +348,10 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 	tables.Protocol.refresh();
 	tables.Metadata.refresh();
 
-	return result;
+	const { version: newVersion, ...rest } = result;
+
+	if (newVersion === undefined)
+		throw new Error("Le protocole a été importé mais n'a plus de version");
+
+	return { version: newVersion, ...rest };
 }
