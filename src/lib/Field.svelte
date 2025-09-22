@@ -1,10 +1,13 @@
 <script>
 	import {} from 'svelte';
+	import IconError from '~icons/ph/x';
+
 	/**
 	 * @import { Snippet, Component } from 'svelte';
 	 *
 	 * @typedef {object} Props
 	 * @property {string | Snippet} label
+	 * @property {string | Snippet} [error] a error message to display. Takes precedence over hint
 	 * @property {string | Snippet} [hint]
 	 * @property {undefined | Component } [Icon]
 	 * @property {undefined | Snippet} [icon]
@@ -13,7 +16,7 @@
 	 */
 
 	/** @type {Props} */
-	const { label, hint, children, composite, icon, Icon } = $props();
+	const { label, hint, error, children, composite, icon, Icon } = $props();
 </script>
 
 <div class="field" class:has-icon={Icon || icon}>
@@ -36,7 +39,18 @@
 			</div>
 			{@render children()}
 		</svelte:element>
-		{#if hint}
+		{#if error}
+			<div class="hint error">
+				<IconError />
+				<div class="content">
+					{#if typeof error === 'string'}
+						{error}
+					{:else}
+						{@render error()}
+					{/if}
+				</div>
+			</div>
+		{:else if hint}
 			<div class="hint">
 				{#if typeof hint === 'string'}
 					{hint}
@@ -75,5 +89,18 @@
 		letter-spacing: normal;
 		font-weight: normal;
 		font-size: 1rem;
+	}
+
+	.hint.error {
+		color: var(--fg-error);
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		font-size: 0.9em;
+		margin-top: 0.5em;
+	}
+
+	.hint.error:has(.content:empty) {
+		opacity: 0;
 	}
 </style>
