@@ -1,11 +1,17 @@
 <script>
 	import { page } from '$app/state';
 	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-	import IconTaxonomy from '~icons/ph/graph';
+	import { tables } from '$lib/idb.svelte.js';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { METADATA_TYPES, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+	import Tooltip from '$lib/Tooltip.svelte';
+	import IconCascades from '~icons/ph/tree-view';
 	import IconInfo from '~icons/ph/info';
 	import IconOptions from '~icons/ph/list-dashes';
 	import IconInference from '~icons/ph/magic-wand';
+	import { updater } from '../../updater.svelte.js';
+	import { uppercaseFirst } from '$lib/i18n.js';
+	import { tooltip } from '$lib/tooltips.js';
 
 	const { children, data } = $props();
 	const { id, label, type } = $derived(data.metadata);
@@ -13,40 +19,64 @@
 
 <div class="header-and-scrollable">
 	<header>
-		<h2>
+		<div class="text">
 			<span class="supertitle">Métadonnée</span>
-			<span class="title">
-				{label || removeNamespaceFromMetadataId(id)}
-				<div class="icon-datatype">
-					<IconDatatype {type} />
-				</div>
-			</span>
-			<code class="id">{id}</code>
-		</h2>
+			<h2>
+				<span class="title">
+					<InlineTextInput
+						discreet
+						help="Nom de la métadonnée"
+						value={label || removeNamespaceFromMetadataId(id)}
+						onblur={updater(async (p, value) => {
+							if (!value) return;
+							await tables.Metadata.update(id, 'label', value);
+						})}
+					/>
+				</span>
+			</h2>
+			<code class="id">
+				<Tooltip text="Identifiant de la métadonnée">{removeNamespaceFromMetadataId(id)}</Tooltip>
+			</code>
+			<div class="datatype">
+				<IconDatatype {type} />
+				{uppercaseFirst(METADATA_TYPES[type].label ?? '')}
+			</div>
+		</div>
 
 		<nav>
 			{#snippet navlink(
 				/** @type {string} */ path,
 				/** @type {string} */ name,
-				/** @type {import('svelte').Component} */ Icon
+				/** @type {import('svelte').Component} */ Icon,
+				/** @type {string|undefined} */ help = undefined
 			)}
 				<a
 					href="#/protocols/{data.protocol.id}/metadata/{removeNamespaceFromMetadataId(id)}/{path}"
 					class:active={page.url.hash.includes(`/${path}`)}
+					use:tooltip={help}
 				>
 					<Icon />
 					{name}
 				</a>
 			{/snippet}
-
 			{@render navlink('infos', 'Informations', IconInfo)}
-			{@render navlink('options', 'Options', IconOptions)}
-			{@render navlink('inference', 'Inférence', IconInference)}
-			{@render navlink('taxonomy', 'Taxonomie', IconTaxonomy)}
+			{#if type === 'enum'}
+				{@render navlink('options', 'Options', IconOptions)}
+				<!-- TODO support inference on non-enums -->
+				{@render navlink('inference', 'Inférence', IconInference)}
+			{/if}
+			{@render navlink(
+				'cascades',
+				'Cascades',
+				IconCascades,
+				"Changer les valeurs d'autres métadonnées en fonction de celle-ci"
+			)}
 		</nav>
 	</header>
 
-	<div class="scrollable">{@render children()}</div>
+	<div class="scrollable" class:padded={!page.route.id?.includes('/options')}>
+		{@render children()}
+	</div>
 </div>
 
 <style>
@@ -71,22 +101,25 @@
 		border-bottom: 1px solid var(--gay);
 	}
 
-	h2 {
+	header .text {
 		display: flex;
 		flex-direction: column;
 	}
 
-	h2 * {
+	header .text * {
 		line-height: 1;
+		margin: 0;
+		padding: 0;
 	}
 
-	h2 .supertitle {
-		font-size: 0.7em;
+	header .supertitle {
 		text-transform: uppercase;
 		letter-spacing: 2px;
+		font-weight: bold;
+		margin-bottom: -0.5em;
 	}
 
-	h2 .title {
+	header .title {
 		font-weight: normal;
 		font-size: 2.5rem;
 		display: flex;
@@ -94,17 +127,21 @@
 		gap: 0.5rem;
 	}
 
-	h2 .icon-datatype {
+	header .datatype {
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		font-size: 1.2rem;
+		gap: 0.5em;
+		margin-top: 0.5em;
+
+		:global(svg) {
+			font-size: 1.2rem;
+		}
 	}
 
-	h2 .id {
-		font-size: 0.8em;
+	header .id {
 		color: var(--gray);
 		font-weight: normal;
+		margin-top: -0.5em;
 	}
 
 	nav {
@@ -137,5 +174,12 @@
 
 	nav a.active::after {
 		background-color: var(--bg-primary);
+	}
+
+	.scrollable.padded {
+		padding: 2rem 1.75rem;
+		:global(> *) {
+			max-width: 1000px;
+		}
 	}
 </style>
