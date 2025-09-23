@@ -112,7 +112,7 @@
 		"json-schema-doc-ts": "^2.0.0",
 		"jszip": "^3.10.1",
 		"knip": "^5.64.0",
-		"lint-staged": "^16.1.6",
+		"lint-staged": "^16.2.0",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.16.0",
 		"pdf-to-png-converter": "^3.10.0",
