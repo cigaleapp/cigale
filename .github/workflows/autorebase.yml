@@ -17,17 +17,62 @@ jobs:
         with:
           ref: main
       - name: Auto-rebase PRs
+        run: |
+          # Recursive function to take into account PRs that target other PR's branches, 
+          # so that they are rebased in the correct order.
+          function rebase_prs() {
+            additional_filters=$1
+
+            function msg() {
+              depth=${2:-1}
+              indent=$(printf '  %.0s' $(seq 1 $depth))
+              echo "${indent}$@"
+            }
+
+            msg "Rebasing PRs with $additional_filters"
+
+            to_update=$(gh pr list -S "$FILTER $additional_filters" --json number --jq '.[].number')
+
+            for pr in $to_update; do
+              msg ""
+              msg "Rebasing PR #$pr https://github.com/${{ github.repository }}/pull/$pr"
+
+              if ! gh pr update-branch $pr --rebase; then
+                msg "Failed to rebase PR #$pr, adding comment"
+                gh pr comment $pr --body "$PR_COMMENT"
+
+              else
+                msg "Successfully rebased PR #$pr"
+
+                branch=$(gh pr view $pr --json headRefName --jq '.headRefName')
+                rebase_prs "base:$branch" $((depth + 1))
+              fi
+            done
+          }
+
+          rebase_prs "base:main"
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          to_update=$(gh pr list -S '-label:no-autorebase -author:app/github-actions -author:app/renovate -author:app/mend' --json number --jq '.[].number')
+          FILTER: >-
+            -label:no-autorebase
+            -author:app/github-actions 
+            -author:app/copilot-swe-agent
+            -author:app/renovate 
+            -author:app/mend
+          PR_COMMENT: |
+            🤖 **Autorebase failed**
 
-          for pr in $to_update; do
-            echo "Rebasing PR #$pr https://github.com/${{ github.repository }}/pull/$pr"
-            if ! gh pr update-branch $pr --rebase; then
-              echo "Failed to rebase PR #$pr, adding comment"
-              gh pr comment $pr --body $'🤖 **Autorebase failed**\n\nThe automatic rebase of this PR failed. This could be due to:\n- Merge conflicts that need manual resolution\n- The PR branch being out of sync with the base branch\n- Other git-related issues\n\nPlease manually rebase your branch or resolve any conflicts:\n```bash\ngit checkout your-branch-name\ngit rebase main\n# Resolve any conflicts if they occur\ngit push --force-with-lease\n```\n\nThe autorebase will be attempted again on the next scheduled run.'
-            else
-              echo "Successfully rebased PR #$pr"
-            fi
-          done
+            The automatic rebase of this PR failed. This could be due to:
+            - Merge conflicts that need manual resolution
+            - The PR branch being out of sync with the base branch
+            - Other git-related issues
+
+            Please manually rebase your branch or resolve any conflicts:
+            ```bash
+            git checkout your-branch-name
+            git rebase main
+            # Resolve any conflicts if they occur
+            git push --force-with-lease
+            ```
+
+            The autorebase will be attempted again on the next scheduled run.
