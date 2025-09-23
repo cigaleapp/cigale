@@ -168,11 +168,14 @@
 {:else if !classifModelLoadingError}
 	<section class="observations" class:empty={!images.length}>
 		<AreaObservations
+			nature="Observation"
 			bind:selection={uiState.selection}
 			{images}
 			{errors}
 			sort={getSettings().gallerySort}
 			loadingText={m.analyzing()}
+			groups={[m.cropped_items(), m.uncropped_items()]}
+			groupings={(item) => (item.boundingBoxes?.length ? m.cropped_items() : m.uncropped_items())}
 			onretry={(id) => {
 				uiState.erroredImages.delete(id);
 				const imageIds = tables.Observation.getFromState(id)?.images;

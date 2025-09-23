@@ -12,7 +12,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 -->
 
-<script>
+<script generics="GroupName extends string">
 	import { uiState } from '$lib/state.svelte';
 	import * as dates from 'date-fns';
 	import { onMount } from 'svelte';
@@ -22,15 +22,24 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { mutationobserver } from './mutations';
 	import { m } from './paraglide/messages';
 	import { getSettings, isDebugMode } from './settings.svelte';
+	import { compareBy, entries } from './utils';
+	import { countThing } from './i18n';
+
+	/**
+	 * @import { CardObservation as Item } from './AreaObservations.utils'
+	 */
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Array<import ('./AreaObservations.utils').CardObservation>} images
+	 * @property {Item[]} images
+	 * @property {'Photo'|'Observation'} nature what kind of items are in `images`
 	 * @property {Map<string, string>} [errors] maps image ids to error messages
 	 * @property {string[]} [selection=[]]
 	 * @property {string} [highlight] id of image to highlight and scroll to
 	 * @property {string} [loadingText]
+	 * @property {GroupName[]} [groups] list of possible group names, if `groupings` is used. Array order is used to order groups in the UI.
+	 * @property {(item: Item) => GroupName} [groupings] function that computes a grouping for each item, to group them up. Return a tuple of [group index, friendly group name]
 	 * @property {(id: string) => void} [ondelete] callback the user wants to delete a card
 	 * @property {(id: string) => void} [onretry] callback the user wants to retry an errored card
 	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
@@ -40,6 +49,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	/** @type {Props } */
 	let {
+		nature,
 		images = $bindable(),
 		ondelete,
 		onretry,
@@ -49,7 +59,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		highlight,
 		loadingText,
 		sort,
-		selection = $bindable([])
+		selection = $bindable([]),
+		groupings,
+		groups
 	} = $props();
 
 	/** @type {HTMLElement | undefined} */
@@ -125,8 +137,24 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		});
 	});
 
-	const sortedImages = $derived(
-		images.toSorted((a, b) => {
+	/**
+	 * @type {Array<readonly [GroupName | "", Item[]]>}
+	 */
+	const groupedAndSortedImages = $derived.by(() => {
+		if (!groupings) return [['', sortImages(images, sort)]];
+		return entries(Object.groupBy(images, groupings))
+			.filter(([, items]) => items && items.length > 0)
+			.map(([key, items]) => /** @type {const} */ ([key, sortImages(items ?? [], sort)]))
+			.toSorted(compareBy(([name]) => groups?.indexOf(name) ?? 0));
+	});
+
+	/**
+	 *
+	 * @param {typeof images} images
+	 * @param {typeof sort} sort
+	 */
+	function sortImages(images, sort) {
+		return images.toSorted((a, b) => {
 			if (sort.direction === 'desc') {
 				[a, b] = [b, a];
 			}
@@ -139,8 +167,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				case 'date':
 					return dates.compareAsc(a.addedAt, b.addedAt);
 			}
-		})
-	);
+		});
+	}
 </script>
 
 <section
@@ -158,27 +186,40 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each sortedImages as props, i (virtualizeKey(props))}
-		<CardObservation
-			--card-size-factor={getSettings().gridSize}
-			data-testid={i === 0 ? 'first-observation-card' : undefined}
-			data-id={props.id}
-			data-loading={props.loading}
-			data-index={props.index}
-			{...props}
-			onclick={oncardclick ? () => oncardclick(props.id) : undefined}
-			ondelete={ondelete ? () => ondelete(props.id) : undefined}
-			onretry={onretry ? () => onretry(props.id) : undefined}
-			errored={errors?.has(props.id)}
-			statusText={errors?.get(props.id) ?? (props.loading === -Infinity ? m.queued() : loadingText)}
-			highlighted={props.id === highlight}
-			selected={selection.includes(props.id.toString())}
-			boundingBoxes={props.boundingBoxes}
-			applyBoundingBoxes={props.applyBoundingBoxes}
-		/>
+	{#each groupedAndSortedImages as [groupName, sortedImages] (groupName)}
+		<section class="group">
+			{#if groupName}
+				<header>
+					<h2>{groupName}</h2>
+					<p>{countThing(nature === 'Photo' ? 'photo' : 'observation', sortedImages.length)}</p>
+				</header>
+			{/if}
+			<div class="items">
+				{#each sortedImages as props, i (virtualizeKey(props))}
+					<CardObservation
+						--card-size-factor={getSettings().gridSize}
+						data-testid={i === 0 ? 'first-observation-card' : undefined}
+						data-id={props.id}
+						data-loading={props.loading}
+						data-index={props.index}
+						{...props}
+						onclick={oncardclick ? () => oncardclick(props.id) : undefined}
+						ondelete={ondelete ? () => ondelete(props.id) : undefined}
+						onretry={onretry ? () => onretry(props.id) : undefined}
+						errored={errors?.has(props.id)}
+						statusText={errors?.get(props.id) ??
+							(props.loading === -Infinity ? m.queued() : loadingText)}
+						highlighted={props.id === highlight}
+						selected={selection.includes(props.id.toString())}
+						boundingBoxes={props.boundingBoxes}
+						applyBoundingBoxes={props.applyBoundingBoxes}
+					/>
+				{/each}
+			</div>
+		</section>
 	{/each}
 
-	{#if isDebugMode() && sortedImages.length > 0}
+	{#if isDebugMode() && images.length > 0}
 		<div class="debug">
 			{#snippet displayIter(set)}
 				{'{'}
@@ -199,15 +240,23 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 </section>
 
 <style>
-	section {
-		gap: 1.5em 1em;
-	}
-
-	section.images {
+	.group .items {
 		display: flex;
 		flex-wrap: wrap;
 		align-content: flex-start;
-		justify-content: space-around;
+		justify-content: space-between;
+		gap: 1.5em 1em;
+	}
+
+	.images {
+		display: flex;
+		flex-direction: column;
+		gap: 3em;
+	}
+
+	.group header {
+		margin-bottom: 1em;
+		user-select: none;
 	}
 
 	.debug {

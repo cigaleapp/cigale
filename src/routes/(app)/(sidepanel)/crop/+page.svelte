@@ -54,11 +54,15 @@
 
 <section class="observations">
 	<AreaObservations
+		nature="Photo"
 		{images}
 		bind:selection={uiState.selection}
 		sort={getSettings().gallerySort}
 		loadingText={m.analyzing()}
 		errors={uiState.erroredImages}
+		groups={[m.with_detections(), m.without_detections()]}
+		groupings={(item) =>
+			item.boundingBoxes?.length ? m.with_detections() : m.without_detections()}
 		onretry={(id) => {
 			uiState.erroredImages.delete(id);
 			detectMore([id]);
@@ -70,7 +74,7 @@
 			await deleteImageFile(id);
 		}}
 		oncardclick={(id) => {
-			goto(`#/crop/${id}`);
+			goto('/(app)/(sidepanel)/crop/[image]', { image: id });
 		}}
 	/>
 	{#if !images.length}
