@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 
-export const ID = type(/[\w_]+/);
+export const ID = type(/^[\w._]+$/);
 
 export const References = ID.array().pipe((ids) => [...new Set(ids)]);
 

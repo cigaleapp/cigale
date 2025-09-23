@@ -38,35 +38,35 @@ describe('processExifData', () => {
 
 		await db.tables.Metadata.set({
 			...metadataField,
-			id: namespacedMetadataId('test-protocol', 'date'),
+			id: namespacedMetadataId('com.example.test.protocol', 'date'),
 			type: 'date',
 			infer: { exif: 'DateTimeOriginal' }
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
-			id: namespacedMetadataId('test-protocol', 'location'),
+			id: namespacedMetadataId('com.example.test.protocol', 'location'),
 			type: 'location',
 			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }
 		});
 
 		await db.tables.Metadata.set({
 			...metadataField,
-			id: namespacedMetadataId('test-protocol', 'no-exif'),
+			id: namespacedMetadataId('com.example.test.protocol', 'no_exif'),
 			type: 'string'
 		});
 
 		await db.tables.Protocol.set({
-			id: 'test-protocol',
+			id: 'com.example.test.protocol',
 			name: 'Test Protocol',
-			metadata: ['date', 'location', 'no-exif'].map((id) =>
-				namespacedMetadataId('test-protocol', id)
+			metadata: ['date', 'location', 'no_exif'].map((id) =>
+				namespacedMetadataId('com.example.test.protocol', id)
 			),
 			authors: [],
 			description: 'Test Protocol',
 			learnMore: 'https://example.com',
 			crop: {
-				metadata: 'test-protocol.crop'
+				metadata: 'com.example.test.protocol.crop'
 			}
 		});
 
@@ -84,14 +84,14 @@ describe('processExifData', () => {
 	test('extracts from image without GPS', async () => {
 		const imageBytes = await readImageBytes('lil-fella.jpeg');
 
-		await processExifData('test-protocol', 'quoicoubaka', imageBytes, {
+		await processExifData('com.example.test.protocol', 'quoicoubaka', imageBytes, {
 			type: 'image/jpeg',
 			name: 'test.jpg'
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
 		expect(image?.metadata).toEqual({
-			[namespacedMetadataId('test-protocol', 'date')]: {
+			[namespacedMetadataId('com.example.test.protocol', 'date')]: {
 				value: new Date('2025-04-25T12:38:36.000Z'),
 				manuallyModified: false,
 				confidence: 1,
@@ -103,20 +103,20 @@ describe('processExifData', () => {
 	test('extracts from image with GPS', async () => {
 		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
 
-		await processExifData('test-protocol', 'quoicoubaka', imageBytes, {
+		await processExifData('com.example.test.protocol', 'quoicoubaka', imageBytes, {
 			type: 'image/jpeg',
 			name: 'test.jpg'
 		});
 
 		const image = await db.tables.Image.get(imageId(0, 0));
 		expect(image?.metadata).toEqual({
-			[namespacedMetadataId('test-protocol', 'date')]: {
+			[namespacedMetadataId('com.example.test.protocol', 'date')]: {
 				value: new Date('2008-10-22T16:29:49.000Z'),
 				manuallyModified: false,
 				confidence: 1,
 				alternatives: {}
 			},
-			[namespacedMetadataId('test-protocol', 'location')]: {
+			[namespacedMetadataId('com.example.test.protocol', 'location')]: {
 				value: {
 					latitude: 43.46715666666389,
 					longitude: 11.885394999997223
