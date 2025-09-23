@@ -5,7 +5,7 @@
  */
 
 import { sendCorrection } from '@cigale/beamup';
-import { entries, pick, propOrNothing } from './utils.js';
+import { entries, nonnull, pick, propOrNothing } from './utils.js';
 import { generateId } from './database.js';
 import { serializeMetadataValue } from './metadata.js';
 
@@ -20,11 +20,22 @@ import { serializeMetadataValue } from './metadata.js';
  */
 export async function storeCorrection(db, protocol, subject, metadata, beforeValue, afterValue) {
 	const image = await db.get('Image', subject).catch(() => undefined);
-	// const observation = image
-	// 	? undefined
-	// 	: await db.get('Observation', subject).catch(() => undefined);
+	const observation = image
+		? undefined
+		: await db.get('Observation', subject).catch(() => undefined);
 
 	const file = image?.fileId ? await db.get('ImageFile', image.fileId) : undefined;
+
+	const hash =
+		image?.sha1 ??
+		(await Promise.all(
+			(observation?.images ?? []).map(async (imageId) =>
+				db
+					.get('Image', imageId)
+					.catch(() => undefined)
+					.then((img) => img?.sha1)
+			)
+		).then((hashes) => hashes.filter(nonnull).join(' ')));
 
 	await db.add(
 		'BeamupCorrection',
@@ -33,7 +44,10 @@ export async function storeCorrection(db, protocol, subject, metadata, beforeVal
 			client: { version: import.meta.env.buildCommit || 'unversioned' },
 			protocol: pick(protocol, 'id', 'version', 'beamup'),
 			metadata: pick(metadata, 'id', 'type'),
-			subject: image ? { image: { id: subject } } : { observation: { id: subject } },
+			subject: {
+				[image ? 'image' : 'observation']: { id: subject },
+				contentHash: hash || null
+			},
 			...propOrNothing(
 				'file',
 				file
@@ -91,7 +105,7 @@ export async function syncCorrections(db, onProgress) {
 			protocol_version: protocol.version?.toString() ?? 'non versioned',
 			subject: subject.image?.id ?? subject.observation?.id ?? '',
 			subject_type: subject.image ? 'image' : subject.observation ? 'observation' : 'other',
-			subject_content_hash: null, // TODO
+			subject_content_hash: subject.contentHash,
 			user: null, // TODO?
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			sent_at: new Date().toISOString()
