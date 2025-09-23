@@ -21,10 +21,10 @@ jobs:
           # Recursive function to take into account PRs that target other PR's branches, 
           # so that they are rebased in the correct order.
           function rebase_prs() {
+            depth=${2:-1}
             additional_filters=$1
 
             function msg() {
-              depth=${2:-1}
               indent=$(printf '  %.0s' $(seq 1 $depth))
               echo "${indent}$@"
             }
