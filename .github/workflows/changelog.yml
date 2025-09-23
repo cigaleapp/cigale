@@ -7,7 +7,7 @@ on:
     - cron: '0 0 28 * *'
   push:
     branches: [main]
-    paths: [.github/workflows/update-changelog.yml, scripts/generate-changelog.js, CHANGELOG.md]
+    paths: [.github/workflows/changelog.yml, scripts/generate-changelog.js, CHANGELOG.md]
 
 jobs:
   update-changelog:
