@@ -24,5 +24,10 @@ jobs:
 
           for pr in $to_update; do
             echo "Rebasing PR #$pr https://github.com/${{ github.repository }}/pull/$pr"
-            gh pr update-branch $pr --rebase || true
+            if ! gh pr update-branch $pr --rebase; then
+              echo "Failed to rebase PR #$pr, adding comment"
+              gh pr comment $pr --body $'🤖 **Autorebase failed**\n\nThe automatic rebase of this PR failed. This could be due to:\n- Merge conflicts that need manual resolution\n- The PR branch being out of sync with the base branch\n- Other git-related issues\n\nPlease manually rebase your branch or resolve any conflicts:\n```bash\ngit checkout your-branch-name\ngit rebase main\n# Resolve any conflicts if they occur\ngit push --force-with-lease\n```\n\nThe autorebase will be attempted again on the next scheduled run.'
+            else
+              echo "Successfully rebased PR #$pr"
+            fi
           done
