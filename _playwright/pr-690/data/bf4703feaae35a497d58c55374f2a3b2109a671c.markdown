@@ -1,0 +1,10 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - img [ref=e3]
+  - paragraph [ref=e5]:
+    - generic [ref=e6]: Chargement…
+    - code [ref=e7]: Chargement du protocole intégré
+  - code [ref=e8]: 22fb1b1a4405c69c24fe1b7c3814c4fc3c70b2a6
+```
