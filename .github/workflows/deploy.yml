@@ -42,5 +42,5 @@ jobs:
             _playwright
             _vitest
             _coverage
-            playwright-report
             _nodemodules
+            playwright.json
