@@ -11,7 +11,9 @@
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import { getSettings, setSetting } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte';
+	import Switch from '$lib/Switch.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import Fuse from 'fuse.js';
@@ -20,6 +22,7 @@
 	import IconManage from '~icons/ph/gear';
 	import IconSearch from '~icons/ph/magnifying-glass';
 	import IconImport from '~icons/ph/upload-simple';
+	import BeamupConsentLearnMore from './BeamupConsentLearnMore.svelte';
 
 	const { data } = $props();
 
@@ -213,6 +216,27 @@
 							/>
 						</div>
 					{/if}
+					{#if p.beamup}
+						<label class="beamup-consent">
+							<Switch
+								value={getSettings().protocolBeamupConsent[p.id]}
+								onchange={async (allow) => {
+									const decidedBefore = p.id in getSettings().protocolBeamupConsent;
+
+									if (!decidedBefore) toasts.success('Merci! 😎');
+
+									await setSetting('protocolBeamupConsent', {
+										...getSettings().protocolBeamupConsent,
+										[p.id]: allow
+									});
+								}}
+							/>
+							Contribuer à l'amélioration du protocole <BeamupConsentLearnMore
+								protocol={p.id}
+								config={p.beamup}
+							/>
+						</label>
+					{/if}
 				{/if}
 			</li>
 		{/each}
@@ -299,6 +323,14 @@
 
 	li .model-select {
 		margin-top: 0.5rem;
+	}
+
+	li .beamup-consent {
+		margin-top: 1.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.9rem;
 	}
 
 	section.manage {
