@@ -81,7 +81,6 @@ function wrangler(table) {
 			await set(table, value);
 			const output = Tables[table].assert(value);
 			const index = _tablesState[table].findIndex((item) => item.id === value.id);
-			console.debug(`indexof ${table} ${value.id} = ${index}`);
 			if (index !== -1) _tablesState[table][index] = output;
 			else {
 				_tablesState[table].push(output);
