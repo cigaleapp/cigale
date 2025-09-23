@@ -5,7 +5,8 @@ import {
 	ID,
 	ModelInput,
 	Probability,
-	References
+	References,
+	SHA1Hash
 } from './schemas/common.js';
 import {
 	EXIFField,
@@ -161,7 +162,11 @@ const BeamupCorrection = table(
 			beamup: BeamupSettings
 		}),
 		metadata: Metadata.pick('id', 'type'),
-		subject: { 'image?': Image.pick('id'), 'observation?': Observation.pick('id') },
+		subject: {
+			'image?': Image.pick('id'),
+			'observation?': Observation.pick('id'),
+			contentHash: SHA1Hash.or('null')
+		},
 		'file?': ImageFile.pick(
 			'id',
 			/* TODO  'contentHash', */ 'filename',
@@ -362,4 +367,9 @@ export const idComparator = (a, b) => {
  *
  * @typedef DimensionsInput
  * @type {typeof Dimensions.inferIn}
+ */
+
+/**
+ * @typedef BeamupCorrection
+ * @type {typeof BeamupCorrection.infer}
  */

@@ -1124,3 +1124,20 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 		element.remove();
 	}, duration);
 }
+
+/**
+ *
+ * @param {ArrayBuffer} content
+ * @returns {Promise<typeof import('$lib/schemas/common').SHA1Hash.infer | null>} base64-encoded SHA-1 sum
+ */
+export async function sha1sum(content) {
+	const digest = await crypto.subtle.digest('SHA-1', content);
+	try {
+		return new Uint8Array(digest).toBase64();
+	} catch {
+		console.warn(
+			'Could not base64-encode the SHA1 digest, probably because browser is too old, see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64#browser_compatibility'
+		);
+		return null;
+	}
+}
