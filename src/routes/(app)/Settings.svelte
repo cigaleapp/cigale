@@ -1,6 +1,7 @@
 <script>
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { tables } from '$lib/idb.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { getLocale, locales, setLocale } from '$lib/paraglide/runtime.js';
 	import { goto, href } from '$lib/paths.js';
@@ -143,7 +144,15 @@
 				max="2"
 				step="0.01"
 				list="gridsize-marks"
-				bind:value={() => getSettings().gridSize, (value) => setSetting('gridSize', value)}
+				bind:value={
+					() => getSettings().gridSize,
+					(value) => {
+						// Don't write to database too eagerly, it lags the UI
+						const settings = tables.Settings.state;
+						settings[settings.findIndex((s) => s.id === 'user')].gridSize = value;
+					}
+				}
+				onblur={async () => setSetting('gridSize', getSettings().gridSize)}
 			/>
 			<datalist id="gridsize-marks">
 				<option value="1"></option>
