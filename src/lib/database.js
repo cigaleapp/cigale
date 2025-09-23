@@ -116,6 +116,11 @@ const Settings = table(
 			direction: 'asc',
 			key: 'date'
 		})),
+		protocolBeamupConsent: scope({ ID })
+			.type({
+				'[ID]': 'boolean'
+			})
+			.default(() => ({})),
 		protocolModelSelections: scope({ ID })
 			.type({
 				'[ID]': {
