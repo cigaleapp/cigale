@@ -76,7 +76,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Check for clutter
-        run: bun run check:clutter
+        run: bun run check:clutter --reporter github-actions
   i18n:
     name: Check for untranslated messages
     runs-on: ubuntu-latest
