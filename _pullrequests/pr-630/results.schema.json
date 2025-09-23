@@ -216,7 +216,7 @@
             "metadata": {
               "type": "string",
               "description": "Métadonnée associée à la boîte englobante",
-              "pattern": "[\\w_]+"
+              "pattern": "^[\\w._]+$"
             },
             "padding": {
               "type": "string",
@@ -227,7 +227,7 @@
             "confirmationMetadata": {
               "type": "string",
               "description": "Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée",
-              "pattern": "[\\w_]+"
+              "pattern": "^[\\w._]+$"
             },
             "infer": {
               "type": "array",
@@ -418,13 +418,13 @@
         "id": {
           "type": "string",
           "description": "Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole",
-          "pattern": "[\\w_]+"
+          "pattern": "^[\\w._]+$"
         },
         "metadata": {
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": "[\\w_]+"
+            "pattern": "^[\\w._]+$"
           }
         },
         "name": {
@@ -486,7 +486,7 @@
           "description": "L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici",
           "items": {
             "type": "string",
-            "pattern": "[\\w_]+"
+            "pattern": "^[\\w._]+$"
           }
         },
         "observations": {
