@@ -62,17 +62,6 @@ jobs:
           PR_COMMENT: |
             🤖 **Autorebase failed**
 
-            The automatic rebase of this PR failed. This could be due to:
-            - Merge conflicts that need manual resolution
-            - The PR branch being out of sync with the base branch
-            - Other git-related issues
+            PRs are kept up-to-date with their base branch automatically via [a github action](https://github.com/${{ github.repository }}/actions/workflows/autorebase.yml). This prevents long-running PRs from drifting too far from the main branch
 
-            Please manually rebase your branch or resolve any conflicts:
-            ```bash
-            git checkout your-branch-name
-            git rebase main
-            # Resolve any conflicts if they occur
-            git push --force-with-lease
-            ```
-
-            The autorebase will be attempted again on the next scheduled run.
+            To opt-out, add the [`no-autorebase` label](https://github.com/${{ github.repository }}/labels?q=no-autorebase) to the PR.
