@@ -2,7 +2,7 @@ name: Auto-rebase PRs on main
 
 on:
   schedule:
-    - cron: '0 */4 * * *' # every 4 hours
+    - cron: '6 7 * * 2' # every week
   workflow_dispatch:
 
 permissions:
