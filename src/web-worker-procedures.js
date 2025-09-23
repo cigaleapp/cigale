@@ -123,5 +123,12 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 					: { progress: undefined, warning: o.warning }
 			),
 		success: type('ArrayBuffer')
+	},
+	computeBlurhash: {
+		input: type({
+			imageId: 'string'
+		}),
+		progress: type('undefined'),
+		success: type('undefined')
 	}
 });

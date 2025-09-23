@@ -4,6 +4,7 @@
 /// <reference lib="webworker" />
 
 import { syncCorrections } from '$lib/beamup.svelte.js';
+import * as blurhash from 'blurhash';
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
 import { cropImage } from '$lib/images.js';
@@ -22,7 +23,7 @@ import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { Analysis } from '$lib/schemas/results';
-import { compareBy, progressSplitter } from '$lib/utils';
+import { compareBy, progressSplitter, sha1sum } from '$lib/utils';
 import { fetchHttpRequest, omit, pick } from '$lib/utils.js';
 import { strToU8, zip } from 'fflate';
 import { openDB } from 'idb';
@@ -557,6 +558,40 @@ swarp.syncStoredCorrections(async (_, onProgress) => {
 	});
 
 	return { total, failed, succeeded };
+});
+
+swarp.computeBlurhash(async ({ imageId }) => {
+	const db = await openDatabase();
+	const image = await db.get('Image', imageId);
+	if (!image) throw new Error(`Image ${imageId} not found in database`);
+	if (!image.fileId) throw new Error(`Image ${imageId} has no associated ImageFile`);
+
+	const file = await db.get('ImagePreviewFile', image.fileId);
+	if (!file) throw new Error(`ImagePreviewFile ${image.fileId} not found in database`);
+
+	const timingStart = performance.now();
+
+	const canvas = new OffscreenCanvas(image.dimensions.width, image.dimensions.height);
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('Could not get canvas context');
+
+	ctx.drawImage(await createImageBitmap(new Blob([file.bytes], { type: image.contentType })), 0, 0);
+	const decoded = ctx.getImageData(0, 0, image.dimensions.width, image.dimensions.height).data;
+
+	const width = 5;
+	image.blurhash = blurhash.encode(
+		decoded,
+		image.dimensions.width,
+		image.dimensions.height,
+		width,
+		Math.floor((image.dimensions.height / image.dimensions.width) * width)
+	);
+
+	console.info(
+		`Computing blurhash for image ${image.id} took ${performance.now() - timingStart}ms`
+	);
+
+	await db.put('Image', image);
 });
 
 void swarp.start();

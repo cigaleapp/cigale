@@ -61,6 +61,15 @@ export const Dimensions = type({
 }));
 
 /**
+ * @see https://github.com/woltapp/blurhash/blob/master/Algorithm.md#structure
+ */
+export const BlurHash = type(
+	/[0-9A-Za-z#$%*+,-.:;=?@[\]^_{|}~]{8,}/,
+	'@',
+	"BlurHash d'une image, voir https://blurha.sh"
+);
+
+/**
  * @see https://en.wikipedia.org/wiki/MD5
  */
 export const SHA1Hash = type('string.base64 == 28', '@', 'Hash SHA-1 encodé en base 64');

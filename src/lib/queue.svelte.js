@@ -223,7 +223,7 @@ class ProcessingQueue {
 				if (isZip(file.type)) {
 					await importResultsZip(file, id, uiState.currentProtocolId);
 				} else {
-					await processImageFile(file, id);
+					await processImageFile(this.swarpc, file, id);
 				}
 			} else if (detection) {
 				await inferBoundingBoxes(this.swarpc, this.cancellers, detection.fileId);
