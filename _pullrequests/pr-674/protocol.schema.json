@@ -31,7 +31,7 @@
         "metadata": {
           "type": "string",
           "description": "Métadonnée associée à la boîte englobante",
-          "pattern": "[\\w_]+"
+          "pattern": "^[\\w._]+$"
         },
         "padding": {
           "type": "string",
@@ -42,7 +42,7 @@
         "confirmationMetadata": {
           "type": "string",
           "description": "Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée",
-          "pattern": "[\\w_]+"
+          "pattern": "^[\\w._]+$"
         },
         "infer": {
           "type": "array",
@@ -233,7 +233,7 @@
     "id": {
       "type": "string",
       "description": "Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole",
-      "pattern": "[\\w_]+"
+      "pattern": "^[\\w._]+$"
     },
     "metadata": {
       "type": "object",
@@ -972,7 +972,7 @@
                     "key": {
                       "type": "string",
                       "description": "Identifiant unique pour cette option",
-                      "pattern": "[\\w_]+"
+                      "pattern": "^[\\w._]+$"
                     },
                     "label": {
                       "type": "string",
@@ -982,9 +982,9 @@
                       "type": "object",
                       "description": "Objet contenant pour clés des identifiants d'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: \"1\", cascade: { genus: \"2\" } }`, une métadonnée genus ayant une option `{ key: \"2\", cascade: { family: \"3\" } }`. Si l'option \"1\" de la métadonnée species est choisie, la métadonnée genus sera définie sur l'option \"2\" et la métadonnée family sera à son tour définie sur l'option \"3\".",
                       "patternProperties": {
-                        "[\\w_]+": {
+                        "^[\\w._]+$": {
                           "type": "string",
-                          "pattern": "[\\w_]+"
+                          "pattern": "^[\\w._]+$"
                         }
                       }
                     },
@@ -2365,7 +2365,7 @@
                     "key": {
                       "type": "string",
                       "description": "Identifiant unique pour cette option",
-                      "pattern": "[\\w_]+"
+                      "pattern": "^[\\w._]+$"
                     },
                     "label": {
                       "type": "string",
@@ -2375,9 +2375,9 @@
                       "type": "object",
                       "description": "Objet contenant pour clés des identifiants d'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: \"1\", cascade: { genus: \"2\" } }`, une métadonnée genus ayant une option `{ key: \"2\", cascade: { family: \"3\" } }`. Si l'option \"1\" de la métadonnée species est choisie, la métadonnée genus sera définie sur l'option \"2\" et la métadonnée family sera à son tour définie sur l'option \"3\".",
                       "patternProperties": {
-                        "[\\w_]+": {
+                        "^[\\w._]+$": {
                           "type": "string",
-                          "pattern": "[\\w_]+"
+                          "pattern": "^[\\w._]+$"
                         }
                       }
                     },
@@ -2482,7 +2482,7 @@
       "description": "L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici",
       "items": {
         "type": "string",
-        "pattern": "[\\w_]+"
+        "pattern": "^[\\w._]+$"
       }
     },
     "observations": {
