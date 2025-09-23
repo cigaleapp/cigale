@@ -8,6 +8,7 @@ import { sendCorrection } from '@cigale/beamup';
 import { entries, nonnull, pick, propOrNothing } from './utils.js';
 import { generateId } from './database.js';
 import { serializeMetadataValue } from './metadata.js';
+import { getSetting } from './settings.svelte.js';
 
 /**
  * Stores a correction made to a protocol's metadata value.
@@ -19,6 +20,9 @@ import { serializeMetadataValue } from './metadata.js';
  * @param {MetadataValue} afterValue - The value after the correction.
  */
 export async function storeCorrection(db, protocol, subject, metadata, beforeValue, afterValue) {
+	const consent = await getSetting('protocolBeamupConsent', db);
+	if (!consent[protocol.id]) return;
+
 	const image = await db.get('Image', subject).catch(() => undefined);
 	const observation = image
 		? undefined

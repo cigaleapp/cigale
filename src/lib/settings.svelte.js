@@ -1,4 +1,5 @@
 import { tables } from './idb.svelte.js';
+import { Tables } from './database.js';
 
 /**
  * @import {Settings} from './database.js';
@@ -49,10 +50,16 @@ export async function setSetting(key, value) {
 /**
  * @template {keyof Settings} Key
  * @param {Key} key
+ * @param {import('./idb.svelte.js').DatabaseHandle} [db]
  * @returns {Promise<Settings[Key]>} the current value of the setting
  */
-export async function getSetting(key) {
-	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
+export async function getSetting(key, db) {
+	const current = db
+		? Tables.Settings.assert(
+				(await db.get('Settings', 'user')) ?? (await db.get('Settings', 'defaults'))
+			)
+		: ((await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults')));
+
 	if (!current) {
 		throw new Error("Les réglages par défaut n'ont pas été initialisés. Rechargez la page.");
 	}
