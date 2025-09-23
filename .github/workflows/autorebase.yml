@@ -20,7 +20,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          to_update=$(gh pr list --label autorebase --json number --jq '.[].number')
+          to_update=$(gh pr list -S '-label:no-autorebase -author:app/github-actions' --json number --jq '.[].number')
 
           for pr in $to_update; do
             echo "Rebasing PR #$pr https://github.com/${{ github.repository }}/pull/$pr"
