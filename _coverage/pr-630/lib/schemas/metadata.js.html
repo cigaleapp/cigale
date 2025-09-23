@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.26% </span>
+                <span class="strong">98.13% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>227/231</span>
+                <span class='fraction'>211/215</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.26% </span>
+                <span class="strong">98.13% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>227/231</span>
+                <span class='fraction'>211/215</span>
             </div>
         
             
@@ -296,23 +296,7 @@
 <a name='L231'></a><a href='#L231'>231</a>
 <a name='L232'></a><a href='#L232'>232</a>
 <a name='L233'></a><a href='#L233'>233</a>
-<a name='L234'></a><a href='#L234'>234</a>
-<a name='L235'></a><a href='#L235'>235</a>
-<a name='L236'></a><a href='#L236'>236</a>
-<a name='L237'></a><a href='#L237'>237</a>
-<a name='L238'></a><a href='#L238'>238</a>
-<a name='L239'></a><a href='#L239'>239</a>
-<a name='L240'></a><a href='#L240'>240</a>
-<a name='L241'></a><a href='#L241'>241</a>
-<a name='L242'></a><a href='#L242'>242</a>
-<a name='L243'></a><a href='#L243'>243</a>
-<a name='L244'></a><a href='#L244'>244</a>
-<a name='L245'></a><a href='#L245'>245</a>
-<a name='L246'></a><a href='#L246'>246</a>
-<a name='L247'></a><a href='#L247'>247</a>
-<a name='L248'></a><a href='#L248'>248</a>
-<a name='L249'></a><a href='#L249'>249</a>
-<a name='L250'></a><a href='#L250'>250</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L234'></a><a href='#L234'>234</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -365,32 +349,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -423,6 +382,15 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -564,7 +532,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
-import { keys } from '../utils.js';
+import { keys, unique } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
 &nbsp;
 /**
@@ -595,66 +563,41 @@ export const MetadataValues = scope({ ID }).type({
 	'[ID]': MetadataValue
 });
 &nbsp;
-export const MetadataType = type("'string'", '@', 'du texte')
-	.or(type("'boolean'", '@', 'un booléen (vrai ou faux)'))
-	.or(type("'integer'", '@', 'un entier'))
-	.or(type("'float'", '@', 'un nombre, potentiellement à virgule'))
-	.or(
-		type(
-			"'enum'",
-			'@',
-			"un ensemble de valeur fixes. Utiliser 'options' sur la définition d'une métadonnée pour préciser les valeurs possibles"
-		)
-	)
-	.or(type("'date'", '@', 'une date'))
-	.or(type("'location'", '@', 'un objet avec deux nombres, `latitude` et `longitude`'))
-	.or(
-		type(
-			"'boundingbox'",
-			'@',
-			"un objet représentant une région rectangulaire au format YOLO, définie par son point central avec `x` et `y`, et sa largeur et hauteur avec `w` et `h`. Les coordonnées sont relatives à la taille de l'image: si (x, y) = (0.5, 0.5), le centre de la boîte est au centre de l'image"
-		)
-	);
-&nbsp;
 /**
- * @type { Record&lt;typeof MetadataType.infer, string&gt; }
+ * @satisfies { Record&lt;string, {label: string, help: string}&gt; }
  */
-export const METADATA_TYPES = {
-	string: 'texte',
-	boolean: 'booléen',
-	integer: 'entier',
-	float: 'nombre',
-	enum: 'énumération',
-	date: 'date',
-	location: 'localisation',
-	boundingbox: 'boîte de recadrage'
-};
+export const METADATA_TYPES = /** @type {const} */ ({
+	string: { label: 'texte', help: 'du texte' },
+	boolean: { label: 'booléen', help: 'vrai ou faux' },
+	integer: { label: 'entier', help: 'un entier' },
+	float: { label: 'nombre', help: 'un nombre, potentiellement à virgule' },
+	enum: { label: 'énumération', help: 'un ensemble de valeur fixes' },
+	date: { label: 'date', help: 'une date' },
+	location: {
+		label: 'localisation',
+		help: 'un objet avec deux nombres, `latitude` et `longitude`'
+	},
+	boundingbox: {
+		label: "région d'image",
+		help: 'un objet représentant une région rectangulaire au format YOLO'
+	}
+});
 &nbsp;
-export const MetadataMergeMethod = type.or(
-	type(
-		'"min"',
-		'@',
-		"Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
-	),
-	type(
-		'"max"',
-		'@',
-		"Choisir la valeur avec la meilleure confiance, et prendre la plus grande valeur en cas d'ambuiguité"
-	),
-	type('"average"', '@', 'Prendre la moyenne des valeurs'),
-	type('"median"', '@', 'Prendre la médiane des valeurs'),
-	type('"none"', '@', 'Ne pas fusionner'),
-	type(
-		'"union"',
-		'@',
-		'Spécifique aux boîtes de recadrage: fusionne les boîtes de recadrage en la plus petite boîte englobant toutes les boîtes'
-	)
+export const MetadataType = type.or(
+	type("'string'", '@', METADATA_TYPES.string.help),
+	type("'boolean'", '@', METADATA_TYPES.boolean.help),
+	type("'integer'", '@', METADATA_TYPES.integer.help),
+	type("'float'", '@', METADATA_TYPES.float.help),
+	type("'enum'", '@', METADATA_TYPES.enum.help),
+	type("'date'", '@', METADATA_TYPES.date.help),
+	type("'location'", '@', METADATA_TYPES.location.help),
+	type("'boundingbox'", '@', METADATA_TYPES.boundingbox.help)
 );
 &nbsp;
 /**
- * @type { Record&lt;typeof MetadataMergeMethod.infer, { label: string; help: string }&gt; }
+ * @satisfies { Record&lt;string, { label: string; help: string }&gt; }
  */
-export const METADATA_MERGE_METHODS = {
+export const METADATA_MERGE_METHODS = /** @type {const} */ ({
 	min: {
 		label: 'Minimum',
 		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
@@ -679,7 +622,16 @@ export const METADATA_MERGE_METHODS = {
 		label: 'Aucune',
 		help: 'Ne pas fusionner'
 	}
-};
+});
+&nbsp;
+export const MetadataMergeMethod = type.or(
+	type('"min"', '@', METADATA_MERGE_METHODS.min.help),
+	type('"max"', '@', METADATA_MERGE_METHODS.max.help),
+	type('"average"', '@', METADATA_MERGE_METHODS.average.help),
+	type('"median"', '@', METADATA_MERGE_METHODS.median.help),
+	type('"none"', '@', METADATA_MERGE_METHODS.none.help),
+	type('"union"', '@', METADATA_MERGE_METHODS.union.help)
+);
 &nbsp;
 export const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
@@ -741,9 +693,9 @@ export const Metadata = type({
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
 	).optional(),
-	'options?': MetadataEnumVariant.array().describe(
-		'Les options valides. Uniquement utile pour une métadonnée de type "enum"'
-	)
+	'options?': MetadataEnumVariant.array()
+		.pipe((opts) =&gt; unique(opts, (o) =&gt; o.key))
+		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
 }).and(
 	type.or(
 		{
@@ -817,7 +769,7 @@ export function namespaceOfMetadataId(metadataId) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-20T22:08:39.403Z
+                at 2025-09-23T20:09:45.097Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
