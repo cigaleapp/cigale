@@ -43,3 +43,4 @@ jobs:
             _vitest
             _coverage
             playwright-report
+            _nodemodules
