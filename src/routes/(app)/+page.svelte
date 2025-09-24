@@ -220,15 +220,18 @@
 					{#if p.beamup}
 						<label class="beamup-consent">
 							<Switch
-								value={getSettings().protocolBeamupConsent[p.id]}
+								value={getSettings().beamupPreferences[p.id]?.enable}
 								onchange={async (allow) => {
-									const decidedBefore = p.id in getSettings().protocolBeamupConsent;
+									const decidedBefore = p.id in getSettings().beamupPreferences;
 
 									if (!decidedBefore) toasts.success('Merci! 😎');
 
-									await setSetting('protocolBeamupConsent', {
-										...getSettings().protocolBeamupConsent,
-										[p.id]: allow
+									await setSetting('beamupPreferences', {
+										...getSettings().beamupPreferences,
+										[p.id]: {
+											enable: allow,
+											email: null
+										}
 									});
 								}}
 							/>
