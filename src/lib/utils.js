@@ -1113,3 +1113,23 @@ export async function sha1sum(content) {
 		return null;
 	}
 }
+
+/**
+ * @template T
+ * @param {T[]} array
+ * @param {(item: T) => string} key
+ * @returns {Map<string, T[]>}
+ */
+export function groupBy(array, key) {
+	// https://caniuse.com/mdn-javascript_builtins_map_groupby
+	if ('groupBy' in Map) {
+		return Map.groupBy(array, key);
+	}
+
+	return array.reduce((acc, item) => {
+		const k = key(item);
+		if (!acc.has(k)) acc.set(k, []);
+		acc.get(k)?.push(item);
+		return acc;
+	}, /** @type {Map<string, T[]>} */ (new Map()));
+}

@@ -4,11 +4,12 @@
  * @import { DatabaseHandle } from './idb.svelte.js'
  */
 
-import { sendCorrection } from '@cigale/beamup';
-import { entries, nonnull, pick, propOrNothing } from './utils.js';
+import * as beamup from '@cigale/beamup';
+import { entries, groupBy, nonnull, pick, propOrNothing, range } from './utils.js';
 import { generateId } from './database.js';
 import { serializeMetadataValue } from './metadata.js';
 import { getSetting } from './settings.svelte.js';
+import { errorMessage } from './i18n.js';
 
 /**
  * Stores a correction made to a protocol's metadata value.
@@ -68,54 +69,77 @@ export async function storeCorrection(db, protocol, subject, metadata, beforeVal
 
 /**
  * @param {DatabaseHandle} db
- * @param {(id: string, error: string|undefined) => void} [onProgress]
+ * @param {(ids: string[], error: string|undefined) => void} [onProgress]
  */
 export async function syncCorrections(db, onProgress) {
-	const corrections = await db.getAll('BeamupCorrection');
-	for (const {
-		id,
-		after,
-		before,
-		protocol,
-		metadata,
-		client,
-		occurredAt,
-		subject
-	} of corrections) {
-		await sendCorrection({
-			origin: protocol.beamup.origin,
-			after: {
-				alternatives: entries(after.alternatives).map(([value, confidence]) => ({
-					value,
-					confidence
-				})),
-				type: metadata.type,
-				value: after.value
-			},
-			before: {
-				alternatives: entries(before.alternatives).map(([value, confidence]) => ({
-					value,
-					confidence
-				})),
-				type: metadata.type,
-				value: before.value
-			},
-			client_name: 'Cigale',
-			client_version: client.version,
-			comment: null,
-			done_at: occurredAt,
-			metadata: metadata.id,
-			protocol_id: protocol.id,
-			protocol_version: protocol.version?.toString() ?? 'non versioned',
-			subject: subject.image?.id ?? subject.observation?.id ?? '',
-			subject_type: subject.image ? 'image' : subject.observation ? 'observation' : 'other',
-			subject_content_hash: subject.contentHash,
-			user: null, // TODO?
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			sent_at: new Date().toISOString()
-		})
-			.then(async () => db.delete('BeamupCorrection', id))
-			.then(() => onProgress?.(id, undefined))
-			.catch((e) => onProgress?.(id, e?.toString() ?? 'Unknown error'));
+	const correctionsByOrigin = await db
+		.getAll('BeamupCorrection')
+		.then((corrections) => groupBy(corrections, (c) => c.protocol.beamup.origin));
+
+	for (const [origin, corrections] of correctionsByOrigin.entries()) {
+		await beamup
+			.sendCorrections({
+				origin,
+				corrections: corrections.map(makeCorrection),
+				onProgress(chunk, sent) {
+					const start = chunk * beamup.CHUNK_SIZE;
+
+					const ids = range(start, sent - start)
+						.map((i) => corrections[i]?.id)
+						.filter(nonnull);
+
+					onProgress?.(ids, undefined);
+				}
+			})
+			.then(async () => {
+				for (const { id } of corrections) {
+					await db.delete('BeamupCorrection', id);
+				}
+			})
+			.catch((error) => {
+				onProgress?.(
+					corrections.map((c) => c.id),
+					errorMessage(error)
+				);
+			});
 	}
+}
+
+/**
+ *
+ * @param {typeof import('$lib/database').Tables.BeamupCorrection.inferIn} correction
+ * @returns {typeof import('@cigale/beamup').SendableCorrection.infer}
+ */
+function makeCorrection({ after, before, protocol, metadata, client, occurredAt, subject }) {
+	return {
+		after: {
+			alternatives: entries(after.alternatives).map(([value, confidence]) => ({
+				value,
+				confidence
+			})),
+			type: metadata.type,
+			value: after.value
+		},
+		before: {
+			alternatives: entries(before.alternatives).map(([value, confidence]) => ({
+				value,
+				confidence
+			})),
+			type: metadata.type,
+			value: before.value
+		},
+		client_name: 'Cigale',
+		client_version: client.version,
+		comment: null,
+		done_at: occurredAt,
+		metadata: metadata.id,
+		protocol_id: protocol.id,
+		protocol_version: protocol.version?.toString() ?? 'non versioned',
+		subject: subject.image?.id ?? subject.observation?.id ?? '',
+		subject_type: /** @type {import('@cigale/beamup').SubjectType} */ (
+			subject.image ? 'image' : subject.observation ? 'observation' : 'other'
+		),
+		subject_content_hash: subject.contentHash,
+		user: null // TODO?
+	};
 }
