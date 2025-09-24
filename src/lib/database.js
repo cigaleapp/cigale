@@ -116,9 +116,12 @@ const Settings = table(
 			direction: 'asc',
 			key: 'date'
 		})),
-		protocolBeamupConsent: scope({ ID })
+		beamupPreferences: scope({ ID })
 			.type({
-				'[ID]': 'boolean'
+				'[ID]': {
+					enable: 'boolean',
+					email: 'string.email | null'
+				}
 			})
 			.default(() => ({})),
 		protocolModelSelections: scope({ ID })
@@ -154,7 +157,8 @@ const BeamupCorrection = table(
 		),
 		before: MetadataValue,
 		after: MetadataValue,
-		occurredAt: 'string.date.iso.parse'
+		occurredAt: 'string.date.iso.parse',
+		email: 'string.email | null'
 	})
 );
 
