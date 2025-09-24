@@ -4,7 +4,7 @@
     "": {
       "name": "CIGALE",
       "dependencies": {
-        "@cigale/beamup": "^0.2.1",
+        "@cigale/beamup": "^0.6.4",
         "@iconify-json/ph": "^1.2.2",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@viselect/vanilla": "^3.9.0",
@@ -130,7 +130,7 @@
 
     "@bcoe/v8-coverage": ["@bcoe/v8-coverage@1.0.2", "", {}, "sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA=="],
 
-    "@cigale/beamup": ["@cigale/beamup@0.2.1", "", { "dependencies": { "arktype": "^2.1.22" }, "peerDependencies": { "typescript": "^5" } }, "sha512-H15RR1RUP0+1xq6LUdmb59DUT7V18VUwU5Y3cY4McjiFzEZoEODbPgLDmF8Z45nO271VSatTERXFAZKWLtItFg=="],
+    "@cigale/beamup": ["@cigale/beamup@0.6.4", "", { "dependencies": { "arktype": "^2.1.22" }, "peerDependencies": { "typescript": "^5.9.2" } }, "sha512-9IkRhEOrUwUrd3AYNpvpqMmSQKzEhcZp+AjukqCZLFEHiDk8lIMpfg2ZAlBT8qBiH6Ch/qBsv5+Sf244gaWU7Q=="],
 
     "@csstools/color-helpers": ["@csstools/color-helpers@5.1.0", "", {}, "sha512-S11EXWJyy0Mz5SYvRmY8nJYTFFd1LCNV+7cXyAgQtOOuzb4EsgfqDufL+9esx72/eLhsRdGZwaldu/h+E4t4BA=="],
 

@@ -538,7 +538,7 @@ swarp.syncStoredCorrections(async (_, onProgress) => {
 		throw new Error('Database does not support Beamup corrections');
 	}
 
-	/** @type {Array<{why: string, id: string}>} */
+	/** @type {Array<{why: string, ids: string[]}>} */
 	let failed = [];
 	let succeeded = 0;
 	const total = await db.count('BeamupCorrection');
@@ -546,9 +546,9 @@ swarp.syncStoredCorrections(async (_, onProgress) => {
 		return { total, failed, succeeded };
 	}
 
-	await syncCorrections(db, (id, error) => {
+	await syncCorrections(db, (ids, error) => {
 		if (error) {
-			failed.push({ why: error, id });
+			failed.push({ why: error, ids });
 		} else {
 			succeeded++;
 		}
