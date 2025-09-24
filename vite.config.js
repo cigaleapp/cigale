@@ -49,6 +49,13 @@ export default defineConfig({
 				conditions: ['browser']
 			}
 		: {},
+	assetsInclude: ['**/*.wasm'],
+	optimizeDeps: {
+		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
+	},
+	build: {
+		minify: process.env.MINIFICATION !== 'off'
+	},
 	plugins: [
 		analyzer(analyzerMode === 'disabled' ? { enabled: false } : { analyzerMode }),
 		icons({
@@ -62,9 +69,5 @@ export default defineConfig({
 			strategy: ['localStorage', 'preferredLanguage', 'baseLocale']
 		}),
 		crossOriginIsolation()
-	],
-	optimizeDeps: {
-		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
-	},
-	assetsInclude: ['**/*.wasm']
+	]
 });
