@@ -101,7 +101,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		progress: type('number'),
 		success: type({
 			total: 'number',
-			failed: type({ why: 'string', id: 'string' }).array(),
+			failed: type({ why: 'string', ids: 'string[]' }).array(),
 			succeeded: 'number'
 		})
 	},
