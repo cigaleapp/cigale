@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.77% </span>
+                <span class="strong">84.62% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>615/717</span>
+                <span class='fraction'>622/735</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64.86% </span>
+                <span class="strong">63.15% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>24/37</span>
+                <span class='fraction'>24/38</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.77% </span>
+                <span class="strong">84.62% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>615/717</span>
+                <span class='fraction'>622/735</span>
             </div>
         
             
@@ -858,7 +858,27 @@
 <a name='L793'></a><a href='#L793'>793</a>
 <a name='L794'></a><a href='#L794'>794</a>
 <a name='L795'></a><a href='#L795'>795</a>
-<a name='L796'></a><a href='#L796'>796</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L796'></a><a href='#L796'>796</a>
+<a name='L797'></a><a href='#L797'>797</a>
+<a name='L798'></a><a href='#L798'>798</a>
+<a name='L799'></a><a href='#L799'>799</a>
+<a name='L800'></a><a href='#L800'>800</a>
+<a name='L801'></a><a href='#L801'>801</a>
+<a name='L802'></a><a href='#L802'>802</a>
+<a name='L803'></a><a href='#L803'>803</a>
+<a name='L804'></a><a href='#L804'>804</a>
+<a name='L805'></a><a href='#L805'>805</a>
+<a name='L806'></a><a href='#L806'>806</a>
+<a name='L807'></a><a href='#L807'>807</a>
+<a name='L808'></a><a href='#L808'>808</a>
+<a name='L809'></a><a href='#L809'>809</a>
+<a name='L810'></a><a href='#L810'>810</a>
+<a name='L811'></a><a href='#L811'>811</a>
+<a name='L812'></a><a href='#L812'>812</a>
+<a name='L813'></a><a href='#L813'>813</a>
+<a name='L814'></a><a href='#L814'>814</a>
+<a name='L815'></a><a href='#L815'>815</a>
+<a name='L816'></a><a href='#L816'>816</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1646,6 +1666,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2448,6 +2488,26 @@ export <span class="fstat-no" title="function not covered" >async function sha1s
 <span class="cstat-no" title="statement not covered" >		return null;</span>
 <span class="cstat-no" title="statement not covered" >	}</span>
 <span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+/**
+ * @template T
+ * @param {T[]} array
+ * @param {(item: T) =&gt; string} key
+ * @returns {Map&lt;string, T[]&gt;}
+ */
+export <span class="fstat-no" title="function not covered" >function groupBy(array, key) {</span>
+<span class="cstat-no" title="statement not covered" >	// https://caniuse.com/mdn-javascript_builtins_map_groupby</span>
+<span class="cstat-no" title="statement not covered" >	if ('groupBy' in Map) {</span>
+<span class="cstat-no" title="statement not covered" >		return Map.groupBy(array, key);</span>
+<span class="cstat-no" title="statement not covered" >	}</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >	return array.reduce((acc, item) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		const k = key(item);</span>
+<span class="cstat-no" title="statement not covered" >		if (!acc.has(k)) acc.set(k, []);</span>
+<span class="cstat-no" title="statement not covered" >		acc.get(k)?.push(item);</span>
+<span class="cstat-no" title="statement not covered" >		return acc;</span>
+<span class="cstat-no" title="statement not covered" >	}, /** @type {Map&lt;string, T[]&gt;} */ (new Map()));</span>
+<span class="cstat-no" title="statement not covered" >}</span>
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -2455,7 +2515,7 @@ export <span class="fstat-no" title="function not covered" >async function sha1s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-23T21:10:07.112Z
+                at 2025-09-24T10:12:02.193Z
             </div>
         <script src="../prettify.js"></script>
         <script>
