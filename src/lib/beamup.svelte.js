@@ -21,8 +21,8 @@ import { errorMessage } from './i18n.js';
  * @param {MetadataValue} afterValue - The value after the correction.
  */
 export async function storeCorrection(db, protocol, subject, metadata, beforeValue, afterValue) {
-	const consent = await getSetting('protocolBeamupConsent', db);
-	if (!consent[protocol.id]) return;
+	const preferences = await getSetting('beamupPreferences', db);
+	if (!preferences[protocol.id]?.enable) return;
 
 	const image = await db.get('Image', subject).catch(() => undefined);
 	const observation = image
@@ -49,6 +49,7 @@ export async function storeCorrection(db, protocol, subject, metadata, beforeVal
 			client: { version: import.meta.env.buildCommit || 'unversioned' },
 			protocol: pick(protocol, 'id', 'version', 'beamup'),
 			metadata: pick(metadata, 'id', 'type'),
+			email: preferences[protocol.id]?.email ?? null,
 			subject: {
 				[image ? 'image' : 'observation']: { id: subject },
 				contentHash: hash || null
@@ -108,9 +109,9 @@ export async function syncCorrections(db, onProgress) {
 /**
  *
  * @param {typeof import('$lib/database').Tables.BeamupCorrection.inferIn} correction
- * @returns {typeof import('@cigale/beamup').SendableCorrection.infer}
+ * @returns {import('@cigale/beamup').SendableCorrection}
  */
-function makeCorrection({ after, before, protocol, metadata, client, occurredAt, subject }) {
+function makeCorrection({ after, before, protocol, metadata, client, occurredAt, subject, email }) {
 	return {
 		after: {
 			alternatives: entries(after.alternatives).map(([value, confidence]) => ({
@@ -140,6 +141,6 @@ function makeCorrection({ after, before, protocol, metadata, client, occurredAt,
 			subject.image ? 'image' : subject.observation ? 'observation' : 'other'
 		),
 		subject_content_hash: subject.contentHash,
-		user: null // TODO?
+		user: email
 	};
 }
