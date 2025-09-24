@@ -4,6 +4,8 @@ import { type } from 'arktype';
 import path from 'node:path';
 import { writeFileSync } from 'node:fs';
 
+const BEAMUP_ORIGIN = 'https://beamup.cigale.gwen.works';
+
 const here = import.meta.dirname;
 
 async function gbifIds(url) {
@@ -247,6 +249,9 @@ const protocol = {
 			json: 'analysis.json',
 			csv: 'metadata.csv'
 		}
+	},
+	beamup: {
+		origin: BEAMUP_ORIGIN
 	}
 };
 
