@@ -1,8 +1,10 @@
 <script>
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { m } from '$lib/paraglide/messages';
+	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import IconInfo from '~icons/ph/question';
 
 	/**
@@ -68,6 +70,26 @@
 			{config.origin}/corrections/{protocol}
 		</a>
 	</p>
+	<section class="email">
+		<p>
+			Si vous le souhaitez, vous pouvez aussi renseigner une addresse e-mail, pour éventuellement
+			être contacté·e
+		</p>
+
+		<InlineTextInput
+			label="Addresse e-mail"
+			value={getSettings().beamupPreferences[protocol]?.email ?? ''}
+			onblur={async (email) => {
+				await setSetting('beamupPreferences', {
+					...getSettings().beamupPreferences,
+					[protocol]: {
+						enable: true,
+						email: email.trim() || null
+					}
+				});
+			}}
+		/>
+	</section>
 
 	{#snippet footer({ close })}
 		<ButtonPrimary onclick={() => close?.()}>OK</ButtonPrimary>
@@ -77,3 +99,14 @@
 <ButtonIcon help={m.learn_more()} onclick={() => open?.()}>
 	<IconInfo />
 </ButtonIcon>
+
+<style>
+	.email {
+		display: flex;
+		flex-direction: column;
+		text-align: center;
+		gap: 0.5em;
+		max-width: 400px;
+		margin: 1em auto;
+	}
+</style>
