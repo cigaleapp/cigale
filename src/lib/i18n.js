@@ -112,3 +112,25 @@ export function errorMessage(error, prefix = '') {
 
 	return prefix ? `${prefix}: ${result}` : result;
 }
+
+/**
+ * Uppercase the first letter of a string
+ * @param {string} str
+ * @returns {string}
+ */
+export function uppercaseFirst(str) {
+	if (!str) return str;
+	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('uppercaseFirst', () => {
+		expect(uppercaseFirst('hello')).toBe('Hello');
+		expect(uppercaseFirst('Hello')).toBe('Hello');
+		expect(uppercaseFirst('')).toBe('');
+		expect(uppercaseFirst('a')).toBe('A');
+		expect(uppercaseFirst('école')).toBe('École');
+	});
+}

@@ -1,3 +1,14 @@
+<script module>
+	/**
+	 * @typedef {object} CustomButtonProps
+	 * @property {() => void | Promise<void>} onclick
+	 * @property {string} help
+	 * @property {'checking' | 'upgrading' | 'available' | 'uptodate' | 'error'} state
+	 * @property {number | undefined} current
+	 * @property {number | undefined} newest
+	 */
+</script>
+
 <script>
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -18,10 +29,12 @@
 	 * @property {number} version
 	 * @property {typeof import('$lib/schemas/common').HTTPRequest.infer} source
 	 * @property {boolean} [compact=false]
+	 * @property {import('svelte').Snippet<[CustomButtonProps]>} [button]
+	 * @property {(newVersion: number) => void | Promise<void>} [onupgrade] called after a successful upgrade
 	 */
 
 	/**  @type {Props}*/
-	const { id, version, source, compact } = $props();
+	const { id, version, source, compact, button: customButton, onupgrade } = $props();
 
 	const swarpc = $derived(page.data.swarpc);
 
@@ -38,20 +51,56 @@
 {#if version && source}
 	{#key checkagain}
 		{#await hasUpgradeAvailable({ id, version, source })}
-			<Btn help={m.checking_for_updates()} disabled onclick={() => {}}>
-				<IconCheckAgain />
-				{#if !compact}
-					{m.update()}
-				{/if}
-			</Btn>
+			{#if customButton}
+				{@render customButton({
+					onclick: () => {},
+					help: m.checking_for_updates(),
+					state: 'checking',
+					current: version,
+					newest: undefined
+				})}
+			{:else}
+				<Btn help={m.checking_for_updates()} disabled onclick={() => {}}>
+					<IconCheckAgain />
+					{#if !compact}
+						{m.update()}
+					{/if}
+				</Btn>
+			{/if}
 		{:then { upToDate, newVersion }}
-			{#if upToDate}
-				<Btn
-					help={m.protocol_up_to_date_click_to_check_again({ newVersion })}
-					onclick={() => {
-						checkagain = Date.now();
-					}}
-				>
+			{@const onclick = async () => {
+				if (upToDate) {
+					checkagain = Date.now();
+				} else {
+					upgrading = true;
+					await upgradeProtocol({ version, source, id, swarpc })
+						.then(({ version }) => {
+							toasts.success(m.protocol_updated_to_version({ version }));
+							onupgrade?.(version);
+						})
+						.catch((e) => {
+							toasts.error(m.cannot_update_protocol({ error: e }));
+						})
+						.finally(() => {
+							upgrading = false;
+						});
+				}
+			}}
+
+			{@const help = upToDate
+				? m.protocol_up_to_date_click_to_check_again({ newVersion })
+				: m.update_available_to_version({ newVersion })}
+
+			{#if upToDate && customButton}
+				{@render customButton({
+					onclick,
+					help,
+					state: 'uptodate',
+					current: version,
+					newest: newVersion
+				})}
+			{:else if upToDate}
+				<Btn {help} {onclick}>
 					<span class="version-check up-to-date">
 						<IconUpToDate />
 						{#if !compact}
@@ -64,23 +113,16 @@
 						</span>
 					{/if}
 				</Btn>
+			{:else if customButton}
+				{@render customButton({
+					onclick,
+					help,
+					state: upgrading ? 'upgrading' : 'available',
+					current: version,
+					newest: newVersion
+				})}
 			{:else}
-				<Btn
-					onclick={async () => {
-						upgrading = true;
-						await upgradeProtocol({ version, source, id, swarpc })
-							.then(({ version }) => {
-								toasts.success(m.protocol_updated_to_version({ version }));
-							})
-							.catch((e) => {
-								toasts.error(m.cannot_update_protocol({ error: e }));
-							})
-							.finally(() => {
-								upgrading = false;
-							});
-					}}
-					help={m.update_available_to_version({ newVersion })}
-				>
+				<Btn {onclick} {help}>
 					<span class="version-check" class:update-available={!upgrading}>
 						{#if upgrading}
 							<LoadingSpinner />
@@ -100,21 +142,39 @@
 				</Btn>
 			{/if}
 		{:catch e}
-			<Btn
-				onclick={() => {
-					checkagain = Date.now();
-				}}
-				help={m.cannot_check_for_updates({ error: e })}
-			>
-				<span class="version-check error">
-					<IconCannotCheckForUpdates />
-					{#if !compact}
-						{m.retry()}
-					{/if}
-				</span>
-			</Btn>
+			{@const onclick = () => {
+				checkagain = Date.now();
+			}}
+			{@const help = m.cannot_check_for_updates({ error: e })}
+
+			{#if customButton}
+				{@render customButton({
+					onclick,
+					help,
+					state: 'error',
+					current: version,
+					newest: undefined
+				})}
+			{:else}
+				<Btn {onclick} {help}>
+					<span class="version-check error">
+						<IconCannotCheckForUpdates />
+						{#if !compact}
+							{m.retry()}
+						{/if}
+					</span>
+				</Btn>
+			{/if}
 		{/await}
 	{/key}
+{:else if version && customButton}
+	{@render customButton({
+		onclick: () => {},
+		help: m.protocol_does_not_support_update_check(),
+		state: 'error',
+		current: version,
+		newest: undefined
+	})}
 {:else if version}
 	<Btn onclick={() => {}} help={m.protocol_does_not_support_update_check()}>
 		<span class="version-check">
@@ -124,6 +184,14 @@
 			{/if}
 		</span>
 	</Btn>
+{:else if customButton}
+	{@render customButton({
+		onclick: () => {},
+		help: m.protocol_not_versioned_help(),
+		state: 'error',
+		current: undefined,
+		newest: undefined
+	})}
 {:else}
 	<Btn onclick={() => {}} help={m.protocol_not_versioned_help()}>
 		<span class="version-check error">
