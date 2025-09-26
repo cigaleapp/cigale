@@ -235,10 +235,17 @@
 						<div class="navlink" class:active={page.url.hash.includes(`metadata/${shortId}/`)}>
 							<div class="menu-icon standin"></div>
 							<a
-								href={href('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-									id,
-									metadata: shortId
-								})}
+								href={href(
+									// @ts-expect-error
+									page.route.id?.includes('/protocols/[id]/metadata/[metadata]/')
+										? page.route.id
+										: '/(app)/protocols/[id]/metadata/[metadata]/infos',
+									{
+										...page.params,
+										id,
+										metadata: shortId
+									}
+								)}
 							>
 								{#if def?.label}
 									{def.label}
