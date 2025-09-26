@@ -21,65 +21,74 @@
 
 	let q = $state('');
 
-	let searchResults = $derived(
-		q
-			? // Using Fuse would be very expensive for metadata with 10k+ options
-				options.filter((o) =>
-					[o.key, o.label].some((field) => field.toLowerCase().includes(q.toLowerCase()))
-				)
-			: options
+	// Using Fuse would be very expensive for metadata with 10k+ options
+	const searchResults = $derived(
+		options.filter((o) =>
+			[o.key, o.label].some((field) => !q || field.toLowerCase().includes(q.toLowerCase()))
+		)
 	);
 
 	/**
-	 *
-	 * @param {string} key
+	 * @param {SubmitEvent & { currentTarget: HTMLFormElement }} e
 	 */
-	function optionUrl(key) {
-		return href('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
-			id: data.protocol.id,
-			metadata: removeNamespaceFromMetadataId(data.metadata.id),
-			option: key
+	async function onCreateOption(e) {
+		e.preventDefault();
+		const nameInput = /** @type {HTMLInputElement|null} */ (e.currentTarget.elements.item(0));
+
+		if (!nameInput?.value) return;
+
+		let key = slugify(nameInput.value).replaceAll('-', '_');
+		if (options.find((o) => o.key === key)) {
+			key += '_' + options.filter((o) => o.key.startsWith(key)).length;
+		}
+
+		try {
+			await set('MetadataOption', {
+				id: `${data.metadata.id}:${key}`,
+				metadataId: data.metadata.id,
+				key,
+				label: nameInput.value,
+				description: ''
+			});
+
+			nameInput.value = '';
+
+			await invalidate(`idb://Metadata/${data.metadata.id}/options`);
+			await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+				id: data.protocol.id,
+				metadata: removeNamespaceFromMetadataId(data.metadata.id),
+				option: key
+			});
+		} catch (error) {
+			toasts.error(errorMessage(error, "Impossible de créer l'option"));
+		}
+	}
+
+	/**
+	 * @param {string} key
+	 * @param {string} label
+	 */
+	async function onDeleteOption(key, label) {
+		const option = structuredClone(options.find((o) => o.key === key));
+		if (!option) throw error(404, `Option avec clé ${key} introuvable`);
+
+		options = options.filter((o) => o.key !== key);
+
+		toasts.withUndo('info', `Option ${label || key} supprimée`, {
+			undo: async () => {
+				// We're within a async callback, Svelte won't track reactive
+				// state changes here, so we invalidate options instead of just
+				// re-adding to the writable $derived options state variable
+				await invalidate(`idb://Metadata/${data.metadata.id}/options`);
+			},
+			commit: async () => drop('MetadataOption', option.id)
 		});
 	}
 </script>
 
 <div class="aside-and-main">
 	<aside>
-		<form
-			class="new-option"
-			onsubmit={async (e) => {
-				e.preventDefault();
-				const nameInput = /** @type {HTMLInputElement|null} */ (e.currentTarget.elements.item(0));
-
-				if (!nameInput?.value) return;
-
-				let key = slugify(nameInput.value).replaceAll('-', '_');
-				if (options.find((o) => o.key === key)) {
-					key += '_' + options.filter((o) => o.key.startsWith(key)).length;
-				}
-
-				try {
-					await set('MetadataOption', {
-						id: `${data.metadata.id}:${key}`,
-						metadataId: data.metadata.id,
-						key,
-						label: nameInput.value,
-						description: ''
-					});
-
-					nameInput.value = '';
-
-					await invalidate(`idb://Metadata/${data.metadata.id}/options`);
-					await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
-						id: data.protocol.id,
-						metadata: removeNamespaceFromMetadataId(data.metadata.id),
-						option: key
-					});
-				} catch (error) {
-					toasts.error(errorMessage(error, "Impossible de créer l'option"));
-				}
-			}}
-		>
+		<form class="new-option" onsubmit={onCreateOption}>
 			<InlineTextInput
 				discreet
 				label="Nom de la nouvelle option"
@@ -108,28 +117,20 @@
 			<VirtualList items={searchResults} let:item>
 				{@const { key, label } = item}
 				<div class="navlink" class:active={page.params.option === key}>
-					<a href={optionUrl(key)}>{label}</a>
+					<a
+						href={href('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+							id: data.protocol.id,
+							metadata: removeNamespaceFromMetadataId(data.metadata.id),
+							option: key
+						})}
+					>
+						{label}
+					</a>
 					<div class="delete">
 						<ButtonIcon
 							dangerous
 							help="Supprimer {label || key}"
-							onclick={async (e) => {
-								e.stopPropagation();
-								const option = structuredClone(options.find((o) => o.key === key));
-								if (!option) throw error(404, `Option avec clé ${key} introuvable`);
-
-								options = options.filter((o) => o.key !== key);
-
-								toasts.withUndo('info', `Option ${label || key} supprimée`, {
-									undo: async () => {
-										// We're within a async callback, Svelte won't track reactive
-										// state changes here, so we invalidate options instead of just
-										// re-adding to the writable $derived options state variable
-										await invalidate(`idb://Metadata/${data.metadata.id}/options`);
-									},
-									commit: async () => drop('MetadataOption', option.id)
-								});
-							}}
+							onclick={async () => onDeleteOption(key, label)}
 						>
 							<IconDelete />
 						</ButtonIcon>
