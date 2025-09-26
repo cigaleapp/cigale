@@ -626,7 +626,7 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
 
 /** @param {Iterable<number>} values */
 export function sum(values) {
-	return values.reduce((acc, cur) => acc + cur, 0);
+	return [...values].reduce((acc, cur) => acc + cur, 0);
 }
 
 /** @param {number[]} values  */
@@ -726,7 +726,6 @@ export function progressSplitter(...layout) {
 		const name = /** @type {PartName} */ (layout[i]);
 		const weight = /** @type {number} */ (layout[i + 1] ?? 1 - sum(parts.map(([, w]) => w)));
 
-		// @ts-expect-error
 		parts.push([name, weight]);
 	}
 
@@ -760,6 +759,40 @@ export function slugify(text) {
 	if (!result) throw new Error(`Cannot slugify "${text}" (result is empty)`);
 
 	return result;
+}
+
+/**
+ * Throws an error with the given message
+ * Useful to throw inside expressions
+ * Example: `const value = possiblyNull ?? throws('value is null')`
+ * @param {string} message
+ * @returns {never}
+ */
+export function throws(message) {
+	throw new Error(message);
+}
+
+/**
+ * @template T
+ * @template [V=T]
+ * @param {Iterable<T>} array
+ * @param {(item: T) => string} key
+ * @param {(item: T) => V} [valueMapper]
+ * @returns {Map<string, V[]>}
+ */
+export function groupBy(array, key, valueMapper) {
+	if ('groupBy' in Map && !valueMapper) {
+		// @ts-expect-error
+		return Map.groupBy(array, key);
+	}
+
+	const map = new Map();
+	for (const item of array) {
+		const k = key(item);
+		if (!map.has(k)) map.set(k, []);
+		map.get(k).push(valueMapper ? valueMapper(item) : item);
+	}
+	return map;
 }
 
 /**
