@@ -1,7 +1,7 @@
 import { invalidate } from '$app/navigation';
 import { page } from '$app/state';
 import { errorMessage } from '$lib/i18n';
-import { tables } from '$lib/idb.svelte';
+import { dependencyURI, tables } from '$lib/idb.svelte';
 import { m } from '$lib/paraglide/messages';
 import { namespacedMetadataId } from '$lib/schemas/metadata';
 import { toasts } from '$lib/toasts.svelte';
@@ -42,7 +42,7 @@ export function updater(changes) {
 		});
 
 		await invalidate(
-			`idb://Metadata/${namespacedMetadataId(page.params.id, page.params.metadata)}`
+			dependencyURI('Metadata', namespacedMetadataId(page.params.id, page.params.metadata))
 		);
 	};
 }

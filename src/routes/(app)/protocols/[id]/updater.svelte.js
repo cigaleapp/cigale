@@ -1,6 +1,6 @@
 import { invalidate } from '$app/navigation';
 import { page } from '$app/state';
-import { tables } from '$lib/idb.svelte';
+import { dependencyURI, tables } from '$lib/idb.svelte';
 import { m } from '$lib/paraglide/messages';
 import { toasts } from '$lib/toasts.svelte';
 import { ArkErrors } from 'arktype';
@@ -30,6 +30,6 @@ export function updater(changes) {
 			toasts.error(m.unable_to_save_changes({ error: err.message }));
 		});
 
-		await invalidate(`idb://Protocol/${page.params.id}`);
+		await invalidate(dependencyURI('Protocol', page.params.id));
 	};
 }

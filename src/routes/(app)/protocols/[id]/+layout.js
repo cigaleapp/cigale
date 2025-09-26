@@ -1,4 +1,4 @@
-import { tables } from '$lib/idb.svelte.js';
+import { dependencyURI, tables } from '$lib/idb.svelte.js';
 import { metadataDefinitionComparator } from '$lib/metadata.js';
 import { nonnull } from '$lib/utils.js';
 import { error } from '@sveltejs/kit';
@@ -8,8 +8,8 @@ export async function load({ params, depends }) {
 	console.info('Loaded protocol from load function', protocol);
 	if (!protocol) error(404, `Protocole ${params.id} introuvable`);
 
-	depends(`idb://Protocol/${params.id}`);
-	protocol.metadata.map((m) => depends(`idb://Metadata/${m}`));
+	depends(dependencyURI('Protocol', params.id));
+	protocol.metadata.map((m) => depends(dependencyURI('Metadata', m)));
 
 	const { crop, metadataOrder } = protocol;
 
