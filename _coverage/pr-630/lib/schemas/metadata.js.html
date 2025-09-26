@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.13% </span>
+                <span class="strong">98.22% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>211/215</span>
+                <span class='fraction'>221/225</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/10</span>
+                <span class='fraction'>9/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/6</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.13% </span>
+                <span class="strong">98.22% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>211/215</span>
+                <span class='fraction'>221/225</span>
             </div>
         
             
@@ -296,7 +296,18 @@
 <a name='L231'></a><a href='#L231'>231</a>
 <a name='L232'></a><a href='#L232'>232</a>
 <a name='L233'></a><a href='#L233'>233</a>
-<a name='L234'></a><a href='#L234'>234</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L234'></a><a href='#L234'>234</a>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -307,8 +318,19 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -485,9 +507,9 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -537,10 +559,21 @@ import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js
 &nbsp;
 /**
  * @param {string} metadataId
- * @param {string} key
+ * @param {import('$lib/metadata').RuntimeValue} key
  */
 export function metadataOptionId(metadataId, key) {
 	return `${metadataId}:${key}`;
+}
+&nbsp;
+/**
+ * @param {string} optionId
+ */
+export function parseMetadataOptionId(optionId) {
+	const parts = optionId.split(':');
+	if (parts.length &lt; 2) <span class="branch-0 cbranch-no" title="branch not covered" >throw new Error(`Invalid metadata option ID: ${optionId}`);</span>
+	const metadataId = parts.slice(0, -1).join(':');
+	const key = parts[parts.length - 1];
+	return { metadataId, key };
 }
 &nbsp;
 export const MetadataValue = type({
@@ -769,7 +802,7 @@ export function namespaceOfMetadataId(metadataId) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-23T20:09:45.097Z
+                at 2025-09-26T11:30:05.797Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
