@@ -6,22 +6,15 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { hasUpgradeAvailable } from '$lib/protocols.js';
-	import { ArkErrors, type } from 'arktype';
+	import { type } from 'arktype';
 	import IconCheck from '~icons/ph/check';
-	import IconWarning from '~icons/ph/warning';
 	import IconUnpublished from '~icons/ph/cloud-x';
+	import IconWarning from '~icons/ph/warning';
 	import { updater } from '../updater.svelte.js';
-	import { getContext } from 'svelte';
 
-	let { data } = $props();
-	let source = $derived(typeof data.source === 'string' ? data.source : data.source?.url);
+	const { data } = $props();
+	const source = $derived(typeof data.source === 'string' ? data.source : data.source?.url);
 	let { version, id } = $derived(data);
-
-	// $inspect('ver', version, 'fromdata', data.version);
-	// $inspect('src', source, 'fromdata', data.source);
-
-	const setSidebarVersion = getContext('setSidebarVersion');
-	$effect(() => setSidebarVersion?.(version));
 
 	/**
 	 * @type {Record<import('$lib/ButtonUpdateProtocol.svelte').CustomButtonProps['state'], string>}
@@ -45,13 +38,8 @@
 		onblur={updater((p, value) => {
 			if (value) {
 				p.source = value;
-				// FIXME reactivity loss of data.source when changed here forces us to change source too
-				source = value;
-				data.source = value;
 			} else {
 				delete p.source;
-				source = undefined;
-				delete data.source;
 			}
 		})}
 	/>
@@ -62,17 +50,10 @@
 			Type={type('string.integer.parse')}
 			value={version?.toString() ?? ''}
 			onblur={updater((p, value) => {
-				if (value instanceof ArkErrors) throw value;
-
 				if (value !== undefined) {
 					p.version = value;
-					// FIXME reactivity loss of data.version when changed here forces us to change version too
-					version = value;
-					data.version = value;
 				} else {
 					delete p.version;
-					version = undefined;
-					delete data.version;
 				}
 			})}
 		/>
@@ -89,7 +70,6 @@
 								<ButtonInk
 									onclick={updater((p) => {
 										p.version = newVersion;
-										version = newVersion;
 									})}
 								>
 									Réétablir
@@ -108,9 +88,9 @@
 							<div class="action">
 								<ButtonUpdateProtocol
 									{...{ id, version, source }}
-									onupgrade={(newVersion) => {
-										data.version = newVersion;
-									}}
+									onupgrade={updater((p, newVer) => {
+										p.version = newVer;
+									})}
 								>
 									{#snippet button({ state, help, onclick })}
 										{@const text = updateButtonTexts[state]}
