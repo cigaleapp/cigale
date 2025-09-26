@@ -532,6 +532,48 @@ export function compareBy(key) {
 	};
 }
 
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('compareBy', () => {
+		test('.sort works', () => {
+			const items = [
+				{ id: 2, name: 'b' },
+				{ id: 1, name: 'a' },
+				{ id: 3, name: 'c' }
+			];
+
+			expect([...items].sort(compareBy((i) => i.id))).toEqual([
+				{ id: 1, name: 'a' },
+				{ id: 2, name: 'b' },
+				{ id: 3, name: 'c' }
+			]);
+
+			expect([...items].sort(compareBy((i) => i.name))).toEqual([
+				{ id: 1, name: 'a' },
+				{ id: 2, name: 'b' },
+				{ id: 3, name: 'c' }
+			]);
+		});
+
+		test('it works', () => {
+			const items = [
+				{ id: 2, name: 'b' },
+				{ id: 1, name: 'a' },
+				{ id: 3, name: 'c' }
+			];
+
+			expect(compareBy((i) => i.id)(items[0], items[1])).toBe(1);
+			expect(compareBy((i) => i.id)(items[1], items[0])).toBe(-1);
+			expect(compareBy((i) => i.id)(items[0], items[0])).toBe(0);
+
+			expect(compareBy((i) => i.name)(items[0], items[1])).toBe(1);
+			expect(compareBy((i) => i.name)(items[1], items[0])).toBe(-1);
+			expect(compareBy((i) => i.name)(items[0], items[0])).toBe(0);
+		});
+	});
+}
+
 /**
  * Add a v= query parameter to the URL to force the browser to reload the resource, using  Date.now() as the value
  * @template {string|URL} T
@@ -614,11 +656,6 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
 		url.searchParams.set('x-cigale-cache-as', cacheAs);
 	}
 
-	// const promise = fetch(url, options);
-	// if (onProgress) promise.then(fetchProgress({ onProgress }));
-
-	// return promise;
-
 	if (onProgress) return fetch(url, options).then(fetchProgress({ onProgress }));
 
 	return fetch(url, options);
@@ -629,9 +666,27 @@ export function sum(values) {
 	return [...values].reduce((acc, cur) => acc + cur, 0);
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('sum', () => {
+		expect(sum([1, 2, 3])).toBe(6);
+		expect(sum([])).toBe(0);
+		expect(sum([-1, 1])).toBe(0);
+	});
+}
+
 /** @param {number[]} values  */
 export function avg(values) {
 	return sum(values) / values.length;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('avg', () => {
+		expect(avg([1, 2, 3])).toBe(2);
+		expect(avg([1, 1, 1])).toBe(1);
+		expect(avg([1, 3])).toBe(2);
+	});
 }
 
 /**
@@ -643,6 +698,22 @@ export function nonnull(value) {
 	return value !== null && value !== undefined;
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('nonnull', () => {
+		expect(nonnull(1)).toBe(true);
+		expect(nonnull(0)).toBe(true);
+		expect(nonnull('a')).toBe(true);
+		expect(nonnull('')).toBe(true);
+		expect(nonnull(true)).toBe(true);
+		expect(nonnull(false)).toBe(true);
+		expect(nonnull({})).toBe(true);
+		expect(nonnull([])).toBe(true);
+		expect(nonnull(null)).toBe(false);
+		expect(nonnull(undefined)).toBe(false);
+	});
+}
+
 /**
  * @param {number} value
  * @param {number} decimals
@@ -652,6 +723,22 @@ export function round(value, decimals = 0) {
 	if (decimals < 0) throw new Error('decimals must be non-negative');
 	const factor = Math.pow(10, decimals);
 	return Math.round(value * factor) / factor;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('round', () => {
+		expect(round(1.2345)).toBe(1);
+		expect(round(1.5)).toBe(2);
+		expect(round(1.2345, 2)).toBe(1.23);
+		expect(round(1.2355, 2)).toBe(1.24);
+		expect(round(-1.2355, 2)).toBe(-1.24);
+		expect(round(-1.2345, 2)).toBe(-1.23);
+		expect(round(1.23456789, 5)).toBe(1.23457);
+		expect(round(1.23456789, 8)).toBe(1.23456789);
+		expect(round(1.23456789, 10)).toBe(1.23456789);
+	});
 }
 
 /**
@@ -670,6 +757,25 @@ export function insideBoundingClientRect({ offsetX, offsetY }, rect, leeway = 0)
 		offsetY >= -leeway &&
 		offsetY <= rect.height + leeway
 	);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('insideBoundingClientRect', () => {
+		const rect = new DOMRect(0, 0, 100, 100);
+		expect(insideBoundingClientRect({ offsetX: 50, offsetY: 50 }, rect)).toBe(true);
+		expect(insideBoundingClientRect({ offsetX: 0, offsetY: 0 }, rect)).toBe(true);
+		expect(insideBoundingClientRect({ offsetX: 100, offsetY: 100 }, rect)).toBe(true);
+		expect(insideBoundingClientRect({ offsetX: -1, offsetY: 50 }, rect)).toBe(false);
+		expect(insideBoundingClientRect({ offsetX: 50, offsetY: -1 }, rect)).toBe(false);
+		expect(insideBoundingClientRect({ offsetX: 101, offsetY: 50 }, rect)).toBe(false);
+		expect(insideBoundingClientRect({ offsetX: 50, offsetY: 101 }, rect)).toBe(false);
+		expect(insideBoundingClientRect({ offsetX: -1, offsetY: 50 }, rect, 2)).toBe(true);
+		expect(insideBoundingClientRect({ offsetX: 50, offsetY: -1 }, rect, 2)).toBe(true);
+		expect(insideBoundingClientRect({ offsetX: 101, offsetY: 50 }, rect, 2)).toBe(true);
+		expect(insideBoundingClientRect({ offsetX: 50, offsetY: 101 }, rect, 2)).toBe(true);
+	});
 }
 
 /**
@@ -786,6 +892,19 @@ export function slugify(text) {
 	return result;
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('slugify', () => {
+		expect(slugify('Hello World!')).toBe('hello-world');
+		expect(slugify('  Leading and trailing spaces  ')).toBe('leading-and-trailing-spaces');
+		expect(slugify('Multiple   spaces')).toBe('multiple-spaces');
+		expect(slugify('Special #$&* Characters')).toBe('special-characters');
+		expect(slugify('Accented éàüö Characters')).toBe('accented-eauo-characters');
+		expect(() => slugify('')).toThrow();
+		expect(() => slugify('你好')).toThrow();
+	});
+}
+
 /**
  * Throws an error with the given message
  * Useful to throw inside expressions
@@ -795,6 +914,14 @@ export function slugify(text) {
  */
 export function throws(message) {
 	throw new Error(message);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('throws', () => {
+		expect(() => throws('test error')).toThrow('test error');
+	});
 }
 
 /**
@@ -820,6 +947,36 @@ export function groupBy(array, key, valueMapper) {
 	return map;
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('groupBy', () => {
+		expect(groupBy([1, 2, 3, 4, 5], (n) => (n % 2 === 0 ? 'even' : 'odd'))).toEqual(
+			new Map([
+				['odd', [1, 3, 5]],
+				['even', [2, 4]]
+			])
+		);
+
+		expect(
+			groupBy(
+				[
+					{ id: 1, name: 'Alice' },
+					{ id: 2, name: 'Bob' },
+					{ id: 3, name: 'Charlie' },
+					{ id: 4, name: 'David' }
+				],
+				(user) => (user.id % 2 === 0 ? 'even' : 'odd'),
+				(user) => user.name
+			)
+		).toEqual(
+			new Map([
+				['odd', ['Alice', 'Charlie']],
+				['even', ['Bob', 'David']]
+			])
+		);
+	});
+}
+
 /**
  * Returns a LAB color-mix placing the value on the color scale made from the given color stops
  * Basically, it's like making a linear gradient and picking a color on it, where the 1 is the end of the gradient and 0 is the beginning
@@ -828,25 +985,99 @@ export function groupBy(array, key, valueMapper) {
  */
 export function gradientedColor(value, ...stops) {
 	if (value >= 1) return `var(--${stops.at(-1)})`;
+	if (value <= 0) return `var(--${stops[0]})`;
 
 	const scale = stops.length - 1;
 	const stop = Math.floor(value * scale);
 
-	return gradient(
-		'lab',
-		`var(--${stops[stop + 1]})`,
-		value * scale - stop,
-		`var(--${stops[stop]})`
-	);
+	return `color-mix(
+		in lab,
+		var(--${stops[stop + 1]})
+		${round((value * scale - stop) * 100, 2)}%,
+		var(--${stops[stop]})
+	)`
+		.replaceAll('\n', '')
+		.replaceAll(/\s+/g, ' ')
+		.replaceAll('( ', '(')
+		.replaceAll(' )', ')');
 }
 
-/**
- *
- * @param {'lab'|'srgb'} colorspace
- * @param {string} stop1 CSS color
- * @param {number} value between 0 and 1
- * @param {string} stop2 CSS color
- */
-function gradient(colorspace, stop1, value, stop2) {
-	return `color-mix(in ${colorspace}, ${stop1} ${value * 100}%, ${stop2})`;
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+	describe('gradientedColor', () => {
+		test('two colors', () => {
+			expect.soft(gradientedColor(0, 'red', 'blue')).toBe('var(--red)');
+			expect.soft(gradientedColor(1, 'red', 'blue')).toBe('var(--blue)');
+
+			const expectations = /** @type {const} */ ([
+				[0.1, 'blue', '10%', 'red'],
+				[0.2, 'blue', '20%', 'red'],
+				[0.25, 'blue', '25%', 'red'],
+				[0.3, 'blue', '30%', 'red'],
+				[0.4, 'blue', '40%', 'red'],
+				[0.5, 'blue', '50%', 'red'],
+				[0.6, 'blue', '60%', 'red'],
+				[0.7, 'blue', '70%', 'red'],
+				[0.75, 'blue', '75%', 'red'],
+				[0.8, 'blue', '80%', 'red'],
+				[0.9, 'blue', '90%', 'red']
+			]);
+
+			for (const [input, color, percent, otherColor] of expectations) {
+				expect
+					.soft(gradientedColor(input, 'red', 'blue'), `with ${input}`)
+					.toBe(`color-mix(in lab, var(--${color}) ${percent}, var(--${otherColor}))`);
+			}
+		});
+
+		test('three colors', () => {
+			expect.soft(gradientedColor(0, 'red', 'yellow', 'blue')).toBe('var(--red)');
+			expect.soft(gradientedColor(1, 'red', 'yellow', 'blue')).toBe('var(--blue)');
+
+			const expectations = /** @type {const} */ ([
+				[0.1, 'yellow', '20%', 'red'],
+				[0.2, 'yellow', '40%', 'red'],
+				[0.25, 'yellow', '50%', 'red'],
+				[0.3, 'yellow', '60%', 'red'],
+				[0.4, 'yellow', '80%', 'red'],
+				[0.5, 'blue', '0%', 'yellow'],
+				[0.6, 'blue', '20%', 'yellow'],
+				[0.7, 'blue', '40%', 'yellow'],
+				[0.75, 'blue', '50%', 'yellow'],
+				[0.8, 'blue', '60%', 'yellow'],
+				[0.9, 'blue', '80%', 'yellow']
+			]);
+
+			for (const [input, color, percent, otherColor] of expectations) {
+				expect
+					.soft(gradientedColor(input, 'red', 'yellow', 'blue'), `with ${input}`)
+					.toBe(`color-mix(in lab, var(--${color}) ${percent}, var(--${otherColor}))`);
+			}
+		});
+
+		test('four colors', () => {
+			expect.soft(gradientedColor(0, 'red', 'yellow', 'green', 'blue')).toBe('var(--red)');
+			expect.soft(gradientedColor(1, 'red', 'yellow', 'green', 'blue')).toBe('var(--blue)');
+
+			const expectations = /** @type {const} */ ([
+				[0.1, 'yellow', '30%', 'red'],
+				[0.2, 'yellow', '60%', 'red'],
+				[0.25, 'yellow', '75%', 'red'],
+				[0.3, 'yellow', '90%', 'red'],
+				[0.4, 'green', '20%', 'yellow'],
+				[0.5, 'green', '50%', 'yellow'],
+				[0.6, 'green', '80%', 'yellow'],
+				[0.7, 'blue', '10%', 'green'],
+				[0.75, 'blue', '25%', 'green'],
+				[0.8, 'blue', '40%', 'green'],
+				[0.9, 'blue', '70%', 'green']
+			]);
+
+			for (const [input, color, percent, otherColor] of expectations) {
+				expect
+					.soft(gradientedColor(input, 'red', 'yellow', 'green', 'blue'), `with ${input}`)
+					.toBe(`color-mix(in lab, var(--${color}) ${percent}, var(--${otherColor}))`);
+			}
+		});
+	});
 }
