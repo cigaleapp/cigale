@@ -1,1 +1,0 @@
-import{b as r,r as t,c as o,g as n}from"./Dw_Mj_sZ.js";function f(s){return(o||r)+s}function a(s,e){return r+t(s,e)}async function i(...s){await n(u(...s))}function u(...s){return"#"+a(...s).replace(a("/"),"/")}export{f as a,i as g,u as h,a as r};
