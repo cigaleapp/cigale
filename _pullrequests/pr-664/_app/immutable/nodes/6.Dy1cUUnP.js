@@ -1,1 +1,0 @@
-import"../chunks/DsnmJJEf.js";import"../chunks/69_IOA4Y.js";import{b as a,a as t}from"../chunks/pFEREEWH.js";var i=a('<div class="error">Métadonnée introuvable</div>');function p(r){var o=i();t(r,o)}export{p as component};
