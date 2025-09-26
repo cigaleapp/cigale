@@ -30,7 +30,10 @@
 	import IconDelete from '~icons/ph/trash';
 	import IconTechnical from '~icons/ph/wrench';
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
+	import IconCollapse from '~icons/ph/caret-double-left';
+	import IconExpand from '~icons/ph/caret-double-right';
 	import { updater } from './updater.svelte';
+	import { fade } from 'svelte/transition';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
@@ -47,6 +50,8 @@
 
 	/** @type {HTMLElement|null} */
 	let metadataNav;
+
+	let collapsedSidebar = $state(false);
 
 	/**
 	 *
@@ -68,7 +73,7 @@
 		});
 
 		await tables.Protocol.update(id, 'metadata', [newId, ...metadata]);
-		await tables.Protocol.update(id, 'metadataOrder', [newId, ...metadataOrder]);
+		if (metadataOrder) await tables.Protocol.update(id, 'metadataOrder', [newId, ...metadataOrder]);
 
 		await invalidate(`idb://Protocol/${id}`);
 
@@ -77,69 +82,81 @@
 </script>
 
 <div class="sidebar-and-main">
-	<aside>
-		<heading>
-			<ButtonInk onclick={() => goto('/protocols')}>
-				<IconBack />
-				{m.back()}
-			</ButtonInk>
-
-			<h1>
-				<InlineTextInput
-					label="Nom du protocole"
-					discreet
-					value={name}
-					onblur={async (newname) => {
-						await tables.Protocol.update(id, 'name', newname);
-						name = newname;
-					}}
-				/>
-			</h1>
-			<code class="subtitle">
-				<InlineTextInput
-					label="ID du protocole"
-					discreet
-					value={id}
-					onblur={async (newid, setValue) => {
-						if (!newid) {
-							setValue(id);
-							return;
-						}
-
-						await tables.Protocol.update(id, 'id', newid);
-						await tables.Protocol.remove(id);
-						id = newid;
-
-						if (!page.route?.id) return;
-						// @ts-expect-error
-						await goto(page.route.id, {
-							...page.params,
-							id: newid
-						});
-					}}
-				/>
-			</code>
-
-			<section class="actions">
-				<ButtonInk
-					onclick={async () => {
-						await exportProtocol(resolve('/'), id).catch((e) => toasts.error(e));
-					}}
-				>
-					<IconExport />
-					{m.export()}
+	<aside class:collapsed={collapsedSidebar}>
+		{#if !collapsedSidebar}
+			<header in:fade>
+				<ButtonInk onclick={() => goto('/protocols')}>
+					<IconBack />
+					{m.back()}
 				</ButtonInk>
 
-				<ButtonInk
-					dangerous
-					disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
-					onclick={() => deleteProtocol?.()}
+				<h1>
+					<InlineTextInput
+						label="Nom du protocole"
+						discreet
+						value={name}
+						onblur={async (newname) => {
+							await tables.Protocol.update(id, 'name', newname);
+							name = newname;
+						}}
+					/>
+				</h1>
+				<code class="subtitle">
+					<InlineTextInput
+						label="ID du protocole"
+						discreet
+						value={id}
+						onblur={async (newid, setValue) => {
+							if (!newid) {
+								setValue(id);
+								return;
+							}
+
+							await tables.Protocol.update(id, 'id', newid);
+							await tables.Protocol.remove(id);
+							id = newid;
+
+							if (!page.route?.id) return;
+							// @ts-expect-error
+							await goto(page.route.id, {
+								...page.params,
+								id: newid
+							});
+						}}
+					/>
+				</code>
+
+				<section class="actions">
+					<ButtonInk
+						onclick={async () => {
+							await exportProtocol(resolve('/'), id).catch((e) => toasts.error(e));
+						}}
+					>
+						<IconExport />
+						{m.export()}
+					</ButtonInk>
+
+					<ButtonInk
+						dangerous
+						disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
+						onclick={() => deleteProtocol?.()}
+					>
+						<IconDelete />
+						{m.delete()}
+					</ButtonInk>
+				</section>
+			</header>
+		{:else}
+			<header in:fade>
+				<ButtonIcon
+					help="Retour aux protocoles"
+					tooltipParams={{ placement: 'right' }}
+					onclick={() => goto('/protocols')}
 				>
-					<IconDelete />
-					{m.delete()}
-				</ButtonInk>
-			</section>
-		</heading>
+					<IconBack />
+				</ButtonIcon>
+			</header>
+		{/if}
 
 		<ModalDeleteProtocol {id} bind:open={deleteProtocol} ondelete={() => goto('/protocols')} />
 
@@ -154,124 +171,173 @@
 			{@render navlink('Exports', 'exports', IconExports)}
 			{@render navlink('Recadrage', 'cropping', IconCropping)}
 			{@render navlink('Métadonnées', '', IconMetadata, metadataDefinitions.length)}
-			<form
-				class="navlink"
-				onsubmit={async (e) => {
-					e.preventDefault();
-					const nameInput = /** @type {HTMLInputElement|null} */ (e.currentTarget.elements.item(0));
-					if (!nameInput?.value) return;
+			{#if !collapsedSidebar}
+				<form
+					in:fade
+					class="navlink"
+					onsubmit={async (e) => {
+						e.preventDefault();
+						const nameInput = /** @type {HTMLInputElement|null} */ (
+							e.currentTarget.elements.item(0)
+						);
+						if (!nameInput?.value) return;
 
-					try {
-						const metadataId = await createMetadata(nameInput.value);
+						try {
+							const metadataId = await createMetadata(nameInput.value);
 
-						const shortId = removeNamespaceFromMetadataId(metadataId);
+							const shortId = removeNamespaceFromMetadataId(metadataId);
 
-						nameInput.value = '';
-						metadataNav?.children
-							.item(metadata.length - 1)
-							?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+							nameInput.value = '';
+							metadataNav?.children
+								.item(metadata.length - 1)
+								?.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-						toasts.success(`Métadonnée ${shortId} créée`);
-						await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-							id,
-							metadata: shortId
-						});
-					} catch (error) {
-						toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
-					}
-				}}
-			>
-				<div class="menu-icon standin"></div>
-				<InlineTextInput
-					label="Nom de la métadonnée"
-					value=""
-					discreet
-					placeholder={{ idle: 'Nouvelle métadonnée…', focused: 'Nom de la métadonnée' }}
-					onblur={() => {}}
-				/>
-				<ButtonIcon help="Créer la métadonnée" submits onclick={() => {}}>
-					<IconAdd />
-				</ButtonIcon>
-			</form>
-			<nav class="metadata" bind:this={metadataNav}>
-				{#each metadataDefinitions as def (def.id)}
-					<div
-						class="navlink"
-						class:active={page.url.hash.includes(
-							`metadata/${removeNamespaceFromMetadataId(def.id)}/`
-						)}
-					>
-						<div class="menu-icon standin"></div>
+							toasts.success(`Métadonnée ${shortId} créée`);
+							await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+								id,
+								metadata: shortId
+							});
+						} catch (error) {
+							toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
+						}
+					}}
+				>
+					<div class="menu-icon standin"></div>
+					<InlineTextInput
+						label="Nom de la métadonnée"
+						value=""
+						discreet
+						placeholder={{ idle: 'Nouvelle métadonnée…', focused: 'Nom de la métadonnée' }}
+						onblur={() => {}}
+					/>
+					<ButtonIcon help="Créer la métadonnée" submits onclick={() => {}}>
+						<IconAdd />
+					</ButtonIcon>
+				</form>
+				<nav in:fade class="metadata" bind:this={metadataNav}>
+					{#each metadataDefinitions as def (def.id)}
+						<div
+							class="navlink"
+							class:active={page.url.hash.includes(
+								`metadata/${removeNamespaceFromMetadataId(def.id)}/`
+							)}
+						>
+							<div class="menu-icon standin"></div>
+							<a
+								href={href('/protocols/[id]/metadata/[metadata]/infos', {
+									id,
+									metadata: removeNamespaceFromMetadataId(def.id)
+								})}
+							>
+								{#if def?.label}
+									{def.label}
+								{:else}
+									<code>{removeNamespaceFromMetadataId(def.id)}</code>
+									<span use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
+										<IconTechnical />
+									</span>
+								{/if}
+								{#if def.id === data.crop?.metadata || (def.infer && 'neural' in def.infer)}
+									<span use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
+										<IconInferred />
+									</span>
+								{:else if def.infer && ('exif' in def.infer || ('latitude' in def.infer && 'exif' in def.infer.latitude))}
+									<span
+										use:tooltip={'exif' in def.infer
+											? m.inferred_from_single_exif({ exif: def.infer.exif })
+											: m.inferred_from_two_exif({
+													latitude: def.infer.latitude.exif,
+													longitude: def.infer.longitude.exif
+												})}
+										style:color="var(--fg-primary)"
+									>
+										<IconTag />
+									</span>
+								{/if}
+							</a>
+
+							<div class="action">
+								<ButtonIcon
+									dangerous
+									help="Supprimer la métadonnée"
+									onclick={async () => {
+										const metadataOrderBefore = structuredClone(metadataOrder);
+
+										const updateProtocol = updater((p, action) => {
+											if (action === 'undo') {
+												p.metadata.push(def.id);
+												if (metadataOrderBefore) p.metadataOrder = metadataOrderBefore;
+											} else {
+												p.metadata = p.metadata.filter((k) => k !== def.id);
+												if (p.metadataOrder)
+													p.metadataOrder = p.metadataOrder.filter((k) => k !== def.id);
+											}
+										});
+
+										await updateProtocol('remove');
+
+										toasts.withUndo(
+											'success',
+											`Métadonnée ${removeNamespaceFromMetadataId(def.id)} supprimée`,
+											{
+												undo: async () => updateProtocol('undo'),
+												commit: async () => tables.Metadata.remove(def.id)
+											}
+										);
+									}}
+								>
+									<IconDelete />
+								</ButtonIcon>
+							</div>
+						</div>
+					{/each}
+				</nav>
+			{:else}
+				<div class="navlink" in:fade>
+					<div class="menu-icon">
+						<ButtonIcon
+							help="Ajouter une métadonnée"
+							tooltipParams={{ placement: 'right' }}
+							onclick={() => (collapsedSidebar = false)}
+						>
+							<IconAdd />
+						</ButtonIcon>
+					</div>
+				</div>
+				<nav class="metadata" in:fade>
+					{#each metadataDefinitions as def (def.id)}
+						{@const label = def.label || removeNamespaceFromMetadataId(def.id)}
 						<a
-							href={href('/protocols/[id]/metadata/[metadata]/infos', {
+							class="navlink"
+							use:tooltip={{ text: label, placement: 'right' }}
+							class:active={page.url.hash.includes(
+								`metadata/${removeNamespaceFromMetadataId(def.id)}/`
+							)}
+							href={href('/(app)/protocols/[id]/metadata/[metadata]/infos', {
 								id,
 								metadata: removeNamespaceFromMetadataId(def.id)
 							})}
 						>
-							{#if def?.label}
-								{def.label}
-							{:else}
-								<code>{removeNamespaceFromMetadataId(def.id)}</code>
-								<span use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
-									<IconTechnical />
-								</span>
-							{/if}
-							{#if def.id === data.crop?.metadata || (def.infer && 'neural' in def.infer)}
-								<span use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
-									<IconInferred />
-								</span>
-							{:else if def.infer && ('exif' in def.infer || ('latitude' in def.infer && 'exif' in def.infer.latitude))}
-								<span
-									use:tooltip={'exif' in def.infer
-										? m.inferred_from_single_exif({ exif: def.infer.exif })
-										: m.inferred_from_two_exif({
-												latitude: def.infer.latitude.exif,
-												longitude: def.infer.longitude.exif
-											})}
-									style:color="var(--fg-primary)"
-								>
-									<IconTag />
-								</span>
-							{/if}
+							<div class="menu-icon">{label.at(0)?.toUpperCase() ?? '?'}</div>
 						</a>
-
-						<div class="action">
-							<ButtonIcon
-								dangerous
-								help="Supprimer la métadonnée"
-								onclick={async () => {
-									const metadataOrderBefore = structuredClone(metadataOrder);
-
-									const updateProtocol = updater((p, action) => {
-										if (action === 'undo') {
-											p.metadata.push(def.id);
-											if (metadataOrderBefore) p.metadataOrder = metadataOrderBefore;
-										} else {
-											p.metadata = p.metadata.filter((k) => k !== def.id);
-											if (p.metadataOrder)
-												p.metadataOrder = p.metadataOrder.filter((k) => k !== def.id);
-										}
-									});
-
-									await updateProtocol('remove');
-
-									toasts.withUndo(
-										'success',
-										`Métadonnée ${removeNamespaceFromMetadataId(def.id)} supprimée`,
-										{
-											undo: async () => updateProtocol('undo'),
-											commit: async () => tables.Metadata.remove(def.id)
-										}
-									);
-								}}
-							>
-								<IconDelete />
-							</ButtonIcon>
-						</div>
-					</div>
-				{/each}
-			</nav>
+					{/each}
+				</nav>
+			{/if}
 		</nav>
+		<div class="collapse-toggle">
+			<ButtonIcon
+				help={collapsedSidebar ? 'Déplier' : 'Replier'}
+				onclick={() => {
+					collapsedSidebar = !collapsedSidebar;
+				}}
+			>
+				{#if collapsedSidebar}
+					<IconExpand />
+				{:else}
+					<IconCollapse />
+				{/if}
+			</ButtonIcon>
+		</div>
 	</aside>
 	<main class:padded={!page.route.id?.startsWith('/(app)/protocols/[id]/metadata/')}>
 		{@render children()}
@@ -289,6 +355,12 @@
 		href={path ? `#/protocols/${id}/${path}` : undefined}
 		class="navlink"
 		class:active={path && page.route.id?.includes(`/protocols/[id]/${path}`)}
+		use:tooltip={collapsedSidebar
+			? {
+					text: name,
+					placement: 'right'
+				}
+			: undefined}
 	>
 		<div class="menu-icon">
 			<Icon />
@@ -307,7 +379,7 @@
 	}
 
 	main {
-		overflow: auto;
+		overflow-y: auto;
 		width: 100%;
 		&.padded {
 			padding: 1.5em;
@@ -335,6 +407,20 @@
 		height: 100%;
 		border-right: 1px solid var(--gray);
 		padding: 1.2em;
+		overflow: hidden;
+		transition: width 0.2s ease;
+
+		&:not(.collapsed) {
+			width: 30rem;
+		}
+		&.collapsed {
+			width: 5rem;
+		}
+	}
+
+	header {
+		/* So that the height is stable when toggling collapsed state */
+		height: 8rem;
 	}
 
 	h1 {
@@ -350,7 +436,7 @@
 	.actions {
 		margin-top: 0.5em;
 		display: flex;
-		flex-flow: row wrap;
+		flex-flow: row;
 		gap: 0.5em;
 	}
 
@@ -358,7 +444,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.75em;
-		overflow: auto;
+		overflow-y: auto;
 		flex-grow: 1;
 	}
 
@@ -397,7 +483,13 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	aside:not(.collapsed) .menu-icon {
 		margin-left: calc(0.25em + 4px);
+	}
+	aside.collapsed .menu-icon {
+		margin-left: 4px;
 	}
 
 	.navlink::before {
