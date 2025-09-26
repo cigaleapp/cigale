@@ -1,7 +1,6 @@
 <script>
 	// @ts-ignore
 	import { page } from '$app/state';
-	import { onMount } from 'svelte';
 	import { tinykeys } from 'tinykeys';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import Modal, { hasAnyModalOpen } from './Modal.svelte';
@@ -23,6 +22,14 @@
 
 	/** @type {Props} */
 	let { binds, openHelp = $bindable(), preventDefault = false } = $props();
+
+	/**
+	 *
+	 * @param {Event} e
+	 */
+	const isTextEntryEvent = (e) =>
+		(e instanceof KeyboardEvent || e instanceof MouseEvent) &&
+		(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement);
 
 	$effect(() =>
 		// Use the tinykeys package to bind the keybindings
@@ -54,6 +61,11 @@
 						async (e) => {
 							if (!bind?.allowInModals && hasAnyModalOpen(page)) {
 								console.warn(`a modal is open, ignoring keybinding ${pattern}`, page.state);
+								return;
+							}
+							// Prevent non-$mod-prefixed shortcuts from working while in a input or textarea
+							if (isTextEntryEvent(e) && !pattern.startsWith('$mod+')) {
+								console.warn(`in input, ignoring keybinding ${pattern}`, e.target);
 								return;
 							}
 							if (bind.when && !bind.when(e)) return;
@@ -89,14 +101,17 @@
 		).toSorted(([a], [b]) => GROUPS_ORDER.indexOf(a) - GROUPS_ORDER.indexOf(b))
 	);
 
-	onMount(() => {
+	$effect(() => {
 		// "?" doesnt work with tinykeys, see https://github.com/jamiebuilds/tinykeys/issues/130
-		window.addEventListener('keyup', (e) => {
-			if (e.key === '?') {
+		const handler = (/** @type {KeyboardEvent} */ e) => {
+			if (e.key === '?' && !isTextEntryEvent(e) && !hasAnyModalOpen(page)) {
 				// Call the function that opens the keyboard shortcuts help modal
 				openHelp?.();
 			}
-		});
+		};
+
+		window.addEventListener('keyup', handler);
+		return () => window.removeEventListener('keyup', handler);
 	});
 </script>
 
