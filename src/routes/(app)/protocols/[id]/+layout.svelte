@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import { errorMessage } from '$lib/i18n';
+	import { errorMessage, uppercaseFirst } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import MetadataBadges from '$lib/MetadataBadges.svelte';
@@ -32,6 +32,7 @@
 	import IconDelete from '~icons/ph/trash';
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
+	import IconDatatype from '$lib/IconDatatype.svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
@@ -215,7 +216,19 @@
 			{@render navlink('Exports', 'exports', IconExports)}
 			{@render navlink('Recadrage', 'cropping', IconCropping)}
 			{@render navlink('Métadonnées', '', IconMetadata, metadataDefinitions.length)}
-			{#if !collapsedSidebar}
+			{#if collapsedSidebar}
+				<div class="navlink" in:fade>
+					<div class="menu-icon">
+						<ButtonIcon
+							help="Ajouter une métadonnée"
+							tooltipParams={{ placement: 'right' }}
+							onclick={() => (collapsedSidebar = false)}
+						>
+							<IconAdd />
+						</ButtonIcon>
+					</div>
+				</div>
+			{:else}
 				<form in:fade class="navlink" onsubmit={onCreateMetadata}>
 					<div class="menu-icon standin"></div>
 					<InlineTextInput
@@ -229,24 +242,40 @@
 						<IconAdd />
 					</ButtonIcon>
 				</form>
-				<nav in:fade class="metadata" bind:this={metadataNav}>
-					{#each metadataDefinitions as def (def.id)}
-						{@const shortId = removeNamespaceFromMetadataId(def.id)}
-						<div class="navlink" class:active={page.url.hash.includes(`metadata/${shortId}/`)}>
-							<div class="menu-icon standin"></div>
+			{/if}
+			<nav class="metadata" bind:this={metadataNav}>
+				{#each metadataDefinitions as def (def.id)}
+					{@const shortId = removeNamespaceFromMetadataId(def.id)}
+					{@const label = def.label || shortId}
+					{@const url = href(
+						// @ts-expect-error
+						page.route.id?.includes('/protocols/[id]/metadata/[metadata]/')
+							? page.route.id
+							: '/(app)/protocols/[id]/metadata/[metadata]/infos',
+						{
+							...page.params,
+							id,
+							metadata: shortId
+						}
+					)}
+
+					<div class="navlink" class:active={page.url.hash.includes(`metadata/${shortId}/`)}>
+						{#if collapsedSidebar}
 							<a
-								href={href(
-									// @ts-expect-error
-									page.route.id?.includes('/protocols/[id]/metadata/[metadata]/')
-										? page.route.id
-										: '/(app)/protocols/[id]/metadata/[metadata]/infos',
-									{
-										...page.params,
-										id,
-										metadata: shortId
-									}
-								)}
+								in:fade
+								class="navlink"
+								use:tooltip={{ text: label, placement: 'right' }}
+								class:active={page.url.hash.includes(`metadata/${shortId}/`)}
+								href={url}
 							>
+								<div class="menu-icon">{uppercaseFirst(label).slice(0, 2)}</div>
+								<div class="datatype-icon">
+									<IconDatatype tooltip={false} type={def.type} />
+								</div>
+							</a>
+						{:else}
+							<div class="menu-icon standin"></div>
+							<a in:fade href={url}>
 								{#if def?.label}
 									{def.label}
 								{:else}
@@ -264,39 +293,10 @@
 									<IconDelete />
 								</ButtonIcon>
 							</div>
-						</div>
-					{/each}
-				</nav>
-			{:else}
-				<div class="navlink" in:fade>
-					<div class="menu-icon">
-						<ButtonIcon
-							help="Ajouter une métadonnée"
-							tooltipParams={{ placement: 'right' }}
-							onclick={() => (collapsedSidebar = false)}
-						>
-							<IconAdd />
-						</ButtonIcon>
+						{/if}
 					</div>
-				</div>
-				<nav class="metadata" in:fade>
-					{#each metadataDefinitions as def (def.id)}
-						{@const shortId = removeNamespaceFromMetadataId(def.id)}
-						{@const label = def.label || shortId}
-						<a
-							class="navlink"
-							use:tooltip={{ text: label, placement: 'right' }}
-							class:active={page.url.hash.includes(`metadata/${shortId}/`)}
-							href={href('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-								id,
-								metadata: shortId
-							})}
-						>
-							<div class="menu-icon">{label.at(0)?.toUpperCase() ?? '?'}</div>
-						</a>
-					{/each}
-				</nav>
-			{/if}
+				{/each}
+			</nav>
 		</nav>
 		<div class="collapse-toggle">
 			<ButtonIcon
@@ -464,6 +464,18 @@
 	}
 	aside.collapsed .menu-icon {
 		margin-left: 4px;
+	}
+
+	aside.collapsed nav.metadata .navlink {
+		position: relative;
+
+		.datatype-icon {
+			position: absolute;
+			top: -4px;
+			right: -4px;
+			font-size: 0.7em;
+			/* background-color: var(--bg-neutral); */
+		}
 	}
 
 	.navlink::before {
