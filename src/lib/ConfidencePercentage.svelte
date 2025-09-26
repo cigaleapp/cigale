@@ -27,7 +27,7 @@
 	<span class="confidence" use:tooltip={help(percent(value, 4))}>
 		{@render children?.()}
 		<code class="confidence" style:color>
-			{percent(value, 0, { pad: 'nbsp' })}
+			{percent(value, value < 0.01 ? 1 : 0, { pad: 'nbsp' })}
 		</code>
 	</span>
 {/if}
