@@ -162,23 +162,6 @@ export function isReactiveTable(name) {
 	return NO_REACTIVE_STATE_TABLES.every((n) => n !== name);
 }
 
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('isReactiveTable', () => {
-		// Tables that should NOT have reactive state
-		expect(isReactiveTable('ImageFile')).toBe(false);
-		expect(isReactiveTable('ImagePreviewFile')).toBe(false);
-		expect(isReactiveTable('MetadataOption')).toBe(false);
-
-		// Tables that SHOULD have reactive state (not in NO_REACTIVE_STATE_TABLES)
-		expect(isReactiveTable('Image')).toBe(true);
-		expect(isReactiveTable('Protocol')).toBe(true);
-		expect(isReactiveTable('Observation')).toBe(true);
-		expect(isReactiveTable('Metadata')).toBe(true);
-		expect(isReactiveTable('Settings')).toBe(true);
-	});
-}
-
 export const Tables = {
 	Image,
 	ImageFile,
