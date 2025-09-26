@@ -6,10 +6,21 @@ import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js
 
 /**
  * @param {string} metadataId
- * @param {string} key
+ * @param {import('$lib/metadata').RuntimeValue} key
  */
 export function metadataOptionId(metadataId, key) {
 	return `${metadataId}:${key}`;
+}
+
+/**
+ * @param {string} optionId
+ */
+export function parseMetadataOptionId(optionId) {
+	const parts = optionId.split(':');
+	if (parts.length < 2) throw new Error(`Invalid metadata option ID: ${optionId}`);
+	const metadataId = parts.slice(0, -1).join(':');
+	const key = parts[parts.length - 1];
+	return { metadataId, key };
 }
 
 export const MetadataValue = type({

@@ -188,8 +188,8 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 			value: classmapping[i]
 		}))
 		.sort((a, b) => b.confidence - a.confidence)
-		.slice(0, 3)
-		.filter(({ confidence }) => confidence > 0.005);
+		.slice(0, 100);
+	// .filter(({ confidence }) => confidence > 0.005);
 
 	tools.abortSignal?.throwIfAborted();
 	if (!results.length) {
