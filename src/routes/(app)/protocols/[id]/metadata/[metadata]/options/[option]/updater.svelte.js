@@ -1,6 +1,6 @@
 import { invalidate } from '$app/navigation';
 import { page } from '$app/state';
-import { get, set } from '$lib/idb.svelte';
+import { dependencyURI, get, set } from '$lib/idb.svelte';
 import { m } from '$lib/paraglide/messages';
 import {
 	ensureNamespacedMetadataId,
@@ -45,7 +45,11 @@ export function updater(changes) {
 		});
 
 		await invalidate(
-			`idb://Metadata/${namespacedMetadataId(page.params.id, page.params.metadata)}/options`
+			dependencyURI(
+				'Metadata',
+				namespacedMetadataId(page.params.id, page.params.metadata),
+				'options'
+			)
 		);
 	};
 }
