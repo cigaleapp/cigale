@@ -1,4 +1,5 @@
 <script>
+	import { invalidate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -6,7 +7,6 @@
 	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { metadataDefinitionComparator } from '$lib/metadata.js';
 	import { m } from '$lib/paraglide/messages.js';
 	import { goto, href } from '$lib/paths.js';
 	import { exportProtocol } from '$lib/protocols';
@@ -35,7 +35,7 @@
 	seo({ title: `Protocole ${page.params.id}` });
 
 	const { children, data } = $props();
-	let { id, name, version, metadata, metadataOrder } = $derived(data);
+	let { id, name, version, metadata, metadataDefinitions, metadataOrder } = $derived(data);
 
 	setContext('setSidebarVersion', (/** @type {number} */ newVersion) => {
 		version = newVersion;
@@ -47,12 +47,6 @@
 
 	/** @type {HTMLElement|null} */
 	let metadataNav;
-
-	const displayedMetadata = $derived(
-		metadata
-			.filter((k) => ![data.crop.metadata, data.crop.confirmationMetadata].includes(k))
-			.toSorted(metadataDefinitionComparator({ metadataOrder }))
-	);
 
 	/**
 	 *
@@ -73,8 +67,10 @@
 			required: false
 		});
 
-		await tables.Protocol.update(id, 'metadata', $state.snapshot(metadata));
-		await tables.Protocol.update(id, 'metadataOrder', $state.snapshot(metadataOrder));
+		await tables.Protocol.update(id, 'metadata', [newId, ...metadata]);
+		await tables.Protocol.update(id, 'metadataOrder', [newId, ...metadataOrder]);
+
+		await invalidate(`idb://Protocol/${id}`);
 
 		return newId;
 	}
@@ -157,7 +153,7 @@
 			)}
 			{@render navlink('Exports', 'exports', IconExports)}
 			{@render navlink('Recadrage', 'cropping', IconCropping)}
-			{@render navlink('Métadonnées', '', IconMetadata, displayedMetadata.length)}
+			{@render navlink('Métadonnées', '', IconMetadata, metadataDefinitions.length)}
 			<form
 				class="navlink"
 				onsubmit={async (e) => {
@@ -167,9 +163,6 @@
 
 					try {
 						const metadataId = await createMetadata(nameInput.value);
-
-						metadata.push(metadataId);
-						metadataOrder?.push(metadataId);
 
 						const shortId = removeNamespaceFromMetadataId(metadataId);
 
@@ -201,72 +194,81 @@
 				</ButtonIcon>
 			</form>
 			<nav class="metadata" bind:this={metadataNav}>
-				{#each displayedMetadata as key (key)}
-					{#await tables.Metadata.get(key) then def}
-						{#if def}
-							<div
-								class="navlink"
-								class:active={page.url.hash.includes(
-									`metadata/${removeNamespaceFromMetadataId(key)}/`
-								)}
-							>
-								<div class="menu-icon standin"></div>
-								<a
-									href={href('/protocols/[id]/metadata/[metadata]/infos', {
-										id,
-										metadata: removeNamespaceFromMetadataId(key)
-									})}
+				{#each metadataDefinitions as def (def.id)}
+					<div
+						class="navlink"
+						class:active={page.url.hash.includes(
+							`metadata/${removeNamespaceFromMetadataId(def.id)}/`
+						)}
+					>
+						<div class="menu-icon standin"></div>
+						<a
+							href={href('/protocols/[id]/metadata/[metadata]/infos', {
+								id,
+								metadata: removeNamespaceFromMetadataId(def.id)
+							})}
+						>
+							{#if def?.label}
+								{def.label}
+							{:else}
+								<code>{removeNamespaceFromMetadataId(def.id)}</code>
+								<span use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
+									<IconTechnical />
+								</span>
+							{/if}
+							{#if def.id === data.crop?.metadata || (def.infer && 'neural' in def.infer)}
+								<span use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
+									<IconInferred />
+								</span>
+							{:else if def.infer && ('exif' in def.infer || ('latitude' in def.infer && 'exif' in def.infer.latitude))}
+								<span
+									use:tooltip={'exif' in def.infer
+										? m.inferred_from_single_exif({ exif: def.infer.exif })
+										: m.inferred_from_two_exif({
+												latitude: def.infer.latitude.exif,
+												longitude: def.infer.longitude.exif
+											})}
+									style:color="var(--fg-primary)"
 								>
-									{#if def?.label}
-										{def.label}
-									{:else}
-										<code>{removeNamespaceFromMetadataId(key)}</code>
-										<span
-											use:tooltip={m.technical_metadata_tooltip()}
-											style:color="var(--fg-error)"
-										>
-											<IconTechnical />
-										</span>
-									{/if}
-									{#if def.id === data.crop?.metadata || (def.infer && 'neural' in def.infer)}
-										<span
-											use:tooltip={m.inferred_metadata_tooltip()}
-											style:color="var(--fg-primary)"
-										>
-											<IconInferred />
-										</span>
-									{:else if def.infer && ('exif' in def.infer || ('latitude' in def.infer && 'exif' in def.infer.latitude))}
-										<span
-											use:tooltip={'exif' in def.infer
-												? m.inferred_from_single_exif({ exif: def.infer.exif })
-												: m.inferred_from_two_exif({
-														latitude: def.infer.latitude.exif,
-														longitude: def.infer.longitude.exif
-													})}
-											style:color="var(--fg-primary)"
-										>
-											<IconTag />
-										</span>
-									{/if}
-								</a>
+									<IconTag />
+								</span>
+							{/if}
+						</a>
 
-								<div class="action">
-									<ButtonIcon
-										dangerous
-										help="Supprimer la métadonnée"
-										onclick={updater(async (p) => {
+						<div class="action">
+							<ButtonIcon
+								dangerous
+								help="Supprimer la métadonnée"
+								onclick={async () => {
+									const metadataOrderBefore = structuredClone(metadataOrder);
+
+									const updateProtocol = updater((p, action) => {
+										if (action === 'undo') {
+											p.metadata.push(def.id);
+											if (metadataOrderBefore) p.metadataOrder = metadataOrderBefore;
+										} else {
 											p.metadata = p.metadata.filter((k) => k !== def.id);
 											if (p.metadataOrder)
 												p.metadataOrder = p.metadataOrder.filter((k) => k !== def.id);
-											await tables.Metadata.remove(def.id);
-										})}
-									>
-										<IconDelete />
-									</ButtonIcon>
-								</div>
-							</div>
-						{/if}
-					{/await}
+										}
+									});
+
+									await updateProtocol('remove');
+
+									toasts.withUndo(
+										'success',
+										`Métadonnée ${removeNamespaceFromMetadataId(def.id)} supprimée`,
+										{
+											undo: async () => updateProtocol('undo'),
+											commit: async () => tables.Metadata.remove(def.id)
+										}
+									);
+								}}
+							>
+								<IconDelete />
+							</ButtonIcon>
+						</div>
+					</div>
 				{/each}
 			</nav>
 		</nav>
@@ -357,6 +359,7 @@
 		flex-direction: column;
 		gap: 0.75em;
 		overflow: auto;
+		flex-grow: 1;
 	}
 
 	.navlink {
