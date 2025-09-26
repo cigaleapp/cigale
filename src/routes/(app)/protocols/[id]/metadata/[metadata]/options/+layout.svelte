@@ -1,15 +1,20 @@
 <script>
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { errorMessage } from '$lib/i18n.js';
+	import { drop, set } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import VirtualList from '@sveltejs/svelte-virtual-list';
-	import { href } from '$lib/paths.js';
+	import { goto, href } from '$lib/paths.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 	import { slugify } from '$lib/utils.js';
+	import { error } from '@sveltejs/kit';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import IconSearch from '~icons/ph/magnifying-glass';
+	import IconAdd from '~icons/ph/plus';
+	import IconDelete from '~icons/ph/trash';
 	import IconClose from '~icons/ph/x';
-	import { updater } from '../updater.svelte.js';
-	import { set } from '$lib/idb.svelte.js';
 
 	const { data, children } = $props();
 	let options = $derived(data.options ?? []);
@@ -30,7 +35,7 @@
 	 * @param {string} key
 	 */
 	function optionUrl(key) {
-		return href('/protocols/[id]/metadata/[metadata]/options/[option]', {
+		return href('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
 			id: data.protocol.id,
 			metadata: removeNamespaceFromMetadataId(data.metadata.id),
 			option: key
@@ -40,31 +45,52 @@
 
 <div class="aside-and-main">
 	<aside>
-		<div class="new-option">
-			<!-- <IconAdd /> -->
+		<form
+			class="new-option"
+			onsubmit={async (e) => {
+				e.preventDefault();
+				const nameInput = /** @type {HTMLInputElement|null} */ (e.currentTarget.elements.item(0));
+
+				if (!nameInput?.value) return;
+
+				let key = slugify(nameInput.value).replaceAll('-', '_');
+				if (options.find((o) => o.key === key)) {
+					key += '_' + options.filter((o) => o.key.startsWith(key)).length;
+				}
+
+				try {
+					await set('MetadataOption', {
+						id: `${data.metadata.id}:${key}`,
+						metadataId: data.metadata.id,
+						key,
+						label: nameInput.value,
+						description: ''
+					});
+
+					nameInput.value = '';
+
+					await invalidate(`idb://Metadata/${data.metadata.id}/options`);
+					await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+						id: data.protocol.id,
+						metadata: removeNamespaceFromMetadataId(data.metadata.id),
+						option: key
+					});
+				} catch (error) {
+					toasts.error(errorMessage(error, "Impossible de créer l'option"));
+				}
+			}}
+		>
 			<InlineTextInput
 				discreet
 				label="Nom de la nouvelle option"
 				placeholder="Nouvelle option…"
 				value=""
-				onblur={updater(async (m, label) => {
-					if (!label) return;
-
-					let key = slugify(label);
-					if (options.find((o) => o.key === key)) {
-						key += '_' + options.filter((o) => o.key.startsWith(key)).length;
-					}
-
-					await set('MetadataOption', {
-						id: `${data.metadata.id}:${key}`,
-						metadataId: data.metadata.id,
-						key,
-						label,
-						description: ''
-					});
-				})}
+				onblur={() => {}}
 			/>
-		</div>
+			<ButtonIcon submits help="Créer la nouvelle option" onclick={() => {}}>
+				<IconAdd />
+			</ButtonIcon>
+		</form>
 		<search>
 			<IconSearch />
 			<InlineTextInput
@@ -81,9 +107,34 @@
 		<nav>
 			<VirtualList items={searchResults} let:item>
 				{@const { key, label } = item}
-				<a href={optionUrl(key)} class:active={page.params.option === key}>
-					{label}
-				</a>
+				<div class="navlink" class:active={page.params.option === key}>
+					<a href={optionUrl(key)}>{label}</a>
+					<div class="delete">
+						<ButtonIcon
+							dangerous
+							help="Supprimer {label || key}"
+							onclick={async (e) => {
+								e.stopPropagation();
+								const option = structuredClone(options.find((o) => o.key === key));
+								if (!option) throw error(404, `Option avec clé ${key} introuvable`);
+
+								options = options.filter((o) => o.key !== key);
+
+								toasts.withUndo('info', `Option ${label || key} supprimée`, {
+									undo: async () => {
+										// We're within a async callback, Svelte won't track reactive
+										// state changes here, so we invalidate options instead of just
+										// re-adding to the writable $derived options state variable
+										await invalidate(`idb://Metadata/${data.metadata.id}/options`);
+									},
+									commit: async () => drop('MetadataOption', option.id)
+								});
+							}}
+						>
+							<IconDelete />
+						</ButtonIcon>
+					</div>
+				</div>
 			</VirtualList>
 		</nav>
 	</aside>
@@ -142,22 +193,25 @@
 		width: 100%;
 	}
 
-	nav a {
+	.navlink {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
 		color: var(--text);
-		text-decoration: none;
 		position: relative;
 		margin-left: 8px;
-		padding: 0.25em 0;
 	}
 
-	nav a:is(:hover, :focus-visible) {
+	.navlink a {
+		text-decoration: none;
+		width: 100%;
+	}
+
+	.navlink:is(:hover, :focus-visible) {
 		color: var(--fg-primary);
 	}
 
-	nav a::after {
+	.navlink::after {
 		content: '';
 		position: absolute;
 		left: -8px;
@@ -167,7 +221,17 @@
 		border-radius: 10000px;
 	}
 
-	nav a.active::after {
+	.navlink.active::after {
 		background-color: var(--bg-primary);
+	}
+
+	.navlink .delete {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.navlink:is(:hover, :focus-visible, .active) .delete {
+		opacity: 1;
+		pointer-events: auto;
 	}
 </style>

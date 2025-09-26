@@ -30,8 +30,6 @@ export function updater(changes) {
 			toasts.error(m.unable_to_save_changes({ error: err.message }));
 		});
 
-		await invalidate((url) => {
-			return url.pathname.includes(`/protocols/${page.params.id}`);
-		});
+		await invalidate(`idb://Protocol/${page.params.id}`);
 	};
 }

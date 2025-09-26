@@ -2,7 +2,11 @@ import { invalidate } from '$app/navigation';
 import { page } from '$app/state';
 import { get, set } from '$lib/idb.svelte';
 import { m } from '$lib/paraglide/messages';
-import { ensureNamespacedMetadataId, metadataOptionId } from '$lib/schemas/metadata';
+import {
+	ensureNamespacedMetadataId,
+	metadataOptionId,
+	namespacedMetadataId
+} from '$lib/schemas/metadata';
 import { toasts } from '$lib/toasts.svelte';
 import { ArkErrors } from 'arktype';
 
@@ -18,30 +22,30 @@ export function updater(changes) {
 		if (!page.params.option) return;
 		if (!page.params.id) return;
 
-		const metadata = await get(
+		const option = await get(
 			'MetadataOption',
 			metadataOptionId(
-				ensureNamespacedMetadataId(page.params.id, page.params.metadata),
+				ensureNamespacedMetadataId(page.params.metadata, page.params.id),
 				page.params.option
 			)
 		);
 
-		if (!metadata) return;
+		if (!option) return;
 
 		try {
-			await changes(metadata, value);
+			await changes(option, value);
 		} catch (err) {
 			if (err instanceof ArkErrors) {
 				toasts.error(m.invalid_value({ error: err.summary }));
 			}
 		}
 
-		await set('MetadataOption', metadata).catch((err) => {
+		await set('MetadataOption', option).catch((err) => {
 			toasts.error(m.unable_to_save_changes({ error: err.message }));
 		});
 
-		await invalidate((url) => {
-			return url.pathname.includes(`/protocols/${page.params.id}`);
-		});
+		await invalidate(
+			`idb://Metadata/${namespacedMetadataId(page.params.id, page.params.metadata)}/options`
+		);
 	};
 }
