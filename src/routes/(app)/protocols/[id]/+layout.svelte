@@ -101,7 +101,7 @@
 		const metadataOrderBefore = structuredClone(metadataOrder);
 		const shortId = removeNamespaceFromMetadataId(def.id);
 
-		const updateProtocol = updater((p, action) => {
+		const updateProtocol = updater((p, /** @type {'undo' | 'remove'} */ action) => {
 			if (action === 'undo') {
 				p.metadata.push(def.id);
 				if (metadataOrderBefore) p.metadataOrder = metadataOrderBefore;
