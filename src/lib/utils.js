@@ -761,3 +761,34 @@ export function slugify(text) {
 
 	return result;
 }
+
+/**
+ * Returns a LAB color-mix placing the value on the color scale made from the given color stops
+ * Basically, it's like making a linear gradient and picking a color on it, where the 1 is the end of the gradient and 0 is the beginning
+ * @param {number} value between 0 and 1
+ * @param {...string} stops CSS color variable names (without the -- in front) representing the color gradient scale
+ */
+export function gradientedColor(value, ...stops) {
+	if (value >= 1) return `var(--${stops.at(-1)})`;
+
+	const scale = stops.length - 1;
+	const stop = Math.floor(value * scale);
+
+	return gradient(
+		'lab',
+		`var(--${stops[stop + 1]})`,
+		value * scale - stop,
+		`var(--${stops[stop]})`
+	);
+}
+
+/**
+ *
+ * @param {'lab'|'srgb'} colorspace
+ * @param {string} stop1 CSS color
+ * @param {number} value between 0 and 1
+ * @param {string} stop2 CSS color
+ */
+function gradient(colorspace, stop1, value, stop2) {
+	return `color-mix(in ${colorspace}, ${stop1} ${value * 100}%, ${stop2})`;
+}

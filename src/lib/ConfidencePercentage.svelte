@@ -1,7 +1,8 @@
 <script>
-	import { percent } from './i18n';
-	import { m } from './paraglide/messages';
-	import { tooltip } from './tooltips';
+	import { percent } from './i18n.js';
+	import { m } from './paraglide/messages.js';
+	import { tooltip } from './tooltips.js';
+	import { gradientedColor } from './utils.js';
 
 	/**
 	 * @typedef {object} Props
@@ -16,21 +17,16 @@
 		children,
 		tooltip: help = (percentage) => m.confidence_percentage({ percentage })
 	} = $props();
+
+	const color = $derived(
+		gradientedColor(value, 'fg-error', 'fg-warning', 'fg-neutral', 'fg-success')
+	);
 </script>
 
 {#if value && value > 0 && value < 1}
 	<span class="confidence" use:tooltip={help(percent(value, 4))}>
 		{@render children?.()}
-		<code
-			class="confidence"
-			style:color="var(--fg-{value < 0.25
-				? 'error'
-				: value < 0.5
-					? 'warning'
-					: value < 0.95
-						? 'neutral'
-						: 'success'})"
-		>
+		<code class="confidence" style:color>
 			{percent(value, 0, { pad: 'nbsp' })}
 		</code>
 	</span>
