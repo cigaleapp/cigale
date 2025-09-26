@@ -189,40 +189,32 @@ export async function storeMetadataValue({
 		alternatives
 	});
 
-	for (const {
-		metadataId: cascadedMetadataId,
-		value: cascadedValue,
-		alternatives,
-		confidence
-	} of cascades) {
+	for (const cascade of cascades) {
 		if (aborted) throw new Error('Operation aborted');
 
-		if (cascadedFrom.includes(cascadedMetadataId)) {
+		if (cascadedFrom.includes(cascade.metadataId)) {
 			throw new Error(
-				`Boucle infinie de cascade détectée pour ${cascadedMetadataId} avec ${cascadedValue}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascadedMetadataId}`
+				`Boucle infinie de cascade détectée pour ${cascade.metadataId} avec ${cascade.value}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascade.metadataId}`
 			);
 		}
 
 		console.info(
-			`Cascading metadata ${metadataId} @ ${value} -> ${cascadedMetadataId}  = ${cascadedValue}`
+			`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
 		);
 
 		const metadataNamespace = namespaceOfMetadataId(metadataId);
 		if (!metadataNamespace)
 			throw new Error(
-				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascadedMetadataId}`
+				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
 			);
 
 		await storeMetadataValue({
 			db,
 			subjectId,
-			metadataId: ensureNamespacedMetadataId(cascadedMetadataId, metadataNamespace),
-			value: cascadedValue,
-			confidence,
-			alternatives,
 			manuallyModified,
 			cascadedFrom: [...cascadedFrom, metadataId],
-			abortSignal
+			abortSignal,
+			...cascade
 		});
 	}
 
