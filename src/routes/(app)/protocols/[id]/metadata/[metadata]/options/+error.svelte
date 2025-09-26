@@ -5,7 +5,7 @@
 
 <div class="error">
 	<Logo variant="error" />
-	Métadonnée “{page.params.metadata}” introuvable
+	Aucune option trouvée avec la clé {page.params.option}
 </div>
 
 <style>
@@ -20,7 +20,6 @@
 		padding: 2em;
 		gap: 1em;
 		color: var(--fg-error);
-		font-size: 1.5em;
 
 		--size: 5em;
 	}
