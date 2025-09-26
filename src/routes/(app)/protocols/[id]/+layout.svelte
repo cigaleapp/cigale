@@ -5,6 +5,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import { errorMessage, uppercaseFirst } from '$lib/i18n';
+	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import MetadataBadges from '$lib/MetadataBadges.svelte';
@@ -17,7 +18,6 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { slugify } from '$lib/utils';
-	import { setContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import IconVersioning from '~icons/ph/arrow-circle-up';
 	import IconBack from '~icons/ph/arrow-left';
@@ -32,17 +32,11 @@
 	import IconDelete from '~icons/ph/trash';
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
-	import IconDatatype from '$lib/IconDatatype.svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
 	const { children, data } = $props();
 	let { id, name, version, metadata, metadataDefinitions, metadataOrder } = $derived(data);
-
-	setContext('setSidebarVersion', (/** @type {number} */ newVersion) => {
-		version = newVersion;
-		data.version = newVersion;
-	});
 
 	/** @type {undefined | (() => void)}*/
 	let deleteProtocol = $state(undefined);
