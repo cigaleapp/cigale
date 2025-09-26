@@ -103,9 +103,10 @@
 			<!-- TODO allow modifying -->
 			<dl class="cascades">
 				{#each cascades as { metadataId, metadata, option, value } (metadataId)}
+					{@const shortId = removeNamespaceFromMetadataId(metadataId)}
 					<div class="row">
 						<dt>
-							{metadata?.label || removeNamespaceFromMetadataId(metadataId)}
+							{metadata?.label || shortId}
 						</dt>
 						<IconArrow />
 						<dd>
@@ -117,7 +118,7 @@
 								onclick={() =>
 									goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
 										id: page.params.id ?? '',
-										metadata: removeNamespaceFromMetadataId(metadataId),
+										metadata: shortId,
 										option: option.key
 									})}
 							>
@@ -143,9 +144,10 @@
 			<ul class="reverse-cascades">
 				<VirtualList items={reverseCascades} let:item>
 					{@const { metadataId, metadata, option, value } = item}
+					{@const shortId = removeNamespaceFromMetadataId(metadataId)}
 					<li>
 						Si
-						{metadata?.label || removeNamespaceFromMetadataId(metadataId)} =
+						{metadata?.label || shortId} =
 						{#if option}
 							{option.label || option.key}
 							<ButtonIcon
@@ -153,7 +155,7 @@
 								onclick={() =>
 									goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
 										id: page.params.id ?? '',
-										metadata: removeNamespaceFromMetadataId(metadataId),
+										metadata: shortId,
 										option: option.key
 									})}
 							>
