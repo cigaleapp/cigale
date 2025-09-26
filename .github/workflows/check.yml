@@ -179,10 +179,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, get-base-branch-coverage]
     if: github.event_name == 'pull_request'
-    strategy:
-      matrix:
-        threshold: ['-0.5']
     steps:
+      - name: Set threshold
+        id: params
+        run: echo threshold="-0.5" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
@@ -196,28 +196,32 @@ jobs:
         id: diff
         run: |
           base_coverage=$(jq '.total.lines.pct' base-coverage/coverage-summary.json)
-          head_coverage=$(jq '.total.lines.pct' coverage/coverage-summary.json)
+          echo "base=$base_coverage" >> $GITHUB_OUTPUT
           echo "Base branch coverage: $base_coverage%"
+
+          head_coverage=$(jq '.total.lines.pct' coverage/coverage-summary.json)
+          echo "head=$head_coverage" >> $GITHUB_OUTPUT
           echo "Head branch coverage: $head_coverage%"
+
           diff=$(echo "$head_coverage - $base_coverage" | bc)
           diff=$(printf "%.2f" "$diff")
-          echo "Coverage difference: $diff%"
           echo "diff=$diff" >> $GITHUB_OUTPUT
-          echo "base=$base_coverage" >> $GITHUB_OUTPUT
-          echo "head=$head_coverage" >> $GITHUB_OUTPUT
+          echo "Coverage difference: $diff%"
 
           if (( $(echo "$diff == 0" | bc -l) )); then
             echo "trend=neutral" >> $GITHUB_OUTPUT
-          else if (( $(echo "$diff > 0" | bc -l) )); then
+          elif (( $(echo "$diff > 0" | bc -l) )); then
             echo "trend=up" >> $GITHUB_OUTPUT
             echo "emoji=✅" >> $GITHUB_OUTPUT
-          else if (( $(echo "$diff < ${{ matrix.threshold }}" | bc -l) )); then
+          elif (( $(echo "$diff < ${{ steps.params.outputs.threshold }}" | bc -l) )); then
             echo "trend=down" >> $GITHUB_OUTPUT
             echo "emoji=❌" >> $GITHUB_OUTPUT
           else
             echo "trend=down" >> $GITHUB_OUTPUT
             echo "emoji=⚠️" >> $GITHUB_OUTPUT
           fi
+
+          cat $GITHUB_OUTPUT
       - name: Add sticky comment with coverage difference
         uses: marocchino/sticky-pull-request-comment@v2
         if: steps.diff.outputs.trend != 'neutral'
@@ -227,8 +231,8 @@ jobs:
             ${{ steps.diff.outputs.emoji }} Coverage is **${{ steps.diff.outputs.trend }}** by **${{ steps.diff.outputs.diff }}%** (from ${{ steps.diff.outputs.base }}% to ${{ steps.diff.outputs.head }}%)
       - name: Fail if coverage decreased too much
         run: |
-          if [ "${{ steps.diff.outputs.trend }}" = "down" ] && (( $(echo "${{ steps.diff.outputs.diff }} < ${{ matrix.threshold }}" | bc -l) )); then
-            echo "Coverage decreased by ${{ steps.diff.outputs.diff }}%, which is more than the allowed threshold of ${{ matrix.threshold }}%."
+          if [ "${{ steps.diff.outputs.trend }}" = "down" ] && (( $(echo "${{ steps.diff.outputs.diff }} < ${{ steps.params.outputs.threshold }}" | bc -l) )); then
+            echo "Coverage decreased by ${{ steps.diff.outputs.diff }}%, which is more than the allowed threshold of ${{ steps.params.outputs.threshold }}%."
             exit 1
           else
             echo "Coverage difference is within the allowed threshold."
