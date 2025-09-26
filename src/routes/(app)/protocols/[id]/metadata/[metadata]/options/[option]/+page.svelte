@@ -95,7 +95,7 @@
 	<div class="left">
 		<Field Icon={IconCascadesFrom} composite>
 			{#snippet label()}
-				Depuis cette option
+				Affecte
 				<p class="label-help">
 					Change la valeur d'autres métadonnées quand {data.metadata.label} = {data.option.label}
 				</p>
@@ -135,7 +135,7 @@
 	<div class="right">
 		<Field Icon={IconCascadesTo} composite>
 			{#snippet label()}
-				Vers cette option
+				Affectée par
 				<p class="label-help">
 					Autres métadonnées qui change {metadata.label} à {data.option.label}
 				</p>
