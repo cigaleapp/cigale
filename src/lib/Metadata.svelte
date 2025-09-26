@@ -85,7 +85,10 @@
 		<section class="alternatives">
 			<div class="title">Alternatives</div>
 			<ul class="options">
-				{#each Object.entries(value.alternatives).sort(([, a], [, b]) => b - a) as [jsonValue, confidence] (jsonValue)}
+				<!-- TODO add expand button to show all alternatives -->
+				{#each Object.entries(value.alternatives)
+					.sort(([, a], [, b]) => b - a)
+					.slice(0, 3) as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
 					{@const enumVariant = isType('enum', definition.type, stringValue)
 						? options?.find(({ key }) => key === stringValue)

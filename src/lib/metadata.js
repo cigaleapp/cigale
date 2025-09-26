@@ -1,12 +1,12 @@
 import { type } from 'arktype';
 import * as dates from 'date-fns';
+import { computeCascades } from './cascades.js';
 import { idComparator, Schemas } from './database.js';
 import { m } from './paraglide/messages.js';
 import { getLocale, setLocale } from './paraglide/runtime.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
-	metadataOptionId,
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
@@ -14,7 +14,7 @@ import {
 import { avg, mapValues } from './utils.js';
 
 /**
- * @import { IDBDatabaseType, IDBTransactionWithAtLeast, ReactiveTableNames } from './idb.svelte.js'
+ * @import { IDBDatabaseType, ReactiveTableNames } from './idb.svelte.js'
  * @import * as DB from './database.js'
  * @typedef {import('idb').IDBPDatabase<IDBDatabaseType>} DatabaseHandle
  */
@@ -130,7 +130,10 @@ export async function storeMetadataValue({
 		confidence,
 		manuallyModified,
 		alternatives: Object.fromEntries(
-			alternatives.map((alternative) => [JSON.stringify(alternative.value), alternative.confidence])
+			alternatives.map((alternative) => [
+				serializeMetadataValue(alternative.value),
+				alternative.confidence
+			])
 		)
 	};
 
@@ -178,39 +181,40 @@ export async function storeMetadataValue({
 
 	if (aborted) throw new Error('Operation aborted');
 
-	// Execute cascades if any
-	const cascades = await db
-		.get('MetadataOption', metadataOptionId(metadataId, value.toString()))
-		.then((o) => o?.cascade ?? {});
+	const cascades = await computeCascades({
+		db,
+		metadataId,
+		value,
+		confidence,
+		alternatives
+	});
 
-	for (const [cascadedMetadataId, cascadedValue] of Object.entries(cascades)) {
+	for (const cascade of cascades) {
 		if (aborted) throw new Error('Operation aborted');
 
-		if (cascadedFrom.includes(cascadedMetadataId)) {
+		if (cascadedFrom.includes(cascade.metadataId)) {
 			throw new Error(
-				`Boucle infinie de cascade détectée pour ${cascadedMetadataId} avec ${cascadedValue}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascadedMetadataId}`
+				`Boucle infinie de cascade détectée pour ${cascade.metadataId} avec ${cascade.value}: ${cascadedFrom.join(' -> ')} -> ${metadataId} -> ${cascade.metadataId}`
 			);
 		}
 
 		console.info(
-			`Cascading metadata ${metadataId} @ ${value} -> ${cascadedMetadataId}  = ${cascadedValue}`
+			`Cascading metadata ${metadataId} @ ${value} -> ${cascade.metadataId}  = ${cascade.value}`
 		);
 
 		const metadataNamespace = namespaceOfMetadataId(metadataId);
 		if (!metadataNamespace)
 			throw new Error(
-				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascadedMetadataId}`
+				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
 			);
+
 		await storeMetadataValue({
 			db,
 			subjectId,
-			metadataId: ensureNamespacedMetadataId(cascadedMetadataId, metadataNamespace),
-			value: cascadedValue,
-			confidence: 1, // TODO maybe improve that?
 			manuallyModified,
-
 			cascadedFrom: [...cascadedFrom, metadataId],
-			abortSignal
+			abortSignal,
+			...cascade
 		});
 	}
 
