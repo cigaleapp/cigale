@@ -39,8 +39,8 @@
 		<textarea
 			rows="5"
 			value={description}
-			onblur={updater((m, { currentTarget }) => {
-				m.description = currentTarget.value;
+			onblur={updater((m, { target }) => {
+				m.description = target.value;
 			})}
 		></textarea>
 	</Field>
@@ -95,6 +95,19 @@
 			value={type}
 			onchange={updater((m, value) => {
 				if (!value) return;
+
+				if (m.infer && [value, m.type].includes('location')) {
+					delete m.infer;
+				}
+
+				if (!MERGEABLE_METADATA_TYPES.has(value)) {
+					m.mergeMethod = 'none';
+				}
+
+				if (m.mergeMethod === 'union' && value !== 'boundingbox') {
+					m.mergeMethod = 'min';
+				}
+
 				m.type = value;
 			})}
 		>
@@ -127,6 +140,17 @@
 					!MERGEABLE_METADATA_TYPES.has(type) || (key === 'union' && type !== 'boundingbox'),
 				subtext: help
 			}))}
+			onchange={updater((m, value) => {
+				if (!value) return;
+
+				if (value === 'union' && m.type !== 'boundingbox') {
+					throw new Error(
+						"La méthode 'union' n'est disponible que pour les métadonnées de type 'boîte de recadrage'"
+					);
+				}
+
+				m.mergeMethod = value;
+			})}
 		>
 			{#snippet children({ key, label, subtext })}
 				{@const Icon = IconMergeMethod(key)}
