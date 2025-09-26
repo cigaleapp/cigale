@@ -623,7 +623,7 @@ test('dependencyURI', () => {
 	expect(idb.dependencyURI('Protocol', 'sixseven')).toBe('idb://Protocol/sixseven');
 	expect(idb.dependencyURI('Metadata', '')).toBe('idb://Metadata');
 	expect(idb.dependencyURI('Settings', 'quoi', 'coubeh')).toBe('idb://Settings/quoi/coubeh');
-	expect(idb.dependencyURI('Settings', 'quoi', 'coubeh/feur/aussi')).toBe(
+	expect(idb.dependencyURI('Settings', 'quoi', 'coubeh', 'feur/aussi')).toBe(
 		'idb://Settings/quoi/coubeh/feur/aussi'
 	);
 });
