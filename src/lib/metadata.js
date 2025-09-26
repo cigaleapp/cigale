@@ -76,6 +76,26 @@ export function serializeMetadataValue(value) {
 	);
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('serializeMetadataValue', () => {
+		expect(serializeMetadataValue('hello')).toBe('"hello"');
+		expect(serializeMetadataValue(42)).toBe('42');
+		expect(serializeMetadataValue(true)).toBe('true');
+		expect(serializeMetadataValue(null)).toBe('null');
+
+		const date = new Date('2023-01-01T12:30:45');
+		expect(serializeMetadataValue(date)).toBe('"2023-01-01T12:30:45"');
+
+		// Invalid date should be serialized as is
+		const invalidDate = new Date('invalid');
+		expect(serializeMetadataValue(invalidDate)).toBe('null'); // Invalid date becomes null when JSON stringified
+
+		expect(serializeMetadataValue(['a', 'b'])).toBe('["a","b"]');
+		expect(serializeMetadataValue({ key: 'value' })).toBe('{"key":"value"}');
+	});
+}
+
 /**
  * Serialize a record of metadata values for storing in the database.
  * @param {DB.MetadataValues} values

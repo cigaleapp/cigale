@@ -40,6 +40,17 @@ export function countThing(name, count, plurals) {
 	return countThings({ [name]: count }, plurals);
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('countThing', () => {
+		expect(countThing('item', 1)).toBe('1 item');
+		expect(countThing('item', 2)).toBe('2 items');
+		expect(countThing('item', 0)).toBe('');
+		expect(countThing('child', 3, { child: 'children' })).toBe('3 children');
+		expect(countThing('person', 1, { person: 'people' })).toBe('1 person');
+	});
+}
+
 /**
  * Converts a number between 0 and 1 to a percentage string.
  * @param {number} value Number between 0 and 1
@@ -62,6 +73,21 @@ export function percent(value, decimals = 0, { pad = 'none' } = {}) {
 	return result + '%';
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('percent', () => {
+		expect(percent(0.5)).toBe('50%');
+		expect(percent(0.123)).toBe('12%');
+		expect(percent(0.123, 1)).toBe('12.3%');
+		expect(percent(0.123, 2)).toBe('12.3%'); // trailing zeros removed
+		expect(percent(0.1234, 2)).toBe('12.34%');
+		expect(percent(1)).toBe('100%');
+		expect(percent(0)).toBe('0%');
+		expect(percent(0.05, 1, { pad: 'zeros' })).toBe('005%'); // 5.0 -> 5 -> 005
+		expect(percent(0.05, 0, { pad: 'nbsp' })).toBe('\u00A05%');
+	});
+}
+
 /**
  * Returns a human-readable name for a content type.
  * @param {string} contentType Content type, of the form type/subtype
@@ -76,6 +102,20 @@ export function humanFormatName(contentType) {
 	}
 
 	return result;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('humanFormatName', () => {
+		expect(humanFormatName('image/jpeg')).toBe('JPEG');
+		expect(humanFormatName('image/png')).toBe('PNG');
+		expect(humanFormatName('video/mp4')).toBe('MP4');
+		expect(humanFormatName('audio/mpeg')).toBe('MPEG');
+		expect(humanFormatName('application/json')).toBe('json');
+		expect(humanFormatName('text/plain')).toBe('plain');
+		expect(humanFormatName('image/x-icon')).toBe('ICON');
+		expect(humanFormatName('application/x-zip-compressed')).toBe('zip-compressed');
+	});
 }
 
 /**
@@ -111,4 +151,21 @@ export function errorMessage(error, prefix = '') {
 	result ||= defaultMessage;
 
 	return prefix ? `${prefix}: ${result}` : result;
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('errorMessage', () => {
+		expect(errorMessage(new Error('Test error'))).toBe('Test error');
+		expect(errorMessage(new Error('Error: Test error'))).toBe('Test error');
+		expect(errorMessage('string error')).toBe('string error');
+		expect(errorMessage(null)).toBe('Unexpected error');
+		expect(errorMessage(undefined)).toBe('Unexpected error');
+		expect(errorMessage(new Error('Test'), 'Prefix')).toBe('Prefix: Test');
+
+		// The current implementation overwrites with toString(), so cause isn't used
+		const errorWithCause = new Error('Main error');
+		errorWithCause.cause = new Error('Cause error');
+		expect(errorMessage(errorWithCause)).toBe('Main error');
+	});
 }

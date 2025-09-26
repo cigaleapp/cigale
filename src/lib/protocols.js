@@ -17,6 +17,28 @@ export function jsonSchemaURL(base) {
 	return `${window.location.origin}${base}/protocol.schema.json`;
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('jsonSchemaURL', () => {
+		// Mock window.location.origin
+		const originalLocation = window.location;
+		Object.defineProperty(window, 'location', {
+			value: { origin: 'https://example.com' },
+			writable: true
+		});
+
+		expect(jsonSchemaURL('')).toBe('https://example.com/protocol.schema.json');
+		expect(jsonSchemaURL('/app')).toBe('https://example.com/app/protocol.schema.json');
+		expect(jsonSchemaURL('/some/path')).toBe('https://example.com/some/path/protocol.schema.json');
+
+		// Restore original location
+		Object.defineProperty(window, 'location', {
+			value: originalLocation,
+			writable: true
+		});
+	});
+}
+
 /**
  * Exports a protocol by ID into a JSON file, and triggers a download of that file.
  * @param {string} base base path of the app - import `base` from `$app/paths`
