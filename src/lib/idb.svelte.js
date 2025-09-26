@@ -278,6 +278,19 @@ export async function* iterator(tableName, index = undefined) {
 }
 
 /**
+ * Useful to declare and invalidate SvelteKit load functions
+ * @see https://svelte.dev/docs/kit/load#Rerunning-load-functions-Manual-invalidation
+ * @param {keyof typeof Tables} tableName
+ * @param {string} key
+ * @param {string} [additionalPath]
+ * @returns {`idb://${string}`}
+ */
+export function dependencyURI(tableName, key, additionalPath = '') {
+	// @ts-expect-error
+	return ['idb:/', tableName, key, additionalPath].filter(Boolean).join('/');
+}
+
+/**
  * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you
  * @template {Array<keyof typeof Tables>} Tables
  * @template {IDBTransactionMode} [Mode="readwrite"]
