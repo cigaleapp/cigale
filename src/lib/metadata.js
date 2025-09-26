@@ -208,6 +208,8 @@ export async function storeMetadataValue({
 				`Metadata ${metadataId} is not namespaced, cannot cascade onto ${cascade.metadataId}`
 			);
 
+		cascade.metadataId = ensureNamespacedMetadataId(cascade.metadataId, metadataNamespace);
+
 		await storeMetadataValue({
 			db,
 			subjectId,
