@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { errorMessage } from '$lib/i18n.js';
-	import { drop, set } from '$lib/idb.svelte.js';
+	import { dependencyURI, drop, set } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { goto, href } from '$lib/paths.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
@@ -53,7 +53,7 @@
 
 			nameInput.value = '';
 
-			await invalidate(`idb://Metadata/${data.metadata.id}/options`);
+			await invalidate(dependencyURI('Metadata', data.metadata.id, 'options'));
 			await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
 				id: data.protocol.id,
 				metadata: removeNamespaceFromMetadataId(data.metadata.id),
@@ -79,7 +79,7 @@
 				// We're within a async callback, Svelte won't track reactive
 				// state changes here, so we invalidate options instead of just
 				// re-adding to the writable $derived options state variable
-				await invalidate(`idb://Metadata/${data.metadata.id}/options`);
+				await invalidate(dependencyURI('Metadata', data.metadata.id, 'options'));
 			},
 			commit: async () => drop('MetadataOption', option.id)
 		});
