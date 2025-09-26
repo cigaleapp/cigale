@@ -737,8 +737,33 @@ export function progressSplitter(...layout) {
 			if (i === partIndex) total += weight * progress;
 		}
 
-		return total / parts.length;
+		return total;
 	};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('progressSplitter', () => {
+		const splitProgress = progressSplitter('download', 0.7, 'decompression', 0.2, 'parsing');
+
+		const expectations = /** @type {const} */ ([
+			['download', 0, 0],
+			['download', 0.5, 0.35],
+			['download', 1, 0.7],
+			['decompression', 0, 0.7],
+			['decompression', 0.5, 0.8],
+			['decompression', 1, 0.9],
+			['parsing', 0, 0.9],
+			['parsing', 0.5, 0.95],
+			['parsing', 1, 1]
+		]);
+
+		for (const [phase, input, expected] of expectations) {
+			expect
+				.soft(splitProgress(phase, input), `with (${phase}, ${input})`)
+				.toBeCloseTo(expected, 15);
+		}
+	});
 }
 
 /**
