@@ -7,6 +7,7 @@
 	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import MetadataBadges from '$lib/MetadataBadges.svelte';
 	import { m } from '$lib/paraglide/messages.js';
 	import { goto, href } from '$lib/paths.js';
 	import { exportProtocol } from '$lib/protocols';
@@ -17,23 +18,20 @@
 	import { tooltip } from '$lib/tooltips.js';
 	import { slugify } from '$lib/utils';
 	import { setContext } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import IconVersioning from '~icons/ph/arrow-circle-up';
 	import IconBack from '~icons/ph/arrow-left';
+	import IconCollapse from '~icons/ph/caret-double-left';
+	import IconExpand from '~icons/ph/caret-double-right';
 	import IconCropping from '~icons/ph/crop';
 	import IconExports from '~icons/ph/file-archive';
 	import IconInfo from '~icons/ph/info';
 	import IconMetadata from '~icons/ph/list-bullets';
-	import IconInferred from '~icons/ph/magic-wand';
 	import IconAdd from '~icons/ph/plus';
 	import IconExport from '~icons/ph/share';
-	import IconTag from '~icons/ph/tag';
 	import IconDelete from '~icons/ph/trash';
-	import IconTechnical from '~icons/ph/wrench';
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
-	import IconCollapse from '~icons/ph/caret-double-left';
-	import IconExpand from '~icons/ph/caret-double-right';
 	import { updater } from './updater.svelte';
-	import { fade } from 'svelte/transition';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
@@ -55,29 +53,97 @@
 
 	/**
 	 *
-	 * @param {string} name
-	 * @returns {Promise<string>} the new metadata ID
+	 * @param {SubmitEvent & { currentTarget: HTMLFormElement }} e
 	 */
-	async function createMetadata(name) {
-		let newId = namespacedMetadataId(id, slugify(name).replaceAll('-', '_'));
-		if (metadata.includes(newId))
-			newId += `_${metadata.filter((k) => k.startsWith(newId)).length + 1}`;
+	async function onCreateMetadata(e) {
+		e.preventDefault();
+		const nameInput = /** @type {HTMLInputElement|null} */ (e.currentTarget.elements.item(0));
+		if (!nameInput?.value) return;
 
-		await tables.Metadata.set({
-			id: newId,
-			label: name,
-			description: '',
-			type: 'string',
-			mergeMethod: 'none',
-			required: false
+		const name = nameInput.value.trim();
+
+		try {
+			let newId = namespacedMetadataId(id, slugify(name).replaceAll('-', '_'));
+			if (metadata.includes(newId))
+				newId += `_${metadata.filter((k) => k.startsWith(newId)).length + 1}`;
+
+			await tables.Metadata.set({
+				id: newId,
+				label: name,
+				description: '',
+				type: 'string',
+				mergeMethod: 'none',
+				required: false
+			});
+
+			await tables.Protocol.update(id, 'metadata', [newId, ...metadata]);
+			if (metadataOrder)
+				await tables.Protocol.update(id, 'metadataOrder', [newId, ...metadataOrder]);
+
+			await invalidate(`idb://Protocol/${id}`);
+
+			const shortId = removeNamespaceFromMetadataId(newId);
+
+			nameInput.value = '';
+			metadataNav?.children
+				.item(metadata.length - 1)
+				?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+			toasts.success(`Métadonnée ${shortId} créée`);
+			await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+				id,
+				metadata: shortId
+			});
+		} catch (error) {
+			toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
+		}
+	}
+
+	/**
+	 * @param {import('$lib/database').Metadata} def
+	 */
+	async function onDeleteMetadata(def) {
+		const metadataOrderBefore = structuredClone(metadataOrder);
+		const shortId = removeNamespaceFromMetadataId(def.id);
+
+		const updateProtocol = updater((p, action) => {
+			if (action === 'undo') {
+				p.metadata.push(def.id);
+				if (metadataOrderBefore) p.metadataOrder = metadataOrderBefore;
+			} else {
+				p.metadata = p.metadata.filter((k) => k !== def.id);
+				if (p.metadataOrder) p.metadataOrder = p.metadataOrder.filter((k) => k !== def.id);
+			}
 		});
 
-		await tables.Protocol.update(id, 'metadata', [newId, ...metadata]);
-		if (metadataOrder) await tables.Protocol.update(id, 'metadataOrder', [newId, ...metadataOrder]);
+		await updateProtocol('remove');
 
-		await invalidate(`idb://Protocol/${id}`);
+		toasts.withUndo('success', `Métadonnée ${shortId} supprimée`, {
+			undo: async () => updateProtocol('undo'),
+			commit: async () => tables.Metadata.remove(def.id)
+		});
+	}
 
-		return newId;
+	/**
+	 * @param {string} newid
+	 * @param {(value: string) => void} setInputValue
+	 */
+	async function changeProtocolID(newid, setInputValue) {
+		if (!newid) {
+			setInputValue(id);
+			return;
+		}
+
+		await tables.Protocol.update(id, 'id', newid);
+		await tables.Protocol.remove(id);
+		id = newid;
+
+		if (!page.route?.id) return;
+		// @ts-expect-error
+		await goto(page.route.id, {
+			...page.params,
+			id: newid
+		});
 	}
 </script>
 
@@ -95,35 +161,13 @@
 						label="Nom du protocole"
 						discreet
 						value={name}
-						onblur={async (newname) => {
-							await tables.Protocol.update(id, 'name', newname);
-							name = newname;
-						}}
+						onblur={updater((p, newName) => {
+							p.name = newName;
+						})}
 					/>
 				</h1>
 				<code class="subtitle">
-					<InlineTextInput
-						label="ID du protocole"
-						discreet
-						value={id}
-						onblur={async (newid, setValue) => {
-							if (!newid) {
-								setValue(id);
-								return;
-							}
-
-							await tables.Protocol.update(id, 'id', newid);
-							await tables.Protocol.remove(id);
-							id = newid;
-
-							if (!page.route?.id) return;
-							// @ts-expect-error
-							await goto(page.route.id, {
-								...page.params,
-								id: newid
-							});
-						}}
-					/>
+					<InlineTextInput label="ID du protocole" discreet value={id} onblur={changeProtocolID} />
 				</code>
 
 				<section class="actions">
@@ -172,36 +216,7 @@
 			{@render navlink('Recadrage', 'cropping', IconCropping)}
 			{@render navlink('Métadonnées', '', IconMetadata, metadataDefinitions.length)}
 			{#if !collapsedSidebar}
-				<form
-					in:fade
-					class="navlink"
-					onsubmit={async (e) => {
-						e.preventDefault();
-						const nameInput = /** @type {HTMLInputElement|null} */ (
-							e.currentTarget.elements.item(0)
-						);
-						if (!nameInput?.value) return;
-
-						try {
-							const metadataId = await createMetadata(nameInput.value);
-
-							const shortId = removeNamespaceFromMetadataId(metadataId);
-
-							nameInput.value = '';
-							metadataNav?.children
-								.item(metadata.length - 1)
-								?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-							toasts.success(`Métadonnée ${shortId} créée`);
-							await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-								id,
-								metadata: shortId
-							});
-						} catch (error) {
-							toasts.error(errorMessage(error, 'Impossible de créer la métadonnée'));
-						}
-					}}
-				>
+				<form in:fade class="navlink" onsubmit={onCreateMetadata}>
 					<div class="menu-icon standin"></div>
 					<InlineTextInput
 						label="Nom de la métadonnée"
@@ -216,75 +231,28 @@
 				</form>
 				<nav in:fade class="metadata" bind:this={metadataNav}>
 					{#each metadataDefinitions as def (def.id)}
-						<div
-							class="navlink"
-							class:active={page.url.hash.includes(
-								`metadata/${removeNamespaceFromMetadataId(def.id)}/`
-							)}
-						>
+						{@const shortId = removeNamespaceFromMetadataId(def.id)}
+						<div class="navlink" class:active={page.url.hash.includes(`metadata/${shortId}/`)}>
 							<div class="menu-icon standin"></div>
 							<a
-								href={href('/protocols/[id]/metadata/[metadata]/infos', {
+								href={href('/(app)/protocols/[id]/metadata/[metadata]/infos', {
 									id,
-									metadata: removeNamespaceFromMetadataId(def.id)
+									metadata: shortId
 								})}
 							>
 								{#if def?.label}
 									{def.label}
 								{:else}
-									<code>{removeNamespaceFromMetadataId(def.id)}</code>
-									<span use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
-										<IconTechnical />
-									</span>
+									<code>{shortId}</code>
 								{/if}
-								{#if def.id === data.crop?.metadata || (def.infer && 'neural' in def.infer)}
-									<span use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
-										<IconInferred />
-									</span>
-								{:else if def.infer && ('exif' in def.infer || ('latitude' in def.infer && 'exif' in def.infer.latitude))}
-									<span
-										use:tooltip={'exif' in def.infer
-											? m.inferred_from_single_exif({ exif: def.infer.exif })
-											: m.inferred_from_two_exif({
-													latitude: def.infer.latitude.exif,
-													longitude: def.infer.longitude.exif
-												})}
-										style:color="var(--fg-primary)"
-									>
-										<IconTag />
-									</span>
-								{/if}
+								<MetadataBadges metadata={def} protocol={data} />
 							</a>
 
 							<div class="action">
 								<ButtonIcon
 									dangerous
 									help="Supprimer la métadonnée"
-									onclick={async () => {
-										const metadataOrderBefore = structuredClone(metadataOrder);
-
-										const updateProtocol = updater((p, action) => {
-											if (action === 'undo') {
-												p.metadata.push(def.id);
-												if (metadataOrderBefore) p.metadataOrder = metadataOrderBefore;
-											} else {
-												p.metadata = p.metadata.filter((k) => k !== def.id);
-												if (p.metadataOrder)
-													p.metadataOrder = p.metadataOrder.filter((k) => k !== def.id);
-											}
-										});
-
-										await updateProtocol('remove');
-
-										toasts.withUndo(
-											'success',
-											`Métadonnée ${removeNamespaceFromMetadataId(def.id)} supprimée`,
-											{
-												undo: async () => updateProtocol('undo'),
-												commit: async () => tables.Metadata.remove(def.id)
-											}
-										);
-									}}
+									onclick={async () => onDeleteMetadata(def)}
 								>
 									<IconDelete />
 								</ButtonIcon>
@@ -306,16 +274,15 @@
 				</div>
 				<nav class="metadata" in:fade>
 					{#each metadataDefinitions as def (def.id)}
-						{@const label = def.label || removeNamespaceFromMetadataId(def.id)}
+						{@const shortId = removeNamespaceFromMetadataId(def.id)}
+						{@const label = def.label || shortId}
 						<a
 							class="navlink"
 							use:tooltip={{ text: label, placement: 'right' }}
-							class:active={page.url.hash.includes(
-								`metadata/${removeNamespaceFromMetadataId(def.id)}/`
-							)}
+							class:active={page.url.hash.includes(`metadata/${shortId}/`)}
 							href={href('/(app)/protocols/[id]/metadata/[metadata]/infos', {
 								id,
-								metadata: removeNamespaceFromMetadataId(def.id)
+								metadata: shortId
 							})}
 						>
 							<div class="menu-icon">{label.at(0)?.toUpperCase() ?? '?'}</div>
