@@ -1,17 +1,16 @@
 <script>
 	import { page } from '$app/state';
+	import { uppercaseFirst } from '$lib/i18n.js';
 	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { METADATA_TYPES, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import Tooltip from '$lib/Tooltip.svelte';
-	import IconCascades from '~icons/ph/tree-view';
+	import { tooltip } from '$lib/tooltips.js';
 	import IconInfo from '~icons/ph/info';
 	import IconOptions from '~icons/ph/list-dashes';
 	import IconInference from '~icons/ph/magic-wand';
-	import { updater } from '../../updater.svelte.js';
-	import { uppercaseFirst } from '$lib/i18n.js';
-	import { tooltip } from '$lib/tooltips.js';
+	import IconCascades from '~icons/ph/tree-view';
+	import { updater } from './updater.svelte.js';
 
 	const { children, data } = $props();
 	const { id, label, type } = $derived(data.metadata);
@@ -27,9 +26,9 @@
 						discreet
 						help="Nom de la métadonnée"
 						value={label || removeNamespaceFromMetadataId(id)}
-						onblur={updater(async (p, value) => {
+						onblur={updater(async (m, value) => {
 							if (!value) return;
-							await tables.Metadata.update(id, 'label', value);
+							m.label = value;
 						})}
 					/>
 				</span>
@@ -62,9 +61,8 @@
 			{@render navlink('infos', 'Informations', IconInfo)}
 			{#if type === 'enum'}
 				{@render navlink('options', 'Options', IconOptions)}
-				<!-- TODO support inference on non-enums -->
-				{@render navlink('inference', 'Inférence', IconInference)}
 			{/if}
+			{@render navlink('inference', 'Inférence', IconInference)}
 			{@render navlink(
 				'cascades',
 				'Cascades',
