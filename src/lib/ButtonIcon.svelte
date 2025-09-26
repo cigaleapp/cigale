@@ -12,11 +12,22 @@
 	 * @property {boolean} [disabled]
 	 * @property {boolean} [crossout] draw a diagonal line through the button's content
 	 * @property {boolean} [dangerous] style the button to indicate a dangerous action
+	 * @property {Partial<import('$lib/tooltips.js').TooltipParameters>} [tooltipParams] additional params for the tooltip
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
-	let { children, onclick, help, keyboard, disabled, crossout, dangerous, submits, ...rest } =
-		$props();
+	let {
+		children,
+		onclick,
+		help,
+		keyboard,
+		disabled,
+		crossout,
+		dangerous,
+		submits,
+		tooltipParams = {},
+		...rest
+	} = $props();
 </script>
 
 <button
@@ -24,7 +35,7 @@
 	{onclick}
 	class:crossout
 	class:dangerous
-	use:tooltip={{ text: help, keyboard }}
+	use:tooltip={{ text: help, keyboard, ...tooltipParams }}
 	aria-label={help}
 	type={submits ? 'submit' : 'button'}
 	{...rest}
