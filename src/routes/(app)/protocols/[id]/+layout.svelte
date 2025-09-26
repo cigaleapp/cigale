@@ -6,7 +6,7 @@
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import { errorMessage, uppercaseFirst } from '$lib/i18n';
 	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { tables } from '$lib/idb.svelte.js';
+	import { dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import MetadataBadges from '$lib/MetadataBadges.svelte';
 	import { m } from '$lib/paraglide/messages.js';
@@ -75,7 +75,7 @@
 			if (metadataOrder)
 				await tables.Protocol.update(id, 'metadataOrder', [newId, ...metadataOrder]);
 
-			await invalidate(`idb://Protocol/${id}`);
+			await invalidate(dependencyURI('Protocol', id));
 
 			const shortId = removeNamespaceFromMetadataId(newId);
 
