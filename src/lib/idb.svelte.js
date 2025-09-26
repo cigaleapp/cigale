@@ -286,12 +286,12 @@ export async function* iterator(tableName, index = undefined) {
  * @see https://svelte.dev/docs/kit/load#Rerunning-load-functions-Manual-invalidation
  * @param {keyof typeof Tables} tableName
  * @param {string} key
- * @param {string} [additionalPath]
+ * @param {...string} additionalPath
  * @returns {`idb://${string}`}
  */
-export function dependencyURI(tableName, key, additionalPath = '') {
+export function dependencyURI(tableName, key, ...additionalPath) {
 	// @ts-expect-error
-	return ['idb:/', tableName, key, additionalPath].filter(Boolean).join('/');
+	return ['idb:/', tableName, key, ...additionalPath].filter(Boolean).join('/');
 }
 
 /**
