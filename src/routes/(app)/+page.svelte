@@ -170,11 +170,15 @@
 						testid={i === 0 ? 'protocol-to-choose' : undefined}
 						aria-pressed={p.id === uiState.currentProtocolId}
 						onclick={async () => {
-							uiState.setCurrentProtocolId(p.id);
+							if (p.id === currentProtocol?.id) {
+								await goto('/(app)/(sidepanel)/import');
+							} else {
+								uiState.setCurrentProtocolId(p.id);
+							}
+
 							preselection.protocol = null;
 							preselection.classificationModel = null;
 							preselection.cropModel = null;
-							await goto('/import');
 						}}
 					>
 						{#if p.id === currentProtocol?.id}
