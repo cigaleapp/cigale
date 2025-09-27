@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">49.63% </span>
+                <span class="strong">50.6% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>404/814</span>
+                <span class='fraction'>420/830</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.54% </span>
+                <span class="strong">73.58% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>37/51</span>
+                <span class='fraction'>39/53</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">49.63% </span>
+                <span class="strong">50.6% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>404/814</span>
+                <span class='fraction'>420/830</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -982,7 +982,27 @@
 <a name='L917'></a><a href='#L917'>917</a>
 <a name='L918'></a><a href='#L918'>918</a>
 <a name='L919'></a><a href='#L919'>919</a>
-<a name='L920'></a><a href='#L920'>920</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L920'></a><a href='#L920'>920</a>
+<a name='L921'></a><a href='#L921'>921</a>
+<a name='L922'></a><a href='#L922'>922</a>
+<a name='L923'></a><a href='#L923'>923</a>
+<a name='L924'></a><a href='#L924'>924</a>
+<a name='L925'></a><a href='#L925'>925</a>
+<a name='L926'></a><a href='#L926'>926</a>
+<a name='L927'></a><a href='#L927'>927</a>
+<a name='L928'></a><a href='#L928'>928</a>
+<a name='L929'></a><a href='#L929'>929</a>
+<a name='L930'></a><a href='#L930'>930</a>
+<a name='L931'></a><a href='#L931'>931</a>
+<a name='L932'></a><a href='#L932'>932</a>
+<a name='L933'></a><a href='#L933'>933</a>
+<a name='L934'></a><a href='#L934'>934</a>
+<a name='L935'></a><a href='#L935'>935</a>
+<a name='L936'></a><a href='#L936'>936</a>
+<a name='L937'></a><a href='#L937'>937</a>
+<a name='L938'></a><a href='#L938'>938</a>
+<a name='L939'></a><a href='#L939'>939</a>
+<a name='L940'></a><a href='#L940'>940</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1053,12 +1073,32 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1979,6 +2019,26 @@ export function serializeMetadataValue(value) {
 	);
 }
 &nbsp;
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('serializeMetadataValue', () =&gt; {
+		expect(serializeMetadataValue('hello')).toBe('"hello"');
+		expect(serializeMetadataValue(42)).toBe('42');
+		expect(serializeMetadataValue(true)).toBe('true');
+		expect(serializeMetadataValue(null)).toBe('null');
+&nbsp;
+		const date = new Date('2023-01-01T12:30:45');
+		expect(serializeMetadataValue(date)).toBe('"2023-01-01T12:30:45"');
+&nbsp;
+		// Invalid date should be serialized as is
+		const invalidDate = new Date('invalid');
+		expect(serializeMetadataValue(invalidDate)).toBe('null'); // Invalid date becomes null when JSON stringified
+&nbsp;
+		expect(serializeMetadataValue(['a', 'b'])).toBe('["a","b"]');
+		expect(serializeMetadataValue({ key: 'value' })).toBe('{"key":"value"}');
+	});
+}
+&nbsp;
 /**
  * Serialize a record of metadata values for storing in the database.
  * @param {DB.MetadataValues} values
@@ -2827,7 +2887,7 @@ export <span class="fstat-no" title="function not covered" >function metadataOpt
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-26T12:18:33.939Z
+                at 2025-09-27T15:14:54.774Z
             </div>
         <script src="../prettify.js"></script>
         <script>
