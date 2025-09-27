@@ -10,7 +10,7 @@ export const References = ID.array().pipe((ids) => [...new Set(ids)]);
  * Allow slightly above 1 to account for floating point imprecision,
  * but clamp it back to [0, 1]
  */
-export const Probability = type('0.0001 <= number <= 1.0001').pipe((n) => clamp(n, 0, 1));
+export const Probability = type('0 <= number <= 1.0001').pipe((n) => clamp(n, 0, 1));
 
 /**
  * Can't use string.url.parse because it prevents us from generating JSON schemas
