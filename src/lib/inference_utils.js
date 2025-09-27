@@ -76,11 +76,6 @@ export async function loadToTensor(
 	buffers,
 	{ width: targetWidth, height: targetHeight, crop, normalized, abortSignal }
 ) {
-	let aborted = false;
-	abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
 	/*
     charge les images et les resize
     -------input------- :
@@ -95,7 +90,7 @@ export async function loadToTensor(
 
 	var float32Data = new Float32Array(targetHeight * targetWidth * 3 * buffers.length);
 	for (let f = 0; f < buffers.length; f++) {
-		if (aborted) throw new Error('Operation aborted');
+		abortSignal?.throwIfAborted();
 
 		let buffer = buffers[f];
 
@@ -106,18 +101,18 @@ export async function loadToTensor(
 		if (crop) {
 			const scaler = coordsScaler({ x: imageTensor.width, y: imageTensor.height });
 			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));
-			if (aborted) throw new Error('Operation aborted');
+			abortSignal?.throwIfAborted();
 			imageTensor.crop({ x, y, w, h });
 		}
 
-		if (aborted) throw new Error('Operation aborted');
+		abortSignal?.throwIfAborted();
 		imageTensor.resize({ w: targetWidth, h: targetHeight });
 
 		var imageBufferData = imageTensor.bitmap.data;
 
 		const [redArray, greenArray, blueArray] = new Array(new Array(), new Array(), new Array());
 		for (let i = 0; i < imageBufferData.length; i += 4) {
-			if (aborted) throw new Error('Operation aborted');
+			abortSignal?.throwIfAborted();
 			redArray.push(imageBufferData[i]);
 			greenArray.push(imageBufferData[i + 1]);
 			blueArray.push(imageBufferData[i + 2]);
@@ -129,13 +124,13 @@ export async function loadToTensor(
 
 		if (normalized) {
 			for (i = 0; i < l; i++) {
-				if (aborted) throw new Error('Operation aborted');
+				abortSignal?.throwIfAborted();
 				float32Data[f * l + i] = transposedData[i] / 255.0; // convert to float
 			}
 		}
 	}
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	var tensor = new ort.Tensor('float32', float32Data, [
 		buffers.length,
 		3,
@@ -156,19 +151,14 @@ export async function loadToTensor(
  * @returns {Promise<ort.Tensor>}
  */
 async function normalizeTensor(tensor, mean, std, denormalize = false, abortSignal) {
-	let aborted = false;
-	abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	const data = await tensor.getData();
 	const dims = tensor.dims;
 
 	for (let x = 0; x < dims[2]; x++) {
 		for (let y = 0; y < dims[3]; y++) {
 			for (let c = 0; c < dims[1]; c++) {
-				if (aborted) throw new Error('Operation aborted');
+				abortSignal?.throwIfAborted();
 				let i = c * dims[2] * dims[3] + x * dims[3] + y;
 				// @ts-ignore
 				data[i] = (data[i] - mean[c]) / std[c];
@@ -180,7 +170,7 @@ async function normalizeTensor(tensor, mean, std, denormalize = false, abortSign
 		}
 	}
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	const newTensor = new ort.Tensor(tensor.type, data, dims);
 	tensor.dispose();
 
@@ -213,11 +203,6 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
             forme : [each img [each box score]]
     */
 
-	let aborted = false;
-	abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
 	/** @type {import('./inference.js').BB[][]}  */
 	let bestBoxes = [];
 	/** @type {number[][]}  */
@@ -238,7 +223,7 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
 		);
 
 		for (let i = 0; i < suboutput.length; i += suboutputSize) {
-			if (aborted) throw new Error('Operation aborted');
+			abortSignal?.throwIfAborted();
 			/**
 			 * Get a data point ("atom") for this bounding box for this model.
 			 * If the protocol's inference detection output shape does not include the atom, return undefined.
@@ -320,13 +305,8 @@ export function output2BB(outputShape, output, numImages, minConfidence, abortSi
  * @returns {Promise<ort.Tensor>}
  */
 async function resizeTensor(tensor, targetWidth, targetHeight, abortSignal) {
-	let aborted = false;
-	abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
 	// resize using nearest neighbor interpolation
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	const data = await tensor.getData();
 	const dims = tensor.dims;
 
@@ -339,7 +319,7 @@ async function resizeTensor(tensor, targetWidth, targetHeight, abortSignal) {
 	for (let x = 0; x < targetWidth; x++) {
 		for (let y = 0; y < targetHeight; y++) {
 			for (let c = 0; c < 3; c++) {
-				if (aborted) throw new Error('Operation aborted');
+				abortSignal?.throwIfAborted();
 
 				const i = c * targetHeight * targetWidth + y * targetWidth + x;
 
@@ -353,7 +333,7 @@ async function resizeTensor(tensor, targetWidth, targetHeight, abortSignal) {
 		}
 	}
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	const resizedTensor = new ort.Tensor(tensor.type, resizedData, resizedDims);
 	return resizedTensor;
 }

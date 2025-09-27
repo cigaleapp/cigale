@@ -135,16 +135,11 @@ export async function storeMetadataValue({
 	cascadedFrom = [],
 	abortSignal
 }) {
-	let aborted = false;
-	abortSignal?.addEventListener('abort', () => {
-		aborted = true;
-	});
-
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	const newValue = {
 		value: serializeMetadataValue(value),
 		confidence,
@@ -169,14 +164,14 @@ export async function storeMetadataValue({
 	if (type && metadata.type !== type)
 		throw new Error(`Type de métadonnée incorrect: ${metadata.type} !== ${type}`);
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
 	const imagesFromImageFile = await db
 		.getAll('Image')
 		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 	if (image) {
 		image.metadata[metadataId] = newValue;
 		db.put('Image', image);
@@ -199,7 +194,7 @@ export async function storeMetadataValue({
 		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 	}
 
-	if (aborted) throw new Error('Operation aborted');
+	abortSignal?.throwIfAborted();
 
 	const cascades = await computeCascades({
 		db,
@@ -210,7 +205,7 @@ export async function storeMetadataValue({
 	});
 
 	for (const cascade of cascades) {
-		if (aborted) throw new Error('Operation aborted');
+		abortSignal?.throwIfAborted();
 
 		if (cascadedFrom.includes(cascade.metadataId)) {
 			throw new Error(
