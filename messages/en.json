@@ -188,5 +188,9 @@
 	"metadata_value_yes": "Yes",
 	"metadata_value_no": "No",
 	"metadata_value_boundingbox": "Box from ({x1}, {y1}) to ({x2}, {y2})",
-	"no_images": "No images"
+	"no_images": "No images",
+	"with_detections": "With detections",
+	"without_detections": "Without detections",
+	"cropped_items": "Cropped",
+	"uncropped_items": "Uncropped"
 }

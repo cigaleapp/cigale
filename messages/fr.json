@@ -187,5 +187,9 @@
 	"metadata_value_yes": "Oui",
 	"metadata_value_no": "Non",
 	"metadata_value_boundingbox": "Boîte de ({x1}, {y1}) à ({x2}, {y2})",
-	"no_images": "Aucune image"
+	"no_images": "Aucune image",
+	"with_detections": "Avec détections",
+	"without_detections": "Sans détection",
+	"cropped_items": "Recadrées",
+	"uncropped_items": "Non recadrées"
 }

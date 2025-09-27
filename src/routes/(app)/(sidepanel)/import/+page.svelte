@@ -50,6 +50,7 @@
 >
 	<section class="observations" class:empty>
 		<AreaObservations
+			nature="Image"
 			bind:selection={uiState.selection}
 			images={allImages}
 			errors={uiState.erroredImages}
