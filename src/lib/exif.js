@@ -68,7 +68,8 @@ export async function processExifData(protocolId, imageFileId, imageBytes, file)
 				subjectId,
 				metadataId: ensureNamespacedMetadataId(key, protocolId),
 				value,
-				confidence
+				confidence,
+				protocol
 			});
 		}
 	}
