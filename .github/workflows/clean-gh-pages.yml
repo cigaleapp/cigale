@@ -38,10 +38,12 @@ jobs:
             done
           done
 
-      - name: Commit and push changes
+      - name: Collapse branch history and push
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "github-actions@github.com"
+          git checkout --orphan flattened
           git add -A
-          git commit -m "Cleanup: Remove stale PR directories"
-          git push
+          git commit -m "Clean up gh-pages branch"
+          git branch -M gh-pages
+          git push -f origin gh-pages
