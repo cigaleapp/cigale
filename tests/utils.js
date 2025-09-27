@@ -661,3 +661,12 @@ export async function setHardwareConcurrency(page, value) {
 		});
 	}, value);
 }
+
+/**
+ *
+ * @param {Page} page
+ * @returns
+ */
+export function firstObservationCard(page) {
+	return page.getByTestId('observations-area').getByRole('article').first();
+}

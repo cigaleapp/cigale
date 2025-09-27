@@ -33,7 +33,7 @@ import { getSetting, getSettings, setSetting } from './settings.svelte';
 // UIState class fields and methods are annotated with @type for documentation and IDE support
 class UIState {
 	processing = $state({
-		/** @type {Array<{name: string; id: string}>} */
+		/** @type {Array<{name: string; id: string; addedAt: Date }>} */
 		files: [],
 		/** @type {number} */
 		total: 0,
@@ -142,14 +142,6 @@ class UIState {
 		console.debug('setPreviewURL', { imageFileId, url });
 		if (!imageFileId) return;
 		this.previewURLs.set(imageFileId, url);
-	}
-	/**
-	 * @param {string | undefined | null} imageFileId
-	 * @returns {string | undefined}
-	 */
-	getPreviewURL(imageFileId) {
-		if (!imageFileId) return undefined;
-		return this.previewURLs.get(imageFileId);
 	}
 
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */

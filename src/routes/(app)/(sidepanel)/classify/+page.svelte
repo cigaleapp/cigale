@@ -1,7 +1,7 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
-	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import CardObservation from '$lib/CardObservation.svelte';
 	import { classificationInferenceSettings } from '$lib/classification.svelte.js';
 	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
@@ -29,36 +29,17 @@
 
 	const { data } = $props();
 
-	const errors = $derived.by(() => {
-		/** @type {typeof uiState.erroredImages} */
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const errors = new Map();
-		for (const [imageId, error] of uiState.erroredImages.entries()) {
-			errors.set(imageId, error);
-			for (const obs of tables.Observation.state) {
-				if (obs.images.includes(imageId)) errors.set(obs.id, error);
+	const items = $derived(
+		tables.Observation.state.map((obs) => ({
+			id: obs.id,
+			addedAt: obs.addedAt,
+			name: obs.label,
+			virtual: false,
+			data: {
+				observation: obs,
+				images: tables.Image.state.filter((img) => obs.images.includes(img.id))
 			}
-		}
-		return errors;
-	});
-
-	/** @type {Array<{ index: number, image: string, title: string ,id: string, stacksize: number, loading?: number|undefined, addedAt: Date }>} */
-	const images = $derived(
-		toAreaObservationProps([], tables.Image.state, tables.Observation.state, {
-			showBoundingBoxes: () => false,
-			isQueued: (item) =>
-				typeof item === 'string'
-					? uiState.queuedImages.has(item)
-					: uiState.queuedImages.has(item.id),
-			isLoaded: (item) =>
-				uiState.classificationInferenceAvailable
-					? typeof item === 'string'
-						? false
-						: uiState.hasPreviewURL(item.fileId) &&
-							!uiState.loadingImages.has(item.id) &&
-							!uiState.queuedImages.has(item.id)
-					: true
-		})
+		}))
 	);
 
 	/**
@@ -166,34 +147,42 @@
 		</div>
 	</section>
 {:else if !classifModelLoadingError}
-	<section class="observations" class:empty={!images.length}>
+	<section class="observations" class:empty={!items.length}>
 		<AreaObservations
-			nature="Observation"
-			bind:selection={uiState.selection}
-			{images}
-			{errors}
+			{items}
 			sort={getSettings().gallerySort}
-			loadingText={m.analyzing()}
 			groups={[m.cropped_items(), m.uncropped_items()]}
-			groupings={(item) => (item.boundingBoxes?.length ? m.cropped_items() : m.uncropped_items())}
-			onretry={(id) => {
-				uiState.erroredImages.delete(id);
-				const imageIds = tables.Observation.getFromState(id)?.images;
-				if (imageIds) {
-					imageIds.forEach((id) => uiState.erroredImages.delete(id));
-					classifyMore(imageIds);
-				} else {
-					toasts.error('Observation is empty (should not happen)');
-				}
-			}}
-			ondelete={async (id) => {
-				const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
-				imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
-				if (isValidImageId(id)) await deleteImageFile(imageIdToFileId(id));
-				await deleteObservation(id, { notFoundOk: true, recursive: true });
-			}}
-		/>
-		{#if !images.length}
+			grouping={({ data: { images } }) =>
+				images.some((img) => uiState.cropMetadataValueOf(img))
+					? m.cropped_items()
+					: m.uncropped_items()}
+		>
+			{#snippet item({ observation, images }, { id })}
+				<CardObservation
+					{observation}
+					{images}
+					boxes="apply-first"
+					loadingStatusText={m.analyzing()}
+					onretry={() => {
+						uiState.erroredImages.delete(id);
+						const imageIds = tables.Observation.getFromState(id)?.images;
+						if (imageIds) {
+							imageIds.forEach((id) => uiState.erroredImages.delete(id));
+							classifyMore(imageIds);
+						} else {
+							toasts.error('Observation is empty (should not happen)');
+						}
+					}}
+					ondelete={async () => {
+						const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
+						imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
+						if (isValidImageId(id)) await deleteImageFile(imageIdToFileId(id));
+						await deleteObservation(id, { notFoundOk: true, recursive: true });
+					}}
+				/>
+			{/snippet}
+		</AreaObservations>
+		{#if !items.length}
 			<div class="empty">
 				<Logo variant="empty" --size="6em" />
 				<p>{m.no_images()}</p>

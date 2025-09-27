@@ -12,57 +12,47 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 -->
 
-<script generics="GroupName extends string">
-	import { uiState } from '$lib/state.svelte';
+<script module>
+	/**
+	 * @template AdditionalData
+	 * @typedef {object} MediaItem
+	 * @property {string} id
+	 * @property {string} name
+	 * @property {Date} addedAt
+	 * @property {boolean} virtual whether this item is virtual (not yet stored in the database)
+	 * @property {AdditionalData} data any additional data that might be useful for grouping/sorting
+	 */
+</script>
+
+<script generics="GroupName extends string, ItemData">
+	import { uiState } from '$lib/state.svelte.js';
 	import * as dates from 'date-fns';
 	import { onMount } from 'svelte';
-	import CardObservation from './CardObservation.svelte';
-	import { DragSelect } from './dragselect.svelte';
-	import { defineKeyboardShortcuts } from './keyboard.svelte';
+	import { DragSelect } from './dragselect.svelte.js';
+	import { countThing } from './i18n.js';
+	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
 	import { mutationobserver } from './mutations';
-	import { m } from './paraglide/messages';
-	import { getSettings, isDebugMode } from './settings.svelte';
-	import { compareBy, entries } from './utils';
-	import { countThing } from './i18n';
+	import { isDebugMode } from './settings.svelte.js';
+	import { compareBy, groupBy } from './utils.js';
 
 	/**
-	 * @import { CardObservation as Item } from './AreaObservations.utils'
+	 * @typedef {MediaItem<ItemData>} Item
 	 */
 
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {Item[]} images
-	 * @property {'Photo'|'Observation'} nature what kind of items are in `images`
-	 * @property {Map<string, string>} [errors] maps image ids to error messages
-	 * @property {string[]} [selection=[]]
-	 * @property {string} [highlight] id of image to highlight and scroll to
-	 * @property {string} [loadingText]
-	 * @property {GroupName[]} [groups] list of possible group names, if `groupings` is used. Array order is used to order groups in the UI.
-	 * @property {(item: Item) => GroupName} [groupings] function that computes a grouping for each item, to group them up. Return a tuple of [group index, friendly group name]
-	 * @property {(id: string) => void} [ondelete] callback the user wants to delete a card
-	 * @property {(id: string) => void} [onretry] callback the user wants to retry an errored card
-	 * @property {(id: string) => void} [oncardclick] callback when the user clicks on the image. Disables drag selection handling if set.
+	 * @property {Item[]} items
+	 * @property {import('svelte').Snippet<[ItemData, Item, number]>} item
+	 * @property {GroupName[]} [groups]
+	 * @property {(item: Item) => GroupName | ""} [grouping]
+	 * @property {string} [highlight] id of the item to highlight (and scroll to)
 	 * @property {(e: MouseEvent|TouchEvent|null) => void} [onemptyclick] callback when the user clicks on the empty area
 	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
 	 */
 
 	/** @type {Props } */
-	let {
-		nature,
-		images = $bindable(),
-		ondelete,
-		onretry,
-		oncardclick,
-		onemptyclick,
-		errors,
-		highlight,
-		loadingText,
-		sort,
-		selection = $bindable([]),
-		groupings,
-		groups
-	} = $props();
+	let { items, item, groups, grouping, onemptyclick, sort, highlight } = $props();
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -73,10 +63,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		if (!imagesContainer) return;
 
 		dragselect?.destroy();
-		dragselect = new DragSelect(imagesContainer, selection, {
+		dragselect = new DragSelect(imagesContainer, uiState.selection, {
 			ondeadclick: onemptyclick
 		});
-		dragselect.setSelection(selection);
+		dragselect.setSelection(uiState.selection);
 		uiState.setSelection = (newSelection) => {
 			if (!dragselect) {
 				console.error('dragselect not initialized');
@@ -92,7 +82,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	});
 
 	$effect(() => {
-		selection = [...new Set(dragselect?.selection ?? [])];
+		uiState.selection = [...new Set(dragselect?.selection ?? [])];
 	});
 
 	defineKeyboardShortcuts('observations', {
@@ -101,7 +91,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			help: 'Tout sélectionner',
 			when: ({ target }) => !(target instanceof HTMLInputElement),
 			do: () => {
-				dragselect?.setSelection(images.map((img) => img.id));
+				dragselect?.setSelection(items.map((img) => img.id));
 			}
 		},
 		// And Ctrl-D to deselect all
@@ -109,17 +99,17 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			help: 'Tout désélectionner',
 			when: ({ target }) => !(target instanceof HTMLInputElement),
 			do: () => {
-				selection = [];
+				uiState.selection = [];
 				dragselect?.setSelection([]);
 			}
 		}
 	});
 
 	/**
-	 * Virtualizes the key for the {#each} block, if needed. See doc for the `virtual` property on `images` prop's type
+	 * Virtualizes the key for the {#each} block, if needed. See doc for the `virtual` property on `items` prop's type
 	 * @param {object} param0
 	 * @param {string} param0.id
-	 * @param {boolean} [param0.virtual=false] whether the image is virtual (not yet stored in the database)
+	 * @param {boolean} [param0.virtual=false]
 	 */
 	function virtualizeKey({ id, virtual = false }) {
 		if (!virtual) return id;
@@ -141,8 +131,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @type {Array<readonly [GroupName | "", Item[]]>}
 	 */
 	const groupedAndSortedImages = $derived.by(() => {
-		if (!groupings) return [['', sortImages(images, sort)]];
-		return entries(Object.groupBy(images, groupings))
+		if (!groups || !grouping) return [['', sortImages(items, sort)]];
+		return [...groupBy(items, grouping).entries()]
 			.filter(([, items]) => items && items.length > 0)
 			.map(([key, items]) => /** @type {const} */ ([key, sortImages(items ?? [], sort)]))
 			.toSorted(compareBy(([name]) => groups?.indexOf(name) ?? 0));
@@ -150,7 +140,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	/**
 	 *
-	 * @param {typeof images} images
+	 * @param {Item[]} images
 	 * @param {typeof sort} sort
 	 */
 	function sortImages(images, sort) {
@@ -163,7 +153,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				case 'id':
 					return a.id.localeCompare(b.id);
 				case 'filename':
-					return a.title.localeCompare(b.title);
+					return a.name.localeCompare(b.name);
 				case 'date':
 					return dates.compareAsc(a.addedAt, b.addedAt);
 			}
@@ -179,10 +169,9 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		childList: true,
 		subtree: true,
 		onchildList() {
-			if (oncardclick) return;
 			if (!imagesContainer) return;
 			dragselect?.refreshSelectables();
-			dragselect?.setSelection(selection);
+			dragselect?.setSelection(uiState.selection);
 		}
 	}}
 >
@@ -191,35 +180,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			{#if groupName}
 				<header>
 					<h2>{groupName}</h2>
-					<p>{countThing(nature === 'Photo' ? 'photo' : 'observation', sortedImages.length)}</p>
+					<p>{countThing('élément', sortedImages.length)}</p>
 				</header>
 			{/if}
 			<div class="items">
 				{#each sortedImages as props, i (virtualizeKey(props))}
-					<CardObservation
-						--card-size-factor={getSettings().gridSize}
-						data-testid={i === 0 ? 'first-observation-card' : undefined}
-						data-id={props.id}
-						data-loading={props.loading}
-						data-index={props.index}
-						{...props}
-						onclick={oncardclick ? () => oncardclick(props.id) : undefined}
-						ondelete={ondelete ? () => ondelete(props.id) : undefined}
-						onretry={onretry ? () => onretry(props.id) : undefined}
-						errored={errors?.has(props.id)}
-						statusText={errors?.get(props.id) ??
-							(props.loading === -Infinity ? m.queued() : loadingText)}
-						highlighted={props.id === highlight}
-						selected={selection.includes(props.id.toString())}
-						boundingBoxes={props.boundingBoxes}
-						applyBoundingBoxes={props.applyBoundingBoxes}
-					/>
+					{@render item(props.data, props, i)}
 				{/each}
 			</div>
 		</section>
 	{/each}
 
-	{#if isDebugMode() && images.length > 0}
+	{#if isDebugMode() && items.length > 0}
 		<div class="debug">
 			{#snippet displayIter(set)}
 				{'{'}
@@ -264,5 +236,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		width: 100%;
 		flex-grow: 1;
 		margin-top: 2rem;
+	}
+
+	.group header {
+		margin-bottom: 1em;
+		user-select: none;
 	}
 </style>

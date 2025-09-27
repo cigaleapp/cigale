@@ -6,7 +6,8 @@ import {
 	loadDatabaseDump,
 	sidepanelMetadataSectionFor,
 	metadataValueInDatabase,
-	setSettings
+	setSettings,
+	firstObservationCard
 } from './utils';
 
 /**
@@ -45,7 +46,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 
 	await page.getByTestId('goto-import').click();
 	await page.waitForURL((u) => u.hash === '#/import');
-	await page.getByTestId('first-observation-card').click();
+	await firstObservationCard(page).click();
 	await expect(page.getByTestId('sidepanel')).toBeVisible();
 
 	// Set to True on image itself
@@ -65,7 +66,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	// Set to False on observation
 	await page.getByTestId('goto-classify').click();
 	await page.waitForURL((u) => u.hash === '#/classify');
-	await page.getByTestId('first-observation-card').click();
+	await firstObservationCard(page).click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
@@ -77,7 +78,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	// Expect image to be still True
 	await page.getByTestId('goto-import').click();
 	await page.waitForURL((u) => u.hash === '#/import');
-	await page.getByTestId('first-observation-card').click();
+	await firstObservationCard(page).click();
 	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "" [checked]:
