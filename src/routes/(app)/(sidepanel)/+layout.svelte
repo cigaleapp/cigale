@@ -171,7 +171,8 @@
 	const selectedHrefsWithCropboxes = $derived(
 		selectedImages
 			.map((image) => {
-				const src = uiState.getPreviewURL(image.fileId);
+				if (!image.fileId) return undefined;
+				const src = uiState.previewURLs.get(image.fileId);
 				if (!src) return undefined;
 				const box = uiState.cropMetadataValueOf(image)?.value;
 				return {

@@ -4,14 +4,13 @@ import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
 import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
+import { imageLimits } from './inference_utils';
 import { m } from './paraglide/messages';
 import { clamp, unique } from './utils';
-import { imageLimits } from './inference_utils';
 
 /**
  * @import { Image, Protocol } from './database.js';
  * @import { IDBTransactionWithAtLeast } from './idb.svelte';
- * @import * as DB from './database';
  */
 
 /**
@@ -324,53 +323,6 @@ if (import.meta.vitest) {
 
 		_tablesState.Image = images;
 		expect(imagesOfImageFile('1')).toEqual([img1, img2]);
-	});
-}
-
-/**
- *
- * @param {string[]} imageFileIds
- * @returns {Map<string, Image[]>}
- */
-export function imagesByImageFile(imageFileIds) {
-	const images = new Map();
-	for (const imageFileId of imageFileIds) {
-		images.set(imageFileId, imagesOfImageFile(imageFileId));
-	}
-	return images;
-}
-
-if (import.meta.vitest) {
-	const { _tablesState } = await import('./idb.svelte');
-	const { test, expect } = import.meta.vitest;
-
-	/**
-	 * @param {string} id
-	 * @param {string} fileId
-	 * @returns {Image}
-	 */
-	const img = (id, fileId) => ({
-		id,
-		fileId,
-		addedAt: new Date(),
-		dimensions: { width: 100, height: 100, aspectRatio: 1 },
-		filename: 'gurt: syubau.jpeg',
-		boundingBoxesAnalyzed: false,
-		contentType: 'image/jpeg',
-		metadata: {}
-	});
-
-	test('imagesByImageFile', () => {
-		_tablesState.Image = [img('1', '1'), img('2', '1'), img('3', '2')];
-
-		const [img1, img2, img3] = _tablesState.Image;
-
-		expect(imagesByImageFile(['1', '2'])).toEqual(
-			new Map([
-				['1', [img1, img2]],
-				['2', [img3]]
-			])
-		);
 	});
 }
 

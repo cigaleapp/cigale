@@ -1,39 +1,38 @@
 <script>
-	import { goto } from '$lib/paths.js';
 	import AreaObservations from '$lib/AreaObservations.svelte';
-	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import CardImageFile from '$lib/CardImageFile.svelte';
 	import * as idb from '$lib/idb.svelte.js';
-	import { deleteImageFile, imageFileIds, imageIsAnalyzed } from '$lib/images';
+	import { deleteImageFile, imageIsAnalyzed } from '$lib/images';
+	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations.js';
 	import { m } from '$lib/paraglide/messages.js';
+	import { goto } from '$lib/paths.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { nonnull } from '$lib/utils.js';
+	import { avg, groupBy, nonnull } from '$lib/utils.js';
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
-	import Logo from '$lib/Logo.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 
 	seo({ title: 'Recadrer' });
+
+	const items = $derived(
+		[...groupBy(idb.tables.Image.state, (img) => img.fileId ?? '').entries()].map(
+			([fileId, images]) => ({
+				id: fileId,
+				addedAt: new Date(avg(images.map((i) => i.addedAt.getTime()))),
+				name: images[0].filename,
+				virtual: false,
+				data: images
+			})
+		)
+	);
 
 	$effect(() => {
 		uiState.imageOpenedInCropper = '';
 	});
-
-	const images = $derived(
-		toAreaObservationProps(imageFileIds(idb.tables.Image.state), [], [], {
-			isLoaded: (fileId) =>
-				!uiState.cropInferenceAvailable ||
-				Boolean(
-					typeof fileId === 'string' &&
-						uiState.hasPreviewURL(fileId) &&
-						imageIsAnalyzed(uiState.currentProtocol, fileId)
-				),
-			isQueued: (fileId) => typeof fileId === 'string' && uiState.queuedImages.has(fileId)
-		})
-	);
 
 	onMount(() => {
 		detectMore(
@@ -54,30 +53,36 @@
 
 <section class="observations">
 	<AreaObservations
-		nature="Photo"
-		{images}
-		bind:selection={uiState.selection}
+		{items}
 		sort={getSettings().gallerySort}
-		loadingText={m.analyzing()}
-		errors={uiState.erroredImages}
 		groups={[m.with_detections(), m.without_detections()]}
-		groupings={(item) =>
-			item.boundingBoxes?.length ? m.with_detections() : m.without_detections()}
-		onretry={(id) => {
-			uiState.erroredImages.delete(id);
-			detectMore([id]);
-		}}
-		ondelete={async (id) => {
-			cancelTask(id, 'Cancelled by user');
-			uiState.processing.removeFile(id);
-			await deleteObservation(id);
-			await deleteImageFile(id);
-		}}
-		oncardclick={(id) => {
-			goto('/(app)/(sidepanel)/crop/[image]', { image: id });
-		}}
-	/>
-	{#if !images.length}
+		grouping={({ data: images }) =>
+			images.some((img) => uiState.cropMetadataValueOf(img))
+				? m.with_detections()
+				: m.without_detections()}
+	>
+		{#snippet item(images, { id: fileId })}
+			<CardImageFile
+				{fileId}
+				{images}
+				boxes="show-all"
+				highlighted={fileId === uiState.imagePreviouslyOpenedInCropper}
+				loadingStatusText={m.analyzing()}
+				onretry={() => {
+					uiState.erroredImages.delete(fileId);
+					detectMore([fileId]);
+				}}
+				ondelete={async () => {
+					cancelTask(fileId, 'Cancelled by user');
+					uiState.processing.removeFile(fileId);
+					await deleteObservation(fileId);
+					await deleteImageFile(fileId);
+				}}
+				onclick={async () => goto('/(app)/(sidepanel)/crop/[image]', { image: fileId })}
+			/>
+		{/snippet}
+	</AreaObservations>
+	{#if !items.length}
 		<div class="empty">
 			<Logo variant="empty" --size="6em" />
 			<p>{m.no_images()}</p>

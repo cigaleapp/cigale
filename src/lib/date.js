@@ -1,4 +1,4 @@
-import { parse, isValid } from 'date-fns';
+import { isValid, parse } from 'date-fns';
 
 /**
  * Returns a parsed date or undefined if a parse error occurs or the date is invalid
