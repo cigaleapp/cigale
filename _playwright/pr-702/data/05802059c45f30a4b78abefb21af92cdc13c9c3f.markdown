@@ -1,0 +1,343 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - heading [level=2]: Observations
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: A
+        - definition: Tout sélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: D
+        - definition: Tout désélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: U
+        - definition: Supprimer toutes les images et observations
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: G
+        - definition: Fusionner des observations ou images
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: G
+        - definition: Séparer toutes les observations sélectionnées en images seules
+        - term:
+          - generic:
+            - generic:
+              - generic: Suppr
+        - definition: Supprimer les images et observations sélectionnées
+      - heading [level=2]: Général
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: I
+              - generic: D
+              - generic: E
+              - generic: V
+        - definition: Activer/Désactiver le debug mode
+      - heading [level=2]: Navigation
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: P
+        - definition: Choisir le protocole
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: I
+        - definition: Importer des images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: R
+        - definition: Recadrer les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: "N"
+        - definition: Classifier les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: X
+        - definition: Exporter les résultats
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: M
+        - definition: Gérer les protocoles
+  - dialog:
+    - banner:
+      - heading [level=1]: Préparation hors-ligne
+      - button:
+        - img
+    - main: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+    - contentinfo:
+      - generic:
+        - button: Démarrer
+  - generic [ref=e3]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Exporter les résultats
+        - button:
+          - img
+      - main:
+        - generic:
+          - radiogroup:
+            - generic:
+              - radio
+              - text: Métadonnées seulement
+            - generic:
+              - radio [checked]
+              - text: Métadonnées et images recadrées
+            - generic:
+              - radio
+              - text: Métadonnées, images recadrées et images originales
+              - paragraph: Permet de ré-importer les résultats ultérieurement
+        - generic:
+          - generic: Marge autour des images recadrées
+          - radiogroup:
+            - radio [checked]: Aucune
+            - radio: 5%
+            - radio: 10%
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: "%"
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: px
+          - paragraph: Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
+      - contentinfo:
+        - generic:
+          - paragraph:
+            - code: 40%
+        - button:
+          - img
+          - text: results.zip
+  - banner [ref=e4]:
+    - navigation [ref=e5]:
+      - link "C.i.g.a.l.e." [ref=e7]:
+        - /url: "#/"
+        - img [ref=e9]
+        - text: C.i.g.a.l.e.
+      - generic [ref=e18]:
+        - link "Protocole" [ref=e19]:
+          - /url: "#/"
+        - img [ref=e20]
+        - link "Importer" [ref=e22]:
+          - /url: "#/import"
+          - text: Importer
+        - img [ref=e24]
+        - generic [ref=e26]:
+          - link "Recadrer" [ref=e27]:
+            - /url: "#/crop"
+          - button [ref=e29] [cursor=pointer]:
+            - img [ref=e30] [cursor=pointer]
+        - img [ref=e32]
+        - generic [ref=e34]:
+          - link "Classifier" [ref=e35]:
+            - /url: "#/classify"
+          - button [ref=e37] [cursor=pointer]:
+            - img [ref=e38] [cursor=pointer]
+        - img [ref=e40]
+        - button "Résultats" [ref=e42] [cursor=pointer]:
+          - img [ref=e43] [cursor=pointer]
+          - text: Résultats
+      - generic [ref=e46]:
+        - button "Réglages" [ref=e47] [cursor=pointer]:
+          - img [ref=e48] [cursor=pointer]
+        - dialog:
+          - generic: Réglages
+          - generic:
+            - generic: Thème
+            - generic:
+              - switch [checked]:
+                - generic:
+                  - img
+              - button "Synchroniser avec le thème du système" [disabled]:
+                - img
+            - generic: Mode debug
+            - generic:
+              - switch:
+                - generic:
+                  - img
+            - generic: Trier les images par
+            - generic:
+              - radiogroup:
+                - radio "Fichier"
+                - radio "Date" [checked]
+              - button "Trier par ordre décroissant":
+                - img
+            - generic: Taille des images
+            - generic:
+              - slider: "1"
+            - generic: Langue
+            - generic:
+              - radiogroup:
+                - radio "English"
+                - radio "Français" [checked]
+                - radio "日本語"
+          - generic:
+            - button "Gérer les protocoles"
+            - button "Raccourcis clavier"
+            - button "Préparation hors-ligne"
+          - generic:
+            - text: CIGALE ver.
+            - link "16c16c4":
+              - /url: https://github.com/cigaleapp/cigale/tree/16c16c471e9f33dde427cc3a2277f08aefd09506
+            - text: ·
+            - link "À propos":
+              - /url: "#/about"
+  - generic [ref=e51]:
+    - article [ref=e52]:
+      - img [ref=e54]
+      - paragraph [ref=e56]: "Impossible d'extraire les métadonnées EXIF de leaf.jpeg: Error: Date value must be a number"
+      - button [ref=e58] [cursor=pointer]:
+        - img [ref=e59] [cursor=pointer]
+    - article:
+      - img [ref=e62]
+      - paragraph [ref=e64]: "Impossible d'extraire les métadonnées EXIF de leaf.jpeg: Error: Date value must be a number"
+      - button [ref=e66] [cursor=pointer]:
+        - img [ref=e67] [cursor=pointer]
+    - article:
+      - img [ref=e70]
+      - paragraph [ref=e72]: "Impossible d'extraire les métadonnées EXIF de leaf.jpeg: Error: Date value must be a number"
+      - button [ref=e74] [cursor=pointer]:
+        - img [ref=e75] [cursor=pointer]
+    - article:
+      - img [ref=e78]
+      - paragraph [ref=e80]: "Impossible d'extraire les métadonnées EXIF de cyan.jpeg: Error: Date value must be a number"
+      - button [ref=e82] [cursor=pointer]:
+        - img [ref=e83] [cursor=pointer]
+  - generic [ref=e86]:
+    - main [ref=e87]:
+      - form [ref=e88]:
+        - generic [ref=e92]:
+          - article [ref=e95] [cursor=pointer]:
+            - generic [ref=e96] [cursor=pointer]:
+              - img "leaf.jpeg" [ref=e98] [cursor=pointer]
+              - generic [ref=e99] [cursor=pointer]:
+                - img [ref=e100] [cursor=pointer]
+                - heading "leaf.jpeg" [level=2] [ref=e102] [cursor=pointer]
+          - article [ref=e105] [cursor=pointer]:
+            - generic [ref=e106] [cursor=pointer]:
+              - img "leaf.jpeg" [ref=e108] [cursor=pointer]
+              - generic [ref=e109] [cursor=pointer]:
+                - img [ref=e110] [cursor=pointer]
+                - heading "leaf.jpeg" [level=2] [ref=e112] [cursor=pointer]
+          - article [ref=e115] [cursor=pointer]:
+            - generic [ref=e116] [cursor=pointer]:
+              - img "leaf.jpeg" [ref=e118] [cursor=pointer]
+              - generic [ref=e119] [cursor=pointer]:
+                - img [ref=e120] [cursor=pointer]
+                - heading "leaf.jpeg" [level=2] [ref=e122] [cursor=pointer]
+          - article [ref=e125] [cursor=pointer]:
+            - generic [ref=e126] [cursor=pointer]:
+              - img "cyan.jpeg" [ref=e128] [cursor=pointer]
+              - generic [ref=e129] [cursor=pointer]:
+                - img [ref=e130] [cursor=pointer]
+                - heading "cyan.jpeg" [level=2] [ref=e132] [cursor=pointer]
+          - article [ref=e135] [cursor=pointer]:
+            - generic [ref=e136] [cursor=pointer]:
+              - generic [ref=e137] [cursor=pointer]:
+                - img [ref=e139] [cursor=pointer]
+                - generic [ref=e141] [cursor=pointer]: "() => { if ($$props.status === \"loading\") return loading_text(); if ($$props.status === \"queued\") return /* @__PURE__ */ queued(); if ($$props.status === \"errored\") return /* @__PURE__ */ error_text(); return \"\"; }"
+              - img [ref=e144] [cursor=pointer]
+              - generic [ref=e146] [cursor=pointer]:
+                - img [ref=e147] [cursor=pointer]
+                - heading "large-image.jpeg" [level=2] [ref=e149] [cursor=pointer]
+          - article [ref=e152] [cursor=pointer]:
+            - generic [ref=e153] [cursor=pointer]:
+              - generic [ref=e154] [cursor=pointer]:
+                - img [ref=e156] [cursor=pointer]
+                - generic [ref=e158] [cursor=pointer]: "() => { if ($$props.status === \"loading\") return loading_text(); if ($$props.status === \"queued\") return /* @__PURE__ */ queued(); if ($$props.status === \"errored\") return /* @__PURE__ */ error_text(); return \"\"; }"
+              - img [ref=e161] [cursor=pointer]
+              - generic [ref=e163] [cursor=pointer]:
+                - img [ref=e164] [cursor=pointer]
+                - heading "cyan.jpeg" [level=2] [ref=e166] [cursor=pointer]
+          - article [ref=e169] [cursor=pointer]:
+            - generic [ref=e170] [cursor=pointer]:
+              - generic [ref=e171] [cursor=pointer]:
+                - img [ref=e173] [cursor=pointer]
+                - generic [ref=e175] [cursor=pointer]: "() => { if ($$props.status === \"loading\") return loading_text(); if ($$props.status === \"queued\") return /* @__PURE__ */ queued(); if ($$props.status === \"errored\") return /* @__PURE__ */ error_text(); return \"\"; }"
+              - img [ref=e178] [cursor=pointer]
+              - generic [ref=e180] [cursor=pointer]:
+                - img [ref=e181] [cursor=pointer]
+                - heading "leaf.jpeg" [level=2] [ref=e183] [cursor=pointer]
+          - article [ref=e186] [cursor=pointer]:
+            - generic [ref=e187] [cursor=pointer]:
+              - generic [ref=e188] [cursor=pointer]:
+                - img [ref=e190] [cursor=pointer]
+                - generic [ref=e192] [cursor=pointer]: "() => { if ($$props.status === \"loading\") return loading_text(); if ($$props.status === \"queued\") return /* @__PURE__ */ queued(); if ($$props.status === \"errored\") return /* @__PURE__ */ error_text(); return \"\"; }"
+              - img [ref=e195] [cursor=pointer]
+              - generic [ref=e197] [cursor=pointer]:
+                - img [ref=e198] [cursor=pointer]
+                - heading "leaf.jpeg" [level=2] [ref=e200] [cursor=pointer]
+          - article [ref=e203] [cursor=pointer]:
+            - generic [ref=e204] [cursor=pointer]:
+              - generic [ref=e205] [cursor=pointer]:
+                - img [ref=e207] [cursor=pointer]
+                - generic [ref=e209] [cursor=pointer]: "() => { if ($$props.status === \"loading\") return loading_text(); if ($$props.status === \"queued\") return /* @__PURE__ */ queued(); if ($$props.status === \"errored\") return /* @__PURE__ */ error_text(); return \"\"; }"
+              - img [ref=e212] [cursor=pointer]
+              - generic [ref=e214] [cursor=pointer]:
+                - img [ref=e215] [cursor=pointer]
+                - heading "leaf.jpeg" [level=2] [ref=e217] [cursor=pointer]
+          - article [ref=e220] [cursor=pointer]:
+            - generic [ref=e221] [cursor=pointer]:
+              - generic [ref=e222] [cursor=pointer]:
+                - img [ref=e224] [cursor=pointer]
+                - generic [ref=e226] [cursor=pointer]: "() => { if ($$props.status === \"loading\") return loading_text(); if ($$props.status === \"queued\") return /* @__PURE__ */ queued(); if ($$props.status === \"errored\") return /* @__PURE__ */ error_text(); return \"\"; }"
+              - img [ref=e229] [cursor=pointer]
+              - generic [ref=e231] [cursor=pointer]:
+                - img [ref=e232] [cursor=pointer]
+                - heading "lil-fella.jpeg" [level=2] [ref=e234] [cursor=pointer]
+    - complementary [ref=e235]:
+      - generic [ref=e236]:
+        - img [ref=e237]
+        - paragraph [ref=e246]: Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées
+      - generic [ref=e247]:
+        - button "Importer d'autres images" [ref=e248] [cursor=pointer]:
+          - img [ref=e249] [cursor=pointer]
+          - text: Importer d'autres images
+        - button "Supprimer 0 images Suppr" [disabled] [ref=e252]:
+          - img [ref=e253]
+          - text: Supprimer 0 images
+          - generic [ref=e256]: Suppr
+  - generic [ref=e257]: Importer · Cigale
+```
