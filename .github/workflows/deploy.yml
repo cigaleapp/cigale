@@ -36,6 +36,7 @@ jobs:
         with:
           folder: public # The folder the action should deploy.
           force: false
+          single-commit: true
           clean-exclude: |
             .nojekyll
             _pullrequests
