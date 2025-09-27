@@ -911,11 +911,13 @@
 						class:unfocused={focusedImageId && focusedImageId !== image.id}
 						class:selected={selectedBox.imageId === image.id}
 					>
-						<CroppedImg
-							box={toTopLeftCoords(box)}
-							src={uiState.getPreviewURL(image.fileId)}
-							class="thumb"
-						/>
+						{#if image.fileId}
+							<CroppedImg
+								box={toTopLeftCoords(box)}
+								src={uiState.previewURLs.get(image.fileId)}
+								class="thumb"
+							/>
+						{/if}
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
 							<p class="dimensions">

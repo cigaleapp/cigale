@@ -10,6 +10,7 @@ import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {
 	chooseDefaultProtocol,
+	firstObservationCard,
 	goToTab,
 	importPhotos,
 	importProtocol,
@@ -97,7 +98,7 @@ for (const offline of [false, true]) {
 			await waitForLoadingEnd(page);
 
 			// Check for classification results in sidepanel
-			await page.getByTestId('first-observation-card').click();
+			await firstObservationCard(page).click();
 			await expect(page.getByText('Espèce')).toBeVisible();
 
 			// Export results
@@ -372,7 +373,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	await setModel('classify', /80 classes/);
 	await expectLoadingText(true, fr.loading_classification_model);
 	await waitForLoadingEnd(page);
-	await expect(page.getByTestId('first-observation-card')).not.toHaveText(/Erreur/);
+	await expect(firstObservationCard(page)).not.toHaveText(/Erreur/);
 
 	await setModel('classify', /17000 classes/);
 	await expectLoadingText(true, fr.loading_classification_model);

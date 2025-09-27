@@ -1,10 +1,11 @@
 <script>
 	import AreaObservations from '$lib/AreaObservations.svelte';
-	import { toAreaObservationProps } from '$lib/AreaObservations.utils';
+	import CardImage from '$lib/CardImage.svelte';
+	import CardMedia from '$lib/CardMedia.svelte';
 	import Dropzone from '$lib/Dropzone.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { tables } from '$lib/idb.svelte';
-	import { deleteImageFile, imageFileIds } from '$lib/images';
+	import { deleteImageFile } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
@@ -13,60 +14,69 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 
-	const fileIds = $derived(imageFileIds(tables.Image.state));
-
-	const images = $derived(
-		toAreaObservationProps(fileIds, [], [], {
-			showBoundingBoxes: () => false,
-			applyBoundingBoxes: () => false,
-			isQueued: (fileId) => typeof fileId === 'string' && uiState.queuedImages.has(fileId),
-			isLoaded: (fileId) => typeof fileId === 'string' && uiState.hasPreviewURL(fileId)
-		})
-	);
-
-	const allImages = $derived(
-		[
-			...images,
-			...uiState.processing.files.map(({ name, id }) => ({
-				id,
-				virtual: true,
-				image: '',
-				title: name,
-				stacksize: 1,
-				loading: uiState.loadingImages.has(id) ? +Infinity : -Infinity,
-				boundingBoxes: [],
-				addedAt: new Date()
-			}))
-		].map((props, i) => ({ ...props, index: i }))
-	);
+	const allImages = $derived([
+		...tables.Image.state.map(({ filename, id, addedAt, fileId }) => ({
+			id: fileId ?? id,
+			addedAt,
+			name: filename,
+			virtual: false,
+			data: tables.Image.getFromState(id)
+		})),
+		...uiState.processing.files.map(({ name, id, addedAt }) => ({
+			id,
+			addedAt,
+			name,
+			virtual: true,
+			data: null
+		}))
+	]);
 
 	const empty = $derived(allImages.length === 0);
 </script>
 
 <Dropzone
 	filetypes={ACCEPTED_IMPORT_TYPES}
-	clickable={images.length === 0}
+	clickable={allImages.length === 0}
 	onfiles={({ files }) => importMore(files)}
 >
 	<section class="observations" class:empty>
 		<AreaObservations
-			nature="Image"
-			bind:selection={uiState.selection}
-			images={allImages}
-			errors={uiState.erroredImages}
+			items={allImages}
 			sort={getSettings().gallerySort}
-			loadingText={m.loading_text()}
 			onemptyclick={async () => {
 				if (uiState.selection.length > 0) return;
 				importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
 			}}
-			ondelete={async (id) => {
-				cancelTask(id, 'Cancelled by user');
-				uiState.processing.removeFile(id);
-				await deleteObservation(id);
-				await deleteImageFile(id);
-			}}
-		/>
+		>
+			{#snippet item(image, { id, name })}
+				{#if image && image.fileId}
+					<CardImage
+						image={{ ...image, fileId: image.fileId }}
+						ondelete={async () => {
+							cancelTask(id, 'Cancelled by user');
+							uiState.processing.removeFile(id);
+							await deleteImageFile(id);
+						}}
+					/>
+				{:else}
+					{@const error = uiState.erroredImages.get(id)}
+					{@const queued = uiState.queuedImages.has(id)}
+					<CardMedia
+						{id}
+						title={name}
+						status={error ? 'errored' : queued ? 'queued' : 'loading'}
+						tooltip={error}
+						image={undefined}
+						ondelete={async () => {
+							cancelTask(id, 'Cancelled by user');
+							uiState.processing.removeFile(id);
+							await deleteObservation(id);
+							await deleteImageFile(id);
+						}}
+					/>
+				{/if}
+			{/snippet}
+		</AreaObservations>
 		{#if empty}
 			<div class="empty-state">
 				<Logo variant="empty" />

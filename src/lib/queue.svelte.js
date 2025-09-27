@@ -174,7 +174,8 @@ class ProcessingQueue {
 		if (task.importing)
 			uiState.processing.files.push({
 				name: task.importing.file.name,
-				id: task.importing.id
+				id: task.importing.id,
+				addedAt: new Date()
 			});
 	}
 
@@ -260,7 +261,7 @@ export function initializeProcessingQueue(arg0) {
  * @throws {Error} if the processing queue is not initialized
  */
 export function cancelTask(subjectId, reason) {
-	assertQueueInitiliazed(processingQueue);
+	assertQueueInitialized(processingQueue);
 
 	processingQueue.cancel(subjectId, reason);
 }
@@ -270,7 +271,7 @@ export function cancelTask(subjectId, reason) {
  * @param {File[]} files
  */
 export function importMore(files) {
-	assertQueueInitiliazed(processingQueue);
+	assertQueueInitialized(processingQueue);
 
 	for (const file of files) {
 		processingQueue.push({ importing: { file, id: imageFileId() } });
@@ -282,7 +283,7 @@ export function importMore(files) {
  * @param {string[]} fileIds
  */
 export function detectMore(fileIds) {
-	assertQueueInitiliazed(processingQueue);
+	assertQueueInitialized(processingQueue);
 
 	for (const fileId of fileIds) {
 		processingQueue.push({ detection: { fileId } });
@@ -294,7 +295,7 @@ export function detectMore(fileIds) {
  * @param  {string[]} imageIds
  */
 export function classifyMore(imageIds) {
-	assertQueueInitiliazed(processingQueue);
+	assertQueueInitialized(processingQueue);
 
 	for (const imageId of imageIds) {
 		processingQueue.push({
@@ -308,7 +309,7 @@ export function classifyMore(imageIds) {
  * @param {ProcessingQueue | undefined} queue
  * @returns {asserts queue is ProcessingQueue}
  */
-function assertQueueInitiliazed(queue) {
+function assertQueueInitialized(queue) {
 	if (!queue)
 		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
 }

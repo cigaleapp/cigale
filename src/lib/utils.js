@@ -926,11 +926,12 @@ if (import.meta.vitest) {
 
 /**
  * @template T
+ * @template [K=string]
  * @template [V=T]
  * @param {Iterable<T>} array
- * @param {(item: T) => string} key
+ * @param {(item: T) => K} key
  * @param {(item: T) => V} [valueMapper]
- * @returns {Map<string, V[]>}
+ * @returns {Map<K, V[]>}
  */
 export function groupBy(array, key, valueMapper) {
 	if ('groupBy' in Map && !valueMapper) {
