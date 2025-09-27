@@ -922,11 +922,12 @@
 								<code use:tooltip={"Dimensions de l'image recadrée (en pixels)"}>{w}×{h}</code>
 								<!-- we have a neural-infered value only, put the confidence next to the value -->
 								{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
-									<sup>
-										<ConfidencePercentage value={initBox.confidence}>
+									<span class="sep">&middot;</span>
+									<ConfidencePercentage value={initBox.confidence}>
+										<div class="confidence-icon">
 											<IconNeuralNet />
-										</ConfidencePercentage>
-									</sup>
+										</div>
+									</ConfidencePercentage>
 								{/if}
 							</p>
 						</div>
@@ -1274,6 +1275,19 @@
 		height: var(--size);
 		border-radius: var(--corner-radius);
 		background: color-mix(in srgb, var(--gray) 35%, transparent);
+	}
+
+	.boxes li .dimensions {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.boxes li .confidence-icon {
+		font-size: 0.8rem;
+		margin-right: 0.5em;
+		display: flex;
+		align-items: center;
 	}
 
 	.boxes li .actions {
