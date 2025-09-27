@@ -1,0 +1,4270 @@
+{
+	"config": {
+		"configFile": "/home/runner/work/cigale/cigale/playwright.config.js",
+		"rootDir": "/home/runner/work/cigale/cigale/tests",
+		"forbidOnly": true,
+		"fullyParallel": true,
+		"globalSetup": null,
+		"globalTeardown": null,
+		"globalTimeout": 3000000,
+		"grep": {},
+		"grepInvert": null,
+		"maxFailures": 0,
+		"metadata": {},
+		"preserveOutput": "always",
+		"reporter": [
+			[
+				"json",
+				{
+					"outputFile": "test-results.json"
+				}
+			],
+			["html", null],
+			["github", null],
+			["list", null]
+		],
+		"reportSlowTests": {
+			"max": 5,
+			"threshold": 300000
+		},
+		"quiet": false,
+		"projects": [
+			{
+				"outputDir": "/home/runner/work/cigale/cigale/test-results",
+				"repeatEach": 1,
+				"retries": 2,
+				"metadata": {},
+				"id": "chromium",
+				"name": "chromium",
+				"testDir": "/home/runner/work/cigale/cigale/tests",
+				"testIgnore": [],
+				"testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+				"timeout": 72000
+			},
+			{
+				"outputDir": "/home/runner/work/cigale/cigale/test-results",
+				"repeatEach": 1,
+				"retries": 2,
+				"metadata": {},
+				"id": "webkit",
+				"name": "webkit",
+				"testDir": "/home/runner/work/cigale/cigale/tests",
+				"testIgnore": [],
+				"testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+				"timeout": 72000
+			}
+		],
+		"shard": null,
+		"updateSnapshots": "missing",
+		"updateSourceMethod": "patch",
+		"version": "1.55.1",
+		"workers": 1,
+		"webServer": {
+			"command": "bun run preview",
+			"port": 4173,
+			"reuseExistingServer": false
+		}
+	},
+	"suites": [
+		{
+			"title": "classification.spec.js",
+			"file": "classification.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [
+				{
+					"title": "allows cancelling classification of an observation",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/430",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/classification.spec.js",
+										"line": 30,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "16865e859d31bca7c6f5-be3df4f783f22fb9e4ea",
+					"file": "classification.spec.js",
+					"line": 30,
+					"column": 1
+				},
+				{
+					"title": "allows cancelling classification of an observation",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/430",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/classification.spec.js",
+										"line": 30,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "16865e859d31bca7c6f5-57af421a25ac5e54a789",
+					"file": "classification.spec.js",
+					"line": 30,
+					"column": 1
+				}
+			],
+			"suites": [
+				{
+					"title": "classifies without error",
+					"file": "classification.spec.js",
+					"line": 11,
+					"column": 6,
+					"specs": [
+						{
+							"title": "when observation has no crop box",
+							"ok": true,
+							"tags": ["issue"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "issue",
+											"description": "https://github.com/cigaleapp/cigale/issues/435",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/classification.spec.js",
+												"line": 12,
+												"column": 2
+											}
+										}
+									],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "16865e859d31bca7c6f5-b64b074698a518187236",
+							"file": "classification.spec.js",
+							"line": 12,
+							"column": 2
+						},
+						{
+							"title": "when observation has no crop box",
+							"ok": true,
+							"tags": ["issue"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "issue",
+											"description": "https://github.com/cigaleapp/cigale/issues/435",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/classification.spec.js",
+												"line": 12,
+												"column": 2
+											}
+										}
+									],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "16865e859d31bca7c6f5-7860a12cb6cccdb84b04",
+							"file": "classification.spec.js",
+							"line": 12,
+							"column": 2
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "core.spec.js",
+			"file": "core.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [
+				{
+					"title": "basic functionality",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-3c33964fcf4498611122",
+					"file": "core.spec.js",
+					"line": 25,
+					"column": 2
+				},
+				{
+					"title": "basic functionality, while offline",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-002e98e57cd9aac36019",
+					"file": "core.spec.js",
+					"line": 25,
+					"column": 2
+				},
+				{
+					"title": "can handle a bunch of images at once",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "concurrency",
+									"description": "12",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/core.spec.js",
+										"line": 141,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-2604ecd758d5e18a5ff6",
+					"file": "core.spec.js",
+					"line": 141,
+					"column": 1
+				},
+				{
+					"title": "can import a protocol via ?protocol",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-87d479cb017deba1d98f",
+					"file": "core.spec.js",
+					"line": 180,
+					"column": 1
+				},
+				{
+					"title": "can pre-set models via ?classificationModel and ?cropModel",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-a8712ac04aeedb55ca39",
+					"file": "core.spec.js",
+					"line": 209,
+					"column": 1
+				},
+				{
+					"title": "can import a protocol and pre-set models via URL parameters",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-1bc5dddab21acac3da24",
+					"file": "core.spec.js",
+					"line": 289,
+					"column": 1
+				},
+				{
+					"title": "changing model while on tab reloads it @real-protocol",
+					"ok": true,
+					"tags": ["real-protocol", "pr"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "pullrequest",
+									"description": "https://github.com/cigaleapp/cigale/pull/659",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/core.spec.js",
+										"line": 329,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-71538dea094ffc15180a",
+					"file": "core.spec.js",
+					"line": 329,
+					"column": 1
+				},
+				{
+					"title": "basic functionality",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-beaf2aa570913999bbba",
+					"file": "core.spec.js",
+					"line": 25,
+					"column": 2
+				},
+				{
+					"title": "basic functionality, while offline",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-7a4202c6836794e4644b",
+					"file": "core.spec.js",
+					"line": 25,
+					"column": 2
+				},
+				{
+					"title": "can handle a bunch of images at once",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "concurrency",
+									"description": "12",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/core.spec.js",
+										"line": 141,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-a02f16da62b39220f00b",
+					"file": "core.spec.js",
+					"line": 141,
+					"column": 1
+				},
+				{
+					"title": "can import a protocol via ?protocol",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-e2fd7aedbcca4b7d35a0",
+					"file": "core.spec.js",
+					"line": 180,
+					"column": 1
+				},
+				{
+					"title": "can pre-set models via ?classificationModel and ?cropModel",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-1a7d92b69ebccf805b86",
+					"file": "core.spec.js",
+					"line": 209,
+					"column": 1
+				},
+				{
+					"title": "can import a protocol and pre-set models via URL parameters",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-adc64819c106d0671be5",
+					"file": "core.spec.js",
+					"line": 289,
+					"column": 1
+				},
+				{
+					"title": "changing model while on tab reloads it @real-protocol",
+					"ok": true,
+					"tags": ["real-protocol", "pr"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "pullrequest",
+									"description": "https://github.com/cigaleapp/cigale/pull/659",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/core.spec.js",
+										"line": 329,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "43b12c68676e60ca47dc-a5ea8990f38dfb2e1981",
+					"file": "core.spec.js",
+					"line": 329,
+					"column": 1
+				}
+			]
+		},
+		{
+			"title": "cropper.spec.js",
+			"file": "cropper.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [],
+			"suites": [
+				{
+					"title": "Cropper view",
+					"file": "cropper.spec.js",
+					"line": 16,
+					"column": 6,
+					"specs": [
+						{
+							"title": "should have all cards visible @webkit-no-parallelization",
+							"ok": true,
+							"tags": ["webkit-no-parallelization"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "f9e8f94299db39c84d67-55944200522b742422ae",
+							"file": "cropper.spec.js",
+							"line": 43,
+							"column": 2
+						},
+						{
+							"title": "should have all cards visible @webkit-no-parallelization",
+							"ok": true,
+							"tags": ["webkit-no-parallelization"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "f9e8f94299db39c84d67-0d10469a64caa2b87874",
+							"file": "cropper.spec.js",
+							"line": 43,
+							"column": 2
+						}
+					],
+					"suites": [
+						{
+							"title": "autoskip enabled OR disabled",
+							"file": "cropper.spec.js",
+							"line": 49,
+							"column": 7,
+							"specs": [
+								{
+									"title": "navigate with arrow keys (autoskip on)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-08b44fb0a806e8c54821",
+									"file": "cropper.spec.js",
+									"line": 55,
+									"column": 4
+								},
+								{
+									"title": "go back to import view with escape key (autoskip on)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-d1dc71c8616f1f8e1f8a",
+									"file": "cropper.spec.js",
+									"line": 70,
+									"column": 4
+								},
+								{
+									"title": "navigate with arrow keys (autoskip off)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-91d5947e3037f2ba420e",
+									"file": "cropper.spec.js",
+									"line": 55,
+									"column": 4
+								},
+								{
+									"title": "go back to import view with escape key (autoskip off)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-d6941f78a397aa5186be",
+									"file": "cropper.spec.js",
+									"line": 70,
+									"column": 4
+								},
+								{
+									"title": "navigate with arrow keys (autoskip on)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-388f3e0faf57eaddc6c7",
+									"file": "cropper.spec.js",
+									"line": 55,
+									"column": 4
+								},
+								{
+									"title": "go back to import view with escape key (autoskip on)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-bb865b9b18c9967eb4ef",
+									"file": "cropper.spec.js",
+									"line": 70,
+									"column": 4
+								},
+								{
+									"title": "navigate with arrow keys (autoskip off)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-fc4786b7c011576e21bd",
+									"file": "cropper.spec.js",
+									"line": 55,
+									"column": 4
+								},
+								{
+									"title": "go back to import view with escape key (autoskip off)",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-574a8d67902f6faa52c4",
+									"file": "cropper.spec.js",
+									"line": 70,
+									"column": 4
+								}
+							]
+						},
+						{
+							"title": "autoskip disabled",
+							"file": "cropper.spec.js",
+							"line": 87,
+							"column": 7,
+							"specs": [
+								{
+									"title": "should not skip on confirm button click",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-f5cd9507dc61da0ab05f",
+									"file": "cropper.spec.js",
+									"line": 92,
+									"column": 3
+								},
+								{
+									"title": "should not skip on confirmation keybind",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-69d7840faf688e33fd29",
+									"file": "cropper.spec.js",
+									"line": 102,
+									"column": 3
+								},
+								{
+									"title": "should toggle autoskip on on keybind press",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-017fb7c2bccf207958d4",
+									"file": "cropper.spec.js",
+									"line": 112,
+									"column": 3
+								},
+								{
+									"title": "should not skip on confirm button click",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-f1220436e88af00a3306",
+									"file": "cropper.spec.js",
+									"line": 92,
+									"column": 3
+								},
+								{
+									"title": "should not skip on confirmation keybind",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-3cb1168028f032ffd7ae",
+									"file": "cropper.spec.js",
+									"line": 102,
+									"column": 3
+								},
+								{
+									"title": "should toggle autoskip on on keybind press",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-39be89cd2b57f5f63032",
+									"file": "cropper.spec.js",
+									"line": 112,
+									"column": 3
+								}
+							]
+						},
+						{
+							"title": "autoskip enabled",
+							"file": "cropper.spec.js",
+							"line": 127,
+							"column": 7,
+							"specs": [
+								{
+									"title": "should skip on confirm button click",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-8d05c9356c84f0ffe1ca",
+									"file": "cropper.spec.js",
+									"line": 132,
+									"column": 3
+								},
+								{
+									"title": "should skip on confirmation keybind",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-8a92fb4f95c44580bd6f",
+									"file": "cropper.spec.js",
+									"line": 142,
+									"column": 3
+								},
+								{
+									"title": "should toggle autoskip off on keybind press",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-297682f0eb0f7565c78f",
+									"file": "cropper.spec.js",
+									"line": 152,
+									"column": 3
+								},
+								{
+									"title": "should autoskip to classify when all images are confirmed",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-97c6fe07e6a6d7d031a7",
+									"file": "cropper.spec.js",
+									"line": 166,
+									"column": 3
+								},
+								{
+									"title": "should skip on confirm button click",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-2327c3a5da373a2ec8a9",
+									"file": "cropper.spec.js",
+									"line": 132,
+									"column": 3
+								},
+								{
+									"title": "should skip on confirmation keybind",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-e3cd4b509fd4ea8aab7b",
+									"file": "cropper.spec.js",
+									"line": 142,
+									"column": 3
+								},
+								{
+									"title": "should toggle autoskip off on keybind press",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-323903ebbeb3322a9c9b",
+									"file": "cropper.spec.js",
+									"line": 152,
+									"column": 3
+								},
+								{
+									"title": "should autoskip to classify when all images are confirmed",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-a70e6c6a7585a3e78567",
+									"file": "cropper.spec.js",
+									"line": 166,
+									"column": 3
+								}
+							]
+						},
+						{
+							"title": "deleting an image",
+							"file": "cropper.spec.js",
+							"line": 183,
+							"column": 7,
+							"specs": [
+								{
+									"title": "should delete the image on ctrl-delete and go to the next image",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-7a90333f7b4afeef01cd",
+									"file": "cropper.spec.js",
+									"line": 207,
+									"column": 3
+								},
+								{
+									"title": "should delete the image via delete button and go to the next image",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-879ed6884a0a276e5452",
+									"file": "cropper.spec.js",
+									"line": 211,
+									"column": 3
+								},
+								{
+									"title": "should delete the image on ctrl-delete and go to the next image",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-9848fafa23ab977e2b30",
+									"file": "cropper.spec.js",
+									"line": 207,
+									"column": 3
+								},
+								{
+									"title": "should delete the image via delete button and go to the next image",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-d29228f44f32a5eee527",
+									"file": "cropper.spec.js",
+									"line": 211,
+									"column": 3
+								}
+							]
+						},
+						{
+							"title": "creating a new bounding box",
+							"file": "cropper.spec.js",
+							"line": 218,
+							"column": 7,
+							"specs": [],
+							"suites": [
+								{
+									"title": "with click-and-drag tool",
+									"file": "cropper.spec.js",
+									"line": 255,
+									"column": 8,
+									"specs": [
+										{
+											"title": "should create boxes on mouseup",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-8fbef96c030e6882c2c2",
+											"file": "cropper.spec.js",
+											"line": 284,
+											"column": 4
+										},
+										{
+											"title": "should mark the image as confirmed if image was untouched",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-d1f6e2da171a23b72fa2",
+											"file": "cropper.spec.js",
+											"line": 295,
+											"column": 4
+										},
+										{
+											"title": "dragging outside the crop surface cancels",
+											"ok": true,
+											"tags": ["issue"],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [
+														{
+															"type": "issue",
+															"description": "https://github.com/cigaleapp/cigale/issues/431",
+															"location": {
+																"file": "/home/runner/work/cigale/cigale/tests/cropper.spec.js",
+																"line": 302,
+																"column": 4
+															}
+														}
+													],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-9c02f01e0f6e76b6dd3f",
+											"file": "cropper.spec.js",
+											"line": 302,
+											"column": 4
+										},
+										{
+											"title": "should create boxes on mouseup",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-a9bc4c5e904e8b4708eb",
+											"file": "cropper.spec.js",
+											"line": 284,
+											"column": 4
+										},
+										{
+											"title": "should mark the image as confirmed if image was untouched",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-66b25d11805f14ae419b",
+											"file": "cropper.spec.js",
+											"line": 295,
+											"column": 4
+										},
+										{
+											"title": "dragging outside the crop surface cancels",
+											"ok": true,
+											"tags": ["issue"],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [
+														{
+															"type": "issue",
+															"description": "https://github.com/cigaleapp/cigale/issues/431",
+															"location": {
+																"file": "/home/runner/work/cigale/cigale/tests/cropper.spec.js",
+																"line": 302,
+																"column": 4
+															}
+														}
+													],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-6f5c10f74db76b029be6",
+											"file": "cropper.spec.js",
+											"line": 302,
+											"column": 4
+										}
+									]
+								},
+								{
+									"title": "with 2-point tool",
+									"file": "cropper.spec.js",
+									"line": 321,
+									"column": 8,
+									"specs": [
+										{
+											"title": "should create boxes every 2 clicks",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-385e5769da3e170af7dc",
+											"file": "cropper.spec.js",
+											"line": 344,
+											"column": 4
+										},
+										{
+											"title": "should mark the image as confirmed if image was untouched",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-7118bd9e1d497f9ece2d",
+											"file": "cropper.spec.js",
+											"line": 355,
+											"column": 4
+										},
+										{
+											"title": "should create boxes every 2 clicks",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-ad20eaf5f62350566752",
+											"file": "cropper.spec.js",
+											"line": 344,
+											"column": 4
+										},
+										{
+											"title": "should mark the image as confirmed if image was untouched",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-c1238c56001ade5e9191",
+											"file": "cropper.spec.js",
+											"line": 355,
+											"column": 4
+										}
+									]
+								},
+								{
+									"title": "with 4-point tool",
+									"file": "cropper.spec.js",
+									"line": 363,
+									"column": 8,
+									"specs": [
+										{
+											"title": "should create boxes every 4 clicks",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-cf6de108d39d40053b8c",
+											"file": "cropper.spec.js",
+											"line": 389,
+											"column": 4
+										},
+										{
+											"title": "should mark the image as confirmed if image was untouched",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-66b91fe3b445d1f972d5",
+											"file": "cropper.spec.js",
+											"line": 399,
+											"column": 4
+										},
+										{
+											"title": "does not leave ghost boxes",
+											"ok": true,
+											"tags": ["issue"],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [
+														{
+															"type": "issue",
+															"description": "https://github.com/cigaleapp/cigale/issues/462",
+															"location": {
+																"file": "/home/runner/work/cigale/cigale/tests/cropper.spec.js",
+																"line": 406,
+																"column": 4
+															}
+														}
+													],
+													"expectedStatus": "passed",
+													"projectId": "chromium",
+													"projectName": "chromium",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-f4ff7b0dd8021d3ba65f",
+											"file": "cropper.spec.js",
+											"line": 406,
+											"column": 4
+										},
+										{
+											"title": "should create boxes every 4 clicks",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-734778985378f23585b2",
+											"file": "cropper.spec.js",
+											"line": 389,
+											"column": 4
+										},
+										{
+											"title": "should mark the image as confirmed if image was untouched",
+											"ok": true,
+											"tags": [],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-4edcd79a5a25d3896bfe",
+											"file": "cropper.spec.js",
+											"line": 399,
+											"column": 4
+										},
+										{
+											"title": "does not leave ghost boxes",
+											"ok": true,
+											"tags": ["issue"],
+											"tests": [
+												{
+													"timeout": 72000,
+													"annotations": [
+														{
+															"type": "issue",
+															"description": "https://github.com/cigaleapp/cigale/issues/462",
+															"location": {
+																"file": "/home/runner/work/cigale/cigale/tests/cropper.spec.js",
+																"line": 406,
+																"column": 4
+															}
+														}
+													],
+													"expectedStatus": "passed",
+													"projectId": "webkit",
+													"projectName": "webkit",
+													"results": [],
+													"status": "skipped"
+												}
+											],
+											"id": "f9e8f94299db39c84d67-6cc0d3b86c938fc78070",
+											"file": "cropper.spec.js",
+											"line": 406,
+											"column": 4
+										}
+									]
+								}
+							]
+						},
+						{
+							"title": "zooming and panning",
+							"file": "cropper.spec.js",
+							"line": 424,
+							"column": 7,
+							"specs": [
+								{
+									"title": "should zoom in and out with the mouse wheel",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "fixme",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/cropper.spec.js",
+														"line": 480,
+														"column": 8
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-2fed887dd48603477cae",
+									"file": "cropper.spec.js",
+									"line": 480,
+									"column": 8
+								},
+								{
+									"title": "should zoom in and out with the keyboard",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-042a6898e70762dce066",
+									"file": "cropper.spec.js",
+									"line": 496,
+									"column": 3
+								},
+								{
+									"title": "should pan with the mouse",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-ca4765e49af964d86c18",
+									"file": "cropper.spec.js",
+									"line": 524,
+									"column": 3
+								},
+								{
+									"title": "recalls zoom and pan between image changes",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-a34eec6987c3fe3840cb",
+									"file": "cropper.spec.js",
+									"line": 544,
+									"column": 3
+								},
+								{
+									"title": "should zoom in and out with the mouse wheel",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "fixme",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/cropper.spec.js",
+														"line": 480,
+														"column": 8
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-9b3d3c3452e0d7058126",
+									"file": "cropper.spec.js",
+									"line": 480,
+									"column": 8
+								},
+								{
+									"title": "should zoom in and out with the keyboard",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-06525f4ada37b97972ad",
+									"file": "cropper.spec.js",
+									"line": 496,
+									"column": 3
+								},
+								{
+									"title": "should pan with the mouse",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-76bd4fe5ad4184910e25",
+									"file": "cropper.spec.js",
+									"line": 524,
+									"column": 3
+								},
+								{
+									"title": "recalls zoom and pan between image changes",
+									"ok": true,
+									"tags": [],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [],
+											"expectedStatus": "passed",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "f9e8f94299db39c84d67-81cfaee614ef05a77d2a",
+									"file": "cropper.spec.js",
+									"line": 544,
+									"column": 3
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "export.spec.js",
+			"file": "export.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [
+				{
+					"title": "correctly applies crop padding",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/463",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/export.spec.js",
+										"line": 8,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "f5d53b089fdfe9adefb4-b7c930144296d509281f",
+					"file": "export.spec.js",
+					"line": 8,
+					"column": 1
+				},
+				{
+					"title": "correctly applies crop padding",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/463",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/export.spec.js",
+										"line": 8,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "f5d53b089fdfe9adefb4-be552ae3988062a71654",
+					"file": "export.spec.js",
+					"line": 8,
+					"column": 1
+				}
+			]
+		},
+		{
+			"title": "gallery.spec.js",
+			"file": "gallery.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [],
+			"suites": [
+				{
+					"title": "sorting",
+					"file": "gallery.spec.js",
+					"line": 5,
+					"column": 6,
+					"specs": [
+						{
+							"title": "by filename",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c668d4c0fb87f924a774-a204a02d0bc9c211eb9a",
+							"file": "gallery.spec.js",
+							"line": 26,
+							"column": 3
+						},
+						{
+							"title": "by date",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c668d4c0fb87f924a774-452a05af94e0e9db162c",
+							"file": "gallery.spec.js",
+							"line": 26,
+							"column": 3
+						},
+						{
+							"title": "by filename",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c668d4c0fb87f924a774-1c13d3c20ce51c34058d",
+							"file": "gallery.spec.js",
+							"line": 26,
+							"column": 3
+						},
+						{
+							"title": "by date",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c668d4c0fb87f924a774-3f9cecf874d0914984a6",
+							"file": "gallery.spec.js",
+							"line": 26,
+							"column": 3
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "import.spec.js",
+			"file": "import.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [
+				{
+					"title": "fails when importing a .CR2 image",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/413",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 215,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-07f735ca5706d2c1671c",
+					"file": "import.spec.js",
+					"line": 215,
+					"column": 1
+				},
+				{
+					"title": "can import a large image",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/412",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 229,
+										"column": 1
+									}
+								},
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/415",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 229,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-b2f0fe6880f8942f187b",
+					"file": "import.spec.js",
+					"line": 229,
+					"column": 1
+				},
+				{
+					"title": "cannot import an extremely large image",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/412",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 242,
+										"column": 1
+									}
+								},
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/414",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 242,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-07c732544491b7403122",
+					"file": "import.spec.js",
+					"line": 242,
+					"column": 1
+				},
+				{
+					"title": "can cancel import",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/430",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 254,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-d67ad13bcbd11e1e58fa",
+					"file": "import.spec.js",
+					"line": 254,
+					"column": 1
+				},
+				{
+					"title": "can import in multiple batches",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-92eb643131304a247ddd",
+					"file": "import.spec.js",
+					"line": 270,
+					"column": 1
+				},
+				{
+					"title": "deleting an image in the import tab does not create ghost observation cards",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/439",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 288,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-a88353fb71830c2a5373",
+					"file": "import.spec.js",
+					"line": 288,
+					"column": 1
+				},
+				{
+					"title": "cannot go to classify tab while detection is ongoing",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/437",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 314,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-e216f18cf0aeccbf4ecc",
+					"file": "import.spec.js",
+					"line": 314,
+					"column": 1
+				},
+				{
+					"title": "can extract EXIF date from an image",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-091a25fc8bacdee113aa",
+					"file": "import.spec.js",
+					"line": 333,
+					"column": 1
+				},
+				{
+					"title": "can extract EXIF GPS data from an image",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-6e74e94dce19b89668a3",
+					"file": "import.spec.js",
+					"line": 355,
+					"column": 1
+				},
+				{
+					"title": "fails when importing a .CR2 image",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/413",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 215,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-9c0b52c620982d69534d",
+					"file": "import.spec.js",
+					"line": 215,
+					"column": 1
+				},
+				{
+					"title": "can import a large image",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/412",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 229,
+										"column": 1
+									}
+								},
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/415",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 229,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-0db1468e2ed51e830262",
+					"file": "import.spec.js",
+					"line": 229,
+					"column": 1
+				},
+				{
+					"title": "cannot import an extremely large image",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/412",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 242,
+										"column": 1
+									}
+								},
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/414",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 242,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-5781f90d81cb0b40e30a",
+					"file": "import.spec.js",
+					"line": 242,
+					"column": 1
+				},
+				{
+					"title": "can cancel import",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/430",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 254,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-244e7f61c3185005aab7",
+					"file": "import.spec.js",
+					"line": 254,
+					"column": 1
+				},
+				{
+					"title": "can import in multiple batches",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-e24cc14355789d36b03d",
+					"file": "import.spec.js",
+					"line": 270,
+					"column": 1
+				},
+				{
+					"title": "deleting an image in the import tab does not create ghost observation cards",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/439",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 288,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-d9c6a72ce59de77edbfb",
+					"file": "import.spec.js",
+					"line": 288,
+					"column": 1
+				},
+				{
+					"title": "cannot go to classify tab while detection is ongoing",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/437",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/import.spec.js",
+										"line": 314,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-a48fbefe561d6e2d5cbe",
+					"file": "import.spec.js",
+					"line": 314,
+					"column": 1
+				},
+				{
+					"title": "can extract EXIF date from an image",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-10365f9709936f7da46b",
+					"file": "import.spec.js",
+					"line": 333,
+					"column": 1
+				},
+				{
+					"title": "can extract EXIF GPS data from an image",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "693429a5fbf051731fdc-049c64eacac8a3b7f726",
+					"file": "import.spec.js",
+					"line": 355,
+					"column": 1
+				}
+			],
+			"suites": [
+				{
+					"title": "correct results.zip",
+					"file": "import.spec.js",
+					"line": 23,
+					"column": 6,
+					"specs": [
+						{
+							"title": "has all the images",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-3d7e3e841e5f1c0160ee",
+							"file": "import.spec.js",
+							"line": 28,
+							"column": 2
+						},
+						{
+							"title": "has the correct bounding boxes @webkit-no-parallelization",
+							"ok": true,
+							"tags": ["webkit-no-parallelization"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-1898303e1d7fa446869d",
+							"file": "import.spec.js",
+							"line": 36,
+							"column": 2
+						},
+						{
+							"title": "does not re-analyze when going to classify tab @webkit-no-parallelization",
+							"ok": true,
+							"tags": ["webkit-no-parallelization"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-7da5afb5dbf72b829d6e",
+							"file": "import.spec.js",
+							"line": 60,
+							"column": 2
+						},
+						{
+							"title": "exporting does not fail",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-1e79456c6763c5438855",
+							"file": "import.spec.js",
+							"line": 133,
+							"column": 2
+						},
+						{
+							"title": "has all the images",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-6fba51aa0f7dcb7a207e",
+							"file": "import.spec.js",
+							"line": 28,
+							"column": 2
+						},
+						{
+							"title": "has the correct bounding boxes @webkit-no-parallelization",
+							"ok": true,
+							"tags": ["webkit-no-parallelization"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-85bf88c691893f6d991c",
+							"file": "import.spec.js",
+							"line": 36,
+							"column": 2
+						},
+						{
+							"title": "does not re-analyze when going to classify tab @webkit-no-parallelization",
+							"ok": true,
+							"tags": ["webkit-no-parallelization"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-7ce58560a71eef43428e",
+							"file": "import.spec.js",
+							"line": 60,
+							"column": 2
+						},
+						{
+							"title": "exporting does not fail",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-d80b1647aa3d66c66d50",
+							"file": "import.spec.js",
+							"line": 133,
+							"column": 2
+						}
+					]
+				},
+				{
+					"title": "missing original photos",
+					"file": "import.spec.js",
+					"line": 175,
+					"column": 6,
+					"specs": [
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-498c79e4c665879109a1",
+							"file": "import.spec.js",
+							"line": 180,
+							"column": 2
+						},
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-6df58ae1672d62ebec62",
+							"file": "import.spec.js",
+							"line": 180,
+							"column": 2
+						}
+					]
+				},
+				{
+					"title": "missing analysis file",
+					"file": "import.spec.js",
+					"line": 185,
+					"column": 6,
+					"specs": [
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-fbbe9a589cb499e80f29",
+							"file": "import.spec.js",
+							"line": 190,
+							"column": 2
+						},
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-8102e741b4d86b2384f3",
+							"file": "import.spec.js",
+							"line": 190,
+							"column": 2
+						}
+					]
+				},
+				{
+					"title": "wrong protocol used",
+					"file": "import.spec.js",
+					"line": 195,
+					"column": 6,
+					"specs": [
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-44d90930590e3181b3d9",
+							"file": "import.spec.js",
+							"line": 200,
+							"column": 2
+						},
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-8397536fccef4d582ba6",
+							"file": "import.spec.js",
+							"line": 200,
+							"column": 2
+						}
+					]
+				},
+				{
+					"title": "invalid json analysis",
+					"file": "import.spec.js",
+					"line": 205,
+					"column": 6,
+					"specs": [
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-46d1ae830800e0a665e3",
+							"file": "import.spec.js",
+							"line": 210,
+							"column": 2
+						},
+						{
+							"title": "fails with the appriopriate error message",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "693429a5fbf051731fdc-8e9566911b70f5f49cec",
+							"file": "import.spec.js",
+							"line": 210,
+							"column": 2
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "modal.spec.js",
+			"file": "modal.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [],
+			"suites": [
+				{
+					"title": "closing a modal",
+					"file": "modal.spec.js",
+					"line": 4,
+					"column": 6,
+					"specs": [
+						{
+							"title": "when clicking outside",
+							"ok": true,
+							"tags": ["issue"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "issue",
+											"description": "https://github.com/cigaleapp/cigale/issues/469",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/modal.spec.js",
+												"line": 5,
+												"column": 2
+											}
+										}
+									],
+									"expectedStatus": "passed",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "4f5218e02fee5a5bd4ca-7c8327606c3da7d8fa37",
+							"file": "modal.spec.js",
+							"line": 5,
+							"column": 2
+						},
+						{
+							"title": "when clicking outside",
+							"ok": true,
+							"tags": ["issue"],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "issue",
+											"description": "https://github.com/cigaleapp/cigale/issues/469",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/modal.spec.js",
+												"line": 5,
+												"column": 2
+											}
+										}
+									],
+									"expectedStatus": "passed",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "4f5218e02fee5a5bd4ca-b2008cf6d6e0feabe300",
+							"file": "modal.spec.js",
+							"line": 5,
+							"column": 2
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "sidepanel.spec.js",
+			"file": "sidepanel.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [
+				{
+					"title": "allows changing metadata values on import page",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/440",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/sidepanel.spec.js",
+										"line": 43,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-00935d7d41a11820a506",
+					"file": "sidepanel.spec.js",
+					"line": 43,
+					"column": 1
+				},
+				{
+					"title": "does not show technical metadata ",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-38260eac3e7cc38fd83a",
+					"file": "sidepanel.spec.js",
+					"line": 91,
+					"column": 1
+				},
+				{
+					"title": "can update a enum-type metadata with cascades",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-ff1051ecc1e810e579f0",
+					"file": "sidepanel.spec.js",
+					"line": 98,
+					"column": 1
+				},
+				{
+					"title": "can search in a enum-type metadata combobox",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-5f1fb9de35e8c5d2395a",
+					"file": "sidepanel.spec.js",
+					"line": 268,
+					"column": 1
+				},
+				{
+					"title": "can update a boolean-type metadata",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/216",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/sidepanel.spec.js",
+										"line": 310,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-5539add663bb5a8cef09",
+					"file": "sidepanel.spec.js",
+					"line": 310,
+					"column": 1
+				},
+				{
+					"title": "shows crop-type metadata as non representable",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-27e40d882a4fd4209e1e",
+					"file": "sidepanel.spec.js",
+					"line": 337,
+					"column": 1
+				},
+				{
+					"title": "can update a date-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-ef3d0b631984a4fe5df1",
+					"file": "sidepanel.spec.js",
+					"line": 349,
+					"column": 1
+				},
+				{
+					"title": "can update a float-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-0ca9b1e80866bc0b934c",
+					"file": "sidepanel.spec.js",
+					"line": 361,
+					"column": 1
+				},
+				{
+					"title": "can update a integer-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-791e08de05ac8c7ca174",
+					"file": "sidepanel.spec.js",
+					"line": 375,
+					"column": 1
+				},
+				{
+					"title": "can update a string-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "chromium",
+							"projectName": "chromium",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-256e6e4d011baa7befbe",
+					"file": "sidepanel.spec.js",
+					"line": 389,
+					"column": 1
+				},
+				{
+					"title": "allows changing metadata values on import page",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/440",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/sidepanel.spec.js",
+										"line": 43,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-f769e070e7d822c80397",
+					"file": "sidepanel.spec.js",
+					"line": 43,
+					"column": 1
+				},
+				{
+					"title": "does not show technical metadata ",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-454fe864bf984e450143",
+					"file": "sidepanel.spec.js",
+					"line": 91,
+					"column": 1
+				},
+				{
+					"title": "can update a enum-type metadata with cascades",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-dd6d44c7640177866bf6",
+					"file": "sidepanel.spec.js",
+					"line": 98,
+					"column": 1
+				},
+				{
+					"title": "can search in a enum-type metadata combobox",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-58aebe77edf7213e42c9",
+					"file": "sidepanel.spec.js",
+					"line": 268,
+					"column": 1
+				},
+				{
+					"title": "can update a boolean-type metadata",
+					"ok": true,
+					"tags": ["issue"],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [
+								{
+									"type": "issue",
+									"description": "https://github.com/cigaleapp/cigale/issues/216",
+									"location": {
+										"file": "/home/runner/work/cigale/cigale/tests/sidepanel.spec.js",
+										"line": 310,
+										"column": 1
+									}
+								}
+							],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-a8c482e26207a2674313",
+					"file": "sidepanel.spec.js",
+					"line": 310,
+					"column": 1
+				},
+				{
+					"title": "shows crop-type metadata as non representable",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-28b1324d357edba66e92",
+					"file": "sidepanel.spec.js",
+					"line": 337,
+					"column": 1
+				},
+				{
+					"title": "can update a date-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-a5fe4cd198899110c164",
+					"file": "sidepanel.spec.js",
+					"line": 349,
+					"column": 1
+				},
+				{
+					"title": "can update a float-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-2ecc38b5822d58809c71",
+					"file": "sidepanel.spec.js",
+					"line": 361,
+					"column": 1
+				},
+				{
+					"title": "can update a integer-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-11a0a723fdcc0871c839",
+					"file": "sidepanel.spec.js",
+					"line": 375,
+					"column": 1
+				},
+				{
+					"title": "can update a string-type metadata",
+					"ok": true,
+					"tags": [],
+					"tests": [
+						{
+							"timeout": 72000,
+							"annotations": [],
+							"expectedStatus": "passed",
+							"projectId": "webkit",
+							"projectName": "webkit",
+							"results": [],
+							"status": "skipped"
+						}
+					],
+					"id": "7359015836e7f5f56ff7-fd06eeda04d43292c33f",
+					"file": "sidepanel.spec.js",
+					"line": 389,
+					"column": 1
+				}
+			]
+		},
+		{
+			"title": "tasks/dbdump.spec.js",
+			"file": "tasks/dbdump.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [],
+			"suites": [
+				{
+					"title": "Database dumps",
+					"file": "tasks/dbdump.spec.js",
+					"line": 19,
+					"column": 6,
+					"specs": [
+						{
+							"title": "basic",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-6aa65ac228ac32d3ecf2",
+							"file": "tasks/dbdump.spec.js",
+							"line": 20,
+							"column": 2
+						},
+						{
+							"title": "kitchensink-protocol",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-cc69f36396627547ace4",
+							"file": "tasks/dbdump.spec.js",
+							"line": 25,
+							"column": 2
+						},
+						{
+							"title": "basic",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-7d37f5ed7c78f19b64c7",
+							"file": "tasks/dbdump.spec.js",
+							"line": 20,
+							"column": 2
+						},
+						{
+							"title": "kitchensink-protocol",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-67822028f4effcdf8cdd",
+							"file": "tasks/dbdump.spec.js",
+							"line": 25,
+							"column": 2
+						}
+					]
+				},
+				{
+					"title": "Exports",
+					"file": "tasks/dbdump.spec.js",
+					"line": 44,
+					"column": 6,
+					"specs": [
+						{
+							"title": "correct",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-a76bf72bffcc4c5f5ed0",
+							"file": "tasks/dbdump.spec.js",
+							"line": 69,
+							"column": 2
+						},
+						{
+							"title": "no-originals",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-1de247ee6c429358e9ff",
+							"file": "tasks/dbdump.spec.js",
+							"line": 78,
+							"column": 2
+						},
+						{
+							"title": "no-analysis",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-a36396c007e75572482e",
+							"file": "tasks/dbdump.spec.js",
+							"line": 87,
+							"column": 2
+						},
+						{
+							"title": "invalid-json-analysis",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-ae37766f44370238c168",
+							"file": "tasks/dbdump.spec.js",
+							"line": 104,
+							"column": 2
+						},
+						{
+							"title": "wrong-protocol",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "chromium",
+									"projectName": "chromium",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-985d3e96404a7b86bcd7",
+							"file": "tasks/dbdump.spec.js",
+							"line": 125,
+							"column": 2
+						},
+						{
+							"title": "correct",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-a11dd6759d4479706cd7",
+							"file": "tasks/dbdump.spec.js",
+							"line": 69,
+							"column": 2
+						},
+						{
+							"title": "no-originals",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-0d1a17b9a76697e7bf95",
+							"file": "tasks/dbdump.spec.js",
+							"line": 78,
+							"column": 2
+						},
+						{
+							"title": "no-analysis",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-b9c96ec49f84e0afc4b8",
+							"file": "tasks/dbdump.spec.js",
+							"line": 87,
+							"column": 2
+						},
+						{
+							"title": "invalid-json-analysis",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-ef2be83a6d4349707e61",
+							"file": "tasks/dbdump.spec.js",
+							"line": 104,
+							"column": 2
+						},
+						{
+							"title": "wrong-protocol",
+							"ok": true,
+							"tags": [],
+							"tests": [
+								{
+									"timeout": 72000,
+									"annotations": [
+										{
+											"type": "skip",
+											"description": "Skipping database dumps and exports on CI, these are meant as easy way to (re)create dump fixtures locally only.",
+											"location": {
+												"file": "/home/runner/work/cigale/cigale/tests/tasks/dbdump.spec.js",
+												"line": 14,
+												"column": 6
+											}
+										}
+									],
+									"expectedStatus": "skipped",
+									"projectId": "webkit",
+									"projectName": "webkit",
+									"results": [],
+									"status": "skipped"
+								}
+							],
+							"id": "c8823c594ef97a52b459-a59eba762c21bd8c81c3",
+							"file": "tasks/dbdump.spec.js",
+							"line": 125,
+							"column": 2
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "tasks/readme.spec.js",
+			"file": "tasks/readme.spec.js",
+			"column": 0,
+			"line": 0,
+			"specs": [],
+			"suites": [
+				{
+					"title": "screenshots",
+					"file": "tasks/readme.spec.js",
+					"line": 6,
+					"column": 6,
+					"specs": [],
+					"suites": [
+						{
+							"title": "en",
+							"file": "tasks/readme.spec.js",
+							"line": 13,
+							"column": 8,
+							"specs": [
+								{
+									"title": "protocol",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-88b830053fd9e7555061",
+									"file": "tasks/readme.spec.js",
+									"line": 45,
+									"column": 4
+								},
+								{
+									"title": "import",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-e24984684048f62d52d6",
+									"file": "tasks/readme.spec.js",
+									"line": 50,
+									"column": 4
+								},
+								{
+									"title": "crop",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-94a09b3d80fb84477125",
+									"file": "tasks/readme.spec.js",
+									"line": 58,
+									"column": 4
+								},
+								{
+									"title": "classify",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-9b14b962dab2196215d1",
+									"file": "tasks/readme.spec.js",
+									"line": 69,
+									"column": 4
+								},
+								{
+									"title": "protocol",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-51b5b34d9921261e6eff",
+									"file": "tasks/readme.spec.js",
+									"line": 45,
+									"column": 4
+								},
+								{
+									"title": "import",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-691d3bda2b07e1a4e60a",
+									"file": "tasks/readme.spec.js",
+									"line": 50,
+									"column": 4
+								},
+								{
+									"title": "crop",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-d453c44744d3252862e0",
+									"file": "tasks/readme.spec.js",
+									"line": 58,
+									"column": 4
+								},
+								{
+									"title": "classify",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-45c4b1e1ad762c901623",
+									"file": "tasks/readme.spec.js",
+									"line": 69,
+									"column": 4
+								}
+							]
+						},
+						{
+							"title": "fr",
+							"file": "tasks/readme.spec.js",
+							"line": 13,
+							"column": 8,
+							"specs": [
+								{
+									"title": "protocol",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-a436dee12692c4a016f3",
+									"file": "tasks/readme.spec.js",
+									"line": 45,
+									"column": 4
+								},
+								{
+									"title": "import",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-567db7ff567466b33fca",
+									"file": "tasks/readme.spec.js",
+									"line": 50,
+									"column": 4
+								},
+								{
+									"title": "crop",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-3040684a7e24f3c66f9c",
+									"file": "tasks/readme.spec.js",
+									"line": 58,
+									"column": 4
+								},
+								{
+									"title": "classify",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "chromium",
+											"projectName": "chromium",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-37c75317a7b89a1bde14",
+									"file": "tasks/readme.spec.js",
+									"line": 69,
+									"column": 4
+								},
+								{
+									"title": "protocol",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-458e68c50d2a0cdc2de6",
+									"file": "tasks/readme.spec.js",
+									"line": 45,
+									"column": 4
+								},
+								{
+									"title": "import",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-794aee8294fe77d5a962",
+									"file": "tasks/readme.spec.js",
+									"line": 50,
+									"column": 4
+								},
+								{
+									"title": "crop",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-52bd30b199d132587a8c",
+									"file": "tasks/readme.spec.js",
+									"line": 58,
+									"column": 4
+								},
+								{
+									"title": "classify",
+									"ok": true,
+									"tags": ["real-protocol"],
+									"tests": [
+										{
+											"timeout": 72000,
+											"annotations": [
+												{
+													"type": "skip",
+													"description": "Skipping these in CI (unless CI explicitly asks for it), they're meant for automated README screenshots updates",
+													"location": {
+														"file": "/home/runner/work/cigale/cigale/tests/tasks/readme.spec.js",
+														"line": 7,
+														"column": 7
+													}
+												}
+											],
+											"expectedStatus": "skipped",
+											"projectId": "webkit",
+											"projectName": "webkit",
+											"results": [],
+											"status": "skipped"
+										}
+									],
+									"id": "1c3a332209940141d414-3635399f03400e0d6253",
+									"file": "tasks/readme.spec.js",
+									"line": 69,
+									"column": 4
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"errors": [],
+	"stats": {
+		"startTime": "2025-09-27T20:21:50.257Z",
+		"duration": 1239.9,
+		"expected": 0,
+		"skipped": 162,
+		"unexpected": 0,
+		"flaky": 0
+	}
+}
