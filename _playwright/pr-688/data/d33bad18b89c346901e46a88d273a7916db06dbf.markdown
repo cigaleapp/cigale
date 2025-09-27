@@ -217,8 +217,8 @@
             - button "Préparation hors-ligne"
           - generic:
             - text: CIGALE ver.
-            - link "43428e3":
-              - /url: https://github.com/cigaleapp/cigale/tree/43428e37dae353acfa49c2633bb2b893802ac4b6
+            - link "ed13117":
+              - /url: https://github.com/cigaleapp/cigale/tree/ed13117d009be166098e511ed284737ce22a9a45
             - text: ·
             - link "À propos":
               - /url: "#/about"
@@ -251,11 +251,9 @@
           - generic [ref=e91]:
             - generic [ref=e92]: bool
             - generic [ref=e93]:
-              - generic [ref=e95]:
-                - switch [active] [ref=e96] [cursor=pointer]:
-                  - img [ref=e98] [cursor=pointer]
-                - text: Non
-              - button [ref=e100] [cursor=pointer]:
+              - switch [ref=e96] [cursor=pointer]:
+                - img [ref=e98] [cursor=pointer]
+              - button [disabled] [ref=e100] [cursor=pointer]:
                 - img [ref=e101] [cursor=pointer]
           - paragraph [ref=e104]: boolean metadata
         - generic [ref=e106]:
@@ -300,12 +298,12 @@
             - generic [ref=e158]: integer
             - generic [ref=e159]:
               - generic [ref=e160]:
-                - textbox "integer" [ref=e161]
-                - button "Décrémenter" [ref=e162]:
+                - textbox "integer" [ref=e161]: "41"
+                - button "Décrémenter" [active] [ref=e162]:
                   - img [ref=e163]
                 - button "Incrémenter" [ref=e165]:
                   - img [ref=e166]
-              - button [disabled] [ref=e168] [cursor=pointer]:
+              - button [ref=e168] [cursor=pointer]:
                 - img [ref=e169] [cursor=pointer]
           - paragraph [ref=e172]: integer metadata
         - generic [ref=e173]:
