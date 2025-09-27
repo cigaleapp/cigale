@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 60
     environment:
       name: Live tests
-      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright.json
     container:
       image: ghcr.io/gwennlbh/playwright-bun:1.55.1
       options: --user 1001
@@ -36,8 +36,24 @@ jobs:
           mkdir -p deployment
           mv test-results.json deployment/playwright.json
 
-      - name: Deploy to GitHub Pages
+      - name: Save as artifact
         if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: deployment/playwright.json
+
+  upload-report:
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: results
+          path: deployment/playwright.json
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: deployment # The folder the action should deploy.
