@@ -201,6 +201,5 @@
 	"back": "Retour",
 	"unable_to_save_changes": "Impossible de sauvegarder les changements: {error}",
 	"invalid_value": "Valeur invalide: {error}",
-	"detection_and_cropping": "Détection et recadrage",
 	"undo": "Annuler"
 }

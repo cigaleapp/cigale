@@ -202,6 +202,5 @@
 	"back": "Back",
 	"unable_to_save_changes": "Unable to save changes: {error}",
 	"invalid_value": "Invalid value: {error}",
-	"detection_and_cropping": "Detection and cropping",
 	"undo": "Undo"
 }
