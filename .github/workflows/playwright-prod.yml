@@ -57,7 +57,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: deployment # The folder the action should deploy.
-          force: false
+          force: true
           single-commit: true
           clean-exclude: |
             .nojekyll
