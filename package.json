@@ -83,7 +83,7 @@
 		"@electron/fuses": "^1.8.0",
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.36.0",
-		"@inlang/paraglide-js": "2.3.2",
+		"@inlang/paraglide-js": "2.4.0",
 		"@jimp/js-jpeg": "^1.6.0",
 		"@playwright/test": "^1.55.1",
 		"@sveltejs/adapter-static": "^3.0.9",
