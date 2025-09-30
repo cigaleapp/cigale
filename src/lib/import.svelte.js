@@ -27,10 +27,11 @@ export const ACCEPTED_IMPORT_TYPES = [
 ];
 
 /**
+ * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
  * @param {File} file
  * @param {string} id
  */
-export async function processImageFile(file, id) {
+export async function processImageFile(swarpc, file, id) {
 	if (!uiState.currentProtocol) {
 		toasts.error(m.no_protocol_selected());
 		return;
@@ -55,7 +56,7 @@ export async function processImageFile(file, id) {
 		height
 	});
 
-	await tables.Image.set({
+	const image = await tables.Image.set({
 		id: imageId(id, 0),
 		filename: file.name,
 		addedAt: dates.formatISO(Date.now()),
@@ -71,6 +72,8 @@ export async function processImageFile(file, id) {
 
 	// We have to remove the file from the processing files list once the Image database object has been created
 	uiState.processing.removeFile(id);
+
+	void swarpc.computeBlurhash({ imageId: image.id });
 
 	await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
 		console.error(error);

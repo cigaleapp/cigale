@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { Dimensions, ID, SHA1Hash, References } from './common.js';
+import { Dimensions, ID, SHA1Hash, References, BlurHash } from './common.js';
 import { MetadataValues } from './metadata.js';
 
 export const Image = type({
@@ -12,7 +12,8 @@ export const Image = type({
 	fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
 	/** Si les boîtes englobantes ont été analysées. Pratique en particulier pour savoir s'il faut calculer les boîtes englobantes pour une image qui n'a aucune observation associée (chaque bounding box crée une image) */
 	boundingBoxesAnalyzed: 'boolean = false',
-	sha1: SHA1Hash.or('null').default(null)
+	sha1: SHA1Hash.or('null').default(null),
+	'blurhash?': BlurHash
 });
 
 export const Observation = type({
