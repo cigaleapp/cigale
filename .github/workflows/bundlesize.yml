@@ -21,12 +21,28 @@ jobs:
         uses: actions/download-artifact@v5
 
       - name: Compare bundle size
+        id: comparison
         uses: wojtekmaj/vite-compare-bundle-size@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           current-stats-json-path: ./head-stats/stats.json
           base-stats-json-path: ./base-stats/stats.json
           describe-assets: changed-only
+
+      # TODO figure out if the action has outputs, use those instead
+      - name: Enforce less than 5% increase
+        run: |
+          gzip_sum_base=$(jq '[.[].gzipSize] | add' base-stats/stats.json)
+          gzip_sum_head=$(jq '[.[].gzipSize] | add' head-stats/stats.json)
+          gzip_diff_abs=$((gzip_sum_head - gzip_sum_base))
+          gzip_diff_perc=$(echo "scale=2; $gzip_diff_abs / $gzip_sum_base * 100" | bc)
+          echo "Base branch gzip size: $gzip_sum_base bytes"
+          echo "Head branch gzip size: $gzip_sum_head bytes"
+          echo "Gzip size difference: $gzip_diff_abs bytes ($gzip_diff_perc%)"
+          if (( $(echo "$gzip_diff_perc > 5" | bc -l) )); then
+            echo "Bundle size increased by more than 5%!"
+            exit 1
+          fi
 
   build:
     runs-on: ubuntu-latest
