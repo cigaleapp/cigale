@@ -151,7 +151,7 @@
 		"idb": "^8.0.3",
 		"jimp": "^1.6.0",
 		"marked": "^16.3.0",
-		"nanoid": "^5.1.5",
+		"nanoid": "^5.1.6",
 		"onnxruntime-web": "^1.22.0",
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
