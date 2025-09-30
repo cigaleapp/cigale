@@ -23,8 +23,9 @@ jobs:
       matrix:
         include:
           - { os: windows, name: Windows, artifacts: out/make/squirrel.windows/*/*Setup.exe }
-          - { os: macos, name: macOS, artifacts: out/make/ }
-          - { os: ubuntu, name: Linux, artifacts: out/make/ }
+          # Disabled for now
+          # - { os: macos, name: macOS, artifacts: out/make/ }
+          # - { os: ubuntu, name: Linux, artifacts: out/make/ }
 
     name: Build for ${{ matrix.name }}
     runs-on: ${{ matrix.os }}-latest
