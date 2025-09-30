@@ -283,7 +283,7 @@ test('can import in multiple batches', async ({ page }) => {
 	await expect(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('with-exif-gps.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('debugsquare.png')).toBeVisible();
-	await expect(page.locator('main').locator('article.card')).toHaveCount(5);
+	await expect(page.locator('main').locator('article.observation')).toHaveCount(5);
 });
 
 test(
@@ -308,7 +308,7 @@ test(
 		    - img
 		    - heading "cyan" [level=2]
 		`);
-		await expect(page.getByRole('main').locator('article.card')).toHaveCount(1);
+		await expect(page.getByRole('main').locator('article.observation')).toHaveCount(1);
 	}
 );
 

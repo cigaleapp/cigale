@@ -36,7 +36,7 @@ test.describe('sorting', () => {
 
 			const getActualOrder = async () =>
 				page
-					.locator('main article.card footer')
+					.locator('main article.observation footer')
 					.allInnerTexts()
 					.then((texts) => texts.map((t) => t.trim()));
 
