@@ -12,17 +12,26 @@ permissions:
 jobs:
   autorebase:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
       - uses: actions/checkout@v5
         with:
           ref: main
+          fetch-depth: 0
+      - name: Set up git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Auto-rebase PRs
         run: |
           # Recursive function to take into account PRs that target other PR's branches, 
           # so that they are rebased in the correct order.
           function rebase_prs() {
             depth=${2:-1}
-            additional_filters=$1
+            base_branch=$1
+            additional_filters="base:$base_branch"
 
             function msg() {
               indent=$(printf '  %.0s' $(seq 1 $depth))
@@ -34,23 +43,30 @@ jobs:
             to_update=$(gh pr list -S "$FILTER $additional_filters" --json number --jq '.[].number')
 
             for pr in $to_update; do
+              branch=$(gh pr view $pr --json headRefName --jq .headRefName)
               msg ""
-              msg "Rebasing PR #$pr https://github.com/${{ github.repository }}/pull/$pr"
+              msg "Rebasing PR #$pr on branch $branch https://github.com/${{ github.repository }}/pull/$pr"
 
-              if ! gh pr update-branch $pr --rebase; then
+              git switch $branch
+
+              if ! git rebase $base_branch; then
                 msg "Failed to rebase PR #$pr, adding comment"
-                gh pr comment $pr --body "$PR_COMMENT"
+                # gh pr comment $pr --body "$PR_COMMENT"
+                git rebase --abort
 
               else
                 msg "Successfully rebased PR #$pr"
+                git push -f
 
                 branch=$(gh pr view $pr --json headRefName --jq '.headRefName')
-                rebase_prs "base:$branch" $((depth + 1))
+                rebase_prs $branch $((depth + 1))
               fi
+
+              git switch main
             done
           }
 
-          rebase_prs "base:main"
+          rebase_prs main
         env:
           GITHUB_TOKEN: ${{ github.token }}
           FILTER: >-
