@@ -155,7 +155,7 @@
 		"onnxruntime-web": "^1.22.0",
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
-		"runed": "^0.32.0",
+		"runed": "^0.34.0",
 		"sveltejs-tippy": "^3.0.0",
 		"swarpc": "^0.14.0",
 		"tiny-jsonc": "^1.0.2",
