@@ -2,8 +2,7 @@ name: Translations
 
 on:
   push:
-    # TODO remove wuchale branch when merged
-    branches: [main, wuchale]
+    branches: [main]
   workflow_dispatch:
     inputs:
       build-image:
