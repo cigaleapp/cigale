@@ -2,7 +2,7 @@
 	"Wuchale: ignore (JS)": {
 		"scope": "javascript,typescript",
 		"prefix": "wc-ignore",
-		"body": "// @wc-ignore"
+		"body": "/* @wc-ignore */"
 	},
 	"Wuchale: ignore (HTML)": {
 		"scope": "svelte",

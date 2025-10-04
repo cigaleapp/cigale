@@ -170,8 +170,8 @@ if (import.meta.vitest) {
 		expect(errorMessage(new Error('Test error'))).toBe('Test error');
 		expect(errorMessage(new Error('Error: Test error'))).toBe('Test error');
 		expect(errorMessage('string error')).toBe('string error');
-		expect(errorMessage(null)).toBe('Unexpected error');
-		expect(errorMessage(undefined)).toBe('Unexpected error');
+		expect(errorMessage(null)).toBe('Erreur inattendue');
+		expect(errorMessage(undefined)).toBe('Erreur inattendue');
 		expect(errorMessage(new Error('Test'), 'Prefix')).toBe('Prefix: Test');
 
 		// The current implementation overwrites with toString(), so cause isn't used

@@ -210,6 +210,7 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 
 	const exifDict = { GPS: {}, Exif: {} };
 	const setExifKey = (key, value) => {
+		// @wc-ignore
 		const category = Object.keys(EXIF_GPS_FIELDS).includes(key) ? 'GPS' : 'Exif';
 		const serialized = serializeExifValue(value);
 		if (serialized === undefined) return;

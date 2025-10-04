@@ -359,7 +359,7 @@ export async function openDatabase() {
 				}
 			}
 			if (oldVersion === 2) {
-				createTable('ImagePreviewFile', Tables.ImagePreviewFile);
+				createTable(/* @wc-ignore */ 'ImagePreviewFile', Tables.ImagePreviewFile);
 				return;
 			}
 			for (const [tableName, schema] of tablesByName) {

@@ -114,7 +114,9 @@ const Settings = table(
 					return fromParaglide;
 				}
 			} catch (e) {
-				console.warn('Error migrating from PARAGLIDE_LOCALE ', e);
+				// ReferenceError => localStorage not defined => not in browser => isok
+				if (!(e instanceof ReferenceError))
+					console.warn('Error migrating from PARAGLIDE_LOCALE ', e);
 			}
 
 			try {

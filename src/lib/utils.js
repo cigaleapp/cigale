@@ -879,7 +879,7 @@ if (import.meta.vitest) {
  */
 export function slugify(text) {
 	const result = text
-		.normalize('NFD') // separate accent from letter
+		.normalize(/* @wc-ignore */ 'NFD') // separate accent from letter
 		.replace(/[\u0300-\u036f]/g, '') // remove all accents
 		.replace(/[^\w\s-]/g, '') // remove all non-word characters (except spaces and dashes)
 		.trim()

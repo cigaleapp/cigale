@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T18:49:17.874Z\n"
+"PO-Revision-Date: 2025-10-04T19:14:05.951Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -152,10 +152,6 @@ msgstr ""
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Modèle d'inférence"
-msgstr ""
-
-#: src/routes/(app)/PrepareForOffline.svelte
-msgid "<0/> OK!"
 msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte
@@ -544,19 +540,6 @@ msgid "Initialisation des réglages par défaut…"
 msgstr "Initializing default settings…"
 
 #: src/routes/(app)/+layout.js
-msgid "Metadata"
-msgstr ""
-
-#: src/routes/(app)/+layout.js
-msgid "Protocol"
-msgstr ""
-
-#: src/routes/(app)/+layout.js
-#: src/routes/(app)/+layout.js
-msgid "Settings"
-msgstr ""
-
-#: src/routes/(app)/+layout.js
 msgid "Chargement du protocole intégré"
 msgstr "Loading built-in protocol"
 
@@ -688,10 +671,6 @@ msgstr ""
 #: src/routes/(app)/PrepareForOffline.svelte
 #: src/routes/(app)/Settings.svelte
 msgid "Préparation hors-ligne"
-msgstr ""
-
-#: src/routes/(app)/PrepareForOffline.svelte
-msgid "<0/> Chargement…"
 msgstr ""
 
 #: src/routes/(app)/PrepareForOffline.svelte
@@ -960,8 +939,105 @@ msgstr ""
 msgid "Dans le cadre d'un"
 msgstr ""
 
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
+msgstr ""
+
+#: src/lib/exif.js
+#: src/lib/i18n.js
+#: src/lib/toasts.svelte.js
+msgid "Erreur inattendue"
+msgstr ""
+
+#. placeholder {0}: file.name
+#. placeholder {1}: e?.toString() ?? 'Erreur inattendue'
+#: src/lib/exif.js
+msgid "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
+msgstr ""
+
+#: src/lib/i18n.js
+msgid "Main error"
+msgstr ""
+
+#. placeholder {0}: id
+#: src/lib/images.js
+msgid "Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): {0}"
+msgstr ""
+
+#. placeholder {0}: imageLimits.maxResolutionInMP
+#. placeholder {1}: imageLimits.maxMemoryUsageInMB
+#: src/lib/images.js
+msgid "L'image est trop grande pour être traitée. Elle doit faire moins de {0} Megapixels et {1} Mo"
+msgstr ""
+
+#: src/lib/observations.js
+msgid "Nouvelle observation"
+msgstr ""
+
+#: src/lib/protocols.js
+msgid "Mon protocole"
+msgstr ""
+
+#: src/lib/protocols.js
+msgid "Prénom Nom"
+msgstr ""
+
+#: src/lib/protocols.js
+msgid "Description de mon protocole"
+msgstr ""
+
+#: src/lib/protocols.js
+msgid "Une métadonnée"
+msgstr ""
+
+#: src/lib/protocols.js
+msgid "Description de la métadonnée"
+msgstr ""
+
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
 msgid_plural "Protocole importé\", \"# protocoles importés"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/lib/import.svelte.js
+#: src/lib/import.svelte.js
+msgid "Aucun protocole sélectionné"
+msgstr ""
+
+#. placeholder {0}: file.name
+#: src/lib/import.svelte.js
+msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
+msgstr ""
+
+#. placeholder {0}: file.name
+#: src/lib/results.svelte.js
+msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
+msgstr ""
+
+#. placeholder {0}: file.name
+#: src/lib/results.svelte.js
+msgid "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
+msgstr ""
+
+#. placeholder {0}: file.name
+#. placeholder {1}: analysis.summary
+#: src/lib/results.svelte.js
+msgid "Fichier d'analyse de {0} invalide: {1}"
+msgstr ""
+
+#. placeholder {0}: file.name
+#. placeholder {1}: protocol.id
+#. placeholder {2}: protocolId
+#: src/lib/results.svelte.js
+msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole actuel est {2}"
+msgstr ""
+
+#. placeholder {0}: file.name
+#: src/lib/results.svelte.js
+msgid "Aucune image trouvée dans l'export {0}. L'export doit contenir les images originales, pas seulement les images recadrées"
+msgstr ""
+
+#: src/lib/seo.svelte.js
+msgid "Cigale"
+msgstr ""
