@@ -25,7 +25,7 @@ jobs:
       - name: 'Check if changes are only revision-date and #: references'
         id: check-changes
         run: |
-          if git diff -I PO-Revision-Date -I '#: ' --exit-code; then
+          if git diff -I PO-Revision-Date --exit-code; then
             echo "No meaningful changes in .po files"
             echo "meaningful=false" >> $GITHUB_OUTPUT
           else
