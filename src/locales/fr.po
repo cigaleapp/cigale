@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T19:14:05.949Z\n"
+"PO-Revision-Date: 2025-10-04T19:36:48.999Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -946,10 +946,6 @@ msgstr "Supprimer toutes les images sélectionnées. Attention, impossible d'ann
 msgid "Dans le cadre d'un"
 msgstr "Dans le cadre d'un"
 
-#: src/routes/(app)/PrepareForOffline.svelte
-msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
-msgstr "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
-
 #: src/lib/exif.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
@@ -1000,6 +996,14 @@ msgstr "Une métadonnée"
 #: src/lib/protocols.js
 msgid "Description de la métadonnée"
 msgstr "Description de la métadonnée"
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid ""
+"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
+"Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
+msgstr ""
+"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
+"Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"

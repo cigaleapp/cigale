@@ -9,6 +9,7 @@
 	 * @property {Partial<{[K in Key]: string}>} [labels] labels for the options
 	 * @property {NoInfer<Key> | undefined} [value] which option is selected
 	 * @property {import('svelte').Snippet<[Key]>} [customOption] snippets to render for each option. called for every option in `options` that is not in `labels`. arguments: option
+	 * @property {(value: NoInfer<Key>) => void | Promise<void>} [onchange] called when the value changes
 	 * @property {boolean} [clickable-custom-options=false] whether the custom options should be clickable. If true, the onclick function will be called when the option is clicked.
 	 */
 
@@ -20,7 +21,8 @@
 		labels,
 		value = $bindable(),
 		customOption,
-		'clickable-custom-options': clickableCustomOptions
+		'clickable-custom-options': clickableCustomOptions,
+		onchange
 	} = $props();
 </script>
 
@@ -33,6 +35,7 @@
 				class="option"
 				onclick={() => {
 					value = option;
+					onchange?.(option);
 				}}
 			>
 				{labels?.[option] ?? option}
@@ -45,7 +48,9 @@
 				aria-checked={option === value}
 				class="option"
 				onclick={() => {
-					if (clickableCustomOptions) value = option;
+					if (!clickableCustomOptions) return;
+					value = option;
+					onchange?.(option);
 				}}
 			>
 				{@render customOption(option)}

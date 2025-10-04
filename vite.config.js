@@ -60,7 +60,8 @@ export default defineConfig({
 			compiler: 'svelte',
 			defaultClass: 'icon'
 		}),
-		wuchale(),
+		// FIXME Wuchale doesnt play well with Vitest for now
+		process.env.VITEST ? undefined : wuchale(),
 		sveltekit(),
 		crossOriginIsolation()
 	]

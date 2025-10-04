@@ -161,7 +161,11 @@
 			<SegmentedGroup
 				clickable-custom-options
 				options={['en', 'fr']}
-				bind:value={() => getSettings().language, (code) => setSetting('language', code)}
+				value={getSettings().language}
+				onchange={async (code) => {
+					await setSetting('language', code);
+					window.location.reload();
+				}}
 			>
 				{#snippet customOption(code)}
 					<!-- @wc-ignore: language names are left in their native language on purpose -->
