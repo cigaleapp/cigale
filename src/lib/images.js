@@ -5,7 +5,6 @@ import { errorMessage, humanFormatName } from './i18n';
 import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { imageLimits } from './inference_utils';
-import { m } from './paraglide/messages';
 import { clamp, unique } from './utils';
 
 /**
@@ -251,7 +250,29 @@ const MAXWIDTH = 1024;
  */
 const MAXHEIGHT = ({ width, height }) => Math.round((MAXWIDTH * height) / width);
 
+const RAW_IMAGE_MEDIA_TYPES = [
+	'image/CR2',
+	'image/x-canon-cr2',
+	'image/x-dcraw',
+	'image/x-canon-crw',
+	'image/x-kodak-dcr',
+	'image/x-adobe-dng',
+	'image/x-epson-erf',
+	'image/x-kodak-k25',
+	'image/x-kodak-kdc',
+	'image/x-minolta-mrw',
+	'image/x-nikon-nef',
+	'image/x-olympus-orf',
+	'image/x-pentax-pef',
+	'image/x-fuji-raf',
+	'image/x-panasonic-raw',
+	'image/x-sony-sr2',
+	'image/x-sony-srf',
+	'image/x-sigma-x3f'
+];
+
 const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
+const SUPPORT_PLANNED_TYPES = [...RAW_IMAGE_MEDIA_TYPES];
 
 /**
  * Resize an image to fit within MAXWIDTH and MAXHEIGHT
@@ -266,8 +287,8 @@ export async function resizeToMaxSize({ source }) {
 		throw new Error(
 			ALWAYS_SUPPORTED_TYPES.includes(source.type)
 				? errorMessage(error)
-				: ['image/CR2', 'image/x-canon-cr2'].includes(source.type)
-					? m.file_format_not_supported_yet({ format: '.CR2' })
+				: SUPPORT_PLANNED_TYPES.includes(source.type)
+					? `Les fichiers ${humanFormatName(source.type)} ne sont pas encore supportés`
 					: m.file_format_not_supported({ format: humanFormatName(source.type) })
 		);
 	});
