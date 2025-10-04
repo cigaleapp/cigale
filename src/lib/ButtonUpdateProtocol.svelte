@@ -11,7 +11,6 @@
 	import IconCannotCheckForUpdates from '~icons/ph/warning-circle';
 	import ButtonIcon from './ButtonIcon.svelte';
 
-
 	/**
 	 * @typedef {object} Props
 	 * @property {string} id

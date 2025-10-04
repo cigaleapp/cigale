@@ -8,7 +8,6 @@
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';
 	import Logo from './Logo.svelte';
-	import { m } from './paraglide/messages.js';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
 	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';

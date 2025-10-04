@@ -6,7 +6,6 @@
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { isType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';
-	import { m } from './paraglide/messages.js';
 	import { isDebugMode } from './settings.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';

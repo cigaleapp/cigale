@@ -5,7 +5,6 @@
 	import IconIncrement from '~icons/ph/plus';
 	import { isType } from './metadata';
 	import MetadataCombobox from './MetadataCombobox.svelte';
-	import { m } from './paraglide/messages.js';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
 	import { round, safeJSONParse } from './utils';

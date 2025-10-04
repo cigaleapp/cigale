@@ -43,7 +43,11 @@
 		{#if version && source}
 			<ButtonUpdateProtocol compact {version} {source} {id} />
 		{:else}
-			<ButtonIcon crossout onclick={() => {}} help={'Ce protocole ne supporte pas la vérification des mises à jour'}>
+			<ButtonIcon
+				crossout
+				onclick={() => {}}
+				help={'Ce protocole ne supporte pas la vérification des mises à jour'}
+			>
 				<IconUpgrade />
 			</ButtonIcon>
 		{/if}

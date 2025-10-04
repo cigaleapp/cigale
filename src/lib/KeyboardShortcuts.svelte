@@ -4,7 +4,6 @@
 	import { tinykeys } from 'tinykeys';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import Modal, { hasAnyModalOpen } from './Modal.svelte';
-	import { m } from './paraglide/messages.js';
 	import { isDebugMode } from './settings.svelte';
 	import { entries } from './utils';
 

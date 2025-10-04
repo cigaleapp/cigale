@@ -61,7 +61,8 @@
 		'$mod+s': {
 			help: '',
 			hidden: true,
-			do: () => toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎')
+			do: () =>
+				toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎')
 		},
 		'i d e v': {
 			help: 'Activer/Désactiver le debug mode',

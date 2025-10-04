@@ -27,7 +27,6 @@
 </script>
 
 <script>
-
 	import IconRetry from '~icons/ph/arrow-counter-clockwise';
 	import IconImage from '~icons/ph/image';
 	import IconDelete from '~icons/ph/trash';

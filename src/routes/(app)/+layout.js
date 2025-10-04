@@ -1,7 +1,8 @@
 import { dev } from '$app/environment';
 import { databaseName, databaseRevision, openTransaction, tables } from '$lib/idb.svelte.js';
 
-import { getLocale } from '$lib/paraglide/runtime';
+import { loadLocale } from 'wuchale/load-utils';
+import '../../locales/loader.svelte.js';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';
 import * as dates from 'date-fns';
@@ -10,15 +11,25 @@ import * as Swarpc from 'swarpc';
 import { PROCEDURES } from '../../web-worker-procedures';
 // oxlint-disable-next-line import/default
 import WebWorker from '../../web-worker.js?worker';
+import { getSettings } from '$lib/settings.svelte';
 
 export async function load() {
-	document.documentElement.lang = getLocale();
+	const locale = getSettings().language;
+	document.documentElement.lang = locale;
+	setLoadingMessage(
+		// Translations not loaded yet
+		// @wc-ignore
+		{ fr: 'Chargement des traductions…', en: 'Loading translations…' }[locale]
+	);
+
+	await loadLocale(locale);
+
 	dates.setDefaultOptions({
 		locale: {
 			fr: dateFnsLocales.fr,
 			en: dateFnsLocales.enUS,
 			ja: dateFnsLocales.ja
-		}[getLocale()]
+		}[locale]
 	});
 
 	const parallelism = Math.ceil(navigator.hardwareConcurrency / 3);
@@ -26,10 +37,7 @@ export async function load() {
 	setLoadingMessage('Chargement du worker neuronal…');
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
-		nodes: parallelism,
-		localStorage: {
-			PARAGLIDE_LOCALE: getLocale()
-		}
+		nodes: parallelism
 	});
 
 	setLoadingMessage('Initialisation DB du worker neuronal…');

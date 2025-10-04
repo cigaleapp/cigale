@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T15:56:02.777Z\n"
+"PO-Revision-Date: 2025-10-04T16:43:49.855Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -411,8 +411,8 @@ msgstr ""
 msgid "Test title"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
 msgstr ""
 

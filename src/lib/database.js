@@ -103,7 +103,19 @@ const Settings = table(
 		theme: type.enumerated('dark', 'light', 'auto'),
 		// TODO(2025-09-05): remove n===10 after a while
 		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),
-		language: type.enumerated('fr'),
+		language: type.enumerated('fr', 'en').default(() => {
+			// TODO(2025-10-04): remove paraglide migration after a while
+
+			const fromParaglide =
+				'localStorage' in window ? localStorage.getItem('PARAGLIDE_LOCALE') : null;
+
+			if (fromParaglide === 'fr' || fromParaglide === 'en') {
+				localStorage.removeItem('PARAGLIDE_LOCALE');
+				return fromParaglide;
+			}
+
+			return navigator.language.split('-', 2).at(0) === 'fr' ? 'fr' : 'en';
+		}),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
 		cropAutoNext: 'boolean = false',

@@ -2,8 +2,6 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
-
-	import { getLocale, locales, setLocale } from '$lib/paraglide/runtime.js';
 	import { goto, href } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
@@ -162,10 +160,11 @@
 		<div class="setting">
 			<SegmentedGroup
 				clickable-custom-options
-				options={[...locales]}
-				bind:value={getLocale, setLocale}
+				options={['en', 'fr']}
+				bind:value={() => getSettings().language, (code) => setSetting('language', code)}
 			>
 				{#snippet customOption(code)}
+					<!-- @wc-ignore: language names are left in their native language on purpose -->
 					{@const names = { en: 'English', fr: 'Français', ja: '日本語' }}
 					{names[code] || code}
 				{/snippet}
@@ -189,7 +188,7 @@
 			{'Raccourcis clavier'}
 		</ButtonSecondary>
 		<ButtonSecondary
-			help={'Télécharger tout ce qu\'il est nécéssaire pour pouvoir utiliser l\'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.'}
+			help={"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."}
 			onclick={() => {
 				openPrepareForOfflineUse?.();
 			}}

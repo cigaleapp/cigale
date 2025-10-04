@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T15:56:02.766Z\n"
+"PO-Revision-Date: 2025-10-04T16:43:49.843Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -312,8 +312,8 @@ msgstr "Il est impossible de revenir en arrière après avoir supprimé un proto
 msgid "Test title"
 msgstr "Test title"
 
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
 msgstr "Oops!"
 

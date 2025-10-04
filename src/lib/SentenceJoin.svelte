@@ -1,6 +1,4 @@
 <script generics="T">
-	import { m } from './paraglide/messages';
-
 	/**
 	 * @typedef Props
 	 * @type {object}

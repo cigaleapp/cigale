@@ -4,7 +4,6 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { prepareForOfflineUse } from '$lib/offline';
-	import { m } from '$lib/paraglide/messages';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { toastIcon } from '$lib/Toast.svelte';
 	import { clamp } from '$lib/utils';
@@ -43,7 +42,7 @@
 </script>
 
 <Modal key="modal_prepare_for_offline" title={'Préparation hors-ligne'} bind:open>
-	{'Télécharger tout ce qu\'il est nécéssaire pour pouvoir utiliser l\'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.'}
+	{"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."}
 	<ul class="bars">
 		{#each progressBars as [modelNo, { done, total, modelURL }] (modelNo)}
 			<li>

@@ -1,4 +1,8 @@
-import { m } from './paraglide/messages';
+import { openDB } from 'idb';
+
+/**
+ * @typedef {import('$lib/database').Settings['language']} Language
+ */
 
 /**
  * Return a ", "-separated list of "{count} {thing}" strings, with thing set to plural.
@@ -181,4 +185,20 @@ if (import.meta.vitest) {
 		errorWithCause.cause = new Error('Cause error');
 		expect(errorMessage(errorWithCause)).toBe('Main error');
 	});
+}
+
+/**
+ * @returns {Language}
+ */
+export function getLocale() {
+	return localStorage.getItem('LOCALE') || 'fr';
+}
+
+/**
+ *
+ * @param {Language} newLocale
+ */
+export function setLocale(newLocale) {
+	localStorage.setItem('LOCALE', newLocale);
+	void openDB;
 }

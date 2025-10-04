@@ -6,7 +6,6 @@
 	import { nukeDatabase } from '$lib/idb.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import { goto } from '$lib/paths.js';
-
 </script>
 
 <main>

@@ -2,8 +2,6 @@ import { type } from 'arktype';
 import * as dates from 'date-fns';
 import { computeCascades } from './cascades.js';
 import { idComparator, Schemas } from './database.js';
-import { m } from './paraglide/messages.js';
-import { getLocale, setLocale } from './paraglide/runtime.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -654,11 +652,12 @@ function toNumber(type, values) {
 /**
  * Returns a human-friendly string for a metadata value.
  * Used for e.g. CSV exports.
+ * @param {import('$lib/i18n.js').Language} language
  * @param {Pick<DB.Metadata, 'type'>} metadata the metadata definition
  * @param {DB.MetadataValue['value']} value the value of the metadata
  * @param {string} [valueLabel] the label of the value, if applicable (e.g. for enums)
  */
-export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
+export function metadataPrettyValue(language, metadata, value, valueLabel = undefined) {
 	switch (metadata.type) {
 		case 'boolean':
 			return value ? 'Oui' : 'Non';
@@ -689,7 +688,7 @@ export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 		}
 
 		case 'float':
-			return Intl.NumberFormat(getLocale()).format(type('number').assert(value));
+			return Intl.NumberFormat(language).format(type('number').assert(value));
 
 		default:
 			return value.toString();
@@ -704,28 +703,31 @@ if (import.meta.vitest) {
 			beforeEach(async () => {
 				const { fr } = await import('date-fns/locale');
 				dates.setDefaultOptions({ locale: fr });
-				setLocale('fr', { reload: false });
 			});
 
 			test('booleans', () => {
-				expect(metadataPrettyValue({ type: 'boolean' }, true)).toBe('Oui');
-				expect(metadataPrettyValue({ type: 'boolean' }, false)).toBe('Non');
+				expect(metadataPrettyValue('fr', { type: 'boolean' }, true)).toBe('Oui');
+				expect(metadataPrettyValue('fr', { type: 'boolean' }, false)).toBe('Non');
 			});
 
 			test('dates', () => {
-				expect(metadataPrettyValue({ type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
+				expect(metadataPrettyValue('fr', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
 					'01/02/2023, 15:04:05'
 				);
 			});
 
 			test('floats', () => {
-				expect(metadataPrettyValue({ type: 'float' }, 12012.34)).toBe('12 012,34');
+				expect(metadataPrettyValue('fr', { type: 'float' }, 12012.34)).toBe('12 012,34');
 			});
 
 			test('bounding boxes', () => {
-				expect(metadataPrettyValue({ type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
+				expect(metadataPrettyValue('fr', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
 					'Boîte de (1, 2) à (4, 6)'
 				);
+			});
+
+			test('integers', () => {
+				expect(metadataPrettyValue('fr', { type: 'integer' }, 12012)).toBe('12\u202F012');
 			});
 		});
 
@@ -733,44 +735,48 @@ if (import.meta.vitest) {
 			beforeEach(async () => {
 				const { enUS } = await import('date-fns/locale');
 				dates.setDefaultOptions({ locale: enUS });
-				setLocale('en', { reload: false });
 			});
 
 			test('booleans', () => {
-				expect(metadataPrettyValue({ type: 'boolean' }, true)).toBe('Yes');
-				expect(metadataPrettyValue({ type: 'boolean' }, false)).toBe('No');
+				expect(metadataPrettyValue('en', { type: 'boolean' }, true)).toBe('Yes');
+				expect(metadataPrettyValue('en', { type: 'boolean' }, false)).toBe('No');
 			});
 
 			test('dates', () => {
-				expect(metadataPrettyValue({ type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
+				expect(metadataPrettyValue('en', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
 					'02/01/2023, 3:04:05 PM'
 				);
 			});
 
 			test('bounding boxes', () => {
-				expect(metadataPrettyValue({ type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
+				expect(metadataPrettyValue('en', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
 					'Box from (1, 2) to (4, 6)'
 				);
 			});
 
 			test('floats', () => {
-				expect(metadataPrettyValue({ type: 'float' }, 12012.34)).toBe('12,012.34');
+				expect(metadataPrettyValue('en', { type: 'float' }, 12012.34)).toBe('12,012.34');
+			});
+
+			test('integers', () => {
+				expect(metadataPrettyValue('en', { type: 'integer' }, 12012)).toBe('12,012');
 			});
 		});
 
-		test('enums', () => {
-			expect(metadataPrettyValue({ type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
-			expect(metadataPrettyValue({ type: 'enum' }, 'value2')).toBe('value2');
-		});
-
 		test('locations', () => {
-			expect(metadataPrettyValue({ type: 'location' }, { latitude: 12.34, longitude: 56.78 })).toBe(
-				'12.34, 56.78'
-			);
+			expect(
+				metadataPrettyValue('fr', { type: 'location' }, { latitude: 12.34, longitude: 56.78 })
+			).toBe('12.34, 56.78');
+			expect(
+				metadataPrettyValue('en', { type: 'location' }, { latitude: 12.34, longitude: 56.78 })
+			).toBe('12.34, 56.78');
 		});
 
-		test('integers', () => {
-			expect(metadataPrettyValue({ type: 'integer' }, 12012)).toBe('12012');
+		test('enums', () => {
+			expect(metadataPrettyValue('en', { type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
+			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
+			expect(metadataPrettyValue('en', { type: 'enum' }, 'value2')).toBe('value2');
+			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value2')).toBe('value2');
 		});
 	});
 }

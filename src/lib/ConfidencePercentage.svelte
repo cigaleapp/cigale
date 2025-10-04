@@ -1,6 +1,5 @@
 <script>
 	import { percent } from './i18n.js';
-	import { m } from './paraglide/messages.js';
 	import { tooltip } from './tooltips.js';
 	import { gradientedColor } from './utils.js';
 
