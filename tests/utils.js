@@ -98,9 +98,18 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
  */
 export async function setSettings({ page }, newSettings) {
 	await page.evaluate(async ([newSettings]) => {
-		const settings = await window.DB.get('Settings', 'user').then(
+		let maxAttempts = 100;
+		let settings = await window.DB.get('Settings', 'user').then(
 			(settings) => settings ?? window.DB.get('Settings', 'defaults')
 		);
+
+		while (!settings && maxAttempts-- > 0) {
+			await new Promise((r) => setTimeout(r, 100));
+			settings = await window.DB.get('Settings', 'user').then(
+				(settings) => settings ?? window.DB.get('Settings', 'defaults')
+			);
+		}
+
 		if (!settings) throw new Error('Settings not found in the database');
 		await window.DB.put('Settings', { ...settings, id: 'user', ...newSettings });
 		await window.refreshDB();
