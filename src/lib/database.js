@@ -106,12 +106,15 @@ const Settings = table(
 		language: type.enumerated('fr', 'en').default(() => {
 			// TODO(2025-10-04): remove paraglide migration after a while
 
-			const fromParaglide =
-				'localStorage' in window ? localStorage.getItem('PARAGLIDE_LOCALE') : null;
+			try {
+				const fromParaglide = localStorage.getItem('PARAGLIDE_LOCALE');
 
-			if (fromParaglide === 'fr' || fromParaglide === 'en') {
-				localStorage.removeItem('PARAGLIDE_LOCALE');
-				return fromParaglide;
+				if (fromParaglide === 'fr' || fromParaglide === 'en') {
+					localStorage.removeItem('PARAGLIDE_LOCALE');
+					return fromParaglide;
+				}
+			} catch (e) {
+				console.warn('Error migrating from PARAGLIDE_LOCALE ', e);
 			}
 
 			return navigator.language.split('-', 2).at(0) === 'fr' ? 'fr' : 'en';

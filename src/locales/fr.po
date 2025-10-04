@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T17:09:51.901Z\n"
+"PO-Revision-Date: 2025-10-04T17:27:10.693Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -942,6 +942,10 @@ msgstr "En attente"
 #: src/lib/CardMedia.svelte
 msgid "Erreur"
 msgstr "Erreur"
+
+#~ msgid "Protocole importé\", \"# protocoles importés"
+#~ msgid_plural "Protocole importé\", \"# protocoles importés"
+#~ msgstr[0] "Protocole importé\", \"# protocoles importés"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
