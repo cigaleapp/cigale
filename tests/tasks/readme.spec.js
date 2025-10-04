@@ -6,9 +6,6 @@ import {
 	importPhotos,
 	setSettings
 } from '../utils';
-import français from '../../messages/fr.json' with { type: 'json' };
-import english from '../../messages/en.json' with { type: 'json' };
-
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
 		Boolean(process.env.CI && !process.env.RUN_README_TESTS),
@@ -17,13 +14,11 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 	for (const language of /** @type {const} */ (['en', 'fr'])) {
 		test.describe(language, () => {
-			const messages = language === 'fr' ? français : english;
-
 			/**
 			 * @param {import('@playwright/test').Page} page
 			 */
 			async function waitForAnalysis(page) {
-				await expect(firstObservationCard(page)).not.toHaveText(new RegExp(messages.analyzing), {
+				await expect(firstObservationCard(page)).not.toHaveText(new RegExp('Analyse…'), {
 					timeout: 20_000
 				});
 			}
@@ -52,7 +47,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 			test('import', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await goToTab(page, 'import', { messages });
+				await goToTab(page, 'import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 				await expect(page).toHaveScreenshot();
@@ -60,23 +55,23 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 			test('crop', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await goToTab(page, 'import', { messages });
+				await goToTab(page, 'import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'crop', { messages });
+				await goToTab(page, 'crop');
 				await firstObservationCard(page).click();
 				await expect(page).toHaveScreenshot();
 			});
 
 			test('classify', async ({ page }) => {
 				await chooseDefaultProtocol(page);
-				await goToTab(page, 'import', { messages });
+				await goToTab(page, 'import');
 
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'classify', { messages });
+				await goToTab(page, 'classify');
 
 				await waitForAnalysis(page);
 				await page.getByText('lil-fella', { exact: true }).first().click();

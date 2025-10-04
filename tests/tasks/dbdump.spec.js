@@ -1,5 +1,4 @@
 import { expect, test } from '../fixtures.js';
-import fr from '../../messages/fr.json' with { type: 'json' };
 import {
 	chooseDefaultProtocol,
 	dumpDatabase,
@@ -69,7 +68,7 @@ test.describe('Exports', () => {
 	test('correct', async ({ page }) => {
 		await prepare({ page });
 		await page.getByRole('button', { name: 'Résultats' }).click();
-		await page.getByText(fr.metadata_cropped_and_full_images).click();
+		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();
 		const download = await page.waitForEvent('download');
 		await download.saveAs('./tests/fixtures/exports/correct.zip');
@@ -78,7 +77,7 @@ test.describe('Exports', () => {
 	test('no-originals', async ({ page }) => {
 		await prepare({ page });
 		await page.getByRole('button', { name: 'Résultats' }).click();
-		await page.getByText(fr.metadata_and_cropped_images).click();
+		await page.getByText('Métadonnées et images recadrées').click();
 		await page.getByText('results.zip').click();
 		const download = await page.waitForEvent('download');
 		await download.saveAs('./tests/fixtures/exports/no-originals.zip');
@@ -87,7 +86,7 @@ test.describe('Exports', () => {
 	test('no-analysis', async ({ page }) => {
 		await prepare({ page });
 		await page.getByRole('button', { name: 'Résultats' }).click();
-		await page.getByText(fr.metadata_cropped_and_full_images).click();
+		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();
 		const download = await page.waitForEvent('download');
 		const zipPath = './tests/fixtures/exports/no-analysis.zip';
@@ -104,7 +103,7 @@ test.describe('Exports', () => {
 	test('invalid-json-analysis', async ({ page }) => {
 		await prepare({ page });
 		await page.getByRole('button', { name: 'Résultats' }).click();
-		await page.getByText(fr.metadata_cropped_and_full_images).click();
+		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();
 		const download = await page.waitForEvent('download');
 		const zipPath = './tests/fixtures/exports/invalid-json-analysis.zip';
@@ -125,7 +124,7 @@ test.describe('Exports', () => {
 	test('wrong-protocol', async ({ page }) => {
 		await prepare({ page });
 		await page.getByRole('button', { name: 'Résultats' }).click();
-		await page.getByText(fr.metadata_cropped_and_full_images).click();
+		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();
 		const download = await page.waitForEvent('download');
 		await download.saveAs('./tests/fixtures/exports/wrong-protocol.zip');
