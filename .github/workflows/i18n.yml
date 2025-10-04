@@ -2,7 +2,8 @@ name: Translations
 
 on:
   push:
-    branches: [main]
+    # TODO remove wuchale branch when merged
+    branches: [main, wuchale]
   workflow_dispatch:
 
 jobs:
