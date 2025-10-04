@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T21:12:26.359Z\n"
+"PO-Revision-Date: 2025-10-04T21:13:02.140Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -1002,6 +1002,16 @@ msgid_plural "Protocole importé\", \"# protocoles importés"
 msgstr[0] ""
 msgstr[1] ""
 
+#: src/lib/import.svelte.js
+#: src/lib/import.svelte.js
+msgid "Aucun protocole sélectionné"
+msgstr ""
+
+#. placeholder {0}: file.name
+#: src/lib/import.svelte.js
+msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
+msgstr ""
+
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
@@ -1032,14 +1042,4 @@ msgstr ""
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"
-msgstr ""
-
-#: src/lib/import.svelte.js
-#: src/lib/import.svelte.js
-msgid "Aucun protocole sélectionné"
-msgstr ""
-
-#. placeholder {0}: file.name
-#: src/lib/import.svelte.js
-msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr ""
