@@ -140,11 +140,7 @@ if (import.meta.vitest) {
  * @returns {string}
  */
 export function errorMessage(error, prefix = '') {
-	let defaultMessage = 'Unexpected error';
-	try {
-		defaultMessage = 'Erreur inattendue';
-		// eslint-disable-next-line no-empty
-	} catch {}
+	const defaultMessage = 'Erreur inattendue';
 
 	let result = defaultMessage;
 
@@ -171,9 +167,6 @@ export function errorMessage(error, prefix = '') {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('errorMessage', async () => {
-		await import('../locales/loader.js');
-		const { loadLocale } = await import('wuchale/load-utils');
-		await loadLocale('en');
 		expect(errorMessage(new Error('Test error'))).toBe('Test error');
 		expect(errorMessage(new Error('Error: Test error'))).toBe('Test error');
 		expect(errorMessage('string error')).toBe('string error');

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T18:37:50.414Z\n"
+"PO-Revision-Date: 2025-10-04T18:49:17.874Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -934,6 +934,30 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Continuer"
+msgstr ""
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
+msgstr ""
+
+#: src/routes/(app)/+page.svelte
+msgid "Modèle d'inférence pour la détection"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Importer d'autres images"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Dans le cadre d'un"
 msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte

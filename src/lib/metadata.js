@@ -660,7 +660,12 @@ function toNumber(type, values) {
 export function metadataPrettyValue(language, metadata, value, valueLabel = undefined) {
 	switch (metadata.type) {
 		case 'boolean':
-			return value ? 'Oui' : 'Non';
+			switch (language) {
+				case 'fr':
+					return value ? 'Oui' : 'Non';
+				default:
+					return value ? 'Yes' : 'No';
+			}
 
 		case 'date':
 			return value instanceof Date ? dates.format(value, 'Ppp') : value.toString();
@@ -684,10 +689,16 @@ export function metadataPrettyValue(language, metadata, value, valueLabel = unde
 				h
 			} = type({ x: 'number', y: 'number', h: 'number', w: 'number' }).assert(value);
 
-			return `Boîte de (${x1}, ${y1}) à (${x1 + w}, ${y1 + h})`;
+			switch (language) {
+				case 'fr':
+					return `Boîte de (${x1}, ${y1}) à (${x1 + w}, ${y1 + h})`;
+				default:
+					return `Box from (${x1}, ${y1}) to (${x1 + w}, ${y1 + h})`;
+			}
 		}
 
 		case 'float':
+		case 'integer':
 			return Intl.NumberFormat(language).format(type('number').assert(value));
 
 		default:

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T18:37:50.398Z\n"
+"PO-Revision-Date: 2025-10-04T18:49:17.861Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -942,6 +942,30 @@ msgstr "<0/> Recadrages confirmés <1/>"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Continuer"
 msgstr "<0/> Continuer"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
+msgstr "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
+
+#: src/routes/(app)/+page.svelte
+msgid "Modèle d'inférence pour la détection"
+msgstr "Modèle d'inférence pour la détection"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
+msgstr "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Importer d'autres images"
+msgstr "<0/> Importer d'autres images"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
+msgstr "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Dans le cadre d'un"
+msgstr "Dans le cadre d'un"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
