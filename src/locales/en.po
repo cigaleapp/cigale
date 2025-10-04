@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T17:27:11.010Z\n"
+"PO-Revision-Date: 2025-10-04T17:28:06.775Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -136,8 +136,8 @@ msgstr "Crop images"
 msgid "Classifier les images"
 msgstr "Classify images"
 
-#: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Export results"
 
@@ -192,8 +192,8 @@ msgstr ""
 
 #: src/routes/(app)/+page.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Importer"
 msgstr "Import"
 
@@ -217,8 +217,8 @@ msgstr ""
 msgid "Fusionner des observations ou images"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Separate all selected observations into individual images"
 
@@ -415,8 +415,8 @@ msgstr ""
 msgid "Test title"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Oops!"
 msgstr ""
 
@@ -805,8 +805,8 @@ msgstr "Images size"
 msgid "Langue"
 msgstr "Language"
 
-#: src/routes/(app)/PrepareForOffline.svelte
 #: src/routes/(app)/Settings.svelte
+#: src/routes/(app)/PrepareForOffline.svelte
 msgid "Préparation hors-ligne"
 msgstr "Prepare for offline use"
 
@@ -874,13 +874,13 @@ msgstr "Loading cropping model…"
 msgid "Impossible de charger le modèle de recadrage"
 msgstr "Cannot load cropping model"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Analyse…"
 msgstr "Analyzing…"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Aucune image"
 msgstr "No images"
 
@@ -935,11 +935,6 @@ msgstr "Queued"
 #: src/lib/CardMedia.svelte
 msgid "Erreur"
 msgstr "Error"
-
-#~ msgid "Protocole importé\", \"# protocoles importés"
-#~ msgid_plural "Protocole importé\", \"# protocoles importés"
-#~ msgstr[0] ""
-#~ msgstr[1] ""
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
