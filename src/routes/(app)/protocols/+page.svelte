@@ -34,7 +34,7 @@
 
 <Modal
 	key="modal_download_protocol_template"
-	title={'Créer un protocole'}
+	title="Créer un protocole"
 	bind:open={downloadNewProtocolTemplate}
 >
 	<p>

@@ -22,7 +22,7 @@
 	<section class="actions">
 		<ButtonIcon
 			dangerous
-			help={'Supprimer'}
+			help="Supprimer"
 			disabled={id === uiState.currentProtocolId && uiState.processing.total > 0}
 			onclick={() => {
 				ondelete();
@@ -32,7 +32,7 @@
 		</ButtonIcon>
 
 		<ButtonIcon
-			help={'Exporter'}
+			help="Exporter"
 			onclick={async () => {
 				await exportProtocol(resolve('/'), id).catch((e) => toasts.error(e));
 			}}
@@ -46,7 +46,7 @@
 			<ButtonIcon
 				crossout
 				onclick={() => {}}
-				help={'Ce protocole ne supporte pas la vérification des mises à jour'}
+				help="Ce protocole ne supporte pas la vérification des mises à jour"
 			>
 				<IconUpgrade />
 			</ButtonIcon>

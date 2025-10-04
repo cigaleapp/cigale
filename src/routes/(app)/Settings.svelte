@@ -91,7 +91,7 @@
 			<ButtonIcon
 				disabled={getSettings().theme === 'auto'}
 				onclick={async () => await setSetting('theme', 'auto')}
-				help={'Synchroniser avec le thème du système'}
+				help="Synchroniser avec le thème du système"
 			>
 				<IconSyncWithSystemTheme />
 			</ButtonIcon>

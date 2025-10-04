@@ -94,9 +94,9 @@
 </script>
 
 <ModalConfirm
-	title={'Importer le protocole distant ?'}
+	title="Importer le protocole distant ?"
 	key="modal_import_remote_protocol"
-	confirm={'Importer'}
+	confirm="Importer"
 	bind:open={openImportRemoteProtocol}
 	oncancel={() => {
 		preselection.protocol = null;
@@ -158,9 +158,9 @@
 			<IconSearch />
 			<InlineTextInput
 				onblur={() => {}}
-				label={'Recherche'}
+				label="Recherche"
 				bind:value={searchQuery}
-				placeholder={'Rechercher...'}
+				placeholder="Rechercher..."
 			/>
 		</li>
 		{#each protocols as p, i (p.id)}
@@ -183,7 +183,7 @@
 						}}
 					>
 						{#if p.id === currentProtocol?.id}
-							<Tooltip text={'Protocole sélectionné'}>
+							<Tooltip text="Protocole sélectionné">
 								<IconCheck />
 							</Tooltip>
 						{/if}

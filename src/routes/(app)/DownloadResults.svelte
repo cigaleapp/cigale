@@ -119,7 +119,7 @@
 	--footer-direction="column"
 	key="modal_export_results"
 	bind:open
-	title={'Exporter les résultats'}
+	title="Exporter les résultats"
 	onopen={() => {
 		toasts.setCurrentPool('exporter');
 	}}

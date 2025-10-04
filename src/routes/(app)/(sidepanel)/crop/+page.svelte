@@ -65,7 +65,7 @@
 				{images}
 				boxes="show-all"
 				highlighted={fileId === uiState.imagePreviouslyOpenedInCropper}
-				loadingStatusText={'Analyse…'}
+				loadingStatusText="Analyse…"
 				onretry={() => {
 					uiState.erroredImages.delete(fileId);
 					detectMore([fileId]);

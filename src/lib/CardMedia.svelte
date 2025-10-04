@@ -122,7 +122,7 @@
 										}}
 									>
 										<IconDelete />
-										{'Supprimer'}
+										Supprimer
 									</ButtonInk>
 								{/if}
 								{#if !loading && onretry}
@@ -133,7 +133,7 @@
 										}}
 									>
 										<IconRetry />
-										{'Rééssayer'}
+										Rééssayer
 									</ButtonInk>
 								{/if}
 							</section>

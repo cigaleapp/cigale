@@ -187,7 +187,7 @@
 					disabled={!canmerge}
 					onclick={onmerge}
 					keyboard="$mod+g"
-					help={'Regrouper les images et/ou observations sélectionnées en une observation'}
+					help="Regrouper les images et/ou observations sélectionnées en une observation"
 				>
 					<IconMerge />
 					{'Regrouper'}
@@ -196,7 +196,7 @@
 					disabled={!cansplit}
 					onclick={onsplit}
 					keyboard="$mod+Shift+g"
-					help={'Séparer toutes les observations sélectionnées en images seules'}
+					help="Séparer toutes les observations sélectionnées en images seules"
 				>
 					<IconSplit />
 					{'Séparer'}

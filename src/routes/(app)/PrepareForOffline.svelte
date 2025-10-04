@@ -41,7 +41,7 @@
 	const StateIcon = $derived(toastIcon(status === true ? 'success' : 'error'));
 </script>
 
-<Modal key="modal_prepare_for_offline" title={'Préparation hors-ligne'} bind:open>
+<Modal key="modal_prepare_for_offline" title="Préparation hors-ligne" bind:open>
 	{"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."}
 	<ul class="bars">
 		{#each progressBars as [modelNo, { done, total, modelURL }] (modelNo)}

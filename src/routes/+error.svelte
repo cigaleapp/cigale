@@ -28,7 +28,7 @@
 		</p>
 		{#if page.status !== 404}
 			<ButtonInk
-				help={'ATTENTION: SUPPRIME TOUTES VOS DONNÉES'}
+				help="ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
 				onclick={async () => {
 					nukeDatabase();
 					window.location.reload();

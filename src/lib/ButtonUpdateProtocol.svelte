@@ -37,10 +37,10 @@
 {#if version && source}
 	{#key checkagain}
 		{#await hasUpgradeAvailable({ id, version, source })}
-			<Btn help={'Recherche de mise à jour…'} disabled onclick={() => {}}>
+			<Btn help="Recherche de mise à jour…" disabled onclick={() => {}}>
 				<IconCheckAgain />
 				{#if !compact}
-					{'Mettre à jour'}
+					Mettre à jour
 				{/if}
 			</Btn>
 		{:then { upToDate, newVersion }}
@@ -54,7 +54,7 @@
 					<span class="version-check up-to-date">
 						<IconUpToDate />
 						{#if !compact}
-							{'À jour'}
+							À jour
 						{/if}
 					</span>
 					{#if !compact}
@@ -107,14 +107,14 @@
 				<span class="version-check error">
 					<IconCannotCheckForUpdates />
 					{#if !compact}
-						{'Rééssayer'}
+						Rééssayer
 					{/if}
 				</span>
 			</Btn>
 		{/await}
 	{/key}
 {:else if version}
-	<Btn onclick={() => {}} help={'Ce protocole ne supporte pas la vérification des mises à jour'}>
+	<Btn onclick={() => {}} help="Ce protocole ne supporte pas la vérification des mises à jour">
 		<span class="version-check">
 			<IconCannotCheckForUpdates />
 			{#if !compact}
@@ -130,7 +130,7 @@
 		<span class="version-check error">
 			{#if !compact}
 				<IconCannotCheckForUpdates />
-				{'Non versionné'}
+				Non versionné
 			{/if}
 		</span>
 	</Btn>

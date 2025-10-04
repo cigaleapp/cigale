@@ -97,7 +97,7 @@
 			close?.();
 		}}
 		<ButtonSecondary
-			help={'Supprime toutes les données pour ce déploiement de preview'}
+			help="Supprime toutes les données pour ce déploiement de preview"
 			onclick={() => {
 				nukeDatabase();
 				window.location.reload();

@@ -956,7 +956,7 @@
 								<IconRevert />
 							</ButtonIcon>
 							<ButtonIcon
-								help={'Supprimer la boîte sélectionnée'}
+								help="Supprimer la boîte sélectionnée"
 								keyboard="Delete"
 								onclick={async () => deleteBoundingBox(image.id)}
 							>
@@ -969,7 +969,7 @@
 					<li class="boxes-list-hint">
 						<p>
 							{@html 'Pour créer une nouvelle boîte,<wbr /> utilisez les outils'}
-							<SentenceJoin items={creationTools} key={(t) => t.name} final={'ou'}>
+							<SentenceJoin items={creationTools} key={(t) => t.name} final="ou">
 								{#snippet children({ icon: Icon, help, shortcut })}
 									<Tooltip text={help} keyboard={shortcut}>
 										<Icon />

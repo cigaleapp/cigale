@@ -231,7 +231,7 @@
 						<a href={highlightedOption.learnMore} target="_blank" class="learn-more">
 							<IconArrowRight />
 							<div class="text">
-								<span>{'En savoir plus'}</span>
+								<span>En savoir plus</span>
 								<code class="domain">{new URL(highlightedOption.learnMore).hostname}</code>
 							</div>
 						</a>

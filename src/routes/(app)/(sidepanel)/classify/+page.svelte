@@ -157,7 +157,7 @@
 					{observation}
 					{images}
 					boxes="apply-first"
-					loadingStatusText={'Analyse…'}
+					loadingStatusText="Analyse…"
 					onretry={() => {
 						uiState.erroredImages.delete(id);
 						const imageIds = tables.Observation.getFromState(id)?.images;
