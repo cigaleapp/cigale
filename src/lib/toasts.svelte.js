@@ -1,6 +1,7 @@
 import { minutesToMilliseconds } from 'date-fns';
 import { nanoid } from 'nanoid';
 import { entries, mapValues } from './utils';
+import { m } from './paraglide/messages';
 
 /**
  * @template T
@@ -41,8 +42,16 @@ const TOAST_POOLS = /** @type {const} @satisfies {Record<string, Omit<ToastPool,
 	exporter: {
 		lifetime: Infinity,
 		capacity: Infinity
+	},
+	protocolcreator: {
+		lifetime: Infinity,
+		capacity: Infinity
 	}
 });
+
+/**
+ * @typedef {keyof typeof TOAST_POOLS} ToastPoolNames
+ */
 
 /**
  * @template T
@@ -127,7 +136,6 @@ class Toasts {
 			throw new Error("You must provide data if you're using callbacks");
 
 		const id = nanoid();
-		const wordsCount = message.split(' ').length + message.split(' ').length;
 
 		/** @type {Toast<typeof data>} */
 		const newToast = {
@@ -139,10 +147,7 @@ class Toasts {
 			// @ts-ignore
 			callbacks,
 			data: data ?? null,
-			lifetime:
-				lifetime === 'inferred'
-					? this.pool.lifetime + minutesToMilliseconds(wordsCount / 300)
-					: lifetime,
+			lifetime: lifetime === 'inferred' ? this.#inferLifetime(message) : lifetime,
 			...rest
 		};
 
@@ -155,6 +160,35 @@ class Toasts {
 			newToast
 		];
 		return id;
+	}
+
+	/**
+	 *
+	 * Shows a toast with an "Undo" button. If the user clicks, calls `undo()`, otherwise calls `commit()` after the toast disappears.
+	 * Default lifetime is 4x longer than with toast.add().
+	 * @template T
+	 * @param {Toast<T>['type']} type
+	 * @param {string} message
+	 * @param {ToastOptions<T> & { undo: () => void | Promise<void>, commit: () => void | Promise<void> }} options
+	 */
+	withUndo(type, message, { undo, commit, ...options }) {
+		if (!message) return;
+
+		const toasts = this;
+
+		return this.add(type, message, {
+			lifetime: 4 * this.#inferLifetime(message),
+			data: [],
+			...options,
+			closed: commit,
+			action: (t) => {
+				undo();
+				toasts.remove(t.id, toasts.currentPoolName, { silent: true });
+			},
+			labels: {
+				action: m.undo()
+			}
+		});
 	}
 
 	/**
@@ -208,15 +242,17 @@ class Toasts {
 	 * Removes a toast by ID.
 	 * @param {string} id
 	 * @param {keyof Pools} [pool] only search in this pool, defaults to all pools
+	 * @param {object} [options]
+	 * @param {boolean} [options.silent] if true, do not call the `closed` callback
 	 * @returns {Promise<void>}
 	 */
-	async remove(id, pool) {
+	async remove(id, pool, { silent = false } = {}) {
 		for (const [poolName, { items }] of entries(this.pools)) {
 			if (pool && pool !== poolName) continue;
 
 			const toast = items.find((t) => t.id === id);
 			if (!toast) return;
-			if (toast.callbacks?.closed) await toast.callbacks.closed(toast);
+			if (!silent) await toast.callbacks.closed?.(toast);
 
 			this.pools[poolName].items = this.items(poolName).filter((t) => t.id !== id);
 		}
@@ -261,6 +297,14 @@ class Toasts {
 		toast.timeoutHandle = setTimeout(() => {
 			this.remove(toast.id);
 		}, toast.lifetime);
+	}
+
+	/**
+	 * @param {string} message
+	 */
+	#inferLifetime(message) {
+		const wordsCount = message.split(' ').length + message.split(' ').length;
+		return this.pool.lifetime + minutesToMilliseconds(wordsCount / 300);
 	}
 }
 

@@ -1,0 +1,99 @@
+<script>
+	import Field from './Field.svelte';
+	import InlineTextInput from './InlineTextInput.svelte';
+	import IconOpenExternal from '~icons/ph/arrow-square-out';
+	import IconSuccess from '~icons/ph/check';
+	import IconFail from '~icons/ph/x';
+	import IconChecking from '~icons/ph/dots-three';
+	import ButtonIcon from './ButtonIcon.svelte';
+
+	/**
+	 * @import { Component, Snippet } from 'svelte';
+	 */
+
+	/**
+	 * @typedef {object} Props
+	 * @property {string} label
+	 * @property {string} [hint]
+	 * @property {string} value
+	 * @property {boolean} [check]
+	 * @property {Component} [Icon]
+	 * @property {Snippet} [icon]
+	 * @property {(newValue: string, setValue: (value: string) => void) => void } onblur
+	 */
+
+	/** @type {Props} */
+	const { label, hint: hintprefix, icon, Icon, value, onblur, check = false } = $props();
+</script>
+
+<Field {label} {icon} {Icon}>
+	<div class="input-and-actions">
+		<InlineTextInput {label} {value} {onblur} />
+		<ButtonIcon
+			help="Ouvrir le lien"
+			onclick={() => {
+				window.open(value, '_blank');
+			}}
+		>
+			<IconOpenExternal />
+		</ButtonIcon>
+	</div>
+
+	{#snippet hint()}
+		{#if hintprefix}
+			{hintprefix} ·
+		{/if}
+		{#if value && check}
+			<div class="hint">
+				{#await fetch(value, { method: 'HEAD' })}
+					<div class="check loading">
+						<IconChecking />
+						Vérification…
+					</div>
+				{:then response}
+					{#if response.ok}
+						<div class="check ok">
+							<IconSuccess />
+							Accessible
+						</div>
+					{:else}
+						<div class="check fail">
+							<IconFail />
+							Inaccessible: HTTP {response.status}
+							{#await response.text() then text}{text}{/await}
+						</div>
+					{/if}
+				{:catch error}
+					<div class="check fail">
+						<IconFail />
+						Inaccessible: {error}
+					</div>
+				{/await}
+			</div>
+		{/if}
+	{/snippet}
+</Field>
+
+<style>
+	.check {
+		display: flex;
+		align-items: center;
+		gap: 0.25em;
+		font-size: 0.9em;
+	}
+
+	.check.ok {
+		color: var(--fg-success);
+	}
+
+	.check.fail {
+		color: var(--fg-error);
+	}
+
+	.input-and-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.25em;
+		width: 100%;
+	}
+</style>

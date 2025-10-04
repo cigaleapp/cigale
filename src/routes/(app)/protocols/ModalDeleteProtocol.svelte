@@ -5,7 +5,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 
 	/**
-	 * @type {{ id: string, open?: () => void, ondelete?: () => void }}
+	 * @type {{ id: string, open: (() => void) | undefined, ondelete?: () => void }}
 	 */
 	let { id, open = $bindable(), ondelete } = $props();
 
