@@ -727,7 +727,7 @@
 	<div class="icon">
 		<IconConfirmedCrop />
 	</div>
-	<p>{'Confirmé'}</p>
+	<p>Confirmé</p>
 </div>
 
 <div class="layout">
@@ -843,7 +843,7 @@
 			<section class="preactions">
 				<ButtonInk inline onclick={goToGallery}>
 					<IconGallery />
-					{'Autres photos'}
+					Autres photos
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
 				<ButtonInk
@@ -852,7 +852,7 @@
 					help={{ text: 'Supprimer cette image et passer à la suivante', keyboard: '$mod+Delete' }}
 				>
 					<IconDelete />
-					{'Supprimer'}
+					Supprimer
 				</ButtonInk>
 			</section>
 			<section class="filename">
@@ -879,7 +879,7 @@
 					disabled={!canRevertAll}
 				>
 					<IconRevert />
-					{'Réinit.'}
+					Réinit.
 				</ButtonSecondary>
 				{#if uiState.cropConfirmationMetadataId}
 					<ButtonSecondary
@@ -894,7 +894,7 @@
 							Invalider
 						{:else}
 							<IconConfirmedCrop />
-							{'Valider'}
+							Valider
 						{/if}
 					</ButtonSecondary>
 				{/if}
@@ -978,7 +978,7 @@
 							</SentenceJoin>
 						</p>
 						<p>
-							{'Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier'}
+							Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier
 						</p>
 					</li>
 				{/if}
@@ -994,7 +994,7 @@
 			<div class="bar">
 				<p>
 					<IconHasCrop />
-					{'Images avec recadrage'}
+					Images avec recadrage
 					{@render percentage(croppedImagesCount)}
 				</p>
 				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
@@ -1003,7 +1003,7 @@
 				<div class="bar">
 					<p>
 						<IconConfirmedCrop />
-						{'Recadrages confirmés'}
+						Recadrages confirmés
 						{@render percentage(confirmedCropsCount)}
 					</p>
 					<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
@@ -1058,7 +1058,7 @@
 					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
 				>
 					<IconContinue />
-					{'Continuer'}
+					Continuer
 				</ButtonSecondary>
 			</div>
 		</nav>

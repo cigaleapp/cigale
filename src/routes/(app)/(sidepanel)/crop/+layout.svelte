@@ -53,7 +53,7 @@
 {#await loadCropperModel(uiState.selectedCropModel)}
 	<section class="loading">
 		<Logo loading />
-		<p>{'Chargement du modèle de recadrage…'}</p>
+		<p>Chargement du modèle de recadrage…</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
@@ -65,7 +65,7 @@
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
-		<p>{'Impossible de charger le modèle de recadrage'}</p>
+		<p>Impossible de charger le modèle de recadrage</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
 		{#if isDebugMode()}

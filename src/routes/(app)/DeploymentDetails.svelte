@@ -62,12 +62,12 @@
 		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
 		{#if buildCommit}
 			{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/commits/${buildCommit}`).then( (res) => res.json() )}
-				<span class="build-date">{'Chargement…'}</span>
+				<span class="build-date">Chargement…</span>
 			{:then { commit: { committer: { date } } }}
 				<Datetime value={date} show="both" />
 			{/await}
 		{/if}
-		<p>{'Ceci est un déploiement de preview'}</p>
+		<p>Ceci est un déploiement de preview</p>
 		<ul>
 			<li>
 				<!-- @wc-context: continuation of sentence "deployment PR for..." -->
@@ -103,19 +103,19 @@
 				window.location.reload();
 			}}
 		>
-			{'Nettoyer la base de données'}
+			Nettoyer la base de données
 		</ButtonSecondary>
 
 		<ButtonSecondary
 			onclick={open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`)}
 		>
-			{'Voir sur Github'}
+			Voir sur Github
 		</ButtonSecondary>
 
 		{#await hasPage('_playwright') then ok}
 			{#if ok}
 				<ButtonSecondary onclick={open(pageURL('_playwright'))}>
-					{'Tests E2E'}
+					Tests E2E
 				</ButtonSecondary>
 			{/if}
 		{/await}
@@ -123,7 +123,7 @@
 		{#await hasPage('_vitest') then ok}
 			{#if ok}
 				<ButtonSecondary onclick={open(pageURL('_vitest'))}>
-					{'Tests unitaires'}
+					Tests unitaires
 				</ButtonSecondary>
 			{/if}
 		{/await}
@@ -131,7 +131,7 @@
 		{#await hasPage('_coverage') then ok}
 			{#if ok}
 				<ButtonSecondary onclick={open(pageURL('_coverage'))}>
-					{'Coverage'}
+					Coverage
 				</ButtonSecondary>
 			{/if}
 		{/await}

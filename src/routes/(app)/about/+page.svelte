@@ -99,11 +99,11 @@
 </header>
 
 <dl>
-	<dt>{'Développé par'}</dt>
+	<dt>Développé par</dt>
 	<dd>
 		{@render peoplelinks(authors)}
 	</dd>
-	<dt>{'Sous la supervision de'}</dt>
+	<dt>Sous la supervision de</dt>
 	<dd>
 		{@render peoplelinks(supervisors)}
 	</dd>

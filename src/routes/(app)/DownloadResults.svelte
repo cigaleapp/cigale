@@ -144,7 +144,7 @@
 	</div>
 
 	<section class="crop-padding" class:irrelevant={include === 'metadataonly'}>
-		<div class="label">{'Marge autour des images recadrées'}</div>
+		<div class="label">Marge autour des images recadrées</div>
 
 		<SegmentedGroup
 			options={['none', 'small', 'medium', 'customPercent', 'customPixels']}
@@ -178,7 +178,7 @@
 			{/snippet}
 		</SegmentedGroup>
 		<p class="fineprint">
-			{'Une valeur en % signifie que la marge est relative aux dimensions de chacune des images'}
+			Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
 		</p>
 	</section>
 

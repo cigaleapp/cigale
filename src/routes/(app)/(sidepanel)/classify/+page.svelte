@@ -137,7 +137,7 @@
 {#if !classifmodelLoaded}
 	<section class="loading">
 		<Logo loading />
-		<p>{'Chargement du modèle de classification'}</p>
+		<p>Chargement du modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
@@ -180,9 +180,9 @@
 		{#if !items.length}
 			<div class="empty">
 				<Logo variant="empty" --size="6em" />
-				<p>{'Aucune image'}</p>
+				<p>Aucune image</p>
 				<ButtonSecondary onclick={() => goto('/import')}>
-					{'Importer'}
+					Importer
 				</ButtonSecondary>
 			</div>
 		{/if}
@@ -191,7 +191,7 @@
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
-		<p>{'Impossible de charger le modèle de classification'}</p>
+		<p>Impossible de charger le modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{errorMessage(classifModelLoadingError)}</p>
 		{#if isDebugMode()}

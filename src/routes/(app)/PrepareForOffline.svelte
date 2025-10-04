@@ -60,13 +60,13 @@
 		{:else if status !== undefined}
 			<StateIcon /> {status}
 		{:else if progressBars.size > 0}
-			<LoadingSpinner /> {'Chargement…'}
+			<LoadingSpinner /> Chargement…
 		{/if}
 	</section>
 	{#snippet footer({ close })}
 		{#if status !== true}
 			<ButtonPrimary {loading} onclick={startDownload}>
-				{'Démarrer'}
+				Démarrer
 			</ButtonPrimary>
 		{:else}
 			<ButtonPrimary
@@ -76,7 +76,7 @@
 					close?.();
 				}}
 			>
-				{'Fermer'}
+				Fermer
 			</ButtonPrimary>
 		{/if}
 	{/snippet}

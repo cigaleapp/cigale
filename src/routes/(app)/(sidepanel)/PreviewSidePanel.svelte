@@ -190,7 +190,7 @@
 					help="Regrouper les images et/ou observations sélectionnées en une observation"
 				>
 					<IconMerge />
-					{'Regrouper'}
+					Regrouper
 				</ButtonSecondary>
 				<ButtonSecondary
 					disabled={!cansplit}
@@ -199,7 +199,7 @@
 					help="Séparer toutes les observations sélectionnées en images seules"
 				>
 					<IconSplit />
-					{'Séparer'}
+					Séparer
 				</ButtonSecondary>
 			</div>
 		{/if}

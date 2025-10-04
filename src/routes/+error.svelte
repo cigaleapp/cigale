@@ -13,7 +13,7 @@
 	<section class="notfound">
 		{#if page.status === 404}
 			<ButtonPrimary onclick={() => goto('/')}>
-				{'Accueil'}
+				Accueil
 			</ButtonPrimary>
 		{/if}
 	</section>
@@ -38,7 +38,7 @@
 					<IconReset />
 				</div>
 
-				{'Réinitialiser la base de données'}
+				Réinitialiser la base de données
 			</ButtonInk>
 		{/if}
 	</section>

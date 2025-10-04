@@ -80,7 +80,7 @@
 		{#if empty}
 			<div class="empty-state">
 				<Logo variant="empty" />
-				<p>{'Cliquer ou déposer des images, ou un export de résultats (.zip)'}</p>
+				<p>Cliquer ou déposer des images, ou un export de résultats (.zip)</p>
 			</div>
 		{/if}
 	</section>

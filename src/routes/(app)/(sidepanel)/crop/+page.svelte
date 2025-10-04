@@ -83,9 +83,9 @@
 	{#if !items.length}
 		<div class="empty">
 			<Logo variant="empty" --size="6em" />
-			<p>{'Aucune image'}</p>
+			<p>Aucune image</p>
 			<ButtonSecondary onclick={() => goto('/import')}>
-				{'Importer'}
+				Importer
 			</ButtonSecondary>
 		</div>
 	{/if}

@@ -157,7 +157,7 @@
 
 		<div class="steps">
 			<a href={href('/')}>
-				{'Protocole'}
+				Protocole
 				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
 				{#if path == '/' || path == ''}
 					<div class="line"></div>
@@ -165,7 +165,7 @@
 			</a>
 			<IconNext></IconNext>
 			<a href={href('/import')} data-testid="goto-import" aria-disabled={!uiState.currentProtocol}>
-				{'Importer'}
+				Importer
 				{#if path == '/import'}
 					<div class="line"></div>
 				{/if}
@@ -181,7 +181,7 @@
 					data-testid="goto-crop"
 					aria-disabled={!uiState.currentProtocol || !hasImages}
 				>
-					{'Recadrer'}
+					Recadrer
 					{#if path.startsWith('/crop')}
 						<div class="line"></div>
 					{/if}
@@ -209,7 +209,7 @@
 						(uiState.processing.task === 'detection' && uiState.processing.progress < 1)}
 					data-testid="goto-classify"
 				>
-					{'Classifier'}
+					Classifier
 					{#if path == '/classify'}
 						<div class="line"></div>
 					{/if}
@@ -226,7 +226,7 @@
 			<IconNext></IconNext>
 			<ButtonSecondary tight onclick={openExportModal}>
 				<IconDownload />
-				{'Résultats'}
+				Résultats
 			</ButtonSecondary>
 		</div>
 

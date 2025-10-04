@@ -139,7 +139,7 @@
 
 	<section class="modal-import-loading">
 		{#if importingPreselectedProtocol}
-			<p>{'Importation en cours...'}</p>
+			<p>Importation en cours...</p>
 		{/if}
 	</section>
 
@@ -151,7 +151,7 @@
 </ModalConfirm>
 
 <div class="content">
-	<h1>{'Choisir un protocole'}</h1>
+	<h1>Choisir un protocole</h1>
 
 	<ul>
 		<li class="search">
@@ -251,7 +251,7 @@
 					<IconImport />
 				{/if}
 
-				{'Importer un protocole'}
+				Importer un protocole
 			{/snippet}
 		</ButtonSecondary>
 	</section>

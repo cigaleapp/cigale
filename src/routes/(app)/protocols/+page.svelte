@@ -80,7 +80,7 @@
 
 <div class="page">
 	<header>
-		<h1>{'Protocoles'}</h1>
+		<h1>Protocoles</h1>
 		<section class="actions">
 			<ButtonSecondary
 				loading
@@ -101,12 +101,12 @@
 			>
 				{#snippet children({ loading })}
 					{#if !loading}<IconImport />{/if}
-					{'Importer'}
+					Importer
 				{/snippet}
 			</ButtonSecondary>
 			<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
 				<IconCreate />
-				{'Créer'}
+				Créer
 			</ButtonSecondary>
 		</section>
 	</header>

@@ -77,9 +77,9 @@
 	open={open ? true : undefined}
 	bind:this={dialogElement}
 >
-	<header>{'Réglages'}</header>
+	<header>Réglages</header>
 	<div class="listParam">
-		<div class="label">{'Thème'}</div>
+		<div class="label">Thème</div>
 		<div class="setting">
 			<Switch
 				value={getSettings().theme === 'auto' ? systemIsLight : getSettings().theme === 'light'}
@@ -96,7 +96,7 @@
 				<IconSyncWithSystemTheme />
 			</ButtonIcon>
 		</div>
-		<div class="label">{'Mode debug'}</div>
+		<div class="label">Mode debug</div>
 		<div class="setting">
 			<Switch
 				data-testid="debug-mode"
@@ -106,7 +106,7 @@
 				}}
 			/>
 		</div>
-		<div class="label">{'Trier les images par'}</div>
+		<div class="label">Trier les images par</div>
 		<div class="setting">
 			<SegmentedGroup
 				options={['filename', 'date']}
@@ -134,7 +134,7 @@
 				{/if}
 			</ButtonIcon>
 		</div>
-		<div class="label">{'Taille des images'}</div>
+		<div class="label">Taille des images</div>
 		<div class="setting">
 			<input
 				type="range"
@@ -156,7 +156,7 @@
 				<option value="1"></option>
 			</datalist>
 		</div>
-		<div class="label">{'Langue'}</div>
+		<div class="label">Langue</div>
 		<div class="setting">
 			<SegmentedGroup
 				clickable-custom-options
@@ -178,14 +178,14 @@
 				await goto('/protocols');
 			}}
 		>
-			{'Gérer les protocoles'}
+			Gérer les protocoles
 		</ButtonSecondary>
 		<ButtonSecondary
 			onclick={() => {
 				openKeyboardShortcuts?.();
 			}}
 		>
-			{'Raccourcis clavier'}
+			Raccourcis clavier
 		</ButtonSecondary>
 		<ButtonSecondary
 			help={"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."}
@@ -193,7 +193,7 @@
 				openPrepareForOfflineUse?.();
 			}}
 		>
-			{'Préparation hors-ligne'}
+			Préparation hors-ligne
 		</ButtonSecondary>
 	</section>
 	<footer>
@@ -205,7 +205,7 @@
 			onclick={() => {
 				open = false;
 			}}
-			href={href('/about')}>{'À propos'}</a
+			href={href('/about')}>À propos</a
 		>
 	</footer>
 </dialog>
