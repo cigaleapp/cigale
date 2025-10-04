@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T22:40:53.971Z\n"
+"PO-Revision-Date: 2025-10-04T23:23:11.577Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -188,7 +188,14 @@ msgstr ""
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
 msgstr ""
 
-#: src/lib/import.svelte.js
+#. placeholder {0}: uiState.selectedClassificationModel
+#. placeholder {1}: uiState.currentProtocol.name
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+msgid ""
+"Aucun paramètre d'inférence défini pour le modèle {0} sur le protocole {1}"
+msgstr ""
+
+#: src/routes/(app)/DownloadResults.svelte src/lib/import.svelte.js
 msgid "Aucun protocole sélectionné"
 msgstr ""
 
@@ -266,6 +273,12 @@ msgstr ""
 msgid "Ce protocole ne supporte pas la vérification des mises à jour"
 msgstr "This protocol does not support update checking"
 
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid ""
+"Ce protocole ne supported pas la validation des recadrages (voir crop."
+"confirmationMetadata dans la définition du protocole)"
+msgstr ""
+
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Ceci est un déploiement de preview"
 msgstr "This is a preview deployment"
@@ -330,8 +343,8 @@ msgstr ""
 msgid "Cigale"
 msgstr ""
 
-#: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/about/+page.svelte
 msgid "Classification"
 msgstr "Classification"
 
@@ -434,7 +447,7 @@ msgstr ""
 msgid "En attente"
 msgstr "Queued"
 
-#: src/lib/MetadataCombobox.svelte src/lib/Metadata.svelte
+#: src/lib/Metadata.svelte src/lib/MetadataCombobox.svelte
 msgid "En savoir plus"
 msgstr "Learn more"
 
@@ -442,13 +455,18 @@ msgstr "Learn more"
 msgid "Erreur"
 msgstr "Error"
 
-#: src/lib/i18n.js src/lib/exif.js src/lib/toasts.svelte.js
+#: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 msgid "Erreur inattendue"
-msgstr "Unexpected error"
+msgstr ""
 
 #. placeholder {0}: file.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
+msgstr ""
+
+#. placeholder {0}: e
+#: src/routes/(app)/+page.svelte
+msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr ""
 
 #. placeholder {0}: error
@@ -456,15 +474,43 @@ msgstr ""
 msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
 msgstr ""
 
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+msgid "Erreur lors du chargement du modèle de classification"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+msgid "Erreur lors du chargement du modèle de détection"
+msgstr ""
+
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Error out selected cards"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example debug toast"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example error toast"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example info toast"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example success toast"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "Example warning toast"
 msgstr ""
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Exporter"
 msgstr "Export"
 
-#: src/routes/(app)/Navigation.svelte src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Export results"
 
@@ -519,9 +565,10 @@ msgstr "Previous image"
 msgid "Image suivante"
 msgstr "Next image"
 
-#: src/routes/(app)/+page.svelte src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Importer"
 msgstr "Import"
 
@@ -556,6 +603,7 @@ msgid "Impossible de charger les dépendances"
 msgstr ""
 
 #. placeholder {0}: e
+#. placeholder {0}: e
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Could not update protocol: {0}"
@@ -582,6 +630,13 @@ msgstr ""
 msgid ""
 "L'image est trop grande pour être traitée. Elle doit faire moins de {0} "
 "Megapixels et {1} Mo"
+msgstr ""
+
+#. placeholder {0}: imageId
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid ""
+"L'image {0} n'a pas de recadrage alternatif, impossible de revenir au "
+"recadrage d'origine"
 msgstr ""
 
 #: src/routes/(app)/Settings.svelte
@@ -707,6 +762,10 @@ msgid "Nouvelle observation"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+msgid "Observation is empty (should not happen)"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
 msgstr ""
@@ -727,6 +786,11 @@ msgstr ""
 msgid "Parallélisme"
 msgstr ""
 
+#: src/routes/(app)/+layout.svelte
+msgid ""
+"Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎"
+msgstr ""
+
 #: src/routes/(app)/protocols/+page.svelte
 msgid ""
 "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des "
@@ -738,6 +802,11 @@ msgstr ""
 msgid "Preview #{0}"
 msgstr "Preview #{0}"
 
+#. placeholder {0}: protocol.name
+#: src/routes/(app)/+page.svelte
+msgid "Protocole \"{0}\" importé et sélectionné"
+msgstr ""
+
 #: src/routes/(app)/Navigation.svelte
 msgid "Protocole <0/>"
 msgstr "Protocol <0/>"
@@ -748,9 +817,23 @@ msgid_plural "Protocole importé\", \"# protocoles importés"
 msgstr[0] ""
 msgstr[1] ""
 
+#. placeholder {0}: version
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Protocole mis à jour vers la v{0}"
+msgstr ""
+
+#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
+msgid "Protocole supprimé"
+msgstr ""
+
 #: src/routes/(app)/+page.svelte
 msgid "Protocole sélectionné"
 msgstr "Selected protocol"
+
+#. placeholder {0}: ps[0].name
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Protocole “{0}” importé"
+msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocoles"
@@ -851,6 +934,10 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Studio Lin"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Suppression de toutes les images et observations…"
 msgstr ""
 
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -1018,6 +1105,18 @@ msgstr ""
 #: src/routes/(app)/DeploymentDetails.svelte
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "de"
+msgstr ""
+
+#: src/routes/(app)/+layout.svelte
+msgid "debug"
+msgstr ""
+
+#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/+layout.svelte
+msgid "default"
+msgstr ""
+
+#: src/routes/(app)/DownloadResults.svelte
+msgid "exporter"
 msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
