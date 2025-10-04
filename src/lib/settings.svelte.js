@@ -49,13 +49,18 @@ export async function setSetting(key, value) {
 /**
  * @template {keyof Settings} Key
  * @param {Key} key
+ * @param {object} [options]
+ * @param {Settings[Key]} [options.fallback] optional fallback value if we can't get settings, instead of throwing
  * @returns {Promise<Settings[Key]>} the current value of the setting
  */
-export async function getSetting(key) {
+export async function getSetting(key, { fallback } = {}) {
 	const current = (await tables.Settings.get('user')) ?? (await tables.Settings.get('defaults'));
+
 	if (!current) {
+		if (fallback !== undefined) return fallback;
 		throw new Error("Les réglages par défaut n'ont pas été initialisés. Rechargez la page.");
 	}
+
 	return current[key];
 }
 

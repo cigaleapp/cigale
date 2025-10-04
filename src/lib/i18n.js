@@ -180,3 +180,12 @@ if (import.meta.vitest) {
 		expect(errorMessage(errorWithCause)).toBe('Main error');
 	});
 }
+
+/**
+ *
+ * @returns {Language}
+ */
+export function localeFromNavigator() {
+	const locale = navigator.language.split('-')[0];
+	return locale === 'fr' ? 'fr' : 'en';
+}

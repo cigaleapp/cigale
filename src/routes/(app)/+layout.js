@@ -12,9 +12,13 @@ import { PROCEDURES } from '../../web-worker-procedures';
 // oxlint-disable-next-line import/default
 import { getSetting } from '$lib/settings.svelte';
 import WebWorker from '../../web-worker.js?worker';
+import { localeFromNavigator } from '$lib/i18n.js';
 
 export async function load() {
-	const locale = await getSetting('language');
+	const locale = await getSetting('language', {
+		fallback: localeFromNavigator()
+	});
+
 	document.documentElement.lang = locale;
 	setLoadingMessage(
 		// Translations not loaded yet

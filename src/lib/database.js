@@ -24,6 +24,7 @@ import {
 	Protocol as ProtocolSchema
 } from './schemas/protocols.js';
 import { clamp } from './utils.js';
+import { localeFromNavigator } from './i18n.js';
 
 /**
  * Generate an ID for a given table
@@ -120,7 +121,7 @@ const Settings = table(
 			}
 
 			try {
-				return navigator.language.split('-', 2).at(0) === 'fr' ? 'fr' : 'en';
+				return localeFromNavigator();
 			} catch (e) {
 				console.warn('Error getting navigator.language, defaulting to fr', e);
 				return 'fr';
