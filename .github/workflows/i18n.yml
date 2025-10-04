@@ -23,7 +23,13 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Refresh .po files
         run: |
-          # For some reason we gotta do it 3 times (at least?) cuz its not idempotent...
+          # Do it 9 times cuz its not idempotent... 🤡
+          bun wuchale --clean
+          bun wuchale --clean
+          bun wuchale --clean
+          bun wuchale --clean
+          bun wuchale --clean
+          bun wuchale --clean
           bun wuchale --clean
           bun wuchale --clean
           bun wuchale --clean
