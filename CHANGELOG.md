@@ -4,14 +4,77 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## September 2025
 
+### Improvements
+
+- Add prepare for offline use feature
+- Add retry button on cards in classify & crop tabs
+- Add selection and sidepanel to crop tab
+- Allow reverting crops even when no initial boxes exist
+- Allow selecting loading cards, cancel tasks when hitting Delete on selection
+- Compute alternatives and confidence scores of cascaded metadata values (#693)
+- Don't apply bounding boxes to cards on import tab
+- Ensure protocols don't have duplicate metadata IDs before saving to database
+- Error on too-large images in the import tab
+- Error out when upgrading a protocol but the newly downloaded one doesn't declare a version
+- Fix ID validation
+- Fix alignment of search icon and search bar on protocol tab
+- Go to import tab when clicking on already-selected protocol on /
+- Group observations/photos by whether they have bounding boxes (#688)
+- Improve no images state when on crop or classify tabs
+- Improve protocol management page
+- Make classmapping download represent only 10% of progress bar for model loading
+- Make confidence of bounding boxes aligned with dimensions
+- Make default observation label customizable (#606)
+- Make grid size customizable
+- Move detection analysis to crop tab
+- Prevent weird jittering of progress bar when using multiple sw&rpc nodes
+- Prompt for more files to import on empty gallery clicks on import tab
+- Put model selection in navbar tabs
+- Remove grid lines background in cropper view
+- Show first digit after comma on confidence percentage when value is less than 1%
+- Show parallelism numbers in /about
+- Style the range input
+- Use color on a gradient scale for confidence percentages
+
 ### Performance Improvements
 
 - Improve general performance
+- Parallelize job queue
+
+### Accessibility Improvements
+
+- Remove useless default aria-label for switch buttons
+- Set aria-label on icon-only buttons
 
 ### Bug Fixes
 
+- Don't preconnect to google fonts domain, fix font loading on preview builds
+- Fix all monospace text is in italics
+- Fix bug when cascading non-namespaced cascades
 - Fix cards unselectable after ungrouping
+- Fix checkboxe's checkmark would escape from scrolling
+- Fix current protocol was lost on page reload
 - Fix error toasts were not red anymore
+- Fix file picker triggered by clicking on import tab
+- Fix fonts not loading
+- Fix href(...)
+- Fix loading state never disappearing on crop tab cards
+- Fix progress bar would stop before 100%
+- Fix retry button in classify tab
+- Fix retry button on crop tab cards
+- Fix small-confidence alternative metadata values would prevent classification from succeeding
+- Prevent caching attempts on non-HTTP schemes
+- Prevent keyboard shortcuts from triggering when typing text into a field
+
+### Data Updates
+
+- Add beamup.origin to generated arthropods protocol
+- Regenerate arthropods protocol (#689)
+
+### Translation Updates
+
+- Localize metadataPrettyValue
+- Translate date- and number-related formatting
 
 ## August 2025
 
