@@ -5,13 +5,38 @@ on:
     # TODO remove wuchale branch when merged
     branches: [main, wuchale]
   workflow_dispatch:
+    inputs:
+      build-image:
+        description: 'Build the i18n Docker image'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
+  build-image:
+    # if: github.event.inputs.build-image
+    name: Build i18n Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .github/workflows
+          file: .github/workflows/i18n.Dockerfile
+          push: true
+          tags: ghcr.io/cigaleapp/cigale/i18n:latest
+
   refresh:
     name: Refresh .po files
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    container:
+      image: ghcr.io/cigaleapp/cigale/i18n:latest
     steps:
       - uses: actions/checkout@v5
         with:
@@ -21,23 +46,9 @@ jobs:
           bun-version-file: .bun-version
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Refresh .po files
-        run: |
-          # Do it 9 times cuz its not idempotent... 🤡
-          bun wuchale --clean
-          bun wuchale --clean
-          bun wuchale --clean
-          bun wuchale --clean
-          bun wuchale --clean
-          bun wuchale --clean
-          bun wuchale --clean
-          bun wuchale --clean
-          bun wuchale --clean
-          if command -v msgmerge; then
-            echo msgmerge is there
-            msgmerge --help
-          fi
-      - name: 'Check if changes are only revision-date and #: references'
+      - name: Run wuchale to update .po files
+        run: bun wuchale --clean
+      - name: Check if changes are only revision-date
         id: check-changes
         run: |
           if git diff -I PO-Revision-Date --exit-code; then
