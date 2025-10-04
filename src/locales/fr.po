@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T23:25:20.658Z\n"
+"PO-Revision-Date: 2025-10-04T23:26:00.652Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -104,8 +104,8 @@ msgstr "<0/> Résultats"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Rééssayer"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/lib/CardMedia.svelte
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Supprimer"
 msgstr "<0/> Supprimer"
 
@@ -170,8 +170,8 @@ msgstr "Aides à l'identification"
 msgid "Alternatives"
 msgstr "Alternatives"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Analyse…"
 msgstr "Analyse…"
 
@@ -208,8 +208,8 @@ msgstr "Aucun raccouci clavier pour cette page"
 msgid "Aucun résultat :/"
 msgstr "Aucun résultat :/"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Aucune image"
 msgstr "Aucune image"
 
@@ -327,7 +327,7 @@ msgstr "Chargement du protocole intégré"
 msgid "Chargement du worker neuronal…"
 msgstr "Chargement du worker neuronal…"
 
-#: src/routes/(app)/DeploymentDetails.svelte src/lib/CardMedia.svelte
+#: src/lib/CardMedia.svelte src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/+layout.js
 msgid "Chargement…"
 msgstr "Chargement…"
@@ -353,8 +353,8 @@ msgstr "Chrome"
 msgid "Cigale"
 msgstr "Cigale"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/about/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Classification"
 msgstr "Classification"
 
@@ -521,7 +521,7 @@ msgstr "Example warning toast"
 msgid "Exporter"
 msgstr "Exporter"
 
-#: src/routes/(app)/Navigation.svelte src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Exporter les résultats"
 
@@ -547,7 +547,7 @@ msgstr "Fusionner des observations ou images"
 msgid "Grâce aux bibliothèques"
 msgstr "Grâce aux bibliothèques"
 
-#: src/routes/(app)/Settings.svelte src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/Navigation.svelte src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Gérer les protocoles"
 
@@ -577,9 +577,9 @@ msgstr "Image précédente"
 msgid "Image suivante"
 msgstr "Image suivante"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/+page.svelte src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/(sidepanel)/+layout.svelte src/routes/(app)/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Importer"
 msgstr "Importer"
 
@@ -785,8 +785,8 @@ msgstr "Nouvelle observation"
 msgid "Observation is empty (should not happen)"
 msgstr "Observation is empty (should not happen)"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Oops!"
 msgstr "Oops!"
 
@@ -865,7 +865,7 @@ msgstr "Protocoles"
 msgid "Prénom Nom"
 msgstr "Prénom Nom"
 
-#: src/routes/(app)/Settings.svelte src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/PrepareForOffline.svelte src/routes/(app)/Settings.svelte
 msgid "Préparation hors-ligne"
 msgstr "Préparation hors-ligne"
 
@@ -873,7 +873,7 @@ msgstr "Préparation hors-ligne"
 msgid "Quitter le mode recadrage"
 msgstr "Quitter le mode recadrage"
 
-#: src/routes/(app)/Settings.svelte src/lib/KeyboardShortcuts.svelte
+#: src/lib/KeyboardShortcuts.svelte src/routes/(app)/Settings.svelte
 msgid "Raccourcis clavier"
 msgstr "Raccourcis clavier"
 
@@ -1022,8 +1022,8 @@ msgid ""
 msgstr ""
 "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Séparer toutes les observations sélectionnées en images seules"
 
@@ -1151,7 +1151,7 @@ msgstr "de"
 msgid "debug"
 msgstr "debug"
 
-#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/+layout.svelte
+#: src/routes/(app)/+layout.svelte src/routes/(app)/DownloadResults.svelte
 msgid "default"
 msgstr "default"
 

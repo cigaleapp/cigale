@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T23:25:20.663Z\n"
+"PO-Revision-Date: 2025-10-04T23:26:00.658Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -104,8 +104,8 @@ msgstr "<0/> Results"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Retry"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/lib/CardMedia.svelte
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Supprimer"
 msgstr "<0/> Delete"
 
@@ -170,8 +170,8 @@ msgstr ""
 msgid "Alternatives"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Analyse…"
 msgstr "Analyzing…"
 
@@ -207,8 +207,8 @@ msgstr "No keyboard shortcuts for this page"
 msgid "Aucun résultat :/"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Aucune image"
 msgstr "No images"
 
@@ -317,7 +317,7 @@ msgstr "Loading built-in protocol"
 msgid "Chargement du worker neuronal…"
 msgstr "Loading neural worker…"
 
-#: src/routes/(app)/DeploymentDetails.svelte src/lib/CardMedia.svelte
+#: src/lib/CardMedia.svelte src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/+layout.js
 msgid "Chargement…"
 msgstr "Loading…"
@@ -343,8 +343,8 @@ msgstr ""
 msgid "Cigale"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/about/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Classification"
 msgstr "Classification"
 
@@ -510,7 +510,7 @@ msgstr ""
 msgid "Exporter"
 msgstr "Export"
 
-#: src/routes/(app)/Navigation.svelte src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Export results"
 
@@ -536,7 +536,7 @@ msgstr ""
 msgid "Grâce aux bibliothèques"
 msgstr ""
 
-#: src/routes/(app)/Settings.svelte src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/Navigation.svelte src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Manage protocols"
 
@@ -565,9 +565,9 @@ msgstr "Previous image"
 msgid "Image suivante"
 msgstr "Next image"
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/+page.svelte src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/(sidepanel)/+layout.svelte src/routes/(app)/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Importer"
 msgstr "Import"
 
@@ -764,8 +764,8 @@ msgstr ""
 msgid "Observation is empty (should not happen)"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Oops!"
 msgstr ""
 
@@ -842,7 +842,7 @@ msgstr "Protocols"
 msgid "Prénom Nom"
 msgstr ""
 
-#: src/routes/(app)/Settings.svelte src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/PrepareForOffline.svelte src/routes/(app)/Settings.svelte
 msgid "Préparation hors-ligne"
 msgstr "Prepare for offline use"
 
@@ -850,7 +850,7 @@ msgstr "Prepare for offline use"
 msgid "Quitter le mode recadrage"
 msgstr "Exit cropping mode"
 
-#: src/routes/(app)/Settings.svelte src/lib/KeyboardShortcuts.svelte
+#: src/lib/KeyboardShortcuts.svelte src/routes/(app)/Settings.svelte
 msgid "Raccourcis clavier"
 msgstr "Keyboard shortcuts"
 
@@ -991,8 +991,8 @@ msgid ""
 "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Separate all selected observations into individual images"
 
@@ -1110,7 +1110,7 @@ msgstr ""
 msgid "debug"
 msgstr ""
 
-#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/+layout.svelte
+#: src/routes/(app)/+layout.svelte src/routes/(app)/DownloadResults.svelte
 msgid "default"
 msgstr ""
 
