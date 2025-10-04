@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T23:26:31.689Z\n"
+"PO-Revision-Date: 2025-10-04T23:28:34.907Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -281,11 +281,11 @@ msgstr "Ce protocole ne supporte pas la vérification des mises à jour"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid ""
-"Ce protocole ne supported pas la validation des recadrages (voir "
-"crop.confirmationMetadata dans la définition du protocole)"
+"Ce protocole ne supported pas la validation des recadrages (voir crop."
+"confirmationMetadata dans la définition du protocole)"
 msgstr ""
-"Ce protocole ne supported pas la validation des recadrages (voir "
-"crop.confirmationMetadata dans la définition du protocole)"
+"Ce protocole ne supported pas la validation des recadrages (voir crop."
+"confirmationMetadata dans la définition du protocole)"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Ceci est un déploiement de preview"
@@ -353,8 +353,8 @@ msgstr "Chrome"
 msgid "Cigale"
 msgstr "Cigale"
 
-#: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/about/+page.svelte
 msgid "Classification"
 msgstr "Classification"
 
@@ -1022,8 +1022,8 @@ msgid ""
 msgstr ""
 "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Séparer toutes les observations sélectionnées en images seules"
 
@@ -1151,7 +1151,7 @@ msgstr "de"
 msgid "debug"
 msgstr "debug"
 
-#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/+layout.svelte
+#: src/routes/(app)/+layout.svelte src/routes/(app)/DownloadResults.svelte
 msgid "default"
 msgstr "default"
 

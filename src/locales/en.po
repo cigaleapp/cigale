@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T23:26:31.692Z\n"
+"PO-Revision-Date: 2025-10-04T23:28:34.913Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -275,8 +275,8 @@ msgstr "This protocol does not support update checking"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid ""
-"Ce protocole ne supported pas la validation des recadrages (voir "
-"crop.confirmationMetadata dans la définition du protocole)"
+"Ce protocole ne supported pas la validation des recadrages (voir crop."
+"confirmationMetadata dans la définition du protocole)"
 msgstr ""
 
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -343,8 +343,8 @@ msgstr ""
 msgid "Cigale"
 msgstr ""
 
-#: src/routes/(app)/about/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/about/+page.svelte
 msgid "Classification"
 msgstr "Classification"
 
@@ -991,8 +991,8 @@ msgid ""
 "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Separate all selected observations into individual images"
 
@@ -1110,7 +1110,7 @@ msgstr ""
 msgid "debug"
 msgstr ""
 
-#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/+layout.svelte
+#: src/routes/(app)/+layout.svelte src/routes/(app)/DownloadResults.svelte
 msgid "default"
 msgstr ""
 
