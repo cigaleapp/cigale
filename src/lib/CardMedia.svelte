@@ -67,9 +67,9 @@
 	const errored = $derived(status === 'errored');
 
 	const defaultStatusText = $derived.by(() => {
-		if (status === 'loading') return m.loading_text();
-		if (status === 'queued') return m.queued();
-		if (status === 'errored') return m.error_text();
+		if (status === 'loading') return 'Chargement…';
+		if (status === 'queued') return 'En attente';
+		if (status === 'errored') return 'Erreur';
 		return '';
 	});
 
@@ -123,7 +123,7 @@
 										}}
 									>
 										<IconDelete />
-										{m.delete()}
+										{'Supprimer'}
 									</ButtonInk>
 								{/if}
 								{#if !loading && onretry}
@@ -134,7 +134,7 @@
 										}}
 									>
 										<IconRetry />
-										{m.retry()}
+										{'Rééssayer'}
 									</ButtonInk>
 								{/if}
 							</section>

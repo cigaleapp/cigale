@@ -74,7 +74,7 @@
 
 		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!chosenProtocol) {
-			toasts.error(m.no_protocol_selected());
+			toasts.error('Aucun protocole sélectionné');
 			exporting = false;
 			return;
 		}
@@ -109,7 +109,7 @@
 		} catch (error) {
 			console.error(error);
 			toasts.error(
-				m.error_while_exporting_results({ error: error?.toString() ?? m.unexpected_error() })
+				m.error_while_exporting_results({ error: error?.toString() ?? 'Erreur inattendue' })
 			);
 		} finally {
 			exporting = false;
@@ -121,7 +121,7 @@
 	--footer-direction="column"
 	key="modal_export_results"
 	bind:open
-	title={m.export_results()}
+	title={'Exporter les résultats'}
 	onopen={() => {
 		toasts.setCurrentPool('exporter');
 	}}
@@ -134,19 +134,19 @@
 		<RadioButtons
 			bind:value={include}
 			options={[
-				{ key: 'metadataonly', label: m.metadata_only() },
-				{ key: 'croppedonly', label: m.metadata_and_cropped_images() },
+				{ key: 'metadataonly', label: 'Métadonnées seulement' },
+				{ key: 'croppedonly', label: 'Métadonnées et images recadrées' },
 				{
 					key: 'full',
-					label: m.metadata_cropped_and_full_images(),
-					subtext: m.allows_reusing_export_later()
+					label: 'Métadonnées, images recadrées et images originales',
+					subtext: 'Permet de ré-importer les résultats ultérieurement'
 				}
 			]}
 		/>
 	</div>
 
 	<section class="crop-padding" class:irrelevant={include === 'metadataonly'}>
-		<div class="label">{m.padding_around_cropped_images()}</div>
+		<div class="label">{'Marge autour des images recadrées'}</div>
 
 		<SegmentedGroup
 			options={['none', 'small', 'medium', 'customPercent', 'customPixels']}
@@ -157,7 +157,7 @@
 				{@const unit = option === 'customPercent' ? '%' : 'px'}
 				<div class="numeric" style:--width={unit === '%' ? '3ch' : '4ch'}>
 					<InlineTextInput
-						label={option === 'customPercent' ? m.in_percent_of_image_dimensions() : m.in_pixels()}
+						label={option === 'customPercent' ? 'en pourcentage des dimensions de l\'image' : 'en pixels'}
 						value={cropPadding.unitless === 0
 							? '0'
 							: cropPadding.unit === unit
@@ -177,7 +177,7 @@
 				</div>
 			{/snippet}
 		</SegmentedGroup>
-		<p class="fineprint">{m.crop_padding_relative_values_explainer()}</p>
+		<p class="fineprint">{'Une valeur en % signifie que la marge est relative aux dimensions de chacune des images'}</p>
 	</section>
 
 	{#snippet footer()}

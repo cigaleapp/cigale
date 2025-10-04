@@ -187,33 +187,33 @@
 					disabled={!canmerge}
 					onclick={onmerge}
 					keyboard="$mod+g"
-					help={m.group_selected_items()}
+					help={'Regrouper les images et/ou observations sélectionnées en une observation'}
 				>
 					<IconMerge />
-					{m.group()}
+					{'Regrouper'}
 				</ButtonSecondary>
 				<ButtonSecondary
 					disabled={!cansplit}
 					onclick={onsplit}
 					keyboard="$mod+Shift+g"
-					help={m.separate_all_selected_help()}
+					help={'Séparer toutes les observations sélectionnées en images seules'}
 				>
 					<IconSplit />
-					{m.separate()}
+					{'Séparer'}
 				</ButtonSecondary>
 			</div>
 		{/if}
 		{#if onimport}
 			<ButtonSecondary onclick={onimport}>
 				<IconImport />
-				{m.import_other_images()}
+				{'Importer d\'autres images'}
 			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}
 			keyboard="Delete"
-			help={m.delete_selected_images_warning()}
+			help={'Supprimer toutes les images sélectionnées. Attention, impossible d\'annuler'}
 			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
 			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
 			--bg-hover={images.length > 0 ? 'var(--bg-error)' : ''}

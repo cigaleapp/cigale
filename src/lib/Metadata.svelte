@@ -123,7 +123,7 @@
 			{/if}
 			{#if definition.learnMore}
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href={definition.learnMore} target="_blank">{m.learn_more()}</a>
+				<a href={definition.learnMore} target="_blank">{'En savoir plus'}</a>
 			{/if}
 		</section>
 	{/if}

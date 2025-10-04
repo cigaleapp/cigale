@@ -661,7 +661,7 @@ function toNumber(type, values) {
 export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 	switch (metadata.type) {
 		case 'boolean':
-			return value ? m.metadata_value_yes() : m.metadata_value_no();
+			return value ? 'Oui' : 'Non';
 
 		case 'date':
 			return value instanceof Date ? dates.format(value, 'Ppp') : value.toString();

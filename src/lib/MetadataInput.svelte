@@ -96,7 +96,7 @@
 		/>
 		<button
 			class="decrement"
-			aria-label={m.input_decrement_value()}
+			aria-label={'Décrémenter'}
 			onclick={() => {
 				if (value === undefined || value === null) {
 					value = 0;
@@ -110,7 +110,7 @@
 		</button>
 		<button
 			class="increment"
-			aria-label={m.input_increment_value()}
+			aria-label={'Incrémenter'}
 			onclick={() => {
 				if (value === undefined || value === null) {
 					value = 0;

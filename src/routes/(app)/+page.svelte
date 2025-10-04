@@ -22,7 +22,7 @@
 
 	const { data } = $props();
 
-	seo({ title: m.choose_protocol() });
+	seo({ title: 'Choisir un protocole' });
 
 	const currentProtocol = $derived(
 		tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId)
@@ -84,7 +84,7 @@
 	 */
 	function radioOptions(models) {
 		return [
-			{ key: -1, label: m.no_inference() },
+			{ key: -1, label: 'Aucune inférence' },
 			...models.map(({ model, name }, key) => {
 				const url = typeof model === 'string' ? model : model.url;
 				return { key, label: name ?? url };
@@ -94,9 +94,9 @@
 </script>
 
 <ModalConfirm
-	title={m.import_remote_protocol_title()}
+	title={'Importer le protocole distant ?'}
 	key="modal_import_remote_protocol"
-	confirm={m.import()}
+	confirm={'Importer'}
 	bind:open={openImportRemoteProtocol}
 	oncancel={() => {
 		preselection.protocol = null;
@@ -127,7 +127,7 @@
 		}
 	}}
 >
-	{m.remote_protocol_import_confirm_following()}
+	{'Ce lien pointe vers un protocole distant. Voulez-vous l\'importer? Il se trouve à l\'adresse suivante:'}
 
 	{#if preselection.protocol && preselectedProtocolIsRemote}
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
@@ -138,7 +138,7 @@
 
 	<section class="modal-import-loading">
 		{#if importingPreselectedProtocol}
-			<p>{m.importing_in_progress()}</p>
+			<p>{'Importation en cours...'}</p>
 		{/if}
 	</section>
 
@@ -150,16 +150,16 @@
 </ModalConfirm>
 
 <div class="content">
-	<h1>{m.choose_protocol()}</h1>
+	<h1>{'Choisir un protocole'}</h1>
 
 	<ul>
 		<li class="search">
 			<IconSearch />
 			<InlineTextInput
 				onblur={() => {}}
-				label={m.search()}
+				label={'Recherche'}
 				bind:value={searchQuery}
-				placeholder={m.search_placeholder()}
+				placeholder={'Rechercher...'}
 			/>
 		</li>
 		{#each protocols as p, i (p.id)}
@@ -182,7 +182,7 @@
 						}}
 					>
 						{#if p.id === currentProtocol?.id}
-							<Tooltip text={m.selected_protocol()}>
+							<Tooltip text={'Protocole sélectionné'}>
 								<IconCheck />
 							</Tooltip>
 						{/if}
@@ -212,7 +212,7 @@
 					{#if uiState.cropModels.length > 0}
 						<div class="model-select">
 							<RadioButtons
-								label={m.inference_model_for_detection()}
+								label={'Modèle d\'inférence pour la détection'}
 								value={uiState.selectedCropModel}
 								onchange={async (value) => {
 									await uiState.setModelSelections({ crop: value ?? 0 });
@@ -230,7 +230,7 @@
 		<p>Le protocole que vous souhaitez n'est pas disponible?</p>
 		<ButtonSecondary onclick={() => goto('/protocols')}>
 			<IconManage />
-			{m.manage_protocols()}
+			{'Gérer les protocoles'}
 		</ButtonSecondary>
 		<ButtonSecondary
 			loading
@@ -251,7 +251,7 @@
 					<IconImport />
 				{/if}
 
-				{m.import_protocol()}
+				{'Importer un protocole'}
 			{/snippet}
 		</ButtonSecondary>
 	</section>

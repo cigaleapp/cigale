@@ -61,10 +61,10 @@
 		'$mod+s': {
 			help: '',
 			hidden: true,
-			do: () => toasts.info(m.no_need_for_ctrl_s())
+			do: () => toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎')
 		},
 		'i d e v': {
-			help: m.toggle_debug_mode(),
+			help: 'Activer/Désactiver le debug mode',
 			do: async () => {
 				await setSetting('showTechnicalMetadata', isDebugMode() ? false : true);
 			}

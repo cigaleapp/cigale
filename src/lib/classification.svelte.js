@@ -12,7 +12,7 @@ import { tables } from './idb.svelte.js';
  */
 export async function classifyImage(swarpc, id, cancellers) {
 	if (!uiState.currentProtocol) {
-		throw new Error(m.no_protocol_selected());
+		throw new Error('Aucun protocole sélectionné');
 	}
 
 	if (!uiState.classificationMetadataId) {

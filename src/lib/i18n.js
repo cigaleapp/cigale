@@ -127,7 +127,7 @@ if (import.meta.vitest) {
 export function errorMessage(error, prefix = '') {
 	let defaultMessage = 'Unexpected error';
 	try {
-		defaultMessage = m.unexpected_error();
+		defaultMessage = 'Erreur inattendue';
 		// eslint-disable-next-line no-empty
 	} catch {}
 

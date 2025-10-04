@@ -38,10 +38,10 @@
 {#if version && source}
 	{#key checkagain}
 		{#await hasUpgradeAvailable({ id, version, source })}
-			<Btn help={m.checking_for_updates()} disabled onclick={() => {}}>
+			<Btn help={'Recherche de mise à jour…'} disabled onclick={() => {}}>
 				<IconCheckAgain />
 				{#if !compact}
-					{m.update()}
+					{'Mettre à jour'}
 				{/if}
 			</Btn>
 		{:then { upToDate, newVersion }}
@@ -55,7 +55,7 @@
 					<span class="version-check up-to-date">
 						<IconUpToDate />
 						{#if !compact}
-							{m.up_to_date()}
+							{'À jour'}
 						{/if}
 					</span>
 					{#if !compact}
@@ -89,7 +89,7 @@
 						{/if}
 						{#if !compact}
 							{#if upgrading}
-								{m.updating()}
+								{'Mise à jour…'}
 							{:else}
 								v{version}
 								<IconArrow />
@@ -109,14 +109,14 @@
 				<span class="version-check error">
 					<IconCannotCheckForUpdates />
 					{#if !compact}
-						{m.retry()}
+						{'Rééssayer'}
 					{/if}
 				</span>
 			</Btn>
 		{/await}
 	{/key}
 {:else if version}
-	<Btn onclick={() => {}} help={m.protocol_does_not_support_update_check()}>
+	<Btn onclick={() => {}} help={'Ce protocole ne supporte pas la vérification des mises à jour'}>
 		<span class="version-check">
 			<IconCannotCheckForUpdates />
 			{#if !compact}
@@ -125,11 +125,11 @@
 		</span>
 	</Btn>
 {:else}
-	<Btn onclick={() => {}} help={m.protocol_not_versioned_help()}>
+	<Btn onclick={() => {}} help={'Ce protocole n\'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version'}>
 		<span class="version-check error">
 			{#if !compact}
 				<IconCannotCheckForUpdates />
-				{m.not_versioned()}
+				{'Non versionné'}
 			{/if}
 		</span>
 	</Btn>

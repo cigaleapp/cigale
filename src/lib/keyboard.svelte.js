@@ -4,10 +4,10 @@ import { entries, keys } from './utils';
 import { m } from './paraglide/messages';
 
 const GROUPS = {
-	general: m.keyboard_shortcuts_group_general(),
-	observations: m.keyboard_shortcuts_group_observations(),
-	navigation: m.keyboard_shortcuts_group_navigation(),
-	cropping: m.keyboard_shortcuts_group_cropping(),
+	general: 'Général',
+	observations: 'Observations',
+	navigation: 'Navigation',
+	cropping: 'Recadrage',
 	debugmode: 'Debug mode'
 };
 

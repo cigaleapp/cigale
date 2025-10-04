@@ -31,7 +31,7 @@ export const ACCEPTED_IMPORT_TYPES = [
  */
 export async function processImageFile(file, id) {
 	if (!uiState.currentProtocol) {
-		toasts.error(m.no_protocol_selected());
+		toasts.error('Aucun protocole sélectionné');
 		return;
 	}
 
@@ -81,7 +81,7 @@ export async function processImageFile(file, id) {
  */
 export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	if (!uiState.currentProtocol) {
-		toasts.error(m.no_protocol_selected());
+		toasts.error('Aucun protocole sélectionné');
 		return;
 	}
 

@@ -25,7 +25,7 @@
 	import { sum } from '$lib/utils.js';
 	import { watch } from 'runed';
 
-	seo({ title: m.classification() });
+	seo({ title: 'Classification' });
 
 	const { data } = $props();
 
@@ -87,7 +87,7 @@
 			})
 			.catch((error) => {
 				console.error(error);
-				toasts.error(m.error_loading_classification_model());
+				toasts.error('Erreur lors du chargement du modèle de classification');
 			});
 	}
 
@@ -140,7 +140,7 @@
 {#if !classifmodelLoaded}
 	<section class="loading">
 		<Logo loading />
-		<p>{m.loading_classification_model()}</p>
+		<p>{'Chargement du modèle de classification'}</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
@@ -151,18 +151,18 @@
 		<AreaObservations
 			{items}
 			sort={getSettings().gallerySort}
-			groups={[m.cropped_items(), m.uncropped_items()]}
+			groups={['Recadrées', 'Non recadrées']}
 			grouping={({ data: { images } }) =>
 				images.some((img) => uiState.cropMetadataValueOf(img))
-					? m.cropped_items()
-					: m.uncropped_items()}
+					? 'Recadrées'
+					: 'Non recadrées'}
 		>
 			{#snippet item({ observation, images }, { id })}
 				<CardObservation
 					{observation}
 					{images}
 					boxes="apply-first"
-					loadingStatusText={m.analyzing()}
+					loadingStatusText={'Analyse…'}
 					onretry={() => {
 						uiState.erroredImages.delete(id);
 						const imageIds = tables.Observation.getFromState(id)?.images;
@@ -185,9 +185,9 @@
 		{#if !items.length}
 			<div class="empty">
 				<Logo variant="empty" --size="6em" />
-				<p>{m.no_images()}</p>
+				<p>{'Aucune image'}</p>
 				<ButtonSecondary onclick={() => goto('/import')}>
-					{m.import_tab()}
+					{'Importer'}
 				</ButtonSecondary>
 			</div>
 		{/if}
@@ -196,7 +196,7 @@
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
-		<p>{m.cannot_load_classification_model()}</p>
+		<p>{'Impossible de charger le modèle de classification'}</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{errorMessage(classifModelLoadingError)}</p>
 		{#if isDebugMode()}

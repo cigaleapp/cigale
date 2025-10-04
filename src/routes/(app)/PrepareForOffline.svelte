@@ -42,8 +42,8 @@
 	const StateIcon = $derived(toastIcon(status === true ? 'success' : 'error'));
 </script>
 
-<Modal key="modal_prepare_for_offline" title={m.prepare_for_offline()} bind:open>
-	{m.prepare_for_offline_help()}
+<Modal key="modal_prepare_for_offline" title={'Préparation hors-ligne'} bind:open>
+	{'Télécharger tout ce qu\'il est nécéssaire pour pouvoir utiliser l\'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.'}
 	<ul class="bars">
 		{#each progressBars as [modelNo, { done, total, modelURL }] (modelNo)}
 			<li>
@@ -61,13 +61,13 @@
 		{:else if status !== undefined}
 			<StateIcon /> {status}
 		{:else if progressBars.size > 0}
-			<LoadingSpinner /> {m.loading_text()}
+			<LoadingSpinner /> {'Chargement…'}
 		{/if}
 	</section>
 	{#snippet footer({ close })}
 		{#if status !== true}
 			<ButtonPrimary {loading} onclick={startDownload}>
-				{m.start()}
+				{'Démarrer'}
 			</ButtonPrimary>
 		{:else}
 			<ButtonPrimary
@@ -77,7 +77,7 @@
 					close?.();
 				}}
 			>
-				{m.close()}
+				{'Fermer'}
 			</ButtonPrimary>
 		{/if}
 	{/snippet}

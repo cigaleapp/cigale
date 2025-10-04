@@ -55,11 +55,11 @@
 	<AreaObservations
 		{items}
 		sort={getSettings().gallerySort}
-		groups={[m.with_detections(), m.without_detections()]}
+		groups={['Avec détections', 'Sans détection']}
 		grouping={({ data: images }) =>
 			images.some((img) => uiState.cropMetadataValueOf(img))
-				? m.with_detections()
-				: m.without_detections()}
+				? 'Avec détections'
+				: 'Sans détection'}
 	>
 		{#snippet item(images, { id: fileId })}
 			<CardImageFile
@@ -67,7 +67,7 @@
 				{images}
 				boxes="show-all"
 				highlighted={fileId === uiState.imagePreviouslyOpenedInCropper}
-				loadingStatusText={m.analyzing()}
+				loadingStatusText={'Analyse…'}
 				onretry={() => {
 					uiState.erroredImages.delete(fileId);
 					detectMore([fileId]);
@@ -85,9 +85,9 @@
 	{#if !items.length}
 		<div class="empty">
 			<Logo variant="empty" --size="6em" />
-			<p>{m.no_images()}</p>
+			<p>{'Aucune image'}</p>
 			<ButtonSecondary onclick={() => goto('/import')}>
-				{m.import_tab()}
+				{'Importer'}
 			</ButtonSecondary>
 		</div>
 	{/if}

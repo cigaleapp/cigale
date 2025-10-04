@@ -23,7 +23,7 @@ export async function load() {
 
 	const parallelism = Math.ceil(navigator.hardwareConcurrency / 3);
 
-	setLoadingMessage(m.loading_neural_worker());
+	setLoadingMessage('Chargement du worker neuronal…');
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
 		nodes: parallelism,
@@ -32,19 +32,19 @@ export async function load() {
 		}
 	});
 
-	setLoadingMessage(m.initializing_worker_db());
+	setLoadingMessage('Initialisation DB du worker neuronal…');
 	await swarpc.init.broadcast({ databaseName, databaseRevision });
 
 	try {
-		setLoadingMessage(m.initializing_database());
+		setLoadingMessage('Initialisation de la base de données…');
 		await tables.initialize();
-		setLoadingMessage(m.loading_builtin_data());
+		setLoadingMessage('Chargement des données intégrées…');
 		await fillBuiltinData(swarpc);
 		await tables.initialize();
 	} catch (e) {
 		console.error(e);
 		error(400, {
-			message: e?.toString() ?? m.unexpected_error()
+			message: e?.toString() ?? 'Erreur inattendue'
 		});
 	}
 
@@ -56,7 +56,7 @@ export async function load() {
  * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
  */
 async function fillBuiltinData(swarpc) {
-	setLoadingMessage(m.initializing_default_settings());
+	setLoadingMessage('Initialisation des réglages par défaut…');
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
 		await tx.objectStore('Settings').put({
 			id: 'defaults',
@@ -72,7 +72,7 @@ async function fillBuiltinData(swarpc) {
 		});
 	});
 
-	setLoadingMessage(m.loading_builtin_protocol());
+	setLoadingMessage('Chargement du protocole intégré');
 
 	const protocolsCount = await tables.Protocol.count();
 
@@ -97,7 +97,7 @@ async function fillBuiltinData(swarpc) {
 						break;
 
 					case 'write-protocol':
-						secondLine = m.writing_protocol();
+						secondLine = 'Écriture du protocole';
 						break;
 
 					case 'write-metadata':
@@ -116,7 +116,7 @@ async function fillBuiltinData(swarpc) {
 						break;
 				}
 
-				setLoadingMessage(`${m.loading_builtin_protocol()}<br>${secondLine}`);
+				setLoadingMessage(`${'Chargement du protocole intégré'}<br>${secondLine}`);
 			});
 		} catch (error) {
 			console.error(error);
@@ -140,6 +140,6 @@ function setLoadingMessage(message) {
 		if (element) element.innerHTML = html;
 	};
 
-	setHTML('loading-title', m.loading_text());
+	setHTML('loading-title', 'Chargement…');
 	setHTML('loading-message', message);
 }

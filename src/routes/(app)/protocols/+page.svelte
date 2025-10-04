@@ -33,7 +33,7 @@
 
 <Modal
 	key="modal_download_protocol_template"
-	title={m.create_protocol()}
+	title={'Créer un protocole'}
 	bind:open={downloadNewProtocolTemplate}
 >
 	<p>
@@ -79,7 +79,7 @@
 
 <div class="page">
 	<header>
-		<h1>{m.protocols()}</h1>
+		<h1>{'Protocoles'}</h1>
 		<section class="actions">
 			<ButtonSecondary
 				loading
@@ -99,12 +99,12 @@
 			>
 				{#snippet children({ loading })}
 					{#if !loading}<IconImport />{/if}
-					{m.import()}
+					{'Importer'}
 				{/snippet}
 			</ButtonSecondary>
 			<ButtonSecondary onclick={() => downloadNewProtocolTemplate?.()}>
 				<IconCreate />
-				{m.create()}
+				{'Créer'}
 			</ButtonSecondary>
 		</section>
 	</header>

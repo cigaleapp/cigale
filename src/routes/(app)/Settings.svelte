@@ -60,7 +60,7 @@
 
 <ButtonIcon
 	data-testid="settings-button"
-	help={open ? m.close() : m.settings()}
+	help={open ? 'Fermer' : 'Réglages'}
 	onclick={() => {
 		open = !open;
 	}}
@@ -79,9 +79,9 @@
 	open={open ? true : undefined}
 	bind:this={dialogElement}
 >
-	<header>{m.settings()}</header>
+	<header>{'Réglages'}</header>
 	<div class="listParam">
-		<div class="label">{m.theme()}</div>
+		<div class="label">{'Thème'}</div>
 		<div class="setting">
 			<Switch
 				value={getSettings().theme === 'auto' ? systemIsLight : getSettings().theme === 'light'}
@@ -93,12 +93,12 @@
 			<ButtonIcon
 				disabled={getSettings().theme === 'auto'}
 				onclick={async () => await setSetting('theme', 'auto')}
-				help={m.sync_with_system_theme()}
+				help={'Synchroniser avec le thème du système'}
 			>
 				<IconSyncWithSystemTheme />
 			</ButtonIcon>
 		</div>
-		<div class="label">{m.debug_mode()}</div>
+		<div class="label">{'Mode debug'}</div>
 		<div class="setting">
 			<Switch
 				data-testid="debug-mode"
@@ -108,7 +108,7 @@
 				}}
 			/>
 		</div>
-		<div class="label">{m.sort_gallery_by()}</div>
+		<div class="label">{'Trier les images par'}</div>
 		<div class="setting">
 			<SegmentedGroup
 				options={['filename', 'date']}
@@ -116,7 +116,7 @@
 					() => getSettings().gallerySort.key,
 					(key) => setSetting('gallerySort', { ...getSettings().gallerySort, key })
 				}
-				labels={{ filename: m.sort_key_filename(), date: m.sort_key_date() }}
+				labels={{ filename: 'Fichier', date: 'Date' }}
 			/>
 			<ButtonIcon
 				data-testid="toggle-sort-direction"
@@ -126,8 +126,8 @@
 						direction: getSettings().gallerySort.direction === 'asc' ? 'desc' : 'asc'
 					})}
 				help={getSettings().gallerySort.direction === 'asc'
-					? m.change_sort_direction_to_desc()
-					: m.change_sort_direction_to_asc()}
+					? 'Trier par ordre décroissant'
+					: 'Trier par ordre croissant'}
 			>
 				{#if getSettings().gallerySort.direction === 'asc'}
 					<IconSortAsc />
@@ -136,7 +136,7 @@
 				{/if}
 			</ButtonIcon>
 		</div>
-		<div class="label">{m.card_size()}</div>
+		<div class="label">{'Taille des images'}</div>
 		<div class="setting">
 			<input
 				type="range"
@@ -158,7 +158,7 @@
 				<option value="1"></option>
 			</datalist>
 		</div>
-		<div class="label">{m.language()}</div>
+		<div class="label">{'Langue'}</div>
 		<div class="setting">
 			<SegmentedGroup
 				clickable-custom-options
@@ -179,22 +179,22 @@
 				await goto('/protocols');
 			}}
 		>
-			{m.manage_protocols()}
+			{'Gérer les protocoles'}
 		</ButtonSecondary>
 		<ButtonSecondary
 			onclick={() => {
 				openKeyboardShortcuts?.();
 			}}
 		>
-			{m.keyboard_shortcuts()}
+			{'Raccourcis clavier'}
 		</ButtonSecondary>
 		<ButtonSecondary
-			help={m.prepare_for_offline_help()}
+			help={'Télécharger tout ce qu\'il est nécéssaire pour pouvoir utiliser l\'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.'}
 			onclick={() => {
 				openPrepareForOfflineUse?.();
 			}}
 		>
-			{m.prepare_for_offline()}
+			{'Préparation hors-ligne'}
 		</ButtonSecondary>
 	</section>
 	<footer>
@@ -206,7 +206,7 @@
 			onclick={() => {
 				open = false;
 			}}
-			href={href('/about')}>{m.about()}</a
+			href={href('/about')}>{'À propos'}</a
 		>
 	</footer>
 </dialog>

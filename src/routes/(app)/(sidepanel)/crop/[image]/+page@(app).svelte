@@ -89,8 +89,8 @@
 	 */
 	const tools = /** @type {const} @satisfies {Tool[]} */ ([
 		{
-			name: m.crop_tool_drag_crop(),
-			help: m.crop_tool_drag_crop_help(),
+			name: 'Glisser-recadrer',
+			help: 'Cliquer et glisser pour créer une boîte de recadrage',
 			icon: IconToolDragCrop,
 			shortcut: 'r',
 			transformable: true,
@@ -99,8 +99,8 @@
 			cursor: 'crosshair'
 		},
 		{
-			name: m.crop_tool_2_points(),
-			help: m.crop_tool_2_points_help(),
+			name: '2 points',
+			help: 'Cliquer sur les 2 coins pour créer une boîte de recadrage',
 			icon: IconTwoPointCrop,
 			shortcut: 'z',
 			transformable: false,
@@ -109,8 +109,8 @@
 			cursor: 'crosshair'
 		},
 		{
-			name: m.crop_tool_4_points(),
-			help: m.crop_tool_4_points_help(),
+			name: '4 points',
+			help: 'Cliquer sur les 4 extrémités pour créer une boîte de recadrage',
 			icon: IconFourPointCrop,
 			shortcut: 'Shift+z',
 			transformable: false,
@@ -119,8 +119,8 @@
 			cursor: 'crosshair'
 		},
 		{
-			name: m.crop_tool_move(),
-			help: m.crop_tool_move_help(),
+			name: 'Déplacer',
+			help: 'Cliquer et glisser pour déplacer la boîte de recadrage',
 			icon: IconToolMove,
 			shortcut: 'v',
 			transformable: false,
@@ -129,8 +129,8 @@
 			cursor: 'pointer'
 		},
 		{
-			name: m.crop_tool_hand(),
-			help: m.crop_tool_hand_help(),
+			name: 'Main',
+			help: 'Cliquer et glisser pour se déplacer dans l\'image',
 			icon: IconToolHand,
 			shortcut: 'h',
 			transformable: false,
@@ -542,22 +542,22 @@
 
 	defineKeyboardShortcuts('cropping', {
 		ArrowLeft: {
-			help: m.previous_image(),
+			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
 			do: () => goto(`#/crop/${prevFileId}`)
 		},
 		'Shift+Space': {
-			help: m.previous_image(),
+			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
 			do: () => goto(`#/crop/${prevFileId}`)
 		},
 		ArrowRight: {
-			help: m.next_image(),
+			help: 'Image suivante',
 			when: () => Boolean(nextFileId),
 			do: () => goto(`#/crop/${nextFileId}`)
 		},
 		Space: {
-			help: m.continue(),
+			help: 'Continuer',
 			do: moveToNextUnconfirmed
 		},
 		'$mod+Delete': {
@@ -565,15 +565,15 @@
 			do: deleteImageFileAndGotoNext
 		},
 		Escape: {
-			help: m.exit_cropping(),
+			help: 'Quitter le mode recadrage',
 			do: goToGallery
 		},
 		a: {
-			help: m.toggle_auto_continue(),
+			help: 'Activer/désactiver la continuation automatique',
 			do: async () => toggleSetting('cropAutoNext')
 		},
 		Delete: {
-			help: m.delete_selected_box_help(),
+			help: 'Supprimer la boîte sélectionnée',
 			when: () => Boolean(selectedBox.imageId),
 			async do() {
 				if (!selectedBox.imageId) return;
@@ -589,7 +589,7 @@
 			}
 		},
 		f: {
-			help: m.hide_unselected_boxes(),
+			help: 'Cacher les boîtes non sélectionnées',
 			when: () => Boolean(selectedBox),
 			do() {
 				if (!selectedBox) return;
@@ -601,7 +601,7 @@
 			}
 		},
 		u: {
-			help: m.revert_to_original_crop(),
+			help: 'Revenir au recadrage d\'origine',
 			when: () => Boolean(revertableCrops[fileId]),
 			do: () => {
 				if (!revertableCrops[fileId]) return;
@@ -609,34 +609,34 @@
 			}
 		},
 		'$mod+u': {
-			help: m.revert_all_to_original(),
+			help: 'Revenir au recadrage d\'origine pour toutes les boîtes',
 			when: () => Object.keys(boundingBoxes).length > 0,
 			do: revertAll
 		},
 		ArrowUp: {
-			help: m.mark_crop_confirmed(),
+			help: 'Marquer le recadrage comme confirmé',
 			when: () => !hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(true)
 		},
 		ArrowDown: {
-			help: m.mark_crop_unconfirmed(),
+			help: 'Marquer le recadrage comme non confirmé',
 			when: () => hasConfirmedCrop(fileId),
 			do: () => changeAllConfirmedStatuses(false)
 		},
 		'+': {
-			help: m.zoom_in(),
+			help: 'Zoomer',
 			do: () => {
 				zoom.scale = clamp(1, zoom.scale + 4 * zoomSpeed, 10);
 			}
 		},
 		'-': {
-			help: m.zoom_out(),
+			help: 'Dézoomer',
 			do: () => {
 				zoom.scale = clamp(1, zoom.scale - 4 * zoomSpeed, 10);
 			}
 		},
 		Digit0: {
-			help: m.reset_zoom(),
+			help: 'Réinitialiser le zoom',
 			do: () => {
 				zoom.origin = { x: 0, y: 0 };
 				zoom.scale = 1;
@@ -654,7 +654,7 @@
 			])
 		),
 		',': {
-			help: m.select_previous_box(),
+			help: 'Sélectionner la boîte précédente',
 			do: () => {
 				const imageIds = Object.keys(boundingBoxes);
 				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
@@ -663,7 +663,7 @@
 			}
 		},
 		';': {
-			help: m.select_next_box(),
+			help: 'Sélectionner la boîte suivante',
 			do: () => {
 				const imageIds = Object.keys(boundingBoxes);
 				const currentIndex = imageIds.indexOf(selectedBox.imageId ?? '');
@@ -727,7 +727,7 @@
 	<div class="icon">
 		<IconConfirmedCrop />
 	</div>
-	<p>{m.confirmed()}</p>
+	<p>{'Confirmé'}</p>
 </div>
 
 <div class="layout">
@@ -843,16 +843,16 @@
 			<section class="preactions">
 				<ButtonInk inline onclick={goToGallery}>
 					<IconGallery />
-					{m.other_photos()}
+					{'Autres photos'}
 					<KeyboardHint shortcut="Escape" />
 				</ButtonInk>
 				<ButtonInk
 					dangerous
 					onclick={deleteImageFileAndGotoNext}
-					help={{ text: m.delete_image_help(), keyboard: '$mod+Delete' }}
+					help={{ text: 'Supprimer cette image et passer à la suivante', keyboard: '$mod+Delete' }}
 				>
 					<IconDelete />
-					{m.delete()}
+					{'Supprimer'}
 				</ButtonInk>
 			</section>
 			<section class="filename">
@@ -879,7 +879,7 @@
 					disabled={!canRevertAll}
 				>
 					<IconRevert />
-					{m.reset()}
+					{'Réinit.'}
 				</ButtonSecondary>
 				{#if uiState.cropConfirmationMetadataId}
 					<ButtonSecondary
@@ -894,7 +894,7 @@
 							Invalider
 						{:else}
 							<IconConfirmedCrop />
-							{m.validate()}
+							{'Valider'}
 						{/if}
 					</ButtonSecondary>
 				{/if}
@@ -936,7 +936,7 @@
 						<div class="actions">
 							{#if Object.values(boundingBoxes).length > 1}
 								<ButtonIcon
-									help={m.show_hide_other_boxes({ action: isFocused ? m.show() : m.hide() })}
+									help={m.show_hide_other_boxes({ action: isFocused ? 'Réafficher' : 'Masquer' })}
 									keyboard="F"
 									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
 									crossout={isFocused}
@@ -955,7 +955,7 @@
 								<IconRevert />
 							</ButtonIcon>
 							<ButtonIcon
-								help={m.delete_selected_box_help()}
+								help={'Supprimer la boîte sélectionnée'}
 								keyboard="Delete"
 								onclick={async () => deleteBoundingBox(image.id)}
 							>
@@ -967,8 +967,8 @@
 				{#if showBoxesListHint}
 					<li class="boxes-list-hint">
 						<p>
-							{@html m.create_new_box_with_tools()}
-							<SentenceJoin items={creationTools} key={(t) => t.name} final={m.sentence_join_or()}>
+							{@html 'Pour créer une nouvelle boîte,<wbr /> utilisez les outils'}
+							<SentenceJoin items={creationTools} key={(t) => t.name} final={'ou'}>
 								{#snippet children({ icon: Icon, help, shortcut })}
 									<Tooltip text={help} keyboard={shortcut}>
 										<Icon />
@@ -977,7 +977,7 @@
 							</SentenceJoin>
 						</p>
 						<p>
-							{m.select_box_with_numbers()}
+							{'Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier'}
 						</p>
 					</li>
 				{/if}
@@ -993,7 +993,7 @@
 			<div class="bar">
 				<p>
 					<IconHasCrop />
-					{m.images_with_cropping()}
+					{'Images avec recadrage'}
 					{@render percentage(croppedImagesCount)}
 				</p>
 				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
@@ -1002,7 +1002,7 @@
 				<div class="bar">
 					<p>
 						<IconConfirmedCrop />
-						{m.confirmed_crops()}
+						{'Recadrages confirmés'}
 						{@render percentage(confirmedCropsCount)}
 					</p>
 					<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
@@ -1057,7 +1057,7 @@
 					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
 				>
 					<IconContinue />
-					{m.continue()}
+					{'Continuer'}
 				</ButtonSecondary>
 			</div>
 		</nav>
