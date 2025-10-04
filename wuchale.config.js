@@ -14,6 +14,8 @@ export default defineConfig({
 				// Table names
 				if (scope === 'script' && Object.keys(Tables).includes(msg)) return false;
 
+				if (/^toasts\.\w+$/.test(call)) return true;
+
 				const startsWithUpperLetter =
 					msg[0] === msg[0].toUpperCase() && msg[0].toLowerCase() !== msg[0].toUpperCase();
 
