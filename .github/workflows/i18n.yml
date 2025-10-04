@@ -22,7 +22,11 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Refresh .po files
-        run: bun wuchale --clean
+        run: |
+          # For some reason we gotta do it 3 times (at least?) cuz its not idempotent...
+          bun wuchale --clean
+          bun wuchale --clean
+          bun wuchale --clean
       - name: 'Check if changes are only revision-date and #: references'
         id: check-changes
         run: |
