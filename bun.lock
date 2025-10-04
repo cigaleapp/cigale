@@ -88,7 +88,6 @@
         "pdf-to-png-converter": "^3.10.0",
         "pixelmatch": "^7.1.0",
         "pngjs": "^7.0.0",
-        "pofile": "^1.1.4",
         "prettier": "^3.6.2",
         "prettier-plugin-svelte": "^3.4.0",
         "rss-parser": "^3.13.0",
