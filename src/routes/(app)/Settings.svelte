@@ -188,7 +188,7 @@
 			Raccourcis clavier
 		</ButtonSecondary>
 		<ButtonSecondary
-			help={"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."}
+			help="Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 			onclick={() => {
 				openPrepareForOfflineUse?.();
 			}}

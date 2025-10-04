@@ -212,7 +212,7 @@
 					{#if uiState.cropModels.length > 0}
 						<div class="model-select">
 							<RadioButtons
-								label={"Modèle d'inférence pour la détection"}
+								label="Modèle d'inférence pour la détection"
 								value={uiState.selectedCropModel}
 								onchange={async (value) => {
 									await uiState.setModelSelections({ crop: value ?? 0 });

@@ -125,7 +125,7 @@
 {:else}
 	<Btn
 		onclick={() => {}}
-		help={"Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"}
+		help="Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
 	>
 		<span class="version-check error">
 			{#if !compact}

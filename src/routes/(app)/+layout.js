@@ -1,6 +1,5 @@
 import { dev } from '$app/environment';
 import { databaseName, databaseRevision, openTransaction, tables } from '$lib/idb.svelte.js';
-
 import { loadLocale } from 'wuchale/load-utils';
 import '../../locales/loader.svelte.js';
 import { toasts } from '$lib/toasts.svelte';

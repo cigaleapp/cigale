@@ -1,5 +1,3 @@
-import { openDB } from 'idb';
-
 /**
  * @typedef {import('$lib/database').Settings['language']} Language
  */
@@ -172,7 +170,10 @@ export function errorMessage(error, prefix = '') {
 
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
-	test('errorMessage', () => {
+	test('errorMessage', async () => {
+		await import('../locales/loader.js');
+		const { loadLocale } = await import('wuchale/load-utils');
+		await loadLocale('en');
 		expect(errorMessage(new Error('Test error'))).toBe('Test error');
 		expect(errorMessage(new Error('Error: Test error'))).toBe('Test error');
 		expect(errorMessage('string error')).toBe('string error');
@@ -185,20 +186,4 @@ if (import.meta.vitest) {
 		errorWithCause.cause = new Error('Cause error');
 		expect(errorMessage(errorWithCause)).toBe('Main error');
 	});
-}
-
-/**
- * @returns {Language}
- */
-export function getLocale() {
-	return localStorage.getItem('LOCALE') || 'fr';
-}
-
-/**
- *
- * @param {Language} newLocale
- */
-export function setLocale(newLocale) {
-	localStorage.setItem('LOCALE', newLocale);
-	void openDB;
 }

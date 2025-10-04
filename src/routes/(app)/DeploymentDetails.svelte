@@ -71,7 +71,7 @@
 		<ul>
 			<li>
 				<!-- @wc-context: continuation of sentence "deployment PR for..." -->
-				pour la PR <a href={prLink}>#{previewingPrNumber}</a> de
+				pour la PR <a href={prLink}>#{previewingPrNumber} {title}</a> de
 				{@render githubUser(user)}
 			</li>
 			{#if issueNumber}

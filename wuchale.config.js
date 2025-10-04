@@ -18,7 +18,6 @@ export default defineConfig({
 					['Space', 'Enter', 'Escape', 'Tab', 'Backspace', 'Delete'].includes(msg) ||
 					/^[A-Z]$/.test(msg);
 
-				if (msg.startsWith('Arrow')) console.log(msg);
 				if (isKeyboardShortcutExpression) {
 					return false;
 				}

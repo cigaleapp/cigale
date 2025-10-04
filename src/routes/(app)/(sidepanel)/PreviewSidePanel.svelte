@@ -206,14 +206,14 @@
 		{#if onimport}
 			<ButtonSecondary onclick={onimport}>
 				<IconImport />
-				{"Importer d'autres images"}
+				Importer d'autres images
 			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}
 			keyboard="Delete"
-			help={"Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"}
+			help="Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
 			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
 			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
 			--bg-hover={images.length > 0 ? 'var(--bg-error)' : ''}

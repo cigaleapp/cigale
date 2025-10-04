@@ -22,7 +22,7 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Refresh .po files
         run: bunx wuchale --clean
-      - name: "Check if changes are only revision-date and #: references"
+      - name: 'Check if changes are only revision-date and #: references'
         id: check-changes
         run: |
           if git diff -I PO-Revision-Date -I '#: ' --exit-code; then

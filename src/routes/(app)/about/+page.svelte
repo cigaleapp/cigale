@@ -107,7 +107,7 @@
 	<dd>
 		{@render peoplelinks(supervisors)}
 	</dd>
-	<dt>{"Dans le cadre d'un"}</dt>
+	<dt>Dans le cadre d'un</dt>
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>
