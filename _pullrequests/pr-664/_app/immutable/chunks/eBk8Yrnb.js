@@ -1,0 +1,1 @@
+import{z as t,k,t as S,A as b,S as h}from"./CubkaVmg.js";function u(r,i){return r===i||r?.[h]===i}function c(r={},i,a,A){return t(()=>{var f,s;return k(()=>{f=s,s=[],S(()=>{r!==a(...s)&&(i(r,...s),f&&u(a(...f),r)&&i(null,...f))})}),()=>{b(()=>{s&&u(a(...s),r)&&i(null,...s)})}}),r}export{c as b};

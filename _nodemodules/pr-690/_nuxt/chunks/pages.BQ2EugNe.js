@@ -1,0 +1,1 @@
+import{a3 as e,a4 as t,aH as n,au as r,ay as i}from"../entry.DrWr9xj7.js";var a=i({__name:`index`,setup(i){let a=t(),o=e();return a.replace({path:`/grid/depth`,hash:location.hash,query:o.query}),(e,t)=>(n(),r(`div`,null,` Redirecting... `))}}),o=a;export{o as default};

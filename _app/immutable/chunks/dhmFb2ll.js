@@ -1,0 +1,1 @@
+import{O as t,P as S,G as b,Q as h,S as k}from"./CtLKvhh7.js";function u(r,i){return r===i||r?.[k]===i}function c(r={},i,a,O){return t(()=>{var f,s;return S(()=>{f=s,s=[],b(()=>{r!==a(...s)&&(i(r,...s),f&&u(a(...f),r)&&i(null,...f))})}),()=>{h(()=>{s&&u(a(...s),r)&&i(null,...s)})}}),r}export{c as b};

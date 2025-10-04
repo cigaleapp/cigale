@@ -1,0 +1,1 @@
+import{g as a}from"./B0nJzvm_.js";const s=()=>"Analyzing…",r=()=>"Analyse…",i=r,g=(o={},e={})=>{const n=e.locale??a();return n==="en"?s():n==="fr"?r():i()},c=()=>"No images",t=()=>"Aucune image",l=t,_=(o={},e={})=>{const n=e.locale??a();return n==="en"?c():n==="fr"?t():l()};export{g as a,_ as n};
