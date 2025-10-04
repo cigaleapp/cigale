@@ -5,7 +5,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { goto } from '$lib/paths.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import RadioButtons from '$lib/RadioButtons.svelte';
@@ -107,7 +107,7 @@
 		const raw = await fetch(preselection.protocol)
 			.then((res) => res.text())
 			.catch((e) => {
-				toasts.error(m.error_importing_remote_protocol({ error: e }));
+				toasts.error(`Erreur lors de l'import du protocole distant: ${e}`);
 				return null;
 			});
 
@@ -121,13 +121,14 @@
 			uiState.setCurrentProtocolId(id);
 			preselection.protocol = null;
 		} catch (error) {
-			toasts.error(m.error_importing_remote_protocol({ error }));
+			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
 		} finally {
 			importingPreselectedProtocol = false;
 		}
 	}}
 >
-	{'Ce lien pointe vers un protocole distant. Voulez-vous l\'importer? Il se trouve à l\'adresse suivante:'}
+	Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse
+	suivante:
 
 	{#if preselection.protocol && preselectedProtocolIsRemote}
 		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
@@ -193,14 +194,13 @@
 					{/if}
 				</div>
 				{#if p.id === uiState.currentProtocolId}
-					{#if uiState.classificationModels.length > 0}
+					{#if uiState.classificationModels.length > 0 && uiState.classificationMetadataId}
+						{@const classificationMetadata = tables.Metadata.getFromState(
+							uiState.classificationMetadataId
+						)}
 						<div class="model-select">
 							<RadioButtons
-								label={m.inference_model_for({
-									target:
-										tables.Metadata.state.find((m) => m.id === uiState.classificationMetadataId)
-											?.label ?? 'classification'
-								})}
+								label="Modèle d'inférence pour {classificationMetadata?.label}"
 								value={uiState.selectedClassificationModel}
 								onchange={async (value) => {
 									await uiState.setModelSelections({ classification: value ?? 0 });
@@ -212,7 +212,7 @@
 					{#if uiState.cropModels.length > 0}
 						<div class="model-select">
 							<RadioButtons
-								label={'Modèle d\'inférence pour la détection'}
+								label={"Modèle d'inférence pour la détection"}
 								value={uiState.selectedCropModel}
 								onchange={async (value) => {
 									await uiState.setModelSelections({ crop: value ?? 0 });
@@ -230,7 +230,7 @@
 		<p>Le protocole que vous souhaitez n'est pas disponible?</p>
 		<ButtonSecondary onclick={() => goto('/protocols')}>
 			<IconManage />
-			{'Gérer les protocoles'}
+			Gérer les protocoles
 		</ButtonSecondary>
 		<ButtonSecondary
 			loading
@@ -241,7 +241,7 @@
 					importProtocol: data.swarpc.importProtocol
 				}).catch((e) => toasts.error(e));
 				if (!protocol || typeof protocol === 'string') return;
-				toasts.success(m.protocol_imported_and_selected({ protocolName: protocol.name }));
+				toasts.success(`Protocole "${protocol.name}" importé et sélectionné`);
 				uiState.setCurrentProtocolId(protocol.id);
 				goto('/import');
 			}}

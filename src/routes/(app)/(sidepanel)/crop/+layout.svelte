@@ -1,6 +1,6 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';

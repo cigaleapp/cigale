@@ -9,7 +9,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { ensureNoLoneImages } from '$lib/observations';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
@@ -92,11 +92,11 @@
 				},
 				({ warning, progress }) => {
 					if (warning) {
-						const [message, args] = warning;
+						const [message, { filename }] = warning;
 
 						switch (message) {
 							case 'exif-write-error':
-								toasts.warn(m.cannot_add_exif_metadata_to_image(args));
+								toasts.warn(`Impossible d'ajouter les métadonnées EXIF à l'image ${filename}`);
 								break;
 						}
 					}
@@ -108,9 +108,7 @@
 			downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
 		} catch (error) {
 			console.error(error);
-			toasts.error(
-				m.error_while_exporting_results({ error: error?.toString() ?? 'Erreur inattendue' })
-			);
+			toasts.error(`Erreur lors de l'exportation des résultats: ${error}`);
 		} finally {
 			exporting = false;
 		}
@@ -157,7 +155,9 @@
 				{@const unit = option === 'customPercent' ? '%' : 'px'}
 				<div class="numeric" style:--width={unit === '%' ? '3ch' : '4ch'}>
 					<InlineTextInput
-						label={option === 'customPercent' ? 'en pourcentage des dimensions de l\'image' : 'en pixels'}
+						label={option === 'customPercent'
+							? "en pourcentage des dimensions de l'image"
+							: 'en pixels'}
 						value={cropPadding.unitless === 0
 							? '0'
 							: cropPadding.unit === unit
@@ -177,7 +177,9 @@
 				</div>
 			{/snippet}
 		</SegmentedGroup>
-		<p class="fineprint">{'Une valeur en % signifie que la marge est relative aux dimensions de chacune des images'}</p>
+		<p class="fineprint">
+			{'Une valeur en % signifie que la marge est relative aux dimensions de chacune des images'}
+		</p>
 	</section>
 
 	{#snippet footer()}

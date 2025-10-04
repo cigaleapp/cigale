@@ -52,6 +52,19 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Pluralizes a string based on a number and a list of candidate strings.
+ * @see https://wuchale.dev/guides/plurals/#usage
+ * @param {number} num
+ * @param {string[]} candidates
+ * @param {(n: number) => number} [rule]
+ * @returns {string}
+ */
+export function plural(num, candidates, rule = (n) => (n === 1 ? 0 : 1)) {
+	const index = rule(num);
+	return candidates[index].replace('#', Intl.NumberFormat().format(num));
+}
+
+/**
  * Converts a number between 0 and 1 to a percentage string.
  * @param {number} value Number between 0 and 1
  * @param {number} [decimals=0] Number of decimal places to include in the output

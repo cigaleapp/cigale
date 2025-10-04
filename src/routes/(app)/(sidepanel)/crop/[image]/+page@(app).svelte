@@ -38,7 +38,7 @@
 	} from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { assertIs, deleteMetadataValue, hasRuntimeType, storeMetadataValue } from '$lib/metadata';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -130,7 +130,7 @@
 		},
 		{
 			name: 'Main',
-			help: 'Cliquer et glisser pour se déplacer dans l\'image',
+			help: "Cliquer et glisser pour se déplacer dans l'image",
 			icon: IconToolHand,
 			shortcut: 'h',
 			transformable: false,
@@ -601,7 +601,7 @@
 			}
 		},
 		u: {
-			help: 'Revenir au recadrage d\'origine',
+			help: "Revenir au recadrage d'origine",
 			when: () => Boolean(revertableCrops[fileId]),
 			do: () => {
 				if (!revertableCrops[fileId]) return;
@@ -609,7 +609,7 @@
 			}
 		},
 		'$mod+u': {
-			help: 'Revenir au recadrage d\'origine pour toutes les boîtes',
+			help: "Revenir au recadrage d'origine pour toutes les boîtes",
 			when: () => Object.keys(boundingBoxes).length > 0,
 			do: revertAll
 		},
@@ -646,7 +646,7 @@
 			tools.map((tool) => [
 				tool.shortcut,
 				{
-					help: m.choose_tool({ name: tool.name }),
+					help: `Choisir l'outil ${tool.name}`,
 					do: () => {
 						activeToolName = tool.name;
 					}
@@ -675,7 +675,7 @@
 			range(1, 10).map((i) => [
 				`Digit${i}`,
 				{
-					help: m.select_box_number({ number: i }),
+					help: `Sélectionner la boîte #${i}`,
 					when: () => Object.keys(boundingBoxes).length >= i,
 					do: () => {
 						const imageId = Object.keys(boundingBoxes)[i - 1];
@@ -734,7 +734,7 @@
 	<aside class="toolbar">
 		{#each tools as tool (tool.name)}
 			<button
-				aria-label={m.select_tool({ tool: tool.name })}
+				aria-label="Choisir l'outil {tool.name}"
 				class:active={tool.name === activeToolName}
 				use:tooltip={{
 					text: `${tool.name}: ${tool.help}`,
@@ -883,11 +883,11 @@
 				</ButtonSecondary>
 				{#if uiState.cropConfirmationMetadataId}
 					<ButtonSecondary
-						keyboard="Arrow{hasConfirmedCrop(fileId) ? 'Down' : 'Up'}"
+						keyboard={hasConfirmedCrop(fileId) ? 'ArrowDown' : 'ArrowUp'}
 						onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
-						help="Marquer le recadrage comme {hasConfirmedCrop(fileId)
-							? 'non confirmé'
-							: 'confirmé'}"
+						help={hasConfirmedCrop(fileId)
+							? 'Marquer le recadrage comme non confirmé'
+							: 'Marquer le recadrage comme confirmé'}
 					>
 						{#if hasConfirmedCrop(fileId)}
 							<IconUnconfirmedCrop />
@@ -936,7 +936,7 @@
 						<div class="actions">
 							{#if Object.values(boundingBoxes).length > 1}
 								<ButtonIcon
-									help={m.show_hide_other_boxes({ action: isFocused ? 'Réafficher' : 'Masquer' })}
+									help={isFocused ? 'Réafficher les autres boîtes' : 'Masquer les autres boîtes'}
 									keyboard="F"
 									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
 									crossout={isFocused}
@@ -945,9 +945,10 @@
 								</ButtonIcon>
 							{/if}
 							<ButtonIcon
-								help="Revenir au recadrage d'origine ({initBox
-									? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${percent(initBox.confidence)} de confiance`
-									: 'indisponible'})"
+								help={initBox
+									? `Revenir au recadrage d'origine 
+									(${roundedPixelDimensions(initBox.value).join(' × ')}, ${percent(initBox.confidence)} de confiance)`
+									: "Recadrage d'origine indisponible"}
 								keyboard="u"
 								disabled={!revertableCrops[image.id]}
 								onclick={() => revertToInferedCrop(image.id)}

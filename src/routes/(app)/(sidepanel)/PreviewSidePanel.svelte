@@ -14,7 +14,7 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 	import IconSplit from '~icons/ph/arrows-out-light';
@@ -206,21 +206,21 @@
 		{#if onimport}
 			<ButtonSecondary onclick={onimport}>
 				<IconImport />
-				{'Importer d\'autres images'}
+				{"Importer d'autres images"}
 			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}
 			keyboard="Delete"
-			help={'Supprimer toutes les images sélectionnées. Attention, impossible d\'annuler'}
+			help={"Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"}
 			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
 			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
 			--bg-hover={images.length > 0 ? 'var(--bg-error)' : ''}
 			--fg-hover={images.length > 0 ? 'var(--fg-error)' : ''}
 		>
 			<IconDelete />
-			{m.delete_n_images({ count: images.length })}
+			Supprimer {images.length} images
 		</ButtonSecondary>
 	</section>
 </aside>

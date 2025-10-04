@@ -6,7 +6,7 @@
 	import { deleteImageFile, imageIsAnalyzed } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations.js';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';

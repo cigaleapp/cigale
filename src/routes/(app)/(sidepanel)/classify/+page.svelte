@@ -14,7 +14,7 @@
 	} from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
@@ -62,10 +62,7 @@
 		);
 		if (!settings) {
 			toasts.error(
-				m.no_inference_params_defined({
-					modelName: uiState.selectedClassificationModel,
-					protocolName: uiState.currentProtocol.name
-				})
+				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur le protocole ${uiState.currentProtocol.name}`
 			);
 			return;
 		}
@@ -153,9 +150,7 @@
 			sort={getSettings().gallerySort}
 			groups={['Recadrées', 'Non recadrées']}
 			grouping={({ data: { images } }) =>
-				images.some((img) => uiState.cropMetadataValueOf(img))
-					? 'Recadrées'
-					: 'Non recadrées'}
+				images.some((img) => uiState.cropMetadataValueOf(img)) ? 'Recadrées' : 'Non recadrées'}
 		>
 			{#snippet item({ observation, images }, { id })}
 				<CardObservation

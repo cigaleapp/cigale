@@ -27,7 +27,7 @@
 </script>
 
 <script>
-	import { m } from '$lib/paraglide/messages.js';
+
 	import IconRetry from '~icons/ph/arrow-counter-clockwise';
 	import IconImage from '~icons/ph/image';
 	import IconDelete from '~icons/ph/trash';
@@ -179,7 +179,7 @@
 					<button
 						disabled={loading}
 						class="stack-count"
-						use:tooltip={`${m.observation_tooltip({ stacksize })}`}
+						use:tooltip={`Cette observation regroupe ${stacksize} images. Cliquez pour les voir toutes.`}
 						onclick={(/** @type {MouseEvent} */ e) => {
 							e.stopPropagation();
 							onstacksizeclick?.();

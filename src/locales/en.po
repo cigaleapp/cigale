@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-04T14:30:11.048Z\n"
-"PO-Revision-Date: 2025-10-04T14:30:12.463Z\n"
+"POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
+"PO-Revision-Date: 2025-10-04T15:56:02.777Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -13,19 +13,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 
 #: src/lib/AreaObservations.svelte
-msgid "élément"
+msgid "Tout sélectionner"
 msgstr ""
 
-#: src/lib/Card.svelte
-msgid "Enter"
+#: src/lib/AreaObservations.svelte
+msgid "Tout désélectionner"
 msgstr ""
 
-#: src/lib/Datetime.svelte
-msgid "PPpp"
-msgstr ""
-
+#. placeholder {0}: newVersion
 #: src/lib/ButtonUpdateProtocol.svelte
-msgid "À jour"
+msgid "Le protocole est à jour (v{0}). Cliquer pour vérifier à nouveau"
 msgstr ""
 
 #. placeholder {0}: version
@@ -33,136 +30,20 @@ msgstr ""
 #: src/lib/ButtonUpdateProtocol.svelte
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "v{0}"
+msgstr "v{0}"
+
+#. placeholder {0}: newVersion
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Une mise à jour vers la v{0} est disponible"
 msgstr ""
 
+#. placeholder {0}: e
 #: src/lib/ButtonUpdateProtocol.svelte
-msgid "Mise à jour…"
-msgstr ""
-
-#. placeholder {0}: version
-#. placeholder {1}: newVersion
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "v{0} <0/> v{1}"
-msgstr ""
-
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "Recherche de mise à jour…"
-msgstr ""
-
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "Mettre à jour"
-msgstr ""
-
-#: src/lib/ButtonUpdateProtocol.svelte
-#: src/lib/CardMedia.svelte
-msgid "Rééssayer"
-msgstr ""
-
-#: src/lib/ButtonUpdateProtocol.svelte
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "Ce protocole ne supporte pas la vérification des mises à jour"
-msgstr ""
-
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
-msgstr ""
-
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "Non versionné"
-msgstr ""
+msgid "Impossible de mettre à jour le protocole: {0}"
+msgstr "Could not update protocol: {0}"
 
 #: src/lib/Dropzone.svelte
 msgid "Déposer des images ici…"
-msgstr ""
-
-#: src/lib/idb.svelte.js
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "ImagePreviewFile"
-msgstr ""
-
-#: src/lib/KeyboardHint.svelte
-msgid "Mac"
-msgstr ""
-
-#: src/lib/KeyboardHint.svelte
-msgid "Ctrl"
-msgstr ""
-
-#: src/lib/KeyboardHint.svelte
-msgid "Suppr"
-msgstr ""
-
-#: src/lib/KeyboardHint.svelte
-msgid "Esc"
-msgstr ""
-
-#: src/lib/CardMedia.svelte
-#: src/routes/(app)/DeploymentDetails.svelte
-#: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/+layout.js
-msgid "Chargement…"
-msgstr ""
-
-#: src/lib/CardMedia.svelte
-msgid "En attente"
-msgstr ""
-
-#: src/lib/CardMedia.svelte
-msgid "Erreur"
-msgstr ""
-
-#: src/lib/CardMedia.svelte
-#: src/routes/(app)/protocols/RowProtocol.svelte
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Supprimer"
-msgstr ""
-
-#: src/lib/KeyboardShortcuts.svelte
-msgid "Général"
-msgstr ""
-
-#: src/lib/KeyboardShortcuts.svelte
-#: src/routes/(app)/Settings.svelte
-msgid "Raccourcis clavier"
-msgstr ""
-
-#: src/lib/KeyboardShortcuts.svelte
-msgid "¯\\_(ツ)_/¯"
-msgstr ""
-
-#: src/lib/KeyboardShortcuts.svelte
-msgid "Aucun raccouci clavier pour cette page"
-msgstr ""
-
-#: src/lib/import.svelte.js
-#: src/lib/import.svelte.js
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Aucun protocole sélectionné"
-msgstr ""
-
-#: src/lib/Metadata.svelte
-msgid "Alternatives"
-msgstr ""
-
-#: src/lib/Metadata.svelte
-#: src/lib/MetadataCombobox.svelte
-msgid "En savoir plus"
-msgstr ""
-
-#: src/lib/idb.test.svelte.js
-#: src/lib/idb.test.svelte.js
-msgid "Test"
-msgstr ""
-
-#: src/lib/idb.test.svelte.js
-msgid "THE NETHER"
-msgstr ""
-
-#: src/lib/MetadataCombobox.svelte
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-msgid "MetadataOption"
 msgstr ""
 
 #: src/lib/MetadataCombobox.svelte
@@ -185,150 +66,38 @@ msgstr ""
 
 #: src/lib/MetadataInput.svelte
 msgid "Oui"
-msgstr ""
+msgstr "Yes"
 
 #: src/lib/MetadataInput.svelte
 msgid "Non"
-msgstr ""
-
-#: src/lib/MetadataInput.svelte
-msgid "Décrémenter"
-msgstr ""
-
-#: src/lib/MetadataInput.svelte
-msgid "Incrémenter"
-msgstr ""
+msgstr "No"
 
 #: src/lib/MetadataInput.svelte
 msgid "Irreprésentable"
 msgstr ""
 
+#: src/lib/Metadata.svelte
+msgid "Alternatives"
+msgstr ""
+
+#: src/lib/KeyboardShortcuts.svelte
+msgid "¯\\_(ツ)_/¯"
+msgstr ""
+
 #: src/lib/Modal.svelte
-#: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/Settings.svelte
 msgid "Fermer"
-msgstr ""
+msgstr "Close"
 
-#: src/lib/queue.svelte.js
-msgid "Processing queue mainloop exited"
-msgstr ""
-
-#: src/lib/queue.svelte.js
-msgid "Progress is"
-msgstr ""
-
-#: src/lib/queue.svelte.js
-msgid "Starting processing queue mainloop with up to"
-msgstr ""
-
-#: src/lib/queue.svelte.js
-msgid "Queue was drained"
-msgstr ""
-
-#: src/lib/queue.svelte.js
-msgid "Task already in queue, skipping."
-msgstr ""
-
-#: src/lib/queue.svelte.js
-msgid "No task to pop, queue is empty"
-msgstr ""
-
-#. placeholder {0}: file.name
-#: src/lib/results.svelte.js
-msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
-msgstr ""
-
-#. placeholder {0}: file.name
-#: src/lib/results.svelte.js
-msgid "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
-msgstr ""
-
-#. placeholder {0}: file.name
-#. placeholder {1}: analysis.summary
-#: src/lib/results.svelte.js
-msgid "Fichier d'analyse de {0} invalide: {1}"
-msgstr ""
-
-#. placeholder {0}: file.name
-#. placeholder {1}: protocol.id
-#. placeholder {2}: protocolId
-#: src/lib/results.svelte.js
-msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole actuel est {2}"
-msgstr ""
-
-#. placeholder {0}: file.name
-#: src/lib/results.svelte.js
-msgid "Aucune image trouvée dans l'export {0}. L'export doit contenir les images originales, pas seulement les images recadrées"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-#: src/routes/(app)/Navigation.svelte
-msgid "Aucune inférence"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Importer le protocole distant ?"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-#: src/routes/(app)/Navigation.svelte
-#: src/routes/(app)/protocols/+page.svelte
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-msgid "Importer"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse suivante:"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Importation en cours..."
-msgstr ""
+#: src/routes/(app)/+layout.svelte
+msgid "Activer/Désactiver le debug mode"
+msgstr "Toggle debug mode"
 
 #: src/routes/(app)/+page.svelte
 msgid "Choisir un protocole"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Recherche"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Rechercher..."
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Protocole sélectionné"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Modèle d'inférence pour la détection"
-msgstr ""
+msgstr "Choose a protocol"
 
 #: src/routes/(app)/+page.svelte
 msgid "Le protocole que vous souhaitez n'est pas disponible?"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-#: src/routes/(app)/Settings.svelte
-msgid "Gérer les protocoles"
-msgstr ""
-
-#: src/routes/(app)/+page.svelte
-msgid "Importer un protocole"
-msgstr ""
-
-#: src/routes/+error.svelte
-msgid "Accueil"
-msgstr ""
-
-#: src/routes/+error.svelte
-msgid "ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
-msgstr ""
-
-#: src/routes/+error.svelte
-msgid "Réinitialiser la base de données"
 msgstr ""
 
 #. placeholder {0}: user.login
@@ -336,172 +105,8 @@ msgstr ""
 msgid "Avatar de {0}"
 msgstr ""
 
-#: src/routes/(app)/DeploymentDetails.svelte
-msgid "Ceci est un déploiement de preview"
-msgstr ""
-
-#: src/routes/(app)/DeploymentDetails.svelte
-msgid "Supprime toutes les données pour ce déploiement de preview"
-msgstr ""
-
-#: src/routes/(app)/DeploymentDetails.svelte
-msgid "Nettoyer la base de données"
-msgstr ""
-
-#: src/routes/(app)/DeploymentDetails.svelte
-msgid "Voir sur Github"
-msgstr ""
-
-#: src/routes/(app)/DeploymentDetails.svelte
-msgid "Tests E2E"
-msgstr ""
-
-#: src/routes/(app)/DeploymentDetails.svelte
-msgid "Tests unitaires"
-msgstr ""
-
-#: src/routes/(app)/DeploymentDetails.svelte
-msgid "Coverage"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Exporter les résultats"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Métadonnées seulement"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Métadonnées et images recadrées"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Métadonnées, images recadrées et images originales"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Permet de ré-importer les résultats ultérieurement"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Marge autour des images recadrées"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Aucune"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
-msgstr ""
-
 #: src/routes/(app)/DownloadResults.svelte
 msgid "<0/> results.zip"
-msgstr ""
-
-#: src/lib/seo.svelte.js
-msgid "Cigale"
-msgstr ""
-
-#: src/lib/toasts.svelte.js
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Erreur inattendue"
-msgstr ""
-
-#: src/routes/(app)/Navigation.svelte
-msgid "<0/> C.i.g.a.l.e."
-msgstr ""
-
-#: src/routes/(app)/Navigation.svelte
-msgid "Protocole"
-msgstr ""
-
-#: src/routes/(app)/Navigation.svelte
-msgid "Recadrer"
-msgstr ""
-
-#: src/routes/(app)/Navigation.svelte
-msgid "Classifier"
-msgstr ""
-
-#: src/routes/(app)/Navigation.svelte
-msgid "Résultats"
-msgstr ""
-
-#: src/routes/(app)/Navigation.svelte
-msgid "Modèle d'inférence"
-msgstr ""
-
-#: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/Settings.svelte
-msgid "Préparation hors-ligne"
-msgstr ""
-
-#: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/Settings.svelte
-msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
-msgstr ""
-
-#: src/routes/(app)/PrepareForOffline.svelte
-msgid "<0/> OK!"
-msgstr ""
-
-#: src/routes/(app)/PrepareForOffline.svelte
-msgid "Démarrer"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-#: src/routes/(app)/Settings.svelte
-msgid "Réglages"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Thème"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Synchroniser avec le thème du système"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Mode debug"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Trier les images par"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Fichier"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Date"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Trier par ordre décroissant"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Trier par ordre croissant"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Taille des images"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "Langue"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "À propos"
-msgstr ""
-
-#: src/routes/(app)/Settings.svelte
-msgid "CIGALE ver. <0/> · <1/>"
 msgstr ""
 
 #: src/routes/_colors/+page.svelte
@@ -513,66 +118,113 @@ msgstr ""
 msgid "Copier var(--{0})"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Image"
+#: src/routes/(app)/Navigation.svelte
+msgid "Choisir le protocole"
+msgstr "Choose protocol"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Importer des images"
+msgstr "Import images"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Recadrer les images"
+msgstr "Crop images"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Classifier les images"
+msgstr "Classify images"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Exporter les résultats"
+msgstr "Export results"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Gérer les protocoles"
+msgstr "Manage protocols"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "<0/> C.i.g.a.l.e."
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Modèle d'inférence"
+msgstr ""
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid "<0/> OK!"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "CIGALE ver. <0/> · <1/>"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Cependant, les protocoles sont représentables par des fichiers de configuration JSON ou YAML"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid ""
+"Sachant qu'un <0>JSON Schema</0> est déclaré dans ces fichiers,\n"
+"la plupart des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid ""
+"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il\n"
+"suffit de l'exporter, modifier le fichier, et réimporter"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "<0/> Format JSON"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "<0/> Format YAML"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Observation"
+msgid "Importer"
+msgstr "Import"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Error out selected cards"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "ImageFile"
+msgid "Un-error selection"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
-#: src/routes/(app)/(sidepanel)/import/+page.svelte
-#: src/routes/(app)/(sidepanel)/import/+page.svelte
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-msgid "Cancelled by user"
+msgid "Spawn a loading image"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Nom de l'observation"
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Supprimer toutes les images et observations"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Chargement des options…"
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Fusionner des observations ou images"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Regrouper les images et/ou observations sélectionnées en une observation"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Regrouper"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+#: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
+msgstr "Separate all selected observations into individual images"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Supprimer les images et observations sélectionnées"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Séparer"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Importer d'autres images"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Delete"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
-msgstr ""
+#: src/routes/(app)/about/+page.svelte
+msgid "À propos"
+msgstr "About"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "C.i.g.a.l.e."
@@ -580,18 +232,6 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune"
-msgstr ""
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Développé par"
-msgstr ""
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Sous la supervision de"
-msgstr ""
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Dans le cadre d'un"
 msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
@@ -691,8 +331,9 @@ msgid "YOLO 11n"
 msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Classification"
-msgstr ""
+msgstr "Classification"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "ResNet50"
@@ -738,6 +379,18 @@ msgstr ""
 msgid "Impossible de charger les dépendances"
 msgstr ""
 
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Nom de l'observation"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Chargement des options…"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
+msgstr ""
+
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Êtes-vous sûr·e?"
 msgstr ""
@@ -751,145 +404,98 @@ msgid "Oui, supprimer"
 msgstr ""
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-#: src/routes/(app)/+layout.js
-msgid "Protocol"
-msgstr ""
-
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-#: src/routes/(app)/+layout.js
-msgid "Metadata"
-msgstr ""
-
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-msgid "Protocole supprimé"
-msgstr ""
-
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Il est impossible de revenir en arrière après avoir supprimé un protocole."
-msgstr ""
-
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "Exporter"
 msgstr ""
 
 #: src/routes/(app)/_playground/+page.svelte
 msgid "Test title"
 msgstr ""
 
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Créer un protocole"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Cependant, les protocoles sont représentables par des fichiers de configuration JSON ou YAML"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid ""
-"Sachant qu'un <0>JSON Schema</0> est déclaré dans ces fichiers,\n"
-"la plupart des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid ""
-"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il\n"
-"suffit de l'exporter, modifier le fichier, et réimporter"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid "<0/> Format JSON"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid "<0/> Format YAML"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Protocoles"
-msgstr ""
-
-#. placeholder {0}: ps[0].name
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Protocole “{0}” importé"
-msgstr ""
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Créer"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/import/+page.svelte
-msgid "Cliquer ou déposer des images, ou un export de résultats (.zip)"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Erreur lors du chargement du modèle de classification"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Chargement du modèle de classification"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Recadrées"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Non recadrées"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-msgid "Analyse…"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Observation is empty (should not happen)"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-msgid "Aucune image"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Oops!"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Impossible de charger le modèle de classification"
-msgstr ""
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
+msgid "Recadrer"
+msgstr "Crop"
 
+#. placeholder {0}: firstImage?.filename ?? '...'
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Ce protocole ne supported pas la validation des recadrages (voir crop.confirmationMetadata dans la définition du protocole)"
-msgstr ""
-
-#. placeholder {0}: imageId
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "L'image {0} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Confirmé"
+msgid "Recadrer {0}"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Main"
+msgid "Image précédente"
+msgstr "Previous image"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Image suivante"
+msgstr "Next image"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Continuer"
+msgstr "Continue"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Supprimer l’image"
 msgstr ""
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Quitter le mode recadrage"
+msgstr "Exit cropping mode"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Activer/désactiver la continuation automatique"
+msgstr "Toggle auto continue"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Supprimer la boîte sélectionnée"
+msgstr "Delete the selected box"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Cacher les boîtes non sélectionnées"
+msgstr "Hide unselected boxes"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Revenir au recadrage d'origine"
+msgstr "Revert to original crop"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Revenir au recadrage d'origine pour toutes les boîtes"
+msgstr "Revert all to original crop"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Marquer le recadrage comme confirmé"
+msgstr "Mark image crop as confirmed"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Marquer le recadrage comme non confirmé"
+msgstr "Mark image crop as not confirmed"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Zoomer"
+msgstr "Zoom in"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Dézoomer"
+msgstr "Zoom out"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Réinitialiser le zoom"
+msgstr "Reset zoom"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Sélectionner la boîte précédente"
+msgstr "Select previous box"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Sélectionner la boîte suivante"
+msgstr "Select next box"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Chargement de l'image…"
@@ -900,103 +506,12 @@ msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Autres photos"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Escape"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Supprimer cette image et passer à la suivante"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Revenir au recadrage d'origine pour toutes les boîtes"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Réinit."
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Down"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Up"
-msgstr ""
-
-#. placeholder {0}: hasConfirmedCrop(fileId) ? 'Down' : 'Up'
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Arrow{0}"
-msgstr ""
-
-#. placeholder {0}: hasConfirmedCrop(fileId) ? 'non confirmé' : 'confirmé'
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Marquer le recadrage comme {0}"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Invalider"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Valider"
 msgstr ""
 
 #. placeholder {0}: i + 1
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Boîte #{0}"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Réafficher"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Masquer"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "F"
-msgstr ""
-
-#. placeholder {0}: initBox ? `${roundedPixelDimensions(initBox.value).join(' × ')}, ${percent(initBox.confidence)} de confiance` : 'indisponible'
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Revenir au recadrage d'origine ({0})"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Supprimer la boîte sélectionnée"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Images avec recadrage"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Recadrages confirmés"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Image précédente"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "ArrowLeft"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Image suivante"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "ArrowRight"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
@@ -1008,49 +523,27 @@ msgid "<0/> Auto"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Space"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Continuer"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Erreur lors du chargement du modèle de détection"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Chargement du modèle de recadrage…"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Impossible de charger le modèle de recadrage"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-msgid "Avec détections"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
-msgid "Sans détection"
 msgstr ""
 
 #: src/routes/(app)/+layout.js
 msgid "Chargement du worker neuronal…"
-msgstr ""
+msgstr "Loading neural worker…"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation DB du worker neuronal…"
-msgstr ""
+msgstr "Initializing neural worker's DB…"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation des réglages par défaut…"
+msgstr "Initializing default settings…"
+
+#: src/routes/(app)/+layout.js
+msgid "Metadata"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Protocol"
 msgstr ""
 
 #: src/routes/(app)/+layout.js
@@ -1060,4 +553,81 @@ msgstr ""
 
 #: src/routes/(app)/+layout.js
 msgid "Chargement du protocole intégré"
+msgstr "Loading built-in protocol"
+
+#: src/routes/(app)/+layout.js
+msgid "Chargement…"
+msgstr "Loading…"
+
+#: src/routes/(app)/+page.svelte
+msgid ""
+"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
+"suivante: <0/> <1/> <2/>"
 msgstr ""
+
+#. placeholder {0}: classificationMetadata?.label
+#: src/routes/(app)/+page.svelte
+msgid "Modèle d'inférence pour {0}"
+msgstr "Inference model for {0}"
+
+#: src/routes/(app)/+page.svelte
+msgid "<0/> Gérer les protocoles"
+msgstr "<0/> Manage protocols"
+
+#. placeholder {0}: images.length
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Supprimer {0} images"
+msgstr "<0/> Delete {0} images"
+
+#. placeholder {0}: tool.name
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Choisir l'outil {0}"
+msgstr "Choose {0} tool"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
+msgid "Mise à jour…"
+msgstr "Updating…"
+
+#. placeholder {0}: version
+#. placeholder {1}: newVersion
+#: src/lib/ButtonUpdateProtocol.svelte
+msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
+msgid "v{0} <0/> v{1}"
+msgstr ""
+
+#. placeholder {0}: previewingPrNumber
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Déploiement de preview pour la PR #{0}"
+msgstr "Preview deployment for PR #{0}"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgctxt "continuation of sentence \"deployment PR for...\""
+msgid "pour la PR"
+msgstr ""
+
+#: src/routes/(app)/DeploymentDetails.svelte
+#: src/routes/(app)/DeploymentDetails.svelte
+msgctxt "continuation of sentence \"deployment PR for...\""
+msgid "de"
+msgstr ""
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgctxt "continuation of sentence \"deployment PR for...\""
+msgid "pour l'issue"
+msgstr ""
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Déploiement de preview pour la <0>PR #{0}</0>"
+msgstr ""
+
+#. placeholder {0}: previewingPrNumber
+#: src/routes/(app)/Navigation.svelte
+msgid "Preview #{0}"
+msgstr "Preview #{0}"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Protocole importé\", \"# protocoles importés"
+msgid_plural "Protocole importé\", \"# protocoles importés"
+msgstr[0] ""
+msgstr[1] ""

@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import { idComparator, isReactiveTable, Tables, generateId } from './database.js';
 import * as devalue from 'devalue';
 
+/** @type {number | null} */
 export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 

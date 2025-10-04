@@ -685,7 +685,7 @@ export function metadataPrettyValue(metadata, value, valueLabel = undefined) {
 				h
 			} = type({ x: 'number', y: 'number', h: 'number', w: 'number' }).assert(value);
 
-			return m.metadata_value_boundingbox({ x1, y1, x2: x1 + w, y2: y1 + h });
+			return `Boîte de (${x1}, ${y1}) à (${x1 + w}, ${y1 + h})`;
 		}
 
 		case 'float':

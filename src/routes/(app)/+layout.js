@@ -1,6 +1,6 @@
 import { dev } from '$app/environment';
 import { databaseName, databaseRevision, openTransaction, tables } from '$lib/idb.svelte.js';
-import { m } from '$lib/paraglide/messages.js';
+
 import { getLocale } from '$lib/paraglide/runtime';
 import { toasts } from '$lib/toasts.svelte';
 import { error } from '@sveltejs/kit';

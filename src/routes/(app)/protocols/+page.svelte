@@ -4,7 +4,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import Modal from '$lib/Modal.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { downloadProtocolTemplate, jsonSchemaURL } from '$lib/protocols.js';
 	import { toasts } from '$lib/toasts.svelte';
@@ -13,6 +13,7 @@
 	import IconCreate from '~icons/ph/plus-circle';
 	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
 	import RowProtocol from './RowProtocol.svelte';
+	import { plural } from '$lib/i18n';
 
 	const { data } = $props();
 
@@ -93,7 +94,8 @@
 						.then((ps) => {
 							if (!ps || typeof ps === 'string' || ps.length === 0) return;
 							if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
-							else toasts.success(m.protocols_imported_multiple({ count: ps.length }));
+							else
+								toasts.success(plural(ps.length, ['Protocole importé", "# protocoles importés']));
 						});
 				}}
 			>

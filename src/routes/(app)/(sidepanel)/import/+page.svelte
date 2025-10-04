@@ -9,7 +9,7 @@
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';

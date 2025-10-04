@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import {wuchale} from '@wuchale/vite-plugin';
+import { wuchale } from '@wuchale/vite-plugin';
 import { execSync } from 'node:child_process';
 import icons from 'unplugin-icons/vite';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';

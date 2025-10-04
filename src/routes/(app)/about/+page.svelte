@@ -2,7 +2,6 @@
 	import Logo from '$lib/Logo.svelte';
 	import JSONC from 'tiny-jsonc';
 	import { seo } from '$lib/seo.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 	import lockfile from '$lib/../../bun.lock?raw';
 
 	const { data } = $props();
@@ -108,7 +107,7 @@
 	<dd>
 		{@render peoplelinks(supervisors)}
 	</dd>
-	<dt>{'Dans le cadre d\'un'}</dt>
+	<dt>{"Dans le cadre d'un"}</dt>
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>

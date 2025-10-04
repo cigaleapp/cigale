@@ -7,7 +7,7 @@
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { goto, href } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -150,7 +150,7 @@
 			</a>
 			{#if previewingPrNumber}
 				<button class="pr-number" onclick={openPreviewPRDetails}>
-					{m.preview_pr_number({ number: previewingPrNumber })}
+					Preview #{previewingPrNumber}
 				</button>
 			{/if}
 		</div>
@@ -199,7 +199,7 @@
 			<div
 				class="with-inference-indicator"
 				use:tooltip={uiState.processing.task === 'detection' && uiState.processing.progress < 1
-					? 'Veuillez attendre la fin de l\'analyse des images avant de les classifier'
+					? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
 					: undefined}
 			>
 				<a

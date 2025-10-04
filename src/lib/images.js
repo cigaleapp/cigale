@@ -274,6 +274,10 @@ const RAW_IMAGE_MEDIA_TYPES = [
 const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
 const SUPPORT_PLANNED_TYPES = [...RAW_IMAGE_MEDIA_TYPES];
 
+export function errorMessageImageTooLarge() {
+	return `L'image est trop grande pour être traitée. Elle doit faire moins de ${imageLimits.maxResolutionInMP} Megapixels et ${imageLimits.maxMemoryUsageInMB} Mo`;
+}
+
 /**
  * Resize an image to fit within MAXWIDTH and MAXHEIGHT
  * @param {object} param0
@@ -289,13 +293,13 @@ export async function resizeToMaxSize({ source }) {
 				? errorMessage(error)
 				: SUPPORT_PLANNED_TYPES.includes(source.type)
 					? `Les fichiers ${humanFormatName(source.type)} ne sont pas encore supportés`
-					: m.file_format_not_supported({ format: humanFormatName(source.type) })
+					: `Le format de fichier ${humanFormatName(source.type)} n'est pas supporté`
 		);
 	});
 	const { width, height } = originalImage;
 
 	if (width * height > imageLimits.maxResolutionInMP * 1e6) {
-		throw new Error(m.image_too_large(imageLimits));
+		throw new Error(errorMessageImageTooLarge());
 	}
 
 	const originalCanvas = document.createElement('canvas');

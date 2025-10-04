@@ -3,7 +3,6 @@
 	import Datetime from '$lib/Datetime.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 
 	const buildCommit = import.meta.env.buildCommit;
 
@@ -52,12 +51,12 @@
 <Modal
 	key="modal_preview_pr"
 	bind:open
-	title={m.preview_deployment_for_pr_no({ number: previewingPrNumber })}
+	title="Déploiement de preview pour la PR #{previewingPrNumber}"
 >
 	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
-			{@html m.preview_deployment_for_pr_no__html({ number: previewingPrNumber, prLink })}
+			Déploiement de preview pour la <a href={prLink}>PR #{previewingPrNumber}</a>
 		</p>
 	{:then { title, user, body }}
 		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
@@ -71,13 +70,15 @@
 		<p>{'Ceci est un déploiement de preview'}</p>
 		<ul>
 			<li>
-				{@html m.preview_deployment_is_for_loaded_second_part__html({ title, prLink })}
+				<!-- @wc-context: continuation of sentence "deployment PR for..." -->
+				pour la PR <a href={prLink}>#{previewingPrNumber}</a> de
 				{@render githubUser(user)}
 			</li>
 			{#if issueNumber}
 				<li>
 					{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/issues/${issueNumber}`).then( (res) => res.json() ) then { title, number, user, html_url }}
-						{@html m.preview_deployment_for_issue_no__html({ html_url, number, title })}
+						<!-- @wc-context: continuation of sentence "deployment PR for..." -->
+						pour l'issue <a href={html_url}>#{number} {title}</a> de
 						{@render githubUser(user)}
 					{/await}
 				</li>

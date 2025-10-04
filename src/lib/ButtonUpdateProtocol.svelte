@@ -10,7 +10,7 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import IconCannotCheckForUpdates from '~icons/ph/warning-circle';
 	import ButtonIcon from './ButtonIcon.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 
 	/**
 	 * @typedef {object} Props
@@ -47,7 +47,7 @@
 		{:then { upToDate, newVersion }}
 			{#if upToDate}
 				<Btn
-					help={m.protocol_up_to_date_click_to_check_again({ newVersion })}
+					help="Le protocole est à jour (v{newVersion}). Cliquer pour vérifier à nouveau"
 					onclick={() => {
 						checkagain = Date.now();
 					}}
@@ -70,16 +70,16 @@
 						upgrading = true;
 						await upgradeProtocol({ version, source, id, swarpc })
 							.then(({ version }) => {
-								toasts.success(m.protocol_updated_to_version({ version }));
+								toasts.success(`Protocole mis à jour vers la v${version}`);
 							})
 							.catch((e) => {
-								toasts.error(m.cannot_update_protocol({ error: e }));
+								toasts.error(`Impossible de mettre à jour le protocole: ${e}`);
 							})
 							.finally(() => {
 								upgrading = false;
 							});
 					}}
-					help={m.update_available_to_version({ newVersion })}
+					help="Une mise à jour vers la v{newVersion} est disponible"
 				>
 					<span class="version-check" class:update-available={!upgrading}>
 						{#if upgrading}
@@ -88,12 +88,11 @@
 							<IconUpgrade />
 						{/if}
 						{#if !compact}
+							<!-- @wc-context: Upgrading a protocol. The <0 /> is an icon arrow -->
 							{#if upgrading}
-								{'Mise à jour…'}
+								Mise à jour…
 							{:else}
-								v{version}
-								<IconArrow />
-								v{newVersion}
+								v{version} <IconArrow /> v{newVersion}
 							{/if}
 						{/if}
 					</span>
@@ -104,7 +103,7 @@
 				onclick={() => {
 					checkagain = Date.now();
 				}}
-				help={m.cannot_check_for_updates({ error: e })}
+				help="Impossible de mettre à jour le protocole: {e}"
 			>
 				<span class="version-check error">
 					<IconCannotCheckForUpdates />
@@ -125,7 +124,10 @@
 		</span>
 	</Btn>
 {:else}
-	<Btn onclick={() => {}} help={'Ce protocole n\'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version'}>
+	<Btn
+		onclick={() => {}}
+		help={"Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"}
+	>
 		<span class="version-check error">
 			{#if !compact}
 				<IconCannotCheckForUpdates />

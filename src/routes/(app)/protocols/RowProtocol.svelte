@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { exportProtocol } from '$lib/protocols';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';

@@ -80,13 +80,7 @@
 		)
 	);
 
-	const GROUPS_ORDER = [
-		'Recadrage',
-		'Observations',
-		'Général',
-		'Navigation',
-		'Debug mode'
-	];
+	const GROUPS_ORDER = ['Recadrage', 'Observations', 'Général', 'Navigation', 'Debug mode'];
 
 	const bindsByGroup = $derived(
 		entries(

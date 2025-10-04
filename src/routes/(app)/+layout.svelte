@@ -13,7 +13,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
