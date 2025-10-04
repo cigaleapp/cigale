@@ -1,0 +1,30 @@
+name: Translations
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    name: Refresh .po files
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Refresh .po files
+        run: bunx wuchale --clean
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: '🌐 Refresh translation files'
+          commit_options: --no-verify
+          file_pattern: src/locales/*.po

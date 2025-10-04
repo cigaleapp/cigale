@@ -1,7 +1,7 @@
 {
 	"Wuchale: ignore (JS)": {
 		"scope": "javascript,typescript",
-		"prefix": "@wc-ignore",
+		"prefix": "wc-ignore",
 		"body": "// @wc-ignore"
 	},
 	"Wuchale: ignore (HTML)": {
@@ -11,7 +11,7 @@
 	},
 	"Wuchale: ignore file (JS)": {
 		"scope": "javascript,typescript",
-		"prefix": "@wc-ignore-file",
+		"prefix": "wc-ignore-file",
 		"body": "// @wc-ignore-file"
 	},
 	"Wuchale: ignore file (HTML)": {
@@ -21,12 +21,12 @@
 	},
 	"Wuchale: include (JS)": {
 		"scope": "javascript,typescript",
-		"prefix": "@wc-include",
+		"prefix": "wc-include",
 		"body": "/* @wc-include */"
 	},
 	"Wuchale: context (JS)": {
 		"scope": "javascript,typescript",
-		"prefix": "@wc-context",
+		"prefix": "wc-context",
 		"body": "/* @wc-context: $1 */"
 	},
 	"Wuchale: context (HTML)": {

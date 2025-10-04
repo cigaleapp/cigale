@@ -12,9 +12,7 @@
 	<Logo --size="6em" variant="error" />
 	<section class="notfound">
 		{#if page.status === 404}
-			<ButtonPrimary onclick={() => goto('/')}>
-				Accueil
-			</ButtonPrimary>
+			<ButtonPrimary onclick={() => goto('/')}>Accueil</ButtonPrimary>
 		{/if}
 	</section>
 

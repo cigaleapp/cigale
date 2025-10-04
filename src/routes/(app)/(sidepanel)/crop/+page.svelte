@@ -84,9 +84,7 @@
 		<div class="empty">
 			<Logo variant="empty" --size="6em" />
 			<p>Aucune image</p>
-			<ButtonSecondary onclick={() => goto('/import')}>
-				Importer
-			</ButtonSecondary>
+			<ButtonSecondary onclick={() => goto('/import')}>Importer</ButtonSecondary>
 		</div>
 	{/if}
 </section>

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T16:43:49.843Z\n"
+"PO-Revision-Date: 2025-10-04T17:09:51.901Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -19,6 +19,8 @@ msgstr ""
 msgid "v{0}"
 msgstr "v{0}"
 
+#: src/lib/CardMedia.svelte
+#: src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/+layout.js
 msgid "Chargement…"
 msgstr "Chargement…"
@@ -66,6 +68,7 @@ msgid "Irreprésentable"
 msgstr "Irreprésentable"
 
 #: src/lib/Modal.svelte
+#: src/routes/(app)/PrepareForOffline.svelte
 msgid "Fermer"
 msgstr "Fermer"
 
@@ -74,6 +77,7 @@ msgid "Le protocole que vous souhaitez n'est pas disponible?"
 msgstr "Le protocole que vous souhaitez n'est pas disponible?"
 
 #: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Gérer les protocoles"
 
@@ -82,6 +86,7 @@ msgstr "Gérer les protocoles"
 msgid "Avatar de {0}"
 msgstr "Avatar de {0}"
 
+#: src/routes/(app)/DownloadResults.svelte
 #: src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Exporter les résultats"
@@ -101,10 +106,6 @@ msgstr "Modèle d'inférence"
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> OK!"
 msgstr "<0/> OK!"
-
-#: src/routes/(app)/Settings.svelte
-msgid "CIGALE ver. <0/> · <1/>"
-msgstr "CIGALE ver. <0/> · <1/>"
 
 #: src/routes/_colors/+page.svelte
 msgid "Color Palette"
@@ -128,6 +129,7 @@ msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métado
 msgstr "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Séparer toutes les observations sélectionnées en images seules"
 
@@ -376,6 +378,7 @@ msgid "Boîte #{0}"
 msgstr "Boîte #{0}"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Supprimer la boîte sélectionnée"
 msgstr "Supprimer la boîte sélectionnée"
 
@@ -544,10 +547,14 @@ msgid "Sélectionner la boîte suivante"
 msgstr "Sélectionner la boîte suivante"
 
 #: src/routes/(app)/+page.svelte
+#: src/routes/(app)/+page.svelte
 msgid "Choisir un protocole"
 msgstr "Choisir un protocole"
 
+#: src/routes/(app)/+page.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Importer"
 msgstr "Importer"
 
@@ -563,14 +570,6 @@ msgstr "Recadrer"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Recadrer {0}"
 msgstr "Recadrer {0}"
-
-#: src/routes/(app)/+page.svelte
-msgid ""
-"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
-"suivante: <0/> <1/> <2/>"
-msgstr ""
-"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
-"suivante: <0/> <1/> <2/>"
 
 #. placeholder {0}: classificationMetadata?.label
 #: src/routes/(app)/+page.svelte
@@ -632,6 +631,317 @@ msgstr "Déploiement de preview pour la <0>PR #{0}</0>"
 #: src/routes/(app)/Navigation.svelte
 msgid "Preview #{0}"
 msgstr "Preview #{0}"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "À jour"
+msgstr "À jour"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Recherche de mise à jour…"
+msgstr "Recherche de mise à jour…"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Mettre à jour"
+msgstr "Mettre à jour"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Rééssayer"
+msgstr "Rééssayer"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Ce protocole ne supporte pas la vérification des mises à jour"
+msgstr "Ce protocole ne supporte pas la vérification des mises à jour"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "<0/> Non versionné"
+msgstr "<0/> Non versionné"
+
+#: src/lib/CardMedia.svelte
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "<0/> Supprimer"
+msgstr "<0/> Supprimer"
+
+#: src/lib/CardMedia.svelte
+msgid "<0/> Rééssayer"
+msgstr "<0/> Rééssayer"
+
+#: src/lib/KeyboardShortcuts.svelte
+#: src/routes/(app)/Settings.svelte
+msgid "Raccourcis clavier"
+msgstr "Raccourcis clavier"
+
+#: src/lib/KeyboardShortcuts.svelte
+msgid "Aucun raccouci clavier pour cette page'/p>"
+msgstr "Aucun raccouci clavier pour cette page'/p>"
+
+#: src/lib/Metadata.svelte
+#: src/lib/MetadataCombobox.svelte
+msgid "En savoir plus"
+msgstr "En savoir plus"
+
+#: src/lib/MetadataInput.svelte
+msgid "Décrémenter"
+msgstr "Décrémenter"
+
+#: src/lib/MetadataInput.svelte
+msgid "Incrémenter"
+msgstr "Incrémenter"
+
+#: src/routes/+error.svelte
+msgid "Accueil"
+msgstr "Accueil"
+
+#: src/routes/+error.svelte
+msgid "ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
+msgstr "ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
+
+#: src/routes/+error.svelte
+msgid "<0/> Réinitialiser la base de données"
+msgstr "<0/> Réinitialiser la base de données"
+
+#: src/routes/(app)/+page.svelte
+msgid "Importer le protocole distant ?"
+msgstr "Importer le protocole distant ?"
+
+#: src/routes/(app)/+page.svelte
+msgid ""
+"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
+"suivante: <0/> <1>Importation en cours...</1> <2/>"
+msgstr ""
+"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
+"suivante: <0/> <1>Importation en cours...</1> <2/>"
+
+#: src/routes/(app)/+page.svelte
+msgid "Recherche"
+msgstr "Recherche"
+
+#: src/routes/(app)/+page.svelte
+msgid "Rechercher..."
+msgstr "Rechercher..."
+
+#: src/routes/(app)/+page.svelte
+msgid "Protocole sélectionné"
+msgstr "Protocole sélectionné"
+
+#: src/routes/(app)/+page.svelte
+msgid "<0/> Importer un protocole"
+msgstr "<0/> Importer un protocole"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Ceci est un déploiement de preview"
+msgstr "Ceci est un déploiement de preview"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Supprime toutes les données pour ce déploiement de preview"
+msgstr "Supprime toutes les données pour ce déploiement de preview"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Nettoyer la base de données"
+msgstr "Nettoyer la base de données"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Voir sur Github"
+msgstr "Voir sur Github"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Tests E2E"
+msgstr "Tests E2E"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Tests unitaires"
+msgstr "Tests unitaires"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "Coverage"
+msgstr "Coverage"
+
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Marge autour des images recadrées"
+msgstr "Marge autour des images recadrées"
+
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
+msgstr "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Protocole <0/>"
+msgstr "Protocole <0/>"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Importer <0/>"
+msgstr "Importer <0/>"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Recadrer <0/>"
+msgstr "Recadrer <0/>"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Classifier <0/>"
+msgstr "Classifier <0/>"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "<0/> Résultats"
+msgstr "<0/> Résultats"
+
+#: src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/Settings.svelte
+msgid "Préparation hors-ligne"
+msgstr "Préparation hors-ligne"
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid "<0/> Chargement…"
+msgstr "<0/> Chargement…"
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid "Démarrer"
+msgstr "Démarrer"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Réglages"
+msgstr "Réglages"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Thème"
+msgstr "Thème"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Synchroniser avec le thème du système"
+msgstr "Synchroniser avec le thème du système"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Mode debug"
+msgstr "Mode debug"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Trier les images par"
+msgstr "Trier les images par"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Taille des images"
+msgstr "Taille des images"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Langue"
+msgstr "Langue"
+
+#: src/routes/(app)/Settings.svelte
+msgid "CIGALE ver. <0/> · <1>À propos</1>"
+msgstr "CIGALE ver. <0/> · <1>À propos</1>"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "Regrouper les images et/ou observations sélectionnées en une observation"
+msgstr "Regrouper les images et/ou observations sélectionnées en une observation"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Regrouper"
+msgstr "<0/> Regrouper"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "<0/> Séparer"
+msgstr "<0/> Séparer"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Créer un protocole"
+msgstr "Créer un protocole"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Protocoles"
+msgstr "Protocoles"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "<0/> Importer"
+msgstr "<0/> Importer"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "<0/> Créer"
+msgstr "<0/> Créer"
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Supprimer"
+msgstr "Supprimer"
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Exporter"
+msgstr "Exporter"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Développé par"
+msgstr "Développé par"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Sous la supervision de"
+msgstr "Sous la supervision de"
+
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+msgid "Chargement du modèle de recadrage…"
+msgstr "Chargement du modèle de recadrage…"
+
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
+msgid "Impossible de charger le modèle de recadrage"
+msgstr "Impossible de charger le modèle de recadrage"
+
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
+msgid "Analyse…"
+msgstr "Analyse…"
+
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
+msgid "Aucune image"
+msgstr "Aucune image"
+
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+msgid "Chargement du modèle de classification"
+msgstr "Chargement du modèle de classification"
+
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+msgid "Impossible de charger le modèle de classification"
+msgstr "Impossible de charger le modèle de classification"
+
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "Cliquer ou déposer des images, ou un export de résultats (.zip)"
+msgstr "Cliquer ou déposer des images, ou un export de résultats (.zip)"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Confirmé"
+msgstr "Confirmé"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "<0/> Autres photos <1/>"
+msgstr "<0/> Autres photos <1/>"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "<0/> Réinit."
+msgstr "<0/> Réinit."
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "<0/> Valider"
+msgstr "<0/> Valider"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
+msgstr "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "<0/> Images avec recadrage <1/>"
+msgstr "<0/> Images avec recadrage <1/>"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "<0/> Recadrages confirmés <1/>"
+msgstr "<0/> Recadrages confirmés <1/>"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "<0/> Continuer"
+msgstr "<0/> Continuer"
+
+#: src/lib/CardMedia.svelte
+msgid "En attente"
+msgstr "En attente"
+
+#: src/lib/CardMedia.svelte
+msgid "Erreur"
+msgstr "Erreur"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"

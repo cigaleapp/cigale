@@ -24,7 +24,9 @@ export default defineConfig({
 				}
 
 				if (startsWithUpperLetter && scope === 'script') {
-					return ['defineKeyboardShortcuts', 'seo'].includes(call);
+					return ['defineKeyboardShortcuts', 'seo', '$derived.by', '$derived', '$effect'].includes(
+						call
+					);
 				}
 			}
 		}),

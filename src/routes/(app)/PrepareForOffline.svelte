@@ -65,9 +65,7 @@
 	</section>
 	{#snippet footer({ close })}
 		{#if status !== true}
-			<ButtonPrimary {loading} onclick={startDownload}>
-				Démarrer
-			</ButtonPrimary>
+			<ButtonPrimary {loading} onclick={startDownload}>Démarrer</ButtonPrimary>
 		{:else}
 			<ButtonPrimary
 				onclick={() => {

@@ -114,25 +114,19 @@
 
 		{#await hasPage('_playwright') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_playwright'))}>
-					Tests E2E
-				</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_playwright'))}>Tests E2E</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_vitest') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_vitest'))}>
-					Tests unitaires
-				</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_coverage') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_coverage'))}>
-					Coverage
-				</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_coverage'))}>Coverage</ButtonSecondary>
 			{/if}
 		{/await}
 	{/snippet}

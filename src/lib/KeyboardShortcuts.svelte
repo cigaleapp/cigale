@@ -125,7 +125,7 @@
 		<dl>
 			<div class="empty">
 				<div class="sad">¯\_(ツ)_/¯</div>
-				<p>Aucun raccouci clavier pour cette page'/p>
+				<p>Aucun raccouci clavier pour cette page'/p></p>
 			</div>
 		</dl>
 	{/each}

@@ -977,9 +977,7 @@
 								{/snippet}
 							</SentenceJoin>
 						</p>
-						<p>
-							Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier
-						</p>
+						<p>Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier</p>
 					</li>
 				{/if}
 			</ul>
