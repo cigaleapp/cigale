@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import extractZip from 'extract-zip';
 import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -660,4 +661,56 @@ export async function setHardwareConcurrency(page, value) {
 			writable: false
 		});
 	}, value);
+}
+
+/**
+ * Exports the results of the analysis.
+ * @param {Page} page
+ * @param {string} destination
+ * @param {{ cropPadding?: string, kind?: 'metadata' | 'cropped' | 'full' }} options
+ */
+export async function exportResults(
+	page,
+	destination,
+	{ cropPadding = '0px', kind = 'cropped' } = {}
+) {
+	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
+
+	if (cropPadding.endsWith('px')) {
+		await page
+			.getByRole('radio', { name: '0 px' })
+			.getByRole('textbox')
+			.fill(cropPadding.replace(/px$/, ''));
+	} else {
+		await page.getByRole('radio', { name: cropPadding }).check();
+	}
+
+	await page
+		.getByText(
+			{
+				metadata: fr.metadata_only,
+				cropped: fr.metadata_and_cropped_images,
+				full: fr.metadata_cropped_and_full_images
+			}[kind]
+		)
+		.click();
+
+	const resultsDir = path.resolve(`./tests/results/${destination}`);
+	await page.getByRole('button', { name: 'results.zip' }).click();
+	const download = await page.waitForEvent('download');
+	expect(download.suggestedFilename()).toBe('results.zip');
+	await download.saveAs(`./tests/results/${destination}.zip`);
+	await extractZip(`${resultsDir}.zip`, { dir: resultsDir });
+
+	return resultsDir;
+}
+
+/**
+ *
+ * @param {string} contents
+ */
+export function parseCsv(contents) {
+	return contents
+		.split('\n')
+		.map((row) => row.split(';').map((cell) => cell.replace(/^"(.+)"$/, '$1')));
 }
