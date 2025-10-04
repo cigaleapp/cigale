@@ -35,7 +35,7 @@ jobs:
             public
             .svelte-kit
   test:
-    timeout-minutes: 60
+    timeout-minutes: 12
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: prepare
