@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T23:24:35.946Z\n"
+"PO-Revision-Date: 2025-10-04T23:26:31.689Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -170,8 +170,8 @@ msgstr "Aides à l'identification"
 msgid "Alternatives"
 msgstr "Alternatives"
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Analyse…"
 msgstr "Analyse…"
 
@@ -208,8 +208,8 @@ msgstr "Aucun raccouci clavier pour cette page"
 msgid "Aucun résultat :/"
 msgstr "Aucun résultat :/"
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Aucune image"
 msgstr "Aucune image"
 
@@ -281,11 +281,11 @@ msgstr "Ce protocole ne supporte pas la vérification des mises à jour"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid ""
-"Ce protocole ne supported pas la validation des recadrages (voir crop."
-"confirmationMetadata dans la définition du protocole)"
+"Ce protocole ne supported pas la validation des recadrages (voir "
+"crop.confirmationMetadata dans la définition du protocole)"
 msgstr ""
-"Ce protocole ne supported pas la validation des recadrages (voir crop."
-"confirmationMetadata dans la définition du protocole)"
+"Ce protocole ne supported pas la validation des recadrages (voir "
+"crop.confirmationMetadata dans la définition du protocole)"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Ceci est un déploiement de preview"
@@ -578,8 +578,8 @@ msgid "Image suivante"
 msgstr "Image suivante"
 
 #: src/routes/(app)/+page.svelte src/routes/(app)/(sidepanel)/+layout.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Importer"
 msgstr "Importer"
 
@@ -785,8 +785,8 @@ msgstr "Nouvelle observation"
 msgid "Observation is empty (should not happen)"
 msgstr "Observation is empty (should not happen)"
 
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
 msgstr "Oops!"
 
@@ -865,7 +865,7 @@ msgstr "Protocoles"
 msgid "Prénom Nom"
 msgstr "Prénom Nom"
 
-#: src/routes/(app)/Settings.svelte src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/PrepareForOffline.svelte src/routes/(app)/Settings.svelte
 msgid "Préparation hors-ligne"
 msgstr "Préparation hors-ligne"
 

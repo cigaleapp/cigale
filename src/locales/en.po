@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T23:24:35.948Z\n"
+"PO-Revision-Date: 2025-10-04T23:26:31.692Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -170,8 +170,8 @@ msgstr ""
 msgid "Alternatives"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Analyse…"
 msgstr "Analyzing…"
 
@@ -197,7 +197,7 @@ msgstr ""
 
 #: src/routes/(app)/DownloadResults.svelte src/lib/import.svelte.js
 msgid "Aucun protocole sélectionné"
-msgstr ""
+msgstr "No protocol selected"
 
 #: src/lib/KeyboardShortcuts.svelte
 msgid "Aucun raccouci clavier pour cette page"
@@ -207,8 +207,8 @@ msgstr "No keyboard shortcuts for this page"
 msgid "Aucun résultat :/"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Aucune image"
 msgstr "No images"
 
@@ -275,8 +275,8 @@ msgstr "This protocol does not support update checking"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid ""
-"Ce protocole ne supported pas la validation des recadrages (voir crop."
-"confirmationMetadata dans la définition du protocole)"
+"Ce protocole ne supported pas la validation des recadrages (voir "
+"crop.confirmationMetadata dans la définition du protocole)"
 msgstr ""
 
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -457,7 +457,7 @@ msgstr "Error"
 
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 msgid "Erreur inattendue"
-msgstr ""
+msgstr "Unexpected error"
 
 #. placeholder {0}: file.name
 #: src/lib/import.svelte.js
@@ -467,7 +467,7 @@ msgstr ""
 #. placeholder {0}: e
 #: src/routes/(app)/+page.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
-msgstr ""
+msgstr "Error while importing remote protocol: {0}"
 
 #. placeholder {0}: error
 #: src/lib/MetadataCombobox.svelte
@@ -476,11 +476,11 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Erreur lors du chargement du modèle de classification"
-msgstr ""
+msgstr "Error while loading classification model"
 
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Erreur lors du chargement du modèle de détection"
-msgstr ""
+msgstr "Error while loading detection model"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Error out selected cards"
@@ -566,8 +566,8 @@ msgid "Image suivante"
 msgstr "Next image"
 
 #: src/routes/(app)/+page.svelte src/routes/(app)/(sidepanel)/+layout.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Importer"
 msgstr "Import"
 
@@ -764,8 +764,8 @@ msgstr ""
 msgid "Observation is empty (should not happen)"
 msgstr ""
 
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
 msgstr ""
 
@@ -819,7 +819,7 @@ msgstr[1] ""
 #. placeholder {0}: version
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Protocole mis à jour vers la v{0}"
-msgstr ""
+msgstr "Protocol updated to v{0}"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Protocole supprimé"
@@ -842,7 +842,7 @@ msgstr "Protocols"
 msgid "Prénom Nom"
 msgstr ""
 
-#: src/routes/(app)/Settings.svelte src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/PrepareForOffline.svelte src/routes/(app)/Settings.svelte
 msgid "Préparation hors-ligne"
 msgstr "Prepare for offline use"
 

@@ -11,7 +11,7 @@
 		"src/lib/FloatingButton.svelte",
 		"src/locales/*.js"
 	],
-	"ignoreBinaries": ["node-modules-inspector"],
+	"ignoreBinaries": ["node-modules-inspector", "msgcat"],
 	"ignoreDependencies": ["@iconify-json/.+", "bun"],
 	"entry": [
 		"scripts/*.js",
