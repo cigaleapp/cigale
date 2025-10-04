@@ -22,7 +22,18 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Refresh .po files
         run: bunx wuchale --clean
-      - name: Commit changes
+      - name: "Check if changes are only revision-date and #: references"
+        id: check-changes
+        run: |
+          if git diff -I PO-Revision-Date -I '#: ' --exit-code; then
+            echo "No meaningful changes in .po files"
+            echo "meaningful=false" >> $GITHUB_OUTPUT
+          else
+            echo "Meaningful changes detected in .po files"
+            echo "meaningful=true" >> $GITHUB_OUTPUT
+          fi
+      - if: steps.check-changes.outputs.meaningful == 'true'
+        name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: '🌐 Refresh translation files'

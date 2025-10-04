@@ -117,7 +117,12 @@ const Settings = table(
 				console.warn('Error migrating from PARAGLIDE_LOCALE ', e);
 			}
 
-			return navigator.language.split('-', 2).at(0) === 'fr' ? 'fr' : 'en';
+			try {
+				return navigator.language.split('-', 2).at(0) === 'fr' ? 'fr' : 'en';
+			} catch (e) {
+				console.warn('Error getting navigator.language, defaulting to fr', e);
+				return 'fr';
+			}
 		}),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',

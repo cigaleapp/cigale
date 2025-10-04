@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T17:28:06.763Z\n"
+"PO-Revision-Date: 2025-10-04T17:28:27.277Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -314,8 +314,8 @@ msgstr "Il est impossible de revenir en arrière après avoir supprimé un proto
 msgid "Test title"
 msgstr "Test title"
 
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
 msgstr "Oops!"
 
@@ -553,8 +553,8 @@ msgstr "Choisir un protocole"
 
 #: src/routes/(app)/+page.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Importer"
 msgstr "Importer"
 
@@ -881,13 +881,13 @@ msgstr "Chargement du modèle de recadrage…"
 msgid "Impossible de charger le modèle de recadrage"
 msgstr "Impossible de charger le modèle de recadrage"
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Analyse…"
 msgstr "Analyse…"
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Aucune image"
 msgstr "Aucune image"
 
