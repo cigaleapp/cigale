@@ -579,9 +579,10 @@ export function modal(page, modalTitle) {
 /**
  *
  * @param {Page} page
+ * @param {Parameters<import('playwright').Locator['click']>[0]} [clickOptions]
  */
-export function openSettings(page) {
-	return page.getByTestId('settings-button').click();
+export function openSettings(page, clickOptions) {
+	return page.getByTestId('settings-button').click(clickOptions);
 }
 
 /**

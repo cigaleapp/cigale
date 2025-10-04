@@ -6,6 +6,7 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {Key[]} options
+	 * @property {string} aria-label aria-label for the group
 	 * @property {Partial<{[K in Key]: string}>} [labels] labels for the options
 	 * @property {NoInfer<Key> | undefined} [value] which option is selected
 	 * @property {import('svelte').Snippet<[Key]>} [customOption] snippets to render for each option. called for every option in `options` that is not in `labels`. arguments: option
@@ -22,11 +23,12 @@
 		value = $bindable(),
 		customOption,
 		'clickable-custom-options': clickableCustomOptions,
-		onchange
+		onchange,
+		...rest
 	} = $props();
 </script>
 
-<div class="segmented-group" role="radiogroup">
+<div class="segmented-group" role="radiogroup" {...rest}>
 	{#each options as option (option)}
 		{#if !customOption || labels?.[option]}
 			<button

@@ -16,6 +16,11 @@
 	 */
 	let status = $state();
 
+	/**
+	 * @type {undefined | (() => void)}
+	 */
+	let close = $state();
+
 	async function startDownload() {
 		await prepareForOfflineUse(
 			tables.Protocol.state.map((p) => p.id),
@@ -41,9 +46,12 @@
 	const StateIcon = $derived(toastIcon(status === true ? 'success' : 'error'));
 </script>
 
-<Modal key="modal_prepare_for_offline" title="Préparation hors-ligne" bind:open>
-	Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.
-	Télécharge tout les modèles pour tout les protocoles actuellement installés.
+<Modal key="modal_prepare_for_offline" title="Préparation hors-ligne" bind:open bind:close>
+	<p>
+		Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.
+		Télécharge tout les modèles pour tout les protocoles actuellement installés.
+	</p>
+
 	<ul class="bars">
 		{#each progressBars as [modelNo, { done, total, modelURL }] (modelNo)}
 			<li>
@@ -52,6 +60,7 @@
 			</li>
 		{/each}
 	</ul>
+
 	<section
 		class="state"
 		style:color="var(--fg-{status === true ? 'success' : loading ? 'secondary' : 'error'})"
@@ -64,6 +73,7 @@
 			<LoadingSpinner /> Chargement…
 		{/if}
 	</section>
+
 	{#snippet footer({ close })}
 		{#if status !== true}
 			<ButtonPrimary {loading} onclick={startDownload}>Démarrer</ButtonPrimary>

@@ -109,6 +109,7 @@
 		<div class="label">Trier les images par</div>
 		<div class="setting">
 			<SegmentedGroup
+				aria-label="Par quoi trier"
 				options={['filename', 'date']}
 				bind:value={
 					() => getSettings().gallerySort.key,
@@ -159,6 +160,7 @@
 		<div class="label">Langue</div>
 		<div class="setting">
 			<SegmentedGroup
+				aria-label="Langue de l'interface"
 				clickable-custom-options
 				options={['en', 'fr']}
 				value={getSettings().language}

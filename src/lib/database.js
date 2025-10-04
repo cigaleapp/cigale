@@ -104,29 +104,32 @@ const Settings = table(
 		theme: type.enumerated('dark', 'light', 'auto'),
 		// TODO(2025-09-05): remove n===10 after a while
 		gridSize: type.number.pipe((n) => (n === 10 ? 1 : clamp(n, 0.5, 2))),
-		language: type.enumerated('fr', 'en').default(() => {
-			// TODO(2025-10-04): remove paraglide migration after a while
+		language: type.enumerated('fr', 'en').default(
+			/** @type {() => 'fr' | 'en'} */
+			() => {
+				// TODO(2025-10-04): remove paraglide migration after a while
 
-			try {
-				const fromParaglide = localStorage.getItem('PARAGLIDE_LOCALE');
+				try {
+					const fromParaglide = localStorage.getItem('PARAGLIDE_LOCALE');
 
-				if (fromParaglide === 'fr' || fromParaglide === 'en') {
-					localStorage.removeItem('PARAGLIDE_LOCALE');
-					return fromParaglide;
+					if (fromParaglide === 'fr' || fromParaglide === 'en') {
+						localStorage.removeItem('PARAGLIDE_LOCALE');
+						return fromParaglide;
+					}
+				} catch (e) {
+					// ReferenceError => localStorage not defined => not in browser => isok
+					if (!(e instanceof ReferenceError))
+						console.warn('Error migrating from PARAGLIDE_LOCALE ', e);
 				}
-			} catch (e) {
-				// ReferenceError => localStorage not defined => not in browser => isok
-				if (!(e instanceof ReferenceError))
-					console.warn('Error migrating from PARAGLIDE_LOCALE ', e);
-			}
 
-			try {
-				return localeFromNavigator();
-			} catch (e) {
-				console.warn('Error getting navigator.language, defaulting to fr', e);
-				return 'fr';
+				try {
+					return localeFromNavigator();
+				} catch (e) {
+					console.warn('Error getting navigator.language, defaulting to fr', e);
+					return 'fr';
+				}
 			}
-		}),
+		),
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
 		cropAutoNext: 'boolean = false',

@@ -8,7 +8,9 @@ export default defineConfig({
 	otherLocales: ['en'],
 	adapters: {
 		main: svelte({
-			heuristic(msg, { call, scope }) {
+			heuristic(msg, { call, scope, file }) {
+				if (file.includes('/_playground/')) return false;
+
 				// Table names
 				if (scope === 'script' && Object.keys(Tables).includes(msg)) return false;
 

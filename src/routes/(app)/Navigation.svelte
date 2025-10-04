@@ -224,7 +224,7 @@
 				)}
 			</div>
 			<IconNext></IconNext>
-			<ButtonSecondary tight onclick={openExportModal}>
+			<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
 				<IconDownload />
 				Résultats
 			</ButtonSecondary>

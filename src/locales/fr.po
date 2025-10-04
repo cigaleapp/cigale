@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T21:13:02.139Z\n"
+"PO-Revision-Date: 2025-10-04T21:50:27.964Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -297,10 +297,6 @@ msgstr "Oui, supprimer"
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Il est impossible de revenir en arrière après avoir supprimé un protocole."
 msgstr "Il est impossible de revenir en arrière après avoir supprimé un protocole."
-
-#: src/routes/(app)/_playground/+page.svelte
-msgid "Test title"
-msgstr "Test title"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
@@ -681,10 +677,6 @@ msgstr "Démarrer"
 msgid "Raccourcis clavier"
 msgstr "Raccourcis clavier"
 
-#: src/lib/KeyboardShortcuts.svelte
-msgid "Aucun raccouci clavier pour cette page'/p>"
-msgstr "Aucun raccouci clavier pour cette page'/p>"
-
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "À jour"
 msgstr "À jour"
@@ -989,14 +981,6 @@ msgstr "Une métadonnée"
 msgid "Description de la métadonnée"
 msgstr "Description de la métadonnée"
 
-#: src/routes/(app)/PrepareForOffline.svelte
-msgid ""
-"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
-"Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
-msgstr ""
-"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
-"Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
-
 #: src/routes/(app)/+page.svelte
 msgid ""
 "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
@@ -1004,6 +988,34 @@ msgid ""
 msgstr ""
 "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
 "suivante: <0/> <1>Importation en cours...</1>"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Par quoi trier"
+msgstr "Par quoi trier"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Langue de l'interface"
+msgstr "Langue de l'interface"
+
+#: src/lib/KeyboardShortcuts.svelte
+msgid "Aucun raccouci clavier pour cette page"
+msgstr "Aucun raccouci clavier pour cette page"
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid ""
+"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
+"Télécharge tout les modèles pour tout les protocoles actuellement installés."
+msgstr ""
+"Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
+"Télécharge tout les modèles pour tout les protocoles actuellement installés."
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid "<0/> OK!"
+msgstr "<0/> OK!"
+
+#: src/routes/(app)/PrepareForOffline.svelte
+msgid "<0/> Chargement…"
+msgstr "<0/> Chargement…"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"

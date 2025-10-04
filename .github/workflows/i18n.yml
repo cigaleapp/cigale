@@ -33,6 +33,10 @@ jobs:
           bun wuchale --clean
           bun wuchale --clean
           bun wuchale --clean
+          if command -v msgmerge; then
+            echo msgmerge is there
+            msgmerge --help
+          fi
       - name: 'Check if changes are only revision-date and #: references'
         id: check-changes
         run: |

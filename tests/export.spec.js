@@ -24,7 +24,7 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 
 	await page.locator('nav').getByRole('link', { name: 'Recadrer' }).click();
 	await firstObservationCard(page).click();
-	await page.getByRole('button', { name: "Sélectionner l'outil 2 points" }).click();
+	await page.getByRole('button', { name: "Choisir l'outil 2 points" }).click();
 	// TODO fix coordinates for WebKit, current snapshots is off-center
 	await page.mouse.click(334, 292);
 	await page.mouse.click(543, 501);
