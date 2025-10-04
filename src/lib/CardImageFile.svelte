@@ -7,18 +7,18 @@
 
 	/**
 	 * @typedef {object} Props
-	 * @property {import('$lib/database').Observation} observation
-	 * @property {import('$lib/database').Image[]} images the images of the observation
+	 * @property {string} fileId
+	 * @property {import('$lib/database').Image[]} images all images with this fileId
 	 * @property {boolean} [highlighted] - whether this image is highlighted
 	 */
 
 	/** @type { Omit< Partial<import('$lib/CardMedia.svelte').Props>, keyof Props> & Props} */
-	const { observation, images, highlighted = false, ...rest } = $props();
+	const { fileId, images, highlighted = false, ...rest } = $props();
 
 	const status = $derived.by(() => {
-		if (images.some(({ id }) => uiState.queuedImages.has(id))) return 'queued';
-		if (images.some(({ id }) => uiState.loadingImages.has(id))) return 'loading';
-		if (images.some(({ id }) => uiState.erroredImages.has(id))) return 'errored';
+		if (uiState.queuedImages.has(fileId)) return 'queued';
+		if (uiState.loadingImages.has(fileId)) return 'loading';
+		if (images.some((img) => uiState.erroredImages.has(img.id))) return 'errored';
 		return 'ok';
 	});
 
@@ -30,19 +30,16 @@
 				.join('; ');
 		}
 
-		if (isDebugMode()) return `${observation.id} @ ${observation.addedAt.toISOString()}`;
+		if (isDebugMode()) return `${fileId} @ ${images[0]?.addedAt.toISOString()}`;
 	});
-
-	const previewImage = $derived(images.length > 0 ? images[0] : undefined);
 </script>
 
 <CardMedia
-	id={observation.id}
-	title={observation.label}
-	image={previewImage?.fileId ? uiState.previewURLs.get(previewImage.fileId) : undefined}
-	selected={uiState.selection.includes(observation.id)}
-	stacksize={observation.images.length}
-	boxes="apply-first"
+	id={fileId}
+	title={images[0].filename}
+	image={uiState.previewURLs.get(fileId)}
+	selected={uiState.selection.includes(fileId)}
+	boxes="show-all"
 	{tooltip}
 	{status}
 	{highlighted}

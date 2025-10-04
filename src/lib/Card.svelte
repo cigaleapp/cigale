@@ -16,19 +16,20 @@ Available CSS variables:
 	 * @type {object}
 	 * @property {import('svelte').Snippet} [children]
 	 * @property {() => void} [onclick]
+	 * @property {'article' | 'li' | 'div'} [tag=article] - HTML tag to use for the card container
 	 */
 
 	/** @type {Props}*/
-	const { children = undefined, onclick } = $props();
+	const { children = undefined, onclick, tag = 'article' } = $props();
 
 	const clickable = $derived(Boolean(onclick));
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-<article
-	class="card"
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<svelte:element
+	this={tag}
 	class:clickable
+	class="card"
 	{onclick}
 	tabindex={clickable ? 0 : undefined}
 	onkeypress={(e) => {
@@ -38,7 +39,7 @@ Available CSS variables:
 	}}
 >
 	{@render children?.()}
-</article>
+</svelte:element>
 
 <style>
 	.card {

@@ -7,6 +7,7 @@ import { expect, test } from './fixtures';
 import {
 	chooseDefaultProtocol,
 	expectTooltipContent,
+	firstObservationCard,
 	getMetadataValuesOfImage,
 	getTab,
 	goToTab,
@@ -221,7 +222,7 @@ test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
 	});
 	await expectTooltipContent(
 		page,
-		page.getByTestId('first-observation-card'),
+		firstObservationCard(page),
 		/Les fichiers .+? ne sont pas (encore )?supportés/
 	);
 });
@@ -246,7 +247,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 	await waitForLoadingEnd(page);
 	await expectTooltipContent(
 		page,
-		page.getByTestId('first-observation-card'),
+		firstObservationCard(page),
 		/L'image est trop grande pour être traitée/
 	);
 });
@@ -255,7 +256,7 @@ test('can cancel import', issue(430), async ({ page }) => {
 	await chooseDefaultProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);
-	await expect(page.getByTestId('first-observation-card')).toHaveText(loadingText, {
+	await expect(firstObservationCard(page)).toHaveText(loadingText, {
 		timeout: 10_000
 	});
 	await page
@@ -282,7 +283,7 @@ test('can import in multiple batches', async ({ page }) => {
 	await expect(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('with-exif-gps.jpeg')).toBeVisible();
 	await expect(page.locator('main').getByText('debugsquare.png')).toBeVisible();
-	await expect(page.locator('main').locator('article.card')).toHaveCount(5);
+	await expect(page.locator('main').locator('article.observation')).toHaveCount(5);
 });
 
 test(
@@ -295,19 +296,19 @@ test(
 		await goToTab(page, 'classify');
 		await waitForLoadingEnd(page);
 		await goToTab(page, 'import');
-		await page.getByTestId('first-observation-card').click();
+		await firstObservationCard(page).click();
 		await page
 			.getByTestId('sidepanel')
 			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
 			.click();
 		await goToTab(page, 'classify');
-		await expect(page.getByTestId('first-observation-card')).toMatchAriaSnapshot(`
+		await expect(firstObservationCard(page)).toMatchAriaSnapshot(`
 		  - article:
 		    - img "cyan"
 		    - img
 		    - heading "cyan" [level=2]
 		`);
-		await expect(page.getByRole('main').locator('article.card')).toHaveCount(1);
+		await expect(page.getByRole('main').locator('article.observation')).toHaveCount(1);
 	}
 );
 
@@ -335,7 +336,7 @@ test('can extract EXIF date from an image', async ({ page }) => {
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella');
 	await waitForLoadingEnd(page);
-	await page.getByTestId('first-observation-card').click();
+	await firstObservationCard(page).click();
 	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
 		'2025-04-25'
 	);
@@ -357,7 +358,7 @@ test('can extract EXIF GPS data from an image', async ({ page }) => {
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'with-exif-gps');
 	await waitForLoadingEnd(page);
-	await page.getByTestId('first-observation-card').click();
+	await firstObservationCard(page).click();
 	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
 		'2008-10-22'
 	);
