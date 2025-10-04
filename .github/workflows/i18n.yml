@@ -72,6 +72,6 @@ jobs:
         name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          commit_message: '🌐 Refresh translation files'
+          commit_message: 🌐 Refresh translation files [ci skip]
           commit_options: --no-verify
           file_pattern: src/locales/*.po
