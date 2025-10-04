@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T22:12:07.760Z\n"
+"PO-Revision-Date: 2025-10-04T22:40:53.957Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -170,8 +170,8 @@ msgstr "Aides à l'identification"
 msgid "Alternatives"
 msgstr "Alternatives"
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Analyse…"
 msgstr "Analyse…"
 
@@ -200,8 +200,8 @@ msgstr "Aucun raccouci clavier pour cette page"
 msgid "Aucun résultat :/"
 msgstr "Aucun résultat :/"
 
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Aucune image"
 msgstr "Aucune image"
 
@@ -498,7 +498,7 @@ msgstr "Fusionner des observations ou images"
 msgid "Grâce aux bibliothèques"
 msgstr "Grâce aux bibliothèques"
 
-#: src/routes/(app)/Settings.svelte src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/Navigation.svelte src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Gérer les protocoles"
 
@@ -529,8 +529,8 @@ msgid "Image suivante"
 msgstr "Image suivante"
 
 #: src/routes/(app)/+page.svelte src/routes/(app)/(sidepanel)/+layout.svelte
-#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+page.svelte
 msgid "Importer"
 msgstr "Importer"
 
@@ -723,8 +723,8 @@ msgstr "Non"
 msgid "Nouvelle observation"
 msgstr "Nouvelle observation"
 
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
 msgstr "Oops!"
 
@@ -931,8 +931,8 @@ msgid ""
 msgstr ""
 "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 #: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Séparer toutes les observations sélectionnées en images seules"
 
