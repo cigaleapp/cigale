@@ -76,7 +76,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Check for clutter
-        run: bun run check:clutter --reporter github-actions
+        run: bun knip --reporter github-actions
 
   get-base-branch-coverage:
     name: Get base branch coverage

@@ -42,13 +42,14 @@
 	"scripts": {
 		"dev": "vite dev",
 		"dev:native": "electron-forge start",
-		"build": "vite build",
 		"prebuild": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js",
+		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "husky",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
-		"check:clutter": "svelte-kit sync && bunx knip",
+		"precheck": "svelte-kit sync",
+		"check": "svelte-check --tsconfig ./jsconfig.json",
+		"preknip": "svelte-kit sync",
+		"knip": "knip",
 		"format": "prettier --write .",
 		"lint": "bunx oxlint && bunx eslint",
 		"lintfix": "bunx oxlint --fix && bunx eslint --fix",
@@ -56,7 +57,8 @@
 		"test": "vitest --coverage.enabled true",
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest",
-		"i18n:extract": "wuchale --clean && bun scripts/sort-po-file.js src/locales/*.po"
+		"wuchale": "wuchale",
+		"postwuchale": "bun run scripts/sort-po-files.js src/locales/*.po"
 	},
 	"lint-staged": {
 		"*!(.svelte).{js,ts}": [
