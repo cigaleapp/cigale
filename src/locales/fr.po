@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T20:42:07.151Z\n"
+"PO-Revision-Date: 2025-10-04T21:10:58.094Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -632,14 +632,6 @@ msgid "Importer le protocole distant ?"
 msgstr "Importer le protocole distant ?"
 
 #: src/routes/(app)/+page.svelte
-msgid ""
-"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
-"suivante: <0/> <1>Importation en cours...</1> <2/>"
-msgstr ""
-"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
-"suivante: <0/> <1>Importation en cours...</1> <2/>"
-
-#: src/routes/(app)/+page.svelte
 msgid "Recherche"
 msgstr "Recherche"
 
@@ -1004,6 +996,14 @@ msgid ""
 msgstr ""
 "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
 "Télécharge tout les modèles pour tout les protocoles actuellement installés. <0/> <1><0/> OK!<0/> Chargement…</1> <2/>"
+
+#: src/routes/(app)/+page.svelte
+msgid ""
+"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
+"suivante: <0/> <1>Importation en cours...</1>"
+msgstr ""
+"Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
+"suivante: <0/> <1>Importation en cours...</1>"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"

@@ -2,6 +2,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
+	import HighlightHostname from '$lib/HighlightHostname.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
@@ -131,10 +132,7 @@
 	suivante:
 
 	{#if preselection.protocol && preselectedProtocolIsRemote}
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-		<a href={preselection.protocol}>
-			{@render highlightHostname(preselection.protocol)}
-		</a>
+		<HighlightHostname linkify url={preselection.protocol} />
 	{/if}
 
 	<section class="modal-import-loading">
@@ -142,12 +140,6 @@
 			<p>Importation en cours...</p>
 		{/if}
 	</section>
-
-	{#snippet highlightHostname(/** @type {string} */ url)}
-		{url.split(new URL(url).hostname, 2)[0]}
-		<strong>{new URL(url).hostname}</strong>
-		{url.split(new URL(url).hostname, 2)[1]}
-	{/snippet}
 </ModalConfirm>
 
 <div class="content">
