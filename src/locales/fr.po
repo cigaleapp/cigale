@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-04T23:23:11.573Z\n"
+"PO-Revision-Date: 2025-10-04T23:23:51.166Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -521,7 +521,7 @@ msgstr "Example warning toast"
 msgid "Exporter"
 msgstr "Exporter"
 
-#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/Navigation.svelte src/routes/(app)/DownloadResults.svelte
 msgid "Exporter les résultats"
 msgstr "Exporter les résultats"
 
@@ -547,7 +547,7 @@ msgstr "Fusionner des observations ou images"
 msgid "Grâce aux bibliothèques"
 msgstr "Grâce aux bibliothèques"
 
-#: src/routes/(app)/Navigation.svelte src/routes/(app)/Settings.svelte
+#: src/routes/(app)/Settings.svelte src/routes/(app)/Navigation.svelte
 msgid "Gérer les protocoles"
 msgstr "Gérer les protocoles"
 
@@ -577,10 +577,9 @@ msgstr "Image précédente"
 msgid "Image suivante"
 msgstr "Image suivante"
 
-#: src/routes/(app)/+page.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/(sidepanel)/+layout.svelte
+#: src/routes/(app)/(sidepanel)/+layout.svelte src/routes/(app)/+page.svelte
 msgid "Importer"
 msgstr "Importer"
 
