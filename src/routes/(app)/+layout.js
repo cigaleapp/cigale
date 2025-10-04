@@ -35,6 +35,12 @@ export async function load() {
 	setLoadingMessage(m.initializing_worker_db());
 	await swarpc.init.broadcast({ databaseName, databaseRevision });
 
+	void swarpc.syncStoredCorrections({}, (progress) => {
+		console.info(
+			`Sending corrections to protocols' beamup servers: ${Math.round(progress * 100)}%`
+		);
+	});
+
 	try {
 		setLoadingMessage(m.initializing_database());
 		await tables.initialize();

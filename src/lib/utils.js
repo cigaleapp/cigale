@@ -1081,3 +1081,35 @@ if (import.meta.vitest) {
 		});
 	});
 }
+
+/**
+ * Prevents having to do the ugly `...(something ? { key: something } : {})` pattern
+ * @template {string} Key
+ * @template Value
+ * @param {Key} key
+ * @param {Value} value
+ * @returns {Partial<Record<Key, NonNullable<Value>>>}
+ */
+export function propOrNothing(key, value) {
+	// @ts-expect-error
+	if (nonnull(value)) return { [key]: value };
+	return {};
+}
+
+/**
+ *
+ * @param {ArrayBuffer} content
+ * @returns {Promise<typeof import('$lib/schemas/common').SHA1Hash.infer | null>} base64-encoded SHA-1 sum
+ */
+export async function sha1sum(content) {
+	const digest = await crypto.subtle.digest('SHA-1', content);
+	try {
+		// @ts-expect-error https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64 baseline 2025 as of Sept. 2025. SHA-1 sums are only used for BeamUp so it's fine if it doesn't work in older browsers
+		return new Uint8Array(digest).toBase64();
+	} catch {
+		console.warn(
+			'Could not base64-encode the SHA1 digest, probably because browser is too old, see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64#browser_compatibility'
+		);
+		return null;
+	}
+}
