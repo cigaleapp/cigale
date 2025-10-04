@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-04T20:41:38.455Z\n"
+"PO-Revision-Date: 2025-10-04T20:42:07.152Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -1012,10 +1012,6 @@ msgstr ""
 msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr ""
 
-#: src/lib/seo.svelte.js
-msgid "Cigale"
-msgstr ""
-
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
@@ -1042,4 +1038,8 @@ msgstr ""
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Aucune image trouvée dans l'export {0}. L'export doit contenir les images originales, pas seulement les images recadrées"
+msgstr ""
+
+#: src/lib/seo.svelte.js
+msgid "Cigale"
 msgstr ""
