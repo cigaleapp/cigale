@@ -1022,8 +1022,8 @@ msgid ""
 msgstr ""
 "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+#: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Séparer toutes les observations sélectionnées en images seules"
 msgstr "Séparer toutes les observations sélectionnées en images seules"
 
@@ -1151,7 +1151,7 @@ msgstr "de"
 msgid "debug"
 msgstr "debug"
 
-#: src/routes/(app)/+layout.svelte src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/DownloadResults.svelte src/routes/(app)/+layout.svelte
 msgid "default"
 msgstr "default"
 
