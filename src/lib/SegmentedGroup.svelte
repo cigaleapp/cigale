@@ -11,6 +11,7 @@
 	 * @property {NoInfer<Key> | undefined} [value] which option is selected
 	 * @property {import('svelte').Snippet<[Key]>} [customOption] snippets to render for each option. called for every option in `options` that is not in `labels`. arguments: option
 	 * @property {(value: NoInfer<Key>) => void | Promise<void>} [onchange] called when the value changes
+	 * @property {string} [data-testid] add a data-testid attribute to the root element
 	 * @property {boolean} [clickable-custom-options=false] whether the custom options should be clickable. If true, the onclick function will be called when the option is clicked.
 	 */
 

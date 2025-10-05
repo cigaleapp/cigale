@@ -4,10 +4,7 @@ import { getSettings, openSettings } from './utils';
 test('can switch languages', async ({ page }) => {
 	await openSettings(page);
 
-	const languagesGroup = page
-		.getByTestId('app-settings')
-
-		.getByRole('radiogroup', { name: "Langue de l'interface" });
+	const languagesGroup = page.getByTestId('app-settings').getByTestId('language-selection');
 
 	// Default is French
 	await expect(languagesGroup.getByRole('radio', { name: 'Français' })).toBeChecked();

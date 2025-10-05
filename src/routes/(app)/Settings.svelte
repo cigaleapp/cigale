@@ -160,6 +160,7 @@
 		<div class="label">Langue</div>
 		<div class="setting">
 			<SegmentedGroup
+				data-testid="language-selection"
 				aria-label="Langue de l'interface"
 				clickable-custom-options
 				options={['en', 'fr']}
