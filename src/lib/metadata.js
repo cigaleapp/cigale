@@ -12,9 +12,8 @@ import {
 import { avg, mapValues } from './utils.js';
 
 /**
- * @import { IDBDatabaseType, ReactiveTableNames } from './idb.svelte.js'
+ * @import { DatabaseHandle, ReactiveTableNames } from './idb.svelte.js'
  * @import * as DB from './database.js'
- * @typedef {import('idb').IDBPDatabase<IDBDatabaseType>} DatabaseHandle
  */
 
 /**

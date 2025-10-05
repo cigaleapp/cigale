@@ -410,10 +410,14 @@ export function nukeDatabase() {
  * @typedef {import('idb').IDBPTransaction<IDBDatabaseType, [...Stores, ...Array<keyof typeof Tables>], Mode>} IDBTransactionWithAtLeast
  */
 
+/**
+ * @typedef {import('idb').IDBPDatabase<IDBDatabaseType>} DatabaseHandle
+ */
+
 // Magie vodoo Typescript, pas besoin de comprendre
 // Si t'es curieuxse, demande à Gwenn qui sera ravie
 // de t'expliquer :3
 /**
- * @type {import('idb').IDBPDatabase<IDBDatabaseType> | undefined}
+ * @type {DatabaseHandle | undefined}
  */
 let _database;

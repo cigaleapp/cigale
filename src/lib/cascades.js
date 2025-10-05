@@ -2,7 +2,7 @@ import { metadataOptionId, parseMetadataOptionId } from './schemas/metadata.js';
 import { entries, groupBy, nonnull, sum } from './utils.js';
 
 /**
- * @import { DatabaseHandle, RuntimeValue } from './metadata.js'
+ * @import { RuntimeValue } from './metadata.js'
  */
 
 /**
@@ -46,7 +46,7 @@ import { entries, groupBy, nonnull, sum } from './utils.js';
  * ```
  *
  * @param {object} param0
- * @param {DatabaseHandle} param0.db
+ * @param {import('./idb.svelte.js').DatabaseHandle} param0.db
  * @param {string} param0.metadataId
  * @param {number} param0.confidence
  * @param {RuntimeValue} param0.value
