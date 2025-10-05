@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05 12:58+0000\n"
+"PO-Revision-Date: 2025-10-05T12:59:06.324Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
-"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Language: en\n"
-"MIME-Version: 1.0\n"
+"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
 "X-Generator: Weblate 5.12.2\n"
 
 #: src/routes/(app)/about/+page.svelte
@@ -219,9 +219,7 @@ msgstr "No images"
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Aucune image trouvée dans l'export {0}. L'export doit contenir les images originales, pas seulement les images recadrées"
-msgstr ""
-"No image found in export {0}. The export needs to include original images "
-"too, not just the cropped ones"
+msgstr "No image found in export {0}. The export needs to include original images too, not just the cropped ones"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Auto"
@@ -262,8 +260,7 @@ msgid ""
 "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
 "suivante: <0/> <1>Importation en cours...</1>"
 msgstr ""
-"This links points to a remote protocol. Do you want to import it? It's "
-"located at the following\n"
+"This links points to a remote protocol. Do you want to import it? It's located at the following\n"
 "address: <0/> <1>Importing...</1>"
 
 #: src/lib/ButtonUpdateProtocol.svelte
@@ -277,9 +274,7 @@ msgstr "This protocol does not support update checking"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Ce protocole ne supported pas la validation des recadrages (voir crop.confirmationMetadata dans la définition du protocole)"
-msgstr ""
-"This protocol does not support marking crops as confirmed (see "
-"crop.confirmationMetadata in the protocol's definition)"
+msgstr "This protocol does not support marking crops as confirmed (see crop.confirmationMetadata in the protocol's definition)"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Ceci est un déploiement de preview"
@@ -348,8 +343,7 @@ msgstr "Classification"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune"
-msgstr ""
-"Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune"
+msgstr "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Classifier <0/>"
