@@ -185,7 +185,7 @@ class Toasts {
 				toasts.remove(t.id, toasts.currentPoolName, { silent: true });
 			},
 			labels: {
-				action: m.undo()
+				action: 'Annuler'
 			}
 		});
 	}

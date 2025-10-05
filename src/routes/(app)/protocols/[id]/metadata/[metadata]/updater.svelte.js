@@ -2,7 +2,6 @@ import { invalidate } from '$app/navigation';
 import { page } from '$app/state';
 import { errorMessage } from '$lib/i18n';
 import { dependencyURI, tables } from '$lib/idb.svelte';
-import { m } from '$lib/paraglide/messages';
 import { namespacedMetadataId } from '$lib/schemas/metadata';
 import { toasts } from '$lib/toasts.svelte';
 import { ArkErrors } from 'arktype';
@@ -28,7 +27,7 @@ export function updater(changes) {
 			await changes(metadata, value);
 		} catch (err) {
 			toasts.error(
-				m.invalid_value({ error: err instanceof ArkErrors ? err.summary : errorMessage(err) })
+				`Valeur invalide : ${err instanceof ArkErrors ? err.summary : errorMessage(err)}`
 			);
 			return;
 		}
@@ -38,7 +37,7 @@ export function updater(changes) {
 		}
 
 		await tables.Metadata.set(metadata).catch((err) => {
-			toasts.error(m.unable_to_save_changes({ error: err.message }));
+			toasts.error(`Impossible de sauvegarder : ${errorMessage(err)}`);
 		});
 
 		await invalidate(

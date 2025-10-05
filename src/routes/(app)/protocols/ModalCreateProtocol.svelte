@@ -6,7 +6,6 @@
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 	import { goto } from '$lib/paths';
 	import { ID } from '$lib/schemas/common';
 	import { namespacedMetadataId } from '$lib/schemas/metadata';
@@ -26,7 +25,7 @@
 	});
 </script>
 
-<Modal key="modal_create_protocol" title={m.create_protocol()} toasts="protocolcreator" bind:open>
+<Modal key="modal_create_protocol" title="Créer un protocole" toasts="protocolcreator" bind:open>
 	<Field label="Nom du protocole">
 		<InlineTextInput
 			label=""
@@ -64,7 +63,7 @@
 	</Field>
 
 	{#snippet footer({ close })}
-		<ButtonSecondary onclick={() => close?.()}>{m.cancel()}</ButtonSecondary>
+		<ButtonSecondary onclick={() => close?.()}>Annuler</ButtonSecondary>
 		<ButtonPrimary
 			onclick={async () => {
 				toasts.clear();
@@ -106,7 +105,7 @@
 				}
 			}}
 		>
-			{m.create()}
+			Créer
 		</ButtonPrimary>
 	{/snippet}
 </Modal>

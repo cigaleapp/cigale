@@ -1,7 +1,7 @@
 import { invalidate } from '$app/navigation';
 import { page } from '$app/state';
+import { errorMessage } from '$lib/i18n';
 import { dependencyURI, get, set } from '$lib/idb.svelte';
-import { m } from '$lib/paraglide/messages';
 import {
 	ensureNamespacedMetadataId,
 	metadataOptionId,
@@ -36,12 +36,12 @@ export function updater(changes) {
 			await changes(option, value);
 		} catch (err) {
 			if (err instanceof ArkErrors) {
-				toasts.error(m.invalid_value({ error: err.summary }));
+				toasts.error(`Valeur invalide : ${err.summary}`);
 			}
 		}
 
 		await set('MetadataOption', option).catch((err) => {
-			toasts.error(m.unable_to_save_changes({ error: err.message }));
+			toasts.error(`Impossible de sauvegarder : ${errorMessage(err)}`);
 		});
 
 		await invalidate(

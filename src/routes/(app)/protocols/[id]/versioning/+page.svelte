@@ -4,7 +4,6 @@
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 	import { hasUpgradeAvailable } from '$lib/protocols.js';
 	import { type } from 'arktype';
 	import IconCheck from '~icons/ph/check';
@@ -21,10 +20,10 @@
 	 */
 	const updateButtonTexts = {
 		checking: '',
-		upgrading: m.updating(),
+		upgrading: 'Mise à jour...',
 		uptodate: '',
-		available: m.update(),
-		error: m.error_text()
+		available: 'Mise à jour disponible',
+		error: 'Erreur lors de la mise à jour'
 	};
 </script>
 
