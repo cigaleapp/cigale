@@ -5,6 +5,7 @@
 	import IconCascadesFrom from '~icons/ph/arrows-split';
 	import IconCascadesTo from '~icons/ph/arrow-bend-down-right';
 	import IconImage from '~icons/ph/image';
+	import IconTrash from '~icons/ph/trash';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -13,6 +14,8 @@
 	import IconArrow from '~icons/ph/arrow-right';
 	import IconOpenInExternal from '~icons/ph/arrow-square-out';
 	import { updater } from './updater.svelte.js';
+	import { onDeleteOption } from '../+layout.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 
 	const { data } = $props();
 	const { cascades, reverseCascades, metadata } = $derived(data);
@@ -169,6 +172,18 @@
 			</ul>
 		</Field>
 	</div>
+</div>
+
+<div class="danger">
+	<ButtonSecondary
+		danger
+		onclick={async () => {
+			await onDeleteOption(key, label);
+		}}
+	>
+		<IconTrash />
+		Supprimer cette option
+	</ButtonSecondary>
 </div>
 
 <style>
