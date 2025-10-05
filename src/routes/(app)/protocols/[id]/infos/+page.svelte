@@ -8,6 +8,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import IconRemove from '~icons/ph/minus-circle';
 	import IconAdd from '~icons/ph/plus';
+	import IconDescription from '~icons/ph/text-align-left';
 
 	/**
 	 * @import { Protocol } from '$lib/database.js';
@@ -22,15 +23,17 @@
 <h2>Informations sur le protocole</h2>
 
 <header>
-	<textarea
-		class="description"
-		value={description}
-		rows="10"
-		onblur={updater((p, { target }) => {
-			p.description = target.value;
-		})}
-		placeholder="Description du protocole..."
-	></textarea>
+	<Field Icon={IconDescription} label="Description">
+		<textarea
+			class="description"
+			value={description}
+			rows="10"
+			onblur={updater((p, { target }) => {
+				p.description = target.value;
+			})}
+			placeholder="Description du protocole..."
+		></textarea>
+	</Field>
 
 	<FieldUrl
 		Icon={IconLearnMore}
