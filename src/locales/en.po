@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T13:50:24.191Z\n"
+"PO-Revision-Date: 2025-10-05 16:12+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
-"Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"MIME-Version: 1.0\n"
 "X-Generator: Weblate 5.12.2\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
@@ -498,19 +498,19 @@ msgstr "Close"
 #. placeholder {1}: analysis.summary
 #: src/lib/results.svelte.js
 msgid "Fichier d'analyse de {0} invalide: {1}"
-msgstr ""
+msgstr "Invalid analysis file for {0}: {1}"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Fontes"
-msgstr ""
+msgstr "Fonts"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Fusionner des observations ou images"
-msgstr ""
+msgstr "Merge observations or images"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Grâce aux bibliothèques"
-msgstr ""
+msgstr "Thanks to libraries"
 
 #: src/routes/(app)/Navigation.svelte
 #: src/routes/(app)/Settings.svelte
@@ -519,15 +519,15 @@ msgstr "Manage protocols"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Hardware"
-msgstr ""
+msgstr "Hardware"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Host Grotesk"
-msgstr ""
+msgstr "Host Grotesk"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Icônes"
-msgstr ""
+msgstr "Icons"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Il est impossible de revenir en arrière après avoir supprimé un protocole."
@@ -567,7 +567,7 @@ msgstr "Import remote protocol ?"
 #. placeholder {1}: e?.toString() ?? 'Erreur inattendue'
 #: src/lib/exif.js
 msgid "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
-msgstr ""
+msgstr "Cannot extract EXIF metadata for {0}: {1}"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Impossible de charger le modèle de classification"
@@ -579,7 +579,7 @@ msgstr "Cannot load cropping model"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Impossible de charger les dépendances"
-msgstr ""
+msgstr "Cannot load dependencies"
 
 #. placeholder {0}: e
 #. placeholder {0}: e
@@ -602,7 +602,7 @@ msgstr "Initializing default settings…"
 
 #: src/lib/MetadataInput.svelte
 msgid "Irreprésentable"
-msgstr ""
+msgstr "Unrepresentable"
 
 #. placeholder {0}: imageLimits.maxResolutionInMP
 #. placeholder {1}: imageLimits.maxMemoryUsageInMB
@@ -621,7 +621,7 @@ msgstr "Language"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Langue de l'interface"
-msgstr ""
+msgstr "Interface language"
 
 #. placeholder {0}: file.name
 #. placeholder {1}: protocol.id
@@ -642,11 +642,11 @@ msgstr "Protocol is up to date (v{0}). Click to verify again"
 
 #: src/routes/(app)/+page.svelte
 msgid "Le protocole que vous souhaitez n'est pas disponible?"
-msgstr ""
+msgstr "Don't see a protocol you want to use?"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Les carnets nature de Jessica"
-msgstr ""
+msgstr "Les carnets nature de Jessica"
 
 #. placeholder {0}: id
 #: src/lib/images.js
@@ -689,7 +689,7 @@ msgstr "Debug mode"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Modèle d'inférence"
-msgstr ""
+msgstr "Inference model"
 
 #: src/routes/(app)/+page.svelte
 msgid "Modèle d'inférence pour la détection"
@@ -702,7 +702,7 @@ msgstr "Inference model for {0}"
 
 #: src/lib/protocols.js
 msgid "Mon protocole"
-msgstr ""
+msgstr "My protocol"
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Métadonées mise à jour à la sélection de cette option"
@@ -714,11 +714,11 @@ msgstr "Clean up database"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Node.js"
-msgstr ""
+msgstr "Node.js"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Nom de l'observation"
-msgstr ""
+msgstr "Observation name"
 
 #: src/lib/MetadataInput.svelte
 msgid "Non"
@@ -726,7 +726,7 @@ msgstr "No"
 
 #: src/lib/observations.js
 msgid "Nouvelle observation"
-msgstr ""
+msgstr "New observation"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Observation is empty (should not happen)"
@@ -735,7 +735,7 @@ msgstr ""
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Oops!"
-msgstr ""
+msgstr "Oops!"
 
 #: src/lib/MetadataInput.svelte
 msgid "Oui"
@@ -743,15 +743,15 @@ msgstr "Yes"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Oui, supprimer"
-msgstr ""
+msgstr "Yes, delete"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Par quoi trier"
-msgstr ""
+msgstr "What to sort on"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Parallélisme"
-msgstr ""
+msgstr "Parallelism"
 
 #: src/routes/(app)/+layout.svelte
 msgid "Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎"
@@ -769,7 +769,7 @@ msgstr "Preview #{0}"
 #. placeholder {0}: protocol.name
 #: src/routes/(app)/+page.svelte
 msgid "Protocole \"{0}\" importé et sélectionné"
-msgstr ""
+msgstr "Imported and selected protocol \"{0}\""
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Protocole <0/>"
@@ -782,7 +782,7 @@ msgstr "Protocol updated to v{0}"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Protocole supprimé"
-msgstr ""
+msgstr "Protocol deleted"
 
 #: src/routes/(app)/+page.svelte
 msgid "Protocole sélectionné"
@@ -791,7 +791,7 @@ msgstr "Selected protocol"
 #. placeholder {0}: ps[0].name
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole “{0}” importé"
-msgstr ""
+msgstr "Imported protocol “{0}”"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocoles"
@@ -830,7 +830,7 @@ msgstr "Crop images"
 #. placeholder {0}: firstImage?.filename ?? '...'
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Recadrer {0}"
-msgstr ""
+msgstr "Crop {0}"
 
 #: src/routes/(app)/+page.svelte
 msgid "Recherche"
@@ -850,7 +850,7 @@ msgstr "Group selected images and/or observations into one observation"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "ResNet50"
-msgstr ""
+msgstr "ResNet50"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Revenir au recadrage d'origine"
@@ -881,7 +881,7 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Service workers"
-msgstr ""
+msgstr "Service workers"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Sous la supervision de"
@@ -893,11 +893,11 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Studio Lin"
-msgstr ""
+msgstr "Studio Lin"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Suppression de toutes les images et observations…"
-msgstr ""
+msgstr "Deleting all images and observations…"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Supprime toutes les données pour ce déploiement de preview"
@@ -914,15 +914,15 @@ msgstr "Delete the selected box"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Supprimer les images et observations sélectionnées"
-msgstr ""
+msgstr "Delete selected images and observations"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Supprimer l’image"
-msgstr ""
+msgstr "Delete image"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Supprimer toutes les images et observations"
-msgstr ""
+msgstr "Delete all images and observations"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
@@ -975,11 +975,11 @@ msgstr "Theme"
 
 #: src/lib/AreaObservations.svelte
 msgid "Tout désélectionner"
-msgstr ""
+msgstr "Deselect all"
 
 #: src/lib/AreaObservations.svelte
 msgid "Tout sélectionner"
-msgstr ""
+msgstr "Select all"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Trier les images par"
@@ -1008,7 +1008,7 @@ msgstr "Update to v{0} is available"
 
 #: src/lib/protocols.js
 msgid "Une métadonnée"
-msgstr ""
+msgstr "A metadata"
 
 #: src/routes/(app)/DownloadResults.svelte
 msgid "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
@@ -1016,7 +1016,7 @@ msgstr "A % value means that the padding is relative to the dimensions of each i
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Versions"
-msgstr ""
+msgstr "Versions"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Voir sur Github"
@@ -1034,11 +1034,11 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Wei Huang"
-msgstr ""
+msgstr "Wei Huang"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "YOLO 11n"
-msgstr ""
+msgstr "YOLO 11n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Zoomer"
@@ -1052,7 +1052,7 @@ msgstr "hello there :) <0/> have a great dayyy 💖💖"
 #: src/routes/(app)/DeploymentDetails.svelte
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "de"
-msgstr ""
+msgstr "by"
 
 #: src/lib/Modal.svelte
 #: src/routes/(app)/+layout.svelte
@@ -1067,7 +1067,7 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "github.com/cigaleapp/cigale"
-msgstr ""
+msgstr "github.com/cigaleapp/cigale"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "par <0>Doğukan Karapınar</0> et <1>İbrahim Kaçtıoğlu</1>, chez <2>Element Type Foundry</2>"
@@ -1076,16 +1076,16 @@ msgstr "by <0>Doğukan Karapınar</0> and <1>İbrahim Kaçtıoğlu</1> from <2>E
 #: src/routes/(app)/DeploymentDetails.svelte
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "pour l'issue"
-msgstr ""
+msgstr "addressing issue"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "pour la PR"
-msgstr ""
+msgstr "of PR"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "sw&rpc"
-msgstr ""
+msgstr "sw&rpc"
 
 #. placeholder {0}: version
 #. placeholder {0}: version
@@ -1099,11 +1099,11 @@ msgstr "v{0}"
 #: src/lib/ButtonUpdateProtocol.svelte
 msgctxt "Upgrading a protocol. The <0 /> is an icon arrow"
 msgid "v{0} <0/> v{1}"
-msgstr ""
+msgstr "v{0} <0/> v{1}"
 
 #: src/lib/KeyboardShortcuts.svelte
 msgid "¯\\_(ツ)_/¯"
-msgstr ""
+msgstr "¯\\_(ツ)_/¯"
 
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "À jour"
@@ -1115,11 +1115,11 @@ msgstr "About"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Êtes-vous sûr·e?"
-msgstr ""
+msgstr "Are you sure?"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "“Projet long” de l'<0>INP-ENSEEIHT</0>"
-msgstr ""
+msgstr "<0>INP-ENSEEIHT</0> school project"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "(aucun)"
@@ -1133,4 +1133,4 @@ msgstr[1] ""
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"
-msgstr ""
+msgstr "Cigale"
