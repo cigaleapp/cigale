@@ -1,5 +1,4 @@
 <script>
-	import { m } from '$lib/paraglide/messages.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import IconInferred from '~icons/ph/magic-wand';
@@ -21,22 +20,19 @@
 
 {#if !label}
 	<code>{removeNamespaceFromMetadataId(id)}</code>
-	<span use:tooltip={m.technical_metadata_tooltip()} style:color="var(--fg-error)">
+	<span use:tooltip={'Métadonnée technique'} style:color="var(--fg-error)">
 		<IconTechnical />
 	</span>
 {/if}
 {#if id === protocol.crop?.metadata || (infer && 'neural' in infer)}
-	<span use:tooltip={m.inferred_metadata_tooltip()} style:color="var(--fg-primary)">
+	<span use:tooltip={'Inférence par réseau neuronal'} style:color="var(--fg-primary)">
 		<IconInferred />
 	</span>
 {:else if infer && ('exif' in infer || ('latitude' in infer && 'exif' in infer.latitude))}
 	<span
 		use:tooltip={'exif' in infer
-			? m.inferred_from_single_exif({ exif: infer.exif })
-			: m.inferred_from_two_exif({
-					latitude: infer.latitude.exif,
-					longitude: infer.longitude.exif
-				})}
+			? `Inféré à partir du champ EXIF ${infer.exif}`
+			: `Inféré à partir des coordonnées GPS EXIF (latitude: ${infer.latitude.exif}, longitude: ${infer.longitude.exif})`}
 		style:color="var(--fg-primary)"
 	>
 		<IconTag />
