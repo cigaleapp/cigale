@@ -256,7 +256,7 @@
 		align-items: center;
 		flex-direction: column;
 		margin: 3rem auto;
-		max-width: 400px;
+		width: min(400px, 100%);
 		gap: 3rem;
 	}
 
@@ -305,6 +305,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		width: 100%;
 	}
 
 	section.manage p {
