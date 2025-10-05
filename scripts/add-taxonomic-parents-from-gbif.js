@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import lightProtocol from '../examples/arthropods.cigaleprotocol.light.json' with { type: 'json' };
+import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import path from 'node:path';
 
 const here = import.meta.dirname;
@@ -110,7 +110,7 @@ await writeFile(
 	JSON.stringify(newProtocol, null, 2)
 );
 await writeFile(
-	path.join(here, '../examples/arthropods.cigaleprotocol.light.json'),
+	path.join(here, '../examples/arthropods.light.cigaleprotocol.json'),
 	JSON.stringify(newLightProtocol, null, 2)
 );
 
