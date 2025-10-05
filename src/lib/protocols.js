@@ -1,12 +1,15 @@
-import { type } from 'arktype';
+import { ArkErrors, type } from 'arktype';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
-import { cachebust } from './utils.js';
+import { cachebust, fetchHttpRequest, fromEntries, keys, range } from './utils.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
+import microdiff from 'microdiff';
+import { ExportedProtocol, Protocol } from './schemas/protocols.js';
+import { metadataOptionsKeyRange } from './metadata.js';
 
 /**
- * @import { Schemas } from './database.js';
+ * @import { Schemas, Tables } from './database.js';
  */
 
 /**
@@ -42,24 +45,31 @@ if (import.meta.vitest) {
 }
 
 /**
- * Exports a protocol by ID into a JSON file, and triggers a download of that file.
- * @param {string} base base path of the app - import `base` from `$app/paths`
- * @param {import("./database").ID} id
- * @param {'json' | 'yaml'} [format='json']
+ * Turn a database-stored protocol into an object suitable for export.
+ * @param {import('./idb.svelte.js').DatabaseHandle} db
+ * @param {typeof Tables.Protocol.infer} protocol
  */
-export async function exportProtocol(base, id, format = 'json') {
-	// Importing is done here so that ./generate-json-schemas can be invoked with bun run (otherwise we get a '$state not defined' error)
-	const { tables, ...idb } = await import('./idb.svelte.js');
+async function toExportedProtocol(db, protocol) {
+	const allMetadataOptions = await db.getAll(
+		'MetadataOption',
+		metadataOptionsKeyRange(protocol.id, null)
+	);
 
-	const protocol = await tables.Protocol.raw.get(id);
-	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
-
-	const allMetadataOptions = await idb.list('MetadataOption');
-
-	downloadProtocol(base, format, {
+	return ExportedProtocol.assert({
 		...protocol,
+		exports: {
+			...protocol.exports,
+			...(protocol.exports
+				? {
+						images: {
+							cropped: protocol.exports.images.cropped.toJSON(),
+							original: protocol.exports.images.original.toJSON()
+						}
+					}
+				: {})
+		},
 		metadata: Object.fromEntries(
-			await tables.Metadata.list().then((defs) =>
+			await db.getAll('Metadata').then((defs) =>
 				defs
 					.filter((def) => protocol?.metadata.includes(def.id))
 					.map(({ id, ...def }) => [
@@ -76,6 +86,24 @@ export async function exportProtocol(base, id, format = 'json') {
 			)
 		)
 	});
+}
+
+/**
+ * Exports a protocol by ID into a JSON file, and triggers a download of that file.
+ * @param {import('./idb.svelte.js').DatabaseHandle} db
+ * @param {string} base base path of the app - import `base` from `$app/paths`
+ * @param {import("./database").ID} id
+ * @param {'json' | 'yaml'} [format='json']
+ */
+export async function exportProtocol(db, base, id, format = 'json') {
+	downloadProtocol(
+		base,
+		format,
+		await db
+			.get('Protocol', id)
+			.then(Protocol.assert)
+			.then((p) => toExportedProtocol(db, p))
+	);
 }
 
 /**
@@ -363,4 +391,100 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 		throw new Error("Le protocole a été importé mais n'a plus de version");
 
 	return { version: newVersion, ...rest };
+}
+
+/**
+ *
+ * Compare the in-database protocol with its remote counterpart, output any changes.
+ * @param {import('./idb.svelte.js').DatabaseHandle} db
+ * @param {import('$lib/database').ID} protocolId
+ * @returns {Promise<import('microdiff').Difference[]>}
+ */
+export async function compareProtocolWithUpstream(db, protocolId) {
+	const databaseProtocol = await db.get('Protocol', protocolId).then(Protocol.assert);
+
+	if (!databaseProtocol?.source) return [];
+
+	const remoteProtocol = await fetchHttpRequest(databaseProtocol.source)
+		.then((r) => r.json())
+		.then((data) => ExportedProtocol(data));
+
+	if (remoteProtocol instanceof ArkErrors) {
+		console.warn('Remote protocol is invalid', remoteProtocol);
+		return [];
+	}
+
+	const localProtocol = await toExportedProtocol(db, databaseProtocol);
+
+	// Sort options for each metadata by key
+	const metadataIds = new Set([...keys(remoteProtocol.metadata), ...keys(localProtocol.metadata)]);
+
+	const DELETED_OPTION = {
+		description: '',
+		key: '',
+		label: '',
+		__deleted: true
+	};
+
+	for (const metadataId of metadataIds) {
+		if (!remoteProtocol.metadata[metadataId]) continue;
+		if (!localProtocol.metadata[metadataId]) continue;
+
+		const remoteOptions = remoteProtocol.metadata[metadataId].options ?? [];
+		const sortedRemoteOptions = [];
+		const localOptions = localProtocol.metadata[metadataId].options ?? [];
+		const sortedLocalOptions = [];
+
+		const optionKeys = [
+			...new Set([...remoteOptions.map((o) => o.key), ...localOptions.map((o) => o.key)])
+		].sort();
+
+		for (const key of optionKeys) {
+			const remoteOption = remoteOptions.find((o) => o.key === key);
+			const localOption = localOptions.find((o) => o.key === key);
+
+			sortedLocalOptions.push(localOption ?? DELETED_OPTION);
+			sortedRemoteOptions.push(remoteOption ?? DELETED_OPTION);
+		}
+
+		remoteProtocol.metadata[metadataId].options = sortedRemoteOptions;
+		localProtocol.metadata[metadataId].options = sortedLocalOptions;
+	}
+
+	const diffs = microdiff(remoteProtocol, localProtocol, {
+		cyclesFix: true
+	});
+
+	// If an option was removed from one side, it'll appear as a all-empty-strings option object with an additional `__deleted: true` property.
+
+	let cleanedDiffs = structuredClone(diffs);
+
+	const diffStartsWith = (path, start) =>
+		path.length >= start.length && range(0, start.length).every((i) => path[i] === start[i]);
+
+	for (const { path } of diffs) {
+		const last = path.at(-1);
+		const prefix = path.slice(0, -1);
+
+		// If the diff indicates that an option was deleted
+		if (last === '__deleted') {
+			const pathToOption = prefix;
+			// Delete all diffs with a path starting with diff.path[..-1]
+			cleanedDiffs = cleanedDiffs.filter((d) => !diffStartsWith(d.path, pathToOption));
+			// and replace them with a single diff indicating the deletion of the option
+			cleanedDiffs.push({
+				type: 'REMOVE',
+				path: [...prefix],
+				// Restore old value by getting all oldValues from diffs
+				oldValue: fromEntries(
+					diffs
+						.filter((d) => diffStartsWith(d.path, pathToOption))
+						.filter((d) => d.path.at(-1) !== '__deleted')
+						.map((d) => /** @type {const} */ ([d.path.at(-1)?.toString() ?? '', d.oldValue]))
+				)
+			});
+		}
+	}
+
+	return cleanedDiffs;
 }

@@ -3,17 +3,44 @@
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
+	import { databaseHandle } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { hasUpgradeAvailable } from '$lib/protocols.js';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import { compareProtocolWithUpstream, hasUpgradeAvailable } from '$lib/protocols.js';
 	import { type } from 'arktype';
 	import IconCheck from '~icons/ph/check';
 	import IconUnpublished from '~icons/ph/cloud-x';
 	import IconWarning from '~icons/ph/warning';
 	import { updater } from '../updater.svelte.js';
+	import ChangesWithRemote from './ChangesWithRemote.svelte';
 
 	const { data } = $props();
 	const source = $derived(typeof data.source === 'string' ? data.source : data.source?.url);
 	let { version, id } = $derived(data);
+
+	const db = $derived(databaseHandle());
+
+	/**
+	 * @typedef {object} UpstreamComparison
+	 * @property {boolean} hasMore
+	 * @property {import('microdiff').Difference[] } changes
+	 */
+	/** @type {UpstreamComparison} */
+	let upstreamComparison = $state({
+		hasMore: false,
+		changes: []
+	});
+
+	async function computeChangesWithUpstream() {
+		const changes = await compareProtocolWithUpstream(db, id);
+
+		upstreamComparison = {
+			hasMore: changes.length > 100,
+			changes: changes.slice(0, 100)
+		};
+
+		return upstreamComparison.changes;
+	}
 
 	/**
 	 * @type {Record<import('$lib/ButtonUpdateProtocol.svelte').CustomButtonProps['state'], string>}
@@ -76,10 +103,39 @@
 							</div>
 						</div>
 					{:else if upToDate}
-						<div class="upgrade-check ok">
-							<IconCheck />
-							À jour
-						</div>
+						{#await computeChangesWithUpstream()}
+							<div class="upgrade-check loading">
+								<LoadingSpinner />
+								Comparaison avec la version distante...
+							</div>
+						{:then diff}
+							{#if diff.length > 0}
+								<div class="upgrade-check warning">
+									<IconWarning />
+									Le protocole local a des modifications non publiées, voir ci-dessous
+									<div class="action">
+										<ButtonInk
+											onclick={updater((p) => {
+												p.version = version + 1;
+												close?.();
+											})}
+										>
+											Passer à la v{version + 1}
+										</ButtonInk>
+									</div>
+								</div>
+							{:else}
+								<div class="upgrade-check ok">
+									<IconCheck />
+									À jour
+								</div>
+							{/if}
+						{:catch error}
+							<div class="upgrade-check warning">
+								<IconWarning />
+								Erreur lors de la comparaison avec la version distante: {error.message}
+							</div>
+						{/await}
 					{:else}
 						<div class="upgrade-check warning">
 							<IconWarning />
@@ -107,6 +163,16 @@
 			{/if}
 		{/snippet}
 	</Field>
+
+	{#if version !== undefined && upstreamComparison.changes.length > 0}
+		{@const { changes, hasMore } = upstreamComparison}
+		<section class="changes-with-remote">
+			<h3>
+				Différences avec la version publiée ({changes.length}{hasMore ? '+' : ''})
+			</h3>
+			<ChangesWithRemote {changes} />
+		</section>
+	{/if}
 </main>
 
 <style>
@@ -135,5 +201,9 @@
 
 	.upgrade-check .action {
 		margin-left: auto;
+	}
+
+	h3 {
+		margin-bottom: 1em;
 	}
 </style>
