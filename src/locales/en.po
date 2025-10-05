@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T00:25:59.725Z\n"
+"PO-Revision-Date: 2025-10-05T00:28:53.296Z\n"
 "Last-Translator: \n"
 "Language: en\n"
 "Language-Team: \n"
@@ -104,8 +104,8 @@ msgstr "<0/> Results"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Retry"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/lib/CardMedia.svelte
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Supprimer"
 msgstr "<0/> Delete"
 
@@ -317,7 +317,7 @@ msgstr "Loading built-in protocol"
 msgid "Chargement du worker neuronal…"
 msgstr "Loading neural worker…"
 
-#: src/routes/(app)/DeploymentDetails.svelte src/lib/CardMedia.svelte
+#: src/lib/CardMedia.svelte src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/+layout.js
 msgid "Chargement…"
 msgstr "Loading…"
@@ -514,7 +514,7 @@ msgstr "Export"
 msgid "Exporter les résultats"
 msgstr "Export results"
 
-#: src/routes/(app)/PrepareForOffline.svelte src/lib/Modal.svelte
+#: src/lib/Modal.svelte src/routes/(app)/PrepareForOffline.svelte
 msgid "Fermer"
 msgstr "Close"
 
@@ -850,7 +850,7 @@ msgstr "Prepare for offline use"
 msgid "Quitter le mode recadrage"
 msgstr "Exit cropping mode"
 
-#: src/routes/(app)/Settings.svelte src/lib/KeyboardShortcuts.svelte
+#: src/lib/KeyboardShortcuts.svelte src/routes/(app)/Settings.svelte
 msgid "Raccourcis clavier"
 msgstr "Keyboard shortcuts"
 
