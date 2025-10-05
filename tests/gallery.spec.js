@@ -1,6 +1,5 @@
 import { test, expect } from './fixtures';
 import { chooseDefaultProtocol, goToTab, importPhotos, openSettings, setSettings } from './utils';
-import fr from '../messages/fr.json' with { type: 'json' };
 
 test.describe('sorting', () => {
 	test.beforeEach(async ({ page }) => {
@@ -19,13 +18,16 @@ test.describe('sorting', () => {
 	});
 
 	/**
-	 * @param {'id'|'filename'|'date'} sortKey
+	 * @param {'filename'|'date'} sortKey
 	 * @param {string[]} order
 	 */
 	async function assertCardsOrder(sortKey, order) {
 		test(`by ${sortKey}`, async ({ page }) => {
 			await openSettings(page);
-			const optionLabel = fr[`sort_key_${sortKey}`];
+			const optionLabel = {
+				filename: 'Fichier',
+				date: 'Date'
+			}[sortKey];
 
 			await page
 				.getByTestId('app-settings')

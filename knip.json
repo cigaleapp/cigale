@@ -8,9 +8,10 @@
 		"src/app.d.ts",
 		"src/lib/Checkbox.svelte",
 		"src/lib/Dropzone.svelte",
-		"src/lib/FloatingButton.svelte"
+		"src/lib/FloatingButton.svelte",
+		"src/locales/*.js"
 	],
-	"ignoreBinaries": ["node-modules-inspector"],
+	"ignoreBinaries": ["node-modules-inspector", "msgcat"],
 	"ignoreDependencies": ["@iconify-json/.+", "bun"],
 	"entry": [
 		"scripts/*.js",
@@ -18,7 +19,8 @@
 		"src/electron/preload.js",
 		"forge.config.js",
 		"forge.env.d.ts",
-		"vite.electron*.config.js"
+		"vite.electron*.config.js",
+		"wuchale.config.js"
 	],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],

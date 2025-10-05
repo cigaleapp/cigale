@@ -1,13 +1,12 @@
 import { onDestroy, onMount } from 'svelte';
 import { uiState } from './state.svelte';
 import { entries, keys } from './utils';
-import { m } from './paraglide/messages';
 
 const GROUPS = {
-	general: m.keyboard_shortcuts_group_general(),
-	observations: m.keyboard_shortcuts_group_observations(),
-	navigation: m.keyboard_shortcuts_group_navigation(),
-	cropping: m.keyboard_shortcuts_group_cropping(),
+	general: 'Général',
+	observations: 'Observations',
+	navigation: 'Navigation',
+	cropping: 'Recadrage',
 	debugmode: 'Debug mode'
 };
 
@@ -19,6 +18,7 @@ const GROUPS = {
  * This function will _not_ override any keybind that already has an existing key shortcut defined.
  * @param {keyof typeof GROUPS} group used to group keybinds together in help dialogs, applied to all keybinds defined here, unless they override it themselves
  * @param {import("./state.svelte").Keymap<keyof typeof GROUPS>} shortcuts
+ * WARNING: If you rename this function, update `heuristic` in `wuchale.config.js`
  */
 export function defineKeyboardShortcuts(group, shortcuts) {
 	onMount(() => {

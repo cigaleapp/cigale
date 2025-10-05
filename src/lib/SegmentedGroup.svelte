@@ -6,9 +6,11 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {Key[]} options
+	 * @property {string} aria-label aria-label for the group
 	 * @property {Partial<{[K in Key]: string}>} [labels] labels for the options
 	 * @property {NoInfer<Key> | undefined} [value] which option is selected
 	 * @property {import('svelte').Snippet<[Key]>} [customOption] snippets to render for each option. called for every option in `options` that is not in `labels`. arguments: option
+	 * @property {(value: NoInfer<Key>) => void | Promise<void>} [onchange] called when the value changes
 	 * @property {boolean} [clickable-custom-options=false] whether the custom options should be clickable. If true, the onclick function will be called when the option is clicked.
 	 */
 
@@ -20,11 +22,13 @@
 		labels,
 		value = $bindable(),
 		customOption,
-		'clickable-custom-options': clickableCustomOptions
+		'clickable-custom-options': clickableCustomOptions,
+		onchange,
+		...rest
 	} = $props();
 </script>
 
-<div class="segmented-group" role="radiogroup">
+<div class="segmented-group" role="radiogroup" {...rest}>
 	{#each options as option (option)}
 		{#if !customOption || labels?.[option]}
 			<button
@@ -33,6 +37,7 @@
 				class="option"
 				onclick={() => {
 					value = option;
+					onchange?.(option);
 				}}
 			>
 				{labels?.[option] ?? option}
@@ -45,7 +50,9 @@
 				aria-checked={option === value}
 				class="option"
 				onclick={() => {
-					if (clickableCustomOptions) value = option;
+					if (!clickableCustomOptions) return;
+					value = option;
+					onchange?.(option);
 				}}
 			>
 				{@render customOption(option)}

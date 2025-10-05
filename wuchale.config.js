@@ -1,0 +1,69 @@
+import { adapter as svelte } from '@wuchale/svelte';
+import { adapter as js } from 'wuchale/adapter-vanilla';
+import { defineConfig } from 'wuchale';
+import { Tables } from './src/lib/database.js';
+
+export default defineConfig({
+	sourceLocale: 'fr',
+	otherLocales: ['en'],
+	adapters: {
+		main: svelte({
+			heuristic(msg, { call, scope, file }) {
+				if (file.includes('/_playground/')) return false;
+
+				// Table names
+				if (scope === 'script' && Object.keys(Tables).includes(msg)) return false;
+
+				if (/^toasts\.\w+$/.test(call)) return true;
+
+				const startsWithUpperLetter =
+					msg[0] === msg[0].toUpperCase() && msg[0].toLowerCase() !== msg[0].toUpperCase();
+
+				const isKeyboardShortcutExpression =
+					/^(Shift|Ctrl|Alt)\+\S+$/.test(msg) ||
+					/^Digit[\d#]$/.test(msg) ||
+					/^Arrow(Left|Right|Up|Down)$/.test(msg) ||
+					['Space', 'Enter', 'Escape', 'Tab', 'Backspace', 'Delete'].includes(msg) ||
+					/^[A-Z]$/.test(msg);
+
+				if (isKeyboardShortcutExpression) {
+					return false;
+				}
+
+				if (startsWithUpperLetter && scope === 'script') {
+					return ['defineKeyboardShortcuts', 'seo', '$derived.by', '$derived', '$effect'].includes(
+						call
+					);
+				}
+			}
+		}),
+		js: js({
+			files: [
+				'src/**/+{page,layout}.{js,ts}',
+				'src/**/+{page,layout}.server.{js,ts}',
+				'src/lib/**.js'
+			],
+			heuristic(msg, { file, call, funcName, ...rest }) {
+				// Strings in test files
+				if (file.endsWith('.test.js') || file.endsWith('.test.svelte.js')) return false;
+
+				// Probably keyboard shortcuts
+				if (msg.length === 1) return false;
+
+				// Log messages for ProcessingQueue
+				if (file === 'src/lib/queue.svelte.js') {
+					if (call === '[MemberExpression].log') return false;
+					if (call === '[MemberExpression].logWarning') return false;
+				}
+
+				// EXIF fields in exif.js
+				if (file === 'src/lib/exif.js' && funcName === 'addExifMetadata') {
+					return false;
+				}
+
+				// Table names
+				if (Object.keys(Tables).includes(msg)) return false;
+			}
+		})
+	}
+});

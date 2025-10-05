@@ -42,20 +42,23 @@
 	"scripts": {
 		"dev": "vite dev",
 		"dev:native": "electron-forge start",
-		"build": "vite build",
 		"prebuild": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js",
+		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "husky",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
-		"check:clutter": "svelte-kit sync && bunx @inlang/paraglide-js compile --outdir src/lib/paraglide && bunx knip",
+		"precheck": "svelte-kit sync",
+		"check": "svelte-check --tsconfig ./jsconfig.json",
+		"preknip": "svelte-kit sync",
+		"knip": "knip",
 		"format": "prettier --write .",
 		"lint": "bunx oxlint && bunx eslint",
 		"lintfix": "bunx oxlint --fix && bunx eslint --fix",
 		"commit": "gitmoji -c",
 		"test": "vitest --coverage.enabled true",
 		"test:ui": "vitest --ui",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"wuchale": "wuchale",
+		"postwuchale": "bun scripts/sort-po-files.js"
 	},
 	"lint-staged": {
 		"*!(.svelte).{js,ts}": [
@@ -83,7 +86,6 @@
 		"@electron/fuses": "^1.8.0",
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.36.0",
-		"@inlang/paraglide-js": "2.4.0",
 		"@jimp/js-jpeg": "^1.6.0",
 		"@playwright/test": "^1.55.1",
 		"@sveltejs/adapter-static": "^3.0.9",
@@ -92,6 +94,7 @@
 		"@types/piexifjs": "^1.0.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
+		"@wuchale/vite-plugin": "^0.14.6",
 		"bun": "^1.2.23",
 		"electron": "^38.2.0",
 		"eslint": "^9.36.0",
@@ -136,6 +139,7 @@
 		"@iconify-json/ph": "^1.2.2",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
+		"@wuchale/svelte": "^0.15.1",
 		"arktype": "^2.1.22",
 		"bits-ui": "^1.8.0",
 		"date-fns": "^4.1.0",
@@ -163,6 +167,7 @@
 		"ulid": "^3.0.1",
 		"unplugin-icons": "^22.3.0",
 		"update-electron-app": "^3.1.1",
+		"wuchale": "^0.16.5",
 		"xss": "^1.0.15",
 		"yaml": "^2.8.1"
 	}

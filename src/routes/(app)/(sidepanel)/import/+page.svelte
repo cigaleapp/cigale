@@ -9,7 +9,7 @@
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
@@ -80,7 +80,7 @@
 		{#if empty}
 			<div class="empty-state">
 				<Logo variant="empty" />
-				<p>{m.click_or_drop_images_or_export()}</p>
+				<p>Cliquer ou déposer des images, ou un export de résultats (.zip)</p>
 			</div>
 		{/if}
 	</section>

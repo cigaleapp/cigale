@@ -7,7 +7,7 @@
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { goto, href } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -105,32 +105,32 @@
 		// Choose [P]rotocol
 		'g p': {
 			do: () => goto('/'),
-			help: m.goto_protocol_tab()
+			help: 'Choisir le protocole'
 		},
 		// [I]mport images
 		'g i': {
 			do: () => goto('/import'),
-			help: m.goto_import_tab()
+			help: 'Importer des images'
 		},
 		// Adjust C[r]ops
 		'g r': {
 			do: () => goto('/crop'),
-			help: m.goto_crop_tab()
+			help: 'Recadrer les images'
 		},
 		// A[n]notate images
 		'g n': {
 			do: () => goto('/classify'),
-			help: m.goto_classify_tab()
+			help: 'Classifier les images'
 		},
 		// E[x]port results
 		'g x': {
 			do: () => openExportModal(),
-			help: m.export_results()
+			help: 'Exporter les résultats'
 		},
 		// [M]anage protocols
 		'g m': {
 			do: () => goto('/protocols/'),
-			help: m.goto_protocol_management()
+			help: 'Gérer les protocoles'
 		}
 	});
 </script>
@@ -150,14 +150,14 @@
 			</a>
 			{#if previewingPrNumber}
 				<button class="pr-number" onclick={openPreviewPRDetails}>
-					{m.preview_pr_number({ number: previewingPrNumber })}
+					Preview #{previewingPrNumber}
 				</button>
 			{/if}
 		</div>
 
 		<div class="steps">
 			<a href={href('/')}>
-				{m.protocol_tab()}
+				Protocole
 				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
 				{#if path == '/' || path == ''}
 					<div class="line"></div>
@@ -165,7 +165,7 @@
 			</a>
 			<IconNext></IconNext>
 			<a href={href('/import')} data-testid="goto-import" aria-disabled={!uiState.currentProtocol}>
-				{m.import_tab()}
+				Importer
 				{#if path == '/import'}
 					<div class="line"></div>
 				{/if}
@@ -181,7 +181,7 @@
 					data-testid="goto-crop"
 					aria-disabled={!uiState.currentProtocol || !hasImages}
 				>
-					{m.crop_tab()}
+					Recadrer
 					{#if path.startsWith('/crop')}
 						<div class="line"></div>
 					{/if}
@@ -189,7 +189,7 @@
 				{@render inferenceSettings(
 					'crop',
 					uiState.cropInferenceAvailable,
-					m.detection_is_disabled_or_unavailable(),
+					'La détection est désactivée ou indisponible',
 					uiState.cropModels,
 					uiState.selectedCropModel,
 					(i) => uiState.setModelSelections({ crop: i })
@@ -199,7 +199,7 @@
 			<div
 				class="with-inference-indicator"
 				use:tooltip={uiState.processing.task === 'detection' && uiState.processing.progress < 1
-					? m.wait_for_detection_to_finish_before_classifying()
+					? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
 					: undefined}
 			>
 				<a
@@ -209,7 +209,7 @@
 						(uiState.processing.task === 'detection' && uiState.processing.progress < 1)}
 					data-testid="goto-classify"
 				>
-					{m.classify_tab()}
+					Classifier
 					{#if path == '/classify'}
 						<div class="line"></div>
 					{/if}
@@ -217,16 +217,16 @@
 				{@render inferenceSettings(
 					'classify',
 					uiState.classificationInferenceAvailable,
-					m.classification_is_disabled_or_unavailable(),
+					'La classification est désactivée ou indisponible',
 					uiState.classificationModels,
 					uiState.selectedClassificationModel,
 					(i) => uiState.setModelSelections({ classification: i })
 				)}
 			</div>
 			<IconNext></IconNext>
-			<ButtonSecondary tight onclick={openExportModal}>
+			<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
 				<IconDownload />
-				{m.results()}
+				Résultats
 			</ButtonSecondary>
 		</div>
 
@@ -256,7 +256,7 @@
 					items={[
 						{
 							i: -1,
-							label: m.no_inference(),
+							label: 'Aucune inférence',
 							onclick: () => setSelection(-1)
 						},
 						...models.map((model, i) => ({

@@ -1,1 +1,2 @@
 *.svelte.js linguist-language=svelte
+*.po diff=podiff

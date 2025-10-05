@@ -1,6 +1,5 @@
 <script>
 	import { percent } from './i18n.js';
-	import { m } from './paraglide/messages.js';
 	import { tooltip } from './tooltips.js';
 	import { gradientedColor } from './utils.js';
 
@@ -12,11 +11,7 @@
 	 */
 
 	/** @type {Props} */
-	const {
-		value,
-		children,
-		tooltip: help = (percentage) => m.confidence_percentage({ percentage })
-	} = $props();
+	const { value, children, tooltip: help = (percentage) => `Confiance: ${percentage}` } = $props();
 
 	const color = $derived(
 		gradientedColor(value, 'fg-error', 'fg-warning', 'fg-neutral', 'fg-success')

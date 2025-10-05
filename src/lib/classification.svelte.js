@@ -1,5 +1,4 @@
 import { match, type } from 'arktype';
-import { m } from './paraglide/messages.js';
 import { uiState } from './state.svelte.js';
 import { MetadataInferOptionsNeural } from './schemas/metadata.js';
 import { tables } from './idb.svelte.js';
@@ -12,7 +11,7 @@ import { tables } from './idb.svelte.js';
  */
 export async function classifyImage(swarpc, id, cancellers) {
 	if (!uiState.currentProtocol) {
-		throw new Error(m.no_protocol_selected());
+		throw new Error('Aucun protocole sélectionné');
 	}
 
 	if (!uiState.classificationMetadataId) {

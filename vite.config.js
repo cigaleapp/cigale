@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { wuchale } from '@wuchale/vite-plugin';
 import { execSync } from 'node:child_process';
 import icons from 'unplugin-icons/vite';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
@@ -18,7 +18,6 @@ export default defineConfig({
 	test: {
 		environment: 'jsdom',
 		include: ['src/lib/**/*.{test,spec}{.svelte,}.{js,ts}'],
-		exclude: ['src/lib/paraglide/**'],
 		includeSource: ['src/lib/**/*{.svelte,}.{js,ts}', 'scripts/generate-json-schemas.js'],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
@@ -26,8 +25,7 @@ export default defineConfig({
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
 			reportOnFailure: true,
-			include: ['src/lib/**/*{.svelte,}.{js,ts}'],
-			exclude: ['src/lib/paraglide/**']
+			include: ['src/lib/**/*{.svelte,}.{js,ts}']
 		}
 	},
 	server: {
@@ -62,12 +60,9 @@ export default defineConfig({
 			compiler: 'svelte',
 			defaultClass: 'icon'
 		}),
+		// FIXME Wuchale doesnt play well with Vitest for now
+		process.env.VITEST ? undefined : wuchale(),
 		sveltekit(),
-		paraglideVitePlugin({
-			project: './project.inlang',
-			outdir: './src/lib/paraglide',
-			strategy: ['localStorage', 'preferredLanguage', 'baseLocale']
-		}),
 		crossOriginIsolation()
 	]
 });

@@ -2,12 +2,11 @@
 	import Logo from '$lib/Logo.svelte';
 	import JSONC from 'tiny-jsonc';
 	import { seo } from '$lib/seo.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 	import lockfile from '$lib/../../bun.lock?raw';
 
 	const { data } = $props();
 
-	seo({ title: m.about_page_title() });
+	seo({ title: 'À propos' });
 
 	/**
 	 * @type {undefined | { node: string; chrome: string; electron: string; os?: { name: string; version: string; architecture: string; archIsUnusual: boolean }; sw: string[] }}
@@ -100,15 +99,15 @@
 </header>
 
 <dl>
-	<dt>{m.developed_by()}</dt>
+	<dt>Développé par</dt>
 	<dd>
 		{@render peoplelinks(authors)}
 	</dd>
-	<dt>{m.supervised_by()}</dt>
+	<dt>Sous la supervision de</dt>
 	<dd>
 		{@render peoplelinks(supervisors)}
 	</dd>
-	<dt>{m.part_of_project()}</dt>
+	<dt>Dans le cadre d'un</dt>
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>

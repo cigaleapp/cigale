@@ -20,7 +20,7 @@ export function mutationobserver(node, options) {
 	}
 
 	function destroy() {
-		observer && observer.disconnect();
+		observer?.disconnect();
 		observer = null;
 	}
 

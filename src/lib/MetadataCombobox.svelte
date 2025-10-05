@@ -8,7 +8,6 @@
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';
 	import Logo from './Logo.svelte';
-	import { m } from './paraglide/messages.js';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
 	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';
@@ -232,7 +231,7 @@
 						<a href={highlightedOption.learnMore} target="_blank" class="learn-more">
 							<IconArrowRight />
 							<div class="text">
-								<span>{m.learn_more()}</span>
+								<span>En savoir plus</span>
 								<code class="domain">{new URL(highlightedOption.learnMore).hostname}</code>
 							</div>
 						</a>

@@ -1,4 +1,6 @@
-import { m } from './paraglide/messages';
+/**
+ * @typedef {import('$lib/database').Settings['language']} Language
+ */
 
 /**
  * Return a ", "-separated list of "{count} {thing}" strings, with thing set to plural.
@@ -49,6 +51,19 @@ if (import.meta.vitest) {
 		expect(countThing('child', 3, { child: 'children' })).toBe('3 children');
 		expect(countThing('person', 1, { person: 'people' })).toBe('1 person');
 	});
+}
+
+/**
+ * Pluralizes a string based on a number and a list of candidate strings.
+ * @see https://wuchale.dev/guides/plurals/#usage
+ * @param {number} num
+ * @param {string[]} candidates
+ * @param {(n: number) => number} [rule]
+ * @returns {string}
+ */
+export function plural(num, candidates, rule = (n) => (n === 1 ? 0 : 1)) {
+	const index = rule(num);
+	return candidates[index].replace('#', Intl.NumberFormat().format(num));
 }
 
 /**
@@ -125,11 +140,7 @@ if (import.meta.vitest) {
  * @returns {string}
  */
 export function errorMessage(error, prefix = '') {
-	let defaultMessage = 'Unexpected error';
-	try {
-		defaultMessage = m.unexpected_error();
-		// eslint-disable-next-line no-empty
-	} catch {}
+	const defaultMessage = 'Erreur inattendue';
 
 	let result = defaultMessage;
 
@@ -155,12 +166,12 @@ export function errorMessage(error, prefix = '') {
 
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
-	test('errorMessage', () => {
+	test('errorMessage', async () => {
 		expect(errorMessage(new Error('Test error'))).toBe('Test error');
 		expect(errorMessage(new Error('Error: Test error'))).toBe('Test error');
 		expect(errorMessage('string error')).toBe('string error');
-		expect(errorMessage(null)).toBe('Unexpected error');
-		expect(errorMessage(undefined)).toBe('Unexpected error');
+		expect(errorMessage(null)).toBe('Erreur inattendue');
+		expect(errorMessage(undefined)).toBe('Erreur inattendue');
 		expect(errorMessage(new Error('Test'), 'Prefix')).toBe('Prefix: Test');
 
 		// The current implementation overwrites with toString(), so cause isn't used
@@ -168,4 +179,13 @@ if (import.meta.vitest) {
 		errorWithCause.cause = new Error('Cause error');
 		expect(errorMessage(errorWithCause)).toBe('Main error');
 	});
+}
+
+/**
+ *
+ * @returns {Language}
+ */
+export function localeFromNavigator() {
+	const locale = navigator.language.split('-')[0];
+	return locale === 'fr' ? 'fr' : 'en';
 }

@@ -14,7 +14,7 @@
 	} from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
@@ -25,7 +25,7 @@
 	import { sum } from '$lib/utils.js';
 	import { watch } from 'runed';
 
-	seo({ title: m.classification() });
+	seo({ title: 'Classification' });
 
 	const { data } = $props();
 
@@ -62,10 +62,7 @@
 		);
 		if (!settings) {
 			toasts.error(
-				m.no_inference_params_defined({
-					modelName: uiState.selectedClassificationModel,
-					protocolName: uiState.currentProtocol.name
-				})
+				`Aucun paramètre d'inférence défini pour le modèle ${uiState.selectedClassificationModel} sur le protocole ${uiState.currentProtocol.name}`
 			);
 			return;
 		}
@@ -87,7 +84,7 @@
 			})
 			.catch((error) => {
 				console.error(error);
-				toasts.error(m.error_loading_classification_model());
+				toasts.error('Erreur lors du chargement du modèle de classification');
 			});
 	}
 
@@ -140,7 +137,7 @@
 {#if !classifmodelLoaded}
 	<section class="loading">
 		<Logo loading />
-		<p>{m.loading_classification_model()}</p>
+		<p>Chargement du modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
@@ -151,18 +148,16 @@
 		<AreaObservations
 			{items}
 			sort={getSettings().gallerySort}
-			groups={[m.cropped_items(), m.uncropped_items()]}
+			groups={['Recadrées', 'Non recadrées']}
 			grouping={({ data: { images } }) =>
-				images.some((img) => uiState.cropMetadataValueOf(img))
-					? m.cropped_items()
-					: m.uncropped_items()}
+				images.some((img) => uiState.cropMetadataValueOf(img)) ? 'Recadrées' : 'Non recadrées'}
 		>
 			{#snippet item({ observation, images }, { id })}
 				<CardObservation
 					{observation}
 					{images}
 					boxes="apply-first"
-					loadingStatusText={m.analyzing()}
+					loadingStatusText="Analyse…"
 					onretry={() => {
 						uiState.erroredImages.delete(id);
 						const imageIds = tables.Observation.getFromState(id)?.images;
@@ -185,10 +180,8 @@
 		{#if !items.length}
 			<div class="empty">
 				<Logo variant="empty" --size="6em" />
-				<p>{m.no_images()}</p>
-				<ButtonSecondary onclick={() => goto('/import')}>
-					{m.import_tab()}
-				</ButtonSecondary>
+				<p>Aucune image</p>
+				<ButtonSecondary onclick={() => goto('/import')}>Importer</ButtonSecondary>
 			</div>
 		{/if}
 	</section>
@@ -196,7 +189,7 @@
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
-		<p>{m.cannot_load_classification_model()}</p>
+		<p>Impossible de charger le modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{errorMessage(classifModelLoadingError)}</p>
 		{#if isDebugMode()}

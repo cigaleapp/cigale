@@ -5,7 +5,6 @@
 	import IconIncrement from '~icons/ph/plus';
 	import { isType } from './metadata';
 	import MetadataCombobox from './MetadataCombobox.svelte';
-	import { m } from './paraglide/messages.js';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
 	import { round, safeJSONParse } from './utils';
@@ -96,7 +95,7 @@
 		/>
 		<button
 			class="decrement"
-			aria-label={m.input_decrement_value()}
+			aria-label="Décrémenter"
 			onclick={() => {
 				if (value === undefined || value === null) {
 					value = 0;
@@ -110,7 +109,7 @@
 		</button>
 		<button
 			class="increment"
-			aria-label={m.input_increment_value()}
+			aria-label="Incrémenter"
 			onclick={() => {
 				if (value === undefined || value === null) {
 					value = 0;

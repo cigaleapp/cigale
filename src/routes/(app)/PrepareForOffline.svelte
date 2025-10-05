@@ -4,7 +4,6 @@
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { prepareForOfflineUse } from '$lib/offline';
-	import { m } from '$lib/paraglide/messages';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { toastIcon } from '$lib/Toast.svelte';
 	import { clamp } from '$lib/utils';
@@ -16,6 +15,11 @@
 	 * @type {undefined | true | string}
 	 */
 	let status = $state();
+
+	/**
+	 * @type {undefined | (() => void)}
+	 */
+	let close = $state();
 
 	async function startDownload() {
 		await prepareForOfflineUse(
@@ -42,8 +46,12 @@
 	const StateIcon = $derived(toastIcon(status === true ? 'success' : 'error'));
 </script>
 
-<Modal key="modal_prepare_for_offline" title={m.prepare_for_offline()} bind:open>
-	{m.prepare_for_offline_help()}
+<Modal key="modal_prepare_for_offline" title="Préparation hors-ligne" bind:open bind:close>
+	<p>
+		Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.
+		Télécharge tout les modèles pour tout les protocoles actuellement installés.
+	</p>
+
 	<ul class="bars">
 		{#each progressBars as [modelNo, { done, total, modelURL }] (modelNo)}
 			<li>
@@ -52,6 +60,7 @@
 			</li>
 		{/each}
 	</ul>
+
 	<section
 		class="state"
 		style:color="var(--fg-{status === true ? 'success' : loading ? 'secondary' : 'error'})"
@@ -61,14 +70,13 @@
 		{:else if status !== undefined}
 			<StateIcon /> {status}
 		{:else if progressBars.size > 0}
-			<LoadingSpinner /> {m.loading_text()}
+			<LoadingSpinner /> Chargement…
 		{/if}
 	</section>
+
 	{#snippet footer({ close })}
 		{#if status !== true}
-			<ButtonPrimary {loading} onclick={startDownload}>
-				{m.start()}
-			</ButtonPrimary>
+			<ButtonPrimary {loading} onclick={startDownload}>Démarrer</ButtonPrimary>
 		{:else}
 			<ButtonPrimary
 				onclick={() => {
@@ -77,7 +85,7 @@
 					close?.();
 				}}
 			>
-				{m.close()}
+				Fermer
 			</ButtonPrimary>
 		{/if}
 	{/snippet}

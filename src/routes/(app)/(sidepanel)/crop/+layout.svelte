@@ -1,6 +1,6 @@
 <script>
 	import Logo from '$lib/Logo.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
@@ -34,7 +34,7 @@
 			)
 			.catch((error) => {
 				console.error(error);
-				toasts.error(m.error_loading_detection_model());
+				toasts.error('Erreur lors du chargement du modèle de détection');
 			});
 	}
 </script>
@@ -53,7 +53,7 @@
 {#await loadCropperModel(uiState.selectedCropModel)}
 	<section class="loading">
 		<Logo loading />
-		<p>{m.loading_cropping_model()}</p>
+		<p>Chargement du modèle de recadrage…</p>
 		<p class="source">{@render modelsource()}</p>
 		<div class="progressbar">
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
@@ -65,7 +65,7 @@
 	<section class="loading errored">
 		<Logo variant="error" />
 		<h2>Oops!</h2>
-		<p>{m.cannot_load_cropping_model()}</p>
+		<p>Impossible de charger le modèle de recadrage</p>
 		<p class="source">{@render modelsource()}</p>
 		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
 		{#if isDebugMode()}

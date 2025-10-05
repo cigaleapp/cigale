@@ -3,7 +3,6 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import fr from '../messages/fr.json' with { type: 'json' };
 import { Schemas } from '../src/lib/database.js';
 
 /**
@@ -55,7 +54,7 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 			await fileInput?.setInputFiles(batch);
 		} else {
 			const filePicker = page.waitForEvent('filechooser');
-			await page.getByRole('button', { name: fr.import_other_images }).click();
+			await page.getByRole('button', { name: "Importer d'autres images" }).click();
 			await filePicker.then((picker) => {
 				picker.setFiles(batch);
 			});
@@ -98,9 +97,18 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
  */
 export async function setSettings({ page }, newSettings) {
 	await page.evaluate(async ([newSettings]) => {
-		const settings = await window.DB.get('Settings', 'user').then(
+		let maxAttempts = 100;
+		let settings = await window.DB.get('Settings', 'user').then(
 			(settings) => settings ?? window.DB.get('Settings', 'defaults')
 		);
+
+		while (!settings && maxAttempts-- > 0) {
+			await new Promise((r) => setTimeout(r, 100));
+			settings = await window.DB.get('Settings', 'user').then(
+				(settings) => settings ?? window.DB.get('Settings', 'defaults')
+			);
+		}
+
 		if (!settings) throw new Error('Settings not found in the database');
 		await window.DB.put('Settings', { ...settings, id: 'user', ...newSettings });
 		await window.refreshDB();
@@ -312,13 +320,14 @@ export async function chooseDefaultProtocol(page, models = {}) {
 }
 
 /**
- * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
+ *
+ * @param {import('$lib/i18n').Language} lang
  */
-const appNavTabs = (m) => ({
-	protocol: { name: m?.protocol_tab ?? 'Protocole', hash: '#/protocol' },
-	import: { name: m?.import_tab ?? 'Importer', hash: '#/import' },
-	crop: { name: m?.crop_tab ?? 'Recadrer', hash: '#/crop' },
-	classify: { name: m?.classify_tab ?? 'Classifier', hash: '#/classify' }
+const appNavTabs = (lang = 'fr') => ({
+	protocol: { name: lang === 'fr' ? 'Protocole' : 'Protocol', hash: '#/protocol' },
+	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
+	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
+	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' }
 });
 
 /**
@@ -326,18 +335,20 @@ const appNavTabs = (m) => ({
  * @param {Page} page
  * @param {'protocol'|'import'|'crop'|'classify'} tabName
  * @param {object} [options]
- * @param {typeof import('../messages/fr.json')} [options.messages] translations for the tab displayed names
  * @param {boolean} [options.waitForModel=true] wait for the model to be loaded (only for crop and classify)
+ * @param {import('$lib/i18n').Language} [options.language=fr]
  */
-export async function goToTab(page, tabName, { messages: m, waitForModel = true } = {}) {
-	getTab(page, tabName, m).click();
-	const tab = appNavTabs(m)[tabName];
+export async function goToTab(page, tabName, { waitForModel = true, language = 'fr' } = {}) {
+	getTab(page, tabName).click();
+	const tab = appNavTabs(language)[tabName];
 	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
 
 	if (waitForModel && (tabName === 'crop' || tabName === 'classify')) {
 		await expect(page.getByTestId('app-main')).not.toHaveText(
 			makeRegexpUnion(
-				tabName === 'crop' ? fr.loading_cropping_model : fr.loading_classification_model
+				tabName === 'crop'
+					? 'Chargement du modèle de recadrage…'
+					: 'Chargement du modèle de classification'
 			),
 			{
 				timeout: 20_000
@@ -350,10 +361,10 @@ export async function goToTab(page, tabName, { messages: m, waitForModel = true 
  *
  * @param {Page} page
  * @param {'protocol'|'import'|'crop'|'classify'} tabName
- * @param {typeof import('../messages/fr.json')} [m] translations for the tab displayed names
+ * @param {'fr'|'en'} [language=fr]
  */
-export function getTab(page, tabName, m = undefined) {
-	const tab = appNavTabs(m)[tabName];
+export function getTab(page, tabName, language = 'fr') {
+	const tab = appNavTabs(language)[tabName];
 	if (!tab) throw new Error(`Unknown tab: ${tabName}`);
 
 	return page.getByTestId('app-nav').getByRole('link', { name: tab.name });
@@ -570,9 +581,10 @@ export function modal(page, modalTitle) {
 /**
  *
  * @param {Page} page
+ * @param {Parameters<import('playwright').Locator['click']>[0]} [clickOptions]
  */
-export function openSettings(page) {
-	return page.getByTestId('settings-button').click();
+export function openSettings(page, clickOptions) {
+	return page.getByTestId('settings-button').click(clickOptions);
 }
 
 /**
@@ -594,9 +606,9 @@ export function makeRegexpUnion(...parts) {
 	);
 }
 
-export const loadingText = makeRegexpUnion(fr.loading_text, fr.analyzing, fr.queued);
+export const loadingText = makeRegexpUnion('Chargement…', 'Analyse…', 'En attente');
 
-export const loadingNotQueuedText = makeRegexpUnion(fr.loading_text, fr.analyzing);
+export const loadingNotQueuedText = makeRegexpUnion('Chargement…', 'Analyse…');
 
 /**
  *

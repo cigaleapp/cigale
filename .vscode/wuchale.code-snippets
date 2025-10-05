@@ -1,0 +1,37 @@
+{
+	"Wuchale: ignore (JS)": {
+		"scope": "javascript,typescript",
+		"prefix": "wc-ignore",
+		"body": "/* @wc-ignore */"
+	},
+	"Wuchale: ignore (HTML)": {
+		"scope": "svelte",
+		"prefix": "@wc-ignore",
+		"body": "<!-- @wc-ignore -->"
+	},
+	"Wuchale: ignore file (JS)": {
+		"scope": "javascript,typescript",
+		"prefix": "wc-ignore-file",
+		"body": "// @wc-ignore-file"
+	},
+	"Wuchale: ignore file (HTML)": {
+		"scope": "svelte",
+		"prefix": "@wc-ignore-file",
+		"body": "<!-- @wc-ignore-file -->"
+	},
+	"Wuchale: include (JS)": {
+		"scope": "javascript,typescript",
+		"prefix": "wc-include",
+		"body": "/* @wc-include */"
+	},
+	"Wuchale: context (JS)": {
+		"scope": "javascript,typescript",
+		"prefix": "wc-context",
+		"body": "/* @wc-context: $1 */"
+	},
+	"Wuchale: context (HTML)": {
+		"scope": "svelte",
+		"prefix": "@wc-context",
+		"body": "<!-- @wc-context: $1 -->"
+	}
+}

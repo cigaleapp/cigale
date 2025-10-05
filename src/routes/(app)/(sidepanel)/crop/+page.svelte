@@ -6,7 +6,7 @@
 	import { deleteImageFile, imageIsAnalyzed } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations.js';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
@@ -55,11 +55,9 @@
 	<AreaObservations
 		{items}
 		sort={getSettings().gallerySort}
-		groups={[m.with_detections(), m.without_detections()]}
+		groups={['Avec détections', 'Sans détection']}
 		grouping={({ data: images }) =>
-			images.some((img) => uiState.cropMetadataValueOf(img))
-				? m.with_detections()
-				: m.without_detections()}
+			images.some((img) => uiState.cropMetadataValueOf(img)) ? 'Avec détections' : 'Sans détection'}
 	>
 		{#snippet item(images, { id: fileId })}
 			<CardImageFile
@@ -67,7 +65,7 @@
 				{images}
 				boxes="show-all"
 				highlighted={fileId === uiState.imagePreviouslyOpenedInCropper}
-				loadingStatusText={m.analyzing()}
+				loadingStatusText="Analyse…"
 				onretry={() => {
 					uiState.erroredImages.delete(fileId);
 					detectMore([fileId]);
@@ -85,10 +83,8 @@
 	{#if !items.length}
 		<div class="empty">
 			<Logo variant="empty" --size="6em" />
-			<p>{m.no_images()}</p>
-			<ButtonSecondary onclick={() => goto('/import')}>
-				{m.import_tab()}
-			</ButtonSecondary>
+			<p>Aucune image</p>
+			<ButtonSecondary onclick={() => goto('/import')}>Importer</ButtonSecondary>
 		</div>
 	{/if}
 </section>

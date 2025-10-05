@@ -14,7 +14,7 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 	import IconSplit from '~icons/ph/arrows-out-light';
@@ -187,40 +187,40 @@
 					disabled={!canmerge}
 					onclick={onmerge}
 					keyboard="$mod+g"
-					help={m.group_selected_items()}
+					help="Regrouper les images et/ou observations sélectionnées en une observation"
 				>
 					<IconMerge />
-					{m.group()}
+					Regrouper
 				</ButtonSecondary>
 				<ButtonSecondary
 					disabled={!cansplit}
 					onclick={onsplit}
 					keyboard="$mod+Shift+g"
-					help={m.separate_all_selected_help()}
+					help="Séparer toutes les observations sélectionnées en images seules"
 				>
 					<IconSplit />
-					{m.separate()}
+					Séparer
 				</ButtonSecondary>
 			</div>
 		{/if}
 		{#if onimport}
 			<ButtonSecondary onclick={onimport}>
 				<IconImport />
-				{m.import_other_images()}
+				Importer d'autres images
 			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}
 			keyboard="Delete"
-			help={m.delete_selected_images_warning()}
+			help="Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
 			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
 			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
 			--bg-hover={images.length > 0 ? 'var(--bg-error)' : ''}
 			--fg-hover={images.length > 0 ? 'var(--fg-error)' : ''}
 		>
 			<IconDelete />
-			{m.delete_n_images({ count: images.length })}
+			Supprimer {images.length} images
 		</ButtonSecondary>
 	</section>
 </aside>

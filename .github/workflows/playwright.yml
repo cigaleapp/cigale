@@ -3,9 +3,9 @@ name: End-to-end tests
 on:
   push:
     branches: [main]
-    paths: [src/**, tests/**, static/**, '*', messages/fr.json, .github/workflows/playwright.yml]
+    paths: [src/**, tests/**, static/**, '*', src/locales/**, .github/workflows/playwright.yml]
   pull_request:
-    paths: [src/**, tests/**, static/**, '*', messages/fr.json, .github/workflows/playwright.yml]
+    paths: [src/**, tests/**, static/**, '*', src/locales/**, .github/workflows/playwright.yml]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -35,7 +35,7 @@ jobs:
             public
             .svelte-kit
   test:
-    timeout-minutes: 60
+    timeout-minutes: 12
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: prepare

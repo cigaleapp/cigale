@@ -13,7 +13,7 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { m } from '$lib/paraglide/messages.js';
+
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -61,10 +61,11 @@
 		'$mod+s': {
 			help: '',
 			hidden: true,
-			do: () => toasts.info(m.no_need_for_ctrl_s())
+			do: () =>
+				toasts.info('Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎')
 		},
 		'i d e v': {
-			help: m.toggle_debug_mode(),
+			help: 'Activer/Désactiver le debug mode',
 			do: async () => {
 				await setSetting('showTechnicalMetadata', isDebugMode() ? false : true);
 			}

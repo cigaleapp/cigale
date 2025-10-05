@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import fr from '../messages/fr.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/results.js';
 import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
@@ -33,15 +32,17 @@ for (const offline of [false, true]) {
 				await page.getByTestId('settings-button').click();
 				await page
 					.getByTestId('app-settings')
-					.getByRole('button', { name: fr.prepare_for_offline })
+					.getByRole('button', { name: 'Préparation hors-ligne' })
 					.click();
-				await modal(page, fr.prepare_for_offline).getByRole('button', { name: 'Démarrer' }).click();
+				await modal(page, 'Préparation hors-ligne')
+					.getByRole('button', { name: 'Démarrer' })
+					.click();
 
-				await expect(modal(page, fr.prepare_for_offline)).toHaveText(/OK!/, {
+				await expect(modal(page, 'Préparation hors-ligne')).toHaveText(/OK!/, {
 					timeout: 10_000
 				});
 
-				await modal(page, fr.prepare_for_offline)
+				await modal(page, 'Préparation hors-ligne')
 					.getByRole('button', { name: 'Fermer' })
 					.first()
 					.click();
@@ -175,7 +176,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 	await expect(page.getByTestId('sidepanel').getByRole('heading', { level: 2 })).toHaveText(
 		`${imagesCount} images`
 	);
-	await expect(observations).not.toHaveText(new RegExp(fr.retry));
+	await expect(observations).not.toHaveText(new RegExp('Rééssayer'));
 });
 
 test('can import a protocol via ?protocol', async ({ page, context }) => {
@@ -358,23 +359,23 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 		await expector.toHaveText(makeRegexpUnion(text));
 	}
 
-	await setModel('crop', fr.no_inference);
+	await setModel('crop', 'Aucune inférence');
 	await goToTab(page, 'crop');
-	await expectLoadingText(false, fr.loading_cropping_model);
+	await expectLoadingText(false, 'Chargement du modèle de recadrage…');
 
 	await setModel('crop', 'YOLO11');
-	await expectLoadingText(true, fr.loading_cropping_model);
+	await expectLoadingText(true, 'Chargement du modèle de recadrage…');
 	await waitForLoadingEnd(page);
 
-	await setModel('classify', fr.no_inference);
+	await setModel('classify', 'Aucune inférence');
 	await goToTab(page, 'classify');
-	await expectLoadingText(false, fr.loading_classification_model);
+	await expectLoadingText(false, 'Chargement du modèle de classification');
 
 	await setModel('classify', /80 classes/);
-	await expectLoadingText(true, fr.loading_classification_model);
+	await expectLoadingText(true, 'Chargement du modèle de classification');
 	await waitForLoadingEnd(page);
 	await expect(firstObservationCard(page)).not.toHaveText(/Erreur/);
 
 	await setModel('classify', /17000 classes/);
-	await expectLoadingText(true, fr.loading_classification_model);
+	await expectLoadingText(true, 'Chargement du modèle de classification');
 });

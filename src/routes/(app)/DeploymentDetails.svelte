@@ -3,7 +3,6 @@
 	import Datetime from '$lib/Datetime.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 
 	const buildCommit = import.meta.env.buildCommit;
 
@@ -52,32 +51,34 @@
 <Modal
 	key="modal_preview_pr"
 	bind:open
-	title={m.preview_deployment_for_pr_no({ number: previewingPrNumber })}
+	title="Déploiement de preview pour la PR #{previewingPrNumber}"
 >
 	{@const prLink = `https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`}
 	{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/pulls/${previewingPrNumber}`).then( (res) => res.json() )}
 		<p>
-			{@html m.preview_deployment_for_pr_no__html({ number: previewingPrNumber, prLink })}
+			Déploiement de preview pour la <a href={prLink}>PR #{previewingPrNumber}</a>
 		</p>
 	{:then { title, user, body }}
 		{@const issueNumber = /(Closes|Fixes) #(\d+)/i.exec(body)?.[2]}
 		{#if buildCommit}
 			{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/commits/${buildCommit}`).then( (res) => res.json() )}
-				<span class="build-date">{m.loading_text()}</span>
+				<span class="build-date">Chargement…</span>
 			{:then { commit: { committer: { date } } }}
 				<Datetime value={date} show="both" />
 			{/await}
 		{/if}
-		<p>{m.preview_deployment_is_for_loaded_first_part()}</p>
+		<p>Ceci est un déploiement de preview</p>
 		<ul>
 			<li>
-				{@html m.preview_deployment_is_for_loaded_second_part__html({ title, prLink })}
+				<!-- @wc-context: continuation of sentence "deployment PR for..." -->
+				pour la PR <a href={prLink}>#{previewingPrNumber} {title}</a> de
 				{@render githubUser(user)}
 			</li>
 			{#if issueNumber}
 				<li>
 					{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/issues/${issueNumber}`).then( (res) => res.json() ) then { title, number, user, html_url }}
-						{@html m.preview_deployment_for_issue_no__html({ html_url, number, title })}
+						<!-- @wc-context: continuation of sentence "deployment PR for..." -->
+						pour l'issue <a href={html_url}>#{number} {title}</a> de
 						{@render githubUser(user)}
 					{/await}
 				</li>
@@ -96,42 +97,36 @@
 			close?.();
 		}}
 		<ButtonSecondary
-			help={m.preview_deployment_cleanup_database_help()}
+			help="Supprime toutes les données pour ce déploiement de preview"
 			onclick={() => {
 				nukeDatabase();
 				window.location.reload();
 			}}
 		>
-			{m.preview_deployment_cleanup_database()}
+			Nettoyer la base de données
 		</ButtonSecondary>
 
 		<ButtonSecondary
 			onclick={open(`https://github.com/cigaleapp/cigale/pull/${previewingPrNumber}`)}
 		>
-			{m.preview_deployment_view_on_github()}
+			Voir sur Github
 		</ButtonSecondary>
 
 		{#await hasPage('_playwright') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_playwright'))}>
-					{m.preview_deployment_e2e_tests()}
-				</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_playwright'))}>Tests E2E</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_vitest') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_vitest'))}>
-					{m.preview_deployment_unit_tests()}
-				</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary>
 			{/if}
 		{/await}
 
 		{#await hasPage('_coverage') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_coverage'))}>
-					{m.preview_deployment_coverage()}
-				</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_coverage'))}>Coverage</ButtonSecondary>
 			{/if}
 		{/await}
 	{/snippet}

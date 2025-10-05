@@ -488,7 +488,8 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 									([key, { value, confidence, valueLabel }]) => [
 										[
 											metadataPrettyKey(metadataDefinitions[key]),
-											metadataPrettyValue(metadataDefinitions[key], value, valueLabel)
+											// Exports always have english value serializations for better interoperability
+											metadataPrettyValue('en', metadataDefinitions[key], value, valueLabel)
 										],
 										[
 											`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,

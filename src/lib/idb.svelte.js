@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import { idComparator, isReactiveTable, Tables, generateId } from './database.js';
 import * as devalue from 'devalue';
 
+/** @type {number | null} */
 export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
@@ -358,7 +359,7 @@ export async function openDatabase() {
 				}
 			}
 			if (oldVersion === 2) {
-				createTable('ImagePreviewFile', Tables.ImagePreviewFile);
+				createTable(/* @wc-ignore */ 'ImagePreviewFile', Tables.ImagePreviewFile);
 				return;
 			}
 			for (const [tableName, schema] of tablesByName) {

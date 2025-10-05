@@ -4,7 +4,6 @@
 	import { tinykeys } from 'tinykeys';
 	import KeyboardHint from './KeyboardHint.svelte';
 	import Modal, { hasAnyModalOpen } from './Modal.svelte';
-	import { m } from './paraglide/messages.js';
 	import { isDebugMode } from './settings.svelte';
 	import { entries } from './utils';
 
@@ -80,20 +79,14 @@
 		)
 	);
 
-	const GROUPS_ORDER = [
-		m.keyboard_shortcuts_group_cropping(),
-		m.keyboard_shortcuts_group_observations(),
-		m.keyboard_shortcuts_group_general(),
-		m.keyboard_shortcuts_group_navigation(),
-		'Debug mode'
-	];
+	const GROUPS_ORDER = ['Recadrage', 'Observations', 'Général', 'Navigation', 'Debug mode'];
 
 	const bindsByGroup = $derived(
 		entries(
 			entries(binds).reduce((acc, [key, bind]) => {
 				if (bind.hidden) return acc;
 				if (bind.debug && !isDebugMode()) return acc;
-				const group = bind.group ?? m.keyboard_shortcuts_group_general();
+				const group = bind.group ?? 'Général';
 				if (!acc[group]) acc[group] = [];
 				acc[group].push([key, bind]);
 				return acc;
@@ -115,7 +108,7 @@
 	});
 </script>
 
-<Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title={m.keyboard_shortcuts()}>
+<Modal bind:open={openHelp} key="modal_keyboard_shortcuts_help" title="Raccourcis clavier">
 	{#each bindsByGroup as [group, binds] (group)}
 		{#if bindsByGroup.length >= 2}
 			<h2>{group}</h2>
@@ -132,7 +125,7 @@
 		<dl>
 			<div class="empty">
 				<div class="sad">¯\_(ツ)_/¯</div>
-				<p>{m.no_keyboard_shortcuts_for_page()}</p>
+				<p>Aucun raccouci clavier pour cette page</p>
 			</div>
 		</dl>
 	{/each}

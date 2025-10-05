@@ -4,8 +4,8 @@
 import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 import { processExifData } from '$lib/exif';
 import { tables } from '$lib/idb.svelte';
-import { imageId, resizeToMaxSize, storeImageBytes } from '$lib/images';
-import { m } from '$lib/paraglide/messages.js';
+import { errorMessageImageTooLarge, imageId, resizeToMaxSize, storeImageBytes } from '$lib/images';
+
 import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte';
 import * as dates from 'date-fns';
@@ -31,14 +31,14 @@ export const ACCEPTED_IMPORT_TYPES = [
  */
 export async function processImageFile(file, id) {
 	if (!uiState.currentProtocol) {
-		toasts.error(m.no_protocol_selected());
+		toasts.error('Aucun protocole sélectionné');
 		return;
 	}
 
 	const originalBytes = await file.arrayBuffer();
 
 	if (originalBytes.byteLength > imageLimits.maxMemoryUsageInMB * Math.pow(2, 20)) {
-		toasts.error(m.image_too_large(imageLimits));
+		toasts.error(errorMessageImageTooLarge());
 		return;
 	}
 
@@ -69,7 +69,7 @@ export async function processImageFile(file, id) {
 
 	await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch((error) => {
 		console.error(error);
-		toasts.error(m.error_extracting_exif_metadata({ fileName: file.name }));
+		toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);
 	});
 }
 
@@ -81,7 +81,7 @@ export async function processImageFile(file, id) {
  */
 export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	if (!uiState.currentProtocol) {
-		toasts.error(m.no_protocol_selected());
+		toasts.error('Aucun protocole sélectionné');
 		return;
 	}
 
@@ -113,7 +113,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 
 	const { boxes, scores } = await inference.request.catch((error) => {
 		if (/(maxMemoryUsageInMB|maxResolutionInMP) limit exceeded/.test(error?.toString())) {
-			return Promise.reject(new Error(m.image_too_large(imageLimits)));
+			return Promise.reject(new Error(errorMessageImageTooLarge()));
 		}
 
 		return Promise.reject(error);
