@@ -3,7 +3,6 @@
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Modal from '$lib/Modal.svelte';
-	import { m } from '$lib/paraglide/messages';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import IconInfo from '~icons/ph/question';
 
@@ -98,7 +97,7 @@
 	{/snippet}
 </Modal>
 
-<ButtonIcon help={m.learn_more()} onclick={() => open?.()}>
+<ButtonIcon help="En savoir plus" onclick={() => open?.()}>
 	<IconInfo />
 </ButtonIcon>
 
