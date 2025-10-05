@@ -1,6 +1,5 @@
 import { match, type } from 'arktype';
 import { tables } from './idb.svelte.js';
-import { m } from './paraglide/messages.js';
 import { MetadataInferOptionsNeural } from './schemas/metadata.js';
 import { uiState } from './state.svelte.js';
 import { pick, propOrNothing } from './utils.js';
