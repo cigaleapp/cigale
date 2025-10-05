@@ -58,7 +58,6 @@
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest",
 		"wuchale": "wuchale",
-		"postwuchale": "bun scripts/sort-po-files.js",
 		"all-contributors": "all-contributors --files README.md --files README_FR.md"
 	},
 	"lint-staged": {
@@ -141,7 +140,7 @@
 		"@iconify-json/ph": "^1.2.2",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
-		"@wuchale/svelte": "^0.15.1",
+		"@wuchale/svelte": "^0.16.0",
 		"arktype": "^2.1.22",
 		"bits-ui": "^1.8.0",
 		"date-fns": "^4.1.0",
@@ -169,7 +168,7 @@
 		"ulid": "^3.0.1",
 		"unplugin-icons": "^22.3.0",
 		"update-electron-app": "^3.1.1",
-		"wuchale": "^0.16.5",
+		"wuchale": "^0.17.0",
 		"xss": "^1.0.15",
 		"yaml": "^2.8.1"
 	}
