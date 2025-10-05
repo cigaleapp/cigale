@@ -3,14 +3,15 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T00:28:53.296Z\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2025-10-05 01:43+0000\n"
+"Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
+"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Language: en\n"
-"Language-Team: \n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
-"MIME-Version: 1.0\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "(none)"
@@ -18,15 +19,16 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
-msgstr ""
+msgstr "<0/> Auto"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Other photos <1/>"
 
 #: src/routes/(app)/Navigation.svelte
+#, fuzzy
 msgid "<0/> C.i.g.a.l.e."
-msgstr ""
+msgstr "<0/> C.i.g.a.l.e."
 
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> Chargement…"
@@ -69,8 +71,9 @@ msgid "<0/> Importer un protocole"
 msgstr "<0/> Import a protocol"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+#, fuzzy
 msgid "<0/> Invalider"
-msgstr ""
+msgstr "<0/> Mark invalid"
 
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "<0/> Non versionné"
@@ -78,7 +81,7 @@ msgstr "<0/> Not versioned"
 
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> OK!"
-msgstr ""
+msgstr "<0/> OK!"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Recadrages confirmés <1/>"
