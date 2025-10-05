@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T16:12:54.297Z\n"
+"PO-Revision-Date: 2025-10-05T16:15:01.273Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -472,10 +472,6 @@ msgstr "Error while loading classification model"
 msgid "Erreur lors du chargement du modèle de détection"
 msgstr "Error while loading detection model"
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Error out selected cards"
-msgstr ""
-
 #: src/routes/(app)/+layout.svelte
 msgid "Example debug toast"
 msgstr ""
@@ -648,11 +644,6 @@ msgstr "Don't see a protocol you want to use?"
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
 
-#. placeholder {0}: id
-#: src/lib/images.js
-msgid "Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): {0}"
-msgstr ""
-
 #: src/routes/(app)/DownloadResults.svelte
 msgid "Marge autour des images recadrées"
 msgstr "Padding around cropped images"
@@ -727,10 +718,6 @@ msgstr "No"
 #: src/lib/observations.js
 msgid "Nouvelle observation"
 msgstr "New observation"
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Observation is empty (should not happen)"
-msgstr ""
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
@@ -887,10 +874,6 @@ msgstr "Service workers"
 msgid "Sous la supervision de"
 msgstr "Under the supervision of"
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Spawn a loading image"
-msgstr ""
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Studio Lin"
 msgstr "Studio Lin"
@@ -957,10 +940,6 @@ msgstr "Separate all selected observations into individual images"
 msgid "Taille des images"
 msgstr "Images size"
 
-#: src/routes/(app)/about/+page.svelte
-msgid "Task queue"
-msgstr ""
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Tests E2E"
 msgstr "E2E tests"
@@ -996,10 +975,6 @@ msgstr ""
 #: src/routes/(app)/Settings.svelte
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr "Download everything needed to use the application offline. Downloads all models for all currently installed protocols."
-
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Un-error selection"
-msgstr ""
 
 #. placeholder {0}: newVersion
 #: src/lib/ButtonUpdateProtocol.svelte
@@ -1053,17 +1028,6 @@ msgstr "hello there :) <0/> have a great dayyy 💖💖"
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "de"
 msgstr "by"
-
-#: src/lib/Modal.svelte
-#: src/routes/(app)/+layout.svelte
-#: src/routes/(app)/DownloadResults.svelte
-msgid "default"
-msgstr ""
-
-#: src/routes/(app)/DownloadResults.svelte
-#: src/routes/(app)/DownloadResults.svelte
-msgid "exporter"
-msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "github.com/cigaleapp/cigale"
@@ -1125,11 +1089,41 @@ msgstr "<0>INP-ENSEEIHT</0> school project"
 msgid "(aucun)"
 msgstr "(none)"
 
+#: src/routes/(app)/+layout.svelte
+msgid "debug"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Mettre en erreur la sélection"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Enlever les erreurs de la sélection"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Créer une image en chargement"
+msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "File de traitement"
+msgstr ""
+
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
 msgid_plural "Protocole importé\", \"# protocoles importés"
 msgstr[0] ""
 msgstr[1] ""
+
+#. placeholder {0}: id
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+msgid "L'observation {0} est vide"
+msgstr ""
+
+#. placeholder {0}: id
+#: src/lib/images.js
+msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
+msgstr ""
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"

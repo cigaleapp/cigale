@@ -165,7 +165,7 @@
 							imageIds.forEach((id) => uiState.erroredImages.delete(id));
 							classifyMore(imageIds);
 						} else {
-							toasts.error('Observation is empty (should not happen)');
+							toasts.error(`L'observation ${id} est vide`);
 						}
 					}}
 					ondelete={async () => {

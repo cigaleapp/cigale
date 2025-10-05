@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-05T16:12:54.295Z\n"
+"PO-Revision-Date: 2025-10-05T16:15:01.268Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -471,10 +471,6 @@ msgstr "Erreur lors du chargement du modèle de classification"
 msgid "Erreur lors du chargement du modèle de détection"
 msgstr "Erreur lors du chargement du modèle de détection"
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Error out selected cards"
-msgstr "Error out selected cards"
-
 #: src/routes/(app)/+layout.svelte
 msgid "Example debug toast"
 msgstr "Example debug toast"
@@ -647,11 +643,6 @@ msgstr "Le protocole que vous souhaitez n'est pas disponible?"
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
 
-#. placeholder {0}: id
-#: src/lib/images.js
-msgid "Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): {0}"
-msgstr "Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): {0}"
-
 #: src/routes/(app)/DownloadResults.svelte
 msgid "Marge autour des images recadrées"
 msgstr "Marge autour des images recadrées"
@@ -726,10 +717,6 @@ msgstr "Non"
 #: src/lib/observations.js
 msgid "Nouvelle observation"
 msgstr "Nouvelle observation"
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Observation is empty (should not happen)"
-msgstr "Observation is empty (should not happen)"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
@@ -888,10 +875,6 @@ msgstr "Service workers"
 msgid "Sous la supervision de"
 msgstr "Sous la supervision de"
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Spawn a loading image"
-msgstr "Spawn a loading image"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Studio Lin"
 msgstr "Studio Lin"
@@ -958,10 +941,6 @@ msgstr "Séparer toutes les observations sélectionnées en images seules"
 msgid "Taille des images"
 msgstr "Taille des images"
 
-#: src/routes/(app)/about/+page.svelte
-msgid "Task queue"
-msgstr "Task queue"
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Tests E2E"
 msgstr "Tests E2E"
@@ -997,10 +976,6 @@ msgstr ""
 #: src/routes/(app)/Settings.svelte
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
-
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Un-error selection"
-msgstr "Un-error selection"
 
 #. placeholder {0}: newVersion
 #: src/lib/ButtonUpdateProtocol.svelte
@@ -1056,17 +1031,6 @@ msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "de"
 msgstr "de"
-
-#: src/lib/Modal.svelte
-#: src/routes/(app)/+layout.svelte
-#: src/routes/(app)/DownloadResults.svelte
-msgid "default"
-msgstr "default"
-
-#: src/routes/(app)/DownloadResults.svelte
-#: src/routes/(app)/DownloadResults.svelte
-msgid "exporter"
-msgstr "exporter"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "github.com/cigaleapp/cigale"
@@ -1128,10 +1092,40 @@ msgstr "“Projet long” de l'<0>INP-ENSEEIHT</0>"
 msgid "(aucun)"
 msgstr "(aucun)"
 
+#: src/routes/(app)/+layout.svelte
+msgid "debug"
+msgstr "debug"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Mettre en erreur la sélection"
+msgstr "Mettre en erreur la sélection"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Enlever les erreurs de la sélection"
+msgstr "Enlever les erreurs de la sélection"
+
+#: src/routes/(app)/(sidepanel)/+layout.svelte
+msgid "Créer une image en chargement"
+msgstr "Créer une image en chargement"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "File de traitement"
+msgstr "File de traitement"
+
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
 msgid_plural "Protocole importé\", \"# protocoles importés"
 msgstr[0] "Protocole importé\", \"# protocoles importés"
+
+#. placeholder {0}: id
+#: src/routes/(app)/(sidepanel)/classify/+page.svelte
+msgid "L'observation {0} est vide"
+msgstr "L'observation {0} est vide"
+
+#. placeholder {0}: id
+#: src/lib/images.js
+msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
+msgstr "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"

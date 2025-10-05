@@ -1,6 +1,6 @@
 import { minutesToMilliseconds } from 'date-fns';
 import { nanoid } from 'nanoid';
-import { entries, mapValues } from './utils';
+import { entries, mapValues } from './utils.js';
 
 /**
  * @template T

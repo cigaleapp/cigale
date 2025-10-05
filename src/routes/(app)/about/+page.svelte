@@ -145,7 +145,7 @@
 	<dt>Parallélisme</dt>
 	<dd>
 		<dl>
-			<dt>Task queue</dt>
+			<dt>File de traitement</dt>
 			<dd><code>{data.parallelism}</code> max.</dd>
 			<dt>sw&rpc</dt>
 			<dd><code>{data.parallelism}</code> nodes</dd>

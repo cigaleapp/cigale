@@ -80,7 +80,7 @@
 					warn: () => toasts.warn(/* @wc-ignore */ 'Example warning toast'),
 					error: () => toasts.error(/* @wc-ignore */ 'Example error toast'),
 					info: () => toasts.info(/* @wc-ignore */ 'Example info toast'),
-					debug: () => toasts.add(/* @wc-ignore */ 'debug', 'Example debug toast'),
+					debug: () => toasts.add('debug', /* @wc-ignore */ 'Example debug toast'),
 					success: () => toasts.success(/* @wc-ignore */ 'Example success toast')
 				};
 				return [

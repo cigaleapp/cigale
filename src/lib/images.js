@@ -81,7 +81,7 @@ if (import.meta.vitest) {
  */
 function invalidImageIdError(id) {
 	return new Error(
-		`Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): ${id}`
+		`Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : ${id}`
 	);
 }
 

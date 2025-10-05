@@ -78,7 +78,7 @@
 
 	defineKeyboardShortcuts('observations', {
 		'x x': {
-			help: 'Error out selected cards',
+			help: 'Mettre en erreur la sélection',
 			debug: true,
 			do() {
 				for (const id of uiState.selection) {
@@ -87,7 +87,7 @@
 			}
 		},
 		'x u': {
-			help: 'Un-error selection',
+			help: 'Enlever les erreurs de la sélection',
 			debug: true,
 			do() {
 				for (const id of uiState.selection) {
@@ -96,12 +96,13 @@
 			}
 		},
 		'x f': {
-			help: 'Spawn a loading image',
+			help: 'Créer une image en chargement',
 			debug: true,
 			do() {
 				uiState.processing.files.push({
 					id: imageFileId(),
-					name: 'Debug image.jpeg'
+					name: 'Debug image.jpeg',
+					addedAt: new Date()
 				});
 			}
 		},
