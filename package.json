@@ -58,7 +58,8 @@
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest",
 		"wuchale": "wuchale",
-		"postwuchale": "bun scripts/sort-po-files.js"
+		"postwuchale": "bun scripts/sort-po-files.js",
+		"all-contributors": "all-contributors --files README.md --files README_FR.md"
 	},
 	"lint-staged": {
 		"*!(.svelte).{js,ts}": [
@@ -95,6 +96,7 @@
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
 		"@wuchale/vite-plugin": "^0.14.6",
+		"all-contributors-cli": "^6.26.1",
 		"bun": "^1.2.23",
 		"electron": "^38.2.0",
 		"eslint": "^9.36.0",
