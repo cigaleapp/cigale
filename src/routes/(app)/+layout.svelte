@@ -77,11 +77,11 @@
 		Object.fromEntries(
 			/**@type{const}*/ (['warn', 'error', 'info', 'debug', 'success']).map((type) => {
 				const toastFns = {
-					warn: () => toasts.warn('Example warning toast'),
-					error: () => toasts.error('Example error toast'),
-					info: () => toasts.info('Example info toast'),
-					debug: () => toasts.add('debug', 'Example debug toast'),
-					success: () => toasts.success('Example success toast')
+					warn: () => toasts.warn(/* @wc-ignore */ 'Example warning toast'),
+					error: () => toasts.error(/* @wc-ignore */ 'Example error toast'),
+					info: () => toasts.info(/* @wc-ignore */ 'Example info toast'),
+					debug: () => toasts.add(/* @wc-ignore */ 'debug', 'Example debug toast'),
+					success: () => toasts.success(/* @wc-ignore */ 'Example success toast')
 				};
 				return [
 					`t t ${type.charAt(0)}`,

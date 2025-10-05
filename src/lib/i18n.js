@@ -167,17 +167,17 @@ export function errorMessage(error, prefix = '') {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('errorMessage', async () => {
-		expect(errorMessage(new Error('Test error'))).toBe('Test error');
-		expect(errorMessage(new Error('Error: Test error'))).toBe('Test error');
+		expect(errorMessage(new Error('test error'))).toBe('test error');
+		expect(errorMessage(new Error(/* @wc-ignore */ 'Error: test error'))).toBe('test error');
 		expect(errorMessage('string error')).toBe('string error');
 		expect(errorMessage(null)).toBe('Erreur inattendue');
 		expect(errorMessage(undefined)).toBe('Erreur inattendue');
-		expect(errorMessage(new Error('Test'), 'Prefix')).toBe('Prefix: Test');
+		expect(errorMessage(new Error('test'), 'prefix')).toBe('prefix: test');
 
 		// The current implementation overwrites with toString(), so cause isn't used
-		const errorWithCause = new Error('Main error');
-		errorWithCause.cause = new Error('Cause error');
-		expect(errorMessage(errorWithCause)).toBe('Main error');
+		const errorWithCause = new Error('main error');
+		errorWithCause.cause = new Error('cause error');
+		expect(errorMessage(errorWithCause)).toBe('main error');
 	});
 }
 

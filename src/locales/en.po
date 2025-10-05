@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T13:07:36.616Z\n"
+"PO-Revision-Date: 2025-10-05T13:30:56.494Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -480,22 +480,6 @@ msgstr ""
 msgid "Example debug toast"
 msgstr ""
 
-#: src/routes/(app)/+layout.svelte
-msgid "Example error toast"
-msgstr ""
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example info toast"
-msgstr ""
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example success toast"
-msgstr ""
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example warning toast"
-msgstr ""
-
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Exporter"
 msgstr "Export"
@@ -662,10 +646,6 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Les carnets nature de Jessica"
-msgstr ""
-
-#: src/lib/i18n.js
-msgid "Main error"
 msgstr ""
 
 #. placeholder {0}: id
@@ -1070,10 +1050,6 @@ msgstr ""
 #: src/routes/(app)/DeploymentDetails.svelte
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "de"
-msgstr ""
-
-#: src/routes/(app)/+layout.svelte
-msgid "debug"
 msgstr ""
 
 #: src/lib/Modal.svelte

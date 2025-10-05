@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-05T13:07:36.612Z\n"
+"PO-Revision-Date: 2025-10-05T13:30:56.486Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -479,22 +479,6 @@ msgstr "Error out selected cards"
 msgid "Example debug toast"
 msgstr "Example debug toast"
 
-#: src/routes/(app)/+layout.svelte
-msgid "Example error toast"
-msgstr "Example error toast"
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example info toast"
-msgstr "Example info toast"
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example success toast"
-msgstr "Example success toast"
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example warning toast"
-msgstr "Example warning toast"
-
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Exporter"
 msgstr "Exporter"
@@ -662,10 +646,6 @@ msgstr "Le protocole que vous souhaitez n'est pas disponible?"
 #: src/routes/(app)/about/+page.svelte
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
-
-#: src/lib/i18n.js
-msgid "Main error"
-msgstr "Main error"
 
 #. placeholder {0}: id
 #: src/lib/images.js
@@ -1076,10 +1056,6 @@ msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgctxt "continuation of sentence \"deployment PR for...\""
 msgid "de"
 msgstr "de"
-
-#: src/routes/(app)/+layout.svelte
-msgid "debug"
-msgstr "debug"
 
 #: src/lib/Modal.svelte
 #: src/routes/(app)/+layout.svelte
