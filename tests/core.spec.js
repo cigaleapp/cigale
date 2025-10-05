@@ -218,7 +218,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	const cropModel = page.getByRole('radiogroup', { name: "Modèle d'inférence pour la détection" });
 
 	async function reset() {
-		await classificationModel.getByRole('radio', { name: 'Léger' }).click();
+		await classificationModel.getByRole('radio', { name: 'Collemboles' }).click();
 		await cropModel.getByRole('radio', { name: 'YOLO11' }).click();
 		await page.waitForTimeout(500);
 	}
@@ -227,7 +227,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence" [checked]
-	    - radio /Léger/
+	    - radio /Collemboles/
 	`);
 	await expect(cropModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour la détection":
@@ -240,7 +240,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence"
-	    - radio /Léger/ [checked]
+	    - radio /Collemboles/ [checked]
 	`);
 	await expect(cropModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour la détection":
@@ -253,7 +253,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence" [checked]
-	    - radio /Léger/
+	    - radio /Collemboles/
 	`);
 	await expect(cropModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour la détection":
@@ -266,7 +266,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence"
-	    - radio /Léger/ [checked]
+	    - radio /Collemboles/ [checked]
 	`);
 	await expect(cropModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour la détection":
@@ -279,7 +279,7 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	await expect(classificationModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence"
-	    - radio /Léger/ [checked]
+	    - radio /Collemboles/ [checked]
 	`);
 	await expect(cropModel).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour la détection":
@@ -318,7 +318,7 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 	).toMatchAriaSnapshot(`
 	  - radiogroup "Modèle d'inférence pour Espèce":
 	    - radio "Aucune inférence" [checked]
-	    - radio /Léger/
+	    - radio /Collemboles/
 	`);
 	await expect(page.getByRole('radiogroup', { name: "Modèle d'inférence pour la détection" }))
 		.toMatchAriaSnapshot(`
