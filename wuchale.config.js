@@ -8,7 +8,7 @@ export default defineConfig({
 	otherLocales: ['en'],
 	adapters: {
 		main: svelte({
-			heuristic(msg, { call, scope, file }) {
+			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
 				if (file.includes('/_playground/')) return false;
 
 				// Table names
@@ -43,7 +43,7 @@ export default defineConfig({
 				'src/**/+{page,layout}.server.{js,ts}',
 				'src/lib/**.js'
 			],
-			heuristic(msg, { file, call, funcName, ...rest }) {
+			heuristic({ msgStr: [msg], details: { file, funcName, call } }) {
 				// Strings in test files
 				if (file.endsWith('.test.js') || file.endsWith('.test.svelte.js')) return false;
 
