@@ -2,8 +2,9 @@ name: Translations
 
 on:
   push:
-    # TODO remove wuchale branch when merged
-    branches: [main, wuchale]
+    branches-ignore:
+      - renovate/*
+      - dependabot/*
   workflow_dispatch:
     inputs:
       build-image:
@@ -52,7 +53,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
-      - name: Make pwd git-safe (we're root in a container)
+      - name: Make working dir git-safe (we're root in a container)
         run: git config --global --add safe.directory $(pwd)
       - name: Install dependencies
         run: bun install --frozen-lockfile
