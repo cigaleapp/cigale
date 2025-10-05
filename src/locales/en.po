@@ -286,6 +286,10 @@ msgstr "This is a preview deployment"
 msgid "Cependant, les protocoles sont représentables par des fichiers de configuration JSON ou YAML"
 msgstr "However, protocols can be defined by a JSON or YAML configuration file"
 
+#: src/routes/(app)/(sidepanel)/import/+page.svelte
+msgid "Certaines images ont un format de fichier non pris en charge"
+msgstr ""
+
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Chargement de l'image…"
 msgstr "Loading image…"
@@ -1153,6 +1157,10 @@ msgstr "Up to date"
 #: src/routes/(app)/about/+page.svelte
 msgid "À propos"
 msgstr "About"
+
+#: src/routes/test/+page.svelte
+msgid "Ça prend ~40 secondes sur mon PC pour un .CR2 en 4K"
+msgstr ""
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Êtes-vous sûr·e?"
