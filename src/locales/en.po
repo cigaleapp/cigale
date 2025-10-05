@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T16:22:57.901Z\n"
+"PO-Revision-Date: 2025-10-05T23:38:31.611Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1340,9 +1340,11 @@ msgid "Site du protocole"
 msgstr ""
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Nom"
 msgstr ""
 
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Email"
 msgstr ""
@@ -1405,6 +1407,7 @@ msgstr ""
 msgid "Champ EXIF invalide: {0}"
 msgstr ""
 
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Description"
@@ -1557,6 +1560,71 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
 msgid "Option not found"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
+msgid "Supprimer cet·te auteurice"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
+msgid "Ajouter un·e autre"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
+msgid "Addresse email"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
+msgid "Ajouter cet·te auteurice"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1><0>Passer à la v{0}</0></1>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Comparaison avec la version distante..."
+msgstr ""
+
+#. placeholder {0}: error.message
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Erreur lors de la comparaison avec la version distante: {0}"
+msgstr ""
+
+#. placeholder {0}: changes.length
+#. placeholder {1}: hasMore ? '+' : ''
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "Différences avec la version publiée ({0}{1})"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+msgid "<0/> Avant"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+msgid "<0/> Maintenant"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+msgid "Voir la métadonnée"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+msgid "Voir l'option"
+msgstr ""
+
+#. placeholder {0}: piece + 1
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+msgid "N°{0}"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+msgid "Vide"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "<0/> Supprimer cette option"
 msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte
