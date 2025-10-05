@@ -9,7 +9,6 @@
 	import { dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import MetadataBadges from '$lib/MetadataBadges.svelte';
-	import { m } from '$lib/paraglide/messages.js';
 	import { goto, href } from '$lib/paths.js';
 	import { exportProtocol } from '$lib/protocols';
 	import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
@@ -148,7 +147,7 @@
 			<header in:fade>
 				<ButtonInk onclick={() => goto('/protocols')}>
 					<IconBack />
-					{m.back()}
+					Retour
 				</ButtonInk>
 
 				<h1>
@@ -172,7 +171,7 @@
 						}}
 					>
 						<IconExport />
-						{m.export()}
+						Exporter
 					</ButtonInk>
 
 					<ButtonInk
@@ -181,7 +180,7 @@
 						onclick={() => deleteProtocol?.()}
 					>
 						<IconDelete />
-						{m.delete()}
+						Supprimer
 					</ButtonInk>
 				</section>
 			</header>
