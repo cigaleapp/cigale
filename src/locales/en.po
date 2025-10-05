@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-07T21:49:20.516Z\n"
+"PO-Revision-Date: 2025-10-09T00:58:51.523Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -32,6 +32,10 @@ msgstr "<0/> Loading…"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Continuer"
 msgstr "<0/> Continue"
+
+#: src/routes/(app)/+page.svelte
+msgid "<0/> Contribuer à l'amélioration du protocole <1/>"
+msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Créer"
@@ -158,6 +162,10 @@ msgstr "Toggle debug mode"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Activer/désactiver la continuation automatique"
 msgstr "Toggle auto continue"
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Addresse e-mail"
+msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Aides à l'identification"
@@ -384,6 +392,10 @@ msgstr "Create a protocol"
 msgid "Dans le cadre d'un"
 msgstr "As part of"
 
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Date et heure de la modification"
+msgstr ""
+
 #: src/lib/protocols.js
 msgid "Description de la métadonnée"
 msgstr "Metadata description"
@@ -435,6 +447,7 @@ msgstr "Queued"
 
 #: src/lib/Metadata.svelte
 #: src/lib/MetadataCombobox.svelte
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
 msgid "En savoir plus"
 msgstr "Learn more"
 
@@ -521,9 +534,26 @@ msgstr "Host Grotesk"
 msgid "Icônes"
 msgstr "Icons"
 
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Identifiant de la métadonnée ayant été modifiée"
+msgstr ""
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid ""
+"Identifiant et <0>hash</0> du/des fichier(s)\n"
+"photos de l'observation ayant été modifiée"
+msgstr ""
+
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Il est impossible de revenir en arrière après avoir supprimé un protocole."
 msgstr "No undo after deleting a protocol."
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid ""
+"Il n'y a pas besoin d'être connecté·e à Internet au moment où l'on corrige la métadonnée, les\n"
+"corrections sont stockées localement et envoyées au prochain démarrage de l'appli, quand une\n"
+"connexion est disponible."
+msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
@@ -596,6 +626,10 @@ msgstr "Initializing default settings…"
 msgid "Irreprésentable"
 msgstr "Unrepresentable"
 
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "L'entièreté de ces données sont publiquement accessibles à <0/>"
+msgstr ""
+
 #. placeholder {0}: imageLimits.maxResolutionInMP
 #. placeholder {1}: imageLimits.maxMemoryUsageInMB
 #: src/lib/images.js
@@ -661,6 +695,10 @@ msgstr "Mark crop as confirmed and go to next unconfirmed image"
 msgid "Marquer le recadrage comme non confirmé"
 msgstr "Mark image crop as not confirmed"
 
+#: src/routes/(app)/+page.svelte
+msgid "Merci! 😎"
+msgstr ""
+
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Mettre à jour"
 msgstr "Update"
@@ -707,6 +745,10 @@ msgstr "Node.js"
 msgid "Nom de l'observation"
 msgstr "Observation name"
 
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Nom et version du protocole"
+msgstr ""
+
 #: src/lib/MetadataInput.svelte
 msgid "Non"
 msgstr "No"
@@ -739,6 +781,12 @@ msgstr "Parallelism"
 #: src/routes/(app)/+layout.svelte
 msgid "Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎"
 msgstr "No need for Control-S, your changes are saved automatically 😎"
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid ""
+"Pour cela, si vous activez cette option, et quand ce protocole est sélectionné, Cigale enverra\n"
+"les données suivantes au <0>serveur BeamUp à {0}</0>"
+msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
@@ -789,6 +837,13 @@ msgstr ""
 msgid "Préparation hors-ligne"
 msgstr "Prepare for offline use"
 
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid ""
+"Quand une métadonnée est modifiée manuellement après avoir été inférée automatiquement par un\n"
+"modèle, cette correction peut être remontée aux auteurices du protocole pour améliorer les\n"
+"modèles d'inférence."
+msgstr ""
+
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Quitter le mode recadrage"
 msgstr "Exit cropping mode"
@@ -831,6 +886,10 @@ msgstr "Search..."
 msgid "Regrouper les images et/ou observations sélectionnées en une observation"
 msgstr "Group selected images and/or observations into one observation"
 
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Remontée de données d'usage anonymisées"
+msgstr ""
+
 #: src/routes/(app)/about/+page.svelte
 msgid "ResNet50"
 msgstr "ResNet50"
@@ -856,6 +915,10 @@ msgstr "Reset zoom"
 msgid "Rééssayer"
 msgstr "Retry"
 
+#: src/lib/utils.js
+msgid "SHA-1"
+msgstr ""
+
 #: src/routes/(app)/protocols/+page.svelte
 msgid ""
 "Sachant qu'un <0>JSON Schema</0> est déclaré dans ces fichiers,\n"
@@ -865,6 +928,12 @@ msgstr ""
 #: src/routes/(app)/about/+page.svelte
 msgid "Service workers"
 msgstr "Service workers"
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid ""
+"Si vous le souhaitez, vous pouvez aussi renseigner une addresse e-mail, pour éventuellement\n"
+"être contacté·e"
+msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Sous la supervision de"
@@ -980,6 +1049,18 @@ msgstr "A metadata"
 #: src/routes/(app)/DownloadResults.svelte
 msgid "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
 msgstr "A % value means that the padding is relative to the dimensions of each image"
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Valeur, score de confiance et alternatives après modification"
+msgstr ""
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Valeur, score de confiance et alternatives avant modification"
+msgstr ""
+
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "Version actuelle de CIGALE"
+msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Versions"
@@ -1103,6 +1184,10 @@ msgstr "Observation {0} is empty"
 msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 msgstr "Malformed image ID (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 
+#: src/routes/(app)/BeamupConsentLearnMore.svelte
+msgid "OK"
+msgstr ""
+
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé"
 msgid_plural "# protocoles importés"
@@ -1141,3 +1226,7 @@ msgstr "https://ibrahimkactioglu.com/"
 #: src/routes/(app)/about/+page.svelte
 msgid "https://elementtype.co/"
 msgstr "https://elementtype.co/"
+
+#: src/lib/beamup.svelte.js
+msgid "Cigale"
+msgstr ""
