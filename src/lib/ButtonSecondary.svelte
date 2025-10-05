@@ -25,6 +25,7 @@ Available CSS variables:
 	 * @property {string|undefined} [testid] add a data-testid attribute to the button
 	 * @property {boolean} [aria-pressed]
 	 * @property {boolean} [loading] show a loading state while the onlick handler is running
+	 * @property {boolean} [danger=false] use a red color scheme for dangerous actions
 	 */
 </script>
 
@@ -39,6 +40,7 @@ Available CSS variables:
 		children,
 		onclick,
 		disabled = false,
+		danger = false,
 		help,
 		keyboard,
 		testid,
@@ -53,6 +55,7 @@ Available CSS variables:
 <button
 	disabled={disabled || isLoading}
 	class:tight
+	class:danger
 	aria-pressed={ariaPressed}
 	onclick={async (e) => {
 		// Only set isLoading here if the onclick handler does not define its own loadingStarted signal.
@@ -103,6 +106,17 @@ Available CSS variables:
 		gap: 0.5em;
 	}
 
+	button.danger:not(:disabled) {
+		color: var(--fg, var(--fg-error));
+		border-color: var(--fg, var(--fg-error));
+	}
+
+	button.danger:not(:disabled):is(:hover, :focus-visible) {
+		background-color: var(--bg-hover, var(--bg-error));
+		color: var(--fg-hover, var(--fg-error));
+		border-color: var(--fg-hover, var(--fg-error));
+	}
+
 	button.tight {
 		padding: 0.25em 0.5em;
 	}
@@ -112,7 +126,7 @@ Available CSS variables:
 		cursor: not-allowed;
 	}
 
-	button:not(:disabled):is(:hover, :focus-visible) {
+	button:not(:disabled):not(.danger):is(:hover, :focus-visible) {
 		background-color: var(--bg-hover, var(--bg-primary-translucent));
 		color: var(--fg-hover, var(--fg-primary));
 		border-color: var(--fg-hover, var(--bg-primary));

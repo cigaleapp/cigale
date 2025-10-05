@@ -214,10 +214,7 @@
 			onclick={ondelete}
 			keyboard="Delete"
 			help="Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
-			--bg={images.length > 0 ? 'var(--bg-neutral)' : ''}
-			--fg={images.length > 0 ? 'var(--fg-error)' : ''}
-			--bg-hover={images.length > 0 ? 'var(--bg-error)' : ''}
-			--fg-hover={images.length > 0 ? 'var(--fg-error)' : ''}
+			danger
 		>
 			<IconDelete />
 			Supprimer {images.length} images
