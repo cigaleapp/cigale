@@ -645,11 +645,11 @@ if (import.meta.vitest) {
 
 /**
  * @param {typeof import('$lib/schemas/common.js').HTTPRequest.infer} request
- * @param {object} options
+ * @param {object} [options]
  * @param {''|'model'} [options.cacheAs=""]
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
  */
-export async function fetchHttpRequest(request, { cacheAs = '', onProgress }) {
+export async function fetchHttpRequest(request, { cacheAs = '', onProgress } = {}) {
 	let url = new URL(typeof request === 'string' ? request : request.url);
 	const options = typeof request === 'string' ? { headers: {} } : request;
 	if (cacheAs) {
