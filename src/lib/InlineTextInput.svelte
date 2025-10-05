@@ -10,6 +10,7 @@
 	 * @property {boolean} [discreet=false] don't show bottom border until hover/focus
 	 * @property {string | { idle: string; focused: string }} [placeholder] give an object to have a different placeholder when focused
 	 * @property {T} [Type=type.string] arktype Type for the value
+	 * @property {'email' | 'text' | 'password'} [type='text'] input type
 	 * @property {(newValue: T['infer'], setValueTo: (v: string) => void) => void | Promise<void>} onblur also triggered on component unmount
 	 * @property {(err: unknown) => void} [onerror] called if onblur throws
 	 */
@@ -21,6 +22,7 @@
 		value = $bindable(),
 		onblur,
 		placeholder: _placeholder = '',
+		type: inputType = 'text',
 		Type = type.string
 	} = $props();
 
@@ -32,6 +34,7 @@
 </script>
 
 <input
+	type={inputType}
 	aria-label={label}
 	class="inline-input"
 	class:discreet
