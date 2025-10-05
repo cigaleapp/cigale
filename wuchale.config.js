@@ -58,6 +58,9 @@ export default defineConfig({
 				// Probably keyboard shortcuts
 				if (msg.length === 1) return false;
 
+				// Microdiff action types
+				if (['CREATE', 'REMOVE', 'CHANGE'].includes(msg)) return false;
+
 				// Log messages for ProcessingQueue
 				if (file === 'src/lib/queue.svelte.js') {
 					if (call === '[MemberExpression].log') return false;
