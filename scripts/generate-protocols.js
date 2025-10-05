@@ -266,7 +266,7 @@ writeFileSync(
 );
 
 writeFileSync(
-	path.join(here, '../examples/arthropods.cigaleprotocol.light.json'),
+	path.join(here, '../examples/arthropods.light.cigaleprotocol.json'),
 	JSON.stringify(
 		{
 			...protocol,
@@ -274,7 +274,7 @@ writeFileSync(
 			name: `Example: arthropodes (lightweight)`,
 			source: protocol.source.replace(
 				'arthropods.cigaleprotocol.json',
-				'arthropods.cigaleprotocol.light.json'
+				'arthropods.light.cigaleprotocol.json'
 			),
 			learnMore: protocol.learnMore.replace('arthropodsexample', 'arthropodsexamplelight'),
 			metadata: {

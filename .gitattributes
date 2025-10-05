@@ -1,2 +1,3 @@
 *.svelte.js linguist-language=svelte
 *.po diff=podiff
+examples/*.cigaleprotocol.json diff=example-protocols
