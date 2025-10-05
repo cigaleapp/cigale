@@ -1095,29 +1095,31 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Mettre en erreur la sélection"
-msgstr ""
+msgstr "Error out selection"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Enlever les erreurs de la sélection"
-msgstr ""
+msgstr "Remove errors from selection"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Créer une image en chargement"
-msgstr ""
+msgstr "Spawn a loading image"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "File de traitement"
-msgstr ""
+msgstr "Processing queue"
 
 #. placeholder {0}: id
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "L'observation {0} est vide"
-msgstr ""
+msgstr "Observation {0} is empty"
 
 #. placeholder {0}: id
 #: src/lib/images.js
 msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 msgstr ""
+"Malformed image ID (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : "
+"{0}"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
@@ -1127,4 +1129,4 @@ msgstr[1] ""
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"
-msgstr ""
+msgstr "CIGALE"
