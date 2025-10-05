@@ -95,7 +95,7 @@
 		"@types/piexifjs": "^1.0.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
-		"@wuchale/vite-plugin": "^0.14.6",
+		"@wuchale/vite-plugin": "^0.14.7",
 		"all-contributors-cli": "^6.26.1",
 		"bun": "^1.2.23",
 		"electron": "^38.2.0",
