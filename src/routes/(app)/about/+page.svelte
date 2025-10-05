@@ -135,7 +135,7 @@
 							{/if}
 							<code>{swurl}</code>
 						{:else}
-							(none)
+							(aucun)
 						{/each}
 					</dd>
 				{/if}

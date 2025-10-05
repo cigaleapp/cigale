@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T12:59:06.324Z\n"
+"PO-Revision-Date: 2025-10-05T13:07:36.616Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -11,11 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "(none)"
-msgstr ""
+"X-Generator: Poedit 3.7\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -26,7 +22,6 @@ msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Other photos <1/>"
 
 #: src/routes/(app)/Navigation.svelte
-#, fuzzy
 msgid "<0/> C.i.g.a.l.e."
 msgstr "<0/> C.i.g.a.l.e."
 
@@ -71,7 +66,6 @@ msgid "<0/> Importer un protocole"
 msgstr "<0/> Import a protocol"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-#, fuzzy
 msgid "<0/> Invalider"
 msgstr "<0/> Mark invalid"
 
@@ -421,7 +415,7 @@ msgstr "Drop images here…"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Détection & recadrage"
-msgstr ""
+msgstr "Detection & cropping"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Développé par"
@@ -433,7 +427,7 @@ msgstr "Zoom out"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Electron"
-msgstr ""
+msgstr "Electron"
 
 #: src/lib/CardMedia.svelte
 msgid "En attente"
@@ -686,7 +680,7 @@ msgstr "Padding around cropped images"
 #. placeholder {0}: error
 #: src/lib/MetadataCombobox.svelte
 msgid "Markdown invalide: {0}"
-msgstr ""
+msgstr "Invalid markdown: {0}"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Marquer le recadrage comme confirmé"
@@ -1148,6 +1142,10 @@ msgstr ""
 #: src/routes/(app)/about/+page.svelte
 msgid "“Projet long” de l'<0>INP-ENSEEIHT</0>"
 msgstr ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "(aucun)"
+msgstr "(none)"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"

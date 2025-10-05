@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-05T12:59:06.322Z\n"
+"PO-Revision-Date: 2025-10-05T13:07:36.612Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -11,10 +11,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "MIME-Version: 1.0\n"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "(none)"
-msgstr "(none)"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -1151,6 +1147,10 @@ msgstr "Êtes-vous sûr·e?"
 #: src/routes/(app)/about/+page.svelte
 msgid "“Projet long” de l'<0>INP-ENSEEIHT</0>"
 msgstr "“Projet long” de l'<0>INP-ENSEEIHT</0>"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "(aucun)"
+msgstr "(aucun)"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé\", \"# protocoles importés"
