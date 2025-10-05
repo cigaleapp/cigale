@@ -2,9 +2,6 @@ name: Translations
 
 on:
   push:
-    branches-ignore:
-      - renovate/*
-      - dependabot/*
 
 jobs:
   refresh:
