@@ -108,11 +108,11 @@ if (import.meta.vitest) {
 		expect(imageIdToFileId(`${id}_000000`)).toBe(id);
 		expect(imageIdToFileId(`${id}_1234567`)).toBe(id);
 		expect(() => imageIdToFileId(`${id}_${id}_123456`)).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 0001KVE9TGKVKZ3GG307YQ70CZ_0001KVE9TGKVKZ3GG307YQ70CZ_123456]`
+			`[Error: Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : 0001KVE9TGKVKZ3GG307YQ70CZ_0001KVE9TGKVKZ3GG307YQ70CZ_123456]`
 		);
 		expect(imageIdToFileId(undefined)).toBeUndefined();
 		expect(() => imageIdToFileId('000001')).toThrowErrorMatchingInlineSnapshot(
-			`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): 000001]`
+			`[Error: Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : 000001]`
 		);
 	});
 }
@@ -399,7 +399,7 @@ if (import.meta.vitest) {
 		});
 		test('throws on malformed IDs', () => {
 			expect(() => parseImageId('coming in hot!!!')).toThrowErrorMatchingInlineSnapshot(
-				`[Error: Malformed image id (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn): coming in hot!!!]`
+				`[Error: Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : coming in hot!!!]`
 			);
 		});
 
