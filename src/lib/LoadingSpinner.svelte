@@ -1,3 +1,11 @@
+<!-- 
+ 
+@component
+CSS Variables: `--size` (default: `1em`)
+
+
+-->
+
 <script>
 	/**
 	 * @typedef Props
