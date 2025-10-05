@@ -3,15 +3,15 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T13:30:56.494Z\n"
+"PO-Revision-Date: 2025-10-05 13:32+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
-"Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"MIME-Version: 1.0\n"
-"X-Generator: Poedit 3.7\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -452,7 +452,7 @@ msgstr "Unexpected error"
 #. placeholder {0}: file.name
 #: src/lib/import.svelte.js
 msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
-msgstr ""
+msgstr "Error while extracting EXIF metadata for {0}"
 
 #. placeholder {0}: e
 #: src/routes/(app)/+page.svelte
@@ -462,7 +462,7 @@ msgstr "Error while importing remote protocol: {0}"
 #. placeholder {0}: error
 #: src/lib/MetadataCombobox.svelte
 msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
-msgstr ""
+msgstr "Error while getting cascaded labels: {0}"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Erreur lors du chargement du modèle de classification"
@@ -531,7 +531,7 @@ msgstr ""
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Il est impossible de revenir en arrière après avoir supprimé un protocole."
-msgstr ""
+msgstr "No undo after deleting a protocol."
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
@@ -609,11 +609,14 @@ msgstr ""
 #: src/lib/images.js
 msgid "L'image est trop grande pour être traitée. Elle doit faire moins de {0} Megapixels et {1} Mo"
 msgstr ""
+"Image is too large to be processed. Images must be less than {0} Megapixels "
+"and {1} MB"
 
 #. placeholder {0}: imageId
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "L'image {0} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine"
 msgstr ""
+"Image {0} has no alternative crop values, unable to revert to original crop"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Langue"
@@ -629,16 +632,18 @@ msgstr ""
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole actuel est {2}"
 msgstr ""
+"Analyis file of {0} has been exported with protocol {1}, but current "
+"protocol is {2}"
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
-msgstr ""
+msgstr "Analysis file of {0} is not valid JSON or is corrupted"
 
 #. placeholder {0}: newVersion
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Le protocole est à jour (v{0}). Cliquer pour vérifier à nouveau"
-msgstr ""
+msgstr "Protocol is up to date (v{0}). Click to verify again"
 
 #: src/routes/(app)/+page.svelte
 msgid "Le protocole que vous souhaitez n'est pas disponible?"
@@ -668,7 +673,7 @@ msgstr "Mark image crop as confirmed"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
-msgstr ""
+msgstr "Mark crop as confirmed and go to next unconfirmed image"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Marquer le recadrage comme non confirmé"
@@ -706,7 +711,7 @@ msgstr ""
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Métadonées mise à jour à la sélection de cette option"
-msgstr ""
+msgstr "Metadata updated when selecting this option"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
@@ -755,7 +760,7 @@ msgstr ""
 
 #: src/routes/(app)/+layout.svelte
 msgid "Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎"
-msgstr ""
+msgstr "No need for Control-S, your changes are saved automatically 😎"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
@@ -946,7 +951,7 @@ msgstr "Select a box with 1 to 9 to edit it with keyboard shortcuts"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
-msgstr ""
+msgstr "Select one or more images to see and edit their metadata"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
@@ -990,6 +995,8 @@ msgid ""
 "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne.\n"
 "Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr ""
+"Download all needed resources for offline usage.\n"
+"Downloads all neural network models for all installed protocols."
 
 #: src/routes/(app)/Settings.svelte
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
@@ -1002,7 +1009,7 @@ msgstr ""
 #. placeholder {0}: newVersion
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Une mise à jour vers la v{0} est disponible"
-msgstr ""
+msgstr "Update to v{0} is available"
 
 #: src/lib/protocols.js
 msgid "Une métadonnée"
@@ -1044,7 +1051,7 @@ msgstr "Zoom in"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
-msgstr ""
+msgstr "hello there :) <0/> have a great dayyy 💖💖"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -1070,6 +1077,8 @@ msgstr ""
 #: src/routes/(app)/about/+page.svelte
 msgid "par <0>Doğukan Karapınar</0> et <1>İbrahim Kaçtıoğlu</1>, chez <2>Element Type Foundry</2>"
 msgstr ""
+"by <0>Doğukan Karapınar</0> and <1>İbrahim Kaçtıoğlu</1> from <2>Element "
+"Type Foundry</2>"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgctxt "continuation of sentence \"deployment PR for...\""
