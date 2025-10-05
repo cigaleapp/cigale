@@ -13,4 +13,4 @@ Ces divers scripts sont lancés chaque semaine par [un workflow Github Actions](
 
 ## Protocoles: arthropods.example.light
 
-Généré comme [`arthropods.example`](#protocoles-arthropodsexample), mais avec seulement les métadonnées pouvant être inférées par le réseau neuronal de classification "léger" (~80 espèces). Le fichier est bien plus petit (~40 ko contre ~4.5 Mo pour `arthropods.example`), et est par exemple utilisé pour accélérer les [tests d'intégration](../.github/workflows/playwright.yml)
+Généré comme [`arthropods.example`](#protocoles-arthropodsexample), mais avec seulement les métadonnées pouvant être inférées par le réseau neuronal de classification "collemboles" (~80 espèces). Le fichier est bien plus petit (~40 ko contre ~4.5 Mo pour `arthropods.example`), et est par exemple utilisé pour accélérer les [tests d'intégration](../.github/workflows/playwright.yml)
