@@ -1,6 +1,6 @@
 import extract from 'extract-zip';
-import path from 'node:path';
 import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
@@ -22,7 +22,9 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'debugsquare.png');
 
-	await page.locator('nav').getByRole('link', { name: 'Recadrer' }).click();
+	await goToTab(page, 'crop');
+	// Reduce flakiness
+	await page.waitForTimeout(1_000);
 	await firstObservationCard(page).click();
 	await page.getByRole('button', { name: "Choisir l'outil 2 points" }).click();
 	// TODO fix coordinates for WebKit, current snapshots is off-center
