@@ -2,7 +2,8 @@ name: Translations
 
 on:
   push:
-    branches: [main]
+    # TODO remove wuchale branch when merged
+    branches: [main, wuchale]
   workflow_dispatch:
     inputs:
       build-image:
@@ -57,18 +58,11 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Run wuchale to update .po files
         run: bun wuchale --clean
-      - name: Check if changes are only revision-date or references
-        id: check-changes
-        run: |
-          if git diff -I PO-Revision-Date -I '^#: ' --exit-code; then
-            echo "No meaningful changes in .po files"
-            echo "meaningful=false" >> $GITHUB_OUTPUT
-          else
-            echo "Meaningful changes detected in .po files"
-            echo "meaningful=true" >> $GITHUB_OUTPUT
-          fi
-      - if: steps.check-changes.outputs.meaningful == 'true'
-        name: Commit changes
+      - name: Setup .po diffing
+        run: git config diff.podiff.command "$command"
+        env:
+          command: podiff -D -u -D '-I Po-Revision-Date' -L
+      - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: 🌐 Refresh translation files [ci skip]
