@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T12:21:21.390Z\n"
+"PO-Revision-Date: 2025-10-05 12:58+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
-"Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"MIME-Version: 1.0\n"
 "X-Generator: Weblate 5.12.2\n"
 
 #: src/routes/(app)/about/+page.svelte
@@ -44,11 +44,11 @@ msgstr "<0/> Create"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Format JSON"
-msgstr ""
+msgstr "<0/> JSON format"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Format YAML"
-msgstr ""
+msgstr "<0/> YAML format"
 
 #: src/routes/(app)/+page.svelte
 msgid "<0/> Gérer les protocoles"
@@ -127,27 +127,27 @@ msgstr "<0/> Mark as valid"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> max."
-msgstr ""
+msgstr "<0/> max."
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> nodes"
-msgstr ""
+msgstr "<0/> nodes"
 
 #: src/routes/(app)/DownloadResults.svelte
 msgid "<0/> results.zip"
-msgstr ""
+msgstr "<0/> results.zip"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> threads"
-msgstr ""
+msgstr "<0/> threads"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0>Phosphor Icons</0> par <1>Helena Zhang</1> et <2>Tobias Fried</2>"
-msgstr ""
+msgstr "<0>Phosphor Icons</0> by <1>Helena Zhang</1> and <2>Tobias Fried</2>"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "API de GBIF"
-msgstr ""
+msgstr "GBIF API"
 
 #: src/routes/+error.svelte
 msgid "ATTENTION: SUPPRIME TOUTES VOS DONNÉES"
@@ -167,11 +167,11 @@ msgstr "Toggle auto continue"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Aides à l'identification"
-msgstr ""
+msgstr "Identification guides"
 
 #: src/lib/Metadata.svelte
 msgid "Alternatives"
-msgstr ""
+msgstr "Alternatives"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
@@ -180,22 +180,22 @@ msgstr "Analyzing…"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
-msgstr ""
+msgstr "Cancel"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Arbre taxonomique"
-msgstr ""
+msgstr "Taxonomic tree"
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Aucun fichier d'analyse trouvé dans l'export {0}"
-msgstr ""
+msgstr "No analysis file found in export {0}"
 
 #. placeholder {0}: uiState.selectedClassificationModel
 #. placeholder {1}: uiState.currentProtocol.name
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Aucun paramètre d'inférence défini pour le modèle {0} sur le protocole {1}"
-msgstr ""
+msgstr "No inference parameters defined for model {0} on protocol {1}"
 
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
@@ -209,7 +209,7 @@ msgstr "No keyboard shortcuts for this page"
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Aucun résultat :/"
-msgstr ""
+msgstr "No results :/"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
@@ -220,36 +220,38 @@ msgstr "No images"
 #: src/lib/results.svelte.js
 msgid "Aucune image trouvée dans l'export {0}. L'export doit contenir les images originales, pas seulement les images recadrées"
 msgstr ""
+"No image found in export {0}. The export needs to include original images "
+"too, not just the cropped ones"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #. placeholder {0}: user.login
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Avatar de {0}"
-msgstr ""
+msgstr "{0}'s avatar"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Avec les données"
-msgstr ""
+msgstr "With data"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Avec les modèles"
-msgstr ""
+msgstr "With models"
 
 #. placeholder {0}: i + 1
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Boîte #{0}"
-msgstr ""
+msgstr "Box #{0}"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "C.i.g.a.l.e."
-msgstr ""
+msgstr "C.i.g.a.l.e."
 
 #: src/routes/(app)/Settings.svelte
 msgid "CIGALE ver. <0/> · <1>À propos</1>"
-msgstr ""
+msgstr "CIGALE ver. <0/> · <1>About</1>"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Cacher les boîtes non sélectionnées"
@@ -260,6 +262,9 @@ msgid ""
 "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
 "suivante: <0/> <1>Importation en cours...</1>"
 msgstr ""
+"This links points to a remote protocol. Do you want to import it? It's "
+"located at the following\n"
+"address: <0/> <1>Importing...</1>"
 
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
@@ -273,6 +278,8 @@ msgstr "This protocol does not support update checking"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Ce protocole ne supported pas la validation des recadrages (voir crop.confirmationMetadata dans la définition du protocole)"
 msgstr ""
+"This protocol does not support marking crops as confirmed (see "
+"crop.confirmationMetadata in the protocol's definition)"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Ceci est un déploiement de preview"
@@ -280,19 +287,19 @@ msgstr "This is a preview deployment"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Cependant, les protocoles sont représentables par des fichiers de configuration JSON ou YAML"
-msgstr ""
+msgstr "However, protocols can be defined by a JSON or YAML configuration file"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Chargement de l'image…"
-msgstr ""
+msgstr "Loading image…"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Chargement des dépendances…"
-msgstr ""
+msgstr "Loading dependencies…"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Chargement des options…"
-msgstr ""
+msgstr "Loading options…"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "Chargement du modèle de classification"
@@ -332,7 +339,7 @@ msgstr "Choose a protocol"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Chrome"
-msgstr ""
+msgstr "Chrome"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/about/+page.svelte
@@ -342,6 +349,7 @@ msgstr "Classification"
 #: src/routes/(app)/about/+page.svelte
 msgid "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune"
 msgstr ""
+"Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Classifier <0/>"
@@ -357,11 +365,11 @@ msgstr "Click or drop images, or an export of results (.zip)"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Code source"
-msgstr ""
+msgstr "Source code"
 
 #: src/routes/_colors/+page.svelte
 msgid "Color Palette"
-msgstr ""
+msgstr "Color Palette"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Confirmé"
@@ -374,7 +382,7 @@ msgstr "Continue"
 #. placeholder {0}: name
 #: src/routes/_colors/+page.svelte
 msgid "Copier var(--{0})"
-msgstr ""
+msgstr "Copy var(--{0})"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Coverage"
@@ -390,11 +398,11 @@ msgstr "As part of"
 
 #: src/lib/protocols.js
 msgid "Description de la métadonnée"
-msgstr ""
+msgstr "Metadata description"
 
 #: src/lib/protocols.js
 msgid "Description de mon protocole"
-msgstr ""
+msgstr "Protocol description"
 
 #: src/lib/MetadataInput.svelte
 msgid "Décrémenter"
@@ -406,7 +414,7 @@ msgstr "Start"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Déploiement de preview pour la <0>PR #{0}</0>"
-msgstr ""
+msgstr "Preview deployment for <0>PR #{0}</0>"
 
 #. placeholder {0}: previewingPrNumber
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -415,7 +423,7 @@ msgstr "Preview deployment for PR #{0}"
 
 #: src/lib/Dropzone.svelte
 msgid "Déposer des images ici…"
-msgstr ""
+msgstr "Drop images here…"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Détection & recadrage"
