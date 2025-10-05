@@ -1,3 +1,48 @@
+<script module>
+	/**
+	 * @param {string} key
+	 * @param {string} label
+	 */
+	export async function onDeleteOption(key, label) {
+		const options = page.data.options ?? [];
+		const option = structuredClone(options.find((o) => o.key === key));
+		if (!option) throw error(404, `Option avec clé ${key} introuvable`);
+
+		page.data.options = options.filter((o) => o.key !== key);
+
+		const wasOnOptionPage =
+			page.route.id === '/(app)/protocols/[id]/metadata/[metadata]/options/[option]' &&
+			page.params.option === key;
+
+		if (wasOnOptionPage) {
+			await goto('/(app)/protocols/[id]/metadata/[metadata]/options', {
+				id: page.params.id ?? '',
+				metadata: page.params.metadata ?? ''
+			});
+		}
+
+		toasts.withUndo('info', `Option ${label || key} supprimée`, {
+			async commit() {
+				await drop('MetadataOption', option.id);
+			},
+			async undo() {
+				// We're within a async callback, Svelte won't track reactive
+				// state changes here, so we invalidate options instead of just
+				// re-adding to the writable $derived options state variable
+				await invalidate(dependencyURI('Metadata', page.data.metadata.id, 'options'));
+				// Go back to the option page if we were on it before
+				if (wasOnOptionPage) {
+					await goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
+						id: page.params.id ?? '',
+						metadata: page.params.metadata ?? '',
+						option: key
+					});
+				}
+			}
+		});
+	}
+</script>
+
 <script>
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
@@ -17,7 +62,10 @@
 	import IconClose from '~icons/ph/x';
 
 	const { data, children } = $props();
-	let options = $derived(data.options ?? []);
+
+	// We don't use $props()'s data, so that we can reactively update options from another page,
+	// see onDeleteOption above
+	let options = $derived(page.data.options ?? []);
 
 	let q = $state('');
 
@@ -62,27 +110,6 @@
 		} catch (error) {
 			toasts.error(errorMessage(error, "Impossible de créer l'option"));
 		}
-	}
-
-	/**
-	 * @param {string} key
-	 * @param {string} label
-	 */
-	async function onDeleteOption(key, label) {
-		const option = structuredClone(options.find((o) => o.key === key));
-		if (!option) throw error(404, `Option avec clé ${key} introuvable`);
-
-		options = options.filter((o) => o.key !== key);
-
-		toasts.withUndo('info', `Option ${label || key} supprimée`, {
-			undo: async () => {
-				// We're within a async callback, Svelte won't track reactive
-				// state changes here, so we invalidate options instead of just
-				// re-adding to the writable $derived options state variable
-				await invalidate(dependencyURI('Metadata', data.metadata.id, 'options'));
-			},
-			commit: async () => drop('MetadataOption', option.id)
-		});
 	}
 </script>
 
