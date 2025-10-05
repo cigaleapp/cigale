@@ -25,6 +25,8 @@
 		const { host, protocol } = new URL(config.origin);
 		return `${protocol}//${host}`;
 	});
+
+	const publicDataUrl = $derived(new URL(`/corrections/${protocol}`, config.origin));
 </script>
 
 <Modal
@@ -65,9 +67,9 @@
 	<p>
 		L'entièreté de ces données sont publiquement accessibles à <a
 			target="_blank"
-			href="{config.origin}/corrections/{protocol}"
+			href={publicDataUrl.href}
 		>
-			{config.origin}/corrections/{protocol}
+			{publicDataUrl.href}
 		</a>
 	</p>
 	<section class="email">
