@@ -43,6 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: read
     container:
       image: ghcr.io/cigaleapp/cigale/i18n:latest
     steps:
@@ -58,18 +59,24 @@ jobs:
       - name: Setup .po diffing
         run: git config diff.podiff.command "$command"
         env:
-          command: podiff -D -u -D '-I PO-Revision-Date' -L
+          command: podiff
+            -D -u
+            -D '-I PO-Revision-Date'
+            -D '-I Language-Team'
+            -D '-I MIME-Version'
+            -L
       - name: Check for changes
         id: status
         run: |
-          git diff
+          git diff | grep -v '^index ' || echo "No changes"
+          git diff | grep -q -v '^index ' && echo "Changes detected" || echo "No changes"
           # for some reason, empty diff with podiff still returns status 1, and "index ....." lines
           # so we don't use --exit-code, but we | grep -v ^index instead
-          echo dirty=$(git diff | grep -v '^index ' && echo "true" || echo "false") >> $GITHUB_OUTPUT
+          echo dirty=$(git diff | grep -q -v '^index ' && echo "true" || echo "false") >> $GITHUB_OUTPUT
       - if: steps.status.outputs.dirty == 'true'
         name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          commit_message: 🌐 Refresh translation files [ci skip]
+          commit_message: 🌐 Refresh translation files
           commit_options: --no-verify
           file_pattern: src/locales/*.po
