@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-05T16:15:01.268Z\n"
+"PO-Revision-Date: 2025-10-05T16:16:47.163Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1112,11 +1112,6 @@ msgstr "Créer une image en chargement"
 msgid "File de traitement"
 msgstr "File de traitement"
 
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Protocole importé\", \"# protocoles importés"
-msgid_plural "Protocole importé\", \"# protocoles importés"
-msgstr[0] "Protocole importé\", \"# protocoles importés"
-
 #. placeholder {0}: id
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "L'observation {0} est vide"
@@ -1126,6 +1121,11 @@ msgstr "L'observation {0} est vide"
 #: src/lib/images.js
 msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 msgstr "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Protocole importé\", \"# protocoles importés"
+msgid_plural "Protocole importé\", \"# protocoles importés"
+msgstr[0] "Protocole importé\", \"# protocoles importés"
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"

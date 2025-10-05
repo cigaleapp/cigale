@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T16:15:01.273Z\n"
+"PO-Revision-Date: 2025-10-05T16:16:47.165Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1109,12 +1109,6 @@ msgstr ""
 msgid "File de traitement"
 msgstr ""
 
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Protocole importé\", \"# protocoles importés"
-msgid_plural "Protocole importé\", \"# protocoles importés"
-msgstr[0] ""
-msgstr[1] ""
-
 #. placeholder {0}: id
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 msgid "L'observation {0} est vide"
@@ -1124,6 +1118,12 @@ msgstr ""
 #: src/lib/images.js
 msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid "Protocole importé\", \"# protocoles importés"
+msgid_plural "Protocole importé\", \"# protocoles importés"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"
