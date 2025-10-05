@@ -94,6 +94,7 @@ msgstr "<0/> Rééssayer"
 
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+#: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Supprimer"
 msgstr "<0/> Supprimer"
 
@@ -163,6 +164,7 @@ msgstr "Alternatives"
 msgid "Analyse…"
 msgstr "Analyse…"
 
+#: src/lib/toasts.svelte.js
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -1086,29 +1088,35 @@ msgstr "Créer"
 msgid "Modifier"
 msgstr "Modifier"
 
-#~ msgid "<0/> Métadonnée “{0}” introuvable"
-#~ msgstr "<0/> Métadonnée “{0}” introuvable"
+#. placeholder {0}: page.params.metadata
+#: src/routes/(app)/protocols/[id]/+error.svelte
+msgid "<0/> Métadonnée “{0}” introuvable"
+msgstr "<0/> Métadonnée “{0}” introuvable"
 
 #. placeholder {0}: page.params.id
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Protocole {0}"
 msgstr "Protocole {0}"
 
-#~ msgid "<0/> Retour"
-#~ msgstr "<0/> Retour"
+#: src/routes/(app)/protocols/[id]/+layout.svelte
+msgid "<0/> Retour"
+msgstr "<0/> Retour"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "ID du protocole"
 msgstr "ID du protocole"
 
-#~ msgid "<0/> Exporter"
-#~ msgstr "<0/> Exporter"
+#: src/routes/(app)/protocols/[id]/+layout.svelte
+msgid "<0/> Exporter"
+msgstr "<0/> Exporter"
 
-#~ msgid "Retour aux protocoles"
-#~ msgstr "Retour aux protocoles"
+#: src/routes/(app)/protocols/[id]/+layout.svelte
+msgid "Retour aux protocoles"
+msgstr "Retour aux protocoles"
 
-#~ msgid "Ajouter une métadonnée"
-#~ msgstr "Ajouter une métadonnée"
+#: src/routes/(app)/protocols/[id]/+layout.svelte
+msgid "Ajouter une métadonnée"
+msgstr "Ajouter une métadonnée"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/+layout.svelte
@@ -1125,8 +1133,10 @@ msgstr "Supprimer la métadonnée"
 
 #. placeholder {0}: errorMessage(err)
 #. placeholder {0}: errorMessage(err)
+#. placeholder {0}: errorMessage(err)
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
+#: src/routes/(app)/protocols/[id]/updater.svelte.js
 msgid "Impossible de sauvegarder : {0}"
 msgstr "Impossible de sauvegarder : {0}"
 
@@ -1229,6 +1239,46 @@ msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "cx | Coordonnée X du point central"
+msgstr "cx | Coordonnée X du point central"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "cy | Coordonée Y du point central"
+msgstr "cy | Coordonée Y du point central"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "sy | Coordonée Y du point supérieur gauche"
+msgstr "sy | Coordonée Y du point supérieur gauche"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "sx | Coordonée X du point supérieur gauche"
+msgstr "sx | Coordonée X du point supérieur gauche"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "ex | Coordonée X du point inférieur droit"
+msgstr "ex | Coordonée X du point inférieur droit"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "ey | Coordonée Y du point inférieur droit"
+msgstr "ey | Coordonée Y du point inférieur droit"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "w | Largeur de la boîte englobante"
+msgstr "w | Largeur de la boîte englobante"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "h | Hauteur de la boîte englobante"
+msgstr "h | Hauteur de la boîte englobante"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "score | Score de confiance de cette boîte, entre 0 et 1"
+msgstr "score | Score de confiance de cette boîte, entre 0 et 1"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "_ | Autre valeur (ignorée par CIGALE)"
+msgstr "_ | Autre valeur (ignorée par CIGALE)"
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Aucun modèle de recadrage défini."
 msgstr "Aucun modèle de recadrage défini."
 
@@ -1273,8 +1323,9 @@ msgstr "Résultats.zip"
 msgid "Informations sur le protocole"
 msgstr "Informations sur le protocole"
 
-#~ msgid "Description du protocole..."
-#~ msgstr "Description du protocole..."
+#: src/routes/(app)/protocols/[id]/infos/+page.svelte
+msgid "Description du protocole..."
+msgstr "Description du protocole..."
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Site du protocole"
@@ -1503,57 +1554,6 @@ msgstr "Metadata {0} for protocol {1} not found"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
 msgid "Option not found"
 msgstr "Option not found"
-
-#~ msgid "Supprimer cet·te auteurice"
-#~ msgstr "Supprimer cet·te auteurice"
-
-#~ msgid "Ajouter un·e autre"
-#~ msgstr "Ajouter un·e autre"
-
-#~ msgid "Addresse email"
-#~ msgstr "Addresse email"
-
-#~ msgid "Ajouter cet·te auteurice"
-#~ msgstr "Ajouter cet·te auteurice"
-
-#~ msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1><0>Passer à la v{0}</0></1>"
-#~ msgstr "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1><0>Passer à la v{0}</0></1>"
-
-#~ msgid "<0/> Comparaison avec la version distante..."
-#~ msgstr "<0/> Comparaison avec la version distante..."
-
-#~ msgid "<0/> Erreur lors de la comparaison avec la version distante: {0}"
-#~ msgstr "<0/> Erreur lors de la comparaison avec la version distante: {0}"
-
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-msgid "<0/> Avant"
-msgstr "<0/> Avant"
-
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-msgid "<0/> Maintenant"
-msgstr "<0/> Maintenant"
-
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-msgid "Voir la métadonnée"
-msgstr "Voir la métadonnée"
-
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-msgid "Voir l'option"
-msgstr "Voir l'option"
-
-#. placeholder {0}: piece + 1
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-msgid "N°{0}"
-msgstr "N°{0}"
-
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-msgid "Vide"
-msgstr "Vide"
-
-#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
-msgid "<0/> Supprimer cette option"
-msgstr "<0/> Supprimer cette option"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé"
