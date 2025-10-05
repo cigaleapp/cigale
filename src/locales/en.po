@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T11:47:41.416Z\n"
+"PO-Revision-Date: 2025-10-05T12:21:21.390Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1080,12 +1080,12 @@ msgstr ""
 msgid "debug"
 msgstr ""
 
+#: src/lib/Modal.svelte
 #: src/routes/(app)/+layout.svelte
 #: src/routes/(app)/DownloadResults.svelte
 msgid "default"
 msgstr ""
 
-#: src/routes/(app)/DownloadResults.svelte
 #: src/routes/(app)/DownloadResults.svelte
 #: src/routes/(app)/DownloadResults.svelte
 msgid "exporter"
