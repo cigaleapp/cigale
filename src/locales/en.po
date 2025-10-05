@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05 13:32+0000\n"
+"PO-Revision-Date: 2025-10-05T13:50:24.191Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
-"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Language: en\n"
-"MIME-Version: 1.0\n"
+"Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
 "X-Generator: Weblate 5.12.2\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
@@ -608,15 +608,12 @@ msgstr ""
 #. placeholder {1}: imageLimits.maxMemoryUsageInMB
 #: src/lib/images.js
 msgid "L'image est trop grande pour être traitée. Elle doit faire moins de {0} Megapixels et {1} Mo"
-msgstr ""
-"Image is too large to be processed. Images must be less than {0} Megapixels "
-"and {1} MB"
+msgstr "Image is too large to be processed. Images must be less than {0} Megapixels and {1} MB"
 
 #. placeholder {0}: imageId
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "L'image {0} n'a pas de recadrage alternatif, impossible de revenir au recadrage d'origine"
-msgstr ""
-"Image {0} has no alternative crop values, unable to revert to original crop"
+msgstr "Image {0} has no alternative crop values, unable to revert to original crop"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Langue"
@@ -631,9 +628,7 @@ msgstr ""
 #. placeholder {2}: protocolId
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole actuel est {2}"
-msgstr ""
-"Analyis file of {0} has been exported with protocol {1}, but current "
-"protocol is {2}"
+msgstr "Analyis file of {0} has been exported with protocol {1}, but current protocol is {2}"
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
@@ -1076,9 +1071,7 @@ msgstr ""
 
 #: src/routes/(app)/about/+page.svelte
 msgid "par <0>Doğukan Karapınar</0> et <1>İbrahim Kaçtıoğlu</1>, chez <2>Element Type Foundry</2>"
-msgstr ""
-"by <0>Doğukan Karapınar</0> and <1>İbrahim Kaçtıoğlu</1> from <2>Element "
-"Type Foundry</2>"
+msgstr "by <0>Doğukan Karapınar</0> and <1>İbrahim Kaçtıoğlu</1> from <2>Element Type Foundry</2>"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgctxt "continuation of sentence \"deployment PR for...\""
