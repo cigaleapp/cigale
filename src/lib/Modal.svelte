@@ -21,6 +21,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	import ButtonIcon from './ButtonIcon.svelte';
 	import { getSettings } from './settings.svelte';
 	import { insideBoundingClientRect } from './utils';
+	import ModalToasts from './ModalToasts.svelte';
+	import { toasts } from '$lib/toasts.svelte.js';
 
 	/**
 	 * @typedef Props
@@ -31,6 +33,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	 * @property {undefined | (() => void)} [close] a function you can bind to, to close the modal. Note that the modal includes a close button in the header, you don't _have_ to use this.
 	 * @property {(() => void) | undefined} [onclose] a function that will be called when the modal is closed, either via the close button or by clicking outside the modal
 	 * @property {(() => void) | undefined} [onopen] a function that will be called when the modal is opened
+	 * @property {import('$lib/toasts.svelte.js').ToastPoolNames} [toasts] display toasts from the specified pool in the footer. Also sets the active toast pool while the modal is open.
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} children the content of the modal
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} [footer] the content of the footer
 	 */
@@ -44,6 +47,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		onclose = undefined,
 		onopen = undefined,
 		footer = undefined,
+		toasts: toastsPool = undefined,
 		children
 	} = $props();
 
@@ -53,10 +57,18 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 
 		open = () => {
 			onopen?.();
+			if (toastsPool) {
+				toasts.setCurrentPool(toastsPool);
+				toasts.clear();
+			}
 			pushState('', { [stateKey]: true });
 		};
 		close = () => {
 			onclose?.();
+			if (toastsPool) {
+				toasts.setCurrentPool('default');
+				toasts.clear();
+			}
 			pushState('', { [stateKey]: false });
 		};
 	});
@@ -104,6 +116,12 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	<main>
 		{@render children({ close })}
 	</main>
+
+	{#if toastsPool}
+		<section class="toasts">
+			<ModalToasts pool={toastsPool} />
+		</section>
+	{/if}
 
 	{#if footer}
 		<footer>
@@ -173,6 +191,14 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		justify-content: center;
 		align-items: center;
 		gap: 0.5em;
+	}
+
+	.toasts {
+		margin-top: auto;
+
+		& + footer {
+			margin-top: 1rem;
+		}
 	}
 
 	h1 {

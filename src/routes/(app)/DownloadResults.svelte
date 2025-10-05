@@ -8,13 +8,12 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import Modal from '$lib/Modal.svelte';
+	import ModalToasts from '$lib/ModalToasts.svelte';
 	import { ensureNoLoneImages } from '$lib/observations';
-
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
-	import { toastIcon, toastTheme } from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tick } from 'svelte';
 	import Download from '~icons/ph/download-simple';
@@ -183,18 +182,8 @@
 	</section>
 
 	{#snippet footer()}
-		<section class="errors">
-			<ul>
-				{#each toasts.items('exporter') as toast (toast.id)}
-					<li style:color="var(--fg-{toastTheme(toast.type)})">
-						{#await toastIcon(toast.type) then Icon}
-							<Icon />
-						{/await}
-						{toast.message}
-					</li>
-				{/each}
-			</ul>
-		</section>
+		<ModalToasts pool="exporter" />
+
 		<section class="progress">
 			<ProgressBar percentage alwaysActive {progress} />
 		</section>
@@ -258,25 +247,5 @@
 		font-size: 0.9em;
 		color: var(--gy);
 		margin-top: 0.75em;
-	}
-
-	.errors {
-		margin-top: 1em;
-		overflow-y: auto;
-		height: 5lh;
-	}
-
-	.errors ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-
-	.errors li {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
-		color: var(--fg-secondary);
-		min-width: 30ch;
 	}
 </style>

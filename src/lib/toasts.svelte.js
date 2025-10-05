@@ -45,6 +45,10 @@ const TOAST_POOLS = /** @type {const} @satisfies {Record<string, Omit<ToastPool,
 });
 
 /**
+ * @typedef {keyof typeof TOAST_POOLS} ToastPoolNames
+ */
+
+/**
  * @template T
  * @typedef {Object} ToastOptions
  * @property {T} [data]
