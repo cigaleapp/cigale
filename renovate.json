@@ -1,7 +1,7 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["config:recommended", "schedule:weekly", "abandonments:recommended"],
-	"prHourlyLimit": 0,
+	"prHourlyLimit": 6,
 	"commitMessagePrefix": "⬆️ ",
 	"rangeStrategy": "bump",
 	"abandonmentThreshold": "2 years",
