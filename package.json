@@ -168,7 +168,7 @@
 		"ulid": "^3.0.1",
 		"unplugin-icons": "^22.4.2",
 		"update-electron-app": "^3.1.1",
-		"wuchale": "^0.17.0",
+		"wuchale": "^0.17.2",
 		"xss": "^1.0.15",
 		"yaml": "^2.8.1"
 	}
