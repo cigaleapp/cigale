@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-05T16:21:03.908Z\n"
+"PO-Revision-Date: 2025-10-06T08:40:38.626Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -471,10 +471,6 @@ msgstr "Error while loading classification model"
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Erreur lors du chargement du modèle de détection"
 msgstr "Error while loading detection model"
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example debug toast"
-msgstr ""
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Exporter"
@@ -1088,10 +1084,6 @@ msgstr "<0>INP-ENSEEIHT</0> school project"
 #: src/routes/(app)/about/+page.svelte
 msgid "(aucun)"
 msgstr "(none)"
-
-#: src/routes/(app)/+layout.svelte
-msgid "debug"
-msgstr ""
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Mettre en erreur la sélection"

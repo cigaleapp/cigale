@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-05T16:21:03.906Z\n"
+"PO-Revision-Date: 2025-10-06T08:40:38.624Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -470,10 +470,6 @@ msgstr "Erreur lors du chargement du modèle de classification"
 #: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Erreur lors du chargement du modèle de détection"
 msgstr "Erreur lors du chargement du modèle de détection"
-
-#: src/routes/(app)/+layout.svelte
-msgid "Example debug toast"
-msgstr "Example debug toast"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Exporter"
@@ -1091,10 +1087,6 @@ msgstr "“Projet long” de l'<0>INP-ENSEEIHT</0>"
 #: src/routes/(app)/about/+page.svelte
 msgid "(aucun)"
 msgstr "(aucun)"
-
-#: src/routes/(app)/+layout.svelte
-msgid "debug"
-msgstr "debug"
 
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Mettre en erreur la sélection"
