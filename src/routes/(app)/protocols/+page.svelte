@@ -95,7 +95,7 @@
 							if (!ps || typeof ps === 'string' || ps.length === 0) return;
 							if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
 							else
-								toasts.success(plural(ps.length, ['Protocole importé", "# protocoles importés']));
+								toasts.success(plural(ps.length, ['Protocole importé', '# protocoles importés']));
 						});
 				}}
 			>
