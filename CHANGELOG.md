@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## October 2025
+
+### Improvements
+
+- Fix width of buttons in protocol selection page
+- Validate bundle analyzer modes on config load instead of assuming type
+
+### Data Updates
+
+- Regenerate example protocols
+
+### Translation Updates
+
+- Fix some weird msgids
+- Refresh translation files
+- Translate some more
+- Translate via Weblate (English)
+
 ## September 2025
 
 ### Improvements
