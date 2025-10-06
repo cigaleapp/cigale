@@ -42,7 +42,6 @@
 	});
 
 	const authors = [
-		{ name: 'Achraf Khairoun', gitlab: 'khairoa' },
 		{ name: 'Céleste Tiano', gitlab: 'tianoc' },
 		{ name: 'Gaetan Laumonier', gitlab: 'laumong' },
 		{ name: 'Gwenn Le Bihan', gitlab: 'gwennlbh', url: 'https://gwen.works' },
@@ -51,11 +50,10 @@
 	].map(({ name, gitlab, url }) => ({ name, url: url ?? `https://git.inpt.fr/${gitlab}` }));
 
 	const supervisors = [
-		// Waiting for approval to show full names
-		{ name: 'Axel C.', url: '' },
-		{ name: 'Maxime C.', url: '' },
-		{ name: 'Rémy E.', url: '' },
-		{ name: 'Thomas F.', url: '' }
+		{ name: 'Axel Carlier', url: 'https://github.com/axelcarlier' },
+		{ name: 'Maxime Cauchois', url: 'https://github.com/mcauchoix' },
+		{ name: 'Edgar Remy', url: 'https://github.com/edgaremy' },
+		{ name: 'Thomas Forgione', url: 'https://github.com/tforgione' }
 	];
 
 	/**
