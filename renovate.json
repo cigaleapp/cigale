@@ -4,6 +4,7 @@
 	"prHourlyLimit": 0,
 	"commitMessagePrefix": "⬆️ ",
 	"rangeStrategy": "bump",
+	"abandonmentThreshold": "2 years",
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to linters and formatters",
