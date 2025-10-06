@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-06T08:40:38.624Z\n"
+"PO-Revision-Date: 2025-10-06T08:47:39.585Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1115,9 +1115,10 @@ msgid "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaa
 msgstr "Identifiant d'image invalide (le format correct est aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn) : {0}"
 
 #: src/routes/(app)/protocols/+page.svelte
-msgid "Protocole importé\", \"# protocoles importés"
-msgid_plural "Protocole importé\", \"# protocoles importés"
-msgstr[0] "Protocole importé\", \"# protocoles importés"
+msgid "Protocole importé"
+msgid_plural "# protocoles importés"
+msgstr[0] "Protocole importé"
+msgstr[1] "# protocoles importés"
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"
