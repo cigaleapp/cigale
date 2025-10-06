@@ -20,6 +20,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: build-electron-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
