@@ -4,6 +4,53 @@
 	"projectOwner": "cigaleapp",
 	"repoType": "github",
 	"commitConvention": "angular",
+	"types": {
+		"infra": {
+			"symbol": "🚇",
+			"description": "Infrastructure (Hosting, Build-Tools, etc)",
+			"link": "https://github.com/cigaleapp/cigale/actions"
+		},
+		"maintenance": {
+			"symbol": "🚧",
+			"description": "Maintenance",
+			"link": "https://github.com/cigaleapp/cigale/issues/77"
+		},
+		"projectManagement": {
+			"symbol": "📆",
+			"description": "Project Management",
+			"link": "https://github.com/cigaleapp/cigale/milestones"
+		},
+		"test": {
+			"symbol": "⚠️",
+			"description": "Tests",
+			"link": "https://github.com/cigaleapp/cigale/tree/main/tests"
+		},
+		"design": {
+			"symbol": "🎨",
+			"description": "Design",
+			"link": "https://www.figma.com/design/2TY5zZvwfuxyotEtRMlWq7/CIGALE-Designs?node-id=0-1&t=tbAUPD1mQBUX926G-1"
+		},
+		"talk": {
+			"symbol": "📢",
+			"description": "Talks",
+			"link": "https://www.canva.com/design/DAGgr_TmduM/6ULoR8Qmb2In9_DkBiiP3A/edit"
+		},
+		"translation": {
+			"symbol": "🌍",
+			"description": "Translation",
+			"link": "https://weblate.gwen.works/projects/cigale/"
+		},
+		"content": {
+			"symbol": "🖋",
+			"description": "Content",
+			"link": "https://cigaleapp.github.io/cigale/#/about"
+		},
+		"data": {
+			"symbol": "🔣",
+			"description": "Data",
+			"link": "https://cigaleapp.github.io/cigale/#/about"
+		}
+	},
 	"contributors": [
 		{
 			"login": "gwennlbh",
@@ -17,7 +64,8 @@
 				"projectManagement",
 				"test",
 				"design",
-				"talk"
+				"talk",
+				"translation"
 			]
 		},
 		{
@@ -32,7 +80,7 @@
 			"name": "Edgar Remy",
 			"avatar_url": "https://avatars.githubusercontent.com/u/83783043?v=4",
 			"profile": "https://github.com/edgaremy",
-			"contributions": ["bug", "userTesting", "data", "ideas", "projectManagement"]
+			"contributions": ["bug", "userTesting", "data", "ideas", "projectManagement", "translation"]
 		},
 		{
 			"login": "mcauchoix",
@@ -54,7 +102,7 @@
 			"name": "whisp00n",
 			"avatar_url": "https://avatars.githubusercontent.com/u/125924054?v=4",
 			"profile": "https://github.com/WhiSp00n",
-			"contributions": ["code", "design", "talk"]
+			"contributions": ["code", "design", "talk", "translation"]
 		},
 		{
 			"login": "CceceLaPlante",
