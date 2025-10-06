@@ -33,6 +33,9 @@ jobs:
       - name: Update CHANGELOG.md
         run: bun run scripts/generate-changelog.js 2024-01-01
 
+      - name: Format CHANGELOG.md
+        run: bun run prettier --write CHANGELOG.md
+
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
