@@ -5,6 +5,8 @@ on:
   schedule:
     # Every 28th of the month at 00:00 UTC
     - cron: '0 0 28 * *'
+    # Every week on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
   push:
     branches: [main]
     paths: [.github/workflows/changelog.yml, scripts/generate-changelog.js, CHANGELOG.md]
@@ -18,21 +20,21 @@ jobs:
         with:
           # Fetch all history for accurate changelog generation
           fetch-depth: 0
+          ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
 
-      - name: Set up Node.js
+      - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
 
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Update CHANGELOG.md
-        run: |
-          bun install --frozen-lockfile
-          bun run scripts/generate-changelog.js 2024-01-01
+        run: bun run scripts/generate-changelog.js 2024-01-01
 
       - name: Commit and push changes
-        uses: peter-evans/create-pull-request@v7
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          branch: update-changelog
-          title: '📝 Update CHANGELOG.md'
-          commit-message: '📝 Update CHANGELOG.md'
-          base: main
+          commit_message: 📝 Update CHANGELOG.md
+          file_pattern: CHANGELOG.md
