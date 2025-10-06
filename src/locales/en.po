@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-06T08:47:39.587Z\n"
+"PO-Revision-Date: 2025-10-06T08:50:03.579Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1114,8 +1114,8 @@ msgstr "Malformed image ID (correct format is aaaaaaaaaaaaaaaaaaaaaaaaaa_nnnnnn)
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Protocole importé"
 msgid_plural "# protocoles importés"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Imported protocol"
+msgstr[1] "Imported # protocols"
 
 #: src/lib/seo.svelte.js
 msgid "Cigale"
