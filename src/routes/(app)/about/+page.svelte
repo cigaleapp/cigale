@@ -214,7 +214,7 @@
 		{#await showDependencies()}
 			<p>Chargement des dépendances…</p>
 		{:then deps}
-			<dl>
+			<dl class="dependencies">
 				{#each deps as [name, version] (name)}
 					<dt>
 						<a target="_blank" href="https://npmjs.com/package/{name}">{name}</a>
@@ -259,5 +259,9 @@
 
 	dl > dd > dl > dd {
 		margin-bottom: 0;
+	}
+
+	.dependencies code {
+		font-size: 0.85em;
 	}
 </style>

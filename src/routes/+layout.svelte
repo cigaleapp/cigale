@@ -46,7 +46,7 @@
 		font-family: 'Host Grotesk', sans-serif;
 	}
 
-	:global(code, pre) {
+	:global(code, pre, code a) {
 		font-family: 'Martian Mono', monospace;
 		font-weight: 260;
 	}
