@@ -16,6 +16,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      BUILD_COMMIT: ${{ github.sha }}
+      BASE_PATH: /cigale
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -29,7 +33,7 @@ jobs:
         run: bun install
 
       - name: Build project
-        run: BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale bun run build
+        run: bun run build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
