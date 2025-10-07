@@ -186,14 +186,18 @@
 				<a href="https://elementtype.co/host-grotesk/">Host Grotesk</a>
 			</dt>
 			<dd>
-				par <a href="https://doughkan.com/">Doğukan Karapınar</a> et
-				<a href="https://ibrahimkactioglu.com/">İbrahim Kaçtıoğlu</a>, chez
-				<a href="https://elementtype.co/"> Element Type Foundry </a>
+				<!-- @wc-include -->
+				<span>
+					par <a href="https://doughkan.com/">Doğukan Karapınar</a> et
+					<a href="https://ibrahimkactioglu.com/">İbrahim Kaçtıoğlu</a>, chez
+					<a href="https://elementtype.co/"> Element Type Foundry </a>
+				</span>
 			</dd>
 			<dt>
 				<a href="https://evilmartians.com/products/martian-mono"><code>Martian Mono</code></a>
 			</dt>
 			<dd>
+				<!-- @wc-include -->
 				<code>
 					par
 					<a href="https://www.romanshamin.me/">Roman Shamin</a>, chez

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-07 19:53+0000\n"
+"PO-Revision-Date: 2025-10-07T21:49:20.516Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1109,14 +1109,6 @@ msgid_plural "# protocoles importés"
 msgstr[0] "Imported protocol"
 msgstr[1] "Imported # protocols"
 
-#: src/routes/(app)/about/+page.svelte
-msgid "Roman Shamin"
-msgstr "Roman Shamin"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "Evil Martians"
-msgstr "Evil Martians"
-
 #. placeholder {0}: title
 #: src/lib/seo.svelte.js
 msgid "{0} · C.I.G.A.L.E."
@@ -1125,3 +1117,27 @@ msgstr "{0} · C.I.G.A.L.E."
 #: src/lib/seo.svelte.js
 msgid "C.I.G.A.L.E."
 msgstr "C.I.G.A.L.E."
+
+#: src/routes/(app)/about/+page.svelte
+msgid "https://www.romanshamin.me/"
+msgstr "https://www.romanshamin.me/"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "https://evilmartians.com"
+msgstr "https://evilmartians.com"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "par <0>Roman Shamin</0>, chez <1>Evil Martians</1>"
+msgstr "by <0>Roman Shamin</0> from <1>Evil Martians</1>"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "https://doughkan.com/"
+msgstr "https://doughkan.com/"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "https://ibrahimkactioglu.com/"
+msgstr "https://ibrahimkactioglu.com/"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "https://elementtype.co/"
+msgstr "https://elementtype.co/"
