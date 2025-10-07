@@ -9,6 +9,7 @@
 	import { isDebugMode } from './settings.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';
+	import { splitMetadataId } from './schemas/metadata';
 
 	/**
 	 * @typedef {object} Props
@@ -127,7 +128,7 @@
 		</section>
 	{/if}
 	{#if isDebugMode()}
-		<pre>{JSON.stringify({ id: definition.id, value }, null, 2)}</pre>
+		<pre class="debug">{JSON.stringify({ ...splitMetadataId(definition.id), value }, null, 2)}</pre>
 	{/if}
 </div>
 
@@ -202,5 +203,9 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--fg-primary);
+	}
+
+	.debug {
+		font-size: 0.7em;
 	}
 </style>

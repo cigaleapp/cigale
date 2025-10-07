@@ -242,3 +242,14 @@ export function namespaceOfMetadataId(metadataId) {
 	if (parts.length < 2) return undefined;
 	return parts.slice(0, -1).join('__');
 }
+
+/**
+ *
+ * @param {string} metadataId
+ */
+export function splitMetadataId(metadataId) {
+	return {
+		namespace: namespaceOfMetadataId(metadataId),
+		id: removeNamespaceFromMetadataId(metadataId)
+	};
+}
