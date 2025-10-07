@@ -5,7 +5,9 @@
  */
 export function seo({ title }) {
 	effectIfNeeded(() => {
-		document.title = title ? `${title} · Cigale` : 'Cigale';
+		document.title = title
+			? /* @wc-include */ `${title} · C.I.G.A.L.E.`
+			: /* @wc-include */ 'C.I.G.A.L.E.';
 	});
 }
 

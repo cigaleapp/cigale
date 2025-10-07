@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-07T12:44:37.022Z\n"
+"PO-Revision-Date: 2025-10-07T12:49:15.475Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1120,6 +1120,11 @@ msgstr "Roman Shamin"
 msgid "Evil Martians"
 msgstr "Evil Martians"
 
+#. placeholder {0}: title
 #: src/lib/seo.svelte.js
-msgid "Cigale"
-msgstr "Cigale"
+msgid "{0} · C.I.G.A.L.E."
+msgstr "{0} · C.I.G.A.L.E."
+
+#: src/lib/seo.svelte.js
+msgid "C.I.G.A.L.E."
+msgstr "C.I.G.A.L.E."

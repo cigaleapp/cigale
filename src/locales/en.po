@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-07T12:44:37.024Z\n"
+"PO-Revision-Date: 2025-10-07T12:49:15.476Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1117,6 +1117,11 @@ msgstr ""
 msgid "Evil Martians"
 msgstr ""
 
+#. placeholder {0}: title
 #: src/lib/seo.svelte.js
-msgid "Cigale"
-msgstr ""
+msgid "{0} · C.I.G.A.L.E."
+msgstr "{0} · C.I.G.A.L.E."
+
+#: src/lib/seo.svelte.js
+msgid "C.I.G.A.L.E."
+msgstr "C.I.G.A.L.E."
