@@ -29,7 +29,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import * as dates from 'date-fns';
 	import { onMount } from 'svelte';
 	import { DragSelect } from './dragselect.svelte.js';
-	import { countThing } from './i18n.js';
+	import { plural } from './i18n.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
 	import { mutationobserver } from './mutations';
 	import { isDebugMode } from './settings.svelte.js';
@@ -180,7 +180,13 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			{#if groupName}
 				<header>
 					<h2>{groupName}</h2>
-					<p>{countThing('élément', sortedImages.length)}</p>
+					<p>
+						<!-- @wc-context: Interpreted as HTML -->
+						{@html plural(sortedImages.length, [
+							'<code>#</code> élément',
+							'<code>#</code> éléments'
+						])}
+					</p>
 				</header>
 			{/if}
 			<div class="items">
