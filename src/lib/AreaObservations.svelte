@@ -237,9 +237,4 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		flex-grow: 1;
 		margin-top: 2rem;
 	}
-
-	.group header {
-		margin-bottom: 1em;
-		user-select: none;
-	}
 </style>
