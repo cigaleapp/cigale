@@ -10,8 +10,8 @@ const url = constructURL({
 			wght: '300..800',
 			ital: '300..800'
 		},
-		'Fragment Mono': {
-			ital: true
+		'Martian Mono': {
+			wght: '200..800'
 		}
 	}
 })

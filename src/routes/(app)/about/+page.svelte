@@ -191,13 +191,13 @@
 				<a href="https://elementtype.co/"> Element Type Foundry </a>
 			</dd>
 			<dt>
-				<a href="https://github.com/weiweihuanghuang/fragment-mono/"><code>Fragment Mono</code></a>
+				<a href="https://evilmartians.com/products/martian-mono"><code>Martian Mono</code></a>
 			</dt>
 			<dd>
 				<code>
 					par
-					<a href="https://weiweihuanghuang.github.io/">Wei Huang</a>, chez
-					<a href="https://studiolin.org/projects/374-2/">Studio Lin</a>
+					<a href="https://www.romanshamin.me/">Roman Shamin</a>, chez
+					<a href="https://evilmartians.com">Evil Martians</a>
 				</code>
 			</dd>
 		</dl>

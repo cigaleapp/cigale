@@ -47,7 +47,8 @@
 	}
 
 	:global(code, pre) {
-		font-family: 'Fragment Mono', monospace;
+		font-family: 'Martian Mono', monospace;
+		font-weight: 260;
 	}
 
 	:global(svg.icon) {
