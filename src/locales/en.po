@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-07T12:56:07.061Z\n"
+"PO-Revision-Date: 2025-10-07 19:53+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -51,7 +51,7 @@ msgstr "<0/> Manage protocols"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Images avec recadrage <1/>"
-msgstr "<0/> Images with cropping <1/>"
+msgstr "<0/> Images with crop boxes <1/>"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Importer"
