@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-07T12:41:35.619Z\n"
+"PO-Revision-Date: 2025-10-07T12:44:37.022Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -444,6 +444,7 @@ msgstr "Erreur"
 #: src/lib/exif.js
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
+#: src/lib/toasts.svelte.js
 msgid "Erreur inattendue"
 msgstr "Erreur inattendue"
 
@@ -870,9 +871,6 @@ msgstr "Service workers"
 msgid "Sous la supervision de"
 msgstr "Sous la supervision de"
 
-#~ msgid "Studio Lin"
-#~ msgstr "Studio Lin"
-
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Suppression de toutes les images et observations…"
 msgstr "Suppression de toutes les images et observations…"
@@ -1004,9 +1002,6 @@ msgstr ""
 msgid "Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche"
 msgstr "Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche"
 
-#~ msgid "Wei Huang"
-#~ msgstr "Wei Huang"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "YOLO 11n"
 msgstr "YOLO 11n"
@@ -1117,9 +1112,6 @@ msgid_plural "# protocoles importés"
 msgstr[0] "Protocole importé"
 msgstr[1] "# protocoles importés"
 
-#~ msgid "Cigale"
-#~ msgstr "Cigale"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Roman Shamin"
 msgstr "Roman Shamin"
@@ -1128,5 +1120,6 @@ msgstr "Roman Shamin"
 msgid "Evil Martians"
 msgstr "Evil Martians"
 
-#~ msgid "Shamin"
-#~ msgstr "Shamin"
+#: src/lib/seo.svelte.js
+msgid "Cigale"
+msgstr "Cigale"

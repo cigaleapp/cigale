@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-07T12:41:35.623Z\n"
+"PO-Revision-Date: 2025-10-07T12:44:37.024Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -445,6 +445,7 @@ msgstr "Error"
 #: src/lib/exif.js
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
+#: src/lib/toasts.svelte.js
 msgid "Erreur inattendue"
 msgstr "Unexpected error"
 
@@ -869,9 +870,6 @@ msgstr "Service workers"
 msgid "Sous la supervision de"
 msgstr "Under the supervision of"
 
-#~ msgid "Studio Lin"
-#~ msgstr "Studio Lin"
-
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 msgid "Suppression de toutes les images et observations…"
 msgstr "Deleting all images and observations…"
@@ -1001,9 +999,6 @@ msgstr ""
 msgid "Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche"
 msgstr ""
 
-#~ msgid "Wei Huang"
-#~ msgstr "Wei Huang"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "YOLO 11n"
 msgstr "YOLO 11n"
@@ -1114,9 +1109,6 @@ msgid_plural "# protocoles importés"
 msgstr[0] "Imported protocol"
 msgstr[1] "Imported # protocols"
 
-#~ msgid "Cigale"
-#~ msgstr ""
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Roman Shamin"
 msgstr ""
@@ -1125,5 +1117,6 @@ msgstr ""
 msgid "Evil Martians"
 msgstr ""
 
-#~ msgid "Shamin"
-#~ msgstr ""
+#: src/lib/seo.svelte.js
+msgid "Cigale"
+msgstr ""
