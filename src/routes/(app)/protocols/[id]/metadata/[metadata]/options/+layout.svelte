@@ -115,18 +115,6 @@
 
 <div class="aside-and-main">
 	<aside>
-		<form class="new-option" onsubmit={onCreateOption}>
-			<InlineTextInput
-				discreet
-				label="Nom de la nouvelle option"
-				placeholder="Nouvelle option…"
-				value=""
-				onblur={() => {}}
-			/>
-			<ButtonIcon submits help="Créer la nouvelle option" onclick={() => {}}>
-				<IconAdd />
-			</ButtonIcon>
-		</form>
 		<search>
 			<IconSearch />
 			<InlineTextInput
@@ -140,6 +128,19 @@
 				<IconClose />
 			</ButtonIcon>
 		</search>
+		<form class="new-option" onsubmit={onCreateOption}>
+			<InlineTextInput
+				discreet
+				label="Nom de la nouvelle option"
+				placeholder="Nouvelle option…"
+				value=""
+				onblur={() => {}}
+			/>
+			<ButtonIcon submits help="Créer la nouvelle option" onclick={() => {}}>
+				<IconAdd />
+			</ButtonIcon>
+		</form>
+
 		<nav>
 			<VirtualList items={searchResults} let:item>
 				{@const { key, label } = item}
