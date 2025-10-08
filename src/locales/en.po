@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-09T16:41:48.976Z\n"
+"PO-Revision-Date: 2025-10-08T10:44:13.511Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1582,12 +1582,6 @@ msgstr ""
 msgid "<0/> Erreur lors de la comparaison avec la version distante: {0}"
 msgstr ""
 
-#. placeholder {0}: changes.length
-#. placeholder {1}: hasMore ? '+' : ''
-#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
-msgid "Différences avec la version publiée ({0}{1})"
-msgstr ""
-
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "<0/> Avant"
 msgstr ""
@@ -1661,91 +1655,10 @@ msgstr "https://elementtype.co/"
 msgid "Protocole modifié par rapport à la version publiée"
 msgstr ""
 
-#~ msgid "<0/> Différences avec la version publiée"
-#~ msgstr ""
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Différences avec la version publiée"
+msgstr ""
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "Ouvrir le lien dans un nouvel onglet"
-msgstr ""
-
-#~ msgid "Chargement..."
-#~ msgstr ""
-
-#~ msgid "Le protocole est à jour (v{0}). Cliquer pour vérifier à nouveau"
-#~ msgstr ""
-
-#~ msgid "Protocole mis à jour vers la v{0}"
-#~ msgstr ""
-
-#~ msgid "Impossible de mettre à jour le protocole: {0}"
-#~ msgstr ""
-
-#~ msgid "Une mise à jour vers la v{0} est disponible"
-#~ msgstr ""
-
-#~ msgid "Mon protocole"
-#~ msgstr ""
-
-#~ msgid "Prénom Nom"
-#~ msgstr ""
-
-#~ msgid "Description de mon protocole"
-#~ msgstr ""
-
-#~ msgid "Une métadonnée"
-#~ msgstr ""
-
-#~ msgid "Description de la métadonnée"
-#~ msgstr ""
-
-#: src/routes/(app)/protocols/[id]/+error.svelte
-msgid "Métadonnée introuvable"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "cx | Coordonnée X du point central"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "cy | Coordonée Y du point central"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "sy | Coordonée Y du point supérieur gauche"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "sx | Coordonée X du point supérieur gauche"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "ex | Coordonée X du point inférieur droit"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "ey | Coordonée Y du point inférieur droit"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "w | Largeur de la boîte englobante"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "h | Hauteur de la boîte englobante"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "score | Score de confiance de cette boîte, entre 0 et 1"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "_ | Autre valeur (ignorée par CIGALE)"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/infos/+page.svelte
-msgid "Pas de modèle"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/infos/+page.svelte
-msgid "Confirmation du détourage <0/> <1/>"
 msgstr ""
