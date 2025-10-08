@@ -1,7 +1,7 @@
 import { ArkErrors, type } from 'arktype';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
-import { cachebust, fetchHttpRequest, fromEntries, keys, range } from './utils.js';
+import { cachebust, fetchHttpRequest, fromEntries, keys, omit, range } from './utils.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import microdiff from 'microdiff';
@@ -56,7 +56,7 @@ async function toExportedProtocol(db, protocol) {
 	);
 
 	return ExportedProtocol.assert({
-		...protocol,
+		...omit(protocol, 'dirty'),
 		exports: {
 			...protocol.exports,
 			...(protocol.exports
@@ -462,27 +462,46 @@ export async function compareProtocolWithUpstream(db, protocolId) {
 	const diffStartsWith = (path, start) =>
 		path.length >= start.length && range(0, start.length).every((i) => path[i] === start[i]);
 
-	for (const { path } of diffs) {
+	for (const { path, type } of diffs) {
 		const last = path.at(-1);
 		const prefix = path.slice(0, -1);
 
 		// If the diff indicates that an option was deleted
 		if (last === '__deleted') {
-			const pathToOption = prefix;
-			// Delete all diffs with a path starting with diff.path[..-1]
-			cleanedDiffs = cleanedDiffs.filter((d) => !diffStartsWith(d.path, pathToOption));
-			// and replace them with a single diff indicating the deletion of the option
-			cleanedDiffs.push({
-				type: 'REMOVE',
-				path: [...prefix],
-				// Restore old value by getting all oldValues from diffs
-				oldValue: fromEntries(
-					diffs
-						.filter((d) => diffStartsWith(d.path, pathToOption))
-						.filter((d) => d.path.at(-1) !== '__deleted')
-						.map((d) => /** @type {const} */ ([d.path.at(-1)?.toString() ?? '', d.oldValue]))
-				)
-			});
+			// __deleted entry was _created_ in localProtocol, so it was a deleted-from-remote option
+			if (type === 'CREATE') {
+				const pathToOption = prefix;
+				// Delete all diffs with a path starting with diff.path[..-1]
+				cleanedDiffs = cleanedDiffs.filter((d) => !diffStartsWith(d.path, pathToOption));
+				// and replace them with a single diff indicating the deletion of the option
+				cleanedDiffs.push({
+					type: 'REMOVE',
+					path: [...prefix],
+					// Restore old value by getting all oldValues from diffs
+					oldValue: fromEntries(
+						diffs
+							.filter((d) => diffStartsWith(d.path, pathToOption))
+							.filter((d) => d.path.at(-1) !== '__deleted')
+							.map((d) => /** @type {const} */ ([d.path.at(-1)?.toString() ?? '', d.oldValue]))
+					)
+				});
+			} else if (type === 'REMOVE') {
+				// __deleted entry was _removed_ from localProtocol, so it's an option that didn't exist in remoteProtocol
+				const pathToOption = prefix;
+				// Delete all diffs with a path starting with diff.path[..-1]
+				cleanedDiffs = cleanedDiffs.filter((d) => !diffStartsWith(d.path, pathToOption));
+				// and replace them with a single diff indicating the addition of the option
+				cleanedDiffs.push({
+					type: 'CREATE',
+					path: [...prefix],
+					value: fromEntries(
+						diffs
+							.filter((d) => diffStartsWith(d.path, pathToOption))
+							.filter((d) => d.path.at(-1) !== '__deleted')
+							.map((d) => /** @type {const} */ ([d.path.at(-1)?.toString() ?? '', d.value]))
+					)
+				});
+			}
 		}
 	}
 
