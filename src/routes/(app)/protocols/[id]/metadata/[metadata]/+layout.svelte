@@ -11,12 +11,14 @@
 	import IconInference from '~icons/ph/magic-wand';
 	import IconCascades from '~icons/ph/tree-view';
 	import { updater } from './updater.svelte.js';
+	import { getSettings } from '$lib/settings.svelte.js';
+	import { fade } from 'svelte/transition';
 
 	const { children, data } = $props();
 	const { id, label, type } = $derived(data.metadata);
 </script>
 
-<div class="header-and-scrollable">
+<div class="header-and-scrollable" in:fade={{ duration: 100 }}>
 	<header>
 		<div class="text">
 			<span class="supertitle">Métadonnée</span>
@@ -47,7 +49,7 @@
 				/** @type {string} */ path,
 				/** @type {string} */ name,
 				/** @type {import('svelte').Component} */ Icon,
-				/** @type {string|undefined} */ help = undefined
+				/** @type {{ help?: string, count?: number }} */ { help, count } = {}
 			)}
 				<a
 					href="#/protocols/{data.protocol.id}/metadata/{removeNamespaceFromMetadataId(id)}/{path}"
@@ -56,19 +58,19 @@
 				>
 					<Icon />
 					{name}
+					{#if count}
+						<code class="badge">{Intl.NumberFormat(getSettings().language).format(count)}</code>
+					{/if}
 				</a>
 			{/snippet}
 			{@render navlink('infos', 'Informations', IconInfo)}
 			{#if type === 'enum'}
-				{@render navlink('options', 'Options', IconOptions)}
+				{@render navlink('options', 'Options', IconOptions, { count: data.optionsCount })}
 			{/if}
 			{@render navlink('inference', 'Inférence', IconInference)}
-			{@render navlink(
-				'cascades',
-				'Cascades',
-				IconCascades,
-				"Changer les valeurs d'autres métadonnées en fonction de celle-ci"
-			)}
+			{@render navlink('cascades', 'Cascades', IconCascades, {
+				help: "Changer les valeurs d'autres métadonnées en fonction de celle-ci"
+			})}
 		</nav>
 	</header>
 
@@ -172,6 +174,16 @@
 
 	nav a.active::after {
 		background-color: var(--bg-primary);
+	}
+
+	nav a .badge {
+		background-color: var(--bg-primary-translucent);
+		color: var(--fg-neutral);
+		font-size: 0.75em;
+		padding: 0.1em 0.4em;
+		border-radius: 10000px;
+		min-width: 1.5em;
+		text-align: center;
 	}
 
 	.scrollable.padded {
