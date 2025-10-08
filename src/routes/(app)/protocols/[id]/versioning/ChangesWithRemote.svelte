@@ -12,6 +12,8 @@
 	import IconEditKey from '~icons/ph/pencil';
 	import IconAddKey from '~icons/ph/plus';
 	import IconRemoveKey from '~icons/ph/trash';
+	import IconOpenInExternal from '~icons/ph/arrow-square-out';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 
 	/**
 	 * @typedef {object} Props
@@ -53,7 +55,11 @@
 				{/if}
 			</div>
 		</dt>
-		<dd class:removed={change.type === 'REMOVE'} class:added-value={change.type === 'CREATE'}>
+		<dd
+			class:removed={change.type === 'REMOVE'}
+			class:removed-value={change.type === 'REMOVE'}
+			class:added-value={change.type === 'CREATE'}
+		>
 			{#if change.type === 'CREATE'}
 				{@render jsonValue(change.value)}
 			{:else if change.type === 'REMOVE'}
@@ -138,7 +144,17 @@
 {/snippet}
 
 {#snippet jsonValue(/** @type {any} */ value)}
-	{#if typeof value === 'string'}
+	{#if typeof value === 'string' && URL.canParse(value)}
+		<div class="string url">
+			{value}
+			<ButtonIcon
+				help="Ouvrir le lien dans un nouvel onglet"
+				onclick={() => window.open(value, '_blank', 'noopener')}
+			>
+				<IconOpenInExternal />
+			</ButtonIcon>
+		</div>
+	{:else if typeof value === 'string'}
 		<span class="string" class:empty={value.length === 0}>
 			{#if value.length === 0}
 				Vide
@@ -250,13 +266,17 @@
 	.added-value .number {
 		color: orange;
 	}
+
 	.added-value .boolean {
 		color: yellow;
 	}
+
 	.added-value .null {
 		color: violet;
 	}
-	.added-value dl.object:not(.nested) {
+
+	.added-value dl.object:not(.nested),
+	.removed-value dl.object {
 		display: grid;
 		grid-template-columns: max-content auto;
 		align-items: center;
@@ -265,12 +285,19 @@
 		dd {
 			margin: 0;
 		}
-	}
-	.added-value .object .key {
-		font-weight: bold;
 
-		&::after {
-			content: ':';
+		.key {
+			font-weight: bold;
+
+			&::after {
+				content: ':';
+			}
 		}
+	}
+
+	.string.url {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25em;
 	}
 </style>
