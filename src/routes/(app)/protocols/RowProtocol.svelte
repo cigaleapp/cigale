@@ -68,9 +68,8 @@
 
 <style>
 	li {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		gap: 2em;
+		display: flex;
+		justify-content: space-between;
 		width: 100%;
 	}
 
