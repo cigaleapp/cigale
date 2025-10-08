@@ -1082,3 +1082,31 @@ if (import.meta.vitest) {
 		});
 	});
 }
+
+/**
+ * Fades out an element matching the given selector over the given duration, then removes it from the DOM.
+ * If it's the first time the app is started (determined by checking localStorage), uses firstTimeDuration instead of duration if provided.
+ * @param {string} selector
+ * @param {number} duration in milliseconds
+ * @param {object} [options]
+ * @param {number} [options.firstTimeDuration] in milliseconds, if provided and it's the first time the app is started, this duration will be used instead of duration
+ */
+export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
+	const firstStart = !localStorage.getItem('app_started_before');
+	localStorage.setItem('app_started_before', 'true');
+
+	if (firstStart) duration = firstTimeDuration ?? duration;
+
+	const element = document.querySelector(selector);
+
+	if (!(element instanceof HTMLElement)) {
+		element?.remove();
+		return;
+	}
+
+	element.style.transition = `opacity ${duration}ms linear`;
+	element.style.opacity = '0';
+	setTimeout(() => {
+		element.remove();
+	}, duration);
+}

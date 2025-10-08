@@ -2,12 +2,15 @@
 	import './style.css';
 	import '$lib/tippy-svg-arrow.css';
 	import '$lib/range-inputs.css';
+	import { fadeOutElement } from '$lib/utils';
 
 	const { children } = $props();
 
-	$effect(() => {
-		document.querySelector('#loading')?.remove();
-	});
+	$effect(() =>
+		fadeOutElement('#loading', 250, {
+			firstTimeDuration: 1_000
+		})
+	);
 
 	$effect(() => {
 		window.nativeWindow?.setControlsColor(
