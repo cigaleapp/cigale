@@ -23,7 +23,10 @@ export function updater(changes) {
 		} catch (err) {
 			if (err instanceof ArkErrors) {
 				toasts.error(`Valeur invalide : ${err.summary}`);
+				return;
 			}
+
+			throw err;
 		}
 
 		await tables.Protocol.set(protocol).catch((err) => {
