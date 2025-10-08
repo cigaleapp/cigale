@@ -10,6 +10,7 @@
 	import { plural } from '$lib/i18n';
 	import { fade } from 'svelte/transition';
 	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
+	import { onMount } from 'svelte';
 
 	const { data } = $props();
 
@@ -24,6 +25,14 @@
 
 	/** @type {undefined | (() => void)} */
 	let openProtocolCreation = $state();
+
+	onMount(async () => {
+		for (const { id: protocolId } of tables.Protocol.state) {
+			const dirty = await data.swarpc.diffProtocolWithRemote({ protocolId });
+			// @ts-expect-error
+			tables.Protocol.getFromState(protocolId).dirty = dirty;
+		}
+	});
 </script>
 
 <ModalDeleteProtocol id={removingProtocol} bind:open={confirmDelete} />

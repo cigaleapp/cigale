@@ -15,7 +15,10 @@ CSS Variables: `--size` (default: `1em`)
 	 */
 
 	/** @type {Props} */
-	const { progress = undefined, waiting = false } = $props();
+	const { progress: rawProgress = undefined, waiting = false } = $props();
+
+	// Don't show progress if we're below 2% cuz we wouldnt see anything anyway
+	const progress = $derived((rawProgress ?? 0) < 0.02 ? undefined : rawProgress);
 
 	const dashOffsetScale = [-125, 0];
 	const dashOffset = $derived.by(() => {
@@ -59,13 +62,17 @@ CSS Variables: `--size` (default: `1em`)
 		stroke-dashoffset: 0;
 	}
 
-	.loading-spinner:not(.infinite) {
+	.loading-spinner:not(.infinite) .circular-loader {
 		/* So that the start of the loading spinner is at the center top */
 		transform: rotate(261deg);
 	}
 
 	.loading-spinner.infinite {
 		animation: spin 2s linear infinite;
+	}
+
+	.loading-spinner:not(.infinite):not(.waiting) {
+		animation: spin 500ms linear infinite;
 	}
 
 	.loader-path {

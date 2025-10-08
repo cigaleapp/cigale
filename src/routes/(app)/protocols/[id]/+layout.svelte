@@ -6,7 +6,7 @@
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import { errorMessage, uppercaseFirst } from '$lib/i18n';
 	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { dependencyURI, tables } from '$lib/idb.svelte.js';
+	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import MetadataBadges from '$lib/MetadataBadges.svelte';
 	import { goto, href } from '$lib/paths.js';
@@ -167,7 +167,9 @@
 				<section class="actions">
 					<ButtonInk
 						onclick={async () => {
-							await exportProtocol(resolve('/'), id).catch((e) => toasts.error(e));
+							await exportProtocol(databaseHandle(), resolve('/'), id).catch((e) =>
+								toasts.error(e)
+							);
 						}}
 					>
 						<IconExport />
@@ -201,7 +203,7 @@
 		<nav>
 			{@render navlink('Informations', 'infos', IconInfo)}
 			{@render navlink(
-				'Versioning',
+				'Versionnage',
 				'versioning',
 				IconVersioning,
 				version ? `v${version}` : undefined

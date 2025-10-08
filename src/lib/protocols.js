@@ -1,7 +1,7 @@
 import { ArkErrors, type } from 'arktype';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
-import { cachebust, fetchHttpRequest, fromEntries, keys, omit, range } from './utils.js';
+import { cachebust, fetchHttpRequest, fromEntries, keys, omit, range, sum } from './utils.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import microdiff from 'microdiff';
@@ -80,7 +80,7 @@ async function toExportedProtocol(db, protocol) {
 								.filter((opt) =>
 									opt.id.startsWith(namespacedMetadataId(protocol.id, id) + ':')
 								)
-								.map(({ id: _, ...opt }) => opt)
+								.map(({ id: _, metadataId: __, ...opt }) => opt)
 						}
 					])
 			)
@@ -398,23 +398,51 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
  * Compare the in-database protocol with its remote counterpart, output any changes.
  * @param {import('./idb.svelte.js').DatabaseHandle} db
  * @param {import('$lib/database').ID} protocolId
+ * @param {object} [options]
+ * @param {(progress: number) => void | Promise<void>} [options.onProgress]
  * @returns {Promise<import('microdiff').Difference[]>}
  */
-export async function compareProtocolWithUpstream(db, protocolId) {
+export async function compareProtocolWithUpstream(db, protocolId, { onProgress } = {}) {
 	const databaseProtocol = await db.get('Protocol', protocolId).then(Protocol.assert);
+
+	const optionsTotalCount = await db.count(
+		'MetadataOption',
+		metadataOptionsKeyRange(protocolId, null)
+	);
+
+	// Note: Totals are based on timings on a single machine,
+	// the values dont really matter as least as they're self-consistent,
+	// it's just to determine what part of the progress bar belongs to fetch+convert
+	// It's in ×2ms so that incrementing progress for options is just 1 per option
+	let progressCompleted = 0;
+	const progressTotals = {
+		fetchAndConvert: 250 /* ×2ms */,
+		microdiff: 25 /* ×2ms */,
+		options: optionsTotalCount /* ×2ms */,
+		postProcess: 2 /* ×2ms */
+	};
+	const incrementProgress = async (amount = 1) => {
+		progressCompleted += amount;
+		onProgress?.(progressCompleted / sum(Object.values(progressTotals)));
+	};
+
+	await incrementProgress(0);
 
 	if (!databaseProtocol?.source) return [];
 
-	const remoteProtocol = await fetchHttpRequest(databaseProtocol.source)
-		.then((r) => r.json())
-		.then((data) => ExportedProtocol(data));
+	const [remoteProtocol, localProtocol] = await Promise.all([
+		fetchHttpRequest(databaseProtocol.source)
+			.then((r) => r.json())
+			.then((data) => ExportedProtocol(data)),
+		toExportedProtocol(db, databaseProtocol)
+	]);
+
+	await incrementProgress(progressTotals.fetchAndConvert);
 
 	if (remoteProtocol instanceof ArkErrors) {
 		console.warn('Remote protocol is invalid', remoteProtocol);
 		return [];
 	}
-
-	const localProtocol = await toExportedProtocol(db, databaseProtocol);
 
 	// Sort options for each metadata by key
 	const metadataIds = new Set([...keys(remoteProtocol.metadata), ...keys(localProtocol.metadata)]);
@@ -445,6 +473,7 @@ export async function compareProtocolWithUpstream(db, protocolId) {
 
 			sortedLocalOptions.push(localOption ?? DELETED_OPTION);
 			sortedRemoteOptions.push(remoteOption ?? DELETED_OPTION);
+			await incrementProgress();
 		}
 
 		remoteProtocol.metadata[metadataId].options = sortedRemoteOptions;
@@ -454,6 +483,8 @@ export async function compareProtocolWithUpstream(db, protocolId) {
 	const diffs = microdiff(remoteProtocol, localProtocol, {
 		cyclesFix: true
 	});
+
+	await incrementProgress(progressTotals.microdiff);
 
 	// If an option was removed from one side, it'll appear as a all-empty-strings option object with an additional `__deleted: true` property.
 
@@ -504,6 +535,8 @@ export async function compareProtocolWithUpstream(db, protocolId) {
 			}
 		}
 	}
+
+	await incrementProgress(progressTotals.postProcess);
 
 	return cleanedDiffs;
 }
