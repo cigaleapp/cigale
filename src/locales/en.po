@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-08T10:44:13.511Z\n"
+"PO-Revision-Date: 2025-10-08T20:50:44.805Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1661,4 +1661,8 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "Ouvrir le lien dans un nouvel onglet"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "Chargement..."
 msgstr ""

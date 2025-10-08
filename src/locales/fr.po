@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-08T10:44:13.506Z\n"
+"PO-Revision-Date: 2025-10-08T20:50:44.802Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1667,3 +1667,7 @@ msgstr "<0/> Différences avec la version publiée"
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "Ouvrir le lien dans un nouvel onglet"
 msgstr "Ouvrir le lien dans un nouvel onglet"
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "Chargement..."
+msgstr "Chargement..."
