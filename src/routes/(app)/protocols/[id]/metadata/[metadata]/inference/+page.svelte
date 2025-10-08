@@ -8,6 +8,7 @@
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { keys, omit } from '$lib/utils';
 	import { ArkErrors } from 'arktype';
+	import { fade } from 'svelte/transition';
 
 	const { data } = $props();
 	const { infer, id } = $derived(data.metadata);
@@ -40,7 +41,7 @@
 	);
 </script>
 
-<div class="content">
+<div class="content" in:fade={{ duration: 100 }}>
 	<RadioButtons
 		options={inferenceTypes}
 		value={currentInferenceType}

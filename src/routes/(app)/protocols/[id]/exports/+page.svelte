@@ -5,6 +5,7 @@
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { fade } from 'svelte/transition';
 	import IconZipFile from '~icons/ph/file-archive';
 	import IconJsonFile from '~icons/ph/file-code';
 	import IconCsvFile from '~icons/ph/file-csv';
@@ -149,23 +150,25 @@
 	</ul>
 {/snippet}
 
-<h2>Structure des exports .zip</h2>
+<main in:fade={{ duration: 100 }}>
+	<h2>Structure des exports .zip</h2>
 
-<ul class="tree">
-	<li>
-		<IconZipFile />
-		<span class="filename">Résultats.zip</span>
-	</li>
-	{@render tree(treeNodes, '')}
-</ul>
+	<ul class="tree">
+		<li>
+			<IconZipFile />
+			<span class="filename">Résultats.zip</span>
+		</li>
+		{@render tree(treeNodes, '')}
+	</ul>
 
-{#if getSettings().showTechnicalMetadata}
-	<pre class="debug">{JSON.stringify(
-			tables.Protocol.state.find((p) => p.id === data.protocol.id)?.exports,
-			null,
-			2
-		)}</pre>
-{/if}
+	{#if getSettings().showTechnicalMetadata}
+		<pre class="debug">{JSON.stringify(
+				tables.Protocol.state.find((p) => p.id === data.protocol.id)?.exports,
+				null,
+				2
+			)}</pre>
+	{/if}
+</main>
 
 <style>
 	ul {
@@ -176,6 +179,12 @@
 		gap: 0.75rem;
 		display: flex;
 		flex-direction: column;
+	}
+
+	main {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
 	}
 
 	.text {

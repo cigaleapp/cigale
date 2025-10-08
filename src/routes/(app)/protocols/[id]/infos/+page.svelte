@@ -9,6 +9,7 @@
 	import IconRemove from '~icons/ph/minus-circle';
 	import IconAdd from '~icons/ph/plus';
 	import IconDescription from '~icons/ph/text-align-left';
+	import { fade } from 'svelte/transition';
 
 	/**
 	 * @import { Protocol } from '$lib/database.js';
@@ -20,9 +21,8 @@
 	let { learnMore, authors, description } = $derived(data);
 </script>
 
-<h2>Informations sur le protocole</h2>
-
-<header>
+<main in:fade={{ duration: 100 }}>
+	<h2>Informations sur le protocole</h2>
 	<Field Icon={IconDescription} label="Description">
 		<textarea
 			class="description"
@@ -144,11 +144,10 @@
 			</ul>
 		</Field>
 	{/if}
-</header>
+</main>
 
 <style>
-	header {
-		margin-bottom: 2em;
+	main {
 		display: flex;
 		flex-direction: column;
 		gap: 1.5em;

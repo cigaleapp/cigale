@@ -15,6 +15,7 @@
 	import Switch from '$lib/Switch.svelte';
 	import { entries } from '$lib/utils';
 	import { updater } from '../updater.svelte.js';
+	import { fade } from 'svelte/transition';
 
 	const { data } = $props();
 	const { type, description, learnMore, required, mergeMethod } = $derived(data.metadata);
@@ -34,7 +35,7 @@
 		})[mergeMethod] ?? IconMergeNone;
 </script>
 
-<main>
+<main in:fade={{ duration: 100 }}>
 	<Field label="Description">
 		<textarea
 			rows="5"

@@ -8,6 +8,7 @@
 	import IconOpenDetails from '~icons/ph/caret-down';
 	import IconTrash from '~icons/ph/trash';
 	import IconAdd from '~icons/ph/plus';
+	import { fade } from 'svelte/transition';
 
 	const { data } = $props();
 	let settings = $derived(data.crop);
@@ -44,7 +45,7 @@
 	});
 </script>
 
-<div class="content">
+<div class="content" in:fade={{ duration: 100 }}>
 	<h2>Recadrage des images</h2>
 
 	<Field label="Stockage des boîtes">TODO</Field>
