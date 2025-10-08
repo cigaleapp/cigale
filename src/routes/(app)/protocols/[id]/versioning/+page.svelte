@@ -1,46 +1,58 @@
 <script>
+	import { page } from '$app/state';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
-	import { databaseHandle, tables } from '$lib/idb.svelte.js';
+	import { percent } from '$lib/i18n.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import { compareProtocolWithUpstream, hasUpgradeAvailable } from '$lib/protocols.js';
+	import Logo from '$lib/Logo.svelte';
+	import { hasUpgradeAvailable } from '$lib/protocols.js';
+	import { clamp, gradientedColor } from '$lib/utils.js';
 	import { type } from 'arktype';
+	import { fade } from 'svelte/transition';
 	import IconCheck from '~icons/ph/check';
 	import IconUnpublished from '~icons/ph/cloud-x';
 	import IconWarning from '~icons/ph/warning';
 	import { updater } from '../updater.svelte.js';
 	import ChangesWithRemote from './ChangesWithRemote.svelte';
-	import { clamp, gradientedColor } from '$lib/utils.js';
 
 	const { data } = $props();
 	const source = $derived(typeof data.source === 'string' ? data.source : data.source?.url);
 	let { version, id } = $derived(data);
 
-	const db = $derived(databaseHandle());
-
 	/**
 	 * @typedef {object} UpstreamComparison
 	 * @property {boolean} hasMore
 	 * @property {import('microdiff').Difference[] } changes
+	 * @property {number} progress comparison in progress (0 to 1)
+	 * @property {boolean} loading whether a comparison is in progress (progress ∈ ]0.02, 1[)
 	 */
 	/** @type {UpstreamComparison} */
 	let upstreamComparison = $state({
 		hasMore: false,
-		changes: []
+		changes: [],
+		progress: 0,
+		get loading() {
+			return this.progress > 0.02 && this.progress < 1;
+		}
 	});
 
 	async function computeChangesWithUpstream() {
-		const changes = await compareProtocolWithUpstream(db, id);
+		const { changes, dirty } = await page.data.swarpc.diffProtocolWithRemote(
+			{ protocolId: id },
+			(progress) => {
+				upstreamComparison.progress = progress;
+			}
+		);
 
-		upstreamComparison = {
-			hasMore: changes.length > 100,
-			changes: changes.slice(0, 100)
-		};
+		upstreamComparison.hasMore = changes.length > 100;
+		upstreamComparison.changes = changes.slice(0, 100);
+		upstreamComparison.progress = 1;
 
-		await tables.Protocol.update(id, 'dirty', changes.length > 0);
+		await tables.Protocol.update(id, 'dirty', dirty);
 
 		return upstreamComparison.changes;
 	}
@@ -57,7 +69,7 @@
 	};
 </script>
 
-<main>
+<main in:fade={{ duration: 100 }}>
 	<h2>Versionnage</h2>
 
 	<FieldUrl
@@ -109,7 +121,7 @@
 					{:else if upToDate}
 						{#await computeChangesWithUpstream()}
 							<div class="upgrade-check loading">
-								<LoadingSpinner />
+								<LoadingSpinner progress={upstreamComparison.progress} />
 								Comparaison avec la version distante...
 							</div>
 						{:then diff}
@@ -168,22 +180,34 @@
 		{/snippet}
 	</Field>
 
-	{#if version !== undefined && upstreamComparison.changes.length > 0}
+	{#if version !== undefined && (upstreamComparison.changes.length > 0 || upstreamComparison.loading)}
 		{@const { changes, hasMore } = upstreamComparison}
 		<section class="changes-with-remote">
 			<h3>
-				<span
-					style:color={gradientedColor(
-						clamp(changes.length / 20, 0, 1),
-						'fg-neutral',
-						'fg-warning',
-						'fg-error'
-					)}
-					class="differences-count">{changes.length}{hasMore ? '+' : ''}</span
-				>
+				{#if upstreamComparison.progress >= 1}
+					<span
+						style:color={gradientedColor(
+							clamp(changes.length / 20, 0, 1),
+							'fg-neutral',
+							'fg-warning',
+							'fg-error'
+						)}
+						class="differences-count">{changes.length}{hasMore ? '+' : ''}</span
+					>
+				{/if}
 				Différences avec la version publiée
 			</h3>
-			<ChangesWithRemote {changes} />
+			{#if upstreamComparison.progress < 1}
+				<div class="loading" in:fade={{ duration: 100 }}>
+					<Logo --size="5rem" drawpercent={upstreamComparison.progress} />
+					<div class="text">
+						<p>Chargement...</p>
+						<code>{percent(upstreamComparison.progress)}</code>
+					</div>
+				</div>
+			{:else}
+				<ChangesWithRemote {changes} />
+			{/if}
 		</section>
 	{/if}
 </main>
@@ -193,6 +217,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
+		flex-grow: 1;
 	}
 
 	.upgrade-check {
@@ -218,6 +243,22 @@
 
 	h3 {
 		margin-bottom: 1em;
+	}
+
+	.changes-with-remote {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.changes-with-remote .loading {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		text-align: center;
+		flex-grow: 1;
 	}
 
 	.differences-count {

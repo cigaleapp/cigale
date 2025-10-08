@@ -14,6 +14,7 @@
 	import IconRemoveKey from '~icons/ph/trash';
 	import IconOpenInExternal from '~icons/ph/arrow-square-out';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import { fade } from 'svelte/transition';
 
 	/**
 	 * @typedef {object} Props
@@ -31,7 +32,7 @@
 	});
 </script>
 
-<dl>
+<dl in:fade>
 	{#each changes as change (change.path.join('.'))}
 		<dt
 			class:removed-key={change.type === 'REMOVE'}
