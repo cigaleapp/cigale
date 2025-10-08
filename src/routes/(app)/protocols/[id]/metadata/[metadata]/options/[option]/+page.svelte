@@ -49,6 +49,7 @@
 				rows="10"
 				value={description}
 				onblur={updater((o, { target }) => {
+					if (!(target instanceof HTMLTextAreaElement)) return;
 					o.description = target.value;
 				})}
 			></textarea>
