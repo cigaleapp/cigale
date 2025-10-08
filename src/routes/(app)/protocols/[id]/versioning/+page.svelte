@@ -13,6 +13,7 @@
 	import IconWarning from '~icons/ph/warning';
 	import { updater } from '../updater.svelte.js';
 	import ChangesWithRemote from './ChangesWithRemote.svelte';
+	import { clamp, gradientedColor } from '$lib/utils.js';
 
 	const { data } = $props();
 	const source = $derived(typeof data.source === 'string' ? data.source : data.source?.url);
@@ -169,7 +170,16 @@
 		{@const { changes, hasMore } = upstreamComparison}
 		<section class="changes-with-remote">
 			<h3>
-				Différences avec la version publiée ({changes.length}{hasMore ? '+' : ''})
+				<span
+					style:color={gradientedColor(
+						clamp(changes.length / 20, 0, 1),
+						'fg-neutral',
+						'fg-warning',
+						'fg-error'
+					)}
+					class="differences-count">{changes.length}{hasMore ? '+' : ''}</span
+				>
+				Différences avec la version publiée
 			</h3>
 			<ChangesWithRemote {changes} />
 		</section>
@@ -206,5 +216,9 @@
 
 	h3 {
 		margin-bottom: 1em;
+	}
+
+	.differences-count {
+		font-weight: bold;
 	}
 </style>
