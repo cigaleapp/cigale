@@ -16,13 +16,14 @@
 	import { updater } from './updater.svelte.js';
 	import { onDeleteOption } from '../+layout.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { fade } from 'svelte/transition';
 
 	const { data } = $props();
 	const { cascades, reverseCascades, metadata } = $derived(data);
 	const { key, label, description, learnMore, image } = $derived(data.option);
 </script>
 
-<div class="split">
+<div class="split" in:fade={{ duration: 100 }}>
 	<div class="left">
 		<Field label="Clé">
 			<InlineTextInput
