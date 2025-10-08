@@ -141,7 +141,7 @@
 	}
 </script>
 
-<div class="sidebar-and-main">
+<div class="sidebar-and-main" in:fade={{ duration: 100 }}>
 	<aside class:collapsed={collapsedSidebar}>
 		{#if !collapsedSidebar}
 			<header in:fade>

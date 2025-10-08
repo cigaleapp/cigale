@@ -56,6 +56,7 @@
 	import { slugify } from '$lib/utils.js';
 	import { error } from '@sveltejs/kit';
 	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import { fade } from 'svelte/transition';
 	import IconSearch from '~icons/ph/magnifying-glass';
 	import IconAdd from '~icons/ph/plus';
 	import IconDelete from '~icons/ph/trash';
@@ -113,7 +114,7 @@
 	}
 </script>
 
-<div class="aside-and-main">
+<div class="aside-and-main" in:fade={{ duration: 100 }}>
 	<aside>
 		<search>
 			<IconSearch />
