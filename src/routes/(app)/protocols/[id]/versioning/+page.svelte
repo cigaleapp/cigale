@@ -3,7 +3,7 @@
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
-	import { databaseHandle } from '$lib/idb.svelte.js';
+	import { databaseHandle, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { compareProtocolWithUpstream, hasUpgradeAvailable } from '$lib/protocols.js';
@@ -39,6 +39,8 @@
 			hasMore: changes.length > 100,
 			changes: changes.slice(0, 100)
 		};
+
+		await tables.Protocol.update(id, 'dirty', changes.length > 0);
 
 		return upstreamComparison.changes;
 	}

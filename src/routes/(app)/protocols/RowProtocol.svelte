@@ -2,22 +2,29 @@
 	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
+	import { databaseHandle } from '$lib/idb.svelte';
 	import { goto } from '$lib/paths';
 	import { exportProtocol } from '$lib/protocols';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import UnsavedChangesIndicator from '$lib/UnsavedChangesIndicator.svelte';
 	import IconUpgrade from '~icons/ph/arrow-circle-up';
 	import IconEdit from '~icons/ph/pencil';
 	import IconExport from '~icons/ph/share';
 	import IconDelete from '~icons/ph/trash';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
-	const { id, name, source, version, ondelete } = $props();
+	const { id, name, dirty, source, version, ondelete } = $props();
 </script>
 
 <li>
 	<section class="text">
-		<h3>{name}</h3>
+		<h3>
+			{#if dirty}
+				<UnsavedChangesIndicator help="Protocole modifié par rapport à la version publiée" />
+			{/if}
+			{name}
+		</h3>
 		<small><code>{id}</code></small>
 	</section>
 	<section class="actions">
@@ -39,7 +46,7 @@
 		<ButtonIcon
 			help="Exporter"
 			onclick={async () => {
-				await exportProtocol(resolve('/'), id).catch((e) => toasts.error(e));
+				await exportProtocol(databaseHandle(), resolve('/'), id).catch((e) => toasts.error(e));
 			}}
 		>
 			<IconExport />
