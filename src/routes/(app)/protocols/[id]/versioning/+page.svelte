@@ -72,6 +72,7 @@
 
 	<Field label="Version actuelle">
 		<InlineTextInput
+			monospace
 			label="Version"
 			Type={type('string.integer.parse')}
 			value={version?.toString() ?? ''}
