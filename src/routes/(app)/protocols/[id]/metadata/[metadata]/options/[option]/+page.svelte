@@ -48,8 +48,8 @@
 			<textarea
 				rows="10"
 				value={description}
-				onblur={updater((o, { currentTarget }) => {
-					o.description = currentTarget.value;
+				onblur={updater((o, { target }) => {
+					o.description = target.value;
 				})}
 			></textarea>
 		</Field>
