@@ -125,6 +125,9 @@ export const Protocol = type({
 	id: ID.describe(
 		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
 	),
+	dirty: type('boolean')
+		.describe('Si le protocole a été modifié depuis sa dernière exportation')
+		.default(false),
 	metadata: References,
 	name: ['string', '@', 'Nom du protocole'],
 	description: ['string', '@', 'Description du protocole'],
@@ -219,7 +222,7 @@ export const Protocol = type({
 		.optional()
 });
 
-export const ExportedProtocol = Protocol.omit('metadata')
+export const ExportedProtocol = Protocol.omit('metadata', 'dirty')
 	.in.and({
 		metadata: {
 			'[string]': Metadata.omit('id').describe('Métadonnée du protocole')
