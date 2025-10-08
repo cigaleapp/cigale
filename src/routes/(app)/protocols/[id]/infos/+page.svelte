@@ -29,6 +29,7 @@
 			value={description}
 			rows="10"
 			onblur={updater((p, { target }) => {
+				if (!(target instanceof HTMLTextAreaElement)) return;
 				p.description = target.value;
 			})}
 			placeholder="Description du protocole..."
