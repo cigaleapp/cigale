@@ -1,13 +1,17 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 
+import type { PROCEDURES } from './web-worker-procedures';
+import type { SwarpcClient } from 'swarpc';
 import 'unplugin-icons/types/svelte';
 
 declare global {
 	namespace App {
 		// interface Error {}
 		// interface Locals {}
-		// interface PageData {}
+		interface PageData {
+			swarpc: SwarpcClient<typeof PROCEDURES>;
+		}
 		interface PageState extends Record<string, any> {}
 		// interface Platform {}
 	}
