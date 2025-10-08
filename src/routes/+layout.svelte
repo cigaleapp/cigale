@@ -43,11 +43,11 @@
 	}
 
 	:global(*) {
-		font-family: 'Host Grotesk', sans-serif;
+		font-family: var(--font-regular);
 	}
 
 	:global(code, pre, code a) {
-		font-family: 'Martian Mono', monospace;
+		font-family: var(--font-mono);
 		font-weight: 260;
 	}
 

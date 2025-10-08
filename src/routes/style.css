@@ -44,6 +44,9 @@ dialog {
 
 	--corner-radius: 7px;
 	--border-thickness: 1px;
+
+	--font-regular: 'Host Grotesk', sans-serif;
+	--font-mono: 'Martian Mono', monospace;
 }
 
 :root,
