@@ -45,7 +45,7 @@
 		"prebuild": "bun run scripts/download-google-fonts.js && bun run scripts/generate-json-schemas.js",
 		"build": "vite build",
 		"preview": "vite preview",
-		"prepare": "husky && bun run prebuild",
+		"prepare": "bun run prebuild",
 		"precheck": "svelte-kit sync",
 		"check": "svelte-check --tsconfig ./jsconfig.json",
 		"preknip": "svelte-kit sync",
@@ -59,18 +59,6 @@
 		"test:watch": "vitest",
 		"wuchale": "wuchale",
 		"all-contributors": "all-contributors --files README.md --files README_FR.md"
-	},
-	"lint-staged": {
-		"*!(.svelte).{js,ts}": [
-			"oxlint --fix"
-		],
-		"*.{svelte,svelte.{js,ts}}": [
-			"oxlint --fix",
-			"eslint --fix"
-		],
-		"*": [
-			"prettier --write --ignore-unknown"
-		]
 	},
 	"devDependencies": {
 		"@electron-forge/cli": "^7.9.0",
@@ -110,13 +98,11 @@
 		"google-auth-library": "^10.4.0",
 		"google-fonts-helper": "^3.7.3",
 		"googleapis": "^161.0.0",
-		"husky": "^9.1.7",
 		"jpeg-js": "^0.4.4",
 		"jsdom": "^27.0.0",
 		"json-schema-doc-ts": "^2.0.0",
 		"jszip": "^3.10.1",
 		"knip": "^5.64.1",
-		"lint-staged": "^16.2.3",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.19.0",
 		"pdf-to-png-converter": "^3.10.0",
