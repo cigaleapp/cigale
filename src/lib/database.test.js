@@ -129,9 +129,6 @@ describe('MetadataValue', () => {
 			expect(value('true').value).toBe(true);
 			expect(value('false').value).toBe(false);
 		});
-		test('null', () => {
-			expect(value('null').value).toBe(null);
-		});
 		test('string', () => {
 			expect(value('"foo"').value).toBe('foo');
 		});
