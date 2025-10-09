@@ -21,7 +21,7 @@ import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { Analysis } from '$lib/schemas/results';
-import { compareBy, progressSplitter } from '$lib/utils';
+import { compareBy, nonnull, progressSplitter } from '$lib/utils';
 import { fetchHttpRequest, omit, pick } from '$lib/utils.js';
 import { strToU8, zip } from 'fflate';
 import { openDB } from 'idb';
@@ -30,6 +30,7 @@ import YAML from 'yaml';
 import { Schemas } from './lib/database.js';
 import { toCSV } from './lib/results.svelte.js';
 import { PROCEDURES } from './web-worker-procedures.js';
+import { toRData } from '$lib/rdata.js';
 
 /**
  * @type {import('idb').IDBPDatabase<import('./lib/idb.svelte.js').IDBDatabaseType> | undefined}
@@ -479,6 +480,10 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 						['protocol', 'observations']
 					)
 				),
+				[filepaths.metadata.csv.replace(/\.csv$/, '.RData')]: [
+					toRData(exportedObservations),
+					{ level: 0 }
+				],
 				[filepaths.metadata.csv]: strToU8(
 					toCSV(
 						[

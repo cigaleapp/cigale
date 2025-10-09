@@ -1117,3 +1117,14 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 		element.remove();
 	}, duration);
 }
+
+/**
+ * Appends data to a buffer.
+ * @param {Uint8Array<ArrayBuffer>} subject
+ * @param {Uint8Array<ArrayBuffer>} data
+ */
+export function extendBufferWith(subject, data) {
+	const offset = subject.length;
+	subject.buffer.resize(subject.byteLength + data.byteLength);
+	subject.set(data, offset);
+}
