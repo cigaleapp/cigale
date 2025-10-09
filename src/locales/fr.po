@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-09T01:04:39.452Z\n"
+"PO-Revision-Date: 2025-10-09T20:45:39.533Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -444,7 +444,6 @@ msgstr "Erreur"
 #: src/lib/exif.js
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
-#: src/lib/toasts.svelte.js
 msgid "Erreur inattendue"
 msgstr "Erreur inattendue"
 
@@ -1152,3 +1151,19 @@ msgid ""
 msgstr ""
 "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
 "clavier"
+
+#~ msgid "UTF-8"
+#~ msgstr "UTF-8"
+
+#~ msgid "NILVALUE"
+#~ msgstr "NILVALUE"
+
+#~ msgid "REF"
+#~ msgstr "REF"
+
+#~ msgid ""
+#~ "X\n"
+#~ ""
+#~ msgstr ""
+#~ "X\n"
+#~ ""
