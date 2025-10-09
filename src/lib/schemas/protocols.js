@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 import Handlebars from 'handlebars';
-import { safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
+import { entries, safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, References, URLString } from './common.js';
 import { Metadata, namespacedMetadataId } from './metadata.js';
 import { Image, Observation } from './observations.js';
@@ -9,16 +9,25 @@ import { Image, Observation } from './observations.js';
  * @import { Analysis } from './results';
  */
 
-export const ModelDetectionOutputShape = type(['"cx"', '@', 'Coordonée X du point central'])
-	.or(type(['"cy"', '@', 'Coordonée Y du point central']))
-	.or(type(['"sy"', '@', 'Coordonée Y du point supérieur gauche']))
-	.or(type(['"sx"', '@', 'Coordonée X du point supérieur gauche']))
-	.or(type(['"ex"', '@', 'Coordonée X du point inférieur droit']))
-	.or(type(['"ey"', '@', 'Coordonée Y du point inférieur droit']))
-	.or(type(['"w"', '@', 'Largeur de la boîte englobante']))
-	.or(type(['"h"', '@', 'Hauteur de la boîte englobante']))
-	.or(type(['"score"', '@', 'Score de confiance de cette boîte, entre 0 et 1']))
-	.or(type(['"_"', '@', 'Autre valeur (ignorée par CIGALE)']))
+export const MODEL_DETECTION_OUTPUT_SHAPES = {
+	cx: { help: 'Coordonée X du point central' },
+	cy: { help: 'Coordonée Y du point central' },
+	sy: { help: 'Coordonée Y du point supérieur gauche' },
+	sx: { help: 'Coordonée X du point supérieur gauche' },
+	ex: { help: 'Coordonée X du point inférieur droit' },
+	ey: { help: 'Coordonée Y du point inférieur droit' },
+	w: { help: 'Largeur de la boîte englobante' },
+	h: { help: 'Hauteur de la boîte englobante' },
+	score: { help: 'Score de confiance de cette boîte, entre 0 et 1' },
+	_: { help: 'Autre valeur (ignorée par CIGALE)' }
+};
+
+export const ModelDetectionOutputShape = type
+	.or(
+		...entries(MODEL_DETECTION_OUTPUT_SHAPES).map(([key, { help }]) =>
+			type(`"${key}"`).describe(help, 'self')
+		)
+	)
 	.array();
 
 const HANDLEBARS_HELPERS = {
