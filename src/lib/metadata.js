@@ -9,7 +9,7 @@ import {
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
-import { avg, mapValues } from './utils.js';
+import { avg, fromEntries, mapValues } from './utils.js';
 
 /**
  * @import { DatabaseHandle, ReactiveTableNames } from './idb.svelte.js'
@@ -657,10 +657,12 @@ function toNumber(type, values) {
  * Used for e.g. CSV exports.
  * @param {import('$lib/i18n.js').Language} language
  * @param {Pick<DB.Metadata, 'type'>} metadata the metadata definition
- * @param {DB.MetadataValue['value']} value the value of the metadata
+ * @param {DB.MetadataValue['value'] | null} value the value of the metadata
  * @param {string} [valueLabel] the label of the value, if applicable (e.g. for enums)
  */
 export function metadataPrettyValue(language, metadata, value, valueLabel = undefined) {
+	if (value === null) return '';
+
 	switch (metadata.type) {
 		case 'boolean':
 			switch (language) {
@@ -920,6 +922,7 @@ export function metadataDefinitionComparator(protocol) {
 
 /**
  * A null-value MetadataValue object
+ * @satisfies {ReturnType<typeof protocolMetadataValues>[string]}
  */
 const METADATA_ZERO_VALUE = /** @type {const} */ ({
 	value: null,
@@ -933,18 +936,13 @@ const METADATA_ZERO_VALUE = /** @type {const} */ ({
  *
  * @param {DB.Protocol} protocol
  * @param {DB.MetadataValues} values
+ * @returns {Record<string, Omit<DB.MetadataValue, 'value'> & { value: RuntimeValue | null }>}
  */
 export function protocolMetadataValues(protocol, values) {
-	return Object.fromEntries(
+	return fromEntries(
 		protocol.metadata
 			.filter((key) => isNamespacedToProtocol(protocol.id, key))
-			.map((key) => [
-				removeNamespaceFromMetadataId(key),
-				values[key] ?? {
-					...METADATA_ZERO_VALUE,
-					valueLabel: ''
-				}
-			])
+			.map((key) => [removeNamespaceFromMetadataId(key), values[key] ?? METADATA_ZERO_VALUE])
 	);
 }
 

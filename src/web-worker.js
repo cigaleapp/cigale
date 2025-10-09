@@ -20,8 +20,8 @@ import { MetadataValues } from '$lib/schemas/metadata';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
-import { Analysis } from '$lib/schemas/results';
-import { compareBy, progressSplitter } from '$lib/utils';
+import { Analysis, toMetadataRecord } from '$lib/schemas/results';
+import { compareBy, mapValues, progressSplitter } from '$lib/utils';
 import { fetchHttpRequest, omit, pick } from '$lib/utils.js';
 import { strToU8, zip } from 'fflate';
 import { openDB } from 'idb';
@@ -328,8 +328,8 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 
 		exportedObservations[id] = {
 			label,
-			metadata,
-			protocolMetadata: protocolMetadataValues(protocolUsed, metadata),
+			metadata: toMetadataRecord(metadata),
+			protocolMetadata: toMetadataRecord(protocolMetadataValues(protocolUsed, metadata)),
 			images: []
 		};
 
@@ -347,8 +347,10 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 
 			const image = {
 				...imageFromDatabase,
-				metadata: metadataValues,
-				protocolMetadata: protocolMetadataValues(protocolUsed, metadataValues)
+				metadata: toMetadataRecord(metadataValues),
+				protocolMetadata: toMetadataRecord(
+					protocolMetadataValues(protocolUsed, metadataValues)
+				)
 			};
 
 			const filepathsData = { observation: exportedObservations[id], image, sequence };

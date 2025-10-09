@@ -1,9 +1,28 @@
 import { type } from 'arktype';
+import { MetadataRuntimeValue } from './metadata.js';
 import { Protocol } from './protocols.js';
+// Can't use $lib/ in $lib/schemas files, they're susceptible
+// to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
+import { mapValues } from '../utils.js';
 
 const MetadataRecord = type({
 	'[string]': {
-		value: ['unknown', '@', 'Valeur de la métadonnée'],
+		value: [
+			type.or(
+				'null',
+				MetadataRuntimeValue.boolean,
+				MetadataRuntimeValue.integer,
+				MetadataRuntimeValue.float,
+				MetadataRuntimeValue.string,
+				// MetadataRuntimeValue.date
+				// Date is not compatible with JSON Schemas, use a datestring instead
+				'string.date.iso',
+				MetadataRuntimeValue.location,
+				MetadataRuntimeValue.boundingbox
+			),
+			'@',
+			'Valeur de la métadonnée'
+		],
 		'valueLabel?': [
 			'string',
 			'@',
@@ -58,3 +77,14 @@ export const Analysis = type({
 	}).describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),
 	protocol: Protocol.describe("Le protocole utilisé pour cette session d'analyse")
 });
+
+/**
+ * @param {Record<string, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/metadata.js').RuntimeValue }>} values
+ * @returns {typeof MetadataRecord.infer}
+ */
+export function toMetadataRecord(values) {
+	return mapValues(values, ({ value, ...rest }) => ({
+		value: value instanceof Date ? value.toISOString() : value,
+		...rest
+	}));
+}
