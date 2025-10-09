@@ -15,6 +15,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import Fuse from 'fuse.js';
+	import { fade } from 'svelte/transition';
 	import { queryParameters, ssp } from 'sveltekit-search-params';
 	import IconCheck from '~icons/ph/check';
 	import IconManage from '~icons/ph/gear';
@@ -142,7 +143,7 @@
 	</section>
 </ModalConfirm>
 
-<div class="content">
+<div class="content" in:fade={{ duration: 100 }}>
 	<h1>Choisir un protocole</h1>
 
 	<ul>

@@ -15,6 +15,7 @@
 	import { avg, groupBy, nonnull } from '$lib/utils.js';
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	seo({ title: 'Recadrer' });
 
@@ -51,7 +52,7 @@
 	);
 </script>
 
-<section class="observations">
+<section class="observations" in:fade={{ duration: 100 }}>
 	<AreaObservations
 		{items}
 		sort={getSettings().gallerySort}

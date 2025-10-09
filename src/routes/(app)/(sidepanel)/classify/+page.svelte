@@ -24,6 +24,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { sum } from '$lib/utils.js';
 	import { watch } from 'runed';
+	import { fade } from 'svelte/transition';
 
 	seo({ title: 'Classification' });
 
@@ -135,7 +136,7 @@
 {/snippet}
 
 {#if !classifmodelLoaded}
-	<section class="loading">
+	<section class="loading" in:fade={{ duration: 100 }}>
 		<Logo loading />
 		<p>Chargement du modèle de classification</p>
 		<p class="source">{@render modelsource()}</p>
@@ -144,7 +145,7 @@
 		</div>
 	</section>
 {:else if !classifModelLoadingError}
-	<section class="observations" class:empty={!items.length}>
+	<section class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
 		<AreaObservations
 			{items}
 			sort={getSettings().gallerySort}
@@ -186,7 +187,7 @@
 		{/if}
 	</section>
 {:else}
-	<section class="loading errored">
+	<section class="loading errored" in:fade={{ duration: 100 }}>
 		<Logo variant="error" />
 		<h2>Oops!</h2>
 		<p>Impossible de charger le modèle de classification</p>

@@ -14,6 +14,7 @@
 	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
 	import RowProtocol from './RowProtocol.svelte';
 	import { plural } from '$lib/i18n';
+	import { fade } from 'svelte/transition';
 
 	const { data } = $props();
 
@@ -78,7 +79,7 @@
 	{/snippet}
 </Modal>
 
-<div class="page">
+<div class="page" in:fade={{ duration: 100 }}>
 	<header>
 		<h1>Protocoles</h1>
 		<section class="actions">

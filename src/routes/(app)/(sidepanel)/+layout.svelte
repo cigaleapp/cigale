@@ -21,6 +21,7 @@
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
+	import { fade } from 'svelte/transition';
 
 	seo({ title: 'Importer' });
 
@@ -201,7 +202,7 @@
 	});
 </script>
 
-<div class="main-and-sidepanel" class:has-sidepanel={showSidePanel}>
+<div class="main-and-sidepanel" class:has-sidepanel={showSidePanel} in:fade={{ duration: 100 }}>
 	<main data-testid="app-main">{@render children?.()}</main>
 	{#if showSidePanel}
 		<PreviewSidePanel

@@ -6,6 +6,7 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { sum } from '$lib/utils.js';
+	import { fade } from 'svelte/transition';
 
 	const { data, children } = $props();
 
@@ -51,7 +52,7 @@
 {/snippet}
 
 {#await loadCropperModel(uiState.selectedCropModel)}
-	<section class="loading">
+	<section class="loading" in:fade={{ duration: 100 }}>
 		<Logo loading />
 		<p>Chargement du modèle de recadrage…</p>
 		<p class="source">{@render modelsource()}</p>

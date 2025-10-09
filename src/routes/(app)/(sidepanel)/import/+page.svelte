@@ -13,15 +13,22 @@
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+	import { unique } from '$lib/utils';
+	import { fade } from 'svelte/transition';
 
 	const allImages = $derived([
-		...tables.Image.state.map(({ filename, id, addedAt, fileId }) => ({
-			id: fileId ?? id,
-			addedAt,
-			name: filename,
-			virtual: false,
-			data: tables.Image.getFromState(id)
-		})),
+		...unique(
+			tables.Image.state.map(({ filename, id, addedAt, fileId }) => ({
+				id: fileId ?? id,
+				addedAt,
+				name: filename,
+				virtual: false,
+				data: tables.Image.getFromState(id)
+			})),
+			// Since id can (and mostly is) fileId, we have to uniquify
+			// by the id because multiple Images can reference the same ImageFile
+			(image) => image.id
+		),
 		...uiState.processing.files.map(({ name, id, addedAt }) => ({
 			id,
 			addedAt,
@@ -32,6 +39,8 @@
 	]);
 
 	const empty = $derived(allImages.length === 0);
+
+	$inspect(allImages);
 </script>
 
 <Dropzone
@@ -39,7 +48,7 @@
 	clickable={allImages.length === 0}
 	onfiles={({ files }) => importMore(files)}
 >
-	<section class="observations" class:empty>
+	<section class="observations" class:empty in:fade={{ duration: 100 }}>
 		<AreaObservations
 			items={allImages}
 			sort={getSettings().gallerySort}
