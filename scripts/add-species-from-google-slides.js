@@ -89,7 +89,10 @@ const longestNameLength = Math.max(...response.data.files.map((file) => file.nam
 
 for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompare(b.name))) {
 	const log = (...items) =>
-		console.info(`${cc.bold}${cc.cyan}[${name.padStart(longestNameLength)}]${cc.reset}`, ...items);
+		console.info(
+			`${cc.bold}${cc.cyan}[${name.padStart(longestNameLength)}]${cc.reset}`,
+			...items
+		);
 
 	try {
 		log('Exporting to PDF');
@@ -193,7 +196,8 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 		);
 
 		const learnMore =
-			Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))[0] ?? links[0][0];
+			Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))[0] ??
+			links[0][0];
 
 		for (const [filepath, protocol] of Object.entries(protocols)) {
 			log(`Adding to ${cc.blue}${protocol.fresh.id}${cc.reset}`);
@@ -244,7 +248,9 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 						(
 							Math.max(
 								...optionKeys(options),
-								...optionKeys(protocol.old.metadata[`${protocol.old.id}__species`].options)
+								...optionKeys(
+									protocol.old.metadata[`${protocol.old.id}__species`].options
+								)
 							) + 1
 						).toString(),
 					image: imageUrl,

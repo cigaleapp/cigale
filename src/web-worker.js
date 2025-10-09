@@ -155,7 +155,8 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 	const session = inferenceSessions.get('classification');
 	if (!session) return { scores: [] };
 	const { classmapping, onnx } = session;
-	if (!classmapping) throw new Error("Le modèle de classification n'a pas de classmapping associé");
+	if (!classmapping)
+		throw new Error("Le modèle de classification n'a pas de classmapping associé");
 
 	tools.abortSignal?.throwIfAborted();
 	if (!image.fileId) throw new Error(`Image ${imageId} has no ImageFile`);
@@ -339,7 +340,10 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 				imagesFromDatabase.find((i) => i.id === imageId)
 			);
 
-			const metadataValues = await addValueLabels(imageFromDatabase.metadata, metadataOptions);
+			const metadataValues = await addValueLabels(
+				imageFromDatabase.metadata,
+				metadataOptions
+			);
 
 			const image = {
 				...imageFromDatabase,
@@ -409,14 +413,22 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 
 			try {
 				if (contentType === 'image/jpeg') {
-					croppedBytes = addExifMetadata(cropped, Object.values(metadataDefinitions), metadata);
+					croppedBytes = addExifMetadata(
+						cropped,
+						Object.values(metadataDefinitions),
+						metadata
+					);
 				} else {
 					croppedBytes = new Uint8Array(cropped);
 				}
 
 				if (include === 'full') {
 					if (contentType === 'image/jpeg') {
-						originalBytes = addExifMetadata(original, Object.values(metadataDefinitions), metadata);
+						originalBytes = addExifMetadata(
+							original,
+							Object.values(metadataDefinitions),
+							metadata
+						);
 					} else {
 						originalBytes = new Uint8Array(original);
 					}
@@ -489,7 +501,12 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 										[
 											metadataPrettyKey(metadataDefinitions[key]),
 											// Exports always have english value serializations for better interoperability
-											metadataPrettyValue('en', metadataDefinitions[key], value, valueLabel)
+											metadataPrettyValue(
+												'en',
+												metadataDefinitions[key],
+												value,
+												valueLabel
+											)
 										],
 										[
 											`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,

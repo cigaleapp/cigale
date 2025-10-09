@@ -257,7 +257,8 @@ export async function deleteMetadataValue({
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
 
-	if (!image && !observation) throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+	if (!image && !observation)
+		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 
 	console.debug(`Delete metadata ${metadataId} in ${subjectId}`);
 	if (image) {
@@ -423,7 +424,9 @@ function mergeMetadata(definition, values) {
 				.flatMap((v) => Object.keys(v.alternatives))
 				.map((valueAsString) => [
 					valueAsString,
-					merger(values.flatMap((v) => v.alternatives[valueAsString] ?? null).filter(Boolean))
+					merger(
+						values.flatMap((v) => v.alternatives[valueAsString] ?? null).filter(Boolean)
+					)
 				])
 		);
 
@@ -644,7 +647,8 @@ function toNumber(type, values) {
 	// @ts-ignore
 	if (type === 'float') return values;
 	if (type === 'boolean') return values.map((v) => (v ? 1 : 0));
-	if (type === 'date') return values.map((v) => new Date(/** @type {Date|string} */ (v)).getTime());
+	if (type === 'date')
+		return values.map((v) => new Date(/** @type {Date|string} */ (v)).getTime());
 	throw new Error(`Impossible de convertir des valeurs de type ${type} en nombre`);
 }
 
@@ -673,9 +677,10 @@ export function metadataPrettyValue(language, metadata, value, valueLabel = unde
 			return valueLabel || value.toString();
 
 		case 'location': {
-			const { latitude, longitude } = type({ latitude: 'number', longitude: 'number' }).assert(
-				value
-			);
+			const { latitude, longitude } = type({
+				latitude: 'number',
+				longitude: 'number'
+			}).assert(value);
 
 			return `${latitude}, ${longitude}`;
 		}
@@ -721,9 +726,9 @@ if (import.meta.vitest) {
 			});
 
 			test('dates', () => {
-				expect(metadataPrettyValue('fr', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
-					'01/02/2023, 15:04:05'
-				);
+				expect(
+					metadataPrettyValue('fr', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))
+				).toBe('01/02/2023, 15:04:05');
 			});
 
 			test('floats', () => {
@@ -731,9 +736,9 @@ if (import.meta.vitest) {
 			});
 
 			test('bounding boxes', () => {
-				expect(metadataPrettyValue('fr', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
-					'Boîte de (1, 2) à (4, 6)'
-				);
+				expect(
+					metadataPrettyValue('fr', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
+				).toBe('Boîte de (1, 2) à (4, 6)');
 			});
 
 			test('integers', () => {
@@ -753,15 +758,15 @@ if (import.meta.vitest) {
 			});
 
 			test('dates', () => {
-				expect(metadataPrettyValue('en', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
-					'02/01/2023, 3:04:05 PM'
-				);
+				expect(
+					metadataPrettyValue('en', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))
+				).toBe('02/01/2023, 3:04:05 PM');
 			});
 
 			test('bounding boxes', () => {
-				expect(metadataPrettyValue('en', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
-					'Box from (1, 2) to (4, 6)'
-				);
+				expect(
+					metadataPrettyValue('en', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
+				).toBe('Box from (1, 2) to (4, 6)');
 			});
 
 			test('floats', () => {
@@ -775,16 +780,28 @@ if (import.meta.vitest) {
 
 		test('locations', () => {
 			expect(
-				metadataPrettyValue('fr', { type: 'location' }, { latitude: 12.34, longitude: 56.78 })
+				metadataPrettyValue(
+					'fr',
+					{ type: 'location' },
+					{ latitude: 12.34, longitude: 56.78 }
+				)
 			).toBe('12.34, 56.78');
 			expect(
-				metadataPrettyValue('en', { type: 'location' }, { latitude: 12.34, longitude: 56.78 })
+				metadataPrettyValue(
+					'en',
+					{ type: 'location' },
+					{ latitude: 12.34, longitude: 56.78 }
+				)
 			).toBe('12.34, 56.78');
 		});
 
 		test('enums', () => {
-			expect(metadataPrettyValue('en', { type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
-			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
+			expect(metadataPrettyValue('en', { type: 'enum' }, 'value1', 'Label 1')).toBe(
+				'Label 1'
+			);
+			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value1', 'Label 1')).toBe(
+				'Label 1'
+			);
 			expect(metadataPrettyValue('en', { type: 'enum' }, 'value2')).toBe('value2');
 			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value2')).toBe('value2');
 		});

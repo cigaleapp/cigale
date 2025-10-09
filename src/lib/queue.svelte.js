@@ -66,7 +66,11 @@ class ProcessingQueue {
 					Promise.allSettled(range(this.parallelism).map(async () => this.pop())).then(
 						(results) => {
 							if (results.some((r) => r.status === 'rejected')) {
-								reject(results.filter((r) => r.status === 'rejected').map((r) => r.reason));
+								reject(
+									results
+										.filter((r) => r.status === 'rejected')
+										.map((r) => r.reason)
+								);
 							} else {
 								resolve(undefined);
 							}

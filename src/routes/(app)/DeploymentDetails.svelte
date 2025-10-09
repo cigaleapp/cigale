@@ -120,7 +120,8 @@
 
 		{#await hasPage('_vitest') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary
+				>
 			{/if}
 		{/await}
 

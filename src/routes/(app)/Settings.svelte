@@ -50,7 +50,9 @@
 		() => effectiveTheme,
 		(theme) => {
 			window.nativeWindow?.setControlsColor(
-				getComputedStyle(document.documentElement).getPropertyValue(`--${theme}__fg-primary`)
+				getComputedStyle(document.documentElement).getPropertyValue(
+					`--${theme}__fg-primary`
+				)
 			);
 		}
 	);
@@ -82,7 +84,9 @@
 		<div class="label">Thème</div>
 		<div class="setting">
 			<Switch
-				value={getSettings().theme === 'auto' ? systemIsLight : getSettings().theme === 'light'}
+				value={getSettings().theme === 'auto'
+					? systemIsLight
+					: getSettings().theme === 'light'}
 				onchange={async (isLight) => {
 					await setSetting('theme', isLight ? 'light' : 'dark');
 				}}
@@ -204,7 +208,9 @@
 		</ButtonSecondary>
 	</section>
 	<footer>
-		CIGALE ver. <a href="https://github.com/cigaleapp/cigale/tree/{import.meta.env.buildCommit}">
+		CIGALE ver. <a
+			href="https://github.com/cigaleapp/cigale/tree/{import.meta.env.buildCommit}"
+		>
 			{import.meta.env.buildCommit.slice(0, 7)}
 		</a>
 		·

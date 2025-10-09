@@ -52,7 +52,9 @@ export async function importResultsZip(file, id, protocolId) {
 
 	if (analysis === undefined) {
 		uiState.processing.removeFile(id);
-		toasts.error(`Le fichier d'analyse de ${file.name} n'est pas au format JSON ou est corrompu`);
+		toasts.error(
+			`Le fichier d'analyse de ${file.name} n'est pas au format JSON ou est corrompu`
+		);
 		return;
 	}
 

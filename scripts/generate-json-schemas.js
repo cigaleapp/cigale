@@ -56,19 +56,28 @@ if (import.meta.vitest) {
 				c: 3,
 				d: { $ark: { object2: true } }
 			};
-			const result = deleteKeys(input, ([, value]) => typeof value === 'object' && value.$ark);
+			const result = deleteKeys(
+				input,
+				([, value]) => typeof value === 'object' && value.$ark
+			);
 			expect(result).toEqual({ a: 1, c: 3 });
 		});
 
 		it('should return an empty object if all keys match the predicate', () => {
 			const input = { $ark: { object1: true } };
-			const result = deleteKeys(input, ([, value]) => typeof value === 'object' && value.object1);
+			const result = deleteKeys(
+				input,
+				([, value]) => typeof value === 'object' && value.object1
+			);
 			expect(result).toEqual({});
 		});
 
 		it('should return the same object if no keys match the predicate', () => {
 			const input = { a: 1, b: 2 };
-			const result = deleteKeys(input, ([, value]) => typeof value === 'object' && value.$ark);
+			const result = deleteKeys(
+				input,
+				([, value]) => typeof value === 'object' && value.$ark
+			);
 			expect(result).toEqual(input);
 		});
 	});

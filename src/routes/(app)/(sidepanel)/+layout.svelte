@@ -145,7 +145,9 @@
 	});
 
 	let showSidePanel = $derived(
-		uiState.processing.files.length + tables.Observation.state.length + tables.Image.state.length >
+		uiState.processing.files.length +
+			tables.Observation.state.length +
+			tables.Image.state.length >
 			0
 	);
 
@@ -210,7 +212,9 @@
 			metadata={mergedMetadataValues}
 			canmerge={uiState.selection.length > 0}
 			onmerge={page.route.id?.endsWith('classify') ? mergeSelection : undefined}
-			cansplit={uiState.selection.some((id) => tables.Observation.state.some((o) => o.id === id))}
+			cansplit={uiState.selection.some((id) =>
+				tables.Observation.state.some((o) => o.id === id)
+			)}
 			onsplit={page.route.id?.endsWith('classify') ? splitSelection : undefined}
 			onimport={page.route.id?.endsWith('import') ? importImages : undefined}
 			ondelete={deleteSelection}

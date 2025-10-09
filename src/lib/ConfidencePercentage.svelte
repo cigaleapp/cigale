@@ -11,7 +11,11 @@
 	 */
 
 	/** @type {Props} */
-	const { value, children, tooltip: help = (percentage) => `Confiance: ${percentage}` } = $props();
+	const {
+		value,
+		children,
+		tooltip: help = (percentage) => `Confiance: ${percentage}`
+	} = $props();
 
 	const color = $derived(
 		gradientedColor(value, 'fg-error', 'fg-warning', 'fg-neutral', 'fg-success')

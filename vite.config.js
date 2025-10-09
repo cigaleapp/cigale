@@ -34,7 +34,9 @@ export default defineConfig({
 	},
 	define: {
 		'import.meta.vitest': 'undefined',
-		'import.meta.env.buildCommit': JSON.stringify(execSync('git rev-parse HEAD').toString().trim()),
+		'import.meta.env.buildCommit': JSON.stringify(
+			execSync('git rev-parse HEAD').toString().trim()
+		),
 		'import.meta.env.previewingPrNumber': process.env.PR_NUMBER ?? 'null'
 	},
 	worker: {

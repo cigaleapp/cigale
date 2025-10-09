@@ -237,9 +237,9 @@ describe('coerceExifValue', () => {
 
 	describe('to date', () => {
 		test('valid date', () => {
-			expect(coerceExifValue(new Date('2023-10-01T12:00:00Z').valueOf() * 1e-3, 'date')).toEqual(
-				new Date('2023-10-01T12:00:00Z')
-			);
+			expect(
+				coerceExifValue(new Date('2023-10-01T12:00:00Z').valueOf() * 1e-3, 'date')
+			).toEqual(new Date('2023-10-01T12:00:00Z'));
 		});
 		test('NaN-valued date', () => {
 			expect(() => coerceExifValue(NaN, 'date')).toThrowErrorMatchingInlineSnapshot(
@@ -278,7 +278,9 @@ describe('coerceExifValue', () => {
 describe('serializeExifValue', () => {
 	describe('from date', () => {
 		test('valid date', () => {
-			expect(serializeExifValue(new Date('2023-10-01T12:00:00Z'))).toEqual('2023:10:01 12:00:00');
+			expect(serializeExifValue(new Date('2023-10-01T12:00:00Z'))).toEqual(
+				'2023:10:01 12:00:00'
+			);
 		});
 		test('invalid date', () => {
 			expect(() => serializeExifValue(new Date(NaN))).toThrowErrorMatchingInlineSnapshot(

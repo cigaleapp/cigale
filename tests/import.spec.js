@@ -362,9 +362,9 @@ test('can extract EXIF GPS data from an image', async ({ page }) => {
 	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
 		'2008-10-22'
 	);
-	await expect(sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')).toHaveValue(
-		'43.46715666666389, 11.885394999997223'
-	);
+	await expect(
+		sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')
+	).toHaveValue('43.46715666666389, 11.885394999997223');
 
 	const metadataValues = await getMetadataValuesOfImage({
 		page,

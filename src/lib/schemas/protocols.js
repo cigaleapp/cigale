@@ -179,7 +179,11 @@ export const Protocol = type({
 			),
 			input: ModelInput.describe("Configuration de l'entrée du modèle"),
 			output: type({
-				'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"],
+				'name?': [
+					'string',
+					'@',
+					"Nom de l'output du modèle à utiliser. output0 par défaut"
+				],
 				normalized: [
 					'boolean',
 					'@',

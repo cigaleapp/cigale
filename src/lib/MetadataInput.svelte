@@ -83,7 +83,9 @@
 				}
 
 				let parsedValue =
-					type === 'integer' ? Number.parseInt(newValue, 10) : Number.parseFloat(newValue);
+					type === 'integer'
+						? Number.parseInt(newValue, 10)
+						: Number.parseFloat(newValue);
 
 				if (Number.isNaN(parsedValue)) {
 					parsedValue = undefined;

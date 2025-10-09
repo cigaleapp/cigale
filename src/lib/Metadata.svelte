@@ -128,7 +128,11 @@
 		</section>
 	{/if}
 	{#if isDebugMode()}
-		<pre class="debug">{JSON.stringify({ ...splitMetadataId(definition.id), value }, null, 2)}</pre>
+		<pre class="debug">{JSON.stringify(
+				{ ...splitMetadataId(definition.id), value },
+				null,
+				2
+			)}</pre>
 	{/if}
 </div>
 

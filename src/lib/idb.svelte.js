@@ -108,7 +108,9 @@ function wrangler(table) {
 			// Update reactive state
 			const index = _tablesState[table].findIndex((item) => item.id === key);
 			if (index === -1) {
-				console.debug(`${logLabel}: item not found in reactive state, refetching entire list`);
+				console.debug(
+					`${logLabel}: item not found in reactive state, refetching entire list`
+				);
 				// @ts-ignore
 				_tablesState[table] = await this.list();
 			} else {
@@ -256,7 +258,9 @@ export async function drop(table, id) {
 			return list(table);
 		})
 		.then((list) => {
-			console.debug(`delete ${table} ${id}: objects are now ${list.map((o) => o.id).join(', ')}`);
+			console.debug(
+				`delete ${table} ${id}: objects are now ${list.map((o) => o.id).join(', ')}`
+			);
 		});
 }
 

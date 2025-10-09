@@ -17,7 +17,8 @@ export default defineConfig({
 				if (/^toasts\.(info|warn|error|success)$/.test(call)) return true;
 
 				const startsWithUpperLetter =
-					msg[0] === msg[0].toUpperCase() && msg[0].toLowerCase() !== msg[0].toUpperCase();
+					msg[0] === msg[0].toUpperCase() &&
+					msg[0].toLowerCase() !== msg[0].toUpperCase();
 
 				const isKeyboardShortcutExpression =
 					/^(Shift|Ctrl|Alt)\+\S+$/.test(msg) ||
@@ -31,9 +32,13 @@ export default defineConfig({
 				}
 
 				if (startsWithUpperLetter && scope === 'script') {
-					return ['defineKeyboardShortcuts', 'seo', '$derived.by', '$derived', '$effect'].includes(
-						call
-					);
+					return [
+						'defineKeyboardShortcuts',
+						'seo',
+						'$derived.by',
+						'$derived',
+						'$effect'
+					].includes(call);
 				}
 			}
 		}),

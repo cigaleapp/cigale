@@ -38,7 +38,10 @@ export async function mergeToObservation(parts) {
 						db.databaseHandle(),
 						observations.map((o) => o.metadataOverrides)
 					)
-				).map(([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }])
+				).map(([key, { value, ...rest }]) => [
+					key,
+					{ ...rest, value: JSON.stringify(value) }
+				])
 			)
 		};
 

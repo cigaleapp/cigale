@@ -526,8 +526,14 @@ describe('wrangler', () => {
 
 			const items = tables.Observation.all();
 
-			expect(await items.next()).toEqual({ done: false, value: { ...observation(0), addedAt } });
-			expect(await items.next()).toEqual({ done: false, value: { ...observation(1), addedAt } });
+			expect(await items.next()).toEqual({
+				done: false,
+				value: { ...observation(0), addedAt }
+			});
+			expect(await items.next()).toEqual({
+				done: false,
+				value: { ...observation(1), addedAt }
+			});
 			expect(await items.next()).toEqual({ done: true, value: undefined });
 			expect(await items.next()).toEqual({ done: true, value: undefined });
 		});

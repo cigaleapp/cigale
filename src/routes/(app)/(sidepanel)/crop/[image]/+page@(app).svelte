@@ -37,7 +37,12 @@
 		parseImageId
 	} from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { assertIs, deleteMetadataValue, hasRuntimeType, storeMetadataValue } from '$lib/metadata';
+	import {
+		assertIs,
+		deleteMetadataValue,
+		hasRuntimeType,
+		storeMetadataValue
+	} from '$lib/metadata';
 
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
@@ -318,7 +323,9 @@
 				const current = image.metadata[uiState.cropMetadataId]?.value;
 				return [
 					image.id,
-					initial && hasRuntimeType('boundingbox', current) && !coordsAreEqual(initial, current)
+					initial &&
+						hasRuntimeType('boundingbox', current) &&
+						!coordsAreEqual(initial, current)
 				];
 			})
 		)
@@ -417,7 +424,11 @@
 				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : undefined,
 				manuallyModified: true
 			});
-		} else if (images.length === 1 && firstImage && !firstImage.metadata[uiState.cropMetadataId]) {
+		} else if (
+			images.length === 1 &&
+			firstImage &&
+			!firstImage.metadata[uiState.cropMetadataId]
+		) {
 			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
 			newImageId = firstImage.id;
 			await storeMetadataValue({
@@ -486,7 +497,9 @@
 	}
 
 	async function moveToNextUnconfirmed() {
-		const imagesAndBoxes = images.map((img) => /** @type {const}*/ ([img, boundingBoxes[img.id]]));
+		const imagesAndBoxes = images.map(
+			(img) => /** @type {const}*/ ([img, boundingBoxes[img.id]])
+		);
 
 		for (const [image, box] of imagesAndBoxes) {
 			await onCropChange(image.id, box ? toTopLeftCoords(box) : undefined);
@@ -849,7 +862,10 @@
 				<ButtonInk
 					dangerous
 					onclick={deleteImageFileAndGotoNext}
-					help={{ text: 'Supprimer cette image et passer à la suivante', keyboard: '$mod+Delete' }}
+					help={{
+						text: 'Supprimer cette image et passer à la suivante',
+						keyboard: '$mod+Delete'
+					}}
 				>
 					<IconDelete />
 					Supprimer
@@ -921,7 +937,9 @@
 						<div class="text">
 							<p class="index">Boîte #{i + 1}</p>
 							<p class="dimensions">
-								<code use:tooltip={"Dimensions de l'image recadrée (en pixels)"}>{w}×{h}</code>
+								<code use:tooltip={"Dimensions de l'image recadrée (en pixels)"}
+									>{w}×{h}</code
+								>
 								<!-- we have a neural-infered value only, put the confidence next to the value -->
 								{#if initBox && !image.metadata[uiState.cropMetadataId].manuallyModified}
 									<span class="sep">&middot;</span>
@@ -936,7 +954,9 @@
 						<div class="actions">
 							{#if Object.values(boundingBoxes).length > 1}
 								<ButtonIcon
-									help={isFocused ? 'Réafficher les autres boîtes' : 'Masquer les autres boîtes'}
+									help={isFocused
+										? 'Réafficher les autres boîtes'
+										: 'Masquer les autres boîtes'}
 									keyboard="F"
 									onclick={() => (focusedImageId = isFocused ? '' : image.id)}
 									crossout={isFocused}
@@ -977,7 +997,10 @@
 								{/snippet}
 							</SentenceJoin>
 						</p>
-						<p>Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier</p>
+						<p>
+							Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis
+							clavier
+						</p>
 					</li>
 				{/if}
 			</ul>
@@ -1004,7 +1027,10 @@
 						Recadrages confirmés
 						{@render percentage(confirmedCropsCount)}
 					</p>
-					<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
+					<ProgressBar
+						alwaysActive
+						progress={confirmedCropsCount / sortedFileIds.length}
+					/>
 				</div>
 			{/if}
 		</section>
@@ -1044,7 +1070,8 @@
 				>
 					<Switch
 						bind:value={
-							() => getSettings().cropAutoNext, (value) => setSetting('cropAutoNext', value)
+							() => getSettings().cropAutoNext,
+							(value) => setSetting('cropAutoNext', value)
 						}
 						label="Auto"
 					/>
