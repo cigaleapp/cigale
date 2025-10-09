@@ -23,26 +23,6 @@ export function parseMetadataOptionId(optionId) {
 	return { metadataId, key };
 }
 
-export const MetadataValue = type({
-	value: type('string.json').pipe((jsonstring) => {
-		/** @type {import('../metadata').RuntimeValue<typeof MetadataType.infer>}  */
-		let out = JSON.parse(jsonstring);
-		if (typeof out === 'string') out = parseISOSafe(out) ?? out;
-		return out;
-	}),
-	confidence: Probability.default(1),
-	manuallyModified: type('boolean')
-		.describe('Si la valeur a été modifiée manuellement')
-		.default(false),
-	alternatives: {
-		'[string.json]': Probability
-	}
-});
-
-export const MetadataValues = scope({ ID }).type({
-	'[ID]': MetadataValue
-});
-
 /**
  * @satisfies { Record<string, {label: string, help: string}> }
  */
@@ -73,6 +53,61 @@ export const MetadataType = type.or(
 	type("'location'", '@', METADATA_TYPES.location.help),
 	type("'boundingbox'", '@', METADATA_TYPES.boundingbox.help)
 );
+
+/**
+ * @typedef {typeof MetadataType.infer} MetadataType
+ */
+
+/**
+ * @satisfies {{[ key in MetadataType ]: import('arktype').Type }}
+ */
+export const MetadataRuntimeValue = /** @type {const} */ ({
+	string: type('string'),
+	boolean: type('boolean'),
+	integer: type('number'),
+	float: type('number'),
+	enum: type('string'),
+	date: type('Date'),
+	location: type({ latitude: 'number', longitude: 'number' }),
+	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' })
+});
+
+export const MetadataRuntimeValueAny = type.or(
+	MetadataRuntimeValue.string,
+	MetadataRuntimeValue.boolean,
+	MetadataRuntimeValue.integer,
+	MetadataRuntimeValue.float,
+	MetadataRuntimeValue.enum,
+	MetadataRuntimeValue.date,
+	MetadataRuntimeValue.location,
+	MetadataRuntimeValue.boundingbox
+);
+
+/**
+ * @template {MetadataType} [Type=MetadataType]
+ * @typedef  RuntimeValue
+ * @type { typeof MetadataRuntimeValue[Type]['infer'] }
+ */
+
+export const MetadataValue = type({
+	value: type('string.json').pipe((jsonstring) => {
+		/** @type {import('../metadata').RuntimeValue<typeof MetadataType.infer>}  */
+		let out = JSON.parse(jsonstring);
+		if (typeof out === 'string') out = parseISOSafe(out) ?? out;
+		return out;
+	}, MetadataRuntimeValueAny),
+	confidence: Probability.default(1),
+	manuallyModified: type('boolean')
+		.describe('Si la valeur a été modifiée manuellement')
+		.default(false),
+	alternatives: {
+		'[string.json]': Probability
+	}
+});
+
+export const MetadataValues = scope({ ID }).type({
+	'[ID]': MetadataValue
+});
 
 /**
  * @satisfies { Record<string, { label: string; help: string }> }
