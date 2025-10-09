@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-09T02:20:38.634Z\n"
+"PO-Revision-Date: 2025-10-10T11:01:37.526Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -164,6 +164,7 @@ msgstr "Alternatives"
 msgid "Analyse…"
 msgstr "Analyse…"
 
+#: src/lib/toasts.svelte.js
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -428,6 +429,7 @@ msgstr "Erreur"
 #: src/lib/exif.js
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
+#: src/lib/toasts.svelte.js
 msgid "Erreur inattendue"
 msgstr "Erreur inattendue"
 
@@ -862,10 +864,6 @@ msgstr "Sélectionner la boîte précédente"
 msgid "Sélectionner la boîte suivante"
 msgstr "Sélectionner la boîte suivante"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-msgstr "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 msgstr "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
@@ -1064,14 +1062,6 @@ msgid "Nom du protocole"
 msgstr "Nom du protocole"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid ""
-"Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez;\n"
-"celui d'un site web permettant de télécharger le protocole, par exemple</0>"
-msgstr ""
-"Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez;\n"
-"celui d'un site web permettant de télécharger le protocole, par exemple</0>"
-
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
 msgstr "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
 
@@ -1236,36 +1226,6 @@ msgstr "pixels"
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
-
-#~ msgid "cx | Coordonnée X du point central"
-#~ msgstr "cx | Coordonnée X du point central"
-
-#~ msgid "cy | Coordonée Y du point central"
-#~ msgstr "cy | Coordonée Y du point central"
-
-#~ msgid "sy | Coordonée Y du point supérieur gauche"
-#~ msgstr "sy | Coordonée Y du point supérieur gauche"
-
-#~ msgid "sx | Coordonée X du point supérieur gauche"
-#~ msgstr "sx | Coordonée X du point supérieur gauche"
-
-#~ msgid "ex | Coordonée X du point inférieur droit"
-#~ msgstr "ex | Coordonée X du point inférieur droit"
-
-#~ msgid "ey | Coordonée Y du point inférieur droit"
-#~ msgstr "ey | Coordonée Y du point inférieur droit"
-
-#~ msgid "w | Largeur de la boîte englobante"
-#~ msgstr "w | Largeur de la boîte englobante"
-
-#~ msgid "h | Hauteur de la boîte englobante"
-#~ msgstr "h | Hauteur de la boîte englobante"
-
-#~ msgid "score | Score de confiance de cette boîte, entre 0 et 1"
-#~ msgstr "score | Score de confiance de cette boîte, entre 0 et 1"
-
-#~ msgid "_ | Autre valeur (ignorée par CIGALE)"
-#~ msgstr "_ | Autre valeur (ignorée par CIGALE)"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Aucun modèle de recadrage défini."
@@ -1661,8 +1621,18 @@ msgstr "Ouvrir le lien dans un nouvel onglet"
 msgid "Chargement..."
 msgstr "Chargement..."
 
-#~ msgid "feur <0/>"
-#~ msgstr "feur <0/>"
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid ""
+"Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
+"clavier"
+msgstr ""
+"Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
+"clavier"
 
-#~ msgid "feur <0>feur <0/></0> <1/>"
-#~ msgstr "feur <0>feur <0/></0> <1/>"
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid ""
+"Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous\n"
+"contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
+msgstr ""
+"Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous\n"
+"contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"

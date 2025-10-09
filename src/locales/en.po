@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-09T02:20:38.644Z\n"
+"PO-Revision-Date: 2025-10-10T11:01:37.528Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -165,6 +165,7 @@ msgstr "Alternatives"
 msgid "Analyse…"
 msgstr "Analyzing…"
 
+#: src/lib/toasts.svelte.js
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -429,6 +430,7 @@ msgstr "Error"
 #: src/lib/exif.js
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
+#: src/lib/toasts.svelte.js
 msgid "Erreur inattendue"
 msgstr "Unexpected error"
 
@@ -863,10 +865,6 @@ msgstr "Select previous box"
 msgid "Sélectionner la boîte suivante"
 msgstr "Select next box"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-msgstr "Select a box with 1 to 9 to edit it with keyboard shortcuts"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 msgstr "Select one or more images to see and edit their metadata"
@@ -1065,12 +1063,6 @@ msgid "Nom du protocole"
 msgstr ""
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid ""
-"Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez;\n"
-"celui d'un site web permettant de télécharger le protocole, par exemple</0>"
-msgstr ""
-
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
 msgstr ""
 
@@ -1235,36 +1227,6 @@ msgstr ""
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Forme de la sortie"
 msgstr ""
-
-#~ msgid "cx | Coordonnée X du point central"
-#~ msgstr ""
-
-#~ msgid "cy | Coordonée Y du point central"
-#~ msgstr ""
-
-#~ msgid "sy | Coordonée Y du point supérieur gauche"
-#~ msgstr ""
-
-#~ msgid "sx | Coordonée X du point supérieur gauche"
-#~ msgstr ""
-
-#~ msgid "ex | Coordonée X du point inférieur droit"
-#~ msgstr ""
-
-#~ msgid "ey | Coordonée Y du point inférieur droit"
-#~ msgstr ""
-
-#~ msgid "w | Largeur de la boîte englobante"
-#~ msgstr ""
-
-#~ msgid "h | Hauteur de la boîte englobante"
-#~ msgstr ""
-
-#~ msgid "score | Score de confiance de cette boîte, entre 0 et 1"
-#~ msgstr ""
-
-#~ msgid "_ | Autre valeur (ignorée par CIGALE)"
-#~ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Aucun modèle de recadrage défini."
@@ -1656,8 +1618,16 @@ msgstr ""
 msgid "Chargement..."
 msgstr ""
 
-#~ msgid "feur <0/>"
-#~ msgstr ""
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid ""
+"Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
+"clavier"
+msgstr ""
+"Select a box with 1 to 9 to edit it with keyboard shortcuts\n"
+""
 
-#~ msgid "feur <0>feur <0/></0> <1/>"
-#~ msgstr ""
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid ""
+"Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous\n"
+"contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
+msgstr ""
