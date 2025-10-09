@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-07T21:49:20.516Z\n"
+"PO-Revision-Date: 2025-10-09T01:04:39.454Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -740,10 +740,6 @@ msgstr "Parallelism"
 msgid "Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 😎"
 msgstr "No need for Control-S, your changes are saved automatically 😎"
 
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
-msgstr ""
-
 #. placeholder {0}: previewingPrNumber
 #: src/routes/(app)/Navigation.svelte
 msgid "Preview #{0}"
@@ -915,10 +911,6 @@ msgstr "Select previous box"
 msgid "Sélectionner la boîte suivante"
 msgstr "Select next box"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-msgstr "Select a box with 1 to 9 to edit it with keyboard shortcuts"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 msgstr "Select one or more images to see and edit their metadata"
@@ -988,12 +980,6 @@ msgstr "Versions"
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Voir sur Github"
 msgstr "Check on Github"
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid ""
-"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il\n"
-"suffit de l'exporter, modifier le fichier, et réimporter"
-msgstr ""
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche"
@@ -1141,3 +1127,21 @@ msgstr "https://ibrahimkactioglu.com/"
 #: src/routes/(app)/about/+page.svelte
 msgid "https://elementtype.co/"
 msgstr "https://elementtype.co/"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid ""
+"Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans\n"
+"l'interface"
+msgstr ""
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid ""
+"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite,\n"
+"il suffit de l'exporter, modifier le fichier, et réimporter"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid ""
+"Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
+"clavier"
+msgstr ""
