@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-09T20:45:39.552Z\n"
+"PO-Revision-Date: 2025-10-09T22:50:30.481Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -445,6 +445,7 @@ msgstr "Error"
 #: src/lib/exif.js
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
+#: src/lib/toasts.svelte.js
 msgid "Erreur inattendue"
 msgstr "Unexpected error"
 
@@ -1144,17 +1145,3 @@ msgid ""
 "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
 "clavier"
 msgstr ""
-
-#~ msgid "UTF-8"
-#~ msgstr ""
-
-#~ msgid "NILVALUE"
-#~ msgstr ""
-
-#~ msgid "REF"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "X\n"
-#~ ""
-#~ msgstr ""
