@@ -25,6 +25,8 @@
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
 		"$lib/*": ["src/lib/*"],
+		"$locales/*": ["src/locales/*"],
+		"$worker/*": ["src/worker/*"],
 		"$service-worker": ["node_modules/@sveltejs/kit/types/index.d.ts"],
 		"$app/types": [".svelte-kit/non-ambient.d.ts"]
 	},

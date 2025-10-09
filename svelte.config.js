@@ -14,6 +14,10 @@ const config = {
 		router: {
 			type: 'hash'
 		},
+		alias: {
+			$worker: 'src/worker',
+			$locales: 'src/locales'
+		},
 		paths: {
 			base:
 				process.env.BASE_PATH ||
