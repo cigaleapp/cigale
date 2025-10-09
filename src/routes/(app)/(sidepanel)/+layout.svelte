@@ -17,7 +17,6 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { watch } from 'runed';
 	import { cancellers } from '../+layout.svelte';
-	import Error from '../../+error.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
