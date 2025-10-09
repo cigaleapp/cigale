@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-08T20:50:44.802Z\n"
+"PO-Revision-Date: 2025-10-09T02:20:38.634Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -164,7 +164,6 @@ msgstr "Alternatives"
 msgid "Analyse…"
 msgstr "Analyse…"
 
-#: src/lib/toasts.svelte.js
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -1238,45 +1237,35 @@ msgstr "pixels"
 msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "cx | Coordonnée X du point central"
-msgstr "cx | Coordonnée X du point central"
+#~ msgid "cx | Coordonnée X du point central"
+#~ msgstr "cx | Coordonnée X du point central"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "cy | Coordonée Y du point central"
-msgstr "cy | Coordonée Y du point central"
+#~ msgid "cy | Coordonée Y du point central"
+#~ msgstr "cy | Coordonée Y du point central"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "sy | Coordonée Y du point supérieur gauche"
-msgstr "sy | Coordonée Y du point supérieur gauche"
+#~ msgid "sy | Coordonée Y du point supérieur gauche"
+#~ msgstr "sy | Coordonée Y du point supérieur gauche"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "sx | Coordonée X du point supérieur gauche"
-msgstr "sx | Coordonée X du point supérieur gauche"
+#~ msgid "sx | Coordonée X du point supérieur gauche"
+#~ msgstr "sx | Coordonée X du point supérieur gauche"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "ex | Coordonée X du point inférieur droit"
-msgstr "ex | Coordonée X du point inférieur droit"
+#~ msgid "ex | Coordonée X du point inférieur droit"
+#~ msgstr "ex | Coordonée X du point inférieur droit"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "ey | Coordonée Y du point inférieur droit"
-msgstr "ey | Coordonée Y du point inférieur droit"
+#~ msgid "ey | Coordonée Y du point inférieur droit"
+#~ msgstr "ey | Coordonée Y du point inférieur droit"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "w | Largeur de la boîte englobante"
-msgstr "w | Largeur de la boîte englobante"
+#~ msgid "w | Largeur de la boîte englobante"
+#~ msgstr "w | Largeur de la boîte englobante"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "h | Hauteur de la boîte englobante"
-msgstr "h | Hauteur de la boîte englobante"
+#~ msgid "h | Hauteur de la boîte englobante"
+#~ msgstr "h | Hauteur de la boîte englobante"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "score | Score de confiance de cette boîte, entre 0 et 1"
-msgstr "score | Score de confiance de cette boîte, entre 0 et 1"
+#~ msgid "score | Score de confiance de cette boîte, entre 0 et 1"
+#~ msgstr "score | Score de confiance de cette boîte, entre 0 et 1"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "_ | Autre valeur (ignorée par CIGALE)"
-msgstr "_ | Autre valeur (ignorée par CIGALE)"
+#~ msgid "_ | Autre valeur (ignorée par CIGALE)"
+#~ msgstr "_ | Autre valeur (ignorée par CIGALE)"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Aucun modèle de recadrage défini."
@@ -1671,3 +1660,9 @@ msgstr "Ouvrir le lien dans un nouvel onglet"
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Chargement..."
 msgstr "Chargement..."
+
+#~ msgid "feur <0/>"
+#~ msgstr "feur <0/>"
+
+#~ msgid "feur <0>feur <0/></0> <1/>"
+#~ msgstr "feur <0>feur <0/></0> <1/>"

@@ -7,23 +7,33 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import IconOpenDetails from '~icons/ph/caret-down';
 	import IconTrash from '~icons/ph/trash';
+	import IconRemoveFromList from '~icons/ph/x';
 	import IconAdd from '~icons/ph/plus';
 	import { fade } from 'svelte/transition';
+	import Combobox from '$lib/Combobox.svelte';
+	import { MODEL_DETECTION_OUTPUT_SHAPES } from '$lib/schemas/protocols.js';
+	import { keys } from '$lib/utils.js';
+
+	import 'computer-modern/cmu-serif.css';
 
 	const { data } = $props();
 	let settings = $derived(data.crop);
 
 	/**
-	 * @param {(current: NonNullable<typeof settings>) => void} update
+	 * @template T
+	 * @param {(current: NonNullable<typeof settings>, received: T) => void} update
+	 * @returns {(received: T) => Promise<void>}
 	 */
-	async function updateSettings(update) {
-		const newSettings = $state.snapshot(settings);
-		if (!newSettings) return;
+	function updater(update) {
+		return async (received) => {
+			const newSettings = $state.snapshot(settings);
+			if (!newSettings) return;
 
-		update(newSettings);
+			update(newSettings, received);
 
-		await tables.Protocol.update(data.id, 'crop', newSettings);
-		settings = newSettings;
+			await tables.Protocol.update(data.id, 'crop', newSettings);
+			settings = newSettings;
+		};
 	}
 
 	/**
@@ -57,12 +67,10 @@
 			<div class="models-label">
 				Modèles d'inférence
 				<ButtonInk
-					onclick={async () => {
-						await updateSettings((s) => {
-							s.infer ??= [];
-							s.infer.push(dummyModelSettings(s.infer.length));
-						});
-					}}
+					onclick={updater((s) => {
+						s.infer ??= [];
+						s.infer.push(dummyModelSettings(s.infer.length));
+					})}
 				>
 					<IconAdd />
 					Ajouter
@@ -70,7 +78,7 @@
 			</div>
 		{/snippet}
 		{#each settings.infer ?? [] as { model, input, output, name }, i (name)}
-			<details>
+			<details open>
 				<summary>
 					<div class="marker">
 						<IconOpenDetails />
@@ -83,10 +91,9 @@
 						<ButtonIcon
 							help="Supprimer ce modèle"
 							dangerous
-							onclick={async () =>
-								await updateSettings((s) => {
-									s.infer = s.infer?.filter((_, index) => index !== i);
-								})}
+							onclick={updater((s) => {
+								s.infer = s.infer?.filter((_, index) => index !== i);
+							})}
 						>
 							<IconTrash />
 						</ButtonIcon>
@@ -96,34 +103,28 @@
 					<InlineTextInput
 						value={name ?? '(Sans nom)'}
 						label="Nom du modèle"
-						onblur={async (newName) => {
-							await updateSettings((s) => {
-								if (!s.infer) return;
-								s.infer[i].name = newName;
-							});
-						}}
+						onblur={updater((s, newName) => {
+							if (!s.infer) return;
+							s.infer[i].name = newName;
+						})}
 					/>
 				</Field>
 				<FieldUrl
 					check
 					label="URL du modèle .onnx"
 					value={typeof model === 'string' ? model : ''}
-					onblur={async (newModel) => {
-						await updateSettings((s) => {
-							if (!s.infer) return;
-							s.infer[i].model = newModel;
-						});
-					}}
+					onblur={updater((s, newModel) => {
+						if (!s.infer) return;
+						s.infer[i].model = newModel;
+					})}
 				/>
 				<Field label="Disposition des pixels">
 					<select
 						value={input.disposition}
-						onchange={async ({ currentTarget }) => {
-							await updateSettings((s) => {
-								if (!s.infer) return;
-								s.infer[i].input.disposition = currentTarget.value;
-							});
-						}}
+						onchange={updater((s, { currentTarget }) => {
+							if (!s.infer) return;
+							s.infer[i].input.disposition = currentTarget.value;
+						})}
 					>
 						<option value="CHW">[C, H, W]</option>
 						<option value="1CHW">[1, C, H, W]</option>
@@ -140,12 +141,10 @@
 				<Field label="Valeur des pixels">
 					<select
 						value={input.normalized ? 'normalized' : 'raw'}
-						onchange={async ({ currentTarget }) => {
-							await updateSettings((s) => {
-								if (!s.infer) return;
-								s.infer[i].input.normalized = currentTarget.value === 'normalized';
-							});
-						}}
+						onchange={updater((s, { currentTarget }) => {
+							if (!s.infer) return;
+							s.infer[i].input.normalized = currentTarget.value === 'normalized';
+						})}
 					>
 						<option value="raw">[0, 255]</option>
 						<option value="normalized">[0, 1]</option>
@@ -164,46 +163,95 @@
 						<InlineTextInput
 							label="Largeur"
 							value={input.width.toString()}
-							onblur={(width) =>
-								updateSettings((s) => {
-									if (!s.infer) return;
-									s.infer[i].input.width = parseInt(width, 10);
-								})}
+							onblur={updater((s, width) => {
+								if (!s.infer) return;
+								s.infer[i].input.width = parseInt(width, 10);
+							})}
 						/>
 						<span class="separator">×</span>
 						<InlineTextInput
 							label="Hauteur"
 							value={input.height.toString()}
-							onblur={(height) =>
-								updateSettings((s) => {
-									if (!s.infer) return;
-									s.infer[i].input.height = parseInt(height, 10);
-								})}
+							onblur={updater((s, height) => {
+								if (!s.infer) return;
+								s.infer[i].input.height = parseInt(height, 10);
+							})}
 						/>
 						<span class="unit">pixels</span>
 					</div>
 				</Field>
 				<Field composite label="Forme de la sortie">
-					<code>[</code>
-					{#each output.shape as dim, i (i)}
-						<label>
-							<select class="use-value-for-selected-label" value={dim}>
-								<option value="cx"> cx | Coordonnée X du point central</option>
-								<option value="cy"> cy | Coordonée Y du point central</option>
-								<option value="sy"> sy | Coordonée Y du point supérieur gauche</option>
-								<option value="sx"> sx | Coordonée X du point supérieur gauche</option>
-								<option value="ex"> ex | Coordonée X du point inférieur droit</option>
-								<option value="ey"> ey | Coordonée Y du point inférieur droit</option>
-								<option value="w"> w | Largeur de la boîte englobante</option>
-								<option value="h"> h | Hauteur de la boîte englobante</option>
-								<option value="score">
-									score | Score de confiance de cette boîte, entre 0 et 1</option
-								>
-								<option value="_"> _ | Autre valeur (ignorée par CIGALE)</option>
-							</select>
-						</label>
-					{/each}
-					<code>]</code>
+					<div class="output-shape">
+						[
+						{#each output.shape as dim, j (j)}
+							{@const isVariable = (/** @type {string} */ dim) =>
+								!['score', '_', 'delete'].includes(dim)}
+							{#if j > 0}
+								,
+							{/if}
+							<Combobox
+								type="single"
+								value={dim}
+								wide
+								onValueChange={updater((s, newDim) => {
+									if (newDim === 'delete') {
+										s.infer[i].output.shape = s.infer[i].output.shape.filter(
+											(_, index) => index !== j
+										);
+									} else {
+										s.infer[i].output.shape[j] = newDim;
+									}
+								})}
+								options={[...keys(MODEL_DETECTION_OUTPUT_SHAPES), 'delete'].map(
+									(key) => ({
+										value: key,
+										label: key
+									})
+								)}
+							>
+								{#snippet input(_, { props })}
+									<input class:italic={isVariable(dim)} class="atom" {...props} />
+								{/snippet}
+
+								{#snippet items(options, Option)}
+									<div class="combobox-items">
+										{#each options as option}
+											{@render Option(option)}
+										{/each}
+									</div>
+								{/snippet}
+
+								{#snippet item({ value })}
+									<div
+										class="atom combobox-item"
+										class:italic={isVariable(value)}
+									>
+										{#if value === 'delete'}
+											<IconRemoveFromList />
+										{:else if value.length === 2}
+											<span>
+												{value.charAt(0)}<sub>{value.charAt(1)}</sub>
+											</span>
+										{:else}
+											<span>{value}</span>
+										{/if}
+									</div>
+								{/snippet}
+
+								{#snippet details(option)}
+									{#if option}
+										<p>
+											{{
+												...MODEL_DETECTION_OUTPUT_SHAPES,
+												delete: { help: 'Supprimer cet élément' }
+											}[option.value]?.help}
+										</p>
+									{/if}
+								{/snippet}
+							</Combobox>
+						{/each}
+						]
+					</div>
 				</Field>
 			</details>
 		{:else}
@@ -269,5 +317,41 @@
 		&[open] .marker :global(svg) {
 			rotate: 180deg;
 		}
+	}
+
+	.output-shape,
+	.output-shape *,
+	.atom,
+	.atom * {
+		font-family: 'CMU Serif';
+	}
+
+	.output-shape .atom {
+		width: 6ch;
+		text-align: center;
+		font-weight: normal;
+		font-size: 1.5em;
+
+		&.italic {
+			font-style: italic;
+		}
+	}
+
+	.combobox-item {
+		font-family: 'CMU Serif';
+		font-size: 1.3em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		&.italic {
+			font-style: italic;
+		}
+	}
+
+	.combobox-items {
+		display: grid;
+		height: 100%;
+		grid-template-columns: repeat(auto-fill, 7ch);
 	}
 </style>

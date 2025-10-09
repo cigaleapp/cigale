@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-08T20:50:44.805Z\n"
+"PO-Revision-Date: 2025-10-09T02:20:38.644Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -165,7 +165,6 @@ msgstr "Alternatives"
 msgid "Analyse…"
 msgstr "Analyzing…"
 
-#: src/lib/toasts.svelte.js
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -1237,45 +1236,35 @@ msgstr ""
 msgid "Forme de la sortie"
 msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "cx | Coordonnée X du point central"
-msgstr ""
+#~ msgid "cx | Coordonnée X du point central"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "cy | Coordonée Y du point central"
-msgstr ""
+#~ msgid "cy | Coordonée Y du point central"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "sy | Coordonée Y du point supérieur gauche"
-msgstr ""
+#~ msgid "sy | Coordonée Y du point supérieur gauche"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "sx | Coordonée X du point supérieur gauche"
-msgstr ""
+#~ msgid "sx | Coordonée X du point supérieur gauche"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "ex | Coordonée X du point inférieur droit"
-msgstr ""
+#~ msgid "ex | Coordonée X du point inférieur droit"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "ey | Coordonée Y du point inférieur droit"
-msgstr ""
+#~ msgid "ey | Coordonée Y du point inférieur droit"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "w | Largeur de la boîte englobante"
-msgstr ""
+#~ msgid "w | Largeur de la boîte englobante"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "h | Hauteur de la boîte englobante"
-msgstr ""
+#~ msgid "h | Hauteur de la boîte englobante"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "score | Score de confiance de cette boîte, entre 0 et 1"
-msgstr ""
+#~ msgid "score | Score de confiance de cette boîte, entre 0 et 1"
+#~ msgstr ""
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "_ | Autre valeur (ignorée par CIGALE)"
-msgstr ""
+#~ msgid "_ | Autre valeur (ignorée par CIGALE)"
+#~ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Aucun modèle de recadrage défini."
@@ -1666,3 +1655,9 @@ msgstr ""
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Chargement..."
 msgstr ""
+
+#~ msgid "feur <0/>"
+#~ msgstr ""
+
+#~ msgid "feur <0>feur <0/></0> <1/>"
+#~ msgstr ""
