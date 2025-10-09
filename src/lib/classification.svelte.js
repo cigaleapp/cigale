@@ -5,7 +5,7 @@ import { tables } from './idb.svelte.js';
 
 /**
  * Classifies an image using the current protocol and selected model.
- * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
  * @param {string} id
  * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
  */

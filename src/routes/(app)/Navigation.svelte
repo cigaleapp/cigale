@@ -26,7 +26,7 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number} [progress=0]
-	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
 	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
 	 */

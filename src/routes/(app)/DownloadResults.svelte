@@ -23,7 +23,7 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {() => void} open
-	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 */
 
 	/** @type {Props} */

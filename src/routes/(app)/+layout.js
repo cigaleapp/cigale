@@ -1,18 +1,18 @@
-import '../../locales/loader.svelte.js';
+import '$locales/loader.svelte.js';
 
 import { dev } from '$app/environment';
 import { databaseName, databaseRevision, openTransaction, tables } from '$lib/idb.svelte.js';
+import { getSetting } from '$lib/settings.svelte';
 import { toasts } from '$lib/toasts.svelte';
+import { PROCEDURES } from '$worker/procedures.js';
 import { error } from '@sveltejs/kit';
 import * as dates from 'date-fns';
 import * as dateFnsLocales from 'date-fns/locale';
 import * as Swarpc from 'swarpc';
 import { loadLocale } from 'wuchale/load-utils';
-import { PROCEDURES } from '../../web-worker-procedures';
 // oxlint-disable-next-line import/default
-import { getSetting } from '$lib/settings.svelte';
-import WebWorker from '../../web-worker.js?worker';
 import { localeFromNavigator } from '$lib/i18n.js';
+import WebWorker from '$worker/start.js?worker';
 
 export async function load() {
 	const locale = await getSetting('language', {

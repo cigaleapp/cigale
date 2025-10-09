@@ -74,7 +74,7 @@ export async function processImageFile(file, id) {
 }
 
 /**
- * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
  * @param {undefined | Map<string, import("swarpc").CancelablePromise["cancel"]>} cancellers
  * @param {string} fileId
  * @returns {Promise<void>}
