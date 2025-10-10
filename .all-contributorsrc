@@ -43,12 +43,12 @@
 		"content": {
 			"symbol": "🖋",
 			"description": "Content",
-			"link": "https://cigaleapp.github.io/cigale/#/about"
+			"link": "https://cigaleapp.github.io/cigale/about"
 		},
 		"data": {
 			"symbol": "🔣",
 			"description": "Data",
-			"link": "https://cigaleapp.github.io/cigale/#/about"
+			"link": "https://cigaleapp.github.io/cigale/about"
 		}
 	},
 	"contributors": [

@@ -55,8 +55,7 @@ async function metadataValueInDatabase(
 test('allows changing metadata values on import page', issue(440), async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	await page.getByTestId('goto-import').click();
-	await page.waitForURL((u) => u.hash === '#/import');
+	await app.tabs.go('import');
 	await firstObservationCard(page).click();
 	await expect(page.getByTestId('sidepanel')).toBeVisible();
 
@@ -75,8 +74,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	`);
 
 	// Set to False on observation
-	await page.getByTestId('goto-classify').click();
-	await page.waitForURL((u) => u.hash === '#/classify');
+	await app.tabs.go('classify');
 	await firstObservationCard(page).click();
 	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
 	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
@@ -87,8 +85,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	`);
 
 	// Expect image to be still True
-	await page.getByTestId('goto-import').click();
-	await page.waitForURL((u) => u.hash === '#/import');
+	await app.tabs.go('import');
 	await firstObservationCard(page).click();
 	await expect(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
 	  - text: bool

@@ -79,7 +79,7 @@ export const AnalyzedObservation = type({
 });
 
 /**
- * @param {Record<string, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/metadata/index.js').RuntimeValue }>} values
+ * @param {Record<string, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/schemas/metadata.js').RuntimeValue }>} values
  * @returns {typeof MetadataRecord.infer}
  */
 export function toMetadataRecord(values) {
@@ -87,4 +87,59 @@ export function toMetadataRecord(values) {
 		value: value instanceof Date ? value.toISOString() : value,
 		...rest
 	}));
+}
+
+if (import.meta.vitest) {
+	const { describe, it, expect } = import.meta.vitest;
+	describe('toMetadataRecord', () => {
+		it('should convert Date to ISO string', () => {
+			const input = {
+				meta1: {
+					value: new Date('2024-01-01T12:00:00Z'),
+					confidence: 0.9,
+					manuallyModified: false,
+					alternatives: {
+						alt1: 0.7
+					}
+				}
+			};
+			const output = toMetadataRecord(input);
+			expect(output.meta1).toMatchObject({
+				...input.meta1,
+				value: '2024-01-01T12:00:00.000Z'
+			});
+		});
+		it('should keep other types unchanged', () => {
+			const input = {
+				meta1: {
+					value: 42,
+					confidence: 0.8,
+					manuallyModified: true,
+					alternatives: {
+						alt1: 0.7
+					}
+				},
+				meta2: {
+					value: 'test',
+					confidence: 1,
+					manuallyModified: false,
+					alternatives: {
+						alt1: 0.7
+					}
+				},
+				meta3: {
+					value: null,
+					confidence: 0,
+					manuallyModified: false,
+					alternatives: {
+						alt1: 0.7
+					}
+				}
+			};
+			const output = toMetadataRecord(input);
+			expect(output.meta1).toMatchObject(input.meta1);
+			expect(output.meta2).toMatchObject(input.meta2);
+			expect(output.meta3).toMatchObject(input.meta3);
+		});
+	});
 }

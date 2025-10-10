@@ -191,7 +191,7 @@ export function makeRegexpUnion(...parts) {
 			.filter((t) => {
 				if (!/^[\p{Letter} …]+$/u.test(t)) {
 					throw new Error(
-						`The loading text "${t}" contains special characters and cannot be used in a RegExp`
+						`The part "${t}" contains special characters and cannot be used in a RegExp`
 					);
 				}
 

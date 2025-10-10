@@ -47,7 +47,8 @@
 		progressbarOnly = false
 	} = $props();
 
-	const path = $derived(page.url.hash.replace(/^#/, ''));
+	const path = $derived(page.url.pathname);
+
 
 	const hasImages = $derived(tables.Image.state.length > 0);
 
@@ -198,7 +199,7 @@
 						use:tooltip={'Session'}
 					>
 						{uiState.currentSession.name}
-						{#if path === `/sessions/${uiState.currentSession.id}`}
+						{#if path === `/sessions/${uiState.currentSession.id}/`}
 							<div class="line"></div>
 						{/if}
 					</a>
@@ -209,7 +210,7 @@
 							aria-disabled={!uiState.currentProtocol}
 						>
 							Importer
-							{#if path == '/import'}
+							{#if path == '/import/'}
 								<div class="line"></div>
 							{/if}
 						</a>
@@ -267,7 +268,7 @@
 							data-testid="goto-classify"
 						>
 							Classifier
-							{#if path == '/classify'}
+							{#if path == '/classify/'}
 								<div class="line"></div>
 							{/if}
 						</a>
@@ -284,7 +285,7 @@
 					<div class="separator"><IconNext /></div>
 					<a href={resolve('/results')} data-testid="goto-results">
 						Résultats
-						{#if path == '/results'}
+						{#if path == '/results/'}
 							<div class="line"></div>
 						{/if}
 					</a>

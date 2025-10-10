@@ -23,6 +23,10 @@ import { toasts } from '$lib/toasts.svelte';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
+export const ssr = false;
+
+export const trailingSlash = 'always';
+
 export async function load() {
 	const locale = await getSetting('language', {
 		fallback: localeFromNavigator()

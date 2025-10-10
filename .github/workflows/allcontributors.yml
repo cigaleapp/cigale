@@ -3,6 +3,7 @@ name: README contributors section
 on:
   workflow_dispatch:
   push:
+    branches: main
     paths:
       - .all-contributorsrc
       - .github/workflows/allcontributors.yml

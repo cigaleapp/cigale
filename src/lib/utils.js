@@ -1342,3 +1342,30 @@ export function isAbortError(error) {
 export function orEmpty(predicate, obj) {
 	return predicate ? [obj] : [];
 }
+
+/**
+ * @template {string} Prefix
+ * @template T
+ * @typedef {T extends `${Prefix}${infer P}` ? P : never} RemovePrefix
+ */
+
+
+/**
+ * @template {string} Prefix
+ * @template T
+ * @typedef {Extract<T, `${Prefix}${string}`>} WithPrefix
+ */
+
+/**
+ * Remove strings that end with the given prefix
+ * @template {string} Prefix
+ * @template T
+ * @typedef {Exclude<T, `${Prefix}${string}`>} WithoutPrefix
+ */
+
+
+/**
+ * Route IDs that are relative to Root.
+ * @template {import('$app/types').RouteId} Root
+ * @typedef {RemovePrefix<`${Root}/`, WithPrefix<`${Root}/`, import('$app/types').RouteId>>} ChildRouteId
+ */

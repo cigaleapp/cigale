@@ -69,7 +69,7 @@ test('import into new session', async ({ page, app }) => {
 	await picker.then((picker) => {
 		picker.setFiles('./tests/fixtures/exports/correct.zip');
 	});
-	await page.waitForURL((u) => u.hash === '#/import');
+	await app.path.wait('/import');
 
 	await expect(page.getByTestId('goto-current-session')).toHaveText('Testing session');
 
@@ -254,7 +254,7 @@ test('import into new session', async ({ page, app }) => {
 	`);
 
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');
 	// Check metadata set in the export
 	await expect(
 		sessionMetadataSectionFor(page, 'Durée de prospection').getByRole('textbox').first()
@@ -277,7 +277,7 @@ test('import into new session', async ({ page, app }) => {
 test('changing metadata values saves them in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Metadata session' });
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');;
 
 	/** @param {string} key */
 	const metadataValueFor = async (key) =>
@@ -312,9 +312,9 @@ test('changing metadata values saves them in the database', async ({ page, app }
 test('changing session info saves in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Test!!' });
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');;
 
-	const id = new URL(page.url()).hash.split('/')[2];
+	const id = new URL(page.url()).pathname.split('/')[2];
 
 	expect(await app.db.session.byId(id)).toMatchObject({
 		id,
@@ -346,7 +346,7 @@ test('can change protocol of session', async ({ page, app }) => {
 	await newSession(page, { name: 'Test' });
 
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');;
 
 	expect(await app.db.session.byName('Test')).toHaveProperty('protocol', exampleProtocol.id);
 

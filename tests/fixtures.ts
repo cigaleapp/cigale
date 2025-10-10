@@ -29,6 +29,7 @@ import {
 	sidepanelMetadataSectionFor,
 	toast,
 	waitForLoadingEnd,
+	waitForRoute,
 	type NavigationTab,
 	type PredownloadedModel
 } from './utils/index.js';
@@ -111,6 +112,10 @@ export type AppFixture = {
 	tabs: {
 		go(tab: NavigationTab): Promise<void>;
 		get(tab: NavigationTab): Locator;
+	};
+	path: {
+		wait(route: Parameters<typeof waitForRoute>[1]): Promise<void>;
+		go(path: import('$app/types').ResolvedPathname): Promise<void>;
 	};
 	tooltips: {
 		expectContent(element: Locator, content: string | RegExp): Promise<void>;
@@ -292,6 +297,13 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			tabs: {
 				go: async (tab) => goToTab(page, tab),
 				get: (tab) => getTab(page, tab)
+			},
+			path: {
+				wait: async (route) => waitForRoute(page, route),
+				async go(path) {
+					const fullPath = (process.env.BASE_PATH || '') + path;
+					await page.goto(fullPath);
+				}
 			},
 			tooltips: {
 				expectContent: async (element, content) =>
