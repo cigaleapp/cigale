@@ -153,7 +153,7 @@ test.describe('correct results.zip', () => {
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [
-					'_4.jpeg',
+					'(Unknown)_4.jpeg',
 					'Allacma fusca_1.jpeg',
 					'Entomobrya muscorum_3.jpeg',
 					'Orchesella cincta_2.jpeg'
@@ -161,7 +161,7 @@ test.describe('correct results.zip', () => {
 			},
 			{
 				Original: [
-					'_4.jpeg',
+					'(Unknown)_4.jpeg',
 					'Allacma fusca_1.jpeg',
 					'Entomobrya muscorum_3.jpeg',
 					'Orchesella cincta_2.jpeg'

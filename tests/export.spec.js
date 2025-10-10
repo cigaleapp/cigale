@@ -40,5 +40,5 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await page.waitForEvent('download').then((e) => e.saveAs(resultsDir + '.zip'));
 	await extract(resultsDir + '.zip', { dir: resultsDir });
 
-	expect(await readFile(path.join(resultsDir, 'Cropped/_1.png'))).toMatchSnapshot();
+	expect(await readFile(path.join(resultsDir, 'Cropped/(Unknown)_1.png'))).toMatchSnapshot();
 });
