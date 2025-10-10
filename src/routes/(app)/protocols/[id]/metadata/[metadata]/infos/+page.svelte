@@ -138,7 +138,8 @@
 				key,
 				label: uppercaseFirst(label),
 				disabled:
-					!MERGEABLE_METADATA_TYPES.has(type) || (key === 'union' && type !== 'boundingbox'),
+					!MERGEABLE_METADATA_TYPES.has(type) ||
+					(key === 'union' && type !== 'boundingbox'),
 				subtext: help
 			}))}
 			onchange={updater((m, value) => {

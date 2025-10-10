@@ -36,7 +36,9 @@
 				</span>
 			</h2>
 			<code class="id">
-				<Tooltip text="Identifiant de la métadonnée">{removeNamespaceFromMetadataId(id)}</Tooltip>
+				<Tooltip text="Identifiant de la métadonnée"
+					>{removeNamespaceFromMetadataId(id)}</Tooltip
+				>
 			</code>
 			<div class="datatype">
 				<IconDatatype {type} />
@@ -52,14 +54,18 @@
 				/** @type {{ help?: string, count?: number }} */ { help, count } = {}
 			)}
 				<a
-					href="#/protocols/{data.protocol.id}/metadata/{removeNamespaceFromMetadataId(id)}/{path}"
+					href="#/protocols/{data.protocol.id}/metadata/{removeNamespaceFromMetadataId(
+						id
+					)}/{path}"
 					class:active={page.url.hash.includes(`/${path}`)}
 					use:tooltip={help}
 				>
 					<Icon />
 					{name}
 					{#if count}
-						<code class="badge">{Intl.NumberFormat(getSettings().language).format(count)}</code>
+						<code class="badge"
+							>{Intl.NumberFormat(getSettings().language).format(count)}</code
+						>
 					{/if}
 				</a>
 			{/snippet}

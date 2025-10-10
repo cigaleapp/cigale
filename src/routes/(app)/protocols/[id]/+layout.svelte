@@ -161,7 +161,12 @@
 					/>
 				</h1>
 				<code class="subtitle">
-					<InlineTextInput label="ID du protocole" discreet value={id} onblur={changeProtocolID} />
+					<InlineTextInput
+						label="ID du protocole"
+						discreet
+						value={id}
+						onblur={changeProtocolID}
+					/>
 				</code>
 
 				<section class="actions">
@@ -230,7 +235,10 @@
 						label="Nom de la métadonnée"
 						value=""
 						discreet
-						placeholder={{ idle: 'Nouvelle métadonnée…', focused: 'Nom de la métadonnée' }}
+						placeholder={{
+							idle: 'Nouvelle métadonnée…',
+							focused: 'Nom de la métadonnée'
+						}}
 						onblur={() => {}}
 					/>
 					<ButtonIcon help="Créer la métadonnée" submits onclick={() => {}}>
@@ -254,7 +262,10 @@
 						}
 					)}
 
-					<div class="navlink" class:active={page.url.hash.includes(`metadata/${shortId}/`)}>
+					<div
+						class="navlink"
+						class:active={page.url.hash.includes(`metadata/${shortId}/`)}
+					>
 						{#if collapsedSidebar}
 							<a
 								in:fade

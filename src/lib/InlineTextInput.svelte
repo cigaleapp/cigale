@@ -29,7 +29,9 @@
 	} = $props();
 
 	const placeholder = $derived(
-		typeof _placeholder === 'string' ? { idle: _placeholder, focused: _placeholder } : _placeholder
+		typeof _placeholder === 'string'
+			? { idle: _placeholder, focused: _placeholder }
+			: _placeholder
 	);
 
 	let focused = $state(false);
