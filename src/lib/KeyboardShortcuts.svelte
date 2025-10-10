@@ -59,7 +59,10 @@
 						/** @param {MouseEvent|KeyboardEvent} e */
 						async (e) => {
 							if (!bind?.allowInModals && hasAnyModalOpen(page)) {
-								console.warn(`a modal is open, ignoring keybinding ${pattern}`, page.state);
+								console.warn(
+									`a modal is open, ignoring keybinding ${pattern}`,
+									page.state
+								);
 								return;
 							}
 							// Prevent non-$mod-prefixed shortcuts from working while in a input or textarea

@@ -180,7 +180,9 @@ if (import.meta.vitest) {
 	const { test, expect, describe } = import.meta.vitest;
 	describe('withinBoundingBox', () => {
 		test('works for points inside', () => {
-			expect(withinBoundingBox({ x: 1, y: 1, width: 10, height: 20 }, { x: 5, y: 10 })).toBe(true);
+			expect(withinBoundingBox({ x: 1, y: 1, width: 10, height: 20 }, { x: 5, y: 10 })).toBe(
+				true
+			);
 		});
 		test('works for points outside', () => {
 			expect(withinBoundingBox({ x: 1, y: 1, width: 10, height: 20 }, { x: -1, y: -1 })).toBe(
@@ -188,7 +190,9 @@ if (import.meta.vitest) {
 			);
 		});
 		test('returns false on zero-sized bounding boxes', () => {
-			expect(withinBoundingBox({ x: 4, y: 5, width: 0, height: 0 }, { x: 4, y: 5 })).toBe(false);
+			expect(withinBoundingBox({ x: 4, y: 5, width: 0, height: 0 }, { x: 4, y: 5 })).toBe(
+				false
+			);
 		});
 	});
 }
@@ -220,7 +224,9 @@ if (import.meta.vitest) {
 				{ x: 5, y: 10, width: 10, height: 20 }
 			)
 		).toBe(13);
-		expect(coordsDifference({ x: 1, y: 1, w: 10, h: 20 }, { x: 5, y: 10, w: 10, h: 20 })).toBe(13);
+		expect(coordsDifference({ x: 1, y: 1, w: 10, h: 20 }, { x: 5, y: 10, w: 10, h: 20 })).toBe(
+			13
+		);
 	});
 }
 
@@ -238,11 +244,20 @@ if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('coordsAreEqual', () => {
 		expect(
-			coordsAreEqual({ x: 1, y: 1, width: 10, height: 20 }, { x: 5, y: 10, width: 10, height: 20 })
+			coordsAreEqual(
+				{ x: 1, y: 1, width: 10, height: 20 },
+				{ x: 5, y: 10, width: 10, height: 20 }
+			)
 		).toBe(false);
-		expect(coordsAreEqual({ x: 1, y: 1, w: 10, h: 20 }, { x: 5, y: 10, w: 10, h: 20 })).toBe(false);
+		expect(coordsAreEqual({ x: 1, y: 1, w: 10, h: 20 }, { x: 5, y: 10, w: 10, h: 20 })).toBe(
+			false
+		);
 		expect(
-			coordsAreEqual({ x: 1, y: 1, w: 10, h: 20 }, { x: 1.01, y: 1.01, w: 10.01, h: 20.01 }, 0.05)
+			coordsAreEqual(
+				{ x: 1, y: 1, w: 10, h: 20 },
+				{ x: 1.01, y: 1.01, w: 10.01, h: 20.01 },
+				0.05
+			)
 		).toBe(true);
 	});
 }

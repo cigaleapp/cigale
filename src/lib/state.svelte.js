@@ -146,7 +146,8 @@ class UIState {
 
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */
 	classificationModels = $derived(
-		tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer?.neural ?? []
+		tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer?.neural ??
+			[]
 	);
 	/** @type {NonNullable<typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']>} */
 	cropModels = $derived(this.currentProtocol?.crop?.infer ?? []);

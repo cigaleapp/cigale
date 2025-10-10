@@ -95,7 +95,13 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	}}
 	onmousedown={({ target, currentTarget, offsetX, offsetY }) => {
 		// If we're close enough to the edge of the dialog but still "inside", don't close, because target === currentTarget but it's not the backdrop yet (see #469)
-		if (insideBoundingClientRect({ offsetX, offsetY }, currentTarget.getBoundingClientRect(), 20)) {
+		if (
+			insideBoundingClientRect(
+				{ offsetX, offsetY },
+				currentTarget.getBoundingClientRect(),
+				20
+			)
+		) {
 			return;
 		}
 		// Close on backdrop click

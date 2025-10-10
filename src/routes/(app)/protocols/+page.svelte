@@ -39,7 +39,8 @@
 	bind:open={downloadNewProtocolTemplate}
 >
 	<p>
-		Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface
+		Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans
+		l'interface
 	</p>
 	<p>
 		Cependant, les protocoles sont représentables par des fichiers de configuration JSON ou YAML
@@ -51,8 +52,8 @@
 		la plupart des éditeurs de code modernes vous proposeront de l'autocomplétion et de la documentation
 	</p>
 	<p>
-		Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il
-		suffit de l'exporter, modifier le fichier, et réimporter
+		Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite,
+		il suffit de l'exporter, modifier le fichier, et réimporter
 	</p>
 
 	{#snippet footer({ close })}
@@ -94,9 +95,15 @@
 						.catch((e) => toasts.error(e))
 						.then((ps) => {
 							if (!ps || typeof ps === 'string' || ps.length === 0) return;
-							if (ps.length === 1) toasts.success(`Protocole “${ps[0].name}” importé`);
+							if (ps.length === 1)
+								toasts.success(`Protocole “${ps[0].name}” importé`);
 							else
-								toasts.success(plural(ps.length, ['Protocole importé', '# protocoles importés']));
+								toasts.success(
+									plural(ps.length, [
+										'Protocole importé',
+										'# protocoles importés'
+									])
+								);
 						});
 				}}
 			>

@@ -153,7 +153,7 @@ test.describe('correct results.zip', () => {
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [
-					'_4.jpeg',
+					'(Unknown)_4.jpeg',
 					'Allacma fusca_1.jpeg',
 					'Entomobrya muscorum_3.jpeg',
 					'Orchesella cincta_2.jpeg'
@@ -161,7 +161,7 @@ test.describe('correct results.zip', () => {
 			},
 			{
 				Original: [
-					'_4.jpeg',
+					'(Unknown)_4.jpeg',
 					'Allacma fusca_1.jpeg',
 					'Entomobrya muscorum_3.jpeg',
 					'Orchesella cincta_2.jpeg'
@@ -362,9 +362,9 @@ test('can extract EXIF GPS data from an image', async ({ page }) => {
 	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
 		'2008-10-22'
 	);
-	await expect(sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')).toHaveValue(
-		'43.46715666666389, 11.885394999997223'
-	);
+	await expect(
+		sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')
+	).toHaveValue('43.46715666666389, 11.885394999997223');
 
 	const metadataValues = await getMetadataValuesOfImage({
 		page,

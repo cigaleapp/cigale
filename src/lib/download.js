@@ -12,7 +12,8 @@ export function downloadAsFile(content, filename, contentType) {
 			? content
 			: new Blob([content], {
 					type:
-						contentType ?? (typeof content === 'string' ? 'text/plain' : 'application/octet-stream')
+						contentType ??
+						(typeof content === 'string' ? 'text/plain' : 'application/octet-stream')
 				});
 
 	const url = URL.createObjectURL(blob);

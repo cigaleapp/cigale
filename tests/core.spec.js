@@ -129,10 +129,14 @@ for (const offline of [false, true]) {
 				'"Identifiant";"Observation";"Date";"Date: Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"'
 			);
 
-			const analysis = JSON.parse(fs.readFileSync(path.join(resultsDir, 'analysis.json'), 'utf8'));
+			const analysis = JSON.parse(
+				fs.readFileSync(path.join(resultsDir, 'analysis.json'), 'utf8')
+			);
 			expect(Analysis.allows(analysis)).toBe(true);
 
-			const image = fs.readFileSync(path.join(resultsDir, 'Cropped', 'Entomobrya muscorum_1.jpeg'));
+			const image = fs.readFileSync(
+				path.join(resultsDir, 'Cropped', 'Entomobrya muscorum_1.jpeg')
+			);
 			expect(image).toMatchSnapshot({
 				maxDiffPixelRatio: 0.01
 			});
@@ -215,7 +219,9 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	const classificationModel = page.getByRole('radiogroup', {
 		name: "Modèle d'inférence pour Espèce"
 	});
-	const cropModel = page.getByRole('radiogroup', { name: "Modèle d'inférence pour la détection" });
+	const cropModel = page.getByRole('radiogroup', {
+		name: "Modèle d'inférence pour la détection"
+	});
 
 	async function reset() {
 		await classificationModel.getByRole('radio', { name: 'Collemboles' }).click();

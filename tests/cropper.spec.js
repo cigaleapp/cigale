@@ -52,7 +52,9 @@ test.describe('Cropper view', () => {
 				await setSettings({ page }, { cropAutoNext: enabled });
 			});
 
-			test(`navigate with arrow keys (autoskip ${enabled ? 'on' : 'off'})`, async ({ page }) => {
+			test(`navigate with arrow keys (autoskip ${enabled ? 'on' : 'off'})`, async ({
+				page
+			}) => {
 				const images = await imagesByName(page);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
 				await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
@@ -78,8 +80,12 @@ test.describe('Cropper view', () => {
 				await expect(
 					page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
 				).toBeVisible();
-				await expect(page.getByRole('main').getByText('cyan.jpeg', { exact: true })).toBeVisible();
-				await expect(page.getByRole('main').getByText('leaf.jpeg', { exact: true })).toBeVisible();
+				await expect(
+					page.getByRole('main').getByText('cyan.jpeg', { exact: true })
+				).toBeVisible();
+				await expect(
+					page.getByRole('main').getByText('leaf.jpeg', { exact: true })
+				).toBeVisible();
 			});
 		}
 	});
@@ -204,11 +210,15 @@ test.describe('Cropper view', () => {
 			);
 		}
 
-		test('should delete the image on ctrl-delete and go to the next image', async ({ page }) => {
+		test('should delete the image on ctrl-delete and go to the next image', async ({
+			page
+		}) => {
 			await navigateThenAssert(page, async (page) => page.keyboard.press('Control+Delete'));
 		});
 
-		test('should delete the image via delete button and go to the next image', async ({ page }) => {
+		test('should delete the image via delete button and go to the next image', async ({
+			page
+		}) => {
 			await navigateThenAssert(page, async (page) => {
 				await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
 			});
@@ -230,7 +240,10 @@ test.describe('Cropper view', () => {
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
 				await expect(
-					isImageConfirmedInDatabase(page, `${image.fileId}_${i.toString().padStart(6, '0')}`)
+					isImageConfirmedInDatabase(
+						page,
+						`${image.fileId}_${i.toString().padStart(6, '0')}`
+					)
 				).resolves.toBe(confirmed);
 			}
 		}
@@ -302,7 +315,9 @@ test.describe('Cropper view', () => {
 			test('dragging outside the crop surface cancels', issue(431), async ({ page }) => {
 				await setSettings({ page }, { showTechnicalMetadata: true });
 				await makeBox(page, 10, 10, 50, -30);
-				await expect(page.locator('.change-area .debug')).toHaveText(/create {2}\(0 0\) × \[0 0\]/);
+				await expect(page.locator('.change-area .debug')).toHaveText(
+					/create {2}\(0 0\) × \[0 0\]/
+				);
 				await expect(page.locator('.change-area .debug')).not.toHaveText(/ready/);
 				await expect(boxesInBoxesList(page)).toMatchAriaSnapshot(`
 				  - listitem:
@@ -472,7 +487,11 @@ test.describe('Cropper view', () => {
 				await expect.soft(image).toHaveCSS('translate', /.+px .+px/);
 
 				expect
-					.soft(await image.evaluate((i) => i.style.translate.split(' ').map(Number.parseFloat)))
+					.soft(
+						await image.evaluate((i) =>
+							i.style.translate.split(' ').map(Number.parseFloat)
+						)
+					)
 					.toEqual([expect.closeTo(translateX, 2), expect.closeTo(translateY, 2)]);
 			}
 		}
@@ -627,7 +646,12 @@ function confirmedCropBadge(page) {
  */
 async function isImageConfirmedInDatabase(page, id) {
 	return Boolean(
-		await getMetadataValue(page, { image: { id } }, exampleProtocol.crop.confirmationMetadata, '')
+		await getMetadataValue(
+			page,
+			{ image: { id } },
+			exampleProtocol.crop.confirmationMetadata,
+			''
+		)
 	);
 }
 

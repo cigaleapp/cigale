@@ -50,7 +50,11 @@
 	);
 
 	afterNavigate(() => {
-		if (preselectedProtocolIsRemote && openImportRemoteProtocol && !importingPreselectedProtocol) {
+		if (
+			preselectedProtocolIsRemote &&
+			openImportRemoteProtocol &&
+			!importingPreselectedProtocol
+		) {
 			openImportRemoteProtocol();
 		}
 	});
@@ -68,7 +72,8 @@
 				crop: preselection.cropModel
 			})
 			.then(() => {
-				if (preselection.classificationModel !== null) preselection.classificationModel = null;
+				if (preselection.classificationModel !== null)
+					preselection.classificationModel = null;
 				if (preselection.cropModel !== null) preselection.cropModel = null;
 			});
 	});
@@ -199,7 +204,9 @@
 								label="Modèle d'inférence pour {classificationMetadata?.label}"
 								value={uiState.selectedClassificationModel}
 								onchange={async (value) => {
-									await uiState.setModelSelections({ classification: value ?? 0 });
+									await uiState.setModelSelections({
+										classification: value ?? 0
+									});
 								}}
 								options={radioOptions(uiState.classificationModels)}
 							/>

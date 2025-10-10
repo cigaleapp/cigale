@@ -58,7 +58,9 @@
 		sort={getSettings().gallerySort}
 		groups={['Avec détections', 'Sans détection']}
 		grouping={({ data: images }) =>
-			images.some((img) => uiState.cropMetadataValueOf(img)) ? 'Avec détections' : 'Sans détection'}
+			images.some((img) => uiState.cropMetadataValueOf(img))
+				? 'Avec détections'
+				: 'Sans détection'}
 	>
 		{#snippet item(images, { id: fileId })}
 			<CardImageFile

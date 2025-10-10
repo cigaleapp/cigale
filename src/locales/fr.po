@@ -1001,10 +1001,6 @@ msgstr "Sélectionner la boîte précédente"
 msgid "Sélectionner la boîte suivante"
 msgstr "Sélectionner la boîte suivante"
 
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-msgstr "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis clavier"
-
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
 msgstr "Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées"
@@ -1086,14 +1082,6 @@ msgstr "Versions"
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Voir sur Github"
 msgstr "Voir sur Github"
-
-#: src/routes/(app)/protocols/+page.svelte
-msgid ""
-"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il\n"
-"suffit de l'exporter, modifier le fichier, et réimporter"
-msgstr ""
-"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite, il\n"
-"suffit de l'exporter, modifier le fichier, et réimporter"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "Vous pouvez télécharger un modèle de protocole vide pour vous faciliter la tâche"

@@ -23,7 +23,9 @@ export const HTTPRequest = URLString.configure(
 )
 	.or({
 		url: URLString.describe("L'URL de la requête"),
-		'headers?': type({ '[string]': 'string' }).describe('Les en-têtes à ajouter dans la requête'),
+		'headers?': type({ '[string]': 'string' }).describe(
+			'Les en-têtes à ajouter dans la requête'
+		),
 		'method?': type
 			.enumerated('GET', 'POST', 'PUT', 'DELETE')
 			.describe('La méthode de la requête (GET par défaut)')

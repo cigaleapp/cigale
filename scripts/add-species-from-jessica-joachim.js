@@ -120,7 +120,8 @@ async function searchForSpecies(index, logHeader, name) {
 		const names = [a.textContent.trim().toLowerCase(), ...(synonyms[name] || [])];
 
 		return names.some((name) => {
-			if (new URL(a.href, 'https://jessica-joachim.com').pathname.match(/^\/?20\d\d/)) return false;
+			if (new URL(a.href, 'https://jessica-joachim.com').pathname.match(/^\/?20\d\d/))
+				return false;
 			if (name === searchedName) return true;
 			if (name.includes(`(${searchedName})`)) return true;
 			return false;
@@ -163,7 +164,14 @@ async function searchForSpecies(index, logHeader, name) {
 	await fetch(speciesPageUrl)
 		.then((r) => r.text())
 		.then((content) =>
-			parseAndDescribeSpecies(content, speciesPageUrl, name, logHeader, index, index % 1000 === 0)
+			parseAndDescribeSpecies(
+				content,
+				speciesPageUrl,
+				name,
+				logHeader,
+				index,
+				index % 1000 === 0
+			)
 		);
 }
 

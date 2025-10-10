@@ -25,7 +25,7 @@ let processingQueue;
 class ProcessingQueue {
 	/**
 	 * @param {object} param0
-	 * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} param0.swarpc
+	 * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} param0.swarpc
 	 * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [param0.cancellers]
 	 * @param {number} [param0.parallelism]
 	 */
@@ -66,7 +66,11 @@ class ProcessingQueue {
 					Promise.allSettled(range(this.parallelism).map(async () => this.pop())).then(
 						(results) => {
 							if (results.some((r) => r.status === 'rejected')) {
-								reject(results.filter((r) => r.status === 'rejected').map((r) => r.reason));
+								reject(
+									results
+										.filter((r) => r.status === 'rejected')
+										.map((r) => r.reason)
+								);
 							} else {
 								resolve(undefined);
 							}
@@ -244,7 +248,7 @@ class ProcessingQueue {
 /**
  * Initialize the processing queue. Must be called in a root $effect (during component initialization).
  * @param {object} arg0
- * @param {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} arg0.swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} arg0.swarpc
  * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [arg0.cancellers]
  */
 export function initializeProcessingQueue(arg0) {

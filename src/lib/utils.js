@@ -45,10 +45,14 @@ if (import.meta.vitest) {
 			expect(mapValuesNoNullables({ a: 1, b: 2 }, (v) => v + 1)).toEqual({ a: 2, b: 3 });
 		});
 		test('with nullables', () => {
-			expect(mapValuesNoNullables({ a: 1, b: null }, (v) => (v ? v + 1 : v))).toEqual({ a: 2 });
+			expect(mapValuesNoNullables({ a: 1, b: null }, (v) => (v ? v + 1 : v))).toEqual({
+				a: 2
+			});
 		});
 		test('with only nullables', () => {
-			expect(mapValuesNoNullables({ a: 1, b: 2 }, (v) => (v % 2 ? null : undefined))).toEqual({});
+			expect(mapValuesNoNullables({ a: 1, b: 2 }, (v) => (v % 2 ? null : undefined))).toEqual(
+				{}
+			);
 		});
 	});
 }
@@ -456,7 +460,10 @@ if (import.meta.vitest) {
 		expect(unique([1, 2, 3, 1, 2])).toEqual([1, 2, 3]);
 		expect(unique(['a', 'b', 'c', 'a', 'b'])).toEqual(['a', 'b', 'c']);
 		expect(unique([])).toEqual([]);
-		expect(unique([{ id: 1 }, { id: 2 }, { id: 1 }], (o) => o.id)).toEqual([{ id: 1 }, { id: 2 }]);
+		expect(unique([{ id: 1 }, { id: 2 }, { id: 1 }], (o) => o.id)).toEqual([
+			{ id: 1 },
+			{ id: 2 }
+		]);
 		expect(unique([{ id: 1 }, { id: 2 }, { id: 1 }], (o) => o.id.toString())).toEqual([
 			{ id: 1 },
 			{ id: 2 }

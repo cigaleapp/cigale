@@ -26,7 +26,7 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number} [progress=0]
-	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
 	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
 	 */
@@ -164,7 +164,11 @@
 				{/if}
 			</a>
 			<IconNext></IconNext>
-			<a href={href('/import')} data-testid="goto-import" aria-disabled={!uiState.currentProtocol}>
+			<a
+				href={href('/import')}
+				data-testid="goto-import"
+				aria-disabled={!uiState.currentProtocol}
+			>
 				Importer
 				{#if path == '/import'}
 					<div class="line"></div>
@@ -173,7 +177,8 @@
 			<IconNext></IconNext>
 			<div class="with-inference-indicator">
 				<a
-					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' && uiState.imageOpenedInCropper
+					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
+					uiState.imageOpenedInCropper
 						? href('/(app)/(sidepanel)/crop/[image]', {
 								image: uiState.imageOpenedInCropper
 							})
@@ -198,7 +203,8 @@
 			<IconNext></IconNext>
 			<div
 				class="with-inference-indicator"
-				use:tooltip={uiState.processing.task === 'detection' && uiState.processing.progress < 1
+				use:tooltip={uiState.processing.task === 'detection' &&
+				uiState.processing.progress < 1
 					? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
 					: undefined}
 			>
@@ -206,7 +212,8 @@
 					href={href('/classify')}
 					aria-disabled={!uiState.currentProtocol ||
 						!hasImages ||
-						(uiState.processing.task === 'detection' && uiState.processing.progress < 1)}
+						(uiState.processing.task === 'detection' &&
+							uiState.processing.progress < 1)}
 					data-testid="goto-classify"
 				>
 					Classifier
@@ -231,7 +238,11 @@
 		</div>
 
 		<div class="settings" class:native={isNativeWindow}>
-			<Settings {openPrepareForOfflineUse} {openKeyboardShortcuts} --navbar-height="{height}px" />
+			<Settings
+				{openPrepareForOfflineUse}
+				{openKeyboardShortcuts}
+				--navbar-height="{height}px"
+			/>
 		</div>
 	</nav>
 

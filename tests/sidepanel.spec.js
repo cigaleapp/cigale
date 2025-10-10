@@ -58,7 +58,8 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	    - img
 	`);
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
-	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
+		.toMatchAriaSnapshot(`
 	  - switch "" [checked]:
 	    - img
 	`);
@@ -70,7 +71,8 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
-	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
+		.toMatchAriaSnapshot(`
 	  - switch "":
 	    - img
 	`);
@@ -237,7 +239,9 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	// Click out and back again
 	await page.getByRole('main').click({ position: { x: 10, y: 10 } });
 	await page.getByText('lil-fella', { exact: true }).click();
-	await expect(page.locator('[data-testid="sidepanel"] .metadata:first-child')).toMatchAriaSnapshot(
+	await expect(
+		page.locator('[data-testid="sidepanel"] .metadata:first-child')
+	).toMatchAriaSnapshot(
 		`
 	  - text: Espèce
 	  - combobox: Dicyrtomina saundersi

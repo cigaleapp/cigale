@@ -124,7 +124,9 @@
 			for (const [metadataId, value] of Object.entries(cascade ?? {})) {
 				if (seen.has(metadataId)) continue; // Avoid cycles
 				seen.add(metadataId); // Mark this metadataId as seen
-				const metadata = await tables.Metadata.get(namespacedMetadataId(protocolId, metadataId));
+				const metadata = await tables.Metadata.get(
+					namespacedMetadataId(protocolId, metadataId)
+				);
 				if (!metadata) continue;
 
 				// If the cascaded metadata value is from an enum, use label instead of the key,
@@ -138,9 +140,11 @@
 					labels[metadata.id] = { value: option.label, metadata: metadata.label, depth };
 
 					if (Object.keys(option.cascade ?? {}).length > 0) {
-						await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then((nested) => {
-							Object.assign(labels, nested);
-						});
+						await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then(
+							(nested) => {
+								Object.assign(labels, nested);
+							}
+						);
 					}
 				} else {
 					// For other types, just show the value directly
@@ -232,7 +236,9 @@
 							<IconArrowRight />
 							<div class="text">
 								<span>En savoir plus</span>
-								<code class="domain">{new URL(highlightedOption.learnMore).hostname}</code>
+								<code class="domain"
+									>{new URL(highlightedOption.learnMore).hostname}</code
+								>
 							</div>
 						</a>
 					{/if}
@@ -259,7 +265,9 @@
 							<p><em>Métadonées mise à jour à la sélection de cette option</em></p>
 						{/if}
 					{:catch error}
-						<p class="error">Erreur lors de la récupération des étiquettes en cascade: {error}</p>
+						<p class="error">
+							Erreur lors de la récupération des étiquettes en cascade: {error}
+						</p>
 					{/await}
 					{#if !highlightedOption?.description && !highlightedOption?.learnMore && !highlightedOption?.image}
 						<section class="empty">

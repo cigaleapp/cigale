@@ -103,8 +103,7 @@ const protocol = {
 	name: 'Example: arthropodes',
 	learnMore: `https://github.com/cigaleapp/cigale/tree/${await x('git', ['rev-parse', 'HEAD']).then((result) => result.stdout)}/scripts/README.md#protocoles-arthropodsexample`,
 	version: (oldProtocol?.version ?? 0) + 1,
-	source:
-		'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
+	source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
 	description:
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',
 	authors: [
@@ -202,8 +201,7 @@ const protocol = {
 						name: 'Arthropodes (~17000 classes)',
 						description: 'Terrestres, France métropolitaine', // TODO
 						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
-						model:
-							'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx',
+						model: 'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx',
 						classmapping:
 							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
 						input: {
@@ -222,8 +220,7 @@ const protocol = {
 		confirmationMetadata: namespaced('crop_is_confirmed'),
 		infer: [
 			{
-				model:
-					'https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx',
+				model: 'https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx',
 				name: 'YOLO11',
 				input: {
 					height: 640,

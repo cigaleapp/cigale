@@ -29,7 +29,9 @@ if (import.meta.vitest) {
 
 		expect(jsonSchemaURL('')).toBe('https://example.com/protocol.schema.json');
 		expect(jsonSchemaURL('/app')).toBe('https://example.com/app/protocol.schema.json');
-		expect(jsonSchemaURL('/some/path')).toBe('https://example.com/some/path/protocol.schema.json');
+		expect(jsonSchemaURL('/some/path')).toBe(
+			'https://example.com/some/path/protocol.schema.json'
+		);
 
 		// Restore original location
 		Object.defineProperty(window, 'location', {
@@ -65,7 +67,9 @@ export async function exportProtocol(base, id, format = 'json') {
 						{
 							...def,
 							options: allMetadataOptions
-								.filter((opt) => opt.id.startsWith(namespacedMetadataId(protocol.id, id) + ':'))
+								.filter((opt) =>
+									opt.id.startsWith(namespacedMetadataId(protocol.id, id) + ':')
+								)
 								.map(({ id: _, ...opt }) => opt)
 						}
 					])
@@ -289,7 +293,9 @@ if (import.meta.vitest) {
 					source: 'https://example.com/protocol.json',
 					id: 'mon-protocole'
 				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole a changé d'identifiant]`);
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`[Error: Le protocole a changé d'identifiant]`
+			);
 		});
 
 		test('should throw an error if the remote protocol has no version', async () => {
@@ -307,7 +313,9 @@ if (import.meta.vitest) {
 					source: 'https://example.com/protocol.json',
 					id: 'mon-protocole'
 				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a plus de version]`);
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`[Error: Le protocole n'a plus de version]`
+			);
 		});
 
 		test('should throw an error if the protocol has no source', async () => {
@@ -329,7 +337,9 @@ if (import.meta.vitest) {
 					source: 'https://example.com/protocol.json',
 					id: 'mon-protocole'
 				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas de version]`);
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`[Error: Le protocole n'a pas de version]`
+			);
 		});
 
 		test('should throw an error if the protocol has no ID', async () => {
@@ -339,7 +349,9 @@ if (import.meta.vitest) {
 					version: 1,
 					source: 'https://example.com/protocol.json'
 				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas d'identifiant]`);
+			).rejects.toThrowErrorMatchingInlineSnapshot(
+				`[Error: Le protocole n'a pas d'identifiant]`
+			);
 		});
 	});
 }
@@ -349,7 +361,7 @@ if (import.meta.vitest) {
  * @param {number} [param0.version]
  * @param {import('$lib/database.js').HTTPRequest} param0.source
  * @param {string} param0.id
- * @param {import('swarpc').SwarpcClient<typeof import('../web-worker-procedures.js').PROCEDURES>} param0.swarpc
+ * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} param0.swarpc
  */
 export async function upgradeProtocol({ version, source, id, swarpc }) {
 	if (!source) throw new Error("Le protocole n'a pas de source");

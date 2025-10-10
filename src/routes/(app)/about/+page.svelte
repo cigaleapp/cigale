@@ -160,11 +160,15 @@
 		<dl>
 			<dt>Aides à l'identification</dt>
 			<dd>
-				<a href="https://jessica-joachim.com/identification">Les carnets nature de Jessica</a>
+				<a href="https://jessica-joachim.com/identification"
+					>Les carnets nature de Jessica</a
+				>
 			</dd>
 			<dt>Arbre taxonomique</dt>
 			<dd>
-				<a href="https://techdocs.gbif.org/en/openapi/v1/species#/Searching%20names/searchNames">
+				<a
+					href="https://techdocs.gbif.org/en/openapi/v1/species#/Searching%20names/searchNames"
+				>
 					API de GBIF
 				</a>
 			</dd>
@@ -194,7 +198,9 @@
 				</span>
 			</dd>
 			<dt>
-				<a href="https://evilmartians.com/products/martian-mono"><code>Martian Mono</code></a>
+				<a href="https://evilmartians.com/products/martian-mono"
+					><code>Martian Mono</code></a
+				>
 			</dt>
 			<dd>
 				<!-- @wc-include -->

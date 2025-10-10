@@ -23,7 +23,7 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {() => void} open
-	 * @property {import('swarpc').SwarpcClient<typeof import('$lib/../web-worker-procedures.js').PROCEDURES>} swarpc
+	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 */
 
 	/** @type {Props} */
@@ -71,7 +71,9 @@
 		uiState.processing.reset();
 		exporting = true;
 
-		const chosenProtocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
+		const chosenProtocol = tables.Protocol.state.find(
+			(p) => p.id === uiState.currentProtocolId
+		);
 		if (!chosenProtocol) {
 			toasts.error('Aucun protocole sélectionné');
 			exporting = false;
@@ -87,7 +89,10 @@
 					include,
 					protocolId: chosenProtocol.id,
 					cropPadding: cropPadding.withUnit,
-					jsonSchemaURL: new URL(asset('/results.schema.json'), page.url.origin).toString()
+					jsonSchemaURL: new URL(
+						asset('/results.schema.json'),
+						page.url.origin
+					).toString()
 				},
 				({ warning, progress }) => {
 					if (warning) {
@@ -95,7 +100,9 @@
 
 						switch (message) {
 							case 'exif-write-error':
-								toasts.warn(`Impossible d'ajouter les métadonnées EXIF à l'image ${filename}`);
+								toasts.warn(
+									`Impossible d'ajouter les métadonnées EXIF à l'image ${filename}`
+								);
 								break;
 						}
 					}

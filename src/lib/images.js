@@ -125,7 +125,9 @@ export function imageIsAnalyzed(protocol, imageFileId) {
 	if (!protocol) return false;
 	if (!imageFileId) return false;
 	if (uiState.erroredImages.has(imageFileId)) return true;
-	return tables.Image.state.some((img) => img.fileId === imageFileId && img.boundingBoxesAnalyzed);
+	return tables.Image.state.some(
+		(img) => img.fileId === imageFileId && img.boundingBoxesAnalyzed
+	);
 }
 
 /**
@@ -167,7 +169,9 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 					tx.objectStore('Image').delete(image.id);
 
 					for (const observation of observations) {
-						const remainingImages = observation.images.filter((imageId) => imageId !== image.id);
+						const remainingImages = observation.images.filter(
+							(imageId) => imageId !== image.id
+						);
 
 						if (remainingImages.length === 0) {
 							tx.objectStore('Observation').delete(observation.id);
@@ -449,9 +453,12 @@ export async function cropImage(bytes, contentType, centeredBoundingBox, padding
 		// @ts-ignore
 		return { cropped: croppedBytes, original: bytes };
 	} catch (error) {
-		throw new Error(`Couldn't crop with ${JSON.stringify({ boundingBox, padding })}: ${error}`, {
-			cause: error
-		});
+		throw new Error(
+			`Couldn't crop with ${JSON.stringify({ boundingBox, padding })}: ${error}`,
+			{
+				cause: error
+			}
+		);
 	} finally {
 		bitmap.close();
 	}

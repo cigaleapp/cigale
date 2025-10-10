@@ -137,7 +137,9 @@
 
 	let creatingBoundingBox = $state(false);
 	let newBoundingBox = $derived(
-		new NewBoundingBox({ limits: { x: 0, y: 0, width: imageRect.width, height: imageRect.height } })
+		new NewBoundingBox({
+			limits: { x: 0, y: 0, width: imageRect.width, height: imageRect.height }
+		})
 	);
 	$effect(() => newBoundingBox.setCreateMode(createMode));
 
@@ -464,7 +466,9 @@
 	.boundingbox .side.draggable.left:hover:not(.dragging) ~ .corner:is(.bottomleft, .topleft),
 	.boundingbox .side.draggable.right:hover:not(.dragging) ~ .corner:is(.topright, .bottomright),
 	.boundingbox .side.draggable.top:hover:not(.dragging) ~ .corner:is(.topleft, .topright),
-	.boundingbox .side.draggable.bottom:hover:not(.dragging) ~ .corner:is(.bottomleft, .bottomright) {
+	.boundingbox
+		.side.draggable.bottom:hover:not(.dragging)
+		~ .corner:is(.bottomleft, .bottomright) {
 		scale: 130%;
 		background: var(--light__bg-primary-translucent);
 	}

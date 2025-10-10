@@ -33,7 +33,8 @@
 			// Handle $mod: it represents Cmd on Mac and Ctrl on Windows/Linux
 			if (part === '$mod' && navigator.platform.startsWith('Mac')) return ' Cmd';
 			if (part === '$mod') return 'Ctrl';
-			if (['shift', 'alt', 'win'].includes(part)) return part[0].toUpperCase() + part.slice(1);
+			if (['shift', 'alt', 'win'].includes(part))
+				return part[0].toUpperCase() + part.slice(1);
 			if (part === 'delete') return 'Suppr';
 			if (part === 'space') return '␣';
 			if (part === 'escape') return 'Esc';

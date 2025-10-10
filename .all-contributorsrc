@@ -80,7 +80,14 @@
 			"name": "Edgar Remy",
 			"avatar_url": "https://avatars.githubusercontent.com/u/83783043?v=4",
 			"profile": "https://github.com/edgaremy",
-			"contributions": ["bug", "userTesting", "data", "ideas", "projectManagement", "translation"]
+			"contributions": [
+				"bug",
+				"userTesting",
+				"data",
+				"ideas",
+				"projectManagement",
+				"translation"
+			]
 		},
 		{
 			"login": "mcauchoix",

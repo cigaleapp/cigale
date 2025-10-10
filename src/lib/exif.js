@@ -132,7 +132,9 @@ export async function extractMetadata(buffer, extractionPlan) {
 			.filter(
 				([, extracted]) =>
 					extracted !== undefined &&
-					!type({ latitude: 'number.NaN', longitude: 'number.NaN' }).allows(extracted.value) &&
+					!type({ latitude: 'number.NaN', longitude: 'number.NaN' }).allows(
+						extracted.value
+					) &&
 					!Number.isNaN(extracted.value)
 			)
 	);
@@ -224,7 +226,9 @@ export function addExifMetadata(bytes, metadataDefs, metadataValues) {
 		if (value === undefined) continue;
 
 		if (
-			type({ latitude: { exif: 'string' }, longitude: { exif: 'string' } }).allows(def.infer) &&
+			type({ latitude: { exif: 'string' }, longitude: { exif: 'string' } }).allows(
+				def.infer
+			) &&
 			type({ latitude: 'number', longitude: 'number' }).allows(value)
 		) {
 			// XXX harcoded BS :/

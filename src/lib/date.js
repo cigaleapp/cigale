@@ -62,7 +62,9 @@ if (import.meta.vitest) {
 		test('works on valid datestrings', () => {
 			expect(tryParse('2023-10-01', 'yyyy-MM-dd')).toBeInstanceOf(Date);
 			expect(tryParse('2023-10-01T12:00:00', "yyyy-MM-dd'T'HH:mm:ss")).toBeInstanceOf(Date);
-			expect(tryParse('2023-10-01T12:00:00Z', "yyyy-MM-dd'T'HH:mm:ssXXX")).toBeInstanceOf(Date);
+			expect(tryParse('2023-10-01T12:00:00Z', "yyyy-MM-dd'T'HH:mm:ssXXX")).toBeInstanceOf(
+				Date
+			);
 		});
 		test('returns undefined for Invalid Date datestrings', () => {
 			expect(tryParse('2019-05-09T08:25:22+0000')).toBeUndefined();

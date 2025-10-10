@@ -12,7 +12,7 @@ import {
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
-import { avg, mapValues } from './utils.js';
+import { avg, fromEntries, mapValues } from './utils.js';
 
 /**
  * @import { DatabaseHandle, ReactiveTableNames } from './idb.svelte.js'
@@ -22,7 +22,7 @@ import { avg, mapValues } from './utils.js';
 /**
  * @template {DB.MetadataType} [Type=DB.MetadataType]
  * @typedef  RuntimeValue
- * @type {Type extends 'boolean' ? boolean : Type extends 'integer' ? number : Type extends 'float' ? number : Type extends 'enum' ? string : Type extends 'date' ? Date : Type extends 'location' ? { latitude: number, longitude: number } : Type extends 'boundingbox' ? { x: number, y: number, w: number, h: number } : string}
+ * @type {import('$lib/schemas/metadata.js').RuntimeValue<Type>}
  */
 
 /**
@@ -306,7 +306,8 @@ export async function deleteMetadataValue({
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
 
-	if (!image && !observation) throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+	if (!image && !observation)
+		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
 
 	console.debug(`Delete metadata ${metadataId} in ${subjectId}`);
 	if (image) {
@@ -472,7 +473,9 @@ function mergeMetadata(definition, values) {
 				.flatMap((v) => Object.keys(v.alternatives))
 				.map((valueAsString) => [
 					valueAsString,
-					merger(values.flatMap((v) => v.alternatives[valueAsString] ?? null).filter(Boolean))
+					merger(
+						values.flatMap((v) => v.alternatives[valueAsString] ?? null).filter(Boolean)
+					)
 				])
 		);
 
@@ -693,7 +696,8 @@ function toNumber(type, values) {
 	// @ts-ignore
 	if (type === 'float') return values;
 	if (type === 'boolean') return values.map((v) => (v ? 1 : 0));
-	if (type === 'date') return values.map((v) => new Date(/** @type {Date|string} */ (v)).getTime());
+	if (type === 'date')
+		return values.map((v) => new Date(/** @type {Date|string} */ (v)).getTime());
 	throw new Error(`Impossible de convertir des valeurs de type ${type} en nombre`);
 }
 
@@ -702,10 +706,12 @@ function toNumber(type, values) {
  * Used for e.g. CSV exports.
  * @param {import('$lib/i18n.js').Language} language
  * @param {Pick<DB.Metadata, 'type'>} metadata the metadata definition
- * @param {DB.MetadataValue['value']} value the value of the metadata
+ * @param {DB.MetadataValue['value'] | null} value the value of the metadata
  * @param {string} [valueLabel] the label of the value, if applicable (e.g. for enums)
  */
 export function metadataPrettyValue(language, metadata, value, valueLabel = undefined) {
+	if (value === null) return '';
+
 	switch (metadata.type) {
 		case 'boolean':
 			switch (language) {
@@ -722,9 +728,10 @@ export function metadataPrettyValue(language, metadata, value, valueLabel = unde
 			return valueLabel || value.toString();
 
 		case 'location': {
-			const { latitude, longitude } = type({ latitude: 'number', longitude: 'number' }).assert(
-				value
-			);
+			const { latitude, longitude } = type({
+				latitude: 'number',
+				longitude: 'number'
+			}).assert(value);
 
 			return `${latitude}, ${longitude}`;
 		}
@@ -770,9 +777,9 @@ if (import.meta.vitest) {
 			});
 
 			test('dates', () => {
-				expect(metadataPrettyValue('fr', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
-					'01/02/2023, 15:04:05'
-				);
+				expect(
+					metadataPrettyValue('fr', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))
+				).toBe('01/02/2023, 15:04:05');
 			});
 
 			test('floats', () => {
@@ -780,9 +787,9 @@ if (import.meta.vitest) {
 			});
 
 			test('bounding boxes', () => {
-				expect(metadataPrettyValue('fr', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
-					'Boîte de (1, 2) à (4, 6)'
-				);
+				expect(
+					metadataPrettyValue('fr', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
+				).toBe('Boîte de (1, 2) à (4, 6)');
 			});
 
 			test('integers', () => {
@@ -802,15 +809,15 @@ if (import.meta.vitest) {
 			});
 
 			test('dates', () => {
-				expect(metadataPrettyValue('en', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))).toBe(
-					'02/01/2023, 3:04:05 PM'
-				);
+				expect(
+					metadataPrettyValue('en', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))
+				).toBe('02/01/2023, 3:04:05 PM');
 			});
 
 			test('bounding boxes', () => {
-				expect(metadataPrettyValue('en', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })).toBe(
-					'Box from (1, 2) to (4, 6)'
-				);
+				expect(
+					metadataPrettyValue('en', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
+				).toBe('Box from (1, 2) to (4, 6)');
 			});
 
 			test('floats', () => {
@@ -824,16 +831,28 @@ if (import.meta.vitest) {
 
 		test('locations', () => {
 			expect(
-				metadataPrettyValue('fr', { type: 'location' }, { latitude: 12.34, longitude: 56.78 })
+				metadataPrettyValue(
+					'fr',
+					{ type: 'location' },
+					{ latitude: 12.34, longitude: 56.78 }
+				)
 			).toBe('12.34, 56.78');
 			expect(
-				metadataPrettyValue('en', { type: 'location' }, { latitude: 12.34, longitude: 56.78 })
+				metadataPrettyValue(
+					'en',
+					{ type: 'location' },
+					{ latitude: 12.34, longitude: 56.78 }
+				)
 			).toBe('12.34, 56.78');
 		});
 
 		test('enums', () => {
-			expect(metadataPrettyValue('en', { type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
-			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value1', 'Label 1')).toBe('Label 1');
+			expect(metadataPrettyValue('en', { type: 'enum' }, 'value1', 'Label 1')).toBe(
+				'Label 1'
+			);
+			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value1', 'Label 1')).toBe(
+				'Label 1'
+			);
 			expect(metadataPrettyValue('en', { type: 'enum' }, 'value2')).toBe('value2');
 			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value2')).toBe('value2');
 		});
@@ -952,6 +971,7 @@ export function metadataDefinitionComparator(protocol) {
 
 /**
  * A null-value MetadataValue object
+ * @satisfies {ReturnType<typeof protocolMetadataValues>[string]}
  */
 const METADATA_ZERO_VALUE = /** @type {const} */ ({
 	value: null,
@@ -965,18 +985,13 @@ const METADATA_ZERO_VALUE = /** @type {const} */ ({
  *
  * @param {DB.Protocol} protocol
  * @param {DB.MetadataValues} values
+ * @returns {Record<string, Omit<DB.MetadataValue, 'value'> & { value: RuntimeValue | null }>}
  */
 export function protocolMetadataValues(protocol, values) {
-	return Object.fromEntries(
+	return fromEntries(
 		protocol.metadata
 			.filter((key) => isNamespacedToProtocol(protocol.id, key))
-			.map((key) => [
-				removeNamespaceFromMetadataId(key),
-				values[key] ?? {
-					...METADATA_ZERO_VALUE,
-					valueLabel: ''
-				}
-			])
+			.map((key) => [removeNamespaceFromMetadataId(key), values[key] ?? METADATA_ZERO_VALUE])
 	);
 }
 

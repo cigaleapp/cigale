@@ -54,7 +54,8 @@ describe('filepath templates', () => {
 		// TODO: find a way to have type inference for a isinstance check
 		// This way, we can also get rid of expectRendered and use template.render directly, making code clearer
 		// @ts-expect-error
-		expect(() => template.render({ id: '123', foo: 'bar' })).toThrowErrorMatchingInlineSnapshot(`
+		expect(() => template.render({ id: '123', foo: 'bar' }))
+			.toThrowErrorMatchingInlineSnapshot(`
 			[Error: Parse error on line 1:
 			{{id}
 			----^
@@ -95,7 +96,9 @@ describe('filepath templates', () => {
 	test('has the suffix helper', () => {
 		const template = FilepathTemplate('{{ suffix filename suf }}');
 		expect(template).not.toBeInstanceOf(ArkErrors);
-		expectRendered(template, { filename: 'file.jpg', suf: '_cropped' }).toBe('file_cropped.jpg');
+		expectRendered(template, { filename: 'file.jpg', suf: '_cropped' }).toBe(
+			'file_cropped.jpg'
+		);
 		expectRendered(template, { filename: 'file.jpg', suf: '_cropped.png' }).toBe(
 			'file_cropped.png.jpg'
 		);
@@ -125,9 +128,6 @@ describe('MetadataValue', () => {
 		test('boolean', () => {
 			expect(value('true').value).toBe(true);
 			expect(value('false').value).toBe(false);
-		});
-		test('null', () => {
-			expect(value('null').value).toBe(null);
 		});
 		test('string', () => {
 			expect(value('"foo"').value).toBe('foo');

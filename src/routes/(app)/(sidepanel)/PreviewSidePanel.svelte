@@ -74,9 +74,8 @@
 			return;
 		}
 
-		idb
-			.list('MetadataOption', metadataOptionsKeyRange(uiState.currentProtocolId, null))
-			.then((result) => {
+		idb.list('MetadataOption', metadataOptionsKeyRange(uiState.currentProtocolId, null)).then(
+			(result) => {
 				// Prevent double-load even if both promises resolved at the same time
 				if (Object.keys(options).length > 0) {
 					loadingOptions = false;
@@ -90,7 +89,8 @@
 					options[metadataId].sort((a, b) => a.label.localeCompare(b.label));
 				}
 				loadingOptions = false;
-			});
+			}
+		);
 	});
 
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
@@ -142,7 +142,11 @@
 					value={singleObservationSelected.label}
 					onblur={async (value) => {
 						if (value === singleObservationSelected.label) return;
-						await tables.Observation.update(singleObservationSelected.id, 'label', value);
+						await tables.Observation.update(
+							singleObservationSelected.id,
+							'label',
+							value
+						);
 					}}
 				/>
 			{:else if singleImageSelected}

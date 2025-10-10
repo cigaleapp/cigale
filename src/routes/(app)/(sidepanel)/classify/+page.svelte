@@ -151,7 +151,9 @@
 			sort={getSettings().gallerySort}
 			groups={['Recadrées', 'Non recadrées']}
 			grouping={({ data: { images } }) =>
-				images.some((img) => uiState.cropMetadataValueOf(img)) ? 'Recadrées' : 'Non recadrées'}
+				images.some((img) => uiState.cropMetadataValueOf(img))
+					? 'Recadrées'
+					: 'Non recadrées'}
 		>
 			{#snippet item({ observation, images }, { id })}
 				<CardObservation

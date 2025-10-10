@@ -44,7 +44,9 @@ function props(parameters) {
 						displayPattern(parameters.keyboard)
 							.entries()
 							.map(([i, part]) =>
-								i % 2 === 0 ? `<kbd>${part}</kbd>` : `<span class=separator>${part}</span>`
+								i % 2 === 0
+									? `<kbd>${part}</kbd>`
+									: `<span class=separator>${part}</span>`
 							)
 							.toArray()
 							.join('') +
