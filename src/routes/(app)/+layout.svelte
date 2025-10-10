@@ -30,12 +30,13 @@
 	import { SvelteMap } from 'svelte/reactivity';
 
 	import { version } from '$app/environment';
+	import { goto } from '$app/navigation';
+	import { resolve, base } from '$app/paths';
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
-	import { resolve } from '$lib/paths';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
@@ -54,6 +55,13 @@
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
 	undo.initialize(100);
+
+	// TODO(2026-01-24) remove at some point
+	onMount(() => {
+		if (page.url.hash.startsWith('#/')) {
+			goto(base + page.url.hash.slice(1));
+		}
+	});
 
 	export const snapshot = {
 		capture() {
