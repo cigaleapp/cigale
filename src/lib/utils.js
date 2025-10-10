@@ -1091,6 +1091,20 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Prevents having to do the ugly `...(something ? { key: something } : {})` pattern
+ * @template {string} Key
+ * @template Value
+ * @param {Key} key
+ * @param {Value} value
+ * @returns {Partial<Record<Key, NonNullable<Value>>>}
+ */
+export function propOrNothing(key, value) {
+	// @ts-expect-error
+	if (nonnull(value)) return { [key]: value };
+	return {};
+}
+
+/**
  * Fades out an element matching the given selector over the given duration, then removes it from the DOM.
  * If it's the first time the app is started (determined by checking localStorage), uses firstTimeDuration instead of duration if provided.
  * @param {string} selector
@@ -1116,4 +1130,21 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 	setTimeout(() => {
 		element.remove();
 	}, duration);
+}
+
+/**
+ *
+ * @param {ArrayBuffer} content
+ * @returns {Promise<typeof import('$lib/schemas/common').SHA1Hash.infer | null>} base64-encoded SHA-1 sum
+ */
+export async function sha1sum(content) {
+	const digest = await crypto.subtle.digest('SHA-1', content);
+	try {
+		return new Uint8Array(digest).toBase64();
+	} catch {
+		console.warn(
+			'Could not base64-encode the SHA1 digest, probably because browser is too old, see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64#browser_compatibility'
+		);
+		return null;
+	}
 }

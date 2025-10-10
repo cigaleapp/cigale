@@ -5,7 +5,8 @@ import {
 	ID,
 	ModelInput,
 	Probability,
-	References
+	References,
+	SHA1Hash
 } from './schemas/common.js';
 import {
 	EXIFField,
@@ -19,6 +20,7 @@ import {
 } from './schemas/metadata.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
 import {
+	BeamupSettings,
 	FilepathTemplate,
 	ModelDetectionOutputShape,
 	Protocol as ProtocolSchema
@@ -140,6 +142,14 @@ const Settings = table(
 			direction: 'asc',
 			key: 'date'
 		})),
+		beamupPreferences: scope({ ID })
+			.type({
+				'[ID]': {
+					enable: 'boolean',
+					email: 'string.email | null'
+				}
+			})
+			.default(() => ({})),
 		protocolModelSelections: scope({ ID })
 			.type({
 				'[ID]': {
@@ -148,6 +158,33 @@ const Settings = table(
 				}
 			})
 			.default(() => ({}))
+	})
+);
+
+const BeamupCorrection = table(
+	['id'],
+	type({
+		id: ID,
+		client: { version: 'string' },
+		protocol: Protocol.pick('id', 'version').and({
+			beamup: BeamupSettings
+		}),
+		metadata: Metadata.pick('id', 'type'),
+		subject: {
+			'image?': Image.pick('id'),
+			'observation?': Observation.pick('id'),
+			contentHash: SHA1Hash.or('null')
+		},
+		'file?': ImageFile.pick(
+			'id',
+			/* TODO  'contentHash', */ 'filename',
+			'contentType',
+			'dimensions'
+		),
+		before: MetadataValue,
+		after: MetadataValue,
+		occurredAt: 'string.date.iso.parse',
+		email: 'string.email | null'
 	})
 );
 
@@ -169,13 +206,15 @@ export const Schemas = {
 	Protocol,
 	Settings,
 	EXIFField,
-	HTTPRequest
+	HTTPRequest,
+	BeamupCorrection
 };
 
 export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 	'ImageFile',
 	'ImagePreviewFile',
-	'MetadataOption'
+	'MetadataOption',
+	'BeamupCorrection'
 ]);
 
 /**
@@ -196,7 +235,8 @@ export const Tables = {
 	Metadata,
 	MetadataOption,
 	Protocol,
-	Settings
+	Settings,
+	BeamupCorrection
 };
 
 /**
@@ -336,4 +376,9 @@ export const idComparator = (a, b) => {
  *
  * @typedef DimensionsInput
  * @type {typeof Dimensions.inferIn}
+ */
+
+/**
+ * @typedef BeamupCorrection
+ * @type {typeof BeamupCorrection.infer}
  */

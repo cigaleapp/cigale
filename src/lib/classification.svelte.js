@@ -1,7 +1,8 @@
 import { match, type } from 'arktype';
-import { uiState } from './state.svelte.js';
-import { MetadataInferOptionsNeural } from './schemas/metadata.js';
 import { tables } from './idb.svelte.js';
+import { MetadataInferOptionsNeural } from './schemas/metadata.js';
+import { uiState } from './state.svelte.js';
+import { pick, propOrNothing } from './utils.js';
 
 /**
  * Classifies an image using the current protocol and selected model.
@@ -10,7 +11,8 @@ import { tables } from './idb.svelte.js';
  * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [cancellers]
  */
 export async function classifyImage(swarpc, id, cancellers) {
-	if (!uiState.currentProtocol) {
+	const protocol = uiState.currentProtocol;
+	if (!protocol) {
 		throw new Error('Aucun protocole sélectionné');
 	}
 
@@ -22,15 +24,16 @@ export async function classifyImage(swarpc, id, cancellers) {
 	}
 
 	const { cancel, request: done } = swarpc.classify.cancelable({
+		protocol: {
+			...pick(protocol, 'id', 'version'),
+			...propOrNothing('beamup', $state.snapshot(protocol.beamup))
+		},
 		imageId: id,
 		metadataIds: {
 			cropbox: uiState.cropMetadataId,
 			target: uiState.classificationMetadataId
 		},
-		taskSettings: classificationInferenceSettings(
-			uiState.currentProtocol,
-			uiState.selectedClassificationModel
-		)
+		taskSettings: classificationInferenceSettings(protocol, uiState.selectedClassificationModel)
 	});
 
 	cancellers?.set(id, cancel);
