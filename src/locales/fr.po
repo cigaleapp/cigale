@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-09T00:58:51.519Z\n"
+"PO-Revision-Date: 2025-10-10T11:12:39.253Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -798,10 +798,6 @@ msgstr ""
 "Pour cela, si vous activez cette option, et quand ce protocole est sélectionné, Cigale enverra\n"
 "les données suivantes au <0>serveur BeamUp à {0}</0>"
 
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
-msgstr "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
-
 #. placeholder {0}: previewingPrNumber
 #: src/routes/(app)/Navigation.svelte
 msgid "Preview #{0}"
@@ -1229,6 +1225,30 @@ msgstr "https://ibrahimkactioglu.com/"
 #: src/routes/(app)/about/+page.svelte
 msgid "https://elementtype.co/"
 msgstr "https://elementtype.co/"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid ""
+"Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans\n"
+"l'interface"
+msgstr ""
+"Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans\n"
+"l'interface"
+
+#: src/routes/(app)/protocols/+page.svelte
+msgid ""
+"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite,\n"
+"il suffit de l'exporter, modifier le fichier, et réimporter"
+msgstr ""
+"Vous pourrez ensuite importer votre protocole ici. Si vous voulez le modifier par la suite,\n"
+"il suffit de l'exporter, modifier le fichier, et réimporter"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid ""
+"Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
+"clavier"
+msgstr ""
+"Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
+"clavier"
 
 #: src/lib/beamup.svelte.js
 msgid "Cigale"

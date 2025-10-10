@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-09T00:58:51.523Z\n"
+"PO-Revision-Date: 2025-10-10T11:12:39.255Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -788,10 +788,6 @@ msgid ""
 "les données suivantes au <0>serveur BeamUp à {0}</0>"
 msgstr ""
 
-#: src/routes/(app)/protocols/+page.svelte
-msgid "Pour l'instant, C.i.g.a.l.e ne permet pas de créer ou modifier des protocoles dans l'interface"
-msgstr ""
-
 #. placeholder {0}: previewingPrNumber
 #: src/routes/(app)/Navigation.svelte
 msgid "Preview #{0}"
@@ -1233,4 +1229,8 @@ msgstr ""
 msgid ""
 "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
 "clavier"
+msgstr ""
+
+#: src/lib/beamup.svelte.js
+msgid "Cigale"
 msgstr ""
