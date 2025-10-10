@@ -17,6 +17,9 @@ export default defineConfig({
 				// Table names
 				if (scope === 'script' && Object.keys(Tables).includes(msg)) return false;
 
+				// Probably math variables, see ModelOutputShapeDiagram.svelte
+				if (msg.length === 1) return false;
+
 				if (/^toasts\.(info|warn|error|success)$/.test(call)) return true;
 
 				const startsWithUpperLetter =
