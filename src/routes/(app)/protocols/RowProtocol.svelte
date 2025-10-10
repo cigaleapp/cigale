@@ -21,7 +21,9 @@
 	<section class="text">
 		<h3>
 			{#if dirty}
-				<UnsavedChangesIndicator help="Protocole modifié par rapport à la version publiée" />
+				<UnsavedChangesIndicator
+					help="Protocole modifié par rapport à la version publiée"
+				/>
 			{/if}
 			{name}
 		</h3>
@@ -46,7 +48,9 @@
 		<ButtonIcon
 			help="Exporter"
 			onclick={async () => {
-				await exportProtocol(databaseHandle(), resolve('/'), id).catch((e) => toasts.error(e));
+				await exportProtocol(databaseHandle(), resolve('/'), id).catch((e) =>
+					toasts.error(e)
+				);
 			}}
 		>
 			<IconExport />

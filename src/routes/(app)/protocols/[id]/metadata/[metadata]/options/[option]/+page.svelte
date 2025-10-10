@@ -102,7 +102,8 @@
 			{#snippet label()}
 				Affecte
 				<p class="label-help">
-					Change la valeur d'autres métadonnées quand {data.metadata.label} = {data.option.label}
+					Change la valeur d'autres métadonnées quand {data.metadata.label} = {data.option
+						.label}
 				</p>
 			{/snippet}
 			<!-- TODO allow modifying -->
@@ -121,11 +122,14 @@
 							<ButtonIcon
 								help="Voir {option.label || option.key}"
 								onclick={() =>
-									goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
-										id: page.params.id ?? '',
-										metadata: shortId,
-										option: option.key
-									})}
+									goto(
+										'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+										{
+											id: page.params.id ?? '',
+											metadata: shortId,
+											option: option.key
+										}
+									)}
 							>
 								<IconOpenInExternal />
 							</ButtonIcon>
@@ -158,11 +162,14 @@
 							<ButtonIcon
 								help="Voir {option.label || option.key}"
 								onclick={() =>
-									goto('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
-										id: page.params.id ?? '',
-										metadata: shortId,
-										option: option.key
-									})}
+									goto(
+										'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+										{
+											id: page.params.id ?? '',
+											metadata: shortId,
+											option: option.key
+										}
+									)}
 							>
 								<IconOpenInExternal />
 							</ButtonIcon>

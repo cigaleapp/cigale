@@ -40,8 +40,8 @@
 		{#snippet label()}
 			Identifiant du protocole
 			<p>
-				Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous contrôlez;
-				celui d'un site web permettant de télécharger le protocole, par exemple
+				Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous
+				contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple
 			</p>
 		{/snippet}
 		<InlineTextInput
@@ -55,7 +55,8 @@
 		{#snippet error()}
 			{@const existingProtocol = tables.Protocol.getFromState(newProtocol.id)}
 			{#if newProtocol.id && !ID.allows(newProtocol.id)}
-				L'identifiant ne doit comporter que des lettres, chiffres, <code>.</code> ou <code>_</code>
+				L'identifiant ne doit comporter que des lettres, chiffres, <code>.</code> ou
+				<code>_</code>
 			{:else if existingProtocol}
 				<em>{existingProtocol.name}</em> utilise déjà cet identifiant
 			{/if}

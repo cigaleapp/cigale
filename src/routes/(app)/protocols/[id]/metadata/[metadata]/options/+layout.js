@@ -5,7 +5,10 @@ import { namespacedMetadataId } from '$lib/schemas/metadata.js';
 export async function load({ params, parent, depends }) {
 	const parentData = await parent();
 
-	const options = await list('MetadataOption', metadataOptionsKeyRange(params.id, params.metadata));
+	const options = await list(
+		'MetadataOption',
+		metadataOptionsKeyRange(params.id, params.metadata)
+	);
 
 	depends(dependencyURI('Metadata', namespacedMetadataId(params.id, params.metadata), 'options'));
 
