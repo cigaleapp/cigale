@@ -166,7 +166,11 @@
 									{#snippet button({ state, help, onclick })}
 										{@const text = updateButtonTexts[state]}
 										{#if text}
-											<ButtonInk disabled={state === 'upgrading'} {help} {onclick}>
+											<ButtonInk
+												disabled={state === 'upgrading'}
+												{help}
+												{onclick}
+											>
 												{text}
 											</ButtonInk>
 										{/if}

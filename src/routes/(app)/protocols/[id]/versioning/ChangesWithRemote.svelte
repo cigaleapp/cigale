@@ -119,11 +119,14 @@
 					{#if option}
 						<a
 							title="Voir l'option"
-							href={href('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
-								id: metadataId.namespace ?? page.params.id ?? '',
-								metadata: metadataId.id,
-								option: option.key
-							})}
+							href={href(
+								'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+								{
+									id: metadataId.namespace ?? page.params.id ?? '',
+									metadata: metadataId.id,
+									option: option.key
+								}
+							)}
 						>
 							{option.label || option.key}
 						</a>

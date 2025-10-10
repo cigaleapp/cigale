@@ -135,7 +135,10 @@
 								label="Nom du fichier"
 								onblur={async (newName) => {
 									child.filename = newName;
-									await updateExportsPath(child.provenance, `${dirname}/${newName}`);
+									await updateExportsPath(
+										child.provenance,
+										`${dirname}/${newName}`
+									);
 								}}
 							/>
 						</span>

@@ -445,7 +445,10 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 	}
 
 	// Sort options for each metadata by key
-	const metadataIds = new Set([...keys(remoteProtocol.metadata), ...keys(localProtocol.metadata)]);
+	const metadataIds = new Set([
+		...keys(remoteProtocol.metadata),
+		...keys(localProtocol.metadata)
+	]);
 
 	const DELETED_OPTION = {
 		description: '',
@@ -513,7 +516,13 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 						diffs
 							.filter((d) => diffStartsWith(d.path, pathToOption))
 							.filter((d) => d.path.at(-1) !== '__deleted')
-							.map((d) => /** @type {const} */ ([d.path.at(-1)?.toString() ?? '', d.oldValue]))
+							.map(
+								(d) =>
+									/** @type {const} */ ([
+										d.path.at(-1)?.toString() ?? '',
+										d.oldValue
+									])
+							)
 					)
 				});
 			} else if (type === 'REMOVE') {
@@ -529,7 +538,13 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 						diffs
 							.filter((d) => diffStartsWith(d.path, pathToOption))
 							.filter((d) => d.path.at(-1) !== '__deleted')
-							.map((d) => /** @type {const} */ ([d.path.at(-1)?.toString() ?? '', d.value]))
+							.map(
+								(d) =>
+									/** @type {const} */ ([
+										d.path.at(-1)?.toString() ?? '',
+										d.value
+									])
+							)
 					)
 				});
 			}
