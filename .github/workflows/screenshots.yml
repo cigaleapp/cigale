@@ -2,12 +2,19 @@ name: Update README screenshots
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/screenshots.yml]
   schedule:
     - cron: '0 0 * * 1,4' # Runs at 00:00 UTC every Monday and Thursday
 
 jobs:
   update-readme-snapshots:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gwennlbh/playwright-bun:1.55.1
+      options: --user 1001
+
     env:
       BUILD_COMMIT: ${{ github.sha }}
       BASE_PATH: /cigale
@@ -16,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Set up Node.js
+      - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
@@ -26,9 +33,6 @@ jobs:
 
       - name: Build site
         run: bun run build
-
-      - name: Install Playwright Browsers
-        run: bunx playwright install --with-deps
 
       - name: Run Playwright readme.spec.js and update screenshots
         run: bunx playwright test tests/tasks/readme.spec.js --update-snapshots
