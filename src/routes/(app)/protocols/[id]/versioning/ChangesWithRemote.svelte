@@ -267,6 +267,11 @@
 		color: var(--gray);
 	}
 
+    .array {
+        list-style: "— ";
+        padding-left: 2ch;
+    }
+
 	.added-value .number {
 		color: orange;
 	}
