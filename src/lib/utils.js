@@ -1117,3 +1117,61 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 		element.remove();
 	}, duration);
 }
+
+/**
+ *
+ * @param {any} obj
+ * @param {(key: string, value: any) => boolean} pred
+ * @returns {any}
+ */
+export function deleteKeysDeep(obj, pred) {
+	if (typeof obj !== 'object') return obj;
+
+	if (Array.isArray(obj)) {
+		return obj.map((item) => deleteKeysDeep(item, pred));
+	}
+
+	return Object.fromEntries(
+		Object.entries(obj)
+			.filter(([key, value]) => !pred(key, value))
+			.map(([key, value]) => [key, deleteKeysDeep(value, pred)])
+	);
+}
+
+if (import.meta.vitest) {
+	const { it, expect, describe } = import.meta.vitest;
+
+	describe('deleteKeys', () => {
+		it('should remove keys that match the predicate', () => {
+			const input = {
+				a: 1,
+				b: { $ark: { object1: true } },
+				c: 3,
+				d: { $ark: { object2: true } }
+			};
+			const result = deleteKeysDeep(
+				input,
+				(_, value) => typeof value === 'object' && value.$ark
+			);
+			expect(result).toEqual({ a: 1, c: 3 });
+		});
+
+		it('should return an empty object if all keys match the predicate', () => {
+			const input = { $ark: { object1: true } };
+			const result = deleteKeysDeep(
+				input,
+				(_, value) => typeof value === 'object' && value.object1
+			);
+			expect(result).toEqual({});
+		});
+
+		it('should return the same object if no keys match the predicate', () => {
+			const input = { a: 1, b: 2 };
+			const result = deleteKeysDeep(
+				input,
+				([, value]) => typeof value === 'object' && value.$ark
+			);
+			expect(result).toEqual(input);
+		});
+	});
+}

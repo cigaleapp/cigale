@@ -297,7 +297,8 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 test('can import a protocol and pre-set models via URL parameters', async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
-	await page.goto('#/protocols');
+	await page.waitForURL('/import');
+	await page.goto('/protocols');
 	await page
 		.getByRole('listitem')
 		.filter({ hasText: lightweightProtocol.id })

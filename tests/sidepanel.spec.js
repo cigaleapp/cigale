@@ -37,7 +37,7 @@ async function initialize({
 		await chooseDefaultProtocol(page);
 	}
 	await page.getByTestId('goto-classify').click();
-	await page.waitForURL((u) => u.hash === '#/classify');
+	await page.waitForURL('/classify');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }
 
@@ -45,7 +45,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await initialize({ page, dump: 'kitchensink-protocol' });
 
 	await page.getByTestId('goto-import').click();
-	await page.waitForURL((u) => u.hash === '#/import');
+	await page.waitForURL('/import');
 	await firstObservationCard(page).click();
 	await expect(page.getByTestId('sidepanel')).toBeVisible();
 
@@ -66,7 +66,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 
 	// Set to False on observation
 	await page.getByTestId('goto-classify').click();
-	await page.waitForURL((u) => u.hash === '#/classify');
+	await page.waitForURL('/classify');
 	await firstObservationCard(page).click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
 	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
@@ -79,7 +79,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 
 	// Expect image to be still True
 	await page.getByTestId('goto-import').click();
-	await page.waitForURL((u) => u.hash === '#/import');
+	await page.waitForURL('/import');
 	await firstObservationCard(page).click();
 	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
 	  - text: bool

@@ -23,7 +23,7 @@ test.describe('Database dumps', () => {
 
 	test('kitchensink-protocol', async ({ page }) => {
 		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
-		await page.goto('#/protocols');
+		await goToTab(page, 'protocol');
 		await page
 			.getByRole('listitem')
 			.filter({ hasText: 'io.github.cigaleapp.arthropods.example.light' })

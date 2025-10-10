@@ -14,6 +14,10 @@ import { loadLocale } from 'wuchale/load-utils';
 import { localeFromNavigator } from '$lib/i18n.js';
 import WebWorker from '$worker/start.js?worker';
 
+export const ssr = false;
+
+export const trailingSlash = 'always';
+
 export async function load() {
 	const locale = await getSetting('language', {
 		fallback: localeFromNavigator()

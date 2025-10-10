@@ -7,24 +7,27 @@ import { resolve } from '$app/paths';
 
 /**
  * @template {RouteId | Pathname} T
- * @typedef { T extends RouteId ? RouteParams<T> extends Record<string, never> ? [route: T] : [route: T, params: RouteParams<T>] : [route: T] } ResolveArgs
+ * @typedef { T extends RouteId ? RouteParams<T> extends Record<string, never> ? undefined :   RouteParams<T> : undefined } ParamsArg
  */
 
 /**
  * @template {RouteId | Pathname} T
- * @param {ResolveArgs<T>} args
+ * @param {T} path
+ * @param {ParamsArg<T>} [params]
+ * @param {Parameters<typeof import('$app/navigation').goto>[1]} [options]
  */
-export async function goto(...args) {
+export async function goto(path, params, options) {
 	// eslint-disable-next-line svelte/no-navigation-without-resolve
-	await navigation.goto(href(...args));
+	await navigation.goto(href(...[path, params]), options);
 }
 
 /**
  * @template {RouteId | Pathname} T
- * @param {ResolveArgs<T>} args
- * @returns {`#${ResolvedPathname}`}
+ * @param {T} path
+ * @param {ParamsArg<T>} [params]
+ * @returns {ResolvedPathname}
  */
-export function href(...args) {
+export function href(path, params) {
 	// @ts-expect-error
-	return '#' + resolve(...args).replace(resolve('/'), '/');
+	return resolve(...(params ? [path, params] : [path]));
 }

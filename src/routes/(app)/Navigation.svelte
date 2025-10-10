@@ -34,8 +34,6 @@
 	/** @type {Props} */
 	let { openKeyboardShortcuts, openPrepareForOfflineUse, progress = 0, swarpc } = $props();
 
-	const path = $derived(page.url.hash.replace(/^#/, ''));
-
 	const hasImages = $derived(tables.Image.state.length > 0);
 
 	/** @type {number|undefined} */
@@ -159,7 +157,7 @@
 			<a href={href('/')}>
 				Protocole
 				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
-				{#if path == '/' || path == ''}
+				{#if page.route.id === "/"}
 					<div class="line"></div>
 				{/if}
 			</a>
@@ -170,7 +168,7 @@
 				aria-disabled={!uiState.currentProtocol}
 			>
 				Importer
-				{#if path == '/import'}
+				{#if page.route.id === '/(app)/(sidepanel)/import'}
 					<div class="line"></div>
 				{/if}
 			</a>
@@ -187,7 +185,7 @@
 					aria-disabled={!uiState.currentProtocol || !hasImages}
 				>
 					Recadrer
-					{#if path.startsWith('/crop')}
+					{#if page.route.id?.startsWith('/(app)/(sidepanel)/crop')}
 						<div class="line"></div>
 					{/if}
 				</a>
@@ -217,7 +215,7 @@
 					data-testid="goto-classify"
 				>
 					Classifier
-					{#if path == '/classify'}
+					{#if page.route.id === '/(app)/(sidepanel)/classify'}
 						<div class="line"></div>
 					{/if}
 				</a>

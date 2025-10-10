@@ -16,11 +16,11 @@ jobs:
           bun-version-file: .bun-version
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Generate JSON schema
-        run: bun run scripts/generate-json-schemas.js
+      - name: Download JSON schema
+        run: wget https://cigaleapp.github.io/cigale/protocol.schema.json
       - name: Validate protocols with JSON schema
         uses: GrantBirki/json-yaml-validate@v3.3.2
         with:
-          json_schema: static/protocol.schema.json
+          json_schema: protocol.schema.json
           json_schema_version: draft-2020-12
           files: examples/*.cigaleprotocol.json

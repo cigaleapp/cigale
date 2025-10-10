@@ -13,25 +13,31 @@ concurrency: preview-${{ github.ref }}
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
+
     environment:
       name: '#${{ github.event.number }}: App preview'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
+
+    env:
+      PR_NUMBER: ${{ github.event.number }}
+      BASE_PATH: /cigale/_pullrequests/pr-${{ github.event.number }}
+      BUILD_COMMIT: ${{ github.sha }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Node
+      - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
 
-      - name: Install and Build
-        if: github.event.action != 'closed' # You might want to skip the build if the PR has been closed
-        run: |
-          bun install
-          BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale/_pullrequests/pr-$PR_NUMBER bun run build
-        env:
-          PR_NUMBER: ${{ github.event.number }}
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build
+        if: github.event.action != 'closed'
+        run: bun run build
 
       - name: Deploy preview
         id: deploy-preview

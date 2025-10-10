@@ -488,9 +488,15 @@
 		}
 
 		if (willAutoskip) {
-			await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`, {
-				invalidateAll: true
-			});
+			if (nextUnconfirmedImageId) {
+				await goto(
+					'/(app)/(sidepanel)/crop/[image]',
+					{ image: nextUnconfirmedImageId },
+					{ invalidateAll: true }
+				);
+			} else {
+				await goto('/classify', undefined, { invalidateAll: true });
+			}
 		}
 
 		return newImageId;
@@ -505,7 +511,11 @@
 			await onCropChange(image.id, box ? toTopLeftCoords(box) : undefined);
 		}
 
-		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
+		if (nextUnconfirmedImageId) {
+			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextUnconfirmedImageId });
+		} else {
+			await goto('/classify');
+		}
 	}
 
 	async function deleteImageFileAndGotoNext() {
@@ -513,7 +523,11 @@
 		await deleteImageFile(fileId);
 		// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
 		// it means we just deleted the last image; so we go back to the import tab
-		await goto(nextFileId ? `#/crop/${nextFileIdBeforeDelete}` : '#/import');
+		if (nextFileId) {
+			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileIdBeforeDelete });
+		} else {
+			await goto('/import');
+		}
 	}
 
 	/**
@@ -557,17 +571,17 @@
 		ArrowLeft: {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto(`#/crop/${prevFileId}`)
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
 		},
 		'Shift+Space': {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto(`#/crop/${prevFileId}`)
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
 		},
 		ArrowRight: {
 			help: 'Image suivante',
 			when: () => Boolean(nextFileId),
-			do: () => goto(`#/crop/${nextFileId}`)
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId })
 		},
 		Space: {
 			help: 'Continuer',
@@ -1041,7 +1055,7 @@
 					help="Image précédente"
 					keyboard="ArrowLeft"
 					onclick={() => {
-						goto(`#/crop/${prevFileId}`);
+						goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId });
 					}}
 				>
 					<IconPrev />
@@ -1054,7 +1068,7 @@
 					help="Image suivante"
 					keyboard="ArrowRight"
 					onclick={() => {
-						goto(`#/crop/${nextFileId}`);
+						goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId });
 					}}
 				>
 					<IconNext />

@@ -324,10 +324,10 @@ export async function chooseDefaultProtocol(page, models = {}) {
  * @param {import('$lib/i18n').Language} lang
  */
 const appNavTabs = (lang = 'fr') => ({
-	protocol: { name: lang === 'fr' ? 'Protocole' : 'Protocol', hash: '#/protocol' },
-	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
-	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
-	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' }
+	protocol: { name: lang === 'fr' ? 'Protocole' : 'Protocol', path: '/protocol' },
+	import: { name: lang === 'fr' ? 'Importer' : 'Import', path: '/import' },
+	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', path: '/crop' },
+	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', path: '/classify' }
 });
 
 /**
@@ -341,7 +341,7 @@ const appNavTabs = (lang = 'fr') => ({
 export async function goToTab(page, tabName, { waitForModel = true, language = 'fr' } = {}) {
 	getTab(page, tabName).click();
 	const tab = appNavTabs(language)[tabName];
-	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
+	await page.waitForURL((u) => u.pathname.replace(/\/$/, '') === tab.path.replace(/\/$/, ''));
 
 	if (waitForModel && (tabName === 'crop' || tabName === 'classify')) {
 		await expect(page.getByTestId('app-main')).not.toHaveText(
