@@ -23,11 +23,21 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
+	import { onMount } from 'svelte';
+	import { goto } from '$lib/paths';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
 
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
+
+	// TODO(2025-10-10) remove at some point
+	onMount(() => {
+		if (page.url.hash.startsWith('#/')) {
+			// @ts-expect-error
+			goto(resolve(page.url.hash.slice(1)));
+		}
+	});
 
 	export const snapshot = {
 		capture() {
