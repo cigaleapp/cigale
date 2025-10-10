@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-10T11:01:37.528Z\n"
+"PO-Revision-Date: 2025-10-10T23:51:14.426Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1630,4 +1630,27 @@ msgstr ""
 msgid ""
 "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous\n"
 "contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Supprimer cet élément"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Boîte englobante"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Invalide"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Ajouter un élément"
 msgstr ""

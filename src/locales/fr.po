@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-10T11:01:37.526Z\n"
+"PO-Revision-Date: 2025-10-10T23:51:14.422Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1605,22 +1605,6 @@ msgstr "https://ibrahimkactioglu.com/"
 msgid "https://elementtype.co/"
 msgstr "https://elementtype.co/"
 
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "Protocole modifié par rapport à la version publiée"
-msgstr "Protocole modifié par rapport à la version publiée"
-
-#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
-msgid "<0/> Différences avec la version publiée"
-msgstr "<0/> Différences avec la version publiée"
-
-#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
-msgid "Ouvrir le lien dans un nouvel onglet"
-msgstr "Ouvrir le lien dans un nouvel onglet"
-
-#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
-msgid "Chargement..."
-msgstr "Chargement..."
-
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid ""
 "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
@@ -1636,3 +1620,42 @@ msgid ""
 msgstr ""
 "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous\n"
 "contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Protocole modifié par rapport à la version publiée"
+msgstr "Protocole modifié par rapport à la version publiée"
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Différences avec la version publiée"
+msgstr "<0/> Différences avec la version publiée"
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "Chargement..."
+msgstr "Chargement..."
+
+#: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
+msgid "Ouvrir le lien dans un nouvel onglet"
+msgstr "Ouvrir le lien dans un nouvel onglet"
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Supprimer cet élément"
+msgstr "Supprimer cet élément"
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Boîte englobante"
+msgstr "Boîte englobante"
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Invalide"
+msgstr "Invalide"
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
+msgstr "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
+
+#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+msgid "Ajouter un élément"
+msgstr "Ajouter un élément"
