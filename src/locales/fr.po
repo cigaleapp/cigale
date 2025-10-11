@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-10T23:51:14.422Z\n"
+"PO-Revision-Date: 2025-10-11T13:51:12.619Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1657,5 +1657,5 @@ msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante d�
 msgstr "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-msgid "Ajouter un élément"
-msgstr "Ajouter un élément"
+msgid "Ajouter"
+msgstr "Ajouter"

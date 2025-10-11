@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-10T23:51:14.426Z\n"
+"PO-Revision-Date: 2025-10-11T13:51:12.623Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1652,5 +1652,5 @@ msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante d�
 msgstr ""
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-msgid "Ajouter un élément"
+msgid "Ajouter"
 msgstr ""
