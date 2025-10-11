@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-11T13:51:12.623Z\n"
+"PO-Revision-Date: 2025-10-11T14:44:43.099Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1169,46 +1169,6 @@ msgid "Disposition des pixels"
 msgstr ""
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "CHW"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "[C, H, W]"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "[1, C, H, W]"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "[nombre de canaux, hauteur, largeur]"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "[1, nombre de canaux, hauteur, largeur]"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Les images en entrée sont des tenseurs de taille <0/>"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Valeur des pixels"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "normalisées (entre 0 et 1)"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "brutes (entre 0 et 255)"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Les valeurs des pixels pixels sont <0/>"
-msgstr ""
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Taille des images en entrée"
 msgstr ""
 
@@ -1653,4 +1613,16 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "Valeur des pixels <0>En entrée du modèle</0>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "entre 0 et 255"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid "entre 0 et 1"
 msgstr ""
