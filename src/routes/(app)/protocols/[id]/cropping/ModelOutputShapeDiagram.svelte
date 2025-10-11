@@ -101,7 +101,9 @@
 			<div class="weight"></div>
 			<div class="weight"></div>
 			<div class="neuron"></div>
-			<div class="label"></div>
+			<div class="label">
+				<ShapeAtomDisplay atom={shape.at(-1) || ''} />
+			</div>
 		</div>
 		{#each [...shape, ''] as dim, i (i)}
 			<div class="node">
@@ -181,7 +183,9 @@
 			<div class="weight"></div>
 			<div class="weight"></div>
 			<div class="neuron"></div>
-			<div class="label"></div>
+			<div class="label">
+				<ShapeAtomDisplay atom={shape.at(0) || ''} />
+			</div>
 		</div>
 	</div>
 
@@ -367,6 +371,11 @@
 
 	.label {
 		margin-left: 0.25em;
+	}
+
+	.faded .label {
+		margin-left: 0.75em;
+		opacity: 0.5;
 	}
 
 	.bounding-box {
