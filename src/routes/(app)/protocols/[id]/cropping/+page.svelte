@@ -1,4 +1,6 @@
 <script>
+	import '$lib/fonts-math/import.css';
+
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import Field from '$lib/Field.svelte';
