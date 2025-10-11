@@ -45,11 +45,15 @@
 		color: var(--fg-primary);
 	}
 
-	:global(*) {
+	:global(body) {
 		font-family: var(--font-regular);
 	}
 
-	:global(code, pre, code a) {
+	:global(input, textarea, button) {
+		font-family: inherit;
+	}
+
+	:global(code, pre, code a, code input) {
 		font-family: var(--font-mono);
 		font-weight: 260;
 	}
