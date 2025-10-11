@@ -1,1 +1,0 @@
-import{b as e,r,c as t,g as o}from"./BnnK0-ax.js";function c(s){return(t||e)+s}function a(...s){return e+r(s[0],s[1])}async function f(...s){await o(n(...s))}function n(...s){return"#"+a(...s).replace(a("/"),"/")}export{c as a,f as g,n as h,a as r};
