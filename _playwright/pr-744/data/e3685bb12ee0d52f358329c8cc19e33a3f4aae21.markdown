@@ -1,0 +1,11 @@
+# Page snapshot
+
+```yaml
+- main [ref=e3]:
+  - img [ref=e5]
+  - generic [ref=e9]:
+    - paragraph [ref=e10]:
+      - code [ref=e11]: HTTP 500
+      - code [ref=e12]: Internal Error
+    - button [ref=e13] [cursor=pointer]
+```
