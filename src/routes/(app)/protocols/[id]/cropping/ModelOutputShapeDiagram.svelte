@@ -27,7 +27,7 @@
 	const { shape, ondelete, onchange, onadd } = $props();
 
 	/** @type {Set<number>} */
-	let openedPickers = $state(new SvelteSet());
+	let openedPickers = new SvelteSet();
 
 	/**
 	 * @param {Array<typeof shape[number]>} atoms
