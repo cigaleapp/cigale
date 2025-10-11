@@ -4,10 +4,14 @@
 	import { tooltip } from '$lib/tooltips';
 	import { entries } from '$lib/utils.js';
 	import { Popover } from 'bits-ui';
-	import IconAdd from '~icons/ph/plus';
+	import { SvelteSet } from 'svelte/reactivity';
 	import IconTrash from '~icons/ph/trash';
-	import MathMLVector from './MathMLVector.svelte';
 	import ShapeAtomDisplay from './ShapeAtomDisplay.svelte';
+	import * as Math from '$lib/mathml/index.js';
+	import HeightExpr from './HeightExpr.svelte';
+	import WidthExpr from './WidthExpr.svelte';
+	import CornerCoordinatesExpr from './CornerCoordinatesExpr.svelte';
+	import MorphArrow from './MorphArrow.svelte';
 
 	/**
 	 * @typedef {typeof import('$lib/schemas/protocols.js').ModelDetectionOutputShape.infer[number]} Atom
@@ -23,6 +27,9 @@
 
 	/** @type {Props} */
 	const { shape, ondelete, onchange, onadd } = $props();
+
+	/** @type {Set<number>} */
+	let openedPickers = $state(new SvelteSet());
 
 	function shapeHas(...atoms) {
 		return atoms.every((a) => shape.includes(a));
@@ -45,34 +52,40 @@
 				<div class="weight"></div>
 				<div class="weight"></div>
 				<div class="weight"></div>
-
 				<div class="neuron"></div>
-
 				<div class="label">
-					<Popover.Root>
+					<Popover.Root
+						bind:open={
+							() => openedPickers.has(i),
+							(v) => {
+								if (v) openedPickers.add(i);
+								else openedPickers.delete(i);
+							}
+						}
+					>
 						<Popover.Trigger>
 							{#snippet child({ props })}
-								{#if dim}
-									<button
-										use:tooltip={"Change l'élément"}
-										class="open-atom-picker"
-										{...props}
-									>
+								<button
+									{...props}
+									class="open-atom-picker"
+									class:create={dim === ''}
+								>
+									{#if dim === ''}
+										Ajouter
+									{:else}
 										<ShapeAtomDisplay atom={dim} />
-									</button>
-								{:else}
-									<ButtonIcon help="Ajouter un élément" {...props}>
-										<IconAdd />
-									</ButtonIcon>
-								{/if}
+									{/if}
+								</button>
 							{/snippet}
 						</Popover.Trigger>
 
-						<Popover.Content>
-							{#each entries(MODEL_DETECTION_OUTPUT_SHAPES) as [atom, { help }]}
+						<Popover.Content align="end">
+							{#each entries(MODEL_DETECTION_OUTPUT_SHAPES) as [atom, { help }] (atom)}
 								<ButtonIcon
 									{help}
 									onclick={() => {
+										openedPickers.delete(i);
+
 										if (dim === '') {
 											onadd(atom);
 										} else {
@@ -89,6 +102,7 @@
 								dangerous
 								onclick={() => {
 									if (dim === '') return;
+									openedPickers.delete(i);
 									ondelete(i);
 								}}
 							>
@@ -110,125 +124,17 @@
 	</div>
 
 	<div class="sep">
-		<svg
-			width="2em"
-			height="1em"
-			viewBox="0 0 68 32"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path
-				d="M1.39844 15.8231L8.89576 8.3258L22.1662 21.5962L35.4366 8.3258L42.9339 15.8231H64.1324M64.1324 15.8231C64.1324 15.8231 52.9299 8.3258 52.9299 0.56543M64.1324 15.8231C64.1324 15.8231 52.9299 21.5962 52.9299 31.285"
-				stroke="var(--fg-neutral)"
-				stroke-width="2px"
-			/>
-		</svg>
+		<MorphArrow />
 	</div>
 
 	<div class="bounding-box">
 		<math class="scale-label height math">
-			{#if shapeHas('h')}
-				<mi>h</mi>
-			{:else if shapeHas('sy', 'ey')}
-				<mrow>
-					<msub>
-						<mi>e</mi>
-						<mi>y</mi>
-					</msub>
-					<mo>-</mo>
-					<msub>
-						<mi>s</mi>
-						<mi>y</mi>
-					</msub>
-				</mrow>
-			{:else if shapeHas('cy', 'ey') || shapeHas('cy', 'sy')}
-				<mrow>
-					<mn>2</mn>
-					<mo fence="true" form="prefix">(</mo>
-					{#if shapeHas('cy', 'ey')}
-						<msub>
-							<mi>e</mi>
-							<mi>y</mi>
-						</msub>
-						<mo>-</mo>
-						<msub>
-							<mi>c</mi>
-							<mi>y</mi>
-						</msub>
-					{:else}
-						<msub>
-							<mi>c</mi>
-							<mi>y</mi>
-						</msub>
-						<mo>-</mo>
-						<msub>
-							<mi>s</mi>
-							<mi>y</mi>
-						</msub>
-					{/if}
-					<mo fence="true" form="postfix">)</mo>
-				</mrow>
-			{:else}
-				<span
-					class="invalid"
-					use:tooltip={"Impossible de déterminer la hauteur. Il manque l'une des grandeurs suivantes: (h) ou (sy et ey) ou (cy et ey) ou (cy et sy)"}
-				>
-					Invalide
-				</span>
-			{/if}
+			<HeightExpr {shape} />
 		</math>
 		<div class="scale height"></div>
 
 		<math class="scale-label width math">
-			{#if shapeHas('w')}
-				<mi>w</mi>
-			{:else if shapeHas('sx', 'ex')}
-				<mrow>
-					<msub>
-						<mi>e</mi>
-						<mi>x</mi>
-					</msub>
-					<mo>-</mo>
-					<msub>
-						<mi>s</mi>
-						<mi>x</mi>
-					</msub>
-				</mrow>
-			{:else if shapeHas('cx', 'ex') || shapeHas('cx', 'sx')}
-				<mrow>
-					<mn>2</mn>
-					<mo fence="true" form="prefix">(</mo>
-					{#if shapeHas('cx', 'ex')}
-						<msub>
-							<mi>e</mi>
-							<mi>x</mi>
-						</msub>
-						<mo>-</mo>
-						<msub>
-							<mi>c</mi>
-							<mi>x</mi>
-						</msub>
-					{:else}
-						<msub>
-							<mi>c</mi>
-							<mi>x</mi>
-						</msub>
-						<mo>-</mo>
-						<msub>
-							<mi>s</mi>
-							<mi>x</mi>
-						</msub>
-					{/if}
-					<mo fence="true" form="postfix">)</mo>
-				</mrow>
-			{:else}
-				<span
-					class="invalid"
-					use:tooltip={"Impossible de déterminer la largeur. Il manque l'une des grandeurs suivantes: (w) ou (sx et ex) ou (cx et ex) ou (cx et sx)"}
-				>
-					Invalide
-				</span>
-			{/if}
+			<WidthExpr {shape} />
 		</math>
 		<div class="scale width"></div>
 
@@ -239,102 +145,7 @@
 			</div>
 
 			<div class="corner-coordinates">
-				<MathMLVector>
-					{#snippet x()}
-						{#if shapeHas('cx', 'w')}
-							<mrow>
-								<msub>
-									<mi>c</mi>
-									<mi>x</mi>
-								</msub>
-								<mo>+</mo>
-								<mfrac>
-									<mi>w</mi>
-									<mn>2</mn>
-								</mfrac>
-							</mrow>
-						{:else if shapeHas('ex')}
-							<msub>
-								<mi>e</mi>
-								<mi>x</mi>
-							</msub>
-						{:else if shapeHas('sx', 'w')}
-							<mrow>
-								<msub>
-									<mi>s</mi>
-									<mi>x</mi>
-								</msub>
-								<mo>+</mo>
-								<mi>w</mi>
-							</mrow>
-						{:else}
-							<span
-								class="invalid"
-								use:tooltip={"Impossible de déterminer cette coordonnée. Il manque l'une des grandeurs suivantes: (cx et w) ou (ex) ou (sx et w)"}
-							>
-								Invalide
-							</span>
-						{/if}
-					{/snippet}
-					{#snippet y()}
-						{#if shapeHas('cy', 'h')}
-							<mrow>
-								<msub>
-									<mi>c</mi>
-									<mi>y</mi>
-								</msub>
-								<mo>+</mo>
-								<mfrac>
-									<mi>h</mi>
-									<mn>2</mn>
-								</mfrac>
-							</mrow>
-						{:else if shapeHas('ey')}
-							<msub>
-								<mi>e</mi>
-								<mi>y</mi>
-							</msub>
-						{:else if shapeHas('sy', 'h')}
-							<mrow>
-								<msub>
-									<mi>s</mi>
-									<mi>y</mi>
-								</msub>
-								<mo>+</mo>
-								<mi>h</mi>
-							</mrow>
-						{:else if shapeHas('sy', 'cy')}
-							<mrow>
-								<msub>
-									<mi>s</mi>
-									<mi>y</mi>
-								</msub>
-								<mo>+</mo>
-								<mrow>
-									<mn>2</mn>
-									<mo fence="true" form="prefix">(</mo>
-									<msub>
-										<mi>c</mi>
-										<mi>y</mi>
-									</msub>
-									<mo>-</mo>
-									<msub>
-										<mi>s</mi>
-										<mi>y</mi>
-									</msub>
-									<mo fence="true" form="postfix">)</mo>
-								</mrow>
-							</mrow>
-						{:else}
-							<span
-								class="invalid"
-								use:tooltip={"Impossible de déterminer cette coordonnée. Il manque l'une des grandeurs suivantes: (cy et h) ou (ey) ou (sy et h)"}
-							>
-								Invalide
-							</span>
-						{/if}
-					{/snippet}
-				</MathMLVector>
+				<CornerCoordinatesExpr {shape} />
 			</div>
 
 			<div class="corner-point"></div>
@@ -591,5 +402,9 @@
 		grid-template-columns: repeat(4, 5rem);
 		grid-auto-rows: 5rem;
 		z-index: 100;
+	}
+
+	button.create {
+		color: var(--gay);
 	}
 </style>

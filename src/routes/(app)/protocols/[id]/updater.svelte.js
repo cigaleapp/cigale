@@ -8,18 +8,18 @@ import { ArkErrors } from 'arktype';
 /**
  * Update the protocol information, save it to the database.
  * @template T
- * @param {(p: typeof import('$lib/database').Tables.Protocol.inferIn, v: T) => void | Promise<void>} changes
- * @returns {(value: T) => Promise<void>} updater for InlineTextInput
+ * @param {(p: typeof import('$lib/database').Tables.Protocol.inferIn, ...v: T[]) => void | Promise<void>} changes
+ * @returns {(...value: NoInfer<T[]>) => Promise<void>} updater for InlineTextInput
  */
 export function updater(changes) {
-	return async (value) => {
+	return async (...value) => {
 		if (!page.params.id) return;
 
 		const protocol = await tables.Protocol.raw.get(page.params.id);
 		if (!protocol) return;
 
 		try {
-			await changes(protocol, value);
+			await changes(protocol, ...value);
 		} catch (err) {
 			if (err instanceof ArkErrors) {
 				toasts.error(`Valeur invalide : ${err.summary}`);
