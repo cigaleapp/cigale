@@ -3,45 +3,32 @@
 	 * @type {{atom: string}}
 	 */
 	const { atom } = $props();
+	import * as Math from 'svelte-mathml';
 
 	const isVariable = $derived(!['score', '_', 'delete', ''].includes(atom));
 </script>
 
-{#if isVariable && atom.length === 2}
-	<span class="atom math">
-		{atom.charAt(0)}
-		<sub>{atom.charAt(1)}</sub>
-	</span>
-{:else if isVariable}
-	<span class="atom math">
+<span class="atom" class:text={!isVariable} class:math={isVariable}>
+	{#if isVariable && atom.length === 2}
+		<math>
+			<Math.Line><Math.Scripts base={atom[0]} sub={atom[1]} /></Math.Line>
+		</math>
+	{:else if isVariable}
+		<math>
+			<Math.Line><Math.Atom expr={atom} /></Math.Line>
+		</math>
+	{:else}
 		{atom}
-	</span>
-{:else}
-	<span class="atom text">{atom}</span>
-{/if}
+	{/if}
+</span>
 
 <style>
-	.math,
-	.math * {
-		font-family: 'CMU Serif', serif;
-		font-style: italic;
-	}
-
-	.math sub {
-		margin-left: -0.8ch;
-	}
-
 	.atom {
-		width: 6ch;
 		text-align: center;
 		font-weight: normal;
 
-		&.text {
-			font-size: 1.2em;
-		}
-
 		&.math {
-			font-size: 1.6em;
+			font-size: 1.3em;
 		}
 	}
 </style>
