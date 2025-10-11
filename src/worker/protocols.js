@@ -92,4 +92,3 @@ swarp.diffProtocolWithRemote(async ({ protocolId }, onProgress) => {
 
 	return { dirty: protocol.dirty, changes };
 });
-

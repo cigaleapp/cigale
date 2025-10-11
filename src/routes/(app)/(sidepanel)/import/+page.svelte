@@ -38,8 +38,6 @@
 	]);
 
 	const empty = $derived(allImages.length === 0);
-
-	$inspect(allImages);
 </script>
 
 <Dropzone
