@@ -12,6 +12,7 @@
 	import IconTrash from '~icons/ph/trash';
 	import { updater } from '../updater.svelte';
 	import ModelOutputShapeDiagram from './ModelOutputShapeDiagram.svelte';
+	import RadioButtons from '$lib/RadioButtons.svelte';
 
 	const { data } = $props();
 	let settings = $derived(data.crop);
@@ -98,46 +99,6 @@
 						p.crop.infer[i].model = newModel;
 					})}
 				/>
-				<Field label="Disposition des pixels">
-					<select
-						value={input.disposition}
-						onchange={updater((p, { currentTarget }) => {
-							if (!p.crop.infer) return;
-							p.crop.infer[i].input.disposition = currentTarget.value;
-						})}
-					>
-						<option value="CHW">[C, H, W]</option>
-						<option value="1CHW">[1, C, H, W]</option>
-					</select>
-					{#snippet hint()}
-						Les images en entrée sont des tenseurs de taille
-						{#if input.disposition === 'CHW'}
-							[nombre de canaux, hauteur, largeur]
-						{:else}
-							[1, nombre de canaux, hauteur, largeur]
-						{/if}
-					{/snippet}
-				</Field>
-				<Field label="Valeur des pixels">
-					<select
-						value={input.normalized ? 'normalized' : 'raw'}
-						onchange={updater((p, { currentTarget }) => {
-							if (!p.crop.infer) return;
-							p.crop.infer[i].input.normalized = currentTarget.value === 'normalized';
-						})}
-					>
-						<option value="raw">[0, 255]</option>
-						<option value="normalized">[0, 1]</option>
-					</select>
-					{#snippet hint()}
-						Les valeurs des pixels pixels sont
-						{#if input.normalized}
-							normalisées (entre 0 et 1)
-						{:else}
-							brutes (entre 0 et 255)
-						{/if}
-					{/snippet}
-				</Field>
 				<Field composite label="Taille des images en entrée">
 					<div class="composite-input-line">
 						<InlineTextInput
@@ -160,6 +121,98 @@
 						<span class="unit">pixels</span>
 					</div>
 				</Field>
+
+				<Field label="Disposition des pixels">
+					<RadioButtons
+						horizontal
+						cards
+						value={input.disposition ?? 'CHW'}
+						onchange={updater((p, newValue) => {
+							if (!p.crop.infer) return;
+							p.crop.infer[i].input.disposition = newValue;
+						})}
+						options={[
+							{
+								key: 'CHW',
+								label: '[C, H, W]',
+								subtext:
+									'Les images en entrée sont des tenseurs de taille [nombre de canaux, hauteur, largeur]'
+							},
+							{
+								key: '1CHW',
+								label: '[1, C, H, W]',
+								subtext:
+									'Les images en entrée sont des tenseurs de taille [1, nombre de canaux, hauteur, largeur]'
+							}
+						]}
+					/>
+				</Field>
+				<Field>
+					{#snippet label()}
+						Valeur des pixels
+						<p>En entrée du modèle</p>
+					{/snippet}
+					<RadioButtons
+						horizontal
+						cards
+						value={input.normalized ? 'normalized' : 'raw'}
+						onchange={updater((p, newValue) => {
+							if (!p.crop.infer) return;
+							p.crop.infer[i].input.normalized = newValue === 'normalized';
+						})}
+						options={[
+							{
+								key: 'raw',
+								label: 'Brutes',
+								subtext: /* @wc-include */ 'entre 0 et 255'
+							},
+							{
+								key: 'normalized',
+								label: 'Normalisées',
+								subtext: /* @wc-include */ 'entre 0 et 1'
+							}
+						]}
+					>
+						{#snippet children({ key, label, subtext })}
+							{@const colors = [
+								[44, 19, 116],
+								[148, 0, 0]
+							]}
+							<div class="color-values-text">
+								<span class="text">{label}</span>
+								<span class="description">{subtext}</span>
+							</div>
+							<div class="color-values-examples">
+								{#each colors as color}
+									{@const [r, g, b] = color.map((c) =>
+										c === 0
+											? 0
+											: key === 'normalized'
+												? (c / 255).toFixed(2)
+												: c
+									)}
+									<div class="color-values-example">
+										<div
+											class="swatch"
+											style:background-color="rgb({color.join(',')})"
+										></div>
+										<code class="coords">
+											<span class="label">R</span>
+											{r}
+											<br />
+											<span class="label">G</span>
+											{g}
+											<br />
+											<span class="label">B</span>
+											{b}
+										</code>
+									</div>
+								{/each}
+							</div>
+						{/snippet}
+					</RadioButtons>
+				</Field>
+
 				<Field composite label="Forme de la sortie">
 					<div class="diagram">
 						<ModelOutputShapeDiagram
@@ -244,6 +297,41 @@
 
 		&[open] .marker :global(svg) {
 			rotate: 180deg;
+		}
+	}
+
+	.color-values-text {
+		margin-bottom: 0.75em;
+
+		.description,
+		p {
+			color: var(--gay);
+		}
+	}
+
+	.color-values-examples {
+		display: flex;
+		gap: 1.5em;
+		margin-bottom: 0.25em;
+	}
+
+	.color-values-example {
+		display: flex;
+		align-items: center;
+		gap: 0.75em;
+
+		.swatch {
+			width: 2em;
+			height: 2em;
+			border-radius: 50%;
+		}
+
+		.coords {
+			font-size: 0.75em;
+		}
+
+		.label {
+			color: var(--gray);
 		}
 	}
 </style>
