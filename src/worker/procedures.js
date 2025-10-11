@@ -116,7 +116,12 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			changes: type
 				.or(
 					{ path: '(number|string)[]', type: '"CREATE"', value: 'unknown' },
-					{ path: '(number|string)[]', type: '"CHANGE"', oldValue: 'unknown', value: 'unknown' },
+					{
+						path: '(number|string)[]',
+						type: '"CHANGE"',
+						oldValue: 'unknown',
+						value: 'unknown'
+					},
 					{ path: '(number|string)[]', type: '"REMOVE"', oldValue: 'unknown' }
 				)
 				.array()
