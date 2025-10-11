@@ -1,3 +1,14 @@
+<script module>
+	/**
+	 * @typedef {object} CustomButtonProps
+	 * @property {() => void | Promise<void>} onclick
+	 * @property {string} help
+	 * @property {'checking' | 'upgrading' | 'available' | 'uptodate' | 'error'} state
+	 * @property {number | undefined} current
+	 * @property {number | undefined} newest
+	 */
+</script>
+
 <script>
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -17,10 +28,12 @@
 	 * @property {number} version
 	 * @property {typeof import('$lib/schemas/common').HTTPRequest.infer} source
 	 * @property {boolean} [compact=false]
+	 * @property {import('svelte').Snippet<[CustomButtonProps]>} [button]
+	 * @property {(newVersion: number) => void | Promise<void>} [onupgrade] called after a successful upgrade
 	 */
 
 	/**  @type {Props}*/
-	const { id, version, source, compact } = $props();
+	const { id, version, source, compact, button: customButton, onupgrade } = $props();
 
 	const swarpc = $derived(page.data.swarpc);
 
@@ -37,20 +50,56 @@
 {#if version && source}
 	{#key checkagain}
 		{#await hasUpgradeAvailable({ id, version, source })}
-			<Btn help="Recherche de mise à jour…" disabled onclick={() => {}}>
-				<IconCheckAgain />
-				{#if !compact}
-					Mettre à jour
-				{/if}
-			</Btn>
+			{#if customButton}
+				{@render customButton({
+					onclick: () => {},
+					help: 'Recherche de mise à jour…',
+					state: 'checking',
+					current: version,
+					newest: undefined
+				})}
+			{:else}
+				<Btn help="Recherche de mise à jour…" disabled onclick={() => {}}>
+					<IconCheckAgain />
+					{#if !compact}
+						Mettre à jour
+					{/if}
+				</Btn>
+			{/if}
 		{:then { upToDate, newVersion }}
-			{#if upToDate}
-				<Btn
-					help="Le protocole est à jour (v{newVersion}). Cliquer pour vérifier à nouveau"
-					onclick={() => {
-						checkagain = Date.now();
-					}}
-				>
+			{@const onclick = async () => {
+				if (upToDate) {
+					checkagain = Date.now();
+				} else {
+					upgrading = true;
+					await upgradeProtocol({ version, source, id, swarpc })
+						.then(({ version }) => {
+							toasts.success(`Protocole mis à jour vers la v${version}`);
+							onupgrade?.(version);
+						})
+						.catch((e) => {
+							toasts.error(`Impossible de mettre à jour le protocole: ${e}`);
+						})
+						.finally(() => {
+							upgrading = false;
+						});
+				}
+			}}
+
+			{@const help = upToDate
+				? `Le protocole est à jour (v${newVersion}). Cliquer pour vérifier à nouveau`
+				: `Une mise à jour vers la v${newVersion} est disponible`}
+
+			{#if upToDate && customButton}
+				{@render customButton({
+					onclick,
+					help,
+					state: 'uptodate',
+					current: version,
+					newest: newVersion
+				})}
+			{:else if upToDate}
+				<Btn {help} {onclick}>
 					<span class="version-check up-to-date">
 						<IconUpToDate />
 						{#if !compact}
@@ -63,23 +112,16 @@
 						</span>
 					{/if}
 				</Btn>
+			{:else if customButton}
+				{@render customButton({
+					onclick,
+					help,
+					state: upgrading ? 'upgrading' : 'available',
+					current: version,
+					newest: newVersion
+				})}
 			{:else}
-				<Btn
-					onclick={async () => {
-						upgrading = true;
-						await upgradeProtocol({ version, source, id, swarpc })
-							.then(({ version }) => {
-								toasts.success(`Protocole mis à jour vers la v${version}`);
-							})
-							.catch((e) => {
-								toasts.error(`Impossible de mettre à jour le protocole: ${e}`);
-							})
-							.finally(() => {
-								upgrading = false;
-							});
-					}}
-					help="Une mise à jour vers la v{newVersion} est disponible"
-				>
+				<Btn {onclick} {help}>
 					<span class="version-check" class:update-available={!upgrading}>
 						{#if upgrading}
 							<LoadingSpinner />
@@ -98,21 +140,38 @@
 				</Btn>
 			{/if}
 		{:catch e}
-			<Btn
-				onclick={() => {
-					checkagain = Date.now();
-				}}
-				help="Impossible de mettre à jour le protocole: {e}"
-			>
-				<span class="version-check error">
-					<IconCannotCheckForUpdates />
-					{#if !compact}
-						Rééssayer
-					{/if}
-				</span>
-			</Btn>
+			{@const onclick = () => {
+				checkagain = Date.now();
+			}}
+
+			{#if customButton}
+				{@render customButton({
+					onclick,
+					help: `Impossible de vérifier les mises à jour: ${e}`,
+					state: 'error',
+					current: version,
+					newest: undefined
+				})}
+			{:else}
+				<Btn {onclick} help="Impossible de vérifier les mises à jour: {e}">
+					<span class="version-check error">
+						<IconCannotCheckForUpdates />
+						{#if !compact}
+							Rééssayer
+						{/if}
+					</span>
+				</Btn>
+			{/if}
 		{/await}
 	{/key}
+{:else if version && customButton}
+	{@render customButton({
+		onclick: () => {},
+		help: 'Ce protocole ne supporte pas la vérification des mises à jour',
+		state: 'error',
+		current: version,
+		newest: undefined
+	})}
 {:else if version}
 	<Btn onclick={() => {}} help="Ce protocole ne supporte pas la vérification des mises à jour">
 		<span class="version-check">
@@ -122,6 +181,14 @@
 			{/if}
 		</span>
 	</Btn>
+{:else if customButton}
+	{@render customButton({
+		onclick: () => {},
+		help: "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version",
+		state: 'error',
+		current: undefined,
+		newest: undefined
+	})}
 {:else}
 	<Btn
 		onclick={() => {}}

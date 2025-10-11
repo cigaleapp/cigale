@@ -1,0 +1,16 @@
+@font-face {
+	font-family: 'Latin Modern Math';
+	src:
+		url('LatinModernMath-Regular.woff2') format('woff2'),
+		url('LatinModernMath-Regular.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+mi,
+mn {
+	font-family: 'Latin Modern Math';
+}
+
+/* TODO reduce subscript style on Firefox */

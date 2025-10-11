@@ -16,15 +16,19 @@ const analyzerMode = type
 export default defineConfig({
 	test: {
 		environment: 'jsdom',
-		include: ['src/lib/**/*.{test,spec}{.svelte,}.{js,ts}'],
-		includeSource: ['src/lib/**/*{.svelte,}.{js,ts}', 'scripts/generate-json-schemas.js'],
+		include: ['src/lib/**/*.{test,spec}{.svelte,}.{js,ts}', 'src/routes/**/utils.js'],
+		includeSource: [
+			'src/lib/**/*{.svelte,}.{js,ts}',
+			'scripts/generate-json-schemas.js',
+			'src/routes/**/utils.js'
+		],
 		reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions', 'html'] : ['default'],
 		globalSetup: './vitest-timezone.js',
 		setupFiles: ['./vitest-setup.js'],
 		coverage: {
 			reporter: ['json-summary', 'json', 'html'],
 			reportOnFailure: true,
-			include: ['src/lib/**/*{.svelte,}.{js,ts}']
+			include: ['src/lib/**/*{.svelte,}.{js,ts}', 'src/routes/**/utils.js']
 		}
 	},
 	server: {

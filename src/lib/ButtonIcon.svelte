@@ -4,24 +4,40 @@
 	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {() => void} onclick
+	 * @property {(e: MouseEvent) => void} onclick
 	 * @property {import('svelte').Snippet} children
+	 * @property {boolean} [submits] whether this button submits a form
 	 * @property {string} help
 	 * @property {string} [keyboard] keyboard shortcut hint to display in the help tooltip
 	 * @property {boolean} [disabled]
 	 * @property {boolean} [crossout] draw a diagonal line through the button's content
+	 * @property {boolean} [dangerous] style the button to indicate a dangerous action
+	 * @property {Partial<import('$lib/tooltips.js').TooltipParameters>} [tooltipParams] additional params for the tooltip
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
-	let { children, onclick, help, keyboard, disabled, crossout, ...rest } = $props();
+	let {
+		children,
+		onclick,
+		help,
+		keyboard,
+		disabled,
+		crossout,
+		dangerous,
+		submits,
+		tooltipParams = {},
+		...rest
+	} = $props();
 </script>
 
 <button
 	{disabled}
 	{onclick}
 	class:crossout
-	use:tooltip={{ text: help, keyboard }}
+	class:dangerous
+	use:tooltip={{ text: help, keyboard, ...tooltipParams }}
 	aria-label={help}
+	type={submits ? 'submit' : 'button'}
 	{...rest}
 >
 	{@render children()}
@@ -42,11 +58,20 @@
 		font-size: var(--font-size, 1em);
 		border: none;
 		position: relative;
+
+		&.dangerous {
+			color: var(--fg-error);
+		}
 	}
 
 	button:is(:hover, :focus-visible) {
 		background-color: var(--hover-bg, var(--bg-primary-translucent));
 		color: var(--hover-fg, var(--fg-neutral));
+	}
+
+	button.dangerous:is(:hover, :focus-visible) {
+		background-color: var(--bg-error);
+		color: var(--fg-neutral);
 	}
 
 	button:disabled {

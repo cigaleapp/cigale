@@ -3,6 +3,7 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { omit, pick } from '$lib/utils.js';
@@ -75,4 +76,19 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	console.timeEnd('Validating protocol after storing');
 
 	return pick(validated, 'id', 'name', 'version');
+});
+
+swarp.diffProtocolWithRemote(async ({ protocolId }, onProgress) => {
+	const db = await openDatabase();
+
+	const protocol = await db.get('Protocol', protocolId);
+	if (!protocol) throw new Error(`Protocol with ID ${protocolId} not found`);
+
+	const changes = await compareProtocolWithUpstream(db, protocolId, { onProgress });
+
+	protocol.dirty = changes.length > 0;
+
+	await db.put('Protocol', protocol);
+
+	return { dirty: protocol.dirty, changes };
 });
