@@ -1,17 +1,15 @@
 <script>
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import * as Math from 'svelte-mathml';
 	import { MODEL_DETECTION_OUTPUT_SHAPES } from '$lib/schemas/protocols.js';
 	import { tooltip } from '$lib/tooltips';
 	import { entries } from '$lib/utils.js';
+	import IconEdit from '~icons/ph/pencil';
 	import { Popover } from 'bits-ui';
 	import { SvelteSet } from 'svelte/reactivity';
 	import IconTrash from '~icons/ph/trash';
-	import ShapeAtomDisplay from './ShapeAtomDisplay.svelte';
-	import * as Math from '$lib/mathml/index.js';
-	import HeightExpr from './HeightExpr.svelte';
-	import WidthExpr from './WidthExpr.svelte';
-	import CornerCoordinatesExpr from './CornerCoordinatesExpr.svelte';
 	import MorphArrow from './MorphArrow.svelte';
+	import ShapeAtomDisplay from './ShapeAtomDisplay.svelte';
 
 	/**
 	 * @typedef {typeof import('$lib/schemas/protocols.js').ModelDetectionOutputShape.infer[number]} Atom
@@ -31,9 +29,68 @@
 	/** @type {Set<number>} */
 	let openedPickers = $state(new SvelteSet());
 
+	/**
+	 * @param {Array<typeof shape[number]>} atoms
+	 */
 	function shapeHas(...atoms) {
 		return atoms.every((a) => shape.includes(a));
 	}
+
+	const heightExpression = $derived.by(() => {
+		if (shapeHas('h')) {
+			return 'h';
+		} else if (shapeHas('sy', 'ey')) {
+			return 'e_y - s_y';
+		} else if (shapeHas('cy', 'ey')) {
+			return '2 * (e_y - c_y)';
+		} else if (shapeHas('cy', 'sy')) {
+			return '2 * (c_y - s_y)';
+		} else {
+			return null;
+		}
+	});
+
+	const widthExpression = $derived.by(() => {
+		if (shapeHas('w')) {
+			return 'w';
+		} else if (shapeHas('sx', 'ex')) {
+			return 'e_x - s_x';
+		} else if (shapeHas('cx', 'ex')) {
+			return '2 * (e_x - c_x)';
+		} else if (shapeHas('cx', 'sx')) {
+			return '2 * (c_x - s_x)';
+		} else {
+			return null;
+		}
+	});
+
+	const cornerXExpression = $derived.by(() => {
+		if (shapeHas('cx', 'w')) {
+			return 'c_x + w/2';
+		} else if (shapeHas('ex')) {
+			return 'e_x';
+		} else if (shapeHas('sx', 'w')) {
+			return 's_x + w';
+		} else if (shapeHas('sx', 'cx')) {
+			return 's_x + 2*(c_x - s_x)';
+		} else {
+			return null;
+		}
+	});
+
+	const cornerYExpression = $derived.by(() => {
+		if (shapeHas('cy', 'h')) {
+			return 'c_y + h/2';
+		} else if (shapeHas('ey')) {
+			return 'e_y';
+		} else if (shapeHas('sy', 'h')) {
+			return 's_y + h';
+		} else if (shapeHas('sy', 'cy')) {
+			return 's_y + 2*(c_y - s_y)';
+		} else {
+			return null;
+		}
+	});
 </script>
 
 <div class="diagram">
@@ -70,11 +127,16 @@
 									class="open-atom-picker"
 									class:create={dim === ''}
 								>
-									{#if dim === ''}
-										Ajouter
-									{:else}
-										<ShapeAtomDisplay atom={dim} />
-									{/if}
+									<div class="label">
+										{#if dim === ''}
+											Ajouter
+										{:else}
+											<ShapeAtomDisplay atom={dim} />
+										{/if}
+									</div>
+									<div class="edit-icon">
+										<IconEdit />
+									</div>
 								</button>
 							{/snippet}
 						</Popover.Trigger>
@@ -128,14 +190,32 @@
 	</div>
 
 	<div class="bounding-box">
-		<math class="scale-label height math">
-			<HeightExpr {shape} />
-		</math>
+		<span class="scale-label height math">
+			{#if heightExpression}
+				<Math.Parse expr={heightExpression} />
+			{:else}
+				<span
+					class="invalid"
+					use:tooltip={"Impossible de déterminer la hauteur. Il manque l'une des grandeurs suivantes: (h) ou (sy et ey) ou (cy et ey) ou (cy et sy)"}
+				>
+					Invalide
+				</span>
+			{/if}
+		</span>
 		<div class="scale height"></div>
 
-		<math class="scale-label width math">
-			<WidthExpr {shape} />
-		</math>
+		<span class="scale-label width math">
+			{#if widthExpression}
+				<Math.Parse expr={widthExpression} />
+			{:else}
+				<span
+					class="invalid"
+					use:tooltip={"Impossible de déterminer la largeur. Il manque l'une des grandeurs suivantes: (w) ou (sx et ex) ou (cx et ex) ou (cx et sx)"}
+				>
+					Invalide
+				</span>
+			{/if}
+		</span>
 		<div class="scale width"></div>
 
 		<div class="box">
@@ -145,7 +225,32 @@
 			</div>
 
 			<div class="corner-coordinates">
-				<CornerCoordinatesExpr {shape} />
+				<Math.Vector>
+					{#snippet x()}
+						{#if cornerXExpression}
+							<Math.Parse bare expr={cornerXExpression} />
+						{:else}
+							<mtext
+								class="invalid"
+								use:tooltip={"Impossible de déterminer cette coordonnée. Il manque l'une des grandeurs suivantes: (cx et w) ou (ex) ou (sx et w)"}
+							>
+								Invalide
+							</mtext>
+						{/if}
+					{/snippet}
+					{#snippet y()}
+						{#if cornerYExpression}
+							<Math.Parse bare expr={cornerYExpression} />
+						{:else}
+							<mtext
+								class="invalid"
+								use:tooltip={"Impossible de déterminer cette coordonnée. Il manque l'une des grandeurs suivantes: (cy et h) ou (ey) ou (sy et h)"}
+							>
+								Invalide
+							</mtext>
+						{/if}
+					{/snippet}
+				</Math.Vector>
 			</div>
 
 			<div class="corner-point"></div>
@@ -261,7 +366,7 @@
 	}
 
 	.label {
-		margin-left: 0.5em;
+		margin-left: 0.25em;
 	}
 
 	.bounding-box {
@@ -284,8 +389,6 @@
 	.scale-label {
 		position: absolute;
 		font-size: 1.25em;
-		font-family: 'CMU Serif', serif;
-		font-style: italic;
 
 		&.width {
 			top: 10px;
@@ -362,6 +465,7 @@
 		position: absolute;
 		right: 20px;
 		bottom: 30px;
+		font-size: 1.2em;
 	}
 
 	.corner-point {
@@ -380,28 +484,49 @@
 		font-style: normal;
 	}
 
-	math *:not(.invalid) {
-		font-family: 'CMU Serif', serif;
-	}
-
-	mi {
-		font-style: italic;
-	}
-
 	.open-atom-picker {
 		background: none;
 		border: none;
 		cursor: pointer;
+		font-size: 1.2em;
+		width: 4ch;
+		height: 4ch;
+		display: flex;
+		align-items: center;
+
+		div {
+			display: flex;
+			width: 100%;
+			align-items: center;
+		}
+
+		.edit-icon {
+			color: var(--fg-primary);
+			display: none;
+		}
+
+		&:is(:hover, :focus-visible) {
+			.label {
+				display: none;
+			}
+			.edit-icon {
+				display: flex;
+			}
+		}
 	}
 
 	:global([data-popover-content]) {
 		padding: 0.5rem;
 		border-radius: var(--corner-radius);
-		background-color: var(--bg-primary-translucent);
+		background-color: var(--bg-neutral);
+		box-shadow:
+			0 3px 6px rgba(0, 0, 0, 0.16),
+			0 3px 6px rgba(0, 0, 0, 0.23);
 		display: grid;
 		grid-template-columns: repeat(4, 5rem);
 		grid-auto-rows: 5rem;
 		z-index: 100;
+		font-size: 1.3em;
 	}
 
 	button.create {
