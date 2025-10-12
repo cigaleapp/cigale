@@ -8,7 +8,7 @@ export default defineConfig({
 	otherLocales: ['en'],
 	// Translations are refreshed via a workflow,
 	// see file://./.github/workflows/i18n.yml
-	hmr: false,
+	hmr: Boolean(process.env.CI),
 	adapters: {
 		main: svelte({
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
