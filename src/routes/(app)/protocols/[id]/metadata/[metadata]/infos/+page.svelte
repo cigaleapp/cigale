@@ -1,21 +1,25 @@
 <script>
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
-	import IconMergeMinimum from '~icons/ph/arrow-line-down';
-	import IconMergeMaximum from '~icons/ph/arrow-line-up';
-	import IconMergeMedian from '~icons/ph/equals';
-	import IconMergeAverage from '~icons/ph/divide';
-	import IconMergeUnion from '~icons/ph/union';
-	import IconMergeNone from '~icons/ph/x-circle';
 	import { uppercaseFirst } from '$lib/i18n';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { MERGEABLE_METADATA_TYPES } from '$lib/metadata.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import { METADATA_MERGE_METHODS, METADATA_TYPES } from '$lib/schemas/metadata';
+	import {
+		METADATA_MERGE_METHODS,
+		METADATA_TYPES,
+		removeNamespaceFromMetadataId
+	} from '$lib/schemas/metadata';
 	import Switch from '$lib/Switch.svelte';
 	import { entries } from '$lib/utils';
-	import { updater } from '../updater.svelte.js';
 	import { fade } from 'svelte/transition';
+	import IconMergeMinimum from '~icons/ph/arrow-line-down';
+	import IconMergeMaximum from '~icons/ph/arrow-line-up';
+	import IconMergeAverage from '~icons/ph/divide';
+	import IconMergeMedian from '~icons/ph/equals';
+	import IconMergeUnion from '~icons/ph/union';
+	import IconMergeNone from '~icons/ph/x-circle';
+	import { updater } from '../updater.svelte.js';
 
 	const { data } = $props();
 	const { type, description, learnMore, required, mergeMethod } = $derived(data.metadata);
@@ -62,7 +66,7 @@
 		<Switch
 			show-label
 			label="Il faut remplir cette métadonnée pour chaque observation"
-			checked={required}
+			value={required}
 			onchange={updater((m, value) => {
 				m.required = value;
 			})}
@@ -73,12 +77,14 @@
 		<Switch
 			show-label
 			label="Cacher cette métadonnée dans l'interface. Utile pour les métadonnées gérées automatiquement, comme celle stockant la boîte de recadrage, par example."
-			checked={technical}
+			value={technical}
 			onchange={updater((m, value) => {
 				if (value) {
 					m.label = '';
 				} else {
-					m.label = uppercaseFirst(m.id.replaceAll('_', ' '));
+					m.label = uppercaseFirst(
+						removeNamespaceFromMetadataId(m.id).replaceAll('_', ' ')
+					);
 				}
 			})}
 		/>

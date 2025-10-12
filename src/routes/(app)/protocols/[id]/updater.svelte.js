@@ -7,6 +7,7 @@ import { ArkErrors } from 'arktype';
 
 /**
  * Update the protocol information, save it to the database.
+ * Return `false` from `changes` to skip saving to database and triggering load function reruns.
  * @template T
  * @param {(p: typeof import('$lib/database').Tables.Protocol.inferIn, ...v: T[]) => void | Promise<void>} changes
  * @returns {(...value: NoInfer<T[]>) => Promise<void>} updater for InlineTextInput
@@ -18,8 +19,11 @@ export function updater(changes) {
 		const protocol = await tables.Protocol.raw.get(page.params.id);
 		if (!protocol) return;
 
+		let needsUpdate = true;
+
 		try {
-			await changes(protocol, ...value);
+			const result = await changes(protocol, ...value);
+			needsUpdate = result !== false;
 		} catch (err) {
 			if (err instanceof ArkErrors) {
 				toasts.error(`Valeur invalide : ${err.summary}`);
@@ -28,6 +32,8 @@ export function updater(changes) {
 
 			throw err;
 		}
+
+		if (!needsUpdate) return;
 
 		await tables.Protocol.set(protocol).catch((err) => {
 			toasts.error(`Impossible de sauvegarder : ${errorMessage(err)}`);

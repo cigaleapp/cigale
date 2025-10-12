@@ -282,11 +282,7 @@
 						{:else}
 							<div class="menu-icon standin"></div>
 							<a in:fade href={url}>
-								{#if def?.label}
-									{def.label}
-								{:else}
-									<code>{shortId}</code>
-								{/if}
+								{def.label || shortId}
 								<MetadataBadges metadata={def} protocol={data} />
 							</a>
 
