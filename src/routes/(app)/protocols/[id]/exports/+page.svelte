@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import IconResult from '~icons/ph/arrow-right';
 	import { HANDLEBARS_HELPERS } from '$lib/schemas/protocols.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';

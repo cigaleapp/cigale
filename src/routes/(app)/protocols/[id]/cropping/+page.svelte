@@ -22,6 +22,7 @@
 	import IconError from '~icons/ph/warning-circle';
 	import { updater } from '../updater.svelte';
 	import ModelConfig from './ModelConfig.svelte';
+	import { modelUrl } from '$lib/inference';
 
 	const { data } = $props();
 	let settings = $derived(data.crop);
@@ -232,21 +233,21 @@
 				</ButtonInk>
 			</div>
 		{/snippet}
-		{#each settings.infer ?? [] as { model, input, output, name }, i (name)}
+		{#each settings.infer ?? [] as inference, i (inference.name || modelUrl(inference.model))}
 			<details>
 				<summary>
 					<div class="marker">
 						<IconOpenDetails />
 					</div>
 					<div class="text">
-						<p>{name}</p>
-						<small>{typeof model === 'string' ? model : model.url}</small>
+						<p>{inference.name}</p>
+						<small>{modelUrl(inference.model)}</small>
 					</div>
 					<div class="actions">
 						<ButtonIcon
 							help="Supprimer ce modèle"
 							dangerous
-							onclick={updater((p) => {
+							onclick={updater((p, _) => {
 								p.crop.infer = p.crop.infer?.filter((_, index) => index !== i);
 							})}
 						>
@@ -254,7 +255,7 @@
 						</ButtonIcon>
 					</div>
 				</summary>
-				<ModelConfig {i} config={settings.infer[i]} />
+				<ModelConfig {i} {inference} />
 			</details>
 		{:else}
 			<p>Aucun modèle de recadrage défini.</p>
