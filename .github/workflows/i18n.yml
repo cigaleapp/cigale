@@ -2,6 +2,7 @@ name: Translations
 
 on:
   push:
+    branches: [main]
 
 jobs:
   refresh:

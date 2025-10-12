@@ -6,6 +6,9 @@ import { Tables } from './src/lib/database.js';
 export default defineConfig({
 	sourceLocale: 'fr',
 	otherLocales: ['en'],
+	// Translations are refreshed via a workflow,
+	// see file://./.github/workflows/i18n.yml
+	hmr: false,
 	adapters: {
 		main: svelte({
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
