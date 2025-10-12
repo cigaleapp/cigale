@@ -1,7 +1,10 @@
 <script>
 	import '$lib/fonts-math/import.css';
 
+	import IconDatatype from '$lib/IconDatatype.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import IconGoto from '~icons/ph/arrow-right';
+	import IconError from '~icons/ph/warning-circle';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
@@ -13,9 +16,30 @@
 	import { updater } from '../updater.svelte';
 	import ModelOutputShapeDiagram from './ModelOutputShapeDiagram.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
+	import {
+		ensureNamespacedMetadataId,
+		removeNamespaceFromMetadataId
+	} from '$lib/schemas/metadata';
+	import { goto } from '$lib/paths';
+	import { page } from '$app/state';
+	import { tables } from '$lib/idb.svelte';
 
 	const { data } = $props();
 	let settings = $derived(data.crop);
+
+	const findMetadata = (idOrShortId) =>
+		data.metadataDefinitions.find(
+			(m) =>
+				ensureNamespacedMetadataId(m.id, data.id) ===
+				ensureNamespacedMetadataId(idOrShortId, data.id)
+		);
+	const cropMetadata = $derived(findMetadata(settings.metadata));
+	const cropConfirmationMetadata = $derived(findMetadata(settings.confirmationMetadata));
+
+	$inspect({
+		boxes: [settings.metadata, findMetadata(settings.metadata)],
+		confirmations: [settings.confirmationMetadata, findMetadata(settings.confirmationMetadata)]
+	});
 
 	/**
 	 * @param {number} currentLength
@@ -39,9 +63,132 @@
 <div class="content" in:fade={{ duration: 100 }}>
 	<h2>Recadrage des images</h2>
 
-	<Field label="Stockage des boîtes">TODO</Field>
+	<Field label="Stockage des boîtes">
+		<div class="metadata-link">
+			{#if cropMetadata}
+				<div class="text">
+					<p>
+						<IconDatatype tooltip={false} type="boundingbox" />
+						{cropMetadata.label || removeNamespaceFromMetadataId(cropMetadata.id)}
+					</p>
+					<small>Boîtes de recadrage stockées dans cette métadonnée</small>
+				</div>
+				<div class="actions">
+					<ButtonInk
+						onclick={async () =>
+							goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+								id: page.params.id,
+								metadata: removeNamespaceFromMetadataId(cropMetadata.id)
+							})}
+					>
+						<IconGoto />
+						Voir
+					</ButtonInk>
+				</div>
+			{:else}
+				<div class="text empty">
+					<p>
+						<IconError />
+						Aucune métadonnée
+					</p>
+					<small>Le protocole ne peut pas stocker les boîtes de recadrage!</small>
+				</div>
+				<div class="actions">
+					<ButtonInk
+						onclick={updater(async (p) => {
+							const shortId = 'crop';
+							const metadataId = ensureNamespacedMetadataId(shortId, p.id);
 
-	<Field label="Stockage de l'état de confirmation">TODO</Field>
+							if (!data.metadataDefinitions.some((m) => m.id === metadataId)) {
+								await tables.Metadata.set({
+									id: metadataId,
+									label: '',
+									type: 'boundingbox',
+									description: "Boîtes de recadrage de l'observation",
+									required: false,
+									mergeMethod: 'union'
+								});
+								p.metadata.push(shortId);
+							}
+
+							p.crop.metadata = shortId;
+
+							await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+								id: p.id,
+								metadata: shortId
+							});
+						})}
+					>
+						Créer
+					</ButtonInk>
+				</div>
+			{/if}
+		</div>
+	</Field>
+
+	<Field label="Stockage de l'état de confirmation">
+		<div class="metadata-link">
+			{#if cropConfirmationMetadata}
+				<div class="text">
+					<p>
+						<IconDatatype tooltip={false} type="boolean" />
+						{cropConfirmationMetadata.label ||
+							removeNamespaceFromMetadataId(cropConfirmationMetadata.id)}
+					</p>
+					<small>Confirmations des recadrages stockés dans cette métadonnée</small>
+				</div>
+				<div class="actions">
+					<ButtonInk
+						onclick={async () =>
+							goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+								id: page.params.id,
+								metadata: removeNamespaceFromMetadataId(cropConfirmationMetadata.id)
+							})}
+					>
+						<IconGoto />
+						Voir
+					</ButtonInk>
+				</div>
+			{:else}
+				<div class="text empty">
+					<p>
+						<IconError />
+						Aucune métadonnée
+					</p>
+					<small>Le protocole ne peut pas stocker les confirmations de recadrage!</small>
+				</div>
+				<div class="actions">
+					<ButtonInk
+						onclick={updater(async (p) => {
+							const shortId = 'crop_confirmation';
+							const metadataId = ensureNamespacedMetadataId(shortId, p.id);
+
+							if (!data.metadataDefinitions.some((m) => m.id === metadataId)) {
+								await tables.Metadata.set({
+									id: metadataId,
+									label: '',
+									type: 'boolean',
+									description: 'Si la boîte de recadrage a été confirmée',
+									required: false,
+									mergeMethod: 'none'
+								});
+								p.metadata.push(shortId);
+							}
+
+							p.crop.confirmationMetadata = shortId;
+
+							await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
+								id: p.id,
+								metadata: shortId
+							});
+						})}
+					>
+						Créer
+					</ButtonInk>
+				</div>
+			{/if}
+		</div>
+	</Field>
 
 	<Field composite>
 		{#snippet label()}
@@ -129,6 +276,12 @@
 						value={input.disposition ?? 'CHW'}
 						onchange={updater((p, newValue) => {
 							if (!p.crop.infer) return;
+
+							// The if prevent infinite loops since calling the updater
+							// triggers a load function re-run, which
+							// in turns updates input.disposition
+							if (newValue === p.crop.infer[i].input.disposition) return false;
+
 							p.crop.infer[i].input.disposition = newValue;
 						})}
 						options={[
@@ -158,7 +311,13 @@
 						value={input.normalized ? 'normalized' : 'raw'}
 						onchange={updater((p, newValue) => {
 							if (!p.crop.infer) return;
-							p.crop.infer[i].input.normalized = newValue === 'normalized';
+
+							// The if prevent infinite loops since calling the updater
+							// See comment in updater() of RadioButtons above
+							const newNormalized = newValue === 'normalized';
+							if (newNormalized === p.crop.infer[i].input.normalized) return false;
+
+							p.crop.infer[i].input.normalized = newNormalized;
 						})}
 						options={[
 							{
@@ -248,6 +407,22 @@
 		gap: 1rem;
 	}
 
+	.metadata-link {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		.text p {
+			display: flex;
+			align-items: center;
+			gap: 0.25em;
+		}
+
+		.text.empty {
+			color: var(--fg-error);
+		}
+	}
+
 	.composite-input-line {
 		display: flex;
 		align-items: center;
@@ -270,6 +445,11 @@
 
 		&::-webkit-details-marker {
 			display: none;
+		}
+
+		.text {
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 
 		.actions {
