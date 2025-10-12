@@ -36,9 +36,8 @@ test('toExportedProtocol', async () => {
 			/**
 			 * @returns {Promise<Array<import('$lib/database').Metadata | import('$lib/database').MetadataEnumVariant & {metadataId: string}>>}
 			 */
-			async (table, range) => {
+			async (table, _range) => {
 				if (table === 'MetadataOption') {
-					console.log('returning metadata options');
 					return [
 						{
 							id: 'protocol1__meta1:opt1',
@@ -171,7 +170,7 @@ describe('compareProtocolWithUpstream', () => {
 			/**
 			 * @returns {Promise<typeof import('$lib/database').Tables.Protocol.inferIn>}
 			 */
-			get: async (table, id) => ({
+			get: async (_table, _id) => ({
 				id: 'protocol1',
 				name: 'Test Protocol',
 				version: 1,
@@ -211,7 +210,7 @@ describe('compareProtocolWithUpstream', () => {
 			/**
 			 * @returns {Promise<typeof import('$lib/database').Tables.Protocol.inferIn>}
 			 */
-			get: async (table, id) => ({
+			get: async (_table, _id) => ({
 				id: 'protocol1',
 				name: 'Test Protocol',
 				version: 1,
@@ -279,7 +278,7 @@ describe('compareProtocolWithUpstream', () => {
 			/**
 			 * @returns {Promise<typeof import('$lib/database').Tables.Protocol.inferIn>}
 			 */
-			get: async (table, id) => ({
+			get: async (_table, _id) => ({
 				id: 'protocol1',
 				name: 'Test Protocol',
 				version: 2,
@@ -309,7 +308,7 @@ describe('compareProtocolWithUpstream', () => {
 			/**
 			 * @returns {Promise<Array<import('$lib/database').Metadata | import('$lib/database').MetadataEnumVariant & {metadataId: string}>>}
 			 */
-			getAll: async (table, range) => {
+			getAll: async (table, _range) => {
 				if (table === 'MetadataOption') {
 					return [
 						{
