@@ -15,7 +15,7 @@
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import Download from '~icons/ph/download-simple';
 
 	// TODO show download size estimates
@@ -64,6 +64,11 @@
 			default:
 				break;
 		}
+	});
+
+	onMount(async () => {
+		include = 'metadataonly';
+		await generateExport();
 	});
 
 	async function generateExport() {

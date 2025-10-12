@@ -13,6 +13,7 @@ import {
 	observationMetadata,
 	protocolMetadataValues
 } from '$lib/metadata';
+import { toRData } from '$lib/rdata.js';
 import { MetadataValues } from '$lib/schemas/metadata';
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { Analysis, toMetadataRecord } from '$lib/schemas/results';
@@ -222,6 +223,10 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 						['protocol', 'observations']
 					)
 				),
+				[filepaths.metadata.csv.replace(/\.csv$/, '.RData')]: [
+					toRData(exportedObservations),
+					{ level: 0 }
+				],
 				[filepaths.metadata.csv]: strToU8(
 					toCSV(
 						[
