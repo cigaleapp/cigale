@@ -17,7 +17,6 @@ export async function load({ params, depends }) {
 		...protocol,
 		metadataDefinitions: await Promise.all(
 			protocol.metadata
-				.filter((k) => ![crop.metadata, crop.confirmationMetadata].includes(k))
 				.toSorted(metadataDefinitionComparator({ metadataOrder }))
 				.map(async (id) => tables.Metadata.get(id))
 		).then((defs) => defs.filter(nonnull))

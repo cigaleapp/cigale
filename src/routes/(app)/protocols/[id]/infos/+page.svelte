@@ -46,104 +46,102 @@
 		})}
 	/>
 
-	{#if authors.length}
-		{#snippet author(/** @type {{name: string; email?: string}} */ a, /** @type {number} */ i)}
-			<div class="author-inputs">
-				<InlineTextInput
-					label="Nom"
-					discreet
-					value={a.name}
-					onblur={updater((p, value) => {
-						a.name = value;
-						p.authors[i].name = value;
-					})}
-				/>
-				<br />
-				<InlineTextInput
-					label="Email"
-					discreet
-					placeholder="Pas d'email"
-					value={a.email ?? ''}
-					onblur={updater((p, value) => {
-						if (value) {
-							a.email = value;
-							p.authors[i].email = value;
-						} else {
-							delete a.email;
-							delete p.authors[i].email;
-						}
-					})}
-				/>
-			</div>
-			<ButtonIcon
-				help="Supprimer cet·te auteurice"
-				onclick={updater((p) => {
-					p.authors.splice(i, 1);
+	{#snippet author(/** @type {{name: string; email?: string}} */ a, /** @type {number} */ i)}
+		<div class="author-inputs">
+			<InlineTextInput
+				label="Nom"
+				discreet
+				value={a.name}
+				onblur={updater((p, value) => {
+					a.name = value;
+					p.authors[i].name = value;
 				})}
-			>
-				<IconRemove />
-			</ButtonIcon>
-		{/snippet}
+			/>
+			<br />
+			<InlineTextInput
+				label="Email"
+				discreet
+				placeholder="Pas d'email"
+				value={a.email ?? ''}
+				onblur={updater((p, value) => {
+					if (value) {
+						a.email = value;
+						p.authors[i].email = value;
+					} else {
+						delete a.email;
+						delete p.authors[i].email;
+					}
+				})}
+			/>
+		</div>
+		<ButtonIcon
+			help="Supprimer cet·te auteurice"
+			onclick={updater((p) => {
+				p.authors.splice(i, 1);
+			})}
+		>
+			<IconRemove />
+		</ButtonIcon>
+	{/snippet}
 
-		<Field composite Icon={IconAuthors} label="Auteurices">
-			<ul class="authors">
-				{#each authors as a, i (a.email + a.name)}
-					<li>{@render author(a, i)}</li>
-				{/each}
-				<li class="new">
-					<form
-						onsubmit={async (e) => {
-							e.preventDefault();
-							const nameInput = /** @type {HTMLInputElement | undefined} */ (
-								e.currentTarget.elements.item(0)
-							);
-							const emailInput = /** @type {HTMLInputElement | undefined} */ (
-								e.currentTarget.elements.item(1)
-							);
+	<Field composite Icon={IconAuthors} label="Auteurices">
+		<ul class="authors">
+			{#each authors as a, i (a.email + a.name)}
+				<li>{@render author(a, i)}</li>
+			{/each}
+			<li class="new">
+				<form
+					onsubmit={async (e) => {
+						e.preventDefault();
+						const nameInput = /** @type {HTMLInputElement | undefined} */ (
+							e.currentTarget.elements.item(0)
+						);
+						const emailInput = /** @type {HTMLInputElement | undefined} */ (
+							e.currentTarget.elements.item(1)
+						);
 
-							if (!emailInput) return;
-							if (!nameInput?.value.trim()) return;
+						if (!emailInput) return;
+						if (!nameInput?.value.trim()) return;
 
-							/** @type {Author} */
-							const author = { name: nameInput.value.trim() };
-							if (emailInput.value.trim()) {
-								author.email = emailInput.value.trim();
-							}
+						/** @type {Author} */
+						const author = { name: nameInput.value.trim() };
+						if (emailInput.value.trim()) {
+							author.email = emailInput.value.trim();
+						}
 
-							await updater((p) => {
-								p.authors.push(author);
-							})(undefined);
+						await updater((p) => {
+							p.authors.push(author);
+						})(undefined);
 
-							nameInput.value = '';
-							emailInput.value = '';
-						}}
-					>
-						<div class="author-inputs">
-							<InlineTextInput
-								label="Nom"
-								discreet
-								placeholder="Ajouter un·e autre"
-								value=""
-								onblur={() => {}}
-							/>
-							<br />
-							<InlineTextInput
-								label="Email"
-								type="email"
-								discreet
-								placeholder="Addresse email"
-								value=""
-								onblur={() => {}}
-							/>
-						</div>
-						<ButtonIcon help="Ajouter cet·te auteurice" submits onclick={() => {}}>
-							<IconAdd />
-						</ButtonIcon>
-					</form>
-				</li>
-			</ul>
-		</Field>
-	{/if}
+						nameInput.value = '';
+						emailInput.value = '';
+					}}
+				>
+					<div class="author-inputs">
+						<InlineTextInput
+							label="Nom"
+							discreet
+							placeholder="Ajouter un·e autre"
+							value=""
+							onblur={() => {}}
+						/>
+						<br />
+						<InlineTextInput
+							label="Email"
+							type="email"
+							discreet
+							placeholder="Addresse email"
+							value=""
+							onblur={() => {}}
+						/>
+					</div>
+					<ButtonIcon help="Ajouter cet·te auteurice" submits onclick={() => {}}>
+						<IconAdd />
+					</ButtonIcon>
+				</form>
+			</li>
+		</ul>
+	</Field>
 </main>
 
 <style>

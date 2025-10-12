@@ -19,7 +19,6 @@
 </script>
 
 {#if !label}
-	<code>{removeNamespaceFromMetadataId(id)}</code>
 	<span use:tooltip={'Métadonnée technique'} style:color="var(--fg-error)">
 		<IconTechnical />
 	</span>
