@@ -23,6 +23,7 @@
 		monospace,
 		value = $bindable(),
 		onblur,
+		onerror,
 		placeholder: _placeholder = '',
 		type: inputType = 'text',
 		Type = type.string
@@ -52,7 +53,7 @@
 		try {
 			await onblur(Type.assert(currentTarget.value), (v) => (value = v));
 		} catch (err) {
-			onerror?.(errorMessage(err));
+			onerror?.(err);
 		}
 	}}
 />
