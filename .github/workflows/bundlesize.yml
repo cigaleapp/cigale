@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Compare
     needs: build
+
     permissions:
       pull-requests: write
+      checks: write
 
     steps:
       - name: Download stats.json files
@@ -29,16 +31,12 @@ jobs:
           base-stats-json-path: ./base-stats/stats.json
           describe-assets: changed-only
 
-      - name: Get PR info
-        id: pr
-        run: |
-          labels=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name')
-          echo "labels=$labels" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get PR labels
+        id: labels
+        uses: joerick/pr-labels-action@v1.0.8
 
       # TODO figure out if the action has outputs, use those instead
-      - if: ${{ !contains(steps.pr.outputs.labels, 'bypass:bundlesize') }}
+      - if: ${{ !contains(steps.labels.outputs.labels, 'bypass:bundlesize') }}
         name: Enforce less than 5% increase
         run: |
           gzip_sum_base=$(jq '[.[].gzipSize] | add' base-stats/stats.json)
