@@ -41,7 +41,7 @@
 	let deleteProtocol = $state(undefined);
 
 	/** @type {HTMLElement|null} */
-	let metadataNav;
+	let metadataNav = $state(null);
 
 	let collapsedSidebar = $state(false);
 
