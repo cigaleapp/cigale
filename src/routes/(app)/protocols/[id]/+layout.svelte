@@ -368,6 +368,10 @@
 		}
 	}
 
+	aside.collapsed + main.padded > :global(*) {
+		max-width: 60rem;
+	}
+
 	.badge {
 		background-color: var(--bg-primary-translucent);
 		font-size: 0.8em;
