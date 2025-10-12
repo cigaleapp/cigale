@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-12 22:53+0000\n"
+"PO-Revision-Date: 2025-10-12T22:54:49.860Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1115,8 +1115,7 @@ msgid ""
 "contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
 msgstr ""
 "Protocol ID <0>Must be unique. Including a domain name of a website you\n"
-"control is recommended; the site where the protocol can be downloaded from, "
-"for example</0>"
+"control is recommended; the site where the protocol can be downloaded from, for example</0>"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
@@ -1156,10 +1155,7 @@ msgstr "<0/> Back"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
-msgstr ""
-"The protocol editing UI is still rough around the edges. Some things cannot "
-"be edited there. To modify them, export the protocol, edit the JSON file and "
-"import it back"
+msgstr "The protocol editing UI is still rough around the edges. Some things cannot be edited there. To modify them, export the protocol, edit the JSON file and import it back"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Beta"
@@ -1220,8 +1216,7 @@ msgid ""
 "Entrez un nombre suivi de <0>%</0> pour une marge relative à la taille de chaque\n"
 "image, ou suivi de <1>px</1> pour une marge en pixels."
 msgstr ""
-"Enter a number followed by <0>%</0> for a value relative to the size of "
-"each\n"
+"Enter a number followed by <0>%</0> for a value relative to the size of each\n"
 "image, or followed by <1>px</1> for a padding in pixels."
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
@@ -1313,8 +1308,7 @@ msgid ""
 "la disposition des pixels."
 msgstr ""
 "*CIGALE cannot make use of neural networks with batching capabilities yet.\n"
-"Only one image will be sent at a time to the model.<0/> This could change in "
-"the future, so it's still useful to\n"
+"Only one image will be sent at a time to the model.<0/> This could change in the future, so it's still useful to\n"
 "configure the pixel layout correctly."
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
@@ -1507,9 +1501,7 @@ msgstr "<0/> Latest version available: <1>v{0}</1> <2><0>Reset</0></2>"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1><0>Passer à la v{0}</0></1>"
-msgstr ""
-"<0/> Protocol has unpublished changes, see below <1><0>Set version to "
-"v{0}</0></1>"
+msgstr "<0/> Protocol has unpublished changes, see below <1><0>Set version to v{0}</0></1>"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> À jour"
@@ -1602,9 +1594,7 @@ msgstr "Technical metadata"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid "Cacher cette métadonnée dans l'interface. Utile pour les métadonnées gérées automatiquement, comme celle stockant la boîte de recadrage, par example."
-msgstr ""
-"Hide this metadata in the UI. Useful for automatically managed metadata, "
-"such as the one storing the bounding box, for example."
+msgstr "Hide this metadata in the UI. Useful for automatically managed metadata, such as the one storing the bounding box, for example."
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid "Type de métadonnée"
@@ -1615,8 +1605,7 @@ msgid ""
 "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs\n"
 "observations en une seule</0>"
 msgstr ""
-"Merge method <0>How to merge values of this metadata when merging "
-"observations into\n"
+"Merge method <0>How to merge values of this metadata when merging observations into\n"
 "a single observation</0>"
 
 #. placeholder {0}: page.params.option
