@@ -41,7 +41,10 @@
 			<IconDelete />
 		</ButtonIcon>
 
-		<ButtonIcon help="Modifier" onclick={() => goto('/(app)/protocols/[id]/infos', { id })}>
+		<ButtonIcon
+			help="Modifier (beta)"
+			onclick={() => goto('/(app)/protocols/[id]/infos', { id })}
+		>
 			<IconEdit />
 		</ButtonIcon>
 

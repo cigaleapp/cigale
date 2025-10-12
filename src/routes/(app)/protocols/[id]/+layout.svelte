@@ -31,6 +31,7 @@
 	import IconDelete from '~icons/ph/trash';
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
+	import Badge from '$lib/Badge.svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
@@ -145,10 +146,18 @@
 	<aside class:collapsed={collapsedSidebar}>
 		{#if !collapsedSidebar}
 			<header in:fade>
-				<ButtonInk onclick={() => goto('/protocols')}>
-					<IconBack />
-					Retour
-				</ButtonInk>
+				<div class="top-actions">
+					<ButtonInk onclick={() => goto('/protocols')}>
+						<IconBack />
+						Retour
+					</ButtonInk>
+
+					<Badge
+						tooltip="L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
+					>
+						Beta
+					</Badge>
+				</div>
 
 				<h1>
 					<InlineTextInput
@@ -401,6 +410,12 @@
 	header {
 		/* So that the height is stable when toggling collapsed state */
 		height: 8rem;
+	}
+
+	header .top-actions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	h1 {
