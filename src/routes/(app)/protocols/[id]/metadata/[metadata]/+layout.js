@@ -1,6 +1,6 @@
 import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsKeyRange } from '$lib/metadata.js';
-import { namespacedMetadataId, splitMetadataId } from '$lib/schemas/metadata.js';
+import { namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, parent, depends }) {

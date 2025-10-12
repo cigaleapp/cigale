@@ -183,7 +183,7 @@
 								<span class="description">{subtext}</span>
 							</div>
 							<div class="color-values-examples">
-								{#each colors as color}
+								{#each colors as color (color.join(''))}
 									{@const [r, g, b] = color.map((c) =>
 										c === 0
 											? 0
