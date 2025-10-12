@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-12T21:02:30.749Z\n"
+"PO-Revision-Date: 2025-10-12 22:53+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1074,117 +1074,125 @@ msgid ""
 "Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis\n"
 "clavier"
 msgstr ""
+"Select a box with 1 to 9 to edit with keyboard\n"
+"shortcuts"
 
 #. placeholder {0}: e
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de vérifier les mises à jour: {0}"
-msgstr ""
+msgstr "Cannot check for updates: {0}"
 
 #: src/lib/FieldURL.svelte
 msgid "Ouvrir le lien"
-msgstr ""
+msgstr "Open link"
 
 #: src/lib/FieldURL.svelte
 msgid "<0/> Accessible"
-msgstr ""
+msgstr "<0/> Available"
 
 #. placeholder {0}: response.status
 #: src/lib/FieldURL.svelte
 msgid "<0/> Inaccessible: HTTP {0} <1/>"
-msgstr ""
+msgstr "<0/> Unreachable: HTTP {0} <1/>"
 
 #: src/lib/FieldURL.svelte
 msgid "<0/> Vérification…"
-msgstr ""
+msgstr "<0/> Checking…"
 
 #. placeholder {0}: error
 #: src/lib/FieldURL.svelte
 msgid "<0/> Inaccessible: {0}"
-msgstr ""
+msgstr "<0/> Unreachable: {0}"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Nom du protocole"
-msgstr ""
+msgstr "Protocol name"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid ""
 "Identifiant du protocole <0>Doit être unique. Il est conseillé de le baser sur un nom de domaine web que vous\n"
 "contrôlez; celui d'un site web permettant de télécharger le protocole, par exemple</0>"
 msgstr ""
+"Protocol ID <0>Must be unique. Including a domain name of a website you\n"
+"control is recommended; the site where the protocol can be downloaded from, "
+"for example</0>"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
-msgstr ""
+msgstr "The ID must contain only letters, digits, <0>.</0> or <1>_</1>"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "<0/> utilise déjà cet identifiant"
-msgstr ""
+msgstr "<0/> already uses that ID"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Créer"
-msgstr ""
+msgstr "Create"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Protocole modifié par rapport à la version publiée"
-msgstr ""
+msgstr "Protocol has changes with the published version"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Modifier (beta)"
-msgstr ""
+msgstr "Edit (beta)"
 
 #. placeholder {0}: page.params.metadata
 #: src/routes/(app)/protocols/[id]/+error.svelte
 msgid "<0/> Métadonnée “{0}” introuvable"
-msgstr ""
+msgstr "<0/> Metadata “{0}” was not found"
 
 #. placeholder {0}: page.params.id
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Protocole {0}"
-msgstr ""
+msgstr "Protocol {0}"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Retour"
-msgstr ""
+msgstr "<0/> Back"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "L'interface de modification de protocole n'est pas encore peaufinée. Certaines choses ne sont pas encore modifiables ici. Pour les changer, exportez les protocoles, modifiez l'export (fichier JSON) et ré-importez-le"
 msgstr ""
+"The protocol editing UI is still rough around the edges. Some things cannot "
+"be edited there. To modify them, export the protocol, edit the JSON file and "
+"import it back"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Beta"
-msgstr ""
+msgstr "Beta"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "ID du protocole"
-msgstr ""
+msgstr "Protocol ID"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Exporter"
-msgstr ""
+msgstr "<0/> Export"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Retour aux protocoles"
-msgstr ""
+msgstr "Back to protocols"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Ajouter une métadonnée"
-msgstr ""
+msgstr "Add a metadata"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/+layout.svelte
 msgid "Nom de la métadonnée"
-msgstr ""
+msgstr "Metadata name"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Créer la métadonnée"
-msgstr ""
+msgstr "Create the metadata"
 
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Supprimer la métadonnée"
-msgstr ""
+msgstr "Delete the metadata"
 
 #. placeholder {0}: errorMessage(err)
 #. placeholder {0}: errorMessage(err)
@@ -1193,106 +1201,110 @@ msgstr ""
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/updater.svelte.js
 msgid "Impossible de sauvegarder : {0}"
-msgstr ""
+msgstr "Cannot save: {0}"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Recadrage des images"
-msgstr ""
+msgstr "Image cropping"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Marge par défault <0>Pour les images recadrées</0>"
-msgstr ""
+msgstr "Default padding <0>for cropped images</0>"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Marge par défaut"
-msgstr ""
+msgstr "Default padding"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid ""
 "Entrez un nombre suivi de <0>%</0> pour une marge relative à la taille de chaque\n"
 "image, ou suivi de <1>px</1> pour une marge en pixels."
 msgstr ""
+"Enter a number followed by <0>%</0> for a value relative to the size of "
+"each\n"
+"image, or followed by <1>px</1> for a padding in pixels."
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Stockage des boîtes"
-msgstr ""
+msgstr "Bounding boxes storage"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Boîtes de recadrage stockées dans cette métadonnée"
-msgstr ""
+msgstr "Bounding boxes are stored using this metadata"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "<0/> Voir"
-msgstr ""
+msgstr "<0/> See"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "<0/> Aucune métadonnée"
-msgstr ""
+msgstr "<0/> No metadata"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Le protocole ne peut pas stocker les boîtes de recadrage!"
-msgstr ""
+msgstr "Protocol cannot store bounding boxes!"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Stockage de l'état de confirmation"
-msgstr ""
+msgstr "Confirmed crop state storage"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Confirmations des recadrages stockés dans cette métadonnée"
-msgstr ""
+msgstr "Crop confirmations are stored with this metadata"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Le protocole ne peut pas stocker les confirmations de recadrage!"
-msgstr ""
+msgstr "Protocol cannot store crop confirmations!"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Modèles d'inférence <0><0/> Ajouter</0>"
-msgstr ""
+msgstr "Inference models <0><0/> Add</0>"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Supprimer ce modèle"
-msgstr ""
+msgstr "Delete this model"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Aucun modèle de recadrage défini."
-msgstr ""
+msgstr "No crop model defined."
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "Nom du modèle"
-msgstr ""
+msgstr "Model name"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "URL du ficher .onnx"
-msgstr ""
+msgstr ".onnx file URL"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "Taille des images en entrée"
-msgstr ""
+msgstr "Size of input images"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "Largeur"
-msgstr ""
+msgstr "Width"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "Hauteur"
-msgstr ""
+msgstr "Height"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "pixels"
-msgstr ""
+msgstr "pixels"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "Disposition des pixels"
-msgstr ""
+msgstr "Pixel layout"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#, fuzzy
 msgid "Représente"
-msgstr ""
+msgstr "Interpreted as"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid ""
@@ -1300,62 +1312,66 @@ msgid ""
 "images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement\n"
 "la disposition des pixels."
 msgstr ""
+"*CIGALE cannot make use of neural networks with batching capabilities yet.\n"
+"Only one image will be sent at a time to the model.<0/> This could change in "
+"the future, so it's still useful to\n"
+"configure the pixel layout correctly."
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "Valeur des pixels"
-msgstr ""
+msgstr "Pixel values"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "entre 0 et 255"
-msgstr ""
+msgstr "between 0 and 255"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "entre 0 et 1"
-msgstr ""
+msgstr "between 0 and 1"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
 msgid "Forme de la sortie"
-msgstr ""
+msgstr "Output shape"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
-msgstr ""
+msgstr "Add"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 msgid "Supprimer cet élément"
-msgstr ""
+msgstr "Delete this element"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 msgid "Invalide"
-msgstr ""
+msgstr "Invalid"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
-msgstr ""
+msgstr "Model output layer <0>Repeats for each detected bounding box</0>"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
 msgid "Boîte englobante"
-msgstr ""
+msgstr "Bounding box"
 
 #. placeholder {0}: page.params.id
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Protocole {0}: Export"
-msgstr ""
+msgstr "Protocol {0}: Export"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Aucune configuration d'exports trouvée pour ce protocole."
-msgstr ""
+msgstr "No export configuration found for this protocol."
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Structure des exports .zip"
-msgstr ""
+msgstr ".zip export file structure"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Résultats.zip"
-msgstr ""
+msgstr "Results.zip"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid ""
@@ -1366,11 +1382,11 @@ msgstr ""
 #. placeholder {0}: '{{}}'
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Ces expressions avec des {0} sont en vérité des <0>templates Handlebars</0>"
-msgstr ""
+msgstr "These expressions with {0} are <0>Handlebar templates</0>"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Variables et helpers disponibles"
-msgstr ""
+msgstr "Available variables and helpers"
 
 #. placeholder {0}: '{{ observation }}'
 #. placeholder {1}: '{{ observation.label }}'
@@ -1381,15 +1397,15 @@ msgstr ""
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "{0} <0/> {1} <1/> {2} <2/> etc."
-msgstr ""
+msgstr "{0} <0/> {1} <1/> {2} <2/> etc."
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Observation à laquelle l'image appartient"
-msgstr ""
+msgstr "Image's observation"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Image en cours d'exportation"
-msgstr ""
+msgstr "Image currently being exported"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid ""
@@ -1399,264 +1415,271 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Nouveau dossier"
-msgstr ""
+msgstr "New folder"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Nom du dossier à créer"
-msgstr ""
+msgstr "Name of new folder"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Le nom du dossier ne peut pas être vide."
-msgstr ""
+msgstr "Folder name cannot be empty."
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Nom du dossier"
-msgstr ""
+msgstr "Folder name"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Nom du fichier"
-msgstr ""
+msgstr "File name"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Informations sur le protocole"
-msgstr ""
+msgstr "Protocol information"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Description du protocole..."
-msgstr ""
+msgstr "Protocol description..."
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Site du protocole"
-msgstr ""
+msgstr "Protocol website"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Nom"
-msgstr ""
+msgstr "Name"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Pas d'email"
-msgstr ""
+msgstr "No email"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Supprimer cet·te auteurice"
-msgstr ""
+msgstr "Delete this author"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Auteurices"
-msgstr ""
+msgstr "Authors"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Ajouter un·e autre"
-msgstr ""
+msgstr "Add another"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Addresse email"
-msgstr ""
+msgstr "Email address"
 
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 msgid "Ajouter cet·te auteurice"
-msgstr ""
+msgstr "Add this author"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Versionnage"
-msgstr ""
+msgstr "Versioning"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "URL de téléchargement du protocole"
-msgstr ""
+msgstr "Protocol download URL"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Version actuelle"
-msgstr ""
+msgstr "Current version"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2><0>Réétablir</0></2>"
-msgstr ""
+msgstr "<0/> Latest version available: <1>v{0}</1> <2><0>Reset</0></2>"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1><0>Passer à la v{0}</0></1>"
 msgstr ""
+"<0/> Protocol has unpublished changes, see below <1><0>Set version to "
+"v{0}</0></1>"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> À jour"
-msgstr ""
+msgstr "<0/> Up to date"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Comparaison avec la version distante..."
-msgstr ""
+msgstr "<0/> Comparing with published version…"
 
 #. placeholder {0}: error.message
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Erreur lors de la comparaison avec la version distante: {0}"
-msgstr ""
+msgstr "<0/> Error while comparing with published version: {0}"
 
 #. placeholder {0}: newVersion
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Une mise à jour à la v{0} est disponible <1/>"
-msgstr ""
+msgstr "<0/> Update to v{0} is available <1/>"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Différences avec la version publiée"
-msgstr ""
+msgstr "<0/> Changes with published version"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Chargement..."
-msgstr ""
+msgstr "Loading..."
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "<0/> Avant"
-msgstr ""
+msgstr "<0/> Before"
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "<0/> Maintenant"
-msgstr ""
+msgstr "<0/> Now"
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "Voir la métadonnée"
-msgstr ""
+msgstr "See metadata"
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "Voir l'option"
-msgstr ""
+msgstr "See option"
 
 #. placeholder {0}: piece + 1
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "N°{0}"
-msgstr ""
+msgstr "#{0}"
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "Ouvrir le lien dans un nouvel onglet"
-msgstr ""
+msgstr "Open link in new tab"
 
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 #: src/routes/(app)/protocols/[id]/versioning/ChangesWithRemote.svelte
 msgid "Vide"
-msgstr ""
+msgstr "Empty"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/+layout.svelte
 msgid "Métadonnée"
-msgstr ""
+msgstr "Metadata"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/+layout.svelte
 msgid "Identifiant de la métadonnée"
-msgstr ""
+msgstr "Metadata ID"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/inference/+page.svelte
 msgid "URL du modèle"
-msgstr ""
+msgstr "Model URL"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/inference/+page.svelte
 msgid "Champ EXIF à utiliser"
-msgstr ""
+msgstr "EXIF field to use"
 
 #. placeholder {0}: newExif.summary
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/inference/+page.svelte
 msgid "Champ EXIF invalide: {0}"
-msgstr ""
+msgstr "Invalid EXIF field: {0}"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid "Obligatoire"
-msgstr ""
+msgstr "Mandatory"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid "Il faut remplir cette métadonnée pour chaque observation"
-msgstr ""
+msgstr "This metadata has to be set on every observation"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid "Métadonnée technique"
-msgstr ""
+msgstr "Technical metadata"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid "Cacher cette métadonnée dans l'interface. Utile pour les métadonnées gérées automatiquement, comme celle stockant la boîte de recadrage, par example."
 msgstr ""
+"Hide this metadata in the UI. Useful for automatically managed metadata, "
+"such as the one storing the bounding box, for example."
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid "Type de métadonnée"
-msgstr ""
+msgstr "Metadata type"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 msgid ""
 "Méthode de fusion <0>Comment fusionner les valeurs de cette métadonnée lors du regroupement de plusieurs\n"
 "observations en une seule</0>"
 msgstr ""
+"Merge method <0>How to merge values of this metadata when merging "
+"observations into\n"
+"a single observation</0>"
 
 #. placeholder {0}: page.params.option
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+error.svelte
 msgid "<0/> Aucune option trouvée avec la clé {0}"
-msgstr ""
+msgstr "<0/> No option found with key {0}"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Rechercher une option"
-msgstr ""
+msgstr "Search options"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Rechercher…"
-msgstr ""
+msgstr "Search…"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Effacer la recherche"
-msgstr ""
+msgstr "Clear search"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Nom de la nouvelle option"
-msgstr ""
+msgstr "Name of new option"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Nouvelle option…"
-msgstr ""
+msgstr "New option…"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Créer la nouvelle option"
-msgstr ""
+msgstr "Create new option"
 
 #. placeholder {0}: label || key
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+layout.svelte
 msgid "Supprimer {0}"
-msgstr ""
+msgstr "Delete {0}"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/+page.svelte
 msgid "Sélectionnez une option"
-msgstr ""
+msgstr "Select an option"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Clé"
-msgstr ""
+msgstr "Key"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Clé de l'option"
-msgstr ""
+msgstr "Option key"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Label"
-msgstr ""
+msgstr "Label"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Label de l'option"
-msgstr ""
+msgstr "Option label"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Lien vers une image"
-msgstr ""
+msgstr "Image URL"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Cascades"
-msgstr ""
+msgstr "Cascades"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid ""
