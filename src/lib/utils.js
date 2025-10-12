@@ -668,6 +668,72 @@ export async function fetchHttpRequest(request, { cacheAs = '', onProgress } = {
 	return fetch(url, options);
 }
 
+if (import.meta.vitest) {
+	const { it, describe, expect, vi } = import.meta.vitest;
+	describe('fetchHttpRequest', async () => {
+		it('works with a simple URL string', async () => {
+			const fetchMock = vi.fn(() =>
+				Promise.resolve(
+					new Response(JSON.stringify({ success: true }), {
+						status: 200,
+						headers: { 'Content-Type': 'application/json' }
+					})
+				)
+			);
+			vi.stubGlobal('fetch', fetchMock);
+
+			const response = await fetchHttpRequest(
+				'https://example.com/api?q=test&another=param',
+				{
+					cacheAs: 'model'
+				}
+			);
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+			expect(fetchMock).toHaveBeenCalledWith(
+				new URL('https://example.com/api?q=test&another=param&x-cigale-cache-as=model'),
+				{ headers: {} }
+			);
+			const data = await response.json();
+			expect(data).toEqual({ success: true });
+
+			// Clean up
+			vi.unstubAllGlobals();
+		});
+		it('works with a full request object', async () => {
+			const fetchMock = vi.fn(() =>
+				Promise.resolve(
+					new Response(JSON.stringify({ success: true }), {
+						status: 200,
+						headers: { 'Content-Type': 'application/json' }
+					})
+				)
+			);
+			vi.stubGlobal('fetch', fetchMock);
+
+			const request = /** @type {const} */ ({
+				url: 'https://example.com/api',
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ key: 'value' })
+			});
+
+			const response = await fetchHttpRequest(request, { cacheAs: 'model' });
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+			expect(fetchMock).toHaveBeenCalledWith(
+				new URL('https://example.com/api?x-cigale-cache-as=model'),
+				request
+			);
+			const data = await response.json();
+			expect(data).toEqual({ success: true });
+
+			// Clean up
+			vi.unstubAllGlobals();
+		});
+	});
+}
+
 /** @param {Iterable<number>} values */
 export function sum(values) {
 	return [...values].reduce((acc, cur) => acc + cur, 0);
