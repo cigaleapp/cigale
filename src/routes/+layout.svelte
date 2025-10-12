@@ -45,11 +45,15 @@
 		color: var(--fg-primary);
 	}
 
-	:global(*) {
+	:global(body) {
 		font-family: var(--font-regular);
 	}
 
-	:global(code, pre, code a) {
+	:global(input, textarea, button) {
+		font-family: inherit;
+	}
+
+	:global(code, pre, code a, code input) {
 		font-family: var(--font-mono);
 		font-weight: 260;
 	}
@@ -78,5 +82,14 @@
 	:global(input[type='range']) {
 		accent-color: var(--fg-primary);
 		--track-height: 0.5em;
+	}
+
+	:global(textarea) {
+		resize: vertical;
+		border: 1px solid var(--gay);
+		border-radius: var(--corner-radius);
+		padding: 0.5em;
+		width: 100%;
+		max-width: 70rem;
 	}
 </style>

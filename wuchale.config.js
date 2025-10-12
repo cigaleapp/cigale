@@ -6,6 +6,9 @@ import { Tables } from './src/lib/database.js';
 export default defineConfig({
 	sourceLocale: 'fr',
 	otherLocales: ['en'],
+	// Translations are refreshed via a workflow,
+	// see file://./.github/workflows/i18n.yml
+	hmr: Boolean(process.env.CI),
 	adapters: {
 		main: svelte({
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
@@ -13,6 +16,9 @@ export default defineConfig({
 
 				// Table names
 				if (scope === 'script' && Object.keys(Tables).includes(msg)) return false;
+
+				// Probably math variables, see ModelOutputShapeDiagram.svelte
+				if (msg.length === 1) return false;
 
 				if (/^toasts\.(info|warn|error|success)$/.test(call)) return true;
 
@@ -54,6 +60,9 @@ export default defineConfig({
 
 				// Probably keyboard shortcuts
 				if (msg.length === 1) return false;
+
+				// Microdiff action types
+				if (['CREATE', 'REMOVE', 'CHANGE'].includes(msg)) return false;
 
 				// Log messages for ProcessingQueue
 				if (file === 'src/lib/queue.svelte.js') {
