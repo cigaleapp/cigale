@@ -11,7 +11,7 @@ export async function load({ params, depends }) {
 	depends(dependencyURI('Protocol', params.id));
 	protocol.metadata.map((m) => depends(dependencyURI('Metadata', m)));
 
-	const { crop, metadataOrder } = protocol;
+	const { metadataOrder } = protocol;
 
 	return {
 		...protocol,
