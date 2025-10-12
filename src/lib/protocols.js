@@ -1,12 +1,14 @@
-import { type } from 'arktype';
+import { ArkErrors, type } from 'arktype';
+import microdiff from 'microdiff';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
-import { namespacedMetadataId } from './schemas/metadata.js';
-import { cachebust } from './utils.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
+import { metadataOptionsKeyRange } from './metadata.js';
+import { ExportedProtocol, Protocol } from './schemas/protocols.js';
+import { cachebust, fetchHttpRequest, fromEntries, keys, omit, range, sum } from './utils.js';
 
 /**
- * @import { Schemas } from './database.js';
+ * @import { Schemas, Tables } from './database.js';
  */
 
 /**
@@ -17,60 +19,43 @@ export function jsonSchemaURL(base) {
 	return `${window.location.origin}${base}/protocol.schema.json`;
 }
 
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('jsonSchemaURL', () => {
-		// Mock window.location.origin
-		const originalLocation = window.location;
-		Object.defineProperty(window, 'location', {
-			value: { origin: 'https://example.com' },
-			writable: true
-		});
-
-		expect(jsonSchemaURL('')).toBe('https://example.com/protocol.schema.json');
-		expect(jsonSchemaURL('/app')).toBe('https://example.com/app/protocol.schema.json');
-		expect(jsonSchemaURL('/some/path')).toBe(
-			'https://example.com/some/path/protocol.schema.json'
-		);
-
-		// Restore original location
-		Object.defineProperty(window, 'location', {
-			value: originalLocation,
-			writable: true
-		});
-	});
-}
-
 /**
- * Exports a protocol by ID into a JSON file, and triggers a download of that file.
- * @param {string} base base path of the app - import `base` from `$app/paths`
- * @param {import("./database").ID} id
- * @param {'json' | 'yaml'} [format='json']
+ * Turn a database-stored protocol into an object suitable for export.
+ * @param {import('./idb.svelte.js').DatabaseHandle} db
+ * @param {typeof Tables.Protocol.infer} protocol
  */
-export async function exportProtocol(base, id, format = 'json') {
-	// Importing is done here so that ./generate-json-schemas can be invoked with bun run (otherwise we get a '$state not defined' error)
-	const { tables, ...idb } = await import('./idb.svelte.js');
+export async function toExportedProtocol(db, protocol) {
+	const allMetadataOptions = await db.getAll(
+		'MetadataOption',
+		metadataOptionsKeyRange(protocol.id, null)
+	);
 
-	const protocol = await tables.Protocol.raw.get(id);
-	if (!protocol) throw new Error(`Protocole ${id} introuvable`);
-
-	const allMetadataOptions = await idb.list('MetadataOption');
-
-	downloadProtocol(base, format, {
-		...protocol,
+	return ExportedProtocol.assert({
+		...omit(protocol, 'dirty'),
+		exports: {
+			...protocol.exports,
+			...(protocol.exports
+				? {
+						images: {
+							cropped: protocol.exports.images.cropped.toJSON(),
+							original: protocol.exports.images.original.toJSON()
+						}
+					}
+				: {})
+		},
 		metadata: Object.fromEntries(
-			await tables.Metadata.list().then((defs) =>
+			await db.getAll('Metadata').then((defs) =>
 				defs
-					.filter((def) => protocol?.metadata.includes(def.id))
-					.map(({ id, ...def }) => [
-						id,
+					.filter((def) => protocol.metadata.includes(def.id))
+					.map((metadata) => [
+						metadata.id,
 						{
-							...def,
+							...omit(metadata, 'id'),
 							options: allMetadataOptions
-								.filter((opt) =>
-									opt.id.startsWith(namespacedMetadataId(protocol.id, id) + ':')
+								.filter(({ id }) =>
+									metadataOptionsKeyRange(protocol.id, metadata.id).includes(id)
 								)
-								.map(({ id: _, ...opt }) => opt)
+								.map((option) => omit(option, 'id', 'metadataId'))
 						}
 					])
 			)
@@ -79,28 +64,21 @@ export async function exportProtocol(base, id, format = 'json') {
 }
 
 /**
- *
+ * Exports a protocol by ID into a JSON file, and triggers a download of that file.
+ * @param {import('./idb.svelte.js').DatabaseHandle} db
  * @param {string} base base path of the app - import `base` from `$app/paths`
- * @param {'json' | 'yaml'} format
+ * @param {import("./database").ID} id
+ * @param {'json' | 'yaml'} [format='json']
  */
-export async function downloadProtocolTemplate(base, format) {
-	downloadProtocol(base, format, {
-		id: 'mon-protocole',
-		name: 'Mon protocole',
-		learnMore: 'https://github.com/moi/mon-protocole',
-		authors: [{ name: 'Prénom Nom', email: 'prenom.nom@example.com' }],
-		description: 'Description de mon protocole',
-		metadata: {
-			'une-metadonnee': {
-				label: 'Une métadonnée',
-				description: 'Description de la métadonnée',
-				learnMore: 'https://example.com',
-				type: 'float',
-				required: false,
-				mergeMethod: 'average'
-			}
-		}
-	});
+export async function exportProtocol(db, base, id, format = 'json') {
+	downloadProtocol(
+		base,
+		format,
+		await db
+			.get('Protocol', id)
+			.then(Protocol.assert)
+			.then((p) => toExportedProtocol(db, p))
+	);
 }
 
 /**
@@ -220,142 +198,6 @@ export async function hasUpgradeAvailable({ version, source, id }) {
 	};
 }
 
-if (import.meta.vitest) {
-	const { vi, describe, test, expect } = import.meta.vitest;
-	describe('hasUpgradeAvailable', () => {
-		test('should return upToDate: false if the version is lower', async () => {
-			const fetch = vi.fn(async () => ({
-				json: async () => ({
-					version: 2,
-					id: 'mon-protocole'
-				})
-			}));
-
-			vi.stubGlobal('fetch', fetch);
-
-			const result = await hasUpgradeAvailable({
-				version: 1,
-				source: 'https://example.com/protocol.json',
-				id: 'mon-protocole'
-			});
-
-			expect(fetch).toHaveBeenCalledWith(
-				expect.stringContaining('https://example.com/protocol.json?v='),
-				{
-					headers: {
-						Accept: 'application/json'
-					}
-				}
-			);
-			expect(result).toEqual({ upToDate: false, newVersion: 2 });
-		});
-
-		test('should return upToDate: true if the version is the same', async () => {
-			const fetch = vi.fn(async () => ({
-				json: async () => ({
-					version: 1,
-					id: 'mon-protocole'
-				})
-			}));
-
-			vi.stubGlobal('fetch', fetch);
-
-			const result = await hasUpgradeAvailable({
-				version: 1,
-				source: 'https://example.com/protocol.json',
-				id: 'mon-protocole'
-			});
-
-			expect(fetch).toHaveBeenCalledWith(
-				expect.stringContaining('https://example.com/protocol.json?v='),
-				{
-					headers: {
-						Accept: 'application/json'
-					}
-				}
-			);
-			expect(result).toEqual({ upToDate: true, newVersion: 1 });
-		});
-
-		test('should throw an error if the protocol ID is different', async () => {
-			const fetch = vi.fn(async () => ({
-				json: async () => ({
-					version: 2,
-					id: 'autre-protocole'
-				})
-			}));
-
-			vi.stubGlobal('fetch', fetch);
-
-			await expect(
-				hasUpgradeAvailable({
-					version: 1,
-					source: 'https://example.com/protocol.json',
-					id: 'mon-protocole'
-				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(
-				`[Error: Le protocole a changé d'identifiant]`
-			);
-		});
-
-		test('should throw an error if the remote protocol has no version', async () => {
-			const fetch = vi.fn(async () => ({
-				json: async () => ({
-					id: 'mon-protocole'
-				})
-			}));
-
-			vi.stubGlobal('fetch', fetch);
-
-			await expect(
-				hasUpgradeAvailable({
-					version: 1,
-					source: 'https://example.com/protocol.json',
-					id: 'mon-protocole'
-				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(
-				`[Error: Le protocole n'a plus de version]`
-			);
-		});
-
-		test('should throw an error if the protocol has no source', async () => {
-			await expect(
-				// @ts-expect-error
-				hasUpgradeAvailable({
-					version: 1,
-					source: undefined,
-					id: 'mon-protocole'
-				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Le protocole n'a pas de source]`);
-		});
-
-		test('should throw an error if the local protocol has no version', async () => {
-			await expect(
-				// @ts-expect-error
-				hasUpgradeAvailable({
-					version: undefined,
-					source: 'https://example.com/protocol.json',
-					id: 'mon-protocole'
-				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(
-				`[Error: Le protocole n'a pas de version]`
-			);
-		});
-
-		test('should throw an error if the protocol has no ID', async () => {
-			await expect(
-				// @ts-expect-error
-				hasUpgradeAvailable({
-					version: 1,
-					source: 'https://example.com/protocol.json'
-				})
-			).rejects.toThrowErrorMatchingInlineSnapshot(
-				`[Error: Le protocole n'a pas d'identifiant]`
-			);
-		});
-	});
-}
-
 /**
  * @param {object} param0
  * @param {number} [param0.version]
@@ -388,4 +230,164 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 		throw new Error("Le protocole a été importé mais n'a plus de version");
 
 	return { version: newVersion, ...rest };
+}
+
+/**
+ *
+ * Compare the in-database protocol with its remote counterpart, output any changes.
+ * @param {import('./idb.svelte.js').DatabaseHandle} db
+ * @param {import('$lib/database').ID} protocolId
+ * @param {object} [options]
+ * @param {(progress: number) => void | Promise<void>} [options.onProgress]
+ * @returns {Promise<import('microdiff').Difference[]>}
+ */
+export async function compareProtocolWithUpstream(db, protocolId, { onProgress } = {}) {
+	const databaseProtocol = await db.get('Protocol', protocolId).then(Protocol.assert);
+
+	await onProgress?.(0);
+
+	if (!databaseProtocol?.source) return [];
+
+	const [remoteProtocol, localProtocol] = await Promise.all([
+		fetchHttpRequest(databaseProtocol.source)
+			.then((r) => r.json())
+			.then((data) => ExportedProtocol(data)),
+		toExportedProtocol(db, databaseProtocol)
+	]);
+
+	if (remoteProtocol instanceof ArkErrors) {
+		console.warn('Remote protocol is invalid', remoteProtocol);
+		return [];
+	}
+
+	// Sort options for each metadata by key
+	const metadataIds = new Set([
+		...keys(remoteProtocol.metadata),
+		...keys(localProtocol.metadata)
+	]);
+
+	const optionsTotalCount = metadataIds.size;
+
+	// Note: Totals are based on timings on a single machine,
+	// the values dont really matter as least as they're self-consistent,
+	// it's just to determine what part of the progress bar belongs to fetch+convert
+	// It's in ×2ms so that incrementing progress for options is just 1 per option
+	let progressCompleted = 0;
+	const progressTotals = {
+		fetchAndConvert: 250 /* ×2ms */,
+		microdiff: 25 /* ×2ms */,
+		options: optionsTotalCount /* ×2ms */,
+		postProcess: 2 /* ×2ms */
+	};
+	const incrementProgress = async (amount = 1) => {
+		progressCompleted += amount;
+		onProgress?.(progressCompleted / sum(Object.values(progressTotals)));
+	};
+
+	await incrementProgress(progressTotals.fetchAndConvert);
+
+	const DELETED_OPTION = {
+		description: '',
+		key: '',
+		label: '',
+		__deleted: true
+	};
+
+	for (const metadataId of metadataIds) {
+		if (!remoteProtocol.metadata[metadataId]) continue;
+		if (!localProtocol.metadata[metadataId]) continue;
+
+		const remoteOptions = remoteProtocol.metadata[metadataId].options ?? [];
+		const sortedRemoteOptions = [];
+		const localOptions = localProtocol.metadata[metadataId].options ?? [];
+		const sortedLocalOptions = [];
+
+		const optionKeys = [
+			...new Set([...remoteOptions.map((o) => o.key), ...localOptions.map((o) => o.key)])
+		].sort();
+
+		for (const key of optionKeys) {
+			const remoteOption = remoteOptions.find((o) => o.key === key);
+			const localOption = localOptions.find((o) => o.key === key);
+
+			sortedLocalOptions.push(localOption ?? DELETED_OPTION);
+			sortedRemoteOptions.push(remoteOption ?? DELETED_OPTION);
+			await incrementProgress();
+		}
+
+		remoteProtocol.metadata[metadataId].options = sortedRemoteOptions;
+		localProtocol.metadata[metadataId].options = sortedLocalOptions;
+	}
+
+	const diffs = microdiff(remoteProtocol, localProtocol, {
+		cyclesFix: true
+	});
+
+	await incrementProgress(progressTotals.microdiff);
+
+	// If an option was removed from one side, it'll appear as a all-empty-strings option object with an additional `__deleted: true` property.
+
+	let cleanedDiffs = structuredClone(diffs);
+
+	const diffStartsWith = (path, start) =>
+		path.length >= start.length && range(0, start.length).every((i) => path[i] === start[i]);
+
+	for (const { path, type } of diffs) {
+		const last = path.at(-1);
+		const prefix = path.slice(0, -1);
+
+		// If the diff indicates that an option was deleted
+		if (last === '__deleted') {
+			// __deleted entry was _created_ in localProtocol, so it was a deleted-from-remote option
+			if (type === 'CREATE') {
+				const pathToOption = prefix;
+				// Delete all diffs with a path starting with diff.path[..-1]
+				cleanedDiffs = cleanedDiffs.filter((d) => !diffStartsWith(d.path, pathToOption));
+				// and replace them with a single diff indicating the deletion of the option
+				cleanedDiffs.push({
+					type: 'REMOVE',
+					path: [...prefix],
+					// Restore old value by getting all oldValues from diffs
+					oldValue: fromEntries(
+						diffs
+							.filter((d) => diffStartsWith(d.path, pathToOption))
+							.filter((d) => d.path.at(-1) !== '__deleted')
+							.map(
+								(d) =>
+									/** @type {const} */ ([
+										d.path.at(-1)?.toString() ?? '',
+										d.oldValue
+									])
+							)
+					)
+				});
+			} else if (type === 'REMOVE') {
+				// __deleted entry was _removed_ from localProtocol, so it's an option that didn't exist in remoteProtocol
+				const pathToOption = prefix;
+				// Delete all diffs with a path starting with diff.path[..-1]
+				cleanedDiffs = cleanedDiffs.filter((d) => !diffStartsWith(d.path, pathToOption));
+				// and replace them with a single diff indicating the addition of the option
+				cleanedDiffs.push({
+					type: 'CREATE',
+					path: [...prefix],
+					value: fromEntries(
+						diffs
+							.filter((d) => diffStartsWith(d.path, pathToOption))
+							.filter((d) => d.path.at(-1) !== '__deleted')
+							.map(
+								(d) =>
+									/** @type {const} */ ([
+										d.path.at(-1)?.toString() ?? '',
+										d.value
+									])
+							)
+					)
+				});
+			}
+		}
+	}
+
+	await incrementProgress(progressTotals.postProcess);
+
+	return cleanedDiffs;
 }

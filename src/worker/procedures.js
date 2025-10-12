@@ -45,7 +45,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		progress: type({}),
 		success: type({
 			boxes: type(['number', 'number', 'number', 'number']).array(),
-			scores: type.number.array()
+			scores: 'number[]'
 		})
 	},
 	classify: {
@@ -63,7 +63,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		}),
 		progress: type({}),
 		success: type({
-			scores: type.number.array()
+			scores: 'number[]'
 		})
 	},
 	importProtocol: {
@@ -107,5 +107,24 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 					: { progress: undefined, warning: o.warning }
 			),
 		success: type('ArrayBuffer')
+	},
+	diffProtocolWithRemote: {
+		input: type({ protocolId: 'string' }),
+		progress: type('0 <= number <= 1'),
+		success: type({
+			dirty: 'boolean',
+			changes: type
+				.or(
+					{ path: '(number|string)[]', type: '"CREATE"', value: 'unknown' },
+					{
+						path: '(number|string)[]',
+						type: '"CHANGE"',
+						oldValue: 'unknown',
+						value: 'unknown'
+					},
+					{ path: '(number|string)[]', type: '"REMOVE"', oldValue: 'unknown' }
+				)
+				.array()
+		})
 	}
 });

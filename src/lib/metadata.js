@@ -332,6 +332,19 @@ export async function addValueLabels(values, metadataOptions) {
 }
 
 /**
+ * @type {Set<DB.MetadataType>}
+ */
+export const MERGEABLE_METADATA_TYPES = new Set([
+	'boolean',
+	'integer',
+	'float',
+	'date',
+	'location',
+	'boundingbox',
+	'enum'
+]);
+
+/**
  * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
  * @param {DatabaseHandle} db
  * @param {DB.Image[]} images
@@ -903,10 +916,13 @@ export function assertIs(type, value) {
 /**
  *
  * @param {{metadataOrder?: undefined | string[]}} protocol
- * @returns {(a: { id: string }, b: { id: string }) => number}
+ * @returns {(a: string | { id: string }, b: string | { id: string }) => number}
  */
 export function metadataDefinitionComparator(protocol) {
-	return ({ id: a }, { id: b }) => {
+	return (a, b) => {
+		if (typeof a !== 'string') a = a.id;
+		if (typeof b !== 'string') b = b.id;
+
 		if (protocol.metadataOrder) {
 			return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
 		}
