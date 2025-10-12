@@ -1,5 +1,4 @@
 <script>
-	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { tooltip } from '$lib/tooltips.js';
 	import IconInferred from '~icons/ph/magic-wand';
 	import IconTag from '~icons/ph/tag';

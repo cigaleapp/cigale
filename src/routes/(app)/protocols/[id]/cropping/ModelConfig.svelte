@@ -12,12 +12,12 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {number} i index of the model in the protocol.crop.infer array
-	 * @property {NonNullable<import('$lib/database').Protocol['crop']['infer']>[number]} config
+	 * @property {NonNullable<import('$lib/database').Protocol['crop']['infer']>[number]} inference
 	 */
 
 	/** @type {Props} */
-	const { config, i } = $props();
-	const { name, input, output, model } = $derived(config);
+	const { inference, i } = $props();
+	const { name, input, output, model } = $derived(inference);
 </script>
 
 <Field label="Nom du modèle">
