@@ -29,8 +29,17 @@ jobs:
           base-stats-json-path: ./base-stats/stats.json
           describe-assets: changed-only
 
+      - name: Get PR info
+        id: pr
+        run: |
+          labels=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name')
+          echo "labels=$labels" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # TODO figure out if the action has outputs, use those instead
-      - name: Enforce less than 5% increase
+      - if: ${{ !contains(steps.pr.outputs.labels, 'bypass:bundlesize') }}
+        name: Enforce less than 5% increase
         run: |
           gzip_sum_base=$(jq '[.[].gzipSize] | add' base-stats/stats.json)
           gzip_sum_head=$(jq '[.[].gzipSize] | add' head-stats/stats.json)
@@ -49,8 +58,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - { name: head, ref: '${{ github.event.pull_request.head.ref }}' }
-          - { name: base, ref: '${{ github.base_ref }}' }
+          - { name: head, ref: "${{ github.event.pull_request.head.ref }}" }
+          - { name: base, ref: "${{ github.base_ref }}" }
     steps:
       - uses: actions/checkout@v5
         with:
