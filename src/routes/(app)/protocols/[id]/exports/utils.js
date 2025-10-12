@@ -130,4 +130,82 @@ if (import.meta.vitest) {
 			]);
 		});
 	});
+
+	describe('gatherToTree', () => {
+		it('should gather paths into a tree structure', () => {
+			/** @type {TreeNode} */
+			const tree = [];
+			gatherToTree({
+				tree,
+				path: 'images/cropped/{observation.id}/{image.exportedAs.original}',
+				provenance: 'images.cropped',
+				help: 'Cropped image'
+			});
+			gatherToTree({
+				tree,
+				path: 'images/original/{observation.id}/{image.exportedAs.original}',
+				provenance: 'images.original',
+				help: 'Original image'
+			});
+			gatherToTree({
+				tree,
+				path: 'metadata.json',
+				provenance: 'metadata.json',
+				help: 'Metadata in JSON format'
+			});
+			gatherToTree({
+				tree,
+				path: 'metadata.csv',
+				provenance: 'metadata.csv',
+				help: 'Metadata in CSV format'
+			});
+			expect(tree).toEqual([
+				{
+					folder: 'images',
+					children: [
+						{
+							folder: 'cropped',
+							children: [
+								{
+									folder: '{observation.id}',
+									children: [
+										{
+											filename: '{image.exportedAs.original}',
+											help: 'Cropped image',
+											provenance: 'images.cropped'
+										}
+									]
+								}
+							]
+						},
+						{
+							folder: 'original',
+							children: [
+								{
+									folder: '{observation.id}',
+									children: [
+										{
+											filename: '{image.exportedAs.original}',
+											help: 'Original image',
+											provenance: 'images.original'
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					filename: 'metadata.json',
+					help: 'Metadata in JSON format',
+					provenance: 'metadata.json'
+				},
+				{
+					filename: 'metadata.csv',
+					help: 'Metadata in CSV format',
+					provenance: 'metadata.csv'
+				}
+			]);
+		});
+	});
 }
