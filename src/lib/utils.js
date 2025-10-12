@@ -1,3 +1,5 @@
+// @wc-ignore-file
+
 import fetchProgress from 'fetch-progress';
 
 /**
