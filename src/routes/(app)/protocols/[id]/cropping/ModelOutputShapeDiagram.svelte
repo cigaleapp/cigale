@@ -1,4 +1,6 @@
 <script>
+	import '$lib/fonts-math/import.css';
+
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import * as Math from 'svelte-mathml';
 	import { MODEL_DETECTION_OUTPUT_SHAPES } from '$lib/schemas/protocols.js';

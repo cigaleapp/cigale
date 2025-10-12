@@ -19,7 +19,7 @@
         "fetch-progress": "git+https://github.com/gwennlbh/fetch-progress#explicit-import-extensions",
         "fflate": "^0.8.2",
         "fuse.js": "^7.1.0",
-        "svelte-mathml": "gwennlbh/svelte-mathml#114bb8f4d2e295453051f10214cdfabde9becfa7",
+        "svelte-mathml": "gwennlbh/svelte-mathml#9a0ff3dced87297077a186ca343b6c6b105320c6",
         "handlebars": "^4.7.8",
         "idb": "^8.0.3",
         "jimp": "^1.6.0",
@@ -1881,7 +1881,7 @@
 
     "svelte-eslint-parser": ["svelte-eslint-parser@1.3.2", "", { "dependencies": { "eslint-scope": "^8.2.0", "eslint-visitor-keys": "^4.0.0", "espree": "^10.0.0", "postcss": "^8.4.49", "postcss-scss": "^4.0.9", "postcss-selector-parser": "^7.0.0" }, "peerDependencies": { "svelte": "^3.37.0 || ^4.0.0 || ^5.0.0" }, "optionalPeers": ["svelte"] }, "sha512-whla4VlUbwJidn/bNyC3Ho3pBrXnR2CBEkuJwtaURW+wfwgKHPaYtZAmwAkp6HWWKCw1ILZL6iKsFdVY11rpDA=="],
 
-    "svelte-mathml": ["svelte-mathml@github:gwennlbh/svelte-mathml#114bb8f", { "peerDependencies": { "svelte": "^5.0.0" } }, "gwennlbh-svelte-mathml-114bb8f"],
+    "svelte-mathml": ["svelte-mathml@github:gwennlbh/svelte-mathml#9a0ff3d", { "peerDependencies": { "svelte": "^5.0.0" } }, "gwennlbh-svelte-mathml-9a0ff3d"],
 
     "svelte-toolbelt": ["svelte-toolbelt@0.7.1", "", { "dependencies": { "clsx": "^2.1.1", "runed": "^0.23.2", "style-to-object": "^1.0.8" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ=="],
 

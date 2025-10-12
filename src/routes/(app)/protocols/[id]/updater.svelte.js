@@ -9,7 +9,7 @@ import { ArkErrors } from 'arktype';
  * Update the protocol information, save it to the database.
  * Return `false` from `changes` to skip saving to database and triggering load function reruns.
  * @template T
- * @param {(p: typeof import('$lib/database').Tables.Protocol.inferIn, ...v: T[]) => void | Promise<void>} changes
+ * @param {(p: typeof import('$lib/database').Tables.Protocol.inferIn, ...v: T[]) => void | false | Promise<void | false>} changes
  * @returns {(...value: NoInfer<T[]>) => Promise<void>} updater for InlineTextInput
  */
 export function updater(changes) {
