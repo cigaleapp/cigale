@@ -30,9 +30,10 @@ export const ModelDetectionOutputShape = type
 	)
 	.array();
 
-const HANDLEBARS_HELPERS = {
+export const HANDLEBARS_HELPERS = {
 	suffix: {
 		documentation: "Ajoute un suffixe à un nom de fichier, avant l'extension",
+		usage: "{{ suffix 'filename.jpeg' '_example' }} -> 'filename_example.jpeg'",
 		/**
 		 * @param {string} subject
 		 * @param {string} suffix
@@ -44,6 +45,7 @@ const HANDLEBARS_HELPERS = {
 	},
 	extension: {
 		documentation: 'Récupère l’extension d’un nom de fichier',
+		usage: "{{ extension 'filename.jpeg' }} -> 'jpeg'",
 		/**
 		 * @param {string} subject
 		 */
@@ -53,6 +55,7 @@ const HANDLEBARS_HELPERS = {
 	},
 	fallback: {
 		documentation: 'Fournit une valeur de repli si la première est indéfinie',
+		usage: "{{ fallback obj.does_not_exist 'Unknown' }} -> 'Unknown'",
 		/**
 		 * @param {string} subject
 		 * @param {string} fallback

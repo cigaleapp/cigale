@@ -2,9 +2,12 @@
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import IconResult from '~icons/ph/arrow-right';
+	import { HANDLEBARS_HELPERS } from '$lib/schemas/protocols.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { entries } from '$lib/utils.js';
 	import { fade } from 'svelte/transition';
 	import IconZipFile from '~icons/ph/file-archive';
 	import IconJsonFile from '~icons/ph/file-code';
@@ -86,6 +89,74 @@
 	}
 </script>
 
+<main in:fade={{ duration: 100 }}>
+	<h2>Structure des exports .zip</h2>
+
+	<ul class="tree">
+		<li>
+			<IconZipFile />
+			<span class="filename">Résultats.zip</span>
+		</li>
+		{@render tree(treeNodes, '')}
+	</ul>
+
+	<p>
+		Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple
+		<strong><code>{'{{ comme_ceci }}'}</code></strong>. Un fichier sera créé par image exportée.
+		On peut aussi utiliser quelques fonctions "helper", qui s'appliquent à une expression
+	</p>
+
+	<p>
+		Ces expressions avec des {'{{}}'} sont en vérité des
+		<a target="_blank" href="https://handlebarsjs.com/guide/">templates Handlebars</a>
+	</p>
+
+	<h3>Variables et helpers disponibles</h3>
+
+	<dl class="variables-docs">
+		<dt>
+			{'{{ observation }}'}
+			<br />
+			{'{{ observation.label }}'}
+			<br />
+			{'{{ observation.protocolMetadata.species.confidence }}'}
+			<br />
+			etc.
+		</dt>
+		<dd>Observation à laquelle l'image appartient</dd>
+		<dt>
+			{'{{ image }}'}
+			<br />
+			{'{{ image.filename }}'}
+			<br />
+			{'{{ image.protocolMetadata.shoot_date.value }}'}
+			<br />
+			etc.
+		</dt>
+		<dd>Image en cours d'exportation</dd>
+		<dt>{'{{ sequence }}'}</dt>
+		<dd>
+			Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de
+			l'export
+		</dd>
+		{#each entries(HANDLEBARS_HELPERS) as [name, { documentation, usage }] (name)}
+			{@const [call, result] = usage.split('->').map((s) => s.trim())}
+			<dt>
+				{call}<br /> &rarr; {result}
+			</dt>
+			<dd>{documentation}</dd>
+		{/each}
+	</dl>
+
+	{#if getSettings().showTechnicalMetadata}
+		<pre class="debug">{JSON.stringify(
+				tables.Protocol.state.find((p) => p.id === data.protocol.id)?.exports,
+				null,
+				2
+			)}</pre>
+	{/if}
+</main>
+
 {#snippet tree(/** @type {TreeNode} */ children, /** @type {string} */ dirname = '')}
 	<ul class="tree">
 		<li class="new-folder">
@@ -152,26 +223,6 @@
 		{/each}
 	</ul>
 {/snippet}
-
-<main in:fade={{ duration: 100 }}>
-	<h2>Structure des exports .zip</h2>
-
-	<ul class="tree">
-		<li>
-			<IconZipFile />
-			<span class="filename">Résultats.zip</span>
-		</li>
-		{@render tree(treeNodes, '')}
-	</ul>
-
-	{#if getSettings().showTechnicalMetadata}
-		<pre class="debug">{JSON.stringify(
-				tables.Protocol.state.find((p) => p.id === data.protocol.id)?.exports,
-				null,
-				2
-			)}</pre>
-	{/if}
-</main>
 
 <style>
 	ul {
@@ -243,5 +294,11 @@
 	pre.debug {
 		margin-top: 3rem;
 		font-size: 0.7em;
+	}
+
+	.variables-docs {
+		display: grid;
+		grid-template-columns: max-content 1fr;
+		gap: 0.5em 1em;
 	}
 </style>
