@@ -7,7 +7,7 @@
         "@iconify-json/ph": "^1.2.2",
         "@sveltejs/svelte-virtual-list": "^3.0.1",
         "@viselect/vanilla": "^3.9.0",
-        "@wuchale/svelte": "^0.16.3",
+        "@wuchale/svelte": "^0.16.4",
         "arktype": "^2.1.22",
         "bits-ui": "^1.8.0",
         "date-fns": "^4.1.0",
@@ -19,7 +19,6 @@
         "fetch-progress": "git+https://github.com/gwennlbh/fetch-progress#explicit-import-extensions",
         "fflate": "^0.8.2",
         "fuse.js": "^7.1.0",
-        "svelte-mathml": "gwennlbh/svelte-mathml#9a0ff3dced87297077a186ca343b6c6b105320c6",
         "handlebars": "^4.7.8",
         "idb": "^8.0.3",
         "jimp": "^1.6.0",
@@ -30,6 +29,7 @@
         "pica-gpu": "^0.2.0",
         "piexifjs": "^1.0.6",
         "runed": "^0.34.0",
+        "svelte-mathml": "gwennlbh/svelte-mathml#9a0ff3dced87297077a186ca343b6c6b105320c6",
         "sveltejs-tippy": "^3.0.0",
         "swarpc": "^0.14.0",
         "tiny-jsonc": "^1.0.2",
@@ -711,7 +711,7 @@
 
     "@vscode/sudo-prompt": ["@vscode/sudo-prompt@9.3.1", "", {}, "sha512-9ORTwwS74VaTn38tNbQhsA5U44zkJfcb0BdTSyyG6frP4e8KMtHuTXYmwefe5dpL8XB1aGSIVTaLjD3BbWb5iA=="],
 
-    "@wuchale/svelte": ["@wuchale/svelte@0.16.3", "", { "dependencies": { "svelte": "^5.37.0", "wuchale": "^0.17.1" } }, "sha512-aOyqIHXfUhAiOaf8kDhkVxyuzl9e8YG6PSXMst4D/VDGqOT2zdgJS/w411zjlVSLisijDXUTmwElld3V+1tBgg=="],
+    "@wuchale/svelte": ["@wuchale/svelte@0.16.4", "", { "dependencies": { "svelte": "^5.37.0", "wuchale": "^0.17.1" } }, "sha512-DQsbNg9ohFCl/RPfg462BhEkswGUHyCWR3iorWxyit1vRS8WXXkWiKToujYZpG+Ab3keA7QkzNNcBdyQ+BAVOw=="],
 
     "@wuchale/vite-plugin": ["@wuchale/vite-plugin@0.14.7", "", { "dependencies": { "wuchale": "^0.17.0" } }, "sha512-+Jmhc1tnwm0H/wSdQdssfzg82uDc8ky/dU7ONXYiHpCNAeLpHCQhfFdUJVgBbqB6/GZ5T5CGls2nJC0ry5bNrw=="],
 
