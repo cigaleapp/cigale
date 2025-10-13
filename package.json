@@ -112,7 +112,7 @@
 		"prettier-plugin-svelte": "^3.4.0",
 		"rss-parser": "^3.13.0",
 		"svelte": "^5.39.11",
-		"svelte-check": "^4.3.2",
+		"svelte-check": "^4.3.3",
 		"sveltekit-search-params": "^4.0.0-next.0",
 		"tinyexec": "^1.0.1",
 		"turndown": "^7.2.1",
