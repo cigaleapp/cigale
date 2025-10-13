@@ -36,7 +36,7 @@ jobs:
 
       - if: steps.changes.outputs.significant == 'true'
         name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: 🌐 Refresh translation files
           commit_options: --no-verify
