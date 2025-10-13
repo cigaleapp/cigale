@@ -102,7 +102,7 @@
 		"jsdom": "^27.0.0",
 		"json-schema-doc-ts": "^2.0.0",
 		"jszip": "^3.10.1",
-		"knip": "^5.64.1",
+		"knip": "^5.64.3",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.19.0",
 		"pdf-to-png-converter": "^3.10.0",
