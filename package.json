@@ -92,7 +92,7 @@
 		"eslint-plugin-oxlint": "^1.19.0",
 		"eslint-plugin-svelte": "^3.12.4",
 		"extract-zip": "^2.0.1",
-		"fake-indexeddb": "^6.2.2",
+		"fake-indexeddb": "^6.2.3",
 		"gitmoji-cli": "^9.7.0",
 		"globals": "^16.4.0",
 		"google-auth-library": "^10.4.0",
