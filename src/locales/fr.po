@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-14T21:42:14.771Z\n"
+"PO-Revision-Date: 2025-10-14T21:43:29.433Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -292,10 +292,6 @@ msgstr "Chargement du modèle de recadrage…"
 msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
-#: src/routes/(app)/+layout.js
-msgid "Chargement du worker neuronal…"
-msgstr "Chargement du worker neuronal…"
-
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -559,10 +555,6 @@ msgstr "Impossible de charger les dépendances"
 #: src/lib/MetadataInput.svelte
 msgid "Incrémenter"
 msgstr "Incrémenter"
-
-#: src/routes/(app)/+layout.js
-msgid "Initialisation DB du worker neuronal…"
-msgstr "Initialisation DB du worker neuronal…"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation des réglages par défaut…"
@@ -1753,3 +1745,7 @@ msgstr "Nombre de tâches en parallèle"
 #: src/routes/(app)/Settings.svelte
 msgid "Augmenter"
 msgstr "Augmenter"
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation du worker…"
+msgstr "Initialisation du worker…"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-14T21:42:14.774Z\n"
+"PO-Revision-Date: 2025-10-14T21:43:29.436Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -293,10 +293,6 @@ msgstr "Loading cropping model…"
 msgid "Chargement du protocole intégré"
 msgstr "Loading built-in protocol"
 
-#: src/routes/(app)/+layout.js
-msgid "Chargement du worker neuronal…"
-msgstr "Loading neural worker…"
-
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -560,10 +556,6 @@ msgstr "Cannot load dependencies"
 #: src/lib/MetadataInput.svelte
 msgid "Incrémenter"
 msgstr "Increment"
-
-#: src/routes/(app)/+layout.js
-msgid "Initialisation DB du worker neuronal…"
-msgstr "Initializing neural worker's DB…"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation des réglages par défaut…"
@@ -1748,4 +1740,8 @@ msgstr ""
 
 #: src/routes/(app)/Settings.svelte
 msgid "Augmenter"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation du worker…"
 msgstr ""
