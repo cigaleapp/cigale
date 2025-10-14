@@ -10,9 +10,6 @@ console.info(
 
 const gitlog = await x('git', [
 	'log',
-	// Hide commits coming from merges of other branches
-	// https://stackoverflow.com/a/76907455/9943464
-	'--first-parent',
 	`--since=${upTo}`,
 	`--until=${date.format(Date.now(), 'yyyy-MM-dd')}`
 ]).then((result) => result.stdout);
