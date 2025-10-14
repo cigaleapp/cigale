@@ -184,14 +184,6 @@
 	</div>
 	<section class="actions">
 		<ButtonSecondary
-			onclick={async () => {
-				open = false;
-				await goto('/protocols');
-			}}
-		>
-			Gérer les protocoles
-		</ButtonSecondary>
-		<ButtonSecondary
 			onclick={() => {
 				openKeyboardShortcuts?.();
 			}}
