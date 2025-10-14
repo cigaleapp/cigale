@@ -42,18 +42,17 @@ export async function load() {
 		fallback: 1
 	});
 
-	setLoadingMessage('Chargement du worker neuronal…');
+	setLoadingMessage('Initialisation du worker…');
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
 		nodes: parallelism
 	});
 
-	setLoadingMessage('Initialisation DB du worker neuronal…');
-	await swarpc.init.broadcast({ databaseName, databaseRevision });
-
 	try {
 		setLoadingMessage('Initialisation de la base de données…');
+		await swarpc.init.broadcast({ databaseName, databaseRevision });
 		await tables.initialize();
+
 		setLoadingMessage('Chargement des données intégrées…');
 		await loadDefaultProtocol(swarpc);
 		await tables.initialize();
