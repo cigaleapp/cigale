@@ -36,7 +36,11 @@ export async function load() {
 		}[locale]
 	});
 
-	const parallelism = Math.ceil(navigator.hardwareConcurrency / 3);
+	await initializeSettings();
+
+	const parallelism = await getSetting('parallelism', {
+		fallback: 1
+	});
 
 	setLoadingMessage('Chargement du worker neuronal…');
 	const swarpc = Swarpc.Client(PROCEDURES, {
@@ -51,7 +55,7 @@ export async function load() {
 		setLoadingMessage('Initialisation de la base de données…');
 		await tables.initialize();
 		setLoadingMessage('Chargement des données intégrées…');
-		await fillBuiltinData(swarpc);
+		await loadDefaultProtocol(swarpc);
 		await tables.initialize();
 	} catch (e) {
 		console.error(e);
@@ -63,11 +67,7 @@ export async function load() {
 	return { swarpc, parallelism };
 }
 
-/**
- *
- * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
- */
-async function fillBuiltinData(swarpc) {
+async function initializeSettings() {
 	setLoadingMessage('Initialisation des réglages par défaut…');
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
 		await tx.objectStore('Settings').put({
@@ -83,11 +83,16 @@ async function fillBuiltinData(swarpc) {
 			gallerySort: { key: 'date', direction: 'asc' }
 		});
 	});
+}
 
+/**
+ *
+ * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
+ */
+async function loadDefaultProtocol(swarpc) {
 	setLoadingMessage('Chargement du protocole intégré');
 
 	const protocolsCount = await tables.Protocol.count();
-
 	if (protocolsCount === 0) {
 		try {
 			const contents = await fetch(

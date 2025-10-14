@@ -2,6 +2,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { href } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
@@ -9,7 +10,9 @@
 	import { watch } from 'runed';
 	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
 	import Gears from '~icons/ph/gear-light';
+	import IconDecrease from '~icons/ph/minus';
 	import Moon from '~icons/ph/moon-light';
+	import IconIncrease from '~icons/ph/plus';
 	import IconSortAsc from '~icons/ph/sort-ascending';
 	import IconSortDesc from '~icons/ph/sort-descending';
 	import Sun from '~icons/ph/sun-light';
@@ -181,6 +184,37 @@
 				{/snippet}
 			</SegmentedGroup>
 		</div>
+		<div class="label">
+			Parallélisme
+			<p class="details">Nombre de tâches en parallèle</p>
+		</div>
+		<div class="setting">
+			<ButtonIcon
+				help="Réduire"
+				onclick={async () => {
+					await setSetting('parallelism', Math.max(1, getSettings().parallelism - 1));
+				}}
+			>
+				<IconDecrease />
+			</ButtonIcon>
+			<div class="number-input">
+				<InlineTextInput
+					label="Nombre de tâches en parallèle"
+					value={getSettings().parallelism}
+					onblur={async (value) => {
+						await setSetting('parallelism', Number.parseInt(value));
+					}}
+				/>
+			</div>
+			<ButtonIcon
+				help="Augmenter"
+				onclick={async () => {
+					await setSetting('parallelism', getSettings().parallelism + 1);
+				}}
+			>
+				<IconIncrease />
+			</ButtonIcon>
+		</div>
 	</div>
 	<section class="actions">
 		<ButtonSecondary
@@ -230,8 +264,7 @@
 		margin-right: 0;
 		display: flex;
 		flex-direction: column;
-		padding-left: 25px;
-		padding-right: 25px;
+		padding: 2rem;
 		z-index: 2;
 		background-color: var(--bg-primary-translucent);
 		border-bottom-left-radius: 5px;
@@ -241,7 +274,6 @@
 	header {
 		font-size: 1.5em;
 		font-weight: bold;
-		margin-top: 0.5em;
 		margin-bottom: 0.5em;
 		color: var(--fg-primary);
 	}
@@ -255,11 +287,29 @@
 	.listParam > div {
 		display: flex;
 		align-items: center;
-		gap: 1em;
+		gap: 0 1em;
 	}
 
 	.listParam .label {
 		font-weight: bold;
+		flex-wrap: wrap;
+		max-width: 10rem;
+	}
+
+	.listParam .label .details {
+		font-weight: normal;
+		font-size: 0.8em;
+	}
+
+	.listParam .setting {
+		max-width: 12rem;
+	}
+
+	.listParam .number-input {
+		font-family: var(--font-mono);
+		width: 3ch;
+		font-size: 1.4em;
+		font-weight: 200;
 	}
 
 	.actions {
