@@ -2,7 +2,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import { goto, href } from '$lib/paths.js';
+	import { href } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
