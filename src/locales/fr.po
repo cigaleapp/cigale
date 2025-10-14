@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-14T21:15:42.315Z\n"
+"PO-Revision-Date: 2025-10-14T21:42:14.771Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1737,3 +1737,19 @@ msgstr "Metadata {0} for protocol {1} not found"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
 msgid "Option not found"
 msgstr "Option not found"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Parallélisme <0>Nombre de tâches en parallèle</0>"
+msgstr "Parallélisme <0>Nombre de tâches en parallèle</0>"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Réduire"
+msgstr "Réduire"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Nombre de tâches en parallèle"
+msgstr "Nombre de tâches en parallèle"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Augmenter"
+msgstr "Augmenter"

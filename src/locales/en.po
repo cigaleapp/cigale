@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-14T21:15:42.318Z\n"
+"PO-Revision-Date: 2025-10-14T21:42:14.774Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1732,4 +1732,20 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
 msgid "Option not found"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Parallélisme <0>Nombre de tâches en parallèle</0>"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Réduire"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Nombre de tâches en parallèle"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Augmenter"
 msgstr ""
