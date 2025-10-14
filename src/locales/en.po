@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-12T22:54:49.860Z\n"
+"PO-Revision-Date: 2025-10-14T21:15:42.318Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -490,7 +490,6 @@ msgid "Grâce aux bibliothèques"
 msgstr "Thanks to libraries"
 
 #: src/routes/(app)/Navigation.svelte
-#: src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Manage protocols"
 

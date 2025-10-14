@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-12T22:54:49.858Z\n"
+"PO-Revision-Date: 2025-10-14T21:15:42.315Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -489,7 +489,6 @@ msgid "Grâce aux bibliothèques"
 msgstr "Grâce aux bibliothèques"
 
 #: src/routes/(app)/Navigation.svelte
-#: src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Gérer les protocoles"
 
