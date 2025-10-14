@@ -26,9 +26,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Improve other model setting inputs
 - Improve style of arrays in protocol changes-with-remote list
 - Make debug dumps smaller in preview panel
+- Make parallelism configurable (Closes #700) (#767)
 - Make version input monospace
 - Put number of cards in grouped grid headings in monospace font
 - Put search bar above new option field in options edition page
+- Remove Manage protocols button on settings flyout
 - Show options count on metadata navbar
 - Switch monospace font to Martian Mono
 - Tweak text styles in /about
