@@ -133,6 +133,14 @@ const Settings = table(
 		showInputHints: 'boolean',
 		showTechnicalMetadata: 'boolean',
 		cropAutoNext: 'boolean = false',
+		parallelism: type('number').default(() => {
+			try {
+				return Math.ceil(navigator.hardwareConcurrency / 3);
+			} catch (e) {
+				console.warn("Couldn't get navigator.hardwareConcurrency, defaulting to 1", e);
+				return 1;
+			}
+		}),
 		gallerySort: type({
 			direction: type.enumerated('asc', 'desc'),
 			key: type.enumerated('filename', 'date')
