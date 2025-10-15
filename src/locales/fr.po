@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-14T21:43:29.433Z\n"
+"PO-Revision-Date: 2025-10-15T22:39:26.497Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1749,3 +1749,21 @@ msgstr "Augmenter"
 #: src/routes/(app)/+layout.js
 msgid "Initialisation du worker…"
 msgstr "Initialisation du worker…"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 élément"
+msgid_plural "# éléments"
+msgstr[0] "1 élément"
+msgstr[1] "# éléments"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 image"
+msgid_plural "# images"
+msgstr[0] "1 image"
+msgstr[1] "# images"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 observation"
+msgid_plural "# observations"
+msgstr[0] "1 observation"
+msgstr[1] "# observations"

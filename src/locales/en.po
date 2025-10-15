@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-14T21:43:29.436Z\n"
+"PO-Revision-Date: 2025-10-15T22:39:26.500Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1745,3 +1745,21 @@ msgstr ""
 #: src/routes/(app)/+layout.js
 msgid "Initialisation du worker…"
 msgstr ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 élément"
+msgid_plural "# éléments"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 image"
+msgid_plural "# images"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 observation"
+msgid_plural "# observations"
+msgstr[0] ""
+msgstr[1] ""
