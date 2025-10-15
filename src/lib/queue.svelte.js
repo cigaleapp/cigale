@@ -1,7 +1,8 @@
 import { classifyImage } from './classification.svelte';
-import { errorMessage } from './i18n';
+import { errorMessage, plural } from './i18n';
 import { imageFileId } from './images';
 import { inferBoundingBoxes, processImageFile } from './import.svelte';
+import { sendNotification } from './notifications';
 import { importResultsZip } from './results.svelte';
 import { uiState } from './state.svelte';
 import { isZip, range } from './utils.js';
@@ -20,6 +21,7 @@ let processingQueue;
  * @property {string} detection.fileId
  * @property {object} [classification]
  * @property {string} classification.imageId
+ * @property {() => Promise<void>} [ondone] called when the task is done (success or failure)
  */
 
 class ProcessingQueue {
@@ -270,15 +272,38 @@ export function cancelTask(subjectId, reason) {
 }
 
 /**
+ *
+ * @param {ProcessingQueueTask[]} tasks
+ * @param {{title: string} & NotificationOptions} notification when batch is done
+ */
+function scheduleBatch(tasks, { title, ...options }) {
+	Promise.all(
+		tasks.map((task) => {
+			assertQueueInitialized(processingQueue);
+			processingQueue.push(task);
+		})
+	).then(() => {
+		sendNotification(title, {
+			icon: '/icon.png',
+			badge: '/badge.png',
+			...options
+		});
+	});
+}
+
+/**
  * Import new files and add them to the processing queue.
  * @param {File[]} files
  */
 export function importMore(files) {
-	assertQueueInitialized(processingQueue);
-
-	for (const file of files) {
-		processingQueue.push({ importing: { file, id: imageFileId() } });
-	}
+	scheduleBatch(
+		files.map((file) => ({ importing: { file, id: imageFileId() } })),
+		{
+			title: 'Import des images terminé',
+			body: plural(files.length, ['1 image importée', `# images importées`]),
+			tag: 'import-complete'
+		}
+	);
 }
 
 /**
@@ -286,11 +311,14 @@ export function importMore(files) {
  * @param {string[]} fileIds
  */
 export function detectMore(fileIds) {
-	assertQueueInitialized(processingQueue);
-
-	for (const fileId of fileIds) {
-		processingQueue.push({ detection: { fileId } });
-	}
+	scheduleBatch(
+		fileIds.map((fileId) => ({ detection: { fileId } })),
+		{
+			title: 'Détection terminée',
+			body: plural(fileIds.length, ['1 image traitée', `# images traitées`]),
+			tag: 'detection-complete'
+		}
+	);
 }
 
 /**
@@ -298,13 +326,14 @@ export function detectMore(fileIds) {
  * @param  {string[]} imageIds
  */
 export function classifyMore(imageIds) {
-	assertQueueInitialized(processingQueue);
-
-	for (const imageId of imageIds) {
-		processingQueue.push({
-			classification: { imageId }
-		});
-	}
+	scheduleBatch(
+		imageIds.map((imageId) => ({ classification: { imageId } })),
+		{
+			title: 'Classification terminée',
+			body: plural(imageIds.length, ['1 image classée', `# images classées`]),
+			tag: 'classification-complete'
+		}
+	);
 }
 
 /**

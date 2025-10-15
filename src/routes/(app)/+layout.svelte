@@ -9,15 +9,18 @@
 	import { watch } from 'runed';
 	import { onDestroy, onMount, setContext } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
+	import { slide } from 'svelte/transition';
 
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import ButtonInk from '$lib/ButtonInk.svelte';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
-	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
+	import { getColorScheme, getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import Toast from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -165,6 +168,21 @@
 	{@render children?.()}
 </div>
 
+{#if getSettings().notifications === null}
+	<div class="nagbar" transition:slide={{ axis: 'y', duration: 100 }}>
+		Activer les notifications pour savoir quand un traitement est terminé.
+		<ButtonInk
+			onclick={async () => {
+				await askForNotificationPermission();
+				setSetting('notifications', hasNotificationsEnabled());
+			}}
+		>
+			Activer
+		</ButtonInk>
+		<ButtonInk onclick={() => setSetting('notifications', false)}>Non merci</ButtonInk>
+	</div>
+{/if}
+
 <style>
 	.toasts {
 		position: fixed;
@@ -193,5 +211,18 @@
 
 	.contents.padded {
 		padding: 1.2em;
+	}
+
+	.nagbar {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		align-items: center;
+		gap: 1em;
+		justify-content: center;
+		padding: 0.5em;
+		background-color: var(--bg-primary-translucent);
 	}
 </style>

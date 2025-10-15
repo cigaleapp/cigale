@@ -15,6 +15,8 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+
+	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -27,6 +29,8 @@
 	let open = $state(false);
 	/** @type {HTMLDialogElement|undefined} */
 	let dialogElement = $state();
+
+	const notificationsEnabled = $derived(hasNotificationsEnabled() && getSettings().notifications);
 
 	$effect(() => {
 		window.addEventListener('mouseup', ({ target }) => {
@@ -108,6 +112,24 @@
 			>
 				<IconSyncWithSystemTheme />
 			</ButtonIcon>
+		</div>
+		<div class="label">
+			Notifications
+			<p class="details">Quand un traitement est terminé</p>
+		</div>
+		<div class="setting">
+			<Switch
+				data-testid="notifications"
+				value={notificationsEnabled}
+				onchange={async (enabled) => {
+					if (enabled) {
+						await askForNotificationPermission();
+						setSetting('notifications', hasNotificationsEnabled());
+					} else {
+						setSetting('notifications', false);
+					}
+				}}
+			/>
 		</div>
 		<div class="label">Mode debug</div>
 		<div class="setting">
