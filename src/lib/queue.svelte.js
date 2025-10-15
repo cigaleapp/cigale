@@ -283,6 +283,7 @@ function scheduleBatch(tasks, { title, ...options }) {
 			processingQueue.push(task);
 		})
 	).then(() => {
+		if (tasks.length === 0) return;
 		sendNotification(title, {
 			icon: '/icon.png',
 			badge: '/badge.png',
