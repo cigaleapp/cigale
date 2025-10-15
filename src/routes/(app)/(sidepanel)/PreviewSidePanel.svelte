@@ -4,7 +4,7 @@
 	 */
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { countThings } from '$lib/i18n';
+	import { plural } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
 	import * as idb from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -14,7 +14,6 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
 	import IconSplit from '~icons/ph/arrows-out-light';
@@ -112,7 +111,10 @@
 			.length,
 		observation: uiState.selection.filter((id) =>
 			tables.Observation.state.some((obs) => obs.id === id)
-		).length
+		).length,
+		get all() {
+			return this.image + this.observation;
+		}
 	});
 </script>
 
@@ -152,8 +154,12 @@
 			{:else if singleImageSelected}
 				<IconImage />
 				{singleImageSelected.filename}
-			{:else}
-				{countThings(selectionCounts)}
+			{:else if selectionCounts.image > 0 && selectionCounts.observation > 0}
+				{plural(selectionCounts.all, ['1 élément', '# éléments'])}
+			{:else if selectionCounts.image > 0}
+				{plural(selectionCounts.image, ['1 image', '# images'])}
+			{:else if selectionCounts.observation > 0}
+				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
 			{/if}
 		</h2>
 		<MetadataList>

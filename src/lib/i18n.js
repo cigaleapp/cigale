@@ -3,57 +3,6 @@
  */
 
 /**
- * Return a ", "-separated list of "{count} {thing}" strings, with thing set to plural.
- * If thing is found in plurals, use that, otherwise use "{thing}s".
- * @param {Record<string, number>} things
- * @param {Record<string, string>} [plurals]
- */
-export function countThings(things, plurals) {
-	return Object.entries(things)
-		.filter(([, count]) => count > 0)
-		.map(([thing, count]) => {
-			let counted = thing;
-			if (count > 1) {
-				counted = plurals?.[thing] ?? `${thing}s`;
-			}
-
-			return `${count} ${counted}`;
-		})
-		.join(', ');
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-
-	test('countThings', () => {
-		expect(countThings({ a: 1, b: 2, c: 0 })).toBe('1 a, 2 bs');
-		expect(countThings({ a: 1, b: 2, c: 0 }, { b: 'foo' })).toBe('1 a, 2 foo');
-		expect(countThings({ a: 1, b: 2, c: 0 }, { a: 'a', b: 'b' })).toBe('1 a, 2 b');
-	});
-}
-
-/**
- *
- * @param {string} name
- * @param {number} count
- * @param {Record<string, string>} [plurals]
- */
-export function countThing(name, count, plurals) {
-	return countThings({ [name]: count }, plurals);
-}
-
-if (import.meta.vitest) {
-	const { test, expect } = import.meta.vitest;
-	test('countThing', () => {
-		expect(countThing('item', 1)).toBe('1 item');
-		expect(countThing('item', 2)).toBe('2 items');
-		expect(countThing('item', 0)).toBe('');
-		expect(countThing('child', 3, { child: 'children' })).toBe('3 children');
-		expect(countThing('person', 1, { person: 'people' })).toBe('1 person');
-	});
-}
-
-/**
  * Pluralizes a string based on a number and a list of candidate strings.
  * @see https://wuchale.dev/guides/plurals/#usage
  * @param {number} num
@@ -101,6 +50,18 @@ if (import.meta.vitest) {
 		expect(percent(0.05, 1, { pad: 'zeros' })).toBe('005%'); // 5.0 -> 5 -> 005
 		expect(percent(0.05, 0, { pad: 'nbsp' })).toBe('\u00A05%');
 	});
+}
+
+/**
+ *
+ * @param {Language} locale
+ * @param {'and'|'or'|'unit'} type
+ * @param {string[]} texts
+ */
+export function humanJoin(locale, type, texts) {
+	return new Intl.ListFormat(locale, {
+		type: type === 'and' ? 'conjunction' : type === 'or' ? 'disjunction' : 'unit'
+	}).format(texts);
 }
 
 /**
