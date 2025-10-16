@@ -53,18 +53,6 @@ if (import.meta.vitest) {
 }
 
 /**
- *
- * @param {Language} locale
- * @param {'and'|'or'|'unit'} type
- * @param {string[]} texts
- */
-export function humanJoin(locale, type, texts) {
-	return new Intl.ListFormat(locale, {
-		type: type === 'and' ? 'conjunction' : type === 'or' ? 'disjunction' : 'unit'
-	}).format(texts);
-}
-
-/**
  * Returns a human-readable name for a content type.
  * @param {string} contentType Content type, of the form type/subtype
  */
