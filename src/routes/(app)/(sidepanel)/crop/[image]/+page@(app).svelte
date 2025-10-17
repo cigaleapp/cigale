@@ -4,7 +4,6 @@
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
-	import { goto } from '$lib/paths.js';
 	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
@@ -43,6 +42,7 @@
 		hasRuntimeType,
 		storeMetadataValue
 	} from '$lib/metadata';
+	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -55,7 +55,6 @@
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
-	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFocus from '~icons/ph/crosshair-simple';
 	import IconNeuralNet from '~icons/ph/graph';
