@@ -1041,7 +1041,8 @@
 					help="Image précédente"
 					keyboard="ArrowLeft"
 					onclick={() => {
-						goto(`#/crop/${prevFileId}`);
+						if (!prevFileId) return;
+						goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId });
 					}}
 				>
 					<IconPrev />
@@ -1056,7 +1057,8 @@
 					help="Image suivante"
 					keyboard="ArrowRight"
 					onclick={() => {
-						goto(`#/crop/${nextFileId}`);
+						if (!nextFileId) return;
+						goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId });
 					}}
 				>
 					<IconNext />
