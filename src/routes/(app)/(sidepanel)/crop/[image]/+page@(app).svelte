@@ -43,7 +43,6 @@
 		hasRuntimeType,
 		storeMetadataValue
 	} from '$lib/metadata';
-
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -1086,7 +1085,6 @@
 					keyboard="Space"
 					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
 				>
-					<IconContinue />
 					Continuer
 				</ButtonSecondary>
 			</div>
