@@ -32,11 +32,6 @@ Available CSS variables:
 	class="card"
 	{onclick}
 	tabindex={clickable ? 0 : undefined}
-	onkeypress={(e) => {
-		if (e.key === 'Enter') {
-			onclick?.();
-		}
-	}}
 >
 	{@render children?.()}
 </svelte:element>
