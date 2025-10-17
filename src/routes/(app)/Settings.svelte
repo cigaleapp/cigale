@@ -36,6 +36,9 @@
 		});
 	});
 
+	const { theme, showTechnicalMetadata, gallerySort, gridSize, language, parallelism } =
+		$derived(getSettings());
+
 	let systemIsLight = $state(true);
 	$effect(() => {
 		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
@@ -76,7 +79,7 @@
 </ButtonIcon>
 
 <dialog
-	data-theme={getSettings().theme}
+	data-theme={theme}
 	class="container"
 	data-testid="app-settings"
 	open={open ? true : undefined}
@@ -87,16 +90,14 @@
 		<div class="label">Thème</div>
 		<div class="setting">
 			<Switch
-				value={getSettings().theme === 'auto'
-					? systemIsLight
-					: getSettings().theme === 'light'}
+				value={theme === 'auto' ? systemIsLight : theme === 'light'}
 				onchange={async (isLight) => {
 					await setSetting('theme', isLight ? 'light' : 'dark');
 				}}
 				icons={{ on: Sun, off: Moon }}
 			></Switch>
 			<ButtonIcon
-				disabled={getSettings().theme === 'auto'}
+				disabled={theme === 'auto'}
 				onclick={async () => await setSetting('theme', 'auto')}
 				help="Synchroniser avec le thème du système"
 			>
@@ -107,7 +108,7 @@
 		<div class="setting">
 			<Switch
 				data-testid="debug-mode"
-				value={getSettings().showTechnicalMetadata}
+				value={showTechnicalMetadata}
 				onchange={async (show) => {
 					await setSetting('showTechnicalMetadata', show);
 				}}
@@ -119,8 +120,8 @@
 				aria-label="Par quoi trier"
 				options={['filename', 'date']}
 				bind:value={
-					() => getSettings().gallerySort.key,
-					(key) => setSetting('gallerySort', { ...getSettings().gallerySort, key })
+					() => gallerySort.key,
+					(key) => setSetting('gallerySort', { ...gallerySort, key })
 				}
 				labels={{ filename: 'Fichier', date: 'Date' }}
 			/>
@@ -128,14 +129,14 @@
 				data-testid="toggle-sort-direction"
 				onclick={async () =>
 					await setSetting('gallerySort', {
-						...getSettings().gallerySort,
-						direction: getSettings().gallerySort.direction === 'asc' ? 'desc' : 'asc'
+						...gallerySort,
+						direction: gallerySort.direction === 'asc' ? 'desc' : 'asc'
 					})}
-				help={getSettings().gallerySort.direction === 'asc'
+				help={gallerySort.direction === 'asc'
 					? 'Trier par ordre décroissant'
 					: 'Trier par ordre croissant'}
 			>
-				{#if getSettings().gallerySort.direction === 'asc'}
+				{#if gallerySort.direction === 'asc'}
 					<IconSortAsc />
 				{:else}
 					<IconSortDesc />
@@ -151,14 +152,14 @@
 				step="0.01"
 				list="gridsize-marks"
 				bind:value={
-					() => getSettings().gridSize,
+					() => gridSize,
 					(value) => {
 						// Don't write to database too eagerly, it lags the UI
 						const settings = tables.Settings.state;
 						settings[settings.findIndex((s) => s.id === 'user')].gridSize = value;
 					}
 				}
-				onblur={async () => setSetting('gridSize', getSettings().gridSize)}
+				onblur={async () => setSetting('gridSize', gridSize)}
 			/>
 			<datalist id="gridsize-marks">
 				<option value="1"></option>
@@ -171,7 +172,7 @@
 				aria-label="Langue de l'interface"
 				clickable-custom-options
 				options={['en', 'fr']}
-				value={getSettings().language}
+				value={language}
 				onchange={async (code) => {
 					await setSetting('language', code);
 					window.location.reload();
@@ -192,7 +193,7 @@
 			<ButtonIcon
 				help="Réduire"
 				onclick={async () => {
-					await setSetting('parallelism', Math.max(1, getSettings().parallelism - 1));
+					await setSetting('parallelism', Math.max(1, parallelism - 1));
 				}}
 			>
 				<IconDecrease />
@@ -200,7 +201,7 @@
 			<div class="number-input">
 				<InlineTextInput
 					label="Nombre de tâches en parallèle"
-					value={getSettings().parallelism}
+					value={parallelism}
 					onblur={async (value) => {
 						await setSetting('parallelism', Number.parseInt(value));
 					}}
@@ -209,7 +210,7 @@
 			<ButtonIcon
 				help="Augmenter"
 				onclick={async () => {
-					await setSetting('parallelism', getSettings().parallelism + 1);
+					await setSetting('parallelism', parallelism + 1);
 				}}
 			>
 				<IconIncrease />
