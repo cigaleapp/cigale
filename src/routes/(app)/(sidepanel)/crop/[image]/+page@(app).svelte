@@ -1046,8 +1046,10 @@
 				>
 					<IconPrev />
 				</ButtonIcon>
-				<code>
-					{sortedFileIds.indexOf(fileId) + 1}⁄{sortedFileIds.length}
+				<code class="numbers">
+					{sortedFileIds.indexOf(fileId) + 1}
+					<div class="separator">⁄</div>
+					{sortedFileIds.length}
 				</code>
 				<ButtonIcon
 					disabled={!nextFileId}
@@ -1356,6 +1358,12 @@
 
 	.info nav .navigation {
 		gap: 0.25em;
+	}
+
+	.info nav .navigation .numbers {
+		display: flex;
+		align-self: center;
+		white-space: nowrap;
 	}
 
 	.info nav .continue {
