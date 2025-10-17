@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-15T22:39:26.500Z\n"
+"PO-Revision-Date: 2025-10-17T23:03:17.736Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -28,10 +28,6 @@ msgstr "<0/> C.i.g.a.l.e."
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "<0/> Continuer"
-msgstr "<0/> Continue"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Créer"
@@ -350,6 +346,7 @@ msgstr "Color Palette"
 msgid "Confirmé"
 msgstr "Confirmed"
 
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Continuer"
 msgstr "Continue"
