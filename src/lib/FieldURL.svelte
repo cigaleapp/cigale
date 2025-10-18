@@ -1,10 +1,10 @@
 <script>
 	import Field from './Field.svelte';
 	import InlineTextInput from './InlineTextInput.svelte';
-	import IconOpenExternal from '~icons/ph/arrow-square-out';
-	import IconSuccess from '~icons/ph/check';
-	import IconFail from '~icons/ph/x';
-	import IconChecking from '~icons/ph/dots-three';
+	import IconOpenExternal from '~icons/ri/external-link-fill';
+	import IconSuccess from '~icons/ri/check-line';
+	import IconFail from '~icons/ri/close-line';
+	import IconChecking from '~icons/ri/more-fill';
 	import ButtonIcon from './ButtonIcon.svelte';
 
 	/**

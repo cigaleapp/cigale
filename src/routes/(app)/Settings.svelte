@@ -8,15 +8,15 @@
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { watch } from 'runed';
-	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
-	import Gears from '~icons/ph/gear-light';
-	import IconDecrease from '~icons/ph/minus';
-	import Moon from '~icons/ph/moon-light';
-	import IconIncrease from '~icons/ph/plus';
-	import IconSortAsc from '~icons/ph/sort-ascending';
-	import IconSortDesc from '~icons/ph/sort-descending';
-	import Sun from '~icons/ph/sun-light';
-	import Cross from '~icons/ph/x-circle-light';
+	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
+	import Gears from '~icons/ri/settings-3-line';
+	import IconDecrease from '~icons/ri/subtract-line';
+	import Moon from '~icons/ri/moon-line';
+	import IconIncrease from '~icons/ri/add-line';
+	import IconSortAsc from '~icons/ri/sort-asc';
+	import IconSortDesc from '~icons/ri/sort-desc';
+	import Sun from '~icons/ri/sun-line';
+	import Cross from '~icons/ri/close-circle-line';
 
 	/**
 	 * @type {{openKeyboardShortcuts?: (() => void) | undefined, openPrepareForOfflineUse?: (() => void) | undefined}}

@@ -16,7 +16,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { tick } from 'svelte';
-	import Download from '~icons/ph/download-simple';
+	import Download from '~icons/ri/download-2-line';
 
 	// TODO show download size estimates
 

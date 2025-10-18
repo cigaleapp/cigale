@@ -6,10 +6,10 @@
 	import { METADATA_TYPES, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips.js';
-	import IconInfo from '~icons/ph/info';
-	import IconOptions from '~icons/ph/list-dashes';
-	import IconInference from '~icons/ph/magic-wand';
-	import IconCascades from '~icons/ph/tree-view';
+	import IconInfo from '~icons/ri/information-2-line';
+	import IconOptions from '~icons/ri/list-unordered';
+	import IconInference from '~icons/ri/sparkling-line';
+	import IconCascades from '~icons/ri/node-tree';
 	import { updater } from './updater.svelte.js';
 	import { getSettings } from '$lib/settings.svelte.js';
 	import { fade } from 'svelte/transition';

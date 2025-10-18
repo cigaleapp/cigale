@@ -13,11 +13,10 @@
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp } from '$lib/utils';
-	import IconSelect from '~icons/ph/caret-down';
-	import IconNext from '~icons/ph/caret-right';
-	import IconCheck from '~icons/ph/check';
-	import IconDownload from '~icons/ph/download-simple';
-	import IconNoInference from '~icons/ph/lightning-slash';
+	import IconSelect from '~icons/ri/arrow-down-s-line';
+	import IconNext from '~icons/ri/arrow-right-s-line';
+	import IconCheck from '~icons/ri/check-line';
+	import IconDownload from '~icons/ri/download-2-line';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
@@ -193,8 +192,6 @@
 				</a>
 				{@render inferenceSettings(
 					'crop',
-					uiState.cropInferenceAvailable,
-					'La détection est désactivée ou indisponible',
 					uiState.cropModels,
 					uiState.selectedCropModel,
 					(i) => uiState.setModelSelections({ crop: i })
@@ -223,8 +220,6 @@
 				</a>
 				{@render inferenceSettings(
 					'classify',
-					uiState.classificationInferenceAvailable,
-					'La classification est désactivée ou indisponible',
 					uiState.classificationModels,
 					uiState.selectedClassificationModel,
 					(i) => uiState.setModelSelections({ classification: i })
@@ -252,49 +247,43 @@
 
 {#snippet inferenceSettings(
 	/** @type {'crop'|'classify'} */ tab,
-	/** @type {boolean} */ available,
-	/** @type {string} */ help,
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */ models,
 	/** @type {number} */ currentModelIndex,
 	/** @type {(i: number) => void }*/ setSelection
 )}
-	<div class="inference" use:tooltip={models.length > 0 ? undefined : help}>
+	<div class="inference">
 		{#if uiState.currentProtocol}
-			{#if models.length > 0}
-				<DropdownMenu
-					data-testid="{tab}-model-select"
-					help="Modèle d'inférence"
-					items={[
-						{
-							i: -1,
-							label: 'Aucune inférence',
-							onclick: () => setSelection(-1)
-						},
-						...models.map((model, i) => ({
-							i,
-							label: model.name ?? '',
-							onclick: () => setSelection(i)
-						}))
-					]}
-				>
-					{#snippet trigger(props)}
-						<!-- {JSON.stringify(props)} -->
-						<ButtonIcon help="" {...props}>
-							<IconSelect />
-						</ButtonIcon>
-					{/snippet}
-					{#snippet item({ label, i })}
-						<div class="selected-model-indicator">
-							{#if i === currentModelIndex}
-								<IconCheck />
-							{/if}
-						</div>
-						{label}
-					{/snippet}
-				</DropdownMenu>
-			{:else if !available}
-				<IconNoInference />
-			{/if}
+			<DropdownMenu
+				data-testid="{tab}-model-select"
+				help="Modèle d'inférence"
+				items={[
+					{
+						i: -1,
+						label: 'Aucune inférence',
+						onclick: () => setSelection(-1)
+					},
+					...models.map((model, i) => ({
+						i,
+						label: model.name ?? '',
+						onclick: () => setSelection(i)
+					}))
+				]}
+			>
+				{#snippet trigger(props)}
+					<!-- {JSON.stringify(props)} -->
+					<ButtonIcon help="" {...props}>
+						<IconSelect />
+					</ButtonIcon>
+				{/snippet}
+				{#snippet item({ label, i })}
+					<div class="selected-model-indicator">
+						{#if i === currentModelIndex}
+							<IconCheck />
+						{/if}
+					</div>
+					{label}
+				{/snippet}
+			</DropdownMenu>
 		{/if}
 	</div>
 {/snippet}

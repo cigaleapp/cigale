@@ -1,6 +1,6 @@
 <script>
 	import {} from 'svelte';
-	import IconError from '~icons/ph/x';
+	import IconError from '~icons/ri/close-line';
 
 	/**
 	 * @import { Snippet, Component } from 'svelte';

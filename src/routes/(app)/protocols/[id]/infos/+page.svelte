@@ -2,13 +2,13 @@
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import IconLearnMore from '~icons/ph/info';
-	import IconAuthors from '~icons/ph/users';
+	import IconLearnMore from '~icons/ri/information-2-line';
+	import IconAuthors from '~icons/ri/group-line';
 	import { updater } from '../updater.svelte.js';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import IconRemove from '~icons/ph/minus-circle';
-	import IconAdd from '~icons/ph/plus';
-	import IconDescription from '~icons/ph/text-align-left';
+	import IconRemove from '~icons/ri/indeterminate-circle-line';
+	import IconAdd from '~icons/ri/add-line';
+	import IconDescription from '~icons/ri/align-left';
 	import { fade } from 'svelte/transition';
 
 	/**

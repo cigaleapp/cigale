@@ -2,7 +2,7 @@
 	"cssvar.extensions": ["css", "svelte"],
 	"cssvar.files": ["packages/app/src/routes/style.css"],
 	"iconify.delimiters": ["/"],
-	"iconify.includes": ["ph"],
+	"iconify.includes": ["ph", "ri"],
 	"emmet.syntaxProfiles": {
 		"html": {
 			"compactBooleanAttributes": true

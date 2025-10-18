@@ -8,13 +8,13 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { entries } from '$lib/utils.js';
 	import { fade } from 'svelte/transition';
-	import IconZipFile from '~icons/ph/file-archive';
-	import IconJsonFile from '~icons/ph/file-code';
-	import IconCsvFile from '~icons/ph/file-csv';
-	import IconFolder from '~icons/ph/folder';
-	import IconFolderNew from '~icons/ph/folder-simple-dashed';
-	import IconFullImage from '~icons/ph/image';
-	import IconCroppedImage from '~icons/ph/image-square';
+	import IconZipFile from '~icons/ri/file-zip-line';
+	import IconJsonFile from '~icons/ri/file-code-line';
+	import IconCsvFile from '~icons/ri/file-chart-line';
+	import IconFolder from '~icons/ri/folder-2-line';
+	import IconFolderNew from '~icons/ri/folder-add-line';
+	import IconFullImage from '~icons/ri/image-2-line';
+	import IconCroppedImage from '~icons/ri/crop-line';
 
 	/**
 	 * @import { TreeNode, NodeProvenance } from './utils.js';
