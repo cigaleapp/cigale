@@ -267,7 +267,7 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 	]);
 
 	const optionsTotalCount = sum(
-		metadataIds.values().map((metadataId) => {
+		[...metadataIds].map((metadataId) => {
 			if (!remoteProtocol.metadata[metadataId]) return 0;
 			if (!localProtocol.metadata[metadataId]) return 0;
 
