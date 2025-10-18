@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-17T23:03:17.734Z\n"
+"PO-Revision-Date: 2025-10-18T14:19:38.422Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -122,10 +122,6 @@ msgstr "<0/> results.zip"
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> threads"
 msgstr "<0/> threads"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "<0>Phosphor Icons</0> par <1>Helena Zhang</1> et <2>Tobias Fried</2>"
-msgstr "<0>Phosphor Icons</0> par <1>Helena Zhang</1> et <2>Tobias Fried</2>"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "API de GBIF"
@@ -1764,3 +1760,7 @@ msgid "1 observation"
 msgid_plural "# observations"
 msgstr[0] "1 observation"
 msgstr[1] "# observations"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
+msgstr "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-17T23:03:17.736Z\n"
+"PO-Revision-Date: 2025-10-18T14:19:38.425Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -123,10 +123,6 @@ msgstr "<0/> results.zip"
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> threads"
 msgstr "<0/> threads"
-
-#: src/routes/(app)/about/+page.svelte
-msgid "<0>Phosphor Icons</0> par <1>Helena Zhang</1> et <2>Tobias Fried</2>"
-msgstr "<0>Phosphor Icons</0> by <1>Helena Zhang</1> and <2>Tobias Fried</2>"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "API de GBIF"
@@ -1760,3 +1756,7 @@ msgid "1 observation"
 msgid_plural "# observations"
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/routes/(app)/about/+page.svelte
+msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
+msgstr ""
