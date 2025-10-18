@@ -106,6 +106,12 @@
 		margin: 0 0.2em;
 	}
 
+	:global(kbd, kbd *) {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: normal;
+	}
+
 	kbd.hint kbd {
 		color: var(--fg-primary);
 	}
