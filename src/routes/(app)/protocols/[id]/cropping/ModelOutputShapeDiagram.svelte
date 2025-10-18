@@ -6,10 +6,10 @@
 	import { MODEL_DETECTION_OUTPUT_SHAPES } from '$lib/schemas/protocols.js';
 	import { tooltip } from '$lib/tooltips';
 	import { entries } from '$lib/utils.js';
-	import IconEdit from '~icons/ph/pencil';
+	import IconEdit from '~icons/ri/pencil-line';
 	import { Popover } from 'bits-ui';
 	import { SvelteSet } from 'svelte/reactivity';
-	import IconTrash from '~icons/ph/trash';
+	import IconTrash from '~icons/ri/delete-bin-line';
 	import MorphArrow from './MorphArrow.svelte';
 	import ShapeAtomDisplay from './ShapeAtomDisplay.svelte';
 

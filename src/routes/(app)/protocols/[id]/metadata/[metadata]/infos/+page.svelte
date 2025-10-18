@@ -13,12 +13,12 @@
 	import Switch from '$lib/Switch.svelte';
 	import { entries } from '$lib/utils';
 	import { fade } from 'svelte/transition';
-	import IconMergeMinimum from '~icons/ph/arrow-line-down';
-	import IconMergeMaximum from '~icons/ph/arrow-line-up';
-	import IconMergeAverage from '~icons/ph/divide';
-	import IconMergeMedian from '~icons/ph/equals';
-	import IconMergeUnion from '~icons/ph/union';
-	import IconMergeNone from '~icons/ph/x-circle';
+	import IconMergeMinimum from '~icons/ri/skip-down-line';
+	import IconMergeMaximum from '~icons/ri/skip-up-line';
+	import IconMergeAverage from '~icons/ri/divide-line';
+	import IconMergeMedian from '~icons/ri/equal-line';
+	import IconMergeUnion from '~icons/ri/shadow-line';
+	import IconMergeNone from '~icons/ri/close-circle-line';
 	import { updater } from '../updater.svelte.js';
 
 	const { data } = $props();

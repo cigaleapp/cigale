@@ -1,5 +1,5 @@
 <script>
-	import IconAsterisk from '~icons/ph/asterisk-bold';
+	import IconAsterisk from '~icons/ri/asterisk';
 	import { tooltip } from './tooltips';
 
 	/** @type {{ help?: string }}*/

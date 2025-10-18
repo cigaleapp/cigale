@@ -13,9 +13,9 @@
 	import { clamp, gradientedColor } from '$lib/utils.js';
 	import { type } from 'arktype';
 	import { fade } from 'svelte/transition';
-	import IconCheck from '~icons/ph/check';
-	import IconUnpublished from '~icons/ph/cloud-x';
-	import IconWarning from '~icons/ph/warning';
+	import IconCheck from '~icons/ri/check-line';
+	import IconUnpublished from '~icons/ri/cloud-off-line';
+	import IconWarning from '~icons/ri/triangle-line';
 	import { updater } from '../updater.svelte.js';
 	import ChangesWithRemote from './ChangesWithRemote.svelte';
 

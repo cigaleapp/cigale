@@ -16,12 +16,12 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { dequal } from 'dequal/lite';
 	import { watch } from 'runed';
-	import IconSplit from '~icons/ph/arrows-out-light';
-	import IconObservation from '~icons/ph/bug-beetle';
-	import IconImage from '~icons/ph/image';
-	import IconMerge from '~icons/ph/selection-background';
-	import IconDelete from '~icons/ph/trash';
-	import IconImport from '~icons/ph/upload-simple';
+	import IconSplit from '~icons/ri/function-line';
+	import IconObservation from '~icons/ri/bug-line';
+	import IconImage from '~icons/ri/image-2-line';
+	import IconMerge from '~icons/ri/shadow-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconImport from '~icons/ri/upload-2-line';
 
 	/**
 	 * @typedef {object} Props

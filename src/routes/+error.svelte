@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import Logo from '$lib/Logo.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import IconReset from '~icons/ph/arrows-counter-clockwise-light';
+	import IconReset from '~icons/ri/loop-left-fill';
 	import { nukeDatabase } from '$lib/idb.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import { goto } from '$lib/paths.js';

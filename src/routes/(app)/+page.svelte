@@ -17,10 +17,10 @@
 	import Fuse from 'fuse.js';
 	import { fade } from 'svelte/transition';
 	import { queryParameters, ssp } from 'sveltekit-search-params';
-	import IconCheck from '~icons/ph/check';
-	import IconManage from '~icons/ph/gear';
-	import IconSearch from '~icons/ph/magnifying-glass';
-	import IconImport from '~icons/ph/upload-simple';
+	import IconCheck from '~icons/ri/check-line';
+	import IconManage from '~icons/ri/settings-3-line';
+	import IconSearch from '~icons/ri/search-line';
+	import IconImport from '~icons/ri/upload-2-line';
 
 	const { data } = $props();
 

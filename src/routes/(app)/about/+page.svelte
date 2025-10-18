@@ -214,9 +214,9 @@
 	</dd>
 	<dt>Icônes</dt>
 	<dd>
-		<a href="https://phosphoricons.com/">Phosphor Icons</a> par
-		<a href="https://helenazhang.com">Helena Zhang</a>
-		et <a href="https://tobiasfried.com">Tobias Fried</a>
+		<a href="https://remixicon.com">Remix Icon</a>
+		par <a href="https://www.zhangxiaochun.com/">Jimmy Cheung</a> et
+		<a href="https://gaoquanquan.com/">Wendy Gao</a>
 	</dd>
 
 	<dt>Grâce aux bibliothèques</dt>

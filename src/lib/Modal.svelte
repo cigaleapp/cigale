@@ -17,7 +17,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 <script>
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
-	import IconClose from '~icons/ph/x';
+	import IconClose from '~icons/ri/close-line';
 	import ButtonIcon from './ButtonIcon.svelte';
 	import { getSettings } from './settings.svelte';
 	import { insideBoundingClientRect } from './utils';

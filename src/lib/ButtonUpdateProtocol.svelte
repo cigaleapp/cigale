@@ -14,12 +14,12 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { hasUpgradeAvailable, upgradeProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
-	import IconUpgrade from '~icons/ph/arrow-circle-up';
-	import IconArrow from '~icons/ph/arrow-right';
-	import IconCheckAgain from '~icons/ph/arrows-counter-clockwise';
-	import IconUpToDate from '~icons/ph/check-circle';
+	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
+	import IconArrow from '~icons/ri/arrow-right-line';
+	import IconCheckAgain from '~icons/ri/loop-left-fill';
+	import IconUpToDate from '~icons/ri/checkbox-circle-line';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import IconCannotCheckForUpdates from '~icons/ph/warning-circle';
+	import IconCannotCheckForUpdates from '~icons/ri/error-warning-line';
 	import ButtonIcon from './ButtonIcon.svelte';
 
 	/**

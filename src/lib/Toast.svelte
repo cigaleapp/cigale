@@ -3,11 +3,11 @@
 -->
 
 <script module>
-	import IconDebug from '~icons/ph/bug';
-	import IconSuccess from '~icons/ph/check';
-	import IconInfo from '~icons/ph/info';
-	import IconWarning from '~icons/ph/warning';
-	import IconError from '~icons/ph/x';
+	import IconDebug from '~icons/ri/bug-2-line';
+	import IconSuccess from '~icons/ri/check-line';
+	import IconInfo from '~icons/ri/information-2-line';
+	import IconWarning from '~icons/ri/triangle-line';
+	import IconError from '~icons/ri/close-line';
 
 	/**
 	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
@@ -48,7 +48,7 @@
 
 <script generics="T">
 	import { fade, slide } from 'svelte/transition';
-	import IconClose from '~icons/ph/x';
+	import IconClose from '~icons/ri/close-line';
 	import ButtonInk from './ButtonInk.svelte';
 
 	/**

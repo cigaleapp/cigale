@@ -51,21 +51,21 @@
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import * as dates from 'date-fns';
 	import { watch } from 'runed';
-	import IconRevert from '~icons/ph/arrow-arc-left';
-	import IconToolMove from '~icons/ph/arrows-out-cardinal';
-	import IconPrev from '~icons/ph/caret-left';
-	import IconNext from '~icons/ph/caret-right';
-	import IconHasCrop from '~icons/ph/crop';
-	import IconFocus from '~icons/ph/crosshair-simple';
-	import IconNeuralNet from '~icons/ph/graph';
-	import IconToolHand from '~icons/ph/hand';
-	import IconFourPointCrop from '~icons/ph/number-circle-four';
-	import IconTwoPointCrop from '~icons/ph/number-circle-two';
-	import IconUnconfirmedCrop from '~icons/ph/seal';
-	import IconConfirmedCrop from '~icons/ph/seal-check';
-	import IconToolDragCrop from '~icons/ph/selection-plus';
-	import IconGallery from '~icons/ph/squares-four';
-	import IconDelete from '~icons/ph/trash';
+	import IconRevert from '~icons/ri/reset-left-fill';
+	import IconToolMove from '~icons/ri/drag-move-2-fill';
+	import IconPrev from '~icons/ri/arrow-left-s-line';
+	import IconNext from '~icons/ri/arrow-right-s-line';
+	import IconHasCrop from '~icons/ri/crop-line';
+	import IconFocus from '~icons/ri/crosshair-line';
+	import IconNeuralNet from '~icons/ri/sparkling-line';
+	import IconToolHand from '~icons/ri/hand';
+	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
+	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
+	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
+	import IconConfirmedCrop from '~icons/ri/check-double-line';
+	import IconToolDragCrop from '~icons/ri/shape-2-line';
+	import IconGallery from '~icons/ri/function-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
