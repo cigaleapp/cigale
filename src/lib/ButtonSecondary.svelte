@@ -97,7 +97,7 @@ Available CSS variables:
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		border: 1px solid var(--fg, var(--gray));
+		border: 0.1625em solid var(--fg, var(--gray));
 		padding: 0.75em;
 		border-radius: var(--corner-radius);
 		width: var(--width);

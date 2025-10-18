@@ -1,22 +1,21 @@
 <script>
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import a from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
+	import IconExpand from '~icons/ri/expand-up-down-line';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
-
 	import { goto, href } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp } from '$lib/utils';
 	import IconSelect from '~icons/ri/arrow-down-s-line';
-	import IconNext from '~icons/ri/arrow-right-s-line';
+	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
-	import IconDownload from '~icons/ri/download-2-line';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
@@ -28,10 +27,17 @@
 	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
 	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
+	 * @property {boolean} [floating]
 	 */
 
 	/** @type {Props} */
-	let { openKeyboardShortcuts, openPrepareForOfflineUse, progress = 0, swarpc } = $props();
+	let {
+		openKeyboardShortcuts,
+		openPrepareForOfflineUse,
+		progress = 0,
+		swarpc,
+		floating = false
+	} = $props();
 
 	const path = $derived(page.url.hash.replace(/^#/, ''));
 
@@ -141,11 +147,21 @@
 {/if}
 
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
-	<nav bind:clientHeight={navHeight} data-testid="app-nav" data-sveltekit-preload-data="viewport">
+	<div class="progressbar">
+		<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
+		<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
+	</div>
+
+	<nav
+		bind:clientHeight={navHeight}
+		data-testid="app-nav"
+		data-sveltekit-preload-data="viewport"
+		class:floating
+	>
 		<div class="logo">
 			<a href={href('/')}>
-				<Logo --fill="var(--bg-primary)" />
-				C.i.g.a.l.e.
+				<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
+				<!-- CIGALE -->
 			</a>
 			{#if previewingPrNumber}
 				<button class="pr-number" onclick={openPreviewPRDetails}>
@@ -155,14 +171,14 @@
 		</div>
 
 		<div class="steps">
-			<a href={href('/')}>
+			<!-- <a href={href('/')}>
 				Protocole
-				<!-- Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check -->
+				Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check 
 				{#if path == '/' || path == ''}
 					<div class="line"></div>
 				{/if}
 			</a>
-			<IconNext></IconNext>
+			<div class="separator"><IconNext /></div> -->
 			<a
 				href={href('/import')}
 				data-testid="goto-import"
@@ -173,7 +189,7 @@
 					<div class="line"></div>
 				{/if}
 			</a>
-			<IconNext></IconNext>
+			<div class="separator"><IconNext /></div>
 			<div class="with-inference-indicator">
 				<a
 					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
@@ -197,7 +213,7 @@
 					(i) => uiState.setModelSelections({ crop: i })
 				)}
 			</div>
-			<IconNext></IconNext>
+			<div class="separator"><IconNext /></div>
 			<div
 				class="with-inference-indicator"
 				use:tooltip={uiState.processing.task === 'detection' &&
@@ -225,24 +241,31 @@
 					(i) => uiState.setModelSelections({ classification: i })
 				)}
 			</div>
-			<IconNext></IconNext>
-			<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
-				<IconDownload />
+			<div class="separator"><IconNext /></div>
+			<a testid="export-results-button" tight onclick={openExportModal}>
+				<!-- <IconDownload /> -->
 				Résultats
-			</ButtonSecondary>
+			</a>
 		</div>
 
-		<div class="settings" class:native={isNativeWindow}>
-			<Settings
-				{openPrepareForOfflineUse}
-				{openKeyboardShortcuts}
-				--navbar-height="{height}px"
-			/>
-		</div>
+		<aside class:native={isNativeWindow}>
+			<a class="protocol-switcher" href={href('/')} use:tooltip={'Changer de protocole'}>
+				{#if uiState.currentProtocol}
+					{uiState.currentProtocol?.name}
+				{:else}
+					Aucun protocole sélectionné
+				{/if}
+				<IconExpand />
+			</a>
+			<div class="settings">
+				<Settings
+					{openPrepareForOfflineUse}
+					{openKeyboardShortcuts}
+					--navbar-height="{height}px"
+				/>
+			</div>
+		</aside>
 	</nav>
-
-	<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
-	<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
 </header>
 
 {#snippet inferenceSettings(
@@ -298,14 +321,16 @@
 	}
 
 	nav {
-		background-color: var(--bg-primary-translucent);
+		/* background-color: var(--bg-primary-translucent); */
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: space-between;
-		padding: 0.5rem 1rem;
+		/* justify-content: space-between; */
+		padding: 1rem 1.5rem;
 		resize: vertical;
 		position: relative;
+
+		height: 75px;
 	}
 
 	header.native-window nav {
@@ -334,7 +359,6 @@
 	nav a {
 		background: none;
 		border: none;
-		padding: 7.5px 15px;
 		text-decoration: none;
 		color: var(--fg-neutral);
 	}
@@ -342,10 +366,19 @@
 	.steps {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
 		width: 100%;
 		margin: 0 2rem;
 		max-width: 800px;
+		margin-right: auto;
+		gap: 2rem;
+	}
+
+	.steps .separator {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: var(--gray);
+		display: none;
 	}
 
 	header.native-window .steps {
@@ -381,11 +414,19 @@
 		gap: 0.5em;
 	}
 
-	.settings {
-		--hover-bg: var(--bg-neutral);
+	aside {
+		display: flex;
+		align-items: center;
+		gap: 2rem;
 	}
 
-	header.native-window .settings {
+	.settings {
+		--hover-bg: var(--bg-neutral);
+		--fg: var(--fg-neutral);
+		--hover-fg: var(--fg-primary);
+	}
+
+	header.native-window aside {
 		margin-right: 130px;
 	}
 
@@ -413,5 +454,42 @@
 
 	nav a[aria-disabled='true'] .line {
 		visibility: hidden;
+	}
+
+	nav.floating {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 10;
+
+		aside {
+			display: none;
+		}
+	}
+
+	.protocol-switcher {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		border: 2px solid transparent;
+		padding: 0.5em 0.75em;
+		border-radius: var(--corner-radius);
+		flex-wrap: nowrap;
+		white-space: nowrap;
+
+		&:hover,
+		&:focus-visible {
+			border-color: var(--gray);
+		}
+	}
+
+	.progressbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+
+		--height: 0.5rem;
+		--fill-color: var(--bg-primary);
 	}
 </style>

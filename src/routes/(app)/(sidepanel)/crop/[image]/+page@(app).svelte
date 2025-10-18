@@ -66,6 +66,8 @@
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
 	import IconGallery from '~icons/ri/function-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
+	import { getContext } from 'svelte';
+	import Logo from '$lib/Logo.svelte';
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
@@ -73,6 +75,8 @@
 	const firstImage = $derived(images.at(0));
 
 	$effect(() => seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` }));
+
+	getContext('setNavbarAppearance')('floating');
 
 	// Controls visibility of the checkmark little centered overlay
 	let confirmedOverlayShown = $state(false);
@@ -742,24 +746,6 @@
 </div>
 
 <div class="layout">
-	<aside class="toolbar">
-		{#each tools as tool (tool.name)}
-			<button
-				aria-label="Choisir l'outil {tool.name}"
-				class:active={tool.name === activeToolName}
-				use:tooltip={{
-					text: `${tool.name}: ${tool.help}`,
-					keyboard: tool.shortcut,
-					placement: 'right'
-				}}
-				onclick={() => {
-					activeToolName = tool.name;
-				}}
-			>
-				<tool.icon />
-			</button>
-		{/each}
-	</aside>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<main
 		class="crop-surface"
@@ -849,6 +835,24 @@
 			/>
 		{/if}
 	</main>
+	<aside class="toolbar">
+		{#each tools as tool (tool.name)}
+			<button
+				aria-label="Choisir l'outil {tool.name}"
+				class:active={tool.name === activeToolName}
+				use:tooltip={{
+					text: `${tool.name}: ${tool.help}`,
+					keyboard: tool.shortcut,
+					placement: 'right'
+				}}
+				onclick={() => {
+					activeToolName = tool.name;
+				}}
+			>
+				<tool.icon />
+			</button>
+		{/each}
+	</aside>
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">

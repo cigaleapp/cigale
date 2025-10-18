@@ -32,6 +32,7 @@
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
 	import Badge from '$lib/Badge.svelte';
+	import { getContext } from 'svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
 
@@ -45,6 +46,8 @@
 	let metadataNav = $state(null);
 
 	let collapsedSidebar = $state(false);
+
+	getContext('setNavbarAppearance')('hidden');
 
 	/**
 	 *

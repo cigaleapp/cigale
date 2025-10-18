@@ -260,10 +260,10 @@
 		display: flex;
 		overflow: hidden;
 	}
-
+	/* 
 	.main-and-sidepanel.has-sidepanel main {
 		border-right: 1px solid var(--gray);
-	}
+	} */
 
 	.main-and-sidepanel:not(.has-sidepanel) main {
 		width: 100%;
