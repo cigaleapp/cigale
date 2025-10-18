@@ -1,0 +1,1 @@
+import{Ht as e,Nt as t,kt as n,nt as r,rt as i}from"#entry";var a=t({__name:`index`,setup(t){let a=i(),o=r();return a.replace({path:`/grid/depth`,hash:location.hash,query:o.query}),(t,r)=>(e(),n(`div`,null,` Redirecting... `))}});export{a as default};
