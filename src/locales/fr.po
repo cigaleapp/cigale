@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-12T21:02:30.746Z\n"
+"PO-Revision-Date: 2025-10-17T23:03:17.734Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -27,10 +27,6 @@ msgstr "<0/> C.i.g.a.l.e."
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Chargement…"
-
-#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
-msgid "<0/> Continuer"
-msgstr "<0/> Continuer"
 
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Créer"
@@ -292,10 +288,6 @@ msgstr "Chargement du modèle de recadrage…"
 msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
-#: src/routes/(app)/+layout.js
-msgid "Chargement du worker neuronal…"
-msgstr "Chargement du worker neuronal…"
-
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -353,6 +345,7 @@ msgstr "Color Palette"
 msgid "Confirmé"
 msgstr "Confirmé"
 
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Continuer"
 msgstr "Continuer"
@@ -489,7 +482,6 @@ msgid "Grâce aux bibliothèques"
 msgstr "Grâce aux bibliothèques"
 
 #: src/routes/(app)/Navigation.svelte
-#: src/routes/(app)/Settings.svelte
 msgid "Gérer les protocoles"
 msgstr "Gérer les protocoles"
 
@@ -560,10 +552,6 @@ msgstr "Impossible de charger les dépendances"
 #: src/lib/MetadataInput.svelte
 msgid "Incrémenter"
 msgstr "Incrémenter"
-
-#: src/routes/(app)/+layout.js
-msgid "Initialisation DB du worker neuronal…"
-msgstr "Initialisation DB du worker neuronal…"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation des réglages par défaut…"
@@ -1738,3 +1726,41 @@ msgstr "Metadata {0} for protocol {1} not found"
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
 msgid "Option not found"
 msgstr "Option not found"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Parallélisme <0>Nombre de tâches en parallèle</0>"
+msgstr "Parallélisme <0>Nombre de tâches en parallèle</0>"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Réduire"
+msgstr "Réduire"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Nombre de tâches en parallèle"
+msgstr "Nombre de tâches en parallèle"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Augmenter"
+msgstr "Augmenter"
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation du worker…"
+msgstr "Initialisation du worker…"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 élément"
+msgid_plural "# éléments"
+msgstr[0] "1 élément"
+msgstr[1] "# éléments"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 image"
+msgid_plural "# images"
+msgstr[0] "1 image"
+msgstr[1] "# images"
+
+#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
+msgid "1 observation"
+msgid_plural "# observations"
+msgstr[0] "1 observation"
+msgstr[1] "# observations"

@@ -79,7 +79,10 @@
 					await deleteObservation(fileId);
 					await deleteImageFile(fileId);
 				}}
-				onclick={async () => goto('/(app)/(sidepanel)/crop/[image]', { image: fileId })}
+				onclick={async (_e, set) => {
+					set({ status: 'loading', loadingStatusText: 'Ouverture…' });
+					await goto('/(app)/(sidepanel)/crop/[image]', { image: fileId });
+				}}
 			/>
 		{/snippet}
 	</AreaObservations>

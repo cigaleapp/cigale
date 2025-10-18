@@ -6,8 +6,44 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add beta disclaimers
+- Add default crop padding setting
+- Add field label for protocol description
+- Allow deleting option from option details page
+- Clarify that pattern repeats by adding labels to faded nodes in diagram
+- Color differences-with-remote-protocol count according to amount of changes
+- Document variables in export configuration
+- Don't update DB if error occured in updater
+- Enlarge panels when sidebar is collapsed
+- Finish authors editing
+- Finish crop settings
+- Finish protocol diffing
+- Fix alignment on RowProtocol
+- Fix math font
 - Fix width of buttons in protocol selection page
+- Implement diffing of protocol with its remote, upstream version
+- Improve appearance of changes with remote protocol
+- Improve other model setting inputs
+- Improve style of arrays in protocol changes-with-remote list
+- Make debug dumps smaller in preview panel
+- Make parallelism configurable (Closes #700) (#767)
+- Make version input monospace
+- Put number of cards in grouped grid headings in monospace font
+- Put search bar above new option field in options edition page
+- Remove Manage protocols button on settings flyout
+- Show options count on metadata navbar
+- Switch monospace font to Martian Mono
+- Tweak text styles in /about
 - Validate bundle analyzer modes on config load instead of assuming type
+
+### Bug Fixes
+
+- Fix displaying of added metadata in protocol diffing
+- Fix fonts not loading
+- Fix option description updates not store in db
+- Fix some bugs
+- Fix translations not working anymore
+- Remove weird import in sidepanel's +layout.svelte
 
 ### Data Updates
 
@@ -17,6 +53,8 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Fix some weird msgids
 - Refresh translation files
+- Reset translation file changes
+- Translate font credit line for Martian Mono in about page
 - Translate some more
 - Translate via Weblate (English)
 
@@ -39,6 +77,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Go to import tab when clicking on already-selected protocol on /
 - Group observations/photos by whether they have bounding boxes (#688)
 - Improve no images state when on crop or classify tabs
+- Improve option/metadata not found states
 - Improve protocol management page
 - Make classmapping download represent only 10% of progress bar for model loading
 - Make confidence of bounding boxes aligned with dimensions
@@ -51,6 +90,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Remove grid lines background in cropper view
 - Show first digit after comma on confidence percentage when value is less than 1%
 - Show parallelism numbers in /about
+- Stay on same tab inside metadata panel when switching metadatas
 - Style the range input
 - Use color on a gradient scale for confidence percentages
 

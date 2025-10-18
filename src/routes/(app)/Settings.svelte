@@ -2,14 +2,17 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
-	import { goto, href } from '$lib/paths.js';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { href } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { watch } from 'runed';
 	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
 	import Gears from '~icons/ph/gear-light';
+	import IconDecrease from '~icons/ph/minus';
 	import Moon from '~icons/ph/moon-light';
+	import IconIncrease from '~icons/ph/plus';
 	import IconSortAsc from '~icons/ph/sort-ascending';
 	import IconSortDesc from '~icons/ph/sort-descending';
 	import Sun from '~icons/ph/sun-light';
@@ -32,6 +35,9 @@
 			open = false;
 		});
 	});
+
+	const { theme, showTechnicalMetadata, gallerySort, gridSize, language, parallelism } =
+		$derived(getSettings());
 
 	let systemIsLight = $state(true);
 	$effect(() => {
@@ -73,7 +79,7 @@
 </ButtonIcon>
 
 <dialog
-	data-theme={getSettings().theme}
+	data-theme={theme}
 	class="container"
 	data-testid="app-settings"
 	open={open ? true : undefined}
@@ -84,16 +90,14 @@
 		<div class="label">Thème</div>
 		<div class="setting">
 			<Switch
-				value={getSettings().theme === 'auto'
-					? systemIsLight
-					: getSettings().theme === 'light'}
+				value={theme === 'auto' ? systemIsLight : theme === 'light'}
 				onchange={async (isLight) => {
 					await setSetting('theme', isLight ? 'light' : 'dark');
 				}}
 				icons={{ on: Sun, off: Moon }}
 			></Switch>
 			<ButtonIcon
-				disabled={getSettings().theme === 'auto'}
+				disabled={theme === 'auto'}
 				onclick={async () => await setSetting('theme', 'auto')}
 				help="Synchroniser avec le thème du système"
 			>
@@ -104,7 +108,7 @@
 		<div class="setting">
 			<Switch
 				data-testid="debug-mode"
-				value={getSettings().showTechnicalMetadata}
+				value={showTechnicalMetadata}
 				onchange={async (show) => {
 					await setSetting('showTechnicalMetadata', show);
 				}}
@@ -116,8 +120,8 @@
 				aria-label="Par quoi trier"
 				options={['filename', 'date']}
 				bind:value={
-					() => getSettings().gallerySort.key,
-					(key) => setSetting('gallerySort', { ...getSettings().gallerySort, key })
+					() => gallerySort.key,
+					(key) => setSetting('gallerySort', { ...gallerySort, key })
 				}
 				labels={{ filename: 'Fichier', date: 'Date' }}
 			/>
@@ -125,14 +129,14 @@
 				data-testid="toggle-sort-direction"
 				onclick={async () =>
 					await setSetting('gallerySort', {
-						...getSettings().gallerySort,
-						direction: getSettings().gallerySort.direction === 'asc' ? 'desc' : 'asc'
+						...gallerySort,
+						direction: gallerySort.direction === 'asc' ? 'desc' : 'asc'
 					})}
-				help={getSettings().gallerySort.direction === 'asc'
+				help={gallerySort.direction === 'asc'
 					? 'Trier par ordre décroissant'
 					: 'Trier par ordre croissant'}
 			>
-				{#if getSettings().gallerySort.direction === 'asc'}
+				{#if gallerySort.direction === 'asc'}
 					<IconSortAsc />
 				{:else}
 					<IconSortDesc />
@@ -148,14 +152,14 @@
 				step="0.01"
 				list="gridsize-marks"
 				bind:value={
-					() => getSettings().gridSize,
+					() => gridSize,
 					(value) => {
 						// Don't write to database too eagerly, it lags the UI
 						const settings = tables.Settings.state;
 						settings[settings.findIndex((s) => s.id === 'user')].gridSize = value;
 					}
 				}
-				onblur={async () => setSetting('gridSize', getSettings().gridSize)}
+				onblur={async () => setSetting('gridSize', gridSize)}
 			/>
 			<datalist id="gridsize-marks">
 				<option value="1"></option>
@@ -168,7 +172,7 @@
 				aria-label="Langue de l'interface"
 				clickable-custom-options
 				options={['en', 'fr']}
-				value={getSettings().language}
+				value={language}
 				onchange={async (code) => {
 					await setSetting('language', code);
 					window.location.reload();
@@ -181,16 +185,39 @@
 				{/snippet}
 			</SegmentedGroup>
 		</div>
+		<div class="label">
+			Parallélisme
+			<p class="details">Nombre de tâches en parallèle</p>
+		</div>
+		<div class="setting">
+			<ButtonIcon
+				help="Réduire"
+				onclick={async () => {
+					await setSetting('parallelism', Math.max(1, parallelism - 1));
+				}}
+			>
+				<IconDecrease />
+			</ButtonIcon>
+			<div class="number-input">
+				<InlineTextInput
+					label="Nombre de tâches en parallèle"
+					value={parallelism}
+					onblur={async (value) => {
+						await setSetting('parallelism', Number.parseInt(value));
+					}}
+				/>
+			</div>
+			<ButtonIcon
+				help="Augmenter"
+				onclick={async () => {
+					await setSetting('parallelism', parallelism + 1);
+				}}
+			>
+				<IconIncrease />
+			</ButtonIcon>
+		</div>
 	</div>
 	<section class="actions">
-		<ButtonSecondary
-			onclick={async () => {
-				open = false;
-				await goto('/protocols');
-			}}
-		>
-			Gérer les protocoles
-		</ButtonSecondary>
 		<ButtonSecondary
 			onclick={() => {
 				openKeyboardShortcuts?.();
@@ -238,8 +265,7 @@
 		margin-right: 0;
 		display: flex;
 		flex-direction: column;
-		padding-left: 25px;
-		padding-right: 25px;
+		padding: 2rem;
 		z-index: 2;
 		background-color: var(--bg-primary-translucent);
 		border-bottom-left-radius: 5px;
@@ -249,7 +275,6 @@
 	header {
 		font-size: 1.5em;
 		font-weight: bold;
-		margin-top: 0.5em;
 		margin-bottom: 0.5em;
 		color: var(--fg-primary);
 	}
@@ -263,11 +288,29 @@
 	.listParam > div {
 		display: flex;
 		align-items: center;
-		gap: 1em;
+		gap: 0 1em;
 	}
 
 	.listParam .label {
 		font-weight: bold;
+		flex-wrap: wrap;
+		max-width: 10rem;
+	}
+
+	.listParam .label .details {
+		font-weight: normal;
+		font-size: 0.8em;
+	}
+
+	.listParam .setting {
+		max-width: 12rem;
+	}
+
+	.listParam .number-input {
+		font-family: var(--font-mono);
+		width: 3ch;
+		font-size: 1.4em;
+		font-weight: 200;
 	}
 
 	.actions {

@@ -1,8 +1,11 @@
 <script module>
 	/**
+	 * @typedef {'queued' | 'loading' | 'ok' | 'errored'} Status
+	 */
+	/**
 	 * @typedef Props
 	 * @type {object}
-	 * @property {() => void} [onclick]
+	 * @property {(e: MouseEvent, set: (props: { status?: Status, loadingStatusText?: string }) => void) => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
 	 * @property {() => void} [ondelete]
 	 * @property {() => void} [onretry]
@@ -11,7 +14,7 @@
 	 * @property {string} title
 	 * @property {number} [stacksize=1] - number of images in this observation
 	 * @property {string | undefined} image - image url
-	 * @property {'queued' | 'loading' | 'ok' | 'errored'} [status="ok"] - status of the image processing
+	 * @property {Status} [status="ok"] - status of the image processing
 	 * @property {string} [statusText] - text to show when status is not `"ok"`
 	 * @property {string} [loadingStatusText] statusText override when status == "loading"
 	 * @property {boolean} [selectable=true] - whether this image can be selected
@@ -39,7 +42,7 @@
 	import { tooltip } from './tooltips';
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
-	const {
+	let {
 		onclick,
 		onstacksizeclick,
 		ondelete,
@@ -93,7 +96,17 @@
 >
 	<div class="main-card">
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
-		<Card tag="div" onclick={onclick && !loading && !errored ? onclick : () => {}}>
+		<Card
+			tag="div"
+			onclick={(e) => {
+				if (loading || errored) return;
+				if (!(e instanceof MouseEvent)) return;
+				onclick?.(e, (newProps) => {
+					if (newProps.status) status = newProps.status;
+					if (newProps.loadingStatusText) loadingStatusText = newProps.loadingStatusText;
+				});
+			}}
+		>
 			<div class="inner">
 				{#if status !== 'ok'}
 					<div class="loading-overlay">

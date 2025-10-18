@@ -1,5 +1,5 @@
 import { classifyImage } from './classification.svelte';
-import { countThing, errorMessage } from './i18n';
+import { errorMessage } from './i18n';
 import { imageFileId } from './images';
 import { inferBoundingBoxes, processImageFile } from './import.svelte';
 import { importResultsZip } from './results.svelte';
@@ -53,8 +53,7 @@ class ProcessingQueue {
 	async start() {
 		this.log(
 			null,
-			'Starting processing queue mainloop with up to',
-			countThing('concurrent task', this.parallelism)
+			`Starting processing queue mainloop with up to ${this.parallelism} concurrent tasks`
 		);
 		while (true) {
 			while (this.tasks.length > 0) {

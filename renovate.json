@@ -1,11 +1,6 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": ["config:recommended", "schedule:weekly", "abandonments:recommended"],
-	"prHourlyLimit": 6,
-	"prConcurrentLimit": 4,
-	"commitMessagePrefix": "⬆️ ",
-	"rangeStrategy": "bump",
-	"abandonmentThreshold": "2 years",
+	"extends": ["github>gwennlbh/renovate"],
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to linters and formatters",
@@ -27,16 +22,6 @@
 		{
 			"description": "Auto-merge patch upgrades (E2E tests should validate that nothing catastrophic happens)",
 			"matchUpdateTypes": ["patch"],
-			"automerge": true
-		},
-		{
-			"description": "Group playwright docker image & npm package",
-			"matchPackageNames": [
-				"@playwright/test",
-				"mcr.microsoft.com/playwright",
-				"ghcr.io/gwennlbh/playwright-bun"
-			],
-			"groupName": "Playwright",
 			"automerge": true
 		}
 	]

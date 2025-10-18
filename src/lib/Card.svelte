@@ -15,7 +15,7 @@ Available CSS variables:
 	 * @typedef Props
 	 * @type {object}
 	 * @property {import('svelte').Snippet} [children]
-	 * @property {() => void} [onclick]
+	 * @property {(e: MouseEvent) => void} [onclick]
 	 * @property {'article' | 'li' | 'div'} [tag=article] - HTML tag to use for the card container
 	 */
 
@@ -32,11 +32,6 @@ Available CSS variables:
 	class="card"
 	{onclick}
 	tabindex={clickable ? 0 : undefined}
-	onkeypress={(e) => {
-		if (e.key === 'Enter') {
-			onclick?.();
-		}
-	}}
 >
 	{@render children?.()}
 </svelte:element>

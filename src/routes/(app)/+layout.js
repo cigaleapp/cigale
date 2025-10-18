@@ -36,28 +36,25 @@ export async function load() {
 		}[locale]
 	});
 
-	const parallelism = Math.ceil(navigator.hardwareConcurrency / 3);
+	await initializeSettings();
 
-	setLoadingMessage('Chargement du worker neuronal…');
+	const parallelism = await getSetting('parallelism', {
+		fallback: 1
+	});
+
+	setLoadingMessage('Initialisation du worker…');
 	const swarpc = Swarpc.Client(PROCEDURES, {
 		worker: WebWorker,
 		nodes: parallelism
 	});
 
-	setLoadingMessage('Initialisation DB du worker neuronal…');
-	await swarpc.init.broadcast({ databaseName, databaseRevision });
-
-	void swarpc.syncStoredCorrections({}, (progress) => {
-		console.info(
-			`Sending corrections to protocols' beamup servers: ${Math.round(progress * 100)}%`
-		);
-	});
-
 	try {
 		setLoadingMessage('Initialisation de la base de données…');
+		await swarpc.init.broadcast({ databaseName, databaseRevision });
 		await tables.initialize();
+
 		setLoadingMessage('Chargement des données intégrées…');
-		await fillBuiltinData(swarpc);
+		await loadDefaultProtocol(swarpc);
 		await tables.initialize();
 	} catch (e) {
 		console.error(e);
@@ -66,14 +63,17 @@ export async function load() {
 		});
 	}
 
+
+	void swarpc.syncStoredCorrections({}, (progress) => {
+		console.info(
+			`Sending corrections to protocols' beamup servers: ${Math.round(progress * 100)}%`
+		);
+	});
+
 	return { swarpc, parallelism };
 }
 
-/**
- *
- * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
- */
-async function fillBuiltinData(swarpc) {
+async function initializeSettings() {
 	setLoadingMessage('Initialisation des réglages par défaut…');
 	await openTransaction(['Metadata', 'Protocol', 'Settings'], {}, async (tx) => {
 		await tx.objectStore('Settings').put({
@@ -89,11 +89,16 @@ async function fillBuiltinData(swarpc) {
 			gallerySort: { key: 'date', direction: 'asc' }
 		});
 	});
+}
 
+/**
+ *
+ * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
+ */
+async function loadDefaultProtocol(swarpc) {
 	setLoadingMessage('Chargement du protocole intégré');
 
 	const protocolsCount = await tables.Protocol.count();
-
 	if (protocolsCount === 0) {
 		try {
 			const contents = await fetch(

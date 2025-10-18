@@ -4,7 +4,6 @@
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
-	import { goto } from '$lib/paths.js';
 	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
@@ -43,7 +42,7 @@
 		hasRuntimeType,
 		storeMetadataValue
 	} from '$lib/metadata';
-
+	import { goto } from '$lib/paths.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
@@ -56,7 +55,6 @@
 	import IconToolMove from '~icons/ph/arrows-out-cardinal';
 	import IconPrev from '~icons/ph/caret-left';
 	import IconNext from '~icons/ph/caret-right';
-	import IconContinue from '~icons/ph/check';
 	import IconHasCrop from '~icons/ph/crop';
 	import IconFocus from '~icons/ph/crosshair-simple';
 	import IconNeuralNet from '~icons/ph/graph';
@@ -1054,20 +1052,24 @@
 					help="Image précédente"
 					keyboard="ArrowLeft"
 					onclick={() => {
-						goto(`#/crop/${prevFileId}`);
+						if (!prevFileId) return;
+						goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId });
 					}}
 				>
 					<IconPrev />
 				</ButtonIcon>
-				<code>
-					{sortedFileIds.indexOf(fileId) + 1}⁄{sortedFileIds.length}
+				<code class="numbers">
+					{sortedFileIds.indexOf(fileId) + 1}
+					<div class="separator">⁄</div>
+					{sortedFileIds.length}
 				</code>
 				<ButtonIcon
 					disabled={!nextFileId}
 					help="Image suivante"
 					keyboard="ArrowRight"
 					onclick={() => {
-						goto(`#/crop/${nextFileId}`);
+						if (!nextFileId) return;
+						goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId });
 					}}
 				>
 					<IconNext />
@@ -1095,7 +1097,6 @@
 					keyboard="Space"
 					help="Marquer le recadrage comme confirmé et passer à la prochaine image non confirmée"
 				>
-					<IconContinue />
 					Continuer
 				</ButtonSecondary>
 			</div>
@@ -1369,6 +1370,12 @@
 
 	.info nav .navigation {
 		gap: 0.25em;
+	}
+
+	.info nav .navigation .numbers {
+		display: flex;
+		align-self: center;
+		white-space: nowrap;
 	}
 
 	.info nav .continue {

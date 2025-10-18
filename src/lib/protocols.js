@@ -266,7 +266,18 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 		...keys(localProtocol.metadata)
 	]);
 
-	const optionsTotalCount = metadataIds.size;
+	const optionsTotalCount = sum(
+		metadataIds.values().map((metadataId) => {
+			if (!remoteProtocol.metadata[metadataId]) return 0;
+			if (!localProtocol.metadata[metadataId]) return 0;
+
+			const remoteOptions = remoteProtocol.metadata[metadataId].options ?? [];
+			const localOptions = localProtocol.metadata[metadataId].options ?? [];
+
+			return new Set([...remoteOptions.map((o) => o.key), ...localOptions.map((o) => o.key)])
+				.size;
+		})
+	);
 
 	// Note: Totals are based on timings on a single machine,
 	// the values dont really matter as least as they're self-consistent,
