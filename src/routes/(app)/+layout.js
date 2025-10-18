@@ -63,6 +63,13 @@ export async function load() {
 		});
 	}
 
+
+	void swarpc.syncStoredCorrections({}, (progress) => {
+		console.info(
+			`Sending corrections to protocols' beamup servers: ${Math.round(progress * 100)}%`
+		);
+	});
+
 	return { swarpc, parallelism };
 }
 
