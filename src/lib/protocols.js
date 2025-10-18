@@ -268,14 +268,16 @@ export async function compareProtocolWithUpstream(db, protocolId, { onProgress }
 
 	const optionsTotalCount = sum(
 		[...metadataIds].map((metadataId) => {
-			if (!remoteProtocol.metadata[metadataId]) return 0;
-			if (!localProtocol.metadata[metadataId]) return 0;
+			const localMetadata = localProtocol.metadata[metadataId];
+			const remoteMetadata = remoteProtocol.metadata[metadataId];
 
-			const remoteOptions = remoteProtocol.metadata[metadataId].options ?? [];
-			const localOptions = localProtocol.metadata[metadataId].options ?? [];
+			if (!localMetadata) return 0;
+			if (!remoteMetadata) return 0;
 
-			return new Set([...remoteOptions.map((o) => o.key), ...localOptions.map((o) => o.key)])
-				.size;
+			const localOptionsKeys = localMetadata.options?.map((o) => o.key) ?? [];
+			const remoteOptionsKeys = remoteMetadata.options?.map((o) => o.key) ?? [];
+
+			return new Set([...localOptionsKeys, ...remoteOptionsKeys]).size;
 		})
 	);
 
