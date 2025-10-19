@@ -304,9 +304,10 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
  * @param {string | RegExp | ((options: Locator) => Locator)} option
  */
 export async function chooseInDropdown(page, dropdownTestId, option) {
-	await page.getByTestId(`${dropdownTestId}-open`).click();
+	const trigger = page.getByTestId(`${dropdownTestId}-open`);
+	const options = page.getByTestId(`${dropdownTestId}-options`);
 
-	const options = await page.getByTestId(`${dropdownTestId}-options`);
+	await trigger.click();
 
 	const item =
 		typeof option === 'function'
@@ -314,6 +315,7 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 			: options.getByRole('menuitem', { name: option });
 
 	await item.click();
+	await page.keyboard.press('Escape'); // Close the dropdown
 }
 
 /**

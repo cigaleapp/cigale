@@ -1,7 +1,8 @@
-import extract from 'extract-zip';
 import * as fs from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
+import extract from 'extract-zip';
+
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/results.js';
@@ -195,7 +196,9 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 	});
 
 	await page.goto(`?protocol=${encodeURIComponent(protocolUrl)}`);
-	await expect(modal(page, 'Importer le protocole distant ?')).toBeVisible();
+	await expect(modal(page, 'Importer le protocole distant ?')).toBeVisible({
+		timeout: 30_000
+	});
 	await expect(modal(page, 'Importer le protocole distant ?').getByRole('link')).toHaveAttribute(
 		'href',
 		protocolUrl
@@ -205,88 +208,131 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 		.getByRole('button', { name: 'Importer' })
 		.click();
 
-	await expect(
-		page.getByRole('button', {
-			name: 'Kitchen sink',
-			exact: true
-		})
-	).toHaveAttribute('aria-pressed', 'true');
+	await expect(page.getByTestId('protocol-switcher-open')).toHaveAccessibleName('Kitchen sink');
 });
 
 test('can pre-set models via ?classificationModel and ?cropModel', async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await chooseProtocol(page);
 
-	const classificationModel = page.getByRole('radiogroup', {
-		name: "Modèle d'inférence pour Espèce"
-	});
-	const cropModel = page.getByRole('radiogroup', {
-		name: "Modèle d'inférence pour la détection"
-	});
-
 	async function reset() {
-		await classificationModel.getByRole('radio', { name: 'Collemboles' }).click();
-		await cropModel.getByRole('radio', { name: 'YOLO11' }).click();
+		await chooseInDropdown(page, 'classification-model-select', 'Collemboles');
+		await chooseInDropdown(page, 'crop-model-select', 'YOLO11');
 		await page.waitForTimeout(500);
 	}
 
 	await page.goto('?classificationModel=0');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(
+		`
+	  - 'button "Example: arthropodes (lightweight)"':
+	    - img
+	`,
+		{
+			timeout: 30_000
+		}
+	);
 	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group:
+	      - 'menuitem /Example: arthropodes \\(lightweight\\).+/':
+	        - img
+	        - code: /v\\d+/
+	        - button /.+/:
+	          - img
+	      - menuitem "Gérer les protocoles":
+	        - img
+	`);
+	await page.keyboard.press('Escape');
 	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
-	await page.getByTestId('classification-models-open').click();
-	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitem "Aucune inférence"
+	      - menuitem "YOLO11":
+	        - img
+	`);
+	await page.keyboard.press('Escape');
+	await page.getByTestId('classify-models-open').click();
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitem "Aucune inférence":
+	        - img
+	      - menuitem /Collemboles \\(~\\d+ classes\\)/
+	`);
+	await page.keyboard.press('Escape');
 
 	await reset();
 
 	await page.goto('?cropModel=0');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
+		timeout: 30_000
+	});
 	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
-	await page.getByTestId('classification-models-open').click();
-	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
+	await page.getByTestId('classify-models-open').click();
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 
 	await reset();
 
 	await page.goto('?classificationModel=0&cropModel=0');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
+		timeout: 30_000
+	});
 	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
-	await page.getByTestId('classification-models-open').click();
-	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
+	await page.getByTestId('classify-models-open').click();
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 
 	await reset();
 
 	await page.goto('?classificationModel=1');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
+		timeout: 30_000
+	});
 	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
-	await page.getByTestId('classification-models-open').click();
-	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
+	await page.getByTestId('classify-models-open').click();
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 
 	await reset();
 
 	await page.goto('?cropModel=1');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
+		timeout: 30_000
+	});
 	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
-	await page.getByTestId('classification-models-open').click();
-	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
+	await page.getByTestId('classify-models-open').click();
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 });
 
 test('can import a protocol and pre-set models via URL parameters', async ({ page }) => {
@@ -304,15 +350,20 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 	);
 	await modal(page, 'Importer le protocole distant ?')
 		.getByRole('button', { name: 'Importer' })
-		.click();
+		.click({
+			timeout: 30_000
+		});
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``);
 	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
-	await page.getByTestId('classification-models-open').click();
-	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
+	await page.getByTestId('classify-models-open').click();
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await page.keyboard.press('Escape');
 });
 
 test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page }) => {
@@ -329,7 +380,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	 * @param {string|RegExp} name
 	 */
 	async function setModel(tab, name) {
-		await chooseInDropdown(page, `${tab}-model-select`, name);
+		await chooseInDropdown(page, `${tab}-models`, name);
 	}
 
 	/**

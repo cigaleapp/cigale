@@ -2,13 +2,13 @@ import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
 	chooseProtocol,
+	firstObservationCard,
 	getMetadataOverridesOfObservation,
+	goToTab,
 	loadDatabaseDump,
-	sidepanelMetadataSectionFor,
 	metadataValueInDatabase,
 	setSettings,
-	firstObservationCard,
-	goToTab
+	sidepanelMetadataSectionFor
 } from './utils';
 
 /**
@@ -33,7 +33,7 @@ async function initialize({
 
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await chooseProtocol(page, protocol);
-	await goToTab(page, 'import');
+	await goToTab(page, 'classify');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }
 
