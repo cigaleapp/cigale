@@ -266,7 +266,7 @@
 		top: var(--navbar-height, 70px);
 		border: none;
 		margin-left: auto;
-		margin-right: 0;
+		margin-right: 1rem;
 		display: flex;
 		flex-direction: column;
 		padding: 2rem;
