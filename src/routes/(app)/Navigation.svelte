@@ -161,7 +161,6 @@
 		<div class="logo">
 			<a href={href('/')}>
 				<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
-				<!-- CIGALE -->
 			</a>
 			{#if previewingPrNumber}
 				<button class="pr-number" onclick={openPreviewPRDetails}>
@@ -235,7 +234,6 @@
 			</div>
 			<div class="separator"><IconNext /></div>
 			<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
-				<!-- <IconDownload /> -->
 				Résultats
 			</ButtonSecondary>
 		</div>
@@ -278,7 +276,6 @@
 				]}
 			>
 				{#snippet trigger(props)}
-					<!-- {JSON.stringify(props)} -->
 					<ButtonIcon help="" {...props}>
 						<IconSelect />
 					</ButtonIcon>
@@ -306,11 +303,9 @@
 	}
 
 	nav {
-		/* background-color: var(--bg-primary-translucent); */
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		/* justify-content: space-between; */
 		padding: 1rem 1.5rem;
 		resize: vertical;
 		position: relative;

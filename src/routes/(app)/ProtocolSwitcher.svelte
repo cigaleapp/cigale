@@ -1,11 +1,9 @@
 <script>
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { uiState } from '$lib/state.svelte.js';
-	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import IconGoto from '~icons/ri/arrow-right-line';
 	import IconSelected from '~icons/ri/check-line';
@@ -31,7 +29,7 @@
 	]}
 >
 	{#snippet trigger(props)}
-		<button class:none-selected={!uiState.currentProtocol} class="protocol-switcher" {...props}>
+		<button class:none-selected={!uiState.currentProtocol} class="trigger" {...props}>
 			{#if uiState.currentProtocol}
 				{uiState.currentProtocol?.name}
 			{:else}
@@ -42,7 +40,7 @@
 	{/snippet}
 
 	{#snippet item({ label, protocol })}
-		<div class="protocol-switcher-item">
+		<div class="item">
 			<div class="label">
 				<div class="icon">
 					{#if uiState.currentProtocolId === protocol?.id}
@@ -69,7 +67,7 @@
 </DropdownMenu>
 
 <style>
-	.protocol-switcher {
+	.trigger {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -90,14 +88,14 @@
 		}
 	}
 
-	.protocol-switcher-item {
+	.item {
 		display: flex;
 		align-items: center;
 		gap: 2rem;
 		width: 100%;
 	}
 
-	.protocol-switcher-item div {
+	.item div {
 		display: flex;
 		align-items: center;
 	}
@@ -113,7 +111,7 @@
 		margin-right: auto;
 	}
 
-	.protocol-switcher-footer {
+	.footer {
 		padding: 1rem;
 		display: flex;
 		justify-content: center;

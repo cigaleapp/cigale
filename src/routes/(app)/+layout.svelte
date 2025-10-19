@@ -29,14 +29,13 @@
 	const { swarpc, parallelism } = $derived(data);
 
 	/** @type {'full' | 'floating' | 'hidden'} */
-	let navbarState = $state('full');
-
-	setContext('setNavbarAppearance', (/** @type {typeof navbarState} */ state) => {
+	let navbarAppearance = $state('full');
+	setContext('setNavbarAppearance', (/** @type {typeof navbarAppearance} */ state) => {
 		onMount(() => {
-			navbarState = state;
+			navbarAppearance = state;
 		});
 		onDestroy(() => {
-			navbarState = 'full';
+			navbarAppearance = 'full';
 		});
 	});
 
@@ -132,12 +131,12 @@
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
 <RemoteProtocolImporter />
 
-{#if navbarState !== 'hidden'}
+{#if navbarAppearance !== 'hidden'}
 	<Navigation
 		{swarpc}
 		{openKeyboardShortcuts}
 		{openPrepareForOfflineUse}
-		floating={navbarState === 'floating'}
+		floating={navbarAppearance === 'floating'}
 		progress={uiState.processing.progress}
 	/>
 {/if}
