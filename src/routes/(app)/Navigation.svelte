@@ -260,7 +260,7 @@
 	<div class="inference">
 		{#if uiState.currentProtocol}
 			<DropdownMenu
-				data-testid="{tab}-model-select"
+				testid="{tab}-models"
 				help="Modèle d'inférence"
 				items={[
 					{

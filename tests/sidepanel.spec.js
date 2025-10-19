@@ -1,7 +1,7 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
-	chooseDefaultProtocol,
+	chooseProtocol,
 	getMetadataOverridesOfObservation,
 	loadDatabaseDump,
 	sidepanelMetadataSectionFor,
@@ -34,7 +34,7 @@ async function initialize({
 	if (protocol) {
 		await page.getByRole('button', { name: protocol, exact: true }).click();
 	} else {
-		await chooseDefaultProtocol(page);
+		await chooseProtocol(page);
 	}
 	await page.getByTestId('goto-classify').click();
 	await page.waitForURL((u) => u.hash === '#/classify');

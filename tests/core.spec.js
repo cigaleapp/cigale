@@ -8,7 +8,7 @@ import { Analysis } from '../src/lib/schemas/results.js';
 import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {
-	chooseDefaultProtocol,
+	chooseProtocol,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
@@ -51,7 +51,7 @@ for (const offline of [false, true]) {
 			}
 
 			await setSettings({ page }, { showTechnicalMetadata: false });
-			await chooseDefaultProtocol(page);
+			await chooseProtocol(page);
 			await goToTab(page, 'import');
 
 			// Import fixture image
@@ -156,7 +156,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 			showTechnicalMetadata: false
 		}
 	);
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 
 	const observations = page.getByTestId('observations-area');
@@ -214,7 +214,7 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 
 test('can pre-set models via ?classificationModel and ?cropModel', async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 
 	const classificationModel = page.getByRole('radiogroup', {
 		name: "Modèle d'inférence pour Espèce"
@@ -296,8 +296,8 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 
 test('can import a protocol and pre-set models via URL parameters', async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 	await page.goto('#/protocols');
+	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 	await page
 		.getByRole('listitem')
 		.filter({ hasText: lightweightProtocol.id })
@@ -336,7 +336,7 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 
 test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 
 	await goToTab(page, 'import');
 	await importPhotos({ page }, ['cyan.jpeg']);

@@ -16,18 +16,23 @@
 	 * @property {Item[]} items
 	 * @property {string} [help]
 	 * @property {import('svelte').Snippet<[Item]>} [item]
-	 * @property {import('svelte').Snippet} [footer]
 	 * @property {import('svelte').Snippet<[{onclick: () => void}& Record<string, unknown>]>} trigger
+	 * @property {string} [testid] sets data-testid to "{your value}-open" on the trigger element and "{your value}-options" on the content element
 	 */
 
 	/** @type {Props} */
-	const { items, item, trigger, footer, help = '', ...rest } = $props();
+	const { items, item, trigger, testid, help = '', ...rest } = $props();
+
+	const testids = $derived({
+		trigger: testid ? `${testid}-open` : undefined,
+		content: testid ? `${testid}-options` : undefined
+	});
 
 	let open = $state(false);
 </script>
 
 <DropdownMenu.Root {open}>
-	<DropdownMenu.Trigger {...rest}>
+	<DropdownMenu.Trigger {...rest} data-testid={testids.trigger}>
 		{#snippet child({ props })}
 			{@render trigger({
 				...props,
@@ -39,7 +44,7 @@
 	</DropdownMenu.Trigger>
 
 	<DropdownMenu.Portal>
-		<DropdownMenu.Content>
+		<DropdownMenu.Content data-testid={testids.content}>
 			<DropdownMenu.Group>
 				{#if help}
 					<DropdownMenu.GroupHeading>{help}</DropdownMenu.GroupHeading>
@@ -55,9 +60,6 @@
 					</DropdownMenu.Item>
 				{/each}
 			</DropdownMenu.Group>
-			{#if footer}
-				{@render footer()}
-			{/if}
 		</DropdownMenu.Content>
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>

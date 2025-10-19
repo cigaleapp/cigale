@@ -11,6 +11,7 @@
 </script>
 
 <DropdownMenu
+	testid="protocol-switcher"
 	items={[
 		...tables.Protocol.state.map((p) => ({
 			protocol: p,

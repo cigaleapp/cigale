@@ -3,20 +3,14 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import {
-	chooseDefaultProtocol,
-	firstObservationCard,
-	goToTab,
-	importPhotos,
-	setSettings
-} from './utils';
+import { chooseProtocol, firstObservationCard, goToTab, importPhotos, setSettings } from './utils';
 
 test('correctly applies crop padding', issue(463), async ({ page }) => {
 	// Disable inference to go faster
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseDefaultProtocol(page, {
-		'la détection': 'Aucune inférence',
-		Espèce: 'Aucune inférence'
+	await chooseProtocol(page, undefined, {
+		crop: 'Aucune inférence',
+		classification: 'Aucune inférence'
 	});
 
 	await goToTab(page, 'import');
