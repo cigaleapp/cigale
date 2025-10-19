@@ -8,6 +8,7 @@ import { Analysis } from '../src/lib/schemas/results.js';
 import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {
+	chooseInDropdown,
 	chooseProtocol,
 	firstObservationCard,
 	goToTab,
@@ -230,68 +231,62 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	}
 
 	await page.goto('?classificationModel=0');
-	await expect(classificationModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour Espèce":
-	    - radio "Aucune inférence" [checked]
-	    - radio /Collemboles/
-	`);
-	await expect(cropModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour la détection":
-	    - radio "Aucune inférence"
-	    - radio "YOLO11" [checked]
-	`);
+
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await page.getByTestId('protocol-switcher-open').click();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await page.getByTestId('crop-models-open').click();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
+	await page.getByTestId('classification-models-open').click();
+	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+
 	await reset();
 
 	await page.goto('?cropModel=0');
-	await expect(classificationModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour Espèce":
-	    - radio "Aucune inférence"
-	    - radio /Collemboles/ [checked]
-	`);
-	await expect(cropModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour la détection":
-	    - radio "Aucune inférence" [checked]
-	    - radio "YOLO11"
-	`);
+
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await page.getByTestId('protocol-switcher-open').click();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await page.getByTestId('crop-models-open').click();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
+	await page.getByTestId('classification-models-open').click();
+	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+
 	await reset();
 
 	await page.goto('?classificationModel=0&cropModel=0');
-	await expect(classificationModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour Espèce":
-	    - radio "Aucune inférence" [checked]
-	    - radio /Collemboles/
-	`);
-	await expect(cropModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour la détection":
-	    - radio "Aucune inférence" [checked]
-	    - radio "YOLO11"
-	`);
+
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await page.getByTestId('protocol-switcher-open').click();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await page.getByTestId('crop-models-open').click();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
+	await page.getByTestId('classification-models-open').click();
+	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+
 	await reset();
 
 	await page.goto('?classificationModel=1');
-	await expect(classificationModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour Espèce":
-	    - radio "Aucune inférence"
-	    - radio /Collemboles/ [checked]
-	`);
-	await expect(cropModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour la détection":
-	    - radio "Aucune inférence"
-	    - radio "YOLO11" [checked]
-	`);
+
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await page.getByTestId('protocol-switcher-open').click();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await page.getByTestId('crop-models-open').click();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
+	await page.getByTestId('classification-models-open').click();
+	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
+
 	await reset();
 
 	await page.goto('?cropModel=1');
-	await expect(classificationModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour Espèce":
-	    - radio "Aucune inférence"
-	    - radio /Collemboles/ [checked]
-	`);
-	await expect(cropModel).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour la détection":
-	    - radio "Aucune inférence"
-	    - radio "YOLO11" [checked]
-	`);
+
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await page.getByTestId('protocol-switcher-open').click();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await page.getByTestId('crop-models-open').click();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
+	await page.getByTestId('classification-models-open').click();
+	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
 });
 
 test('can import a protocol and pre-set models via URL parameters', async ({ page }) => {
@@ -310,28 +305,14 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 	await modal(page, 'Importer le protocole distant ?')
 		.getByRole('button', { name: 'Importer' })
 		.click();
-	await expect(
-		page.getByRole('button', {
-			name: lightweightProtocol.name,
-			exact: true
-		})
-	).toHaveAttribute('aria-pressed', 'true');
 
-	await expect(
-		page.getByRole('radiogroup', {
-			name: "Modèle d'inférence pour Espèce"
-		})
-	).toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour Espèce":
-	    - radio "Aucune inférence" [checked]
-	    - radio /Collemboles/
-	`);
-	await expect(page.getByRole('radiogroup', { name: "Modèle d'inférence pour la détection" }))
-		.toMatchAriaSnapshot(`
-	  - radiogroup "Modèle d'inférence pour la détection":
-	    - radio "Aucune inférence" [checked]
-	    - radio "YOLO11"
-	`);
+	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot();
+	await page.getByTestId('protocol-switcher-open').click();
+	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot();
+	await page.getByTestId('crop-models-open').click();
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot();
+	await page.getByTestId('classification-models-open').click();
+	await expect(page.getByTestId('classification-models-options')).toMatchAriaSnapshot();
 });
 
 test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page }) => {
@@ -348,11 +329,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	 * @param {string|RegExp} name
 	 */
 	async function setModel(tab, name) {
-		const button = page.getByTestId(`${tab}-model-select`);
-		await button.click();
-
-		const modalId = await button.getAttribute('aria-controls');
-		await page.locator(`#${modalId}`).getByRole('menuitem', { name }).click();
+		await chooseInDropdown(page, `${tab}-model-select`, name);
 	}
 
 	/**

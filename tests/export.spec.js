@@ -10,7 +10,7 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await chooseProtocol(page, undefined, {
 		crop: 'Aucune inférence',
-		classification: 'Aucune inférence'
+		classify: 'Aucune inférence'
 	});
 
 	await goToTab(page, 'import');

@@ -301,7 +301,7 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
  * Opens a dropdown and chooses an item by its name
  * @param {Page} page
  * @param {string} dropdownTestId
- * @param {string | ((options: Locator) => Locator)} option
+ * @param {string | RegExp | ((options: Locator) => Locator)} option
  */
 export async function chooseInDropdown(page, dropdownTestId, option) {
 	await page.getByTestId(`${dropdownTestId}-open`).click();
@@ -309,9 +309,9 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 	const options = await page.getByTestId(`${dropdownTestId}-options`);
 
 	const item =
-		typeof option === 'string'
-			? options.getByRole('menuitem', { name: option })
-			: option(options);
+		typeof option === 'function'
+			? option(options)
+			: options.getByRole('menuitem', { name: option });
 
 	await item.click();
 }
@@ -320,7 +320,7 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
  *
  * @param {Page} page
  * @param {string} [name]
- * @param {{ crop?: string, classification?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
 export async function chooseProtocol(page, name, models = {}) {
 	// Choose default protocol

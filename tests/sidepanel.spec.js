@@ -7,7 +7,8 @@ import {
 	sidepanelMetadataSectionFor,
 	metadataValueInDatabase,
 	setSettings,
-	firstObservationCard
+	firstObservationCard,
+	goToTab
 } from './utils';
 
 /**
@@ -31,13 +32,8 @@ async function initialize({
 	await loadDatabaseDump(page, `${dump}.devalue`);
 
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	if (protocol) {
-		await page.getByRole('button', { name: protocol, exact: true }).click();
-	} else {
-		await chooseProtocol(page);
-	}
-	await page.getByTestId('goto-classify').click();
-	await page.waitForURL((u) => u.hash === '#/classify');
+	await chooseProtocol(page, protocol);
+	await goToTab(page, 'import');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }
 
