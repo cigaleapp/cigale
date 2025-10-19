@@ -181,8 +181,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				<header>
 					<h2>{groupName}</h2>
 					<p>
-						<!-- @wc-context: Interpreted as HTML -->
-						{@html plural(sortedImages.length, ['# élément', '# éléments'])}
+						{plural(sortedImages.length, ['# élément', '# éléments'])}
 					</p>
 				</header>
 			{/if}
