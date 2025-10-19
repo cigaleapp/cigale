@@ -401,9 +401,9 @@
 	}
 
 	.settings {
-		--hover-bg: var(--bg-neutral);
-		--fg: var(--fg-neutral);
-		--hover-fg: var(--fg-primary);
+		--trigger-hover-bg: var(--bg-neutral);
+		--trigger-fg: var(--fg-neutral);
+		--trigger-hover-fg: var(--fg-primary);
 	}
 
 	header.native-window aside {

@@ -6,6 +6,9 @@
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { queryParameters, ssp } from 'sveltekit-search-params';
+	import { page } from '$app/state';
+
+	const { swarpc } = $derived(page.data);
 
 	let importingPreselectedProtocol = $state(false);
 	const numberToIndex = {
@@ -74,7 +77,7 @@
 		if (!raw) return;
 
 		try {
-			const { id } = await data.swarpc.importProtocol({ contents: raw });
+			const { id } = await swarpc.importProtocol({ contents: raw });
 			await tables.Protocol.refresh();
 			await tables.Metadata.refresh();
 

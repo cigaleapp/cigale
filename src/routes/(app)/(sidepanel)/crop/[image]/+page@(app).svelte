@@ -51,23 +51,22 @@
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import * as dates from 'date-fns';
 	import { watch } from 'runed';
-	import IconRevert from '~icons/ri/reset-left-fill';
-	import IconToolMove from '~icons/ri/drag-move-2-fill';
+	import { getContext } from 'svelte';
+	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
+	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
-	import IconHasCrop from '~icons/ri/crop-line';
-	import IconFocus from '~icons/ri/crosshair-line';
-	import IconNeuralNet from '~icons/ri/sparkling-line';
-	import IconToolHand from '~icons/ri/hand';
-	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
-	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
-	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
 	import IconConfirmedCrop from '~icons/ri/check-double-line';
-	import IconToolDragCrop from '~icons/ri/shape-2-line';
-	import IconGallery from '~icons/ri/function-line';
+	import IconHasCrop from '~icons/ri/crop-line';
+	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
+	import IconFocus from '~icons/ri/crosshair-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
-	import { getContext } from 'svelte';
-	import Logo from '$lib/Logo.svelte';
+	import IconToolMove from '~icons/ri/drag-move-2-fill';
+	import IconGallery from '~icons/ri/function-line';
+	import IconToolHand from '~icons/ri/hand';
+	import IconRevert from '~icons/ri/reset-left-fill';
+	import IconToolDragCrop from '~icons/ri/shape-2-line';
+	import IconNeuralNet from '~icons/ri/sparkling-line';
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');

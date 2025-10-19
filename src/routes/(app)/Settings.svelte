@@ -65,6 +65,10 @@
 </script>
 
 <ButtonIcon
+	--fg="var(--trigger-fg)"
+	--bg="var(--trigger-bg)"
+	--hover-fg="var(--trigger-hover-fg)"
+	--hover-bg="var(--trigger-hover-bg)"
 	data-testid="settings-button"
 	help={open ? 'Fermer' : 'Réglages'}
 	onclick={() => {
