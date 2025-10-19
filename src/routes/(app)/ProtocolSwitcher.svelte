@@ -13,13 +13,6 @@
 <DropdownMenu
 	testid="protocol-switcher"
 	items={[
-		...tables.Protocol.state.map((p) => ({
-			protocol: p,
-			label: p.name,
-			onclick() {
-				uiState.setCurrentProtocolId(p.id);
-			}
-		})),
 		{
 			protocol: null,
 			label: 'Gérer les protocoles',
@@ -28,6 +21,15 @@
 			}
 		}
 	]}
+	selectableItems={tables.Protocol.state.map((p) => ({
+		protocol: p,
+		key: p.id,
+		label: p.name,
+		selected: uiState.currentProtocolId === p.id,
+		onclick() {
+			uiState.setCurrentProtocolId(p.id);
+		}
+	}))}
 >
 	{#snippet trigger(props)}
 		<button class:none-selected={!uiState.currentProtocol} class="trigger" {...props}>

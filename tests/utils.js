@@ -312,7 +312,7 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 	const item =
 		typeof option === 'function'
 			? option(options)
-			: options.getByRole('menuitem', { name: option });
+			: options.getByRole('menuitemcheckbox', { name: option });
 
 	await item.click();
 	await page.keyboard.press('Escape'); // Close the dropdown

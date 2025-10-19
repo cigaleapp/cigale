@@ -152,12 +152,7 @@
 		<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
 	</div>
 
-	<nav
-		bind:clientHeight={navHeight}
-		data-testid="app-nav"
-		data-sveltekit-preload-data="viewport"
-		class:floating
-	>
+	<nav bind:clientHeight={navHeight} data-testid="app-nav" class:floating>
 		<div class="logo">
 			<a href={href('/')}>
 				<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
@@ -262,16 +257,19 @@
 			<DropdownMenu
 				testid="{tab}-models"
 				help="Modèle d'inférence"
-				items={[
+				items={[]}
+				selectableItems={[
 					{
-						i: -1,
+						key: -1,
 						label: 'Aucune inférence',
+						selected: currentModelIndex === -1,
 						onclick: () => setSelection(-1)
 					},
 					...models.map((model, i) => ({
-						i,
+						key: i,
 						label: model.name ?? '',
-						onclick: () => setSelection(i)
+						onclick: () => setSelection(i),
+						selected: currentModelIndex === i
 					}))
 				]}
 			>
@@ -280,9 +278,9 @@
 						<IconSelect />
 					</ButtonIcon>
 				{/snippet}
-				{#snippet item({ label, i })}
+				{#snippet item({ label, key })}
 					<div class="selected-model-indicator">
-						{#if i === currentModelIndex}
+						{#if key === currentModelIndex}
 							<IconCheck />
 						{/if}
 					</div>

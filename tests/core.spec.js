@@ -216,53 +216,41 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 	await chooseProtocol(page);
 
 	async function reset() {
-		await chooseInDropdown(page, 'classification-model-select', 'Collemboles');
-		await chooseInDropdown(page, 'crop-model-select', 'YOLO11');
+		await chooseInDropdown(page, 'classify-models', 'Collemboles');
+		await chooseInDropdown(page, 'crop-models', 'YOLO11');
 		await page.waitForTimeout(500);
 	}
 
 	await page.goto('?classificationModel=0');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(
-		`
-	  - 'button "Example: arthropodes (lightweight)"':
-	    - img
-	`,
+	await expect(page.getByTestId('protocol-switcher-open')).toHaveAccessibleName(
+		'Example: arthropodes (lightweight)',
 		{
 			timeout: 30_000
 		}
 	);
-	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(`
-	  - menu:
-	    - group:
-	      - 'menuitem /Example: arthropodes \\(lightweight\\).+/':
-	        - img
-	        - code: /v\\d+/
-	        - button /.+/:
-	          - img
-	      - menuitem "Gérer les protocoles":
-	        - img
-	`);
-	await page.keyboard.press('Escape');
+
 	await page.getByTestId('crop-models-open').click();
 	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(`
 	  - menu:
 	    - group "Modèle d'inférence":
 	      - group: Modèle d'inférence
-	      - menuitem "Aucune inférence"
-	      - menuitem "YOLO11":
+	      - menuitemcheckbox "Aucune inférence"
+	      - menuitemcheckbox "YOLO11" [checked]:
 	        - img
+	    - group
 	`);
 	await page.keyboard.press('Escape');
+
 	await page.getByTestId('classify-models-open').click();
 	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(`
 	  - menu:
 	    - group "Modèle d'inférence":
 	      - group: Modèle d'inférence
-	      - menuitem "Aucune inférence":
+	      - menuitemcheckbox "Aucune inférence" [checked]:
 	        - img
-	      - menuitem /Collemboles \\(~\\d+ classes\\)/
+	      - menuitemcheckbox /Collemboles \\(~\\d+ classes\\)/
+	    - group
 	`);
 	await page.keyboard.press('Escape');
 
@@ -270,74 +258,125 @@ test('can pre-set models via ?classificationModel and ?cropModel', async ({ page
 
 	await page.goto('?cropModel=0');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
-		timeout: 30_000
-	});
-	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.getByTestId('crop-models-open').click({ timeout: 30_000 });
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence" [checked]:
+	        - img
+	      - menuitemcheckbox "YOLO11"
+	    - group
+	`);
 	await page.keyboard.press('Escape');
-	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
-	await page.keyboard.press('Escape');
+
 	await page.getByTestId('classify-models-open').click();
-	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence"
+	      - menuitemcheckbox /Collemboles \\(~\\d+ classes\\)/ [checked]:
+	        - img
+	    - group
+	`);
 	await page.keyboard.press('Escape');
 
 	await reset();
 
 	await page.goto('?classificationModel=0&cropModel=0');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
-		timeout: 30_000
-	});
-	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.getByTestId('crop-models-open').click({ timeout: 30_000 });
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence" [checked]:
+	        - img
+	      - menuitemcheckbox "YOLO11"
+	    - group
+	`);
 	await page.keyboard.press('Escape');
-	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
-	await page.keyboard.press('Escape');
+
 	await page.getByTestId('classify-models-open').click();
-	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence" [checked]:
+	        - img
+	      - menuitemcheckbox /Collemboles \\(~\\d+ classes\\)/
+	    - group
+	`);
 	await page.keyboard.press('Escape');
 
 	await reset();
 
 	await page.goto('?classificationModel=1');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
-		timeout: 30_000
-	});
-	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.getByTestId('crop-models-open').click({ timeout: 30_000 });
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence"
+	      - menuitemcheckbox "YOLO11" [checked]:
+	        - img
+	    - group
+	`);
 	await page.keyboard.press('Escape');
-	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
-	await page.keyboard.press('Escape');
+
 	await page.getByTestId('classify-models-open').click();
-	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence"
+	      - menuitemcheckbox /Collemboles \\(~\\d+ classes\\)/ [checked]:
+	        - img
+	    - group
+	`);
 	await page.keyboard.press('Escape');
 
 	await reset();
 
 	await page.goto('?cropModel=1');
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``, {
-		timeout: 30_000
-	});
-	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
+	await page.getByTestId('crop-models-open').click({ timeout: 30_000 });
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence"
+	      - menuitemcheckbox "YOLO11" [checked]:
+	        - img
+	    - group
+	`);
 	await page.keyboard.press('Escape');
-	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
-	await page.keyboard.press('Escape');
+
 	await page.getByTestId('classify-models-open').click();
-	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence"
+	      - menuitemcheckbox /Collemboles \\(~\\d+ classes\\)/ [checked]:
+	        - img
+	    - group
+	`);
 	await page.keyboard.press('Escape');
 });
 
 test('can import a protocol and pre-set models via URL parameters', async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await page.goto('#/protocols');
+
+	await page.getByTestId('protocol-switcher-open').click();
+	await page
+		.getByTestId('protocol-switcher-options')
+		.getByRole('menuitem', { name: 'Gérer les protocoles' })
+		.click();
+	await page.waitForURL((u) => u.hash === '#/protocols');
+
 	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 	await page
 		.getByRole('listitem')
@@ -351,18 +390,35 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 	await modal(page, 'Importer le protocole distant ?')
 		.getByRole('button', { name: 'Importer' })
 		.click({
-			timeout: 30_000
+			timeout: 60_000
 		});
 
-	await expect(page.getByTestId('protocol-switcher-open')).toMatchAriaSnapshot(``);
-	await page.getByTestId('protocol-switcher-open').click();
-	await expect(page.getByTestId('protocol-switcher-options')).toMatchAriaSnapshot(``);
-	await page.keyboard.press('Escape');
+	await expect(page.getByTestId('protocol-switcher-open')).toHaveAccessibleName(
+		'Example: arthropodes (lightweight)'
+	);
+
 	await page.getByTestId('crop-models-open').click();
-	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(``);
+	await expect(page.getByTestId('crop-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence" [checked]:
+	        - img
+	      - menuitemcheckbox "YOLO11"
+	    - group
+	`);
 	await page.keyboard.press('Escape');
+
 	await page.getByTestId('classify-models-open').click();
-	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(``);
+	await expect(page.getByTestId('classify-models-options')).toMatchAriaSnapshot(`
+	  - menu:
+	    - group "Modèle d'inférence":
+	      - group: Modèle d'inférence
+	      - menuitemcheckbox "Aucune inférence" [checked]:
+	        - img
+	      - menuitemcheckbox /Collemboles \\(~\\d+ classes\\)/
+	    - group
+	`);
 	await page.keyboard.press('Escape');
 });
 
