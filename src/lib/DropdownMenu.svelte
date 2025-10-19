@@ -77,7 +77,6 @@
 
 	:global([data-dropdown-menu-item]) {
 		padding: 0.5rem 1rem;
-		border-radius: 0.25rem;
 		cursor: pointer;
 		user-select: none;
 		display: flex;
@@ -86,7 +85,7 @@
 	}
 
 	:global([data-dropdown-menu-item]:is(:hover, :focus-visible)) {
-		background-color: var(--bg-primary);
+		background-color: var(--bg-primary-translucent);
 		color: var(--fg-primary);
 	}
 </style>

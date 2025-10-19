@@ -1,10 +1,8 @@
 <script>
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import a from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
-	import IconExpand from '~icons/ri/expand-up-down-line';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
@@ -16,6 +14,7 @@
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
+	import IconExpand from '~icons/ri/expand-up-down-line';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import Settings from './Settings.svelte';
@@ -249,14 +248,32 @@
 		</div>
 
 		<aside class:native={isNativeWindow}>
-			<a class="protocol-switcher" href={href('/')} use:tooltip={'Changer de protocole'}>
-				{#if uiState.currentProtocol}
-					{uiState.currentProtocol?.name}
-				{:else}
-					Aucun protocole sélectionné
-				{/if}
-				<IconExpand />
-			</a>
+			<!-- <a class="protocol-switcher" href={href('/')} >
+			</a> -->
+			<DropdownMenu
+				items={tables.Protocol.state.map((p) => ({
+					...p,
+					label: p.name,
+					onclick() {
+						uiState.setCurrentProtocolId(p.id);
+					}
+				}))}
+			>
+				{#snippet trigger(props)}
+					<button
+						class="protocol-switcher"
+						use:tooltip={'Changer de protocole'}
+						{...props}
+					>
+						{#if uiState.currentProtocol}
+							{uiState.currentProtocol?.name}
+						{:else}
+							Aucun protocole sélectionné
+						{/if}
+						<IconExpand />
+					</button>
+				{/snippet}
+			</DropdownMenu>
 			<div class="settings">
 				<Settings
 					{openPrepareForOfflineUse}
@@ -476,6 +493,7 @@
 		border-radius: var(--corner-radius);
 		flex-wrap: nowrap;
 		white-space: nowrap;
+		font-size: 1rem;
 
 		&:hover,
 		&:focus-visible {
