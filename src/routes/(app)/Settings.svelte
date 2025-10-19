@@ -267,8 +267,9 @@
 		flex-direction: column;
 		padding: 2rem;
 		z-index: 2;
-		background-color: var(--bg-primary-translucent);
-		border-bottom-left-radius: 5px;
+		background-color: var(--bg-neutral);
+		border-radius: var(--corner-radius);
+		border: 1px solid var(--fg-primary);
 		font-size: smaller;
 	}
 
@@ -276,7 +277,6 @@
 		font-size: 1.5em;
 		font-weight: bold;
 		margin-bottom: 0.5em;
-		color: var(--fg-primary);
 	}
 
 	.listParam {

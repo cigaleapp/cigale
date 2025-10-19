@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
@@ -14,9 +15,9 @@
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
-	import IconExpand from '~icons/ri/expand-up-down-line';
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
+	import ProtocolSwitcher from './ProtocolSwitcher.svelte';
 	import Settings from './Settings.svelte';
 
 	/**
@@ -170,14 +171,6 @@
 		</div>
 
 		<div class="steps">
-			<!-- <a href={href('/')}>
-				Protocole
-				Removing preselection GET params from URL removes the slash, which would unselect the tab w/o the == "" check 
-				{#if path == '/' || path == ''}
-					<div class="line"></div>
-				{/if}
-			</a>
-			<div class="separator"><IconNext /></div> -->
 			<a
 				href={href('/import')}
 				data-testid="goto-import"
@@ -241,39 +234,14 @@
 				)}
 			</div>
 			<div class="separator"><IconNext /></div>
-			<a testid="export-results-button" tight onclick={openExportModal}>
+			<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
 				<!-- <IconDownload /> -->
 				Résultats
-			</a>
+			</ButtonSecondary>
 		</div>
 
 		<aside class:native={isNativeWindow}>
-			<!-- <a class="protocol-switcher" href={href('/')} >
-			</a> -->
-			<DropdownMenu
-				items={tables.Protocol.state.map((p) => ({
-					...p,
-					label: p.name,
-					onclick() {
-						uiState.setCurrentProtocolId(p.id);
-					}
-				}))}
-			>
-				{#snippet trigger(props)}
-					<button
-						class="protocol-switcher"
-						use:tooltip={'Changer de protocole'}
-						{...props}
-					>
-						{#if uiState.currentProtocol}
-							{uiState.currentProtocol?.name}
-						{:else}
-							Aucun protocole sélectionné
-						{/if}
-						<IconExpand />
-					</button>
-				{/snippet}
-			</DropdownMenu>
+			<ProtocolSwitcher />
 			<div class="settings">
 				<Settings
 					{openPrepareForOfflineUse}
@@ -481,23 +449,6 @@
 
 		aside {
 			display: none;
-		}
-	}
-
-	.protocol-switcher {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		border: 2px solid transparent;
-		padding: 0.5em 0.75em;
-		border-radius: var(--corner-radius);
-		flex-wrap: nowrap;
-		white-space: nowrap;
-		font-size: 1rem;
-
-		&:hover,
-		&:focus-visible {
-			border-color: var(--gray);
 		}
 	}
 

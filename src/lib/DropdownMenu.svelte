@@ -16,11 +16,12 @@
 	 * @property {Item[]} items
 	 * @property {string} [help]
 	 * @property {import('svelte').Snippet<[Item]>} [item]
+	 * @property {import('svelte').Snippet} [footer]
 	 * @property {import('svelte').Snippet<[{onclick: () => void}& Record<string, unknown>]>} trigger
 	 */
 
 	/** @type {Props} */
-	const { items, item, trigger, help = '', ...rest } = $props();
+	const { items, item, trigger, footer, help = '', ...rest } = $props();
 
 	let open = $state(false);
 </script>
@@ -54,6 +55,9 @@
 					</DropdownMenu.Item>
 				{/each}
 			</DropdownMenu.Group>
+			{#if footer}
+				{@render footer()}
+			{/if}
 		</DropdownMenu.Content>
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>
@@ -66,6 +70,7 @@
 		border: 1px solid var(--fg-primary);
 		border-radius: 0.5rem;
 		overflow: hidden;
+		z-index: 100;
 	}
 
 	:global([data-dropdown-menu-group-heading]) {
