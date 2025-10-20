@@ -6,13 +6,13 @@
 	import { entries } from '$lib/utils';
 	import { type } from 'arktype';
 	import wordDiff from 'word-diff';
-	import IconBefore from '~icons/ph/arrow-arc-left';
-	import IconAfter from '~icons/ph/arrow-arc-right';
-	import IconKeyValueSeparator from '~icons/ph/caret-right-fill';
-	import IconEditKey from '~icons/ph/pencil';
-	import IconAddKey from '~icons/ph/plus';
-	import IconRemoveKey from '~icons/ph/trash';
-	import IconOpenInExternal from '~icons/ph/arrow-square-out';
+	import IconBefore from '~icons/ri/arrow-left-wide-fill';
+	import IconAfter from '~icons/ri/arrow-right-wide-fill';
+	import IconKeyValueSeparator from '~icons/ri/arrow-right-s-fill';
+	import IconEditKey from '~icons/ri/pencil-line';
+	import IconAddKey from '~icons/ri/add-line';
+	import IconRemoveKey from '~icons/ri/delete-bin-line';
+	import IconOpenInExternal from '~icons/ri/external-link-fill';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { fade } from 'svelte/transition';
 

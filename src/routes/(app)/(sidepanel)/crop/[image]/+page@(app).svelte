@@ -51,21 +51,22 @@
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import * as dates from 'date-fns';
 	import { watch } from 'runed';
-	import IconRevert from '~icons/ph/arrow-arc-left';
-	import IconToolMove from '~icons/ph/arrows-out-cardinal';
-	import IconPrev from '~icons/ph/caret-left';
-	import IconNext from '~icons/ph/caret-right';
-	import IconHasCrop from '~icons/ph/crop';
-	import IconFocus from '~icons/ph/crosshair-simple';
-	import IconNeuralNet from '~icons/ph/graph';
-	import IconToolHand from '~icons/ph/hand';
-	import IconFourPointCrop from '~icons/ph/number-circle-four';
-	import IconTwoPointCrop from '~icons/ph/number-circle-two';
-	import IconUnconfirmedCrop from '~icons/ph/seal';
-	import IconConfirmedCrop from '~icons/ph/seal-check';
-	import IconToolDragCrop from '~icons/ph/selection-plus';
-	import IconGallery from '~icons/ph/squares-four';
-	import IconDelete from '~icons/ph/trash';
+	import { getContext } from 'svelte';
+	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
+	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
+	import IconPrev from '~icons/ri/arrow-left-s-line';
+	import IconNext from '~icons/ri/arrow-right-s-line';
+	import IconConfirmedCrop from '~icons/ri/check-double-line';
+	import IconHasCrop from '~icons/ri/crop-line';
+	import IconTwoPointCrop from '~icons/ri/crosshair-2-line';
+	import IconFocus from '~icons/ri/crosshair-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconToolMove from '~icons/ri/drag-move-2-fill';
+	import IconGallery from '~icons/ri/function-line';
+	import IconToolHand from '~icons/ri/hand';
+	import IconRevert from '~icons/ri/reset-left-fill';
+	import IconToolDragCrop from '~icons/ri/shape-2-line';
+	import IconNeuralNet from '~icons/ri/sparkling-line';
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
@@ -73,6 +74,8 @@
 	const firstImage = $derived(images.at(0));
 
 	$effect(() => seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` }));
+
+	getContext('setNavbarAppearance')('floating');
 
 	// Controls visibility of the checkmark little centered overlay
 	let confirmedOverlayShown = $state(false);
@@ -755,24 +758,6 @@
 </div>
 
 <div class="layout">
-	<aside class="toolbar">
-		{#each tools as tool (tool.name)}
-			<button
-				aria-label="Choisir l'outil {tool.name}"
-				class:active={tool.name === activeToolName}
-				use:tooltip={{
-					text: `${tool.name}: ${tool.help}`,
-					keyboard: tool.shortcut,
-					placement: 'right'
-				}}
-				onclick={() => {
-					activeToolName = tool.name;
-				}}
-			>
-				<tool.icon />
-			</button>
-		{/each}
-	</aside>
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<main
 		class="crop-surface"
@@ -862,6 +847,24 @@
 			/>
 		{/if}
 	</main>
+	<aside class="toolbar">
+		{#each tools as tool (tool.name)}
+			<button
+				aria-label="Choisir l'outil {tool.name}"
+				class:active={tool.name === activeToolName}
+				use:tooltip={{
+					text: `${tool.name}: ${tool.help}`,
+					keyboard: tool.shortcut,
+					placement: 'right'
+				}}
+				onclick={() => {
+					activeToolName = tool.name;
+				}}
+			>
+				<tool.icon />
+			</button>
+		{/each}
+	</aside>
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">

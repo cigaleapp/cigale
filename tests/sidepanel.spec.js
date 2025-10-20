@@ -1,13 +1,14 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
-	chooseDefaultProtocol,
+	chooseProtocol,
+	firstObservationCard,
 	getMetadataOverridesOfObservation,
+	goToTab,
 	loadDatabaseDump,
-	sidepanelMetadataSectionFor,
 	metadataValueInDatabase,
 	setSettings,
-	firstObservationCard
+	sidepanelMetadataSectionFor
 } from './utils';
 
 /**
@@ -31,13 +32,8 @@ async function initialize({
 	await loadDatabaseDump(page, `${dump}.devalue`);
 
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	if (protocol) {
-		await page.getByRole('button', { name: protocol, exact: true }).click();
-	} else {
-		await chooseDefaultProtocol(page);
-	}
-	await page.getByTestId('goto-classify').click();
-	await page.waitForURL((u) => u.hash === '#/classify');
+	await chooseProtocol(page, protocol);
+	await goToTab(page, 'classify');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }
 

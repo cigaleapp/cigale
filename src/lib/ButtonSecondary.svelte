@@ -31,7 +31,7 @@ Available CSS variables:
 
 <script>
 	import KeyboardHint from './KeyboardHint.svelte';
-	import IconSpinner from '~icons/ph/spinner-ball';
+	import LoadingSpinner from './LoadingSpinner.svelte';
 
 	import { tooltip } from './tooltips';
 
@@ -80,7 +80,7 @@ Available CSS variables:
 >
 	{#if isLoading}
 		<div class="loading-spinner">
-			<IconSpinner />
+			<LoadingSpinner />
 		</div>
 	{/if}
 	{@render children({ loading: isLoading && loading })}
@@ -97,7 +97,7 @@ Available CSS variables:
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		border: 1px solid var(--fg, var(--gray));
+		border: 0.1625em solid var(--fg, var(--gray));
 		padding: 0.75em;
 		border-radius: var(--corner-radius);
 		width: var(--width);

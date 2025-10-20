@@ -15,11 +15,11 @@
 	import { Protocol } from '$lib/schemas/protocols';
 	import { TraversalError } from 'arktype';
 	import { fade } from 'svelte/transition';
-	import IconGoto from '~icons/ph/arrow-right';
-	import IconOpenDetails from '~icons/ph/caret-down';
-	import IconAdd from '~icons/ph/plus';
-	import IconTrash from '~icons/ph/trash';
-	import IconError from '~icons/ph/warning-circle';
+	import IconGoto from '~icons/ri/arrow-right-line';
+	import IconOpenDetails from '~icons/ri/arrow-down-s-line';
+	import IconAdd from '~icons/ri/add-line';
+	import IconTrash from '~icons/ri/delete-bin-line';
+	import IconError from '~icons/ri/error-warning-line';
 	import { updater } from '../updater.svelte';
 	import ModelConfig from './ModelConfig.svelte';
 	import { modelUrl } from '$lib/inference';

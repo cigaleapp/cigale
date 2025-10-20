@@ -89,6 +89,9 @@
 			});
 	}
 
+	// TODO fix chunked batching: add a throttle to
+	// wait before starting classification batch
+	// so that tasks are more likely to be queued together
 	$effect(() => {
 		if (!uiState.classificationInferenceAvailable) return;
 		if (!classifmodelLoaded) return;
@@ -203,7 +206,6 @@
 
 <style>
 	.observations {
-		padding: 2.5em;
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;

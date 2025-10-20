@@ -5,7 +5,7 @@ import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.jso
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
-	chooseDefaultProtocol,
+	chooseProtocol,
 	expectTooltipContent,
 	firstObservationCard,
 	getMetadataValuesOfImage,
@@ -214,7 +214,7 @@ test.describe('invalid json analysis', async () => {
 });
 
 test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'sample.cr2');
 	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
@@ -228,7 +228,7 @@ test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
 });
 
 test('can import a large image', issue(412, 415), async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'large-image.jpeg');
 	await expect(page.getByText('large-image.jpeg')).toBeVisible({
@@ -241,7 +241,7 @@ test('can import a large image', issue(412, 415), async ({ page }) => {
 });
 
 test('cannot import an extremely large image', issue(412, 414), async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, '20K-gray.jpeg');
 	await waitForLoadingEnd(page);
@@ -253,7 +253,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 });
 
 test('can cancel import', issue(430), async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);
 	await expect(firstObservationCard(page)).toHaveText(loadingText, {
@@ -269,7 +269,7 @@ test('can cancel import', issue(430), async ({ page }) => {
 });
 
 test('can import in multiple batches', async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos(
 		{ page, wait: false },
@@ -290,7 +290,7 @@ test(
 	'deleting an image in the import tab does not create ghost observation cards',
 	issue(439),
 	async ({ page }) => {
-		await chooseDefaultProtocol(page);
+		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'lil-fella', 'cyan');
 		await goToTab(page, 'classify');
@@ -313,7 +313,7 @@ test(
 );
 
 test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella', 'cyan');
 
@@ -332,7 +332,7 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 });
 
 test('can extract EXIF date from an image', async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella');
 	await waitForLoadingEnd(page);
@@ -354,7 +354,7 @@ test('can extract EXIF date from an image', async ({ page }) => {
 });
 
 test('can extract EXIF GPS data from an image', async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'with-exif-gps');
 	await waitForLoadingEnd(page);

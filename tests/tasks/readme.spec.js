@@ -1,11 +1,5 @@
 import { expect, test } from '../fixtures';
-import {
-	chooseDefaultProtocol,
-	firstObservationCard,
-	goToTab,
-	importPhotos,
-	setSettings
-} from '../utils';
+import { chooseProtocol, firstObservationCard, goToTab, importPhotos, setSettings } from '../utils';
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
 		Boolean(process.env.CI && !process.env.RUN_README_TESTS),
@@ -41,12 +35,12 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			});
 
 			test('protocol', async ({ page }) => {
-				await chooseDefaultProtocol(page);
+				await chooseProtocol(page);
 				await expect(page).toHaveScreenshot();
 			});
 
 			test('import', async ({ page }) => {
-				await chooseDefaultProtocol(page);
+				await chooseProtocol(page);
 				await goToTab(page, 'import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
@@ -54,7 +48,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			});
 
 			test('crop', async ({ page }) => {
-				await chooseDefaultProtocol(page);
+				await chooseProtocol(page);
 				await goToTab(page, 'import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
@@ -65,7 +59,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			});
 
 			test('classify', async ({ page }) => {
-				await chooseDefaultProtocol(page);
+				await chooseProtocol(page);
 				await goToTab(page, 'import');
 
 				await importPhotos({ page }, 'lil-fella.jpeg');

@@ -8,15 +8,15 @@
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { watch } from 'runed';
-	import IconSyncWithSystemTheme from '~icons/ph/arrows-counter-clockwise';
-	import Gears from '~icons/ph/gear-light';
-	import IconDecrease from '~icons/ph/minus';
-	import Moon from '~icons/ph/moon-light';
-	import IconIncrease from '~icons/ph/plus';
-	import IconSortAsc from '~icons/ph/sort-ascending';
-	import IconSortDesc from '~icons/ph/sort-descending';
-	import Sun from '~icons/ph/sun-light';
-	import Cross from '~icons/ph/x-circle-light';
+	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
+	import Gears from '~icons/ri/settings-3-line';
+	import IconDecrease from '~icons/ri/subtract-line';
+	import Moon from '~icons/ri/moon-line';
+	import IconIncrease from '~icons/ri/add-line';
+	import IconSortAsc from '~icons/ri/sort-asc';
+	import IconSortDesc from '~icons/ri/sort-desc';
+	import Sun from '~icons/ri/sun-line';
+	import Cross from '~icons/ri/close-circle-line';
 
 	/**
 	 * @type {{openKeyboardShortcuts?: (() => void) | undefined, openPrepareForOfflineUse?: (() => void) | undefined}}
@@ -65,6 +65,10 @@
 </script>
 
 <ButtonIcon
+	--fg="var(--trigger-fg)"
+	--bg="var(--trigger-bg)"
+	--hover-fg="var(--trigger-hover-fg)"
+	--hover-bg="var(--trigger-hover-bg)"
 	data-testid="settings-button"
 	help={open ? 'Fermer' : 'Réglages'}
 	onclick={() => {
@@ -262,13 +266,14 @@
 		top: var(--navbar-height, 70px);
 		border: none;
 		margin-left: auto;
-		margin-right: 0;
+		margin-right: 1rem;
 		display: flex;
 		flex-direction: column;
 		padding: 2rem;
 		z-index: 2;
-		background-color: var(--bg-primary-translucent);
-		border-bottom-left-radius: 5px;
+		background-color: var(--bg-neutral);
+		border-radius: var(--corner-radius);
+		border: 1px solid var(--fg-primary);
 		font-size: smaller;
 	}
 
@@ -276,7 +281,6 @@
 		font-size: 1.5em;
 		font-weight: bold;
 		margin-bottom: 0.5em;
-		color: var(--fg-primary);
 	}
 
 	.listParam {

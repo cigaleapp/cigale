@@ -1,6 +1,6 @@
 import { expect, test } from '../fixtures.js';
 import {
-	chooseDefaultProtocol,
+	chooseProtocol,
 	dumpDatabase,
 	goToTab,
 	importPhotos,
@@ -32,7 +32,7 @@ test.describe('Database dumps', () => {
 		await page.getByRole('button', { name: 'Oui, supprimer' }).click();
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
 		await page.locator('nav').getByRole('link', { name: 'Protocole' }).click();
-		await chooseDefaultProtocol(page);
+		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
 		await page.waitForTimeout(2_000);
@@ -46,7 +46,7 @@ test.describe('Exports', () => {
 	 * @param {import('@playwright/test').Page} param0.page
 	 */
 	async function prepare({ page }) {
-		await chooseDefaultProtocol(page);
+		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan', 'leaf', 'lil-fella', 'with-exif-gps');
 		await expect(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {

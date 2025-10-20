@@ -1,8 +1,8 @@
 <script>
-	import IconCheck from '~icons/ph/check';
-	import IconMerged from '~icons/ph/stack';
-	import IconTechnical from '~icons/ph/wrench';
-	import IconClear from '~icons/ph/x';
+	import IconCheck from '~icons/ri/check-line';
+	import IconMerged from '~icons/ri/stack-line';
+	import IconTechnical from '~icons/ri/settings-line';
+	import IconClear from '~icons/ri/close-line';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { isType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';

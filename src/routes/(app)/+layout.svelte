@@ -13,19 +13,31 @@
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { nonnull, pick } from '$lib/utils';
 	import { watch } from 'runed';
+	import { onDestroy, onMount, setContext } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
+	import RemoteProtocolImporter from './RemoteProtocolImporter.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
+
+	/** @type {'full' | 'floating' | 'hidden'} */
+	let navbarAppearance = $state('full');
+	setContext('setNavbarAppearance', (/** @type {typeof navbarAppearance} */ state) => {
+		onMount(() => {
+			navbarAppearance = state;
+		});
+		onDestroy(() => {
+			navbarAppearance = 'full';
+		});
+	});
 
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
@@ -117,13 +129,17 @@
 
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
+<RemoteProtocolImporter />
 
-<Navigation
-	{swarpc}
-	{openKeyboardShortcuts}
-	{openPrepareForOfflineUse}
-	progress={uiState.processing.progress}
-/>
+{#if navbarAppearance !== 'hidden'}
+	<Navigation
+		{swarpc}
+		{openKeyboardShortcuts}
+		{openPrepareForOfflineUse}
+		floating={navbarAppearance === 'floating'}
+		progress={uiState.processing.progress}
+	/>
+{/if}
 
 <section class="toasts" data-testid="toasts-area">
 	{#each toasts.items('default') as toast (toast.id)}

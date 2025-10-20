@@ -22,9 +22,19 @@ export async function goto(...args) {
 /**
  * @template {RouteId | Pathname} T
  * @param {ResolveArgs<T>} args
+ * @returns {ResolvedPathname}
+ */
+export function hashPath(...args) {
+	// @ts-expect-error
+	return resolve(...args).replace(resolve('/'), '/');
+}
+
+/**
+ * @template {RouteId | Pathname} T
+ * @param {ResolveArgs<T>} args
  * @returns {`#${ResolvedPathname}`}
  */
 export function href(...args) {
 	// @ts-expect-error
-	return '#' + resolve(...args).replace(resolve('/'), '/');
+	return '/#' + hashPath(...args);
 }

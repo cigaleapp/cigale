@@ -1,8 +1,8 @@
 <script>
 	import { tooltip } from '$lib/tooltips.js';
-	import IconInferred from '~icons/ph/magic-wand';
-	import IconTag from '~icons/ph/tag';
-	import IconTechnical from '~icons/ph/wrench';
+	import IconInferred from '~icons/ri/sparkling-line';
+	import IconTag from '~icons/ri/price-tag-3-line';
+	import IconTechnical from '~icons/ri/settings-line';
 
 	/**
 	 * @typedef {object} Props

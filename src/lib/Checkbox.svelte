@@ -1,6 +1,6 @@
 <script>
 	//export let value = false;
-	import Icon from '~icons/ph/check-light';
+	import Icon from '~icons/ri/check-line';
 
 	/**
 	 * @typedef {object} Props

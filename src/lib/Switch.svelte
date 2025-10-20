@@ -1,6 +1,6 @@
 <script>
-	import Check from '~icons/ph/check-bold';
-	import Cross from '~icons/ph/x-bold';
+	import Check from '~icons/ri/check-line';
+	import Cross from '~icons/ri/close-line';
 	import { getSettings } from './settings.svelte';
 
 	/**

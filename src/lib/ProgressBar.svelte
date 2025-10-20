@@ -38,7 +38,7 @@
 
 	.progress-bar {
 		width: 100%;
-		height: 0.25rem;
+		height: var(--height, 0.25rem);
 		border-radius: var(--corners, 0);
 		background: var(--inactive-bg);
 		overflow: hidden;
@@ -46,7 +46,7 @@
 
 	.progress-bar .completed {
 		height: 100%;
-		background: var(--fg-primary);
+		background: var(--fill-color, var(--fg-primary));
 		transition: width 0.5s;
 	}
 

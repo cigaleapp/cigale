@@ -5,11 +5,12 @@
  */
 
 import * as beamup from '@cigale/beamup';
-import { entries, groupBy, nonnull, pick, propOrNothing, range } from './utils.js';
+
 import { generateId } from './database.js';
+import { errorMessage } from './i18n.js';
 import { serializeMetadataValue } from './metadata.js';
 import { getSetting } from './settings.svelte.js';
-import { errorMessage } from './i18n.js';
+import { entries, groupBy, nonnull, pick, propOrNothing, range } from './utils.js';
 
 /**
  * Stores a correction made to a protocol's metadata value.
@@ -57,7 +58,13 @@ export async function storeCorrection(db, protocol, subject, metadata, beforeVal
 			...propOrNothing(
 				'file',
 				file
-					? pick(file, 'id', /* TODO 'contentHash', */ 'filename', 'contentType', 'dimensions')
+					? pick(
+							file,
+							'id',
+							/* TODO 'contentHash', */ 'filename',
+							'contentType',
+							'dimensions'
+						)
 					: undefined
 			),
 			before: { ...beforeValue, value: serializeMetadataValue(beforeValue) },

@@ -3,8 +3,8 @@
 	import { tables } from '$lib/idb.svelte.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
-	import IconImport from '~icons/ph/download';
-	import IconCreate from '~icons/ph/plus-circle';
+	import IconImport from '~icons/ri/download-2-line';
+	import IconCreate from '~icons/ri/add-circle-line';
 	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
 	import RowProtocol from './RowProtocol.svelte';
 	import { plural } from '$lib/i18n';

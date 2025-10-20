@@ -8,10 +8,10 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import UnsavedChangesIndicator from '$lib/UnsavedChangesIndicator.svelte';
-	import IconUpgrade from '~icons/ph/arrow-circle-up';
-	import IconEdit from '~icons/ph/pencil';
-	import IconExport from '~icons/ph/share';
-	import IconDelete from '~icons/ph/trash';
+	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
+	import IconEdit from '~icons/ri/pencil-line';
+	import IconExport from '~icons/ri/share-forward-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
 	const { id, name, dirty, source, version, ondelete } = $props();

@@ -57,10 +57,10 @@
 	import { error } from '@sveltejs/kit';
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { fade } from 'svelte/transition';
-	import IconSearch from '~icons/ph/magnifying-glass';
-	import IconAdd from '~icons/ph/plus';
-	import IconDelete from '~icons/ph/trash';
-	import IconClose from '~icons/ph/x';
+	import IconSearch from '~icons/ri/search-line';
+	import IconAdd from '~icons/ri/add-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconClose from '~icons/ri/close-line';
 
 	const { data, children } = $props();
 

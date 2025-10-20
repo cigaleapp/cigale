@@ -1,22 +1,21 @@
 <script>
+	import IconInfo from '~icons/ri/question-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
-	import IconInfo from '~icons/ph/question';
+	import Switch from '$lib/Switch.svelte';
 
 	/**
 	 * @typedef {object} Props
 	 * @property {typeof import('$lib/schemas/protocols').BeamupSettings.infer} config
 	 * @property {string} protocol
+	 * @property {undefined | (() => void)} [open]
 	 */
 
 	/** @type {Props}*/
-	const { config, protocol } = $props();
-
-	/** @type{undefined | (() => void)}*/
-	let open = $state();
+	let { config, protocol, open = $bindable() } = $props();
 
 	const domain = $derived.by(() => {
 		if (!URL.canParse(config.origin)) return config.origin;
@@ -26,6 +25,10 @@
 	});
 
 	const publicDataUrl = $derived(new URL(`/corrections/${protocol}`, config.origin));
+
+	const preferences = $derived(
+		getSettings().beamupPreferences[protocol] ?? { enable: false, email: null }
+	);
 </script>
 
 <Modal
@@ -34,14 +37,16 @@
 	bind:open
 >
 	<p>
-		Quand une métadonnée est modifiée manuellement après avoir été inférée automatiquement par un
-		modèle, cette correction peut être remontée aux auteurices du protocole pour améliorer les
-		modèles d'inférence.
+		Quand une métadonnée est modifiée manuellement après avoir été inférée automatiquement par
+		un modèle, cette correction peut être remontée aux auteurices du protocole pour améliorer
+		les modèles d'inférence.
 	</p>
 
 	<p>
-		Pour cela, si vous activez cette option, et quand ce protocole est sélectionné, Cigale enverra
-		les données suivantes au <a target="_blank" href={config.origin}>serveur BeamUp à {domain}</a>
+		Pour cela, si vous activez cette option, et quand ce protocole est sélectionné, Cigale
+		enverra les données suivantes au <a target="_blank" href={config.origin}
+			>serveur BeamUp à {domain}</a
+		>
 	</p>
 
 	<ul>
@@ -52,15 +57,15 @@
 		<li>Valeur, score de confiance et alternatives avant modification</li>
 		<li>Valeur, score de confiance et alternatives après modification</li>
 		<li>
-			Identifiant et <a target="_blank" href="https://fr.wikipedia.org/wiki/Hash">hash</a> du/des fichier(s)
-			photos de l'observation ayant été modifiée
+			Identifiant et <a target="_blank" href="https://fr.wikipedia.org/wiki/Hash">hash</a> du/des
+			fichier(s) photos de l'observation ayant été modifiée
 		</li>
 	</ul>
 
 	<p>
-		Il n'y a pas besoin d'être connecté·e à Internet au moment où l'on corrige la métadonnée, les
-		corrections sont stockées localement et envoyées au prochain démarrage de l'appli, quand une
-		connexion est disponible.
+		Il n'y a pas besoin d'être connecté·e à Internet au moment où l'on corrige la métadonnée,
+		les corrections sont stockées localement et envoyées au prochain démarrage de l'appli, quand
+		une connexion est disponible.
 	</p>
 
 	<p>
@@ -71,10 +76,26 @@
 			{publicDataUrl.href}
 		</a>
 	</p>
+	<section class="toggle">
+		<Switch
+			show-label
+			label="Activer"
+			value={preferences.enable}
+			onchange={async (enable) => {
+				await setSetting('beamupPreferences', {
+					...getSettings().beamupPreferences,
+					[protocol]: {
+						...preferences,
+						enable
+					}
+				});
+			}}
+		/>
+	</section>
 	<section class="email">
 		<p>
-			Si vous le souhaitez, vous pouvez aussi renseigner une addresse e-mail, pour éventuellement
-			être contacté·e
+			Si vous le souhaitez, vous pouvez aussi renseigner une addresse e-mail, pour
+			éventuellement être contacté·e
 		</p>
 
 		<InlineTextInput
@@ -84,7 +105,7 @@
 				await setSetting('beamupPreferences', {
 					...getSettings().beamupPreferences,
 					[protocol]: {
-						enable: true,
+						...preferences,
 						email: email.trim() || null
 					}
 				});
@@ -97,12 +118,9 @@
 	{/snippet}
 </Modal>
 
-<ButtonIcon help="En savoir plus" onclick={() => open?.()}>
-	<IconInfo />
-</ButtonIcon>
-
 <style>
-	.email {
+	.email,
+	.toggle {
 		display: flex;
 		flex-direction: column;
 		text-align: center;
