@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-20T01:54:39.940Z\n"
+"PO-Revision-Date: 2025-10-20T19:28:23.268Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -21,10 +21,6 @@ msgstr "<0/> Auto"
 msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Other photos <1/>"
 
-#: src/routes/(app)/Navigation.svelte
-msgid "<0/> C.i.g.a.l.e."
-msgstr "<0/> C.i.g.a.l.e."
-
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
@@ -32,10 +28,6 @@ msgstr "<0/> Loading…"
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Créer"
 msgstr "<0/> Create"
-
-#: src/routes/(app)/+page.svelte
-msgid "<0/> Gérer les protocoles"
-msgstr "<0/> Manage protocols"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Images avec recadrage <1/>"
@@ -49,17 +41,9 @@ msgstr "<0/> Import"
 msgid "<0/> Importer d'autres images"
 msgstr "<0/> Import other images"
 
-#: src/routes/(app)/+page.svelte
-msgid "<0/> Importer un protocole"
-msgstr "<0/> Import a protocol"
-
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Invalider"
 msgstr "<0/> Mark invalid"
-
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "<0/> Non versionné"
-msgstr "<0/> Not versioned"
 
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> OK!"
@@ -181,6 +165,7 @@ msgstr "No inference parameters defined for model {0} on protocol {1}"
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
 #: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/ProtocolSwitcher.svelte
 msgid "Aucun protocole sélectionné"
 msgstr "No protocol selected"
 
@@ -236,7 +221,7 @@ msgstr "CIGALE ver. <0/> · <1>About</1>"
 msgid "Cacher les boîtes non sélectionnées"
 msgstr "Hide unselected boxes"
 
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid ""
 "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
 "suivante: <0/> <1>Importation en cours...</1>"
@@ -299,11 +284,6 @@ msgstr "Choose {0} tool"
 #: src/routes/(app)/Navigation.svelte
 msgid "Choisir le protocole"
 msgstr "Choose protocol"
-
-#: src/routes/(app)/+page.svelte
-#: src/routes/(app)/+page.svelte
-msgid "Choisir un protocole"
-msgstr "Choose a protocol"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Chrome"
@@ -429,7 +409,7 @@ msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr "Error while extracting EXIF metadata for {0}"
 
 #. placeholder {0}: e
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Error while importing remote protocol: {0}"
 
@@ -512,7 +492,7 @@ msgstr "Next image"
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Importer"
 msgstr "Import"
 
@@ -524,7 +504,7 @@ msgstr "Import <0/>"
 msgid "Importer des images"
 msgstr "Import images"
 
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Importer le protocole distant ?"
 msgstr "Import remote protocol ?"
 
@@ -589,10 +569,6 @@ msgstr "Analyis file of {0} has been exported with protocol {1}, but current pro
 msgid "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
 msgstr "Analysis file of {0} is not valid JSON or is corrupted"
 
-#: src/routes/(app)/+page.svelte
-msgid "Le protocole que vous souhaitez n'est pas disponible?"
-msgstr "Don't see a protocol you want to use?"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
@@ -634,15 +610,6 @@ msgstr "Debug mode"
 #: src/routes/(app)/Navigation.svelte
 msgid "Modèle d'inférence"
 msgstr "Inference model"
-
-#: src/routes/(app)/+page.svelte
-msgid "Modèle d'inférence pour la détection"
-msgstr "Inference model for detection"
-
-#. placeholder {0}: classificationMetadata?.label
-#: src/routes/(app)/+page.svelte
-msgid "Modèle d'inférence pour {0}"
-msgstr "Inference model for {0}"
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Métadonées mise à jour à la sélection de cette option"
@@ -698,22 +665,9 @@ msgstr "No need for Control-S, your changes are saved automatically 😎"
 msgid "Preview #{0}"
 msgstr "Preview #{0}"
 
-#. placeholder {0}: protocol.name
-#: src/routes/(app)/+page.svelte
-msgid "Protocole \"{0}\" importé et sélectionné"
-msgstr "Imported and selected protocol \"{0}\""
-
-#: src/routes/(app)/Navigation.svelte
-msgid "Protocole <0/>"
-msgstr "Protocol <0/>"
-
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Protocole supprimé"
 msgstr "Protocol deleted"
-
-#: src/routes/(app)/+page.svelte
-msgid "Protocole sélectionné"
-msgstr "Selected protocol"
 
 #. placeholder {0}: ps[0].name
 #: src/routes/(app)/protocols/+page.svelte
@@ -755,17 +709,9 @@ msgstr "Crop images"
 msgid "Recadrer {0}"
 msgstr "Crop {0}"
 
-#: src/routes/(app)/+page.svelte
-msgid "Recherche"
-msgstr "Search"
-
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Recherche de mise à jour…"
 msgstr "Checking for updates…"
-
-#: src/routes/(app)/+page.svelte
-msgid "Rechercher..."
-msgstr "Search..."
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Regrouper les images et/ou observations sélectionnées en une observation"
@@ -1769,4 +1715,14 @@ msgstr ""
 #. placeholder {0}: e
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de mettre à jour le protocole: {0}"
+msgstr ""
+
+#: src/lib/AreaObservations.svelte
+msgid "# élément"
+msgid_plural "# éléments"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Non versionné"
 msgstr ""

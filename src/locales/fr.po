@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-20T01:54:39.938Z\n"
+"PO-Revision-Date: 2025-10-20T19:28:23.266Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -20,10 +20,6 @@ msgstr "<0/> Auto"
 msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Autres photos <1/>"
 
-#: src/routes/(app)/Navigation.svelte
-msgid "<0/> C.i.g.a.l.e."
-msgstr "<0/> C.i.g.a.l.e."
-
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Chargement…"
@@ -31,10 +27,6 @@ msgstr "<0/> Chargement…"
 #: src/routes/(app)/protocols/+page.svelte
 msgid "<0/> Créer"
 msgstr "<0/> Créer"
-
-#: src/routes/(app)/+page.svelte
-msgid "<0/> Gérer les protocoles"
-msgstr "<0/> Gérer les protocoles"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Images avec recadrage <1/>"
@@ -48,17 +40,9 @@ msgstr "<0/> Importer"
 msgid "<0/> Importer d'autres images"
 msgstr "<0/> Importer d'autres images"
 
-#: src/routes/(app)/+page.svelte
-msgid "<0/> Importer un protocole"
-msgstr "<0/> Importer un protocole"
-
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Invalider"
 msgstr "<0/> Invalider"
-
-#: src/lib/ButtonUpdateProtocol.svelte
-msgid "<0/> Non versionné"
-msgstr "<0/> Non versionné"
 
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid "<0/> OK!"
@@ -180,6 +164,7 @@ msgstr "Aucun paramètre d'inférence défini pour le modèle {0} sur le protoco
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
 #: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/ProtocolSwitcher.svelte
 msgid "Aucun protocole sélectionné"
 msgstr "Aucun protocole sélectionné"
 
@@ -235,7 +220,7 @@ msgstr "CIGALE ver. <0/> · <1>À propos</1>"
 msgid "Cacher les boîtes non sélectionnées"
 msgstr "Cacher les boîtes non sélectionnées"
 
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid ""
 "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
 "suivante: <0/> <1>Importation en cours...</1>"
@@ -298,11 +283,6 @@ msgstr "Choisir l'outil {0}"
 #: src/routes/(app)/Navigation.svelte
 msgid "Choisir le protocole"
 msgstr "Choisir le protocole"
-
-#: src/routes/(app)/+page.svelte
-#: src/routes/(app)/+page.svelte
-msgid "Choisir un protocole"
-msgstr "Choisir un protocole"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Chrome"
@@ -428,7 +408,7 @@ msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 
 #. placeholder {0}: e
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Erreur lors de l'import du protocole distant: {0}"
 
@@ -511,7 +491,7 @@ msgstr "Image suivante"
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Importer"
 msgstr "Importer"
 
@@ -523,7 +503,7 @@ msgstr "Importer <0/>"
 msgid "Importer des images"
 msgstr "Importer des images"
 
-#: src/routes/(app)/+page.svelte
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Importer le protocole distant ?"
 msgstr "Importer le protocole distant ?"
 
@@ -588,10 +568,6 @@ msgstr "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais
 msgid "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
 msgstr "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
 
-#: src/routes/(app)/+page.svelte
-msgid "Le protocole que vous souhaitez n'est pas disponible?"
-msgstr "Le protocole que vous souhaitez n'est pas disponible?"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
@@ -633,15 +609,6 @@ msgstr "Mode debug"
 #: src/routes/(app)/Navigation.svelte
 msgid "Modèle d'inférence"
 msgstr "Modèle d'inférence"
-
-#: src/routes/(app)/+page.svelte
-msgid "Modèle d'inférence pour la détection"
-msgstr "Modèle d'inférence pour la détection"
-
-#. placeholder {0}: classificationMetadata?.label
-#: src/routes/(app)/+page.svelte
-msgid "Modèle d'inférence pour {0}"
-msgstr "Modèle d'inférence pour {0}"
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Métadonées mise à jour à la sélection de cette option"
@@ -697,22 +664,9 @@ msgstr "Pas besoin de Ctrl-S, vos changements sont sauvegardés automatiquement 
 msgid "Preview #{0}"
 msgstr "Preview #{0}"
 
-#. placeholder {0}: protocol.name
-#: src/routes/(app)/+page.svelte
-msgid "Protocole \"{0}\" importé et sélectionné"
-msgstr "Protocole \"{0}\" importé et sélectionné"
-
-#: src/routes/(app)/Navigation.svelte
-msgid "Protocole <0/>"
-msgstr "Protocole <0/>"
-
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Protocole supprimé"
 msgstr "Protocole supprimé"
-
-#: src/routes/(app)/+page.svelte
-msgid "Protocole sélectionné"
-msgstr "Protocole sélectionné"
 
 #. placeholder {0}: ps[0].name
 #: src/routes/(app)/protocols/+page.svelte
@@ -754,17 +708,9 @@ msgstr "Recadrer les images"
 msgid "Recadrer {0}"
 msgstr "Recadrer {0}"
 
-#: src/routes/(app)/+page.svelte
-msgid "Recherche"
-msgstr "Recherche"
-
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Recherche de mise à jour…"
 msgstr "Recherche de mise à jour…"
-
-#: src/routes/(app)/+page.svelte
-msgid "Rechercher..."
-msgstr "Rechercher..."
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Regrouper les images et/ou observations sélectionnées en une observation"
@@ -1774,3 +1720,13 @@ msgstr "Protocole mis à jour vers la v{0}"
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Impossible de mettre à jour le protocole: {0}"
+
+#: src/lib/AreaObservations.svelte
+msgid "# élément"
+msgid_plural "# éléments"
+msgstr[0] "# élément"
+msgstr[1] "# éléments"
+
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Non versionné"
+msgstr "Non versionné"
