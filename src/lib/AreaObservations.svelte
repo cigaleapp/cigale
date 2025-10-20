@@ -181,11 +181,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				<header>
 					<h2>{groupName}</h2>
 					<p>
-						<!-- @wc-context: Interpreted as HTML -->
-						{@html plural(sortedImages.length, [
-							'<code>#</code> élément',
-							'<code>#</code> éléments'
-						])}
+						{plural(sortedImages.length, ['# élément', '# éléments'])}
 					</p>
 				</header>
 			{/if}
@@ -224,6 +220,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		align-content: flex-start;
 		justify-content: space-between;
 		gap: 1.5em 1em;
+		padding: 0 2.5em;
 	}
 
 	.images {
@@ -233,8 +230,22 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	}
 
 	.group header {
-		margin-bottom: 1em;
 		user-select: none;
+		display: flex;
+		align-items: center;
+		justify-content: start;
+		gap: 1em;
+		position: sticky;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 10;
+		background-color: var(--bg-neutral);
+		padding: 0 2.5em 0.75em 2.5em;
+
+		* {
+			font-size: 1.1rem;
+		}
 	}
 
 	.debug {

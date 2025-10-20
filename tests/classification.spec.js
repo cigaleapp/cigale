@@ -1,7 +1,7 @@
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
-	chooseDefaultProtocol,
+	chooseProtocol,
 	firstObservationCard,
 	getMetadataValue,
 	getObservation,
@@ -11,7 +11,7 @@ import {
 
 test.describe('classifies without error', () => {
 	test('when observation has no crop box', issue(435), async ({ page }) => {
-		await chooseDefaultProtocol(page);
+		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'issue-435.jpeg');
 		await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
@@ -29,7 +29,7 @@ test.describe('classifies without error', () => {
 });
 
 test('allows cancelling classification of an observation', issue(430), async ({ page }) => {
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {

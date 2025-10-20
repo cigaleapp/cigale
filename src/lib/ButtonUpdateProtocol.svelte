@@ -20,6 +20,7 @@
 	import IconUpToDate from '~icons/ri/checkbox-circle-line';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import IconCannotCheckForUpdates from '~icons/ri/error-warning-line';
+	import IconNotVersioned from '~icons/ri/question-line';
 	import ButtonIcon from './ButtonIcon.svelte';
 
 	/**
@@ -174,8 +175,8 @@
 	})}
 {:else if version}
 	<Btn onclick={() => {}} help="Ce protocole ne supporte pas la vérification des mises à jour">
-		<span class="version-check">
-			<IconCannotCheckForUpdates />
+		<span class="version-check not-applicable">
+			<IconNotVersioned />
 			{#if !compact}
 				v{version}
 			{/if}
@@ -194,9 +195,9 @@
 		onclick={() => {}}
 		help="Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version"
 	>
-		<span class="version-check error">
+		<span class="version-check not-applicable">
+			<IconNotVersioned />
 			{#if !compact}
-				<IconCannotCheckForUpdates />
 				Non versionné
 			{/if}
 		</span>
@@ -214,6 +215,10 @@
 
 	.version-check.update-available {
 		color: var(--fg-warning);
+	}
+
+	.version-check.not-applicable {
+		color: var(--gay);
 	}
 
 	.version-check {

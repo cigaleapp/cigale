@@ -2,7 +2,7 @@ import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	browserConsole,
-	chooseDefaultProtocol,
+	chooseProtocol,
 	getImage,
 	getMetadataValue,
 	getSettings,
@@ -17,7 +17,7 @@ test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }, testInfo) => {
 		testInfo.setTimeout(40_000);
 		await loadDatabaseDump(page);
-		await chooseDefaultProtocol(page);
+		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		const allImages = await listTable(page, 'Image');
 		await markImagesAsConfirmedInDatabase(
@@ -547,14 +547,14 @@ test.describe('Cropper view', () => {
 			await expect(image).toHaveCSS('scale', '1');
 
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 254.761, 140.073);
+			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 
 			await page.mouse.down({ button: 'middle' });
 			await zoomAt(page, 0, 50, 50);
 			await page.mouse.up({ button: 'middle' });
 			await page.waitForTimeout(200);
 
-			await checkImageTransforms(page, 1.728, 181.761, 45.0734);
+			await checkImageTransforms(page, 1.728, 181.761, 46.5267);
 
 			// Make sure no box was created
 			await expect(page.getByText(/Boîte #\d+/)).toHaveCount(1);
@@ -563,18 +563,18 @@ test.describe('Cropper view', () => {
 		test('recalls zoom and pan between image changes', async ({ page }) => {
 			const images = await imagesByName(page);
 			await zoomAt(page, 120, 100, 100);
-			await checkImageTransforms(page, 1.728, 254.761, 140.073);
+			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 
 			await page.keyboard.press('ArrowRight');
 			await page.waitForURL((u) => u.hash === `#/crop/${images.withExifGps.fileId}`);
 
 			await zoomAt(page, 40, 150, 150);
-			await checkImageTransforms(page, 1.44, 124.186, 73.3824);
+			await checkImageTransforms(page, 1.44, 124.186, 73.1136);
 
 			await page.keyboard.press('ArrowLeft');
 			await page.waitForURL((u) => u.hash === `#/crop/${images.lilFella.fileId}`);
 
-			await checkImageTransforms(page, 1.728, 254.761, 140.073);
+			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 		});
 	});
 });

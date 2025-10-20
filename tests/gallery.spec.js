@@ -1,9 +1,9 @@
 import { test, expect } from './fixtures';
-import { chooseDefaultProtocol, goToTab, importPhotos, openSettings, setSettings } from './utils';
+import { chooseProtocol, goToTab, importPhotos, openSettings, setSettings } from './utils';
 
 test.describe('sorting', () => {
 	test.beforeEach(async ({ page }) => {
-		await chooseDefaultProtocol(page);
+		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		await setSettings({ page }, { showTechnicalMetadata: true });
 

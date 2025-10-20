@@ -298,23 +298,39 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 }
 
 /**
+ * Opens a dropdown and chooses an item by its name
+ * @param {Page} page
+ * @param {string} dropdownTestId
+ * @param {string | RegExp | ((options: Locator) => Locator)} option
+ */
+export async function chooseInDropdown(page, dropdownTestId, option) {
+	const trigger = page.getByTestId(`${dropdownTestId}-open`);
+	const options = page.getByTestId(`${dropdownTestId}-options`);
+
+	await trigger.click();
+
+	const item =
+		typeof option === 'function'
+			? option(options)
+			: options.getByRole('menuitemcheckbox', { name: option });
+
+	await item.click();
+	await page.keyboard.press('Escape'); // Close the dropdown
+}
+
+/**
  *
  * @param {Page} page
- * @param {Record<string, string>} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {string} [name]
+ * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
-export async function chooseDefaultProtocol(page, models = {}) {
+export async function chooseProtocol(page, name, models = {}) {
 	// Choose default protocol
-	await expect(page.getByTestId('protocol-to-choose')).toBeVisible({ timeout: 20_000 });
-	await page.getByTestId('protocol-to-choose').click();
+	await chooseInDropdown(page, 'protocol-switcher', name ?? ((opts) => opts.first()));
+
 	if (models) {
 		for (const [task, model] of Object.entries(models)) {
-			await page
-				.locator('.model-select', {
-					hasText: `Modèle d'inférence pour ${task}`,
-					has: page.locator('input[type="radio"]')
-				})
-				.getByRole('radio', { name: model })
-				.check();
+			await chooseInDropdown(page, `${task}-models`, model);
 		}
 	}
 }
@@ -324,7 +340,6 @@ export async function chooseDefaultProtocol(page, models = {}) {
  * @param {import('$lib/i18n').Language} lang
  */
 const appNavTabs = (lang = 'fr') => ({
-	protocol: { name: lang === 'fr' ? 'Protocole' : 'Protocol', hash: '#/protocol' },
 	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
 	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
 	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' }
@@ -333,7 +348,7 @@ const appNavTabs = (lang = 'fr') => ({
 /**
  *
  * @param {Page} page
- * @param {'protocol'|'import'|'crop'|'classify'} tabName
+ * @param {'import'|'crop'|'classify'} tabName
  * @param {object} [options]
  * @param {boolean} [options.waitForModel=true] wait for the model to be loaded (only for crop and classify)
  * @param {import('$lib/i18n').Language} [options.language=fr]
@@ -360,7 +375,7 @@ export async function goToTab(page, tabName, { waitForModel = true, language = '
 /**
  *
  * @param {Page} page
- * @param {'protocol'|'import'|'crop'|'classify'} tabName
+ * @param {'import'|'crop'|'classify'} tabName
  * @param {'fr'|'en'} [language=fr]
  */
 export function getTab(page, tabName, language = 'fr') {
@@ -371,13 +386,13 @@ export function getTab(page, tabName, language = 'fr') {
 }
 
 /**
- *
+ * Must already be on the /protocols management page
  * @param {Page} page
  * @param {string} filepath relative to tests/fixtures/
  */
 export async function importProtocol(page, filepath) {
 	const fileChooser = page.waitForEvent('filechooser');
-	await page.getByRole('button', { name: 'Importer un protocole' }).click();
+	await page.getByRole('button', { name: 'Importer' }).click();
 	await fileChooser.then((chooser) =>
 		chooser.setFiles(path.join(import.meta.dirname, './fixtures', filepath))
 	);
@@ -441,7 +456,7 @@ export function toast(page, message, { exact = false, type = undefined }) {
  */
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseDefaultProtocol(page);
+	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();

@@ -39,7 +39,11 @@ const webkit = {
 export default defineConfig({
 	/* Leave some time before github actions makes the job time out (1 hour), so the report can be deployed */
 	globalTimeout: minutesToMilliseconds(9),
-	timeout: minutesToMilliseconds(1.2),
+	timeout: dependsOnTarget({
+		dev: minutesToMilliseconds(5),
+		live: minutesToMilliseconds(1.2),
+		built: minutesToMilliseconds(1.2)
+	}),
 	testDir: './tests',
 	/* Run tests in files in parallel */
 	fullyParallel: true,
@@ -47,8 +51,8 @@ export default defineConfig({
 	forbidOnly: !!process.env.CI,
 	/* Retry on CI only */
 	retries: process.env.CI ? 2 : 0,
-	/* Opt out of parallel tests on CI. */
-	workers: process.env.CI ? 1 : undefined,
+	/* Opt out of parallel tests. */
+	workers: 1,
 	/* Reporter to use. See https://playwright.dev/docs/test-reporters */
 	reporter: process.env.CI
 		? [

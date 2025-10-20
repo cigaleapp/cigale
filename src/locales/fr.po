@@ -81,8 +81,8 @@ msgid "<0/> Réinitialiser la base de données"
 msgstr "<0/> Réinitialiser la base de données"
 
 #: src/routes/(app)/Navigation.svelte
-msgid "<0/> Résultats"
-msgstr "<0/> Résultats"
+msgid "Résultats"
+msgstr "Résultats"
 
 #: src/lib/CardMedia.svelte
 msgid "<0/> Rééssayer"

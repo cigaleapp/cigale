@@ -65,6 +65,10 @@
 </script>
 
 <ButtonIcon
+	--fg="var(--trigger-fg)"
+	--bg="var(--trigger-bg)"
+	--hover-fg="var(--trigger-hover-fg)"
+	--hover-bg="var(--trigger-hover-bg)"
 	data-testid="settings-button"
 	help={open ? 'Fermer' : 'Réglages'}
 	onclick={() => {
@@ -262,13 +266,14 @@
 		top: var(--navbar-height, 70px);
 		border: none;
 		margin-left: auto;
-		margin-right: 0;
+		margin-right: 1rem;
 		display: flex;
 		flex-direction: column;
 		padding: 2rem;
 		z-index: 2;
-		background-color: var(--bg-primary-translucent);
-		border-bottom-left-radius: 5px;
+		background-color: var(--bg-neutral);
+		border-radius: var(--corner-radius);
+		border: 1px solid var(--fg-primary);
 		font-size: smaller;
 	}
 
@@ -276,7 +281,6 @@
 		font-size: 1.5em;
 		font-weight: bold;
 		margin-bottom: 0.5em;
-		color: var(--fg-primary);
 	}
 
 	.listParam {
