@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add default crop padding setting
 - Add field label for protocol description
 - Allow deleting option from option details page
+- Change icon pack to Remix Icon (#776)
 - Clarify that pattern repeats by adding labels to faded nodes in diagram
 - Color differences-with-remote-protocol count according to amount of changes
 - Document variables in export configuration
@@ -19,6 +20,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Finish crop settings
 - Finish protocol diffing
 - Fix alignment on RowProtocol
+- Fix font family in keyboard hints
 - Fix math font
 - Fix width of buttons in protocol selection page
 - Implement diffing of protocol with its remote, upstream version
@@ -28,9 +30,12 @@ All notable changes to this project will be documented in this file, on a monthl
 - Make debug dumps smaller in preview panel
 - Make parallelism configurable (Closes #700) (#767)
 - Make version input monospace
+- Prevent image numbers in cropper navigation from becoming small
 - Put number of cards in grouped grid headings in monospace font
 - Put search bar above new option field in options edition page
 - Remove Manage protocols button on settings flyout
+- Remove checkmark icon from continue button in cropper
+- Show loading spinner on card while loading cropper view
 - Show options count on metadata navbar
 - Switch monospace font to Martian Mono
 - Tweak text styles in /about
@@ -38,6 +43,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Bug Fixes
 
+- Fix computation progress for protocol diffing not showing up
 - Fix displaying of added metadata in protocol diffing
 - Fix fonts not loading
 - Fix option description updates not store in db
