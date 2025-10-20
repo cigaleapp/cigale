@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-10-18T14:19:38.422Z\n"
+"PO-Revision-Date: 2025-10-20T01:54:39.938Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1764,3 +1764,13 @@ msgstr[1] "# observations"
 #: src/routes/(app)/about/+page.svelte
 msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
 msgstr "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
+
+#. placeholder {0}: version
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Protocole mis à jour vers la v{0}"
+msgstr "Protocole mis à jour vers la v{0}"
+
+#. placeholder {0}: e
+#: src/lib/ButtonUpdateProtocol.svelte
+msgid "Impossible de mettre à jour le protocole: {0}"
+msgstr "Impossible de mettre à jour le protocole: {0}"
