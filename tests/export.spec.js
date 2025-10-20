@@ -22,8 +22,8 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await firstObservationCard(page).click();
 	await page.getByRole('button', { name: "Choisir l'outil 2 points" }).click();
 	// TODO fix coordinates for WebKit, current snapshots is off-center
-	await page.mouse.click(334 - 56, 292 - 34);
-	await page.mouse.click(543 - 56, 501 - 34);
+	await page.mouse.click(334 - 56, 292 - 36);
+	await page.mouse.click(543 - 56, 501 - 36);
 
 	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
 
