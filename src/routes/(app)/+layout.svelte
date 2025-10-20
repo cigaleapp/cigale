@@ -6,21 +6,23 @@
 </script>
 
 <script>
-	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
-	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
-	import Toast from '$lib/Toast.svelte';
-	import * as db from '$lib/idb.svelte';
-	import { tables } from '$lib/idb.svelte';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { initializeProcessingQueue } from '$lib/queue.svelte';
-	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
-	import { uiState } from '$lib/state.svelte';
-	import { toasts } from '$lib/toasts.svelte';
-	import { nonnull, pick } from '$lib/utils';
 	import { watch } from 'runed';
 	import { onDestroy, onMount, setContext } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
+
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
+	import * as db from '$lib/idb.svelte';
+	import { tables } from '$lib/idb.svelte';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { initializeProcessingQueue } from '$lib/queue.svelte';
+	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
+	import { uiState } from '$lib/state.svelte';
+	import Toast from '$lib/Toast.svelte';
+	import { toasts } from '$lib/toasts.svelte';
+	import { nonnull, pick } from '$lib/utils';
+
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
 	import RemoteProtocolImporter from './RemoteProtocolImporter.svelte';

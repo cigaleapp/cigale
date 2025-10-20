@@ -3,12 +3,13 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import { classify, infer, loadModel } from '$lib/inference.js';
+import { Schemas } from '$lib/database.js';
 import { loadToTensor } from '$lib/inference_utils.js';
+import { classify, infer, loadModel } from '$lib/inference.js';
 import { storeMetadataValue } from '$lib/metadata.js';
 import { progressSplitter } from '$lib/utils';
 import { fetchHttpRequest } from '$lib/utils.js';
-import { Schemas } from '$lib/database.js';
+
 import { openDatabase, swarp } from './index.js';
 
 /**

@@ -31,8 +31,9 @@
 
 <script>
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
-	import IconImage from '~icons/ri/image-2-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconImage from '~icons/ri/image-2-line';
+
 	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import Card from './Card.svelte';

@@ -1,12 +1,12 @@
 <script>
-	import Logo from '$lib/Logo.svelte';
+	import { fade } from 'svelte/transition';
 
+	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { sum } from '$lib/utils.js';
-	import { fade } from 'svelte/transition';
 
 	const { data, children } = $props();
 

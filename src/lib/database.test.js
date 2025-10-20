@@ -1,7 +1,8 @@
 import { ArkErrors } from 'arktype';
 import * as dates from 'date-fns';
 import { describe, expect, test } from 'vitest';
-import { Schemas, generateId, idComparator } from './database';
+
+import { generateId, idComparator, Schemas } from './database';
 import { FilepathTemplate } from './schemas/protocols';
 
 describe('generateId', () => {

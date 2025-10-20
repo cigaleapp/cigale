@@ -3,11 +3,13 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import YAML from 'yaml';
+
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
 import { omit, pick } from '$lib/utils.js';
-import YAML from 'yaml';
+
 import { openDatabase, swarp } from './index.js';
 
 swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {

@@ -1,8 +1,9 @@
 <script>
-	import Logo from '$lib/Logo.svelte';
 	import JSONC from 'tiny-jsonc';
-	import { seo } from '$lib/seo.svelte';
+
 	import lockfile from '$lib/../../bun.lock?raw';
+	import Logo from '$lib/Logo.svelte';
+	import { seo } from '$lib/seo.svelte';
 
 	const { data } = $props();
 

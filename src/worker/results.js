@@ -3,6 +3,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import { strToU8, zip } from 'fflate';
+
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
 import { cropImage } from '$lib/images.js';
@@ -17,7 +19,7 @@ import { MetadataValues } from '$lib/schemas/metadata';
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { Analysis, toMetadataRecord } from '$lib/schemas/results';
 import { compareBy } from '$lib/utils';
-import { strToU8, zip } from 'fflate';
+
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
 import { openDatabase, swarp } from './index.js';

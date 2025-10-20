@@ -1,6 +1,7 @@
 import { match } from 'arktype';
 import { Jimp } from 'jimp';
 import * as ort from 'onnxruntime-web';
+
 import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
 
 /**

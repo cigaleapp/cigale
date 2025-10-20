@@ -1,8 +1,10 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 
-import type { PROCEDURES } from '$worker/procedures.js';
 import type { SwarpcClient } from 'swarpc';
+
+import type { PROCEDURES } from '$worker/procedures.js';
+
 import 'unplugin-icons/types/svelte';
 
 declare global {

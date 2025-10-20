@@ -1,9 +1,10 @@
 import { type } from 'arktype';
-import { MetadataRuntimeValue } from './metadata.js';
-import { Protocol } from './protocols.js';
+
 // Can't use $lib/ in $lib/schemas files, they're susceptible
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
 import { mapValues } from '../utils.js';
+import { MetadataRuntimeValue } from './metadata.js';
+import { Protocol } from './protocols.js';
 
 const MetadataRecord = type({
 	'[string]': {

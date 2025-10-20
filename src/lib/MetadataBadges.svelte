@@ -1,8 +1,8 @@
 <script>
-	import { tooltip } from '$lib/tooltips.js';
-	import IconInferred from '~icons/ri/sparkling-line';
 	import IconTag from '~icons/ri/price-tag-3-line';
 	import IconTechnical from '~icons/ri/settings-line';
+	import IconInferred from '~icons/ri/sparkling-line';
+	import { tooltip } from '$lib/tooltips.js';
 
 	/**
 	 * @typedef {object} Props

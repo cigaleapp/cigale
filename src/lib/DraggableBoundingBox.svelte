@@ -1,6 +1,7 @@
 <script>
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
+
 	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 	import { imageIdToFileId } from './images';

@@ -1,6 +1,7 @@
 import { adapter as svelte } from '@wuchale/svelte';
-import { adapter as js } from 'wuchale/adapter-vanilla';
 import { defineConfig } from 'wuchale';
+import { adapter as js } from 'wuchale/adapter-vanilla';
+
 import { Tables } from './src/lib/database.js';
 
 export default defineConfig({

@@ -1,6 +1,7 @@
-import extract from 'extract-zip';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import extract from 'extract-zip';
+
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import { chooseProtocol, firstObservationCard, goToTab, importPhotos, setSettings } from './utils';

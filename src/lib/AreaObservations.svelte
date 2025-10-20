@@ -25,9 +25,11 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 </script>
 
 <script generics="GroupName extends string, ItemData">
-	import { uiState } from '$lib/state.svelte.js';
 	import * as dates from 'date-fns';
 	import { onMount } from 'svelte';
+
+	import { uiState } from '$lib/state.svelte.js';
+
 	import { DragSelect } from './dragselect.svelte.js';
 	import { plural } from './i18n.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';

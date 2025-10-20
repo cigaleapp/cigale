@@ -1,8 +1,9 @@
+import { error } from '@sveltejs/kit';
+
 import { get, list, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsKeyRange } from '$lib/metadata.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { entries } from '$lib/utils.js';
-import { error } from '@sveltejs/kit';
 
 export async function load({ parent, params }) {
 	if (!params.id) throw error(400, 'Protocol ID is required');

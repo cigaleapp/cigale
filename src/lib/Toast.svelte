@@ -5,9 +5,9 @@
 <script module>
 	import IconDebug from '~icons/ri/bug-2-line';
 	import IconSuccess from '~icons/ri/check-line';
+	import IconError from '~icons/ri/close-line';
 	import IconInfo from '~icons/ri/information-2-line';
 	import IconWarning from '~icons/ri/triangle-line';
-	import IconError from '~icons/ri/close-line';
 
 	/**
 	 * @param {import('$lib/toasts.svelte.js').Toast<any>['type']} type
@@ -48,7 +48,9 @@
 
 <script generics="T">
 	import { fade, slide } from 'svelte/transition';
+
 	import IconClose from '~icons/ri/close-line';
+
 	import ButtonInk from './ButtonInk.svelte';
 
 	/**

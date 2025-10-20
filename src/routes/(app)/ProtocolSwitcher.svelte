@@ -1,13 +1,13 @@
 <script>
+	import IconGoto from '~icons/ri/arrow-right-line';
+	import IconSelected from '~icons/ri/check-line';
+	import IconExpand from '~icons/ri/expand-up-down-line';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
-	import IconGoto from '~icons/ri/arrow-right-line';
-	import IconSelected from '~icons/ri/check-line';
-	import IconExpand from '~icons/ri/expand-up-down-line';
 </script>
 
 <DropdownMenu

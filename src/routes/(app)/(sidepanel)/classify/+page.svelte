@@ -1,4 +1,7 @@
 <script>
+	import { watch } from 'runed';
+	import { fade } from 'svelte/transition';
+
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
@@ -14,7 +17,6 @@
 	} from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
-
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
@@ -23,8 +25,6 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { sum } from '$lib/utils.js';
-	import { watch } from 'runed';
-	import { fade } from 'svelte/transition';
 
 	seo({ title: 'Classification' });
 

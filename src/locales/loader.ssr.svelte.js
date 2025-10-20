@@ -3,7 +3,7 @@
 
 /// <reference types="wuchale/virtual" />
 
-import { loadCatalog, loadIDs, key } from 'virtual:wuchale/proxy/sync'; // because it's on the server
+import { key, loadCatalog, loadIDs } from 'virtual:wuchale/proxy/sync'; // because it's on the server
 import { currentCatalog } from 'wuchale/load-utils/server';
 
 export { loadCatalog, loadIDs, key }; // for hooks.server.{js,ts}

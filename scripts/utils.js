@@ -1,6 +1,6 @@
-import * as JPEG from 'jpeg-js';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'path';
+import * as JPEG from 'jpeg-js';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 

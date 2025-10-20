@@ -1,9 +1,9 @@
-import { app, BrowserWindow, ipcMain, session } from 'electron';
-import { updateElectronApp } from 'update-electron-app';
-import path from 'node:path';
-import started from 'electron-squirrel-startup';
-import serve from 'electron-serve';
 import os from 'node:os';
+import path from 'node:path';
+import { app, BrowserWindow, ipcMain, session } from 'electron';
+import serve from 'electron-serve';
+import started from 'electron-squirrel-startup';
+import { updateElectronApp } from 'update-electron-app';
 
 /* global MAIN_WINDOW_VITE_DEV_SERVER_URL */
 const builtFileserver = serve({ directory: path.join(import.meta.dirname, 'sveltekit') });

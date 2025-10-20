@@ -1,4 +1,10 @@
 <script>
+	import { type } from 'arktype';
+	import { fade } from 'svelte/transition';
+
+	import IconCheck from '~icons/ri/check-line';
+	import IconUnpublished from '~icons/ri/cloud-off-line';
+	import IconWarning from '~icons/ri/triangle-line';
 	import { page } from '$app/state';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
@@ -11,11 +17,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { hasUpgradeAvailable } from '$lib/protocols.js';
 	import { clamp, gradientedColor } from '$lib/utils.js';
-	import { type } from 'arktype';
-	import { fade } from 'svelte/transition';
-	import IconCheck from '~icons/ri/check-line';
-	import IconUnpublished from '~icons/ri/cloud-off-line';
-	import IconWarning from '~icons/ri/triangle-line';
+
 	import { updater } from '../updater.svelte.js';
 	import ChangesWithRemote from './ChangesWithRemote.svelte';
 

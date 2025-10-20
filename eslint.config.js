@@ -1,11 +1,12 @@
-import prettier from 'eslint-config-prettier';
-import js from '@eslint/js';
+import { fileURLToPath } from 'node:url';
 import { includeIgnoreFile } from '@eslint/compat';
+import js from '@eslint/js';
+import prettier from 'eslint-config-prettier';
+import depend from 'eslint-plugin-depend';
 import oxlint from 'eslint-plugin-oxlint';
 import svelte from 'eslint-plugin-svelte';
-import depend from 'eslint-plugin-depend';
 import globals from 'globals';
-import { fileURLToPath } from 'node:url';
+
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 /** @type {import('eslint').Linter.Config[]} */

@@ -1,5 +1,7 @@
 import Viselect from '@viselect/vanilla';
+
 import './dragselect.css';
+
 import { nonnull } from './utils';
 
 export class DragSelect {

@@ -1,9 +1,9 @@
 import 'fake-indexeddb/auto';
 
+import { readFileSync } from 'node:fs';
 import exif from 'exif-parser';
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { readFileSync } from 'node:fs';
 import {
 	addExifMetadata,
 	coerceExifValue,

@@ -1,3 +1,6 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import JSZip from 'jszip';
+
 import { expect, test } from '../fixtures.js';
 import {
 	chooseProtocol,
@@ -7,8 +10,6 @@ import {
 	importProtocol,
 	importResults
 } from '../utils.js';
-import JSZip from 'jszip';
-import { readFile, writeFile } from 'node:fs/promises';
 
 test.skip(
 	Boolean(process.env.CI),
