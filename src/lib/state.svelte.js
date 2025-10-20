@@ -1,6 +1,8 @@
-import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 import { match } from 'arktype';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+
+import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
+
 import { tables } from './idb.svelte';
 import { getMetadataValue } from './metadata';
 import { getSetting, getSettings, setSetting } from './settings.svelte';

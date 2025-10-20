@@ -2,8 +2,10 @@
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { marked } from 'marked';
+
 	import IconArrowRight from '~icons/ri/arrow-right-line';
 	import IconCheck from '~icons/ri/check-line';
+
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';

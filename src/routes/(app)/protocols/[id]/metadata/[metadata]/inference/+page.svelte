@@ -1,4 +1,7 @@
 <script>
+	import { ArkErrors } from 'arktype';
+	import { fade } from 'svelte/transition';
+
 	import { invalidateAll } from '$app/navigation';
 	import { EXIF_FIELDS } from '$lib/exiffields';
 	import FieldUrl from '$lib/FieldURL.svelte';
@@ -7,8 +10,6 @@
 	import { EXIFField } from '$lib/schemas/metadata.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { keys, omit } from '$lib/utils';
-	import { ArkErrors } from 'arktype';
-	import { fade } from 'svelte/transition';
 
 	const { data } = $props();
 	const { infer, id } = $derived(data.metadata);

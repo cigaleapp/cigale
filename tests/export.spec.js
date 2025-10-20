@@ -1,9 +1,16 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import { chooseProtocol,
-	exportResults, firstObservationCard, goToTab, importPhotos, setSettings } from './utils';
+import {
+	chooseProtocol,
+	exportResults,
+	firstObservationCard,
+	goToTab,
+	importPhotos,
+	setSettings
+} from './utils';
 
 test('correctly applies crop padding', issue(463), async ({ page }) => {
 	// Disable inference to go faster

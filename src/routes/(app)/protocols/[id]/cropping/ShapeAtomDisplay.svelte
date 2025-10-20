@@ -1,9 +1,10 @@
 <script>
+	import * as Math from 'svelte-mathml';
+
 	/**
 	 * @type {{atom: string}}
 	 */
 	const { atom } = $props();
-	import * as Math from 'svelte-mathml';
 
 	const isVariable = $derived(!['score', '_', 'delete', ''].includes(atom));
 </script>

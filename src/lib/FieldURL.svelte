@@ -1,11 +1,12 @@
 <script>
-	import Field from './Field.svelte';
-	import InlineTextInput from './InlineTextInput.svelte';
-	import IconOpenExternal from '~icons/ri/external-link-fill';
 	import IconSuccess from '~icons/ri/check-line';
 	import IconFail from '~icons/ri/close-line';
+	import IconOpenExternal from '~icons/ri/external-link-fill';
 	import IconChecking from '~icons/ri/more-fill';
+
 	import ButtonIcon from './ButtonIcon.svelte';
+	import Field from './Field.svelte';
+	import InlineTextInput from './InlineTextInput.svelte';
 
 	/**
 	 * @import { Component, Snippet } from 'svelte';

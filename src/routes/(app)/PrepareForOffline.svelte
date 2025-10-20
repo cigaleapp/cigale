@@ -1,4 +1,6 @@
 <script>
+	import { SvelteMap } from 'svelte/reactivity';
+
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
@@ -7,7 +9,6 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { toastIcon } from '$lib/Toast.svelte';
 	import { clamp } from '$lib/utils';
-	import { SvelteMap } from 'svelte/reactivity';
 
 	let { open = $bindable() } = $props();
 

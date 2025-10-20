@@ -1,15 +1,16 @@
 <script>
 	import IconCheck from '~icons/ri/check-line';
-	import IconMerged from '~icons/ri/stack-line';
-	import IconTechnical from '~icons/ri/settings-line';
 	import IconClear from '~icons/ri/close-line';
+	import IconTechnical from '~icons/ri/settings-line';
+	import IconMerged from '~icons/ri/stack-line';
+
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import { isType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';
+	import { splitMetadataId } from './schemas/metadata';
 	import { isDebugMode } from './settings.svelte';
 	import { tooltip } from './tooltips';
 	import { safeJSONParse } from './utils';
-	import { splitMetadataId } from './schemas/metadata';
 
 	/**
 	 * @typedef {object} Props

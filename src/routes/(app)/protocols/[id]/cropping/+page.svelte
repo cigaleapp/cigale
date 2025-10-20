@@ -1,4 +1,12 @@
 <script>
+	import { TraversalError } from 'arktype';
+	import { fade } from 'svelte/transition';
+
+	import IconAdd from '~icons/ri/add-line';
+	import IconOpenDetails from '~icons/ri/arrow-down-s-line';
+	import IconGoto from '~icons/ri/arrow-right-line';
+	import IconTrash from '~icons/ri/delete-bin-line';
+	import IconError from '~icons/ri/error-warning-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
@@ -6,6 +14,7 @@
 	import { errorMessage } from '$lib/i18n';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { modelUrl } from '$lib/inference';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { goto } from '$lib/paths';
 	import {
@@ -13,16 +22,9 @@
 		removeNamespaceFromMetadataId
 	} from '$lib/schemas/metadata';
 	import { Protocol } from '$lib/schemas/protocols';
-	import { TraversalError } from 'arktype';
-	import { fade } from 'svelte/transition';
-	import IconGoto from '~icons/ri/arrow-right-line';
-	import IconOpenDetails from '~icons/ri/arrow-down-s-line';
-	import IconAdd from '~icons/ri/add-line';
-	import IconTrash from '~icons/ri/delete-bin-line';
-	import IconError from '~icons/ri/error-warning-line';
+
 	import { updater } from '../updater.svelte';
 	import ModelConfig from './ModelConfig.svelte';
-	import { modelUrl } from '$lib/inference';
 
 	const { data } = $props();
 	let settings = $derived(data.crop);

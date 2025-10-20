@@ -1,7 +1,8 @@
 import { match, type } from 'arktype';
-import { uiState } from './state.svelte.js';
-import { MetadataInferOptionsNeural } from './schemas/metadata.js';
+
 import { tables } from './idb.svelte.js';
+import { MetadataInferOptionsNeural } from './schemas/metadata.js';
+import { uiState } from './state.svelte.js';
 
 /**
  * Classifies an image using the current protocol and selected model.

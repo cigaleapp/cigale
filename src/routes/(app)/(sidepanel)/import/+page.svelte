@@ -1,4 +1,6 @@
 <script>
+	import { fade } from 'svelte/transition';
+
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import CardImage from '$lib/CardImage.svelte';
 	import CardMedia from '$lib/CardMedia.svelte';
@@ -12,9 +14,8 @@
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { unique } from '$lib/utils';
-	import { fade } from 'svelte/transition';
 	import { toasts } from '$lib/toasts.svelte';
+	import { unique } from '$lib/utils';
 
 	const allImages = $derived([
 		...unique(

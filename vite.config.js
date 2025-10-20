@@ -1,9 +1,9 @@
 /// <reference types="vitest" />
+import { execSync } from 'node:child_process';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { wuchale } from '@wuchale/vite-plugin';
 import { type } from 'arktype';
-import { execSync } from 'node:child_process';
 import icons from 'unplugin-icons/vite';
 import { analyzer } from 'vite-bundle-analyzer';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';

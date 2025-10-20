@@ -11,8 +11,8 @@ import { expect, test } from './fixtures.js';
 import {
 	chooseInDropdown,
 	chooseProtocol,
-	firstObservationCard,
 	exportResults,
+	firstObservationCard,
 	goToTab,
 	importPhotos,
 	importProtocol,

@@ -1,15 +1,17 @@
 <script>
+	import IconBoundingbox from '~icons/ri/artboard-2-line';
+	import IconCube from '~icons/ri/box-3-line';
 	import IconRaw from '~icons/ri/braces-fill';
 	import IconDate from '~icons/ri/calendar-line';
 	import IconBoolean from '~icons/ri/checkbox-line';
-	import IconBoundingbox from '~icons/ri/artboard-2-line';
-	import IconCube from '~icons/ri/box-3-line';
-	import IconEnum from '~icons/ri/menu-search-line';
+	import IconString from '~icons/ri/font-size';
 	import IconLocation from '~icons/ri/map-pin-line';
+	import IconEnum from '~icons/ri/menu-search-line';
 	import IconInteger from '~icons/ri/number-1';
 	import IconFloat from '~icons/ri/ruler-line';
-	import IconString from '~icons/ri/font-size';
+
 	import { tooltip } from './tooltips';
+
 	/**
 	 * @type {{ type: import('$lib/database').MetadataType, tooltip?: boolean }}
 	 */

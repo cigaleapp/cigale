@@ -1,5 +1,6 @@
 import { type } from 'arktype';
 import Handlebars from 'handlebars';
+
 import { entries, safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 import { HTTPRequest, ID, ModelInput, References, URLString } from './common.js';
 import { Metadata, namespacedMetadataId } from './metadata.js';

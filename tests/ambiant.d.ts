@@ -1,5 +1,6 @@
-import type { IDBDatabaseType } from '$lib/idb.svelte';
 import type { IDBPDatabase } from 'idb';
+
+import type { IDBDatabaseType } from '$lib/idb.svelte';
 
 declare global {
 	interface Window {

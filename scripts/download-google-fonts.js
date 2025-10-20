@@ -1,6 +1,6 @@
-import { download, constructURL } from 'google-fonts-helper';
-
 import path from 'node:path';
+import { constructURL, download } from 'google-fonts-helper';
+
 const here = import.meta.dirname;
 
 const url = constructURL({

@@ -1,14 +1,16 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import * as dates from 'date-fns';
 import extract from 'extract-zip';
-import path from 'node:path';
+
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseProtocol,
 	expectTooltipContent,
-	firstObservationCard,
 	exportResults,
+	firstObservationCard,
 	getMetadataValuesOfImage,
 	getTab,
 	goToTab,
@@ -22,7 +24,6 @@ import {
 	toast,
 	waitForLoadingEnd
 } from './utils';
-import { readFileSync } from 'node:fs';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {

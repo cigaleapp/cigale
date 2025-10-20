@@ -1,4 +1,15 @@
 <script>
+	import { watch } from 'runed';
+
+	import IconIncrease from '~icons/ri/add-line';
+	import Cross from '~icons/ri/close-circle-line';
+	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
+	import Moon from '~icons/ri/moon-line';
+	import Gears from '~icons/ri/settings-3-line';
+	import IconSortAsc from '~icons/ri/sort-asc';
+	import IconSortDesc from '~icons/ri/sort-desc';
+	import IconDecrease from '~icons/ri/subtract-line';
+	import Sun from '~icons/ri/sun-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
@@ -7,16 +18,6 @@
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
-	import { watch } from 'runed';
-	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
-	import Gears from '~icons/ri/settings-3-line';
-	import IconDecrease from '~icons/ri/subtract-line';
-	import Moon from '~icons/ri/moon-line';
-	import IconIncrease from '~icons/ri/add-line';
-	import IconSortAsc from '~icons/ri/sort-asc';
-	import IconSortDesc from '~icons/ri/sort-desc';
-	import Sun from '~icons/ri/sun-line';
-	import Cross from '~icons/ri/close-circle-line';
 
 	/**
 	 * @type {{openKeyboardShortcuts?: (() => void) | undefined, openPrepareForOfflineUse?: (() => void) | undefined}}

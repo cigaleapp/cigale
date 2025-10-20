@@ -1,5 +1,6 @@
 <script>
 	import IconAsterisk from '~icons/ri/asterisk';
+
 	import { tooltip } from './tooltips';
 
 	/** @type {{ help?: string }}*/

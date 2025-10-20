@@ -1,4 +1,7 @@
 <script>
+	import { tick } from 'svelte';
+
+	import Download from '~icons/ri/download-2-line';
 	import { asset } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -15,8 +18,6 @@
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { tick } from 'svelte';
-	import Download from '~icons/ri/download-2-line';
 
 	// TODO show download size estimates
 

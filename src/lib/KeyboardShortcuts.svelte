@@ -1,7 +1,9 @@
 <script>
 	// @ts-ignore
-	import { page } from '$app/state';
 	import { tinykeys } from 'tinykeys';
+
+	import { page } from '$app/state';
+
 	import KeyboardHint from './KeyboardHint.svelte';
 	import Modal, { hasAnyModalOpen } from './Modal.svelte';
 	import { isDebugMode } from './settings.svelte';

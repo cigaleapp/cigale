@@ -1,4 +1,5 @@
 import { type } from 'arktype';
+
 import { Dimensions, ID, References } from './common.js';
 import { MetadataValues } from './metadata.js';
 

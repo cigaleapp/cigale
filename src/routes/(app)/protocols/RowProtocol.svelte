@@ -1,4 +1,8 @@
 <script>
+	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconEdit from '~icons/ri/pencil-line';
+	import IconExport from '~icons/ri/share-forward-line';
 	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
@@ -8,10 +12,6 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import UnsavedChangesIndicator from '$lib/UnsavedChangesIndicator.svelte';
-	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
-	import IconEdit from '~icons/ri/pencil-line';
-	import IconExport from '~icons/ri/share-forward-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
 	const { id, name, dirty, source, version, ondelete } = $props();

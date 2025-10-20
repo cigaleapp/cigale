@@ -1,6 +1,7 @@
 import { tables } from './idb.svelte';
 import { modelUrl } from './inference';
 import { fetchHttpRequest, nonnull } from './utils';
+
 /**
  * @import * as DB from '$lib/database';
  */

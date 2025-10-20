@@ -15,14 +15,15 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 </script>
 
 <script>
+	import IconClose from '~icons/ri/close-line';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
-	import IconClose from '~icons/ri/close-line';
+	import { toasts } from '$lib/toasts.svelte.js';
+
 	import ButtonIcon from './ButtonIcon.svelte';
+	import ModalToasts from './ModalToasts.svelte';
 	import { getSettings } from './settings.svelte';
 	import { insideBoundingClientRect } from './utils';
-	import ModalToasts from './ModalToasts.svelte';
-	import { toasts } from '$lib/toasts.svelte.js';
 
 	/**
 	 * @typedef Props

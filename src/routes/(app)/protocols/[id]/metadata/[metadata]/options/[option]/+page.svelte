@@ -1,22 +1,24 @@
 <script>
-	import { page } from '$app/state';
 	import VirtualList from '@sveltejs/svelte-virtual-list';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import IconCascadesFrom from '~icons/ri/corner-right-down-fill';
+	import { fade } from 'svelte/transition';
+
+	import IconArrow from '~icons/ri/arrow-right-line';
 	import IconCascadesTo from '~icons/ri/corner-down-right-fill';
-	import IconImage from '~icons/ri/image-2-line';
+	import IconCascadesFrom from '~icons/ri/corner-right-down-fill';
 	import IconTrash from '~icons/ri/delete-bin-line';
+	import IconOpenInExternal from '~icons/ri/external-link-fill';
+	import IconImage from '~icons/ri/image-2-line';
+	import { page } from '$app/state';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { goto } from '$lib/paths.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
-	import IconArrow from '~icons/ri/arrow-right-line';
-	import IconOpenInExternal from '~icons/ri/external-link-fill';
-	import { updater } from './updater.svelte.js';
+
 	import { onDeleteOption } from '../+layout.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import { fade } from 'svelte/transition';
+	import { updater } from './updater.svelte.js';
 
 	const { data } = $props();
 	const { cascades, reverseCascades, metadata } = $derived(data);

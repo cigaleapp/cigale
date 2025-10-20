@@ -1,4 +1,6 @@
 import { scope, type } from 'arktype';
+
+import { localeFromNavigator } from './i18n.js';
 import {
 	Dimensions,
 	HTTPRequest,
@@ -24,7 +26,6 @@ import {
 	Protocol as ProtocolSchema
 } from './schemas/protocols.js';
 import { clamp } from './utils.js';
-import { localeFromNavigator } from './i18n.js';
 
 /**
  * Generate an ID for a given table

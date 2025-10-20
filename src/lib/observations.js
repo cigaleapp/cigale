@@ -1,5 +1,6 @@
-import * as db from './idb.svelte';
 import { generateId } from '$lib/database.js';
+
+import * as db from './idb.svelte';
 import { tables } from './idb.svelte';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';

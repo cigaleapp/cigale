@@ -1,4 +1,5 @@
 import * as ort from 'onnxruntime-web';
+
 import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
 import { fetchHttpRequest } from './utils.js';
 
