@@ -591,7 +591,7 @@ if (import.meta.vitest) {
  */
 export function cachebust(url) {
 	const parsedUrl = new URL(url);
-    // TODO use x-cigale-cache-bust instead of v
+	// TODO use x-cigale-cache-bust instead of v
 	parsedUrl.searchParams.set('v', Date.now().toString());
 	if (typeof url === 'string') {
 		// @ts-expect-error
