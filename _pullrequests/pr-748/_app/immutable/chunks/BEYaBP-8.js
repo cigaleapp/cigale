@@ -1,0 +1,1 @@
+import{a2 as b,a3 as t,b as h,a4 as k,a5 as S}from"./DLg_PPZ_.js";function u(r,a){return r===a||r?.[S]===a}function d(r={},a,f,T){return b(()=>{var i,s;return t(()=>{i=s,s=[],h(()=>{r!==f(...s)&&(a(r,...s),i&&u(f(...i),r)&&a(null,...i))})}),()=>{k(()=>{s&&u(f(...s),r)&&a(null,...s)})}}),r}export{d as b};

@@ -1,0 +1,1 @@
+import{b as t,r,c as e,g as n}from"./BvFcs73z.js";function f(a){return(e||t)+a}function s(...a){return t+r(a[0],a[1])}async function i(...a){await n(u(...a))}function o(...a){return s(...a).replace(s("/"),"/")}function u(...a){return"/#"+o(...a)}export{u as a,f as b,i as g,o as h,s as r};

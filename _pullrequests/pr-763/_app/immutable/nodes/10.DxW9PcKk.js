@@ -1,0 +1,1 @@
+import{r}from"../chunks/BfCOZENo.js";import{h as e}from"../chunks/Dv-8uhUY.js";import"../chunks/DsnmJJEf.js";import"../chunks/69_IOA4Y.js";async function t({url:o}){r(307,`/${o.search}#${e("/import")}`)}const c=Object.freeze(Object.defineProperty({__proto__:null,load:t},Symbol.toStringTag,{value:"Module"}));function m(o){}export{m as component,c as universal};
