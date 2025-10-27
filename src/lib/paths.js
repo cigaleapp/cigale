@@ -36,5 +36,5 @@ export function hashPath(...args) {
  */
 export function href(...args) {
 	// @ts-expect-error
-	return '/#' + hashPath(...args);
+	return '#' + hashPath(...args);
 }
