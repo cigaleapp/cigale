@@ -127,7 +127,7 @@
 	"dependencies": {
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
-		"@wuchale/svelte": "^0.16.5",
+		"@wuchale/svelte": "^0.16.6",
 		"arktype": "^2.1.23",
 		"bits-ui": "^1.8.0",
 		"date-fns": "^4.1.0",
