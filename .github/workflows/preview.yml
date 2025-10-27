@@ -10,6 +10,11 @@ on:
 
 concurrency: preview-${{ github.ref }}
 
+env:
+  BASE_PATH: /cigale/_pullrequests/pr-${{ github.event.number }}
+  PR_NUMBER: ${{ github.event.number }}
+  BUILD_COMMIT: ${{ github.sha }}
+
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
@@ -29,9 +34,7 @@ jobs:
         if: github.event.action != 'closed' # You might want to skip the build if the PR has been closed
         run: |
           bun install
-          BUILD_COMMIT=${{ github.sha }} BASE_PATH=/cigale/_pullrequests/pr-$PR_NUMBER bun run build
-        env:
-          PR_NUMBER: ${{ github.event.number }}
+          bun run build
 
       - name: Deploy preview
         id: deploy-preview
