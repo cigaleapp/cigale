@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Download stats.json files
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
 
       - name: Compare bundle size
         id: comparison
@@ -76,7 +76,7 @@ jobs:
           BUNDLE_ANALYZER: json
 
       - name: Upload stats.json
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.name }}-stats
           path: ./public/stats.json

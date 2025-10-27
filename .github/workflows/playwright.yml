@@ -27,7 +27,7 @@ jobs:
         env:
           MINIFICATION: 'off'
       - name: Upload build as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build
           include-hidden-files: true
@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Download built app
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: build
           path: ./
@@ -65,7 +65,7 @@ jobs:
         run: bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
           SHARDING: '1'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-shard-${{ matrix.shard-index }}
@@ -83,7 +83,7 @@ jobs:
     name: Combine reports
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           path: ./playwright-report-shards
           pattern: playwright-report-shard-*
