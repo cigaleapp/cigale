@@ -53,3 +53,7 @@ out/
 # Runs on prebuild
 static/fonts
 static/fonts.css
+
+# Database for a local Beamup server instance
+# see https://github.com/cigaleapp/beamup
+beamup-db/

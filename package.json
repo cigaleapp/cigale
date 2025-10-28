@@ -125,6 +125,7 @@
 		"vitest": "^4.0.4"
 	},
 	"dependencies": {
+		"@cigale/beamup": "^0.6.4",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
 		"@wuchale/svelte": "^0.16.6",

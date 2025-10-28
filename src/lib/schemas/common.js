@@ -62,3 +62,8 @@ export const Dimensions = type({
 	height,
 	aspectRatio: width / height
 }));
+
+/**
+ * @see https://en.wikipedia.org/wiki/MD5
+ */
+export const SHA1Hash = type('string.base64 == 28', '@', 'Hash SHA-1 encodé en base 64');

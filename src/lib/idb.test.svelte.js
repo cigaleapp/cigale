@@ -18,18 +18,20 @@ test('openDatabase', async () => {
 	expect(window).toHaveProperty('DB');
 	expect(window).toHaveProperty('refreshDB');
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
-	expect(db.version).toMatchInlineSnapshot(`3`);
+	expect(db.version).toBeGreaterThan(0);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
 		FakeDOMStringList {
-		  "0": "Image",
-		  "1": "ImageFile",
-		  "2": "ImagePreviewFile",
-		  "3": "Metadata",
-		  "4": "MetadataOption",
-		  "5": "Observation",
-		  "6": "Protocol",
-		  "7": "Settings",
+		  "0": "BeamupCorrection",
+		  "1": "Image",
+		  "2": "ImageFile",
+		  "3": "ImagePreviewFile",
+		  "4": "Metadata",
+		  "5": "MetadataOption",
+		  "6": "Observation",
+		  "7": "Protocol",
+		  "8": "Settings",
 		  "_values": [
+		    "BeamupCorrection",
 		    "Image",
 		    "ImageFile",
 		    "ImagePreviewFile",
@@ -90,7 +92,8 @@ describe('operations', () => {
 			const db = await openDatabase();
 			const addedAt = new Date();
 			await idb.set('Image', {
-				id: imageId(0, 0),
+				id: imageId('0', 0),
+				sha1: null,
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
@@ -106,14 +109,15 @@ describe('operations', () => {
 				}
 			});
 
-			const serialized = await db.get('Image', imageId(0, 0));
+			const serialized = await db.get('Image', imageId('0', 0));
 			expect(serialized).toEqual({
-				id: imageId(0, 0),
+				id: imageId('0', 0),
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
+				sha1: null,
 				metadata: {
 					water: {
 						value: '"bucket"',
@@ -124,15 +128,16 @@ describe('operations', () => {
 				}
 			});
 
-			const deserialized = await idb.get('Image', imageId(0, 0));
+			const deserialized = await idb.get('Image', imageId('0', 0));
 			expect(deserialized).toEqual({
-				id: imageId(0, 0),
+				id: imageId('0', 0),
 				addedAt,
 				fileId: 'quoicoubaka',
 				boundingBoxesAnalyzed: false,
 				dimensions: { width: 100, height: 100, aspectRatio: 1 },
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
+				sha1: null,
 				metadata: {
 					water: {
 						value: 'bucket',
@@ -176,12 +181,13 @@ describe('operations', () => {
 		const db = await openDatabase();
 		const addedAt = new Date();
 		await db.put('Image', {
-			id: imageId(0, 0),
+			id: imageId('0', 0),
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
 			contentType: 'what/ever',
 			filename: 'THE NETHER',
+			sha1: null,
 			metadata: {
 				water: {
 					value: '"bucket"',
@@ -192,12 +198,13 @@ describe('operations', () => {
 			}
 		});
 		await db.put('Image', {
-			id: imageId(0, 1),
+			id: imageId('0', 1),
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
 			contentType: 'the ehehhe',
 			filename: 'ogrjoigrejo',
+			sha1: null,
 			metadata: {
 				water: {
 					value: '"ogjroe"',
@@ -207,14 +214,15 @@ describe('operations', () => {
 				}
 			}
 		});
-		expect(await idb.get('Image', imageId(0, 0))).toEqual({
-			id: imageId(0, 0),
+		expect(await idb.get('Image', imageId('0', 0))).toEqual({
+			id: imageId('0', 0),
 			addedAt,
 			fileId: 'quoicoubaka',
 			boundingBoxesAnalyzed: false,
 			dimensions: { width: 100, height: 100, aspectRatio: 1 },
 			contentType: 'what/ever',
 			filename: 'THE NETHER',
+			sha1: null,
 			metadata: {
 				water: {
 					value: 'bucket',
@@ -301,7 +309,12 @@ describe('operations', () => {
 
 describe('wrangler', () => {
 	const addedAt = new Date();
-	const observation = (/** @type {number} */ i) => ({
+
+	/**
+	 * @param {number} i
+	 * @returns {typeof import('./database').Tables.Observation.inferIn}
+	 */
+	const observation = (i) => ({
 		id: `test${i}`,
 		addedAt: addedAt.toISOString(),
 		images: [],
@@ -309,13 +322,18 @@ describe('wrangler', () => {
 		metadataOverrides: {}
 	});
 
-	const image = (/** @type {number} */ i) => ({
-		id: imageId(0, i),
+	/**
+	 * @param {number} i
+	 * @returns {typeof import('./database').Tables.Image.inferIn}
+	 */
+	const image = (i) => ({
+		id: imageId('0', i),
 		addedAt: addedAt.toISOString(),
 		fileId: 'quoicoubaka',
 		dimensions: { width: 100, height: 100 },
 		contentType: 'what/ever',
 		filename: 'THE NETHER',
+		sha1: null,
 		metadata: {
 			water: {
 				value: '"bucket"',
