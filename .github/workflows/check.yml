@@ -41,7 +41,7 @@ jobs:
         run: bun run test
       - name: Save aside coverage report
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vitest-report-head
           path: ./coverage
@@ -84,7 +84,7 @@ jobs:
         run: bun run test
       - name: Save aside coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: vitest-report-base
           path: ./coverage
@@ -99,7 +99,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Get coverage report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: vitest-report-head
           path: ./coverage
@@ -122,11 +122,11 @@ jobs:
         id: params
         run: echo threshold="-0.5" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: vitest-report-head
           path: ./coverage
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: vitest-report-base
           path: ./base-coverage
