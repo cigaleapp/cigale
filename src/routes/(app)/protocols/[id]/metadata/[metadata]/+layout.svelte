@@ -1,18 +1,20 @@
 <script>
+	import { fade } from 'svelte/transition';
+
+	import IconInfo from '~icons/ri/information-2-line';
+	import IconOptions from '~icons/ri/list-unordered';
+	import IconCascades from '~icons/ri/node-tree';
+	import IconInference from '~icons/ri/sparkling-line';
 	import { page } from '$app/state';
 	import { uppercaseFirst } from '$lib/i18n.js';
 	import IconDatatype from '$lib/IconDatatype.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { METADATA_TYPES, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+	import { getSettings } from '$lib/settings.svelte.js';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips.js';
-	import IconInfo from '~icons/ri/information-2-line';
-	import IconOptions from '~icons/ri/list-unordered';
-	import IconInference from '~icons/ri/sparkling-line';
-	import IconCascades from '~icons/ri/node-tree';
+
 	import { updater } from './updater.svelte.js';
-	import { getSettings } from '$lib/settings.svelte.js';
-	import { fade } from 'svelte/transition';
 
 	const { children, data } = $props();
 	const { id, label, type } = $derived(data.metadata);

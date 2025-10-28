@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { type } from 'arktype';
+
 import { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 import { Analysis } from '../src/lib/schemas/results.js';
 

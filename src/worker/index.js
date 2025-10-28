@@ -5,6 +5,7 @@
 
 import { openDB } from 'idb';
 import * as Swarp from 'swarpc';
+
 import { PROCEDURES } from './procedures.js';
 
 /**

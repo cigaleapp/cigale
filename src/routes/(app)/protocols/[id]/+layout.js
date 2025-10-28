@@ -1,7 +1,8 @@
+import { error } from '@sveltejs/kit';
+
 import { dependencyURI, tables } from '$lib/idb.svelte.js';
 import { metadataDefinitionComparator } from '$lib/metadata.js';
 import { nonnull } from '$lib/utils.js';
-import { error } from '@sveltejs/kit';
 
 export async function load({ params, depends }) {
 	const protocol = await tables.Protocol.get(params.id);

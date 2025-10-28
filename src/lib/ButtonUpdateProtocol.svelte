@@ -10,17 +10,18 @@
 </script>
 
 <script>
+	import IconArrow from '~icons/ri/arrow-right-line';
+	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
+	import IconUpToDate from '~icons/ri/checkbox-circle-line';
+	import IconCannotCheckForUpdates from '~icons/ri/error-warning-line';
+	import IconCheckAgain from '~icons/ri/loop-left-fill';
+	import IconNotVersioned from '~icons/ri/question-line';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import { hasUpgradeAvailable, upgradeProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
-	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
-	import IconArrow from '~icons/ri/arrow-right-line';
-	import IconCheckAgain from '~icons/ri/loop-left-fill';
-	import IconUpToDate from '~icons/ri/checkbox-circle-line';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import IconCannotCheckForUpdates from '~icons/ri/error-warning-line';
-	import IconNotVersioned from '~icons/ri/question-line';
+
 	import ButtonIcon from './ButtonIcon.svelte';
 
 	/**

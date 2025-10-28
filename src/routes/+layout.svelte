@@ -2,6 +2,7 @@
 	import './style.css';
 	import '$lib/tippy-svg-arrow.css';
 	import '$lib/range-inputs.css';
+
 	import { fadeOutElement } from '$lib/utils';
 
 	const { children } = $props();

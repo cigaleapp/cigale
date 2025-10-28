@@ -1,7 +1,8 @@
+import { mkdir, rm } from 'node:fs/promises';
 import { test as base } from '@playwright/test';
-import { rm, mkdir } from 'node:fs/promises';
-import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { mockProtocolSourceURL, setHardwareConcurrency } from './utils';
 
 export { exampleProtocol };

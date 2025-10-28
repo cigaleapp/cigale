@@ -1,16 +1,18 @@
 <script>
+	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
+
+	import IconCreate from '~icons/ri/add-circle-line';
+	import IconImport from '~icons/ri/download-2-line';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import { plural } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte.js';
 	import { promptAndImportProtocol } from '$lib/protocols';
 	import { toasts } from '$lib/toasts.svelte';
-	import IconImport from '~icons/ri/download-2-line';
-	import IconCreate from '~icons/ri/add-circle-line';
+
+	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
 	import ModalDeleteProtocol from './ModalDeleteProtocol.svelte';
 	import RowProtocol from './RowProtocol.svelte';
-	import { plural } from '$lib/i18n';
-	import { fade } from 'svelte/transition';
-	import ModalCreateProtocol from './ModalCreateProtocol.svelte';
-	import { onMount } from 'svelte';
 
 	const { data } = $props();
 

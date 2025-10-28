@@ -1,4 +1,12 @@
 <script>
+	import { fade } from 'svelte/transition';
+
+	import IconMergeNone from '~icons/ri/close-circle-line';
+	import IconMergeAverage from '~icons/ri/divide-line';
+	import IconMergeMedian from '~icons/ri/equal-line';
+	import IconMergeUnion from '~icons/ri/shadow-line';
+	import IconMergeMinimum from '~icons/ri/skip-down-line';
+	import IconMergeMaximum from '~icons/ri/skip-up-line';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import { uppercaseFirst } from '$lib/i18n';
@@ -12,13 +20,7 @@
 	} from '$lib/schemas/metadata';
 	import Switch from '$lib/Switch.svelte';
 	import { entries } from '$lib/utils';
-	import { fade } from 'svelte/transition';
-	import IconMergeMinimum from '~icons/ri/skip-down-line';
-	import IconMergeMaximum from '~icons/ri/skip-up-line';
-	import IconMergeAverage from '~icons/ri/divide-line';
-	import IconMergeMedian from '~icons/ri/equal-line';
-	import IconMergeUnion from '~icons/ri/shadow-line';
-	import IconMergeNone from '~icons/ri/close-circle-line';
+
 	import { updater } from '../updater.svelte.js';
 
 	const { data } = $props();

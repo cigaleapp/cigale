@@ -2,8 +2,9 @@
  * @import { ProceduresMap } from 'swarpc';
  */
 
-import { Schemas } from '$lib/database.js';
 import { type } from 'arktype';
+
+import { Schemas } from '$lib/database.js';
 
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	init: {

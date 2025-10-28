@@ -1,9 +1,10 @@
 import 'fake-indexeddb/auto';
 
-import { test, describe, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
+
+import { computeCascades } from './cascades.js';
 import { openDatabase } from './idb.svelte.js';
 import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
-import { computeCascades } from './cascades.js';
 
 describe('computeCascades', () => {
 	/**

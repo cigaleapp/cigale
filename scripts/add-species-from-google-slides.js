@@ -1,15 +1,16 @@
-import { x } from 'tinyexec';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
+import path from 'node:path';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 import { Jimp } from 'jimp';
 import { JSDOM } from 'jsdom';
-import { readFileSync, writeFileSync } from 'node:fs';
-import { mkdir } from 'node:fs/promises';
-import path from 'node:path';
 import odt from 'odt2html';
 import { pdfToPng } from 'pdf-to-png-converter';
-import keys from '../google-drive-key.json' with { type: 'json' };
+import { x } from 'tinyexec';
 import Turndown from 'turndown';
+
+import keys from '../google-drive-key.json' with { type: 'json' };
 import { decodePhoto, photoChanged } from './utils.js';
 
 await mkdir(path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.images'), {

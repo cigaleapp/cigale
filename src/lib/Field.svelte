@@ -1,5 +1,6 @@
 <script>
-	import {} from 'svelte';
+	import 'svelte';
+
 	import IconError from '~icons/ri/close-line';
 
 	/**

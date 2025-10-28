@@ -4,7 +4,8 @@
 
 <script>
 	import { toasts } from '$lib/toasts.svelte.js';
-	import { toastTheme, toastIcon } from './Toast.svelte';
+
+	import { toastIcon, toastTheme } from './Toast.svelte';
 
 	/**
 	 * @typedef {object} Props

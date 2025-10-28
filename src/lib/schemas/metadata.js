@@ -1,4 +1,5 @@
 import { scope, type } from 'arktype';
+
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
 import { keys, unique } from '../utils.js';

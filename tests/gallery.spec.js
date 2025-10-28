@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures';
+import { expect, test } from './fixtures';
 import { chooseProtocol, goToTab, importPhotos, openSettings, setSettings } from './utils';
 
 test.describe('sorting', () => {

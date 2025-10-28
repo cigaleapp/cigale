@@ -2,6 +2,15 @@
 	/**
 	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
+	import { dequal } from 'dequal/lite';
+	import { watch } from 'runed';
+
+	import IconObservation from '~icons/ri/bug-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconSplit from '~icons/ri/function-line';
+	import IconImage from '~icons/ri/image-2-line';
+	import IconMerge from '~icons/ri/shadow-line';
+	import IconImport from '~icons/ri/upload-2-line';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { plural } from '$lib/i18n';
@@ -14,14 +23,6 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
-	import { dequal } from 'dequal/lite';
-	import { watch } from 'runed';
-	import IconSplit from '~icons/ri/function-line';
-	import IconObservation from '~icons/ri/bug-line';
-	import IconImage from '~icons/ri/image-2-line';
-	import IconMerge from '~icons/ri/shadow-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
-	import IconImport from '~icons/ri/upload-2-line';
 
 	/**
 	 * @typedef {object} Props

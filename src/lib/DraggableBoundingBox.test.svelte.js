@@ -1,4 +1,5 @@
 import { describe, expect, it, test } from 'vitest';
+
 import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
 
 describe('fittedImageRect', () => {

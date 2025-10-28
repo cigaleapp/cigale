@@ -1,10 +1,11 @@
-import { JSDOM } from 'jsdom';
-import { marked } from 'marked';
-import RSSParser from 'rss-parser';
 import { writeFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { JSDOM } from 'jsdom';
+import { marked } from 'marked';
+import RSSParser from 'rss-parser';
 import Turndown from 'turndown';
+
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import oldProtocol from '../examples/old-arthropods.cigaleprotocol.json' with { type: 'json' };
 

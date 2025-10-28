@@ -1,14 +1,15 @@
 /**
  * @import { DimensionsInput } from '$lib/database.js';
  */
+import * as dates from 'date-fns';
+
 import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
 import { processExifData } from '$lib/exif';
 import { tables } from '$lib/idb.svelte';
 import { errorMessageImageTooLarge, imageId, resizeToMaxSize, storeImageBytes } from '$lib/images';
-
 import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte';
-import * as dates from 'date-fns';
+
 import { imageLimits } from './inference_utils';
 import { serializeMetadataValues } from './metadata';
 import { sha1sum } from './utils';

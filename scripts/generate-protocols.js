@@ -1,8 +1,8 @@
-import { readFile } from 'node:fs/promises';
-import { x } from 'tinyexec';
-import { type } from 'arktype';
-import path from 'node:path';
 import { writeFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { type } from 'arktype';
+import { x } from 'tinyexec';
 
 const BEAMUP_ORIGIN = 'https://beamup.cigale.gwen.works';
 

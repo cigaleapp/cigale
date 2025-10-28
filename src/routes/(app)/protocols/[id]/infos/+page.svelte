@@ -1,15 +1,17 @@
 <script>
+	import { fade } from 'svelte/transition';
+
+	import IconAdd from '~icons/ri/add-line';
+	import IconDescription from '~icons/ri/align-left';
+	import IconAuthors from '~icons/ri/group-line';
+	import IconRemove from '~icons/ri/indeterminate-circle-line';
+	import IconLearnMore from '~icons/ri/information-2-line';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import IconLearnMore from '~icons/ri/information-2-line';
-	import IconAuthors from '~icons/ri/group-line';
+
 	import { updater } from '../updater.svelte.js';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import IconRemove from '~icons/ri/indeterminate-circle-line';
-	import IconAdd from '~icons/ri/add-line';
-	import IconDescription from '~icons/ri/align-left';
-	import { fade } from 'svelte/transition';
 
 	/**
 	 * @import { Protocol } from '$lib/database.js';

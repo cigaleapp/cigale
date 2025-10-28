@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-20T19:28:23.268Z\n"
+"PO-Revision-Date: 2025-10-27 12:42+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1615,11 +1615,11 @@ msgstr ""
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Voir {0}"
-msgstr ""
+msgstr "See {0}"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Aucune cascade"
-msgstr ""
+msgstr "No cascades defined"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
@@ -1628,32 +1628,32 @@ msgstr ""
 #. placeholder {0}: metadata?.label || shortId
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Si {0} = <0/>"
-msgstr ""
+msgstr "If {0} = <0/>"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "<0/> Supprimer cette option"
-msgstr ""
+msgstr "<0/> Delete this option"
 
 #. placeholder {0}: params.id
 #: src/routes/(app)/protocols/[id]/+layout.js
 msgid "Protocole {0} introuvable"
-msgstr ""
+msgstr "Protocol {0} not found"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.js
 msgid "Métadonnées des images exportées"
-msgstr ""
+msgstr "Exported images' metadata"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.js
 msgid "Export JSON complet de l'analyse"
-msgstr ""
+msgstr "Full JSON export of analysis"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.js
 msgid "Images recadrées"
-msgstr ""
+msgstr "Cropped images"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.js
 msgid "Images originales"
-msgstr ""
+msgstr "Original images"
 
 #. placeholder {0}: id
 #. placeholder {1}: protocol.id
@@ -1667,62 +1667,62 @@ msgstr ""
 
 #: src/routes/(app)/Settings.svelte
 msgid "Parallélisme <0>Nombre de tâches en parallèle</0>"
-msgstr ""
+msgstr "Parallelism<0>Amount of tasks to run in parallel</0>"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Réduire"
-msgstr ""
+msgstr "Decrease"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Nombre de tâches en parallèle"
-msgstr ""
+msgstr "Amount of parallel tasks"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Augmenter"
-msgstr ""
+msgstr "Increase"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation du worker…"
-msgstr ""
+msgstr "Initializing worker…"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 élément"
 msgid_plural "# éléments"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 element"
+msgstr[1] "# elements"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 image"
 msgid_plural "# images"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 image"
+msgstr[1] "# images"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "1 observation"
 msgid_plural "# observations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 observation"
+msgstr[1] "# observations"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0>Remix Icon</0> par <1>Jimmy Cheung</1> et <2>Wendy Gao</2>"
-msgstr ""
+msgstr "<0>Remix Icon</0> by <1>Jimmy Cheung</1> and <2>Wendy Gao</2>"
 
 #. placeholder {0}: version
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Protocole mis à jour vers la v{0}"
-msgstr ""
+msgstr "Updated protocol to v{0}"
 
 #. placeholder {0}: e
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Impossible de mettre à jour le protocole: {0}"
-msgstr ""
+msgstr "Could not update protocol: {0}"
 
 #: src/lib/AreaObservations.svelte
 msgid "# élément"
 msgid_plural "# éléments"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# element"
+msgstr[1] "# elements"
 
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Non versionné"
-msgstr ""
+msgstr "Not versioned"

@@ -1,5 +1,6 @@
 import { expect, test } from '../fixtures';
 import { chooseProtocol, firstObservationCard, goToTab, importPhotos, setSettings } from '../utils';
+
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
 		Boolean(process.env.CI && !process.env.RUN_README_TESTS),

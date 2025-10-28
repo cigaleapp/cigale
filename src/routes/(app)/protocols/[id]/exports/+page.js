@@ -1,4 +1,5 @@
 import { gatherToTree } from './utils.js';
+
 /**
  * @import { TreeNode } from './utils.js';
  */

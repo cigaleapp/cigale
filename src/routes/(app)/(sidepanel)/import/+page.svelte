@@ -1,4 +1,6 @@
 <script>
+	import { fade } from 'svelte/transition';
+
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import CardImage from '$lib/CardImage.svelte';
 	import CardMedia from '$lib/CardMedia.svelte';
@@ -13,7 +15,6 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { unique } from '$lib/utils';
-	import { fade } from 'svelte/transition';
 
 	const allImages = $derived([
 		...unique(

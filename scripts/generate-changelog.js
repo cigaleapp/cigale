@@ -1,5 +1,5 @@
-import * as date from 'date-fns';
 import { writeFile } from 'node:fs/promises';
+import * as date from 'date-fns';
 import { x } from 'tinyexec';
 
 const upTo = process.argv[2];

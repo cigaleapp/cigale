@@ -1,7 +1,22 @@
 <script>
+	import { getContext } from 'svelte';
+	import { fade } from 'svelte/transition';
+
+	import IconAdd from '~icons/ri/add-line';
+	import IconCollapse from '~icons/ri/arrow-left-double-fill';
+	import IconBack from '~icons/ri/arrow-left-line';
+	import IconExpand from '~icons/ri/arrow-right-double-fill';
+	import IconVersioning from '~icons/ri/arrow-up-circle-line';
+	import IconCropping from '~icons/ri/crop-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconExports from '~icons/ri/file-zip-line';
+	import IconInfo from '~icons/ri/information-2-line';
+	import IconMetadata from '~icons/ri/list-unordered';
+	import IconExport from '~icons/ri/share-forward-line';
 	import { invalidate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import Badge from '$lib/Badge.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import { errorMessage, uppercaseFirst } from '$lib/i18n';
@@ -17,22 +32,9 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { slugify } from '$lib/utils';
-	import { fade } from 'svelte/transition';
-	import IconVersioning from '~icons/ri/arrow-up-circle-line';
-	import IconBack from '~icons/ri/arrow-left-line';
-	import IconCollapse from '~icons/ri/arrow-left-double-fill';
-	import IconExpand from '~icons/ri/arrow-right-double-fill';
-	import IconCropping from '~icons/ri/crop-line';
-	import IconExports from '~icons/ri/file-zip-line';
-	import IconInfo from '~icons/ri/information-2-line';
-	import IconMetadata from '~icons/ri/list-unordered';
-	import IconAdd from '~icons/ri/add-line';
-	import IconExport from '~icons/ri/share-forward-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
+
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
-	import Badge from '$lib/Badge.svelte';
-	import { getContext } from 'svelte';
 
 	seo({ title: `Protocole ${page.params.id}` });
 

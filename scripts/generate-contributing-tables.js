@@ -1,7 +1,8 @@
-import { Tables } from '../src/lib/database.js';
 import { readFile, writeFile } from 'node:fs/promises';
-import { JSONSchemaMarkdownDoc } from 'json-schema-doc-ts';
 import path from 'node:path';
+import { JSONSchemaMarkdownDoc } from 'json-schema-doc-ts';
+
+import { Tables } from '../src/lib/database.js';
 
 /**
  *

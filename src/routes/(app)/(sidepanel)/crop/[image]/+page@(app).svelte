@@ -4,54 +4,10 @@
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
-	import { page } from '$app/state';
-	import {
-		boundingBoxIsNonZero,
-		coordsAreEqual,
-		coordsScaler,
-		toCenteredCoords,
-		toTopLeftCoords
-	} from '$lib/BoundingBoxes.svelte';
-	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import CroppedImg from '$lib/CroppedImg.svelte';
-	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
-	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
-	import KeyboardHint from '$lib/KeyboardHint.svelte';
-	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import ProgressBar from '$lib/ProgressBar.svelte';
-	import SentenceJoin from '$lib/SentenceJoin.svelte';
-	import Switch from '$lib/Switch.svelte';
-	import Tooltip from '$lib/Tooltip.svelte';
-	import { idComparator } from '$lib/database.js';
-	import { percent } from '$lib/i18n';
-	import * as idb from '$lib/idb.svelte.js';
-	import {
-		deleteImageFile,
-		imageFileIds,
-		imagesOfImageFile,
-		imageId as makeImageId,
-		parseImageId
-	} from '$lib/images';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import {
-		assertIs,
-		deleteMetadataValue,
-		hasRuntimeType,
-		storeMetadataValue
-	} from '$lib/metadata';
-	import { goto } from '$lib/paths.js';
-	import { seo } from '$lib/seo.svelte';
-	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
-	import { uiState } from '$lib/state.svelte';
-	import { toasts } from '$lib/toasts.svelte';
-	import { tooltip } from '$lib/tooltips';
-	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import * as dates from 'date-fns';
 	import { watch } from 'runed';
 	import { getContext } from 'svelte';
+
 	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
 	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
 	import IconPrev from '~icons/ri/arrow-left-s-line';
@@ -67,6 +23,51 @@
 	import IconRevert from '~icons/ri/reset-left-fill';
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
 	import IconNeuralNet from '~icons/ri/sparkling-line';
+	import { page } from '$app/state';
+	import {
+		boundingBoxIsNonZero,
+		coordsAreEqual,
+		coordsScaler,
+		toCenteredCoords,
+		toTopLeftCoords
+	} from '$lib/BoundingBoxes.svelte';
+	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import ButtonInk from '$lib/ButtonInk.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
+	import CroppedImg from '$lib/CroppedImg.svelte';
+	import { idComparator } from '$lib/database.js';
+	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
+	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
+	import { percent } from '$lib/i18n';
+	import * as idb from '$lib/idb.svelte.js';
+	import {
+		deleteImageFile,
+		imageFileIds,
+		imagesOfImageFile,
+		imageId as makeImageId,
+		parseImageId
+	} from '$lib/images';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	import KeyboardHint from '$lib/KeyboardHint.svelte';
+	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import {
+		assertIs,
+		deleteMetadataValue,
+		hasRuntimeType,
+		storeMetadataValue
+	} from '$lib/metadata';
+	import { goto } from '$lib/paths.js';
+	import ProgressBar from '$lib/ProgressBar.svelte';
+	import SentenceJoin from '$lib/SentenceJoin.svelte';
+	import { seo } from '$lib/seo.svelte';
+	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
+	import { uiState } from '$lib/state.svelte';
+	import Switch from '$lib/Switch.svelte';
+	import { toasts } from '$lib/toasts.svelte';
+	import Tooltip from '$lib/Tooltip.svelte';
+	import { tooltip } from '$lib/tooltips';
+	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');

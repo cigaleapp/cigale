@@ -44,6 +44,14 @@
 </script>
 
 <script>
+	import { error } from '@sveltejs/kit';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import { fade } from 'svelte/transition';
+
+	import IconAdd from '~icons/ri/add-line';
+	import IconClose from '~icons/ri/close-line';
+	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconSearch from '~icons/ri/search-line';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -54,13 +62,6 @@
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { slugify } from '$lib/utils.js';
-	import { error } from '@sveltejs/kit';
-	import VirtualList from '@sveltejs/svelte-virtual-list';
-	import { fade } from 'svelte/transition';
-	import IconSearch from '~icons/ri/search-line';
-	import IconAdd from '~icons/ri/add-line';
-	import IconDelete from '~icons/ri/delete-bin-line';
-	import IconClose from '~icons/ri/close-line';
 
 	const { data, children } = $props();
 

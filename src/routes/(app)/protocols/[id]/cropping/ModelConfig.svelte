@@ -1,11 +1,13 @@
 <script>
 	import '$lib/fonts-math/import.css';
 
+	import * as Math from 'svelte-mathml';
+
 	import Field from '$lib/Field.svelte';
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
-	import * as Math from 'svelte-mathml';
+
 	import { updater } from '../updater.svelte';
 	import ModelOutputShapeDiagram from './ModelOutputShapeDiagram.svelte';
 

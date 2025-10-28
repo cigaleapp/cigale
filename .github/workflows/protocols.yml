@@ -70,7 +70,7 @@ jobs:
         run: rm examples/old-*.json
 
       - name: Store scripts/jessica-joachim-crawler-report.md
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: jessica-joachim-crawler-report
           path: scripts/jessica-joachim-crawler-report.md

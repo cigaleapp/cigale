@@ -1,4 +1,7 @@
 <script>
+	import IconSelect from '~icons/ri/arrow-down-s-line';
+	import IconNext from '~icons/ri/arrow-right-s-fill';
+	import IconCheck from '~icons/ri/check-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -12,9 +15,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp } from '$lib/utils';
-	import IconSelect from '~icons/ri/arrow-down-s-line';
-	import IconNext from '~icons/ri/arrow-right-s-fill';
-	import IconCheck from '~icons/ri/check-line';
+
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
 	import ProtocolSwitcher from './ProtocolSwitcher.svelte';

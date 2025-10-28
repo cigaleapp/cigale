@@ -1,9 +1,14 @@
 <script>
+	import { watch } from 'runed';
+	import { fade } from 'svelte/transition';
+
 	import { page } from '$app/state';
 	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
 	import { deleteImageFile, imageFileId } from '$lib/images';
+	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
 		deleteMetadataValue,
@@ -15,12 +20,9 @@
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { watch } from 'runed';
+
 	import { cancellers } from '../+layout.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
-	import { promptForFiles } from '$lib/files';
-	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
-	import { fade } from 'svelte/transition';
 
 	seo({ title: 'Importer' });
 

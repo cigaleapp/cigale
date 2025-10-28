@@ -1,7 +1,8 @@
+import * as devalue from 'devalue';
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
-import { idComparator, isReactiveTable, Tables, generateId } from './database.js';
-import * as devalue from 'devalue';
+
+import { generateId, idComparator, isReactiveTable, Tables } from './database.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =

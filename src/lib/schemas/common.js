@@ -1,5 +1,6 @@
-import { clamp } from '../utils.js';
 import { type } from 'arktype';
+
+import { clamp } from '../utils.js';
 
 export const ID = type(/^[\w._]+$/);
 

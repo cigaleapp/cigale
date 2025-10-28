@@ -1,3 +1,5 @@
+import { describe, expect, it, test, vi } from 'vitest';
+
 import { metadataOptionsKeyRange } from '$lib/metadata.js';
 import {
 	compareProtocolWithUpstream,
@@ -7,7 +9,6 @@ import {
 } from '$lib/protocols.js';
 import { Protocol } from '$lib/schemas/protocols.js';
 import { pick } from '$lib/utils.js';
-import { describe, expect, it, test, vi } from 'vitest';
 
 import 'fake-indexeddb/auto';
 

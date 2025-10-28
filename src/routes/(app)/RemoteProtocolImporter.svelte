@@ -1,12 +1,13 @@
 <script>
+	import { queryParameters, ssp } from 'sveltekit-search-params';
+
 	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/state';
 	import HighlightHostname from '$lib/HighlightHostname.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
-	import { queryParameters, ssp } from 'sveltekit-search-params';
-	import { page } from '$app/state';
 
 	const { swarpc } = $derived(page.data);
 

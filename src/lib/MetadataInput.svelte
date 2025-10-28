@@ -1,8 +1,10 @@
 <script>
 	import * as dates from 'date-fns';
+
+	import IconIncrement from '~icons/ri/add-line';
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
-	import IconIncrement from '~icons/ri/add-line';
+
 	import { isType } from './metadata';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import Switch from './Switch.svelte';

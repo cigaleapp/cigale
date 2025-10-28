@@ -1,4 +1,13 @@
 <script>
+	import { fade } from 'svelte/transition';
+
+	import IconCroppedImage from '~icons/ri/crop-line';
+	import IconCsvFile from '~icons/ri/file-chart-line';
+	import IconJsonFile from '~icons/ri/file-code-line';
+	import IconZipFile from '~icons/ri/file-zip-line';
+	import IconFolder from '~icons/ri/folder-2-line';
+	import IconFolderNew from '~icons/ri/folder-add-line';
+	import IconFullImage from '~icons/ri/image-2-line';
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -7,14 +16,6 @@
 	import { getSettings } from '$lib/settings.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { entries } from '$lib/utils.js';
-	import { fade } from 'svelte/transition';
-	import IconZipFile from '~icons/ri/file-zip-line';
-	import IconJsonFile from '~icons/ri/file-code-line';
-	import IconCsvFile from '~icons/ri/file-chart-line';
-	import IconFolder from '~icons/ri/folder-2-line';
-	import IconFolderNew from '~icons/ri/folder-add-line';
-	import IconFullImage from '~icons/ri/image-2-line';
-	import IconCroppedImage from '~icons/ri/crop-line';
 
 	/**
 	 * @import { TreeNode, NodeProvenance } from './utils.js';
