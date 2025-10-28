@@ -14,6 +14,7 @@
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+	import { toasts } from '$lib/toasts.svelte';
 	import { unique } from '$lib/utils';
 
 	const allImages = $derived([
@@ -45,6 +46,8 @@
 	filetypes={ACCEPTED_IMPORT_TYPES}
 	clickable={allImages.length === 0}
 	onfiles={({ files }) => importMore(files)}
+	onunacceptable={() =>
+		toasts.error('Certaines images ont un format de fichier non pris en charge')}
 >
 	<section class="observations" class:empty in:fade={{ duration: 100 }}>
 		<AreaObservations
