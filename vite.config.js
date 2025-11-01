@@ -4,6 +4,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { wuchale } from '@wuchale/vite-plugin';
 import { type } from 'arktype';
+import postcssPresetEnv from 'postcss-preset-env';
 import icons from 'unplugin-icons/vite';
 import { analyzer } from 'vite-bundle-analyzer';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
@@ -58,6 +59,11 @@ export default defineConfig({
 	},
 	build: {
 		minify: process.env.MINIFICATION !== 'off'
+	},
+	css: {
+		postcss: {
+			plugins: [postcssPresetEnv({ browsers: 'baseline widely available, >1%' })]
+		}
 	},
 	plugins: [
 		analyzer(analyzerMode === 'disabled' ? { enabled: false } : { analyzerMode }),
