@@ -16,7 +16,7 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { href } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
-	import { getSettings, setSetting } from '$lib/settings.svelte';
+	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
 
 	/**
@@ -84,7 +84,7 @@
 </ButtonIcon>
 
 <dialog
-	data-theme={theme}
+	style:color-scheme={getColorScheme()}
 	class="container"
 	data-testid="app-settings"
 	open={open ? true : undefined}
