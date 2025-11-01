@@ -1,14 +1,14 @@
 <script>
 	import JSONC from 'tiny-jsonc';
 
+	import IconSuccess from '~icons/ri/checkbox-circle-line';
+	import IconError from '~icons/ri/close-circle-line';
+	import IconWarning from '~icons/ri/error-warning-line';
+	import IconPrimary from '~icons/ri/information-line';
+	import IconNeutral from '~icons/ri/quote-text';
 	import lockfile from '$lib/../../bun.lock?raw';
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
-    import IconError from '~icons/ri/close-circle-line'
-    import IconWarning from '~icons/ri/error-warning-line'
-    import IconSuccess from '~icons/ri/checkbox-circle-line'
-    import IconPrimary from '~icons/ri/information-line'
-    import IconNeutral from '~icons/ri/quote-text'
 
 	const { data } = $props();
 
@@ -231,14 +231,14 @@
 		{/await}
 	</dd>
 
-    <dt></dt>
-    <dd>
-        {@render colorswatch('error', IconError)}
-        {@render colorswatch('warning', IconWarning)}
-        {@render colorswatch('success', IconSuccess)}
-        {@render colorswatch('primary', IconPrimary)}
-        {@render colorswatch('neutral', IconNeutral)}
-    </dd>
+	<dt></dt>
+	<dd>
+		{@render colorswatch('error', IconError)}
+		{@render colorswatch('warning', IconWarning)}
+		{@render colorswatch('success', IconSuccess)}
+		{@render colorswatch('primary', IconPrimary)}
+		{@render colorswatch('neutral', IconNeutral)}
+	</dd>
 </dl>
 
 {#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ people)}
@@ -296,13 +296,13 @@
 		font-size: 0.85em;
 	}
 
-    .swatch {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: var(--corner-radius);
-        margin-right: 1rem;
-    }
+	.swatch {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: var(--corner-radius);
+		margin-right: 1rem;
+	}
 </style>
