@@ -1,0 +1,1 @@
+import{j as r,k as n}from"./Bn_ZbADV.js";import{_ as f,g as o}from"./ByTqR5TD.js";function a({title:t}){f(o("main")),_(()=>{const e=f(o("main"));document.title=t?e.t(217,[t]):e.t(218)})}function _(t){if(r()){t();return}n(()=>{t()})}export{a as s};
