@@ -62,7 +62,7 @@ function wrangler(table) {
 			return _tablesState[table];
 		},
 		async refresh() {
-			console.info(`refresh ${table}`);
+			console.debug(`refresh ${table}`);
 			// @ts-ignore
 			_tablesState[table] = await this.list();
 		},
