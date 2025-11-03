@@ -3,7 +3,9 @@ import { redirect } from '@sveltejs/kit';
 import { resolve } from '$app/paths';
 import { href } from '$lib/paths';
 
+// Go to #/import but keep url search params
 export async function load({ url }) {
-	const { origin, pathname, hash } = new URL(href('/'))
-	redirect(307, `${origin}${pathname}${url.search}${hash}`);
+	let destination = new URL(href('/import'), url.origin)
+	destination.search = url.search
+	redirect(307, destination);
 }
