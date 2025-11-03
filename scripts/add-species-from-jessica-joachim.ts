@@ -12,8 +12,8 @@ import type { ExportedProtocol } from '../src/lib/schemas/protocols';
 const hasInnerText = type({ innerText: 'string' });
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
-const jsdomOpts = { virtualConsole: new jsdom.VirtualConsole() };
-jsdomOpts.virtualConsole.on('error', (e) => {
+const virtualConsole = new jsdom.VirtualConsole();
+virtualConsole.on('error', (e) => {
 	if (/Could not parse CSS stylesheet/i.test(e.toString())) return;
 	console.error(e);
 });
@@ -119,9 +119,7 @@ async function getNewsfeedUpdateArticles(): Promise<URL[]> {
 }
 
 async function updatedSpecies(updatesArticle: URL): Promise<Array<readonly [string, URL]>> {
-	const doc = await fetch(updatesArticle)
-		.then((r) => r.text())
-		.then((html) => new JSDOM(html).window.document);
+	const doc = await fetchAndParseHtml(updatesArticle);
 
 	// TODO get URL patterns (/insectes/*, /especes/*, ... ) to filter out irrelevant links
 	return Array.from(doc.querySelectorAll<HTMLAnchorElement>('main .entry-content a'))
@@ -135,9 +133,9 @@ async function updatedSpecies(updatesArticle: URL): Promise<Array<readonly [stri
 }
 
 async function searchForSpecies(name: string): Promise<URL | null> {
-	const results = await fetch(new URL(`/?${new URLSearchParams({ s: name })}`, ORIGIN))
-		.then((r) => r.text())
-		.then((html) => new JSDOM(html).window.document);
+	const results = await fetchAndParseHtml(
+		new URL(`/?${new URLSearchParams({ s: name })}`, ORIGIN)
+	);
 
 	const links = results.querySelectorAll<HTMLAnchorElement>('main article h2 a');
 
@@ -155,9 +153,7 @@ async function getSpecies(
 	key: string,
 	page: URL
 ): Promise<Partial<typeof MetadataEnumVariant.infer> | null> {
-	const doc = await fetch(page)
-		.then((r) => r.text())
-		.then((html) => new JSDOM(html).window.document);
+	const doc = await fetchAndParseHtml(page);
 
 	const content = doc.querySelector('main');
 	if (!content) return null;
@@ -182,7 +178,7 @@ async function getSpecies(
 	content.querySelector('h1')?.remove();
 	// Remove year-only bold text, it's usually above a gallery (that is now removed)
 	content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((el) => {
-        if (!hasInnerText.allows(el)) return;
+		if (!hasInnerText.allows(el)) return;
 		if (/^20\d\d(-20\d\d)?$/.test(el.innerText.trim())) {
 			el.remove();
 		}
@@ -190,11 +186,14 @@ async function getSpecies(
 
 	// Remove links that became empty
 	content.querySelectorAll('a').forEach((a) => {
-        if (!hasInnerText.allows(a)) return;
+		if (!hasInnerText.allows(a)) return;
 		if (!a.innerText.trim()) {
 			a.remove();
 		}
 	});
+
+	// TODO improve this
+	content.querySelectorAll('img').forEach((img) => img.remove());
 
 	return {
 		key,
@@ -236,4 +235,11 @@ function yellow(text: string): string {
 	};
 
 	return `${cc.yellow}${text}${cc.reset}`;
+}
+
+async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document'] | null> {
+	const response = await fetch(url);
+	if (!response.ok) return null;
+
+	return new JSDOM(await response.text(), { virtualConsole }).window.document;
 }
