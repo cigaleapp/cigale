@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { type } from 'arktype';
 import { JSDOM } from 'jsdom';
 import * as jsdom from 'jsdom';
 import RSSParser from 'rss-parser';
@@ -7,6 +8,8 @@ import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols';
+
+const hasInnerText = type({ innerText: 'string' });
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const jsdomOpts = { virtualConsole: new jsdom.VirtualConsole() };
@@ -179,7 +182,7 @@ async function getSpecies(
 	content.querySelector('h1')?.remove();
 	// Remove year-only bold text, it's usually above a gallery (that is now removed)
 	content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((el) => {
-		if (!(el instanceof HTMLElement)) return;
+        if (!hasInnerText.allows(el)) return;
 		if (/^20\d\d(-20\d\d)?$/.test(el.innerText.trim())) {
 			el.remove();
 		}
@@ -187,7 +190,7 @@ async function getSpecies(
 
 	// Remove links that became empty
 	content.querySelectorAll('a').forEach((a) => {
-		if (!(a instanceof HTMLAnchorElement)) return;
+        if (!hasInnerText.allows(a)) return;
 		if (!a.innerText.trim()) {
 			a.remove();
 		}
