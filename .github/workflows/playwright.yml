@@ -33,7 +33,7 @@ jobs:
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: prepare
     container:
-      image: ghcr.io/gwennlbh/playwright-bun:1.55.1
+      image: ghcr.io/gwennlbh/playwright-bun:v1.56.1
       options: --user 1001
     strategy:
       fail-fast: false
