@@ -1,6 +1,7 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["github>gwennlbh/renovate"],
+    "prConcurrentLimit": 8,
 	"packageRules": [
 		{
 			"description": "Auto-merge updates to linters and formatters",
