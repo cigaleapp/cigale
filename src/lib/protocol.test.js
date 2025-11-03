@@ -248,6 +248,12 @@ describe('compareProtocolWithUpstream', () => {
 				metadata: {},
 				authors: [],
 				description: 'A test protocol',
+				source: 'https://example.com/protocol.json',
+                crop: {
+                    metadata: 'feur',
+                    confirmationMetadata: 'quoicoubaka',
+                    padding: '0px'
+                },
 				exports: {
 					metadata: {
 						json: 'analysis.json',
