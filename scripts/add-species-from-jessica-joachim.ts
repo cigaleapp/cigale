@@ -172,6 +172,8 @@ async function getSpecies(
 	content.querySelector('.entry-content > [id^=like-post-wrapper]')?.remove();
 	// Social media share buttons
 	content.querySelector('.entry-content > .sharedaddy')?.remove();
+	// Text (most likely header) for the removed gallery
+	content.querySelector('.entry-content > p:has(+ .wp-block-kadence-advancedgallery)')?.remove();
 	// Gallery (can't be represented in markdown well)
 	content.querySelector('.entry-content > .wp-block-kadence-advancedgallery')?.remove();
 	content.querySelector('.entry-content > .tiled-gallery')?.remove();
@@ -190,6 +192,9 @@ async function getSpecies(
 		}
 	});
 
+	// TODO improve this
+	content.querySelectorAll('img').forEach((img) => img.remove());
+
 	// Remove links that became empty
 	content.querySelectorAll('a').forEach((node) => {
 		const el = withCleanedInnerText(node);
@@ -199,9 +204,6 @@ async function getSpecies(
 			node.remove();
 		}
 	});
-
-	// TODO improve this
-	content.querySelectorAll('img').forEach((img) => img.remove());
 
 	return {
 		key,
