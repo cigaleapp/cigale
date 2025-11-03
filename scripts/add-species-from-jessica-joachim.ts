@@ -1,11 +1,19 @@
 import path from 'node:path';
 import { JSDOM } from 'jsdom';
+import * as jsdom from 'jsdom';
 import RSSParser from 'rss-parser';
 import Turndown from 'turndown';
 
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols';
+
+// Suppress annoying virtual console error we can't do anything about and don't care about
+const jsdomOpts = { virtualConsole: new jsdom.VirtualConsole() }
+jsdomOpts.virtualConsole.on("error", e => {
+    if (/Could not parse CSS stylesheet/i.test(e.toString())) return
+    console.error(e)
+})
 
 const here = import.meta.dirname;
 const protocolPath = path.join(here, '../examples/arthropods.cigaleprotocol.json');
