@@ -3,7 +3,7 @@ name: Vitest
 on:
   workflow_call:
     inputs:
-      compare-coverage: 
+      compare-coverage:
         type: boolean
         default: true
 
