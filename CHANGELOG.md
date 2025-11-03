@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## November 2025
+
+### Improvements
+
+- Adjust colors
+
+### Data Updates
+
+- Regenerate example protocols
+
 ## October 2025
 
 ### Improvements
