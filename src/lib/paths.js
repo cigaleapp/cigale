@@ -26,5 +26,5 @@ export async function goto(...args) {
  */
 export function href(...args) {
 	// @ts-expect-error
-	return resolve(...args)
+	return resolve(...args);
 }

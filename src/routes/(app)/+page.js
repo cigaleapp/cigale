@@ -5,7 +5,7 @@ import { href } from '$lib/paths';
 
 // Go to #/import but keep url search params
 export async function load({ url }) {
-	let destination = new URL(href('/import'), url.origin)
-	destination.search = url.search
+	let destination = new URL(href('/import'), url.origin);
+	destination.search = url.search;
 	redirect(307, destination);
 }
