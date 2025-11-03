@@ -10,7 +10,8 @@ env:
   BUILD_COMMIT: ${{ github.sha }}
 
 jobs:
-  deploy-preview:
+  deploy:
+    name: Build & Deploy
     runs-on: ubuntu-latest
     environment:
       name: '#${{ github.event.number }}: App preview'

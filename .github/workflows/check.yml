@@ -84,3 +84,11 @@ jobs:
     uses: ./.github/workflows/docker.yml
     with:
       deploy: ${{ github.ref_name == 'main' }}
+
+  is-mergeable:
+    if: github.event_name == 'pull_request'
+    name: Mergeable?
+    needs: [json-schema, lint, test, e2e, preview, electron, docker, bundlesize]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All checks passed :)"
