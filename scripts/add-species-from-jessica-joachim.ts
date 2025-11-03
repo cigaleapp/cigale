@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { type } from 'arktype';
+import { ArkErrors, type } from 'arktype';
 import { JSDOM } from 'jsdom';
 import * as jsdom from 'jsdom';
 import RSSParser from 'rss-parser';
@@ -9,7 +9,9 @@ import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: '
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols';
 
-const hasInnerText = type({ innerText: 'string' });
+const withCleanedInnerText = type({
+	innerText: ['string', '=>', (txt) => txt.replaceAll('\r?\n', ' ').trim()]
+});
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const virtualConsole = new jsdom.VirtualConsole();
@@ -120,6 +122,7 @@ async function getNewsfeedUpdateArticles(): Promise<URL[]> {
 
 async function updatedSpecies(updatesArticle: URL): Promise<Array<readonly [string, URL]>> {
 	const doc = await fetchAndParseHtml(updatesArticle);
+	if (!doc) return [];
 
 	// TODO get URL patterns (/insectes/*, /especes/*, ... ) to filter out irrelevant links
 	return Array.from(doc.querySelectorAll<HTMLAnchorElement>('main .entry-content a'))
@@ -137,7 +140,7 @@ async function searchForSpecies(name: string): Promise<URL | null> {
 		new URL(`/?${new URLSearchParams({ s: name })}`, ORIGIN)
 	);
 
-	const links = results.querySelectorAll<HTMLAnchorElement>('main article h2 a');
+	const links = results?.querySelectorAll<HTMLAnchorElement>('main article h2 a') ?? [];
 
 	for (const link of links) {
 		const title = link.textContent;
@@ -154,6 +157,7 @@ async function getSpecies(
 	page: URL
 ): Promise<Partial<typeof MetadataEnumVariant.infer> | null> {
 	const doc = await fetchAndParseHtml(page);
+	if (!doc) return null;
 
 	const content = doc.querySelector('main');
 	if (!content) return null;
@@ -177,18 +181,22 @@ async function getSpecies(
 	// Remove title
 	content.querySelector('h1')?.remove();
 	// Remove year-only bold text, it's usually above a gallery (that is now removed)
-	content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((el) => {
-		if (!hasInnerText.allows(el)) return;
-		if (/^20\d\d(-20\d\d)?$/.test(el.innerText.trim())) {
-			el.remove();
+	content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((node) => {
+		const el = withCleanedInnerText(node);
+		if (el instanceof ArkErrors) return;
+
+		if (/^20\d\d(-20\d\d)?$/.test(el.innerText)) {
+			node.remove();
 		}
 	});
 
 	// Remove links that became empty
-	content.querySelectorAll('a').forEach((a) => {
-		if (!hasInnerText.allows(a)) return;
-		if (!a.innerText.trim()) {
-			a.remove();
+	content.querySelectorAll('a').forEach((node) => {
+		const el = withCleanedInnerText(node);
+		if (el instanceof ArkErrors) return;
+
+		if (!el.innerText) {
+			node.remove();
 		}
 	});
 
