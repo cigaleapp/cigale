@@ -1,8 +1,9 @@
 import { redirect } from '@sveltejs/kit';
 
 import { resolve } from '$app/paths';
-import { hashPath } from '$lib/paths';
+import { href } from '$lib/paths';
 
 export async function load({ url }) {
-	redirect(307, resolve(`/${url.search}#${hashPath('/import')}`));
+	const { origin, pathname, hash } = new URL(href('/'))
+	redirect(307, `${origin}${pathname}${url.search}${hash}`);
 }
