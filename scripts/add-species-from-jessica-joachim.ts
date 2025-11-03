@@ -168,6 +168,21 @@ async function getSpecies(
 	content.querySelector('.entry-content > .wp-block-kadence-advancedbtn')?.remove();
 	// Remove title
 	content.querySelector('h1')?.remove();
+	// Remove year-only bold text, it's usually above a gallery (that is now removed)
+	content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((el) => {
+		if (!(el instanceof HTMLElement)) return;
+		if (/^20\d\d(-20\d\d)?$/.test(el.innerText.trim())) {
+			el.remove();
+		}
+	});
+
+	// Remove links that became empty
+	content.querySelectorAll('a').forEach((a) => {
+		if (!(a instanceof HTMLAnchorElement)) return;
+		if (!a.innerText.trim()) {
+			a.remove();
+		}
+	});
 
 	return {
 		key,
