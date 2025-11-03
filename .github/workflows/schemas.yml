@@ -1,13 +1,12 @@
 name: Schemas
 
 on:
-  push:
-    paths: ['*.yaml', '*.yml', '*.json']
-  workflow_dispatch:
+  workflow_call:
+    inputs: {}
 
 jobs:
-  Validate-example-protocols:
-    name: Validate example protocols
+  protocols:
+    name: Protocols
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

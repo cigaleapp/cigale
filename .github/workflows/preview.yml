@@ -1,14 +1,8 @@
 name: Deploy PR previews
 
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - closed
-
-concurrency: preview-${{ github.ref }}
+  workflow_call:
+    inputs: {}
 
 env:
   BASE_PATH: /cigale/_pullrequests/pr-${{ github.event.number }}
@@ -31,7 +25,7 @@ jobs:
           bun-version-file: .bun-version
 
       - name: Install and Build
-        if: github.event.action != 'closed' # You might want to skip the build if the PR has been closed
+        if: github.event.action != 'closed'
         run: |
           bun install
           bun run build

@@ -2,7 +2,10 @@ name: Vitest
 
 on:
   workflow_call:
-    inputs: {}
+    inputs:
+      compare-coverage: 
+        type: boolean
+        default: true
 
 jobs:
   test:
@@ -38,7 +41,7 @@ jobs:
   get-base-branch-coverage:
     name: Get base branch coverage
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/')
+    if: inputs.compare-coverage
     steps:
       - uses: actions/checkout@v5
         with:
@@ -84,7 +87,7 @@ jobs:
     name: Compare coverage
     runs-on: ubuntu-latest
     needs: [test, get-base-branch-coverage]
-    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/')
+    if: inputs.compare-coverage
     steps:
       - name: Set threshold
         id: params

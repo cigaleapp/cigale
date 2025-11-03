@@ -24,6 +24,10 @@ jobs:
       - name: Lint
         run: bun run lint
 
+  json-schema:
+    name: Validate JSONs
+    uses: ./.github/workflows/schemas.yml
+
   clutter:
     name: Check for clutter
     runs-on: ubuntu-latest
@@ -37,20 +41,46 @@ jobs:
       - name: Check for clutter
         run: bun knip --reporter github-actions
 
+  bundlesize:
+    if: github.ref_name != 'main'
+    name: Bundle size
+    uses: ./.github/workflows/bundlesize.yml
+
   test:
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
+    with:
+      compare-coverage: ${{ github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/') }}
 
   e2e:
-    needs: [lint, test]
+    needs: [json-schema, lint, test]
     name: E2E
     uses: ./.github/workflows/playwright.yml
 
+  preview:
+    if: github.event_name == 'pull_request'
+    needs: [json-schema, lint, test]
+    name: PR Preview
+    uses: ./.github/workflows/preview.yml
+
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: [clutter, e2e]
+    needs: e2e
     name: Deploy
     concurrency:
       group: deploy-gh-pages
       cancel-in-progress: true
     uses: ./.github/workflows/deploy.yml
+
+  electron:
+    if: github.event_name == 'pull_request'
+    needs: e2e
+    name: Electron
+    uses: ./.github/workflows/electron.yml
+
+  docker:
+    needs: e2e
+    name: Docker
+    uses: ./.github/workflows/docker.yml
+    with:
+      deploy: ${{ github.ref_name == 'main' }}
