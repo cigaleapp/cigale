@@ -327,6 +327,7 @@ const RAW_IMAGE_FILE_EXTENSIONS = [
 const ALWAYS_SUPPORTED_TYPES = ['image/jpeg', 'image/png'];
 const SUPPORT_PLANNED_TYPES = [...RAW_IMAGE_MEDIA_TYPES];
 
+/* istanbul ignore next */
 export function errorMessageImageTooLarge() {
 	return `L'image est trop grande pour être traitée. Elle doit faire moins de ${imageLimits.maxResolutionInMP} Megapixels et ${imageLimits.maxMemoryUsageInMB} Mo`;
 }
@@ -559,6 +560,27 @@ export function isRawImage(file) {
 		RAW_IMAGE_MEDIA_TYPES.includes(file.type) ||
 		RAW_IMAGE_FILE_EXTENSIONS.some((ext) => file.name.toLocaleLowerCase().endsWith(ext))
 	);
+}
+
+if (import.meta.vitest) {
+	const { describe, test, expect } = import.meta.vitest;
+
+	describe('isRawImage', () => {
+		test('detects raw images by media type', () => {
+			const file = new File([], 'image.cr2', { type: 'image/CR2' });
+			expect(isRawImage(file)).toBe(true);
+		});
+
+		test('detects raw images by file extension', () => {
+			const file = new File([], 'image.nef', { type: 'application/octet-stream' });
+			expect(isRawImage(file)).toBe(true);
+		});
+
+		test('returns false on non-raw images', () => {
+			const file = new File([], 'image.jpg', { type: 'image/jpeg' });
+			expect(isRawImage(file)).toBe(false);
+		});
+	});
 }
 
 /**
