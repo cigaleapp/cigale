@@ -1,4 +1,4 @@
-import '$locales/loader.svelte.js';
+import '$locales/main.loader.svelte.js';
 
 import { error } from '@sveltejs/kit';
 import * as dates from 'date-fns';

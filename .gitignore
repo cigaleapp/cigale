@@ -53,3 +53,5 @@ out/
 # Runs on prebuild
 static/fonts
 static/fonts.css
+src/locales/.wuchale
+src/locales/data.js
