@@ -531,6 +531,25 @@ export function parseCropPadding(padding) {
 	};
 }
 
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+	describe('parseCropPadding', () => {
+		test('parses pixel padding', () => {
+			const padding = parseCropPadding('20px');
+			expect(padding.unit).toBe('px');
+			expect(padding.unitless).toBe(20);
+			expect(padding.inPixels(200)).toBe(20);
+		});
+
+		test('parses percentage padding', () => {
+			const padding = parseCropPadding('10%');
+			expect(padding.unit).toBe('%');
+			expect(padding.unitless).toBe(10);
+			expect(padding.inPixels(300)).toBe(30);
+		});
+	});
+}
+
 /**
  *
  * @param {File} file
