@@ -1,20 +1,8 @@
 name: Desktop app
 
 on:
-  workflow_dispatch:
-  push:
-    tags: [v*]
-  pull_request:
-    branches-ignore:
-      - renovate/*
-      - '!renovate/*electron*'
-    paths:
-      - .github/workflows/electron.yml
-      - src/electron/
-      - vite.electron*
-      - forge.*
-      - package.json
-      - package-lock.json
+  workflow_call:
+    inputs: {}
 
 # https://www.electronforge.io/config/publishers/github#authentication
 permissions:

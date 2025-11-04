@@ -54,6 +54,10 @@ out/
 static/fonts
 static/fonts.css
 
+# Wuchale-related
+src/locales/.wuchale
+src/locales/data.js
+
 # Database for a local Beamup server instance
 # see https://github.com/cigaleapp/beamup
 beamup-db/

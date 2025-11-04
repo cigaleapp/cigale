@@ -22,7 +22,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ModalToasts from './ModalToasts.svelte';
-	import { getSettings } from './settings.svelte';
+	import { getColorScheme } from './settings.svelte';
 	import { insideBoundingClientRect } from './utils';
 
 	/**
@@ -82,13 +82,11 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 		if (page.state[stateKey]) modalElement.showModal();
 		else modalElement.close();
 	});
-
-	const theme = $derived(getSettings().theme);
 </script>
 
 <dialog
 	aria-hidden={!page.state[stateKey]}
-	data-theme={theme}
+	style:color-scheme={getColorScheme()}
 	bind:this={modalElement}
 	onclose={() => {
 		// Update state when dialog is closed via browser-controlled means (e.g. Esc key)

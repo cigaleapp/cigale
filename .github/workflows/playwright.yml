@@ -1,15 +1,8 @@
 name: End-to-end tests
 
 on:
-  push:
-    branches: [main]
-    paths: [src/**, tests/**, static/**, '*', src/locales/**, .github/workflows/playwright.yml]
-  pull_request:
-    paths: [src/**, tests/**, static/**, '*', src/locales/**, .github/workflows/playwright.yml]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  workflow_call:
+    inputs: {}
 
 jobs:
   prepare:

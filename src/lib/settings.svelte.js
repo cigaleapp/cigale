@@ -26,6 +26,10 @@ export function getSettings() {
 	return _settings;
 }
 
+export function getColorScheme() {
+	return _settings.theme === 'auto' ? 'light dark' : _settings.theme;
+}
+
 /**
  *
  * @param {Key} key

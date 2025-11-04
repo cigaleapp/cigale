@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-10-27 12:42+0000\n"
+"PO-Revision-Date: 2025-11-04T08:22:06.708Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1048,10 +1048,6 @@ msgstr ""
 "control is recommended; the site where the protocol can be downloaded from, for example</0>"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0>.</0> ou <1>_</1>"
-msgstr "The ID must contain only letters, digits, <0>.</0> or <1>_</1>"
-
-#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "<0/> utilise déjà cet identifiant"
 msgstr "<0/> already uses that ID"
 
@@ -1140,14 +1136,6 @@ msgstr "Default padding <0>for cropped images</0>"
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Marge par défaut"
 msgstr "Default padding"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid ""
-"Entrez un nombre suivi de <0>%</0> pour une marge relative à la taille de chaque\n"
-"image, ou suivi de <1>px</1> pour une marge en pixels."
-msgstr ""
-"Enter a number followed by <0>%</0> for a value relative to the size of each\n"
-"image, or followed by <1>px</1> for a padding in pixels."
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid "Stockage des boîtes"
@@ -1424,14 +1412,6 @@ msgstr "Current version"
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Version"
 msgstr "Version"
-
-#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
-msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2><0>Réétablir</0></2>"
-msgstr "<0/> Latest version available: <1>v{0}</1> <2><0>Reset</0></2>"
-
-#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
-msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1><0>Passer à la v{0}</0></1>"
-msgstr "<0/> Protocol has unpublished changes, see below <1><0>Set version to v{0}</0></1>"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> À jour"
@@ -1726,3 +1706,21 @@ msgstr[1] "# elements"
 #: src/lib/ButtonUpdateProtocol.svelte
 msgid "Non versionné"
 msgstr "Not versioned"
+
+#: src/routes/(app)/protocols/ModalCreateProtocol.svelte
+msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+msgid ""
+"Entrez un nombre suivi de <0/> pour une marge relative à la taille de chaque\n"
+"image, ou suivi de <1/> pour une marge en pixels."
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/versioning/+page.svelte
+msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
+msgstr ""
