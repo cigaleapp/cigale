@@ -41,11 +41,6 @@ jobs:
       - name: Check for clutter
         run: bun knip --reporter github-actions
 
-  bundlesize:
-    if: github.ref_name != 'main'
-    name: Bundle size
-    uses: ./.github/workflows/bundlesize.yml
-
   test:
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
@@ -56,6 +51,12 @@ jobs:
     needs: [json-schema, lint, test]
     name: E2E
     uses: ./.github/workflows/playwright.yml
+
+  bundlesize:
+    if: github.ref_name != 'main'
+    needs: test
+    name: Bundle size
+    uses: ./.github/workflows/bundlesize.yml
 
   preview:
     if: github.event_name == 'pull_request'
