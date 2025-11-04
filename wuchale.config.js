@@ -12,6 +12,7 @@ export default defineConfig({
 	hmr: Boolean(process.env.CI),
 	adapters: {
 		main: svelte({
+			loader: 'sveltekit',
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
 				if (file.includes('/_playground/')) return false;
 
@@ -50,6 +51,7 @@ export default defineConfig({
 			}
 		}),
 		js: js({
+			loader: 'vite',
 			files: [
 				'src/**/+{page,layout}.{js,ts}',
 				'src/**/+{page,layout}.server.{js,ts}',

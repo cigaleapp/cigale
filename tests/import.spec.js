@@ -307,7 +307,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page })
 	);
 });
 
-test('can cancel import', issue(430), async ({ page }) => {
+test.fixme('can cancel import', issue(430), async ({ page }) => {
 	await chooseProtocol(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);

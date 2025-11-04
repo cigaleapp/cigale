@@ -1,12 +1,11 @@
 name: Docker image
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-    paths: [Dockerfile, .github/workflows/docker.yml]
+  workflow_call:
+    inputs:
+      deploy:
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -32,9 +31,9 @@ jobs:
       - name: Build docker image
         uses: docker/build-push-action@v6
         with:
+          file: ./Dockerfile
           context: .
-          push: true
+          push: ${{ inputs.deploy }}
           tags: |
             ghcr.io/cigaleapp/cigale:latest
             ghcr.io/cigaleapp/cigale:${{ github.sha }}
-          file: ./Dockerfile

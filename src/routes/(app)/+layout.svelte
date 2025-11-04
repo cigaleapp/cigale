@@ -17,7 +17,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
-	import { getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
+	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import Toast from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -113,10 +113,8 @@
 		)
 	);
 
-	const settings = $derived(getSettings());
-
 	$effect(() => {
-		document.documentElement.dataset.theme = settings.theme;
+		document.documentElement.style.colorScheme = getColorScheme();
 	});
 
 	/** @type {undefined|(() => void)} */

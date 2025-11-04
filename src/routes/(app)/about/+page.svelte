@@ -1,6 +1,11 @@
 <script>
 	import JSONC from 'tiny-jsonc';
 
+	import IconSuccess from '~icons/ri/checkbox-circle-line';
+	import IconError from '~icons/ri/close-circle-line';
+	import IconWarning from '~icons/ri/error-warning-line';
+	import IconPrimary from '~icons/ri/information-line';
+	import IconNeutral from '~icons/ri/quote-text';
 	import lockfile from '$lib/../../bun.lock?raw';
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
@@ -73,19 +78,6 @@
 		return pkgs.map((name) => [name, packages[name][0].replace(`${name}@`, '')]);
 	}
 </script>
-
-{#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ people)}
-	{#each people.sort(() => Math.random() - 0.5) as { url, name }, i (url || name)}
-		{#if i > 0},
-		{/if}
-		{#if url}
-			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-			<a target="_blank" href={url}>{name}</a>
-		{:else}
-			{name}
-		{/if}
-	{/each}
-{/snippet}
 
 <header>
 	<Logo drawpercent={logoDrawPercent} />
@@ -238,7 +230,35 @@
 			<p>{error}</p>
 		{/await}
 	</dd>
+
+	<dt></dt>
+	<dd>
+		{@render colorswatch('error', IconError)}
+		{@render colorswatch('warning', IconWarning)}
+		{@render colorswatch('success', IconSuccess)}
+		{@render colorswatch('primary', IconPrimary)}
+		{@render colorswatch('neutral', IconNeutral)}
+	</dd>
 </dl>
+
+{#snippet peoplelinks(/** @type {Array<{ name: string; url: string }>} */ people)}
+	{#each people.sort(() => Math.random() - 0.5) as { url, name }, i (url || name)}
+		{#if i > 0},
+		{/if}
+		{#if url}
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+			<a target="_blank" href={url}>{name}</a>
+		{:else}
+			{name}
+		{/if}
+	{/each}
+{/snippet}
+
+{#snippet colorswatch(/** @type {string} */ color, /** @type {import('svelte').Component}*/ Icon)}
+	<div class="swatch" style:color="var(--fg-{color})" style:background-color="var(--bg-{color})">
+		<Icon />
+	</div>
+{/snippet}
 
 <style>
 	header {
@@ -274,5 +294,15 @@
 
 	.dependencies code {
 		font-size: 0.85em;
+	}
+
+	.swatch {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: var(--corner-radius);
+		margin-right: 1rem;
 	}
 </style>
