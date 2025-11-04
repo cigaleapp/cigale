@@ -78,6 +78,7 @@
 				<li>
 					{#await fetch(`https://api.github.com/repos/cigaleapp/cigale/issues/${issueNumber}`).then( (res) => res.json() ) then { title, number, user, html_url }}
 						<!-- @wc-context: continuation of sentence "deployment PR for..." -->
+						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 						pour l'issue <a href={html_url}>#{number} {title}</a> de
 						{@render githubUser(user)}
 					{/await}

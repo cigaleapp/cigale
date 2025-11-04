@@ -53,12 +53,13 @@
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconSearch from '~icons/ri/search-line';
 	import { invalidate } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { errorMessage } from '$lib/i18n.js';
 	import { dependencyURI, drop, set } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { goto, href } from '$lib/paths.js';
+	import { goto } from '$lib/paths.js';
 	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { slugify } from '$lib/utils.js';
@@ -148,11 +149,14 @@
 				{@const { key, label } = item}
 				<div class="navlink" class:active={page.params.option === key}>
 					<a
-						href={href('/(app)/protocols/[id]/metadata/[metadata]/options/[option]', {
-							id: data.protocol.id,
-							metadata: removeNamespaceFromMetadataId(data.metadata.id),
-							option: key
-						})}
+						href={resolve(
+							'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
+							{
+								id: data.protocol.id,
+								metadata: removeNamespaceFromMetadataId(data.metadata.id),
+								option: key
+							}
+						)}
 					>
 						{label}
 					</a>

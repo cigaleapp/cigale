@@ -27,12 +27,6 @@ export default [
 		},
 		rules: {
 			'svelte/no-at-html-tags': 'off',
-			'svelte/no-navigation-without-resolve': [
-				'error',
-				{
-					ignoreLinks: true
-				}
-			],
 			'no-unused-vars': [
 				'error',
 				{
