@@ -1,10 +1,9 @@
 name: Checks
 
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
-    types: [opened, reopened, synchronize]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -87,9 +86,12 @@ jobs:
       deploy: ${{ github.ref_name == 'main' }}
 
   is-mergeable:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && !cancelled()
     name: Mergeable?
     needs: [json-schema, lint, test, e2e, preview, electron, docker, bundlesize]
     runs-on: ubuntu-latest
     steps:
-      - run: echo "All checks passed :)"
+      - if: contains(needs.*.result, 'failure')
+        run: echo "Some tests failed :'("; exit 1
+      - if: ${{ !contains(needs.*.result, 'failure') }}
+        run: echo "All checks passed! This PR is mergeable :D"
