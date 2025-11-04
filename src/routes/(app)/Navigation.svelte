@@ -2,6 +2,7 @@
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -10,7 +11,7 @@
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { goto, href } from '$lib/paths.js';
+	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
@@ -155,7 +156,7 @@
 
 	<nav bind:clientHeight={navHeight} data-testid="app-nav" class:floating>
 		<div class="logo">
-			<a href={href('/')}>
+			<a href={resolve('/')}>
 				<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
 			</a>
 			{#if previewingPrNumber}
@@ -167,7 +168,7 @@
 
 		<div class="steps">
 			<a
-				href={href('/import')}
+				href={resolve('/import')}
 				data-testid="goto-import"
 				aria-disabled={!uiState.currentProtocol}
 			>
@@ -178,21 +179,24 @@
 			</a>
 			<div class="separator"><IconNext /></div>
 			<div class="with-inference-indicator">
+				<!-- eslint-disable svelte/no-navigation-without-resolve -->
 				<a
 					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
 					uiState.imageOpenedInCropper
-						? href('/(app)/(sidepanel)/crop/[image]', {
+						? resolve('/(app)/(sidepanel)/crop/[image]', {
 								image: uiState.imageOpenedInCropper
 							})
-						: href('/crop')}
+						: resolve('/crop')}
 					data-testid="goto-crop"
 					aria-disabled={!uiState.currentProtocol || !hasImages}
 				>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 					Recadrer
 					{#if path.startsWith('/crop')}
 						<div class="line"></div>
 					{/if}
 				</a>
+
 				{@render inferenceSettings(
 					'crop',
 					uiState.cropModels,
@@ -209,7 +213,7 @@
 					: undefined}
 			>
 				<a
-					href={href('/classify')}
+					href={resolve('/classify')}
 					aria-disabled={!uiState.currentProtocol ||
 						!hasImages ||
 						(uiState.processing.task === 'detection' &&

@@ -15,16 +15,5 @@ import { resolve } from '$app/paths';
  * @param {ResolveArgs<T>} args
  */
 export async function goto(...args) {
-	// eslint-disable-next-line svelte/no-navigation-without-resolve
-	await navigation.goto(href(...args));
-}
-
-/**
- * @template {RouteId | Pathname} T
- * @param {ResolveArgs<T>} args
- * @returns {ResolvedPathname}
- */
-export function href(...args) {
-	// @ts-expect-error
-	return resolve(...args);
+	await navigation.goto(resolve(...args));
 }
