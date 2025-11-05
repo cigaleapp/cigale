@@ -3,11 +3,10 @@
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconEdit from '~icons/ri/pencil-line';
 	import IconExport from '~icons/ri/share-forward-line';
-	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import { databaseHandle } from '$lib/idb.svelte';
-	import { goto } from '$lib/paths';
+	import { goto, resolve } from '$lib/paths';
 	import { exportProtocol } from '$lib/protocols';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';

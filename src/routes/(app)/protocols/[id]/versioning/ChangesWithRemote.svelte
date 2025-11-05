@@ -10,10 +10,10 @@
 	import IconRemoveKey from '~icons/ri/delete-bin-line';
 	import IconOpenInExternal from '~icons/ri/external-link-fill';
 	import IconEditKey from '~icons/ri/pencil-line';
-	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { get, tables } from '$lib/idb.svelte';
+	import { resolve } from '$lib/paths';
 	import { metadataOptionId, splitMetadataId } from '$lib/schemas/metadata';
 	import { entries } from '$lib/utils';
 

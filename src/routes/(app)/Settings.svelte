@@ -10,11 +10,11 @@
 	import IconSortDesc from '~icons/ri/sort-desc';
 	import IconDecrease from '~icons/ri/subtract-line';
 	import Sun from '~icons/ri/sun-line';
-	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { resolve } from '$lib/paths';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
