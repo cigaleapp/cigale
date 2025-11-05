@@ -3,6 +3,10 @@ name: Docker image
 on:
   workflow_call:
     inputs:
+      artifact:
+        type: string
+        description: Name of artifact to download built app from. If empty, app will be built here.
+        default: ""
       deploy:
         type: boolean
         default: false
@@ -26,7 +30,13 @@ jobs:
           bun-version-file: .bun-version
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - name: Build
+      - if: inputs.artifact != ''
+        name: Download built app
+        uses: actions/download-artifact@v6
+        with:
+          name: ${{ inputs.artifact }}
+      - if: inputs.artifact == ''
+        name: Build
         run: bun run build
       - name: Build docker image
         uses: docker/build-push-action@v6
