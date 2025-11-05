@@ -27,6 +27,8 @@ export default [
 		},
 		rules: {
 			'svelte/no-at-html-tags': 'off',
+            // See https://github.com/sveltejs/kit/issues/14894
+            'svelte/no-navigation-without-resolve': 'off',
 			'no-unused-vars': [
 				'error',
 				{
