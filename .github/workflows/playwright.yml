@@ -2,36 +2,17 @@ name: End-to-end tests
 
 on:
   workflow_call:
-    inputs: {}
+    inputs:
+      artifact:
+        type: string
+        description: Name of artifact to download built app from.
+        required: true
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    name: Prepare
-    steps:
-      - uses: actions/checkout@v5
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: .bun-version
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-      - name: Build
-        run: bun run build
-        env:
-          MINIFICATION: 'off'
-      - name: Upload build as artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: build
-          include-hidden-files: true
-          path: |
-            public
-            .svelte-kit
   test:
     timeout-minutes: 12
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
-    needs: prepare
     container:
       image: ghcr.io/gwennlbh/playwright-bun:1.55.1
       options: --user 1001
@@ -50,7 +31,7 @@ jobs:
       - name: Download built app
         uses: actions/download-artifact@v6
         with:
-          name: build
+          name: ${{ inputs.artifact }}
           path: ./
       - name: Remove task-type spec files for better sharding balance
         run: rm tests/tasks/*
