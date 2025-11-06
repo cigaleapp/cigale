@@ -32,7 +32,7 @@ jobs:
         name: Build (without minification)
         run: bun run build
         env:
-          MINIFICATION: "off"
+          MINIFICATION: 'off'
       - name: Determine artifact name
         id: artifact
         run: echo "name=build-${{ inputs.minify && 'minified' || 'full' }}-${{ github.sha }}" >> $GITHUB_OUTPUT

@@ -6,7 +6,7 @@ on:
       artifact:
         type: string
         description: Name of artifact to download built app from. If empty, app will be built here.
-        default: ""
+        default: ''
       deploy:
         type: boolean
         default: false
