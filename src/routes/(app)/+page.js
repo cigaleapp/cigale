@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 
-import { resolve } from '$lib/paths';
+// We use $app/paths' resolve, so that the base path is included in the URL
+import { resolve } from '$app/paths';
 
 // Go to #/import but keep url search params
 export async function load({ url }) {
