@@ -108,7 +108,7 @@
 		"knip": "^5.68.0",
 		"odt2html": "^1.0.1",
 		"oxlint": "^1.26.0",
-		"pdf-to-png-converter": "^3.10.0",
+		"pdf-to-png-converter": "^3.11.0",
 		"pixelmatch": "^7.1.0",
 		"pngjs": "^7.0.0",
 		"postcss-preset-env": "^10.4.0",
