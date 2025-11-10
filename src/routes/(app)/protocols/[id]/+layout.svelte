@@ -14,7 +14,6 @@
 	import IconMetadata from '~icons/ri/list-unordered';
 	import IconExport from '~icons/ri/share-forward-line';
 	import { invalidate } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Badge from '$lib/Badge.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -24,7 +23,8 @@
 	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import MetadataBadges from '$lib/MetadataBadges.svelte';
-	import { goto, href } from '$lib/paths.js';
+	import { resolve } from '$lib/paths';
+	import { goto } from '$lib/paths.js';
 	import { exportProtocol } from '$lib/protocols';
 	import { namespacedMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
 	import { seo } from '$lib/seo.svelte.js';
@@ -264,7 +264,7 @@
 				{#each metadataDefinitions as def (def.id)}
 					{@const shortId = removeNamespaceFromMetadataId(def.id)}
 					{@const label = def.label || shortId}
-					{@const url = href(
+					{@const url = resolve(
 						// @ts-expect-error
 						page.route.id?.includes('/protocols/[id]/metadata/[metadata]/')
 							? page.route.id

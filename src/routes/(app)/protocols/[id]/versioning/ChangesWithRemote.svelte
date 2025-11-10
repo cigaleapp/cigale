@@ -13,7 +13,7 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import { get, tables } from '$lib/idb.svelte';
-	import { href } from '$lib/paths';
+	import { resolve } from '$lib/paths';
 	import { metadataOptionId, splitMetadataId } from '$lib/schemas/metadata';
 	import { entries } from '$lib/utils';
 
@@ -108,7 +108,7 @@
 			{#if i === 1 && typeof piece === 'string'}
 				<a
 					title="Voir la métadonnée"
-					href={href('/(app)/protocols/[id]/metadata/[metadata]', {
+					href={resolve('/(app)/protocols/[id]/metadata/[metadata]', {
 						id: metadataId.namespace ?? page.params.id ?? '',
 						metadata: metadataId.id
 					})}
@@ -120,7 +120,7 @@
 					{#if option}
 						<a
 							title="Voir l'option"
-							href={href(
+							href={resolve(
 								'/(app)/protocols/[id]/metadata/[metadata]/options/[option]',
 								{
 									id: metadataId.namespace ?? page.params.id ?? '',

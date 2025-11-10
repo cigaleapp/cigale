@@ -14,7 +14,7 @@
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { href } from '$lib/paths.js';
+	import { resolve } from '$lib/paths';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -250,7 +250,7 @@
 			onclick={() => {
 				open = false;
 			}}
-			href={href('/about')}>À propos</a
+			href={resolve('/about')}>À propos</a
 		>
 	</footer>
 </dialog>

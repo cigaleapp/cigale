@@ -1,8 +1,8 @@
 import * as navigation from '$app/navigation';
-import { resolve } from '$app/paths';
+import { resolve as _resolve } from '$app/paths';
 
 /**
- * @import { RouteId, Pathname, RouteParams, ResolvedPathname } from '$app/types';
+ * @import { RouteId, Pathname, RouteParams } from '$app/types';
  */
 
 /**
@@ -14,17 +14,15 @@ import { resolve } from '$app/paths';
  * @template {RouteId | Pathname} T
  * @param {ResolveArgs<T>} args
  */
-export async function goto(...args) {
-	// eslint-disable-next-line svelte/no-navigation-without-resolve
-	await navigation.goto(href(...args));
+export function resolve(...args) {
+	const [_, hash] = _resolve(...args).split('#', 2);
+	return '#' + hash;
 }
 
 /**
  * @template {RouteId | Pathname} T
  * @param {ResolveArgs<T>} args
- * @returns {ResolvedPathname}
  */
-export function href(...args) {
-	// @ts-expect-error
-	return resolve(...args);
+export async function goto(...args) {
+	await navigation.goto(_resolve(...args));
 }

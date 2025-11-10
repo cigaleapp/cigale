@@ -10,12 +10,12 @@
 	import { onDestroy, onMount, setContext } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
-	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
+	import { resolve } from '$lib/paths';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
