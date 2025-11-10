@@ -11,7 +11,6 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { slide } from 'svelte/transition';
 
-	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import * as db from '$lib/idb.svelte';
@@ -19,6 +18,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications';
+	import { resolve } from '$lib/paths';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
 	import { getColorScheme, getSettings, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';

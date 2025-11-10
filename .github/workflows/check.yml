@@ -1,10 +1,9 @@
 name: Checks
 
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
-    types: [opened, reopened, synchronize]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -41,21 +40,31 @@ jobs:
       - name: Check for clutter
         run: bun knip --reporter github-actions
 
-  bundlesize:
-    if: github.ref_name != 'main'
-    name: Bundle size
-    uses: ./.github/workflows/bundlesize.yml
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      minify: false
 
   test:
+    needs: build
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
     with:
       compare-coverage: ${{ github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/') }}
 
   e2e:
-    needs: [json-schema, lint, test]
+    needs: [build, json-schema, lint, test]
     name: E2E
     uses: ./.github/workflows/playwright.yml
+    with:
+      artifact: ${{ needs.build.outputs.artifact }}
+
+  bundlesize:
+    if: github.ref_name != 'main'
+    needs: test
+    name: Bundle size
+    uses: ./.github/workflows/bundlesize.yml
 
   preview:
     if: github.event_name == 'pull_request'
@@ -74,21 +83,25 @@ jobs:
 
   electron:
     if: github.event_name == 'pull_request'
-    needs: e2e
+    needs: [e2e]
     name: Electron
     uses: ./.github/workflows/electron.yml
 
   docker:
-    needs: e2e
+    needs: [build, e2e]
     name: Docker
     uses: ./.github/workflows/docker.yml
     with:
+      artifact: ${{ needs.build.outputs.artifact }}
       deploy: ${{ github.ref_name == 'main' }}
 
   is-mergeable:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && !cancelled()
     name: Mergeable?
-    needs: [json-schema, lint, test, e2e, preview, electron, docker, bundlesize]
+    needs: [build, json-schema, lint, test, e2e, preview, electron, docker, bundlesize]
     runs-on: ubuntu-latest
     steps:
-      - run: echo "All checks passed :)"
+      - if: contains(needs.*.result, 'failure')
+        run: echo "Some tests failed :'("; exit 1
+      - if: ${{ !contains(needs.*.result, 'failure') }}
+        run: echo "All checks passed! This PR is mergeable :D"

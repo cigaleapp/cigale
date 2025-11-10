@@ -12,7 +12,7 @@
 		"src/locales/*.js"
 	],
 	"ignoreBinaries": ["node-modules-inspector", "msgcat"],
-	"ignoreDependencies": ["@iconify-json/.+", "bun"],
+	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector"],
 	"entry": [
 		"scripts/*.js",
 		"src/electron/main.{d.ts,js}",

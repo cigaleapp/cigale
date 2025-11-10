@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      minify:
+        required: false
+        type: boolean
+        default: true
+    outputs:
+      artifact:
+        description: The build artifact name
+        value: ${{ jobs.app.outputs.artifact }}
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    name: App
+    outputs:
+      artifact: ${{ steps.artifact.outputs.name }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - if: inputs.minify
+        name: Build
+        run: bun run build
+      - if: ${{ !inputs.minify }}
+        name: Build (without minification)
+        run: bun run build
+        env:
+          MINIFICATION: 'off'
+      - name: Determine artifact name
+        id: artifact
+        run: echo "name=build-${{ inputs.minify && 'minified' || 'full' }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+      - name: Upload build as artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          include-hidden-files: true
+          path: |
+            public
+            .svelte-kit
