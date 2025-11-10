@@ -8,9 +8,18 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Adjust colors
 
+### Bug Fixes
+
+- Fix full-page reload for goto()s
+- Fix whole-page reload on every <a> click
+
 ### Data Updates
 
 - Regenerate example protocols
+
+### Translation Updates
+
+- Refresh translation files
 
 ## October 2025
 
