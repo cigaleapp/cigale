@@ -95,7 +95,7 @@
 		"eslint-plugin-oxlint": "^1.25.0",
 		"eslint-plugin-svelte": "^3.13.0",
 		"extract-zip": "^2.0.1",
-		"fake-indexeddb": "^6.2.4",
+		"fake-indexeddb": "^6.2.5",
 		"gitmoji-cli": "^9.7.0",
 		"globals": "^16.5.0",
 		"google-auth-library": "^10.5.0",
