@@ -2,7 +2,6 @@
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
-	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -11,6 +10,7 @@
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { resolve } from '$lib/paths';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
