@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Bug Fixes
 
+- Fix 404 when going to /
 - Fix full-page reload for goto()s
 - Fix whole-page reload on every <a> click
 
