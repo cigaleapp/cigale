@@ -152,7 +152,7 @@
 		"runed": "^0.36.0",
 		"svelte-mathml": "gwennlbh/svelte-mathml#dcbe2e494dc501eaca9ca85f1ee953f9b5846fd3",
 		"sveltejs-tippy": "^3.0.0",
-		"swarpc": "^0.16.0",
+		"swarpc": "^0.16.1",
 		"tiny-jsonc": "^1.0.2",
 		"tinykeys": "^3.0.0",
 		"ulid": "^3.0.1",
