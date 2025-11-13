@@ -2,17 +2,22 @@
 	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
+	import IconDismiss from '~icons/ri/close-line';
+	import IconNotificationsOn from '~icons/ri/notification-2-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications';
 	import { resolve } from '$lib/paths';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp } from '$lib/utils';
@@ -236,6 +241,27 @@
 			<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
 				Résultats
 			</ButtonSecondary>
+
+			{#if getSettings().notifications === null}
+				<div class="notifications">
+					<ButtonInk
+						help="Activer les notifications pour savoir quand un traitement est terminé."
+						onclick={async () => {
+							await askForNotificationPermission();
+							setSetting('notifications', hasNotificationsEnabled());
+						}}
+					>
+						<IconNotificationsOn />
+						Activer
+					</ButtonInk>
+					<ButtonIcon
+						onclick={() => setSetting('notifications', false)}
+						help="Ne pas activer les notifications"
+					>
+						<IconDismiss />
+					</ButtonIcon>
+				</div>
+			{/if}
 		</div>
 
 		<aside class:native={isNativeWindow}>
@@ -362,6 +388,11 @@
 		align-items: center;
 		color: var(--gray);
 		display: none;
+	}
+
+	.notifications {
+		display: flex;
+		align-items: center;
 	}
 
 	header.native-window .steps {
