@@ -60,6 +60,13 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			taskSettings: {
 				input: Schemas.ModelInput,
 				'output?': { name: 'string' }
+			},
+			protocol: {
+				id: 'string',
+				'version?': 'number',
+				'beamup?': {
+					origin: 'string.url'
+				}
 			}
 		}),
 		progress: type({}),
@@ -88,6 +95,15 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			id: 'string',
 			name: 'string',
 			'version?': 'number | undefined'
+		})
+	},
+	syncStoredCorrections: {
+		input: type('object'),
+		progress: type('number'),
+		success: type({
+			total: 'number',
+			failed: type({ why: 'string', ids: 'string[]' }).array(),
+			succeeded: 'number'
 		})
 	},
 	generateResultsZip: {

@@ -9,7 +9,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 3;
+export const databaseRevision = 4;
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -380,6 +380,12 @@ export async function openDatabase() {
 				createTable(/* @wc-ignore */ 'ImagePreviewFile', Tables.ImagePreviewFile);
 				return;
 			}
+
+			if (oldVersion === 3) {
+				createTable('BeamupCorrection', Tables.BeamupCorrection);
+				return;
+			}
+
 			for (const [tableName, schema] of tablesByName) {
 				createTable(tableName, schema);
 			}
@@ -434,6 +440,10 @@ export function nukeDatabase() {
 
 // Magie vodoo Typescript, pas besoin de comprendre
 // Si t'es curieuxse, demande à Gwenn qui sera ravie
+/**
+ * @typedef {import('idb').IDBPDatabase<IDBDatabaseType>} DatabaseHandle
+ */
+
 // de t'expliquer :3
 /**
  * @type {DatabaseHandle | undefined}

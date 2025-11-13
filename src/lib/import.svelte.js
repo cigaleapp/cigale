@@ -12,6 +12,7 @@ import { toasts } from '$lib/toasts.svelte';
 
 import { imageLimits } from './inference_utils';
 import { serializeMetadataValues } from './metadata';
+import { sha1sum } from './utils';
 
 export const ACCEPTED_IMPORT_TYPES = [
 	'image/jpeg',
@@ -62,6 +63,10 @@ export async function processImageFile(file, id) {
 		contentType: file.type,
 		dimensions: { width, height },
 		fileId: id,
+		sha1: await sha1sum(originalBytes).catch((err) => {
+			console.warn(`Error computing SHA-1 hash for ${file.name}, fileId: ${id}`, err);
+			return null;
+		}),
 		metadata: {}
 	});
 

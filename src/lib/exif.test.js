@@ -71,12 +71,13 @@ describe('processExifData', () => {
 		});
 
 		await db.tables.Image.set({
-			id: imageId(0, 0),
+			id: imageId('0', 0),
 			addedAt: '2023-10-01T00:00:00Z',
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
 			contentType: 'image/jpeg',
 			filename: 'test.jpg',
+			sha1: null,
 			metadata: {}
 		});
 	});
@@ -89,7 +90,7 @@ describe('processExifData', () => {
 			name: 'test.jpg'
 		});
 
-		const image = await db.tables.Image.get(imageId(0, 0));
+		const image = await db.tables.Image.get(imageId('0', 0));
 		expect(image?.metadata).toEqual({
 			[namespacedMetadataId('com.example.test.protocol', 'date')]: {
 				value: new Date('2025-04-25T12:38:36.000Z'),
@@ -108,7 +109,7 @@ describe('processExifData', () => {
 			name: 'test.jpg'
 		});
 
-		const image = await db.tables.Image.get(imageId(0, 0));
+		const image = await db.tables.Image.get(imageId('0', 0));
 		expect(image?.metadata).toEqual({
 			[namespacedMetadataId('com.example.test.protocol', 'date')]: {
 				value: new Date('2008-10-22T16:29:49.000Z'),

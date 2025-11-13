@@ -2,11 +2,14 @@ import { type } from 'arktype';
 import * as dates from 'date-fns';
 
 import { computeCascades } from './cascades.js';
+import { storeCorrection } from './beamup.svelte.js';
 import { idComparator, Schemas } from './database.js';
+import { databaseHandle } from './idb.svelte.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
 	namespacedMetadataId,
+	MetadataValue,
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
@@ -120,6 +123,7 @@ export function serializeMetadataValues(values) {
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  * @param {AbortSignal} [options.abortSignal] signal d'abandon pour annuler la requête
+ * @param {Pick<DB.Protocol, 'id' | 'version' | 'beamup'>} options.protocol le protocole courant, utilisé pour BeamUp
  */
 export async function storeMetadataValue({
 	db,
@@ -131,8 +135,16 @@ export async function storeMetadataValue({
 	alternatives = [],
 	manuallyModified = false,
 	cascadedFrom = [],
-	abortSignal
+	abortSignal,
+	protocol
 }) {
+	/**
+	 * Guaranteed to be set only if beamupSettings is set (for performance reasons: calculating
+	 * the old value can be a bit expensive in the observation subject case)
+	 * @type {null | typeof import('./database.js').Schemas.MetadataValue.inferIn}
+	 */
+	let oldValue = null;
+
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
@@ -171,9 +183,32 @@ export async function storeMetadataValue({
 
 	abortSignal?.throwIfAborted();
 	if (image) {
+		if (metadataId in image.metadata) {
+			oldValue = structuredClone(image.metadata[metadataId]);
+		}
 		image.metadata[metadataId] = newValue;
 		db.put('Image', image);
 	} else if (observation) {
+		if (metadataId in observation.metadataOverrides) {
+			oldValue = structuredClone(observation.metadataOverrides[metadataId]);
+		} else if (observation.images.length > 0) {
+			const images = await db
+				.getAll('Image')
+				.then((imgs) => imgs.filter((img) => observation.images.includes(img.id)));
+			const merged = mergeMetadata(
+				metadata,
+				images
+					.filter((img) => img.metadata[metadataId])
+					.map((img) => img.metadata[metadataId])
+					.map(Schemas.MetadataValue.assert)
+			);
+			if (merged) {
+				oldValue = {
+					...merged,
+					value: serializeMetadataValue(merged.value)
+				};
+			}
+		}
 		observation.metadataOverrides[metadataId] = newValue;
 		db.put('Observation', observation);
 	} else if (imagesFromImageFile) {
@@ -185,7 +220,8 @@ export async function storeMetadataValue({
 				value,
 				confidence,
 				manuallyModified,
-				abortSignal
+				abortSignal,
+				protocol
 			});
 		}
 	} else {
@@ -229,8 +265,21 @@ export async function storeMetadataValue({
 			manuallyModified,
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
+			protocol,
 			...cascade
 		});
+	}
+
+	if ('beamup' in protocol && oldValue && !oldValue.manuallyModified && manuallyModified) {
+		void storeCorrection(
+			databaseHandle(),
+			// @ts-expect-error TS doesn't understand we checked beamup exists
+			protocol,
+			subjectId,
+			metadata,
+			MetadataValue.assert(oldValue),
+			newValue
+		).catch(console.error);
 	}
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
