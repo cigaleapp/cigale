@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-11-04T08:22:06.708Z\n"
+"PO-Revision-Date: 2025-11-13T14:05:01.958Z\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1723,4 +1723,36 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Activer les notifications pour savoir quand un traitement est terminé."
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "<0/> Activer"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Ne pas activer les notifications"
+msgstr ""
+
+#: src/routes/(app)/Settings.svelte
+msgid "Notifications <0>Quand un traitement est terminé</0>"
+msgstr ""
+
+#: src/lib/notifications.js
+msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
+msgstr ""
+
+#: src/lib/queue.svelte.js
+msgid "Import des images terminé"
+msgstr ""
+
+#: src/lib/queue.svelte.js
+msgid "Détection terminée"
+msgstr ""
+
+#: src/lib/queue.svelte.js
+msgid "Classification terminée"
 msgstr ""
