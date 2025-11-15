@@ -1,0 +1,1 @@
+import{h as i,i as n}from"./Bc1CFHR5.js";import{g as f}from"./BdsmG4U7.js";function c({title:e}){f("main"),o(()=>{const t=f("main");document.title=e?t.t(211,[e]):t.t(212)})}function o(e){if(i()){e();return}n(()=>{e()})}export{c as s};

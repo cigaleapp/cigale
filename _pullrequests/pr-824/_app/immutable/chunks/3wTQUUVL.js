@@ -1,0 +1,1 @@
+import{b as t,r as a,c as e,g as o}from"./B5U2EkDq.js";function f(s){return(e||t)+s}const r="#";function n(...s){return t+r+a(s[0],s[1])}async function i(...s){await o(u(...s))}function u(...s){return n(...s)}export{f as a,i as g,u as h,n as r};

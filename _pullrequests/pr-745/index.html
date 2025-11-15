@@ -1,0 +1,135 @@
+<!doctype html>
+<html dir="ltr">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="manifest" href="manifest.json" />
+		<link rel="icon" href="/cigale/_pullrequests/pr-745/favicon.png" />
+		<link rel="stylesheet" href="/cigale/_pullrequests/pr-745/fonts.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Cigale</title>
+		<style>
+			#loading {
+				app-region: drag;
+				position: fixed;
+				inset: 0;
+				z-index: 10000000000;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				gap: 2rem;
+				font-family: 'Host Grotesk', sans-serif;
+				font-size: 2rem;
+				background-color: var(--bg-neutral, black);
+				color: var(--fg-neutral, white);
+			}
+
+			#loading .spinner {
+				--size: 40px;
+				width: var(--size);
+				height: var(--size);
+
+				circle {
+					fill: transparent;
+					stroke: var(--fg-neutral, black);
+					stroke-width: 4;
+					stroke-linecap: square;
+					stroke-dasharray: calc(3.14 * var(--size));
+					transform-origin: calc(0.5 * var(--size)) calc(0.5 * var(--size));
+					animation: spinner 1.5s linear infinite;
+				}
+			}
+
+			#loading p {
+				text-align: center;
+			}
+
+			#loading #loading-message {
+				font-size: 0.8rem;
+				margin-top: 0.5em;
+				opacity: 0.75;
+				display: block;
+				text-align: center;
+			}
+
+			#loading .app-version {
+				position: fixed;
+				bottom: 1.5rem;
+				text-align: center;
+				left: 0;
+				right: 0;
+				font-size: 0.8rem;
+				color: gray;
+			}
+
+			@keyframes spinner {
+				0% {
+					rotate: 0deg;
+					stroke-dashoffset: calc(0.66 * var(--size));
+				}
+				50% {
+					rotate: 720deg;
+					stroke-dashoffset: calc(3.14 * var(--size));
+				}
+				100% {
+					rotate: 1080deg;
+					stroke-dashoffset: calc(0.66 * var(--size));
+				}
+			}
+		</style>
+		
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/entry/start.DKZLVgH5.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/BzLgmW9O.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/CMLQTTwp.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/Bc1CFHR5.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DIeogL5L.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DVqnCL53.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/CP20mFtd.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DTviC2j1.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DXdun3op.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/entry/app.DOPolAcl.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/PPVm8Dsz.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DsnmJJEf.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DwaFNRGB.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DVWnSVX9.js">
+		<link rel="modulepreload" href="/cigale/_pullrequests/pr-745/_app/immutable/chunks/DvTuN7kR.js">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div id="loading">
+			<svg class="spinner" height="40" width="40" viewBox="0 0 40 40">
+				<circle cx="20" cy="20" r="18"></circle>
+			</svg>
+			<p>
+				<!-- Set dynamically because i18n -->
+				<span id="loading-title"></span>
+				<code id="loading-message"></code>
+			</p>
+			<code class="app-version">89191428a9c26a9d9feea1b4adcde5ce623b0316</code>
+		</div>
+		<div style="display: contents">
+			<script>
+				{
+					__sveltekit_1nc2mrg = {
+						base: new URL('.', location).pathname.slice(0, -1),
+						assets: "/cigale/_pullrequests/pr-745"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("/cigale/_pullrequests/pr-745/_app/immutable/entry/start.DKZLVgH5.js"),
+						import("/cigale/_pullrequests/pr-745/_app/immutable/entry/app.DOPolAcl.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element);
+					});
+
+					if ('serviceWorker' in navigator) {
+						addEventListener('load', function () {
+							navigator.serviceWorker.register('/cigale/_pullrequests/pr-745/service-worker.js');
+						});
+					}
+				}
+			</script>
+		</div>
+	</body>
+</html>
