@@ -79,7 +79,7 @@
 		"@jimp/js-jpeg": "^1.6.0",
 		"@playwright/test": "^1.55.1",
 		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.48.4",
+		"@sveltejs/kit": "^2.48.5",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@sveltejs/vite-plugin-svelte-inspector": "^5.0.1",
 		"@types/piexifjs": "^1.0.0",
