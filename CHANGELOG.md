@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add notifications (#775)
 - Adjust colors
 
 ### Bug Fixes
