@@ -129,7 +129,7 @@
 	"dependencies": {
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
-		"@wuchale/svelte": "^0.17.4",
+		"@wuchale/svelte": "^0.17.5",
 		"arktype": "^2.1.26",
 		"bits-ui": "^1.8.0",
 		"date-fns": "^4.1.0",
@@ -159,7 +159,7 @@
 		"unplugin-icons": "^22.5.0",
 		"update-electron-app": "^3.1.1",
 		"word-diff": "^1.0.1",
-		"wuchale": "^0.18.3",
+		"wuchale": "^0.18.5",
 		"xss": "^1.0.15",
 		"yaml": "^2.8.1"
 	}
