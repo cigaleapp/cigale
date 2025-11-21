@@ -28,12 +28,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import * as dates from 'date-fns';
 	import { onMount } from 'svelte';
 
+	import IconTrash from '~icons/ri/delete-bin-line';
 	import { uiState } from '$lib/state.svelte.js';
 
+	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
 	import { plural } from './i18n.js';
+	import { openTransaction } from './idb.svelte.js';
+	import { deleteImageFile } from './images.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
 	import { mutationobserver } from './mutations';
+	import { deleteObservation } from './observations.js';
+	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { compareBy, groupBy } from './utils.js';
 
@@ -185,6 +191,31 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 					<p>
 						{plural(sortedImages.length, ['# élément', '# éléments'])}
 					</p>
+					<div class="actions">
+						<ButtonInk
+							dangerous
+							help="Suppprimer tout les éléments de ce groupe"
+							onclick={async () => {
+								await openTransaction(
+									['Image', 'Observation', 'ImageFile', 'ImagePreviewFile'],
+									{},
+									async (tx) => {
+										for (const { id } of sortedImages) {
+											cancelTask(id, 'Cancelled by user');
+											await deleteObservation(id, {
+												notFoundOk: true,
+												recursive: true
+											});
+											await deleteImageFile(id, tx, true);
+										}
+									}
+								);
+							}}
+						>
+							<IconTrash />
+							Supprimer</ButtonInk
+						>
+					</div>
 				</header>
 			{/if}
 			<div class="items">
@@ -247,6 +278,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 		* {
 			font-size: 1.1rem;
+		}
+
+		.actions {
+			margin-left: auto;
 		}
 	}
 
