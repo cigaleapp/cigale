@@ -459,8 +459,8 @@
 	}
 
 	.boundingbox.new {
-		background: color-mix(in srgb, var(--light__bg-primary-translucent) 30%, transparent);
-		border: var(--thick) dashed var(--light__bg-primary);
+		background: color-mix(in srgb, var(--bg-primary-translucent) 30%, transparent);
+		border: var(--thick) dashed var(--bg-primary);
 	}
 
 	.boundingbox:hover:not(:has(:hover)):not(:has(.dragging)) .corner.draggable,
@@ -471,7 +471,7 @@
 		.side.draggable.bottom:hover:not(.dragging)
 		~ .corner:is(.bottomleft, .bottomright) {
 		scale: 130%;
-		background: var(--light__bg-primary-translucent);
+		background: var(--bg-primary-translucent);
 	}
 
 	.side {
@@ -526,6 +526,7 @@
 
 	.corner,
 	.boundingbox-point {
+		color-scheme: light;
 		position: absolute;
 		width: 1.5rem;
 		height: 1.5rem;
@@ -536,7 +537,7 @@
 
 	.boundingbox-point {
 		translate: -50% -50%;
-		background: var(--light__bg-primary);
+		background: var(--bg-primary);
 	}
 
 	.change-area.precise .boundingbox-point {
@@ -549,13 +550,13 @@
 	}
 
 	.corner.draggable:hover {
-		background: var(--light__bg-primary-translucent);
+		background: var(--bg-primary-translucent);
 		scale: 130%;
 	}
 
 	.corner.dragging {
 		scale: 110%;
-		background: var(--light__bg-primary);
+		background: var(--bg-primary);
 	}
 
 	.topleft {
