@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T14:30:10.954Z\n"
-"PO-Revision-Date: 2025-11-04T08:22:06.706Z\n"
+"PO-Revision-Date: 2025-11-13T14:05:01.955Z\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: \n"
@@ -1730,3 +1730,35 @@ msgstr "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
 msgstr "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Activer les notifications pour savoir quand un traitement est terminé."
+msgstr "Activer les notifications pour savoir quand un traitement est terminé."
+
+#: src/routes/(app)/Navigation.svelte
+msgid "<0/> Activer"
+msgstr "<0/> Activer"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Ne pas activer les notifications"
+msgstr "Ne pas activer les notifications"
+
+#: src/routes/(app)/Settings.svelte
+msgid "Notifications <0>Quand un traitement est terminé</0>"
+msgstr "Notifications <0>Quand un traitement est terminé</0>"
+
+#: src/lib/notifications.js
+msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
+msgstr "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
+
+#: src/lib/queue.svelte.js
+msgid "Import des images terminé"
+msgstr "Import des images terminé"
+
+#: src/lib/queue.svelte.js
+msgid "Détection terminée"
+msgstr "Détection terminée"
+
+#: src/lib/queue.svelte.js
+msgid "Classification terminée"
+msgstr "Classification terminée"
