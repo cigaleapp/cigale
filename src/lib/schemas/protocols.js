@@ -184,6 +184,11 @@ export const Protocol = type({
 				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées. Nombre suivi de 'px' pour un nombre de pixels fixe, ou de '%' pour un pourcentage des dimensions de chaque image."
 			)
 			.default('0px'),
+		'classifyUncropped?': [
+			'boolean',
+			'@',
+			"Lancer la classification des images qui n'ont pas de boîte englobante"
+		],
 		'infer?': type({
 			'name?': [
 				'string',
