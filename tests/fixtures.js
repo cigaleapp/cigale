@@ -1,11 +1,15 @@
-import { mkdir, rm } from 'node:fs/promises';
+import { mkdir, readFile, rm } from 'node:fs/promises';
 import { test as base } from '@playwright/test';
 
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import { mockProtocolSourceURL, setHardwareConcurrency } from './utils';
+import { mockProtocolSourceURL, mockUrl, setHardwareConcurrency } from './utils';
 
 export { exampleProtocol };
+
+const classificationArthropodaModel = await readFile(
+	'classification-arthropoda-polymny-2025-04-11.onnx'
+);
 
 // Make exampleProtocol lightweight by cutting out 90% of metadata options
 
@@ -34,6 +38,10 @@ export const test = base.extend(
 						json: exampleProtocol
 					});
 				}
+
+				await mockUrl(page, context, defaultProtocol.crop.infer[0].model, {
+					body: classificationArthropodaModel
+				});
 
 				const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;
 				if (concurrency) {
