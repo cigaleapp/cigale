@@ -558,6 +558,22 @@ export async function expectTooltipContent(page, locator, content) {
 }
 
 /**
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {string | RegExp | ((u: URL) => boolean)} url
+ * @param {{json: object} | {body: string | Buffer}} result
+ */
+export async function mockUrl(page, context, url, result) {
+	await Promise.all(
+		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
+		[context, page].map(async (target) =>
+			target.route(url, async (route) => route.fulfill(result))
+		)
+	);
+}
+
+/**
  *
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Page} page
@@ -566,17 +582,14 @@ export async function expectTooltipContent(page, locator, content) {
  * @param {{json: object} | {body: string | Buffer}} mockedResult
  */
 export async function mockProtocolSourceURL(page, context, source, mockedResult) {
-	await Promise.all(
-		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
-		[context, page].map(async (target) =>
-			target.route(
-				(u) => {
-					u.searchParams.delete('v');
-					return u.toString() === source;
-				},
-				async (route) => route.fulfill(mockedResult)
-			)
-		)
+	await mockUrl(
+		page,
+		context,
+		(u) => {
+			u.searchParams.delete('v');
+			return u.toString() === source;
+		},
+		mockedResult
 	);
 }
 
