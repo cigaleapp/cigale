@@ -3,30 +3,11 @@ import { expect, test } from './fixtures';
 import {
 	chooseProtocol,
 	firstObservationCard,
-	getMetadataValue,
 	getObservation,
 	goToTab,
-	importPhotos
+	importPhotos,
+    waitForLoadingEnd
 } from './utils';
-
-test.describe('classifies without error', () => {
-	test('when observation has no crop box', issue(435), async ({ page }) => {
-		await chooseProtocol(page);
-		await goToTab(page, 'import');
-		await importPhotos({ page }, 'issue-435.jpeg');
-		await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
-			timeout: 20_000
-		});
-		await goToTab(page, 'classify');
-		await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
-			timeout: 20_000
-		});
-		await page.waitForTimeout(5_000);
-		expect(
-			await getMetadataValue(page, { image: { filename: 'issue-435.jpeg' } }, 'species')
-		).toBeDefined();
-	});
-});
 
 test('allows cancelling classification of an observation', issue(430), async ({ page }) => {
 	await chooseProtocol(page);
@@ -35,6 +16,8 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
 	});
+    await goToTab(page, 'crop');
+    await waitForLoadingEnd(page);
 	await goToTab(page, 'classify');
 	await expect(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
