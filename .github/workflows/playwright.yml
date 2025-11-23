@@ -22,7 +22,7 @@ jobs:
         shard-index: [1, 2, 3, 4, 5, 6, 7, 8]
         shard-count: [8]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
@@ -61,7 +61,7 @@ jobs:
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     name: Combine reports
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/download-artifact@v6
         with:
           path: ./playwright-report-shards

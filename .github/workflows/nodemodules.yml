@@ -20,7 +20,7 @@ jobs:
       name: '#${{ github.event.pull_request.number }}: node_modules analysis'
       url: ${{ steps.upload.outputs.preview-url }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
