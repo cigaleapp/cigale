@@ -73,6 +73,7 @@ msgstr "Results"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Retry"
 
+#: src/lib/AreaObservations.svelte
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
@@ -1743,6 +1744,10 @@ msgstr ""
 
 #: src/lib/notifications.js
 msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
+msgstr ""
+
+#: src/lib/AreaObservations.svelte
+msgid "Suppprimer tout les éléments de ce groupe"
 msgstr ""
 
 #: src/lib/queue.svelte.js

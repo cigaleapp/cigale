@@ -72,6 +72,7 @@ msgstr "Résultats"
 msgid "<0/> Rééssayer"
 msgstr "<0/> Rééssayer"
 
+#: src/lib/AreaObservations.svelte
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
@@ -1750,6 +1751,10 @@ msgstr "Notifications <0>Quand un traitement est terminé</0>"
 #: src/lib/notifications.js
 msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
 msgstr "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
+
+#: src/lib/AreaObservations.svelte
+msgid "Suppprimer tout les éléments de ce groupe"
+msgstr "Suppprimer tout les éléments de ce groupe"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
