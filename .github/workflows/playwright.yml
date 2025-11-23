@@ -33,10 +33,10 @@ jobs:
         with:
           name: ${{ inputs.artifact }}
           path: ./
-      - name: Pre-download heavy model 
+      - name: Pre-download heavy model
         uses: carlosperate/download-file-action@v2
         with:
-          file-url: "https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx"
+          file-url: 'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx'
           file-name: classification-arthropoda-polymny-2025-04-11.onnx
       - name: Remove task-type spec files for better sharding balance
         run: rm tests/tasks/*
