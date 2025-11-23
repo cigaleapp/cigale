@@ -21,7 +21,7 @@
         "handlebars": "^4.7.8",
         "idb": "^8.0.3",
         "jimp": "^1.6.0",
-        "marked": "^17.0.0",
+        "marked": "^17.0.1",
         "microdiff": "^1.5.0",
         "nanoid": "^5.1.6",
         "onnxruntime-web": "^1.22.0",
@@ -1582,7 +1582,7 @@
 
     "map-age-cleaner": ["map-age-cleaner@0.1.3", "", { "dependencies": { "p-defer": "^1.0.0" } }, "sha512-bJzx6nMoP6PDLPBFmg7+xRKeFZvFboMrGlxmNj9ClvX53KrmvM5bXFXEWjbz4cz1AFn+jWJ9z/DJSz7hrs0w3w=="],
 
-    "marked": ["marked@17.0.0", "", { "bin": { "marked": "bin/marked.js" } }, "sha512-KkDYEWEEiYJw/KC+DVm1zzlpMQSMIu6YRltkcCvwheCp8HWPXCk9JwOmHJKBlGfzcpzcIt6x3sMnTsRm/51oDg=="],
+    "marked": ["marked@17.0.1", "", { "bin": { "marked": "bin/marked.js" } }, "sha512-boeBdiS0ghpWcSwoNm/jJBwdpFaMnZWRzjA6SkUMYb40SVaN1x7mmfGKp0jvexGcx+7y2La5zRZsYFZI6Qpypg=="],
 
     "matcher": ["matcher@3.0.0", "", { "dependencies": { "escape-string-regexp": "^4.0.0" } }, "sha512-OkeDaAZ/bQCxeFAozM55PKcKU0yJMPGifLwV4Qgjitu+5MoAfSQN4lsLJeXZ1b8w0x+/Emda6MZgXS1jvsapng=="],
 
