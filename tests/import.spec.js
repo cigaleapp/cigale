@@ -294,8 +294,8 @@ test(
 		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'lil-fella', 'cyan');
-        await goToTab(page, 'crop');
-        await waitForLoadingEnd(page);
+		await goToTab(page, 'crop');
+		await waitForLoadingEnd(page);
 		await goToTab(page, 'classify');
 		await waitForLoadingEnd(page);
 		await goToTab(page, 'import');

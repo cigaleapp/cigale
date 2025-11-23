@@ -6,7 +6,7 @@ import {
 	getObservation,
 	goToTab,
 	importPhotos,
-    waitForLoadingEnd
+	waitForLoadingEnd
 } from './utils';
 
 test('allows cancelling classification of an observation', issue(430), async ({ page }) => {
@@ -16,8 +16,8 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
 	});
-    await goToTab(page, 'crop');
-    await waitForLoadingEnd(page);
+	await goToTab(page, 'crop');
+	await waitForLoadingEnd(page);
 	await goToTab(page, 'classify');
 	await expect(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
