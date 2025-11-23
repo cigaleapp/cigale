@@ -147,6 +147,11 @@ for (const offline of [false, true]) {
 }
 
 test('can handle a bunch of images at once', withParallelism(4), async ({ page }) => {
+	test.fixme(
+		true,
+		"Really flaky since this week for no reason, even on local runs, sometimes it works fines, sometimes it makes Chrome freeze. Even the profiler freezes, so we can't know what causes it. Nothing obvious in the console too."
+	);
+
 	const imagesCount = 10;
 
 	const timeouts = { begin: 500, finish: imagesCount * 0.4 * 60_000 };
