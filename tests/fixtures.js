@@ -9,7 +9,12 @@ export { exampleProtocol };
 
 const classificationArthropodaModel = await readFile(
 	'classification-arthropoda-polymny-2025-04-11.onnx'
-);
+).catch(() => {
+	console.warn(
+		`Warning: cannot find 'classification-arthropoda-polymny-2025-04-11.onnx' model file. Tests will use the network to fetch it.`
+	);
+	return null;
+});
 
 // Make exampleProtocol lightweight by cutting out 90% of metadata options
 
@@ -39,9 +44,11 @@ export const test = base.extend(
 					});
 				}
 
-				await mockUrl(page, context, defaultProtocol.crop.infer[0].model, {
-					body: classificationArthropodaModel
-				});
+				if (classificationArthropodaModel !== null) {
+					await mockUrl(page, context, defaultProtocol.crop.infer[0].model, {
+						body: classificationArthropodaModel
+					});
+				}
 
 				const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;
 				if (concurrency) {
