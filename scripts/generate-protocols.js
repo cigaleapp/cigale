@@ -101,7 +101,7 @@ const protocol = {
 	$schema: 'https://cigaleapp.github.io/cigale/protocol.schema.json',
 	id: 'io.github.cigaleapp.arthropods.example',
 	name: 'Example: arthropodes',
-	learnMore: `https://github.com/cigaleapp/cigale/tree/${await x('git', ['rev-parse', 'HEAD']).then((result) => result.stdout)}/scripts/README.md#protocoles-arthropodsexample`,
+	learnMore: `https://github.com/cigaleapp/cigale/tree/${await x('git', ['rev-parse', 'HEAD']).then((result) => result.stdout.trim())}/scripts/README.md#protocoles-arthropodsexample`,
 	version: (oldProtocol?.version ?? 0) + 1,
 	source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
 	description:
