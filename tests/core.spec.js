@@ -117,8 +117,8 @@ for (const offline of [false, true]) {
 			await extract('./tests/results/lil-fella.zip', { dir: resultsDir });
 
 			expect(readdirTreeSync(resultsDir)).toMatchObject([
-				{ Cropped: ['Entomobrya muscorum_1.jpeg'] },
-				{ Original: ['Entomobrya muscorum_1.jpeg'] },
+				{ Cropped: ['Entomobrya muscorum_obs1_1.jpeg'] },
+				{ Original: ['Entomobrya muscorum_obs1_1.jpeg'] },
 				'analysis.json',
 				'metadata.csv'
 			]);
@@ -137,7 +137,7 @@ for (const offline of [false, true]) {
 			expect(Analysis.allows(analysis)).toBe(true);
 
 			const image = fs.readFileSync(
-				path.join(resultsDir, 'Cropped', 'Entomobrya muscorum_1.jpeg')
+				path.join(resultsDir, 'Cropped', 'Entomobrya muscorum_obs1_1.jpeg')
 			);
 			expect(image).toMatchSnapshot({
 				maxDiffPixelRatio: 0.01

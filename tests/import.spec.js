@@ -154,18 +154,18 @@ test.describe('correct results.zip', () => {
 		expect(readdirTreeSync(resultsDir)).toMatchObject([
 			{
 				Cropped: [
-					'(Unknown)_4.jpeg',
-					'Allacma fusca_1.jpeg',
-					'Entomobrya muscorum_3.jpeg',
-					'Orchesella cincta_2.jpeg'
+					expect.stringMatching(/\(Unknown\)_obs\d_4\.jpeg/),
+					expect.stringMatching(/Allacma fusca_obs\d_1\.jpeg/),
+					expect.stringMatching(/Entomobrya muscorum_obs\d_3\.jpeg/),
+					expect.stringMatching(/Orchesella cincta_obs\d_2\.jpeg/)
 				]
 			},
 			{
 				Original: [
-					'(Unknown)_4.jpeg',
-					'Allacma fusca_1.jpeg',
-					'Entomobrya muscorum_3.jpeg',
-					'Orchesella cincta_2.jpeg'
+					expect.stringMatching(/\(Unknown\)_obs\d_4\.jpeg/),
+					expect.stringMatching(/Allacma fusca_obs\d_1\.jpeg/),
+					expect.stringMatching(/Entomobrya muscorum_obs\d_3\.jpeg/),
+					expect.stringMatching(/Orchesella cincta_obs\d_2\.jpeg/)
 				]
 			},
 			'analysis.json',
