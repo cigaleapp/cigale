@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     container:
-      image: ghcr.io/gwennlbh/playwright-bun:1.55.1
+      image: ghcr.io/gwennlbh/playwright-bun:v1.57.0
       options: --user 1001
     strategy:
       fail-fast: false
