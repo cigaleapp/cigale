@@ -5,6 +5,28 @@ import { describe, expect, test } from 'vitest';
 import { generateId, idComparator, Schemas } from './database';
 import { FilepathTemplate } from './schemas/protocols';
 
+/**
+ * @type {Parameters<typeof FilepathTemplate.infer.render>[0]}
+ */
+const filepathMockData = {
+	numberInObservation: 1,
+	sequence: 1,
+	image: {
+		filename: 'image1.jpg',
+		sequence: 1,
+		numberInObservation: 1,
+		metadata: {},
+		contentType: 'image/jpeg',
+		id: 'i12345'
+	},
+	observation: {
+		label: 'Test Observation',
+		number: 1,
+		metadata: {},
+		protocolMetadata: {}
+	}
+};
+
 describe('generateId', () => {
 	test('should generate a unique ID', () => {
 		const id1 = generateId('Image');
@@ -21,7 +43,7 @@ describe('generateId', () => {
 describe('filepath templates', () => {
 	/**
 	 * @param {typeof FilepathTemplate.infer|ArkErrors} template
-	 * @param {Record<string, unknown>} data
+	 * @param {Partial<Parameters<typeof FilepathTemplate.infer.render>[0]> | Record<string, any>} data
 	 * @returns
 	 */
 	function expectRendered(template, data) {
@@ -32,15 +54,14 @@ describe('filepath templates', () => {
 		}
 
 		// TODO we should use fakerjs to generate fake Image data and pass that to template.render instead of using any object
-		// @ts-expect-error
-		return expect(template.render(data));
+		return expect(template.render({ ...filepathMockData, ...data }));
 		// oxlint-enable valid-expect
 	}
 
 	test('renders simple variables', () => {
-		const template = FilepathTemplate('{{id}}.jpg');
+		const template = FilepathTemplate('{{sequence}}.jpg');
 		expect(template).not.toBeInstanceOf(ArkErrors);
-		expectRendered(template, { id: '123' }).toBe('123.jpg');
+		expectRendered(template, { sequence: 123 }).toBe('123.jpg');
 	});
 
 	test.todo('fails with malformed templates', () => {
@@ -50,16 +71,15 @@ describe('filepath templates', () => {
 	});
 
 	test('fails at runtime with malformed templates', () => {
-		const template = FilepathTemplate('{{id}');
+		const template = FilepathTemplate('{{sequence}');
 		expect(template).not.toBeInstanceOf(ArkErrors);
 		// TODO: find a way to have type inference for a isinstance check
 		// This way, we can also get rid of expectRendered and use template.render directly, making code clearer
 		// @ts-expect-error
-		expect(() => template.render({ id: '123', foo: 'bar' }))
-			.toThrowErrorMatchingInlineSnapshot(`
+		expect(() => template.render(filepathMockData)).toThrowErrorMatchingInlineSnapshot(`
 			[Error: Parse error on line 1:
-			{{id}
-			----^
+			{{sequence}
+			----------^
 			Expecting 'CLOSE_RAW_BLOCK', 'CLOSE', 'CLOSE_UNESCAPED', 'OPEN_SEXPR', 'CLOSE_SEXPR', 'ID', 'OPEN_BLOCK_PARAMS', 'STRING', 'NUMBER', 'BOOLEAN', 'UNDEFINED', 'NULL', 'DATA', 'SEP', got 'INVALID']
 		`);
 	});
@@ -137,9 +157,12 @@ describe('MetadataValue', () => {
 			expect(value('-3.14').value).toBe(-3.14);
 		});
 		test('datestring', () => {
-			expect(dates.formatISO(value('"2025-01-01T00:00:00Z"').value)).toMatch(
-				/^2025-01-01T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/
-			);
+			expect(
+				dates.formatISO(
+					// @ts-expect-error
+					value('"2025-01-01T00:00:00Z"').value
+				)
+			).toMatch(/^2025-01-01T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/);
 		});
 	});
 });

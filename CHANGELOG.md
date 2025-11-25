@@ -8,9 +8,11 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Add notifications (#775)
 - Adjust colors
+- Disable auto-classification of uncropped images (#888)
 
 ### Bug Fixes
 
+- Corner handles of crop box were transparent when hovered or held
 - Fix 404 when going to /
 - Fix full-page reload for goto()s
 - Fix whole-page reload on every <a> click

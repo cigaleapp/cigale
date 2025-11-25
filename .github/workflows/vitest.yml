@@ -15,7 +15,7 @@ jobs:
       name: '#${{ github.event.number }}: Unit tests report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     if: inputs.compare-coverage
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.base.ref }}
       - uses: oven-sh/setup-bun@v2
@@ -69,7 +69,7 @@ jobs:
       name: '#${{ github.event.number }}: Test coverage report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Get coverage report
         uses: actions/download-artifact@v6
         with:
@@ -93,7 +93,7 @@ jobs:
       - name: Set threshold
         id: params
         run: echo threshold="-0.5" >> $GITHUB_OUTPUT
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/download-artifact@v6
         with:
           name: vitest-report-head

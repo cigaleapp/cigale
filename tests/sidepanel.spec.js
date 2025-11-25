@@ -114,13 +114,18 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	    - code: /\\d+%/
 	  - option "Allacma fusca 9%":
 	    - code: 9%
-	  - option "Anurida maritima"
-	  - option "Bilobella aurantiaca"
-	  - option "Bilobella braunerae"
-	  - option "Bourletiella arvalis"
-	  - option "Bourletiella hortensis"
-	  - option "Brachystomella parvula"
-	  - option "Caprainea marginata"
+	  - option "Pogonognathellus longicornis 5%":
+	    - code: 5%
+	  - option "Dicyrtomina ornata 4%":
+	    - code: 4%
+	  - option "Orchesella quinquefasciata 3%":
+	    - code: 3%
+	  - option "Entomobrya nivalis 2%":
+	    - code: 2%
+	  - option "Entomobrya superba 2%":
+	    - code: 2%
+	  - option "Caprainea marginata 2%":
+	    - code: 2%
 	  - heading "Entomobrya muscorum" [level=2]
 	  - link "En savoir plus gbif.org":
 	    - /url: https://gbif.org/species/2120749
@@ -163,13 +168,18 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	    - code: /\\d+%/
 	  - option "Allacma fusca 9%":
 	    - code: 9%
-	  - option "Anurida maritima"
-	  - option "Bilobella aurantiaca"
-	  - option "Bilobella braunerae"
-	  - option "Bourletiella arvalis"
-	  - option "Bourletiella hortensis"
-	  - option "Brachystomella parvula"
-	  - option "Caprainea marginata"
+	  - option "Pogonognathellus longicornis 5%":
+	    - code: 5%
+	  - option "Dicyrtomina ornata 4%":
+	    - code: 4%
+	  - option "Orchesella quinquefasciata 3%":
+	    - code: 3%
+	  - option "Entomobrya nivalis 2%":
+	    - code: 2%
+	  - option "Entomobrya superba 2%":
+	    - code: 2%
+	  - option "Caprainea marginata 2%":
+	    - code: 2%
 	  - heading "Dicyrtomina saundersi" [level=2]
 	  - link "En savoir plus gbif.org":
 	    - /url: https://gbif.org/species/4536978
@@ -271,13 +281,18 @@ test('can search in a enum-type metadata combobox', async ({ page }) => {
 	await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
 	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-	  - option "Dicyrtoma fusca"
-	  - option "Dicyrtomina flavosignata"
-	  - option "Dicyrtomina minuta"
-	  - option "Dicyrtomina ornata"
+	  - option "Dicyrtoma fusca 0.4%":
+	    - code: 0.4%
+	  - option "Dicyrtomina flavosignata 0.2%":
+	    - code: 0.2%
+	  - option "Dicyrtomina minuta 1%":
+	    - code: 1%
+	  - option "Dicyrtomina ornata 4%":
+	    - code: 4%
 	  - option /Dicyrtomina saundersi \\d+%/:
 	    - code: /\\d+%/
-	  - option "Dicyrtomina signata"
+	  - option "Dicyrtomina signata 0.3%":
+	    - code: 0.3%
 	  - heading "Entomobrya muscorum" [level=2]
 	  - link "En savoir plus gbif.org":
 	    - /url: https://gbif.org/species/2120749

@@ -13,12 +13,12 @@ jobs:
       name: Live tests
       url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright.json
     container:
-      image: ghcr.io/gwennlbh/playwright-bun:1.55.1
+      image: ghcr.io/gwennlbh/playwright-bun:v1.57.0
       options: --user 1001
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version

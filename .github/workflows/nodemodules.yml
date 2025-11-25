@@ -20,7 +20,7 @@ jobs:
       name: '#${{ github.event.pull_request.number }}: node_modules analysis'
       url: ${{ steps.upload.outputs.preview-url }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
@@ -28,13 +28,8 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Install node-modules-inspector
         run: bun install --global node-modules-inspector
-      - name: Gaslight node-modules-inspector
-        run: |
-          rm bun.lock
-          bun pm pkg delete packageManager
-          npm i
       - name: Run node-modules-inspector
-        run: node-modules-inspector build --base /cigale/_nodemodules/pr-${{ github.event.pull_request.number }} --outDir out
+        run: bunx node-modules-inspector build --base /cigale/_nodemodules/pr-${{ github.event.pull_request.number }} --outDir out
       - name: Upload to github pages
         id: upload
         uses: rossjrw/pr-preview-action@v1
