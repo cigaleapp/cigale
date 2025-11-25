@@ -1756,6 +1756,10 @@ msgstr "Vous avez refusé les notifications système. Veuillez changer cela dans
 msgid "Suppprimer tout les éléments de ce groupe"
 msgstr "Suppprimer tout les éléments de ce groupe"
 
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Numéro de l'image dans l'observation, commençant à 1."
+msgstr "Numéro de l'image dans l'observation, commençant à 1."
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
