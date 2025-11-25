@@ -23,8 +23,12 @@ test.describe('Database dumps', () => {
 	});
 
 	test('kitchensink-protocol', async ({ page }) => {
+		await page.getByTestId('protocol-switcher-open').click();
+		await page
+			.getByTestId('protocol-switcher-options')
+			.getByRole('menuitem', { name: 'Gérer les protocoles' })
+			.click();
 		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
-		await page.goto('#/protocols');
 		await page
 			.getByRole('listitem')
 			.filter({ hasText: 'io.github.cigaleapp.arthropods.example.light' })
@@ -32,7 +36,6 @@ test.describe('Database dumps', () => {
 			.click();
 		await page.getByRole('button', { name: 'Oui, supprimer' }).click();
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
-		await page.locator('nav').getByRole('link', { name: 'Protocole' }).click();
 		await chooseProtocol(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');

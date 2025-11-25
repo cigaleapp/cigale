@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import extract from 'extract-zip';
 
@@ -35,5 +35,7 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await page.waitForEvent('download').then((e) => e.saveAs(resultsDir + '.zip'));
 	await extract(resultsDir + '.zip', { dir: resultsDir });
 
-	expect(await readFile(path.join(resultsDir, 'Cropped/(Unknown)_1.png'))).toMatchSnapshot();
+	expect(await readdir(path.join(resultsDir, 'Cropped'))).toContain('(Unknown)_obs1_1.png');
+
+	expect(await readFile(path.join(resultsDir, 'Cropped/(Unknown)_obs1_1.png'))).toMatchSnapshot();
 });

@@ -5,10 +5,7 @@ import { entries, safeJSONStringify, splitFilenameOnExtension } from '../utils.j
 import { HTTPRequest, ID, ModelInput, References, URLString } from './common.js';
 import { Metadata, namespacedMetadataId } from './metadata.js';
 import { Image, Observation } from './observations.js';
-
-/**
- * @import { Analysis } from './results';
- */
+import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
 export const MODEL_DETECTION_OUTPUT_SHAPES = {
 	cx: { help: 'Coordonée X du point central' },
@@ -72,67 +69,43 @@ for (const [name, { implementation }] of Object.entries(HANDLEBARS_HELPERS)) {
 }
 
 /**
- * @template {import('arktype').Type} T
+ * @template {import("arktype").Type} T
  * @param {T} Input
  */
 export const TemplatedString = (Input) =>
-	type.string
-		.pipe((t) => {
-			try {
-				return {
-					source: t,
-					template: Handlebars.compile(t, {
-						noEscape: true,
-						assumeObjects: true,
-						knownHelpersOnly: true,
-						knownHelpers: {
-							suffix: true,
-							extension: true,
-							fallback: true
-						}
-					})
-				};
-			} catch (e) {
-				throw new Error(`Invalid template ${safeJSONStringify(t)}: ${e}`);
-			}
-		})
-		.pipe(({ source, template }) => ({
-			/** @param {typeof Input.inferIn} data  */
-			render(data) {
-				data = Input.assert(data);
-
-				return template(data);
-			},
-			toJSON: () => source
-		}));
-
-export const FilepathTemplate = type.string
-	.pipe((t) => {
+	type.string.pipe((t) => {
 		try {
+			const compiled = Handlebars.compile(t, {
+				noEscape: true,
+				assumeObjects: true,
+				knownHelpersOnly: true,
+				knownHelpers: { suffix: true, extension: true, fallback: true }
+			});
+
 			return {
-				source: t,
-				template: Handlebars.compile(t, {
-					noEscape: true,
-					assumeObjects: true,
-					knownHelpersOnly: true,
-					knownHelpers: {
-						suffix: true,
-						extension: true,
-						fallback: true
-					}
-				})
+				toJSON: () => t,
+				/**
+				 * @param {T["inferIn"]} data
+				 * @return {string}
+				 */
+				render: (data) => compiled(Input.assert(data))
 			};
 		} catch (e) {
 			throw new Error(`Invalid template ${safeJSONStringify(t)}: ${e}`);
 		}
-	})
-	.pipe(({ source, template }) => ({
-		/** @param {{ observation: Omit<typeof Analysis.inferIn['observations'][number], 'images'>, image: typeof Analysis.inferIn['observations'][number]['images'][number], sequence: number }} data */
-		render(data) {
-			return template(data).replaceAll('\\', '/');
-		},
-		toJSON: () => source
-	}));
+	});
+
+export const FilepathTemplate = TemplatedString(
+	type({
+		observation: AnalyzedObservation.omit('images'),
+		image: AnalyzedImage.omit('exportedAs')
+		// TODO deprecate these, put them in the image object only
+	}).and(AnalyzedImage.pick('sequence', 'numberInObservation'))
+).pipe(({ render, toJSON }) => ({
+	toJSON,
+	/** @type {typeof render} */
+	render: (data) => render(data).replaceAll('\\', '/')
+}));
 
 export const Protocol = type({
 	id: ID.describe(

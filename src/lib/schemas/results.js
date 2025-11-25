@@ -4,7 +4,6 @@ import { type } from 'arktype';
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
 import { mapValues } from '../utils.js';
 import { MetadataRuntimeValue } from './metadata.js';
-import { Protocol } from './protocols.js';
 
 const MetadataRecord = type({
 	'[string]': {
@@ -47,36 +46,35 @@ const MetadataRecord = type({
 	}
 });
 
-export const Analysis = type({
-	observations: type({
-		'[string]': {
-			label: ['string', '@', "Label de l'observation"],
-			images: type({
-				id: ['string', '@', "ID de l'image"],
-				filename: ['string', '@', 'Nom du fichier utilisé pour cette image'],
-				contentType: [
-					'string',
-					'@',
-					"Type de contenu de l'image, au format MIME (exemple: image/jpeg)"
-				],
-				sequence: [
-					'number',
-					'@',
-					"Numéro de séquence de l'image dans l'archive .zip. Unique à l'entièreté de l'export"
-				],
-				metadata: MetadataRecord,
-				exportedAs: type({
-					original: ['string', '@', "Chemin vers l'image originale"],
-					cropped: ['string', '@', "Chemin vers l'image recadrée"]
-				}).describe("Chemins dans l'archive .zip vers l'image exportée")
-			}).array(),
-			metadata: MetadataRecord,
-			protocolMetadata: MetadataRecord.describe(
-				"Métadonnées définies par le protocole. Les clés de l'objet sont les identifiants des métadonnées, sans le préfixe qui identifie leur protocole de provenance"
-			)
-		}
-	}).describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),
-	protocol: Protocol.describe("Le protocole utilisé pour cette session d'analyse")
+export const AnalyzedImage = type({
+	id: ['string', '@', "ID de l'image"],
+	filename: ['string', '@', 'Nom du fichier utilisé pour cette image'],
+	contentType: [
+		'string',
+		'@',
+		"Type de contenu de l'image, au format MIME (exemple: image/jpeg)"
+	],
+	sequence: [
+		'number > 0',
+		'@',
+		"Numéro de séquence de l'image dans l'archive .zip. Unique à l'entièreté de l'export"
+	],
+	numberInObservation: ['number > 0', '@', "Numéro de l'image dans l'observation"],
+	metadata: MetadataRecord,
+	exportedAs: type({
+		original: ['string', '@', "Chemin vers l'image originale"],
+		cropped: ['string', '@', "Chemin vers l'image recadrée"]
+	}).describe("Chemins dans l'archive .zip vers l'image exportée")
+});
+
+export const AnalyzedObservation = type({
+	number: ['number > 0', '@', "Numéro de l'observation dans l'export"],
+	label: ['string', '@', "Label de l'observation"],
+	images: AnalyzedImage.array(),
+	metadata: MetadataRecord,
+	protocolMetadata: MetadataRecord.describe(
+		"Métadonnées définies par le protocole. Les clés de l'objet sont les identifiants des métadonnées, sans le préfixe qui identifie leur protocole de provenance"
+	)
 });
 
 /**

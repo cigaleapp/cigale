@@ -135,6 +135,8 @@
 		</dt>
 		<dd>Image en cours d'exportation</dd>
 		<dt>{'{{ sequence }}'}</dt>
+		<dd>Numéro de l'image dans l'observation, commençant à 1.</dd>
+		<dt>{'{{ numberInObservation }}'}</dt>
 		<dd>
 			Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de
 			l'export

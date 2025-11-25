@@ -238,9 +238,9 @@ const protocol = {
 	exports: {
 		images: {
 			cropped:
-				'Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}',
+				'Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}',
 			original:
-				'Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_{{ sequence }}.{{ extension image.filename }}'
+				'Original/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}'
 		},
 		metadata: {
 			json: 'analysis.json',

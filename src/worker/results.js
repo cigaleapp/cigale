@@ -17,12 +17,13 @@ import {
 } from '$lib/metadata';
 import { MetadataValues } from '$lib/schemas/metadata';
 import { FilepathTemplate } from '$lib/schemas/protocols';
-import { Analysis, toMetadataRecord } from '$lib/schemas/results';
+import { toMetadataRecord } from '$lib/schemas/results';
 import { compareBy } from '$lib/utils';
 
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
 import { openDatabase, swarp } from './index.js';
+import { Analysis } from '$lib/schemas/exports.js';
 
 swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaURL }, notify) => {
 	const db = await openDatabase();
@@ -60,10 +61,13 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 	 */
 	let exportedObservations = {};
 	let sequence = 1;
+    let observationNumber = 0;
 
 	// To have stable sequence numbers, really useful for testing
 	observations.sort(compareBy((o) => o.label + o.id));
 	for (const { id, label, images, metadataOverrides } of observations) {
+        observationNumber++;
+
 		const metadata = await observationMetadata(db, {
 			images,
 			metadataOverrides: MetadataValues.assert(metadataOverrides)
@@ -71,12 +75,13 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 
 		exportedObservations[id] = {
 			label,
+            number: observationNumber,
 			metadata: toMetadataRecord(metadata),
 			protocolMetadata: toMetadataRecord(protocolMetadataValues(protocolUsed, metadata)),
 			images: []
 		};
 
-		for (const imageId of images.sort()) {
+		for (const [i, imageId] of images.entries()) {
 			if (!imagesFromDatabase.some((i) => i.id === imageId)) continue;
 
 			const imageFromDatabase = Schemas.Image.assert(
@@ -88,19 +93,29 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 				metadataOptions
 			);
 
+            const numberInObservation = i + 1;
+
 			const image = {
 				...imageFromDatabase,
+                sequence,
+                numberInObservation,
 				metadata: toMetadataRecord(metadataValues),
 				protocolMetadata: toMetadataRecord(
 					protocolMetadataValues(protocolUsed, metadataValues)
 				)
 			};
 
-			const filepathsData = { observation: exportedObservations[id], image, sequence };
+			const filepathsData = {
+				observation: exportedObservations[id],
+				image,
+				sequence,
+				numberInObservation
+			};
 
 			exportedObservations[id].images.push({
 				...image,
 				sequence,
+				numberInObservation,
 				exportedAs: {
 					original: filepaths.images.original.render(filepathsData),
 					cropped: filepaths.images.cropped.render(filepathsData)
