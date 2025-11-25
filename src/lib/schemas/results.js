@@ -55,11 +55,11 @@ export const AnalyzedImage = type({
 		"Type de contenu de l'image, au format MIME (exemple: image/jpeg)"
 	],
 	sequence: [
-		'number',
+		'number > 0',
 		'@',
 		"Numéro de séquence de l'image dans l'archive .zip. Unique à l'entièreté de l'export"
 	],
-	numberInObservation: ['number', '@', "Numéro de l'image dans l'observation, commençant à 1."],
+	numberInObservation: ['number > 0', '@', "Numéro de l'image dans l'observation"],
 	metadata: MetadataRecord,
 	exportedAs: type({
 		original: ['string', '@', "Chemin vers l'image originale"],
@@ -68,6 +68,7 @@ export const AnalyzedImage = type({
 });
 
 export const AnalyzedObservation = type({
+	number: ['number > 0', '@', "Numéro de l'observation dans l'export"],
 	label: ['string', '@', "Label de l'observation"],
 	images: AnalyzedImage.array(),
 	metadata: MetadataRecord,

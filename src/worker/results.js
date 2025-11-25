@@ -61,10 +61,13 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 	 */
 	let exportedObservations = {};
 	let sequence = 1;
+    let observationNumber = 0;
 
 	// To have stable sequence numbers, really useful for testing
 	observations.sort(compareBy((o) => o.label + o.id));
 	for (const { id, label, images, metadataOverrides } of observations) {
+        observationNumber++;
+
 		const metadata = await observationMetadata(db, {
 			images,
 			metadataOverrides: MetadataValues.assert(metadataOverrides)
@@ -72,6 +75,7 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 
 		exportedObservations[id] = {
 			label,
+            number: observationNumber,
 			metadata: toMetadataRecord(metadata),
 			protocolMetadata: toMetadataRecord(protocolMetadataValues(protocolUsed, metadata)),
 			images: []
