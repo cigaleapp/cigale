@@ -4,7 +4,6 @@ import { type } from 'arktype';
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
 import { mapValues } from '../utils.js';
 import { MetadataRuntimeValue } from './metadata.js';
-import { Protocol } from './protocols.js';
 
 const MetadataRecord = type({
 	'[string]': {
@@ -75,13 +74,6 @@ export const AnalyzedObservation = type({
 	protocolMetadata: MetadataRecord.describe(
 		"Métadonnées définies par le protocole. Les clés de l'objet sont les identifiants des métadonnées, sans le préfixe qui identifie leur protocole de provenance"
 	)
-});
-
-export const Analysis = type({
-	observations: type({
-		'[string]': AnalyzedObservation
-	}).describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),
-	protocol: Protocol.describe("Le protocole utilisé pour cette session d'analyse")
 });
 
 /**

@@ -1,12 +1,12 @@
 import { ArkErrors } from 'arktype';
 import { strFromU8, unzipSync } from 'fflate';
 
-import * as db from './idb.svelte';
-import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images';
-import { serializeMetadataValue } from './metadata';
-import { Analysis } from './schemas/results';
-import { uiState } from './state.svelte';
-import { toasts } from './toasts.svelte';
+import * as db from './idb.svelte.js';
+import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images.js';
+import { serializeMetadataValue } from './metadata.js';
+import { Analysis } from './schemas/exports.js';
+import { uiState } from './state.svelte.js';
+import { toasts } from './toasts.svelte.js';
 import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils';
 
 /**

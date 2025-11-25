@@ -5,7 +5,7 @@ import extract from 'extract-zip';
 
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import { Analysis } from '../src/lib/schemas/results.js';
+import { Analysis } from '../src/lib/schemas/exports.js';
 import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {

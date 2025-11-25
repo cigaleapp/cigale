@@ -17,12 +17,13 @@ import {
 } from '$lib/metadata';
 import { MetadataValues } from '$lib/schemas/metadata';
 import { FilepathTemplate } from '$lib/schemas/protocols';
-import { Analysis, toMetadataRecord } from '$lib/schemas/results';
+import { toMetadataRecord } from '$lib/schemas/results';
 import { compareBy } from '$lib/utils';
 
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
 import { openDatabase, swarp } from './index.js';
+import { Analysis } from '$lib/schemas/exports.js';
 
 swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaURL }, notify) => {
 	const db = await openDatabase();
