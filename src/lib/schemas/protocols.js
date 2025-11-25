@@ -100,7 +100,7 @@ export const FilepathTemplate = TemplatedString(
 		observation: AnalyzedObservation.omit('images'),
 		image: AnalyzedImage.omit('exportedAs')
 		// TODO deprecate these, put them in the image object only
-	}).and(AnalyzedImage.pick('sequence'))
+	}).and(AnalyzedImage.pick('sequence', 'numberInObservation'))
 ).pipe(({ render, toJSON }) => ({
 	toJSON,
 	/** @type {typeof render} */

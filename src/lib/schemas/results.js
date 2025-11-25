@@ -60,6 +60,7 @@ export const AnalyzedImage = type({
 		'@',
 		"Numéro de séquence de l'image dans l'archive .zip. Unique à l'entièreté de l'export"
 	],
+	numberInObservation: ['number', '@', "Numéro de l'image dans l'observation, commençant à 1."],
 	metadata: MetadataRecord,
 	exportedAs: type({
 		original: ['string', '@', "Chemin vers l'image originale"],
