@@ -15,6 +15,7 @@ import {
 	observationMetadata,
 	protocolMetadataValues
 } from '$lib/metadata';
+import { Analysis } from '$lib/schemas/exports.js';
 import { MetadataValues } from '$lib/schemas/metadata';
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { toMetadataRecord } from '$lib/schemas/results';
@@ -23,7 +24,6 @@ import { compareBy } from '$lib/utils';
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
 import { openDatabase, swarp } from './index.js';
-import { Analysis } from '$lib/schemas/exports.js';
 
 swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaURL }, notify) => {
 	const db = await openDatabase();
@@ -61,12 +61,12 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 	 */
 	let exportedObservations = {};
 	let sequence = 1;
-    let observationNumber = 0;
+	let observationNumber = 0;
 
 	// To have stable sequence numbers, really useful for testing
 	observations.sort(compareBy((o) => o.label + o.id));
 	for (const { id, label, images, metadataOverrides } of observations) {
-        observationNumber++;
+		observationNumber++;
 
 		const metadata = await observationMetadata(db, {
 			images,
@@ -75,7 +75,7 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 
 		exportedObservations[id] = {
 			label,
-            number: observationNumber,
+			number: observationNumber,
 			metadata: toMetadataRecord(metadata),
 			protocolMetadata: toMetadataRecord(protocolMetadataValues(protocolUsed, metadata)),
 			images: []
@@ -93,12 +93,12 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 				metadataOptions
 			);
 
-            const numberInObservation = i + 1;
+			const numberInObservation = i + 1;
 
 			const image = {
 				...imageFromDatabase,
-                sequence,
-                numberInObservation,
+				sequence,
+				numberInObservation,
 				metadata: toMetadataRecord(metadataValues),
 				protocolMetadata: toMetadataRecord(
 					protocolMetadataValues(protocolUsed, metadataValues)
