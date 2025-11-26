@@ -186,10 +186,12 @@ const protocol = {
 			infer: {
 				neural: [
 					{
-						name: 'Collemboles (~80 classes)',
-						model: 'https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx',
+						name: 'Arthropodes (~17000 classes)',
+						description: 'Terrestres, France métropolitaine', // TODO
+						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
+						model: 'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx',
 						classmapping:
-							'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt',
+							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
 						input: {
 							height: 224,
 							width: 224,
@@ -198,12 +200,10 @@ const protocol = {
 						}
 					},
 					{
-						name: 'Arthropodes (~17000 classes)',
-						description: 'Terrestres, France métropolitaine', // TODO
-						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
-						model: 'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx',
+						name: 'Collemboles (~80 classes)',
+						model: 'https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx',
 						classmapping:
-							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
+							'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt',
 						input: {
 							height: 224,
 							width: 224,
