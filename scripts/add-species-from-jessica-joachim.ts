@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { ArkErrors, type } from 'arktype';
 import { JSDOM } from 'jsdom';
 import * as jsdom from 'jsdom';
 import RSSParser from 'rss-parser';
@@ -9,9 +8,10 @@ import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: '
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols';
 
-const withCleanedInnerText = type({
-	innerText: ['string', '=>', (txt) => txt.replaceAll('\r?\n', ' ').trim()]
-});
+const cleanedTextContent = (node: Element) =>
+	'textContent' in node && typeof node.textContent === 'string'
+		? node.textContent.replaceAll('\r?\n', ' ').trim()
+		: undefined;
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const virtualConsole = new jsdom.VirtualConsole();
@@ -35,13 +35,14 @@ if (import.meta.main) {
 }
 
 async function main() {
-	const augmented = await augmentProtocol(protocol);
+	const augmented = await augmentProtocol(protocol, 20);
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
 	await Bun.$`bunx prettier --write ${protocolPath}`;
 }
 
 async function augmentProtocol(
-	protocol: typeof ExportedProtocol.infer
+	protocol: typeof ExportedProtocol.infer, 
+    limit = -1
 ): Promise<typeof ExportedProtocol.infer> {
 	const augmented = structuredClone(protocol);
 	const protocolSpecies =
@@ -86,6 +87,8 @@ async function augmentProtocol(
 	total = protocolSpecies.length;
 	for (const s of protocolSpecies) {
 		done++;
+
+        if (limit > 0 && done > limit) break;
 
 		if (s.label in notFoundCache) continue;
 
@@ -184,10 +187,9 @@ async function getSpecies(
 	content.querySelector('h1')?.remove();
 	// Remove year-only bold text, it's usually above a gallery (that is now removed)
 	content.querySelectorAll('strong, h1, h2, h3, h4, h5, h6').forEach((node) => {
-		const el = withCleanedInnerText(node);
-		if (el instanceof ArkErrors) return;
+		const text = cleanedTextContent(node) ?? '';
 
-		if (/^20\d\d(-20\d\d)?$/.test(el.innerText)) {
+		if (/^20\d\d(-20\d\d)?$/.test(text)) {
 			node.remove();
 		}
 	});
@@ -197,10 +199,9 @@ async function getSpecies(
 
 	// Remove links that became empty
 	content.querySelectorAll('a').forEach((node) => {
-		const el = withCleanedInnerText(node);
-		if (el instanceof ArkErrors) return;
+		const text = cleanedTextContent(node) ?? '';
 
-		if (!el.innerText) {
+		if (!text) {
 			node.remove();
 		}
 	});
