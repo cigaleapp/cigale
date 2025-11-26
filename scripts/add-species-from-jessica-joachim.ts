@@ -41,8 +41,8 @@ async function main() {
 }
 
 async function augmentProtocol(
-	protocol: typeof ExportedProtocol.infer, 
-    limit = -1
+	protocol: typeof ExportedProtocol.infer,
+	limit = -1
 ): Promise<typeof ExportedProtocol.infer> {
 	const augmented = structuredClone(protocol);
 	const protocolSpecies =
@@ -88,7 +88,7 @@ async function augmentProtocol(
 	for (const s of protocolSpecies) {
 		done++;
 
-        if (limit > 0 && done > limit) break;
+		if (limit > 0 && done > limit) break;
 
 		if (s.label in notFoundCache) continue;
 
@@ -148,7 +148,14 @@ async function searchForSpecies(name: string): Promise<URL | null> {
 	for (const link of links) {
 		const title = link.textContent;
 		if (blogTitleMatchesSpeciesName(title, name)) {
-			return new URL(link.href);
+			const url = new URL(link.href);
+
+			// Skip blog posts that happen to match the species name
+			if (/^\d{4}\/\d{1,2}\/\d{1,2}\//.test(url.pathname)) {
+				continue;
+			}
+
+			return url;
 		}
 	}
 
