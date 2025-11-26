@@ -206,7 +206,7 @@
 					'crop',
 					uiState.cropModels,
 					uiState.selectedCropModel,
-					(i) => uiState.setModelSelections({ crop: i })
+					async (i) => uiState.setModelSelections({ crop: i })
 				)}
 			</div>
 			<div class="separator"><IconNext /></div>
@@ -234,7 +234,7 @@
 					'classify',
 					uiState.classificationModels,
 					uiState.selectedClassificationModel,
-					(i) => uiState.setModelSelections({ classification: i })
+					async (i) => uiState.setModelSelections({ classification: i })
 				)}
 			</div>
 			<div class="separator"><IconNext /></div>
@@ -281,8 +281,20 @@
 	/** @type {'crop'|'classify'} */ tab,
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */ models,
 	/** @type {number} */ currentModelIndex,
-	/** @type {(i: number) => void }*/ setSelection
+	/** @type {(i: number) => Promise<void> }*/ setSelection
 )}
+	{@const selectableItem = (/** @type {number} */ i, /** @type {string} */ label) => ({
+		key: i,
+		label,
+		selected: currentModelIndex === i,
+		async onclick() {
+			await setSelection(i);
+			if (path === `/${tab}` && currentModelIndex !== i) {
+				window.location.reload();
+			}
+		}
+	})}
+
 	<div class="inference">
 		{#if uiState.currentProtocol}
 			<DropdownMenu
@@ -290,18 +302,8 @@
 				help="Modèle d'inférence"
 				items={[]}
 				selectableItems={[
-					{
-						key: -1,
-						label: 'Aucune inférence',
-						selected: currentModelIndex === -1,
-						onclick: () => setSelection(-1)
-					},
-					...models.map((model, i) => ({
-						key: i,
-						label: model.name ?? '',
-						onclick: () => setSelection(i),
-						selected: currentModelIndex === i
-					}))
+					selectableItem(-1, 'Aucune inférence'),
+					...models.map((model, i) => selectableItem(i, model.name ?? `Modèle ${i + 1}`))
 				]}
 			>
 				{#snippet trigger(props)}
