@@ -214,6 +214,13 @@ async function getSpecies(
 	};
 }
 
+// TODO remove once TS declares it itself
+declare global {
+	interface RegExpConstructor {
+		escape(s: string): string;
+	}
+}
+
 function blogTitleMatchesSpeciesName(title: string, name: string): boolean {
 	const normalize = (str: string) => str.trim().toLowerCase();
 
