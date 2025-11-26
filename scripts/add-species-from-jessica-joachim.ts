@@ -35,7 +35,7 @@ if (import.meta.main) {
 }
 
 async function main() {
-	const augmented = await augmentProtocol(protocol, 20);
+	const augmented = await augmentProtocol(protocol, process.env.CI ? -1 : 50);
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
 	await Bun.$`bunx prettier --write ${protocolPath}`;
 }
