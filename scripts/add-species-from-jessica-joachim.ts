@@ -293,6 +293,10 @@ async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['do
 	} else {
 		const response = await fetch(url);
 		if (!response.ok) {
+			if (response.status === 429) {
+				await new Promise((resolve) => setTimeout(resolve, 10_000));
+				return fetchAndParseHtml(url);
+			}
 			throw new Error(
 				`Failed to fetch ${url.toString()}: ${response.status} ${response.statusText}`
 			);
