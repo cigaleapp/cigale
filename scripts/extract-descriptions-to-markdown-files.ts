@@ -30,6 +30,6 @@ if (import.meta.main) {
 		const markdownContent = await extractToMarkdown(key);
 		const filePath = path.join(directory, `${key}.md`);
 		await writeFile(filePath, markdownContent, 'utf-8');
-		console.log(`Extracted description for ${key} to ${filePath}`);
+		console.info(`Extracted description for ${key} to ${filePath}`);
 	}
 }

@@ -38,34 +38,6 @@ if (import.meta.main) {
 }
 
 async function main() {
-	// await searchForSpecies('');
-	// Bun.write(
-	// 	'untouched.json',
-	// 	JSON.stringify({
-	// 		all: Object.fromEntries(speciesLinks!.entries()),
-	// 		untouched: Object.fromEntries(
-	// 			[...(await scanSpecies(protocol)).values()].filter(
-	// 				([text, link]) =>
-	// 					![
-	// 						'vegetaux',
-	// 						'amphibiens',
-	// 						'mollusques',
-	// 						'reptiles',
-	// 						encodeURIComponent('mammifères'),
-	// 						'mammifères',
-	// 						'hygromiidae',
-	// 						'crustaces',
-    //                         'mammif%c2%90eres',
-	// 						'lichens',
-    //                         'oiseaux',
-	// 						'champignons-et-myxomycetes'
-	// 					].includes(link.pathname.split('/').at(1) ?? '') &&
-	// 					!link.pathname.startsWith('/especes/vegetaux/') && 
-    //                     !/ (sp|ind[eé]t[eé]rmin[eé])$/.test(text)
-	// 			)
-	// 		)
-	// 	})
-	// );
 	const augmented = await augmentProtocol(protocol);
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
 	await Bun.$`bunx prettier --write ${protocolPath}`;
@@ -75,8 +47,6 @@ async function scanSpecies(protocol: typeof ExportedProtocol.infer) {
 	await searchForSpecies('');
 
 	let untouchedLinks = [...(speciesLinks?.entries() ?? [])];
-
-	console.log('Total species links found:', untouchedLinks.length);
 
 	const total =
 		protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options!.length;
@@ -258,9 +228,6 @@ function blogTitleMatchesSpeciesName(title: string, name: string): boolean {
 
 	for (const candidate of candidates) {
 		if (candidate.test(normalize(title))) {
-			if (name === 'Aiolopus puissanti') {
-				console.log('Matched with', candidate);
-			}
 			return true;
 		}
 	}
