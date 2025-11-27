@@ -143,6 +143,13 @@ async function searchForSpecies(name: string): Promise<URL | null> {
 	);
 
 	for (const [title, link] of speciesLinks ?? []) {
+		// FIXME redirects to an image file
+		if (
+			link.href ===
+			'https://jessica-joachim.com/insectes/dipteres/syrphidae/paragus-pecchiolii/'
+		) {
+			continue;
+		}
 		if (blogTitleMatchesSpeciesName(title, name)) {
 			return link;
 		}
