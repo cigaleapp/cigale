@@ -1,4 +1,6 @@
+import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { formatDuration, intervalToDuration } from 'date-fns';
 import { JSDOM } from 'jsdom';
 import * as jsdom from 'jsdom';
 import RSSParser from 'rss-parser';
@@ -24,6 +26,7 @@ const here = import.meta.dirname;
 const protocolPath = path.join(here, '../examples/arthropods.cigaleprotocol.json');
 const rss = new RSSParser();
 const tdown = new Turndown();
+let speciesLinks: Map<string, URL> | undefined;
 // For some reason Turndown#turndown is typed as string instead of a method returning string
 const htmlToMarkdown = (html: string) =>
 	(tdown.turndown as unknown as (input: string) => string)(html);
@@ -35,9 +38,63 @@ if (import.meta.main) {
 }
 
 async function main() {
-	const augmented = await augmentProtocol(protocol, process.env.CI ? -1 : 50);
+	// await searchForSpecies('');
+	// Bun.write(
+	// 	'untouched.json',
+	// 	JSON.stringify({
+	// 		all: Object.fromEntries(speciesLinks!.entries()),
+	// 		untouched: Object.fromEntries(
+	// 			[...(await scanSpecies(protocol)).values()].filter(
+	// 				([text, link]) =>
+	// 					![
+	// 						'vegetaux',
+	// 						'amphibiens',
+	// 						'mollusques',
+	// 						'reptiles',
+	// 						encodeURIComponent('mammifères'),
+	// 						'mammifères',
+	// 						'hygromiidae',
+	// 						'crustaces',
+    //                         'mammif%c2%90eres',
+	// 						'lichens',
+    //                         'oiseaux',
+	// 						'champignons-et-myxomycetes'
+	// 					].includes(link.pathname.split('/').at(1) ?? '') &&
+	// 					!link.pathname.startsWith('/especes/vegetaux/') && 
+    //                     !/ (sp|ind[eé]t[eé]rmin[eé])$/.test(text)
+	// 			)
+	// 		)
+	// 	})
+	// );
+	const augmented = await augmentProtocol(protocol);
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
 	await Bun.$`bunx prettier --write ${protocolPath}`;
+}
+
+async function scanSpecies(protocol: typeof ExportedProtocol.infer) {
+	await searchForSpecies('');
+
+	let untouchedLinks = [...(speciesLinks?.entries() ?? [])];
+
+	console.log('Total species links found:', untouchedLinks.length);
+
+	const total =
+		protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options!.length;
+	let done = 0;
+	for (const { label, key } of protocol.metadata[
+		'io.github.cigaleapp.arthropods.example__species'
+	].options!) {
+		const u = (await searchForSpecies(label))?.href;
+		untouchedLinks = untouchedLinks.filter(([, link]) => link.href !== u);
+
+		if (++done % 500 === 0) {
+			console.info(
+				`${align(done, total)} ${percentage(done, total)} Scanned species ${dim(label)}`
+			);
+		}
+	}
+
+	return untouchedLinks;
 }
 
 async function augmentProtocol(
@@ -48,41 +105,12 @@ async function augmentProtocol(
 	const protocolSpecies =
 		augmented.metadata['io.github.cigaleapp.arthropods.example__species'].options!;
 
-	const updatesArticles = await getNewsfeedUpdateArticles();
-
 	let total = 0;
 	let done = 0;
-	for (const articleUrl of updatesArticles) {
-		const updatedSpeciesList = await updatedSpecies(articleUrl);
-		total += updatedSpeciesList.length;
-
-		for (const [name, pageUrl] of updatedSpeciesList) {
-			done++;
-
-			const enumVariant = protocolSpecies.find(({ label }) =>
-				blogTitleMatchesSpeciesName(name, label)
-			);
-
-			if (!enumVariant) continue;
-
-			console.info(`${done}/${total} Updating species ${enumVariant.label} with ${pageUrl}`);
-
-			const newData = await getSpecies(enumVariant.key, pageUrl);
-
-			if (!newData) {
-				console.warn(yellow(`⁄ Could not extract data for species ${enumVariant.label}`));
-				continue;
-			}
-
-			// TODO accept non-enums in cascades
-			// enumVariant.cascade = { ...enumVariant.cascade,  scientific_name: enumVariant.label };
-			Object.assign(enumVariant, newData);
-		}
-	}
-
-	const notFoundCache: Record<string, Array<{ text: string; url: string }>> = await fetch(
-		'https://raw.githubusercontent.com/cigaleapp/models/main/jessica-joachim-404cache.json'
-	).then((r) => r.json());
+	let processed = 0;
+	let stepDurationsSum = 0;
+	let lastStepTime = performance.now();
+	let eta = 0; // in ms
 
 	total = protocolSpecies.length;
 	for (const s of protocolSpecies) {
@@ -90,11 +118,9 @@ async function augmentProtocol(
 
 		if (limit > 0 && done > limit) break;
 
-		if (s.label in notFoundCache) continue;
-
 		const pageUrl = await searchForSpecies(s.label);
 		if (!pageUrl) {
-			console.warn(yellow(`⁄ Could not find page for species ${s.label}`));
+			// console.warn(yellow(`⁄ Could not find page for species ${s.label}`));
 			continue;
 		}
 
@@ -105,57 +131,50 @@ async function augmentProtocol(
 			continue;
 		}
 
-		console.info(`${done}/${total} Updating species ${s.label} with ${pageUrl}`);
-
 		Object.assign(s, newData);
+
+		processed++;
+
+		const currentTime = performance.now();
+		const currentStepDuration = currentTime - lastStepTime;
+		stepDurationsSum += currentStepDuration;
+		lastStepTime = currentTime;
+
+		eta = (stepDurationsSum / processed) * (total - done);
+
+		console.info(
+			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${formatEta(eta)}`)} Updating species ${dim(`took ${currentStepDuration.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
+		);
 	}
+
+	console.info(
+		cyan(
+			`⁄ Finished processing species, updated ${processed}/${total} entries (${percentage(processed, total)})`
+		)
+	);
 
 	return augmented;
 }
 
-async function getNewsfeedUpdateArticles(): Promise<URL[]> {
-	const feed = await rss.parseURL('https://jessica-joachim.com/feed/');
-	const updates = feed.items
-		.filter(({ categories }) => categories?.includes('Mises à jour'))
-		.map(({ link }) => (link ? new URL(link) : null))
-		.filter((link): link is URL => link !== null);
-
-	return updates;
-}
-
-async function updatedSpecies(updatesArticle: URL): Promise<Array<readonly [string, URL]>> {
-	const doc = await fetchAndParseHtml(updatesArticle);
-	if (!doc) return [];
-
-	// TODO get URL patterns (/insectes/*, /especes/*, ... ) to filter out irrelevant links
-	return Array.from(doc.querySelectorAll<HTMLAnchorElement>('main .entry-content a'))
-		.map((link) => [
-			link.textContent?.trim(),
-			URL.canParse(link.href) ? new URL(link.href) : updatesArticle
-		])
-		.map((link) => link as [string, URL])
-		.filter(([name]) => Boolean(name))
-		.filter(([, url]) => url.origin === ORIGIN && url.pathname !== updatesArticle.pathname);
-}
-
 async function searchForSpecies(name: string): Promise<URL | null> {
-	const results = await fetchAndParseHtml(
-		new URL(`/?${new URLSearchParams({ s: name })}`, ORIGIN)
+	speciesLinks ??= await fetchAndParseHtml(new URL(`/identification`, ORIGIN)).then(
+		(doc) =>
+			new Map(
+				[...(doc?.getElementById('Listefiches')?.querySelectorAll('a') ?? [])]
+					.map((a) => {
+						const text = cleanedTextContent(a) ?? '';
+						if (!text) return null;
+						const url = new URL(a.href, ORIGIN);
+						if (!url) return null;
+						return [text, url];
+					})
+					.filter((e): e is [string, URL] => e !== null)
+			)
 	);
 
-	const links = results?.querySelectorAll<HTMLAnchorElement>('main article h2 a') ?? [];
-
-	for (const link of links) {
-		const title = link.textContent;
+	for (const [title, link] of speciesLinks ?? []) {
 		if (blogTitleMatchesSpeciesName(title, name)) {
-			const url = new URL(link.href);
-
-			// Skip blog posts that happen to match the species name
-			if (/^\d{4}\/\d{1,2}\/\d{1,2}\//.test(url.pathname)) {
-				continue;
-			}
-
-			return url;
+			return link;
 		}
 	}
 
@@ -233,11 +252,15 @@ function blogTitleMatchesSpeciesName(title: string, name: string): boolean {
 
 	const candidates = [
 		new RegExp(`^${RegExp.escape(name)}$`, 'i'),
-		new RegExp(`^.+ \\(${RegExp.escape(name)}\\)$`, 'i')
+		new RegExp(`^.+ \\(${RegExp.escape(name)}\\)$`, 'i'),
+		new RegExp(`^${RegExp.escape(name)} \\(.+\\)$`, 'i')
 	];
 
 	for (const candidate of candidates) {
 		if (candidate.test(normalize(title))) {
+			if (name === 'Aiolopus puissanti') {
+				console.log('Matched with', candidate);
+			}
 			return true;
 		}
 	}
@@ -245,26 +268,64 @@ function blogTitleMatchesSpeciesName(title: string, name: string): boolean {
 	return false;
 }
 
+// ANSI control sequences
+class CC {
+	static clearline = '\x1b[2K';
+	static red = '\x1b[31m';
+	static reset = '\x1b[0m';
+	static dim = '\x1b[2m';
+	static blue = '\x1b[34m';
+	static bold = '\x1b[1m';
+	static yellow = '\x1b[33m';
+	static cyan = '\x1b[36m';
+}
+
 function yellow(text: string): string {
-	// ANSI control sequences
+	return `${CC.yellow}${text}${CC.reset}`;
+}
 
-	const cc = {
-		clearline: '\x1b[2K',
-		red: '\x1b[31m',
-		reset: '\x1b[0m',
-		dim: '\x1b[2m',
-		blue: '\x1b[34m',
-		bold: '\x1b[1m',
-		yellow: '\x1b[33m',
-		cyan: '\x1b[36m'
-	};
+function cyan(text: string): string {
+	return `${CC.cyan}${text}${CC.reset}`;
+}
 
-	return `${cc.yellow}${text}${cc.reset}`;
+function dim(text: string): string {
+	return `${CC.dim}${text}${CC.reset}`;
+}
+
+function percentage(part: number, total: number, precision = 0): string {
+	return ((part / total) * 100).toFixed(precision).padStart(3 + precision, ' ') + '%';
+}
+
+function align<T extends string | number>(num: T, total: T | T[]): string {
+	return num.toString().padStart(total.toString().length);
+}
+
+function formatEta(eta: number): string {
+	const { hours = 0, minutes = 0 } = intervalToDuration({ start: 0, end: eta });
+	return `${hours.toString().padStart(2, '0')}h${minutes.toString().padStart(2, '0')}`;
 }
 
 async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document'] | null> {
-	const response = await fetch(url);
-	if (!response.ok) return null;
+	const cachedir = path.join('.jessica-joachim-cache');
+	const cachefile = path.join(
+		cachedir,
+		encodeURIComponent(url.toString().replace(ORIGIN, '')) + '.html'
+	);
 
-	return new JSDOM(await response.text(), { virtualConsole }).window.document;
+	let html: string;
+
+	if (await exists(cachefile)) {
+		html = await readFile(cachefile, 'utf-8');
+	} else {
+		const response = await fetch(url);
+		if (!response.ok) return null;
+
+		html = await response.text();
+
+		if (await exists(cachedir)) {
+			await writeFile(cachefile, html);
+		}
+	}
+
+	return new JSDOM(html, { virtualConsole }).window.document;
 }
