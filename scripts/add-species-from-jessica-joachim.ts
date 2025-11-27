@@ -50,30 +50,6 @@ async function main() {
 	await Bun.$`bunx prettier --write ${protocolPath}`;
 }
 
-async function scanSpecies(protocol: typeof ExportedProtocol.infer) {
-	await searchForSpecies('');
-
-	let untouchedLinks = [...(speciesLinks?.entries() ?? [])];
-
-	const total =
-		protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options!.length;
-	let done = 0;
-	for (const { label, key } of protocol.metadata[
-		'io.github.cigaleapp.arthropods.example__species'
-	].options!) {
-		const u = (await searchForSpecies(label))?.href;
-		untouchedLinks = untouchedLinks.filter(([, link]) => link.href !== u);
-
-		if (++done % 500 === 0) {
-			console.info(
-				`${align(done, total)} ${percentage(done, total)} Scanned species ${dim(label)}`
-			);
-		}
-	}
-
-	return untouchedLinks;
-}
-
 async function augmentProtocol(
 	protocol: typeof ExportedProtocol.infer,
 	limit = -1
@@ -85,9 +61,7 @@ async function augmentProtocol(
 	let total = 0;
 	let done = 0;
 	let processed = 0;
-	let stepDurationsSum = 0;
-	let lastStepTime = performance.now();
-	let eta = 0; // in ms
+	const eta = new EtaCalculator(10);
 
 	total = protocolSpecies.length;
 	for (const s of protocolSpecies) {
@@ -112,15 +86,12 @@ async function augmentProtocol(
 
 		processed++;
 
-		const currentTime = performance.now();
-		const currentStepDuration = currentTime - lastStepTime;
-		stepDurationsSum += currentStepDuration;
-		lastStepTime = currentTime;
-
-		eta = (stepDurationsSum / processed) * (total - done);
+		const stepTookMs = eta.msSinceLastStep();
+		eta.step();
 
 		console.info(
-			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${formatEta(eta)}`)} Updating species ${dim(`took ${currentStepDuration.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
+			// FIXME use percentage advancement instead of 1_700
+			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(1_700 - processed)}`)} Updating species ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
 		);
 	}
 
@@ -277,9 +248,60 @@ function align<T extends string | number>(num: T, total: T | T[]): string {
 	return num.toString().padStart(total.toString().length);
 }
 
-function formatEta(eta: number): string {
-	const { hours = 0, minutes = 0 } = intervalToDuration({ start: 0, end: eta });
-	return `${hours.toString().padStart(2, '0')}h${minutes.toString().padStart(2, '0')}`;
+class EtaCalculator {
+	private lastSteps: number[] = [];
+	private maxSteps: number;
+	private lastStepTime: number = performance.now();
+
+	constructor(maxSteps: number) {
+		this.maxSteps = maxSteps;
+	}
+
+	step(): void {
+		const currentTime = performance.now();
+		const durationSeconds = (currentTime - this.lastStepTime) / 1000;
+		this.lastStepTime = currentTime;
+		this.addStep(durationSeconds);
+	}
+
+	msSinceLastStep(): number {
+		return performance.now() - this.lastStepTime;
+	}
+
+	private addStep(durationSeconds: number) {
+		this.lastSteps.push(durationSeconds);
+		if (this.lastSteps.length > this.maxSteps) {
+			this.lastSteps.shift();
+		}
+	}
+
+	private getAverage(): number {
+		const sum = this.lastSteps.reduce((a, b) => a + b, 0);
+		return sum / this.lastSteps.length;
+	}
+
+	seconds(remainingSteps: number): number {
+		return this.getAverage() * remainingSteps;
+	}
+
+	display(remainingSteps: number): string {
+		const {
+			hours = 0,
+			minutes = 0,
+			seconds = 0
+		} = intervalToDuration({
+			start: 0,
+			end: this.seconds(remainingSteps) * 1000
+		});
+
+		const formatPart = (n: number) => n.toString().padStart(2, '0');
+
+		if (hours === 0) {
+			return `${formatPart(minutes)}m${formatPart(seconds)}`;
+		}
+
+		return `${formatPart(hours)}h${formatPart(minutes)}`;
+	}
 }
 
 async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document']> {
