@@ -144,7 +144,8 @@ async function getSpecies(
 
 	const imageUrl = content.querySelector('img')?.src;
 
-    const removeAll = (selector: string) => content.querySelectorAll(selector).forEach((el) => el.remove());
+	const removeAll = (selector: string) =>
+		content.querySelectorAll(selector).forEach((el) => el.remove());
 
 	// First image, keeping it in description would be redundant
 	content.querySelector('img')?.remove();
