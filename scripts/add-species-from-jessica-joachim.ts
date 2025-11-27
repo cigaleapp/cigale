@@ -144,6 +144,8 @@ async function getSpecies(
 
 	const imageUrl = content.querySelector('img')?.src;
 
+    const removeAll = (selector: string) => content.querySelectorAll(selector).forEach((el) => el.remove());
+
 	// First image, keeping it in description would be redundant
 	content.querySelector('img')?.remove();
 	// Comments
@@ -153,13 +155,14 @@ async function getSpecies(
 	// Social media share buttons
 	content.querySelector('.entry-content > .sharedaddy')?.remove();
 	// Text (most likely header) for the removed gallery
-	content.querySelector('.entry-content > p:has(+ .wp-block-kadence-advancedgallery)')?.remove();
+	removeAll('.entry-content > p:has(+ .wp-block-kadence-advancedgallery)');
 	// Gallery (can't be represented in markdown well)
-	content.querySelector('.entry-content > .wp-block-kadence-advancedgallery')?.remove();
-	content.querySelector('.entry-content > .tiled-gallery')?.remove();
-	content.querySelector('.entry-content > [id^=gallery-]')?.remove();
+	removeAll('.entry-content > .wp-block-kadence-advancedgallery');
+	removeAll('.entry-content > .tiled-gallery');
+	removeAll('.entry-content > [id^=gallery-]');
+	removeAll('.entry-content > [id^=gallery-]');
 	// Navigation buttons
-	content.querySelector('.entry-content > .wp-block-kadence-advancedbtn')?.remove();
+	removeAll('.entry-content > .wp-block-kadence-advancedbtn');
 	// Remove title
 	content.querySelector('h1')?.remove();
 	// Remove year-only bold text, it's usually above a gallery (that is now removed)
