@@ -10,6 +10,13 @@ import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: '
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols';
 
+const LINKS_TO_AVOID = [
+	// FIXME redirects to an image file
+	'https://jessica-joachim.com/insectes/dipteres/syrphidae/paragus-pecchiolii/',
+	// FIXME 404 not found
+	'https://jessica-joachim.com/insectes/dipteres/syrphidae/eupeodes-luniger/'
+];
+
 const cleanedTextContent = (node: Element) =>
 	'textContent' in node && typeof node.textContent === 'string'
 		? node.textContent.replaceAll('\r?\n', ' ').trim()
@@ -143,11 +150,7 @@ async function searchForSpecies(name: string): Promise<URL | null> {
 	);
 
 	for (const [title, link] of speciesLinks ?? []) {
-		// FIXME redirects to an image file
-		if (
-			link.href ===
-			'https://jessica-joachim.com/insectes/dipteres/syrphidae/paragus-pecchiolii/'
-		) {
+		if (LINKS_TO_AVOID.includes(link.href)) {
 			continue;
 		}
 		if (blogTitleMatchesSpeciesName(title, name)) {
@@ -298,7 +301,7 @@ async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['do
 				return fetchAndParseHtml(url);
 			}
 			throw new Error(
-				`Failed to fetch ${url.toString()}: ${response.status} ${response.statusText}`
+				`Failed to fetch ${url.toString()} : ${response.status} ${response.statusText}`
 			);
 		}
 
