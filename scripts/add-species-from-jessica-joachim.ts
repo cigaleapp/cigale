@@ -154,12 +154,12 @@ async function searchForSpecies(name: string): Promise<URL | null> {
 async function getSpecies(
 	key: string,
 	page: URL
-): Promise<Partial<typeof MetadataEnumVariant.infer> | null> {
+): Promise<Partial<typeof MetadataEnumVariant.infer>> {
 	const doc = await fetchAndParseHtml(page);
-	if (!doc) return null;
+	if (!doc) throw new Error(`Could not fetch or parse page at ${page.toString()}`);
 
 	const content = doc.querySelector('main');
-	if (!content) return null;
+	if (!content) throw new Error(`Could not find main content in page at ${page.toString()}`);
 
 	const imageUrl = content.querySelector('img')?.src;
 
@@ -272,7 +272,7 @@ function formatEta(eta: number): string {
 	return `${hours.toString().padStart(2, '0')}h${minutes.toString().padStart(2, '0')}`;
 }
 
-async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document'] | null> {
+async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document']> {
 	const cachedir = path.join('.jessica-joachim-cache');
 	const cachefile = path.join(
 		cachedir,
@@ -285,7 +285,11 @@ async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['do
 		html = await readFile(cachefile, 'utf-8');
 	} else {
 		const response = await fetch(url);
-		if (!response.ok) return null;
+		if (!response.ok) {
+			throw new Error(
+				`Failed to fetch ${url.toString()}: ${response.status} ${response.statusText}`
+			);
+		}
 
 		html = await response.text();
 
