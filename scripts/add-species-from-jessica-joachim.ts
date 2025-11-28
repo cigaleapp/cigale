@@ -61,7 +61,10 @@ async function augmentProtocol(
 	let total = 0;
 	let done = 0;
 	let processed = 0;
-	const eta = new EtaCalculator(10);
+	const eta = new EtaCalculator({
+		averageOver: 10,
+		totalSteps: 1_750 // TODO use percentage advancement instead of hardcoded number
+	});
 
 	total = protocolSpecies.length;
 	for (const s of protocolSpecies) {
@@ -90,8 +93,7 @@ async function augmentProtocol(
 		eta.step();
 
 		console.info(
-			// FIXME use percentage advancement instead of 1_700
-			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(1_700 - processed)}`)} Updating species ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
+			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(processed)}`)} Updating species ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
 		);
 	}
 
@@ -255,10 +257,12 @@ function align<T extends string | number>(num: T, total: T | T[]): string {
 class EtaCalculator {
 	private lastSteps: number[] = [];
 	private maxSteps: number;
+	private totalSteps: number;
 	private lastStepTime: number = performance.now();
 
-	constructor(maxSteps: number) {
-		this.maxSteps = maxSteps;
+	constructor({ averageOver, totalSteps }: { averageOver: number; totalSteps: number }) {
+		this.maxSteps = averageOver;
+		this.totalSteps = totalSteps;
 	}
 
 	step(): void {
@@ -284,18 +288,18 @@ class EtaCalculator {
 		return sum / this.lastSteps.length;
 	}
 
-	seconds(remainingSteps: number): number {
-		return this.getAverage() * remainingSteps;
+	seconds(stepsDone: number): number {
+		return this.getAverage() * (this.totalSteps - stepsDone);
 	}
 
-	display(remainingSteps: number): string {
+	display(stepsDone: number): string {
 		const {
 			hours = 0,
 			minutes = 0,
 			seconds = 0
 		} = intervalToDuration({
 			start: 0,
-			end: this.seconds(remainingSteps) * 1000
+			end: this.seconds(stepsDone) * 1000
 		});
 
 		const formatPart = (n: number) => n.toString().padStart(2, '0');
