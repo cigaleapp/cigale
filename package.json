@@ -48,7 +48,7 @@
 		"prepare": "bun run prebuild",
 		"precheck": "svelte-kit sync",
 		"check": "svelte-check --tsconfig ./jsconfig.json",
-		"preknip": "svelte-kit sync",
+		"preknip": "svelte-kit sync && wuchale",
 		"knip": "knip",
 		"format": "prettier --write .",
 		"lint": "bunx oxlint && bunx eslint",
