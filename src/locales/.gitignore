@@ -1,0 +1,2 @@
+*.loader.{js,svelte.js}
+*.loader.server.{js,svelte.js}
