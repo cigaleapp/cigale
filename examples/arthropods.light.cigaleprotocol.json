@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/fe06a53512c2555a6ee634223c67755ada50ee8b\n/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 28,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/fa5f8d8674ca8749316b742b2166703bf71527fe/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 30,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -1320,7 +1320,10 @@
 					"key": "9217813",
 					"label": "Orchesella villosa",
 					"description": "",
-					"learnMore": "https://gbif.org/species/9217813"
+					"learnMore": "https://gbif.org/species/9217813",
+					"cascade": {
+						"genus": "2120960"
+					}
 				},
 				{
 					"key": "9616579",

@@ -8,7 +8,7 @@ on:
   pull_request:
     paths:
       - scripts/generate-protocols.js
-      - scripts/add-species-from-jessica-joachim.js
+      - scripts/add-species-from-jessica-joachim.ts
       - scripts/add-species-from-google-slides.js
       - scripts/add-taxonomic-parents-from-gbif.js
       - .github/workflows/protocols.yml
@@ -47,7 +47,7 @@ jobs:
         run: bun run scripts/generate-protocols.js
 
       - name: Add data from Jessica Joachim
-        run: bun run scripts/add-species-from-jessica-joachim.js
+        run: bun run scripts/add-species-from-jessica-joachim.ts
 
       - name: Set google-drive-key.json
         uses: mobiledevops/secret-to-file-action@v1
@@ -68,15 +68,6 @@ jobs:
 
       - name: Clean old protocol
         run: rm examples/old-*.json
-
-      - name: Store scripts/jessica-joachim-crawler-report.md
-        uses: actions/upload-artifact@v5
-        with:
-          name: jessica-joachim-crawler-report
-          path: scripts/jessica-joachim-crawler-report.md
-
-      - name: Remove scripts/jessica-joachim-crawler-report.md
-        run: rm scripts/jessica-joachim-crawler-report.md
 
       - name: Format & lintfix
         run: bun run format && bun run lintfix

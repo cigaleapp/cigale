@@ -6,20 +6,28 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add \_obsN in exported images' file names
 - Add notifications (#775)
+- Add {{numberInObservation}} in export filepath templates
+- Add {{observation.number}} and {{numberInObservation}} to export path templates (#904)
+- Add {{observation.number}} in protocol export path templates
 - Adjust colors
 - Disable auto-classification of uncropped images (#888)
+- Select Arthropods model by default on built-in protocol (#906)
 
 ### Bug Fixes
 
 - Corner handles of crop box were transparent when hovered or held
 - Fix 404 when going to /
 - Fix full-page reload for goto()s
+- Fix learn more URL in default protocol
+- Fix models not changing or glitching when switching models while on the tab (#905)
 - Fix whole-page reload on every <a> click
 
 ### Data Updates
 
 - Regenerate example protocols
+- Rewrite Jessica Joachim script (#824)
 
 ### Translation Updates
 

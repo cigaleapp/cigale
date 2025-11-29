@@ -1,6 +1,7 @@
 {
 	"cssvar.extensions": ["css", "svelte"],
 	"cssvar.files": ["packages/app/src/routes/style.css"],
+	"bun.test.enable": false,
 	"iconify.delimiters": ["/"],
 	"iconify.includes": ["ph", "ri"],
 	"emmet.syntaxProfiles": {
@@ -9,10 +10,6 @@
 		}
 	},
 	"githubIssues.queries": [
-		{
-			"label": "Summerbugs",
-			"query": "repo:${owner}/${repository} milestone:summerbugs state:open"
-		},
 		{
 			"label": "Cahier des charges",
 			"query": "repo:${owner}/${repository} milestone:\"Cahier des charges\" "
