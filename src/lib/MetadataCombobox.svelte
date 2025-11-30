@@ -18,7 +18,7 @@
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 */
 
-	/** @typedef { { value: string; label: string } } Item */
+	/** @typedef { { value: string; label: string; synonyms: string[] } } Item */
 	/**
 	 * @typedef {object} Props
 	 * @property {import('./database.js').MetadataEnumVariant[]} options
@@ -48,7 +48,9 @@
 	const label = $derived(options.find((opt) => opt.key === value)?.label ?? '');
 
 	/** @type {Item[]} */
-	const items = $derived(options.map((opt) => ({ value: opt.key, label: opt.label })));
+	const items = $derived(
+		options.map(({ key, label, synonyms }) => ({ value: key, label, synonyms }))
+	);
 
 	const filteredItems = $derived.by(() => {
 		if (searchValue === '') {
@@ -60,7 +62,11 @@
 			];
 		}
 
-		return items.filter((item) => item.label.toLowerCase().includes(searchValue.toLowerCase()));
+		return items.filter((item) =>
+			[item.label, ...item.synonyms].some((term) =>
+				term.toLowerCase().includes(searchValue.toLowerCase())
+			)
+		);
 	});
 
 	/**
