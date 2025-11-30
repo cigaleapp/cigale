@@ -29,8 +29,9 @@ const allGbifIds = new Set([
 	...lightweightModelGbifIds
 ]);
 
-const gbifIdToCanonicalName = await fetch(
-	'https://raw.githubusercontent.com/cigaleapp/models/main/gbif-id-to-canonical-name.json'
+/** @type { Record<string, { name: string; synonyms: string[] }>} */
+let gbifCache = await fetch(
+	'https://raw.githubusercontent.com/cigaleapp/models/main/gbif-cache.json'
 )
 	.then((res) => res.json())
 	.catch((e) =>
@@ -47,20 +48,43 @@ console.info(`Protocol has ${allGbifIds.size} species options`);
  * @type {Array<typeof import('../src/lib/schemas/metadata').MetadataEnumVariant.infer>}
  */
 const options = [];
+
 for (const gbifId of allGbifIds) {
-	const name =
-		gbifIdToCanonicalName[Number.parseInt(gbifId)] ??
-		(await fetch(`https://api.gbif.org/v1/species/${gbifId}/name`)
-			.then((res) => res.json())
-			.then((data) => data.canonicalName));
+	gbifCache[gbifId] ??= await fetch(`https://api.gbif.org/v1/species/${gbifId}/synonyms`)
+		.then((res) => res.json())
+		.then(async ({ results }) => {
+			if (!results.length) {
+				return {
+					name: await fetch(`https://api.gbif.org/v1/species/${gbifId}/name`)
+						.then((res) => res.json())
+						.then((data) => data.canonicalName),
+					synonyms: []
+				};
+			}
+
+			const name = results[0].species;
+
+			/** @type {Set<string>} */
+			const synonyms = new Set(results.map((r) => r.canonicalName));
+			synonyms.delete(name);
+
+			return { name, synonyms: [...synonyms] };
+		});
+
+	const { name, synonyms } = gbifCache[gbifId];
+
 	process.stdout.write(`\x1b[2K\r[${options.length}/${allGbifIds.size}] ${gbifId} -> ${name}`);
+	// gbifCache[gbifId] = { name, synonyms };
 	options.push({
 		key: gbifId,
 		label: name,
+		synonyms,
 		description: '',
 		learnMore: `https://gbif.org/species/${gbifId}`
 	});
 }
+
+// writeFileSync(path.join(here, 'gbif-cache.json'), JSON.stringify(gbifCache, null, 2));
 
 options.sort((a, b) => a.label.localeCompare(b.label));
 
