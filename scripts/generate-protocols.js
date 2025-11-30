@@ -78,7 +78,8 @@ for (const gbifId of allGbifIds) {
 	options.push({
 		key: gbifId,
 		label: name,
-		synonyms,
+        // Remove mystery null values
+		synonyms: synonyms.filter(Boolean),
 		description: '',
 		learnMore: `https://gbif.org/species/${gbifId}`
 	});
