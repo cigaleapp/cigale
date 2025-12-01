@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-11-13T14:05:01.958Z\n"
+"PO-Revision-Date: 2025-12-01 17:21+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1216,7 +1216,6 @@ msgid "Disposition des pixels"
 msgstr "Pixel layout"
 
 #: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
-#, fuzzy
 msgid "Représente"
 msgstr "Interpreted as"
 
@@ -1589,7 +1588,7 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
-msgstr ""
+msgstr "Affects <0>Changes the value of other metadata when {0} = {1}</0>"
 
 #. placeholder {0}: option.label || option.key
 #. placeholder {0}: option.label || option.key
@@ -1604,7 +1603,7 @@ msgstr "No cascades defined"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affectée par <0>Autres métadonnées qui change {0} à {1}</0>"
-msgstr ""
+msgstr "Affected by <0>Other metadata that change {0} to {1}</0>"
 
 #. placeholder {0}: metadata?.label || shortId
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
@@ -1643,8 +1642,9 @@ msgid "Metadata {0} for protocol {1} not found"
 msgstr ""
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
+#, fuzzy
 msgid "Option not found"
-msgstr ""
+msgstr "Option not found"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Parallélisme <0>Nombre de tâches en parallèle</0>"
@@ -1710,7 +1710,7 @@ msgstr "Not versioned"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
-msgstr ""
+msgstr "ID must only contain letters, numbers, <0/> or <1/>"
 
 #: src/routes/(app)/protocols/[id]/cropping/+page.svelte
 msgid ""
@@ -1720,79 +1720,83 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
-msgstr ""
+msgstr "<0/> Latest published version: <1>v{0}</1> <2>Revert</2>"
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Le protocole local a des modifications non publiées, voir ci-dessous <1>Passer à la v{0}</1>"
-msgstr ""
+msgstr "<0/> Local protocol has unsaved changes, see below <1>Set to v{0}</1>"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Activer les notifications pour savoir quand un traitement est terminé."
-msgstr ""
+msgstr "Be notified when processing finishes."
 
 #: src/routes/(app)/Navigation.svelte
 msgid "<0/> Activer"
-msgstr ""
+msgstr "<0/> Enable"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Ne pas activer les notifications"
-msgstr ""
+msgstr "Don't enable notifications"
 
 #: src/routes/(app)/Settings.svelte
 msgid "Notifications <0>Quand un traitement est terminé</0>"
-msgstr ""
+msgstr "Notifications <0>When processing finishes</0>"
 
 #: src/lib/notifications.js
 msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
 msgstr ""
+"You refused system notifications. Please change this in your browser's "
+"settings."
 
 #: src/lib/AreaObservations.svelte
 msgid "Suppprimer tout les éléments de ce groupe"
-msgstr ""
+msgstr "Delete all items from this group"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Numéro de l'image dans l'observation, commençant à 1."
-msgstr ""
+msgstr "Number of the image within the observation, beginning at 1."
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Aussi connu sous le nom de"
-msgstr ""
+msgstr "Also known as"
 
 #: src/lib/MetadataCombobox.svelte
 msgid "AKA"
-msgstr ""
+msgstr "AKA"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Synonymes"
-msgstr ""
+msgstr "Synonyms"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid ""
 "Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
 "synonyme."
 msgstr ""
+"Other possible names for this option. Allows finding the option by searching "
+"for a synonym."
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Synonyme"
-msgstr ""
+msgstr "Synonym"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Supprimer le synonyme"
-msgstr ""
+msgstr "Delete synonym"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Ajouter un synonyme"
-msgstr ""
+msgstr "Add a synonym"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
-msgstr ""
+msgstr "Images import finished"
 
 #: src/lib/queue.svelte.js
 msgid "Détection terminée"
-msgstr ""
+msgstr "Detection finished"
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
-msgstr ""
+msgstr "Classification finished"
