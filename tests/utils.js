@@ -336,6 +336,14 @@ export async function chooseProtocol(page, name, models = {}) {
 	}
 }
 
+export async function goToProtocolManagement(page) {
+	await page.getByTestId('protocol-switcher-open').click();
+	await page
+		.getByTestId('protocol-switcher-options')
+		.getByRole('menuitem', { name: 'Gérer les protocoles' })
+		.click();
+}
+
 /**
  *
  * @param {import('$lib/i18n').Language} lang

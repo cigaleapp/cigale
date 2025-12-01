@@ -29,6 +29,10 @@ jobs:
     name: Regenerate
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: regenerate-example-protocols
+      cancel-in-progress: true
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

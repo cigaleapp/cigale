@@ -45,21 +45,24 @@ test('toExportedProtocol', async () => {
 							metadataId: 'protocol1__meta1',
 							key: 'opt1',
 							label: 'Option 1',
-							description: 'Desc 1'
+							description: 'Desc 1',
+						    synonyms: []
 						},
 						{
 							id: 'protocol1__meta1:opt2',
 							metadataId: 'protocol1__meta1',
 							key: 'opt2',
 							label: 'Option 2',
-							description: 'Desc 2'
+							description: 'Desc 2',
+						    synonyms: []
 						},
 						{
 							id: 'protocol1__meta2:opt1',
 							metadataId: 'protocol1__meta2',
 							key: 'opt1',
 							label: 'Option A',
-							description: 'Desc A'
+							description: 'Desc A',
+						    synonyms: []
 						}
 					];
 				} else if (table === 'Metadata') {
@@ -138,8 +141,8 @@ test('toExportedProtocol', async () => {
 				mergeMethod: 'max',
 				required: false,
 				options: [
-					{ key: 'opt1', label: 'Option 1', description: 'Desc 1' },
-					{ key: 'opt2', label: 'Option 2', description: 'Desc 2' }
+					{ key: 'opt1', label: 'Option 1', description: 'Desc 1', synonyms: [] },
+					{ key: 'opt2', label: 'Option 2', description: 'Desc 2', synonyms: [] }
 				]
 			},
 			protocol1__meta2: {
@@ -149,7 +152,7 @@ test('toExportedProtocol', async () => {
 				mergeMethod: 'max',
 				required: false,
 				type: 'enum',
-				options: [{ key: 'opt1', label: 'Option A', description: 'Desc A' }]
+				options: [{ key: 'opt1', label: 'Option A', description: 'Desc A', synonyms: [] }]
 			}
 		},
 		exports: {

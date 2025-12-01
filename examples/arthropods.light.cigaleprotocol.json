@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/fa5f8d8674ca8749316b742b2166703bf71527fe/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 30,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/59f1d2da54664951a1c684e6161a948bd1572628/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 31,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -680,6 +680,21 @@
 				{
 					"key": "2119903",
 					"label": "Isotomurus maculatus",
+					"synonyms": [
+						"Desoria riparia",
+						"Desoria tigrina",
+						"Isotoma bifasciata",
+						"Isotoma fulvo-maculata",
+						"Isotoma maculatus",
+						"Isotoma palustris maculata",
+						"Isotomurus hortorum",
+						"Isotomurus maculata",
+						"Isotomurus palustris",
+						"Isotomurus palustris hortorum",
+						"Isotomurus palustris maculata",
+						"Isotomurus palustris maculatus",
+						"Isotomurus palustris texensis"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2119903",
 					"cascade": {
@@ -689,6 +704,7 @@
 				{
 					"key": "2120343",
 					"label": "Isotomiella minor",
+					"synonyms": ["Isotoma minor"],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120343",
 					"cascade": {
@@ -698,6 +714,18 @@
 				{
 					"key": "2120372",
 					"label": "Folsomia quadrioculata",
+					"synonyms": [
+						"Folsomia anophthalma",
+						"Folsomia diplophthalma quadripunctata",
+						"Folsomia gracilis",
+						"Folsomia monosetosa",
+						"Folsomia nana",
+						"Folsomia pallida",
+						"Folsomia quadriculata",
+						"Folsomia quadriociulata",
+						"Folsomia quadriocula",
+						"Folsomia quadrioculala"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120372",
 					"cascade": {
@@ -707,6 +735,21 @@
 				{
 					"key": "2120383",
 					"label": "Folsomia candida",
+					"synonyms": [
+						"Entomobrya cavicola",
+						"Entomobrya emeraldica",
+						"Folsomia abchasica",
+						"Folsomia caldaria",
+						"Folsomia candida indistincta",
+						"Folsomia cavicola",
+						"Folsomia dentata",
+						"Folsomia distincta",
+						"Folsomia dubia",
+						"Folsomia fimetaria",
+						"Folsomia fimetaria dentata",
+						"Folsomia fontis",
+						"Folsomia kingi"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120383",
 					"cascade": {
@@ -716,6 +759,16 @@
 				{
 					"key": "2120418",
 					"label": "Parisotoma notabilis",
+					"synonyms": [
+						"Desoria monticola",
+						"Halisotoma delicatula",
+						"Halisotoma menotabilis",
+						"Isotoma delicatula",
+						"Isotoma eunotabilis",
+						"Isotoma menotabilis",
+						"Isotoma notabilis",
+						"Parisotoma nitabilis"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120418",
 					"cascade": {
@@ -725,6 +778,24 @@
 				{
 					"key": "2120565",
 					"label": "Sminthurides malmgreni",
+					"synonyms": [
+						"Sminthurides cruciatus",
+						"Sminthurides dentospinalis",
+						"Sminthurides elegantulus",
+						"Sminthurides elegantulus malmgrenii",
+						"Sminthurides immaculatus",
+						"Sminthurides ludovicianus",
+						"Sminthurides maculatus",
+						"Sminthurides malgreni",
+						"Sminthurides malmegreni",
+						"Sminthurides malmgeni",
+						"Sminthurides malmgremi",
+						"Sminthurides malmgreni elegantulus",
+						"Sminthurides malmgreni dorsomaculatus",
+						"Sminthurides malmgreni elegantula",
+						"Sminthurides malmgreni immaculata",
+						"Sminthurides malmgreni maculata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120565",
 					"cascade": {
@@ -734,6 +805,24 @@
 				{
 					"key": "2120616",
 					"label": "Bourletiella hortensis",
+					"synonyms": [
+						"Achetidae myrmecophila",
+						"Bourletiella albamaculata",
+						"Bourletiella basalis",
+						"Bourletiella dorsalis",
+						"Bourletiella hortensis apicalis",
+						"Bourletiella hortensis folsomi",
+						"Bourletiella juvenilis",
+						"Bourletiella lineata",
+						"Bourletiella maturus",
+						"Bourletiella pruinosa",
+						"Bourletiella quadrisignatus",
+						"Bourletiella signata",
+						"Bourletiella viridis",
+						"Podura fusco-nigra",
+						"Podura signata",
+						"Sminthurus albamacula"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120616",
 					"cascade": {
@@ -743,6 +832,15 @@
 				{
 					"key": "2120633",
 					"label": "Bourletiella arvalis",
+					"synonyms": [
+						"Bourletiella hortensis hispanica",
+						"Bourletiella luteus",
+						"Bourletiella repandus",
+						"Deuterosminthurus neopandus",
+						"Smynthurus arvalis",
+						"Smynthurus roseus",
+						"Symnthurus arvalis"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120633",
 					"cascade": {
@@ -752,6 +850,16 @@
 				{
 					"key": "2120704",
 					"label": "Cyphoderus albinus",
+					"synonyms": [
+						"Beckia albinos",
+						"Beckia argenta",
+						"Beckia argentea",
+						"Camponotus albinos",
+						"Cyphodeirus albinos",
+						"Cyphodeirus albus",
+						"Cyphodeirus argenteus",
+						"Cyphodeirus argentus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120704",
 					"cascade": {
@@ -761,6 +869,25 @@
 				{
 					"key": "2120749",
 					"label": "Entomobrya muscorum",
+					"synonyms": [
+						"Degeeria muscorum",
+						"Entomobrya cognata",
+						"Entomobrya cognata albicans",
+						"Entomobrya cognata nigricans",
+						"Entomobrya intermedea elongata",
+						"Entomobrya intermedia",
+						"Entomobrya intermedia elongata",
+						"Entomobrya macrocerata",
+						"Entomobrya muscorum albina",
+						"Entomobrya muscorum puncticepta",
+						"Entomobrya muscorum punctincepta",
+						"Entomobrya muscorum nigricans",
+						"Entomobrya muscorum postbimaculata",
+						"Entomobrya muscorum-albina",
+						"Entomobrya muscorum-postbimaculata",
+						"Entomobrya nivalis",
+						"Entomobrya orcheselloides"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120749",
 					"cascade": {
@@ -770,6 +897,23 @@
 				{
 					"key": "2120754",
 					"label": "Entomobrya multifasciata",
+					"synonyms": [
+						"Degeeria corticalis",
+						"Degeeria decemfasciata",
+						"Degeeria disjuncta",
+						"Degeeria lanuginosa",
+						"Degeeria marginata",
+						"Degeeria multifasciata",
+						"Degeeria muscorum",
+						"Degeeria muscorum obscura",
+						"Degeeria nivalis",
+						"Entomobrya aurantiaca",
+						"Entomobrya decemfasciata",
+						"Entomobrya multifasciata nigra",
+						"Entomobrya multifasciatam",
+						"Entomobrya multifesita",
+						"Entomobrya nicoleti fasciata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120754",
 					"cascade": {
@@ -779,6 +923,19 @@
 				{
 					"key": "2120794",
 					"label": "Entomobrya atrocincta",
+					"synonyms": [
+						"Entomobrya atrocincta nigrocincta",
+						"Entomobrya atrocincta principalis",
+						"Entomobrya atrocincta prolineata",
+						"Entomobrya atrocincta aurata",
+						"Entomobrya atrocincta lineata",
+						"Entomobrya citrina",
+						"Entomobrya clitellaria newmani",
+						"Entomobrya clittellaria",
+						"Entomobrya flava",
+						"Entomobrya multifasciata",
+						"Entomobrya nigrocincta citrina"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120794",
 					"cascade": {
@@ -788,6 +945,15 @@
 				{
 					"key": "2120796",
 					"label": "Entomobrya nigrocincta",
+					"synonyms": [
+						"Entomobrya atrocincta",
+						"Entomobrya clitellaria",
+						"Entomobrya clitellaria australasia",
+						"Entomobrya clitellaria newmani",
+						"Entomobrya clittelaria",
+						"Entomobrya clittelaria newmani",
+						"Entomobrya nigrocincta canariensis"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120796",
 					"cascade": {
@@ -797,6 +963,13 @@
 				{
 					"key": "2120805",
 					"label": "Entomobrya albocincta",
+					"synonyms": [
+						"Degeeria albo-cincta",
+						"Degeeria cincta",
+						"Entomobrya albocerulea martini",
+						"Entomobrya clitellaria albocincta",
+						"Podura albo-cincta"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120805",
 					"cascade": {
@@ -806,6 +979,14 @@
 				{
 					"key": "2120806",
 					"label": "Entomobrya marginata",
+					"synonyms": [
+						"Entomobrya caerula",
+						"Entomobrya caerulea",
+						"Entomobrya marginata pallida",
+						"Entomobrya marginatam",
+						"Entomobrya maritima",
+						"Entomobrya multifasciata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120806",
 					"cascade": {
@@ -815,6 +996,19 @@
 				{
 					"key": "2120828",
 					"label": "Willowsia buski",
+					"synonyms": [
+						"Degeeria buski distincta",
+						"Degeeria cyanea",
+						"Degeeria pruni",
+						"Seira buskii",
+						"Sira buscki",
+						"Sira buski",
+						"Sira buskii",
+						"Sira busquii",
+						"Sira corticaloides",
+						"Sira flava",
+						"Willowsia buskii"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120828",
 					"cascade": {
@@ -824,6 +1018,22 @@
 				{
 					"key": "2120833",
 					"label": "Willowsia platani",
+					"synonyms": [
+						"Degeeria platani",
+						"Degeeria pulchella",
+						"Entomobrya multifasciata pulchella",
+						"Entomobrya multifasciata-pulchella",
+						"Entomobrya nicoleti-pulchella",
+						"Entomobrya pulchella",
+						"Podura argenteo cincta",
+						"Podura argenteo-cincta",
+						"Podura argentocincta",
+						"Seira platani",
+						"Sira corticalis",
+						"Sira flava",
+						"Sira nigromaculata",
+						"Sira plantani"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120833",
 					"cascade": {
@@ -833,6 +1043,21 @@
 				{
 					"key": "2120836",
 					"label": "Willowsia nigromaculata",
+					"synonyms": [
+						"Degeeria platani",
+						"Lepidocyrtus americanus",
+						"Seira mimica",
+						"Seira nigromaculata",
+						"Sira elongata",
+						"Sira mimica",
+						"Sira nigromaculata",
+						"Sira platani",
+						"Willowsia bimaculata",
+						"Willowsia mimica",
+						"Willowsia nigromaculata platani",
+						"Willowsia platani",
+						"Willowsia platani authors"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120836",
 					"cascade": {
@@ -842,6 +1067,24 @@
 				{
 					"key": "2120892",
 					"label": "Lepidocyrtus curvicollis",
+					"synonyms": [
+						"Cyphodeirus capucinus",
+						"Cyphodeirus ceneus",
+						"Cyphodeirus lignorum",
+						"Cyphodeirus pusillus",
+						"Cyphoderus capucinus",
+						"Lepidocyrtus boerneri",
+						"Lepidocyrtus borneri",
+						"Lepidocyrtus curvicolis",
+						"Lepidocyrtus curvicollis fuscicans",
+						"Lepidocyrtus curvicollis oribates",
+						"Lepidocyrtus curvicollis semiviolaceus",
+						"Lepidocyrtus fuscicans",
+						"Lepidocyrtus latzeli",
+						"Lepidocyrtus luteus",
+						"Lepidocyrtus neglectus",
+						"Lepidocyrtus oribates"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120892",
 					"cascade": {
@@ -851,6 +1094,17 @@
 				{
 					"key": "2120899",
 					"label": "Lepidocyrtus paradoxus",
+					"synonyms": [
+						"Cyphodeirus capucinus",
+						"Lepidocyrtus alleganyensis",
+						"Lepidocyrtus cephalopurpureus",
+						"Lepidocyrtus christianseni",
+						"Lepidocyrtus insignis",
+						"Lepidocyrtus paradaoxus",
+						"Lepidocyrtus paradoxas",
+						"Paidium cucullatum",
+						"Paidium curcullatum"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120899",
 					"cascade": {
@@ -860,6 +1114,14 @@
 				{
 					"key": "2120911",
 					"label": "Lepidocyrtus lignorum",
+					"synonyms": [
+						"Lepidocyrtus albicans",
+						"Lepidocyrtus argentatus",
+						"Lepidocyrtus lignolum",
+						"Lepidocyrtus lignorus",
+						"Lepidocyrtus ligonorum",
+						"Podura lignorum"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120911",
 					"cascade": {
@@ -869,6 +1131,19 @@
 				{
 					"key": "2120918",
 					"label": "Lepidocyrtus cyaneus",
+					"synonyms": [
+						"Isotoma violaceus",
+						"Lepidocyrtus anglicanus",
+						"Lepidocyrtus assimilis",
+						"Lepidocyrtus curvicollis-paradoxus-subgroup",
+						"Lepidocyrtus cyaneo",
+						"Lepidocyrtus cyaneus cinereus",
+						"Lepidocyrtus cyaneus principalis",
+						"Lepidocyrtus cyaneus assimilis",
+						"Lepidocyrtus cyanus",
+						"Lepidocyrtus elegantulus",
+						"Lepidocyrtus metallicus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120918",
 					"cascade": {
@@ -878,6 +1153,27 @@
 				{
 					"key": "2120964",
 					"label": "Orchesella cincta",
+					"synonyms": [
+						"Aetheocerus albo-cincta",
+						"Aetheocerus cingula",
+						"Aetheocerus vagus",
+						"Choreutes cingulatus",
+						"Heterotoma livida",
+						"Heterotoma pulchricornis",
+						"Heterotoma quadripunctata",
+						"Heterotoma septemguttata",
+						"Heterotoma septempunctata",
+						"Orchesella cincta principalis",
+						"Orchesella cincta juvenile",
+						"Orchesella cincta intermedia",
+						"Orchesella cincta mauritanica",
+						"Orchesella cincta obscura",
+						"Orchesella cincta pallida",
+						"Orchesella cincta rufa",
+						"Orchesella cincta silvatica",
+						"Orchesella cincta taurica",
+						"Orchesella cincta thoracoarcuata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2120964",
 					"cascade": {
@@ -887,6 +1183,25 @@
 				{
 					"key": "2121008",
 					"label": "Heteromurus nitidus",
+					"synonyms": [
+						"Degeeria margaritacea",
+						"Heteroma crystallina",
+						"Heteromurus albus",
+						"Heteromurus americana",
+						"Heteromurus armapollerae",
+						"Heteromurus cavernicolus",
+						"Heteromurus clayae",
+						"Heteromurus crystallina",
+						"Heteromurus gradgensis",
+						"Heteromurus hirsutus",
+						"Heteromurus margaritatus",
+						"Heteromurus nididus",
+						"Heteromurus nitida",
+						"Heteromurus nitidus albicans",
+						"Heteromurus nitidus armapollerae",
+						"Heteromurus nitidus brevicornis",
+						"Heteromurus nitidus margaritarius"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121008",
 					"cascade": {
@@ -896,6 +1211,27 @@
 				{
 					"key": "2121271",
 					"label": "Ceratophysella denticulata",
+					"synonyms": [
+						"Achorutes armata cuspidate",
+						"Achorutes armatus",
+						"Achorutes armatus cuspidatus",
+						"Achorutes cuspidata",
+						"Achorutes denticulatus",
+						"Achorutes distinguendus",
+						"Achorutes scotica",
+						"Ceratophysella communis exilis",
+						"Ceratophysella denticula",
+						"Ceratophysella denticulada",
+						"Ceratophysella denticulate",
+						"Ceratophysella distinguenda",
+						"Ceratophysella exilis",
+						"Hypogastrura afghanistanensis",
+						"Hypogastrura communis exilis",
+						"Hypogastrura deniculata",
+						"Hypogastrura denticulata",
+						"Hypogastrura engadinensis",
+						"Hypogastrura exilis"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121271",
 					"cascade": {
@@ -905,6 +1241,15 @@
 				{
 					"key": "2121303",
 					"label": "Ceratophysella longispina",
+					"synonyms": [
+						"Achorutes longispinis",
+						"Achorutes longispinus",
+						"Ceratophysella arctica",
+						"Ceratophysella hirsuta",
+						"Hypogastrura hirsuta",
+						"Hypogastrura longispina trispina",
+						"Hypogastrura longispinus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121303",
 					"cascade": {
@@ -914,6 +1259,27 @@
 				{
 					"key": "2121447",
 					"label": "Hypogastrura viatica",
+					"synonyms": [
+						"Achorutes dubius",
+						"Achorutes murorum",
+						"Achorutes muscorum",
+						"Achorutes pseudoviaticus",
+						"Achorutes similutas",
+						"Achorutes sub-viaticus",
+						"Achorutes subviaticus",
+						"Achorutes titahiensis",
+						"Achorutes viatica inermis",
+						"Achorutes viaticus trispina",
+						"Achorutes viaticus maculosa",
+						"Hypogastrura antarctica",
+						"Hypogastrura aquatic",
+						"Hypogastrura aquatica",
+						"Hypogastrura muralis",
+						"Hypogastrura murorum",
+						"Hypogastrura pseudoviatica",
+						"Hypogastrura similata",
+						"Hypogastrura subviatica"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121447",
 					"cascade": {
@@ -923,6 +1289,22 @@
 				{
 					"key": "2121891",
 					"label": "Tomocerus minor",
+					"synonyms": [
+						"Choreutes plumbea",
+						"Choreutes plumbeus",
+						"Macrotoma celer",
+						"Macrotoma minor",
+						"Macrotoma plumbea",
+						"Macrotoma tridentifera",
+						"Podura plumbaea",
+						"Podura plumbea",
+						"Podurides poduraplumbea",
+						"Tomocerus minor orcina",
+						"Tomocerus minor noricus",
+						"Tomocerus norvegicus",
+						"Tomocerus plumbeus",
+						"Tomocerus tridentiferus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121891",
 					"cascade": {
@@ -932,6 +1314,14 @@
 				{
 					"key": "2121897",
 					"label": "Tomocerus vulgaris",
+					"synonyms": [
+						"Macrotoma nigra",
+						"Macrotoma vulgaris",
+						"Tomocerus minutus",
+						"Tomocerus niger",
+						"Tomocerus plumbea",
+						"Tomocerus vulgaris kurilensis"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121897",
 					"cascade": {
@@ -941,6 +1331,22 @@
 				{
 					"key": "2121936",
 					"label": "Brachystomella parvula",
+					"synonyms": [
+						"Brachystomella crassicornis",
+						"Brachystomella maritima",
+						"Brachystomella maritime",
+						"Brachystomella media",
+						"Brachystomella terrafolia",
+						"Brachystomella wahlgreni",
+						"Chondrachorutes wahlgreni",
+						"Schoetella crassicornis",
+						"Schoettella albomaculata",
+						"Schoettella crassicornis",
+						"Schoettella media",
+						"Schoettella minor",
+						"Schoettella parvula",
+						"Schottella parvula"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121936",
 					"cascade": {
@@ -950,6 +1356,15 @@
 				{
 					"key": "2121989",
 					"label": "Anurida maritima",
+					"synonyms": [
+						"Achorutes maritimus",
+						"Anura marina",
+						"Anura maritima",
+						"Anurida bisetosa",
+						"Anurida maritime",
+						"Anurida megalops",
+						"Lipura maritima"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2121989",
 					"cascade": {
@@ -959,6 +1374,25 @@
 				{
 					"key": "2122079",
 					"label": "Neanura muscorum",
+					"synonyms": [
+						"Achonetes taberculatus",
+						"Achorutes muscorum",
+						"Achorutes tuberculatus",
+						"Anoura crassicornis",
+						"Anoura nigra",
+						"Anoura sextuberculata",
+						"Anura gibbosa",
+						"Anura nigra",
+						"Blax ater",
+						"Neanura alpestris",
+						"Neanura betulae",
+						"Neanura gibbosa",
+						"Neanura muscorum alpestris",
+						"Neanura muscorum purpurascens",
+						"Neanura persimilis",
+						"Neanura sextuberculata",
+						"Neanura tuberculata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122079",
 					"cascade": {
@@ -968,6 +1402,20 @@
 				{
 					"key": "2122146",
 					"label": "Podura aquatica",
+					"synonyms": [
+						"Achorutes dubius",
+						"Hypogastrura aquatica",
+						"Podura aquatic",
+						"Podura aquatica mimula",
+						"Podura aquatica ferruginea",
+						"Podura aquatica nigripes",
+						"Podura aquaticae",
+						"Podura aquaticus",
+						"Podura aqvatica",
+						"Podura atra aquatica",
+						"Podura granulata",
+						"Podura viatica"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122146",
 					"cascade": {
@@ -977,6 +1425,15 @@
 				{
 					"key": "2122151",
 					"label": "Megalothorax minimus",
+					"synonyms": [
+						"Amerus normani",
+						"Amerus normanni",
+						"Megalothorax miniumus",
+						"Megalothorax normani",
+						"Megalothorax tristani",
+						"Megolothorax mimimus",
+						"Neelus maculosus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122151",
 					"cascade": {
@@ -986,6 +1443,11 @@
 				{
 					"key": "2122157",
 					"label": "Neelus murinus",
+					"synonyms": [
+						"Megalothorax minimus",
+						"Megalothorax murinus bolivari",
+						"Neelus minimus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122157",
 					"cascade": {
@@ -995,6 +1457,21 @@
 				{
 					"key": "2122214",
 					"label": "Sminthurinus elegans",
+					"synonyms": [
+						"Sminthurinus aureus ornata",
+						"Sminthurinus aureus transversalis",
+						"Sminthurinus aureus atrata",
+						"Sminthurinus aureus dorsalis",
+						"Sminthurinus cancellatus",
+						"Sminthurinus elegans cancellus",
+						"Sminthurinus elegans atratus",
+						"Sminthurinus elegans ochropus",
+						"Sminthurinus elegans ornata",
+						"Sminthurinus similitortus",
+						"Sminthurus aureus ornata",
+						"Sminthurus aureus ornatous",
+						"Sminthurus elegans"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122214",
 					"cascade": {
@@ -1004,6 +1481,15 @@
 				{
 					"key": "2122217",
 					"label": "Sminthurinus niger",
+					"synonyms": [
+						"Sminthurinus albifrons",
+						"Sminthurinus aureus alba",
+						"Sminthurinus concolor",
+						"Sminthurinus quadrimaculatus",
+						"Sminthurus bimaculatus",
+						"Smynthurus concolor",
+						"Smynthurus niger"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122217",
 					"cascade": {
@@ -1013,6 +1499,26 @@
 				{
 					"key": "2122282",
 					"label": "Dicyrtomina minuta",
+					"synonyms": [
+						"Dicyrtoma atropurpurea",
+						"Dicyrtoma dorsi-maculata",
+						"Dicyrtoma dorsimalulata",
+						"Dicyrtoma labellei",
+						"Dicyrtoma minuta typica",
+						"Dicyrtoma variabilis",
+						"Dicyrtomina atropurpureus",
+						"Dicyrtomina labellei",
+						"Dicyrtomina nigromaculata",
+						"Papirius coulonii",
+						"Papirius minuto",
+						"Papirius minutus",
+						"Papirius minutus fusca",
+						"Papirius minutus pulchella",
+						"Papirius minutus quadrimaculata",
+						"Papirius nigromaculatus",
+						"Podura minuta",
+						"Podura signata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/2122282",
 					"cascade": {
@@ -1022,6 +1528,19 @@
 				{
 					"key": "4536978",
 					"label": "Dicyrtomina saundersi",
+					"synonyms": [
+						"Dicyrtoma minuta",
+						"Dicyrtoma minuta principalis",
+						"Dicyrtoma minuta meridionalis",
+						"Dicyrtoma saundersi",
+						"Dicyrtomina meridionalis",
+						"Dicyrtomina minuta",
+						"Dicyrtomina minuta ornata",
+						"Dicyrtomina saundersi ornata",
+						"Papirius minutus ornata",
+						"Papirius minutus ornatus",
+						"Papirius ornatus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4536978",
 					"cascade": {
@@ -1031,6 +1550,25 @@
 				{
 					"key": "4536981",
 					"label": "Dicyrtomina ornata",
+					"synonyms": [
+						"Dicyrtoma dorsi-maculata",
+						"Dicyrtoma dorsimaculata maculata",
+						"Dicyrtoma ornata",
+						"Dicyrtoma signatus",
+						"Dicyrtomina carpenteri",
+						"Dicyrtomina couloni",
+						"Dicyrtomina labellei",
+						"Dicyrtomina minuta coulonii",
+						"Dicyrtomina minuta ornatus",
+						"Dicyrtomina minuta-couloni",
+						"Dicyrtomina minuta-ornata",
+						"Dicyrtomina ornata couloni",
+						"Dicyrtomina ornate",
+						"Papirius carpenteri",
+						"Papirius ornato",
+						"Papirius saundersii",
+						"Ptenothrix carpenteri"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4536981",
 					"cascade": {
@@ -1040,6 +1578,26 @@
 				{
 					"key": "4536992",
 					"label": "Dicyrtoma fusca",
+					"synonyms": [
+						"Dicyrtoma albella",
+						"Dicyrtoma atro-purpurea",
+						"Dicyrtoma atropurpurea",
+						"Dicyrtoma cursor",
+						"Dicyrtoma fusca fenestratus",
+						"Dicyrtoma fusca typica",
+						"Dicyrtoma fusca silvatica",
+						"Dicyrtoma fusca maculifera",
+						"Dicyrtoma fusca rufescens",
+						"Papirius coursor",
+						"Papirius cursor",
+						"Papirius cursore",
+						"Papirius fusco",
+						"Papirius fuscus",
+						"Papirius fuscus principalis",
+						"Papirius longicornis",
+						"Papirius silvaticus",
+						"Podura atra"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4536992",
 					"cascade": {
@@ -1049,6 +1607,26 @@
 				{
 					"key": "4537006",
 					"label": "Deuterosminthurus bicinctus",
+					"synonyms": [
+						"Bourletiella flava",
+						"Burletiella sulphurea",
+						"Deuterosminthurus bicinctus flava",
+						"Deuterosminthurus bicinctus repanda",
+						"Deuterosminthurus bicinctus pallipes",
+						"Deuterosminthurus bicinctus puncteola",
+						"Deuterosminthurus cinctus",
+						"Deuterosminthurus flava",
+						"Sminthurus bicinctus",
+						"Sminthurus cinctus",
+						"Sminthurus lupulinae",
+						"Sminthurus luteus",
+						"Sminthurus novemlineatus",
+						"Sminthurus oblongus minor",
+						"Sminthurus pallipes",
+						"Sminthurus speciosus",
+						"Smynthurus bicinctus",
+						"Smynthurus luteus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537006",
 					"cascade": {
@@ -1058,6 +1636,24 @@
 				{
 					"key": "4537010",
 					"label": "Deuterosminthurus pallipes",
+					"synonyms": [
+						"Bourletiella mixta",
+						"Deuterosminthurus beckeri",
+						"Deuterosminthurus bellingeri",
+						"Deuterosminthurus bicinctus",
+						"Deuterosminthurus bicinctus repanda",
+						"Deuterosminthurus feneysi",
+						"Deuterosminthurus fenyesi",
+						"Deuterosminthurus pallipes repanda",
+						"Deuterosminthurus repanda",
+						"Deuterosminthurus repandus",
+						"Sminthurus atratus",
+						"Sminthurus luteus",
+						"Sminthurus ochraceus",
+						"Sminthurus palliceps",
+						"Sminthurus pallipes",
+						"Smynthurus echii"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537010",
 					"cascade": {
@@ -1067,6 +1663,14 @@
 				{
 					"key": "4537070",
 					"label": "Fasciosminthurus quinquefasciatus",
+					"synonyms": [
+						"Bourletiella zebrina",
+						"Deuterosminthurus cinquefasciatus",
+						"Deuterosminthurus quinquefasciatus",
+						"Prorastriopes cinquefasciatus",
+						"Sminthurus quinquefasciatus",
+						"Sminthurus zebrinus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537070",
 					"cascade": {
@@ -1076,6 +1680,25 @@
 				{
 					"key": "4537098",
 					"label": "Sminthurides aquaticus",
+					"synonyms": [
+						"Sminthurides amicus",
+						"Sminthurides aquatica levanderi",
+						"Sminthurides aquaticus principalis",
+						"Sminthurides aquaticus levanderis",
+						"Sminthurides aquaticus viridula",
+						"Sminthurus amicus",
+						"Sminthurus apicalis",
+						"Sminthurus apicalis principalis",
+						"Sminthurus apicalis levanderi",
+						"Sminthurus apicalis viridulus",
+						"Sminthurus apiculis",
+						"Sminthurus aquaticus",
+						"Sminthurus aquaticus levanderi",
+						"Sminthurus aquaticus viridulus",
+						"Sminthurus aqvaticus",
+						"Smynthurus amicus",
+						"Smynthurus aquaticus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537098",
 					"cascade": {
@@ -1085,6 +1708,16 @@
 				{
 					"key": "4537112",
 					"label": "Sminthurides penicillifer",
+					"synonyms": [
+						"Sminthurides pauliani",
+						"Sminthurides penicilifer",
+						"Sminthurides penicillifer incomota",
+						"Sminthurides penicillifer incompta",
+						"Sminthurides penicillifer typica",
+						"Sminthurides penicillifer incompacta",
+						"Sminthurus penicillifer",
+						"Sminthurus penicillifer incompta"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537112",
 					"cascade": {
@@ -1094,6 +1727,7 @@
 				{
 					"key": "4537137",
 					"label": "Sminthurinus lawrencei",
+					"synonyms": [],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537137",
 					"cascade": {
@@ -1103,6 +1737,15 @@
 				{
 					"key": "4537152",
 					"label": "Sminthurinus trinotatus",
+					"synonyms": [
+						"Sminthurinus aureus bimaculata",
+						"Sminthurinus bifavopunctatus",
+						"Sminthurinus fenestratus",
+						"Sminthurinus igniceps trinotata",
+						"Sminthurinus igniceps trinotatus",
+						"Sminthurinus trinotatus incompleta",
+						"Sminthurus biflavopunctatus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537152",
 					"cascade": {
@@ -1112,6 +1755,24 @@
 				{
 					"key": "4537246",
 					"label": "Allacma fusca",
+					"synonyms": [
+						"Allacma ater",
+						"Allacma buski",
+						"Allacma fusca pardalina",
+						"Allacma fusca picea",
+						"Dicyrtoma fusca",
+						"Podura atra",
+						"Podura fusca",
+						"Podura fusco-nigra",
+						"Podura globosa",
+						"Sminthurus fuscus",
+						"Sminthurus fuscus pustulatea",
+						"Sminthurus fuscus albiceps",
+						"Sminthurus fuscus pustulatus",
+						"Sminthurus plumbeus",
+						"Sminthurus purpurascens",
+						"Smynthurus buskii"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537246",
 					"cascade": {
@@ -1121,6 +1782,15 @@
 				{
 					"key": "4537257",
 					"label": "Caprainea marginata",
+					"synonyms": [
+						"Caprainea echinata",
+						"Caprainea marginata bremondialis",
+						"Sminthurus echinatus",
+						"Sminthurus erinaceus",
+						"Sminthurus marginatus",
+						"Sminthurus marginatus cineraceus",
+						"Sminthurus marginatus cinereus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537257",
 					"cascade": {
@@ -1130,6 +1800,16 @@
 				{
 					"key": "4537269",
 					"label": "Vitronura giselae",
+					"synonyms": [
+						"Achorutes roseus",
+						"Anoura rosea",
+						"Anura rosea",
+						"Biloba rosea",
+						"Metanura pygmaea",
+						"Neanura giselae",
+						"Neanura mandarina",
+						"Neanura rosea"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537269",
 					"cascade": {
@@ -1139,6 +1819,16 @@
 				{
 					"key": "4537275",
 					"label": "Bilobella aurantiaca",
+					"synonyms": [
+						"Achorutes aurantiacus",
+						"Achorutes aurantica",
+						"Bilobella auratiaca",
+						"Bilobella auriantaca",
+						"Bilobella burgalensis",
+						"Neanura aurantiaca",
+						"Neanura aurantica",
+						"Neanura pyrenaea"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537275",
 					"cascade": {
@@ -1148,6 +1838,7 @@
 				{
 					"key": "4537282",
 					"label": "Bilobella braunerae",
+					"synonyms": [],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537282",
 					"cascade": {
@@ -1157,6 +1848,12 @@
 				{
 					"key": "4537334",
 					"label": "Monobella grassei",
+					"synonyms": [
+						"Achorutes grassei",
+						"Bilobella grassei",
+						"Neanura graccei",
+						"Neanura grassei"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4537334",
 					"cascade": {
@@ -1166,6 +1863,14 @@
 				{
 					"key": "4538009",
 					"label": "Kalaphorura burmeisteri",
+					"synonyms": [
+						"Aphorura burmeisteri",
+						"Aphorura paradoxa",
+						"Kalaphorura paradoxa",
+						"Kalaphorura tuberculata",
+						"Lipura burmeisteri",
+						"Lipura tuberculata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4538009",
 					"cascade": {
@@ -1175,6 +1880,11 @@
 				{
 					"key": "4538730",
 					"label": "Pogonognathellus flavescens",
+					"synonyms": [
+						"Macrotoma flavescens",
+						"Tomocerus flavescens",
+						"Tomocerus separatus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4538730",
 					"cascade": {
@@ -1184,6 +1894,23 @@
 				{
 					"key": "4538732",
 					"label": "Pogonognathellus longicornis",
+					"synonyms": [
+						"Architomocerura litsteriana",
+						"Macrotoma ferruginea",
+						"Macrotoma ferruginosa",
+						"Macrotoma rufescens",
+						"Macrotoma spiricornis",
+						"Podura bicolor",
+						"Podura iricolor",
+						"Podura longicornis",
+						"Podura plumbea",
+						"Pogonognathellus logicornis",
+						"Pogonognathus plumbeus",
+						"Tomocerus litsterianus",
+						"Tomocerus longicornes",
+						"Tomocerus longicornis",
+						"Tomocerus plombeus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4538732",
 					"cascade": {
@@ -1193,6 +1920,7 @@
 				{
 					"key": "4539043",
 					"label": "Isotomurus gallicus",
+					"synonyms": ["Isotomurus balteatus", "Isotomurus palustris balteata"],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539043",
 					"cascade": {
@@ -1202,6 +1930,11 @@
 				{
 					"key": "4539049",
 					"label": "Isotomurus unifasciatus",
+					"synonyms": [
+						"Isotoma palustris unifasciata",
+						"Isotoma unifasciata",
+						"Isotomurus palustris unifasciata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539049",
 					"cascade": {
@@ -1211,6 +1944,7 @@
 				{
 					"key": "4539244",
 					"label": "Lepidocyrtus fimetarius",
+					"synonyms": [],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539244",
 					"cascade": {
@@ -1220,6 +1954,18 @@
 				{
 					"key": "4539297",
 					"label": "Seira ferrarii",
+					"synonyms": [
+						"Lepidocyrtinus italicus",
+						"Seira arenaria",
+						"Seira banuylensis",
+						"Seira banylensis",
+						"Seira ferraii",
+						"Seira ferrari",
+						"Seira ferruginea",
+						"Seira petrae",
+						"Sira banyulensis",
+						"Sira ferrari"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539297",
 					"cascade": {
@@ -1229,6 +1975,23 @@
 				{
 					"key": "4539584",
 					"label": "Entomobrya nicoleti",
+					"synonyms": [
+						"Degeeria nicoletii",
+						"Entomobrya aurantiaca",
+						"Entomobrya bimaculata",
+						"Entomobrya corticalis pallida",
+						"Entomobrya lanuginosa",
+						"Entomobrya muscorum",
+						"Entomobrya muscorum obscura",
+						"Entomobrya nicoleti aegyptiaca",
+						"Entomobrya nicoleti principalis",
+						"Entomobrya nicoleti typica",
+						"Entomobrya nicoleti obscura",
+						"Entomobrya nicoletii",
+						"Entomobrya nivalis",
+						"Entomobrya nivalis maculata",
+						"Mydonius nivalis nicoletii"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539584",
 					"cascade": {
@@ -1238,6 +2001,7 @@
 				{
 					"key": "4539594",
 					"label": "Entomobrya superba",
+					"synonyms": ["Calistella reinhardi", "Degeeria superba"],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539594",
 					"cascade": {
@@ -1247,6 +2011,12 @@
 				{
 					"key": "4539597",
 					"label": "Entomobrya corticalis",
+					"synonyms": [
+						"Entomobrya corticalem",
+						"Entomobrya corticali",
+						"Entomobrya corticalis principalis",
+						"Entomobrya ligata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539597",
 					"cascade": {
@@ -1256,6 +2026,25 @@
 				{
 					"key": "4539661",
 					"label": "Orchesella flavescens",
+					"synonyms": [
+						"Aetheocerus dimidiatus",
+						"Aetheocerus quinquefasciatus",
+						"Aetheocerus rubrofasciatus",
+						"Aetheocerus rufofasciatus",
+						"Degeeria variegata",
+						"Heterotoma flavescens",
+						"Heterotoma musci",
+						"Orchesella crassicornis",
+						"Orchesella flavescens lateralis",
+						"Orchesella flavescens medialis",
+						"Orchesella flavescens triangulimaculata",
+						"Orchesella flavescens quinquelineata",
+						"Orchesella kervillei",
+						"Orchesella melanocephala",
+						"Orchesella melapocephala",
+						"Orchesella milanocephila",
+						"Orchesella nigro-maculata"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539661",
 					"cascade": {
@@ -1265,6 +2054,13 @@
 				{
 					"key": "4539682",
 					"label": "Orchesella quinquefasciata",
+					"synonyms": [
+						"Orchesella quinquefaciata",
+						"Orchesella quinquefasciata postarcuata",
+						"Orchesella villosa",
+						"Orchesella villosa atrofrontalis",
+						"Orchesella villosa devergens"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539682",
 					"cascade": {
@@ -1274,6 +2070,20 @@
 				{
 					"key": "4539722",
 					"label": "Heteromurus major",
+					"synonyms": [
+						"Heteromurus caerulescens",
+						"Heteromurus caucasicus",
+						"Heteromurus coerulescens",
+						"Heteromurus melitensis",
+						"Heteromurus melittensis",
+						"Heteromurus mexicanus",
+						"Lepidocyrtus lundbladi",
+						"Podura plumbea",
+						"Podura plumbeo",
+						"Podura teres",
+						"Podura violacea",
+						"Templetonia major"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/4539722",
 					"cascade": {
@@ -1283,6 +2093,26 @@
 				{
 					"key": "5166886",
 					"label": "Isotoma viridis",
+					"synonyms": [
+						"Desoria fusia",
+						"Desoria riparia",
+						"Heterotoma chlorata",
+						"Heterotoma cylindricum",
+						"Isotama nicoletii",
+						"Isotoma annulata",
+						"Isotoma arborea",
+						"Isotoma belfragei",
+						"Isotoma capitola",
+						"Isotoma catena",
+						"Isotoma cincta",
+						"Isotoma ciridis",
+						"Isotoma desmarestii",
+						"Isotoma glauca",
+						"Isotoma hibernica",
+						"Isotoma lineata",
+						"Isotoma montana",
+						"Isotoma nicolet"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/5166886",
 					"cascade": {
@@ -1292,6 +2122,7 @@
 				{
 					"key": "5167064",
 					"label": "Sminthurus viridis",
+					"synonyms": ["Podura viridis"],
 					"description": "",
 					"learnMore": "https://gbif.org/species/5167064",
 					"cascade": {
@@ -1301,6 +2132,17 @@
 				{
 					"key": "7446310",
 					"label": "Dicyrtomina flavosignata",
+					"synonyms": [
+						"? flavosignata",
+						"Dicyrtoma lucasii",
+						"Dicyrtoma minuta flavescens",
+						"Dicyrtomina minuta flavosignata",
+						"Dicyrtomina variabilis",
+						"Papirius flavo-signato",
+						"Papirius flavo-signatus",
+						"Papirius flavosignatus cinerascens",
+						"Papirius flavosignatus orcina"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/7446310",
 					"cascade": {
@@ -1310,6 +2152,15 @@
 				{
 					"key": "7641902",
 					"label": "Isotoma riparia",
+					"synonyms": [
+						"Desoria riparia",
+						"Isotoma aquaticum griseum",
+						"Isotoma palustre",
+						"Isotoma riparium",
+						"Isotoma viridis aquatilis",
+						"Podura aquatica grisea",
+						"Podura palustris"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/7641902",
 					"cascade": {
@@ -1319,6 +2170,7 @@
 				{
 					"key": "9217813",
 					"label": "Orchesella villosa",
+					"synonyms": ["Podura villosa"],
 					"description": "",
 					"learnMore": "https://gbif.org/species/9217813",
 					"cascade": {
@@ -1328,6 +2180,25 @@
 				{
 					"key": "9616579",
 					"label": "Vertagopus asiaticus",
+					"synonyms": [
+						"Desoria cylindrica",
+						"Desoria pallida",
+						"Isotoma arborea",
+						"Isotoma denticulata",
+						"Isotoma ianthina",
+						"Isotoma rubicauda",
+						"Isotoma rubricauda",
+						"Isotoma synonymica",
+						"Isotoma terminata",
+						"Isotoma viatica",
+						"Isotoma violacea",
+						"Podura annularis",
+						"Podura arborea",
+						"Podura fuliginosa",
+						"Podura nemotrosa",
+						"Podura oblonga nigra",
+						"Vertagopus arborea"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/9616579",
 					"cascade": {
@@ -1337,6 +2208,15 @@
 				{
 					"key": "10038254",
 					"label": "Orchesella bifasciata",
+					"synonyms": [
+						"Orchesella aureola",
+						"Orchesella aureola dolomitica",
+						"Orchesella bifasciata atra",
+						"Orchesella bifasciata genuina",
+						"Orchesella bifasciata intermedia",
+						"Orchesella bifasciata multifasciata",
+						"Orchesella bifasciata obscura"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/10038254",
 					"cascade": {
@@ -1346,6 +2226,7 @@
 				{
 					"key": "10765511",
 					"label": "Dicyrtomina signata",
+					"synonyms": [],
 					"description": "",
 					"learnMore": "https://gbif.org/species/10765511",
 					"cascade": {
@@ -1355,6 +2236,24 @@
 				{
 					"key": "10848695",
 					"label": "Seira musarum",
+					"synonyms": [
+						"Cyphodeirus longicornis",
+						"Cyphoderus longicornis",
+						"Degeeria domestica",
+						"Degeeria elongata",
+						"Degeeria erudita",
+						"Degeeria fenestrarum",
+						"Degeeria nigromaculata",
+						"Drepanocyrtus dowlingeri",
+						"Drepanocyrtus dowlingi",
+						"Entomobrya fenestrarum",
+						"Isotoma cursitans",
+						"Isotoma faenestrarum",
+						"Isotoma fenestrarum",
+						"Lepidocyrtinus domesticus",
+						"Lepidocyrtinus gridelli",
+						"Lepidocyrtinus gridellii"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/10848695",
 					"cascade": {
@@ -1364,6 +2263,25 @@
 				{
 					"key": "10915874",
 					"label": "Entomobrya nivalis",
+					"synonyms": [
+						"Degeeria lanuginosa",
+						"Degeeria minuta",
+						"Degeeria nigro-maculata",
+						"Degeeria nigromaculata",
+						"Degeeria nivalis interrupta",
+						"Degeeria nivalis montana",
+						"Degeeria pi",
+						"Entomobrya annulata",
+						"Entomobrya cognata",
+						"Entomobrya decemfasciata",
+						"Entomobrya disjuncta",
+						"Entomobrya flava",
+						"Entomobrya lanuginosa-muscorum",
+						"Entomobrya multifasciata",
+						"Entomobrya muscorum obscura",
+						"Entomobrya muscorum obscurior",
+						"Entomobrya muscorum pallida"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/10915874",
 					"cascade": {
@@ -1373,6 +2291,24 @@
 				{
 					"key": "10934196",
 					"label": "Isotomurus palustris",
+					"synonyms": [
+						"Aetheocerus aquaticus",
+						"Degeeria pi",
+						"Desoria riparia",
+						"Isotoma aequalis",
+						"Isotoma balteata",
+						"Isotoma lineata",
+						"Isotoma maculata",
+						"Isotoma palustris",
+						"Isotoma palustris cincta",
+						"Isotoma palustris pallida",
+						"Isotoma palustris spilosoma",
+						"Isotoma pulustris",
+						"Isotoma spilosoma",
+						"Isotoma stuxbergii",
+						"Isotoma tricolor",
+						"Isotoma tullbergi"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/10934196",
 					"cascade": {
@@ -1382,6 +2318,20 @@
 				{
 					"key": "10990673",
 					"label": "Sminthurinus aureus",
+					"synonyms": [
+						"Metakatianna anglicana",
+						"Sminthurinus albus",
+						"Sminthurinus anglicanus",
+						"Sminthurinus aureus atratus",
+						"Sminthurinus aureus alba",
+						"Sminthurinus aureus apigmentatus",
+						"Sminthurinus aureus atrata",
+						"Sminthurinus aureus cyaneus",
+						"Sminthurinus aureus fusca",
+						"Sminthurinus aureus maculata",
+						"Sminthurinus aureus reticulatus",
+						"Sminthurinus aureus ochropus"
+					],
 					"description": "",
 					"learnMore": "https://gbif.org/species/10990673",
 					"cascade": {

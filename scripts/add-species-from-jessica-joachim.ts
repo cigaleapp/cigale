@@ -1,9 +1,8 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { formatDuration, intervalToDuration } from 'date-fns';
-import { JSDOM } from 'jsdom';
+import { intervalToDuration } from 'date-fns';
 import * as jsdom from 'jsdom';
-import RSSParser from 'rss-parser';
+import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
@@ -31,7 +30,6 @@ virtualConsole.on('error', (e) => {
 
 const here = import.meta.dirname;
 const protocolPath = path.join(here, '../examples/arthropods.cigaleprotocol.json');
-const rss = new RSSParser();
 const tdown = new Turndown();
 let speciesLinks: Map<string, URL> | undefined;
 // For some reason Turndown#turndown is typed as string instead of a method returning string
@@ -62,8 +60,8 @@ async function augmentProtocol(
 	let done = 0;
 	let processed = 0;
 	const eta = new EtaCalculator({
-		averageOver: 10,
-		totalSteps: 1_750 // TODO use percentage advancement instead of hardcoded number
+		averageOver: 50,
+		totalSteps: 1_850 // TODO use percentage advancement instead of hardcoded number
 	});
 
 	total = protocolSpecies.length;
@@ -72,7 +70,7 @@ async function augmentProtocol(
 
 		if (limit > 0 && done > limit) break;
 
-		const pageUrl = await searchForSpecies(s.label);
+		const pageUrl = await searchForSpecies(s.label, ...s.synonyms);
 		if (!pageUrl) {
 			// console.warn(yellow(`⁄ Could not find page for species ${s.label}`));
 			continue;
@@ -106,7 +104,7 @@ async function augmentProtocol(
 	return augmented;
 }
 
-async function searchForSpecies(name: string): Promise<URL | null> {
+async function searchForSpecies(...names: string[]): Promise<URL | null> {
 	speciesLinks ??= await fetchAndParseHtml(new URL(`/identification`, ORIGIN)).then(
 		(doc) =>
 			new Map(
@@ -126,7 +124,7 @@ async function searchForSpecies(name: string): Promise<URL | null> {
 		if (LINKS_TO_AVOID.includes(link.href)) {
 			continue;
 		}
-		if (blogTitleMatchesSpeciesName(title, name)) {
+		if (blogTitleMatchesSpeciesName(title, names)) {
 			return link;
 		}
 	}
@@ -204,14 +202,14 @@ declare global {
 	}
 }
 
-function blogTitleMatchesSpeciesName(title: string, name: string): boolean {
+function blogTitleMatchesSpeciesName(title: string, names: string[]): boolean {
 	const normalize = (str: string) => str.trim().toLowerCase();
 
-	const candidates = [
+	const candidates = names.flatMap((name) => [
 		new RegExp(`^${RegExp.escape(name)}$`, 'i'),
 		new RegExp(`^.+ \\(${RegExp.escape(name)}\\)$`, 'i'),
 		new RegExp(`^${RegExp.escape(name)} \\(.+\\)$`, 'i')
-	];
+	]);
 
 	for (const candidate of candidates) {
 		if (candidate.test(normalize(title))) {
