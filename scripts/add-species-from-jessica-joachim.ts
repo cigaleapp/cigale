@@ -1,5 +1,6 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { type } from 'arktype';
 import { intervalToDuration } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
@@ -13,7 +14,11 @@ const LINKS_TO_AVOID = [
 	// FIXME redirects to an image file
 	'https://jessica-joachim.com/insectes/dipteres/syrphidae/paragus-pecchiolii/',
 	// FIXME 404 not found
-	'https://jessica-joachim.com/insectes/dipteres/syrphidae/eupeodes-luniger/'
+	'https://jessica-joachim.com/insectes/dipteres/syrphidae/eupeodes-luniger/',
+	// FIXME 404 not found
+	'https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/curculionidae/aulacobaris-sp/',
+	// FIXME redirects to an image file
+	'https://jessica-joachim.com/insectes/coleopteres-scarabees-coccinelles/chrysomelidae/timarcha-sp/'
 ];
 
 const cleanedTextContent = (node: Element) =>
@@ -43,43 +48,52 @@ if (import.meta.main) {
 }
 
 async function main() {
-	const augmented = await augmentProtocol(protocol);
+	const metadataKey = type('"genus" | "species"').assert(process.argv[2]);
+
+	const augmented = await augmentMetadata(
+		protocol,
+		metadataKey,
+		metadataKey === 'species' ? searchForSpecies : searchForGenus
+	);
+
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
 	await Bun.$`bunx prettier --write ${protocolPath}`;
 }
 
-async function augmentProtocol(
+async function augmentMetadata(
 	protocol: typeof ExportedProtocol.infer,
+	metadataKey: 'genus' | 'species',
+	search: (...names: string[]) => Promise<URL | null>,
 	limit = -1
 ): Promise<typeof ExportedProtocol.infer> {
 	const augmented = structuredClone(protocol);
-	const protocolSpecies =
-		augmented.metadata['io.github.cigaleapp.arthropods.example__species'].options!;
+	const metadataOptions = augmented.metadata[`${protocol.id}__${metadataKey}`].options!;
 
 	let total = 0;
 	let done = 0;
 	let processed = 0;
 	const eta = new EtaCalculator({
-		averageOver: 50,
-		totalSteps: 1_850 // TODO use percentage advancement instead of hardcoded number
+		averageOver: 300,
+		// TODO use percentage advancement instead of hardcoded number
+		totalSteps: { species: 1850, genus: 345 }[metadataKey]
 	});
 
-	total = protocolSpecies.length;
-	for (const s of protocolSpecies) {
+	total = metadataOptions.length;
+	for (const s of metadataOptions) {
 		done++;
 
 		if (limit > 0 && done > limit) break;
 
-		const pageUrl = await searchForSpecies(s.label, ...s.synonyms);
+		const pageUrl = await search(s.label, ...(s.synonyms ?? []));
 		if (!pageUrl) {
 			// console.warn(yellow(`⁄ Could not find page for species ${s.label}`));
 			continue;
 		}
 
-		const newData = await getSpecies(s.key, pageUrl);
+		const newData = await augmentMetadataOption(s.key, pageUrl);
 
 		if (!newData) {
-			console.warn(yellow(`⁄ Could not extract data for species ${s.label}`));
+			console.warn(yellow(`⁄ Could not extract data for ${metadataKey} ${s.label}`));
 			continue;
 		}
 
@@ -91,17 +105,21 @@ async function augmentProtocol(
 		eta.step();
 
 		console.info(
-			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(processed)}`)} Updating species ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
+			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(processed)}`)} Updating ${metadataKey} ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
 		);
 	}
 
 	console.info(
 		cyan(
-			`⁄ Finished processing species, updated ${processed}/${total} entries (${percentage(processed, total)})`
+			`⁄ Finished processing ${metadataKey}, updated ${processed}/${total} entries (${percentage(processed, total)})`
 		)
 	);
 
 	return augmented;
+}
+
+async function searchForGenus(...names: string[]): Promise<URL | null> {
+	return searchForSpecies(...names.map((name) => `${name} sp`));
 }
 
 async function searchForSpecies(...names: string[]): Promise<URL | null> {
@@ -132,7 +150,7 @@ async function searchForSpecies(...names: string[]): Promise<URL | null> {
 	return null;
 }
 
-async function getSpecies(
+async function augmentMetadataOption(
 	key: string,
 	page: URL
 ): Promise<Partial<typeof MetadataEnumVariant.infer>> {
