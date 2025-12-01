@@ -5,6 +5,7 @@ import { expect, test } from '../fixtures.js';
 import {
 	chooseProtocol,
 	dumpDatabase,
+	goToProtocolManagement,
 	goToTab,
 	importPhotos,
 	importProtocol,
@@ -18,16 +19,17 @@ test.skip(
 
 test.describe('Database dumps', () => {
 	test('basic', async ({ page }) => {
+		await goToProtocolManagement(page);
+		await importProtocol(page, '../../examples/arthropods.light.cigaleprotocol.json');
+		await chooseProtocol(page);
+
+		await goToTab(page, 'import');
 		await importResults(page, 'correct.zip');
 		await dumpDatabase(page, 'basic.devalue');
 	});
 
 	test('kitchensink-protocol', async ({ page }) => {
-		await page.getByTestId('protocol-switcher-open').click();
-		await page
-			.getByTestId('protocol-switcher-options')
-			.getByRole('menuitem', { name: 'Gérer les protocoles' })
-			.click();
+		await goToProtocolManagement(page);
 		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 		await page
 			.getByRole('listitem')
@@ -37,6 +39,7 @@ test.describe('Database dumps', () => {
 		await page.getByRole('button', { name: 'Oui, supprimer' }).click();
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
 		await chooseProtocol(page);
+
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
 		await page.waitForTimeout(2_000);
