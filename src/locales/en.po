@@ -1744,9 +1744,7 @@ msgstr "Notifications <0>When processing finishes</0>"
 
 #: src/lib/notifications.js
 msgid "Vous avez refusé les notifications système. Veuillez changer cela dans les paramètres de votre navigateur."
-msgstr ""
-"You refused system notifications. Please change this in your browser's "
-"settings."
+msgstr "You refused system notifications. Please change this in your browser's settings."
 
 #: src/lib/AreaObservations.svelte
 msgid "Suppprimer tout les éléments de ce groupe"
@@ -1772,9 +1770,7 @@ msgstr "Synonyms"
 msgid ""
 "Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
 "synonyme."
-msgstr ""
-"Other possible names for this option. Allows finding the option by searching "
-"for a synonym."
+msgstr "Other possible names for this option. Allows finding the option by searching for a synonym."
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
@@ -1791,12 +1787,12 @@ msgstr "Add a synonym"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
-msgstr "Images import finished"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Détection terminée"
-msgstr "Detection finished"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
-msgstr "Classification finished"
+msgstr ""
