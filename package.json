@@ -153,7 +153,7 @@
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
 		"runed": "^0.37.0",
-		"svelte-mathml": "gwennlbh/svelte-mathml#dcbe2e494dc501eaca9ca85f1ee953f9b5846fd3",
+		"svelte-mathml": "gwennlbh/svelte-mathml#4f4a70d9c50942769b52d40fcf9adbe04bd973ac",
 		"sveltejs-tippy": "^3.0.0",
 		"swarpc": "^0.16.1",
 		"tiny-jsonc": "^1.0.2",
