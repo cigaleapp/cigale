@@ -1754,6 +1754,37 @@ msgstr ""
 msgid "Numéro de l'image dans l'observation, commençant à 1."
 msgstr ""
 
+#: src/lib/MetadataCombobox.svelte
+msgid "Aussi connu sous le nom de"
+msgstr ""
+
+#: src/lib/MetadataCombobox.svelte
+msgid "AKA"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Synonymes"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid ""
+"Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
+"synonyme."
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Synonyme"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Supprimer le synonyme"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Ajouter un synonyme"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""

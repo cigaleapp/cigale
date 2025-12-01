@@ -1760,6 +1760,39 @@ msgstr "Suppprimer tout les éléments de ce groupe"
 msgid "Numéro de l'image dans l'observation, commençant à 1."
 msgstr "Numéro de l'image dans l'observation, commençant à 1."
 
+#: src/lib/MetadataCombobox.svelte
+msgid "Aussi connu sous le nom de"
+msgstr "Aussi connu sous le nom de"
+
+#: src/lib/MetadataCombobox.svelte
+msgid "AKA"
+msgstr "AKA"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Synonymes"
+msgstr "Synonymes"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid ""
+"Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
+"synonyme."
+msgstr ""
+"Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
+"synonyme."
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Synonyme"
+msgstr "Synonyme"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Supprimer le synonyme"
+msgstr "Supprimer le synonyme"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Ajouter un synonyme"
+msgstr "Ajouter un synonyme"
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
