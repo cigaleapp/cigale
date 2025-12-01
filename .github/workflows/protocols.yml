@@ -3,7 +3,7 @@ name: Example protocols
 on:
   schedule:
     # Runs at 00:00 UTC every Monday
-    - cron: '0 0 * * 1,4'
+    - cron: 0 0 * * 1,4
   workflow_dispatch:
   pull_request:
     paths:
@@ -50,8 +50,8 @@ jobs:
       - name: Initialize protocol
         run: bun run scripts/generate-protocols.js
 
-      - name: Add data from Jessica Joachim
-        run: bun run scripts/add-species-from-jessica-joachim.ts
+      - name: Add species descriptions from JJ
+        run: bun run scripts/add-species-from-jessica-joachim.ts species
 
       - name: Set google-drive-key.json
         uses: mobiledevops/secret-to-file-action@v1
@@ -69,6 +69,9 @@ jobs:
 
       - name: Add data from GBIF
         run: bun run scripts/add-taxonomic-parents-from-gbif.js
+
+      - name: Add genus descriptions from JJ
+        run: bun run scripts/add-species-from-jessica-joachim.ts genus
 
       - name: Clean old protocol
         run: rm examples/old-*.json
