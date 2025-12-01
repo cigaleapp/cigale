@@ -6,13 +6,15 @@
 	import IconArrowRight from '~icons/ri/arrow-right-line';
 	import IconCheck from '~icons/ri/check-line';
 
+	import Badge from './Badge.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';
 	import Logo from './Logo.svelte';
-	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata';
+	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';
+	import { compareBy } from './utils.js';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
@@ -52,6 +54,13 @@
 		options.map(({ key, label, synonyms }) => ({ value: key, label, synonyms }))
 	);
 
+	/**
+	 * @param {string} search
+	 * @param  {...string} values
+	 */
+	const nameMatches = (search, ...values) =>
+		values.some((val) => val.toLowerCase().includes(search.toLowerCase()));
+
 	const filteredItems = $derived.by(() => {
 		if (searchValue === '') {
 			return [
@@ -59,14 +68,18 @@
 					.filter(({ value }) => value in confidences)
 					.toSorted((a, b) => confidences[b.value] - confidences[a.value]),
 				...items.filter(({ value }) => !(value in confidences))
-			];
+			].map((item) => ({ ...item, matchedFrom: item.label }));
 		}
 
-		return items.filter((item) =>
-			[item.label, ...item.synonyms].some((term) =>
-				term.toLowerCase().includes(searchValue.toLowerCase())
-			)
-		);
+		return items
+			.filter((item) => nameMatches(searchValue, item.label, ...item.synonyms))
+			.map((item) => ({
+				...item,
+				matchedFrom: nameMatches(searchValue, item.label)
+					? item.label
+					: item.synonyms.find((syn) => nameMatches(searchValue, syn))
+			}))
+			.toSorted(compareBy(({ label, matchedFrom }) => (label === matchedFrom ? 0 : 1)));
 	});
 
 	/**
@@ -208,7 +221,18 @@
 									<div class="check">
 										<IconCheck />
 									</div>
-									<span class="label">{item.label}</span>
+									<span class="label">
+										{item.label}
+										{#if item.matchedFrom && item.matchedFrom !== item.label}
+											<br />
+											<span class="aka">
+												<Badge tooltip="Aussi connu sous le nom de">
+													AKA
+												</Badge>
+												{item.matchedFrom}
+											</span>
+										{/if}
+									</span>
 									<div class="confidence">
 										<ConfidencePercentage value={confidences[item.value]} />
 									</div>
@@ -250,9 +274,13 @@
 							</div>
 						</a>
 					{/if}
+
 					<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
 					{#await cascadeLabels() then labels}
 						{@const maxdepth = Math.max(...Object.values(labels).map((l) => l.depth))}
+						{#if Object.keys(labels).length > 0}
+							<p><em>Métadonées mise à jour à la sélection de cette option</em></p>
+						{/if}
 						<table>
 							<tbody>
 								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, depth }] (metadataId)}
@@ -269,9 +297,6 @@
 								{/each}
 							</tbody>
 						</table>
-						{#if Object.keys(labels).length > 0}
-							<p><em>Métadonées mise à jour à la sélection de cette option</em></p>
-						{/if}
 					{:catch error}
 						<p class="error">
 							Erreur lors de la récupération des étiquettes en cascade: {error}
@@ -373,6 +398,14 @@
 	.item:not(.selected) .check {
 		opacity: 0;
 		visibility: hidden;
+	}
+
+	.item .label .aka {
+		font-size: 0.85em;
+		font-style: italic;
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
 	}
 
 	.items .confidence {
