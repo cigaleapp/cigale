@@ -1,9 +1,8 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { formatDuration, intervalToDuration } from 'date-fns';
-import { JSDOM } from 'jsdom';
+import { intervalToDuration } from 'date-fns';
 import * as jsdom from 'jsdom';
-import RSSParser from 'rss-parser';
+import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
@@ -31,7 +30,6 @@ virtualConsole.on('error', (e) => {
 
 const here = import.meta.dirname;
 const protocolPath = path.join(here, '../examples/arthropods.cigaleprotocol.json');
-const rss = new RSSParser();
 const tdown = new Turndown();
 let speciesLinks: Map<string, URL> | undefined;
 // For some reason Turndown#turndown is typed as string instead of a method returning string
