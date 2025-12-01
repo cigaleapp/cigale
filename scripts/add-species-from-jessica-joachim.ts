@@ -62,7 +62,7 @@ async function augmentProtocol(
 	let done = 0;
 	let processed = 0;
 	const eta = new EtaCalculator({
-		averageOver: 10,
+		averageOver: 50,
 		totalSteps: 1_850 // TODO use percentage advancement instead of hardcoded number
 	});
 
