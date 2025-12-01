@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## December 2025
+
+### Improvements
+
+- Allow editing metadata option synonyms in protocol editor
+- Show synonyms when metadata search matched by synonym
+
+### Data Updates
+
+- Regenerate example protocols
+
+### Translation Updates
+
+- Refresh translation files
+- Translate via Weblate (English)
+
 ## November 2025
 
 ### Improvements
@@ -13,6 +29,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add {{observation.number}} in protocol export path templates
 - Adjust colors
 - Disable auto-classification of uncropped images (#888)
+- Introduce metadata option synonyms
 - Select Arthropods model by default on built-in protocol (#906)
 
 ### Bug Fixes
@@ -22,12 +39,15 @@ All notable changes to this project will be documented in this file, on a monthl
 - Fix full-page reload for goto()s
 - Fix learn more URL in default protocol
 - Fix models not changing or glitching when switching models while on the tab (#905)
+- Fix mystery null values in synonyms for built-in protocol
 - Fix whole-page reload on every <a> click
 
 ### Data Updates
 
 - Regenerate example protocols
 - Rewrite Jessica Joachim script (#824)
+- Search with synonyms in Jessica Joachim site when generating built-in protocol
+- Set synonyms on species for built-in protocol
 
 ### Translation Updates
 
