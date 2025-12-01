@@ -152,7 +152,7 @@
 		"onnxruntime-web": "^1.22.0",
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
-		"runed": "^0.36.0",
+		"runed": "^0.37.0",
 		"svelte-mathml": "gwennlbh/svelte-mathml#dcbe2e494dc501eaca9ca85f1ee953f9b5846fd3",
 		"sveltejs-tippy": "^3.0.0",
 		"swarpc": "^0.16.1",
