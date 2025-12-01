@@ -272,9 +272,9 @@
 	ul.synonyms {
 		list-style: none;
 		padding: 0;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1rem;
 
 		li {
 			display: flex;

@@ -46,7 +46,7 @@ test('toExportedProtocol', async () => {
 							key: 'opt1',
 							label: 'Option 1',
 							description: 'Desc 1',
-						    synonyms: []
+							synonyms: []
 						},
 						{
 							id: 'protocol1__meta1:opt2',
@@ -54,7 +54,7 @@ test('toExportedProtocol', async () => {
 							key: 'opt2',
 							label: 'Option 2',
 							description: 'Desc 2',
-						    synonyms: []
+							synonyms: []
 						},
 						{
 							id: 'protocol1__meta2:opt1',
@@ -62,7 +62,7 @@ test('toExportedProtocol', async () => {
 							key: 'opt1',
 							label: 'Option A',
 							description: 'Desc A',
-						    synonyms: []
+							synonyms: []
 						}
 					];
 				} else if (table === 'Metadata') {
