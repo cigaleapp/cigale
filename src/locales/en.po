@@ -1803,12 +1803,12 @@ msgstr "App"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
-msgstr "Images import finished"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Détection terminée"
-msgstr "Detection finished"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
-msgstr "Classification finished"
+msgstr ""
