@@ -6,6 +6,7 @@
 	import IconWarning from '~icons/ri/error-warning-line';
 	import IconPrimary from '~icons/ri/information-line';
 	import IconNeutral from '~icons/ri/quote-text';
+	import { version } from '$app/environment';
 	import lockfile from '$lib/../../bun.lock?raw';
 	import Logo from '$lib/Logo.svelte';
 	import { seo } from '$lib/seo.svelte';
@@ -53,7 +54,7 @@
 		{ name: 'Gwenn Le Bihan', gitlab: 'gwennlbh', url: 'https://gwen.works' },
 		{ name: 'Ines Charles', gitlab: 'charlei' },
 		{ name: 'Olivier Lamothe', gitlab: 'lamotho' }
-	].map(({ name, gitlab, url }) => ({ name, url: url ?? `https://git.inpt.fr/${gitlab}` }));
+	].map(({ gitlab, ...rest }) => ({ url: `https://git.inpt.fr/${gitlab}`, ...rest }));
 
 	const supervisors = [
 		{ name: 'Axel Carlier', url: 'https://github.com/axelcarlier' },
@@ -102,10 +103,12 @@
 	<dd>
 		“Projet long” de l'<a href="https://enseeiht.fr">INP-ENSEEIHT</a>
 	</dd>
-	{#if electronVersions}
-		<dt>Versions</dt>
-		<dd>
-			<dl>
+	<dt>Versions</dt>
+	<dd>
+		<dl>
+			<dt>Appli</dt>
+			<dd>{version}</dd>
+			{#if electronVersions}
 				<dt>Node.js</dt>
 				<dd><code>{electronVersions.node}</code></dd>
 				<dt>Chrome</dt>
@@ -130,9 +133,9 @@
 						{/each}
 					</dd>
 				{/if}
-			</dl>
-		</dd>
-	{/if}
+			{/if}
+		</dl>
+	</dd>
 	<dt>Parallélisme</dt>
 	<dd>
 		<dl>
