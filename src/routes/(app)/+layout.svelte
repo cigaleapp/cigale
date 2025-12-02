@@ -3,11 +3,30 @@
 	 * @type {Map<string, import("swarpc").CancelablePromise["cancel"]>}
 	 */
 	export const cancellers = new SvelteMap();
+
+	/**
+	 * @typedef {'full' | 'hidden'} NavbarAppearance
+	 */
+	let _navbarAppearance = $state('full');
+
+	/**
+	 * Set navbar appearance for the page or layout, until unmounted.
+	 * Uses `onMount` and `onDestroy` internally.
+	 * @param {NavbarAppearance} appearance
+	 */
+	export function navbarAppearance(appearance) {
+		onMount(() => {
+			_navbarAppearance = appearance;
+			return () => {
+				_navbarAppearance = 'full';
+			};
+		});
+	}
 </script>
 
 <script>
 	import { watch } from 'runed';
-	import { onDestroy, onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
 	import { version } from '$app/environment';
@@ -30,17 +49,6 @@
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
-
-	/** @type {'full' | 'floating' | 'hidden'} */
-	let navbarAppearance = $state('full');
-	setContext('setNavbarAppearance', (/** @type {typeof navbarAppearance} */ state) => {
-		onMount(() => {
-			navbarAppearance = state;
-		});
-		onDestroy(() => {
-			navbarAppearance = 'full';
-		});
-	});
 
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
 
@@ -157,15 +165,13 @@
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
 <RemoteProtocolImporter />
 
-{#if navbarAppearance !== 'hidden'}
-	<Navigation
-		{swarpc}
-		{openKeyboardShortcuts}
-		{openPrepareForOfflineUse}
-		floating={navbarAppearance === 'floating'}
-		progress={uiState.processing.progress}
-	/>
-{/if}
+<Navigation
+	{swarpc}
+	{openKeyboardShortcuts}
+	{openPrepareForOfflineUse}
+	progressbarOnly={_navbarAppearance === 'hidden'}
+	progress={uiState.processing.progress}
+/>
 
 <section class="toasts" data-testid="toasts-area">
 	{#each toasts.items('default') as toast (toast.id)}

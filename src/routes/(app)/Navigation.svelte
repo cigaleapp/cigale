@@ -34,7 +34,7 @@
 	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
 	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
-	 * @property {boolean} [floating]
+	 * @property {boolean} [progressbarOnly] Only show the progress bar, hide the navbar and logo
 	 */
 
 	/** @type {Props} */
@@ -43,7 +43,7 @@
 		openPrepareForOfflineUse,
 		progress = 0,
 		swarpc,
-		floating = false
+		progressbarOnly = false
 	} = $props();
 
 	const path = $derived(page.url.hash.replace(/^#/, ''));
@@ -159,122 +159,124 @@
 		<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
 	</div>
 
-	<nav bind:clientHeight={navHeight} data-testid="app-nav" class:floating>
-		<div class="logo">
-			<a href={resolve('/')}>
-				<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
-			</a>
-			{#if previewingPrNumber}
-				<button class="pr-number" onclick={openPreviewPRDetails}>
-					Preview #{previewingPrNumber}
-				</button>
-			{/if}
-		</div>
-
-		<div class="steps">
-			<a
-				href={resolve('/import')}
-				data-testid="goto-import"
-				aria-disabled={!uiState.currentProtocol}
-			>
-				Importer
-				{#if path == '/import'}
-					<div class="line"></div>
+	{#if !progressbarOnly}
+		<nav bind:clientHeight={navHeight} data-testid="app-nav">
+			<div class="logo">
+				<a href={resolve('/')}>
+					<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
+				</a>
+				{#if previewingPrNumber}
+					<button class="pr-number" onclick={openPreviewPRDetails}>
+						Preview #{previewingPrNumber}
+					</button>
 				{/if}
-			</a>
-			<div class="separator"><IconNext /></div>
-			<div class="with-inference-indicator">
-				<!-- eslint-disable svelte/no-navigation-without-resolve -->
+			</div>
+
+			<div class="steps">
 				<a
-					href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
-					uiState.imageOpenedInCropper
-						? resolve('/(app)/(sidepanel)/crop/[image]', {
-								image: uiState.imageOpenedInCropper
-							})
-						: resolve('/crop')}
-					data-testid="goto-crop"
-					aria-disabled={!uiState.currentProtocol || !hasImages}
+					href={resolve('/import')}
+					data-testid="goto-import"
+					aria-disabled={!uiState.currentProtocol}
 				>
-					<!-- eslint-enable svelte/no-navigation-without-resolve -->
-					Recadrer
-					{#if path.startsWith('/crop')}
+					Importer
+					{#if path == '/import'}
 						<div class="line"></div>
 					{/if}
 				</a>
-
-				{@render inferenceSettings(
-					'crop',
-					uiState.cropModels,
-					uiState.selectedCropModel,
-					async (i) => uiState.setModelSelections({ crop: i })
-				)}
-			</div>
-			<div class="separator"><IconNext /></div>
-			<div
-				class="with-inference-indicator"
-				use:tooltip={uiState.processing.task === 'detection' &&
-				uiState.processing.progress < 1
-					? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
-					: undefined}
-			>
-				<a
-					href={resolve('/classify')}
-					aria-disabled={!uiState.currentProtocol ||
-						!hasImages ||
-						(uiState.processing.task === 'detection' &&
-							uiState.processing.progress < 1)}
-					data-testid="goto-classify"
-				>
-					Classifier
-					{#if path == '/classify'}
-						<div class="line"></div>
-					{/if}
-				</a>
-				{@render inferenceSettings(
-					'classify',
-					uiState.classificationModels,
-					uiState.selectedClassificationModel,
-					async (i) => uiState.setModelSelections({ classification: i })
-				)}
-			</div>
-			<div class="separator"><IconNext /></div>
-			<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
-				Résultats
-			</ButtonSecondary>
-
-			{#if getSettings().notifications === null}
-				<div class="notifications">
-					<ButtonInk
-						help="Activer les notifications pour savoir quand un traitement est terminé."
-						onclick={async () => {
-							await askForNotificationPermission();
-							setSetting('notifications', hasNotificationsEnabled());
-						}}
+				<div class="separator"><IconNext /></div>
+				<div class="with-inference-indicator">
+					<!-- eslint-disable svelte/no-navigation-without-resolve -->
+					<a
+						href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
+						uiState.imageOpenedInCropper
+							? resolve('/(app)/(sidepanel)/crop/[image]', {
+									image: uiState.imageOpenedInCropper
+								})
+							: resolve('/crop')}
+						data-testid="goto-crop"
+						aria-disabled={!uiState.currentProtocol || !hasImages}
 					>
-						<IconNotificationsOn />
-						Activer
-					</ButtonInk>
-					<ButtonIcon
-						onclick={() => setSetting('notifications', false)}
-						help="Ne pas activer les notifications"
-					>
-						<IconDismiss />
-					</ButtonIcon>
+						<!-- eslint-enable svelte/no-navigation-without-resolve -->
+						Recadrer
+						{#if path.startsWith('/crop')}
+							<div class="line"></div>
+						{/if}
+					</a>
+
+					{@render inferenceSettings(
+						'crop',
+						uiState.cropModels,
+						uiState.selectedCropModel,
+						async (i) => uiState.setModelSelections({ crop: i })
+					)}
 				</div>
-			{/if}
-		</div>
+				<div class="separator"><IconNext /></div>
+				<div
+					class="with-inference-indicator"
+					use:tooltip={uiState.processing.task === 'detection' &&
+					uiState.processing.progress < 1
+						? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
+						: undefined}
+				>
+					<a
+						href={resolve('/classify')}
+						aria-disabled={!uiState.currentProtocol ||
+							!hasImages ||
+							(uiState.processing.task === 'detection' &&
+								uiState.processing.progress < 1)}
+						data-testid="goto-classify"
+					>
+						Classifier
+						{#if path == '/classify'}
+							<div class="line"></div>
+						{/if}
+					</a>
+					{@render inferenceSettings(
+						'classify',
+						uiState.classificationModels,
+						uiState.selectedClassificationModel,
+						async (i) => uiState.setModelSelections({ classification: i })
+					)}
+				</div>
+				<div class="separator"><IconNext /></div>
+				<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
+					Résultats
+				</ButtonSecondary>
 
-		<aside class:native={isNativeWindow}>
-			<ProtocolSwitcher />
-			<div class="settings">
-				<Settings
-					{openPrepareForOfflineUse}
-					{openKeyboardShortcuts}
-					--navbar-height="{height}px"
-				/>
+				{#if getSettings().notifications === null}
+					<div class="notifications">
+						<ButtonInk
+							help="Activer les notifications pour savoir quand un traitement est terminé."
+							onclick={async () => {
+								await askForNotificationPermission();
+								setSetting('notifications', hasNotificationsEnabled());
+							}}
+						>
+							<IconNotificationsOn />
+							Activer
+						</ButtonInk>
+						<ButtonIcon
+							onclick={() => setSetting('notifications', false)}
+							help="Ne pas activer les notifications"
+						>
+							<IconDismiss />
+						</ButtonIcon>
+					</div>
+				{/if}
 			</div>
-		</aside>
-	</nav>
+
+			<aside class:native={isNativeWindow}>
+				<ProtocolSwitcher />
+				<div class="settings">
+					<Settings
+						{openPrepareForOfflineUse}
+						{openKeyboardShortcuts}
+						--navbar-height="{height}px"
+					/>
+				</div>
+			</aside>
+		</nav>
+	{/if}
 </header>
 
 {#snippet inferenceSettings(
@@ -470,17 +472,6 @@
 
 	nav a[aria-disabled='true'] .line {
 		visibility: hidden;
-	}
-
-	nav.floating {
-		position: fixed;
-		top: 0;
-		left: 0;
-		z-index: 10;
-
-		aside {
-			display: none;
-		}
 	}
 
 	.progressbar {

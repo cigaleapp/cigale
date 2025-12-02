@@ -6,7 +6,6 @@
 	 */
 	import * as dates from 'date-fns';
 	import { watch } from 'runed';
-	import { getContext } from 'svelte';
 
 	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
 	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
@@ -68,6 +67,7 @@
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
+	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
@@ -76,7 +76,7 @@
 
 	$effect(() => seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` }));
 
-	getContext('setNavbarAppearance')('floating');
+	navbarAppearance('hidden');
 
 	// Controls visibility of the checkmark little centered overlay
 	let confirmedOverlayShown = $state(false);

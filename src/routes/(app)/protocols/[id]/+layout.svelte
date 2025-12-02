@@ -1,5 +1,4 @@
 <script>
-	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
@@ -32,6 +31,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { slugify } from '$lib/utils';
+	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
@@ -49,7 +49,7 @@
 
 	let collapsedSidebar = $state(false);
 
-	getContext('setNavbarAppearance')('hidden');
+	navbarAppearance('hidden');
 
 	/**
 	 *
