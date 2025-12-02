@@ -26,6 +26,8 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await page.mouse.click(278, 255);
 	await page.mouse.click(487, 464);
 
+	await page.getByRole('button', { name: 'Autres photos Esc' }).click();
+
 	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
 
 	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
