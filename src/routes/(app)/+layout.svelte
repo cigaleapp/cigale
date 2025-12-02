@@ -10,6 +10,7 @@
 	import { onDestroy, onMount, setContext } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
+	import { version } from '$app/environment';
 	import { page } from '$app/state';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
@@ -115,6 +116,31 @@
 
 	$effect(() => {
 		document.documentElement.style.colorScheme = getColorScheme();
+	});
+
+	onMount(() => {
+		navigator.serviceWorker.ready.then((registration) => {
+			const installedVersion = localStorage.getItem('sw-version');
+
+			if (installedVersion !== version) {
+				localStorage.setItem('sw-version', version);
+				toasts.info('L’application a été mise à jour.');
+			}
+
+			registration.addEventListener('updatefound', () => {
+				// TODO remove
+				console.info('Update found in service worker');
+				toasts.info('Une mise à jour est disponible.', {
+					lifetime: Infinity,
+					labels: {
+						action: 'Recharger'
+					},
+					action() {
+						location.reload();
+					}
+				});
+			});
+		});
 	});
 
 	/** @type {undefined|(() => void)} */
