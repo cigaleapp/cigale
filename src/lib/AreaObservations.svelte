@@ -51,16 +51,28 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @typedef Props
 	 * @type {object}
 	 * @property {Item[]} items
-	 * @property {import('svelte').Snippet<[ItemData, Item, number]>} item
+	 * @property {import('svelte').Snippet<[ItemData, Item]>} item
 	 * @property {GroupName[]} [groups]
 	 * @property {(item: Item) => GroupName | ""} [grouping]
 	 * @property {string} [highlight] id of the item to highlight (and scroll to)
 	 * @property {(e: MouseEvent|TouchEvent|null) => void} [onemptyclick] callback when the user clicks on the empty area
 	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
+	 * @property {[string, Item[]] | undefined} [unroll] [observation id, inner items] unroll inner cards. Only relevant for items that have multiple cards (i.e. with a stack size > 1)
 	 */
 
 	/** @type {Props } */
-	let { items, item, groups, grouping, onemptyclick, sort, highlight } = $props();
+	let {
+		items,
+		item,
+		groups,
+		grouping,
+		onemptyclick,
+		sort,
+		highlight,
+		unroll = ['', []]
+	} = $props();
+
+	const [unrolledId, unrolledItems] = $derived(unroll);
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -219,8 +231,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				</header>
 			{/if}
 			<div class="items">
-				{#each sortedImages as props, i (virtualizeKey(props))}
-					{@render item(props.data, props, i)}
+				{#each sortedImages as props (virtualizeKey(props))}
+					{@const unrolled = unrolledId === props.id}
+					<div class="item-unroll-container" class:unrolled>
+						{@render item(props.data, props)}
+					</div>
+					{#if unrolled}
+						{#each unrolledItems as innerProps (virtualizeKey(innerProps))}
+							<div class="item-unroll-container" class:unrolled>
+								{@render item(innerProps.data, innerProps)}
+							</div>
+						{/each}
+					{/if}
 				{/each}
 			</div>
 		</section>
@@ -250,10 +272,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	.group .items {
 		display: flex;
 		flex-wrap: wrap;
-		align-content: flex-start;
+		/* align-content: flex-start;
 		justify-content: space-between;
-		gap: 1.5em 1em;
+		gap: 1.5em 1em; */
 		padding: 0 2.5em;
+	}
+
+	.item-unroll-container {
+		padding: 1em;
+	}
+
+	.item-unroll-container.unrolled {
+		background-color: var(--bg-primary-translucent);
 	}
 
 	.images {
