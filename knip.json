@@ -26,7 +26,7 @@
 		"$lib/*": ["src/lib/*"],
 		"$locales/*": ["src/locales/*"],
 		"$worker/*": ["src/worker/*"],
-        "$routes/*": ["src/routes/*"],
+		"$routes/*": ["src/routes/*"],
 		"$service-worker": ["node_modules/@sveltejs/kit/types/index.d.ts"],
 		"$app/types": [".svelte-kit/non-ambient.d.ts"]
 	},
