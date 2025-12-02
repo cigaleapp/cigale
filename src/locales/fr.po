@@ -1793,6 +1793,22 @@ msgstr "Supprimer le synonyme"
 msgid "Ajouter un synonyme"
 msgstr "Ajouter un synonyme"
 
+#: src/routes/(app)/+layout.svelte
+msgid "L’application a été mise à jour."
+msgstr "L’application a été mise à jour."
+
+#: src/routes/(app)/+layout.svelte
+msgid "Une mise à jour est disponible."
+msgstr "Une mise à jour est disponible."
+
+#: src/routes/(app)/+layout.svelte
+msgid "Recharger"
+msgstr "Recharger"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Appli"
+msgstr "Appli"
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
