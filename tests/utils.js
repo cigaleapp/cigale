@@ -719,3 +719,20 @@ export async function setHardwareConcurrency(page, value) {
 export function firstObservationCard(page) {
 	return page.getByTestId('observations-area').getByRole('article').first();
 }
+
+/**
+ *
+ * @param {import('node:stream').Readable} stream
+ * @returns
+ */
+export async function readStreamToBuffer(stream) {
+	return Buffer.concat(await Array.fromAsync(stream));
+}
+
+/**
+ * @param {import('node:stream').Readable} stream
+ */
+export async function readStreamToString(stream) {
+	const buffer = await readStreamToBuffer(stream);
+	return buffer.toString('utf-8');
+}

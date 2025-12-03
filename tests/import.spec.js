@@ -1,25 +1,23 @@
-import path from 'node:path';
 import * as dates from 'date-fns';
-import extract from 'extract-zip';
+import * as yauzl from 'yauzl-promise';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
-	chooseProtocol,
-	expectTooltipContent,
-	firstObservationCard,
-	getMetadataValuesOfImage,
-	getTab,
-	goToTab,
-	importPhotos,
-	importResults,
-	listTable,
-	loadingText,
-	readdirTreeSync,
-	sidepanelMetadataSectionFor,
-	toast,
-	waitForLoadingEnd
+    chooseProtocol,
+    expectTooltipContent,
+    firstObservationCard,
+    getMetadataValuesOfImage,
+    getTab,
+    goToTab,
+    importPhotos,
+    importResults,
+    listTable,
+    loadingText,
+    sidepanelMetadataSectionFor,
+    toast,
+    waitForLoadingEnd
 } from './utils';
 
 test.describe('correct results.zip', () => {
@@ -139,37 +137,24 @@ test.describe('correct results.zip', () => {
 		const download = await page.waitForEvent('download');
 		expect(download.suggestedFilename()).toBe('results.zip');
 
-		// FIXME: 'invalid zip data'
-		// const contents = await download
-		// 	.createReadStream()
-		// 	.then((stream) => stream.toArray())
-		// 	.then(({ data }) => new Uint8Array(data))
-		// 	.then((data) => unzipSync(data));
-		// expect(Object.keys(contents)).toMatchObject(['results.json', 'metadata.csv']);
-
-		const resultsDir = path.resolve('./tests/results/correct');
 		await download.saveAs('./tests/results/correct.zip');
-		await extract('./tests/results/correct.zip', { dir: resultsDir });
-		console.info(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
-		expect(readdirTreeSync(resultsDir)).toMatchObject([
-			{
-				Cropped: [
-					expect.stringMatching(/\(Unknown\)_obs\d_4\.jpeg/),
-					expect.stringMatching(/Allacma fusca_obs\d_1\.jpeg/),
-					expect.stringMatching(/Entomobrya muscorum_obs\d_3\.jpeg/),
-					expect.stringMatching(/Orchesella cincta_obs\d_2\.jpeg/)
-				]
-			},
-			{
-				Original: [
-					expect.stringMatching(/\(Unknown\)_obs\d_4\.jpeg/),
-					expect.stringMatching(/Allacma fusca_obs\d_1\.jpeg/),
-					expect.stringMatching(/Entomobrya muscorum_obs\d_3\.jpeg/),
-					expect.stringMatching(/Orchesella cincta_obs\d_2\.jpeg/)
-				]
-			},
+		const zip = await yauzl.open('./tests/results/correct.zip');
+
+		expect(
+			await zip
+				.readEntries(zip.entryCount)
+				.then((entries) => entries.map((entry) => entry.filename))
+		).toMatchObject([
 			'analysis.json',
-			'metadata.csv'
+			'metadata.csv',
+			expect.stringMatching(/^Cropped\/Allacma fusca_obs\d_1\.jpeg$/),
+			expect.stringMatching(/^Original\/Allacma fusca_obs\d_1\.jpeg$/),
+			expect.stringMatching(/^Cropped\/Orchesella cincta_obs\d_2\.jpeg$/),
+			expect.stringMatching(/^Original\/Orchesella cincta_obs\d_2\.jpeg$/),
+			expect.stringMatching(/^Cropped\/Entomobrya muscorum_obs\d_3\.jpeg$/),
+			expect.stringMatching(/^Original\/Entomobrya muscorum_obs\d_3\.jpeg$/),
+			expect.stringMatching(/^Cropped\/\(Unknown\)_obs\d_4\.jpeg$/),
+			expect.stringMatching(/^Original\/\(Unknown\)_obs\d_4\.jpeg$/),
 		]);
 	});
 });
