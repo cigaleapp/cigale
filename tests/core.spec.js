@@ -120,6 +120,7 @@ for (const offline of [false, true]) {
 				zipPaths.push(entry.filename);
 
 				if (entry.filename === 'Cropped/Entomobrya muscorum_obs1_1.jpeg') {
+					expect.soft(entry.getLastMod().toISOString()).toBe('2025-04-25T12:38:36.000Z');
 					expect
 						.soft(await entry.openReadStream().then(readStreamToBuffer))
 						.toMatchSnapshot({
