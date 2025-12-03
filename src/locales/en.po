@@ -1053,8 +1053,7 @@ msgid "<0/> utilise déjà cet identifiant"
 msgstr "<0/> already uses that ID"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+#: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "Créer"
 msgstr "Create"
 
@@ -1146,13 +1145,11 @@ msgstr "Bounding boxes storage"
 msgid "Boîtes de recadrage stockées dans cette métadonnée"
 msgstr "Bounding boxes are stored using this metadata"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+#: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "<0/> Voir"
 msgstr "<0/> See"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+#: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "<0/> Aucune métadonnée"
 msgstr "<0/> No metadata"
 
@@ -1276,10 +1273,6 @@ msgstr "Protocol {0}: Export"
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Aucune configuration d'exports trouvée pour ce protocole."
 msgstr "No export configuration found for this protocol."
-
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
-msgid "Structure des exports .zip"
-msgstr ".zip export file structure"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Résultats.zip"
@@ -1800,6 +1793,26 @@ msgstr "Reload"
 #: src/routes/(app)/about/+page.svelte
 msgid "Appli"
 msgstr "App"
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Exports .zip"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Dates de modification"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Métadonnée à utiliser pour la date de modification des fichers images"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "La date d'export sera utilisée comme date de modification des fichiers images"
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Arborescence"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
