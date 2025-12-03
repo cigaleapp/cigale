@@ -730,9 +730,49 @@ export async function readStreamToBuffer(stream) {
 }
 
 /**
- * @param {import('node:stream').Readable} stream
+ * Only one of json, text or buffer should be provided.
+ * @typedef {object} ZipFileEntryCheck
+ * @property {(text: string) => void | Promise<void>} [text] function to call with the text content of the file
+ * @property {(buffer: Buffer) => void | Promise<void>} [buffer] function to call with the buffer content of the file
+ * @property {(json: any) => void | Promise<void>} [json] function to call with the parsed JSON content of the file
+ * @property {(entry: import('yauzl-promise').Entry) => void | Promise<void>} [entry] function to call with the zip entry itself
  */
-export async function readStreamToString(stream) {
-	const buffer = await readStreamToBuffer(stream);
-	return buffer.toString('utf-8');
+
+/**
+ * @template {string} Files
+ * Matches the files present in a zip file against an expected list of file names, without regard for order.
+ * @param {import('yauzl-promise').ZipFile} zip
+ * @param {Array<RegExp|Files>} expectedFiles
+ * @param {Partial<Record<Files, ZipFileEntryCheck>>} [checks] additional checks to perform for specific files
+ */
+export async function expectZipFiles(zip, expectedFiles, checks = {}) {
+	const zipFiles = [];
+	for await (const file of zip) {
+		zipFiles.push(file.filename);
+		if (file.filename in checks) {
+			// @ts-expect-error
+			const { json, text, buffer, entry } = checks[file.filename];
+
+			const buf = await file.openReadStream().then(readStreamToBuffer);
+
+			if (buffer) {
+				await buffer(buf);
+			} else if (text) {
+				await text(buf.toString('utf-8'));
+			} else if (json) {
+				await json(JSON.parse(buf.toString('utf-8')));
+			}
+
+			if (entry) {
+				await entry(file);
+			}
+		}
+	}
+
+	expect(zipFiles).toHaveLength(expectedFiles.length);
+	for (const expectedFile of expectedFiles) {
+		expect(zipFiles).toContain(
+			expectedFile instanceof RegExp ? expect.stringMatching(expectedFile) : expectedFile
+		);
+	}
 }
