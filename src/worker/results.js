@@ -30,6 +30,8 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 	const protocolUsed = await db.get('Protocol', protocolId).then(Schemas.Protocol.assert);
 	if (!protocolUsed) throw new Error(`Protocol with ID ${protocolId} not found`);
 
+	const mtimeMetadataKey = protocolUsed.exports?.images?.mtime;
+
 	const filepaths = protocolUsed.exports ?? {
 		images: {
 			cropped: FilepathTemplate.assert('cropped/{{sequence}}.{{extension image.filename}}'),
@@ -283,13 +285,25 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 					: Object.fromEntries(
 							Object.values(exportedObservations)
 								.flatMap(({ images }) => images)
-								.flatMap(({ exportedAs, id }) => {
+								.flatMap(({ exportedAs, id, metadata }) => {
 									const buffers = buffersOfImages.find((i) => i.imageId === id);
 									if (!buffers) return [];
 
+									/**
+									 * @type {import('fflate').AsyncZipOptions}
+									 */
+									let options = { level: 0 };
+
+									if (
+										mtimeMetadataKey &&
+										typeof metadata[mtimeMetadataKey]?.value === 'string'
+									) {
+										options.mtime = new Date(metadata[mtimeMetadataKey].value);
+									}
+
 									return [
-										[exportedAs.cropped, [buffers.croppedBytes, { level: 0 }]],
-										[exportedAs.original, [buffers.originalBytes, { level: 0 }]]
+										[exportedAs.cropped, [buffers.croppedBytes, options]],
+										[exportedAs.original, [buffers.originalBytes, options]]
 									].filter(([, [bytes]]) => bytes !== undefined);
 								})
 						))

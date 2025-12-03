@@ -262,6 +262,7 @@ const protocol = {
 	},
 	exports: {
 		images: {
+            mtime: namespaced('shoot_date'),
 			cropped:
 				'Cropped/{{ fallback image.protocolMetadata.species.valueLabel "(Unknown)" }}_obs{{ observation.number }}_{{ sequence }}.{{ extension image.filename }}',
 			original:

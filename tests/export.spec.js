@@ -1,10 +1,16 @@
-import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import extract from 'extract-zip';
+import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import { chooseProtocol, firstObservationCard, goToTab, importPhotos, setSettings } from './utils';
+import {
+    chooseProtocol,
+    firstObservationCard,
+    goToTab,
+    importPhotos,
+    readStreamToBuffer,
+    setSettings
+} from './utils';
 
 test('correctly applies crop padding', issue(463), async ({ page }) => {
 	// Disable inference to go faster
@@ -32,12 +38,18 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 
 	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
 
-	const resultsDir = path.resolve('./tests/results/crop-padding');
+	const resultsFilepath = path.resolve('./tests/results/crop-padding.zip');
 	await page.getByRole('button', { name: 'results.zip' }).click();
-	await page.waitForEvent('download').then((e) => e.saveAs(resultsDir + '.zip'));
-	await extract(resultsDir + '.zip', { dir: resultsDir });
+	await page.waitForEvent('download').then((e) => e.saveAs(resultsFilepath));
+	const zip = await yauzl.open(path.join(resultsFilepath));
 
-	expect(await readdir(path.join(resultsDir, 'Cropped'))).toContain('(Unknown)_obs1_1.png');
+	let hasObservation = false;
+	for await (const entry of zip) {
+		if (entry.filename === 'Cropped/(Unknown)_obs1_1.png') {
+			expect(await readStreamToBuffer(await entry.openReadStream())).toMatchSnapshot();
+			hasObservation = true;
+		}
+	}
 
-	expect(await readFile(path.join(resultsDir, 'Cropped/(Unknown)_obs1_1.png'))).toMatchSnapshot();
+	expect(hasObservation).toBe(true);
 });
