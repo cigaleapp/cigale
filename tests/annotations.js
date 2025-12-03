@@ -50,17 +50,3 @@ export function withParallelism(value) {
 		}
 	};
 }
-
-/**
- * @param {...TestSettings} values
- * @returns {TestSettings}
- */
-export function annotations(...values) {
-	return {
-		tag: values
-			.map((v) => v.tag)
-			.filter(Boolean)
-			.join(' '),
-		annotation: values.flatMap((v) => v.annotation)
-	};
-}

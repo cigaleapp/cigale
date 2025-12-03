@@ -4,8 +4,8 @@
 		"src/lib/schemas/*",
 		"src/lib/utils.js",
 		"src/lib/exiffields.js",
-		"tests/**",
 		"src/app.d.ts",
+		"tests/ambiant.d.ts",
 		"src/lib/Checkbox.svelte",
 		"src/lib/Dropzone.svelte",
 		"src/lib/FloatingButton.svelte",
@@ -19,7 +19,9 @@
 		"forge.config.js",
 		"forge.env.d.ts",
 		"vite.electron*.config.js",
-		"wuchale.config.js"
+		"wuchale.config.js",
+		"tests/*.spec.js",
+		"tests/tasks/*.spec.js"
 	],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],

@@ -7,6 +7,7 @@ import { expect, test } from './fixtures';
 import {
 	chooseProtocol,
 	expectTooltipContent,
+	expectZipFiles,
 	firstObservationCard,
 	getMetadataValuesOfImage,
 	getTab,
@@ -138,23 +139,17 @@ test.describe('correct results.zip', () => {
 		expect(download.suggestedFilename()).toBe('results.zip');
 
 		await download.saveAs('./tests/results/correct.zip');
-		const zip = await yauzl.open('./tests/results/correct.zip');
-
-		expect(
-			await zip
-				.readEntries(zip.entryCount)
-				.then((entries) => entries.map((entry) => entry.filename))
-		).toMatchObject([
+		await expectZipFiles(await yauzl.open('./tests/results/correct.zip'), [
 			'analysis.json',
 			'metadata.csv',
-			expect.stringMatching(/^Cropped\/Allacma fusca_obs\d_1\.jpeg$/),
-			expect.stringMatching(/^Original\/Allacma fusca_obs\d_1\.jpeg$/),
-			expect.stringMatching(/^Cropped\/Orchesella cincta_obs\d_2\.jpeg$/),
-			expect.stringMatching(/^Original\/Orchesella cincta_obs\d_2\.jpeg$/),
-			expect.stringMatching(/^Cropped\/Entomobrya muscorum_obs\d_3\.jpeg$/),
-			expect.stringMatching(/^Original\/Entomobrya muscorum_obs\d_3\.jpeg$/),
-			expect.stringMatching(/^Cropped\/\(Unknown\)_obs\d_4\.jpeg$/),
-			expect.stringMatching(/^Original\/\(Unknown\)_obs\d_4\.jpeg$/)
+			/^Cropped\/Allacma fusca_obs\d_1\.jpeg$/,
+			/^Original\/Allacma fusca_obs\d_1\.jpeg$/,
+			/^Cropped\/Orchesella cincta_obs\d_2\.jpeg$/,
+			/^Original\/Orchesella cincta_obs\d_2\.jpeg$/,
+			/^Cropped\/Entomobrya muscorum_obs\d_3\.jpeg$/,
+			/^Original\/Entomobrya muscorum_obs\d_3\.jpeg$/,
+			/^Cropped\/\(Unknown\)_obs\d_4\.jpeg$/,
+			/^Original\/\(Unknown\)_obs\d_4\.jpeg$/
 		]);
 	});
 });
@@ -164,7 +159,7 @@ test.describe('missing original photos', () => {
 		await importResults(page, 'no-originals.zip', { waitForLoading: false });
 	});
 
-	test('fails with the appriopriate error message', async ({ page }) => {
+	test('fails with the appropriate error message', async ({ page }) => {
 		await expect(toast(page, 'Aucune image trouvée', { type: 'error' })).toBeVisible();
 	});
 });

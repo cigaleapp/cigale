@@ -5,6 +5,7 @@ import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseProtocol,
+	expectZipFiles,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
@@ -41,15 +42,11 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	const resultsFilepath = path.resolve('./tests/results/crop-padding.zip');
 	await page.getByRole('button', { name: 'results.zip' }).click();
 	await page.waitForEvent('download').then((e) => e.saveAs(resultsFilepath));
-	const zip = await yauzl.open(path.join(resultsFilepath));
 
-	let hasObservation = false;
-	for await (const entry of zip) {
-		if (entry.filename === 'Cropped/(Unknown)_obs1_1.png') {
-			expect(await readStreamToBuffer(await entry.openReadStream())).toMatchSnapshot();
-			hasObservation = true;
+	const zip = await yauzl.open(resultsFilepath);
+	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
+		'Cropped/(Unknown)_obs1_1.png': {
+			buffer: async (buf) => expect(buf).toMatchSnapshot()
 		}
-	}
-
-	expect(hasObservation).toBe(true);
+	});
 });

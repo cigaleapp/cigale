@@ -408,38 +408,6 @@ export async function importProtocol(page, filepath) {
 }
 
 /**
- * @template {*} Leaf
- * @typedef {Array<Leaf | { [dir: string]: ArrayTree<Leaf> }>} ArrayTree
- */
-
-/**
- *
- * @param {string} root
- * @returns {ArrayTree<string>}
- */
-export function readdirTreeSync(root) {
-	const result = [];
-	const files = readdirSync(root, { withFileTypes: true });
-	for (const file of files) {
-		if (file.isDirectory()) {
-			result.push({
-				[file.name]: readdirTreeSync(path.join(root, file.name))
-			});
-		} else {
-			result.push(file.name);
-		}
-	}
-
-	return result.sort((a, b) => {
-		// Sort folders before files
-		if (typeof a === 'object' && typeof b === 'string') return -1;
-		if (typeof a === 'string' && typeof b === 'object') return 1;
-		if (typeof a === 'string' && typeof b === 'string') return a.localeCompare(b);
-		return Object.keys(a)[0].localeCompare(Object.keys(b)[0]);
-	});
-}
-
-/**
  *
  * @param {Page} page
  * @param {string|RegExp} message
@@ -542,7 +510,7 @@ export const browserConsole = {
  * @param {Page} page
  * @param {import('@playwright/test').Locator} locator
  */
-export async function tooltipOf(page, locator) {
+async function tooltipOf(page, locator) {
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, { timeout: 1_000 });
 	const tippyId = await locator.getAttribute('aria-describedby');
 	return page.locator(`#${tippyId}`);
@@ -618,7 +586,7 @@ export function modal(page, modalTitle) {
 /**
  *
  * @param {Page} page
- * @param {Parameters<import('playwright').Locator['click']>[0]} [clickOptions]
+ * @param {Parameters<import('@playwright/test').Locator['click']>[0]} [clickOptions]
  */
 export function openSettings(page, clickOptions) {
 	return page.getByTestId('settings-button').click(clickOptions);
@@ -645,7 +613,7 @@ export function makeRegexpUnion(...parts) {
 
 export const loadingText = makeRegexpUnion('Chargement…', 'Analyse…', 'En attente');
 
-export const loadingNotQueuedText = makeRegexpUnion('Chargement…', 'Analyse…');
+const loadingNotQueuedText = makeRegexpUnion('Chargement…', 'Analyse…');
 
 /**
  *
