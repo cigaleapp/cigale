@@ -5,19 +5,19 @@ import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.jso
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
-    chooseProtocol,
-    expectTooltipContent,
-    firstObservationCard,
-    getMetadataValuesOfImage,
-    getTab,
-    goToTab,
-    importPhotos,
-    importResults,
-    listTable,
-    loadingText,
-    sidepanelMetadataSectionFor,
-    toast,
-    waitForLoadingEnd
+	chooseProtocol,
+	expectTooltipContent,
+	firstObservationCard,
+	getMetadataValuesOfImage,
+	getTab,
+	goToTab,
+	importPhotos,
+	importResults,
+	listTable,
+	loadingText,
+	sidepanelMetadataSectionFor,
+	toast,
+	waitForLoadingEnd
 } from './utils';
 
 test.describe('correct results.zip', () => {
@@ -154,7 +154,7 @@ test.describe('correct results.zip', () => {
 			expect.stringMatching(/^Cropped\/Entomobrya muscorum_obs\d_3\.jpeg$/),
 			expect.stringMatching(/^Original\/Entomobrya muscorum_obs\d_3\.jpeg$/),
 			expect.stringMatching(/^Cropped\/\(Unknown\)_obs\d_4\.jpeg$/),
-			expect.stringMatching(/^Original\/\(Unknown\)_obs\d_4\.jpeg$/),
+			expect.stringMatching(/^Original\/\(Unknown\)_obs\d_4\.jpeg$/)
 		]);
 	});
 });

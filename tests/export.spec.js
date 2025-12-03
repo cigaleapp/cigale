@@ -4,12 +4,12 @@ import * as yauzl from 'yauzl-promise';
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
-    chooseProtocol,
-    firstObservationCard,
-    goToTab,
-    importPhotos,
-    readStreamToBuffer,
-    setSettings
+	chooseProtocol,
+	firstObservationCard,
+	goToTab,
+	importPhotos,
+	readStreamToBuffer,
+	setSettings
 } from './utils';
 
 test('correctly applies crop padding', issue(463), async ({ page }) => {
