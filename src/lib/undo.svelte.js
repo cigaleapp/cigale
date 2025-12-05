@@ -158,17 +158,103 @@ class UndoStack {
 			}
 		});
 
-		defineKeyboardShortcuts('general', {
-			'$mod+z': {
-				help: 'Annuler',
-				do: async () => undo.pop()
-			},
-			'$mod+Shift+z': {
-				help: 'Rétablir',
-				do: async () => undo.rewind()
-			}
-		});
+		if (!import.meta.vitest) {
+			defineKeyboardShortcuts('general', {
+				'$mod+z': {
+					help: 'Annuler',
+					do: async () => undo.pop()
+				},
+				'$mod+Shift+z': {
+					help: 'Rétablir',
+					do: async () => undo.rewind()
+				}
+			});
+		}
 	}
 }
 
 export const undo = new UndoStack();
+
+if (import.meta.vitest) {
+	const { it, expect, vi } = import.meta.vitest;
+
+	it('pushes and pops undo operations', () => {
+		const handler = vi.fn();
+
+		$effect.root(() => {
+			undo.initialize(100);
+			undo.handlers['crop/box/create'] = handler;
+			undo.push('crop/box/create', {
+				imageId: 'img1',
+				box: { x: 0, y: 0, w: 100, h: 100 }
+			});
+
+			undo.pop();
+		})();
+
+		expect(handler).toHaveBeenCalledOnce();
+		expect(handler).toHaveBeenCalledWith({
+			imageId: 'img1',
+			box: { x: 0, y: 0, w: 100, h: 100 }
+		});
+	});
+
+	it('rewinds undone operations', () => {
+		const createHandler = vi.fn();
+		const deleteHandler = vi.fn();
+
+		$effect.root(() => {
+			undo.initialize(100);
+			undo.handlers['crop/box/create'] = createHandler;
+			undo.handlers['crop/box/delete'] = deleteHandler;
+
+			undo.push('crop/box/create', {
+				imageId: 'img2',
+				box: { x: 10, y: 10, w: 50, h: 50 }
+			});
+
+			undo.pop(); // Undo create
+			undo.rewind(); // Redo create
+		})();
+
+		expect(createHandler).toHaveBeenCalledOnce();
+		expect(createHandler).toHaveBeenCalledWith({
+			imageId: 'img2',
+			box: { x: 10, y: 10, w: 50, h: 50 }
+		});
+
+		expect(deleteHandler).toHaveBeenCalledOnce();
+		expect(deleteHandler).toHaveBeenCalledWith({
+			imageId: 'img2',
+			box: { x: 10, y: 10, w: 50, h: 50 }
+		});
+	});
+
+	it('can undo/redo multiple operations', () => {
+		const handle = vi.fn();
+
+		const box90 = { x: 10, y: 10, w: 90, h: 90 };
+		const box80 = { x: 10, y: 10, w: 80, h: 80 };
+		const box60 = { x: 20, y: 20, w: 60, h: 60 };
+
+		$effect.root(() => {
+			undo.initialize(100);
+			undo.handlers['crop/box/edit'] = handle;
+
+			undo.push('crop/box/edit', { imageId: 'img3', before: box90, after: box80 });
+			undo.push('crop/box/edit', { imageId: 'img3', before: box80, after: box60 });
+
+			undo.pop(); // Undo second edit
+			undo.pop(); // Undo first edit
+			undo.rewind(); // Redo first edit
+			undo.rewind(); // Redo second edit
+		})();
+
+		expect(handle).toHaveBeenCalledTimes(4);
+		// before/after are swapped because the handler *undoes* the operation
+		expect(handle).toHaveBeenNthCalledWith(1, { imageId: 'img3', before: box80, after: box60 });
+		expect(handle).toHaveBeenNthCalledWith(2, { imageId: 'img3', before: box90, after: box80 });
+		expect(handle).toHaveBeenNthCalledWith(3, { imageId: 'img3', before: box80, after: box90 });
+		expect(handle).toHaveBeenNthCalledWith(4, { imageId: 'img3', before: box60, after: box80 });
+	});
+}
