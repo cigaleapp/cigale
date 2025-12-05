@@ -59,16 +59,19 @@ const OPERATION_REWINDERS = {
 
 class UndoStack {
 	/** @type {UndoableOperation[]} */
-	stack = $state([]);
+	stack = [];
 
 	/**
 	 * Stores undone operations for redo functionality
 	 * @type {UndoableOperation[]}
 	 */
-	graveyard = $state([]);
+	graveyard = [];
 
 	/** @type {Partial<{ [K in UndoableOperationName]: UndoHandler<K> }>} */
 	handlers = {};
+
+	/** Max undo depth */
+	depth = 100;
 
 	/**
 	 *
@@ -99,6 +102,9 @@ class UndoStack {
 
 		this.graveyard = [];
 		this.stack.push({ op, data: _data });
+		if (this.stack.length > this.depth) {
+			this.stack.shift();
+		}
 	}
 
 	peek() {
@@ -151,12 +157,7 @@ class UndoStack {
 	 */
 	initialize(depth) {
 		this.stack = [];
-
-		$effect(() => {
-			if (this.stack.length > depth) {
-				this.stack.shift();
-			}
-		});
+		this.depth = depth;
 
 		if (!import.meta.vitest) {
 			defineKeyboardShortcuts('general', {
@@ -256,5 +257,42 @@ if (import.meta.vitest) {
 		expect(handle).toHaveBeenNthCalledWith(2, { imageId: 'img3', before: box90, after: box80 });
 		expect(handle).toHaveBeenNthCalledWith(3, { imageId: 'img3', before: box80, after: box90 });
 		expect(handle).toHaveBeenNthCalledWith(4, { imageId: 'img3', before: box60, after: box80 });
+	});
+
+	it('respects max undo depth', () => {
+		const handler = vi.fn();
+
+		$effect.root(() => {
+			undo.initialize(2);
+			undo.handlers['crop/box/create'] = handler;
+
+			undo.push('crop/box/create', {
+				imageId: 'img4',
+				box: { x: 0, y: 0, w: 10, h: 10 }
+			});
+			undo.push('crop/box/create', {
+				imageId: 'img4',
+				box: { x: 0, y: 0, w: 20, h: 20 }
+			});
+			undo.push('crop/box/create', {
+				imageId: 'img4',
+				box: { x: 0, y: 0, w: 30, h: 30 }
+			});
+
+			// First operation should have been discarded
+			undo.pop(); // Undoes w:30
+			undo.pop(); // Undoes w:20
+			undo.pop(); // Nothing to undo
+		})();
+
+		expect(handler).toHaveBeenCalledTimes(2);
+		expect(handler).toHaveBeenNthCalledWith(1, {
+			imageId: 'img4',
+			box: { x: 0, y: 0, w: 30, h: 30 }
+		});
+		expect(handler).toHaveBeenNthCalledWith(2, {
+			imageId: 'img4',
+			box: { x: 0, y: 0, w: 20, h: 20 }
+		});
 	});
 }
