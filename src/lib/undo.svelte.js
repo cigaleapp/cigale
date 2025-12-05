@@ -176,166 +176,249 @@ class UndoStack {
 export const undo = new UndoStack();
 
 if (import.meta.vitest) {
-	const { it, expect, vi } = import.meta.vitest;
+	const { it, expect, vi, describe } = import.meta.vitest;
 
-	it('pushes and pops undo operations', () => {
-		const handler = vi.fn();
+	describe('UndoStack', () => {
+		it('pushes and pops undo operations', () => {
+			const handler = vi.fn();
 
-		$effect.root(() => {
-			undo.initialize(100);
-			undo.handlers['crop/box/create'] = handler;
-			undo.push('crop/box/create', {
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/create'] = handler;
+				undo.push('crop/box/create', {
+					imageId: 'img1',
+					box: { x: 0, y: 0, w: 100, h: 100 }
+				});
+
+				undo.pop();
+			})();
+
+			expect(handler).toHaveBeenCalledOnce();
+			expect(handler).toHaveBeenCalledWith({
 				imageId: 'img1',
 				box: { x: 0, y: 0, w: 100, h: 100 }
 			});
-
-			undo.pop();
-		})();
-
-		expect(handler).toHaveBeenCalledOnce();
-		expect(handler).toHaveBeenCalledWith({
-			imageId: 'img1',
-			box: { x: 0, y: 0, w: 100, h: 100 }
 		});
-	});
 
-	it('rewinds undone operations', () => {
-		const createHandler = vi.fn();
-		const deleteHandler = vi.fn();
+		it('rewinds undone operations', () => {
+			const createHandler = vi.fn();
+			const deleteHandler = vi.fn();
 
-		$effect.root(() => {
-			undo.initialize(100);
-			undo.handlers['crop/box/create'] = createHandler;
-			undo.handlers['crop/box/delete'] = deleteHandler;
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/create'] = createHandler;
+				undo.handlers['crop/box/delete'] = deleteHandler;
 
-			undo.push('crop/box/create', {
+				undo.push('crop/box/create', {
+					imageId: 'img2',
+					box: { x: 10, y: 10, w: 50, h: 50 }
+				});
+
+				undo.pop(); // Undo create
+				undo.rewind(); // Redo create
+			})();
+
+			expect(createHandler).toHaveBeenCalledOnce();
+			expect(createHandler).toHaveBeenCalledWith({
 				imageId: 'img2',
 				box: { x: 10, y: 10, w: 50, h: 50 }
 			});
 
-			undo.pop(); // Undo create
-			undo.rewind(); // Redo create
-		})();
-
-		expect(createHandler).toHaveBeenCalledOnce();
-		expect(createHandler).toHaveBeenCalledWith({
-			imageId: 'img2',
-			box: { x: 10, y: 10, w: 50, h: 50 }
+			expect(deleteHandler).toHaveBeenCalledOnce();
+			expect(deleteHandler).toHaveBeenCalledWith({
+				imageId: 'img2',
+				box: { x: 10, y: 10, w: 50, h: 50 }
+			});
 		});
 
-		expect(deleteHandler).toHaveBeenCalledOnce();
-		expect(deleteHandler).toHaveBeenCalledWith({
-			imageId: 'img2',
-			box: { x: 10, y: 10, w: 50, h: 50 }
+		it('can undo/redo multiple operations', () => {
+			const handle = vi.fn();
+
+			const box90 = { x: 10, y: 10, w: 90, h: 90 };
+			const box80 = { x: 10, y: 10, w: 80, h: 80 };
+			const box60 = { x: 20, y: 20, w: 60, h: 60 };
+
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/edit'] = handle;
+
+				undo.push('crop/box/edit', { imageId: 'img3', before: box90, after: box80 });
+				undo.push('crop/box/edit', { imageId: 'img3', before: box80, after: box60 });
+
+				undo.pop(); // Undo second edit
+				undo.pop(); // Undo first edit
+				undo.rewind(); // Redo first edit
+				undo.rewind(); // Redo second edit
+			})();
+
+			expect(handle).toHaveBeenCalledTimes(4);
+			// before/after are swapped because the handler *undoes* the operation
+			expect(handle).toHaveBeenNthCalledWith(1, {
+				imageId: 'img3',
+				before: box80,
+				after: box60
+			});
+			expect(handle).toHaveBeenNthCalledWith(2, {
+				imageId: 'img3',
+				before: box90,
+				after: box80
+			});
+			expect(handle).toHaveBeenNthCalledWith(3, {
+				imageId: 'img3',
+				before: box80,
+				after: box90
+			});
+			expect(handle).toHaveBeenNthCalledWith(4, {
+				imageId: 'img3',
+				before: box60,
+				after: box80
+			});
 		});
-	});
 
-	it('can undo/redo multiple operations', () => {
-		const handle = vi.fn();
+		it('respects max undo depth', () => {
+			const handler = vi.fn();
 
-		const box90 = { x: 10, y: 10, w: 90, h: 90 };
-		const box80 = { x: 10, y: 10, w: 80, h: 80 };
-		const box60 = { x: 20, y: 20, w: 60, h: 60 };
+			$effect.root(() => {
+				undo.initialize(2);
+				undo.handlers['crop/box/create'] = handler;
 
-		$effect.root(() => {
-			undo.initialize(100);
-			undo.handlers['crop/box/edit'] = handle;
+				undo.push('crop/box/create', {
+					imageId: 'img4',
+					box: { x: 0, y: 0, w: 10, h: 10 }
+				});
+				undo.push('crop/box/create', {
+					imageId: 'img4',
+					box: { x: 0, y: 0, w: 20, h: 20 }
+				});
+				undo.push('crop/box/create', {
+					imageId: 'img4',
+					box: { x: 0, y: 0, w: 30, h: 30 }
+				});
 
-			undo.push('crop/box/edit', { imageId: 'img3', before: box90, after: box80 });
-			undo.push('crop/box/edit', { imageId: 'img3', before: box80, after: box60 });
+				// First operation should have been discarded
+				undo.pop(); // Undoes w:30
+				undo.pop(); // Undoes w:20
+				undo.pop(); // Nothing to undo
+			})();
 
-			undo.pop(); // Undo second edit
-			undo.pop(); // Undo first edit
-			undo.rewind(); // Redo first edit
-			undo.rewind(); // Redo second edit
-		})();
-
-		expect(handle).toHaveBeenCalledTimes(4);
-		// before/after are swapped because the handler *undoes* the operation
-		expect(handle).toHaveBeenNthCalledWith(1, { imageId: 'img3', before: box80, after: box60 });
-		expect(handle).toHaveBeenNthCalledWith(2, { imageId: 'img3', before: box90, after: box80 });
-		expect(handle).toHaveBeenNthCalledWith(3, { imageId: 'img3', before: box80, after: box90 });
-		expect(handle).toHaveBeenNthCalledWith(4, { imageId: 'img3', before: box60, after: box80 });
-	});
-
-	it('respects max undo depth', () => {
-		const handler = vi.fn();
-
-		$effect.root(() => {
-			undo.initialize(2);
-			undo.handlers['crop/box/create'] = handler;
-
-			undo.push('crop/box/create', {
-				imageId: 'img4',
-				box: { x: 0, y: 0, w: 10, h: 10 }
-			});
-			undo.push('crop/box/create', {
-				imageId: 'img4',
-				box: { x: 0, y: 0, w: 20, h: 20 }
-			});
-			undo.push('crop/box/create', {
+			expect(handler).toHaveBeenCalledTimes(2);
+			expect(handler).toHaveBeenNthCalledWith(1, {
 				imageId: 'img4',
 				box: { x: 0, y: 0, w: 30, h: 30 }
 			});
-
-			// First operation should have been discarded
-			undo.pop(); // Undoes w:30
-			undo.pop(); // Undoes w:20
-			undo.pop(); // Nothing to undo
-		})();
-
-		expect(handler).toHaveBeenCalledTimes(2);
-		expect(handler).toHaveBeenNthCalledWith(1, {
-			imageId: 'img4',
-			box: { x: 0, y: 0, w: 30, h: 30 }
-		});
-		expect(handler).toHaveBeenNthCalledWith(2, {
-			imageId: 'img4',
-			box: { x: 0, y: 0, w: 20, h: 20 }
-		});
-	});
-
-	it('does nothing when undo stack is empty', () => {
-		const handler = vi.fn();
-		$effect.root(() => {
-			undo.initialize(100);
-			undo.handlers['crop/box/create'] = handler;
-
-			undo.pop(); // Nothing to undo
-		})();
-
-		expect(handler).not.toHaveBeenCalled();
-	});
-
-	it('errors out when pushing invalid operation data', () => {
-		const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-		const handler = vi.fn();
-		$effect.root(() => {
-			undo.initialize(100);
-			undo.handlers['crop/box/create'] = handler;
-			undo.push('crop/box/create', {
-				imageId: 'img5',
-				// @ts-expect-error Testing invalid data
-				box: { x: 'invalid', y: 0, w: 100, h: 100 }
+			expect(handler).toHaveBeenNthCalledWith(2, {
+				imageId: 'img4',
+				box: { x: 0, y: 0, w: 20, h: 20 }
 			});
+		});
 
-			undo.pop();
-		})();
+		it('does nothing when undo stack is empty', () => {
+			const handler = vi.fn();
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/create'] = handler;
 
-		expect(consoleError).toHaveBeenCalled();
-		consoleError.mockRestore();
-		expect(handler).not.toHaveBeenCalled();
+				undo.pop(); // Nothing to undo
+			})();
+
+			expect(handler).not.toHaveBeenCalled();
+		});
+
+		it('errors out when pushing invalid operation data', () => {
+			const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+			const handler = vi.fn();
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/create'] = handler;
+				undo.push('crop/box/create', {
+					imageId: 'img5',
+					// @ts-expect-error Testing invalid data
+					box: { x: 'invalid', y: 0, w: 100, h: 100 }
+				});
+
+				undo.pop();
+			})();
+
+			expect(consoleError).toHaveBeenCalled();
+			consoleError.mockRestore();
+			expect(handler).not.toHaveBeenCalled();
+		});
+
+		it('errors out when popping operation with no handler', () => {
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.push('crop/box/create', {
+					imageId: 'img6',
+					box: { x: 0, y: 0, w: 100, h: 100 }
+				});
+				// No handler registered for 'crop/box/create'
+				expect(() => undo.pop()).toThrowError(
+					'No handler for undo operation crop/box/create'
+				);
+			})();
+		});
 	});
 
-	it('errors out when popping operation with no handler', () => {
-		$effect.root(() => {
-			undo.initialize(100);
-			undo.push('crop/box/create', {
-				imageId: 'img6',
-				box: { x: 0, y: 0, w: 100, h: 100 }
-			});
-			// No handler registered for 'crop/box/create'
-			expect(() => undo.pop()).toThrowError('No handler for undo operation crop/box/create');
-		})();
+	describe('Crop operations', () => {
+		it('rewinds crop box edit operations correctly', () => {
+			const boxBefore = { x: 15, y: 15, w: 70, h: 70 };
+			const boxAfter = { x: 20, y: 20, w: 60, h: 60 };
+			let box = { ...boxBefore };
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/edit'] = ({ imageId, before, after }) => {
+					box = { ...before };
+				};
+
+				undo.push('crop/box/edit', {
+					imageId: 'img7',
+					before: boxBefore,
+					after: boxAfter
+				});
+
+				// Simulate applying the edit
+				box = { ...boxAfter };
+
+				undo.pop(); // Undo edit
+				expect(box).toEqual(boxBefore);
+
+				undo.rewind(); // Redo edit
+				expect(box).toEqual(boxAfter);
+			})();
+		});
+
+		it('rewinds crop box create/delete operations correctly', () => {
+			const box = { x: 5, y: 5, w: 50, h: 50 };
+			let boxes = { testBox: { ...box }, otherBox: { ...box } };
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/create'] = ({ imageId, box }) => {
+					delete boxes['testBox'];
+				};
+				undo.handlers['crop/box/delete'] = ({ imageId, box }) => {
+					boxes['testBox'] = { ...box };
+				};
+
+				// Create box
+				undo.push('crop/box/create', {
+					imageId: 'img8',
+					box
+				});
+
+				// Simulate creating the box
+				boxes['testBox'] = { ...box };
+
+				expect(boxes).toHaveProperty('testBox');
+
+				undo.pop(); // Undo create
+				expect(boxes).not.toHaveProperty('testBox');
+
+				undo.rewind(); // Redo create
+				expect(boxes).toEqual({
+					testBox: { ...box },
+					otherBox: { ...box }
+				});
+			})();
+		});
 	});
 }
