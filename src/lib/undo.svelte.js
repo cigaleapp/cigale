@@ -4,7 +4,7 @@ import { onDestroy, onMount } from 'svelte';
 import { centeredBoundingBox } from './BoundingBoxes.svelte.js';
 import { defineKeyboardShortcuts } from './keyboard.svelte.js';
 
-const UndoableOperationSchemas = {
+const OPERATIONS = {
 	'crop/box/create': type({
 		imageId: 'string',
 		box: centeredBoundingBox
@@ -21,12 +21,23 @@ const UndoableOperationSchemas = {
 };
 
 /**
- * @typedef {keyof typeof UndoableOperationSchemas} UndoableOperationName
+ * @type {{ [K in UndoableOperationName]: RedoTransformer<K> } }
+ */
+const OPERATION_REWINDERS = {
+	'crop/box/create': (data) => ({ op: 'crop/box/delete', data }),
+	'crop/box/delete': (data) => ({ op: 'crop/box/create', data }),
+	'crop/box/edit': ({ imageId, before, after }) => ({
+		op: 'crop/box/edit',
+		data: { imageId, before: after, after: before }
+	})
+};
+/**
+ * @typedef {keyof typeof OPERATIONS} UndoableOperationName
  */
 
 /**
  * @template {UndoableOperationName} T
- * @typedef {typeof UndoableOperationSchemas[T]['inferIn']} UndoableOperationData
+ * @typedef {typeof OPERATIONS[T]['inferIn']} UndoableOperationData
  */
 
 /**
@@ -59,9 +70,6 @@ class UndoStack {
 	/** @type {Partial<{ [K in UndoableOperationName]: UndoHandler<K> }>} */
 	handlers = {};
 
-	/** @type {Partial<{ [K in UndoableOperationName]: RedoTransformer<K> }>} */
-	redoTransformers = {};
-
 	/**
 	 *
 	 * @param {UndoableOperation} operation
@@ -81,14 +89,13 @@ class UndoStack {
 	push(op, data) {
 		const _data = $state.snapshot(data);
 
-		if (!UndoableOperationSchemas[op].allows(_data)) {
+		if (!OPERATIONS[op].allows(_data)) {
 			console.error(
 				'Invalid undo operation data',
 				{ op, data: _data },
-				UndoableOperationSchemas[op](_data)
+				OPERATIONS[op](_data)
 			);
 		}
-
 
 		this.graveyard = [];
 		this.stack.push({ op, data: _data });
@@ -105,7 +112,6 @@ class UndoStack {
 			return;
 		}
 
-
 		this.graveyard.push(operation);
 
 		return this.#handle(operation);
@@ -120,13 +126,7 @@ class UndoStack {
 
 		const { op, data } = operation;
 
-		const inversed = this.redoTransformers[op]?.(data);
-		if (!inversed) {
-			console.warn(`No redo transformer for operation ${op}`);
-			return;
-		}
-
-		return this.#handle(inversed);
+		return this.#handle(OPERATION_REWINDERS[op](data));
 	}
 
 	/**
@@ -142,23 +142,6 @@ class UndoStack {
 
 		onDestroy(() => {
 			delete this.handlers[op];
-		});
-	}
-
-	/**
-	 * Register a way to redo an operation by undoing its inverse
-	 * The function given here should turn an operation into its inverse, so that when the undo handler is called on it, it redoes the original operation.
-	 * @template {UndoableOperationName} T
-	 * @param {T} op
-	 * @param {typeof this.redoTransformers[T]} transformer
-	 */
-	rewinder(op, transformer) {
-		onMount(() => {
-			this.redoTransformers[op] = transformer;
-		});
-
-		onDestroy(() => {
-			delete this.redoTransformers[op];
 		});
 	}
 
