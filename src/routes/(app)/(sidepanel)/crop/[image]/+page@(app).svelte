@@ -8,7 +8,9 @@
 	import { watch } from 'runed';
 
 	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
+	import IconUndo from '~icons/ri/arrow-go-back-fill';
 	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
+	import IconRedo from '~icons/ri/arrow-go-forward-fill';
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedCrop from '~icons/ri/check-double-line';
@@ -921,6 +923,20 @@
 				<tool.icon />
 			</button>
 		{/each}
+		<button
+			aria-label="Annuler"
+			use:tooltip={{ text: 'Annuler', keyboard: '$mod+z', placement: 'right' }}
+			onclick={() => undo.pop()}
+		>
+			<IconUndo />
+		</button>
+		<button
+			aria-label="Rétablir"
+			use:tooltip={{ text: 'Rétablir', keyboard: '$mod+Shift+z', placement: 'right' }}
+			onclick={() => undo.rewind()}
+		>
+			<IconRedo />
+		</button>
 	</aside>
 	<aside class="info">
 		<section class="top">
