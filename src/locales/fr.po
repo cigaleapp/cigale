@@ -142,6 +142,8 @@ msgid "Analyse…"
 msgstr "Analyse…"
 
 #: src/lib/toasts.svelte.js
+#: src/lib/undo.svelte.js
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -1821,6 +1823,11 @@ msgstr "La date d'export sera utilisée comme date de modification des fichiers 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Arborescence"
 msgstr "Arborescence"
+
+#: src/lib/undo.svelte.js
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Rétablir"
+msgstr "Rétablir"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

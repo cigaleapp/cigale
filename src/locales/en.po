@@ -143,6 +143,8 @@ msgid "Analyse…"
 msgstr "Analyzing…"
 
 #: src/lib/toasts.svelte.js
+#: src/lib/undo.svelte.js
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -1812,6 +1814,11 @@ msgstr ""
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Arborescence"
+msgstr ""
+
+#: src/lib/undo.svelte.js
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Rétablir"
 msgstr ""
 
 #: src/lib/queue.svelte.js
