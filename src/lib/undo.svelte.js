@@ -50,8 +50,17 @@ class UndoStack {
 	/** @type {UndoableOperation[]} */
 	stack = $state([]);
 
+	/**
+	 * Stores undone operations for redo functionality
+	 * @type {UndoableOperation[]}
+	 */
+	graveyard = $state([]);
+
 	/** @type {Partial<{ [K in UndoableOperationName]: UndoHandler<K> }>} */
 	handlers = {};
+
+	/** @type {Partial<{ [K in UndoableOperationName]: RedoTransformer<K> }>} */
+	redoTransformers = {};
 
 	/**
 	 *
@@ -82,6 +91,7 @@ class UndoStack {
 
 		console.log('Undo push', { op, data: _data });
 
+		this.graveyard = [];
 		this.stack.push({ op, data: _data });
 	}
 
@@ -103,6 +113,24 @@ class UndoStack {
 		return this.#handle(operation);
 	}
 
+	rewind() {
+		const operation = this.graveyard.pop();
+		if (!operation) {
+			console.warn('Redo stack is empty');
+			return;
+		}
+
+		const { op, data } = operation;
+
+		const inversed = this.redoTransformers[op]?.(data);
+		if (!inversed) {
+			console.warn(`No redo transformer for operation ${op}`);
+			return;
+		}
+
+		return this.#handle(inversed);
+	}
+
 	/**
 	 * Register a handler until the page/layout is unmounted
 	 * @template {UndoableOperationName} T
@@ -116,6 +144,23 @@ class UndoStack {
 
 		onDestroy(() => {
 			delete this.handlers[op];
+		});
+	}
+
+	/**
+	 * Register a way to redo an operation by undoing its inverse
+	 * The function given here should turn an operation into its inverse, so that when the undo handler is called on it, it redoes the original operation.
+	 * @template {UndoableOperationName} T
+	 * @param {T} op
+	 * @param {typeof this.redoTransformers[T]} transformer
+	 */
+	rewinder(op, transformer) {
+		onMount(() => {
+			this.redoTransformers[op] = transformer;
+		});
+
+		onDestroy(() => {
+			delete this.redoTransformers[op];
 		});
 	}
 
@@ -137,6 +182,10 @@ class UndoStack {
 				help: 'Annuler',
 				do: async () => undo.pop()
 			},
+			'$mod+Shift+z': {
+				help: 'Rétablir',
+				do: async () => undo.rewind()
+			}
 		});
 	}
 }

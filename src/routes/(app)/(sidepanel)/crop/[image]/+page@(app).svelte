@@ -359,13 +359,28 @@
 		await deleteBoundingBox(imageId, { skipUndo: true });
 	});
 
+	undo.rewinder('crop/box/create', ({ imageId, box }) => ({
+		op: 'crop/box/delete',
+		data: { imageId, box }
+	}));
+
 	undo.on('crop/box/edit', async ({ imageId, before }) => {
 		await onCropChange(imageId, toTopLeftCoords(before), false, false);
 	});
 
+	undo.rewinder('crop/box/edit', ({ imageId, before, after }) => ({
+		op: 'crop/box/edit',
+		data: { imageId, before: after, after: before }
+	}));
+
 	undo.on('crop/box/delete', async ({ box }) => {
 		await onCropChange(null, toTopLeftCoords(box), false, false);
 	});
+
+	undo.rewinder('crop/box/delete', ({ imageId, box }) => ({
+		op: 'crop/box/create',
+		data: { imageId, box }
+	}));
 
 	/**
 	 * @param {string} imageId
