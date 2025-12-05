@@ -739,7 +739,7 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 
 	expect(zipFiles).toHaveLength(expectedFiles.length);
 	for (const expectedFile of expectedFiles) {
-		expect(zipFiles).toContain(
+		expect(zipFiles).toContainEqual(
 			expectedFile instanceof RegExp ? expect.stringMatching(expectedFile) : expectedFile
 		);
 	}
