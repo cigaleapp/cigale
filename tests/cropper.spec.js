@@ -312,6 +312,20 @@ test.describe('Cropper view', () => {
 				await expectConfirmed(page, true);
 			});
 
+			test('undo/redo', async ({ page }) => {
+				await makeBox(page, 10, 10, 50, 50);
+				await expectBoxInList(page, 2, 245, 245);
+
+				// Undo box creation
+				await page.keyboard.press('Control+z');
+				await expect(boxesInBoxesList(page)).toHaveCount(1);
+
+				// Redo box creation
+				await page.keyboard.press('Control+Shift+z');
+				await expectBoxInList(page, 2, 245, 245);
+				await expect(boxesInBoxesList(page)).toHaveCount(2);
+			});
+
 			test('dragging outside the crop surface cancels', issue(431), async ({ page }) => {
 				await setSettings({ page }, { showTechnicalMetadata: true });
 				await makeBox(page, 10, 10, 50, -30);
@@ -372,6 +386,20 @@ test.describe('Cropper view', () => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
 				await expectConfirmed(page, true);
+			});
+
+			test('undo/redo', async ({ page }) => {
+				await makeBox(page, 10, 10, 50, 50);
+				await expectBoxInList(page, 2, 327, 327);
+
+				// Undo box creation
+				await page.keyboard.press('Control+z');
+				await expect(boxesInBoxesList(page)).toHaveCount(1);
+
+				// Redo box creation
+				await page.keyboard.press('Control+Shift+z');
+				await expectBoxInList(page, 2, 327, 327);
+				await expect(boxesInBoxesList(page)).toHaveCount(2);
 			});
 		});
 
