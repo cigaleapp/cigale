@@ -355,7 +355,6 @@
 		}
 	}
 
-	$inspect(undo.stack);
 
 	undo.on('crop/box/create', async ({ imageId }) => {
 		await deleteBoundingBox(imageId, { skipUndo: true });

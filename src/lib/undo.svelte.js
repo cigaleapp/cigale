@@ -89,7 +89,6 @@ class UndoStack {
 			);
 		}
 
-		console.log('Undo push', { op, data: _data });
 
 		this.graveyard = [];
 		this.stack.push({ op, data: _data });
@@ -106,7 +105,6 @@ class UndoStack {
 			return;
 		}
 
-		console.log('Undo pop', operation);
 
 		this.graveyard.push(operation);
 
