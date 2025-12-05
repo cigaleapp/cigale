@@ -45,6 +45,7 @@
 	import {
 		deleteImageFile,
 		imageFileIds,
+		imageIdToFileId,
 		imagesOfImageFile,
 		imageId as makeImageId,
 		parseImageId
@@ -356,14 +357,17 @@
 	}
 
 	undo.on('crop/box/create', async ({ imageId }) => {
+		if (imageIdToFileId(imageId) !== fileId) return;
 		await deleteBoundingBox(imageId, { skipUndo: true });
 	});
 
 	undo.on('crop/box/edit', async ({ imageId, before }) => {
+		if (imageIdToFileId(imageId) !== fileId) return;
 		await onCropChange(imageId, toTopLeftCoords(before), false, false);
 	});
 
-	undo.on('crop/box/delete', async ({ box }) => {
+	undo.on('crop/box/delete', async ({ imageId, box }) => {
+		if (imageIdToFileId(imageId) !== fileId) return;
 		await onCropChange(null, toTopLeftCoords(box), false, false);
 	});
 
