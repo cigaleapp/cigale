@@ -154,7 +154,9 @@ class UndoStack {
 	 */
 	initialize(depth) {
 		this.stack = [];
+		this.graveyard = [];
 		this.depth = depth;
+		this.handlers = {};
 
 		if (!import.meta.vitest) {
 			defineKeyboardShortcuts('general', {
@@ -291,5 +293,49 @@ if (import.meta.vitest) {
 			imageId: 'img4',
 			box: { x: 0, y: 0, w: 20, h: 20 }
 		});
+	});
+
+	it('does nothing when undo stack is empty', () => {
+		const handler = vi.fn();
+		$effect.root(() => {
+			undo.initialize(100);
+			undo.handlers['crop/box/create'] = handler;
+
+			undo.pop(); // Nothing to undo
+		})();
+
+		expect(handler).not.toHaveBeenCalled();
+	});
+
+	it('errors out when pushing invalid operation data', () => {
+		const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+		const handler = vi.fn();
+		$effect.root(() => {
+			undo.initialize(100);
+			undo.handlers['crop/box/create'] = handler;
+			undo.push('crop/box/create', {
+				imageId: 'img5',
+				// @ts-expect-error Testing invalid data
+				box: { x: 'invalid', y: 0, w: 100, h: 100 }
+			});
+
+			undo.pop();
+		})();
+
+		expect(consoleError).toHaveBeenCalled();
+		consoleError.mockRestore();
+		expect(handler).not.toHaveBeenCalled();
+	});
+
+	it('errors out when popping operation with no handler', () => {
+		$effect.root(() => {
+			undo.initialize(100);
+			undo.push('crop/box/create', {
+				imageId: 'img6',
+				box: { x: 0, y: 0, w: 100, h: 100 }
+			});
+			// No handler registered for 'crop/box/create'
+			expect(() => undo.pop()).toThrowError('No handler for undo operation crop/box/create');
+		})();
 	});
 }
