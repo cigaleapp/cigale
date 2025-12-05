@@ -1,4 +1,5 @@
 <script>
+	import { toTopLeftCoords } from './BoundingBoxes.svelte';
 	import CardMedia from './CardMedia.svelte';
 	import { isDebugMode } from './settings.svelte.js';
 	import { uiState } from './state.svelte.js';
@@ -23,13 +24,16 @@
 		if (status === 'errored') return uiState.erroredImages.get(image.id);
 		if (isDebugMode()) return `${image.id} @ ${image.addedAt.toISOString()}`;
 	});
+
+	const cropbox = $derived.by(() => uiState.cropMetadataValueOf(image)?.value);
 </script>
 
 <CardMedia
-	id={image.fileId}
+	id={image.id}
 	title={image.filename}
 	image={uiState.previewURLs.get(image.fileId)}
-	selected={uiState.selection.includes(image.fileId)}
+	selected={uiState.selection.includes(image.id)}
+	boundingBoxes={cropbox ? [toTopLeftCoords(cropbox)] : []}
 	boxes="show-all"
 	{tooltip}
 	{status}

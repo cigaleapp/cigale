@@ -95,6 +95,15 @@
 
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
 
+	/**
+	 * @param {import('$lib/database').Image} img
+	 * @param {string} selector
+	 *
+	 */
+	function imageSelectedBy(img, selector) {
+		return [img.fileId, img.id].includes(selector);
+	}
+
 	const singleObservationSelected = $derived(
 		uiState.selection.length === 1
 			? tables.Observation.state.find((obs) => obs.id === uiState.selection[0])
@@ -103,13 +112,14 @@
 
 	const singleImageSelected = $derived(
 		uiState.selection.length === 1
-			? tables.Image.state.find((img) => img.fileId === uiState.selection[0])
+			? tables.Image.state.find((img) => imageSelectedBy(img, uiState.selection[0]))
 			: undefined
 	);
 
 	const selectionCounts = $derived({
-		image: uiState.selection.filter((id) => tables.Image.state.some((img) => img.fileId === id))
-			.length,
+		image: uiState.selection.filter((id) =>
+			tables.Image.state.some((img) => imageSelectedBy(img, id))
+		).length,
 		observation: uiState.selection.filter((id) =>
 			tables.Observation.state.some((obs) => obs.id === id)
 		).length,
