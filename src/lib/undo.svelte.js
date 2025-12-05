@@ -107,10 +107,6 @@ class UndoStack {
 		}
 	}
 
-	peek() {
-		return this.stack.at(-1);
-	}
-
 	pop() {
 		const operation = this.stack.pop();
 		if (!operation) {
