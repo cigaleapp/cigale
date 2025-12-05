@@ -98,6 +98,7 @@ class UndoStack {
 				{ op, data: _data },
 				OPERATIONS[op](_data)
 			);
+			return;
 		}
 
 		this.graveyard = [];
