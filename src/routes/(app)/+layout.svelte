@@ -41,6 +41,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import Toast from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { undo } from '$lib/undo.svelte';
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
@@ -51,6 +52,8 @@
 	const { swarpc, parallelism } = $derived(data);
 
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
+
+	undo.initialize(100);
 
 	export const snapshot = {
 		capture() {

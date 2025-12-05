@@ -8,7 +8,9 @@
 	import { watch } from 'runed';
 
 	import IconFourPointCrop from '~icons/ri/apps-2-add-line';
+	import IconUndo from '~icons/ri/arrow-go-back-fill';
 	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
+	import IconRedo from '~icons/ri/arrow-go-forward-fill';
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedCrop from '~icons/ri/check-double-line';
@@ -43,6 +45,7 @@
 	import {
 		deleteImageFile,
 		imageFileIds,
+		imageIdToFileId,
 		imagesOfImageFile,
 		imageId as makeImageId,
 		parseImageId
@@ -66,6 +69,7 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { undo } from '$lib/undo.svelte';
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
@@ -352,10 +356,34 @@
 		}
 	}
 
+	undo.on('crop/box/create', async ({ imageId }) => {
+		if (imageIdToFileId(imageId) !== fileId) return;
+		await deleteBoundingBox(imageId, { skipUndo: true });
+	});
+
+	undo.on('crop/box/edit', async ({ imageId, before }) => {
+		if (imageIdToFileId(imageId) !== fileId) return;
+		await onCropChange(imageId, toTopLeftCoords(before), false, false);
+	});
+
+	undo.on('crop/box/delete', async ({ imageId, box }) => {
+		if (imageIdToFileId(imageId) !== fileId) return;
+		await onCropChange(null, toTopLeftCoords(box), false, false);
+	});
+
 	/**
 	 * @param {string} imageId
+	 * @param {object} [options]
+	 * @param {boolean} [options.skipUndo] whether to skip pushing this operation to the undo stack
 	 */
-	async function deleteBoundingBox(imageId) {
+	async function deleteBoundingBox(imageId, { skipUndo = false } = {}) {
+		if (!skipUndo) {
+			undo.push('crop/box/delete', {
+				imageId,
+				box: boundingBoxes[imageId]
+			});
+		}
+
 		if (images.length === 1) {
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
@@ -371,9 +399,15 @@
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
 	 * @param {Rect|undefined} newBoundingBox
 	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
+	 * @param {boolean} [pushToUndoStack=true] whether to push this change to the undo stack
 	 * @returns {Promise<string|null>} the ID of the image we just modified/created
 	 */
-	async function onCropChange(imageId, newBoundingBox, flashConfirmedOverlay = true) {
+	async function onCropChange(
+		imageId,
+		newBoundingBox,
+		flashConfirmedOverlay = true,
+		pushToUndoStack = true
+	) {
 		if (!newBoundingBox) {
 			// No bounding box, just mark the image as confirmed and move on
 			if (imageId) {
@@ -414,6 +448,14 @@
 		let newImageId = '';
 
 		if (imageId) {
+			if (pushToUndoStack) {
+				undo.push('crop/box/edit', {
+					imageId,
+					before: boundingBoxes[imageId],
+					after: toCenteredCoords(newBoundingBox)
+				});
+			}
+
 			// We're modifying an existing cropbox
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
@@ -433,6 +475,14 @@
 		) {
 			// We're creating a new cropbox, but it is the first one (and we already have an image, it just doesn't have a cropbox)
 			newImageId = firstImage.id;
+
+			if (pushToUndoStack) {
+				undo.push('crop/box/create', {
+					imageId: newImageId,
+					box: toCenteredCoords(newBoundingBox)
+				});
+			}
+
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
 				metadataId: uiState.cropMetadataId,
@@ -449,6 +499,14 @@
 				fileId,
 				Math.max(...images.map(({ id }) => parseImageId(id).subindex)) + 1
 			);
+
+			if (pushToUndoStack) {
+				undo.push('crop/box/create', {
+					imageId: newImageId,
+					box: toCenteredCoords(newBoundingBox)
+				});
+			}
+
 			await idb.tables.Image.set({
 				id: newImageId,
 				filename: firstImage?.filename ?? '',
@@ -852,6 +910,20 @@
 				<tool.icon />
 			</button>
 		{/each}
+		<button
+			aria-label="Annuler"
+			use:tooltip={{ text: 'Annuler', keyboard: '$mod+z', placement: 'right' }}
+			onclick={() => undo.pop()}
+		>
+			<IconUndo />
+		</button>
+		<button
+			aria-label="Rétablir"
+			use:tooltip={{ text: 'Rétablir', keyboard: '$mod+Shift+z', placement: 'right' }}
+			onclick={() => undo.rewind()}
+		>
+			<IconRedo />
+		</button>
 	</aside>
 	<aside class="info">
 		<section class="top">
