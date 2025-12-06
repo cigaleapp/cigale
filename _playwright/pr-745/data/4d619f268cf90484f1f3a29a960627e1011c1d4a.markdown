@@ -1,0 +1,394 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - heading [level=2]: Recadrage
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: U
+        - definition: Revenir au recadrage d'origine pour toutes les boîtes
+        - term:
+          - generic:
+            - generic:
+              - generic: Suppr
+        - definition: Supprimer la boîte sélectionnée
+        - term:
+          - generic:
+            - generic:
+              - generic: ←
+        - definition: Image précédente
+        - term:
+          - generic:
+            - generic:
+              - generic: Shift
+              - generic: +
+              - generic: ␣
+        - definition: Image précédente
+        - term:
+          - generic:
+            - generic:
+              - generic: →
+        - definition: Image suivante
+        - term:
+          - generic:
+            - generic:
+              - generic: ␣
+        - definition: Continuer
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Suppr
+        - definition: Supprimer l’image
+        - term:
+          - generic:
+            - generic:
+              - generic: Esc
+        - definition: Quitter le mode recadrage
+        - term:
+          - generic:
+            - generic:
+              - generic: A
+        - definition: Activer/désactiver la continuation automatique
+        - term:
+          - generic:
+            - generic:
+              - generic: F
+        - definition: Cacher les boîtes non sélectionnées
+        - term:
+          - generic:
+            - generic:
+              - generic: U
+        - definition: Revenir au recadrage d'origine
+        - term:
+          - generic:
+            - generic:
+              - generic: ↑
+        - definition: Marquer le recadrage comme confirmé
+        - term:
+          - generic:
+            - generic:
+              - generic: ↓
+        - definition: Marquer le recadrage comme non confirmé
+        - term:
+          - generic:
+            - generic:
+              - generic: +
+        - definition: Zoomer
+        - term:
+          - generic:
+            - generic:
+              - generic: "-"
+        - definition: Dézoomer
+        - term:
+          - generic:
+            - generic:
+              - generic: "0"
+        - definition: Réinitialiser le zoom
+        - term:
+          - generic:
+            - generic:
+              - generic: R
+        - definition: Choisir l'outil Glisser-recadrer
+        - term:
+          - generic:
+            - generic:
+              - generic: Z
+        - definition: Choisir l'outil 2 points
+        - term:
+          - generic:
+            - generic:
+              - generic: Shift
+              - generic: +
+              - generic: Z
+        - definition: Choisir l'outil 4 points
+        - term:
+          - generic:
+            - generic:
+              - generic: V
+        - definition: Choisir l'outil Déplacer
+        - term:
+          - generic:
+            - generic:
+              - generic: H
+        - definition: Choisir l'outil Main
+        - term:
+          - generic:
+            - generic:
+              - generic: ","
+        - definition: Sélectionner la boîte précédente
+        - term:
+          - generic:
+            - generic:
+              - generic: ;
+        - definition: Sélectionner la boîte suivante
+        - term:
+          - generic:
+            - generic:
+              - generic: "1"
+        - definition: "Sélectionner la boîte #1"
+        - term:
+          - generic:
+            - generic:
+              - generic: "2"
+        - definition: "Sélectionner la boîte #2"
+        - term:
+          - generic:
+            - generic:
+              - generic: "3"
+        - definition: "Sélectionner la boîte #3"
+        - term:
+          - generic:
+            - generic:
+              - generic: "4"
+        - definition: "Sélectionner la boîte #4"
+        - term:
+          - generic:
+            - generic:
+              - generic: "5"
+        - definition: "Sélectionner la boîte #5"
+        - term:
+          - generic:
+            - generic:
+              - generic: "6"
+        - definition: "Sélectionner la boîte #6"
+        - term:
+          - generic:
+            - generic:
+              - generic: "7"
+        - definition: "Sélectionner la boîte #7"
+        - term:
+          - generic:
+            - generic:
+              - generic: "8"
+        - definition: "Sélectionner la boîte #8"
+        - term:
+          - generic:
+            - generic:
+              - generic: "9"
+        - definition: "Sélectionner la boîte #9"
+      - heading [level=2]: Général
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: I
+              - generic: D
+              - generic: E
+              - generic: V
+        - definition: Activer/Désactiver le debug mode
+      - heading [level=2]: Navigation
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: P
+        - definition: Choisir le protocole
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: I
+        - definition: Importer des images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: R
+        - definition: Recadrer les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: "N"
+        - definition: Classifier les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: X
+        - definition: Exporter les résultats
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: M
+        - definition: Gérer les protocoles
+  - dialog:
+    - banner:
+      - heading [level=1]: Préparation hors-ligne
+      - button:
+        - img
+    - main:
+      - paragraph: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+    - contentinfo:
+      - generic:
+        - button: Démarrer
+  - dialog:
+    - banner:
+      - heading [level=1]: Importer le protocole distant ?
+      - button:
+        - img
+    - main: "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse suivante:"
+    - contentinfo:
+      - generic:
+        - button: Annuler
+        - generic:
+          - button: Importer
+  - generic [ref=e3]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Exporter les résultats
+        - button:
+          - img
+      - main:
+        - generic:
+          - radiogroup:
+            - generic:
+              - radio
+              - text: Métadonnées seulement
+            - generic:
+              - radio [checked]
+              - text: Métadonnées et images recadrées
+            - generic:
+              - radio
+              - text: Métadonnées, images recadrées et images originales
+              - paragraph: Permet de ré-importer les résultats ultérieurement
+        - generic:
+          - generic: Marge autour des images recadrées
+          - radiogroup:
+            - radio [checked]: Aucune
+            - radio: 5%
+            - radio: 10%
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: "%"
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: px
+          - paragraph: Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
+      - contentinfo:
+        - generic:
+          - paragraph:
+            - code: 0%
+        - button:
+          - img
+          - text: results.zip
+  - banner:
+    - navigation [ref=e6]:
+      - link [ref=e8]:
+        - /url: "#/"
+        - img [ref=e10]
+      - generic [ref=e19]:
+        - link "Importer" [ref=e20]:
+          - /url: "#/import"
+        - generic [ref=e21]:
+          - link "Recadrer" [ref=e22]:
+            - /url: "#/crop"
+            - text: Recadrer
+          - button [ref=e25] [cursor=pointer]:
+            - img [ref=e26]
+        - generic [ref=e28]:
+          - link "Classifier" [ref=e29]:
+            - /url: "#/classify"
+          - button [ref=e31] [cursor=pointer]:
+            - img [ref=e32]
+        - button "Résultats" [ref=e34] [cursor=pointer]
+        - generic [ref=e35]:
+          - button "Activer" [ref=e36] [cursor=pointer]:
+            - img [ref=e37]
+            - text: Activer
+          - button "Ne pas activer les notifications" [ref=e39] [cursor=pointer]:
+            - img [ref=e40]
+  - generic [ref=e43]:
+    - main [ref=e44]:
+      - paragraph [ref=e46]: coucou toi :) passes une bonne journée ! 💖💖
+    - complementary [ref=e49]:
+      - button "Choisir l'outil Glisser-recadrer" [ref=e50] [cursor=pointer]:
+        - img [ref=e51]
+      - button "Choisir l'outil 2 points" [ref=e53] [cursor=pointer]:
+        - img [ref=e54]
+      - button "Choisir l'outil 4 points" [active] [ref=e56] [cursor=pointer]:
+        - img [ref=e57]
+      - button "Choisir l'outil Déplacer" [ref=e59] [cursor=pointer]:
+        - img [ref=e60]
+      - button "Choisir l'outil Main" [ref=e62] [cursor=pointer]:
+        - img [ref=e63]
+    - complementary [ref=e65]:
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - button "Autres photos Esc" [ref=e68] [cursor=pointer]:
+            - img [ref=e69]
+            - text: Autres photos
+            - generic [ref=e72]: Esc
+          - button "Supprimer" [ref=e73] [cursor=pointer]:
+            - img [ref=e74]
+            - text: Supprimer
+        - heading "lil-fella.jpeg" [level=1] [ref=e77]
+        - generic [ref=e78]:
+          - button "Réinit. Ctrl + U" [ref=e79] [cursor=pointer]:
+            - img [ref=e80]
+            - text: Réinit.
+            - generic [ref=e82]:
+              - generic [ref=e83]: Ctrl
+              - generic [ref=e84]: +
+              - generic [ref=e85]: U
+          - button "Valider ↑" [ref=e86] [cursor=pointer]:
+            - img [ref=e87]
+            - text: Valider
+            - generic [ref=e90]: ↑
+      - list [ref=e92]:
+        - listitem [ref=e93]:
+          - img [ref=e95]
+          - generic [ref=e96]:
+            - paragraph [ref=e97]: "Boîte #1"
+            - paragraph [ref=e98]:
+              - code [ref=e99]: 1441×1881
+          - generic [ref=e100]:
+            - button "Recadrage d'origine indisponible" [disabled] [ref=e101]:
+              - img [ref=e102]
+            - button "Supprimer la boîte sélectionnée" [ref=e104] [cursor=pointer]:
+              - img [ref=e105]
+      - generic [ref=e107]:
+        - paragraph [ref=e109]:
+          - img [ref=e110]
+          - text: Images avec recadrage
+          - code [ref=e112]: 100%
+        - paragraph [ref=e116]:
+          - img [ref=e117]
+          - text: Recadrages confirmés
+          - code [ref=e119]: 0%
+      - navigation [ref=e121]:
+        - generic [ref=e122]:
+          - button "Image précédente" [ref=e123] [cursor=pointer]:
+            - img [ref=e124]
+          - code [ref=e126]:
+            - text: "3"
+            - generic [ref=e127]: ⁄
+            - text: "4"
+          - button "Image suivante" [ref=e128] [cursor=pointer]:
+            - img [ref=e129]
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - switch "Auto" [ref=e134] [cursor=pointer]:
+              - img [ref=e136]
+            - text: Auto
+          - button "Continuer ␣" [ref=e138] [cursor=pointer]:
+            - text: Continuer
+            - generic [ref=e140]: ␣
+  - generic [ref=e141]: Recadrer lil-fella.jpeg · C.I.G.A.L.E.
+```
