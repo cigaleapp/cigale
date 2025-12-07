@@ -92,7 +92,7 @@
 		"@wuchale/vite-plugin": "^0.15.3",
 		"all-contributors-cli": "^6.26.1",
 		"bun": "^1.3.3",
-		"electron": "^39.2.4",
+		"electron": "^39.2.6",
 		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-depend": "^1.4.0",
