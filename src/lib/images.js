@@ -164,8 +164,30 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 			// Store there cuz imagesOfImageFile() reads from reactive state.
 			const imagesOfFile = imagesOfImageFile(id);
 			try {
-				tx.objectStore('ImageFile').delete(id);
-				tx.objectStore('ImagePreviewFile').delete(id);
+				const file = await tx.objectStore('ImageFile').get(id);
+				const preview = await tx.objectStore('ImagePreviewFile').get(id);
+
+				if (!file && !notFoundOk) {
+					throw new Error(`ImageFile with id ${id} not found`);
+				}
+
+				if (!preview && !notFoundOk) {
+					throw new Error(`ImagePreviewFile with id ${id} not found`);
+				}
+
+				if (file) {
+					tx.objectStore('ImageFile').put({
+						...file,
+						deleted: true
+					});
+				}
+
+				if (preview) {
+					tx.objectStore('ImagePreviewFile').put({
+						...preview,
+						deleted: true
+					});
+				}
 
 				for (const image of imagesOfFile) {
 					tx.objectStore('Image').delete(image.id);
@@ -332,7 +354,7 @@ export async function resizeToMaxSize({ source }) {
 /**
  *
  * @param {string} imageFileId
- * @param {Image[]} [images] look for images in this array instead of the database
+ * @param {undefined | Image[]} [images] look for images in this array instead of the database
  * @returns {Image[]}
  */
 export function imagesOfImageFile(imageFileId, images = undefined) {

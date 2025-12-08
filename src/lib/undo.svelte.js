@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { onDestroy, onMount } from 'svelte';
 
 import { centeredBoundingBox } from './BoundingBoxes.svelte.js';
+import { Schemas, Tables } from './database.js';
 import { defineKeyboardShortcuts } from './keyboard.svelte.js';
 
 const OPERATIONS = {
@@ -17,6 +18,22 @@ const OPERATIONS = {
 		imageId: 'string',
 		before: centeredBoundingBox,
 		after: centeredBoundingBox
+	}),
+	'crop/box/reset': type({
+		imageId: 'string',
+		before: centeredBoundingBox,
+		after: centeredBoundingBox
+	}),
+	'crop/reset': type({
+		fileId: 'string',
+		before: { '[string]': centeredBoundingBox },
+		after: { '[string]': centeredBoundingBox },
+		confirmed: 'boolean'
+	}),
+	'crop/deletefile': type({
+		fileId: 'string',
+		images: Schemas.Image.array(),
+		redoing: 'boolean = false'
 	})
 };
 
@@ -29,6 +46,18 @@ const OPERATION_REWINDERS = {
 	'crop/box/edit': ({ imageId, before, after }) => ({
 		op: 'crop/box/edit',
 		data: { imageId, before: after, after: before }
+	}),
+	'crop/box/reset': ({ imageId, before, after }) => ({
+		op: 'crop/box/reset',
+		data: { imageId, before: after, after: before, confirmed: false }
+	}),
+	'crop/reset': ({ fileId, before, after }) => ({
+		op: 'crop/reset',
+		data: { fileId, before: after, after: before }
+	}),
+	'crop/deletefile': ({ fileId, images, redoing }) => ({
+		op: 'crop/deletefile',
+		data: { fileId, images, redoing: !redoing }
 	})
 };
 /**

@@ -63,7 +63,7 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings, setSetting, toggleSetting } from '$lib/settings.svelte';
+	import { getSettings, isDebugMode, setSetting, toggleSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import Switch from '$lib/Switch.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -294,8 +294,10 @@
 	/**
 	 * @param {string} imageId
 	 */
-	async function revertToInferedCrop(imageId) {
+	async function revertToInferredCrop(imageId) {
+		const boxBefore = $state.snapshot(boundingBoxes[imageId]);
 		const initialCrop = initialCrops[imageId];
+
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 		if (!initialCrop) {
 			toasts.error(
@@ -320,6 +322,12 @@
 				subjectId: imageId
 			});
 		}
+
+		undo.push('crop/box/reset', {
+			imageId,
+			before: boxBefore,
+			after: $state.snapshot(boundingBoxes[imageId])
+		});
 	}
 
 	const revertableCrops = $derived(
@@ -343,6 +351,9 @@
 	);
 
 	async function revertAll() {
+		const confirmed = hasConfirmedCrop(fileId);
+		const boxesBefore = $state.snapshot(boundingBoxes);
+
 		// Either we have no initial crop: reverting means removing all boxes
 		if (Object.values(initialCrops).every((c) => !c)) {
 			for (const { id } of images) {
@@ -351,9 +362,16 @@
 		} else {
 			// Or we have at least one: revert all boxes to their initial positions
 			for (const { id } of images) {
-				await revertToInferedCrop(id);
+				await revertToInferredCrop(id);
 			}
 		}
+
+		undo.push('crop/reset', {
+			fileId,
+			confirmed,
+			before: boxesBefore,
+			after: $state.snapshot(boundingBoxes)
+		});
 	}
 
 	undo.on('crop/box/create', async ({ imageId }) => {
@@ -363,12 +381,50 @@
 
 	undo.on('crop/box/edit', async ({ imageId, before }) => {
 		if (imageIdToFileId(imageId) !== fileId) return;
-		await onCropChange(imageId, toTopLeftCoords(before), false, false);
+		await onCropChange(imageId, toTopLeftCoords(before), {
+			flashConfirmedOverlay: false,
+			pushToUndoStack: false
+		});
 	});
 
 	undo.on('crop/box/delete', async ({ imageId, box }) => {
 		if (imageIdToFileId(imageId) !== fileId) return;
-		await onCropChange(null, toTopLeftCoords(box), false, false);
+		await onCropChange(null, toTopLeftCoords(box), {
+			flashConfirmedOverlay: false,
+			pushToUndoStack: false
+		});
+	});
+
+	undo.on('crop/box/reset', async ({ imageId, before }) => {
+		if (imageIdToFileId(imageId) !== fileId) return;
+		await onCropChange(imageId, toTopLeftCoords(before), {
+			flashConfirmedOverlay: false,
+			pushToUndoStack: false
+		});
+	});
+
+	undo.on('crop/reset', async ({ fileId: operationFileId, before, confirmed }) => {
+		if (operationFileId !== fileId) return;
+
+		for (const [id, box] of Object.entries(before)) {
+			await onCropChange(id, toTopLeftCoords(box), {
+				flashConfirmedOverlay: false,
+				pushToUndoStack: false,
+				markAsConfirmed: confirmed
+			});
+		}
+	});
+
+	undo.on('crop/deletefile', async ({ fileId: operationFileId, images, redoing }) => {
+		if (redoing) {
+			await deleteImageFile(fileId);
+		} else {
+			for (const image of images) {
+				await idb.tables.Image.set(image);
+			}
+		}
+
+		await goto(`/crop/${operationFileId}`);
 	});
 
 	/**
@@ -398,15 +454,16 @@
 	/**
 	 * @param {string|null} imageId ID of the image we're confirming a new crop for. Null if we're creating a new cropbox.
 	 * @param {Rect|undefined} newBoundingBox
-	 * @param {boolean} [flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
-	 * @param {boolean} [pushToUndoStack=true] whether to push this change to the undo stack
+	 * @param {object} [options]
+	 * @param {boolean} [options.flashConfirmedOverlay=true] flash the confirmed overlay when appropriate
+	 * @param {boolean} [options.pushToUndoStack=true] whether to push this change to the undo stack
+	 * @param {boolean} [options.markAsConfirmed=true] whether to mark the crop as confirmed
 	 * @returns {Promise<string|null>} the ID of the image we just modified/created
 	 */
 	async function onCropChange(
 		imageId,
 		newBoundingBox,
-		flashConfirmedOverlay = true,
-		pushToUndoStack = true
+		{ flashConfirmedOverlay = true, pushToUndoStack = true, markAsConfirmed = true } = {}
 	) {
 		if (!newBoundingBox) {
 			// No bounding box, just mark the image as confirmed and move on
@@ -435,14 +492,16 @@
 			(activeTool.createMode !== 'clickanddrag' || !hasCrop(fileId));
 
 		const image = imageId ? images.find((img) => img.id === imageId) : undefined;
-		const species = image?.metadata[uiState.classificationMetadataId];
-		if (species && !species.manuallyModified) {
-			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
-			await deleteMetadataValue({
-				db: idb.databaseHandle(),
-				metadataId: uiState.classificationMetadataId,
-				subjectId: image.id
-			});
+		if (uiState.classificationMetadataId) {
+			const species = image?.metadata[uiState.classificationMetadataId];
+			if (species && !species.manuallyModified) {
+				// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
+				await deleteMetadataValue({
+					db: idb.databaseHandle(),
+					metadataId: uiState.classificationMetadataId,
+					subjectId: image.id
+				});
+			}
 		}
 
 		let newImageId = '';
@@ -534,7 +593,7 @@
 
 		showBoxesListHint = false;
 
-		await changeAllConfirmedStatuses(true);
+		if (markAsConfirmed) await changeAllConfirmedStatuses(true);
 
 		// Select cropbox
 		if (!selectedBox.manual) {
@@ -548,9 +607,7 @@
 		}
 
 		if (willAutoskip) {
-			await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`, {
-				invalidateAll: true
-			});
+			await goto(nextUnconfirmedImageId ? `/crop/${nextUnconfirmedImageId}` : `/classify`);
 		}
 
 		return newImageId;
@@ -565,15 +622,20 @@
 			await onCropChange(image.id, box ? toTopLeftCoords(box) : undefined);
 		}
 
-		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
+		await goto(nextUnconfirmedImageId ? `/crop/${nextUnconfirmedImageId}` : `/classify`);
 	}
 
 	async function deleteImageFileAndGotoNext() {
+		undo.push('crop/deletefile', {
+			fileId,
+			images: await Promise.all(images.map(({ id }) => idb.tables.Image.raw.get(id)))
+		});
+
 		const nextFileIdBeforeDelete = $state.snapshot(nextFileId);
 		await deleteImageFile(fileId);
 		// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
 		// it means we just deleted the last image; so we go back to the import tab
-		await goto(nextFileId ? `#/crop/${nextFileIdBeforeDelete}` : '#/import');
+		await goto(nextFileId ? `/crop/${nextFileIdBeforeDelete}` : '/import');
 	}
 
 	/**
@@ -678,7 +740,7 @@
 			when: () => Boolean(revertableCrops[fileId]),
 			do: () => {
 				if (!revertableCrops[fileId]) return;
-				revertToInferedCrop(fileId);
+				revertToInferredCrop(fileId);
 			}
 		},
 		'$mod+u': {
@@ -1045,7 +1107,7 @@
 									: "Recadrage d'origine indisponible"}
 								keyboard="u"
 								disabled={!revertableCrops[image.id]}
-								onclick={() => revertToInferedCrop(image.id)}
+								onclick={() => revertToInferredCrop(image.id)}
 							>
 								<IconRevert />
 							</ButtonIcon>
@@ -1075,6 +1137,27 @@
 							Sélectionnez une boîte avec 1 à 9 pour la modifier avec des raccourcis
 							clavier
 						</p>
+					</li>
+				{/if}
+				{#if isDebugMode()}
+					<li class="debug">
+						<dl>
+							<dt>Revertable</dt>
+							<dd>
+								<ul>
+									{#each Object.entries(initialCrops) as [imageId, crop]}
+										<li>
+											{imageId.replace(fileId, '')} =
+											{#if crop}
+												{JSON.stringify(crop)}
+											{:else}
+												—
+											{/if}
+										</li>
+									{/each}
+								</ul>
+							</dd>
+						</dl>
 					</li>
 				{/if}
 			</ul>

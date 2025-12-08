@@ -67,7 +67,8 @@ const ImageFile = table(
 		bytes: 'ArrayBuffer',
 		filename: 'string',
 		contentType: /\w+\/\w+/,
-		dimensions: Dimensions
+		dimensions: Dimensions,
+		deleted: 'boolean = false'
 	})
 );
 
@@ -79,7 +80,8 @@ const ImagePreviewFile = table(
 		bytes: 'ArrayBuffer',
 		filename: 'string',
 		contentType: /\w+\/\w+/,
-		dimensions: Dimensions
+		dimensions: Dimensions,
+		deleted: 'boolean = false'
 	})
 );
 
