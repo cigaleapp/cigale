@@ -57,6 +57,7 @@ export async function processImageFile(file, id) {
 
 	await tables.Image.set({
 		id: imageId(id, 0),
+		sessionId: uiState.currentSessionId,
 		filename: file.name,
 		addedAt: dates.formatISO(Date.now()),
 		contentType: file.type,

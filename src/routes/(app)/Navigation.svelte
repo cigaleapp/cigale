@@ -24,7 +24,7 @@
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
-	import ProtocolSwitcher from './ProtocolSwitcher.svelte';
+	import SessionSwitcher from './SessionSwitcher.svelte';
 	import Settings from './Settings.svelte';
 
 	/**
@@ -173,6 +173,13 @@
 			</div>
 
 			<div class="steps">
+				<a href={resolve('/sessions')} data-testid="goto-sessions">
+					Sessions
+					{#if path.startsWith('/sessions')}
+						<div class="line"></div>
+					{/if}
+				</a>
+
 				<a
 					href={resolve('/import')}
 					data-testid="goto-import"
@@ -266,7 +273,7 @@
 			</div>
 
 			<aside class:native={isNativeWindow}>
-				<ProtocolSwitcher />
+				<SessionSwitcher />
 				<div class="settings">
 					<Settings
 						{openPrepareForOfflineUse}

@@ -16,6 +16,7 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import { resolve } from '$lib/paths';
+	import { goto } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
@@ -259,6 +260,13 @@
 		>
 			Préparation hors-ligne
 		</ButtonSecondary>
+		<ButtonSecondary
+			onclick={async () => {
+				await goto('/protocols');
+			}}
+		>
+			Gérer les protocoles
+		</ButtonSecondary>
 	</section>
 	<footer>
 		CIGALE ver. <a
@@ -345,6 +353,8 @@
 		gap: 1em;
 		margin-top: 2em;
 		margin-bottom: 1em;
+		/* flex-wrap: wrap; */
+		max-width: 400px;
 	}
 
 	footer {

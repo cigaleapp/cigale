@@ -40,11 +40,15 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	console.time('Storing Protocol');
 	tx.objectStore('Protocol').put({
 		...protocol,
-		metadata: Object.keys(protocol.metadata)
+		metadata: [...Object.keys(protocol.metadata), ...Object.keys(protocol.sessionMetadata)],
+		sessionMetadata: Object.keys(protocol.sessionMetadata)
 	});
 	console.timeEnd('Storing Protocol');
 
-	for (const [id, metadata] of Object.entries(protocol.metadata)) {
+	for (const [id, metadata] of Object.entries({
+		...protocol.metadata,
+		...protocol.sessionMetadata
+	})) {
 		if (typeof metadata === 'string') continue;
 
 		onLoadingState('write-metadata', metadata.label || id);

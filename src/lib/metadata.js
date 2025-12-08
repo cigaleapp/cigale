@@ -110,7 +110,7 @@ export function serializeMetadataValues(values) {
  *
  * @template {DB.MetadataType} Type
  * @param {object} options
- * @param {string} options.subjectId id de l'image ou l'observation
+ * @param {string} options.subjectId id de l'image, l'observation ou la session
  * @param {string} options.metadataId id de la métadonnée
  * @param {Type} [options.type] le type de données pour la métadonnée, sert à éviter des problèmes de typages
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
@@ -165,12 +165,16 @@ export async function storeMetadataValue({
 	abortSignal?.throwIfAborted();
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
+	const session = await db.get('Session', subjectId);
 	const imagesFromImageFile = await db
 		.getAll('Image')
 		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
 	abortSignal?.throwIfAborted();
-	if (image) {
+	if (session) {
+		session.metadata[metadataId] = newValue;
+		db.put('Session', session);
+	} else if (image) {
 		image.metadata[metadataId] = newValue;
 		db.put('Image', image);
 	} else if (observation) {

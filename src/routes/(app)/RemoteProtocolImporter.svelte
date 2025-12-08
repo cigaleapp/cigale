@@ -40,7 +40,6 @@
 	$effect(() => {
 		if (preselectedProtocolIsRemote) return;
 		if (preselection.protocol) {
-			uiState.setCurrentProtocolId(preselection.protocol);
 			preselection.protocol = null;
 		}
 
@@ -78,11 +77,10 @@
 		if (!raw) return;
 
 		try {
-			const { id } = await swarpc.importProtocol({ contents: raw });
+			await swarpc.importProtocol({ contents: raw });
 			await tables.Protocol.refresh();
 			await tables.Metadata.refresh();
 
-			uiState.setCurrentProtocolId(id);
 			preselection.protocol = null;
 		} catch (error) {
 			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);

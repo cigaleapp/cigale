@@ -57,10 +57,10 @@
 
 	export const snapshot = {
 		capture() {
-			return pick(uiState, 'currentProtocolId');
+			return pick(uiState, 'currentSessionId');
 		},
-		restore({ currentProtocolId }) {
-			uiState.setCurrentProtocolId(currentProtocolId);
+		async restore({ currentSessionId }) {
+			await uiState.setCurrentSessionId(currentSessionId);
 		}
 	};
 

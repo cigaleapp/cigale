@@ -26,7 +26,9 @@ export function toCSV(header, rows, separator = ';') {
 }
 
 /**
- * Import back a results zip file.
+ * Import back a results zip file. 
+ * If we are currently in a session, the imported observations and images will be linked to that session. 
+ * TODO: Otherwise, a new session will be created.
  * @param {File} file
  * @param {string} id
  * @param {string} [protocolId] make sure that the protocolId is the same as the one used to export the zip file
@@ -65,12 +67,12 @@ export async function importResultsZip(file, id, protocolId) {
 		return;
 	}
 
-	const { protocol, observations } = analysis;
+	const { session, observations } = analysis;
 
-	if (protocolId && protocol.id !== protocolId) {
+	if (protocolId && session.protocol !== protocolId) {
 		uiState.processing.removeFile(id);
 		toasts.error(
-			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${protocol.id}, mais le protocole actuel est ${protocolId}`
+			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${session.protocol}, mais le protocole actuel est ${protocolId}`
 		);
 		return;
 	}
@@ -118,6 +120,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await db.tables.Observation.set({
 			...pick(observation, 'id', 'label'),
+			sessionId: uiState.currentSessionId ?? session.id,
 			images: observation.images.map((i) => i.id),
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			addedAt: new Date().toISOString(),
@@ -147,6 +150,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await db.tables.Image.set({
 			...pick(image, 'id', 'filename', 'contentType'),
+			sessionId: uiState.currentSessionId ?? session.id,
 			dimensions: { width, height },
 			fileId: imageIdToFileId(image.id),
 			boundingBoxesAnalyzed: true,

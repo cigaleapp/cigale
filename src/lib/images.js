@@ -23,6 +23,7 @@ import { clamp, unique } from './utils';
 const sampleImage = (id, fileId) => ({
 	id,
 	fileId,
+	sessionId: 'testing',
 	addedAt: new Date(667),
 	dimensions: { width: 100, height: 100, aspectRatio: 1 },
 	filename: 'gurt: syubau.jpeg',
@@ -233,14 +234,16 @@ export async function storeImageBytes({
 			bytes: originalBytes,
 			contentType,
 			filename,
-			dimensions: { width, height }
+			dimensions: { width, height },
+			sessionId: uiState.currentSessionId
 		});
 		tx.objectStore('ImagePreviewFile').put({
 			id,
 			bytes: resizedBytes,
 			contentType,
 			filename,
-			dimensions: { width, height }
+			dimensions: { width, height },
+			sessionId: uiState.currentSessionId
 		});
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));

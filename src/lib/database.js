@@ -15,7 +15,7 @@ import {
 	MetadataInferOptions,
 	MetadataMergeMethod,
 	Metadata as MetadataSchema,
-	MetadataType,
+	MetadataType as MetadataTypeSchema,
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
@@ -25,6 +25,7 @@ import {
 	ModelDetectionOutputShape,
 	Protocol as ProtocolSchema
 } from './schemas/protocols.js';
+import { Session as SessionSchema } from './schemas/sessions.js';
 import { clamp } from './utils.js';
 
 /**
@@ -60,32 +61,36 @@ if (import.meta.vitest) {
 }
 
 const ImageFile = table(
-	['id'],
+	['id', 'sessionid'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,
 		bytes: 'ArrayBuffer',
 		filename: 'string',
 		contentType: /\w+\/\w+/,
-		dimensions: Dimensions
+		dimensions: Dimensions,
+		sessionId: ID
 	})
 );
 
 const ImagePreviewFile = table(
-	['id'],
+	['id', 'sessionid'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,
 		bytes: 'ArrayBuffer',
 		filename: 'string',
 		contentType: /\w+\/\w+/,
-		dimensions: Dimensions
+		dimensions: Dimensions,
+		sessionId: ID
 	})
 );
 
-const Image = table(['id', 'addedAt'], ImageSchema);
+const Image = table(['id', 'addedAt', 'sessionId'], ImageSchema);
 
-const Observation = table(['id', 'addedAt'], ObservationSchema);
+const Observation = table(['id', 'addedAt', 'sessionId'], ObservationSchema);
+
+const Session = table(['id'], SessionSchema);
 
 const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
@@ -171,8 +176,9 @@ export const Schemas = {
 	ModelInput,
 	ModelDetectionOutputShape,
 	Observation,
+	Session,
 	MetadataInferOptions,
-	MetadataType,
+	MetadataTypeSchema,
 	MetadataMergeMethod,
 	MetadataEnumVariant,
 	Metadata,
@@ -188,6 +194,8 @@ export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 	'MetadataOption'
 ]);
 
+export const SESSION_DEPENDENT_REACTIVE_TABLES = /** @type {const} */ (['Image', 'Observation']);
+
 /**
  *
  * @template {keyof typeof Tables} TableName
@@ -198,11 +206,21 @@ export function isReactiveTable(name) {
 	return NO_REACTIVE_STATE_TABLES.every((n) => n !== name);
 }
 
+/**
+ * @template {keyof typeof Tables} TableName
+ * @param {TableName} name
+ * @returns {name is typeof SESSION_DEPENDENT_REACTIVE_TABLES[number]}
+ */
+export function isSessionDependentReactiveTable(name) {
+	return SESSION_DEPENDENT_REACTIVE_TABLES.some((n) => n === name);
+}
+
 export const Tables = {
 	Image,
 	ImageFile,
 	ImagePreviewFile,
 	Observation,
+	Session,
 	Metadata,
 	MetadataOption,
 	Protocol,
@@ -281,8 +299,13 @@ export const idComparator = (a, b) => {
  */
 
 /**
+ * @typedef  Session
+ * @type {typeof Session.infer}
+ */
+
+/**
  * @typedef  MetadataType
- * @type {typeof MetadataType.infer}
+ * @type {typeof MetadataTypeSchema.infer}
  */
 
 /**

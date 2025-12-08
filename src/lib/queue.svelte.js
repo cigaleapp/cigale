@@ -251,6 +251,7 @@ class ProcessingQueue {
  * @param {object} arg0
  * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} arg0.swarpc
  * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [arg0.cancellers]
+ * @param {number} [arg0.parallelism]
  */
 export function initializeProcessingQueue(arg0) {
 	processingQueue ??= new ProcessingQueue({

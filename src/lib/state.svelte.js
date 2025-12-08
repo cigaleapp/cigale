@@ -84,7 +84,29 @@ class UIState {
 	/** @type {undefined | ((newSelection: string[]) => void)} */
 	setSelection = $state(undefined);
 	/** @type {string} */
-	_currentProtocolId = $state('');
+	_currentSessionId = $state('');
+
+	/** @type {string} */
+	currentSessionId = $derived(
+		this._currentSessionId || localStorage.getItem('currentSessionId') || ''
+	);
+
+	/**
+	 * @param {string} id
+	 */
+	async setCurrentSessionId(id) {
+		localStorage.setItem('currentSessionId', id);
+		await tables.initialize(id);
+		this._currentSessionId = id;
+	}
+
+	/** @type {import('./database').Session | undefined}  */
+	currentSession = $derived(tables.Session.state.find((s) => s.id === this.currentSessionId));
+
+	currentProtocolId = $derived(this.currentSession?.protocol);
+
+	/** @type {import('./database').Protocol | undefined} */
+	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
 
 	/**
 	 * @param {import('./database').Image} image
@@ -92,22 +114,6 @@ class UIState {
 	 */
 	cropMetadataValueOf(image) {
 		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
-	}
-
-	/** @type {import('./database').Protocol | undefined} */
-	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
-
-	/** @type {string} */
-	currentProtocolId = $derived(
-		this._currentProtocolId || localStorage.getItem('currentProtocolId') || ''
-	);
-
-	/**
-	 * @param {string} id
-	 */
-	setCurrentProtocolId(id) {
-		localStorage.setItem('currentProtocolId', id);
-		this._currentProtocolId = id;
 	}
 
 	/** @type {string} */
@@ -156,6 +162,7 @@ class UIState {
 
 	/** @type {number} */
 	selectedCropModel = $derived.by(() => {
+		if (!this.currentProtocolId) return -1;
 		const metadataId = this.cropMetadataId;
 		if (!metadataId) return -1;
 		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
@@ -163,6 +170,7 @@ class UIState {
 
 	/** @type {number} */
 	selectedClassificationModel = $derived.by(() => {
+		if (!this.currentProtocolId) return -1;
 		const metadataId = this.classificationMetadataId;
 		if (!metadataId) return -1;
 		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
@@ -180,6 +188,9 @@ class UIState {
 	 * @returns {Promise<void>}
 	 */
 	async setModelSelections({ classification = null, crop = null }) {
+		// TODO make this per-session instead of per-selected-protocol
+		if (!this.currentProtocolId) return;
+
 		if (classification === null && crop === null) return; // no change
 
 		const metadataIds = {

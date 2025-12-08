@@ -336,6 +336,9 @@ export async function chooseProtocol(page, name, models = {}) {
 	}
 }
 
+/**
+ * @param {Page} page
+ */
 export async function goToProtocolManagement(page) {
 	await page.getByTestId('protocol-switcher-open').click();
 	await page
@@ -349,15 +352,20 @@ export async function goToProtocolManagement(page) {
  * @param {import('$lib/i18n').Language} lang
  */
 const appNavTabs = (lang = 'fr') => ({
+	sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
 	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
 	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
 	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' }
 });
 
 /**
+ * @typedef {keyof ReturnType<typeof appNavTabs>} NavigationTab
+ */
+
+/**
  *
  * @param {Page} page
- * @param {'import'|'crop'|'classify'} tabName
+ * @param {NavigationTab} tabName
  * @param {object} [options]
  * @param {boolean} [options.waitForModel=true] wait for the model to be loaded (only for crop and classify)
  * @param {import('$lib/i18n').Language} [options.language=fr]
@@ -384,7 +392,7 @@ export async function goToTab(page, tabName, { waitForModel = true, language = '
 /**
  *
  * @param {Page} page
- * @param {'import'|'crop'|'classify'} tabName
+ * @param {NavigationTab} tabName
  * @param {'fr'|'en'} [language=fr]
  */
 export function getTab(page, tabName, language = 'fr') {
