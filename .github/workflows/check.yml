@@ -71,7 +71,7 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request'
-    needs: [json-schema, lint, test]
+    needs: [json-schema, build]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
 
@@ -122,6 +122,7 @@ jobs:
       - lint
       - test
       - e2e
+      - clutter
       - preview
       - electron
       - docker
