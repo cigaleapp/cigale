@@ -11,12 +11,12 @@
 	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
+	import { importMore } from '$lib/queue.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { imagesOfSession, observationsOfSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import { compareBy } from '$lib/utils';
-	import { importMore } from '$lib/queue.svelte';
 
 	seo({ title: 'Sessions' });
 
@@ -33,7 +33,8 @@
 			description: defaultProtocol.id,
 			protocol: tables.Protocol.state[0]?.id,
 			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString()
+			updatedAt: new Date().toISOString(),
+			metadata: {}
 		});
 
 		await goto('/(app)/sessions/[id]', { id });

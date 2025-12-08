@@ -1,5 +1,3 @@
-import { session } from 'electron';
-
 import { generateId } from '$lib/database.js';
 
 import * as db from './idb.svelte';

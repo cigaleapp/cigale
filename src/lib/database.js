@@ -194,7 +194,7 @@ export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 	'MetadataOption'
 ]);
 
-export const SESSION_DEPENDENT_REACTIVE_TABLES = /** @type {const} */ (['Image', 'Observation']);
+const SESSION_DEPENDENT_REACTIVE_TABLES = /** @type {const} */ (['Image', 'Observation']);
 
 /**
  *

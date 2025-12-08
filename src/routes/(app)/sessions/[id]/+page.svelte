@@ -21,8 +21,6 @@
 	let sessionMetadata = $derived(data.sessionMetadata);
 	let { protocol: protocolId, name } = $derived(data.session);
 
-	const protocol = $derived(protocolId ? tables.Protocol.getFromState(protocolId) : undefined);
-
 	$effect(() => {
 		invalidate(dependencyURI('Protocol', protocolId));
 	});
