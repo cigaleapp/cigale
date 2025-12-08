@@ -270,6 +270,7 @@ msgid "Chargement du modèle de recadrage…"
 msgstr "Loading cropping model…"
 
 #: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
 msgid "Chargement du protocole intégré"
 msgstr "Loading built-in protocol"
 
@@ -403,6 +404,7 @@ msgstr "Error"
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
+#: src/routes/(app)/+layout.js
 msgid "Erreur inattendue"
 msgstr "Unexpected error"
 
@@ -412,6 +414,8 @@ msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr "Error while extracting EXIF metadata for {0}"
 
 #. placeholder {0}: e
+#. placeholder {0}: error
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 #: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Error while importing remote protocol: {0}"
@@ -631,6 +635,7 @@ msgid "Nom de l'observation"
 msgstr "Observation name"
 
 #: src/lib/MetadataInput.svelte
+#: src/lib/metadata.js
 msgid "Non"
 msgstr "No"
 
@@ -644,6 +649,7 @@ msgid "Oops!"
 msgstr "Oops!"
 
 #: src/lib/MetadataInput.svelte
+#: src/lib/metadata.js
 msgid "Oui"
 msgstr "Yes"
 
@@ -1821,6 +1827,60 @@ msgstr ""
 msgid "Rétablir"
 msgstr ""
 
+#. placeholder {0}: filename
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
+msgstr ""
+
+#. placeholder {0}: error
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Erreur lors de l'exportation des résultats: {0}"
+msgstr ""
+
+#. placeholder {0}: shortId
+#: src/routes/(app)/protocols/[id]/+layout.svelte
+msgid "Métadonnée {0} créée"
+msgstr ""
+
+#. placeholder {0}: err.summary
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
+#: src/routes/(app)/protocols/[id]/updater.svelte.js
+msgid "Valeur invalide : {0}"
+msgstr ""
+
+#: src/lib/metadata.js
+msgid "Yes"
+msgstr ""
+
+#: src/lib/metadata.js
+msgid "No"
+msgstr ""
+
+#: src/lib/metadata.js
+msgid "Ppp"
+msgstr ""
+
+#. placeholder {0}: x1
+#. placeholder {1}: y1
+#. placeholder {2}: x1 + w
+#. placeholder {3}: y1 + h
+#: src/lib/metadata.js
+msgid "Boîte de ({0}, {1}) à ({2}, {3})"
+msgstr ""
+
+#. placeholder {0}: x1
+#. placeholder {1}: y1
+#. placeholder {2}: x1 + w
+#. placeholder {3}: y1 + h
+#: src/lib/metadata.js
+msgid "Box from ({0}, {1}) to ({2}, {3})"
+msgstr ""
+
+#: src/lib/metadata.js
+msgid "Date"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
@@ -1831,4 +1891,46 @@ msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation de la base de données…"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Chargement des données intégrées…"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Analyse"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Filtrage des métadonnées intégrées"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Validation"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Écriture du protocole"
+msgstr ""
+
+#. placeholder {0}: detail
+#: src/routes/(app)/+layout.js
+msgid "Écriture de la métadonnée<br>{0}"
+msgstr ""
+
+#. placeholder {0}: detail
+#: src/routes/(app)/+layout.js
+msgid "Écriture des options de la métadonnée<br>{0}"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Post-validation"
+msgstr ""
+
+#: src/routes/(app)/+layout.js
+msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
 msgstr ""

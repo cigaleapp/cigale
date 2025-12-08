@@ -269,6 +269,7 @@ msgid "Chargement du modèle de recadrage…"
 msgstr "Chargement du modèle de recadrage…"
 
 #: src/routes/(app)/+layout.js
+#: src/routes/(app)/+layout.js
 msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
@@ -402,6 +403,7 @@ msgstr "Erreur"
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
+#: src/routes/(app)/+layout.js
 msgid "Erreur inattendue"
 msgstr "Erreur inattendue"
 
@@ -411,6 +413,8 @@ msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 
 #. placeholder {0}: e
+#. placeholder {0}: error
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 #: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Erreur lors de l'import du protocole distant: {0}"
@@ -630,6 +634,7 @@ msgid "Nom de l'observation"
 msgstr "Nom de l'observation"
 
 #: src/lib/MetadataInput.svelte
+#: src/lib/metadata.js
 msgid "Non"
 msgstr "Non"
 
@@ -643,6 +648,7 @@ msgid "Oops!"
 msgstr "Oops!"
 
 #: src/lib/MetadataInput.svelte
+#: src/lib/metadata.js
 msgid "Oui"
 msgstr "Oui"
 
@@ -1829,6 +1835,60 @@ msgstr "Arborescence"
 msgid "Rétablir"
 msgstr "Rétablir"
 
+#. placeholder {0}: filename
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
+msgstr "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
+
+#. placeholder {0}: error
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Erreur lors de l'exportation des résultats: {0}"
+msgstr "Erreur lors de l'exportation des résultats: {0}"
+
+#. placeholder {0}: shortId
+#: src/routes/(app)/protocols/[id]/+layout.svelte
+msgid "Métadonnée {0} créée"
+msgstr "Métadonnée {0} créée"
+
+#. placeholder {0}: err.summary
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
+#: src/routes/(app)/protocols/[id]/updater.svelte.js
+msgid "Valeur invalide : {0}"
+msgstr "Valeur invalide : {0}"
+
+#: src/lib/metadata.js
+msgid "Yes"
+msgstr "Yes"
+
+#: src/lib/metadata.js
+msgid "No"
+msgstr "No"
+
+#: src/lib/metadata.js
+msgid "Ppp"
+msgstr "Ppp"
+
+#. placeholder {0}: x1
+#. placeholder {1}: y1
+#. placeholder {2}: x1 + w
+#. placeholder {3}: y1 + h
+#: src/lib/metadata.js
+msgid "Boîte de ({0}, {1}) à ({2}, {3})"
+msgstr "Boîte de ({0}, {1}) à ({2}, {3})"
+
+#. placeholder {0}: x1
+#. placeholder {1}: y1
+#. placeholder {2}: x1 + w
+#. placeholder {3}: y1 + h
+#: src/lib/metadata.js
+msgid "Box from ({0}, {1}) to ({2}, {3})"
+msgstr "Box from ({0}, {1}) to ({2}, {3})"
+
+#: src/lib/metadata.js
+msgid "Date"
+msgstr "Date"
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
@@ -1840,3 +1900,45 @@ msgstr "Détection terminée"
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
 msgstr "Classification terminée"
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation de la base de données…"
+msgstr "Initialisation de la base de données…"
+
+#: src/routes/(app)/+layout.js
+msgid "Chargement des données intégrées…"
+msgstr "Chargement des données intégrées…"
+
+#: src/routes/(app)/+layout.js
+msgid "Analyse"
+msgstr "Analyse"
+
+#: src/routes/(app)/+layout.js
+msgid "Filtrage des métadonnées intégrées"
+msgstr "Filtrage des métadonnées intégrées"
+
+#: src/routes/(app)/+layout.js
+msgid "Validation"
+msgstr "Validation"
+
+#: src/routes/(app)/+layout.js
+msgid "Écriture du protocole"
+msgstr "Écriture du protocole"
+
+#. placeholder {0}: detail
+#: src/routes/(app)/+layout.js
+msgid "Écriture de la métadonnée<br>{0}"
+msgstr "Écriture de la métadonnée<br>{0}"
+
+#. placeholder {0}: detail
+#: src/routes/(app)/+layout.js
+msgid "Écriture des options de la métadonnée<br>{0}"
+msgstr "Écriture des options de la métadonnée<br>{0}"
+
+#: src/routes/(app)/+layout.js
+msgid "Post-validation"
+msgstr "Post-validation"
+
+#: src/routes/(app)/+layout.js
+msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
+msgstr "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
