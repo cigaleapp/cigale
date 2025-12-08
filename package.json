@@ -124,7 +124,7 @@
 		"turndown": "^7.2.2",
 		"typescript": "^5.9.3",
 		"vite": "^7.2.7",
-		"vite-bundle-analyzer": "^1.2.3",
+		"vite-bundle-analyzer": "^1.3.0",
 		"vite-plugin-cross-origin-isolation": "^0.1.6",
 		"vitest": "^4.0.14",
 		"yauzl-promise": "^4.0.0"
