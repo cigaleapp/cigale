@@ -115,7 +115,7 @@
 		"pixelmatch": "^7.1.0",
 		"pngjs": "^7.0.0",
 		"postcss-preset-env": "^10.4.0",
-		"prettier": "^3.7.3",
+		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.0",
 		"svelte": "^5.45.2",
 		"svelte-check": "^4.3.4",
