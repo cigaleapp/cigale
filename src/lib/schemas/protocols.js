@@ -114,7 +114,12 @@ export const Protocol = type({
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
-	metadata: References,
+	metadata: References.describe(
+		"Toutes les métadonnées du protocole (qu'elles soient associées aux sessions ou aux observations/images)"
+	),
+	sessionMetadata: References.describe('Métadonnées associées à la session entière').default(
+		() => []
+	),
 	name: ['string', '@', 'Nom du protocole'],
 	description: ['string', '@', 'Description du protocole'],
 	'learnMore?': URLString.describe(
@@ -218,10 +223,15 @@ export const Protocol = type({
 		.optional()
 });
 
-export const ExportedProtocol = Protocol.omit('metadata', 'dirty')
+export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'dirty')
 	.in.and({
 		metadata: {
-			'[string]': Metadata.omit('id').describe('Métadonnée du protocole')
+			'[string]': Metadata.omit('id').describe(
+				'Métadonnées associées aux observations/imagess'
+			)
+		},
+		sessionMetadata: {
+			'[string]': Metadata.omit('id').describe('Métadonnées associées à la session entière')
 		}
 	})
 	.pipe((protocol) => ({
