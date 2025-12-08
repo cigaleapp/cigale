@@ -5,13 +5,14 @@ on:
     # Runs at 00:00 UTC every Monday
     - cron: 0 0 * * 1,4
   workflow_dispatch:
-  pull_request:
-    paths:
-      - scripts/generate-protocols.js
-      - scripts/add-species-from-jessica-joachim.ts
-      - scripts/add-species-from-google-slides.js
-      - scripts/add-taxonomic-parents-from-gbif.js
-      - .github/workflows/protocols.yml
+  # XXX: DONT MERGE WITH THIS
+  # pull_request:
+  #   paths:
+  #     - scripts/generate-protocols.js
+  #     - scripts/add-species-from-jessica-joachim.ts
+  #     - scripts/add-species-from-google-slides.js
+  #     - scripts/add-taxonomic-parents-from-gbif.js
+  #     - .github/workflows/protocols.yml
   push:
     branches:
       - renovate/googleapis-*
