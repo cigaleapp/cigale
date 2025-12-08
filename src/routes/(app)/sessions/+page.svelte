@@ -39,9 +39,6 @@
 			metadata: {}
 		});
 
-		invalidate(dependencyURI('Session', id));
-		invalidate(dependencyURI('Session', '*'));
-
 		await goto('/(app)/sessions/[id]', { id });
 	}
 </script>

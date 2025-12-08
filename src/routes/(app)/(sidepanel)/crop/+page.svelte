@@ -23,6 +23,7 @@
 		[...groupBy(idb.tables.Image.state, (img) => img.fileId ?? '').entries()].map(
 			([fileId, images]) => ({
 				id: fileId,
+				sessionId: images[0].sessionId,
 				addedAt: new Date(avg(images.map((i) => i.addedAt.getTime()))),
 				name: images[0].filename,
 				virtual: false,

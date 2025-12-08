@@ -5,7 +5,7 @@ import { uiState } from '$lib/state.svelte.js';
 import { compareBy, nonnull } from '$lib/utils';
 
 export async function load({ depends }) {
-	depends(dependencyURI('Session', '*'));
+	depends(dependencyURI('Session', ''));
 
 	return {
 		sessions: await sortedSessions()

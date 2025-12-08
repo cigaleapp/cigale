@@ -47,8 +47,8 @@ swarp.generateResultsZip(async ({ sessionId, include, cropPadding, jsonSchemaURL
 		}
 	};
 
-	const observations = await db.getAll('Observation');
-	const imagesFromDatabase = await db.getAll('Image');
+	const observations = await db.getAllFromIndex('Observation', 'sessionId', sessionId)
+	const imagesFromDatabase = await db.getAllFromIndex('Image', 'sessionId', sessionId);
 	const metadataDefinitions = await db
 		.getAll('Metadata')
 		.then((ms) => Object.fromEntries(ms.map((m) => [m.id, m])));

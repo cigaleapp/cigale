@@ -303,6 +303,7 @@ describe('wrangler', () => {
 	const addedAt = new Date();
 	const observation = (/** @type {number} */ i) => ({
 		id: `test${i}`,
+		sessionId: 'testing',
 		addedAt: addedAt.toISOString(),
 		images: [],
 		label: 'Test',
@@ -310,7 +311,8 @@ describe('wrangler', () => {
 	});
 
 	const image = (/** @type {number} */ i) => ({
-		id: imageId(0, i),
+		id: imageId('0', i),
+		sessionId: 'testing',
 		addedAt: addedAt.toISOString(),
 		fileId: 'quoicoubaka',
 		dimensions: { width: 100, height: 100 },
@@ -328,7 +330,7 @@ describe('wrangler', () => {
 
 	test('initialize', async () => {
 		await idb.set('Observation', observation(0));
-		await tables.initialize();
+		await tables.initialize('testing');
 		expect(idb._tablesState).toEqual({
 			Observation: [
 				{
@@ -344,18 +346,18 @@ describe('wrangler', () => {
 	});
 	test('refresh', async () => {
 		await idb.set('Observation', observation(0));
-		await tables.initialize();
+		await tables.initialize('testing');
 		expect(tables.Observation.state).toHaveLength(1);
 		await idb.set('Observation', observation(1));
 		await idb.set('Observation', observation(2));
 		expect(tables.Observation.state).toHaveLength(1);
-		await tables.Observation.refresh();
+		await tables.Observation.refresh('testing');
 		expect(tables.Observation.state).toHaveLength(3);
 	});
 
 	describe('individual tables', () => {
 		beforeEach(async () => {
-			await tables.initialize();
+			await tables.initialize('testing');
 		});
 
 		test('get', async () => {
@@ -431,6 +433,7 @@ describe('wrangler', () => {
 		test('add', async () => {
 			const observation = {
 				addedAt: addedAt.toISOString(),
+				sessionId: 'testing',
 				images: [],
 				label: 'Test',
 				metadataOverrides: {}
@@ -480,10 +483,10 @@ describe('wrangler', () => {
 			]);
 			expect(await idb.list('Image')).toEqual([
 				expect.objectContaining({
-					id: imageId(0, 0)
+					id: imageId('0', 0)
 				}),
 				expect.objectContaining({
-					id: imageId(0, 1)
+					id: imageId('0', 1)
 				})
 			]);
 			expect(await idb.list('Observation')).toEqual([
@@ -495,10 +498,10 @@ describe('wrangler', () => {
 			expect(await idb.get('Observation', 'test0')).toBeUndefined();
 			expect(await idb.list('Image')).toEqual([
 				expect.objectContaining({
-					id: imageId(0, 0)
+					id: imageId('0', 0)
 				}),
 				expect.objectContaining({
-					id: imageId(0, 1)
+					id: imageId('0', 1)
 				})
 			]);
 		});
@@ -553,7 +556,7 @@ describe('wrangler', () => {
 					}
 				});
 				expect(tables.Image.state).toHaveLength(0);
-				await tables.Image.refresh();
+				await tables.Image.refresh('testing');
 				expect(tables.Image.state).toEqual([
 					{
 						...image(0),
@@ -593,7 +596,7 @@ describe('wrangler', () => {
 			test('get', async () => {
 				await tables.Image.set(image(0));
 				await tables.Image.set(image(1));
-				expect(await tables.Image.get(imageId(0, 0))).toEqual({
+				expect(await tables.Image.get(imageId('0', 0))).toEqual({
 					...image(0),
 					addedAt,
 					dimensions: { width: 100, height: 100, aspectRatio: 1 },
@@ -609,7 +612,7 @@ describe('wrangler', () => {
 						}
 					}
 				});
-				expect(await tables.Image.raw.get(imageId(0, 1))).toEqual({
+				expect(await tables.Image.raw.get(imageId('0', 1))).toEqual({
 					...image(1),
 					addedAt: addedAt.toISOString(),
 					metadata: {

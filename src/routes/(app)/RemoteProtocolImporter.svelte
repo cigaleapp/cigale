@@ -78,8 +78,8 @@
 
 		try {
 			await swarpc.importProtocol({ contents: raw });
-			await tables.Protocol.refresh();
-			await tables.Metadata.refresh();
+			await tables.Protocol.refresh(null);
+			await tables.Metadata.refresh(null);
 
 			preselection.protocol = null;
 		} catch (error) {

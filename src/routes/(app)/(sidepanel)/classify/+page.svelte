@@ -33,6 +33,7 @@
 	const items = $derived(
 		tables.Observation.state.map((obs) => ({
 			id: obs.id,
+			sessionId: obs.sessionId,
 			addedAt: obs.addedAt,
 			name: obs.label,
 			virtual: false,

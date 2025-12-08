@@ -149,8 +149,8 @@ export async function promptAndImportProtocol({
 					}).catch((err) => Promise.reject(new Error(errorMessage(err))));
 
 					const { tables } = await import('./idb.svelte.js');
-					await tables.Protocol.refresh();
-					await tables.Metadata.refresh();
+					await tables.Protocol.refresh(null);
+					await tables.Metadata.refresh(null);
 
 					resolve(result);
 				};
@@ -228,8 +228,8 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 	}).then((r) => r.text());
 
 	const result = await swarpc.importProtocol({ contents });
-	tables.Protocol.refresh();
-	tables.Metadata.refresh();
+	tables.Protocol.refresh(null);
+	tables.Metadata.refresh(null);
 
 	const { version: newVersion, ...rest } = result;
 
