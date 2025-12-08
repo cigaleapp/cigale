@@ -1,3 +1,5 @@
+import { uiState } from './state.svelte';
+
 /**
  *
  * @param {object} options
@@ -5,9 +7,11 @@
  */
 export function seo({ title }) {
 	effectIfNeeded(() => {
+		const suffix = uiState.currentSession?.name ?? 'C.I.G.A.L.E.';
+
 		document.title = title
-			? /* @wc-include */ `${title} · C.I.G.A.L.E.`
-			: /* @wc-include */ 'C.I.G.A.L.E.';
+			? /* @wc-include */ `${title} · ${suffix}`
+			: /* @wc-include */ suffix;
 	});
 }
 

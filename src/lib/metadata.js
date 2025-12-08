@@ -172,7 +172,11 @@ export async function storeMetadataValue({
 
 	abortSignal?.throwIfAborted();
 	if (session) {
-		session.metadata[metadataId] = newValue;
+		if (session.metadata) {
+			session.metadata[metadataId] = newValue;
+		} else {
+			session.metadata = { [metadataId]: newValue };
+		}
 		db.put('Session', session);
 	} else if (image) {
 		image.metadata[metadataId] = newValue;

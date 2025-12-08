@@ -38,7 +38,7 @@ export async function classifyImage(swarpc, id, cancellers) {
 
 	await done;
 
-	await tables.Image.refresh();
+	await tables.Image.refresh(uiState.currentSessionId);
 }
 
 /**

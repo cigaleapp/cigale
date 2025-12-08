@@ -1,3 +1,5 @@
+import { session } from 'electron';
+
 import { generateId } from '$lib/database.js';
 
 import * as db from './idb.svelte';
@@ -135,6 +137,7 @@ export function newObservation(image, protocol) {
 	const observationId = generateId('Observation');
 	const newObs = {
 		id: observationId,
+		sessionId: uiState.currentSessionId ?? '',
 		images: [image.id],
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([image]),

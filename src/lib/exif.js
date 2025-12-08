@@ -113,7 +113,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 		)
 		.case(
 			{
-				type: Schemas.MetadataType,
+				type: Schemas.MetadataTypeSchema,
 				infer: { exif: 'string' }
 			},
 			({ infer, type }) => ({

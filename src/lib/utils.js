@@ -516,9 +516,13 @@ if (import.meta.vitest) {
 
 /**
  * @template Item
- * @param {(item: Item) => string|number} key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ * @param {((item: Item) => string|number) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
  */
 export function compareBy(key) {
+	if (typeof key === 'string') {
+		return compareBy((item) => item[key]);
+	}
+
 	/**
 	 * @param {Item} a
 	 * @param {Item} b
@@ -579,6 +583,18 @@ if (import.meta.vitest) {
 			expect(compareBy((i) => i.name)(items[0], items[1])).toBe(1);
 			expect(compareBy((i) => i.name)(items[1], items[0])).toBe(-1);
 			expect(compareBy((i) => i.name)(items[0], items[0])).toBe(0);
+		});
+
+		test('it works with key strings', () => {
+			const items = [
+				{ id: 2, name: 'b' },
+				{ id: 1, name: 'a' },
+				{ id: 3, name: 'c' }
+			];
+
+			expect(compareBy('id')(items[0], items[1])).toBe(1);
+			expect(compareBy('name')(items[1], items[0])).toBe(-1);
+			expect(compareBy('id')(items[0], items[0])).toBe(0);
 		});
 	});
 }

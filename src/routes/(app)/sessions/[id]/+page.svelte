@@ -1,15 +1,15 @@
 <script>
+	import { dequal } from 'dequal';
 	import { fade } from 'svelte/transition';
 
-	import IconExpand from '~icons/ri/expand-up-down-line';
 	import { invalidate } from '$app/navigation';
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import Field from '$lib/Field.svelte';
 	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { storeMetadataValue } from '$lib/metadata.js';
+	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
+	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata.js';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { goto } from '$lib/paths.js';
@@ -72,45 +72,9 @@
 			e.preventDefault();
 		}}
 	>
-		<DropdownMenu
-			items={[
-				{
-					protocol: null,
-					key: '#manage',
-					label: 'Gérer les protocoles',
-					/** @returns {Promise<void>} */
-					async onclick() {
-						await goto('/protocols');
-					}
-				}
-			]}
-			selectableItems={tables.Protocol.state.map((p) => ({
-				protocol: p,
-				key: p.id,
-				selected: protocolId === p.id,
-				label: p.name,
-				onclick() {
-					protocolId = p.id;
-				}
-			}))}
-		>
-			{#snippet trigger(props)}
-				<Field label="Protocole">
-					<button class="trigger" {...props}>
-						{#if protocol}
-							{protocol.name}
-						{:else}
-							Sélectionner un protocole
-						{/if}
-						<IconExpand />
-					</button>
-				</Field>
-			{/snippet}
-
-			{#snippet item({ label })}
-				<div>{label}</div>
-			{/snippet}
-		</DropdownMenu>
+		<Field label="Protocole">
+			<InputSelectProtocol bind:value={protocolId} />
+		</Field>
 	</form>
 
 	<h2>Métadonnées</h2>
@@ -122,13 +86,23 @@
 					options={data.sessionMetadataOptions[def.id]}
 					definition={def}
 					{value}
-					onchange={async () => {
-						storeMetadataValue({
-							db: databaseHandle(),
-							subjectId: data.session.id,
-							metadataId: def.id,
-							value: value.value
-						});
+					onchange={async (v) => {
+						if (dequal(v, value?.value)) return;
+
+						if (v !== undefined) {
+							await storeMetadataValue({
+								db: databaseHandle(),
+								subjectId: data.session.id,
+								metadataId: def.id,
+								value: v
+							});
+						} else {
+							await deleteMetadataValue({
+								db: databaseHandle(),
+								subjectId: data.session.id,
+								metadataId: def.id
+							});
+						}
 					}}
 				/>
 			{/each}

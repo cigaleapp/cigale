@@ -24,7 +24,6 @@
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
-	import SessionSwitcher from './SessionSwitcher.svelte';
 	import Settings from './Settings.svelte';
 
 	/**
@@ -273,7 +272,6 @@
 			</div>
 
 			<aside class:native={isNativeWindow}>
-				<SessionSwitcher />
 				<div class="settings">
 					<Settings
 						{openPrepareForOfflineUse}

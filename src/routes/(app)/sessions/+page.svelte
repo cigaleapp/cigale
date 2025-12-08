@@ -2,47 +2,78 @@
 	import { fade } from 'svelte/transition';
 
 	import IconAdd from '~icons/ri/add-line';
+	import IconImport from '~icons/ri/import-line';
 	import ButtonInk from '$lib/ButtonInk.svelte';
+	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Card from '$lib/Card.svelte';
 	import Datetime from '$lib/Datetime.svelte';
+	import { promptForFiles } from '$lib/files';
 	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
+	import { seo } from '$lib/seo.svelte';
 	import { imagesOfSession, observationsOfSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import { compareBy } from '$lib/utils';
+	import { importMore } from '$lib/queue.svelte';
+
+	seo({ title: 'Sessions' });
 
 	const defaultProtocol = $derived(tables.Protocol.state[0]);
+
+	async function createSession() {
+		if (!defaultProtocol) {
+			toasts.error('Aucun protocole installé, impossible de créer une session.');
+			return;
+		}
+
+		const { id } = await tables.Session.add({
+			name: `Session du ${Intl.DateTimeFormat().format(new Date())}`,
+			description: defaultProtocol.id,
+			protocol: tables.Protocol.state[0]?.id,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString()
+		});
+
+		await goto('/(app)/sessions/[id]', { id });
+	}
 </script>
 
 <main in:fade={{ duration: 100 }}>
-	<h1>Sessions</h1>
+	<header>
+		<h1>Sessions</h1>
+		<section class="actions">
+			<ButtonSecondary
+				onclick={async () => {
+					const zipfile = await promptForFiles({
+						accept: 'application/zip',
+						multiple: false
+					});
+
+					await uiState.setCurrentSessionId(null);
+					importMore(zipfile);
+					await goto('/import');
+				}}
+			>
+				<IconImport />
+				Importer un export .zip
+			</ButtonSecondary>
+			<ButtonSecondary
+				onclick={async () => {
+					await createSession();
+				}}
+			>
+				<IconAdd />
+				Nouvelle session
+			</ButtonSecondary>
+		</section>
+	</header>
 
 	<section class="sessions">
-		<Card
-			tooltip="Créer une nouvelle session"
-			onclick={async () => {
-				if (!defaultProtocol) {
-					toasts.error('Aucun protocole installé, impossible de créer une session.');
-					return;
-				}
-
-				const { id } = await tables.Session.add({
-					name: `Session du ${Intl.DateTimeFormat().format(new Date())}`,
-					description: defaultProtocol.id,
-					protocol: tables.Protocol.state[0]?.id,
-					createdAt: new Date().toISOString(),
-					updatedAt: new Date().toISOString()
-				});
-
-				await goto('/(app)/sessions/[id]', { id });
-			}}
-		>
-			<div class="content new">
-				<IconAdd />
-			</div>
-		</Card>
-		{#each tables.Session.state as { createdAt, id, name, protocol: protocolId } (id)}
+		{#each tables.Session.state
+			.toSorted(compareBy('updatedAt'))
+			.toReversed() as { createdAt, id, name, protocol: protocolId } (id)}
 			{@const protocol = tables.Protocol.getFromState(protocolId)}
 			<Card
 				--card-border={uiState.currentSessionId === id ? 'var(--bg-primary)' : ''}
@@ -90,13 +121,39 @@
 					</footer>
 				</div>
 			</Card>
+		{:else}
+			<Card
+				tooltip="Créer une nouvelle session"
+				onclick={async () => {
+					await createSession();
+				}}
+			>
+				<div class="content new">
+					<IconAdd />
+				</div>
+			</Card>
 		{/each}
 	</section>
 </main>
 
 <style>
-	h1 {
-		text-align: center;
+	main {
+		width: 100%;
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+
+	main > header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 2rem;
+
+		.actions {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
 	}
 
 	section.sessions {
@@ -106,9 +163,6 @@
 		justify-content: center;
 		gap: 1rem;
 		padding: 1rem;
-		width: 100%;
-		max-width: 1200px;
-		margin: 0 auto;
 
 		--card-height: 250px;
 		--card-width: 350px;

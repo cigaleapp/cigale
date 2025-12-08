@@ -2,65 +2,66 @@
 	import IconGoto from '~icons/ri/arrow-right-line';
 	import IconSelected from '~icons/ri/check-line';
 	import IconExpand from '~icons/ri/expand-up-down-line';
+	import ButtonUpdateProtocol from '$lib/ButtonUpdateProtocol.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
-	import { uiState } from '$lib/state.svelte.js';
+	import { tooltip } from '$lib/tooltips.js';
+
+	/**
+	 * @typedef {object} Props
+	 * @property {string} value selected protocol's ID
+	 */
+
+	/** @type {Props} */
+	let { value = $bindable() } = $props();
 </script>
 
 <DropdownMenu
-	testid="protocol-switcher"
 	items={[
 		{
-			session: null,
-			key: '#current',
-			label: 'Gérer la session actuelle',
-			async onclick() {
-				if (!uiState.currentSessionId) {
-					return;
-				}
-
-				await goto('/(app)/sessions/[id]', {
-					id: uiState.currentSessionId
-				});
+			protocol: null,
+			label: 'Gérer les protocoles',
+			onclick() {
+				goto('/protocols');
 			}
 		}
 	]}
-	selectableItems={tables.Session.state.map((s) => ({
-		session: s,
-		key: s.id,
-		label: s.name,
-		selected: uiState.currentSessionId === s.id,
-		async onclick() {
-			await uiState.setCurrentSessionId(s.id);
+	selectableItems={tables.Protocol.state.map((p) => ({
+		protocol: p,
+		key: p.id,
+		label: p.name,
+		selected: value === p.id,
+		onclick() {
+			value = p.id;
 		}
 	}))}
 >
 	{#snippet trigger(props)}
-		<button class:none-selected={!uiState.currentSession} class="trigger" {...props}>
-			{#if uiState.currentSession}
-				{uiState.currentSession?.name}
+		<button class:none-selected={!value} class="trigger" {...props}>
+			{#if value}
+				{tables.Protocol.getFromState(value)?.name}
 			{:else}
-				Aucune session sélectionnée
+				Aucun protocole sélectionné
 			{/if}
 			<IconExpand />
 		</button>
 	{/snippet}
 
-	{#snippet item({ label, session })}
+	{#snippet item({ label, protocol })}
 		<div class="item">
 			<div class="label">
 				<div class="icon">
-					{#if uiState.currentSessionId === session?.id}
+					{#if value === protocol?.id}
 						<IconSelected />
-					{:else if !session}
+					{:else if !protocol}
 						<IconGoto />
 					{/if}
 				</div>
 				{label}
 			</div>
 
-			<!-- <div class="version">
+			<div class="version">
 				{#if protocol}
 					{#if protocol.version}
 						<code use:tooltip={'Version du protocole'}>
@@ -69,7 +70,7 @@
 					{/if}
 					<ButtonUpdateProtocol compact {...protocol} />
 				{/if}
-			</div> -->
+			</div>
 		</div>
 	{/snippet}
 </DropdownMenu>

@@ -33,11 +33,13 @@
 	{@render swatch('fg-success', 'light')}
 	{@render swatch('bg-neutral', 'dark')}
 	{@render swatch('fg-neutral', 'light')}
+	{@render swatch('gray', 'light')}
+	{@render swatch('gay', 'light')}
 </div>
 
 <style>
 	.palette {
-		font-family: Arial, sans-serif;
+		font-family: var(--font-mono);
 		margin: 0;
 		padding: 20px;
 		background-color: var(--bg-neutral);

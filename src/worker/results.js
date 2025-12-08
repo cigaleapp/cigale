@@ -25,8 +25,12 @@ import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
 import { openDatabase, swarp } from './index.js';
 
-swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaURL }, notify) => {
+swarp.generateResultsZip(async ({ sessionId, include, cropPadding, jsonSchemaURL }, notify) => {
 	const db = await openDatabase();
+	const session = await db.get('Session', sessionId).then(Schemas.Session.assert);
+	if (!session) throw new Error(`Session with ID ${sessionId} not found`);
+
+	const protocolId = session.protocol;
 	const protocolUsed = await db.get('Protocol', protocolId).then(Schemas.Protocol.assert);
 	if (!protocolUsed) throw new Error(`Protocol with ID ${protocolId} not found`);
 
@@ -226,17 +230,11 @@ swarp.generateResultsZip(async ({ protocolId, include, cropPadding, jsonSchemaUR
 						'json',
 						jsonSchemaURL.toString(),
 						Analysis.assert({
-							observations: exportedObservations,
-							protocol: {
-								...protocolUsed,
-								exports: {
-									...protocolUsed.exports,
-									images: {
-										original: filepaths.images.original.toJSON(),
-										cropped: filepaths.images.cropped.toJSON()
-									}
-								}
-							}
+							session: {
+								...session,
+								metadata: toMetadataRecord(session.metadata)
+							},
+							observations: exportedObservations
 						}),
 						['protocol', 'observations']
 					)

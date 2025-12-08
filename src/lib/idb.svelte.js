@@ -44,7 +44,7 @@ export const _tablesState = $state({
  * @type {{
  *  [Name in ReactiveTableNames]: ReturnType<typeof wrangler<Name>>
  * } & {
- * 	initialize: (sessionId: string) => Promise<void>
+ * 	initialize: (sessionId: string|null) => Promise<void>
  * }}
  */
 // @ts-ignore
@@ -71,13 +71,14 @@ function wrangler(table) {
 		get state() {
 			return _tablesState[table];
 		},
-		/** @param {string} sessionId */
+		/** @param {string|null} sessionId */
 		async refresh(sessionId) {
 			console.debug(`refresh ${table} for session ${sessionId}`);
 			// @ts-ignore
-			_tablesState[table] = isSessionDependentReactiveTable(table)
-				? await this.list('sessionId', sessionId)
-				: await this.list();
+			_tablesState[table] =
+				isSessionDependentReactiveTable(table) && sessionId
+					? await this.list('sessionId', sessionId)
+					: await this.list();
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
