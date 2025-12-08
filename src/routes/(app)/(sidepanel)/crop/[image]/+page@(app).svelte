@@ -617,17 +617,17 @@
 		ArrowLeft: {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/crop/[image]', { image: prevFileId })
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
 		},
 		'Shift+Space': {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto('/(app)/crop/[image]', { image: prevFileId })
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
 		},
 		ArrowRight: {
 			help: 'Image suivante',
 			when: () => Boolean(nextFileId),
-			do: () => goto('/(app)/crop/[image]', { image: nextFileId })
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId })
 		},
 		Space: {
 			help: 'Continuer',

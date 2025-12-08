@@ -26,19 +26,18 @@ export function toCSV(header, rows, separator = ';') {
 }
 
 /**
- * Import back a results zip file. 
- * If we are currently in a session, the imported observations and images will be linked to that session. 
- * TODO: Otherwise, a new session will be created.
+ * Import back a results zip file.
+ * If we are currently in a session, the imported observations and images will be linked to that session.
  * @param {File} file
  * @param {string} id
- * @param {string} [protocolId] make sure that the protocolId is the same as the one used to export the zip file
  */
-export async function importResultsZip(file, id, protocolId) {
+export async function importResultsZip(file, id) {
 	const contents = new Uint8Array(await file.arrayBuffer());
 
 	const results = unzipSync(contents, {
 		filter: ({ name }) => {
-			return name === (uiState.currentProtocol?.exports?.metadata.json ?? 'analysis.json');
+			// TODO dont make analysis.json configurable anymore, otherwise we can't know where it is since we don't know the protocol used in the export yet
+			return name === 'analysis.json';
 		}
 	});
 
@@ -69,12 +68,31 @@ export async function importResultsZip(file, id, protocolId) {
 
 	const { session, observations } = analysis;
 
-	if (protocolId && session.protocol !== protocolId) {
+	/** @type {import('$lib/database').Session} */
+	let sessionToUse;
+
+	if (!uiState.currentSession) {
+		toasts.info('Importation dans une nouvelle session');
+		const newSession = await db.tables.Session.add({
+			name: session.name ?? `Import de ${file.name}`,
+			description: `Importée depuis ${file.name}`,
+			protocol: session.protocol,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			metadata: session.metadata ?? {}
+		});
+
+		await uiState.setCurrentSessionId(newSession.id);
+
+		sessionToUse = newSession;
+	} else if (uiState.currentSession.protocol !== session.protocol) {
 		uiState.processing.removeFile(id);
 		toasts.error(
-			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${session.protocol}, mais le protocole actuel est ${protocolId}`
+			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${session.protocol}, mais le protocole de la session est ${uiState.currentSession.protocol}`
 		);
 		return;
+	} else {
+		sessionToUse = uiState.currentSession;
 	}
 
 	const files = Object.values(observations)
@@ -120,7 +138,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await db.tables.Observation.set({
 			...pick(observation, 'id', 'label'),
-			sessionId: uiState.currentSessionId ?? session.id,
+			sessionId: sessionToUse.id,
 			images: observation.images.map((i) => i.id),
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			addedAt: new Date().toISOString(),
@@ -140,6 +158,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await storeImageBytes({
 			id: imageIdToFileId(image.id),
+			sessionId: sessionToUse.id,
 			resizedBytes,
 			originalBytes,
 			contentType: image.contentType,
@@ -150,7 +169,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await db.tables.Image.set({
 			...pick(image, 'id', 'filename', 'contentType'),
-			sessionId: uiState.currentSessionId ?? session.id,
+			sessionId: sessionToUse.id,
 			dimensions: { width, height },
 			fileId: imageIdToFileId(image.id),
 			boundingBoxesAnalyzed: true,

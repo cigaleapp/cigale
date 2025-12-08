@@ -8,7 +8,7 @@
 
 <style>
 	.liste {
-		gap: 1.5em;
+		gap: var(--metadata-list-gap, 1.5em);
 		display: flex;
 		flex-direction: column;
 		scrollbar-color: var(--gray) transparent;

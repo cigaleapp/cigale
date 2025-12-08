@@ -9,7 +9,7 @@ export const Analysis = type({
 	}).describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),
 	session: Session.omit('metadata')
 		.and({
-			metaddata: MetadataRecord
+			metadata: MetadataRecord
 		})
 		.describe("La session d'analyse")
 });

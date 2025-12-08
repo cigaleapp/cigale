@@ -217,9 +217,11 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
  * @param {number} param0.width the width of the image
  * @param {number} param0.height the height of the image
  * @param {IDBTransactionWithAtLeast<['Image', 'ImageFile', 'ImagePreviewFile']>} [param0.tx] transaction to use
+ * @param {string} [param0.sessionId] session ID to associate the image with
  */
 export async function storeImageBytes({
 	id,
+	sessionId,
 	originalBytes,
 	resizedBytes,
 	contentType,
@@ -235,7 +237,7 @@ export async function storeImageBytes({
 			contentType,
 			filename,
 			dimensions: { width, height },
-			sessionId: uiState.currentSessionId
+			sessionId: sessionId ?? uiState.currentSessionId
 		});
 		tx.objectStore('ImagePreviewFile').put({
 			id,
@@ -243,7 +245,7 @@ export async function storeImageBytes({
 			contentType,
 			filename,
 			dimensions: { width, height },
-			sessionId: uiState.currentSessionId
+			sessionId: sessionId ?? uiState.currentSessionId
 		});
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));

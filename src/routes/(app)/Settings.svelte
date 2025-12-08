@@ -260,13 +260,6 @@
 		>
 			Préparation hors-ligne
 		</ButtonSecondary>
-		<ButtonSecondary
-			onclick={async () => {
-				await goto('/protocols');
-			}}
-		>
-			Gérer les protocoles
-		</ButtonSecondary>
 	</section>
 	<footer>
 		CIGALE ver. <a

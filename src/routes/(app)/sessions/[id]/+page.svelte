@@ -153,6 +153,6 @@
 	}
 
 	form.metadata {
-		gap: 4rem;
+		--metadata-list-gap: 3rem;
 	}
 </style>

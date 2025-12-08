@@ -21,7 +21,8 @@
 
 	const tooltip = $derived.by(() => {
 		if (status === 'errored') return uiState.erroredImages.get(image.id);
-		if (isDebugMode()) return `${image.id} @ ${image.addedAt.toISOString()}`;
+		if (isDebugMode())
+			return `${image.id} @ ${image.addedAt.toISOString()} [${image.sessionId}]`;
 	});
 </script>
 

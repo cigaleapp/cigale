@@ -30,7 +30,7 @@
 				.join('; ');
 		}
 
-		if (isDebugMode()) return `${observation.id} @ ${observation.addedAt.toISOString()}`;
+		if (isDebugMode()) return `${observation.id} @ ${observation.addedAt.toISOString()} [${observation.sessionId}]`;
 	});
 
 	const previewImage = $derived(images.length > 0 ? images[0] : undefined);

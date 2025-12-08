@@ -227,7 +227,7 @@ class ProcessingQueue {
 			if (importing) {
 				const { file, id } = importing;
 				if (isZip(file.type)) {
-					await importResultsZip(file, id, uiState.currentProtocolId);
+					await importResultsZip(file, id);
 				} else {
 					await processImageFile(file, id);
 				}

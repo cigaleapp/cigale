@@ -236,6 +236,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				}
 			{/snippet}
 			<code>
+				session {uiState.currentSessionId} <br />
 				selection {@render displayIter(uiState.selection)} <br />
 				queued {@render displayIter(uiState.queuedImages)} <br />
 				loading {@render displayIter(uiState.loadingImages)} <br />

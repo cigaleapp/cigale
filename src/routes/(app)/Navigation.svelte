@@ -1,5 +1,8 @@
 <script>
+	import { fade } from 'svelte/transition';
+
 	import IconSelect from '~icons/ri/arrow-down-s-line';
+	import IconBack from '~icons/ri/arrow-left-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
 	import IconDismiss from '~icons/ri/close-line';
@@ -161,9 +164,20 @@
 	{#if !progressbarOnly}
 		<nav bind:clientHeight={navHeight} data-testid="app-nav">
 			<div class="logo">
-				<a href={resolve('/')}>
+				<button
+					use:tooltip={'Accueil'}
+					onclick={async () => {
+						if (uiState.currentSession) {
+							await goto('/(app)/sessions');
+							await uiState.setCurrentSessionId(null);
+						} else {
+							await goto('/');
+						}
+					}}
+				>
 					<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
-				</a>
+				</button>
+
 				{#if previewingPrNumber}
 					<button class="pr-number" onclick={openPreviewPRDetails}>
 						Preview #{previewingPrNumber}
@@ -171,84 +185,107 @@
 				{/if}
 			</div>
 
-			<div class="steps">
-				<a href={resolve('/sessions')} data-testid="goto-sessions">
-					Sessions
-					{#if path.startsWith('/sessions')}
-						<div class="line"></div>
-					{/if}
-				</a>
-
-				<a
-					href={resolve('/import')}
-					data-testid="goto-import"
-					aria-disabled={!uiState.currentProtocol}
-				>
-					Importer
-					{#if path == '/import'}
-						<div class="line"></div>
-					{/if}
-				</a>
-				<div class="separator"><IconNext /></div>
-				<div class="with-inference-indicator">
-					<!-- eslint-disable svelte/no-navigation-without-resolve -->
+			{#if uiState.currentSession}
+				<div class="steps" in:fade={{ delay: 50, duration: 100 }}>
 					<a
-						href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
-						uiState.imageOpenedInCropper
-							? resolve('/(app)/(sidepanel)/crop/[image]', {
-									image: uiState.imageOpenedInCropper
-								})
-							: resolve('/crop')}
-						data-testid="goto-crop"
-						aria-disabled={!uiState.currentProtocol || !hasImages}
+						class="session-link"
+						href={resolve('/(app)/sessions/[id]', { id: uiState.currentSessionId })}
+						data-testid="goto-current-session"
+						use:tooltip={'Session'}
 					>
-						<!-- eslint-enable svelte/no-navigation-without-resolve -->
-						Recadrer
-						{#if path.startsWith('/crop')}
+						{uiState.currentSession.name}
+						{#if path === `/sessions/${uiState.currentSessionId}`}
 							<div class="line"></div>
 						{/if}
 					</a>
-
-					{@render inferenceSettings(
-						'crop',
-						uiState.cropModels,
-						uiState.selectedCropModel,
-						async (i) => uiState.setModelSelections({ crop: i })
-					)}
-				</div>
-				<div class="separator"><IconNext /></div>
-				<div
-					class="with-inference-indicator"
-					use:tooltip={uiState.processing.task === 'detection' &&
-					uiState.processing.progress < 1
-						? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
-						: undefined}
-				>
 					<a
-						href={resolve('/classify')}
-						aria-disabled={!uiState.currentProtocol ||
-							!hasImages ||
-							(uiState.processing.task === 'detection' &&
-								uiState.processing.progress < 1)}
-						data-testid="goto-classify"
+						href={resolve('/import')}
+						data-testid="goto-import"
+						aria-disabled={!uiState.currentProtocol}
 					>
-						Classifier
-						{#if path == '/classify'}
+						Importer
+						{#if path == '/import'}
 							<div class="line"></div>
 						{/if}
 					</a>
-					{@render inferenceSettings(
-						'classify',
-						uiState.classificationModels,
-						uiState.selectedClassificationModel,
-						async (i) => uiState.setModelSelections({ classification: i })
-					)}
-				</div>
-				<div class="separator"><IconNext /></div>
-				<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
-					Résultats
-				</ButtonSecondary>
+					<div class="separator"><IconNext /></div>
+					<div class="with-inference-indicator">
+						<!-- eslint-disable svelte/no-navigation-without-resolve -->
+						<a
+							href={page.route.id !== '/(app)/(sidepanel)/crop/[image]' &&
+							uiState.imageOpenedInCropper
+								? resolve('/(app)/(sidepanel)/crop/[image]', {
+										image: uiState.imageOpenedInCropper
+									})
+								: resolve('/crop')}
+							data-testid="goto-crop"
+							aria-disabled={!uiState.currentProtocol || !hasImages}
+						>
+							<!-- eslint-enable svelte/no-navigation-without-resolve -->
+							Recadrer
+							{#if path.startsWith('/crop')}
+								<div class="line"></div>
+							{/if}
+						</a>
 
+						{@render inferenceSettings(
+							'crop',
+							uiState.cropModels,
+							uiState.selectedCropModel,
+							async (i) => uiState.setModelSelections({ crop: i })
+						)}
+					</div>
+					<div class="separator"><IconNext /></div>
+					<div
+						class="with-inference-indicator"
+						use:tooltip={uiState.processing.task === 'detection' &&
+						uiState.processing.progress < 1
+							? "Veuillez attendre la fin de l'analyse des images avant de les classifier"
+							: undefined}
+					>
+						<a
+							href={resolve('/classify')}
+							aria-disabled={!uiState.currentProtocol ||
+								!hasImages ||
+								(uiState.processing.task === 'detection' &&
+									uiState.processing.progress < 1)}
+							data-testid="goto-classify"
+						>
+							Classifier
+							{#if path == '/classify'}
+								<div class="line"></div>
+							{/if}
+						</a>
+						{@render inferenceSettings(
+							'classify',
+							uiState.classificationModels,
+							uiState.selectedClassificationModel,
+							async (i) => uiState.setModelSelections({ classification: i })
+						)}
+					</div>
+					<div class="separator"><IconNext /></div>
+					<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
+						Résultats
+					</ButtonSecondary>
+				</div>
+			{:else}
+				<div class="steps" in:fade={{ delay: 50, duration: 100 }}>
+					<a href={resolve('/sessions')} data-testid="goto-sessions">
+						Sessions
+						{#if path.startsWith('/sessions')}
+							<div class="line"></div>
+						{/if}
+					</a>
+					<a href={resolve('/protocols')} data-testid="goto-protocols">
+						Protocoles
+						{#if path.startsWith('/protocols')}
+							<div class="line"></div>
+						{/if}
+					</a>
+				</div>
+			{/if}
+
+			<aside class:native={isNativeWindow}>
 				{#if getSettings().notifications === null}
 					<div class="notifications">
 						<ButtonInk
@@ -269,9 +306,7 @@
 						</ButtonIcon>
 					</div>
 				{/if}
-			</div>
 
-			<aside class:native={isNativeWindow}>
 				<div class="settings">
 					<Settings
 						{openPrepareForOfflineUse}
@@ -379,6 +414,7 @@
 		border: none;
 		text-decoration: none;
 		color: var(--fg-neutral);
+		white-space: nowrap;
 	}
 
 	.steps {
@@ -420,6 +456,11 @@
 		color: var(--fg-primary);
 	}
 
+	.session-link {
+		color: var(--fg-primary);
+		font-weight: bold;
+	}
+
 	.logo {
 		--size: 40px;
 		display: flex;
@@ -431,7 +472,7 @@
 		--size: 25px;
 	}
 
-	.logo a:first-child {
+	.logo button:first-child {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
