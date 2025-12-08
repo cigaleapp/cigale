@@ -230,7 +230,7 @@ export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'di
 				'Métadonnées associées aux observations/imagess'
 			)
 		},
-		sessionMetadata: {
+		'sessionMetadata?': {
 			'[string]': Metadata.omit('id').describe('Métadonnées associées à la session entière')
 		}
 	})
@@ -238,6 +238,12 @@ export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'di
 		...protocol,
 		metadata: Object.fromEntries(
 			Object.entries(protocol.metadata).map(([id, metadata]) => [
+				namespacedMetadataId(protocol.id, id),
+				metadata
+			])
+		),
+		sessionMetadata: Object.fromEntries(
+			Object.entries(protocol.sessionMetadata ?? {}).map(([id, metadata]) => [
 				namespacedMetadataId(protocol.id, id),
 				metadata
 			])
