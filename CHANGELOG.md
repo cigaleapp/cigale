@@ -6,12 +6,25 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add undo/redo buttons to UI
 - Allow editing metadata option synonyms in protocol editor
+- Allow using a date metadata to set file mtime in zip export
+- Hide navbar in cropper (#921)
+- Improve lightmode error background color a bit
+- Show app version in about page
+- Show notification when app update is found or was installed
 - Show synonyms when metadata search matched by synonym
+
+### Bug Fixes
+
+- Don't apply undos if operation was for a different ImageFile
+- Don't push operation to undo stack if its data is invalid
+- Fix undo stack depth limit enforcement
 
 ### Data Updates
 
 - Regenerate example protocols
+- Use JJ site for genus descriptions too (#920)
 
 ### Translation Updates
 
