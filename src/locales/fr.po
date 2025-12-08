@@ -1889,18 +1889,6 @@ msgstr "Box from ({0}, {1}) to ({2}, {3})"
 msgid "Date"
 msgstr "Date"
 
-#: src/lib/queue.svelte.js
-msgid "Import des images terminé"
-msgstr "Import des images terminé"
-
-#: src/lib/queue.svelte.js
-msgid "Détection terminée"
-msgstr "Détection terminée"
-
-#: src/lib/queue.svelte.js
-msgid "Classification terminée"
-msgstr "Classification terminée"
-
 #: src/routes/(app)/+layout.js
 msgid "Initialisation de la base de données…"
 msgstr "Initialisation de la base de données…"
@@ -1942,3 +1930,15 @@ msgstr "Post-validation"
 #: src/routes/(app)/+layout.js
 msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
 msgstr "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
+
+#: src/lib/queue.svelte.js
+msgid "Import des images terminé"
+msgstr "Import des images terminé"
+
+#: src/lib/queue.svelte.js
+msgid "Détection terminée"
+msgstr "Détection terminée"
+
+#: src/lib/queue.svelte.js
+msgid "Classification terminée"
+msgstr "Classification terminée"

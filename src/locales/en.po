@@ -1881,18 +1881,6 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: src/lib/queue.svelte.js
-msgid "Import des images terminé"
-msgstr ""
-
-#: src/lib/queue.svelte.js
-msgid "Détection terminée"
-msgstr ""
-
-#: src/lib/queue.svelte.js
-msgid "Classification terminée"
-msgstr ""
-
 #: src/routes/(app)/+layout.js
 msgid "Initialisation de la base de données…"
 msgstr ""
@@ -1933,4 +1921,16 @@ msgstr ""
 
 #: src/routes/(app)/+layout.js
 msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
+msgstr ""
+
+#: src/lib/queue.svelte.js
+msgid "Import des images terminé"
+msgstr ""
+
+#: src/lib/queue.svelte.js
+msgid "Détection terminée"
+msgstr ""
+
+#: src/lib/queue.svelte.js
+msgid "Classification terminée"
 msgstr ""
