@@ -33,6 +33,7 @@
 	import { page } from '$app/state';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { resolve } from '$lib/paths';
@@ -74,10 +75,7 @@
 			for (const fileId of imageFileIds) {
 				void (async () => {
 					if (uiState.hasPreviewURL(fileId)) return;
-					const file = await db.get('ImagePreviewFile', fileId);
-					if (!file) return;
-					const blob = new Blob([file.bytes], { type: file.contentType });
-					uiState.setPreviewURL(fileId, URL.createObjectURL(blob));
+					await loadPreviewImage(fileId);
 				})();
 			}
 		}

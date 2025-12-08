@@ -3,22 +3,24 @@
 
 	import IconAdd from '~icons/ri/add-line';
 	import IconImport from '~icons/ri/import-line';
+	import { invalidate } from '$app/navigation';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Card from '$lib/Card.svelte';
 	import Datetime from '$lib/Datetime.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { plural } from '$lib/i18n.js';
-	import { tables } from '$lib/idb.svelte.js';
+	import { dependencyURI, tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { importMore } from '$lib/queue.svelte';
 	import { seo } from '$lib/seo.svelte';
-	import { imagesOfSession, observationsOfSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
-	import { compareBy } from '$lib/utils';
 
 	seo({ title: 'Sessions' });
+
+	const { data } = $props();
+	const sessions = $derived(data.sessions);
 
 	const defaultProtocol = $derived(tables.Protocol.state[0]);
 
@@ -36,6 +38,9 @@
 			updatedAt: new Date().toISOString(),
 			metadata: {}
 		});
+
+		invalidate(dependencyURI('Session', id));
+		invalidate(dependencyURI('Session', '*'));
 
 		await goto('/(app)/sessions/[id]', { id });
 	}
@@ -72,10 +77,7 @@
 	</header>
 
 	<section class="sessions">
-		{#each tables.Session.state
-			.toSorted(compareBy('updatedAt'))
-			.toReversed() as { createdAt, id, name, protocol: protocolId } (id)}
-			{@const protocol = tables.Protocol.getFromState(protocolId)}
+		{#each sessions as { createdAt, id, name, protocol, counts, thumbs } (id)}
 			<Card
 				--card-border={uiState.currentSessionId === id ? 'var(--bg-primary)' : ''}
 				tooltip="Ouvrir la session"
@@ -87,7 +89,9 @@
 			>
 				<div class="content">
 					<div class="gallery">
-						<!-- TODO -->
+						{#each thumbs as src (src)}
+							<img {src} />
+						{/each}
 					</div>
 					<header>
 						<p class="protocol">
@@ -102,11 +106,9 @@
 							Créé <Datetime show="relative" value={createdAt} />
 						</p>
 						<p class="counts">
-							{#await observationsOfSession(id) then obs}
-								{plural(obs.length, ['# observation', '# observations'])}
-							{/await} · {#await imagesOfSession(id) then images}
-								{plural(images.length, ['# image', '# images'])}
-							{/await}
+							{plural(counts.observations, ['# observation', '# observations'])}
+							·
+							{plural(counts.images, ['# image', '# images'])}
 						</p>
 					</header>
 					<footer>
@@ -184,6 +186,18 @@
 		place-items: center;
 		grid-template-rows: 1fr;
 		font-size: 3rem;
+	}
+
+	.content .gallery {
+		display: flex;
+		gap: 0.5rem;
+		padding: 1rem 1rem 0;
+		height: 100%;
+		overflow: hidden;
+
+		img {
+			border-radius: var(--corner-radius);
+		}
 	}
 
 	.content header {

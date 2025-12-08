@@ -177,7 +177,7 @@
 		selectedImages
 			.map((image) => {
 				if (!image.fileId) return undefined;
-				const src = uiState.previewURLs.get(image.fileId);
+				const src = uiState.getPreviewURL(image.fileId);
 				if (!src) return undefined;
 				const box = uiState.cropMetadataValueOf(image)?.value;
 				return {

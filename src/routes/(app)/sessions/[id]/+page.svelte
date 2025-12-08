@@ -75,39 +75,42 @@
 		</Field>
 	</form>
 
-	<h2>Métadonnées</h2>
+	{#if sessionMetadata.length > 0}
+		<h2>Métadonnées</h2>
 
-	<form class="metadata">
-		<MetadataList>
-			{#each sessionMetadata as { def, value } (def.id)}
-				<Metadata
-					options={data.sessionMetadataOptions[def.id]}
-					definition={def}
-					{value}
-					onchange={async (v) => {
-						if (dequal(v, value?.value)) return;
+		<form class="metadata">
+			<MetadataList>
+				{#each sessionMetadata as { def, value } (def.id)}
+					<Metadata
+						options={data.sessionMetadataOptions[def.id]}
+						definition={def}
+						{value}
+						onchange={async (v) => {
+							if (dequal(v, value?.value)) return;
 
-						if (v !== undefined) {
-							await storeMetadataValue({
-								db: databaseHandle(),
-								subjectId: data.session.id,
-								metadataId: def.id,
-								value: v
-							});
-						} else {
-							await deleteMetadataValue({
-								db: databaseHandle(),
-								subjectId: data.session.id,
-								metadataId: def.id
-							});
-						}
-					}}
-				/>
-			{/each}
-		</MetadataList>
-	</form>
+							if (v !== undefined) {
+								await storeMetadataValue({
+									db: databaseHandle(),
+									subjectId: data.session.id,
+									metadataId: def.id,
+									value: v
+								});
+							} else {
+								await deleteMetadataValue({
+									db: databaseHandle(),
+									subjectId: data.session.id,
+									metadataId: def.id
+								});
+							}
+						}}
+					/>
+				{/each}
+			</MetadataList>
+		</form>
+	{/if}
 
 	<ButtonPrimary
+		loading
 		onclick={async () => {
 			await uiState.setCurrentSessionId(data.session.id);
 			await goto(`/import`);

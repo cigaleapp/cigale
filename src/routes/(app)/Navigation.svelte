@@ -186,7 +186,7 @@
 			</div>
 
 			{#if uiState.currentSession}
-				<div class="steps" in:fade={{ delay: 50, duration: 100 }}>
+				<div class="steps" in:fade={{ duration: 100 }}>
 					<a
 						class="session-link"
 						href={resolve('/(app)/sessions/[id]', { id: uiState.currentSessionId })}
@@ -269,7 +269,7 @@
 					</ButtonSecondary>
 				</div>
 			{:else}
-				<div class="steps" in:fade={{ delay: 50, duration: 100 }}>
+				<div class="steps" in:fade={{ duration: 100 }}>
 					<a href={resolve('/sessions')} data-testid="goto-sessions">
 						Sessions
 						{#if path.startsWith('/sessions')}

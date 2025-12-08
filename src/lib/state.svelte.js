@@ -71,6 +71,8 @@ class UIState {
 	imagePreviouslyOpenedInCropper = $state('');
 	/** @type {Map<string, string>} */
 	previewURLs = new SvelteMap();
+	/** @type {Map<string, string>} These persist across session changes */
+	globalPreviewURLs = new SvelteMap();
 	/** @type {Map<string, string>} */
 	erroredImages = new SvelteMap();
 	/** @type {Set<string>} */
@@ -92,10 +94,11 @@ class UIState {
 	);
 
 	/**
-	 * @param {string} id
+	 * @param {string | null} id
 	 */
 	async setCurrentSessionId(id) {
 		localStorage.setItem('currentSessionId', id);
+		this.clearPreviewURLs();
 		await tables.initialize(id);
 		this._currentSessionId = id;
 	}
@@ -140,16 +143,49 @@ class UIState {
 	 */
 	hasPreviewURL(imageFileId) {
 		if (!imageFileId) return false;
-		return this.previewURLs.has(imageFileId);
+		return this.globalPreviewURLs.has(imageFileId) || this.previewURLs.has(imageFileId);
 	}
+
+	/**
+	 *
+	 * @param {string | undefined | null} imageFileId
+	 * @returns {string | undefined}
+	 */
+	getPreviewURL(imageFileId) {
+		if (!imageFileId) return undefined;
+		return this.previewURLs.get(imageFileId) || this.globalPreviewURLs.get(imageFileId);
+	}
+
 	/**
 	 * @param {string | undefined | null} imageFileId
 	 * @param {string} url
+	 * @param {boolean} [global=false]
 	 */
-	setPreviewURL(imageFileId, url) {
-		console.debug('setPreviewURL', { imageFileId, url });
+	setPreviewURL(imageFileId, url, global = false) {
+		console.debug('setPreviewURL', { imageFileId, url, global });
 		if (!imageFileId) return;
-		this.previewURLs.set(imageFileId, url);
+		if (global) {
+			this.globalPreviewURLs.set(imageFileId, url);
+		} else {
+			this.previewURLs.set(imageFileId, url);
+		}
+	}
+
+	/**
+	 * @param {string} imageFileId
+	 */
+	revokePreviewURL(imageFileId) {
+		const url = this.previewURLs.get(imageFileId);
+		if (!url) return;
+		URL.revokeObjectURL(url);
+		this.previewURLs.delete(imageFileId);
+		this.globalPreviewURLs.delete(imageFileId);
+	}
+
+	clearPreviewURLs() {
+		for (const id of this.previewURLs.keys()) {
+			this.revokePreviewURL(id);
+		}
 	}
 
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */

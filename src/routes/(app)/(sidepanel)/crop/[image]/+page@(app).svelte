@@ -170,7 +170,7 @@
 				.filter(([, value]) => Boolean(value))
 		)
 	);
-	const imageSrc = $derived(uiState.previewURLs.get(fileId));
+	const imageSrc = $derived(uiState.getPreviewURL(fileId));
 	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idComparator));
 	const prevFileId = $derived.by(() => {
 		const idx = sortedFileIds.indexOf(fileId) - 1;
@@ -1004,7 +1004,7 @@
 						{#if image.fileId}
 							<CroppedImg
 								box={toTopLeftCoords(box)}
-								src={uiState.previewURLs.get(image.fileId)}
+								src={uiState.getPreviewURL(image.fileId)}
 								class="thumb"
 							/>
 						{/if}

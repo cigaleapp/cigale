@@ -199,7 +199,7 @@ export async function deleteImageFile(id, tx, notFoundOk = true) {
 		uiState.imageOpenedInCropper = '';
 	}
 
-	const previewURL = uiState.previewURLs.get(id);
+	const previewURL = uiState.getPreviewURL(id);
 	if (previewURL) {
 		URL.revokeObjectURL(previewURL);
 		uiState.previewURLs.delete(id);
@@ -250,6 +250,18 @@ export async function storeImageBytes({
 		const preview = new Blob([resizedBytes], { type: contentType });
 		uiState.setPreviewURL(id, URL.createObjectURL(preview));
 	});
+}
+
+/**
+ * Loads a imageFileId preview into uiState.previewURLs
+ * @param {string} id
+ * @param {'global' | 'session'} [scope] whether to load into global or session preview URLs
+ */
+export async function loadPreviewImage(id, scope = 'session') {
+	const file = await db.get('ImagePreviewFile', id);
+	if (!file) return;
+	const blob = new Blob([file.bytes], { type: file.contentType });
+	uiState.setPreviewURL(id, URL.createObjectURL(blob), scope === 'global');
 }
 
 // ATTENTION: Changer aussi dans la validation des définitions de protocoles (Ctrl-F pour 1024 dans tout le projet pour être sûr·e de rien louper) si jamais on change ça

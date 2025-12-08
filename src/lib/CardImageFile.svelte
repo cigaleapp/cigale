@@ -37,7 +37,7 @@
 <CardMedia
 	id={fileId}
 	title={images[0].filename}
-	image={uiState.previewURLs.get(fileId)}
+	image={uiState.getPreviewURL(fileId)}
 	selected={uiState.selection.includes(fileId)}
 	boxes="show-all"
 	{tooltip}
