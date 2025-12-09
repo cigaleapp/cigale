@@ -61,7 +61,7 @@ describe('deleteSession', () => {
 			description: '',
 			protocol: 'protocol1',
 			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
+			openedAt: new Date().toISOString(),
 			metadata: {
 				[namespacedMetadataId('com.example.test.protocol', 'no_exif')]: {
 					alternatives: {},

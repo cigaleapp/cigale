@@ -80,7 +80,7 @@ export async function importResultsZip(file, id) {
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			createdAt: new Date().toISOString(),
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			updatedAt: new Date().toISOString(),
+			openedAt: new Date().toISOString(),
 			metadata: session.metadata ?? {}
 		});
 

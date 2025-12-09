@@ -34,7 +34,7 @@
 			description: defaultProtocol.id,
 			protocol: tables.Protocol.state[0]?.id,
 			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
+			openedAt: new Date().toISOString(),
 			metadata: {}
 		});
 

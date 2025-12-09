@@ -66,7 +66,7 @@
 			e.preventDefault();
 		}}
 	>
-		<Field label="Protocole">
+		<Field composite label="Protocole">
 			<InputSelectProtocol
 				testid="protocol"
 				value={protocolId}

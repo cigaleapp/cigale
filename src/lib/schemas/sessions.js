@@ -8,7 +8,7 @@ export const Session = type({
 	name: 'string',
 	// Date is not compatible with JSON Schemas, use a datestring instead
 	createdAt: 'string.date.iso',
-	updatedAt: 'string.date.iso',
+	openedAt: 'string.date.iso',
 	description: 'string',
 	protocol: ID,
 	metadata: MetadataValues

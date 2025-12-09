@@ -101,6 +101,7 @@ class UIState {
 		if (id === null) {
 			localStorage.removeItem('currentSessionId');
 		} else {
+			void tables.Session.update(id, 'openedAt', new Date().toISOString());
 			localStorage.setItem('currentSessionId', id);
 		}
 

@@ -37,7 +37,7 @@ async function loadSessionThumbnails(sessionId) {
 async function sortedSessions() {
 	const sessions = await tables.Session.list();
 
-	sessions.sort(compareBy('updatedAt'));
+	sessions.sort(compareBy('openedAt'));
 	sessions.reverse();
 
 	for (const session of sessions) {

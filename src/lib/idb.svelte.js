@@ -73,12 +73,18 @@ function wrangler(table) {
 		},
 		/** @param {string|null} sessionId */
 		async refresh(sessionId) {
-			console.debug(`refresh ${table} for session ${sessionId}`);
-			// @ts-ignore
-			_tablesState[table] =
-				isSessionDependentReactiveTable(table) && sessionId
-					? await this.list('sessionId', sessionId)
-					: await this.list();
+			if (!sessionId && isSessionDependentReactiveTable(table)) {
+				console.debug(`refresh ${table} without session: clearing state`);
+				_tablesState[table] = [];
+			} else if (sessionId && isSessionDependentReactiveTable(table)) {
+				console.debug(`refresh ${table} for session ${sessionId}`);
+				// @ts-ignore
+				_tablesState[table] = await this.list('sessionId', sessionId);
+			} else {
+				console.debug(`refresh ${table}`);
+				// @ts-ignore
+				_tablesState[table] = await this.list();
+			}
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
