@@ -272,7 +272,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		top: 0;
 		left: 0;
 		right: 0;
-		z-index: 10;
+		z-index: 100;
 		background-color: var(--bg-neutral);
 		padding: 0 2.5em 0.75em 2.5em;
 
