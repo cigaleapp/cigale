@@ -119,6 +119,7 @@
 			</Card>
 		{:else}
 			<Card
+				testid="new-session-card"
 				tooltip="Créer une nouvelle session"
 				onclick={async () => {
 					await createSession();

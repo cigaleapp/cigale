@@ -21,10 +21,11 @@ Available CSS variables:
 	 * @property {(e: MouseEvent) => void} [onclick]
 	 * @property {'article' | 'li' | 'div'} [tag=article] - HTML tag to use for the card container
 	 * @property {string} [tooltip] - Tooltip text to show on hover (only if clickable)
+	 * @property {string} [testid]
 	 */
 
 	/** @type {Props}*/
-	const { children = undefined, onclick, tag = 'article', tooltip: tooltipText } = $props();
+	const { children = undefined, onclick, tag = 'article', tooltip: tooltipText, testid } = $props();
 
 	const clickable = $derived(Boolean(onclick));
 </script>
@@ -33,6 +34,7 @@ Available CSS variables:
 <svelte:element
 	this={tag}
 	class:clickable
+	data-testid={testid}
 	use:tooltip={clickable && tooltipText ? tooltipText : undefined}
 	class="card"
 	{onclick}
