@@ -108,29 +108,6 @@
 				});
 			}
 		},
-		'$mod+u': {
-			help: 'Supprimer toutes les images et observations',
-			async do() {
-				toasts.warn('Suppression de toutes les images et observations…');
-				await db.openTransaction(
-					['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
-					{},
-					(tx) => {
-						tx.objectStore('Observation').clear();
-						tx.objectStore('ImageFile').clear();
-						uiState.previewURLs.clear();
-						tx.objectStore('Image').clear();
-						uiState.queuedImages.clear();
-						uiState.erroredImages.clear();
-						uiState.loadingImages.clear();
-						uiState.processing.files = [];
-						uiState.setSelection?.([]);
-						cancellers.forEach((cancel) => cancel('Cancelled by user'));
-						cancellers.clear();
-					}
-				);
-			}
-		},
 		'$mod+g': {
 			help: 'Fusionner des observations ou images',
 			do: mergeSelection

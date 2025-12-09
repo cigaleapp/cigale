@@ -129,13 +129,14 @@ function fallbackObservationLabel(parts) {
  *
  * @param {typeof import('$lib/database').Schemas.Image.inferIn} image
  * @param {import('$lib/database').Protocol} protocol
+ * @param {import('$lib/database').Session} session
  * @returns {typeof import('$lib/database').Schemas.Observation.inferIn}
  */
-export function newObservation(image, protocol) {
+export function newObservation(image, protocol, session) {
 	const observationId = generateId('Observation');
 	const newObs = {
 		id: observationId,
-		sessionId: uiState.currentSessionId ?? '',
+		sessionId: session.id,
 		images: [image.id],
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([image]),
@@ -153,15 +154,21 @@ export function newObservation(image, protocol) {
  * @param {import('./idb.svelte').IDBTransactionWithAtLeast<["Observation", "Image"]>} [tx] reuse an existing transaction
  */
 export async function ensureNoLoneImages(tx) {
+	const session = uiState.currentSession;
 	const protocol = uiState.currentProtocol;
 	if (!protocol) throw new Error('No protocol selected');
+	if (!session) throw new Error('No session selected');
+
 	await db.openTransaction(['Observation', 'Image'], { tx }, async (tx) => {
-		const images = await tx.objectStore('Image').getAll();
-		const observations = await tx.objectStore('Observation').getAll();
+		const images = await tx.objectStore('Image').index('sessionId').getAll(session.id);
+		const observations = await tx
+			.objectStore('Observation')
+			.index('sessionId')
+			.getAll(session.id);
 
 		for (const image of images) {
 			if (!observations.some((o) => o.images.includes(image.id))) {
-				const newObs = newObservation(image, protocol);
+				const newObs = newObservation(image, protocol, session);
 				tx.objectStore('Observation').add(newObs);
 				// Update ui selection so we don't have ghosts in preview side panel
 				uiState.setSelection?.(

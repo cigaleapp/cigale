@@ -32,6 +32,7 @@
 		),
 		...uiState.processing.files.map(({ name, id, addedAt }) => ({
 			id,
+			sessionId: uiState.currentSessionId,
 			addedAt,
 			name,
 			virtual: true,

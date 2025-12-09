@@ -100,12 +100,8 @@
 						</p>
 						<h2>{name}</h2>
 						<p class="date">
-							Créé <Datetime show="relative" value={createdAt} />
-						</p>
-						<p class="counts">
-							{plural(counts.observations, ['# observation', '# observations'])}
-							·
 							{plural(counts.images, ['# image', '# images'])}
+							· créée <Datetime show="relative" value={createdAt} />
 						</p>
 					</header>
 					<footer>
@@ -139,7 +135,7 @@
 <style>
 	main {
 		width: 100%;
-		max-width: 1000px;
+		max-width: 1200px;
 		margin: 0 auto;
 	}
 
@@ -171,7 +167,7 @@
 
 	.content {
 		display: grid;
-		grid-template-rows: 2fr max-content minmax(3rem, 1fr);
+		grid-template-rows: 3fr max-content 50px;
 		grid-template-columns: 100%;
 		gap: 1rem;
 		width: 100%;
@@ -199,6 +195,18 @@
 
 	.content header {
 		padding: 0 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+
+		h2 {
+			line-height: 1;
+		}
+
+		.protocol,
+		.date {
+			color: var(--gay);
+		}
 	}
 
 	.content footer {
