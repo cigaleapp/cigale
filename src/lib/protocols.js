@@ -34,7 +34,11 @@ export async function toExportedProtocol(db, protocol) {
 	const allMetadataDefs = Object.fromEntries(
 		await db.getAll('Metadata').then((defs) =>
 			defs
-				.filter((def) => protocol.metadata.includes(def.id))
+				.filter(
+					(def) =>
+						protocol.metadata.includes(def.id) ||
+						protocol.sessionMetadata.includes(def.id)
+				)
 				.map((metadata) => [
 					metadata.id,
 					{
@@ -64,9 +68,9 @@ export async function toExportedProtocol(db, protocol) {
 		},
 		metadata: pick(
 			allMetadataDefs,
-			protocol.metadata.filter((id) => !protocol.sessionMetadata.includes(id))
+			...protocol.metadata.filter((id) => !protocol.sessionMetadata.includes(id))
 		),
-		sessionMetadata: pick(allMetadataDefs, protocol.sessionMetadata)
+		sessionMetadata: pick(allMetadataDefs, ...protocol.sessionMetadata)
 	});
 }
 

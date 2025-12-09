@@ -104,7 +104,8 @@ test('toExportedProtocol', async () => {
 		id: 'protocol1',
 		name: 'Test Protocol',
 		version: 1,
-		metadata: ['protocol1__meta1', 'protocol1__meta2'],
+		metadata: ['protocol1__meta1', 'protocol1__meta2', 'protocol1__meta3'],
+		sessionMetadata: ['protocol1__meta3'],
 		authors: [],
 		description: 'A test protocol',
 		crop: {
@@ -132,6 +133,17 @@ test('toExportedProtocol', async () => {
 
 	expect(exported).toEqual({
 		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'crop'),
+		sessionMetadata: {
+			protocol1__meta3: {
+				key: 'meta3',
+				label: 'Metadata 3',
+				type: 'enum',
+				description: 'Metadata 3 description',
+				mergeMethod: 'max',
+				required: false,
+				options: []
+			}
+		},
 		metadata: {
 			protocol1__meta1: {
 				key: 'meta1',
@@ -179,6 +191,7 @@ describe('compareProtocolWithUpstream', () => {
 				name: 'Test Protocol',
 				version: 1,
 				metadata: [],
+				sessionMetadata: [],
 				authors: [],
 				description: 'A test protocol',
 				// no source:
@@ -220,6 +233,7 @@ describe('compareProtocolWithUpstream', () => {
 				version: 1,
 				metadata: [],
 				authors: [],
+				sessionMetadata: [],
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {

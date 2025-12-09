@@ -18,7 +18,7 @@ test('openDatabase', async () => {
 	expect(window).toHaveProperty('DB');
 	expect(window).toHaveProperty('refreshDB');
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
-	expect(db.version).toMatchInlineSnapshot(`3`);
+	expect(db.version).toMatchInlineSnapshot(`4`);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
 		FakeDOMStringList {
 		  "0": "Image",
@@ -28,7 +28,8 @@ test('openDatabase', async () => {
 		  "4": "MetadataOption",
 		  "5": "Observation",
 		  "6": "Protocol",
-		  "7": "Settings",
+		  "7": "Session",
+		  "8": "Settings",
 		  "_values": [
 		    "Image",
 		    "ImageFile",
@@ -37,6 +38,7 @@ test('openDatabase', async () => {
 		    "MetadataOption",
 		    "Observation",
 		    "Protocol",
+		    "Session",
 		    "Settings",
 		  ],
 		}
@@ -53,6 +55,7 @@ test('nukeDatabase', async () => {
 	const db = await openDatabase();
 	await db.put('ImageFile', {
 		id: 'flint and steel',
+		sessionId: 'testing',	
 		bytes: new ArrayBuffer(),
 		filename: 'ha',
 		contentType: 'image/png',
@@ -91,6 +94,7 @@ describe('operations', () => {
 			const addedAt = new Date();
 			await idb.set('Image', {
 				id: imageId(0, 0),
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
@@ -109,6 +113,7 @@ describe('operations', () => {
 			const serialized = await db.get('Image', imageId(0, 0));
 			expect(serialized).toEqual({
 				id: imageId(0, 0),
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
@@ -127,6 +132,7 @@ describe('operations', () => {
 			const deserialized = await idb.get('Image', imageId(0, 0));
 			expect(deserialized).toEqual({
 				id: imageId(0, 0),
+				sessionId: 'testing',
 				addedAt,
 				fileId: 'quoicoubaka',
 				boundingBoxesAnalyzed: false,
@@ -151,6 +157,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('Observation', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				addedAt: new Date().toISOString(),
 				images: [],
 				label: 'Test',
@@ -160,6 +167,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('ImageFile', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				bytes: new ArrayBuffer(0),
 				filename: 'ha',
 				contentType: 'image/png',
@@ -177,6 +185,7 @@ describe('operations', () => {
 		const addedAt = new Date();
 		await db.put('Image', {
 			id: imageId(0, 0),
+			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
@@ -193,6 +202,7 @@ describe('operations', () => {
 		});
 		await db.put('Image', {
 			id: imageId(0, 1),
+			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
@@ -209,6 +219,7 @@ describe('operations', () => {
 		});
 		expect(await idb.get('Image', imageId(0, 0))).toEqual({
 			id: imageId(0, 0),
+			sessionId: 'testing',
 			addedAt,
 			fileId: 'quoicoubaka',
 			boundingBoxesAnalyzed: false,
@@ -233,6 +244,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('Observation', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				images: [],
 				label: 'Test',
@@ -249,6 +261,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('Observation', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				images: [],
 				label: 'Test',
@@ -265,6 +278,7 @@ describe('operations', () => {
 		const addedAt = new Date();
 		const observation = (/** @type {number} */ i) => ({
 			id: `test${i}`,
+			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			images: [],
 			label: 'Test',
@@ -304,6 +318,7 @@ describe('wrangler', () => {
 	const observation = (/** @type {number} */ i) => ({
 		id: `test${i}`,
 		sessionId: 'testing',
+		sessionId: 'testing',
 		addedAt: addedAt.toISOString(),
 		images: [],
 		label: 'Test',
@@ -339,6 +354,7 @@ describe('wrangler', () => {
 				}
 			],
 			Image: [],
+			Session: [],
 			Metadata: [],
 			Protocol: [],
 			Settings: []

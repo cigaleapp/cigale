@@ -72,6 +72,7 @@ describe('processExifData', () => {
 
 		await db.tables.Image.set({
 			id: imageId(0, 0),
+			sessionId: 'testing',
 			addedAt: '2023-10-01T00:00:00Z',
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
