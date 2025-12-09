@@ -85,19 +85,24 @@ class UIState {
 	cropperZoomStates = new SvelteMap();
 	/** @type {undefined | ((newSelection: string[]) => void)} */
 	setSelection = $state(undefined);
-	/** @type {string} */
-	_currentSessionId = $state('');
+	/** @type {string | null} */
+	_currentSessionId = $state(null);
 
-	/** @type {string} */
+	/** @type {string | null} */
 	currentSessionId = $derived(
-		this._currentSessionId || localStorage.getItem('currentSessionId') || ''
+		this._currentSessionId || localStorage.getItem('currentSessionId') || null
 	);
 
 	/**
 	 * @param {string | null} id
 	 */
 	async setCurrentSessionId(id) {
-		localStorage.setItem('currentSessionId', id);
+		if (id === null) {
+			localStorage.removeItem('currentSessionId');
+		} else {
+			localStorage.setItem('currentSessionId', id);
+		}
+
 		this.clearPreviewURLs();
 		await tables.initialize(id);
 		this._currentSessionId = id;
