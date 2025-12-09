@@ -16,7 +16,6 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { askForNotificationPermission, hasNotificationsEnabled } from '$lib/notifications.js';
 	import { resolve } from '$lib/paths';
-	import { goto } from '$lib/paths.js';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';

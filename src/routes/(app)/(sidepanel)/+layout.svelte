@@ -21,7 +21,6 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
-	import { cancellers } from '../+layout.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });

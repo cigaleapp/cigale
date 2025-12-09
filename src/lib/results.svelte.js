@@ -77,7 +77,9 @@ export async function importResultsZip(file, id) {
 			name: session.name ?? `Import de ${file.name}`,
 			description: `Importée depuis ${file.name}`,
 			protocol: session.protocol,
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			createdAt: new Date().toISOString(),
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			updatedAt: new Date().toISOString(),
 			metadata: session.metadata ?? {}
 		});

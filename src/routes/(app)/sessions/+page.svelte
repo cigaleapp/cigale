@@ -3,14 +3,13 @@
 
 	import IconAdd from '~icons/ri/add-line';
 	import IconImport from '~icons/ri/import-line';
-	import { invalidate } from '$app/navigation';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Card from '$lib/Card.svelte';
 	import Datetime from '$lib/Datetime.svelte';
 	import { promptForFiles } from '$lib/files';
 	import { plural } from '$lib/i18n.js';
-	import { dependencyURI, tables } from '$lib/idb.svelte.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
 	import { importMore } from '$lib/queue.svelte';
 	import { seo } from '$lib/seo.svelte';

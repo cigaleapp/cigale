@@ -202,7 +202,6 @@
 	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
-	$inspect({ sortedFileIds, nextFileId, nextUnconfirmedImageId });
 
 	/** @type {Record<string, undefined | { value: Metadata.RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
@@ -589,8 +588,8 @@
 		const nextFileIdBeforeDelete = $state.snapshot(nextFileId);
 		await deleteImageFile(fileId);
 
-		if (nextFileId) {
-			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId });
+		if (nextFileIdBeforeDelete) {
+			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileIdBeforeDelete });
 		} else {
 			// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
 			// it means we just deleted the last image; so we go back to the import tab

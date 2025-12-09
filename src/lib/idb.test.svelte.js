@@ -318,7 +318,6 @@ describe('wrangler', () => {
 	const observation = (/** @type {number} */ i) => ({
 		id: `test${i}`,
 		sessionId: 'testing',
-		sessionId: 'testing',
 		addedAt: addedAt.toISOString(),
 		images: [],
 		label: 'Test',

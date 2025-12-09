@@ -31,7 +31,6 @@
 
 	import { version } from '$app/environment';
 	import { page } from '$app/state';
-	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';

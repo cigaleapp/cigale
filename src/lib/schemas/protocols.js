@@ -86,7 +86,7 @@ export const TemplatedString = (Input) =>
 				toJSON: () => t,
 				/**
 				 * @param {T["inferIn"]} data
-				 * @return {string}
+				 * @returns {string}
 				 */
 				render: (data) => compiled(Input.assert(data))
 			};

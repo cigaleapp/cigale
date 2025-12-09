@@ -9,7 +9,6 @@ import {
 	firstObservationCard,
 	goToTab,
 	importPhotos,
-	readStreamToBuffer,
 	setSettings
 } from './utils';
 

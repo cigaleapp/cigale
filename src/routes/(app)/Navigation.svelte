@@ -2,7 +2,6 @@
 	import { fade } from 'svelte/transition';
 
 	import IconSelect from '~icons/ri/arrow-down-s-line';
-	import IconBack from '~icons/ri/arrow-left-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
 	import IconCheck from '~icons/ri/check-line';
 	import IconDismiss from '~icons/ri/close-line';

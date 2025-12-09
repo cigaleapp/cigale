@@ -1,4 +1,4 @@
-import { getSetting, getSettings } from './settings.svelte';
+import { getSettings } from './settings.svelte';
 import { toasts } from './toasts.svelte';
 
 /**

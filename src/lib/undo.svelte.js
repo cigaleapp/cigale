@@ -366,7 +366,7 @@ if (import.meta.vitest) {
 			let box = { ...boxBefore };
 			$effect.root(() => {
 				undo.initialize(100);
-				undo.handlers['crop/box/edit'] = ({ imageId, before, after }) => {
+				undo.handlers['crop/box/edit'] = ({ before }) => {
 					box = { ...before };
 				};
 
@@ -392,10 +392,10 @@ if (import.meta.vitest) {
 			let boxes = { testBox: { ...box }, otherBox: { ...box } };
 			$effect.root(() => {
 				undo.initialize(100);
-				undo.handlers['crop/box/create'] = ({ imageId, box }) => {
+				undo.handlers['crop/box/create'] = () => {
 					delete boxes['testBox'];
 				};
-				undo.handlers['crop/box/delete'] = ({ imageId, box }) => {
+				undo.handlers['crop/box/delete'] = ({  box }) => {
 					boxes['testBox'] = { ...box };
 				};
 

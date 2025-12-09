@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect } from '@playwright/test';
@@ -701,7 +701,7 @@ export function firstObservationCard(page) {
  * @param {import('node:stream').Readable} stream
  * @returns
  */
-export async function readStreamToBuffer(stream) {
+async function readStreamToBuffer(stream) {
 	return Buffer.concat(await Array.fromAsync(stream));
 }
 
