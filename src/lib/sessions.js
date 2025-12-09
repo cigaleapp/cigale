@@ -3,20 +3,6 @@ import * as idb from '$lib/idb.svelte.js';
 import { imageIdToFileId } from './images';
 
 /**
- * @param {string} sessionId
- */
-export async function observationsOfSession(sessionId) {
-	return idb.listByIndex('Observation', 'sessionId', sessionId);
-}
-
-/**
- * @param {string} sessionId
- */
-export async function imagesOfSession(sessionId) {
-	return idb.listByIndex('Image', 'sessionId', sessionId);
-}
-
-/**
  *
  * @param {string} sessionId
  */

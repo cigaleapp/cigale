@@ -1,6 +1,5 @@
-import { dependencyURI, tables } from '$lib/idb.svelte.js';
+import { dependencyURI, listByIndex, tables } from '$lib/idb.svelte.js';
 import { loadPreviewImage } from '$lib/images.js';
-import { imagesOfSession, observationsOfSession } from '$lib/sessions.js';
 import { uiState } from '$lib/state.svelte.js';
 import { compareBy, nonnull } from '$lib/utils';
 
@@ -16,7 +15,7 @@ export async function load({ depends }) {
  * @param {string} sessionId
  */
 async function loadSessionThumbnails(sessionId) {
-	const images = await imagesOfSession(sessionId);
+	const images = await listByIndex('Image', 'sessionId', sessionId);
 
 	const firstUniqueFileIds = [
 		...new Set(images.map((image) => image.fileId).filter(nonnull))
@@ -45,8 +44,7 @@ async function sortedSessions() {
 		session.protocol = await tables.Protocol.get(session.protocol);
 		session.thumbs = await loadSessionThumbnails(session.id);
 		session.counts = {
-			observations: (await observationsOfSession(session.id)).length,
-			images: (await imagesOfSession(session.id)).length
+			images: await listByIndex('Image', 'sessionId', session.id).then((imgs) => imgs.length)
 		};
 	}
 
