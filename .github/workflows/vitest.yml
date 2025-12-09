@@ -3,6 +3,9 @@ name: Vitest
 on:
   workflow_call:
     inputs:
+      publish-report:
+        type: boolean
+        default: true
       compare-coverage:
         type: boolean
         default: true
@@ -27,13 +30,13 @@ jobs:
       - name: Run tests
         run: bun run test
       - name: Save aside coverage report
-        if: ${{ always() }}
+        if: inputs.compare-coverage && always() 
         uses: actions/upload-artifact@v5
         with:
           name: vitest-report-head
           path: ./coverage
       - name: Deploy results to Github Pages
-        if: ${{ !cancelled() }}
+        if: inputs.publish-report && !cancelled()
         uses: rossjrw/pr-preview-action@v1
         id: deploy-preview
         with:
@@ -67,7 +70,7 @@ jobs:
     name: Upload coverage report
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref_name != 'main'
+    if: github.ref_name != 'main' && inputs.compare-coverage
     environment:
       name: '#${{ github.event.number }}: Test coverage report'
       url: ${{ steps.deploy-preview.outputs.preview-url }}
@@ -139,7 +142,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         if: steps.diff.outputs.trend != 'neutral'
         with:
-          header: '📊 Coverage difference'
+          header: 📊 Coverage difference
           message: |
             ${{ steps.diff.outputs.emoji }} Coverage is **${{ steps.diff.outputs.trend }}** by **${{ steps.diff.outputs.diff }}%** (from ${{ steps.diff.outputs.base }}% to ${{ steps.diff.outputs.head }}%)
       - name: Fail if coverage decreased too much

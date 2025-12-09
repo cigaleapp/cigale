@@ -54,7 +54,16 @@ jobs:
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
     with:
-      compare-coverage: ${{ github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/') }}
+      publish-report: false
+      compare-coverage: false
+
+  coverage:
+    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/')
+    needs: test
+    name: Check coverage
+    uses: ./.github/workflows/vitest.yml
+    with:
+      compare-coverage: true
 
   e2e:
     needs: [build, json-schema, lint, test]
@@ -121,6 +130,7 @@ jobs:
       - json-schema
       - lint
       - test
+      - coverage
       - e2e
       - clutter
       - preview
