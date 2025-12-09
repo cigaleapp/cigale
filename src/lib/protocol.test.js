@@ -441,8 +441,8 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol updated',
 				exports: {
 					metadata: {
-						json: 'analysis_v2.json', // changed
-						csv: 'metadata.csv'
+						json: 'analysis.json',
+						csv: 'metadata_v2.csv' // changed
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -510,10 +510,10 @@ describe('compareProtocolWithUpstream', () => {
 				value: 'A test protocol'
 			},
 			{
-				oldValue: 'analysis_v2.json',
-				path: ['exports', 'metadata', 'json'],
+				oldValue: 'metadata_v2.csv',
+				path: ['exports', 'metadata', 'csv'],
 				type: 'CHANGE',
-				value: 'analysis.json'
+				value: 'metadata.csv'
 			},
 			{
 				oldValue: 'Metadata 1 description updated',

@@ -5,6 +5,7 @@ import * as db from './idb.svelte.js';
 import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images.js';
 import { serializeMetadataValue } from './metadata.js';
 import { Analysis } from './schemas/exports.js';
+import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
 import { uiState } from './state.svelte.js';
 import { toasts } from './toasts.svelte.js';
 import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils';
@@ -36,8 +37,7 @@ export async function importResultsZip(file, id) {
 
 	const results = unzipSync(contents, {
 		filter: ({ name }) => {
-			// TODO dont make analysis.json configurable anymore, otherwise we can't know where it is since we don't know the protocol used in the export yet
-			return name === 'analysis.json';
+			return name === ANALYSIS_JSON_ZIP_FILEPATH;
 		}
 	});
 

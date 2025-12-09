@@ -15,6 +15,7 @@
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import Tooltip from '$lib/Tooltip.svelte';
 	import { entries } from '$lib/utils.js';
 
 	import MetadataLink from '../MetadataLink.svelte';
@@ -214,18 +215,26 @@
 					<Icon />
 					<div class="text">
 						<span class="filename">
-							<InlineTextInput
-								discreet
-								value={child.filename}
-								label="Nom du fichier"
-								onblur={async (newName) => {
-									child.filename = newName;
-									await updateExportsPath(
-										child.provenance,
-										`${dirname}/${newName}`
-									);
-								}}
-							/>
+							{#if child.provenance === 'metadata.json'}
+								<Tooltip
+									text="Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
+								>
+									{child.filename}
+								</Tooltip>
+							{:else}
+								<InlineTextInput
+									discreet
+									value={child.filename}
+									label="Nom du fichier"
+									onblur={async (newName) => {
+										child.filename = newName;
+										await updateExportsPath(
+											child.provenance,
+											`${dirname}/${newName}`
+										);
+									}}
+								/>
+							{/if}
 						</span>
 						<span class="help">{child.help}</span>
 					</div>
