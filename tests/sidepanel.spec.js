@@ -1,6 +1,8 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
+	changeSessionProtocol,
+	chooseFirstSession,
 	firstObservationCard,
 	getMetadataOverridesOfObservation,
 	goToTab,
@@ -32,7 +34,8 @@ async function initialize({
 	await loadDatabaseDump(page, `${dump}.devalue`);
 
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await newSession(page, protocol);
+	await chooseFirstSession(page);
+	if (protocol) await changeSessionProtocol(page, protocol);
 	await goToTab(page, 'classify');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }

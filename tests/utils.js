@@ -359,6 +359,18 @@ export async function chooseFirstSession(page) {
 }
 
 /**
+ *
+ * @param {Page} page
+ * @param {string} name
+ */
+export async function changeSessionProtocol(page, name) {
+	await page.getByTestId('goto-current-session').click();
+	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await chooseInDropdown(page, 'protocol', name);
+	await goToTab(page, 'import');
+}
+
+/**
  * @param {Page} page
  */
 export async function goToProtocolManagement(page) {
