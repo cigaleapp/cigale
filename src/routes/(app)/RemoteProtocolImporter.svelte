@@ -6,6 +6,7 @@
 	import HighlightHostname from '$lib/HighlightHostname.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import { goto } from '$lib/paths';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
@@ -80,8 +81,7 @@
 			await swarpc.importProtocol({ contents: raw });
 			await tables.Protocol.refresh(null);
 			await tables.Metadata.refresh(null);
-
-			preselection.protocol = null;
+			await goto('/protocols');
 		} catch (error) {
 			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
 		} finally {

@@ -218,7 +218,8 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 		.getByRole('button', { name: 'Importer' })
 		.click();
 
-	await goToProtocolManagement(page);
+	await page.waitForURL((u) => u.hash === '#/protocols');
+
 	await expect(page.getByRole('listitem', { name: 'Kitchen sink' })).toBeVisible();
 	await expect(page.getByRole('listitem', { name: lightweightProtocol.name })).toBeVisible();
 });
