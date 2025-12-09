@@ -11,11 +11,12 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {string} value selected protocol's ID
+	 * @property {(value: string) => Promise<void> | void} [onchange]
 	 * @property {string} [testid]
 	 */
 
 	/** @type {Props} */
-	let { value = $bindable(), testid } = $props();
+	let { value = $bindable(), testid, onchange } = $props();
 </script>
 
 <DropdownMenu
@@ -34,8 +35,9 @@
 		key: p.id,
 		label: p.name,
 		selected: value === p.id,
-		onclick() {
+		async onclick() {
 			value = p.id;
+			await onchange?.(value);
 		}
 	}))}
 >

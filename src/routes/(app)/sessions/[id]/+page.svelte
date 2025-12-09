@@ -20,10 +20,6 @@
 	const { data } = $props();
 	let sessionMetadata = $derived(data.sessionMetadata);
 	let { protocol: protocolId, name } = $derived(data.session);
-
-	$effect(() => {
-		invalidate(dependencyURI('Protocol', protocolId));
-	});
 </script>
 
 <main in:fade={{ duration: 100 }}>
@@ -71,7 +67,14 @@
 		}}
 	>
 		<Field label="Protocole">
-			<InputSelectProtocol testid="protocol" bind:value={protocolId} />
+			<InputSelectProtocol
+				testid="protocol"
+				value={protocolId}
+				onchange={async (newProtocolId) => {
+					await tables.Session.update(data.session.id, 'protocol', newProtocolId);
+					invalidate(dependencyURI('Session', data.session.id));
+				}}
+			/>
 		</Field>
 	</form>
 
