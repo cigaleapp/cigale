@@ -195,7 +195,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 	await expect(observations).not.toHaveText(new RegExp('Rééssayer'));
 });
 
-test('can import a protocol via ?protocol', async ({ page, context }) => {
+test('can import a protocol via /protocols/import/url', async ({ page, context }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	const protocolUrl = 'https://example.com/kitchensink.cigaleprotocol.yaml';
 	await mockProtocolSourceURL(page, context, protocolUrl, {
@@ -205,7 +205,9 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 		)
 	});
 
-	await page.goto(`?protocol=${encodeURIComponent(protocolUrl)}`);
+	await page.waitForURL((u) => u.hash === '#/sessions');
+
+	await page.goto(`#/protocols/import/${protocolUrl}`);
 	await expect(modal(page, 'Importer le protocole distant ?')).toBeVisible({
 		timeout: 30_000
 	});

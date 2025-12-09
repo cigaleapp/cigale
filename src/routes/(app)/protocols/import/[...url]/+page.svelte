@@ -12,7 +12,7 @@
 	let importing = $state(false);
 
 	const toImport = $derived.by(() => {
-		const protocol = page.url.searchParams.get('protocol');
+		const protocol = page.params.url;
 		if (!protocol) return null;
 
 		if (Boolean(protocol.startsWith('https:') && URL.canParse(protocol))) {
@@ -36,8 +36,8 @@
 	key="modal_import_remote_protocol"
 	confirm="Importer"
 	bind:open={openModal}
-	oncancel={() => {
-		page.url.searchParams.delete('protocol');
+	oncancel={async () => {
+		await goto('/');
 	}}
 	onconfirm={async () => {
 		if (!toImport) return;

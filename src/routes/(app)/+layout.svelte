@@ -46,7 +46,6 @@
 
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
-	import RemoteProtocolImporter from './RemoteProtocolImporter.svelte';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
@@ -163,7 +162,6 @@
 
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
-<RemoteProtocolImporter />
 
 <Navigation
 	{swarpc}
