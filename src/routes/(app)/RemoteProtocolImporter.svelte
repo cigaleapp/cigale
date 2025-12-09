@@ -1,59 +1,33 @@
 <script>
-	import { queryParameters, ssp } from 'sveltekit-search-params';
-
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import HighlightHostname from '$lib/HighlightHostname.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 	import { goto } from '$lib/paths';
-	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
 	const { swarpc } = $derived(page.data);
 
-	let importingPreselectedProtocol = $state(false);
-	const numberToIndex = {
-		encode: (/** @type {unknown} */ v) => (v === null ? undefined : (Number(v) + 1).toString()),
-		decode: (/** @type {unknown} */ v) => (v === null ? null : Number(v) - 1)
-	};
-	const preselection = queryParameters({
-		protocol: ssp.string(),
-		classificationModel: numberToIndex,
-		cropModel: numberToIndex
+	let importing = $state(false);
+
+	const toImport = $derived.by(() => {
+		const protocol = page.url.searchParams.get('protocol');
+		if (!protocol) return null;
+
+		if (Boolean(protocol.startsWith('https:') && URL.canParse(protocol))) {
+			return new URL(protocol);
+		}
+
+		return null;
 	});
 
-	let openImportRemoteProtocol = $state();
-	const preselectedProtocolIsRemote = $derived(
-		Boolean(preselection.protocol?.startsWith('https:') && URL.canParse(preselection.protocol))
-	);
+	let openModal = $state();
 
 	afterNavigate(() => {
-		if (
-			preselectedProtocolIsRemote &&
-			openImportRemoteProtocol &&
-			!importingPreselectedProtocol
-		) {
-			openImportRemoteProtocol();
+		if (openModal && toImport && !importing) {
+			openModal();
 		}
-	});
-
-	$effect(() => {
-		if (preselectedProtocolIsRemote) return;
-		if (preselection.protocol) {
-			preselection.protocol = null;
-		}
-
-		void uiState
-			.setModelSelections({
-				classification: preselection.classificationModel,
-				crop: preselection.cropModel
-			})
-			.then(() => {
-				if (preselection.classificationModel !== null)
-					preselection.classificationModel = null;
-				if (preselection.cropModel !== null) preselection.cropModel = null;
-			});
 	});
 </script>
 
@@ -61,14 +35,14 @@
 	title="Importer le protocole distant ?"
 	key="modal_import_remote_protocol"
 	confirm="Importer"
-	bind:open={openImportRemoteProtocol}
+	bind:open={openModal}
 	oncancel={() => {
-		preselection.protocol = null;
+		page.url.searchParams.delete('protocol');
 	}}
 	onconfirm={async () => {
-		if (!preselection.protocol) return;
-		importingPreselectedProtocol = true;
-		const raw = await fetch(preselection.protocol)
+		if (!toImport) return;
+		importing = true;
+		const raw = await fetch(toImport)
 			.then((res) => res.text())
 			.catch((e) => {
 				toasts.error(`Erreur lors de l'import du protocole distant: ${e}`);
@@ -85,19 +59,19 @@
 		} catch (error) {
 			toasts.error(`Erreur lors de l'import du protocole distant: ${error}`);
 		} finally {
-			importingPreselectedProtocol = false;
+			importing = false;
 		}
 	}}
 >
 	Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse
 	suivante:
 
-	{#if preselection.protocol && preselectedProtocolIsRemote}
-		<HighlightHostname linkify url={preselection.protocol} />
+	{#if toImport}
+		<HighlightHostname linkify url={toImport} />
 	{/if}
 
 	<section class="modal-import-loading">
-		{#if importingPreselectedProtocol}
+		{#if importing}
 			<p>Importation en cours...</p>
 		{/if}
 	</section>
