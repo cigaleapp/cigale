@@ -21,9 +21,7 @@ test.describe('Database dumps', () => {
 	test('basic', async ({ page }) => {
 		await goToProtocolManagement(page);
 		await importProtocol(page, '../../examples/arthropods.light.cigaleprotocol.json');
-		await newSession(page);
 
-		await goToTab(page, 'import');
 		await importResults(page, 'correct.zip');
 		await dumpDatabase(page, 'basic.devalue');
 	});
@@ -63,6 +61,7 @@ test.describe('Exports', () => {
 		await page.getByText('lil-fella.jpeg').click();
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await page.waitForTimeout(1000);
+		await page.getByRole('button', { name: 'Autres photos Esc' }).click();
 		await goToTab(page, 'classify');
 		await page.waitForTimeout(1000);
 		await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
