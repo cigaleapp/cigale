@@ -155,14 +155,6 @@ const Settings = table(
 			direction: 'asc',
 			key: 'date'
 		})),
-		protocolModelSelections: scope({ ID })
-			.type({
-				'[ID]': {
-					// -1 is for none selected
-					'[ID]': 'number.integer >= -1'
-				}
-			})
-			.default(() => ({}))
 	})
 );
 

@@ -1,4 +1,4 @@
-import { type } from 'arktype';
+import { scope, type } from 'arktype';
 
 import { ID } from './common.js';
 import { MetadataValues } from './metadata.js';
@@ -11,5 +11,12 @@ export const Session = type({
 	openedAt: 'string.date.iso',
 	description: 'string',
 	protocol: ID,
-	metadata: MetadataValues
+	metadata: MetadataValues,
+	inferenceModels: scope({ ID })
+		.type({
+			// -1 is for none selected
+			'[ID]': 'number.integer >= -1'
+		})
+		.describe('Maps metadata IDs to selected model indices')
+		.default(() => ({}))
 });

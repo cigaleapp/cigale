@@ -5,7 +5,6 @@ import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
 import { tables } from './idb.svelte';
 import { getMetadataValue } from './metadata';
-import { getSetting, getSettings, setSetting } from './settings.svelte';
 import { undo } from './undo.svelte';
 
 /**
@@ -209,7 +208,7 @@ class UIState {
 		if (!this.currentProtocolId) return -1;
 		const metadataId = this.cropMetadataId;
 		if (!metadataId) return -1;
-		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
+		return this.currentSession?.inferenceModels[metadataId] ?? 0;
 	});
 
 	/** @type {number} */
@@ -217,7 +216,7 @@ class UIState {
 		if (!this.currentProtocolId) return -1;
 		const metadataId = this.classificationMetadataId;
 		if (!metadataId) return -1;
-		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
+		return this.currentSession?.inferenceModels[metadataId] ?? 0;
 	});
 
 	/** @type {boolean} */
@@ -232,8 +231,7 @@ class UIState {
 	 * @returns {Promise<void>}
 	 */
 	async setModelSelections({ classification = null, crop = null }) {
-		// TODO make this per-session instead of per-selected-protocol
-		if (!this.currentProtocolId) return;
+		if (!this.currentSession) return;
 
 		if (classification === null && crop === null) return; // no change
 
@@ -244,7 +242,7 @@ class UIState {
 
 		if (!metadataIds.classification || !metadataIds.crop) return;
 
-		const current = await getSetting('protocolModelSelections');
+		const current = this.currentSession.inferenceModels;
 		/** @type {Record<string, number>} */
 		const changes = {};
 
@@ -259,12 +257,9 @@ class UIState {
 			return; // no change
 		}
 
-		await setSetting('protocolModelSelections', {
+		await tables.Session.update(this.currentSession.id, 'inferenceModels', {
 			...current,
-			[this.currentProtocolId]: {
-				...current[this.currentProtocolId],
-				...changes
-			}
+			...changes
 		});
 	}
 
