@@ -220,8 +220,17 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 
 	await page.waitForURL((u) => u.hash === '#/protocols');
 
-	await expect(page.getByRole('listitem', { name: 'Kitchen sink' })).toBeVisible();
-	await expect(page.getByRole('listitem', { name: lightweightProtocol.name })).toBeVisible();
+	await expect(page.getByRole('listitem')).toHaveCount(2);
+	await expect(
+		page
+			.getByRole('listitem')
+			.filter({ has: page.getByRole('heading', { name: 'Kitchen sink' }) })
+	).toBeVisible();
+	await expect(
+		page
+			.getByRole('listitem')
+			.filter({ has: page.getByRole('heading', { name: lightweightProtocol.name }) })
+	).toBeVisible();
 });
 
 test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page }) => {
