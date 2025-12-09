@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-12-02 10:43+0000\n"
+"PO-Revision-Date: 2025-12-10 13:28+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1718,6 +1718,8 @@ msgid ""
 "Entrez un nombre suivi de <0/> pour une marge relative à la taille de chaque\n"
 "image, ou suivi de <1/> pour une marge en pixels."
 msgstr ""
+"Enter a number followed by <0/> for a value relative to the size of each\n"
+"image, or followed by <1/> for a value in pixels."
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
@@ -1804,7 +1806,7 @@ msgstr "App"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Exports .zip"
-msgstr ""
+msgstr ".zip exports"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Dates de modification"
