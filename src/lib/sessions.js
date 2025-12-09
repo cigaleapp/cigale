@@ -13,21 +13,18 @@ export async function deleteSession(sessionId) {
 		async (tx) => {
 			tx.objectStore('Session').delete(sessionId);
 
-			const obs = await tx
-				.objectStore('Observation')
-				.index('sessionId')
-				.openKeyCursor(sessionId);
-			while (obs?.advance(1)) {
-				obs.delete();
+			const obs = await tx.objectStore('Observation').index('sessionId').getAll(sessionId);
+
+			for (const o of obs) {
+				tx.objectStore('Observation').delete(o.id);
 			}
 
-			const imgs = await tx.objectStore('Image').index('sessionId').openKeyCursor(sessionId);
+			const imgs = await tx.objectStore('Image').index('sessionId').getAll(sessionId);
 
-			while (imgs?.advance(1)) {
-				const imgId = imgs.key;
-				imgs.delete();
-				tx.objectStore('ImageFile').delete(imageIdToFileId(imgId));
-				tx.objectStore('ImagePreviewFile').delete(imageIdToFileId(imgId));
+			for (const img of imgs) {
+				tx.objectStore('Image').delete(img.id);
+				tx.objectStore('ImageFile').delete(imageIdToFileId(img.id));
+				tx.objectStore('ImagePreviewFile').delete(imageIdToFileId(img.id));
 			}
 		}
 	);
