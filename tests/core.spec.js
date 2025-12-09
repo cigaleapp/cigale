@@ -9,7 +9,6 @@ import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {
 	chooseInDropdown,
-	chooseProtocol,
 	expectZipFiles,
 	firstObservationCard,
 	goToTab,
@@ -18,6 +17,7 @@ import {
 	makeRegexpUnion,
 	mockProtocolSourceURL,
 	modal,
+	newSession,
 	setSettings,
 	waitForLoadingEnd
 } from './utils.js';
@@ -52,7 +52,7 @@ for (const offline of [false, true]) {
 			}
 
 			await setSettings({ page }, { showTechnicalMetadata: false });
-			await chooseProtocol(page);
+			await newSession(page);
 			await goToTab(page, 'import');
 
 			// Import fixture image
@@ -169,7 +169,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 			showTechnicalMetadata: false
 		}
 	);
-	await chooseProtocol(page);
+	await newSession(page);
 	await goToTab(page, 'import');
 
 	const observations = page.getByTestId('observations-area');
@@ -224,7 +224,7 @@ test('can import a protocol via ?protocol', async ({ page, context }) => {
 
 test('can pre-set models via ?classificationModel and ?cropModel', async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseProtocol(page);
+	await newSession(page);
 
 	async function reset() {
 		await chooseInDropdown(page, 'classify-models', 'Collemboles');
@@ -435,7 +435,7 @@ test('can import a protocol and pre-set models via URL parameters', async ({ pag
 
 test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseProtocol(page);
+	await newSession(page);
 
 	await goToTab(page, 'import');
 	await importPhotos({ page }, ['cyan.jpeg']);

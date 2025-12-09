@@ -11,13 +11,15 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {string} value selected protocol's ID
+	 * @property {string} [testid]
 	 */
 
 	/** @type {Props} */
-	let { value = $bindable() } = $props();
+	let { value = $bindable(), testid } = $props();
 </script>
 
 <DropdownMenu
+	{testid}
 	items={[
 		{
 			protocol: null,

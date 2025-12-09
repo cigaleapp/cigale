@@ -322,12 +322,22 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 /**
  *
  * @param {Page} page
- * @param {string} [name]
+ * @param {string} [protocol] name of protocol to use
  * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
-export async function chooseProtocol(page, name, models = {}) {
-	// Choose default protocol
-	await chooseInDropdown(page, 'protocol-switcher', name ?? ((opts) => opts.first()));
+export async function newSession(page, protocol, models = {}) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+
+	await page.getByTestId('new-session').click();
+	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+
+	if (protocol) {
+		await chooseInDropdown(page, 'protocol', protocol);
+	}
+
+	await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
+	await page.waitForURL((u) => u.hash === '#/import');
 
 	if (models) {
 		for (const [task, model] of Object.entries(models)) {
@@ -340,11 +350,17 @@ export async function chooseProtocol(page, name, models = {}) {
  * @param {Page} page
  */
 export async function goToProtocolManagement(page) {
-	await page.getByTestId('protocol-switcher-open').click();
-	await page
-		.getByTestId('protocol-switcher-options')
-		.getByRole('menuitem', { name: 'Gérer les protocoles' })
-		.click();
+	await goHome(page);
+	await goToTab(page, 'protocols');
+}
+
+/**
+ *
+ * @param {Page} page
+ */
+async function goHome(page) {
+	await page.getByTestId('goto-home').click();
+	await page.waitForURL((u) => u.hash === '#/sessions');
 }
 
 /**
@@ -352,10 +368,11 @@ export async function goToProtocolManagement(page) {
  * @param {import('$lib/i18n').Language} lang
  */
 const appNavTabs = (lang = 'fr') => ({
-	sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
 	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
 	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
-	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' }
+	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' },
+	sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
+	protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' }
 });
 
 /**
@@ -441,7 +458,7 @@ export function toast(page, message, { exact = false, type = undefined }) {
  */
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseProtocol(page);
+	await newSession(page);
 	await goToTab(page, 'import');
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();

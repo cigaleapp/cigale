@@ -1,12 +1,12 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
-	chooseProtocol,
 	firstObservationCard,
 	getMetadataOverridesOfObservation,
 	goToTab,
 	loadDatabaseDump,
 	metadataValueInDatabase,
+	newSession,
 	setSettings,
 	sidepanelMetadataSectionFor
 } from './utils';
@@ -32,7 +32,7 @@ async function initialize({
 	await loadDatabaseDump(page, `${dump}.devalue`);
 
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseProtocol(page, protocol);
+	await newSession(page, protocol);
 	await goToTab(page, 'classify');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }

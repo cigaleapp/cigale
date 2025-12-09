@@ -71,7 +71,7 @@
 		}}
 	>
 		<Field label="Protocole">
-			<InputSelectProtocol bind:value={protocolId} />
+			<InputSelectProtocol testid="protocol" bind:value={protocolId} />
 		</Field>
 	</form>
 

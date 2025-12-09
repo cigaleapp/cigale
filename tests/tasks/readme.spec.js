@@ -1,5 +1,5 @@
 import { expect, test } from '../fixtures';
-import { chooseProtocol, firstObservationCard, goToTab, importPhotos, setSettings } from '../utils';
+import { firstObservationCard, goToTab, importPhotos, newSession, setSettings } from '../utils';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
@@ -36,12 +36,12 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			});
 
 			test('protocol', async ({ page }) => {
-				await chooseProtocol(page);
+				await newSession(page);
 				await expect(page).toHaveScreenshot();
 			});
 
 			test('import', async ({ page }) => {
-				await chooseProtocol(page);
+				await newSession(page);
 				await goToTab(page, 'import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
@@ -49,7 +49,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			});
 
 			test('crop', async ({ page }) => {
-				await chooseProtocol(page);
+				await newSession(page);
 				await goToTab(page, 'import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
@@ -60,7 +60,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			});
 
 			test('classify', async ({ page }) => {
-				await chooseProtocol(page);
+				await newSession(page);
 				await goToTab(page, 'import');
 
 				await importPhotos({ page }, 'lil-fella.jpeg');

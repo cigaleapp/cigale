@@ -3,13 +3,13 @@ import JSZip from 'jszip';
 
 import { expect, test } from '../fixtures.js';
 import {
-	chooseProtocol,
 	dumpDatabase,
 	goToProtocolManagement,
 	goToTab,
 	importPhotos,
 	importProtocol,
-	importResults
+	importResults,
+	newSession
 } from '../utils.js';
 
 test.skip(
@@ -21,7 +21,7 @@ test.describe('Database dumps', () => {
 	test('basic', async ({ page }) => {
 		await goToProtocolManagement(page);
 		await importProtocol(page, '../../examples/arthropods.light.cigaleprotocol.json');
-		await chooseProtocol(page);
+		await newSession(page);
 
 		await goToTab(page, 'import');
 		await importResults(page, 'correct.zip');
@@ -38,7 +38,7 @@ test.describe('Database dumps', () => {
 			.click();
 		await page.getByRole('button', { name: 'Oui, supprimer' }).click();
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
-		await chooseProtocol(page);
+		await newSession(page);
 
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
@@ -53,7 +53,7 @@ test.describe('Exports', () => {
 	 * @param {import('@playwright/test').Page} param0.page
 	 */
 	async function prepare({ page }) {
-		await chooseProtocol(page);
+		await newSession(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan', 'leaf', 'lil-fella', 'with-exif-gps');
 		await expect(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {

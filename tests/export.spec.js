@@ -4,18 +4,18 @@ import * as yauzl from 'yauzl-promise';
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
-	chooseProtocol,
 	expectZipFiles,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
+	newSession,
 	setSettings
 } from './utils';
 
 test('correctly applies crop padding', issue(463), async ({ page }) => {
 	// Disable inference to go faster
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseProtocol(page, undefined, {
+	await newSession(page, undefined, {
 		crop: 'Aucune inférence',
 		classify: 'Aucune inférence'
 	});

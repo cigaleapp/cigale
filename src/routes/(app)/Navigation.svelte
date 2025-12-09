@@ -165,6 +165,7 @@
 			<div class="logo">
 				<button
 					use:tooltip={'Accueil'}
+					data-testid="goto-home"
 					onclick={async () => {
 						if (uiState.currentSession) {
 							await goto('/(app)/sessions');
@@ -188,12 +189,12 @@
 				<div class="steps" in:fade={{ duration: 100 }}>
 					<a
 						class="session-link"
-						href={resolve('/(app)/sessions/[id]', { id: uiState.currentSessionId })}
+						href={resolve('/(app)/sessions/[id]', { id: uiState.currentSession.id })}
 						data-testid="goto-current-session"
 						use:tooltip={'Session'}
 					>
 						{uiState.currentSession.name}
-						{#if path === `/sessions/${uiState.currentSessionId}`}
+						{#if path === `/sessions/${uiState.currentSession.id}`}
 							<div class="line"></div>
 						{/if}
 					</a>

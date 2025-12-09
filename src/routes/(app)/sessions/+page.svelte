@@ -62,6 +62,7 @@
 				Importer un export .zip
 			</ButtonSecondary>
 			<ButtonSecondary
+				testid="new-session"
 				onclick={async () => {
 					await createSession();
 				}}
