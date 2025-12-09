@@ -6,6 +6,7 @@ import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 import { tables } from './idb.svelte';
 import { getMetadataValue } from './metadata';
 import { getSetting, getSettings, setSetting } from './settings.svelte';
+import { undo } from './undo.svelte';
 
 /**
  * @import * as DB from './database';
@@ -104,6 +105,7 @@ class UIState {
 		}
 
 		this.clearPreviewURLs();
+		undo.clear();
 		await tables.initialize(id);
 		this._currentSessionId = id;
 	}

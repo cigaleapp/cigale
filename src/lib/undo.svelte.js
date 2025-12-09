@@ -132,6 +132,11 @@ class UndoStack {
 		return this.#handle(OPERATION_REWINDERS[op](data));
 	}
 
+	clear() {
+		this.stack = [];
+		this.graveyard = [];
+	}
+
 	/**
 	 * Register a handler until the page/layout is unmounted
 	 * @template {UndoableOperationName} T
@@ -357,6 +362,26 @@ if (import.meta.vitest) {
 				);
 			})();
 		});
+
+		it('can clear the undo stack', () => {
+			const handler = vi.fn();
+
+			$effect.root(() => {
+				undo.initialize(100);
+				undo.handlers['crop/box/create'] = handler;
+				undo.push('crop/box/create', {
+					imageId: 'img9',
+					box: { x: 0, y: 0, w: 100, h: 100 }
+				});
+
+				undo.clear();
+
+				undo.pop(); // Nothing to undo
+				undo.rewind(); // Nothing to redo
+			})();
+
+			expect(handler).not.toHaveBeenCalled();
+		});
 	});
 
 	describe('Crop operations', () => {
@@ -395,7 +420,7 @@ if (import.meta.vitest) {
 				undo.handlers['crop/box/create'] = () => {
 					delete boxes['testBox'];
 				};
-				undo.handlers['crop/box/delete'] = ({  box }) => {
+				undo.handlers['crop/box/delete'] = ({ box }) => {
 					boxes['testBox'] = { ...box };
 				};
 
