@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures.js';
-import { getSettings, openSettings } from './utils';
+import { getSettings, getTab, openSettings } from './utils';
 
 test('can switch languages', async ({ page }) => {
 	await openSettings(page);
@@ -11,7 +11,7 @@ test('can switch languages', async ({ page }) => {
 	expect(await getSettings({ page })).toMatchObject({ language: 'fr' });
 
 	// Check for french text in the UI
-	await expect(page.getByTestId('export-results-button')).toHaveAccessibleName('Résultats');
+	await expect(getTab(page, 'protocols')).toHaveAccessibleName('Protocoles');
 
 	// Switch to English
 	await languagesGroup.getByRole('radio', { name: 'English' }).click();
@@ -24,5 +24,5 @@ test('can switch languages', async ({ page }) => {
 	expect(await getSettings({ page })).toMatchObject({ language: 'en' });
 
 	// Check for english text in the UI
-	await expect(page.getByTestId('export-results-button')).toHaveAccessibleName('Results');
+	await expect(getTab(page, 'protocols')).toHaveAccessibleName('Protocols');
 });

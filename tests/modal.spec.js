@@ -1,8 +1,10 @@
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
+import { newSession } from './utils';
 
 test.describe('closing a modal', () => {
 	test('when clicking outside', issue(469), async ({ page }) => {
+		await newSession(page);
 		await page.getByRole('navigation').getByRole('button', { name: 'Résultats' }).click();
 		// Wait for modal animation
 		await page.waitForTimeout(1000);

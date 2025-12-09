@@ -347,6 +347,18 @@ export async function newSession(page, protocol, models = {}) {
 }
 
 /**
+ *
+ * @param {Page} page
+ */
+export async function chooseFirstSession(page) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+
+	await page.locator('main article').first().click();
+	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
  * @param {Page} page
  */
 export async function goToProtocolManagement(page) {
