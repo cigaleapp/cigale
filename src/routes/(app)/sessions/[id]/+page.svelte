@@ -66,6 +66,17 @@
 			e.preventDefault();
 		}}
 	>
+		<Field label="Description">
+			<textarea
+				value={data.session.description}
+				onblur={async ({ target }) => {
+					if (!(target instanceof HTMLTextAreaElement)) return;
+					await tables.Session.update(data.session.id, 'description', target.value);
+					invalidate(dependencyURI('Session', data.session.id));
+				}}
+			></textarea>
+		</Field>
+
 		<Field composite label="Protocole">
 			<InputSelectProtocol
 				testid="protocol"
