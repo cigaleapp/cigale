@@ -1,5 +1,4 @@
 <script>
-	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	import IconCreate from '~icons/ri/add-circle-line';
