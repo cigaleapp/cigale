@@ -7,6 +7,7 @@
 
 	import { isType } from './metadata';
 	import MetadataCombobox from './MetadataCombobox.svelte';
+	import RadioButtons from './RadioButtons.svelte';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
 	import { round, safeJSONParse } from './utils';
@@ -21,6 +22,7 @@
 	 * @property {boolean} [disabled]
 	 * @property {import('./database').MetadataEnumVariant[]} [options]
 	 * @property {Record<string, number>} [confidences]
+	 * @property {boolean} [isCompactEnum] whether to use the compact enum display (radio buttons)
 	 */
 
 	/** @type {Props} */
@@ -31,14 +33,30 @@
 		disabled,
 		definition,
 		options = [],
+		isCompactEnum = false,
 		onblur
 	} = $props();
 
-	const { type } = definition;
+	const { type } = $derived(definition);
 </script>
 
-<div class="metadata-input" data-type={type} data-metadata-id={definition.id}>
-	{#if isType('enum', type, value)}
+<div
+	class="metadata-input"
+	data-type={type}
+	data-metadata-id={definition.id}
+	class:compact-enum={isCompactEnum}
+>
+	{#if isType('enum', type, value) && isCompactEnum}
+		<RadioButtons
+			value={value ?? undefined}
+			onchange={onblur}
+			options={options
+				.map((opt) => ({
+					key: opt.key,
+					label: opt.label
+				}))}
+		></RadioButtons>
+	{:else if isType('enum', type, value)}
 		<MetadataCombobox
 			{id}
 			{disabled}
@@ -189,13 +207,17 @@
 		border: none;
 	}
 
-	.metadata-input:not([data-type='boolean']):not(:has(.unrepresentable)) {
+	.metadata-input.compact-enum {
+		width: 100%;
+	}
+
+	.metadata-input:not([data-type='boolean']):not(.compact-enum):not(:has(.unrepresentable)) {
 		border-bottom: 2px dashed var(--fg-neutral);
 		display: flex;
 		align-items: center;
 	}
 
-	.metadata-input:not([data-type='boolean']):focus-within {
+	.metadata-input:not([data-type='boolean']):not(.compact-enum):focus-within {
 		border-bottom-style: solid;
 	}
 

@@ -516,7 +516,7 @@ if (import.meta.vitest) {
 
 /**
  * @template Item
- * @param {((item: Item) => string|number) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ * @param {((item: Item) => string|number|undefined) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
  */
 export function compareBy(key) {
 	if (typeof key === 'string') {
@@ -532,6 +532,10 @@ export function compareBy(key) {
 		const aKey = key(a);
 		const bKey = key(b);
 
+		if (aKey === undefined && bKey === undefined) return 0;
+		if (aKey === undefined) return -1;
+		if (bKey === undefined) return 1;
+
 		if (aKey === bKey) return 0;
 		if (typeof aKey === 'string' && typeof bKey === 'string') {
 			return aKey.localeCompare(bKey);
@@ -540,6 +544,7 @@ export function compareBy(key) {
 		if (typeof aKey === 'number' && typeof bKey === 'number') {
 			return aKey - bKey;
 		}
+
 
 		return aKey.toString().localeCompare(bKey.toString());
 	};
