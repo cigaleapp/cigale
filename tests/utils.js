@@ -322,10 +322,12 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 /**
  *
  * @param {Page} page
- * @param {string} [protocol] name of protocol to use
- * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {object} [options]
+ * @param {string} [options.protocol] name of protocol to use
+ * @param {{ crop?: string, classify?: string }} [options.models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {string} [options.name] name of the session
  */
-export async function newSession(page, protocol, models = {}) {
+export async function newSession(page, { name, protocol, models = {} } = {}) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
 
@@ -336,6 +338,10 @@ export async function newSession(page, protocol, models = {}) {
 		await chooseInDropdown(page, 'protocol', protocol);
 	}
 
+	if (name) {
+		await page.getByRole('textbox', { name: 'Nom de la session' }).fill(name);
+	}
+
 	await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
 
@@ -344,6 +350,33 @@ export async function newSession(page, protocol, models = {}) {
 			await chooseInDropdown(page, `${task}-models`, model);
 		}
 	}
+}
+
+/**
+ * @param {Page} page
+ * @param {string} name
+ */
+export async function switchSession(page, name) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+	await page.getByRole('heading', { name }).click();
+	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
+ * @param {Page} page
+ * @param {string} name
+ */
+export async function deleteSession(page, name) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+	const sessionCard = page.getByRole('article').filter({
+		has: page.getByRole('heading', { name })
+	});
+
+	await sessionCard.getByRole('button', { name: 'Gérer' }).click();
+	await page.getByRole('button', { name: 'Supprimer' }).click();
+	await page.waitForURL((u) => u.hash === '#/sessions');
 }
 
 /**
