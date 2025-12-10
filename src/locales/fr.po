@@ -1065,10 +1065,6 @@ msgid "Créer"
 msgstr "Créer"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "Protocole modifié par rapport à la version publiée"
-msgstr "Protocole modifié par rapport à la version publiée"
-
-#: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Modifier (beta)"
 msgstr "Modifier (beta)"
 
