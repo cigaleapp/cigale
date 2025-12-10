@@ -538,6 +538,9 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 		},
 		readFileSync(location, 'utf-8')
 	);
+
+	// FIXME await finishes before all [loadDatabaseDump] logs ??
+	await page.waitForTimeout(5_000);
 }
 
 export const browserConsole = {
