@@ -10,7 +10,7 @@
 	import RadioButtons from './RadioButtons.svelte';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
-	import { round, safeJSONParse } from './utils';
+	import { compareBy, round, safeJSONParse } from './utils';
 
 	/**
 	 * @typedef {object} Props
@@ -51,6 +51,7 @@
 			value={value ?? undefined}
 			onchange={onblur}
 			options={options
+				.toSorted(compareBy(({ key }) => definition.ordering?.indexOf(key)))
 				.map((opt) => ({
 					key: opt.key,
 					label: opt.label
