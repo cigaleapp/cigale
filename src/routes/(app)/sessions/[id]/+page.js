@@ -15,7 +15,7 @@ export async function load({ params: { id }, depends }) {
 	depends(idb.dependencyURI('Protocol', session.protocol));
 	const protocol = await tables.Protocol.get(session.protocol);
 	if (!protocol) {
-		error(500, 'Session protocol not found');
+		return { session, protocol: null, sessionMetadata: [], sessionMetadataOptions: {} };
 	}
 
 	const sessionMetadataDefs = await Promise.all(

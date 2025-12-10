@@ -89,7 +89,11 @@
 		</Field>
 	</form>
 
-	{#if sessionMetadata.length > 0}
+	{#if !data.protocol}
+		<section class="error">
+			Protocole <code>{data.session.protocol}</code> introuvable.
+		</section>
+	{:else if sessionMetadata.length > 0}
 		<h2>Métadonnées</h2>
 
 		<form class="metadata">
@@ -100,6 +104,7 @@
 						definition={def}
 						{value}
 						onchange={async (v) => {
+							console.log(v, value)
 							if (dequal(v, value?.value)) return;
 
 							if (v !== undefined) {
@@ -171,5 +176,17 @@
 
 	form.metadata {
 		--metadata-list-gap: 3rem;
+	}
+
+	section.error {
+		background-color: var(--bg-error);
+		color: var(--fg-error);
+		padding: 1rem;
+		border-radius: 0.5rem;
+		text-align: center;
+
+		code {
+			font-size: 0.8em;
+		}
 	}
 </style>
