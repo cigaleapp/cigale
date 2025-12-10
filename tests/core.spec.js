@@ -10,7 +10,6 @@ import {
 	chooseInDropdown,
 	expectZipFiles,
 	firstObservationCard,
-	goToProtocolManagement,
 	goToTab,
 	importPhotos,
 	makeRegexpUnion,

@@ -8,7 +8,6 @@ import {
 	goToTab,
 	loadDatabaseDump,
 	metadataValueInDatabase,
-	newSession,
 	setSettings,
 	sidepanelMetadataSectionFor
 } from './utils';

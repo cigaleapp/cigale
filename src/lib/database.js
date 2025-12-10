@@ -1,4 +1,4 @@
-import { scope, type } from 'arktype';
+import { type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
 import {
@@ -154,7 +154,7 @@ const Settings = table(
 		}).default(() => ({
 			direction: 'asc',
 			key: 'date'
-		})),
+		}))
 	})
 );
 

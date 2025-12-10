@@ -12,11 +12,11 @@
 	let importing = $state(false);
 
 	const toImport = $derived.by(() => {
-		const protocol = page.params.url;
-		if (!protocol) return null;
+		const url = page.params.url;
+		if (!url) return null;
 
-		if (Boolean(protocol.startsWith('https:') && URL.canParse(protocol))) {
-			return new URL(protocol);
+		if (url.startsWith('https:') && URL.canParse(url)) {
+			return new URL(url);
 		}
 
 		return null;

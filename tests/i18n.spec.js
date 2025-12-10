@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures.js';
-import { getSettings, getTab, openSettings } from './utils';
+import { getSettings, openSettings } from './utils';
 
 test('can switch languages', async ({ page }) => {
 	await openSettings(page);
