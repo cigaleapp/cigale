@@ -10,20 +10,19 @@
 	import { exportProtocol } from '$lib/protocols';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import UnsavedChangesIndicator from '$lib/UnsavedChangesIndicator.svelte';
 
 	/** @type {import('$lib/database').Protocol & { ondelete: () => void }} */
-	const { id, name, dirty, source, version, ondelete } = $props();
+	const { id, name, source, version, ondelete } = $props();
 </script>
 
 <li>
 	<section class="text">
 		<h3>
-			{#if dirty}
+			<!-- {#if dirty}
 				<UnsavedChangesIndicator
 					help="Protocole modifié par rapport à la version publiée"
 				/>
-			{/if}
+			{/if} -->
 			{name}
 		</h3>
 		<small><code>{id}</code></small>
