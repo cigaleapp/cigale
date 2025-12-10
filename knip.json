@@ -9,6 +9,7 @@
 		"src/lib/Checkbox.svelte",
 		"src/lib/Dropzone.svelte",
 		"src/lib/FloatingButton.svelte",
+		"src/lib/UnsavedChangesIndicator.svelte",
 		"src/locales/**/*.js"
 	],
 	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector"],
