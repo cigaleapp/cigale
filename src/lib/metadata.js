@@ -191,6 +191,7 @@ export async function storeMetadataValue({
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
 				db,
+				sessionId,
 				subjectId: id,
 				metadataId,
 				value,
@@ -236,6 +237,7 @@ export async function storeMetadataValue({
 
 		await storeMetadataValue({
 			db,
+			sessionId,
 			subjectId,
 			manuallyModified,
 			cascadedFrom: [...cascadedFrom, metadataId],
@@ -285,6 +287,7 @@ export async function deleteMetadataValue({
 			for (const imageId of observation.images) {
 				await deleteMetadataValue({
 					db,
+					sessionId,
 					subjectId: imageId,
 					recursive: false,
 					metadataId,

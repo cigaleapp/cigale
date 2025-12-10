@@ -202,7 +202,6 @@
 	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
-
 	/** @type {Record<string, undefined | { value: Metadata.RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
 		Object.fromEntries(
@@ -314,7 +313,7 @@
 
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
-			sessionId: uiState.currentSessionId,
+			sessionId: uiState.currentSession?.id,
 			subjectId: imageId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
@@ -325,6 +324,7 @@
 		if (uiState.classificationMetadataId) {
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.classificationMetadataId,
 				subjectId: imageId
 			});
@@ -396,6 +396,7 @@
 		if (images.length === 1) {
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId
 			});
@@ -449,6 +450,7 @@
 			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.classificationMetadataId,
 				subjectId: image.id
 			});
@@ -468,6 +470,7 @@
 			// We're modifying an existing cropbox
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId,
 				type: 'boundingbox',
@@ -494,6 +497,7 @@
 
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.cropMetadataId,
 				subjectId: newImageId,
 				type: 'boundingbox',

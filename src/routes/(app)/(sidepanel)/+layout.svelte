@@ -202,6 +202,7 @@
 					if (value === undefined) {
 						await deleteMetadataValue({
 							db: db.databaseHandle(),
+							sessionId: uiState.currentSession?.id,
 							subjectId,
 							metadataId: id,
 							recursive: true
@@ -209,6 +210,7 @@
 					} else {
 						await storeMetadataValue({
 							db: db.databaseHandle(),
+							sessionId: uiState.currentSession?.id,
 							subjectId,
 							metadataId: id,
 							confidence: 1,
