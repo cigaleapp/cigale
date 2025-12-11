@@ -158,7 +158,7 @@ export async function getImage({ page, ...query }) {
 }
 
 /**
- *
+ * Get observation object in database
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} param0.label
@@ -171,6 +171,21 @@ export async function getObservation({ page, label }) {
 	}, /** @type {const} */ ([label]));
 	if (!observation) throw new Error(`Observation ${label} not found in the database`);
 	return observation;
+}
+
+/**
+ * Get session object in database
+ * @param {{page: Page} & ({name: string} | {id: string})} param0
+ * @returns {Promise<typeof import('$lib/database').Schemas.Session.inferIn>}
+ */
+export async function getSession({ page, ...query }) {
+	const session = await page.evaluate(async ([query]) => {
+		const sessions = await window.DB.getAll('Session');
+		return sessions.find((s) => ('id' in query ? s.id === query.id : s.name === query.name));
+	}, /** @type {const} */ ([query]));
+	if (!session)
+		throw new Error(`Session with ${JSON.stringify(query)} not found in the database`);
+	return session;
 }
 
 /**
@@ -197,7 +212,7 @@ export async function getMetadataValuesOfImage({ page, protocolId, image }) {
 }
 
 /**
- *
+ * Get metadata values set on the observation (.metadataOverrides)
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} param0.protocolId
@@ -218,11 +233,32 @@ export async function getMetadataOverridesOfObservation({ page, protocolId, obse
 }
 
 /**
+ * Get metadata values set on the session
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @param {string} param0.name session name
+ * @param {string} param0.protocolId
+ * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
+ */
+async function getMetadataValuesOfSession({ page, name, protocolId }) {
+	const { metadata } = await getSession({ page, name });
+	return Object.fromEntries(
+		Object.entries(metadata)
+			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
+			.map(([id, { value }]) => [
+				protocolId ? id.replace(`${protocolId}__`, '') : id,
+				safeJSONParse(value)
+			])
+	);
+}
+
+/**
  *
  * @param {Page} page
- * @param {{image: {id: string} | {filename: string}} | {observation: string}} query
+ * @param {{image: {id: string} | {filename: string}} | {observation: string} | {session: {name: string}}} query
  * @param {string} metadataKey
  * @param {string} [protocolId]
+ * @returns {Promise<import('$lib/metadata').RuntimeValue | undefined>}
  */
 export async function getMetadataValue(page, query, metadataKey, protocolId = lightProtocol.id) {
 	if ('image' in query) {
@@ -235,6 +271,23 @@ export async function getMetadataValue(page, query, metadataKey, protocolId = li
 			page,
 			'Metadata of image',
 			query.image,
+			'for protocol',
+			protocolId,
+			metadata
+		);
+		return metadata[metadataKey];
+	}
+
+	if ('session' in query) {
+		const metadata = await getMetadataValuesOfSession({
+			page,
+			name: query.session.name,
+			protocolId
+		});
+		await browserConsole.log(
+			page,
+			'Metadata of session',
+			query.session.name,
 			'for protocol',
 			protocolId,
 			metadata
@@ -736,13 +789,26 @@ export async function waitForLoadingEnd(area, timeout = 30_000) {
 
 /**
  * @param {Page} page
- * @param {string} nameOrDescription
+ * @param {string} metadataLabel
  */
-export function sidepanelMetadataSectionFor(page, nameOrDescription) {
+export function sidepanelMetadataSectionFor(page, metadataLabel) {
 	return page
 		.getByTestId('sidepanel')
 		.locator('section')
-		.filter({ hasText: nameOrDescription })
+		.filter({ hasText: metadataLabel })
+		.first();
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string} metadataLabel
+ */
+export function sessionMetadataSectionFor(page, metadataLabel) {
+	return page
+		.getByTestId('session-metadata')
+		.locator('section')
+		.filter({ hasText: metadataLabel })
 		.first();
 }
 

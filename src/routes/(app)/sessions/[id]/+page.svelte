@@ -95,7 +95,7 @@
 	{:else if sessionMetadata.length > 0}
 		<h2>Métadonnées</h2>
 
-		<form class="metadata">
+		<form class="metadata" data-testid="session-metadata">
 			<MetadataList>
 				{#each sessionMetadata as { def, value } (def.id)}
 					<Metadata
