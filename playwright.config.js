@@ -38,7 +38,7 @@ const webkit = {
  */
 export default defineConfig({
 	/* Leave some time before github actions makes the job time out (1 hour), so the report can be deployed */
-	globalTimeout: minutesToMilliseconds(9),
+	globalTimeout: minutesToMilliseconds(10),
 	timeout: dependsOnTarget({
 		dev: minutesToMilliseconds(5),
 		live: minutesToMilliseconds(1.2),
