@@ -26,11 +26,10 @@
 
 	const _id = $props.id();
 
-
 	const isCompactEnum = $derived(
 		definition.type === 'enum' &&
-			options.length <= 5 &&
-			options.every((opt) =>  !opt.image && !opt.learnMore)
+			options.length <= 10 &&
+			options.every((opt) => !opt.image && !opt.learnMore)
 	);
 </script>
 
