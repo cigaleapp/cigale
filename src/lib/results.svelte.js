@@ -84,7 +84,7 @@ export async function importResultsZip(file, id) {
 			metadata: session.metadata ?? {}
 		});
 
-		await uiState.setCurrentSessionId(newSession.id);
+		await uiState.switchSession(newSession.id);
 
 		sessionToUse = newSession;
 	} else if (uiState.currentSession.protocol !== session.protocol) {

@@ -52,7 +52,7 @@
 			</ButtonSecondary>
 			<ButtonSecondary
 				onclick={async () => {
-					await uiState.setCurrentSessionId(data.session.id);
+					await uiState.switchSession(data.session.id);
 					await goto('/import');
 				}}
 			>
@@ -104,7 +104,7 @@
 						definition={def}
 						{value}
 						onchange={async (v) => {
-							console.log(v, value)
+							console.log(v, value);
 							if (dequal(v, value?.value)) return;
 
 							if (v !== undefined) {
@@ -131,7 +131,7 @@
 	<ButtonPrimary
 		loading
 		onclick={async () => {
-			await uiState.setCurrentSessionId(data.session.id);
+			await uiState.switchSession(data.session.id);
 			await goto(`/import`);
 		}}
 	>

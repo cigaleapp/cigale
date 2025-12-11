@@ -96,7 +96,7 @@ class UIState {
 	/**
 	 * @param {string | null} id
 	 */
-	async setCurrentSessionId(id) {
+	async switchSession(id) {
 		if (id === null) {
 			localStorage.removeItem('currentSessionId');
 		} else {

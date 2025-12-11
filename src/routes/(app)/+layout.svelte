@@ -59,7 +59,7 @@
 			return pick(uiState, 'currentSessionId');
 		},
 		async restore({ currentSessionId }) {
-			await uiState.setCurrentSessionId(currentSessionId);
+			await uiState.switchSession(currentSessionId);
 		}
 	};
 

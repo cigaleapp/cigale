@@ -53,7 +53,7 @@
 						multiple: false
 					});
 
-					await uiState.setCurrentSessionId(null);
+					await uiState.switchSession(null);
 					importMore(zipfile);
 					await goto('/import');
 				}}
@@ -79,7 +79,7 @@
 				--card-border={uiState.currentSessionId === id ? 'var(--bg-primary)' : ''}
 				tooltip="Ouvrir la session"
 				onclick={async () => {
-					await uiState.setCurrentSessionId(id);
+					await uiState.switchSession(id);
 					// TODO remember last viewed page in session
 					await goto('/import');
 				}}

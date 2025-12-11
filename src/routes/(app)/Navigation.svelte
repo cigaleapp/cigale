@@ -169,7 +169,7 @@
 					onclick={async () => {
 						if (uiState.currentSession) {
 							await goto('/(app)/sessions');
-							await uiState.setCurrentSessionId(null);
+							await uiState.switchSession(null);
 						} else {
 							await goto('/');
 						}
