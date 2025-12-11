@@ -85,6 +85,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 </script>
 
 <dialog
+	data-key={stateKey}
 	aria-hidden={!page.state[stateKey]}
 	style:color-scheme={getColorScheme()}
 	bind:this={modalElement}

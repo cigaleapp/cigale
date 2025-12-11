@@ -720,13 +720,21 @@ export async function mockProtocolSourceURL(page, context, source, mockedResult)
 /**
  *
  * @param {Page} page
- * @param {string} modalTitle
+ * @param {string | {title: string} | {key: `modal_${string}`}} query providing a string is equivalent to providing {title: string}
  */
-export function modal(page, modalTitle) {
+export function modal(page, query) {
+	if (typeof query === 'string') {
+		return modal(page, { title: query });
+	}
+
+	if ('key' in query) {
+		return page.locator(`dialog[data-key='${query.key}']`);
+	}
+
 	return page.getByRole('dialog').filter({
 		visible: true,
 		has: page.getByRole('banner').getByRole('heading', {
-			name: modalTitle,
+			name: query.title,
 			exact: true
 		})
 	});
@@ -738,9 +746,13 @@ export function modal(page, modalTitle) {
  * @param {object} [opts]
  * @param {string} [opts.type] text to type before hitting confirm button
  * @param {string} [opts.title='Êtes-vous sûr·e?'] title of the modal
+ * @param {`modal_${string}`} [opts.modalKey] data-key of the modal to target
  */
-export async function confirmDeletionModal(page, { type, title = 'Êtes-vous sûr·e?' } = {}) {
-	const deletionModal = modal(page, title);
+export async function confirmDeletionModal(
+	page,
+	{ type, title = 'Êtes-vous sûr·e?', modalKey } = {}
+) {
+	const deletionModal = modal(page, modalKey ? { key: modalKey } : { title });
 	await expect(deletionModal).toBeVisible();
 
 	if (type) {
