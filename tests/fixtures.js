@@ -1,23 +1,20 @@
 import { mkdir, rm } from 'node:fs/promises';
 import { test as base } from '@playwright/test';
 
-import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import {
 	getPredownloadedModel,
-	mockPredownloadedModel,
+	mockPredownloadedModels,
 	mockProtocolSourceURL,
 	setHardwareConcurrency
 } from './utils';
 
-export { exampleProtocol };
-
-const classificationArthropodaModel = await getPredownloadedModel(
+const classification80Model = await getPredownloadedModel('model_classif.onnx');
+const classification17kModel = await getPredownloadedModel(
 	'classification-arthropoda-polymny-2025-04-11.onnx'
 );
 const detectionModel = await getPredownloadedModel('arthropod_detector_yolo11n_conf0.437.onnx');
-
-// Make exampleProtocol lightweight by cutting out 90% of metadata options
 
 /**
  * @import { Fixtures, TestType, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
@@ -40,30 +37,15 @@ export const test = base.extend(
 				await mkdir('./tests/results', { recursive: true });
 
 				if (!tags.includes('@real-protocol')) {
-					await mockProtocolSourceURL(page, context, defaultProtocol.source, {
-						json: exampleProtocol
+					await mockProtocolSourceURL(page, context, fullProtocol.source, {
+						json: lightProtocol
 					});
 				}
 
-				if (detectionModel !== null) {
-					await mockPredownloadedModel(
-						page,
-						context,
-						defaultProtocol,
-						'detection',
-						detectionModel
-					);
-				}
-
-				if (classificationArthropodaModel !== null) {
-					await mockPredownloadedModel(
-						page,
-						context,
-						defaultProtocol,
-						{ metadata: 'species' },
-						classificationArthropodaModel
-					);
-				}
+				await mockPredownloadedModels(page, context, fullProtocol, {
+					detection: [detectionModel],
+					species: [classification17kModel, classification80Model]
+				});
 
 				const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;
 				if (concurrency) {
@@ -89,3 +71,4 @@ export const test = base.extend(
 );
 
 export { expect } from '@playwright/test';
+export { lightProtocol as exampleProtocol };

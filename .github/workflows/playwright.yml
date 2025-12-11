@@ -41,6 +41,11 @@ jobs:
         with:
           file-url: https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx
           file-name: classification-arthropoda-polymny-2025-04-11.onnx
+      - name: Pre-download simple 80 classification model
+        uses: carlosperate/download-file-action@v2
+        with:
+          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx
+          file-name: model_classif.onnx
       - name: Pre-download YOLO detection model
         uses: carlosperate/download-file-action@v2
         with:

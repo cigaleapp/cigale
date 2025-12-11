@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect } from '@playwright/test';
 
-import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Schemas } from '../src/lib/database.js';
 
 /**
@@ -224,7 +224,7 @@ export async function getMetadataOverridesOfObservation({ page, protocolId, obse
  * @param {string} metadataKey
  * @param {string} [protocolId]
  */
-export async function getMetadataValue(page, query, metadataKey, protocolId = defaultProtocol.id) {
+export async function getMetadataValue(page, query, metadataKey, protocolId = lightProtocol.id) {
 	if ('image' in query) {
 		const metadata = await getMetadataValuesOfImage({
 			page,
@@ -856,7 +856,7 @@ export async function getPredownloadedModel(filename) {
  * @param {{metadata: string} | 'detection'} task
  * @param {{ body: Buffer<ArrayBufferLike>, filename: string }} model
  */
-export async function mockPredownloadedModel(page, context, protocol, task, { filename, body }) {
+async function mockPredownloadedModel(page, context, protocol, task, { filename, body }) {
 	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural']} arg0 */
 	const modelMatches = ({ model }) =>
 		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
@@ -871,4 +871,25 @@ export async function mockPredownloadedModel(page, context, protocol, task, { fi
 		`Using pre-downloaded model ${filename} for ${task === 'detection' ? 'detection' : task.metadata}`
 	);
 	await mockUrl(page, context, url, { body });
+}
+
+/**
+ * @param {Page} page
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
+ * @param {Record<'detection'|'species', Array<null | { body: Buffer<ArrayBufferLike>, filename: string }>>} models
+ */
+export async function mockPredownloadedModels(page, context, protocol, models) {
+	for (const [task, taskModels] of Object.entries(models)) {
+		for (const model of taskModels) {
+			if (!model) continue;
+			await mockPredownloadedModel(
+				page,
+				context,
+				protocol,
+				task === 'detection' ? 'detection' : { metadata: task },
+				model
+			);
+		}
+	}
 }
