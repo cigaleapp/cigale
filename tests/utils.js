@@ -888,9 +888,6 @@ async function mockPredownloadedModel(
 			: protocol.metadata[`${protocol.id}__${task.metadata}`].infer?.neural.find(modelMatches)
 					?.model;
 
-	console.info(
-		`Using pre-downloaded model ${filename} for ${task === 'detection' ? 'detection' : task.metadata}`
-	);
 	await mockUrl(page, context, url, { body: model });
 
 	if (classmapping && task !== 'detection') {
@@ -901,9 +898,6 @@ async function mockPredownloadedModel(
 
 		if (!classmappingUrl) return;
 
-		console.info(
-			`Using pre-downloaded classmapping for model ${filename} for ${task.metadata}`
-		);
 		await mockUrl(page, context, classmappingUrl, { body: classmapping });
 	}
 }
