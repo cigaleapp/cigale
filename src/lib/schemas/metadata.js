@@ -155,7 +155,7 @@ export const MetadataEnumVariant = type({
 	synonyms: type('string[]')
 		.describe('Synonymes (labels alternatifs) pour cette option')
 		.default(() => []),
-	description: ['string', '@', 'Description (optionnelle) de cette option'],
+	'description?': type('string').describe('Description (optionnelle) de cette option'),
 	'image?': URLString,
 	'learnMore?': URLString.describe(
 		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
