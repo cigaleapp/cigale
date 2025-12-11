@@ -114,13 +114,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: |
-          # Check for "XXX: DONT MERGE" in current source code
-          if git grep -q 'XXX: DONT MERGE'; then
-            echo "Found 'XXX: DONT MERGE' in source code. Failing the job."
+          # Check for "do not merge" comment in the codebase
+          if git grep -q "$prefix: $message"; then
+            echo "Found "$prefix: $message" in source code. Failing the job."
             exit 1
           else
-            echo "No 'XXX: DONT MERGE' found in source code."
+            echo "No "$prefix: $message" found in source code."
           fi
+        env:
+          prefix: XXX
+          message: DONT MERGE
 
   is-mergeable:
     if: github.event_name == 'pull_request' && !cancelled()
