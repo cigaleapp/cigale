@@ -5,7 +5,6 @@ import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
 import { tables } from './idb.svelte';
 import { getMetadataValue } from './metadata';
-import { undo } from './undo.svelte';
 
 /**
  * @import * as DB from './database';

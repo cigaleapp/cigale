@@ -36,6 +36,7 @@ export const test = base.extend(
 	 */
 	({
 		forEachWorker: [
+			// oxlint-disable-next-line no-empty-pattern required by playwright
 			async ({}, use) => {
 				classification80Model = await getPredownloadedModel(
 					'model_classif.onnx',

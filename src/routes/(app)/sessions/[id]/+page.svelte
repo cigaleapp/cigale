@@ -14,7 +14,6 @@
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { goto } from '$lib/paths.js';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
-	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
 	const { data } = $props();
