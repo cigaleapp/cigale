@@ -120,7 +120,7 @@ const cladeMetadata = (clade, label) => ({
 });
 
 /**
- * @type {typeof import('../src/lib/protocols').ExportedProtocol.inferIn}
+ * @satisfies {typeof import('../src/lib/schemas/protocols.js').ExportedProtocol.inferIn}
  */
 const protocol = {
 	$schema: 'https://cigaleapp.github.io/cigale/protocol.schema.json',
@@ -152,10 +152,24 @@ const protocol = {
 		}
 	],
 	metadataOrder: [
+		// Session-wide
+		'prospection_duration',
+		'prospection_distance',
+		'homogenous_habitat',
+		'strictness',
+		'wind',
+		'temperature',
+		'cloud_coverage',
+		'shadow',
+		'camera_type',
+		'has_flash',
+		'session_date',
+		// Observations
 		'species',
 		'genus',
 		'family',
 		'order',
+		'habitat_photo',
 		'shoot_date',
 		'shoot_location',
 		'class',
@@ -164,6 +178,114 @@ const protocol = {
 		'crop',
 		'crop_is_confirmed'
 	].map(namespaced),
+	sessionMetadata: {
+		[namespaced('prospection_duration')]: {
+			// TODO duration datatype ?
+			type: 'integer',
+			label: 'Durée de prospection',
+			description: 'Durée (en minutes) de la prospection sur le terrain',
+			required: false,
+			mergeMethod: 'average'
+		},
+		[namespaced('prospection_distance')]: {
+			type: 'integer',
+			label: 'Distance de prospection',
+			description: 'Distance (en mètres) parcourue pendant la prospection',
+			required: false,
+			mergeMethod: 'average'
+		},
+		// TODO trajectory
+		[namespaced('homogenous_habitat')]: {
+			type: 'boolean',
+			label: 'Habitat homogène',
+			description:
+				"J'ai choisi un habitat homogène pour réaliser mon relevé (laisser vide si inconnu)",
+			required: false,
+			mergeMethod: 'none'
+		},
+		[namespaced('strictness')]: {
+			type: 'enum',
+			label: "Niveau d'exigence",
+			description: "J'ai photographié",
+			required: true,
+			mergeMethod: 'min',
+			options: [
+				{ key: 'all', label: 'Tous les individus rencontrés' },
+				{ key: 'inventory', label: 'Au moins un individu de chaque espèce rencontrée' },
+				{ key: 'at_will', label: "Juste quelques individus quand j'en avais envie" }
+			]
+		},
+		[namespaced('wind')]: {
+			type: 'enum',
+			label: 'Vent',
+			description: 'Condition de vent pendant la prospection',
+			required: false,
+			mergeMethod: 'max',
+			options: [
+				{ key: 'none', label: 'Pas du tout' },
+				{ key: 'light', label: 'Léger' },
+				{ key: 'moderate', label: 'Modéré' },
+				{ key: 'strong', label: 'Fort' }
+			]
+		},
+		[namespaced('temperature')]: {
+			type: 'integer',
+			label: 'Température',
+			description: 'Température approximative pendant la prospection (en °C)',
+			required: false,
+			mergeMethod: 'average'
+		},
+		[namespaced('cloud_coverage')]: {
+			type: 'enum',
+			label: 'Couverture nuageuse',
+			description: 'Condition de couverture nuageuse pendant la prospection',
+			required: false,
+			mergeMethod: 'max',
+			options: [
+				{ key: 'clear', label: 'Dégagé' },
+				{ key: '10_30_percent', label: '10-30%' },
+				{ key: 'half', label: '50%' },
+				{ key: 'more_than_half', label: 'Plus de 50%' },
+				{ key: 'overcast', label: 'Tout couvert' }
+			]
+		},
+		[namespaced('shadow')]: {
+			type: 'integer',
+			label: "Photos à l'ombre",
+			description: "Part des photos prises à l'ombre (en pourcentage)",
+			required: false,
+			mergeMethod: 'average'
+		},
+		[namespaced('camera_type')]: {
+			type: 'enum',
+			label: 'Type d’appareil photo',
+			description: "Type d'appareil photo utilisé pour prendre les photos",
+			required: false,
+			mergeMethod: 'none',
+			options: [
+				{ key: 'smartphone', label: 'Smartphone' },
+				{ key: 'compact', label: 'Appareil photo compact' },
+				{ key: 'dslr', label: 'Appareil photo reflex (DSLR)' },
+				{ key: 'mirrorless', label: 'Appareil photo hybride' }
+			]
+		},
+		[namespaced('has_flash')]: {
+			type: 'boolean',
+			label: 'Flash utilisé',
+			description:
+				"Le flash de l'appareil photo a-t-il été utilisé pour prendre des photos ?",
+			required: false,
+			mergeMethod: 'max'
+		},
+		[namespaced('session_date')]: {
+			type: 'date',
+			label: 'Date de la session',
+			description:
+				'Date à laquelle la session a été réalisée. On peut laisser vide si la date a été correctement réglée sur l’appareil photo',
+			required: false,
+			mergeMethod: 'average'
+		}
+	},
 	metadata: {
 		[namespaced('kingdom')]: cladeMetadata('kingdom', 'Règne'),
 		[namespaced('phylum')]: cladeMetadata('phylum', 'Phylum'),
@@ -171,6 +293,18 @@ const protocol = {
 		[namespaced('order')]: cladeMetadata('order', 'Ordre'),
 		[namespaced('family')]: cladeMetadata('family', 'Famille'),
 		[namespaced('genus')]: cladeMetadata('genus', 'Genre'),
+		[namespaced('habitat_photo')]: {
+			type: 'enum',
+			label: "Photo d'habitat",
+			description:
+				"Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat",
+			required: false,
+			mergeMethod: 'none',
+			options: [
+				{ key: 'current', label: "C'est une photo de l'habitat actuel" },
+				{ key: 'nearby', label: "C'est une photo de l'habitat à proximité" }
+			]
+		},
 		[namespaced('shoot_date')]: {
 			type: 'date',
 			label: 'Date',
