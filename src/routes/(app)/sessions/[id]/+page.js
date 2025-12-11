@@ -15,7 +15,13 @@ export async function load({ params: { id }, depends }) {
 	depends(idb.dependencyURI('Protocol', session.protocol));
 	const protocol = await tables.Protocol.get(session.protocol);
 	if (!protocol) {
-		return { session, protocol: null, sessionMetadata: [], sessionMetadataOptions: {} };
+		return {
+			session,
+			protocol: null,
+			sessionMetadata: [],
+			sessionMetadataOptions: {},
+			counts: { observations: 0, images: 0 }
+		};
 	}
 
 	const sessionMetadataDefs = await Promise.all(
@@ -40,5 +46,12 @@ export async function load({ params: { id }, depends }) {
 		])
 	).then((options) => Object.fromEntries(options));
 
-	return { session, protocol, sessionMetadata, sessionMetadataOptions };
+	const counts = {
+		observations: await idb
+			.listByIndex('Observation', 'sessionId', session.id)
+			.then((obs) => obs.length),
+		images: await idb.listByIndex('Image', 'sessionId', session.id).then((imgs) => imgs.length)
+	};
+
+	return { session, protocol, sessionMetadata, sessionMetadataOptions, counts };
 }

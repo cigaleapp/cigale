@@ -437,6 +437,7 @@ export async function deleteSession(page, name) {
 
 	await sessionCard.getByRole('button', { name: 'Gérer' }).click();
 	await page.getByRole('button', { name: 'Supprimer' }).click();
+	await confirmDeletionModal(page, { type: name, modalKey: 'modal_delete_session' });
 	await page.waitForURL((u) => u.hash === '#/sessions');
 }
 

@@ -6,12 +6,14 @@
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Field from '$lib/Field.svelte';
+	import { plural } from '$lib/i18n.js';
 	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
 	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata.js';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
+	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
 	import { goto } from '$lib/paths.js';
 	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { toasts } from '$lib/toasts.svelte.js';
@@ -37,18 +39,25 @@
 		/>
 
 		<section class="actions">
-			<!-- TODO confirm modal -->
-			<ButtonSecondary
-				danger
-				loading
-				onclick={async () => {
+			<ModalConfirmDeletion
+				key="modal_delete_session"
+				typeToConfirm={name}
+				consequences={[
+					plural(data.counts.images, [
+						'La suppression de 1 image',
+						'La suppression de # images'
+					]),
+					plural(data.counts.observations, [
+						'La suppression de 1 observation',
+						'La suppression de # observations'
+					])
+				]}
+				onconfirm={async () => {
 					await deleteSession(data.session.id);
 					toasts.success('Session supprimée.');
 					await goto('/sessions');
 				}}
-			>
-				Supprimer
-			</ButtonSecondary>
+			/>
 			<ButtonSecondary
 				onclick={async () => {
 					await switchSession(data.session.id);
