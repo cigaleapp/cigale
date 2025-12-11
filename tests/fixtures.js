@@ -37,9 +37,13 @@ export const test = base.extend(
 	({
 		forEachWorker: [
 			async ({}, use) => {
-				classification80Model = await getPredownloadedModel('model_classif.onnx');
+				classification80Model = await getPredownloadedModel(
+					'model_classif.onnx',
+					'lightweight-80-classmapping.txt'
+				);
 				classification17kModel = await getPredownloadedModel(
-					'classification-arthropoda-polymny-2025-04-11.onnx'
+					'classification-arthropoda-polymny-2025-04-11.onnx',
+					'polymny-17k-classmapping.txt'
 				);
 				detectionModel = await getPredownloadedModel(
 					'arthropod_detector_yolo11n_conf0.437.onnx'

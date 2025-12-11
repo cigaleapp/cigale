@@ -835,23 +835,33 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 }
 
 /**
- * @typedef {{ body: Buffer<ArrayBufferLike>, filename: string }} PredownloadedModel
+ * @typedef {{ model: Buffer<ArrayBufferLike>, classmapping: Buffer<ArrayBufferLike> | undefined, filename: string }} PredownloadedModel
  */
 
 /**
  *
  * @param {string} filename
+ * @param {string} [classmappingFilename]
  * @returns {Promise<PredownloadedModel|null>}
  */
-export async function getPredownloadedModel(filename) {
-	const body = await readFile(filename).catch(() => {
+export async function getPredownloadedModel(filename, classmappingFilename) {
+	const model = await readFile(filename).catch(() => {
 		console.warn(
 			`Warning: cannot find '${filename}' model file. Tests will use the network to fetch it.`
 		);
 		return null;
 	});
 
-	return body ? { body, filename } : null;
+	const classmapping = classmappingFilename
+		? await readFile(classmappingFilename).catch(() => {
+				console.warn(
+					`Warning: cannot find '${classmappingFilename}' classmapping file. Tests will use the network to fetch the '${filename}' model.`
+				);
+				return undefined;
+			})
+		: undefined;
+
+	return model ? { model, classmapping, filename } : null;
 }
 
 /**
@@ -861,7 +871,13 @@ export async function getPredownloadedModel(filename) {
  * @param {{metadata: string} | 'detection'} task
  * @param {PredownloadedModel} model
  */
-async function mockPredownloadedModel(page, context, protocol, task, { filename, body }) {
+async function mockPredownloadedModel(
+	page,
+	context,
+	protocol,
+	task,
+	{ filename, model, classmapping }
+) {
 	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural']} arg0 */
 	const modelMatches = ({ model }) =>
 		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
@@ -875,7 +891,21 @@ async function mockPredownloadedModel(page, context, protocol, task, { filename,
 	console.info(
 		`Using pre-downloaded model ${filename} for ${task === 'detection' ? 'detection' : task.metadata}`
 	);
-	await mockUrl(page, context, url, { body });
+	await mockUrl(page, context, url, { body: model });
+
+	if (classmapping && task !== 'detection') {
+		const classmappingUrl =
+			protocol.metadata[`${protocol.id}__${task.metadata}`].infer?.neural.find(
+				modelMatches
+			)?.classmapping;
+
+		if (!classmappingUrl) return;
+
+		console.info(
+			`Using pre-downloaded classmapping for model ${filename} for ${task.metadata}`
+		);
+		await mockUrl(page, context, classmappingUrl, { body: classmapping });
+	}
 }
 
 /**
