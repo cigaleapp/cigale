@@ -26,6 +26,7 @@ on:
 
 jobs:
   regenerate:
+    if: github.event.pull_request.draft == false
     name: Regenerate
     runs-on: ubuntu-latest
 
