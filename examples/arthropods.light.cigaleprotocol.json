@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/b9894502e1bcd4f4ad2f4022e61c7a1deb509668/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 37,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/95d148d0cf3fe7a786b83cac9168c07e269340bc/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 38,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -27,10 +27,22 @@
 		}
 	],
 	"metadataOrder": [
+		"io.github.cigaleapp.arthropods.example.light__prospection_duration",
+		"io.github.cigaleapp.arthropods.example.light__prospection_distance",
+		"io.github.cigaleapp.arthropods.example.light__homogenous_habitat",
+		"io.github.cigaleapp.arthropods.example.light__strictness",
+		"io.github.cigaleapp.arthropods.example.light__wind",
+		"io.github.cigaleapp.arthropods.example.light__temperature",
+		"io.github.cigaleapp.arthropods.example.light__cloud_coverage",
+		"io.github.cigaleapp.arthropods.example.light__shadow",
+		"io.github.cigaleapp.arthropods.example.light__camera_type",
+		"io.github.cigaleapp.arthropods.example.light__has_flash",
+		"io.github.cigaleapp.arthropods.example.light__session_date",
 		"io.github.cigaleapp.arthropods.example.light__species",
 		"io.github.cigaleapp.arthropods.example.light__genus",
 		"io.github.cigaleapp.arthropods.example.light__family",
 		"io.github.cigaleapp.arthropods.example.light__order",
+		"io.github.cigaleapp.arthropods.example.light__habitat_photo",
 		"io.github.cigaleapp.arthropods.example.light__shoot_date",
 		"io.github.cigaleapp.arthropods.example.light__shoot_location",
 		"io.github.cigaleapp.arthropods.example.light__class",
@@ -39,6 +51,157 @@
 		"io.github.cigaleapp.arthropods.example.light__crop",
 		"io.github.cigaleapp.arthropods.example.light__crop_is_confirmed"
 	],
+	"sessionMetadata": {
+		"io.github.cigaleapp.arthropods.example.light__prospection_duration": {
+			"type": "integer",
+			"label": "Durée de prospection",
+			"description": "Durée (en minutes) de la prospection sur le terrain",
+			"required": false,
+			"mergeMethod": "average"
+		},
+		"io.github.cigaleapp.arthropods.example.light__prospection_distance": {
+			"type": "integer",
+			"label": "Distance de prospection",
+			"description": "Distance (en mètres) parcourue pendant la prospection",
+			"required": false,
+			"mergeMethod": "average"
+		},
+		"io.github.cigaleapp.arthropods.example.light__homogenous_habitat": {
+			"type": "boolean",
+			"label": "Habitat homogène",
+			"description": "J'ai choisi un habitat homogène pour réaliser mon relevé (laisser vide si inconnu)",
+			"required": false,
+			"mergeMethod": "none"
+		},
+		"io.github.cigaleapp.arthropods.example.light__strictness": {
+			"type": "enum",
+			"label": "Niveau d'exigence",
+			"description": "J'ai photographié",
+			"required": true,
+			"mergeMethod": "min",
+			"options": [
+				{
+					"key": "all",
+					"label": "Tous les individus rencontrés"
+				},
+				{
+					"key": "inventory",
+					"label": "Au moins un individu de chaque espèce rencontrée"
+				},
+				{
+					"key": "at_will",
+					"label": "Juste quelques individus quand j'en avais envie"
+				}
+			]
+		},
+		"io.github.cigaleapp.arthropods.example.light__wind": {
+			"type": "enum",
+			"label": "Vent",
+			"description": "Condition de vent pendant la prospection",
+			"required": false,
+			"mergeMethod": "max",
+			"options": [
+				{
+					"key": "none",
+					"label": "Pas du tout"
+				},
+				{
+					"key": "light",
+					"label": "Léger"
+				},
+				{
+					"key": "moderate",
+					"label": "Modéré"
+				},
+				{
+					"key": "strong",
+					"label": "Fort"
+				}
+			]
+		},
+		"io.github.cigaleapp.arthropods.example.light__temperature": {
+			"type": "integer",
+			"label": "Température",
+			"description": "Température approximative pendant la prospection (en °C)",
+			"required": false,
+			"mergeMethod": "average"
+		},
+		"io.github.cigaleapp.arthropods.example.light__cloud_coverage": {
+			"type": "enum",
+			"label": "Couverture nuageuse",
+			"description": "Condition de couverture nuageuse pendant la prospection",
+			"required": false,
+			"mergeMethod": "max",
+			"options": [
+				{
+					"key": "clear",
+					"label": "Dégagé"
+				},
+				{
+					"key": "10_30_percent",
+					"label": "10-30%"
+				},
+				{
+					"key": "half",
+					"label": "50%"
+				},
+				{
+					"key": "more_than_half",
+					"label": "Plus de 50%"
+				},
+				{
+					"key": "overcast",
+					"label": "Tout couvert"
+				}
+			]
+		},
+		"io.github.cigaleapp.arthropods.example.light__shadow": {
+			"type": "integer",
+			"label": "Photos à l'ombre",
+			"description": "Part des photos prises à l'ombre (en pourcentage)",
+			"required": false,
+			"mergeMethod": "average"
+		},
+		"io.github.cigaleapp.arthropods.example.light__camera_type": {
+			"type": "enum",
+			"label": "Type d’appareil photo",
+			"description": "Type d'appareil photo utilisé pour prendre les photos",
+			"required": false,
+			"mergeMethod": "none",
+			"options": [
+				{
+					"key": "smartphone",
+					"label": "Smartphone"
+				},
+				{
+					"key": "compact",
+					"label": "Appareil photo compact"
+				},
+				{
+					"key": "dslr",
+					"label": "Appareil photo reflex (DSLR)"
+				},
+				{
+					"key": "mirrorless",
+					"label": "Appareil photo hybride"
+				}
+			]
+		},
+		"io.github.cigaleapp.arthropods.example.light__has_flash": {
+			"type": "boolean",
+			"label": "Flash utilisé",
+			"description": "Le flash de l'appareil photo a-t-il été utilisé pour prendre des photos ?",
+			"required": false,
+			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__session_date": {
+			"type": "date",
+			"label": "Date de la session",
+			"description": "Date à laquelle la session a été réalisée. On peut laisser vide si la date a été correctement réglée sur l’appareil photo",
+			"required": false,
+			"mergeMethod": "average"
+		}
+	},
 	"metadata": {
 		"io.github.cigaleapp.arthropods.example.light__kingdom": {
 			"type": "enum",
@@ -630,6 +793,23 @@
 			"required": false,
 			"description": "",
 			"mergeMethod": "max"
+		},
+		"io.github.cigaleapp.arthropods.example.light__habitat_photo": {
+			"type": "enum",
+			"label": "Photo d'habitat",
+			"description": "Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat",
+			"required": false,
+			"mergeMethod": "none",
+			"options": [
+				{
+					"key": "current",
+					"label": "C'est une photo de l'habitat actuel"
+				},
+				{
+					"key": "nearby",
+					"label": "C'est une photo de l'habitat à proximité"
+				}
+			]
 		},
 		"io.github.cigaleapp.arthropods.example.light__shoot_date": {
 			"type": "date",
