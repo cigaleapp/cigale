@@ -363,6 +363,8 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 export async function switchSession(page, name) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
+	// XXX: Wait until page is ready
+	await page.waitForTimeout(500);
 	await page.getByRole('heading', { name }).click();
 	await page.waitForURL((u) => u.hash === '#/import');
 }
@@ -374,6 +376,8 @@ export async function switchSession(page, name) {
 export async function deleteSession(page, name) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
+	// XXX: Wait until page is ready
+	await page.waitForTimeout(500);
 	const sessionCard = page.getByRole('article').filter({
 		has: page.getByRole('heading', { name })
 	});

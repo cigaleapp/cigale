@@ -24,6 +24,7 @@ test.describe('isolation', () => {
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
 		await importPhotos({ page }, 'debugsquare.png');
+		await waitForLoadingEnd(page);
 
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
