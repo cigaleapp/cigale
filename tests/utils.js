@@ -573,7 +573,9 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 	);
 
 	// FIXME await finishes before all [loadDatabaseDump] logs ??
-	await page.waitForTimeout(5_000);
+	await page.waitForTimeout(3_000);
+	await page.reload();
+	await page.waitForFunction(() => Boolean(window.devalue && window.DB && window.refreshDB));
 }
 
 export const browserConsole = {
