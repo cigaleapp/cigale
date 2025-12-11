@@ -54,3 +54,4 @@ out/
 static/fonts
 static/fonts.css
 classification-arthropoda-polymny-2025-04-11.onnx
+arthropod_detector_yolo11n_conf0.437.onnx

@@ -15,6 +15,7 @@ export { exampleProtocol };
 const classificationArthropodaModel = await getPredownloadedModel(
 	'classification-arthropoda-polymny-2025-04-11.onnx'
 );
+const detectionModel = await getPredownloadedModel('arthropod_detector_yolo11n_conf0.437.onnx');
 
 // Make exampleProtocol lightweight by cutting out 90% of metadata options
 
@@ -42,6 +43,16 @@ export const test = base.extend(
 					await mockProtocolSourceURL(page, context, defaultProtocol.source, {
 						json: exampleProtocol
 					});
+				}
+
+				if (detectionModel !== null) {
+					await mockPredownloadedModel(
+						page,
+						context,
+						defaultProtocol,
+						'detection',
+						detectionModel
+					);
 				}
 
 				if (classificationArthropodaModel !== null) {
