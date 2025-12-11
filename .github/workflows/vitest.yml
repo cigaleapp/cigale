@@ -30,7 +30,7 @@ jobs:
       - name: Run tests
         run: bun run test
       - name: Save aside coverage report
-        if: inputs.compare-coverage && always() 
+        if: inputs.compare-coverage && always()
         uses: actions/upload-artifact@v5
         with:
           name: vitest-report-head
