@@ -5,14 +5,13 @@ on:
     # Runs at 00:00 UTC every Monday
     - cron: 0 0 * * 1,4
   workflow_dispatch:
-  # XXX: DONT MERGE WITH THIS
-  # pull_request:
-  #   paths:
-  #     - scripts/generate-protocols.js
-  #     - scripts/add-species-from-jessica-joachim.ts
-  #     - scripts/add-species-from-google-slides.js
-  #     - scripts/add-taxonomic-parents-from-gbif.js
-  #     - .github/workflows/protocols.yml
+  pull_request:
+    paths:
+      - scripts/generate-protocols.js
+      - scripts/add-species-from-jessica-joachim.ts
+      - scripts/add-species-from-google-slides.js
+      - scripts/add-taxonomic-parents-from-gbif.js
+      - .github/workflows/protocols.yml
   push:
     branches:
       - renovate/googleapis-*
@@ -83,7 +82,7 @@ jobs:
       - name: Setup diffing that ignores version and learnMore fields
         run: git config diff.example-protocols.textconv "$textconv"
         env:
-          textconv: jq 'del(.version) | del(.learnMore)' $1
+          textconv: jq 'del(.version) | del(.learnMore) | del (.metadata[].options[]?.image)' $1
 
       - name: Check for changes
         id: status
