@@ -40,5 +40,6 @@ export async function switchSession(id) {
 	uiState.setCurrentSession(id);
 	uiState.clearPreviewURLs();
 	undo.clear();
+	withQueue((q) => q.cancelAll('La session a été fermée'));
 	await idb.tables.initialize(id);
 }

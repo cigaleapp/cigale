@@ -205,6 +205,18 @@ class ProcessingQueue {
 		uiState.processing.total--;
 	}
 
+	/**
+	 * Cancel all tasks in the processing queue.
+	 * @param {string} reason
+	 */
+	cancelAll(reason) {
+		if (!this.cancellers) throw new Error('No cancellers map set, cannot cancel all tasks.');
+
+		for (const subjectId of this.cancellers.keys()) {
+			this.cancel(subjectId, reason);
+		}
+	}
+
 	async pop() {
 		const task = this.tasks.shift();
 		if (!task) {
