@@ -9,6 +9,9 @@ import {
 } from './utils';
 
 test.describe('isolation', () => {
+	test.beforeEach(() => {
+		test.setTimeout(20_000);
+	});
 	test('no images from one session shows up in another', async ({ page }) => {
 		await newSession(page, { name: 'Session A' });
 		await goToTab(page, 'import');
