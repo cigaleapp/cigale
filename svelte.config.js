@@ -16,7 +16,8 @@ const config = {
 		},
 		alias: {
 			$worker: 'src/worker',
-			$locales: 'src/locales'
+			$locales: 'src/locales',
+			$routes: 'src/routes'
 		},
 		paths: {
 			base:

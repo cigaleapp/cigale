@@ -3,13 +3,33 @@
 	 * @type {Map<string, import("swarpc").CancelablePromise["cancel"]>}
 	 */
 	export const cancellers = new SvelteMap();
+
+	/**
+	 * @typedef {'full' | 'hidden'} NavbarAppearance
+	 */
+	let _navbarAppearance = $state('full');
+
+	/**
+	 * Set navbar appearance for the page or layout, until unmounted.
+	 * Uses `onMount` and `onDestroy` internally.
+	 * @param {NavbarAppearance} appearance
+	 */
+	export function navbarAppearance(appearance) {
+		onMount(() => {
+			_navbarAppearance = appearance;
+			return () => {
+				_navbarAppearance = 'full';
+			};
+		});
+	}
 </script>
 
 <script>
 	import { watch } from 'runed';
-	import { onDestroy, onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
+	import { version } from '$app/environment';
 	import { page } from '$app/state';
 	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
@@ -21,6 +41,7 @@
 	import { uiState } from '$lib/state.svelte';
 	import Toast from '$lib/Toast.svelte';
 	import { toasts } from '$lib/toasts.svelte';
+	import { undo } from '$lib/undo.svelte';
 	import { nonnull, pick } from '$lib/utils';
 
 	import Navigation from './Navigation.svelte';
@@ -30,18 +51,9 @@
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
 
-	/** @type {'full' | 'floating' | 'hidden'} */
-	let navbarAppearance = $state('full');
-	setContext('setNavbarAppearance', (/** @type {typeof navbarAppearance} */ state) => {
-		onMount(() => {
-			navbarAppearance = state;
-		});
-		onDestroy(() => {
-			navbarAppearance = 'full';
-		});
-	});
-
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
+
+	undo.initialize(100);
 
 	export const snapshot = {
 		capture() {
@@ -117,6 +129,31 @@
 		document.documentElement.style.colorScheme = getColorScheme();
 	});
 
+	onMount(() => {
+		navigator.serviceWorker.ready.then((registration) => {
+			const installedVersion = localStorage.getItem('sw-version');
+
+			if (installedVersion !== version) {
+				localStorage.setItem('sw-version', version);
+				toasts.info('L’application a été mise à jour.');
+			}
+
+			registration.addEventListener('updatefound', () => {
+				// TODO remove
+				console.info('Update found in service worker');
+				toasts.info('Une mise à jour est disponible.', {
+					lifetime: Infinity,
+					labels: {
+						action: 'Recharger'
+					},
+					action() {
+						location.reload();
+					}
+				});
+			});
+		});
+	});
+
 	/** @type {undefined|(() => void)} */
 	let openKeyboardShortcuts = $state();
 	/** @type {undefined|(() => void)} */
@@ -131,15 +168,13 @@
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
 <RemoteProtocolImporter />
 
-{#if navbarAppearance !== 'hidden'}
-	<Navigation
-		{swarpc}
-		{openKeyboardShortcuts}
-		{openPrepareForOfflineUse}
-		floating={navbarAppearance === 'floating'}
-		progress={uiState.processing.progress}
-	/>
-{/if}
+<Navigation
+	{swarpc}
+	{openKeyboardShortcuts}
+	{openPrepareForOfflineUse}
+	progressbarOnly={_navbarAppearance === 'hidden'}
+	progress={uiState.processing.progress}
+/>
 
 <section class="toasts" data-testid="toasts-area">
 	{#each toasts.items('default') as toast (toast.id)}

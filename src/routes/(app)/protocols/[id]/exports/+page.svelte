@@ -17,6 +17,8 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { entries } from '$lib/utils.js';
 
+	import MetadataLink from '../MetadataLink.svelte';
+
 	/**
 	 * @import { TreeNode, NodeProvenance } from './utils.js';
 	 */
@@ -90,7 +92,17 @@
 </script>
 
 <main in:fade={{ duration: 100 }}>
-	<h2>Structure des exports .zip</h2>
+	<h2>Exports .zip</h2>
+
+	<h3>Dates de modification</h3>
+	<MetadataLink
+		definitions={data.metadataDefinitions}
+		key={data.protocol.exports?.images.mtime}
+		help="Métadonnée à utiliser pour la date de modification des fichers images"
+		no-metadata="La date d'export sera utilisée comme date de modification des fichiers images"
+	/>
+
+	<h3>Arborescence</h3>
 
 	<ul class="tree">
 		<li>
@@ -240,7 +252,11 @@
 	main {
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+	}
+
+	h3 {
+		margin-top: 2rem;
+		margin-bottom: 0.5rem;
 	}
 
 	.text {

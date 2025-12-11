@@ -4,39 +4,23 @@
 
 	import IconAdd from '~icons/ri/add-line';
 	import IconOpenDetails from '~icons/ri/arrow-down-s-line';
-	import IconGoto from '~icons/ri/arrow-right-line';
 	import IconTrash from '~icons/ri/delete-bin-line';
-	import IconError from '~icons/ri/error-warning-line';
-	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import Field from '$lib/Field.svelte';
 	import { errorMessage } from '$lib/i18n';
-	import IconDatatype from '$lib/IconDatatype.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { modelUrl } from '$lib/inference';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
-	import { goto } from '$lib/paths';
-	import {
-		ensureNamespacedMetadataId,
-		removeNamespaceFromMetadataId
-	} from '$lib/schemas/metadata';
+	import { removeNamespaceFromMetadataId } from '$lib/schemas/metadata';
 	import { Protocol } from '$lib/schemas/protocols';
 
+	import MetadataLink from '../MetadataLink.svelte';
 	import { updater } from '../updater.svelte';
 	import ModelConfig from './ModelConfig.svelte';
 
 	const { data } = $props();
 	let settings = $derived(data.crop);
-
-	const findMetadata = (idOrShortId) =>
-		data.metadataDefinitions.find(
-			(m) =>
-				ensureNamespacedMetadataId(m.id, data.id) ===
-				ensureNamespacedMetadataId(idOrShortId, data.id)
-		);
-	const cropMetadata = $derived(findMetadata(settings.metadata));
-	const cropConfirmationMetadata = $derived(findMetadata(settings.confirmationMetadata));
 
 	let paddingInputError = $state('');
 
@@ -92,130 +76,47 @@
 	</Field>
 
 	<Field label="Stockage des boîtes">
-		<div class="metadata-link">
-			{#if cropMetadata}
-				<div class="text">
-					<p>
-						<IconDatatype tooltip={false} type="boundingbox" />
-						{cropMetadata.label || removeNamespaceFromMetadataId(cropMetadata.id)}
-					</p>
-					<small>Boîtes de recadrage stockées dans cette métadonnée</small>
-				</div>
-				<div class="actions">
-					<ButtonInk
-						onclick={async () =>
-							goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-								id: page.params.id,
-								metadata: removeNamespaceFromMetadataId(cropMetadata.id)
-							})}
-					>
-						<IconGoto />
-						Voir
-					</ButtonInk>
-				</div>
-			{:else}
-				<div class="text empty">
-					<p>
-						<IconError />
-						Aucune métadonnée
-					</p>
-					<small>Le protocole ne peut pas stocker les boîtes de recadrage!</small>
-				</div>
-				<div class="actions">
-					<ButtonInk
-						onclick={updater(async (p) => {
-							const shortId = 'crop';
-							const metadataId = ensureNamespacedMetadataId(shortId, p.id);
-
-							if (!data.metadataDefinitions.some((m) => m.id === metadataId)) {
-								await tables.Metadata.set({
-									id: metadataId,
-									label: '',
-									type: 'boundingbox',
-									description: "Boîtes de recadrage de l'observation",
-									required: false,
-									mergeMethod: 'union'
-								});
-								p.metadata.push(shortId);
-							}
-
-							p.crop.metadata = shortId;
-
-							await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-								id: p.id,
-								metadata: shortId
-							});
-						})}
-					>
-						Créer
-					</ButtonInk>
-				</div>
-			{/if}
-		</div>
+		<MetadataLink
+			definitions={data.metadataDefinitions}
+			key={settings.metadata}
+			help="Boîtes de recadrage stockées dans cette métadonnée"
+			no-metadata="Le protocole ne peut pas stocker les boîtes de recadrage!"
+			onupdate={(p) => {
+				p.crop.metadata = removeNamespaceFromMetadataId(settings.metadata);
+			}}
+			oncreate={async () => {
+				await tables.Metadata.set({
+					id: removeNamespaceFromMetadataId(settings.metadata),
+					label: '',
+					type: 'boundingbox',
+					description: "Boîtes de recadrage de l'observation",
+					required: false,
+					mergeMethod: 'union'
+				});
+			}}
+		/>
 	</Field>
 
 	<Field label="Stockage de l'état de confirmation">
-		<div class="metadata-link">
-			{#if cropConfirmationMetadata}
-				<div class="text">
-					<p>
-						<IconDatatype tooltip={false} type="boolean" />
-						{cropConfirmationMetadata.label ||
-							removeNamespaceFromMetadataId(cropConfirmationMetadata.id)}
-					</p>
-					<small>Confirmations des recadrages stockés dans cette métadonnée</small>
-				</div>
-				<div class="actions">
-					<ButtonInk
-						onclick={async () =>
-							goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-								id: page.params.id,
-								metadata: removeNamespaceFromMetadataId(cropConfirmationMetadata.id)
-							})}
-					>
-						<IconGoto />
-						Voir
-					</ButtonInk>
-				</div>
-			{:else}
-				<div class="text empty">
-					<p>
-						<IconError />
-						Aucune métadonnée
-					</p>
-					<small>Le protocole ne peut pas stocker les confirmations de recadrage!</small>
-				</div>
-				<div class="actions">
-					<ButtonInk
-						onclick={updater(async (p) => {
-							const shortId = 'crop_confirmation';
-							const metadataId = ensureNamespacedMetadataId(shortId, p.id);
-
-							if (!data.metadataDefinitions.some((m) => m.id === metadataId)) {
-								await tables.Metadata.set({
-									id: metadataId,
-									label: '',
-									type: 'boolean',
-									description: 'Si la boîte de recadrage a été confirmée',
-									required: false,
-									mergeMethod: 'none'
-								});
-								p.metadata.push(shortId);
-							}
-
-							p.crop.confirmationMetadata = shortId;
-
-							await goto('/(app)/protocols/[id]/metadata/[metadata]/infos', {
-								id: p.id,
-								metadata: shortId
-							});
-						})}
-					>
-						Créer
-					</ButtonInk>
-				</div>
-			{/if}
-		</div>
+		<MetadataLink
+			definitions={data.metadataDefinitions}
+			key={settings.confirmationMetadata}
+			help="Confirmations des recadrages stockés dans cette métadonnée"
+			no-metadata="Le protocole ne peut pas stocker les confirmations de recadrage!"
+			onupdate={(p, key) => {
+				p.crop.confirmationMetadata = key;
+			}}
+			oncreate={async (key) => {
+				await tables.Metadata.set({
+					id: key,
+					label: '',
+					type: 'boolean',
+					description: 'Si la boîte de recadrage a été confirmée',
+					required: false,
+					mergeMethod: 'none'
+				});
+			}}
+		/>
 	</Field>
 
 	<Field composite>
@@ -270,22 +171,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-	}
-
-	.metadata-link {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-
-		.text p {
-			display: flex;
-			align-items: center;
-			gap: 0.25em;
-		}
-
-		.text.empty {
-			color: var(--fg-error);
-		}
 	}
 
 	.models-label {

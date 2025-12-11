@@ -2,7 +2,7 @@ import { type } from 'arktype';
 
 import { TARGETHEIGHT, TARGETWIDTH } from './inference';
 
-const centeredBoundingBox = type({
+export const centeredBoundingBox = type({
 	x: 'number',
 	y: 'number',
 	w: 'number',

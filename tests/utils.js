@@ -2,7 +2,6 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect } from '@playwright/test';
-import extractZip from 'extract-zip';
 
 import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Schemas } from '../src/lib/database.js';
@@ -337,6 +336,14 @@ export async function chooseProtocol(page, name, models = {}) {
 	}
 }
 
+export async function goToProtocolManagement(page) {
+	await page.getByTestId('protocol-switcher-open').click();
+	await page
+		.getByTestId('protocol-switcher-options')
+		.getByRole('menuitem', { name: 'Gérer les protocoles' })
+		.click();
+}
+
 /**
  *
  * @param {import('$lib/i18n').Language} lang
@@ -398,38 +405,6 @@ export async function importProtocol(page, filepath) {
 	await fileChooser.then((chooser) =>
 		chooser.setFiles(path.join(import.meta.dirname, './fixtures', filepath))
 	);
-}
-
-/**
- * @template {*} Leaf
- * @typedef {Array<Leaf | { [dir: string]: ArrayTree<Leaf> }>} ArrayTree
- */
-
-/**
- *
- * @param {string} root
- * @returns {ArrayTree<string>}
- */
-export function readdirTreeSync(root) {
-	const result = [];
-	const files = readdirSync(root, { withFileTypes: true });
-	for (const file of files) {
-		if (file.isDirectory()) {
-			result.push({
-				[file.name]: readdirTreeSync(path.join(root, file.name))
-			});
-		} else {
-			result.push(file.name);
-		}
-	}
-
-	return result.sort((a, b) => {
-		// Sort folders before files
-		if (typeof a === 'object' && typeof b === 'string') return -1;
-		if (typeof a === 'string' && typeof b === 'object') return 1;
-		if (typeof a === 'string' && typeof b === 'string') return a.localeCompare(b);
-		return Object.keys(a)[0].localeCompare(Object.keys(b)[0]);
-	});
 }
 
 /**
@@ -535,7 +510,7 @@ export const browserConsole = {
  * @param {Page} page
  * @param {import('@playwright/test').Locator} locator
  */
-export async function tooltipOf(page, locator) {
+async function tooltipOf(page, locator) {
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, { timeout: 1_000 });
 	const tippyId = await locator.getAttribute('aria-describedby');
 	return page.locator(`#${tippyId}`);
@@ -611,7 +586,7 @@ export function modal(page, modalTitle) {
 /**
  *
  * @param {Page} page
- * @param {Parameters<import('playwright').Locator['click']>[0]} [clickOptions]
+ * @param {Parameters<import('@playwright/test').Locator['click']>[0]} [clickOptions]
  */
 export function openSettings(page, clickOptions) {
 	return page.getByTestId('settings-button').click(clickOptions);
@@ -638,7 +613,7 @@ export function makeRegexpUnion(...parts) {
 
 export const loadingText = makeRegexpUnion('Chargement…', 'Analyse…', 'En attente');
 
-export const loadingNotQueuedText = makeRegexpUnion('Chargement…', 'Analyse…');
+const loadingNotQueuedText = makeRegexpUnion('Chargement…', 'Analyse…');
 
 /**
  *
@@ -745,14 +720,13 @@ export async function exportResults(
 		)
 		.click();
 
-	const resultsDir = path.resolve(`./tests/results/${destination}`);
 	await page.getByRole('button', { name: 'results.zip' }).click();
 	const download = await page.waitForEvent('download');
 	expect(download.suggestedFilename()).toBe('results.zip');
-	await download.saveAs(`./tests/results/${destination}.zip`);
-	await extractZip(`${resultsDir}.zip`, { dir: resultsDir });
+	const saveAs = `./tests/results/${destination}.zip`;
+	await download.saveAs(saveAs);
 
-	return resultsDir;
+	return saveAs;
 }
 
 /**
@@ -763,4 +737,63 @@ export function parseCsv(contents) {
 	return contents
 		.split('\n')
 		.map((row) => row.split(';').map((cell) => cell.replace(/^"(.+)"$/, '$1')));
+}
+/**
+ *
+ * @param {import('node:stream').Readable} stream
+ * @returns
+ */
+export async function readStreamToBuffer(stream) {
+	return Buffer.concat(await Array.fromAsync(stream));
+}
+
+/**
+ * Only one of json, text or buffer should be provided.
+ * @typedef {object} ZipFileEntryCheck
+ * @property {(text: string) => void | Promise<void>} [text] function to call with the text content of the file
+ * @property {(buffer: Buffer) => void | Promise<void>} [buffer] function to call with the buffer content of the file
+ * @property {(json: any) => void | Promise<void>} [json] function to call with the parsed JSON content of the file
+ * @property {(cells: string[][]) => void | Promise<void>} [csv] function to call with the parsed CSV content of the file
+ * @property {(entry: import('yauzl-promise').Entry) => void | Promise<void>} [entry] function to call with the zip entry itself
+ */
+
+/**
+ * @template {string} Files
+ * Matches the files present in a zip file against an expected list of file names, without regard for order.
+ * @param {import('yauzl-promise').ZipFile} zip
+ * @param {Array<RegExp|Files>} expectedFiles
+ * @param {Partial<Record<Files, ZipFileEntryCheck>>} [checks] additional checks to perform for specific files
+ */
+export async function expectZipFiles(zip, expectedFiles, checks = {}) {
+	const zipFiles = [];
+	for await (const file of zip) {
+		zipFiles.push(file.filename);
+		if (file.filename in checks) {
+			// @ts-expect-error
+			const { json, csv, text, buffer, entry } = checks[file.filename];
+
+			const buf = await file.openReadStream().then(readStreamToBuffer);
+
+			if (buffer) {
+				await buffer(buf);
+			} else if (text) {
+				await text(buf.toString('utf-8'));
+			} else if (json) {
+				await json(JSON.parse(buf.toString('utf-8')));
+			} else if (csv) {
+				await csv(parseCsv(buf.toString('utf-8')));
+			}
+
+			if (entry) {
+				await entry(file);
+			}
+		}
+	}
+
+	expect(zipFiles).toHaveLength(expectedFiles.length);
+	for (const expectedFile of expectedFiles) {
+		expect(zipFiles).toContainEqual(
+			expectedFile instanceof RegExp ? expect.stringMatching(expectedFile) : expectedFile
+		);
+	}
 }

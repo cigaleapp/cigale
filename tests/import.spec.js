@@ -1,7 +1,5 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import * as dates from 'date-fns';
-import extract from 'extract-zip';
+import * as yauzl from 'yauzl-promise';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue } from './annotations';
@@ -9,6 +7,7 @@ import { expect, test } from './fixtures';
 import {
 	chooseProtocol,
 	expectTooltipContent,
+	expectZipFiles,
 	exportResults,
 	firstObservationCard,
 	getMetadataValuesOfImage,
@@ -18,8 +17,6 @@ import {
 	importResults,
 	listTable,
 	loadingText,
-	parseCsv,
-	readdirTreeSync,
 	sidepanelMetadataSectionFor,
 	toast,
 	waitForLoadingEnd
@@ -142,37 +139,18 @@ test.describe('correct results.zip', () => {
 		const download = await page.waitForEvent('download');
 		expect(download.suggestedFilename()).toBe('results.zip');
 
-		// FIXME: 'invalid zip data'
-		// const contents = await download
-		// 	.createReadStream()
-		// 	.then((stream) => stream.toArray())
-		// 	.then(({ data }) => new Uint8Array(data))
-		// 	.then((data) => unzipSync(data));
-		// expect(Object.keys(contents)).toMatchObject(['results.json', 'metadata.csv']);
-
-		const resultsDir = path.resolve('./tests/results/correct');
 		await download.saveAs('./tests/results/correct.zip');
-		await extract('./tests/results/correct.zip', { dir: resultsDir });
-		console.info(JSON.stringify(readdirTreeSync(resultsDir), null, 2));
-		expect(readdirTreeSync(resultsDir)).toMatchObject([
-			{
-				Cropped: [
-					expect.stringMatching(/\(Unknown\)_obs\d_4\.jpeg/),
-					expect.stringMatching(/Allacma fusca_obs\d_1\.jpeg/),
-					expect.stringMatching(/Entomobrya muscorum_obs\d_3\.jpeg/),
-					expect.stringMatching(/Orchesella cincta_obs\d_2\.jpeg/)
-				]
-			},
-			{
-				Original: [
-					expect.stringMatching(/\(Unknown\)_obs\d_4\.jpeg/),
-					expect.stringMatching(/Allacma fusca_obs\d_1\.jpeg/),
-					expect.stringMatching(/Entomobrya muscorum_obs\d_3\.jpeg/),
-					expect.stringMatching(/Orchesella cincta_obs\d_2\.jpeg/)
-				]
-			},
+		await expectZipFiles(await yauzl.open('./tests/results/correct.zip'), [
 			'analysis.json',
-			'metadata.csv'
+			'metadata.csv',
+			/^Cropped\/Allacma fusca_obs\d_1\.jpeg$/,
+			/^Original\/Allacma fusca_obs\d_1\.jpeg$/,
+			/^Cropped\/Orchesella cincta_obs\d_2\.jpeg$/,
+			/^Original\/Orchesella cincta_obs\d_2\.jpeg$/,
+			/^Cropped\/Entomobrya muscorum_obs\d_3\.jpeg$/,
+			/^Original\/Entomobrya muscorum_obs\d_3\.jpeg$/,
+			/^Cropped\/\(Unknown\)_obs\d_4\.jpeg$/,
+			/^Original\/\(Unknown\)_obs\d_4\.jpeg$/
 		]);
 	});
 });
@@ -182,7 +160,7 @@ test.describe('missing original photos', () => {
 		await importResults(page, 'no-originals.zip', { waitForLoading: false });
 	});
 
-	test('fails with the appriopriate error message', async ({ page }) => {
+	test('fails with the appropriate error message', async ({ page }) => {
 		await expect(toast(page, 'Aucune image trouvée', { type: 'error' })).toBeVisible();
 	});
 });
@@ -231,55 +209,73 @@ test('can import a .CR2 image', issue(114, 384), async ({ page }) => {
 	await goToTab(page, 'classify');
 	await waitForLoadingEnd(page);
 
-	const resultsDir = await exportResults(page, 'CR2', {
+	const results = await exportResults(page, 'CR2', {
 		kind: 'full'
 	});
 
-	for (const dir of ['Cropped', 'Original']) {
-		expect
-			.soft(
-				readFileSync(path.join(resultsDir, dir, 'Fasciosminthurus quinquefasciatus_1.jpeg'))
-			)
-			.toMatchSnapshot();
-	}
-	expect(parseCsv(readFileSync(path.join(resultsDir, 'metadata.csv'), 'utf-8'))).toMatchObject([
+	await expectZipFiles(
+		await yauzl.open(results),
 		[
-			'Identifiant',
-			'Observation',
-			'Espèce',
-			'Espèce: Confiance',
-			'Genre',
-			'Genre: Confiance',
-			'Famille',
-			'Famille: Confiance',
-			'Ordre',
-			'Ordre: Confiance',
-			'Classe',
-			'Classe: Confiance',
-			'Phylum',
-			'Phylum: Confiance',
-			'Règne',
-			'Règne: Confiance'
+			'analysis.json',
+			'metadata.csv',
+			'Cropped/Fasciosminthurus quinquefasciatus_obs1_1.jpeg',
+			'Original/Fasciosminthurus quinquefasciatus_obs1_1.jpeg'
 		],
-		[
-			expect.any(String),
-			'sample',
-			'Fasciosminthurus quinquefasciatus',
-			expect.stringMatching(/^0\.11/),
-			'Fasciosminthurus',
-			'1',
-			'Bourletiellidae',
-			'1',
-			'Symphypleona',
-			'1',
-			'Collembola',
-			'1',
-			'Arthropoda',
-			'1',
-			'Animalia',
-			'1'
-		]
-	]);
+		{
+			'Cropped/Fasciosminthurus quinquefasciatus_obs1_1.jpeg': {
+				buffer(buf) {
+					expect(buf).toMatchSnapshot({ name: 'CR2 Cropped' });
+				}
+			},
+			'Original/Fasciosminthurus quinquefasciatus_obs1_1.jpeg': {
+				buffer(buf) {
+					expect(buf).toMatchSnapshot({ name: 'CR2 Original' });
+				}
+			},
+			'metadata.csv': {
+				csv(cells) {
+					expect(cells).toMatchObject([
+						[
+							'Identifiant',
+							'Observation',
+							'Espèce',
+							'Espèce: Confiance',
+							'Genre',
+							'Genre: Confiance',
+							'Famille',
+							'Famille: Confiance',
+							'Ordre',
+							'Ordre: Confiance',
+							'Classe',
+							'Classe: Confiance',
+							'Phylum',
+							'Phylum: Confiance',
+							'Règne',
+							'Règne: Confiance'
+						],
+						[
+							expect.any(String),
+							'sample',
+							'Fasciosminthurus quinquefasciatus',
+							expect.stringMatching(/^0\.11/),
+							'Fasciosminthurus',
+							'1',
+							'Bourletiellidae',
+							'1',
+							'Symphypleona',
+							'1',
+							'Collembola',
+							'1',
+							'Arthropoda',
+							'1',
+							'Animalia',
+							'1'
+						]
+					]);
+				}
+			}
+		}
+	);
 });
 
 test('can import a large image', issue(412, 415), async ({ page }) => {

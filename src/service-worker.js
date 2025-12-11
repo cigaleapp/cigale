@@ -2,6 +2,7 @@
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
+
 import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
@@ -17,17 +18,19 @@ const ASSETS = [
 	/^https?:\/\//.test(u)
 );
 
-self.addEventListener('install', (event) => {
+const sw = /** @type {ServiceWorkerGlobalScope} */ (self);
+
+sw.addEventListener('install', (event) => {
 	// Create a new cache and add all files to it
 	async function addFilesToCache() {
 		const cache = await caches.open(CACHE);
 		await cache.addAll(ASSETS);
 	}
 
-	event.waitUntil(addFilesToCache().then(self.skipWaiting()));
+	event.waitUntil(addFilesToCache().then(sw.skipWaiting()));
 });
 
-self.addEventListener('activate', (event) => {
+sw.addEventListener('activate', (event) => {
 	console.info(`Actinvating sw version ${version}`);
 	// Remove previous cached data from disk
 	async function deleteOldCaches() {
@@ -36,10 +39,10 @@ self.addEventListener('activate', (event) => {
 		}
 	}
 
-	event.waitUntil(deleteOldCaches().then(self.clients.claim()));
+	event.waitUntil(deleteOldCaches().then(sw.clients.claim()));
 });
 
-self.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
+sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 	// ignore POST requests etc.
 	if (event.request.method !== 'GET') return;
 

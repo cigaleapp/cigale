@@ -1,14 +1,16 @@
-import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseProtocol,
+	expectZipFiles,
 	exportResults,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
+	readStreamToBuffer,
 	setSettings
 } from './utils';
 
@@ -32,11 +34,16 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 	await page.mouse.click(278, 255);
 	await page.mouse.click(487, 464);
 
-	const resultsDir = await exportResults(page, 'crop-padding', {
+	await page.getByRole('button', { name: 'Autres photos Esc' }).click();
+
+	const resultsFilepath = await exportResults(page, 'crop-padding', {
 		cropPadding: '40px'
 	});
 
-	expect(await readdir(path.join(resultsDir, 'Cropped'))).toContain('(Unknown)_obs1_1.png');
-
-	expect(await readFile(path.join(resultsDir, 'Cropped/(Unknown)_obs1_1.png'))).toMatchSnapshot();
+	const zip = await yauzl.open(resultsFilepath);
+	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
+		'Cropped/(Unknown)_obs1_1.png': {
+			buffer: async (buf) => expect(buf).toMatchSnapshot()
+		}
+	});
 });

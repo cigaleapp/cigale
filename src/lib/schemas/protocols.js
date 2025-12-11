@@ -196,7 +196,12 @@ export const Protocol = type({
 	exports: type({
 		images: type({
 			cropped: FilepathTemplate.describe('Chemins des images recadrées'),
-			original: FilepathTemplate.describe('Chemins des images originales')
+			original: FilepathTemplate.describe('Chemins des images originales'),
+			'mtime?': [
+				'string',
+				'@',
+				'Métadonnée à utiliser pour la date de modification des fichiers exportés'
+			]
 		}).describe(
 			`Chemins où sauvegarder les images. Vous pouvez utiliser {{observation.metadata.identifiant.value}} pour insérer la valeur d'une métadonnée, {{image.filename}} pour le nom de fichier, {{observation.label}} pour le label (nom) de l'observation, et {{sequence}} pour un numéro d'image, commençant à 1. {{observation.metadata.identifiant.valueLabel}} peut être pratique pour obtenir le label associé au choix d'une métadonnée de type 'enum'. Enfin, il est possible de faire {{suffix image.filename "_exemple"}} pour ajouter "_exemple" à la fin d'un nom de fichier, mais avant son extension (par exemple: {{suffix image.filename "_cropped"}} donnera "IMG_1245_cropped.JPEG" si l'image avait pour nom de fichier "IMG_12345.JPEG"); Vous pouvez faire {{extension image.filename}} pour avoir l'extension d'un fichier, et {{fallback image.metadata.exemple "(Inconnnu)"}} pour utiliser "(Inconnu)" si image.metadata.example n'existe pas. Ce sont enfait des templates Handlebars, en savoir plus: https://handlebarsjs.com/guide/`
 		),

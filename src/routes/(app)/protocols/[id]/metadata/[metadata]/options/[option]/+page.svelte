@@ -8,6 +8,7 @@
 	import IconTrash from '~icons/ri/delete-bin-line';
 	import IconOpenInExternal from '~icons/ri/external-link-fill';
 	import IconImage from '~icons/ri/image-2-line';
+	import IconRemove from '~icons/ri/indeterminate-circle-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -47,6 +48,7 @@
 				})}
 			/>
 		</Field>
+
 		<Field label="Description">
 			<textarea
 				rows="10"
@@ -91,6 +93,53 @@
 		{/if}
 	</div>
 </div>
+
+<h3>Synonymes</h3>
+<p>
+	Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un
+	synonyme.
+</p>
+
+<ul class="synonyms">
+	{#each data.option.synonyms ?? [] as synonym, i (i)}
+		<li>
+			<InlineTextInput
+				value={synonym}
+				label="Synonyme"
+				discreet
+				onblur={updater((o, value) => {
+					if (value) {
+						o.synonyms[i] = value;
+					} else {
+						o.synonyms.splice(i, 1);
+					}
+				})}
+			/>
+			<ButtonIcon
+				help="Supprimer le synonyme"
+				onclick={updater((o) => {
+					o.synonyms.splice(i, 1);
+				})}
+			>
+				<IconRemove />
+			</ButtonIcon>
+		</li>
+	{/each}
+	<li class="new">
+		<InlineTextInput
+			label="Synonyme"
+			placeholder="Ajouter un synonyme"
+			discreet
+			onblur={updater((o, value) => {
+				if (!value) return;
+				if (!o.synonyms) {
+					o.synonyms = [];
+				}
+				o.synonyms.push(value);
+			})}
+		/>
+	</li>
+</ul>
 
 <h3>Cascades</h3>
 <p>
@@ -218,6 +267,21 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+
+	ul.synonyms {
+		list-style: none;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1rem;
+
+		li {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			margin: 0;
+		}
 	}
 
 	.right img {

@@ -4,14 +4,14 @@
 		"src/lib/schemas/*",
 		"src/lib/utils.js",
 		"src/lib/exiffields.js",
-		"tests/**",
 		"src/app.d.ts",
+		"tests/ambiant.d.ts",
 		"src/lib/Checkbox.svelte",
 		"src/lib/Dropzone.svelte",
 		"src/lib/FloatingButton.svelte",
-		"src/locales/*.js"
+		"src/lib/UnsavedChangesIndicator.svelte",
+		"src/locales/**/*.js"
 	],
-	"ignoreBinaries": ["node-modules-inspector", "msgcat"],
 	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector"],
 	"entry": [
 		"scripts/*.js",
@@ -20,13 +20,16 @@
 		"forge.config.js",
 		"forge.env.d.ts",
 		"vite.electron*.config.js",
-		"wuchale.config.js"
+		"wuchale.config.js",
+		"tests/*.spec.js",
+		"tests/tasks/*.spec.js"
 	],
 	"paths": {
 		"~icons/*": ["node_modules/unplugin-icons/types/svelte5.d.ts"],
 		"$lib/*": ["src/lib/*"],
 		"$locales/*": ["src/locales/*"],
 		"$worker/*": ["src/worker/*"],
+		"$routes/*": ["src/routes/*"],
 		"$service-worker": ["node_modules/@sveltejs/kit/types/index.d.ts"],
 		"$app/types": [".svelte-kit/non-ambient.d.ts"]
 	},

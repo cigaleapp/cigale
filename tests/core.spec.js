@@ -1,7 +1,6 @@
-import * as fs from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import extract from 'extract-zip';
+import * as yauzl from 'yauzl-promise';
 
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
@@ -11,6 +10,7 @@ import { expect, test } from './fixtures.js';
 import {
 	chooseInDropdown,
 	chooseProtocol,
+	expectZipFiles,
 	exportResults,
 	firstObservationCard,
 	goToTab,
@@ -19,7 +19,6 @@ import {
 	makeRegexpUnion,
 	mockProtocolSourceURL,
 	modal,
-	readdirTreeSync,
 	setSettings,
 	waitForLoadingEnd
 } from './utils.js';
@@ -105,37 +104,45 @@ for (const offline of [false, true]) {
 			await firstObservationCard(page).click();
 			await expect(page.getByText('Espèce')).toBeVisible();
 
-			// Results
-			const resultsDir = await exportResults(page, 'lil-fella', {
-				kind: 'full'
-			});
-
-			expect(readdirTreeSync(resultsDir)).toMatchObject([
-				{ Cropped: ['Entomobrya muscorum_obs1_1.jpeg'] },
-				{ Original: ['Entomobrya muscorum_obs1_1.jpeg'] },
-				'analysis.json',
-				'metadata.csv'
-			]);
-
-			const csv = fs.readFileSync(path.join(resultsDir, 'metadata.csv'), 'utf8');
-			expect(csv.split('\n')).toHaveLength(2);
-
-			const firstLine = csv.split('\n')[0];
-			expect(firstLine).toBe(
-				'"Identifiant";"Observation";"Date";"Date: Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"'
+			// Export results
+			const results = await exportResults(page, 'lil-fella', { kind: 'full' });
+			await expectZipFiles(
+				await yauzl.open(results),
+				[
+					'analysis.json',
+					'metadata.csv',
+					'Cropped/Entomobrya muscorum_obs1_1.jpeg',
+					'Original/Entomobrya muscorum_obs1_1.jpeg'
+				],
+				{
+					'analysis.json': {
+						json(data) {
+							expect.soft(Analysis.allows(data)).toBe(true);
+						}
+					},
+					'metadata.csv': {
+						text(txt) {
+							const lines = txt.split('\n');
+							expect(lines).toHaveLength(2);
+							expect
+								.soft(lines.at(0))
+								.toBe(
+									'"Identifiant";"Observation";"Date";"Date: Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"'
+								);
+						}
+					},
+					'Cropped/Entomobrya muscorum_obs1_1.jpeg': {
+						buffer(buf) {
+							expect.soft(buf).toMatchSnapshot({ maxDiffPixelRatio: 0.01 });
+						},
+						entry(entry) {
+							expect
+								.soft(entry.getLastMod().toISOString())
+								.toEqual('2025-04-25T12:38:36.000Z');
+						}
+					}
+				}
 			);
-
-			const analysis = JSON.parse(
-				fs.readFileSync(path.join(resultsDir, 'analysis.json'), 'utf8')
-			);
-			expect(Analysis.allows(analysis)).toBe(true);
-
-			const image = fs.readFileSync(
-				path.join(resultsDir, 'Cropped', 'Entomobrya muscorum_obs1_1.jpeg')
-			);
-			expect(image).toMatchSnapshot({
-				maxDiffPixelRatio: 0.01
-			});
 		}
 	);
 }

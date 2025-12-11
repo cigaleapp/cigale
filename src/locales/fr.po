@@ -142,6 +142,8 @@ msgid "Analyse…"
 msgstr "Analyse…"
 
 #: src/lib/toasts.svelte.js
+#: src/lib/undo.svelte.js
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
@@ -266,6 +268,7 @@ msgstr "Chargement du modèle de classification"
 msgid "Chargement du modèle de recadrage…"
 msgstr "Chargement du modèle de recadrage…"
 
+#: src/routes/(app)/+layout.js
 #: src/routes/(app)/+layout.js
 msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
@@ -400,6 +403,7 @@ msgstr "Erreur"
 #: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
+#: src/routes/(app)/+layout.js
 msgid "Erreur inattendue"
 msgstr "Erreur inattendue"
 
@@ -409,6 +413,8 @@ msgid "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 msgstr "Erreur lors de l'extraction des métadonnées EXIF pour {0}"
 
 #. placeholder {0}: e
+#. placeholder {0}: error
+#: src/routes/(app)/RemoteProtocolImporter.svelte
 #: src/routes/(app)/RemoteProtocolImporter.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Erreur lors de l'import du protocole distant: {0}"
@@ -628,6 +634,7 @@ msgid "Nom de l'observation"
 msgstr "Nom de l'observation"
 
 #: src/lib/MetadataInput.svelte
+#: src/lib/metadata.js
 msgid "Non"
 msgstr "Non"
 
@@ -641,6 +648,7 @@ msgid "Oops!"
 msgstr "Oops!"
 
 #: src/lib/MetadataInput.svelte
+#: src/lib/metadata.js
 msgid "Oui"
 msgstr "Oui"
 
@@ -1052,14 +1060,9 @@ msgid "<0/> utilise déjà cet identifiant"
 msgstr "<0/> utilise déjà cet identifiant"
 
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+#: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "Créer"
 msgstr "Créer"
-
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "Protocole modifié par rapport à la version publiée"
-msgstr "Protocole modifié par rapport à la version publiée"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Modifier (beta)"
@@ -1145,13 +1148,11 @@ msgstr "Stockage des boîtes"
 msgid "Boîtes de recadrage stockées dans cette métadonnée"
 msgstr "Boîtes de recadrage stockées dans cette métadonnée"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+#: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "<0/> Voir"
 msgstr "<0/> Voir"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
+#: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "<0/> Aucune métadonnée"
 msgstr "<0/> Aucune métadonnée"
 
@@ -1275,10 +1276,6 @@ msgstr "Protocole {0}: Export"
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Aucune configuration d'exports trouvée pour ce protocole."
 msgstr "Aucune configuration d'exports trouvée pour ce protocole."
-
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
-msgid "Structure des exports .zip"
-msgstr "Structure des exports .zip"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Résultats.zip"
@@ -1759,6 +1756,176 @@ msgstr "Suppprimer tout les éléments de ce groupe"
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Numéro de l'image dans l'observation, commençant à 1."
 msgstr "Numéro de l'image dans l'observation, commençant à 1."
+
+#: src/lib/MetadataCombobox.svelte
+msgid "Aussi connu sous le nom de"
+msgstr "Aussi connu sous le nom de"
+
+#: src/lib/MetadataCombobox.svelte
+msgid "AKA"
+msgstr "AKA"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Synonymes"
+msgstr "Synonymes"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid ""
+"Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
+"synonyme."
+msgstr ""
+"Autres noms possibles pour cette option. Permet de trouver l'option en cherchant avec un\n"
+"synonyme."
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Synonyme"
+msgstr "Synonyme"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Supprimer le synonyme"
+msgstr "Supprimer le synonyme"
+
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+msgid "Ajouter un synonyme"
+msgstr "Ajouter un synonyme"
+
+#: src/routes/(app)/+layout.svelte
+msgid "L’application a été mise à jour."
+msgstr "L’application a été mise à jour."
+
+#: src/routes/(app)/+layout.svelte
+msgid "Une mise à jour est disponible."
+msgstr "Une mise à jour est disponible."
+
+#: src/routes/(app)/+layout.svelte
+msgid "Recharger"
+msgstr "Recharger"
+
+#: src/routes/(app)/about/+page.svelte
+msgid "Appli"
+msgstr "Appli"
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Exports .zip"
+msgstr "Exports .zip"
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Dates de modification"
+msgstr "Dates de modification"
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Métadonnée à utiliser pour la date de modification des fichers images"
+msgstr "Métadonnée à utiliser pour la date de modification des fichers images"
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "La date d'export sera utilisée comme date de modification des fichiers images"
+msgstr "La date d'export sera utilisée comme date de modification des fichiers images"
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Arborescence"
+msgstr "Arborescence"
+
+#: src/lib/undo.svelte.js
+#: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+msgid "Rétablir"
+msgstr "Rétablir"
+
+#. placeholder {0}: filename
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
+msgstr "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
+
+#. placeholder {0}: error
+#: src/routes/(app)/DownloadResults.svelte
+msgid "Erreur lors de l'exportation des résultats: {0}"
+msgstr "Erreur lors de l'exportation des résultats: {0}"
+
+#. placeholder {0}: shortId
+#: src/routes/(app)/protocols/[id]/+layout.svelte
+msgid "Métadonnée {0} créée"
+msgstr "Métadonnée {0} créée"
+
+#. placeholder {0}: err.summary
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
+#: src/routes/(app)/protocols/[id]/updater.svelte.js
+msgid "Valeur invalide : {0}"
+msgstr "Valeur invalide : {0}"
+
+#: src/lib/metadata.js
+msgid "Yes"
+msgstr "Yes"
+
+#: src/lib/metadata.js
+msgid "No"
+msgstr "No"
+
+#: src/lib/metadata.js
+msgid "Ppp"
+msgstr "Ppp"
+
+#. placeholder {0}: x1
+#. placeholder {1}: y1
+#. placeholder {2}: x1 + w
+#. placeholder {3}: y1 + h
+#: src/lib/metadata.js
+msgid "Boîte de ({0}, {1}) à ({2}, {3})"
+msgstr "Boîte de ({0}, {1}) à ({2}, {3})"
+
+#. placeholder {0}: x1
+#. placeholder {1}: y1
+#. placeholder {2}: x1 + w
+#. placeholder {3}: y1 + h
+#: src/lib/metadata.js
+msgid "Box from ({0}, {1}) to ({2}, {3})"
+msgstr "Box from ({0}, {1}) to ({2}, {3})"
+
+#: src/lib/metadata.js
+msgid "Date"
+msgstr "Date"
+
+#: src/routes/(app)/+layout.js
+msgid "Initialisation de la base de données…"
+msgstr "Initialisation de la base de données…"
+
+#: src/routes/(app)/+layout.js
+msgid "Chargement des données intégrées…"
+msgstr "Chargement des données intégrées…"
+
+#: src/routes/(app)/+layout.js
+msgid "Analyse"
+msgstr "Analyse"
+
+#: src/routes/(app)/+layout.js
+msgid "Filtrage des métadonnées intégrées"
+msgstr "Filtrage des métadonnées intégrées"
+
+#: src/routes/(app)/+layout.js
+msgid "Validation"
+msgstr "Validation"
+
+#: src/routes/(app)/+layout.js
+msgid "Écriture du protocole"
+msgstr "Écriture du protocole"
+
+#. placeholder {0}: detail
+#: src/routes/(app)/+layout.js
+msgid "Écriture de la métadonnée<br>{0}"
+msgstr "Écriture de la métadonnée<br>{0}"
+
+#. placeholder {0}: detail
+#: src/routes/(app)/+layout.js
+msgid "Écriture des options de la métadonnée<br>{0}"
+msgstr "Écriture des options de la métadonnée<br>{0}"
+
+#: src/routes/(app)/+layout.js
+msgid "Post-validation"
+msgstr "Post-validation"
+
+#: src/routes/(app)/+layout.js
+msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
+msgstr "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

@@ -152,6 +152,9 @@ export const MetadataMergeMethod = type.or(
 export const MetadataEnumVariant = type({
 	key: [ID, '@', 'Identifiant unique pour cette option'],
 	label: ['string', '@', "Nom de l'option, affichable dans une interface utilisateur"],
+	synonyms: type('string[]')
+		.describe('Synonymes (labels alternatifs) pour cette option')
+		.default(() => []),
 	description: ['string', '@', 'Description (optionnelle) de cette option'],
 	'image?': URLString,
 	'learnMore?': URLString.describe(
