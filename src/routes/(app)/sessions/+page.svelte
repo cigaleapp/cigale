@@ -32,7 +32,7 @@
 
 		const { id } = await tables.Session.add({
 			name: `Session du ${Intl.DateTimeFormat().format(new Date())}`,
-			description: defaultProtocol.id,
+			description: '',
 			protocol: tables.Protocol.state[0]?.id,
 			createdAt: new Date().toISOString(),
 			openedAt: new Date().toISOString(),
