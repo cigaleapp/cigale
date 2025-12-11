@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
 
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true

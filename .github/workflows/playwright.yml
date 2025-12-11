@@ -8,6 +8,9 @@ on:
         description: Name of artifact to download built app from.
         required: true
 
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+
 jobs:
   test:
     timeout-minutes: 12

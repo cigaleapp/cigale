@@ -1,5 +1,8 @@
 name: Build
 
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+
 on:
   workflow_call:
     inputs:

@@ -4,6 +4,9 @@ on:
   workflow_call:
     inputs: {}
 
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+
 jobs:
   compare:
     runs-on: ubuntu-latest
