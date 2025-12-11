@@ -82,7 +82,10 @@ export async function importResultsZip(file, id) {
 			createdAt: new Date().toISOString(),
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			openedAt: new Date().toISOString(),
-			metadata: session.metadata ?? {}
+			metadata: mapValues(session.metadata ?? {}, ({ value, ...rest }) => ({
+				...rest,
+				value: serializeMetadataValue(value)
+			}))
 		});
 
 		await switchSession(newSession.id);
