@@ -1,6 +1,7 @@
 <script>
+	import { plural } from '$lib/i18n.js';
 	import { openTransaction, tables } from '$lib/idb.svelte.js';
-	import ModalConfirm from '$lib/ModalConfirm.svelte';
+	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
 	import { isNamespacedToProtocol } from '$lib/schemas/metadata';
 	import { toasts } from '$lib/toasts.svelte';
 
@@ -13,14 +14,24 @@
 	 * Protocol we're confirming deletion for
 	 */
 	let removingProtocol = $derived(tables.Protocol.getFromState(id));
+
+	/**
+	 * Sessions that use this protocol
+	 */
+	const sessionsUsingProtocol = $derived(tables.Session.state.filter((s) => s.protocol === id));
 </script>
 
-<ModalConfirm
-	title="Êtes-vous sûr·e?"
-	key="modal_delete_protocol"
+<ModalConfirmDeletion
+	button={null}
 	bind:open
-	cancel="Annuler"
-	confirm="Oui, supprimer"
+	key="modal_delete_protocol"
+	typeToConfirm={removingProtocol?.name}
+	consequences={[
+		plural(sessionsUsingProtocol.length, [
+			"L'impossibilité d'utiliser 1 session",
+			"L'impossibilité d'utiliser # sessions"
+		])
+	]}
 	onconfirm={async () => {
 		await openTransaction(['Protocol', 'Metadata', 'MetadataOption'], {}, async (tx) => {
 			if (!removingProtocol) return;
@@ -43,6 +54,4 @@
 		toasts.success('Protocole supprimé');
 		ondelete?.();
 	}}
->
-	Il est impossible de revenir en arrière après avoir supprimé un protocole.
-</ModalConfirm>
+/>

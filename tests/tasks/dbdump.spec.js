@@ -1,14 +1,16 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import JSZip from 'jszip';
 
-import { expect, test } from '../fixtures.js';
+import { exampleProtocol, expect, test } from '../fixtures.js';
 import {
+	confirmDeletionModal,
 	dumpDatabase,
 	goToProtocolManagement,
 	goToTab,
 	importPhotos,
 	importProtocol,
 	importResults,
+	modal,
 	newSession,
 	sessionMetadataSectionFor
 } from '../utils.js';
@@ -32,10 +34,10 @@ test.describe('Database dumps', () => {
 		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 		await page
 			.getByRole('listitem')
-			.filter({ hasText: 'io.github.cigaleapp.arthropods.example.light' })
+			.filter({ hasText: exampleProtocol.id })
 			.getByRole('button', { name: 'Supprimer' })
 			.click();
-		await page.getByRole('button', { name: 'Oui, supprimer' }).click();
+		await confirmDeletionModal(page, { type: exampleProtocol.name });
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
 		await newSession(page);
 

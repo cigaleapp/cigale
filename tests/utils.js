@@ -724,11 +724,30 @@ export async function mockProtocolSourceURL(page, context, source, mockedResult)
  */
 export function modal(page, modalTitle) {
 	return page.getByRole('dialog').filter({
+		visible: true,
 		has: page.getByRole('banner').getByRole('heading', {
 			name: modalTitle,
 			exact: true
 		})
 	});
+}
+
+/**
+ * Expects an open deletion confirmation modal, and confirms deletion
+ * @param {Page} page
+ * @param {object} [opts]
+ * @param {string} [opts.type] text to type before hitting confirm button
+ * @param {string} [opts.title='Êtes-vous sûr·e?'] title of the modal
+ */
+export async function confirmDeletionModal(page, { type, title = 'Êtes-vous sûr·e?' } = {}) {
+	const deletionModal = modal(page, title);
+	await expect(deletionModal).toBeVisible();
+
+	if (type) {
+		const textbox = deletionModal.getByRole('textbox');
+		await textbox.fill(type);
+	}
+	await deletionModal.getByRole('button', { name: 'Oui, supprimer' }).click();
 }
 
 /**
