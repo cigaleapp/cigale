@@ -835,8 +835,13 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 }
 
 /**
+ * @typedef {{ body: Buffer<ArrayBufferLike>, filename: string }} PredownloadedModel
+ */
+
+/**
  *
  * @param {string} filename
+ * @returns {Promise<PredownloadedModel|null>}
  */
 export async function getPredownloadedModel(filename) {
 	const body = await readFile(filename).catch(() => {
@@ -846,7 +851,7 @@ export async function getPredownloadedModel(filename) {
 		return null;
 	});
 
-	return { body, filename };
+	return body ? { body, filename } : null;
 }
 
 /**
@@ -854,7 +859,7 @@ export async function getPredownloadedModel(filename) {
  * @param {import('@playwright/test').BrowserContext} context
  * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
  * @param {{metadata: string} | 'detection'} task
- * @param {{ body: Buffer<ArrayBufferLike>, filename: string }} model
+ * @param {PredownloadedModel} model
  */
 async function mockPredownloadedModel(page, context, protocol, task, { filename, body }) {
 	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural']} arg0 */
@@ -877,7 +882,7 @@ async function mockPredownloadedModel(page, context, protocol, task, { filename,
  * @param {Page} page
  * @param {import('@playwright/test').BrowserContext} context
  * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
- * @param {Record<'detection'|'species', Array<null | { body: Buffer<ArrayBufferLike>, filename: string }>>} models
+ * @param {Record<'detection'|'species', Array<null | PredownloadedModel>>} models
  */
 export async function mockPredownloadedModels(page, context, protocol, models) {
 	for (const [task, taskModels] of Object.entries(models)) {

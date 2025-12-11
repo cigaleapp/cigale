@@ -10,24 +10,44 @@ import {
 	setHardwareConcurrency
 } from './utils';
 
-const classification80Model = await getPredownloadedModel('model_classif.onnx');
-const classification17kModel = await getPredownloadedModel(
-	'classification-arthropoda-polymny-2025-04-11.onnx'
-);
-const detectionModel = await getPredownloadedModel('arthropod_detector_yolo11n_conf0.437.onnx');
+/**
+ * @type {import('./utils').PredownloadedModel|null}
+ */
+let classification80Model = null;
+/**
+ * @type {import('./utils').PredownloadedModel|null}
+ */
+let classification17kModel = null;
+/**
+ * @type {import('./utils').PredownloadedModel|null}
+ */
+let detectionModel = null;
 
 /**
  * @import { Fixtures, TestType, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
  */
 
 /**
- * @type {TestType<{ forEachTest: void } & PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions >}
+ * @type {TestType<{ forEachTest: void} & PlaywrightTestArgs & PlaywrightTestOptions, { forEachWorker: void  } & PlaywrightWorkerArgs & PlaywrightWorkerOptions >}
  */
 export const test = base.extend(
 	/**
-	 * @type {Fixtures<{forEachTest: void}, {}, PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
+	 * @type {Fixtures<{forEachTest: void}, {forEachWorker: void}, PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
 	 */
 	({
+		forEachWorker: [
+			async ({}, use) => {
+				classification80Model = await getPredownloadedModel('model_classif.onnx');
+				classification17kModel = await getPredownloadedModel(
+					'classification-arthropoda-polymny-2025-04-11.onnx'
+				);
+				detectionModel = await getPredownloadedModel(
+					'arthropod_detector_yolo11n_conf0.437.onnx'
+				);
+				await use();
+			},
+			{ scope: 'worker', auto: true }
+		],
 		forEachTest: [
 			async ({ page, context }, use, { tags, annotations }) => {
 				// https://playwright.dev/docs/service-workers-experimental
