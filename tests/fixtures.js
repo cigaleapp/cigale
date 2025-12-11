@@ -1,20 +1,20 @@
-import { mkdir, readFile, rm } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import { test as base } from '@playwright/test';
 
 import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import { mockProtocolSourceURL, mockUrl, setHardwareConcurrency } from './utils';
+import {
+	getPredownloadedModel,
+	mockPredownloadedModel,
+	mockProtocolSourceURL,
+	setHardwareConcurrency
+} from './utils';
 
 export { exampleProtocol };
 
-const classificationArthropodaModel = await readFile(
+const classificationArthropodaModel = await getPredownloadedModel(
 	'classification-arthropoda-polymny-2025-04-11.onnx'
-).catch(() => {
-	console.warn(
-		`Warning: cannot find 'classification-arthropoda-polymny-2025-04-11.onnx' model file. Tests will use the network to fetch it.`
-	);
-	return null;
-});
+);
 
 // Make exampleProtocol lightweight by cutting out 90% of metadata options
 
@@ -45,9 +45,13 @@ export const test = base.extend(
 				}
 
 				if (classificationArthropodaModel !== null) {
-					await mockUrl(page, context, defaultProtocol.crop.infer[0].model, {
-						body: classificationArthropodaModel
-					});
+					await mockPredownloadedModel(
+						page,
+						context,
+						defaultProtocol,
+						{ metadata: 'species' },
+						classificationArthropodaModel
+					);
 				}
 
 				const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;

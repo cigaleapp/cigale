@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect } from '@playwright/test';
 
@@ -629,7 +629,7 @@ export async function expectTooltipContent(page, locator, content) {
  * @param {string | RegExp | ((u: URL) => boolean)} url
  * @param {{json: object} | {body: string | Buffer}} result
  */
-export async function mockUrl(page, context, url, result) {
+async function mockUrl(page, context, url, result) {
 	await Promise.all(
 		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
 		[context, page].map(async (target) =>
@@ -832,4 +832,43 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 			expectedFile instanceof RegExp ? expect.stringMatching(expectedFile) : expectedFile
 		);
 	}
+}
+
+/**
+ *
+ * @param {string} filename
+ */
+export async function getPredownloadedModel(filename) {
+	const body = await readFile(filename).catch(() => {
+		console.warn(
+			`Warning: cannot find '${filename}' model file. Tests will use the network to fetch it.`
+		);
+		return null;
+	});
+
+	return { body, filename };
+}
+
+/**
+ * @param {Page} page
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
+ * @param {{metadata: string} | 'detection'} task
+ * @param {{ body: Buffer<ArrayBufferLike>, filename: string }} model
+ */
+export async function mockPredownloadedModel(page, context, protocol, task, { filename, body }) {
+	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural']} arg0 */
+	const modelMatches = ({ model }) =>
+		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
+
+	const url =
+		task === 'detection'
+			? protocol.crop.infer?.find(modelMatches)?.model
+			: protocol.metadata[`${protocol.id}__${task.metadata}`].infer?.neural.find(modelMatches)
+					?.model;
+
+	console.info(
+		`Using pre-downloaded model ${filename} for ${task === 'detection' ? 'detection' : task.metadata}`
+	);
+	await mockUrl(page, context, url, { body });
 }
