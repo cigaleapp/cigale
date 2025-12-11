@@ -330,6 +330,8 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 export async function newSession(page, { name, protocol, models = {} } = {}) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
+	// XXX: Wait until page is ready
+	await page.waitForTimeout(500);
 
 	await page.getByTestId('new-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
