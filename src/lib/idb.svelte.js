@@ -90,7 +90,10 @@ function wrangler(table) {
 		get: async (key) => get(table, key),
 		/** @param {string} key  */
 		getFromState: (key) => _tablesState[table].find((item) => item.id === key),
-		/** @param {typeof Tables[Table]['inferIn']} value */
+		/**
+		 * @param {typeof Tables[Table]['inferIn']} value
+		 * @returns {Promise<typeof Tables[Table]['inferOut']>}
+		 */
 		async set(value) {
 			await set(table, value);
 			const output = Tables[table].assert(value);
@@ -141,7 +144,10 @@ function wrangler(table) {
 
 			return true;
 		},
-		/** @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value */
+		/**
+		 * @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value
+		 * @returns {Promise<typeof Tables[Table]['inferOut']>}
+		 */
 		async add(value) {
 			return this.set(
 				// @ts-ignore
