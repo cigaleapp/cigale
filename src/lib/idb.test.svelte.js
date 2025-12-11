@@ -55,7 +55,7 @@ test('nukeDatabase', async () => {
 	const db = await openDatabase();
 	await db.put('ImageFile', {
 		id: 'flint and steel',
-		sessionId: 'testing',	
+		sessionId: 'testing',
 		bytes: new ArrayBuffer(),
 		filename: 'ha',
 		contentType: 'image/png',
@@ -359,15 +359,50 @@ describe('wrangler', () => {
 			Settings: []
 		});
 	});
-	test('refresh', async () => {
-		await idb.set('Observation', observation(0));
-		await tables.initialize('testing');
-		expect(tables.Observation.state).toHaveLength(1);
-		await idb.set('Observation', observation(1));
-		await idb.set('Observation', observation(2));
-		expect(tables.Observation.state).toHaveLength(1);
-		await tables.Observation.refresh('testing');
-		expect(tables.Observation.state).toHaveLength(3);
+	describe('refresh', () => {
+		test('with session', async () => {
+			await idb.set('Observation', observation(0));
+			await tables.initialize('testing');
+			expect(tables.Observation.state).toHaveLength(1);
+			await idb.set('Observation', observation(1));
+			await idb.set('Observation', observation(2));
+			expect(tables.Observation.state).toHaveLength(1);
+			await tables.Observation.refresh('testing');
+			expect(tables.Observation.state).toHaveLength(3);
+		});
+
+		test('with another session', async () => {
+			await idb.set('Observation', observation(0));
+			await tables.initialize('testing');
+			expect(tables.Observation.state).toHaveLength(1);
+			await idb.set('Observation', observation(1));
+			await idb.set('Observation', observation(2));
+			await tables.Observation.refresh('anotherSession');
+			expect(tables.Observation.state).toHaveLength(0);
+		});
+
+		test('without session', async () => {
+			await idb.set('Metadata', {
+				id: 'test',
+				label: 'Test',
+				description: '',
+				mergeMethod: 'none',
+				required: false,
+				type: 'string'
+			});
+
+			await idb.set('Observation', observation(0));
+
+			await tables.initialize('testing');
+			expect(tables.Metadata.state).toHaveLength(1);
+			expect(tables.Observation.state).toHaveLength(1);
+
+			await tables.Observation.refresh(null);
+			expect(tables.Observation.state).toHaveLength(0);
+
+			await tables.Metadata.refresh(null);
+			expect(tables.Metadata.state).toHaveLength(1);
+		});
 	});
 
 	describe('individual tables', () => {
