@@ -339,7 +339,9 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 	}
 
 	if (name) {
-		await page.getByRole('textbox', { name: 'Nom de la session' }).fill(name);
+		const textbox = page.getByRole('textbox', { name: 'Nom de la session' });
+		await textbox.fill(name);
+		await textbox.blur();
 	}
 
 	await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
