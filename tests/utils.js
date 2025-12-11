@@ -506,7 +506,7 @@ const appNavTabs = (lang = 'fr') => ({
  * @param {import('$lib/i18n').Language} [options.language=fr]
  */
 export async function goToTab(page, tabName, { waitForModel = true, language = 'fr' } = {}) {
-	getTab(page, tabName).click();
+	await getTab(page, tabName).click();
 	const tab = appNavTabs(language)[tabName];
 	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
 
