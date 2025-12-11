@@ -96,7 +96,7 @@ class UIState {
 	/**
 	 * @param {string | null} id
 	 */
-	async switchSession(id) {
+	async setCurrentSession(id) {
 		if (id === null) {
 			localStorage.removeItem('currentSessionId');
 		} else {
@@ -104,9 +104,6 @@ class UIState {
 			localStorage.setItem('currentSessionId', id);
 		}
 
-		this.clearPreviewURLs();
-		undo.clear();
-		await tables.initialize(id);
 		this._currentSessionId = id;
 	}
 

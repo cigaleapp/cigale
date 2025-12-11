@@ -19,6 +19,7 @@
 	import { resolve } from '$lib/paths';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
+	import { switchSession } from '$lib/sessions';
 	import { getSettings, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
@@ -169,7 +170,7 @@
 					onclick={async () => {
 						if (uiState.currentSession) {
 							await goto('/(app)/sessions');
-							await uiState.switchSession(null);
+							await switchSession(null);
 						} else {
 							await goto('/');
 						}

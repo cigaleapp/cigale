@@ -46,6 +46,7 @@
 
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
+	import { switchSession } from '$lib/sessions';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
@@ -59,7 +60,7 @@
 			return pick(uiState, 'currentSessionId');
 		},
 		async restore({ currentSessionId }) {
-			await uiState.switchSession(currentSessionId);
+			await switchSession(currentSessionId);
 		}
 	};
 

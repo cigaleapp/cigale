@@ -6,6 +6,7 @@ import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images.js';
 import { serializeMetadataValue } from './metadata.js';
 import { Analysis } from './schemas/exports.js';
 import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
+import { switchSession } from './sessions.js';
 import { uiState } from './state.svelte.js';
 import { toasts } from './toasts.svelte.js';
 import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils';
@@ -84,7 +85,7 @@ export async function importResultsZip(file, id) {
 			metadata: session.metadata ?? {}
 		});
 
-		await uiState.switchSession(newSession.id);
+		await switchSession(newSession.id);
 
 		sessionToUse = newSession;
 	} else if (uiState.currentSession.protocol !== session.protocol) {

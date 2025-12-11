@@ -1,6 +1,9 @@
 import * as idb from '$lib/idb.svelte.js';
 
-import { imageIdToFileId } from './images';
+import { imageIdToFileId } from './images.js';
+import { withQueue } from './queue.svelte.js';
+import { uiState } from './state.svelte.js';
+import { undo } from './undo.svelte.js';
 
 /**
  *
@@ -28,4 +31,14 @@ export async function deleteSession(sessionId) {
 			}
 		}
 	);
+}
+
+/**
+ * @param {string} id id of the session to switch to
+ */
+export async function switchSession(id) {
+	uiState.setCurrentSession(id);
+	uiState.clearPreviewURLs();
+	undo.clear();
+	await idb.tables.initialize(id);
 }

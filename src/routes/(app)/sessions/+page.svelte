@@ -13,6 +13,7 @@
 	import { goto } from '$lib/paths.js';
 	import { importMore } from '$lib/queue.svelte';
 	import { seo } from '$lib/seo.svelte';
+	import { switchSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
@@ -53,7 +54,7 @@
 						multiple: false
 					});
 
-					await uiState.switchSession(null);
+					await switchSession(null);
 					importMore(zipfile);
 					await goto('/import');
 				}}
@@ -79,7 +80,7 @@
 				--card-border={uiState.currentSessionId === id ? 'var(--bg-primary)' : ''}
 				tooltip="Ouvrir la session"
 				onclick={async () => {
-					await uiState.switchSession(id);
+					await switchSession(id);
 					// TODO remember last viewed page in session
 					await goto('/import');
 				}}

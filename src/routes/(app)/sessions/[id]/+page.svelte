@@ -13,7 +13,7 @@
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { goto } from '$lib/paths.js';
-	import { deleteSession } from '$lib/sessions.js';
+	import { deleteSession, switchSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
 
@@ -52,7 +52,7 @@
 			</ButtonSecondary>
 			<ButtonSecondary
 				onclick={async () => {
-					await uiState.switchSession(data.session.id);
+					await switchSession(data.session.id);
 					await goto('/import');
 				}}
 			>
@@ -131,7 +131,7 @@
 	<ButtonPrimary
 		loading
 		onclick={async () => {
-			await uiState.switchSession(data.session.id);
+			await switchSession(data.session.id);
 			await goto(`/import`);
 		}}
 	>
