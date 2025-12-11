@@ -110,6 +110,7 @@
 							if (v !== undefined) {
 								await storeMetadataValue({
 									db: databaseHandle(),
+									manuallyModified: true,
 									subjectId: data.session.id,
 									metadataId: def.id,
 									value: v
