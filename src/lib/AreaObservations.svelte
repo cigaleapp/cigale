@@ -295,5 +295,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		width: 100%;
 		flex-grow: 1;
 		margin-top: 2rem;
+		font-size: 0.75rem;
 	}
 </style>
