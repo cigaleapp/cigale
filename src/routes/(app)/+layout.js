@@ -52,7 +52,7 @@ export async function load() {
 			success({ procedure, data }) {
 				if (procedure !== 'importProtocol') return;
 
-				// We preload icons here instead of in the web worker 
+				// We preload icons here instead of in the web worker
 				// so that the service worker can pick up on the fetch call and cache it
 				// > [...] when the **main app thread** makes a network request.
 				// https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/fetch_event
