@@ -1219,3 +1219,16 @@ export function readableOn(color) {
 	);
 	return o > 125 ? '#000000' : '#ffffff';
 }
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('readableOn', () => {
+		expect(readableOn('#ffffff')).toBe('#000000');
+		expect(readableOn('#000000')).toBe('#ffffff');
+		expect(readableOn('#ff0000')).toBe('#ffffff');
+		expect(readableOn('#00ff00')).toBe('#000000');
+		expect(readableOn('#0000ff')).toBe('#ffffff');
+		expect(readableOn('#808080')).toBe('#000000');
+		expect(readableOn('#c0ffee')).toBe('#000000');
+	});
+}
