@@ -205,7 +205,7 @@ const protocol = {
 		},
 		[namespaced('strictness')]: {
 			type: 'enum',
-			label: "Niveau d'exigence",
+			label: "Exhaustivité du relevé",
 			description: "J'ai photographié",
 			required: true,
 			mergeMethod: 'min',
