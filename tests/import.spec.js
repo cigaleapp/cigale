@@ -180,7 +180,9 @@ test.describe('wrong protocol used', () => {
 	});
 
 	test('fails with the appriopriate error message', async ({ page }) => {
-		await expect(toast(page, 'le protocole de la session est', { type: 'error' })).toBeVisible();
+		await expect(
+			toast(page, 'le protocole de la session est', { type: 'error' })
+		).toBeVisible();
 	});
 });
 

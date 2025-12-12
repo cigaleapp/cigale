@@ -545,7 +545,6 @@ export function compareBy(key) {
 			return aKey - bKey;
 		}
 
-
 		return aKey.toString().localeCompare(bKey.toString());
 	};
 }

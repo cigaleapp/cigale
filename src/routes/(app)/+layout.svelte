@@ -37,6 +37,7 @@
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { resolve } from '$lib/paths';
 	import { initializeProcessingQueue } from '$lib/queue.svelte';
+	import { switchSession } from '$lib/sessions';
 	import { getColorScheme, isDebugMode, setSetting } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import Toast from '$lib/Toast.svelte';
@@ -46,7 +47,6 @@
 
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
-	import { switchSession } from '$lib/sessions';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);

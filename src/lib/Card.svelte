@@ -25,7 +25,13 @@ Available CSS variables:
 	 */
 
 	/** @type {Props}*/
-	const { children = undefined, onclick, tag = 'article', tooltip: tooltipText, testid } = $props();
+	const {
+		children = undefined,
+		onclick,
+		tag = 'article',
+		tooltip: tooltipText,
+		testid
+	} = $props();
 
 	const clickable = $derived(Boolean(onclick));
 </script>
