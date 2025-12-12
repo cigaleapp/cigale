@@ -73,14 +73,19 @@
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
+	navbarAppearance('hidden');
+
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
-	const images = $derived(imagesOfImageFile(fileId, idb.tables.Image.state));
+	const images = $derived(
+		imagesOfImageFile(
+			fileId,
+			idb.tables.Image.state.filter((img) => img.sessionId === uiState.currentSessionId)
+		)
+	);
 	const firstImage = $derived(images.at(0));
 
-	$effect(() => seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` }));
-
-	navbarAppearance('hidden');
+	seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` });
 
 	// Controls visibility of the checkmark little centered overlay
 	let confirmedOverlayShown = $state(false);
@@ -170,7 +175,8 @@
 				.filter(([, value]) => Boolean(value))
 		)
 	);
-	const imageSrc = $derived(uiState.previewURLs.get(fileId));
+
+	const imageSrc = $derived(uiState.getPreviewURL(fileId));
 	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idComparator));
 	const prevFileId = $derived.by(() => {
 		const idx = sortedFileIds.indexOf(fileId) - 1;
@@ -267,6 +273,7 @@
 
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
+			sessionId: uiState.currentSessionId,
 			metadataId,
 			subjectId: imageId,
 			type: 'boolean',
@@ -306,6 +313,7 @@
 
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
+			sessionId: uiState.currentSession?.id,
 			subjectId: imageId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
@@ -316,6 +324,7 @@
 		if (uiState.classificationMetadataId) {
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.classificationMetadataId,
 				subjectId: imageId
 			});
@@ -387,6 +396,7 @@
 		if (images.length === 1) {
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId
 			});
@@ -440,6 +450,7 @@
 			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.classificationMetadataId,
 				subjectId: image.id
 			});
@@ -459,6 +470,7 @@
 			// We're modifying an existing cropbox
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId,
 				type: 'boundingbox',
@@ -485,6 +497,7 @@
 
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
+				sessionId: uiState.currentSession?.id,
 				metadataId: uiState.cropMetadataId,
 				subjectId: newImageId,
 				type: 'boundingbox',
@@ -509,6 +522,7 @@
 
 			await idb.tables.Image.set({
 				id: newImageId,
+				sessionId: uiState.currentSessionId,
 				filename: firstImage?.filename ?? '',
 				addedAt: dates.formatISO(firstImage?.addedAt ?? new Date()),
 				contentType: firstImage?.contentType ?? '',
@@ -548,9 +562,11 @@
 		}
 
 		if (willAutoskip) {
-			await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`, {
-				invalidateAll: true
-			});
+			if (nextUnconfirmedImageId) {
+				await goto('/(app)/(sidepanel)/crop/[image]', { image: nextUnconfirmedImageId });
+			} else {
+				await goto('/(app)/(sidepanel)/classify');
+			}
 		}
 
 		return newImageId;
@@ -565,15 +581,24 @@
 			await onCropChange(image.id, box ? toTopLeftCoords(box) : undefined);
 		}
 
-		await goto(nextUnconfirmedImageId ? `#/crop/${nextUnconfirmedImageId}` : `#/classify`);
+		if (nextUnconfirmedImageId) {
+			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextUnconfirmedImageId });
+		} else {
+			await goto('/(app)/(sidepanel)/classify');
+		}
 	}
 
 	async function deleteImageFileAndGotoNext() {
 		const nextFileIdBeforeDelete = $state.snapshot(nextFileId);
 		await deleteImageFile(fileId);
-		// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
-		// it means we just deleted the last image; so we go back to the import tab
-		await goto(nextFileId ? `#/crop/${nextFileIdBeforeDelete}` : '#/import');
+
+		if (nextFileIdBeforeDelete) {
+			await goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileIdBeforeDelete });
+		} else {
+			// If nextFileId (and not nextFileIdBeforeDelete) is undefined,
+			// it means we just deleted the last image; so we go back to the import tab
+			await goto('/(app)/(sidepanel)/import');
+		}
 	}
 
 	/**
@@ -617,17 +642,17 @@
 		ArrowLeft: {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto(`#/crop/${prevFileId}`)
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
 		},
 		'Shift+Space': {
 			help: 'Image précédente',
 			when: () => Boolean(prevFileId),
-			do: () => goto(`#/crop/${prevFileId}`)
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: prevFileId })
 		},
 		ArrowRight: {
 			help: 'Image suivante',
 			when: () => Boolean(nextFileId),
-			do: () => goto(`#/crop/${nextFileId}`)
+			do: () => goto('/(app)/(sidepanel)/crop/[image]', { image: nextFileId })
 		},
 		Space: {
 			help: 'Continuer',
@@ -1004,7 +1029,7 @@
 						{#if image.fileId}
 							<CroppedImg
 								box={toTopLeftCoords(box)}
-								src={uiState.previewURLs.get(image.fileId)}
+								src={uiState.getPreviewURL(image.fileId)}
 								class="thumb"
 							/>
 						{/if}

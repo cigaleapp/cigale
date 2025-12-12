@@ -9,6 +9,8 @@ Available CSS variables:
 - **`--fg`**: text color
 - **`--bg-hover`**: background color on hover
 - **`--fg-hover`**: text color on hover
+- **`--bg-disabled`**: background color when disabled
+- **`--fg-disabled`**: text color when disabled
  
 -->
 
@@ -103,6 +105,11 @@ Available CSS variables:
 		font-weight: bold;
 		font-size: var(--font-size, 1em);
 		gap: 0.5em;
+
+		transition:
+			background-color 0.2s,
+			color 0.2s,
+			border-color 0.2s;
 	}
 
 	button.danger:not(:disabled) {
@@ -121,8 +128,19 @@ Available CSS variables:
 	}
 
 	button:disabled {
-		opacity: 0.75;
 		cursor: not-allowed;
+		background-color: var(
+			--bg-disabled,
+			color-mix(in srgb, var(--bg, var(--bg-neutral)) 50%, transparent)
+		);
+		color: var(
+			--fg-disabled,
+			color-mix(in srgb, var(--fg, var(--fg-neutral)) 50%, transparent)
+		);
+		border-color: var(
+			--fg-disabled,
+			color-mix(in srgb, var(--fg, var(--fg-neutral)) 50%, transparent)
+		);
 	}
 
 	button:not(:disabled):not(.danger):is(:hover, :focus-visible) {

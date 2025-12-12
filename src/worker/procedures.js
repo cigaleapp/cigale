@@ -92,7 +92,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	},
 	generateResultsZip: {
 		input: type({
-			protocolId: 'string',
+			sessionId: 'string',
 			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
 			cropPadding: /^\d+(px|%)$/,
 			jsonSchemaURL: 'string.url.parse'

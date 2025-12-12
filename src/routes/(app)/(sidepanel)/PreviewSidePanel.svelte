@@ -55,6 +55,7 @@
 		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
 		if (!protocol) return [];
 		return protocol.metadata
+			.filter((id) => !protocol.sessionMetadata.includes(id))
 			.map((id) => tables.Metadata.state.find((m) => m.id === id))
 			.filter((m) => m !== undefined)
 			.toSorted(metadataDefinitionComparator(protocol));
@@ -68,6 +69,11 @@
 
 	let loadingOptions = $state(true);
 	watch([() => definitions], () => {
+		if (!uiState.currentProtocolId) {
+			loadingOptions = false;
+			return;
+		}
+
 		// Prevent double-load
 		if (Object.keys(options).length > 0) {
 			loadingOptions = false;

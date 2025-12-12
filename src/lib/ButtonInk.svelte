@@ -9,14 +9,23 @@
 	 * @property {boolean} [inline=false] removes horizontal padding so that it its neatly with other inline elements
 	 * @property {boolean} [dangerous=false]
 	 * @property {boolean} [disabled=false]
+	 * @property {boolean} [fills=false] fills the whole container
 	 * @property {string | { text: string; keyboard: string }} [help]
 	 */
 
 	/** @type {Props} */
-	let { children, onclick, help, dangerous, disabled = false, inline = false } = $props();
+	let {
+		children,
+		onclick,
+		help,
+		dangerous,
+		disabled = false,
+		inline = false,
+		fills = false
+	} = $props();
 </script>
 
-<button {onclick} use:tooltip={help} {disabled} class:dangerous class:inline>
+<button {onclick} use:tooltip={help} {disabled} class={{ dangerous, inline, fills }}>
 	{@render children()}
 </button>
 
@@ -57,5 +66,11 @@
 
 	button.dangerous:is(:hover, :focus-visible) {
 		background-color: var(--bg-error-hover, var(--bg-error));
+	}
+
+	button.fills {
+		height: 100%;
+		width: 100%;
+		border-radius: 0;
 	}
 </style>

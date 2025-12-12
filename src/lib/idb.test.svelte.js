@@ -18,7 +18,7 @@ test('openDatabase', async () => {
 	expect(window).toHaveProperty('DB');
 	expect(window).toHaveProperty('refreshDB');
 	expect(db.name).toMatchInlineSnapshot(`"database"`);
-	expect(db.version).toMatchInlineSnapshot(`3`);
+	expect(db.version).toMatchInlineSnapshot(`4`);
 	expect(db.objectStoreNames).toMatchInlineSnapshot(`
 		FakeDOMStringList {
 		  "0": "Image",
@@ -28,7 +28,8 @@ test('openDatabase', async () => {
 		  "4": "MetadataOption",
 		  "5": "Observation",
 		  "6": "Protocol",
-		  "7": "Settings",
+		  "7": "Session",
+		  "8": "Settings",
 		  "_values": [
 		    "Image",
 		    "ImageFile",
@@ -37,6 +38,7 @@ test('openDatabase', async () => {
 		    "MetadataOption",
 		    "Observation",
 		    "Protocol",
+		    "Session",
 		    "Settings",
 		  ],
 		}
@@ -53,6 +55,7 @@ test('nukeDatabase', async () => {
 	const db = await openDatabase();
 	await db.put('ImageFile', {
 		id: 'flint and steel',
+		sessionId: 'testing',
 		bytes: new ArrayBuffer(),
 		filename: 'ha',
 		contentType: 'image/png',
@@ -91,6 +94,7 @@ describe('operations', () => {
 			const addedAt = new Date();
 			await idb.set('Image', {
 				id: imageId(0, 0),
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
@@ -109,6 +113,7 @@ describe('operations', () => {
 			const serialized = await db.get('Image', imageId(0, 0));
 			expect(serialized).toEqual({
 				id: imageId(0, 0),
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
 				dimensions: { width: 100, height: 100 },
@@ -127,6 +132,7 @@ describe('operations', () => {
 			const deserialized = await idb.get('Image', imageId(0, 0));
 			expect(deserialized).toEqual({
 				id: imageId(0, 0),
+				sessionId: 'testing',
 				addedAt,
 				fileId: 'quoicoubaka',
 				boundingBoxesAnalyzed: false,
@@ -151,6 +157,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('Observation', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				addedAt: new Date().toISOString(),
 				images: [],
 				label: 'Test',
@@ -160,6 +167,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('ImageFile', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				bytes: new ArrayBuffer(0),
 				filename: 'ha',
 				contentType: 'image/png',
@@ -177,6 +185,7 @@ describe('operations', () => {
 		const addedAt = new Date();
 		await db.put('Image', {
 			id: imageId(0, 0),
+			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
@@ -193,6 +202,7 @@ describe('operations', () => {
 		});
 		await db.put('Image', {
 			id: imageId(0, 1),
+			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
@@ -209,6 +219,7 @@ describe('operations', () => {
 		});
 		expect(await idb.get('Image', imageId(0, 0))).toEqual({
 			id: imageId(0, 0),
+			sessionId: 'testing',
 			addedAt,
 			fileId: 'quoicoubaka',
 			boundingBoxesAnalyzed: false,
@@ -233,6 +244,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('Observation', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				images: [],
 				label: 'Test',
@@ -249,6 +261,7 @@ describe('operations', () => {
 		for (const i of [0, 1, 2]) {
 			await db.put('Observation', {
 				id: `test${i}`,
+				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				images: [],
 				label: 'Test',
@@ -265,6 +278,7 @@ describe('operations', () => {
 		const addedAt = new Date();
 		const observation = (/** @type {number} */ i) => ({
 			id: `test${i}`,
+			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			images: [],
 			label: 'Test',
@@ -303,6 +317,7 @@ describe('wrangler', () => {
 	const addedAt = new Date();
 	const observation = (/** @type {number} */ i) => ({
 		id: `test${i}`,
+		sessionId: 'testing',
 		addedAt: addedAt.toISOString(),
 		images: [],
 		label: 'Test',
@@ -310,7 +325,8 @@ describe('wrangler', () => {
 	});
 
 	const image = (/** @type {number} */ i) => ({
-		id: imageId(0, i),
+		id: imageId('0', i),
+		sessionId: 'testing',
 		addedAt: addedAt.toISOString(),
 		fileId: 'quoicoubaka',
 		dimensions: { width: 100, height: 100 },
@@ -328,7 +344,7 @@ describe('wrangler', () => {
 
 	test('initialize', async () => {
 		await idb.set('Observation', observation(0));
-		await tables.initialize();
+		await tables.initialize('testing');
 		expect(idb._tablesState).toEqual({
 			Observation: [
 				{
@@ -337,25 +353,61 @@ describe('wrangler', () => {
 				}
 			],
 			Image: [],
+			Session: [],
 			Metadata: [],
 			Protocol: [],
 			Settings: []
 		});
 	});
-	test('refresh', async () => {
-		await idb.set('Observation', observation(0));
-		await tables.initialize();
-		expect(tables.Observation.state).toHaveLength(1);
-		await idb.set('Observation', observation(1));
-		await idb.set('Observation', observation(2));
-		expect(tables.Observation.state).toHaveLength(1);
-		await tables.Observation.refresh();
-		expect(tables.Observation.state).toHaveLength(3);
+	describe('refresh', () => {
+		test('with session', async () => {
+			await idb.set('Observation', observation(0));
+			await tables.initialize('testing');
+			expect(tables.Observation.state).toHaveLength(1);
+			await idb.set('Observation', observation(1));
+			await idb.set('Observation', observation(2));
+			expect(tables.Observation.state).toHaveLength(1);
+			await tables.Observation.refresh('testing');
+			expect(tables.Observation.state).toHaveLength(3);
+		});
+
+		test('with another session', async () => {
+			await idb.set('Observation', observation(0));
+			await tables.initialize('testing');
+			expect(tables.Observation.state).toHaveLength(1);
+			await idb.set('Observation', observation(1));
+			await idb.set('Observation', observation(2));
+			await tables.Observation.refresh('anotherSession');
+			expect(tables.Observation.state).toHaveLength(0);
+		});
+
+		test('without session', async () => {
+			await idb.set('Metadata', {
+				id: 'test',
+				label: 'Test',
+				description: '',
+				mergeMethod: 'none',
+				required: false,
+				type: 'string'
+			});
+
+			await idb.set('Observation', observation(0));
+
+			await tables.initialize('testing');
+			expect(tables.Metadata.state).toHaveLength(1);
+			expect(tables.Observation.state).toHaveLength(1);
+
+			await tables.Observation.refresh(null);
+			expect(tables.Observation.state).toHaveLength(0);
+
+			await tables.Metadata.refresh(null);
+			expect(tables.Metadata.state).toHaveLength(1);
+		});
 	});
 
 	describe('individual tables', () => {
 		beforeEach(async () => {
-			await tables.initialize();
+			await tables.initialize('testing');
 		});
 
 		test('get', async () => {
@@ -431,6 +483,7 @@ describe('wrangler', () => {
 		test('add', async () => {
 			const observation = {
 				addedAt: addedAt.toISOString(),
+				sessionId: 'testing',
 				images: [],
 				label: 'Test',
 				metadataOverrides: {}
@@ -480,10 +533,10 @@ describe('wrangler', () => {
 			]);
 			expect(await idb.list('Image')).toEqual([
 				expect.objectContaining({
-					id: imageId(0, 0)
+					id: imageId('0', 0)
 				}),
 				expect.objectContaining({
-					id: imageId(0, 1)
+					id: imageId('0', 1)
 				})
 			]);
 			expect(await idb.list('Observation')).toEqual([
@@ -495,10 +548,10 @@ describe('wrangler', () => {
 			expect(await idb.get('Observation', 'test0')).toBeUndefined();
 			expect(await idb.list('Image')).toEqual([
 				expect.objectContaining({
-					id: imageId(0, 0)
+					id: imageId('0', 0)
 				}),
 				expect.objectContaining({
-					id: imageId(0, 1)
+					id: imageId('0', 1)
 				})
 			]);
 		});
@@ -553,7 +606,7 @@ describe('wrangler', () => {
 					}
 				});
 				expect(tables.Image.state).toHaveLength(0);
-				await tables.Image.refresh();
+				await tables.Image.refresh('testing');
 				expect(tables.Image.state).toEqual([
 					{
 						...image(0),
@@ -593,7 +646,7 @@ describe('wrangler', () => {
 			test('get', async () => {
 				await tables.Image.set(image(0));
 				await tables.Image.set(image(1));
-				expect(await tables.Image.get(imageId(0, 0))).toEqual({
+				expect(await tables.Image.get(imageId('0', 0))).toEqual({
 					...image(0),
 					addedAt,
 					dimensions: { width: 100, height: 100, aspectRatio: 1 },
@@ -609,7 +662,7 @@ describe('wrangler', () => {
 						}
 					}
 				});
-				expect(await tables.Image.raw.get(imageId(0, 1))).toEqual({
+				expect(await tables.Image.raw.get(imageId('0', 1))).toEqual({
 					...image(1),
 					addedAt: addedAt.toISOString(),
 					metadata: {

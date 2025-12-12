@@ -50,13 +50,15 @@ export async function load() {
 	});
 
 	try {
+		const sessionId = localStorage.getItem('currentSessionId');
+
 		setLoadingMessage('Initialisation de la base de données…');
 		await swarpc.init.broadcast({ databaseName, databaseRevision });
-		await tables.initialize();
+		await tables.initialize(sessionId);
 
 		setLoadingMessage('Chargement des données intégrées…');
 		await loadDefaultProtocol(swarpc);
-		await tables.initialize();
+		await tables.initialize(sessionId);
 	} catch (e) {
 		console.error(e);
 		error(400, {

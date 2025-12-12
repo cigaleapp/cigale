@@ -16,6 +16,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	/**
 	 * @template AdditionalData
 	 * @typedef {object} MediaItem
+	 * @property {string} sessionId useful as a failsafe to ensure no items from other sessions are shown
 	 * @property {string} id
 	 * @property {string} name
 	 * @property {Date} addedAt
@@ -139,8 +140,12 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @type {Array<readonly [GroupName | "", Item[]]>}
 	 */
 	const groupedAndSortedImages = $derived.by(() => {
-		if (!groups || !grouping) return [['', sortImages(items, sort)]];
-		return [...groupBy(items, grouping).entries()]
+		const itemsWithoutOtherSessions = items.filter(
+			(item) => item.sessionId === uiState.currentSessionId
+		);
+
+		if (!groups || !grouping) return [['', sortImages(itemsWithoutOtherSessions, sort)]];
+		return [...groupBy(itemsWithoutOtherSessions, grouping).entries()]
 			.filter(([, items]) => items && items.length > 0)
 			.map(([key, items]) => /** @type {const} */ ([key, sortImages(items ?? [], sort)]))
 			.toSorted(compareBy(([name]) => groups?.indexOf(name) ?? 0));
@@ -236,6 +241,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				}
 			{/snippet}
 			<code>
+				session {uiState.currentSessionId} <br />
 				selection {@render displayIter(uiState.selection)} <br />
 				queued {@render displayIter(uiState.queuedImages)} <br />
 				loading {@render displayIter(uiState.loadingImages)} <br />

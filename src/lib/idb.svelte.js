@@ -2,14 +2,20 @@ import * as devalue from 'devalue';
 import { openDB } from 'idb';
 import { nanoid } from 'nanoid';
 
-import { generateId, idComparator, isReactiveTable, Tables } from './database.js';
+import {
+	generateId,
+	idComparator,
+	isReactiveTable,
+	isSessionDependentReactiveTable,
+	Tables
+} from './database.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 3;
+export const databaseRevision = 4;
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -29,7 +35,8 @@ export const _tablesState = $state({
 	Metadata: [],
 	Observation: [],
 	Protocol: [],
-	Settings: []
+	Settings: [],
+	Session: []
 });
 
 /**
@@ -37,16 +44,19 @@ export const _tablesState = $state({
  * @type {{
  *  [Name in ReactiveTableNames]: ReturnType<typeof wrangler<Name>>
  * } & {
- * 	initialize: () => Promise<void>
+ * 	initialize: (sessionId: string|null) => Promise<void>
  * }}
  */
 // @ts-ignore
 export const tables = {
 	...Object.fromEntries(tableNames.filter(isReactiveTable).map((name) => [name, wrangler(name)])),
-	async initialize() {
+	/**
+	 * Initialize reactive tables for the current session
+	 */
+	async initialize(sessionId) {
 		for (const name of tableNames) {
 			if (!isReactiveTable(name)) continue;
-			await tables[name].refresh();
+			await tables[name].refresh(sessionId);
 		}
 	}
 };
@@ -61,16 +71,29 @@ function wrangler(table) {
 		get state() {
 			return _tablesState[table];
 		},
-		async refresh() {
-			console.debug(`refresh ${table}`);
-			// @ts-ignore
-			_tablesState[table] = await this.list();
+		/** @param {string|null} sessionId */
+		async refresh(sessionId) {
+			if (!sessionId && isSessionDependentReactiveTable(table)) {
+				console.debug(`refresh ${table} without session: clearing state`);
+				_tablesState[table] = [];
+			} else if (sessionId && isSessionDependentReactiveTable(table)) {
+				console.debug(`refresh ${table} for session ${sessionId}`);
+				// @ts-ignore
+				_tablesState[table] = await this.list('sessionId', sessionId);
+			} else {
+				console.debug(`refresh ${table}`);
+				// @ts-ignore
+				_tablesState[table] = await this.list();
+			}
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
 		/** @param {string} key  */
 		getFromState: (key) => _tablesState[table].find((item) => item.id === key),
-		/** @param {typeof Tables[Table]['inferIn']} value */
+		/**
+		 * @param {typeof Tables[Table]['inferIn']} value
+		 * @returns {Promise<typeof Tables[Table]['inferOut']>}
+		 */
 		async set(value) {
 			await set(table, value);
 			const output = Tables[table].assert(value);
@@ -121,7 +144,10 @@ function wrangler(table) {
 
 			return true;
 		},
-		/** @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value */
+		/**
+		 * @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value
+		 * @returns {Promise<typeof Tables[Table]['inferOut']>}
+		 */
 		async add(value) {
 			return this.set(
 				// @ts-ignore
@@ -158,7 +184,11 @@ function wrangler(table) {
 				await actions(tx.objectStore(table));
 			});
 		},
-		list: async () => list(table),
+		/**
+		 * @param {import('idb').IndexNames<IDBDatabaseType, Table>} [index]
+		 * @param {IDBKeyRange|string} [key]
+		 */
+		list: async (index, key) => (index && key ? listByIndex(table, index, key) : list(table)),
 		all: () => iterator(table),
 		count: async () => {
 			const db = await openDatabase();
@@ -245,6 +275,29 @@ export async function list(tableName, keyRange = undefined) {
 }
 
 /**
+ * @template {keyof typeof Tables} TableName
+ * @param {TableName} tableName
+ * @param {import('idb').IndexNames<IDBDatabaseType, TableName>} indexName
+ * @param {IDBKeyRange | string} [keyRange]
+ * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
+ */
+export async function listByIndex(tableName, indexName, keyRange = undefined) {
+	const db = await openDatabase();
+	const validator = Tables[tableName];
+	// @ts-ignore
+	return await db
+		.getAllFromIndex(
+			tableName,
+			indexName,
+			typeof keyRange === 'string' ? IDBKeyRange.only(keyRange) : keyRange
+		)
+		.then((values) => values.map((v) => validator.assert(v)).sort(idComparator))
+		.then((result) => {
+			return result;
+		});
+}
+
+/**
  * Delete an entry from a table by key
  * @param {TableName} table
  * @param {string | IDBKeyRange} id
@@ -302,12 +355,15 @@ export function dependencyURI(tableName, key, ...additionalPath) {
  * @param {Tables} tableNames
  * @param {object} param1
  * @param {Mode} [param1.mode="readwrite"]
+ * @param {string} [param1.session] current session ID, used to refresh session-dependent reactive tables. Defaults to localStorage's currentSessionId
  * @param {IDBTransactionWithAtLeast<Tables, Mode>} [param1.tx] already existing transaction to use instead of creating a new one. In that case, the transaction is not committed and the reactive tables' state is not refreshed, since it's assumed that a openTransactions() call higher up in the call stack will already do this
  * @param {(tx: IDBTransactionWithAtLeast<Tables, Mode>) => void | Promise<void>} actions
  */
-export async function openTransaction(tableNames, { mode }, actions) {
+export async function openTransaction(tableNames, { mode, session }, actions) {
 	// @ts-ignore
 	mode ??= 'readwrite';
+
+	session ??= localStorage.getItem('currentSessionId') || '';
 
 	// IndexedDB transactions are auto-comitted, so we can't reuse them reliably. will maybe find a fix for this.
 	// if (tx) {
@@ -336,7 +392,7 @@ export async function openTransaction(tableNames, { mode }, actions) {
 	await newTx.done;
 
 	for (const table of tableNames.filter(isReactiveTable)) {
-		await tables[table].refresh();
+		await tables[table].refresh(session);
 	}
 }
 
@@ -364,6 +420,10 @@ export async function openDatabase() {
 			const createTable = (tableName, schema) => {
 				if (!schema.meta.table) return;
 				const keyPath = schema.meta.table.indexes[0];
+				if (db.objectStoreNames.contains(tableName)) {
+					console.warn(`Table ${tableName} already exists, skipping creation`);
+					return;
+				}
 				const store = db.createObjectStore(tableName, { keyPath });
 				for (const index of schema.meta.table.indexes.slice(1)) {
 					store.createIndex(index, index);
@@ -380,6 +440,11 @@ export async function openDatabase() {
 				createTable(/* @wc-ignore */ 'ImagePreviewFile', Tables.ImagePreviewFile);
 				return;
 			}
+
+			if (oldVersion === 3) {
+				createTable('Session', Tables.Session);
+			}
+
 			for (const [tableName, schema] of tablesByName) {
 				createTable(tableName, schema);
 			}
@@ -393,9 +458,14 @@ export async function openDatabase() {
 	};
 	window.DB = _database;
 	window.refreshDB = () => {
+		const session = localStorage.getItem('currentSessionId') || undefined;
+		if (!session) {
+			console.warn('No current session ID set, cannot refresh reactive tables');
+			return;
+		}
 		for (const table of tableNames) {
 			if (!isReactiveTable(table)) continue;
-			tables[table].refresh();
+			tables[table].refresh(session ?? '');
 		}
 	};
 

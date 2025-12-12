@@ -6,12 +6,21 @@
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
-	import { uiState } from '$lib/state.svelte.js';
 	import { tooltip } from '$lib/tooltips.js';
+
+	/**
+	 * @typedef {object} Props
+	 * @property {string} value selected protocol's ID
+	 * @property {(value: string) => Promise<void> | void} [onchange]
+	 * @property {string} [testid]
+	 */
+
+	/** @type {Props} */
+	let { value = $bindable(), testid, onchange } = $props();
 </script>
 
 <DropdownMenu
-	testid="protocol-switcher"
+	{testid}
 	items={[
 		{
 			protocol: null,
@@ -25,16 +34,17 @@
 		protocol: p,
 		key: p.id,
 		label: p.name,
-		selected: uiState.currentProtocolId === p.id,
-		onclick() {
-			uiState.setCurrentProtocolId(p.id);
+		selected: value === p.id,
+		async onclick() {
+			value = p.id;
+			await onchange?.(value);
 		}
 	}))}
 >
 	{#snippet trigger(props)}
-		<button class:none-selected={!uiState.currentProtocol} class="trigger" {...props}>
-			{#if uiState.currentProtocol}
-				{uiState.currentProtocol?.name}
+		<button class:none-selected={!value} class="trigger" {...props}>
+			{#if value}
+				{tables.Protocol.getFromState(value)?.name}
 			{:else}
 				Aucun protocole sélectionné
 			{/if}
@@ -46,7 +56,7 @@
 		<div class="item">
 			<div class="label">
 				<div class="icon">
-					{#if uiState.currentProtocolId === protocol?.id}
+					{#if value === protocol?.id}
 						<IconSelected />
 					{:else if !protocol}
 						<IconGoto />

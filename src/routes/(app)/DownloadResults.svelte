@@ -88,7 +88,7 @@
 			const zipfileBytes = await swarpc.generateResultsZip(
 				{
 					include,
-					protocolId: chosenProtocol.id,
+					sessionId: uiState.currentSessionId,
 					cropPadding: cropPadding.withUnit,
 					jsonSchemaURL: new URL(
 						asset('/results.schema.json'),

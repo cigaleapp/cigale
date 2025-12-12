@@ -156,6 +156,9 @@ export const MetadataEnumVariant = type({
 		.describe('Synonymes (labels alternatifs) pour cette option')
 		.default(() => []),
 	'description?': type('string').describe('Description (optionnelle) de cette option'),
+	'index?': type('number').describe(
+		"Nombre permettant de trier les options dans l'interface. Par défaut, correspond à l'indice de l'option dans l'ordre de définition de sa métadonnée"
+	),
 	'image?': URLString,
 	'learnMore?': URLString.describe(
 		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
@@ -214,6 +217,7 @@ export const Metadata = type({
 	).optional(),
 	'options?': MetadataEnumVariant.array()
 		.pipe((opts) => unique(opts, (o) => o.key))
+		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
 		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
 }).and(
 	type.or(

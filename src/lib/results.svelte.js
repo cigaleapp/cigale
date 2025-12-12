@@ -5,6 +5,8 @@ import * as db from './idb.svelte.js';
 import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images.js';
 import { serializeMetadataValue } from './metadata.js';
 import { Analysis } from './schemas/exports.js';
+import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
+import { switchSession } from './sessions.js';
 import { uiState } from './state.svelte.js';
 import { toasts } from './toasts.svelte.js';
 import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils';
@@ -27,16 +29,16 @@ export function toCSV(header, rows, separator = ';') {
 
 /**
  * Import back a results zip file.
+ * If we are currently in a session, the imported observations and images will be linked to that session.
  * @param {File} file
  * @param {string} id
- * @param {string} [protocolId] make sure that the protocolId is the same as the one used to export the zip file
  */
-export async function importResultsZip(file, id, protocolId) {
+export async function importResultsZip(file, id) {
 	const contents = new Uint8Array(await file.arrayBuffer());
 
 	const results = unzipSync(contents, {
 		filter: ({ name }) => {
-			return name === (uiState.currentProtocol?.exports?.metadata.json ?? 'analysis.json');
+			return name === ANALYSIS_JSON_ZIP_FILEPATH;
 		}
 	});
 
@@ -65,14 +67,38 @@ export async function importResultsZip(file, id, protocolId) {
 		return;
 	}
 
-	const { protocol, observations } = analysis;
+	const { session, observations } = analysis;
 
-	if (protocolId && protocol.id !== protocolId) {
+	/** @type {import('$lib/database').Session} */
+	let sessionToUse;
+
+	if (!uiState.currentSession) {
+		toasts.info('Importation dans une nouvelle session');
+		const newSession = await db.tables.Session.add({
+			name: session.name || `Import de ${file.name}`,
+			description: session.description || `Importée depuis ${file.name}`,
+			protocol: session.protocol,
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+			createdAt: new Date().toISOString(),
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+			openedAt: new Date().toISOString(),
+			metadata: mapValues(session.metadata ?? {}, ({ value, ...rest }) => ({
+				...rest,
+				value: serializeMetadataValue(value)
+			}))
+		});
+
+		await switchSession(newSession.id);
+
+		sessionToUse = newSession;
+	} else if (uiState.currentSession.protocol !== session.protocol) {
 		uiState.processing.removeFile(id);
 		toasts.error(
-			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${protocol.id}, mais le protocole actuel est ${protocolId}`
+			`Le fichier d'analyse de ${file.name} a été exporté avec le protocole ${session.protocol}, mais le protocole de la session est ${uiState.currentSession.protocol}`
 		);
 		return;
+	} else {
+		sessionToUse = uiState.currentSession;
 	}
 
 	const files = Object.values(observations)
@@ -118,6 +144,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await db.tables.Observation.set({
 			...pick(observation, 'id', 'label'),
+			sessionId: sessionToUse.id,
 			images: observation.images.map((i) => i.id),
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			addedAt: new Date().toISOString(),
@@ -137,6 +164,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await storeImageBytes({
 			id: imageIdToFileId(image.id),
+			sessionId: sessionToUse.id,
 			resizedBytes,
 			originalBytes,
 			contentType: image.contentType,
@@ -147,6 +175,7 @@ export async function importResultsZip(file, id, protocolId) {
 
 		await db.tables.Image.set({
 			...pick(image, 'id', 'filename', 'contentType'),
+			sessionId: sessionToUse.id,
 			dimensions: { width, height },
 			fileId: imageIdToFileId(image.id),
 			boundingBoxesAnalyzed: true,

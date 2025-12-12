@@ -205,6 +205,18 @@ class ProcessingQueue {
 		uiState.processing.total--;
 	}
 
+	/**
+	 * Cancel all tasks in the processing queue.
+	 * @param {string} reason
+	 */
+	cancelAll(reason) {
+		if (!this.cancellers) throw new Error('No cancellers map set, cannot cancel all tasks.');
+
+		for (const subjectId of this.cancellers.keys()) {
+			this.cancel(subjectId, reason);
+		}
+	}
+
 	async pop() {
 		const task = this.tasks.shift();
 		if (!task) {
@@ -227,7 +239,7 @@ class ProcessingQueue {
 			if (importing) {
 				const { file, id } = importing;
 				if (isZip(file.type)) {
-					await importResultsZip(file, id, uiState.currentProtocolId);
+					await importResultsZip(file, id);
 				} else {
 					await processImageFile(file, id);
 				}
@@ -244,52 +256,6 @@ class ProcessingQueue {
 			uiState.loadingImages.delete(this.taskSubjectId(task));
 		}
 	}
-}
-
-/**
- * Initialize the processing queue. Must be called in a root $effect (during component initialization).
- * @param {object} arg0
- * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} arg0.swarpc
- * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [arg0.cancellers]
- */
-export function initializeProcessingQueue(arg0) {
-	processingQueue ??= new ProcessingQueue({
-		parallelism: Math.ceil(navigator.hardwareConcurrency / 2),
-		...arg0
-	});
-}
-
-/**
- * Cancel a task in the processing queue.
- * @param {string} subjectId
- * @param {string} reason
- * @throws {Error} if the processing queue is not initialized
- */
-export function cancelTask(subjectId, reason) {
-	assertQueueInitialized(processingQueue);
-
-	processingQueue.cancel(subjectId, reason);
-}
-
-/**
- *
- * @param {ProcessingQueueTask[]} tasks
- * @param {{title: string} & NotificationOptions} notification when batch is done
- */
-function scheduleBatch(tasks, { title, ...options }) {
-	Promise.all(
-		tasks.map((task) => {
-			assertQueueInitialized(processingQueue);
-			processingQueue.push(task);
-		})
-	).then(() => {
-		if (tasks.length === 0) return;
-		sendNotification(title, {
-			icon: '/icon.png',
-			badge: '/badge.png',
-			...options
-		});
-	});
 }
 
 /**
@@ -338,6 +304,32 @@ export function classifyMore(imageIds) {
 }
 
 /**
+ * Cancel a task in the processing queue.
+ * @param {string} subjectId
+ * @param {string} reason
+ * @throws {Error} if the processing queue is not initialized
+ */
+export function cancelTask(subjectId, reason) {
+	withQueue((q) => q.cancel(subjectId, reason));
+}
+
+/**
+ *
+ * @param {ProcessingQueueTask[]} tasks
+ * @param {{title: string} & NotificationOptions} notification when batch is done
+ */
+function scheduleBatch(tasks, { title, ...options }) {
+	Promise.all(tasks.map((task) => withQueue((q) => q.push(task)))).then(() => {
+		if (tasks.length === 0) return;
+		sendNotification(title, {
+			icon: '/icon.png',
+			badge: '/badge.png',
+			...options
+		});
+	});
+}
+
+/**
  *
  * @param {ProcessingQueue | undefined} queue
  * @returns {asserts queue is ProcessingQueue}
@@ -345,4 +337,29 @@ export function classifyMore(imageIds) {
 function assertQueueInitialized(queue) {
 	if (!queue)
 		throw new Error('Processing queue not initialized. Call initializeProcessingQueue first.');
+}
+
+/**
+ * Initialize the processing queue. Must be called in a root $effect (during component initialization).
+ * @param {object} arg0
+ * @param {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} arg0.swarpc
+ * @param {Map<string, import("swarpc").CancelablePromise["cancel"]>} [arg0.cancellers]
+ * @param {number} [arg0.parallelism]
+ */
+export function initializeProcessingQueue(arg0) {
+	processingQueue ??= new ProcessingQueue({
+		parallelism: Math.ceil(navigator.hardwareConcurrency / 2),
+		...arg0
+	});
+}
+
+/**
+ * @template T
+ * @param {(queue: ProcessingQueue) => T} fn
+ * @returns {T}
+ */
+export function withQueue(fn) {
+	assertQueueInitialized(processingQueue);
+
+	return fn(processingQueue);
 }

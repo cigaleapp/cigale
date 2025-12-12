@@ -12,18 +12,6 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 			return key.startsWith('modal_') && value;
 		});
 	}
-</script>
-
-<script>
-	import IconClose from '~icons/ri/close-line';
-	import { pushState } from '$app/navigation';
-	import { page } from '$app/state';
-	import { toasts } from '$lib/toasts.svelte.js';
-
-	import ButtonIcon from './ButtonIcon.svelte';
-	import ModalToasts from './ModalToasts.svelte';
-	import { getColorScheme } from './settings.svelte';
-	import { insideBoundingClientRect } from './utils';
 
 	/**
 	 * @typedef Props
@@ -38,6 +26,18 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} children the content of the modal
 	 * @property {import('svelte').Snippet<[{ close: undefined | (() => void) }]>} [footer] the content of the footer
 	 */
+</script>
+
+<script>
+	import IconClose from '~icons/ri/close-line';
+	import { pushState } from '$app/navigation';
+	import { page } from '$app/state';
+	import { toasts } from '$lib/toasts.svelte.js';
+
+	import ButtonIcon from './ButtonIcon.svelte';
+	import ModalToasts from './ModalToasts.svelte';
+	import { getColorScheme } from './settings.svelte';
+	import { insideBoundingClientRect } from './utils';
 
 	/**  @type {Props} */
 	let {
@@ -85,6 +85,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 </script>
 
 <dialog
+	data-key={stateKey}
 	aria-hidden={!page.state[stateKey]}
 	style:color-scheme={getColorScheme()}
 	bind:this={modalElement}

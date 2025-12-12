@@ -31,8 +31,8 @@
 
 	import { version } from '$app/environment';
 	import { page } from '$app/state';
-	import * as db from '$lib/idb.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { loadPreviewImage } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import KeyboardShortcuts from '$lib/KeyboardShortcuts.svelte';
 	import { resolve } from '$lib/paths';
@@ -46,7 +46,7 @@
 
 	import Navigation from './Navigation.svelte';
 	import PrepareForOffline from './PrepareForOffline.svelte';
-	import RemoteProtocolImporter from './RemoteProtocolImporter.svelte';
+	import { switchSession } from '$lib/sessions';
 
 	const { children, data } = $props();
 	const { swarpc, parallelism } = $derived(data);
@@ -57,10 +57,10 @@
 
 	export const snapshot = {
 		capture() {
-			return pick(uiState, 'currentProtocolId');
+			return pick(uiState, 'currentSessionId');
 		},
-		restore({ currentProtocolId }) {
-			uiState.setCurrentProtocolId(currentProtocolId);
+		async restore({ currentSessionId }) {
+			await switchSession(currentSessionId);
 		}
 	};
 
@@ -74,10 +74,7 @@
 			for (const fileId of imageFileIds) {
 				void (async () => {
 					if (uiState.hasPreviewURL(fileId)) return;
-					const file = await db.get('ImagePreviewFile', fileId);
-					if (!file) return;
-					const blob = new Blob([file.bytes], { type: file.contentType });
-					uiState.setPreviewURL(fileId, URL.createObjectURL(blob));
+					await loadPreviewImage(fileId);
 				})();
 			}
 		}
@@ -166,7 +163,6 @@
 
 <KeyboardShortcuts bind:openHelp={openKeyboardShortcuts} preventDefault binds={uiState.keybinds} />
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
-<RemoteProtocolImporter />
 
 <Navigation
 	{swarpc}

@@ -30,14 +30,14 @@
 				.join('; ');
 		}
 
-		if (isDebugMode()) return `${fileId} @ ${images[0]?.addedAt.toISOString()}`;
+		if (isDebugMode()) return `${fileId} @ ${images[0]?.addedAt.toISOString()} [${images[0]?.sessionId}]`;
 	});
 </script>
 
 <CardMedia
 	id={fileId}
 	title={images[0].filename}
-	image={uiState.previewURLs.get(fileId)}
+	image={uiState.getPreviewURL(fileId)}
 	selected={uiState.selection.includes(fileId)}
 	boxes="show-all"
 	{tooltip}

@@ -38,3 +38,14 @@ jobs:
           source-dir: ./public
           umbrella-dir: _pullrequests
           comment: false
+
+      - name: Wait for preview to be live
+        if: github.event.action != 'closed'
+        run: |
+          wget ${{ steps.deploy-preview.outputs.preview-url }}
+          while ! grep "$BUILD_COMMIT" index.html; do
+            echo "Preview not live yet, waiting..."
+            sleep 5
+            rm index.html
+            wget ${{ steps.deploy-preview.outputs.preview-url }}
+          done

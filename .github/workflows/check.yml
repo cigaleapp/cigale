@@ -54,7 +54,16 @@ jobs:
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
     with:
-      compare-coverage: ${{ github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/') }}
+      publish-report: false
+      compare-coverage: false
+
+  coverage:
+    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'renovate/')
+    needs: test
+    name: Check coverage
+    uses: ./.github/workflows/vitest.yml
+    with:
+      compare-coverage: true
 
   e2e:
     needs: [build, json-schema, lint, test]
@@ -71,7 +80,7 @@ jobs:
 
   preview:
     if: github.event_name == 'pull_request'
-    needs: [json-schema, lint, test]
+    needs: [json-schema, build]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
 
@@ -98,10 +107,40 @@ jobs:
       artifact: ${{ needs.build.outputs.artifact }}
       deploy: ${{ github.ref_name == 'main' }}
 
+  dont-merge-comment:
+    name: Check for presence of "do not merge" comment
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          # Check for "do not merge" comment in the codebase
+          if git grep -q "$prefix: $message"; then
+            echo "Found "$prefix: $message" in source code. Failing the job."
+            exit 1
+          else
+            echo "No "$prefix: $message" found in source code."
+          fi
+        env:
+          prefix: XXX
+          message: DONT MERGE
+
   is-mergeable:
     if: github.event_name == 'pull_request' && !cancelled()
     name: Mergeable?
-    needs: [build, json-schema, lint, test, e2e, preview, electron, docker, bundlesize]
+    needs:
+      - build
+      - json-schema
+      - lint
+      - test
+      - coverage
+      - e2e
+      - clutter
+      - preview
+      - electron
+      - docker
+      - bundlesize
+      - dont-merge-comment
     runs-on: ubuntu-latest
     steps:
       - if: contains(needs.*.result, 'failure')

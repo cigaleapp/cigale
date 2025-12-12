@@ -14,6 +14,7 @@ const outputDir = path.resolve(here, '../static/');
  * @param {import('arktype').Type} schema
  */
 async function exportJsonSchema(name, schema) {
+	console.info(`Exporting JSON Schema for ${name}…`);
 	let schemaObject = {
 		$schema: 'https://json-schema.org/draft-07/schema',
 		...schema.in.toJsonSchema()

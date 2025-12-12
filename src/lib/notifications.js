@@ -1,3 +1,4 @@
+import { getSettings } from './settings.svelte';
 import { toasts } from './toasts.svelte';
 
 /**
@@ -30,5 +31,5 @@ export async function sendNotification(title, options) {
 }
 
 export function hasNotificationsEnabled() {
-	return Notification.permission === 'granted';
+	return Notification.permission === 'granted' && getSettings().notifications;
 }

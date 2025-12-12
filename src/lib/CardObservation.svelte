@@ -30,7 +30,7 @@
 				.join('; ');
 		}
 
-		if (isDebugMode()) return `${observation.id} @ ${observation.addedAt.toISOString()}`;
+		if (isDebugMode()) return `${observation.id} @ ${observation.addedAt.toISOString()} [${observation.sessionId}]`;
 	});
 
 	const previewImage = $derived(images.length > 0 ? images[0] : undefined);
@@ -39,7 +39,7 @@
 <CardMedia
 	id={observation.id}
 	title={observation.label}
-	image={previewImage?.fileId ? uiState.previewURLs.get(previewImage.fileId) : undefined}
+	image={previewImage?.fileId ? uiState.getPreviewURL(previewImage.fileId) : undefined}
 	selected={uiState.selection.includes(observation.id)}
 	stacksize={observation.images.length}
 	boxes="apply-first"

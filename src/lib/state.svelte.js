@@ -5,7 +5,6 @@ import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
 import { tables } from './idb.svelte';
 import { getMetadataValue } from './metadata';
-import { getSetting, getSettings, setSetting } from './settings.svelte';
 
 /**
  * @import * as DB from './database';
@@ -71,6 +70,8 @@ class UIState {
 	imagePreviouslyOpenedInCropper = $state('');
 	/** @type {Map<string, string>} */
 	previewURLs = new SvelteMap();
+	/** @type {Map<string, string>} These persist across session changes */
+	globalPreviewURLs = new SvelteMap();
 	/** @type {Map<string, string>} */
 	erroredImages = new SvelteMap();
 	/** @type {Set<string>} */
@@ -83,8 +84,35 @@ class UIState {
 	cropperZoomStates = new SvelteMap();
 	/** @type {undefined | ((newSelection: string[]) => void)} */
 	setSelection = $state(undefined);
-	/** @type {string} */
-	_currentProtocolId = $state('');
+	/** @type {string | null} */
+	_currentSessionId = $state(null);
+
+	/** @type {string | null} */
+	currentSessionId = $derived(
+		this._currentSessionId || localStorage.getItem('currentSessionId') || null
+	);
+
+	/**
+	 * @param {string | null} id
+	 */
+	async setCurrentSession(id) {
+		if (id === null) {
+			localStorage.removeItem('currentSessionId');
+		} else {
+			void tables.Session.update(id, 'openedAt', new Date().toISOString());
+			localStorage.setItem('currentSessionId', id);
+		}
+
+		this._currentSessionId = id;
+	}
+
+	/** @type {import('./database').Session | undefined}  */
+	currentSession = $derived(tables.Session.state.find((s) => s.id === this.currentSessionId));
+
+	currentProtocolId = $derived(this.currentSession?.protocol);
+
+	/** @type {import('./database').Protocol | undefined} */
+	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
 
 	/**
 	 * @param {import('./database').Image} image
@@ -92,22 +120,6 @@ class UIState {
 	 */
 	cropMetadataValueOf(image) {
 		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
-	}
-
-	/** @type {import('./database').Protocol | undefined} */
-	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
-
-	/** @type {string} */
-	currentProtocolId = $derived(
-		this._currentProtocolId || localStorage.getItem('currentProtocolId') || ''
-	);
-
-	/**
-	 * @param {string} id
-	 */
-	setCurrentProtocolId(id) {
-		localStorage.setItem('currentProtocolId', id);
-		this._currentProtocolId = id;
 	}
 
 	/** @type {string} */
@@ -134,16 +146,49 @@ class UIState {
 	 */
 	hasPreviewURL(imageFileId) {
 		if (!imageFileId) return false;
-		return this.previewURLs.has(imageFileId);
+		return this.globalPreviewURLs.has(imageFileId) || this.previewURLs.has(imageFileId);
 	}
+
+	/**
+	 *
+	 * @param {string | undefined | null} imageFileId
+	 * @returns {string | undefined}
+	 */
+	getPreviewURL(imageFileId) {
+		if (!imageFileId) return undefined;
+		return this.previewURLs.get(imageFileId) || this.globalPreviewURLs.get(imageFileId);
+	}
+
 	/**
 	 * @param {string | undefined | null} imageFileId
 	 * @param {string} url
+	 * @param {boolean} [global=false]
 	 */
-	setPreviewURL(imageFileId, url) {
-		console.debug('setPreviewURL', { imageFileId, url });
+	setPreviewURL(imageFileId, url, global = false) {
+		console.debug('setPreviewURL', { imageFileId, url, global });
 		if (!imageFileId) return;
-		this.previewURLs.set(imageFileId, url);
+		if (global) {
+			this.globalPreviewURLs.set(imageFileId, url);
+		} else {
+			this.previewURLs.set(imageFileId, url);
+		}
+	}
+
+	/**
+	 * @param {string} imageFileId
+	 */
+	revokePreviewURL(imageFileId) {
+		const url = this.previewURLs.get(imageFileId);
+		if (!url) return;
+		URL.revokeObjectURL(url);
+		this.previewURLs.delete(imageFileId);
+		this.globalPreviewURLs.delete(imageFileId);
+	}
+
+	clearPreviewURLs() {
+		for (const id of this.previewURLs.keys()) {
+			this.revokePreviewURL(id);
+		}
 	}
 
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */
@@ -156,16 +201,18 @@ class UIState {
 
 	/** @type {number} */
 	selectedCropModel = $derived.by(() => {
+		if (!this.currentProtocolId) return -1;
 		const metadataId = this.cropMetadataId;
 		if (!metadataId) return -1;
-		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
+		return this.currentSession?.inferenceModels[metadataId] ?? 0;
 	});
 
 	/** @type {number} */
 	selectedClassificationModel = $derived.by(() => {
+		if (!this.currentProtocolId) return -1;
 		const metadataId = this.classificationMetadataId;
 		if (!metadataId) return -1;
-		return getSettings().protocolModelSelections[this.currentProtocolId]?.[metadataId] ?? 0;
+		return this.currentSession?.inferenceModels[metadataId] ?? 0;
 	});
 
 	/** @type {boolean} */
@@ -180,6 +227,8 @@ class UIState {
 	 * @returns {Promise<void>}
 	 */
 	async setModelSelections({ classification = null, crop = null }) {
+		if (!this.currentSession) return;
+
 		if (classification === null && crop === null) return; // no change
 
 		const metadataIds = {
@@ -189,7 +238,7 @@ class UIState {
 
 		if (!metadataIds.classification || !metadataIds.crop) return;
 
-		const current = await getSetting('protocolModelSelections');
+		const current = this.currentSession.inferenceModels;
 		/** @type {Record<string, number>} */
 		const changes = {};
 
@@ -204,12 +253,9 @@ class UIState {
 			return; // no change
 		}
 
-		await setSetting('protocolModelSelections', {
+		await tables.Session.update(this.currentSession.id, 'inferenceModels', {
 			...current,
-			[this.currentProtocolId]: {
-				...current[this.currentProtocolId],
-				...changes
-			}
+			...changes
 		});
 	}
 

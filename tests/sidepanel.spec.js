@@ -1,7 +1,8 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
-	chooseProtocol,
+	changeSessionProtocol,
+	chooseFirstSession,
 	firstObservationCard,
 	getMetadataOverridesOfObservation,
 	goToTab,
@@ -32,7 +33,8 @@ async function initialize({
 	await loadDatabaseDump(page, `${dump}.devalue`);
 
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseProtocol(page, protocol);
+	await chooseFirstSession(page);
+	if (protocol) await changeSessionProtocol(page, protocol);
 	await goToTab(page, 'classify');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }
@@ -234,8 +236,7 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 		.getByTestId('metadata-combobox-viewport')
 		.getByText('Dicyrtomina saundersi 18%')
 		.click();
-	await expect.soft(page.locator('[data-testid="sidepanel"] .metadata:first-child'))
-		.toMatchAriaSnapshot(`
+	await expect.soft(sidepanelMetadataSectionFor(page, 'Espèce')).toMatchAriaSnapshot(`
 		  - text: Espèce
 		  - combobox: Dicyrtomina saundersi
 		  - button:
@@ -265,9 +266,7 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	// Click out and back again
 	await page.getByRole('main').click({ position: { x: 10, y: 10 } });
 	await page.getByText('lil-fella', { exact: true }).click();
-	await expect(
-		page.locator('[data-testid="sidepanel"] .metadata:first-child')
-	).toMatchAriaSnapshot(
+	await expect(sidepanelMetadataSectionFor(page, 'Espèce')).toMatchAriaSnapshot(
 		`
 	  - text: Espèce
 	  - combobox: Dicyrtomina saundersi

@@ -1,9 +1,9 @@
 import { expect, test } from './fixtures';
-import { chooseProtocol, goToTab, importPhotos, openSettings, setSettings } from './utils';
+import { goToTab, importPhotos, newSession, openSettings, setSettings } from './utils';
 
 test.describe('sorting', () => {
 	test.beforeEach(async ({ page }) => {
-		await chooseProtocol(page);
+		await newSession(page);
 		await goToTab(page, 'import');
 		await setSettings({ page }, { showTechnicalMetadata: true });
 
