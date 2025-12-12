@@ -44,6 +44,9 @@
 		if (!protocol) throw new Error('No protocol selected');
 
 		await tables.Observation.do(async (tx) => {
+			if (!uiState.currentSession)
+				throw new Error('No session selected, cannot split observations');
+
 			for (const id of uiState.selection) {
 				const obs = tables.Observation.getFromState(id);
 				if (!obs) continue;
@@ -52,7 +55,7 @@
 				for (const imageId of obs.images) {
 					const image = await tables.Image.raw.get(imageId);
 					if (!image) continue;
-					const obs = newObservation(image, protocol);
+					const obs = newObservation(image, protocol, uiState.currentSession);
 					tx.add(obs);
 					toselect.push(obs.id);
 				}
