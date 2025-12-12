@@ -2038,6 +2038,10 @@ msgstr "Protocole <0/> introuvable."
 msgid "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
 msgstr "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
 
+#: src/lib/sessions.js
+msgid "La session a été fermée"
+msgstr "La session a été fermée"
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
@@ -2059,7 +2063,3 @@ msgstr "Import de {0}"
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
 msgstr "Importée depuis {0}"
-
-#: src/lib/sessions.js
-msgid "La session a été fermée"
-msgstr "La session a été fermée"

@@ -2032,6 +2032,10 @@ msgstr ""
 msgid "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
 msgstr ""
 
+#: src/lib/sessions.js
+msgid "La session a été fermée"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
@@ -2052,8 +2056,4 @@ msgstr ""
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
-msgstr ""
-
-#: src/lib/sessions.js
-msgid "La session a été fermée"
 msgstr ""
