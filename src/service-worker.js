@@ -9,6 +9,8 @@ import { build, files, version } from '$service-worker';
 const CACHE = `cache-${version}`;
 // Models are cached independently of the version
 const MODELS_CACHE = `cache-models`;
+// Icon data from Iconfiy API can be cached indefinitely
+const ICONS_CACHE = `cache-icons`;
 
 const ASSETS = [
 	...build, // the app itself
@@ -49,18 +51,12 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 	async function respond() {
 		let url = new URL(event.request.url);
 
-		const cacheName = url.searchParams.get('x-cigale-cache-as') ? MODELS_CACHE : CACHE;
+		if (url.searchParams.get('x-cigale-cache-as') === 'models') {
+			return tryCache(event.request, MODELS_CACHE);
+		}
 
-		if (cacheName === MODELS_CACHE) {
-			const cache = await caches.open(MODELS_CACHE);
-			console.debug(`Serving ${url} from models cache`);
-			const response = await cache.match(url.href);
-
-			if (response) {
-				return response;
-			} else {
-				console.warn(`Model ${url} not found in cache, fetching from network`);
-			}
+		if (url.hostname === 'api.iconify.design') {
+			return tryCache(event.request, ICONS_CACHE);
 		}
 
 		// for everything else, try the network first, but
@@ -75,7 +71,7 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 			}
 
 			if (response.status === 200) {
-				const cache = await caches.open(cacheName);
+				const cache = await caches.open(CACHE);
 				cache.put(event.request, response.clone());
 			}
 
@@ -96,3 +92,34 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 
 	event.respondWith(respond());
 });
+
+/**
+ *
+ * @param {Request} request
+ * @param {string} cacheName
+ */
+async function tryCache(request, cacheName) {
+	const cache = await caches.open(cacheName);
+	const match = await cache.match(request.url.href);
+
+	if (match) {
+		console.debug(`Serving ${request.url} from ${cacheName} cache`);
+		return match;
+	}
+
+	console.warn(`${request.url} not found in ${cacheName} cache, fetching from network`);
+	const response = await fetch(request);
+
+	// if we're offline, fetch can return a value that is not a Response
+	// instead of throwing - and we can't pass this non-Response to respondWith
+	if (!(response instanceof Response)) {
+		throw new Error('invalid response from fetch');
+	}
+
+	if (response.status === 200) {
+		const cache = await caches.open(cacheName);
+		cache.put(request, response.clone());
+	}
+
+	return response;
+}

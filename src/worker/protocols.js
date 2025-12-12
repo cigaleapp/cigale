@@ -13,6 +13,10 @@ import { omit, pick } from '$lib/utils.js';
 import { openDatabase, swarp } from './index.js';
 
 swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
+	// ri: icons to preload from Iconify API. See MetadataEnumVariant's "icon" field.
+	/** @type {Set<string>} */
+	const iconsToPreload = new Set();
+
 	/**
 	 * @param {typeof import('./procedures.js').PROCEDURES.importProtocol.progress.infer.phase} phase
 	 * @param {string} [detail]
@@ -72,6 +76,10 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 				metadataId: namespacedMetadataId(protocol.id, id),
 				...option
 			});
+
+			if (option.icon) {
+				iconsToPreload.add(option.icon);
+			}
 		}
 		console.timeEnd(`Storing Metadata Options for ${id}`);
 	}
@@ -81,7 +89,10 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	const validated = ExportedProtocol.assert(protocol);
 	console.timeEnd('Validating protocol after storing');
 
-	return pick(validated, 'id', 'name', 'version');
+	return {
+		...pick(validated, 'id', 'name', 'version'),
+		iconsToPreload: [...iconsToPreload]
+	};
 });
 
 swarp.diffProtocolWithRemote(async ({ protocolId }, onProgress) => {
