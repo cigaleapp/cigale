@@ -17,15 +17,20 @@ import { toasts } from './toasts.svelte.js';
 
 /**
  *
- * @param {string} protocolId
+ * @param {string} sessionId
  * @param {string} imageFileId
  * @param {ArrayBuffer|Buffer} imageBytes
  * @param {{ type: string; name: string }} file
  */
-export async function processExifData(protocolId, imageFileId, imageBytes, file) {
-	const protocol = await db.tables.Protocol.get(protocolId);
+export async function processExifData(sessionId, imageFileId, imageBytes, file) {
+	const session = await db.tables.Session.get(sessionId);
+	if (!session) {
+		throw new Error(`Session ${sessionId} introuvable`);
+	}
+
+	const protocol = await db.tables.Protocol.get(session.protocol);
 	if (!protocol) {
-		throw new Error(`Protocole ${protocolId} introuvable`);
+		throw new Error(`Protocole ${session.protocol} introuvable`);
 	}
 	const metadataOfProtocol = await db.tables.Metadata.list().then((defs) =>
 		defs.filter((def) => protocol.metadata.includes(def.id))
@@ -67,7 +72,8 @@ export async function processExifData(protocolId, imageFileId, imageBytes, file)
 			await storeMetadataValue({
 				db: db.databaseHandle(),
 				subjectId,
-				metadataId: ensureNamespacedMetadataId(key, protocolId),
+				sessionId: session.id,
+				metadataId: ensureNamespacedMetadataId(key, protocol.id),
 				value,
 				confidence
 			});
@@ -113,7 +119,7 @@ export async function extractMetadata(buffer, extractionPlan) {
 		)
 		.case(
 			{
-				type: Schemas.MetadataType,
+				type: Schemas.MetadataTypeSchema,
 				infer: { exif: 'string' }
 			},
 			({ infer, type }) => ({

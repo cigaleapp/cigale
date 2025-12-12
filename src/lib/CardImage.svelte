@@ -21,14 +21,15 @@
 
 	const tooltip = $derived.by(() => {
 		if (status === 'errored') return uiState.erroredImages.get(image.id);
-		if (isDebugMode()) return `${image.id} @ ${image.addedAt.toISOString()}`;
+		if (isDebugMode())
+			return `${image.id} @ ${image.addedAt.toISOString()} [${image.sessionId}]`;
 	});
 </script>
 
 <CardMedia
 	id={image.fileId}
 	title={image.filename}
-	image={uiState.previewURLs.get(image.fileId)}
+	image={uiState.getPreviewURL(image.fileId)}
 	selected={uiState.selection.includes(image.fileId)}
 	boxes="show-all"
 	{tooltip}

@@ -86,6 +86,7 @@ export async function processImageFile(file, id) {
 
 	await tables.Image.set({
 		id: imageId(id, 0),
+		sessionId: uiState.currentSessionId,
 		filename: file.name,
 		addedAt: dates.formatISO(Date.now()),
 		contentType: file.type,
@@ -98,7 +99,7 @@ export async function processImageFile(file, id) {
 	uiState.processing.removeFile(id);
 
 	if (!isRawImage(file)) {
-		await processExifData(uiState.currentProtocol.id, id, originalBytes, file).catch(
+		await processExifData(uiState.currentSession.id, id, originalBytes, file).catch(
 			(error) => {
 				console.error(error);
 				toasts.error(`Erreur lors de l'extraction des métadonnées EXIF pour ${file.name}`);

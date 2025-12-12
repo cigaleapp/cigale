@@ -142,11 +142,11 @@ msgstr "Alternatives"
 msgid "Analyse…"
 msgstr "Analyzing…"
 
+#: src/lib/ModalConfirmDeletion.svelte
 #: src/lib/toasts.svelte.js
 #: src/lib/undo.svelte.js
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "Annuler"
 msgstr "Cancel"
 
@@ -165,10 +165,10 @@ msgstr "No analysis file found in export {0}"
 msgid "Aucun paramètre d'inférence défini pour le modèle {0} sur le protocole {1}"
 msgstr "No inference parameters defined for model {0} on protocol {1}"
 
+#: src/lib/InputSelectProtocol.svelte
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
 #: src/routes/(app)/DownloadResults.svelte
-#: src/routes/(app)/ProtocolSwitcher.svelte
 msgid "Aucun protocole sélectionné"
 msgstr "No protocol selected"
 
@@ -224,7 +224,7 @@ msgstr "CIGALE ver. <0/> · <1>About</1>"
 msgid "Cacher les boîtes non sélectionnées"
 msgstr "Hide unselected boxes"
 
-#: src/routes/(app)/RemoteProtocolImporter.svelte
+#: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid ""
 "Ce lien pointe vers un protocole distant. Voulez-vous l'importer? Il se trouve à l'adresse\n"
 "suivante: <0/> <1>Importation en cours...</1>"
@@ -415,8 +415,8 @@ msgstr "Error while extracting EXIF metadata for {0}"
 
 #. placeholder {0}: e
 #. placeholder {0}: error
-#: src/routes/(app)/RemoteProtocolImporter.svelte
-#: src/routes/(app)/RemoteProtocolImporter.svelte
+#: src/routes/(app)/protocols/import/[...url]/+page.svelte
+#: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Erreur lors de l'import du protocole distant: {0}"
 msgstr "Error while importing remote protocol: {0}"
 
@@ -481,10 +481,6 @@ msgstr "Host Grotesk"
 msgid "Icônes"
 msgstr "Icons"
 
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
-msgid "Il est impossible de revenir en arrière après avoir supprimé un protocole."
-msgstr "No undo after deleting a protocol."
-
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
@@ -499,7 +495,7 @@ msgstr "Next image"
 #: src/routes/(app)/(sidepanel)/+layout.svelte
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
 #: src/routes/(app)/(sidepanel)/crop/+page.svelte
-#: src/routes/(app)/RemoteProtocolImporter.svelte
+#: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importer"
 msgstr "Import"
 
@@ -511,7 +507,7 @@ msgstr "Import <0/>"
 msgid "Importer des images"
 msgstr "Import images"
 
-#: src/routes/(app)/RemoteProtocolImporter.svelte
+#: src/routes/(app)/protocols/import/[...url]/+page.svelte
 msgid "Importer le protocole distant ?"
 msgstr "Import remote protocol ?"
 
@@ -563,13 +559,6 @@ msgstr "Language"
 #: src/routes/(app)/Settings.svelte
 msgid "Langue de l'interface"
 msgstr "Interface language"
-
-#. placeholder {0}: file.name
-#. placeholder {1}: protocol.id
-#. placeholder {2}: protocolId
-#: src/lib/results.svelte.js
-msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole actuel est {2}"
-msgstr "Analyis file of {0} has been exported with protocol {1}, but current protocol is {2}"
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
@@ -653,7 +642,7 @@ msgstr "Oops!"
 msgid "Oui"
 msgstr "Yes"
 
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
+#: src/lib/ModalConfirmDeletion.svelte
 msgid "Oui, supprimer"
 msgstr "Yes, delete"
 
@@ -759,14 +748,11 @@ msgstr "Service workers"
 msgid "Sous la supervision de"
 msgstr "Under the supervision of"
 
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Suppression de toutes les images et observations…"
-msgstr "Deleting all images and observations…"
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Deletes all data for this preview deployment"
 
+#: src/lib/ModalConfirmDeletion.svelte
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Supprimer"
 msgstr "Delete"
@@ -783,10 +769,6 @@ msgstr "Delete selected images and observations"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Supprimer l’image"
 msgstr "Delete image"
-
-#: src/routes/(app)/(sidepanel)/+layout.svelte
-msgid "Supprimer toutes les images et observations"
-msgstr "Delete all images and observations"
 
 #: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
 msgid "Supprimer toutes les images sélectionnées. Attention, impossible d'annuler"
@@ -931,7 +913,7 @@ msgstr "Up to date"
 msgid "À propos"
 msgstr "About"
 
-#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
+#: src/lib/ModalConfirmDeletion.svelte
 msgid "Êtes-vous sûr·e?"
 msgstr "Are you sure?"
 
@@ -974,15 +956,6 @@ msgid "Protocole importé"
 msgid_plural "# protocoles importés"
 msgstr[0] "Imported protocol"
 msgstr[1] "Imported # protocols"
-
-#. placeholder {0}: title
-#: src/lib/seo.svelte.js
-msgid "{0} · C.I.G.A.L.E."
-msgstr "{0} · C.I.G.A.L.E."
-
-#: src/lib/seo.svelte.js
-msgid "C.I.G.A.L.E."
-msgstr "C.I.G.A.L.E."
 
 #: src/routes/(app)/about/+page.svelte
 msgid "https://www.romanshamin.me/"
@@ -1349,6 +1322,7 @@ msgstr "Protocol information"
 #: src/routes/(app)/protocols/[id]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/infos/+page.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
+#: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Description"
 msgstr "Description"
 
@@ -1921,6 +1895,147 @@ msgstr ""
 msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
 msgstr ""
 
+#: src/lib/results.svelte.js
+msgid "Importation dans une nouvelle session"
+msgstr ""
+
+#. placeholder {0}: file.name
+#. placeholder {1}: session.protocol
+#. placeholder {2}: uiState.currentSession.protocol
+#: src/lib/results.svelte.js
+msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole de la session est {2}"
+msgstr ""
+
+#. placeholder {0}: title
+#. placeholder {1}: suffix
+#: src/lib/seo.svelte.js
+msgid "{0} · {1}"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Sessions <0/>"
+msgstr "Sessions <0/>"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Protocoles <0/>"
+msgstr "Protocols <0/>"
+
+#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Sessions"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Aucun protocole installé, impossible de créer une session."
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Importer un export .zip"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "<0/> Nouvelle session"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Ouvrir la session"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Protocole indisponible"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "# image"
+msgid_plural "# images"
+msgstr[0] ""
+msgstr[1] ""
+
+#. placeholder {0}: plural(counts.images, ['# image', '# images'])
+#: src/routes/(app)/sessions/+page.svelte
+msgid "{0} · créée <0/>"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Gérer"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Créer une nouvelle session"
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Nom de la session"
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Session supprimée."
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Ouvrir"
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Protocole"
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Métadonnées"
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "ID de la session"
+msgstr ""
+
+#: src/routes/(app)/sessions/[id]/+page.js
+msgid "Session not found"
+msgstr ""
+
+#: src/lib/ModalConfirmDeletion.svelte
+msgid "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
+msgstr ""
+
+#. placeholder {0}: typeToConfirm
+#: src/lib/ModalConfirmDeletion.svelte
+msgid "Taper “{0}”"
+msgstr ""
+
+#: src/lib/ModalConfirmDeletion.svelte
+msgid "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1/>"
+msgstr ""
+
+#: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
+msgid "L'impossibilité d'utiliser 1 session"
+msgid_plural "L'impossibilité d'utiliser # sessions"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "La suppression de 1 image"
+msgid_plural "La suppression de # images"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "La suppression de 1 observation"
+msgid_plural "La suppression de # observations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/routes/(app)/sessions/[id]/+page.svelte
+msgid "Protocole <0/> introuvable."
+msgstr ""
+
+#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+msgid "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
+msgstr ""
+
+#: src/lib/sessions.js
+msgid "La session a été fermée"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
@@ -1931,4 +2046,14 @@ msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
+msgstr ""
+
+#. placeholder {0}: file.name
+#: src/lib/results.svelte.js
+msgid "Import de {0}"
+msgstr ""
+
+#. placeholder {0}: file.name
+#: src/lib/results.svelte.js
+msgid "Importée depuis {0}"
 msgstr ""

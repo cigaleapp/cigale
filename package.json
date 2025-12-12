@@ -119,7 +119,6 @@
 		"prettier-plugin-svelte": "^3.4.0",
 		"svelte": "^5.45.6",
 		"svelte-check": "^4.3.4",
-		"sveltekit-search-params": "^4.0.0-next.0",
 		"tinyexec": "^1.0.2",
 		"turndown": "^7.2.2",
 		"typescript": "^5.9.3",

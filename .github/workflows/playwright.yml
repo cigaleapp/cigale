@@ -8,11 +8,54 @@ on:
         description: Name of artifact to download built app from.
         required: true
 
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+
 jobs:
+  predownload:
+    runs-on: ubuntu-latest
+    name: Pre-download models
+    container:
+      image: ghcr.io/gwennlbh/playwright-bun:v1.57.0
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Pre-download polymny 17k classification model
+        uses: carlosperate/download-file-action@v2
+        with:
+          file-url: https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx
+      - name: Pre-download polymny 17k classmapping
+        uses: carlosperate/download-file-action@v2
+        with:
+          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt
+      - name: Pre-download lightweight 80 classification model
+        uses: carlosperate/download-file-action@v2
+        with:
+          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx
+      - name: Pre-download lightweight 80 classmapping
+        uses: carlosperate/download-file-action@v2
+        with:
+          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt
+      - name: Pre-download YOLO detection model
+        uses: carlosperate/download-file-action@v2
+        with:
+          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx
+      - name: Save to artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: predownloaded-models
+          path: |
+            *.onnx
+            *-classmapping.txt
+
   test:
     timeout-minutes: 12
     runs-on: ubuntu-latest
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
+    needs: predownload
     container:
       image: ghcr.io/gwennlbh/playwright-bun:v1.57.0
       options: --user 1001
@@ -33,11 +76,10 @@ jobs:
         with:
           name: ${{ inputs.artifact }}
           path: ./
-      - name: Pre-download heavy model
-        uses: carlosperate/download-file-action@v2
+      - name: Retrieve pre-downloaded models
+        uses: actions/download-artifact@v6
         with:
-          file-url: 'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx'
-          file-name: classification-arthropoda-polymny-2025-04-11.onnx
+          name: predownloaded-models
       - name: Remove task-type spec files for better sharding balance
         run: rm tests/tasks/*
       - name: Run Playwright tests

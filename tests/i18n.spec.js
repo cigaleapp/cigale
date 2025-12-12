@@ -11,7 +11,7 @@ test('can switch languages', async ({ page }) => {
 	expect(await getSettings({ page })).toMatchObject({ language: 'fr' });
 
 	// Check for french text in the UI
-	await expect(page.getByTestId('export-results-button')).toHaveAccessibleName('Résultats');
+	await expect(page.getByTestId('app-settings').locator('header')).toHaveText('Réglages');
 
 	// Switch to English
 	await languagesGroup.getByRole('radio', { name: 'English' }).click();
@@ -24,5 +24,5 @@ test('can switch languages', async ({ page }) => {
 	expect(await getSettings({ page })).toMatchObject({ language: 'en' });
 
 	// Check for english text in the UI
-	await expect(page.getByTestId('export-results-button')).toHaveAccessibleName('Results');
+	await expect(page.getByTestId('app-settings').locator('header')).toHaveText('Settings');
 });

@@ -25,10 +25,16 @@
 	let { value, merged, definition, options = [], onchange = () => {} } = $props();
 
 	const _id = $props.id();
+
+	const isCompactEnum = $derived(
+		definition.type === 'enum' &&
+			options.length <= 10 &&
+			options.every((opt) => !opt.image && !opt.learnMore)
+	);
 </script>
 
 <div class="metadata">
-	<section class="first-line">
+	<section class="first-line" class:break={isCompactEnum}>
 		<label for={_id}>
 			{#if definition.label}
 				{definition.label}
@@ -49,6 +55,7 @@
 				value={value?.value}
 				onblur={onchange}
 				{merged}
+				{isCompactEnum}
 				confidences={Object.fromEntries([
 					...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
 						safeJSONParse(key)?.toString(),
@@ -148,6 +155,16 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1em;
+
+		&.break {
+			flex-direction: column;
+			align-items: flex-start;
+			margin-bottom: 1em;
+
+			.value {
+				width: 100%;
+			}
+		}
 	}
 	.value {
 		display: flex;

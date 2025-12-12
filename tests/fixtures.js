@@ -1,35 +1,58 @@
-import { mkdir, readFile, rm } from 'node:fs/promises';
+import { mkdir, rm } from 'node:fs/promises';
 import { test as base } from '@playwright/test';
 
-import defaultProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import exampleProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
-import { mockProtocolSourceURL, mockUrl, setHardwareConcurrency } from './utils';
+import fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import {
+	getPredownloadedModel,
+	mockPredownloadedModels,
+	mockProtocolSourceURL,
+	setHardwareConcurrency
+} from './utils';
 
-export { exampleProtocol };
-
-const classificationArthropodaModel = await readFile(
-	'classification-arthropoda-polymny-2025-04-11.onnx'
-).catch(() => {
-	console.warn(
-		`Warning: cannot find 'classification-arthropoda-polymny-2025-04-11.onnx' model file. Tests will use the network to fetch it.`
-	);
-	return null;
-});
-
-// Make exampleProtocol lightweight by cutting out 90% of metadata options
+/**
+ * @type {import('./utils').PredownloadedModel|null}
+ */
+let classification80Model = null;
+/**
+ * @type {import('./utils').PredownloadedModel|null}
+ */
+let classification17kModel = null;
+/**
+ * @type {import('./utils').PredownloadedModel|null}
+ */
+let detectionModel = null;
 
 /**
  * @import { Fixtures, TestType, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions } from '@playwright/test';
  */
 
 /**
- * @type {TestType<{ forEachTest: void } & PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions >}
+ * @type {TestType<{ forEachTest: void} & PlaywrightTestArgs & PlaywrightTestOptions, { forEachWorker: void  } & PlaywrightWorkerArgs & PlaywrightWorkerOptions >}
  */
 export const test = base.extend(
 	/**
-	 * @type {Fixtures<{forEachTest: void}, {}, PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
+	 * @type {Fixtures<{forEachTest: void}, {forEachWorker: void}, PlaywrightTestArgs & PlaywrightTestOptions, PlaywrightWorkerArgs & PlaywrightWorkerOptions>}
 	 */
 	({
+		forEachWorker: [
+			// oxlint-disable-next-line no-empty-pattern required by playwright
+			async ({}, use) => {
+				classification80Model = await getPredownloadedModel(
+					'model_classif.onnx',
+					'lightweight-80-classmapping.txt'
+				);
+				classification17kModel = await getPredownloadedModel(
+					'classification-arthropoda-polymny-2025-04-11.onnx',
+					'polymny-17k-classmapping.txt'
+				);
+				detectionModel = await getPredownloadedModel(
+					'arthropod_detector_yolo11n_conf0.437.onnx'
+				);
+				await use();
+			},
+			{ scope: 'worker', auto: true }
+		],
 		forEachTest: [
 			async ({ page, context }, use, { tags, annotations }) => {
 				// https://playwright.dev/docs/service-workers-experimental
@@ -39,16 +62,15 @@ export const test = base.extend(
 				await mkdir('./tests/results', { recursive: true });
 
 				if (!tags.includes('@real-protocol')) {
-					await mockProtocolSourceURL(page, context, defaultProtocol.source, {
-						json: exampleProtocol
+					await mockProtocolSourceURL(page, context, fullProtocol.source, {
+						json: lightProtocol
 					});
 				}
 
-				if (classificationArthropodaModel !== null) {
-					await mockUrl(page, context, defaultProtocol.crop.infer[0].model, {
-						body: classificationArthropodaModel
-					});
-				}
+				await mockPredownloadedModels(page, context, fullProtocol, {
+					detection: [detectionModel],
+					species: [classification17kModel, classification80Model]
+				});
 
 				const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;
 				if (concurrency) {
@@ -74,3 +96,4 @@ export const test = base.extend(
 );
 
 export { expect } from '@playwright/test';
+export { lightProtocol as exampleProtocol };

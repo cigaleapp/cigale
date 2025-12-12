@@ -54,6 +54,11 @@
 		font-family: inherit;
 	}
 
+	:global(button) {
+		border: none;
+		cursor: pointer;
+	}
+
 	:global(code, pre, code a, code input) {
 		font-family: var(--font-mono);
 		font-weight: 260;

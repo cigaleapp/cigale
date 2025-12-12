@@ -56,7 +56,7 @@
 					<DropdownMenu.GroupHeading>{help}</DropdownMenu.GroupHeading>
 				{/if}
 
-				{#each selectableItems as i (i.label)}
+				{#each selectableItems as i (i.key)}
 					<DropdownMenu.CheckboxItem
 						checked={i.selected}
 						onSelect={i.onclick}

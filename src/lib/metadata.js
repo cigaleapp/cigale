@@ -32,12 +32,13 @@ import { avg, fromEntries, mapValues } from './utils.js';
 /**
  * Refresh the specified table. Does nothing if we can't import idb.svelte.js.
  * We do it this way so that this file can be imported in the web worker.
+ * @param {string} sessionId
  * @param {...ReactiveTableNames} tableNames
  */
-async function refreshTables(...tableNames) {
+async function refreshTables(sessionId, ...tableNames) {
 	try {
 		const idb = await import('$lib/idb.svelte.js');
-		await Promise.all(tableNames.map((name) => idb.tables[name].refresh()));
+		await Promise.all(tableNames.map((name) => idb.tables[name].refresh(sessionId)));
 	} catch (error) {
 		console.warn(`Cannot refresh tables ${tableNames}:`, error);
 	}
@@ -110,7 +111,7 @@ export function serializeMetadataValues(values) {
  *
  * @template {DB.MetadataType} Type
  * @param {object} options
- * @param {string} options.subjectId id de l'image ou l'observation
+ * @param {string} options.subjectId id de l'image, l'observation ou la session
  * @param {string} options.metadataId id de la métadonnée
  * @param {Type} [options.type] le type de données pour la métadonnée, sert à éviter des problèmes de typages
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
@@ -120,6 +121,7 @@ export function serializeMetadataValues(values) {
  * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  * @param {AbortSignal} [options.abortSignal] signal d'abandon pour annuler la requête
+ * @param {string} [options.sessionId] id de la session en cours, important pour refresh le state réactif des tables
  */
 export async function storeMetadataValue({
 	db,
@@ -131,6 +133,7 @@ export async function storeMetadataValue({
 	alternatives = [],
 	manuallyModified = false,
 	cascadedFrom = [],
+	sessionId,
 	abortSignal
 }) {
 	if (!namespaceOfMetadataId(metadataId)) {
@@ -165,12 +168,20 @@ export async function storeMetadataValue({
 	abortSignal?.throwIfAborted();
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
+	const session = await db.get('Session', subjectId);
 	const imagesFromImageFile = await db
 		.getAll('Image')
 		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
 	abortSignal?.throwIfAborted();
-	if (image) {
+	if (session) {
+		if (session.metadata) {
+			session.metadata[metadataId] = newValue;
+		} else {
+			session.metadata = { [metadataId]: newValue };
+		}
+		db.put('Session', session);
+	} else if (image) {
 		image.metadata[metadataId] = newValue;
 		db.put('Image', image);
 	} else if (observation) {
@@ -180,6 +191,7 @@ export async function storeMetadataValue({
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
 				db,
+				sessionId,
 				subjectId: id,
 				metadataId,
 				value,
@@ -225,6 +237,7 @@ export async function storeMetadataValue({
 
 		await storeMetadataValue({
 			db,
+			sessionId,
 			subjectId,
 			manuallyModified,
 			cascadedFrom: [...cascadedFrom, metadataId],
@@ -234,8 +247,8 @@ export async function storeMetadataValue({
 	}
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
-	if (cascadedFrom.length === 0) {
-		await refreshTables(image ? 'Image' : 'Observation');
+	if (cascadedFrom.length === 0 && sessionId) {
+		await refreshTables(sessionId, image ? 'Image' : 'Observation');
 	}
 }
 
@@ -247,13 +260,15 @@ export async function storeMetadataValue({
  * @param {boolean} [options.recursive=false] si true, supprime la métadonnée de toutes les images composant l'observation
  * @param {DatabaseHandle} options.db BDD à modifier
  * @param {boolean} [options.reactive=true] refresh reactive table state if possible
+ * @param {string} [options.sessionId] current session, used to refresh reactive tables
  */
 export async function deleteMetadataValue({
 	db,
 	subjectId,
 	metadataId,
 	recursive = false,
-	reactive = true
+	reactive = true,
+	sessionId
 }) {
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
@@ -272,6 +287,7 @@ export async function deleteMetadataValue({
 			for (const imageId of observation.images) {
 				await deleteMetadataValue({
 					db,
+					sessionId,
 					subjectId: imageId,
 					recursive: false,
 					metadataId,
@@ -282,7 +298,7 @@ export async function deleteMetadataValue({
 		}
 	}
 
-	if (reactive) await refreshTables('Image', 'Observation');
+	if (reactive && sessionId) await refreshTables(sessionId, 'Image', 'Observation');
 
 	return;
 }

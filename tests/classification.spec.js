@@ -1,16 +1,16 @@
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
-	chooseProtocol,
 	firstObservationCard,
 	getObservation,
 	goToTab,
 	importPhotos,
+	newSession,
 	waitForLoadingEnd
 } from './utils';
 
 test('allows cancelling classification of an observation', issue(430), async ({ page }) => {
-	await chooseProtocol(page);
+	await newSession(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {

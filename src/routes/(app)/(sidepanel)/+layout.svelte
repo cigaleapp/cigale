@@ -21,7 +21,6 @@
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
-	import { cancellers } from '../+layout.svelte';
 	import PreviewSidePanel from './PreviewSidePanel.svelte';
 
 	seo({ title: 'Importer' });
@@ -108,29 +107,6 @@
 				});
 			}
 		},
-		'$mod+u': {
-			help: 'Supprimer toutes les images et observations',
-			async do() {
-				toasts.warn('Suppression de toutes les images et observations…');
-				await db.openTransaction(
-					['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
-					{},
-					(tx) => {
-						tx.objectStore('Observation').clear();
-						tx.objectStore('ImageFile').clear();
-						uiState.previewURLs.clear();
-						tx.objectStore('Image').clear();
-						uiState.queuedImages.clear();
-						uiState.erroredImages.clear();
-						uiState.loadingImages.clear();
-						uiState.processing.files = [];
-						uiState.setSelection?.([]);
-						cancellers.forEach((cancel) => cancel('Cancelled by user'));
-						cancellers.clear();
-					}
-				);
-			}
-		},
 		'$mod+g': {
 			help: 'Fusionner des observations ou images',
 			do: mergeSelection
@@ -177,7 +153,7 @@
 		selectedImages
 			.map((image) => {
 				if (!image.fileId) return undefined;
-				const src = uiState.previewURLs.get(image.fileId);
+				const src = uiState.getPreviewURL(image.fileId);
 				if (!src) return undefined;
 				const box = uiState.cropMetadataValueOf(image)?.value;
 				return {
@@ -226,6 +202,7 @@
 					if (value === undefined) {
 						await deleteMetadataValue({
 							db: db.databaseHandle(),
+							sessionId: uiState.currentSession?.id,
 							subjectId,
 							metadataId: id,
 							recursive: true
@@ -233,6 +210,7 @@
 					} else {
 						await storeMetadataValue({
 							db: db.databaseHandle(),
+							sessionId: uiState.currentSession?.id,
 							subjectId,
 							metadataId: id,
 							confidence: 1,

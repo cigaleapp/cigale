@@ -345,6 +345,8 @@
 		gap: 1em;
 		margin-top: 2em;
 		margin-bottom: 1em;
+		/* flex-wrap: wrap; */
+		max-width: 400px;
 	}
 
 	footer {

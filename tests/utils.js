@@ -1,9 +1,9 @@
-import { readdirSync, readFileSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect } from '@playwright/test';
 
-import defaultProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Schemas } from '../src/lib/database.js';
 
 /**
@@ -158,7 +158,7 @@ export async function getImage({ page, ...query }) {
 }
 
 /**
- *
+ * Get observation object in database
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} param0.label
@@ -171,6 +171,21 @@ export async function getObservation({ page, label }) {
 	}, /** @type {const} */ ([label]));
 	if (!observation) throw new Error(`Observation ${label} not found in the database`);
 	return observation;
+}
+
+/**
+ * Get session object in database
+ * @param {{page: Page} & ({name: string} | {id: string})} param0
+ * @returns {Promise<typeof import('$lib/database').Schemas.Session.inferIn>}
+ */
+export async function getSession({ page, ...query }) {
+	const session = await page.evaluate(async ([query]) => {
+		const sessions = await window.DB.getAll('Session');
+		return sessions.find((s) => ('id' in query ? s.id === query.id : s.name === query.name));
+	}, /** @type {const} */ ([query]));
+	if (!session)
+		throw new Error(`Session with ${JSON.stringify(query)} not found in the database`);
+	return session;
 }
 
 /**
@@ -197,7 +212,7 @@ export async function getMetadataValuesOfImage({ page, protocolId, image }) {
 }
 
 /**
- *
+ * Get metadata values set on the observation (.metadataOverrides)
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} param0.protocolId
@@ -218,13 +233,34 @@ export async function getMetadataOverridesOfObservation({ page, protocolId, obse
 }
 
 /**
+ * Get metadata values set on the session
+ * @param {object} param0
+ * @param {Page} param0.page
+ * @param {string} param0.name session name
+ * @param {string} param0.protocolId
+ * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
+ */
+async function getMetadataValuesOfSession({ page, name, protocolId }) {
+	const { metadata } = await getSession({ page, name });
+	return Object.fromEntries(
+		Object.entries(metadata)
+			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
+			.map(([id, { value }]) => [
+				protocolId ? id.replace(`${protocolId}__`, '') : id,
+				safeJSONParse(value)
+			])
+	);
+}
+
+/**
  *
  * @param {Page} page
- * @param {{image: {id: string} | {filename: string}} | {observation: string}} query
+ * @param {{image: {id: string} | {filename: string}} | {observation: string} | {session: {name: string}}} query
  * @param {string} metadataKey
  * @param {string} [protocolId]
+ * @returns {Promise<import('$lib/metadata').RuntimeValue | undefined>}
  */
-export async function getMetadataValue(page, query, metadataKey, protocolId = defaultProtocol.id) {
+export async function getMetadataValue(page, query, metadataKey, protocolId = lightProtocol.id) {
 	if ('image' in query) {
 		const metadata = await getMetadataValuesOfImage({
 			page,
@@ -235,6 +271,23 @@ export async function getMetadataValue(page, query, metadataKey, protocolId = de
 			page,
 			'Metadata of image',
 			query.image,
+			'for protocol',
+			protocolId,
+			metadata
+		);
+		return metadata[metadataKey];
+	}
+
+	if ('session' in query) {
+		const metadata = await getMetadataValuesOfSession({
+			page,
+			name: query.session.name,
+			protocolId
+		});
+		await browserConsole.log(
+			page,
+			'Metadata of session',
+			query.session.name,
 			'for protocol',
 			protocolId,
 			metadata
@@ -322,12 +375,32 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 /**
  *
  * @param {Page} page
- * @param {string} [name]
- * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {object} [options]
+ * @param {string} [options.protocol] name of protocol to use
+ * @param {{ crop?: string, classify?: string }} [options.models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {string} [options.name] name of the session
  */
-export async function chooseProtocol(page, name, models = {}) {
-	// Choose default protocol
-	await chooseInDropdown(page, 'protocol-switcher', name ?? ((opts) => opts.first()));
+export async function newSession(page, { name, protocol, models = {} } = {}) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+	// XXX: Wait until page is ready
+	await page.waitForTimeout(500);
+
+	await page.getByTestId('new-session').click();
+	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+
+	if (protocol) {
+		await chooseInDropdown(page, 'protocol', protocol);
+	}
+
+	if (name) {
+		const textbox = page.getByRole('textbox', { name: 'Nom de la session' });
+		await textbox.fill(name);
+		await textbox.blur();
+	}
+
+	await page.getByRole('button', { name: 'Ouvrir', exact: true }).click();
+	await page.waitForURL((u) => u.hash === '#/import');
 
 	if (models) {
 		for (const [task, model] of Object.entries(models)) {
@@ -336,12 +409,77 @@ export async function chooseProtocol(page, name, models = {}) {
 	}
 }
 
+/**
+ * @param {Page} page
+ * @param {string} name
+ */
+export async function switchSession(page, name) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+	// XXX: Wait until page is ready
+	await page.waitForTimeout(500);
+	await page.getByRole('heading', { name }).click();
+	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
+ * @param {Page} page
+ * @param {string} name
+ */
+export async function deleteSession(page, name) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+	// XXX: Wait until page is ready
+	await page.waitForTimeout(500);
+	const sessionCard = page.getByRole('article').filter({
+		has: page.getByRole('heading', { name })
+	});
+
+	await sessionCard.getByRole('button', { name: 'Gérer' }).click();
+	await page.getByRole('button', { name: 'Supprimer' }).click();
+	await confirmDeletionModal(page, { type: name, modalKey: 'modal_delete_session' });
+	await page.waitForURL((u) => u.hash === '#/sessions');
+}
+
+/**
+ *
+ * @param {Page} page
+ */
+export async function chooseFirstSession(page) {
+	await goHome(page);
+	await goToTab(page, 'sessions');
+
+	await page.locator('main article:not([data-testid=new-session-card])').first().click();
+	await page.waitForURL((u) => u.hash === '#/import');
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string} name
+ */
+export async function changeSessionProtocol(page, name) {
+	await page.getByTestId('goto-current-session').click();
+	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await chooseInDropdown(page, 'protocol', name);
+	await goToTab(page, 'import');
+}
+
+/**
+ * @param {Page} page
+ */
 export async function goToProtocolManagement(page) {
-	await page.getByTestId('protocol-switcher-open').click();
-	await page
-		.getByTestId('protocol-switcher-options')
-		.getByRole('menuitem', { name: 'Gérer les protocoles' })
-		.click();
+	await goHome(page);
+	await goToTab(page, 'protocols');
+}
+
+/**
+ *
+ * @param {Page} page
+ */
+async function goHome(page) {
+	await page.getByTestId('goto-home').click();
+	await page.waitForURL((u) => u.hash === '#/sessions');
 }
 
 /**
@@ -351,19 +489,25 @@ export async function goToProtocolManagement(page) {
 const appNavTabs = (lang = 'fr') => ({
 	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
 	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
-	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' }
+	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' },
+	sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
+	protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' }
 });
+
+/**
+ * @typedef {keyof ReturnType<typeof appNavTabs>} NavigationTab
+ */
 
 /**
  *
  * @param {Page} page
- * @param {'import'|'crop'|'classify'} tabName
+ * @param {NavigationTab} tabName
  * @param {object} [options]
  * @param {boolean} [options.waitForModel=true] wait for the model to be loaded (only for crop and classify)
  * @param {import('$lib/i18n').Language} [options.language=fr]
  */
 export async function goToTab(page, tabName, { waitForModel = true, language = 'fr' } = {}) {
-	getTab(page, tabName).click();
+	await getTab(page, tabName).click();
 	const tab = appNavTabs(language)[tabName];
 	await page.waitForURL((u) => u.hash.replace(/\/$/, '') === tab.hash.replace(/\/$/, ''));
 
@@ -384,7 +528,7 @@ export async function goToTab(page, tabName, { waitForModel = true, language = '
 /**
  *
  * @param {Page} page
- * @param {'import'|'crop'|'classify'} tabName
+ * @param {NavigationTab} tabName
  * @param {'fr'|'en'} [language=fr]
  */
 export function getTab(page, tabName, language = 'fr') {
@@ -433,7 +577,7 @@ export function toast(page, message, { exact = false, type = undefined }) {
  */
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings({ page }, { showTechnicalMetadata: false });
-	await chooseProtocol(page);
+	await newSession(page);
 	await goToTab(page, 'import');
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
@@ -489,6 +633,11 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 		},
 		readFileSync(location, 'utf-8')
 	);
+
+	// FIXME await finishes before all [loadDatabaseDump] logs ??
+	await page.waitForTimeout(3_000);
+	await page.reload();
+	await page.waitForFunction(() => Boolean(window.devalue && window.DB && window.refreshDB));
 }
 
 export const browserConsole = {
@@ -540,7 +689,7 @@ export async function expectTooltipContent(page, locator, content) {
  * @param {string | RegExp | ((u: URL) => boolean)} url
  * @param {{json: object} | {body: string | Buffer}} result
  */
-export async function mockUrl(page, context, url, result) {
+async function mockUrl(page, context, url, result) {
 	await Promise.all(
 		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
 		[context, page].map(async (target) =>
@@ -572,15 +721,46 @@ export async function mockProtocolSourceURL(page, context, source, mockedResult)
 /**
  *
  * @param {Page} page
- * @param {string} modalTitle
+ * @param {string | {title: string} | {key: `modal_${string}`}} query providing a string is equivalent to providing {title: string}
  */
-export function modal(page, modalTitle) {
+export function modal(page, query) {
+	if (typeof query === 'string') {
+		return modal(page, { title: query });
+	}
+
+	if ('key' in query) {
+		return page.locator(`dialog[data-key='${query.key}']`);
+	}
+
 	return page.getByRole('dialog').filter({
+		visible: true,
 		has: page.getByRole('banner').getByRole('heading', {
-			name: modalTitle,
+			name: query.title,
 			exact: true
 		})
 	});
+}
+
+/**
+ * Expects an open deletion confirmation modal, and confirms deletion
+ * @param {Page} page
+ * @param {object} [opts]
+ * @param {string} [opts.type] text to type before hitting confirm button
+ * @param {string} [opts.title='Êtes-vous sûr·e?'] title of the modal
+ * @param {`modal_${string}`} [opts.modalKey] data-key of the modal to target
+ */
+export async function confirmDeletionModal(
+	page,
+	{ type, title = 'Êtes-vous sûr·e?', modalKey } = {}
+) {
+	const deletionModal = modal(page, modalKey ? { key: modalKey } : { title });
+	await expect(deletionModal).toBeVisible();
+
+	if (type) {
+		const textbox = deletionModal.getByRole('textbox');
+		await textbox.fill(type);
+	}
+	await deletionModal.getByRole('button', { name: 'Oui, supprimer' }).click();
 }
 
 /**
@@ -641,13 +821,26 @@ export async function waitForLoadingEnd(area, timeout = 30_000) {
 
 /**
  * @param {Page} page
- * @param {string} nameOrDescription
+ * @param {string} metadataLabel
  */
-export function sidepanelMetadataSectionFor(page, nameOrDescription) {
+export function sidepanelMetadataSectionFor(page, metadataLabel) {
 	return page
 		.getByTestId('sidepanel')
 		.locator('section')
-		.filter({ hasText: nameOrDescription })
+		.filter({ hasText: metadataLabel })
+		.first();
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {string} metadataLabel
+ */
+export function sessionMetadataSectionFor(page, metadataLabel) {
+	return page
+		.getByTestId('session-metadata')
+		.locator('section')
+		.filter({ hasText: metadataLabel })
 		.first();
 }
 
@@ -743,7 +936,7 @@ export function parseCsv(contents) {
  * @param {import('node:stream').Readable} stream
  * @returns
  */
-export async function readStreamToBuffer(stream) {
+async function readStreamToBuffer(stream) {
 	return Buffer.concat(await Array.fromAsync(stream));
 }
 
@@ -795,5 +988,94 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 		expect(zipFiles).toContainEqual(
 			expectedFile instanceof RegExp ? expect.stringMatching(expectedFile) : expectedFile
 		);
+	}
+}
+
+/**
+ * @typedef {{ model: Buffer<ArrayBufferLike>, classmapping: Buffer<ArrayBufferLike> | undefined, filename: string }} PredownloadedModel
+ */
+
+/**
+ *
+ * @param {string} filename
+ * @param {string} [classmappingFilename]
+ * @returns {Promise<PredownloadedModel|null>}
+ */
+export async function getPredownloadedModel(filename, classmappingFilename) {
+	const model = await readFile(filename).catch(() => {
+		console.warn(
+			`Warning: cannot find '${filename}' model file. Tests will use the network to fetch it.`
+		);
+		return null;
+	});
+
+	const classmapping = classmappingFilename
+		? await readFile(classmappingFilename).catch(() => {
+				console.warn(
+					`Warning: cannot find '${classmappingFilename}' classmapping file. Tests will use the network to fetch the '${filename}' model.`
+				);
+				return undefined;
+			})
+		: undefined;
+
+	return model ? { model, classmapping, filename } : null;
+}
+
+/**
+ * @param {Page} page
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
+ * @param {{metadata: string} | 'detection'} task
+ * @param {PredownloadedModel} model
+ */
+async function mockPredownloadedModel(
+	page,
+	context,
+	protocol,
+	task,
+	{ filename, model, classmapping }
+) {
+	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural']} arg0 */
+	const modelMatches = ({ model }) =>
+		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
+
+	const url =
+		task === 'detection'
+			? protocol.crop.infer?.find(modelMatches)?.model
+			: protocol.metadata[`${protocol.id}__${task.metadata}`].infer?.neural.find(modelMatches)
+					?.model;
+
+	await mockUrl(page, context, url, { body: model });
+
+	if (classmapping && task !== 'detection') {
+		const classmappingUrl =
+			protocol.metadata[`${protocol.id}__${task.metadata}`].infer?.neural.find(
+				modelMatches
+			)?.classmapping;
+
+		if (!classmappingUrl) return;
+
+		await mockUrl(page, context, classmappingUrl, { body: classmapping });
+	}
+}
+
+/**
+ * @param {Page} page
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
+ * @param {Record<'detection'|'species', Array<null | PredownloadedModel>>} models
+ */
+export async function mockPredownloadedModels(page, context, protocol, models) {
+	for (const [task, taskModels] of Object.entries(models)) {
+		for (const model of taskModels) {
+			if (!model) continue;
+			await mockPredownloadedModel(
+				page,
+				context,
+				protocol,
+				task === 'detection' ? 'detection' : { metadata: task },
+				model
+			);
+		}
 	}
 }

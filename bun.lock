@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "CIGALE",
@@ -101,7 +100,6 @@
         "prettier-plugin-svelte": "^3.4.0",
         "svelte": "^5.45.6",
         "svelte-check": "^4.3.4",
-        "sveltekit-search-params": "^4.0.0-next.0",
         "tinyexec": "^1.0.2",
         "turndown": "^7.2.2",
         "typescript": "^5.9.3",
@@ -2149,8 +2147,6 @@
     "svelte-toolbelt": ["svelte-toolbelt@0.7.1", "", { "dependencies": { "clsx": "^2.1.1", "runed": "^0.23.2", "style-to-object": "^1.0.8" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ=="],
 
     "sveltejs-tippy": ["sveltejs-tippy@3.0.0", "", { "dependencies": { "tippy.js": "~6.0.1" } }, "sha512-LAfQikm61AeqZW1hCFWUsmGEMmhMHDvrPV0JhbT38Ell9SqBjmFaY//+YKUxaJvx6nLMxGQdlcHA1rDg2Ml8tQ=="],
-
-    "sveltekit-search-params": ["sveltekit-search-params@4.0.0-next.0", "", { "peerDependencies": { "@sveltejs/kit": "^2.0.0", "svelte": "^5.0.0" } }, "sha512-haFr5seakusriPePAv2F5/lsOa37rr9AOGDa5JOZ9CaB0Vrl8V8PdtqNWfh/kF0jlANdkdqz5gKK66nhhHT8tg=="],
 
     "swarpc": ["swarpc@0.16.1", "", {}, "sha512-DdvgFsCWWyM+A/KZshnNnA1GQZjZopz8/UHxQR+pu3VodMlcc5Cghlkvv2vS7PZGX0wCRSRKkW0uXOehjjqrXw=="],
 

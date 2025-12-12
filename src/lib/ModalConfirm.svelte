@@ -15,13 +15,15 @@
 	 * @property {import('svelte').Snippet} [children] the content of the modal
 	 * @property {string} [confirm] the text to display on the confirm button
 	 * @property {string} [cancel] the text to display on the cancel button
+	 * @property {boolean} [disable-confirm] whether to disable the confirm button
 	 */
 
-	/** @type {Props} */
+	/** @type {Props & Partial<Omit<import('$lib/Modal.svelte').Props, keyof Props>>} */
 	let {
 		onconfirm,
 		oncancel = undefined,
 		children = undefined,
+		'disable-confirm': disableConfirm = false,
 		confirm = 'OK',
 		cancel = 'Annuler',
 		close = $bindable(undefined),
@@ -45,6 +47,7 @@
 			</ButtonSecondary>
 			<ButtonPrimary
 				loading
+				disabled={disableConfirm}
 				onclick={async () => {
 					await onconfirm();
 					close?.();

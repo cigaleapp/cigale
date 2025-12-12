@@ -2,7 +2,7 @@ import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	browserConsole,
-	chooseProtocol,
+	chooseFirstSession,
 	getImage,
 	getMetadataValue,
 	getSettings,
@@ -17,7 +17,7 @@ test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page }, testInfo) => {
 		testInfo.setTimeout(40_000);
 		await loadDatabaseDump(page);
-		await chooseProtocol(page);
+		await chooseFirstSession(page);
 		await goToTab(page, 'import');
 		const allImages = await listTable(page, 'Image');
 		await markImagesAsConfirmedInDatabase(

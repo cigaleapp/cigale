@@ -19,9 +19,10 @@
 
 	const allImages = $derived([
 		...unique(
-			tables.Image.state.map(({ filename, id, addedAt, fileId }) => ({
+			tables.Image.state.map(({ filename, id, addedAt, fileId, sessionId }) => ({
 				id: fileId ?? id,
 				addedAt,
+				sessionId,
 				name: filename,
 				virtual: false,
 				data: tables.Image.getFromState(id)
@@ -32,6 +33,7 @@
 		),
 		...uiState.processing.files.map(({ name, id, addedAt }) => ({
 			id,
+			sessionId: uiState.currentSessionId,
 			addedAt,
 			name,
 			virtual: true,

@@ -72,6 +72,7 @@ describe('processExifData', () => {
 
 		await db.tables.Image.set({
 			id: imageId(0, 0),
+			sessionId: 'testing',
 			addedAt: '2023-10-01T00:00:00Z',
 			fileId: 'quoicoubaka',
 			dimensions: { width: 100, height: 100 },
@@ -79,12 +80,22 @@ describe('processExifData', () => {
 			filename: 'test.jpg',
 			metadata: {}
 		});
+
+		await db.tables.Session.set({
+			id: 'testing',
+			protocol: 'com.example.test.protocol',
+			createdAt: '2023-10-01T00:00:00Z',
+			openedAt: '2023-10-01T00:00:00Z',
+			description: '',
+			metadata: {},
+			name: 'Testing Session'
+		});
 	});
 
 	test('extracts from image without GPS', async () => {
 		const imageBytes = await readImageBytes('lil-fella.jpeg');
 
-		await processExifData('com.example.test.protocol', 'quoicoubaka', imageBytes, {
+		await processExifData('testing', 'quoicoubaka', imageBytes, {
 			type: 'image/jpeg',
 			name: 'test.jpg'
 		});
@@ -103,7 +114,7 @@ describe('processExifData', () => {
 	test('extracts from image with GPS', async () => {
 		const imageBytes = await readImageBytes('with-exif-gps.jpeg');
 
-		await processExifData('com.example.test.protocol', 'quoicoubaka', imageBytes, {
+		await processExifData('testing', 'quoicoubaka', imageBytes, {
 			type: 'image/jpeg',
 			name: 'test.jpg'
 		});

@@ -6,7 +6,7 @@ import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import { metadataOptionsKeyRange } from './metadata.js';
 import { ExportedProtocol, Protocol } from './schemas/protocols.js';
-import { cachebust, fetchHttpRequest, fromEntries, keys, omit, range, sum } from './utils.js';
+import { cachebust, fetchHttpRequest, fromEntries, keys, omit, pick, range, sum } from './utils.js';
 
 /**
  * @import { Schemas, Tables } from './database.js';
@@ -31,6 +31,28 @@ export async function toExportedProtocol(db, protocol) {
 		metadataOptionsKeyRange(protocol.id, null)
 	);
 
+	const allMetadataDefs = Object.fromEntries(
+		await db.getAll('Metadata').then((defs) =>
+			defs
+				.filter(
+					(def) =>
+						protocol.metadata.includes(def.id) ||
+						protocol.sessionMetadata.includes(def.id)
+				)
+				.map((metadata) => [
+					metadata.id,
+					{
+						...omit(metadata, 'id'),
+						options: allMetadataOptions
+							.filter(({ id }) =>
+								metadataOptionsKeyRange(protocol.id, metadata.id).includes(id)
+							)
+							.map((option) => omit(option, 'id', 'metadataId'))
+					}
+				])
+		)
+	);
+
 	return ExportedProtocol.assert({
 		...omit(protocol, 'dirty'),
 		exports: {
@@ -44,23 +66,11 @@ export async function toExportedProtocol(db, protocol) {
 					}
 				: {})
 		},
-		metadata: Object.fromEntries(
-			await db.getAll('Metadata').then((defs) =>
-				defs
-					.filter((def) => protocol.metadata.includes(def.id))
-					.map((metadata) => [
-						metadata.id,
-						{
-							...omit(metadata, 'id'),
-							options: allMetadataOptions
-								.filter(({ id }) =>
-									metadataOptionsKeyRange(protocol.id, metadata.id).includes(id)
-								)
-								.map((option) => omit(option, 'id', 'metadataId'))
-						}
-					])
-			)
-		)
+		metadata: pick(
+			allMetadataDefs,
+			...protocol.metadata.filter((id) => !protocol.sessionMetadata.includes(id))
+		),
+		sessionMetadata: pick(allMetadataDefs, ...protocol.sessionMetadata)
 	});
 }
 
@@ -143,8 +153,8 @@ export async function promptAndImportProtocol({
 					}).catch((err) => Promise.reject(new Error(errorMessage(err))));
 
 					const { tables } = await import('./idb.svelte.js');
-					await tables.Protocol.refresh();
-					await tables.Metadata.refresh();
+					await tables.Protocol.refresh(null);
+					await tables.Metadata.refresh(null);
 
 					resolve(result);
 				};
@@ -222,8 +232,8 @@ export async function upgradeProtocol({ version, source, id, swarpc }) {
 	}).then((r) => r.text());
 
 	const result = await swarpc.importProtocol({ contents });
-	tables.Protocol.refresh();
-	tables.Metadata.refresh();
+	tables.Protocol.refresh(null);
+	tables.Metadata.refresh(null);
 
 	const { version: newVersion, ...rest } = result;
 

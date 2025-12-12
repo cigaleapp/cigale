@@ -1,15 +1,18 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import JSZip from 'jszip';
 
-import { expect, test } from '../fixtures.js';
+import { exampleProtocol, expect, test } from '../fixtures.js';
 import {
-	chooseProtocol,
+	confirmDeletionModal,
 	dumpDatabase,
 	goToProtocolManagement,
 	goToTab,
 	importPhotos,
 	importProtocol,
-	importResults
+	importResults,
+	modal,
+	newSession,
+	sessionMetadataSectionFor
 } from '../utils.js';
 
 test.skip(
@@ -21,9 +24,7 @@ test.describe('Database dumps', () => {
 	test('basic', async ({ page }) => {
 		await goToProtocolManagement(page);
 		await importProtocol(page, '../../examples/arthropods.light.cigaleprotocol.json');
-		await chooseProtocol(page);
 
-		await goToTab(page, 'import');
 		await importResults(page, 'correct.zip');
 		await dumpDatabase(page, 'basic.devalue');
 	});
@@ -33,12 +34,12 @@ test.describe('Database dumps', () => {
 		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
 		await page
 			.getByRole('listitem')
-			.filter({ hasText: 'io.github.cigaleapp.arthropods.example.light' })
+			.filter({ hasText: exampleProtocol.id })
 			.getByRole('button', { name: 'Supprimer' })
 			.click();
-		await page.getByRole('button', { name: 'Oui, supprimer' }).click();
+		await confirmDeletionModal(page, { type: exampleProtocol.name });
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
-		await chooseProtocol(page);
+		await newSession(page);
 
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
@@ -53,16 +54,35 @@ test.describe('Exports', () => {
 	 * @param {import('@playwright/test').Page} param0.page
 	 */
 	async function prepare({ page }) {
-		await chooseProtocol(page);
+		await newSession(page, { name: 'Testing session' });
+
+		await page.getByTestId('goto-current-session').click();
+		await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+		await sessionMetadataSectionFor(page, 'Durée de prospection')
+			.getByRole('textbox')
+			.first()
+			.fill('54');
+		await sessionMetadataSectionFor(page, 'Durée de prospection')
+			.getByRole('textbox')
+			.first()
+			.blur();
+		await sessionMetadataSectionFor(page, 'Vent')
+			.getByRole('radiogroup')
+			.getByRole('radio', { name: 'Modéré' })
+			.check();
+
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'cyan', 'leaf', 'lil-fella', 'with-exif-gps');
 		await expect(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {
 			timeout: 30_000
 		});
+
 		await goToTab(page, 'crop');
 		await page.getByText('lil-fella.jpeg').click();
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await page.waitForTimeout(1000);
+		await page.getByRole('button', { name: 'Autres photos Esc' }).click();
+
 		await goToTab(page, 'classify');
 		await page.waitForTimeout(1000);
 		await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
@@ -144,8 +164,8 @@ test.describe('Exports', () => {
 		if (!analysisFile) throw new Error('analysis.json not found in zip');
 		const analysisContent = await analysisFile.async('string');
 		const modifiedContent = analysisContent.replace(
-			'"id": "io.github.cigaleapp.arthropods.example.light"',
-			'"id": "io.github.cigaleapp.arthropods.example.wrong"'
+			'"protocol": "io.github.cigaleapp.arthropods.example.light"',
+			'"protocol": "io.github.cigaleapp.arthropods.example.wrong"'
 		);
 		zip.file('analysis.json', modifiedContent);
 		const newZipData = await zip.generateAsync({ type: 'nodebuffer' });

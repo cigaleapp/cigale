@@ -104,7 +104,8 @@ test('toExportedProtocol', async () => {
 		id: 'protocol1',
 		name: 'Test Protocol',
 		version: 1,
-		metadata: ['protocol1__meta1', 'protocol1__meta2'],
+		metadata: ['protocol1__meta1', 'protocol1__meta2', 'protocol1__meta3'],
+		sessionMetadata: ['protocol1__meta3'],
 		authors: [],
 		description: 'A test protocol',
 		crop: {
@@ -132,6 +133,17 @@ test('toExportedProtocol', async () => {
 
 	expect(exported).toEqual({
 		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'crop'),
+		sessionMetadata: {
+			protocol1__meta3: {
+				key: 'meta3',
+				label: 'Metadata 3',
+				type: 'enum',
+				description: 'Metadata 3 description',
+				mergeMethod: 'max',
+				required: false,
+				options: []
+			}
+		},
 		metadata: {
 			protocol1__meta1: {
 				key: 'meta1',
@@ -141,8 +153,20 @@ test('toExportedProtocol', async () => {
 				mergeMethod: 'max',
 				required: false,
 				options: [
-					{ key: 'opt1', label: 'Option 1', description: 'Desc 1', synonyms: [] },
-					{ key: 'opt2', label: 'Option 2', description: 'Desc 2', synonyms: [] }
+					{
+						index: 0,
+						key: 'opt1',
+						label: 'Option 1',
+						description: 'Desc 1',
+						synonyms: []
+					},
+					{
+						index: 1,
+						key: 'opt2',
+						label: 'Option 2',
+						description: 'Desc 2',
+						synonyms: []
+					}
 				]
 			},
 			protocol1__meta2: {
@@ -152,7 +176,15 @@ test('toExportedProtocol', async () => {
 				mergeMethod: 'max',
 				required: false,
 				type: 'enum',
-				options: [{ key: 'opt1', label: 'Option A', description: 'Desc A', synonyms: [] }]
+				options: [
+					{
+						index: 0,
+						key: 'opt1',
+						label: 'Option A',
+						description: 'Desc A',
+						synonyms: []
+					}
+				]
 			}
 		},
 		exports: {
@@ -179,6 +211,7 @@ describe('compareProtocolWithUpstream', () => {
 				name: 'Test Protocol',
 				version: 1,
 				metadata: [],
+				sessionMetadata: [],
 				authors: [],
 				description: 'A test protocol',
 				// no source:
@@ -220,6 +253,7 @@ describe('compareProtocolWithUpstream', () => {
 				version: 1,
 				metadata: [],
 				authors: [],
+				sessionMetadata: [],
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {
@@ -326,21 +360,24 @@ describe('compareProtocolWithUpstream', () => {
 							metadataId: 'protocol1__meta1',
 							key: 'opt1',
 							label: 'Option 1',
-							description: 'Desc 1'
+							description: 'Desc 1',
+							synonyms: []
 						},
 						{
 							id: 'protocol1__meta1:opt2',
 							metadataId: 'protocol1__meta1',
 							key: 'opt2',
 							label: 'Option 2',
-							description: 'Desc 2'
+							description: 'Desc 2',
+							synonyms: []
 						},
 						{
 							id: 'protocol1__meta2:opt1',
 							metadataId: 'protocol1__meta2',
 							key: 'opt1',
 							label: 'Option A',
-							description: 'Desc A'
+							description: 'Desc A',
+							synonyms: []
 						}
 					];
 				} else if (table === 'Metadata') {
@@ -427,8 +464,8 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol updated',
 				exports: {
 					metadata: {
-						json: 'analysis_v2.json', // changed
-						csv: 'metadata.csv'
+						json: 'analysis.json',
+						csv: 'metadata_v2.csv' // changed
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -496,10 +533,10 @@ describe('compareProtocolWithUpstream', () => {
 				value: 'A test protocol'
 			},
 			{
-				oldValue: 'analysis_v2.json',
-				path: ['exports', 'metadata', 'json'],
+				oldValue: 'metadata_v2.csv',
+				path: ['exports', 'metadata', 'csv'],
 				type: 'CHANGE',
-				value: 'analysis.json'
+				value: 'metadata.csv'
 			},
 			{
 				oldValue: 'Metadata 1 description updated',

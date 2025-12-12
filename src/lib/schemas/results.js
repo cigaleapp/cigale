@@ -5,7 +5,7 @@ import { type } from 'arktype';
 import { mapValues } from '../utils.js';
 import { MetadataRuntimeValue } from './metadata.js';
 
-const MetadataRecord = type({
+export const MetadataRecord = type({
 	'[string]': {
 		value: [
 			type.or(
