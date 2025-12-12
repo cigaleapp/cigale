@@ -257,7 +257,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		display: flex;
 		flex-wrap: wrap;
 		align-content: flex-start;
-		justify-content: space-between;
 		gap: 1.5em 1em;
 		padding: 0 2.5em;
 	}
