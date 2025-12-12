@@ -1206,3 +1206,16 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 		element.remove();
 	}, duration);
 }
+
+/**
+ * @param {string} color Hex of background color string, e.g. #RRGGBB
+ */
+export function readableOn(color) {
+	const rgb = color.replace(/^#/, '').match(/.{2}/g);
+	if (rgb === null) throw new Error('Invalid color, use hex notation');
+	const o = Math.round(
+		(parseInt(rgb[0], 16) * 299 + parseInt(rgb[1], 16) * 587 + parseInt(rgb[2], 16) * 114) /
+			1000
+	);
+	return o > 125 ? '#000000' : '#ffffff';
+}

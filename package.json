@@ -129,6 +129,7 @@
 		"yauzl-promise": "^4.0.0"
 	},
 	"dependencies": {
+		"@iconify/svelte": "^5.1.0",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
 		"@wuchale/svelte": "^0.17.6",
@@ -154,7 +155,7 @@
 		"runed": "^0.37.0",
 		"svelte-mathml": "gwennlbh/svelte-mathml#2fcd4befe817b768daddffe373cddecd9aaf009e",
 		"sveltejs-tippy": "^3.0.0",
-		"swarpc": "^0.16.1",
+		"swarpc": "^0.17.2",
 		"tiny-jsonc": "^1.0.2",
 		"tinykeys": "^3.0.0",
 		"ulid": "^3.0.2",

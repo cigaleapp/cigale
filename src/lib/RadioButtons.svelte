@@ -1,12 +1,13 @@
-<script generics="OptionKey extends string|number">
+<script generics="OptionKey extends string|number, AdditionalItemData = {}">
 	/**
 	 * @template {string|number} Key
-	 * @typedef {{ key: Key; label: string; subtext?: string, disabled?: boolean }} Item
+	 * @typedef {{ key: Key; label: string; subtext?: string, disabled?: boolean } & AdditionalItemData} Item
 	 */
 
 	/**
 	 * @typedef {object} Props
 	 * @property {Array<Item<OptionKey>>} options possible options
+	 * @property {boolean} [vertical] force vertical display of radio buttons. if neither vertical nor horizontal is set, the buttons will be laid horizontally only if they all fit in a single row.
 	 * @property {boolean} [horizontal] display the radio buttons in a grid
 	 * @property {boolean} [cards] display the radio buttons as cards
 	 * @property {NoInfer<OptionKey>} [value] the value of the selected radio button
@@ -23,7 +24,8 @@
 		cards,
 		onchange = () => {},
 		label,
-		horizontal
+		horizontal,
+		vertical
 	} = $props();
 
 	$effect(() => {
@@ -31,7 +33,13 @@
 	});
 </script>
 
-<div class="radio-inputs" class:horizontal role="radiogroup" aria-label={label}>
+<div
+	class="radio-inputs"
+	class:horizontal
+	class:smart-horizontal={!horizontal && !vertical}
+	role="radiogroup"
+	aria-label={label}
+>
 	{#if label}
 		<legend>{label}</legend>
 	{/if}
@@ -64,6 +72,20 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 		gap: 1em;
+	}
+
+	.radio-inputs.smart-horizontal {
+		display: flex;
+		flex-flow: row wrap;
+		gap: 0.5em 2em;
+
+		& > * {
+			flex: 0 0 auto;
+		}
+
+		&:has(> :nth-child(n + 2):not(:first-child):not(:last-child)) {
+			flex-direction: column;
+		}
 	}
 
 	label.card {
