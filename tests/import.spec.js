@@ -282,13 +282,13 @@ test(
 		await setInferenceModels(page, { classify: 'Aucune inférence' });
 		await goToTab(page, 'classify');
 		await goToTab(page, 'import');
-		await observationCard(page, "cyan.jpeg").click();
+		await observationCard(page, 'cyan.jpeg').click();
 		await page
 			.getByTestId('sidepanel')
 			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
 			.click();
 		await goToTab(page, 'classify');
-		await expect(observationCard(page, "cyan")).not.toBeVisible();
+		await expect(observationCard(page, 'cyan')).not.toBeVisible();
 	}
 );
 

@@ -29,8 +29,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import * as dates from 'date-fns';
 	import { onMount } from 'svelte';
 
-	import { uiState } from '$lib/state.svelte.js';
 	import IconTrash from '~icons/ri/delete-bin-line';
+	import { uiState } from '$lib/state.svelte.js';
 
 	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
