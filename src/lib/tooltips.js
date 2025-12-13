@@ -65,6 +65,20 @@ function props(parameters) {
  * @param {string | [string, number] | TooltipParameters | undefined} parameters text or [text, delay] or tippy.js options
  */
 export function tooltip(node, parameters) {
+	// TODO figure out a way to show tooltips above <dialog>s
+	if (node.closest('dialog')) {
+		return {
+			/** @param {string | [string, number] | TooltipParameters | undefined} parameters */
+			update(parameters) {
+				const { content } = props(parameters);
+				node.setAttribute('title', content);
+			},
+			destroy() {
+				node.removeAttribute('title');
+			}
+		};
+	}
+
 	const properties = props(parameters);
 	tippy(node, properties);
 
