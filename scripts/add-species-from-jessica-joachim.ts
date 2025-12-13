@@ -162,6 +162,33 @@ async function augmentMetadataOption(
 
 	const imageUrl = content.querySelector('img')?.src;
 
+	const hasImageWithFilename = (filename: string) =>
+		[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
+			(candidate) =>
+				new URL(candidate.getAttribute('src')!).pathname.split('/').pop() === filename
+		);
+
+	const cascade: Record<string, string> = {};
+
+	// Niveau de difficulté
+	for (const [key, niveau] of Object.entries({
+		easy: 'facile',
+		medium: 'moyenne',
+		hard: 'difficile',
+		very_hard: 'tres-difficile'
+	})) {
+		if (hasImageWithFilename(`Id-${niveau}.jpg`)) {
+			cascade.identification_difficulty = key;
+		}
+	}
+
+	// Statut de conservation
+	for (const symbol of ['lc', 'nt', 'vu', 'en', 'cr', 'ex']) {
+		if (hasImageWithFilename(`Statut-${symbol.toUpperCase()}.jpg`)) {
+			cascade.conservation_status = symbol;
+		}
+	}
+
 	const removeAll = (selector: string) =>
 		content.querySelectorAll(selector).forEach((el) => el.remove());
 
@@ -209,7 +236,8 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		image: imageUrl
+		image: imageUrl,
+		cascade
 	};
 }
 
