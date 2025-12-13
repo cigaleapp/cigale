@@ -44,7 +44,7 @@
 		const protocol = uiState.currentProtocol;
 		if (!protocol) throw new Error('No protocol selected');
 
-		await db.openTransaction(['Image', 'Observation'], {mode: "readwrite"}, async (tx) => {
+		await db.openTransaction(['Image', 'Observation'], { mode: 'readwrite' }, async (tx) => {
 			if (!uiState.currentSession)
 				throw new Error('No session selected, cannot split observations');
 
