@@ -4,6 +4,7 @@
 
 	import AreaObservations from '$lib/AreaObservations.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
+	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
 	import { classificationInferenceSettings } from '$lib/classification.svelte.js';
 	import { errorMessage } from '$lib/i18n';
@@ -38,11 +39,30 @@
 			name: obs.label,
 			virtual: false,
 			data: {
+				image: undefined,
 				observation: obs,
 				images: tables.Image.state.filter((img) => obs.images.includes(img.id))
 			}
 		}))
 	);
+
+	let unrolledObservation = $state('');
+	const unroll = $derived([
+		unrolledObservation,
+		items
+			.find((item) => item.id === unrolledObservation)
+			?.data.images.map((img) => ({
+				id: img.id,
+				name: img.filename,
+				addedAt: img.addedAt,
+				virtual: false,
+				data: {
+					image: img,
+					observation: undefined,
+					images: [img]
+				}
+			})) ?? []
+	]);
 
 	/**
 	 * loaded and total bytes counts, set and updated by loadModel()
@@ -155,6 +175,7 @@
 	<section class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
 		<AreaObservations
 			{items}
+			{unroll}
 			sort={getSettings().gallerySort}
 			groups={['Recadrées', 'Non recadrées']}
 			grouping={({ data: { images } }) =>
@@ -162,29 +183,36 @@
 					? 'Recadrées'
 					: 'Non recadrées'}
 		>
-			{#snippet item({ observation, images }, { id })}
-				<CardObservation
-					{observation}
-					{images}
-					boxes="apply-first"
-					loadingStatusText="Analyse…"
-					onretry={() => {
-						uiState.erroredImages.delete(id);
-						const imageIds = tables.Observation.getFromState(id)?.images;
-						if (imageIds) {
-							imageIds.forEach((id) => uiState.erroredImages.delete(id));
-							classifyMore(imageIds);
-						} else {
-							toasts.error(`L'observation ${id} est vide`);
-						}
-					}}
-					ondelete={async () => {
-						const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
-						imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
-						if (isValidImageId(id)) await deleteImageFile(imageIdToFileId(id));
-						await deleteObservation(id, { notFoundOk: true, recursive: true });
-					}}
-				/>
+			{#snippet item({ observation, image, images }, { id })}
+				{#if observation}
+					<CardObservation
+						{observation}
+						{images}
+						boxes="apply-first"
+						loadingStatusText="Analyse…"
+						onstacksizeclick={() => {
+							unrolledObservation = unrolledObservation === id ? '' : id;
+						}}
+						onretry={() => {
+							uiState.erroredImages.delete(id);
+							const imageIds = tables.Observation.getFromState(id)?.images;
+							if (imageIds) {
+								imageIds.forEach((id) => uiState.erroredImages.delete(id));
+								classifyMore(imageIds);
+							} else {
+								toasts.error(`L'observation ${id} est vide`);
+							}
+						}}
+						ondelete={async () => {
+							const imageIds = tables.Observation.getFromState(id)?.images ?? [id];
+							imageIds.forEach((id) => cancelTask(id, 'Cancelled by user'));
+							if (isValidImageId(id)) await deleteImageFile(imageIdToFileId(id));
+							await deleteObservation(id, { notFoundOk: true, recursive: true });
+						}}
+					/>
+				{:else if image}
+					<CardImage {image} boxes="apply-first" />
+				{/if}
 			{/snippet}
 		</AreaObservations>
 		{#if !items.length}

@@ -135,7 +135,7 @@
 		uiState.selection
 			.flatMap((id) => {
 				// Try assuming id === image
-				const image = tables.Image.state.find((i) => i.fileId === id);
+				const image = tables.Image.state.find((i) => [i.fileId, i.id].includes(id));
 				if (image) return [image];
 				// Otherwise, get every observation's image
 				return tables.Observation.state
