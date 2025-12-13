@@ -152,14 +152,14 @@ export function imageBufferWasSaved(image) {
 
 /**
  *
- * @param {string} id ImageFile ID
+ * @param {string} id ImageFile ID or Image ID
  * @param {IDBTransactionWithAtLeast<["Image", "ImageFile", "ImagePreviewFile"]>} [tx]
  * @param {boolean} [notFoundOk=true]
  */
 export async function deleteImageFile(id, tx, notFoundOk = true) {
 	await db.openTransaction(
 		['Image', 'ImageFile', 'ImagePreviewFile', 'Observation'],
-		{ tx },
+		{ tx, session: uiState.currentSession?.id },
 		async (tx) => {
 			const observations = await tx.objectStore('Observation').getAll();
 			// Store there cuz imagesOfImageFile() reads from reactive state.
