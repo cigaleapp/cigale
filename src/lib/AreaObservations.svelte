@@ -38,7 +38,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { openTransaction } from './idb.svelte.js';
 	import { deleteImageFile } from './images.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
-	import { mutationobserver } from './mutations';
+	import { mutationobserver, resizeobserver } from './mutations';
 	import { deleteObservation } from './observations.js';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
@@ -184,12 +184,38 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			}
 		});
 	}
+
+	function roundUnrolledCorners() {
+		const items = [
+			...(imagesContainer?.querySelectorAll('.item-unroll-container.unrolled') ?? [])
+		];
+
+		const itemCoords = [...items].map((el) => el.getBoundingClientRect());
+
+		imagesContainer?.querySelectorAll('.item-unroll-container.unrolled').forEach((el) => {
+			if (!(el instanceof HTMLElement)) return;
+			const coords = el.getBoundingClientRect();
+
+			const row = itemCoords.filter(({ y }) => y === coords.y);
+			const column = itemCoords.filter(({ x }) => x === coords.x);
+
+			el.dataset.roundCornerTop = column.every(({ y }) => y >= coords.y).toString();
+			el.dataset.roundCornerBottom = column.every(({ y }) => y <= coords.y).toString();
+			el.dataset.roundCornerLeft = row.every(({ x }) => x >= coords.x).toString();
+			el.dataset.roundCornerRight = row.every(({ x }) => x <= coords.x).toString();
+		});
+	}
 </script>
 
 <section
 	class="images"
 	data-testid="observations-area"
 	bind:this={imagesContainer}
+	use:resizeobserver={{
+		onresize() {
+			roundUnrolledCorners();
+		}
+	}}
 	use:mutationobserver={{
 		childList: true,
 		subtree: true,
@@ -197,6 +223,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			if (!imagesContainer) return;
 			dragselect?.refreshSelectables();
 			dragselect?.setSelection(uiState.selection);
+			roundUnrolledCorners();
 		}
 	}}
 >
@@ -288,6 +315,21 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	.item-unroll-container.unrolled {
 		background-color: var(--bg-primary-translucent);
+	}
+
+	.item-unroll-container.unrolled {
+		&:global([data-round-corner-top='true'][data-round-corner-left='true']) {
+			border-top-left-radius: var(--corner-radius);
+		}
+		&:global([data-round-corner-top='true'][data-round-corner-right='true']) {
+			border-top-right-radius: var(--corner-radius);
+		}
+		&:global([data-round-corner-bottom='true'][data-round-corner-left='true']) {
+			border-bottom-left-radius: var(--corner-radius);
+		}
+		&:global([data-round-corner-bottom='true'][data-round-corner-right='true']) {
+			border-bottom-right-radius: var(--corner-radius);
+		}
 	}
 
 	.images {
