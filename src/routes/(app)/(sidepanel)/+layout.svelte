@@ -7,7 +7,7 @@
 	import { promptForFiles } from '$lib/files';
 	import * as db from '$lib/idb.svelte';
 	import { openTransaction, tables } from '$lib/idb.svelte';
-	import { deleteImageFile, imageFileId } from '$lib/images';
+	import { deleteImageFile, imageFileId, imageIdToFileId } from '$lib/images';
 	import { ACCEPTED_IMPORT_TYPES } from '$lib/import.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import {
@@ -74,6 +74,7 @@
 					cancelTask(id, 'Cancelled by user');
 					await deleteObservation(id, { tx, notFoundOk: true, recursive: true });
 					await deleteImageFile(id, tx, true);
+					await deleteImageFile(imageIdToFileId(id), tx, true);
 				}
 			}
 		);
@@ -135,7 +136,7 @@
 		uiState.selection
 			.flatMap((id) => {
 				// Try assuming id === image
-				const image = tables.Image.state.find((i) => i.fileId === id);
+				const image = tables.Image.state.find((i) => [i.fileId, i.id].includes(id));
 				if (image) return [image];
 				// Otherwise, get every observation's image
 				return tables.Observation.state
