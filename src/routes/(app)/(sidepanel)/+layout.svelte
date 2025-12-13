@@ -17,6 +17,7 @@
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
+	import { Image } from '$lib/schemas/observations';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -43,7 +44,7 @@
 		const protocol = uiState.currentProtocol;
 		if (!protocol) throw new Error('No protocol selected');
 
-		await tables.Observation.do(async (tx) => {
+		await db.openTransaction(['Image', 'Observation'], {mode: "readwrite"}, async (tx) => {
 			if (!uiState.currentSession)
 				throw new Error('No session selected, cannot split observations');
 
@@ -51,12 +52,12 @@
 				const obs = tables.Observation.getFromState(id);
 				if (!obs) continue;
 
-				tx.delete(id);
+				tx.objectStore('Observation').delete(id);
 				for (const imageId of obs.images) {
-					const image = await tables.Image.raw.get(imageId);
+					const image = await tx.objectStore('Image').get(imageId);
 					if (!image) continue;
 					const obs = newObservation(image, protocol, uiState.currentSession);
-					tx.add(obs);
+					tx.objectStore('Observation').add(obs);
 					toselect.push(obs.id);
 				}
 			}
