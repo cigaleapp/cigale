@@ -12,6 +12,7 @@
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';
 	import Logo from './Logo.svelte';
+	import OverflowableText from './OverflowableText.svelte';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';
@@ -294,28 +295,27 @@
 						</a>
 					{/if}
 
-					<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
 					{#await cascadeLabels() then labels}
-						{@const maxdepth = Math.max(...Object.values(labels).map((l) => l.depth))}
-						{#if Object.keys(labels).length > 0}
-							<p><em>Métadonées mise à jour à la sélection de cette option</em></p>
-						{/if}
-						<table>
+						<table class="cascades">
 							<tbody>
 								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, depth }] (metadataId)}
 									{@const revdepth = maxdepth - depth}
+								<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
 									<tr>
 										<td>
-											{#if revdepth > 0}
-												{@html '&nbsp;'.repeat((revdepth - 1) * 3) + '└─'}
-											{/if}
-											{metadata}
+											<OverflowableText text={metadata} />
 										</td>
-										<td>{value}</td>
+										<td>
+											{/if}
+											{value}
+										</td>
 									</tr>
 								{/each}
 							</tbody>
 						</table>
+						{#if Object.keys(labels).length > 0}
+							<p><em>Métadonées mises à jour à la sélection de cette option</em></p>
+						{/if}
 					{:catch error}
 						<p class="error">
 							Erreur lors de la récupération des étiquettes en cascade: {error}
@@ -466,6 +466,24 @@
 
 	.docs .description p:not(:last-child) {
 		margin-bottom: 0.5em;
+	}
+
+	.docs table.cascades {
+		border-collapse: collapse;
+		table-layout: fixed;
+		width: 100%;
+	}
+
+	.docs .cascades td {
+		border: 1px solid color-mix(in srgb, var(--fg-neutral) 40%, transparent);
+		border-left: none;
+		border-right: none;
+	}
+
+	.docs .cascades td:first-child {
+		overflow: hidden;
+		padding-right: 1rem;
+		width: 7rem;
 	}
 
 	.learn-more {
