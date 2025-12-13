@@ -109,13 +109,14 @@
 
 	const singleImageSelected = $derived(
 		uiState.selection.length === 1
-			? tables.Image.state.find((img) => img.fileId === uiState.selection[0])
+			? tables.Image.state.find((img) => [img.id, img.fileId].includes(uiState.selection[0]))
 			: undefined
 	);
 
 	const selectionCounts = $derived({
-		image: uiState.selection.filter((id) => tables.Image.state.some((img) => img.fileId === id))
-			.length,
+		image: uiState.selection.filter((id) =>
+			tables.Image.state.some((img) => [img.id, img.fileId].includes(id))
+		).length,
 		observation: uiState.selection.filter((id) =>
 			tables.Observation.state.some((obs) => obs.id === id)
 		).length,

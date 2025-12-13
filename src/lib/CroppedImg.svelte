@@ -47,7 +47,7 @@
 
 <picture class="cropped {klass}">
 	{#if blurfill}
-		<img class="blur" {src} alt="" aria-hidden="true" />
+		<img data-is-blur="true" class="blur" {src} alt="" aria-hidden="true" />
 	{/if}
 	<img
 		style:transform-origin={percents(corners.topleft)}

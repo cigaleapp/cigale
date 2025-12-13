@@ -20,7 +20,7 @@
 	 * @property {boolean} [selectable=true] - whether this image can be selected
 	 * @property {boolean} [selected=false]
 	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
-	 * @property {"show-all" | "apply-first"} [boxes] what to do with the images' bounding boxes. Either display them all, or crop to the first one.
+	 * @property {"show-all" | "apply-first" | "none"} [boxes] what to do with the images' bounding boxes. Either display them all, or crop to the first one.
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
 	 * @property {number} boundingBoxes.x
 	 * @property {number} boundingBoxes.y

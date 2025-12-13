@@ -281,6 +281,7 @@ test(
 		await goToTab(page, 'classify');
 		await waitForLoadingEnd(page);
 		await goToTab(page, 'import');
+		await waitForLoadingEnd(page);
 		await firstObservationCard(page).click();
 		await page
 			.getByTestId('sidepanel')

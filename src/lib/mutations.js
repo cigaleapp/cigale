@@ -28,3 +28,33 @@ export function mutationobserver(node, options) {
 
 	return { update, destroy };
 }
+
+// Same thing but for ResizeObserver
+
+/**
+ *
+ * @param {HTMLElement} node
+ * @param {{onresize?: (entries: ResizeObserverEntry[], observer: ResizeObserver) => void}} options
+ * @returns
+ */
+export function resizeobserver(node, options) {
+	/** @type {ResizeObserver|null}  */
+	let observer = null;
+
+	function update(options = {}) {
+		destroy();
+		observer = new ResizeObserver((entries, observer) => {
+			options.onresize?.(entries, observer);
+		});
+		observer.observe(node);
+	}
+
+	function destroy() {
+		observer?.disconnect();
+		observer = null;
+	}
+
+	update(options);
+
+	return { update, destroy };
+}
