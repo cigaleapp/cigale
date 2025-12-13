@@ -5,7 +5,7 @@ import { tables } from './idb.svelte';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
 import { uiState } from './state.svelte';
-import { nonnull } from './utils';
+import { compareBy, nonnull } from './utils';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge
@@ -33,7 +33,7 @@ export async function mergeToObservation(parts) {
 	const observation = {
 		id: newId,
 		sessionId,
-		images: [...imageIds],
+		images: [...imageIds].toSorted(compareBy((id) => parts.indexOf(id))),
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([...observations, ...images]),
 		metadataOverrides: Object.fromEntries(

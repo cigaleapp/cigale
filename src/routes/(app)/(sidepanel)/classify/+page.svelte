@@ -25,7 +25,7 @@
 	import { getSettings, isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { sum } from '$lib/utils.js';
+	import { nonnull, sum } from '$lib/utils.js';
 
 	seo({ title: 'Classification' });
 
@@ -41,7 +41,7 @@
 			data: {
 				image: undefined,
 				observation: obs,
-				images: tables.Image.state.filter((img) => obs.images.includes(img.id))
+				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull)
 			}
 		}))
 	);
