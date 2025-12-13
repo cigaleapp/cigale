@@ -17,7 +17,6 @@
 	} from '$lib/metadata';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
-	import { Image } from '$lib/schemas/observations';
 	import { seo } from '$lib/seo.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
