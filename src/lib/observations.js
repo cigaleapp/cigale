@@ -15,6 +15,9 @@ export async function mergeToObservation(parts) {
 	const protocol = uiState.currentProtocol;
 	if (!protocol) throw new Error('No protocol selected');
 
+	const sessionId = uiState.currentSession?.id;
+	if (!sessionId) throw new Error('No session selected');
+
 	const observations = parts.map((part) => tables.Observation.getFromState(part)).filter(nonnull);
 
 	const images = await Promise.all(parts.map(async (part) => tables.Image.raw.get(part))).then(
@@ -30,6 +33,7 @@ export async function mergeToObservation(parts) {
 	await tables.Observation.do(async (tx) => {
 		const observation = {
 			id: newId,
+			sessionId,
 			images: [...imageIds],
 			addedAt: new Date().toISOString(),
 			label: fallbackObservationLabel([...observations, ...images]),
