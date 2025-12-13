@@ -7,6 +7,7 @@ import { expect, test } from './fixtures';
 import {
 	expectTooltipContent,
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
 	getMetadataValuesOfImage,
 	getTab,
@@ -196,17 +197,86 @@ test.describe('invalid json analysis', async () => {
 	});
 });
 
-test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
+test('can import a .CR2 image', issue(114, 384), async ({ page }) => {
 	await newSession(page);
+
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'sample.cr2');
-	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
-		timeout: 5_000
+	// Decoding RAW images is slow, which is to be expected
+	await waitForLoadingEnd(page, { finish: 60_000 });
+
+	await goToTab(page, 'crop');
+	await waitForLoadingEnd(page);
+
+	await goToTab(page, 'classify');
+	await waitForLoadingEnd(page);
+
+	const results = await exportResults(page, 'CR2', {
+		kind: 'full'
 	});
-	await expectTooltipContent(
-		page,
-		firstObservationCard(page),
-		/Les fichiers .+? ne sont pas (encore )?supportés/
+
+	await expectZipFiles(
+		await yauzl.open(results),
+		[
+			'analysis.json',
+			'metadata.csv',
+			'Cropped/Fasciosminthurus quinquefasciatus_obs1_1.jpeg',
+			'Original/Fasciosminthurus quinquefasciatus_obs1_1.jpeg'
+		],
+		{
+			'Cropped/Fasciosminthurus quinquefasciatus_obs1_1.jpeg': {
+				buffer(buf) {
+					expect(buf).toMatchSnapshot({ name: 'CR2 Cropped' });
+				}
+			},
+			'Original/Fasciosminthurus quinquefasciatus_obs1_1.jpeg': {
+				buffer(buf) {
+					expect(buf).toMatchSnapshot({ name: 'CR2 Original' });
+				}
+			},
+			'metadata.csv': {
+				csv(cells) {
+					expect(cells).toMatchObject([
+						[
+							'Identifiant',
+							'Observation',
+							'Espèce',
+							'Espèce: Confiance',
+							'Genre',
+							'Genre: Confiance',
+							'Famille',
+							'Famille: Confiance',
+							'Ordre',
+							'Ordre: Confiance',
+							'Classe',
+							'Classe: Confiance',
+							'Phylum',
+							'Phylum: Confiance',
+							'Règne',
+							'Règne: Confiance'
+						],
+						[
+							expect.any(String),
+							'sample',
+							'Fasciosminthurus quinquefasciatus',
+							expect.stringMatching(/^0\.11/),
+							'Fasciosminthurus',
+							'1',
+							'Bourletiellidae',
+							'1',
+							'Symphypleona',
+							'1',
+							'Collembola',
+							'1',
+							'Arthropoda',
+							'1',
+							'Animalia',
+							'1'
+						]
+					]);
+				}
+			}
+		}
 	);
 });
 

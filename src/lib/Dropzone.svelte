@@ -48,7 +48,15 @@
 			files = [...event.dataTransfer.files];
 		}
 
-		if (filetypes && filetypes.length > 0 && files.some((f) => !filetypes.includes(f.type))) {
+		const fileIsValid = (/** @type {File} */ file) => {
+			if (!filetypes) return true;
+			if (!filetypes.length) return true;
+			if (filetypes.includes(file.type)) return true;
+			if (filetypes.some((ext) => file.name.toLowerCase().endsWith(ext))) return true;
+			return false;
+		};
+
+		if (!files.every(fileIsValid)) {
 			onunacceptable?.(files);
 			return;
 		}

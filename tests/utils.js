@@ -882,6 +882,56 @@ export function firstObservationCard(page) {
 }
 
 /**
+ * Exports the results of the analysis.
+ * @param {Page} page
+ * @param {string} destination
+ * @param {{ cropPadding?: string, kind?: 'metadata' | 'cropped' | 'full' }} options
+ */
+export async function exportResults(
+	page,
+	destination,
+	{ cropPadding = '0px', kind = 'cropped' } = {}
+) {
+	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
+
+	if (cropPadding.endsWith('px')) {
+		await page
+			.getByRole('radio', { name: '0 px' })
+			.getByRole('textbox')
+			.fill(cropPadding.replace(/px$/, ''));
+	} else {
+		await page.getByRole('radio', { name: cropPadding }).check();
+	}
+
+	await page
+		.getByText(
+			{
+				metadata: 'Métadonnées seulement',
+				cropped: 'Métadonnées et images recadrées',
+				full: 'Métadonnées, images recadrées et images originales'
+			}[kind]
+		)
+		.click();
+
+	await page.getByRole('button', { name: 'results.zip' }).click();
+	const download = await page.waitForEvent('download');
+	expect(download.suggestedFilename()).toBe('results.zip');
+	const saveAs = `./tests/results/${destination}.zip`;
+	await download.saveAs(saveAs);
+
+	return saveAs;
+}
+
+/**
+ *
+ * @param {string} contents
+ */
+export function parseCsv(contents) {
+	return contents
+		.split('\n')
+		.map((row) => row.split(';').map((cell) => cell.replace(/^"(.+)"$/, '$1')));
+}
+/**
  *
  * @param {import('node:stream').Readable} stream
  * @returns
@@ -896,6 +946,7 @@ async function readStreamToBuffer(stream) {
  * @property {(text: string) => void | Promise<void>} [text] function to call with the text content of the file
  * @property {(buffer: Buffer) => void | Promise<void>} [buffer] function to call with the buffer content of the file
  * @property {(json: any) => void | Promise<void>} [json] function to call with the parsed JSON content of the file
+ * @property {(cells: string[][]) => void | Promise<void>} [csv] function to call with the parsed CSV content of the file
  * @property {(entry: import('yauzl-promise').Entry) => void | Promise<void>} [entry] function to call with the zip entry itself
  */
 
@@ -912,7 +963,7 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 		zipFiles.push(file.filename);
 		if (file.filename in checks) {
 			// @ts-expect-error
-			const { json, text, buffer, entry } = checks[file.filename];
+			const { json, csv, text, buffer, entry } = checks[file.filename];
 
 			const buf = await file.openReadStream().then(readStreamToBuffer);
 
@@ -922,6 +973,8 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 				await text(buf.toString('utf-8'));
 			} else if (json) {
 				await json(JSON.parse(buf.toString('utf-8')));
+			} else if (csv) {
+				await csv(parseCsv(buf.toString('utf-8')));
 			}
 
 			if (entry) {

@@ -5,6 +5,7 @@ import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
@@ -36,13 +37,9 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 
 	await page.getByRole('button', { name: 'Autres photos Esc' }).click();
 
-	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
-
-	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
-
-	const resultsFilepath = path.resolve('./tests/results/crop-padding.zip');
-	await page.getByRole('button', { name: 'results.zip' }).click();
-	await page.waitForEvent('download').then((e) => e.saveAs(resultsFilepath));
+	const resultsFilepath = await exportResults(page, 'crop-padding', {
+		cropPadding: '40px'
+	});
 
 	const zip = await yauzl.open(resultsFilepath);
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {

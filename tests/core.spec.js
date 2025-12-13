@@ -9,6 +9,7 @@ import { expect, test } from './fixtures.js';
 import {
 	chooseInDropdown,
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
@@ -102,15 +103,9 @@ for (const offline of [false, true]) {
 			await expect(page.getByText('Espèce')).toBeVisible();
 
 			// Export results
-			await page.getByTestId('app-nav').getByRole('button', { name: 'Résultats' }).click();
-			await page.getByText(/et images originales/i).click();
-			await page.getByText('results.zip').click();
-			const download = await page.waitForEvent('download');
-			expect(download.suggestedFilename()).toBe('results.zip');
-			await download.saveAs('./tests/results/lil-fella.zip');
-
+			const results = await exportResults(page, 'lil-fella', { kind: 'full' });
 			await expectZipFiles(
-				await yauzl.open('./tests/results/lil-fella.zip'),
+				await yauzl.open(results),
 				[
 					'analysis.json',
 					'metadata.csv',
