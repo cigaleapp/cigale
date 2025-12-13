@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/63</span>
+                <span class='fraction'>0/65</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/51</span>
+                <span class='fraction'>0/53</span>
             </div>
         
             
@@ -242,12 +242,7 @@
 <a name='L177'></a><a href='#L177'>177</a>
 <a name='L178'></a><a href='#L178'>178</a>
 <a name='L179'></a><a href='#L179'>179</a>
-<a name='L180'></a><a href='#L180'>180</a>
-<a name='L181'></a><a href='#L181'>181</a>
-<a name='L182'></a><a href='#L182'>182</a>
-<a name='L183'></a><a href='#L183'>183</a>
-<a name='L184'></a><a href='#L184'>184</a>
-<a name='L185'></a><a href='#L185'>185</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L180'></a><a href='#L180'>180</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -280,17 +275,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,9 +286,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -438,7 +428,7 @@ import { tables } from './idb.svelte';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
 import { uiState } from './state.svelte';
-import { nonnull } from './utils';
+import { compareBy, nonnull } from './utils';
 &nbsp;
 /**
  * @param {string[]} parts IDs of observations or images to merge
@@ -463,31 +453,26 @@ export async function <span class="fstat-no" title="function not covered" >merge
 &nbsp;
 	const newId =<span class="cstat-no" title="statement not covered" > generateId('Observation');</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	await tables.Observation.do(<span class="fstat-no" title="function not covered" >async </span>(tx) =&gt; {</span>
-		const observation = <span class="cstat-no" title="statement not covered" >{</span>
-			id: newId,
-			sessionId,
-			images: [...imageIds],
-			addedAt: new Date().toISOString(),
-			label: fallbackObservationLabel([...observations, ...images]),
-			metadataOverrides: Object.fromEntries(
-				Object.entries(
-					await mergeMetadataValues(
-						db.databaseHandle(),
-						observations.map(<span class="fstat-no" title="function not covered" >(o</span>) =&gt; <span class="cstat-no" title="statement not covered" >o.metadataOverrides)</span>
-					)
-				).map(<span class="fstat-no" title="function not covered" >([</span>key, { value, ...rest }]) =&gt; <span class="cstat-no" title="statement not covered" >[</span>
-					key,
-					{ ...rest, value: JSON.stringify(value) }
-				])
-			)
-		};
+	const observation = <span class="cstat-no" title="statement not covered" >{</span>
+		id: newId,
+		sessionId,
+		images: [...imageIds].toSorted(compareBy(<span class="fstat-no" title="function not covered" >(i</span>d) =&gt; <span class="cstat-no" title="statement not covered" >parts.indexOf(id))</span>),
+		addedAt: new Date().toISOString(),
+		label: fallbackObservationLabel([...observations, ...images]),
+		metadataOverrides: Object.fromEntries(
+			Object.entries(
+				await mergeMetadataValues(
+					db.databaseHandle(),
+					observations.map(<span class="fstat-no" title="function not covered" >(o</span>) =&gt; <span class="cstat-no" title="statement not covered" >o.metadataOverrides)</span>
+				)
+			).map(<span class="fstat-no" title="function not covered" >([</span>key, { value, ...rest }]) =&gt; <span class="cstat-no" title="statement not covered" >[key, { ...rest, value: JSON.stringify(value) }])</span>
+		)
+	};
 &nbsp;
-<span class="cstat-no" title="statement not covered" >		tx.add({</span>
-			...observation,
-			label: defaultObservationLabel({ protocol, images, observation })
-		});
+<span class="cstat-no" title="statement not covered" >	observation.label = defaultObservationLabel({ protocol, images, observation });</span>
 &nbsp;
+<span class="cstat-no" title="statement not covered" >	await tables.Observation.do(<span class="fstat-no" title="function not covered" >(t</span>x) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >		tx.add(observation);</span>
 <span class="cstat-no" title="statement not covered" >		for (const { id } of observations) {</span>
 <span class="cstat-no" title="statement not covered" >			tx.delete(id);</span>
 		}
@@ -545,7 +530,7 @@ export async function <span class="fstat-no" title="function not covered" >delet
  */
 function <span class="fstat-no" title="function not covered" >defaultObservationLabel(</span>{ images, observation, protocol }) {
 <span class="cstat-no" title="statement not covered" >	return (</span>
-		protocol?.observations?.defaultLabel?.render({ images, observation }) ??
+		protocol?.observations?.defaultLabel?.render({ images, observation }) ||
 		fallbackObservationLabel([observation, ...images])
 	);
 }
@@ -622,7 +607,7 @@ export async function <span class="fstat-no" title="function not covered" >ensur
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-13T11:41:54.595Z
+                at 2025-12-13T14:31:57.312Z
             </div>
         <script src="../prettify.js"></script>
         <script>
