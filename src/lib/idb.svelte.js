@@ -180,7 +180,7 @@ function wrangler(table) {
 		async do(actions) {
 			const loglabel = `do ${table} #${nanoid()}`;
 			console.debug(loglabel);
-			await openTransaction([table], {}, async (tx) => {
+			await openTransaction([table], { mode: 'readwrite' }, async (tx) => {
 				await actions(tx.objectStore(table));
 			});
 		},
