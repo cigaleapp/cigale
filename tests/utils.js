@@ -403,9 +403,18 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 	await page.waitForURL((u) => u.hash === '#/import');
 
 	if (models) {
-		for (const [task, model] of Object.entries(models)) {
-			await chooseInDropdown(page, `${task}-models`, model);
-		}
+		await setInferenceModels(page, models);
+	}
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ */
+export async function setInferenceModels(page, models) {
+	for (const [task, model] of Object.entries(models)) {
+		await chooseInDropdown(page, `${task}-models`, model);
 	}
 }
 
@@ -879,6 +888,18 @@ export async function setHardwareConcurrency(page, value) {
  */
 export function firstObservationCard(page) {
 	return page.getByTestId('observations-area').getByRole('article').first();
+}
+
+/**
+ * @param {Page} page
+ * @param {string} label
+ */
+export function observationCard(page, label) {
+	return page
+		.getByTestId('observations-area')
+		.getByRole('article')
+		.filter({ has: page.getByRole('heading', { name: label }) })
+		.first();
 }
 
 /**
