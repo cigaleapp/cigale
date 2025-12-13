@@ -114,7 +114,7 @@
 	let highlightedOption = $state();
 
 	/**
-	 * @type {Record<string, Record<string, { value: string; metadata: string; depth: number }>>}
+	 * @type {Record<string, Record<string, { value: string; metadata: string; depth: number, color?: string, icon?: string }>>}
 	 */
 	let cascadeLabelsCache = $state({});
 	$effect(() => {
@@ -163,7 +163,12 @@
 						metadataOptionId(namespacedMetadataId(protocolId, metadata.id), value)
 					);
 					if (!option) continue;
-					labels[metadata.id] = { value: option.label, metadata: metadata.label, depth };
+					labels[metadata.id] = {
+						value: option.label,
+						metadata: metadata.label,
+						depth,
+						...pick(option, 'color', 'icon')
+					};
 
 					if (Object.keys(option.cascade ?? {}).length > 0) {
 						await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then(
@@ -298,14 +303,25 @@
 					{#await cascadeLabels() then labels}
 						<table class="cascades">
 							<tbody>
-								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, depth }] (metadataId)}
-									{@const revdepth = maxdepth - depth}
 								<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
+								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, color, icon }] (metadataId)}
 									<tr>
 										<td>
 											<OverflowableText text={metadata} />
 										</td>
 										<td>
+											{#if icon || color}
+												<div
+													class="icon"
+													style:background-color={color}
+													style:color={color
+														? readableOn(color)
+														: undefined}
+												>
+													{#if icon}
+														<Icon {icon} />
+													{/if}
+												</div>
 											{/if}
 											{value}
 										</td>
@@ -434,7 +450,8 @@
 		gap: 0.5em;
 	}
 
-	.items .icon {
+	.items .icon,
+	.cascades .icon {
 		font-size: 1.4em;
 		display: flex;
 		align-items: center;
@@ -484,6 +501,13 @@
 		overflow: hidden;
 		padding-right: 1rem;
 		width: 7rem;
+	}
+
+	.docs .cascades .icon {
+		/* Sorry 😭 we're in a table cell, 
+		display: flex fucks everything up */
+		float: left;
+		margin-right: 0.25em;
 	}
 
 	.learn-more {
