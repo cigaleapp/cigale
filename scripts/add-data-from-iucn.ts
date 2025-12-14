@@ -23,7 +23,15 @@ const IUCNResponse = type.or(
 				'NT',
 				'LC',
 				'DD',
-				'NE'
+				'NE',
+				'NA',
+				'I',
+				'LR/cd',
+				'V',
+				'E',
+				'LR/nt',
+				'LR/lc',
+				'R'
 			)
 		}).array()
 	}
@@ -99,6 +107,68 @@ async function augmentMetadata(metadata: (typeof ExportedProtocol.inferOut)['met
 				`${progress} ${option.label} is data deficient (DD) according to IUCN, not storing status.`
 			);
 			continue;
+		}
+
+		if (assessment.red_list_category_code === 'NA') {
+			warning(
+				`${progress} ${option.label} has no applicable status (NA) according to IUCN, not storing status.`
+			);
+			continue;
+		}
+
+		if (assessment.red_list_category_code === 'I') {
+			warning(
+				`${progress} ${option.label} is indicated as Invasive (I) according to IUCN, not storing status.`
+			);
+			continue;
+		}
+
+		if (assessment.red_list_category_code === 'LR/cd') {
+			warning(
+				`${progress} ${option.label} has status Lower Risk/conservation dependent (LR/cd) according to IUCN, mapping to Near Threatened (NT).`
+			);
+
+			assessment.red_list_category_code = 'NT';
+		}
+
+		if (assessment.red_list_category_code === 'V') {
+			warning(
+				`${progress} ${option.label} has status Vulnerable (V) according to IUCN, mapping to Vulnerable (VU).`
+			);
+
+			assessment.red_list_category_code = 'VU';
+		}
+
+		if (assessment.red_list_category_code === 'E') {
+			warning(
+				`${progress} ${option.label} has status Endangered (E) according to IUCN, mapping to Endangered (EN).`
+			);
+
+			assessment.red_list_category_code = 'EN';
+		}
+
+		if (assessment.red_list_category_code === 'LR/nt') {
+			warning(
+				`${progress} ${option.label} has status Lower Risk/near threatened (LR/nt) according to IUCN, mapping to Near Threatened (NT).`
+			);
+
+			assessment.red_list_category_code = 'NT';
+		}
+
+		if (assessment.red_list_category_code === 'LR/lc') {
+			warning(
+				`${progress} ${option.label} has status Lower Risk/least concern (LR/lc) according to IUCN, mapping to Least Concern (LC).`
+			);
+
+			assessment.red_list_category_code = 'LC';
+		}
+
+		if (assessment.red_list_category_code === 'R') {
+			warning(
+				`${progress} ${option.label} has status Rare (R) according to IUCN, mapping to Near Threatened (NT).`
+			);
+
+			assessment.red_list_category_code = 'NT';
 		}
 
 		log(`${progress} ${option.label} has status ${assessment.red_list_category_code}`);
