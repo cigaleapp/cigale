@@ -158,17 +158,17 @@ class CC {
 }
 
 function notice(message: string) {
-	console.log(`${CC.dim}${message}${CC.reset}`);
+	console.info(`${CC.dim}${message}${CC.reset}`);
 }
 
 function error(message: string) {
-	console.log(`${CC.red}${message}${CC.reset}`);
+	console.info(`${CC.red}${message}${CC.reset}`);
 }
 
 function warning(message: string) {
-	console.log(`${CC.yellow}${message}${CC.reset}`);
+	console.info(`${CC.yellow}${message}${CC.reset}`);
 }
 
 function log(message: string) {
-	console.log(`${CC.blue}${message}${CC.reset}`);
+	console.info(`${CC.blue}${message}${CC.reset}`);
 }
