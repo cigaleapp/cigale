@@ -74,6 +74,11 @@ jobs:
       - name: Add genus descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts genus
 
+      - name: Add data from IUCN
+        run: bun run scripts/add-data-from-iucn.ts
+        env:
+          IUCN_API_TOKEN: ${{ secrets.IUCN_API_TOKEN }}
+
       - name: Clean old protocol
         run: rm examples/old-*.json
 

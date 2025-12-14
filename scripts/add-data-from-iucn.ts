@@ -1,0 +1,174 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { ArkErrors, type } from 'arktype';
+
+import type { ExportedProtocol } from '../src/lib/schemas/protocols';
+
+const token = process.env.IUCN_API_TOKEN;
+if (!token) throw new Error('IUCN_API_TOKEN is not set in environment variables.');
+
+const IUCNResponse = type.or(
+	{
+		error: 'string'
+	},
+	{
+		assessments: type({
+			latest: 'boolean',
+			red_list_category_code: type.enumerated(
+				'EX',
+				'EW',
+				'CR',
+				'EN',
+				'VU',
+				'NT',
+				'LC',
+				'DD',
+				'NE'
+			)
+		}).array()
+	}
+);
+
+if (import.meta.main) {
+	await augmentProtocol(
+		path.join(import.meta.dir, '../examples/arthropods.cigaleprotocol.json'),
+		'species'
+	);
+}
+
+async function augmentProtocol(filepath: string, metadata: string) {
+	const protocol: typeof ExportedProtocol.inferOut = JSON.parse(readFileSync(filepath, 'utf8'));
+
+	await augmentMetadata(protocol.metadata[`${protocol.id}__${metadata}`]);
+
+	writeFileSync(filepath, JSON.stringify(protocol, null, 2), 'utf8');
+}
+
+async function augmentMetadata(metadata: (typeof ExportedProtocol.inferOut)['metadata'][string]) {
+	if (!('options' in metadata) || !metadata.options)
+		throw new Error(`No options found in metadata “${metadata.label}”`);
+
+	const total = metadata.options.length;
+	let done = 0;
+	let added = 0;
+
+	for (const option of metadata.options) {
+		const progress = `[${(++done).toString().padStart(total.toString().length)}/${total} | ${added.toString().padStart(total.toString().length)}]`;
+
+		const { parsed: iucn, raw } = await fetchIUCNData(option.label);
+
+		if (iucn instanceof ArkErrors) {
+			error(
+				`${progress} invalid response from IUCN for “${option.label}”: ${iucn.summary}. Response was ${raw}`
+			);
+			continue;
+		}
+
+		if ('error' in iucn) {
+			if (iucn.error === 'Not found') {
+				notice(`${progress} ${option.label} not found in IUCN`);
+			} else {
+				error(`${progress} error from IUCN for ${option.label}: ${iucn.error}`);
+			}
+			continue;
+		}
+
+		if (iucn.assessments.length === 0) {
+			notice(`${progress} ${option.label} has no IUCN assessments`);
+			continue;
+		}
+
+		let assessment = iucn.assessments.find((a) => a.latest);
+
+		if (!assessment) {
+			warning(
+				`${progress} ${option.label} has no up-to-date IUCN assessment, using an outdated one.`
+			);
+			assessment = iucn.assessments[0];
+		}
+
+		if (assessment.red_list_category_code === 'NE') {
+			warning(
+				`${progress} ${option.label} has not been evaluated (NE) according to IUCN, not storing status.`
+			);
+			continue;
+		}
+
+		if (assessment.red_list_category_code === 'DD') {
+			warning(
+				`${progress} ${option.label} is data deficient (DD) according to IUCN, not storing status.`
+			);
+			continue;
+		}
+
+		log(`${progress} ${option.label} has status ${assessment.red_list_category_code}`);
+		added++;
+		option.cascade = {
+			...option.cascade,
+			conservation_status: assessment.red_list_category_code.toLowerCase()
+		};
+	}
+}
+
+async function fetchIUCNData(speciesName: string) {
+	const [genus_name, species_name] = speciesName.split(' ');
+
+	const response = await fetch(
+		'https://api.iucnredlist.org/api/v4/taxa/scientific_name?' +
+			new URLSearchParams({ genus_name, species_name }),
+		{
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		}
+	);
+
+	if (response.status === 429) {
+		await new Promise((resolve) => setTimeout(resolve, 5000));
+		return fetchIUCNData(speciesName);
+	}
+
+	const text = await response.text();
+
+	try {
+		return {
+			raw: text,
+			parsed: IUCNResponse(JSON.parse(text))
+		};
+	} catch (e) {
+		return {
+			raw: text,
+			parsed: {
+				error: `Response from IUCN could not be parsed as JSON. Got HTTP ${response.status} ${response.statusText} with body “${text}”. Error is ${e}`
+			}
+		};
+	}
+}
+
+// ANSI control sequences
+class CC {
+	static clearline = '\x1b[2K';
+	static red = '\x1b[31m';
+	static reset = '\x1b[0m';
+	static dim = '\x1b[2m';
+	static blue = '\x1b[34m';
+	static bold = '\x1b[1m';
+	static yellow = '\x1b[33m';
+	static cyan = '\x1b[36m';
+}
+
+function notice(message: string) {
+	console.log(`${CC.dim}${message}${CC.reset}`);
+}
+
+function error(message: string) {
+	console.log(`${CC.red}${message}${CC.reset}`);
+}
+
+function warning(message: string) {
+	console.log(`${CC.yellow}${message}${CC.reset}`);
+}
+
+function log(message: string) {
+	console.log(`${CC.blue}${message}${CC.reset}`);
+}
