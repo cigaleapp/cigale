@@ -1,11 +1,28 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { ArkErrors, type } from 'arktype';
+import { formatDuration } from 'date-fns';
 
 import type { ExportedProtocol } from '../src/lib/schemas/protocols';
+import { EtaCalculator } from './eta';
 
 const token = process.env.IUCN_API_TOKEN;
 if (!token) throw new Error('IUCN_API_TOKEN is not set in environment variables.');
+
+const notFoundCache = new Set<string>();
+try {
+	const species = await fetch(
+		'https://raw.githubusercontent.com/cigaleapp/models/main/iucn-not-found.json'
+	)
+		.then((res) => res.json())
+		.then((data: Record<string, { name: string }>) => Object.values(data).map((s) => s.name));
+
+	for (const s of species) {
+		notFoundCache.add(s);
+	}
+} catch (e) {
+	error(`Error fetching IUCN not-found cache: ${e}`);
+}
 
 const IUCNResponse = type.or(
 	{
@@ -59,11 +76,23 @@ async function augmentMetadata(metadata: (typeof ExportedProtocol.inferOut)['met
 	const total = metadata.options.length;
 	let done = 0;
 	let added = 0;
+	const eta = new EtaCalculator({
+		averageOver: 2_000,
+		totalSteps: total - notFoundCache.size
+	});
 
-	for (const option of metadata.options) {
-		const progress = `[${(++done).toString().padStart(total.toString().length)}/${total} | ${added.toString().padStart(total.toString().length)}]`;
+	for (const [i, option] of metadata.options.entries()) {
+		const progress = `${((done / (total - notFoundCache.size)) * 100).toFixed(0).padStart(3)}% [${(i + 1).toString().padStart(total.toString().length)}/${total} | ${added.toString().padStart(total.toString().length)}] → ${eta.display(done)} `;
+
+		if (notFoundCache.has(option.label)) {
+			// notice(`${progress} ${option.label} is known to be not found in IUCN, skipping.`);
+			continue;
+		}
 
 		const { parsed: iucn, raw } = await fetchIUCNData(option.label);
+
+		done++;
+		eta.step();
 
 		if (iucn instanceof ArkErrors) {
 			error(
@@ -180,7 +209,7 @@ async function augmentMetadata(metadata: (typeof ExportedProtocol.inferOut)['met
 	}
 }
 
-async function fetchIUCNData(speciesName: string) {
+async function fetchIUCNData(speciesName: string, { rateLimitWait = 5_000 } = {}) {
 	const [genus_name, species_name] = speciesName.split(' ');
 
 	const response = await fetch(
@@ -194,8 +223,11 @@ async function fetchIUCNData(speciesName: string) {
 	);
 
 	if (response.status === 429) {
-		await new Promise((resolve) => setTimeout(resolve, 5000));
-		return fetchIUCNData(speciesName);
+		notice(
+			`-- Rate limit exceeded, waiting ${formatDuration({ seconds: rateLimitWait * 1e-3 })}...`
+		);
+		await new Promise((resolve) => setTimeout(resolve, rateLimitWait));
+		return fetchIUCNData(speciesName, { rateLimitWait: Math.floor(rateLimitWait * Math.E) });
 	}
 
 	const text = await response.text();
