@@ -387,7 +387,7 @@ const protocol = {
 					key: 'lc',
 					label: 'LC',
 					description: 'Préoccupation mineure (“Least Concern”)',
-					color: '#16ca85ff'
+					color: '#16ca85'
 				}
 			]
 		},
