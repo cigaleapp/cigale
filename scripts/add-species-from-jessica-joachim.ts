@@ -90,7 +90,7 @@ async function augmentMetadata(
 			continue;
 		}
 
-		const newData = await augmentMetadataOption(s.key, pageUrl);
+		const newData = await augmentMetadataOption(s, pageUrl);
 
 		if (!newData) {
 			console.warn(yellow(`⁄ Could not extract data for ${metadataKey} ${s.label}`));
@@ -151,7 +151,7 @@ async function searchForSpecies(...names: string[]): Promise<URL | null> {
 }
 
 async function augmentMetadataOption(
-	key: string,
+	{ key, cascade }: typeof MetadataEnumVariant.infer,
 	page: URL
 ): Promise<Partial<typeof MetadataEnumVariant.infer>> {
 	const doc = await fetchAndParseHtml(page);
@@ -168,7 +168,7 @@ async function augmentMetadataOption(
 				new URL(candidate.getAttribute('src')!).pathname.split('/').pop() === filename
 		);
 
-	const cascade: Record<string, string> = {};
+	cascade ??= {};
 
 	// Niveau de difficulté
 	for (const [key, niveau] of Object.entries({
