@@ -10,7 +10,7 @@ import fetchProgress from 'fetch-progress';
  * @param {(value: VIn) => VOut} mapper
  * @returns {Record<K, NoInfer<VOut>>}
  */
-export function mapValues(subject, mapper) {
+export function mapValues<K, VIn, VOut>(subject: Record<K, VIn>, mapper: (value: VIn) => VOut): Record<K, NoInfer<VOut>> {
 	// @ts-expect-error
 	return Object.fromEntries(Object.entries(subject).map(([key, value]) => [key, mapper(value)]));
 }
@@ -32,7 +32,7 @@ if (import.meta.vitest) {
  * @param {(value: VIn) => VOut} mapper
  * @returns {Record<K, NoInfer<NonNullable<VOut>>>}
  */
-export function mapValuesNoNullables(subject, mapper) {
+export function mapValuesNoNullables<K, VIn, VOut>(subject: Record<K, VIn>, mapper: (value: VIn) => VOut): Record<K, NoInfer<NonNullable<VOut>>> {
 	return Object.fromEntries(
 		Object.entries(subject)
 			.map(([key, value]) => [key, mapper(value)])
@@ -64,7 +64,7 @@ if (import.meta.vitest) {
  * @param {Record<K, unknown>} subject
  * @returns {K[]}
  */
-export function keys(subject) {
+export function keys<K>(subject: Record<K, unknown>): K[] {
 	// @ts-expect-error
 	return Object.keys(subject);
 }
@@ -83,7 +83,7 @@ if (import.meta.vitest) {
  * @param {Array<[K, V]>} subject
  * @returns {Record<K, V>}
  */
-export function fromEntries(subject) {
+export function fromEntries<K, V>(subject: Array<[K, V]>): Record<K, V> {
 	// @ts-expect-error
 	return Object.fromEntries(subject);
 }
@@ -107,7 +107,7 @@ if (import.meta.vitest) {
  * @param {Record<K, V>} subject
  * @returns {Array<[K, V]>}
  */
-export function entries(subject) {
+export function entries<K, V>(subject: Record<K, V>): Array<[K, V]> {
 	// @ts-expect-error
 	return Object.entries(subject);
 }
@@ -129,7 +129,7 @@ if (import.meta.vitest) {
  * @param {Record<K, V>} subject
  * @returns {Record<V, K>}
  */
-export function invertRecord(subject) {
+export function invertRecord<K, V>(subject: Record<K, V>): Record<V, K> {
 	return fromEntries(entries(subject).map(([key, value]) => [value, key]));
 }
 
@@ -148,7 +148,7 @@ if (import.meta.vitest) {
  * @param {T[]} values
  * @returns {value is T}
  */
-export function oneOf(value, values) {
+export function oneOf<T>(value: string, values: T[]): value is T {
 	// @ts-expect-error
 	return values.includes(value);
 }
@@ -169,7 +169,7 @@ if (import.meta.vitest) {
  * @param {T[]} values
  * @returns {values is [...Omit<T, U>[], U, ...Omit<T, U>[]]}
  */
-export function hasOnce(value, values) {
+export function hasOnce<T, U>(value: U, values: T[]): values is [...Omit<T, U>[], U, ...Omit<T, U>[]] {
 	return values.filter((v) => v === value).length === 1;
 }
 
@@ -188,7 +188,7 @@ if (import.meta.vitest) {
  * @param {...any} args
  * @returns {boolean}
  */
-export function xor(...args) {
+export function xor(...args: any[]): boolean {
 	if (args.length === 0) return false;
 	const [first, ...rest] = args;
 	return xor(...rest) !== Boolean(first);
@@ -211,7 +211,7 @@ if (import.meta.vitest) {
  * @param {...any} args
  * @returns {boolean}
  */
-export function or(...args) {
+export function or(...args: any[]): boolean {
 	return args.some(Boolean);
 }
 
@@ -236,7 +236,7 @@ if (import.meta.vitest) {
  * @param {...KeysOut} keys
  * @returns {Pick<Obj, KeysOut>}
  */
-export function pick(subject, ...keys) {
+export function pick<KeysOut, Obj>(subject: Obj, ...keys: KeysOut[]): Pick<Obj, KeysOut> {
 	// We're not using fromEntries and entries with a filter, because Object.fromEntries does not return $derived or $state fields from classes
 	// see https://svelte.dev/playground/32a7d1c8995f45b49f01b7ae86fef7bd?version=5.38.7
 
@@ -258,9 +258,9 @@ if (import.meta.vitest) {
 
 		class Test {
 			/** @type {number} */
-			id = 0;
+			id: number = 0;
 			/** @type {string} */
-			name = '';
+			name: string = '';
 		}
 
 		const testZero = new Test();
@@ -282,7 +282,7 @@ if (import.meta.vitest) {
  * @param {...KeysOut} keys
  * @returns {Record<Exclude<KeysIn, KeysOut>, V>}
  */
-export function omit(subject, ...keys) {
+export function omit<KeysIn, KeysOut, V>(subject: Record<KeysIn, V>, ...keys: KeysOut[]): Record<Exclude<KeysIn, KeysOut>, V> {
 	return fromEntries(entries(subject).filter(([key]) => !oneOf(key, keys)));
 }
 
@@ -301,7 +301,7 @@ if (import.meta.vitest) {
  * @param {*} str
  * @returns
  */
-export function safeJSONParse(str) {
+export function safeJSONParse(str: any) {
 	try {
 		return JSON.parse(str?.toString() ?? '');
 	} catch {
@@ -322,7 +322,7 @@ if (import.meta.vitest) {
 /**
  * @param {*} value
  */
-export function safeJSONStringify(value) {
+export function safeJSONStringify(value: any) {
 	try {
 		return JSON.stringify(value);
 	} catch {
@@ -345,7 +345,7 @@ if (import.meta.vitest) {
  * @param {number} value
  * @returns {-1|0|1}
  */
-export function sign(value) {
+export function sign(value: number): -1 | 0 | 1 {
 	// @ts-expect-error
 	return Math.sign(value);
 }
@@ -371,7 +371,7 @@ if (import.meta.vitest) {
  * @param {number} max
  * @returns {number}
  */
-export function clamp(value, min, max) {
+export function clamp(value: number, min: number, max: number): number {
 	return Math.max(min, Math.min(max, value));
 }
 
@@ -396,7 +396,7 @@ if (import.meta.vitest) {
  * @param  {...ToIterables<T>} arrays
  * @yields {T}
  */
-export function* zip(...arrays) {
+export function* zip<T>(...arrays: ToIterables<T>[]) {
 	// Get iterators for all of the iterables.
 	const iterators = arrays.map((i) => i[Symbol.iterator]());
 
@@ -439,14 +439,8 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @template {*} T
- * @param {T[]} array
- * @param {(item: T) => string|number} [key]
- * @returns {T[]}
- */
 // @ts-expect-error key should be non-optional if T is not string|number
-export function unique(array, key = (x) => x) {
+export function unique<T>(array: T[], key: (item: T) => string | number = (x) => x): T[] {
 	const seen = new Set();
 	return array.filter((item) => {
 		const k = key(item);
@@ -473,11 +467,7 @@ if (import.meta.vitest) {
 	});
 }
 
-/**
- * @param {Uint8Array} uint8Array
- * @returns {ArrayBuffer}
- */
-export function uint8ArrayToArrayBuffer(uint8Array) {
+export function uint8ArrayToArrayBuffer(uint8Array: Uint8Array): ArrayBuffer {
 	return uint8Array.buffer.slice(
 		uint8Array.byteOffset,
 		uint8Array.byteOffset + uint8Array.byteLength
@@ -499,7 +489,7 @@ if (import.meta.vitest) {
  * @param {string} filename
  * @returns [string, string] [filename without extension, extension]
  */
-export function splitFilenameOnExtension(filename) {
+export function splitFilenameOnExtension(filename: string) {
 	const match = filename.match(/^([^.]+)\.(.+)$/);
 	if (!match) return [filename, ''];
 	return [match[1], match[2]];
@@ -518,7 +508,7 @@ if (import.meta.vitest) {
  * @template Item
  * @param {((item: Item) => string|number|undefined) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
  */
-export function compareBy(key) {
+export function compareBy<Item>(key: ((item: Item) => string | number | undefined) | (keyof Item & string)) {
 	if (typeof key === 'string') {
 		return compareBy((item) => item[key]);
 	}
@@ -528,7 +518,7 @@ export function compareBy(key) {
 	 * @param {Item} b
 	 * @returns {number}
 	 */
-	return (a, b) => {
+	return (a: Item, b: Item): number => {
 		const aKey = key(a);
 		const bKey = key(b);
 
@@ -609,7 +599,7 @@ if (import.meta.vitest) {
  * @param {T} url
  * @returns {T}
  */
-export function cachebust(url) {
+export function cachebust<T>(url: T): T {
 	const parsedUrl = new URL(url);
 	// TODO use x-cigale-cache-bust instead of v
 	parsedUrl.searchParams.set('v', Date.now().toString());
@@ -655,7 +645,7 @@ if (import.meta.vitest) {
  * @param {number|undefined} [end]
  * @returns {number[]}
  */
-export function range(startOrEnd, end = undefined) {
+export function range(startOrEnd: number, end: number | undefined = undefined): number[] {
 	if (end === undefined) {
 		return Array.from({ length: startOrEnd }, (_, i) => i);
 	}
@@ -679,7 +669,7 @@ if (import.meta.vitest) {
  * @param {''|'model'} [options.cacheAs=""]
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
  */
-export async function fetchHttpRequest(request, { cacheAs = '', onProgress } = {}) {
+export async function fetchHttpRequest(request: typeof import('$lib/schemas/common.js').HTTPRequest.infer, { cacheAs = '', onProgress }: { cacheAs?: '' | 'model'; onProgress?: import('fetch-progress').FetchProgressInitOptions['onProgress']; } = {}) {
 	let url = new URL(typeof request === 'string' ? request : request.url);
 	const options = typeof request === 'string' ? { headers: {} } : request;
 	if (cacheAs) {
@@ -758,7 +748,7 @@ if (import.meta.vitest) {
 }
 
 /** @param {Iterable<number>} values */
-export function sum(values) {
+export function sum(values: Iterable<number>) {
 	return [...values].reduce((acc, cur) => acc + cur, 0);
 }
 
@@ -772,7 +762,7 @@ if (import.meta.vitest) {
 }
 
 /** @param {number[]} values  */
-export function avg(values) {
+export function avg(values: number[]) {
 	return sum(values) / values.length;
 }
 
@@ -790,7 +780,7 @@ if (import.meta.vitest) {
  * @param {T} value
  * @returns {value is NonNullable<T>}
  */
-export function nonnull(value) {
+export function nonnull<T>(value: T): value is NonNullable<T> {
 	return value !== null && value !== undefined;
 }
 
@@ -815,7 +805,7 @@ if (import.meta.vitest) {
  * @param {number} decimals
  * @returns {number}
  */
-export function round(value, decimals = 0) {
+export function round(value: number, decimals: number = 0): number {
 	if (decimals < 0) throw new Error('decimals must be non-negative');
 	const factor = Math.pow(10, decimals);
 	return Math.round(value * factor) / factor;
@@ -846,7 +836,7 @@ if (import.meta.vitest) {
  * @param {number} leeway how many pixels to consider still "inside" the rect even if it's outside
  * @returns
  */
-export function insideBoundingClientRect({ offsetX, offsetY }, rect, leeway = 0) {
+export function insideBoundingClientRect({ offsetX, offsetY }: { offsetX: number; offsetY: number; }, rect: DOMRect, leeway: number = 0) {
 	return (
 		offsetX >= -leeway &&
 		offsetX <= rect.width + leeway &&
@@ -879,7 +869,7 @@ if (import.meta.vitest) {
  * @param {string} contentType
  * @returns {contentType is 'application/zip' | 'application/x-zip-compressed' | 'application/x-zip' }
  */
-export function isZip(contentType) {
+export function isZip(contentType: string): contentType is 'application/zip' | 'application/x-zip-compressed' | 'application/x-zip' {
 	return (
 		contentType === 'application/zip' ||
 		contentType === 'application/x-zip-compressed' ||
@@ -893,7 +883,7 @@ export function isZip(contentType) {
  * @param {T} expr
  * @returns {T}
  */
-export function logexpr(tag, expr) {
+export function logexpr<T>(tag: string, expr: T): T {
 	// oxlint-disable-next-line no-console
 	console.log(`{${tag}}`, expr);
 	return expr;
@@ -920,9 +910,9 @@ export function logexpr(tag, expr) {
  * @param {...(PartName | number)} layout
  * @returns {(part: PartName, progress: number) => number}
  */
-export function progressSplitter(...layout) {
+export function progressSplitter<PartName>(...layout: (PartName | number)[]): (part: PartName, progress: number) => number {
 	/** @type {Array<[PartName, number]>} */
-	let parts = [];
+	let parts: Array<[PartName, number]> = [];
 
 	for (let i = 0; i < layout.length; i += 2) {
 		const name = /** @type {PartName} */ (layout[i]);
@@ -973,7 +963,7 @@ if (import.meta.vitest) {
  * Throws if the result is still not ASCII (e.g. CJK characters, we don't have transliteration tables for everything)
  * @param {string} text
  */
-export function slugify(text) {
+export function slugify(text: string) {
 	const result = text
 		.normalize(/* @wc-ignore */ 'NFD') // separate accent from letter
 		.replace(/[\u0300-\u036f]/g, '') // remove all accents
@@ -1008,7 +998,7 @@ if (import.meta.vitest) {
  * @param {string} message
  * @returns {never}
  */
-export function throws(message) {
+export function throws(message: string): never {
 	throw new Error(message);
 }
 
@@ -1029,7 +1019,7 @@ if (import.meta.vitest) {
  * @param {(item: T) => V} [valueMapper]
  * @returns {Map<K, V[]>}
  */
-export function groupBy(array, key, valueMapper) {
+export function groupBy<T, K = string, V = T>(array: Iterable<T>, key: (item: T) => K, valueMapper: (item: T) => V): Map<K, V[]> {
 	if ('groupBy' in Map && !valueMapper) {
 		// @ts-expect-error
 		return Map.groupBy(array, key);
@@ -1080,7 +1070,7 @@ if (import.meta.vitest) {
  * @param {number} value between 0 and 1
  * @param {...string} stops CSS color variable names (without the -- in front) representing the color gradient scale
  */
-export function gradientedColor(value, ...stops) {
+export function gradientedColor(value: number, ...stops: string[]) {
 	if (value >= 1) return `var(--${stops.at(-1)})`;
 	if (value <= 0) return `var(--${stops[0]})`;
 
@@ -1187,7 +1177,7 @@ if (import.meta.vitest) {
  * @param {object} [options]
  * @param {number} [options.firstTimeDuration] in milliseconds, if provided and it's the first time the app is started, this duration will be used instead of duration
  */
-export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
+export function fadeOutElement(selector: string, duration: number, { firstTimeDuration }: { firstTimeDuration?: number; } = {}) {
 	const firstStart = !localStorage.getItem('app_started_before');
 	localStorage.setItem('app_started_before', 'true');
 
@@ -1210,7 +1200,7 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 /**
  * @param {string} color Hex of background color string, e.g. #RRGGBB
  */
-export function readableOn(color) {
+export function readableOn(color: string) {
 	const rgb = color.replace(/^#/, '').match(/.{2}/g);
 	if (rgb === null) throw new Error('Invalid color, use hex notation');
 	const o = Math.round(

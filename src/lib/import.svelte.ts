@@ -132,7 +132,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	/**
 	 * @param {[number, number, number, number]} param0
 	 */
-	const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
+	const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol, uiState.selectedCropModel)({ x, y, w, h });
 
 	for (let i = 0; i < boxes.length; i++) {
 		await tables.Image.set({

@@ -5,18 +5,11 @@ import { EXIF_FIELDS } from '../exiffields.js';
 import { keys, unique } from '../utils.js';
 import { ColorHex, HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
 
-/**
- * @param {string} metadataId
- * @param {import('$lib/metadata').RuntimeValue} key
- */
-export function metadataOptionId(metadataId, key) {
+export function metadataOptionId(metadataId: string, key: import('$lib/metadata').RuntimeValue) {
 	return `${metadataId}:${key}`;
 }
 
-/**
- * @param {string} optionId
- */
-export function parseMetadataOptionId(optionId) {
+export function parseMetadataOptionId(optionId: string) {
 	const parts = optionId.split(':');
 	if (parts.length < 2) throw new Error(`Invalid metadata option ID: ${optionId}`);
 	const metadataId = parts.slice(0, -1).join(':');
@@ -24,10 +17,7 @@ export function parseMetadataOptionId(optionId) {
 	return { metadataId, key };
 }
 
-/**
- * @satisfies { Record<string, {label: string, help: string}> }
- */
-export const METADATA_TYPES = /** @type {const} */ ({
+export const METADATA_TYPES = {
 	string: { label: 'texte', help: 'du texte' },
 	boolean: { label: 'booléen', help: 'vrai ou faux' },
 	integer: { label: 'entier', help: 'un entier' },
@@ -42,7 +32,7 @@ export const METADATA_TYPES = /** @type {const} */ ({
 		label: "région d'image",
 		help: 'un objet représentant une région rectangulaire au format YOLO'
 	}
-});
+} as const satisfies Record<string, { label: string; help: string }>;
 
 export const MetadataType = type.or(
 	type("'string'", '@', METADATA_TYPES.string.help),
@@ -55,14 +45,9 @@ export const MetadataType = type.or(
 	type("'boundingbox'", '@', METADATA_TYPES.boundingbox.help)
 );
 
-/**
- * @typedef {typeof MetadataType.infer} MetadataType
- */
+export type MetadataType = typeof MetadataType.infer;
 
-/**
- * @satisfies {{[ key in MetadataType ]: import('arktype').Type }}
- */
-export const MetadataRuntimeValue = /** @type {const} */ ({
+export const MetadataRuntimeValue = {
 	string: type('string'),
 	boolean: type('boolean'),
 	integer: type('number'),
@@ -71,7 +56,7 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	date: type('Date'),
 	location: type({ latitude: 'number', longitude: 'number' }),
 	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' })
-});
+} as const satisfies { [key in MetadataType]: import('arktype').Type };
 
 export const MetadataRuntimeValueAny = type.or(
 	MetadataRuntimeValue.string,
@@ -84,16 +69,12 @@ export const MetadataRuntimeValueAny = type.or(
 	MetadataRuntimeValue.boundingbox
 );
 
-/**
- * @template {MetadataType} [Type=MetadataType]
- * @typedef  RuntimeValue
- * @type { typeof MetadataRuntimeValue[Type]['infer'] }
- */
+export type RuntimeValue<Type extends MetadataType = MetadataType> =
+	(typeof MetadataRuntimeValue)[Type]['infer'];
 
 export const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
-		/** @type {import('../metadata').RuntimeValue<typeof MetadataType.infer>}  */
-		let out = JSON.parse(jsonstring);
+		let out: RuntimeValue<typeof MetadataType.infer> = JSON.parse(jsonstring);
 		if (typeof out === 'string') out = parseISOSafe(out) ?? out;
 		return out;
 	}, MetadataRuntimeValueAny),
@@ -113,7 +94,7 @@ export const MetadataValues = scope({ ID }).type({
 /**
  * @satisfies { Record<string, { label: string; help: string }> }
  */
-export const METADATA_MERGE_METHODS = /** @type {const} */ ({
+export const METADATA_MERGE_METHODS = /** @type {const} */ {
 	min: {
 		label: 'Minimum',
 		help: "Choisir la valeur avec la meilleure confiance, et prendre la plus petite valeur en cas d'ambuiguité"
@@ -138,7 +119,7 @@ export const METADATA_MERGE_METHODS = /** @type {const} */ ({
 		label: 'Aucune',
 		help: 'Ne pas fusionner'
 	}
-});
+};
 
 export const MetadataMergeMethod = type.or(
 	type('"min"', '@', METADATA_MERGE_METHODS.min.help),
@@ -241,12 +222,11 @@ export const Metadata = type({
 /**
  * Ensures a metadata ID is namespaced to the given protocol ID
  * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
- * @template {string} ProtocolID
- * @param {ProtocolID} protocolId
- * @param {string} metadataId
- * @returns {`${ProtocolID}__${string}`}
  */
-export function namespacedMetadataId(protocolId, metadataId) {
+export function namespacedMetadataId<ProtocolID extends string>(
+	protocolId: ProtocolID,
+	metadataId: string
+): `${ProtocolID}__${string}` {
 	metadataId = metadataId.replace(/^.+__/, '');
 	return `${protocolId}__${metadataId}`;
 }
@@ -256,7 +236,7 @@ export function namespacedMetadataId(protocolId, metadataId) {
  * @param {string} metadataId the metadata ID to ensure is namespaced
  * @param {string} fallbackProtocolId the protocol ID to use if the metadata ID is not namespaced
  */
-export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
+export function ensureNamespacedMetadataId(metadataId: string, fallbackProtocolId: string) {
 	if (isNamespacedToProtocol(fallbackProtocolId, metadataId)) return metadataId;
 	return namespacedMetadataId(fallbackProtocolId, metadataId);
 }
@@ -268,7 +248,10 @@ export function ensureNamespacedMetadataId(metadataId, fallbackProtocolId) {
  * @param {string} metadataId
  * @returns {metadataId is `${ProtocolID}__${string}` }
  */
-export function isNamespacedToProtocol(protocolId, metadataId) {
+export function isNamespacedToProtocol<ProtocolID>(
+	protocolId: ProtocolID,
+	metadataId: string
+): metadataId is `${ProtocolID}__${string}` {
 	return metadataId.startsWith(`${protocolId}__`);
 }
 
@@ -277,7 +260,7 @@ export function isNamespacedToProtocol(protocolId, metadataId) {
  * @param {string} metadataId
  * @returns {string}
  */
-export function removeNamespaceFromMetadataId(metadataId) {
+export function removeNamespaceFromMetadataId(metadataId: string): string {
 	return metadataId.replace(/^.+__/, '');
 }
 
@@ -286,7 +269,7 @@ export function removeNamespaceFromMetadataId(metadataId) {
  * @param {string} metadataId
  * @returns
  */
-export function namespaceOfMetadataId(metadataId) {
+export function namespaceOfMetadataId(metadataId: string) {
 	const parts = metadataId.split('__');
 	if (parts.length < 2) return undefined;
 	return parts.slice(0, -1).join('__');
@@ -296,7 +279,7 @@ export function namespaceOfMetadataId(metadataId) {
  *
  * @param {string} metadataId
  */
-export function splitMetadataId(metadataId) {
+export function splitMetadataId(metadataId: string) {
 	return {
 		namespace: namespaceOfMetadataId(metadataId),
 		id: removeNamespaceFromMetadataId(metadataId)

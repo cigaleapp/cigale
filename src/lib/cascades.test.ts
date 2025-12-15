@@ -2,17 +2,14 @@ import 'fake-indexeddb/auto';
 
 import { beforeEach, describe, expect, test } from 'vitest';
 
+import type { Metadata, MetadataEnumVariant, MetadataType, Tables } from '$lib/database';
+
 import { computeCascades } from './cascades.js';
 import { openDatabase } from './idb.svelte.js';
 import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
 
 describe('computeCascades', () => {
-	/**
-	 * @param {string} id
-	 * @param {import('$lib/database').MetadataType} [type="enum"]
-	 * @returns {typeof import('$lib/database').Tables.Metadata.infer}
-	 */
-	const mockMetadata = (id, type = 'enum') => ({
+	const mockMetadata = (id: string, type: MetadataType = 'enum'): Metadata => ({
 		description: '',
 		id: namespacedMetadataId('mockproto', id),
 		label: '',
@@ -21,16 +18,13 @@ describe('computeCascades', () => {
 		type
 	});
 
-	/**
-	 * @param {string} metadataId
-	 * @param {number} i
-	 * @returns {  typeof import('$lib/database').Tables.MetadataOption.infer } */
-	const mockOption = (metadataId, i) => ({
+	const mockOption = (metadataId: string, i: number): typeof Tables.MetadataOption.infer => ({
 		metadataId,
 		id: metadataOptionId(metadataId, i.toString()),
 		description: '',
 		key: i.toString(),
-		label: ''
+		label: '',
+		synonyms: []
 	});
 
 	beforeEach(async () => {

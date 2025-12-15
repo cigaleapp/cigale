@@ -44,7 +44,7 @@ sw.addEventListener('activate', (event) => {
 	event.waitUntil(deleteOldCaches().then(sw.clients.claim()));
 });
 
-sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
+sw.addEventListener('fetch', ( event: FetchEvent) => {
 	// ignore POST requests etc.
 	if (event.request.method !== 'GET') return;
 
@@ -98,7 +98,7 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
  * @param {Request} request
  * @param {string} cacheName
  */
-async function tryCache(request, cacheName) {
+async function tryCache(request: Request, cacheName: string) {
 	const cache = await caches.open(cacheName);
 	const match = await cache.match(request.url.href);
 

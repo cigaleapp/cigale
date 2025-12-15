@@ -11,26 +11,23 @@ import {
 } from './database.js';
 
 /** @type {number | null} */
-export const previewingPrNumber =
+export const previewingPrNumber: number | null =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
 export const databaseRevision = 4;
 
-/**
- * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
- */
+export type NonReactiveTableNames =
+	(typeof import('./database.js').NO_REACTIVE_STATE_TABLES)[number];
 
-/**
- * @typedef {Exclude<keyof typeof Tables, NonReactiveTableNames>} ReactiveTableNames
- */
+export type ReactiveTableNames = Exclude<keyof typeof Tables, NonReactiveTableNames>;
 
-/** @type {Array<keyof typeof Tables>} */
 // @ts-ignore
-const tableNames = Object.keys(Tables);
+const tableNames: Array<keyof typeof Tables> = Object.keys(Tables);
 
-/** @type {{[Table in ReactiveTableNames]: Array<typeof Tables[Table]['infer']>}} */
-export const _tablesState = $state({
+export const _tablesState: {
+	[Table in ReactiveTableNames]: Array<(typeof Tables)[Table]['infer']>;
+} = $state({
 	Image: [],
 	Metadata: [],
 	Observation: [],
@@ -39,16 +36,10 @@ export const _tablesState = $state({
 	Session: []
 });
 
-/**
- *
- * @type {{
- *  [Name in ReactiveTableNames]: ReturnType<typeof wrangler<Name>>
- * } & {
- * 	initialize: (sessionId: string|null) => Promise<void>
- * }}
- */
-// @ts-ignore
-export const tables = {
+// @ts-expect-error
+export const tables: { [Name in ReactiveTableNames]: ReturnType<typeof wrangler<Name>> } & {
+	initialize: (sessionId: string | null) => Promise<void>;
+} = {
 	...Object.fromEntries(tableNames.filter(isReactiveTable).map((name) => [name, wrangler(name)])),
 	/**
 	 * Initialize reactive tables for the current session
@@ -61,18 +52,13 @@ export const tables = {
 	}
 };
 
-/**
- *
- * @param {Table} table
- * @template {ReactiveTableNames} Table
- */
-function wrangler(table) {
+function wrangler<Table extends ReactiveTableNames>(table: Table) {
 	return {
 		get state() {
 			return _tablesState[table];
 		},
 		/** @param {string|null} sessionId */
-		async refresh(sessionId) {
+		async refresh(sessionId: string | null) {
 			if (!sessionId && isSessionDependentReactiveTable(table)) {
 				console.debug(`refresh ${table} without session: clearing state`);
 				_tablesState[table] = [];
@@ -87,14 +73,16 @@ function wrangler(table) {
 			}
 		},
 		/** @param {string} key  */
-		get: async (key) => get(table, key),
+		get: async (key: string) => get(table, key),
 		/** @param {string} key  */
-		getFromState: (key) => _tablesState[table].find((item) => item.id === key),
+		getFromState: (key: string) => _tablesState[table].find((item) => item.id === key),
 		/**
 		 * @param {typeof Tables[Table]['inferIn']} value
 		 * @returns {Promise<typeof Tables[Table]['inferOut']>}
 		 */
-		async set(value) {
+		async set(
+			value: (typeof Tables)[Table]['inferIn']
+		): Promise<(typeof Tables)[Table]['inferOut']> {
 			await set(table, value);
 			const output = Tables[table].assert(value);
 			const index = _tablesState[table].findIndex((item) => item.id === value.id);
@@ -106,14 +94,13 @@ function wrangler(table) {
 			return output;
 		},
 		/**
-		 *
-		 * @param {string} key
-		 * @param {Prop} property
-		 * @param {typeof Tables[Table]['inferIn'][Prop]} value
-		 * @template {keyof typeof Tables[Table]['inferIn']} Prop
 		 * @returns {Promise<boolean>} true if the item was found and updated, false otherwise
 		 */
-		async update(key, property, value) {
+		async update<Prop extends keyof (typeof Tables)[Table]['inferIn']>(
+			key: string,
+			property: Prop,
+			value: (typeof Tables)[Table]['inferIn'][Prop]
+		): Promise<boolean> {
 			const logLabel = `upd ${table} ${key} ${typeof property === 'string' ? property : '<Symbol>'} = ${value}`;
 
 			// Get item from DB
@@ -144,11 +131,9 @@ function wrangler(table) {
 
 			return true;
 		},
-		/**
-		 * @param {Omit<typeof Tables[Table]['inferIn'], 'id'>} value
-		 * @returns {Promise<typeof Tables[Table]['inferOut']>}
-		 */
-		async add(value) {
+		async add(
+			value: Omit<(typeof Tables)[Table]['inferIn'], 'id'>
+		): Promise<(typeof Tables)[Table]['inferOut']> {
 			return this.set(
 				// @ts-ignore
 				{ ...value, id: generateId(table) }
@@ -159,9 +144,9 @@ function wrangler(table) {
 			_tablesState[table] = [];
 		},
 		/**
-		 * @param {string | IDBKeyRange} id key of the object to remove
+		 * @param  id key of the object to remove
 		 */
-		async remove(id) {
+		async remove(id: string | IDBKeyRange) {
 			await drop(table, id);
 			const index = _tablesState[table].findIndex((item) => item.id === id);
 			if (index !== -1) {
@@ -174,21 +159,22 @@ function wrangler(table) {
 		},
 		/**
 		 * Create a read-write transaction, execute `actions` given the transaction's object store for that table, and commit the transaction
-		 * @param {(store: import('idb').IDBPObjectStore<IDBDatabaseType, [Table], Table, "readwrite">) => void | Promise<void>} actions
-		 * @returns
 		 */
-		async do(actions) {
+		async do(
+			actions: (
+				store: import('idb').IDBPObjectStore<IDBDatabaseType, [Table], Table, 'readwrite'>
+			) => void | Promise<void>
+		) {
 			const loglabel = `do ${table} #${nanoid()}`;
 			console.debug(loglabel);
 			await openTransaction([table], { mode: 'readwrite' }, async (tx) => {
 				await actions(tx.objectStore(table));
 			});
 		},
-		/**
-		 * @param {import('idb').IndexNames<IDBDatabaseType, Table>} [index]
-		 * @param {IDBKeyRange|string} [key]
-		 */
-		list: async (index, key) => (index && key ? listByIndex(table, index, key) : list(table)),
+		list: async (
+			index: import('idb').IndexNames<IDBDatabaseType, Table>,
+			key: IDBKeyRange | string
+		) => (index && key ? listByIndex(table, index, key) : list(table)),
 		all: () => iterator(table),
 		count: async () => {
 			const db = await openDatabase();
@@ -196,16 +182,11 @@ function wrangler(table) {
 		},
 		/** Do not go through validation or type morphing, manipulate the underlying database values directly. Useful for performance reasons, when changing only a property inside of an object and leaving the others unchanged, for example */
 		raw: {
-			/** @param {typeof Tables[Table]['inferIn']} value */
-			async set(value) {
+			async set(value: (typeof Tables)[Table]['inferIn']) {
 				const db = await openDatabase();
 				return await db.put(table, value);
 			},
-			/**
-			 * @param {string} key
-			 * @returns {Promise<typeof Tables[Table]['inferIn'] | undefined>}
-			 */
-			async get(key) {
+			async get(key: string): Promise<(typeof Tables)[Table]['inferIn'] | undefined> {
 				const db = await openDatabase();
 				return await db.get(table, key);
 			}
@@ -213,13 +194,10 @@ function wrangler(table) {
 	};
 }
 
-/**
- *
- * @param {TableName} tableName
- * @param {typeof Tables[TableName]['inferIn']} value
- * @template {keyof typeof Tables} TableName
- */
-export async function set(tableName, value) {
+export async function set<TableName extends keyof typeof Tables>(
+	tableName: TableName,
+	value: (typeof Tables)[TableName]['inferIn']
+) {
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	validator.assert(value);
@@ -228,25 +206,17 @@ export async function set(tableName, value) {
 	});
 }
 
-/**
- * @param {TableName} table
- * @template {keyof typeof Tables} TableName
- */
-export async function clear(table) {
+export async function clear<TableName extends keyof typeof Tables>(table: TableName) {
 	const db = await openDatabase();
 	await db.clear(table).then((result) => {
 		return result;
 	});
 }
 
-/**
- *
- * @param {TableName} tableName
- * @param {string} key
- * @returns {Promise<undefined | typeof Tables[TableName]['infer']>}
- * @template {keyof typeof Tables} TableName
- */
-export async function get(tableName, key) {
+export async function get<TableName extends keyof typeof Tables>(
+	tableName: TableName,
+	key: string
+): Promise<undefined | (typeof Tables)[TableName]['infer']> {
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	return await db.get(tableName, key).then((value) => {
@@ -255,14 +225,10 @@ export async function get(tableName, key) {
 	});
 }
 
-/**
- *
- * @param {TableName} tableName
- * @param {IDBKeyRange} [keyRange]
- * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
- * @template {keyof typeof Tables} TableName
- */
-export async function list(tableName, keyRange = undefined) {
+export async function list<TableName extends keyof typeof Tables>(
+	tableName: TableName,
+	keyRange: IDBKeyRange | undefined = undefined
+): Promise<Array<(typeof Tables)[TableName]['infer']>> {
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	// @ts-ignore
@@ -274,14 +240,11 @@ export async function list(tableName, keyRange = undefined) {
 		});
 }
 
-/**
- * @template {keyof typeof Tables} TableName
- * @param {TableName} tableName
- * @param {import('idb').IndexNames<IDBDatabaseType, TableName>} indexName
- * @param {IDBKeyRange | string} [keyRange]
- * @returns {Promise<Array<typeof Tables[TableName]['infer']>>}
- */
-export async function listByIndex(tableName, indexName, keyRange = undefined) {
+export async function listByIndex<TableName extends keyof typeof Tables>(
+	tableName: TableName,
+	indexName: import('idb').IndexNames<IDBDatabaseType, TableName>,
+	keyRange: IDBKeyRange | string | undefined = undefined
+): Promise<Array<(typeof Tables)[TableName]['infer']>> {
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	// @ts-ignore
@@ -299,12 +262,11 @@ export async function listByIndex(tableName, indexName, keyRange = undefined) {
 
 /**
  * Delete an entry from a table by key
- * @param {TableName} table
- * @param {string | IDBKeyRange} id
- * @returns {Promise<void>}
- * @template {keyof typeof Tables} TableName
  */
-export async function drop(table, id) {
+export async function drop<TableName extends keyof typeof Tables>(
+	table: TableName,
+	id: string | IDBKeyRange
+): Promise<void> {
 	const db = await openDatabase();
 	return await db
 		.delete(table, id)
@@ -318,14 +280,10 @@ export async function drop(table, id) {
 		});
 }
 
-/**
- *
- * @param {TableName} tableName
- * @param {string} [index]
- * @template {keyof typeof Tables} TableName
- * @yields {typeof Tables[TableName]['infer']}
- */
-export async function* iterator(tableName, index = undefined) {
+export async function* iterator<TableName extends keyof typeof Tables>(
+	tableName: TableName,
+	index: string | undefined = undefined
+): AsyncGenerator<(typeof Tables)[TableName]['infer'], void> {
 	const db = await openDatabase();
 	const validator = Tables[tableName];
 	const store = db.transaction(tableName).store;
@@ -338,28 +296,36 @@ export async function* iterator(tableName, index = undefined) {
 /**
  * Useful to declare and invalidate SvelteKit load functions
  * @see https://svelte.dev/docs/kit/load#Rerunning-load-functions-Manual-invalidation
- * @param {keyof typeof Tables} tableName
- * @param {string} key
- * @param {...string} additionalPath
- * @returns {`idb://${string}`}
  */
-export function dependencyURI(tableName, key, ...additionalPath) {
+export function dependencyURI(
+	tableName: keyof typeof Tables,
+	key: string,
+	...additionalPath: string[]
+): `idb://${string}` {
 	// @ts-expect-error
 	return ['idb:/', tableName, key, ...additionalPath].filter(Boolean).join('/');
 }
 
 /**
  * Create a transaction, execute `actions`. Commits the transaction and refreshes reactive tables' state for you
- * @template {Array<keyof typeof Tables>} Tables
- * @template {IDBTransactionMode} [Mode="readwrite"]
- * @param {Tables} tableNames
- * @param {object} param1
- * @param {Mode} [param1.mode="readwrite"]
- * @param {string} [param1.session] current session ID, used to refresh session-dependent reactive tables. Defaults to localStorage's currentSessionId
- * @param {IDBTransactionWithAtLeast<Tables, Mode>} [param1.tx] already existing transaction to use instead of creating a new one. In that case, the transaction is not committed and the reactive tables' state is not refreshed, since it's assumed that a openTransactions() call higher up in the call stack will already do this
- * @param {(tx: IDBTransactionWithAtLeast<Tables, Mode>) => void | Promise<void>} actions
+ * @param tableNames
+ * @param param1
+ * @param param1.mode
+ * @param param1.session current session ID, used to refresh session-dependent reactive tables. Defaults to localStorage's currentSessionId
+ * @param param1.tx already existing transaction to use instead of creating a new one. In that case, the transaction is not committed and the reactive tables' state is not refreshed, since it's assumed that a openTransactions() call higher up in the call stack will already do this
+ * @param actions
  */
-export async function openTransaction(tableNames, { mode, session }, actions) {
+export async function openTransaction<
+	Tables extends Array<keyof typeof Tables>,
+	Mode extends IDBTransactionMode = 'readwrite'
+>(
+	tableNames: Tables,
+	{
+		mode,
+		session
+	}: { mode?: Mode; session?: string; tx?: IDBTransactionWithAtLeast<Tables, Mode> },
+	actions: (tx: IDBTransactionWithAtLeast<Tables, Mode>) => void | Promise<void>
+) {
 	// @ts-ignore
 	mode ??= 'readwrite';
 
@@ -407,17 +373,17 @@ export function databaseHandle() {
 export async function openDatabase() {
 	if (_database) return _database;
 
-	/** @type {Array<{[K in keyof typeof Tables]: [K, typeof Tables[K]]}[keyof typeof Tables]>} */
-	// @ts-ignore
-	const tablesByName = Object.entries(Tables);
+	// @ts-expect-error
+	const tablesByName: Array<
+		{ [K in keyof typeof Tables]: [K, (typeof Tables)[K]] }[keyof typeof Tables]
+	> = Object.entries(Tables);
 
 	_database = await openDB(databaseName, databaseRevision, {
 		upgrade(db, oldVersion) {
-			/**
-			 * @param {keyof typeof Tables} tableName
-			 * @param {import('arktype').Type} schema
-			 */
-			const createTable = (tableName, schema) => {
+			const createTable = (
+				tableName: keyof typeof Tables,
+				schema: import('arktype').Type
+			) => {
 				if (!schema.meta.table) return;
 				const keyPath = schema.meta.table.indexes[0];
 				if (db.objectStoreNames.contains(tableName)) {
@@ -480,32 +446,28 @@ export function nukeDatabase() {
 	indexedDB.deleteDatabase(databaseName);
 }
 
-/**
- * @typedef {{
- *   [Name in keyof typeof Tables]: {
- *      value: (typeof Tables[Name])['inferIn']
- *      key: string,
- *     indexes: {
- *        [IndexName in string]: string;
- *     }
- *   }
- * }} IDBDatabaseType
- */
+export type IDBDatabaseType = {
+	[Name in keyof typeof Tables]: {
+		value: (typeof Tables)[Name]['inferIn'];
+		key: string;
+		indexes: {
+			[IndexName in string]: string;
+		};
+	};
+};
 
 /**
- * @template {Array<keyof typeof Tables>} Stores Required stores
- * @template {IDBTransactionMode} [Mode="readwrite"]
- * @typedef {import('idb').IDBPTransaction<IDBDatabaseType, [...Stores, ...Array<keyof typeof Tables>], Mode>} IDBTransactionWithAtLeast
+ * @template  Stores Required stores
  */
+export type IDBTransactionWithAtLeast<
+	Stores extends Array<keyof typeof Tables>,
+	Mode extends IDBTransactionMode = 'readwrite'
+> = import('idb').IDBPTransaction<
+	IDBDatabaseType,
+	[...Stores, ...Array<keyof typeof Tables>],
+	Mode
+>;
 
-/**
- * @typedef {import('idb').IDBPDatabase<IDBDatabaseType>} DatabaseHandle
- */
+export type DatabaseHandle = import('idb').IDBPDatabase<IDBDatabaseType>;
 
-// Magie vodoo Typescript, pas besoin de comprendre
-// Si t'es curieuxse, demande à Gwenn qui sera ravie
-// de t'expliquer :3
-/**
- * @type {DatabaseHandle | undefined}
- */
-let _database;
+let _database: DatabaseHandle | undefined;

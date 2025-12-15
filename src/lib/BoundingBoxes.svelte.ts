@@ -25,39 +25,47 @@ const _rect = type({
 
 const _anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
 
-/**
- * @typedef {typeof _anyBoundingBox.infer} AnyBoundingBox
- * @typedef {typeof topLeftBoundingBox.infer} TopLeftBoundingBox
- * @typedef {typeof centeredBoundingBox.infer} CenteredBoundingBox
- * @typedef {typeof _rect.infer} Rect
- */
+export type AnyBoundingBox = typeof _anyBoundingBox.infer;
 
-/**
- *
- * @param {object} param0
- * @param {number} param0.x
- * @param {number} param0.y
- * @returns scaled coordinates
- */
-export function coordsScaler({ x: xwise, y: ywise }) {
-	/**
-	 * @template {AnyBoundingBox} BoundingBox
-	 * @param {BoundingBox} param0
-	 * @returns {BoundingBox}
-	 */
-	return ({ x, y, ...wh }) => {
-		const [newx, newy] = [x * xwise, y * ywise];
-		if ('width' in wh && 'height' in wh)
-			return { x: newx, y: newy, width: wh.width * xwise, height: wh.height * ywise };
-		if ('w' in wh && 'h' in wh) return { x: newx, y: newy, w: wh.w * xwise, h: wh.h * ywise };
-		return { x: newx, y: newy, ...wh };
-	};
+export type TopLeftBoundingBox = typeof topLeftBoundingBox.infer;
+
+export type CenteredBoundingBox = typeof centeredBoundingBox.infer;
+
+export type Rect = typeof _rect.infer;
+
+export function coordsScaler({ x: xwise, y: ywise }: { x: number; y: number }) {
+	function scale(box: TopLeftBoundingBox): TopLeftBoundingBox;
+	function scale(box: CenteredBoundingBox): CenteredBoundingBox;
+	function scale({ x, y, ...wh }: AnyBoundingBox): AnyBoundingBox {
+		if ('width' in wh && 'height' in wh) {
+			return {
+				x: x * xwise,
+				y: y * ywise,
+				width: wh.width * xwise,
+				height: wh.height * ywise
+			};
+		}
+
+		return {
+			x: x * xwise,
+			y: y * ywise,
+			w: wh.w * xwise,
+			h: wh.h * ywise
+		};
+	}
+
+	return scale;
 }
 
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('coordsScaler', () => {
-		expect(coordsScaler({ x: 2, y: 3 })({ x: 1, y: 2 })).toEqual({ x: 2, y: 6 });
+		expect(coordsScaler({ x: 2, y: 3 })({ x: 1, w: 1, y: 2, h: 3 })).toEqual({
+			x: 2,
+			y: 6,
+			w: 2,
+			h: 9
+		});
 		expect(coordsScaler({ x: 2, y: 3 })({ x: 1, y: 2, width: 4, height: 5 })).toEqual({
 			x: 2,
 			y: 6,
@@ -67,12 +75,11 @@ if (import.meta.vitest) {
 	});
 }
 
-/** @param {undefined | import('./database').Protocol} protocol  */
-export const toRelativeCoords = (protocol) => {
+export const toRelativeCoords = (protocol: undefined | import('./database').Protocol, model: number) => {
 	if (!protocol) throw new Error('No protocol was provided');
 	return coordsScaler({
-		x: 1 / (protocol.crop?.infer?.input?.width ?? TARGETWIDTH),
-		y: 1 / (protocol.crop?.infer?.input?.height ?? TARGETHEIGHT)
+		x: 1 / (protocol.crop?.infer?.[model]?.input?.width ?? TARGETWIDTH),
+		y: 1 / (protocol.crop?.infer?.[model]?.input?.height ?? TARGETHEIGHT)
 	});
 };
 
@@ -83,7 +90,17 @@ export const toRelativeCoords = (protocol) => {
  * @param {number} param0.width
  * @param {number} param0.height
  */
-export function toCenteredCoords({ x, y, width, height }) {
+export function toCenteredCoords({
+	x,
+	y,
+	width,
+	height
+}: {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}) {
 	return {
 		x: x + width / 2,
 		y: y + height / 2,
@@ -111,7 +128,7 @@ if (import.meta.vitest) {
  * @param {number} param0.w
  * @param {number} param0.h
  */
-export function toTopLeftCoords({ x, y, w, h }) {
+export function toTopLeftCoords({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
 	return {
 		x: x - w / 2,
 		y: y - h / 2,
@@ -171,7 +188,10 @@ if (import.meta.vitest) {
  * @param {{x: number, y: number}} point
  * @returns
  */
-export function withinBoundingBox(boundingBox, { x, y }) {
+export function withinBoundingBox(
+	boundingBox: { x: number; y: number; width: number; height: number },
+	{ x, y }: { x: number; y: number }
+) {
 	if (!boundingBoxIsNonZero(boundingBox)) return false;
 	const { x: x_box, y: y_box, width, height } = boundingBox;
 	return x >= x_box && x <= x_box + width && y >= y_box && y <= y_box + height;
@@ -203,7 +223,7 @@ if (import.meta.vitest) {
  * @param {AnyBoundingBox} a
  * @param {AnyBoundingBox} b
  */
-function coordsDifference(a, b) {
+function coordsDifference(a: AnyBoundingBox, b: AnyBoundingBox) {
 	let combinedDifference = 0;
 
 	combinedDifference += Math.abs(a.x - b.x);
@@ -237,7 +257,7 @@ if (import.meta.vitest) {
  * @param {AnyBoundingBox} b
  * @param {number} tolerance
  */
-export function coordsAreEqual(a, b, tolerance = 0) {
+export function coordsAreEqual(a: AnyBoundingBox, b: AnyBoundingBox, tolerance: number = 0) {
 	return coordsDifference(a, b) <= tolerance;
 }
 
@@ -268,7 +288,12 @@ if (import.meta.vitest) {
  * @param {AnyBoundingBox} boundingBox
  * @returns {{ topleft: [number, number], topright: [number, number], bottomleft: [number, number], bottomright: [number, number] }}
  */
-export function toCorners(boundingBox) {
+export function toCorners(boundingBox: AnyBoundingBox): {
+	topleft: [number, number];
+	topright: [number, number];
+	bottomleft: [number, number];
+	bottomright: [number, number];
+} {
 	if (!('width' in boundingBox) || !('height' in boundingBox)) {
 		return toCorners(toTopLeftCoords(boundingBox));
 	}

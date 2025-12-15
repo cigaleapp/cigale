@@ -1,4 +1,4 @@
-import { type } from 'arktype';
+import { Type, type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
 import {
@@ -30,9 +30,8 @@ import { clamp } from './utils.js';
 
 /**
  * Generate an ID for a given table
- * @param {keyof typeof Tables} table
  */
-export function generateId(table) {
+export function generateId(table: keyof typeof Tables) {
 	return table.slice(0, 1).toLowerCase() + Math.random().toString(36).slice(2, 9);
 }
 
@@ -113,7 +112,7 @@ const Settings = table(
 		notifications: 'boolean | null = null',
 		language: type.enumerated('fr', 'en').default(
 			/** @type {() => 'fr' | 'en'} */
-			() => {
+			(): 'fr' | 'en' => {
 				// TODO(2025-10-04): remove paraglide migration after a while
 
 				try {
@@ -180,31 +179,26 @@ export const Schemas = {
 	HTTPRequest
 };
 
-export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
+export const NO_REACTIVE_STATE_TABLES = [
 	'ImageFile',
 	'ImagePreviewFile',
 	'MetadataOption'
-]);
+] as const;
 
-const SESSION_DEPENDENT_REACTIVE_TABLES = /** @type {const} */ (['Image', 'Observation']);
+const SESSION_DEPENDENT_REACTIVE_TABLES = ['Image', 'Observation'] as const;
 
-/**
- *
- * @template {keyof typeof Tables} TableName
- * @param {TableName} name
- * @returns {name is Exclude<TableName, typeof NO_REACTIVE_STATE_TABLES[number]>}
- */
-export function isReactiveTable(name) {
+export function isReactiveTable<TableName extends keyof typeof Tables>(
+	name: TableName
+): name is Exclude<TableName, (typeof NO_REACTIVE_STATE_TABLES)[number]> {
 	return NO_REACTIVE_STATE_TABLES.every((n) => n !== name);
 }
 
-/**
- * @template {keyof typeof Tables} TableName
- * @param {TableName} name
- * @returns {name is typeof SESSION_DEPENDENT_REACTIVE_TABLES[number]}
- */
-export function isSessionDependentReactiveTable(name) {
-	return SESSION_DEPENDENT_REACTIVE_TABLES.some((n) => n === name);
+export function isSessionDependentReactiveTable<TableName extends keyof typeof Tables>(
+	name: TableName
+): name is Extract<TableName, (typeof SESSION_DEPENDENT_REACTIVE_TABLES)[number]> {
+	return SESSION_DEPENDENT_REACTIVE_TABLES.includes(
+		name as (typeof SESSION_DEPENDENT_REACTIVE_TABLES)[number]
+	);
 }
 
 export const Tables = {
@@ -221,15 +215,13 @@ export const Tables = {
 
 /**
  *
- * @param {string|string[]} keyPaths expanded to an array.
+ * @param  keyPaths expanded to an array.
  * Every element is an index to be created.
  * Indexes are dot-joined paths to keys in the objects.
  * First index is given as the keyPath argument when creating the object store instead.
- * @param {Schema} schema
- * @template {import('arktype').Type} Schema
- * @returns
+ * @param  schema
  */
-function table(keyPaths, schema) {
+function table<Schema extends Type>(keyPaths: string | string[], schema: Schema) {
 	const expandedKeyPaths = Array.isArray(keyPaths)
 		? keyPaths.map((keyPath) => keyPath)
 		: [keyPaths];
@@ -240,12 +232,11 @@ function table(keyPaths, schema) {
 /**
  * Returns a comparator to sort objects by their id property
  * If both IDs are numeric, they are compared numerically even if they are strings
- * @template {{id: string|number} | string | number} IdOrObject
- * @param {IdOrObject} a
- * @param {IdOrObject} b
- * @returns {number}
  */
-export const idComparator = (a, b) => {
+export const idComparator = <IdOrObject extends { id: string | number } | string | number>(
+	a: IdOrObject,
+	b: IdOrObject
+): number => {
 	// @ts-ignore
 	if (typeof a === 'object' && 'id' in a) return idComparator(a.id, b.id);
 	// @ts-ignore
@@ -260,105 +251,44 @@ export const idComparator = (a, b) => {
 	return a.localeCompare(b);
 };
 
-/**
- * @typedef  ID
- * @type {typeof ID.infer}
- */
+export type ID = typeof ID.infer;
 
-/**
- * @typedef  Probability
- * @type {typeof Probability.infer}
- */
+export type Probability = typeof Probability.infer;
 
-/**
- * @typedef  MetadataValue
- * @type {typeof MetadataValue.infer}
- */
+export type MetadataValue = typeof MetadataValue.infer;
 
-/**
- * @typedef  MetadataValues
- * @type {typeof MetadataValues.infer}
- */
+export type MetadataValues = typeof MetadataValues.infer;
 
-/**
- * @typedef  Image
- * @type {typeof Image.infer}
- */
+export type Image = typeof Image.infer;
 
-/**
- * @typedef  Observation
- * @type {typeof Observation.infer}
- */
+export type Observation = typeof Observation.infer;
 
-/**
- * @typedef  Session
- * @type {typeof Session.infer}
- */
+export type Session = typeof Session.infer;
 
-/**
- * @typedef  MetadataType
- * @type {typeof MetadataTypeSchema.infer}
- */
+export type MetadataType = typeof MetadataTypeSchema.infer;
 
-/**
- * @typedef  MetadataMergeMethod
- * @type {typeof MetadataMergeMethod.infer}
- */
+export type MetadataMergeMethod = typeof MetadataMergeMethod.infer;
 
-/**
- * @typedef  MetadataEnumVariant
- * @type {typeof MetadataEnumVariant.infer}
- */
+export type MetadataEnumVariant = typeof MetadataEnumVariant.infer;
 
-/**
- * @typedef  Metadata
- * @type {typeof Metadata.infer}
- */
+export type Metadata = typeof Metadata.infer;
 
-/**
- * @typedef  Protocol
- * @type {typeof Protocol.infer}
- */
+export type Protocol = typeof Protocol.infer;
 
-/**
- * @typedef  ModelInput
- * @type {typeof ModelInput.infer}
- */
+export type ModelInput = typeof ModelInput.infer;
 
-/**
- * @typedef  ModelDetectionOutputShape
- * @type {typeof ModelDetectionOutputShape.infer}
- */
+export type ModelDetectionOutputShape = typeof ModelDetectionOutputShape.infer;
 
-/**
- * @typedef  Settings
- * @type {typeof Settings.infer}
- */
+export type Settings = typeof Settings.infer;
 
-/**
- * @typedef  HTTPRequest
- * @type {typeof HTTPRequest.infer}
- */
+export type HTTPRequest = typeof HTTPRequest.infer;
 
-/**
- * @typedef EXIFField
- * @type {typeof EXIFField.infer}
- */
+export type EXIFField = typeof EXIFField.infer;
 
-/**
- * @typedef MetadataInferOptions
- * @type {typeof MetadataInferOptions.infer}
- */
+export type MetadataInferOptions = typeof MetadataInferOptions.infer;
 
-/**
- * @typedef ImageFile
- * @type {typeof ImageFile.infer}
- */
+export type ImageFile = typeof ImageFile.infer;
 
-/**
- * @typedef Dimensions
- * @type {typeof Dimensions.infer}
- *
- * @typedef DimensionsInput
- * @type {typeof Dimensions.inferIn}
- */
+export type Dimensions = typeof Dimensions.infer;
+
+export type DimensionsInput = typeof Dimensions.inferIn;

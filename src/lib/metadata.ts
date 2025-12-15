@@ -3,6 +3,7 @@ import * as dates from 'date-fns';
 
 import { computeCascades } from './cascades.js';
 import { idComparator, Schemas } from './database.js';
+import type * as DB from './database.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
@@ -12,22 +13,11 @@ import {
 } from './schemas/metadata.js';
 import { avg, fromEntries, mapValues } from './utils.js';
 
-/**
- * @import { DatabaseHandle, ReactiveTableNames } from './idb.svelte.js'
- * @import * as DB from './database.js'
- */
+type RuntimeValue<Type = DB.MetadataType> = import('$lib/schemas/metadata.js').RuntimeValue<Type>;
 
-/**
- * @template {DB.MetadataType} [Type=DB.MetadataType]
- * @typedef  RuntimeValue
- * @type {import('$lib/schemas/metadata.js').RuntimeValue<Type>}
- */
-
-/**
- * @template {DB.MetadataType} [Type=DB.MetadataType]
- * @typedef TypedMetadataValue
- * @type {Omit<DB.MetadataValue, 'value'> & { value: RuntimeValue<Type> }}
- */
+type TypedMetadataValue<Type = DB.MetadataType> = Omit<DB.MetadataValue, 'value'> & {
+	value: RuntimeValue<Type>;
+};
 
 /**
  * Refresh the specified table. Does nothing if we can't import idb.svelte.js.
@@ -695,8 +685,7 @@ function toNumber(type, values) {
 	// @ts-ignore
 	if (type === 'float') return values;
 	if (type === 'boolean') return values.map((v) => (v ? 1 : 0));
-	if (type === 'date')
-		return values.map((v) => new Date(/** @type {Date|string} */ (v)).getTime());
+	if (type === 'date') return values.map((v) => new Date(/** @type {Date|string} */ v).getTime());
 	throw new Error(`Impossible de convertir des valeurs de type ${type} en nombre`);
 }
 
@@ -968,19 +957,19 @@ export function metadataDefinitionComparator(protocol) {
 /**
  * @template T
  * @template Undefinable
- * @typedef{ Undefinable extends true ? T | undefined : T } Maybe
  */
+type Maybe = Undefinable extends true ? T | undefined : T;
 
 /**
  * A null-value MetadataValue object
  * @satisfies {ReturnType<typeof protocolMetadataValues>[string]}
  */
-const METADATA_ZERO_VALUE = /** @type {const} */ ({
+const METADATA_ZERO_VALUE = /** @type {const} */ {
 	value: null,
 	manuallyModified: false,
 	confidence: 0,
 	alternatives: {}
-});
+};
 
 /**
  * Returns a un-namespaced object of all metadata values of the given protocol, given the metadata values object of an image/observation. If a metadata value is absent from the given values, the value is still present, but set to `null`.

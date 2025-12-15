@@ -34,68 +34,53 @@ import { getMetadataValue } from './metadata';
 // UIState class fields and methods are annotated with @type for documentation and IDE support
 class UIState {
 	processing = $state({
-		/** @type {Array<{name: string; id: string; addedAt: Date }>} */
-		files: [],
-		/** @type {number} */
+		files: [] as Array<{ name: string; id: string; addedAt: Date }>,
 		total: 0,
-		/** @type {number} */
 		done: 0,
-		/** @type {number} */
 		time: 0,
-		/** @type {''|'import'|'detection'|'classification'|'export'} */
-		task: '',
-		/** @type {number} */
-		get progress() {
+		task: '' as '' | 'import' | 'detection' | 'classification' | 'export',
+		get progress(): number {
 			return this.total ? this.done / this.total : 0;
 		},
-		/** @type {(id: string) => void} */
-		removeFile(id) {
+		removeFile(id: string): void {
 			const idx = this.files.findIndex((f) => f.id === id);
 			if (idx === -1) return;
 			this.files.splice(idx, 1);
 		},
-		/** @type {() => void} */
-		reset() {
+		reset(): void {
 			this.total = 0;
 			this.done = 0;
 			this.time = 0;
 			this.task = '';
 		}
 	});
-	/** @type {string[]} */
-	selection = $state([]);
-	/** @type {string | ''} */
-	imageOpenedInCropper = $state('');
-	/** @type {string | ''} */
-	imagePreviouslyOpenedInCropper = $state('');
-	/** @type {Map<string, string>} */
-	previewURLs = new SvelteMap();
-	/** @type {Map<string, string>} These persist across session changes */
-	globalPreviewURLs = new SvelteMap();
-	/** @type {Map<string, string>} */
-	erroredImages = new SvelteMap();
-	/** @type {Set<string>} */
-	loadingImages = new SvelteSet();
-	/** @type {Set<string>} */
-	queuedImages = new SvelteSet();
-	/** @type {Keymap} */
+	selection: string[] = $state([]);
+	imageOpenedInCropper: string | '' = $state('');
+	imagePreviouslyOpenedInCropper: string | '' = $state('');
+	previewURLs: Map<string, string> = new SvelteMap();
+	/**  These persist across session changes */
+	globalPreviewURLs: Map<string, string> = new SvelteMap();
+	erroredImages: Map<string, string> = new SvelteMap();
+	loadingImages: Set<string> = new SvelteSet();
+	queuedImages: Set<string> = new SvelteSet();
 	keybinds = $state({});
 	/** @type {Map<string, import('./DraggableBoundingBox.svelte.js').ZoomState>} */
-	cropperZoomStates = new SvelteMap();
+	cropperZoomStates=
+		new SvelteMap();
 	/** @type {undefined | ((newSelection: string[]) => void)} */
-	setSelection = $state(undefined);
+	setSelection: undefined | ((newSelection: string[]) => void) = $state(undefined);
 	/** @type {string | null} */
-	_currentSessionId = $state(null);
+	_currentSessionId: string | null = $state(null);
 
 	/** @type {string | null} */
-	currentSessionId = $derived(
+	currentSessionId: string | null = $derived(
 		this._currentSessionId || localStorage.getItem('currentSessionId') || null
 	);
 
 	/**
 	 * @param {string | null} id
 	 */
-	async setCurrentSession(id) {
+	async setCurrentSession(id: string | null) {
 		if (id === null) {
 			localStorage.removeItem('currentSessionId');
 		} else {
@@ -107,23 +92,29 @@ class UIState {
 	}
 
 	/** @type {import('./database').Session | undefined}  */
-	currentSession = $derived(tables.Session.state.find((s) => s.id === this.currentSessionId));
+	currentSession: import('./database').Session | undefined = $derived(
+		tables.Session.state.find((s) => s.id === this.currentSessionId)
+	);
 
 	currentProtocolId = $derived(this.currentSession?.protocol);
 
 	/** @type {import('./database').Protocol | undefined} */
-	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
+	currentProtocol: import('./database').Protocol | undefined = $derived(
+		tables.Protocol.state.find((p) => p.id === this.currentProtocolId)
+	);
 
 	/**
 	 * @param {import('./database').Image} image
 	 * @returns {import('./metadata').TypedMetadataValue<'boundingbox'>|undefined}
 	 */
-	cropMetadataValueOf(image) {
+	cropMetadataValueOf(
+		image: import('./database').Image
+	): import('./metadata').TypedMetadataValue<'boundingbox'> | undefined {
 		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
 	}
 
 	/** @type {string} */
-	cropMetadataId = $derived(
+	cropMetadataId: string = $derived(
 		tables.Metadata.state.find(
 			(m) =>
 				this.currentProtocol?.metadata.includes(m.id) &&
@@ -132,7 +123,7 @@ class UIState {
 	);
 
 	/** @type {string} */
-	cropConfirmationMetadataId = $derived(
+	cropConfirmationMetadataId: string = $derived(
 		tables.Metadata.state.find(
 			(m) =>
 				this.currentProtocol?.metadata.includes(m.id) &&
@@ -144,7 +135,7 @@ class UIState {
 	 * @param {string | undefined | null} imageFileId
 	 * @returns {boolean}
 	 */
-	hasPreviewURL(imageFileId) {
+	hasPreviewURL(imageFileId: string | undefined | null): boolean {
 		if (!imageFileId) return false;
 		return this.globalPreviewURLs.has(imageFileId) || this.previewURLs.has(imageFileId);
 	}
@@ -154,7 +145,7 @@ class UIState {
 	 * @param {string | undefined | null} imageFileId
 	 * @returns {string | undefined}
 	 */
-	getPreviewURL(imageFileId) {
+	getPreviewURL(imageFileId: string | undefined | null): string | undefined {
 		if (!imageFileId) return undefined;
 		return this.previewURLs.get(imageFileId) || this.globalPreviewURLs.get(imageFileId);
 	}
@@ -164,7 +155,7 @@ class UIState {
 	 * @param {string} url
 	 * @param {boolean} [global=false]
 	 */
-	setPreviewURL(imageFileId, url, global = false) {
+	setPreviewURL(imageFileId: string | undefined | null, url: string, global: boolean = false) {
 		console.debug('setPreviewURL', { imageFileId, url, global });
 		if (!imageFileId) return;
 		if (global) {
@@ -177,7 +168,7 @@ class UIState {
 	/**
 	 * @param {string} imageFileId
 	 */
-	revokePreviewURL(imageFileId) {
+	revokePreviewURL(imageFileId: string) {
 		const url = this.previewURLs.get(imageFileId);
 		if (!url) return;
 		URL.revokeObjectURL(url);
@@ -192,15 +183,18 @@ class UIState {
 	}
 
 	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */
-	classificationModels = $derived(
-		tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer?.neural ??
-			[]
-	);
+	classificationModels: (typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer)['neural'] =
+		$derived(
+			tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer
+				?.neural ?? []
+		);
 	/** @type {NonNullable<typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']>} */
-	cropModels = $derived(this.currentProtocol?.crop?.infer ?? []);
+	cropModels: NonNullable<
+		(typeof import('$lib/schemas/protocols.js').Protocol.infer)['crop']['infer']
+	> = $derived(this.currentProtocol?.crop?.infer ?? []);
 
 	/** @type {number} */
-	selectedCropModel = $derived.by(() => {
+	selectedCropModel: number = $derived.by(() => {
 		if (!this.currentProtocolId) return -1;
 		const metadataId = this.cropMetadataId;
 		if (!metadataId) return -1;
@@ -208,7 +202,7 @@ class UIState {
 	});
 
 	/** @type {number} */
-	selectedClassificationModel = $derived.by(() => {
+	selectedClassificationModel: number = $derived.by(() => {
 		if (!this.currentProtocolId) return -1;
 		const metadataId = this.classificationMetadataId;
 		if (!metadataId) return -1;
@@ -216,9 +210,11 @@ class UIState {
 	});
 
 	/** @type {boolean} */
-	cropInferenceAvailable = $derived(this.cropModels.length > 0 && this.selectedCropModel !== -1);
+	cropInferenceAvailable: boolean = $derived(
+		this.cropModels.length > 0 && this.selectedCropModel !== -1
+	);
 	/** @type {boolean} */
-	classificationInferenceAvailable = $derived(
+	classificationInferenceAvailable: boolean = $derived(
 		this.classificationModels.length > 0 && this.selectedClassificationModel !== -1
 	);
 
@@ -226,7 +222,13 @@ class UIState {
 	 * @param {{ classification?: number | null, crop?: number | null }} indices
 	 * @returns {Promise<void>}
 	 */
-	async setModelSelections({ classification = null, crop = null }) {
+	async setModelSelections({
+		classification = null,
+		crop = null
+	}: {
+		classification?: number | null;
+		crop?: number | null;
+	}): Promise<void> {
 		if (!this.currentSession) return;
 
 		if (classification === null && crop === null) return; // no change
@@ -240,7 +242,7 @@ class UIState {
 
 		const current = this.currentSession.inferenceModels;
 		/** @type {Record<string, number>} */
-		const changes = {};
+		const changes: Record<string, number> = {};
 
 		if (classification !== null && classification !== this.selectedClassificationModel) {
 			changes[metadataIds.classification] = classification;
@@ -260,7 +262,7 @@ class UIState {
 	}
 
 	/** @type {string|undefined} */
-	classificationMetadataId = $derived.by(() => {
+	classificationMetadataId: string | undefined = $derived.by(() => {
 		const isCandidate = match
 			.case(
 				{
