@@ -8,6 +8,7 @@ import {
 	goToTab,
 	loadDatabaseDump,
 	metadataValueInDatabase,
+	setInferenceModels,
 	setSettings,
 	sidepanelMetadataSectionFor
 } from './utils';
@@ -35,6 +36,7 @@ async function initialize({
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await chooseFirstSession(page);
 	if (protocol) await changeSessionProtocol(page, protocol);
+	await setInferenceModels(page, { classify: 'Aucune inférence' });
 	await goToTab(page, 'classify');
 	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
 }
@@ -143,28 +145,28 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	    - img
 	    - text: ""
 	    - code: gbif.org
-	  - paragraph:
-	    - emphasis: Métadonées mise à jour à la sélection de cette option
 	  - table:
 	    - rowgroup:
 	      - row "Règne Animalia":
 	        - cell "Règne"
 	        - cell "Animalia"
-	      - row "└─ Phylum Arthropoda":
-	        - cell "└─ Phylum"
+	      - row "Phylum Arthropoda":
+	        - cell "Phylum"
 	        - cell "Arthropoda"
-	      - row "└─ Classe Collembola":
-	        - cell "└─ Classe"
+	      - row "Classe Collembola":
+	        - cell "Classe"
 	        - cell "Collembola"
-	      - row "└─ Ordre Entomobryomorpha":
-	        - cell "└─ Ordre"
+	      - row "Ordre Entomobryomorpha":
+	        - cell "Ordre"
 	        - cell "Entomobryomorpha"
-	      - row "└─ Famille Entomobryidae":
-	        - cell "└─ Famille"
+	      - row "Famille Entomobryidae":
+	        - cell "Famille"
 	        - cell "Entomobryidae"
-	      - row "└─ Genre Entomobrya":
-	        - cell "└─ Genre"
+	      - row "Genre Entomobrya":
+	        - cell "Genre"
 	        - cell "Entomobrya"
+	  - paragraph:
+	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
 
 	// Hovering over another option
@@ -207,28 +209,28 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	    - img
 	    - text: ""
 	    - code: gbif.org
-	  - paragraph:
-	    - emphasis: Métadonées mise à jour à la sélection de cette option
 	  - table:
 	    - rowgroup:
 	      - row "Règne Animalia":
 	        - cell "Règne"
 	        - cell "Animalia"
-	      - row "└─ Phylum Arthropoda":
-	        - cell "└─ Phylum"
+	      - row "Phylum Arthropoda":
+	        - cell "Phylum"
 	        - cell "Arthropoda"
-	      - row "└─ Classe Collembola":
-	        - cell "└─ Classe"
+	      - row "Classe Collembola":
+	        - cell "Classe"
 	        - cell "Collembola"
-	      - row "└─ Ordre Symphypleona":
-	        - cell "└─ Ordre"
+	      - row "Ordre Symphypleona":
+	        - cell "Ordre"
 	        - cell "Symphypleona"
-	      - row "└─ Famille Dicyrtomidae":
-	        - cell "└─ Famille"
+	      - row "Famille Dicyrtomidae":
+	        - cell "Famille"
 	        - cell "Dicyrtomidae"
-	      - row "└─ Genre Dicyrtomina":
-	        - cell "└─ Genre"
+	      - row "Genre Dicyrtomina":
+	        - cell "Genre"
 	        - cell "Dicyrtomina"
+	  - paragraph:
+	    - emphasis: Métadonées mises à jour à la sélection de cette option
 	`);
 
 	// Selecting the other option
@@ -301,53 +303,56 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
 		await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-	  - option "Dicyrtoma fusca 0.4%":
-	    - text: ""
-	    - code: 0.4%
-	  - option "Dicyrtomina flavosignata 0.2%":
-	    - text: ""
-	    - code: 0.2%
-	  - option "Dicyrtomina minuta 1%":
-	    - text: ""
-	    - code: 1%
-	  - option "Dicyrtomina ornata 4%":
-	    - text: ""
-	    - code: 4%
-	  - option /Dicyrtomina saundersi \\d+%/:
-	    - text: ""
-	    - code: /\\d+%/
-	  - option "Dicyrtomina signata 0.3%":
-	    - text: ""
-	    - code: 0.3%
-	  - heading "Entomobrya muscorum" [level=2]
-	  - link "En savoir plus gbif.org":
-	    - /url: https://gbif.org/species/2120749
-	    - img
-	    - text: ""
-	    - code: gbif.org
-	  - paragraph:
-	    - emphasis: Métadonées mise à jour à la sélection de cette option
-	  - table:
-	    - rowgroup:
-	      - row "Règne Animalia":
-	        - cell "Règne"
-	        - cell "Animalia"
-	      - row "└─ Phylum Arthropoda":
-	        - cell "└─ Phylum"
-	        - cell "Arthropoda"
-	      - row "└─ Classe Collembola":
-	        - cell "└─ Classe"
-	        - cell "Collembola"
-	      - row "└─ Ordre Entomobryomorpha":
-	        - cell "└─ Ordre"
-	        - cell "Entomobryomorpha"
-	      - row "└─ Famille Entomobryidae":
-	        - cell "└─ Famille"
-	        - cell "Entomobryidae"
-	      - row "└─ Genre Entomobrya":
-	        - cell "└─ Genre"
-	        - cell "Entomobrya"
-	`);
+		  - option "Dicyrtoma fusca 0.4%":
+		    - text: ""
+		    - code: 0.4%
+		  - option "Dicyrtomina flavosignata 0.2%":
+		    - text: ""
+		    - code: 0.2%
+		  - option "Dicyrtomina minuta 1%":
+		    - text: ""
+		    - code: 1%
+		  - option "Dicyrtomina ornata 4%":
+		    - text: ""
+		    - code: 4%
+		  - option /Dicyrtomina saundersi \\d+%/:
+		    - text: ""
+		    - code: /\\d+%/
+		  - option "Dicyrtomina signata 0.3%":
+		    - text: ""
+		    - code: 0.3%
+		  - option "Allacma fusca AKA Dicyrtoma fusca 9%":
+		    - text: ""
+		    - code: 9%
+		  - heading "Entomobrya muscorum" [level=2]
+		  - link "En savoir plus gbif.org":
+		    - /url: https://gbif.org/species/2120749
+		    - img
+		    - text: ""
+		    - code: gbif.org
+		  - table:
+		    - rowgroup:
+		      - row "Règne Animalia":
+		        - cell "Règne"
+		        - cell "Animalia"
+		      - row "Phylum Arthropoda":
+		        - cell "Phylum"
+		        - cell "Arthropoda"
+		      - row "Classe Collembola":
+		        - cell "Classe"
+		        - cell "Collembola"
+		      - row "Ordre Entomobryomorpha":
+		        - cell "Ordre"
+		        - cell "Entomobryomorpha"
+		      - row "Famille Entomobryidae":
+		        - cell "Famille"
+		        - cell "Entomobryidae"
+		      - row "Genre Entomobrya":
+		        - cell "Genre"
+		        - cell "Entomobrya"
+		  - paragraph:
+		    - emphasis: Métadonées mises à jour à la sélection de cette option
+		`);
 	});
 
 	test('by synonym', async ({ page }) => {
@@ -378,28 +383,28 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		    - img
 		    - text: ""
 		    - code: gbif.org
-		  - paragraph:
-		    - emphasis: Métadonées mise à jour à la sélection de cette option
 		  - table:
 		    - rowgroup:
 		      - row "Règne Animalia":
 		        - cell "Règne"
 		        - cell "Animalia"
-		      - row "└─ Phylum Arthropoda":
-		        - cell "└─ Phylum"
+		      - row "Phylum Arthropoda":
+		        - cell "Phylum"
 		        - cell "Arthropoda"
-		      - row "└─ Classe Collembola":
-		        - cell "└─ Classe"
+		      - row "Classe Collembola":
+		        - cell "Classe"
 		        - cell "Collembola"
-		      - row "└─ Ordre Entomobryomorpha":
-		        - cell "└─ Ordre"
+		      - row "Ordre Entomobryomorpha":
+		        - cell "Ordre"
 		        - cell "Entomobryomorpha"
-		      - row "└─ Famille Entomobryidae":
-		        - cell "└─ Famille"
+		      - row "Famille Entomobryidae":
+		        - cell "Famille"
 		        - cell "Entomobryidae"
-		      - row "└─ Genre Entomobrya":
-		        - cell "└─ Genre"
+		      - row "Genre Entomobrya":
+		        - cell "Genre"
 		        - cell "Entomobrya"
+		  - paragraph:
+		    - emphasis: Métadonées mises à jour à la sélection de cette option
 		`);
 	});
 });
