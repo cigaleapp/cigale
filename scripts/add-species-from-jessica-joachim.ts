@@ -1,7 +1,6 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { type } from 'arktype';
-import { intervalToDuration } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
@@ -9,6 +8,7 @@ import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols';
+import { EtaCalculator } from './eta';
 
 const LINKS_TO_AVOID = [
 	// FIXME redirects to an image file
@@ -90,7 +90,7 @@ async function augmentMetadata(
 			continue;
 		}
 
-		const newData = await augmentMetadataOption(s.key, pageUrl);
+		const newData = await augmentMetadataOption(s, pageUrl);
 
 		if (!newData) {
 			console.warn(yellow(`⁄ Could not extract data for ${metadataKey} ${s.label}`));
@@ -151,7 +151,7 @@ async function searchForSpecies(...names: string[]): Promise<URL | null> {
 }
 
 async function augmentMetadataOption(
-	key: string,
+	{ key, cascade }: typeof MetadataEnumVariant.infer,
 	page: URL
 ): Promise<Partial<typeof MetadataEnumVariant.infer>> {
 	const doc = await fetchAndParseHtml(page);
@@ -161,6 +161,33 @@ async function augmentMetadataOption(
 	if (!content) throw new Error(`Could not find main content in page at ${page.toString()}`);
 
 	const imageUrl = content.querySelector('img')?.src;
+
+	const hasImageWithFilename = (filename: string) =>
+		[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
+			(candidate) =>
+				new URL(candidate.getAttribute('src')!).pathname.split('/').pop() === filename
+		);
+
+	cascade ??= {};
+
+	// Niveau de difficulté
+	for (const [key, niveau] of Object.entries({
+		easy: 'facile',
+		medium: 'moyenne',
+		hard: 'difficile',
+		very_hard: 'tres-difficile'
+	})) {
+		if (hasImageWithFilename(`Id-${niveau}.jpg`)) {
+			cascade.identification_difficulty = key;
+		}
+	}
+
+	// Statut de conservation
+	for (const symbol of ['lc', 'nt', 'vu', 'en', 'cr', 'ex']) {
+		if (hasImageWithFilename(`Statut-${symbol.toUpperCase()}.jpg`)) {
+			cascade.conservation_status = symbol;
+		}
+	}
 
 	const removeAll = (selector: string) =>
 		content.querySelectorAll(selector).forEach((el) => el.remove());
@@ -209,7 +236,8 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		image: imageUrl
+		image: imageUrl,
+		cascade
 	};
 }
 
@@ -268,64 +296,6 @@ function percentage(part: number, total: number, precision = 0): string {
 
 function align<T extends string | number>(num: T, total: T | T[]): string {
 	return num.toString().padStart(total.toString().length);
-}
-
-class EtaCalculator {
-	private lastSteps: number[] = [];
-	private maxSteps: number;
-	private totalSteps: number;
-	private lastStepTime: number = performance.now();
-
-	constructor({ averageOver, totalSteps }: { averageOver: number; totalSteps: number }) {
-		this.maxSteps = averageOver;
-		this.totalSteps = totalSteps;
-	}
-
-	step(): void {
-		const currentTime = performance.now();
-		const durationSeconds = (currentTime - this.lastStepTime) / 1000;
-		this.lastStepTime = currentTime;
-		this.addStep(durationSeconds);
-	}
-
-	msSinceLastStep(): number {
-		return performance.now() - this.lastStepTime;
-	}
-
-	private addStep(durationSeconds: number) {
-		this.lastSteps.push(durationSeconds);
-		if (this.lastSteps.length > this.maxSteps) {
-			this.lastSteps.shift();
-		}
-	}
-
-	private getAverage(): number {
-		const sum = this.lastSteps.reduce((a, b) => a + b, 0);
-		return sum / this.lastSteps.length;
-	}
-
-	seconds(stepsDone: number): number {
-		return this.getAverage() * (this.totalSteps - stepsDone);
-	}
-
-	display(stepsDone: number): string {
-		const {
-			hours = 0,
-			minutes = 0,
-			seconds = 0
-		} = intervalToDuration({
-			start: 0,
-			end: this.seconds(stepsDone) * 1000
-		});
-
-		const formatPart = (n: number) => n.toString().padStart(2, '0');
-
-		if (hours === 0) {
-			return `${formatPart(minutes)}m${formatPart(seconds)}`;
-		}
-
-		return `${formatPart(hours)}h${formatPart(minutes)}`;
-	}
 }
 
 async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document']> {

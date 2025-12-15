@@ -99,7 +99,7 @@ for (const offline of [false, true]) {
 
 			// Check for classification results in sidepanel
 			await firstObservationCard(page).click();
-			await expect(page.getByText('Espèce')).toBeVisible();
+			await expect(page.getByText('Espèce', { exact: true })).toBeVisible();
 
 			// Export results
 			await page.getByTestId('app-nav').getByRole('button', { name: 'Résultats' }).click();

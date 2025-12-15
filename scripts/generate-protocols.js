@@ -172,6 +172,8 @@ const protocol = {
 		'habitat_photo',
 		'shoot_date',
 		'shoot_location',
+		'identification_difficulty',
+		'conservation_status',
 		'class',
 		'phylum',
 		'kingdom',
@@ -303,6 +305,90 @@ const protocol = {
 			options: [
 				{ key: 'current', label: "C'est une photo de l'habitat actuel" },
 				{ key: 'nearby', label: "C'est une photo de l'habitat à proximité" }
+			]
+		},
+		[namespaced('identification_difficulty')]: {
+			type: 'enum',
+			label: "Difficulté d'identification",
+			description: "Niveau de difficulté pour identifier l'espèce sur la photo",
+			required: false,
+			mergeMethod: 'average',
+			options: [
+				{
+					key: 'easy',
+					label: 'Facile',
+					color: '#367517',
+					icon: 'ri:emotion-laugh-line'
+				},
+				{
+					key: 'medium',
+					label: 'Moyenne',
+					color: '#e8e819',
+					icon: 'ri:emotion-happy-line'
+				},
+				{
+					key: 'hard',
+					label: 'Difficile',
+					color: '#dd8808',
+					icon: 'ri:emotion-normal-line'
+				},
+				{
+					key: 'very_hard',
+					label: 'Très difficile',
+					color: '#cd3c28',
+					icon: 'ri:emotion-unhappy-line'
+				}
+			]
+		},
+		[namespaced('conservation_status')]: {
+			type: 'enum',
+			label: 'Statut de conservation',
+			description: "Statut de conservation IUCN de l'espèce",
+			required: false,
+			mergeMethod: 'average',
+			options: [
+				{
+					key: 'ex',
+					label: 'EX',
+					description: 'Éteint (“Extinct”)',
+					color: '#000000'
+				},
+				{
+					key: 'ew',
+					label: 'EW',
+					description: 'Éteint à l’état sauvage (“Extinct in the Wild”)',
+					color: '#3a3a3a'
+				},
+				{
+					key: 'cr',
+					label: 'CR',
+					description: 'En danger critique d’extinction (“Critically Endangered”)',
+					color: '#cd3030'
+				},
+				{
+					key: 'en',
+					label: 'EN',
+					description: 'En danger (“Endangered”)',
+					color: '#cd6630'
+				},
+				{
+					key: 'vu',
+					label: 'VU',
+					description: 'Vulnérable (“Vulnerable”)',
+					color: '#cd9a00'
+				},
+				{
+					key: 'nt',
+					label: 'NT',
+					description: 'Quasi menacé (“Near Threatened”)',
+					color: '#006666'
+				},
+				{
+					key: 'lc',
+					label: 'LC',
+					description: 'Préoccupation mineure (“Least Concern”)',
+					color: '#16ca85'
+				}
 			]
 		},
 		[namespaced('shoot_date')]: {
