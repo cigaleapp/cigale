@@ -27,6 +27,7 @@
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
+	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import Settings from './Settings.svelte';
 
 	/**
@@ -307,6 +308,9 @@
 						</ButtonIcon>
 					</div>
 				{/if}
+
+				<ModalSubmitIssue type="bug" />
+				<ModalSubmitIssue type="feature" />
 
 				<div class="settings">
 					<Settings
