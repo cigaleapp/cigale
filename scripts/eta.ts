@@ -1,4 +1,4 @@
-import { intervalToDuration } from "date-fns";
+import { intervalToDuration } from 'date-fns';
 
 export class EtaCalculator {
 	private lastSteps: number[] = [];
@@ -21,8 +21,6 @@ export class EtaCalculator {
 	msSinceLastStep(): number {
 		return performance.now() - this.lastStepTime;
 	}
-
-
 
 	private addStep(durationSeconds: number) {
 		this.lastSteps.push(durationSeconds);
