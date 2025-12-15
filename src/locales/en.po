@@ -607,10 +607,6 @@ msgstr "Debug mode"
 msgid "Modèle d'inférence"
 msgstr "Inference model"
 
-#: src/lib/MetadataCombobox.svelte
-msgid "Métadonées mise à jour à la sélection de cette option"
-msgstr "Metadata updated when selecting this option"
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
 msgstr "Clean up database"
@@ -2034,6 +2030,10 @@ msgstr ""
 
 #: src/lib/sessions.js
 msgid "La session a été fermée"
+msgstr ""
+
+#: src/lib/MetadataCombobox.svelte
+msgid "Métadonées mises à jour à la sélection de cette option"
 msgstr ""
 
 #: src/lib/queue.svelte.js

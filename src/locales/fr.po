@@ -606,10 +606,6 @@ msgstr "Mode debug"
 msgid "Modèle d'inférence"
 msgstr "Modèle d'inférence"
 
-#: src/lib/MetadataCombobox.svelte
-msgid "Métadonées mise à jour à la sélection de cette option"
-msgstr "Métadonées mise à jour à la sélection de cette option"
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
 msgstr "Nettoyer la base de données"
@@ -2041,6 +2037,10 @@ msgstr "Impossible de modifier le chemin du fichier JSON, car CIGALE doit conna�
 #: src/lib/sessions.js
 msgid "La session a été fermée"
 msgstr "La session a été fermée"
+
+#: src/lib/MetadataCombobox.svelte
+msgid "Métadonées mises à jour à la sélection de cette option"
+msgstr "Métadonées mises à jour à la sélection de cette option"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
