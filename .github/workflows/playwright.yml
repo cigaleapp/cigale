@@ -44,7 +44,7 @@ jobs:
         with:
           file-url: https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx
       - name: Save to artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: predownloaded-models
           path: |
@@ -72,12 +72,12 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Download built app
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.artifact }}
           path: ./
       - name: Retrieve pre-downloaded models
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: predownloaded-models
       - name: Remove task-type spec files for better sharding balance
@@ -86,7 +86,7 @@ jobs:
         run: bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
           SHARDING: '1'
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-shard-${{ matrix.shard-index }}
@@ -104,7 +104,7 @@ jobs:
     name: Combine reports
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           path: ./playwright-report-shards
           pattern: playwright-report-shard-*
