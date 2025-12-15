@@ -6,23 +6,60 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add deletion confirmation modal for session deletes
+- Add radio buttons presentation for smaller enum metadata
 - Add undo/redo buttons to UI
 - Allow editing metadata option synonyms in protocol editor
+- Allow specifying metadata option ordering for enums
+- Allow unrolling stacked cards (e.g. observations with >1 images)
 - Allow using a date metadata to set file mtime in zip export
+- Cancel all tasks when switching sessions
+- Clear undo stack when switching sessions
+- Display enums with compact representation when they have ≤10 items
+- Fix card overlays going over grouping header
+- Handle viewing sessions with unavailable protocols
 - Hide navbar in cropper (#921)
+- Implement MetadataEnumVariant.{color,icon} (#956)
+- Implement session protocol change
+- Improve disabled state (and transitions from/to disable state) for Button{Secondary,Primary}
 - Improve lightmode error background color a bit
+- Improve remote protocol import flow
+- Introduce session-level metadata in protocol definition
+- Left-align cards in AreaObservation (Closes #950)
+- Make analysis.json's zip filepath non-customizable
+- Make inference model selections per-session
+- Make session description editable
+- Mention sessions using the protocol when deleting it
+- Remove unsaved work indicator in protocols list
+- Round corners of unrolled group background
 - Show app version in about page
 - Show notification when app update is found or was installed
 - Show synonyms when metadata search matched by synonym
 
 ### Bug Fixes
 
+- (probably) fix splitting observations
 - Don't apply undos if operation was for a different ImageFile
 - Don't push operation to undo stack if its data is invalid
+- Don't put protocol id as default description for new sessions
+- Fix EXIF extraction not updating UI with metadata values
+- Fix cannot import results zip into session if export has session metadata values set
+- Fix deleteSession
+- Fix image deletion not working in import tab
+- Fix metadata change DB writes not being reactive
+- Fix observation merging making observations disappear
+- Fix observation merging sometimes not working on Chrome
+- Fix observation splitting not working
 - Fix undo stack depth limit enforcement
+- Make metadata option description actually optional
+- Make metadata value clear button work on import tab and on session metadata
+- Make sure preview image of >1-images-observation is the first image of the selection used to group it up
+- Retrieve session description for zip export when importing it, fallback name when saved one is empty
+- Set manuallyModified when changing session metadata values
 
 ### Data Updates
 
+- Forward-port session metadata in example protocol
 - Regenerate example protocols
 - Use JJ site for genus descriptions too (#920)
 
@@ -30,6 +67,7 @@ All notable changes to this project will be documented in this file, on a monthl
 
 - Refresh translation files
 - Translate via Weblate (English)
+- Update translations
 
 ## November 2025
 
