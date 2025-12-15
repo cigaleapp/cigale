@@ -47,5 +47,5 @@ jobs:
             echo "Preview not live yet, waiting..."
             sleep 5
             rm index.html
-            wget ${{ steps.deploy-preview.outputs.preview-url }}
+            wget ${{ steps.deploy-preview.outputs.preview-url }} || touch index.html
           done

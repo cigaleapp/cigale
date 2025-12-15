@@ -272,14 +272,21 @@ export async function deleteMetadataValue({
 }) {
 	const image = await db.get('Image', subjectId);
 	const observation = await db.get('Observation', subjectId);
+	const session = await db.get('Session', subjectId);
+	const imagesFromImageFile = await db
+		.getAllFromIndex('Image', 'sessionId', sessionId)
+		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
-	if (!image && !observation)
-		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+	if (!image && !observation && !session && imagesFromImageFile.length === 0)
+		throw new Error(`Aucune image, observation ou session avec l'ID ${subjectId}`);
 
 	console.debug(`Delete metadata ${metadataId} in ${subjectId}`);
 	if (image) {
 		delete image.metadata[metadataId];
 		db.put('Image', image);
+	} else if (session) {
+		delete session.metadata[metadataId];
+		db.put('Session', session);
 	} else if (observation) {
 		delete observation.metadataOverrides[metadataId];
 		db.put('Observation', observation);
@@ -295,6 +302,17 @@ export async function deleteMetadataValue({
 					reactive: false
 				});
 			}
+		}
+	} else if (imagesFromImageFile) {
+		for (const { id } of imagesFromImageFile) {
+			await deleteMetadataValue({
+				db,
+				sessionId,
+				subjectId: id,
+				recursive: false,
+				metadataId,
+				reactive: false
+			});
 		}
 	}
 

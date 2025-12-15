@@ -87,7 +87,8 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		success: type({
 			id: 'string',
 			name: 'string',
-			'version?': 'number | undefined'
+			'version?': 'number | undefined',
+			iconsToPreload: 'string[]'
 		})
 	},
 	generateResultsZip: {

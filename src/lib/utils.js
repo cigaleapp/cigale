@@ -1206,3 +1206,29 @@ export function fadeOutElement(selector, duration, { firstTimeDuration } = {}) {
 		element.remove();
 	}, duration);
 }
+
+/**
+ * @param {string} color Hex of background color string, e.g. #RRGGBB
+ */
+export function readableOn(color) {
+	const rgb = color.replace(/^#/, '').match(/.{2}/g);
+	if (rgb === null) throw new Error('Invalid color, use hex notation');
+	const o = Math.round(
+		(parseInt(rgb[0], 16) * 299 + parseInt(rgb[1], 16) * 587 + parseInt(rgb[2], 16) * 114) /
+			1000
+	);
+	return o > 125 ? '#000000' : '#ffffff';
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('readableOn', () => {
+		expect(readableOn('#ffffff')).toBe('#000000');
+		expect(readableOn('#000000')).toBe('#ffffff');
+		expect(readableOn('#ff0000')).toBe('#ffffff');
+		expect(readableOn('#00ff00')).toBe('#000000');
+		expect(readableOn('#0000ff')).toBe('#ffffff');
+		expect(readableOn('#808080')).toBe('#000000');
+		expect(readableOn('#c0ffee')).toBe('#000000');
+	});
+}

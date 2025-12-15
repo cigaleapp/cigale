@@ -5,6 +5,7 @@ import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.jso
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
+	chooseFirstSession,
 	expectTooltipContent,
 	expectZipFiles,
 	exportResults,
@@ -15,8 +16,11 @@ import {
 	importPhotos,
 	importResults,
 	listTable,
+	loadDatabaseDump,
 	loadingText,
 	newSession,
+	observationCard,
+	setInferenceModels,
 	sidepanelMetadataSectionFor,
 	toast,
 	waitForLoadingEnd
@@ -343,27 +347,18 @@ test(
 	'deleting an image in the import tab does not create ghost observation cards',
 	issue(439),
 	async ({ page }) => {
-		await newSession(page);
-		await goToTab(page, 'import');
-		await importPhotos({ page }, 'lil-fella', 'cyan');
-		await goToTab(page, 'crop');
-		await waitForLoadingEnd(page);
+		await loadDatabaseDump(page, 'basic.devalue');
+		await chooseFirstSession(page);
+		await setInferenceModels(page, { classify: 'Aucune inférence' });
 		await goToTab(page, 'classify');
-		await waitForLoadingEnd(page);
 		await goToTab(page, 'import');
-		await firstObservationCard(page).click();
+		await observationCard(page, 'cyan.jpeg').click();
 		await page
 			.getByTestId('sidepanel')
 			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
 			.click();
 		await goToTab(page, 'classify');
-		await expect(firstObservationCard(page)).toMatchAriaSnapshot(`
-		  - article:
-		    - img "cyan"
-		    - img
-		    - heading "cyan" [level=2]
-		`);
-		await expect(page.getByRole('main').locator('article.observation')).toHaveCount(1);
+		await expect(observationCard(page, 'cyan')).not.toBeVisible();
 	}
 );
 

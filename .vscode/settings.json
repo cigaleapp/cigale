@@ -12,7 +12,7 @@
 	"githubIssues.queries": [
 		{
 			"label": "Cahier des charges",
-			"query": "repo:${owner}/${repository} milestone:\"Terraforma: Échéance 1\" "
+			"query": "repo:${owner}/${repository} milestone:\"Terraforma: Échéance 1\" state:open"
 		},
 		{
 			"label": "Created Issues",

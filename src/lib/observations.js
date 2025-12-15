@@ -5,7 +5,7 @@ import { tables } from './idb.svelte';
 import { deleteImageFile, imageFileIds } from './images';
 import { mergeMetadataValues } from './metadata';
 import { uiState } from './state.svelte';
-import { nonnull } from './utils';
+import { compareBy, nonnull } from './utils';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge
@@ -14,6 +14,9 @@ import { nonnull } from './utils';
 export async function mergeToObservation(parts) {
 	const protocol = uiState.currentProtocol;
 	if (!protocol) throw new Error('No protocol selected');
+
+	const sessionId = uiState.currentSession?.id;
+	if (!sessionId) throw new Error('No session selected');
 
 	const observations = parts.map((part) => tables.Observation.getFromState(part)).filter(nonnull);
 
@@ -27,30 +30,26 @@ export async function mergeToObservation(parts) {
 
 	const newId = generateId('Observation');
 
-	await tables.Observation.do(async (tx) => {
-		const observation = {
-			id: newId,
-			images: [...imageIds],
-			addedAt: new Date().toISOString(),
-			label: fallbackObservationLabel([...observations, ...images]),
-			metadataOverrides: Object.fromEntries(
-				Object.entries(
-					await mergeMetadataValues(
-						db.databaseHandle(),
-						observations.map((o) => o.metadataOverrides)
-					)
-				).map(([key, { value, ...rest }]) => [
-					key,
-					{ ...rest, value: JSON.stringify(value) }
-				])
-			)
-		};
+	const observation = {
+		id: newId,
+		sessionId,
+		images: [...imageIds].toSorted(compareBy((id) => parts.indexOf(id))),
+		addedAt: new Date().toISOString(),
+		label: fallbackObservationLabel([...observations, ...images]),
+		metadataOverrides: Object.fromEntries(
+			Object.entries(
+				await mergeMetadataValues(
+					db.databaseHandle(),
+					observations.map((o) => o.metadataOverrides)
+				)
+			).map(([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }])
+		)
+	};
 
-		tx.add({
-			...observation,
-			label: defaultObservationLabel({ protocol, images, observation })
-		});
+	observation.label = defaultObservationLabel({ protocol, images, observation });
 
+	await tables.Observation.do((tx) => {
+		tx.add(observation);
 		for (const { id } of observations) {
 			tx.delete(id);
 		}
@@ -108,7 +107,7 @@ export async function deleteObservation(
  */
 function defaultObservationLabel({ images, observation, protocol }) {
 	return (
-		protocol?.observations?.defaultLabel?.render({ images, observation }) ??
+		protocol?.observations?.defaultLabel?.render({ images, observation }) ||
 		fallbackObservationLabel([observation, ...images])
 	);
 }

@@ -18,6 +18,8 @@ export const Probability = type('0 <= number <= 1.0001').pipe((n) => clamp(n, 0,
  */
 export const URLString = type(/https?:\/\/.+/);
 
+export const ColorHex = type(/^#?[0-9A-Fa-f]{6}$/).pipe((s) => (s.startsWith('#') ? s : `#${s}`));
+
 export const HTTPRequest = URLString.configure(
 	"L'URL à laquelle se situe le fichier. Effectue une requête GET sans en-têtes particuliers.",
 	'self'

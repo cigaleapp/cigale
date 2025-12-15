@@ -63,6 +63,7 @@
 			{#snippet item(image, { id, name })}
 				{#if image && image.fileId}
 					<CardImage
+						boxes="none"
 						image={{ ...image, fileId: image.fileId }}
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');

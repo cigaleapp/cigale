@@ -1,4 +1,5 @@
 <script>
+	import Icon from '@iconify/svelte';
 	import * as dates from 'date-fns';
 
 	import IconIncrement from '~icons/ri/add-line';
@@ -10,7 +11,7 @@
 	import RadioButtons from './RadioButtons.svelte';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips';
-	import { compareBy, round, safeJSONParse } from './utils';
+	import { compareBy, pick, readableOn, round, safeJSONParse } from './utils';
 
 	/**
 	 * @typedef {object} Props
@@ -50,13 +51,28 @@
 		<RadioButtons
 			value={value ?? undefined}
 			onchange={onblur}
+			cards={options.every((opt) => opt.icon || opt.color)}
 			options={options
 				.toSorted(compareBy(({ key }) => definition.ordering?.indexOf(key)))
-				.map((opt) => ({
-					key: opt.key,
-					label: opt.label
-				}))}
-		></RadioButtons>
+				.map((opt) => pick(opt, 'key', 'label', 'icon', 'color'))}
+		>
+			{#snippet children({ label, icon, color })}
+				<div class="label">
+					{#if icon || color}
+						<div
+							class="icon"
+							style:background-color={color}
+							style:color={color ? readableOn(color) : undefined}
+						>
+							{#if icon}
+								<Icon {icon} />
+							{/if}
+						</div>
+					{/if}
+					{label}
+				</div>
+			{/snippet}
+		</RadioButtons>
 	{:else if isType('enum', type, value)}
 		<MetadataCombobox
 			{id}
@@ -210,6 +226,22 @@
 
 	.metadata-input.compact-enum {
 		width: 100%;
+	}
+
+	.metadata-input.compact-enum .label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75em;
+		margin-left: 0.25em;
+
+		.icon {
+			border-radius: 50%;
+			font-size: 1.2em;
+			display: flex;
+			align-items: center;
+			height: 0.9em;
+			width: 0.9em;
+		}
 	}
 
 	.metadata-input:not([data-type='boolean']):not(.compact-enum):not(:has(.unrepresentable)) {

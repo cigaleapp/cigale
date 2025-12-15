@@ -38,7 +38,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { openTransaction } from './idb.svelte.js';
 	import { deleteImageFile } from './images.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
-	import { mutationobserver } from './mutations';
+	import { mutationobserver, resizeobserver } from './mutations';
 	import { deleteObservation } from './observations.js';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
@@ -52,16 +52,28 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @typedef Props
 	 * @type {object}
 	 * @property {Item[]} items
-	 * @property {import('svelte').Snippet<[ItemData, Item, number]>} item
+	 * @property {import('svelte').Snippet<[ItemData, Item]>} item
 	 * @property {GroupName[]} [groups]
 	 * @property {(item: Item) => GroupName | ""} [grouping]
 	 * @property {string} [highlight] id of the item to highlight (and scroll to)
 	 * @property {(e: MouseEvent|TouchEvent|null) => void} [onemptyclick] callback when the user clicks on the empty area
 	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
+	 * @property {[string, Item[]] | undefined} [unroll] [observation id, inner items] unroll inner cards. Only relevant for items that have multiple cards (i.e. with a stack size > 1)
 	 */
 
 	/** @type {Props } */
-	let { items, item, groups, grouping, onemptyclick, sort, highlight } = $props();
+	let {
+		items,
+		item,
+		groups,
+		grouping,
+		onemptyclick,
+		sort,
+		highlight,
+		unroll = ['', []]
+	} = $props();
+
+	const [unrolledId, unrolledItems] = $derived(unroll);
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -172,12 +184,38 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			}
 		});
 	}
+
+	function roundUnrolledCorners() {
+		const items = [
+			...(imagesContainer?.querySelectorAll('.item-unroll-container.unrolled') ?? [])
+		];
+
+		const itemCoords = [...items].map((el) => el.getBoundingClientRect());
+
+		imagesContainer?.querySelectorAll('.item-unroll-container.unrolled').forEach((el) => {
+			if (!(el instanceof HTMLElement)) return;
+			const coords = el.getBoundingClientRect();
+
+			const row = itemCoords.filter(({ y }) => y === coords.y);
+			const column = itemCoords.filter(({ x }) => x === coords.x);
+
+			el.dataset.roundCornerTop = column.every(({ y }) => y >= coords.y).toString();
+			el.dataset.roundCornerBottom = column.every(({ y }) => y <= coords.y).toString();
+			el.dataset.roundCornerLeft = row.every(({ x }) => x >= coords.x).toString();
+			el.dataset.roundCornerRight = row.every(({ x }) => x <= coords.x).toString();
+		});
+	}
 </script>
 
 <section
 	class="images"
 	data-testid="observations-area"
 	bind:this={imagesContainer}
+	use:resizeobserver={{
+		onresize() {
+			roundUnrolledCorners();
+		}
+	}}
 	use:mutationobserver={{
 		childList: true,
 		subtree: true,
@@ -185,6 +223,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 			if (!imagesContainer) return;
 			dragselect?.refreshSelectables();
 			dragselect?.setSelection(uiState.selection);
+			roundUnrolledCorners();
 		}
 	}}
 >
@@ -224,8 +263,18 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				</header>
 			{/if}
 			<div class="items">
-				{#each sortedImages as props, i (virtualizeKey(props))}
-					{@render item(props.data, props, i)}
+				{#each sortedImages as props (virtualizeKey(props))}
+					{@const unrolled = unrolledId === props.id}
+					<div class="item-unroll-container" class:unrolled>
+						{@render item(props.data, props)}
+					</div>
+					{#if unrolled}
+						{#each unrolledItems as innerProps (virtualizeKey(innerProps))}
+							<div class="item-unroll-container" class:unrolled>
+								{@render item(innerProps.data, innerProps)}
+							</div>
+						{/each}
+					{/if}
 				{/each}
 			</div>
 		</section>
@@ -257,8 +306,30 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		display: flex;
 		flex-wrap: wrap;
 		align-content: flex-start;
-		gap: 1.5em 1em;
 		padding: 0 2.5em;
+	}
+
+	.item-unroll-container {
+		padding: 1em;
+	}
+
+	.item-unroll-container.unrolled {
+		background-color: var(--bg-primary-translucent);
+	}
+
+	.item-unroll-container.unrolled {
+		&:global([data-round-corner-top='true'][data-round-corner-left='true']) {
+			border-top-left-radius: var(--corner-radius);
+		}
+		&:global([data-round-corner-top='true'][data-round-corner-right='true']) {
+			border-top-right-radius: var(--corner-radius);
+		}
+		&:global([data-round-corner-bottom='true'][data-round-corner-left='true']) {
+			border-bottom-left-radius: var(--corner-radius);
+		}
+		&:global([data-round-corner-bottom='true'][data-round-corner-right='true']) {
+			border-bottom-right-radius: var(--corner-radius);
+		}
 	}
 
 	.images {
@@ -295,5 +366,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		width: 100%;
 		flex-grow: 1;
 		margin-top: 2rem;
+		font-size: 0.75rem;
 	}
 </style>

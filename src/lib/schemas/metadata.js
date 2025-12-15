@@ -3,7 +3,7 @@ import { scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
 import { keys, unique } from '../utils.js';
-import { HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
+import { ColorHex, HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
 
 /**
  * @param {string} metadataId
@@ -162,6 +162,12 @@ export const MetadataEnumVariant = type({
 	'image?': URLString,
 	'learnMore?': URLString.describe(
 		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
+	),
+	'color?': ColorHex.describe(
+		"Code hexadécimal (avec ou sans le # préfixe) d'une couleur associée à cette option, pour l'affichage dans l'interface"
+	),
+	'icon?': type(/^ri:[\w-]+$/).describe(
+		"Code Iconify d'une icône associée à cette option, provenant du pack d'icônes “Remix Icon”. Voir https://icon-sets.iconify.design/ri/ pour la liste."
 	),
 	'cascade?': scope({ ID })
 		.type({ '[ID]': 'ID' })

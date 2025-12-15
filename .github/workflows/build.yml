@@ -40,7 +40,7 @@ jobs:
         id: artifact
         run: echo "name=build-${{ inputs.minify && 'minified' || 'full' }}-${{ github.sha }}" >> $GITHUB_OUTPUT
       - name: Upload build as artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.artifact.outputs.name }}
           include-hidden-files: true

@@ -1,4 +1,5 @@
 <script>
+	import Icon from '@iconify/svelte';
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps } from 'bits-ui';
 	import { marked } from 'marked';
@@ -14,13 +15,13 @@
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';
-	import { compareBy } from './utils.js';
+	import { compareBy, pick, readableOn } from './utils.js';
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
 	 */
 
-	/** @typedef { { value: string; label: string; synonyms: string[] } } Item */
+	/** @typedef { { value: string; label: string; synonyms: string[], icon?: string, color?: string } } Item */
 	/**
 	 * @typedef {object} Props
 	 * @property {import('./database.js').MetadataEnumVariant[]} options
@@ -51,7 +52,10 @@
 
 	/** @type {Item[]} */
 	const items = $derived(
-		options.map(({ key, label, synonyms }) => ({ value: key, label, synonyms }))
+		options.map(({ key, ...rest }) => ({
+			value: key,
+			...pick(rest, 'label', 'synonyms', 'icon', 'color')
+		}))
 	);
 
 	/**
@@ -233,8 +237,23 @@
 											</span>
 										{/if}
 									</span>
-									<div class="confidence">
-										<ConfidencePercentage value={confidences[item.value]} />
+									<div class="right">
+										{#if item.icon || item.color}
+											<div
+												class="icon"
+												style:background-color={item.color}
+												style:color={item.color
+													? readableOn(item.color)
+													: undefined}
+											>
+												{#if item.icon}
+													<Icon icon={item.icon} />
+												{/if}
+											</div>
+										{/if}
+										<div class="confidence">
+											<ConfidencePercentage value={confidences[item.value]} />
+										</div>
 									</div>
 								</div>
 							{/snippet}
@@ -408,8 +427,20 @@
 		gap: 0.5em;
 	}
 
-	.items .confidence {
+	.items .right {
 		margin-left: auto;
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.items .icon {
+		font-size: 1.4em;
+		display: flex;
+		align-items: center;
+		height: 0.8em;
+		width: 0.8em;
+		border-radius: 50%;
 	}
 
 	.docs {

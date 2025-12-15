@@ -38,7 +38,7 @@ jobs:
 
       - name: Save as artifact
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: results
           path: deployment/playwright.json
@@ -49,7 +49,7 @@ jobs:
     if: ${{ !cancelled() }}
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: results
           path: deployment/playwright.json
