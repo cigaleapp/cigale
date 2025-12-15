@@ -36,11 +36,11 @@
 
 	import AnimatableCheckmark from './AnimatableCheckmark.svelte';
 	import ButtonInk from './ButtonInk.svelte';
-	import OverflowableText from './OverflowableText.svelte';
 	import Card from './Card.svelte';
 	import CroppedImg from './CroppedImg.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import Logo from './Logo.svelte';
+	import OverflowableText from './OverflowableText.svelte';
 	import { tooltip } from './tooltips';
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
