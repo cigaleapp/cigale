@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { dequal } from 'dequal';
 	import { fade } from 'svelte/transition';
 

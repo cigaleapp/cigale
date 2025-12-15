@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { toTopLeftCoords } from './BoundingBoxes.svelte';
 	import CardMedia from './CardMedia.svelte';
 	import { isDebugMode } from './settings.svelte.js';

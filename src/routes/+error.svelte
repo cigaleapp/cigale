@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconReset from '~icons/ri/loop-left-fill';
 	import { page } from '$app/state';
 	import ButtonInk from '$lib/ButtonInk.svelte';

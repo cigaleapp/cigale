@@ -6,7 +6,7 @@ CSS Variables: `--size` (default: `1em`)
 
 -->
 
-<script>
+<script lang="ts">
 	/**
 	 * @typedef Props
 	 * @type {object}

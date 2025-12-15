@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	//export let value = false;
 	import Icon from '~icons/ri/check-line';
 

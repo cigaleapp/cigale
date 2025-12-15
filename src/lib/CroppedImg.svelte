@@ -1,6 +1,6 @@
 <!-- @component A wrapped <img> tag that displays an image cropped to a given bounding box. -->
 
-<script>
+<script lang="ts">
 	import { toCorners } from './BoundingBoxes.svelte';
 
 	/**

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { fade } from 'svelte/transition';
 

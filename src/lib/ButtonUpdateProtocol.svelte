@@ -9,7 +9,7 @@
 	 */
 </script>
 
-<script>
+<script lang="ts">
 	import IconArrow from '~icons/ri/arrow-right-line';
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconUpToDate from '~icons/ri/checkbox-circle-line';

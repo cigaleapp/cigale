@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import '$lib/fonts-math/import.css';
 
 	import * as Math from 'svelte-mathml';

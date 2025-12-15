@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { ArkErrors } from 'arktype';
 	import { fade } from 'svelte/transition';
 

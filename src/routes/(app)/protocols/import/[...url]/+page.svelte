@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import HighlightHostname from '$lib/HighlightHostname.svelte';

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { fade } from 'svelte/transition';
 
 	import AreaObservations from '$lib/AreaObservations.svelte';

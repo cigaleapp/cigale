@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import '$lib/fonts-math/import.css';
 
 	import { Popover } from 'bits-ui';

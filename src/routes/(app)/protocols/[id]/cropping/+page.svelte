@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { TraversalError } from 'arktype';
 	import { fade } from 'svelte/transition';
 

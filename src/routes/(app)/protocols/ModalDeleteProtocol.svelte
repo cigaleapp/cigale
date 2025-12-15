@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { plural } from '$lib/i18n.js';
 	import { openTransaction, tables } from '$lib/idb.svelte.js';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';

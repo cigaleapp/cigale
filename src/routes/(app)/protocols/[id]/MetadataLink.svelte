@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconGoto from '~icons/ri/arrow-right-line';
 	import IconError from '~icons/ri/error-warning-line';
 	import { goto } from '$app/navigation';

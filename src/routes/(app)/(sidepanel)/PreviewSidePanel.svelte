@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	/**
 	 * @import { TopLeftBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import ButtonPrimary from './ButtonPrimary.svelte';
 	import ButtonSecondary from './ButtonSecondary.svelte';
 	import Modal from './Modal.svelte';

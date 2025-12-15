@@ -2,7 +2,7 @@
  @component --height for the height of the toasts container (default: 5lh)
 -->
 
-<script>
+<script lang="ts">
 	import { toasts } from '$lib/toasts.svelte.js';
 
 	import { toastIcon, toastTheme } from './Toast.svelte';

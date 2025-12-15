@@ -2,7 +2,7 @@
 @component Display a machine-readable (<time>) datetime with a optional relative part
 -->
 
-<script>
+<script lang="ts">
 	import * as dates from 'date-fns';
 
 	import { tooltip } from './tooltips';

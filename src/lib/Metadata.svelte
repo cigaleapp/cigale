@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconCheck from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';

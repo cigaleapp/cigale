@@ -2,7 +2,7 @@
 @component Requires a parent element with a defined width
 -->
 
-<script>
+<script lang="ts">
 	import { clamp } from './utils';
 
 	/**

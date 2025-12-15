@@ -29,7 +29,7 @@
 	 */
 </script>
 
-<script>
+<script lang="ts">
 	import IconRetry from '~icons/ri/arrow-go-back-fill';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconImage from '~icons/ri/image-2-line';

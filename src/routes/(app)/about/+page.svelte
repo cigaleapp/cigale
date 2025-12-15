@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import JSONC from 'tiny-jsonc';
 
 	import IconSuccess from '~icons/ri/checkbox-circle-line';

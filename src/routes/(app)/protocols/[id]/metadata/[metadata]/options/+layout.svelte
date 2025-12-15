@@ -43,7 +43,7 @@
 	}
 </script>
 
-<script>
+<script lang="ts">
 	import { error } from '@sveltejs/kit';
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { fade } from 'svelte/transition';

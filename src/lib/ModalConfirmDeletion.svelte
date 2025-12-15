@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import ModalConfirm from '$lib/ModalConfirm.svelte';
 
 	import ButtonSecondary from './ButtonSecondary.svelte';

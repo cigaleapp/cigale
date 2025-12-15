@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import * as Math from 'svelte-mathml';
 
 	/**

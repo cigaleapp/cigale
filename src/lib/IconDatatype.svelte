@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconBoundingbox from '~icons/ri/artboard-2-line';
 	import IconCube from '~icons/ri/box-3-line';
 	import IconRaw from '~icons/ri/braces-fill';

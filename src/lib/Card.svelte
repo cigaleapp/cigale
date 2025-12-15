@@ -11,7 +11,7 @@ Available CSS variables:
  
 -->
 
-<script>
+<script lang="ts">
 	import { tooltip } from './tooltips.js';
 
 	/**

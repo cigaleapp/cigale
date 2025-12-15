@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	/**
 	 * @import * as Metadata from '$lib/metadata.js';
 	 * @import * as DB from '$lib/database.js';

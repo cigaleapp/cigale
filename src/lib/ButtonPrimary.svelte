@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import ButtonSecondary from './ButtonSecondary.svelte';
 
 	/** @type {import ('./ButtonSecondary.svelte').Props} */

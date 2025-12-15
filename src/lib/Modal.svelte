@@ -28,7 +28,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	 */
 </script>
 
-<script>
+<script lang="ts">
 	import IconClose from '~icons/ri/close-line';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';

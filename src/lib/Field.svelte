@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import 'svelte';
 
 	import IconError from '~icons/ri/close-line';

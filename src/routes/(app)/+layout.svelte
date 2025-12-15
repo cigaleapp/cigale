@@ -24,7 +24,7 @@
 	}
 </script>
 
-<script>
+<script lang="ts">
 	import { watch } from 'runed';
 	import { onMount } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';

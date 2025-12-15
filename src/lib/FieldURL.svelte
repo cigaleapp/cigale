@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconSuccess from '~icons/ri/check-line';
 	import IconFail from '~icons/ri/close-line';
 	import IconOpenExternal from '~icons/ri/external-link-fill';

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconUpgrade from '~icons/ri/arrow-up-circle-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
 	import IconEdit from '~icons/ri/pencil-line';

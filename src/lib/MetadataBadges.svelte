@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconTag from '~icons/ri/price-tag-3-line';
 	import IconTechnical from '~icons/ri/settings-line';
 	import IconInferred from '~icons/ri/sparkling-line';

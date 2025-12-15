@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconAsterisk from '~icons/ri/asterisk';
 
 	import { tooltip } from './tooltips';

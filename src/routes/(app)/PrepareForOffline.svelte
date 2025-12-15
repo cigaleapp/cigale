@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { SvelteMap } from 'svelte/reactivity';
 
 	import ButtonPrimary from '$lib/ButtonPrimary.svelte';

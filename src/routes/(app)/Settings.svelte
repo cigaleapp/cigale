@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { watch } from 'runed';
 
 	import IconIncrease from '~icons/ri/add-line';

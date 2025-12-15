@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import IconGoto from '~icons/ri/arrow-right-line';
 	import IconSelected from '~icons/ri/check-line';
 	import IconExpand from '~icons/ri/expand-up-down-line';

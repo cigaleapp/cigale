@@ -67,7 +67,7 @@
 	}
 </script>
 
-<script>
+<script lang="ts">
 	import { tooltip } from './tooltips';
 
 	/**

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import './style.css';
 	import '$lib/tippy-svg-arrow.css';
 	import '$lib/range-inputs.css';

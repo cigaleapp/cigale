@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import Datetime from '$lib/Datetime.svelte';
 	import { nukeDatabase, previewingPrNumber } from '$lib/idb.svelte';

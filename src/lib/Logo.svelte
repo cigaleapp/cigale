@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	/**
 	 * @type {{variant?: 'regular' | 'error' | "empty", drawpercent?: number, loading?: boolean }}
 	 */

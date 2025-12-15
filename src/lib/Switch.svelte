@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Check from '~icons/ri/check-line';
 	import Cross from '~icons/ri/close-line';
 
