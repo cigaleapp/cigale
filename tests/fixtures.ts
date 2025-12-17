@@ -34,7 +34,7 @@ let classification17kModel: PredownloadedModel | null = null;
 let detectionModel: PredownloadedModel | null = null;
 
 type Fixtures = {
-	database: {
+	db: {
 		observation: {
 			byLabel(label: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
 			byId(id: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
@@ -73,7 +73,7 @@ type Fixtures = {
 	tooltips: {
 		expectContent(element: Locator, content: string | RegExp): Promise<void>;
 	};
-	loadingScreen: {
+	loading: {
 		wait(timeout?: number): Promise<void>;
 		waitIn(area: Locator, timeout?: number): Promise<void>;
 	};
@@ -82,65 +82,57 @@ type Fixtures = {
 	};
 };
 
-export const test = base.extend<Fixtures & { forEachTest: void }, { forEachWorker: void }>({
-	database: async ({ page }, use) => {
+export const test = base.extend<{ forEachTest: void; app: Fixtures }, { forEachWorker: void }>({
+	app: async ({ page }, use) => {
+		const sidepanel = page.getByTestId('sidepanel') as Fixtures['sidepanel'];
+		sidepanel.metadataSection = (label) => sidepanelMetadataSectionFor(page, label);
+
 		await use({
-			observation: {
-				list: async () => listTable(page, 'Observation'),
-				byId: async (id) => getDatabaseRowById(page, 'Observation', id),
-				byLabel: async (label) => getDatabaseRowByField(page, 'Observation', 'label', label)
+			sidepanel,
+			db: {
+				observation: {
+					list: async () => listTable(page, 'Observation'),
+					byId: async (id) => getDatabaseRowById(page, 'Observation', id),
+					byLabel: async (label) =>
+						getDatabaseRowByField(page, 'Observation', 'label', label)
+				},
+				image: {
+					list: async () => listTable(page, 'Image'),
+					byId: async (id) => getDatabaseRowById(page, 'Image', id),
+					byFilename: async (fname) =>
+						getDatabaseRowByField(page, 'Image', 'filename', fname)
+				},
+				session: {
+					list: async () => listTable(page, 'Session'),
+					byId: async (id) => getDatabaseRowById(page, 'Session', id),
+					byName: async (name) => getDatabaseRowByField(page, 'Session', 'name', name)
+				}
 			},
-			image: {
-				list: async () => listTable(page, 'Image'),
-				byId: async (id) => getDatabaseRowById(page, 'Image', id),
-				byFilename: async (fname) => getDatabaseRowByField(page, 'Image', 'filename', fname)
+			modals: {
+				byKey: (key) => modal(page, { key }),
+				byMessage: (message) => modal(page, { title: message }),
+				confirmDeletion: async (key, type) =>
+					confirmDeletionModal(page, { type, modalKey: key })
 			},
-			session: {
-				list: async () => listTable(page, 'Session'),
-				byId: async (id) => getDatabaseRowById(page, 'Session', id),
-				byName: async (name) => getDatabaseRowByField(page, 'Session', 'name', name)
+			toasts: {
+				byMessage: (type, message) => toast(page, message, { type: type ?? undefined })
+			},
+			settings: {
+				set: async (values) => setSettings({ page }, values),
+				get: async () => getSettings({ page })
+			},
+			tabs: {
+				go: async (tab) => goToTab(page, tab)
+			},
+			tooltips: {
+				expectContent: async (element, content) =>
+					expectTooltipContent(page, element, content)
+			},
+			loading: {
+				wait: async (timeout) => waitForLoadingEnd(page, timeout),
+				waitIn: async (area, timeout) => waitForLoadingEnd(area, timeout)
 			}
 		});
-	},
-	modals: async ({ page }, use) => {
-		await use({
-			byKey: (key) => modal(page, { key }),
-			byMessage: (message) => modal(page, { title: message }),
-			confirmDeletion: async (key, type) =>
-				confirmDeletionModal(page, { type, modalKey: key })
-		});
-	},
-	toasts: async ({ page }, use) => {
-		await use({
-			byMessage: (type, message) => toast(page, message, { type: type ?? undefined })
-		});
-	},
-	settings: async ({ page }, use) => {
-		await use({
-			set: async (values) => setSettings({ page }, values),
-			get: async () => getSettings({ page })
-		});
-	},
-	tabs: async ({ page }, use) => {
-		await use({
-			go: async (tab) => goToTab(page, tab)
-		});
-	},
-	tooltips: async ({ page }, use) => {
-		await use({
-			expectContent: async (element, content) => expectTooltipContent(page, element, content)
-		});
-	},
-	loadingScreen: async ({ page }, use) => {
-		await use({
-			wait: async (timeout) => waitForLoadingEnd(page, timeout),
-			waitIn: async (area, timeout) => waitForLoadingEnd(area, timeout)
-		});
-	},
-	sidepanel: async ({ page }, use) => {
-		const locator = page.getByTestId('sidepanel') as Fixtures['sidepanel'];
-		locator.metadataSection = (label) => sidepanelMetadataSectionFor(page, label);
-		await use(locator);
 	},
 	forEachWorker: [
 		// oxlint-disable-next-line no-empty-pattern required by playwright

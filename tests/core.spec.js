@@ -31,7 +31,7 @@ import {
 for (const offline of [false, true]) {
 	test(
 		offline ? 'basic functionality, while offline' : 'basic functionality',
-		async ({ page, context, loadingScreen }) => {
+		async ({ page, context, app }) => {
 			if (offline) {
 				test.skip(context.serviceWorkers().length === 0, "No sw, can't test offline");
 
@@ -68,7 +68,7 @@ for (const offline of [false, true]) {
 			await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
 			await goToTab(page, 'crop');
-			await loadingScreen.wait();
+			await app.loading.wait();
 
 			// Check for inferred bounding box
 			const boundingBoxStyle = Object.fromEntries(
@@ -103,7 +103,7 @@ for (const offline of [false, true]) {
 			// Go to classification view
 			await goToTab(page, 'classify');
 			// Wait for inference
-			await loadingScreen.wait();
+			await app.loading.wait();
 
 			// Check for classification results in sidepanel
 			await firstObservationCard(page).click();
@@ -242,13 +242,13 @@ test('can import a protocol via /protocols/import/url', async ({ page, context }
 	).toBeVisible();
 });
 
-test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page, loadingScreen }) => {
+test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page, app }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await newSession(page);
 
 	await goToTab(page, 'import');
 	await importPhotos({ page }, ['cyan.jpeg']);
-	await loadingScreen.wait();
+	await app.loading.wait();
 
 	/**
 	 *
@@ -275,7 +275,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 
 	await setModel('crop', 'YOLO11');
 	await expectLoadingText(true, 'Chargement du modèle de recadrage…');
-	await loadingScreen.wait();
+	await app.loading.wait();
 
 	await setModel('classify', 'Aucune inférence');
 	await goToTab(page, 'classify');
@@ -283,7 +283,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 
 	await setModel('classify', /80 classes/);
 	await expectLoadingText(true, 'Chargement du modèle de classification');
-	await loadingScreen.wait();
+	await app.loading.wait();
 	await expect(firstObservationCard(page)).not.toHaveText(/Erreur/);
 
 	await setModel('classify', /17000 classes/);

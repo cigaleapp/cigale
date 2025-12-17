@@ -227,11 +227,11 @@ test('can import a large image', issue(412, 415), async ({ page }) => {
 	});
 });
 
-test('cannot import an extremely large image', issue(412, 414), async ({ page, loadingScreen }) => {
+test('cannot import an extremely large image', issue(412, 414), async ({ page, app }) => {
 	await newSession(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, '20K-gray.jpeg');
-	await loadingScreen.wait();
+	await app.loading.wait();
 	await expectTooltipContent(
 		page,
 		firstObservationCard(page),
@@ -292,7 +292,7 @@ test(
 	}
 );
 
-test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page, loadingScreen }) => {
+test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page, app }) => {
 	await newSession(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella', 'cyan');
@@ -305,17 +305,17 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
 
 	// Once everything is done, make sure that we can go to the classify tab
-	await loadingScreen.wait();
+	await app.loading.wait();
 
 	await expect(getTab(page, 'classify')).toBeEnabled({ timeout: 1_000 });
 	await goToTab(page, 'classify');
 });
 
-test('can extract EXIF date from an image', async ({ page, loadingScreen }) => {
+test('can extract EXIF date from an image', async ({ page, app }) => {
 	await newSession(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'lil-fella');
-	await loadingScreen.wait();
+	await app.loading.wait();
 	await firstObservationCard(page).click();
 	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
 		'2025-04-25'
@@ -333,11 +333,11 @@ test('can extract EXIF date from an image', async ({ page, loadingScreen }) => {
 	});
 });
 
-test('can extract EXIF GPS data from an image', async ({ page, loadingScreen }) => {
+test('can extract EXIF GPS data from an image', async ({ page, app }) => {
 	await newSession(page);
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'with-exif-gps');
-	await loadingScreen.wait();
+	await app.loading.wait();
 	await firstObservationCard(page).click();
 	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
 		'2008-10-22'

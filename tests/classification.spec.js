@@ -5,7 +5,7 @@ import { firstObservationCard, getObservation, goToTab, importPhotos, newSession
 test(
 	'allows cancelling classification of an observation',
 	issue(430),
-	async ({ page, loadingScreen }) => {
+	async ({ page, app }) => {
 		await newSession(page);
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
@@ -13,7 +13,7 @@ test(
 			timeout: 10_000
 		});
 		await goToTab(page, 'crop');
-		await loadingScreen.wait();
+		await app.loading.wait();
 		await goToTab(page, 'classify');
 		await expect(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
 			timeout: 10_000
