@@ -138,6 +138,35 @@ export async function getSettings({ page }) {
 
 /**
  *
+ * @template {import('idb').StoreNames<IDBDatabaseType>} Table
+ * @template {keyof IDBDatabaseType[Table]['value']} Field
+ * @param {Page} page
+ * @param {Table} tableName
+ * @param {Field} fieldName
+ * @param {IDBDatabaseType[Table]['value'][Field]} fieldValue
+ * @returns
+ */
+export async function getDatabaseRowByField(page, tableName, fieldName, fieldValue) {
+	return page.evaluate(async ([tableName, fieldName, fieldValue]) => {
+		const rows = await window.DB.getAll(tableName);
+		return rows.find((r) => r[fieldName] === fieldValue);
+	}, /** @type {const} */ ([tableName, fieldName, fieldValue]));
+}
+
+/**
+ * @template {import('idb').StoreNames<IDBDatabaseType>} Table
+ * @param {Page} page
+ * @param {Table} tableName
+ * @param {string} id
+ */
+export async function getDatabaseRowById(page, tableName, id) {
+	return page.evaluate(async ([tableName, id]) => {
+		return window.DB.get(tableName, id);
+	}, /** @type {const} */ ([tableName, id]));
+}
+
+/**
+ *
  * @param {{ page: Page }  & ({ id: string } | { filename: string })} param0
  * @returns {Promise<typeof import('$lib/database').Schemas.Image.inferIn>}
  */
