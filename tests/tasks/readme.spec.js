@@ -1,5 +1,5 @@
 import { expect, test } from '../fixtures';
-import { firstObservationCard, importPhotos, newSession, setSettings } from '../utils';
+import { firstObservationCard, importPhotos, newSession } from '../utils';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
@@ -18,7 +18,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				});
 			}
 
-			test.beforeEach(async ({ page, browserName }) => {
+			test.beforeEach(async ({ page, app, browserName }) => {
 				test.skip(browserName !== 'chromium', 'Only taking screenshots in one browser');
 
 				const languageNames = {

@@ -230,7 +230,12 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page, a
 test.fixme('can cancel import', issue(430), async ({ page, app }) => {
 	await newSession(page);
 	await app.tabs.go('import');
-	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);
+	await importPhotos({ page, wait: false }, [
+		'lil-fella',
+		'cyan',
+		'leaf',
+		'with-exif-gps'
+	]);
 	await expect(firstObservationCard(page)).toHaveText(loadingText, {
 		timeout: 10_000
 	});
@@ -290,7 +295,7 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 
 	await app.tabs.go('crop');
 
-	await expect(app.tabs.get('crop')).toBeDisabled({ timeout: 100 });
+	await expect(app.tabs.get('classify')).toBeDisabled({ timeout: 100 });
 
 	// Once everything is done, make sure that we can go to the classify tab
 	await app.loading.wait();

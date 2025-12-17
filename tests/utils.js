@@ -153,21 +153,6 @@ export async function getDatabaseRowById(page, tableName, id) {
 }
 
 /**
- * Get session object in database
- * @param {{page: Page} & ({name: string} | {id: string})} param0
- * @returns {Promise<typeof import('$lib/database').Schemas.Session.inferIn>}
- */
-export async function getSession({ page, ...query }) {
-	const session = await page.evaluate(async ([query]) => {
-		const sessions = await window.DB.getAll('Session');
-		return sessions.find((s) => ('id' in query ? s.id === query.id : s.name === query.name));
-	}, /** @type {const} */ ([query]));
-	if (!session)
-		throw new Error(`Session with ${JSON.stringify(query)} not found in the database`);
-	return session;
-}
-
-/**
  *
  * @template {import('idb').StoreNames<import('$lib/idb.svelte.js').IDBDatabaseType>} Table
  * @param {Page} page
@@ -447,7 +432,7 @@ export function toast(page, message, { type = undefined } = {}) {
  * @param {boolean} [options.waitForLoading] wait for loading to finish
  */
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
-	await app.settings.set({ showTechnicalMetadata: false });
+	await setSettings({ page }, { showTechnicalMetadata: false });
 	await newSession(page);
 	await goToTab(page, 'import');
 	// Import fixture zip
@@ -770,19 +755,6 @@ export function sessionMetadataSectionFor(page, metadataLabel) {
 		.locator('section')
 		.filter({ hasText: metadataLabel })
 		.first();
-}
-
-/**
- * @param {Page} page
- * @param {string} key
- * @param {string} [observationLabel='leaf']
- */
-export async function metadataValueInDatabase(page, key, observationLabel = 'leaf') {
-	return await getMetadataOverridesOfObservation({
-		page,
-		protocolId: 'io.github.cigaleapp.kitchensink',
-		observation: observationLabel
-	}).then((values) => values[key]);
 }
 
 /**

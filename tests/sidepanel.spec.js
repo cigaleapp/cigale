@@ -5,7 +5,6 @@ import {
 	chooseFirstSession,
 	firstObservationCard,
 	loadDatabaseDump,
-	metadataValueInDatabase,
 	setInferenceModels
 } from './utils';
 
@@ -20,24 +19,28 @@ import {
  * @param {Page} param0.page
  * @param {AppFixture} param0.app
  * @param {'basic'|'kitchensink-protocol'} [param0.dump=basic] name of the database dump to load, without extension
- * @param {string} [param0.observation] name of the observation to open
- * @param {string} [param0.protocol] protocol to choose, if not the default one
  */
-async function initialize({
-	page,
-	app,
-	dump = 'basic',
-	protocol = dump === 'basic' ? undefined : 'Kitchen sink',
-	observation = dump === 'basic' ? 'lil-fella' : 'leaf'
-}) {
+async function initialize({ page, app, dump = 'basic' }) {
 	await loadDatabaseDump(page, `${dump}.devalue`);
-
 	await app.settings.set({ showTechnicalMetadata: false });
 	await chooseFirstSession(page);
-	if (protocol) await changeSessionProtocol(page, protocol);
+	if (dump === 'kitchensink-protocol') await changeSessionProtocol(page, 'Kitchen sink');
 	await setInferenceModels(page, { classify: 'Aucune inférence' });
 	await app.tabs.go('classify');
-	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
+	await page
+		.getByText(dump === 'basic' ? 'lil-fella' : 'leaf', { exact: true })
+		.click({ timeout: 10_000 });
+}
+
+/**
+ *
+ * @param {AppFixture} app
+ * @param {string} key
+ * @param {string} [observation]
+ * @returns
+ */
+async function metadataValueInDatabase(app, key, observation = 'leaf') {
+	return app.db.metadata.values({ observation }).then((metadata) => metadata[key]);
 }
 
 test('allows changing metadata values on import page', issue(440), async ({ page, app }) => {
@@ -405,7 +408,7 @@ test.describe('can search in a enum-type metadata combobox', () => {
 test('can update a boolean-type metadata', issue(216), async ({ page, app }) => {
 	await initialize({ page, app, dump: 'kitchensink-protocol' });
 
-	expect.soft(await metadataValueInDatabase(page, 'bool')).toBeUndefined();
+	expect.soft(await metadataValueInDatabase(app, 'bool')).toBeUndefined();
 	await expect
 		.soft(app.sidepanel.metadataSection('bool').getByRole('switch'))
 		.not.toHaveAttribute('aria-checked');
@@ -417,7 +420,7 @@ test('can update a boolean-type metadata', issue(216), async ({ page, app }) => 
 	  - switch "" [checked]:
 	    - img
 	`);
-	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(true);
+	expect.soft(await metadataValueInDatabase(app, 'bool')).toBe(true);
 
 	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
 
@@ -426,7 +429,7 @@ test('can update a boolean-type metadata', issue(216), async ({ page, app }) => 
 	  - switch "":
 	    - img
 	`);
-	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(false);
+	expect.soft(await metadataValueInDatabase(app, 'bool')).toBe(false);
 });
 
 test('shows crop-type metadata as non representable', async ({ page, app }) => {
@@ -450,7 +453,7 @@ test('can update a date-type metadata', async ({ page, app }) => {
 	await dateSection.getByRole('textbox').fill('2025-05-01');
 
 	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
-	expect(await metadataValueInDatabase(page, 'date')).toBe('2025-05-01T00:00:00');
+	expect(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
 });
 
 test('can update a float-type metadata', async ({ page, app }) => {
@@ -464,7 +467,7 @@ test('can update a float-type metadata', async ({ page, app }) => {
 	await floatSection.getByRole('button', { name: 'Incrémenter' }).click();
 
 	await expect(floatSection.getByRole('textbox')).toHaveValue('4.14');
-	expect(await metadataValueInDatabase(page, 'float')).toBe(4.14);
+	expect(await metadataValueInDatabase(app, 'float')).toBe(4.14);
 });
 
 test('can update a integer-type metadata', async ({ page, app }) => {
@@ -478,7 +481,7 @@ test('can update a integer-type metadata', async ({ page, app }) => {
 	await integerSection.getByRole('button', { name: 'Décrémenter' }).click();
 
 	await expect(integerSection.getByRole('textbox')).toHaveValue('41');
-	expect(await metadataValueInDatabase(page, 'integer')).toBe(41);
+	expect(await metadataValueInDatabase(app, 'integer')).toBe(41);
 });
 
 test('can update a string-type metadata', async ({ page, app }) => {
@@ -491,5 +494,5 @@ test('can update a string-type metadata', async ({ page, app }) => {
 	await stringSection.getByRole('textbox').blur();
 
 	await expect(stringSection.getByRole('textbox')).toHaveValue('Hello world');
-	expect(await metadataValueInDatabase(page, 'string')).toBe('Hello world');
+	expect(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
 });
