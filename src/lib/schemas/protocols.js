@@ -253,3 +253,7 @@ export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'di
 			])
 		)
 	}));
+
+/**
+ * @typedef {typeof ExportedProtocol.inferOut} ExportedProtocol
+ */
