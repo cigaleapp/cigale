@@ -9,6 +9,7 @@
 	import Field from '$lib/Field.svelte';
 	import { databaseHandle, listByIndex } from '$lib/idb.svelte';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Modal from '$lib/Modal.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -27,6 +28,13 @@
 	let close = $state();
 
 	const OpenIcon = $derived(type === 'bug' ? IconBug : IconIdea);
+
+	defineKeyboardShortcuts('general', {
+		[type === 'bug' ? '$mod+!' : '$mod+*']: {
+			help: type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité',
+			do: () => open?.()
+		}
+	});
 </script>
 
 <Modal
