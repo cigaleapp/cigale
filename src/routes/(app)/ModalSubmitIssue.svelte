@@ -78,24 +78,26 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					type,
-					title,
-					body,
-					metadata: {
-						Version: version,
-						'User Agent': navigator.userAgent,
-						Page: window.location.href,
-						OS: ua.os.toString(),
-						Browser: ua.browser.toString(),
-						Device: ua.device.toString(),
-						Protocol: uiState.currentProtocol
-							? `${uiState.currentProtocol.id} v${uiState.currentProtocol.version}`
-							: '_None_',
-						'Open session': sessionStats?.toString() || '_None_',
-						'Database rev.': db.version.toString()
-					}
-				})
+				body: JSON.stringify(
+					/** @satisfies {typeof import('$lib/schemas/issue-creator').IssueCreatorRequest['infer']} */ ({
+						type,
+						title,
+						body,
+						metadata: {
+							Version: version,
+							'User Agent': navigator.userAgent,
+							Page: window.location.href,
+							OS: ua.os.toString(),
+							Browser: ua.browser.toString(),
+							Device: ua.device.toString(),
+							Protocol: uiState.currentProtocol
+								? `${uiState.currentProtocol.id} v${uiState.currentProtocol.version}`
+								: '_None_',
+							'Open session': sessionStats?.toString() || '_None_',
+							'Database rev.': db.version.toString()
+						}
+					})
+				)
 			});
 
 			close?.();

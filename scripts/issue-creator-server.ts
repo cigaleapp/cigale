@@ -1,16 +1,7 @@
-import { ArkErrors, type } from 'arktype';
+import { ArkErrors } from 'arktype';
 import { Octokit } from 'octokit';
 
-const SubmitRequest = type({
-	title: ['string', '@', 'Issue title'],
-	body: ['string', '@', 'Issue body'],
-	type: type.enumerated('bug', 'feature').describe('Type of issue to create'),
-	metadata: [
-		'Record<string, string>',
-		'@',
-		'Additional metadata to include at the end of the issue body'
-	]
-});
+import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
 
 const cors = {
 	'Access-Control-Allow-Origin': '*',
@@ -29,7 +20,7 @@ Bun.serve({
 			const user = await github.rest.users.getAuthenticated();
 			return Response.json({
 				'Connected as': user.data.login,
-				'POST /submit': SubmitRequest.toJsonSchema()
+				'POST /submit': IssueCreatorRequest.toJsonSchema()
 			});
 		},
 		'/submit': {
@@ -40,7 +31,7 @@ Bun.serve({
 				});
 			},
 			async POST(request) {
-				const data = SubmitRequest(await request.json());
+				const data = IssueCreatorRequest(await request.json());
 				if (data instanceof ArkErrors) {
 					return Response.json(
 						{
