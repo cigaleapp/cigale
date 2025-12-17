@@ -20,11 +20,11 @@ test.describe('isolation', () => {
 	test.beforeEach(() => {
 		test.setTimeout(40_000);
 	});
-	test('no images from one session shows up in another', async ({ page }) => {
+	test('no images from one session shows up in another', async ({ page, loadingScreen }) => {
 		await newSession(page, { name: 'Session A' });
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
-		await waitForLoadingEnd(page);
+		await loadingScreen.wait();
 
 		await newSession(page, { name: 'Session B' });
 		await goToTab(page, 'import');
@@ -32,7 +32,7 @@ test.describe('isolation', () => {
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
 		await importPhotos({ page }, 'debugsquare.png');
-		await waitForLoadingEnd(page);
+		await loadingScreen.wait();
 
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
@@ -44,17 +44,17 @@ test.describe('isolation', () => {
 		await expect(page.getByText('debugsquare.png')).not.toBeVisible();
 	});
 
-	test('deleting a session only deletes its images', async ({ page }) => {
+	test('deleting a session only deletes its images', async ({ page, loadingScreen }) => {
 		await newSession(page, { name: 'Session A' });
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
-		await waitForLoadingEnd(page);
+		await loadingScreen.wait();
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
 		await newSession(page, { name: 'Session B' });
 		await goToTab(page, 'import');
 		await importPhotos({ page }, 'debugsquare.png');
-		await waitForLoadingEnd(page);
+		await loadingScreen.wait();
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 
 		await deleteSession(page, 'Session A');
@@ -300,7 +300,7 @@ test('changing session info saves in the database', async ({ page }) => {
 	expect(await getSession({ page, id })).toHaveProperty('description', 'A description');
 });
 
-test('can change protocol of session', async ({ page }) => {
+test('can change protocol of session', async ({ page, loadingScreen }) => {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await goToProtocolManagement(page);
 	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
@@ -320,7 +320,7 @@ test('can change protocol of session', async ({ page }) => {
 
 	await goToTab(page, 'import');
 	await importPhotos({ page }, 'cyan.jpeg');
-	await waitForLoadingEnd(page);
+	await loadingScreen.wait();
 	await page.getByText('cyan.jpeg').click();
 	await expect(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: bool
