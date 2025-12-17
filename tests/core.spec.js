@@ -19,11 +19,8 @@ import {
 	makeRegexpUnion,
 	mockProtocolSourceURL,
 	mockUrl,
-	modal,
 	newSession,
 	setInferenceModels,
-	setSettings,
-	toast,
 	waitForLoadingEnd
 } from './utils.js';
 
@@ -40,15 +37,18 @@ for (const offline of [false, true]) {
 					.getByTestId('app-settings')
 					.getByRole('button', { name: 'Préparation hors-ligne' })
 					.click();
-				await modal(page, 'Préparation hors-ligne')
+
+				await app.modals
+					.byTitle('Préparation hors-ligne')
 					.getByRole('button', { name: 'Démarrer' })
 					.click();
 
-				await expect(modal(page, 'Préparation hors-ligne')).toHaveText(/OK!/, {
+				await expect(app.modals.byTitle('Préparation hors-ligne')).toHaveText(/OK!/, {
 					timeout: 10_000
 				});
 
-				await modal(page, 'Préparation hors-ligne')
+				await app.modals
+					.byTitle('Préparation hors-ligne')
 					.getByRole('button', { name: 'Fermer' })
 					.first()
 					.click();
@@ -56,7 +56,7 @@ for (const offline of [false, true]) {
 				context.setOffline(true);
 			}
 
-			await setSettings({ page }, { showTechnicalMetadata: false });
+			await app.settings.set({ showTechnicalMetadata: false });
 			await newSession(page);
 			await app.tabs.go('import');
 
@@ -168,12 +168,9 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 	const timeouts = { begin: 500, finish: imagesCount * 0.4 * 60_000 };
 	test.setTimeout(3 * timeouts.finish);
 
-	await setSettings(
-		{ page },
-		{
-			showTechnicalMetadata: false
-		}
-	);
+	await app.settings.set({
+		showTechnicalMetadata: false
+	});
 	await newSession(page);
 	await app.tabs.go('import');
 
@@ -201,8 +198,8 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 	await expect(observations).not.toHaveText(new RegExp('Rééssayer'));
 });
 
-test('can import a protocol via /protocols/import/url', async ({ page, context }) => {
-	await setSettings({ page }, { showTechnicalMetadata: false });
+test('can import a protocol via /protocols/import/url', async ({ page, app, context }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
 	const protocolUrl = 'https://example.com/kitchensink.cigaleprotocol.yaml';
 	await mockProtocolSourceURL(page, context, protocolUrl, {
 		body: await readFile(
@@ -214,15 +211,15 @@ test('can import a protocol via /protocols/import/url', async ({ page, context }
 	await page.waitForURL((u) => u.hash === '#/sessions');
 
 	await page.goto(`#/protocols/import/${protocolUrl}`);
-	await expect(modal(page, 'Importer le protocole distant ?')).toBeVisible({
+	await expect(app.modals.byTitle('Importer le protocole distant ?')).toBeVisible({
 		timeout: 30_000
 	});
-	await expect(modal(page, 'Importer le protocole distant ?').getByRole('link')).toHaveAttribute(
-		'href',
-		protocolUrl
-	);
+	await expect(
+		app.modals.byTitle('Importer le protocole distant ?').getByRole('link')
+	).toHaveAttribute('href', protocolUrl);
 
-	await modal(page, 'Importer le protocole distant ?')
+	await app.modals
+		.byTitle('Importer le protocole distant ?')
 		.getByRole('button', { name: 'Importer' })
 		.click();
 
@@ -242,7 +239,7 @@ test('can import a protocol via /protocols/import/url', async ({ page, context }
 });
 
 test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page, app }) => {
-	await setSettings({ page }, { showTechnicalMetadata: false });
+	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page);
 
 	await app.tabs.go('import');
@@ -313,7 +310,7 @@ test('can send a bug report', async ({ page, app, context }) => {
 	await setInferenceModels(page, { crop: 'Aucune inférence' });
 	await app.tabs.go('crop');
 
-	const report = modal(page, { key: 'modal_submit_issue_bug' });
+	const report = app.modals.byKey('modal_submit_issue_bug');
 
 	await page.getByTestId('open-bug-report').click();
 
@@ -323,7 +320,7 @@ test('can send a bug report', async ({ page, app, context }) => {
 	await report.getByRole('button', { name: 'Envoyer' }).click();
 
 	await expect(
-		toast(page, 'Merci pour votre contribution!', { type: 'success' }).getByRole('button', {
+		app.toasts.byMessage('success', 'Merci pour votre contribution!').getByRole('button', {
 			name: 'Voir'
 		})
 	).toHaveAttribute('href', 'https://example.com/issue/123');

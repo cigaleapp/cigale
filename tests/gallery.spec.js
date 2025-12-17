@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures';
-import { importPhotos, newSession, openSettings } from './utils';
+import { importPhotos, newSession } from './utils';
 
 test.describe('sorting', () => {
 	test.beforeEach(async ({ page, app }) => {
@@ -23,7 +23,7 @@ test.describe('sorting', () => {
 	 */
 	async function assertCardsOrder(sortKey, order) {
 		test(`by ${sortKey}`, async ({ page, app }) => {
-			await openSettings(page);
+			await app.settings.open();
 			const optionLabel = {
 				filename: 'Fichier',
 				date: 'Date'

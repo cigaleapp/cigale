@@ -28,7 +28,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 				await page.setViewportSize({ width: (16 / 9) * 720, height: 720 });
 
-				await setSettings({ page }, { showTechnicalMetadata: false });
+				await app.settings.set({ showTechnicalMetadata: false });
 
 				await page.getByTestId('settings-button').click();
 				await page.getByRole('radio', { name: languageNames[language] }).click();

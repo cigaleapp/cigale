@@ -447,7 +447,7 @@ export function toast(page, message, { type = undefined } = {}) {
  * @param {boolean} [options.waitForLoading] wait for loading to finish
  */
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
-	await setSettings({ page }, { showTechnicalMetadata: false });
+	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page);
 	await goToTab(page, 'import');
 	// Import fixture zip

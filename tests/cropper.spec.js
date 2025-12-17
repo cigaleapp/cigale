@@ -2,14 +2,7 @@ import { throwError } from '$lib/utils.js';
 
 import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
-import {
-	browserConsole,
-	chooseFirstSession,
-	listTable,
-	loadDatabaseDump,
-	setImageMetadata,
-	setSettings
-} from './utils.js';
+import { browserConsole, chooseFirstSession, loadDatabaseDump, setImageMetadata } from './utils.js';
 
 /**
  * @import { AppFixture } from './fixtures';
@@ -21,7 +14,7 @@ test.describe('Cropper view', () => {
 		await loadDatabaseDump(page);
 		await chooseFirstSession(page);
 		await app.tabs.go('import');
-		const allImages = await listTable(page, 'Image');
+		const allImages = await app.db.image.list();
 		await markImagesAsConfirmedInDatabase(
 			page,
 			allImages.map((i) => i.id),
@@ -104,7 +97,7 @@ test.describe('Cropper view', () => {
 
 	test.describe('autoskip disabled', () => {
 		test.beforeEach(async ({ page, app }) => {
-			await setSettings({ page }, { cropAutoNext: false });
+			await app.settings.set({ cropAutoNext: false });
 		});
 
 		test('should not skip on confirm button click', async ({ page, app }) => {
@@ -185,9 +178,11 @@ test.describe('Cropper view', () => {
 			const { withExifGps: image } = await imagesByName(app);
 			await markImagesAsConfirmedInDatabase(
 				page,
-				await listTable(page, 'Image').then((images) =>
-					images.filter(({ fileId }) => fileId !== image.fileId).map(({ id }) => id)
-				)
+				await app.db.image
+					.list()
+					.then((images) =>
+						images.filter(({ fileId }) => fileId !== image.fileId).map(({ id }) => id)
+					)
 			);
 
 			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
@@ -206,7 +201,7 @@ test.describe('Cropper view', () => {
 		 */
 		async function navigateThenAssert(page, app, deleteAction) {
 			const { leaf, lilFella } = await imagesByName(app);
-			const imagesBefore = await listTable(page, 'Image');
+			const imagesBefore = await app.db.image.list();
 
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${leaf.fileId}`);
@@ -218,7 +213,7 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 
-			expect(await listTable(page, 'Image')).toEqual(
+			expect(await app.db.image.list()).toEqual(
 				imagesBefore.filter(({ fileId }) => fileId !== leaf.fileId)
 			);
 		}
@@ -349,7 +344,7 @@ test.describe('Cropper view', () => {
 			});
 
 			test('dragging outside the crop surface cancels', issue(431), async ({ page, app }) => {
-				await setSettings({ page }, { showTechnicalMetadata: true });
+				await app.settings.set({ showTechnicalMetadata: true });
 				await makeBox(page, 10, 10, 50, -30);
 				await expect(page.locator('.change-area .debug')).toHaveText(
 					/create {2}\(0 0\) × \[0 0\]/
