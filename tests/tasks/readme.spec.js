@@ -1,5 +1,5 @@
 import { expect, test } from '../fixtures';
-import { firstObservationCard, goToTab, importPhotos, newSession, setSettings } from '../utils';
+import { firstObservationCard, importPhotos, newSession, setSettings } from '../utils';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
@@ -35,38 +35,38 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				await page.getByTestId('settings-button').click();
 			});
 
-			test('protocol', async ({ page }) => {
+			test('protocol', async ({ page, app }) => {
 				await newSession(page);
 				await expect(page).toHaveScreenshot();
 			});
 
-			test('import', async ({ page }) => {
+			test('import', async ({ page, app }) => {
 				await newSession(page);
-				await goToTab(page, 'import');
+				await app.tabs.go('import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 				await expect(page).toHaveScreenshot();
 			});
 
-			test('crop', async ({ page }) => {
+			test('crop', async ({ page, app }) => {
 				await newSession(page);
-				await goToTab(page, 'import');
+				await app.tabs.go('import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'crop');
+				await app.tabs.go('crop');
 				await firstObservationCard(page).click();
 				await expect(page).toHaveScreenshot();
 			});
 
-			test('classify', async ({ page }) => {
+			test('classify', async ({ page, app }) => {
 				await newSession(page);
-				await goToTab(page, 'import');
+				await app.tabs.go('import');
 
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'classify');
+				await app.tabs.go('classify');
 
 				await waitForAnalysis(page);
 				await page.getByText('lil-fella', { exact: true }).first().click();

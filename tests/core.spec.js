@@ -14,7 +14,6 @@ import {
 	chooseInDropdown,
 	expectZipFiles,
 	firstObservationCard,
-	goToTab,
 	importPhotos,
 	loadDatabaseDump,
 	makeRegexpUnion,
@@ -59,7 +58,7 @@ for (const offline of [false, true]) {
 
 			await setSettings({ page }, { showTechnicalMetadata: false });
 			await newSession(page);
-			await goToTab(page, 'import');
+			await app.tabs.go('import');
 
 			// Import fixture image
 			await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
@@ -67,7 +66,7 @@ for (const offline of [false, true]) {
 			await fileInput?.setInputFiles('./tests/fixtures/lil-fella.jpeg');
 			await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
-			await goToTab(page, 'crop');
+			await app.tabs.go('crop');
 			await app.loading.wait();
 
 			// Check for inferred bounding box
@@ -93,7 +92,7 @@ for (const offline of [false, true]) {
 			expect(boundingBoxStyle.height).toBeCloseTo(36.4674, 0);
 
 			// Go to crop view
-			await goToTab(page, 'crop');
+			await app.tabs.go('crop');
 			await page.getByText('lil-fella.jpeg').click();
 
 			// Check for continuing
@@ -101,7 +100,7 @@ for (const offline of [false, true]) {
 			await expect(page.getByText('Confirmé', { exact: true })).toBeVisible();
 
 			// Go to classification view
-			await goToTab(page, 'classify');
+			await app.tabs.go('classify');
 			// Wait for inference
 			await app.loading.wait();
 
@@ -158,7 +157,7 @@ for (const offline of [false, true]) {
 	);
 }
 
-test('can handle a bunch of images at once', withParallelism(4), async ({ page }) => {
+test('can handle a bunch of images at once', withParallelism(4), async ({ page, app }) => {
 	test.fixme(
 		true,
 		"Really flaky since this week for no reason, even on local runs, sometimes it works fines, sometimes it makes Chrome freeze. Even the profiler freezes, so we can't know what causes it. Nothing obvious in the console too."
@@ -176,7 +175,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 		}
 	);
 	await newSession(page);
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 
 	const observations = page.getByTestId('observations-area');
 
@@ -188,10 +187,10 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 
 	// Makes the test really slow
 
-	// await goToTab(page, 'crop');
+	// await app.tabs.go('crop')
 	// await waitForLoadingEnd(observations, timeouts);
 
-	// await goToTab(page, 'classify');
+	// await app.tabs.go('classify')
 	// await waitForLoadingEnd(observations, timeouts);
 
 	await page.keyboard.press('Control+A');
@@ -246,7 +245,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await newSession(page);
 
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, ['cyan.jpeg']);
 	await app.loading.wait();
 
@@ -270,7 +269,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	}
 
 	await setModel('crop', 'Aucune inférence');
-	await goToTab(page, 'crop');
+	await app.tabs.go('crop');
 	await expectLoadingText(false, 'Chargement du modèle de recadrage…');
 
 	await setModel('crop', 'YOLO11');
@@ -278,7 +277,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	await app.loading.wait();
 
 	await setModel('classify', 'Aucune inférence');
-	await goToTab(page, 'classify');
+	await app.tabs.go('classify');
 	await expectLoadingText(false, 'Chargement du modèle de classification');
 
 	await setModel('classify', /80 classes/);
@@ -290,7 +289,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	await expectLoadingText(true, 'Chargement du modèle de classification');
 });
 
-test('can send a bug report', async ({ page, context }) => {
+test('can send a bug report', async ({ page, app, context }) => {
 	/** @type {undefined | typeof import('../src/lib/schemas/issue-creator').IssueCreatorRequest['inferIn']} */
 	let requestBody;
 
@@ -312,7 +311,7 @@ test('can send a bug report', async ({ page, context }) => {
 	await loadDatabaseDump(page, 'basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, { crop: 'Aucune inférence' });
-	await goToTab(page, 'crop');
+	await app.tabs.go('crop');
 
 	const report = modal(page, { key: 'modal_submit_issue_bug' });
 

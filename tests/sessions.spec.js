@@ -4,7 +4,6 @@ import {
 	deleteSession,
 	getMetadataValue,
 	goToProtocolManagement,
-	goToTab,
 	importPhotos,
 	importProtocol,
 	newSession,
@@ -18,12 +17,12 @@ test.describe('isolation', () => {
 	});
 	test('no images from one session shows up in another', async ({ page, app }) => {
 		await newSession(page, { name: 'Session A' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
 		await app.loading.wait();
 
 		await newSession(page, { name: 'Session B' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
@@ -34,7 +33,7 @@ test.describe('isolation', () => {
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
 		await switchSession(page, 'Session A');
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 		await expect(page.getByText('debugsquare.png')).not.toBeVisible();
@@ -42,13 +41,13 @@ test.describe('isolation', () => {
 
 	test('deleting a session only deletes its images', async ({ page, app }) => {
 		await newSession(page, { name: 'Session A' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
 		await app.loading.wait();
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
 		await newSession(page, { name: 'Session B' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await importPhotos({ page }, 'debugsquare.png');
 		await app.loading.wait();
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
@@ -57,7 +56,7 @@ test.describe('isolation', () => {
 		await expect(page.getByText('Session A')).not.toBeVisible();
 
 		await switchSession(page, 'Session B');
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 	});
@@ -80,10 +79,10 @@ test('import into new session', async ({ page, app }) => {
 	await expect(page.getByText('with-exif-gps.jpeg')).toBeVisible();
 	await expect(page.locator('main article')).toHaveCount(4);
 
-	await goToTab(page, 'crop');
+	await app.tabs.go('crop');
 	await expect(page.locator('main header > *').nth(1)).toHaveText('4 éléments');
 
-	await goToTab(page, 'classify');
+	await app.tabs.go('classify');
 	await page.getByText('cyan', { exact: true }).click();
 	await expect(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: Espèce
@@ -231,7 +230,7 @@ test('import into new session', async ({ page, app }) => {
 	);
 });
 
-test('changing metadata values saves them in the database', async ({ page }) => {
+test('changing metadata values saves them in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Metadata session' });
 	await page.getByTestId('goto-current-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
@@ -314,7 +313,7 @@ test('can change protocol of session', async ({ page, app }) => {
 		'io.github.cigaleapp.kitchensink'
 	);
 
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg');
 	await app.loading.wait();
 	await page.getByText('cyan.jpeg').click();

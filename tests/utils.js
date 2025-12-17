@@ -166,59 +166,6 @@ export async function getDatabaseRowById(page, tableName, id) {
 }
 
 /**
- *
- * @param {{ page: Page }  & ({ id: string } | { filename: string })} param0
- * @returns {Promise<typeof import('$lib/database').Schemas.Image.inferIn>}
- */
-export async function getImage({ page, ...query }) {
-	const image = await page.evaluate(async ([query]) => {
-		if ('id' in query) {
-			const image = await window.DB.get('Image', query.id);
-			if (!image) throw new Error(`Image ${query.id} not found in the database`);
-			return image;
-		} else {
-			const images = await window.DB.getAll('Image');
-			const image = images.find((i) => i.filename === query.filename);
-			if (!image)
-				throw new Error(`Image with filename ${query.filename} not found in the database`);
-			return image;
-		}
-	}, /** @type {const} */ ([query]));
-	return image;
-}
-
-/**
- * Get observation object in database
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} param0.label
- * @returns {Promise<typeof import('$lib/database').Schemas.Observation.inferIn>}
- */
-export async function getObservation({ page, label }) {
-	const observation = await page.evaluate(async ([label]) => {
-		const observations = await window.DB.getAll('Observation');
-		return observations.find((obs) => obs.label === label);
-	}, /** @type {const} */ ([label]));
-	if (!observation) throw new Error(`Observation ${label} not found in the database`);
-	return observation;
-}
-
-/**
- * Get session object in database
- * @param {{page: Page} & ({name: string} | {id: string})} param0
- * @returns {Promise<typeof import('$lib/database').Schemas.Session.inferIn>}
- */
-export async function getSession({ page, ...query }) {
-	const session = await page.evaluate(async ([query]) => {
-		const sessions = await window.DB.getAll('Session');
-		return sessions.find((s) => ('id' in query ? s.id === query.id : s.name === query.name));
-	}, /** @type {const} */ ([query]));
-	if (!session)
-		throw new Error(`Session with ${JSON.stringify(query)} not found in the database`);
-	return session;
-}
-
-/**
  * Returns object mapping metadata keys to their (runtime, deserialized) values
  * @param {object} param0
  * @param {Page} param0.page
@@ -454,7 +401,7 @@ export async function setInferenceModels(page, models) {
  */
 export async function switchSession(page, name) {
 	await goHome(page);
-	await goToTab(page, 'sessions');
+	await goToTab(page, 'sessions')
 	// XXX: Wait until page is ready
 	await page.waitForTimeout(500);
 	await page.getByRole('heading', { name }).click();
@@ -467,7 +414,7 @@ export async function switchSession(page, name) {
  */
 export async function deleteSession(page, name) {
 	await goHome(page);
-	await goToTab(page, 'sessions');
+	await goToTab(page, 'sessions')
 	// XXX: Wait until page is ready
 	await page.waitForTimeout(500);
 	const sessionCard = page.getByRole('article').filter({
@@ -486,7 +433,7 @@ export async function deleteSession(page, name) {
  */
 export async function chooseFirstSession(page) {
 	await goHome(page);
-	await goToTab(page, 'sessions');
+	await goToTab(page, 'sessions')
 
 	await page.locator('main article:not([data-testid=new-session-card])').first().click();
 	await page.waitForURL((u) => u.hash === '#/import');
@@ -501,7 +448,7 @@ export async function changeSessionProtocol(page, name) {
 	await page.getByTestId('goto-current-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
 	await chooseInDropdown(page, 'protocol', name);
-	await goToTab(page, 'import');
+	await goToTab(page, 'import')
 }
 
 /**
@@ -509,7 +456,7 @@ export async function changeSessionProtocol(page, name) {
  */
 export async function goToProtocolManagement(page) {
 	await goHome(page);
-	await goToTab(page, 'protocols');
+	await goToTab(page, 'protocols')
 }
 
 /**
@@ -616,7 +563,7 @@ export function toast(page, message, { type = undefined } = {}) {
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await newSession(page);
-	await goToTab(page, 'import');
+	await goToTab(page, 'import')
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");

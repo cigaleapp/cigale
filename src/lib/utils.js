@@ -1232,3 +1232,11 @@ if (import.meta.vitest) {
 		expect(readableOn('#c0ffee')).toBe('#000000');
 	});
 }
+
+/**
+ * @param {string} message
+ * @returns {never}
+ */
+export function throwError(message) {
+	throw new Error(message);
+}

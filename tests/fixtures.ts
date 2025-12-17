@@ -15,11 +15,13 @@ import {
 	getDatabaseRowById,
 	getPredownloadedModel,
 	getSettings,
+	getTab,
 	goToTab,
 	listTable,
 	mockPredownloadedModels,
 	mockProtocolSourceURL,
 	modal,
+	openSettings,
 	setHardwareConcurrency,
 	setSettings,
 	sidepanelMetadataSectionFor,
@@ -33,7 +35,7 @@ let classification80Model: PredownloadedModel | null = null;
 let classification17kModel: PredownloadedModel | null = null;
 let detectionModel: PredownloadedModel | null = null;
 
-type Fixtures = {
+export type AppFixture = {
 	db: {
 		observation: {
 			byLabel(label: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
@@ -53,7 +55,7 @@ type Fixtures = {
 	};
 	modals: {
 		byKey(key: `modal_${string}`): Locator;
-		byMessage(message: string): Locator;
+		byTitle(message: string): Locator;
 		/**
 		 * Confirms deletion if a deletion-confirm modal is open
 		 * @param type text to type before hitting confirm button
@@ -66,9 +68,12 @@ type Fixtures = {
 	settings: {
 		set(values: Partial<Settings>): Promise<void>;
 		get(): Promise<Settings>;
+		get<Key extends keyof Settings>(key: Key): Promise<Settings[Key]>;
+		open(options?: Parameters<Locator['click']>[0]): Promise<void>;
 	};
 	tabs: {
 		go(tab: NavigationTab): Promise<void>;
+		get(tab: NavigationTab): Locator;
 	};
 	tooltips: {
 		expectContent(element: Locator, content: string | RegExp): Promise<void>;
@@ -82,9 +87,9 @@ type Fixtures = {
 	};
 };
 
-export const test = base.extend<{ forEachTest: void; app: Fixtures }, { forEachWorker: void }>({
+export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEachWorker: void }>({
 	app: async ({ page }, use) => {
-		const sidepanel = page.getByTestId('sidepanel') as Fixtures['sidepanel'];
+		const sidepanel = page.getByTestId('sidepanel') as AppFixture['sidepanel'];
 		sidepanel.metadataSection = (label) => sidepanelMetadataSectionFor(page, label);
 
 		await use({
@@ -110,7 +115,7 @@ export const test = base.extend<{ forEachTest: void; app: Fixtures }, { forEachW
 			},
 			modals: {
 				byKey: (key) => modal(page, { key }),
-				byMessage: (message) => modal(page, { title: message }),
+				byTitle: (message) => modal(page, { title: message }),
 				confirmDeletion: async (key, type) =>
 					confirmDeletionModal(page, { type, modalKey: key })
 			},
@@ -119,10 +124,16 @@ export const test = base.extend<{ forEachTest: void; app: Fixtures }, { forEachW
 			},
 			settings: {
 				set: async (values) => setSettings({ page }, values),
-				get: async () => getSettings({ page })
+				get: async <Key extends keyof Settings>(...maybeKey: [] | [Key]) => {
+					const settings = await getSettings({ page });
+					const key = maybeKey[0];
+					return key ? settings[key] : settings;
+				},
+				open: async (options) => openSettings(page, options)
 			},
 			tabs: {
-				go: async (tab) => goToTab(page, tab)
+				go: async (tab) => goToTab(page, tab),
+				get: tab => getTab(page, tab)
 			},
 			tooltips: {
 				expectContent: async (element, content) =>
