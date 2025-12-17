@@ -4,7 +4,6 @@ import {
 	changeSessionProtocol,
 	chooseFirstSession,
 	firstObservationCard,
-	getMetadataOverridesOfObservation,
 	loadDatabaseDump,
 	metadataValueInDatabase,
 	setInferenceModels
@@ -276,11 +275,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	);
 
 	// Check database
-	const metadata = await getMetadataOverridesOfObservation({
-		page,
-		protocolId: 'io.github.cigaleapp.arthropods.example.light',
-		observation: 'lil-fella'
-	});
+	const metadata = await app.db.metadata.values({ observation: 'lil-fella' });
 
 	expect(metadata).toEqual({
 		...metadata,

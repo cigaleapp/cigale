@@ -2,7 +2,6 @@ import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	chooseInDropdown,
 	deleteSession,
-	getMetadataValue,
 	goToProtocolManagement,
 	importPhotos,
 	importProtocol,
@@ -237,7 +236,7 @@ test('changing metadata values saves them in the database', async ({ page, app }
 
 	/** @param {string} key */
 	const metadataValueFor = async (key) =>
-		getMetadataValue(page, { session: { name: 'Metadata session' } }, key);
+		app.db.metadata.values({ session: 'Metadata session' }).then((values) => values[key]);
 
 	expect(await metadataValueFor('prospection_duration')).toBeUndefined();
 

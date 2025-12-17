@@ -3,20 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect } from '@playwright/test';
 
-import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Schemas } from '../src/lib/database.js';
-
-/**
- * @param {unknown} value
- */
-function safeJSONParse(value) {
-	try {
-		return JSON.parse(value);
-	} catch (e) {
-		console.warn('Failed to parse JSON value:', value, e);
-		return undefined; // Return the original value if parsing fails
-	}
-}
 
 /**
  * @import { Page, Locator } from '@playwright/test';
@@ -166,119 +153,18 @@ export async function getDatabaseRowById(page, tableName, id) {
 }
 
 /**
- * Returns object mapping metadata keys to their (runtime, deserialized) values
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} [param0.protocolId] keep only metadata from this protocol, strip the prefix (namespace) from the keys in the returned object
- * @param {string | {id: string} | {filename: string}} param0.image id of the image to get metadata from
- * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
+ * Get session object in database
+ * @param {{page: Page} & ({name: string} | {id: string})} param0
+ * @returns {Promise<typeof import('$lib/database').Schemas.Session.inferIn>}
  */
-export async function getMetadataValuesOfImage({ page, protocolId, image }) {
-	const { metadata } = await getImage({
-		page,
-		...(typeof image === 'string' ? { id: image } : image)
-	});
-	return Object.fromEntries(
-		Object.entries(metadata)
-			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
-			.map(([id, { value }]) => [
-				protocolId ? id.replace(`${protocolId}__`, '') : id,
-				safeJSONParse(value)
-			])
-	);
-}
-
-/**
- * Get metadata values set on the observation (.metadataOverrides)
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} param0.protocolId
- * @param {string} param0.observation label
- * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
- */
-export async function getMetadataOverridesOfObservation({ page, protocolId, observation }) {
-	const { metadataOverrides } = await getObservation({ page, label: observation });
-
-	return Object.fromEntries(
-		Object.entries(metadataOverrides)
-			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
-			.map(([id, { value }]) => [
-				protocolId ? id.replace(`${protocolId}__`, '') : id,
-				safeJSONParse(value)
-			])
-	);
-}
-
-/**
- * Get metadata values set on the session
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} param0.name session name
- * @param {string} param0.protocolId
- * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
- */
-async function getMetadataValuesOfSession({ page, name, protocolId }) {
-	const { metadata } = await getSession({ page, name });
-	return Object.fromEntries(
-		Object.entries(metadata)
-			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
-			.map(([id, { value }]) => [
-				protocolId ? id.replace(`${protocolId}__`, '') : id,
-				safeJSONParse(value)
-			])
-	);
-}
-
-/**
- *
- * @param {Page} page
- * @param {{image: {id: string} | {filename: string}} | {observation: string} | {session: {name: string}}} query
- * @param {string} metadataKey
- * @param {string} [protocolId]
- * @returns {Promise<import('$lib/metadata').RuntimeValue | undefined>}
- */
-export async function getMetadataValue(page, query, metadataKey, protocolId = lightProtocol.id) {
-	if ('image' in query) {
-		const metadata = await getMetadataValuesOfImage({
-			page,
-			image: query.image,
-			protocolId
-		});
-		await browserConsole.log(
-			page,
-			'Metadata of image',
-			query.image,
-			'for protocol',
-			protocolId,
-			metadata
-		);
-		return metadata[metadataKey];
-	}
-
-	if ('session' in query) {
-		const metadata = await getMetadataValuesOfSession({
-			page,
-			name: query.session.name,
-			protocolId
-		});
-		await browserConsole.log(
-			page,
-			'Metadata of session',
-			query.session.name,
-			'for protocol',
-			protocolId,
-			metadata
-		);
-		return metadata[metadataKey];
-	}
-
-	const metadataOverrides = await getMetadataOverridesOfObservation({
-		page,
-		protocolId,
-		observation: query.observation
-	});
-
-	return metadataOverrides[metadataKey];
+export async function getSession({ page, ...query }) {
+	const session = await page.evaluate(async ([query]) => {
+		const sessions = await window.DB.getAll('Session');
+		return sessions.find((s) => ('id' in query ? s.id === query.id : s.name === query.name));
+	}, /** @type {const} */ ([query]));
+	if (!session)
+		throw new Error(`Session with ${JSON.stringify(query)} not found in the database`);
+	return session;
 }
 
 /**
@@ -401,7 +287,7 @@ export async function setInferenceModels(page, models) {
  */
 export async function switchSession(page, name) {
 	await goHome(page);
-	await goToTab(page, 'sessions')
+	await goToTab(page, 'sessions');
 	// XXX: Wait until page is ready
 	await page.waitForTimeout(500);
 	await page.getByRole('heading', { name }).click();
@@ -414,7 +300,7 @@ export async function switchSession(page, name) {
  */
 export async function deleteSession(page, name) {
 	await goHome(page);
-	await goToTab(page, 'sessions')
+	await goToTab(page, 'sessions');
 	// XXX: Wait until page is ready
 	await page.waitForTimeout(500);
 	const sessionCard = page.getByRole('article').filter({
@@ -433,7 +319,7 @@ export async function deleteSession(page, name) {
  */
 export async function chooseFirstSession(page) {
 	await goHome(page);
-	await goToTab(page, 'sessions')
+	await goToTab(page, 'sessions');
 
 	await page.locator('main article:not([data-testid=new-session-card])').first().click();
 	await page.waitForURL((u) => u.hash === '#/import');
@@ -448,7 +334,7 @@ export async function changeSessionProtocol(page, name) {
 	await page.getByTestId('goto-current-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
 	await chooseInDropdown(page, 'protocol', name);
-	await goToTab(page, 'import')
+	await goToTab(page, 'import');
 }
 
 /**
@@ -456,7 +342,7 @@ export async function changeSessionProtocol(page, name) {
  */
 export async function goToProtocolManagement(page) {
 	await goHome(page);
-	await goToTab(page, 'protocols')
+	await goToTab(page, 'protocols');
 }
 
 /**
@@ -563,7 +449,7 @@ export function toast(page, message, { type = undefined } = {}) {
 export async function importResults(page, filepath, { waitForLoading = true } = {}) {
 	await setSettings({ page }, { showTechnicalMetadata: false });
 	await newSession(page);
-	await goToTab(page, 'import')
+	await goToTab(page, 'import');
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");

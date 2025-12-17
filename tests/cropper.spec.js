@@ -5,7 +5,6 @@ import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
-	getMetadataValue,
 	listTable,
 	loadDatabaseDump,
 	setImageMetadata,
@@ -260,7 +259,7 @@ test.describe('Cropper view', () => {
 			for (let i = 0; i < boxesCount; i++) {
 				await expect(
 					isImageConfirmedInDatabase(
-						page,
+						app,
 						`${image.fileId}_${i.toString().padStart(6, '0')}`
 					)
 				).resolves.toBe(confirmed);
@@ -698,17 +697,17 @@ function confirmedCropBadge(page) {
 
 /**
  * Gets the confirmed crop status of the image with the given id in the database.
- * @param {import('@playwright/test').Page} page
+ * @param {AppFixture} app
  * @param {string} id
  */
-async function isImageConfirmedInDatabase(page, id) {
+async function isImageConfirmedInDatabase(app, id) {
 	return Boolean(
-		await getMetadataValue(
-			page,
-			{ image: { id } },
-			exampleProtocol.crop.confirmationMetadata,
-			''
-		)
+		await app.db.metadata
+			.values({
+				imageId: id,
+				protocolId: ''
+			})
+			.then((v) => v[exampleProtocol.crop.confirmationMetadata])
 	);
 }
 

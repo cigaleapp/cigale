@@ -1,14 +1,12 @@
 import * as dates from 'date-fns';
 import * as yauzl from 'yauzl-promise';
 
-import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseFirstSession,
 	expectZipFiles,
 	firstObservationCard,
-	getMetadataValuesOfImage,
 	importPhotos,
 	importResults,
 	loadDatabaseDump,
@@ -19,11 +17,11 @@ import {
 } from './utils';
 
 test.describe('correct results.zip', () => {
-	test.beforeEach(async ({ page, app }) => {
+	test.beforeEach(async ({ page }) => {
 		await importResults(page, 'correct.zip');
 	});
 
-	test('has all the images', async ({ page, app }) => {
+	test('has all the images', async ({ page }) => {
 		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
@@ -311,11 +309,7 @@ test('can extract EXIF date from an image', async ({ page, app }) => {
 		'2025-04-25'
 	);
 
-	const metadataValues = await getMetadataValuesOfImage({
-		page,
-		protocolId: lightweightProtocol.id,
-		image: { filename: 'lil-fella.jpeg' }
-	});
+	const metadataValues = await app.db.metadata.values({ image: 'lil-fella.jpeg' });
 
 	expect(metadataValues).toMatchObject({
 		...metadataValues,
@@ -336,11 +330,7 @@ test('can extract EXIF GPS data from an image', async ({ page, app }) => {
 		'43.46715666666389, 11.885394999997223'
 	);
 
-	const metadataValues = await getMetadataValuesOfImage({
-		page,
-		protocolId: lightweightProtocol.id,
-		image: { filename: 'with-exif-gps.jpeg' }
-	});
+	const metadataValues = await app.db.metadata.values({ image: 'with-exif-gps.jpeg' });
 
 	expect(metadataValues).toMatchObject({
 		...metadataValues,

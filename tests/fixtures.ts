@@ -3,8 +3,11 @@ import { test as base, type Locator } from '@playwright/test';
 
 import type { Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
+import type { RuntimeValue } from '$lib/metadata';
+import type { MetadataValues } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
+import { safeJSONParse, throwError } from '$lib/utils';
 
 import fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
@@ -51,6 +54,20 @@ export type AppFixture = {
 			byName(label: string): Promise<IDBDatabaseType['Session']['value'] | undefined>;
 			byId(id: string): Promise<IDBDatabaseType['Session']['value'] | undefined>;
 			list(): Promise<IDBDatabaseType['Session']['value'][]>;
+		};
+		metadata: {
+			values(args: {
+				/** The image's filename */
+				image?: string;
+				/** The image's ID */
+				imageId?: string;
+				/** The observation's label */
+				observation?: string;
+				/** The session's name */
+				session?: string;
+				/** Remove namespace from metadata id (keys of returned object). By default, set to lightweight protocol's id */
+				protocolId?: string | null;
+			}): Promise<Record<string, RuntimeValue>>;
 		};
 	};
 	modals: {
@@ -111,6 +128,57 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 					list: async () => listTable(page, 'Session'),
 					byId: async (id) => getDatabaseRowById(page, 'Session', id),
 					byName: async (name) => getDatabaseRowByField(page, 'Session', 'name', name)
+				},
+				metadata: {
+					async values({
+						session,
+						image,
+						imageId,
+						observation: obs,
+						protocolId = lightProtocol.id
+					}) {
+						let object:
+							| undefined
+							| IDBDatabaseType['Image' | 'Observation' | 'Session']['value'];
+
+						if (imageId) {
+							object = await getDatabaseRowById(page, 'Image', imageId);
+						} else if (image) {
+							object = await getDatabaseRowByField(page, 'Image', 'filename', image);
+						} else if (obs) {
+							object = await getDatabaseRowByField(page, 'Observation', 'label', obs);
+						} else if (session) {
+							object = await getDatabaseRowByField(page, 'Session', 'name', session);
+						} else {
+							throw new Error(
+								'At least one of image, observation or session must be provided'
+							);
+						}
+
+						if (!object) {
+							throw new Error(
+								`Could not find database object for provided parameters: ${JSON.stringify(
+									{ session, image, observation: obs, imageId }
+								)}`
+							);
+						}
+
+						const values =
+							'metadataOverrides' in object
+								? object.metadataOverrides
+								: object.metadata;
+
+						return Object.fromEntries(
+							Object.entries(values)
+								.filter(([id]) =>
+									protocolId ? id.startsWith(`${protocolId}__`) : true
+								)
+								.map(([id, { value }]) => [
+									protocolId ? id.replace(`${protocolId}__`, '') : id,
+									safeJSONParse(value)
+								])
+						);
+					}
 				}
 			},
 			modals: {
@@ -133,7 +201,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			},
 			tabs: {
 				go: async (tab) => goToTab(page, tab),
-				get: tab => getTab(page, tab)
+				get: (tab) => getTab(page, tab)
 			},
 			tooltips: {
 				expectContent: async (element, content) =>
