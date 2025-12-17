@@ -4,45 +4,54 @@ import {
 	changeSessionProtocol,
 	chooseFirstSession,
 	firstObservationCard,
-	getMetadataOverridesOfObservation,
-	goToTab,
 	loadDatabaseDump,
-	metadataValueInDatabase,
-	setInferenceModels,
-	setSettings,
-	sidepanelMetadataSectionFor
+	setInferenceModels
 } from './utils';
 
 /**
  * @import { Page } from '@playwright/test';
+ * @import { AppFixture } from './fixtures';
  */
 
 /**
  *
  * @param {object} param0
  * @param {Page} param0.page
- * @param {'basic'|'kitchensink-protocol'} [param0.dump=basic] name of the database dump to load, without extension
- * @param {string} [param0.observation] name of the observation to open
- * @param {string} [param0.protocol] protocol to choose, if not the default one
+ * @param {AppFixture} param0.app
+ * @param {import('./filepaths.js').FixturePaths.DatabaseDumps} [param0.dump=basic] name of the database dump to load, without extension
  */
-async function initialize({
-	page,
-	dump = 'basic',
-	protocol = dump === 'basic' ? undefined : 'Kitchen sink',
-	observation = dump === 'basic' ? 'lil-fella' : 'leaf'
-}) {
-	await loadDatabaseDump(page, `${dump}.devalue`);
-
-	await setSettings({ page }, { showTechnicalMetadata: false });
+async function initialize({ page, app, dump = 'db/basic.devalue' }) {
+	await loadDatabaseDump(page, dump);
+	await app.settings.set({ showTechnicalMetadata: false });
 	await chooseFirstSession(page);
-	if (protocol) await changeSessionProtocol(page, protocol);
-	await setInferenceModels(page, { classify: 'Aucune inférence' });
-	await goToTab(page, 'classify');
-	await page.getByText(observation, { exact: true }).click({ timeout: 10_000 });
+	if (dump === 'db/kitchensink-protocol.devalue')
+		await changeSessionProtocol(page, 'Kitchen sink');
+	await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
+	await app.tabs.go('classify');
+	await page
+		.getByText(dump === 'db/basic.devalue' ? 'lil-fella' : 'leaf', { exact: true })
+		.click({ timeout: 10_000 });
 }
 
-test('allows changing metadata values on import page', issue(440), async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol' });
+/**
+ *
+ * @param {AppFixture} app
+ * @param {string} key
+ * @param {string} [observation]
+ * @param {string} [protocolId]
+ * @returns
+ */
+async function metadataValueInDatabase(
+	app,
+	key,
+	observation = 'leaf',
+	protocolId = 'io.github.cigaleapp.kitchensink'
+) {
+	return app.db.metadata.values({ observation, protocolId }).then((metadata) => metadata[key]);
+}
+
+test('allows changing metadata values on import page', issue(440), async ({ page, app }) => {
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	await page.getByTestId('goto-import').click();
 	await page.waitForURL((u) => u.hash === '#/import');
@@ -50,16 +59,15 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await expect(page.getByTestId('sidepanel')).toBeVisible();
 
 	// Set to True on image itself
-	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
+	await expect(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "":
 	    - img
 	  - button [disabled]:
 	    - img
 	`);
-	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
-	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
-		.toMatchAriaSnapshot(`
+	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
+	await expect(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
 	  - switch "" [checked]:
 	    - img
 	`);
@@ -68,11 +76,10 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await page.getByTestId('goto-classify').click();
 	await page.waitForURL((u) => u.hash === '#/classify');
 	await firstObservationCard(page).click();
-	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
-	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
-	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
-	await expect(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
-		.toMatchAriaSnapshot(`
+	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
+	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
+	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
+	await expect(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
 	  - switch "":
 	    - img
 	`);
@@ -81,7 +88,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await page.getByTestId('goto-import').click();
 	await page.waitForURL((u) => u.hash === '#/import');
 	await firstObservationCard(page).click();
-	await expect(sidepanelMetadataSectionFor(page, 'bool')).toMatchAriaSnapshot(`
+	await expect(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "" [checked]:
 	    - img
@@ -91,15 +98,15 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	`);
 });
 
-test('does not show technical metadata ', async ({ page }) => {
-	await initialize({ page });
+test('does not show technical metadata ', async ({ page, app }) => {
+	await initialize({ page, app });
 	await expect(
 		page.getByText('io.github.cigaleapp.arthropods.example__crop', { exact: true })
 	).toBeHidden();
 });
 
-test('can update a enum-type metadata with cascades', async ({ page }) => {
-	await initialize({ page });
+test('can update a enum-type metadata with cascades', async ({ page, app }) => {
+	await initialize({ page, app });
 
 	const nthCombobox = (/** @type {number} */ n) =>
 		page
@@ -238,7 +245,7 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 		.getByTestId('metadata-combobox-viewport')
 		.getByText('Dicyrtomina saundersi 18%')
 		.click();
-	await expect.soft(sidepanelMetadataSectionFor(page, 'Espèce')).toMatchAriaSnapshot(`
+	await expect.soft(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(`
 		  - text: Espèce
 		  - combobox: Dicyrtomina saundersi
 		  - button:
@@ -268,7 +275,7 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	// Click out and back again
 	await page.getByRole('main').click({ position: { x: 10, y: 10 } });
 	await page.getByText('lil-fella', { exact: true }).click();
-	await expect(sidepanelMetadataSectionFor(page, 'Espèce')).toMatchAriaSnapshot(
+	await expect(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(
 		`
 	  - text: Espèce
 	  - combobox: Dicyrtomina saundersi
@@ -278,11 +285,7 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 	);
 
 	// Check database
-	const metadata = await getMetadataOverridesOfObservation({
-		page,
-		protocolId: 'io.github.cigaleapp.arthropods.example.light',
-		observation: 'lil-fella'
-	});
+	const metadata = await app.db.metadata.values({ observation: 'lil-fella' });
 
 	expect(metadata).toEqual({
 		...metadata,
@@ -298,8 +301,8 @@ test('can update a enum-type metadata with cascades', async ({ page }) => {
 });
 
 test.describe('can search in a enum-type metadata combobox', () => {
-	test('by name', async ({ page }) => {
-		await initialize({ page });
+	test('by name', async ({ page, app }) => {
+		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
 		await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
@@ -355,8 +358,8 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		`);
 	});
 
-	test('by synonym', async ({ page }) => {
-		await initialize({ page });
+	test('by synonym', async ({ page, app }) => {
+		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
 		await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
@@ -409,37 +412,37 @@ test.describe('can search in a enum-type metadata combobox', () => {
 	});
 });
 
-test('can update a boolean-type metadata', issue(216), async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol' });
+test('can update a boolean-type metadata', issue(216), async ({ page, app }) => {
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	expect.soft(await metadataValueInDatabase(page, 'bool')).toBeUndefined();
+	expect.soft(await metadataValueInDatabase(app, 'bool')).toBeUndefined();
 	await expect
-		.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
+		.soft(app.sidepanel.metadataSection('bool').getByRole('switch'))
 		.not.toHaveAttribute('aria-checked');
 
-	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
+	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
 
-	await expect.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
+	await expect.soft(app.sidepanel.metadataSection('bool').getByRole('switch'))
 		.toMatchAriaSnapshot(`
 	  - switch "" [checked]:
 	    - img
 	`);
-	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(true);
+	expect.soft(await metadataValueInDatabase(app, 'bool')).toBe(true);
 
-	await sidepanelMetadataSectionFor(page, 'bool').getByRole('switch').click();
+	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
 
-	await expect.soft(sidepanelMetadataSectionFor(page, 'bool').getByRole('switch'))
+	await expect.soft(app.sidepanel.metadataSection('bool').getByRole('switch'))
 		.toMatchAriaSnapshot(`
 	  - switch "":
 	    - img
 	`);
-	expect.soft(await metadataValueInDatabase(page, 'bool')).toBe(false);
+	expect.soft(await metadataValueInDatabase(app, 'bool')).toBe(false);
 });
 
-test('shows crop-type metadata as non representable', async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol' });
+test('shows crop-type metadata as non representable', async ({ page, app }) => {
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	await expect(sidepanelMetadataSectionFor(page, 'crop')).toMatchAriaSnapshot(`
+	await expect(app.sidepanel.metadataSection('crop')).toMatchAriaSnapshot(`
 	  - text: crop
 	  - img
 	  - paragraph: Irreprésentable
@@ -448,22 +451,22 @@ test('shows crop-type metadata as non representable', async ({ page }) => {
 	`);
 });
 
-test('can update a date-type metadata', async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol' });
+test('can update a date-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const dateSection = sidepanelMetadataSectionFor(page, 'date');
+	const dateSection = app.sidepanel.metadataSection('date');
 	await expect(dateSection.getByRole('textbox')).toHaveValue('');
 
 	await dateSection.getByRole('textbox').fill('2025-05-01');
 
 	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
-	expect(await metadataValueInDatabase(page, 'date')).toBe('2025-05-01T00:00:00');
+	expect(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
 });
 
-test('can update a float-type metadata', async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol' });
+test('can update a float-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const floatSection = sidepanelMetadataSectionFor(page, 'float');
+	const floatSection = app.sidepanel.metadataSection('float');
 	await expect(floatSection.getByRole('textbox')).toHaveValue('');
 
 	await floatSection.getByRole('textbox').fill('3.14');
@@ -471,13 +474,13 @@ test('can update a float-type metadata', async ({ page }) => {
 	await floatSection.getByRole('button', { name: 'Incrémenter' }).click();
 
 	await expect(floatSection.getByRole('textbox')).toHaveValue('4.14');
-	expect(await metadataValueInDatabase(page, 'float')).toBe(4.14);
+	expect(await metadataValueInDatabase(app, 'float')).toBe(4.14);
 });
 
-test('can update a integer-type metadata', async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol' });
+test('can update a integer-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const integerSection = sidepanelMetadataSectionFor(page, 'integer');
+	const integerSection = app.sidepanel.metadataSection('integer');
 	await expect(integerSection.getByRole('textbox')).toHaveValue('');
 
 	await integerSection.getByRole('textbox').fill('42');
@@ -485,18 +488,18 @@ test('can update a integer-type metadata', async ({ page }) => {
 	await integerSection.getByRole('button', { name: 'Décrémenter' }).click();
 
 	await expect(integerSection.getByRole('textbox')).toHaveValue('41');
-	expect(await metadataValueInDatabase(page, 'integer')).toBe(41);
+	expect(await metadataValueInDatabase(app, 'integer')).toBe(41);
 });
 
-test('can update a string-type metadata', async ({ page }) => {
-	await initialize({ page, dump: 'kitchensink-protocol' });
+test('can update a string-type metadata', async ({ page, app }) => {
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const stringSection = sidepanelMetadataSectionFor(page, 'string');
+	const stringSection = app.sidepanel.metadataSection('string');
 	await expect(stringSection.getByRole('textbox')).toHaveValue('');
 
 	await stringSection.getByRole('textbox').fill('Hello world');
 	await stringSection.getByRole('textbox').blur();
 
 	await expect(stringSection.getByRole('textbox')).toHaveValue('Hello world');
-	expect(await metadataValueInDatabase(page, 'string')).toBe('Hello world');
+	expect(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
 });

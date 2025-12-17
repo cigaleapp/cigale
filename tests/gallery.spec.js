@@ -1,11 +1,11 @@
 import { expect, test } from './fixtures';
-import { goToTab, importPhotos, newSession, openSettings, setSettings } from './utils';
+import { importPhotos, newSession } from './utils';
 
 test.describe('sorting', () => {
-	test.beforeEach(async ({ page }) => {
+	test.beforeEach(async ({ page, app }) => {
 		await newSession(page);
-		await goToTab(page, 'import');
-		await setSettings({ page }, { showTechnicalMetadata: true });
+		await app.tabs.go('import');
+		await app.settings.set({ showTechnicalMetadata: true });
 
 		// Import real images from fixtures (these files must exist)
 		await importPhotos(
@@ -22,8 +22,8 @@ test.describe('sorting', () => {
 	 * @param {string[]} order
 	 */
 	async function assertCardsOrder(sortKey, order) {
-		test(`by ${sortKey}`, async ({ page }) => {
-			await openSettings(page);
+		test(`by ${sortKey}`, async ({ page, app }) => {
+			await app.settings.open();
 			const optionLabel = {
 				filename: 'Fichier',
 				date: 'Date'

@@ -1,24 +1,15 @@
 import { expect, test } from './fixtures';
-import {
-	chooseFirstSession,
-	getImage,
-	getObservation,
-	goToTab,
-	loadDatabaseDump,
-	observationCard,
-	setInferenceModels,
-	setSettings
-} from './utils';
+import { chooseFirstSession, loadDatabaseDump, observationCard, setInferenceModels } from './utils';
 
-test.beforeEach(async ({ page }) => {
-	await setSettings({ page }, { gallerySort: { direction: 'asc', key: 'filename' } });
-	await loadDatabaseDump(page, 'basic.devalue');
+test.beforeEach(async ({ page, app }) => {
+	await app.settings.set({ gallerySort: { direction: 'asc', key: 'filename' } });
+	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, { classify: 'Aucune inférence' });
-	await goToTab(page, 'classify');
+	await app.tabs.go('classify');
 });
 
-test('allows merging and unrolling two observations', async ({ page }) => {
+test('allows merging and unrolling two observations', async ({ page, app }) => {
 	const src = {
 		lilfella: await observationImage(page, 'lil-fella').getAttribute('src'),
 		cyan: await observationImage(page, 'cyan').getAttribute('src')
@@ -33,14 +24,14 @@ test('allows merging and unrolling two observations', async ({ page }) => {
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
 
 	const imageIds = {
-		lilfella: await getImage({ page, filename: 'lil-fella.jpeg' }),
-		cyan: await getImage({ page, filename: 'cyan.jpeg' })
+		lilfella: await app.db.image.byFilename('lil-fella.jpeg'),
+		cyan: await app.db.image.byFilename('cyan.jpeg')
 	};
 
 	if (!imageIds.lilfella) throw new Error('Could not get lil-fella image ID');
 	if (!imageIds.cyan) throw new Error('Could not get cyan image ID');
 
-	expect(await getObservation({ page, label: 'lil-fella' })).toHaveProperty('images', [
+	expect(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
 		imageIds.lilfella.id,
 		imageIds.cyan.id
 	]);
@@ -73,7 +64,7 @@ test('allows merging and unrolling two observations', async ({ page }) => {
 	await expect(observationCard(page, 'lil-fella.jpeg')).not.toBeVisible();
 });
 
-test('allows merging three observations', async ({ page }) => {
+test('allows merging three observations', async ({ page, app }) => {
 	await selectObservation(page, 'leaf');
 	await selectObservation(page, 'lil-fella');
 	await selectObservation(page, 'cyan');
@@ -83,16 +74,16 @@ test('allows merging three observations', async ({ page }) => {
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
 
 	const imageIds = {
-		lilfella: await getImage({ page, filename: 'lil-fella.jpeg' }),
-		cyan: await getImage({ page, filename: 'cyan.jpeg' }),
-		leaf: await getImage({ page, filename: 'leaf.jpeg' })
+		lilfella: await app.db.image.byFilename('lil-fella.jpeg'),
+		cyan: await app.db.image.byFilename('cyan.jpeg'),
+		leaf: await app.db.image.byFilename('leaf.jpeg')
 	};
 
 	if (!imageIds.lilfella) throw new Error('Could not get lil-fella image ID');
 	if (!imageIds.cyan) throw new Error('Could not get cyan image ID');
 	if (!imageIds.leaf) throw new Error('Could not get leaf image ID');
 
-	expect(await getObservation({ page, label: 'leaf' })).toHaveProperty('images', [
+	expect(await app.db.observation.byLabel('leaf')).toHaveProperty('images', [
 		imageIds.leaf.id,
 		imageIds.lilfella.id,
 		imageIds.cyan.id
@@ -109,7 +100,7 @@ test('allows merging three observations', async ({ page }) => {
 	await expect(observationImage(page, 'leaf')).toHaveAttribute('src', leafImageSrc);
 });
 
-test('allows merging a second time into the same observation', async ({ page }) => {
+test('allows merging a second time into the same observation', async ({ page, app }) => {
 	await selectObservation(page, 'lil-fella');
 	await selectObservation(page, 'cyan');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
@@ -124,23 +115,23 @@ test('allows merging a second time into the same observation', async ({ page }) 
 	    - button "3"
 	`);
 	const imageIds = {
-		lilfella: await getImage({ page, filename: 'lil-fella.jpeg' }),
-		cyan: await getImage({ page, filename: 'cyan.jpeg' }),
-		leaf: await getImage({ page, filename: 'leaf.jpeg' })
+		lilfella: await app.db.image.byFilename('lil-fella.jpeg'),
+		cyan: await app.db.image.byFilename('cyan.jpeg'),
+		leaf: await app.db.image.byFilename('leaf.jpeg')
 	};
 
 	if (!imageIds.lilfella) throw new Error('Could not get lil-fella image ID');
 	if (!imageIds.cyan) throw new Error('Could not get cyan image ID');
 	if (!imageIds.leaf) throw new Error('Could not get leaf image ID');
 
-	expect(await getObservation({ page, label: 'lil-fella' })).toHaveProperty('images', [
+	expect(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
 		imageIds.lilfella.id,
 		imageIds.cyan.id,
 		imageIds.leaf.id
 	]);
 });
 
-test('can split merged observations', async ({ page }) => {
+test('can split merged observations', async ({ page, app }) => {
 	await selectObservation(page, 'lil-fella');
 	await selectObservation(page, 'cyan');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();

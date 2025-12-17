@@ -2,73 +2,67 @@ import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	chooseInDropdown,
 	deleteSession,
-	getMetadataValue,
-	getSession,
 	goToProtocolManagement,
-	goToTab,
 	importPhotos,
 	importProtocol,
-	metadataValueInDatabase,
 	newSession,
 	sessionMetadataSectionFor,
-	setSettings,
-	switchSession,
-	waitForLoadingEnd
+	switchSession
 } from './utils';
 
 test.describe('isolation', () => {
 	test.beforeEach(() => {
 		test.setTimeout(40_000);
 	});
-	test('no images from one session shows up in another', async ({ page }) => {
+	test('no images from one session shows up in another', async ({ page, app }) => {
 		await newSession(page, { name: 'Session A' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
-		await waitForLoadingEnd(page);
+		await app.loading.wait();
 
 		await newSession(page, { name: 'Session B' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
 		await importPhotos({ page }, 'debugsquare.png');
-		await waitForLoadingEnd(page);
+		await app.loading.wait();
 
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
 		await switchSession(page, 'Session A');
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 		await expect(page.getByText('debugsquare.png')).not.toBeVisible();
 	});
 
-	test('deleting a session only deletes its images', async ({ page }) => {
+	test('deleting a session only deletes its images', async ({ page, app }) => {
 		await newSession(page, { name: 'Session A' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
-		await waitForLoadingEnd(page);
+		await app.loading.wait();
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
 		await newSession(page, { name: 'Session B' });
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await importPhotos({ page }, 'debugsquare.png');
-		await waitForLoadingEnd(page);
+		await app.loading.wait();
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 
 		await deleteSession(page, 'Session A');
 		await expect(page.getByText('Session A')).not.toBeVisible();
 
 		await switchSession(page, 'Session B');
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 	});
 });
 
-test('import into new session', async ({ page }) => {
-	await setSettings({ page }, { showTechnicalMetadata: false });
+test('import into new session', async ({ page, app }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
 	const picker = page.waitForEvent('filechooser');
 	await page.getByRole('button', { name: 'Importer un export .zip' }).click();
 	await picker.then((picker) => {
@@ -84,10 +78,10 @@ test('import into new session', async ({ page }) => {
 	await expect(page.getByText('with-exif-gps.jpeg')).toBeVisible();
 	await expect(page.locator('main article')).toHaveCount(4);
 
-	await goToTab(page, 'crop');
+	await app.tabs.go('crop');
 	await expect(page.locator('main header > *').nth(1)).toHaveText('4 éléments');
 
-	await goToTab(page, 'classify');
+	await app.tabs.go('classify');
 	await page.getByText('cyan', { exact: true }).click();
 	await expect(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: Espèce
@@ -235,14 +229,14 @@ test('import into new session', async ({ page }) => {
 	);
 });
 
-test('changing metadata values saves them in the database', async ({ page }) => {
+test('changing metadata values saves them in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Metadata session' });
 	await page.getByTestId('goto-current-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
 
 	/** @param {string} key */
 	const metadataValueFor = async (key) =>
-		getMetadataValue(page, { session: { name: 'Metadata session' } }, key);
+		app.db.metadata.values({ session: 'Metadata session' }).then((values) => values[key]);
 
 	expect(await metadataValueFor('prospection_duration')).toBeUndefined();
 
@@ -270,14 +264,14 @@ test('changing metadata values saves them in the database', async ({ page }) => 
 	expect(await metadataValueFor('wind')).toBe('strong');
 });
 
-test('changing session info saves in the database', async ({ page }) => {
+test('changing session info saves in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Test!!' });
 	await page.getByTestId('goto-current-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
 
 	const id = new URL(page.url()).hash.split('/')[2];
 
-	expect(await getSession({ page, id })).toMatchObject({
+	expect(await app.db.session.byId(id)).toMatchObject({
 		id,
 		name: 'Test!!',
 		createdAt: expect.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z/),
@@ -291,36 +285,36 @@ test('changing session info saves in the database', async ({ page }) => {
 	await nameInput.fill('New name');
 	await nameInput.blur();
 
-	expect(await getSession({ page, id })).toHaveProperty('name', 'New name');
+	expect(await app.db.session.byId(id)).toHaveProperty('name', 'New name');
 
 	const descriptionInput = page.getByRole('textbox', { name: 'Description' });
 	await descriptionInput.fill('A description');
 	await descriptionInput.blur();
 
-	expect(await getSession({ page, id })).toHaveProperty('description', 'A description');
+	expect(await app.db.session.byId(id)).toHaveProperty('description', 'A description');
 });
 
-test('can change protocol of session', async ({ page }) => {
-	await setSettings({ page }, { showTechnicalMetadata: false });
+test('can change protocol of session', async ({ page, app }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
 	await goToProtocolManagement(page);
-	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
+	await importProtocol(page, 'kitchensink.cigaleprotocol.yaml');
 	await newSession(page, { name: 'Test' });
 
 	await page.getByTestId('goto-current-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
 
-	expect(await getSession({ page, name: 'Test' })).toHaveProperty('protocol', exampleProtocol.id);
+	expect(await app.db.session.byName('Test')).toHaveProperty('protocol', exampleProtocol.id);
 
 	await chooseInDropdown(page, 'protocol', 'Kitchen sink');
 
-	expect(await getSession({ page, name: 'Test' })).toHaveProperty(
+	expect(await app.db.session.byName('Test')).toHaveProperty(
 		'protocol',
 		'io.github.cigaleapp.kitchensink'
 	);
 
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg');
-	await waitForLoadingEnd(page);
+	await app.loading.wait();
 	await page.getByText('cyan.jpeg').click();
 	await expect(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: bool

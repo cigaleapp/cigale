@@ -1,15 +1,15 @@
 node_modules
 
 # Output
-.output
-.vercel
-.netlify
-.wrangler
-/.svelte-kit
-/build
+.output/
+.vercel/
+.netlify/
+.wrangler/
+.svelte-kit/
+build/
 
 # OS
-.DS_Store
+.DS_Store/
 Thumbs.db
 
 # Env
@@ -23,8 +23,8 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # Paraglide
-src/lib/paraglide
-public
+src/lib/paraglide/
+public/
 
 
 # JSON Schemas are generated from ArkType schemas to ensure that they are always in sync
@@ -34,27 +34,30 @@ scripts/jessica-joachim-crawler-report.md
 scripts/jessica-joachim-404cache.json
 
 # Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-tests/results
-coverage
-html
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+tests/results/
+coverage/
+html/
 google-drive*.json
-slides
+slides/
 scripts/gbif.json
 examples/old-arthropods.cigaleprotocol.json
-.vite/build
+.vite/build/
 
 out/
 
 # Fonts: managed by scripts/download-google-fonts.js so that they're up-to-date
 # Runs on prebuild
-static/fonts
+static/fonts/
 static/fonts.css
 classification-arthropoda-polymny-2025-04-11.onnx
 arthropod_detector_yolo11n_conf0.437.onnx
 lightweight-80-classmapping.txt
 model_classif.onnx
 polymny-17k-classmapping.txt
+
+# ééé
+tests/filepaths.ts

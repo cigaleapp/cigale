@@ -1,33 +1,24 @@
 import * as dates from 'date-fns';
 import * as yauzl from 'yauzl-promise';
 
-import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
 import {
 	chooseFirstSession,
-	expectTooltipContent,
 	expectZipFiles,
 	firstObservationCard,
-	getMetadataValuesOfImage,
-	getTab,
-	goToTab,
 	importPhotos,
 	importResults,
-	listTable,
 	loadDatabaseDump,
 	loadingText,
 	newSession,
 	observationCard,
-	setInferenceModels,
-	sidepanelMetadataSectionFor,
-	toast,
-	waitForLoadingEnd
+	setInferenceModels
 } from './utils';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'correct.zip');
+		await importResults(page, 'exports/correct.zip');
 	});
 
 	test('has all the images', async ({ page }) => {
@@ -38,8 +29,8 @@ test.describe('correct results.zip', () => {
 		await expect(page.getByText(/\.jpeg$/)).toHaveCount(4);
 	});
 
-	test('has the correct bounding boxes @webkit-no-parallelization', async ({ page }) => {
-		await goToTab(page, 'crop');
+	test('has the correct bounding boxes @webkit-no-parallelization', async ({ page, app }) => {
+		await app.tabs.go('crop');
 
 		/**
 		 *
@@ -52,9 +43,9 @@ test.describe('correct results.zip', () => {
 			).toHaveCount(count);
 		}
 
-		const images = await listTable(page, 'Image').then((images) =>
-			images.sort((a, b) => dates.compareAsc(a.addedAt, b.addedAt))
-		);
+		const images = await app.db.image
+			.list()
+			.then((images) => images.sort((a, b) => dates.compareAsc(a.addedAt, b.addedAt)));
 
 		await expectBoundingBoxesCount(images[0].fileId ?? '', 1);
 		await expectBoundingBoxesCount(images[1].fileId ?? '', 1);
@@ -63,9 +54,10 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('does not re-analyze when going to classify tab @webkit-no-parallelization', async ({
-		page
+		page,
+		app
 	}) => {
-		await goToTab(page, 'classify');
+		await app.tabs.go('classify');
 		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
 		});
@@ -135,7 +127,7 @@ test.describe('correct results.zip', () => {
 		`);
 	});
 
-	test('exporting does not fail', async ({ page }) => {
+	test('exporting does not fail', async ({ page, app }) => {
 		await page.getByRole('button', { name: 'Résultats' }).click();
 		await page.getByText(/et images originales/i).click();
 		await page.getByText('results.zip').click();
@@ -160,89 +152,90 @@ test.describe('correct results.zip', () => {
 
 test.describe('missing original photos', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'no-originals.zip', { waitForLoading: false });
+		await importResults(page, 'exports/no-originals.zip', { waitForLoading: false });
 	});
 
-	test('fails with the appropriate error message', async ({ page }) => {
-		await expect(toast(page, 'Aucune image trouvée', { type: 'error' })).toBeVisible();
+	test('fails with the appropriate error message', async ({ app }) => {
+		await expect(app.toasts.byMessage('error', 'Aucune image trouvée')).toBeVisible();
 	});
 });
 
 test.describe('missing analysis file', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'no-analysis.zip', { waitForLoading: false });
+		await importResults(page, 'exports/no-analysis.zip', { waitForLoading: false });
 	});
 
-	test('fails with the appriopriate error message', async ({ page }) => {
-		await expect(toast(page, "Aucun fichier d'analyse", { type: 'error' })).toBeVisible();
+	test('fails with the appriopriate error message', async ({ app }) => {
+		await expect(app.toasts.byMessage('error', "Aucun fichier d'analyse")).toBeVisible();
 	});
 });
 
 test.describe('wrong protocol used', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'wrong-protocol.zip', { waitForLoading: false });
+		await importResults(page, 'exports/wrong-protocol.zip', { waitForLoading: false });
 	});
 
-	test('fails with the appriopriate error message', async ({ page }) => {
-		await expect(
-			toast(page, 'le protocole de la session est', { type: 'error' })
-		).toBeVisible();
+	test('fails with the appriopriate error message', async ({ app }) => {
+		await expect(app.toasts.byMessage('error', 'le protocole de la session est')).toBeVisible();
 	});
 });
 
 test.describe('invalid json analysis', async () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'invalid-json-analysis.zip', { waitForLoading: false });
+		await importResults(page, 'exports/invalid-json-analysis.zip', { waitForLoading: false });
 	});
 
-	test('fails with the appriopriate error message', async ({ page }) => {
-		await expect(toast(page, 'JSON', { type: 'error' })).toBeVisible();
+	test('fails with the appriopriate error message', async ({ app }) => {
+		await expect(app.toasts.byMessage('error', 'JSON')).toBeVisible();
 	});
 });
 
-test('fails when importing a .CR2 image', issue(413), async ({ page }) => {
+test('fails when importing a .CR2 image', issue(413), async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, 'sample.cr2');
 	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 5_000
 	});
-	await expectTooltipContent(
-		page,
+	await app.tooltips.expectContent(
 		firstObservationCard(page),
 		/Les fichiers .+? ne sont pas (encore )?supportés/
 	);
 });
 
-test('can import a large image', issue(412, 415), async ({ page }) => {
+test('can import a large image', issue(412, 415), async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, 'large-image.jpeg');
 	await expect(page.getByText('large-image.jpeg')).toBeVisible({
 		timeout: 10_000
 	});
-	await goToTab(page, 'classify');
+	await app.tabs.go('classify');
 	await expect(page.getByText('large-image')).toBeVisible({
 		timeout: 10_000
 	});
 });
 
-test('cannot import an extremely large image', issue(412, 414), async ({ page }) => {
+test('cannot import an extremely large image', issue(412, 414), async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, '20K-gray.jpeg');
-	await waitForLoadingEnd(page);
-	await expectTooltipContent(
-		page,
+	await app.loading.wait();
+	await app.tooltips.expectContent(
 		firstObservationCard(page),
 		/L'image est trop grande pour être traitée/
 	);
 });
 
-test.fixme('can cancel import', issue(430), async ({ page }) => {
+test.fixme('can cancel import', issue(430), async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
-	await importPhotos({ page, wait: false }, ['lil-fella', 'cyan', 'leaf', 'with-exif-gps']);
+	await app.tabs.go('import');
+	await importPhotos({ page, wait: false }, [
+		'lil-fella.jpeg',
+		'cyan.jpeg',
+		'leaf.jpeg',
+		'with-exif-gps.jpeg'
+	]);
 	await expect(firstObservationCard(page)).toHaveText(loadingText, {
 		timeout: 10_000
 	});
@@ -255,13 +248,13 @@ test.fixme('can cancel import', issue(430), async ({ page }) => {
 	});
 });
 
-test('can import in multiple batches', async ({ page }) => {
+test('can import in multiple batches', async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos(
 		{ page, wait: false },
-		['lil-fella', 'leaf'],
-		['with-exif-gps', '20K-gray', 'debugsquare.png']
+		['lil-fella.jpeg', 'leaf.jpeg'],
+		['with-exif-gps.jpeg', '20K-gray.jpeg', 'debugsquare.png']
 	);
 	await expect(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 60_000
@@ -276,56 +269,52 @@ test('can import in multiple batches', async ({ page }) => {
 test(
 	'deleting an image in the import tab does not create ghost observation cards',
 	issue(439),
-	async ({ page }) => {
-		await loadDatabaseDump(page, 'basic.devalue');
+	async ({ page, app }) => {
+		await loadDatabaseDump(page, 'db/basic.devalue');
 		await chooseFirstSession(page);
 		await setInferenceModels(page, { classify: 'Aucune inférence' });
-		await goToTab(page, 'classify');
-		await goToTab(page, 'import');
+		await app.tabs.go('classify');
+		await app.tabs.go('import');
 		await observationCard(page, 'cyan.jpeg').click();
 		await page
 			.getByTestId('sidepanel')
 			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
 			.click();
-		await goToTab(page, 'classify');
+		await app.tabs.go('classify');
 		await expect(observationCard(page, 'cyan')).not.toBeVisible();
 	}
 );
 
-test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page }) => {
+test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
-	await importPhotos({ page }, 'lil-fella', 'cyan');
+	await app.tabs.go('import');
+	await importPhotos({ page }, 'lil-fella.jpeg', 'cyan.jpeg');
 
 	// Now, we have at least one image loaded (so technically the classify tab should be accessible),
 	// but the other image is still being analyzed.
 
-	await goToTab(page, 'crop');
+	await app.tabs.go('crop');
 
-	await expect(getTab(page, 'classify')).toBeDisabled({ timeout: 100 });
+	await expect(app.tabs.get('classify')).toBeDisabled({ timeout: 100 });
 
 	// Once everything is done, make sure that we can go to the classify tab
-	await waitForLoadingEnd(page);
+	await app.loading.wait();
 
-	await expect(getTab(page, 'classify')).toBeEnabled({ timeout: 1_000 });
-	await goToTab(page, 'classify');
+	await expect(app.tabs.get('classify')).toBeEnabled({ timeout: 1_000 });
+	await app.tabs.go('classify');
 });
 
-test('can extract EXIF date from an image', async ({ page }) => {
+test('can extract EXIF date from an image', async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
-	await importPhotos({ page }, 'lil-fella');
-	await waitForLoadingEnd(page);
+	await app.tabs.go('import');
+	await importPhotos({ page }, 'lil-fella.jpeg');
+	await app.loading.wait();
 	await firstObservationCard(page).click();
-	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+	await expect(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
 		'2025-04-25'
 	);
 
-	const metadataValues = await getMetadataValuesOfImage({
-		page,
-		protocolId: lightweightProtocol.id,
-		image: { filename: 'lil-fella.jpeg' }
-	});
+	const metadataValues = await app.db.metadata.values({ image: 'lil-fella.jpeg' });
 
 	expect(metadataValues).toMatchObject({
 		...metadataValues,
@@ -333,24 +322,20 @@ test('can extract EXIF date from an image', async ({ page }) => {
 	});
 });
 
-test('can extract EXIF GPS data from an image', async ({ page }) => {
+test('can extract EXIF GPS data from an image', async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
-	await importPhotos({ page }, 'with-exif-gps');
-	await waitForLoadingEnd(page);
+	await app.tabs.go('import');
+	await importPhotos({ page }, 'with-exif-gps.jpeg');
+	await app.loading.wait();
 	await firstObservationCard(page).click();
-	await expect(sidepanelMetadataSectionFor(page, 'Date').getByRole('textbox')).toHaveValue(
+	await expect(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
 		'2008-10-22'
 	);
-	await expect(
-		sidepanelMetadataSectionFor(page, 'Localisation').getByRole('textbox')
-	).toHaveValue('43.46715666666389, 11.885394999997223');
+	await expect(app.sidepanel.metadataSection('Localisation').getByRole('textbox')).toHaveValue(
+		'43.46715666666389, 11.885394999997223'
+	);
 
-	const metadataValues = await getMetadataValuesOfImage({
-		page,
-		protocolId: lightweightProtocol.id,
-		image: { filename: 'with-exif-gps.jpeg' }
-	});
+	const metadataValues = await app.db.metadata.values({ image: 'with-exif-gps.jpeg' });
 
 	expect(metadataValues).toMatchObject({
 		...metadataValues,

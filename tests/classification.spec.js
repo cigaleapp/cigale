@@ -1,24 +1,17 @@
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import {
-	firstObservationCard,
-	getObservation,
-	goToTab,
-	importPhotos,
-	newSession,
-	waitForLoadingEnd
-} from './utils';
+import { firstObservationCard, importPhotos, newSession } from './utils';
 
-test('allows cancelling classification of an observation', issue(430), async ({ page }) => {
+test('allows cancelling classification of an observation', issue(430), async ({ page, app }) => {
 	await newSession(page);
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
 	});
-	await goToTab(page, 'crop');
-	await waitForLoadingEnd(page);
-	await goToTab(page, 'classify');
+	await app.tabs.go('crop');
+	await app.loading.wait();
+	await app.tabs.go('classify');
 	await expect(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
 	});
@@ -27,5 +20,5 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await expect(firstObservationCard(page)).not.toBeVisible({
 		timeout: 5_000
 	});
-	expect(async () => getObservation({ page, label: 'lil-fella' })).rejects.toThrow();
+	expect(await app.db.observation.byLabel('lil-fella')).toBeUndefined();
 });

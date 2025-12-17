@@ -3,18 +3,11 @@ import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations';
 import { expect, test } from './fixtures';
-import {
-	expectZipFiles,
-	firstObservationCard,
-	goToTab,
-	importPhotos,
-	newSession,
-	setSettings
-} from './utils';
+import { expectZipFiles, firstObservationCard, importPhotos, newSession } from './utils';
 
-test('correctly applies crop padding', issue(463), async ({ page }) => {
+test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	// Disable inference to go faster
-	await setSettings({ page }, { showTechnicalMetadata: false });
+	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page, {
 		models: {
 			crop: 'Aucune inférence',
@@ -22,10 +15,10 @@ test('correctly applies crop padding', issue(463), async ({ page }) => {
 		}
 	});
 
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, 'debugsquare.png');
 
-	await goToTab(page, 'crop');
+	await app.tabs.go('crop');
 	// Reduce flakiness
 	await page.waitForTimeout(1_000);
 	await firstObservationCard(page).click();

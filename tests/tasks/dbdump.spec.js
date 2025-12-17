@@ -6,11 +6,9 @@ import {
 	confirmDeletionModal,
 	dumpDatabase,
 	goToProtocolManagement,
-	goToTab,
 	importPhotos,
 	importProtocol,
 	importResults,
-	modal,
 	newSession,
 	sessionMetadataSectionFor
 } from '../utils.js';
@@ -23,15 +21,15 @@ test.skip(
 test.describe('Database dumps', () => {
 	test('basic', async ({ page }) => {
 		await goToProtocolManagement(page);
-		await importProtocol(page, '../../examples/arthropods.light.cigaleprotocol.json');
+		await importProtocol(page, 'arthropods.light.cigaleprotocol.json');
 
-		await importResults(page, 'correct.zip');
+		await importResults(page, 'exports/correct.zip');
 		await dumpDatabase(page, 'basic.devalue');
 	});
 
-	test('kitchensink-protocol', async ({ page }) => {
+	test('kitchensink-protocol', async ({ page, app }) => {
 		await goToProtocolManagement(page);
-		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
+		await importProtocol(page, 'kitchensink.cigaleprotocol.yaml');
 		await page
 			.getByRole('listitem')
 			.filter({ hasText: exampleProtocol.id })
@@ -41,7 +39,7 @@ test.describe('Database dumps', () => {
 		await expect(page.getByText('Protocole supprimé')).toBeVisible();
 		await newSession(page);
 
-		await goToTab(page, 'import');
+		await app.tabs.go('import');
 		await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
 		await page.waitForTimeout(2_000);
 		await dumpDatabase(page, 'kitchensink-protocol.devalue');
@@ -52,8 +50,9 @@ test.describe('Exports', () => {
 	/**
 	 * @param {object} param0
 	 * @param {import('@playwright/test').Page} param0.page
+	 * @param {import('../fixtures.js').AppFixture} param0.app
 	 */
-	async function prepare({ page }) {
+	async function prepare({ page, app }) {
 		await newSession(page, { name: 'Testing session' });
 
 		await page.getByTestId('goto-current-session').click();
@@ -71,19 +70,25 @@ test.describe('Exports', () => {
 			.getByRole('radio', { name: 'Modéré' })
 			.check();
 
-		await goToTab(page, 'import');
-		await importPhotos({ page }, 'cyan', 'leaf', 'lil-fella', 'with-exif-gps');
+		await app.tabs.go('import');
+		await importPhotos(
+			{ page },
+			'cyan.jpeg',
+			'leaf.jpeg',
+			'lil-fella.jpeg',
+			'with-exif-gps.jpeg'
+		);
 		await expect(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {
 			timeout: 30_000
 		});
 
-		await goToTab(page, 'crop');
+		await app.tabs.go('crop');
 		await page.getByText('lil-fella.jpeg').click();
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await page.waitForTimeout(1000);
 		await page.getByRole('button', { name: 'Autres photos Esc' }).click();
 
-		await goToTab(page, 'classify');
+		await app.tabs.go('classify');
 		await page.waitForTimeout(1000);
 		await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
 			timeout: 10_000
@@ -92,8 +97,8 @@ test.describe('Exports', () => {
 		await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, { timeout: 10_000 });
 	}
 
-	test('correct', async ({ page }) => {
-		await prepare({ page });
+	test('correct', async ({ page, app }) => {
+		await prepare({ page, app });
 		await page.getByRole('button', { name: 'Résultats' }).click();
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();
@@ -101,8 +106,8 @@ test.describe('Exports', () => {
 		await download.saveAs('./tests/fixtures/exports/correct.zip');
 	});
 
-	test('no-originals', async ({ page }) => {
-		await prepare({ page });
+	test('no-originals', async ({ page, app }) => {
+		await prepare({ page, app });
 		await page.getByRole('button', { name: 'Résultats' }).click();
 		await page.getByText('Métadonnées et images recadrées').click();
 		await page.getByText('results.zip').click();
@@ -110,8 +115,8 @@ test.describe('Exports', () => {
 		await download.saveAs('./tests/fixtures/exports/no-originals.zip');
 	});
 
-	test('no-analysis', async ({ page }) => {
-		await prepare({ page });
+	test('no-analysis', async ({ page, app }) => {
+		await prepare({ page, app });
 		await page.getByRole('button', { name: 'Résultats' }).click();
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();
@@ -127,8 +132,8 @@ test.describe('Exports', () => {
 		await writeFile(zipPath, newZipData);
 	});
 
-	test('invalid-json-analysis', async ({ page }) => {
-		await prepare({ page });
+	test('invalid-json-analysis', async ({ page, app }) => {
+		await prepare({ page, app });
 		await page.getByRole('button', { name: 'Résultats' }).click();
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();
@@ -148,8 +153,8 @@ test.describe('Exports', () => {
 		await writeFile(zipPath, newZipData);
 	});
 
-	test('wrong-protocol', async ({ page }) => {
-		await prepare({ page });
+	test('wrong-protocol', async ({ page, app }) => {
+		await prepare({ page, app });
 		await page.getByRole('button', { name: 'Résultats' }).click();
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
 		await page.getByText('results.zip').click();

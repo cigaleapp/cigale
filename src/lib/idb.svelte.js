@@ -208,6 +208,10 @@ function wrangler(table) {
 			async get(key) {
 				const db = await openDatabase();
 				return await db.get(table, key);
+			},
+			async list() {
+				const db = await openDatabase();
+				return await db.getAll(table);
 			}
 		}
 	};

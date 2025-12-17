@@ -3,24 +3,13 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { expect } from '@playwright/test';
 
-import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Schemas } from '../src/lib/database.js';
-
-/**
- * @param {unknown} value
- */
-function safeJSONParse(value) {
-	try {
-		return JSON.parse(value);
-	} catch (e) {
-		console.warn('Failed to parse JSON value:', value, e);
-		return undefined; // Return the original value if parsing fails
-	}
-}
+import { ExamplePaths, FixturePaths } from './filepaths.js';
 
 /**
  * @import { Page, Locator } from '@playwright/test';
  * @import { Settings, MetadataValue } from '$lib/database.js';
+ * @import {IDBDatabaseType} from '$lib/idb.svelte.js';
  */
 
 /**
@@ -29,16 +18,13 @@ function safeJSONParse(value) {
  * @param {Page} ctx.page
  * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
  * @param {number} [ctx.additionalWaitTime] wait additional milliseconds between each import (when names.length > 1)
- * @param {...(string|string[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
+ * @param {...(FixturePaths.Photos|FixturePaths.Photos[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
  */
 export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }, ...names) {
 	if (!names) throw new Error('No file names provided');
 
 	/** @param {string} name */
-	const addDotJpeg = (name) => (path.extname(name) ? name : `${name}.jpeg`);
-
-	/** @param {string} name */
-	const nameToPath = (name) => path.join('./tests/fixtures', addDotJpeg(name));
+	const nameToPath = (name) => path.join(FixturePaths.root, name);
 
 	await expect(page.getByText('(.zip)')).toBeVisible();
 
@@ -76,7 +62,7 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 			if (!lastItem) throw new Error('No last item to wait for');
 		}
 
-		const element = page.getByText(addDotJpeg(lastItem), { exact: true }).last();
+		const element = page.getByText(lastItem, { exact: true }).last();
 		await expect(element).toBeVisible({
 			timeout: 20_000
 		});
@@ -112,7 +98,7 @@ export async function setSettings({ page }, newSettings) {
 
 		if (!settings) throw new Error('Settings not found in the database');
 		await window.DB.put('Settings', { ...settings, id: 'user', ...newSettings });
-		await window.refreshDB();
+		window.refreshDB();
 	}, /** @type {const} */ ([newSettings]));
 }
 
@@ -137,179 +123,39 @@ export async function getSettings({ page }) {
 
 /**
  *
- * @param {{ page: Page }  & ({ id: string } | { filename: string })} param0
- * @returns {Promise<typeof import('$lib/database').Schemas.Image.inferIn>}
- */
-export async function getImage({ page, ...query }) {
-	const image = await page.evaluate(async ([query]) => {
-		if ('id' in query) {
-			const image = await window.DB.get('Image', query.id);
-			if (!image) throw new Error(`Image ${query.id} not found in the database`);
-			return image;
-		} else {
-			const images = await window.DB.getAll('Image');
-			const image = images.find((i) => i.filename === query.filename);
-			if (!image)
-				throw new Error(`Image with filename ${query.filename} not found in the database`);
-			return image;
-		}
-	}, /** @type {const} */ ([query]));
-	return image;
-}
-
-/**
- * Get observation object in database
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} param0.label
- * @returns {Promise<typeof import('$lib/database').Schemas.Observation.inferIn>}
- */
-export async function getObservation({ page, label }) {
-	const observation = await page.evaluate(async ([label]) => {
-		const observations = await window.DB.getAll('Observation');
-		return observations.find((obs) => obs.label === label);
-	}, /** @type {const} */ ([label]));
-	if (!observation) throw new Error(`Observation ${label} not found in the database`);
-	return observation;
-}
-
-/**
- * Get session object in database
- * @param {{page: Page} & ({name: string} | {id: string})} param0
- * @returns {Promise<typeof import('$lib/database').Schemas.Session.inferIn>}
- */
-export async function getSession({ page, ...query }) {
-	const session = await page.evaluate(async ([query]) => {
-		const sessions = await window.DB.getAll('Session');
-		return sessions.find((s) => ('id' in query ? s.id === query.id : s.name === query.name));
-	}, /** @type {const} */ ([query]));
-	if (!session)
-		throw new Error(`Session with ${JSON.stringify(query)} not found in the database`);
-	return session;
-}
-
-/**
- * Returns object mapping metadata keys to their (runtime, deserialized) values
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} [param0.protocolId] keep only metadata from this protocol, strip the prefix (namespace) from the keys in the returned object
- * @param {string | {id: string} | {filename: string}} param0.image id of the image to get metadata from
- * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
- */
-export async function getMetadataValuesOfImage({ page, protocolId, image }) {
-	const { metadata } = await getImage({
-		page,
-		...(typeof image === 'string' ? { id: image } : image)
-	});
-	return Object.fromEntries(
-		Object.entries(metadata)
-			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
-			.map(([id, { value }]) => [
-				protocolId ? id.replace(`${protocolId}__`, '') : id,
-				safeJSONParse(value)
-			])
-	);
-}
-
-/**
- * Get metadata values set on the observation (.metadataOverrides)
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} param0.protocolId
- * @param {string} param0.observation label
- * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
- */
-export async function getMetadataOverridesOfObservation({ page, protocolId, observation }) {
-	const { metadataOverrides } = await getObservation({ page, label: observation });
-
-	return Object.fromEntries(
-		Object.entries(metadataOverrides)
-			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
-			.map(([id, { value }]) => [
-				protocolId ? id.replace(`${protocolId}__`, '') : id,
-				safeJSONParse(value)
-			])
-	);
-}
-
-/**
- * Get metadata values set on the session
- * @param {object} param0
- * @param {Page} param0.page
- * @param {string} param0.name session name
- * @param {string} param0.protocolId
- * @returns {Promise<Record<string, import('$lib/metadata').RuntimeValue>>}
- */
-async function getMetadataValuesOfSession({ page, name, protocolId }) {
-	const { metadata } = await getSession({ page, name });
-	return Object.fromEntries(
-		Object.entries(metadata)
-			.filter(([id]) => (protocolId ? id.startsWith(`${protocolId}__`) : true))
-			.map(([id, { value }]) => [
-				protocolId ? id.replace(`${protocolId}__`, '') : id,
-				safeJSONParse(value)
-			])
-	);
-}
-
-/**
- *
- * @param {Page} page
- * @param {{image: {id: string} | {filename: string}} | {observation: string} | {session: {name: string}}} query
- * @param {string} metadataKey
- * @param {string} [protocolId]
- * @returns {Promise<import('$lib/metadata').RuntimeValue | undefined>}
- */
-export async function getMetadataValue(page, query, metadataKey, protocolId = lightProtocol.id) {
-	if ('image' in query) {
-		const metadata = await getMetadataValuesOfImage({
-			page,
-			image: query.image,
-			protocolId
-		});
-		await browserConsole.log(
-			page,
-			'Metadata of image',
-			query.image,
-			'for protocol',
-			protocolId,
-			metadata
-		);
-		return metadata[metadataKey];
-	}
-
-	if ('session' in query) {
-		const metadata = await getMetadataValuesOfSession({
-			page,
-			name: query.session.name,
-			protocolId
-		});
-		await browserConsole.log(
-			page,
-			'Metadata of session',
-			query.session.name,
-			'for protocol',
-			protocolId,
-			metadata
-		);
-		return metadata[metadataKey];
-	}
-
-	const metadataOverrides = await getMetadataOverridesOfObservation({
-		page,
-		protocolId,
-		observation: query.observation
-	});
-
-	return metadataOverrides[metadataKey];
-}
-
-/**
- *
- * @template {keyof typeof import('$lib/idb.svelte.js').tables} Table
+ * @template {import('idb').StoreNames<IDBDatabaseType>} Table
+ * @template {keyof IDBDatabaseType[Table]['value']} Field
  * @param {Page} page
  * @param {Table} tableName
- * @returns {Promise<typeof import('$lib/idb.svelte.js').tables[Table]['state']>}
+ * @param {Field} fieldName
+ * @param {IDBDatabaseType[Table]['value'][Field]} fieldValue
+ * @returns
+ */
+export async function getDatabaseRowByField(page, tableName, fieldName, fieldValue) {
+	return page.evaluate(async ([tableName, fieldName, fieldValue]) => {
+		const rows = await window.DB.getAll(tableName);
+		return rows.find((r) => r[fieldName] === fieldValue);
+	}, /** @type {const} */ ([tableName, fieldName, fieldValue]));
+}
+
+/**
+ * @template {import('idb').StoreNames<IDBDatabaseType>} Table
+ * @param {Page} page
+ * @param {Table} tableName
+ * @param {string} id
+ */
+export async function getDatabaseRowById(page, tableName, id) {
+	return page.evaluate(async ([tableName, id]) => {
+		return window.DB.get(tableName, id);
+	}, /** @type {const} */ ([tableName, id]));
+}
+
+/**
+ *
+ * @template {import('idb').StoreNames<import('$lib/idb.svelte.js').IDBDatabaseType>} Table
+ * @param {Page} page
+ * @param {Table} tableName
+ * @returns {ReturnType<typeof window.DB.getAll<Table>>}
  */
 export async function listTable(page, tableName) {
 	const table = await page.evaluate(async ([tableName]) => {
@@ -410,7 +256,7 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 /**
  *
  * @param {Page} page
- * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {{ crop?: string, classify?: string }} models names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
 export async function setInferenceModels(page, models) {
 	for (const [task, model] of Object.entries(models)) {
@@ -550,14 +396,12 @@ export function getTab(page, tabName, language = 'fr') {
 /**
  * Must already be on the /protocols management page
  * @param {Page} page
- * @param {string} filepath relative to tests/fixtures/
+ * @param {ExamplePaths.Protocols} filepath relative to tests/fixtures/
  */
 export async function importProtocol(page, filepath) {
 	const fileChooser = page.waitForEvent('filechooser');
 	await page.getByRole('button', { name: 'Importer' }).click();
-	await fileChooser.then((chooser) =>
-		chooser.setFiles(path.join(import.meta.dirname, './fixtures', filepath))
-	);
+	await fileChooser.then((chooser) => chooser.setFiles(path.join(ExamplePaths.root, filepath)));
 }
 
 /**
@@ -567,7 +411,7 @@ export async function importProtocol(page, filepath) {
  * @param {object} options
  * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
  */
-export function toast(page, message, { type = undefined }) {
+export function toast(page, message, { type = undefined } = {}) {
 	let loc = page.getByTestId('toasts-area');
 
 	if (type) {
@@ -579,7 +423,7 @@ export function toast(page, message, { type = undefined }) {
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {string} filepath to the zip file, relative to tests/fixtures/exports
+ * @param {FixturePaths.Exports} filepath to the zip file, relative to tests/fixtures/exports
  * @param {object} [options]
  * @param {boolean} [options.waitForLoading] wait for loading to finish
  */
@@ -590,7 +434,7 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
-	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
+	await fileInput?.setInputFiles(path.join(FixturePaths.root, filepath));
 	if (waitForLoading) await waitForLoadingEnd(page);
 }
 
@@ -604,6 +448,7 @@ export async function dumpDatabase(page, filepath) {
 
 	const encodedDump = await page.evaluate(async () => {
 		const tableNames = window.DB.objectStoreNames;
+		/** @type {Partial<Record<import('idb').StoreNames<import('$lib/idb.svelte.js').IDBDatabaseType>, any>>} */
 		const dump = {};
 		for (const tableName of tableNames) {
 			dump[tableName] = await window.DB.getAll(tableName);
@@ -616,28 +461,76 @@ export async function dumpDatabase(page, filepath) {
 }
 
 /**
+ * @typedef {{[ Table in import('idb').StoreNames<IDBDatabaseType>]: Array<IDBDatabaseType[Table]['value']>}} DatabaseDump
+ */
+
+/**
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} filepath relative to tests/fixtures/db
+ * @param {FixturePaths.DatabaseDumps} filepath relative to tests/fixtures/db
  */
-export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
-	const location = path.join(import.meta.dirname, './fixtures/db/', filepath);
+export async function loadDatabaseDump(page, filepath = 'db/basic.devalue') {
+	const location = path.join(FixturePaths.root, filepath);
 
 	await page.evaluate(
 		async (dump) => {
-			const decoded = window.devalue.parse(dump);
-			const orderedTables = Object.entries(decoded).sort(([a], [b]) =>
-				// Load Protocol before everything else so that the default protocol does not start importing
-				a === 'Protocol' ? -1 : b === 'Protocol' ? 1 : a.localeCompare(b)
-			);
-			for (const [tableName, entries] of orderedTables) {
-				await window.DB.clear(tableName);
-				for (const entry of entries) {
-					console.info('[loadDatabaseDump] Adding entry to', tableName, entry);
-					await window.DB.put(tableName, entry);
+			/**
+			 * @template {import('idb').StoreNames<IDBDatabaseType>} TableName
+			 * @param {undefined | import('idb').IDBPTransaction<IDBDatabaseType, TableName[], "readwrite">} tx
+			 * @param {TableName} tableName
+			 * @param {DatabaseDump[TableName]} rows
+			 */
+			async function setTableEntries(tx, tableName, rows) {
+				if (tx) {
+					await tx.objectStore(tableName).clear();
+				} else {
+					await window.DB.clear(tableName);
+				}
+
+				for (const row of rows) {
+					console.info('[loadDatabaseDump] Adding row to', tableName, row);
+					if (tx) {
+						await tx.objectStore(tableName).put(row);
+					} else {
+						await window.DB.put(tableName, row);
+					}
 				}
 			}
-			await window.refreshDB();
+
+			/** @type {DatabaseDump} */
+			const { Protocol, ...otherTables } = window.devalue.parse(dump);
+
+			await setTableEntries(undefined, 'Protocol', Protocol);
+
+			/**
+			 * @template {string} K
+			 * @param {Record<K, unknown>} subject
+			 * @returns {K[]}
+			 */
+			function keys(subject) {
+				// @ts-expect-error
+				return Object.keys(subject);
+			}
+			/**
+			 * @template {string} K
+			 * @template {any} V
+			 * @param {Record<K, V>} subject
+			 * @returns {Array<[K, V]>}
+			 */
+			function entries(subject) {
+				// @ts-expect-error
+				return Object.entries(subject);
+			}
+
+			const tx = window.DB.transaction(keys(otherTables), 'readwrite');
+
+			for (const [tableName, rows] of entries(otherTables)) {
+				await setTableEntries(tx, tableName, rows);
+			}
+
+			await tx.done;
+
+			window.refreshDB();
 		},
 		readFileSync(location, 'utf-8')
 	);
@@ -861,19 +754,6 @@ export function sessionMetadataSectionFor(page, metadataLabel) {
 }
 
 /**
- * @param {Page} page
- * @param {string} key
- * @param {string} [observationLabel='leaf']
- */
-export async function metadataValueInDatabase(page, key, observationLabel = 'leaf') {
-	return await getMetadataOverridesOfObservation({
-		page,
-		protocolId: 'io.github.cigaleapp.kitchensink',
-		observation: observationLabel
-	}).then((values) => values[key]);
-}
-
-/**
  * ⚠️ **Needs a navigation before taking effect**
  * @param {Page} page
  * @param {number} value
@@ -1010,7 +890,7 @@ async function mockPredownloadedModel(
 	task,
 	{ filename, model, classmapping }
 ) {
-	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural']} arg0 */
+	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural'][number]} arg0 */
 	const modelMatches = ({ model }) =>
 		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
 

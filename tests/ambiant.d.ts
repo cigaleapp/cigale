@@ -7,8 +7,8 @@ declare global {
 		DB: IDBPDatabase<IDBDatabaseType>;
 		refreshDB: () => void;
 		devalue: {
-			serialize: (value: any) => string;
-			deserialize: (value: string) => any;
+			stringify: (value: any) => string;
+			parse: (value: string) => any;
 		};
 	}
 
