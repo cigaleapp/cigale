@@ -26,7 +26,7 @@ async function initialize({ page, app, dump = 'db/basic.devalue' }) {
 	await chooseFirstSession(page);
 	if (dump === 'db/kitchensink-protocol.devalue')
 		await changeSessionProtocol(page, 'Kitchen sink');
-	await setInferenceModels(page, { classify: 'Aucune inférence' });
+	await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
 	await app.tabs.go('classify');
 	await page
 		.getByText(dump === 'db/basic.devalue' ? 'lil-fella' : 'leaf', { exact: true })
@@ -38,10 +38,16 @@ async function initialize({ page, app, dump = 'db/basic.devalue' }) {
  * @param {AppFixture} app
  * @param {string} key
  * @param {string} [observation]
+ * @param {string} [protocolId]
  * @returns
  */
-async function metadataValueInDatabase(app, key, observation = 'leaf') {
-	return app.db.metadata.values({ observation }).then((metadata) => metadata[key]);
+async function metadataValueInDatabase(
+	app,
+	key,
+	observation = 'leaf',
+	protocolId = 'io.github.cigaleapp.kitchensink'
+) {
+	return app.db.metadata.values({ observation, protocolId }).then((metadata) => metadata[key]);
 }
 
 test('allows changing metadata values on import page', issue(440), async ({ page, app }) => {
