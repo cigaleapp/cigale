@@ -401,7 +401,6 @@ msgid "Erreur"
 msgstr "Error"
 
 #: src/lib/exif.js
-#: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
 #: src/routes/(app)/+layout.js
