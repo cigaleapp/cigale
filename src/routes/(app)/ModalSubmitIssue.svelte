@@ -115,11 +115,10 @@
 
 				toasts.success('Merci pour votre contribution!', {
 					data: true,
+					lifetime: Infinity,
+					action: new URL(data.url),
 					labels: {
 						action: 'Voir'
-					},
-					action() {
-						window.open(data.url, '_blank');
 					}
 				});
 			} else {
@@ -141,6 +140,7 @@
 <ButtonIcon
 	onclick={() => open?.()}
 	help={type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité'}
+	data-testid={type === 'bug' ? 'open-bug-report' : 'open-feature-request'}
 >
 	<OpenIcon />
 </ButtonIcon>
