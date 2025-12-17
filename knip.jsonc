@@ -14,7 +14,9 @@
 	],
 	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector"],
 	"entry": [
-		"scripts/*.js",
+		"scripts/issue-creator-server.ts",
+		// TODO add to a CI workflow
+		"scripts/generate-contributing-tables.js",
 		"src/electron/main.{d.ts,js}",
 		"src/electron/preload.js",
 		"forge.config.js",

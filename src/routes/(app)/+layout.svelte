@@ -178,10 +178,11 @@
 			{...toast}
 			action={toast.labels.action}
 			dismiss={toast.labels.close}
-			onaction={() => {
-				toast.callbacks?.action?.(toast);
-			}}
-			ondismiss={() => {
+			onaction={toast.callbacks.action instanceof URL
+				? toast.callbacks.action
+				: async () => toast.callbacks.action?.(toast)}
+			ondismiss={async () => {
+				await toast.callbacks.closed?.(toast);
 				toasts.remove(toast.id);
 			}}
 		/>

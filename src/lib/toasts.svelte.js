@@ -19,7 +19,7 @@ import { entries, mapValues } from './utils.js';
  * @property {string} [labels.action]
  * @property {string} [labels.close]
  * @property {Object} callbacks
- * @property {(toast: Toast<T>) => MaybePromise<void>} [callbacks.action]
+ * @property {URL | ((toast: Toast<T>) => MaybePromise<void>)} [callbacks.action]
  * @property {(toast: Toast<T>) => MaybePromise<void>} [callbacks.closed]
  * @property {boolean} [showLifetime]
  * @property {number} [lifetime]

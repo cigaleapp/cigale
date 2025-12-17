@@ -565,17 +565,16 @@ export async function importProtocol(page, filepath) {
  * @param {Page} page
  * @param {string|RegExp} message
  * @param {object} options
- * @param {boolean} [options.exact]
  * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
  */
-export function toast(page, message, { exact = false, type = undefined }) {
-	const area = page.getByTestId('toasts-area');
+export function toast(page, message, { type = undefined }) {
+	let loc = page.getByTestId('toasts-area');
 
 	if (type) {
-		return area.locator(`[data-type='${type}']`).getByText(message, { exact });
+		loc = loc.locator(`[data-type=${type}]`);
 	}
 
-	return area.getByText(message, { exact });
+	return loc.filter({ hasText: message });
 }
 
 /**
@@ -692,17 +691,25 @@ export async function expectTooltipContent(page, locator, content) {
 }
 
 /**
+ * @template Args
+ * @template T
+ * @typedef {T | ((args: Args) => T) | ((args: Args) => Promise<T>)} MaybeAsyncFunction
+ */
+
+/**
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').BrowserContext} context
  * @param {string | RegExp | ((u: URL) => boolean)} url
- * @param {{json: object} | {body: string | Buffer}} result
+ * @param {MaybeAsyncFunction<import('@playwright/test').Route, {json:object}|{body:string|Buffer}>} result
  */
-async function mockUrl(page, context, url, result) {
+export async function mockUrl(page, context, url, result) {
 	await Promise.all(
 		// Context: service workers. Page: regular fetch() requests (for browsers that don't support service worker instrumentation)
 		[context, page].map(async (target) =>
-			target.route(url, async (route) => route.fulfill(result))
+			target.route(url, async (route) =>
+				route.fulfill(typeof result === 'function' ? await result(route) : result)
+			)
 		)
 	);
 }

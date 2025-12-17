@@ -1,22 +1,30 @@
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
+import { ArkErrors } from 'arktype';
 import * as yauzl from 'yauzl-promise';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/exports.js';
+import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator';
 import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {
+	browserConsole,
+	chooseFirstSession,
 	chooseInDropdown,
 	expectZipFiles,
 	firstObservationCard,
 	goToTab,
 	importPhotos,
+	loadDatabaseDump,
 	makeRegexpUnion,
 	mockProtocolSourceURL,
+	mockUrl,
 	modal,
 	newSession,
+	setInferenceModels,
 	setSettings,
+	toast,
 	waitForLoadingEnd
 } from './utils.js';
 
@@ -280,4 +288,64 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 
 	await setModel('classify', /17000 classes/);
 	await expectLoadingText(true, 'Chargement du modèle de classification');
+});
+
+test('can send a bug report', async ({ page, context }) => {
+	/** @type {undefined | typeof import('../src/lib/schemas/issue-creator').IssueCreatorRequest['inferIn']} */
+	let requestBody;
+
+	await mockUrl(
+		page,
+		context,
+		(u) => u.hostname === 'mkissue.cigale.gwen.works',
+		async (route) => {
+			requestBody = route.request().postDataJSON();
+			await browserConsole.log(page, 'mocking route, body is', requestBody);
+			return {
+				json: {
+					url: 'https://example.com/issue/123'
+				}
+			};
+		}
+	);
+
+	await loadDatabaseDump(page, 'basic.devalue');
+	await chooseFirstSession(page);
+	await setInferenceModels(page, { crop: 'Aucune inférence' });
+	await goToTab(page, 'crop');
+
+	const report = modal(page, { key: 'modal_submit_issue_bug' });
+
+	await page.getByTestId('open-bug-report').click();
+
+	await expect(report).toBeVisible();
+	await report.getByRole('textbox', { name: 'Description' }).fill('This is a test bug report.');
+	await report.getByRole('textbox', { name: 'Titre' }).fill('Test Bug Report');
+	await report.getByRole('button', { name: 'Envoyer' }).click();
+
+	await expect(
+		toast(page, 'Merci pour votre contribution!', { type: 'success' }).getByRole('button', {
+			name: 'Voir'
+		})
+	).toHaveAttribute('href', 'https://example.com/issue/123');
+
+	expect.soft(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
+	expect.soft(URL.canParse(requestBody?.metadata.Page ?? '')).toBeTruthy();
+	expect.soft(requestBody).toEqual(
+		/** @satisfies {typeof requestBody} */ ({
+			title: 'Test Bug Report',
+			body: 'This is a test bug report.',
+			type: 'bug',
+			metadata: expect.objectContaining({
+				// FIXME: seems like URL doesnt change when using playwright
+				// Page: expect.stringMatching(/#\/crop\/?$/),
+				Protocol: expect.stringMatching(
+					// Version number depends on what was captured in the database dump
+					// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
+					new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
+				),
+				'Open session': '4 images, 4 observations'
+			})
+		})
+	);
 });
