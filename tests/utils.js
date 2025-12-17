@@ -21,6 +21,7 @@ function safeJSONParse(value) {
 /**
  * @import { Page, Locator } from '@playwright/test';
  * @import { Settings, MetadataValue } from '$lib/database.js';
+ * @import {IDBDatabaseType} from '$lib/idb.svelte.js';
  */
 
 /**
@@ -112,7 +113,7 @@ export async function setSettings({ page }, newSettings) {
 
 		if (!settings) throw new Error('Settings not found in the database');
 		await window.DB.put('Settings', { ...settings, id: 'user', ...newSettings });
-		await window.refreshDB();
+		window.refreshDB();
 	}, /** @type {const} */ ([newSettings]));
 }
 
@@ -306,10 +307,10 @@ export async function getMetadataValue(page, query, metadataKey, protocolId = li
 
 /**
  *
- * @template {keyof typeof import('$lib/idb.svelte.js').tables} Table
+ * @template {import('idb').StoreNames<import('$lib/idb.svelte.js').IDBDatabaseType>} Table
  * @param {Page} page
  * @param {Table} tableName
- * @returns {Promise<typeof import('$lib/idb.svelte.js').tables[Table]['state']>}
+ * @returns {ReturnType<typeof window.DB.getAll<Table>>}
  */
 export async function listTable(page, tableName) {
 	const table = await page.evaluate(async ([tableName]) => {
@@ -410,7 +411,7 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 /**
  *
  * @param {Page} page
- * @param {{ crop?: string, classify?: string }} [models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {{ crop?: string, classify?: string }} models names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
 export async function setInferenceModels(page, models) {
 	for (const [task, model] of Object.entries(models)) {
@@ -567,7 +568,7 @@ export async function importProtocol(page, filepath) {
  * @param {object} options
  * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
  */
-export function toast(page, message, { type = undefined }) {
+export function toast(page, message, { type = undefined } = {}) {
 	let loc = page.getByTestId('toasts-area');
 
 	if (type) {
@@ -604,6 +605,7 @@ export async function dumpDatabase(page, filepath) {
 
 	const encodedDump = await page.evaluate(async () => {
 		const tableNames = window.DB.objectStoreNames;
+		/** @type {Partial<Record<import('idb').StoreNames<import('$lib/idb.svelte.js').IDBDatabaseType>, any>>} */
 		const dump = {};
 		for (const tableName of tableNames) {
 			dump[tableName] = await window.DB.getAll(tableName);
@@ -616,6 +618,10 @@ export async function dumpDatabase(page, filepath) {
 }
 
 /**
+ * @typedef {{[ Table in import('idb').StoreNames<IDBDatabaseType>]: Array<IDBDatabaseType[Table]['value']>}} DatabaseDump
+ */
+
+/**
  *
  * @param {import('@playwright/test').Page} page
  * @param {string} filepath relative to tests/fixtures/db
@@ -625,19 +631,63 @@ export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
 
 	await page.evaluate(
 		async (dump) => {
-			const decoded = window.devalue.parse(dump);
-			const orderedTables = Object.entries(decoded).sort(([a], [b]) =>
-				// Load Protocol before everything else so that the default protocol does not start importing
-				a === 'Protocol' ? -1 : b === 'Protocol' ? 1 : a.localeCompare(b)
-			);
-			for (const [tableName, entries] of orderedTables) {
-				await window.DB.clear(tableName);
-				for (const entry of entries) {
-					console.info('[loadDatabaseDump] Adding entry to', tableName, entry);
-					await window.DB.put(tableName, entry);
+			/**
+			 * @template {import('idb').StoreNames<IDBDatabaseType>} TableName
+			 * @param {undefined | import('idb').IDBPTransaction<IDBDatabaseType, TableName[], "readwrite">} tx
+			 * @param {TableName} tableName
+			 * @param {DatabaseDump[TableName]} rows
+			 */
+			async function setTableEntries(tx, tableName, rows) {
+				if (tx) {
+					await tx.objectStore(tableName).clear();
+				} else {
+					await window.DB.clear(tableName);
+				}
+
+				for (const row of rows) {
+					console.info('[loadDatabaseDump] Adding row to', tableName, row);
+					if (tx) {
+						await tx.objectStore(tableName).put(row);
+					} else {
+						await window.DB.put(tableName, row);
+					}
 				}
 			}
-			await window.refreshDB();
+
+			/** @type {DatabaseDump} */
+			const { Protocol, ...otherTables } = window.devalue.parse(dump);
+
+			await setTableEntries(undefined, 'Protocol', Protocol);
+
+			/**
+			 * @template {string} K
+			 * @param {Record<K, unknown>} subject
+			 * @returns {K[]}
+			 */
+			function keys(subject) {
+				// @ts-expect-error
+				return Object.keys(subject);
+			}
+			/**
+			 * @template {string} K
+			 * @template {any} V
+			 * @param {Record<K, V>} subject
+			 * @returns {Array<[K, V]>}
+			 */
+			function entries(subject) {
+				// @ts-expect-error
+				return Object.entries(subject);
+			}
+
+			const tx = window.DB.transaction(keys(otherTables), 'readwrite');
+
+			for (const [tableName, rows] of entries(otherTables)) {
+				await setTableEntries(tx, tableName, rows);
+			}
+
+			await tx.done;
+
+			window.refreshDB();
 		},
 		readFileSync(location, 'utf-8')
 	);
@@ -1010,7 +1060,7 @@ async function mockPredownloadedModel(
 	task,
 	{ filename, model, classmapping }
 ) {
-	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural']} arg0 */
+	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural'][number]} arg0 */
 	const modelMatches = ({ model }) =>
 		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
 
