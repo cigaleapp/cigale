@@ -4,6 +4,7 @@ import path from 'node:path';
 import { expect } from '@playwright/test';
 
 import { Schemas } from '../src/lib/database.js';
+import { ExamplePaths, FixturePaths } from './filepaths.js';
 
 /**
  * @import { Page, Locator } from '@playwright/test';
@@ -17,16 +18,13 @@ import { Schemas } from '../src/lib/database.js';
  * @param {Page} ctx.page
  * @param {boolean} [ctx.wait=true] whether to wait for the loading message to disappear
  * @param {number} [ctx.additionalWaitTime] wait additional milliseconds between each import (when names.length > 1)
- * @param {...(string|string[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
+ * @param {...(FixturePaths.Photos|FixturePaths.Photos[])} names paths relative to ./tests/fixtures. If no extension is provided, .jpeg is used. Pass in arrays to import multiple files at once.
  */
 export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }, ...names) {
 	if (!names) throw new Error('No file names provided');
 
 	/** @param {string} name */
-	const addDotJpeg = (name) => (path.extname(name) ? name : `${name}.jpeg`);
-
-	/** @param {string} name */
-	const nameToPath = (name) => path.join('./tests/fixtures', addDotJpeg(name));
+	const nameToPath = (name) => path.join(FixturePaths.root, name);
 
 	await expect(page.getByText('(.zip)')).toBeVisible();
 
@@ -64,7 +62,7 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 			if (!lastItem) throw new Error('No last item to wait for');
 		}
 
-		const element = page.getByText(addDotJpeg(lastItem), { exact: true }).last();
+		const element = page.getByText(lastItem, { exact: true }).last();
 		await expect(element).toBeVisible({
 			timeout: 20_000
 		});
@@ -398,14 +396,12 @@ export function getTab(page, tabName, language = 'fr') {
 /**
  * Must already be on the /protocols management page
  * @param {Page} page
- * @param {string} filepath relative to tests/fixtures/
+ * @param {ExamplePaths.Protocols} filepath relative to tests/fixtures/
  */
 export async function importProtocol(page, filepath) {
 	const fileChooser = page.waitForEvent('filechooser');
 	await page.getByRole('button', { name: 'Importer' }).click();
-	await fileChooser.then((chooser) =>
-		chooser.setFiles(path.join(import.meta.dirname, './fixtures', filepath))
-	);
+	await fileChooser.then((chooser) => chooser.setFiles(path.join(ExamplePaths.root, filepath)));
 }
 
 /**
@@ -427,7 +423,7 @@ export function toast(page, message, { type = undefined } = {}) {
 
 /**
  * @param {import('@playwright/test').Page} page
- * @param {string} filepath to the zip file, relative to tests/fixtures/exports
+ * @param {FixturePaths.Exports} filepath to the zip file, relative to tests/fixtures/exports
  * @param {object} [options]
  * @param {boolean} [options.waitForLoading] wait for loading to finish
  */
@@ -438,7 +434,7 @@ export async function importResults(page, filepath, { waitForLoading = true } = 
 	// Import fixture zip
 	await expect(page.getByText(/\(.zip\)/)).toBeVisible();
 	const fileInput = await page.$("input[type='file']");
-	await fileInput?.setInputFiles(path.join('./tests/fixtures/exports/', filepath));
+	await fileInput?.setInputFiles(path.join(FixturePaths.root, filepath));
 	if (waitForLoading) await waitForLoadingEnd(page);
 }
 
@@ -471,10 +467,10 @@ export async function dumpDatabase(page, filepath) {
 /**
  *
  * @param {import('@playwright/test').Page} page
- * @param {string} filepath relative to tests/fixtures/db
+ * @param {FixturePaths.DatabaseDumps} filepath relative to tests/fixtures/db
  */
-export async function loadDatabaseDump(page, filepath = 'basic.devalue') {
-	const location = path.join(import.meta.dirname, './fixtures/db/', filepath);
+export async function loadDatabaseDump(page, filepath = 'db/basic.devalue') {
+	const location = path.join(FixturePaths.root, filepath);
 
 	await page.evaluate(
 		async (dump) => {

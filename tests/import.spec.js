@@ -18,7 +18,7 @@ import {
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'correct.zip');
+		await importResults(page, 'exports/correct.zip');
 	});
 
 	test('has all the images', async ({ page }) => {
@@ -152,7 +152,7 @@ test.describe('correct results.zip', () => {
 
 test.describe('missing original photos', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'no-originals.zip', { waitForLoading: false });
+		await importResults(page, 'exports/no-originals.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appropriate error message', async ({ app }) => {
@@ -162,7 +162,7 @@ test.describe('missing original photos', () => {
 
 test.describe('missing analysis file', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'no-analysis.zip', { waitForLoading: false });
+		await importResults(page, 'exports/no-analysis.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appriopriate error message', async ({ app }) => {
@@ -172,7 +172,7 @@ test.describe('missing analysis file', () => {
 
 test.describe('wrong protocol used', () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'wrong-protocol.zip', { waitForLoading: false });
+		await importResults(page, 'exports/wrong-protocol.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appriopriate error message', async ({ app }) => {
@@ -182,7 +182,7 @@ test.describe('wrong protocol used', () => {
 
 test.describe('invalid json analysis', async () => {
 	test.beforeEach(async ({ page }) => {
-		await importResults(page, 'invalid-json-analysis.zip', { waitForLoading: false });
+		await importResults(page, 'exports/invalid-json-analysis.zip', { waitForLoading: false });
 	});
 
 	test('fails with the appriopriate error message', async ({ app }) => {
@@ -231,10 +231,10 @@ test.fixme('can cancel import', issue(430), async ({ page, app }) => {
 	await newSession(page);
 	await app.tabs.go('import');
 	await importPhotos({ page, wait: false }, [
-		'lil-fella',
-		'cyan',
-		'leaf',
-		'with-exif-gps'
+		'lil-fella.jpeg',
+		'cyan.jpeg',
+		'leaf.jpeg',
+		'with-exif-gps.jpeg'
 	]);
 	await expect(firstObservationCard(page)).toHaveText(loadingText, {
 		timeout: 10_000
@@ -253,8 +253,8 @@ test('can import in multiple batches', async ({ page, app }) => {
 	await app.tabs.go('import');
 	await importPhotos(
 		{ page, wait: false },
-		['lil-fella', 'leaf'],
-		['with-exif-gps', '20K-gray', 'debugsquare.png']
+		['lil-fella.jpeg', 'leaf.jpeg'],
+		['with-exif-gps.jpeg', '20K-gray.jpeg', 'debugsquare.png']
 	);
 	await expect(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 60_000
@@ -270,7 +270,7 @@ test(
 	'deleting an image in the import tab does not create ghost observation cards',
 	issue(439),
 	async ({ page, app }) => {
-		await loadDatabaseDump(page, 'basic.devalue');
+		await loadDatabaseDump(page, 'db/basic.devalue');
 		await chooseFirstSession(page);
 		await setInferenceModels(page, { classify: 'Aucune inférence' });
 		await app.tabs.go('classify');
@@ -288,7 +288,7 @@ test(
 test('cannot go to classify tab while detection is ongoing', issue(437), async ({ page, app }) => {
 	await newSession(page);
 	await app.tabs.go('import');
-	await importPhotos({ page }, 'lil-fella', 'cyan');
+	await importPhotos({ page }, 'lil-fella.jpeg', 'cyan.jpeg');
 
 	// Now, we have at least one image loaded (so technically the classify tab should be accessible),
 	// but the other image is still being analyzed.
@@ -307,7 +307,7 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 test('can extract EXIF date from an image', async ({ page, app }) => {
 	await newSession(page);
 	await app.tabs.go('import');
-	await importPhotos({ page }, 'lil-fella');
+	await importPhotos({ page }, 'lil-fella.jpeg');
 	await app.loading.wait();
 	await firstObservationCard(page).click();
 	await expect(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
@@ -325,7 +325,7 @@ test('can extract EXIF date from an image', async ({ page, app }) => {
 test('can extract EXIF GPS data from an image', async ({ page, app }) => {
 	await newSession(page);
 	await app.tabs.go('import');
-	await importPhotos({ page }, 'with-exif-gps');
+	await importPhotos({ page }, 'with-exif-gps.jpeg');
 	await app.loading.wait();
 	await firstObservationCard(page).click();
 	await expect(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(

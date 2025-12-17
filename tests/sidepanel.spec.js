@@ -18,17 +18,18 @@ import {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {AppFixture} param0.app
- * @param {'basic'|'kitchensink-protocol'} [param0.dump=basic] name of the database dump to load, without extension
+ * @param {import('./filepaths.js').FixturePaths.DatabaseDumps} [param0.dump=basic] name of the database dump to load, without extension
  */
-async function initialize({ page, app, dump = 'basic' }) {
-	await loadDatabaseDump(page, `${dump}.devalue`);
+async function initialize({ page, app, dump = 'db/basic.devalue' }) {
+	await loadDatabaseDump(page, dump);
 	await app.settings.set({ showTechnicalMetadata: false });
 	await chooseFirstSession(page);
-	if (dump === 'kitchensink-protocol') await changeSessionProtocol(page, 'Kitchen sink');
+	if (dump === 'db/kitchensink-protocol.devalue')
+		await changeSessionProtocol(page, 'Kitchen sink');
 	await setInferenceModels(page, { classify: 'Aucune inférence' });
 	await app.tabs.go('classify');
 	await page
-		.getByText(dump === 'basic' ? 'lil-fella' : 'leaf', { exact: true })
+		.getByText(dump === 'db/basic.devalue' ? 'lil-fella' : 'leaf', { exact: true })
 		.click({ timeout: 10_000 });
 }
 
@@ -44,7 +45,7 @@ async function metadataValueInDatabase(app, key, observation = 'leaf') {
 }
 
 test('allows changing metadata values on import page', issue(440), async ({ page, app }) => {
-	await initialize({ page, app, dump: 'kitchensink-protocol' });
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	await page.getByTestId('goto-import').click();
 	await page.waitForURL((u) => u.hash === '#/import');
@@ -406,7 +407,7 @@ test.describe('can search in a enum-type metadata combobox', () => {
 });
 
 test('can update a boolean-type metadata', issue(216), async ({ page, app }) => {
-	await initialize({ page, app, dump: 'kitchensink-protocol' });
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	expect.soft(await metadataValueInDatabase(app, 'bool')).toBeUndefined();
 	await expect
@@ -433,7 +434,7 @@ test('can update a boolean-type metadata', issue(216), async ({ page, app }) => 
 });
 
 test('shows crop-type metadata as non representable', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'kitchensink-protocol' });
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	await expect(app.sidepanel.metadataSection('crop')).toMatchAriaSnapshot(`
 	  - text: crop
@@ -445,7 +446,7 @@ test('shows crop-type metadata as non representable', async ({ page, app }) => {
 });
 
 test('can update a date-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'kitchensink-protocol' });
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const dateSection = app.sidepanel.metadataSection('date');
 	await expect(dateSection.getByRole('textbox')).toHaveValue('');
@@ -457,7 +458,7 @@ test('can update a date-type metadata', async ({ page, app }) => {
 });
 
 test('can update a float-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'kitchensink-protocol' });
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const floatSection = app.sidepanel.metadataSection('float');
 	await expect(floatSection.getByRole('textbox')).toHaveValue('');
@@ -471,7 +472,7 @@ test('can update a float-type metadata', async ({ page, app }) => {
 });
 
 test('can update a integer-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'kitchensink-protocol' });
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const integerSection = app.sidepanel.metadataSection('integer');
 	await expect(integerSection.getByRole('textbox')).toHaveValue('');
@@ -485,7 +486,7 @@ test('can update a integer-type metadata', async ({ page, app }) => {
 });
 
 test('can update a string-type metadata', async ({ page, app }) => {
-	await initialize({ page, app, dump: 'kitchensink-protocol' });
+	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const stringSection = app.sidepanel.metadataSection('string');
 	await expect(stringSection.getByRole('textbox')).toHaveValue('');

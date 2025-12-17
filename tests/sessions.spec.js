@@ -297,7 +297,7 @@ test('changing session info saves in the database', async ({ page, app }) => {
 test('can change protocol of session', async ({ page, app }) => {
 	await app.settings.set({ showTechnicalMetadata: false });
 	await goToProtocolManagement(page);
-	await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
+	await importProtocol(page, 'kitchensink.cigaleprotocol.yaml');
 	await newSession(page, { name: 'Test' });
 
 	await page.getByTestId('goto-current-session').click();

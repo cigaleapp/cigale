@@ -3,7 +3,7 @@ import { chooseFirstSession, loadDatabaseDump, observationCard, setInferenceMode
 
 test.beforeEach(async ({ page, app }) => {
 	await app.settings.set({ gallerySort: { direction: 'asc', key: 'filename' } });
-	await loadDatabaseDump(page, 'basic.devalue');
+	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, { classify: 'Aucune inférence' });
 	await app.tabs.go('classify');

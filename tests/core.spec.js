@@ -176,6 +176,7 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 
 	const observations = page.getByTestId('observations-area');
 
+	/** @type {import('./filepaths').FixturePaths.Photos[]} */
 	const images = ['cyan.jpeg', 'lil-fella.jpeg', 'leaf.jpeg', 'large-image.jpeg'];
 	const randomImage = () => images[Math.floor(Math.random() * images.length)];
 	await importPhotos({ page, wait: false }, Array.from({ length: imagesCount }, randomImage));
@@ -305,7 +306,7 @@ test('can send a bug report', async ({ page, app, context }) => {
 		}
 	);
 
-	await loadDatabaseDump(page, 'basic.devalue');
+	await loadDatabaseDump(page, 'db/basic.devalue');
 	await chooseFirstSession(page);
 	await setInferenceModels(page, { crop: 'Aucune inférence' });
 	await app.tabs.go('crop');

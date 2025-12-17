@@ -21,15 +21,15 @@ test.skip(
 test.describe('Database dumps', () => {
 	test('basic', async ({ page }) => {
 		await goToProtocolManagement(page);
-		await importProtocol(page, '../../examples/arthropods.light.cigaleprotocol.json');
+		await importProtocol(page, 'arthropods.light.cigaleprotocol.json');
 
-		await importResults(page, 'correct.zip');
+		await importResults(page, 'exports/correct.zip');
 		await dumpDatabase(page, 'basic.devalue');
 	});
 
 	test('kitchensink-protocol', async ({ page, app }) => {
 		await goToProtocolManagement(page);
-		await importProtocol(page, '../../examples/kitchensink.cigaleprotocol.yaml');
+		await importProtocol(page, 'kitchensink.cigaleprotocol.yaml');
 		await page
 			.getByRole('listitem')
 			.filter({ hasText: exampleProtocol.id })
@@ -71,7 +71,13 @@ test.describe('Exports', () => {
 			.check();
 
 		await app.tabs.go('import');
-		await importPhotos({ page }, 'cyan', 'leaf', 'lil-fella', 'with-exif-gps');
+		await importPhotos(
+			{ page },
+			'cyan.jpeg',
+			'leaf.jpeg',
+			'lil-fella.jpeg',
+			'with-exif-gps.jpeg'
+		);
 		await expect(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {
 			timeout: 30_000
 		});
