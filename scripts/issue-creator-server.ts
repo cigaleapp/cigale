@@ -79,4 +79,4 @@ Bun.serve({
 	}
 });
 
-console.log(`Listening on :${env.PORT}`);
+console.info(`Listening on :${env.PORT}`);

@@ -41,7 +41,7 @@ const client = new DiscordJS.Client({
 });
 
 client.on('clientReady', async () => {
-	console.log('Bot is ready.');
+	console.info('Bot is ready.');
 	const guildId = process.env.GUILD_ID || '';
 
 	const guild = client.guilds.cache.get(guildId);
@@ -74,7 +74,7 @@ client.on('clientReady', async () => {
 client.on('interactionCreate', async (interaction) => {
 	if (interaction.isMessageContextMenuCommand()) {
 		const { commandName, targetMessage, user } = interaction;
-		console.log(`Received command ${commandName} from ${user.tag}`);
+		console.info(`Received command ${commandName} from ${user.tag}`);
 		const githubIssueCommand = /^To Github (?<type>Bug|Feature Request|Task)$/.exec(
 			commandName
 		);
@@ -108,7 +108,7 @@ client.on('interactionCreate', async (interaction) => {
 		}
 	} else if (interaction.isModalSubmit()) {
 		const { fields, customId } = interaction;
-		console.log(`Received modal submit ${interaction.customId} from ${interaction.user.tag}`);
+		console.info(`Received modal submit ${interaction.customId} from ${interaction.user.tag}`);
 		const title = fields.getTextInputValue('title');
 		const body = fields.getTextInputValue('desc');
 		const labels = fields.fields.has('labels') ? fields.getStringSelectValues('labels') : [];
@@ -127,7 +127,7 @@ client.on('interactionCreate', async (interaction) => {
 				// "Dependencies",
 			}[customId.replace('create github issue ', '')] ?? null;
 
-		console.log(`Creating issue with`, {
+		console.info(`Creating issue with`, {
 			title,
 			body,
 			labels,

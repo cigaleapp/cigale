@@ -15,6 +15,7 @@
 	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector"],
 	"entry": [
 		"scripts/issue-creator-server.ts",
+		"scripts/issue-creator-discord-bot.ts",
 		// TODO add to a CI workflow
 		"scripts/generate-contributing-tables.js",
 		"src/electron/main.{d.ts,js}",
