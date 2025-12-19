@@ -1,4 +1,3 @@
-import { RestEndpointMethodTypes } from '@octokit/rest';
 import arkenv from 'arkenv';
 import { regex } from 'arktype';
 import * as DiscordJS from 'discord.js';
@@ -165,16 +164,10 @@ export const getModal = ({
 	id: string;
 	user: DiscordJS.User;
 	message: DiscordJS.Message<boolean>;
-	labels: RestEndpointMethodTypes['issues']['listLabelsForRepo']['response']['data'];
-	issueTypes: Array<{
-		id: number;
-		name: string;
-		description: string;
-		color: string;
-		is_enabled: boolean;
-	}>;
-	milestones: RestEndpointMethodTypes['issues']['listMilestones']['response']['data'];
-	collaborators: RestEndpointMethodTypes['repos']['listCollaborators']['response']['data'];
+	labels: Array<{ name: string; description: string }>;
+	issueTypes: Array<{ name: string; description: string; is_enabled: boolean }>;
+	milestones: Array<{ title: string; description: string }>;
+	collaborators: Array<{ login: string; name?: string | null }>;
 }) => {
 	return createModal(id, 'Create GitHub Issue', {
 		Title: textInput('title*', TextInputStyle.Short),
@@ -197,7 +190,7 @@ export const getModal = ({
 			'assignee',
 			collaborators.map(({ login, name }) => ({
 				name: login,
-				description: name
+				description: name ?? null
 			}))
 		)
 	});
