@@ -1,20 +1,26 @@
+import { readFileSync } from 'node:fs';
+import arkenv from 'arkenv';
 import { ArkErrors } from 'arktype';
-import { Octokit } from 'octokit';
+import { App } from 'octokit';
 
 import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
 
-const cors = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
-	'Access-Control-Allow-Headers': 'Content-Type'
-};
-
-const github = new Octokit({
-	auth: process.env.GITHUB_TOKEN
+const env = arkenv({
+	GITHUB_APP_ID: 'string > 0',
+	GITHUB_APP_INSTALLATION_ID: 'string.integer.parse',
+	GITHUB_APP_KEY_FILE: 'string > 0',
+	PORT: 'number.port'
 });
 
+const reporter = new App({
+	appId: env.GITHUB_APP_ID,
+	privateKey: readFileSync(env.GITHUB_APP_KEY_FILE, 'utf8')
+});
+
+const github = await reporter.getInstallationOctokit(env.GITHUB_APP_INSTALLATION_ID);
+
 Bun.serve({
-	port: Number(process.argv[1]),
+	port: env.PORT,
 	routes: {
 		async '/'() {
 			const user = await github.rest.users.getAuthenticated();
@@ -26,8 +32,7 @@ Bun.serve({
 		'/submit': {
 			async OPTIONS() {
 				return new Response(null, {
-					status: 204,
-					headers: cors
+					status: 204
 				});
 			},
 			async POST(request) {
@@ -40,7 +45,7 @@ Bun.serve({
 						},
 						{
 							status: 400,
-							headers: { 'Content-Type': 'application/json', ...cors }
+							headers: { 'Content-Type': 'application/json' }
 						}
 					);
 				}
@@ -58,12 +63,12 @@ Bun.serve({
 							.join('\n')}`
 					});
 
-					return Response.json({ url: issue.data.html_url }, { headers: cors });
+					return Response.json({ url: issue.data.html_url });
 				} catch (error) {
 					console.error('Failed to create issue on GitHub:', error);
 					return Response.json(
 						{ error: 'Failed to create issue on GitHub' },
-						{ status: 500, headers: { 'Content-Type': 'application/json', ...cors } }
+						{ status: 500, headers: { 'Content-Type': 'application/json' } }
 					);
 				}
 			}
@@ -73,3 +78,5 @@ Bun.serve({
 		return new Response('Not found', { status: 404 });
 	}
 });
+
+console.log(`Listening on :${env.PORT}`);

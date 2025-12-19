@@ -61,3 +61,6 @@ polymny-17k-classmapping.txt
 
 # ééé
 tests/filepaths.ts
+
+scripts/.ssh
+*.pem
