@@ -69,7 +69,7 @@
 	 */
 
 	/** @type {Props} */
-	const { type, message, action = 'OK', onaction, dismiss, ondismiss = () => {} } = $props();
+	const { type, message, action, onaction, dismiss, ondismiss = () => {} } = $props();
 </script>
 
 <article
@@ -87,14 +87,16 @@
 	</div>
 	<p>{message}</p>
 	<section class="actions">
-		{#if onaction instanceof URL}
-			<ButtonInk href={onaction}>
-				{action}
-			</ButtonInk>
-		{:else if onaction}
-			<ButtonInk onclick={onaction}>
-				{action}
-			</ButtonInk>
+		{#if action}
+			{#if onaction instanceof URL}
+				<ButtonInk href={onaction}>
+					{action}
+				</ButtonInk>
+			{:else if onaction}
+				<ButtonInk onclick={onaction}>
+					{action}
+				</ButtonInk>
+			{/if}
 		{/if}
 
 		{#if dismiss}
