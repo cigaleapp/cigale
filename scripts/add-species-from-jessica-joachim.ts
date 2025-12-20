@@ -236,7 +236,7 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		image: imageUrl,
+		images: imageUrl ? [imageUrl] : [],
 		cascade
 	};
 }

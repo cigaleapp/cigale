@@ -188,10 +188,12 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				return doc;
 			});
 
-		const description = htmlToMarkdown(html.querySelector('section[data-page="page2"]'));
+		const description = htmlToMarkdown(
+			html.querySelector('section[data-page^="page"]:not([data-page="page1"])')
+		);
 
 		const links = Object.fromEntries(
-			[...html.querySelectorAll('section[data-page="page2"] a')]
+			[...html.querySelectorAll('section[data-page^="page"]:not([data-page="page1"]) a')]
 				.map((node) => [node.href, node.textContent])
 				.filter(([, text]) => text && text !== ' ')
 		);
@@ -223,10 +225,10 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 
 			if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
 				imageUrl.searchParams.set('v', protocol.fresh.version.toString());
-			} else if (oldOption && URL.canParse(oldOption.image)) {
+			} else if (oldOption && URL.canParse(oldOption.images?.[0])) {
 				imageUrl.searchParams.set(
 					'v',
-					new URL(oldOption.image).searchParams.get('v') ??
+					new URL(oldOption.images?.[0]).searchParams.get('v') ??
 						protocol.fresh.version?.toString() ??
 						'0'
 				);
@@ -238,7 +240,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				option.learnMore = learnMore;
 				option.description = description;
 				option.links = links;
-				option.image = imageUrl;
+				option.images = [imageUrl.toString()];
 			} else {
 				const optionKeys = (options) => options.map((o) => Number(o.key));
 				options.push({
@@ -254,7 +256,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 								)
 							) + 1
 						).toString(),
-					image: imageUrl,
+					images: [imageUrl.toString()],
 					description,
 					links,
 					learnMore
