@@ -77,8 +77,8 @@ jobs:
       - name: Clean old protocol
         run: rm examples/old-*.json
 
-      - name: Format & lintfix
-        run: bun run format && bun run lintfix
+      - name: Format generated protocols
+        run: bun x prettier --write examples/*.cigaleprotocol.json
 
       - name: Setup diffing that ignores version and learnMore fields
         run: git config diff.example-protocols.textconv "$textconv"

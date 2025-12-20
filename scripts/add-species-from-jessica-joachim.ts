@@ -91,7 +91,12 @@ async function main() {
 	);
 
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
-	await Bun.$`bun x prettier --write ${protocolPath}`;
+
+	try {
+		await Bun.$`bun x prettier --write ${protocolPath}`;
+	} catch (error) {
+		console.error(`Couldnt format protocol ${protocolPath}:\n`, error);
+	}
 }
 
 async function augmentMetadata(
@@ -321,13 +326,14 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.yoast_head_json.canonical.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		image: imageUrl,
+		images: imageUrl ? [imageUrl] : [],
 		cascade
 	};
 }
 
 async function fetchPagesViaWordpressAPI(
-	lookups: Map<string, URL>
+	lookups: Map<string, URL>,
+	{ rateLimitWaitSeconds = 12 } = {}
 ): Promise<Record<string, undefined | typeof WordpressPage.infer>> {
 	const query = new URLSearchParams(
 		[...lookups.values()].flatMap((link) => {
@@ -345,14 +351,16 @@ async function fetchPagesViaWordpressAPI(
 	// Handle rate limiting
 	if (response.status === 429 || response.status === 504) {
 		const retryAfter = response.headers.get('Retry-After');
-		const waitTime = retryAfter ? Number(retryAfter) : 12;
+		const waitTime = retryAfter ? Number(retryAfter) : rateLimitWaitSeconds;
 		console.warn(
 			yellow(
 				`⁄ Rate limited by Wordpress API. Waiting for ${waitTime} seconds before retrying...`
 			)
 		);
 		await new Promise((resolve) => setTimeout(resolve, secondsToMilliseconds(waitTime)));
-		return fetchPagesViaWordpressAPI(lookups);
+		return fetchPagesViaWordpressAPI(lookups, {
+			rateLimitWaitSeconds: rateLimitWaitSeconds * Math.E
+		});
 	}
 
 	if (response.headers.get('Content-Type')?.startsWith('application/json') === false) {
