@@ -137,7 +137,11 @@
 	{/if}
 	{#if isDebugMode()}
 		<pre class="debug">{JSON.stringify(
-				{ ...splitMetadataId(definition.id), value },
+				{
+					...splitMetadataId(definition.id),
+					...(options.length <= 10 ? { options } : {}),
+					value
+				},
 				null,
 				2
 			)}</pre>
