@@ -78,3 +78,50 @@ function setupFadeProperty() {
 		styleElement.textContent = styleContent;
 	}
 }
+
+if (import.meta.vitest) {
+	const { describe, test, expect } = import.meta.vitest;
+
+	describe('scrollfader attachment', () => {
+		test('should set up the CSS properties correctly', () => {
+			const div = document.createElement('div');
+			div.style.height = '300px';
+			div.style.overflowY = 'scroll';
+			div.innerHTML = '<div style="height:1000px;"></div>';
+			document.body.appendChild(div);
+
+			const detach = scrollfader(div);
+
+			expect(div.style.maskImage).toContain('linear-gradient');
+			expect(div.style.webkitMaskImage).toContain('linear-gradient');
+			expect(div.style.transition).toBe('--fade 0.1s ease');
+			expect(div.style.getPropertyValue('--fade')).toBeDefined();
+
+			detach?.();
+			document.body.removeChild(div);
+		});
+
+		test('should update --fade on scroll', () => {
+			const div = document.createElement('div');
+			div.style.height = '300px';
+			div.style.overflowY = 'scroll';
+			div.innerHTML = '<div style="height:1000px;"></div>';
+			document.body.appendChild(div);
+
+			const detach = scrollfader(div);
+
+			// Scroll to bottom
+			div.scrollTop = div.scrollHeight - div.clientHeight;
+			div.dispatchEvent(new Event('scroll'));
+			expect(div.style.getPropertyValue('--fade')).toBe('0');
+
+			// Scroll up 100px
+			div.scrollTop -= 100;
+			div.dispatchEvent(new Event('scroll'));
+			expect(parseFloat(div.style.getPropertyValue('--fade'))).toBeGreaterThan(0);
+
+			detach?.();
+			document.body.removeChild(div);
+		});
+	});
+}
