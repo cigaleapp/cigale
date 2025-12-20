@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Find tag for workflow commit or read Docker-build-tag trailer
         id: find-tag
-        uses: actions/github-script@v6
+        uses: actions/github-script@v8
         with:
           script: |
             const sha = github.context.payload.workflow_run.head_sha;
