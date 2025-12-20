@@ -1240,18 +1240,3 @@ if (import.meta.vitest) {
 export function throwError(message) {
 	throw new Error(message);
 }
-
-/**
- * @param {HTMLElement} element
- * @returns {string} Computed effective background color of the element, climbing up the DOM tree until a non-transparent color is found
- */
-export function effectiveBackgroundColor(element) {
-	const bgColor = getComputedStyle(element).backgroundColor;
-	if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
-		return bgColor;
-	} else if (element.parentElement) {
-		return effectiveBackgroundColor(element.parentElement);
-	} else {
-		return 'var(--bg-neutral)'; // default fallback
-	}
-}
