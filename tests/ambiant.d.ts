@@ -7,7 +7,9 @@ declare global {
 		DB: IDBPDatabase<IDBDatabaseType>;
 		refreshDB: () => void;
 		devalue: {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			stringify: (value: any) => string;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			parse: (value: string) => any;
 		};
 	}

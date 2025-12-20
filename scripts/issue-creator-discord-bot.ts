@@ -157,7 +157,6 @@ export const getModal = ({
 	user,
 	message,
 	labels,
-	issueTypes,
 	milestones,
 	collaborators
 }: {
@@ -298,7 +297,7 @@ function textInput(
 }
 
 function parseFieldId(id: string): { customId: string; required: boolean } {
-	const [customId, _] = id.split('*');
+	const [customId] = id.split('*');
 	const required = id.endsWith('*');
 	return { customId, required };
 }
