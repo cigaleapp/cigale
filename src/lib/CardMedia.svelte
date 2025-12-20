@@ -40,6 +40,7 @@
 	import CroppedImg from './CroppedImg.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import Logo from './Logo.svelte';
+	import OverflowableText from './OverflowableText.svelte';
 	import { tooltip } from './tooltips';
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
@@ -75,12 +76,6 @@
 		if (status === 'errored') return 'Erreur';
 		return '';
 	});
-
-	// TODO: extract logic to tooltip.js
-	// https://stackoverflow.com/a/10017343/9943464
-	let titleElement = $state();
-	let titleOffsetWidth = $state(0);
-	let titleWasEllipsed = $derived(titleOffsetWidth < titleElement?.scrollWidth);
 </script>
 
 <article
@@ -183,12 +178,8 @@
 					<div class="check-icon">
 						<AnimatableCheckmark />
 					</div>
-					<h2
-						bind:this={titleElement}
-						bind:offsetWidth={titleOffsetWidth}
-						use:tooltip={titleWasEllipsed ? title : undefined}
-					>
-						{title}
+					<h2>
+						<OverflowableText text={title} />
 					</h2>
 					<button
 						disabled={loading}
@@ -343,10 +334,10 @@
 		font-size: 1rem;
 		margin: 0;
 		text-align: center;
-		text-overflow: ellipsis;
 		overflow: hidden;
-		white-space: nowrap;
 		margin-right: 0.75em;
+		display: flex;
+		align-items: center;
 	}
 
 	.stack-count {

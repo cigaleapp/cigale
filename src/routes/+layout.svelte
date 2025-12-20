@@ -79,6 +79,11 @@
 		border: 1px solid var(--fg-neutral);
 	}
 
+	:global([data-tippy-root]) {
+		/* Position tooltips above bits-ui comboboxes (and other flyouts) */
+		z-index: 100000 !important;
+	}
+
 	:global([data-tippy-root] .tippy-box > .tippy-svg-arrow) {
 		fill: var(--bg-neutral) !important;
 		stroke: var(--fg-neutral);

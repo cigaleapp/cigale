@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/89286f16c4284359557435465dd57f474d4c8ca0/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 42,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/0fd365672849f64f53909b989093411261dd15aa/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 43,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -45,6 +45,8 @@
 		"io.github.cigaleapp.arthropods.example.light__habitat_photo",
 		"io.github.cigaleapp.arthropods.example.light__shoot_date",
 		"io.github.cigaleapp.arthropods.example.light__shoot_location",
+		"io.github.cigaleapp.arthropods.example.light__identification_difficulty",
+		"io.github.cigaleapp.arthropods.example.light__conservation_status",
 		"io.github.cigaleapp.arthropods.example.light__class",
 		"io.github.cigaleapp.arthropods.example.light__phylum",
 		"io.github.cigaleapp.arthropods.example.light__kingdom",
@@ -808,6 +810,90 @@
 				{
 					"key": "nearby",
 					"label": "C'est une photo de l'habitat à proximité"
+				}
+			]
+		},
+		"io.github.cigaleapp.arthropods.example.light__identification_difficulty": {
+			"type": "enum",
+			"label": "Difficulté d'identification",
+			"description": "Niveau de difficulté pour identifier l'espèce sur la photo",
+			"required": false,
+			"mergeMethod": "average",
+			"options": [
+				{
+					"key": "easy",
+					"label": "Facile",
+					"color": "#367517",
+					"icon": "ri:emotion-laugh-line"
+				},
+				{
+					"key": "medium",
+					"label": "Moyenne",
+					"color": "#e8e819",
+					"icon": "ri:emotion-happy-line"
+				},
+				{
+					"key": "hard",
+					"label": "Difficile",
+					"color": "#dd8808",
+					"icon": "ri:emotion-normal-line"
+				},
+				{
+					"key": "very_hard",
+					"label": "Très difficile",
+					"color": "#cd3c28",
+					"icon": "ri:emotion-unhappy-line"
+				}
+			]
+		},
+		"io.github.cigaleapp.arthropods.example.light__conservation_status": {
+			"type": "enum",
+			"label": "Statut de conservation",
+			"description": "Statut de conservation IUCN de l'espèce",
+			"required": false,
+			"mergeMethod": "average",
+			"options": [
+				{
+					"key": "ex",
+					"label": "EX",
+					"description": "Éteint (“Extinct”)",
+					"color": "#000000"
+				},
+				{
+					"key": "ew",
+					"label": "EW",
+					"description": "Éteint à l’état sauvage (“Extinct in the Wild”)",
+					"color": "#3a3a3a"
+				},
+				{
+					"key": "cr",
+					"label": "CR",
+					"description": "En danger critique d’extinction (“Critically Endangered”)",
+					"color": "#cd3030"
+				},
+				{
+					"key": "en",
+					"label": "EN",
+					"description": "En danger (“Endangered”)",
+					"color": "#cd6630"
+				},
+				{
+					"key": "vu",
+					"label": "VU",
+					"description": "Vulnérable (“Vulnerable”)",
+					"color": "#cd9a00"
+				},
+				{
+					"key": "nt",
+					"label": "NT",
+					"description": "Quasi menacé (“Near Threatened”)",
+					"color": "#006666"
+				},
+				{
+					"key": "lc",
+					"label": "LC",
+					"description": "Préoccupation mineure (“Least Concern”)",
+					"color": "#16ca85"
 				}
 			]
 		},

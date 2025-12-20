@@ -1,5 +1,5 @@
 import { expect, test } from '../fixtures';
-import { firstObservationCard, goToTab, importPhotos, newSession, setSettings } from '../utils';
+import { firstObservationCard, importPhotos, newSession } from '../utils';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(
@@ -18,7 +18,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				});
 			}
 
-			test.beforeEach(async ({ page, browserName }) => {
+			test.beforeEach(async ({ page, app, browserName }) => {
 				test.skip(browserName !== 'chromium', 'Only taking screenshots in one browser');
 
 				const languageNames = {
@@ -28,45 +28,45 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 				await page.setViewportSize({ width: (16 / 9) * 720, height: 720 });
 
-				await setSettings({ page }, { showTechnicalMetadata: false });
+				await app.settings.set({ showTechnicalMetadata: false });
 
 				await page.getByTestId('settings-button').click();
 				await page.getByRole('radio', { name: languageNames[language] }).click();
 				await page.getByTestId('settings-button').click();
 			});
 
-			test('protocol', async ({ page }) => {
+			test('protocol', async ({ page, app }) => {
 				await newSession(page);
 				await expect(page).toHaveScreenshot();
 			});
 
-			test('import', async ({ page }) => {
+			test('import', async ({ page, app }) => {
 				await newSession(page);
-				await goToTab(page, 'import');
+				await app.tabs.go('import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 				await expect(page).toHaveScreenshot();
 			});
 
-			test('crop', async ({ page }) => {
+			test('crop', async ({ page, app }) => {
 				await newSession(page);
-				await goToTab(page, 'import');
+				await app.tabs.go('import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'crop');
+				await app.tabs.go('crop');
 				await firstObservationCard(page).click();
 				await expect(page).toHaveScreenshot();
 			});
 
-			test('classify', async ({ page }) => {
+			test('classify', async ({ page, app }) => {
 				await newSession(page);
-				await goToTab(page, 'import');
+				await app.tabs.go('import');
 
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
 
-				await goToTab(page, 'classify');
+				await app.tabs.go('classify');
 
 				await waitForAnalysis(page);
 				await page.getByText('lil-fella', { exact: true }).first().click();

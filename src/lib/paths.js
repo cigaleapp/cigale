@@ -24,5 +24,5 @@ export function resolve(...args) {
  * @param {ResolveArgs<T>} args
  */
 export async function goto(...args) {
-	await navigation.goto(_resolve(...args));
+	await navigation.goto(resolve(...args));
 }

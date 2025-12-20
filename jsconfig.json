@@ -10,7 +10,9 @@
 		"sourceMap": true,
 		"strict": true,
 		"exactOptionalPropertyTypes": true,
+		"module": "es2022",
 		"moduleResolution": "bundler",
+		"target": "es2022",
 		"types": ["vitest/importMeta"]
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

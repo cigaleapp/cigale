@@ -401,7 +401,6 @@ msgid "Erreur"
 msgstr "Error"
 
 #: src/lib/exif.js
-#: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
 #: src/routes/(app)/+layout.js
@@ -606,10 +605,6 @@ msgstr "Debug mode"
 #: src/routes/(app)/Navigation.svelte
 msgid "Modèle d'inférence"
 msgstr "Inference model"
-
-#: src/lib/MetadataCombobox.svelte
-msgid "Métadonées mise à jour à la sélection de cette option"
-msgstr "Metadata updated when selecting this option"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
@@ -2034,6 +2029,49 @@ msgstr ""
 
 #: src/lib/sessions.js
 msgid "La session a été fermée"
+msgstr ""
+
+#: src/lib/MetadataCombobox.svelte
+msgid "Métadonées mises à jour à la sélection de cette option"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Signaler un bug"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Proposer une fonctionnalité"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid ""
+"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous\n"
+"attendiez"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Description <0/>"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Titre"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Merci pour votre contribution!"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Voir"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Une erreur est survenue lors de la soumission de votre demande. Veuillez réessayer plus tard."
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Envoyer"
 msgstr ""
 
 #: src/lib/queue.svelte.js

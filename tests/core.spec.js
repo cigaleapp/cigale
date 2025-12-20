@@ -1,30 +1,34 @@
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
+import { ArkErrors } from 'arktype';
 import * as yauzl from 'yauzl-promise';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/exports.js';
+import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator';
 import { pr, withParallelism } from './annotations';
 import { expect, test } from './fixtures.js';
 import {
+	browserConsole,
+	chooseFirstSession,
 	chooseInDropdown,
 	expectZipFiles,
 	exportResults,
 	firstObservationCard,
-	goToTab,
 	importPhotos,
+	loadDatabaseDump,
 	makeRegexpUnion,
 	mockProtocolSourceURL,
-	modal,
+	mockUrl,
 	newSession,
-	setSettings,
+	setInferenceModels,
 	waitForLoadingEnd
 } from './utils.js';
 
 for (const offline of [false, true]) {
 	test(
 		offline ? 'basic functionality, while offline' : 'basic functionality',
-		async ({ page, context }) => {
+		async ({ page, context, app }) => {
 			if (offline) {
 				test.skip(context.serviceWorkers().length === 0, "No sw, can't test offline");
 
@@ -34,15 +38,18 @@ for (const offline of [false, true]) {
 					.getByTestId('app-settings')
 					.getByRole('button', { name: 'Préparation hors-ligne' })
 					.click();
-				await modal(page, 'Préparation hors-ligne')
+
+				await app.modals
+					.byTitle('Préparation hors-ligne')
 					.getByRole('button', { name: 'Démarrer' })
 					.click();
 
-				await expect(modal(page, 'Préparation hors-ligne')).toHaveText(/OK!/, {
+				await expect(app.modals.byTitle('Préparation hors-ligne')).toHaveText(/OK!/, {
 					timeout: 10_000
 				});
 
-				await modal(page, 'Préparation hors-ligne')
+				await app.modals
+					.byTitle('Préparation hors-ligne')
 					.getByRole('button', { name: 'Fermer' })
 					.first()
 					.click();
@@ -50,9 +57,9 @@ for (const offline of [false, true]) {
 				context.setOffline(true);
 			}
 
-			await setSettings({ page }, { showTechnicalMetadata: false });
+			await app.settings.set({ showTechnicalMetadata: false });
 			await newSession(page);
-			await goToTab(page, 'import');
+			await app.tabs.go('import');
 
 			// Import fixture image
 			await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
@@ -60,8 +67,8 @@ for (const offline of [false, true]) {
 			await fileInput?.setInputFiles('./tests/fixtures/lil-fella.jpeg');
 			await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
-			await goToTab(page, 'crop');
-			await waitForLoadingEnd(page);
+			await app.tabs.go('crop');
+			await app.loading.wait();
 
 			// Check for inferred bounding box
 			const boundingBoxStyle = Object.fromEntries(
@@ -86,7 +93,7 @@ for (const offline of [false, true]) {
 			expect(boundingBoxStyle.height).toBeCloseTo(36.4674, 0);
 
 			// Go to crop view
-			await goToTab(page, 'crop');
+			await app.tabs.go('crop');
 			await page.getByText('lil-fella.jpeg').click();
 
 			// Check for continuing
@@ -94,13 +101,13 @@ for (const offline of [false, true]) {
 			await expect(page.getByText('Confirmé', { exact: true })).toBeVisible();
 
 			// Go to classification view
-			await goToTab(page, 'classify');
+			await app.tabs.go('classify');
 			// Wait for inference
-			await waitForLoadingEnd(page);
+			await app.loading.wait();
 
 			// Check for classification results in sidepanel
 			await firstObservationCard(page).click();
-			await expect(page.getByText('Espèce')).toBeVisible();
+			await expect(page.getByText('Espèce', { exact: true })).toBeVisible();
 
 			// Export results
 			const results = await exportResults(page, 'lil-fella', { kind: 'full' });
@@ -145,7 +152,7 @@ for (const offline of [false, true]) {
 	);
 }
 
-test('can handle a bunch of images at once', withParallelism(4), async ({ page }) => {
+test('can handle a bunch of images at once', withParallelism(4), async ({ page, app }) => {
 	test.fixme(
 		true,
 		"Really flaky since this week for no reason, even on local runs, sometimes it works fines, sometimes it makes Chrome freeze. Even the profiler freezes, so we can't know what causes it. Nothing obvious in the console too."
@@ -156,17 +163,15 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 	const timeouts = { begin: 500, finish: imagesCount * 0.4 * 60_000 };
 	test.setTimeout(3 * timeouts.finish);
 
-	await setSettings(
-		{ page },
-		{
-			showTechnicalMetadata: false
-		}
-	);
+	await app.settings.set({
+		showTechnicalMetadata: false
+	});
 	await newSession(page);
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 
 	const observations = page.getByTestId('observations-area');
 
+	/** @type {import('./filepaths').FixturePaths.Photos[]} */
 	const images = ['cyan.jpeg', 'lil-fella.jpeg', 'leaf.jpeg', 'large-image.jpeg'];
 	const randomImage = () => images[Math.floor(Math.random() * images.length)];
 	await importPhotos({ page, wait: false }, Array.from({ length: imagesCount }, randomImage));
@@ -175,10 +180,10 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 
 	// Makes the test really slow
 
-	// await goToTab(page, 'crop');
+	// await app.tabs.go('crop')
 	// await waitForLoadingEnd(observations, timeouts);
 
-	// await goToTab(page, 'classify');
+	// await app.tabs.go('classify')
 	// await waitForLoadingEnd(observations, timeouts);
 
 	await page.keyboard.press('Control+A');
@@ -189,8 +194,8 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page }
 	await expect(observations).not.toHaveText(new RegExp('Rééssayer'));
 });
 
-test('can import a protocol via /protocols/import/url', async ({ page, context }) => {
-	await setSettings({ page }, { showTechnicalMetadata: false });
+test('can import a protocol via /protocols/import/url', async ({ page, app, context }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
 	const protocolUrl = 'https://example.com/kitchensink.cigaleprotocol.yaml';
 	await mockProtocolSourceURL(page, context, protocolUrl, {
 		body: await readFile(
@@ -202,15 +207,15 @@ test('can import a protocol via /protocols/import/url', async ({ page, context }
 	await page.waitForURL((u) => u.hash === '#/sessions');
 
 	await page.goto(`#/protocols/import/${protocolUrl}`);
-	await expect(modal(page, 'Importer le protocole distant ?')).toBeVisible({
+	await expect(app.modals.byTitle('Importer le protocole distant ?')).toBeVisible({
 		timeout: 30_000
 	});
-	await expect(modal(page, 'Importer le protocole distant ?').getByRole('link')).toHaveAttribute(
-		'href',
-		protocolUrl
-	);
+	await expect(
+		app.modals.byTitle('Importer le protocole distant ?').getByRole('link')
+	).toHaveAttribute('href', protocolUrl);
 
-	await modal(page, 'Importer le protocole distant ?')
+	await app.modals
+		.byTitle('Importer le protocole distant ?')
 		.getByRole('button', { name: 'Importer' })
 		.click();
 
@@ -229,13 +234,13 @@ test('can import a protocol via /protocols/import/url', async ({ page, context }
 	).toBeVisible();
 });
 
-test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page }) => {
-	await setSettings({ page }, { showTechnicalMetadata: false });
+test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page, app }) => {
+	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page);
 
-	await goToTab(page, 'import');
+	await app.tabs.go('import');
 	await importPhotos({ page }, ['cyan.jpeg']);
-	await waitForLoadingEnd(page);
+	await app.loading.wait();
 
 	/**
 	 *
@@ -257,22 +262,82 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	}
 
 	await setModel('crop', 'Aucune inférence');
-	await goToTab(page, 'crop');
+	await app.tabs.go('crop');
 	await expectLoadingText(false, 'Chargement du modèle de recadrage…');
 
 	await setModel('crop', 'YOLO11');
 	await expectLoadingText(true, 'Chargement du modèle de recadrage…');
-	await waitForLoadingEnd(page);
+	await app.loading.wait();
 
 	await setModel('classify', 'Aucune inférence');
-	await goToTab(page, 'classify');
+	await app.tabs.go('classify');
 	await expectLoadingText(false, 'Chargement du modèle de classification');
 
 	await setModel('classify', /80 classes/);
 	await expectLoadingText(true, 'Chargement du modèle de classification');
-	await waitForLoadingEnd(page);
+	await app.loading.wait();
 	await expect(firstObservationCard(page)).not.toHaveText(/Erreur/);
 
 	await setModel('classify', /17000 classes/);
 	await expectLoadingText(true, 'Chargement du modèle de classification');
+});
+
+test('can send a bug report', async ({ page, app, context }) => {
+	/** @type {undefined | typeof import('../src/lib/schemas/issue-creator').IssueCreatorRequest['inferIn']} */
+	let requestBody;
+
+	await mockUrl(
+		page,
+		context,
+		(u) => u.hostname === 'mkissue.cigale.gwen.works',
+		async (route) => {
+			requestBody = route.request().postDataJSON();
+			await browserConsole.log(page, 'mocking route, body is', requestBody);
+			return {
+				json: {
+					url: 'https://example.com/issue/123'
+				}
+			};
+		}
+	);
+
+	await loadDatabaseDump(page, 'db/basic.devalue');
+	await chooseFirstSession(page);
+	await setInferenceModels(page, { crop: 'Aucune inférence' });
+	await app.tabs.go('crop');
+
+	const report = app.modals.byKey('modal_submit_issue_bug');
+
+	await page.getByTestId('open-bug-report').click();
+
+	await expect(report).toBeVisible();
+	await report.getByRole('textbox', { name: 'Description' }).fill('This is a test bug report.');
+	await report.getByRole('textbox', { name: 'Titre' }).fill('Test Bug Report');
+	await report.getByRole('button', { name: 'Envoyer' }).click();
+
+	await expect(
+		app.toasts.byMessage('success', 'Merci pour votre contribution!').getByRole('button', {
+			name: 'Voir'
+		})
+	).toHaveAttribute('href', 'https://example.com/issue/123');
+
+	expect.soft(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
+	expect.soft(URL.canParse(requestBody?.metadata.Page ?? '')).toBeTruthy();
+	expect.soft(requestBody).toEqual(
+		/** @satisfies {typeof requestBody} */ ({
+			title: 'Test Bug Report',
+			body: 'This is a test bug report.',
+			type: 'bug',
+			metadata: expect.objectContaining({
+				// FIXME: seems like URL doesnt change when using playwright
+				// Page: expect.stringMatching(/#\/crop\/?$/),
+				Protocol: expect.stringMatching(
+					// Version number depends on what was captured in the database dump
+					// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
+					new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
+				),
+				'Open session': '4 images, 4 observations'
+			})
+		})
+	);
 });

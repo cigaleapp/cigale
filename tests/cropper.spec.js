@@ -1,46 +1,49 @@
+import { throwError } from '$lib/utils.js';
+
 import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
-import {
-	browserConsole,
-	chooseFirstSession,
-	getImage,
-	getMetadataValue,
-	getSettings,
-	goToTab,
-	listTable,
-	loadDatabaseDump,
-	setImageMetadata,
-	setSettings
-} from './utils.js';
+import { browserConsole, chooseFirstSession, loadDatabaseDump, setImageMetadata } from './utils.js';
+
+/**
+ * @import { AppFixture } from './fixtures';
+ */
 
 test.describe('Cropper view', () => {
-	test.beforeEach(async ({ page }, testInfo) => {
+	test.beforeEach(async ({ page, app }, testInfo) => {
 		testInfo.setTimeout(40_000);
 		await loadDatabaseDump(page);
 		await chooseFirstSession(page);
-		await goToTab(page, 'import');
-		const allImages = await listTable(page, 'Image');
+		await app.tabs.go('import');
+		const allImages = await app.db.image.list();
 		await markImagesAsConfirmedInDatabase(
 			page,
 			allImages.map((i) => i.id),
 			false
 		);
-		await goToTab(page, 'crop');
+		await app.tabs.go('crop');
 	});
 
 	/**
-	 * @param {Page} page
+	 * @param {AppFixture} app
 	 */
-	async function imagesByName(page) {
+	async function imagesByName(app) {
 		return {
-			leaf: await getImage({ page, filename: 'leaf.jpeg' }),
-			lilFella: await getImage({ page, filename: 'lil-fella.jpeg' }),
-			cyan: await getImage({ page, filename: 'cyan.jpeg' }),
-			withExifGps: await getImage({ page, filename: 'with-exif-gps.jpeg' })
+			leaf:
+				(await app.db.image.byFilename('leaf.jpeg')) ??
+				throwError('Image leaf.jpeg not found'),
+			lilFella:
+				(await app.db.image.byFilename('lil-fella.jpeg')) ??
+				throwError('Image lil-fella.jpeg not found'),
+			cyan:
+				(await app.db.image.byFilename('cyan.jpeg')) ??
+				throwError('Image cyan.jpeg not found'),
+			withExifGps:
+				(await app.db.image.byFilename('with-exif-gps.jpeg')) ??
+				throwError('Image with-exif-gps.jpeg not found')
 		};
 	}
 
-	test('should have all cards visible @webkit-no-parallelization', async ({ page }) => {
+	test('should have all cards visible @webkit-no-parallelization', async ({ page, app }) => {
 		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
@@ -48,14 +51,15 @@ test.describe('Cropper view', () => {
 
 	test.describe('autoskip enabled OR disabled', async () => {
 		for (const enabled of [true, false]) {
-			test.beforeEach(async ({ page }) => {
-				await setSettings({ page }, { cropAutoNext: enabled });
+			test.beforeEach(async ({ page, app }) => {
+				await app.settings.set({ cropAutoNext: enabled });
 			});
 
 			test(`navigate with arrow keys (autoskip ${enabled ? 'on' : 'off'})`, async ({
-				page
+				page,
+				app
 			}) => {
-				const images = await imagesByName(page);
+				const images = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
 				await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
 				await page.keyboard.press('ArrowRight');
@@ -70,9 +74,10 @@ test.describe('Cropper view', () => {
 			});
 
 			test(`go back to import view with escape key (autoskip ${enabled ? 'on' : 'off'})`, async ({
-				page
+				page,
+				app
 			}) => {
-				const { leaf: image } = await imagesByName(page);
+				const { leaf: image } = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
 				await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 				await page.keyboard.press('Escape');
@@ -91,12 +96,12 @@ test.describe('Cropper view', () => {
 	});
 
 	test.describe('autoskip disabled', () => {
-		test.beforeEach(async ({ page }) => {
-			await setSettings({ page }, { cropAutoNext: false });
+		test.beforeEach(async ({ page, app }) => {
+			await app.settings.set({ cropAutoNext: false });
 		});
 
-		test('should not skip on confirm button click', async ({ page }) => {
-			const { leaf: image } = await imagesByName(page);
+		test('should not skip on confirm button click', async ({ page, app }) => {
+			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 			await page.waitForTimeout(1000);
@@ -105,8 +110,8 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
-		test('should not skip on confirmation keybind', async ({ page }) => {
-			const { leaf: image } = await imagesByName(page);
+		test('should not skip on confirmation keybind', async ({ page, app }) => {
+			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 			await page.waitForTimeout(1000);
@@ -115,15 +120,15 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
-		test('should toggle autoskip on on keybind press', async ({ page }) => {
-			const { leaf: image } = await imagesByName(page);
+		test('should toggle autoskip on on keybind press', async ({ page, app }) => {
+			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 
-			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
+			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
 			await page.keyboard.press('a');
 			await page.waitForTimeout(500);
-			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
+			const { cropAutoNext, ...othersAfter } = await app.settings.get();
 
 			expect(cropAutoNext).toBe(true);
 			expect(othersBefore).toMatchObject(othersAfter);
@@ -131,12 +136,12 @@ test.describe('Cropper view', () => {
 	});
 
 	test.describe('autoskip enabled', () => {
-		test.beforeEach(async ({ page }) => {
-			await setSettings({ page }, { cropAutoNext: true, showTechnicalMetadata: true });
+		test.beforeEach(async ({ app }) => {
+			await app.settings.set({ cropAutoNext: true, showTechnicalMetadata: true });
 		});
 
-		test('should skip on confirm button click', async ({ page }) => {
-			const images = await imagesByName(page);
+		test('should skip on confirm button click', async ({ page, app }) => {
+			const images = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
 			await page.waitForTimeout(1000);
@@ -145,8 +150,8 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		});
 
-		test('should skip on confirmation keybind', async ({ page }) => {
-			const images = await imagesByName(page);
+		test('should skip on confirmation keybind', async ({ page, app }) => {
+			const images = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${images.leaf.fileId}`);
 			await page.waitForTimeout(1000);
@@ -155,27 +160,29 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		});
 
-		test('should toggle autoskip off on keybind press', async ({ page }) => {
-			const { leaf: image } = await imagesByName(page);
+		test('should toggle autoskip off on keybind press', async ({ page, app }) => {
+			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${image.fileId}`);
 
-			const { cropAutoNext: _, ...othersBefore } = await getSettings({ page });
+			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
 			await page.keyboard.press('a');
 			await page.waitForTimeout(500);
-			const { cropAutoNext, ...othersAfter } = await getSettings({ page });
+			const { cropAutoNext, ...othersAfter } = await app.settings.get();
 
 			expect(cropAutoNext).toBe(false);
 			expect(othersBefore).toMatchObject(othersAfter);
 		});
 
-		test('should autoskip to classify when all images are confirmed', async ({ page }) => {
-			const { withExifGps: image } = await imagesByName(page);
+		test('should autoskip to classify when all images are confirmed', async ({ page, app }) => {
+			const { withExifGps: image } = await imagesByName(app);
 			await markImagesAsConfirmedInDatabase(
 				page,
-				await listTable(page, 'Image').then((images) =>
-					images.filter(({ fileId }) => fileId !== image.fileId).map(({ id }) => id)
-				)
+				await app.db.image
+					.list()
+					.then((images) =>
+						images.filter(({ fileId }) => fileId !== image.fileId).map(({ id }) => id)
+					)
 			);
 
 			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
@@ -189,11 +196,12 @@ test.describe('Cropper view', () => {
 	test.describe('deleting an image', () => {
 		/**
 		 * @param {import('@playwright/test').Page} page
+		 * @param {AppFixture} app
 		 * @param {(page: import('@playwright/test').Page) => Promise<void>} deleteAction
 		 */
-		async function navigateThenAssert(page, deleteAction) {
-			const { leaf, lilFella } = await imagesByName(page);
-			const imagesBefore = await listTable(page, 'Image');
+		async function navigateThenAssert(page, app, deleteAction) {
+			const { leaf, lilFella } = await imagesByName(app);
+			const imagesBefore = await app.db.image.list();
 
 			await page.getByText('leaf.jpeg', { exact: true }).click();
 			await page.waitForURL((u) => u.hash === `#/crop/${leaf.fileId}`);
@@ -205,21 +213,25 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 
-			expect(await listTable(page, 'Image')).toEqual(
+			expect(await app.db.image.list()).toEqual(
 				imagesBefore.filter(({ fileId }) => fileId !== leaf.fileId)
 			);
 		}
 
 		test('should delete the image on ctrl-delete and go to the next image', async ({
-			page
+			page,
+			app
 		}) => {
-			await navigateThenAssert(page, async (page) => page.keyboard.press('Control+Delete'));
+			await navigateThenAssert(page, app, async (page) =>
+				page.keyboard.press('Control+Delete')
+			);
 		});
 
 		test('should delete the image via delete button and go to the next image', async ({
-			page
+			page,
+			app
 		}) => {
-			await navigateThenAssert(page, async (page) => {
+			await navigateThenAssert(page, app, async (page) => {
 				await page.getByRole('button', { name: 'Supprimer', exact: true }).click();
 			});
 		});
@@ -233,15 +245,16 @@ test.describe('Cropper view', () => {
 		/**
 		 * Expects that all the images of leaf.jpeg are marked as confirmed or unconfirmed in the database.
 		 * @param {import('@playwright/test').Page} page
+		 * @param {AppFixture} app
 		 * @param {boolean} confirmed
 		 */
-		async function expectAllImagesConfirmedInDatabase(page, confirmed) {
-			const { lilFella: image } = await imagesByName(page);
+		async function expectAllImagesConfirmedInDatabase(page, app, confirmed) {
+			const { lilFella: image } = await imagesByName(app);
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
 				await expect(
 					isImageConfirmedInDatabase(
-						page,
+						app,
 						`${image.fileId}_${i.toString().padStart(6, '0')}`
 					)
 				).resolves.toBe(confirmed);
@@ -255,14 +268,15 @@ test.describe('Cropper view', () => {
 		 * - has all images marked as confirmed in the database
 		 * - has the "Invalider" button shown
 		 * @param {import('@playwright/test').Page} page
+		 * @param {AppFixture} app
 		 * @param {boolean} implicit also check that the overlay is shown
 		 */
-		async function expectConfirmed(page, implicit = false) {
+		async function expectConfirmed(page, app, implicit = false) {
 			if (implicit) await expect(confirmedCropOverlay(page)).toBeVisible();
 			await expect(confirmedCropBadge(page)).toBeVisible();
 			await expect(page.getByRole('button', { name: 'Invalider' })).toBeVisible();
 			await page.waitForTimeout(500);
-			await expectAllImagesConfirmedInDatabase(page, true);
+			await expectAllImagesConfirmedInDatabase(page, app, true);
 		}
 
 		test.describe('with click-and-drag tool', () => {
@@ -294,7 +308,7 @@ test.describe('Cropper view', () => {
 				await page.mouse.up();
 			}
 
-			test('should create boxes on mouseup', async ({ page }) => {
+			test('should create boxes on mouseup', async ({ page, app }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 245, 245);
 				await makeBox(page, 100, 100, 340, 120);
@@ -305,14 +319,17 @@ test.describe('Cropper view', () => {
 				await expect(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
-			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
-				await expectAllImagesConfirmedInDatabase(page, false);
+			test('should mark the image as confirmed if image was untouched', async ({
+				page,
+				app
+			}) => {
+				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 245, 245);
-				await expectConfirmed(page, true);
+				await expectConfirmed(page, app, true);
 			});
 
-			test('undo/redo', async ({ page }) => {
+			test('undo/redo', async ({ page, app }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 245, 245);
 
@@ -326,8 +343,8 @@ test.describe('Cropper view', () => {
 				await expect(boxesInBoxesList(page)).toHaveCount(2);
 			});
 
-			test('dragging outside the crop surface cancels', issue(431), async ({ page }) => {
-				await setSettings({ page }, { showTechnicalMetadata: true });
+			test('dragging outside the crop surface cancels', issue(431), async ({ page, app }) => {
+				await app.settings.set({ showTechnicalMetadata: true });
 				await makeBox(page, 10, 10, 50, -30);
 				await expect(page.locator('.change-area .debug')).toHaveText(
 					/create {2}\(0 0\) × \[0 0\]/
@@ -348,7 +365,7 @@ test.describe('Cropper view', () => {
 		});
 
 		test.describe('with 2-point tool', () => {
-			test.beforeEach(async ({ page }) => {
+			test.beforeEach(async ({ page, app }) => {
 				await page.getByRole('button', { name: '2 points' }).click();
 			});
 
@@ -370,7 +387,7 @@ test.describe('Cropper view', () => {
 				});
 			}
 
-			test('should create boxes every 2 clicks', async ({ page }) => {
+			test('should create boxes every 2 clicks', async ({ page, app }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
 				await makeBox(page, 100, 100, 170, 80);
@@ -381,14 +398,17 @@ test.describe('Cropper view', () => {
 				await expect(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
-			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
-				await expectAllImagesConfirmedInDatabase(page, false);
+			test('should mark the image as confirmed if image was untouched', async ({
+				page,
+				app
+			}) => {
+				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
-				await expectConfirmed(page, true);
+				await expectConfirmed(page, app, true);
 			});
 
-			test('undo/redo', async ({ page }) => {
+			test('undo/redo', async ({ page, app }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
 
@@ -404,7 +424,7 @@ test.describe('Cropper view', () => {
 		});
 
 		test.describe('with 4-point tool', () => {
-			test.beforeEach(async ({ page }) => {
+			test.beforeEach(async ({ page, app }) => {
 				await page.getByRole('button', { name: '4 points' }).click();
 			});
 
@@ -429,7 +449,7 @@ test.describe('Cropper view', () => {
 				await changeArea.click({ position: { x: x4, y: y4 } });
 			}
 
-			test('should create boxes every 4 clicks', async ({ page }) => {
+			test('should create boxes every 4 clicks', async ({ page, app }) => {
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await expectBoxInList(page, 2, 327, 735);
 				await makeBox(page, 100, 100, 170, 80, 170, 150, 100, 150);
@@ -439,15 +459,18 @@ test.describe('Cropper view', () => {
 				await expect(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
-			test('should mark the image as confirmed if image was untouched', async ({ page }) => {
-				await expectAllImagesConfirmedInDatabase(page, false);
+			test('should mark the image as confirmed if image was untouched', async ({
+				page,
+				app
+			}) => {
+				await expectAllImagesConfirmedInDatabase(page, app, false);
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await expectBoxInList(page, 2, 327, 735);
-				await expectConfirmed(page, true);
+				await expectConfirmed(page, app, true);
 			});
 
-			test('does not leave ghost boxes', issue(462), async ({ page }) => {
-				const { withExifGps: image } = await imagesByName(page);
+			test('does not leave ghost boxes', issue(462), async ({ page, app }) => {
+				const { withExifGps: image } = await imagesByName(app);
 				await page.keyboard.press('1');
 				await page.keyboard.press('Delete');
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
@@ -524,7 +547,7 @@ test.describe('Cropper view', () => {
 			}
 		}
 
-		test.fixme('should zoom in and out with the mouse wheel', async ({ page }) => {
+		test.fixme('should zoom in and out with the mouse wheel', async ({ page, app }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
@@ -540,7 +563,7 @@ test.describe('Cropper view', () => {
 			await checkImageTransforms(page, 2.75188, 142.537, -173.856);
 		});
 
-		test('should zoom in and out with the keyboard', async ({ page }) => {
+		test('should zoom in and out with the keyboard', async ({ page, app }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
@@ -568,7 +591,7 @@ test.describe('Cropper view', () => {
 			await checkImageTransforms(page, 1);
 		});
 
-		test('should pan with the mouse', async ({ page }) => {
+		test('should pan with the mouse', async ({ page, app }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
@@ -588,8 +611,8 @@ test.describe('Cropper view', () => {
 			await expect(page.getByText(/Boîte #\d+/)).toHaveCount(1);
 		});
 
-		test('recalls zoom and pan between image changes', async ({ page }) => {
-			const images = await imagesByName(page);
+		test('recalls zoom and pan between image changes', async ({ page, app }) => {
+			const images = await imagesByName(app);
 			await zoomAt(page, 120, 100, 100);
 			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 
@@ -669,17 +692,17 @@ function confirmedCropBadge(page) {
 
 /**
  * Gets the confirmed crop status of the image with the given id in the database.
- * @param {import('@playwright/test').Page} page
+ * @param {AppFixture} app
  * @param {string} id
  */
-async function isImageConfirmedInDatabase(page, id) {
+async function isImageConfirmedInDatabase(app, id) {
 	return Boolean(
-		await getMetadataValue(
-			page,
-			{ image: { id } },
-			exampleProtocol.crop.confirmationMetadata,
-			''
-		)
+		await app.db.metadata
+			.values({
+				imageId: id,
+				protocolId: ''
+			})
+			.then((v) => v[exampleProtocol.crop.confirmationMetadata])
 	);
 }
 

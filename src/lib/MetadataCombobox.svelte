@@ -12,7 +12,9 @@
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';
 	import Logo from './Logo.svelte';
+	import OverflowableText from './OverflowableText.svelte';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
+	import { scrollfader } from './scrollfader.js';
 	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';
 	import { compareBy, pick, readableOn } from './utils.js';
@@ -113,7 +115,7 @@
 	let highlightedOption = $state();
 
 	/**
-	 * @type {Record<string, Record<string, { value: string; metadata: string; depth: number }>>}
+	 * @type {Record<string, Record<string, { value: string; metadata: string; depth: number, color?: string, icon?: string }>>}
 	 */
 	let cascadeLabelsCache = $state({});
 	$effect(() => {
@@ -162,7 +164,12 @@
 						metadataOptionId(namespacedMetadataId(protocolId, metadata.id), value)
 					);
 					if (!option) continue;
-					labels[metadata.id] = { value: option.label, metadata: metadata.label, depth };
+					labels[metadata.id] = {
+						value: option.label,
+						metadata: metadata.label,
+						depth,
+						...pick(option, 'color', 'icon')
+					};
 
 					if (Object.keys(option.cascade ?? {}).length > 0) {
 						await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then(
@@ -263,7 +270,7 @@
 						<span class="no-results">Aucun résultat :/</span>
 					{/if}
 				</div>
-				<div class="docs">
+				<div class="docs" {@attach scrollfader}>
 					{#if highlightedOption?.image}
 						<img src={highlightedOption.image} alt="" class="thumb" />
 					{:else if highlightedOption?.description || highlightedOption?.learnMore}
@@ -294,28 +301,38 @@
 						</a>
 					{/if}
 
-					<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
 					{#await cascadeLabels() then labels}
-						{@const maxdepth = Math.max(...Object.values(labels).map((l) => l.depth))}
-						{#if Object.keys(labels).length > 0}
-							<p><em>Métadonées mise à jour à la sélection de cette option</em></p>
-						{/if}
-						<table>
+						<table class="cascades">
 							<tbody>
-								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, depth }] (metadataId)}
-									{@const revdepth = maxdepth - depth}
+								<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
+								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, color, icon }] (metadataId)}
 									<tr>
 										<td>
-											{#if revdepth > 0}
-												{@html '&nbsp;'.repeat((revdepth - 1) * 3) + '└─'}
-											{/if}
-											{metadata}
+											<OverflowableText text={metadata} />
 										</td>
-										<td>{value}</td>
+										<td>
+											{#if icon || color}
+												<div
+													class="icon"
+													style:background-color={color}
+													style:color={color
+														? readableOn(color)
+														: undefined}
+												>
+													{#if icon}
+														<Icon {icon} />
+													{/if}
+												</div>
+											{/if}
+											{value}
+										</td>
 									</tr>
 								{/each}
 							</tbody>
 						</table>
+						{#if Object.keys(labels).length > 0}
+							<p><em>Métadonées mises à jour à la sélection de cette option</em></p>
+						{/if}
 					{:catch error}
 						<p class="error">
 							Erreur lors de la récupération des étiquettes en cascade: {error}
@@ -434,7 +451,8 @@
 		gap: 0.5em;
 	}
 
-	.items .icon {
+	.items .icon,
+	.cascades .icon {
 		font-size: 1.4em;
 		display: flex;
 		align-items: center;
@@ -466,6 +484,31 @@
 
 	.docs .description p:not(:last-child) {
 		margin-bottom: 0.5em;
+	}
+
+	.docs table.cascades {
+		border-collapse: collapse;
+		table-layout: fixed;
+		width: 100%;
+	}
+
+	.docs .cascades td {
+		border: 1px solid color-mix(in srgb, var(--fg-neutral) 40%, transparent);
+		border-left: none;
+		border-right: none;
+	}
+
+	.docs .cascades td:first-child {
+		overflow: hidden;
+		padding-right: 1rem;
+		width: 7rem;
+	}
+
+	.docs .cascades .icon {
+		/* Sorry 😭 we're in a table cell, 
+		display: flex fucks everything up */
+		float: left;
+		margin-right: 0.25em;
 	}
 
 	.learn-more {

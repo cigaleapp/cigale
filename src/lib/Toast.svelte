@@ -62,14 +62,14 @@
 	 * @typedef Props
 	 * @property {string} message the toast to display
 	 * @property {Toast['type']} type the type of toast to display
-	 * @property {?() => void} onaction the action to perform when the user interacts with the toast
+	 * @property {URL | (() => void) | undefined} onaction the action to perform when the user interacts with the toast
 	 * @property {string|undefined} [action] the text to use for the action button
-	 * @property {?() => void} ondismiss the action to perform when the user dismisses the toast
+	 * @property {(() => void) | undefined} ondismiss the action to perform when the user dismisses the toast
 	 * @property {string|undefined} [dismiss] the text to use for the dismiss button. If not set, a close icon will be used instead
 	 */
 
 	/** @type {Props} */
-	const { type, message, action, onaction, dismiss, ondismiss } = $props();
+	const { type, message, action, onaction, dismiss, ondismiss = () => {} } = $props();
 </script>
 
 <article
@@ -87,11 +87,18 @@
 	</div>
 	<p>{message}</p>
 	<section class="actions">
-		{#if action && onaction}
-			<ButtonInk onclick={onaction}>
-				{action}
-			</ButtonInk>
+		{#if action}
+			{#if onaction instanceof URL}
+				<ButtonInk href={onaction}>
+					{action}
+				</ButtonInk>
+			{:else if onaction}
+				<ButtonInk onclick={onaction}>
+					{action}
+				</ButtonInk>
+			{/if}
 		{/if}
+
 		{#if dismiss}
 			<ButtonInk onclick={ondismiss}>
 				{dismiss}

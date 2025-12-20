@@ -400,7 +400,6 @@ msgid "Erreur"
 msgstr "Erreur"
 
 #: src/lib/exif.js
-#: src/lib/exif.js src/lib/toasts.svelte.js src/lib/i18n.js
 #: src/lib/i18n.js
 #: src/lib/toasts.svelte.js
 #: src/routes/(app)/+layout.js
@@ -605,10 +604,6 @@ msgstr "Mode debug"
 #: src/routes/(app)/Navigation.svelte
 msgid "Modèle d'inférence"
 msgstr "Modèle d'inférence"
-
-#: src/lib/MetadataCombobox.svelte
-msgid "Métadonées mise à jour à la sélection de cette option"
-msgstr "Métadonées mise à jour à la sélection de cette option"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
@@ -2041,6 +2036,51 @@ msgstr "Impossible de modifier le chemin du fichier JSON, car CIGALE doit conna�
 #: src/lib/sessions.js
 msgid "La session a été fermée"
 msgstr "La session a été fermée"
+
+#: src/lib/MetadataCombobox.svelte
+msgid "Métadonées mises à jour à la sélection de cette option"
+msgstr "Métadonées mises à jour à la sélection de cette option"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Signaler un bug"
+msgstr "Signaler un bug"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Proposer une fonctionnalité"
+msgstr "Proposer une fonctionnalité"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid ""
+"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous\n"
+"attendiez"
+msgstr ""
+"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous\n"
+"attendiez"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Description <0/>"
+msgstr "Description <0/>"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Titre"
+msgstr "Titre"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Merci pour votre contribution!"
+msgstr "Merci pour votre contribution!"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Voir"
+msgstr "Voir"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Une erreur est survenue lors de la soumission de votre demande. Veuillez réessayer plus tard."
+msgstr "Une erreur est survenue lors de la soumission de votre demande. Veuillez réessayer plus tard."
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Envoyer"
+msgstr "Envoyer"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

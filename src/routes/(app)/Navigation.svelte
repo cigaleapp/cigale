@@ -27,6 +27,7 @@
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import DownloadResults from './DownloadResults.svelte';
+	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import Settings from './Settings.svelte';
 
 	/**
@@ -308,6 +309,9 @@
 					</div>
 				{/if}
 
+				<ModalSubmitIssue type="bug" />
+				<ModalSubmitIssue type="feature" />
+
 				<div class="settings">
 					<Settings
 						{openPrepareForOfflineUse}
@@ -482,7 +486,11 @@
 	aside {
 		display: flex;
 		align-items: center;
-		gap: 2rem;
+		gap: 0.5rem;
+	}
+
+	aside .notifications {
+		margin-right: 1.5rem;
 	}
 
 	.settings {
