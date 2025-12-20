@@ -12,6 +12,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+
 jobs:
   lint:
     name: Lint
@@ -99,14 +100,6 @@ jobs:
     name: Electron
     uses: ./.github/workflows/electron.yml
 
-  docker:
-    needs: [build, e2e]
-    name: Docker
-    uses: ./.github/workflows/docker.yml
-    with:
-      artifact: ${{ needs.build.outputs.artifact }}
-      deploy: ${{ github.ref_name == 'main' }}
-
   dont-merge-comment:
     name: Check for presence of "do not merge" comment
     if: github.event_name == 'pull_request'
@@ -138,7 +131,6 @@ jobs:
       - clutter
       - preview
       - electron
-      - docker
       - bundlesize
       - dont-merge-comment
     runs-on: ubuntu-latest

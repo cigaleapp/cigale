@@ -1,0 +1,57 @@
+name: Docker (after Checks)
+
+on:
+  workflow_run:
+    workflows:
+      - 'Checks'
+    types:
+      - completed
+
+jobs:
+  is-tagged:
+    name: Run only if the commit is tagged
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    outputs:
+      tag-name: ${{ steps.find-tag.outputs.result }}
+    steps:
+      - name: Find tag for workflow commit or read Docker-build-tag trailer
+        id: find-tag
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const sha = github.context.payload.workflow_run.head_sha;
+            const { owner, repo } = context.repo;
+
+            // Find tag associated with the commit
+            const tags = await github.paginate(github.rest.repos.listTags, { owner, repo, per_page: 100 });
+            const tag = tags.find(t => t.commit && t.commit.sha === sha);
+            if (tag) return tag.name.replace(/^v/, '');
+
+            // No tag found: fetch the commit message and look for a trailer
+            const commit = await github.rest.repos.getCommit({ owner, repo, ref: sha });
+            const message = commit.data && commit.data.commit && commit.data.commit.message || '';
+            const trailer = message.match(/^Docker-build-tag:\s*(.+)$/gmi);
+            if (trailer && trailer.length) {
+              return trailer.at(-1).split(':', 2).at(1).trim().replace(/^v/, '');
+            }
+
+            // No tag found
+            return '';
+
+  build:
+    name: Build the app
+    needs: is-tagged
+    if: needs.is-tagged.outputs.tag-name != ''
+    uses: ./.github/workflows/build.yml
+    with:
+      minify: true
+
+  docker:
+    name: Build & push Docker image
+    needs: [build, is-tagged]
+    uses: ./.github/workflows/docker.yml
+    with:
+      artifact: ${{ needs.build.outputs.artifact }}
+      tag: ${{ needs.is-tagged.outputs.tag-name }}
+      deploy: true

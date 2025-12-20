@@ -7,6 +7,10 @@ on:
         type: string
         description: Name of artifact to download built app from. If empty, app will be built here.
         default: ''
+      tag:
+        type: string
+        description: Tag to apply to the Docker image. Defaults to the GitHub SHA.
+        default: ''
       deploy:
         type: boolean
         default: false
@@ -46,4 +50,4 @@ jobs:
           push: ${{ inputs.deploy }}
           tags: |
             ghcr.io/cigaleapp/cigale:latest
-            ghcr.io/cigaleapp/cigale:${{ github.sha }}
+            ghcr.io/cigaleapp/cigale:${{ inputs.tag || github.sha }}
