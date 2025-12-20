@@ -378,15 +378,12 @@
 		font-weight: bold;
 	}
 
-	.viewport :global(> *) {
+	.items,
+	.docs {
 		width: 50%;
 		scrollbar-color: var(--gray) transparent;
 		scrollbar-gutter: stable;
 		scrollbar-width: thin;
-	}
-
-	.items,
-	.docs {
 		overflow-y: auto;
 	}
 
@@ -394,11 +391,11 @@
 		width: 800px;
 	}
 
-	:global([data-wide-docs] .viewport > :nth-child(1)) {
+	:global([data-wide-docs] .items) {
 		width: 40%;
 	}
 
-	:global([data-wide-docs] .viewport > :nth-child(2)) {
+	:global([data-wide-docs] .docs) {
 		width: 60%;
 	}
 
