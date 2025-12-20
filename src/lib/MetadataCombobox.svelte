@@ -14,6 +14,7 @@
 	import Logo from './Logo.svelte';
 	import OverflowableText from './OverflowableText.svelte';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
+	import ScrollFader from './ScrollFader.svelte';
 	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';
 	import { compareBy, pick, readableOn } from './utils.js';
@@ -269,80 +270,87 @@
 						<span class="no-results">Aucun résultat :/</span>
 					{/if}
 				</div>
-				<div class="docs">
-					{#if highlightedOption?.image}
-						<img src={highlightedOption.image} alt="" class="thumb" />
-					{:else if highlightedOption?.description || highlightedOption?.learnMore}
-						<h2>{highlightedOption.label}</h2>
-					{/if}
-					{#if highlightedOption?.description}
-						<section class="description">
-							{#await marked(highlightedOption.description) then html}
-								{@html html}
-							{:catch error}
-								{#if isDebugMode()}
-									<p class="error">Markdown invalide: {error}</p>
-								{/if}
-								{highlightedOption.description}
-							{/await}
-						</section>
-					{/if}
-					{#if highlightedOption?.learnMore}
-						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-						<a href={highlightedOption.learnMore} target="_blank" class="learn-more">
-							<IconArrowRight />
-							<div class="text">
-								<span>En savoir plus</span>
-								<code class="domain"
-									>{new URL(highlightedOption.learnMore).hostname}</code
-								>
-							</div>
-						</a>
-					{/if}
-
-					{#await cascadeLabels() then labels}
-						<table class="cascades">
-							<tbody>
-								<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
-								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, color, icon }] (metadataId)}
-									<tr>
-										<td>
-											<OverflowableText text={metadata} />
-										</td>
-										<td>
-											{#if icon || color}
-												<div
-													class="icon"
-													style:background-color={color}
-													style:color={color
-														? readableOn(color)
-														: undefined}
-												>
-													{#if icon}
-														<Icon {icon} />
-													{/if}
-												</div>
-											{/if}
-											{value}
-										</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
-						{#if Object.keys(labels).length > 0}
-							<p><em>Métadonées mises à jour à la sélection de cette option</em></p>
+				<ScrollFader height={200}>
+					<div class="docs">
+						{#if highlightedOption?.image}
+							<img src={highlightedOption.image} alt="" class="thumb" />
+						{:else if highlightedOption?.description || highlightedOption?.learnMore}
+							<h2>{highlightedOption.label}</h2>
 						{/if}
-					{:catch error}
-						<p class="error">
-							Erreur lors de la récupération des étiquettes en cascade: {error}
-						</p>
-					{/await}
-					{#if !highlightedOption?.description && !highlightedOption?.learnMore && !highlightedOption?.image}
-						<section class="empty">
-							<Logo variant="empty" />
-						</section>
-					{/if}
-				</div>
+						{#if highlightedOption?.description}
+							<section class="description">
+								{#await marked(highlightedOption.description) then html}
+									{@html html}
+								{:catch error}
+									{#if isDebugMode()}
+										<p class="error">Markdown invalide: {error}</p>
+									{/if}
+									{highlightedOption.description}
+								{/await}
+							</section>
+						{/if}
+						{#if highlightedOption?.learnMore}
+							<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+							<a
+								href={highlightedOption.learnMore}
+								target="_blank"
+								class="learn-more"
+							>
+								<IconArrowRight />
+								<div class="text">
+									<span>En savoir plus</span>
+									<code class="domain"
+										>{new URL(highlightedOption.learnMore).hostname}</code
+									>
+								</div>
+							</a>
+						{/if}
+						{#await cascadeLabels() then labels}
+							<table class="cascades">
+								<tbody>
+									<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
+									{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, color, icon }] (metadataId)}
+										<tr>
+											<td>
+												<OverflowableText text={metadata} />
+											</td>
+											<td>
+												{#if icon || color}
+													<div
+														class="icon"
+														style:background-color={color}
+														style:color={color
+															? readableOn(color)
+															: undefined}
+													>
+														{#if icon}
+															<Icon {icon} />
+														{/if}
+													</div>
+												{/if}
+												{value}
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+							{#if Object.keys(labels).length > 0}
+								<p>
+									<em>Métadonées mises à jour à la sélection de cette option</em>
+								</p>
+							{/if}
+						{:catch error}
+							<p class="error">
+								Erreur lors de la récupération des étiquettes en cascade: {error}
+							</p>
+						{/await}
+						{#if !highlightedOption?.description && !highlightedOption?.learnMore && !highlightedOption?.image}
+							<section class="empty">
+								<Logo variant="empty" />
+							</section>
+						{/if}
+					</div>
+				</ScrollFader>
 			</div>
 		</Combobox.Content>
 	</Combobox.Portal>
@@ -377,12 +385,15 @@
 		font-weight: bold;
 	}
 
-	.items,
-	.docs {
+	.viewport :global(> *) {
 		width: 50%;
 		scrollbar-color: var(--gray) transparent;
 		scrollbar-gutter: stable;
 		scrollbar-width: thin;
+	}
+
+	.items,
+	.docs {
 		overflow-y: auto;
 	}
 
@@ -390,11 +401,11 @@
 		width: 800px;
 	}
 
-	:global([data-wide-docs] .items) {
+	:global([data-wide-docs] .viewport > :nth-child(1)) {
 		width: 40%;
 	}
 
-	:global([data-wide-docs] .docs) {
+	:global([data-wide-docs] .viewport > :nth-child(2)) {
 		width: 60%;
 	}
 
