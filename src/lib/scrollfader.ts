@@ -1,6 +1,15 @@
 import type { Attachment } from 'svelte/attachments';
 
+/**
+ * Indicates that a container is scrollable by fading out content at the bottom, unless there's nothing more to scroll.
+ * Height of the fade is 200px.
+ * Fade effect is achieved using CSS mask-image and a custom property (--fade) to control the opacity of the fade.
+ * --fade is updated on scroll and corresponds to how far the user is from the bottom of the scrollable content, with 0 meaning at the bottom and 1 meaning 200px or more from the bottom.
+ * @see https://github.com/harshmandan/svelte-overflow-fade/blob/0f8104c9f1ad29b8d3817e18dd016ad8a7ac09b2/src/lib/index.ts#L212
+ * @param element the scrollable container to apply the fade to
+ */
 export const scrollfader: Attachment<HTMLElement> = (element) => {
+	// TODO configurable / percentage of element clientHeight ?
 	const height = 200;
 
 	setupFadeProperty();
