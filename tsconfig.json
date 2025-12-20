@@ -10,7 +10,7 @@
 		"sourceMap": true,
 		"strict": true,
 		"exactOptionalPropertyTypes": true,
-		"module": "es2022",
+		"module": "esnext",
 		"moduleResolution": "bundler",
 		"target": "es2022",
 		"types": ["vitest/importMeta"]

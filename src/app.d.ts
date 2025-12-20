@@ -14,6 +14,7 @@ declare global {
 		interface PageData {
 			swarpc: SwarpcClient<typeof PROCEDURES>;
 		}
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any,  @typescript-eslint/no-empty-object-type
 		interface PageState extends Record<string, any> {}
 		// interface Platform {}
 	}
