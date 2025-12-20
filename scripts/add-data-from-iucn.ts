@@ -76,6 +76,7 @@ async function augmentMetadata(metadata: (typeof ExportedProtocol.inferOut)['met
 	const total = metadata.options.length;
 	let done = 0;
 	let added = 0;
+
 	const eta = new EtaCalculator({
 		averageOver: 2_000,
 		totalSteps: total - notFoundCache.size
