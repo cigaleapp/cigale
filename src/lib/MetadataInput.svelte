@@ -53,7 +53,7 @@
 			onchange={onblur}
 			cards={options.every((opt) => opt.icon || opt.color)}
 			options={options
-				.toSorted(compareBy(({ key }) => definition.ordering?.indexOf(key)))
+				.toSorted(compareBy(({ index }) => index))
 				.map((opt) => pick(opt, 'key', 'label', 'icon', 'color'))}
 		>
 			{#snippet children({ label, icon, color })}
