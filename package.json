@@ -121,7 +121,7 @@
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.1",
 		"svelte": "^5.46.0",
-		"svelte-check": "^4.3.4",
+		"svelte-check": "^4.3.5",
 		"tinyexec": "^1.0.2",
 		"turndown": "^7.2.2",
 		"typescript": "^5.9.3",
