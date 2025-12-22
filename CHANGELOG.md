@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add deletion confirmation modal for session deletes
+- Add issue submit modal
+- Add keyboard shortcuts for issue submitting
 - Add radio buttons presentation for smaller enum metadata
 - Add undo/redo buttons to UI
 - Allow editing metadata option synonyms in protocol editor
@@ -21,9 +23,11 @@ All notable changes to this project will be documented in this file, on a monthl
 - Hide navbar in cropper (#921)
 - Implement MetadataEnumVariant.{color,icon} (#956)
 - Implement session protocol change
+- Improve cascades display in combobox
 - Improve disabled state (and transitions from/to disable state) for Button{Secondary,Primary}
 - Improve lightmode error background color a bit
 - Improve remote protocol import flow
+- Indicate scrollablility on MetadataCombobox description part (Closes #995)
 - Introduce session-level metadata in protocol definition
 - Left-align cards in AreaObservation (Closes #950)
 - Make analysis.json's zip filepath non-customizable
@@ -33,8 +37,14 @@ All notable changes to this project will be documented in this file, on a monthl
 - Remove unsaved work indicator in protocols list
 - Round corners of unrolled group background
 - Show app version in about page
+- Show icon & color of cascaded values in combobox
 - Show notification when app update is found or was installed
 - Show synonyms when metadata search matched by synonym
+- Use title attribute when putting a tooltip on a element inside of a <dialog>
+
+### Accessibility Improvements
+
+- Allow ButtonInk to be a <a> tag, expose this for toast actions
 
 ### Bug Fixes
 
@@ -43,6 +53,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Don't push operation to undo stack if its data is invalid
 - Don't put protocol id as default description for new sessions
 - Fix EXIF extraction not updating UI with metadata values
+- Fix OK button showing up on all toasts (Fixes #992)
 - Fix cannot import results zip into session if export has session metadata values set
 - Fix deleteSession
 - Fix image deletion not working in import tab
@@ -54,13 +65,25 @@ All notable changes to this project will be documented in this file, on a monthl
 - Make metadata option description actually optional
 - Make metadata value clear button work on import tab and on session metadata
 - Make sure preview image of >1-images-observation is the first image of the selection used to group it up
+- Put tooltips above bits-ui flyouts (e.g. comboboxes)
 - Retrieve session description for zip export when importing it, fallback name when saved one is empty
 - Set manuallyModified when changing session metadata values
+- Show description of options on MetadataInput when presenting as radio buttons
+- Sort metadata options by index instead of (non-specified) ordering property
+- Try fixing full-page reload on each goto() navigation in prod only
 
 ### Data Updates
 
+- Add ETA and exponential retry wait time for IUCN augmentation script
+- Add icon-padded.png logo
+- Difficulté d'ID et statut IUCN dans le proto. d'example (Closes #369)
+- Fix extra ff in color hex of conservation_status metadata option
 - Forward-port session metadata in example protocol
+- Get IUCN conservation status from the IUCN Red List API
+- Handle more IUCN codes
+- Prevent JJ script from deleting other cascades when augmenting
 - Regenerate example protocols
+- Try fixing ordering of conservation_status and identification_difficulty
 - Use JJ site for genus descriptions too (#920)
 
 ### Translation Updates
