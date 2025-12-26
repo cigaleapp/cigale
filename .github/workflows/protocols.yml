@@ -88,9 +88,10 @@ jobs:
       - name: Setup diffing that ignores version and learnMore fields
         run: git config diff.example-protocols.textconv "$textconv"
         env:
-          textconv: jq 'del(.version) | del(.learnMore) | del (.metadata[].options[]?.image)' $1
+          textconv: jq 'del(.version) | del(.learnMore)' $1
 
       - name: Pull in case main has changed since we started
+        if: github.event_name == 'push' && github.ref_name == 'main'
         run: git pull origin main --rebase --autostash
 
       - name: Check for changes
