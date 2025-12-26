@@ -88,14 +88,22 @@ await mkdir('./slides', { recursive: true });
 
 const longestNameLength = Math.max(...response.data.files.map((file) => file.name.length));
 
-for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompare(b.name))) {
+for (const { name, id, webViewLink } of response.data.files.sort((a, b) =>
+	a.name.localeCompare(b.name)
+)) {
 	const log = (...items) =>
 		console.info(
 			`${cc.bold}${cc.cyan}[${name.padStart(longestNameLength)}]${cc.reset}`,
 			...items
 		);
 
+	if (name === 'A-BASE') {
+		log('Skipping');
+		continue;
+	}
+
 	try {
+		log(`Using document at ${cc.blue}${webViewLink}${cc.reset}`);
 		log('Exporting to PDF');
 		const pdf = await drive.files.export(
 			{
@@ -130,6 +138,13 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 						cropbox.end = { x: width - x, y: height - y, found: true };
 					}
 				});
+
+				if (cropbox.end.x < cropbox.start.x || cropbox.end.y < cropbox.start.y) {
+					cropbox = {
+						start: cropbox.end,
+						end: cropbox.start
+					};
+				}
 
 				const logbox = ({ start, end }) => `(${start.x} ${start.y}) -> (${end.x} ${end.y})`;
 
@@ -188,19 +203,25 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				return doc;
 			});
 
-		const description = htmlToMarkdown(
-			html.querySelector('section[data-page^="page"]:not([data-page="page1"])')
+		const firstPage = html.querySelector('section[data-page="page1"]');
+		if (!firstPage) throw new Error('Document has no pages');
+
+		const description = htmlToMarkdown(firstPage);
+
+		const otherPages = [...html.querySelectorAll('section[data-page]')].filter((node) =>
+			/^page\d+$/.test(node.dataset.page)
 		);
 
 		const links = Object.fromEntries(
-			[...html.querySelectorAll('section[data-page^="page"]:not([data-page="page1"]) a')]
+			otherPages
+				.flatMap((node) => [...node.querySelectorAll('a')])
 				.map((node) => [node.href, node.textContent])
 				.filter(([, text]) => text && text !== ' ')
 		);
 
 		const learnMore =
-			Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))[0] ??
-			links[0][0];
+			Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))?.[0] ??
+			Object.entries(links)[0];
 
 		for (const [filepath, protocol] of Object.entries(protocols)) {
 			log(`Adding to ${cc.blue}${protocol.fresh.id}${cc.reset}`);
@@ -276,7 +297,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			writeFileSync(filepath, JSON.stringify(protocol.fresh, null, 2));
 		}
 	} catch (error) {
-		log('An error occured:', error);
+		log('An error occured:\n', error);
 	}
 }
 
