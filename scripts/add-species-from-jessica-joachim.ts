@@ -10,6 +10,29 @@ import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 import { EtaCalculator } from './eta.js';
 
+const RichContent = type({ rendered: "string" }).pipe(content => new JSDOM(content.rendered))
+const OGImage = type({ url: "string.url.parse", width: "number", height: "number" })
+
+const WordpressPage = type({
+	id: "number",
+	date: "string.date.iso.parse",
+	date_gmt: "string.date.iso.parse",
+	modified: "string.date.iso.parse",
+	modified_gmt: "string.date.iso.parse",
+	slug: "string",
+	link: "string.url.parse",
+	title: RichContent,
+	content: RichContent,
+	excerpt: RichContent,
+	yoast_head_json: {
+		canonical: "string.url.parse",
+		og_description: "string",
+		og_image: OGImage.array()
+	}
+});
+
+const WordpressPagesResponse = WordpressPage.array().atLeastLength(1)
+
 const LINKS_TO_AVOID = [
 	// FIXME redirects to an image file
 	'https://jessica-joachim.com/insectes/dipteres/syrphidae/paragus-pecchiolii/',
