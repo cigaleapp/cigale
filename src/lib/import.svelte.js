@@ -6,7 +6,12 @@ import * as dates from 'date-fns';
 import { toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
 import { processExifData } from '$lib/exif.js';
 import { tables } from '$lib/idb.svelte.js';
-import { errorMessageImageTooLarge, imageId, resizeToMaxSize, storeImageBytes } from '$lib/images.js';
+import {
+	errorMessageImageTooLarge,
+	imageId,
+	resizeToMaxSize,
+	storeImageBytes
+} from '$lib/images.js';
 import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte.js';
 

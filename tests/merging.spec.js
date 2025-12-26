@@ -1,5 +1,10 @@
 import { expect, test } from './fixtures.js';
-import { chooseFirstSession, loadDatabaseDump, observationCard, setInferenceModels } from './utils.js';
+import {
+	chooseFirstSession,
+	loadDatabaseDump,
+	observationCard,
+	setInferenceModels
+} from './utils.js';
 
 test.beforeEach(async ({ page, app }) => {
 	await app.settings.set({ gallerySort: { direction: 'asc', key: 'filename' } });
