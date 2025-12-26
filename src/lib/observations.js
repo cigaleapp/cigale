@@ -1,11 +1,11 @@
 import { generateId } from '$lib/database.js';
 
-import * as db from './idb.svelte';
-import { tables } from './idb.svelte';
-import { deleteImageFile, imageFileIds } from './images';
-import { mergeMetadataValues } from './metadata';
-import { uiState } from './state.svelte';
-import { compareBy, nonnull } from './utils';
+import * as db from './idb.svelte.js';
+import { tables } from './idb.svelte.js';
+import { deleteImageFile, imageFileIds } from './images.js';
+import { mergeMetadataValues } from './metadata.js';
+import { uiState } from './state.svelte.js';
+import { compareBy, nonnull } from './utils.js';
 
 /**
  * @param {string[]} parts IDs of observations or images to merge

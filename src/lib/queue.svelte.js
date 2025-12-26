@@ -1,10 +1,10 @@
-import { classifyImage } from './classification.svelte';
-import { errorMessage, plural } from './i18n';
-import { imageFileId } from './images';
-import { inferBoundingBoxes, processImageFile } from './import.svelte';
-import { sendNotification } from './notifications';
-import { importResultsZip } from './results.svelte';
-import { uiState } from './state.svelte';
+import { classifyImage } from './classification.svelte.js';
+import { errorMessage, plural } from './i18n.js';
+import { imageFileId } from './images.js';
+import { inferBoundingBoxes, processImageFile } from './import.svelte.js';
+import { sendNotification } from './notifications.js';
+import { importResultsZip } from './results.svelte.js';
+import { uiState } from './state.svelte.js';
 import { isZip, range } from './utils.js';
 
 /**

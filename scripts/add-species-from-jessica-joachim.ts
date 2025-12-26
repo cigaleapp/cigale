@@ -6,9 +6,9 @@ import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import type { MetadataEnumVariant } from '../src/lib/schemas/metadata';
-import type { ExportedProtocol } from '../src/lib/schemas/protocols';
-import { EtaCalculator } from './eta';
+import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
+import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+import { EtaCalculator } from './eta.js';
 
 const LINKS_TO_AVOID = [
 	// FIXME redirects to an image file

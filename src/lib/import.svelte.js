@@ -3,9 +3,9 @@
  */
 import * as dates from 'date-fns';
 
-import { toRelativeCoords } from '$lib/BoundingBoxes.svelte';
-import { processExifData } from '$lib/exif';
-import { tables } from '$lib/idb.svelte';
+import { toRelativeCoords } from '$lib/BoundingBoxes.svelte.js';
+import { processExifData } from '$lib/exif.js';
+import { tables } from '$lib/idb.svelte.js';
 import {
 	decodeRawPhoto,
 	errorMessageImageTooLarge,
@@ -13,12 +13,12 @@ import {
 	isRawImage,
 	resizeToMaxSize,
 	storeImageBytes
-} from '$lib/images';
+} from '$lib/images.js';
 import { uiState } from '$lib/state.svelte.js';
-import { toasts } from '$lib/toasts.svelte';
+import { toasts } from '$lib/toasts.svelte.js';
 
-import { imageLimits } from './inference_utils';
-import { serializeMetadataValues } from './metadata';
+import { imageLimits } from './inference_utils.js';
+import { serializeMetadataValues } from './metadata.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
 	'image/jpeg',

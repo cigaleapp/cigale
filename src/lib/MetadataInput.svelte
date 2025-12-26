@@ -6,12 +6,12 @@
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
 
-	import { isType } from './metadata';
+	import { isType } from './metadata.js';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import RadioButtons from './RadioButtons.svelte';
 	import Switch from './Switch.svelte';
-	import { tooltip } from './tooltips';
-	import { compareBy, pick, readableOn, round, safeJSONParse } from './utils';
+	import { tooltip } from './tooltips.js';
+	import { compareBy, pick, readableOn, round, safeJSONParse } from './utils.js';
 
 	/**
 	 * @typedef {object} Props
@@ -53,23 +53,28 @@
 			onchange={onblur}
 			cards={options.every((opt) => opt.icon || opt.color)}
 			options={options
-				.toSorted(compareBy(({ key }) => definition.ordering?.indexOf(key)))
-				.map((opt) => pick(opt, 'key', 'label', 'icon', 'color'))}
+				.toSorted(compareBy(({ index }) => index))
+				.map((opt) => pick(opt, 'key', 'label', 'icon', 'color', 'description'))}
 		>
-			{#snippet children({ label, icon, color })}
+			{#snippet children({ label, icon, color, description })}
 				<div class="label">
-					{#if icon || color}
-						<div
-							class="icon"
-							style:background-color={color}
-							style:color={color ? readableOn(color) : undefined}
-						>
-							{#if icon}
-								<Icon {icon} />
-							{/if}
-						</div>
+					<div class="first-line">
+						{#if icon || color}
+							<div
+								class="icon"
+								style:background-color={color}
+								style:color={color ? readableOn(color) : undefined}
+							>
+								{#if icon}
+									<Icon {icon} />
+								{/if}
+							</div>
+						{/if}
+						{label}
+					</div>
+					{#if description}
+						<p class="subtext">{description}</p>
 					{/if}
-					{label}
 				</div>
 			{/snippet}
 		</RadioButtons>
@@ -229,10 +234,20 @@
 	}
 
 	.metadata-input.compact-enum .label {
-		display: inline-flex;
-		align-items: center;
 		gap: 0.75em;
 		margin-left: 0.25em;
+
+		&:not(:has(.subtext)) {
+			display: inline-flex;
+			align-items: center;
+		}
+
+		.first-line {
+			display: flex;
+			align-items: center;
+			gap: 0.5em;
+			flex-wrap: nowrap;
+		}
 
 		.icon {
 			border-radius: 50%;
@@ -241,6 +256,13 @@
 			align-items: center;
 			height: 0.9em;
 			width: 0.9em;
+		}
+
+		.subtext {
+			margin: 0;
+			margin-top: 0.25em;
+			font-size: 0.9em;
+			color: var(--gay);
 		}
 	}
 

@@ -3,8 +3,8 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
-import { tables } from './idb.svelte';
-import { getMetadataValue } from './metadata';
+import { tables } from './idb.svelte.js';
+import { getMetadataValue } from './metadata.js';
 
 /**
  * @import * as DB from './database';

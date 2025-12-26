@@ -2,10 +2,10 @@ import 'fake-indexeddb/auto';
 
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { nukeDatabase, openDatabase, tables } from './idb.svelte';
+import { nukeDatabase, openDatabase, tables } from './idb.svelte.js';
 import * as idb from './idb.svelte.js';
-import { imageId } from './images';
-import { keys } from './utils';
+import { imageId } from './images.js';
+import { keys } from './utils.js';
 
 beforeEach(() => {
 	nukeDatabase();

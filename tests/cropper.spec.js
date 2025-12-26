@@ -5,7 +5,7 @@ import { exampleProtocol, expect, test } from './fixtures.js';
 import { browserConsole, chooseFirstSession, loadDatabaseDump, setImageMetadata } from './utils.js';
 
 /**
- * @import { AppFixture } from './fixtures';
+ * @import { AppFixture } from './fixtures.js';
  */
 
 test.describe('Cropper view', () => {

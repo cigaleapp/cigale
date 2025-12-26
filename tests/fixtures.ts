@@ -4,10 +4,9 @@ import { test as base, type Locator } from '@playwright/test';
 import type { Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
 import type { RuntimeValue } from '$lib/metadata';
-import type { MetadataValues } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
-import { safeJSONParse, throwError } from '$lib/utils';
+import { safeJSONParse } from '$lib/utils';
 
 import fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
@@ -32,7 +31,7 @@ import {
 	waitForLoadingEnd,
 	type NavigationTab,
 	type PredownloadedModel
-} from './utils';
+} from './utils.js';
 
 let classification80Model: PredownloadedModel | null = null;
 let classification17kModel: PredownloadedModel | null = null;

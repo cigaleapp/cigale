@@ -5,8 +5,8 @@ import * as yauzl from 'yauzl-promise';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/exports.js';
-import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator';
-import { pr, withParallelism } from './annotations';
+import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
+import { pr, withParallelism } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
 	browserConsole,

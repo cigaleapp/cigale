@@ -2,11 +2,11 @@
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 
-	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte';
+	import { coordsScaler, withinBoundingBox } from './BoundingBoxes.svelte.js';
 	import { fittedImageRect, NewBoundingBox } from './DraggableBoundingBox.svelte.js';
-	import { imageIdToFileId } from './images';
-	import { isDebugMode } from './settings.svelte';
-	import { mapValues } from './utils';
+	import { imageIdToFileId } from './images.js';
+	import { isDebugMode } from './settings.svelte.js';
+	import { mapValues } from './utils.js';
 
 	/**
 	 * @import { ZoomState } from './DraggableBoundingBox.svelte.js';

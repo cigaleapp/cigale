@@ -7,8 +7,9 @@ import {
 	importProtocol,
 	newSession,
 	sessionMetadataSectionFor,
+	setInferenceModels,
 	switchSession
-} from './utils';
+} from './utils.js';
 
 test.describe('isolation', () => {
 	test.beforeEach(() => {
@@ -77,6 +78,11 @@ test('import into new session', async ({ page, app }) => {
 	await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 	await expect(page.getByText('with-exif-gps.jpeg')).toBeVisible();
 	await expect(page.locator('main article')).toHaveCount(4);
+
+	await setInferenceModels(page, {
+		crop: 'Aucune inférence',
+		classify: 'Aucune inférence'
+	});
 
 	await app.tabs.go('crop');
 	await expect(page.locator('main header > *').nth(1)).toHaveText('4 éléments');
@@ -174,10 +180,10 @@ test('import into new session', async ({ page, app }) => {
 	        - img
 	  - text: Photo d'habitat
 	  - radiogroup:
-	    - radio "C'est une photo de l'habitat à proximité"
-	    - text: C'est une photo de l'habitat à proximité
 	    - radio "C'est une photo de l'habitat actuel"
 	    - text: C'est une photo de l'habitat actuel
+	    - radio "C'est une photo de l'habitat à proximité"
+	    - text: C'est une photo de l'habitat à proximité
 	  - button [disabled]:
 	    - img
 	  - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
@@ -191,6 +197,30 @@ test('import into new session', async ({ page, app }) => {
 	  - button [disabled]:
 	    - img
 	  - paragraph: Endroit où la photo a été prise
+	  - text: Difficulté d'identification
+	  - radiogroup: Facile Moyenne Difficile Très difficile
+	  - button [disabled]:
+	    - img
+	  - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
+	  - text: Statut de conservation
+	  - radiogroup:
+	    - text: EX
+	    - paragraph: Éteint (“Extinct”)
+	    - text: EW
+	    - paragraph: Éteint à l’état sauvage (“Extinct in the Wild”)
+	    - text: CR
+	    - paragraph: En danger critique d’extinction (“Critically Endangered”)
+	    - text: EN
+	    - paragraph: En danger (“Endangered”)
+	    - text: VU
+	    - paragraph: Vulnérable (“Vulnerable”)
+	    - text: NT
+	    - paragraph: Quasi menacé (“Near Threatened”)
+	    - text: LC
+	    - paragraph: Préoccupation mineure (“Least Concern”)
+	  - button [disabled]:
+	    - img
+	  - paragraph: Statut de conservation IUCN de l'espèce
 	  - text: Classe
 	  - combobox: Collembola
 	  - code: /\\d+%/
@@ -335,10 +365,12 @@ test('can change protocol of session', async ({ page, app }) => {
 	  - paragraph: date metadata
 	  - text: enum
 	  - radiogroup:
-	    - radio "One"
+	    - radio "One Option 1"
 	    - text: One
-	    - radio "Two"
+	    - paragraph: Option 1
+	    - radio "Two Option 2"
 	    - text: Two
+	    - paragraph: Option 2
 	  - button [disabled]:
 	    - img
 	  - paragraph: enum metadata

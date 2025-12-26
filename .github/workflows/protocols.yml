@@ -90,6 +90,9 @@ jobs:
         env:
           textconv: jq 'del(.version) | del(.learnMore) | del (.metadata[].options[]?.image)' $1
 
+      - name: Pull in case main has changed since we started
+        run: git pull origin main --rebase --autostash
+
       - name: Check for changes
         id: status
         run: |

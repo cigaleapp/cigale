@@ -6,6 +6,9 @@ import depend from 'eslint-plugin-depend';
 import oxlint from 'eslint-plugin-oxlint';
 import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
+import ts from 'typescript-eslint';
+
+import svelteConfig from './svelte.config.js';
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
@@ -14,6 +17,10 @@ export default [
 	includeIgnoreFile(gitignorePath),
 	depend.configs['flat/recommended'],
 	js.configs.recommended,
+	...ts.configs.recommended.map((cfg) => ({
+		files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+		...cfg
+	})),
 	...svelte.configs['flat/recommended'],
 	prettier,
 	...svelte.configs['flat/prettier'],
@@ -37,6 +44,17 @@ export default [
 					caughtErrorsIgnorePattern: '^_'
 				}
 			]
+		}
+	},
+	{
+		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+				extraFileExtensions: ['.svelte'],
+				parser: ts.parser,
+				svelteConfig
+			}
 		}
 	},
 	// oxlint should be the last one

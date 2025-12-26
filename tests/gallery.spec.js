@@ -1,5 +1,5 @@
-import { expect, test } from './fixtures';
-import { importPhotos, newSession } from './utils';
+import { expect, test } from './fixtures.js';
+import { importPhotos, newSession } from './utils.js';
 
 test.describe('sorting', () => {
 	test.beforeEach(async ({ page, app }) => {

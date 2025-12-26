@@ -5,12 +5,12 @@
 	import IconMerged from '~icons/ri/stack-line';
 
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { isType } from './metadata';
+	import { isType } from './metadata.js';
 	import MetadataInput from './MetadataInput.svelte';
-	import { splitMetadataId } from './schemas/metadata';
-	import { isDebugMode } from './settings.svelte';
-	import { tooltip } from './tooltips';
-	import { safeJSONParse } from './utils';
+	import { splitMetadataId } from './schemas/metadata.js';
+	import { isDebugMode } from './settings.svelte.js';
+	import { tooltip } from './tooltips.js';
+	import { safeJSONParse } from './utils.js';
 
 	/**
 	 * @typedef {object} Props
@@ -137,7 +137,11 @@
 	{/if}
 	{#if isDebugMode()}
 		<pre class="debug">{JSON.stringify(
-				{ ...splitMetadataId(definition.id), value },
+				{
+					...splitMetadataId(definition.id),
+					...(options.length <= 10 ? { options } : {}),
+					value
+				},
 				null,
 				2
 			)}</pre>

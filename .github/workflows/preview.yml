@@ -42,7 +42,7 @@ jobs:
       - name: Wait for preview to be live
         if: github.event.action != 'closed'
         run: |
-          wget ${{ steps.deploy-preview.outputs.preview-url }}
+          wget ${{ steps.deploy-preview.outputs.preview-url }} || touch index.html
           while ! grep "$BUILD_COMMIT" index.html; do
             echo "Preview not live yet, waiting..."
             sleep 5

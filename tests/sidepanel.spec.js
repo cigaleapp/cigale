@@ -6,11 +6,11 @@ import {
 	firstObservationCard,
 	loadDatabaseDump,
 	setInferenceModels
-} from './utils';
+} from './utils.js';
 
 /**
  * @import { Page } from '@playwright/test';
- * @import { AppFixture } from './fixtures';
+ * @import { AppFixture } from './fixtures.js';
  */
 
 /**

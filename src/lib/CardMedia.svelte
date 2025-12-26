@@ -41,7 +41,7 @@
 	import LoadingSpinner from './LoadingSpinner.svelte';
 	import Logo from './Logo.svelte';
 	import OverflowableText from './OverflowableText.svelte';
-	import { tooltip } from './tooltips';
+	import { tooltip } from './tooltips.js';
 
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
 	let {

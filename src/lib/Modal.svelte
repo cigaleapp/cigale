@@ -36,8 +36,8 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 
 	import ButtonIcon from './ButtonIcon.svelte';
 	import ModalToasts from './ModalToasts.svelte';
-	import { getColorScheme } from './settings.svelte';
-	import { insideBoundingClientRect } from './utils';
+	import { getColorScheme } from './settings.svelte.js';
+	import { insideBoundingClientRect } from './utils.js';
 
 	/**  @type {Props} */
 	let {

@@ -19,8 +19,8 @@
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
-	import { hasUpgradeAvailable, upgradeProtocol } from '$lib/protocols';
-	import { toasts } from '$lib/toasts.svelte';
+	import { hasUpgradeAvailable, upgradeProtocol } from '$lib/protocols.js';
+	import { toasts } from '$lib/toasts.svelte.js';
 
 	import ButtonIcon from './ButtonIcon.svelte';
 
