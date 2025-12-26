@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 
-import { AnalyzedObservation, MetadataRecord } from './results';
-import { Session } from './sessions';
+import { AnalyzedObservation, MetadataRecord } from './results.js';
+import { Session } from './sessions.js';
 
 export const Analysis = type({
 	observations: type({

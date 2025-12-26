@@ -3,8 +3,8 @@ import path from 'node:path';
 import { ArkErrors, type } from 'arktype';
 import { formatDuration } from 'date-fns';
 
-import type { ExportedProtocol } from '../src/lib/schemas/protocols';
-import { EtaCalculator } from './eta';
+import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+import { EtaCalculator } from './eta.js';
 
 const token = process.env.IUCN_API_TOKEN;
 if (!token) throw new Error('IUCN_API_TOKEN is not set in environment variables.');

@@ -1,6 +1,6 @@
-import { issue } from './annotations';
-import { expect, test } from './fixtures';
-import { newSession } from './utils';
+import { issue } from './annotations.js';
+import { expect, test } from './fixtures.js';
+import { newSession } from './utils.js';
 
 test.describe('closing a modal', () => {
 	test('when clicking outside', issue(469), async ({ page, app }) => {

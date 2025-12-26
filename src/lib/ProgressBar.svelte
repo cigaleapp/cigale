@@ -3,7 +3,7 @@
 -->
 
 <script>
-	import { clamp } from './utils';
+	import { clamp } from './utils.js';
 
 	/**
 	 * @typedef {object} Props

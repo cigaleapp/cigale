@@ -10,7 +10,7 @@
 	import IconInteger from '~icons/ri/number-1';
 	import IconFloat from '~icons/ri/ruler-line';
 
-	import { tooltip } from './tooltips';
+	import { tooltip } from './tooltips.js';
 
 	/**
 	 * @type {{ type: import('$lib/database').MetadataType, tooltip?: boolean }}

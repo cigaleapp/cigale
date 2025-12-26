@@ -6,12 +6,12 @@
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
 
-	import { isType } from './metadata';
+	import { isType } from './metadata.js';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import RadioButtons from './RadioButtons.svelte';
 	import Switch from './Switch.svelte';
-	import { tooltip } from './tooltips';
-	import { compareBy, pick, readableOn, round, safeJSONParse } from './utils';
+	import { tooltip } from './tooltips.js';
+	import { compareBy, pick, readableOn, round, safeJSONParse } from './utils.js';
 
 	/**
 	 * @typedef {object} Props

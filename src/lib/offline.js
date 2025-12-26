@@ -1,6 +1,6 @@
-import { tables } from './idb.svelte';
-import { modelUrl } from './inference';
-import { fetchHttpRequest, nonnull } from './utils';
+import { tables } from './idb.svelte.js';
+import { modelUrl } from './inference.js';
+import { fetchHttpRequest, nonnull } from './utils.js';
 
 /**
  * @import * as DB from '$lib/database';

@@ -5,7 +5,7 @@
   -->
 
 <script>
-	import { tooltip } from './tooltips';
+	import { tooltip } from './tooltips.js';
 
 	/**
 	 * @typedef Props

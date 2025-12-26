@@ -6,8 +6,8 @@
 
 	import KeyboardHint from './KeyboardHint.svelte';
 	import Modal, { hasAnyModalOpen } from './Modal.svelte';
-	import { isDebugMode } from './settings.svelte';
-	import { entries } from './utils';
+	import { isDebugMode } from './settings.svelte.js';
+	import { entries } from './utils.js';
 
 	/**
 	 * @import { Keybind, Keymap } from '$lib/state.svelte.js'

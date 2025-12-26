@@ -34,7 +34,7 @@ Available CSS variables:
 <script>
 	import KeyboardHint from './KeyboardHint.svelte';
 	import LoadingSpinner from './LoadingSpinner.svelte';
-	import { tooltip } from './tooltips';
+	import { tooltip } from './tooltips.js';
 
 	/** @type {Props} */
 	let {

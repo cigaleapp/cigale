@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 
-import { clamp, sign } from './utils';
+import { clamp, sign } from './utils.js';
 
 /**
  * Represents the zoom state of the image.

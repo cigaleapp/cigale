@@ -5,7 +5,7 @@
 <script>
 	import * as dates from 'date-fns';
 
-	import { tooltip } from './tooltips';
+	import { tooltip } from './tooltips.js';
 
 	/**
 	 * @typedef {object} Props

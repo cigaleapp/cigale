@@ -2,7 +2,7 @@ import Viselect from '@viselect/vanilla';
 
 import './dragselect.css';
 
-import { nonnull } from './utils';
+import { nonnull } from './utils.js';
 
 export class DragSelect {
 	/** @type {HTMLElement|undefined} */

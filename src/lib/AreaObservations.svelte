@@ -38,7 +38,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { openTransaction } from './idb.svelte.js';
 	import { deleteImageFile } from './images.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
-	import { mutationobserver, resizeobserver } from './mutations';
+	import { mutationobserver, resizeobserver } from './mutations.js';
 	import { deleteObservation } from './observations.js';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
