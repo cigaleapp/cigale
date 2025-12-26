@@ -1,7 +1,7 @@
 import { onDestroy, onMount } from 'svelte';
 
-import { uiState } from './state.svelte';
-import { entries, keys } from './utils';
+import { uiState } from './state.svelte.js';
+import { entries, keys } from './utils.js';
 
 const GROUPS = {
 	general: 'Général',

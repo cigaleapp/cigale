@@ -2,8 +2,8 @@ import { ArkErrors } from 'arktype';
 import * as dates from 'date-fns';
 import { describe, expect, test } from 'vitest';
 
-import { generateId, idComparator, Schemas } from './database';
-import { FilepathTemplate } from './schemas/protocols';
+import { generateId, idComparator, Schemas } from './database.js';
+import { FilepathTemplate } from './schemas/protocols.js';
 
 /**
  * @type {Parameters<typeof FilepathTemplate.infer.render>[0]}

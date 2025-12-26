@@ -1,7 +1,7 @@
 <script>
 	import IconAsterisk from '~icons/ri/asterisk';
 
-	import { tooltip } from './tooltips';
+	import { tooltip } from './tooltips.js';
 
 	/** @type {{ help?: string }}*/
 	const { help = 'Modifications non enregistrées' } = $props();

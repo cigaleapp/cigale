@@ -2,12 +2,12 @@ import { ulid } from 'ulid';
 
 import { uiState } from '$lib/state.svelte';
 
-import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte';
-import { errorMessage, humanFormatName } from './i18n';
-import * as db from './idb.svelte';
-import { tables } from './idb.svelte';
-import { imageLimits } from './inference_utils';
-import { clamp, unique } from './utils';
+import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
+import { errorMessage, humanFormatName } from './i18n.js';
+import * as db from './idb.svelte.js';
+import { tables } from './idb.svelte.js';
+import { imageLimits } from './inference_utils.js';
+import { clamp, unique } from './utils.js';
 
 /**
  * @import { Image, Protocol } from './database.js';

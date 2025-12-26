@@ -2,7 +2,7 @@ import tippy from 'sveltejs-tippy';
 import xss from 'xss';
 
 import { displayPattern } from './KeyboardHint.svelte';
-import { omit } from './utils';
+import { omit } from './utils.js';
 
 /**
  * @typedef {object} TooltipParameters

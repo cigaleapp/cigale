@@ -31,7 +31,7 @@ import {
 	waitForLoadingEnd,
 	type NavigationTab,
 	type PredownloadedModel
-} from './utils';
+} from './utils.js';
 
 let classification80Model: PredownloadedModel | null = null;
 let classification17kModel: PredownloadedModel | null = null;

@@ -1,5 +1,5 @@
-import { expect, test } from '../fixtures';
-import { firstObservationCard, importPhotos, newSession } from '../utils';
+import { expect, test } from '../fixtures.js';
+import { firstObservationCard, importPhotos, newSession } from '../utils.js';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
 	test.skip(

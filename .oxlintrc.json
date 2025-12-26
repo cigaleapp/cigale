@@ -10,17 +10,18 @@
 				"allow": ["warn", "error", "info", "dir", "time", "timeEnd", "debug"]
 			}
 		],
-		// TODO: Waiting for https://github.com/oxc-project/oxc/pull/15009
-		// "import/extensions": [
-		// 	"error",
-		// 	"ignorePackages",
-		// 	{
-		// 		"pathGroupOverrides": [
-		// 			{ "pattern": "$app/*", "action": "ignore" },
-		// 			{ "pattern": "~icons/*/*", "action": "ignore" }
-		// 		]
-		// 	}
-		// ],
+		"import/extensions": [
+			"error",
+			"always",
+			{
+				"ignorePackages": true,
+				"checkTypeImports": true,
+				"pathGroupOverrides": [
+					{ "pattern": "$app/*", "action": "ignore" },
+					{ "pattern": "~icons/*/*", "action": "ignore" },
+				]
+			}
+		],
 		"no-restricted-imports": [
 			"error",
 			{

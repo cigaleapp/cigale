@@ -9,7 +9,7 @@ import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
 import { switchSession } from './sessions.js';
 import { uiState } from './state.svelte.js';
 import { toasts } from './toasts.svelte.js';
-import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils';
+import { entries, mapValues, pick, safeJSONParse, uint8ArrayToArrayBuffer } from './utils.js';
 
 /**
  * @template {string} HeaderKey

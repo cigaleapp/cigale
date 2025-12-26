@@ -1,9 +1,9 @@
 import path from 'node:path';
 import * as yauzl from 'yauzl-promise';
 
-import { issue } from './annotations';
-import { expect, test } from './fixtures';
-import { expectZipFiles, firstObservationCard, importPhotos, newSession } from './utils';
+import { issue } from './annotations.js';
+import { expect, test } from './fixtures.js';
+import { expectZipFiles, firstObservationCard, importPhotos, newSession } from './utils.js';
 
 test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	// Disable inference to go faster

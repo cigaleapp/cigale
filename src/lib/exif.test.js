@@ -10,9 +10,9 @@ import {
 	extractMetadata,
 	processExifData,
 	serializeExifValue
-} from './exif';
+} from './exif.js';
 import * as db from './idb.svelte.js';
-import { imageId } from './images';
+import { imageId } from './images.js';
 import { namespacedMetadataId } from './schemas/metadata.js';
 
 /**

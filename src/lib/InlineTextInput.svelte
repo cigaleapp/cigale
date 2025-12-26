@@ -1,7 +1,7 @@
 <script generics="T extends import('arktype').Type = typeof import('arktype').type.string">
 	import { type } from 'arktype';
 
-	import { tooltip } from './tooltips';
+	import { tooltip } from './tooltips.js';
 
 	/**
 	 * @typedef {object} Props

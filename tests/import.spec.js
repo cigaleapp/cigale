@@ -1,8 +1,8 @@
 import * as dates from 'date-fns';
 import * as yauzl from 'yauzl-promise';
 
-import { issue } from './annotations';
-import { expect, test } from './fixtures';
+import { issue } from './annotations.js';
+import { expect, test } from './fixtures.js';
 import {
 	chooseFirstSession,
 	expectZipFiles,
@@ -14,7 +14,7 @@ import {
 	newSession,
 	observationCard,
 	setInferenceModels
-} from './utils';
+} from './utils.js';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {
