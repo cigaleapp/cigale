@@ -107,7 +107,7 @@
 		"google-fonts-helper": "^3.7.3",
 		"googleapis": "^169.0.0",
 		"jpeg-js": "^0.4.4",
-		"jsdom": "^27.3.0",
+		"jsdom": "^27.4.0",
 		"json-schema-doc-ts": "^2.0.0",
 		"jszip": "^3.10.1",
 		"knip": "^5.76.3",
