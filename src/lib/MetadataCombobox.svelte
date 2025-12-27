@@ -8,6 +8,7 @@
 	import IconCheck from '~icons/ri/check-line';
 
 	import Badge from './Badge.svelte';
+	import Carousel from './Carousel.svelte';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';
@@ -271,8 +272,15 @@
 					{/if}
 				</div>
 				<div class="docs" {@attach scrollfader}>
-					{#if highlightedOption?.image}
-						<img src={highlightedOption.image} alt="" class="thumb" />
+					{#if highlightedOption?.image || (highlightedOption?.images?.length ?? 0) > 0}
+						{@const images = highlightedOption?.image
+							? [highlightedOption?.image]
+							: (highlightedOption?.images ?? [])}
+						<Carousel items={images}>
+							{#snippet item(src)}
+								<img {src} class="thumb" alt="" />
+							{/snippet}
+						</Carousel>
 					{:else if highlightedOption?.description || highlightedOption?.learnMore}
 						<h2>{highlightedOption.label}</h2>
 					{/if}

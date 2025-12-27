@@ -57,7 +57,12 @@ async function main() {
 	);
 
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
-	await Bun.$`bunx prettier --write ${protocolPath}`;
+
+	try {
+		await Bun.$`bunx prettier --write ${protocolPath}`;
+	} catch (error) {
+		console.error(`Couldnt format protocol ${protocolPath}:\n`, error);
+	}
 }
 
 async function augmentMetadata(
@@ -236,7 +241,7 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		image: imageUrl,
+		images: imageUrl ? [imageUrl] : [],
 		cascade
 	};
 }
