@@ -1,4 +1,5 @@
 <script>
+	import { formatDistanceToNow } from 'date-fns';
 	import { fade } from 'svelte/transition';
 
 	import IconSelect from '~icons/ri/arrow-down-s-line';
@@ -34,6 +35,7 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number} [progress=0]
+	 * @property {number} [eta=Infinity]
 	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
 	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
@@ -45,6 +47,7 @@
 		openKeyboardShortcuts,
 		openPrepareForOfflineUse,
 		progress = 0,
+		eta = Infinity,
 		swarpc,
 		progressbarOnly = false
 	} = $props();
@@ -87,6 +90,8 @@
 			window.nativeWindow?.startCallingAttention();
 		}
 	});
+
+	const showingEta = $derived(eta < Infinity && progress > 0 && progress < 1);
 
 	$effect(() => {
 		if (isNativeWindow) return;
@@ -166,8 +171,10 @@
 		<nav bind:clientHeight={navHeight} data-testid="app-nav">
 			<div class="logo">
 				<button
-					use:tooltip={'Accueil'}
 					data-testid="goto-home"
+					use:tooltip={showingEta
+						? `Termine ${formatDistanceToNow(Date.now() + eta, { addSuffix: true, includeSeconds: true })}`
+						: 'Accueil'}
 					onclick={async () => {
 						if (uiState.currentSession) {
 							await goto('/(app)/sessions');
@@ -177,6 +184,11 @@
 						}
 					}}
 				>
+					{#if showingEta}
+						<div class="progress-overlay" transition:fade>
+							{percent(progress)}
+						</div>
+					{/if}
 					<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
 				</button>
 
@@ -471,6 +483,24 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+	}
+
+	.logo {
+		position: relative;
+
+		.progress-overlay {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			pointer-events: none;
+			z-index: 10;
+			color: var(--fg-primary);
+			font-weight: bold;
+			font-size: 1.2em;
+			background: rgb(255 255 255 / 0.6);
+		}
 	}
 
 	header.native-window .logo {
