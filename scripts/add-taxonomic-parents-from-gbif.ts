@@ -1,18 +1,45 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { warning } from '@actions/core';
+import { Estimation as ETA } from 'arrival-time';
+import { formatDistanceToNowStrict, millisecondsToHours } from 'date-fns';
 
-import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
-import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import _lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import { MetadataEnumVariant } from '../src/lib/database.js';
+import { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+
+const protocol = _protocol as typeof ExportedProtocol.infer;
+const lightProtocol = _lightProtocol as unknown as typeof ExportedProtocol.infer;
 
 const here = import.meta.dirname;
 
-/**
- * @type {Record<number, GbifSpecies>}
- */
-const cachedGbifData = await readFile(path.join(here, './gbif.json'), 'utf-8')
+const IUCN_GBIF_TO_TWO_LETTER_CODE = {
+	EXTINCT: 'ex',
+	EXTINCT_IN_THE_WILD: 'ew',
+	REGIONALLY_EXTINCT: 're',
+	CRITICALLY_ENDANGERED: 'cr',
+	ENDANGERED: 'en',
+	VULNERABLE: 'vu',
+	NEAR_THREATENED: 'nt',
+	LEAST_CONCERN: 'lc',
+	DATA_DEFICIENT: 'dd',
+	NOT_APPLICABLE: 'na',
+	NOT_EVALUATED: 'ne'
+} as const satisfies Record<GbifIucnRedListCategory['category'], string>;
+
+const onlineCacheUrl = 'https://github.com/cigaleapp/models/raw/refs/heads/main/gbif.json';
+
+const cachedGbifData: Record<number, GbifSpecies> &
+	Record<`${number}/synonyms`, { results: GbifSpecies[] }> &
+	Record<'#updatedAt', string> &
+	Record<`${number}/iucnRedListCategory`, GbifIucnRedListCategory> = await readFile(
+	path.join(here, './gbif.json'),
+	'utf-8'
+)
 	.then((v) => JSON.parse(v))
 	.catch(() =>
-		fetch('https://github.com/cigaleapp/models/raw/refs/heads/main/gbif.json')
+		fetch(onlineCacheUrl)
 			.then((res) => res.json())
 			.then((json) => {
 				void (async () => {
@@ -23,33 +50,74 @@ const cachedGbifData = await readFile(path.join(here, './gbif.json'), 'utf-8')
 	)
 	.catch(() => ({}));
 
-/**
- *
- * @param {string|number} gbifId
- * @returns {Promise<GbifSpecies>}
- */
-async function getSpecies(gbifId) {
-	const cached = cachedGbifData[Number(gbifId)];
-	if (cached) {
-		return cached;
+const cacheFreshness = Date.now() - new Date(cachedGbifData['#updatedAt']).valueOf();
+
+if (cacheFreshness > millisecondsToHours(24 * 31)) {
+	warning(
+		`GBIF cache is older than 31 days (${formatDistanceToNowStrict(
+			new Date(cachedGbifData['#updatedAt'])
+		)} old). Cache will be ignored. Consider updating gbif.json manually at ${onlineCacheUrl}.`
+	);
+}
+
+async function fetchWithCache<Path extends keyof typeof cachedGbifData>(
+	path: Path
+): Promise<(typeof cachedGbifData)[Path]> {
+	if (cachedGbifData[path]) {
+		return cachedGbifData[path];
 	}
 
-	const response = await fetch(`https://api.gbif.org/v1/species/${gbifId}`);
+	const response = await fetch(`https://api.gbif.org/v1/species/${path}`);
 	if (!response.ok) {
+		console.error(`\n\nGBIF API request failed for ${path}:`, await response.text());
 		throw new Error(`GBIF API request failed with status ${response.status}`);
 	}
 
 	const data = await response.json();
-	cachedGbifData[gbifId] = data;
+	cachedGbifData[path] = data;
 	return data;
 }
+
+/**
+ *
+ * @param {string|number} gbifId
+ * @returns {Promise<GbifSpecies | undefined>}
+ */
+async function getSpecies(gbifId: string | number): Promise<GbifSpecies | undefined> {
+	if (gbifId === undefined || gbifId === null) {
+		return undefined;
+	}
+
+	return fetchWithCache(Number(gbifId));
+}
+
+// async function resolveSynonyms(gbifId: number) {
+// 	const taxon = await getSpecies(gbifId);
+// 	if (!taxon) return undefined;
+
+// 	switch (taxon.taxonomicStatus) {
+// 		case 'ACCEPTED':
+// 			return taxon;
+// 		case 'DOUBTFUL':
+// 		case 'SYNONYM':
+// 		case 'HETEROTYPIC_SYNONYM':
+// 		case 'HOMOTYPIC_SYNONYM':
+// 		case 'PROPARTE_SYNONYM': {
+// 			return await fetchWithCache(`${gbifId}/synonyms`).then((data) =>
+// 				data.results.find((s) => s.taxonomicStatus === 'ACCEPTED')
+// 			);
+// 		}
+// 	}
+// }
 
 const newProtocol = { ...protocol };
 const newLightProtocol = { ...lightProtocol };
 
-for (const [i, { key }] of protocol.metadata[
-	'io.github.cigaleapp.arthropods.example__species'
-].options.entries()) {
+const options = protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options!;
+
+const eta = new ETA({ total: options.length });
+
+for (const [i, { key }] of options.entries()) {
 	const species = await getSpecies(key);
 	if (!species) {
 		console.warn(`No species found for GBIF ID ${key}`);
@@ -58,7 +126,7 @@ for (const [i, { key }] of protocol.metadata[
 
 	const addToLight = newLightProtocol.metadata[
 		'io.github.cigaleapp.arthropods.example.light__species'
-	].options.find((o) => o.key === key);
+	].options!.find((o) => o.key === key);
 
 	const protocols = addToLight ? [newLightProtocol, newProtocol] : [newProtocol];
 
@@ -76,11 +144,17 @@ for (const [i, { key }] of protocol.metadata[
 			`\nMissing some taxonomic keys for species ${species.canonicalName} (GBIF ID: ${key}): https://api.gbif.org/v1/species/${key}. Missing: ${Object.entries(
 				keys
 			)
-				.filter(([_, v]) => !v)
+				.filter(([, v]) => !v)
 				.map(([k]) => k)
 				.join(', ')}`
 		);
 	}
+
+	// const genus = await getSpecies(keys.genus);
+	// const family = await getSpecies(keys.family);
+	// const order = await getSpecies(keys.order);
+	// const class_ = await getSpecies(keys.class);
+	// const phylum = await getSpecies(keys.phylum);
 
 	await addToOptions(protocols, 'genus', keys.genus, species.genus);
 	await addToOptions(protocols, 'family', keys.family, species.family);
@@ -96,8 +170,12 @@ for (const [i, { key }] of protocol.metadata[
 	await setCascadeOnOption(protocols, 'class', keys.class, 'phylum', keys.phylum);
 	await setCascadeOnOption(protocols, 'phylum', keys.phylum, 'kingdom', keys.kingdom);
 
+	await setICUNStatus(protocols, 'species', key);
+
+	eta.update(i + 1);
+
 	process.stdout.write(
-		`\x1b[1K\rProcessed ${i + 1}/${protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options.length} species: ${species.scientificName}`
+		`\x1b[1K\r ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))} Processed ${i + 1}/${protocol.metadata['io.github.cigaleapp.arthropods.example__species'].options!.length} species: ${species.scientificName}`
 	);
 }
 
@@ -109,6 +187,8 @@ metadataToSort
 		protocol.metadata[id].options?.sort((a, b) => a.label.localeCompare(b.label));
 	});
 
+cachedGbifData['#updatedAt'] = new Date().toISOString();
+
 await writeFile(path.join(here, './gbif.json'), JSON.stringify(cachedGbifData, null, 2));
 await writeFile(
 	path.join(here, '../examples/arthropods.cigaleprotocol.json'),
@@ -119,9 +199,48 @@ await writeFile(
 	JSON.stringify(newLightProtocol, null, 2)
 );
 
-async function setCascadeOnOption(protocols, id, key, parentId, parentKey) {
+async function setICUNStatus(
+	protocols: (typeof ExportedProtocol.infer)[],
+	id: string,
+	key: string
+) {
 	const [protocol, ...rest] = protocols;
-	const opts = protocol.metadata[`${protocol.id}__${id}`].options;
+	const opts = protocol.metadata[`${protocol.id}__${id}`].options!;
+	const opt = opts.find((o) => o.key === key);
+	if (!opt) {
+		console.warn(`Option ${id} with key ${key} not found`);
+		return;
+	}
+
+	const { category } = (await fetchWithCache(`${Number(key)}/iucnRedListCategory`)) ?? {
+		category: 'NOT_EVALUATED'
+	};
+
+	const code = IUCN_GBIF_TO_TWO_LETTER_CODE[category] ?? 'ne';
+
+	switch (code) {
+		case 'dd':
+		case 'na':
+		case 'ne':
+			return;
+		default:
+			opt.cascade!.conservation_status = code;
+	}
+
+	if (rest.length > 0) {
+		await setICUNStatus(rest, id, key);
+	}
+}
+
+async function setCascadeOnOption(
+	protocols: (typeof ExportedProtocol.infer)[],
+	id: string,
+	key: string,
+	parentId: string,
+	parentKey: string
+) {
+	const [protocol, ...rest] = protocols;
+	const opts = protocol.metadata[`${protocol.id}__${id}`].options!;
 	const opt = opts.find((o) => o.key === key);
 	if (!opt) {
 		console.warn(`Option ${id} with key ${key} not found`);
@@ -146,9 +265,15 @@ async function setCascadeOnOption(protocols, id, key, parentId, parentKey) {
 	}
 }
 
-async function addToOptions(protocols, id, key, label, description = '') {
+async function addToOptions(
+	protocols: (typeof ExportedProtocol.infer)[],
+	id: string,
+	key: string,
+	label: string,
+	description = ''
+) {
 	const [protocol, ...rest] = protocols;
-	const opts = protocol.metadata[`${protocol.id}__${id}`].options;
+	const opts = protocol.metadata[`${protocol.id}__${id}`].options!;
 	if (opts.some((o) => o.key === key)) return;
 
 	if (!key) {
@@ -160,58 +285,98 @@ async function addToOptions(protocols, id, key, label, description = '') {
 		console.warn(`${id} / ${key} has empty label`);
 	}
 
-	opts.push(
-		/** @type {import('$lib/database.js').MetadataEnumVariant} */ ({
-			key,
-			label,
-			description,
-			learnMore: `https://gbif.org/species/${key}`
-		})
-	);
+	opts.push({
+		key,
+		label,
+		description,
+		learnMore: `https://gbif.org/species/${key}`
+	} as MetadataEnumVariant);
 
 	if (rest.length > 0) {
 		await addToOptions(rest, id, key, label, description);
 	}
 }
 
-/**
- * @typedef {object} GbifSpecies
- * @property {number} key
- * @property {number} nubKey
- * @property {number} nameKey
- * @property {string} taxonID
- * @property {number} sourceTaxonKey
- * @property {string} kingdom
- * @property {string} phylum
- * @property {string} order
- * @property {string} family
- * @property {string} genus
- * @property {string} species
- * @property {number} kingdomKey
- * @property {number} phylumKey
- * @property {number} classKey
- * @property {number} orderKey
- * @property {number} familyKey
- * @property {number} genusKey
- * @property {number} speciesKey
- * @property {string} datasetKey
- * @property {string} constituentKey
- * @property {number} parentKey
- * @property {string} parent
- * @property {number} basionymKey
- * @property {string} basionym
- * @property {string} scientificName
- * @property {string} canonicalName
- * @property {string} authorship
- * @property {string} nameType
- * @property {string} rank
- * @property {string} origin
- * @property {string} taxonomicStatus
- * @property {unknown} nomenclaturalStatus
- * @property {string} remarks
- * @property {number} numDescendants
- * @property {string} lastCrawled
- * @property {string} lastInterpreted
- * @property {unknown} issues
- * @property {string} class
- */
+interface GbifIucnRedListCategory {
+	/** The taxonomic threat status as given in our https://api.gbif.org/v1/enumeration/basic/ThreatStatus[ThreatStatus enum]. */
+	category:
+		| 'EXTINCT'
+		| 'EXTINCT_IN_THE_WILD'
+		| 'REGIONALLY_EXTINCT'
+		| 'CRITICALLY_ENDANGERED'
+		| 'ENDANGERED'
+		| 'VULNERABLE'
+		| 'NEAR_THREATENED'
+		| 'LEAST_CONCERN'
+		| 'DATA_DEFICIENT'
+		| 'NOT_APPLICABLE'
+		| 'NOT_EVALUATED';
+	usageKey: number;
+	/** The name usage “taxon“ key to which this Red List category applies. */
+	scientificName: string;
+	/** The taxonomic status of the name. */
+	taxonomicStatus:
+		| 'ACCEPTED'
+		| 'DOUBTFUL'
+		| 'SYNONYM'
+		| 'HETEROTYPIC_SYNONYM'
+		| 'HOMOTYPIC_SYNONYM'
+		| 'PROPARTE_SYNONYM'
+		| 'MISAPPLIED';
+	/** The accepted name, if the name is a synonym. */
+	acceptedName: string;
+	/** The accepted name's usage key, if the name is a synonym. */
+	acceptedUsageKey: number;
+	/** The original IUCN identifier used for the name usage. */
+	iucnTaxonID: string;
+	/** The code for the taxonomic threat status as given in our https://api.gbif.org/v1/enumeration/basic/ThreatStatus[ThreatStatus enum]. */
+	code: string;
+}
+
+interface GbifSpecies {
+	key: number;
+	nubKey: number;
+	nameKey: number;
+	taxonID: string;
+	sourceTaxonKey: number;
+	kingdom: string;
+	phylum: string;
+	order: string;
+	family: string;
+	genus: string;
+	species: string;
+	kingdomKey: number;
+	phylumKey: number;
+	classKey: number;
+	orderKey: number;
+	familyKey: number;
+	genusKey: number;
+	speciesKey: number;
+	datasetKey: string;
+	constituentKey: string;
+	parentKey: number;
+	parent: string;
+	basionymKey: number;
+	basionym: string;
+	scientificName: string;
+	canonicalName: string;
+	authorship: string;
+	nameType: string;
+	rank: string;
+	origin: string;
+	taxonomicStatus:
+		| 'ACCEPTED'
+		| 'DOUBTFUL'
+		| 'SYNONYM'
+		| 'HETEROTYPIC_SYNONYM'
+		| 'HOMOTYPIC_SYNONYM'
+		| 'PROPARTE_SYNONYM'
+		| 'MISAPPLIED';
+	nomenclaturalStatus: unknown;
+	remarks: string;
+	numDescendants: number;
+	lastCrawled: string;
+	lastInterpreted: string;
+	issues: unknown;
+	class: string;
+}
