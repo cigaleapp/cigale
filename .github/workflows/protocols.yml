@@ -69,15 +69,10 @@ jobs:
         run: rm google-drive-key.json
 
       - name: Add data from GBIF
-        run: bun run scripts/add-taxonomic-parents-from-gbif.js
+        run: bun run scripts/add-taxonomic-parents-from-gbif.ts
 
       - name: Add genus descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts genus
-
-      - name: Add data from IUCN
-        run: bun run scripts/add-data-from-iucn.ts
-        env:
-          IUCN_API_TOKEN: ${{ secrets.IUCN_API_TOKEN }}
 
       - name: Clean old protocol
         run: rm examples/old-*.json
@@ -88,9 +83,10 @@ jobs:
       - name: Setup diffing that ignores version and learnMore fields
         run: git config diff.example-protocols.textconv "$textconv"
         env:
-          textconv: jq 'del(.version) | del(.learnMore) | del (.metadata[].options[]?.image)' $1
+          textconv: jq 'del(.version) | del(.learnMore)' $1
 
       - name: Pull in case main has changed since we started
+        if: github.event_name == 'push' && github.ref_name == 'main'
         run: git pull origin main --rebase --autostash
 
       - name: Check for changes

@@ -1,6 +1,7 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { type } from 'arktype';
+import { ArkErrors, type } from 'arktype';
+import { secondsToMilliseconds } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
@@ -9,6 +10,46 @@ import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: '
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 import { EtaCalculator } from './eta.js';
+
+// Suppress annoying virtual console error we can't do anything about and don't care about
+const virtualConsole = new jsdom.VirtualConsole();
+virtualConsole.on('error', (e) => {
+	if (/Could not parse CSS stylesheet/i.test(e.toString())) return;
+	console.error(e);
+});
+
+const RichContent = type({ rendered: 'string' }).pipe(
+	(content) =>
+		new JSDOM(content.rendered, {
+			virtualConsole
+		})
+);
+
+const OGImage = type({
+	url: 'string.url.parse',
+	width: 'string.integer.parse | number | ""',
+	height: 'string.integer.parse | number | ""'
+});
+
+const WordpressPage = type({
+	id: 'number',
+	date: 'string.date.iso.parse',
+	date_gmt: 'string.date.iso.parse',
+	modified: 'string.date.iso.parse',
+	modified_gmt: 'string.date.iso.parse',
+	slug: 'string',
+	link: 'string.url.parse',
+	title: RichContent,
+	content: RichContent,
+	excerpt: RichContent,
+	yoast_head_json: {
+		canonical: 'string.url.parse',
+		og_description: 'string = ""',
+		og_image: OGImage.array().default(() => [])
+	}
+});
+
+const WordpressPagesResponse = WordpressPage.array().atLeastLength(1);
 
 const LINKS_TO_AVOID = [
 	// FIXME redirects to an image file
@@ -25,13 +66,6 @@ const cleanedTextContent = (node: Element) =>
 	'textContent' in node && typeof node.textContent === 'string'
 		? node.textContent.replaceAll('\r?\n', ' ').trim()
 		: undefined;
-
-// Suppress annoying virtual console error we can't do anything about and don't care about
-const virtualConsole = new jsdom.VirtualConsole();
-virtualConsole.on('error', (e) => {
-	if (/Could not parse CSS stylesheet/i.test(e.toString())) return;
-	console.error(e);
-});
 
 const here = import.meta.dirname;
 const protocolPath = path.join(here, '../examples/arthropods.cigaleprotocol.json');
@@ -57,72 +91,96 @@ async function main() {
 	);
 
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
-	await Bun.$`bunx prettier --write ${protocolPath}`;
+	await Bun.$`bun x prettier --write ${protocolPath}`;
 }
 
 async function augmentMetadata(
 	protocol: typeof ExportedProtocol.infer,
 	metadataKey: 'genus' | 'species',
-	search: (...names: string[]) => Promise<URL | null>,
+	search: (lookups: Record<string, string[]>) => Promise<Map<string, URL>>,
 	limit = -1
 ): Promise<typeof ExportedProtocol.infer> {
 	const augmented = structuredClone(protocol);
 	const metadataOptions = augmented.metadata[`${protocol.id}__${metadataKey}`].options!;
 
-	let total = 0;
+	const batchSize = 50;
+
+	console.info(
+		cyan(`⁄ Starting to process ${metadataKey}, ${metadataOptions.length} entries to check`)
+	);
+	const pageUrls = await search(
+		Object.fromEntries(metadataOptions.map((s) => [s.key, [s.label, ...(s.synonyms ?? [])]]))
+	);
+	console.info(cyan(`⁄ Found ${pageUrls.size} pages for ${metadataKey} to process`));
+
+	const total = pageUrls.size;
 	let done = 0;
 	let processed = 0;
 	const eta = new EtaCalculator({
-		averageOver: 300,
-		// TODO use percentage advancement instead of hardcoded number
-		totalSteps: { species: 1850, genus: 345 }[metadataKey]
+		averageOver: 10 * batchSize,
+		totalSteps: total
 	});
 
-	total = metadataOptions.length;
-	for (const s of metadataOptions) {
-		done++;
-
+	for (const urlsChunk of chunkBySize(batchSize, [...pageUrls.entries()])) {
 		if (limit > 0 && done > limit) break;
 
-		const pageUrl = await search(s.label, ...(s.synonyms ?? []));
-		if (!pageUrl) {
-			// console.warn(yellow(`⁄ Could not find page for species ${s.label}`));
-			continue;
+		const pages = await fetchPagesViaWordpressAPI(new Map(urlsChunk));
+
+		for (const [key, page] of Object.entries(pages)) {
+			done++;
+
+			if (!page) {
+				console.warn(
+					yellow(
+						`⁄ Could not fetch page for ${metadataKey} ${key} at ${pageUrls.get(key)}`
+					)
+				);
+				continue;
+			}
+
+			const i = metadataOptions.findIndex((s) => s.key === key);
+			if (i < 0) throw new Error(`No option with key ${key}`);
+
+			const s = metadataOptions[i];
+
+			const newData = await augmentMetadataOption(s, page!);
+
+			if (!newData) {
+				console.warn(yellow(`⁄ Could not extract data for ${metadataKey} ${s.label}`));
+				continue;
+			}
+
+			Object.assign(s, newData);
+
+			processed++;
+
+			const stepTookMs = eta.msSinceLastStep();
+
+			eta.step();
+			console.info(
+				`${align(processed, total)} ${percentage(done, total)} ${cyan(`→ ${eta.display(processed)}`)} Updating ${metadataKey} ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label} with ${page!.link}`
+			);
 		}
-
-		const newData = await augmentMetadataOption(s, pageUrl);
-
-		if (!newData) {
-			console.warn(yellow(`⁄ Could not extract data for ${metadataKey} ${s.label}`));
-			continue;
-		}
-
-		Object.assign(s, newData);
-
-		processed++;
-
-		const stepTookMs = eta.msSinceLastStep();
-		eta.step();
-
-		console.info(
-			`${align(processed, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(processed)}`)} Updating ${metadataKey} ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label}  with ${pageUrl} `
-		);
 	}
 
 	console.info(
 		cyan(
-			`⁄ Finished processing ${metadataKey}, updated ${processed}/${total} entries (${percentage(processed, total)})`
+			`⁄ Finished processing ${metadataKey}, updated ${processed}/${total} entries out of ${metadataOptions.length} options (${percentage(processed, metadataOptions.length)})`
 		)
 	);
 
 	return augmented;
 }
 
-async function searchForGenus(...names: string[]): Promise<URL | null> {
-	return searchForSpecies(...names.map((name) => `${name} sp`));
+async function searchForGenus(lookups: Record<string, string[]>) {
+	return searchForSpecies(
+		Object.fromEntries(
+			Object.entries(lookups).map(([key, names]) => [key, names.map((name) => `${name} sp`)])
+		)
+	);
 }
 
-async function searchForSpecies(...names: string[]): Promise<URL | null> {
+async function searchForSpecies(lookups: Record<string, string[]>) {
 	speciesLinks ??= await fetchAndParseHtml(new URL(`/identification`, ORIGIN)).then(
 		(doc) =>
 			new Map(
@@ -135,32 +193,57 @@ async function searchForSpecies(...names: string[]): Promise<URL | null> {
 						return [text, url];
 					})
 					.filter((e): e is [string, URL] => e !== null)
+					.filter(([, url]) => !LINKS_TO_AVOID.includes(url.href))
 			)
 	);
 
-	for (const [title, link] of speciesLinks ?? []) {
-		if (LINKS_TO_AVOID.includes(link.href)) {
-			continue;
-		}
-		if (blogTitleMatchesSpeciesName(title, names)) {
-			return link;
-		}
-	}
+	console.info(
+		cyan(`⁄ Fetched ${speciesLinks!.size} species links from Jessica Joachim blog for matching`)
+	);
 
-	return null;
+	const total = speciesLinks!.size;
+	const links = [...speciesLinks!.entries()];
+	const eta = new EtaCalculator({ averageOver: 300, totalSteps: total });
+	let done = 0;
+	const results = await Promise.all(
+		links.map(async ([title, link]) => {
+			done++;
+
+			console.info(
+				`${align(done, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(done)}`)} Finding GBIF ID for ${title}`
+			);
+
+			const slug = lastPathSegment(link).toLowerCase();
+
+			const titleMatcher = speciesNamesToBlogTitleMatcher(title);
+
+			for (const [key, names] of Object.entries(lookups)) {
+				if (names.some((name) => name.replaceAll(' ', '-').toLowerCase() === slug)) {
+					eta.step();
+					return [key, link] as const;
+				}
+
+				if (titleMatcher(names)) {
+					eta.step();
+					return [key, link] as const;
+				}
+			}
+		})
+	);
+
+	const map = new Map(results.filter((e): e is [string, URL] => e !== undefined));
+	return map;
 }
 
 async function augmentMetadataOption(
 	{ key, cascade }: typeof MetadataEnumVariant.infer,
-	page: URL
+	page: typeof WordpressPage.infer
 ): Promise<Partial<typeof MetadataEnumVariant.infer>> {
-	const doc = await fetchAndParseHtml(page);
-	if (!doc) throw new Error(`Could not fetch or parse page at ${page.toString()}`);
+	const content: HTMLElement = page.content.window.document.body;
+	if (!content) throw new Error(`Could not find main content in page at ${page.link.toString()}`);
 
-	const content = doc.querySelector('main');
-	if (!content) throw new Error(`Could not find main content in page at ${page.toString()}`);
-
-	const imageUrl = content.querySelector('img')?.src;
+	const imageUrl =
+		page.yoast_head_json.og_image.at(0)?.url?.toString() ?? content.querySelector('img')?.src;
 
 	const hasImageWithFilename = (filename: string) =>
 		[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
@@ -194,21 +277,19 @@ async function augmentMetadataOption(
 
 	// First image, keeping it in description would be redundant
 	content.querySelector('img')?.remove();
-	// Comments
-	content.querySelector('.entry-content > #comments')?.remove();
-	// Like button section
-	content.querySelector('.entry-content > [id^=like-post-wrapper]')?.remove();
-	// Social media share buttons
-	content.querySelector('.entry-content > .sharedaddy')?.remove();
 	// Text (most likely header) for the removed gallery
-	removeAll('.entry-content > p:has(+ .wp-block-kadence-advancedgallery)');
+	removeAll('p:has(+ .wp-block-kadence-advancedgallery)');
 	// Gallery (can't be represented in markdown well)
-	removeAll('.entry-content > .wp-block-kadence-advancedgallery');
-	removeAll('.entry-content > .tiled-gallery');
-	removeAll('.entry-content > [id^=gallery-]');
-	removeAll('.entry-content > [id^=gallery-]');
+	removeAll('.wp-block-kadence-advancedgallery');
+	removeAll('.tiled-gallery');
+	removeAll('[id^=gallery-]');
+	removeAll('[id^=gallery-]');
 	// Navigation buttons
-	removeAll('.entry-content > .wp-block-kadence-advancedbtn');
+	removeAll('.wp-block-kadence-advancedbtn');
+	removeAll('.wp-block-kadence-tabs');
+	// Style tags, that are dumped as plain text when converting to markdown,
+	// for some reason
+	removeAll('style');
 	// Remove title
 	content.querySelector('h1')?.remove();
 	// Remove year-only bold text, it's usually above a gallery (that is now removed)
@@ -230,15 +311,97 @@ async function augmentMetadataOption(
 		if (!text) {
 			node.remove();
 		}
+
+		if (node.href.startsWith('#')) {
+			node.replaceWith(document.createTextNode(text));
+		}
 	});
 
 	return {
 		key,
-		learnMore: page.toString(),
+		learnMore: page.yoast_head_json.canonical.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
 		image: imageUrl,
 		cascade
 	};
+}
+
+async function fetchPagesViaWordpressAPI(
+	lookups: Map<string, URL>
+): Promise<Record<string, undefined | typeof WordpressPage.infer>> {
+	const query = new URLSearchParams(
+		[...lookups.values()].flatMap((link) => {
+			const { id, slug } = extractPageParams(link);
+			if (slug) return [['slug[]', slug]];
+			if (id) return [['id[]', id.toString()]];
+			return [];
+		})
+	);
+
+	query.append('per_page', lookups.size.toString());
+
+	const response = await fetch(`https://jessica-joachim.com/wp-json/wp/v2/pages?${query}`);
+
+	// Handle rate limiting
+	if (response.status === 429 || response.status === 504) {
+		const retryAfter = response.headers.get('Retry-After');
+		const waitTime = retryAfter ? Number(retryAfter) : 12;
+		console.warn(
+			yellow(
+				`⁄ Rate limited by Wordpress API. Waiting for ${waitTime} seconds before retrying...`
+			)
+		);
+		await new Promise((resolve) => setTimeout(resolve, secondsToMilliseconds(waitTime)));
+		return fetchPagesViaWordpressAPI(lookups);
+	}
+
+	if (response.headers.get('Content-Type')?.startsWith('application/json') === false) {
+		throw new Error(
+			`Unexpected content type: ${response.headers.get('Content-Type')} for ${response.url}. text: ${await response.text()}`
+		);
+	}
+
+	const data = WordpressPagesResponse(await response.json());
+
+	if (data instanceof ArkErrors) {
+		throw new Error(data.summary);
+	}
+
+	return Object.fromEntries(
+		[...lookups.entries()].map(([key, link]) => {
+			const { id } = extractPageParams(link);
+			const page = data.find(
+				(page) => page.id === id || page.link.pathname === link.pathname
+			);
+			if (!page)
+				console.error(
+					`Could not find page for ${key} at ${link.toString()}: id=${id}, pathname=${link.pathname}, within: (${data.length})`,
+					data.map((p) => ({ id: p.id, pathname: p.link.pathname }))
+				);
+			return [key, page];
+		})
+	);
+}
+
+function extractPageParams(page: URL) {
+	if (page.searchParams.has('page_id')) {
+		return { id: Number(page.searchParams.get('page_id')), slug: undefined };
+	}
+
+	return {
+		id: undefined,
+		slug: lastPathSegment(page) || undefined
+	};
+}
+
+function lastPathSegment(url: URL): string {
+	return (
+		url.pathname
+			.split('/')
+			.map((seg) => seg.trim())
+			.filter(Boolean)
+			.at(-1) ?? ''
+	);
 }
 
 // TODO remove once TS declares it itself
@@ -248,22 +411,14 @@ declare global {
 	}
 }
 
-function blogTitleMatchesSpeciesName(title: string, names: string[]): boolean {
-	const normalize = (str: string) => str.trim().toLowerCase();
+function speciesNamesToBlogTitleMatcher(title: string): (names: string[]) => boolean {
+	let latinName = title;
 
-	const candidates = names.flatMap((name) => [
-		new RegExp(`^${RegExp.escape(name)}$`, 'i'),
-		new RegExp(`^.+ \\(${RegExp.escape(name)}\\)$`, 'i'),
-		new RegExp(`^${RegExp.escape(name)} \\(.+\\)$`, 'i')
-	]);
+	const vernaculared = /^(.+ \((?<latin>\w+ \w+)\))|((?<latin>\w+ \w+) \(.+\))$/.exec(title);
 
-	for (const candidate of candidates) {
-		if (candidate.test(normalize(title))) {
-			return true;
-		}
-	}
+	if (vernaculared?.groups?.latin) latinName = vernaculared.groups.latin;
 
-	return false;
+	return (names) => names.includes(latinName);
 }
 
 // ANSI control sequences
@@ -296,6 +451,12 @@ function percentage(part: number, total: number, precision = 0): string {
 
 function align<T extends string | number>(num: T, total: T | T[]): string {
 	return num.toString().padStart(total.toString().length);
+}
+
+function chunkBySize<T>(by: number, items: T[]): T[][] {
+	return new Array(Math.ceil(items.length / by))
+		.fill([])
+		.map((_, i) => items.slice(i * by, (i + 1) * by));
 }
 
 async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['document']> {

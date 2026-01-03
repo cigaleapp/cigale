@@ -11,11 +11,11 @@ export class EtaCalculator {
 		this.totalSteps = totalSteps;
 	}
 
-	step(): void {
+	step(count = 1): void {
 		const currentTime = performance.now();
 		const durationSeconds = (currentTime - this.lastStepTime) / 1000;
 		this.lastStepTime = currentTime;
-		this.addStep(durationSeconds);
+		for (let i = 0; i < count; i++) this.addStep(durationSeconds / count);
 	}
 
 	msSinceLastStep(): number {
