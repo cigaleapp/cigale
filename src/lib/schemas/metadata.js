@@ -159,7 +159,14 @@ export const MetadataEnumVariant = type({
 	'index?': type('number').describe(
 		"Nombre permettant de trier les options dans l'interface. Par défaut, correspond à l'indice de l'option dans l'ordre de définition de sa métadonnée"
 	),
-	'image?': URLString,
+	'image?': URLString.configure({
+		deprecated: true,
+		description:
+			"Image illustrant cette option de l'énumération. Utiliser plutôt `images` avec un seul élément."
+	}),
+	'images?': URLString.array().describe(
+		"Liste d'images illustrant cette option de l'énumération. Permet d'en spécifier plusieurs"
+	),
 	'learnMore?': URLString.describe(
 		"Lien pour en savoir plus sur cette option de l'énumération en particulier"
 	),
