@@ -27,7 +27,41 @@ jobs:
       - name: Get release notes
         id: release_notes
         run: |
-          bun run -e "const fs = require('fs'); const changelog = fs.readFileSync('CHANGELOG.md', 'utf8'); const lines = changelog.split(/\r?\n/); let notes = []; let inSection = false; let foundSection = false; for (const line of lines) { if (line.trim().startsWith('## ')) { if (inSection) break; inSection = true; foundSection = true; continue; } if (inSection) notes.push(line); } while (notes.length && notes[0].trim() === '') notes.shift(); const result = notes.join('\n').trim(); console.log('release_notes<<EOF'); if (foundSection) { console.log(result || '[No content found after first ## section]'); } else { console.log('[No ## section found in CHANGELOG.md]'); } console.log('EOF');"
+          Get-Content Env:SCRIPT | Out-File get-notes.js
+          bun get-notes.js >> $GITHUB_OUTPUT
+        env:
+          SCRIPT: |
+            const fs = require('fs'); 
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8'); 
+            const lines = changelog.split(/\r?\n/); 
+            let notes = []; 
+            let inSection = false; 
+            let foundSection = false; 
+
+            for (const line of lines) { 
+              if (line.trim().startsWith('## ')) { 
+                if (inSection) break; 
+                inSection = true; 
+                foundSection = true; 
+                continue; 
+              } 
+                
+              if (inSection) notes.push(line); 
+            } 
+              
+            while (notes.length && notes[0].trim() === '') notes.shift(); 
+
+            const result = notes.join('\n').trim(); 
+
+            console.log('release_notes<<EOF'); 
+
+            if (foundSection) { 
+              console.log(result || '[No content found after first ## section]'); 
+            } else { 
+              console.log('[No ## section found in CHANGELOG.md]'); 
+            } 
+              
+            console.log('EOF');
       - name: Build, package and publish app
         run: bun run prebuild; bunx electron-forge publish
         env:
