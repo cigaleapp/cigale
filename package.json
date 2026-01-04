@@ -76,7 +76,7 @@
 		"@eslint/compat": "^2.0.0",
 		"@eslint/js": "^9.39.2",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-		"@iconify-json/ri": "^1.2.6",
+		"@iconify-json/ri": "^1.2.7",
 		"@jimp/js-jpeg": "^1.6.0",
 		"@playwright/test": "^1.57.0",
 		"@sveltejs/adapter-static": "^3.0.10",
