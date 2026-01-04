@@ -158,7 +158,7 @@
 		"marked": "^17.0.1",
 		"microdiff": "^1.5.0",
 		"nanoid": "^5.1.6",
-		"onnxruntime-web": "^1.22.0",
+		"onnxruntime-web": "^1.23.2",
 		"pica-gpu": "^0.2.0",
 		"piexifjs": "^1.0.6",
 		"runed": "^0.37.1",
