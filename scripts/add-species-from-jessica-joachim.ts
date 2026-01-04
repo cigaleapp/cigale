@@ -1,7 +1,8 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { ArkErrors, type } from 'arktype';
-import { secondsToMilliseconds } from 'date-fns';
+import { Estimation as ETA } from 'arrival-time';
+import { formatDistanceToNowStrict, secondsToMilliseconds } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
@@ -9,7 +10,6 @@ import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
-import { EtaCalculator } from './eta.js';
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const virtualConsole = new jsdom.VirtualConsole();
@@ -91,7 +91,12 @@ async function main() {
 	);
 
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
-	await Bun.$`bun x prettier --write ${protocolPath}`;
+
+	try {
+		await Bun.$`bun x prettier --write ${protocolPath}`;
+	} catch (error) {
+		console.error(`Couldnt format protocol ${protocolPath}:\n`, error);
+	}
 }
 
 async function augmentMetadata(
@@ -113,13 +118,12 @@ async function augmentMetadata(
 	);
 	console.info(cyan(`⁄ Found ${pageUrls.size} pages for ${metadataKey} to process`));
 
+	const retry = new Map<string, URL>();
+
 	const total = pageUrls.size;
 	let done = 0;
 	let processed = 0;
-	const eta = new EtaCalculator({
-		averageOver: 10 * batchSize,
-		totalSteps: total
-	});
+	const eta = new ETA({ total });
 
 	for (const urlsChunk of chunkBySize(batchSize, [...pageUrls.entries()])) {
 		if (limit > 0 && done > limit) break;
@@ -132,9 +136,12 @@ async function augmentMetadata(
 			if (!page) {
 				console.warn(
 					yellow(
-						`⁄ Could not fetch page for ${metadataKey} ${key} at ${pageUrls.get(key)}`
+						`⁄ Could not fetch page for ${metadataKey} ${key} at ${pageUrls.get(key)}. Adding to retry-batch...`
 					)
 				);
+
+				retry.set(key, pageUrls.get(key)!);
+
 				continue;
 			}
 
@@ -154,12 +161,69 @@ async function augmentMetadata(
 
 			processed++;
 
-			const stepTookMs = eta.msSinceLastStep();
+			eta.update(done, total);
 
-			eta.step();
 			console.info(
-				`${align(processed, total)} ${percentage(done, total)} ${cyan(`→ ${eta.display(processed)}`)} Updating ${metadataKey} ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label} with ${page!.link}`
+				`${align(processed, total)} ${percentage(done, total)} ${cyan(
+					`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
+				)} Updating ${metadataKey} ${dim(`takes ~${Math.round(eta.measure().averageTime)}ms`)} ${s.label} with ${page!.link}`
 			);
+		}
+	}
+
+	if (retry.size > 0) {
+		console.info(
+			cyan(
+				`⁄ Retrying ${retry.size} failed ${metadataKey} entries one more time via Wordpress API...`
+			)
+		);
+
+		let done = 0;
+		const total = retry.size;
+		const eta = new ETA({ total });
+
+		// Shuffle batches to avoid hitting rate limits on same entries
+		const retries = [...retry.entries()].sort(() => 0.5 - Math.random());
+
+		for (const urlChunk of chunkBySize(Math.floor(batchSize / 2), retries)) {
+			const pages = await fetchPagesViaWordpressAPI(new Map(urlChunk));
+
+			for (const [key, page] of Object.entries(pages)) {
+				done++;
+
+				if (!page) {
+					console.warn(
+						yellow(
+							`⁄ Could not fetch page for ${metadataKey} ${key} at ${pageUrls.get(key)} on retry. Skipping...`
+						)
+					);
+
+					continue;
+				}
+
+				const i = metadataOptions.findIndex((s) => s.key === key);
+				if (i < 0) throw new Error(`No option with key ${key}`);
+
+				const s = metadataOptions[i];
+
+				const newData = await augmentMetadataOption(s, page!);
+				if (!newData) {
+					console.warn(
+						yellow(`⁄ Could not extract data for ${metadataKey} ${s.label} on retry`)
+					);
+					continue;
+				}
+
+				Object.assign(s, newData);
+				processed++;
+
+				eta.update(done, total);
+				console.info(
+					`${align(processed, total)} ${percentage(done, total)} ${cyan(
+						`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
+					)} (retry) Updating ${metadataKey} ${dim(`takes ~${Math.round(eta.measure().averageTime)}ms`)} ${s.label} with ${page!.link}`
+				);
+			}
 		}
 	}
 
@@ -203,14 +267,17 @@ async function searchForSpecies(lookups: Record<string, string[]>) {
 
 	const total = speciesLinks!.size;
 	const links = [...speciesLinks!.entries()];
-	const eta = new EtaCalculator({ averageOver: 300, totalSteps: total });
+	const eta = new ETA({ total });
 	let done = 0;
 	const results = await Promise.all(
 		links.map(async ([title, link]) => {
 			done++;
+			eta.update(done, total);
 
 			console.info(
-				`${align(done, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(done)}`)} Finding GBIF ID for ${title}`
+				`${align(done, total)} ${percentage(done, total, 1)} ${cyan(
+					`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
+				)} Finding GBIF ID for ${title}`
 			);
 
 			const slug = lastPathSegment(link).toLowerCase();
@@ -219,12 +286,10 @@ async function searchForSpecies(lookups: Record<string, string[]>) {
 
 			for (const [key, names] of Object.entries(lookups)) {
 				if (names.some((name) => name.replaceAll(' ', '-').toLowerCase() === slug)) {
-					eta.step();
 					return [key, link] as const;
 				}
 
 				if (titleMatcher(names)) {
-					eta.step();
 					return [key, link] as const;
 				}
 			}
@@ -321,13 +386,14 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.yoast_head_json.canonical.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		image: imageUrl,
+		images: imageUrl ? [imageUrl] : [],
 		cascade
 	};
 }
 
 async function fetchPagesViaWordpressAPI(
-	lookups: Map<string, URL>
+	lookups: Map<string, URL>,
+	{ rateLimitWaitSeconds = 12 } = {}
 ): Promise<Record<string, undefined | typeof WordpressPage.infer>> {
 	const query = new URLSearchParams(
 		[...lookups.values()].flatMap((link) => {
@@ -345,14 +411,26 @@ async function fetchPagesViaWordpressAPI(
 	// Handle rate limiting
 	if (response.status === 429 || response.status === 504) {
 		const retryAfter = response.headers.get('Retry-After');
-		const waitTime = retryAfter ? Number(retryAfter) : 12;
+		const waitTime = retryAfter ? Number(retryAfter) : rateLimitWaitSeconds;
 		console.warn(
 			yellow(
 				`⁄ Rate limited by Wordpress API. Waiting for ${waitTime} seconds before retrying...`
 			)
 		);
+
+		if (waitTime > 60) {
+			console.error(
+				`⁄ Wait time is quite long (${waitTime}s). Skipping this batch: ${query}. Response was`,
+				await response.text()
+			);
+			return Object.fromEntries([...lookups.keys()].map((key) => [key, undefined]));
+		}
+
 		await new Promise((resolve) => setTimeout(resolve, secondsToMilliseconds(waitTime)));
-		return fetchPagesViaWordpressAPI(lookups);
+
+		return fetchPagesViaWordpressAPI(lookups, {
+			rateLimitWaitSeconds: rateLimitWaitSeconds * Math.E
+		});
 	}
 
 	if (response.headers.get('Content-Type')?.startsWith('application/json') === false) {
