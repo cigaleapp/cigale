@@ -2,7 +2,7 @@
 	"name": "CIGALE",
 	"private": true,
 	"description": "Classification Intelligente et Gestion des Arthropodes et de L'Entomofaune",
-	"version": "2025.11.0",
+	"version": "2025.12.0",
 	"packageManager": "bun@1.2.21",
 	"type": "module",
 	"main": ".vite/build/main.js",
