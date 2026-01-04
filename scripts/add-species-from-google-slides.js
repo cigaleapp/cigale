@@ -296,9 +296,10 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 					)
 				);
 
-				if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
-					imageUrls[i].searchParams.set('v', protocol.fresh.version.toString());
-				}
+				// False positive
+				// if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
+				// 	imageUrls[i].searchParams.set('v', protocol.fresh.version.toString());
+				// }
 			}
 
 			if (options.some((o) => o.label === name)) {
