@@ -118,6 +118,8 @@ async function augmentMetadata(
 	);
 	console.info(cyan(`⁄ Found ${pageUrls.size} pages for ${metadataKey} to process`));
 
+	const retry = new Map<string, URL>();
+
 	const total = pageUrls.size;
 	let done = 0;
 	let processed = 0;
@@ -134,9 +136,12 @@ async function augmentMetadata(
 			if (!page) {
 				console.warn(
 					yellow(
-						`⁄ Could not fetch page for ${metadataKey} ${key} at ${pageUrls.get(key)}`
+						`⁄ Could not fetch page for ${metadataKey} ${key} at ${pageUrls.get(key)}. Adding to retry-batch...`
 					)
 				);
+
+				retry.set(key, pageUrls.get(key)!);
+
 				continue;
 			}
 
@@ -163,6 +168,62 @@ async function augmentMetadata(
 					`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
 				)} Updating ${metadataKey} ${dim(`takes ~${Math.round(eta.measure().averageTime)}ms`)} ${s.label} with ${page!.link}`
 			);
+		}
+	}
+
+	if (retry.size > 0) {
+		console.info(
+			cyan(
+				`⁄ Retrying ${retry.size} failed ${metadataKey} entries one more time via Wordpress API...`
+			)
+		);
+
+		let done = 0;
+		const total = retry.size;
+		const eta = new ETA({ total });
+
+		// Shuffle batches to avoid hitting rate limits on same entries
+		const retries = [...retry.entries()].sort(() => 0.5 - Math.random());
+
+		for (const urlChunk of chunkBySize(Math.floor(batchSize / 2), retries)) {
+			const pages = await fetchPagesViaWordpressAPI(new Map(urlChunk));
+
+			for (const [key, page] of Object.entries(pages)) {
+				done++;
+
+				if (!page) {
+					console.warn(
+						yellow(
+							`⁄ Could not fetch page for ${metadataKey} ${key} at ${pageUrls.get(key)} on retry. Skipping...`
+						)
+					);
+
+					continue;
+				}
+
+				const i = metadataOptions.findIndex((s) => s.key === key);
+				if (i < 0) throw new Error(`No option with key ${key}`);
+
+				const s = metadataOptions[i];
+
+				const newData = await augmentMetadataOption(s, page!);
+				if (!newData) {
+					console.warn(
+						yellow(`⁄ Could not extract data for ${metadataKey} ${s.label} on retry`)
+					);
+					continue;
+				}
+
+				Object.assign(s, newData);
+				processed++;
+
+				eta.update(done, total);
+				console.info(
+					`${align(processed, total)} ${percentage(done, total)} ${cyan(
+						`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
+					)} (retry) Updating ${metadataKey} ${dim(`takes ~${Math.round(eta.measure().averageTime)}ms`)} ${s.label} with ${page!.link}`
+				);
+			}
 		}
 	}
 
@@ -356,7 +417,17 @@ async function fetchPagesViaWordpressAPI(
 				`⁄ Rate limited by Wordpress API. Waiting for ${waitTime} seconds before retrying...`
 			)
 		);
+
+		if (waitTime > 60) {
+			console.error(
+				`⁄ Wait time is quite long (${waitTime}s). Skipping this batch: ${query}. Response was`,
+				await response.text()
+			);
+			return Object.fromEntries([...lookups.keys()].map((key) => [key, undefined]));
+		}
+
 		await new Promise((resolve) => setTimeout(resolve, secondsToMilliseconds(waitTime)));
+
 		return fetchPagesViaWordpressAPI(lookups, {
 			rateLimitWaitSeconds: rateLimitWaitSeconds * Math.E
 		});
