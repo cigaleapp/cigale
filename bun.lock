@@ -30,7 +30,7 @@
         "pica-gpu": "^0.2.0",
         "piexifjs": "^1.0.6",
         "runed": "^0.37.1",
-        "svelte-mathml": "gwennlbh/svelte-mathml#2fcd4befe817b768daddffe373cddecd9aaf009e",
+        "svelte-mathml": "gwennlbh/svelte-mathml#64dd30646516d03f00587ca3e22e9f8a291dad67",
         "sveltejs-tippy": "^3.0.0",
         "swarpc": "^0.17.2",
         "tiny-jsonc": "^1.0.2",
@@ -2256,7 +2256,7 @@
 
     "svelte-eslint-parser": ["svelte-eslint-parser@1.4.0", "", { "dependencies": { "eslint-scope": "^8.2.0", "eslint-visitor-keys": "^4.0.0", "espree": "^10.0.0", "postcss": "^8.4.49", "postcss-scss": "^4.0.9", "postcss-selector-parser": "^7.0.0" }, "peerDependencies": { "svelte": "^3.37.0 || ^4.0.0 || ^5.0.0" }, "optionalPeers": ["svelte"] }, "sha512-fjPzOfipR5S7gQ/JvI9r2H8y9gMGXO3JtmrylHLLyahEMquXI0lrebcjT+9/hNgDej0H7abTyox5HpHmW1PSWA=="],
 
-    "svelte-mathml": ["svelte-mathml@github:gwennlbh/svelte-mathml#2fcd4be", { "peerDependencies": { "svelte": "^5.45.6" } }, "gwennlbh-svelte-mathml-2fcd4be"],
+    "svelte-mathml": ["svelte-mathml@github:gwennlbh/svelte-mathml#64dd306", { "peerDependencies": { "svelte": "^5.45.6" } }, "gwennlbh-svelte-mathml-64dd306"],
 
     "svelte-toolbelt": ["svelte-toolbelt@0.7.1", "", { "dependencies": { "clsx": "^2.1.1", "runed": "^0.23.2", "style-to-object": "^1.0.8" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ=="],
 
