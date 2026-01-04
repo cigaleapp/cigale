@@ -27,8 +27,8 @@ jobs:
       - name: Get release notes
         id: release_notes
         run: |
-          Get-Content Env:SCRIPT | Out-File get-notes.js
-          bun get-notes.js >> $GITHUB_OUTPUT
+          Get-Content Env:SCRIPT | Out-File .\get-notes.js
+          bun run get-notes.js >> $GITHUB_OUTPUT
         env:
           SCRIPT: |
             const fs = require('fs'); 
@@ -68,9 +68,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ELECTRON_BUILD: '1'
 
+      - name: Get current date
+        id: today
+        run: |
+          echo month-name=$(Get-Date -Format "MMMM") >> $GITHUB_OUTPUT
+          echo year=$(Get-Date -Format "yyyy") >> $GITHUB_OUTPUT
+
       - name: Set release notes on release draft
         uses: softprops/action-gh-release@v2
         with:
           body: ${{ steps.release_notes.outputs.release_notes }}
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: ${{ steps.today.outputs.month-name }} ${{ steps.today.outputs.year }}
           draft: true
