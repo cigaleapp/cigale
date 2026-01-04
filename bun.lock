@@ -60,7 +60,7 @@
         "@eslint/compat": "^2.0.0",
         "@eslint/js": "^9.39.2",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
-        "@iconify-json/ri": "^1.2.6",
+        "@iconify-json/ri": "^1.2.7",
         "@jimp/js-jpeg": "^1.6.0",
         "@playwright/test": "^1.57.0",
         "@sveltejs/adapter-static": "^3.0.10",
@@ -442,7 +442,7 @@
 
     "@ianvs/prettier-plugin-sort-imports": ["@ianvs/prettier-plugin-sort-imports@4.7.0", "", { "dependencies": { "@babel/generator": "^7.26.2", "@babel/parser": "^7.26.2", "@babel/traverse": "^7.25.9", "@babel/types": "^7.26.0", "semver": "^7.5.2" }, "peerDependencies": { "@prettier/plugin-oxc": "^0.0.4", "@vue/compiler-sfc": "2.7.x || 3.x", "content-tag": "^4.0.0", "prettier": "2 || 3 || ^4.0.0-0", "prettier-plugin-ember-template-tag": "^2.1.0" }, "optionalPeers": ["@prettier/plugin-oxc", "@vue/compiler-sfc", "content-tag", "prettier-plugin-ember-template-tag"] }, "sha512-soa2bPUJAFruLL4z/CnMfSEKGznm5ebz29fIa9PxYtu8HHyLKNE1NXAs6dylfw1jn/ilEIfO2oLLN6uAafb7DA=="],
 
-    "@iconify-json/ri": ["@iconify-json/ri@1.2.6", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-tGXRmXtb8oFu8DNg9MsS1pywKFgs9QZ4U6LBzUamBHaw3ePSiPd7ouE64gzHzfEcR16hgVaXoUa+XxD3BB0XOg=="],
+    "@iconify-json/ri": ["@iconify-json/ri@1.2.7", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-j/Fkb8GlWY5y/zLj1BGxWRtDzuJFrI7562zLw+iQVEykieBgew43+r8qAvtSajvb75MfUIHjsNOYQPRD8FfLfw=="],
 
     "@iconify/svelte": ["@iconify/svelte@5.1.0", "", { "dependencies": { "@iconify/types": "^2.0.0" }, "peerDependencies": { "svelte": ">4.0.0" } }, "sha512-I14nSqo0pNXO5OKsT61ZO3XIPF4yRHA2ErgPsaZ1sPJdKXn80o7o8jOe1xpWphbb9FihdX6by9zlKKBss61mFw=="],
 
