@@ -1,7 +1,8 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { ArkErrors, type } from 'arktype';
-import { secondsToMilliseconds } from 'date-fns';
+import { Estimation as ETA } from 'arrival-time';
+import { formatDistanceToNowStrict, secondsToMilliseconds } from 'date-fns';
 import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
@@ -9,7 +10,6 @@ import Turndown from 'turndown';
 import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
-import { EtaCalculator } from './eta.js';
 
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const virtualConsole = new jsdom.VirtualConsole();
@@ -121,10 +121,7 @@ async function augmentMetadata(
 	const total = pageUrls.size;
 	let done = 0;
 	let processed = 0;
-	const eta = new EtaCalculator({
-		averageOver: 10 * batchSize,
-		totalSteps: total
-	});
+	const eta = new ETA({ total });
 
 	for (const urlsChunk of chunkBySize(batchSize, [...pageUrls.entries()])) {
 		if (limit > 0 && done > limit) break;
@@ -159,11 +156,12 @@ async function augmentMetadata(
 
 			processed++;
 
-			const stepTookMs = eta.msSinceLastStep();
+			eta.update(done, total);
 
-			eta.step();
 			console.info(
-				`${align(processed, total)} ${percentage(done, total)} ${cyan(`→ ${eta.display(processed)}`)} Updating ${metadataKey} ${dim(`took ${stepTookMs.toFixed(0)}ms`)} ${s.label} with ${page!.link}`
+				`${align(processed, total)} ${percentage(done, total)} ${cyan(
+					`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
+				)} Updating ${metadataKey} ${dim(`takes ~${Math.round(eta.measure().averageTime)}ms`)} ${s.label} with ${page!.link}`
 			);
 		}
 	}
@@ -208,14 +206,17 @@ async function searchForSpecies(lookups: Record<string, string[]>) {
 
 	const total = speciesLinks!.size;
 	const links = [...speciesLinks!.entries()];
-	const eta = new EtaCalculator({ averageOver: 300, totalSteps: total });
+	const eta = new ETA({ total });
 	let done = 0;
 	const results = await Promise.all(
 		links.map(async ([title, link]) => {
 			done++;
+			eta.update(done, total);
 
 			console.info(
-				`${align(done, total)} ${percentage(done, total, 1)} ${cyan(`→ ${eta.display(done)}`)} Finding GBIF ID for ${title}`
+				`${align(done, total)} ${percentage(done, total, 1)} ${cyan(
+					`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
+				)} Finding GBIF ID for ${title}`
 			);
 
 			const slug = lastPathSegment(link).toLowerCase();
@@ -224,12 +225,10 @@ async function searchForSpecies(lookups: Record<string, string[]>) {
 
 			for (const [key, names] of Object.entries(lookups)) {
 				if (names.some((name) => name.replaceAll(' ', '-').toLowerCase() === slug)) {
-					eta.step();
 					return [key, link] as const;
 				}
 
 				if (titleMatcher(names)) {
-					eta.step();
 					return [key, link] as const;
 				}
 			}
