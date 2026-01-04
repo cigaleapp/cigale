@@ -479,12 +479,14 @@ msgstr "Host Grotesk"
 msgid "Icônes"
 msgstr "Icônes"
 
+#: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Image précédente"
 msgstr "Image précédente"
 
+#: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Image suivante"
