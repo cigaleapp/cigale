@@ -11,6 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "MIME-Version: 1.0\n"
+"Source-Language: fr\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -854,12 +855,6 @@ msgstr "Zoomer"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
-
-#: src/routes/(app)/DeploymentDetails.svelte
-#: src/routes/(app)/DeploymentDetails.svelte
-msgctxt "continuation of sentence \"deployment PR for...\""
-msgid "de"
-msgstr "de"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "github.com/cigaleapp/cigale"
@@ -2083,6 +2078,11 @@ msgstr "Une erreur est survenue lors de la soumission de votre demande. Veuillez
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Envoyer"
 msgstr "Envoyer"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "de"
+msgstr "de"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

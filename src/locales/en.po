@@ -12,6 +12,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "X-Generator: Weblate 5.12.2\n"
+"Source-Language: fr\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -855,12 +856,6 @@ msgstr "Zoom in"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgstr "hello there :) <0/> have a great dayyy 💖💖"
-
-#: src/routes/(app)/DeploymentDetails.svelte
-#: src/routes/(app)/DeploymentDetails.svelte
-msgctxt "continuation of sentence \"deployment PR for...\""
-msgid "de"
-msgstr "by"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "github.com/cigaleapp/cigale"
@@ -2074,6 +2069,11 @@ msgstr ""
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Envoyer"
+msgstr ""
+
+#: src/routes/(app)/DeploymentDetails.svelte
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "de"
 msgstr ""
 
 #: src/lib/queue.svelte.js
