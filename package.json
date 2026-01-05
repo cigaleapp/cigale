@@ -138,7 +138,7 @@
 		"@iconify/svelte": "^5.1.0",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
-		"@wuchale/svelte": "^0.17.9",
+		"@wuchale/svelte": "^0.18.1",
 		"arktype": "^2.1.29",
 		"arrival-time": "^1.0.6",
 		"bits-ui": "^1.8.0",
