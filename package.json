@@ -135,7 +135,7 @@
 		"yauzl-promise": "^4.0.0"
 	},
 	"dependencies": {
-		"@iconify/svelte": "^5.1.0",
+		"@iconify/svelte": "^5.2.1",
 		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"@viselect/vanilla": "^3.9.0",
 		"@wuchale/svelte": "^0.17.9",
