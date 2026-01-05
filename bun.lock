@@ -78,7 +78,7 @@
         "@vitest/ui": "^4.0.16",
         "@wuchale/vite-plugin": "^0.15.7",
         "all-contributors-cli": "^6.26.1",
-        "arkenv": "^0.8.1",
+        "arkenv": "^0.8.2",
         "bun": "^1.3.5",
         "discord.js": "^14.25.1",
         "electron": "^39.2.7",
@@ -1037,7 +1037,7 @@
 
     "aria-query": ["aria-query@5.3.2", "", {}, "sha512-COROpnaoap1E2F000S62r6A60uHZnmlvomhfyT2DlTcrY1OrBKn2UhH7qn5wTC9zMvD0AY7csdPSNwKP+7WiQw=="],
 
-    "arkenv": ["arkenv@0.8.1", "", { "peerDependencies": { "arktype": "^2.1.22" } }, "sha512-6aGadHN2nuWuRNWcmNc/CfdlUak6jeZi/WBLLWN/LvBFY8aR+FSMJE6x9SUS9L1m+qp94MTVyKpi3tDzo+SoJw=="],
+    "arkenv": ["arkenv@0.8.2", "", { "peerDependencies": { "arktype": "^2.1.22" } }, "sha512-FD5p4G0TcgeFXm6aMDEUVGd1hL6Hytz8bzynnwTXkwQ1s9QZPGKZiZHq6H7G0tWx/UryvgE5QNFp1S7eWU5lKQ=="],
 
     "arkregex": ["arkregex@0.0.5", "", { "dependencies": { "@ark/util": "0.56.0" } }, "sha512-ncYjBdLlh5/QnVsAA8De16Tc9EqmYM7y/WU9j+236KcyYNUXogpz3sC4ATIZYzzLxwI+0sEOaQLEmLmRleaEXw=="],
 
