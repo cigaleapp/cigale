@@ -76,7 +76,7 @@
         "@types/yauzl-promise": "^4.0.1",
         "@vitest/coverage-v8": "^4.0.16",
         "@vitest/ui": "^4.0.16",
-        "@wuchale/vite-plugin": "^0.15.7",
+        "@wuchale/vite-plugin": "^0.16.2",
         "all-contributors-cli": "^6.26.1",
         "arkenv": "^0.8.2",
         "bun": "^1.3.5",
@@ -989,7 +989,7 @@
 
     "@wuchale/svelte": ["@wuchale/svelte@0.17.9", "", { "dependencies": { "magic-string": "^0.30.21", "svelte": "^5.37.0", "wuchale": "^0.18.8" } }, "sha512-Tf8BWp8iiFWoHKzqJrfxL7wwjoa1cK3MZ2MD1C3Dkf4fGwgPo/mShIFISCpC0Ph3PcopzvZB3Wh8FH3JExjbJQ=="],
 
-    "@wuchale/vite-plugin": ["@wuchale/vite-plugin@0.15.7", "", { "dependencies": { "wuchale": "^0.18.11" } }, "sha512-ypbzbdUMkpFjSWcper+wbq+rhw/t6FkS9B5PtC9kcs7E5poOjU9GuhmcyNF77KV+3qq7B5C2UYGjWISWP9oulA=="],
+    "@wuchale/vite-plugin": ["@wuchale/vite-plugin@0.16.2", "", { "dependencies": { "wuchale": "^0.19.0" } }, "sha512-ejTqoJew7F+zOQ8IDYa+PNPiD+YTV/9p0LpIqnoOM6s5sVVzHvuskGVNUVprVmMsWGVRSQDt0qX6mifi9ufutg=="],
 
     "@xmldom/xmldom": ["@xmldom/xmldom@0.8.11", "", {}, "sha512-cQzWCtO6C8TQiYl1ruKNn2U6Ao4o4WBBcbL61yJl84x+j5sOWWFU9X7DpND8XZG3daDppSsigMdfAIl2upQBRw=="],
 
@@ -2741,6 +2741,8 @@
 
     "@wuchale/svelte/wuchale": ["wuchale@0.18.9", "", { "dependencies": { "@sveltejs/acorn-typescript": "^1.0.8", "acorn": "^8.15.0", "chokidar": "^5.0.0", "magic-string": "^0.30.21", "path-to-regexp": "^8.3.0", "picomatch": "^4.0.3", "pofile": "^1.1.4", "tinyglobby": "^0.2.15" }, "bin": { "wuchale": "dist/cli/index.js" } }, "sha512-QBWnr5kgxuqP7lSZeDMIz/mnrE9sfmai9mTqnitEWRYd4RlarMPvorrluhFLoZ4GOw3564EUoTK8drlfeiJd0Q=="],
 
+    "@wuchale/vite-plugin/wuchale": ["wuchale@0.19.1", "", { "dependencies": { "@sveltejs/acorn-typescript": "^1.0.8", "acorn": "^8.15.0", "chokidar": "^5.0.0", "magic-string": "^0.30.21", "path-to-regexp": "^8.3.0", "picomatch": "^4.0.3", "pofile": "^1.1.4", "tinyglobby": "^0.2.15" }, "bin": { "wuchale": "dist/cli/index.js" } }, "sha512-8Pm/8GFMeOWZWR20PUbbVJHtz14NpOOC2CcXAxALNinY0m8++FdKpH3bSJ+H3O9f8gxDjv0ZOvuAeng6bgx+MA=="],
+
     "ajv-formats/ajv": ["ajv@8.17.1", "", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g=="],
 
     "ajv-keywords/ajv": ["ajv@8.17.1", "", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g=="],
@@ -3227,6 +3229,10 @@
 
     "@wuchale/svelte/wuchale/picomatch": ["picomatch@4.0.3", "", {}, "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="],
 
+    "@wuchale/vite-plugin/wuchale/chokidar": ["chokidar@5.0.0", "", { "dependencies": { "readdirp": "^5.0.0" } }, "sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw=="],
+
+    "@wuchale/vite-plugin/wuchale/picomatch": ["picomatch@4.0.3", "", {}, "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="],
+
     "ajv-formats/ajv/json-schema-traverse": ["json-schema-traverse@1.0.0", "", {}, "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug=="],
 
     "ajv-keywords/ajv/json-schema-traverse": ["json-schema-traverse@1.0.0", "", {}, "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug=="],
@@ -3426,6 +3432,8 @@
     "@octokit/webhooks/@octokit/request-error/@octokit/types/@octokit/openapi-types": ["@octokit/openapi-types@27.0.0", "", {}, "sha512-whrdktVs1h6gtR+09+QsNk2+FO+49j6ga1c55YZudfEG+oKJVvJLQi3zkOm5JjiUXAagWK2tI2kTGKJ2Ys7MGA=="],
 
     "@wuchale/svelte/wuchale/chokidar/readdirp": ["readdirp@5.0.0", "", {}, "sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ=="],
+
+    "@wuchale/vite-plugin/wuchale/chokidar/readdirp": ["readdirp@5.0.0", "", {}, "sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ=="],
 
     "boxen/string-width/strip-ansi/ansi-regex": ["ansi-regex@6.2.2", "", {}, "sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg=="],
 
