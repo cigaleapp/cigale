@@ -5,13 +5,13 @@ import { adapter as js } from 'wuchale/adapter-vanilla';
 import { Tables } from './src/lib/database.js';
 
 export default defineConfig({
-	sourceLocale: 'fr',
-	otherLocales: ['en'],
+	locales: ['en', 'fr'],
 	// Translations are refreshed via a workflow,
 	// see file://./.github/workflows/i18n.yml
 	hmr: Boolean(process.env.CI),
 	adapters: {
 		main: svelte({
+			sourceLocale: 'fr',
 			loader: 'sveltekit',
 			heuristic({ msgStr: [msg], details: { file, scope, call } }) {
 				if (file.includes('/_playground/')) return false;
@@ -51,6 +51,7 @@ export default defineConfig({
 			}
 		}),
 		js: js({
+			sourceLocale: 'fr',
 			loader: 'vite',
 			files: [
 				'src/**/+{page,layout}.{js,ts}',
