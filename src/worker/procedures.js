@@ -5,6 +5,7 @@
 import { type } from 'arktype';
 
 import { Schemas } from '$lib/database.js';
+import { NodeProvenance } from '$lib/file-tree.js';
 
 export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	init: {
@@ -109,6 +110,20 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 					: { progress: undefined, warning: o.warning }
 			),
 		success: type('ArrayBuffer')
+	},
+	previewResultsZip: {
+		input: type({
+			sessionId: 'string',
+			include: type.enumerated('croppedonly', 'full', 'metadataonly')
+		}),
+		progress: type('undefined'),
+		success: type.scope({ NodeProvenance }).type({
+			paths: { '[NodeProvenance]': 'string[]' },
+			size: {
+				uncompressed: ['number.integer >= 0', '@', 'bytes'],
+				compressed: ['number.integer >= 0', '@', 'bytes, estimated']
+			}
+		})
 	},
 	diffProtocolWithRemote: {
 		input: type({ protocolId: 'string' }),

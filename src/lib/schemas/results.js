@@ -48,6 +48,7 @@ export const MetadataRecord = type({
 
 export const AnalyzedImage = type({
 	id: ['string', '@', "ID de l'image"],
+	fileId: ['string | null', '@', "ID du fichier source de l'image"],
 	filename: ['string', '@', 'Nom du fichier utilisé pour cette image'],
 	contentType: [
 		'string',
