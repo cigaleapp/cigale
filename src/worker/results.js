@@ -161,17 +161,6 @@ swarp.generateResultsZip(
 			}
 		}
 
-		console.log(
-			`Actual sizes:\n`,
-			buffersOfImages
-				.sort(compareBy('imageId'))
-				.map(
-					({ imageId, croppedBytes, originalBytes }) =>
-						`${imageId}, ${croppedBytes.length}, ${originalBytes?.length}`
-				)
-				.join('\n')
-		);
-
 		abortSignal?.throwIfAborted();
 
 		const zipfile = await Promise.race([
@@ -334,30 +323,6 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 	abortSignal?.throwIfAborted();
 
 	const images = Object.values(exportedObservations).flatMap((o) => o.images);
-
-	console.log(
-		`Estimated sizes:\n`,
-		images
-			.sort(compareBy('id'))
-			.map(({ filename, fileId, metadata, id }) => {
-				if (!fileId) return `${filename}: no fileId`;
-				const stats = imageFileStats.get(fileId);
-				if (!stats) return `${filename}: no stats`;
-				const cropbox = MetadataRuntimeValue.boundingbox(
-					metadata[protocolUsed.crop?.metadata ?? 'crop']?.value
-				);
-				if (cropbox instanceof ArkErrors)
-					return `${id}, ${stats.fullSize}, ${stats.fullSize}`;
-
-				const width = cropbox.w * stats.dimensions.width;
-				const height = cropbox.h * stats.dimensions.height;
-
-				const cropped = stats.bytePerPixel * (width * height) * 6.37;
-				const full = stats.fullSize;
-				return `${id}, ${cropped}, ${full}`;
-			})
-			.join('\n')
-	);
 
 	// Infer cropped image's sizes based on their full image file's byte per pixel and the cropbox's dimensions
 	const imagesSize = {
