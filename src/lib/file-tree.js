@@ -1,5 +1,14 @@
+import { type } from 'arktype';
+
+export const NodeProvenance = type.enumerated(
+	'metadata.json',
+	'metadata.csv',
+	'images.cropped',
+	'images.original'
+);
+
 /**
- * @typedef {`metadata.${'json'|'csv'}`|`images.${'cropped'|'original'}`} NodeProvenance
+ * @typedef {typeof NodeProvenance.infer} NodeProvenance
  */
 /**
  * @typedef {object} TreeLeaf
@@ -11,41 +20,43 @@
  */
 
 /**
- * Add a new path to the given tree (in-place).
+ * Add new paths to the given tree (in-place).
  * @param {object} arg
  * @param {TreeNode} arg.tree
- * @param {string} arg.path
+ * @param {string[]} arg.paths
  * @param {boolean} [arg.isDirectory=false] whether the path is a directory
  * @param {string} [arg.help]
  * @param {NodeProvenance} arg.provenance
  */
-export function gatherToTree({ tree, path, provenance, isDirectory = false, help = '' }) {
-	const [current, ...deeper] = splitPath(path);
-	if (deeper.length === 0) {
-		if (isDirectory) {
-			tree.push({ folder: current, provenance, children: [] });
-		} else {
-			tree.push({ filename: current, help, provenance });
+export function gatherToTree({ tree, paths, provenance, isDirectory = false, help = '' }) {
+	for (const path of paths) {
+		const [current, ...deeper] = splitPath(path);
+		if (deeper.length === 0) {
+			if (isDirectory) {
+				tree.push({ folder: current, provenance, children: [] });
+			} else {
+				tree.push({ filename: current, help, provenance });
+			}
+			return;
 		}
-		return;
-	}
 
-	let folder = tree.find((f) => 'folder' in f && f.folder === current);
-	if (!folder) {
-		tree.push({ folder: current, children: [] });
-		folder = tree[tree.length - 1];
-	}
+		let folder = tree.find((f) => 'folder' in f && f.folder === current);
+		if (!folder) {
+			tree.push({ folder: current, children: [] });
+			folder = tree[tree.length - 1];
+		}
 
-	if (!('children' in folder)) {
-		throw new Error(`Expected folder "${current}" to have a children array`);
-	}
+		if (!('children' in folder)) {
+			throw new Error(`Expected folder "${current}" to have a children array`);
+		}
 
-	gatherToTree({
-		tree: folder.children,
-		path: deeper.join('/'),
-		provenance,
-		help
-	});
+		gatherToTree({
+			tree: folder.children,
+			paths: [deeper.join('/')],
+			provenance,
+			help
+		});
+	}
 }
 
 /**
@@ -137,25 +148,25 @@ if (import.meta.vitest) {
 			const tree = [];
 			gatherToTree({
 				tree,
-				path: 'images/cropped/{observation.id}/{image.exportedAs.original}',
+				paths: ['images/cropped/{observation.id}/{image.exportedAs.original}'],
 				provenance: 'images.cropped',
 				help: 'Cropped image'
 			});
 			gatherToTree({
 				tree,
-				path: 'images/original/{observation.id}/{image.exportedAs.original}',
+				paths: ['images/original/{observation.id}/{image.exportedAs.original}'],
 				provenance: 'images.original',
 				help: 'Original image'
 			});
 			gatherToTree({
 				tree,
-				path: 'metadata.json',
+				paths: ['metadata.json'],
 				provenance: 'metadata.json',
 				help: 'Metadata in JSON format'
 			});
 			gatherToTree({
 				tree,
-				path: 'metadata.csv',
+				paths: ['metadata.csv'],
 				provenance: 'metadata.csv',
 				help: 'Metadata in CSV format'
 			});
