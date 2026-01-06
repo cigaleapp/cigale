@@ -243,7 +243,10 @@
 				</div>
 			{:else}
 				<div class="tree" in:fade>
-					<ZipContentsTree tree={preview} />
+					<ZipContentsTree
+						tree={preview}
+						rootHelp="~{formatBytesSize(sizeEstimates.uncompressed)} une fois dézippé"
+					/>
 				</div>
 			{/if}
 		</section>

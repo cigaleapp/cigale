@@ -21,11 +21,13 @@
 		tree: TreeNode;
 		editable?: boolean;
 		// idk why it thinks it's unused, i mean yeah it's an interface's method signature ??
-		// eslint-disable-next-line no-unused-vars 
+		// eslint-disable-next-line no-unused-vars
 		onedit?: (provenance: NodeProvenance, path: string) => void | Promise<void>;
+		/** Help text for the root of the tree */
+		rootHelp?: string;
 	}
 
-	const { tree: root, editable = false, onedit }: Props = $props();
+	const { tree: root, editable = false, onedit, rootHelp }: Props = $props();
 
 	async function editMany(children: TreeNode, dirname: string) {
 		for (const child of children) {
@@ -54,7 +56,12 @@
 <ul class="tree">
 	<li>
 		<IconZipFile />
-		<span class="filename">Résultats.zip</span>
+		<div class="text">
+			<span class="filename">results.zip</span>
+			{#if rootHelp}
+				<span class="help">{rootHelp}</span>
+			{/if}
+		</div>
 	</li>
 	{@render tree(root, '')}
 </ul>
