@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-12-10 13:28+0000\n"
+"PO-Revision-Date: 2026-01-07 01:46+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1590,10 +1590,9 @@ msgstr "Original images"
 #. placeholder {1}: protocol.id
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/+layout.js
 msgid "Metadata {0} for protocol {1} not found"
-msgstr ""
+msgstr "Metadata {0} for protocol {1} not found"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
-#, fuzzy
 msgid "Option not found"
 msgstr "Option not found"
 
@@ -1778,29 +1777,29 @@ msgstr ""
 #: src/lib/undo.svelte.js
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Rétablir"
-msgstr ""
+msgstr "Redo"
 
 #. placeholder {0}: filename
 #: src/routes/(app)/results/+page.svelte
 msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
-msgstr ""
+msgstr "Cannot add EXIF metadata to {0}"
 
 #. placeholder {0}: error
 #: src/routes/(app)/results/+page.svelte
 msgid "Erreur lors de l'exportation des résultats: {0}"
-msgstr ""
+msgstr "Could not export results: {0}"
 
 #. placeholder {0}: shortId
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Métadonnée {0} créée"
-msgstr ""
+msgstr "Metadata {0} created"
 
 #. placeholder {0}: err.summary
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/updater.svelte.js
 msgid "Valeur invalide : {0}"
-msgstr ""
+msgstr "Invalide value : {0}"
 
 #: src/lib/metadata.js
 msgid "Yes"
@@ -1820,7 +1819,7 @@ msgstr ""
 #. placeholder {3}: y1 + h
 #: src/lib/metadata.js
 msgid "Boîte de ({0}, {1}) à ({2}, {3})"
-msgstr ""
+msgstr "Box from ({0}, {1}) to ({2}, {3})"
 
 #. placeholder {0}: x1
 #. placeholder {1}: y1
@@ -1828,23 +1827,23 @@ msgstr ""
 #. placeholder {3}: y1 + h
 #: src/lib/metadata.js
 msgid "Box from ({0}, {1}) to ({2}, {3})"
-msgstr ""
+msgstr "Box from ({0}, {1}) to ({2}, {3})"
 
 #: src/lib/metadata.js
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation de la base de données…"
-msgstr ""
+msgstr "Initializing database…"
 
 #: src/routes/(app)/+layout.js
 msgid "Chargement des données intégrées…"
-msgstr ""
+msgstr "Loading built-in data…"
 
 #: src/routes/(app)/+layout.js
 msgid "Analyse"
-msgstr ""
+msgstr "Analysis"
 
 #: src/routes/(app)/+layout.js
 msgid "Filtrage des métadonnées intégrées"
@@ -1856,7 +1855,7 @@ msgstr ""
 
 #: src/routes/(app)/+layout.js
 msgid "Écriture du protocole"
-msgstr ""
+msgstr "Writing protocol"
 
 #. placeholder {0}: detail
 #: src/routes/(app)/+layout.js
@@ -2058,7 +2057,7 @@ msgstr ""
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Envoyer"
-msgstr ""
+msgstr "Send"
 
 #: src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/DeploymentDetails.svelte
@@ -2067,15 +2066,15 @@ msgstr ""
 
 #: src/lib/ZipContentsTree.svelte
 msgid "results.zip"
-msgstr ""
+msgstr "results.zip"
 
 #: src/lib/ZipContentsTree.svelte
 msgid "Dossier vide"
-msgstr ""
+msgstr "Empty folder"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Résultats <0/>"
-msgstr ""
+msgstr "Results <0/>"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Aucune session active à exporter."
@@ -2087,17 +2086,19 @@ msgstr ""
 
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> results.zip <1/>"
-msgstr ""
+msgstr "<0/> results.zip <1/>"
 
 #: src/routes/(app)/results/+page.svelte
 msgid ""
 "Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
 "images"
 msgstr ""
+"A % value means that the padding is relative to\n"
+"the dimensions of each image"
 
 #: src/routes/(app)/results/+page.svelte
 msgid "Contenu de l'export .zip"
-msgstr ""
+msgstr "Exported .zip contents"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
