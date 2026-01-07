@@ -118,11 +118,18 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		}),
 		progress: type('undefined'),
 		success: type.scope({ NodeProvenance }).type({
-			paths: { '[NodeProvenance]': 'string[]' },
-			size: {
-				uncompressed: ['number.integer >= 0', '@', 'bytes'],
-				compressed: ['number.integer >= 0', '@', 'bytes, estimated']
-			}
+			'[NodeProvenance]': 'string[]'
+		})
+	},
+	estimateResultsZipSize: {
+		input: type({
+			sessionId: 'string',
+			include: type.enumerated('croppedonly', 'full', 'metadataonly')
+		}),
+		progress: type('undefined'),
+		success: type({
+			uncompressed: ['number.integer >= 0', '@', 'bytes'],
+			compressed: ['number.integer >= 0', '@', 'bytes, estimated']
 		})
 	},
 	diffProtocolWithRemote: {
