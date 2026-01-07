@@ -23,7 +23,6 @@ msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Other photos <1/>"
 
 #: src/routes/(app)/PrepareForOffline.svelte
-#: src/routes/(app)/results/+page.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
 
@@ -1386,6 +1385,8 @@ msgstr "<0/> Update to v{0} is available <1/>"
 msgid "<0/> Différences avec la version publiée"
 msgstr "<0/> Changes with published version"
 
+#: src/lib/LoadingText.svelte
+#: src/lib/LoadingText.svelte
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Chargement..."
 msgstr "Loading..."
@@ -1649,6 +1650,7 @@ msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Could not update protocol: {0}"
 
 #: src/lib/AreaObservations.svelte
+#: src/lib/ZipContentsTree.svelte
 #: src/lib/ZipContentsTree.svelte
 msgid "# élément"
 msgid_plural "# éléments"
@@ -2098,6 +2100,10 @@ msgstr "Exported .zip contents"
 msgid ""
 "Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
 "vous attendiez"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> une fois dézippé"
 msgstr ""
 
 #: src/lib/queue.svelte.js
