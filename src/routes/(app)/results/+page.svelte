@@ -56,8 +56,6 @@
 		}
 	});
 
-	const sizeEstimates: { compressed?: number; uncompressed?: number } = $state({});
-
 	$effect(() => {
 		if (!exporting && uiState.processing.task === 'export') {
 			uiState.processing.reset();
@@ -67,6 +65,7 @@
 	// TODO tidy up that code once https://github.com/gwennlbh/swarpc/issues/115 is implemented
 	let cancelExportGeneration = $state((_: string) => {});
 	let cancelExportPreview = $state((_: string) => {});
+	let cancelExportSizeEstimation = $state((_: string) => {});
 
 	async function generateExport() {
 		cancelExportGeneration('Un nouvel export a été démarré');
@@ -143,11 +142,8 @@
 
 		const preview = await request;
 
-		sizeEstimates.compressed = preview.size.compressed;
-		sizeEstimates.uncompressed = preview.size.uncompressed;
-
 		const tree: TreeNode = [];
-		for (const [provenance, paths] of entries(preview.paths)) {
+		for (const [provenance, paths] of entries(preview)) {
 			gatherToTree({ tree, paths, provenance });
 		}
 		return tree;
@@ -159,6 +155,21 @@
 		preview = undefined;
 		(async () => {
 			preview = await previewZipContents();
+		})();
+	});
+
+	let sizeEstimates: { compressed?: number; uncompressed?: number } = $state({});
+
+	watch([() => include], () => {
+		cancelExportSizeEstimation('Une nouvelle estimation de taille a été demandée');
+		sizeEstimates = {};
+		(async () => {
+			const { cancel, request } = swarpc.estimateResultsZipSize.cancelable({
+				include,
+				sessionId: uiState.currentSessionId
+			});
+			cancelExportSizeEstimation = cancel;
+			sizeEstimates = await request;
 		})();
 	});
 </script>

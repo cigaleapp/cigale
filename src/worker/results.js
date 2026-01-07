@@ -295,6 +295,42 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 		db,
 		abortSignal
 	});
+
+	return {
+		'metadata.csv': [filepaths.metadata.csv],
+		'metadata.json': [filepaths.metadata.json],
+		'images.cropped':
+			include === 'metadataonly'
+				? []
+				: Object.values(exportedObservations).flatMap((o) =>
+						o.images.map((i) => i.exportedAs.cropped)
+					),
+		'images.original':
+			include !== 'full'
+				? []
+				: Object.values(exportedObservations).flatMap((o) =>
+						o.images.map((i) => i.exportedAs.original)
+					)
+	};
+});
+
+swarp.estimateResultsZipSize(async ({ sessionId, include }, _, { abortSignal }) => {
+	const db = await openDatabase();
+	const session = await db.get('Session', sessionId).then(Schemas.Session.assert);
+	if (!session) throw new Error(`Session with ID ${sessionId} not found`);
+	abortSignal?.throwIfAborted();
+
+	const protocolId = session.protocol;
+	const protocolUsed = await db.get('Protocol', protocolId).then(Schemas.Protocol.assert);
+	if (!protocolUsed) throw new Error(`Protocol with ID ${protocolId} not found`);
+	abortSignal?.throwIfAborted();
+
+	const observations = await db.getAllFromIndex('Observation', 'sessionId', sessionId);
+	const images = await Promise.all(
+		Object.values(observations)
+			.flatMap((o) => o.images)
+			.map(async (id) => db.get('Image', id).then(Schemas.Image.assert))
+	);
 	abortSignal?.throwIfAborted();
 
 	const imageFileStats = await db.getAllFromIndex('ImageFile', 'sessionId', sessionId).then(
@@ -312,10 +348,9 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 	);
 	abortSignal?.throwIfAborted();
 
-	const images = Object.values(exportedObservations).flatMap((o) => o.images);
-
-	// Infer cropped image's sizes based on their full image file's byte per pixel and the cropbox's dimensions
-	const imagesSize = {
+	const estimations = {
+		json: (5300e3 / 94) * Object.keys(observations).length,
+		csv: (30e3 / 94) * Object.keys(observations).length,
 		full: sum(
 			images.map(({ fileId }) => {
 				if (!fileId) return 0;
@@ -324,6 +359,7 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 				return stats.fullSize;
 			})
 		),
+		// Infer cropped image's sizes based on their full image file's byte per pixel and the cropbox's dimensions
 		cropped: sum(
 			images.map(({ fileId, metadata }) => {
 				if (!fileId) return 0;
@@ -347,49 +383,35 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 		)
 	};
 
-	abortSignal?.throwIfAborted();
-
-	const estimations = {
-		json: (5300e3 / 94) * Object.keys(exportedObservations).length,
-		csv: (30e3 / 94) * Object.keys(exportedObservations).length
-	};
-
+	/** @satisfies { Record<keyof typeof estimations, number> } */
 	const compressionRates = {
 		json: 1 - 0.93,
-		csv: 1 - 0.7
+		csv: 1 - 0.7,
+		cropped: 1,
+		full: 1
 	};
 
-	const totalImagesSize = {
-		metadataonly: 0,
-		croppedonly: imagesSize.cropped,
-		full: imagesSize.full + imagesSize.cropped
-	}[include];
+	/**
+	 *
+	 * @param  {...(keyof typeof estimations)} things
+	 */
+	function computeEstimates(...things) {
+		return {
+			compressed: sum(things.map((thing) => compressionRates[thing] * estimations[thing])),
+			uncompressed: sum(things.map((thing) => estimations[thing]))
+		};
+	}
 
-	return {
-		size: {
-			uncompressed: estimations.json + estimations.csv + totalImagesSize,
-			compressed:
-				compressionRates.json * estimations.json +
-				compressionRates.csv * estimations.csv +
-				totalImagesSize
-		},
-		paths: {
-			'metadata.csv': [filepaths.metadata.csv],
-			'metadata.json': [filepaths.metadata.json],
-			'images.cropped':
-				include === 'metadataonly'
-					? []
-					: Object.values(exportedObservations).flatMap((o) =>
-							o.images.map((i) => i.exportedAs.cropped)
-						),
-			'images.original':
-				include !== 'full'
-					? []
-					: Object.values(exportedObservations).flatMap((o) =>
-							o.images.map((i) => i.exportedAs.original)
-						)
-		}
-	};
+	switch (include) {
+		case 'metadataonly':
+			return computeEstimates('json', 'csv');
+		case 'croppedonly':
+			return computeEstimates('json', 'csv', 'cropped');
+		case 'full':
+			return computeEstimates('json', 'csv', 'cropped', 'full');
+		default:
+			throw new Error(`Unknown include type: ${include}`);
+	}
 });
 
 /**
