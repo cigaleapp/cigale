@@ -19,15 +19,16 @@ Available CSS variables:
 	 * @typedef Props
 	 * @type {object}
 	 * @property {import('svelte').Snippet<[{loading: boolean}]>} children
-	 * @property {(e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void} onclick
+	 * @property {undefined | ((e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
 	 * @property {boolean} [disabled=false]
 	 * @property {boolean} [tight=false] limit the height of the button
 	 * @property {string} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 * @property {string|undefined} [testid] add a data-testid attribute to the button
 	 * @property {boolean} [aria-pressed]
-	 * @property {boolean} [loading] show a loading state while the onlick handler is running
+	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.
 	 * @property {boolean} [danger=false] use a red color scheme for dangerous actions
+	 * @property {boolean} [submits=false] if true, the button acts as a submit button in a form context
 	 */
 </script>
 
@@ -44,6 +45,7 @@ Available CSS variables:
 		danger = false,
 		help,
 		keyboard,
+		submits,
 		testid,
 		loading = false,
 		tight = false,
@@ -54,6 +56,7 @@ Available CSS variables:
 </script>
 
 <button
+	type={submits ? 'submit' : 'button'}
 	disabled={disabled || isLoading}
 	class:tight
 	class:danger
