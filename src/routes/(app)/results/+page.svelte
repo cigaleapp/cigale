@@ -236,7 +236,7 @@
 			</div>
 		</section>
 
-		<section class="preview">
+		<section class="preview" data-testid="zip-preview">
 			<h2>Contenu de l'export .zip</h2>
 			{#if !preview}
 				<div class="loading" in:fade>
