@@ -1,23 +1,24 @@
 <script lang="ts">
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
-	import { fade } from 'svelte/transition';
 
 	import Download from '~icons/ri/download-2-line';
 	import { asset } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { downloadAsFile } from '$lib/download.js';
-	import { gatherToTree, type TreeNode } from '$lib/file-tree.js';
+	import { gatherToTree, type TreeNode, type TreeNodeMaybeLoading } from '$lib/file-tree.js';
 	import { formatBytesSize } from '$lib/i18n';
 	import { parseCropPadding } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
+	import LoadingText, { Loading } from '$lib/LoadingText.svelte';
 	import { ensureNoLoneImages } from '$lib/observations.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import { tooltip } from '$lib/tooltips.js';
 	import { entries } from '$lib/utils.js';
 	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 
@@ -172,6 +173,11 @@
 			sizeEstimates = await request;
 		})();
 	});
+
+	const loadingFolder: TreeNodeMaybeLoading[number] = {
+		folder: Loading,
+		children: Array(10).fill(Loading)
+	};
 </script>
 
 <main>
@@ -185,9 +191,13 @@
 				<Download />
 			{/if}
 			results.zip
-			{#if sizeEstimates.compressed}
-				<code class="size">~{formatBytesSize(sizeEstimates.compressed)}</code>
-			{/if}
+			<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
+				<LoadingText value={sizeEstimates.compressed} mask="~{formatBytesSize(150e3)}">
+					{#snippet loaded(size)}
+						~{formatBytesSize(size)}
+					{/snippet}
+				</LoadingText>
+			</code>
 		</ButtonSecondary>
 	</header>
 	<div class="side-by-side">
@@ -249,19 +259,32 @@
 
 		<section class="preview" data-testid="zip-preview">
 			<h2>Contenu de l'export .zip</h2>
-			{#if !preview}
-				<div class="loading" in:fade>
-					<LoadingSpinner --size="2em" />
-					Chargement…
-				</div>
-			{:else}
-				<div class="tree" in:fade>
-					<ZipContentsTree
-						tree={preview}
-						rootHelp="~{formatBytesSize(sizeEstimates.uncompressed)} une fois dézippé"
-					/>
-				</div>
-			{/if}
+
+			<div class="tree loading">
+				<ZipContentsTree
+					tree={preview ?? [
+						Loading,
+						Loading,
+						...{
+							metadataonly: [],
+							croppedonly: [loadingFolder],
+							full: [loadingFolder, loadingFolder]
+						}[include]
+					]}
+				>
+					{#snippet rootHelp()}
+						<LoadingText
+							value={sizeEstimates.uncompressed}
+							mask="~{formatBytesSize(1e6)}"
+						>
+							{#snippet loaded(size)}
+								~{formatBytesSize(size)}
+							{/snippet}
+						</LoadingText>
+						une fois dézippé
+					{/snippet}
+				</ZipContentsTree>
+			</div>
 		</section>
 	</div>
 </main>
@@ -332,18 +355,8 @@
 		margin-top: 0.75em;
 	}
 
-	.loading {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 2em;
-		width: 100%;
-		height: 300px;
-	}
-
 	code.size {
 		font-size: 0.85em;
+		min-width: 6ch;
 	}
 </style>

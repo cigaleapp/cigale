@@ -1258,3 +1258,19 @@ export async function unlessAborted(signal, promise) {
 		})
 	]);
 }
+
+export const LOREM_IPSUM = `Lorem ipsum dolor sit amet. A impedit beatae sed nostrum voluptatem
+ut omnis aliquid et galisum quaerat. Est sunt voluptatem aut porro iste et tempora voluptatem
+aut pariatur minima sed omnis cumque est iusto fugit vel rerum magni. 33 ducimus nesciunt ut
+consequuntur esse nam necessitatibus tempore sit suscipit voluptatibus qui rerum earum non autem
+doloribus. Rem itaque esse est nostrum optio id repellat recusandae et ipsa quis.
+
+Aut odio ipsa sed autem esse ut autem error qui voluptates perspiciatis aut officiis consequuntur
+sit amet nihil. Eos delectus consequatur sit natus iure qui omnis omnis ea illum distinctio et
+quos quidem. Et nisi autem est rerum eius ut dolorum commodi et temporibus expedita ea dolorem 
+error ad asperiores facilis ad numquam libero. Aut suscipit maxime sit explicabo dolorem est
+accusantium enim et repudiandae omnis cum dolorem nemo id quia facilis.
+
+Et dolorem perferendis et rerum suscipit qui voluptatibus quia et nihil nostrum 33 omnis soluta. 
+Nam minus minima et perspiciatis velit et eveniet rerum et nihil voluptates aut eaque ipsa et 
+ratione facere!`;

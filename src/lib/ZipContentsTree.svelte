@@ -1,30 +1,37 @@
 <script lang="ts">
-	import type { Component } from 'svelte';
+	import type { Component, Snippet } from 'svelte';
 
 	import IconCroppedImage from '~icons/ri/crop-line';
 	import IconCsvFile from '~icons/ri/file-chart-line';
 	import IconJsonFile from '~icons/ri/file-code-line';
+	import IconFile from '~icons/ri/file-line';
 	import IconZipFile from '~icons/ri/file-zip-line';
 	import IconFolder from '~icons/ri/folder-2-line';
 	import IconFolderNew from '~icons/ri/folder-add-line';
 	import IconFullImage from '~icons/ri/image-2-line';
-	import type { NodeProvenance, TreeNode } from '$lib/file-tree.js';
+	import type { NodeProvenance, TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import Tooltip from '$lib/Tooltip.svelte';
 
 	import Badge from './Badge.svelte';
 	import { plural } from './i18n.js';
+	import {
+		loaded,
+		Loading,
+		default as LoadingText,
+		type MaybeLoading
+	} from './LoadingText.svelte';
 	import { scrollfader } from './scrollfader.js';
 
 	interface Props {
-		tree: TreeNode;
+		tree: TreeNodeMaybeLoading;
 		editable?: boolean;
 		// idk why it thinks it's unused, i mean yeah it's an interface's method signature ??
 		// eslint-disable-next-line no-unused-vars
 		onedit?: (provenance: NodeProvenance, path: string) => void | Promise<void>;
 		/** Help text for the root of the tree */
-		rootHelp?: string;
+		rootHelp?: string | Snippet;
 	}
 
 	const { tree: root, editable = false, onedit, rootHelp }: Props = $props();
@@ -39,7 +46,7 @@
 		}
 	}
 
-	const iconOfNode = (provenance: NodeProvenance): Component => {
+	function iconOfNode(provenance: NodeProvenance): Component {
 		switch (provenance) {
 			case 'metadata.csv':
 				return IconCsvFile;
@@ -50,7 +57,13 @@
 			case 'images.original':
 				return IconFullImage;
 		}
-	};
+	}
+
+	function nodeKey(node: TreeNodeMaybeLoading[number], index: number) {
+		if (!loaded(node)) return index;
+		if ('folder' in node) return loaded(node.folder) ? node.folder : index;
+		return node.filename;
+	}
 </script>
 
 <ul class="tree">
@@ -59,16 +72,23 @@
 		<div class="text">
 			<span class="filename">results.zip</span>
 			{#if rootHelp}
-				<span class="help">{rootHelp}</span>
+				<span class="help">
+					{#if typeof rootHelp === 'string'}
+						{rootHelp}
+					{:else}
+						{@render rootHelp()}
+					{/if}
+				</span>
 			{/if}
 		</div>
 	</li>
-	{@render tree(root, '')}
+	{@render tree(root)}
 </ul>
 
-{#snippet tree(children: TreeNode, dirname: string = '')}
+{#snippet tree(children: TreeNodeMaybeLoading, parents: Array<MaybeLoading<string>> = [])}
 	{@const hasOnlyLeaves =
-		Array.isArray(children) && children.every((child) => !('children' in child))}
+		Array.isArray(children) &&
+		children.every((child) => !loaded(child) || !('children' in child))}
 
 	<ul
 		class="tree"
@@ -96,29 +116,47 @@
 				</button>
 			</li>
 		{/if}
-		{#each children as child ('folder' in child ? child.folder : child.filename)}
+
+		{#each children as child, i (nodeKey(child, i))}
 			<li>
-				{#if 'folder' in child}
+				{#if !loaded(child)}
+					<IconFile />
+					<div class="text">
+						<LoadingText value={Loading} mask={{ words: 6 }} />
+					</div>
+				{:else if 'folder' in child}
 					{@const Icon = child.icon ?? IconFolder}
 					<Icon />
 					<div class="text">
-						{#if editable}
+						{#if editable && loaded(child.folder)}
 							<InlineTextInput
 								discreet
 								value={child.folder}
 								label="Nom du dossier"
 								onblur={async (newName) => {
 									child.folder = newName;
-									await editMany(child.children, `${dirname}/${newName}`);
+									if (!child.children.every(loaded)) return;
+									if (!parents.every(loaded)) return;
+									await editMany(child.children, [...parents, newName].join('/'));
 								}}
 							/>
 						{:else}
-							{child.folder}
+							<LoadingText value={child.folder} mask={{ words: 6 }} />
 						{/if}
 					</div>
 					{#if 'children' in child && child.children.length > 5}
 						<Badge>
-							{plural(child.children.length, ['# élément', '# éléments'])}
+							{#if child.children.every(loaded)}
+								{plural(child.children.length, ['# élément', '# éléments'])}
+							{:else}
+								<LoadingText
+									value={Loading}
+									mask={plural(child.children.length, [
+										'# élément',
+										'# éléments'
+									])}
+								/>
+							{/if}
 						</Badge>
 					{/if}
 				{:else}
@@ -141,7 +179,11 @@
 									label="Nom du fichier"
 									onblur={async (newName) => {
 										child.filename = newName;
-										await onedit?.(child.provenance, `${dirname}/${newName}`);
+										if (!parents.every(loaded)) return;
+										await onedit?.(
+											child.provenance,
+											[...parents, newName].join('/')
+										);
 									}}
 								/>
 							{/if}
@@ -150,8 +192,8 @@
 					</div>
 				{/if}
 			</li>
-			{#if 'children' in child}
-				{@render tree(child.children, `${dirname}/${child.folder}`)}
+			{#if loaded(child) && 'children' in child}
+				{@render tree(child.children, [...parents, child.folder])}
 			{/if}
 		{:else}
 			<li class="empty">

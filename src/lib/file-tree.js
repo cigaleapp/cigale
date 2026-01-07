@@ -8,6 +8,10 @@ export const NodeProvenance = type.enumerated(
 );
 
 /**
+ * @import {MaybeLoading} from '$lib/LoadingText.svelte';
+ */
+
+/**
  * @typedef {typeof NodeProvenance.infer} NodeProvenance
  */
 /**
@@ -15,8 +19,14 @@ export const NodeProvenance = type.enumerated(
  * @property {string} filename
  * @property {string} help
  * @property {NodeProvenance} provenance
- *
+ */
+
+/**
  * @typedef {Array<TreeLeaf | { folder: string; icon?: import('svelte').Component; children: TreeLeaf[] }>} TreeNode
+ */
+
+/**
+ * @typedef {Array<MaybeLoading<TreeLeaf> | { folder: MaybeLoading<string>; icon?: import('svelte').Component; children: Array<MaybeLoading<TreeLeaf>> }>} TreeNodeMaybeLoading
  */
 
 /**
