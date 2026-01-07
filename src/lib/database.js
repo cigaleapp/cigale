@@ -61,7 +61,7 @@ if (import.meta.vitest) {
 }
 
 const ImageFile = table(
-	['id', 'sessionid'],
+	['id', 'sessionId'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,
@@ -74,7 +74,7 @@ const ImageFile = table(
 );
 
 const ImagePreviewFile = table(
-	['id', 'sessionid'],
+	['id', 'sessionId'],
 	type({
 		/** ID of the associated Image object */
 		id: ID,

@@ -1240,3 +1240,21 @@ if (import.meta.vitest) {
 export function throwError(message) {
 	throw new Error(message);
 }
+
+/**
+ * Await to await the given promise, but throw if the given AbortSignal is aborted before the promise resolves
+ * @template T
+ * @param {AbortSignal | undefined} signal
+ * @param {Promise<T>} promise
+ * @returns {Promise<T>}
+ */
+export async function unlessAborted(signal, promise) {
+	return Promise.race([
+		promise,
+		new Promise((_, reject) => {
+			signal?.addEventListener('abort', () => {
+				reject(signal.reason);
+			});
+		})
+	]);
+}

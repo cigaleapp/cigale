@@ -1,57 +1,23 @@
-<script>
+<script lang="ts">
 	import { fade } from 'svelte/transition';
 
-	import IconCroppedImage from '~icons/ri/crop-line';
-	import IconCsvFile from '~icons/ri/file-chart-line';
-	import IconJsonFile from '~icons/ri/file-code-line';
-	import IconZipFile from '~icons/ri/file-zip-line';
-	import IconFolder from '~icons/ri/folder-2-line';
-	import IconFolderNew from '~icons/ri/folder-add-line';
-	import IconFullImage from '~icons/ri/image-2-line';
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte.js';
-	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { HANDLEBARS_HELPERS } from '$lib/schemas/protocols.js';
 	import { seo } from '$lib/seo.svelte';
 	import { getSettings } from '$lib/settings.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import Tooltip from '$lib/Tooltip.svelte';
 	import { entries } from '$lib/utils.js';
+	import ZipContentsTree from '$lib/ZipContentsTree.svelte';
 
+	import type { NodeProvenance } from '../../../../../lib/file-tree.js';
 	import MetadataLink from '../MetadataLink.svelte';
-
-	/**
-	 * @import { TreeNode, NodeProvenance } from './utils.js';
-	 */
-
-	/**
-	 *
-	 * @param {NodeProvenance} provenance
-	 * @returns {import('svelte').Component}
-	 */
-	const iconOfNode = (provenance) => {
-		switch (provenance) {
-			case 'metadata.csv':
-				return IconCsvFile;
-			case 'metadata.json':
-				return IconJsonFile;
-			case 'images.cropped':
-				return IconCroppedImage;
-			case 'images.original':
-				return IconFullImage;
-		}
-	};
 
 	seo({ title: `Protocole ${page.params.id}: Export` });
 
 	const { data } = $props();
-	const treeNodes = $state(data.initialTree ?? []);
 
-	/**
-	 * @param {NodeProvenance} provenance
-	 * @param {string} path
-	 */
-	async function updateExportsPath(provenance, path) {
+	async function updateExportsPath(provenance: NodeProvenance, path: string) {
 		const [dotpathParent, dotpathChild] = provenance.split('.');
 
 		const { id, exports } = data.protocol;
@@ -76,20 +42,6 @@
 
 		await tables.Protocol.update(id, 'exports', newExports);
 	}
-
-	/**
-	 * @param {TreeNode} children
-	 * @param {string} dirname
-	 */
-	async function updateExportPaths(children, dirname) {
-		for (const child of children) {
-			if ('folder' in child) {
-				await updateExportPaths(child.children, `${dirname}/${child.folder}`);
-			} else {
-				await updateExportsPath(child.provenance, `${dirname}/${child.filename}`);
-			}
-		}
-	}
 </script>
 
 <main in:fade={{ duration: 100 }}>
@@ -105,13 +57,7 @@
 
 	<h3>Arborescence</h3>
 
-	<ul class="tree">
-		<li>
-			<IconZipFile />
-			<span class="filename">Résultats.zip</span>
-		</li>
-		{@render tree(treeNodes, '')}
-	</ul>
+	<ZipContentsTree tree={data.initialTree} editable onedit={updateExportsPath} />
 
 	<p>
 		Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple
@@ -172,92 +118,7 @@
 	{/if}
 </main>
 
-{#snippet tree(/** @type {TreeNode} */ children, /** @type {string} */ dirname = '')}
-	<ul class="tree">
-		<li class="new-folder">
-			<button>
-				<IconFolderNew />
-				<InlineTextInput
-					discreet
-					value=""
-					placeholder="Nouveau dossier"
-					label="Nom du dossier à créer"
-					onblur={(folder, setValue) => {
-						if (!folder.trim()) {
-							toasts.error('Le nom du dossier ne peut pas être vide.');
-							return;
-						}
-
-						setValue('');
-						children.push({ folder, children: [] });
-					}}
-				/>
-			</button>
-		</li>
-		{#each children as child ('folder' in child ? child.folder : child.filename)}
-			<li>
-				{#if 'folder' in child}
-					{@const Icon = child.icon ?? IconFolder}
-					<Icon />
-					<div class="text">
-						<InlineTextInput
-							discreet
-							value={child.folder}
-							label="Nom du dossier"
-							onblur={async (newName) => {
-								child.folder = newName;
-								await updateExportPaths(child.children, `${dirname}/${newName}`);
-							}}
-						/>
-					</div>
-				{:else}
-					{@const Icon = iconOfNode(child.provenance)}
-					<Icon />
-					<div class="text">
-						<span class="filename">
-							{#if child.provenance === 'metadata.json'}
-								<Tooltip
-									text="Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
-								>
-									{child.filename}
-								</Tooltip>
-							{:else}
-								<InlineTextInput
-									discreet
-									value={child.filename}
-									label="Nom du fichier"
-									onblur={async (newName) => {
-										child.filename = newName;
-										await updateExportsPath(
-											child.provenance,
-											`${dirname}/${newName}`
-										);
-									}}
-								/>
-							{/if}
-						</span>
-						<span class="help">{child.help}</span>
-					</div>
-				{/if}
-			</li>
-			{#if 'children' in child}
-				{@render tree(child.children, `${dirname}/${child.folder}`)}
-			{/if}
-		{/each}
-	</ul>
-{/snippet}
-
 <style>
-	ul {
-		--indent: 2rem;
-		list-style: none;
-		padding-left: var(--indent);
-		padding-top: 0.75rem;
-		gap: 0.75rem;
-		display: flex;
-		flex-direction: column;
-	}
-
 	main {
 		display: flex;
 		flex-direction: column;
@@ -266,56 +127,6 @@
 	h3 {
 		margin-top: 2rem;
 		margin-bottom: 0.5rem;
-	}
-
-	.text {
-		display: flex;
-		flex-direction: column;
-		flex-grow: 1;
-		margin-left: 0.5rem;
-	}
-
-	.text .help {
-		font-size: 0.9em;
-		color: var(--gray);
-	}
-
-	ul ul {
-		position: relative;
-	}
-	ul ul::before {
-		content: '';
-		position: absolute;
-		width: 2px;
-		background-color: var(--fg-neutral);
-		/* XXX the -3px is pixel-perfect-fiddling because icons are a little slimmer than their whole bounding width. visual alignement, basically */
-		left: calc(var(--indent) / 2 - 2px - 3px);
-		top: 0;
-		bottom: 0;
-	}
-
-	ul ul li {
-		position: relative;
-	}
-	ul ul li::before {
-		content: '';
-		position: absolute;
-		left: calc(-1 * var(--indent) / 2 - 2px - 3px);
-		width: calc(var(--indent) / 2);
-		height: 2px;
-		background-color: var(--fg-neutral);
-	}
-
-	li,
-	li > button {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-	button {
-		font-size: 1rem;
-		border: none;
-		padding: 0;
 	}
 
 	pre.debug {

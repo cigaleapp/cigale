@@ -17,7 +17,8 @@ const filepathMockData = {
 		numberInObservation: 1,
 		metadata: {},
 		contentType: 'image/jpeg',
-		id: 'i12345'
+		id: 'i12345',
+		fileId: 'f12345'
 	},
 	observation: {
 		label: 'Test Observation',

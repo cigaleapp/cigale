@@ -15,7 +15,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 4;
+export const databaseRevision = 5;
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
@@ -416,7 +416,7 @@ export async function openDatabase() {
 	const tablesByName = Object.entries(Tables);
 
 	_database = await openDB(databaseName, databaseRevision, {
-		upgrade(db, oldVersion) {
+		upgrade(db, oldVersion, _newVersion, tx) {
 			/**
 			 * @param {keyof typeof Tables} tableName
 			 * @param {import('arktype').Type} schema
@@ -429,6 +429,23 @@ export async function openDatabase() {
 					return;
 				}
 				const store = db.createObjectStore(tableName, { keyPath });
+				for (const index of schema.meta.table.indexes.slice(1)) {
+					store.createIndex(index, index);
+				}
+			};
+
+			/**
+			 * @param {keyof typeof Tables} tableName
+			 */
+			const rebuildIndexes = async (tableName) => {
+				const schema = Tables[tableName];
+				if (!schema.meta.table) return;
+				const store = tx.objectStore(tableName);
+				// Delete all indexes
+				for (const indexName of store.indexNames) {
+					store.deleteIndex(indexName);
+				}
+				// Recreate indexes
 				for (const index of schema.meta.table.indexes.slice(1)) {
 					store.createIndex(index, index);
 				}
@@ -447,6 +464,11 @@ export async function openDatabase() {
 
 			if (oldVersion === 3) {
 				createTable('Session', Tables.Session);
+			}
+
+			if (oldVersion === 4) {
+				rebuildIndexes('ImageFile');
+				rebuildIndexes('ImagePreviewFile');
 			}
 
 			for (const [tableName, schema] of tablesByName) {

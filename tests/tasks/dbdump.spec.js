@@ -99,27 +99,27 @@ test.describe('Exports', () => {
 
 	test('correct', async ({ page, app }) => {
 		await prepare({ page, app });
-		await page.getByRole('button', { name: 'Résultats' }).click();
+		await app.tabs.go('results');
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
-		await page.getByText('results.zip').click();
+		await page.getByRole('button', { name: 'results.zip' }).click();
 		const download = await page.waitForEvent('download');
 		await download.saveAs('./tests/fixtures/exports/correct.zip');
 	});
 
 	test('no-originals', async ({ page, app }) => {
 		await prepare({ page, app });
-		await page.getByRole('button', { name: 'Résultats' }).click();
+		await app.tabs.go('results');
 		await page.getByText('Métadonnées et images recadrées').click();
-		await page.getByText('results.zip').click();
+		await page.getByRole('button', { name: 'results.zip' }).click();
 		const download = await page.waitForEvent('download');
 		await download.saveAs('./tests/fixtures/exports/no-originals.zip');
 	});
 
 	test('no-analysis', async ({ page, app }) => {
 		await prepare({ page, app });
-		await page.getByRole('button', { name: 'Résultats' }).click();
+		await app.tabs.go('results');
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
-		await page.getByText('results.zip').click();
+		await page.getByRole('button', { name: 'results.zip' }).click();
 		const download = await page.waitForEvent('download');
 		const zipPath = './tests/fixtures/exports/no-analysis.zip';
 		await download.saveAs(zipPath);
@@ -134,9 +134,9 @@ test.describe('Exports', () => {
 
 	test('invalid-json-analysis', async ({ page, app }) => {
 		await prepare({ page, app });
-		await page.getByRole('button', { name: 'Résultats' }).click();
+		await app.tabs.go('results');
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
-		await page.getByText('results.zip').click();
+		await page.getByRole('button', { name: 'results.zip' }).click();
 		const download = await page.waitForEvent('download');
 		const zipPath = './tests/fixtures/exports/invalid-json-analysis.zip';
 		await download.saveAs(zipPath);
@@ -155,9 +155,9 @@ test.describe('Exports', () => {
 
 	test('wrong-protocol', async ({ page, app }) => {
 		await prepare({ page, app });
-		await page.getByRole('button', { name: 'Résultats' }).click();
+		await app.tabs.go('results');
 		await page.getByText('Métadonnées, images recadrées et images originales').click();
-		await page.getByText('results.zip').click();
+		await page.getByRole('button', { name: 'results.zip' }).click();
 		const download = await page.waitForEvent('download');
 		await download.saveAs('./tests/fixtures/exports/wrong-protocol.zip');
 

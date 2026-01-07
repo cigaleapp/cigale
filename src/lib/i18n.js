@@ -160,3 +160,33 @@ if (import.meta.vitest) {
 		expect(uppercaseFirst('école')).toBe('École');
 	});
 }
+
+/**
+ *
+ * @param {number} bytes byte count
+ * @returns {string} formatted size
+ */
+export function formatBytesSize(bytes) {
+	// SI powers (so, in terms of powers of ten and not powers of two)
+	const power = bytes < 1e3 ? 0 : bytes < 1e6 ? 1 : bytes < 1e9 ? 2 : bytes < 1e12 ? 3 : 4;
+
+	const formatter = new Intl.NumberFormat(undefined, {
+		style: 'unit',
+		unitDisplay: 'narrow',
+		unit: {
+			0: 'byte',
+			1: 'kilobyte',
+			2: 'megabyte',
+			3: 'gigabyte',
+			4: 'terabyte'
+		}[power]
+	});
+
+	const value = bytes / 2 ** (10 * power);
+
+	const rounding = value > 10 ? 0 : value > 1 ? 1 : 2;
+
+	const rounded = Math.round(value * 10 ** rounding) / 10 ** rounding;
+
+	return formatter.format(rounded);
+}

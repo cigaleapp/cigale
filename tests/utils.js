@@ -345,8 +345,9 @@ const appNavTabs = (lang = 'fr') => ({
 	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
 	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
 	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' },
+	results: { name: lang === 'fr' ? 'Résultats' : 'Results', hash: '#/results' },
 	sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
-	protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' }
+	protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' },
 });
 
 /**

@@ -1,7 +1,7 @@
-import { gatherToTree } from './utils.js';
+import { gatherToTree } from '../../../../../lib/file-tree.js';
 
 /**
- * @import { TreeNode } from './utils.js';
+ * @import { TreeNode } from '../../../../../lib/file-tree.js';
  */
 
 export async function load({ parent }) {
@@ -29,28 +29,28 @@ export async function load({ parent }) {
 	gatherToTree({
 		tree: nodes,
 		provenance: 'metadata.csv',
-		path: csv,
+		paths: [csv],
 		help: 'Métadonnées des images exportées'
 	});
 
 	gatherToTree({
 		tree: nodes,
 		provenance: 'metadata.json',
-		path: json,
+		paths: [json],
 		help: "Export JSON complet de l'analyse"
 	});
 
 	gatherToTree({
 		tree: nodes,
 		provenance: 'images.cropped',
-		path: cropped.toJSON(),
+		paths: [cropped.toJSON()],
 		help: 'Images recadrées'
 	});
 
 	gatherToTree({
 		tree: nodes,
 		provenance: 'images.original',
-		path: original.toJSON(),
+		paths: [original.toJSON()],
 		help: 'Images originales'
 	});
 

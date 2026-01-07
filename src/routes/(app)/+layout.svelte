@@ -165,7 +165,6 @@
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
 
 <Navigation
-	{swarpc}
 	{openKeyboardShortcuts}
 	{openPrepareForOfflineUse}
 	progressbarOnly={_navbarAppearance === 'hidden'}

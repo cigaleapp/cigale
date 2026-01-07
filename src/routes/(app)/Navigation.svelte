@@ -10,7 +10,6 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
@@ -27,7 +26,6 @@
 	import { clamp } from '$lib/utils';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
-	import DownloadResults from './DownloadResults.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import Settings from './Settings.svelte';
 
@@ -48,7 +46,6 @@
 		openPrepareForOfflineUse,
 		progress = 0,
 		eta = Infinity,
-		swarpc,
 		progressbarOnly = false
 	} = $props();
 
@@ -61,8 +58,6 @@
 
 	/** @type {number|undefined} */
 	let navHeight = $state();
-
-	let openExportModal = $state();
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
@@ -144,18 +139,16 @@
 		},
 		// E[x]port results
 		'g x': {
-			do: () => openExportModal(),
+			do: () => goto('/results'),
 			help: 'Exporter les résultats'
 		},
 		// [M]anage protocols
 		'g m': {
-			do: () => goto('/protocols/'),
+			do: () => goto('/protocols'),
 			help: 'Gérer les protocoles'
 		}
 	});
 </script>
-
-<DownloadResults {swarpc} bind:open={openExportModal} />
 
 {#if previewingPrNumber}
 	<DeploymentDetails bind:open={openPreviewPRDetails} />
@@ -163,8 +156,7 @@
 
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
 	<div class="progressbar">
-		<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
-		<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
+		<ProgressBar {progress} />
 	</div>
 
 	{#if !progressbarOnly}
@@ -278,9 +270,12 @@
 						)}
 					</div>
 					<div class="separator"><IconNext /></div>
-					<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
+					<a href={resolve('/results')} data-testid="goto-results">
 						Résultats
-					</ButtonSecondary>
+						{#if path == '/results'}
+							<div class="line"></div>
+						{/if}
+					</a>
 				</div>
 			{:else}
 				<div class="steps" in:fade={{ duration: 100 }}>
@@ -499,7 +494,7 @@
 			color: var(--fg-primary);
 			font-weight: bold;
 			font-size: 1.2em;
-			background: rgb(255 255 255 / 0.6);
+			background: rgb(from var(--bg-neutral) r g b / 0.6);
 		}
 	}
 
