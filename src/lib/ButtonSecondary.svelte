@@ -62,6 +62,8 @@ Available CSS variables:
 	class:danger
 	aria-pressed={ariaPressed}
 	onclick={async (e) => {
+		if (!onclick) return;
+
 		// Only set isLoading here if the onclick handler does not define its own loadingStarted signal.
 		// This is kinda crude but you cant reflect a function object's args in JS, see https://stackoverflow.com/q/6921588/9943464 (well you can, but by uhhhh parsing the source code, yeah.)
 		if (loading && !onclick.toString().includes('loadingStarted')) isLoading = true;
@@ -87,7 +89,7 @@ Available CSS variables:
 			<LoadingSpinner />
 		</div>
 	{/if}
-	{@render children({ loading: isLoading && loading })}
+	{@render children({ loading: isLoading && loading !== false })}
 	{#if keyboard}
 		<KeyboardHint shortcut={keyboard} />
 	{/if}
