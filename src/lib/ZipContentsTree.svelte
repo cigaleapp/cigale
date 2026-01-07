@@ -89,7 +89,6 @@
 								toasts.error('Le nom du dossier ne peut pas être vide.');
 								return;
 							}
-
 							setValue('');
 							children.push({ folder, children: [] });
 						}}
@@ -166,11 +165,23 @@
 	ul {
 		--indent: 2rem;
 		list-style: none;
-		padding-left: var(--indent);
+
 		padding-top: 0.75rem;
 		gap: 0.75rem;
 		display: flex;
 		flex-direction: column;
+
+		/* Used for pixel-perfect alignment */
+		--shift: 5px;
+		/* We split the indent in two so the border (vertical line) snugs in between and is thus centered */
+		padding-left: calc(var(--indent) / 2 + var(--shift));
+		margin-left: calc(var(--indent) / 2 - var(--shift));
+
+		/* Within a ul ul selector to not add a vertical line to the root tree */
+		ul {
+			/* Vertical line */
+			border-left: 2px solid var(--fg-neutral);
+		}
 	}
 
 	ul.leaves-only {
@@ -189,20 +200,6 @@
 	.text .help {
 		font-size: 0.9em;
 		color: var(--gray);
-	}
-
-	ul ul {
-		position: relative;
-	}
-	ul ul::before {
-		content: '';
-		position: absolute;
-		width: 2px;
-		background-color: var(--fg-neutral);
-		/* XXX the -3px is pixel-perfect-fiddling because icons are a little slimmer than their whole bounding width. visual alignement, basically */
-		left: calc(var(--indent) / 2 - 2px - 3px);
-		top: 0;
-		bottom: 0;
 	}
 
 	ul ul li {
