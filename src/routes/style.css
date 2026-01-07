@@ -24,6 +24,7 @@ dialog {
 	--bg-primary-translucent: color-mix(in srgb, var(--bg-primary) 35%, var(--bg-neutral));
 	--gray: color-mix(in srgb, var(--fg-neutral) 35%, var(--bg-neutral));
 	--gay: color-mix(in srgb, var(--fg-neutral) 75%, var(--bg-neutral));
+	--faint: color-mix(in srgb, var(--fg-neutral) 15%, var(--bg-neutral));
 
 	--corner-radius: 7px;
 	--border-thickness: 1px;
