@@ -24,6 +24,7 @@ import { compareBy, progressSplitter, sum } from '$lib/utils';
 
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
+import { unlessAborted } from '../lib/utils.js';
 import { openDatabase, swarp } from './index.js';
 
 swarp.generateResultsZip(
@@ -163,125 +164,114 @@ swarp.generateResultsZip(
 
 		abortSignal?.throwIfAborted();
 
-		const zipfile = await Promise.race([
-			/**
-			 * @type {Promise<never>}
-			 */ (
-				new Promise((_, reject) =>
-					abortSignal?.addEventListener('abort', () => reject(abortSignal.reason))
-				)
-			),
-			/**
-			 * @type {Promise<Uint8Array<ArrayBuffer>>}
-			 */ (
-				new Promise((resolve, reject) =>
-					zip(
-						{
-							[filepaths.metadata.json]: strToU8(
-								stringifyWithToplevelOrdering(
-									'json',
-									jsonSchemaURL.toString(),
-									Analysis.assert({
-										session: {
-											...session,
-											metadata: toMetadataRecord(session.metadata)
-										},
-										observations: exportedObservations
-									}),
-									['protocol', 'observations']
-								)
-							),
-							[filepaths.metadata.csv]: strToU8(
-								toCSV(
-									[
-										'Identifiant',
-										'Observation',
-										// 2 columns for each metadata: for the value itself, and for the confidence in the value
-										...allMetadataKeys
-											.filter((k) => Boolean(metadataDefinitions[k]?.label))
-											.flatMap((k) => [
-												metadataPrettyKey(metadataDefinitions[k]),
-												`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
-											])
-									],
-									observations.map((o) => ({
-										Identifiant: o.id,
-										Observation: o.label,
-										...Object.fromEntries(
-											Object.entries(
-												exportedObservations[o.id].metadata
-											).flatMap(
-												([key, { value, confidence, valueLabel }]) => [
-													[
-														metadataPrettyKey(metadataDefinitions[key]),
-														// Exports always have english value serializations for better interoperability
-														metadataPrettyValue(
-															'en',
-															metadataDefinitions[key],
-															value,
-															valueLabel
-														)
-													],
-													[
-														`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
-														confidence.toString()
-													]
+		/** @type {Uint8Array<ArrayBuffer>} */
+		const zipfile = await unlessAborted(
+			abortSignal,
+			new Promise((resolve, reject) =>
+				zip(
+					{
+						[filepaths.metadata.json]: strToU8(
+							stringifyWithToplevelOrdering(
+								'json',
+								jsonSchemaURL.toString(),
+								Analysis.assert({
+									session: {
+										...session,
+										metadata: toMetadataRecord(session.metadata)
+									},
+									observations: exportedObservations
+								}),
+								['protocol', 'observations']
+							)
+						),
+						[filepaths.metadata.csv]: strToU8(
+							toCSV(
+								[
+									'Identifiant',
+									'Observation',
+									// 2 columns for each metadata: for the value itself, and for the confidence in the value
+									...allMetadataKeys
+										.filter((k) => Boolean(metadataDefinitions[k]?.label))
+										.flatMap((k) => [
+											metadataPrettyKey(metadataDefinitions[k]),
+											`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
+										])
+								],
+								observations.map((o) => ({
+									Identifiant: o.id,
+									Observation: o.label,
+									...Object.fromEntries(
+										Object.entries(exportedObservations[o.id].metadata).flatMap(
+											([key, { value, confidence, valueLabel }]) => [
+												[
+													metadataPrettyKey(metadataDefinitions[key]),
+													// Exports always have english value serializations for better interoperability
+													metadataPrettyValue(
+														'en',
+														metadataDefinitions[key],
+														value,
+														valueLabel
+													)
+												],
+												[
+													`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
+													confidence.toString()
 												]
-											)
+											]
 										)
-									}))
-								)
-							),
-							...(include === 'metadataonly'
-								? {}
-								: Object.fromEntries(
-										Object.values(exportedObservations)
-											.flatMap(({ images }) => images)
-											.flatMap(({ exportedAs, id, metadata }) => {
-												const buffers = buffersOfImages.find(
-													(i) => i.imageId === id
+									)
+								}))
+							)
+						),
+						...(include === 'metadataonly'
+							? {}
+							: Object.fromEntries(
+									Object.values(exportedObservations)
+										.flatMap(({ images }) => images)
+										.flatMap(({ exportedAs, id, metadata }) => {
+											const buffers = buffersOfImages.find(
+												(i) => i.imageId === id
+											);
+											if (!buffers) return [];
+
+											/**
+											 * @type {import('fflate').AsyncZipOptions}
+											 */
+											let options = { level: 0 };
+
+											if (
+												mtimeMetadataKey &&
+												typeof metadata[mtimeMetadataKey]?.value ===
+													'string'
+											) {
+												options.mtime = new Date(
+													metadata[mtimeMetadataKey].value
 												);
-												if (!buffers) return [];
+											}
 
-												/**
-												 * @type {import('fflate').AsyncZipOptions}
-												 */
-												let options = { level: 0 };
-
-												if (
-													mtimeMetadataKey &&
-													typeof metadata[mtimeMetadataKey]?.value ===
-														'string'
-												) {
-													options.mtime = new Date(
-														metadata[mtimeMetadataKey].value
-													);
-												}
-
-												return [
-													[
-														exportedAs.cropped,
-														[buffers.croppedBytes, options]
-													],
-													[
-														exportedAs.original,
-														[buffers.originalBytes, options]
-													]
-												].filter(([, [bytes]]) => bytes !== undefined);
-											})
-									))
-						},
-						{
-							comment: `Generated by C.i.g.a.l.e on ${new Date().toISOString()}`
-						},
-						(err, data) => {
-							if (err) reject(err);
-							resolve(data);
-						}
-					)
+											return [
+												[
+													exportedAs.cropped,
+													[buffers.croppedBytes, options]
+												],
+												[
+													exportedAs.original,
+													[buffers.originalBytes, options]
+												]
+											].filter(([, [bytes]]) => bytes !== undefined);
+										})
+								))
+					},
+					{
+						comment: `Generated by C.i.g.a.l.e on ${new Date().toISOString()}`
+					},
+					(err, data) => {
+						if (err) reject(err);
+						resolve(data);
+					}
 				)
 			)
-		]);
+		);
 
 		notify({ progress: 1 });
 		return zipfile.buffer;
