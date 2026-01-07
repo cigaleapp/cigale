@@ -418,11 +418,11 @@ async function prepare({ protocolUsed, sessionId, db, abortSignal, onProgress })
 	const imagesFromDatabase = await db.getAllFromIndex('Image', 'sessionId', sessionId);
 	abortSignal?.throwIfAborted();
 	const metadataOptions = await db.getAll('MetadataOption').then((opts) => {
-		/** @type {Record<string, typeof opts>} */
+		/** @type {Record<string, Record<string, typeof opts[number]>>} */
 		const options = {};
 		for (const opt of opts) {
-			if (!options[opt.metadataId]) options[opt.metadataId] = [];
-			options[opt.metadataId].push(opt);
+			if (!options[opt.metadataId]) options[opt.metadataId] = {};
+			options[opt.metadataId][opt.key] = opt;
 		}
 		return options;
 	});
@@ -460,11 +460,9 @@ async function prepare({ protocolUsed, sessionId, db, abortSignal, onProgress })
 		abortSignal?.throwIfAborted();
 
 		for (const [i, imageId] of images.entries()) {
-			if (!imagesFromDatabase.some((i) => i.id === imageId)) continue;
-
-			const imageFromDatabase = Schemas.Image.assert(
-				imagesFromDatabase.find((i) => i.id === imageId)
-			);
+			const databaseImage = imagesFromDatabase.find((i) => i.id === imageId);
+			if (!databaseImage) continue;
+			const imageFromDatabase = Schemas.Image.assert(databaseImage);
 
 			const metadataValues = await addValueLabels(
 				imageFromDatabase.metadata,

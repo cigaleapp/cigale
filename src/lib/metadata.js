@@ -10,7 +10,7 @@ import {
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
 } from './schemas/metadata.js';
-import { avg, fromEntries, mapValues } from './utils.js';
+import { avg, compareBy, fromEntries, mapValues } from './utils.js';
 
 /**
  * @import { DatabaseHandle, ReactiveTableNames } from './idb.svelte.js'
@@ -328,9 +328,11 @@ export async function deleteMetadataValue({
  * @returns {Promise<DB.MetadataValues>}
  */
 export async function observationMetadata(db, observation) {
-	const images = await db
-		.getAll('Image')
-		.then((images) => images.filter((img) => observation.images.includes(img.id)));
+	const images = await Promise.all(
+		observation.images.map(async (id) => await db.get('Image', id))
+	);
+
+	images.sort(compareBy(({ id }) => observation.images.indexOf(id)));
 
 	const metadataFromImages = await mergeMetadataValues(
 		db,
@@ -346,7 +348,7 @@ export async function observationMetadata(db, observation) {
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
  * @param {DB.MetadataValues} values
- * @param {Record<string, DB.MetadataEnumVariant[]>} metadataOptions
+ * @param {Record<string, Record<string, DB.MetadataEnumVariant>>} metadataOptions
  * @returns {Promise<Record<string, DB.MetadataValue & { valueLabel?: string }>>}
  */
 export async function addValueLabels(values, metadataOptions) {
@@ -355,13 +357,9 @@ export async function addValueLabels(values, metadataOptions) {
 			const opts = metadataOptions[key];
 			if (!opts) return [key, value];
 
-			return [
-				key,
-				{
-					...value,
-					valueLabel: opts?.find((o) => o.key === value.value.toString())?.label
-				}
-			];
+			const opt = opts[value.value.toString()];
+
+			return [key, { ...value, valueLabel: opt?.label }];
 		})
 	);
 }
