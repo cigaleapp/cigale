@@ -132,6 +132,8 @@
 
 		cancelExportPreview('Une nouvelle prévisualisation a été demandée');
 
+		await ensureNoLoneImages();
+
 		const { cancel, request } = swarpc.previewResultsZip.cancelable({
 			include,
 			sessionId: uiState.currentSessionId
