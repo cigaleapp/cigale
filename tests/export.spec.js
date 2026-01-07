@@ -29,7 +29,7 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 
 	await page.getByRole('button', { name: 'Autres photos Esc' }).click();
 
-	await page.locator('nav').getByRole('button', { name: 'Résultats' }).click();
+	await app.tabs.go('results');
 
 	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
 

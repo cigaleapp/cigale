@@ -128,9 +128,9 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('exporting does not fail', async ({ page, app }) => {
-		await page.getByRole('button', { name: 'Résultats' }).click();
+		await app.tabs.go('results');
 		await page.getByText(/et images originales/i).click();
-		await page.getByText('results.zip').click();
+		await page.getByRole('button', { name: 'results.zip' }).click();
 		const download = await page.waitForEvent('download');
 		expect(download.suggestedFilename()).toBe('results.zip');
 

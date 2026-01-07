@@ -109,9 +109,9 @@ for (const offline of [false, true]) {
 			await expect(page.getByText('Espèce', { exact: true })).toBeVisible();
 
 			// Export results
-			await page.getByTestId('app-nav').getByRole('button', { name: 'Résultats' }).click();
+			await app.tabs.go('results');
 			await page.getByText(/et images originales/i).click();
-			await page.getByText('results.zip').click();
+			await page.getByRole('button', { name: 'results.zip' }).click();
 			const download = await page.waitForEvent('download');
 			expect(download.suggestedFilename()).toBe('results.zip');
 			await download.saveAs('./tests/results/lil-fella.zip');
