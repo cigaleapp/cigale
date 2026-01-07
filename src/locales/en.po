@@ -23,6 +23,7 @@ msgid "<0/> Autres photos <1/>"
 msgstr "<0/> Other photos <1/>"
 
 #: src/routes/(app)/PrepareForOffline.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "<0/> Chargement…"
 msgstr "<0/> Loading…"
 
@@ -66,7 +67,7 @@ msgstr "<0/> Reset"
 msgid "<0/> Réinitialiser la base de données"
 msgstr "<0/> Reset database"
 
-#: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Résultats"
 msgstr "Results"
 
@@ -101,10 +102,6 @@ msgstr "<0/> max."
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> nodes"
 msgstr "<0/> nodes"
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "<0/> results.zip"
-msgstr "<0/> results.zip"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> threads"
@@ -169,7 +166,6 @@ msgstr "No inference parameters defined for model {0} on protocol {1}"
 #: src/lib/InputSelectProtocol.svelte
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
-#: src/routes/(app)/DownloadResults.svelte
 msgid "Aucun protocole sélectionné"
 msgstr "No protocol selected"
 
@@ -437,7 +433,6 @@ msgstr "Error while loading detection model"
 msgid "Exporter"
 msgstr "Export"
 
-#: src/routes/(app)/DownloadResults.svelte
 #: src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Export results"
@@ -571,7 +566,8 @@ msgstr "Analysis file of {0} is not valid JSON or is corrupted"
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
 
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Marge autour des images recadrées"
 msgstr "Padding around cropped images"
 
@@ -832,10 +828,6 @@ msgstr ""
 #: src/routes/(app)/Settings.svelte
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr "Download everything needed to use the application offline. Downloads all models for all currently installed protocols."
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
-msgstr "A % value means that the padding is relative to the dimensions of each image"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Versions"
@@ -1244,10 +1236,6 @@ msgid "Aucune configuration d'exports trouvée pour ce protocole."
 msgstr "No export configuration found for this protocol."
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
-msgid "Résultats.zip"
-msgstr "Results.zip"
-
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid ""
 "Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple <0/>. Un fichier sera créé par image exportée.\n"
 "On peut aussi utiliser quelques fonctions \"helper\", qui s'appliquent à une expression"
@@ -1287,23 +1275,23 @@ msgid ""
 "l'export"
 msgstr ""
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nouveau dossier"
 msgstr "New folder"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du dossier à créer"
 msgstr "Name of new folder"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Le nom du dossier ne peut pas être vide."
 msgstr "Folder name cannot be empty."
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du dossier"
 msgstr "Folder name"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du fichier"
 msgstr "File name"
 
@@ -1662,6 +1650,7 @@ msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Could not update protocol: {0}"
 
 #: src/lib/AreaObservations.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "# élément"
 msgid_plural "# éléments"
 msgstr[0] "# element"
@@ -1792,12 +1781,12 @@ msgid "Rétablir"
 msgstr ""
 
 #. placeholder {0}: filename
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
 msgstr ""
 
 #. placeholder {0}: error
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Erreur lors de l'exportation des résultats: {0}"
 msgstr ""
 
@@ -2020,7 +2009,7 @@ msgstr[1] ""
 msgid "Protocole <0/> introuvable."
 msgstr ""
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
 msgstr ""
 
@@ -2074,6 +2063,40 @@ msgstr ""
 #: src/routes/(app)/DeploymentDetails.svelte
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "de"
+msgstr ""
+
+#: src/lib/ZipContentsTree.svelte
+msgid "results.zip"
+msgstr ""
+
+#: src/lib/ZipContentsTree.svelte
+msgid "Dossier vide"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Résultats <0/>"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Aucune session active à exporter."
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Aucune session active à prévisualiser."
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> results.zip <1/>"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid ""
+"Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
+"images"
+msgstr ""
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Contenu de l'export .zip"
 msgstr ""
 
 #: src/lib/queue.svelte.js
