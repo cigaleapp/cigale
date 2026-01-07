@@ -2029,12 +2029,6 @@ msgid "Proposer une fonctionnalité"
 msgstr ""
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
-msgid ""
-"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous\n"
-"attendiez"
-msgstr ""
-
-#: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Description <0/>"
 msgstr ""
 
@@ -2099,6 +2093,12 @@ msgstr ""
 #: src/routes/(app)/results/+page.svelte
 msgid "Contenu de l'export .zip"
 msgstr "Exported .zip contents"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid ""
+"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
+"vous attendiez"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
