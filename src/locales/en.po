@@ -1772,8 +1772,7 @@ msgstr "Metadata to use to set the image files' last modified date"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "La date d'export sera utilisée comme date de modification des fichiers images"
-msgstr ""
-"The export's date will be used as the last-modified date for the image files"
+msgstr "The export's date will be used as the last-modified date for the image files"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Arborescence"
@@ -1878,9 +1877,7 @@ msgstr "Post-validation"
 
 #: src/routes/(app)/+layout.js
 msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
-msgstr ""
-"Cannot load the built-in protocol. Verify your Internet connection or try "
-"reloading the page."
+msgstr "Cannot load the built-in protocol. Verify your Internet connection or try reloading the page."
 
 #: src/lib/results.svelte.js
 msgid "Importation dans une nouvelle session"
@@ -1891,9 +1888,7 @@ msgstr "Importing in a new session"
 #. placeholder {2}: uiState.currentSession.protocol
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole de la session est {2}"
-msgstr ""
-"Analysis file of {0} was exported with protocol {1}, but the current "
-"session's protocol is {2}"
+msgstr "Analysis file of {0} was exported with protocol {1}, but the current session's protocol is {2}"
 
 #. placeholder {0}: title
 #. placeholder {1}: suffix
@@ -2021,9 +2016,7 @@ msgstr "Protocol {0} not found."
 
 #: src/lib/ZipContentsTree.svelte
 msgid "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
-msgstr ""
-"Cannot edit the JSON file's path, as CIGALE needs to know where it is in the "
-".zip archive to be able to import it back."
+msgstr "Cannot edit the JSON file's path, as CIGALE needs to know where it is in the .zip archive to be able to import it back."
 
 #: src/lib/sessions.js
 msgid "La session a été fermée"
@@ -2122,22 +2115,22 @@ msgstr "<0/> once unzipped"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
-msgstr "Images import finished"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Détection terminée"
-msgstr "Detection finished"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
-msgstr "Classification finished"
+msgstr ""
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Import de {0}"
-msgstr "Import of {0}"
+msgstr ""
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
-msgstr "Imported from {0}"
+msgstr ""
