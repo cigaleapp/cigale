@@ -161,13 +161,14 @@
 
 	let sizeEstimates: { compressed?: number; uncompressed?: number } = $state({});
 
-	watch([() => include], () => {
+	watch([() => include, () => cropPadding], () => {
 		cancelExportSizeEstimation('Une nouvelle estimation de taille a été demandée');
 		sizeEstimates = {};
 		(async () => {
 			const { cancel, request } = swarpc.estimateResultsZipSize.cancelable({
 				include,
-				sessionId: uiState.currentSessionId
+				sessionId: uiState.currentSessionId,
+				cropPadding: cropPadding.withUnit
 			});
 			cancelExportSizeEstimation = cancel;
 			sizeEstimates = await request;
