@@ -26,6 +26,7 @@
 	let title = $state('');
 	let open = $state();
 	let close = $state();
+	let submitting = $state(false);
 
 	const OpenIcon = $derived(type === 'bug' ? IconBug : IconIdea);
 
@@ -43,28 +44,11 @@
 	key="modal_submit_issue_{type}"
 	title={type === 'bug' ? 'Signaler un bug' : 'Proposer une fonctionnalité'}
 >
-	<Field>
-		{#snippet label()}
-			Description
-			{#if type === 'bug'}
-				<p>
-					Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous
-					attendiez
-				</p>
-			{/if}
-		{/snippet}
-		<textarea bind:value={body} rows="6" />
-	</Field>
-
-	<Field label="Titre">
-		<InlineTextInput label="Titre" bind:value={title} />
-	</Field>
-
-	<ButtonPrimary
-		loading
-		onclick={async () => {
+	<form
+		onsubmit={async (e) => {
+			submitting = true;
+			e.preventDefault();
 			const ua = UAParser(navigator.userAgent);
-
 			const sessionStats = uiState.currentSession
 				? {
 						images: await listByIndex('Image', 'sessionId', uiState.currentSession.id),
@@ -78,9 +62,7 @@
 						}
 					}
 				: undefined;
-
 			const db = databaseHandle();
-
 			const response = await fetch('https://mkissue.cigale.gwen.works/submit', {
 				method: 'POST',
 				headers: {
@@ -107,12 +89,10 @@
 					})
 				)
 			});
-
+			submitting = false;
 			close?.();
-
 			if (response.ok) {
 				const data = await response.json();
-
 				toasts.success('Merci pour votre contribution!', {
 					data: true,
 					lifetime: Infinity,
@@ -133,8 +113,25 @@
 			}
 		}}
 	>
-		Envoyer
-	</ButtonPrimary>
+		<Field>
+			{#snippet label()}
+				Description
+				{#if type === 'bug'}
+					<p>
+						Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous
+						vous attendiez
+					</p>
+				{/if}
+			{/snippet}
+			<textarea bind:value={body} rows="6"></textarea>
+		</Field>
+		<Field label="Titre">
+			<InlineTextInput required label="Titre" bind:value={title} />
+		</Field>
+		<ButtonPrimary submits loading={submitting ? 'always' : false} onclick={undefined}>
+			Envoyer
+		</ButtonPrimary>
+	</form>
 </Modal>
 
 <ButtonIcon
@@ -144,3 +141,11 @@
 >
 	<OpenIcon />
 </ButtonIcon>
+
+<style>
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+</style>

@@ -1,4 +1,5 @@
 <script>
+	import { formatDistanceToNow } from 'date-fns';
 	import { fade } from 'svelte/transition';
 
 	import IconSelect from '~icons/ri/arrow-down-s-line';
@@ -9,7 +10,6 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
@@ -26,7 +26,6 @@
 	import { clamp } from '$lib/utils';
 
 	import DeploymentDetails from './DeploymentDetails.svelte';
-	import DownloadResults from './DownloadResults.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import Settings from './Settings.svelte';
 
@@ -34,6 +33,7 @@
 	 * @typedef Props
 	 * @type {object}
 	 * @property {number} [progress=0]
+	 * @property {number} [eta=Infinity]
 	 * @property {import('swarpc').SwarpcClient<typeof import('$worker/procedures.js').PROCEDURES>} swarpc
 	 * @property {(() => void) | undefined} [openKeyboardShortcuts]
 	 * @property {(() => void) | undefined} [openPrepareForOfflineUse]
@@ -45,7 +45,7 @@
 		openKeyboardShortcuts,
 		openPrepareForOfflineUse,
 		progress = 0,
-		swarpc,
+		eta = Infinity,
 		progressbarOnly = false
 	} = $props();
 
@@ -58,8 +58,6 @@
 
 	/** @type {number|undefined} */
 	let navHeight = $state();
-
-	let openExportModal = $state();
 
 	/** @type {undefined | (() => void)} */
 	let openPreviewPRDetails = $state();
@@ -87,6 +85,8 @@
 			window.nativeWindow?.startCallingAttention();
 		}
 	});
+
+	const showingEta = $derived(eta < Infinity && progress > 0 && progress < 1);
 
 	$effect(() => {
 		if (isNativeWindow) return;
@@ -139,18 +139,16 @@
 		},
 		// E[x]port results
 		'g x': {
-			do: () => openExportModal(),
+			do: () => goto('/results'),
 			help: 'Exporter les résultats'
 		},
 		// [M]anage protocols
 		'g m': {
-			do: () => goto('/protocols/'),
+			do: () => goto('/protocols'),
 			help: 'Gérer les protocoles'
 		}
 	});
 </script>
-
-<DownloadResults {swarpc} bind:open={openExportModal} />
 
 {#if previewingPrNumber}
 	<DeploymentDetails bind:open={openPreviewPRDetails} />
@@ -158,16 +156,17 @@
 
 <header bind:clientHeight={height} class:native-window={isNativeWindow}>
 	<div class="progressbar">
-		<!-- When generating the ZIP, the bar is shown inside the modal. Showing it here also would be weird & distracting -->
-		<ProgressBar progress={uiState.processing.task === 'export' ? 0 : progress} />
+		<ProgressBar {progress} />
 	</div>
 
 	{#if !progressbarOnly}
 		<nav bind:clientHeight={navHeight} data-testid="app-nav">
 			<div class="logo">
 				<button
-					use:tooltip={'Accueil'}
 					data-testid="goto-home"
+					use:tooltip={showingEta
+						? `Termine ${formatDistanceToNow(Date.now() + eta, { addSuffix: true, includeSeconds: true })}`
+						: 'Accueil'}
 					onclick={async () => {
 						if (uiState.currentSession) {
 							await goto('/(app)/sessions');
@@ -177,6 +176,11 @@
 						}
 					}}
 				>
+					{#if showingEta}
+						<div class="progress-overlay" transition:fade>
+							{percent(progress)}
+						</div>
+					{/if}
 					<Logo --stroke-width="75" --size="2rem" --fill="transparent" />
 				</button>
 
@@ -266,9 +270,12 @@
 						)}
 					</div>
 					<div class="separator"><IconNext /></div>
-					<ButtonSecondary testid="export-results-button" tight onclick={openExportModal}>
+					<a href={resolve('/results')} data-testid="goto-results">
 						Résultats
-					</ButtonSecondary>
+						{#if path == '/results'}
+							<div class="line"></div>
+						{/if}
+					</a>
 				</div>
 			{:else}
 				<div class="steps" in:fade={{ duration: 100 }}>
@@ -471,6 +478,24 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+	}
+
+	.logo {
+		position: relative;
+
+		.progress-overlay {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			pointer-events: none;
+			z-index: 10;
+			color: var(--fg-primary);
+			font-weight: bold;
+			font-size: 1.2em;
+			background: rgb(from var(--bg-neutral) r g b / 0.6);
+		}
 	}
 
 	header.native-window .logo {

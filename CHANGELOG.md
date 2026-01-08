@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## January 2026
+
+### Improvements
+
+- Add ETA as tooltip on navbar logo when processing is ongoing (Closes #51) (#1027)
+
+### Data Updates
+
+- Regenerate example protocols
+
+### Translation Updates
+
+- Refresh translation files
+
 ## December 2025
 
 ### Improvements
@@ -12,6 +26,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Add radio buttons presentation for smaller enum metadata
 - Add undo/redo buttons to UI
 - Allow editing metadata option synonyms in protocol editor
+- Allow multiple images on a single metadata option
 - Allow specifying metadata option ordering for enums
 - Allow unrolling stacked cards (e.g. observations with >1 images)
 - Allow using a date metadata to set file mtime in zip export
@@ -85,6 +100,7 @@ All notable changes to this project will be documented in this file, on a monthl
 - Regenerate example protocols
 - Try fixing ordering of conservation_status and identification_difficulty
 - Use JJ site for genus descriptions too (#920)
+- Use images instead of image when generating example protocol
 
 ### Translation Updates
 

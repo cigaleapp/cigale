@@ -11,7 +11,7 @@ import { x } from 'tinyexec';
 import Turndown from 'turndown';
 
 import keys from '../google-drive-key.json' with { type: 'json' };
-import { decodePhoto, photoChanged } from './utils.js';
+import { decodePhoto, photoChanged, range } from './utils.js';
 
 await mkdir(path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.images'), {
 	recursive: true
@@ -95,55 +95,15 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			...items
 		);
 
+	if (name === 'A-BASE') {
+		log('Skipping');
+		continue;
+	}
+
 	try {
-		log('Exporting to PDF');
-		const pdf = await drive.files.export(
-			{
-				fileId: id,
-				mimeType: 'application/pdf'
-			},
-			{
-				responseType: 'arraybuffer'
-			}
+		log(
+			`Using document at ${cc.blue}https://docs.google.com/presentation/d/${id}/edit${cc.reset}`
 		);
-
-		log(`Converting slide 1 to image`);
-		const image = await pdfToPng(pdf.data, { pagesToProcess: [1], viewportScale: 2 })
-			.then(([{ content }]) => Jimp.fromBuffer(content))
-			.then((image) => {
-				const { width, height } = image.bitmap;
-				let cropbox = {
-					start: { x: 0, y: 0, found: false },
-					end: { x: width, y: height, found: false }
-				};
-
-				const isBackground = (x, y) => image.getPixelColor(x, y) === 0xffffffff;
-
-				image.scan((x, y) => {
-					// Get topleft corner
-					if (!cropbox.start.found && !isBackground(x, y)) {
-						cropbox.start = { x, y, found: true };
-					}
-
-					// Get bottomright corner
-					if (!cropbox.end.found && !isBackground(width - x, height - y)) {
-						cropbox.end = { x: width - x, y: height - y, found: true };
-					}
-				});
-
-				const logbox = ({ start, end }) => `(${start.x} ${start.y}) -> (${end.x} ${end.y})`;
-
-				log(
-					`Cropping image to ${cc.blue}${logbox(cropbox)}${cc.reset} from ${cc.cyan}(0 0) -> (${width} ${height})${cc.reset}`
-				);
-
-				return image.crop({
-					x: cropbox.start.x,
-					y: cropbox.start.y,
-					w: cropbox.end.x - cropbox.start.x,
-					h: cropbox.end.y - cropbox.start.y
-				});
-			});
 
 		log('Exporting as ODP');
 		const odp = await drive.files.export(
@@ -156,7 +116,6 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			}
 		);
 
-		log('Extracting description');
 		const html = await odt
 			.toHTML({
 				path: Buffer.from(odp.data),
@@ -188,48 +147,159 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				return doc;
 			});
 
-		const description = htmlToMarkdown(html.querySelector('section[data-page="page2"]'));
+		const pages = new Map(
+			[...html.querySelectorAll('section[data-page]')]
+				.filter((node) => /^page\d+$/.test(node.dataset.page))
+				.map((node) => [Number.parseInt(node.dataset.page.replace('page', '')), node])
+		);
+
+		const imagePageNumbers = new Set(
+			[...pages.entries()]
+				.filter(([, node]) => node.querySelector('img') !== null)
+				.map(([num]) => num)
+		);
+
+		if (!imagePageNumbers.size) {
+			log('No image found in slides');
+		}
+
+		const textPages = [...pages.entries()]
+			.filter(([num]) => !imagePageNumbers.has(num))
+			.map(([, node]) => node);
+
+		log('Exporting to PDF');
+		const pdf = await drive.files.export(
+			{
+				fileId: id,
+				mimeType: 'application/pdf'
+			},
+			{
+				responseType: 'arraybuffer'
+			}
+		);
+
+		log(`Converting slides ${[...imagePageNumbers].join(', ')} to images`);
+		const images = await pdfToPng(pdf.data, {
+			pagesToProcess: [...imagePageNumbers],
+			viewportScale: 4
+		})
+			.then((results) =>
+				Promise.all(results.map(async ({ content }) => Jimp.fromBuffer(content)))
+			)
+			.then((images) =>
+				images.map((image) => {
+					const { width, height } = image.bitmap;
+					let cropbox = {
+						start: { x: 0, y: 0, found: false },
+						end: { x: width, y: height, found: false }
+					};
+
+					const isBackground = (x, y) => image.getPixelColor(x, y) === 0xffffffff;
+
+					// Get first and last columns that are not all-background
+					for (let x = 0; x < width; x++) {
+						if (
+							!cropbox.start.found &&
+							range(height).some((y) => !isBackground(x, y))
+						) {
+							cropbox.start.x = x;
+							cropbox.start.found = true;
+						}
+
+						if (
+							!cropbox.end.found &&
+							range(height).some((y) => !isBackground(width - x - 1, y))
+						) {
+							cropbox.end.x = width - x - 1;
+							cropbox.end.found = true;
+						}
+					}
+
+					cropbox.start.found = false;
+					cropbox.end.found = false;
+
+					// Get first and last rows that are not all-background
+					for (let y = 0; y < height; y++) {
+						if (!cropbox.start.found && range(width).some((x) => !isBackground(x, y))) {
+							cropbox.start.y = y;
+							cropbox.start.found = true;
+						}
+
+						if (
+							!cropbox.end.found &&
+							range(width).some((x) => !isBackground(x, height - y - 1))
+						) {
+							cropbox.end.y = height - y - 1;
+							cropbox.end.found = true;
+						}
+					}
+
+					const logbox = ({ start, end }) =>
+						`(${start.x} ${start.y}) -> (${end.x} ${end.y})`;
+
+					log(
+						`Cropping image to ${cc.blue}${logbox(cropbox)}${cc.reset} from ${cc.cyan}(0 0) -> (${width} ${height})${cc.reset}`
+					);
+
+					return image.crop({
+						x: cropbox.start.x,
+						y: cropbox.start.y,
+						w: cropbox.end.x - cropbox.start.x,
+						h: cropbox.end.y - cropbox.start.y
+					});
+				})
+			);
+
+		log('Extracting description');
+
+		const description = textPages.map(htmlToMarkdown).join('\n\n');
 
 		const links = Object.fromEntries(
-			[...html.querySelectorAll('section[data-page="page2"] a')]
-				.map((node) => [node.href, node.textContent])
-				.filter(([, text]) => text && text !== ' ')
+			textPages
+				.flatMap((node) => [...node.querySelectorAll('a')])
+				.map((node) => /** @type {const} */ ([node.textContent, node.href]))
+				.filter(([text]) => text && text !== ' ')
 		);
 
 		const learnMore =
-			Object.entries(links).find(([, text]) => ['INPN', 'LMDI'].includes(text))[0] ??
-			links[0][0];
+			links.INPN ?? links.LMDI ?? links.GBIF ?? Object.values(links)[0] ?? undefined;
+
+		/** @type {URL[]} */
+		let imageUrls = [];
 
 		for (const [filepath, protocol] of Object.entries(protocols)) {
 			log(`Adding to ${cc.blue}${protocol.fresh.id}${cc.reset}`);
 
 			const options = protocol.fresh.metadata[`${protocol.fresh.id}__species`].options;
 
-			const imagePath = path.join(filepath.replace('.json', '.images'), `${name}.png`);
-
-			const oldPhoto = decodePhoto(imagePath);
-
-			log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
-			image.write(imagePath);
-
-			const imageUrl = new URL(
-				'https://raw.githubusercontent.com/cigaleapp/cigale/main/' +
-					path.relative(path.join(filepath, '../..'), imagePath).replaceAll('\\', '/')
-			);
-
 			const oldOption = protocol.old.metadata[`${protocol.old.id}__species`].options.find(
 				(o) => o.label === name
 			);
 
-			if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
-				imageUrl.searchParams.set('v', protocol.fresh.version.toString());
-			} else if (oldOption && URL.canParse(oldOption.image)) {
-				imageUrl.searchParams.set(
-					'v',
-					new URL(oldOption.image).searchParams.get('v') ??
-						protocol.fresh.version?.toString() ??
-						'0'
+			for (const [i, image] of images.entries()) {
+				const imagePath = path.join(
+					filepath.replace('.json', '.images'),
+					`${name}_${i}.png`
 				);
+
+				const oldPhoto = decodePhoto(imagePath);
+
+				log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
+				image.write(imagePath);
+
+				imageUrls.push(
+					new URL(
+						'https://raw.githubusercontent.com/cigaleapp/cigale/main/' +
+							path
+								.relative(path.join(filepath, '../..'), imagePath)
+								.replaceAll('\\', '/')
+					)
+				);
+
+				// False positive
+				// if (protocol.fresh.version && photoChanged(imagePath, oldPhoto)) {
+				// 	imageUrls[i].searchParams.set('v', protocol.fresh.version.toString());
+				// }
 			}
 
 			if (options.some((o) => o.label === name)) {
@@ -238,7 +308,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 				option.learnMore = learnMore;
 				option.description = description;
 				option.links = links;
-				option.image = imageUrl;
+				option.images = imageUrls.map((u) => u.toString());
 			} else {
 				const optionKeys = (options) => options.map((o) => Number(o.key));
 				options.push({
@@ -254,7 +324,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 								)
 							) + 1
 						).toString(),
-					image: imageUrl,
+					images: imageUrls.map((u) => u.toString()),
 					description,
 					links,
 					learnMore
@@ -274,7 +344,7 @@ for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompa
 			writeFileSync(filepath, JSON.stringify(protocol.fresh, null, 2));
 		}
 	} catch (error) {
-		log('An error occured:', error);
+		log('An error occured:\n', error);
 	}
 }
 

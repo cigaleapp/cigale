@@ -7,6 +7,7 @@
 	 * @typedef {object} Props
 	 * @property {string} label
 	 * @property {string} value
+	 * @property {boolean} [required=false]
 	 * @property {boolean} [discreet=false] don't show bottom border until hover/focus
 	 * @property {boolean} [monospace] use a monospace font
 	 * @property {string | { idle: string; focused: string }} [placeholder] give an object to have a different placeholder when focused
@@ -21,6 +22,7 @@
 		label,
 		discreet,
 		monospace,
+		required,
 		value = $bindable(),
 		onblur = () => {},
 		onerror,
@@ -42,6 +44,7 @@
 	type={inputType}
 	aria-label={label}
 	class="inline-input"
+	{required}
 	class:monospace
 	class:discreet
 	placeholder={focused ? placeholder.focused : placeholder.idle}

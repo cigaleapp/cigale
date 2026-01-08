@@ -11,6 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 "MIME-Version: 1.0\n"
+"Source-Language: fr\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -64,7 +65,7 @@ msgstr "<0/> Réinit."
 msgid "<0/> Réinitialiser la base de données"
 msgstr "<0/> Réinitialiser la base de données"
 
-#: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Résultats"
 msgstr "Résultats"
 
@@ -99,10 +100,6 @@ msgstr "<0/> max."
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> nodes"
 msgstr "<0/> nodes"
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "<0/> results.zip"
-msgstr "<0/> results.zip"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> threads"
@@ -167,7 +164,6 @@ msgstr "Aucun paramètre d'inférence défini pour le modèle {0} sur le protoco
 #: src/lib/InputSelectProtocol.svelte
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
-#: src/routes/(app)/DownloadResults.svelte
 msgid "Aucun protocole sélectionné"
 msgstr "Aucun protocole sélectionné"
 
@@ -435,7 +431,6 @@ msgstr "Erreur lors du chargement du modèle de détection"
 msgid "Exporter"
 msgstr "Exporter"
 
-#: src/routes/(app)/DownloadResults.svelte
 #: src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Exporter les résultats"
@@ -479,12 +474,14 @@ msgstr "Host Grotesk"
 msgid "Icônes"
 msgstr "Icônes"
 
+#: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Image précédente"
 msgstr "Image précédente"
 
+#: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Image suivante"
@@ -567,7 +564,8 @@ msgstr "Le fichier d'analyse de {0} n'est pas au format JSON ou est corrompu"
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
 
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Marge autour des images recadrées"
 msgstr "Marge autour des images recadrées"
 
@@ -829,10 +827,6 @@ msgstr ""
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
-msgstr "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Versions"
 msgstr "Versions"
@@ -852,12 +846,6 @@ msgstr "Zoomer"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgstr "coucou toi :) <0/> passes une bonne journée ! 💖💖"
-
-#: src/routes/(app)/DeploymentDetails.svelte
-#: src/routes/(app)/DeploymentDetails.svelte
-msgctxt "continuation of sentence \"deployment PR for...\""
-msgid "de"
-msgstr "de"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "github.com/cigaleapp/cigale"
@@ -1246,10 +1234,6 @@ msgid "Aucune configuration d'exports trouvée pour ce protocole."
 msgstr "Aucune configuration d'exports trouvée pour ce protocole."
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
-msgid "Résultats.zip"
-msgstr "Résultats.zip"
-
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid ""
 "Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple <0/>. Un fichier sera créé par image exportée.\n"
 "On peut aussi utiliser quelques fonctions \"helper\", qui s'appliquent à une expression"
@@ -1293,23 +1277,23 @@ msgstr ""
 "Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de\n"
 "l'export"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nouveau dossier"
 msgstr "Nouveau dossier"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du dossier à créer"
 msgstr "Nom du dossier à créer"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Le nom du dossier ne peut pas être vide."
 msgstr "Le nom du dossier ne peut pas être vide."
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du dossier"
 msgstr "Nom du dossier"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du fichier"
 msgstr "Nom du fichier"
 
@@ -1404,6 +1388,8 @@ msgstr "<0/> Une mise à jour à la v{0} est disponible <1/>"
 msgid "<0/> Différences avec la version publiée"
 msgstr "<0/> Différences avec la version publiée"
 
+#: src/lib/LoadingText.svelte
+#: src/lib/LoadingText.svelte
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Chargement..."
 msgstr "Chargement..."
@@ -1669,6 +1655,8 @@ msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Impossible de mettre à jour le protocole: {0}"
 
 #: src/lib/AreaObservations.svelte
+#: src/lib/ZipContentsTree.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "# élément"
 msgid_plural "# éléments"
 msgstr[0] "# élément"
@@ -1801,12 +1789,12 @@ msgid "Rétablir"
 msgstr "Rétablir"
 
 #. placeholder {0}: filename
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
 msgstr "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
 
 #. placeholder {0}: error
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Erreur lors de l'exportation des résultats: {0}"
 msgstr "Erreur lors de l'exportation des résultats: {0}"
 
@@ -2029,7 +2017,7 @@ msgstr[1] "La suppression de # observations"
 msgid "Protocole <0/> introuvable."
 msgstr "Protocole <0/> introuvable."
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
 msgstr "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
 
@@ -2048,14 +2036,6 @@ msgstr "Signaler un bug"
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Proposer une fonctionnalité"
 msgstr "Proposer une fonctionnalité"
-
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid ""
-"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous\n"
-"attendiez"
-msgstr ""
-"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous\n"
-"attendiez"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Description <0/>"
@@ -2081,6 +2061,59 @@ msgstr "Une erreur est survenue lors de la soumission de votre demande. Veuillez
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Envoyer"
 msgstr "Envoyer"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+#: src/routes/(app)/DeploymentDetails.svelte
+msgid "de"
+msgstr "de"
+
+#: src/lib/ZipContentsTree.svelte
+msgid "results.zip"
+msgstr "results.zip"
+
+#: src/lib/ZipContentsTree.svelte
+msgid "Dossier vide"
+msgstr "Dossier vide"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Résultats <0/>"
+msgstr "Résultats <0/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Aucune session active à exporter."
+msgstr "Aucune session active à exporter."
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Aucune session active à prévisualiser."
+msgstr "Aucune session active à prévisualiser."
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> results.zip <1/>"
+msgstr "<0/> results.zip <1/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid ""
+"Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
+"images"
+msgstr ""
+"Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
+"images"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Contenu de l'export .zip"
+msgstr "Contenu de l'export .zip"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid ""
+"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
+"vous attendiez"
+msgstr ""
+"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
+"vous attendiez"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> une fois dézippé"
+msgstr "<0/> une fois dézippé"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

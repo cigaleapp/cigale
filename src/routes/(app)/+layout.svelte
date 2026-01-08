@@ -165,11 +165,11 @@
 <PrepareForOffline bind:open={openPrepareForOfflineUse} />
 
 <Navigation
-	{swarpc}
 	{openKeyboardShortcuts}
 	{openPrepareForOfflineUse}
 	progressbarOnly={_navbarAppearance === 'hidden'}
 	progress={uiState.processing.progress}
+	eta={uiState.eta}
 />
 
 <section class="toasts" data-testid="toasts-area">

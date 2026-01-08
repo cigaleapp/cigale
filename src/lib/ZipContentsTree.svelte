@@ -1,0 +1,274 @@
+<script lang="ts">
+	import type { Component, Snippet } from 'svelte';
+
+	import IconCroppedImage from '~icons/ri/crop-line';
+	import IconCsvFile from '~icons/ri/file-chart-line';
+	import IconJsonFile from '~icons/ri/file-code-line';
+	import IconFile from '~icons/ri/file-line';
+	import IconZipFile from '~icons/ri/file-zip-line';
+	import IconFolder from '~icons/ri/folder-2-line';
+	import IconFolderNew from '~icons/ri/folder-add-line';
+	import IconFullImage from '~icons/ri/image-2-line';
+	import type { NodeProvenance, TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import { toasts } from '$lib/toasts.svelte.js';
+	import Tooltip from '$lib/Tooltip.svelte';
+
+	import Badge from './Badge.svelte';
+	import { plural } from './i18n.js';
+	import {
+		loaded,
+		Loading,
+		default as LoadingText,
+		type MaybeLoading
+	} from './LoadingText.svelte';
+	import { scrollfader } from './scrollfader.js';
+
+	interface Props {
+		tree: TreeNodeMaybeLoading;
+		editable?: boolean;
+		// idk why it thinks it's unused, i mean yeah it's an interface's method signature ??
+		// eslint-disable-next-line no-unused-vars
+		onedit?: (provenance: NodeProvenance, path: string) => void | Promise<void>;
+		/** Help text for the root of the tree */
+		rootHelp?: string | Snippet;
+	}
+
+	const { tree: root, editable = false, onedit, rootHelp }: Props = $props();
+
+	async function editMany(children: TreeNode, dirname: string) {
+		for (const child of children) {
+			if ('folder' in child) {
+				await editMany(child.children, `${dirname}/${child.folder}`);
+			} else {
+				await onedit?.(child.provenance, `${dirname}/${child.filename}`);
+			}
+		}
+	}
+
+	function iconOfNode(provenance: NodeProvenance): Component {
+		switch (provenance) {
+			case 'metadata.csv':
+				return IconCsvFile;
+			case 'metadata.json':
+				return IconJsonFile;
+			case 'images.cropped':
+				return IconCroppedImage;
+			case 'images.original':
+				return IconFullImage;
+		}
+	}
+
+	function nodeKey(node: TreeNodeMaybeLoading[number], index: number) {
+		if (!loaded(node)) return index;
+		if ('folder' in node) return loaded(node.folder) ? node.folder : index;
+		return node.filename;
+	}
+</script>
+
+<ul class="tree">
+	<li>
+		<IconZipFile />
+		<div class="text">
+			<span class="filename">results.zip</span>
+			{#if rootHelp}
+				<span class="help">
+					{#if typeof rootHelp === 'string'}
+						{rootHelp}
+					{:else}
+						{@render rootHelp()}
+					{/if}
+				</span>
+			{/if}
+		</div>
+	</li>
+	{@render tree(root)}
+</ul>
+
+{#snippet tree(children: TreeNodeMaybeLoading, parents: Array<MaybeLoading<string>> = [])}
+	{@const hasOnlyLeaves =
+		Array.isArray(children) &&
+		children.every((child) => !loaded(child) || !('children' in child))}
+
+	<ul
+		class="tree"
+		class:leaves-only={hasOnlyLeaves}
+		{@attach hasOnlyLeaves ? scrollfader : () => {}}
+	>
+		{#if editable}
+			<li class="new-folder">
+				<button>
+					<IconFolderNew />
+					<InlineTextInput
+						discreet
+						value=""
+						placeholder="Nouveau dossier"
+						label="Nom du dossier à créer"
+						onblur={(folder, setValue) => {
+							if (!folder.trim()) {
+								toasts.error('Le nom du dossier ne peut pas être vide.');
+								return;
+							}
+							setValue('');
+							children.push({ folder, children: [] });
+						}}
+					/>
+				</button>
+			</li>
+		{/if}
+
+		{#each children as child, i (nodeKey(child, i))}
+			<li>
+				{#if !loaded(child)}
+					<IconFile />
+					<div class="text">
+						<LoadingText value={Loading} mask={{ words: 6 }} />
+					</div>
+				{:else if 'folder' in child}
+					{@const Icon = child.icon ?? IconFolder}
+					<Icon />
+					<div class="text">
+						{#if editable && loaded(child.folder)}
+							<InlineTextInput
+								discreet
+								value={child.folder}
+								label="Nom du dossier"
+								onblur={async (newName) => {
+									child.folder = newName;
+									if (!child.children.every(loaded)) return;
+									if (!parents.every(loaded)) return;
+									await editMany(child.children, [...parents, newName].join('/'));
+								}}
+							/>
+						{:else}
+							<LoadingText value={child.folder} mask={{ words: 6 }} />
+						{/if}
+					</div>
+					{#if 'children' in child && child.children.length > 5}
+						<Badge>
+							{#if child.children.every(loaded)}
+								{plural(child.children.length, ['# élément', '# éléments'])}
+							{:else}
+								<LoadingText
+									value={Loading}
+									mask={plural(child.children.length, [
+										'# élément',
+										'# éléments'
+									])}
+								/>
+							{/if}
+						</Badge>
+					{/if}
+				{:else}
+					{@const Icon = iconOfNode(child.provenance)}
+					<Icon />
+					<div class="text">
+						<span class="filename">
+							{#if !editable}
+								{child.filename}
+							{:else if child.provenance === 'metadata.json'}
+								<Tooltip
+									text="Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
+								>
+									{child.filename}
+								</Tooltip>
+							{:else}
+								<InlineTextInput
+									discreet
+									value={child.filename}
+									label="Nom du fichier"
+									onblur={async (newName) => {
+										child.filename = newName;
+										if (!parents.every(loaded)) return;
+										await onedit?.(
+											child.provenance,
+											[...parents, newName].join('/')
+										);
+									}}
+								/>
+							{/if}
+						</span>
+						<span class="help">{child.help}</span>
+					</div>
+				{/if}
+			</li>
+			{#if loaded(child) && 'children' in child}
+				{@render tree(child.children, [...parents, child.folder])}
+			{/if}
+		{:else}
+			<li class="empty">
+				<i>Dossier vide</i>
+			</li>
+		{/each}
+	</ul>
+{/snippet}
+
+<style>
+	ul {
+		--indent: 2rem;
+		list-style: none;
+
+		padding-top: 0.75rem;
+		gap: 0.75rem;
+		display: flex;
+		flex-direction: column;
+
+		/* Used for pixel-perfect alignment */
+		--shift: 5px;
+		/* We split the indent in two so the border (vertical line) snugs in between and is thus centered */
+		padding-left: calc(var(--indent) / 2 + var(--shift));
+		margin-left: calc(var(--indent) / 2 - var(--shift));
+
+		/* Within a ul ul selector to not add a vertical line to the root tree */
+		ul {
+			/* Vertical line */
+			border-left: 2px solid var(--fg-neutral);
+		}
+	}
+
+	ul.leaves-only {
+		max-height: 12rem;
+		overflow: auto;
+		position: relative;
+	}
+
+	.text {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		margin-left: 0.5rem;
+	}
+
+	.text .help {
+		font-size: 0.9em;
+		color: var(--gray);
+	}
+
+	ul ul li {
+		position: relative;
+	}
+	ul ul li::before {
+		content: '';
+		position: absolute;
+		left: calc(-1 * var(--indent) / 2 - 2px - 3px);
+		width: calc(var(--indent) / 2);
+		height: 2px;
+		background-color: var(--fg-neutral);
+	}
+
+	li,
+	li > button {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	button {
+		font-size: 1rem;
+		border: none;
+		padding: 0;
+	}
+
+	.empty {
+		color: var(--gay);
+	}
+</style>

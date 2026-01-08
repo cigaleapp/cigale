@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2025-12-10 13:28+0000\n"
+"PO-Revision-Date: 2026-01-07 18:24+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -12,6 +12,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "X-Generator: Weblate 5.12.2\n"
+"Source-Language: fr\n"
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "<0/> Auto"
@@ -65,7 +66,7 @@ msgstr "<0/> Reset"
 msgid "<0/> Réinitialiser la base de données"
 msgstr "<0/> Reset database"
 
-#: src/routes/(app)/Navigation.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Résultats"
 msgstr "Results"
 
@@ -100,10 +101,6 @@ msgstr "<0/> max."
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> nodes"
 msgstr "<0/> nodes"
-
-#: src/routes/(app)/DownloadResults.svelte
-msgid "<0/> results.zip"
-msgstr "<0/> results.zip"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "<0/> threads"
@@ -168,7 +165,6 @@ msgstr "No inference parameters defined for model {0} on protocol {1}"
 #: src/lib/InputSelectProtocol.svelte
 #: src/lib/import.svelte.js
 #: src/lib/import.svelte.js
-#: src/routes/(app)/DownloadResults.svelte
 msgid "Aucun protocole sélectionné"
 msgstr "No protocol selected"
 
@@ -436,7 +432,6 @@ msgstr "Error while loading detection model"
 msgid "Exporter"
 msgstr "Export"
 
-#: src/routes/(app)/DownloadResults.svelte
 #: src/routes/(app)/Navigation.svelte
 msgid "Exporter les résultats"
 msgstr "Export results"
@@ -480,12 +475,14 @@ msgstr "Host Grotesk"
 msgid "Icônes"
 msgstr "Icons"
 
+#: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Image précédente"
 msgstr "Previous image"
 
+#: src/lib/Carousel.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Image suivante"
@@ -568,7 +565,8 @@ msgstr "Analysis file of {0} is not valid JSON or is corrupted"
 msgid "Les carnets nature de Jessica"
 msgstr "Les carnets nature de Jessica"
 
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Marge autour des images recadrées"
 msgstr "Padding around cropped images"
 
@@ -830,10 +828,6 @@ msgstr ""
 msgid "Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés."
 msgstr "Download everything needed to use the application offline. Downloads all models for all currently installed protocols."
 
-#: src/routes/(app)/DownloadResults.svelte
-msgid "Une valeur en % signifie que la marge est relative aux dimensions de chacune des images"
-msgstr "A % value means that the padding is relative to the dimensions of each image"
-
 #: src/routes/(app)/about/+page.svelte
 msgid "Versions"
 msgstr "Versions"
@@ -853,12 +847,6 @@ msgstr "Zoom in"
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "coucou toi :) <0/> passes une bonne journée ! 💖💖"
 msgstr "hello there :) <0/> have a great dayyy 💖💖"
-
-#: src/routes/(app)/DeploymentDetails.svelte
-#: src/routes/(app)/DeploymentDetails.svelte
-msgctxt "continuation of sentence \"deployment PR for...\""
-msgid "de"
-msgstr "by"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "github.com/cigaleapp/cigale"
@@ -1247,10 +1235,6 @@ msgid "Aucune configuration d'exports trouvée pour ce protocole."
 msgstr "No export configuration found for this protocol."
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
-msgid "Résultats.zip"
-msgstr "Results.zip"
-
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid ""
 "Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple <0/>. Un fichier sera créé par image exportée.\n"
 "On peut aussi utiliser quelques fonctions \"helper\", qui s'appliquent à une expression"
@@ -1289,24 +1273,26 @@ msgid ""
 "Un numéro de séquence, dont l'unicité est guarantie à travers toutes les images de\n"
 "l'export"
 msgstr ""
+"A sequence number. Guaranteed to be unique\n"
+"for the whole export"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nouveau dossier"
 msgstr "New folder"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du dossier à créer"
 msgstr "Name of new folder"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Le nom du dossier ne peut pas être vide."
 msgstr "Folder name cannot be empty."
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du dossier"
 msgstr "Folder name"
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Nom du fichier"
 msgstr "File name"
 
@@ -1401,6 +1387,8 @@ msgstr "<0/> Update to v{0} is available <1/>"
 msgid "<0/> Différences avec la version publiée"
 msgstr "<0/> Changes with published version"
 
+#: src/lib/LoadingText.svelte
+#: src/lib/LoadingText.svelte
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "Chargement..."
 msgstr "Loading..."
@@ -1605,10 +1593,9 @@ msgstr "Original images"
 #. placeholder {1}: protocol.id
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/+layout.js
 msgid "Metadata {0} for protocol {1} not found"
-msgstr ""
+msgstr "Metadata {0} for protocol {1} not found"
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.js
-#, fuzzy
 msgid "Option not found"
 msgstr "Option not found"
 
@@ -1665,6 +1652,8 @@ msgid "Impossible de mettre à jour le protocole: {0}"
 msgstr "Could not update protocol: {0}"
 
 #: src/lib/AreaObservations.svelte
+#: src/lib/ZipContentsTree.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "# élément"
 msgid_plural "# éléments"
 msgstr[0] "# element"
@@ -1775,54 +1764,54 @@ msgstr ".zip exports"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Dates de modification"
-msgstr ""
+msgstr "Last modified dates"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Métadonnée à utiliser pour la date de modification des fichers images"
-msgstr ""
+msgstr "Metadata to use to set the image files' last modified date"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "La date d'export sera utilisée comme date de modification des fichiers images"
-msgstr ""
+msgstr "The export's date will be used as the last-modified date for the image files"
 
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
 msgid "Arborescence"
-msgstr ""
+msgstr "File structure"
 
 #: src/lib/undo.svelte.js
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
 msgid "Rétablir"
-msgstr ""
+msgstr "Redo"
 
 #. placeholder {0}: filename
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Impossible d'ajouter les métadonnées EXIF à l'image {0}"
-msgstr ""
+msgstr "Cannot add EXIF metadata to {0}"
 
 #. placeholder {0}: error
-#: src/routes/(app)/DownloadResults.svelte
+#: src/routes/(app)/results/+page.svelte
 msgid "Erreur lors de l'exportation des résultats: {0}"
-msgstr ""
+msgstr "Could not export results: {0}"
 
 #. placeholder {0}: shortId
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "Métadonnée {0} créée"
-msgstr ""
+msgstr "Metadata {0} created"
 
 #. placeholder {0}: err.summary
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/updater.svelte.js
 #: src/routes/(app)/protocols/[id]/updater.svelte.js
 msgid "Valeur invalide : {0}"
-msgstr ""
+msgstr "Invalide value : {0}"
 
 #: src/lib/metadata.js
 msgid "Yes"
-msgstr ""
+msgstr "Yes"
 
 #: src/lib/metadata.js
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: src/lib/metadata.js
 msgid "Ppp"
@@ -1834,7 +1823,7 @@ msgstr ""
 #. placeholder {3}: y1 + h
 #: src/lib/metadata.js
 msgid "Boîte de ({0}, {1}) à ({2}, {3})"
-msgstr ""
+msgstr "Box from ({0}, {1}) to ({2}, {3})"
 
 #. placeholder {0}: x1
 #. placeholder {1}: y1
@@ -1842,70 +1831,71 @@ msgstr ""
 #. placeholder {3}: y1 + h
 #: src/lib/metadata.js
 msgid "Box from ({0}, {1}) to ({2}, {3})"
-msgstr ""
+msgstr "Box from ({0}, {1}) to ({2}, {3})"
 
 #: src/lib/metadata.js
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: src/routes/(app)/+layout.js
 msgid "Initialisation de la base de données…"
-msgstr ""
+msgstr "Initializing database…"
 
 #: src/routes/(app)/+layout.js
 msgid "Chargement des données intégrées…"
-msgstr ""
+msgstr "Loading built-in data…"
 
 #: src/routes/(app)/+layout.js
 msgid "Analyse"
-msgstr ""
+msgstr "Analysis"
 
 #: src/routes/(app)/+layout.js
 msgid "Filtrage des métadonnées intégrées"
-msgstr ""
+msgstr "Filtering built-in metadata"
 
 #: src/routes/(app)/+layout.js
 msgid "Validation"
-msgstr ""
+msgstr "Validation"
 
 #: src/routes/(app)/+layout.js
 msgid "Écriture du protocole"
-msgstr ""
+msgstr "Writing protocol"
 
 #. placeholder {0}: detail
 #: src/routes/(app)/+layout.js
 msgid "Écriture de la métadonnée<br>{0}"
-msgstr ""
+msgstr "Writing metadata<br>{0}"
 
 #. placeholder {0}: detail
 #: src/routes/(app)/+layout.js
 msgid "Écriture des options de la métadonnée<br>{0}"
-msgstr ""
+msgstr "Writing metadata's options<br>{0}"
 
 #: src/routes/(app)/+layout.js
 msgid "Post-validation"
-msgstr ""
+msgstr "Post-validation"
 
 #: src/routes/(app)/+layout.js
 msgid "Impossible de charger le protocole par défaut. Vérifiez votre connexion Internet ou essayez de recharger la page."
-msgstr ""
+msgstr "Cannot load the built-in protocol. Verify your Internet connection or try reloading the page."
 
 #: src/lib/results.svelte.js
 msgid "Importation dans une nouvelle session"
-msgstr ""
+msgstr "Importing in a new session"
 
 #. placeholder {0}: file.name
 #. placeholder {1}: session.protocol
 #. placeholder {2}: uiState.currentSession.protocol
 #: src/lib/results.svelte.js
 msgid "Le fichier d'analyse de {0} a été exporté avec le protocole {1}, mais le protocole de la session est {2}"
-msgstr ""
+msgstr "Analysis file of {0} was exported with protocol {1}, but the current session's protocol is {2}"
 
 #. placeholder {0}: title
 #. placeholder {1}: suffix
 #: src/lib/seo.svelte.js
+#, fuzzy
 msgid "{0} · {1}"
-msgstr ""
+msgstr "{0} · {1}"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Sessions <0/>"
@@ -1918,161 +1908,210 @@ msgstr "Protocols <0/>"
 #: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Sessions"
-msgstr ""
+msgstr "Sessions"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Aucun protocole installé, impossible de créer une session."
-msgstr ""
+msgstr "No protocol is installed, cannot create a session."
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Importer un export .zip"
-msgstr ""
+msgstr "<0/> Import a .zip export"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "<0/> Nouvelle session"
-msgstr ""
+msgstr "<0/> New session"
 
 #: src/routes/(app)/sessions/+page.svelte
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir la session"
-msgstr ""
+msgstr "Open the session"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Protocole indisponible"
-msgstr ""
+msgstr "Protocol unavailable"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "# image"
 msgid_plural "# images"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "# image"
+msgstr[1] "# images"
 
 #. placeholder {0}: plural(counts.images, ['# image', '# images'])
 #: src/routes/(app)/sessions/+page.svelte
 msgid "{0} · créée <0/>"
-msgstr ""
+msgstr "{0} · created <0/>"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Gérer"
-msgstr ""
+msgstr "Manage"
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Créer une nouvelle session"
-msgstr ""
+msgstr "Create a new session"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Nom de la session"
-msgstr ""
+msgstr "Session name"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Session supprimée."
-msgstr ""
+msgstr "Session was deleted."
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Ouvrir"
-msgstr ""
+msgstr "Open"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
+#, fuzzy
 msgid "Protocole"
-msgstr ""
+msgstr "Protocol"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Métadonnées"
-msgstr ""
+msgstr "Metadata"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "ID de la session"
-msgstr ""
+msgstr "Session ID"
 
 #: src/routes/(app)/sessions/[id]/+page.js
 msgid "Session not found"
-msgstr ""
+msgstr "Session not found"
 
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Afin de confirmer la suppression, veuillez taper <0/> ci-dessous:"
-msgstr ""
+msgstr "After confirming deletion, please type <0/> below:"
 
 #. placeholder {0}: typeToConfirm
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Taper “{0}”"
-msgstr ""
+msgstr "Type “{0}”"
 
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "La suppression entraînera: <0/> Il est impossible de revenir en arrière. <1/>"
-msgstr ""
+msgstr "Deletion will cause: <0/> The operation cannot be undone. <1/>"
 
 #: src/routes/(app)/protocols/ModalDeleteProtocol.svelte
 msgid "L'impossibilité d'utiliser 1 session"
 msgid_plural "L'impossibilité d'utiliser # sessions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "The inability to use 1 session"
+msgstr[1] "The inability to use # sessions"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "La suppression de 1 image"
 msgid_plural "La suppression de # images"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "The deletion of 1 image"
+msgstr[1] "The deletion of # images"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "La suppression de 1 observation"
 msgid_plural "La suppression de # observations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "The deletion of 1 observation"
+msgstr[1] "The deletion of # observations"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
 msgid "Protocole <0/> introuvable."
-msgstr ""
+msgstr "Protocol {0} not found."
 
-#: src/routes/(app)/protocols/[id]/exports/+page.svelte
+#: src/lib/ZipContentsTree.svelte
 msgid "Impossible de modifier le chemin du fichier JSON, car CIGALE doit connaître son emplacement dans le .zip pour pouvoir importer des analyses."
-msgstr ""
+msgstr "Cannot edit the JSON file's path, as CIGALE needs to know where it is in the .zip archive to be able to import it back."
 
 #: src/lib/sessions.js
 msgid "La session a été fermée"
-msgstr ""
+msgstr "Session was closed"
 
 #: src/lib/MetadataCombobox.svelte
 msgid "Métadonées mises à jour à la sélection de cette option"
-msgstr ""
+msgstr "Metadata updated when selecting this option"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Signaler un bug"
-msgstr ""
+msgstr "Report a bug"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Proposer une fonctionnalité"
-msgstr ""
-
-#: src/routes/(app)/ModalSubmitIssue.svelte
-msgid ""
-"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous\n"
-"attendiez"
-msgstr ""
+msgstr "Suggest a feature"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Description <0/>"
-msgstr ""
+msgstr "Description <0/>"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Titre"
-msgstr ""
+msgstr "Title"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Merci pour votre contribution!"
-msgstr ""
+msgstr "Thank you for your contribution!"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Voir"
-msgstr ""
+msgstr "See"
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Une erreur est survenue lors de la soumission de votre demande. Veuillez réessayer plus tard."
-msgstr ""
+msgstr "An error occured while submitting your request. Please try again later."
 
 #: src/routes/(app)/ModalSubmitIssue.svelte
 msgid "Envoyer"
+msgstr "Send"
+
+#: src/routes/(app)/DeploymentDetails.svelte
+#: src/routes/(app)/DeploymentDetails.svelte
+#, fuzzy
+msgid "de"
+msgstr "of"
+
+#: src/lib/ZipContentsTree.svelte
+msgid "results.zip"
+msgstr "results.zip"
+
+#: src/lib/ZipContentsTree.svelte
+msgid "Dossier vide"
+msgstr "Empty folder"
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Résultats <0/>"
+msgstr "Results <0/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Aucune session active à exporter."
+msgstr "No active session to export."
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Aucune session active à prévisualiser."
+msgstr "No session to preview."
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> results.zip <1/>"
+msgstr "<0/> results.zip <1/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid ""
+"Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
+"images"
 msgstr ""
+"A % value means that the padding is relative to\n"
+"the dimensions of each image"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "Contenu de l'export .zip"
+msgstr "Exported .zip contents"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid ""
+"Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous\n"
+"vous attendiez"
+msgstr ""
+"Explain how to reproduce the bug you found, step-by-step, and what\n"
+"you were expecting"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> une fois dézippé"
+msgstr "<0/> once unzipped"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

@@ -27,16 +27,57 @@ jobs:
       - name: Get release notes
         id: release_notes
         run: |
-          bun run -e "const fs = require('fs'); const changelog = fs.readFileSync('CHANGELOG.md', 'utf8'); const lines = changelog.split(/\r?\n/); let notes = []; let inSection = false; let foundSection = false; for (const line of lines) { if (line.trim().startsWith('## ')) { if (inSection) break; inSection = true; foundSection = true; continue; } if (inSection) notes.push(line); } while (notes.length && notes[0].trim() === '') notes.shift(); const result = notes.join('\n').trim(); console.log('release_notes<<EOF'); if (foundSection) { console.log(result || '[No content found after first ## section]'); } else { console.log('[No ## section found in CHANGELOG.md]'); } console.log('EOF');"
+          Get-Content Env:SCRIPT | Out-File .\get-notes.js
+          bun run get-notes.js >> $GITHUB_OUTPUT
+        env:
+          SCRIPT: |
+            const fs = require('fs'); 
+            const changelog = fs.readFileSync('CHANGELOG.md', 'utf8'); 
+            const lines = changelog.split(/\r?\n/); 
+            let notes = []; 
+            let inSection = false; 
+            let foundSection = false; 
+
+            for (const line of lines) { 
+              if (line.trim().startsWith('## ')) { 
+                if (inSection) break; 
+                inSection = true; 
+                foundSection = true; 
+                continue; 
+              } 
+                
+              if (inSection) notes.push(line); 
+            } 
+              
+            while (notes.length && notes[0].trim() === '') notes.shift(); 
+
+            const result = notes.join('\n').trim(); 
+
+            console.log('release_notes<<EOF'); 
+
+            if (foundSection) { 
+              console.log(result || '[No content found after first ## section]'); 
+            } else { 
+              console.log('[No ## section found in CHANGELOG.md]'); 
+            } 
+              
+            console.log('EOF');
       - name: Build, package and publish app
         run: bun run prebuild; bunx electron-forge publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ELECTRON_BUILD: '1'
 
+      - name: Get current date
+        id: today
+        run: |
+          echo month-name=$(Get-Date -Format "MMMM") >> $GITHUB_OUTPUT
+          echo year=$(Get-Date -Format "yyyy") >> $GITHUB_OUTPUT
+
       - name: Set release notes on release draft
         uses: softprops/action-gh-release@v2
         with:
           body: ${{ steps.release_notes.outputs.release_notes }}
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: ${{ steps.today.outputs.month-name }} ${{ steps.today.outputs.year }}
           draft: true

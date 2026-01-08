@@ -1,4 +1,6 @@
 import { match } from 'arktype';
+import { Estimation as ETA } from 'arrival-time';
+import { watch } from 'runed';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
@@ -31,7 +33,6 @@ import { getMetadataValue } from './metadata.js';
  * @type {Record<string, Keybind<Groups>>}
  */
 
-// UIState class fields and methods are annotated with @type for documentation and IDE support
 class UIState {
 	processing = $state({
 		/** @type {Array<{name: string; id: string; addedAt: Date }>} */
@@ -62,6 +63,24 @@ class UIState {
 			this.task = '';
 		}
 	});
+
+	#eta = new ETA({ total: 0 });
+
+	/** @param {number} total, @param {number} done */
+	#updateETA(done, total) {
+		if (done >= total || total === 0) {
+			this.#eta.reset();
+			return;
+		}
+
+		this.#eta.update(done, total);
+	}
+
+	eta = $derived.by(() => {
+		this.#updateETA(this.processing.done, this.processing.total);
+		return this.#eta.estimate();
+	});
+
 	/** @type {string[]} */
 	selection = $state([]);
 	/** @type {string | ''} */
