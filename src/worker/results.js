@@ -8,7 +8,7 @@ import { strToU8, zip } from 'fflate';
 
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
-import { cropImage } from '$lib/images.js';
+import { cropImage, parseCropPadding } from '$lib/images.js';
 import {
 	addValueLabels,
 	metadataPrettyKey,
@@ -314,7 +314,7 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 	};
 });
 
-swarp.estimateResultsZipSize(async ({ sessionId, include }, _, { abortSignal }) => {
+swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { abortSignal }) => {
 	const db = await openDatabase();
 	const session = await db.get('Session', sessionId).then(Schemas.Session.assert);
 	if (!session) throw new Error(`Session with ID ${sessionId} not found`);
@@ -370,8 +370,10 @@ swarp.estimateResultsZipSize(async ({ sessionId, include }, _, { abortSignal }) 
 				);
 				if (cropbox instanceof ArkErrors) return stats.fullSize;
 
-				const width = cropbox.w * stats.dimensions.width;
-				const height = cropbox.h * stats.dimensions.height;
+				const { width, height } = parseCropPadding(cropPadding).apply(
+					stats.dimensions,
+					cropbox
+				);
 
 				const estimation = stats.bytePerPixel * (width * height);
 

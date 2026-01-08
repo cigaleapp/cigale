@@ -935,3 +935,15 @@ export async function mockPredownloadedModels(page, context, protocol, models) {
 		}
 	}
 }
+
+
+/**
+ * @template {string} K
+ * @template {any} V
+ * @param {Record<K, V>} subject
+ * @returns {Array<[K, V]>}
+ */
+export function entries(subject) {
+	// @ts-expect-error
+	return Object.entries(subject);
+}
