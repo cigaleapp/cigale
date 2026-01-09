@@ -34,7 +34,7 @@ export async function deleteSession(sessionId) {
 }
 
 /**
- * @param {string} id id of the session to switch to
+ * @param {string | null} id id of the session to switch to, or null to close it
  */
 export async function switchSession(id) {
 	uiState.setCurrentSession(id);

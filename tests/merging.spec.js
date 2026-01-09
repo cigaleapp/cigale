@@ -1,3 +1,4 @@
+import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
 	chooseFirstSession,
@@ -147,6 +148,214 @@ test('can split merged observations', async ({ page, app }) => {
 	await expect(observationCard(page, 'lil-fella')).toBeVisible();
 	await expect(observationCard(page, 'cyan')).toBeVisible();
 	await expect(observationCard(page, 'leaf')).toBeVisible();
+});
+
+test('selecting multiple images', issue(1054), async ({ page, app }) => {
+	await loadDatabaseDump(page, 'db/basic.devalue');
+	await chooseFirstSession(page);
+	await setInferenceModels(page, {
+		classify: 'Aucune inférence'
+	});
+	await app.tabs.go('classify');
+
+	// Set identification_difficulty on one of the observations
+	await page.getByRole('article', { name: 'cyan' }).click();
+	const medium = app.sidepanel
+		.metadataSection(/Difficulté d'identification/)
+		.getByRole('radio', { name: 'Moyenne' });
+	await medium.scrollIntoViewIfNeeded();
+	await medium.check();
+	await page.getByRole('article', { name: 'cyan' }).click();
+
+	// Select multiple observations
+	for (const observation of ['cyan', 'leaf', 'lil-fella']) {
+		await selectObservation(page, observation);
+		await page.waitForTimeout(500);
+		await expect(app.toasts.byType('error')).not.toBeVisible();
+	}
+
+	// Assert sidepanel content
+	await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
+	  - complementary:
+	    - img "Image 1 de la sélection"
+	    - img "Image 2 de la sélection"
+	    - img "Image 3 de la sélection"
+	    - heading "3 observations" [level=2]
+	    - text: Espèce
+	    - combobox: Entomobrya muscorum
+	    - code: /\\d+%/
+	    - img
+	    - button:
+	      - img
+	    - text: Alternatives
+	    - list:
+	      - listitem:
+	        - text: Dicyrtomina saundersi
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Tomocerus vulgaris
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Sminthurus viridis
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	    - text: Genre
+	    - combobox: Entomobrya
+	    - code: /\\d+%/
+	    - img
+	    - button:
+	      - img
+	    - text: Alternatives
+	    - list:
+	      - listitem:
+	        - text: Dicyrtomina
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Tomocerus
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Entomobrya
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	    - text: Famille
+	    - combobox: Entomobryidae
+	    - code: /\\d+%/
+	    - img
+	    - button:
+	      - img
+	    - text: Alternatives
+	    - list:
+	      - listitem:
+	        - text: Dicyrtomidae
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Orchesellidae
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Entomobryidae
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	    - text: Ordre
+	    - combobox: Entomobryomorpha
+	    - code: /\\d+%/
+	    - img
+	    - button:
+	      - img
+	    - text: Alternatives
+	    - list:
+	      - listitem:
+	        - text: Symphypleona
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Entomobryomorpha
+	        - code: /\\d+%/
+	        - button:
+	          - img
+	      - listitem:
+	        - text: Poduromorpha
+	        - code: 5%
+	        - button:
+	          - img
+	    - text: Photo d'habitat
+	    - radiogroup:
+	      - radio "C'est une photo de l'habitat actuel"
+	      - text: C'est une photo de l'habitat actuel
+	      - radio "C'est une photo de l'habitat à proximité"
+	      - text: C'est une photo de l'habitat à proximité
+	    - button [disabled]:
+	      - img
+	    - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
+	    - text: Date
+	    - textbox "Date": /\\d+-\\d+-\\d+/
+	    - button:
+	      - img
+	    - paragraph: Moment où la photo a été prise
+	    - text: Localisation
+	    - textbox "Localisation"
+	    - button [disabled]:
+	      - img
+	    - paragraph: Endroit où la photo a été prise
+	    - text: Difficulté d'identification
+	    - radiogroup:
+	      - radio "Facile"
+	      - text: Facile
+	      - radio "Moyenne" [checked]
+	      - text: Moyenne
+	      - radio "Difficile"
+	      - text: Difficile
+	      - radio "Très difficile"
+	      - text: Très difficile
+	    - button:
+	      - img
+	    - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
+	    - text: Statut de conservation
+	    - radiogroup:
+	      - radio "EX Éteint (“Extinct”)"
+	      - text: EX
+	      - paragraph: Éteint (“Extinct”)
+	      - radio "EW Éteint à l’état sauvage (“Extinct in the Wild”)"
+	      - text: EW
+	      - paragraph: Éteint à l’état sauvage (“Extinct in the Wild”)
+	      - radio "CR En danger critique d’extinction (“Critically Endangered”)"
+	      - text: CR
+	      - paragraph: En danger critique d’extinction (“Critically Endangered”)
+	      - radio "EN En danger (“Endangered”)"
+	      - text: EN
+	      - paragraph: En danger (“Endangered”)
+	      - radio "VU Vulnérable (“Vulnerable”)"
+	      - text: VU
+	      - paragraph: Vulnérable (“Vulnerable”)
+	      - radio "NT Quasi menacé (“Near Threatened”)"
+	      - text: NT
+	      - paragraph: Quasi menacé (“Near Threatened”)
+	      - radio "LC Préoccupation mineure (“Least Concern”)"
+	      - text: LC
+	      - paragraph: Préoccupation mineure (“Least Concern”)
+	    - button [disabled]:
+	      - img
+	    - paragraph: Statut de conservation IUCN de l'espèce
+	    - text: Classe
+	    - combobox: Collembola
+	    - code: /\\d+%/
+	    - button:
+	      - img
+	    - text: Phylum
+	    - combobox: Arthropoda
+	    - code: /\\d+%/
+	    - button:
+	      - img
+	    - text: Règne
+	    - combobox: Animalia
+	    - code: /\\d+%/
+	    - button:
+	      - img
+	    - button "Regrouper Ctrl + G":
+	      - img
+	      - text: ""
+	    - button "Séparer Ctrl + Shift + G":
+	      - img
+	      - text: ""
+	    - button "Supprimer 3 images Suppr":
+	      - img
+	      - text: ""
+	`);
 });
 
 /**

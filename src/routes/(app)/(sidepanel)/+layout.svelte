@@ -172,16 +172,22 @@
 	let mergedMetadataValues = $state({});
 
 	watch([() => selectedImages, () => selectedObservations], () => {
+		if (!uiState.currentProtocol) return;
+
 		// FIXME needed to force refresh when selectedObservations' metadataOverrides change values, this isn't picked up by Svelte for some reason. I tried reproducing but couldn't yet, see https://svelte.dev/playground/eef37e409ca04fa888badd3e7588f461?version=5.25.0
 		void mergeMetadataFromImagesAndObservations(
 			db.databaseHandle(),
+			uiState.currentProtocol,
 			selectedImages,
 			selectedObservations
 		)
 			.then((values) => {
 				mergedMetadataValues = values;
 			})
-			.catch((e) => toasts.error(e));
+			.catch((e) => {
+				console.error(e);
+				toasts.error(e);
+			});
 	});
 </script>
 
@@ -226,6 +232,7 @@
 
 				await mergeMetadataFromImagesAndObservations(
 					db.databaseHandle(),
+					uiState.currentProtocol,
 					selectedImages,
 					selectedObservations
 				)

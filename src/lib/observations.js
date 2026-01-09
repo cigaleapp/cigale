@@ -40,6 +40,7 @@ export async function mergeToObservation(parts) {
 			Object.entries(
 				await mergeMetadataValues(
 					db.databaseHandle(),
+					protocol,
 					observations.map((o) => o.metadataOverrides)
 				)
 			).map(([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }])

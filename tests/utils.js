@@ -254,9 +254,13 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 }
 
 /**
+ * @typedef {"Aucune inférence" | (string & {})} InferenceModelName
+ */
+
+/**
  *
  * @param {Page} page
- * @param {{ crop?: string, classify?: string }} models names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {{ crop?: InferenceModelName, classify?: InferenceModelName }} models names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
 export async function setInferenceModels(page, models) {
 	for (const [task, model] of Object.entries(models)) {
@@ -408,7 +412,7 @@ export async function importProtocol(page, filepath) {
 /**
  *
  * @param {Page} page
- * @param {string|RegExp} message
+ * @param {string|RegExp|null} message null to not filter on the message
  * @param {object} options
  * @param {undefined | import('$lib/toasts.svelte').Toast<null>['type']} [options.type]
  */
@@ -419,7 +423,11 @@ export function toast(page, message, { type = undefined } = {}) {
 		loc = loc.locator(`[data-type=${type}]`);
 	}
 
-	return loc.filter({ hasText: message });
+	if (message) {
+		loc = loc.filter({ hasText: message });
+	}
+
+	return loc;
 }
 
 /**
@@ -731,7 +739,7 @@ export async function waitForLoadingEnd(area, timeout = 30_000) {
 
 /**
  * @param {Page} page
- * @param {string} metadataLabel
+ * @param {string | RegExp} metadataLabel
  */
 export function sidepanelMetadataSectionFor(page, metadataLabel) {
 	return page
@@ -744,7 +752,7 @@ export function sidepanelMetadataSectionFor(page, metadataLabel) {
 /**
  *
  * @param {Page} page
- * @param {string} metadataLabel
+ * @param {string | RegExp} metadataLabel
  */
 export function sessionMetadataSectionFor(page, metadataLabel) {
 	return page

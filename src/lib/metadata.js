@@ -325,9 +325,10 @@ export async function deleteMetadataValue({
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
  * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} observation
  * @param {DatabaseHandle} db
+ * @param {DB.Protocol} protocol
  * @returns {Promise<DB.MetadataValues>}
  */
-export async function observationMetadata(db, observation) {
+export async function observationMetadata(db, protocol, observation) {
 	const images = await Promise.all(
 		observation.images.map(async (id) => await db.get('Image', id))
 	);
@@ -336,6 +337,7 @@ export async function observationMetadata(db, observation) {
 
 	const metadataFromImages = await mergeMetadataValues(
 		db,
+		protocol,
 		images.map((img) => Schemas.MetadataValues.assert(img.metadata))
 	);
 
@@ -380,16 +382,19 @@ export const MERGEABLE_METADATA_TYPES = new Set([
 /**
  * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
  * @param {DatabaseHandle} db
+ * @param {DB.Protocol} protocol
  * @param {DB.Image[]} images
  * @param {DB.Observation[]} observations
  */
-export async function mergeMetadataFromImagesAndObservations(db, images, observations) {
+export async function mergeMetadataFromImagesAndObservations(db, protocol, images, observations) {
 	const mergedValues = await mergeMetadataValues(
 		db,
+		protocol,
 		images.map((img) => img.metadata)
 	);
 	const mergedOverrides = await mergeMetadataValues(
 		db,
+		protocol,
 		observations.map((obs) => obs.metadataOverrides)
 	);
 
@@ -408,10 +413,11 @@ export async function mergeMetadataFromImagesAndObservations(db, images, observa
 
 /**
  * @param {DatabaseHandle} db
+ * @param {DB.Protocol} protocol
  * @param {Array<DB.MetadataValues>} values
  * @returns {Promise<Record<string, DB.MetadataValue & { merged: boolean }>>}
  */
-export async function mergeMetadataValues(db, values) {
+export async function mergeMetadataValues(db, protocol, values) {
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
@@ -434,7 +440,27 @@ export async function mergeMetadataValues(db, values) {
 				.map(([, v]) => v)
 		);
 
-		const merged = mergeMetadata(definition, valuesOfKey);
+		/** @type {DB.MetadataEnumVariant[]} */
+		let options = [];
+
+		if (definition.type === 'enum' && definition.mergeMethod === 'average') {
+			const optionsCount = await db.count(
+				'MetadataOption',
+				metadataOptionsKeyRange(protocol.id, definition.id)
+			);
+
+			if (optionsCount > 500) {
+				throw new Error(
+					`Impossible de fusionner les valeurs de la métadonnée ${key} en mode moyenne car elle possède plus de 500 options (${optionsCount} options). Le protocol doit choisir un autre mode de fusion.`
+				);
+			}
+
+			options = await db
+				.getAll('MetadataOption', metadataOptionsKeyRange(protocol.id, definition.id))
+				.then((opts) => opts.map((opt) => Schemas.MetadataEnumVariant.assert(opt)));
+		}
+
+		const merged = mergeMetadata(definition, valuesOfKey, options);
 
 		if (merged !== null && merged !== undefined)
 			output[key] = {
@@ -450,8 +476,9 @@ export async function mergeMetadataValues(db, values) {
  *
  * @param {DB.Metadata} definition
  * @param {DB.MetadataValue[]} values
+ * @param {DB.MetadataEnumVariant[]} [options]
  */
-function mergeMetadata(definition, values) {
+function mergeMetadata(definition, values, options = []) {
 	/**
 	 * @param {(probabilities: number[]) => number} merger
 	 * @param {DB.MetadataValue[]} values
@@ -481,8 +508,8 @@ function mergeMetadata(definition, values) {
 			return {
 				value: mergeAverage(
 					definition.type,
-					// @ŧs-ignore
-					values.map((v) => v.value)
+					values.map((v) => v.value),
+					options
 				),
 				manuallyModified: values.some((v) => v.manuallyModified),
 				confidence: avg(values.map((v) => v.confidence)),
@@ -493,7 +520,7 @@ function mergeMetadata(definition, values) {
 			return {
 				value: mergeByMajority(
 					definition.type,
-					// @ts-ignore
+					// @ts-expect-error
 					values,
 					definition.mergeMethod === 'max' ? max : min
 				),
@@ -561,42 +588,59 @@ function mergeByMajority(_type, values, strategy) {
  * Merge values by average.
  * @param {Type} type
  * @param {Value[]} values
+ * @param {import('./database.js').MetadataEnumVariant[]} [options]
  * @returns {Value}
  * @template {RuntimeValue<Type>} Value
  * @template {DB.MetadataType} Type
  */
-function mergeAverage(type, values) {
+function mergeAverage(type, values, options = []) {
 	/**
-	 * @param {typeof values} values
+	 * @template {DB.MetadataType} T
+	 * @param {Parameters<typeof toNumber>[1]} values
 	 */
 	const average = (values) => avg(toNumber(type, values));
 
-	// @ts-ignore
+	// @ts-expect-error
 	if (type === 'boolean') return average(values) > 0.5;
-	// @ts-ignore
+	// @ts-expect-error
 	if (type === 'integer') return Math.ceil(average(values));
-	// @ts-ignore
+	// @ts-expect-error
 	if (type === 'float') return average(values);
-	// @ts-ignore
+	// @ts-expect-error
 	if (type === 'date') return new Date(average(values));
 	if (type === 'location') {
-		// @ts-ignore
+		// @ts-expect-error
 		return {
 			latitude: avg(
 				values.map(
 					(v) =>
-						// @ts-ignore
+						// @ts-expect-error
 						v.latitude
 				)
 			),
 			longitude: avg(
 				values.map(
 					(
-						v //@ts-ignore
+						v //@ts-expect-error
 					) => v.longitude
 				)
 			)
 		};
+	}
+
+	if (type === 'enum') {
+		// Get average index of values, and return closest option
+
+		const averageIndex = Math.round(
+			avg(
+				/** @type {string[]} */ (values)
+					.map((v) => options.find((opt) => opt.key === v)?.index)
+					.filter((v) => v !== undefined)
+			)
+		);
+
+		// @ts-expect-error
+		return options.find((opt) => opt.index === averageIndex)?.key ?? values[0];
 	}
 
 	throw new Error(`Impossible de fusionner en mode moyenne des valeurs de type ${type}`);
@@ -681,10 +725,8 @@ function mergeByUnion(type, values) {
 
 /**
  * Convert series of values to an output number
- * @param {Type} type
- * @param {Value[]} values
- * @template {RuntimeValue<Type>} Value
- * @template {DB.MetadataType} Type
+ * @param {DB.MetadataType} type
+ * @param {Array<RuntimeValue<"integer" | "float" | "boolean" | "date">>} values
  * @returns {number[]}
  */
 function toNumber(type, values) {

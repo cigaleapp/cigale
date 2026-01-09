@@ -87,6 +87,7 @@
 	class:stacked
 	data-selectable={selectable ? '' : undefined}
 	data-id={id}
+	aria-label={title}
 	use:tooltip={tooltipText}
 	{...rest}
 >
