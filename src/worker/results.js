@@ -468,7 +468,7 @@ async function prepare({ protocolUsed, sessionId, db, abortSignal, onProgress })
 	for (const { id, label, images, metadataOverrides } of observations) {
 		observationNumber++;
 
-		const metadata = await observationMetadata(db, {
+		const metadata = await observationMetadata(db, protocolUsed, {
 			images,
 			metadataOverrides: MetadataValues.assert(metadataOverrides)
 		}).then((obsm) => addValueLabels(obsm, metadataOptions));
