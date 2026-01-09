@@ -21,14 +21,13 @@ export function pr(number) {
 }
 
 /**
- * @param {number} number
- * @param {...number} otherNumbers
+ * @param {[number, ...number[]]} numbers
  * @returns	{TestSettings}
  */
-export function issue(number, ...otherNumbers) {
+export function issue(...numbers) {
 	return {
 		tag: '@issue',
-		annotation: [number, ...otherNumbers].map((n) => ({
+		annotation: numbers.map((n) => ({
 			type: 'issue',
 			description: `https://github.com/cigaleapp/cigale/issues/${n}`
 		}))

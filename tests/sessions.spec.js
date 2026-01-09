@@ -198,24 +198,39 @@ test('import into new session', async ({ page, app }) => {
 	    - img
 	  - paragraph: Endroit où la photo a été prise
 	  - text: Difficulté d'identification
-	  - radiogroup: Facile Moyenne Difficile Très difficile
+	  - radiogroup:
+	    - radio "Facile"
+	    - text: Facile
+	    - radio "Moyenne"
+	    - text: Moyenne
+	    - radio "Difficile"
+	    - text: Difficile
+	    - radio "Très difficile"
+	    - text: Très difficile
 	  - button [disabled]:
 	    - img
 	  - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
 	  - text: Statut de conservation
 	  - radiogroup:
+	    - radio "EX Éteint (“Extinct”)"
 	    - text: EX
 	    - paragraph: Éteint (“Extinct”)
+	    - radio "EW Éteint à l’état sauvage (“Extinct in the Wild”)"
 	    - text: EW
 	    - paragraph: Éteint à l’état sauvage (“Extinct in the Wild”)
+	    - radio "CR En danger critique d’extinction (“Critically Endangered”)"
 	    - text: CR
 	    - paragraph: En danger critique d’extinction (“Critically Endangered”)
+	    - radio "EN En danger (“Endangered”)"
 	    - text: EN
 	    - paragraph: En danger (“Endangered”)
+	    - radio "VU Vulnérable (“Vulnerable”)"
 	    - text: VU
 	    - paragraph: Vulnérable (“Vulnerable”)
+	    - radio "NT Quasi menacé (“Near Threatened”)"
 	    - text: NT
 	    - paragraph: Quasi menacé (“Near Threatened”)
+	    - radio "LC Préoccupation mineure (“Least Concern”)"
 	    - text: LC
 	    - paragraph: Préoccupation mineure (“Least Concern”)
 	  - button [disabled]:

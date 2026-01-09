@@ -80,6 +80,7 @@ export type AppFixture = {
 	};
 	toasts: {
 		byMessage(type: Toast<unknown>['type'] | null, message: string): Locator;
+		byType(type: Toast<unknown>['type']): Locator;
 	};
 	settings: {
 		set(values: Partial<Settings>): Promise<void>;
@@ -99,7 +100,7 @@ export type AppFixture = {
 		waitIn(area: Locator, timeout?: number): Promise<void>;
 	};
 	sidepanel: Locator & {
-		metadataSection(label: string): Locator;
+		metadataSection(label: string | RegExp): Locator;
 	};
 };
 
@@ -187,7 +188,8 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 					confirmDeletionModal(page, { type, modalKey: key })
 			},
 			toasts: {
-				byMessage: (type, message) => toast(page, message, { type: type ?? undefined })
+				byMessage: (type, message) => toast(page, message, { type: type ?? undefined }),
+				byType: (type) => toast(page, null, { type })
 			},
 			settings: {
 				set: async (values) => setSettings({ page }, values),
