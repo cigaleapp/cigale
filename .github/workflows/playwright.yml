@@ -28,6 +28,8 @@ jobs:
             echo "Downloading $url"
             wget -q $url
           done
+
+          ls -l
         env:
           PROTOCOL_URL: https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json
           JQ_SELECTORS: .crop.infer[].model,
