@@ -23,7 +23,7 @@ jobs:
 
       - name: Pre-download default protocol's models
         run: |
-          urls=$(wget -fsSL $PROTOCOL_URL | jq -r "[$JQ_SELECTORS] | .[]")
+          urls=$(curl -fsSL $PROTOCOL_URL | jq -r "[$JQ_SELECTORS] | .[]")
           for url in $urls; do
             echo "Downloading $url"
             wget -q $url
