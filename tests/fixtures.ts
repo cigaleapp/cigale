@@ -33,9 +33,9 @@ import {
 	type PredownloadedModel
 } from './utils.js';
 
-let classification80Model: PredownloadedModel | null = null;
-let classification17kModel: PredownloadedModel | null = null;
-let detectionModel: PredownloadedModel | null = null;
+let arthropodaClassifierModel: PredownloadedModel | null = null;
+let collembolaClassifierModel: PredownloadedModel | null = null;
+let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export type AppFixture = {
 	db: {
@@ -215,17 +215,15 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 	forEachWorker: [
 		// oxlint-disable-next-line no-empty-pattern required by playwright
 		async ({}, use) => {
-			classification80Model = await getPredownloadedModel(
-				'model_classif.onnx',
-				'lightweight-80-classmapping.txt'
+			arthropodaClassifierModel = await getPredownloadedModel(
+				'classifier-collembola.onnx',
+				'classifier-collembola-classmapping.txt'
 			);
-			classification17kModel = await getPredownloadedModel(
-				'classification-arthropoda-polymny-2025-04-11.onnx',
-				'polymny-17k-classmapping.txt'
+			collembolaClassifierModel = await getPredownloadedModel(
+				'classifier-arthropoda.onnx',
+				'classifier-arthropoda-classmapping.txt'
 			);
-			detectionModel = await getPredownloadedModel(
-				'arthropod_detector_yolo11n_conf0.437.onnx'
-			);
+			arthropodaDetectionModel = await getPredownloadedModel('detector-arthropoda.onnx');
 			await use();
 		},
 		{ scope: 'worker', auto: true }
@@ -250,8 +248,8 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			}
 
 			await mockPredownloadedModels(page, context, fullProtocol as ExportedProtocol, {
-				detection: [detectionModel],
-				species: [classification17kModel, classification80Model]
+				detection: [arthropodaDetectionModel],
+				species: [collembolaClassifierModel, arthropodaClassifierModel]
 			});
 
 			const concurrency = annotations.find((a) => a.type === 'concurrency')?.description;
