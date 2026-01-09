@@ -33,8 +33,7 @@ jobs:
           done
         env:
           PROTOCOL_URL: https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json
-          JQ_SELECTORS:
-            .crop.infer[].model, 
+          JQ_SELECTORS: .crop.infer[].model,
             .metadata[].infer?.neural[]?.model,
             .metadata[].infer?.neural[]?.classmapping
 
