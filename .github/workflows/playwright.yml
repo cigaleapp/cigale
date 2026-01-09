@@ -15,9 +15,6 @@ jobs:
   predownload:
     runs-on: ubuntu-latest
     name: Pre-download models
-    container:
-      image: ghcr.io/gwennlbh/playwright-bun:v1.57.0
-      options: --user 1001
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
