@@ -1,6 +1,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
+import { Estimation as ETA } from 'arrival-time';
+import { formatDistanceToNowStrict, isValid as isValidDate } from 'date-fns';
 import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 import { Jimp } from 'jimp';
@@ -84,16 +86,34 @@ const response = await drive.files.list({
 	q: `'${GOOGLE_DRIVE_FOLDER_URL}' in parents and mimeType = 'application/vnd.google-apps.presentation'`
 });
 
+const files = response.data.files.sort((a, b) => a.name.localeCompare(b.name));
+
+const eta = new ETA({ total: files.length });
+
 await mkdir('./slides', { recursive: true });
 
-const longestNameLength = Math.max(...response.data.files.map((file) => file.name.length));
+const longestNameLength = Math.max(...files.map((file) => file.name.length));
 
-for (const { name, id } of response.data.files.sort((a, b) => a.name.localeCompare(b.name))) {
-	const log = (...items) =>
+for (const [i, { name, id }] of files.entries()) {
+	eta.update(i);
+
+	const log = (...items) => {
+		let remaining = new Date(Date.now() + eta.estimate());
+		if (!isValidDate(remaining)) {
+			remaining = new Date();
+		}
+
+		const remainingStr = formatDistanceToNowStrict(remaining, { addSuffix: true });
+
+		const percent = Math.round((i / files.length) * 100)
+			.toString()
+			.padStart(3);
+
 		console.info(
-			`${cc.bold}${cc.cyan}[${name.padStart(longestNameLength)}]${cc.reset}`,
+			`${cc.bold} ${percent}% ${cc.cyan}[${name.padStart(longestNameLength)}]${cc.reset} ${cc.dim}${remainingStr}${cc.reset}`,
 			...items
 		);
+	};
 
 	if (name === 'A-BASE') {
 		log('Skipping');
