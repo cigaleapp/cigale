@@ -100,4 +100,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: 🍱 Regenerate example protocols
-          file_pattern: examples/*.cigaleprotocol.json
+          file_pattern: examples/*.cigaleprotocol.{json,images/*}
