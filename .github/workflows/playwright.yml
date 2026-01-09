@@ -26,7 +26,7 @@ jobs:
           urls=$(curl -fsSL $PROTOCOL_URL | jq -r "[$JQ_SELECTORS] | .[]")
           for url in $urls; do
             echo "Downloading $url"
-            wget -q $url
+            wget --content-disposition -q $url
           done
 
           ls -l
