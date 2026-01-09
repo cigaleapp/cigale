@@ -23,26 +23,21 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
-      - name: Pre-download polymny 17k classification model
-        uses: carlosperate/download-file-action@v2
-        with:
-          file-url: https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx
-      - name: Pre-download polymny 17k classmapping
-        uses: carlosperate/download-file-action@v2
-        with:
-          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt
-      - name: Pre-download lightweight 80 classification model
-        uses: carlosperate/download-file-action@v2
-        with:
-          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx
-      - name: Pre-download lightweight 80 classmapping
-        uses: carlosperate/download-file-action@v2
-        with:
-          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt
-      - name: Pre-download YOLO detection model
-        uses: carlosperate/download-file-action@v2
-        with:
-          file-url: https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx
+
+      - name: Pre-download default protocol's models
+        run: |
+          urls=$(wget -fsSL $PROTOCOL_URL | jq -r "[$JQ_SELECTORS] | .[]")
+          for url in $urls; do
+            echo "Downloading $url"
+            wget -q $url
+          done
+        env:
+          PROTOCOL_URL: https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json
+          JQ_SELECTORS:
+            .crop.infer[].model, 
+            .metadata[].infer?.neural[]?.model,
+            .metadata[].infer?.neural[]?.classmapping
+
       - name: Save to artifact
         uses: actions/upload-artifact@v6
         with:
