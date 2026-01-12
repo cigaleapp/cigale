@@ -63,14 +63,7 @@
 		}
 	});
 
-	// TODO tidy up that code once https://github.com/gwennlbh/swarpc/issues/115 is implemented
-	let cancelExportGeneration = $state((_: string) => {});
-	let cancelExportPreview = $state((_: string) => {});
-	let cancelExportSizeEstimation = $state((_: string) => {});
-
 	async function generateExport() {
-		cancelExportGeneration('Un nouvel export a été démarré');
-
 		await toasts.clear('exporter');
 		uiState.processing.reset();
 		exporting = true;
@@ -86,7 +79,7 @@
 			uiState.processing.task = 'export';
 			uiState.processing.total = 1;
 			uiState.processing.done = 0;
-			const { cancel, request: zipfileBytes } = swarpc.generateResultsZip.cancelable(
+			const zipfileBytes = await swarpc.generateResultsZip.once(
 				{
 					include,
 					sessionId: uiState.currentSessionId,
@@ -113,9 +106,7 @@
 				}
 			);
 
-			cancelExportGeneration = cancel;
-
-			downloadAsFile(await zipfileBytes, 'results.zip', 'application/zip');
+			downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
 		} catch (error) {
 			console.error(error);
 			toasts.error(`Erreur lors de l'exportation des résultats: ${error}`);
@@ -130,18 +121,12 @@
 			return [];
 		}
 
-		cancelExportPreview('Une nouvelle prévisualisation a été demandée');
-
 		await ensureNoLoneImages();
 
-		const { cancel, request } = swarpc.previewResultsZip.cancelable({
+		const preview = await swarpc.previewResultsZip.once({
 			include,
 			sessionId: uiState.currentSessionId
 		});
-
-		cancelExportPreview = cancel;
-
-		const preview = await request;
 
 		const tree: TreeNode = [];
 		for (const [provenance, paths] of entries(preview)) {
@@ -162,16 +147,14 @@
 	let sizeEstimates: { compressed?: number; uncompressed?: number } = $state({});
 
 	watch([() => include, () => cropPadding], () => {
-		cancelExportSizeEstimation('Une nouvelle estimation de taille a été demandée');
 		sizeEstimates = {};
 		(async () => {
-			const { cancel, request } = swarpc.estimateResultsZipSize.cancelable({
+			if (!uiState.currentSessionId) return;
+			sizeEstimates = await swarpc.estimateResultsZipSize.once({
 				include,
 				sessionId: uiState.currentSessionId,
 				cropPadding: cropPadding.withUnit
 			});
-			cancelExportSizeEstimation = cancel;
-			sizeEstimates = await request;
 		})();
 	});
 
