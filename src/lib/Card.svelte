@@ -20,6 +20,7 @@ Available CSS variables:
 	 * @type {object}
 	 * @property {import('svelte').Snippet} [children]
 	 * @property {(e: MouseEvent) => void} [onclick]
+	 * @property {() => void} [ondoubleclick]
 	 * @property {'article' | 'li' | 'div'} [tag=article] - HTML tag to use for the card container
 	 * @property {string} [tooltip] - Tooltip text to show on hover (only if clickable)
 	 * @property {string} [testid]
@@ -30,6 +31,7 @@ Available CSS variables:
 	const {
 		children = undefined,
 		onclick,
+		ondoubleclick,
 		tag = 'article',
 		tooltip: tooltipText,
 		testid,
@@ -47,6 +49,7 @@ Available CSS variables:
 	data-testid={testid}
 	use:tooltip={clickable && tooltipText ? tooltipText : undefined}
 	class="card"
+	ondblclick={ondoubleclick}
 	onclick={async (e) => {
 		try {
 			loading = true;

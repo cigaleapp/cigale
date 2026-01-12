@@ -1,0 +1,67 @@
+import { error } from '@sveltejs/kit';
+
+import type { MetadataEnumVariant } from '$lib/database.js';
+import { dependencyURI, list, listByIndex, tables } from '$lib/idb.svelte.js';
+import { metadataOptionsKeyRange } from '$lib/metadata.js';
+import { uiState } from '$lib/state.svelte.js';
+import { compareBy } from '$lib/utils.js';
+
+let allOptions: [string | undefined, MetadataEnumVariant[]] = [undefined, []];
+
+export async function load({ params, depends }) {
+	if (!uiState.currentSessionId) error(400, 'Aucune session active');
+
+	const focusedMetadata = uiState.classificationMetadataId
+		? await tables.Metadata.get(uiState.classificationMetadataId)
+		: undefined;
+
+	if (focusedMetadata && uiState.currentProtocolId && allOptions[0] !== focusedMetadata.id) {
+		allOptions = [
+			focusedMetadata.id,
+			await list(
+				'MetadataOption',
+				metadataOptionsKeyRange(uiState.currentProtocolId, focusedMetadata.id)
+			)
+		];
+	}
+
+	const image = await tables.Image.get(params.image);
+	if (!image) error(404, 'Image introuvable');
+
+	depends(dependencyURI('Image', image.id));
+
+	const images = await listByIndex('Image', 'sessionId', uiState.currentSessionId);
+
+	/** Number of the image within the images that point to its ImageFile */
+	const imageNo =
+		images
+			.filter((i) => i.fileId === image.fileId)
+			.sort(compareBy('id'))
+			.findIndex((i) => i.id === image.id) + 1;
+
+	// Get next image
+	const currentImageIndex = images.sort(compareBy('id')).findIndex((i) => i.id === image.id);
+
+	if (currentImageIndex === -1) {
+		error(500, 'Image introuvable dans la session');
+	}
+
+	const nextImageIndex = currentImageIndex + 1;
+	const prevImageIndex = currentImageIndex - 1;
+
+	const nextImage = nextImageIndex < images.length ? images[nextImageIndex] : null;
+	const prevImage = prevImageIndex >= 0 ? images[prevImageIndex] : null;
+
+	return {
+		image,
+		imageNo,
+		focusedMetadata,
+		allOptions: allOptions[1],
+		navigation: {
+			nextImage,
+			prevImage,
+			currentImageIndex,
+			totalImages: images.length
+		}
+	};
+}
