@@ -34,7 +34,7 @@
         "runed": "^0.37.1",
         "svelte-mathml": "gwennlbh/svelte-mathml#64dd30646516d03f00587ca3e22e9f8a291dad67",
         "sveltejs-tippy": "^3.0.0",
-        "swarpc": "^0.17.2",
+        "swarpc": "^0.18.0",
         "tiny-jsonc": "^1.0.2",
         "tinykeys": "^3.0.0",
         "ua-parser-js": "^2.0.7",
@@ -2273,7 +2273,7 @@
 
     "sveltejs-tippy": ["sveltejs-tippy@3.0.0", "", { "dependencies": { "tippy.js": "~6.0.1" } }, "sha512-LAfQikm61AeqZW1hCFWUsmGEMmhMHDvrPV0JhbT38Ell9SqBjmFaY//+YKUxaJvx6nLMxGQdlcHA1rDg2Ml8tQ=="],
 
-    "swarpc": ["swarpc@0.17.2", "", {}, "sha512-5Jj0kCiKTaJ2FMB8tQ4cN39VrIpd/HzmvaZl2O7IlPko3EoCpcukBqqAIrFFJ5obqnuo9JgV6mrwGd6PGuH/UA=="],
+    "swarpc": ["swarpc@0.18.0", "", {}, "sha512-ItCaEDVmWRJMFTWEl4UUI9Pw+07MvTn7Ws3btm5z2IJxR6HTFOwCYqaIfnyLA5cA5iXASAsJeKJbtEZrmWCAkA=="],
 
     "symbol-tree": ["symbol-tree@3.2.4", "", {}, "sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw=="],
 
