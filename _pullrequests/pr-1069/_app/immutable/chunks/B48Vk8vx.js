@@ -1,0 +1,1 @@
+import{h as t,i,aa as c,d as f}from"./D-GDKPWF.js";import{B as y}from"./DDxVhE8M.js";function l(r,e,n){t&&i();var s=new y(r),o=!c();f(()=>{var a=e();o&&a!==null&&typeof a=="object"&&(a={}),s.ensure(a,n)})}export{l as k};
