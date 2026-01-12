@@ -494,21 +494,11 @@ if (import.meta.vitest) {
  */
 export async function cropImage(bytes, contentType, centeredBoundingBox, padding = '0px') {
 	const bitmap = await createImageBitmap(new Blob([bytes], { type: contentType }));
-	const boundingBox = coordsScaler({ x: bitmap.width, y: bitmap.height })(
-		toTopLeftCoords(centeredBoundingBox)
-	);
 
-	const { inPixels } = parseCropPadding(padding);
-	const paddingPixels = { x: inPixels(bitmap.width), y: inPixels(bitmap.height) };
+	const { x, y, width, height } = parseCropPadding(padding).apply(bitmap, centeredBoundingBox);
 
 	try {
-		const croppedBitmap = await createImageBitmap(
-			bitmap,
-			clamp(boundingBox.x - paddingPixels.x, 0, bitmap.width),
-			clamp(boundingBox.y - paddingPixels.y, 0, bitmap.height),
-			clamp(boundingBox.width + 2 * paddingPixels.x, 1, bitmap.width),
-			clamp(boundingBox.height + 2 * paddingPixels.y, 1, bitmap.height)
-		);
+		const croppedBitmap = await createImageBitmap(bitmap, x, y, width, height);
 
 		const canvas = new OffscreenCanvas(croppedBitmap.width, croppedBitmap.height);
 		canvas.getContext('2d')?.drawImage(croppedBitmap, 0, 0);
@@ -522,7 +512,7 @@ export async function cropImage(bytes, contentType, centeredBoundingBox, padding
 		return { cropped: croppedBytes, original: bytes };
 	} catch (error) {
 		throw new Error(
-			`Couldn't crop with ${JSON.stringify({ boundingBox, padding })}: ${error}`,
+			`Couldn't crop with ${JSON.stringify({ centeredBoundingBox, padding })}: ${error}`,
 			{
 				cause: error
 			}
@@ -535,7 +525,7 @@ export async function cropImage(bytes, contentType, centeredBoundingBox, padding
 /**
  *
  * @param {string} padding
- * @returns {{ withUnit: string, unitless: number, unit: 'px' | '%', inPixels: (basis: number) => number }}
+ * @returns {{ withUnit: string, unitless: number, unit: 'px' | '%', inPixels: (basis: number) => number, apply: (dimensions: {width: number, height: number}, cropbox: import('./BoundingBoxes.svelte.js').CenteredBoundingBox) => import('./BoundingBoxes.svelte.js').TopLeftBoundingBox}}
  */
 export function parseCropPadding(padding) {
 	const match = padding.match(/(\d+)(px|%)/);
@@ -545,7 +535,17 @@ export function parseCropPadding(padding) {
 		withUnit: padding,
 		unitless: value,
 		unit,
-		inPixels: (axis) => (unit === 'px' ? value : Math.round((axis * value) / 100))
+		inPixels: (axis) => (unit === 'px' ? value : Math.round((axis * value) / 100)),
+		apply({ width, height }, { w, h, ...xy }) {
+			const { x, y } = toTopLeftCoords({ w, h, ...xy });
+
+			return {
+				x: clamp(x * width - this.inPixels(width), 0, width),
+				y: clamp(y * height - this.inPixels(height), 0, height),
+				width: clamp(w * width + this.inPixels(width) * 2, 1, width),
+				height: clamp(h * height + this.inPixels(height) * 2, 1, height)
+			};
+		}
 	};
 }
 

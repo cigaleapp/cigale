@@ -20,12 +20,40 @@ async function gbifIds(url) {
 		);
 }
 
-const lightweightModelGbifIds = await gbifIds(
-	'https://cigaleapp.github.io/models/lightweight-80-classmapping.txt'
-);
+/**
+ * @param {"detector" | "classifier"} task
+ * @param {"collembola" | "arthropoda"} [scope]
+ * @param {"model" | "classmapping"} [type]
+ */
+function modelUrl(task, scope, type) {
+	const ending = {
+		model: '.onnx',
+		classmapping: '-classmapping.txt'
+	}[type];
+
+	return `https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/${task}-${scope}${ending}?download=true`;
+}
+
+const MODELS = {
+	detectors: {
+		arthropoda: modelUrl('detector', 'arthropoda', 'model')
+	},
+	classifiers: {
+		arthropoda: {
+			model: modelUrl('classifier', 'arthropoda', 'model'),
+			classmapping: modelUrl('classifier', 'arthropoda', 'classmapping')
+		},
+		collembola: {
+			model: modelUrl('classifier', 'collembola', 'model'),
+			classmapping: modelUrl('classifier', 'collembola', 'classmapping')
+		}
+	}
+};
+
+const lightweightModelGbifIds = await gbifIds(MODELS.classifiers.collembola.classmapping);
 
 const allGbifIds = new Set([
-	...(await gbifIds('https://cigaleapp.github.io/models/polymny-17k-classmapping.txt')),
+	...(await gbifIds(MODELS.classifiers.arthropoda.classmapping)),
 	...lightweightModelGbifIds
 ]);
 
@@ -433,10 +461,7 @@ const protocol = {
 					{
 						name: 'Arthropodes (~17000 classes)',
 						description: 'Terrestres, France métropolitaine', // TODO
-						// FIXME: github release downloads are not cors-enabled, so we use a CORS proxy... this one has a 2GB bandwidth limit, if things are actually cached correctly it should be fine?
-						model: 'https://media.gwen.works/cigale/models/classification-arthropoda-polymny-2025-04-11.onnx',
-						classmapping:
-							'https://raw.githubusercontent.com/cigaleapp/models/main/polymny-17k-classmapping.txt',
+						...MODELS.classifiers.arthropoda,
 						input: {
 							height: 224,
 							width: 224,
@@ -446,9 +471,7 @@ const protocol = {
 					},
 					{
 						name: 'Collemboles (~80 classes)',
-						model: 'https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx',
-						classmapping:
-							'https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt',
+						...MODELS.classifiers.collembola,
 						input: {
 							height: 224,
 							width: 224,
@@ -465,7 +488,7 @@ const protocol = {
 		confirmationMetadata: namespaced('crop_is_confirmed'),
 		infer: [
 			{
-				model: 'https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx',
+				model: MODELS.detectors.arthropoda,
 				name: 'YOLO11',
 				input: {
 					height: 640,

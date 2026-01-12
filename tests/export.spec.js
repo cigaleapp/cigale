@@ -5,6 +5,7 @@ import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import {
 	chooseFirstSession,
+	entries,
 	expectZipFiles,
 	firstObservationCard,
 	importPhotos,
@@ -60,10 +61,23 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 
 	/**
 	 *
-	 * @param {string} include
+	 * @param {object} opts
+	 * @param {string} [opts.include]
+	 * @param {{px: number}|{'%': number}} [opts.cropPadding]
 	 */
-	async function changeExportInclude(include) {
-		await page.getByRole('radio', { name: include }).click();
+	async function changeExportSettings({ include, cropPadding }) {
+		if (include) {
+			await page.getByRole('radio', { name: include }).click();
+		}
+
+		if (cropPadding) {
+			// @ts-ignore
+			const [[unit, value]] = entries(cropPadding);
+
+			const input = page.getByRole('radio', { name: unit }).getByRole('textbox');
+			await input.fill(value.toString());
+			await input.blur();
+		}
 
 		await page.waitForTimeout(200);
 
@@ -72,9 +86,9 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 		});
 	}
 
-	await changeExportInclude('Métadonnées seulement');
-	await expect(downloadButton).toHaveText('results.zip ~16ko');
-	await expect(preview).toMatchAriaSnapshot(`
+	await changeExportSettings({ include: 'Métadonnées seulement' });
+	await expect.soft(downloadButton).toHaveText('results.zip ~16ko');
+	await expect.soft(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
@@ -89,9 +103,9 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	        - text: analysis.json
 	`);
 
-	await changeExportInclude('Métadonnées et images recadrées');
-	await expect(downloadButton).toHaveText('results.zip ~4,2Mo');
-	await expect(preview).toMatchAriaSnapshot(`
+	await changeExportSettings({ include: 'Métadonnées et images recadrées' });
+	await expect.soft(downloadButton).toHaveText('results.zip ~4,2Mo');
+	await expect.soft(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
@@ -122,9 +136,9 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	          - text: (Unknown)_obs4_4.jpeg
 	`);
 
-	await changeExportInclude('Métadonnées, images recadrées et images originales');
-	await expect(downloadButton).toHaveText('results.zip ~9,8Mo');
-	await expect(preview).toMatchAriaSnapshot(`
+	await changeExportSettings({ include: 'Métadonnées, images recadrées et images originales' });
+	await expect.soft(downloadButton).toHaveText('results.zip ~9,8Mo');
+	await expect.soft(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
@@ -170,4 +184,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	          - img
 	          - text: (Unknown)_obs4_4.jpeg
 	`);
+
+	await changeExportSettings({ cropPadding: { px: 200 } });
+	await expect.soft(downloadButton).toHaveText('results.zip ~12Mo');
 });

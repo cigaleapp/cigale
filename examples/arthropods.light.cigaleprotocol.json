@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/d2fcf4ca253fd7bb9a75107ce9bd031f856b3815/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 47,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/36e448fae61025463201c7ed2fd350dfb70409c1/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 49,
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -2609,8 +2609,8 @@
 				"neural": [
 					{
 						"name": "Collemboles (~80 classes)",
-						"model": "https://raw.githubusercontent.com/cigaleapp/models/main/model_classif.onnx",
-						"classmapping": "https://raw.githubusercontent.com/cigaleapp/models/main/lightweight-80-classmapping.txt",
+						"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-collembola.onnx?download=true",
+						"classmapping": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/classifier-collembola-classmapping.txt?download=true",
 						"input": {
 							"height": 224,
 							"width": 224,
@@ -2627,7 +2627,7 @@
 		"confirmationMetadata": "io.github.cigaleapp.arthropods.example.light__crop_is_confirmed",
 		"infer": [
 			{
-				"model": "https://raw.githubusercontent.com/cigaleapp/models/main/arthropod_detector_yolo11n_conf0.437.onnx",
+				"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/detector-arthropoda.onnx?download=true",
 				"name": "YOLO11",
 				"input": {
 					"height": 640,

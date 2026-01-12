@@ -111,8 +111,15 @@
 		}
 	}
 
-	label.card input {
-		display: none;
+	label.card {
+		position: relative;
+
+		input {
+			/* Using display: none; removes radio buttons from the accessibility tree */
+			position: absolute;
+			inset: 0;
+			opacity: 0;
+		}
 	}
 
 	input[type='radio'] {

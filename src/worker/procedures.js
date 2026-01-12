@@ -124,7 +124,8 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	estimateResultsZipSize: {
 		input: type({
 			sessionId: 'string',
-			include: type.enumerated('croppedonly', 'full', 'metadataonly')
+			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
+			cropPadding: /^\d+(px|%)$/
 		}),
 		progress: type('undefined'),
 		success: type({
