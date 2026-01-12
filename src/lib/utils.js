@@ -24,6 +24,32 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template {string} KIn
+ * @template {string} KOut
+ * @template {any} V
+ * @param {Record<KIn, V>} subject
+ * @param {(key: KIn, value: V) => KOut} mapper
+ * @returns {Record<KOut, V>}
+ */
+export function mapKeys(subject, mapper) {
+	// @ts-expect-error
+	return Object.fromEntries(
+		Object.entries(subject).map(([key, value]) => [
+			mapper(/** @type {KIn} */ (key), value),
+			value
+		])
+	);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('mapKeys', () => {
+		expect(mapKeys({ a: 1, b: 2 }, (k) => k.toUpperCase())).toEqual({ A: 1, B: 2 });
+		expect(mapKeys({ a: 1, b: 2 }, (k) => k + k)).toEqual({ aa: 1, bb: 2 });
+	});
+}
+
+/**
  * Maps values of an object, and filters out entries with nullable values from the result
  * @template {string} K
  * @template {any} VIn

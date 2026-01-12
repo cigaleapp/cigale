@@ -5,7 +5,7 @@
 <script generics="Key extends string">
 	/**
 	 * @typedef {object} Props
-	 * @property {Key[]} options
+	 * @property {Key[] | readonly Key[]} options
 	 * @property {string} aria-label aria-label for the group
 	 * @property {Partial<{[K in Key]: string}>} [labels] labels for the options
 	 * @property {NoInfer<Key> | undefined} [value] which option is selected
