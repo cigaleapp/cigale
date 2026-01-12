@@ -190,7 +190,7 @@
 				{/if}
 			</div>
 
-			{#if uiState.currentSession}
+			{#if uiState.currentSession && page.route.id !== '/(app)/sessions' && page.route.id !== '/(app)/protocols'}
 				<div class="steps" in:fade={{ duration: 100 }}>
 					<a
 						class="session-link"
@@ -268,7 +268,7 @@
 							data-testid="goto-classify"
 						>
 							Classifier
-							{#if path == '/classify/'}
+							{#if path.startsWith('/classify')}
 								<div class="line"></div>
 							{/if}
 						</a>

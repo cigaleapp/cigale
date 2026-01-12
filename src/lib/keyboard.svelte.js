@@ -8,7 +8,8 @@ const GROUPS = {
 	observations: 'Observations',
 	navigation: 'Navigation',
 	cropping: 'Recadrage',
-	debugmode: 'Debug mode'
+	debugmode: 'Debug mode',
+	classification: 'Classification'
 };
 
 /**

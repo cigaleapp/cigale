@@ -1,30 +1,6 @@
-<script>
-	import Icon from '@iconify/svelte';
-	import VirtualList from '@sveltejs/svelte-virtual-list';
-	import { Combobox, mergeProps } from 'bits-ui';
-	import { marked } from 'marked';
-
-	import IconArrowRight from '~icons/ri/arrow-right-line';
-	import IconCheck from '~icons/ri/check-line';
-
-	import Badge from './Badge.svelte';
-	import Carousel from './Carousel.svelte';
-	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import * as idb from './idb.svelte.js';
-	import { tables } from './idb.svelte.js';
-	import Logo from './Logo.svelte';
-	import OverflowableText from './OverflowableText.svelte';
-	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
-	import { scrollfader } from './scrollfader.js';
-	import { isDebugMode } from './settings.svelte';
-	import { uiState } from './state.svelte';
-	import { compareBy, pick, readableOn } from './utils.js';
-
-	/**
-	 * @import {WithoutChildrenOrChild} from 'bits-ui';
-	 */
-
+<script module>
 	/** @typedef { { value: string; label: string; synonyms: string[], icon?: string, color?: string } } Item */
+
 	/**
 	 * @typedef {object} Props
 	 * @property {import('./database.js').MetadataEnumVariant[]} options
@@ -32,6 +8,33 @@
 	 * @property {WithoutChildrenOrChild<Combobox.ContentProps>} [contentProps]
 	 * @property {string} [id]
 	 * @property {Record<string, number>} [confidences]
+	 * @property {(action: 'focus' | 'blur' | 'toggle') => void} [focuser]
+	 */
+</script>
+
+<script>
+	import Icon from '@iconify/svelte';
+	import VirtualList from '@sveltejs/svelte-virtual-list';
+	import { Combobox, mergeProps } from 'bits-ui';
+	import { marked } from 'marked';
+
+	import IconCheck from '~icons/ri/check-line';
+
+	import Badge from './Badge.svelte';
+	import { cascadeLabels } from './cascades.js';
+	import ConfidencePercentage from './ConfidencePercentage.svelte';
+	import * as idb from './idb.svelte.js';
+	import LearnMoreLink from './LearnMoreLink.svelte';
+	import Logo from './Logo.svelte';
+	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
+	import { scrollfader } from './scrollfader.js';
+	import { isDebugMode } from './settings.svelte';
+	import { uiState } from './state.svelte';
+	import { compareBy, pick, readableOn } from './utils.js';
+
+	/**
+	 * @import {WithoutChildrenOrChild} from 'bits-ui';
+	 * @import {CascadeLabelsCache} from './cascades.js';
 	 */
 
 	/**
@@ -42,6 +45,7 @@
 		confidences = {},
 		value = $bindable(),
 		open = $bindable(false),
+		focuser = $bindable(),
 		inputProps,
 		contentProps,
 		...restProps
@@ -115,91 +119,17 @@
 	/** @type {undefined | import('./database').MetadataEnumVariant} */
 	let highlightedOption = $state();
 
-	/**
-	 * @type {Record<string, Record<string, { value: string; metadata: string; depth: number, color?: string, icon?: string }>>}
-	 */
-	let cascadeLabelsCache = $state({});
-	$effect(() => {
-		// Halve cache when its size reaches 4000
-		if (Object.keys(cascadeLabelsCache).length > 4000) {
-			console.debug('Halving cascadeLabels cache');
-			cascadeLabelsCache = Object.fromEntries(Object.entries(cascadeLabelsCache).slice(2000));
-		}
+	const highlightedOptionImage = $derived.by(() => {
+		if (!highlightedOption) return undefined;
+		if (highlightedOption.image) return highlightedOption.image;
+		if (highlightedOption.images?.at(0)) return highlightedOption.images[0];
+		return undefined;
 	});
 
-	async function cascadeLabels() {
-		const protocolId = uiState.currentProtocol?.id;
-		if (!protocolId) return {};
-		if (!highlightedOption) return {};
-
-		if (highlightedOption.key in cascadeLabelsCache) {
-			return cascadeLabelsCache[highlightedOption.key];
-		}
-
-		/**
-		 * Subfunction to recursively collect cascades.
-		 * Base case: at some point all options will have no cascades
-		 * @param {string} protocolId
-		 * @param {Record<string, string>} cascade - The cascade we're collecting from
-		 * @param {Set<string>} seen id of metadata already seen, to avoid cycles
-		 * @param {number} [depth=0] - Current depth in the cascade
-		 */
-		async function collect(protocolId, cascade, seen, depth = 0) {
-			/**
-			 * @type {typeof cascadeLabelsCache[string]} labels
-			 */
-			const labels = {};
-			for (const [metadataId, value] of Object.entries(cascade ?? {})) {
-				if (seen.has(metadataId)) continue; // Avoid cycles
-				seen.add(metadataId); // Mark this metadataId as seen
-				const metadata = await tables.Metadata.get(
-					namespacedMetadataId(protocolId, metadataId)
-				);
-				if (!metadata) continue;
-
-				// If the cascaded metadata value is from an enum, use label instead of the key,
-				// and see if there are nested cascades further down
-				if (metadata.type === 'enum') {
-					const option = await idb.get(
-						'MetadataOption',
-						metadataOptionId(namespacedMetadataId(protocolId, metadata.id), value)
-					);
-					if (!option) continue;
-					labels[metadata.id] = {
-						value: option.label,
-						metadata: metadata.label,
-						depth,
-						...pick(option, 'color', 'icon')
-					};
-
-					if (Object.keys(option.cascade ?? {}).length > 0) {
-						await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then(
-							(nested) => {
-								Object.assign(labels, nested);
-							}
-						);
-					}
-				} else {
-					// For other types, just show the value directly
-					labels[metadata.id] = {
-						value: value,
-						metadata: metadata.label,
-						depth
-					};
-				}
-			}
-
-			return labels;
-		}
-
-		cascadeLabelsCache[highlightedOption.key] = await collect(
-			protocolId,
-			highlightedOption.cascade ?? {},
-			new Set()
-		);
-
-		return cascadeLabelsCache[highlightedOption.key];
-	}
+	/**
+	 * @type {CascadeLabelsCache}
+	 */
+	let cascadeLabelsCache = $state({});
 </script>
 
 <Combobox.Root {value} bind:open {...mergedRootProps} {items}>
@@ -208,7 +138,31 @@
 	</div> -->
 	<Combobox.Input {...mergedInputProps}>
 		{#snippet child({ props: { value, ...props } })}
-			<input {...props} value={open ? value : value || label} />
+			<input
+				{...props}
+				value={open ? value : label || value}
+				{@attach (e) => {
+					focuser = (action) => {
+						switch (action) {
+							case 'focus':
+								e.focus();
+								break;
+							case 'blur':
+								e.blur();
+								open = false;
+								break;
+							case 'toggle':
+								if (document.activeElement === e) {
+									e.blur();
+									open = false;
+								} else {
+									e.focus();
+								}
+								break;
+						}
+					};
+				}}
+			/>
 		{/snippet}
 	</Combobox.Input>
 	<!-- <Combobox.Trigger>Open</Combobox.Trigger> -->
@@ -272,15 +226,8 @@
 					{/if}
 				</div>
 				<div class="docs" {@attach scrollfader}>
-					{#if highlightedOption?.image || (highlightedOption?.images?.length ?? 0) > 0}
-						{@const images = highlightedOption?.image
-							? [highlightedOption?.image]
-							: (highlightedOption?.images ?? [])}
-						<Carousel items={images}>
-							{#snippet item(src)}
-								<img {src} class="thumb" alt="" />
-							{/snippet}
-						</Carousel>
+					{#if highlightedOptionImage}
+						<img src={highlightedOptionImage} alt="" />
 					{:else if highlightedOption?.description || highlightedOption?.learnMore}
 						<h2>{highlightedOption.label}</h2>
 					{/if}
@@ -297,48 +244,12 @@
 						</section>
 					{/if}
 					{#if highlightedOption?.learnMore}
-						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-						<a href={highlightedOption.learnMore} target="_blank" class="learn-more">
-							<IconArrowRight />
-							<div class="text">
-								<span>En savoir plus</span>
-								<code class="domain"
-									>{new URL(highlightedOption.learnMore).hostname}</code
-								>
-							</div>
-						</a>
+						<LearnMoreLink href={highlightedOption.learnMore} />
 					{/if}
 
-					{#await cascadeLabels() then labels}
-						<table class="cascades">
-							<tbody>
-								<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
-								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, color, icon }] (metadataId)}
-									<tr>
-										<td>
-											<OverflowableText text={metadata} />
-										</td>
-										<td>
-											{#if icon || color}
-												<div
-													class="icon"
-													style:background-color={color}
-													style:color={color
-														? readableOn(color)
-														: undefined}
-												>
-													{#if icon}
-														<Icon {icon} />
-													{/if}
-												</div>
-											{/if}
-											{value}
-										</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
-						{#if Object.keys(labels).length > 0}
+					{#await cascadeLabels( { cache: cascadeLabelsCache, db: idb.databaseHandle(), protocolId: uiState.currentProtocolId, option: highlightedOption } ) then cascades}
+						<MetadataCascadesTable {cascades} />
+						{#if Object.keys(cascades).length > 0}
 							<p><em>Métadonées mises à jour à la sélection de cette option</em></p>
 						{/if}
 					{:catch error}
@@ -346,6 +257,7 @@
 							Erreur lors de la récupération des étiquettes en cascade: {error}
 						</p>
 					{/await}
+
 					{#if !highlightedOption?.description && !highlightedOption?.learnMore && !highlightedOption?.image}
 						<section class="empty">
 							<Logo variant="empty" />
@@ -459,8 +371,7 @@
 		gap: 0.5em;
 	}
 
-	.items .icon,
-	.cascades .icon {
+	.items .icon {
 		font-size: 1.4em;
 		display: flex;
 		align-items: center;
@@ -492,46 +403,5 @@
 
 	.docs .description p:not(:last-child) {
 		margin-bottom: 0.5em;
-	}
-
-	.docs table.cascades {
-		border-collapse: collapse;
-		table-layout: fixed;
-		width: 100%;
-	}
-
-	.docs .cascades td {
-		border: 1px solid color-mix(in srgb, var(--fg-neutral) 40%, transparent);
-		border-left: none;
-		border-right: none;
-	}
-
-	.docs .cascades td:first-child {
-		overflow: hidden;
-		padding-right: 1rem;
-		width: 7rem;
-	}
-
-	.docs .cascades .icon {
-		/* Sorry 😭 we're in a table cell, 
-		display: flex fucks everything up */
-		float: left;
-		margin-right: 0.25em;
-	}
-
-	.learn-more {
-		display: flex;
-		align-items: center;
-		color: var(--fg-primary);
-		text-decoration: none;
-		gap: 1em;
-	}
-	.learn-more .text {
-		display: flex;
-		flex-direction: column;
-	}
-	.learn-more .text .domain {
-		font-size: 0.8em;
-		color: var(--gay);
 	}
 </style>
