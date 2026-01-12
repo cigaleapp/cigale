@@ -9,10 +9,12 @@
 
 	import Badge from './Badge.svelte';
 	import Carousel from './Carousel.svelte';
+	import { cascadeLabels } from './cascades.js';
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
 	import * as idb from './idb.svelte.js';
 	import { tables } from './idb.svelte.js';
 	import Logo from './Logo.svelte';
+	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import OverflowableText from './OverflowableText.svelte';
 	import { metadataOptionId, namespacedMetadataId } from './schemas/metadata.js';
 	import { scrollfader } from './scrollfader.js';
@@ -22,6 +24,7 @@
 
 	/**
 	 * @import {WithoutChildrenOrChild} from 'bits-ui';
+	 * @import {CascadeLabelsCache} from './cascades.js';
 	 */
 
 	/** @typedef { { value: string; label: string; synonyms: string[], icon?: string, color?: string } } Item */
@@ -116,90 +119,9 @@
 	let highlightedOption = $state();
 
 	/**
-	 * @type {Record<string, Record<string, { value: string; metadata: string; depth: number, color?: string, icon?: string }>>}
+	 * @type {CascadeLabelsCache}
 	 */
 	let cascadeLabelsCache = $state({});
-	$effect(() => {
-		// Halve cache when its size reaches 4000
-		if (Object.keys(cascadeLabelsCache).length > 4000) {
-			console.debug('Halving cascadeLabels cache');
-			cascadeLabelsCache = Object.fromEntries(Object.entries(cascadeLabelsCache).slice(2000));
-		}
-	});
-
-	async function cascadeLabels() {
-		const protocolId = uiState.currentProtocol?.id;
-		if (!protocolId) return {};
-		if (!highlightedOption) return {};
-
-		if (highlightedOption.key in cascadeLabelsCache) {
-			return cascadeLabelsCache[highlightedOption.key];
-		}
-
-		/**
-		 * Subfunction to recursively collect cascades.
-		 * Base case: at some point all options will have no cascades
-		 * @param {string} protocolId
-		 * @param {Record<string, string>} cascade - The cascade we're collecting from
-		 * @param {Set<string>} seen id of metadata already seen, to avoid cycles
-		 * @param {number} [depth=0] - Current depth in the cascade
-		 */
-		async function collect(protocolId, cascade, seen, depth = 0) {
-			/**
-			 * @type {typeof cascadeLabelsCache[string]} labels
-			 */
-			const labels = {};
-			for (const [metadataId, value] of Object.entries(cascade ?? {})) {
-				if (seen.has(metadataId)) continue; // Avoid cycles
-				seen.add(metadataId); // Mark this metadataId as seen
-				const metadata = await tables.Metadata.get(
-					namespacedMetadataId(protocolId, metadataId)
-				);
-				if (!metadata) continue;
-
-				// If the cascaded metadata value is from an enum, use label instead of the key,
-				// and see if there are nested cascades further down
-				if (metadata.type === 'enum') {
-					const option = await idb.get(
-						'MetadataOption',
-						metadataOptionId(namespacedMetadataId(protocolId, metadata.id), value)
-					);
-					if (!option) continue;
-					labels[metadata.id] = {
-						value: option.label,
-						metadata: metadata.label,
-						depth,
-						...pick(option, 'color', 'icon')
-					};
-
-					if (Object.keys(option.cascade ?? {}).length > 0) {
-						await collect(protocolId, option.cascade ?? {}, seen, depth + 1).then(
-							(nested) => {
-								Object.assign(labels, nested);
-							}
-						);
-					}
-				} else {
-					// For other types, just show the value directly
-					labels[metadata.id] = {
-						value: value,
-						metadata: metadata.label,
-						depth
-					};
-				}
-			}
-
-			return labels;
-		}
-
-		cascadeLabelsCache[highlightedOption.key] = await collect(
-			protocolId,
-			highlightedOption.cascade ?? {},
-			new Set()
-		);
-
-		return cascadeLabelsCache[highlightedOption.key];
-	}
 </script>
 
 <Combobox.Root {value} bind:open {...mergedRootProps} {items}>
@@ -309,36 +231,9 @@
 						</a>
 					{/if}
 
-					{#await cascadeLabels() then labels}
-						<table class="cascades">
-							<tbody>
-								<!-- Cascade's recursion tree is displayed reversed because deeply recursive cascades are mainly meant for taxonomic stuff -- it's the childmost metadata that set their parent, so, in the resulting recursion tree, the parentmost metadata end up childmost (eg. species have cascades that sets genus, genus sets family, etc. so family is deeper in the recursion tree than genus, whereas in a taxonomic tree it's the opposite) -->
-								{#each Object.entries(labels).toReversed() as [metadataId, { value, metadata, color, icon }] (metadataId)}
-									<tr>
-										<td>
-											<OverflowableText text={metadata} />
-										</td>
-										<td>
-											{#if icon || color}
-												<div
-													class="icon"
-													style:background-color={color}
-													style:color={color
-														? readableOn(color)
-														: undefined}
-												>
-													{#if icon}
-														<Icon {icon} />
-													{/if}
-												</div>
-											{/if}
-											{value}
-										</td>
-									</tr>
-								{/each}
-							</tbody>
-						</table>
-						{#if Object.keys(labels).length > 0}
+					{#await cascadeLabels( { cache: cascadeLabelsCache, db: idb.databaseHandle(), protocolId: uiState.currentProtocolId, option: highlightedOption } ) then cascades}
+						<MetadataCascadesTable {cascades} />
+						{#if Object.keys(cascades).length > 0}
 							<p><em>Métadonées mises à jour à la sélection de cette option</em></p>
 						{/if}
 					{:catch error}
@@ -346,6 +241,7 @@
 							Erreur lors de la récupération des étiquettes en cascade: {error}
 						</p>
 					{/await}
+
 					{#if !highlightedOption?.description && !highlightedOption?.learnMore && !highlightedOption?.image}
 						<section class="empty">
 							<Logo variant="empty" />
@@ -492,31 +388,6 @@
 
 	.docs .description p:not(:last-child) {
 		margin-bottom: 0.5em;
-	}
-
-	.docs table.cascades {
-		border-collapse: collapse;
-		table-layout: fixed;
-		width: 100%;
-	}
-
-	.docs .cascades td {
-		border: 1px solid color-mix(in srgb, var(--fg-neutral) 40%, transparent);
-		border-left: none;
-		border-right: none;
-	}
-
-	.docs .cascades td:first-child {
-		overflow: hidden;
-		padding-right: 1rem;
-		width: 7rem;
-	}
-
-	.docs .cascades .icon {
-		/* Sorry 😭 we're in a table cell, 
-		display: flex fucks everything up */
-		float: left;
-		margin-right: 0.25em;
 	}
 
 	.learn-more {

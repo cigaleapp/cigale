@@ -193,6 +193,11 @@
 						onstacksizeclick={() => {
 							unrolledObservation = unrolledObservation === id ? '' : id;
 						}}
+						ondoubleclick={() => {
+							const imageIds = observation.images;
+							if (imageIds.length !== 1) return;
+							goto('/(app)/(sidepanel)/classify/[image]', { image: imageIds[0] });
+						}}
 						onretry={() => {
 							uiState.erroredImages.delete(id);
 							const imageIds = tables.Observation.getFromState(id)?.images;
@@ -211,7 +216,13 @@
 						}}
 					/>
 				{:else if image}
-					<CardImage {image} boxes="apply-first" />
+					<CardImage
+						{image}
+						boxes="apply-first"
+						ondoubleclick={() => {
+							goto('/(app)/(sidepanel)/classify/[image]', { image: image.id });
+						}}
+					/>
 				{/if}
 			{/snippet}
 		</AreaObservations>
