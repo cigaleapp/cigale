@@ -7,14 +7,29 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add ETA as tooltip on navbar logo when processing is ongoing (Closes #51) (#1027)
+- Fix vertical line in zip contents preview tree not extending when scrolling
+- Implement average merge method for enum metadata
+- Rajouter validation pour les forms de creation d'issue (Closes #1049)
+- Show uncompressed zip size estimate
+- Take crop padding into account when estimating .zip sizes (#1052)
+- Turn results modal into a full page, complete with zip files preview and size estimations
+- Use skeleton UI instead of spinners where relevant (Closes #1047)
+
+### Bug Fixes
+
+- Fix sessionId index name for file tables
+- Prevent zip preview from being empty if we went from import tab to results tab directly
 
 ### Data Updates
 
+- Add missing images for builtin protocol
+- Commit new images when regenerating protocols
 - Regenerate example protocols
 
 ### Translation Updates
 
 - Refresh translation files
+- Translate via Weblate (English)
 
 ## December 2025
 
