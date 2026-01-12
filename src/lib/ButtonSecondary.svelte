@@ -22,7 +22,7 @@ Available CSS variables:
 	 * @property {undefined | ((e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
 	 * @property {boolean} [disabled=false]
 	 * @property {boolean} [tight=false] limit the height of the button
-	 * @property {string} [help]
+	 * @property {Parameters<typeof tooltip>[1]} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 * @property {string|undefined} [testid] add a data-testid attribute to the button
 	 * @property {boolean} [aria-pressed]
@@ -81,7 +81,7 @@ Available CSS variables:
 			if (loading) isLoading = false;
 		}
 	}}
-	use:tooltip={help ? { text: help, keyboard } : undefined}
+	use:tooltip={typeof help === 'string' && keyboard ? { text: help, keyboard } : help}
 	data-testid={testid || undefined}
 >
 	{#if isLoading}

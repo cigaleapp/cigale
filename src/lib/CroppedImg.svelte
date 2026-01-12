@@ -9,10 +9,11 @@
 	 * @property {string} [class] - Additional classes to apply to the div wrapper.
 	 * @property {import('./BoundingBoxes.svelte').Rect} box - The bounding box to crop the image to, in relative (0-1), top-left coordinates.
 	 * @property {boolean} [blurfill] fill empty space with a blurred version of the image.
+	 * @property {boolean} [background] show the full image as the background (darkened)
 	 */
 
 	/** @type {Props & Record<string, unknown>} */
-	const { src, box, blurfill, class: klass = '', ...rest } = $props();
+	const { src, box, blurfill, background, class: klass = '', ...rest } = $props();
 	const corners = $derived(toCorners(box));
 
 	const aspectRatio = $derived(box.width / box.height);
@@ -49,6 +50,20 @@
 	{#if blurfill}
 		<img data-is-blur="true" class="blur" {src} alt="" aria-hidden="true" />
 	{/if}
+
+	{#if background}
+		<img
+			style:transform-origin={percents(corners.topleft)}
+			style:translate={percents(translate)}
+			style:scale="{scale * 100}%"
+			{src}
+			alt=""
+			aria-hidden="true"
+			data-is-background="true"
+			class="background"
+		/>
+	{/if}
+
 	<img
 		style:transform-origin={percents(corners.topleft)}
 		style:translate={percents(translate)}
@@ -70,6 +85,7 @@
 	picture {
 		overflow: hidden;
 		position: relative;
+		display: block;
 	}
 
 	img {
@@ -83,6 +99,12 @@
 		inset: 0;
 		filter: blur(20px);
 		scale: 1.5;
+	}
+
+	img.background {
+		position: absolute;
+		inset: 0;
+		filter: brightness(0.25);
 	}
 
 	/**

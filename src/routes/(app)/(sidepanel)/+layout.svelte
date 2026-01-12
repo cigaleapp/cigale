@@ -161,6 +161,7 @@
 				const box = uiState.cropMetadataValueOf(image)?.value;
 				return {
 					src,
+					id: image.id,
 					box: box ? toTopLeftCoords(box) : undefined
 				};
 			})

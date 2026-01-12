@@ -16,6 +16,7 @@
 		isValidImageId
 	} from '$lib/images';
 	import { loadModel } from '$lib/inference.js';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
 	import { mergeMetadataFromImagesAndObservations } from '$lib/metadata/merging.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
@@ -154,6 +155,29 @@
 		if (!uiState.setSelection) return;
 		void ensureNoLoneImages();
 	});
+
+	defineKeyboardShortcuts('classification', {
+		'$mod+Enter': {
+			help: "Classifier l'image sélectionnée en plein écran",
+			when: () => uiState.selection.length === 1,
+			async do() {
+				let id = uiState.selection.at(0);
+				if (!id) return;
+
+				const isImage = tables.Image.state.find((img) => img.id === id);
+
+				if (!isImage) {
+					id = tables.Observation.state.find(
+						(obs) => obs.id === id && obs.images.length === 1
+					)?.images?.[0];
+				}
+
+				if (!id) return;
+
+				await goto('/(app)/(sidepanel)/classify/[image]', { image: id });
+			}
+		}
+	});
 </script>
 
 {#snippet modelsource()}
@@ -189,6 +213,11 @@
 						onstacksizeclick={() => {
 							unrolledObservation = unrolledObservation === id ? '' : id;
 						}}
+						ondoubleclick={() => {
+							const imageIds = observation.images;
+							if (imageIds.length !== 1) return;
+							goto('/(app)/(sidepanel)/classify/[image]', { image: imageIds[0] });
+						}}
 						onretry={() => {
 							uiState.erroredImages.delete(id);
 							const imageIds = tables.Observation.getFromState(id)?.images;
@@ -207,7 +236,13 @@
 						}}
 					/>
 				{:else if image}
-					<CardImage {image} boxes="apply-first" />
+					<CardImage
+						{image}
+						boxes="apply-first"
+						ondoubleclick={() => {
+							goto('/(app)/(sidepanel)/classify/[image]', { image: image.id });
+						}}
+					/>
 				{/if}
 			{/snippet}
 		</AreaObservations>

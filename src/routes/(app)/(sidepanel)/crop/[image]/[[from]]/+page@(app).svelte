@@ -11,6 +11,7 @@
 	import IconUndo from '~icons/ri/arrow-go-back-fill';
 	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
 	import IconRedo from '~icons/ri/arrow-go-forward-fill';
+	import IconBack from '~icons/ri/arrow-left-line';
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedCrop from '~icons/ri/check-double-line';
@@ -45,12 +46,13 @@
 	import {
 		deleteImageFile,
 		imageFileIds,
+		imageId,
 		imageIdToFileId,
 		imagesOfImageFile,
 		imageId as makeImageId,
 		parseImageId
-	} from '$lib/images';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	} from '$lib/images.js';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import {
@@ -81,6 +83,10 @@
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
+	const openedFromImage = $derived(
+		page.params.from ? imageId(fileId, Number(page.params.from)) : undefined
+	);
+
 	const images = $derived(
 		imagesOfImageFile(
 			fileId,
@@ -618,9 +624,13 @@
 		return [w, h];
 	}
 
-	function goToGallery() {
+	function exit() {
 		uiState.imagePreviouslyOpenedInCropper = fileId;
-		goto('/crop');
+		if (openedFromImage) {
+			goto('/(app)/(sidepanel)/classify/[image]', { image: openedFromImage });
+		} else {
+			goto('/crop');
+		}
 	}
 
 	$effect(() => {
@@ -666,7 +676,7 @@
 		},
 		Escape: {
 			help: 'Quitter le mode recadrage',
-			do: goToGallery
+			do: exit
 		},
 		a: {
 			help: 'Activer/désactiver la continuation automatique',
@@ -955,11 +965,23 @@
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">
-				<ButtonInk inline onclick={goToGallery}>
-					<IconGallery />
-					Autres photos
-					<KeyboardHint shortcut="Escape" />
-				</ButtonInk>
+				{#if openedFromImage}
+					<ButtonInk
+						inline
+						onclick={exit}
+						help="Retourner à la classification de l'image"
+					>
+						<IconBack />
+						Retour
+						<KeyboardHint shortcut="Escape" />
+					</ButtonInk>
+				{:else}
+					<ButtonInk inline onclick={exit}>
+						<IconGallery />
+						Autres photos
+						<KeyboardHint shortcut="Escape" />
+					</ButtonInk>
+				{/if}
 				<ButtonInk
 					dangerous
 					onclick={deleteImageFileAndGotoNext}
