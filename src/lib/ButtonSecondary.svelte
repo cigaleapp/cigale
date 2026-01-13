@@ -134,17 +134,14 @@ Available CSS variables:
 
 	button:disabled {
 		cursor: not-allowed;
-		background-color: var(
-			--bg-disabled,
-			color-mix(in srgb, var(--bg, var(--bg-neutral)) 50%, transparent)
-		);
+		background-color: var(--bg-disabled, var(--bg-neutral));
 		color: var(
 			--fg-disabled,
 			color-mix(in srgb, var(--fg, var(--fg-neutral)) 50%, transparent)
 		);
 		border-color: var(
 			--fg-disabled,
-			color-mix(in srgb, var(--fg, var(--fg-neutral)) 50%, transparent)
+			color-mix(in srgb, var(--fg, var(--fg-neutral)) 50%, var(--bg-neutral))
 		);
 	}
 
