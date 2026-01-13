@@ -7,7 +7,7 @@ import { ColorHex, HTTPRequest, ID, ModelInput, Probability, URLString } from '.
 
 /**
  * @param {string} metadataId
- * @param {import('$lib/metadata').RuntimeValue} key
+ * @param {import('$lib/metadata').RuntimeValue<"enum">} key
  */
 export function metadataOptionId(metadataId, key) {
 	return `${metadataId}:${key}`;
