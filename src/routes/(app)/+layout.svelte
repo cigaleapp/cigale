@@ -15,7 +15,7 @@
 	 * @param {NavbarAppearance} appearance
 	 */
 	export function navbarAppearance(appearance) {
-		onMount(() => {
+		$effect(() => {
 			_navbarAppearance = appearance;
 			return () => {
 				_navbarAppearance = 'full';
