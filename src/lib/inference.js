@@ -159,16 +159,23 @@ export async function loadModel(
  * @returns {string}
  */
 function inferenceModelId(protocolId, request) {
-	if (typeof request === 'string') return request;
+	/** @type {Array<string|undefined>} */
+	let components = [protocolId];
 
-	return [
-		protocolId,
-		request.method,
-		request.url,
-		Object.entries(request.headers)
-			.sort(([a], [b]) => a.localeCompare(b))
-			.map(([k, v]) => `${k}:${v}`)
-	].join('|');
+	if (typeof request === 'string') {
+		components = [...components, 'GET', request];
+	} else {
+		components = [
+			...components,
+			request.method,
+			request.url,
+			...Object.entries(request.headers ?? {})
+				.sort(([a], [b]) => a.localeCompare(b))
+				.map(([k, v]) => `${k}:${v}`)
+		];
+	}
+
+	return components.filter(Boolean).join('|');
 }
 
 if (import.meta.vitest) {
