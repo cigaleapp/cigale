@@ -16,6 +16,7 @@
 		imageIsClassified,
 		isValidImageId
 	} from '$lib/images';
+	import { loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { goto } from '$lib/paths.js';
@@ -25,7 +26,7 @@
 	import { getSettings, isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { nonnull, sum } from '$lib/utils.js';
+	import { nonnull } from '$lib/utils.js';
 
 	seo({ title: 'Classification' });
 
@@ -89,18 +90,16 @@
 			return;
 		}
 
-		await data.swarpc.loadModel
-			.broadcast(
-				{
-					protocolId: uiState.currentProtocol.id,
-					request: settings.model,
-					classmapping: settings.classmapping,
-					task: 'classification'
-				},
-				(progresses) => {
-					modelLoadingProgress = sum(progresses.values()) / data.parallelism;
-				}
-			)
+		await loadModel(data.swarpc, 'classification', {
+			protocolId: uiState.currentProtocol.id,
+			requests: {
+				model: settings.model,
+				classmapping: settings.classmapping
+			},
+			onProgress(p) {
+				modelLoadingProgress = p;
+			}
+		})
 			.then(() => {
 				classifmodelLoaded = true;
 			})

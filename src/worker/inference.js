@@ -3,6 +3,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import * as ort from 'onnxruntime-web';
+
 import { Schemas } from '$lib/database.js';
 import { loadToTensor } from '$lib/inference_utils.js';
 import { classify, infer, loadModel } from '$lib/inference.js';
@@ -28,61 +30,25 @@ import { openDatabase, swarp } from './index.js';
  */
 let inferenceSessions = new Map();
 
-swarp.loadModel(async ({ task, request, classmapping, protocolId, webgpu }, onProgress) => {
-	const splitProgress = progressSplitter('model', 0.9, 'classmapping');
+swarp.loadModel(async ({ task, model, classmapping, inferenceSessionId: id, webgpu }) => {
+	const onnx = await ort.InferenceSession.create(model, {
+		executionProviders: webgpu ? ['webgpu'] : []
+	});
 
-	/**
-	 * @param {string} protocolId
-	 * @param {import('$lib/database.js').HTTPRequest} request
-	 * @returns {string}
-	 */
-	function inferenceModelId(protocolId, request) {
-		if (typeof request === 'string') return request;
+	if (!onnx) throw new Error('Impossible de charger le modèle ONNX');
 
-		return [
-			protocolId,
-			request.method,
-			request.url,
-			Object.entries(request.headers)
-				.sort(([a], [b]) => a.localeCompare(b))
-				.map(([k, v]) => `${k}:${v}`)
-		].join('|');
-	}
-
-	const id = inferenceModelId(protocolId, request);
-	const existingSession = inferenceSessions.get(task);
-	if (existingSession && existingSession.id === id) {
-		console.debug(`Model ${task} already loaded with ID ${id}`);
-		return true; // Model is already loaded
-	}
-
-	console.debug(`Loading model for task ${task} with ID ${id}`);
 	/** @type {InferenceSession} */
-	const session = {
-		id,
-		onnx: await loadModel(request, webgpu, ({ transferred, total }) => {
-			onProgress(splitProgress('model', transferred / total));
-		})
-	};
+	const session = { id, onnx };
 
 	if (classmapping) {
-		session.classmapping = await fetchHttpRequest(classmapping, {
-			cacheAs: 'model',
-			onProgress({ transferred, total }) {
-				onProgress(splitProgress('classmapping', transferred / total));
-			}
-		})
-			.then((res) => res.text())
-			.then((text) => text.split(/\r?\n/).filter(Boolean));
+		session.classmapping = classmapping.split(/\r?\n/).filter(Boolean);
 	}
-
-	console.debug(`Model ${task} loaded successfully with ID ${id}`);
 
 	inferenceSessions.set(task, session);
 	return true;
 });
 
-swarp.isModelLoaded(async (task) => inferenceSessions.has(task));
+swarp.inferenceSessionId(async (task) => inferenceSessions.get(task)?.id ?? null);
 
 swarp.inferBoundingBoxes(async ({ fileId, taskSettings }, _, tools) => {
 	const session = inferenceSessions.get('detection')?.onnx;
