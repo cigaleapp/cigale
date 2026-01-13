@@ -2138,6 +2138,10 @@ msgstr "Bearer token"
 msgid "X-Custom-Header"
 msgstr "X-Custom-Header"
 
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Ouverture…"
+msgstr "Ouverture…"
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"

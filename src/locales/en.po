@@ -2136,6 +2136,10 @@ msgstr ""
 msgid "X-Custom-Header"
 msgstr ""
 
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Ouverture…"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
