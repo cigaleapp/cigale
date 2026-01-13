@@ -307,8 +307,13 @@ async function augmentMetadataOption(
 	const content: HTMLElement = page.content.window.document.body;
 	if (!content) throw new Error(`Could not find main content in page at ${page.link.toString()}`);
 
+	// We aren't using yoast's og_image because it often is either poor resolution or not the same as the main content's main image
 	const imageUrl =
-		page.yoast_head_json.og_image.at(0)?.url?.toString() ?? content.querySelector('img')?.src;
+		parseURLSafe(content.querySelector('img')?.getAttribute('src')) ??
+		page.yoast_head_json.og_image.at(0)?.url;
+
+	// Since this is wordpress, the image might have a `?resize` query param, remove it
+	imageUrl?.searchParams.delete('resize');
 
 	const hasImageWithFilename = (filename: string) =>
 		[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
@@ -386,7 +391,7 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.yoast_head_json.canonical.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		images: imageUrl ? [imageUrl] : [],
+		images: imageUrl ? [imageUrl.toString()] : [],
 		cascade
 	};
 }
@@ -568,4 +573,14 @@ async function fetchAndParseHtml(url: URL | string): Promise<JSDOM['window']['do
 	}
 
 	return new JSDOM(html, { virtualConsole }).window.document;
+}
+
+function parseURLSafe(str: string | undefined | null): URL | undefined {
+	if (!str) return undefined;
+
+	try {
+		return new URL(str);
+	} catch {
+		return undefined;
+	}
 }
