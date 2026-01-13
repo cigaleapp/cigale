@@ -1,7 +1,7 @@
 import tippy from 'sveltejs-tippy';
 import xss from 'xss';
 
-import { displayPattern } from './KeyboardHint.svelte';
+import { APPLE_GLYPHS, displayPattern } from './KeyboardHint.svelte';
 import { omit } from './utils.js';
 
 /**
@@ -46,7 +46,7 @@ function props(parameters) {
 							.entries()
 							.map(([i, part]) =>
 								i % 2 === 0
-									? `<kbd>${part}</kbd>`
+									? `<kbd class=${APPLE_GLYPHS.includes(part) ? 'apple-glyph' : '""'}>${part}</kbd>`
 									: `<span class=separator>${part}</span>`
 							)
 							.toArray()
