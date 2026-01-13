@@ -7,7 +7,7 @@ import { omit } from './utils.js';
 /**
  * @typedef {object} TooltipParameters
  * @property {string} text - The text to display in the tooltip.
- * @property {string} [keyboard] - The keyboard shortcut to display in the tooltip.
+ * @property {string|undefined} [keyboard] - The keyboard shortcut to display in the tooltip.
  * @property {number} [delay] - The delay before showing the tooltip.
  * @property {`${'top'|'right'|'bottom'|'left'}${''|`-${'start'|'end'}`}`} [placement] - The placement of the tooltip .
  */
