@@ -954,3 +954,11 @@ export function entries(subject) {
 	// @ts-expect-error
 	return Object.entries(subject);
 }
+
+/**
+ * @param {string} message
+ * @returns {never}
+ */
+export function throwError(message) {
+	throw new Error(message);
+}
