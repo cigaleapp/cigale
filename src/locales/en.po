@@ -2113,6 +2113,29 @@ msgstr ""
 msgid "<0/> une fois dézippé"
 msgstr "<0/> once unzipped"
 
+#. placeholder {0}: node
+#. placeholder {1}: reason
+#. placeholder {0}: node
+#. placeholder {1}: reason ?? 'failed to load model'
+#: src/lib/inference.js
+#: src/lib/inference.js
+msgid "Node {0}: {1}"
+msgstr ""
+
+#. placeholder {0}: node
+#: src/lib/inference.js
+msgid "Node {0}: failed to load model"
+msgstr ""
+
+#: src/lib/inference.js
+#: src/lib/inference.js
+msgid "Bearer token"
+msgstr ""
+
+#: src/lib/inference.js
+msgid "X-Custom-Header"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
