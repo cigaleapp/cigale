@@ -23,6 +23,10 @@
 {@render children?.()}
 
 <style>
+	:global(*) {
+		scrollbar-width: thin;
+	}
+
 	:global(body) {
 		display: flex;
 		flex-direction: column;
