@@ -1,7 +1,11 @@
 import * as ort from 'onnxruntime-web';
 
 import { loadToTensor, output2BB, preprocessTensor } from './inference_utils.js';
-import { fetchHttpRequest } from './utils.js';
+import { fetchHttpRequest, progressSplitter } from './utils.js';
+
+/**
+ * @import { PROCEDURES } from '$worker/procedures.js';
+ */
 
 /**
  * @typedef {[number, number, number, number]} BB [x,y,w,h]
@@ -63,29 +67,108 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
 
 /**
  *
- * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} request
- * @param {boolean} webgpu
- * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [onProgress] called everytime the progress changes
- * @returns {Promise<import('onnxruntime-web').InferenceSession > }
+ * @param {import('swarpc').SwarpcClient<typeof PROCEDURES>} swarpc
+ * @param { 'classification' | 'detection' } task
+ * @param {object} params
+ * @param {string} params.protocolId
+ * @param {object} params.requests
+ * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} params.requests.model
+ * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} params.requests.classmapping
+ * @param {boolean} [params.webgpu]
+ * @param {(p: number) => void} [params.onProgress] called everytime the progress changes
+ * @returns {Promise<string> } ID of the inference session
  */
-export async function loadModel(request, webgpu = false, onProgress) {
-	// load un modèle ONNX, soit de classification, soit de détection.
+export async function loadModel(
+	swarpc,
+	task,
+	{ protocolId, requests, webgpu = false, onProgress }
+) {
+	// TODO: tidy up .broadcast() result handling once https://github.com/gwennlbh/swarpc/issues/121 is resolved
 
 	onProgress ??= () => {};
+	const splitProgress = progressSplitter('model', 0.8, 'classmapping', 0.1, 'loading');
 
-	const model = await fetchHttpRequest(request, {
+	const id = inferenceModelId(protocolId, requests.model);
+
+	const existingSession = await swarpc.inferenceSessionId.broadcast(task);
+
+	if (!existingSession.every((s) => s.status === 'fulfilled')) {
+		const reasons = existingSession
+			.filter((s) => s.status === 'rejected')
+			.map(({ reason, node }) => `Node ${node}: ${reason}`);
+
+		throw new Error(
+			`Failed to get existing inference session for task ${task}: ${reasons.join('\n')}`
+		);
+	}
+
+	if (existingSession.every((s) => s.value === id)) {
+		console.debug(`Model ${task} already loaded with ID ${id} on all nodes`);
+		return id;
+	}
+
+	const model = await fetchHttpRequest(requests.model, {
 		cacheAs: 'model',
-		onProgress
+		onProgress({ transferred, total }) {
+			onProgress(splitProgress('model', transferred / total));
+		}
 	})
 		.then((response) => response.arrayBuffer())
 		.then((buffer) => new Uint8Array(buffer));
 
-	const session = ort.InferenceSession.create(model, {
-		executionProviders: webgpu ? ['webgpu'] : []
+	/** @type {string | undefined} */
+	let classmapping = undefined;
+	if (requests.classmapping) {
+		classmapping = await fetchHttpRequest(requests.classmapping, {
+			cacheAs: 'model',
+			onProgress({ transferred, total }) {
+				onProgress(splitProgress('classmapping', transferred / total));
+			}
+		}).then((res) => res.text());
+	}
+
+	const load = await swarpc.loadModel.broadcast({
+		task,
+		model,
+		classmapping,
+		webgpu,
+		inferenceSessionId: id
 	});
 
-	if (!session) throw new Error('Impossible de charger le modèle ONNX');
-	return session;
+	if (!load.every((s) => s.status === 'fulfilled' && s.value === true)) {
+		const reasons = [
+			...load
+				.filter((s) => s.status === 'rejected')
+				.map(({ reason, node }) => `Node ${node}: ${reason ?? 'failed to load model'}`),
+			...load
+				.filter((s) => s.status === 'fulfilled' && s.value !== true)
+				.map(({ node }) => `Node ${node}: failed to load model`)
+		];
+
+		throw new Error(`Failed to load model for task ${task}: ${reasons.join('\n')}`);
+	}
+
+	onProgress(splitProgress('loading', 1));
+
+	return id;
+}
+
+/**
+ * @param {string} protocolId
+ * @param {import('$lib/database.js').HTTPRequest} request
+ * @returns {string}
+ */
+function inferenceModelId(protocolId, request) {
+	if (typeof request === 'string') return request;
+
+	return [
+		protocolId,
+		request.method,
+		request.url,
+		Object.entries(request.headers)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([k, v]) => `${k}:${v}`)
+	].join('|');
 }
 
 /**

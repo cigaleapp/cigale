@@ -18,19 +18,19 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 	},
 	loadModel: {
 		input: type({
-			protocolId: 'string',
-			request: Schemas.HTTPRequest,
-			'classmapping?': Schemas.HTTPRequest,
+			model: 'TypedArray.Uint8',
+			'classmapping?': 'string | undefined',
 			task: '"classification" | "detection"',
-			'webgpu?': 'boolean'
+			'webgpu?': 'boolean',
+			inferenceSessionId: 'string > 1'
 		}),
-		progress: type('0 <= number <= 1'),
+		progress: type('undefined'),
 		success: type('true')
 	},
-	isModelLoaded: {
+	inferenceSessionId: {
 		input: type('"classification" | "detection"'),
-		progress: type({}),
-		success: type('boolean')
+		progress: type('undefined'),
+		success: type('string | null')
 	},
 	inferBoundingBoxes: {
 		input: type({

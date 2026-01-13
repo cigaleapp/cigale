@@ -51,7 +51,7 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 	async function respond() {
 		let url = new URL(event.request.url);
 
-		if (url.searchParams.get('x-cigale-cache-as') === 'models') {
+		if (url.searchParams.get('x-cigale-cache-as') === 'model') {
 			return tryCache(event.request, MODELS_CACHE);
 		}
 
@@ -70,7 +70,7 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 				throw new Error('invalid response from fetch');
 			}
 
-			if (response.status === 200) {
+			if (response.ok) {
 				const cache = await caches.open(CACHE);
 				cache.put(event.request, response.clone());
 			}
@@ -100,7 +100,7 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
  */
 async function tryCache(request, cacheName) {
 	const cache = await caches.open(cacheName);
-	const match = await cache.match(request.url.href);
+	const match = await cache.match(request.url);
 
 	if (match) {
 		console.debug(`Serving ${request.url} from ${cacheName} cache`);
@@ -116,7 +116,7 @@ async function tryCache(request, cacheName) {
 		throw new Error('invalid response from fetch');
 	}
 
-	if (response.status === 200) {
+	if (response.ok) {
 		const cache = await caches.open(cacheName);
 		cache.put(request, response.clone());
 	}
