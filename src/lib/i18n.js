@@ -12,7 +12,7 @@
  */
 export function plural(num, candidates, rule = (n) => (n === 1 ? 0 : 1)) {
 	const index = rule(num);
-	return candidates[index].replace('#', Intl.NumberFormat().format(num));
+	return candidates[index]?.replace('#', Intl.NumberFormat().format(num));
 }
 
 /**
