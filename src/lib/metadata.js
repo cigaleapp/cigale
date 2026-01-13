@@ -140,16 +140,27 @@ export async function storeMetadataValue({
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
 	}
 
+	if (confidence > 1) {
+		console.warn(`Confidence ${confidence} is greater than 1, capping to 1`);
+		confidence = 1;
+	}
+
 	abortSignal?.throwIfAborted();
 	const newValue = {
 		value: serializeMetadataValue(value),
 		confidence,
 		manuallyModified,
 		alternatives: Object.fromEntries(
-			alternatives.map((alternative) => [
-				serializeMetadataValue(alternative.value),
-				alternative.confidence
-			])
+			alternatives.map(({ value, confidence }) => {
+				if (confidence > 1) {
+					console.warn(
+						`Confidence ${confidence} of alternative ${value} is greater than 1, capping to 1`
+					);
+					confidence = 1;
+				}
+
+				return [serializeMetadataValue(value), confidence];
+			})
 		)
 	};
 
