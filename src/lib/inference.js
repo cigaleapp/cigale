@@ -171,6 +171,30 @@ function inferenceModelId(protocolId, request) {
 	].join('|');
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('inferenceModelId', () => {
+		const id1 = inferenceModelId('protocol1', 'http://example.com/model.onnx');
+		const id2 = inferenceModelId('protocol1', {
+			url: 'http://example.com/model.onnx',
+			method: 'GET',
+			headers: { Authorization: 'Bearer token' }
+		});
+		const id3 = inferenceModelId('protocol1', {
+			url: 'http://example.com/model.onnx',
+			method: 'GET',
+			headers: { 'X-Custom-Header': 'value', Authorization: 'Bearer token' }
+		});
+
+		expect(id1).toBe('protocol1|GET|http://example.com/model.onnx');
+		expect(id2).toBe('protocol1|GET|http://example.com/model.onnx|Authorization:Bearer token');
+		expect(id3).toBe(
+			'protocol1|GET|http://example.com/model.onnx|Authorization:Bearer token|X-Custom-Header:value'
+		);
+	});
+}
+
 /**
  * @param {import('$lib/database').HTTPRequest} model
  * @returns {string}
