@@ -62,6 +62,7 @@
 			if (part === 'delete') return winmac('Suppr', '⌦');
 			if (part === 'space') return '␣';
 			if (part === 'escape') return 'Esc';
+			if (part === 'enter') return '⏎';
 
 			// Single-letter parts most likely represent letter keys,
 			// so uppercase them cuz its prettier
