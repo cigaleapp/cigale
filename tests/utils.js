@@ -345,14 +345,15 @@ async function goHome(page) {
  *
  * @param {import('$lib/i18n').Language} lang
  */
-const appNavTabs = (lang = 'fr') => ({
-	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
-	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
-	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' },
-	results: { name: lang === 'fr' ? 'Résultats' : 'Results', hash: '#/results' },
-	sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
-	protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' }
-});
+export const appNavTabs = (lang = 'fr') =>
+	/** @type {const} */ ({
+		import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
+		crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
+		classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' },
+		results: { name: lang === 'fr' ? 'Résultats' : 'Results', hash: '#/results' },
+		sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
+		protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' }
+	});
 
 /**
  * @typedef {keyof ReturnType<typeof appNavTabs>} NavigationTab
@@ -569,7 +570,7 @@ export const browserConsole = {
  * @param {Page} page
  * @param {import('@playwright/test').Locator} locator
  */
-async function tooltipOf(page, locator) {
+export async function tooltipOf(page, locator) {
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, { timeout: 1_000 });
 	const tippyId = await locator.getAttribute('aria-describedby');
 	return page.locator(`#${tippyId}`);

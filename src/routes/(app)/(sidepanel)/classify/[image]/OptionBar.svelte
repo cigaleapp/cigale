@@ -128,6 +128,7 @@
 <div class="bar" data-layout={layout}>
 	<div class="prev" style:grid-area="prev">
 		<ButtonSecondary
+			aria-label="Option précédente"
 			disabled={!prevOption}
 			onclick={async () => setOption(prevOption!, confidences)}
 			help={{
@@ -149,7 +150,7 @@
 		</ButtonSecondary>
 	</div>
 
-	<div class="current" style:grid-area="current">
+	<div class="current" style:grid-area="current" data-testid="current">
 		<ButtonSecondary
 			onclick={() => focusOptionCombobox('focus')}
 			help={{
@@ -175,6 +176,7 @@
 
 	<div class="next" style:grid-area="next">
 		<ButtonSecondary
+			aria-label="Option suivante"
 			disabled={!nextOption}
 			onclick={async () => setOption(nextOption!, confidences)}
 			help={{
