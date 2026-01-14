@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2026-01-07 18:24+0000\n"
+"PO-Revision-Date: 2026-01-14 16:27+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -2058,7 +2058,7 @@ msgstr ""
 
 #: src/routes/(app)/sessions/+page.svelte
 msgid "Ouverture…"
-msgstr ""
+msgstr "Opening…"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Mises à jour automatiques"
@@ -2116,22 +2116,22 @@ msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
-msgstr ""
+msgstr "Images import finished"
 
 #: src/lib/queue.svelte.js
 msgid "Détection terminée"
-msgstr ""
+msgstr "Detection finished"
 
 #: src/lib/queue.svelte.js
 msgid "Classification terminée"
-msgstr ""
+msgstr "Classification finished"
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Import de {0}"
-msgstr ""
+msgstr "Import of {0}"
 
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
-msgstr ""
+msgstr "Imported from {0}"
