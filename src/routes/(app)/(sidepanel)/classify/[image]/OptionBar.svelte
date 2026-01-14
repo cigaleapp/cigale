@@ -135,11 +135,15 @@
 				keyboard: 'J'
 			}}
 		>
-			<div class="prev-button-contents">
-				{#if prevOption}
-					<ConfidencePercentage value={confidences[prevOption.key]} />
+			<div class="button-contents prev">
+				<ConfidencePercentage
+					compact
+					tooltip={() => ''}
+					value={prevOption ? confidences[prevOption.key] : undefined}
+				/>
+				{#if layout === 'left-right'}
+					Précédente
 				{/if}
-				Précédente
 				<IconPrevious />
 			</div>
 		</ButtonSecondary>
@@ -164,9 +168,7 @@
 					await setOption({ key: newKey }, confidences);
 				}}
 			/>
-			{#if current?.confidence}
-				<ConfidencePercentage value={current.confidence} />
-			{/if}
+			<ConfidencePercentage compact value={current?.confidence} />
 			<IconExpand />
 		</ButtonSecondary>
 	</div>
@@ -180,11 +182,17 @@
 				keyboard: 'L'
 			}}
 		>
-			<IconNext />
-			Suivante
-			{#if nextOption}
-				<ConfidencePercentage value={confidences[nextOption.key]} />
-			{/if}
+			<div class="button-contents">
+				<IconNext />
+				{#if layout === 'left-right'}
+					Suivante
+				{/if}
+				<ConfidencePercentage
+					compact
+					tooltip={() => ''}
+					value={nextOption ? confidences[nextOption.key] : undefined}
+				/>
+			</div>
 		</ButtonSecondary>
 	</div>
 </div>
@@ -198,22 +206,27 @@
 
 		&[data-layout='left-right'] {
 			grid-template-areas: 'prev current next';
+			grid-template-columns: 1fr auto 1fr;
 		}
 
 		&[data-layout='top-bottom'] {
 			justify-content: start;
 			grid-template-areas: 'current prev next';
+			grid-template-columns: auto 1fr 1fr;
 
-			.prev-button-contents {
+			.button-contents.prev {
 				flex-direction: row-reverse;
 			}
 		}
 	}
 
-	.prev-button-contents {
+	.button-contents {
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+		width: 100%;
+		/* XXX: To match up height with the combobox "button" */
+		padding: 0.13em 0;
 	}
 
 	.current :global(input) {
