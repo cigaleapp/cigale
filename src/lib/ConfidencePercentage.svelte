@@ -8,15 +8,13 @@
 	 * @property {number|undefined} value if undefined, the element shows a fallback "--%" text
 	 * @property {(percent: `${number}%`) => string} [tooltip] - text to show when hovering the percentage
 	 * @property {import('svelte').Snippet} [children] optional content to put before the percentage, useful to make it under the tooltip activation area
-	 * @property {boolean} [compact] if true, the percentage is guaranteed to never change width (by omitting "0" in "0.n%" representations)
 	 */
 
 	/** @type {Props} */
 	const {
 		value,
 		children,
-		tooltip: help = (percentage) => `Confiance: ${percentage}`,
-		compact
+		tooltip: help = (percentage) => `Confiance: ${percentage}`
 	} = $props();
 
 	const color = $derived(
@@ -30,13 +28,13 @@
 	<span class="confidence" use:tooltip={help(percent(value, 4))}>
 		{@render children?.()}
 		<code class="figure" style:color>
-			{percent(value, decimals, { pad: 'nbsp', trimZero: compact })}
+			{percent(value, decimals, { pad: 'nbsp', length: 4 })}
 		</code>
 	</span>
 {:else}
 	<span class="confidence empty">
 		{@render children?.()}
-		<code class="figure">--%</code>
+		<code class="figure">&nbsp;--%</code>
 	</span>
 {/if}
 

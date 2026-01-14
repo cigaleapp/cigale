@@ -21,21 +21,17 @@ export function plural(num, candidates, rule = (n) => (n === 1 ? 0 : 1)) {
  * @param {number} [decimals=0] Number of decimal places to include in the output
  * @param {object} [options] Additional options
  * @param {'none'|'nbsp'|'zeros'} [options.pad=none] Whether to pad the percentage with leading non-breaking spaces
- * @param {boolean} [options.trimZero=false] Whether to trim leading zero before the decimal point (e.g. ".5%" instead of "0.5%")
+ * @param {number} [options.length] Total length of the resulting string (including % sign); if not specified, this is calculated based on decimals and the eventual padding. only relevant when pad is not 'none'.
  * @returns {`${number}%`} Percentage string
  */
-export function percent(value, decimals = 0, { pad = 'none', trimZero = false } = {}) {
+export function percent(value, decimals = 0, { pad = 'none', length } = {}) {
 	let result = (value * 100).toFixed(decimals);
 
 	// Remove trailing zeros and decimal point if not needed
 	if (decimals > 0) result = result.replace(/\.?0+$/, '');
 
 	if (pad !== 'none') {
-		result = result.padStart(2 + decimals, pad === 'nbsp' ? '\u00A0' : '0');
-	}
-
-	if (trimZero && result.startsWith('0.')) {
-		result = result.slice(1);
+		result = result.padStart(length ?? 2 + decimals, pad === 'nbsp' ? '\u00A0' : '0');
 	}
 
 	// @ts-expect-error
@@ -55,10 +51,6 @@ if (import.meta.vitest) {
 		expect.soft(percent(0.05, 1, { pad: 'zeros' })).toBe('005%'); // 5.0 -> 5 -> 005
 		expect.soft(percent(0.05, 0, { pad: 'nbsp' })).toBe('\u00A05%');
 		expect.soft(percent(0.005, 2, { pad: 'nbsp' })).toBe('\u00A00.5%');
-		expect.soft(percent(0.005, 1, { trimZero: true })).toBe('.5%');
-		expect.soft(percent(0.0005, 2, { trimZero: true })).toBe('.05%');
-		expect.soft(percent(0, 2, { trimZero: true })).toBe('0%');
-		expect.soft(percent(0.0096, 0, { pad: 'nbsp', trimZero: true })).toBe('\u00A01%');
 	});
 }
 
