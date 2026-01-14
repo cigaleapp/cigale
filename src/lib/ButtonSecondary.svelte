@@ -29,6 +29,7 @@ Available CSS variables:
 	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.
 	 * @property {boolean} [danger=false] use a red color scheme for dangerous actions
 	 * @property {boolean} [submits=false] if true, the button acts as a submit button in a form context
+	 * @property {string} [aria-label] accessible label for the button
 	 */
 </script>
 
@@ -49,7 +50,7 @@ Available CSS variables:
 		testid,
 		loading = false,
 		tight = false,
-		'aria-pressed': ariaPressed
+		...aria
 	} = $props();
 
 	let isLoading = $state(false);
@@ -60,7 +61,7 @@ Available CSS variables:
 	disabled={disabled || isLoading}
 	class:tight
 	class:danger
-	aria-pressed={ariaPressed}
+	{...aria}
 	onclick={async (e) => {
 		if (!onclick) return;
 

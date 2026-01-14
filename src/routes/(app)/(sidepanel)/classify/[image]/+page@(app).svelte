@@ -4,6 +4,7 @@
 
 <script lang="ts">
 	import { marked } from 'marked';
+	import type { Attachment } from 'svelte/attachments';
 	import { fade } from 'svelte/transition';
 
 	import { cascadeLabels, type CascadeLabelsCache } from '$lib/cascades';
@@ -43,29 +44,37 @@
 	let expand = $state<Expandable>('none');
 
 	undo.initialize(100);
+
+	function area(areaName: string): Attachment {
+		return (node) => {
+			if (!(node instanceof HTMLElement)) return;
+			node.style.gridArea = areaName;
+			node.dataset.testid = areaName;
+		};
+	}
 </script>
 
 <main data-layout={layout} data-expand={expand}>
-	<div class="references" style:grid-area="references" in:fade={{ duration: 200 }}>
+	<div class="references" {@attach area('references')} in:fade={{ duration: 200 }}>
 		{#if option}
 			<References {option} {layout} bind:expand />
 		{/if}
 	</div>
-	<div class="subject" style:grid-area="subject" in:fade={{ duration: 200 }}>
+	<div class="subject" {@attach area('subject')} in:fade={{ duration: 200 }}>
 		{#if image}
 			<Subject {image} {layout} bind:expand />
 		{/if}
 	</div>
-	<div class="panel" style:grid-area="panel">
-		<div class="header" style:grid-area="header">
+	<div class="panel" {@attach area('panel')}>
+		<div class="header" {@attach area('header')}>
 			<Header {image} {imageNo} />
 		</div>
 
-		<div class="layout-switcher" style:grid-area="layout-switcher">
+		<div class="layout-switcher" {@attach area('layout-switcher')}>
 			<LayoutSwitcher bind:layout />
 		</div>
 
-		<div class="focused-option" style:grid-area="focused-option" in:fade={{ duration: 200 }}>
+		<div class="focused-option" {@attach area('focused-option')} in:fade={{ duration: 200 }}>
 			{#if image && focusedMetadata}
 				<OptionBar {layout} {options} {image} {focusedMetadata} {currentMetadataValue} />
 			{/if}
@@ -74,7 +83,7 @@
 		{#if option}
 			<div
 				class="cascades"
-				style:grid-area="cascades"
+				{@attach area('cascades')}
 				{@attach scrollfader}
 				in:fade={{ duration: 200 }}
 			>
@@ -89,7 +98,7 @@
 
 			<div
 				class="synonyms"
-				style:grid-area="synonyms"
+				{@attach area('synonyms')}
 				{@attach scrollfader}
 				in:fade={{ duration: 200 }}
 			>
@@ -108,7 +117,7 @@
 
 			<div
 				class="description"
-				style:grid-area="description"
+				{@attach area('description')}
 				{@attach scrollfader}
 				in:fade={{ duration: 200 }}
 			>
@@ -131,7 +140,7 @@
 			</div>
 		{/if}
 
-		<div class="nav" style:grid-area="nav">
+		<div class="nav" {@attach area('nav')}>
 			<Navigation {...navigation} />
 		</div>
 	</div>

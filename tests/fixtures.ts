@@ -1,5 +1,6 @@
 import { mkdir, rm } from 'node:fs/promises';
 import { test as base, type Locator } from '@playwright/test';
+import type { IDBPDatabase } from 'idb';
 
 import type { Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
@@ -11,6 +12,7 @@ import { safeJSONParse } from '$lib/utils';
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import {
+	appNavTabs,
 	confirmDeletionModal,
 	expectTooltipContent,
 	getDatabaseRowByField,
@@ -28,6 +30,7 @@ import {
 	setSettings,
 	sidepanelMetadataSectionFor,
 	toast,
+	tooltipOf,
 	waitForLoadingEnd,
 	waitForRoute,
 	type NavigationTab,
@@ -51,6 +54,7 @@ export type AppFixture = {
 			byId(id: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
 			byName(name: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
 		};
+		with(cb: (db: IDBPDatabase<IDBDatabaseType>) => Promise<void>): Promise<void>;
 		observation: {
 			byLabel(label: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
 			byId(id: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
@@ -112,6 +116,7 @@ export type AppFixture = {
 	tabs: {
 		go(tab: NavigationTab): Promise<void>;
 		get(tab: NavigationTab): Locator;
+		hash(tab: NavigationTab): `#${string}`;
 	};
 	path: {
 		wait(route: Parameters<typeof waitForRoute>[1]): Promise<void>;
@@ -119,6 +124,7 @@ export type AppFixture = {
 	};
 	tooltips: {
 		expectContent(element: Locator, content: string | RegExp): Promise<void>;
+		trigger(element: Locator): Promise<Locator>;
 	};
 	loading: {
 		wait(timeout?: number): Promise<void>;
@@ -296,7 +302,8 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			},
 			tabs: {
 				go: async (tab) => goToTab(page, tab),
-				get: (tab) => getTab(page, tab)
+				get: (tab) => getTab(page, tab),
+				hash: (tab) => appNavTabs()[tab].hash
 			},
 			path: {
 				wait: async (route) => waitForRoute(page, route),
@@ -306,8 +313,13 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 				}
 			},
 			tooltips: {
-				expectContent: async (element, content) =>
-					expectTooltipContent(page, element, content)
+				async expectContent(element, content) {
+					return expectTooltipContent(page, element, content);
+				},
+				async trigger(element) {
+					await element.hover({ force: true });
+					return tooltipOf(page, element);
+				}
 			},
 			loading: {
 				wait: async (timeout) => waitForLoadingEnd(page, timeout),
