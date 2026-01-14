@@ -138,7 +138,6 @@
 		>
 			<div class="button-contents prev">
 				<ConfidencePercentage
-					compact
 					tooltip={() => ''}
 					value={prevOption ? confidences[prevOption.key] : undefined}
 				/>
@@ -169,7 +168,7 @@
 					await setOption({ key: newKey }, confidences);
 				}}
 			/>
-			<ConfidencePercentage compact value={current?.confidence} />
+			<ConfidencePercentage value={current?.confidence} />
 			<IconExpand />
 		</ButtonSecondary>
 	</div>
@@ -190,7 +189,6 @@
 					Suivante
 				{/if}
 				<ConfidencePercentage
-					compact
 					tooltip={() => ''}
 					value={nextOption ? confidences[nextOption.key] : undefined}
 				/>
