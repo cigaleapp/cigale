@@ -8,9 +8,11 @@ import * as jsdom from 'jsdom';
 import { JSDOM } from 'jsdom';
 import Turndown from 'turndown';
 
-import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import _protocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+
+const protocol = _protocol as typeof ExportedProtocol.infer;
 
 const env = arkenv({
 	WORDPRESS_USERNAME: 'string > 0',
@@ -94,11 +96,7 @@ if (import.meta.main) {
 async function main() {
 	const metadataKey = type('"genus" | "species"').assert(process.argv[2]);
 
-	const augmented = await augmentMetadata(
-		protocol,
-		metadataKey,
-		metadataKey === 'species' ? searchForSpecies : searchForGenus
-	);
+	const augmented = await augmentMetadata(protocol, metadataKey);
 
 	await Bun.write(protocolPath, JSON.stringify(augmented, null, 2));
 
@@ -111,8 +109,7 @@ async function main() {
 
 async function augmentMetadata(
 	protocol: typeof ExportedProtocol.infer,
-	metadataKey: 'genus' | 'species',
-	search: (lookups: Record<string, string[]>) => Promise<Map<string, URL>>
+	metadataKey: 'genus' | 'species'
 ): Promise<typeof ExportedProtocol.infer> {
 	const augmented = structuredClone(protocol);
 	const metadataOptions = augmented.metadata[`${protocol.id}__${metadataKey}`].options!;
@@ -122,9 +119,7 @@ async function augmentMetadata(
 	console.info(
 		cyan(`⁄ Starting to process ${metadataKey}, ${metadataOptions.length} entries to check`)
 	);
-	const pageUrls = await search(
-		Object.fromEntries(metadataOptions.map((s) => [s.key, [s.label, ...(s.synonyms ?? [])]]))
-	);
+	const pageUrls = await searchFor(metadataKey);
 	console.info(cyan(`⁄ Found ${pageUrls.size} pages for ${metadataKey} to process`));
 
 	const retry = new Map<string, URL>();
@@ -245,15 +240,14 @@ async function augmentMetadata(
 	return augmented;
 }
 
-async function searchForGenus(lookups: Record<string, string[]>) {
-	return searchForSpecies(
-		Object.fromEntries(
-			Object.entries(lookups).map(([key, names]) => [key, names.map((name) => `${name} sp`)])
-		)
+async function searchFor(metadataKey: string) {
+	const nameToGbifID = new Map<string, string>(
+		protocol.metadata[`${protocol.id}__${metadataKey}`].options!.flatMap((o) => [
+			[o.label, o.key] as const,
+			...(o.synonyms ?? []).map((syn) => [syn, o.key] as const)
+		])
 	);
-}
 
-async function searchForSpecies(lookups: Record<string, string[]>) {
 	speciesLinks ??= await fetchAndParseHtml(new URL(`/identification`, ORIGIN)).then(
 		(doc) =>
 			new Map(
@@ -291,17 +285,27 @@ async function searchForSpecies(lookups: Record<string, string[]>) {
 				)} Finding GBIF ID for ${title}`
 			);
 
-			const slug = lastPathSegment(link).toLowerCase();
+			if (nameToGbifID.has(title)) {
+				return [nameToGbifID.get(title)!, link] as const;
+			}
 
-			const titleMatcher = speciesNamesToBlogTitleMatcher(title);
+			if (title.includes('(') && title.includes(')')) {
+				const match = /(.+?) \((.+?)\)/.exec(title);
+				if (!match) return undefined;
 
-			for (const [key, names] of Object.entries(lookups)) {
-				if (names.some((name) => name.replaceAll(' ', '-').toLowerCase() === slug)) {
-					return [key, link] as const;
+				const [, vernacular, latin] = match;
+				if (nameToGbifID.has(latin)) {
+					return [nameToGbifID.get(latin)!, link] as const;
 				}
+				if (nameToGbifID.has(vernacular)) {
+					return [nameToGbifID.get(vernacular)!, link] as const;
+				}
+			}
 
-				if (titleMatcher(names)) {
-					return [key, link] as const;
+			if (title.match(/ sp\.?$/)) {
+				const latin = title.replace(/ sp\.?$/, '').trim();
+				if (nameToGbifID.has(latin)) {
+					return [nameToGbifID.get(latin)!, link] as const;
 				}
 			}
 		})
@@ -529,16 +533,6 @@ declare global {
 	interface RegExpConstructor {
 		escape(s: string): string;
 	}
-}
-
-function speciesNamesToBlogTitleMatcher(title: string): (names: string[]) => boolean {
-	let latinName = title;
-
-	const vernaculared = /^(.+ \((?<latin>\w+ \w+)\))|((?<latin>\w+ \w+) \(.+\))$/.exec(title);
-
-	if (vernaculared?.groups?.latin) latinName = vernaculared.groups.latin;
-
-	return (names) => names.includes(latinName);
 }
 
 // ANSI control sequences
