@@ -117,7 +117,7 @@ async function augmentMetadata(
 	const augmented = structuredClone(protocol);
 	const metadataOptions = augmented.metadata[`${protocol.id}__${metadataKey}`].options!;
 
-	const batchSize = 50;
+	const batchSize = 80;
 
 	console.info(
 		cyan(`⁄ Starting to process ${metadataKey}, ${metadataOptions.length} entries to check`)
