@@ -227,6 +227,14 @@
 		width: 100%;
 		/* XXX: To match up height with the combobox "button" */
 		padding: 0.13em 0;
+		justify-content: space-between;
+	}
+
+	.prev,
+	.next {
+		:global(button) {
+			width: 100%;
+		}
 	}
 
 	.current :global(input) {
