@@ -53,6 +53,9 @@ jobs:
 
       - name: Add species descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts species
+        env:
+          WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
+          WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
 
       - name: Set google-drive-key.json
         uses: mobiledevops/secret-to-file-action@v1
@@ -73,6 +76,9 @@ jobs:
 
       - name: Add genus descriptions from JJ
         run: bun run scripts/add-species-from-jessica-joachim.ts genus
+        env:
+          WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
+          WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
 
       - name: Clean old protocol
         run: rm examples/old-*.json

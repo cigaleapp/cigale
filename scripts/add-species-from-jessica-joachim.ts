@@ -1,5 +1,6 @@
 import { exists, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import arkenv from 'arkenv';
 import { ArkErrors, type } from 'arktype';
 import { Estimation as ETA } from 'arrival-time';
 import { formatDistanceToNowStrict, secondsToMilliseconds } from 'date-fns';
@@ -11,6 +12,12 @@ import protocol from '../examples/arthropods.cigaleprotocol.json' with { type: '
 import type { MetadataEnumVariant } from '../src/lib/schemas/metadata.js';
 import type { ExportedProtocol } from '../src/lib/schemas/protocols.js';
 
+const env = arkenv({
+	WORDPRESS_USERNAME: 'string > 0',
+	WORDPRESS_APP_PASSWORD: /(\w{4} ?){6}/,
+	LIMIT: ['number >= 0', '=', Infinity]
+});
+
 // Suppress annoying virtual console error we can't do anything about and don't care about
 const virtualConsole = new jsdom.VirtualConsole();
 virtualConsole.on('error', (e) => {
@@ -18,12 +25,14 @@ virtualConsole.on('error', (e) => {
 	console.error(e);
 });
 
-const RichContent = type({ rendered: 'string' }).pipe(
-	(content) =>
-		new JSDOM(content.rendered, {
-			virtualConsole
-		})
-);
+const RichContent = type({ rendered: 'string', raw: 'string' }).pipe((content) => ({
+	raw: new JSDOM(content.raw, {
+		virtualConsole
+	}),
+	rendered: new JSDOM(content.rendered, {
+		virtualConsole
+	})
+}));
 
 const OGImage = type({
 	url: 'string.url.parse',
@@ -71,9 +80,10 @@ const here = import.meta.dirname;
 const protocolPath = path.join(here, '../examples/arthropods.cigaleprotocol.json');
 const tdown = new Turndown();
 let speciesLinks: Map<string, URL> | undefined;
-// For some reason Turndown#turndown is typed as string instead of a method returning string
-const htmlToMarkdown = (html: string) =>
-	(tdown.turndown as unknown as (input: string) => string)(html);
+
+function htmlToMarkdown(html: string) {
+	return tdown.turndown(html).replaceAll('\n• ', '\n- ');
+}
 
 const ORIGIN = 'https://jessica-joachim.com';
 
@@ -102,8 +112,7 @@ async function main() {
 async function augmentMetadata(
 	protocol: typeof ExportedProtocol.infer,
 	metadataKey: 'genus' | 'species',
-	search: (lookups: Record<string, string[]>) => Promise<Map<string, URL>>,
-	limit = -1
+	search: (lookups: Record<string, string[]>) => Promise<Map<string, URL>>
 ): Promise<typeof ExportedProtocol.infer> {
 	const augmented = structuredClone(protocol);
 	const metadataOptions = augmented.metadata[`${protocol.id}__${metadataKey}`].options!;
@@ -126,7 +135,7 @@ async function augmentMetadata(
 	const eta = new ETA({ total });
 
 	for (const urlsChunk of chunkBySize(batchSize, [...pageUrls.entries()])) {
-		if (limit > 0 && done > limit) break;
+		// if (limit > 0 && done > limit) break;
 
 		const pages = await fetchPagesViaWordpressAPI(new Map(urlsChunk));
 
@@ -265,7 +274,7 @@ async function searchForSpecies(lookups: Record<string, string[]>) {
 		cyan(`⁄ Fetched ${speciesLinks!.size} species links from Jessica Joachim blog for matching`)
 	);
 
-	const total = speciesLinks!.size;
+	const total = Math.min(speciesLinks!.size, env.LIMIT);
 	const links = [...speciesLinks!.entries()];
 	const eta = new ETA({ total });
 	let done = 0;
@@ -273,6 +282,8 @@ async function searchForSpecies(lookups: Record<string, string[]>) {
 		links.map(async ([title, link]) => {
 			done++;
 			eta.update(done, total);
+
+			if (done >= env.LIMIT) return undefined;
 
 			console.info(
 				`${align(done, total)} ${percentage(done, total, 1)} ${cyan(
@@ -304,16 +315,25 @@ async function augmentMetadataOption(
 	{ key, cascade }: typeof MetadataEnumVariant.infer,
 	page: typeof WordpressPage.infer
 ): Promise<Partial<typeof MetadataEnumVariant.infer>> {
-	const content: HTMLElement = page.content.window.document.body;
+	const content: HTMLElement = page.content.rendered.window.document.body;
 	if (!content) throw new Error(`Could not find main content in page at ${page.link.toString()}`);
 
 	// We aren't using yoast's og_image because it often is either poor resolution or not the same as the main content's main image
-	const imageUrl =
-		parseURLSafe(content.querySelector('img')?.getAttribute('src')) ??
-		page.yoast_head_json.og_image.at(0)?.url;
+	let images: URL[] = [...page.content.raw.window.document.body.querySelectorAll('img')]
+		.map((img) => parseURLSafe(img.src))
+		.filter((src): src is URL => {
+			if (!src) return false;
+			if (isSpecialImage(src)) return false;
+			return true;
+		});
 
-	// Since this is wordpress, the image might have a `?resize` query param, remove it
-	imageUrl?.searchParams.delete('resize');
+	if (images.length === 0)
+		images = [page.yoast_head_json.og_image.at(0)?.url].filter(
+			(x): x is URL => x !== undefined
+		);
+
+	// The images might have a `?resize` query param, remove that
+	images.forEach((src) => src.searchParams.delete('resize'));
 
 	const hasImageWithFilename = (filename: string) =>
 		[...content.querySelectorAll(`img[src*="${filename}"]`)].some(
@@ -371,7 +391,6 @@ async function augmentMetadataOption(
 		}
 	});
 
-	// TODO improve this
 	content.querySelectorAll('img').forEach((img) => img.remove());
 
 	// Remove links that became empty
@@ -391,7 +410,7 @@ async function augmentMetadataOption(
 		key,
 		learnMore: page.yoast_head_json.canonical.toString(),
 		description: htmlToMarkdown(content.innerHTML).trim(),
-		images: imageUrl ? [imageUrl.toString()] : [],
+		images: images.map((u) => u.toString()),
 		cascade
 	};
 }
@@ -410,8 +429,14 @@ async function fetchPagesViaWordpressAPI(
 	);
 
 	query.append('per_page', lookups.size.toString());
+	query.append('context', 'edit');
 
-	const response = await fetch(`https://jessica-joachim.com/wp-json/wp/v2/pages?${query}`);
+	const response = await fetch(`https://jessica-joachim.com/wp-json/wp/v2/pages?${query}`, {
+		headers: {
+			Authorization:
+				'Basic ' + btoa(`${env.WORDPRESS_USERNAME}:${env.WORDPRESS_APP_PASSWORD}`)
+		}
+	});
 
 	// Handle rate limiting
 	if (response.status === 429 || response.status === 504) {
@@ -463,6 +488,18 @@ async function fetchPagesViaWordpressAPI(
 				);
 			return [key, page];
 		})
+	);
+}
+
+/**
+ * checks for image src that are things such as identification difficulty or conservation status icons
+ * @param src
+ */
+function isSpecialImage(src: URL): boolean {
+	const filename = src.pathname.split('/').pop() ?? '';
+	return (
+		/^Id-(facile|moyenne|difficile|tres-difficile)\.jpg$/.test(filename) ||
+		/^Statut-(LC|NT|VU|EN|CR|EX)\.jpg$/.test(filename)
 	);
 }
 
