@@ -1,20 +1,23 @@
 <script lang="ts">
+	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconCrop from '~icons/ri/crop-line';
 	import IconGallery from '~icons/ri/function-line';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import type { Image } from '$lib/database';
+	import type { Image, Metadata } from '$lib/database';
 	import { parseImageId } from '$lib/images';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto, resolve } from '$lib/paths.js';
+	import { tooltip } from '$lib/tooltips';
 
 	interface Props {
 		image: Image | undefined;
 		imageNo: number;
+		focusedMetadata: Metadata | undefined;
 	}
 
-	const { image, imageNo }: Props = $props();
+	const { image, imageNo, focusedMetadata }: Props = $props();
 
 	const cropUrlParams = $derived.by(() => {
 		if (!image) return;
@@ -71,6 +74,12 @@
 		<h1>
 			{#if image}
 				<OverflowableText text={`${image.filename} #${imageNo}`} />
+
+				{#if focusedMetadata && image.metadata[focusedMetadata.id]?.confirmed}
+					<div class="confirmed" use:tooltip={'Classification confirmée'}>
+						<IconConfirmed />
+					</div>
+				{/if}
 			{/if}
 		</h1>
 	</div>
@@ -91,5 +100,14 @@
 
 	h1 {
 		overflow: hidden;
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	.confirmed {
+		color: var(--fg-success);
+		display: inline-flex;
+		font-size: 0.8em;
 	}
 </style>

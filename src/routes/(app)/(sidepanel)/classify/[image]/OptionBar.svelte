@@ -1,6 +1,8 @@
 <script lang="ts">
+	import IconUnconfirmed from '~icons/ri/arrow-go-back-line';
 	import IconPrevious from '~icons/ri/arrow-left-line';
 	import IconNext from '~icons/ri/arrow-right-line';
+	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconExpand from '~icons/ri/expand-up-down-line';
 	import { invalidate } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
@@ -57,7 +59,7 @@
 	async function setOption(
 		option: { key: string },
 		confidences: Record<string, number>,
-		{ pushToUndoStack = true } = {}
+		{ confirmed = false, manuallyModified = false, pushToUndoStack = true } = {}
 	) {
 		if (!image) throw new Error('Image not found');
 		if (!focusedMetadata) throw new Error('No metadata focused');
@@ -73,6 +75,8 @@
 			type: 'enum',
 			value: option.key,
 			confidence: confidences[option.key] ?? 1,
+			manuallyModified,
+			confirmed,
 			alternatives: [
 				...(newAlternative ? [newAlternative] : []),
 				...entries(confidences).map(([value, confidence]) => ({
@@ -119,7 +123,28 @@
 			help: 'Ouvrir/Fermer la liste des options',
 			do: (e) => {
 				e.preventDefault();
-				focusOptionCombobox('toggle');
+				focusOptionCombobox?.('toggle');
+			}
+		},
+		M: {
+			help: 'Ouvrir le lien "En savoir plus" dans un nouvel onglet',
+			when: () => Boolean(option?.learnMore),
+			do() {
+				window.open(option!.learnMore, '_blank');
+			}
+		},
+		ArrowUp: {
+			help: 'Marquer la classification comme confirmée',
+			async do() {
+				if (!option) return;
+				await setOption(option!, confidences, { confirmed: true, pushToUndoStack: false });
+			}
+		},
+		ArrowDown: {
+			help: 'Marquer la classification comme non confirmée',
+			async do() {
+				if (!option) return;
+				await setOption(option!, confidences, { confirmed: false, pushToUndoStack: false });
 			}
 		}
 	});
@@ -165,7 +190,7 @@
 				bind:focuser={focusOptionCombobox}
 				onValueChange={async (newKey) => {
 					if (!newKey) return;
-					await setOption({ key: newKey }, confidences);
+					await setOption({ key: newKey }, confidences, { manuallyModified: true });
 				}}
 			/>
 			<ConfidencePercentage value={current?.confidence} />
@@ -195,6 +220,34 @@
 			</div>
 		</ButtonSecondary>
 	</div>
+
+	{#if layout === 'top-bottom'}
+		<div class="confirmation" style:grid-area="confirmation" data-testid="confirmation">
+			<ButtonSecondary
+				onclick={async () => {
+					if (!option) return;
+					await setOption(option, confidences, {
+						confirmed: !current?.confirmed,
+						pushToUndoStack: false
+					});
+				}}
+				help={{
+					text: current?.confirmed
+						? 'Marquer comme non confirmée '
+						: 'Confirmer la classification ',
+					keyboard: current?.confirmed ? 'ArrowDown' : 'ArrowUp'
+				}}
+			>
+				<div class="button-contents">
+					{#if current?.confirmed}
+						<IconUnconfirmed />
+					{:else}
+						<IconConfirmed />
+					{/if}
+				</div>
+			</ButtonSecondary>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -211,7 +264,7 @@
 
 		&[data-layout='top-bottom'] {
 			justify-content: start;
-			grid-template-areas: 'current prev next';
+			grid-template-areas: 'current prev next confirmation';
 			grid-template-columns: auto 1fr 1fr;
 
 			.button-contents.prev {
