@@ -104,6 +104,7 @@ test('toExportedProtocol', async () => {
 		id: 'protocol1',
 		name: 'Test Protocol',
 		version: 1,
+		updates: 'automatic',
 		metadata: ['protocol1__meta1', 'protocol1__meta2', 'protocol1__meta3'],
 		sessionMetadata: ['protocol1__meta3'],
 		authors: [],
@@ -132,7 +133,7 @@ test('toExportedProtocol', async () => {
 	expect.soft(db.getAll).toHaveBeenCalledWith('Metadata');
 
 	expect(exported).toEqual({
-		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'crop'),
+		...pick(protocol, 'id', 'name', 'version', 'description', 'authors', 'crop', 'updates'),
 		sessionMetadata: {
 			protocol1__meta3: {
 				key: 'meta3',
@@ -250,6 +251,7 @@ describe('compareProtocolWithUpstream', () => {
 			get: async (_table, _id) => ({
 				id: 'protocol1',
 				name: 'Test Protocol',
+				updates: 'automatic',
 				version: 1,
 				metadata: [],
 				authors: [],
@@ -282,6 +284,7 @@ describe('compareProtocolWithUpstream', () => {
 				id: 'protocol1',
 				name: 'Test Protocol',
 				version: 1,
+				updates: 'automatic',
 				metadata: {},
 				authors: [],
 				description: 'A test protocol',
@@ -326,6 +329,7 @@ describe('compareProtocolWithUpstream', () => {
 				id: 'protocol1',
 				name: 'Test Protocol',
 				version: 2,
+				updates: 'automatic',
 				metadata: ['protocol1__meta1', 'protocol1__meta2'],
 				authors: [],
 				description: 'A test protocol',
@@ -420,6 +424,7 @@ describe('compareProtocolWithUpstream', () => {
 				id: 'protocol1',
 				name: 'Test Protocol Updated',
 				version: 2,
+				updates: 'automatic',
 				crop: {
 					metadata: 'feur',
 					confirmationMetadata: 'quoicoubaka',
