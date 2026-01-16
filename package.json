@@ -144,7 +144,7 @@
 		"bits-ui": "^1.8.0",
 		"date-fns": "^4.1.0",
 		"dequal": "^2.0.3",
-		"devalue": "^5.6.1",
+		"devalue": "^5.6.2",
 		"electron-serve": "^3.0.0",
 		"electron-squirrel-startup": "^1.0.1",
 		"embla-carousel-auto-height": "^8.6.0",
