@@ -24,15 +24,38 @@ on:
       - renovate/turndown-*
       - renovate/marked-*
 
+concurrency:
+  group: regenerate-example-protocols
+  cancel-in-progress: true
+
 jobs:
+  check:
+    name: Check for Regenerate-Protocol commit trailer
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check-commit.outputs.skip }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Check commit messages
+        id: check-commit
+        run: |
+          message=$(git log -1 --pretty=%B)
+          echo "Checking in $message"
+          skip="false"
+          if echo "$message" | grep -q 'Regenerate-Protocol: No'; then
+            skip="true"
+          fi
+          echo Skipping regenerate: $skip
+          echo "skip=$skip" >> $GITHUB_OUTPUT
+
   regenerate:
-    if: github.event.pull_request.draft == false
+    needs: check
+    if: github.event.pull_request.draft == false && needs.check.outputs.skip != 'true'
     name: Regenerate
     runs-on: ubuntu-latest
-
-    concurrency:
-      group: regenerate-example-protocols
-      cancel-in-progress: true
 
     steps:
       - name: Checkout repository
@@ -105,7 +128,10 @@ jobs:
         if: steps.status.outputs.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: 🍱 Regenerate example protocols
+          commit_message: |
+            🍱 Regenerate example protocols
+
+            Regenerate-Protocol: No
           file_pattern: |
             examples/*.cigaleprotocol.json
             examples/*.cigaleprotocol.images/*
