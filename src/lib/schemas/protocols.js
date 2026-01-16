@@ -158,11 +158,11 @@ export const Protocol = type({
 	},
 	crop: type({
 		metadata: [ID, '@', 'Métadonnée associée à la boîte englobante'],
-		'confirmationMetadata?': [
-			ID,
-			'@',
-			'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée'
-		],
+		'confirmationMetadata?': ID.configure({
+			deprecated: true,
+			description:
+				'Métadonnée associée au fait que la boîte englobante a été (humainement) confirmée. Dépréciée, la confirmation est maintenant stockée dans les valeurs des métadonnées directement.'
+		}),
 		padding: type(/^\d+(%|px)$/)
 			.describe(
 				"Pixels de marge à rajouter autour de la boîte englobante au moment d'exporter les images recadrées. Nombre suivi de 'px' pour un nombre de pixels fixe, ou de '%' pour un pourcentage des dimensions de chaque image."

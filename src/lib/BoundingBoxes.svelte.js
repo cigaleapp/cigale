@@ -33,6 +33,11 @@ const _anyBoundingBox = type.or(centeredBoundingBox, topLeftBoundingBox);
  */
 
 /**
+ * @type {CenteredBoundingBox}
+ */
+export const FULL_IMAGE_CROPBOX = { w: 1, h: 1, x: 0.5, y: 0.5 };
+
+/**
  *
  * @param {object} param0
  * @param {number} param0.x
