@@ -701,12 +701,9 @@ function confirmedCropBadge(page) {
  */
 async function isImageConfirmedInDatabase(app, id) {
 	return Boolean(
-		await app.db.metadata
-			.values({
-				imageId: id,
-				protocolId: ''
-			})
-			.then((v) => v[exampleProtocol.crop.confirmationMetadata])
+		await app.db.image
+			.byId(id)
+			.then((img) => img?.metadata[exampleProtocol.crop.metadata]?.confirmed)
 	);
 }
 
@@ -721,17 +718,14 @@ async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 	for (const [i, id] of ids.entries()) {
 		await browserConsole.log(
 			page,
-			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.confirmationMetadata}) (${i + 1}/${ids.length})`
+			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.metadata}) (${i + 1}/${ids.length})`
 		);
 		await setImageMetadata(
 			{ page },
 			id,
 			{
-				[exampleProtocol.crop.confirmationMetadata]: {
-					value: confirmed,
-					manuallyModified: true,
-					confidence: 1,
-					alternatives: {}
+				[exampleProtocol.crop.metadata]: {
+					confirmed: true
 				}
 			},
 			{

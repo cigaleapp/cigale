@@ -143,6 +143,7 @@ describe('operations', () => {
 					water: {
 						value: 'bucket',
 						confidence: 1,
+						confirmed: false,
 						manuallyModified: false,
 						alternatives: {
 							'"release!!!!"': 0.3
@@ -230,6 +231,7 @@ describe('operations', () => {
 				water: {
 					value: 'bucket',
 					confidence: 1,
+					confirmed: false,
 					manuallyModified: false,
 					alternatives: {
 						'"release!!!!"': 0.3
@@ -617,6 +619,7 @@ describe('wrangler', () => {
 							water: {
 								value: 'bucket',
 								confidence: 1,
+								confirmed: false,
 								manuallyModified: false,
 								alternatives: {
 									'"release!!!!"': 0.3
@@ -633,6 +636,7 @@ describe('wrangler', () => {
 							water: {
 								value: 'bucket',
 								confidence: 1,
+								confirmed: false,
 								manuallyModified: false,
 								alternatives: {
 									'"release!!!!"': 0.3
@@ -655,6 +659,7 @@ describe('wrangler', () => {
 						water: {
 							value: 'bucket',
 							confidence: 1,
+							confirmed: false,
 							manuallyModified: false,
 							alternatives: {
 								'"release!!!!"': 0.3

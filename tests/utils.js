@@ -172,7 +172,7 @@ export async function listTable(page, tableName) {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} id
- * @param {Record<string, MetadataValue>} metadata
+ * @param {Record<string, Partial<MetadataValue>>} metadata
  * @param {object} options
  * @param {boolean} [options.refreshDB=true] whether to refresh the database after updating
  */
@@ -185,10 +185,19 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 			metadata: {
 				...image.metadata,
 				...Object.fromEntries(
-					Object.entries(metadata).map(([key, { value, ...rest }]) => [
-						key,
-						{ ...rest, value: JSON.stringify(value) }
-					])
+					Object.entries(metadata).map(([key, value]) => {
+						if ('value' in value) {
+							value.value = JSON.stringify(value.value);
+						}
+
+						return [
+							key,
+							{
+								...image.metadata[key],
+								...value
+							}
+						];
+					})
 				)
 			}
 		});
