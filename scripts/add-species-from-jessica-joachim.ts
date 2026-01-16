@@ -268,22 +268,13 @@ async function searchFor(metadataKey: string) {
 		cyan(`⁄ Fetched ${speciesLinks!.size} species links from Jessica Joachim blog for matching`)
 	);
 
-	const total = Math.min(speciesLinks!.size, env.LIMIT);
 	const links = [...speciesLinks!.entries()];
-	const eta = new ETA({ total });
 	let done = 0;
 	const results = await Promise.all(
 		links.map(async ([title, link]) => {
 			done++;
-			eta.update(done, total);
 
 			if (done >= env.LIMIT) return undefined;
-
-			console.info(
-				`${align(done, total)} ${percentage(done, total, 1)} ${cyan(
-					`→ ${formatDistanceToNowStrict(new Date(Date.now() + eta.estimate()))}`
-				)} Finding GBIF ID for ${title}`
-			);
 
 			if (nameToGbifID.has(title)) {
 				return [nameToGbifID.get(title)!, link] as const;
