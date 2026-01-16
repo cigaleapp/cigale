@@ -2155,6 +2155,11 @@ msgstr "Via {0}"
 msgid "<0/> Modifier <1>Beta</1>"
 msgstr "<0/> Modifier <1>Beta</1>"
 
+#. placeholder {0}: updates[0].name
+#: src/routes/(app)/+layout.js
+msgid "Le protocole \"{0}\" a été mis à jour"
+msgstr "Le protocole \"{0}\" a été mis à jour"
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr "Import des images terminé"
@@ -2176,8 +2181,3 @@ msgstr "Import de {0}"
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
 msgstr "Importée depuis {0}"
-
-#. placeholder {0}: updates[0].name
-#: src/routes/(app)/+layout.js
-msgid "Le protocole \"{0}\" a été mis à jour"
-msgstr "Le protocole \"{0}\" a été mis à jour"
