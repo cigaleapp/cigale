@@ -67,7 +67,7 @@
 	</div>
 	<div class="panel" {@attach area('panel')}>
 		<div class="header" {@attach area('header')}>
-			<Header {image} {imageNo} />
+			<Header  {image} {imageNo} {focusedMetadata} />
 		</div>
 
 		<div class="layout-switcher" {@attach area('layout-switcher')}>
@@ -141,7 +141,7 @@
 		{/if}
 
 		<div class="nav" {@attach area('nav')}>
-			<Navigation {...navigation} />
+			<Navigation {...navigation} {focusedMetadata} currentImage={image} />
 		</div>
 	</div>
 </main>
@@ -268,7 +268,7 @@
 	main[data-layout='top-bottom'] .panel {
 		padding: 1em 2em;
 		grid-template-columns: 1fr 1fr;
-		grid-template-rows: min-content min-content 1.5fr 1fr min-content;
+		grid-template-rows: min-content min-content 1.5fr min-content min-content;
 		grid-template-areas:
 			'header header'
 			'focused-option focused-option'

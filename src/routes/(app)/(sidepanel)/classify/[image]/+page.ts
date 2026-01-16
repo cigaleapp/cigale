@@ -52,6 +52,24 @@ export async function load({ params, depends }) {
 	const nextImage = nextImageIndex < images.length ? images[nextImageIndex] : null;
 	const prevImage = prevImageIndex >= 0 ? images[prevImageIndex] : null;
 
+	// Counts
+	const classifiedImagesCount = focusedMetadata
+		? images.filter((img) => img.metadata[focusedMetadata.id]).length
+		: 0;
+
+	const confirmedClassificationsCount = focusedMetadata
+		? images.filter((img) => img.metadata[focusedMetadata.id]?.confirmed).length
+		: 0;
+
+	const nextUnconfirmedImage = focusedMetadata
+		? images.find(
+				(img, index) =>
+					index > currentImageIndex &&
+					img.metadata[focusedMetadata.id] &&
+					!img.metadata[focusedMetadata.id]?.confirmed
+			)
+		: null;
+
 	return {
 		image,
 		imageNo,
@@ -61,7 +79,10 @@ export async function load({ params, depends }) {
 			nextImage,
 			prevImage,
 			currentImageIndex,
-			totalImages: images.length
+			totalImages: images.length,
+			classifiedImagesCount,
+			confirmedClassificationsCount,
+			nextUnconfirmedImage
 		}
 	};
 }
