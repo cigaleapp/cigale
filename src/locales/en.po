@@ -77,6 +77,7 @@ msgstr "<0/> Retry"
 #: src/lib/AreaObservations.svelte
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+#: src/routes/(app)/protocols/RowProtocol.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Supprimer"
 msgstr "<0/> Delete"
@@ -746,7 +747,6 @@ msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Deletes all data for this preview deployment"
 
 #: src/lib/ModalConfirmDeletion.svelte
-#: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Supprimer"
 msgstr "Delete"
 
@@ -1020,10 +1020,6 @@ msgstr "<0/> already uses that ID"
 #: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "Créer"
 msgstr "Create"
-
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "Modifier (beta)"
-msgstr "Edit (beta)"
 
 #. placeholder {0}: page.params.metadata
 #: src/routes/(app)/protocols/[id]/+error.svelte
@@ -2140,6 +2136,23 @@ msgstr ""
 msgid "Ouverture…"
 msgstr ""
 
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Mises à jour automatiques"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Mettre à jour automatiquement"
+msgstr ""
+
+#. placeholder {0}: source
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Via {0}"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "<0/> Modifier <1>Beta</1>"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
@@ -2160,4 +2173,9 @@ msgstr ""
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
+msgstr ""
+
+#. placeholder {0}: updates[0].name
+#: src/routes/(app)/+layout.js
+msgid "Le protocole \"{0}\" a été mis à jour"
 msgstr ""
