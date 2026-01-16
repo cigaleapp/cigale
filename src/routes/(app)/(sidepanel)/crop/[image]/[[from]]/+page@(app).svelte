@@ -38,6 +38,7 @@
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
+	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { idComparator } from '$lib/database.js';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
@@ -99,7 +100,7 @@
 	seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` });
 
 	// Controls visibility of the checkmark little centered overlay
-	let confirmedOverlayShown = $state(false);
+	let showConfirmedOverlay = $state(async () => {});
 
 	/** @type {typeof tools[number]['name']} */
 	let activeToolName = $state('Glisser-recadrer');
@@ -569,9 +570,7 @@
 		}
 
 		if (willFlashConfirmedOverlay) {
-			confirmedOverlayShown = true;
-			await new Promise((resolve) => setTimeout(resolve, 500));
-			confirmedOverlayShown = false;
+			await showConfirmedOverlay();
 		}
 
 		if (willAutoskip) {
@@ -838,12 +837,7 @@
 	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
 
-<div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}>
-	<div class="icon">
-		<IconConfirmedCrop />
-	</div>
-	<p>Confirmé</p>
-</div>
+<ConfirmedOverlay bind:show={showConfirmedOverlay} />
 
 <div class="layout">
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -1219,37 +1213,6 @@
 		display: flex;
 		height: 100%;
 		overflow: hidden;
-	}
-
-	.confirmed-overlay {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		z-index: 100;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 1.5rem;
-		padding: 2rem;
-		color: var(--fg-success);
-		background-color: var(--bg-neutral);
-		border-radius: var(--corner-radius);
-		display: flex;
-		flex-direction: column;
-		transition: opacity 0.2s;
-		pointer-events: none;
-	}
-
-	.confirmed-overlay[aria-hidden='true'] {
-		opacity: 0;
-		/* https://github.com/microsoft/playwright/issues/5129#issuecomment-772746396 */
-		visibility: hidden;
-	}
-
-	.confirmed-overlay .icon {
-		font-size: 2.5em;
-		margin-bottom: -1rem;
 	}
 
 	.toolbar {
