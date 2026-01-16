@@ -51,7 +51,10 @@ test('can auto-update a protocol', async ({ page, app }) => {
 	const { newVersion } = await setup({ page, app }, true);
 
 	await expect(
-		app.toasts.byMessage('info', 'Le protocole "Example: arthropodes (lightweight)" a été mis à jour')
+		app.toasts.byMessage(
+			'info',
+			'Le protocole "Example: arthropodes (lightweight)" a été mis à jour'
+		)
 	).toBeVisible();
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');

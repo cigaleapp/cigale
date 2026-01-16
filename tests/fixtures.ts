@@ -252,7 +252,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			await mkdir('./tests/results', { recursive: true });
 
 			if (!tags.includes('@real-protocol')) {
-				// @ts-expect-error we don't support non-string protocol source values for now 
+				// @ts-expect-error we don't support non-string protocol source values for now
 				await mockProtocolSourceURL(page, context, fullProtocol.source, {
 					json: lightProtocol
 				});
