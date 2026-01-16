@@ -88,6 +88,10 @@
 		z-index: 100000 !important;
 	}
 
+	:global([data-tippy-root] .tippy-content) {
+		word-break: break-all;
+	}
+
 	:global([data-tippy-root] .tippy-box > .tippy-svg-arrow) {
 		fill: var(--bg-neutral) !important;
 		stroke: var(--fg-neutral);

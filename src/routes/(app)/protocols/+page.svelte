@@ -26,6 +26,8 @@
 
 	/** @type {undefined | (() => void)} */
 	let openProtocolCreation = $state();
+
+	let expandedProtocol = $state('');
 </script>
 
 <ModalDeleteProtocol id={removingProtocol} bind:open={confirmDelete} />
@@ -75,6 +77,13 @@
 		{#each tables.Protocol.state as p (p.id)}
 			<RowProtocol
 				{...p}
+				bind:expanded={
+					() => expandedProtocol === p.id,
+					(expanded) => {
+						if (expanded) expandedProtocol = p.id;
+						else if (expandedProtocol === p.id) expandedProtocol = '';
+					}
+				}
 				ondelete={() => {
 					removingProtocol = p.id;
 					confirmDelete?.();

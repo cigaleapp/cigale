@@ -156,6 +156,7 @@ const protocol = {
 	name: 'Example: arthropodes',
 	learnMore: `https://github.com/cigaleapp/cigale/tree/${await x('git', ['rev-parse', 'HEAD']).then((result) => result.stdout.trim())}/scripts/README.md#protocoles-arthropodsexample`,
 	version: (oldProtocol?.version ?? 0) + 1,
+	updates: 'automatic',
 	source: 'https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json',
 	description:
 		'Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification',

@@ -10,7 +10,14 @@ import { loadLocale } from 'wuchale/load-utils';
 import { dev } from '$app/environment';
 // oxlint-disable-next-line import/default
 import { localeFromNavigator } from '$lib/i18n.js';
-import { databaseName, databaseRevision, openTransaction, tables } from '$lib/idb.svelte.js';
+import {
+	databaseHandle,
+	databaseName,
+	databaseRevision,
+	openTransaction,
+	tables
+} from '$lib/idb.svelte.js';
+import { autoUpdateProtocols } from '$lib/protocols';
 import { getSetting } from '$lib/settings.svelte';
 import { toasts } from '$lib/toasts.svelte';
 import { PROCEDURES } from '$worker/procedures.js';
@@ -83,6 +90,15 @@ export async function load() {
 		});
 	}
 
+	void autoUpdateProtocols(databaseHandle(), swarpc).then((updates) => {
+		if (updates.length === 0) return;
+		toasts.info(
+			updates.length === 1
+				? `Le protocole "${updates[0].name}" a été mis à jour`
+				: `${updates.length} protocoles ont été mis à jour: ${updates.map((u) => `"${u.name}"`).join(', ')}`
+		);
+	});
+
 	return { swarpc, parallelism };
 }
 
@@ -97,7 +113,6 @@ async function initializeSettings() {
 			language: 'fr',
 			showInputHints: true,
 			showTechnicalMetadata: dev,
-			protocolModelSelections: {},
 			cropAutoNext: false,
 			gallerySort: { key: 'date', direction: 'asc' }
 		});

@@ -33,6 +33,11 @@ test.describe('Database dumps', () => {
 		await page
 			.getByRole('listitem')
 			.filter({ hasText: exampleProtocol.id })
+			.locator('details')
+			.click();
+		await page
+			.getByRole('listitem')
+			.filter({ hasText: exampleProtocol.id })
 			.getByRole('button', { name: 'Supprimer' })
 			.click();
 		await confirmDeletionModal(page, { type: exampleProtocol.name });
