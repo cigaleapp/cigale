@@ -7,6 +7,7 @@ import {
 import { entries, groupBy, nonnull, pick, sum } from './utils.js';
 
 /**
+ * @import * as DB from './database.js'
  * @import { RuntimeValue } from './metadata.js'
  * @import { DatabaseHandle } from './idb.svelte.js'
  * @import { MetadataEnumVariant } from './database.js'
@@ -57,9 +58,22 @@ import { entries, groupBy, nonnull, pick, sum } from './utils.js';
  * @param {string} param0.metadataId
  * @param {number} param0.confidence
  * @param {RuntimeValue} param0.value
- * @param { Array<{ value: RuntimeValue, confidence: number }> } param0.alternatives
+ * @param { DB.MetadataValue["alternatives"] | Array<{ value: RuntimeValue, confidence: number }> } param0.alternatives
  */
-export async function computeCascades({ db, metadataId, confidence, value, alternatives }) {
+export async function computeCascades({
+	db,
+	metadataId,
+	confidence,
+	value,
+	alternatives: _alternatives
+}) {
+	const alternatives = !Array.isArray(_alternatives)
+		? Object.entries(_alternatives).map(([value, confidence]) => ({
+				value: /** @type {RuntimeValue} */ (JSON.parse(value)),
+				confidence
+			}))
+		: _alternatives;
+
 	return await Promise.all(
 		// List of { value, confidence }, that includes the main value as well as the alternatives
 		[{ value, confidence }, ...alternatives].map(async ({ confidence, value }) => {

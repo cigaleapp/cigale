@@ -34,6 +34,11 @@ export const MetadataRecord = type({
 			'@',
 			'La valeur de la métadonnée a été modifiée manuellement'
 		],
+		confirmed: [
+			'number',
+			'@',
+			'La valeur de la métadonnée a été confirmée par un·e utilisateurice'
+		],
 		alternatives: type({
 			'[string]': [
 				'number',

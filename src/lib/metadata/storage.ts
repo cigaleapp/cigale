@@ -52,6 +52,7 @@ async function refreshTables(sessionId: string, ...tableNames: ReactiveTableName
  * @param options.value la valeur de la métadonnée
  * @param options.manuallyModified si la valeur a été modifiée manuellement
  * @param options.confidence la confiance dans la valeur (proba que ce soit la bonne valeur)
+ * @param options.confirmed si la valeur a été confirmée manuellement comme correcte
  * @param options.db BDD à modifier
  * @param options.alternatives les autres valeurs possibles
  * @param options.cascadedFrom ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
@@ -65,6 +66,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	type,
 	value,
 	confidence = 1,
+	confirmed = false,
 	alternatives = [],
 	manuallyModified = false,
 	cascadedFrom = [],
@@ -77,11 +79,14 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	value: RuntimeValue<Type>;
 	manuallyModified?: boolean;
 	confidence?: number;
+	confirmed?: boolean;
 	db: DatabaseHandle;
-	alternatives?: Array<{ value: RuntimeValue<Type>; confidence: number }>;
+	alternatives?:
+		| DB.MetadataValue['alternatives']
+		| Array<{ value: RuntimeValue<Type>; confidence: number }>;
 	cascadedFrom?: string[];
-	abortSignal?: AbortSignal | undefined;
-	sessionId?: string | undefined;
+	abortSignal?: AbortSignal;
+	sessionId?: string;
 }) {
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
@@ -96,19 +101,22 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	const newValue = {
 		value: serializeMetadataValue(value),
 		confidence,
+		confirmed,
 		manuallyModified,
-		alternatives: Object.fromEntries(
-			alternatives.map(({ value, confidence }) => {
-				if (confidence > 1) {
-					console.warn(
-						`Confidence ${confidence} of alternative ${value} is greater than 1, capping to 1`
-					);
-					confidence = 1;
-				}
+		alternatives: !Array.isArray(alternatives)
+			? alternatives
+			: Object.fromEntries(
+					alternatives.map(({ value, confidence }) => {
+						if (confidence > 1) {
+							console.warn(
+								`Confidence ${confidence} of alternative ${value} is greater than 1, capping to 1`
+							);
+							confidence = 1;
+						}
 
-				return [serializeMetadataValue(value), confidence];
-			})
-		)
+						return [serializeMetadataValue(value), confidence];
+					})
+				)
 	};
 
 	// Make sure the alternatives does not contain the value itself
@@ -154,6 +162,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				metadataId,
 				value,
 				confidence,
+				confirmed,
 				manuallyModified,
 				abortSignal
 			});
@@ -198,6 +207,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			sessionId,
 			subjectId,
 			manuallyModified,
+			confirmed,
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
 			...cascade
