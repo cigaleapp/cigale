@@ -172,7 +172,7 @@ export async function listTable(page, tableName) {
  * @param {object} param0
  * @param {Page} param0.page
  * @param {string} id
- * @param {Record<string, MetadataValue>} metadata
+ * @param {Record<string, Partial<MetadataValue>>} metadata
  * @param {object} options
  * @param {boolean} [options.refreshDB=true] whether to refresh the database after updating
  */
@@ -185,10 +185,19 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 			metadata: {
 				...image.metadata,
 				...Object.fromEntries(
-					Object.entries(metadata).map(([key, { value, ...rest }]) => [
-						key,
-						{ ...rest, value: JSON.stringify(value) }
-					])
+					Object.entries(metadata).map(([key, value]) => {
+						if ('value' in value) {
+							value.value = JSON.stringify(value.value);
+						}
+
+						return [
+							key,
+							{
+								...image.metadata[key],
+								...value
+							}
+						];
+					})
 				)
 			}
 		});
@@ -345,14 +354,15 @@ async function goHome(page) {
  *
  * @param {import('$lib/i18n').Language} lang
  */
-const appNavTabs = (lang = 'fr') => ({
-	import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
-	crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
-	classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' },
-	results: { name: lang === 'fr' ? 'Résultats' : 'Results', hash: '#/results' },
-	sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
-	protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' }
-});
+export const appNavTabs = (lang = 'fr') =>
+	/** @type {const} */ ({
+		import: { name: lang === 'fr' ? 'Importer' : 'Import', hash: '#/import' },
+		crop: { name: lang === 'fr' ? 'Recadrer' : 'Crop', hash: '#/crop' },
+		classify: { name: lang === 'fr' ? 'Classifier' : 'Classify', hash: '#/classify' },
+		results: { name: lang === 'fr' ? 'Résultats' : 'Results', hash: '#/results' },
+		sessions: { name: lang === 'fr' ? 'Sessions' : 'Sessions', hash: '#/sessions' },
+		protocols: { name: lang === 'fr' ? 'Protocoles' : 'Protocols', hash: '#/protocols' }
+	});
 
 /**
  * @typedef {keyof ReturnType<typeof appNavTabs>} NavigationTab
@@ -569,7 +579,7 @@ export const browserConsole = {
  * @param {Page} page
  * @param {import('@playwright/test').Locator} locator
  */
-async function tooltipOf(page, locator) {
+export async function tooltipOf(page, locator) {
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, { timeout: 1_000 });
 	const tippyId = await locator.getAttribute('aria-describedby');
 	return page.locator(`#${tippyId}`);

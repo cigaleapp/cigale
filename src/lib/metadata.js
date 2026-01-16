@@ -117,8 +117,9 @@ export function serializeMetadataValues(values) {
  * @param {RuntimeValue<Type>} options.value la valeur de la métadonnée
  * @param {boolean} [options.manuallyModified=false] si la valeur a été modifiée manuellement
  * @param {number} [options.confidence=1] la confiance dans la valeur (proba que ce soit la bonne valeur)
+ * @param {boolean} [options.confirmed=false] si la valeur a été confirmée manuellement comme correcte
  * @param {DatabaseHandle} options.db BDD à modifier
- * @param {Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
+ * @param {DB.MetadataValue['alternatives'] | Array<{ value: RuntimeValue<Type>; confidence: number }>} [options.alternatives=[]] les autres valeurs possibles
  * @param {string[]} [options.cascadedFrom] ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
  * @param {AbortSignal} [options.abortSignal] signal d'abandon pour annuler la requête
  * @param {string} [options.sessionId] id de la session en cours, important pour refresh le state réactif des tables
@@ -130,6 +131,7 @@ export async function storeMetadataValue({
 	type,
 	value,
 	confidence = 1,
+	confirmed = false,
 	alternatives = [],
 	manuallyModified = false,
 	cascadedFrom = [],
@@ -149,19 +151,22 @@ export async function storeMetadataValue({
 	const newValue = {
 		value: serializeMetadataValue(value),
 		confidence,
+		confirmed,
 		manuallyModified,
-		alternatives: Object.fromEntries(
-			alternatives.map(({ value, confidence }) => {
-				if (confidence > 1) {
-					console.warn(
-						`Confidence ${confidence} of alternative ${value} is greater than 1, capping to 1`
-					);
-					confidence = 1;
-				}
+		alternatives: !Array.isArray(alternatives)
+			? alternatives
+			: Object.fromEntries(
+					alternatives.map(({ value, confidence }) => {
+						if (confidence > 1) {
+							console.warn(
+								`Confidence ${confidence} of alternative ${value} is greater than 1, capping to 1`
+							);
+							confidence = 1;
+						}
 
-				return [serializeMetadataValue(value), confidence];
-			})
-		)
+						return [serializeMetadataValue(value), confidence];
+					})
+				)
 	};
 
 	// Make sure the alternatives does not contain the value itself
@@ -207,6 +212,7 @@ export async function storeMetadataValue({
 				metadataId,
 				value,
 				confidence,
+				confirmed,
 				manuallyModified,
 				abortSignal
 			});
@@ -251,6 +257,7 @@ export async function storeMetadataValue({
 			sessionId,
 			subjectId,
 			manuallyModified,
+			confirmed,
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
 			...cascade

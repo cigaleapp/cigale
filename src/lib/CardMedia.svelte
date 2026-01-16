@@ -7,6 +7,7 @@
 	 * @type {object}
 	 * @property {(e: MouseEvent, set: (props: { status?: Status, loadingStatusText?: string }) => void) => void} [onclick]
 	 * @property {() => void} [onstacksizeclick]
+	 * @property {() => void} [ondoubleclick]
 	 * @property {() => void} [ondelete]
 	 * @property {() => void} [onretry]
 	 * @property {string | undefined} [tooltip] tooltip to show
@@ -46,6 +47,7 @@
 	/** @type {Props & Omit<Record<string, unknown>, keyof Props>}*/
 	let {
 		onclick,
+		ondoubleclick,
 		onstacksizeclick,
 		ondelete,
 		onretry,
@@ -95,6 +97,7 @@
 		<!-- use () => {} instead of undefined so that the hover/focus styles still apply -->
 		<Card
 			tag="div"
+			{ondoubleclick}
 			onclick={(e) => {
 				if (loading || errored) return;
 				if (!(e instanceof MouseEvent)) return;

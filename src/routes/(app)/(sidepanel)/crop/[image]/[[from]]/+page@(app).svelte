@@ -11,6 +11,7 @@
 	import IconUndo from '~icons/ri/arrow-go-back-fill';
 	import IconUnconfirmedCrop from '~icons/ri/arrow-go-back-line';
 	import IconRedo from '~icons/ri/arrow-go-forward-fill';
+	import IconBack from '~icons/ri/arrow-left-line';
 	import IconPrev from '~icons/ri/arrow-left-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedCrop from '~icons/ri/check-double-line';
@@ -29,6 +30,7 @@
 		boundingBoxIsNonZero,
 		coordsAreEqual,
 		coordsScaler,
+		FULL_IMAGE_CROPBOX,
 		toCenteredCoords,
 		toTopLeftCoords
 	} from '$lib/BoundingBoxes.svelte';
@@ -36,6 +38,7 @@
 	import ButtonInk from '$lib/ButtonInk.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
+	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { idComparator } from '$lib/database.js';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
@@ -45,12 +48,13 @@
 	import {
 		deleteImageFile,
 		imageFileIds,
+		imageId,
 		imageIdToFileId,
 		imagesOfImageFile,
 		imageId as makeImageId,
 		parseImageId
-	} from '$lib/images';
-	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	} from '$lib/images.js';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import LoadingSpinner from '$lib/LoadingSpinner.svelte';
 	import {
@@ -70,13 +74,17 @@
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { undo } from '$lib/undo.svelte';
-	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
+	import { clamp, fromEntries, mapValues, nonnull, pick, range, sign } from '$lib/utils';
 	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
 	navbarAppearance('hidden');
 
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
+	const openedFromImage = $derived(
+		page.params.from ? imageId(fileId, Number(page.params.from)) : undefined
+	);
+
 	const images = $derived(
 		imagesOfImageFile(
 			fileId,
@@ -88,7 +96,7 @@
 	seo({ title: `Recadrer ${firstImage?.filename ?? '...'}` });
 
 	// Controls visibility of the checkmark little centered overlay
-	let confirmedOverlayShown = $state(false);
+	let showConfirmedOverlay = $state(async () => {});
 
 	/** @type {typeof tools[number]['name']} */
 	let activeToolName = $state('Glisser-recadrer');
@@ -258,27 +266,37 @@
 	 * @param {DB.Image} image
 	 */
 	function imageHasConfirmedCrop(image) {
-		const metadataId = uiState.currentProtocol?.crop?.confirmationMetadata;
-		if (!metadataId) return false;
-		return metadataId in image.metadata && image.metadata[metadataId].value;
+		const value = uiState.cropMetadataValueOf(image);
+		return value?.confirmed;
 	}
 
 	/**
-	 * @param {string} imageId
+	 * @param {DB.Image} image
 	 * @param {boolean} confirmed
 	 */
-	async function changeCropConfirmedStatus(imageId, confirmed) {
-		const metadataId = uiState.cropConfirmationMetadataId;
-		if (!metadataId) return;
+	async function changeCropConfirmedStatus(image, confirmed) {
+		if (!uiState.currentSessionId) return;
+		if (!uiState.cropMetadataId) return;
+
+		let value = uiState.cropMetadataValueOf(image);
+		if (!value) {
+			value = {
+				confidence: 1,
+				manuallyModified: true,
+				value: FULL_IMAGE_CROPBOX,
+				alternatives: {},
+				confirmed: true
+			};
+		}
 
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
 			sessionId: uiState.currentSessionId,
-			metadataId,
-			subjectId: imageId,
-			type: 'boolean',
-			manuallyModified: true,
-			value: confirmed
+			metadataId: uiState.cropMetadataId,
+			subjectId: image.id,
+			type: 'boundingbox',
+			...value,
+			confirmed
 		});
 	}
 
@@ -286,22 +304,15 @@
 	 * @param {boolean} confirmed
 	 */
 	async function changeAllConfirmedStatuses(confirmed) {
-		if (!uiState.cropConfirmationMetadataId) {
-			toasts.error(
-				'Ce protocole ne supported pas la validation des recadrages (voir crop.confirmationMetadata dans la définition du protocole)'
-			);
-			return;
-		}
-
 		for (const image of images) {
-			await changeCropConfirmedStatus(image.id, confirmed);
+			await changeCropConfirmedStatus(image, confirmed);
 		}
 	}
 
 	/**
 	 * @param {string} imageId
 	 */
-	async function revertToInferedCrop(imageId) {
+	async function revertToInferredCrop(imageId) {
 		const initialCrop = initialCrops[imageId];
 		// On subsequent crops, the user's crop will be the main value and the neural network's crop will be in the alternatives.
 		if (!initialCrop) {
@@ -360,7 +371,7 @@
 		} else {
 			// Or we have at least one: revert all boxes to their initial positions
 			for (const { id } of images) {
-				await revertToInferedCrop(id);
+				await revertToInferredCrop(id);
 			}
 		}
 	}
@@ -418,10 +429,18 @@
 		flashConfirmedOverlay = true,
 		pushToUndoStack = true
 	) {
+		if (!uiState.currentSessionId) return null;
+
+		const image = imageId ? images.find((img) => img.id === imageId) : undefined;
+		if (imageId && !image) {
+			toasts.error(`Impossible de trouver l'image ${imageId} pour la confirmer`);
+			return null;
+		}
+
 		if (!newBoundingBox) {
 			// No bounding box, just mark the image as confirmed and move on
-			if (imageId) {
-				await changeCropConfirmedStatus(imageId, true);
+			if (image) {
+				await changeCropConfirmedStatus(image, true);
 			}
 
 			return imageId;
@@ -431,8 +450,6 @@
 		const willFlashConfirmedOverlay =
 			// the caller asked for it,
 			flashConfirmedOverlay &&
-			// we can actually mark crops as confirmed given the current protocol
-			Boolean(uiState.cropConfirmationMetadataId) &&
 			// and this is the last image before the file is considered confirmed
 			images.filter(imageHasConfirmedCrop).length === images.length - 1;
 
@@ -444,16 +461,17 @@
 			// in click-and-drag creation mode, auto-skip occurs only when the bounding box did not exist before (since the first creation of the box is much less likely to be the final one)
 			(activeTool.createMode !== 'clickanddrag' || !hasCrop(fileId));
 
-		const image = imageId ? images.find((img) => img.id === imageId) : undefined;
-		const species = image?.metadata[uiState.classificationMetadataId];
-		if (species && !species.manuallyModified) {
-			// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
-			await deleteMetadataValue({
-				db: idb.databaseHandle(),
-				sessionId: uiState.currentSession?.id,
-				metadataId: uiState.classificationMetadataId,
-				subjectId: image.id
-			});
+		if (uiState.classificationMetadataId) {
+			const species = image?.metadata[uiState.classificationMetadataId];
+			if (species && !species.manuallyModified) {
+				// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
+				await deleteMetadataValue({
+					db: idb.databaseHandle(),
+					sessionId: uiState.currentSession?.id,
+					metadataId: uiState.classificationMetadataId,
+					subjectId: image.id
+				});
+			}
 		}
 
 		let newImageId = '';
@@ -510,7 +528,7 @@
 			// We're creating a >1st cropbox
 			newImageId = makeImageId(
 				fileId,
-				Math.max(...images.map(({ id }) => parseImageId(id).subindex)) + 1
+				Math.max(...images.map(({ id }) => parseImageId(id).subindex).filter(nonnull)) + 1
 			);
 
 			if (pushToUndoStack) {
@@ -533,13 +551,7 @@
 						value: JSON.stringify(toCenteredCoords(newBoundingBox)),
 						confidence: 1,
 						manuallyModified: true,
-						alternatives: {}
-					},
-					// Set it right now to prevent confirmed crop indicators flickering
-					[uiState.cropConfirmationMetadataId]: {
-						value: 'true',
-						confidence: 1,
-						manuallyModified: true,
+						confirmed: true,
 						alternatives: {}
 					}
 				}
@@ -556,9 +568,7 @@
 		}
 
 		if (willFlashConfirmedOverlay) {
-			confirmedOverlayShown = true;
-			await new Promise((resolve) => setTimeout(resolve, 500));
-			confirmedOverlayShown = false;
+			await showConfirmedOverlay();
 		}
 
 		if (willAutoskip) {
@@ -616,9 +626,13 @@
 		return [w, h];
 	}
 
-	function goToGallery() {
+	function exit() {
 		uiState.imagePreviouslyOpenedInCropper = fileId;
-		goto('/crop');
+		if (openedFromImage) {
+			goto('/(app)/(sidepanel)/classify/[image]', { image: openedFromImage });
+		} else {
+			goto('/crop');
+		}
 	}
 
 	$effect(() => {
@@ -664,7 +678,7 @@
 		},
 		Escape: {
 			help: 'Quitter le mode recadrage',
-			do: goToGallery
+			do: exit
 		},
 		a: {
 			help: 'Activer/désactiver la continuation automatique',
@@ -703,7 +717,7 @@
 			when: () => Boolean(revertableCrops[fileId]),
 			do: () => {
 				if (!revertableCrops[fileId]) return;
-				revertToInferedCrop(fileId);
+				revertToInferredCrop(fileId);
 			}
 		},
 		'$mod+u': {
@@ -821,12 +835,7 @@
 	const zoomSpeed = $derived(zoom.scale * 0.1);
 </script>
 
-<div class="confirmed-overlay" aria-hidden={!confirmedOverlayShown}>
-	<div class="icon">
-		<IconConfirmedCrop />
-	</div>
-	<p>Confirmé</p>
-</div>
+<ConfirmedOverlay bind:show={showConfirmedOverlay} />
 
 <div class="layout">
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
@@ -953,11 +962,23 @@
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">
-				<ButtonInk inline onclick={goToGallery}>
-					<IconGallery />
-					Autres photos
-					<KeyboardHint shortcut="Escape" />
-				</ButtonInk>
+				{#if openedFromImage}
+					<ButtonInk
+						inline
+						onclick={exit}
+						help="Retourner à la classification de l'image"
+					>
+						<IconBack />
+						Retour
+						<KeyboardHint shortcut="Escape" />
+					</ButtonInk>
+				{:else}
+					<ButtonInk inline onclick={exit}>
+						<IconGallery />
+						Autres photos
+						<KeyboardHint shortcut="Escape" />
+					</ButtonInk>
+				{/if}
 				<ButtonInk
 					dangerous
 					onclick={deleteImageFileAndGotoNext}
@@ -996,23 +1017,21 @@
 					<IconRevert />
 					Réinit.
 				</ButtonSecondary>
-				{#if uiState.cropConfirmationMetadataId}
-					<ButtonSecondary
-						keyboard={hasConfirmedCrop(fileId) ? 'ArrowDown' : 'ArrowUp'}
-						onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
-						help={hasConfirmedCrop(fileId)
-							? 'Marquer le recadrage comme non confirmé'
-							: 'Marquer le recadrage comme confirmé'}
-					>
-						{#if hasConfirmedCrop(fileId)}
-							<IconUnconfirmedCrop />
-							Invalider
-						{:else}
-							<IconConfirmedCrop />
-							Valider
-						{/if}
-					</ButtonSecondary>
-				{/if}
+				<ButtonSecondary
+					keyboard={hasConfirmedCrop(fileId) ? 'ArrowDown' : 'ArrowUp'}
+					onclick={() => changeAllConfirmedStatuses(!hasConfirmedCrop(fileId))}
+					help={hasConfirmedCrop(fileId)
+						? 'Marquer le recadrage comme non confirmé'
+						: 'Marquer le recadrage comme confirmé'}
+				>
+					{#if hasConfirmedCrop(fileId)}
+						<IconUnconfirmedCrop />
+						Invalider
+					{:else}
+						<IconConfirmedCrop />
+						Valider
+					{/if}
+				</ButtonSecondary>
 			</section>
 		</section>
 		<section class="boxes">
@@ -1070,7 +1089,7 @@
 									: "Recadrage d'origine indisponible"}
 								keyboard="u"
 								disabled={!revertableCrops[image.id]}
-								onclick={() => revertToInferedCrop(image.id)}
+								onclick={() => revertToInferredCrop(image.id)}
 							>
 								<IconRevert />
 							</ButtonIcon>
@@ -1119,19 +1138,14 @@
 				</p>
 				<ProgressBar alwaysActive progress={croppedImagesCount / sortedFileIds.length} />
 			</div>
-			{#if uiState.cropConfirmationMetadataId}
-				<div class="bar">
-					<p>
-						<IconConfirmedCrop />
-						Recadrages confirmés
-						{@render percentage(confirmedCropsCount)}
-					</p>
-					<ProgressBar
-						alwaysActive
-						progress={confirmedCropsCount / sortedFileIds.length}
-					/>
-				</div>
-			{/if}
+			<div class="bar">
+				<p>
+					<IconConfirmedCrop />
+					Recadrages confirmés
+					{@render percentage(confirmedCropsCount)}
+				</p>
+				<ProgressBar alwaysActive progress={confirmedCropsCount / sortedFileIds.length} />
+			</div>
 		</section>
 		<nav>
 			<div class="navigation">
@@ -1197,37 +1211,6 @@
 		display: flex;
 		height: 100%;
 		overflow: hidden;
-	}
-
-	.confirmed-overlay {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		z-index: 100;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 1.5rem;
-		padding: 2rem;
-		color: var(--fg-success);
-		background-color: var(--bg-neutral);
-		border-radius: var(--corner-radius);
-		display: flex;
-		flex-direction: column;
-		transition: opacity 0.2s;
-		pointer-events: none;
-	}
-
-	.confirmed-overlay[aria-hidden='true'] {
-		opacity: 0;
-		/* https://github.com/microsoft/playwright/issues/5129#issuecomment-772746396 */
-		visibility: hidden;
-	}
-
-	.confirmed-overlay .icon {
-		font-size: 2.5em;
-		margin-bottom: -1rem;
 	}
 
 	.toolbar {

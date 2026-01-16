@@ -105,6 +105,7 @@ describe('processExifData', () => {
 			[namespacedMetadataId('com.example.test.protocol', 'date')]: {
 				value: new Date('2025-04-25T12:38:36.000Z'),
 				manuallyModified: false,
+				confirmed: false,
 				confidence: 1,
 				alternatives: {}
 			}
@@ -125,6 +126,7 @@ describe('processExifData', () => {
 				value: new Date('2008-10-22T16:29:49.000Z'),
 				manuallyModified: false,
 				confidence: 1,
+				confirmed: false,
 				alternatives: {}
 			},
 			[namespacedMetadataId('com.example.test.protocol', 'location')]: {
@@ -134,6 +136,7 @@ describe('processExifData', () => {
 				},
 				manuallyModified: false,
 				confidence: 1,
+				confirmed: false,
 				alternatives: {}
 			}
 		});

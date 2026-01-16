@@ -485,7 +485,6 @@ const protocol = {
 	},
 	crop: {
 		metadata: namespaced('crop'),
-		confirmationMetadata: namespaced('crop_is_confirmed'),
 		infer: [
 			{
 				model: MODELS.detectors.arthropoda,
