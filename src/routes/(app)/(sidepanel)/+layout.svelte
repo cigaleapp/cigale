@@ -14,7 +14,7 @@
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
 		storeMetadataValue
-	} from '$lib/metadata';
+	} from '$lib/metadata/index.js';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';

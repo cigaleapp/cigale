@@ -18,8 +18,8 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { metadataDefinitionComparator, metadataOptionsKeyRange } from '$lib/metadata';
 	import Metadata from '$lib/Metadata.svelte';
+	import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import { metadataDefinitionComparator } from '$lib/protocols';
 	import { getSettings } from '$lib/settings.svelte';

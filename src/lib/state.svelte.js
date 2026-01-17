@@ -10,7 +10,7 @@ import { getMetadataValue } from './metadata/index.js';
 
 /**
  * @import * as DB from './database';
- * @import { TypedMetadataValue } from './metadata';
+ * @import { TypedMetadataValue } from './metadata/index.js';
  * @import { ZoomState } from './DraggableBoundingBox.svelte.js';
  */
 
