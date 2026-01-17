@@ -124,6 +124,19 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template {string} KIn
+ * @template {any} VIn
+ * @template {string} KOut
+ * @template {any} VOut
+ * @param {Record<KIn, VIn>} subject
+ * @param {(key: KIn, value: VIn) => [KOut, VOut]} mapper
+ * @returns {Record<KOut, VOut>}
+ */
+export function mapEntries(subject, mapper) {
+	return fromEntries(entries(subject).map(([key, value]) => mapper(key, value)));
+}
+
+/**
  * @template {string} K
  * @template {string} V
  * @param {Record<K, V>} subject
@@ -820,12 +833,16 @@ if (import.meta.vitest) {
 
 /**
  * @param {number} value
- * @param {number} decimals
+ * @param {number} decimals if negative, rounds to tens, hundreds, etc.
  * @returns {number}
  */
 export function round(value, decimals = 0) {
-	if (decimals < 0) throw new Error('decimals must be non-negative');
-	const factor = Math.pow(10, decimals);
+	const factor = Math.pow(10, Math.abs(decimals));
+
+	if (decimals < 0) {
+		return Math.round(value / factor) * factor;
+	}
+
 	return Math.round(value * factor) / factor;
 }
 
@@ -842,6 +859,11 @@ if (import.meta.vitest) {
 		expect(round(1.23456789, 5)).toBe(1.23457);
 		expect(round(1.23456789, 8)).toBe(1.23456789);
 		expect(round(1.23456789, 10)).toBe(1.23456789);
+		expect(round(12345, -1)).toBe(12350);
+		expect(round(12345, -2)).toBe(12300);
+		expect(round(12555, -2)).toBe(12600);
+		expect(round(-12555, -2)).toBe(-12600);
+		expect(round(-12345, -2)).toBe(-12300);
 	});
 }
 

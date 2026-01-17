@@ -13,8 +13,10 @@ export const METADATA_ZERO_VALUE = {
 
 
 export * from './display.js';
+export * from './grouping.js';
 export * from './merging.js';
 export * from './namespacing.js';
 export * from './serializing.js';
+export * from './sorting.js';
 export * from './storage.js';
 export * from './types.js';
