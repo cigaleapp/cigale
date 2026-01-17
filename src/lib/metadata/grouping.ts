@@ -234,7 +234,13 @@ if (import.meta.vitest) {
 			groupByMetadataValue(items, {
 				metadata: metadatas.integer
 			})
-		).toMatchInlineSnapshot();
+		).toMatchObject({
+			'': [items[5]],
+			'10': [items[0], items[1]],
+			'15': [items[2]],
+			'20': [items[3]],
+			'30': [items[4]]
+		});
 	});
 
 	describe('groupMetadataValues', () => {
@@ -244,7 +250,12 @@ if (import.meta.vitest) {
 					groupMetadataValues(values.integer, {
 						type: metadatas.integer.type
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'10': ['item1', 'item2'],
+					'15': ['item3'],
+					'20': ['item4'],
+					'30': ['item5']
+				});
 			});
 
 			test('with tens tolerances', () => {
@@ -253,7 +264,11 @@ if (import.meta.vitest) {
 						type: metadatas.integer.type,
 						tolerances: { float: -1, date: 'second' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'10': ['item1', 'item2'],
+					'20': ['item3', 'item4'],
+					'30': ['item5']
+				});
 			});
 		});
 
@@ -263,7 +278,12 @@ if (import.meta.vitest) {
 					groupMetadataValues(values.float, {
 						type: metadatas.float.type
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'10.1': ['item1', 'item2'],
+					'15.6': ['item3'],
+					'20': ['item4', 'item5'],
+					'25': ['item6']
+				});
 			});
 
 			test('with decimal tolerances', () => {
@@ -272,7 +292,13 @@ if (import.meta.vitest) {
 						type: metadatas.float.type,
 						tolerances: { float: 2, date: 'second' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'10.12': ['item1'],
+					'10.13': ['item2'],
+					'15.57': ['item3'],
+					'20': ['item4', 'item5'],
+					'25': ['item6']
+				});
 			});
 
 			test('with hundreds tolerances', () => {
@@ -281,7 +307,9 @@ if (import.meta.vitest) {
 						type: metadatas.float.type,
 						tolerances: { float: -2, date: 'second' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'0': ['item1', 'item2', 'item3', 'item4', 'item5', 'item6']
+				});
 			});
 		});
 
@@ -291,7 +319,12 @@ if (import.meta.vitest) {
 					groupMetadataValues(values.date, {
 						type: metadatas.date.type
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'1': ['item1', 'item2'],
+					'2': ['item3'],
+					'3': ['item4', 'item5'],
+					'4': ['item6']
+				});
 			});
 
 			test('with minute tolerances', () => {
@@ -300,7 +333,10 @@ if (import.meta.vitest) {
 						type: metadatas.date.type,
 						tolerances: { float: 2, date: 'minute' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'0': ['item1', 'item2', 'item3', 'item4', 'item6'],
+					'5': ['item5']
+				});
 			});
 		});
 
@@ -309,7 +345,12 @@ if (import.meta.vitest) {
 				groupMetadataValues(values.string, {
 					type: metadatas.string.type
 				})
-			).toMatchInlineSnapshot();
+			).toMatchObject({
+				'"apple"': ['item1', 'item3'],
+				'"banana"': ['item2', 'item5'],
+				'"grape"': ['item6'],
+				'"orange"': ['item4']
+			});
 		});
 
 		test('booleans', () => {
@@ -317,7 +358,10 @@ if (import.meta.vitest) {
 				groupMetadataValues(values.boolean, {
 					type: metadatas.boolean.type
 				})
-			).toMatchInlineSnapshot();
+			).toMatchObject({
+				false: ['item2', 'item4', 'item5'],
+				true: ['item1', 'item3', 'item6']
+			});
 		});
 
 		describe('locations', () => {
@@ -326,7 +370,11 @@ if (import.meta.vitest) {
 					groupMetadataValues(values.location, {
 						type: metadatas.location.type
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'{"latitude":10.1,"longitude":20.1}': ['item1', 'item2', 'item4', 'item5'],
+					'{"latitude":15.6,"longitude":25.6}': ['item3'],
+					'{"latitude":30,"longitude":40}': ['item6']
+				});
 			});
 
 			test('with unit decimal tolerances', () => {
@@ -335,7 +383,11 @@ if (import.meta.vitest) {
 						type: metadatas.location.type,
 						tolerances: { float: 0, date: 'second' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'{"latitude":10,"longitude":20}': ['item1', 'item2', 'item4', 'item5'],
+					'{"latitude":16,"longitude":26}': ['item3'],
+					'{"latitude":30,"longitude":40}': ['item6']
+				});
 			});
 
 			test('with tens tolerances', () => {
@@ -344,7 +396,11 @@ if (import.meta.vitest) {
 						type: metadatas.location.type,
 						tolerances: { float: -1, date: 'second' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'{"latitude":10,"longitude":20}': ['item1', 'item2', 'item4', 'item5'],
+					'{"latitude":20,"longitude":30}': ['item3'],
+					'{"latitude":30,"longitude":40}': ['item6']
+				});
 			});
 		});
 
@@ -353,7 +409,11 @@ if (import.meta.vitest) {
 				groupMetadataValues(values.enum, {
 					type: metadatas.enum.type
 				})
-			).toMatchInlineSnapshot();
+			).toMatchObject({
+				'"A"': ['item1', 'item3', 'item6'],
+				'"B"': ['item2', 'item5'],
+				'"C"': ['item4']
+			});
 		});
 
 		describe('bounding boxes', () => {
@@ -362,7 +422,12 @@ if (import.meta.vitest) {
 					groupMetadataValues(values.boundingbox, {
 						type: metadatas.boundingbox.type
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'{"x":10,"y":10,"w":50,"h":50}': ['item1'],
+					'{"x":11,"y":11,"w":50,"h":50}': ['item4', 'item5'],
+					'{"x":12,"y":12,"w":50,"h":50}': ['item2'],
+					'{"x":15,"y":15,"w":50,"h":50}': ['item6']
+				});
 			});
 
 			test('with unit decimal tolerances', () => {
@@ -371,7 +436,12 @@ if (import.meta.vitest) {
 						type: metadatas.boundingbox.type,
 						tolerances: { float: 0, date: 'second' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'{"x":10,"y":10,"w":50,"h":50}': ['item1'],
+					'{"x":11,"y":11,"w":50,"h":50}': ['item4', 'item5'],
+					'{"x":12,"y":12,"w":50,"h":50}': ['item2'],
+					'{"x":15,"y":15,"w":50,"h":50}': ['item6']
+				});
 			});
 
 			test('with tens tolerances', () => {
@@ -380,7 +450,10 @@ if (import.meta.vitest) {
 						type: metadatas.boundingbox.type,
 						tolerances: { float: -1, date: 'second' }
 					})
-				).toMatchInlineSnapshot();
+				).toMatchObject({
+					'{"x":10,"y":10,"w":50,"h":50}': ['item1', 'item2', 'item4', 'item5'],
+					'{"x":20,"y":20,"w":50,"h":50}': ['item6']
+				});
 			});
 		});
 	});
