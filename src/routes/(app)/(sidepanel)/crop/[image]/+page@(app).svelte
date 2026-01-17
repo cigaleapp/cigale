@@ -1,6 +1,6 @@
 <script>
 	/**
-	 * @import * as Metadata from '$lib/metadata.js';
+	 * @import * as Metadata from '$lib/metadata';
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */

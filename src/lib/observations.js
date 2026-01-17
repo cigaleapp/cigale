@@ -3,7 +3,7 @@ import { generateId } from '$lib/database.js';
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { deleteImageFile, imageFileIds } from './images.js';
-import { mergeMetadataValues } from './metadata.js';
+import { mergeMetadataValues } from './metadata/index.js';
 import { uiState } from './state.svelte.js';
 import { compareBy, nonnull } from './utils.js';
 

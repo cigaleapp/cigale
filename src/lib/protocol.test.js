@@ -1,6 +1,6 @@
 import { describe, expect, it, test, vi } from 'vitest';
 
-import { metadataOptionsKeyRange } from '$lib/metadata.js';
+import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import {
 	compareProtocolWithUpstream,
 	hasUpgradeAvailable,
