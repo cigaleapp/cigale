@@ -1,5 +1,3 @@
-import { type } from 'arktype';
-
 import type * as DB from '$lib/database';
 import { MetadataRuntimeValue, type RuntimeValue } from '$lib/schemas/metadata';
 
@@ -8,52 +6,21 @@ export type TypedMetadataValue<Type extends DB.MetadataType = DB.MetadataType> =
 	'value'
 > & { value: RuntimeValue<Type> };
 
-/**
- * Asserts that a metadata is of a certain type, inferring the correct runtime type for its value
- */
-export function isType<Type extends DB.MetadataType, Value extends undefined | RuntimeValue>(
-	testedtyp: Type,
-	metadatatyp: DB.MetadataType,
-	value: Value
-): value is Value extends RuntimeValue ? RuntimeValue<Type> : undefined | RuntimeValue<Type> {
-	/**
-	 * @param {import('arktype').Type} v
-	 * @returns boolean
-	 */
-	const ok = (v: import('arktype').Type) =>
-		metadatatyp === testedtyp && (value === undefined || !(v(value) instanceof type.errors));
+export type RuntimeValuesPerType = { [K in DB.MetadataType]: RuntimeValue<K> };
 
-	switch (testedtyp) {
-		case 'boolean':
-			return ok(type('boolean'));
-		case 'integer':
-		case 'float':
-			return ok(type('number'));
-		case 'enum':
-			return ok(type('string | number'));
-		case 'date':
-			return ok(type('Date'));
-		case 'location':
-			return ok(type({ latitude: 'number', longitude: 'number' }));
-		case 'boundingbox':
-			return ok(type({ x: 'number', y: 'number', w: 'number', h: 'number' }));
-		case 'string':
-			return ok(type('string'));
-		default:
-			throw new Error(`Type inconnu: ${testedtyp}`);
-	}
-}
+type TypeswitchReturnTypes<R> = { [T in DB.MetadataType]: R };
 
-type TypeswitchReturnTypes<R = any> = { [T in DB.MetadataType]: R };
-
-type TypeswitchCases<ReturnTypes extends TypeswitchReturnTypes> = {
+type TypeswitchCases<ReturnTypes extends TypeswitchReturnTypes<any>> = {
 	[T in DB.MetadataType]: (...values: RuntimeValue<T>[]) => ReturnTypes[T];
 };
 
 type TypeswitchValues = RuntimeValue | [RuntimeValue, RuntimeValue] | RuntimeValue[];
 
 /**
- * Run different code depending on metadata value's type
+ * Run different code depending on metadata value's type.
+ * Return types for the branches can be specified in two ways:
+ * - by specifying R: a common return type for all branches
+ * - by specifying RT: a mapping of return types per metadata type. For example, RuntimeValuesPerType if you want each branch to preserve its own runtime type. When specifying RT, you can set R to `any` to avoid TS errors.
  */
 export function switchOnMetadataType<
 	R,
@@ -84,31 +51,17 @@ export function switchOnMetadataType<
 	return (cases[type] ?? fallback)(...typeds);
 }
 
-/**
- * Just like `isType`, but for an array of values
- */
-export function areType<Type extends DB.MetadataType, Value extends undefined | RuntimeValue>(
-	testedtyp: Type,
-	metadatatyp: DB.MetadataType,
-	value: Value[]
-): value is Value extends RuntimeValue ? RuntimeValue<Type>[] : undefined | RuntimeValue<Type>[] {
-	return value.every((v) => isType(testedtyp, metadatatyp, v));
-}
-
 export function hasRuntimeType<Type extends DB.MetadataType>(
 	type: Type,
 	value: any
 ): value is RuntimeValue<Type> {
-	return isType(type, type, value);
+	return MetadataRuntimeValue[type].allows(value);
 }
 
-export function assertIs<Type extends DB.MetadataType>(
-	type: Type,
-	value: unknown
-): RuntimeValue<Type> {
-	// @ts-ignore
-	if (!isType(type, type, value))
+export function assertIs<Type extends DB.MetadataType>(type: Type, value: any): RuntimeValue<Type> {
+	if (!hasRuntimeType(type, value))
 		throw new Error(`La valeur n'est pas de type ${type}: ${JSON.stringify(value)}`);
+
 	return value;
 }
 

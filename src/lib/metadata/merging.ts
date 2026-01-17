@@ -5,7 +5,7 @@ import type { RuntimeValue } from '$lib/schemas/metadata.js';
 import { avg, mapValues, nonnull } from '$lib/utils.js';
 
 import { metadataOptionsKeyRange } from './storage.js';
-import { switchOnMetadataType } from './types.js';
+import { switchOnMetadataType, type RuntimeValuesPerType } from './types.js';
 
 export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
 	'boolean',
@@ -221,7 +221,7 @@ function mergeByAggregate<Type extends DB.MetadataType, Value extends RuntimeVal
 	options: DB.MetadataEnumVariant[];
 	aggregate: (vals: number[]) => number;
 }) {
-	return switchOnMetadataType<any, { [K in DB.MetadataType]: RuntimeValue<K> }>(
+	return switchOnMetadataType<any, RuntimeValuesPerType>(
 		type,
 		values,
 		{
