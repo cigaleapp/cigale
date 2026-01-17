@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 
 import { dependencyURI, tables } from '$lib/idb.svelte.js';
-import { metadataDefinitionComparator } from '$lib/metadata/index.js';
+import { metadataDefinitionComparator } from '$lib/protocols.js';
 import { nonnull } from '$lib/utils.js';
 
 export async function load({ params, depends }) {
