@@ -5,7 +5,7 @@
 	import IconMerged from '~icons/ri/stack-line';
 
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { isType } from './metadata';
+	import { hasRuntimeType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
@@ -98,7 +98,7 @@
 					.sort(([, a], [, b]) => b - a)
 					.slice(0, 3) as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
-					{@const enumVariant = isType('enum', definition.type, stringValue)
+					{@const enumVariant = hasRuntimeType('enum', stringValue)
 						? options?.find(({ key }) => key === stringValue)
 						: undefined}
 					<li>
