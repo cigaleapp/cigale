@@ -73,6 +73,10 @@
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
+	/**
+	 * @import { RuntimeValue } from '$lib/schemas/metadata';
+	 */
+
 	navbarAppearance('hidden');
 
 	// TODO figure out why the [image] route param is nullable
@@ -163,7 +167,7 @@
 	let focusedImageId = $state('');
 
 	/**
-	 * @type {Record<string, Metadata.RuntimeValue<'boundingbox'>>}
+	 * @type {Record<string, RuntimeValue<'boundingbox'>>}
 	 */
 	const boundingBoxes = $derived(
 		Object.fromEntries(
@@ -202,7 +206,7 @@
 	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
-	/** @type {Record<string, undefined | { value: Metadata.RuntimeValue<'boundingbox'>, confidence: number }>} */
+	/** @type {Record<string, undefined | { value: RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
 		Object.fromEntries(
 			images.map((image) => {
@@ -477,7 +481,7 @@
 				value: toCenteredCoords(newBoundingBox),
 				confidence: 1,
 				// Put the neural-network-inferred (initial) value in the alternatives as a backup
-				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : undefined,
+				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : [],
 				manuallyModified: true
 			});
 		} else if (

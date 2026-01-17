@@ -13,9 +13,9 @@ import {
 	addValueLabels,
 	metadataPrettyKey,
 	metadataPrettyValue,
-	observationMetadata,
 	protocolMetadataValues
 } from '$lib/metadata';
+import { observationMetadata } from '$lib/observations.js';
 import { Analysis } from '$lib/schemas/exports.js';
 import { MetadataRuntimeValue, MetadataValues } from '$lib/schemas/metadata';
 import { FilepathTemplate } from '$lib/schemas/protocols';

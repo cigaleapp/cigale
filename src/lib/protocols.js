@@ -462,3 +462,20 @@ export async function autoUpdateProtocols(db, swarpc) {
 		.map((r) => r.value)
 		.filter((v) => v !== undefined);
 }
+
+/**
+ *
+ * @param {{metadataOrder?: undefined | string[]}} protocol
+ * @returns {(a: string | { id: string }, b: string | { id: string }) => number}
+ */
+export function metadataDefinitionComparator(protocol) {
+	return (a, b) => {
+		if (typeof a !== 'string') a = a.id;
+		if (typeof b !== 'string') b = b.id;
+
+		if (protocol.metadataOrder) {
+			return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
+		}
+		return idComparator(a, b);
+	};
+}
