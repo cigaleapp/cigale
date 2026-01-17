@@ -1,6 +1,6 @@
 <script>
 	/**
-	 * @import * as Metadata from '$lib/metadata';
+	 * @import * as Metadata from '$lib/metadata/index.js';
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
@@ -58,7 +58,7 @@
 		deleteMetadataValue,
 		hasRuntimeType,
 		storeMetadataValue
-	} from '$lib/metadata';
+	} from '$lib/metadata/index.js';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';

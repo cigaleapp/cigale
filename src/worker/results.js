@@ -14,7 +14,7 @@ import {
 	metadataPrettyKey,
 	metadataPrettyValue,
 	protocolMetadataValues
-} from '$lib/metadata';
+} from '$lib/metadata/index.js';
 import { observationMetadata } from '$lib/observations.js';
 import { Analysis } from '$lib/schemas/exports.js';
 import { MetadataRuntimeValue, MetadataValues } from '$lib/schemas/metadata';

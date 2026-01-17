@@ -10,7 +10,7 @@
 	import { databaseHandle, dependencyURI, tables } from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import InputSelectProtocol from '$lib/InputSelectProtocol.svelte';
-	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata';
+	import { deleteMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
 	import Metadata from '$lib/Metadata.svelte';
 	import MetadataList from '$lib/MetadataList.svelte';
 	import ModalConfirmDeletion from '$lib/ModalConfirmDeletion.svelte';
