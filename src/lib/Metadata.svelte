@@ -5,7 +5,7 @@
 	import IconMerged from '~icons/ri/stack-line';
 
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { isType } from './metadata.js';
+	import { isType } from './metadata';
 	import MetadataInput from './MetadataInput.svelte';
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
@@ -18,7 +18,7 @@
 	 * @property {import('./database').MetadataEnumVariant[]} [options]
 	 * @property {undefined | import('./database').MetadataValue} value
 	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
-	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onchange]
+	 * @property {(value: undefined | import('./schemas/metadata').RuntimeValue) => void} [onchange]
 	 */
 
 	/** @type {Props} */

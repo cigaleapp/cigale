@@ -3,7 +3,7 @@ import { strFromU8, unzipSync } from 'fflate';
 
 import * as db from './idb.svelte.js';
 import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images.js';
-import { serializeMetadataValue } from './metadata.js';
+import { serializeMetadataValue } from './metadata/index.js';
 import { Analysis } from './schemas/exports.js';
 import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
 import { switchSession } from './sessions.js';

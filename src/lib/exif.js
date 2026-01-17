@@ -6,13 +6,13 @@ import piexif from 'piexifjs';
 import { Schemas } from './database.js';
 import { EXIF_GPS_FIELDS } from './exiffields.js';
 import * as db from './idb.svelte.js';
-import { storeMetadataValue } from './metadata.js';
+import { storeMetadataValue } from './metadata/index.js';
 import { ensureNamespacedMetadataId } from './schemas/metadata.js';
 import { toasts } from './toasts.svelte.js';
 
 /**
  * @import { MetadataInferOptions, MetadataType } from './database.js';
- * @import { RuntimeValue } from './metadata.js';
+ * @import { RuntimeValue } from './metadata/index.js';
  */
 
 /**
@@ -151,7 +151,7 @@ export async function extractMetadata(buffer, extractionPlan) {
  * @template {import('./database.js').MetadataType} T
  * @param {unknown} value
  * @param {T} coerceTo
- * @returns {import('./metadata.js').RuntimeValue<T>}
+ * @returns {import('./metadata/index.js').RuntimeValue<T>}
  */
 export function coerceExifValue(value, coerceTo) {
 	switch (coerceTo) {

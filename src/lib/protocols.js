@@ -5,7 +5,7 @@ import { Schemas } from './database.js';
 import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
-import { metadataOptionsKeyRange } from './metadata.js';
+import { metadataOptionsKeyRange } from './metadata/index.js';
 import { ExportedProtocol, Protocol } from './schemas/protocols.js';
 import { cachebust, fetchHttpRequest, fromEntries, keys, omit, pick, range, sum } from './utils.js';
 

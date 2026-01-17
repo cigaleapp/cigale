@@ -6,7 +6,7 @@
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
 
-	import { isType } from './metadata.js';
+	import { isType } from './metadata';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import RadioButtons from './RadioButtons.svelte';
 	import Switch from './Switch.svelte';
@@ -16,9 +16,9 @@
 	/**
 	 * @typedef {object} Props
 	 * @property {import('./database').Metadata} definition
-	 * @property {undefined | import('./metadata').RuntimeValue} value
+	 * @property {undefined | import('./metadata/index.js').RuntimeValue} value
 	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
-	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onblur]
+	 * @property {(value: undefined | import('./metadata/index.js').RuntimeValue) => void} [onblur]
 	 * @property {string} [id]
 	 * @property {boolean} [disabled]
 	 * @property {import('./database').MetadataEnumVariant[]} [options]

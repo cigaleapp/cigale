@@ -1,20 +1,21 @@
 import { type } from 'arktype';
 import * as dates from 'date-fns';
 
-import { computeCascades } from './cascades.js';
-import { idComparator, Schemas } from './database.js';
+import { computeCascades } from '../cascades.js';
+import { idComparator, Schemas } from '../database.js';
 import {
 	ensureNamespacedMetadataId,
 	isNamespacedToProtocol,
+	MetadataRuntimeValue,
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 	removeNamespaceFromMetadataId
-} from './schemas/metadata.js';
-import { avg, compareBy, fromEntries, mapValues } from './utils.js';
+} from '../schemas/metadata.js';
+import { avg, compareBy, fromEntries, mapValues, nonnull } from '../utils.js';
 
 /**
- * @import { DatabaseHandle, ReactiveTableNames } from './idb.svelte.js'
- * @import * as DB from './database.js'
+ * @import { DatabaseHandle, ReactiveTableNames } from '../idb.svelte.js'
+ * @import * as DB from '../database.js'
  */
 
 /**
@@ -69,7 +70,7 @@ export function getMetadataValue(image, type, metadataId) {
  */
 export function serializeMetadataValue(value) {
 	return JSON.stringify(
-		value instanceof Date && dates.isValid(value)
+		value instanceof Date && dates.isValidDate(value)
 			? dates.format(value, "yyyy-MM-dd'T'HH:mm:ss")
 			: value
 	);
@@ -342,7 +343,7 @@ export async function deleteMetadataValue({
 export async function observationMetadata(db, protocol, observation) {
 	const images = await Promise.all(
 		observation.images.map(async (id) => await db.get('Image', id))
-	);
+	).then((ims) => ims.filter(nonnull));
 
 	images.sort(compareBy(({ id }) => observation.images.indexOf(id)));
 
@@ -599,7 +600,7 @@ function mergeByMajority(_type, values, strategy) {
  * Merge values by average.
  * @param {Type} type
  * @param {Value[]} values
- * @param {import('./database.js').MetadataEnumVariant[]} [options]
+ * @param {import('../database.js').MetadataEnumVariant[]} [options]
  * @returns {Value}
  * @template {RuntimeValue<Type>} Value
  * @template {DB.MetadataType} Type
@@ -712,7 +713,7 @@ function mergeMedian(type, values) {
 
 /**
  * Merge values by union.
- * @param {import('./database.js').MetadataType} type
+ * @param {import('../database.js').MetadataType} type
  * @param {Array<RuntimeValue>} values
  * @returns {RuntimeValue<"boundingbox">}
  */
@@ -960,6 +961,23 @@ export function isType(testedtyp, metadatatyp, value) {
 		default:
 			throw new Error(`Type inconnu: ${testedtyp}`);
 	}
+}
+
+/**
+ * Run different code depending on metadata value's type
+ * @template {{[T in DB.MetadataType]: any}} ReturnTypes
+ * @param {DB.MetadataType} type
+ * @param {RuntimeValue | [RuntimeValue, RuntimeValue]} value
+ * @param {{[T in DB.MetadataType]: (...values: RuntimeValue<T>[]) => ReturnTypes[T]}} cases
+ * @returns {ReturnTypes[DB.MetadataType]}
+ */
+export function switchOnMetadataType(type, value, cases) {
+	const typedValue = Array.isArray(value)
+		? value.map((v) => MetadataRuntimeValue[type].assert(v))
+		: MetadataRuntimeValue[type].assert(value);
+
+	// @ts-expect-error typescript can't link the type of value and type parameter
+	return cases[type](typedValue);
 }
 
 /**
