@@ -1,6 +1,7 @@
 import * as dates from 'date-fns';
 
 import * as DB from '$lib/database';
+import type { RuntimeValue } from '$lib/schemas/metadata';
 import { mapValues } from '$lib/utils';
 
 /**
@@ -35,11 +36,19 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Serialize a full metadata value (including confidence, alternatives, etc)
+ */
+export function serializeMetadataFullValue<T extends { value: RuntimeValue }>({
+	value,
+	...rest
+}: T): T & { value: string } {
+
+	return { ...rest, value: serializeMetadataValue(value) };
+}
+
+/**
  * Serialize a record of metadata values for storing in the database.
  */
 export function serializeMetadataValues(values: DB.MetadataValues): DB.MetadataValues {
-	return mapValues(values, ({ value, ...rest }) => ({
-		...rest,
-		value: serializeMetadataValue(value)
-	}));
+	return mapValues(values, serializeMetadataFullValue);
 }

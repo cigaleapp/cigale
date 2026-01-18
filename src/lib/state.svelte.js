@@ -1,12 +1,9 @@
-import { match } from 'arktype';
 import { Estimation as ETA } from 'arrival-time';
-import { watch } from 'runed';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-
-import { MetadataInferOptionsNeural } from '$lib/schemas/metadata.js';
 
 import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
+import { defaultClassificationMetadata } from './protocols.js';
 
 /**
  * @import * as DB from './database';
@@ -279,19 +276,11 @@ class UIState {
 	}
 
 	/** @type {string|undefined} */
-	classificationMetadataId = $derived.by(() => {
-		const isCandidate = match
-			.case(
-				{
-					id: 'string',
-					type: '"enum"',
-					infer: MetadataInferOptionsNeural
-				},
-				({ id }) => this.currentProtocol?.metadata.includes(id)
-			)
-			.default(() => false);
-		return tables.Metadata.state.find((m) => isCandidate(m))?.id;
-	});
+	classificationMetadataId = $derived(
+		this.currentProtocol
+			? defaultClassificationMetadata(this.currentProtocol, tables.Metadata.state)
+			: undefined
+	);
 }
 
 export const uiState = new UIState();

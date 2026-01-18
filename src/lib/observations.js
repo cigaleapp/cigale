@@ -3,9 +3,14 @@ import { generateId, Schemas } from '$lib/database.js';
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { deleteImageFile, imageFileIds } from './images.js';
-import { mergeMetadataValues } from './metadata/index.js';
+import {
+	mergeMetadataFromImagesAndObservations,
+	mergeMetadataValues,
+	serializeMetadataFullValue,
+	serializeMetadataValue
+} from './metadata/index.js';
 import { uiState } from './state.svelte.js';
-import { compareBy, nonnull } from './utils.js';
+import { compareBy, mapValues, nonnull } from './utils.js';
 
 /**
  * @import * as DB from '$lib/database.js'
@@ -41,14 +46,9 @@ export async function mergeToObservation(parts) {
 		images: [...imageIds].toSorted(compareBy((id) => parts.indexOf(id))),
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([...observations, ...images]),
-		metadataOverrides: Object.fromEntries(
-			Object.entries(
-				await mergeMetadataValues(
-					db.databaseHandle(),
-					protocol,
-					observations.map((o) => o.metadataOverrides)
-				)
-			).map(([key, { value, ...rest }]) => [key, { ...rest, value: JSON.stringify(value) }])
+		metadataOverrides: mapValues(
+			mergeMetadataFromImagesAndObservations({ protocol, images: [], observations }),
+			serializeMetadataFullValue
 		)
 	};
 
@@ -194,15 +194,17 @@ export async function ensureNoLoneImages(tx) {
 export async function observationMetadata(db, protocol, observation) {
 	const images = await Promise.all(
 		observation.images.map(async (id) => await db.get('Image', id))
-	).then((ims) => ims.filter(nonnull));
+	).then((ims) => ims.filter(nonnull).map((img) => Schemas.Image.assert(img)));
 
 	images.sort(compareBy(({ id }) => observation.images.indexOf(id)));
 
-	const metadataFromImages = await mergeMetadataValues(
-		db,
-		protocol,
-		images.map((img) => Schemas.MetadataValues.assert(img.metadata))
-	);
+	const metadataFromImages = mergeMetadataFromImagesAndObservations({
+		definitions: await db
+			.getAll('Metadata')
+			.then((defs) => defs.map((def) => Schemas.Metadata.assert(def))),
+		images,
+		observations: []
+	});
 
 	return {
 		...metadataFromImages,

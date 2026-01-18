@@ -67,7 +67,7 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	boolean: type('boolean'),
 	integer: type('number'),
 	float: type('number'),
-	enum: type('string'),
+	enum: type('string | number'),
 	date: type('Date'),
 	location: type({ latitude: 'number', longitude: 'number' }),
 	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' })
@@ -225,6 +225,13 @@ export const Metadata = type({
 	),
 	required: ['boolean', '@', 'Si la métadonnée est obligatoire'],
 	description: ['string', '@', 'Description, pour aider à comprendre la métadonnée'],
+	sortable: type('boolean')
+		.describe('Si la métadonnée peut être utilisée pour trier des images ou observations')
+		.default(false),
+	groupable: type('boolean')
+		.describe('Si la métadonnée peut être utilisée pour grouper des images ou observations')
+		.default(false),
+	type: MetadataType.describe('Type de la métadonnée'),
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
 	).optional(),
