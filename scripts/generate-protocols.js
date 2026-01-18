@@ -144,7 +144,8 @@ const cladeMetadata = (clade, label) => ({
 	label,
 	required: false,
 	description: '',
-	mergeMethod: 'max'
+	mergeMethod: 'max',
+	groupable: true
 });
 
 /**
@@ -331,6 +332,7 @@ const protocol = {
 				"Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat",
 			required: false,
 			mergeMethod: 'none',
+			groupable: true,
 			options: [
 				{ key: 'current', label: "C'est une photo de l'habitat actuel" },
 				{ key: 'nearby', label: "C'est une photo de l'habitat à proximité" }
@@ -342,6 +344,8 @@ const protocol = {
 			description: "Niveau de difficulté pour identifier l'espèce sur la photo",
 			required: false,
 			mergeMethod: 'average',
+			groupable: true,
+			sortable: true,
 			options: [
 				{
 					key: 'easy',
@@ -375,6 +379,8 @@ const protocol = {
 			description: "Statut de conservation IUCN de l'espèce",
 			required: false,
 			mergeMethod: 'average',
+			groupable: true,
+			sortable: true,
 			options: [
 				{
 					key: 'ex',
@@ -426,6 +432,8 @@ const protocol = {
 			description: 'Moment où la photo a été prise',
 			required: false,
 			mergeMethod: 'average',
+			sortable: true,
+			groupable: true,
 			infer: { exif: 'DateTimeOriginal' }
 		},
 		[namespaced('shoot_location')]: {
@@ -434,6 +442,7 @@ const protocol = {
 			description: 'Endroit où la photo a été prise',
 			required: false,
 			mergeMethod: 'average',
+			groupable: true,
 			infer: { latitude: { exif: 'GPSLatitude' }, longitude: { exif: 'GPSLongitude' } }
 		},
 		[namespaced('crop')]: {
@@ -455,6 +464,7 @@ const protocol = {
 			label: 'Espèce',
 			description: '',
 			required: true,
+			groupable: true,
 			mergeMethod: 'max',
 			options: options.sort((a, b) => parseFloat(a.key) - parseFloat(b.key)),
 			infer: {
