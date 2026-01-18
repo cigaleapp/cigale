@@ -1,5 +1,6 @@
 <script lang="ts">
 	import IconSelect from '~icons/ri/arrow-down-s-line';
+	import IconSubmenu from '~icons/ri/arrow-right-s-line';
 	import IconCheck from '~icons/ri/check-line';
 	import IconSortAsc from '~icons/ri/sort-asc';
 	import IconSortDesc from '~icons/ri/sort-desc';
@@ -45,6 +46,7 @@
 
 	function selectableModel(i: number, label: string) {
 		return {
+			type: 'selectable' as const,
 			data: { direction: null },
 			key: i,
 			label,
@@ -118,16 +120,51 @@
 		items={[
 			{
 				label: 'Trier par…',
-				selectables: entries(SORT_FIELDS).map(([key, { label }]) => {
+				items: entries(SORT_FIELDS).map(([key, { label }]) => {
 					const direction = currentSettings?.sort.direction ?? null;
 					const field = currentSettings?.sort.field;
+					const metadata = currentSettings?.sort.metadata;
 					const selected = field === key;
+					const needsMetadata = sortOrGroupFieldNeedsMetadata(key);
+
+					if (needsMetadata) {
+						return {
+							type: 'submenu',
+							data: { direction: null },
+							label,
+							selected,
+							submenu: {
+								label: 'Métadonnée',
+								items: sortableMetadata.map((m) => ({
+									type: 'selectable',
+									data: { direction },
+									key: m.id,
+									label: m.label || removeNamespaceFromMetadataId(m.id),
+									selected: selected && metadata === m.id,
+									closeOnSelect: false,
+									async onclick() {
+										if (selected && metadata === m.id) {
+											await setSettings('sort', {
+												direction: direction === 'asc' ? 'desc' : 'asc'
+											});
+										} else {
+											await setSettings('sort', {
+												metadata: m.id,
+												field: key
+											});
+										}
+									}
+								}))
+							}
+						};
+					}
 
 					return {
-						data: { direction },
 						key,
 						label,
 						selected,
+						data: { direction },
+						type: 'selectable',
 						closeOnSelect: false,
 						async onclick() {
 							if (selected) {
@@ -142,26 +179,48 @@
 					};
 				})
 			},
-			...orEmpty(currentSettingsNeedsMetadata.sort, {
-				label: 'Métadonnée de tri',
-				selectables: sortableMetadata.map((m) => ({
-					data: { direction: null },
-					key: m.id,
-					label: m.label || removeNamespaceFromMetadataId(m.id),
-					selected: currentSettings?.sort.metadata === m.id,
-					closeOnSelect: false,
-					async onclick() {
-						await setSettings('sort', { metadata: m.id });
-					}
-				}))
-			}),
 			{
 				label: 'Regrouper par…',
-				selectables: entries(GROUP_FIELDS).map(([key, { label }]) => {
+				items: entries(GROUP_FIELDS).map(([key, { label }]) => {
 					const field = currentSettings?.group.field;
+					const metadata = currentSettings?.group.metadata;
 					const selected = field === key;
+					const needsMetadata = sortOrGroupFieldNeedsMetadata(key);
+
+					if (needsMetadata) {
+						return {
+							type: 'submenu',
+							data: { direction: null },
+							label,
+							selected,
+							submenu: {
+								label: 'Métadonnée',
+								items: groupableMetadata.map((m) => ({
+									type: 'selectable',
+									data: { direction: null },
+									key: m.id,
+									label: m.label || removeNamespaceFromMetadataId(m.id),
+									selected: selected && metadata === m.id,
+									closeOnSelect: false,
+									async onclick() {
+										if (selected && metadata === m.id) {
+											await setSettings('group', {
+												field: 'none'
+											});
+										} else {
+											await setSettings('group', {
+												metadata: m.id,
+												field: key
+											});
+										}
+									}
+								}))
+							}
+						};
+					}
 
 					return {
+						type: 'selectable',
 						data: { direction: null },
 						key,
 						label,
@@ -173,22 +232,10 @@
 					};
 				})
 			},
-			...orEmpty(currentSettingsNeedsMetadata.group, {
-				label: 'Métadonnée de regroupement',
-				selectables: groupableMetadata.map((m) => ({
-					data: { direction: null },
-					key: m.id,
-					label: m.label || removeNamespaceFromMetadataId(m.id),
-					selected: currentSettings?.group.metadata === m.id,
-					closeOnSelect: false,
-					async onclick() {
-						await setSettings('group', { metadata: m.id });
-					}
-				}))
-			}),
+
 			...orEmpty(uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
-				selectables: [
+				items: [
 					selectableModel(-1, 'Aucune inférence'),
 					...models.map((model, i) => selectableModel(i, model.name ?? `Modèle ${i + 1}`))
 				]
@@ -200,8 +247,8 @@
 				<IconSelect />
 			</ButtonIcon>
 		{/snippet}
-		{#snippet item({ direction }, { label, selected })}
-			<div class="selected-model-indicator">
+		{#snippet item({ direction }, { label, selected, type })}
+			<div class="icon">
 				{#if selected && direction === 'asc'}
 					<IconSortDesc />
 				{:else if selected && direction === 'desc'}
@@ -210,7 +257,12 @@
 					<IconCheck />
 				{/if}
 			</div>
-			{label}
+			<div class="label">{label}</div>
+			<div class="icon">
+				{#if type === 'submenu'}
+					<IconSubmenu />
+				{/if}
+			</div>
 		{/snippet}
 	</DropdownMenu>
 </div>
@@ -223,10 +275,15 @@
 		font-size: 0.9em;
 	}
 
-	.selected-model-indicator {
+	.icon {
 		width: 1.5em;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		color: var(--fg-primary);
+	}
+
+	.label {
+		flex-grow: 1;
 	}
 </style>

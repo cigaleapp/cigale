@@ -6,16 +6,16 @@ import { ID } from './common.js';
 import { MetadataValues } from './metadata.js';
 
 export const SORT_FIELDS = /** @type {const} */ ({
-	metadataValue: { label: 'Valeur de…' },
-	metadataConfidence: { label: 'Confiance de…' },
+	metadataValue: { label: 'Métadonnée…' },
+	metadataConfidence: { label: 'Confiance en…' },
 	id: { label: 'ID' },
 	name: { label: 'Nom' }
 });
 
 export const GROUP_FIELDS = /** @type {const} */ ({
-	metadataValue: { label: 'Valeur de…' },
+	metadataValue: { label: 'Métadonnée…' },
 	metadataPresence: { label: 'Présence de…' },
-	metadataConfidence: { label: 'Confiance de…' },
+	metadataConfidence: { label: 'Confiance en…' },
 	none: { label: 'Aucun regroupement' }
 });
 

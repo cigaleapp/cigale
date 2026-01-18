@@ -24,7 +24,8 @@
 	items={[
 		{
 			label: 'Choisir un protocole',
-			selectables: tables.Protocol.state.map((p) => ({
+			items: tables.Protocol.state.map((p) => ({
+				type: 'selectable',
 				data: { protocol: p },
 				key: p.id,
 				label: p.name,
@@ -38,6 +39,7 @@
 		{
 			items: [
 				{
+					type: 'clickable',
 					data: { protocol: null },
 					label: 'Gérer les protocoles',
 					async onclick() {
