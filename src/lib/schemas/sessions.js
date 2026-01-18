@@ -1,7 +1,7 @@
 import { scope, type } from 'arktype';
 
-import { keys } from '$lib/utils.js';
-
+// schemas are imported by scripts that are run by Bun directly, so dont use $lib here
+import { keys } from '../utils.js';
 import { ID } from './common.js';
 import { MetadataValues } from './metadata.js';
 
