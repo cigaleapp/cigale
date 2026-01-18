@@ -7,7 +7,7 @@
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
-	import { set, tables } from '$lib/idb.svelte';
+	import { tables } from '$lib/idb.svelte';
 	import {
 		removeNamespaceFromMetadataId,
 		type MetadataInferOptionsNeural
@@ -26,7 +26,7 @@
 		tab: 'crop' | 'classify' | 'import';
 		models: (typeof MetadataInferOptionsNeural.infer)['neural'];
 		currentModelIndex: number;
-		setModel: (i: number) => Promise<void>;
+		setModel: (_i: number) => Promise<void>;
 	}
 
 	const { tab, models, currentModelIndex, setModel }: Props = $props();
@@ -71,11 +71,6 @@
 				}
 			: undefined
 	);
-
-	const currentSettingsNeedsMetadata = $derived({
-		group: currentSettings?.group && sortOrGroupFieldNeedsMetadata(currentSettings.group.field),
-		sort: currentSettings?.sort && sortOrGroupFieldNeedsMetadata(currentSettings.sort.field)
-	});
 
 	async function setSettings<Task extends 'sort' | 'group'>(
 		task: Task,

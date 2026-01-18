@@ -1,13 +1,12 @@
 import * as dates from 'date-fns';
 
 import type * as DB from '$lib/database.js';
-import { plural, type Language } from '$lib/i18n';
-import { METADATA_TYPES, type RuntimeValue } from '$lib/schemas/metadata';
-import { fromEntries, groupBy, keys, mapEntries, mapValues, nonnull, round } from '$lib/utils';
+import { type Language } from '$lib/i18n';
+import { type RuntimeValue } from '$lib/schemas/metadata.js';
+import { fromEntries, groupBy, mapValues, round } from '$lib/utils.js';
 
-import { metadataPrettyValue } from './display';
-import { serializeMetadataValue } from './serializing';
-import { switchOnMetadataType } from './types';
+import { metadataPrettyValue } from './display.js';
+import { switchOnMetadataType } from './types.js';
 
 /**
  *
@@ -95,45 +94,6 @@ export function metadataValueGrouper({
 		});
 }
 
-// /**
-//  * Groups images or observations by their metadata values.
-//  * Items that don't have a value for the given metadata will be grouped into a empty-string-keyed value
-//  * @param  items the items to group
-//  * @param  args
-//  * @param  args.metadata the metadata to group with
-//  * @param  args.tolerances tolerances to apply when comparing certain metadata types.
-//  */
-// export function groupByMetadataValue<Item extends { id: string; metadata: DB.MetadataValues }>(
-// 	items: Array<Item>,
-// 	{
-// 		metadata,
-// 		tolerances
-// 	}: {
-// 		metadata: Pick<DB.Metadata, 'type' | 'id'>;
-// 		tolerances?: Parameters<typeof metadataValueGrouper>[0]['tolerances'];
-// 	}
-// ) {
-// 	const itemsById = items
-// 		.map(({ id, metadata: m }) => [id, m[metadata.id]?.value ?? null] as const)
-// 		.filter(([, v]) => v !== null);
-
-// 	const grouped: Record<string, Item[]> = {};
-
-// 	for (const [group, ids] of Object.entries(
-// 		groupMetadataValues(itemsById, {
-// 			type: metadata.type,
-// 			tolerances
-// 		})
-// 	)) {
-// 		grouped[group] = ids.map((id) => items.find((item) => item.id === id)).filter(nonnull);
-// 	}
-
-// 	// Group items without a value under an empty string key
-// 	grouped[''] = items.filter((item) => item.metadata[metadata.id] === undefined);
-
-// 	return grouped;
-// }
-
 if (import.meta.vitest) {
 	const { describe, test, expect } = import.meta.vitest;
 	const { metadatas, values } = await import('./_testdata.js');
@@ -148,7 +108,7 @@ if (import.meta.vitest) {
 		});
 
 		return mapValues(
-			fromEntries([...groupBy(vals, ([_, value]) => grouper(value)).entries()]),
+			fromEntries([...groupBy(vals, ([, value]) => grouper(value)).entries()]),
 			(items) => items.map(([id]) => id)
 		);
 	}

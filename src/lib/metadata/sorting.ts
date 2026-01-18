@@ -1,10 +1,10 @@
 import * as dates from 'date-fns';
 
 import type * as DB from '$lib/database.js';
-import type { RuntimeValue } from '$lib/schemas/metadata';
-import type { Comparator } from '$lib/utils';
+import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import type { Comparator } from '$lib/utils.js';
 
-import { switchOnMetadataType } from '.';
+import { switchOnMetadataType } from './index.js';
 
 /**
  * Returns a comparator function to sort metadata values according to their runtime value.

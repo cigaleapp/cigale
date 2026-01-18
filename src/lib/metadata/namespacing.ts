@@ -1,13 +1,14 @@
-import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from '$lib/schemas/metadata';
-import { fromEntries } from '$lib/utils';
+import { isNamespacedToProtocol, removeNamespaceFromMetadataId } from '$lib/schemas/metadata.js';
+import { fromEntries } from '$lib/utils.js';
 
-import { METADATA_ZERO_VALUE } from '.';
+import { METADATA_ZERO_VALUE } from './index.js';
 
 /**
  * Returns a un-namespaced object of all metadata values of the given protocol, given the metadata values object of an image/observation. If a metadata value is absent from the given values, the value is still present, but set to `null`.
  */
 export function protocolMetadataValues(
 	protocol: { metadata: string[]; id: string },
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	values: { [x: string]: any }
 ) {
 	return fromEntries(

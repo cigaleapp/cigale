@@ -1,10 +1,10 @@
 import type { MetadataValues } from './database.js';
-import { list, tables } from './idb.svelte';
-import { compareByMetadataValue, metadataOptionsKeyRange, metadataValueGrouper } from './metadata';
-import { removeNamespaceFromMetadataId, splitMetadataId } from './schemas/metadata';
+import { list, tables } from './idb.svelte.js';
+import { compareByMetadataValue, metadataOptionsKeyRange, metadataValueGrouper } from './metadata/index.js';
+import { removeNamespaceFromMetadataId, splitMetadataId } from './schemas/metadata.js';
 import type { GroupSettings, SortSettings } from './schemas/sessions.js';
 import { getSettings } from './settings.svelte.js';
-import { applySortDirection, compareBy, type Comparator } from './utils';
+import { applySortDirection, compareBy, type Comparator } from './utils.js';
 
 export type GalleryItem<AdditionalData> = {
 	sessionId: string;

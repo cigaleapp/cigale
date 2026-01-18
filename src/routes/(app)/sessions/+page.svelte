@@ -13,7 +13,6 @@
 	import { goto } from '$lib/paths.js';
 	import { defaultClassificationMetadata } from '$lib/protocols.js';
 	import { importMore } from '$lib/queue.svelte';
-	import { ensureNamespacedMetadataId } from '$lib/schemas/metadata.js';
 	import { seo } from '$lib/seo.svelte';
 	import { switchSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';

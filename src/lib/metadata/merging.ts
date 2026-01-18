@@ -1,10 +1,7 @@
 import type * as DB from '$lib/database';
-import { Schemas } from '$lib/database';
-import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import { splitMetadataId, type RuntimeValue } from '$lib/schemas/metadata.js';
+import { type RuntimeValue } from '$lib/schemas/metadata.js';
 import { avg, mapValues, nonnull } from '$lib/utils.js';
 
-import { metadataOptionsKeyRange } from './storage.js';
 import { switchOnMetadataType, type RuntimeValuesPerType } from './types.js';
 
 export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
@@ -20,12 +17,15 @@ export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
 /**
  * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
  */
-export function mergeMetadataFromImagesAndObservations(
-	{definitions, images, observations}:
-	{definitions: DB.Metadata[],
-	images: DB.Image[],
-	observations: DB.Observation[]}
-) {
+export function mergeMetadataFromImagesAndObservations({
+	definitions,
+	images,
+	observations
+}: {
+	definitions: DB.Metadata[];
+	images: DB.Image[];
+	observations: DB.Observation[];
+}) {
 	// TODO improve performance by passing a cache
 	// const options = await Promise.all(
 	// 	definitions.map(async (def) => {
@@ -110,7 +110,7 @@ export function mergeMetadataValues(
 	return output;
 }
 
-export function mergeMetadata(
+function mergeMetadata(
 	definition: DB.Metadata,
 	values: DB.MetadataValue[],
 	options: DB.MetadataEnumVariant[] = []
@@ -219,6 +219,7 @@ function mergeByAggregate<Type extends DB.MetadataType, Value extends RuntimeVal
 	options: DB.MetadataEnumVariant[];
 	aggregate: (vals: number[]) => number;
 }) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	return switchOnMetadataType<any, RuntimeValuesPerType>(
 		type,
 		values,

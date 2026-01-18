@@ -1,14 +1,14 @@
-import { computeCascades } from '$lib/cascades';
-import type * as DB from '$lib/database';
-import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte';
+import { computeCascades } from '$lib/cascades.js';
+import type * as DB from '$lib/database.js';
+import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
 import {
 	ensureNamespacedMetadataId,
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 	type RuntimeValue
-} from '$lib/schemas/metadata';
+} from '$lib/schemas/metadata.js';
 
-import { serializeMetadataValue } from './serializing';
+import { serializeMetadataValue } from './serializing.js';
 
 /**
  *
@@ -34,7 +34,7 @@ export function metadataOptionsKeyRange(
  * Refresh the specified table. Does nothing if we can't import idb.svelte.js.
  * We do it this way so that this file can be imported in the web worker.
  */
-export async function refreshTables(sessionId: string, ...tableNames: ReactiveTableNames[]) {
+async function refreshTables(sessionId: string, ...tableNames: ReactiveTableNames[]) {
 	try {
 		const idb = await import('$lib/idb.svelte.js');
 		await Promise.all(tableNames.map((name) => idb.tables[name].refresh(sessionId)));
@@ -129,7 +129,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	const session = await db.get('Session', subjectId);
 	const imagesFromImageFile = await db
 		.getAll('Image')
-		.then((imgs: any[]) => imgs.filter(({ fileId }) => fileId === subjectId));
+		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
 	abortSignal?.throwIfAborted();
 	if (session) {
@@ -240,7 +240,7 @@ export async function deleteMetadataValue({
 	const session = await db.get('Session', subjectId);
 	const imagesFromImageFile = await db
 		.getAllFromIndex('Image', 'sessionId', sessionId)
-		.then((imgs: any[]) => imgs.filter(({ fileId }) => fileId === subjectId));
+		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
 
 	if (!image && !observation && !session && imagesFromImageFile.length === 0)
 		throw new Error(`Aucune image, observation ou session avec l'ID ${subjectId}`);

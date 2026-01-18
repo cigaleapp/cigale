@@ -21,7 +21,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
-	import { galleryItemsGrouper, galleryItemsSorter } from './gallery';
+	import { galleryItemsGrouper, galleryItemsSorter } from './gallery.js';
 	import { plural } from './i18n.js';
 	import { openTransaction } from './idb.svelte.js';
 	import { deleteImageFile } from './images.js';
@@ -146,10 +146,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		const sortingSettings =
 			uiState.currentSession.sort[zone] ?? uiState.currentSession.sort.global;
 
-		console.log('Setting grouper and sorter with settings', {
-			groupingSettings,
-			sortingSettings
-		});
 
 		void (async () => {
 			sorter = await galleryItemsSorter(sortingSettings);
