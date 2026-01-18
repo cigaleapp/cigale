@@ -1,136 +1,157 @@
 import * as dates from 'date-fns';
 
 import type * as DB from '$lib/database.js';
+import { plural, type Language } from '$lib/i18n';
 import { METADATA_TYPES, type RuntimeValue } from '$lib/schemas/metadata';
-import { keys, mapEntries, mapValues, nonnull, round } from '$lib/utils';
+import { fromEntries, groupBy, keys, mapEntries, mapValues, nonnull, round } from '$lib/utils';
 
+import { metadataPrettyValue } from './display';
 import { serializeMetadataValue } from './serializing';
 import { switchOnMetadataType } from './types';
 
 /**
  *
- * @param  values the metadata values to group. The first element of the tuples is some key or ID to identify the source of the metadata value.
  * @param  args
+ * @param  args.language the language to use for pretty-printing metadata values
+ * @param  args.options the metadata options, if applicable (for enums)
  * @param  args.type the metadata type of the given values to group with
  * @param  [args.tolerances] tolerances to apply when comparing certain metadata types.
  * @param  args.tolerances.date the granularity to consider when comparing date values
  * @param  args.tolerances.float number of decimal places to consider when comparing number values (ints or floats). If negative, rounds to powers of ten. Also used for location latitude/longitude values and bounding box coordinates.
- * @returns  the grouped metadata values. Keys are eother serialized metadata values, or numbers for date types (representing the second / minute / etc depending on the tolerance specified).
+ * @returns  a function to put a given value into a group, returning the serialized group key
  */
-function groupMetadataValues(
-	values: Array<readonly [string, RuntimeValue]>,
-	{
-		type,
-		tolerances = {
-			date: 'day',
-			float: 1
-		}
-	}: {
-		type: DB.MetadataType;
-		tolerances?:
-			| undefined
-			| {
-					date: 'year' | 'month' | 'day' | 'weekday' | 'hour' | 'minute' | 'second';
-					float: number;
-			  };
+export function metadataValueGrouper({
+	language,
+	type,
+	options = [],
+	tolerances = {
+		date: 'day',
+		float: 1
 	}
-) {
+}: {
+	language: Language;
+	type: DB.MetadataType;
+	options?: DB.MetadataEnumVariant[];
+	tolerances?:
+		| undefined
+		| {
+				date: 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second';
+				float: number;
+		  };
+}) {
 	const rnd = (v: number) => round(v, tolerances.float);
+	const display = (value: RuntimeValue) =>
+		metadataPrettyValue(language, { type }, value, options.find((o) => o.key === value)?.label);
 
-	return mapValues(
-		Object.groupBy(values, ([, value]) =>
-			switchOnMetadataType<string | number>(type, value, {
-				boolean: serializeMetadataValue,
-				string: serializeMetadataValue,
-				enum: serializeMetadataValue,
-				integer: (v) => serializeMetadataValue(rnd(v)),
-				float: (v) => serializeMetadataValue(rnd(v)),
-				boundingbox: (coords) => serializeMetadataValue(mapValues(coords, rnd)),
-				location: (coords) => serializeMetadataValue(mapValues(coords, rnd)),
-				date: (v) => {
-					switch (tolerances.date) {
-						case 'year':
-							return dates.getYear(v);
-						case 'month':
-							return dates.getMonth(v);
-						case 'day':
-							return dates.getDate(v);
-						case 'weekday':
-							return dates.getDay(v);
-						case 'hour':
-							return dates.getHours(v);
-						case 'minute':
-							return dates.getMinutes(v);
-						case 'second':
-							return dates.getSeconds(v);
-						default:
-							throw new Error(
-								`Invalid date tolerance: ${tolerances.date} (expected year, month, day, weekday, hour, minute or second)`
-							);
-					}
+	return (value: RuntimeValue) =>
+		switchOnMetadataType<string>(type, value, {
+			boolean: display,
+			string: display,
+			enum: display,
+			integer: (v) => display(rnd(v)),
+			float: (v) => display(rnd(v)),
+			boundingbox: (coords) => display(mapValues(coords, rnd)),
+			location: (coords) => display(mapValues(coords, rnd)),
+			date: (v) => {
+				switch (tolerances.date) {
+					case 'year':
+						return `Année ${dates.getYear(v)}`;
+					case 'month':
+						return dates.format(v, 'MMMM yyyy');
+					case 'day':
+						return new Intl.DateTimeFormat(language, {
+							dateStyle: 'long'
+						}).format(v);
+					case 'hour':
+						return new Intl.DateTimeFormat(language, {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							hour: 'numeric'
+						}).format(v);
+					case 'minute':
+						return new Intl.DateTimeFormat(language, {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							hour: 'numeric',
+							minute: 'numeric'
+						}).format(v);
+					case 'second':
+						return new Intl.DateTimeFormat(language, {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							hour: 'numeric',
+							minute: 'numeric',
+							second: 'numeric'
+						}).format(v);
+					default:
+						throw new Error(
+							`Invalid date tolerance: ${tolerances.date} (expected year, month, day, hour, minute or second)`
+						);
 				}
-			}).toString()
-		),
-		(group) => group!.map(([id]) => id)
-	);
+			}
+		});
 }
 
-/**
- * Groups images or observations by their metadata values.
- * Items that don't have a value for the given metadata will be grouped into a empty-string-keyed value
- * @param  items the items to group
- * @param  args
- * @param  args.metadata the metadata to group with
- * @param  args.tolerances tolerances to apply when comparing certain metadata types.
- */
-export function groupByMetadataValue<Item extends { id: string; metadata: DB.MetadataValues }>(
-	items: Array<Item>,
-	{
-		metadata,
-		tolerances
-	}: {
-		metadata: Pick<DB.Metadata, 'type' | 'id'>;
-		tolerances?: Parameters<typeof groupMetadataValues>[1]['tolerances'];
-	}
-) {
-	const itemsById = items
-		.map(({ id, metadata: m }) => [id, m[metadata.id]?.value ?? null] as const)
-		.filter(([, v]) => v !== null);
+// /**
+//  * Groups images or observations by their metadata values.
+//  * Items that don't have a value for the given metadata will be grouped into a empty-string-keyed value
+//  * @param  items the items to group
+//  * @param  args
+//  * @param  args.metadata the metadata to group with
+//  * @param  args.tolerances tolerances to apply when comparing certain metadata types.
+//  */
+// export function groupByMetadataValue<Item extends { id: string; metadata: DB.MetadataValues }>(
+// 	items: Array<Item>,
+// 	{
+// 		metadata,
+// 		tolerances
+// 	}: {
+// 		metadata: Pick<DB.Metadata, 'type' | 'id'>;
+// 		tolerances?: Parameters<typeof metadataValueGrouper>[0]['tolerances'];
+// 	}
+// ) {
+// 	const itemsById = items
+// 		.map(({ id, metadata: m }) => [id, m[metadata.id]?.value ?? null] as const)
+// 		.filter(([, v]) => v !== null);
 
-	const grouped: Record<string, Item[]> = {};
+// 	const grouped: Record<string, Item[]> = {};
 
-	for (const [group, ids] of Object.entries(
-		groupMetadataValues(itemsById, {
-			type: metadata.type,
-			tolerances
-		})
-	)) {
-		grouped[group] = ids.map((id) => items.find((item) => item.id === id)).filter(nonnull);
-	}
+// 	for (const [group, ids] of Object.entries(
+// 		groupMetadataValues(itemsById, {
+// 			type: metadata.type,
+// 			tolerances
+// 		})
+// 	)) {
+// 		grouped[group] = ids.map((id) => items.find((item) => item.id === id)).filter(nonnull);
+// 	}
 
-	// Group items without a value under an empty string key
-	grouped[''] = items.filter((item) => item.metadata[metadata.id] === undefined);
+// 	// Group items without a value under an empty string key
+// 	grouped[''] = items.filter((item) => item.metadata[metadata.id] === undefined);
 
-	return grouped;
-}
+// 	return grouped;
+// }
 
 if (import.meta.vitest) {
 	const { describe, test, expect } = import.meta.vitest;
-	const { items, metadatas, values } = await import('./_testdata.js');
+	const { metadatas, values } = await import('./_testdata.js');
 
-	test('groupByMetadataValue', () => {
-		expect(
-			groupByMetadataValue(items, {
-				metadata: metadatas.integer
-			})
-		).toMatchObject({
-			'': [items[5]],
-			'10': [items[0], items[1]],
-			'15': [items[2]],
-			'20': [items[3]],
-			'30': [items[4]]
+	function groupMetadataValues(
+		vals: (typeof values)[keyof typeof values],
+		settings: Omit<Parameters<typeof metadataValueGrouper>[0], 'language'>
+	) {
+		const grouper = metadataValueGrouper({
+			language: 'fr',
+			...settings
 		});
-	});
+
+		return mapValues(
+			fromEntries([...groupBy(vals, ([_, value]) => grouper(value)).entries()]),
+			(items) => items.map(([id]) => id)
+		);
+	}
 
 	describe('groupMetadataValues', () => {
 		describe('integers', () => {
@@ -235,10 +256,10 @@ if (import.meta.vitest) {
 					type: metadatas.string.type
 				})
 			).toMatchObject({
-				'"apple"': ['item1', 'item3'],
-				'"banana"': ['item2', 'item5'],
-				'"grape"': ['item6'],
-				'"orange"': ['item4']
+				apple: ['item1', 'item3'],
+				banana: ['item2', 'item5'],
+				grape: ['item6'],
+				orange: ['item4']
 			});
 		});
 
@@ -248,8 +269,8 @@ if (import.meta.vitest) {
 					type: metadatas.boolean.type
 				})
 			).toMatchObject({
-				false: ['item2', 'item4', 'item5'],
-				true: ['item1', 'item3', 'item6']
+				Oui: ['item2', 'item4', 'item5'],
+				Non: ['item1', 'item3', 'item6']
 			});
 		});
 

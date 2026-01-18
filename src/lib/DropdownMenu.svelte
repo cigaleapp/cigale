@@ -1,31 +1,41 @@
-<script generics="ItemData, SelectableItemData">
+<script generics="D = never, SD = never">
 	import { DropdownMenu } from 'bits-ui';
 
 	/**
-	 * @typedef {object} ItemBase
+	 * @template D
+	 * @typedef {object} Item
 	 * @property {string} label
 	 * @property {() => void} onclick
 	 * @property {boolean} [selected] adds aria-checked="true" to the item, and set role="menuitemcheckbox" to all items
+	 * @property {boolean} [closeOnSelect] whether to close the menu when this item is selected (default: true)
+	 * @property {D} data additional data associated with the item
 	 */
 
 	/**
-	 * @typedef {ItemBase & ItemData} Item
-	 * @typedef {ItemBase & SelectableItemData & { selected: boolean, key: string | number }} SelectableItem
-	 * @typedef {Item | SelectableItem} AnyItem
+	 * @template SD
+	 * @typedef {Item<SD> & { selected: boolean, key: string | number }} SelectableItem
+	 */
+
+	/**
+	 * @template D, SD
+	 * @typedef {Item<D> | SelectableItem<SD>} AnyItem
+	 */
+
+	/**
+	 * @template D, SD
+	 * @typedef {{label?: string} & ({items: Item<D>[]} | {selectables: SelectableItem<SD>[]})} ItemsGroup
 	 */
 
 	/**
 	 * @typedef {object} Props
-	 * @property {Item[]} items
-	 * @property {SelectableItem[]} [selectableItems]
-	 * @property {string} [help]
-	 * @property {import('svelte').Snippet<[AnyItem]>} [item]
+	 * @property {ItemsGroup<D, SD>[]} items
+	 * @property {import('svelte').Snippet<[AnyItem<D, SD>["data"], AnyItem<D, SD> & {selected: boolean}]>} [item]
 	 * @property {import('svelte').Snippet<[{onclick: () => void}& Record<string, unknown>]>} trigger
 	 * @property {string} [testid] sets data-testid to "{your value}-open" on the trigger element and "{your value}-options" on the content element
 	 */
 
 	/** @type {Props} */
-	const { items, item, selectableItems = [], trigger, testid, help = '', ...rest } = $props();
+	const { items: groups, item, trigger, testid, ...rest } = $props();
 
 	const testids = $derived({
 		trigger: testid ? `${testid}-open` : undefined,
@@ -49,49 +59,57 @@
 
 	<DropdownMenu.Portal>
 		<DropdownMenu.Content data-testid={testids.content}>
-			<DropdownMenu.CheckboxGroup
-				value={selectableItems.filter((i) => i.selected).map((i) => i.key.toString())}
-			>
-				{#if help}
-					<DropdownMenu.GroupHeading>{help}</DropdownMenu.GroupHeading>
-				{/if}
-
-				{#each selectableItems as i (i.key)}
-					<DropdownMenu.CheckboxItem
-						checked={i.selected}
-						onSelect={i.onclick}
-						value={i.key.toString()}
-						textValue={i.label}
-						aria-label={i.label}
+			{#each groups as group}
+				{#if 'selectables' in group}
+					<DropdownMenu.CheckboxGroup
+						value={group.selectables
+							.filter((i) => i.selected)
+							.map((i) => i.key.toString())}
 					>
-						{#if item}
-							{@render item(i)}
-						{:else}
-							{i.label}
+						{#if group.label}
+							<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>
 						{/if}
-					</DropdownMenu.CheckboxItem>
-				{/each}
-			</DropdownMenu.CheckboxGroup>
 
-			<DropdownMenu.Group>
-				{#if help && !selectableItems.length}
-					<DropdownMenu.GroupHeading>{help}</DropdownMenu.GroupHeading>
+						{#each group.selectables as i (i.key)}
+							<DropdownMenu.CheckboxItem
+								checked={i.selected}
+								onSelect={i.onclick}
+								closeOnSelect={i.closeOnSelect ?? true}
+								value={i.key.toString()}
+								textValue={i.label}
+								aria-label={i.label}
+							>
+								{#if item}
+									{@render item(i.data, i)}
+								{:else}
+									{i.label}
+								{/if}
+							</DropdownMenu.CheckboxItem>
+						{/each}
+					</DropdownMenu.CheckboxGroup>
+				{:else}
+					<DropdownMenu.Group>
+						{#if group.label}
+							<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>
+						{/if}
+
+						{#each group.items as i (i.label)}
+							<DropdownMenu.Item
+								textValue={i.label}
+								onSelect={i.onclick}
+								closeOnSelect={i.closeOnSelect ?? true}
+								aria-label={i.label}
+							>
+								{#if item}
+									{@render item(i.data, { ...i, selected: false })}
+								{:else}
+									{i.label}
+								{/if}
+							</DropdownMenu.Item>
+						{/each}
+					</DropdownMenu.Group>
 				{/if}
-
-				{#each items as i (i.label)}
-					<DropdownMenu.Item
-						textValue={i.label}
-						onSelect={i.onclick}
-						aria-label={i.label}
-					>
-						{#if item}
-							{@render item(i)}
-						{:else}
-							{i.label}
-						{/if}
-					</DropdownMenu.Item>
-				{/each}
-			</DropdownMenu.Group>
+			{/each}
 		</DropdownMenu.Content>
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>

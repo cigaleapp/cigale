@@ -528,8 +528,14 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template T
+ * @typedef {(a: T, b: T) => number} Comparator
+ */
+
+/**
  * @template Item
  * @param {((item: Item) => string|number|undefined) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ * @returns {Comparator<Item>}
  */
 export function compareBy(key) {
 	if (typeof key === 'string') {
@@ -614,6 +620,18 @@ if (import.meta.vitest) {
 			expect(compareBy('id')(items[0], items[0])).toBe(0);
 		});
 	});
+}
+
+/**
+ * Returns a new comparator that takes into account a given sorting direction. Input comparator is assumed to be sorting in asc order.
+ * @template T
+ * @param {'asc'|'desc'} direction
+ * @param {Comparator<T>} comparator
+ * @returns {Comparator<T>}
+ */
+export function applySortDirection(direction, comparator) {
+	const mul = direction === 'asc' ? 1 : -1;
+	return (a, b) => mul * comparator(a, b);
 }
 
 /**
@@ -1312,4 +1330,14 @@ ratione facere!`;
  */
 export function isAbortError(error) {
 	return error instanceof DOMException && error.name === 'AbortError';
+}
+/**
+ * Spread into an array literal to conditionally add something to it
+ * @template T
+ * @param {boolean | undefined | null} predicate
+ * @param {T} obj
+ * @returns { [T] | [] }
+ */
+export function orEmpty(predicate, obj) {
+	return predicate ? [obj] : [];
 }

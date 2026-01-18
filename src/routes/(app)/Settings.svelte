@@ -140,35 +140,6 @@
 				}}
 			/>
 		</div>
-		<div class="label">Trier les images par</div>
-		<div class="setting">
-			<SegmentedGroup
-				aria-label="Par quoi trier"
-				options={['filename', 'date']}
-				bind:value={
-					() => gallerySort.key,
-					(key) => setSetting('gallerySort', { ...gallerySort, key })
-				}
-				labels={{ filename: 'Fichier', date: 'Date' }}
-			/>
-			<ButtonIcon
-				data-testid="toggle-sort-direction"
-				onclick={async () =>
-					await setSetting('gallerySort', {
-						...gallerySort,
-						direction: gallerySort.direction === 'asc' ? 'desc' : 'asc'
-					})}
-				help={gallerySort.direction === 'asc'
-					? 'Trier par ordre décroissant'
-					: 'Trier par ordre croissant'}
-			>
-				{#if gallerySort.direction === 'asc'}
-					<IconSortAsc />
-				{:else}
-					<IconSortDesc />
-				{/if}
-			</ButtonIcon>
-		</div>
 		<div class="label">Taille des images</div>
 		<div class="setting">
 			<input

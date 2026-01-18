@@ -73,11 +73,13 @@ export function metadataPrettyValue(
 				h
 			} = type({ x: 'number', y: 'number', h: 'number', w: 'number' }).assert(value);
 
+			const point = (x: number, y: number) => `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+
 			switch (language) {
 				case 'fr':
-					return `Boîte de (${x1}, ${y1}) à (${x1 + w}, ${y1 + h})`;
+					return `Boîte de ${point(x1, y1)} à ${point(x1 + w, y1 + h)}`;
 				default:
-					return `Box from (${x1}, ${y1}) to (${x1 + w}, ${y1 + h})`;
+					return `Box from ${point(x1, y1)} to ${point(x1 + w, y1 + h)}`;
 			}
 		}
 

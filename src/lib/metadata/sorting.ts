@@ -2,6 +2,7 @@ import * as dates from 'date-fns';
 
 import type * as DB from '$lib/database.js';
 import type { RuntimeValue } from '$lib/schemas/metadata';
+import type { Comparator } from '$lib/utils';
 
 import { switchOnMetadataType } from '.';
 
@@ -18,7 +19,7 @@ function compareMetadataValues({
 }: {
 	type: DB.MetadataType;
 	options?: DB.MetadataEnumVariant[];
-}): (a: RuntimeValue, b: RuntimeValue) => number {
+}): Comparator<RuntimeValue> {
 	return (a, b) =>
 		switchOnMetadataType<number>(type, [a, b], {
 			boolean: (a, b) => Number(a) - Number(b),
@@ -57,7 +58,7 @@ export function compareByMetadataValue({
 }: {
 	metadata: Pick<DB.Metadata, 'id' | 'type'>;
 	options?: DB.MetadataEnumVariant[];
-}): (a: { metadata: DB.MetadataValues }, b: { metadata: DB.MetadataValues }) => number {
+}): Comparator<{ metadata: DB.MetadataValues }> {
 	const comparator = compareMetadataValues({ type: metadata.type, options });
 	return (a, b) => {
 		const valueA = a.metadata[metadata.id]?.value ?? null;

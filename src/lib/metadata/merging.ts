@@ -1,7 +1,7 @@
 import type * as DB from '$lib/database';
 import { Schemas } from '$lib/database';
 import type { DatabaseHandle } from '$lib/idb.svelte.js';
-import type { RuntimeValue } from '$lib/schemas/metadata.js';
+import { splitMetadataId, type RuntimeValue } from '$lib/schemas/metadata.js';
 import { avg, mapValues, nonnull } from '$lib/utils.js';
 
 import { metadataOptionsKeyRange } from './storage.js';
@@ -20,21 +20,38 @@ export const MERGEABLE_METADATA_TYPES: Set<DB.MetadataType> = new Set([
 /**
  * Merge metadata values from images and observations. For every metadata key, the value is taken from the merged values of observation overrides if there exists at least one, otherwise from the merged values of the images.
  */
-export async function mergeMetadataFromImagesAndObservations(
-	db: DatabaseHandle,
-	protocol: DB.Protocol,
+export function mergeMetadataFromImagesAndObservations(
+	{definitions, images, observations}:
+	{definitions: DB.Metadata[],
 	images: DB.Image[],
-	observations: DB.Observation[]
+	observations: DB.Observation[]}
 ) {
-	const mergedValues = await mergeMetadataValues(
-		db,
-		protocol,
-		images.map((img) => img.metadata)
+	// TODO improve performance by passing a cache
+	// const options = await Promise.all(
+	// 	definitions.map(async (def) => {
+	// 		if (def.type !== 'enum') return [def.id, []] as const;
+	// 		const parsedId = splitMetadataId(def.id);
+	// 		if (!parsedId.namespace) {
+	// 			throw new Error(`Cannot get options for non-namespaced metadata ID ${def.id}`);
+	// 		}
+
+	// 		const opts = await db.getAll(
+	// 			'MetadataOption',
+	// 			metadataOptionsKeyRange(parsedId.namespace, parsedId.id)
+	// 		);
+
+	// 		return [def.id, opts] as const;
+	// 	})
+	// ).then((entries) => Object.fromEntries(entries));
+
+	const mergedValues = mergeMetadataValues(
+		images.map((img) => img.metadata),
+		{ definitions }
 	);
-	const mergedOverrides = await mergeMetadataValues(
-		db,
-		protocol,
-		observations.map((obs) => obs.metadataOverrides)
+
+	const mergedOverrides = mergeMetadataValues(
+		observations.map((obs) => obs.metadataOverrides),
+		{ definitions }
 	);
 
 	const keys = new Set([...Object.keys(mergedValues), ...Object.keys(mergedOverrides)]);
@@ -49,17 +66,17 @@ export async function mergeMetadataFromImagesAndObservations(
 	return output;
 }
 
-/**
- * @param db
- * @param protocol
- * @param values
- * @returns {Promise<Record<string, DB.MetadataValue & { merged: boolean }>>}
- */
-export async function mergeMetadataValues(
-	db: DatabaseHandle,
-	protocol: DB.Protocol,
-	values: Array<DB.MetadataValues>
-): Promise<Record<string, DB.MetadataValue & { merged: boolean }>> {
+export function mergeMetadataValues(
+	values: Array<DB.MetadataValues>,
+	{
+		definitions,
+		options = {}
+	}: {
+		definitions: DB.Metadata[];
+		/** Key is id of the metadata */
+		options?: Record<string, DB.MetadataEnumVariant[]>;
+	}
+): Record<string, DB.MetadataValue & { merged: boolean }> {
 	if (values.length === 1) {
 		return mapValues(values[0], (v) => ({ ...v, merged: false }));
 	}
@@ -69,7 +86,7 @@ export async function mergeMetadataValues(
 	const keys = new Set(values.flatMap((singleSubjectValues) => Object.keys(singleSubjectValues)));
 
 	for (const key of keys) {
-		const definition = Schemas.Metadata.assert(await db.get('Metadata', key));
+		const definition = definitions.find((def) => def.id === key);
 		if (!definition) {
 			console.warn(`Cannot merge metadata values for unknown key ${key}`);
 			continue;
@@ -81,26 +98,7 @@ export async function mergeMetadataValues(
 				.map(([, v]) => v)
 		);
 
-		let options: DB.MetadataEnumVariant[] = [];
-
-		if (definition.type === 'enum' && definition.mergeMethod === 'average') {
-			const optionsCount = await db.count(
-				'MetadataOption',
-				metadataOptionsKeyRange(protocol.id, definition.id)
-			);
-
-			if (optionsCount > 500) {
-				throw new Error(
-					`Impossible de fusionner les valeurs de la métadonnée ${key} en mode moyenne car elle possède plus de 500 options (${optionsCount} options). Le protocol doit choisir un autre mode de fusion.`
-				);
-			}
-
-			options = await db
-				.getAll('MetadataOption', metadataOptionsKeyRange(protocol.id, definition.id))
-				.then((opts) => opts.map((opt) => Schemas.MetadataEnumVariant.assert(opt)));
-		}
-
-		const merged = mergeMetadata(definition, valuesOfKey, options);
+		const merged = mergeMetadata(definition, valuesOfKey, options[key] ?? []);
 
 		if (merged !== null && merged !== undefined)
 			output[key] = {
@@ -112,7 +110,7 @@ export async function mergeMetadataValues(
 	return output;
 }
 
-function mergeMetadata(
+export function mergeMetadata(
 	definition: DB.Metadata,
 	values: DB.MetadataValue[],
 	options: DB.MetadataEnumVariant[] = []
