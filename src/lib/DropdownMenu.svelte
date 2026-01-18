@@ -1,5 +1,6 @@
 <script lang="ts" generics="D = never, SD = never">
 	import { DropdownMenu } from 'bits-ui';
+	import { tr } from 'date-fns/locale';
 	import type { Snippet } from 'svelte';
 
 	type Item<D> = {
@@ -25,6 +26,7 @@
 		data: D;
 		label: string;
 		selected?: boolean;
+		testid?: string;
 		submenu: {
 			label?: string;
 			items: Array<Item<D> | SelectableItem<SD>>;
@@ -35,6 +37,7 @@
 
 	type ItemsGroup<D, SD> = {
 		label?: string;
+		testid?: string;
 		items: AnyItem<D, SD>[];
 	};
 
@@ -47,16 +50,18 @@
 
 	const { items: groups, item, trigger, testid, ...rest }: Props = $props();
 
-	const testids = $derived({
-		trigger: testid ? `${testid}-open` : undefined,
-		content: testid ? `${testid}-options` : undefined
-	});
+	function testids(testid: string | undefined) {
+		return {
+			trigger: testid ? `${testid}-open` : undefined,
+			content: testid ? `${testid}-content` : undefined
+		};
+	}
 
 	let open = $state(false);
 </script>
 
 <DropdownMenu.Root {open}>
-	<DropdownMenu.Trigger {...rest} data-testid={testids.trigger}>
+	<DropdownMenu.Trigger {...rest} data-testid={testids(testid).trigger}>
 		{#snippet child({ props })}
 			{@render trigger({
 				...props,
@@ -68,9 +73,9 @@
 	</DropdownMenu.Trigger>
 
 	<DropdownMenu.Portal>
-		<DropdownMenu.Content data-testid={testids.content}>
+		<DropdownMenu.Content data-testid={testids(testid).content}>
 			{#each groups as group}
-				<DropdownMenu.Group>
+				<DropdownMenu.Group data-testid={group.testid}>
 					{#if group.label}
 						<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>
 					{/if}
@@ -106,14 +111,14 @@
 							</DropdownMenu.CheckboxItem>
 						{:else if i.type === 'submenu'}
 							<DropdownMenu.Sub>
-								<DropdownMenu.SubTrigger>
+								<DropdownMenu.SubTrigger data-testid={testids(i.testid).trigger}>
 									{#if item}
 										{@render item(i.data, { selected: false, ...i })}
 									{:else}
 										{i.label}
 									{/if}
 								</DropdownMenu.SubTrigger>
-								<DropdownMenu.SubContent>
+								<DropdownMenu.SubContent data-testid={testids(i.testid).content}>
 									<DropdownMenu.Group>
 										{#if i.submenu.label}
 											<DropdownMenu.GroupHeading
