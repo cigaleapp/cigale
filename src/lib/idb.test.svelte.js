@@ -86,6 +86,8 @@ describe('operations', () => {
 				label: 'Test',
 				mergeMethod: 'none',
 				required: false,
+				sortable: false,
+				groupable: false,
 				type: 'string'
 			});
 		});

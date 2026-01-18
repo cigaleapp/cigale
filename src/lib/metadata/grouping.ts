@@ -189,8 +189,8 @@ if (import.meta.vitest) {
 						type: metadatas.float.type
 					})
 				).toMatchObject({
-					'10.1': ['item1', 'item2'],
-					'15.6': ['item3'],
+					'10,1': ['item1', 'item2'],
+					'15,6': ['item3'],
 					'20': ['item4', 'item5'],
 					'25': ['item6']
 				});
@@ -203,9 +203,9 @@ if (import.meta.vitest) {
 						tolerances: { float: 2, date: 'second' }
 					})
 				).toMatchObject({
-					'10.12': ['item1'],
-					'10.13': ['item2'],
-					'15.57': ['item3'],
+					'10,12': ['item1'],
+					'10,13': ['item2'],
+					'15,57': ['item3'],
 					'20': ['item4', 'item5'],
 					'25': ['item6']
 				});
@@ -230,10 +230,10 @@ if (import.meta.vitest) {
 						type: metadatas.date.type
 					})
 				).toMatchObject({
-					'1': ['item1', 'item2'],
-					'2': ['item3'],
-					'3': ['item4', 'item5'],
-					'4': ['item6']
+					'1 janvier 2023': ['item1', 'item2'],
+					'2 janvier 2023': ['item3'],
+					'3 janvier 2023': ['item4', 'item5'],
+					'4 janvier 2023': ['item6']
 				});
 			});
 
@@ -244,8 +244,11 @@ if (import.meta.vitest) {
 						tolerances: { float: 2, date: 'minute' }
 					})
 				).toMatchObject({
-					'0': ['item1', 'item2', 'item3', 'item4', 'item6'],
-					'5': ['item5']
+					'1 janvier 2023 à 12:00': ['item1', 'item2'],
+					'2 janvier 2023 à 12:00': ['item3'],
+					'3 janvier 2023 à 12:00': ['item4'],
+					'3 janvier 2023 à 12:05': ['item5'],
+					'4 janvier 2023 à 12:00': ['item6']
 				});
 			});
 		});
@@ -269,8 +272,8 @@ if (import.meta.vitest) {
 					type: metadatas.boolean.type
 				})
 			).toMatchObject({
-				Oui: ['item2', 'item4', 'item5'],
-				Non: ['item1', 'item3', 'item6']
+				Non: ['item2', 'item4', 'item5'],
+				Oui: ['item1', 'item3', 'item6']
 			});
 		});
 
@@ -281,9 +284,9 @@ if (import.meta.vitest) {
 						type: metadatas.location.type
 					})
 				).toMatchObject({
-					'{"latitude":10.1,"longitude":20.1}': ['item1', 'item2', 'item4', 'item5'],
-					'{"latitude":15.6,"longitude":25.6}': ['item3'],
-					'{"latitude":30,"longitude":40}': ['item6']
+					'10.1, 20.1': ['item1', 'item2', 'item4', 'item5'],
+					'15.6, 25.6': ['item3'],
+					'30, 40': ['item6']
 				});
 			});
 
@@ -294,9 +297,9 @@ if (import.meta.vitest) {
 						tolerances: { float: 0, date: 'second' }
 					})
 				).toMatchObject({
-					'{"latitude":10,"longitude":20}': ['item1', 'item2', 'item4', 'item5'],
-					'{"latitude":16,"longitude":26}': ['item3'],
-					'{"latitude":30,"longitude":40}': ['item6']
+					'10, 20': ['item1', 'item2', 'item4', 'item5'],
+					'16, 26': ['item3'],
+					'30, 40': ['item6']
 				});
 			});
 
@@ -307,9 +310,9 @@ if (import.meta.vitest) {
 						tolerances: { float: -1, date: 'second' }
 					})
 				).toMatchObject({
-					'{"latitude":10,"longitude":20}': ['item1', 'item2', 'item4', 'item5'],
-					'{"latitude":20,"longitude":30}': ['item3'],
-					'{"latitude":30,"longitude":40}': ['item6']
+					'10, 20': ['item1', 'item2', 'item4', 'item5'],
+					'20, 30': ['item3'],
+					'30, 40': ['item6']
 				});
 			});
 		});
@@ -320,9 +323,9 @@ if (import.meta.vitest) {
 					type: metadatas.enum.type
 				})
 			).toMatchObject({
-				'"A"': ['item1', 'item3', 'item6'],
-				'"B"': ['item2', 'item5'],
-				'"C"': ['item4']
+				A: ['item1', 'item3', 'item6'],
+				B: ['item2', 'item5'],
+				C: ['item4']
 			});
 		});
 
@@ -333,10 +336,10 @@ if (import.meta.vitest) {
 						type: metadatas.boundingbox.type
 					})
 				).toMatchObject({
-					'{"x":10,"y":10,"w":50,"h":50}': ['item1'],
-					'{"x":11,"y":11,"w":50,"h":50}': ['item4', 'item5'],
-					'{"x":12,"y":12,"w":50,"h":50}': ['item2'],
-					'{"x":15,"y":15,"w":50,"h":50}': ['item6']
+					'Boîte de (10.00, 10.00) à (60.00, 60.00)': ['item1'],
+					'Boîte de (11.00, 11.00) à (61.00, 61.00)': ['item4', 'item5'],
+					'Boîte de (12.00, 12.00) à (62.00, 62.00)': ['item2'],
+					'Boîte de (15.00, 15.00) à (65.00, 65.00)': ['item6']
 				});
 			});
 
@@ -347,10 +350,10 @@ if (import.meta.vitest) {
 						tolerances: { float: 0, date: 'second' }
 					})
 				).toMatchObject({
-					'{"x":10,"y":10,"w":50,"h":50}': ['item1'],
-					'{"x":11,"y":11,"w":50,"h":50}': ['item4', 'item5'],
-					'{"x":12,"y":12,"w":50,"h":50}': ['item2'],
-					'{"x":15,"y":15,"w":50,"h":50}': ['item6']
+					'Boîte de (10.00, 10.00) à (60.00, 60.00)': ['item1'],
+					'Boîte de (11.00, 11.00) à (61.00, 61.00)': ['item4', 'item5'],
+					'Boîte de (12.00, 12.00) à (62.00, 62.00)': ['item2'],
+					'Boîte de (15.00, 15.00) à (65.00, 65.00)': ['item6']
 				});
 			});
 
@@ -361,8 +364,13 @@ if (import.meta.vitest) {
 						tolerances: { float: -1, date: 'second' }
 					})
 				).toMatchObject({
-					'{"x":10,"y":10,"w":50,"h":50}': ['item1', 'item2', 'item4', 'item5'],
-					'{"x":20,"y":20,"w":50,"h":50}': ['item6']
+					'Boîte de (10.00, 10.00) à (60.00, 60.00)': [
+						'item1',
+						'item2',
+						'item4',
+						'item5'
+					],
+					'Boîte de (20.00, 20.00) à (70.00, 70.00)': ['item6']
 				});
 			});
 		});

@@ -120,7 +120,7 @@ if (import.meta.vitest) {
 			test('bounding boxes', () => {
 				expect(
 					metadataPrettyValue('fr', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
-				).toBe('Boîte de (1, 2) à (4, 6)');
+				).toBe('Boîte de (1.00, 2.00) à (4.00, 6.00)');
 			});
 
 			test('integers', () => {
@@ -148,7 +148,7 @@ if (import.meta.vitest) {
 			test('bounding boxes', () => {
 				expect(
 					metadataPrettyValue('en', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
-				).toBe('Box from (1, 2) to (4, 6)');
+				).toBe('Box from (1.00, 2.00) to (4.00, 6.00)');
 			});
 
 			test('floats', () => {
