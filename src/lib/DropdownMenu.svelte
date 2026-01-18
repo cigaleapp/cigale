@@ -1,41 +1,37 @@
-<script generics="D = never, SD = never">
+<script lang="ts" generics="D = never, SD = never">
 	import { DropdownMenu } from 'bits-ui';
+	import type { Snippet } from 'svelte';
 
-	/**
-	 * @template D
-	 * @typedef {object} Item
-	 * @property {string} label
-	 * @property {() => void} onclick
-	 * @property {boolean} [selected] adds aria-checked="true" to the item, and set role="menuitemcheckbox" to all items
-	 * @property {boolean} [closeOnSelect] whether to close the menu when this item is selected (default: true)
-	 * @property {D} data additional data associated with the item
-	 */
+	type Item<D> = {
+		label: string;
+		onclick: () => void;
+		/** Adds aria-checked="true" to the item, and set role="menuitemcheckbox" to all items */
+		selected?: boolean;
+		/** Whether to close the menu when this item is selected (default: true) */
+		closeOnSelect?: boolean;
+		/** Additional data associated with the item */
+		data: D;
+	};
 
-	/**
-	 * @template SD
-	 * @typedef {Item<SD> & { selected: boolean, key: string | number }} SelectableItem
-	 */
+	type SelectableItem<SD> = Item<SD> & {
+		selected: boolean;
+		key: string | number;
+	};
 
-	/**
-	 * @template D, SD
-	 * @typedef {Item<D> | SelectableItem<SD>} AnyItem
-	 */
+	type AnyItem<D, SD> = Item<D> | SelectableItem<SD>;
 
-	/**
-	 * @template D, SD
-	 * @typedef {{label?: string} & ({items: Item<D>[]} | {selectables: SelectableItem<SD>[]})} ItemsGroup
-	 */
+	type ItemsGroup<D, SD> = {
+		label?: string;
+	} & ({ items: Item<D>[] } | { selectables: SelectableItem<SD>[] });
 
-	/**
-	 * @typedef {object} Props
-	 * @property {ItemsGroup<D, SD>[]} items
-	 * @property {import('svelte').Snippet<[AnyItem<D, SD>["data"], AnyItem<D, SD> & {selected: boolean}]>} [item]
-	 * @property {import('svelte').Snippet<[{onclick: () => void}& Record<string, unknown>]>} trigger
-	 * @property {string} [testid] sets data-testid to "{your value}-open" on the trigger element and "{your value}-options" on the content element
-	 */
+	interface Props {
+		items: ItemsGroup<D, SD>[];
+		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
+		trigger: Snippet<[{ onclick: () => void } & Record<string, unknown>]>;
+		testid?: string;
+	}
 
-	/** @type {Props} */
-	const { items: groups, item, trigger, testid, ...rest } = $props();
+	const { items: groups, item, trigger, testid, ...rest }: Props = $props();
 
 	const testids = $derived({
 		trigger: testid ? `${testid}-open` : undefined,
