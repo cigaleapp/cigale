@@ -8,6 +8,7 @@
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte';
+	import { metadataDefinitionComparator } from '$lib/protocols';
 	import {
 		removeNamespaceFromMetadataId,
 		type MetadataInferOptionsNeural
@@ -60,8 +61,16 @@
 		};
 	}
 
-	const sortableMetadata = $derived(tables.Metadata.state.filter((m) => m.sortable));
-	const groupableMetadata = $derived(tables.Metadata.state.filter((m) => m.groupable));
+	const compareMetadataDefs = $derived(
+		metadataDefinitionComparator(uiState.currentProtocol ?? { metadataOrder: undefined })
+	);
+
+	const sortableMetadata = $derived(
+		tables.Metadata.state.filter((m) => m.sortable).sort(compareMetadataDefs)
+	);
+	const groupableMetadata = $derived(
+		tables.Metadata.state.filter((m) => m.groupable).sort(compareMetadataDefs)
+	);
 
 	const currentSettings = $derived(
 		uiState.currentSession
