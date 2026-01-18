@@ -264,7 +264,11 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
  */
 export async function setInferenceModels(page, models) {
 	for (const [task, model] of Object.entries(models)) {
-		await chooseInDropdown(page, `${task}-models`, model);
+		await chooseInDropdown(page, `${task}-settings`, (options) =>
+			options
+				.getByTestId(`${task}-settings-inference-model`)
+				.getByRole('menuitemcheckbox', { name: model })
+		);
 	}
 }
 
