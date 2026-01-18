@@ -116,9 +116,10 @@
 
 <div class="inference">
 	<DropdownMenu
-		testid="{tab}-models"
+		testid="{tab}-settings"
 		items={[
 			{
+				testid: `${tab}-settings-sort`,
 				label: 'Trier par…',
 				items: entries(SORT_FIELDS).map(([key, { label }]) => {
 					const direction = currentSettings?.sort.direction ?? null;
@@ -135,6 +136,7 @@
 							selected,
 							submenu: {
 								label: 'Métadonnée',
+								testid: `${tab}-settings-sort-by-${key}-metadata`,
 								items: sortableMetadata.map((m) => ({
 									type: 'selectable',
 									data: { direction },
@@ -195,6 +197,7 @@
 							selected,
 							submenu: {
 								label: 'Métadonnée',
+								testid: `${tab}-settings-group-by-${key}-metadata`,
 								items: groupableMetadata.map((m) => ({
 									type: 'selectable',
 									data: { direction: null },
@@ -235,6 +238,7 @@
 
 			...orEmpty(uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
+				testid: `${tab}-settings-inference-model`,
 				items: [
 					selectableModel(-1, 'Aucune inférence'),
 					...models.map((model, i) => selectableModel(i, model.name ?? `Modèle ${i + 1}`))
