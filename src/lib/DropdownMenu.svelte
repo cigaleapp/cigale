@@ -52,7 +52,7 @@
 	function testids(testid: string | undefined) {
 		return {
 			trigger: testid ? `${testid}-open` : undefined,
-			content: testid ? `${testid}-content` : undefined
+			content: testid ? `${testid}-options` : undefined
 		};
 	}
 

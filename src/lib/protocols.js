@@ -468,7 +468,7 @@ export async function autoUpdateProtocols(db, swarpc) {
 /**
  *
  * @param {{metadataOrder?: undefined | string[]}} protocol
- * @returns {(a: string | { id: string }, b: string | { id: string }) => number}
+ * @returns {import('./utils.js').Comparator< string | { id: string }>}
  */
 export function metadataDefinitionComparator(protocol) {
 	return (a, b) => {

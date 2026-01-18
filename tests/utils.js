@@ -210,7 +210,7 @@ export async function chooseInDropdown(page, dropdownTestId, option) {
 	await trigger.click();
 
 	const item =
-		typeof option === 'function'
+		typeof option === "function"
 			? option(options)
 			: options.getByRole('menuitemcheckbox', { name: option });
 
@@ -264,7 +264,11 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
  */
 export async function setInferenceModels(page, models) {
 	for (const [task, model] of Object.entries(models)) {
-		await chooseInDropdown(page, `${task}-models`, model);
+		await chooseInDropdown(page, `${task}-settings`, (options) =>
+			options
+				.getByRole('group', { name: "Modèle d'inférence" })
+				.getByRole('menuitemcheckbox', { name: model })
+		);
 	}
 }
 
