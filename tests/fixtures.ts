@@ -3,7 +3,7 @@ import { test as base, type Locator } from '@playwright/test';
 
 import type { Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
-import type { RuntimeValue } from '$lib/metadata';
+import type { RuntimeValue } from '$lib/metadata/index.js';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
 import { safeJSONParse } from '$lib/utils';

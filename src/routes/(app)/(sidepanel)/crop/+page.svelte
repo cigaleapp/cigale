@@ -9,11 +9,11 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import { deleteImageFile, imageIsAnalyzed } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
+	import { mergeMetadataValues } from '$lib/metadata';
 	import { deleteObservation } from '$lib/observations.js';
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { avg, groupBy, nonnull } from '$lib/utils.js';
 
@@ -27,6 +27,14 @@
 				addedAt: new Date(avg(images.map((i) => i.addedAt.getTime()))),
 				name: images[0].filename,
 				virtual: false,
+				metadata: mergeMetadataValues(
+					images.map((img) => img.metadata),
+					{
+						definitions: idb.tables.Metadata.state,
+						// TODO
+						options: {}
+					}
+				),
 				data: images
 			})
 		)
@@ -54,15 +62,7 @@
 </script>
 
 <section class="observations" in:fade={{ duration: 100 }}>
-	<AreaObservations
-		{items}
-		sort={getSettings().gallerySort}
-		groups={['Avec détections', 'Sans détection']}
-		grouping={({ data: images }) =>
-			images.some((img) => uiState.cropMetadataValueOf(img))
-				? 'Avec détections'
-				: 'Sans détection'}
-	>
+	<AreaObservations {items} zone="crop">
 		{#snippet item(images, { id: fileId })}
 			<CardImageFile
 				{fileId}

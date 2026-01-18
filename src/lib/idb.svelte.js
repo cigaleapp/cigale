@@ -88,6 +88,12 @@ function wrangler(table) {
 		},
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
+		/** @param {string} key */
+		getOrThrow: async (key) => {
+			const item = await get(table, key);
+			if (!item) throw new Error(`Item not found in ${table} with key ${key}`);
+			return item;
+		},
 		/** @param {string} key  */
 		getFromState: (key) => _tablesState[table].find((item) => item.id === key),
 		/**

@@ -2,7 +2,7 @@ import { metadataOptionId, parseMetadataOptionId } from './schemas/metadata.js';
 import { entries, groupBy, nonnull, sum } from './utils.js';
 
 /**
- * @import { RuntimeValue } from './metadata.js'
+ * @import { RuntimeValue } from './metadata/index.js'
  */
 
 /**

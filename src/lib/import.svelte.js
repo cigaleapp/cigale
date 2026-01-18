@@ -16,7 +16,7 @@ import { uiState } from '$lib/state.svelte.js';
 import { toasts } from '$lib/toasts.svelte.js';
 
 import { imageLimits } from './inference_utils.js';
-import { serializeMetadataValues } from './metadata.js';
+import { serializeMetadataValues } from './metadata/index.js';
 
 export const ACCEPTED_IMPORT_TYPES = [
 	'image/jpeg',

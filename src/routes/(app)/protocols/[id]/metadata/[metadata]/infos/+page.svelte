@@ -11,7 +11,7 @@
 	import FieldUrl from '$lib/FieldURL.svelte';
 	import { uppercaseFirst } from '$lib/i18n';
 	import IconDatatype from '$lib/IconDatatype.svelte';
-	import { MERGEABLE_METADATA_TYPES } from '$lib/metadata.js';
+	import { MERGEABLE_METADATA_TYPES } from '$lib/metadata/index.js';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 	import {
 		METADATA_MERGE_METHODS,

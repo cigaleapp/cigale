@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 
 import * as idb from '$lib/idb.svelte.js';
 import { tables } from '$lib/idb.svelte.js';
-import { metadataOptionsKeyRange } from '$lib/metadata.js';
+import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import { compareBy, nonnull } from '$lib/utils';
 
 export async function load({ params: { id }, depends }) {

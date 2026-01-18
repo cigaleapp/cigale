@@ -10,7 +10,7 @@
 	 * @property {boolean} [vertical] force vertical display of radio buttons. if neither vertical nor horizontal is set, the buttons will be laid horizontally only if they all fit in a single row.
 	 * @property {boolean} [horizontal] display the radio buttons in a grid
 	 * @property {boolean} [cards] display the radio buttons as cards
-	 * @property {NoInfer<OptionKey>} [value] the value of the selected radio button
+	 * @property {NoInfer<OptionKey> | undefined} [value] the value of the selected radio button
 	 * @property {(value: OptionKey|undefined) => void} [onchange] callback to call when the user selects a radio button
 	 * @property {import('svelte').Snippet<[Item<NoInfer<OptionKey>> & { value: typeof value, selected: boolean }]>} [children] content of the label
 	 * @property {string} [label] label for the radio group

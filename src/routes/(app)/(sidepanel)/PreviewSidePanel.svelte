@@ -18,9 +18,10 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import Logo from '$lib/Logo.svelte';
-	import { metadataDefinitionComparator, metadataOptionsKeyRange } from '$lib/metadata';
 	import Metadata from '$lib/Metadata.svelte';
+	import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
+	import { metadataDefinitionComparator } from '$lib/protocols';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 
@@ -33,7 +34,7 @@
 	 * @property {(() => void) | undefined} [onsplit] callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown.
 	 * @property {(() => void) | undefined} [onimport] callback to call when the user wants to import additional images. If not set, the import button is not shown.
 	 * @property {boolean} [cansplit=false] whether the user is allowed to split the selected observation(s)
-	 * @property {(key: string, value: undefined | import('$lib/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
+	 * @property {(key: string, value: undefined | import('$lib/schemas/metadata').RuntimeValue) => void} onmetadatachange callback to call when a metadata's value is modified
 	 * @property {boolean} [canmerge=false] whether the user is allowed to merge images or observations
 	 * @property {Record<string, import('$lib/database').MetadataValue & { merged: boolean } >} metadata values of the metadata we're viewing.
 	 */

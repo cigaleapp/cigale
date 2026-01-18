@@ -5,7 +5,7 @@
 	import IconMerged from '~icons/ri/stack-line';
 
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { isType } from './metadata.js';
+	import { hasRuntimeType } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
 	import { splitMetadataId } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
@@ -18,7 +18,7 @@
 	 * @property {import('./database').MetadataEnumVariant[]} [options]
 	 * @property {undefined | import('./database').MetadataValue} value
 	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
-	 * @property {(value: undefined | import('./metadata').RuntimeValue) => void} [onchange]
+	 * @property {(value: undefined | import('./schemas/metadata').RuntimeValue) => void} [onchange]
 	 */
 
 	/** @type {Props} */
@@ -98,7 +98,7 @@
 					.sort(([, a], [, b]) => b - a)
 					.slice(0, 3) as [jsonValue, confidence] (jsonValue)}
 					{@const stringValue = safeJSONParse(jsonValue)?.toString()}
-					{@const enumVariant = isType('enum', definition.type, stringValue)
+					{@const enumVariant = hasRuntimeType('enum', stringValue)
 						? options?.find(({ key }) => key === stringValue)
 						: undefined}
 					<li>
