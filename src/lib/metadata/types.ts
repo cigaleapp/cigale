@@ -10,6 +10,7 @@ export type RuntimeValuesPerType = { [K in DB.MetadataType]: RuntimeValue<K> };
 
 type TypeswitchReturnTypes<R> = { [T in DB.MetadataType]: R };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type TypeswitchCases<ReturnTypes extends TypeswitchReturnTypes<any>> = {
 	[T in DB.MetadataType]: (...values: RuntimeValue<T>[]) => ReturnTypes[T];
 };
@@ -53,11 +54,13 @@ export function switchOnMetadataType<
 
 export function hasRuntimeType<Type extends DB.MetadataType>(
 	type: Type,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	value: any
 ): value is RuntimeValue<Type> {
 	return MetadataRuntimeValue[type].allows(value);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function assertIs<Type extends DB.MetadataType>(type: Type, value: any): RuntimeValue<Type> {
 	if (!hasRuntimeType(type, value))
 		throw new Error(`La valeur n'est pas de type ${type}: ${JSON.stringify(value)}`);

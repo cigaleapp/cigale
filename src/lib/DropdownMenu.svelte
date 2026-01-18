@@ -1,6 +1,5 @@
 <script lang="ts" generics="D = never, SD = never">
 	import { DropdownMenu } from 'bits-ui';
-	import { tr } from 'date-fns/locale';
 	import type { Snippet } from 'svelte';
 
 	type Item<D> = {
@@ -74,7 +73,7 @@
 
 	<DropdownMenu.Portal>
 		<DropdownMenu.Content data-testid={testids(testid).content}>
-			{#each groups as group}
+			{#each groups as group (group.label)}
 				<DropdownMenu.Group data-testid={group.testid}>
 					{#if group.label}
 						<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>

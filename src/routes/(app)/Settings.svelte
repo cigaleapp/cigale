@@ -6,8 +6,6 @@
 	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
 	import Moon from '~icons/ri/moon-line';
 	import Gears from '~icons/ri/settings-3-line';
-	import IconSortAsc from '~icons/ri/sort-asc';
-	import IconSortDesc from '~icons/ri/sort-desc';
 	import IconDecrease from '~icons/ri/subtract-line';
 	import Sun from '~icons/ri/sun-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
@@ -40,7 +38,7 @@
 		});
 	});
 
-	const { theme, showTechnicalMetadata, gallerySort, gridSize, language, parallelism } =
+	const { theme, showTechnicalMetadata, gridSize, language, parallelism } =
 		$derived(getSettings());
 
 	let systemIsLight = $state(true);

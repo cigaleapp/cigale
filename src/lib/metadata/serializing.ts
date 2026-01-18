@@ -7,6 +7,7 @@ import { mapValues } from '$lib/utils';
 /**
  * Serialize a metadata value for storing in the database.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function serializeMetadataValue(value: any): string {
 	return JSON.stringify(
 		value instanceof Date && dates.isValid(value)
