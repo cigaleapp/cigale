@@ -1,6 +1,7 @@
 // @ts-check
+import { tz } from '@date-fns/tz';
 import { defineConfig, devices } from '@playwright/test';
-import { minutesToMilliseconds } from 'date-fns';
+import { formatISO9075, minutesToMilliseconds } from 'date-fns';
 
 /** @typedef {NonNullable<import('@playwright/test').PlaywrightTestConfig['projects']>[number]} Project */
 
@@ -45,6 +46,11 @@ export default defineConfig({
 		built: minutesToMilliseconds(1.2)
 	}),
 	testDir: './tests',
+	metadata: {
+		generated: formatISO9075(new Date(), {
+			in: tz('Europe/Paris')
+		})
+	},
 	/* Run tests in files in parallel */
 	fullyParallel: true,
 	/* Fail the build on CI if you accidentally left test.only in the source code. */
