@@ -7,24 +7,38 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add ETA as tooltip on navbar logo when processing is ongoing (Closes #51) (#1027)
+- Add protocol auto-updating (Closes #954) (#1088)
+- Fix opacity of disabled ButtonSecondary
 - Fix vertical line in zip contents preview tree not extending when scrolling
 - Implement average merge method for enum metadata
+- Improve keyboard shortcuts hints
+- Make Chrome scrollbars thinner
 - Rajouter validation pour les forms de creation d'issue (Closes #1049)
+- Safeguard against crashing if somehow a plural i18n message doesn't have enough candidates
+- Safeguard against storing >1-confidence metadata values
+- Show loading spinner when opening a session
 - Show uncompressed zip size estimate
 - Take crop padding into account when estimating .zip sizes (#1052)
 - Turn results modal into a full page, complete with zip files preview and size estimations
+- Use enter key glyph to display Enter in keybind hints
 - Use skeleton UI instead of spinners where relevant (Closes #1047)
 
 ### Bug Fixes
 
+- Fix inference models not being cached (Closes #1077)
 - Fix sessionId index name for file tables
+- Include protocol ID in caching key when using string-form HTTPRequest for inference model
 - Prevent zip preview from being empty if we went from import tab to results tab directly
 
 ### Data Updates
 
 - Add missing images for builtin protocol
 - Commit new images when regenerating protocols
+- Correctly get all relevant images from Jessica Joachim for built-in protocol
+- Fix builtin protocol's images from Jessica Joachim
+- Regenerate builtin protocol
 - Regenerate example protocols
+- Set groupable and sortable on relevant metadata for built-in protocol
 
 ### Translation Updates
 
