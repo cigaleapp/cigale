@@ -22,7 +22,7 @@ import {
 	newSession,
 	setInferenceModels,
 	waitForLoadingEnd
-} from './utils.js';
+} from './utils/index.js';
 
 for (const offline of [false, true]) {
 	test(

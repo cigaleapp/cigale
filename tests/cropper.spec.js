@@ -6,7 +6,7 @@ import {
 	loadDatabaseDump,
 	setImageMetadata,
 	throwError
-} from './utils.js';
+} from './utils/index.js';
 
 /**
  * @import { AppFixture } from './fixtures.js';

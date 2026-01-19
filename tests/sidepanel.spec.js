@@ -6,7 +6,7 @@ import {
 	firstObservationCard,
 	loadDatabaseDump,
 	setInferenceModels
-} from './utils.js';
+} from './utils/index.js';
 
 /**
  * @import { Page } from '@playwright/test';

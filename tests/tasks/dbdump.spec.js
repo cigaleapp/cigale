@@ -11,7 +11,7 @@ import {
 	importResults,
 	newSession,
 	sessionMetadataSectionFor
-} from '../utils.js';
+} from '../utils/index.js';
 
 test.skip(
 	Boolean(process.env.CI),

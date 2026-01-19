@@ -11,7 +11,7 @@ import {
 	importPhotos,
 	loadDatabaseDump,
 	newSession
-} from './utils.js';
+} from './utils/index.js';
 
 test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	// Disable inference to go faster

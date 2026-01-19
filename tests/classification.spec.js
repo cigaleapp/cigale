@@ -1,6 +1,6 @@
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
-import { firstObservationCard, importPhotos, newSession } from './utils.js';
+import { firstObservationCard, importPhotos, newSession } from './utils/index.js';
 
 test('allows cancelling classification of an observation', issue(430), async ({ page, app }) => {
 	await newSession(page);
