@@ -21,7 +21,7 @@ test('basic', async ({ page }) => {
 	await importProtocol(page, 'arthropods.light.cigaleprotocol.json');
 
 	await importResults(page, 'exports/correct.zip');
-	await dumpDatabase(page, 'basic.devalue');
+	await dumpDatabase(page, 'db/basic.devalue');
 });
 
 test('kitchensink-protocol', async ({ page, app }) => {
@@ -44,5 +44,5 @@ test('kitchensink-protocol', async ({ page, app }) => {
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg');
 	await page.waitForTimeout(2_000);
-	await dumpDatabase(page, 'kitchensink-protocol.devalue');
+	await dumpDatabase(page, 'db/kitchensink-protocol.devalue');
 });

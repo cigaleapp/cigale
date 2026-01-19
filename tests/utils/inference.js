@@ -6,7 +6,7 @@ import { chooseInDropdown, mockUrl } from './core.js';
  */
 
 /**
- * @typedef {"Aucune inférence" | (string & {})} InferenceModelName
+ * @typedef {"Aucune inférence" | (string & {}) | RegExp} InferenceModelName
  */
 
 /**

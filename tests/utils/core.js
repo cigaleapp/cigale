@@ -300,7 +300,7 @@ export function throwError(message) {
  * Opens a dropdown and chooses an item by its name
  * @param {Page} page
  * @param {string} dropdownTestId
- * @param {[string | RegExp | ((options: Locator) => Locator)] | [string, string]} option can be a single argument, or two strings where the first one is the group (dropdown submenu's label) and the second one the option name
+ * @param {[string | RegExp | ((options: Locator) => Locator)] | [string, string | RegExp]} option can be a single argument, or two strings where the first one is the group (dropdown submenu's label) and the second one the option name
  */
 export async function chooseInDropdown(page, dropdownTestId, ...option) {
 	const trigger = page.getByTestId(`${dropdownTestId}-open`);

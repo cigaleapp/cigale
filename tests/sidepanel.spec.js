@@ -26,7 +26,9 @@ async function initialize({ page, app, dump = 'db/basic.devalue' }) {
 	await chooseFirstSession(page);
 	if (dump === 'db/kitchensink-protocol.devalue')
 		await changeSessionProtocol(page, 'Kitchen sink');
-	await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
+	// Kitchen sink protocol has inference models set
+	if (dump !== 'db/kitchensink-protocol.devalue')
+		await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
 	await app.tabs.go('classify');
 	await page
 		.getByText(dump === 'db/basic.devalue' ? 'lil-fella' : 'leaf', { exact: true })

@@ -11,7 +11,6 @@ import { expect, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
-	chooseInDropdown,
 	expectZipFiles,
 	firstObservationCard,
 	importPhotos,
@@ -248,15 +247,6 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	await app.loading.wait();
 
 	/**
-	 *
-	 * @param {'crop'|'classify'} tab
-	 * @param {string|RegExp} name
-	 */
-	async function setModel(tab, name) {
-		await chooseInDropdown(page, `${tab}-models`, name);
-	}
-
-	/**
 	 * @param {boolean} toBePresent
 	 * @param {string} text
 	 */
@@ -266,24 +256,24 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 		await expector.toHaveText(makeRegexpUnion(text));
 	}
 
-	await setModel('crop', 'Aucune inférence');
+	await setInferenceModels(page, { crop: 'Aucune inférence' });
 	await app.tabs.go('crop');
 	await expectLoadingText(false, 'Chargement du modèle de recadrage…');
 
-	await setModel('crop', 'YOLO11');
+	await setInferenceModels(page, { crop: 'YOLO11' });
 	await expectLoadingText(true, 'Chargement du modèle de recadrage…');
 	await app.loading.wait();
 
-	await setModel('classify', 'Aucune inférence');
+	await setInferenceModels(page, { classify: 'Aucune inférence' });
 	await app.tabs.go('classify');
 	await expectLoadingText(false, 'Chargement du modèle de classification');
 
-	await setModel('classify', /80 classes/);
+	await setInferenceModels(page, { classify: /80 classes/ });
 	await expectLoadingText(true, 'Chargement du modèle de classification');
 	await app.loading.wait();
 	await expect(firstObservationCard(page)).not.toHaveText(/Erreur/);
 
-	await setModel('classify', /17000 classes/);
+	await setInferenceModels(page, { classify: /17000 classes/ });
 	await expectLoadingText(true, 'Chargement du modèle de classification');
 });
 

@@ -182,7 +182,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - img "Image 3 de la sélection"
 	    - heading "3 observations" [level=2]
 	    - text: Espèce
-	    - combobox: Entomobrya muscorum
+	    - combobox: Allacma fusca
 	    - code: /\\d+%/
 	    - img
 	    - button:
@@ -205,7 +205,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	        - button:
 	          - img
 	    - text: Genre
-	    - combobox: Entomobrya
+	    - combobox: Allacma
 	    - code: /\\d+%/
 	    - img
 	    - button:
@@ -228,7 +228,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	        - button:
 	          - img
 	    - text: Famille
-	    - combobox: Entomobryidae
+	    - combobox: Sminthuridae
 	    - code: /\\d+%/
 	    - img
 	    - button:
@@ -251,7 +251,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	        - button:
 	          - img
 	    - text: Ordre
-	    - combobox: Entomobryomorpha
+	    - combobox: Symphypleona
 	    - code: /\\d+%/
 	    - img
 	    - button:
