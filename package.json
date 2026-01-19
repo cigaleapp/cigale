@@ -107,7 +107,7 @@
 		"globals": "^17.0.0",
 		"google-auth-library": "^10.5.0",
 		"google-fonts-helper": "^3.7.3",
-		"googleapis": "^170.0.0",
+		"googleapis": "^170.1.0",
 		"jpeg-js": "^0.4.4",
 		"jsdom": "^27.4.0",
 		"json-schema-doc-ts": "^2.0.0",
