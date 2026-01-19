@@ -1,0 +1,384 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - dialog:
+      - banner:
+        - heading [level=1]: Raccourcis clavier
+        - button:
+          - img
+      - main:
+        - heading [level=2]: Observations
+        - generic:
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: A
+          - definition: Tout sélectionner
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: D
+          - definition: Tout désélectionner
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: G
+          - definition: Fusionner des observations ou images
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: Shift
+                - generic: +
+                - generic: G
+          - definition: Séparer toutes les observations sélectionnées en images seules
+          - term:
+            - generic:
+              - generic:
+                - generic: Suppr
+          - definition: Supprimer les images et observations sélectionnées
+        - heading [level=2]: Général
+        - generic:
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: "!"
+          - definition: Signaler un bug
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: "*"
+          - definition: Proposer une fonctionnalité
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: Z
+          - definition: Annuler
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: Shift
+                - generic: +
+                - generic: Z
+          - definition: Rétablir
+          - term:
+            - generic:
+              - generic:
+                - generic: I
+                - generic: D
+                - generic: E
+                - generic: V
+          - definition: Activer/Désactiver le debug mode
+        - heading [level=2]: Navigation
+        - generic:
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: P
+          - definition: Choisir le protocole
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: I
+          - definition: Importer des images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: R
+          - definition: Recadrer les images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: "N"
+          - definition: Classifier les images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: X
+          - definition: Exporter les résultats
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: M
+          - definition: Gérer les protocoles
+    - dialog:
+      - banner:
+        - heading [level=1]: Préparation hors-ligne
+        - button:
+          - img
+      - main:
+        - paragraph: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+      - contentinfo:
+        - generic:
+          - button: Démarrer
+    - banner:
+      - navigation:
+        - generic:
+          - button:
+            - generic:
+              - img
+        - generic:
+          - link "Testing session":
+            - /url: "#/sessions/syty7rgc"
+          - generic:
+            - link "Importer":
+              - /url: "#/import"
+              - text: Importer
+            - generic:
+              - button:
+                - img
+          - generic:
+            - link "Recadrer":
+              - /url: "#/crop"
+            - generic:
+              - button [expanded]:
+                - img
+          - generic:
+            - link "Classifier":
+              - /url: "#/classify"
+            - generic:
+              - button:
+                - img
+          - link "Résultats":
+            - /url: "#/results"
+        - complementary:
+          - generic:
+            - button "Activer":
+              - img
+              - text: Activer
+            - button "Ne pas activer les notifications":
+              - img
+          - dialog:
+            - generic:
+              - heading [level=1]: Signaler un bug
+              - button:
+                - img
+            - main:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - text: Description
+                        - paragraph: Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez
+                      - textbox
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Titre
+                      - textbox
+                - generic:
+                  - button: Envoyer
+          - button "Signaler un bug":
+            - img
+          - dialog:
+            - generic:
+              - heading [level=1]: Proposer une fonctionnalité
+              - button:
+                - img
+            - main:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Description
+                      - textbox
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Titre
+                      - textbox
+                - generic:
+                  - button: Envoyer
+          - button "Proposer une fonctionnalité":
+            - img
+          - generic:
+            - generic:
+              - generic:
+                - button "Réglages":
+                  - img
+              - dialog:
+                - generic: Réglages
+                - generic:
+                  - generic: Thème
+                  - generic:
+                    - generic:
+                      - switch [checked]:
+                        - generic:
+                          - img
+                    - button "Synchroniser avec le thème du système" [disabled]:
+                      - img
+                  - generic:
+                    - text: Notifications
+                    - paragraph: Quand un traitement est terminé
+                  - generic:
+                    - generic:
+                      - switch:
+                        - generic:
+                          - img
+                  - generic: Mode debug
+                  - generic:
+                    - generic:
+                      - switch:
+                        - generic:
+                          - img
+                  - generic: Taille des images
+                  - generic:
+                    - slider: "1"
+                  - generic: Langue
+                  - generic:
+                    - radiogroup "Langue de l'interface":
+                      - radio "English"
+                      - radio "Français" [checked]
+                  - generic:
+                    - text: Parallélisme
+                    - paragraph: Nombre de tâches en parallèle
+                  - generic:
+                    - button "Réduire":
+                      - img
+                    - generic:
+                      - textbox "Nombre de tâches en parallèle":
+                        - /placeholder: ""
+                        - text: "2"
+                    - button "Augmenter":
+                      - img
+                - generic:
+                  - button "Raccourcis clavier"
+                  - button "Préparation hors-ligne"
+                - generic:
+                  - text: CIGALE ver.
+                  - link "0d2590d":
+                    - /url: https://github.com/cigaleapp/cigale/tree/0d2590d608598707d4cc295234527a6e69832297
+                  - text: ·
+                  - link "À propos":
+                    - /url: "#/about"
+    - generic:
+      - generic:
+        - main:
+          - form:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - article "cyan.jpeg":
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - img "cyan.jpeg"
+                                - generic:
+                                  - generic:
+                                    - img
+                                  - heading "cyan.jpeg" [level=2]:
+                                    - generic: cyan.jpeg
+                      - generic:
+                        - article "leaf.jpeg":
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - img "leaf.jpeg"
+                                - generic:
+                                  - generic:
+                                    - img
+                                  - heading "leaf.jpeg" [level=2]:
+                                    - generic: leaf.jpeg
+                      - generic:
+                        - article "lil-fella.jpeg":
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - img "lil-fella.jpeg"
+                                - generic:
+                                  - generic:
+                                    - img
+                                  - heading "lil-fella.jpeg" [level=2]:
+                                    - generic: lil-fella.jpeg
+                      - generic:
+                        - article "with-exif-gps.jpeg":
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - img "with-exif-gps.jpeg"
+                                - generic:
+                                  - generic:
+                                    - img
+                                  - heading "with-exif-gps.jpeg" [level=2]:
+                                    - generic: with-exif-gps.jpeg
+        - complementary:
+          - generic:
+            - img
+            - paragraph: Sélectionnez une ou plusieurs images pour voir et modifier leurs métadonnées
+          - generic:
+            - button "Importer d'autres images":
+              - img
+              - text: Importer d'autres images
+            - button "Supprimer 0 images Suppr" [disabled]:
+              - img
+              - text: Supprimer 0 images
+              - generic:
+                - generic: Suppr
+    - generic: Importer · C.I.G.A.L.E.
+  - menu [active] [ref=e2]:
+    - group "Trier par…" [ref=e3]:
+      - group [ref=e4]: Trier par…
+      - menuitem "Métadonnée…" [ref=e5] [cursor=pointer]:
+        - generic [ref=e6]: Métadonnée…
+        - img [ref=e8]
+      - menuitem "Confiance en…" [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: Confiance en…
+        - img [ref=e13]
+      - menuitemcheckbox "ID" [checked] [ref=e15] [cursor=pointer]:
+        - img [ref=e17]
+        - generic [ref=e19]: ID
+      - menuitemcheckbox "Nom" [ref=e20] [cursor=pointer]:
+        - generic [ref=e21]: Nom
+    - group "Regrouper par…" [ref=e22]:
+      - group [ref=e23]: Regrouper par…
+      - menuitem "Métadonnée…" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: Métadonnée…
+        - img [ref=e27]
+      - menuitem "Présence de…" [ref=e29] [cursor=pointer]:
+        - generic [ref=e30]: Présence de…
+        - img [ref=e32]
+      - menuitem "Confiance en…" [ref=e34] [cursor=pointer]:
+        - generic [ref=e35]: Confiance en…
+        - img [ref=e37]
+      - menuitemcheckbox "Aucun regroupement" [checked] [ref=e39] [cursor=pointer]:
+        - img [ref=e41]
+        - generic [ref=e43]: Aucun regroupement
+    - group "Modèle d'inférence" [ref=e44]:
+      - group [ref=e45]: Modèle d'inférence
+      - menuitemcheckbox "Aucune inférence" [ref=e46] [cursor=pointer]:
+        - generic [ref=e47]: Aucune inférence
+      - menuitemcheckbox "YOLO11" [checked] [ref=e48] [cursor=pointer]:
+        - img [ref=e50]
+        - generic [ref=e52]: YOLO11
+```

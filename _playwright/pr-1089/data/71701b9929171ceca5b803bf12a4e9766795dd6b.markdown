@@ -1,0 +1,308 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - dialog:
+      - banner:
+        - heading [level=1]: Raccourcis clavier
+        - button:
+          - img
+      - main:
+        - heading [level=2]: Général
+        - generic:
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: "!"
+          - definition: Signaler un bug
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: "*"
+          - definition: Proposer une fonctionnalité
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: Z
+          - definition: Annuler
+          - term:
+            - generic:
+              - generic:
+                - generic: Ctrl
+                - generic: +
+                - generic: Shift
+                - generic: +
+                - generic: Z
+          - definition: Rétablir
+          - term:
+            - generic:
+              - generic:
+                - generic: I
+                - generic: D
+                - generic: E
+                - generic: V
+          - definition: Activer/Désactiver le debug mode
+        - heading [level=2]: Navigation
+        - generic:
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: P
+          - definition: Choisir le protocole
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: I
+          - definition: Importer des images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: R
+          - definition: Recadrer les images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: "N"
+          - definition: Classifier les images
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: X
+          - definition: Exporter les résultats
+          - term:
+            - generic:
+              - generic:
+                - generic: G
+                - generic: M
+          - definition: Gérer les protocoles
+    - dialog:
+      - banner:
+        - heading [level=1]: Préparation hors-ligne
+        - button:
+          - img
+      - main:
+        - paragraph: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+      - contentinfo:
+        - generic:
+          - button: Démarrer
+    - banner:
+      - navigation:
+        - generic:
+          - button:
+            - generic:
+              - img
+        - generic:
+          - link "Session du 09/01/2026":
+            - /url: "#/sessions/s8envk78"
+            - text: Session du 09/01/2026
+          - generic:
+            - link "Importer":
+              - /url: "#/import"
+            - generic:
+              - button:
+                - img
+          - generic:
+            - link "Recadrer":
+              - /url: "#/crop"
+            - generic:
+              - button:
+                - img
+          - generic:
+            - link "Classifier":
+              - /url: "#/classify"
+            - generic:
+              - button:
+                - img
+          - link "Résultats":
+            - /url: "#/results"
+        - complementary:
+          - generic:
+            - button "Activer":
+              - img
+              - text: Activer
+            - button "Ne pas activer les notifications":
+              - img
+          - dialog:
+            - generic:
+              - heading [level=1]: Signaler un bug
+              - button:
+                - img
+            - main:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - text: Description
+                        - paragraph: Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez
+                      - textbox
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Titre
+                      - textbox
+                - generic:
+                  - button: Envoyer
+          - button "Signaler un bug":
+            - img
+          - dialog:
+            - generic:
+              - heading [level=1]: Proposer une fonctionnalité
+              - button:
+                - img
+            - main:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Description
+                      - textbox
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: Titre
+                      - textbox
+                - generic:
+                  - button: Envoyer
+          - button "Proposer une fonctionnalité":
+            - img
+          - generic:
+            - generic:
+              - generic:
+                - button "Réglages":
+                  - img
+              - dialog:
+                - generic: Réglages
+                - generic:
+                  - generic: Thème
+                  - generic:
+                    - generic:
+                      - switch [checked]:
+                        - generic:
+                          - img
+                    - button "Synchroniser avec le thème du système" [disabled]:
+                      - img
+                  - generic:
+                    - text: Notifications
+                    - paragraph: Quand un traitement est terminé
+                  - generic:
+                    - generic:
+                      - switch:
+                        - generic:
+                          - img
+                  - generic: Mode debug
+                  - generic:
+                    - generic:
+                      - switch:
+                        - generic:
+                          - img
+                  - generic: Taille des images
+                  - generic:
+                    - slider: "1"
+                  - generic: Langue
+                  - generic:
+                    - radiogroup "Langue de l'interface":
+                      - radio "English"
+                      - radio "Français" [checked]
+                  - generic:
+                    - text: Parallélisme
+                    - paragraph: Nombre de tâches en parallèle
+                  - generic:
+                    - button "Réduire":
+                      - img
+                    - generic:
+                      - textbox "Nombre de tâches en parallèle":
+                        - /placeholder: ""
+                        - text: "2"
+                    - button "Augmenter":
+                      - img
+                - generic:
+                  - button "Raccourcis clavier"
+                  - button "Préparation hors-ligne"
+                - generic:
+                  - text: CIGALE ver.
+                  - link "0d2590d":
+                    - /url: https://github.com/cigaleapp/cigale/tree/0d2590d608598707d4cc295234527a6e69832297
+                  - text: ·
+                  - link "À propos":
+                    - /url: "#/about"
+    - generic:
+      - main:
+        - heading "Session du 09/01/2026 Supprimer Ouvrir" [level=1]:
+          - textbox "Nom de la session":
+            - /placeholder: ""
+            - text: Session du 09/01/2026
+          - generic:
+            - dialog:
+              - generic:
+                - heading [level=1]: Êtes-vous sûr·e?
+                - button:
+                  - img
+              - main:
+                - text: "La suppression entraînera:"
+                - list:
+                  - listitem: La suppression de 2 images
+                  - listitem: La suppression de 0 observations
+                - text: Il est impossible de revenir en arrière.
+                - generic:
+                  - paragraph:
+                    - text: Afin de confirmer la suppression, veuillez taper
+                    - strong: Session du 09/01/2026
+                    - text: "ci-dessous:"
+                  - textbox
+              - generic:
+                - generic:
+                  - button: Annuler
+                  - generic:
+                    - button [disabled]: Oui, supprimer
+            - button "Supprimer"
+            - button "Ouvrir"
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Description
+                - textbox "Description"
+          - generic:
+            - generic:
+              - generic:
+                - generic: Protocole
+                - button "Kitchen sink" [expanded]:
+                  - text: Kitchen sink
+                  - img
+        - generic:
+          - button "Ouvrir la session"
+        - generic:
+          - generic:
+            - generic:
+              - generic: ID de la session
+              - code: s8envk78
+    - generic: Importer · Session du 09/01/2026
+  - menu [ref=e2]:
+    - group "Choisir un protocole" [ref=e3]:
+      - group [ref=e4]: Choisir un protocole
+      - menuitemcheckbox "Kitchen sink" [checked] [ref=e5] [cursor=pointer]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - img [ref=e9]
+            - text: Kitchen sink
+          - button "Ce protocole n'est pas versionné, pour le mettre à jour, supprimer le et importez la nouvelle version" [active] [ref=e12]:
+            - img [ref=e14]
+    - group [ref=e16]:
+      - menuitem "Gérer les protocoles" [ref=e17] [cursor=pointer]:
+        - generic [ref=e19]:
+          - img [ref=e21]
+          - text: Gérer les protocoles
+```

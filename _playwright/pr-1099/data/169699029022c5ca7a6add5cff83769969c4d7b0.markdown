@@ -1,0 +1,10 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - img [ref=e3]
+  - paragraph [ref=e5]:
+    - text: Chargement…
+    - code [ref=e6]: Initialisation de la base de données…
+  - code [ref=e7]: fdc8342978233d1548b81b7d13497f5a0830ab6f
+```
