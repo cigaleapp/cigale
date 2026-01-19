@@ -201,18 +201,23 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
  * Opens a dropdown and chooses an item by its name
  * @param {Page} page
  * @param {string} dropdownTestId
- * @param {string | RegExp | ((options: Locator) => Locator)} option
+ * @param {[string | RegExp | ((options: Locator) => Locator)] | [string, string]} option can be a single argument, or two strings where the first one is the group (dropdown submenu's label) and the second one the option name
  */
-export async function chooseInDropdown(page, dropdownTestId, option) {
+export async function chooseInDropdown(page, dropdownTestId, ...option) {
 	const trigger = page.getByTestId(`${dropdownTestId}-open`);
 	const options = page.getByTestId(`${dropdownTestId}-options`);
 
 	await trigger.click();
 
-	const item =
-		typeof option === "function"
-			? option(options)
-			: options.getByRole('menuitemcheckbox', { name: option });
+	const [locator, sublocator] = option;
+
+	const item = sublocator
+		? options
+				.getByRole('group', { name: locator.toString() })
+				.getByRole('menuitemcheckbox', { name: sublocator })
+		: typeof locator === 'function'
+			? locator(options)
+			: options.getByRole('menuitemcheckbox', { name: locator });
 
 	await item.click();
 	await page.keyboard.press('Escape'); // Close the dropdown
@@ -263,12 +268,8 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
  * @param {{ crop?: InferenceModelName, classify?: InferenceModelName }} models names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
 export async function setInferenceModels(page, models) {
-	for (const [task, model] of Object.entries(models)) {
-		await chooseInDropdown(page, `${task}-settings`, (options) =>
-			options
-				.getByRole('group', { name: "Modèle d'inférence" })
-				.getByRole('menuitemcheckbox', { name: model })
-		);
+	for (const [tab, model] of Object.entries(models)) {
+		await chooseInDropdown(page, `${tab}-settings`, "Modèle d'inférence", model);
 	}
 }
 
