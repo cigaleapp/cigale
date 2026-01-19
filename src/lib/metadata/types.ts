@@ -1,3 +1,5 @@
+import { ArkErrors } from 'arktype';
+
 import type * as DB from '$lib/database';
 import { MetadataRuntimeValue, type RuntimeValue } from '$lib/schemas/metadata';
 
@@ -33,8 +35,9 @@ export function switchOnMetadataType<
 >(
 	type: DB.MetadataType,
 	value: TypeswitchValues,
-	cases: Partial<TypeswitchCases<RT>>,
-	fallback: (...values: RuntimeValue[]) => RT[DB.MetadataType]
+	cases: TypeswitchCases<RT>,
+	fallback: undefined,
+	error?: (...values: ArkErrors[]) => RT[DB.MetadataType]
 ): RT[DB.MetadataType];
 export function switchOnMetadataType<
 	R,
@@ -43,10 +46,31 @@ export function switchOnMetadataType<
 	type: DB.MetadataType,
 	value: TypeswitchValues,
 	cases: Partial<TypeswitchCases<RT>>,
-	fallback?: (...values: RuntimeValue[]) => RT[DB.MetadataType]
+	fallback: (...values: RuntimeValue[]) => RT[DB.MetadataType],
+	error?: (...values: ArkErrors[]) => RT[DB.MetadataType]
+): RT[DB.MetadataType];
+export function switchOnMetadataType<
+	R,
+	RT extends TypeswitchReturnTypes<R> = TypeswitchReturnTypes<R>
+>(
+	type: DB.MetadataType,
+	value: TypeswitchValues,
+	cases: Partial<TypeswitchCases<RT>>,
+	fallback?: (...values: RuntimeValue[]) => RT[DB.MetadataType],
+	error?: (...values: ArkErrors[]) => RT[DB.MetadataType]
 ): RT[DB.MetadataType] {
 	const values = Array.isArray(value) ? value : [value];
-	const typeds = values.map((v) => MetadataRuntimeValue[type].assert(v));
+	const typeds = values.map((v) => MetadataRuntimeValue[type](v));
+
+	if (typeds.some((v) => v instanceof ArkErrors)) {
+		if (error) return error(...(typeds.filter((v) => v instanceof ArkErrors) as ArkErrors[]));
+		throw new Error(
+			`Invalid metadata value for type ${type}: ${typeds
+				.filter((v) => v instanceof ArkErrors)
+				.map((v) => v.toString())
+				.join('; ')}`
+		);
+	}
 
 	// @ts-expect-error typescript can't link the type of value and type parameter
 	return (cases[type] ?? fallback)(...typeds);
