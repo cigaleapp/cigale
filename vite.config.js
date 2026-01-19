@@ -60,6 +60,7 @@ export default defineConfig({
 	},
 	build: {
 		minify: !env.DEBUG,
+		sourcemap: env.DEBUG ? 'inline' : false
 	},
 	css: {
 		postcss: {
