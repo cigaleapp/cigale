@@ -15,7 +15,9 @@ export function parseISOSafe(maybeDatestring) {
 		maybeDatestring,
 		'yyyy-MM-dd',
 		"yyyy-MM-dd'T'HH:mm:ss",
-		"yyyy-MM-dd'T'HH:mm:ssXXX"
+		"yyyy-MM-dd'T'HH:mm:ss.SSS",
+		"yyyy-MM-dd'T'HH:mm:ssXXX",
+		"yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
 	);
 }
 
@@ -28,6 +30,7 @@ if (import.meta.vitest) {
 			expect(parseISOSafe('2023-10-01T12:00:00')).toBeInstanceOf(Date);
 			expect(parseISOSafe('2023-10-01T12:00:00Z')).toBeInstanceOf(Date);
 			expect(parseISOSafe('2023-10-01T12:00:00+02:00')).toBeInstanceOf(Date);
+			expect(parseISOSafe('2025-04-25T12:38:36.000Z')).toBeInstanceOf(Date);
 		});
 		test('does not parse "61"', () => {
 			// Crazy right??
