@@ -75,6 +75,7 @@ export async function importResultsZip(file, id) {
 	if (!uiState.currentSession) {
 		toasts.info('Importation dans une nouvelle session');
 		const newSession = await db.tables.Session.add({
+			...session,
 			name: session.name || `Import de ${file.name}`,
 			description: session.description || `Importée depuis ${file.name}`,
 			protocol: session.protocol,
