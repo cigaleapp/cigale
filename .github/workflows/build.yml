@@ -6,10 +6,11 @@ env:
 on:
   workflow_call:
     inputs:
-      minify:
+      debug:
         required: false
         type: boolean
         default: true
+        description: Build with debug info (non-minified + sourcemaps)
     outputs:
       artifact:
         description: The build artifact name
@@ -28,17 +29,17 @@ jobs:
           bun-version-file: .bun-version
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      - if: inputs.minify
+      - if: inputs.debug
         name: Build
         run: bun run build
-      - if: ${{ !inputs.minify }}
+      - if: ${{ !inputs.debug }}
         name: Build (without minification)
         run: bun run build
         env:
-          MINIFICATION: 'off'
+          DEBUG: 'true'
       - name: Determine artifact name
         id: artifact
-        run: echo "name=build-${{ inputs.minify && 'minified' || 'full' }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+        run: echo "name=build-${{ inputs.debug && 'minified' || 'full' }}-${{ github.sha }}" >> $GITHUB_OUTPUT
       - name: Upload build as artifact
         uses: actions/upload-artifact@v6
         with:

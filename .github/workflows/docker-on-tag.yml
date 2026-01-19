@@ -45,7 +45,7 @@ jobs:
     if: needs.is-tagged.outputs.tag-name != ''
     uses: ./.github/workflows/build.yml
     with:
-      minify: true
+      debug: true
 
   docker:
     name: Build & push Docker image
