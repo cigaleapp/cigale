@@ -58,7 +58,8 @@
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest",
 		"wuchale": "wuchale",
-		"all-contributors": "all-contributors --files README.md --files README_FR.md"
+		"all-contributors": "all-contributors --files README.md --files README_FR.md",
+		"test:update-fixtures": "playwright test tasks/exports.spec.js --update-snapshots -x --headed && playwright test tasks/dbdump.spec.js -x --headed --update-snapshots"
 	},
 	"devDependencies": {
 		"@actions/core": "^2.0.2",
