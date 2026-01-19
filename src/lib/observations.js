@@ -47,7 +47,11 @@ export async function mergeToObservation(parts) {
 		addedAt: new Date().toISOString(),
 		label: fallbackObservationLabel([...observations, ...images]),
 		metadataOverrides: mapValues(
-			mergeMetadataFromImagesAndObservations({ protocol, images: [], observations }),
+			mergeMetadataFromImagesAndObservations({
+				definitions: tables.Metadata.state,
+				images: [],
+				observations
+			}),
 			serializeMetadataFullValue
 		)
 	};

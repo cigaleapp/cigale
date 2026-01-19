@@ -172,11 +172,9 @@
 	const boundingBoxes = $derived(
 		Object.fromEntries(
 			images
-				.map(({ metadata, id }) => [
-					id,
-					assertIs('boundingbox', metadata[uiState.cropMetadataId]?.value)
-				])
-				.filter(([, value]) => Boolean(value))
+				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value])
+				.filter(([, box]) => box !== undefined)
+				.map(([id, box]) => [id, assertIs('boundingbox', box)])
 		)
 	);
 
