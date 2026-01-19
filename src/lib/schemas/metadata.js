@@ -7,7 +7,7 @@ import { ColorHex, HTTPRequest, ID, ModelInput, Probability, URLString } from '.
 
 /**
  * @param {string} metadataId
- * @param {import('$lib/metadata').RuntimeValue<"enum">} key
+ * @param {RuntimeValue<"enum">} key
  */
 export function metadataOptionId(metadataId, key) {
 	return `${metadataId}:${key}`;
@@ -92,7 +92,7 @@ export const MetadataRuntimeValueAny = type.or(
 
 export const MetadataValue = type({
 	value: type('string.json').pipe((jsonstring) => {
-		/** @type {import('../metadata').RuntimeValue<typeof MetadataType.infer>}  */
+		/** @type {RuntimeValue<typeof MetadataType.infer>}  */
 		let out = JSON.parse(jsonstring);
 		if (typeof out === 'string') out = parseISOSafe(out) ?? out;
 		return out;
