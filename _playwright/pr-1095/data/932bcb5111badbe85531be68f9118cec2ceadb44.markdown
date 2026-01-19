@@ -1,0 +1,414 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - heading [level=2]: Observations
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: A
+        - definition: Tout sélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: D
+        - definition: Tout désélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: G
+        - definition: Fusionner des observations ou images
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: G
+        - definition: Séparer toutes les observations sélectionnées en images seules
+        - term:
+          - generic:
+            - generic:
+              - generic: Suppr
+        - definition: Supprimer les images et observations sélectionnées
+      - heading [level=2]: Général
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: "!"
+        - definition: Signaler un bug
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: "*"
+        - definition: Proposer une fonctionnalité
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Z
+        - definition: Annuler
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: Z
+        - definition: Rétablir
+        - term:
+          - generic:
+            - generic:
+              - generic: I
+              - generic: D
+              - generic: E
+              - generic: V
+        - definition: Activer/Désactiver le debug mode
+      - heading [level=2]: Navigation
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: P
+        - definition: Choisir le protocole
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: I
+        - definition: Importer des images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: R
+        - definition: Recadrer les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: "N"
+        - definition: Classifier les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: X
+        - definition: Exporter les résultats
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: M
+        - definition: Gérer les protocoles
+  - dialog:
+    - banner:
+      - heading [level=1]: Préparation hors-ligne
+      - button:
+        - img
+    - main:
+      - paragraph: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+    - contentinfo:
+      - generic:
+        - button: Démarrer
+  - banner [ref=e3]:
+    - navigation [ref=e6]:
+      - button [ref=e8] [cursor=pointer]:
+        - img [ref=e10]
+      - generic [ref=e19]:
+        - link "Session du 09/01/2026" [ref=e20] [cursor=pointer]:
+          - /url: "#/sessions/s8envk78"
+        - link "Importer" [ref=e21] [cursor=pointer]:
+          - /url: "#/import"
+        - generic [ref=e22]:
+          - link "Recadrer" [ref=e23] [cursor=pointer]:
+            - /url: "#/crop"
+          - button [ref=e25] [cursor=pointer]:
+            - img [ref=e26]
+        - generic [ref=e28]:
+          - link "Classifier" [ref=e29] [cursor=pointer]:
+            - /url: "#/classify"
+            - text: Classifier
+          - button [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+        - link "Résultats" [ref=e35] [cursor=pointer]:
+          - /url: "#/results"
+      - complementary [ref=e36]:
+        - generic [ref=e37]:
+          - button "Activer" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+            - text: Activer
+          - button "Ne pas activer les notifications" [ref=e41] [cursor=pointer]:
+            - img [ref=e42]
+        - dialog:
+          - generic:
+            - heading [level=1]: Signaler un bug
+            - button:
+              - img
+          - main:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - text: Description
+                      - paragraph: Expliquer comment reproduire votre bug, étape par étape, et ce à quoi vous vous attendiez
+                    - textbox
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Titre
+                    - textbox
+              - generic:
+                - button: Envoyer
+        - button "Signaler un bug" [ref=e44] [cursor=pointer]:
+          - img [ref=e45]
+        - dialog:
+          - generic:
+            - heading [level=1]: Proposer une fonctionnalité
+            - button:
+              - img
+          - main:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Description
+                    - textbox
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Titre
+                    - textbox
+              - generic:
+                - button: Envoyer
+        - button "Proposer une fonctionnalité" [ref=e47] [cursor=pointer]:
+          - img [ref=e48]
+        - generic [ref=e51]:
+          - button "Réglages" [ref=e53] [cursor=pointer]:
+            - img [ref=e54]
+          - dialog:
+            - generic: Réglages
+            - generic:
+              - generic: Thème
+              - generic:
+                - generic:
+                  - switch [checked]:
+                    - generic:
+                      - img
+                - button "Synchroniser avec le thème du système" [disabled]:
+                  - img
+              - generic:
+                - text: Notifications
+                - paragraph: Quand un traitement est terminé
+              - generic:
+                - generic:
+                  - switch:
+                    - generic:
+                      - img
+              - generic: Mode debug
+              - generic:
+                - generic:
+                  - switch:
+                    - generic:
+                      - img
+              - generic: Trier les images par
+              - generic:
+                - radiogroup "Par quoi trier":
+                  - radio "Fichier"
+                  - radio "Date" [checked]
+                - button "Trier par ordre décroissant":
+                  - img
+              - generic: Taille des images
+              - generic:
+                - slider: "1"
+              - generic: Langue
+              - generic:
+                - radiogroup "Langue de l'interface":
+                  - radio "English"
+                  - radio "Français" [checked]
+              - generic:
+                - text: Parallélisme
+                - paragraph: Nombre de tâches en parallèle
+              - generic:
+                - button "Réduire":
+                  - img
+                - generic:
+                  - textbox "Nombre de tâches en parallèle":
+                    - /placeholder: ""
+                    - text: "2"
+                - button "Augmenter":
+                  - img
+            - generic:
+              - button "Raccourcis clavier"
+              - button "Préparation hors-ligne"
+            - generic:
+              - text: CIGALE ver.
+              - link "209de56":
+                - /url: https://github.com/cigaleapp/cigale/tree/209de56ad5d9cc88e6741c0c99a28ec9c4131a01
+              - text: ·
+              - link "À propos":
+                - /url: "#/about"
+  - generic [ref=e57]:
+    - main [ref=e58]:
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - heading "Non recadrées" [level=2] [ref=e63]
+          - paragraph [ref=e64]: 2 éléments
+          - button "Supprimer" [ref=e66] [cursor=pointer]:
+            - img [ref=e67]
+            - text: Supprimer
+        - generic [ref=e69]:
+          - article "leaf" [ref=e71] [cursor=pointer]:
+            - generic [ref=e74]:
+              - img "leaf" [ref=e76]
+              - generic [ref=e77]:
+                - img [ref=e79]
+                - heading "leaf" [level=2] [ref=e81]:
+                  - generic [ref=e82]: leaf
+          - article "cyan" [ref=e84] [cursor=pointer]:
+            - generic [ref=e87]:
+              - img "cyan" [ref=e89]
+              - generic [ref=e90]:
+                - img [ref=e91]
+                - heading "cyan" [level=2] [ref=e93]:
+                  - generic [ref=e94]: cyan
+    - complementary [ref=e95]:
+      - img "Image 1 de l'observation leaf" [ref=e97]
+      - heading "leaf" [level=2] [ref=e98]:
+        - img [ref=e99]
+        - textbox "Nom de l'observation" [ref=e101]:
+          - /placeholder: ""
+          - text: leaf
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - generic [ref=e105]: bool
+            - generic [ref=e106]:
+              - switch [ref=e110] [cursor=pointer]:
+                - img [ref=e112]
+              - button [disabled] [ref=e114] [cursor=pointer]:
+                - img [ref=e115]
+          - paragraph [ref=e118]: boolean metadata
+        - generic [ref=e120]:
+          - generic [ref=e121]: crop
+          - generic [ref=e122]:
+            - generic [ref=e124]:
+              - img [ref=e125]
+              - paragraph [ref=e127]: Irreprésentable
+            - button [disabled] [ref=e128] [cursor=pointer]:
+              - img [ref=e129]
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - generic [ref=e133]: date
+            - generic [ref=e134]:
+              - textbox "date" [ref=e136]
+              - button [disabled] [ref=e137] [cursor=pointer]:
+                - img [ref=e138]
+          - paragraph [ref=e141]: date metadata
+        - generic [ref=e142]:
+          - generic [ref=e143]:
+            - generic [ref=e144]: enum
+            - generic [ref=e145]:
+              - radiogroup [ref=e147]:
+                - generic [ref=e148]:
+                  - radio "One Option 1" [ref=e149]
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: One
+                    - paragraph [ref=e152]: Option 1
+                - generic [ref=e153]:
+                  - radio "Two Option 2" [ref=e154]
+                  - generic [ref=e155]:
+                    - generic [ref=e156]: Two
+                    - paragraph [ref=e157]: Option 2
+              - button [disabled] [ref=e158] [cursor=pointer]:
+                - img [ref=e159]
+          - paragraph [ref=e162]: enum metadata
+        - generic [ref=e163]:
+          - generic [ref=e164]:
+            - generic [ref=e165]: float
+            - generic [ref=e166]:
+              - generic [ref=e167]:
+                - textbox "float" [ref=e168]
+                - button "Décrémenter" [ref=e169] [cursor=pointer]:
+                  - img [ref=e170]
+                - button "Incrémenter" [ref=e172] [cursor=pointer]:
+                  - img [ref=e173]
+              - button [disabled] [ref=e175] [cursor=pointer]:
+                - img [ref=e176]
+          - paragraph [ref=e179]: float metadata
+        - generic [ref=e180]:
+          - generic [ref=e181]:
+            - generic [ref=e182]: integer
+            - generic [ref=e183]:
+              - generic [ref=e184]:
+                - textbox "integer" [ref=e185]: "41"
+                - button "Décrémenter" [active] [ref=e186] [cursor=pointer]:
+                  - img [ref=e187]
+                - button "Incrémenter" [ref=e189] [cursor=pointer]:
+                  - img [ref=e190]
+              - button [ref=e192] [cursor=pointer]:
+                - img [ref=e193]
+          - paragraph [ref=e196]: integer metadata
+        - generic [ref=e197]:
+          - generic [ref=e198]:
+            - generic [ref=e199]: location
+            - generic [ref=e200]:
+              - textbox "location" [ref=e202]
+              - button [disabled] [ref=e203] [cursor=pointer]:
+                - img [ref=e204]
+          - paragraph [ref=e207]: location metadata
+        - generic [ref=e208]:
+          - generic [ref=e209]:
+            - generic [ref=e210]: string
+            - generic [ref=e211]:
+              - textbox "string" [ref=e213]
+              - button [disabled] [ref=e214] [cursor=pointer]:
+                - img [ref=e215]
+          - paragraph [ref=e218]: string metadata
+      - generic [ref=e219]:
+        - generic [ref=e220]:
+          - button "Regrouper Ctrl + G" [ref=e221] [cursor=pointer]:
+            - img [ref=e222]
+            - text: Regrouper
+            - generic [ref=e224]:
+              - generic [ref=e225]: Ctrl
+              - generic [ref=e226]: +
+              - generic [ref=e227]: G
+          - button "Séparer Ctrl + Shift + G" [ref=e228] [cursor=pointer]:
+            - img [ref=e229]
+            - text: Séparer
+            - generic [ref=e231]:
+              - generic [ref=e232]: Ctrl
+              - generic [ref=e233]: +
+              - generic [ref=e234]: Shift
+              - generic [ref=e235]: +
+              - generic [ref=e236]: G
+        - button "Supprimer 1 images Suppr" [ref=e237] [cursor=pointer]:
+          - img [ref=e238]
+          - text: Supprimer 1 images
+          - generic [ref=e241]: Suppr
+  - generic [ref=e242]: Classification · Session du 09/01/2026
+```
