@@ -10,6 +10,7 @@
 	import { tables } from '$lib/idb.svelte';
 	import { metadataDefinitionComparator } from '$lib/protocols';
 	import {
+		namespaceOfMetadataId,
 		removeNamespaceFromMetadataId,
 		type MetadataInferOptionsNeural
 	} from '$lib/schemas/metadata';
@@ -65,12 +66,15 @@
 		metadataDefinitionComparator(uiState.currentProtocol ?? { metadataOrder: undefined })
 	);
 
-	const sortableMetadata = $derived(
-		tables.Metadata.state.filter((m) => m.sortable).sort(compareMetadataDefs)
+	const metadataOfProtocol = $derived(
+		tables.Metadata.state
+			.filter((m) => namespaceOfMetadataId(m.id) === uiState.currentProtocolId)
+			.sort(compareMetadataDefs)
 	);
-	const groupableMetadata = $derived(
-		tables.Metadata.state.filter((m) => m.groupable).sort(compareMetadataDefs)
-	);
+
+	const sortableMetadata = $derived(metadataOfProtocol.filter((m) => m.sortable));
+	const groupableMetadata = $derived(metadataOfProtocol.filter((m) => m.groupable));
+
 
 	const currentSettings = $derived(
 		uiState.currentSession
