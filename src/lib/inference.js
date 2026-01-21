@@ -83,26 +83,17 @@ export async function loadModel(
 	task,
 	{ protocolId, requests, webgpu = false, onProgress }
 ) {
-	// TODO: tidy up .broadcast() result handling once https://github.com/gwennlbh/swarpc/issues/121 is resolved
-
 	onProgress ??= () => {};
 	const splitProgress = progressSplitter('model', 0.8, 'classmapping', 0.1, 'loading');
 
 	const id = inferenceModelId(protocolId, requests.model);
 
-	const existingSession = await swarpc.inferenceSessionId.broadcast(task);
+	const existingSession = await swarpc.inferenceSessionId.broadcast.orThrow(task).catch((e) => {
+		console.error(e);
+		throw new Error(`Failed to get existing inference session for task ${task}: ${e}`);
+	});
 
-	if (!existingSession.every((s) => s.status === 'fulfilled')) {
-		const reasons = existingSession
-			.filter((s) => s.status === 'rejected')
-			.map(({ reason, node }) => `Node ${node}: ${reason}`);
-
-		throw new Error(
-			`Failed to get existing inference session for task ${task}: ${reasons.join('\n')}`
-		);
-	}
-
-	if (existingSession.every((s) => s.value === id)) {
+	if (existingSession.every((loadedSession) => loadedSession === id)) {
 		console.debug(`Model ${task} already loaded with ID ${id} on all nodes`);
 		return id;
 	}
@@ -127,7 +118,7 @@ export async function loadModel(
 		}).then((res) => res.text());
 	}
 
-	const load = await swarpc.loadModel.broadcast({
+	const loaded = await swarpc.loadModel.broadcast.once.orThrow({
 		task,
 		model,
 		classmapping,
@@ -135,17 +126,8 @@ export async function loadModel(
 		inferenceSessionId: id
 	});
 
-	if (!load.every((s) => s.status === 'fulfilled' && s.value === true)) {
-		const reasons = [
-			...load
-				.filter((s) => s.status === 'rejected')
-				.map(({ reason, node }) => `Node ${node}: ${reason ?? 'failed to load model'}`),
-			...load
-				.filter((s) => s.status === 'fulfilled' && s.value !== true)
-				.map(({ node }) => `Node ${node}: failed to load model`)
-		];
-
-		throw new Error(`Failed to load model for task ${task}: ${reasons.join('\n')}`);
+	if (!loaded.every(Boolean)) {
+		throw new Error(`Failed to load model for task ${task}`);
 	}
 
 	onProgress(splitProgress('loading', 1));

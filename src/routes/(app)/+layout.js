@@ -77,7 +77,7 @@ export async function load() {
 		const sessionId = localStorage.getItem('currentSessionId');
 
 		setLoadingMessage('Initialisation de la base de données…');
-		await swarpc.init.broadcast({ databaseName, databaseRevision });
+		await swarpc.init.broadcast.orThrow({ databaseName, databaseRevision });
 		await tables.initialize(sessionId);
 
 		setLoadingMessage('Chargement des données intégrées…');
