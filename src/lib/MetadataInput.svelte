@@ -31,7 +31,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
+	const {
 		value,
 		confidences = {},
 		id,
@@ -51,202 +51,203 @@
 	data-metadata-id={definition.id}
 	class:compact-enum={isCompactEnum}
 >
-	<MetadataTypeswitch {type} {value}>
-		{#snippet enum_(value)}
-			{#if isCompactEnum}
-				<RadioButtons
-					{value}
-					onchange={onblur}
-					cards={options.every((opt) => opt.icon || opt.color)}
-					options={options
-						.toSorted(compareBy(({ index }) => index))
-						.map((opt) => pick(opt, 'key', 'label', 'icon', 'color', 'description'))}
-				>
-					{#snippet children({ label, icon, color, description })}
-						<div class="label">
-							<div class="first-line">
-								{#if icon || color}
-									<div
-										class="icon"
-										style:background-color={color}
-										style:color={color ? readableOn(color) : undefined}
-									>
-										{#if icon}
-											<Icon {icon} />
-										{/if}
-									</div>
+	<!-- XXX: Is not reactive without an explicit {#key}, idk why -->
+	{#key value}
+		<MetadataTypeswitch {type} {value}>
+			{#snippet enum_(value)}
+				{#if isCompactEnum}
+					<RadioButtons
+						value={value?.toString()}
+						onchange={onblur}
+						cards={options.every((opt) => opt.icon || opt.color)}
+						options={options
+							.toSorted(compareBy(({ index }) => index))
+							.map((opt) =>
+								pick(opt, 'key', 'label', 'icon', 'color', 'description')
+							)}
+					>
+						{#snippet children({ label, icon, color, description })}
+							<div class="label">
+								<div class="first-line">
+									{#if icon || color}
+										<div
+											class="icon"
+											style:background-color={color}
+											style:color={color ? readableOn(color) : undefined}
+										>
+											{#if icon}
+												<Icon {icon} />
+											{/if}
+										</div>
+									{/if}
+									{label}
+								</div>
+								{#if description}
+									<p class="subtext">{description}</p>
 								{/if}
-								{label}
 							</div>
-							{#if description}
-								<p class="subtext">{description}</p>
-							{/if}
-						</div>
-					{/snippet}
-				</RadioButtons>
-			{:else}
-				<MetadataCombobox
+						{/snippet}
+					</RadioButtons>
+				{:else}
+					<MetadataCombobox
+						{id}
+						{options}
+						{confidences}
+						type="single"
+						disabled={disabled ?? false}
+						value={safeJSONParse(value?.toString())?.toString() ?? value}
+						onValueChange={(newValue) => {
+							if (newValue === undefined) {
+								onblur(undefined);
+								return;
+							}
+							onblur(newValue.toString());
+						}}
+					/>
+				{/if}
+			{/snippet}
+			{#snippet boolean(value)}
+				<div class="boolean-switch">
+					<Switch
+						value={value ?? false}
+						onchange={(newValue) => {
+							onblur(newValue);
+						}}
+					/>
+					{#if value}
+						Oui
+					{:else if value === false}
+						Non
+					{/if}
+				</div>
+			{/snippet}
+			{#snippet string(value)}
+				<input
+					type="text"
+					{value}
 					{id}
-					{options}
-					{confidences}
-					type="single"
-					disabled={disabled ?? false}
-					value={safeJSONParse(value?.toString())?.toString() ?? value}
-					onValueChange={(newValue) => {
+					{disabled}
+					onblur={(e) => onblur(e.currentTarget.value)}
+				/>
+			{/snippet}
+			{#snippet numeric(val)}
+				<input
+					{id}
+					{disabled}
+					type="text"
+					inputmode="numeric"
+					onblur={({ currentTarget }) => {
+						if (!(currentTarget instanceof HTMLInputElement)) return;
+						const newValue = currentTarget.value;
+						if (!newValue) {
+							onblur(undefined);
+							return;
+						}
+
+						/** @type {number|undefined} */
+						let parsedValue =
+							type === 'integer'
+								? Number.parseInt(newValue, 10)
+								: Number.parseFloat(newValue);
+
+						if (Number.isNaN(parsedValue)) {
+							parsedValue = undefined;
+						}
+
+						onblur(parsedValue);
+					}}
+					value={val?.toString() ?? ''}
+				/>
+				<button
+					class="decrement"
+					aria-label="Décrémenter"
+					onclick={() => {
+						if (typeof value !== 'number') return;
+						onblur(round((value ?? 0) - 1, 5));
+					}}
+				>
+					<IconDecrement />
+				</button>
+				<button
+					class="increment"
+					aria-label="Incrémenter"
+					onclick={() => {
+						if (typeof value !== 'number') return;
+						onblur(round((value ?? 0) + 1, 5));
+					}}
+				>
+					<IconIncrement />
+				</button>
+			{/snippet}
+			{#snippet date(value)}
+				<!-- TODO use bits-ui datepicker -->
+				<input
+					type="date"
+					{id}
+					{disabled}
+					onblur={() => onblur(value)}
+					bind:value={
+						() => {
+							if (value === undefined) return undefined;
+							return dates.format(value, 'yyyy-MM-dd');
+						},
+						(newValue) => {
+							if (newValue === undefined) {
+								onblur(undefined);
+								return undefined;
+							}
+							onblur(dates.parse(newValue, 'yyyy-MM-dd', new Date()));
+							return newValue;
+						}
+					}
+				/>
+			{/snippet}
+			{#snippet location(value)}
+				<input
+					type="text"
+					{id}
+					{disabled}
+					onblur={({ currentTarget }) => {
+						let newValue = currentTarget.value;
 						if (newValue === undefined) {
 							onblur(undefined);
 							return;
 						}
-						onblur(newValue.toString());
-					}}
-				/>
-			{/if}
-		{/snippet}
-		{#snippet boolean(value)}
-			<div class="boolean-switch">
-				<Switch
-					value={value ?? false}
-					onchange={(newValue) => {
-						onblur(newValue);
-					}}
-				/>
-				{#if value}
-					Oui
-				{:else if value === false}
-					Non
-				{/if}
-			</div>
-		{/snippet}
-		{#snippet string(value)}
-			<input type="text" {value} {id} {disabled} onblur={() => onblur(value)} />
-		{/snippet}
-		{#snippet numeric(val)}
-			<input
-				{id}
-				{disabled}
-				type="text"
-				inputmode="numeric"
-				onblur={({ currentTarget }) => {
-					if (!(currentTarget instanceof HTMLInputElement)) return;
-					const newValue = currentTarget.value;
-					if (!newValue) {
-						onblur(undefined);
-						return;
-					}
-
-					/** @type {number|undefined} */
-					let parsedValue =
-						type === 'integer'
-							? Number.parseInt(newValue, 10)
-							: Number.parseFloat(newValue);
-
-					if (Number.isNaN(parsedValue)) {
-						parsedValue = undefined;
-					}
-
-					onblur(parsedValue);
-				}}
-				value={val?.toString() ?? ''}
-			/>
-			<button
-				class="decrement"
-				aria-label="Décrémenter"
-				onclick={() => {
-					if (value === undefined || value === null) {
-						value = 0;
-					}
-					if (typeof value !== 'number') return;
-					value--;
-					value = round(value, 5);
-					onblur(value);
-				}}
-			>
-				<IconDecrement />
-			</button>
-			<button
-				class="increment"
-				aria-label="Incrémenter"
-				onclick={() => {
-					if (value === undefined || value === null) {
-						value = 0;
-					}
-					if (typeof value !== 'number') return;
-					value++;
-					value = round(value, 5);
-					onblur(value);
-				}}
-			>
-				<IconIncrement />
-			</button>
-		{/snippet}
-		{#snippet date(value)}
-			<!-- TODO use bits-ui datepicker -->
-			<input
-				type="date"
-				{id}
-				{disabled}
-				onblur={() => onblur(value)}
-				bind:value={
-					() => {
-						if (value === undefined) return undefined;
-						return dates.format(value, 'yyyy-MM-dd');
-					},
-					(newValue) => {
-						if (newValue === undefined) {
-							onblur(undefined);
-							return undefined;
+						if (!newValue.includes(',')) {
+							return;
 						}
-						onblur(dates.parse(newValue, 'yyyy-MM-dd', new Date()));
-						return newValue;
-					}
-				}
-			/>
-		{/snippet}
-		{#snippet location(value)}
-			<input
-				type="text"
-				{id}
-				{disabled}
-				onblur={({ currentTarget }) => {
-					let newValue = currentTarget.value;
-					if (newValue === undefined) {
-						onblur(undefined);
-						return;
-					}
-					if (!newValue.includes(',')) {
-						return;
-					}
-					if (newValue.split(',').length > 3) {
-						return;
-					}
-					// French convention: commas for decimals, semicolons for separation
-					if (newValue.split(',').length === 3) {
-						newValue = newValue.replace(',', '.').replace(';', ',');
-					}
-					const [latitude, longitude] = newValue
-						.split(',')
-						.map((v) => parseFloat(v.trim()));
-					onblur({ latitude, longitude });
-				}}
-				value={value ? `${value.latitude}, ${value.longitude}` : ''}
-			/>
-		{/snippet}
-		{#snippet fallback()}
-			<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>
-				<IconError />
-				<p>Irreprésentable</p>
-			</div>
-		{/snippet}
-		{#snippet error()}
-			<div
-				class="unrepresentable"
-				use:tooltip={`${JSON.stringify(value, null, 2)} n'est pas une valeur valide de type ${type}`}
-			>
-				<IconError />
-				<p>Mismatch</p>
-			</div>
-		{/snippet}
-	</MetadataTypeswitch>
+						if (newValue.split(',').length > 3) {
+							return;
+						}
+						// French convention: commas for decimals, semicolons for separation
+						if (newValue.split(',').length === 3) {
+							newValue = newValue.replace(',', '.').replace(';', ',');
+						}
+						const [latitude, longitude] = newValue
+							.split(',')
+							.map((v) => parseFloat(v.trim()));
+						onblur({ latitude, longitude });
+					}}
+					value={value ? `${value.latitude}, ${value.longitude}` : ''}
+				/>
+			{/snippet}
+			{#snippet fallback()}
+				<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>
+					<IconError />
+					<p>Irreprésentable</p>
+				</div>
+			{/snippet}
+			{#snippet error()}
+				<div
+					class="unrepresentable"
+					use:tooltip={`${JSON.stringify(value, null, 2)} n'est pas une valeur valide de type ${type}`}
+				>
+					<IconError />
+					<p>Mismatch</p>
+				</div>
+			{/snippet}
+		</MetadataTypeswitch>
+	{/key}
 </div>
 
 <style>
