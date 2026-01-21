@@ -99,7 +99,7 @@
 			...settings
 		};
 
-		if (sortOrGroupFieldNeedsMetadata(updated.field) && !updated.metadata) {
+		if (sortOrGroupFieldNeedsMetadata(task, updated.field) && !updated.metadata) {
 			console.warn('Not updating in DB yet, user needs to select metadata too');
 			return;
 		}
@@ -134,7 +134,8 @@
 					const field = currentSettings?.sort.field;
 					const metadata = currentSettings?.sort.metadata;
 					const selected = field === key;
-					const needsMetadata = sortOrGroupFieldNeedsMetadata(key);
+					const needsMetadata = sortOrGroupFieldNeedsMetadata("sort", key);
+
 
 					if (needsMetadata) {
 						return {
@@ -196,7 +197,7 @@
 					const field = currentSettings?.group.field;
 					const metadata = currentSettings?.group.metadata;
 					const selected = field === key;
-					const needsMetadata = sortOrGroupFieldNeedsMetadata(key);
+					const needsMetadata = sortOrGroupFieldNeedsMetadata("group", key);
 
 					if (needsMetadata) {
 						return {

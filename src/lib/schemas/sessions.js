@@ -6,26 +6,32 @@ import { ID } from './common.js';
 import { MetadataValues } from './metadata.js';
 
 export const SORT_FIELDS = /** @type {const} */ ({
-	metadataValue: { label: 'Métadonnée…' },
-	metadataConfidence: { label: 'Confiance en…' },
-	id: { label: 'ID' },
-	name: { label: 'Nom' }
+	metadataValue: { label: 'Métadonnée…', needsMetadata: true },
+	metadataConfidence: { label: 'Confiance en…', needsMetadata: true },
+	id: { label: 'ID', needsMetadata: false },
+	name: { label: 'Nom', needsMetadata: false }
 });
 
 export const GROUP_FIELDS = /** @type {const} */ ({
-	metadataValue: { label: 'Métadonnée…' },
-	metadataPresence: { label: 'Présence de…' },
-	metadataConfidence: { label: 'Confiance en…' },
-	none: { label: 'Aucun regroupement' }
+	metadataValue: { label: 'Métadonnée…', needsMetadata: true },
+	metadataPresence: { label: 'Présence de…', needsMetadata: true },
+	metadataConfidence: { label: 'Confiance en…', needsMetadata: true },
+	none: { label: 'Aucun regroupement', needsMetadata: false }
 });
 
 /**
  *
- * @param {keyof typeof SORT_FIELDS | keyof typeof GROUP_FIELDS} field
+ * @param {"sort" | "group"} task
+ * @param {keyof ( typeof SORT_FIELDS & typeof GROUP_FIELDS)} field
  * @returns
  */
-export function sortOrGroupFieldNeedsMetadata(field) {
-	return field.startsWith('metadata');
+export function sortOrGroupFieldNeedsMetadata(task, field) {
+	switch (task) {
+		// @ts-expect-error
+		case 'sort': return SORT_FIELDS[field].needsMetadata
+		// @ts-expect-error
+		case 'group': return GROUP_FIELDS[field].needsMetadata
+	}
 }
 
 export const SortSettings = type({
