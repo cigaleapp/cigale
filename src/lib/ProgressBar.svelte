@@ -1,5 +1,7 @@
 <!-- 
 @component Requires a parent element with a defined width
+
+TODO: Don't animate when progress decreases (e.g. when a new task starts and it goes back to 0)
 -->
 
 <script>

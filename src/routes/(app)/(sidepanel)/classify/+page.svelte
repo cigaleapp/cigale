@@ -7,7 +7,6 @@
 	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
 	import { classificationInferenceSettings } from '$lib/classification.svelte.js';
-	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
 	import {
 		deleteImageFile,
@@ -23,10 +22,10 @@
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings, isDebugMode } from '$lib/settings.svelte';
+	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { nonnull } from '$lib/utils.js';
+	import { isAbortError, nonnull } from '$lib/utils.js';
 
 	seo({ title: 'Classification' });
 
@@ -70,6 +69,7 @@
 	 */
 	let modelLoadingProgress = $state(0);
 
+	let modelAbortController = new AbortController();
 	let classifmodelLoaded = $state(false);
 	/** @type {Error|undefined}*/
 	let classifModelLoadingError = $state();
@@ -90,7 +90,12 @@
 			return;
 		}
 
+		modelAbortController.abort();
+		classifModelLoadingError = undefined;
+		modelAbortController = new AbortController();
+
 		await loadModel(data.swarpc, 'classification', {
+			abortSignal: modelAbortController.signal,
 			protocolId: uiState.currentProtocol.id,
 			requests: {
 				model: settings.model,
@@ -99,14 +104,7 @@
 			onProgress(p) {
 				modelLoadingProgress = p;
 			}
-		})
-			.then(() => {
-				classifmodelLoaded = true;
-			})
-			.catch((error) => {
-				console.error(error);
-				toasts.error('Erreur lors du chargement du modèle de classification');
-			});
+		});
 	}
 
 	// TODO fix chunked batching: add a throttle to
@@ -137,8 +135,11 @@
 			void loadClassifModel()
 				.catch((error) => {
 					classifModelLoadingError = error;
+					if (isAbortError(error)) return;
+					console.error(error);
+					toasts.error('Erreur lors du chargement du modèle de classification');
 				})
-				.finally(() => {
+				.then(() => {
 					classifmodelLoaded = true;
 				});
 		}
@@ -170,7 +171,7 @@
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
 		</div>
 	</section>
-{:else if !classifModelLoadingError}
+{:else}
 	<section class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
 		<AreaObservations
 			{items}
@@ -222,17 +223,6 @@
 			</div>
 		{/if}
 	</section>
-{:else}
-	<section class="loading errored" in:fade={{ duration: 100 }}>
-		<Logo variant="error" />
-		<h2>Oops!</h2>
-		<p>Impossible de charger le modèle de classification</p>
-		<p class="source">{@render modelsource()}</p>
-		<p class="message">{errorMessage(classifModelLoadingError)}</p>
-		{#if isDebugMode()}
-			<pre class="trace">{classifModelLoadingError?.stack}</pre>
-		{/if}
-	</section>
 {/if}
 
 <style>
@@ -269,20 +259,6 @@
 	}
 
 	.loading .source {
-		font-size: 0.8em;
-	}
-
-	.loading.errored {
-		gap: 0.5em;
-	}
-
-	.loading.errored *:not(p.message) {
-		color: var(--fg-error);
-	}
-
-	.loading.errored .trace {
-		max-width: 80%;
-		overflow-x: auto;
 		font-size: 0.8em;
 	}
 

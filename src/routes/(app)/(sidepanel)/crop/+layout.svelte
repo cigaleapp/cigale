@@ -1,17 +1,20 @@
 <script>
+	import { watch } from 'runed';
 	import { fade } from 'svelte/transition';
 
 	import { loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
-	import { isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
+	import { isAbortError } from '$lib/utils.js';
 
 	const { data, children } = $props();
 
 	let modelLoadingProgress = $state(0);
-
+	let modelLoaded = $state(false);
+	// let modelLoadingError = $state();
+	let modelAbortController = new AbortController();
 	/**
 	 * @param {number} selectedModel
 	 */
@@ -22,17 +25,37 @@
 		const cropModel = uiState.currentProtocol.crop.infer?.[selectedModel]?.model;
 		if (!cropModel) return;
 
+		modelAbortController.abort();
+		// TODO: use in page.svelte to prevent starting inferences if model didnt load
+		// modelLoadingError = undefined;
+		modelAbortController = new AbortController();
+
 		await loadModel(data.swarpc, 'detection', {
+			abortSignal: modelAbortController.signal,
 			protocolId: uiState.currentProtocol.id,
-			requests: { model: cropModel },
+			requests: { model: cropModel, classmapping: undefined },
 			onProgress(p) {
 				modelLoadingProgress = p;
 			}
-		}).catch((error) => {
-			console.error(error);
-			toasts.error('Erreur lors du chargement du modèle de détection');
 		});
 	}
+
+	watch(
+		() => uiState.selectedCropModel,
+		() => {
+			modelLoaded = false;
+			void loadCropperModel(uiState.selectedCropModel)
+				.catch((error) => {
+					// modelLoadingError = error;
+					if (isAbortError(error)) return;
+					console.error(error);
+					toasts.error('Erreur lors du chargement du modèle de classification');
+				})
+				.then(() => {
+					modelLoaded = true;
+				});
+		}
+	);
 </script>
 
 {#snippet modelsource()}
@@ -46,7 +69,7 @@
 	{/if}
 {/snippet}
 
-{#await loadCropperModel(uiState.selectedCropModel)}
+{#if !modelLoaded}
 	<section class="loading" in:fade={{ duration: 100 }}>
 		<Logo loading />
 		<p>Chargement du modèle de recadrage…</p>
@@ -55,22 +78,9 @@
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
 		</div>
 	</section>
-{:then _}
+{:else}
 	{@render children()}
-{:catch error}
-	<section class="loading errored">
-		<Logo variant="error" />
-		<h2>Oops!</h2>
-		<p>Impossible de charger le modèle de recadrage</p>
-		<p class="source">{@render modelsource()}</p>
-		<p class="message">{error?.toString() ?? 'Erreur inattendue'}</p>
-		{#if isDebugMode()}
-			<pre>
-					{error?.stack ?? '(no stack trace available)'}
-				</pre>
-		{/if}
-	</section>
-{/await}
+{/if}
 
 <style>
 	.loading {
@@ -97,13 +107,5 @@
 		flex-direction: column;
 		gap: 0.5em;
 		align-items: center;
-	}
-
-	.loading.errored {
-		gap: 0.5em;
-	}
-
-	.loading.errored *:not(p.message) {
-		color: var(--fg-error);
 	}
 </style>
