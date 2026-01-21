@@ -145,6 +145,7 @@
 							submenu: {
 								label: 'Métadonnée',
 								testid: `${tab}-settings-sort-by-${key}-metadata`,
+								empty: "Le protocole ne définit aucune métadonnée triable.",
 								items: sortableMetadata.map((m) => ({
 									type: 'selectable',
 									data: { direction },
@@ -206,6 +207,7 @@
 							submenu: {
 								label: 'Métadonnée',
 								testid: `${tab}-settings-group-by-${key}-metadata`,
+								empty: "Le protocole ne définit aucune métadonnée groupable.",
 								items: groupableMetadata.map((m) => ({
 									type: 'selectable',
 									data: { direction: null },

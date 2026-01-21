@@ -28,6 +28,8 @@
 		testid?: string;
 		submenu: {
 			label?: string;
+			/** Text to show when items is empty */
+			empty?: string;
 			items: Array<Item<D> | SelectableItem<SD>>;
 		};
 	};
@@ -158,6 +160,10 @@
 													{/if}
 												</DropdownMenu.CheckboxItem>
 											{/if}
+										{:else}
+										<DropdownMenu.Item disabled>
+											<div class="empty-submenu">{i.submenu.empty ?? 'Aucun élément disponible'}</div>
+										</DropdownMenu.Item>
 										{/each}
 									</DropdownMenu.Group>
 								</DropdownMenu.SubContent>
@@ -197,8 +203,17 @@
 		gap: 0.25em;
 	}
 
-	:global([data-dropdown-menu-item]:is(:hover, :focus-visible)) {
+	:global([data-dropdown-menu-item]:not([aria-disabled=true]):is(:hover, :focus-visible)) {
 		background-color: var(--bg-primary-translucent);
 		color: var(--fg-primary);
+	}
+
+	.empty-submenu {
+		max-width: 200px;
+		min-height: 300px;
+		display: flex;
+		align-items: center;
+		text-align: center;
+		color: var(--gay)
 	}
 </style>
