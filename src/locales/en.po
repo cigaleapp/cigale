@@ -422,12 +422,9 @@ msgid "Erreur lors de la récupération des étiquettes en cascade: {0}"
 msgstr "Error while getting cascaded labels: {0}"
 
 #: src/routes/(app)/(sidepanel)/classify/+page.svelte
+#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
 msgid "Erreur lors du chargement du modèle de classification"
 msgstr "Error while loading classification model"
-
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Erreur lors du chargement du modèle de détection"
-msgstr "Error while loading detection model"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Exporter"
@@ -513,14 +510,6 @@ msgstr "Import remote protocol ?"
 #: src/lib/exif.js
 msgid "Impossible d'extraire les métadonnées EXIF de {0}: {1}"
 msgstr "Cannot extract EXIF metadata for {0}: {1}"
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-msgid "Impossible de charger le modèle de classification"
-msgstr "Cannot load classification model"
-
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Impossible de charger le modèle de recadrage"
-msgstr "Cannot load cropping model"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Impossible de charger les dépendances"
@@ -625,11 +614,6 @@ msgstr "No"
 #: src/lib/observations.js
 msgid "Nouvelle observation"
 msgstr "New observation"
-
-#: src/routes/(app)/(sidepanel)/classify/+page.svelte
-#: src/routes/(app)/(sidepanel)/crop/+layout.svelte
-msgid "Oops!"
-msgstr "Oops!"
 
 #: src/lib/MetadataInput.svelte
 #: src/lib/metadata.js
