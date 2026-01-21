@@ -2111,20 +2111,6 @@ msgstr ""
 msgid "<0/> une fois dézippé"
 msgstr "<0/> une fois dézippé"
 
-#. placeholder {0}: node
-#. placeholder {1}: reason
-#. placeholder {0}: node
-#. placeholder {1}: reason ?? 'failed to load model'
-#: src/lib/inference.js
-#: src/lib/inference.js
-msgid "Node {0}: {1}"
-msgstr "Node {0}: {1}"
-
-#. placeholder {0}: node
-#: src/lib/inference.js
-msgid "Node {0}: failed to load model"
-msgstr "Node {0}: failed to load model"
-
 #: src/lib/inference.js
 #: src/lib/inference.js
 msgid "Bearer token"
