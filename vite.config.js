@@ -17,7 +17,7 @@ const analyzerMode = type
 export default defineConfig({
 	test: {
 		environment: 'jsdom',
-		include: ['src/lib/**/*.{test,spec}{.svelte,}.{js,ts}', 'src/routes/**/utils.js'],
+		include: ['src/lib/**/*.test{.svelte,}.{js,ts}', 'src/routes/**/utils.js'],
 		includeSource: [
 			'src/lib/**/*{.svelte,}.{js,ts}',
 			'scripts/generate-json-schemas.js',

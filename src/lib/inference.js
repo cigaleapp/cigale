@@ -73,15 +73,16 @@ const MEAN = [0.485, 0.456, 0.406]; // valeurs de normalisation pour la classifi
  * @param {string} params.protocolId
  * @param {object} params.requests
  * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} params.requests.model
- * @param {typeof import('$lib/schemas/common').HTTPRequest.infer} params.requests.classmapping
+ * @param {typeof import('$lib/schemas/common').HTTPRequest.infer | undefined} params.requests.classmapping
  * @param {boolean} [params.webgpu]
  * @param {(p: number) => void} [params.onProgress] called everytime the progress changes
- * @returns {Promise<string> } ID of the inference session
+ * @param {AbortSignal} [params.abortSignal] signal to abort the loading
+ * @returns {Promise<string>} ID of the inference session
  */
 export async function loadModel(
 	swarpc,
 	task,
-	{ protocolId, requests, webgpu = false, onProgress }
+	{ protocolId, requests, webgpu = false, onProgress, abortSignal }
 ) {
 	onProgress ??= () => {};
 	const splitProgress = progressSplitter('model', 0.8, 'classmapping', 0.1, 'loading');
@@ -99,6 +100,7 @@ export async function loadModel(
 	}
 
 	const model = await fetchHttpRequest(requests.model, {
+		signal: abortSignal,
 		cacheAs: 'model',
 		onProgress({ transferred, total }) {
 			onProgress(splitProgress('model', transferred / total));
@@ -111,6 +113,7 @@ export async function loadModel(
 	let classmapping = undefined;
 	if (requests.classmapping) {
 		classmapping = await fetchHttpRequest(requests.classmapping, {
+			signal: abortSignal,
 			cacheAs: 'model',
 			onProgress({ transferred, total }) {
 				onProgress(splitProgress('classmapping', transferred / total));

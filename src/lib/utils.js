@@ -678,12 +678,20 @@ if (import.meta.vitest) {
  * @param {object} [options]
  * @param {''|'model'} [options.cacheAs=""]
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
+ * @param {AbortSignal} [options.signal]
  */
-export async function fetchHttpRequest(request, { cacheAs = '', onProgress } = {}) {
+export async function fetchHttpRequest(request, { cacheAs = '', onProgress, signal } = {}) {
 	let url = new URL(typeof request === 'string' ? request : request.url);
+
+	/** @type {RequestInit} */
 	const options = typeof request === 'string' ? { headers: {} } : request;
+
 	if (cacheAs) {
 		url.searchParams.set('x-cigale-cache-as', cacheAs);
+	}
+
+	if (signal) {
+		options.signal = signal;
 	}
 
 	if (onProgress) return fetch(url, options).then(fetchProgress({ onProgress }));
@@ -1274,3 +1282,12 @@ accusantium enim et repudiandae omnis cum dolorem nemo id quia facilis.
 Et dolorem perferendis et rerum suscipit qui voluptatibus quia et nihil nostrum 33 omnis soluta. 
 Nam minus minima et perspiciatis velit et eveniet rerum et nihil voluptates aut eaque ipsa et 
 ratione facere!`;
+
+/**
+ *
+ * @param {any} error
+ * @returns {error is DOMException}
+ */
+export function isAbortError(error) {
+	return error instanceof DOMException && error.name === 'AbortError';
+}
