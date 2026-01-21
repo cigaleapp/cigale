@@ -450,7 +450,8 @@ const protocol = {
 			label: '',
 			description: '',
 			required: true,
-			mergeMethod: 'union'
+			mergeMethod: 'union',
+			groupable: true,
 		},
 		[namespaced('crop_is_confirmed')]: {
 			type: 'boolean',
