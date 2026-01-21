@@ -79,6 +79,7 @@
 			<Card
 				--card-border={uiState.currentSessionId === id ? 'var(--bg-primary)' : ''}
 				tooltip="Ouvrir la session"
+				loading="Ouverture…"
 				onclick={async () => {
 					await switchSession(id);
 					// TODO remember last viewed page in session

@@ -2,8 +2,9 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/36e448fae61025463201c7ed2fd350dfb70409c1/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 49,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/557a07c51b1d8c4cc715a20d749b532293755928/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 52,
+	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
 	"authors": [
@@ -218,7 +219,8 @@
 			"label": "Règne",
 			"required": false,
 			"description": "",
-			"mergeMethod": "max"
+			"mergeMethod": "max",
+			"groupable": true
 		},
 		"io.github.cigaleapp.arthropods.example.light__phylum": {
 			"type": "enum",
@@ -236,7 +238,8 @@
 			"label": "Phylum",
 			"required": false,
 			"description": "",
-			"mergeMethod": "max"
+			"mergeMethod": "max",
+			"groupable": true
 		},
 		"io.github.cigaleapp.arthropods.example.light__class": {
 			"type": "enum",
@@ -254,7 +257,8 @@
 			"label": "Classe",
 			"required": false,
 			"description": "",
-			"mergeMethod": "max"
+			"mergeMethod": "max",
+			"groupable": true
 		},
 		"io.github.cigaleapp.arthropods.example.light__order": {
 			"type": "enum",
@@ -299,7 +303,8 @@
 			"label": "Ordre",
 			"required": false,
 			"description": "",
-			"mergeMethod": "max"
+			"mergeMethod": "max",
+			"groupable": true
 		},
 		"io.github.cigaleapp.arthropods.example.light__family": {
 			"type": "enum",
@@ -452,7 +457,8 @@
 			"label": "Famille",
 			"required": false,
 			"description": "",
-			"mergeMethod": "max"
+			"mergeMethod": "max",
+			"groupable": true
 		},
 		"io.github.cigaleapp.arthropods.example.light__genus": {
 			"type": "enum",
@@ -794,7 +800,8 @@
 			"label": "Genre",
 			"required": false,
 			"description": "",
-			"mergeMethod": "max"
+			"mergeMethod": "max",
+			"groupable": true
 		},
 		"io.github.cigaleapp.arthropods.example.light__habitat_photo": {
 			"type": "enum",
@@ -802,6 +809,7 @@
 			"description": "Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat",
 			"required": false,
 			"mergeMethod": "none",
+			"groupable": true,
 			"options": [
 				{
 					"key": "current",
@@ -819,6 +827,8 @@
 			"description": "Niveau de difficulté pour identifier l'espèce sur la photo",
 			"required": false,
 			"mergeMethod": "average",
+			"groupable": true,
+			"sortable": true,
 			"options": [
 				{
 					"key": "easy",
@@ -852,6 +862,8 @@
 			"description": "Statut de conservation IUCN de l'espèce",
 			"required": false,
 			"mergeMethod": "average",
+			"groupable": true,
+			"sortable": true,
 			"options": [
 				{
 					"key": "ex",
@@ -903,6 +915,8 @@
 			"description": "Moment où la photo a été prise",
 			"required": false,
 			"mergeMethod": "average",
+			"sortable": true,
+			"groupable": true,
 			"infer": {
 				"exif": "DateTimeOriginal"
 			}
@@ -913,6 +927,7 @@
 			"description": "Endroit où la photo a été prise",
 			"required": false,
 			"mergeMethod": "average",
+			"groupable": true,
 			"infer": {
 				"latitude": {
 					"exif": "GPSLatitude"
@@ -941,6 +956,7 @@
 			"label": "Espèce",
 			"description": "",
 			"required": true,
+			"groupable": true,
 			"mergeMethod": "max",
 			"options": [
 				{

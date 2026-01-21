@@ -12,6 +12,7 @@ Available CSS variables:
 -->
 
 <script>
+	import LoadingSpinner from './LoadingSpinner.svelte';
 	import { tooltip } from './tooltips.js';
 
 	/**
@@ -22,6 +23,7 @@ Available CSS variables:
 	 * @property {'article' | 'li' | 'div'} [tag=article] - HTML tag to use for the card container
 	 * @property {string} [tooltip] - Tooltip text to show on hover (only if clickable)
 	 * @property {string} [testid]
+	 * @property {boolean | string} [loading=false] - Whether to show a loading state while onclick is being processed, if string, show it instead of the default loading text
 	 */
 
 	/** @type {Props}*/
@@ -30,9 +32,11 @@ Available CSS variables:
 		onclick,
 		tag = 'article',
 		tooltip: tooltipText,
-		testid
+		testid,
+		loading: showLoading = false
 	} = $props();
 
+	let loading = $state(false);
 	const clickable = $derived(Boolean(onclick));
 </script>
 
@@ -43,9 +47,23 @@ Available CSS variables:
 	data-testid={testid}
 	use:tooltip={clickable && tooltipText ? tooltipText : undefined}
 	class="card"
-	{onclick}
+	onclick={async (e) => {
+		try {
+			loading = true;
+			await onclick?.(e);
+		} finally {
+			loading = false;
+		}
+	}}
+	aria-busy={loading}
 	tabindex={clickable ? 0 : undefined}
 >
+	{#if showLoading && loading}
+		<div class="loading-overlay">
+			<LoadingSpinner />
+			{typeof showLoading == 'string' ? showLoading : 'Chargement…'}
+		</div>
+	{/if}
 	{@render children?.()}
 </svelte:element>
 
@@ -79,5 +97,26 @@ Available CSS variables:
 		box-shadow:
 			0 3px 6px var(--shadow-color-1),
 			0 3px 6px var(--shadow-color-2);
+	}
+
+	.card {
+		position: relative;
+
+		.loading-overlay {
+			z-index: 10;
+			position: absolute;
+			inset: 0;
+			background-color: color-mix(in srgb, var(--bg-neutral) 80%, transparent);
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			font-size: 1.25em;
+			gap: 0.5em;
+
+			/* Spinner */
+			--size: 2em;
+		}
 	}
 </style>

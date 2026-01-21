@@ -1,4 +1,7 @@
 <script module>
+	const MODIFIERS = ['$mod', 'ctrl', 'shift', 'alt', 'win'];
+	export const APPLE_GLYPHS = ['⌘', '⌥', '⌃', '⇧', '⌦'];
+
 	/**
 	 * Returns an array of `[key, separator, key, separator...]` strings, to be shown as for example
 	 * ```html
@@ -11,6 +14,8 @@
 	 * @returns {string[]}
 	 */
 	export function displayPattern(pattern) {
+		const isMacOS = navigator.platform.toUpperCase().includes('MAC');
+
 		// Split by spaces: "ctrl+c arrowup" -> ["ctrl+c", "arrowup"]
 		const chords = pattern.split(' ');
 		const parts = chords
@@ -27,17 +32,37 @@
 			])
 			.flat() // ["ctrl", "+", "c", " ", "arrowup", " "]
 			.slice(0, -1) // Remove the last space
-			.map((part) => part.toLowerCase()); // Remove potential uppercase letters
+			.map((part) => part.toLowerCase()) // Remove potential uppercase letters
+			.map((part, i, parts) => {
+				// Touch up: prevent "modifier + arrow" from having a "+" between them: since it's a modifier, it can't be a chord anyways, and it looks kind of ugly with the + next to an arrow character.
+				// On MacOS, don't show "+" between a modifier and any other key
+				if (
+					part === '+' &&
+					(parts[i + 1]?.startsWith('arrow') || isMacOS) &&
+					MODIFIERS.includes(parts[i - 1])
+				) {
+					return '';
+				}
+
+				return part;
+			});
 
 		return parts.map((part) => {
-			// Handle $mod: it represents Cmd on Mac and Ctrl on Windows/Linux
-			if (part === '$mod' && navigator.platform.startsWith('Mac')) return ' Cmd';
-			if (part === '$mod') return 'Ctrl';
-			if (['shift', 'alt', 'win'].includes(part))
-				return part[0].toUpperCase() + part.slice(1);
-			if (part === 'delete') return 'Suppr';
+			/**
+			 * @param {string} win windows representation of the key
+			 * @param {string} mac macOS representation of the key
+			 */
+			const winmac = (win, mac) => (isMacOS ? mac : win);
+
+			if (part === '$mod') return winmac('Ctrl', '⌘');
+			if (part === 'shift') return winmac('Shift', '⇧');
+			if (part === 'ctrl') return winmac('Ctrl', '⌃');
+			if (part === 'alt') return winmac('Alt', '⌥');
+			if (part === 'win') return winmac('Win', '⌘');
+			if (part === 'delete') return winmac('Suppr', '⌦');
 			if (part === 'space') return '␣';
 			if (part === 'escape') return 'Esc';
+			if (part === 'enter') return '⏎';
 
 			// Single-letter parts most likely represent letter keys,
 			// so uppercase them cuz its prettier
@@ -86,7 +111,9 @@
 	{#each displayPattern(shortcut).entries() as [i, part] (i)}
 		{#if i % 2 == 0}
 			<!-- Every even part represents a key -->
-			<kbd>{part}</kbd>
+			<kbd class:apple-glyph={APPLE_GLYPHS.includes(part)}>
+				{part}
+			</kbd>
 		{:else}
 			<!-- Every odd part is either "+" or a space -->
 			<span class="separator">{part}</span>
@@ -114,5 +141,22 @@
 
 	kbd.hint kbd {
 		color: var(--fg-primary);
+	}
+
+	:global(kbd.apple-glyph) {
+		font-family: 'SF Mono Key Glyphs', var(--font-mono);
+		font-size: 1.05rem;
+		line-height: 0.6;
+	}
+
+	@font-face {
+		font-family: 'SF Mono Key Glyphs';
+		src: url('/fonts/AppleSymbols_Keyboard_Glyphs.woff2') format('woff2');
+		unicode-range:
+			U+2318 /* ⌘ */,
+			U+2325 /* ⌥ */,
+			U+2303 /* ⌃ */,
+			U+21E7 /* ⇧ */,
+			U+2326; /* ⌦ */
 	}
 </style>

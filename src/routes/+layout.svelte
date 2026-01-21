@@ -23,6 +23,10 @@
 {@render children?.()}
 
 <style>
+	:global(*) {
+		scrollbar-width: thin;
+	}
+
 	:global(body) {
 		display: flex;
 		flex-direction: column;
@@ -82,6 +86,10 @@
 	:global([data-tippy-root]) {
 		/* Position tooltips above bits-ui comboboxes (and other flyouts) */
 		z-index: 100000 !important;
+	}
+
+	:global([data-tippy-root] .tippy-content) {
+		word-break: break-all;
 	}
 
 	:global([data-tippy-root] .tippy-box > .tippy-svg-arrow) {

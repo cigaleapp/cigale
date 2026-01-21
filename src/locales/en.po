@@ -77,6 +77,7 @@ msgstr "<0/> Retry"
 #: src/lib/AreaObservations.svelte
 #: src/lib/CardMedia.svelte
 #: src/routes/(app)/(sidepanel)/crop/[image]/+page@(app).svelte
+#: src/routes/(app)/protocols/RowProtocol.svelte
 #: src/routes/(app)/protocols/[id]/+layout.svelte
 msgid "<0/> Supprimer"
 msgstr "<0/> Delete"
@@ -746,7 +747,6 @@ msgid "Supprime toutes les données pour ce déploiement de preview"
 msgstr "Deletes all data for this preview deployment"
 
 #: src/lib/ModalConfirmDeletion.svelte
-#: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Supprimer"
 msgstr "Delete"
 
@@ -1020,10 +1020,6 @@ msgstr "<0/> already uses that ID"
 #: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "Créer"
 msgstr "Create"
-
-#: src/routes/(app)/protocols/RowProtocol.svelte
-msgid "Modifier (beta)"
-msgstr "Edit (beta)"
 
 #. placeholder {0}: page.params.metadata
 #: src/routes/(app)/protocols/[id]/+error.svelte
@@ -2112,6 +2108,55 @@ msgstr ""
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> une fois dézippé"
 msgstr "<0/> once unzipped"
+
+#. placeholder {0}: node
+#. placeholder {1}: reason
+#. placeholder {0}: node
+#. placeholder {1}: reason ?? 'failed to load model'
+#: src/lib/inference.js
+#: src/lib/inference.js
+msgid "Node {0}: {1}"
+msgstr ""
+
+#. placeholder {0}: node
+#: src/lib/inference.js
+msgid "Node {0}: failed to load model"
+msgstr ""
+
+#: src/lib/inference.js
+#: src/lib/inference.js
+msgid "Bearer token"
+msgstr ""
+
+#: src/lib/inference.js
+msgid "X-Custom-Header"
+msgstr ""
+
+#: src/routes/(app)/sessions/+page.svelte
+msgid "Ouverture…"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Mises à jour automatiques"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Mettre à jour automatiquement"
+msgstr ""
+
+#. placeholder {0}: source
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "Via {0}"
+msgstr ""
+
+#: src/routes/(app)/protocols/RowProtocol.svelte
+msgid "<0/> Modifier <1>Beta</1>"
+msgstr ""
+
+#. placeholder {0}: updates[0].name
+#: src/routes/(app)/+layout.js
+msgid "Le protocole \"{0}\" a été mis à jour"
+msgstr ""
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"

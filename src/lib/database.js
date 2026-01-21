@@ -154,7 +154,8 @@ const Settings = table(
 		}).default(() => ({
 			direction: 'asc',
 			key: 'date'
-		}))
+		})),
+		autoUpdateProtocols: type('Record<string, boolean>').default(() => ({}))
 	})
 );
 

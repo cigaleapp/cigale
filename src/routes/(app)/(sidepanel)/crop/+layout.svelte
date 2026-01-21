@@ -1,12 +1,12 @@
 <script>
 	import { fade } from 'svelte/transition';
 
+	import { loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
-	import { sum } from '$lib/utils.js';
 
 	const { data, children } = $props();
 
@@ -22,21 +22,16 @@
 		const cropModel = uiState.currentProtocol.crop.infer?.[selectedModel]?.model;
 		if (!cropModel) return;
 
-		await data.swarpc.loadModel
-			.broadcast(
-				{
-					protocolId: uiState.currentProtocol.id,
-					request: cropModel,
-					task: 'detection'
-				},
-				(progresses) => {
-					modelLoadingProgress = sum(progresses.values()) / data.parallelism;
-				}
-			)
-			.catch((error) => {
-				console.error(error);
-				toasts.error('Erreur lors du chargement du modèle de détection');
-			});
+		await loadModel(data.swarpc, 'detection', {
+			protocolId: uiState.currentProtocol.id,
+			requests: { model: cropModel },
+			onProgress(p) {
+				modelLoadingProgress = p;
+			}
+		}).catch((error) => {
+			console.error(error);
+			toasts.error('Erreur lors du chargement du modèle de détection');
+		});
 	}
 </script>
 

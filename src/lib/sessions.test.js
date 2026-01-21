@@ -147,6 +147,7 @@ describe('deleteSession', () => {
 			    ],
 			    "name": "Test Protocol",
 			    "sessionMetadata": [],
+			    "updates": "manual",
 			  },
 			]
 		`);

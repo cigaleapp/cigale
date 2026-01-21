@@ -1,8 +1,12 @@
-import { throwError } from '$lib/utils.js';
-
 import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
-import { browserConsole, chooseFirstSession, loadDatabaseDump, setImageMetadata } from './utils.js';
+import {
+	browserConsole,
+	chooseFirstSession,
+	loadDatabaseDump,
+	setImageMetadata,
+	throwError
+} from './utils.js';
 
 /**
  * @import { AppFixture } from './fixtures.js';

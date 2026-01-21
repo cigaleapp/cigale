@@ -128,6 +128,10 @@ export const Protocol = type({
 		"Lien vers un site où l'on peut se renseigner sur ce protocole. Cela peut aussi être simplement un lien de téléchargement direct de ce fichier"
 	),
 	'version?': ['number', '@', 'Version actuelle du protocole'],
+	updates: type
+		.enumerated('automatic', 'manual')
+		.describe('Mode de mise à jour du protocole')
+		.default('manual'),
 	'source?': HTTPRequest.describe(
 		`Requête ou URL devant mener à un fichier JSON contenant la version la plus récente du protocole. Permet de proposer des mises à jour.
 		

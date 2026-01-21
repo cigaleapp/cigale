@@ -8,7 +8,7 @@ import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
 import { safeJSONParse } from '$lib/utils';
 
-import fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
+import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import {
 	confirmDeletionModal,
@@ -33,12 +33,19 @@ import {
 	type PredownloadedModel
 } from './utils.js';
 
+const fullProtocol = _fullProtocol as ExportedProtocol;
+
 let arthropodaClassifierModel: PredownloadedModel | null = null;
 let collembolaClassifierModel: PredownloadedModel | null = null;
 let arthropodaDetectionModel: PredownloadedModel | null = null;
 
 export type AppFixture = {
 	db: {
+		ready(): Promise<void>;
+		protocol: {
+			byId(id: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
+			byName(name: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
+		};
 		observation: {
 			byLabel(label: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
 			byId(id: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
@@ -112,6 +119,15 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 		await use({
 			sidepanel,
 			db: {
+				ready: async () => {
+					await page.waitForFunction(() =>
+						Boolean(window.devalue && window.DB && window.refreshDB)
+					);
+				},
+				protocol: {
+					byId: async (id) => getDatabaseRowById(page, 'Protocol', id),
+					byName: async (name) => getDatabaseRowByField(page, 'Protocol', 'name', name)
+				},
 				observation: {
 					list: async () => listTable(page, 'Observation'),
 					byId: async (id) => getDatabaseRowById(page, 'Observation', id),
@@ -231,25 +247,22 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 		{ scope: 'worker', auto: true }
 	],
 	forEachTest: [
-		async ({ page, context }, use, { tags, annotations }) => {
-			// https://playwright.dev/docs/service-workers-experimental
-			process.env.PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS = '1';
-
+		async ({ page, context, app }, use, { tags, annotations }) => {
 			await rm('./tests/results', { recursive: true, force: true });
 			await mkdir('./tests/results', { recursive: true });
 
 			if (!tags.includes('@real-protocol')) {
-				await mockProtocolSourceURL(
-					page,
-					context,
-					(fullProtocol as ExportedProtocol).source as string,
-					{
-						json: lightProtocol
-					}
-				);
+				// @ts-expect-error we don't support non-string protocol source values for now
+				await mockProtocolSourceURL(page, context, fullProtocol.source, {
+					json: lightProtocol
+				});
+
+				await mockProtocolSourceURL(page, context, lightProtocol.source, {
+					json: lightProtocol
+				});
 			}
 
-			await mockPredownloadedModels(page, context, fullProtocol as ExportedProtocol, {
+			await mockPredownloadedModels(page, context, fullProtocol, {
 				detection: [arthropodaDetectionModel],
 				species: [collembolaClassifierModel, arthropodaClassifierModel]
 			});
@@ -267,9 +280,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			}
 
 			await page.goto('./');
-			await page.waitForFunction(() =>
-				Boolean(window.devalue && window.DB && window.refreshDB)
-			);
+			await app.db.ready();
 			await use();
 		},
 		{ auto: true }
