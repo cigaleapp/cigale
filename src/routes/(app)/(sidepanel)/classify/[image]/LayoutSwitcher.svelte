@@ -1,27 +1,36 @@
-<script module lang="ts">
-	const LAYOUTS = ['top-bottom', 'left-right'] as const;
-	export type Layout = (typeof LAYOUTS)[number];
-</script>
-
 <script lang="ts">
 	import IconLayoutTopBottom from '~icons/ri/layout-4-line';
+	import { tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
+	import { FULLSCREEN_CLASSIFY_LAYOUTS as LAYOUTS } from '$lib/schemas/sessions';
+	import { uiState } from '$lib/state.svelte';
 	import { tooltip } from '$lib/tooltips';
+	import { sleep } from '$lib/utils';
 
 	interface Props {
-		layout: 'top-bottom' | 'left-right';
 		/** A function that {en,dis}ables CSS transitions when called */
 		toggleLayoutTransitions: (enable: boolean) => void;
 	}
 
-	let { layout = $bindable('top-bottom'), toggleLayoutTransitions }: Props = $props();
+	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
 
-	function cycleLayout() {
+	const nextLayout = $derived(LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]);
+
+	let { toggleLayoutTransitions }: Props = $props();
+
+	async function cycleLayout() {
+		if (!uiState.currentSessionId) return;
+
 		toggleLayoutTransitions(false);
-		layout = LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length];
-		setTimeout(() => {
-			toggleLayoutTransitions(true);
-		}, 50);
+
+		await tables.Session.update(
+			uiState.currentSessionId,
+			'fullscreenClassifyLayout',
+			nextLayout
+		);
+
+		await sleep(50);
+		toggleLayoutTransitions(true);
 	}
 
 	defineKeyboardShortcuts('classification', {
