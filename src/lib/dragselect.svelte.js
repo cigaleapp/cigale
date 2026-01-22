@@ -77,7 +77,7 @@ export class DragSelect {
 			// We use the parent to allow users of the AreaObservations component to decide how much padding they want around the images
 			// Using the parent, we can let the user start their selection in the padding area, and still select the images
 			boundaries: boundary,
-			startAreas: boundary,
+			startAreas: '[data-starts-selection]',
 			// file://./dragselect.css
 			selectionAreaClass: 'viselect-selection-area',
 			behaviour: {
