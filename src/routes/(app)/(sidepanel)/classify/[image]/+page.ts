@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 
 import type { MetadataEnumVariant } from '$lib/database.js';
 import { dependencyURI, list, listByIndex, tables } from '$lib/idb.svelte.js';
-import { metadataOptionsKeyRange } from '$lib/metadata.js';
+import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import { uiState } from '$lib/state.svelte.js';
 import { compareBy } from '$lib/utils.js';
 

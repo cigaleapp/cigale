@@ -27,7 +27,7 @@ export async function goHome(page) {
  *
  * @param {import('$lib/i18n').Language} lang
  */
-const appNavTabs = (lang = 'fr') =>
+export const appNavTabs = (lang = 'fr') =>
 	/** @type {const}, @satisfies {Record<string, { name: string; route: import('$app/types').ResolvedPathname }>} */ ({
 		import: {
 			name: lang === 'fr' ? 'Importer' : 'Import',
@@ -58,7 +58,7 @@ const appNavTabs = (lang = 'fr') =>
 			name: lang === 'fr' ? 'Protocoles' : 'Protocols',
 			route: '/protocols'
 		}
-	});
+	} );
 
 /**
  * @typedef {keyof ReturnType<typeof appNavTabs>} NavigationTab

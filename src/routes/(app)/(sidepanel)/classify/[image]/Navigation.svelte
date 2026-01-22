@@ -10,7 +10,7 @@
 	import { percent } from '$lib/i18n';
 	import { databaseHandle } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
-	import { storeMetadataValue } from '$lib/metadata';
+	import { storeMetadataValue } from '$lib/metadata/index.js';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
