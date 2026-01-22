@@ -42,6 +42,7 @@
 	const option = $derived(options.find((o) => o.key === currentMetadataValue?.value));
 
 	let expand = $state<Expandable>('none');
+	let layoutTransitions = $state(true);
 
 	undo.initialize(100);
 
@@ -54,7 +55,7 @@
 	}
 </script>
 
-<main data-layout={layout} data-expand={expand}>
+<main data-layout={layout} data-expand={expand} data-layout-transitions={layoutTransitions}>
 	<div class="references" {@attach area('references')} in:fade={{ duration: 200 }}>
 		{#if option}
 			<References {option} {layout} bind:expand />
@@ -67,11 +68,17 @@
 	</div>
 	<div class="panel" {@attach area('panel')}>
 		<div class="header" {@attach area('header')}>
-			<Header  {image} {imageNo} {focusedMetadata} />
+			<Header {image} {imageNo} {focusedMetadata} />
 		</div>
 
 		<div class="layout-switcher" {@attach area('layout-switcher')}>
-			<LayoutSwitcher bind:layout />
+			<LayoutSwitcher
+				bind:layout
+				toggleLayoutTransitions={(enable) => {
+					console.log('toggleLayoutTransitions', enable);
+					layoutTransitions = enable;
+				}}
+			/>
 		</div>
 
 		<div class="focused-option" {@attach area('focused-option')} in:fade={{ duration: 200 }}>
@@ -151,7 +158,9 @@
 		display: grid;
 		height: 100dvh;
 		overflow: hidden;
+	}
 
+	main[data-layout-transitions='true'] {
 		transition:
 			grid-template-rows 0.2s,
 			grid-template-columns 0.2s,
