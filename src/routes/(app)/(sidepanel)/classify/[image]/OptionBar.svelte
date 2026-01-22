@@ -12,6 +12,7 @@
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { storeMetadataValue, type TypedMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCombobox, { type Props as ComboboxProps } from '$lib/MetadataCombobox.svelte';
+	import { uiState } from '$lib/state.svelte';
 	import { undo } from '$lib/undo.svelte.js';
 	import { compareBy, entries, mapKeys, nonnull } from '$lib/utils.js';
 
@@ -20,16 +21,11 @@
 		focusedMetadata: Metadata;
 		options: MetadataEnumVariant[];
 		currentMetadataValue: TypedMetadataValue<'enum'> | undefined;
-		layout: 'left-right' | 'top-bottom';
 	}
 
-	const {
-		image,
-		focusedMetadata,
-		options,
-		currentMetadataValue: current,
-		layout
-	}: Props = $props();
+	const { image, focusedMetadata, options, currentMetadataValue: current }: Props = $props();
+
+	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
 
 	let focusOptionCombobox: ComboboxProps['focuser'] = $state((_) => {});
 

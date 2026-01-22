@@ -23,7 +23,7 @@
 	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
 	import Header from './Header.svelte';
-	import LayoutSwitcher, { type Layout } from './LayoutSwitcher.svelte';
+	import LayoutSwitcher from './LayoutSwitcher.svelte';
 	import Navigation from './Navigation.svelte';
 	import OptionBar from './OptionBar.svelte';
 	import References from './References.svelte';
@@ -31,12 +31,12 @@
 
 	navbarAppearance('hidden');
 
-	let layout = $state<Layout>('top-bottom');
-
 	const { data } = $props();
 	const { image, imageNo, navigation, focusedMetadata, allOptions: options } = $derived(data);
 
 	const cascadeLabelsCache: CascadeLabelsCache = $state({});
+
+	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
 
 	const currentMetadataValue = $derived(
 		image && focusedMetadata ? getMetadataValue(image, 'enum', focusedMetadata.id) : undefined
@@ -61,12 +61,12 @@
 <main data-layout={layout} data-expand={expand} data-layout-transitions={layoutTransitions}>
 	<div class="references" {@attach area('references')} in:fade={{ duration: 200 }}>
 		{#if option}
-			<References {option} {layout} bind:expand />
+			<References {option}  bind:expand />
 		{/if}
 	</div>
 	<div class="subject" {@attach area('subject')} in:fade={{ duration: 200 }}>
 		{#if image}
-			<Subject {image} {layout} bind:expand />
+			<Subject {image}  bind:expand />
 		{/if}
 	</div>
 	<div class="panel" {@attach area('panel')}>
@@ -76,7 +76,6 @@
 
 		<div class="layout-switcher" {@attach area('layout-switcher')}>
 			<LayoutSwitcher
-				bind:layout
 				toggleLayoutTransitions={(enable) => {
 					console.log('toggleLayoutTransitions', enable);
 					layoutTransitions = enable;
@@ -86,7 +85,7 @@
 
 		<div class="focused-option" {@attach area('focused-option')} in:fade={{ duration: 200 }}>
 			{#if image && focusedMetadata}
-				<OptionBar {layout} {options} {image} {focusedMetadata} {currentMetadataValue} />
+				<OptionBar  {options} {image} {focusedMetadata} {currentMetadataValue} />
 			{/if}
 		</div>
 

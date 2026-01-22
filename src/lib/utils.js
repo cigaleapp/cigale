@@ -1393,3 +1393,20 @@ export function orEmpty(predicate, obj) {
  * @template {import('$app/types').RouteId} Root
  * @typedef {RemovePrefix<`${Root}/`, WithPrefix<`${Root}/`, import('$app/types').RouteId>>} ChildRouteId
  */
+/**
+ * Promisified setTimeout
+ * @param {number} ms
+ */
+export async function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('sleep', async () => {
+		const start = Date.now();
+		await sleep(100);
+		const end = Date.now();
+		expect(end - start).toBeGreaterThanOrEqual(100);
+	});
+}

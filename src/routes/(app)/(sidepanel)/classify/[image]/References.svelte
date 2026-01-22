@@ -4,21 +4,22 @@
 	import type { MetadataEnumVariant } from '$lib/database';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import Logo from '$lib/Logo.svelte';
+	import { uiState } from '$lib/state.svelte';
 
 	import type { Expandable } from './+page@(app).svelte';
-	import type { Layout } from './LayoutSwitcher.svelte';
 	import WithExpandButton from './WithExpandButton.svelte';
 
 	interface Props {
 		option: MetadataEnumVariant;
 		expand: Expandable;
-		layout: Layout;
 	}
 
 	let carouselScrollers: CarouselProps['scrollers'] = $state();
 
-	let { option, expand = $bindable(), layout }: Props = $props();
+	let { option, expand = $bindable() }: Props = $props();
 	const { image, images, label, key } = $derived(option);
+
+	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
 
 	defineKeyboardShortcuts('classification', {
 		'Shift+L': {

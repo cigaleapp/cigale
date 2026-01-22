@@ -9,16 +9,16 @@
 	import { uiState } from '$lib/state.svelte';
 
 	import type { Expandable } from './+page@(app).svelte';
-	import type { Layout } from './LayoutSwitcher.svelte';
 	import WithExpandButton from './WithExpandButton.svelte';
 
 	interface Props {
 		image: Image;
 		expand: Expandable;
-		layout: Layout;
 	}
 
-	let { image, expand = $bindable(), layout }: Props = $props();
+	let { image, expand = $bindable() }: Props = $props();
+
+	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
 
 	let zoomed = $state(true);
 
