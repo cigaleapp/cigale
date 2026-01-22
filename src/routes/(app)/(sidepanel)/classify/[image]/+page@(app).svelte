@@ -322,6 +322,10 @@
 		}
 	}
 
+	.panel .synonyms {
+		max-height: 15rem;
+	}
+
 	.panel .nav {
 		align-self: flex-end;
 	}
