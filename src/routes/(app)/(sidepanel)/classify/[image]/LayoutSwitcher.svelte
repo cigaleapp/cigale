@@ -10,12 +10,18 @@
 
 	interface Props {
 		layout: 'top-bottom' | 'left-right';
+		/** A function that {en,dis}ables CSS transitions when called */
+		toggleLayoutTransitions: (enable: boolean) => void;
 	}
 
-	let { layout = $bindable('top-bottom') }: Props = $props();
+	let { layout = $bindable('top-bottom'), toggleLayoutTransitions }: Props = $props();
 
 	function cycleLayout() {
+		toggleLayoutTransitions(false);
 		layout = LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length];
+		setTimeout(() => {
+			toggleLayoutTransitions(true);
+		}, 50);
 	}
 
 	defineKeyboardShortcuts('classification', {
