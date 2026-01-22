@@ -1369,6 +1369,16 @@ export function orEmpty(predicate, obj) {
 	return predicate ? [obj] : [];
 }
 
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('orEmpty', () => {
+		expect(orEmpty(true, 1)).toEqual([1]);
+		expect(orEmpty(false, 1)).toEqual([]);
+		expect(orEmpty(undefined, 1)).toEqual([]);
+		expect(orEmpty(null, 1)).toEqual([]);
+	});
+}
+
 /**
  * @template {string} Prefix
  * @template T
