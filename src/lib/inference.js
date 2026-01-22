@@ -89,6 +89,7 @@ export async function loadModel(
 
 	const id = inferenceModelId(protocolId, requests.model);
 
+	// TODO cancel previous calls once https://github.com/gwennlbh/swarpc/issues/126 is implemented
 	const existingSession = await swarpc.inferenceSessionId.broadcast.orThrow(task).catch((e) => {
 		console.error(e);
 		throw new Error(`Failed to get existing inference session for task ${task}: ${e}`);

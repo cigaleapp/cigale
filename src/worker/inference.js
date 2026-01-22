@@ -8,7 +8,7 @@ import * as ort from 'onnxruntime-web';
 import { Schemas } from '$lib/database.js';
 import { loadToTensor } from '$lib/inference_utils.js';
 import { classify, infer, loadModel } from '$lib/inference.js';
-import { storeMetadataValue } from '$lib/metadata.js';
+import { storeMetadataValue } from '$lib/metadata/index.js';
 import { progressSplitter } from '$lib/utils';
 import { fetchHttpRequest } from '$lib/utils.js';
 
@@ -97,7 +97,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 	}
 
 	const cropbox =
-		/** @type {undefined | import('$lib/metadata.js').RuntimeValue<'boundingbox'>} */ (
+		/** @type {undefined | import('$lib/metadata/index.js').RuntimeValue<'boundingbox'>} */ (
 			image.metadata[metadataIds.cropbox]?.value ?? { x: 0.5, y: 0.5, w: 1, h: 1 }
 		);
 

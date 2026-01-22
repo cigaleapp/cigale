@@ -2,15 +2,12 @@
 	import { formatDistanceToNow } from 'date-fns';
 	import { fade } from 'svelte/transition';
 
-	import IconSelect from '~icons/ri/arrow-down-s-line';
 	import IconNext from '~icons/ri/arrow-right-s-fill';
-	import IconCheck from '~icons/ri/check-line';
 	import IconDismiss from '~icons/ri/close-line';
 	import IconNotificationsOn from '~icons/ri/notification-2-line';
 	import { page } from '$app/state';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { percent } from '$lib/i18n';
 	import { previewingPrNumber, tables } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
@@ -28,6 +25,7 @@
 	import DeploymentDetails from './DeploymentDetails.svelte';
 	import ModalSubmitIssue from './ModalSubmitIssue.svelte';
 	import Settings from './Settings.svelte';
+	import TabSettings from './TabSettings.svelte';
 
 	/**
 	 * @typedef Props
@@ -204,16 +202,25 @@
 							<div class="line"></div>
 						{/if}
 					</a>
-					<a
-						href={resolve('/import')}
-						data-testid="goto-import"
-						aria-disabled={!uiState.currentProtocol}
-					>
-						Importer
-						{#if path == '/import'}
-							<div class="line"></div>
-						{/if}
-					</a>
+					<div class="with-inference-indicator">
+						<a
+							href={resolve('/import')}
+							data-testid="goto-import"
+							aria-disabled={!uiState.currentProtocol}
+						>
+							Importer
+							{#if path == '/import'}
+								<div class="line"></div>
+							{/if}
+						</a>
+
+						<TabSettings
+							tab="import"
+							models={[]}
+							currentModelIndex={-1}
+							setModel={async () => {}}
+						/>
+					</div>
 					<div class="separator"><IconNext /></div>
 					<div class="with-inference-indicator">
 						<!-- eslint-disable svelte/no-navigation-without-resolve -->
@@ -234,12 +241,12 @@
 							{/if}
 						</a>
 
-						{@render inferenceSettings(
-							'crop',
-							uiState.cropModels,
-							uiState.selectedCropModel,
-							async (i) => uiState.setModelSelections({ crop: i })
-						)}
+						<TabSettings
+							tab="crop"
+							models={uiState.cropModels}
+							currentModelIndex={uiState.selectedCropModel}
+							setModel={async (i) => uiState.setModelSelections({ crop: i })}
+						/>
 					</div>
 					<div class="separator"><IconNext /></div>
 					<div
@@ -262,12 +269,14 @@
 								<div class="line"></div>
 							{/if}
 						</a>
-						{@render inferenceSettings(
-							'classify',
-							uiState.classificationModels,
-							uiState.selectedClassificationModel,
-							async (i) => uiState.setModelSelections({ classification: i })
-						)}
+
+						<TabSettings
+							tab="classify"
+							models={uiState.classificationModels}
+							currentModelIndex={uiState.selectedClassificationModel}
+							setModel={async (i) =>
+								uiState.setModelSelections({ classification: i })}
+						/>
 					</div>
 					<div class="separator"><IconNext /></div>
 					<a href={resolve('/results')} data-testid="goto-results">
@@ -331,53 +340,6 @@
 	{/if}
 </header>
 
-{#snippet inferenceSettings(
-	/** @type {'crop'|'classify'} */ tab,
-	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */ models,
-	/** @type {number} */ currentModelIndex,
-	/** @type {(i: number) => Promise<void> }*/ setSelection
-)}
-	{@const selectableItem = (/** @type {number} */ i, /** @type {string} */ label) => ({
-		key: i,
-		label,
-		selected: currentModelIndex === i,
-		async onclick() {
-			await setSelection(i);
-			if (path === `/${tab}` && currentModelIndex !== i) {
-				window.location.reload();
-			}
-		}
-	})}
-
-	<div class="inference">
-		{#if uiState.currentProtocol}
-			<DropdownMenu
-				testid="{tab}-models"
-				help="Modèle d'inférence"
-				items={[]}
-				selectableItems={[
-					selectableItem(-1, 'Aucune inférence'),
-					...models.map((model, i) => selectableItem(i, model.name ?? `Modèle ${i + 1}`))
-				]}
-			>
-				{#snippet trigger(props)}
-					<ButtonIcon help="" {...props}>
-						<IconSelect />
-					</ButtonIcon>
-				{/snippet}
-				{#snippet item({ label, key })}
-					<div class="selected-model-indicator">
-						{#if key === currentModelIndex}
-							<IconCheck />
-						{/if}
-					</div>
-					{label}
-				{/snippet}
-			</DropdownMenu>
-		{/if}
-	</div>
-{/snippet}
-
 <style>
 	header {
 		app-region: drag;
@@ -404,20 +366,6 @@
 
 	nav .with-inference-indicator {
 		display: flex;
-		align-items: center;
-	}
-
-	nav .inference {
-		color: var(--fg-warning);
-		display: flex;
-		align-items: center;
-		font-size: 0.9em;
-	}
-
-	.selected-model-indicator {
-		width: 1.5em;
-		display: flex;
-		justify-content: center;
 		align-items: center;
 	}
 

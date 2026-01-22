@@ -12,40 +12,32 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 -->
 
-<script module>
-	/**
-	 * @template AdditionalData
-	 * @typedef {object} MediaItem
-	 * @property {string} sessionId useful as a failsafe to ensure no items from other sessions are shown
-	 * @property {string} id
-	 * @property {string} name
-	 * @property {Date} addedAt
-	 * @property {boolean} virtual whether this item is virtual (not yet stored in the database)
-	 * @property {AdditionalData} data any additional data that might be useful for grouping/sorting
-	 */
-</script>
-
-<script generics="GroupName extends string, ItemData">
-	import * as dates from 'date-fns';
+<script generics="ItemData">
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	import IconTrash from '~icons/ri/delete-bin-line';
 	import { uiState } from '$lib/state.svelte.js';
 
 	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
+	import { galleryItemsGrouper, galleryItemsSorter } from './gallery.js';
 	import { plural } from './i18n.js';
 	import { openTransaction } from './idb.svelte.js';
 	import { deleteImageFile } from './images.js';
 	import { defineKeyboardShortcuts } from './keyboard.svelte.js';
+	import Logo from './Logo.svelte';
 	import { mutationobserver, resizeobserver } from './mutations.js';
 	import { deleteObservation } from './observations.js';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
-	import { compareBy, groupBy } from './utils.js';
+	import { compareBy, entries } from './utils.js';
 
 	/**
-	 * @typedef {MediaItem<ItemData>} Item
+	 * @import { Session } from '$lib/schemas/sessions';
+	 * @import { GalleryItem } from '$lib/gallery';
+	 * @typedef {Exclude<keyof typeof Session.infer['sort'], 'global'>} Zone
+	 * @typedef {GalleryItem<ItemData>} Item
 	 */
 
 	/**
@@ -53,25 +45,14 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @type {object}
 	 * @property {Item[]} items
 	 * @property {import('svelte').Snippet<[ItemData, Item]>} item
-	 * @property {GroupName[]} [groups]
-	 * @property {(item: Item) => GroupName | ""} [grouping]
 	 * @property {string} [highlight] id of the item to highlight (and scroll to)
 	 * @property {(e: MouseEvent|TouchEvent|null) => void} [onemptyclick] callback when the user clicks on the empty area
-	 * @property {{direction: 'asc' | 'desc', key: 'filename'|'id'|'date'}} sort sort order
+	 * @property {Zone} zone the zone where the area is, used to get grouping & sorting settings
 	 * @property {[string, Item[]] | undefined} [unroll] [observation id, inner items] unroll inner cards. Only relevant for items that have multiple cards (i.e. with a stack size > 1)
 	 */
 
 	/** @type {Props } */
-	let {
-		items,
-		item,
-		groups,
-		grouping,
-		onemptyclick,
-		sort,
-		highlight,
-		unroll = ['', []]
-	} = $props();
+	let { items, item, onemptyclick, zone, highlight, unroll = ['', []] } = $props();
 
 	const [unrolledId, unrolledItems] = $derived(unroll);
 
@@ -149,41 +130,54 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	});
 
 	/**
-	 * @type {Array<readonly [GroupName | "", Item[]]>}
+	 * @type {undefined | null | ((item: Item) => [string|number, string])}
 	 */
-	const groupedAndSortedImages = $derived.by(() => {
-		const itemsWithoutOtherSessions = items.filter(
-			(item) => item.sessionId === uiState.currentSessionId
-		);
+	let grouper = $state();
 
-		if (!groups || !grouping) return [['', sortImages(itemsWithoutOtherSessions, sort)]];
-		return [...groupBy(itemsWithoutOtherSessions, grouping).entries()]
-			.filter(([, items]) => items && items.length > 0)
-			.map(([key, items]) => /** @type {const} */ ([key, sortImages(items ?? [], sort)]))
-			.toSorted(compareBy(([name]) => groups?.indexOf(name) ?? 0));
+	/**
+	 * @type {undefined | ((a: Item, b: Item) => number)}
+	 */
+	let sorter = $state();
+
+	$effect(() => {
+		if (!uiState.currentSession) return;
+		const groupingSettings =
+			uiState.currentSession.group[zone] ?? uiState.currentSession.group.global;
+		const sortingSettings =
+			uiState.currentSession.sort[zone] ?? uiState.currentSession.sort.global;
+
+
+		void (async () => {
+			sorter = await galleryItemsSorter(sortingSettings);
+			grouper = await galleryItemsGrouper(groupingSettings);
+		})();
 	});
 
 	/**
-	 *
-	 * @param {Item[]} images
-	 * @param {typeof sort} sort
+	 * undefined means the items are still being grouped/sorted (e.g. grouper and sorter are not loaded yet)
+	 * @type {undefined | Array<{ label: string, sortKey: string|number, items: Item[] }>}
 	 */
-	function sortImages(images, sort) {
-		return images.toSorted((a, b) => {
-			if (sort.direction === 'desc') {
-				[a, b] = [b, a];
-			}
+	const groups = $derived.by(() => {
+		if (grouper === undefined) return undefined;
+		if (sorter === undefined) return undefined;
 
-			switch (sort.key) {
-				case 'id':
-					return a.id.localeCompare(b.id);
-				case 'filename':
-					return a.name.localeCompare(b.name);
-				case 'date':
-					return dates.compareAsc(a.addedAt, b.addedAt);
+		/** @type {Record<string, {items: Item[], sortKey: string|number}>} */
+		const grouped = {};
+
+		if (grouper) {
+			for (const item of items) {
+				const [sortKey, label] = grouper(item);
+				grouped[label] ??= { items: [], sortKey };
+				grouped[label].items.push(item);
 			}
-		});
-	}
+		} else {
+			grouped[''] = { items, sortKey: 0 };
+		}
+
+		return entries(grouped)
+			.map(([label, { items, sortKey }]) => ({ label, sortKey, items: items.sort(sorter) }))
+			.sort(compareBy(({ sortKey }) => sortKey));
+	});
 
 	function roundUnrolledCorners() {
 		const items = [
@@ -227,58 +221,72 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 	}}
 >
-	{#each groupedAndSortedImages as [groupName, sortedImages] (groupName)}
-		<section class="group">
-			{#if groupName}
-				<header>
-					<h2>{groupName}</h2>
-					<p>
-						{plural(sortedImages.length, ['# élément', '# éléments'])}
-					</p>
-					<div class="actions">
-						<ButtonInk
-							dangerous
-							help="Suppprimer tout les éléments de ce groupe"
-							onclick={async () => {
-								await openTransaction(
-									['Image', 'Observation', 'ImageFile', 'ImagePreviewFile'],
-									{},
-									async (tx) => {
-										for (const { id } of sortedImages) {
-											cancelTask(id, 'Cancelled by user');
-											await deleteObservation(id, {
-												notFoundOk: true,
-												recursive: true
-											});
-											await deleteImageFile(id, tx, true);
-										}
-									}
-								);
-							}}
-						>
-							<IconTrash />
-							Supprimer</ButtonInk
-						>
-					</div>
-				</header>
-			{/if}
-			<div class="items">
-				{#each sortedImages as props (virtualizeKey(props))}
-					{@const unrolled = unrolledId === props.id}
-					<div class="item-unroll-container" class:unrolled>
-						{@render item(props.data, props)}
-					</div>
-					{#if unrolled}
-						{#each unrolledItems as innerProps (virtualizeKey(innerProps))}
-							<div class="item-unroll-container" class:unrolled>
-								{@render item(innerProps.data, innerProps)}
+	{#if groups}
+		<div class="groups" in:fade={{ duration: 200 }}>
+			{#each groups as { label, items, sortKey } (sortKey)}
+				<section class="group" role="region" aria-label={label}>
+					{#if label}
+						<header>
+							<h2>{label}</h2>
+							<p>
+								{plural(items.length, ['# élément', '# éléments'])}
+							</p>
+							<div class="actions">
+								<ButtonInk
+									dangerous
+									help="Suppprimer tout les éléments de ce groupe"
+									onclick={async () => {
+										await openTransaction(
+											[
+												'Image',
+												'Observation',
+												'ImageFile',
+												'ImagePreviewFile'
+											],
+											{},
+											async (tx) => {
+												for (const { id } of items) {
+													cancelTask(id, 'Cancelled by user');
+													await deleteObservation(id, {
+														notFoundOk: true,
+														recursive: true
+													});
+													await deleteImageFile(id, tx, true);
+												}
+											}
+										);
+									}}
+								>
+									<IconTrash />
+									Supprimer</ButtonInk
+								>
 							</div>
-						{/each}
+						</header>
 					{/if}
-				{/each}
-			</div>
-		</section>
-	{/each}
+					<div class="items">
+						{#each items as props (virtualizeKey(props))}
+							{@const unrolled = unrolledId === props.id}
+							<div class="item-unroll-container" class:unrolled>
+								{@render item(props.data, props)}
+							</div>
+							{#if unrolled}
+								{#each unrolledItems as innerProps (virtualizeKey(innerProps))}
+									<div class="item-unroll-container" class:unrolled>
+										{@render item(innerProps.data, innerProps)}
+									</div>
+								{/each}
+							{/if}
+						{/each}
+					</div>
+				</section>
+			{/each}
+		</div>
+	{:else}
+		<div class="loading">
+			<Logo loading />
+			<p>Tri en cours…</p>
+		</div>
+	{/if}
 
 	{#if isDebugMode() && items.length > 0}
 		<div class="debug">
@@ -329,6 +337,20 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		}
 		&:global([data-round-corner-bottom='true'][data-round-corner-right='true']) {
 			border-bottom-right-radius: var(--corner-radius);
+		}
+	}
+
+	.images:has(.loading) {
+		height: 100%;
+
+		.loading {
+			--size: 4em;
+			display: flex;
+			flex-direction: column;
+			gap: 1.2em;
+			justify-content: center;
+			align-items: center;
+			height: 100%;
 		}
 	}
 

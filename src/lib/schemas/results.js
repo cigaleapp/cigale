@@ -79,7 +79,7 @@ export const AnalyzedObservation = type({
 });
 
 /**
- * @param {Record<string, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/metadata.js').RuntimeValue }>} values
+ * @param {Record<string, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/metadata/index.js').RuntimeValue }>} values
  * @returns {typeof MetadataRecord.infer}
  */
 export function toMetadataRecord(values) {

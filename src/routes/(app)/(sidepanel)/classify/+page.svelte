@@ -17,12 +17,12 @@
 	} from '$lib/images';
 	import { loadModel } from '$lib/inference.js';
 	import Logo from '$lib/Logo.svelte';
+	import { mergeMetadataFromImagesAndObservations } from '$lib/metadata/merging.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 	import { isAbortError, nonnull } from '$lib/utils.js';
@@ -37,6 +37,11 @@
 			sessionId: obs.sessionId,
 			addedAt: obs.addedAt,
 			name: obs.label,
+			metadata: mergeMetadataFromImagesAndObservations({
+				definitions: tables.Metadata.state,
+				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				observations: [obs]
+			}),
 			virtual: false,
 			data: {
 				image: undefined,
@@ -173,16 +178,7 @@
 	</section>
 {:else}
 	<section class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
-		<AreaObservations
-			{items}
-			{unroll}
-			sort={getSettings().gallerySort}
-			groups={['Recadrées', 'Non recadrées']}
-			grouping={({ data: { images } }) =>
-				images.some((img) => uiState.cropMetadataValueOf(img))
-					? 'Recadrées'
-					: 'Non recadrées'}
-		>
+		<AreaObservations {items} {unroll} zone="classify">
 			{#snippet item({ observation, image, images }, { id })}
 				{#if observation}
 					<CardObservation

@@ -151,10 +151,12 @@ const Settings = table(
 		gallerySort: type({
 			direction: type.enumerated('asc', 'desc'),
 			key: type.enumerated('filename', 'date')
-		}).default(() => ({
-			direction: 'asc',
-			key: 'date'
-		})),
+		})
+			.configure({ deprecated: true })
+			.default(() => ({
+				direction: 'asc',
+				key: 'date'
+			})),
 		autoUpdateProtocols: type('Record<string, boolean>').default(() => ({}))
 	})
 );

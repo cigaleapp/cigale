@@ -124,6 +124,19 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template {string} KIn
+ * @template {any} VIn
+ * @template {string} KOut
+ * @template {any} VOut
+ * @param {Record<KIn, VIn>} subject
+ * @param {(key: KIn, value: VIn) => [KOut, VOut]} mapper
+ * @returns {Record<KOut, VOut>}
+ */
+export function mapEntries(subject, mapper) {
+	return fromEntries(entries(subject).map(([key, value]) => mapper(key, value)));
+}
+
+/**
  * @template {string} K
  * @template {string} V
  * @param {Record<K, V>} subject
@@ -515,8 +528,14 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template T
+ * @typedef {(a: T, b: T) => number} Comparator
+ */
+
+/**
  * @template Item
  * @param {((item: Item) => string|number|undefined) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ * @returns {Comparator<Item>}
  */
 export function compareBy(key) {
 	if (typeof key === 'string') {
@@ -601,6 +620,18 @@ if (import.meta.vitest) {
 			expect(compareBy('id')(items[0], items[0])).toBe(0);
 		});
 	});
+}
+
+/**
+ * Returns a new comparator that takes into account a given sorting direction. Input comparator is assumed to be sorting in asc order.
+ * @template T
+ * @param {'asc'|'desc'} direction
+ * @param {Comparator<T>} comparator
+ * @returns {Comparator<T>}
+ */
+export function applySortDirection(direction, comparator) {
+	const mul = direction === 'asc' ? 1 : -1;
+	return (a, b) => mul * comparator(a, b);
 }
 
 /**
@@ -820,12 +851,16 @@ if (import.meta.vitest) {
 
 /**
  * @param {number} value
- * @param {number} decimals
+ * @param {number} decimals if negative, rounds to tens, hundreds, etc.
  * @returns {number}
  */
 export function round(value, decimals = 0) {
-	if (decimals < 0) throw new Error('decimals must be non-negative');
-	const factor = Math.pow(10, decimals);
+	const factor = Math.pow(10, Math.abs(decimals));
+
+	if (decimals < 0) {
+		return Math.round(value / factor) * factor;
+	}
+
 	return Math.round(value * factor) / factor;
 }
 
@@ -842,6 +877,11 @@ if (import.meta.vitest) {
 		expect(round(1.23456789, 5)).toBe(1.23457);
 		expect(round(1.23456789, 8)).toBe(1.23456789);
 		expect(round(1.23456789, 10)).toBe(1.23456789);
+		expect(round(12345, -1)).toBe(12350);
+		expect(round(12345, -2)).toBe(12300);
+		expect(round(12555, -2)).toBe(12600);
+		expect(round(-12555, -2)).toBe(-12600);
+		expect(round(-12345, -2)).toBe(-12300);
 	});
 }
 
@@ -1290,4 +1330,14 @@ ratione facere!`;
  */
 export function isAbortError(error) {
 	return error instanceof DOMException && error.name === 'AbortError';
+}
+/**
+ * Spread into an array literal to conditionally add something to it
+ * @template T
+ * @param {boolean | undefined | null} predicate
+ * @param {T} obj
+ * @returns { [T] | [] }
+ */
+export function orEmpty(predicate, obj) {
+	return predicate ? [obj] : [];
 }

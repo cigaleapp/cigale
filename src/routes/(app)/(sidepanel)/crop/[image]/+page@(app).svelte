@@ -1,6 +1,6 @@
 <script>
 	/**
-	 * @import * as Metadata from '$lib/metadata.js';
+	 * @import * as Metadata from '$lib/metadata/index.js';
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
@@ -58,7 +58,7 @@
 		deleteMetadataValue,
 		hasRuntimeType,
 		storeMetadataValue
-	} from '$lib/metadata';
+	} from '$lib/metadata/index.js';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
@@ -72,6 +72,10 @@
 	import { undo } from '$lib/undo.svelte';
 	import { clamp, fromEntries, mapValues, pick, range, sign } from '$lib/utils';
 	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
+
+	/**
+	 * @import { RuntimeValue } from '$lib/schemas/metadata';
+	 */
 
 	navbarAppearance('hidden');
 
@@ -163,16 +167,14 @@
 	let focusedImageId = $state('');
 
 	/**
-	 * @type {Record<string, Metadata.RuntimeValue<'boundingbox'>>}
+	 * @type {Record<string, RuntimeValue<'boundingbox'>>}
 	 */
 	const boundingBoxes = $derived(
 		Object.fromEntries(
 			images
-				.map(({ metadata, id }) => [
-					id,
-					assertIs('boundingbox', metadata[uiState.cropMetadataId]?.value)
-				])
-				.filter(([, value]) => Boolean(value))
+				.map(({ id, metadata }) => [id, metadata[uiState.cropMetadataId]?.value])
+				.filter(([, box]) => box !== undefined)
+				.map(([id, box]) => [id, assertIs('boundingbox', box)])
 		)
 	);
 
@@ -202,7 +204,7 @@
 	const croppedImagesCount = $derived(sortedFileIds.filter(hasCrop).length);
 	const confirmedCropsCount = $derived(sortedFileIds.filter(hasConfirmedCrop).length);
 
-	/** @type {Record<string, undefined | { value: Metadata.RuntimeValue<'boundingbox'>, confidence: number }>} */
+	/** @type {Record<string, undefined | { value: RuntimeValue<'boundingbox'>, confidence: number }>} */
 	const initialCrops = $derived(
 		Object.fromEntries(
 			images.map((image) => {
@@ -477,7 +479,7 @@
 				value: toCenteredCoords(newBoundingBox),
 				confidence: 1,
 				// Put the neural-network-inferred (initial) value in the alternatives as a backup
-				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : undefined,
+				alternatives: initialCrops[imageId] ? [initialCrops[imageId]] : [],
 				manuallyModified: true
 			});
 		} else if (

@@ -47,7 +47,7 @@ jobs:
     name: Build
     uses: ./.github/workflows/build.yml
     with:
-      minify: false
+      debug: false
 
   test:
     needs: build

@@ -58,10 +58,12 @@
 		"test:ui": "vitest --ui",
 		"test:watch": "vitest",
 		"wuchale": "wuchale",
-		"all-contributors": "all-contributors --files README.md --files README_FR.md"
+		"all-contributors": "all-contributors --files README.md --files README_FR.md",
+		"test:update-fixtures": "playwright test tasks/exports.spec.js --update-snapshots -x --headed && playwright test tasks/dbdump.spec.js --update-snapshots -x --headed "
 	},
 	"devDependencies": {
 		"@actions/core": "^2.0.2",
+		"@date-fns/tz": "^1.4.1",
 		"@electron-forge/cli": "^7.11.1",
 		"@electron-forge/maker-deb": "^7.11.1",
 		"@electron-forge/maker-flatpak": "^7.11.1",

@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 
 import { expect, test, type AppFixture } from './fixtures.js';
-import { goToProtocolManagement } from './utils.js';
+import { goToProtocolManagement } from './utils/index.js';
 
 async function setup(
 	{ page, app }: { page: Page; app: AppFixture },

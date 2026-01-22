@@ -6,7 +6,7 @@ import {
 	firstObservationCard,
 	loadDatabaseDump,
 	setInferenceModels
-} from './utils.js';
+} from './utils/index.js';
 
 /**
  * @import { Page } from '@playwright/test';
@@ -26,7 +26,9 @@ async function initialize({ page, app, dump = 'db/basic.devalue' }) {
 	await chooseFirstSession(page);
 	if (dump === 'db/kitchensink-protocol.devalue')
 		await changeSessionProtocol(page, 'Kitchen sink');
-	await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
+	// Kitchen sink protocol has inference models set
+	if (dump !== 'db/kitchensink-protocol.devalue')
+		await setInferenceModels(page, { classify: 'Aucune inférence', crop: 'Aucune inférence' });
 	await app.tabs.go('classify');
 	await page
 		.getByText(dump === 'db/basic.devalue' ? 'lil-fella' : 'leaf', { exact: true })
@@ -414,28 +416,19 @@ test.describe('can search in a enum-type metadata combobox', () => {
 
 test('can update a boolean-type metadata', issue(216), async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
+	const switch_ = app.sidepanel.metadataSection('bool').getByRole('switch');
 
+	await expect.soft(switch_).toHaveAttribute('aria-checked', 'false');
 	expect.soft(await metadataValueInDatabase(app, 'bool')).toBeUndefined();
-	await expect
-		.soft(app.sidepanel.metadataSection('bool').getByRole('switch'))
-		.not.toHaveAttribute('aria-checked');
 
-	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
+	await switch_.click();
 
-	await expect.soft(app.sidepanel.metadataSection('bool').getByRole('switch'))
-		.toMatchAriaSnapshot(`
-	  - switch "" [checked]:
-	    - img
-	`);
+	await expect.soft(switch_).toHaveAttribute('aria-checked', 'true');
 	expect.soft(await metadataValueInDatabase(app, 'bool')).toBe(true);
 
-	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
+	await switch_.click();
 
-	await expect.soft(app.sidepanel.metadataSection('bool').getByRole('switch'))
-		.toMatchAriaSnapshot(`
-	  - switch "":
-	    - img
-	`);
+	await expect.soft(switch_).toHaveAttribute('aria-checked', 'false');
 	expect.soft(await metadataValueInDatabase(app, 'bool')).toBe(false);
 });
 
@@ -494,12 +487,12 @@ test('can update a integer-type metadata', async ({ page, app }) => {
 test('can update a string-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	const stringSection = app.sidepanel.metadataSection('string');
-	await expect(stringSection.getByRole('textbox')).toHaveValue('');
+	const textbox = app.sidepanel.metadataSection('string').getByRole('textbox');
+	await expect(textbox).toHaveValue('');
 
-	await stringSection.getByRole('textbox').fill('Hello world');
-	await stringSection.getByRole('textbox').blur();
+	await textbox.fill('Hello world');
+	await textbox.blur();
 
-	await expect(stringSection.getByRole('textbox')).toHaveValue('Hello world');
+	await expect(textbox).toHaveValue('Hello world');
 	expect(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
 });

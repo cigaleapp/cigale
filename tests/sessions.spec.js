@@ -9,7 +9,7 @@ import {
 	sessionMetadataSectionFor,
 	setInferenceModels,
 	switchSession
-} from './utils.js';
+} from './utils/index.js';
 
 test.describe('isolation', () => {
 	test.beforeEach(() => {

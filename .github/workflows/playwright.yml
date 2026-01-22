@@ -91,7 +91,9 @@ jobs:
     if: always()
     environment:
       name: '#${{ github.event.number }}: End-to-end tests report'
-      url: ${{ steps.deploy-preview.outputs.preview-url }}
+      # #?show-metadata-other allows showing extra metadata sections in the report
+      # Ref: https://github.com/microsoft/playwright/blob/e76ca6c/packages/html-reporter/src/metadataView.tsx#L62
+      url: '${{ steps.deploy-preview.outputs.preview-url }}#?show-metadata-other'
     name: Combine reports
     steps:
       - uses: actions/checkout@v6
