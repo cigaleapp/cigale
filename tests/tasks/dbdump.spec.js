@@ -1,5 +1,3 @@
-
-
 import { exampleProtocol, expect, test } from '../fixtures.js';
 import {
 	confirmDeletionModal,

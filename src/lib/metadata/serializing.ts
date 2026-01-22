@@ -43,7 +43,6 @@ export function serializeMetadataFullValue<T extends { value: RuntimeValue }>({
 	value,
 	...rest
 }: T): T & { value: string } {
-
 	return { ...rest, value: serializeMetadataValue(value) };
 }
 

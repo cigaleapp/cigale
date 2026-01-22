@@ -146,7 +146,6 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		const sortingSettings =
 			uiState.currentSession.sort[zone] ?? uiState.currentSession.sort.global;
 
-
 		void (async () => {
 			sorter = await galleryItemsSorter(sortingSettings);
 			grouper = await galleryItemsGrouper(groupingSettings);

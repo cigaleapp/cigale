@@ -1,6 +1,10 @@
 import type { MetadataValues } from './database.js';
 import { list, tables } from './idb.svelte.js';
-import { compareByMetadataValue, metadataOptionsKeyRange, metadataValueGrouper } from './metadata/index.js';
+import {
+	compareByMetadataValue,
+	metadataOptionsKeyRange,
+	metadataValueGrouper
+} from './metadata/index.js';
 import { removeNamespaceFromMetadataId, splitMetadataId } from './schemas/metadata.js';
 import type { GroupSettings, SortSettings } from './schemas/sessions.js';
 import { getSettings } from './settings.svelte.js';

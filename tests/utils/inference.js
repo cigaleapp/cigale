@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+
 import { chooseInDropdown, mockUrl } from './core.js';
 
 /**

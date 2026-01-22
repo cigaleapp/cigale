@@ -75,7 +75,6 @@
 	const sortableMetadata = $derived(metadataOfProtocol.filter((m) => m.sortable));
 	const groupableMetadata = $derived(metadataOfProtocol.filter((m) => m.groupable));
 
-
 	const currentSettings = $derived(
 		uiState.currentSession
 			? {
@@ -134,8 +133,7 @@
 					const field = currentSettings?.sort.field;
 					const metadata = currentSettings?.sort.metadata;
 					const selected = field === key;
-					const needsMetadata = sortOrGroupFieldNeedsMetadata("sort", key);
-
+					const needsMetadata = sortOrGroupFieldNeedsMetadata('sort', key);
 
 					if (needsMetadata) {
 						return {
@@ -146,7 +144,7 @@
 							submenu: {
 								label: 'Métadonnée',
 								testid: `${tab}-settings-sort-by-${key}-metadata`,
-								empty: "Le protocole ne définit aucune métadonnée triable.",
+								empty: 'Le protocole ne définit aucune métadonnée triable.',
 								items: sortableMetadata.map((m) => ({
 									type: 'selectable',
 									data: { direction },
@@ -197,7 +195,7 @@
 					const field = currentSettings?.group.field;
 					const metadata = currentSettings?.group.metadata;
 					const selected = field === key;
-					const needsMetadata = sortOrGroupFieldNeedsMetadata("group", key);
+					const needsMetadata = sortOrGroupFieldNeedsMetadata('group', key);
 
 					if (needsMetadata) {
 						return {
@@ -208,7 +206,7 @@
 							submenu: {
 								label: 'Métadonnée',
 								testid: `${tab}-settings-group-by-${key}-metadata`,
-								empty: "Le protocole ne définit aucune métadonnée groupable.",
+								empty: 'Le protocole ne définit aucune métadonnée groupable.',
 								items: groupableMetadata.map((m) => ({
 									type: 'selectable',
 									data: { direction: null },

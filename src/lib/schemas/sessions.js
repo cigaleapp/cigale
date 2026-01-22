@@ -28,9 +28,11 @@ export const GROUP_FIELDS = /** @type {const} */ ({
 export function sortOrGroupFieldNeedsMetadata(task, field) {
 	switch (task) {
 		// @ts-expect-error
-		case 'sort': return SORT_FIELDS[field].needsMetadata
+		case 'sort':
+			return SORT_FIELDS[field].needsMetadata;
 		// @ts-expect-error
-		case 'group': return GROUP_FIELDS[field].needsMetadata
+		case 'group':
+			return GROUP_FIELDS[field].needsMetadata;
 	}
 }
 

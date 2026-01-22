@@ -161,9 +161,11 @@
 												</DropdownMenu.CheckboxItem>
 											{/if}
 										{:else}
-										<DropdownMenu.Item disabled>
-											<div class="empty-submenu">{i.submenu.empty ?? 'Aucun élément disponible'}</div>
-										</DropdownMenu.Item>
+											<DropdownMenu.Item disabled>
+												<div class="empty-submenu">
+													{i.submenu.empty ?? 'Aucun élément disponible'}
+												</div>
+											</DropdownMenu.Item>
 										{/each}
 									</DropdownMenu.Group>
 								</DropdownMenu.SubContent>
@@ -203,7 +205,7 @@
 		gap: 0.25em;
 	}
 
-	:global([data-dropdown-menu-item]:not([aria-disabled=true]):is(:hover, :focus-visible)) {
+	:global([data-dropdown-menu-item]:not([aria-disabled='true']):is(:hover, :focus-visible)) {
 		background-color: var(--bg-primary-translucent);
 		color: var(--fg-primary);
 	}
@@ -214,6 +216,6 @@
 		display: flex;
 		align-items: center;
 		text-align: center;
-		color: var(--gay)
+		color: var(--gay);
 	}
 </style>

@@ -11,7 +11,6 @@ export const METADATA_ZERO_VALUE = {
 	alternatives: {}
 } as const satisfies DB.MetadataValue;
 
-
 export * from './display.js';
 export * from './grouping.js';
 export * from './merging.js';
