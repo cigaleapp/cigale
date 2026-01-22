@@ -224,7 +224,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	{#if groups}
 		<div class="groups" in:fade={{ duration: 200 }}>
 			{#each groups as { label, items, sortKey } (sortKey)}
-				<section class="group">
+				<section class="group" role="region" aria-label={label}>
 					{#if label}
 						<header>
 							<h2>{label}</h2>

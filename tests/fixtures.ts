@@ -45,6 +45,7 @@ let arthropodaDetectionModel: PredownloadedModel | null = null;
 export type AppFixture = {
 	db: {
 		ready(): Promise<void>;
+		refresh(): Promise<void>;
 		protocol: {
 			byId(id: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
 			byName(name: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
@@ -83,8 +84,8 @@ export type AppFixture = {
 				imageId: string,
 				/** The metadata key. If not namespaced, it'll be namespaced to the lightweight protocol's id */
 				key: RemoveNamespace<keyof typeof lightProtocol.metadata> | (string & {}),
-				/** The new value to set it as */
-				value: RuntimeValue | { confidence: number; value: RuntimeValue }
+				/** The new value to set it as. Use null to remove the value  */
+				value: null | RuntimeValue | { confidence: number; value: RuntimeValue }
 			): Promise<void>;
 		};
 	};
@@ -131,10 +132,15 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 		await use({
 			sidepanel,
 			db: {
-				ready: async () => {
+				async ready() {
 					await page.waitForFunction(() =>
 						Boolean(window.devalue && window.DB && window.refreshDB)
 					);
+				},
+				async refresh() {
+					await page.evaluate(async () => {
+						await window.refreshDB();
+					});
 				},
 				protocol: {
 					byId: async (id) => getDatabaseRowById(page, 'Protocol', id),
@@ -216,6 +222,23 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 
 						if (!key.includes('__')) {
 							key = `${lightProtocol.id}__${key}`;
+						}
+
+						if (value === null) {
+							await page.evaluate(
+								async ([imageId, key]) => {
+									const image = await window.DB.get('Image', imageId);
+									if (!image) {
+										throw new Error(`Could not find image with ID ${imageId}`);
+									}
+
+									delete image.metadata[key];
+
+									await window.DB.put('Image', image);
+								},
+								[imageId, key]
+							);
+							return;
 						}
 
 						const newValue =
