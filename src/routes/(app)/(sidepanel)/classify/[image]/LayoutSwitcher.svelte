@@ -9,6 +9,7 @@
 
 	interface Props {
 		/** A function that {en,dis}ables CSS transitions when called */
+		// eslint-disable-next-line no-unused-vars
 		toggleLayoutTransitions: (enable: boolean) => void;
 	}
 

@@ -1,4 +1,6 @@
-<script module>
+<script lang="ts" module>
+	/* oxlint-disable */
+	// Oxlint thinks that componentOrSnippet is undefined
 	export { componentOrSnippet };
 </script>
 
