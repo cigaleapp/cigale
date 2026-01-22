@@ -305,7 +305,9 @@ export function throwError(message) {
 export async function chooseInDropdown(page, dropdownTestId, ...option) {
 	const trigger = page.getByTestId(`${dropdownTestId}-open`);
 	const options = page.getByTestId(`${dropdownTestId}-options`);
-	await trigger.click();
+	if (await options.isHidden()) {
+		await trigger.click();
+	}
 	const [locator, sublocator] = option;
 
 	const item = sublocator
@@ -324,4 +326,33 @@ export async function chooseInDropdown(page, dropdownTestId, ...option) {
 
 	await item.click();
 	await page.keyboard.press('Escape'); // Close the dropdown
+}
+
+/**
+ * Opens a dropdown and hovers over an item by its name
+ * @param {Page} page
+ * @param {string} dropdownTestId
+ * @param {[string | RegExp | ((options: Locator) => Locator)] | [string, string | RegExp]} option can be a single argument, or two strings where the first one is the group (dropdown submenu's label) and the second one the option name
+ */
+export async function hoverOnDropdownOption(page, dropdownTestId, ...option) {
+	const trigger = page.getByTestId(`${dropdownTestId}-open`);
+	const options = page.getByTestId(`${dropdownTestId}-options`);
+	await trigger.click();
+	const [locator, sublocator] = option;
+
+	const item = sublocator
+		? options
+				.getByRole('group', {
+					name: locator.toString()
+				})
+				.getByRole('menuitem', {
+					name: sublocator
+				})
+		: typeof locator === 'function'
+			? locator(options)
+			: options.getByRole('menuitem', {
+					name: locator
+				});
+
+	await item.hover();
 }

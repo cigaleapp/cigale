@@ -35,6 +35,9 @@ import {
 
 const fullProtocol = _fullProtocol as ExportedProtocol;
 
+type RemoveNamespace<Key extends `io.github.cigaleapp.arthropods.example.light__${string}`> =
+	Key extends `io.github.cigaleapp.arthropods.example.light__${infer Rest}` ? Rest : never;
+
 let arthropodaClassifierModel: PredownloadedModel | null = null;
 let collembolaClassifierModel: PredownloadedModel | null = null;
 let arthropodaDetectionModel: PredownloadedModel | null = null;
@@ -62,6 +65,7 @@ export type AppFixture = {
 			list(): Promise<IDBDatabaseType['Session']['value'][]>;
 		};
 		metadata: {
+			get(id: string): Promise<IDBDatabaseType['Metadata']['value'] | undefined>;
 			values(args: {
 				/** The image's filename */
 				image?: string;
@@ -74,6 +78,14 @@ export type AppFixture = {
 				/** Remove namespace from metadata id (keys of returned object). By default, set to lightweight protocol's id */
 				protocolId?: string | null;
 			}): Promise<Record<string, RuntimeValue>>;
+			set(
+				/** The image's ID  */
+				imageId: string,
+				/** The metadata key. If not namespaced, it'll be namespaced to the lightweight protocol's id */
+				key: RemoveNamespace<keyof typeof lightProtocol.metadata> | (string & {}),
+				/** The new value to set it as */
+				value: RuntimeValue | { confidence: number; value: RuntimeValue }
+			): Promise<void>;
 		};
 	};
 	modals: {
@@ -146,6 +158,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 					byName: async (name) => getDatabaseRowByField(page, 'Session', 'name', name)
 				},
 				metadata: {
+					get: async (id) => getDatabaseRowById(page, 'Metadata', id),
 					async values({
 						session,
 						image,
@@ -193,6 +206,43 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 									protocolId ? id.replace(`${protocolId}__`, '') : id,
 									safeJSONParse(value)
 								])
+						);
+					},
+					async set(imageId, key, value) {
+						const original = await getDatabaseRowById(page, 'Image', imageId);
+						if (!original) {
+							throw new Error(`Could not find image with ID ${imageId}`);
+						}
+
+						if (!key.includes('__')) {
+							key = `${lightProtocol.id}__${key}`;
+						}
+
+						const newValue =
+							typeof value === 'object' && 'value' in value
+								? {
+										confidence: value.confidence,
+										value: JSON.stringify(value.value)
+									}
+								: { value: JSON.stringify(value) };
+
+						const updated: IDBDatabaseType['Image']['value'] = {
+							...original,
+							metadata: {
+								...original.metadata,
+								[key]: {
+									alternatives: {},
+									confidence: 1,
+									...newValue
+								}
+							}
+						};
+
+						await page.evaluate(
+							async ([updated]) => {
+								await window.DB.put('Image', updated);
+							},
+							[updated]
 						);
 					}
 				}

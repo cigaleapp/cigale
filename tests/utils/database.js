@@ -61,10 +61,10 @@ export async function listTable(page, tableName) {
 /**
  * Store a database dump in the fixtures/db directory
  * @param {import('@playwright/test').Page} page
- * @param {string} filepath relative to tests/fixtures/db
+ * @param {FixturePaths.DatabaseDumps} filepath relative to tests/fixtures/db
  */
 export async function dumpDatabase(page, filepath) {
-	const dest = path.join(import.meta.dirname, './fixtures/db/', filepath);
+	const dest = path.join(import.meta.dirname, '../..', FixturePaths.root, filepath);
 
 	const encodedDump = await page.evaluate(async () => {
 		const tableNames = window.DB.objectStoreNames;
