@@ -85,7 +85,7 @@ test('import into new session', async ({ page, app }) => {
 	});
 
 	await app.tabs.go('crop');
-	await expect(page.locator('main header > *').nth(1)).toHaveText('4 éléments');
+	await expect(page.locator('main header > *').nth(2)).toHaveText('4 éléments');
 
 	await app.tabs.go('classify');
 	await page.getByText('cyan', { exact: true }).click();
