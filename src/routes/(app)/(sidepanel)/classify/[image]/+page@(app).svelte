@@ -7,6 +7,9 @@
 	import type { Attachment } from 'svelte/attachments';
 	import { fade } from 'svelte/transition';
 
+	import IconDescription from '~icons/ri/align-left';
+	import IconCascades from '~icons/ri/corner-right-down-fill';
+	import IconSynonyms from '~icons/ri/links-line';
 	import { cascadeLabels, type CascadeLabelsCache } from '$lib/cascades';
 	import Field from '$lib/Field.svelte';
 	import { openDatabase } from '$lib/idb.svelte.js';
@@ -94,7 +97,12 @@
 				{@attach scrollfader}
 				in:fade={{ duration: 200 }}
 			>
-				<Field composite label="Métadonnées associées">
+				<Field
+					composite
+					label="Métadonnées associées"
+					Icon={IconCascades}
+					indent-icon={false}
+				>
 					{#await openDatabase() then db}
 						{#await cascadeLabels( { cache: cascadeLabelsCache, db, protocolId: uiState.currentProtocolId, option } ) then cascades}
 							<MetadataCascadesTable {cascades} />
@@ -109,7 +117,7 @@
 				{@attach scrollfader}
 				in:fade={{ duration: 200 }}
 			>
-				<Field composite label="Synonymes">
+				<Field composite label="Synonymes" Icon={IconSynonyms} indent-icon={false}>
 					{#if option.synonyms.length === 0}
 						<p>Aucun synonyme défini.</p>
 					{:else}
@@ -128,7 +136,7 @@
 				{@attach scrollfader}
 				in:fade={{ duration: 200 }}
 			>
-				<Field composite label="Description">
+				<Field composite label="Description" Icon={IconDescription} indent-icon={false}>
 					{#await marked(option.description ?? '') then html}
 						{@html html}
 					{:catch error}
@@ -324,6 +332,10 @@
 
 	.panel .synonyms {
 		max-height: 15rem;
+
+		ul {
+			padding-left: 0;
+		}
 	}
 
 	.panel .nav {
