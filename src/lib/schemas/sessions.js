@@ -20,17 +20,13 @@ export const GROUP_FIELDS = /** @type {const} */ ({
 });
 
 /**
- *
- * @param {"sort" | "group"} task
- * @param {keyof ( typeof SORT_FIELDS & typeof GROUP_FIELDS)} field
- * @returns
+ * @param {['sort', keyof typeof SORT_FIELDS] | ['group', keyof typeof GROUP_FIELDS]} param0 [task, field]
+ * @returns {boolean}
  */
-export function sortOrGroupFieldNeedsMetadata(task, field) {
+export function sortOrGroupFieldNeedsMetadata(...[task, field]) {
 	switch (task) {
-		// @ts-expect-error
 		case 'sort':
 			return SORT_FIELDS[field].needsMetadata;
-		// @ts-expect-error
 		case 'group':
 			return GROUP_FIELDS[field].needsMetadata;
 	}
