@@ -1,6 +1,5 @@
 import { mkdir, rm } from 'node:fs/promises';
 import { test as base, type Locator } from '@playwright/test';
-import type { IDBPDatabase } from 'idb';
 
 import type { Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
