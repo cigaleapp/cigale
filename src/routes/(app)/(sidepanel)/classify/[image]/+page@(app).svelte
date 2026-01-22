@@ -11,7 +11,7 @@
 	import Field from '$lib/Field.svelte';
 	import { openDatabase } from '$lib/idb.svelte.js';
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
-	import { getMetadataValue } from '$lib/metadata.js';
+	import { getMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
 	import { scrollfader } from '$lib/scrollfader';
 	import { isDebugMode } from '$lib/settings.svelte.js';

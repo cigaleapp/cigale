@@ -54,7 +54,6 @@ export type AppFixture = {
 			byId(id: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
 			byName(name: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
 		};
-		with(cb: (db: IDBPDatabase<IDBDatabaseType>) => Promise<void>): Promise<void>;
 		observation: {
 			byLabel(label: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;
 			byId(id: string): Promise<IDBDatabaseType['Observation']['value'] | undefined>;

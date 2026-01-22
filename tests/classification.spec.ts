@@ -8,7 +8,7 @@ import {
 	loadDatabaseDump,
 	newSession,
 	setInferenceModels
-} from './utils.js';
+} from './utils/index.js';
 
 test('allows cancelling classification of an observation', issue(430), async ({ page, app }) => {
 	await newSession(page);

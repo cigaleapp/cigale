@@ -8,7 +8,7 @@ import { entries, groupBy, nonnull, pick, sum } from './utils.js';
 
 /**
  * @import * as DB from './database.js'
- * @import { RuntimeValue } from './metadata.js'
+ * @import { RuntimeValue } from './metadata/index.js'
  * @import { DatabaseHandle } from './idb.svelte.js'
  * @import { MetadataEnumVariant } from './database.js'
  */

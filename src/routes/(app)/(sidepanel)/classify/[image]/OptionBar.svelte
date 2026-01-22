@@ -10,7 +10,7 @@
 	import type { Image, Metadata, MetadataEnumVariant } from '$lib/database.js';
 	import { dependencyURI, openDatabase } from '$lib/idb.svelte.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
-	import { storeMetadataValue, type TypedMetadataValue } from '$lib/metadata.js';
+	import { storeMetadataValue, type TypedMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCombobox, { type Props as ComboboxProps } from '$lib/MetadataCombobox.svelte';
 	import { undo } from '$lib/undo.svelte.js';
 	import { compareBy, entries, mapKeys, nonnull } from '$lib/utils.js';

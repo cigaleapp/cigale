@@ -46,7 +46,7 @@ export const browserConsole = {
  * @param {Page} page
  * @param {import('@playwright/test').Locator} locator
  */
-async function tooltipOf(page, locator) {
+export async function tooltipOf(page, locator) {
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, {
 		timeout: 1_000
 	});
