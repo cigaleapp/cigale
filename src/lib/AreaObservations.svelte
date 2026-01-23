@@ -13,6 +13,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script generics="ItemData">
+	import { watch } from 'runed';
 	import { onMount } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
@@ -67,6 +68,11 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 * @type {SvelteSet<string | number>}
 	 */
 	const collapsedGroups = new SvelteSet();
+
+	watch([() => grouper], () => {
+		// Clear collapsed groups when grouping changes
+		collapsedGroups.clear();
+	});
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -146,21 +152,32 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 */
 	let grouper = $state();
 
+	const groupingSettings = $derived(
+		uiState.currentSession?.group[zone] ?? uiState.currentSession?.group.global
+	);
+
+	$effect(() => {
+		if (!groupingSettings) return;
+
+		void (async () => {
+			grouper = await galleryItemsGrouper(groupingSettings);
+		})();
+	});
+
 	/**
 	 * @type {undefined | ((a: Item, b: Item) => number)}
 	 */
 	let sorter = $state();
 
+	const sortingSettings = $derived(
+		uiState.currentSession?.sort[zone] ?? uiState.currentSession?.sort.global
+	);
+
 	$effect(() => {
-		if (!uiState.currentSession) return;
-		const groupingSettings =
-			uiState.currentSession.group[zone] ?? uiState.currentSession.group.global;
-		const sortingSettings =
-			uiState.currentSession.sort[zone] ?? uiState.currentSession.sort.global;
+		if (!sortingSettings) return;
 
 		void (async () => {
 			sorter = await galleryItemsSorter(sortingSettings);
-			grouper = await galleryItemsGrouper(groupingSettings);
 		})();
 	});
 
