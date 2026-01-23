@@ -14,7 +14,14 @@
 		removeNamespaceFromMetadataId,
 		type MetadataInferOptionsNeural
 	} from '$lib/schemas/metadata';
-	import { GROUP_FIELDS, GroupSettings, SORT_FIELDS, SortSettings } from '$lib/schemas/sessions';
+	import {
+		GROUP_FIELDS,
+		GROUPING_TOLERANCES,
+		GroupSettings,
+		SORT_FIELDS,
+		sortOrGroupFieldNeedsMetadata,
+		SortSettings
+	} from '$lib/schemas/sessions';
 	import { uiState } from '$lib/state.svelte';
 	import { entries, orEmpty } from '$lib/utils';
 
@@ -78,45 +85,36 @@
 			: undefined
 	);
 
-	async function setSettings(
-		...[task, settings]:
-			| ['sort', Partial<typeof SortSettings.infer>]
-			| ['group', Partial<typeof GroupSettings.infer>]
+	async function setSettings<Task extends 'sort' | 'group'>(
+		task: Task,
+		settings: Partial<
+			Task extends 'sort' ? typeof SortSettings.infer : typeof GroupSettings.infer
+		>
 	) {
 		if (!uiState.currentSession) return;
 		if (!currentSettings) return;
 
+		const updated = {
+			...currentSettings[task],
+			...settings
+		};
+
+		if (sortOrGroupFieldNeedsMetadata(task, updated.field) && !updated.metadata) {
+			console.warn('Not updating in DB yet, user needs to select metadata too');
+			return;
+		}
+
 		if (task === 'sort') {
-			const updated = {
-				...currentSettings.sort,
-				...settings
-			};
-
-			if (!updated.metadata && SORT_FIELDS[updated.field].needsMetadata) {
-				console.warn('Tried to set sort field that needs metadata without metadata id');
-				return;
-			}
-
 			const value = $state.snapshot({
 				...uiState.currentSession.sort,
-				[tab]: updated
+				[tab]: { direction: 'asc', ...updated }
 			});
 
 			await tables.Session.update(uiState.currentSession.id, 'sort', value);
 		} else {
-			const updated = {
-				...currentSettings.group,
-				...settings
-			};
-
-			if (!updated.metadata && GROUP_FIELDS[updated.field].needsMetadata) {
-				console.warn('Tried to set group field that needs metadata without metadata id');
-				return;
-			}
-
 			const value = $state.snapshot({
 				...uiState.currentSession.group,
-				[tab]: updated
+				[tab]: { ...updated }
 			});
 
 			await tables.Session.update(uiState.currentSession.id, 'group', value);
@@ -136,7 +134,7 @@
 					const field = currentSettings?.sort.field;
 					const metadata = currentSettings?.sort.metadata;
 					const selected = field === key;
-					const needsMetadata = SORT_FIELDS[key].needsMetadata;
+					const needsMetadata = sortOrGroupFieldNeedsMetadata('sort', key);
 
 					if (needsMetadata) {
 						return {
@@ -198,7 +196,7 @@
 					const field = currentSettings?.group.field;
 					const metadata = currentSettings?.group.metadata;
 					const selected = field === key;
-					const needsMetadata = GROUP_FIELDS[key].needsMetadata;
+					const needsMetadata = sortOrGroupFieldNeedsMetadata('group', key);
 
 					if (needsMetadata) {
 						return {
@@ -247,7 +245,44 @@
 					};
 				})
 			},
-
+			...orEmpty(GROUP_FIELDS[currentSettings?.group.field ?? 'none'].needsTolerance, {
+				label: 'Précision des groupes',
+				testid: `${tab}-settings-group-tolerances`,
+				items: entries(GROUPING_TOLERANCES)
+					.filter(([, { affectedTypes }]) => {
+						if (!currentSettings?.group.metadata) return false;
+						const groupingByMetadata = tables.Metadata.getFromState(
+							currentSettings.group.metadata
+						);
+						if (!groupingByMetadata) return false;
+						return affectedTypes.includes(groupingByMetadata.type);
+					})
+					.map(([field, { options, label, help }]) => ({
+						type: 'submenu' as const,
+						data: { direction: null },
+						label,
+						submenu: {
+							label: help,
+							items: entries(options).map(([key, { scientific, casual }]) => ({
+								type: 'selectable' as const,
+								label: casual,
+								data: { direction: null, icon: scientific },
+								closeOnSelect: false,
+								key: scientific,
+								selected: currentSettings?.group.tolerances[field] === key,
+								async onclick() {
+									if (!currentSettings) return;
+									await setSettings('group', {
+										tolerances: {
+											...currentSettings.group.tolerances,
+											[field]: key
+										}
+									});
+								}
+							}))
+						}
+					}))
+			}),
 			...orEmpty(uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
 				testid: `${tab}-settings-inference-model`,
@@ -263,7 +298,7 @@
 				<IconSelect />
 			</ButtonIcon>
 		{/snippet}
-		{#snippet item({ direction }, { label, selected, type })}
+		{#snippet item({ direction, icon }, { label, selected, type })}
 			<div class="icon">
 				{#if selected && direction === 'asc'}
 					<IconSortDesc />
@@ -273,7 +308,12 @@
 					<IconCheck />
 				{/if}
 			</div>
-			<div class="label">{label}</div>
+			<div class="label">
+				{#if icon}
+					<code>{icon}</code>
+				{/if}
+				{label}
+			</div>
 			<div class="icon">
 				{#if type === 'submenu'}
 					<IconSubmenu />
@@ -297,6 +337,12 @@
 		justify-content: center;
 		align-items: center;
 		color: var(--fg-primary);
+	}
+
+	.label code {
+		display: inline-flex;
+		font-size: 0.8em;
+		width: 5ch;
 	}
 
 	.label {
