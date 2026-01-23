@@ -1,0 +1,560 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "sw-version",
+          "value": "dev"
+        },
+        {
+          "name": "app_started_before",
+          "value": "true"
+        }
+      ],
+      "indexedDB": [
+        {
+          "name": "database",
+          "version": 5,
+          "stores": [
+            {
+              "name": "Image",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "value": {
+                    "id": "01KFM4HWFKG36GM9P5P47APHE2_000000",
+                    "sessionId": "snlxgnxd",
+                    "filename": "cyan.jpeg",
+                    "addedAt": "2026-01-23T00:37:33Z",
+                    "contentType": "image/jpeg",
+                    "dimensions": {
+                      "width": 224,
+                      "height": 224
+                    },
+                    "fileId": "01KFM4HWFKG36GM9P5P47APHE2",
+                    "metadata": {}
+                  }
+                },
+                {
+                  "value": {
+                    "id": "01KFM4HWQPRN7E72N70RCTM7MM_000000",
+                    "sessionId": "snlxgnxd",
+                    "filename": "leaf.jpeg",
+                    "addedAt": "2026-01-23T00:37:33Z",
+                    "contentType": "image/jpeg",
+                    "dimensions": {
+                      "width": 224,
+                      "height": 224
+                    },
+                    "fileId": "01KFM4HWQPRN7E72N70RCTM7MM",
+                    "metadata": {}
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "name": "addedAt",
+                  "keyPath": "addedAt",
+                  "multiEntry": false,
+                  "unique": false
+                },
+                {
+                  "name": "sessionId",
+                  "keyPath": "sessionId",
+                  "multiEntry": false,
+                  "unique": false
+                }
+              ]
+            },
+            {
+              "name": "ImageFile",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "valueEncoded": {
+                    "o": [
+                      {
+                        "k": "id",
+                        "v": "01KFM4HWFKG36GM9P5P47APHE2"
+                      },
+                      {
+                        "k": "bytes",
+                        "v": {
+                          "o": [],
+                          "id": 2
+                        }
+                      },
+                      {
+                        "k": "contentType",
+                        "v": "image/jpeg"
+                      },
+                      {
+                        "k": "filename",
+                        "v": "cyan.jpeg"
+                      },
+                      {
+                        "k": "dimensions",
+                        "v": {
+                          "o": [
+                            {
+                              "k": "width",
+                              "v": 224
+                            },
+                            {
+                              "k": "height",
+                              "v": 224
+                            }
+                          ],
+                          "id": 3
+                        }
+                      },
+                      {
+                        "k": "sessionId",
+                        "v": "snlxgnxd"
+                      }
+                    ],
+                    "id": 1
+                  }
+                },
+                {
+                  "valueEncoded": {
+                    "o": [
+                      {
+                        "k": "id",
+                        "v": "01KFM4HWQPRN7E72N70RCTM7MM"
+                      },
+                      {
+                        "k": "bytes",
+                        "v": {
+                          "o": [],
+                          "id": 2
+                        }
+                      },
+                      {
+                        "k": "contentType",
+                        "v": "image/jpeg"
+                      },
+                      {
+                        "k": "filename",
+                        "v": "leaf.jpeg"
+                      },
+                      {
+                        "k": "dimensions",
+                        "v": {
+                          "o": [
+                            {
+                              "k": "width",
+                              "v": 224
+                            },
+                            {
+                              "k": "height",
+                              "v": 224
+                            }
+                          ],
+                          "id": 3
+                        }
+                      },
+                      {
+                        "k": "sessionId",
+                        "v": "snlxgnxd"
+                      }
+                    ],
+                    "id": 1
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "name": "sessionId",
+                  "keyPath": "sessionId",
+                  "multiEntry": false,
+                  "unique": false
+                }
+              ]
+            },
+            {
+              "name": "ImagePreviewFile",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "valueEncoded": {
+                    "o": [
+                      {
+                        "k": "id",
+                        "v": "01KFM4HWFKG36GM9P5P47APHE2"
+                      },
+                      {
+                        "k": "bytes",
+                        "v": {
+                          "o": [],
+                          "id": 2
+                        }
+                      },
+                      {
+                        "k": "contentType",
+                        "v": "image/jpeg"
+                      },
+                      {
+                        "k": "filename",
+                        "v": "cyan.jpeg"
+                      },
+                      {
+                        "k": "dimensions",
+                        "v": {
+                          "o": [
+                            {
+                              "k": "width",
+                              "v": 224
+                            },
+                            {
+                              "k": "height",
+                              "v": 224
+                            }
+                          ],
+                          "id": 3
+                        }
+                      },
+                      {
+                        "k": "sessionId",
+                        "v": "snlxgnxd"
+                      }
+                    ],
+                    "id": 1
+                  }
+                },
+                {
+                  "valueEncoded": {
+                    "o": [
+                      {
+                        "k": "id",
+                        "v": "01KFM4HWQPRN7E72N70RCTM7MM"
+                      },
+                      {
+                        "k": "bytes",
+                        "v": {
+                          "o": [],
+                          "id": 2
+                        }
+                      },
+                      {
+                        "k": "contentType",
+                        "v": "image/jpeg"
+                      },
+                      {
+                        "k": "filename",
+                        "v": "leaf.jpeg"
+                      },
+                      {
+                        "k": "dimensions",
+                        "v": {
+                          "o": [
+                            {
+                              "k": "width",
+                              "v": 224
+                            },
+                            {
+                              "k": "height",
+                              "v": 224
+                            }
+                          ],
+                          "id": 3
+                        }
+                      },
+                      {
+                        "k": "sessionId",
+                        "v": "snlxgnxd"
+                      }
+                    ],
+                    "id": 1
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "name": "sessionId",
+                  "keyPath": "sessionId",
+                  "multiEntry": false,
+                  "unique": false
+                }
+              ]
+            },
+            {
+              "name": "Metadata",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__bool",
+                    "description": "boolean metadata",
+                    "label": "bool",
+                    "mergeMethod": "average",
+                    "required": false,
+                    "type": "boolean",
+                    "groupable": false,
+                    "sortable": false
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__crop",
+                    "type": "boundingbox",
+                    "description": "",
+                    "label": "crop",
+                    "mergeMethod": "union",
+                    "required": false,
+                    "groupable": false,
+                    "sortable": false
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__date",
+                    "description": "date metadata",
+                    "label": "date",
+                    "mergeMethod": "average",
+                    "required": false,
+                    "type": "date",
+                    "groupable": false,
+                    "sortable": false
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__enum",
+                    "description": "enum metadata",
+                    "label": "enum",
+                    "mergeMethod": "average",
+                    "required": false,
+                    "type": "enum",
+                    "groupable": false,
+                    "sortable": false
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__float",
+                    "description": "float metadata",
+                    "label": "float",
+                    "mergeMethod": "average",
+                    "required": false,
+                    "type": "float",
+                    "groupable": false,
+                    "sortable": false
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__integer",
+                    "description": "integer metadata",
+                    "label": "integer",
+                    "mergeMethod": "average",
+                    "required": false,
+                    "type": "integer",
+                    "groupable": false,
+                    "sortable": false
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__location",
+                    "description": "location metadata",
+                    "label": "location",
+                    "mergeMethod": "average",
+                    "required": false,
+                    "type": "location",
+                    "groupable": false,
+                    "sortable": false
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__string",
+                    "description": "string metadata",
+                    "label": "string",
+                    "mergeMethod": "average",
+                    "required": false,
+                    "type": "string",
+                    "groupable": false,
+                    "sortable": false
+                  }
+                }
+              ],
+              "indexes": []
+            },
+            {
+              "name": "MetadataOption",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__enum:one",
+                    "metadataId": "io.github.cigaleapp.kitchensink__enum",
+                    "index": 0,
+                    "description": "Option 1",
+                    "key": "one",
+                    "label": "One",
+                    "synonyms": []
+                  }
+                },
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink__enum:two",
+                    "metadataId": "io.github.cigaleapp.kitchensink__enum",
+                    "index": 1,
+                    "description": "Option 2",
+                    "key": "two",
+                    "label": "Two",
+                    "synonyms": []
+                  }
+                }
+              ],
+              "indexes": []
+            },
+            {
+              "name": "Observation",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [],
+              "indexes": [
+                {
+                  "name": "addedAt",
+                  "keyPath": "addedAt",
+                  "multiEntry": false,
+                  "unique": false
+                },
+                {
+                  "name": "sessionId",
+                  "keyPath": "sessionId",
+                  "multiEntry": false,
+                  "unique": false
+                }
+              ]
+            },
+            {
+              "name": "Protocol",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "value": {
+                    "id": "io.github.cigaleapp.kitchensink",
+                    "name": "Kitchen sink",
+                    "description": "Made to demo all of the available data types and features that are supported by CIGALE protocols.",
+                    "authors": [
+                      {
+                        "name": "Gwenn Le Bihan"
+                      }
+                    ],
+                    "metadata": [
+                      "io.github.cigaleapp.kitchensink__crop",
+                      "io.github.cigaleapp.kitchensink__bool",
+                      "io.github.cigaleapp.kitchensink__date",
+                      "io.github.cigaleapp.kitchensink__enum",
+                      "io.github.cigaleapp.kitchensink__float",
+                      "io.github.cigaleapp.kitchensink__integer",
+                      "io.github.cigaleapp.kitchensink__string",
+                      "io.github.cigaleapp.kitchensink__location"
+                    ],
+                    "crop": {
+                      "metadata": "crop",
+                      "padding": "0px"
+                    },
+                    "sessionMetadata": []
+                  }
+                }
+              ],
+              "indexes": []
+            },
+            {
+              "name": "Session",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "value": {
+                    "name": "Session du 23/01/2026",
+                    "description": "",
+                    "protocol": "io.github.cigaleapp.kitchensink",
+                    "createdAt": "2026-01-23T00:37:32.810Z",
+                    "openedAt": "2026-01-23T00:37:33.035Z",
+                    "metadata": {},
+                    "group": {
+                      "global": {
+                        "field": "none"
+                      },
+                      "crop": {
+                        "field": "metadataPresence",
+                        "metadata": "crop"
+                      },
+                      "classify": {
+                        "field": "none"
+                      }
+                    },
+                    "sort": {
+                      "global": {
+                        "field": "name",
+                        "direction": "asc"
+                      }
+                    },
+                    "id": "snlxgnxd"
+                  }
+                }
+              ],
+              "indexes": []
+            },
+            {
+              "name": "Settings",
+              "autoIncrement": false,
+              "keyPath": "id",
+              "records": [
+                {
+                  "value": {
+                    "id": "defaults",
+                    "protocols": [],
+                    "theme": "auto",
+                    "gridSize": 1,
+                    "language": "fr",
+                    "showInputHints": true,
+                    "showTechnicalMetadata": true,
+                    "cropAutoNext": false,
+                    "gallerySort": {
+                      "key": "date",
+                      "direction": "asc"
+                    }
+                  }
+                },
+                {
+                  "value": {
+                    "id": "user",
+                    "protocols": [],
+                    "theme": "auto",
+                    "gridSize": 1,
+                    "language": "fr",
+                    "showInputHints": true,
+                    "showTechnicalMetadata": true,
+                    "cropAutoNext": false,
+                    "gallerySort": {
+                      "key": "date",
+                      "direction": "asc"
+                    },
+                    "parallelism": 4,
+                    "autoUpdateProtocols": {},
+                    "notifications": null
+                  }
+                }
+              ],
+              "indexes": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
