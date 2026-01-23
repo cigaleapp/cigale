@@ -14,13 +14,7 @@
 		removeNamespaceFromMetadataId,
 		type MetadataInferOptionsNeural
 	} from '$lib/schemas/metadata';
-	import {
-		GROUP_FIELDS,
-		GroupSettings,
-		SORT_FIELDS,
-		sortOrGroupFieldNeedsMetadata,
-		SortSettings
-	} from '$lib/schemas/sessions';
+	import { GROUP_FIELDS, GroupSettings, SORT_FIELDS, SortSettings } from '$lib/schemas/sessions';
 	import { uiState } from '$lib/state.svelte';
 	import { entries, orEmpty } from '$lib/utils';
 
@@ -84,36 +78,45 @@
 			: undefined
 	);
 
-	async function setSettings<Task extends 'sort' | 'group'>(
-		task: Task,
-		settings: Partial<
-			Task extends 'sort' ? typeof SortSettings.infer : typeof GroupSettings.infer
-		>
+	async function setSettings(
+		...[task, settings]:
+			| ['sort', Partial<typeof SortSettings.infer>]
+			| ['group', Partial<typeof GroupSettings.infer>]
 	) {
 		if (!uiState.currentSession) return;
 		if (!currentSettings) return;
 
-		const updated = {
-			...currentSettings[task],
-			...settings
-		};
-
-		if (sortOrGroupFieldNeedsMetadata(task, updated.field) && !updated.metadata) {
-			console.warn('Not updating in DB yet, user needs to select metadata too');
-			return;
-		}
-
 		if (task === 'sort') {
+			const updated = {
+				...currentSettings.sort,
+				...settings
+			};
+
+			if (!updated.metadata && SORT_FIELDS[updated.field].needsMetadata) {
+				console.warn('Tried to set sort field that needs metadata without metadata id');
+				return;
+			}
+
 			const value = $state.snapshot({
 				...uiState.currentSession.sort,
-				[tab]: { direction: 'asc', ...updated }
+				[tab]: updated
 			});
 
 			await tables.Session.update(uiState.currentSession.id, 'sort', value);
 		} else {
+			const updated = {
+				...currentSettings.group,
+				...settings
+			};
+
+			if (!updated.metadata && GROUP_FIELDS[updated.field].needsMetadata) {
+				console.warn('Tried to set group field that needs metadata without metadata id');
+				return;
+			}
+
 			const value = $state.snapshot({
 				...uiState.currentSession.group,
-				[tab]: { ...updated }
+				[tab]: updated
 			});
 
 			await tables.Session.update(uiState.currentSession.id, 'group', value);
@@ -133,7 +136,7 @@
 					const field = currentSettings?.sort.field;
 					const metadata = currentSettings?.sort.metadata;
 					const selected = field === key;
-					const needsMetadata = sortOrGroupFieldNeedsMetadata('sort', key);
+					const needsMetadata = SORT_FIELDS[key].needsMetadata;
 
 					if (needsMetadata) {
 						return {
@@ -195,7 +198,7 @@
 					const field = currentSettings?.group.field;
 					const metadata = currentSettings?.group.metadata;
 					const selected = field === key;
-					const needsMetadata = sortOrGroupFieldNeedsMetadata('group', key);
+					const needsMetadata = GROUP_FIELDS[key].needsMetadata;
 
 					if (needsMetadata) {
 						return {

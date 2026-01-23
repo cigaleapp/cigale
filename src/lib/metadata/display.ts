@@ -2,6 +2,8 @@ import { type } from 'arktype';
 import * as dates from 'date-fns';
 
 import * as DB from '$lib/database';
+import type { RuntimeValue } from '$lib/schemas/metadata';
+import { round } from '$lib/utils';
 
 /**
  * Adds valueLabel to each metadata value object when the metadata is an enum.
@@ -32,16 +34,25 @@ export async function addValueLabels(
  * @param metadata the metadata definition
  * @param value the value of the metadata
  * @param valueLabel the label of the value, if applicable (e.g. for enums)
+ * @param precision number of decimal places to use for float values of bounding box. set to undefined to not limit decimal places.
  */
-export function metadataPrettyValue(
-	language: import('$lib/i18n.js').Language,
-	metadata: Pick<DB.Metadata, 'type'>,
-	value: DB.MetadataValue['value'] | null,
-	valueLabel: string | undefined = undefined
+export function metadataPrettyValue<Type extends DB.MetadataType>(
+	value: RuntimeValue<Type> | null,
+	{
+		language,
+		type: metadataType,
+		valueLabel,
+		boundingBoxPrecision = 2
+	}: {
+		language: import('$lib/i18n.js').Language;
+		type: Type;
+		valueLabel?: string | undefined;
+		boundingBoxPrecision?:  number | 'unbounded' | undefined;
+	}
 ) {
 	if (value === null) return '';
 
-	switch (metadata.type) {
+	switch (metadataType) {
 		case 'boolean':
 			switch (language) {
 				case 'fr':
@@ -66,20 +77,28 @@ export function metadataPrettyValue(
 		}
 
 		case 'boundingbox': {
-			const {
-				x: x1,
-				y: y1,
-				w,
-				h
-			} = type({ x: 'number', y: 'number', h: 'number', w: 'number' }).assert(value);
+			const { x, y, w, h } = type({
+				x: 'number',
+				y: 'number',
+				h: 'number',
+				w: 'number'
+			}).assert(value);
 
-			const point = (x: number, y: number) => `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+			const coord = (v: number) =>
+				boundingBoxPrecision === 'unbounded'
+					? v.toString()
+					: round(v, boundingBoxPrecision)
+
+			const point = (x: number, y: number) => `(${coord(x)}, ${coord(y)})`;
+
+			const start = point(x, y);
+			const end = point(x + w, y + h);
 
 			switch (language) {
 				case 'fr':
-					return `Boîte de ${point(x1, y1)} à ${point(x1 + w, y1 + h)}`;
+					return `Boîte de ${start} à ${end}`;
 				default:
-					return `Box from ${point(x1, y1)} to ${point(x1 + w, y1 + h)}`;
+					return `Box from ${start} to ${end}`;
 			}
 		}
 
@@ -103,28 +122,49 @@ if (import.meta.vitest) {
 			});
 
 			test('booleans', () => {
-				expect(metadataPrettyValue('fr', { type: 'boolean' }, true)).toBe('Oui');
-				expect(metadataPrettyValue('fr', { type: 'boolean' }, false)).toBe('Non');
+				expect(metadataPrettyValue(true, { type: 'boolean', language: 'fr' })).toBe('Oui');
+				expect(metadataPrettyValue(false, { type: 'boolean', language: 'fr' })).toBe('Non');
 			});
 
 			test('dates', () => {
 				expect(
-					metadataPrettyValue('fr', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))
+					metadataPrettyValue(new Date('2023-02-01T15:04:05Z'), {
+						type: 'date',
+						language: 'fr'
+					})
 				).toBe('01/02/2023, 15:04:05');
 			});
 
 			test('floats', () => {
-				expect(metadataPrettyValue('fr', { type: 'float' }, 12012.34)).toBe('12 012,34');
+				expect(metadataPrettyValue(12012.34, { type: 'float', language: 'fr' })).toBe(
+					'12 012,34'
+				);
 			});
 
-			test('bounding boxes', () => {
-				expect(
-					metadataPrettyValue('fr', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
-				).toBe('Boîte de (1.00, 2.00) à (4.00, 6.00)');
+			describe('bounding boxes', () => {
+				const box = { x: 1, y: 2.005, w: 3, h: 4 };
+
+				test('with default precision', () => {
+					expect(metadataPrettyValue(box, { type: 'boundingbox', language: 'fr' })).toBe(
+						'Boîte de (1, 2.01) à (4, 6.01)'
+					);
+				});
+
+				test('with unbounded precision', () => {
+					expect(
+						metadataPrettyValue(box, {
+							type: 'boundingbox',
+							language: 'fr',
+							boundingBoxPrecision: 'unbounded'
+						})
+					).toBe('Boîte de (1, 2.005) à (4, 6.005)');
+				});
 			});
 
 			test('integers', () => {
-				expect(metadataPrettyValue('fr', { type: 'integer' }, 12012)).toBe('12\u202F012');
+				expect(metadataPrettyValue(12012, { type: 'integer', language: 'fr' })).toBe(
+					'12\u202F012'
+				);
 			});
 		});
 
@@ -135,57 +175,84 @@ if (import.meta.vitest) {
 			});
 
 			test('booleans', () => {
-				expect(metadataPrettyValue('en', { type: 'boolean' }, true)).toBe('Yes');
-				expect(metadataPrettyValue('en', { type: 'boolean' }, false)).toBe('No');
+				expect(metadataPrettyValue(true, { type: 'boolean', language: 'en' })).toBe('Yes');
+				expect(metadataPrettyValue(false, { type: 'boolean', language: 'en' })).toBe('No');
 			});
 
 			test('dates', () => {
 				expect(
-					metadataPrettyValue('en', { type: 'date' }, new Date('2023-02-01T15:04:05Z'))
+					metadataPrettyValue(new Date('2023-02-01T15:04:05Z'), {
+						type: 'date',
+						language: 'en'
+					})
 				).toBe('02/01/2023, 3:04:05 PM');
 			});
 
-			test('bounding boxes', () => {
-				expect(
-					metadataPrettyValue('en', { type: 'boundingbox' }, { x: 1, y: 2, w: 3, h: 4 })
-				).toBe('Box from (1.00, 2.00) to (4.00, 6.00)');
+			describe('bounding boxes', () => {
+				const box = { x: 1, y: 2.005, w: 3, h: 4 };
+
+				test('with default precision', () => {
+					expect(metadataPrettyValue(box, { type: 'boundingbox', language: 'en' })).toBe(
+						'Box from (1, 2.01) to (4, 6.01)'
+					);
+				});
+
+				test('with unbounded precision', () => {
+					expect(
+						metadataPrettyValue(box, {
+							type: 'boundingbox',
+							language: 'en',
+							boundingBoxPrecision: 'unbounded'
+						})
+					).toBe('Box from (1, 2.005) to (4, 6.005)');
+				});
 			});
 
 			test('floats', () => {
-				expect(metadataPrettyValue('en', { type: 'float' }, 12012.34)).toBe('12,012.34');
+				expect(metadataPrettyValue(12012.34, { type: 'float', language: 'en' })).toBe(
+					'12,012.34'
+				);
 			});
 
 			test('integers', () => {
-				expect(metadataPrettyValue('en', { type: 'integer' }, 12012)).toBe('12,012');
+				expect(metadataPrettyValue(12012, { type: 'integer', language: 'en' })).toBe(
+					'12,012'
+				);
 			});
 		});
 
 		test('locations', () => {
 			expect(
 				metadataPrettyValue(
-					'fr',
-					{ type: 'location' },
-					{ latitude: 12.34, longitude: 56.78 }
+					{ latitude: 12.34, longitude: 56.78 },
+					{ type: 'location', language: 'fr' }
 				)
 			).toBe('12.34, 56.78');
 			expect(
 				metadataPrettyValue(
-					'en',
-					{ type: 'location' },
-					{ latitude: 12.34, longitude: 56.78 }
+					{ latitude: 12.34, longitude: 56.78 },
+					{ type: 'location', language: 'en' }
 				)
 			).toBe('12.34, 56.78');
 		});
 
 		test('enums', () => {
-			expect(metadataPrettyValue('en', { type: 'enum' }, 'value1', 'Label 1')).toBe(
-				'Label 1'
-			);
-			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value1', 'Label 1')).toBe(
-				'Label 1'
-			);
-			expect(metadataPrettyValue('en', { type: 'enum' }, 'value2')).toBe('value2');
-			expect(metadataPrettyValue('fr', { type: 'enum' }, 'value2')).toBe('value2');
+			expect(
+				metadataPrettyValue('value1', {
+					language: 'en',
+					type: 'enum',
+					valueLabel: 'Label 1'
+				})
+			).toBe('Label 1');
+			expect(
+				metadataPrettyValue('value1', {
+					language: 'fr',
+					type: 'enum',
+					valueLabel: 'Label 1'
+				})
+			).toBe('Label 1');
+			expect(metadataPrettyValue('value2', { language: 'en', type: 'enum' })).toBe('value2');
+			expect(metadataPrettyValue('value2', { language: 'fr', type: 'enum' })).toBe('value2');
 		});
 	});
 }
