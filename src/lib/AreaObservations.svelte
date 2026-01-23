@@ -36,6 +36,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { deleteObservation } from './observations.js';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
+	import { toasts } from './toasts.svelte';
 	import { compareBy, entries } from './utils.js';
 
 	/**
@@ -159,9 +160,15 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	$effect(() => {
 		if (!groupingSettings) return;
 
-		void (async () => {
-			grouper = await galleryItemsGrouper(groupingSettings);
-		})();
+		void galleryItemsGrouper(groupingSettings)
+			.then((result) => {
+				grouper = result;
+			})
+			.catch((e) => {
+				console.error('couldnt set grouper', e);
+				toasts.error('Impossible de regrouper avec les paramètres choisis');
+				grouper = null;
+			});
 	});
 
 	/**
@@ -176,9 +183,15 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	$effect(() => {
 		if (!sortingSettings) return;
 
-		void (async () => {
-			sorter = await galleryItemsSorter(sortingSettings);
-		})();
+		void galleryItemsSorter(sortingSettings)
+			.then((result) => {
+				sorter = result;
+			})
+			.catch((e) => {
+				console.error('couldnt set sorter', e);
+				toasts.error('Impossible de trier avec les paramètres choisis');
+				sorter = compareBy('id')
+			});
 	});
 
 	/**
