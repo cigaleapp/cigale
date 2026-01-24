@@ -1,0 +1,74 @@
+name: Clean dev deployments
+
+permissions: 
+  pull-requests: read
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Every day at midnight
+  workflow_dispatch:
+
+env:
+  HOST: gwen.works
+
+jobs:
+  clean:
+    name: Clean
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Install gh CLI
+        run: sudo apt-get install gh -y
+
+      - name: Create SSH identity
+        env: 
+          PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
+          USERNAME: cigale
+          HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
+        run: |
+          key=~/.ssh/dev-deployments-key
+
+          echo Recreating keypair from private key...
+          mkdir -p $(dirname $key)
+          echo "$PRIVATE_KEY" > $key
+          chmod 600 $key
+          ssh-keygen -f $key -y > $key.pub
+          echo Public key is $(cat $key.pub)
+
+          cat <<EOF > ~/.ssh/config
+            Host dev-deployments
+              HostName $HOST
+              User $USERNAME
+              IdentityFile $key
+          EOF
+          echo Wrote config file: $(cat ~/.ssh/config)
+
+          echo Adding server host key to known_hosts...
+          echo "$HOST $HOST_KEY" >> ~/.ssh/known_hosts
+
+          echo Setting up SSH connection to server...
+          ssh -vvT dev-deployments "echo OK"
+
+      - name: Remove stale deployments
+        env:
+          REPO_PR_URL: ${{ github.event.repository.html_url }}/pull
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+
+          open_prs=$(gh -R ${{ github.repository }} pr list --state open --json number --jq '.[].number')
+          echo Open PRs: $open_prs
+
+          directories=$(ssh dev-deployments "ls -1d www/pr-*/")
+          echo Directories to check: $directories
+
+          for directory in $directories; do
+            number=$(basename "$directory" | cut -d'-' -f2)
+            if ! echo "$open_prs" | grep -q "$number"; then
+              echo "💢 $REPO_PR_URL/$number: $directory removed, as $number does not match any open PR"
+              ssh dev-deployments "rm -rf www/pr-$number"
+            else
+              echo "⏭️ $REPO_PR_URL/$number: $directory kept as $number is still open"
+            fi
+          done

@@ -53,6 +53,7 @@ jobs:
     needs: build
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
+    secrets: inherit
     with:
       publish-report: false
       compare-coverage: false
@@ -62,6 +63,7 @@ jobs:
     needs: test
     name: Check coverage
     uses: ./.github/workflows/vitest.yml
+    secrets: inherit
     with:
       compare-coverage: true
 
@@ -69,6 +71,7 @@ jobs:
     needs: [build, json-schema, lint, test]
     name: E2E
     uses: ./.github/workflows/playwright.yml
+    secrets: inherit
     with:
       artifact: ${{ needs.build.outputs.artifact }}
 
@@ -83,6 +86,7 @@ jobs:
     needs: [json-schema, build]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
+    secrets: inherit
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'

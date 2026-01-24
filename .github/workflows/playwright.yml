@@ -1,7 +1,15 @@
 name: End-to-end tests
 
+permissions: 
+  actions: write
+  contents: read
+
 on:
   workflow_call:
+    secrets:
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
+        required: true
+        description: 'SSH private key for deploying to dev deployments server'
     inputs:
       artifact:
         type: string
@@ -89,11 +97,6 @@ jobs:
     needs: test
     # run even if tests fail
     if: always()
-    environment:
-      name: '#${{ github.event.number }}: End-to-end tests report'
-      # #?show-metadata-other allows showing extra metadata sections in the report
-      # Ref: https://github.com/microsoft/playwright/blob/e76ca6c/packages/html-reporter/src/metadataView.tsx#L62
-      url: '${{ steps.deploy-preview.outputs.preview-url }}#?show-metadata-other'
     name: Combine reports
     steps:
       - uses: actions/checkout@v6
@@ -110,11 +113,26 @@ jobs:
       - name: Merge sharded reports into HTML
         run: bunx playwright merge-reports --reporter html ./playwright-report-shards
 
-      - name: Deploy results on github pages
+      - name: Save report
         if: ${{ !cancelled() }}
-        id: deploy-preview
-        uses: rossjrw/pr-preview-action@v1
+        uses: actions/upload-artifact@v6
         with:
-          source-dir: ./playwright-report
-          umbrella-dir: _playwright
-          comment: false
+          name: report
+          path: ./playwright-report
+          retention-days: 1
+
+  upload-report:
+    # run even if tests fail
+    if: always()
+    name: Upload report
+    needs: combine-reports
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: '#${{ github.event.number }}: E2E tests'
+      artifact: report
+      subdomain: pr-${{ github.event.number }}-reports
+      path: /playwright
+      # #?show-metadata-other allows showing extra metadata sections in the report
+      # Ref: https://github.com/microsoft/playwright/blob/e76ca6c/packages/html-reporter/src/metadataView.tsx#L62
+      environment-url-append: '#?show-metadata-other'
