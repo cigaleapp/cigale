@@ -103,6 +103,25 @@ test.describe('grouping', () => {
 		'Ordre: confiance à 25%-50%': ['cyan.jpeg'],
 		'Sans Ordre': ['lil-fella.jpeg']
 	});
+
+	test('collapse and expand groups', async ({ page }) => {
+		await chooseInDropdown(
+			page,
+			page.getByRole('button', { name: "Réglages d'import" }),
+			'Regrouper par…',
+			'Métadonnée…',
+			'Ordre'
+		);
+
+		const group = page.locator('main').getByRole('region', { name: 'Ordre = Symphypleona' });
+		const leaf = page.locator('main').getByRole('article', { name: 'leaf.jpeg' });
+
+		await expect(leaf).toBeVisible();
+		await group.getByRole('button', { name: 'Réduire le groupe' }).click();
+		await expect(leaf).not.toBeVisible();
+		await group.getByRole('button', { name: 'Développer le groupe' }).click();
+		await expect(leaf).toBeVisible();
+	});
 });
 
 function testCardsOrder<Label extends Exclude<keyof SortFieldByLabel, 'ID'>>(
