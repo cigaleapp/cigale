@@ -590,10 +590,6 @@ msgstr "Updating…"
 msgid "Mode debug"
 msgstr "Debug mode"
 
-#: src/routes/(app)/Navigation.svelte
-msgid "Modèle d'inférence"
-msgstr "Inference model"
-
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Nettoyer la base de données"
 msgstr "Clean up database"
@@ -607,7 +603,6 @@ msgid "Nom de l'observation"
 msgstr "Observation name"
 
 #: src/lib/MetadataInput.svelte
-#: src/lib/metadata.js
 msgid "Non"
 msgstr "No"
 
@@ -616,17 +611,12 @@ msgid "Nouvelle observation"
 msgstr "New observation"
 
 #: src/lib/MetadataInput.svelte
-#: src/lib/metadata.js
 msgid "Oui"
 msgstr "Yes"
 
 #: src/lib/ModalConfirmDeletion.svelte
 msgid "Oui, supprimer"
 msgstr "Yes, delete"
-
-#: src/routes/(app)/Settings.svelte
-msgid "Par quoi trier"
-msgstr "What to sort on"
 
 #: src/routes/(app)/about/+page.svelte
 msgid "Parallélisme"
@@ -795,10 +785,6 @@ msgstr "Deselect all"
 #: src/lib/AreaObservations.svelte
 msgid "Tout sélectionner"
 msgstr "Select all"
-
-#: src/routes/(app)/Settings.svelte
-msgid "Trier les images par"
-msgstr "Sort images by"
 
 #: src/routes/(app)/PrepareForOffline.svelte
 msgid ""
@@ -1785,38 +1771,6 @@ msgstr "Metadata {0} created"
 msgid "Valeur invalide : {0}"
 msgstr "Invalide value : {0}"
 
-#: src/lib/metadata.js
-msgid "Yes"
-msgstr "Yes"
-
-#: src/lib/metadata.js
-msgid "No"
-msgstr "No"
-
-#: src/lib/metadata.js
-msgid "Ppp"
-msgstr ""
-
-#. placeholder {0}: x1
-#. placeholder {1}: y1
-#. placeholder {2}: x1 + w
-#. placeholder {3}: y1 + h
-#: src/lib/metadata.js
-msgid "Boîte de ({0}, {1}) à ({2}, {3})"
-msgstr "Box from ({0}, {1}) to ({2}, {3})"
-
-#. placeholder {0}: x1
-#. placeholder {1}: y1
-#. placeholder {2}: x1 + w
-#. placeholder {3}: y1 + h
-#: src/lib/metadata.js
-msgid "Box from ({0}, {1}) to ({2}, {3})"
-msgstr "Box from ({0}, {1}) to ({2}, {3})"
-
-#: src/lib/metadata.js
-msgid "Date"
-msgstr "Date"
-
 #: src/routes/(app)/+layout.js
 msgid "Initialisation de la base de données…"
 msgstr "Initializing database…"
@@ -2126,6 +2080,38 @@ msgstr ""
 #. placeholder {0}: updates[0].name
 #: src/routes/(app)/+layout.js
 msgid "Le protocole \"{0}\" a été mis à jour"
+msgstr ""
+
+#: src/lib/AreaObservations.svelte
+msgid "Impossible de regrouper avec les paramètres choisis"
+msgstr ""
+
+#: src/lib/AreaObservations.svelte
+msgid "Impossible de trier avec les paramètres choisis"
+msgstr ""
+
+#: src/lib/AreaObservations.svelte
+msgid "Tri en cours…"
+msgstr ""
+
+#: src/lib/InputSelectProtocol.svelte
+msgid "Choisir un protocole"
+msgstr ""
+
+#: src/lib/MetadataInput.svelte
+msgid "Mismatch"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Réglages d'import"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Réglages de recadrage"
+msgstr ""
+
+#: src/routes/(app)/Navigation.svelte
+msgid "Réglages de classification"
 msgstr ""
 
 #: src/lib/queue.svelte.js
