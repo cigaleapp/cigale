@@ -16,6 +16,7 @@
 	} from '$lib/schemas/metadata';
 	import {
 		GROUP_FIELDS,
+		GROUPING_TOLERANCES,
 		GroupSettings,
 		SORT_FIELDS,
 		sortOrGroupFieldNeedsMetadata,
@@ -26,12 +27,13 @@
 
 	interface Props {
 		tab: 'crop' | 'classify' | 'import';
+		label: string;
 		models: (typeof MetadataInferOptionsNeural.infer)['neural'];
 		currentModelIndex: number;
 		setModel: (_i: number) => Promise<void>;
 	}
 
-	const { tab, models, currentModelIndex, setModel }: Props = $props();
+	const { tab, models, currentModelIndex, setModel, label }: Props = $props();
 
 	const isOnTabItself = $derived.by(() => {
 		switch (page.route.id) {
@@ -244,7 +246,44 @@
 					};
 				})
 			},
-
+			...orEmpty(GROUP_FIELDS[currentSettings?.group.field ?? 'none'].needsTolerance, {
+				label: 'Précision des groupes',
+				testid: `${tab}-settings-group-tolerances`,
+				items: entries(GROUPING_TOLERANCES)
+					.filter(([, { affectedTypes }]) => {
+						if (!currentSettings?.group.metadata) return false;
+						const groupingByMetadata = tables.Metadata.getFromState(
+							currentSettings.group.metadata
+						);
+						if (!groupingByMetadata) return false;
+						return affectedTypes.includes(groupingByMetadata.type);
+					})
+					.map(([field, { options, label, help }]) => ({
+						type: 'submenu' as const,
+						data: { direction: null },
+						label,
+						submenu: {
+							label: help,
+							items: entries(options).map(([key, { scientific, casual }]) => ({
+								type: 'selectable' as const,
+								label: casual,
+								data: { direction: null, icon: scientific },
+								closeOnSelect: false,
+								key: scientific,
+								selected: currentSettings?.group.tolerances[field] === key,
+								async onclick() {
+									if (!currentSettings) return;
+									await setSettings('group', {
+										tolerances: {
+											...currentSettings.group.tolerances,
+											[field]: key
+										}
+									});
+								}
+							}))
+						}
+					}))
+			}),
 			...orEmpty(uiState.currentProtocol && models.length > 0, {
 				label: "Modèle d'inférence",
 				testid: `${tab}-settings-inference-model`,
@@ -256,11 +295,11 @@
 		]}
 	>
 		{#snippet trigger(props)}
-			<ButtonIcon help="" {...props}>
+			<ButtonIcon help={label} {...props}>
 				<IconSelect />
 			</ButtonIcon>
 		{/snippet}
-		{#snippet item({ direction }, { label, selected, type })}
+		{#snippet item({ direction, icon }, { label, selected, type })}
 			<div class="icon">
 				{#if selected && direction === 'asc'}
 					<IconSortDesc />
@@ -270,7 +309,12 @@
 					<IconCheck />
 				{/if}
 			</div>
-			<div class="label">{label}</div>
+			<div class="label">
+				{#if icon}
+					<code>{icon}</code>
+				{/if}
+				{label}
+			</div>
 			<div class="icon">
 				{#if type === 'submenu'}
 					<IconSubmenu />
@@ -294,6 +338,12 @@
 		justify-content: center;
 		align-items: center;
 		color: var(--fg-primary);
+	}
+
+	.label code {
+		display: inline-flex;
+		font-size: 0.8em;
+		width: 5ch;
 	}
 
 	.label {

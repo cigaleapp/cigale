@@ -870,6 +870,7 @@ if (import.meta.vitest) {
 	test('round', () => {
 		expect(round(1.2345)).toBe(1);
 		expect(round(1.5)).toBe(2);
+		expect(round(1.4, 1)).toBe(1.4);
 		expect(round(1.2345, 2)).toBe(1.23);
 		expect(round(1.2355, 2)).toBe(1.24);
 		expect(round(-1.2355, 2)).toBe(-1.24);

@@ -8,8 +8,8 @@ import { expect, test, type AppFixture } from './fixtures.js';
 import {
 	chooseFirstSession,
 	chooseInDropdown,
-	hoverOnDropdownOption,
-	loadDatabaseDump
+	loadDatabaseDump,
+	type Tuple
 } from './utils/index.js';
 
 const photos = [
@@ -103,6 +103,25 @@ test.describe('grouping', () => {
 		'Ordre: confiance à 25%-50%': ['cyan.jpeg'],
 		'Sans Ordre': ['lil-fella.jpeg']
 	});
+
+	test('collapse and expand groups', async ({ page }) => {
+		await chooseInDropdown(
+			page,
+			page.getByRole('button', { name: "Réglages d'import" }),
+			'Regrouper par…',
+			'Métadonnée…',
+			'Ordre'
+		);
+
+		const group = page.locator('main').getByRole('region', { name: 'Ordre = Symphypleona' });
+		const leaf = page.locator('main').getByRole('article', { name: 'leaf.jpeg' });
+
+		await expect(leaf).toBeVisible();
+		await group.getByRole('button', { name: 'Réduire le groupe' }).click();
+		await expect(leaf).not.toBeVisible();
+		await group.getByRole('button', { name: 'Développer le groupe' }).click();
+		await expect(leaf).toBeVisible();
+	});
 });
 
 function testCardsOrder<Label extends Exclude<keyof SortFieldByLabel, 'ID'>>(
@@ -117,32 +136,24 @@ function testCardsOrder<Label extends Exclude<keyof SortFieldByLabel, 'ID'>>(
 	}
 
 	test(label, async ({ page, app }) => {
+		const trigger = page.getByRole('button', { name: "Réglages d'import" });
+
+		let query: Tuple<string, 2 | 3> = ['Trier par', field];
+		if (metadata) {
+			const m = await app.db.metadata.get(metadata);
+			query = [...query, m!.label];
+		}
+
 		// Reset before choosing, otherwise itll reverse order instead of setting it
 		// We use 'ID' because it's never the field we're testing
-		await chooseInDropdown(page, 'import-settings', 'Trier par', 'ID');
-		await selectOption();
+		await chooseInDropdown(page, trigger, 'Trier par', 'ID');
+
+		await chooseInDropdown(page, trigger, ...query);
 		await expectCardsOrder(page.locator('main'), order);
 
-		await selectOption(); // re-select to reverse order
+		// re-select to reverse order
+		await chooseInDropdown(page, trigger, ...query);
 		await expectCardsOrder(page.locator('main'), order.toReversed());
-
-		async function selectOption() {
-			if (metadata) {
-				const metadataLabel = await app.db.metadata
-					.get(metadata)
-					.then((m) => m?.label ?? metadata.split('__')[1]);
-
-				await hoverOnDropdownOption(page, 'import-settings', 'Trier par', field);
-				await page
-					.getByTestId('import-settings-options')
-					.getByRole('group', { name: 'Métadonnée' })
-					.getByRole('menuitemcheckbox', { name: metadataLabel })
-					.click();
-				await page.keyboard.press('Escape');
-			} else {
-				await chooseInDropdown(page, 'import-settings', 'Trier par', field);
-			}
-		}
 	});
 }
 
@@ -159,19 +170,16 @@ function testCardsGroups<Field extends keyof GroupFieldByLabel>(
 	}
 
 	test(label, async ({ page, app }) => {
+		const trigger = page.getByRole('button', { name: "Réglages d'import" });
+
 		if (metadata) {
 			const metadataLabel = await app.db.metadata
 				.get(metadata)
 				.then((m) => m?.label ?? metadata.split('__')[1]);
 
-			await hoverOnDropdownOption(page, 'import-settings', 'Regrouper par', field);
-			await page
-				.getByTestId('import-settings-options')
-				.getByRole('group', { name: 'Métadonnée' })
-				.getByRole('menuitemcheckbox', { name: metadataLabel })
-				.click();
+			await chooseInDropdown(page, trigger, 'Regrouper par', field, metadataLabel);
 		} else {
-			await chooseInDropdown(page, 'import-settings', 'Regrouper par', field);
+			await chooseInDropdown(page, trigger, 'Regrouper par', field);
 		}
 
 		for (const [label, photos] of Object.entries(groupings)) {

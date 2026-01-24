@@ -3,7 +3,8 @@ import * as dates from 'date-fns';
 import type * as DB from '$lib/database.js';
 import { type Language } from '$lib/i18n';
 import { type RuntimeValue } from '$lib/schemas/metadata.js';
-import { fromEntries, groupBy, mapValues, round } from '$lib/utils.js';
+import { GROUPING_TOLERANCES, GroupSettings } from '$lib/schemas/sessions.js';
+import { fromEntries, groupBy, keys, mapValues, round } from '$lib/utils.js';
 
 import { metadataPrettyValue } from './display.js';
 import { switchOnMetadataType } from './types.js';
@@ -14,33 +15,46 @@ import { switchOnMetadataType } from './types.js';
  * @param  args.language the language to use for pretty-printing metadata values
  * @param  args.options the metadata options, if applicable (for enums)
  * @param  args.type the metadata type of the given values to group with
- * @param  [args.tolerances] tolerances to apply when comparing certain metadata types.
+ * @param  args.tolerances tolerances to apply when comparing certain metadata types.
  * @param  args.tolerances.date the granularity to consider when comparing date values
  * @param  args.tolerances.float number of decimal places to consider when comparing number values (ints or floats). If negative, rounds to powers of ten. Also used for location latitude/longitude values and bounding box coordinates.
  * @returns  a function to put a given value into a group, returning the serialized group key
  */
-export function metadataValueGrouper({
+export function metadataValueGrouper<Type extends DB.MetadataType>({
 	language,
 	type,
 	options = [],
-	tolerances = {
-		date: 'day',
-		float: 1
-	}
+	tolerances
 }: {
+	type: Type;
 	language: Language;
-	type: DB.MetadataType;
 	options?: DB.MetadataEnumVariant[];
-	tolerances?:
-		| undefined
-		| {
-				date: 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second';
-				float: number;
-		  };
+	tolerances?: undefined | (typeof GroupSettings)['infer']['tolerances'];
 }) {
-	const rnd = (v: number) => round(v, tolerances.float);
+	const decimalTolerance = tolerances
+		? {
+				giga: -9,
+				mega: -6,
+				kilo: -3,
+				deca: -1,
+				unit: 0,
+				deci: 1,
+				centi: 2,
+				milli: 3,
+				micro: 6,
+				nano: 9
+			}[tolerances.decimal]
+		: undefined;
+
+	const rnd = (v: number) => round(v, decimalTolerance!);
+
 	const display = (value: RuntimeValue) =>
-		metadataPrettyValue(language, { type }, value, options.find((o) => o.key === value)?.label);
+		metadataPrettyValue(value, {
+			type,
+			language,
+			valueLabel: options.find((o) => o.key === value)?.label,
+			boundingBoxPrecision: decimalTolerance
+		});
 
 	return (value: RuntimeValue) =>
 		switchOnMetadataType<string>(type, value, {
@@ -52,7 +66,7 @@ export function metadataValueGrouper({
 			boundingbox: (coords) => display(mapValues(coords, rnd)),
 			location: (coords) => display(mapValues(coords, rnd)),
 			date: (v) => {
-				switch (tolerances.date) {
+				switch (tolerances?.dates) {
 					case 'year':
 						return `Année ${dates.getYear(v)}`;
 					case 'month':
@@ -76,18 +90,9 @@ export function metadataValueGrouper({
 							hour: 'numeric',
 							minute: 'numeric'
 						}).format(v);
-					case 'second':
-						return new Intl.DateTimeFormat(language, {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-							hour: 'numeric',
-							minute: 'numeric',
-							second: 'numeric'
-						}).format(v);
 					default:
 						throw new Error(
-							`Invalid date tolerance: ${tolerances.date} (expected year, month, day, hour, minute or second)`
+							`Invalid date tolerance: ${tolerances?.dates} (expected ${keys(GROUPING_TOLERANCES.dates).join(', ')})`
 						);
 				}
 			}
@@ -98,9 +103,9 @@ if (import.meta.vitest) {
 	const { describe, test, expect } = import.meta.vitest;
 	const { metadatas, values } = await import('./_testdata.js');
 
-	function groupMetadataValues(
+	function groupMetadataValues<Type extends DB.MetadataType>(
 		vals: (typeof values)[keyof typeof values],
-		settings: Omit<Parameters<typeof metadataValueGrouper>[0], 'language'>
+		settings: Omit<Parameters<typeof metadataValueGrouper<Type>>[0], 'language'>
 	) {
 		const grouper = metadataValueGrouper({
 			language: 'fr',
@@ -115,10 +120,11 @@ if (import.meta.vitest) {
 
 	describe('groupMetadataValues', () => {
 		describe('integers', () => {
-			test('with default tolerances', () => {
+			test('with unit tolerance', () => {
 				expect(
 					groupMetadataValues(values.integer, {
-						type: metadatas.integer.type
+						type: metadatas.integer.type,
+						tolerances: { decimal: 'unit', dates: 'minute' }
 					})
 				).toMatchObject({
 					'10': ['item1', 'item2'],
@@ -128,11 +134,11 @@ if (import.meta.vitest) {
 				});
 			});
 
-			test('with tens tolerances', () => {
+			test('with tens tolerance', () => {
 				expect(
 					groupMetadataValues(values.integer, {
 						type: metadatas.integer.type,
-						tolerances: { float: -1, date: 'second' }
+						tolerances: { decimal: 'deca', dates: 'minute' }
 					})
 				).toMatchObject({
 					'10': ['item1', 'item2'],
@@ -143,10 +149,11 @@ if (import.meta.vitest) {
 		});
 
 		describe('floats', () => {
-			test('with default tolerances', () => {
+			test('with deci tolerance', () => {
 				expect(
 					groupMetadataValues(values.float, {
-						type: metadatas.float.type
+						type: metadatas.float.type,
+						tolerances: { decimal: 'deci', dates: 'minute' }
 					})
 				).toMatchObject({
 					'10,1': ['item1', 'item2'],
@@ -156,11 +163,11 @@ if (import.meta.vitest) {
 				});
 			});
 
-			test('with decimal tolerances', () => {
+			test('with centi tolerance', () => {
 				expect(
 					groupMetadataValues(values.float, {
 						type: metadatas.float.type,
-						tolerances: { float: 2, date: 'second' }
+						tolerances: { decimal: 'centi', dates: 'minute' }
 					})
 				).toMatchObject({
 					'10,12': ['item1'],
@@ -171,11 +178,11 @@ if (import.meta.vitest) {
 				});
 			});
 
-			test('with hundreds tolerances', () => {
+			test('with kilo tolerance', () => {
 				expect(
 					groupMetadataValues(values.float, {
 						type: metadatas.float.type,
-						tolerances: { float: -2, date: 'second' }
+						tolerances: { decimal: 'kilo', dates: 'minute' }
 					})
 				).toMatchObject({
 					'0': ['item1', 'item2', 'item3', 'item4', 'item5', 'item6']
@@ -184,10 +191,11 @@ if (import.meta.vitest) {
 		});
 
 		describe('dates', () => {
-			test('with default tolerances', () => {
+			test('with day tolerance', () => {
 				expect(
 					groupMetadataValues(values.date, {
-						type: metadatas.date.type
+						type: metadatas.date.type,
+						tolerances: { decimal: 'unit', dates: 'day' }
 					})
 				).toMatchObject({
 					'1 janvier 2023': ['item1', 'item2'],
@@ -197,11 +205,11 @@ if (import.meta.vitest) {
 				});
 			});
 
-			test('with minute tolerances', () => {
+			test('with minute tolerance', () => {
 				expect(
 					groupMetadataValues(values.date, {
 						type: metadatas.date.type,
-						tolerances: { float: 2, date: 'minute' }
+						tolerances: { decimal: 'unit', dates: 'minute' }
 					})
 				).toMatchObject({
 					'1 janvier 2023 à 12:00': ['item1', 'item2'],
@@ -238,10 +246,11 @@ if (import.meta.vitest) {
 		});
 
 		describe('locations', () => {
-			test('with default tolerances', () => {
+			test('with deci tolerance', () => {
 				expect(
 					groupMetadataValues(values.location, {
-						type: metadatas.location.type
+						type: metadatas.location.type,
+						tolerances: { decimal: 'deci', dates: 'minute' }
 					})
 				).toMatchObject({
 					'10.1, 20.1': ['item1', 'item2', 'item4', 'item5'],
@@ -250,11 +259,11 @@ if (import.meta.vitest) {
 				});
 			});
 
-			test('with unit decimal tolerances', () => {
+			test('with unit tolerance', () => {
 				expect(
 					groupMetadataValues(values.location, {
 						type: metadatas.location.type,
-						tolerances: { float: 0, date: 'second' }
+						tolerances: { decimal: 'unit', dates: 'minute' }
 					})
 				).toMatchObject({
 					'10, 20': ['item1', 'item2', 'item4', 'item5'],
@@ -263,11 +272,11 @@ if (import.meta.vitest) {
 				});
 			});
 
-			test('with tens tolerances', () => {
+			test('with deca tolerance', () => {
 				expect(
 					groupMetadataValues(values.location, {
 						type: metadatas.location.type,
-						tolerances: { float: -1, date: 'second' }
+						tolerances: { decimal: 'deca', dates: 'minute' }
 					})
 				).toMatchObject({
 					'10, 20': ['item1', 'item2', 'item4', 'item5'],
@@ -290,47 +299,43 @@ if (import.meta.vitest) {
 		});
 
 		describe('bounding boxes', () => {
-			test('with default tolerances', () => {
-				expect(
-					groupMetadataValues(values.boundingbox, {
-						type: metadatas.boundingbox.type
-					})
-				).toMatchObject({
-					'Boîte de (10.00, 10.00) à (60.00, 60.00)': ['item1'],
-					'Boîte de (11.00, 11.00) à (61.00, 61.00)': ['item4', 'item5'],
-					'Boîte de (12.00, 12.00) à (62.00, 62.00)': ['item2'],
-					'Boîte de (15.00, 15.00) à (65.00, 65.00)': ['item6']
-				});
-			});
-
-			test('with unit decimal tolerances', () => {
+			test('with deci tolerance', () => {
 				expect(
 					groupMetadataValues(values.boundingbox, {
 						type: metadatas.boundingbox.type,
-						tolerances: { float: 0, date: 'second' }
+						tolerances: { decimal: 'deci', dates: 'minute' }
 					})
 				).toMatchObject({
-					'Boîte de (10.00, 10.00) à (60.00, 60.00)': ['item1'],
-					'Boîte de (11.00, 11.00) à (61.00, 61.00)': ['item4', 'item5'],
-					'Boîte de (12.00, 12.00) à (62.00, 62.00)': ['item2'],
-					'Boîte de (15.00, 15.00) à (65.00, 65.00)': ['item6']
+					'Boîte de (10, 10) à (60, 60)': ['item1'],
+					'Boîte de (11, 11.5) à (61, 61.5)': ['item4', 'item5'],
+					'Boîte de (12, 12) à (62, 62)': ['item2'],
+					'Boîte de (15, 15) à (65, 65)': ['item6']
 				});
 			});
 
-			test('with tens tolerances', () => {
+			test('with unit tolerance', () => {
 				expect(
 					groupMetadataValues(values.boundingbox, {
 						type: metadatas.boundingbox.type,
-						tolerances: { float: -1, date: 'second' }
+						tolerances: { decimal: 'unit', dates: 'minute' }
 					})
 				).toMatchObject({
-					'Boîte de (10.00, 10.00) à (60.00, 60.00)': [
-						'item1',
-						'item2',
-						'item4',
-						'item5'
-					],
-					'Boîte de (20.00, 20.00) à (70.00, 70.00)': ['item6']
+					'Boîte de (10, 10) à (60, 60)': ['item1'],
+					'Boîte de (11, 12) à (61, 62)': ['item4', 'item5'],
+					'Boîte de (12, 12) à (62, 62)': ['item2'],
+					'Boîte de (15, 15) à (65, 65)': ['item6']
+				});
+			});
+
+			test('with deca tolerance', () => {
+				expect(
+					groupMetadataValues(values.boundingbox, {
+						type: metadatas.boundingbox.type,
+						tolerances: { decimal: 'deca', dates: 'minute' }
+					})
+				).toMatchObject({
+					'Boîte de (10, 10) à (60, 60)': ['item1', 'item2', 'item4', 'item5'],
+					'Boîte de (20, 20) à (70, 70)': ['item6']
 				});
 			});
 		});

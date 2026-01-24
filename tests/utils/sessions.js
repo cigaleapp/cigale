@@ -29,7 +29,11 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
 
 	if (protocol) {
-		await chooseInDropdown(page, 'protocol', protocol);
+		await chooseInDropdown(
+			page,
+			page.getByRole('button', { name: 'Choisir un protocole' }),
+			protocol
+		);
 	}
 
 	if (name) {
@@ -131,6 +135,6 @@ export async function chooseFirstSession(page) {
 export async function changeSessionProtocol(page, name) {
 	await page.getByTestId('goto-current-session').click();
 	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
-	await chooseInDropdown(page, 'protocol', name);
+	await chooseInDropdown(page, page.getByRole('button', { name: 'Choisir un protocole' }), name);
 	await goToTab(page, 'import');
 }

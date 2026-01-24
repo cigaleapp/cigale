@@ -118,7 +118,8 @@ export async function galleryItemsGrouper<D>(
 			const grouper = metadataValueGrouper({
 				type: metadata.type,
 				language: getSettings().language,
-				options
+				tolerances: settings.tolerances,
+				options,
 			});
 
 			return (item) => {

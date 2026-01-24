@@ -13,12 +13,17 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 -->
 
 <script generics="ItemData">
+	import { watch } from 'runed';
 	import { onMount } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
 
+	import IconCollapse from '~icons/ri/arrow-down-s-line';
+	import IconExpand from '~icons/ri/arrow-right-s-line';
 	import IconTrash from '~icons/ri/delete-bin-line';
 	import { uiState } from '$lib/state.svelte.js';
 
+	import ButtonIcon from './ButtonIcon.svelte';
 	import ButtonInk from './ButtonInk.svelte';
 	import { DragSelect } from './dragselect.svelte.js';
 	import { galleryItemsGrouper, galleryItemsSorter } from './gallery.js';
@@ -31,6 +36,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { deleteObservation } from './observations.js';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
+	import { toasts } from './toasts.svelte';
 	import { compareBy, entries } from './utils.js';
 
 	/**
@@ -54,7 +60,20 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	/** @type {Props } */
 	let { items, item, onemptyclick, zone, highlight, unroll = ['', []] } = $props();
 
+	const componentId = $props.id();
+
 	const [unrolledId, unrolledItems] = $derived(unroll);
+
+	/**
+	 * Set of group `sortKey`s that are collapsed
+	 * @type {SvelteSet<string | number>}
+	 */
+	const collapsedGroups = new SvelteSet();
+
+	watch([() => grouper], () => {
+		// Clear collapsed groups when grouping changes
+		collapsedGroups.clear();
+	});
 
 	/** @type {HTMLElement | undefined} */
 	let imagesContainer = $state();
@@ -134,22 +153,45 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	 */
 	let grouper = $state();
 
+	const groupingSettings = $derived(
+		uiState.currentSession?.group[zone] ?? uiState.currentSession?.group.global
+	);
+
+	$effect(() => {
+		if (!groupingSettings) return;
+
+		void galleryItemsGrouper(groupingSettings)
+			.then((result) => {
+				grouper = result;
+			})
+			.catch((e) => {
+				console.error('couldnt set grouper', e);
+				toasts.error('Impossible de regrouper avec les paramètres choisis');
+				grouper = null;
+			});
+	});
+
 	/**
 	 * @type {undefined | ((a: Item, b: Item) => number)}
 	 */
 	let sorter = $state();
 
-	$effect(() => {
-		if (!uiState.currentSession) return;
-		const groupingSettings =
-			uiState.currentSession.group[zone] ?? uiState.currentSession.group.global;
-		const sortingSettings =
-			uiState.currentSession.sort[zone] ?? uiState.currentSession.sort.global;
+	const sortingSettings = $derived(
+		uiState.currentSession?.sort[zone] ?? uiState.currentSession?.sort.global
+	);
 
-		void (async () => {
-			sorter = await galleryItemsSorter(sortingSettings);
-			grouper = await galleryItemsGrouper(groupingSettings);
-		})();
+	$effect(() => {
+		if (!sortingSettings) return;
+
+		void galleryItemsSorter(sortingSettings)
+			.then((result) => {
+				sorter = result;
+			})
+			.catch((e) => {
+				console.error('couldnt set sorter', e);
+				toasts.error('Impossible de trier avec les paramètres choisis');
+				sorter = compareBy('id')
+			});
 	});
 
 	/**
@@ -223,9 +265,35 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	{#if groups}
 		<div class="groups" in:fade={{ duration: 200 }}>
 			{#each groups as { label, items, sortKey } (sortKey)}
-				<section class="group" role="region" aria-label={label}>
+				<section
+					class="group"
+					role="region"
+					aria-label={label}
+					id="{componentId}-group-{sortKey}"
+				>
 					{#if label}
-						<header>
+						<header
+							aria-expanded={!collapsedGroups.has(sortKey)}
+							aria-controls="{componentId}-group-{sortKey}"
+						>
+							<ButtonIcon
+								help={collapsedGroups.has(sortKey)
+									? 'Développer le groupe'
+									: 'Réduire le groupe'}
+								onclick={async () => {
+									if (collapsedGroups.has(sortKey)) {
+										collapsedGroups.delete(sortKey);
+									} else {
+										collapsedGroups.add(sortKey);
+									}
+								}}
+							>
+								{#if collapsedGroups.has(sortKey)}
+									<IconExpand />
+								{:else}
+									<IconCollapse />
+								{/if}
+							</ButtonIcon>
 							<h2>{label}</h2>
 							<p>
 								{plural(items.length, ['# élément', '# éléments'])}
@@ -262,21 +330,23 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 							</div>
 						</header>
 					{/if}
-					<div class="items">
-						{#each items as props (virtualizeKey(props))}
-							{@const unrolled = unrolledId === props.id}
-							<div class="item-unroll-container" class:unrolled>
-								{@render item(props.data, props)}
-							</div>
-							{#if unrolled}
-								{#each unrolledItems as innerProps (virtualizeKey(innerProps))}
-									<div class="item-unroll-container" class:unrolled>
-										{@render item(innerProps.data, innerProps)}
-									</div>
-								{/each}
-							{/if}
-						{/each}
-					</div>
+					{#if !collapsedGroups.has(sortKey)}
+						<div class="items" data-starts-selection>
+							{#each items as props (virtualizeKey(props))}
+								{@const unrolled = unrolledId === props.id}
+								<div class="item-unroll-container" class:unrolled>
+									{@render item(props.data, props)}
+								</div>
+								{#if unrolled}
+									{#each unrolledItems as innerProps (virtualizeKey(innerProps))}
+										<div class="item-unroll-container" class:unrolled>
+											{@render item(innerProps.data, innerProps)}
+										</div>
+									{/each}
+								{/if}
+							{/each}
+						</div>
+					{/if}
 				</section>
 			{/each}
 		</div>
@@ -364,7 +434,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 		display: flex;
 		align-items: center;
 		justify-content: start;
-		gap: 1em;
+		gap: 0.5em;
 		position: sticky;
 		top: 0;
 		left: 0;
@@ -379,6 +449,10 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 
 		.actions {
 			margin-left: auto;
+		}
+
+		h2 {
+			margin-right: 0.5em;
 		}
 	}
 

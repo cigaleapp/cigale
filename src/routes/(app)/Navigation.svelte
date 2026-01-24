@@ -215,6 +215,7 @@
 						</a>
 
 						<TabSettings
+							label="Réglages d'import"
 							tab="import"
 							models={[]}
 							currentModelIndex={-1}
@@ -242,6 +243,7 @@
 						</a>
 
 						<TabSettings
+							label="Réglages de recadrage"
 							tab="crop"
 							models={uiState.cropModels}
 							currentModelIndex={uiState.selectedCropModel}
@@ -272,6 +274,7 @@
 
 						<TabSettings
 							tab="classify"
+							label="Réglages de classification"
 							models={uiState.classificationModels}
 							currentModelIndex={uiState.selectedClassificationModel}
 							setModel={async (i) =>

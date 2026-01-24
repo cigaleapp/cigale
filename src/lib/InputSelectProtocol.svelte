@@ -51,7 +51,7 @@
 	]}
 >
 	{#snippet trigger(props)}
-		<button class:none-selected={!value} class="trigger" {...props}>
+		<button aria-label="Choisir un protocole" class:none-selected={!value} class="trigger" {...props}>
 			{#if value}
 				{tables.Protocol.getFromState(value)?.name}
 			{:else}

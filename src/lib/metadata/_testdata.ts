@@ -75,7 +75,7 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_boolean: false,
 			metadata_location: { latitude: 10.124, longitude: 20.124 },
 			metadata_enum: 'C',
-			metadata_boundingbox: { x: 11, y: 11, w: 50, h: 50 }
+			metadata_boundingbox: { x: 11, y: 11.5, w: 50, h: 50 }
 		}
 	},
 	{
@@ -88,7 +88,7 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			metadata_boolean: false,
 			metadata_location: { latitude: 10.124, longitude: 20.124 },
 			metadata_enum: 'B',
-			metadata_boundingbox: { x: 11, y: 11, w: 50, h: 50 }
+			metadata_boundingbox: { x: 11, y: 11.5, w: 50, h: 50 }
 		}
 	},
 	{

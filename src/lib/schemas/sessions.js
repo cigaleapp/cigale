@@ -5,6 +5,10 @@ import { keys } from '../utils.js';
 import { ID } from './common.js';
 import { MetadataValues } from './metadata.js';
 
+/**
+ * @import * as DB from '$lib/database.js';
+ */
+
 export const SORT_FIELDS = /** @type {const} */ ({
 	metadataValue: { label: 'Métadonnée…', needsMetadata: true },
 	metadataConfidence: { label: 'Confiance en…', needsMetadata: true },
@@ -13,24 +17,57 @@ export const SORT_FIELDS = /** @type {const} */ ({
 });
 
 export const GROUP_FIELDS = /** @type {const} */ ({
-	metadataValue: { label: 'Métadonnée…', needsMetadata: true },
-	metadataPresence: { label: 'Présence de…', needsMetadata: true },
-	metadataConfidence: { label: 'Confiance en…', needsMetadata: true },
-	none: { label: 'Aucun regroupement', needsMetadata: false }
+	metadataValue: { label: 'Métadonnée…', needsMetadata: true, needsTolerance: true },
+	metadataPresence: { label: 'Présence de…', needsMetadata: true, needsTolerance: false },
+	metadataConfidence: { label: 'Confiance en…', needsMetadata: true, needsTolerance: false },
+	none: { label: 'Aucun regroupement', needsMetadata: false, needsTolerance: false }
+});
+
+export const GROUPING_TOLERANCES = /** @type {const} */ ({
+	dates: {
+		label: 'Dates',
+		help: 'Précision des dates',
+		affectedTypes: /** @type {DB.MetadataType[]} */ (['date']),
+		options: {
+			year: { scientific: '', casual: 'Par année' },
+			month: { scientific: '', casual: 'Par mois' },
+			day: { scientific: '', casual: 'Par jour' },
+			hour: { scientific: '', casual: 'Par heure' },
+			minute: { scientific: '', casual: 'Par minute' }
+		}
+	},
+	decimal: {
+		label: 'Nombres',
+		help: 'Précision des nombres',
+		affectedTypes: /** @type {DB.MetadataType[]} */ ([
+			'integer',
+			'float',
+			'boundingbox',
+			'location'
+		]),
+		options: {
+			giga: { scientific: 'G', casual: 'Au milliard' },
+			mega: { scientific: 'M', casual: 'Au million' },
+			kilo: { scientific: 'k', casual: 'Au millier' },
+			deca: { scientific: '10', casual: 'À la dizaine' },
+			unit: { scientific: '1', casual: "À l'entier" },
+			deci: { scientific: '0.1', casual: 'Au dixième' },
+			centi: { scientific: '0.01', casual: 'Au centième' },
+			milli: { scientific: 'm', casual: 'Au millième' },
+			micro: { scientific: 'µ', casual: 'Au millionième' },
+			nano: { scientific: 'n', casual: 'Au milliardième' }
+		}
+	}
 });
 
 /**
- *
- * @param {"sort" | "group"} task
- * @param {keyof ( typeof SORT_FIELDS & typeof GROUP_FIELDS)} field
- * @returns
+ * @param {['sort', keyof typeof SORT_FIELDS] | ['group', keyof typeof GROUP_FIELDS]} param0 [task, field]
+ * @returns {boolean}
  */
-export function sortOrGroupFieldNeedsMetadata(task, field) {
+export function sortOrGroupFieldNeedsMetadata(...[task, field]) {
 	switch (task) {
-		// @ts-expect-error
 		case 'sort':
 			return SORT_FIELDS[field].needsMetadata;
-		// @ts-expect-error
 		case 'group':
 			return GROUP_FIELDS[field].needsMetadata;
 	}
@@ -44,7 +81,14 @@ export const SortSettings = type({
 
 export const GroupSettings = type({
 	field: type.enumerated(...keys(GROUP_FIELDS)),
-	'metadata?': ID
+	'metadata?': ID,
+	tolerances: type({
+		dates: type.enumerated(...keys(GROUPING_TOLERANCES.dates.options)),
+		decimal: type.enumerated(...keys(GROUPING_TOLERANCES.decimal.options))
+	}).default(() => ({
+		dates: 'day',
+		decimal: 'unit'
+	}))
 });
 
 export const Session = type({

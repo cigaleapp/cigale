@@ -274,9 +274,14 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	  - combobox: Animalia
 	`);
 
-	// Click out and back again
-	await page.getByRole('main').click({ position: { x: 10, y: 10 } });
+	// Unselect and reselect
+	const groupHeader = page
+		.getByRole('main')
+		.getByRole('region', { name: 'Espèce: confiance à 75%-100%' });
+	await groupHeader.getByRole('button', { name: 'Réduire le groupe' }).click();
+	await groupHeader.getByRole('button', { name: 'Développer le groupe' }).click();
 	await page.getByText('lil-fella', { exact: true }).click();
+
 	await expect(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(
 		`
 	  - text: Espèce

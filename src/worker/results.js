@@ -205,13 +205,12 @@ swarp.generateResultsZip(
 											([key, { value, confidence, valueLabel }]) => [
 												[
 													metadataPrettyKey(metadataDefinitions[key]),
-													// Exports always have english value serializations for better interoperability
-													metadataPrettyValue(
-														'en',
-														metadataDefinitions[key],
-														value,
+													metadataPrettyValue(value, {
+														// Exports always have english value serializations for better interoperability
+														language: 'en',
+														type: metadataDefinitions[key].type,
 														valueLabel
-													)
+													})
 												],
 												[
 													`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
