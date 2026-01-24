@@ -16,14 +16,14 @@
 
 	/**
 	 *
-	 * @param {`_${string}`} umbrellaDir
+	 * @param {"playwright" | "vitest" | "coverage" | "node-modules"} umbrellaDir
 	 */
 	function pageURL(umbrellaDir) {
-		return `https://cigaleapp.github.io/cigale/${umbrellaDir}/pr-${previewingPrNumber}`;
+		return `https://pr-${previewingPrNumber}-reports.cigale.gwen.works/${umbrellaDir}`;
 	}
 
 	/**
-	 * @param {`_${string}`} umbrellaDir
+	 * @param {"playwright" | "vitest" | "coverage" | "node-modules"} umbrellaDir
 	 */
 	async function hasPage(umbrellaDir) {
 		return fetch(pageURL(umbrellaDir), { method: 'HEAD' })
@@ -113,22 +113,22 @@
 			Voir sur Github
 		</ButtonSecondary>
 
-		{#await hasPage('_playwright') then ok}
+		{#await hasPage('playwright') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_playwright'))}>Tests E2E</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('playwright'))}>Tests E2E</ButtonSecondary>
 			{/if}
 		{/await}
 
-		{#await hasPage('_vitest') then ok}
+		{#await hasPage('vitest') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_vitest'))}>Tests unitaires</ButtonSecondary
+				<ButtonSecondary onclick={open(pageURL('vitest'))}>Tests unitaires</ButtonSecondary
 				>
 			{/if}
 		{/await}
 
-		{#await hasPage('_coverage') then ok}
+		{#await hasPage('coverage') then ok}
 			{#if ok}
-				<ButtonSecondary onclick={open(pageURL('_coverage'))}>Coverage</ButtonSecondary>
+				<ButtonSecondary onclick={open(pageURL('coverage'))}>Coverage</ButtonSecondary>
 			{/if}
 		{/await}
 	{/snippet}

@@ -18,6 +18,8 @@ jobs:
       - name: Install gh CLI
         run: |
           sudo apt-get install gh -y
+
+      # TODO: remove this step once we have full migrated to the dev server
       - name: Remove dirs in _vitest, _playwright, etc. for PRs that are no longer open
         env:
           REPO_PR_URL: ${{ github.event.repository.html_url }}/pull

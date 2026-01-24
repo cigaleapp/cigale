@@ -1,21 +1,25 @@
 name: Deploy PR previews
 
+permissions: 
+  actions: write
+  contents: read
+
 on:
   workflow_call:
+    secrets:
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
+        required: true
+        description: 'SSH private key for deploying to dev deployments server'
     inputs: {}
 
 env:
-  BASE_PATH: /cigale/_pullrequests/pr-${{ github.event.number }}
   PR_NUMBER: ${{ github.event.number }}
   BUILD_COMMIT: ${{ github.sha }}
 
 jobs:
-  deploy:
-    name: Build & Deploy
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    environment:
-      name: '#${{ github.event.number }}: App preview'
-      url: ${{ steps.deploy-preview.outputs.preview-url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -31,21 +35,20 @@ jobs:
           bun install
           bun run build
 
-      - name: Deploy preview
-        id: deploy-preview
-        uses: rossjrw/pr-preview-action@v1
+      - name: Save preview
+        uses: actions/upload-artifact@v6
         with:
-          source-dir: ./public
-          umbrella-dir: _pullrequests
-          comment: false
+          name: app
+          path: ./public
+          retention-days: 1
 
-      - name: Wait for preview to be live
-        if: github.event.action != 'closed'
-        run: |
-          wget ${{ steps.deploy-preview.outputs.preview-url }} || touch index.html
-          while ! grep "$BUILD_COMMIT" index.html; do
-            echo "Preview not live yet, waiting..."
-            sleep 5
-            rm index.html
-            wget ${{ steps.deploy-preview.outputs.preview-url }} || touch index.html
-          done
+  upload:
+    name: Deploy
+    needs: build
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: '#${{ github.event.number }}: App preview'
+      artifact: app
+      subdomain: pr-${{ github.event.number }}
+      path: /
