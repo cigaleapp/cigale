@@ -47,7 +47,7 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 		language: import('$lib/i18n.js').Language;
 		type: Type;
 		valueLabel?: string | undefined;
-		boundingBoxPrecision?:  number | 'unbounded' | undefined;
+		boundingBoxPrecision?: number | 'unbounded' | undefined;
 	}
 ) {
 	if (value === null) return '';
@@ -87,7 +87,7 @@ export function metadataPrettyValue<Type extends DB.MetadataType>(
 			const coord = (v: number) =>
 				boundingBoxPrecision === 'unbounded'
 					? v.toString()
-					: round(v, boundingBoxPrecision)
+					: round(v, boundingBoxPrecision);
 
 			const point = (x: number, y: number) => `(${coord(x)}, ${coord(y)})`;
 

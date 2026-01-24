@@ -119,7 +119,7 @@ export async function galleryItemsGrouper<D>(
 				type: metadata.type,
 				language: getSettings().language,
 				tolerances: settings.tolerances,
-				options,
+				options
 			});
 
 			return (item) => {
