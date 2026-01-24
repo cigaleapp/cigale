@@ -1,6 +1,6 @@
 name: Deploy PR previews
 
-permissions: 
+permissions:
   actions: write
   contents: read
 

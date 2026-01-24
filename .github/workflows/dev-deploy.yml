@@ -1,6 +1,6 @@
 name: Developer deployments
 
-permissions: 
+permissions:
   actions: read
   contents: read
 
@@ -8,7 +8,7 @@ env:
   HOST: gwen.works
 
 on:
-  workflow_call: 
+  workflow_call:
     secrets:
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
         required: true
@@ -22,12 +22,12 @@ on:
         type: string
         description: Suffix to append to the environment URL
         default: ''
-      domain: 
+      domain:
         type: string
         description: You shouldnt have to change this
         # TODO: once have cigale.cnrs.fr, change it
         default: cigale.gwen.works
-      subdomain: 
+      subdomain:
         type: string
         description: Subdomain of the dev deployments domain to upload to
         required: true
@@ -35,7 +35,7 @@ on:
         type: string
         description: Name of artifact to upload to the subdomain
         required: true
-      path: 
+      path:
         type: string
         description: Path to put the contents at
         required: true
@@ -50,7 +50,7 @@ jobs:
     # Ugly in Github list of environments cuz it causes text wrapping
     # name: Deploy to ${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
     name: Deploy
-    environment: 
+    environment:
       name: ${{ inputs.environment }}
       url: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}${{ inputs.environment-url-append }}
     steps:
@@ -70,7 +70,7 @@ jobs:
           echo Injected live-check comment into to-upload/index.html:
           tail -n 3 to-upload/index.html
       - name: Create SSH identity
-        env: 
+        env:
           PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
           USERNAME: cigale
           HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}
@@ -111,9 +111,9 @@ jobs:
 
       - name: Wait for it to be live
         if: inputs.live-check
-        env: 
+        env:
           URL: https://${{ inputs.subdomain }}.${{ inputs.domain }}${{ inputs.path }}
-        run: | 
+        run: |
           echo Getting server IP from $HOST
           resolved_ip=$(dig +short $HOST | head -n 1)
           echo Resolved IP is $resolved_ip
@@ -133,6 +133,3 @@ jobs:
             touch index.html
             curl -fsSL $dns $URL > index.html
           done
-
-
-        

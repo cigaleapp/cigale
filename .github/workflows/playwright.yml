@@ -1,6 +1,6 @@
 name: End-to-end tests
 
-permissions: 
+permissions:
   actions: write
   contents: read
 

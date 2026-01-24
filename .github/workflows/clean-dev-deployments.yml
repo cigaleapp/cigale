@@ -1,6 +1,6 @@
 name: Clean dev deployments
 
-permissions: 
+permissions:
   pull-requests: read
 
 on:
@@ -22,7 +22,7 @@ jobs:
         run: sudo apt-get install gh -y
 
       - name: Create SSH identity
-        env: 
+        env:
           PRIVATE_KEY: ${{ secrets.DEV_DEPLOYMENTS_SSH_PRIVATE_KEY }}
           USERNAME: cigale
           HOST_KEY: ${{ secrets.DEV_DEPLOYMENTS_HOST_KEY }}

@@ -1,6 +1,6 @@
 name: node_modules
 
-permissions: 
+permissions:
   actions: write
   contents: read
 
