@@ -36,6 +36,7 @@ export function metadataValueGrouper<Type extends DB.MetadataType>({
 				giga: -9,
 				mega: -6,
 				kilo: -3,
+				hecto: -2,
 				deca: -1,
 				unit: 0,
 				deci: 1,

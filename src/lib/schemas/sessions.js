@@ -49,6 +49,7 @@ export const GROUPING_TOLERANCES = /** @type {const} */ ({
 			giga: { scientific: 'G', casual: 'Au milliard' },
 			mega: { scientific: 'M', casual: 'Au million' },
 			kilo: { scientific: 'k', casual: 'Au millier' },
+			hecto: { scientific: '100', casual: 'À la centaine' },
 			deca: { scientific: '10', casual: 'À la dizaine' },
 			unit: { scientific: '1', casual: "À l'entier" },
 			deci: { scientific: '0.1', casual: 'Au dixième' },
