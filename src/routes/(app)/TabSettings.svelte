@@ -27,12 +27,13 @@
 
 	interface Props {
 		tab: 'crop' | 'classify' | 'import';
+		label: string;
 		models: (typeof MetadataInferOptionsNeural.infer)['neural'];
 		currentModelIndex: number;
 		setModel: (_i: number) => Promise<void>;
 	}
 
-	const { tab, models, currentModelIndex, setModel }: Props = $props();
+	const { tab, models, currentModelIndex, setModel, label }: Props = $props();
 
 	const isOnTabItself = $derived.by(() => {
 		switch (page.route.id) {
@@ -294,7 +295,7 @@
 		]}
 	>
 		{#snippet trigger(props)}
-			<ButtonIcon help="" {...props}>
+			<ButtonIcon help={label} {...props}>
 				<IconSelect />
 			</ButtonIcon>
 		{/snippet}

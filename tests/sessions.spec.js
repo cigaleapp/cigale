@@ -350,7 +350,11 @@ test('can change protocol of session', async ({ page, app }) => {
 
 	expect(await app.db.session.byName('Test')).toHaveProperty('protocol', exampleProtocol.id);
 
-	await chooseInDropdown(page, 'protocol', 'Kitchen sink');
+	await chooseInDropdown(
+		page,
+		page.getByRole('button', { name: 'Choisir un protocole' }),
+		'Kitchen sink'
+	);
 
 	expect(await app.db.session.byName('Test')).toHaveProperty(
 		'protocol',

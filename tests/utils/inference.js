@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-import { chooseInDropdown, mockUrl } from './core.js';
+import { chooseInDropdown, entries, mockUrl } from './core.js';
 
 /**
  * @import { Page } from '@playwright/test';
@@ -16,8 +16,14 @@ import { chooseInDropdown, mockUrl } from './core.js';
  * @param {{ crop?: InferenceModelName, classify?: InferenceModelName }} models names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
  */
 export async function setInferenceModels(page, models) {
-	for (const [tab, model] of Object.entries(models)) {
-		await chooseInDropdown(page, `${tab}-settings`, "Modèle d'inférence", model);
+	for (const [tab, model] of entries(models)) {
+		if (!model) continue;
+
+		const trigger = page.getByRole('button', {
+			name: { crop: 'Réglages de recadrage', classify: 'Réglages de classification' }[tab]
+		});
+
+		await chooseInDropdown(page, trigger, "Modèle d'inférence", model);
 	}
 }
 

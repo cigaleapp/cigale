@@ -278,10 +278,9 @@ export async function expectZipFiles(zip, expectedFiles, checks = {}) {
 }
 
 /**
- * @template {string} K
- * @template {any} V
- * @param {Record<K, V>} subject
- * @returns {Array<[K, V]>}
+ * @template {object} T
+ * @param {T} subject
+ * @returns { { [K in keyof T]-?: [K, T[K]] }[keyof T][] }
  */
 export function entries(subject) {
 	// @ts-expect-error
@@ -297,62 +296,81 @@ export function throwError(message) {
 }
 
 /**
- * Opens a dropdown and chooses an item by its name
- * @param {Page} page
- * @param {string} dropdownTestId
- * @param {[string | RegExp | ((options: Locator) => Locator)] | [string, string | RegExp]} option can be a single argument, or two strings where the first one is the group (dropdown submenu's label) and the second one the option name
+ * @template T
+ * @template {1 | 2 | 3 | 4} Size
+ * @typedef {Size extends 1 ? [T] : Size extends 2 ? [T, T] : Size extends 3 ? [T, T, T] : Size extends 4 ? [T, T, T, T] : never} Tuple
  */
-export async function chooseInDropdown(page, dropdownTestId, ...option) {
-	const trigger = page.getByTestId(`${dropdownTestId}-open`);
-	const options = page.getByTestId(`${dropdownTestId}-options`);
-	if (await options.isHidden()) {
-		await trigger.click();
-	}
-	const [locator, sublocator] = option;
 
-	const item = sublocator
-		? options
-				.getByRole('group', {
-					name: locator.toString()
-				})
-				.getByRole('menuitemcheckbox', {
-					name: sublocator
-				})
-		: typeof locator === 'function'
-			? locator(options)
-			: options.getByRole('menuitemcheckbox', {
-					name: locator
-				});
-
-	await item.click();
-	await page.keyboard.press('Escape'); // Close the dropdown
+/**
+ * @template T
+ * @template {Array<1 | 2 | 3 | 4>} Sizes
+ * @param {Tuple<T, 1|2|3|4>} tuple
+ * @param {Sizes} sizes
+ * @returns {tuple is Tuple<T, Sizes[number]>}
+ */
+function tupleSizeIs(tuple, ...sizes) {
+	return sizes.some((size) => tuple.length === size);
 }
 
 /**
- * Opens a dropdown and hovers over an item by its name
+ * Opens a dropdown and chooses an item by its name
  * @param {Page} page
- * @param {string} dropdownTestId
- * @param {[string | RegExp | ((options: Locator) => Locator)] | [string, string | RegExp]} option can be a single argument, or two strings where the first one is the group (dropdown submenu's label) and the second one the option name
+ * @param {Locator} trigger locator or test id
+ * @param {Tuple<string | RegExp, 1 | 2 | 3 | 4>} option [option name] or [group label, option name] or [group label, option name that opens a submenu, submenu option name] or [group label, option name that opens a submenu, submenu group name, submenu option name]
  */
-export async function hoverOnDropdownOption(page, dropdownTestId, ...option) {
-	const trigger = page.getByTestId(`${dropdownTestId}-open`);
-	const options = page.getByTestId(`${dropdownTestId}-options`);
-	await trigger.click();
-	const [locator, sublocator] = option;
+export async function chooseInDropdown(page, trigger, ...option) {
+	if (!(await trigger.getAttribute('aria-controls'))) {
+		await trigger.click();
+	}
 
-	const item = sublocator
-		? options
-				.getByRole('group', {
-					name: locator.toString()
-				})
-				.getByRole('menuitem', {
-					name: sublocator
-				})
-		: typeof locator === 'function'
-			? locator(options)
-			: options.getByRole('menuitem', {
-					name: locator
-				});
+	await expect(trigger).toHaveAttribute('aria-controls');
 
-	await item.hover();
+	const options = await trigger
+		.getAttribute('aria-controls')
+		.then((id) => page.locator(`#${id}`));
+
+	// We have a submenu, find the first option and hover over it
+	if (tupleSizeIs(option, 3, 4)) {
+		const [group, item, ...submenuOption] = option;
+
+		const submenuTrigger = locateOption(options, group, item);
+
+		// Hover over the first option
+		await submenuTrigger.hover();
+
+		await expect(submenuTrigger).toHaveAttribute('aria-controls');
+
+		// Find the submenu
+		const submenu = await submenuTrigger
+			.getAttribute('aria-controls')
+			.then((id) => page.locator(`#${id}`));
+
+		// Click its option
+		await locateOption(submenu, ...submenuOption).click();
+	} else {
+		await locateOption(options, ...option).click();
+	}
+
+	await page.keyboard.press('Escape'); // Close the dropdown(s)
+
+	/**
+	 * @param {Locator} options
+	 * @param {Tuple<string | RegExp, 1 | 2>} query
+	 */
+	function locateOption(options, ...query) {
+		const [locator, sublocator] = query;
+
+		if (sublocator) {
+			const group = options.getByRole('group', { name: locator });
+
+			return group
+				.getByRole('menuitem', { name: sublocator })
+				.or(group.getByRole('menuitemcheckbox', { name: sublocator }))
+				.or(group.getByRole('menuitemradio', { name: sublocator }));
+		}
+
+		return options.getByRole('menuitemcheckbox', {
+			name: locator
+		});
+	}
 }
