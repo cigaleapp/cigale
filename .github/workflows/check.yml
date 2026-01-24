@@ -86,7 +86,7 @@ jobs:
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: e2e
+    needs: [e2e, dont-merge-comment]
     name: Deploy
     concurrency:
       group: deploy-gh-pages
@@ -101,7 +101,6 @@ jobs:
 
   dont-merge-comment:
     name: Check for presence of "do not merge" comment
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
