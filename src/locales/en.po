@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-04T15:19:18.709Z\n"
-"PO-Revision-Date: 2026-01-14 16:27+0000\n"
+"PO-Revision-Date: 2026-01-24 11:04+0000\n"
 "Last-Translator: Gwenn Le Bihan <gwenn.lebihan7@gmail.com>\n"
 "Language: en\n"
 "Language-Team: English <http://weblate.gwen.works/projects/cigale/ui/en/>\n"
@@ -1205,6 +1205,9 @@ msgid ""
 "Pour les images recadrées et originales, il y a des variables dans le chemin, par exemple <0/>. Un fichier sera créé par image exportée.\n"
 "On peut aussi utiliser quelques fonctions \"helper\", qui s'appliquent à une expression"
 msgstr ""
+"For images (original and cropped), there are variables in the path, for "
+"example <0/>. A file per exported image will be created.\n"
+"You can also used several \"helper\" functions, that apply to an expression"
 
 #. placeholder {0}: '{{}}'
 #: src/routes/(app)/protocols/[id]/exports/+page.svelte
@@ -1505,6 +1508,9 @@ msgid ""
 "Permet de changer la valeur d'autres métadonnées quand cette option est choisie. Peut être\n"
 "pratique pour représenter des taxonomies, ajouter des attributs à une métadonnée, etc."
 msgstr ""
+"Allows changing the value of other metadata when this option is selected. "
+"May be\n"
+"useful to represent taxonomies, add attributes to a metadata option, etc."
 
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/options/[option]/+page.svelte
 msgid "Affecte <0>Change la valeur d'autres métadonnées quand {0} = {1}</0>"
@@ -1827,7 +1833,6 @@ msgstr "Analysis file of {0} was exported with protocol {1}, but the current ses
 #. placeholder {0}: title
 #. placeholder {1}: suffix
 #: src/lib/seo.svelte.js
-#, fuzzy
 msgid "{0} · {1}"
 msgstr "{0} · {1}"
 
@@ -1897,7 +1902,6 @@ msgid "Ouvrir"
 msgstr "Open"
 
 #: src/routes/(app)/sessions/[id]/+page.svelte
-#, fuzzy
 msgid "Protocole"
 msgstr "Protocol"
 
@@ -2062,41 +2066,41 @@ msgstr "Opening…"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Mises à jour automatiques"
-msgstr ""
+msgstr "Automatic updates"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Mettre à jour automatiquement"
-msgstr ""
+msgstr "Auto-update"
 
 #. placeholder {0}: source
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "Via {0}"
-msgstr ""
+msgstr "Via {0}"
 
 #: src/routes/(app)/protocols/RowProtocol.svelte
 msgid "<0/> Modifier <1>Beta</1>"
-msgstr ""
+msgstr "<0/> Edit <1>Beta</1>"
 
 #. placeholder {0}: updates[0].name
 #: src/routes/(app)/+layout.js
 msgid "Le protocole \"{0}\" a été mis à jour"
-msgstr ""
+msgstr "Protocol \"{0}\" was updated"
 
 #: src/lib/AreaObservations.svelte
 msgid "Impossible de regrouper avec les paramètres choisis"
-msgstr ""
+msgstr "Cannot group with the selected settings"
 
 #: src/lib/AreaObservations.svelte
 msgid "Impossible de trier avec les paramètres choisis"
-msgstr ""
+msgstr "Cannot sort with the selected settings"
 
 #: src/lib/AreaObservations.svelte
 msgid "Tri en cours…"
-msgstr ""
+msgstr "Sorting…"
 
 #: src/lib/InputSelectProtocol.svelte
 msgid "Choisir un protocole"
-msgstr ""
+msgstr "Choose a protocol"
 
 #: src/lib/MetadataInput.svelte
 msgid "Mismatch"
@@ -2104,15 +2108,15 @@ msgstr ""
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Réglages d'import"
-msgstr ""
+msgstr "Import settings"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Réglages de recadrage"
-msgstr ""
+msgstr "Crop settings"
 
 #: src/routes/(app)/Navigation.svelte
 msgid "Réglages de classification"
-msgstr ""
+msgstr "Classification settings"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
