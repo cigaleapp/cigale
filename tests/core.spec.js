@@ -267,10 +267,13 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	await setInferenceModels(page, { classify: 'Aucune inférence' });
 	await app.tabs.go('classify');
 	await expectLoadingText(false, 'Chargement du modèle de classification');
+	await expect(page.locator('main').getByRole('region', { name: 'Sans Espèce' })).toBeVisible();
 
 	await setInferenceModels(page, { classify: /80 classes/ });
 	await expectLoadingText(true, 'Chargement du modèle de classification');
-	await app.loading.wait();
+	await expect(
+		page.getByRole('region', { name: /^Espèce: confiance à \d+%-\d+%$/ })
+	).toBeVisible();
 	await expect(firstObservationCard(page)).not.toHaveText(/Erreur/);
 
 	await setInferenceModels(page, { classify: /17000 classes/ });
