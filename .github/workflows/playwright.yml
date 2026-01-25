@@ -14,6 +14,8 @@ on:
         description: 'API token for ReportPortal'
       REPORTPORTAL_DOMAIN:
         description: 'Domain of ReportPortal instance'
+      INFLUXDB_TOKEN:
+        description: 'Token for InfluxDB instance'
     inputs:
       artifact:
         type: string
@@ -22,6 +24,10 @@ on:
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+  INFLUXDB_TOKEN: ${{ secrets.INFLUXDB_TOKEN }}
+  INFLUXDB_URL: 'https://influxdb.gwen.works'
+  INFLUXDB_ORG: 'cigale'
+  INFLUXDB_BUCKET: 'playwright'
 
 jobs:
   predownload:

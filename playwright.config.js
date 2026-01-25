@@ -15,7 +15,8 @@ const env = arkenv({
 	SHARDING: 'boolean = false',
 	'REPORTPORTAL_API_KEY?': 'string',
 	'REPORTPORTAL_DOMAIN?': 'string',
-	'REPORTPORTAL_LAUNCH_ID?': 'string'
+	'REPORTPORTAL_LAUNCH_ID?': 'string',
+	'INFLUXDB_TOKEN?': 'string'
 });
 
 /** @typedef {NonNullable<import('@playwright/test').PlaywrightTestConfig['projects']>[number]} Project */
@@ -100,7 +101,8 @@ export default defineConfig({
 				[env.SHARDING ? 'blob' : 'html'],
 				['github'],
 				['list'],
-				...reportPortalReporter
+				...reportPortalReporter,
+				...(env.INFLUXDB_TOKEN ? [['./tests/reporters/influxdb.ts']] : [])
 			]
 		: [],
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
