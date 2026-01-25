@@ -208,9 +208,9 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 		)
 	});
 
-	await page.waitForURL((u) => u.hash === '#/sessions');
+	await app.path.wait('/sessions');
 
-	await page.goto(`#/protocols/import/${protocolUrl}`);
+	await app.path.go(`/protocols/import/${protocolUrl}`);
 	await expect(app.modals.byTitle('Importer le protocole distant ?')).toBeVisible({
 		timeout: 30_000
 	});
@@ -223,7 +223,7 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 		.getByRole('button', { name: 'Importer' })
 		.click();
 
-	await page.waitForURL((u) => u.hash === '#/protocols');
+	await app.path.wait('/protocols');
 
 	await expect(page.getByRole('listitem')).toHaveCount(2);
 	await expect(

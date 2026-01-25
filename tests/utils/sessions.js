@@ -3,7 +3,8 @@ import {
 	confirmDeletionModal,
 	goHome,
 	goToTab,
-	setInferenceModels
+	setInferenceModels,
+	waitForRoute
 } from './index.js';
 
 /**
@@ -26,7 +27,7 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 	await page.waitForTimeout(500);
 
 	await page.getByTestId('new-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await waitForRoute(page, "/(app)/sessions/[id]")
 
 	if (protocol) {
 		await chooseInDropdown(
@@ -52,7 +53,7 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 		})
 		.click();
 
-	await page.waitForURL((u) => u.hash === '#/import');
+	await waitForRoute(page, '/import');
 
 	if (models) {
 		await setInferenceModels(page, models);
@@ -76,7 +77,7 @@ export async function switchSession(page, name) {
 		})
 		.click();
 
-	await page.waitForURL((u) => u.hash === '#/import');
+	await waitForRoute(page, '/import');
 }
 
 /**
@@ -113,7 +114,7 @@ export async function deleteSession(page, name) {
 		modalKey: 'modal_delete_session'
 	});
 
-	await page.waitForURL((u) => u.hash === '#/sessions');
+	await waitForRoute(page, '/sessions');
 }
 
 /**
@@ -124,7 +125,7 @@ export async function chooseFirstSession(page) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
 	await page.locator('main article:not([data-testid=new-session-card])').first().click();
-	await page.waitForURL((u) => u.hash === '#/import');
+	await waitForRoute(page, '/import');
 }
 
 /**
@@ -134,7 +135,7 @@ export async function chooseFirstSession(page) {
  */
 export async function changeSessionProtocol(page, name) {
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await waitForRoute(page, "/(app)/sessions/[id]");
 	await chooseInDropdown(page, page.getByRole('button', { name: 'Choisir un protocole' }), name);
 	await goToTab(page, 'import');
 }

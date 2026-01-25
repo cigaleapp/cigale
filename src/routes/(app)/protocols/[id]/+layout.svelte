@@ -52,6 +52,12 @@
 	navbarAppearance('hidden');
 
 	/**
+	 * Available route IDs relative to here.
+	 * @import { ChildRouteId, WithoutPrefix  } from '$lib/utils';
+	 * @typedef {WithoutPrefix<"metadata/[metadata]", ChildRouteId<"/(app)/protocols/[id]">>} ProtocolRouteIds
+	 */
+
+	/**
 	 *
 	 * @param {SubmitEvent & { currentTarget: HTMLFormElement }} e
 	 */
@@ -278,14 +284,14 @@
 
 					<div
 						class="navlink"
-						class:active={page.url.hash.includes(`metadata/${shortId}/`)}
+						class:active={page.url.pathname.includes(`metadata/${shortId}/`)}
 					>
 						{#if collapsedSidebar}
 							<a
 								in:fade
 								class="navlink"
 								use:tooltip={{ text: label, placement: 'right' }}
-								class:active={page.url.hash.includes(`metadata/${shortId}/`)}
+								class:active={page.url.pathname.includes(`metadata/${shortId}/`)}
 								href={url}
 							>
 								<div class="menu-icon">{uppercaseFirst(label).slice(0, 2)}</div>
@@ -336,15 +342,16 @@
 
 {#snippet navlink(
 	/** @type {string} */ name,
-	/** @type {string} */ path,
+	/** @type {ProtocolRouteIds | ""} */ route,
 	/** @type {import('svelte').Component} */ Icon,
 	/** @type {string|number|undefined} */ badge = undefined
 )}
+	{@const path = route === '' ? route : resolve(`/(app)/protocols/[id]/${route}`, { id })}
 	<svelte:element
 		this={path ? 'a' : 'span'}
-		href={path ? `#/protocols/${id}/${path}` : undefined}
+		href={path || undefined}
 		class="navlink"
-		class:active={path && page.route.id?.includes(`/protocols/[id]/${path}`)}
+		class:active={route && page.route.id?.startsWith(`/(app)/protocols/[id]/${route}`)}
 		use:tooltip={collapsedSidebar
 			? {
 					text: name,
