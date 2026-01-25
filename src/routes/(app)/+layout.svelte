@@ -31,7 +31,7 @@
 
 	import { version } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { resolve, base } from '$app/paths';
+	import { base, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { tables } from '$lib/idb.svelte';
 	import { loadPreviewImage } from '$lib/images';

@@ -1349,7 +1349,6 @@ export function orEmpty(predicate, obj) {
  * @typedef {T extends `${Prefix}${infer P}` ? P : never} RemovePrefix
  */
 
-
 /**
  * @template {string} Prefix
  * @template T
@@ -1362,7 +1361,6 @@ export function orEmpty(predicate, obj) {
  * @template T
  * @typedef {Exclude<T, `${Prefix}${string}`>} WithoutPrefix
  */
-
 
 /**
  * Route IDs that are relative to Root.

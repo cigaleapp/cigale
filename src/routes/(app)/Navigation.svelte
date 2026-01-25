@@ -49,7 +49,6 @@
 
 	const path = $derived(page.url.pathname);
 
-
 	const hasImages = $derived(tables.Image.state.length > 0);
 
 	/** @type {number|undefined} */

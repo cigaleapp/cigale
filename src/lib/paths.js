@@ -19,4 +19,4 @@ export async function goto(...args) {
 }
 
 // TODO: remove at some point
-export { resolve }
+export { resolve };

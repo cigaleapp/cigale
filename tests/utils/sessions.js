@@ -27,7 +27,7 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 	await page.waitForTimeout(500);
 
 	await page.getByTestId('new-session').click();
-	await waitForRoute(page, "/(app)/sessions/[id]")
+	await waitForRoute(page, '/(app)/sessions/[id]');
 
 	if (protocol) {
 		await chooseInDropdown(
@@ -135,7 +135,7 @@ export async function chooseFirstSession(page) {
  */
 export async function changeSessionProtocol(page, name) {
 	await page.getByTestId('goto-current-session').click();
-	await waitForRoute(page, "/(app)/sessions/[id]");
+	await waitForRoute(page, '/(app)/sessions/[id]');
 	await chooseInDropdown(page, page.getByRole('button', { name: 'Choisir un protocole' }), name);
 	await goToTab(page, 'import');
 }

@@ -277,7 +277,7 @@ test('import into new session', async ({ page, app }) => {
 test('changing metadata values saves them in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Metadata session' });
 	await page.getByTestId('goto-current-session').click();
-	await app.path.wait('/(app)/sessions/[id]');;
+	await app.path.wait('/(app)/sessions/[id]');
 
 	/** @param {string} key */
 	const metadataValueFor = async (key) =>
@@ -312,7 +312,7 @@ test('changing metadata values saves them in the database', async ({ page, app }
 test('changing session info saves in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Test!!' });
 	await page.getByTestId('goto-current-session').click();
-	await app.path.wait('/(app)/sessions/[id]');;
+	await app.path.wait('/(app)/sessions/[id]');
 
 	const id = new URL(page.url()).pathname.split('/')[2];
 
@@ -346,7 +346,7 @@ test('can change protocol of session', async ({ page, app }) => {
 	await newSession(page, { name: 'Test' });
 
 	await page.getByTestId('goto-current-session').click();
-	await app.path.wait('/(app)/sessions/[id]');;
+	await app.path.wait('/(app)/sessions/[id]');
 
 	expect(await app.db.session.byName('Test')).toHaveProperty('protocol', exampleProtocol.id);
 

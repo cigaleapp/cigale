@@ -65,15 +65,15 @@ test.describe('Cropper view', () => {
 			}) => {
 				const images = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await app.path.wait(`/crop/${images.leaf.fileId}`)
+				await app.path.wait(`/crop/${images.leaf.fileId}`);
 				await page.keyboard.press('ArrowRight');
-				await app.path.wait(`/crop/${images.lilFella.fileId}`)
+				await app.path.wait(`/crop/${images.lilFella.fileId}`);
 				await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
-				await app.path.wait(`/crop/${images.leaf.fileId}`)
+				await app.path.wait(`/crop/${images.leaf.fileId}`);
 				await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
-				await app.path.wait(`/crop/${images.cyan.fileId}`)
+				await app.path.wait(`/crop/${images.cyan.fileId}`);
 				await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 			});
 
@@ -83,9 +83,9 @@ test.describe('Cropper view', () => {
 			}) => {
 				const { leaf: image } = await imagesByName(app);
 				await page.getByText('leaf.jpeg', { exact: true }).click();
-				await app.path.wait(`/crop/${image.fileId}`)
+				await app.path.wait(`/crop/${image.fileId}`);
 				await page.keyboard.press('Escape');
-				await app.path.wait('/crop')
+				await app.path.wait('/crop');
 				await expect(
 					page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
 				).toBeVisible();
@@ -107,27 +107,27 @@ test.describe('Cropper view', () => {
 		test('should not skip on confirm button click', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`)
+			await app.path.wait(`/crop/${image.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await app.path.wait(`/crop/${image.fileId}`)
+			await app.path.wait(`/crop/${image.fileId}`);
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should not skip on confirmation keybind', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`)
+			await app.path.wait(`/crop/${image.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await app.path.wait(`/crop/${image.fileId}`)
+			await app.path.wait(`/crop/${image.fileId}`);
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should toggle autoskip on on keybind press', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`)
+			await app.path.wait(`/crop/${image.fileId}`);
 
 			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
 			await page.keyboard.press('a');
@@ -147,27 +147,27 @@ test.describe('Cropper view', () => {
 		test('should skip on confirm button click', async ({ page, app }) => {
 			const images = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${images.leaf.fileId}`)
+			await app.path.wait(`/crop/${images.leaf.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await app.path.wait(`/crop/${images.lilFella.fileId}`)
+			await app.path.wait(`/crop/${images.lilFella.fileId}`);
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should skip on confirmation keybind', async ({ page, app }) => {
 			const images = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${images.leaf.fileId}`)
+			await app.path.wait(`/crop/${images.leaf.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
-			await app.path.wait(`/crop/${images.lilFella.fileId}`)
+			await app.path.wait(`/crop/${images.lilFella.fileId}`);
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should toggle autoskip off on keybind press', async ({ page, app }) => {
 			const { leaf: image } = await imagesByName(app);
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`)
+			await app.path.wait(`/crop/${image.fileId}`);
 
 			const { cropAutoNext: _, ...othersBefore } = await app.settings.get();
 			await page.keyboard.press('a');
@@ -190,7 +190,7 @@ test.describe('Cropper view', () => {
 			);
 
 			await page.getByText('with-exif-gps.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${image.fileId}`)
+			await app.path.wait(`/crop/${image.fileId}`);
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await page.waitForTimeout(1000);
 			expect(new URL(page.url()).pathname).toMatch(/^\/classify\/?$/);
@@ -208,11 +208,11 @@ test.describe('Cropper view', () => {
 			const imagesBefore = await app.db.image.list();
 
 			await page.getByText('leaf.jpeg', { exact: true }).click();
-			await app.path.wait(`/crop/${leaf.fileId}`)
+			await app.path.wait(`/crop/${leaf.fileId}`);
 
 			await deleteAction(page);
 
-			await app.path.wait(`/crop/${lilFella.fileId}`)
+			await app.path.wait(`/crop/${lilFella.fileId}`);
 
 			await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
@@ -479,7 +479,7 @@ test.describe('Cropper view', () => {
 				await page.keyboard.press('Delete');
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await page.keyboard.press('ArrowRight');
-				await app.path.wait(`/crop/${image.fileId}`)
+				await app.path.wait(`/crop/${image.fileId}`);
 
 				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms
 				for (const _ of Array.from({ length: 10 })) {
@@ -621,13 +621,13 @@ test.describe('Cropper view', () => {
 			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 
 			await page.keyboard.press('ArrowRight');
-			await app.path.wait(`/crop/${images.withExifGps.fileId}`)
+			await app.path.wait(`/crop/${images.withExifGps.fileId}`);
 
 			await zoomAt(page, 40, 150, 150);
 			await checkImageTransforms(page, 1.44, 124.186, 73.1136);
 
 			await page.keyboard.press('ArrowLeft');
-			await app.path.wait(`/crop/${images.lilFella.fileId}`)
+			await app.path.wait(`/crop/${images.lilFella.fileId}`);
 
 			await checkImageTransforms(page, 1.728, 254.761, 140.527);
 		});

@@ -8,7 +8,7 @@ const config = {
 		},
 		adapter: adapter({
 			pages: process.env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',
-			fallback: 'index.html',
+			fallback: 'index.html'
 		}),
 		alias: {
 			$worker: 'src/worker',
