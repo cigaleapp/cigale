@@ -1,7 +1,22 @@
 // @ts-check
 import { tz } from '@date-fns/tz';
 import { defineConfig, devices } from '@playwright/test';
+import arkenv from 'arkenv';
 import { formatISO9075, minutesToMilliseconds } from 'date-fns';
+
+/**
+ * @import RPReporter from '@reportportal/agent-js-playwright';
+ * @typedef {RPReporter['config']} ReportPortalConfig
+ */
+
+const env = arkenv({
+	CI: 'boolean = false',
+	'BASE_URL?': 'string.url',
+	SHARDING: 'boolean = false',
+	'REPORTPORTAL_API_KEY?': 'string',
+	'REPORTPORTAL_DOMAIN?': 'string',
+	'REPORTPORTAL_LAUNCH_ID?': 'string'
+});
 
 /** @typedef {NonNullable<import('@playwright/test').PlaywrightTestConfig['projects']>[number]} Project */
 
@@ -11,7 +26,7 @@ const chromium = {
 	use: {
 		...devices['Desktop Chrome'],
 		contextOptions: {
-			serviceWorkers: process.env.CI ? 'allow' : 'block'
+			serviceWorkers: env.CI ? 'allow' : 'block'
 		}
 	}
 };
@@ -34,6 +49,25 @@ const webkit = {
 	}
 };
 
+const reportPortalReporter =
+	env.REPORTPORTAL_API_KEY && env.REPORTPORTAL_DOMAIN && env.REPORTPORTAL_LAUNCH_ID
+		? [
+				/** @type {const} */
+				([
+					'@reportportal/agent-js-playwright',
+					/** @type {ReportPortalConfig} */
+					({
+						apiKey: env.REPORTPORTAL_API_KEY,
+						endpoint: `https://${env.REPORTPORTAL_DOMAIN}/api/v2`,
+						project: 'CIGALE',
+						launchId: env.REPORTPORTAL_LAUNCH_ID,
+						includeTestSteps: true
+						// debug: true,
+					})
+				])
+			]
+		: [];
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -54,25 +88,26 @@ export default defineConfig({
 	/* Run tests in files in parallel */
 	fullyParallel: true,
 	/* Fail the build on CI if you accidentally left test.only in the source code. */
-	forbidOnly: !!process.env.CI,
+	forbidOnly: !!env.CI,
 	/* Retry on CI only */
-	retries: process.env.CI ? 2 : 0,
+	retries: env.CI ? 2 : 0,
 	/* Opt out of parallel tests. */
 	workers: 1,
 	/* Reporter to use. See https://playwright.dev/docs/test-reporters */
-	reporter: process.env.CI
+	reporter: env.CI
 		? [
 				['json', { outputFile: 'test-results.json' }],
-				[process.env.SHARDING ? 'blob' : 'html'],
+				[env.SHARDING ? 'blob' : 'html'],
 				['github'],
-				['list']
+				['list'],
+				...reportPortalReporter
 			]
 		: [],
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. */
 		baseURL: dependsOnTarget({
-			live: process.env.BASE_URL,
+			live: env.BASE_URL,
 			dev: 'http://localhost:5173',
 			built: 'http://localhost:4173'
 		}),
@@ -127,7 +162,7 @@ export default defineConfig({
  * @returns {L | D | B}
  */
 function dependsOnTarget({ live, dev, built }) {
-	if (process.env.BASE_URL) return live;
-	if (process.env.CI) return built;
+	if (env.BASE_URL) return live;
+	if (env.CI) return built;
 	return dev;
 }
