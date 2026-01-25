@@ -47,7 +47,8 @@
 		progressbarOnly = false
 	} = $props();
 
-	const path = $derived(page.url.pathname);
+	// @ts-expect-error
+	const path = $derived(resolve(page.url.pathname));
 
 	const hasImages = $derived(tables.Image.state.length > 0);
 
