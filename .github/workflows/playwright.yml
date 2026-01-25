@@ -48,7 +48,7 @@ jobs:
           REPORTPORTAL_API_KEY: ${{ secrets.REPORTPORTAL_API_KEY }}
           REPORTPORTAL_DOMAIN: ${{ secrets.REPORTPORTAL_DOMAIN }}
           RUN_ID: ${{ github.run_id }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} 
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
 
       - name: Pre-download default protocol's models
@@ -158,7 +158,7 @@ jobs:
           REPORTPORTAL_DOMAIN: ${{ secrets.REPORTPORTAL_DOMAIN }}
           REPORTPORTAL_LAUNCH_ID: ${{ needs.predownload.outputs.reportportal-launch-id }}
           RUN_ID: ${{ github.run_id }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} 
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
 
   upload-report:
