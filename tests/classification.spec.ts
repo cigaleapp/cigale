@@ -72,7 +72,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		const lilFella = await app.db.observation.byLabel('lil-fella');
 		if (!lilFella) throw new Error('Missing lil-fella observation in database dump');
 
-		await page.waitForURL((u) => u.hash === `#/classify/${lilFella.images[0]}`);
+		await app.path.wait(`/classify/${lilFella.images[0]}`);
 	});
 
 	for (const switchLayout of [false, true]) {
@@ -233,7 +233,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				});
 			});
 
-			test('can go to the crop view and back', async ({ page }) => {
+			test('can go to the crop view and back', async ({ page, app }) => {
 				const url = page.url();
 
 				await page
@@ -242,13 +242,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 					.getByRole('button', { name: 'Recadrer' })
 					.click();
 
-				await page.waitForURL((u) => u.hash.startsWith('#/crop/'));
+				await app.path.wait('/(app)/(sidepanel)/crop/[image]')
 
 				await ex(page).toHaveTitle(/^Recadrer lil-fella.jpeg · /);
 
 				await page.getByRole('button', { name: 'Retour' }).click();
 
-				await page.waitForURL((u) => u.hash.startsWith('#/classify/'));
+				await app.path.wait('/(app)/(sidepanel)/classify/[image]')
 				await ex(page).toHaveURL(url);
 			});
 
