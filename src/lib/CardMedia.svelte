@@ -21,6 +21,7 @@
 	 * @property {boolean} [selectable=true] - whether this image can be selected
 	 * @property {boolean} [selected=false]
 	 * @property {boolean} [highlighted] - whether this image is highlighted. selected implies highlighted.
+	 * @property {{ width: number, height: number } | undefined} dimensions - original dimensions of the image
 	 * @property {"show-all" | "apply-first" | "none"} [boxes] what to do with the images' bounding boxes. Either display them all, or crop to the first one.
 	 * @property {object[]} [boundingBoxes] - array of bounding boxes. Values are between 0 and 1 (relative to the width/height of the image)
 	 * @property {number} boundingBoxes.x
@@ -53,6 +54,7 @@
 		onretry,
 		title,
 		image,
+		dimensions,
 		selected = false,
 		selectable = true,
 		highlighted,
@@ -155,9 +157,16 @@
 				{/if}
 				<div class="boundingboxes-wrapper" class:has-boxes={boxes === 'show-all'}>
 					{#if image}
-						{#if boxes === 'apply-first' && boundingBoxes.length > 0}
-							<CroppedImg blurfill src={image} alt={title} box={boundingBoxes[0]} />
+						{#if boxes === 'apply-first' && boundingBoxes.length > 0 && dimensions}
+							<CroppedImg
+								blurfill
+								{dimensions}
+								src={image}
+								alt={title}
+								box={boundingBoxes[0]}
+							/>
 						{:else}
+							<!-- TODO compute dimensions to emulate object-fit: contain… (1/2) -->
 							<img src={image} alt={title} />
 						{/if}
 					{:else}
@@ -167,6 +176,7 @@
 					{/if}
 					{#if boxes === 'show-all'}
 						{#each boundingBoxes as bounding, index (index)}
+							<!-- TODO …and use it here to compute box dimensions, taking into account image's original dimensions (% -> px) then making it relative to the actual <img> tag dims (px -> %)  (2/2) -->
 							<div
 								data-testid="card-observation-bounding-box"
 								class="bb"

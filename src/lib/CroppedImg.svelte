@@ -1,52 +1,78 @@
 <!-- @component A wrapped <img> tag that displays an image cropped to a given bounding box. -->
 
-<script>
-	import { toCorners } from './BoundingBoxes.svelte';
+<script lang="ts">
+	import { toCorners, type Rect } from './BoundingBoxes.svelte';
 
-	/**
-	 * @typedef {object} Props
-	 * @property {string|undefined} src - The source URL of the image.
-	 * @property {string} [class] - Additional classes to apply to the div wrapper.
-	 * @property {import('./BoundingBoxes.svelte').Rect} box - The bounding box to crop the image to, in relative (0-1), top-left coordinates.
-	 * @property {boolean} [blurfill] fill empty space with a blurred version of the image.
-	 * @property {boolean} [background] show the full image as the background (darkened)
-	 */
-
-	/** @type {Props & Record<string, unknown>} */
-	const { src, box, blurfill, background, class: klass = '', ...rest } = $props();
-	const corners = $derived(toCorners(box));
-
-	const aspectRatio = $derived(box.width / box.height);
-
-	/**
-	 *
-	 * @param {[number, number]} param0
-	 */
-	function percents([x, y]) {
-		return [x * 100, y * 100].map((c) => c + '%').join(' ');
+	interface Props {
+		src: string | undefined;
+		class?: string;
+		box: Rect;
+		blurfill?: boolean;
+		dimensions: { width: number; height: number };
+		background?: boolean;
+		/** Transition transformation changes */
+		transitions?: boolean;
 	}
 
-	/**
-	 * @type {number}
-	 */
-	const scale = $derived((1 / box.width) * Math.min(aspectRatio, 1));
+	const {
+		src,
+		box,
+		blurfill,
+		background,
+		dimensions: imageDimensions,
+		class: klass = '',
+		transitions = false,
+		...rest
+	}: Props & Record<string, unknown> = $props();
 
-	/**
-	 * @type {[number, number]}
-	 */
-	const translate = $derived.by(() => {
+	const corners = $derived(toCorners(box));
+
+	const aspectRatio = $derived(
+		(box.width * imageDimensions.width) / (box.height * imageDimensions.height)
+	);
+
+	function percents(coords: undefined | [number, number]) {
+		return coords?.map((c) => c * 100 + '%').join(' ');
+	}
+
+	let areaRect: undefined | DOMRectReadOnly = $state();
+	const areaAspectRatio = $derived.by(() => {
+		if (!areaRect) return undefined;
+		const { width, height } = areaRect;
+		return width / height;
+	});
+
+	const scale: undefined | [number, number] = $derived.by(() => {
+		if (!areaAspectRatio) return undefined;
+
+		const [w, h] = [
+			(1 / box.width) * Math.min(aspectRatio, 1),
+			(1 / box.height) * Math.min(1 / aspectRatio, 1)
+		];
+
+		if (areaAspectRatio > aspectRatio) {
+			return [w / areaAspectRatio, h];
+		} else {
+			return [w, h * areaAspectRatio];
+		}
+	});
+
+	const translate: undefined | [number, number] = $derived.by(() => {
+		if (!scale) return undefined;
+
 		const [originX, originY] = corners.topleft;
-		const [finalW, finalH] = [scale * box.width, scale * box.height];
+		const [scaleW, scaleH] = scale;
+		const [finalW, finalH] = [scaleW * box.width, scaleH * box.height];
 
 		if (aspectRatio > 1) {
-			return [-originX, -originY + 1 / 2 - finalH / 2];
+			return [-originX + 1 / 2 - finalW / 2, -originY + 1 / 2 - finalH / 2];
 		} else {
 			return [-originX + 1 / 2 - finalW / 2, -originY];
 		}
 	});
 </script>
 
-<picture class="cropped {klass}">
+<picture class="cropped {klass}" bind:contentRect={areaRect} class:transitions>
 	{#if blurfill}
 		<img data-is-blur="true" class="blur" {src} alt="" aria-hidden="true" />
 	{/if}
@@ -55,7 +81,7 @@
 		<img
 			style:transform-origin={percents(corners.topleft)}
 			style:translate={percents(translate)}
-			style:scale="{scale * 100}%"
+			style:scale={percents(scale)}
 			{src}
 			alt=""
 			aria-hidden="true"
@@ -65,9 +91,11 @@
 	{/if}
 
 	<img
+		{src}
+		{...rest}
 		style:transform-origin={percents(corners.topleft)}
 		style:translate={percents(translate)}
-		style:scale="{scale * 100}%"
+		style:scale={percents(scale)}
 		style:clip-path="polygon({[
 			corners.topleft,
 			corners.topright,
@@ -76,8 +104,6 @@
 		]
 			.map(percents)
 			.join(', ')})"
-		{src}
-		{...rest}
 	/>
 </picture>
 
@@ -88,10 +114,13 @@
 		display: block;
 	}
 
+	picture.transitions img {
+		transition: all 0.2s;
+	}
+
 	img {
 		width: 100%;
 		height: 100%;
-		transition: all 0.2s;
 	}
 
 	img.blur {

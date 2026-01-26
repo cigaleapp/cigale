@@ -21,6 +21,7 @@
 	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
 
 	let zoomed = $state(true);
+	let transitionCrop = $state(false);
 
 	const box = $derived(
 		zoomed
@@ -37,13 +38,18 @@
 		O: {
 			help: "Agrandir/Réduire l'image",
 			do() {
+				transitionCrop = false;
 				expand = expand === 'subject' ? 'none' : 'subject';
 			}
 		},
 		Z: {
 			help: "Voir l'image entière/recadrée",
 			do() {
+				transitionCrop = true;
 				zoomed = !zoomed;
+				setTimeout(() => {
+					transitionCrop = false;
+				}, /* XXX: Duration of crop transition as set in CroppedImg component */ 200);
 			}
 		}
 	});
@@ -77,8 +83,10 @@
 
 	{#if box}
 		<CroppedImg
+			dimensions={image.dimensions}
 			src={uiState.getPreviewURL(image.fileId)}
 			box={toTopLeftCoords(box)}
+			transitions={transitionCrop}
 			background
 		/>
 	{:else}
