@@ -7,28 +7,45 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Improvements
 
 - Add ETA as tooltip on navbar logo when processing is ongoing (Closes #51) (#1027)
+- Add ability to catch coercion errors in switchOnMetadataType()
 - Add protocol auto-updating (Closes #954) (#1088)
+- Allow changing tolerance settings for grouping in gallery tabs
+- Allow grouping observation with hundreds number precision
 - Fix opacity of disabled ButtonSecondary
 - Fix vertical line in zip contents preview tree not extending when scrolling
+- Handle empty state for tab settings group/sort metadata submenu
+- Handle invalid grouping/sorting settings gracefully
 - Implement average merge method for enum metadata
 - Improve keyboard shortcuts hints
 - Make Chrome scrollbars thinner
+- Make gallery groups collapsible
+- Make model switching less buggy (#1110)
 - Rajouter validation pour les forms de creation d'issue (Closes #1049)
 - Safeguard against crashing if somehow a plural i18n message doesn't have enough candidates
 - Safeguard against storing >1-confidence metadata values
 - Show loading spinner when opening a session
 - Show uncompressed zip size estimate
+- Sort metadata in tab's sort/group dropdowns
 - Take crop padding into account when estimating .zip sizes (#1052)
 - Turn results modal into a full page, complete with zip files preview and size estimations
 - Use enter key glyph to display Enter in keybind hints
 - Use skeleton UI instead of spinners where relevant (Closes #1047)
+- Use submenus to shorten tab settings dropdown
 
 ### Bug Fixes
 
+- Fix click-to-import triggering when clicking on buttons in gallery groups' headers
+- Fix crashes related to metadata merging code changes
+- Fix current tab indicators not showing on non-root base path deployments
+- Fix duplicates in sort/group metadata submenus
 - Fix inference models not being cached (Closes #1077)
+- Fix reactivity over value prop of MetadataInput
 - Fix sessionId index name for file tables
 - Include protocol ID in caching key when using string-form HTTPRequest for inference model
+- Parse serialized date metadata values with fractional seconds
 - Prevent zip preview from being empty if we went from import tab to results tab directly
+- Reset collapsed groups state when group settings change
+- Restore group and sort settings when importing an exported session
 
 ### Data Updates
 
@@ -43,6 +60,69 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Translation Updates
 
 - Refresh translation files
+- Translate via Weblate (English)
+
+## October 2025
+
+### Improvements
+
+- Add beta disclaimers
+- Add default crop padding setting
+- Add field label for protocol description
+- Allow deleting option from option details page
+- Change icon pack to Remix Icon (#776)
+- Clarify that pattern repeats by adding labels to faded nodes in diagram
+- Color differences-with-remote-protocol count according to amount of changes
+- Document variables in export configuration
+- Don't update DB if error occured in updater
+- Enlarge panels when sidebar is collapsed
+- Finish authors editing
+- Finish crop settings
+- Finish protocol diffing
+- Fix alignment on RowProtocol
+- Fix font family in keyboard hints
+- Fix math font
+- Fix width of buttons in protocol selection page
+- Implement diffing of protocol with its remote, upstream version
+- Improve appearance of changes with remote protocol
+- Improve other model setting inputs
+- Improve style of arrays in protocol changes-with-remote list
+- Make debug dumps smaller in preview panel
+- Make parallelism configurable (Closes #700) (#767)
+- Make version input monospace
+- Migrate from hash-router-based URLs
+- Prevent image numbers in cropper navigation from becoming small
+- Put number of cards in grouped grid headings in monospace font
+- Put search bar above new option field in options edition page
+- Remove Manage protocols button on settings flyout
+- Remove checkmark icon from continue button in cropper
+- Show loading spinner on card while loading cropper view
+- Show options count on metadata navbar
+- Switch monospace font to Martian Mono
+- Tweak text styles in /about
+- Validate bundle analyzer modes on config load instead of assuming type
+
+### Bug Fixes
+
+- Fix computation progress for protocol diffing not showing up
+- Fix displaying of added metadata in protocol diffing
+- Fix fonts not loading
+- Fix option description updates not store in db
+- Fix some bugs
+- Fix translations not working anymore
+- Remove weird import in sidepanel's +layout.svelte
+
+### Data Updates
+
+- Regenerate example protocols
+
+### Translation Updates
+
+- Fix some weird msgids
+- Refresh translation files
+- Reset translation file changes
+- Translate font credit line for Martian Mono in about page
+- Translate some more
 - Translate via Weblate (English)
 
 ## December 2025
@@ -171,68 +251,6 @@ All notable changes to this project will be documented in this file, on a monthl
 ### Translation Updates
 
 - Refresh translation files
-
-## October 2025
-
-### Improvements
-
-- Add beta disclaimers
-- Add default crop padding setting
-- Add field label for protocol description
-- Allow deleting option from option details page
-- Change icon pack to Remix Icon (#776)
-- Clarify that pattern repeats by adding labels to faded nodes in diagram
-- Color differences-with-remote-protocol count according to amount of changes
-- Document variables in export configuration
-- Don't update DB if error occured in updater
-- Enlarge panels when sidebar is collapsed
-- Finish authors editing
-- Finish crop settings
-- Finish protocol diffing
-- Fix alignment on RowProtocol
-- Fix font family in keyboard hints
-- Fix math font
-- Fix width of buttons in protocol selection page
-- Implement diffing of protocol with its remote, upstream version
-- Improve appearance of changes with remote protocol
-- Improve other model setting inputs
-- Improve style of arrays in protocol changes-with-remote list
-- Make debug dumps smaller in preview panel
-- Make parallelism configurable (Closes #700) (#767)
-- Make version input monospace
-- Prevent image numbers in cropper navigation from becoming small
-- Put number of cards in grouped grid headings in monospace font
-- Put search bar above new option field in options edition page
-- Remove Manage protocols button on settings flyout
-- Remove checkmark icon from continue button in cropper
-- Show loading spinner on card while loading cropper view
-- Show options count on metadata navbar
-- Switch monospace font to Martian Mono
-- Tweak text styles in /about
-- Validate bundle analyzer modes on config load instead of assuming type
-
-### Bug Fixes
-
-- Fix computation progress for protocol diffing not showing up
-- Fix displaying of added metadata in protocol diffing
-- Fix fonts not loading
-- Fix option description updates not store in db
-- Fix some bugs
-- Fix translations not working anymore
-- Remove weird import in sidepanel's +layout.svelte
-
-### Data Updates
-
-- Regenerate example protocols
-
-### Translation Updates
-
-- Fix some weird msgids
-- Refresh translation files
-- Reset translation file changes
-- Translate font credit line for Martian Mono in about page
-- Translate some more
-- Translate via Weblate (English)
 
 ## September 2025
 
