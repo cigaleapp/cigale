@@ -324,9 +324,11 @@
 			return;
 		}
 
+		if (!uiState.currentSessionId) return;
+
 		await storeMetadataValue({
 			db: idb.databaseHandle(),
-			sessionId: uiState.currentSession?.id,
+			sessionId: uiState.currentSessionId,
 			subjectId: imageId,
 			metadataId: uiState.cropMetadataId,
 			type: 'boundingbox',
@@ -337,7 +339,7 @@
 		if (uiState.classificationMetadataId) {
 			await deleteMetadataValue({
 				db: idb.databaseHandle(),
-				sessionId: uiState.currentSession?.id,
+				sessionId: uiState.currentSessionId,
 				metadataId: uiState.classificationMetadataId,
 				subjectId: imageId
 			});
@@ -469,7 +471,7 @@
 				// Species confidence was inferred, we need to remove it so we can infer it again, since it's inferred on the _cropped_ image
 				await deleteMetadataValue({
 					db: idb.databaseHandle(),
-					sessionId: uiState.currentSession?.id,
+					sessionId: uiState.currentSessionId,
 					metadataId: uiState.classificationMetadataId,
 					subjectId: image.id
 				});
@@ -490,7 +492,7 @@
 			// We're modifying an existing cropbox
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
-				sessionId: uiState.currentSession?.id,
+				sessionId: uiState.currentSessionId,
 				metadataId: uiState.cropMetadataId,
 				subjectId: imageId,
 				type: 'boundingbox',
@@ -517,7 +519,7 @@
 
 			await storeMetadataValue({
 				db: idb.databaseHandle(),
-				sessionId: uiState.currentSession?.id,
+				sessionId: uiState.currentSessionId,
 				metadataId: uiState.cropMetadataId,
 				subjectId: newImageId,
 				type: 'boundingbox',

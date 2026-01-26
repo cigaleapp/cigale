@@ -1,8 +1,10 @@
+import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
+	getDatabaseRowById,
 	loadDatabaseDump,
 	setImageMetadata,
 	throwError
@@ -720,11 +722,17 @@ async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 			page,
 			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.metadata}) (${i + 1}/${ids.length})`
 		);
+
+		const image = await getDatabaseRowById(page, 'Image', id).then((img) =>
+			Schemas.Image.assert(img)
+		);
+
 		await setImageMetadata(
 			{ page },
 			id,
 			{
 				[exampleProtocol.crop.metadata]: {
+					...image?.metadata[exampleProtocol.crop.metadata],
 					confirmed: true
 				}
 			},
