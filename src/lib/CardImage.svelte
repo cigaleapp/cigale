@@ -5,8 +5,12 @@
 	import { uiState } from './state.svelte.js';
 
 	/**
+	 * @import * as DB from '$lib/database.js';
+	 */
+
+	/**
 	 * @typedef {object} Props
-	 * @property {import('$lib/database').Image & { fileId: string }} image
+	 * @property {DB.Image} image
 	 * @property {boolean} [highlighted] - whether this image is highlighted
 	 */
 
@@ -32,7 +36,8 @@
 <CardMedia
 	id={image.id}
 	title={image.filename}
-	image={uiState.getPreviewURL(image.fileId)}
+	image={image.fileId ? uiState.getPreviewURL(image.fileId) : undefined}
+	dimensions={image.dimensions}
 	selected={uiState.selection.includes(image.id)}
 	boundingBoxes={cropbox ? [toTopLeftCoords(cropbox)] : []}
 	boxes="show-all"

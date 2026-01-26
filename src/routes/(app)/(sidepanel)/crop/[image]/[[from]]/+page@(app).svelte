@@ -1047,8 +1047,9 @@
 						class:unfocused={focusedImageId && focusedImageId !== image.id}
 						class:selected={selectedBox.imageId === image.id}
 					>
-						{#if image.fileId}
+						{#if image.fileId && firstImage}
 							<CroppedImg
+								dimensions={firstImage.dimensions}
 								box={toTopLeftCoords(box)}
 								src={uiState.getPreviewURL(image.fileId)}
 								class="thumb"
