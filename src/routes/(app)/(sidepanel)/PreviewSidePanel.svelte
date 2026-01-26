@@ -235,6 +235,7 @@
 		{#if page.route.id === '/(app)/(sidepanel)/classify'}
 			<ButtonSecondary
 				disabled={images.length !== 1}
+				loading
 				onclick={async () => {
 					const [image] = images;
 					if (!image) return;
