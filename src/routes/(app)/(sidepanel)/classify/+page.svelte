@@ -28,10 +28,20 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { isAbortError, nonnull } from '$lib/utils.js';
 
+	/**
+	 * @import * as DB from '$lib/database.js';
+	 * @import { GalleryItem } from '$lib/gallery.js';
+	 */
+
+	/**
+	 * @typedef {GalleryItem<{ image: DB.Image | undefined; observation: DB.Observation | undefined; images: DB.Image[] }>} Item
+	 */
+
 	seo({ title: 'Classification' });
 
 	const { data } = $props();
 
+	/** @type {Item[]} */
 	const items = $derived(
 		tables.Observation.state.map((obs) => ({
 			id: obs.id,
@@ -53,6 +63,8 @@
 	);
 
 	let unrolledObservation = $state('');
+
+	/** @type {[string, Item[]]} */
 	const unroll = $derived([
 		unrolledObservation,
 		items
@@ -61,6 +73,8 @@
 				id: img.id,
 				name: img.filename,
 				addedAt: img.addedAt,
+				sessionId: img.sessionId,
+				metadata: img.metadata,
 				virtual: false,
 				data: {
 					image: img,
