@@ -103,7 +103,12 @@ export const Session = type({
 	description: 'string',
 	protocol: ID,
 	metadata: MetadataValues,
-	fullscreenClassifyLayout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS).default('top-bottom'),
+	fullscreenClassifier: type({
+		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),
+		'focusedMetadata?': ID
+	}).default(() => ({
+		layout: 'top-bottom'
+	})),
 	sort: type({
 		global: SortSettings,
 		// Per-tab

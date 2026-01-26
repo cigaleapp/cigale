@@ -13,7 +13,7 @@
 		toggleLayoutTransitions: (enable: boolean) => void;
 	}
 
-	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
+	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	const nextLayout = $derived(LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]);
 
