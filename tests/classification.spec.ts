@@ -242,13 +242,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 					.getByRole('button', { name: 'Recadrer' })
 					.click();
 
-				await app.path.wait('/(app)/(sidepanel)/crop/[image]')
+				await app.path.wait('/(app)/(sidepanel)/crop/[image]/[[from]]');
 
 				await ex(page).toHaveTitle(/^Recadrer lil-fella.jpeg · /);
 
 				await page.getByRole('button', { name: 'Retour' }).click();
 
-				await app.path.wait('/(app)/(sidepanel)/classify/[image]')
+				await app.path.wait('/(app)/(sidepanel)/classify/[image]');
 				await ex(page).toHaveURL(url);
 			});
 
@@ -260,14 +260,12 @@ test.describe('full-screen classification view', pr(1071), () => {
 						.getByRole('button', { name: 'Autres images' })
 						.click();
 
-					await page.waitForURL(/#\/classify$/);
-					await ex(page).toHaveURL((u) => u.hash === app.tabs.hash('classify'));
+					await app.path.wait('/classify');
 				});
 
 				test('with the keyboard', async ({ page, app }) => {
 					await page.keyboard.press('Escape');
-					await page.waitForURL(/#\/classify$/);
-					await ex(page).toHaveURL((u) => u.hash === app.tabs.hash('classify'));
+					await app.path.wait('/classify');
 				});
 			});
 

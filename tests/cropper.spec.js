@@ -1,8 +1,10 @@
+import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
+	getDatabaseRowById,
 	loadDatabaseDump,
 	setImageMetadata,
 	throwError
@@ -19,7 +21,7 @@ test.describe('Cropper view', () => {
 		await chooseFirstSession(page);
 		await app.tabs.go('import');
 		const allImages = await app.db.image.list();
-		await markImagesAsConfirmedInDatabase(
+		await setImageConfirmedStatusInDB(
 			page,
 			allImages.map((i) => i.id),
 			false
@@ -180,7 +182,7 @@ test.describe('Cropper view', () => {
 
 		test('should autoskip to classify when all images are confirmed', async ({ page, app }) => {
 			const { withExifGps: image } = await imagesByName(app);
-			await markImagesAsConfirmedInDatabase(
+			await setImageConfirmedStatusInDB(
 				page,
 				await app.db.image
 					.list()
@@ -714,18 +716,24 @@ async function isImageConfirmedInDatabase(app, id) {
  * @param {string[]} ids
  * @param {boolean} [confirmed=true]
  */
-async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
+async function setImageConfirmedStatusInDB(page, ids, confirmed = true) {
 	for (const [i, id] of ids.entries()) {
 		await browserConsole.log(
 			page,
 			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.metadata}) (${i + 1}/${ids.length})`
 		);
+
+		const image = await getDatabaseRowById(page, 'Image', id).then((img) =>
+			Schemas.Image.assert(img)
+		);
+
 		await setImageMetadata(
 			{ page },
 			id,
 			{
 				[exampleProtocol.crop.metadata]: {
-					confirmed: true
+					...image?.metadata[exampleProtocol.crop.metadata],
+					confirmed
 				}
 			},
 			{

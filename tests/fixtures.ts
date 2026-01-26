@@ -11,7 +11,6 @@ import { safeJSONParse } from '$lib/utils';
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import {
-	appNavTabs,
 	confirmDeletionModal,
 	expectTooltipContent,
 	getDatabaseRowByField,
@@ -114,7 +113,6 @@ export type AppFixture = {
 	tabs: {
 		go(tab: NavigationTab): Promise<void>;
 		get(tab: NavigationTab): Locator;
-		hash(tab: NavigationTab): `#${string}`;
 	};
 	path: {
 		wait(route: Parameters<typeof waitForRoute>[1]): Promise<void>;
@@ -148,7 +146,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 				},
 				async refresh() {
 					await page.evaluate(async () => {
-						await window.refreshDB();
+						window.refreshDB();
 					});
 				},
 				protocol: {
@@ -300,8 +298,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			},
 			tabs: {
 				go: async (tab) => goToTab(page, tab),
-				get: (tab) => getTab(page, tab),
-				hash: (tab) => appNavTabs()[tab].hash
+				get: (tab) => getTab(page, tab)
 			},
 			path: {
 				wait: async (route) => waitForRoute(page, route),
