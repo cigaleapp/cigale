@@ -11,8 +11,11 @@ let allOptions: [string | undefined, MetadataEnumVariant[]] = [undefined, []];
 export async function load({ params, depends }) {
 	if (!uiState.currentSessionId) error(400, 'Aucune session active');
 
-	const focusedMetadata = uiState.classificationMetadataId
-		? await tables.Metadata.get(uiState.classificationMetadataId)
+	const focusedMetadataId =
+		uiState.currentSession?.fullscreenClassifier.focusedMetadata ??
+		uiState.classificationMetadataId;
+	const focusedMetadata = focusedMetadataId
+		? await tables.Metadata.get(focusedMetadataId)
 		: undefined;
 
 	if (focusedMetadata && uiState.currentProtocolId && allOptions[0] !== focusedMetadata.id) {

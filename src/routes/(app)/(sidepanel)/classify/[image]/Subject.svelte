@@ -18,7 +18,7 @@
 
 	let { image, expand = $bindable() }: Props = $props();
 
-	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
+	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	let zoomed = $state(true);
 	let transitionCrop = $state(false);

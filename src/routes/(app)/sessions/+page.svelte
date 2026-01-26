@@ -17,6 +17,7 @@
 	import { switchSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import { orEmptyObj } from '$lib/utils.js';
 
 	seo({ title: 'Sessions' });
 
@@ -45,6 +46,12 @@
 			createdAt: new Date().toISOString(),
 			openedAt: new Date().toISOString(),
 			metadata: {},
+			fullscreenClassifier: {
+				layout: 'top-bottom',
+				...orEmptyObj(classificationMetadata !== undefined, {
+					focusedMetadata: classificationMetadata ?? ''
+				})
+			},
 			group: {
 				global: { field: 'none' },
 				crop: { field: 'metadataPresence', metadata: defaultProtocol.crop.metadata },

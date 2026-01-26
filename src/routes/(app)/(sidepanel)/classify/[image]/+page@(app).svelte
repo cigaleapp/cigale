@@ -36,7 +36,7 @@
 
 	const cascadeLabelsCache: CascadeLabelsCache = $state({});
 
-	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
+	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	const currentMetadataValue = $derived(
 		image && focusedMetadata ? getMetadataValue(image, 'enum', focusedMetadata.id) : undefined

@@ -1358,6 +1358,7 @@ ratione facere!`;
 export function isAbortError(error) {
 	return error instanceof DOMException && error.name === 'AbortError';
 }
+
 /**
  * Spread into an array literal to conditionally add something to it
  * @template T
@@ -1376,6 +1377,28 @@ if (import.meta.vitest) {
 		expect(orEmpty(false, 1)).toEqual([]);
 		expect(orEmpty(undefined, 1)).toEqual([]);
 		expect(orEmpty(null, 1)).toEqual([]);
+	});
+}
+
+/**
+ * Spread into an object literal to conditionally add something to it
+ * @template T
+ * @param {boolean | undefined | null} predicate
+ * @param {T} obj
+ * @returns { T | {} }
+ */
+export function orEmptyObj(predicate, obj) {
+	return predicate ? obj : {};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('orEmptyObj', () => {
+		expect(orEmptyObj(true, { a: 1 })).toEqual({ a: 1 });
+		expect(orEmptyObj(false, { a: 1 })).toEqual({});
+		expect(orEmptyObj(undefined, { a: 1 })).toEqual({});
+		expect(orEmptyObj(null, { a: 1 })).toEqual({});
 	});
 }
 

@@ -19,7 +19,7 @@
 	let { option, expand = $bindable() }: Props = $props();
 	const { image, images, label, key } = $derived(option);
 
-	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
+	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	defineKeyboardShortcuts('classification', {
 		'Shift+L': {

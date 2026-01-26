@@ -25,7 +25,7 @@
 
 	const { image, focusedMetadata, options, currentMetadataValue: current }: Props = $props();
 
-	const layout = $derived(uiState.currentSession?.fullscreenClassifyLayout ?? 'top-bottom');
+	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	let focusOptionCombobox: ComboboxProps['focuser'] = $state((_) => {});
 
