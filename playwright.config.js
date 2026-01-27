@@ -65,7 +65,8 @@ export default defineConfig({
 				['json', { outputFile: 'test-results.json' }],
 				[process.env.SHARDING ? 'blob' : 'html'],
 				['github'],
-				['list']
+				['list'],
+				['./tests/reporters/pleye.js', pleyeConfig()]
 			]
 		: [],
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -116,6 +117,25 @@ export default defineConfig({
 		}
 	})
 });
+
+/**
+ * @returns {import('./tests/reporters/pleye').PleyeParams}
+ */
+function pleyeConfig() {
+	return {
+		debug: process.env.PLEYE_DEBUG === 'debug',
+		apiKey: process.env.PLEYE_API_KEY || '',
+		serverOrigin: 'https://pleye.gwen.works',
+		repositoryGitHubId: Number(process.env.GITHUB_REPOSITORY_ID) || 0,
+		githubJobId: Number(process.env.GITHUB_JOB_ID) || 0,
+		githubRunId: Number(process.env.GITHUB_RUN_ID) || 0,
+		commitSha: process.env.GITHUB_COMMIT_SHA || '',
+		branch: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '',
+		pullRequestNumber: process.env.GITHUB_PR_NUMBER
+			? Number(process.env.GITHUB_PR_NUMBER)
+			: undefined
+	};
+}
 
 /**
  *
