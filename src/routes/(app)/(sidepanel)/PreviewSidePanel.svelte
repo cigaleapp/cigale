@@ -7,27 +7,31 @@
 
 	import IconObservation from '~icons/ri/bug-line';
 	import IconDelete from '~icons/ri/delete-bin-line';
+	import IconFullScreen from '~icons/ri/fullscreen-line';
 	import IconSplit from '~icons/ri/function-line';
 	import IconImage from '~icons/ri/image-2-line';
 	import IconMerge from '~icons/ri/shadow-line';
 	import IconImport from '~icons/ri/upload-2-line';
+	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import { plural } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
 	import * as idb from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
+	import KeyboardHint from '$lib/KeyboardHint.svelte';
 	import Logo from '$lib/Logo.svelte';
 	import Metadata from '$lib/Metadata.svelte';
 	import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
+	import { goto } from '$lib/paths';
 	import { metadataDefinitionComparator } from '$lib/protocols';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 
 	/**
 	 * @typedef {object} Props
-	 * @property {Array<{ src: string; box?: undefined | TopLeftBoundingBox }>} images source **href**s of the images/observations we're modifying the metadata on
+	 * @property {Array<{ src: string; box?: undefined | TopLeftBoundingBox, id: string, dimensions: {width: number, height: number} }>} images source **href**s of the images/observations we're modifying the metadata on
 	 * @property {(() => void) | undefined} [onmerge] callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown.
 	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
 	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
@@ -125,6 +129,18 @@
 			return this.image + this.observation;
 		}
 	});
+
+	/**
+	 * @param {{ width: number, height: number }} dimensions
+	 * @param {undefined | TopLeftBoundingBox} box
+	 * @returns {[number, number]}
+	 */
+	function applyBox(dimensions, box) {
+		const apply = (/** @type {number} */ orig, /** @type {number|undefined} */ axis) =>
+			axis ? Math.round(orig * axis) : orig;
+
+		return [apply(dimensions.width, box?.width), apply(dimensions.height, box?.height)];
+	}
 </script>
 
 <aside
@@ -134,15 +150,18 @@
 >
 	{#if images.length > 0 && !loadingOptions}
 		<div class="images">
-			{#each images as { src, box }, i (i)}
+			{#each images as { src, box, dimensions }, i (i)}
 				{@const alt = singleObservationSelected
 					? `Image ${i + 1} de l'observation ${singleObservationSelected.label}`
 					: `Image ${i + 1} de la sélection`}
-				{#if box}
-					<CroppedImg blurfill {src} {alt} {box} />
-				{:else}
-					<img {src} {alt} />
-				{/if}
+
+				<div class="image" style:aspect-ratio={applyBox(dimensions, box).join(' / ')}>
+					{#if box}
+						<CroppedImg blurfill {src} {alt} {box} {dimensions} />
+					{:else}
+						<img {src} {alt} />
+					{/if}
+				</div>
 			{/each}
 		</div>
 		<h2>
@@ -228,6 +247,25 @@
 				Importer d'autres images
 			</ButtonSecondary>
 		{/if}
+		{#if page.route.id === '/(app)/(sidepanel)/classify'}
+			<ButtonSecondary
+				disabled={images.length !== 1}
+				loading
+				onclick={async () => {
+					const [image] = images;
+					if (!image) return;
+					await goto('/(app)/(sidepanel)/classify/[image]', { image: image.id });
+				}}
+			>
+				<IconFullScreen />
+				Ouvrir en plein écran
+				{#if images.length > 1}
+					&nbsp;(sélectionnez une seule image)
+				{:else}
+					<KeyboardHint shortcut="$mod+Enter" />
+				{/if}
+			</ButtonSecondary>
+		{/if}
 		<ButtonSecondary
 			disabled={images.length === 0}
 			onclick={ondelete}
@@ -291,9 +329,10 @@
 		overflow-x: hidden;
 	}
 
-	.images :global(> *) {
+	.images .image {
 		height: 50px;
 		border-radius: var(--corner-radius);
+		overflow: hidden;
 	}
 
 	.button {

@@ -59,10 +59,10 @@
 			}}
 		>
 			{#snippet item(image, { id, name })}
-				{#if image && image.fileId}
+				{#if image}
 					<CardImage
 						boxes="none"
-						image={{ ...image, fileId: image.fileId }}
+						{image}
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);
@@ -78,6 +78,7 @@
 						status={error ? 'errored' : queued ? 'queued' : 'loading'}
 						tooltip={error}
 						image={undefined}
+						dimensions={undefined}
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);

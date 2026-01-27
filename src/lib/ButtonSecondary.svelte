@@ -22,13 +22,14 @@ Available CSS variables:
 	 * @property {undefined | ((e: MouseEvent, signals: { loadingStarted: () => void, loadingEnded: () => void }) => Promise<void> |void)} onclick
 	 * @property {boolean} [disabled=false]
 	 * @property {boolean} [tight=false] limit the height of the button
-	 * @property {string} [help]
+	 * @property {Parameters<typeof tooltip>[1]} [help]
 	 * @property {string} [keyboard] keyboard shortcut hint to display
 	 * @property {string|undefined} [testid] add a data-testid attribute to the button
 	 * @property {boolean} [aria-pressed]
 	 * @property {boolean |"always"} [loading] show a loading state while the onlick handler is running. set to "always" to always show the loading state.
 	 * @property {boolean} [danger=false] use a red color scheme for dangerous actions
 	 * @property {boolean} [submits=false] if true, the button acts as a submit button in a form context
+	 * @property {string} [aria-label] accessible label for the button
 	 */
 </script>
 
@@ -49,7 +50,7 @@ Available CSS variables:
 		testid,
 		loading = false,
 		tight = false,
-		'aria-pressed': ariaPressed
+		...aria
 	} = $props();
 
 	let isLoading = $state(false);
@@ -60,7 +61,7 @@ Available CSS variables:
 	disabled={disabled || isLoading}
 	class:tight
 	class:danger
-	aria-pressed={ariaPressed}
+	{...aria}
 	onclick={async (e) => {
 		if (!onclick) return;
 
@@ -81,7 +82,7 @@ Available CSS variables:
 			if (loading) isLoading = false;
 		}
 	}}
-	use:tooltip={help ? { text: help, keyboard } : undefined}
+	use:tooltip={typeof help === 'string' && keyboard ? { text: help, keyboard } : help}
 	data-testid={testid || undefined}
 >
 	{#if isLoading}

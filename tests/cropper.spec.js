@@ -1,8 +1,10 @@
+import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
 import { exampleProtocol, expect, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
+	getDatabaseRowById,
 	loadDatabaseDump,
 	setImageMetadata,
 	throwError
@@ -701,12 +703,9 @@ function confirmedCropBadge(page) {
  */
 async function isImageConfirmedInDatabase(app, id) {
 	return Boolean(
-		await app.db.metadata
-			.values({
-				imageId: id,
-				protocolId: ''
-			})
-			.then((v) => v[exampleProtocol.crop.confirmationMetadata])
+		await app.db.image
+			.byId(id)
+			.then((img) => img?.metadata[exampleProtocol.crop.metadata]?.confirmed)
 	);
 }
 
@@ -721,17 +720,20 @@ async function markImagesAsConfirmedInDatabase(page, ids, confirmed = true) {
 	for (const [i, id] of ids.entries()) {
 		await browserConsole.log(
 			page,
-			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.confirmationMetadata}) (${i + 1}/${ids.length})`
+			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.metadata}) (${i + 1}/${ids.length})`
 		);
+
+		const image = await getDatabaseRowById(page, 'Image', id).then((img) =>
+			Schemas.Image.assert(img)
+		);
+
 		await setImageMetadata(
 			{ page },
 			id,
 			{
-				[exampleProtocol.crop.confirmationMetadata]: {
-					value: confirmed,
-					manuallyModified: true,
-					confidence: 1,
-					alternatives: {}
+				[exampleProtocol.crop.metadata]: {
+					...image?.metadata[exampleProtocol.crop.metadata],
+					confirmed: true
 				}
 			},
 			{
