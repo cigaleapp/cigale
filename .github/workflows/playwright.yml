@@ -10,10 +10,6 @@ on:
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
         required: true
         description: 'SSH private key for deploying to dev deployments server'
-      REPORTPORTAL_API_KEY:
-        description: 'API token for ReportPortal'
-      REPORTPORTAL_DOMAIN:
-        description: 'Domain of ReportPortal instance'
     inputs:
       artifact:
         type: string
@@ -27,29 +23,11 @@ jobs:
   predownload:
     runs-on: ubuntu-latest
     name: Pre-download models
-    outputs:
-      reportportal-launch-id: ${{ steps.report-portal.outputs.launchid }}
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Start Report Portal launch
-        id: report-portal
-        run: |
-          launch_id=$(bun run scripts/reportportal-manage-launch.ts start)
-          echo Started ReportPortal launch with ID $launch_id
-          echo "launchid=$launch_id" >> $GITHUB_OUTPUT
-        env:
-          REPORTPORTAL_API_KEY: ${{ secrets.REPORTPORTAL_API_KEY }}
-          REPORTPORTAL_DOMAIN: ${{ secrets.REPORTPORTAL_DOMAIN }}
-          RUN_ID: ${{ github.run_id }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
 
       - name: Pre-download default protocol's models
         run: |
@@ -106,10 +84,7 @@ jobs:
       - name: Run Playwright tests
         run: bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
-          SHARDING: 'true'
-          REPORTPORTAL_API_KEY: ${{ secrets.REPORTPORTAL_API_KEY }}
-          REPORTPORTAL_DOMAIN: ${{ secrets.REPORTPORTAL_DOMAIN }}
-          REPORTPORTAL_LAUNCH_ID: ${{ needs.predownload.outputs.reportportal-launch-id }}
+          SHARDING: '1'
       - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
@@ -119,7 +94,7 @@ jobs:
 
   combine-reports:
     runs-on: ubuntu-latest
-    needs: [test, predownload]
+    needs: test
     # run even if tests fail
     if: always()
     name: Combine reports
@@ -145,21 +120,6 @@ jobs:
           name: report
           path: ./playwright-report
           retention-days: 1
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Finish Report Portal launch
-        run: |
-          echo Finishing ReportPortal launch with ID $launch_id
-          bun run scripts/reportportal-manage-launch.ts finish $REPORTPORTAL_LAUNCH_ID
-        env:
-          REPORTPORTAL_API_KEY: ${{ secrets.REPORTPORTAL_API_KEY }}
-          REPORTPORTAL_DOMAIN: ${{ secrets.REPORTPORTAL_DOMAIN }}
-          REPORTPORTAL_LAUNCH_ID: ${{ needs.predownload.outputs.reportportal-launch-id }}
-          RUN_ID: ${{ github.run_id }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          GIT_BRANCH: ${{ github.head_ref || github.ref_name }}
 
   upload-report:
     # run even if tests fail
