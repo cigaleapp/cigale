@@ -20,6 +20,7 @@ jobs:
     env:
       BUILD_COMMIT: ${{ github.sha }}
       BASE_PATH: /cigale
+      SVELTEKIT_FALLBACK_PAGE: 404.html
 
     steps:
       - name: Checkout repository
