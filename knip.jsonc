@@ -10,7 +10,8 @@
 		"src/lib/Dropzone.svelte",
 		"src/lib/FloatingButton.svelte",
 		"src/lib/UnsavedChangesIndicator.svelte",
-		"src/locales/**/*.js"
+		"src/locales/**/*.js",
+		"tests/reporters/pleye.js"
 	],
 	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector"],
 	"entry": [
