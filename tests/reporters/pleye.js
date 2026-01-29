@@ -3,7 +3,6 @@
 // @ts-nocheck
 
 // This script is served by Pleye, on /reporter.js of your instance.
-// Pleye version stptescount update
 
 /**
  * @import { Inputs } from '../routes/update/[repository=integer]/inputs';
