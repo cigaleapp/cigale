@@ -22,6 +22,7 @@ jobs:
           ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
       - run: |
           curl -fsSL https://pleye.gwen.works/reporter.js?no-version -o tests/reporters/pleye.js
+          bunx prettier --write tests/reporters/pleye.js
       - name: Propose changes
         uses: peter-evans/create-pull-request@v8
         with:
