@@ -1,0 +1,33 @@
+name: Update Pleye reporter
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 0 * * *' # Daily
+
+concurrency:
+  group: format
+  cancel-in-progress: true
+
+jobs:
+  commit:
+    name: Commit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
+      - run: |
+          curl -fsSL https://pleye.gwen.works/reporter.js?no-version -o tests/reporters/pleye.js
+      - name: Propose changes
+        uses: peter-evans/create-pull-request@v8
+        with:
+          add-paths: tests/reporters/pleye.js
+          commit-message: 👽 Update Pleye's Playwright reporter
+          branch: update-pleye-reporter
+          title: '👽 Update Pleye reporter'
+          body: |
+            https://pleye.gwen.works has a new version of the Playwright reporter. This PR updates it to the current version that the server provides.
