@@ -16,12 +16,12 @@ test.describe('isolation', () => {
 		test.setTimeout(40_000);
 	});
 	test('no images from one session shows up in another', async ({ page, app }) => {
-		await newSession(page, { name: 'Session A' });
+		await newSession(page, { name: 'Session α' });
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
 		await app.loading.wait();
 
-		await newSession(page, { name: 'Session B' });
+		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
@@ -32,7 +32,7 @@ test.describe('isolation', () => {
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
-		await switchSession(page, 'Session A');
+		await switchSession(page, 'Session α');
 		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
@@ -40,22 +40,22 @@ test.describe('isolation', () => {
 	});
 
 	test('deleting a session only deletes its images', async ({ page, app }) => {
-		await newSession(page, { name: 'Session A' });
+		await newSession(page, { name: 'Session α' });
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
 		await app.loading.wait();
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
-		await newSession(page, { name: 'Session B' });
+		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'debugsquare.png');
 		await app.loading.wait();
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 
-		await deleteSession(page, 'Session A');
-		await expect(page.getByText('Session A')).not.toBeVisible();
+		await deleteSession(page, 'Session α');
+		await expect(page.getByText('Session α')).not.toBeVisible();
 
-		await switchSession(page, 'Session B');
+		await switchSession(page, 'Session β');
 		await app.tabs.go('import');
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
