@@ -74,6 +74,8 @@ jobs:
         shard-count: [12]
     steps:
       - uses: actions/checkout@v6
+        with: 
+          fetch-depth: 3
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
