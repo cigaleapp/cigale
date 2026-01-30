@@ -15,9 +15,10 @@ const env = arkenv({
 	GITHUB_ACTIONS: 'boolean = false',
 	BUNDLE_ANALYZER: type.enumerated('json', 'server', 'static', 'disabled').default('disabled'),
 	VITEST: 'boolean = false',
-	DEBUG: 'boolean = false',
-	'PR_NUMBER?': 'number'
+	DEBUG: 'boolean = false'
 });
+
+const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : undefined;
 
 export default defineConfig({
 	test: {
@@ -47,7 +48,7 @@ export default defineConfig({
 		'import.meta.env.buildCommit': JSON.stringify(
 			execSync('git rev-parse HEAD').toString().trim()
 		),
-		'import.meta.env.previewingPrNumber': env.PR_NUMBER ?? 'null'
+		'import.meta.env.previewingPrNumber': prNumber ?? 'null'
 	},
 	worker: {
 		format: 'es',
