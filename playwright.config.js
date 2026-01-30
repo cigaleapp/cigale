@@ -194,6 +194,7 @@ function pleyeReporter() {
 			commitAuthorEmail: authorEmail,
 			commitAuthorUsername: commitUsername,
 			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
+			pullRequestTitle: env.PR_TITLE || '',
 			pullRequestNumber: process.env.PR_NUMBER
 				? parseInt(process.env.PR_NUMBER, 10)
 				: undefined
