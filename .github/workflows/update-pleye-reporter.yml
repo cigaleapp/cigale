@@ -1,7 +1,11 @@
 name: Update Pleye reporter
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      commit:
+        type: boolean
+        description: If true, don't create a PR, commit to main directly instead
   schedule:
     - cron: '0 0 * * *' # Daily
 
@@ -25,6 +29,7 @@ jobs:
           bun-version-file: .bun-version
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
       - name: Get current Pleye version on server
         id: pleye
         run: |
@@ -33,7 +38,17 @@ jobs:
       - run: |
           curl -fsSL https://pleye.gwen.works/reporter.js?no-version -o tests/reporters/pleye.js
           bunx prettier --write tests/reporters/pleye.js
-      - name: Propose changes
+
+      - if: inputs.commit
+        name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: |
+            👽 Update Pleye's Playwright reporter
+
+            Pleye server version is ${{ steps.pleye.outputs.version }}
+      - if: ${{ !inputs.commit }}
+        name: Propose changes
         uses: peter-evans/create-pull-request@v8
         with:
           add-paths: tests/reporters/pleye.js
