@@ -4,8 +4,6 @@
 
 // This script is served by Pleye, on /reporter.js of your instance.
 
-
-
 /**
  * @import { Inputs } from '../routes/update/[repository=integer]/inputs';
  * @import * as PW from '@playwright/test/reporter';
@@ -42,6 +40,8 @@ export default class Pleye {
 	#debugging = false;
 	/** @type {string} */
 	#baseDirectory = '/';
+	/** @type {number} */
+	#expectedTestsCount = 0;
 	/**
 	 * Stores the current step index for each test.
 	 * Test are keyed by a JSON stringified version of their TestIdentifierParams.
@@ -54,7 +54,8 @@ export default class Pleye {
 	 * @param {PleyeParams} params
 	 */
 	constructor(params) {
-		const { apiKey, serverOrigin, repositoryGitHubId, debug, baseDirectory, ...runData } = params;
+		const { apiKey, serverOrigin, repositoryGitHubId, debug, baseDirectory, ...runData } =
+			params;
 		this.#apiKey = apiKey;
 		this.#serverOrigin = serverOrigin;
 		this.#repositoryGitHubId = repositoryGitHubId;
@@ -62,7 +63,6 @@ export default class Pleye {
 		this.#baseDirectory = baseDirectory ?? '/';
 		this.#runData = {
 			startedAt: new Date(),
-			baseDirectory: this.#baseDirectory,
 			...runData
 		};
 	}
@@ -73,8 +73,14 @@ export default class Pleye {
 	 * @param {PW.Suite} suite
 	 */
 	onBegin(config, suite) {
+		this.#expectedTestsCount = suite.allTests().length;
+
 		this.#sendPayload('begin', {
-			run: this.#runData,
+			run: {
+				...this.#runData,
+				baseDirectory: this.#baseDirectory,
+				testrunsCount: this.#expectedTestsCount
+			},
 			projects: config.projects.map((project) => ({
 				name: project.name,
 				match: toArray(project.testMatch).map(String),
@@ -175,11 +181,16 @@ export default class Pleye {
 		}
 
 		this.#stepIndices.set(this.stepIndicesKey(test), -1);
-		if (this.#debugging) console.info('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
+		if (this.#debugging)
+			console.info('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
+
+		// If we're gonna retry a test, the expected tests count increases
+		if (result.retry) this.#expectedTestsCount++;
 
 		this.#sendPayload('test-begin', {
 			githubJobId: this.#runData.githubJobId,
 			projectName: project.name,
+			testrunsCount: this.#expectedTestsCount,
 			test: {
 				title,
 				path,
@@ -370,7 +381,9 @@ function toError(error) {
  * @returns {string}
  */
 function bufferToText(writes) {
-	return writes.map((chunk) => (Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk)).join('');
+	return writes
+		.map((chunk) => (Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk))
+		.join('');
 }
 
 /**
