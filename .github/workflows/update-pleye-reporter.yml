@@ -10,7 +10,7 @@ on:
     - cron: '0 0 * * *' # Daily
 
 concurrency:
-  group: format
+  group: ${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
