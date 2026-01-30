@@ -4,6 +4,8 @@
 
 // This script is served by Pleye, on /reporter.js of your instance.
 
+
+
 /**
  * @import { Inputs } from '../routes/update/[repository=integer]/inputs';
  * @import * as PW from '@playwright/test/reporter';
@@ -19,6 +21,7 @@
  * @property {number} githubRunId ID of the current GitHub run we're on, ${{ github.run_id }}
  * @property {string} commitSha Current commit SHA
  * @property {string} branch Current branch name
+ * @property {string} [baseDirectory] Absolute directory to the root of the repository, used to relativize file paths
  * @property {boolean} [debug] Whether to enable debug logging
  * @property {number | undefined | null} [pullRequestNumber] Pull request number, if any
  */
@@ -37,6 +40,8 @@ export default class Pleye {
 	#runData;
 	/** @type {boolean} */
 	#debugging = false;
+	/** @type {string} */
+	#baseDirectory = '/';
 	/**
 	 * Stores the current step index for each test.
 	 * Test are keyed by a JSON stringified version of their TestIdentifierParams.
@@ -49,13 +54,15 @@ export default class Pleye {
 	 * @param {PleyeParams} params
 	 */
 	constructor(params) {
-		const { apiKey, serverOrigin, repositoryGitHubId, debug, ...runData } = params;
+		const { apiKey, serverOrigin, repositoryGitHubId, debug, baseDirectory, ...runData } = params;
 		this.#apiKey = apiKey;
 		this.#serverOrigin = serverOrigin;
 		this.#repositoryGitHubId = repositoryGitHubId;
 		this.#debugging = debug ?? false;
+		this.#baseDirectory = baseDirectory ?? '/';
 		this.#runData = {
 			startedAt: new Date(),
+			baseDirectory: this.#baseDirectory,
 			...runData
 		};
 	}
@@ -99,6 +106,19 @@ export default class Pleye {
 	 * @returns
 	 */
 	onStepBegin(test, result, step) {
+		// For now, we send both step-begin and step-end at the end of the step to filter out steps that are <1second long, otherwise theres too many requests
+	}
+
+	/**
+	 *
+	 * @param {PW.TestCase} test
+	 * @param {PW.TestResult} result
+	 * @param {PW.TestStep} step
+	 */
+	onStepEnd(test, result, step) {
+		const stepIdentifier = this.#stepIdentifierParams(test, result);
+		if (!stepIdentifier) return;
+
 		if (step.steps.length > 0) {
 			// We only care about "true" steps
 			return;
@@ -107,6 +127,12 @@ export default class Pleye {
 		const testKey = this.stepIndicesKey(test);
 		const index = (this.#stepIndices.get(testKey) ?? -1) + 1;
 		this.#stepIndices.set(testKey, index);
+
+		if (step.duration < 1_000) {
+			// Ignore steps that are less than 1 second long
+			// Index is still incremented above, so that the UI knows that a step happened here
+			return;
+		}
 
 		this.#sendPayload('step-begin', {
 			githubJobId: this.#runData.githubJobId,
@@ -120,23 +146,12 @@ export default class Pleye {
 				startedAt: step.startTime,
 				annotations: step.annotations,
 				category: toStepCategory(step.category),
-				filePath: step.location?.file ?? null,
+				filePath: step.location ? this.#relativeFilepath(step.location.file) : null,
 				locationInFile: step.location ? [step.location.line, step.location.column] : null
 				// TODO: step.parent
 				// parentStepId: step.parent
 			}
 		});
-	}
-
-	/**
-	 *
-	 * @param {PW.TestCase} test
-	 * @param {PW.TestResult} result
-	 * @param {PW.TestStep} step
-	 */
-	onStepEnd(test, result, step) {
-		const stepIdentifier = this.#stepIdentifierParams(test, result);
-		if (!stepIdentifier) return;
 
 		this.#sendPayload('step-end', {
 			githubJobId: this.#runData.githubJobId,
@@ -160,8 +175,7 @@ export default class Pleye {
 		}
 
 		this.#stepIndices.set(this.stepIndicesKey(test), -1);
-		if (this.#debugging)
-			console.info('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
+		if (this.#debugging) console.info('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
 
 		this.#sendPayload('test-begin', {
 			githubJobId: this.#runData.githubJobId,
@@ -170,7 +184,7 @@ export default class Pleye {
 				title,
 				path,
 				tags: test.tags,
-				filePath: test.location.file,
+				filePath: this.#relativeFilepath(test.location.file),
 				locationInFile: [test.location.line, test.location.column],
 				annotations: test.annotations
 			},
@@ -267,9 +281,21 @@ export default class Pleye {
 	 */
 	#testIdentifierParams(test) {
 		return {
-			filePath: test.location.file,
+			filePath: this.#relativeFilepath(test.location.file),
 			...splitTitlePath(test.titlePath())
 		};
+	}
+
+	/**
+	 *
+	 * @param {string} absolutePath
+	 */
+	#relativeFilepath(absolutePath) {
+		if (absolutePath.startsWith(this.#baseDirectory)) {
+			return absolutePath.slice(this.#baseDirectory.length).replace(/^\/+/, '');
+		}
+
+		return absolutePath;
 	}
 }
 
@@ -343,9 +369,7 @@ function toError(error) {
  * @returns {string}
  */
 function bufferToText(writes) {
-	return writes
-		.map((chunk) => (Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk))
-		.join('');
+	return writes.map((chunk) => (Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk)).join('');
 }
 
 /**

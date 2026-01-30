@@ -20,6 +20,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
+      - name: Get current Pleye version on server
+        id: pleye
+        run: |
+          VERSION=$(curl -fsSL https://pleye.gwen.works/version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
       - run: |
           curl -fsSL https://pleye.gwen.works/reporter.js?no-version -o tests/reporters/pleye.js
           bunx prettier --write tests/reporters/pleye.js
@@ -31,4 +36,7 @@ jobs:
           branch: update-pleye-reporter
           title: '👽 Update Pleye reporter'
           body: |
-            https://pleye.gwen.works has a new version of the Playwright reporter. This PR updates it to the current version that the server provides.
+            https://pleye.gwen.works has a new version of the Playwright reporter. 
+            This PR updates it to the current version that the server provides.
+
+            Pleye version is ${{ steps.pleye.outputs.version }}
