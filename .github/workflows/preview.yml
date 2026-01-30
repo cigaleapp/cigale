@@ -6,15 +6,16 @@ permissions:
 
 on:
   workflow_call:
+    inputs: {}
     secrets:
       DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
         required: true
         description: 'SSH private key for deploying to dev deployments server'
-    inputs: {}
 
 env:
   PR_NUMBER: ${{ github.event.number }}
   BUILD_COMMIT: ${{ github.sha }}
+  SVELTEKIT_FALLBACK_PAGE: index.html
 
 jobs:
   build:
