@@ -16,12 +16,20 @@
  * @property {string} serverOrigin Origin of the Pleye server, e.g. https://pleye.example.com
  * @property {number} repositoryGitHubId Github ID of the current repository, ${{ github.repository_id }}
  * @property {number} githubJobId ID of the current GitHub job we're on, ${{ github.job.check_run_id }}
+ * @property {string} githubJobName Name of the current GitHub job we're on, ${{ github.job }}
  * @property {number} githubRunId ID of the current GitHub run we're on, ${{ github.run_id }}
+ * @property {string} githubRunName Name of the current GitHub run we're on, ${{ github.workflow }}
  * @property {string} commitSha Current commit SHA
+ * @property {string} commitTitle Current commit title
+ * @property {string} commitDescription Current commit description
+ * @property {string} commitAuthorName Name of the commit author
+ * @property {string} [commitAuthorUsername] Username of the commit author
+ * @property {string} commitAuthorEmail Email of the commit author
  * @property {string} branch Current branch name
  * @property {string} [baseDirectory] Absolute directory to the root of the repository, used to relativize file paths
  * @property {boolean} [debug] Whether to enable debug logging
  * @property {number | undefined | null} [pullRequestNumber] Pull request number, if any
+ * @property {string} [pullRequestTitle] Pull request title, if any
  */
 
 /**

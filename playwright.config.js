@@ -1,6 +1,8 @@
 // @ts-check
+import { spawnSync } from 'node:child_process';
 import { tz } from '@date-fns/tz';
 import { defineConfig, devices } from '@playwright/test';
+import arkenv from 'arkenv';
 import { formatISO9075, minutesToMilliseconds } from 'date-fns';
 
 /** @typedef {NonNullable<import('@playwright/test').PlaywrightTestConfig['projects']>[number]} Project */
@@ -66,7 +68,7 @@ export default defineConfig({
 				[process.env.SHARDING ? 'blob' : 'html'],
 				['github'],
 				['list'],
-				['./tests/reporters/pleye.js', pleyeConfig()]
+				...pleyeReporter()
 			]
 		: [],
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -119,25 +121,76 @@ export default defineConfig({
 });
 
 /**
- * @returns {import('./tests/reporters/pleye').PleyeParams}
+ * @returns {[[string, import('./tests/reporters/pleye').PleyeParams]] | []}
  */
-function pleyeConfig() {
-	return {
-		debug: process.env.PLEYE_DEBUG === 'debug',
-		apiKey: process.env.PLEYE_API_KEY || '',
-		serverOrigin: 'https://pleye.gwen.works',
-		repositoryGitHubId: Number(process.env.GITHUB_REPOSITORY_ID) || 0,
-		githubJobId: Number(process.env.GITHUB_JOB_ID) || 0,
-		githubRunId: Number(process.env.GITHUB_RUN_ID) || 0,
-		// Careful: use GITHUB_WORKSPACE and NOT ${{ github.workspace }}, see
-		// https://github.com/actions/runner/issues/2058
-		baseDirectory: process.env.GITHUB_WORKSPACE || process.cwd() || '',
-		commitSha: process.env.GITHUB_COMMIT_SHA || '',
-		branch: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '',
-		pullRequestNumber: process.env.GITHUB_PR_NUMBER
-			? Number(process.env.GITHUB_PR_NUMBER)
-			: undefined
-	};
+function pleyeReporter() {
+	try {
+		const env = arkenv({
+			PLEYE_DEBUG: 'string',
+			PLEYE_API_KEY: 'string > 8',
+			GITHUB_REPOSITORY_ID: 'number',
+			JOB_ID: 'number',
+			WORKFLOW_NAME: 'string',
+			GITHUB_RUN_ID: 'number',
+			GITHUB_WORKSPACE: 'string',
+			COMMIT_SHA: 'string > 10',
+			'PR_NUMBER?': 'number',
+			'PR_TITLE?': 'string',
+			'GITHUB_HEAD_REF?': 'string',
+			GITHUB_REF_NAME: 'string'
+		});
+
+		const [commitTitle, authorName, authorEmail, ...commitDescription] = spawnSync('git', [
+			'log',
+			'-1',
+			`--pretty=%s%n%an%n%ae%n%b`,
+			env.COMMIT_SHA
+		])
+			.stdout.toString('utf-8')
+			.split('\n');
+
+		const jobName = spawnSync('gh', [
+			'run',
+			'view',
+			env.JOB_ID.toString(),
+			'--json',
+			'jobs',
+			'--jq',
+			`.jobs[] | select(.databaseId == ${env.JOB_ID}).name`
+		])
+			.stdout.toString('utf-8')
+			.trim();
+		/**
+		 * @type {import('./tests/reporters/pleye').PleyeParams}
+		 */
+		const config = {
+			debug: env.PLEYE_DEBUG === 'debug',
+			apiKey: env.PLEYE_API_KEY || '',
+			serverOrigin: 'https://pleye.gwen.works',
+			repositoryGitHubId: env.GITHUB_REPOSITORY_ID,
+			githubJobId: env.JOB_ID,
+			githubJobName: jobName,
+			githubRunId: env.GITHUB_RUN_ID,
+			githubRunName: env.WORKFLOW_NAME,
+			// Careful: use GITHUB_WORKSPACE and NOT ${{ github.workspace }}, see
+			// https://github.com/actions/runner/issues/2058
+			baseDirectory: env.GITHUB_WORKSPACE,
+			commitSha: env.COMMIT_SHA,
+			commitTitle: commitTitle,
+			commitDescription: commitDescription.join('\n'),
+			commitAuthorName: authorName,
+			commitAuthorEmail: authorEmail,
+			// XXX: DONT MERGE
+			commitAuthorUsername: 'gwennlbh',
+			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
+			pullRequestNumber: env.PR_NUMBER
+		};
+
+		return [['./tests/reporters/pleye.js', config]];
+	} catch (e) {
+		console.error('Failed to setup Pleye reporter:', e);
+		return [];
+	}
 }
 
 /**
