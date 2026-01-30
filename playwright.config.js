@@ -134,7 +134,7 @@ function pleyeReporter() {
 			GITHUB_RUN_ID: 'number',
 			GITHUB_WORKSPACE: 'string',
 			COMMIT_SHA: 'string > 10',
-			'PR_NUMBER?': 'number',
+			PR_NUMBER: 'number | "" = ""',
 			'PR_TITLE?': 'string',
 			'GITHUB_HEAD_REF?': 'string',
 			GITHUB_REF_NAME: 'string'
@@ -183,7 +183,7 @@ function pleyeReporter() {
 			// XXX: DONT MERGE
 			commitAuthorUsername: 'gwennlbh',
 			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
-			pullRequestNumber: env.PR_NUMBER
+			pullRequestNumber: env.PR_NUMBER === '' ? undefined : env.PR_NUMBER
 		};
 
 		return [['./tests/reporters/pleye.js', config]];
