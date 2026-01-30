@@ -4,8 +4,6 @@
 
 // This script is served by Pleye, on /reporter.js of your instance.
 
-
-
 /**
  * @import { Inputs } from '../routes/update/[repository=integer]/inputs';
  * @import * as PW from '@playwright/test/reporter';
@@ -54,7 +52,8 @@ export default class Pleye {
 	 * @param {PleyeParams} params
 	 */
 	constructor(params) {
-		const { apiKey, serverOrigin, repositoryGitHubId, debug, baseDirectory, ...runData } = params;
+		const { apiKey, serverOrigin, repositoryGitHubId, debug, baseDirectory, ...runData } =
+			params;
 		this.#apiKey = apiKey;
 		this.#serverOrigin = serverOrigin;
 		this.#repositoryGitHubId = repositoryGitHubId;
@@ -175,7 +174,8 @@ export default class Pleye {
 		}
 
 		this.#stepIndices.set(this.stepIndicesKey(test), -1);
-		if (this.#debugging) console.info('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
+		if (this.#debugging)
+			console.info('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
 
 		this.#sendPayload('test-begin', {
 			githubJobId: this.#runData.githubJobId,
@@ -369,7 +369,9 @@ function toError(error) {
  * @returns {string}
  */
 function bufferToText(writes) {
-	return writes.map((chunk) => (Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk)).join('');
+	return writes
+		.map((chunk) => (Buffer.isBuffer(chunk) ? chunk.toString('utf-8') : chunk))
+		.join('');
 }
 
 /**
