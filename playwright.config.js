@@ -134,7 +134,8 @@ function pleyeReporter() {
 			GITHUB_RUN_ID: 'number',
 			GITHUB_WORKSPACE: 'string',
 			COMMIT_SHA: 'string > 10',
-			PR_NUMBER: 'number | "" = ""',
+			// Empty string does not count as undefined or absent
+			PR_NUMBER: 'number | "none" = "none"',
 			'PR_TITLE?': 'string',
 			'GITHUB_HEAD_REF?': 'string',
 			GITHUB_REF_NAME: 'string'
@@ -192,7 +193,7 @@ function pleyeReporter() {
 			commitAuthorEmail: authorEmail,
 			commitAuthorUsername: commitUsername,
 			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
-			pullRequestNumber: env.PR_NUMBER === '' ? undefined : env.PR_NUMBER
+			pullRequestNumber: env.PR_NUMBER === 'none' ? undefined : env.PR_NUMBER
 		};
 
 		return [['./tests/reporters/pleye.js', config]];

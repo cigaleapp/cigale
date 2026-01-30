@@ -23,7 +23,7 @@ env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
   PLEYE_DEBUG: nodebug
   PLEYE_API_KEY: ${{ secrets.PLEYE_API_KEY }}
-  PR_NUMBER: ${{ github.event.number }}
+  PR_NUMBER: ${{ github.event.number || 'none' }}
   PR_TITLE: ${{ github.event.pull_request.title }}
   COMMIT_SHA: ${{  github.event.pull_request.head.sha || github.sha }}
   WORKFLOW_NAME: ${{ github.workflow }}
