@@ -20,6 +20,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ssh-key: ${{ secrets.AUTOCOMMITS_DEPLOY_KEY }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
       - name: Get current Pleye version on server
         id: pleye
         run: |
