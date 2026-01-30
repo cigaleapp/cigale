@@ -50,7 +50,7 @@ jobs:
       debug: false
 
   test:
-    needs: build
+    needs: lint
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
     secrets: inherit
