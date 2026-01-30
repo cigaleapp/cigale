@@ -129,6 +129,9 @@ function pleyeConfig() {
 		repositoryGitHubId: Number(process.env.GITHUB_REPOSITORY_ID) || 0,
 		githubJobId: Number(process.env.GITHUB_JOB_ID) || 0,
 		githubRunId: Number(process.env.GITHUB_RUN_ID) || 0,
+		// Careful: use GITHUB_WORKSPACE and NOT ${{ github.workspace }}, see
+		// https://github.com/actions/runner/issues/2058
+		baseDirectory: process.env.GITHUB_WORKSPACE || process.cwd() || '',
 		commitSha: process.env.GITHUB_COMMIT_SHA || '',
 		branch: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '',
 		pullRequestNumber: process.env.GITHUB_PR_NUMBER
