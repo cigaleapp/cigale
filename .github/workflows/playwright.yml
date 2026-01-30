@@ -28,8 +28,6 @@ env:
   COMMIT_SHA: ${{  github.event.pull_request.head.sha || github.sha }}
   WORKFLOW_NAME: ${{ github.workflow }}
 
-  
-
 jobs:
   predownload:
     runs-on: ubuntu-latest
