@@ -160,6 +160,16 @@ function pleyeReporter() {
 		])
 			.stdout.toString('utf-8')
 			.trim();
+
+		const commitUsername = spawnSync('gh', [
+			'api',
+			`/repos/${process.env.GITHUB_REPOSITORY}/commits/${env.COMMIT_SHA}`,
+			'--jq',
+			'.author.login'
+		])
+			.stdout.toString('utf-8')
+			.trim();
+
 		/**
 		 * @type {import('./tests/reporters/pleye').PleyeParams}
 		 */
@@ -180,8 +190,7 @@ function pleyeReporter() {
 			commitDescription: commitDescription.join('\n'),
 			commitAuthorName: authorName,
 			commitAuthorEmail: authorEmail,
-			// XXX: DONT MERGE
-			commitAuthorUsername: 'gwennlbh',
+			commitAuthorUsername: commitUsername,
 			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
 			pullRequestNumber: env.PR_NUMBER === '' ? undefined : env.PR_NUMBER
 		};
