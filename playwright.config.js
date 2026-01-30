@@ -135,7 +135,8 @@ function pleyeReporter() {
 			GITHUB_WORKSPACE: 'string',
 			COMMIT_SHA: 'string > 10',
 			// Empty string does not count as undefined or absent
-			PR_NUMBER: 'number | "none" = "none"',
+			// Theres no way to fix this, so we just use process.env for this one
+			// PR_NUMBER: 'number',
 			'PR_TITLE?': 'string',
 			'GITHUB_HEAD_REF?': 'string',
 			GITHUB_REF_NAME: 'string'
@@ -193,7 +194,9 @@ function pleyeReporter() {
 			commitAuthorEmail: authorEmail,
 			commitAuthorUsername: commitUsername,
 			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
-			pullRequestNumber: env.PR_NUMBER === 'none' ? undefined : env.PR_NUMBER
+			pullRequestNumber: process.env.PR_NUMBER
+				? parseInt(process.env.PR_NUMBER, 10)
+				: undefined
 		};
 
 		return [['./tests/reporters/pleye.js', config]];
