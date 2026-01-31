@@ -124,6 +124,11 @@ export default defineConfig({
  * @returns {[[string, import('./tests/reporters/pleye').PleyeParams]] | []}
  */
 function pleyeReporter() {
+	if (!process.env.PLEYE_API_KEY) {
+		console.warn('PLEYE_API_KEY not set, skipping Pleye reporter setup');
+		return [];
+	}
+
 	try {
 		const env = arkenv({
 			PLEYE_DEBUG: 'string',
