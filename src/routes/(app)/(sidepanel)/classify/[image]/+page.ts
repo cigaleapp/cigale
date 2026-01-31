@@ -8,7 +8,11 @@ import { compareBy } from '$lib/utils.js';
 
 let allOptions: [string | undefined, MetadataEnumVariant[]] = [undefined, []];
 
-export async function load({ params, depends }) {
+export async function load({ params, depends, parent }) {
+	// Make sure tables are loaded, otherwise uiState.currentSession will be undefined, 
+	// even though uiState.currentSessionId is set.
+	await parent();
+
 	if (!uiState.currentSessionId) error(400, 'Aucune session active');
 
 	const focusedMetadataId =
