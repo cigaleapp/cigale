@@ -3,12 +3,13 @@
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedClassification from '~icons/ri/check-double-line';
 	import IconClassified from '~icons/ri/check-line';
+	import { invalidate } from '$app/navigation';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
 	import type { Image, Metadata } from '$lib/database';
 	import { percent } from '$lib/i18n';
-	import { databaseHandle } from '$lib/idb.svelte';
+	import { databaseHandle, dependencyURI } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import { storeMetadataValue } from '$lib/metadata/index.js';
 	import { goto } from '$lib/paths.js';
@@ -69,6 +70,8 @@
 
 			if (!currently.confirmed && confirmed) await showOverlay();
 		}
+
+		await invalidate(dependencyURI('Image', currentImage.id));
 	}
 
 	defineKeyboardShortcuts('classification', {
