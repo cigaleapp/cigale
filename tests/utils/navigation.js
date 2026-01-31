@@ -27,7 +27,7 @@ export async function goHome(page) {
  *
  * @param {import('$lib/i18n').Language} lang
  */
-export const appNavTabs = (lang = 'fr') =>
+const appNavTabs = (lang = 'fr') =>
 	/** @type {const}, @satisfies {Record<string, { name: string; route: import('$app/types').ResolvedPathname }>} */ ({
 		import: {
 			name: lang === 'fr' ? 'Importer' : 'Import',
