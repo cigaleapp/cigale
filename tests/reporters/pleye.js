@@ -5,6 +5,7 @@
 // This script is served by Pleye, on /reporter.js of your instance.
 
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 
 /**
@@ -378,10 +379,15 @@ export default class Pleye {
 	 */
 	#attachmentTraceViewerURL(attachment) {
 		if (!this.#attachmentIsTrace(attachment)) return null;
-		if (!attachment.body) return null;
 		if (!attachment.path) return null;
 
-		const sha1 = calculateSha1(attachment.body);
+		let body = attachment.body;
+		if (!body) {
+			// Read from disk
+			body = readFileSync(attachment.path);
+		}
+
+		const sha1 = calculateSha1(body);
 		const extension = path.extname(attachment.path);
 
 		if (!extension.startsWith('.')) return null;
