@@ -241,6 +241,13 @@ export default class Pleye {
 	 * @param {PW.TestResult} result
 	 */
 	onTestEnd(test, result) {
+		if (this.#debugging) console.info('[Pleye] onTestEnd, attachments are', result.attachments);
+		if (this.#debugging)
+			console.info(
+				'[Pleye] onTestEnd, the following trace viewer URLs were derived:',
+				result.attachments.map((a) => this.#attachmentTraceViewerURL(a))
+			);
+
 		this.#sendPayload('test-end', {
 			githubJobId: this.#runData.githubJobId,
 			test: this.#testIdentifierParams(test),
