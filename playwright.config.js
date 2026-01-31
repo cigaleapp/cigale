@@ -139,7 +139,12 @@ function pleyeReporter() {
 			// PR_NUMBER: 'number',
 			'PR_TITLE?': 'string',
 			'GITHUB_HEAD_REF?': 'string',
-			GITHUB_REF_NAME: 'string'
+			GITHUB_REF_NAME: 'string',
+			TRACE_VIEWER_BASE_URL: [
+				'string.url',
+				':',
+				(url, ctx) => !url.endsWith('/') || ctx.reject('base url must not end with a slash')
+			]
 		});
 
 		const [commitTitle, authorName, authorEmail, ...commitDescription] = spawnSync('git', [
@@ -195,6 +200,8 @@ function pleyeReporter() {
 			commitAuthorUsername: commitUsername,
 			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
 			pullRequestTitle: env.PR_TITLE || '',
+			traceViewerUrl: (sha1, extension) =>
+				new URL(`${env.TRACE_VIEWER_BASE_URL}/trace/${sha1 + extension}`),
 			pullRequestNumber: process.env.PR_NUMBER
 				? parseInt(process.env.PR_NUMBER, 10)
 				: undefined

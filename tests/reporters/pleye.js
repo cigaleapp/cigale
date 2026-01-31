@@ -4,6 +4,9 @@
 
 // This script is served by Pleye, on /reporter.js of your instance.
 
+import { createHash } from 'node:crypto';
+import * as path from 'node:path';
+
 /**
  * @import { Inputs } from '../routes/update/[repository=integer]/inputs';
  * @import * as PW from '@playwright/test/reporter';
@@ -22,6 +25,7 @@
  * @property {string} commitSha Current commit SHA
  * @property {string} commitTitle Current commit title
  * @property {string} commitDescription Current commit description
+ * @property {(sha1: string, extension: `.${string}`) => URL | null} traceViewerUrl Function that generates a trace viewer URL given a trace attachment's  SHA1 content hash and its file extension. For example, for Playwright's HTML reporter, traces are at `/data/${sha1}${extension}`
  * @property {string} commitAuthorName Name of the commit author
  * @property {string} [commitAuthorUsername] Username of the commit author
  * @property {string} commitAuthorEmail Email of the commit author
@@ -45,11 +49,15 @@ export default class Pleye {
 	/** @type {RunData} */
 	#runData;
 	/** @type {boolean} */
-	#debugging = false;
+	#debugging;
 	/** @type {string} */
-	#baseDirectory = '/';
+	#baseDirectory;
+	/** @type {PleyeParams['traceViewerUrl']} */
+	#traceViewerUrl;
+
 	/** @type {number} */
 	#expectedTestsCount = 0;
+
 	/**
 	 * Stores the current step index for each test.
 	 * Test are keyed by a JSON stringified version of their TestIdentifierParams.
@@ -62,13 +70,23 @@ export default class Pleye {
 	 * @param {PleyeParams} params
 	 */
 	constructor(params) {
-		const { apiKey, serverOrigin, repositoryGitHubId, debug, baseDirectory, ...runData } =
-			params;
+		const {
+			apiKey,
+			serverOrigin,
+			repositoryGitHubId,
+			debug,
+			baseDirectory,
+			traceViewerUrl,
+			...runData
+		} = params;
+
 		this.#apiKey = apiKey;
 		this.#serverOrigin = serverOrigin;
 		this.#repositoryGitHubId = repositoryGitHubId;
 		this.#debugging = debug ?? false;
 		this.#baseDirectory = baseDirectory ?? '/';
+		this.#traceViewerUrl = traceViewerUrl ?? (() => null);
+
 		this.#runData = {
 			startedAt: new Date(),
 			...runData
@@ -236,7 +254,11 @@ export default class Pleye {
 				startedAt: result.startTime,
 				status: result.status,
 				stdout: bufferToText(result.stdout),
-				stderr: bufferToText(result.stderr)
+				stderr: bufferToText(result.stderr),
+				traceViewerUrl:
+					result.attachments
+						.map((attachment) => this.#attachmentTraceViewerURL(attachment))
+						.find((url) => url !== null) ?? null
 			}
 		});
 	}
@@ -333,6 +355,32 @@ export default class Pleye {
 
 		return absolutePath;
 	}
+
+	/**
+	 * @see https://github.com/microsoft/playwright/blob/de8df95e3542bbc83d35e9a96a3edfa684527147/packages/playwright/src/reporters/html.ts#L455
+	 * @param {PW.TestResult['attachments'][number]} attachment
+	 * @returns {boolean}
+	 */
+	#attachmentIsTrace(attachment) {
+		return attachment.name === 'trace';
+	}
+
+	/**
+	 * @see https://github.com/microsoft/playwright/blob/de8df95e3542bbc83d35e9a96a3edfa684527147/packages/playwright/src/reporters/html.ts#L474
+	 * @param {PW.TestResult['attachments'][number]} attachment
+	 */
+	#attachmentTraceViewerURL(attachment) {
+		if (!this.#attachmentIsTrace(attachment)) return null;
+		if (!attachment.body) return null;
+		if (!attachment.path) return null;
+
+		const sha1 = calculateSha1(attachment.body);
+		const extension = path.extname(attachment.path);
+
+		if (!extension.startsWith('.')) return null;
+
+		return this.#traceViewerUrl(sha1, /** @type {`.${string}`} */ (extension));
+	}
 }
 
 /**
@@ -416,4 +464,16 @@ function splitTitlePath(titlePath) {
 		title: fullpath.at(-1) ?? '',
 		path: fullpath.slice(0, -1)
 	};
+}
+
+/**
+ *
+ * @see https://github.com/microsoft/playwright/blob/de8df95e3542bbc83d35e9a96a3edfa684527147/packages/playwright-core/src/server/utils/crypto.ts#L25-L29
+ * @param {Buffer | string} buffer
+ * @returns {string}
+ */
+function calculateSha1(buffer) {
+	const hash = createHash('sha1');
+	hash.update(buffer);
+	return hash.digest('hex');
 }
