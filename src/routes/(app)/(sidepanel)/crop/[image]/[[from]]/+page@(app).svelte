@@ -1,6 +1,5 @@
 <script>
 	/**
-	 * @import * as Metadata from '$lib/metadata/index.js';
 	 * @import * as DB from '$lib/database.js';
 	 * @import { Rect, CenteredBoundingBox } from '$lib/BoundingBoxes.svelte.js';
 	 */
@@ -40,14 +39,12 @@
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
 	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { idComparator } from '$lib/database.js';
 	import DraggableBoundingBox from '$lib/DraggableBoundingBox.svelte';
 	import { INITIAL_ZOOM_STATE } from '$lib/DraggableBoundingBox.svelte.js';
 	import { percent } from '$lib/i18n';
 	import * as idb from '$lib/idb.svelte.js';
 	import {
 		deleteImageFile,
-		imageFileIds,
 		imageId,
 		imageIdToFileId,
 		imagesOfImageFile,

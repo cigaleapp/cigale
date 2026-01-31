@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 
 import type { MetadataEnumVariant } from '$lib/database.js';
-import { galleryEffectiveSorter, galleryItemsSorter } from '$lib/gallery.js';
+import { galleryEffectiveSorter } from '$lib/gallery.js';
 import { dependencyURI, list, listByIndex, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import { uiState } from '$lib/state.svelte.js';
