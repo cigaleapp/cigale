@@ -154,7 +154,7 @@ function pleyeReporter() {
 		const jobName = spawnSync('gh', [
 			'run',
 			'view',
-			env.JOB_ID.toString(),
+			env.GITHUB_RUN_ID.toString(),
 			'--json',
 			'jobs',
 			'--jq',
