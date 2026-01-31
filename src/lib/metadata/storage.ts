@@ -85,8 +85,8 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		| DB.MetadataValue['alternatives']
 		| Array<{ value: RuntimeValue<Type>; confidence: number }>;
 	cascadedFrom?: string[];
-	abortSignal?: AbortSignal;
-	sessionId?: string;
+	abortSignal?: AbortSignal | undefined;
+	sessionId?: string | undefined;
 }) {
 	if (!namespaceOfMetadataId(metadataId)) {
 		throw new Error(`Le metadataId ${metadataId} n'est pas namespacé`);
