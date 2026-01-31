@@ -83,6 +83,9 @@
 
 	navbarAppearance('hidden');
 
+	const { data } = $props();
+	const { sortedFileIds } = $derived(data);
+
 	// TODO figure out why the [image] route param is nullable
 	const fileId = $derived(page.params.image || '');
 	const openedFromImage = $derived(
@@ -187,7 +190,6 @@
 	);
 
 	const imageSrc = $derived(uiState.getPreviewURL(fileId));
-	const sortedFileIds = $derived(imageFileIds(idb.tables.Image.state).toSorted(idComparator));
 	const prevFileId = $derived.by(() => {
 		const idx = sortedFileIds.indexOf(fileId) - 1;
 		if (idx < 0) return undefined;

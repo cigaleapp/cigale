@@ -1,15 +1,15 @@
 import { error } from '@sveltejs/kit';
 
 import type { MetadataEnumVariant } from '$lib/database.js';
+import { galleryEffectiveSorter, galleryItemsSorter } from '$lib/gallery.js';
 import { dependencyURI, list, listByIndex, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import { uiState } from '$lib/state.svelte.js';
-import { compareBy } from '$lib/utils.js';
 
 let allOptions: [string | undefined, MetadataEnumVariant[]] = [undefined, []];
 
 export async function load({ params, depends, parent }) {
-	// Make sure tables are loaded, otherwise uiState.currentSession will be undefined, 
+	// Make sure tables are loaded, otherwise uiState.currentSession will be undefined,
 	// even though uiState.currentSessionId is set.
 	await parent();
 
@@ -39,15 +39,32 @@ export async function load({ params, depends, parent }) {
 
 	const images = await listByIndex('Image', 'sessionId', uiState.currentSessionId);
 
+	const sortSettings =
+		uiState.currentSession?.sort.classify ?? uiState.currentSession?.sort.global;
+	const groupSettings =
+		uiState.currentSession?.group.classify ?? uiState.currentSession?.group.global;
+
+	if (sortSettings && groupSettings) {
+		const imagesSorter = await galleryEffectiveSorter({
+			sortSettings,
+			groupSettings
+		});
+
+		const toGalleryItem = ({ id, filename, metadata }: (typeof images)[number]) => ({
+			id,
+			metadata,
+			name: filename
+		});
+
+		images.sort((a, b) => imagesSorter(toGalleryItem(a), toGalleryItem(b)));
+	}
+
 	/** Number of the image within the images that point to its ImageFile */
 	const imageNo =
-		images
-			.filter((i) => i.fileId === image.fileId)
-			.sort(compareBy('id'))
-			.findIndex((i) => i.id === image.id) + 1;
+		images.filter((i) => i.fileId === image.fileId).findIndex((i) => i.id === image.id) + 1;
 
 	// Get next image
-	const currentImageIndex = images.sort(compareBy('id')).findIndex((i) => i.id === image.id);
+	const currentImageIndex = images.findIndex((i) => i.id === image.id);
 
 	if (currentImageIndex === -1) {
 		error(500, 'Image introuvable dans la session');
