@@ -141,9 +141,10 @@ function pleyeReporter() {
 			'GITHUB_HEAD_REF?': 'string',
 			GITHUB_REF_NAME: 'string',
 			TRACE_VIEWER_BASE_URL: [
-				'string.url',
+				'string.url.parse',
 				':',
-				(url, ctx) => !url.endsWith('/') || ctx.reject('base url must not end with a slash')
+				(url, ctx) =>
+					!url.pathname.endsWith('/') || ctx.reject('base url must not end with a slash')
 			]
 		});
 
@@ -201,7 +202,9 @@ function pleyeReporter() {
 			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
 			pullRequestTitle: env.PR_TITLE || '',
 			traceViewerUrl: (sha1, extension) =>
-				new URL(`${env.TRACE_VIEWER_BASE_URL}/trace/${sha1 + extension}`),
+				urlWithBase(env.TRACE_VIEWER_BASE_URL, '/trace/index.html', {
+					trace: urlWithBase(env.TRACE_VIEWER_BASE_URL, `/data/${sha1 + extension}`)
+				}),
 			pullRequestNumber: process.env.PR_NUMBER
 				? parseInt(process.env.PR_NUMBER, 10)
 				: undefined
@@ -227,4 +230,15 @@ function dependsOnTarget({ live, dev, built }) {
 	if (process.env.BASE_URL) return live;
 	if (process.env.CI) return built;
 	return dev;
+}
+
+/**
+ *
+ * @param {URL} base
+ * @param {`/${string}`} pathname
+ * @param {Record<string, { toString(): string }>} query
+ */
+function urlWithBase(base, pathname, query = {}) {
+	const search = '?' + new URLSearchParams({ ...base.searchParams, ...query });
+	return new URL(base.pathname + pathname + search + base.hash, base);
 }
