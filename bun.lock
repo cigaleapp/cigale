@@ -15,7 +15,7 @@
         "date-fns": "^4.1.0",
         "dequal": "^2.0.3",
         "devalue": "^5.6.2",
-        "electron-serve": "^3.0.0",
+        "electron-serve": "^3.0.1",
         "electron-squirrel-startup": "^1.0.1",
         "embla-carousel-svelte": "^8.6.0",
         "exif-parser": "^0.1.12",
@@ -1275,7 +1275,7 @@
 
     "electron-installer-redhat": ["electron-installer-redhat@3.4.0", "", { "dependencies": { "@malept/cross-spawn-promise": "^1.0.0", "debug": "^4.1.1", "electron-installer-common": "^0.10.2", "fs-extra": "^9.0.0", "lodash": "^4.17.15", "word-wrap": "^1.2.3", "yargs": "^16.0.2" }, "os": [ "linux", "darwin", ], "bin": { "electron-installer-redhat": "src/cli.js" } }, "sha512-gEISr3U32Sgtj+fjxUAlSDo3wyGGq6OBx7rF5UdpIgbnpUvMN4W5uYb0ThpnAZ42VEJh/3aODQXHbFS4f5J3Iw=="],
 
-    "electron-serve": ["electron-serve@3.0.0", "", {}, "sha512-lRN7xhNx8mtuFcXWqJhqVYsk0YsHvDqIIJd+NM7h+s5UBSBmwTUCozbGLqEuT4nSAigmbVVeuL3vo42RmwzlzA=="],
+    "electron-serve": ["electron-serve@3.0.1", "", {}, "sha512-o40R/CfuxT4ccpD3kK2enFghd2jgXSgI02l4p51f8f2clXC4GPKpi0JQUn1FSRGrIHWH8fjdPlRsznEyItDPLg=="],
 
     "electron-squirrel-startup": ["electron-squirrel-startup@1.0.1", "", { "dependencies": { "debug": "^2.2.0" } }, "sha512-sTfFIHGku+7PsHLJ7v0dRcZNkALrV+YEozINTW8X1nM//e5O3L+rfYuvSW00lmGHnYmUjARZulD8F2V8ISI9RA=="],
 
