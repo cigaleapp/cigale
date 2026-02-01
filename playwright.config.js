@@ -148,8 +148,7 @@ function pleyeReporter() {
 			TRACE_VIEWER_BASE_URL: [
 				'string.url',
 				':',
-				(url, ctx) =>
-					!url.endsWith('/') || ctx.reject('base url must not end with a slash')
+				(url, ctx) => !url.endsWith('/') || ctx.reject('base url must not end with a slash')
 			]
 		});
 

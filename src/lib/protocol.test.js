@@ -116,7 +116,7 @@ test('toExportedProtocol', async () => {
 		authors: [],
 		description: 'A test protocol',
 		crop: {
-			metadata: 'meta1',
+			metadata: 'meta1'
 		},
 		exports: {
 			metadata: {

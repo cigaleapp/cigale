@@ -2,6 +2,7 @@
 	import 'svelte';
 
 	import IconError from '~icons/ri/close-line';
+
 	import { componentOrSnippet } from './componentOrSnippet.svelte';
 
 	/**
@@ -74,8 +75,6 @@
 		{/if}
 	</div>
 </div>
-
-
 
 <style>
 	.field {

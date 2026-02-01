@@ -61,12 +61,12 @@
 <main data-layout={layout} data-expand={expand} data-layout-transitions={layoutTransitions}>
 	<div class="references" {@attach area('references')} in:fade={{ duration: 200 }}>
 		{#if option}
-			<References {option}  bind:expand />
+			<References {option} bind:expand />
 		{/if}
 	</div>
 	<div class="subject" {@attach area('subject')} in:fade={{ duration: 200 }}>
 		{#if image}
-			<Subject {image}  bind:expand />
+			<Subject {image} bind:expand />
 		{/if}
 	</div>
 	<div class="panel" {@attach area('panel')}>
@@ -84,7 +84,7 @@
 
 		<div class="focused-option" {@attach area('focused-option')} in:fade={{ duration: 200 }}>
 			{#if image && focusedMetadata}
-				<OptionBar  {options} {image} {focusedMetadata} {currentMetadataValue} />
+				<OptionBar {options} {image} {focusedMetadata} {currentMetadataValue} />
 			{/if}
 		</div>
 
