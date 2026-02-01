@@ -132,6 +132,4 @@ jobs:
             🍱 Regenerate example protocols
 
             Regenerate-Protocol: No
-          file_pattern: |
-            examples/*.cigaleprotocol.json
-            examples/*.cigaleprotocol.images/*
+          file_pattern: examples/*.cigaleprotocol.json examples/*.cigaleprotocol.images/*

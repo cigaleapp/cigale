@@ -5,6 +5,7 @@
 	import IconOptions from '~icons/ri/list-unordered';
 	import IconCascades from '~icons/ri/node-tree';
 	import IconInference from '~icons/ri/sparkling-line';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { uppercaseFirst } from '$lib/i18n.js';
 	import IconDatatype from '$lib/IconDatatype.svelte';
@@ -18,6 +19,12 @@
 
 	const { children, data } = $props();
 	const { id, label, type } = $derived(data.metadata);
+
+	/**
+	 * Available route IDs relative to here.
+	 * @import { ChildRouteId, WithoutPrefix } from '$lib/utils';
+	 * @typedef {WithoutPrefix<"options/[option]", ChildRouteId<"/(app)/protocols/[id]/metadata/[metadata]">>} MetadataRouteIds
+	 */
 </script>
 
 <div class="header-and-scrollable" in:fade={{ duration: 100 }}>
@@ -50,16 +57,18 @@
 
 		<nav>
 			{#snippet navlink(
-				/** @type {string} */ path,
+				/** @type {MetadataRouteIds} */ route,
 				/** @type {string} */ name,
 				/** @type {import('svelte').Component} */ Icon,
 				/** @type {{ help?: string, count?: number }} */ { help, count } = {}
 			)}
+				{@const path = resolve(`/(app)/protocols/[id]/metadata/[metadata]/${route}`, {
+					id: data.protocol.id,
+					metadata: removeNamespaceFromMetadataId(id)
+				})}
 				<a
-					href="#/protocols/{data.protocol.id}/metadata/{removeNamespaceFromMetadataId(
-						id
-					)}/{path}"
-					class:active={page.url.hash.includes(`/${path}`)}
+					href={path}
+					class:active={page.url.pathname.includes(`/${path}`)}
 					use:tooltip={help}
 				>
 					<Icon />

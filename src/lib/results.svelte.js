@@ -3,7 +3,7 @@ import { strFromU8, unzipSync } from 'fflate';
 
 import * as db from './idb.svelte.js';
 import { imageIdToFileId, resizeToMaxSize, storeImageBytes } from './images.js';
-import { serializeMetadataValue } from './metadata.js';
+import { serializeMetadataValue } from './metadata/index.js';
 import { Analysis } from './schemas/exports.js';
 import { ANALYSIS_JSON_ZIP_FILEPATH } from './schemas/protocols.js';
 import { switchSession } from './sessions.js';
@@ -75,6 +75,7 @@ export async function importResultsZip(file, id) {
 	if (!uiState.currentSession) {
 		toasts.info('Importation dans une nouvelle session');
 		const newSession = await db.tables.Session.add({
+			...session,
 			name: session.name || `Import de ${file.name}`,
 			description: session.description || `Importée depuis ${file.name}`,
 			protocol: session.protocol,

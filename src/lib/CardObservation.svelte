@@ -41,6 +41,7 @@
 	id={observation.id}
 	title={observation.label}
 	image={previewImage?.fileId ? uiState.getPreviewURL(previewImage.fileId) : undefined}
+	dimensions={previewImage?.dimensions}
 	selected={uiState.selection.includes(observation.id)}
 	stacksize={observation.images.length}
 	boxes="apply-first"

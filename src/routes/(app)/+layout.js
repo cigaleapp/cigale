@@ -23,6 +23,10 @@ import { toasts } from '$lib/toasts.svelte';
 import { PROCEDURES } from '$worker/procedures.js';
 import WebWorker from '$worker/start.js?worker';
 
+export const ssr = false;
+
+export const trailingSlash = 'always';
+
 export async function load() {
 	const locale = await getSetting('language', {
 		fallback: localeFromNavigator()
@@ -77,7 +81,7 @@ export async function load() {
 		const sessionId = localStorage.getItem('currentSessionId');
 
 		setLoadingMessage('Initialisation de la base de données…');
-		await swarpc.init.broadcast({ databaseName, databaseRevision });
+		await swarpc.init.broadcast.orThrow({ databaseName, databaseRevision });
 		await tables.initialize(sessionId);
 
 		setLoadingMessage('Chargement des données intégrées…');

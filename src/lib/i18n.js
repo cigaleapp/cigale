@@ -21,16 +21,17 @@ export function plural(num, candidates, rule = (n) => (n === 1 ? 0 : 1)) {
  * @param {number} [decimals=0] Number of decimal places to include in the output
  * @param {object} [options] Additional options
  * @param {'none'|'nbsp'|'zeros'} [options.pad=none] Whether to pad the percentage with leading non-breaking spaces
+ * @param {number} [options.length] Total length of the resulting string (including % sign); if not specified, this is calculated based on decimals and the eventual padding. only relevant when pad is not 'none'.
  * @returns {`${number}%`} Percentage string
  */
-export function percent(value, decimals = 0, { pad = 'none' } = {}) {
+export function percent(value, decimals = 0, { pad = 'none', length } = {}) {
 	let result = (value * 100).toFixed(decimals);
 
 	// Remove trailing zeros and decimal point if not needed
 	if (decimals > 0) result = result.replace(/\.?0+$/, '');
 
 	if (pad !== 'none') {
-		result = result.padStart(2 + decimals, pad === 'nbsp' ? '\u00A0' : '0');
+		result = result.padStart(length ?? 2 + decimals, pad === 'nbsp' ? '\u00A0' : '0');
 	}
 
 	// @ts-expect-error
@@ -40,15 +41,16 @@ export function percent(value, decimals = 0, { pad = 'none' } = {}) {
 if (import.meta.vitest) {
 	const { test, expect } = import.meta.vitest;
 	test('percent', () => {
-		expect(percent(0.5)).toBe('50%');
-		expect(percent(0.123)).toBe('12%');
-		expect(percent(0.123, 1)).toBe('12.3%');
-		expect(percent(0.123, 2)).toBe('12.3%'); // trailing zeros removed
-		expect(percent(0.1234, 2)).toBe('12.34%');
-		expect(percent(1)).toBe('100%');
-		expect(percent(0)).toBe('0%');
-		expect(percent(0.05, 1, { pad: 'zeros' })).toBe('005%'); // 5.0 -> 5 -> 005
-		expect(percent(0.05, 0, { pad: 'nbsp' })).toBe('\u00A05%');
+		expect.soft(percent(0.5)).toBe('50%');
+		expect.soft(percent(0.123)).toBe('12%');
+		expect.soft(percent(0.123, 1)).toBe('12.3%');
+		expect.soft(percent(0.123, 2)).toBe('12.3%'); // trailing zeros removed
+		expect.soft(percent(0.1234, 2)).toBe('12.34%');
+		expect.soft(percent(1)).toBe('100%');
+		expect.soft(percent(0)).toBe('0%');
+		expect.soft(percent(0.05, 1, { pad: 'zeros' })).toBe('005%'); // 5.0 -> 5 -> 005
+		expect.soft(percent(0.05, 0, { pad: 'nbsp' })).toBe('\u00A05%');
+		expect.soft(percent(0.005, 2, { pad: 'nbsp' })).toBe('\u00A00.5%');
 	});
 }
 

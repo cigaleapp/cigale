@@ -1,5 +1,9 @@
 name: node_modules
 
+permissions:
+  actions: write
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -32,11 +36,19 @@ jobs:
       - name: Install node-modules-inspector
         run: bun install --global node-modules-inspector
       - name: Run node-modules-inspector
-        run: bunx node-modules-inspector build --base /cigale/_nodemodules/pr-${{ github.event.pull_request.number }} --outDir out
-      - name: Upload to github pages
-        id: upload
-        uses: rossjrw/pr-preview-action@v1
+        run: bunx node-modules-inspector build --base /node-modules --outDir out
+      - name: Save report
+        uses: actions/upload-artifact@v6
         with:
-          source-dir: ./out
-          umbrella-dir: _nodemodules
-          comment: false
+          path: ./out
+          name: report
+          retention-days: 1
+
+  report:
+    needs: analyze
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      artifact: report
+      subdomain: pr-${{ github.event.number }}-reports
+      path: /node-modules

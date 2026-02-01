@@ -3,8 +3,10 @@ name: Update Changelog
 on:
   workflow_dispatch:
   schedule:
-    # Every 28th of the month at 00:00 UTC
+    # Every end of of the month at 00:00 UTC
     - cron: '0 0 28 * *'
+    - cron: '0 0 30 * *'
+    - cron: '0 0 31 * *'
     # Every week on Monday at 00:00 UTC
     - cron: '0 0 * * 1'
   push:

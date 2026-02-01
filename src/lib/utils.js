@@ -24,6 +24,32 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template {string} KIn
+ * @template {string} KOut
+ * @template {any} V
+ * @param {Record<KIn, V>} subject
+ * @param {(key: KIn, value: V) => KOut} mapper
+ * @returns {Record<KOut, V>}
+ */
+export function mapKeys(subject, mapper) {
+	// @ts-expect-error
+	return Object.fromEntries(
+		Object.entries(subject).map(([key, value]) => [
+			mapper(/** @type {KIn} */ (key), value),
+			value
+		])
+	);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('mapKeys', () => {
+		expect(mapKeys({ a: 1, b: 2 }, (k) => k.toUpperCase())).toEqual({ A: 1, B: 2 });
+		expect(mapKeys({ a: 1, b: 2 }, (k) => k + k)).toEqual({ aa: 1, bb: 2 });
+	});
+}
+
+/**
  * Maps values of an object, and filters out entries with nullable values from the result
  * @template {string} K
  * @template {any} VIn
@@ -121,6 +147,19 @@ if (import.meta.vitest) {
 		]);
 		expect(entries({})).toEqual([]);
 	});
+}
+
+/**
+ * @template {string} KIn
+ * @template {any} VIn
+ * @template {string} KOut
+ * @template {any} VOut
+ * @param {Record<KIn, VIn>} subject
+ * @param {(key: KIn, value: VIn) => [KOut, VOut]} mapper
+ * @returns {Record<KOut, VOut>}
+ */
+export function mapEntries(subject, mapper) {
+	return fromEntries(entries(subject).map(([key, value]) => mapper(key, value)));
 }
 
 /**
@@ -515,8 +554,14 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template T
+ * @typedef {(a: T, b: T) => number} Comparator
+ */
+
+/**
  * @template Item
  * @param {((item: Item) => string|number|undefined) | (keyof Item & string) } key function to create the comparator function with. Should return a string (will be used with localeCompare) or a number (will be subtracted)
+ * @returns {Comparator<Item>}
  */
 export function compareBy(key) {
 	if (typeof key === 'string') {
@@ -604,6 +649,18 @@ if (import.meta.vitest) {
 }
 
 /**
+ * Returns a new comparator that takes into account a given sorting direction. Input comparator is assumed to be sorting in asc order.
+ * @template T
+ * @param {'asc'|'desc'} direction
+ * @param {Comparator<T>} comparator
+ * @returns {Comparator<T>}
+ */
+export function applySortDirection(direction, comparator) {
+	const mul = direction === 'asc' ? 1 : -1;
+	return (a, b) => mul * comparator(a, b);
+}
+
+/**
  * Add a v= query parameter to the URL to force the browser to reload the resource, using  Date.now() as the value
  * @template {string|URL} T
  * @param {T} url
@@ -678,12 +735,20 @@ if (import.meta.vitest) {
  * @param {object} [options]
  * @param {''|'model'} [options.cacheAs=""]
  * @param {import('fetch-progress').FetchProgressInitOptions['onProgress']} [options.onProgress]
+ * @param {AbortSignal} [options.signal]
  */
-export async function fetchHttpRequest(request, { cacheAs = '', onProgress } = {}) {
+export async function fetchHttpRequest(request, { cacheAs = '', onProgress, signal } = {}) {
 	let url = new URL(typeof request === 'string' ? request : request.url);
+
+	/** @type {RequestInit} */
 	const options = typeof request === 'string' ? { headers: {} } : request;
+
 	if (cacheAs) {
 		url.searchParams.set('x-cigale-cache-as', cacheAs);
+	}
+
+	if (signal) {
+		options.signal = signal;
 	}
 
 	if (onProgress) return fetch(url, options).then(fetchProgress({ onProgress }));
@@ -812,12 +877,16 @@ if (import.meta.vitest) {
 
 /**
  * @param {number} value
- * @param {number} decimals
+ * @param {number} decimals if negative, rounds to tens, hundreds, etc.
  * @returns {number}
  */
 export function round(value, decimals = 0) {
-	if (decimals < 0) throw new Error('decimals must be non-negative');
-	const factor = Math.pow(10, decimals);
+	const factor = Math.pow(10, Math.abs(decimals));
+
+	if (decimals < 0) {
+		return Math.round(value / factor) * factor;
+	}
+
 	return Math.round(value * factor) / factor;
 }
 
@@ -827,6 +896,7 @@ if (import.meta.vitest) {
 	test('round', () => {
 		expect(round(1.2345)).toBe(1);
 		expect(round(1.5)).toBe(2);
+		expect(round(1.4, 1)).toBe(1.4);
 		expect(round(1.2345, 2)).toBe(1.23);
 		expect(round(1.2355, 2)).toBe(1.24);
 		expect(round(-1.2355, 2)).toBe(-1.24);
@@ -834,6 +904,11 @@ if (import.meta.vitest) {
 		expect(round(1.23456789, 5)).toBe(1.23457);
 		expect(round(1.23456789, 8)).toBe(1.23456789);
 		expect(round(1.23456789, 10)).toBe(1.23456789);
+		expect(round(12345, -1)).toBe(12350);
+		expect(round(12345, -2)).toBe(12300);
+		expect(round(12555, -2)).toBe(12600);
+		expect(round(-12555, -2)).toBe(-12600);
+		expect(round(-12345, -2)).toBe(-12300);
 	});
 }
 
@@ -1274,3 +1349,97 @@ accusantium enim et repudiandae omnis cum dolorem nemo id quia facilis.
 Et dolorem perferendis et rerum suscipit qui voluptatibus quia et nihil nostrum 33 omnis soluta. 
 Nam minus minima et perspiciatis velit et eveniet rerum et nihil voluptates aut eaque ipsa et 
 ratione facere!`;
+
+/**
+ *
+ * @param {any} error
+ * @returns {error is DOMException}
+ */
+export function isAbortError(error) {
+	return error instanceof DOMException && error.name === 'AbortError';
+}
+
+/**
+ * Spread into an array literal to conditionally add something to it
+ * @template T
+ * @param {boolean | undefined | null} predicate
+ * @param {T} obj
+ * @returns { [T] | [] }
+ */
+export function orEmpty(predicate, obj) {
+	return predicate ? [obj] : [];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('orEmpty', () => {
+		expect(orEmpty(true, 1)).toEqual([1]);
+		expect(orEmpty(false, 1)).toEqual([]);
+		expect(orEmpty(undefined, 1)).toEqual([]);
+		expect(orEmpty(null, 1)).toEqual([]);
+	});
+}
+
+/**
+ * Spread into an object literal to conditionally add something to it
+ * @template T
+ * @param {boolean | undefined | null} predicate
+ * @param {T} obj
+ * @returns { T | {} }
+ */
+export function orEmptyObj(predicate, obj) {
+	return predicate ? obj : {};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('orEmptyObj', () => {
+		expect(orEmptyObj(true, { a: 1 })).toEqual({ a: 1 });
+		expect(orEmptyObj(false, { a: 1 })).toEqual({});
+		expect(orEmptyObj(undefined, { a: 1 })).toEqual({});
+		expect(orEmptyObj(null, { a: 1 })).toEqual({});
+	});
+}
+
+/**
+ * @template {string} Prefix
+ * @template T
+ * @typedef {T extends `${Prefix}${infer P}` ? P : never} RemovePrefix
+ */
+
+/**
+ * @template {string} Prefix
+ * @template T
+ * @typedef {Extract<T, `${Prefix}${string}`>} WithPrefix
+ */
+
+/**
+ * Remove strings that end with the given prefix
+ * @template {string} Prefix
+ * @template T
+ * @typedef {Exclude<T, `${Prefix}${string}`>} WithoutPrefix
+ */
+
+/**
+ * Route IDs that are relative to Root.
+ * @template {import('$app/types').RouteId} Root
+ * @typedef {RemovePrefix<`${Root}/`, WithPrefix<`${Root}/`, import('$app/types').RouteId>>} ChildRouteId
+ */
+/**
+ * Promisified setTimeout
+ * @param {number} ms
+ */
+export async function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('sleep', async () => {
+		const start = Date.now();
+		await sleep(100);
+		const end = Date.now();
+		expect(end - start).toBeGreaterThanOrEqual(100);
+	});
+}

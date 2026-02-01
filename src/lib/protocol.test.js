@@ -1,6 +1,6 @@
 import { describe, expect, it, test, vi } from 'vitest';
 
-import { metadataOptionsKeyRange } from '$lib/metadata.js';
+import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import {
 	compareProtocolWithUpstream,
 	hasUpgradeAvailable,
@@ -74,7 +74,9 @@ test('toExportedProtocol', async () => {
 							description: 'Metadata 1 description',
 							label: 'Metadata 1',
 							mergeMethod: 'max',
-							required: false
+							required: false,
+							sortable: false,
+							groupable: false
 						},
 						{
 							id: 'protocol1__meta2',
@@ -83,7 +85,9 @@ test('toExportedProtocol', async () => {
 							label: 'Metadata 2',
 							description: 'Metadata 2 description',
 							mergeMethod: 'max',
-							required: false
+							required: false,
+							sortable: false,
+							groupable: false
 						},
 						{
 							id: 'protocol1__meta3',
@@ -92,7 +96,9 @@ test('toExportedProtocol', async () => {
 							label: 'Metadata 3',
 							description: 'Metadata 3 description',
 							mergeMethod: 'max',
-							required: false
+							required: false,
+							sortable: false,
+							groupable: false
 						}
 					];
 				}
@@ -110,8 +116,7 @@ test('toExportedProtocol', async () => {
 		authors: [],
 		description: 'A test protocol',
 		crop: {
-			metadata: 'meta1',
-			confirmationMetadata: 'meta2'
+			metadata: 'meta1'
 		},
 		exports: {
 			metadata: {
@@ -142,7 +147,9 @@ test('toExportedProtocol', async () => {
 				description: 'Metadata 3 description',
 				mergeMethod: 'max',
 				required: false,
-				options: []
+				options: [],
+				sortable: false,
+				groupable: false
 			}
 		},
 		metadata: {
@@ -153,6 +160,8 @@ test('toExportedProtocol', async () => {
 				description: 'Metadata 1 description',
 				mergeMethod: 'max',
 				required: false,
+				sortable: false,
+				groupable: false,
 				options: [
 					{
 						index: 0,
@@ -177,6 +186,8 @@ test('toExportedProtocol', async () => {
 				mergeMethod: 'max',
 				required: false,
 				type: 'enum',
+				sortable: false,
+				groupable: false,
 				options: [
 					{
 						index: 0,
@@ -218,7 +229,6 @@ describe('compareProtocolWithUpstream', () => {
 				// no source:
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -260,7 +270,6 @@ describe('compareProtocolWithUpstream', () => {
 				source: 'https://example.com/protocol.json',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -291,7 +300,6 @@ describe('compareProtocolWithUpstream', () => {
 				source: 'https://example.com/protocol.json',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -336,7 +344,6 @@ describe('compareProtocolWithUpstream', () => {
 				source: 'https://example.com/protocol.json',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -427,7 +434,6 @@ describe('compareProtocolWithUpstream', () => {
 				updates: 'automatic',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				metadata: {

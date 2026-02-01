@@ -97,28 +97,6 @@
 		/>
 	</Field>
 
-	<Field label="Stockage de l'état de confirmation">
-		<MetadataLink
-			definitions={data.metadataDefinitions}
-			key={settings.confirmationMetadata}
-			help="Confirmations des recadrages stockés dans cette métadonnée"
-			no-metadata="Le protocole ne peut pas stocker les confirmations de recadrage!"
-			onupdate={(p, key) => {
-				p.crop.confirmationMetadata = key;
-			}}
-			oncreate={async (key) => {
-				await tables.Metadata.set({
-					id: key,
-					label: '',
-					type: 'boolean',
-					description: 'Si la boîte de recadrage a été confirmée',
-					required: false,
-					mergeMethod: 'none'
-				});
-			}}
-		/>
-	</Field>
-
 	<Field composite>
 		{#snippet label()}
 			<div class="models-label">

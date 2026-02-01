@@ -1,42 +1,70 @@
-<script generics="ItemData, SelectableItemData">
+<script lang="ts" module>
+	export type Item<D> = {
+		type: 'clickable';
+		label: string;
+		onclick: () => void;
+		/** Adds aria-checked="true" to the item, and set role="menuitemcheckbox" to all items */
+		selected?: boolean;
+		/** Whether to close the menu when this item is selected (default: true) */
+		closeOnSelect?: boolean;
+		/** Additional data associated with the item */
+		data: D;
+	};
+
+	export type SelectableItem<SD> = Omit<Item<SD>, 'type'> & {
+		type: 'selectable';
+		selected: boolean;
+		key: string | number;
+	};
+
+	export type SubmenuItem<D, SD> = {
+		type: 'submenu';
+		data: D;
+		label: string;
+		selected?: boolean;
+		testid?: string;
+		submenu: {
+			label?: string;
+			/** Text to show when items is empty */
+			empty?: string;
+			items: Array<Item<D> | SelectableItem<SD>>;
+		};
+	};
+
+	export type AnyItem<D, SD> = Item<D> | SelectableItem<SD> | SubmenuItem<D, SD>;
+
+	export type ItemsGroup<D, SD> = {
+		label?: string;
+		testid?: string;
+		items: AnyItem<D, SD>[];
+	};
+</script>
+
+<script lang="ts" generics="D = never, SD = never">
 	import { DropdownMenu } from 'bits-ui';
+	import type { Snippet } from 'svelte';
 
-	/**
-	 * @typedef {object} ItemBase
-	 * @property {string} label
-	 * @property {() => void} onclick
-	 * @property {boolean} [selected] adds aria-checked="true" to the item, and set role="menuitemcheckbox" to all items
-	 */
+	interface Props {
+		items: ItemsGroup<D, SD>[];
+		item?: Snippet<[AnyItem<D, SD>['data'], AnyItem<D, SD> & { selected: boolean }]>;
+		trigger: Snippet<[{ onclick: () => void } & Record<string, unknown>]>;
+		testid?: string | undefined;
+	}
 
-	/**
-	 * @typedef {ItemBase & ItemData} Item
-	 * @typedef {ItemBase & SelectableItemData & { selected: boolean, key: string | number }} SelectableItem
-	 * @typedef {Item | SelectableItem} AnyItem
-	 */
+	const { items: groups, item, trigger, testid, ...rest }: Props = $props();
 
-	/**
-	 * @typedef {object} Props
-	 * @property {Item[]} items
-	 * @property {SelectableItem[]} [selectableItems]
-	 * @property {string} [help]
-	 * @property {import('svelte').Snippet<[AnyItem]>} [item]
-	 * @property {import('svelte').Snippet<[{onclick: () => void}& Record<string, unknown>]>} trigger
-	 * @property {string} [testid] sets data-testid to "{your value}-open" on the trigger element and "{your value}-options" on the content element
-	 */
-
-	/** @type {Props} */
-	const { items, item, selectableItems = [], trigger, testid, help = '', ...rest } = $props();
-
-	const testids = $derived({
-		trigger: testid ? `${testid}-open` : undefined,
-		content: testid ? `${testid}-options` : undefined
-	});
+	function testids(testid: string | undefined) {
+		return {
+			trigger: testid ? `${testid}-open` : undefined,
+			content: testid ? `${testid}-options` : undefined
+		};
+	}
 
 	let open = $state(false);
 </script>
 
 <DropdownMenu.Root {open}>
-	<DropdownMenu.Trigger {...rest} data-testid={testids.trigger}>
+	<DropdownMenu.Trigger {...rest} data-testid={testids(testid).trigger}>
 		{#snippet child({ props })}
 			{@render trigger({
 				...props,
@@ -48,50 +76,113 @@
 	</DropdownMenu.Trigger>
 
 	<DropdownMenu.Portal>
-		<DropdownMenu.Content data-testid={testids.content}>
-			<DropdownMenu.CheckboxGroup
-				value={selectableItems.filter((i) => i.selected).map((i) => i.key.toString())}
-			>
-				{#if help}
-					<DropdownMenu.GroupHeading>{help}</DropdownMenu.GroupHeading>
-				{/if}
-
-				{#each selectableItems as i (i.key)}
-					<DropdownMenu.CheckboxItem
-						checked={i.selected}
-						onSelect={i.onclick}
-						value={i.key.toString()}
-						textValue={i.label}
-						aria-label={i.label}
-					>
-						{#if item}
-							{@render item(i)}
-						{:else}
-							{i.label}
+		<DropdownMenu.Content data-testid={testids(testid).content}>
+			{#each groups as group (group.label)}
+				{#if group.items.length > 0}
+					<DropdownMenu.Group data-testid={group.testid}>
+						{#if group.label}
+							<DropdownMenu.GroupHeading>{group.label}</DropdownMenu.GroupHeading>
 						{/if}
-					</DropdownMenu.CheckboxItem>
-				{/each}
-			</DropdownMenu.CheckboxGroup>
 
-			<DropdownMenu.Group>
-				{#if help && !selectableItems.length}
-					<DropdownMenu.GroupHeading>{help}</DropdownMenu.GroupHeading>
+						{#each group.items as i (i.label)}
+							{#if i.type === 'clickable'}
+								<DropdownMenu.Item
+									textValue={i.label}
+									onSelect={i.onclick}
+									closeOnSelect={i.closeOnSelect ?? true}
+									aria-label={i.label}
+								>
+									{#if item}
+										{@render item(i.data, { selected: false, ...i })}
+									{:else}
+										{i.label}
+									{/if}
+								</DropdownMenu.Item>
+							{:else if i.type === 'selectable'}
+								<DropdownMenu.CheckboxItem
+									checked={i.selected}
+									onSelect={i.onclick}
+									closeOnSelect={i.closeOnSelect ?? true}
+									value={i.key.toString()}
+									textValue={i.label}
+									aria-label={i.label}
+								>
+									{#if item}
+										{@render item(i.data, i)}
+									{:else}
+										{i.label}
+									{/if}
+								</DropdownMenu.CheckboxItem>
+							{:else if i.type === 'submenu'}
+								<DropdownMenu.Sub>
+									<DropdownMenu.SubTrigger
+										data-testid={testids(i.testid).trigger}
+									>
+										{#if item}
+											{@render item(i.data, { selected: false, ...i })}
+										{:else}
+											{i.label}
+										{/if}
+									</DropdownMenu.SubTrigger>
+									<DropdownMenu.SubContent
+										data-testid={testids(i.testid).content}
+									>
+										<DropdownMenu.Group>
+											{#if i.submenu.label}
+												<DropdownMenu.GroupHeading
+													>{i.submenu.label}</DropdownMenu.GroupHeading
+												>
+											{/if}
+
+											{#each i.submenu.items as j (j.label)}
+												{#if j.type === 'clickable'}
+													<DropdownMenu.Item
+														textValue={j.label}
+														onSelect={j.onclick}
+														closeOnSelect={j.closeOnSelect ?? true}
+														aria-label={j.label}
+													>
+														{#if item}
+															{@render item(j.data, {
+																...j,
+																selected: false
+															})}
+														{:else}
+															{j.label}
+														{/if}
+													</DropdownMenu.Item>
+												{:else if j.type === 'selectable'}
+													<DropdownMenu.CheckboxItem
+														checked={j.selected}
+														onSelect={j.onclick}
+														closeOnSelect={j.closeOnSelect ?? true}
+														value={j.key.toString()}
+														textValue={j.label}
+														aria-label={j.label}
+													>
+														{#if item}
+															{@render item(j.data, j)}
+														{:else}
+															{j.label}
+														{/if}
+													</DropdownMenu.CheckboxItem>
+												{/if}
+											{:else}
+												<DropdownMenu.Item disabled>
+													<div class="empty-submenu">
+														{i.submenu.empty ??
+															'Aucun élément disponible'}
+													</div>
+												</DropdownMenu.Item>
+											{/each}
+										</DropdownMenu.Group>
+									</DropdownMenu.SubContent>
+								</DropdownMenu.Sub>
+							{/if}
+						{/each}
+					</DropdownMenu.Group>
 				{/if}
-
-				{#each items as i (i.label)}
-					<DropdownMenu.Item
-						textValue={i.label}
-						onSelect={i.onclick}
-						aria-label={i.label}
-					>
-						{#if item}
-							{@render item(i)}
-						{:else}
-							{i.label}
-						{/if}
-					</DropdownMenu.Item>
-				{/each}
-			</DropdownMenu.Group>
+			{/each}
 		</DropdownMenu.Content>
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>
@@ -123,8 +214,17 @@
 		gap: 0.25em;
 	}
 
-	:global([data-dropdown-menu-item]:is(:hover, :focus-visible)) {
+	:global([data-dropdown-menu-item]:not([aria-disabled='true']):is(:hover, :focus-visible)) {
 		background-color: var(--bg-primary-translucent);
 		color: var(--fg-primary);
+	}
+
+	.empty-submenu {
+		max-width: 200px;
+		min-height: 300px;
+		display: flex;
+		align-items: center;
+		text-align: center;
+		color: var(--gay);
 	}
 </style>

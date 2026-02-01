@@ -1,4 +1,3 @@
-import path from 'node:path';
 import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations.js';
@@ -7,11 +6,12 @@ import {
 	chooseFirstSession,
 	entries,
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
 	importPhotos,
 	loadDatabaseDump,
 	newSession
-} from './utils.js';
+} from './utils/index.js';
 
 test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	// Disable inference to go faster

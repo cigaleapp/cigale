@@ -155,6 +155,7 @@ describe('deleteSession', () => {
 			[
 			  {
 			    "description": "",
+			    "groupable": false,
 			    "id": "com.example.test.protocol__date",
 			    "infer": {
 			      "exif": "DateTimeOriginal",
@@ -163,10 +164,12 @@ describe('deleteSession', () => {
 			    "learnMore": "https://example.com",
 			    "mergeMethod": "none",
 			    "required": false,
+			    "sortable": false,
 			    "type": "date",
 			  },
 			  {
 			    "description": "",
+			    "groupable": false,
 			    "id": "com.example.test.protocol__location",
 			    "infer": {
 			      "latitude": {
@@ -180,15 +183,18 @@ describe('deleteSession', () => {
 			    "learnMore": "https://example.com",
 			    "mergeMethod": "none",
 			    "required": false,
+			    "sortable": false,
 			    "type": "location",
 			  },
 			  {
 			    "description": "",
+			    "groupable": false,
 			    "id": "com.example.test.protocol__no_exif",
 			    "label": "",
 			    "learnMore": "https://example.com",
 			    "mergeMethod": "none",
 			    "required": false,
+			    "sortable": false,
 			    "type": "string",
 			  },
 			]

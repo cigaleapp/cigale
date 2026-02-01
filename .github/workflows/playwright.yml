@@ -1,7 +1,18 @@
 name: End-to-end tests
 
+permissions:
+  actions: write
+  contents: read
+
 on:
   workflow_call:
+    secrets:
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
+        required: true
+        description: 'SSH private key for deploying to dev deployments server'
+      PLEYE_API_KEY:
+        required: false
+        description: 'API key for uploading test results to Pleye'
     inputs:
       artifact:
         type: string
@@ -10,6 +21,14 @@ on:
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
+  PLEYE_DEBUG: nodebug
+  PLEYE_API_KEY: ${{ secrets.PLEYE_API_KEY }}
+  PR_NUMBER: ${{ github.event.number }}
+  PR_TITLE: ${{ github.event.pull_request.title }}
+  COMMIT_SHA: ${{  github.event.pull_request.head.sha || github.sha }}
+  WORKFLOW_NAME: ${{ github.workflow }}
+  # XXX: Depends on dev-deployments workflow's domain default value
+  TRACE_VIEWER_BASE_URL: https://pr-${{ github.event.number }}-reports.cigale.gwen.works/playwright
 
 jobs:
   predownload:
@@ -48,15 +67,17 @@ jobs:
     name: Test (shard ${{ matrix.shard-index }} of ${{ matrix.shard-count }})
     needs: predownload
     container:
-      image: ghcr.io/gwennlbh/playwright-bun:v1.57.0
+      image: ghcr.io/gwennlbh/playwright-bun:v1.58.1
       options: --user 1001
     strategy:
       fail-fast: false
       matrix:
-        shard-index: [1, 2, 3, 4, 5, 6, 7, 8]
-        shard-count: [8]
+        shard-index: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        shard-count: [12]
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 3
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .bun-version
@@ -77,6 +98,8 @@ jobs:
         run: bunx playwright test --shard=${{ matrix.shard-index}}/${{ matrix.shard-count }}
         env:
           SHARDING: '1'
+          JOB_ID: ${{ job.check_run_id }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
@@ -89,9 +112,6 @@ jobs:
     needs: test
     # run even if tests fail
     if: always()
-    environment:
-      name: '#${{ github.event.number }}: End-to-end tests report'
-      url: ${{ steps.deploy-preview.outputs.preview-url }}
     name: Combine reports
     steps:
       - uses: actions/checkout@v6
@@ -108,11 +128,26 @@ jobs:
       - name: Merge sharded reports into HTML
         run: bunx playwright merge-reports --reporter html ./playwright-report-shards
 
-      - name: Deploy results on github pages
+      - name: Save report
         if: ${{ !cancelled() }}
-        id: deploy-preview
-        uses: rossjrw/pr-preview-action@v1
+        uses: actions/upload-artifact@v6
         with:
-          source-dir: ./playwright-report
-          umbrella-dir: _playwright
-          comment: false
+          name: report
+          path: ./playwright-report
+          retention-days: 1
+
+  upload-report:
+    # run even if tests fail
+    if: always()
+    name: Upload report
+    needs: combine-reports
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with:
+      environment: '#${{ github.event.number }}: E2E tests'
+      artifact: report
+      subdomain: pr-${{ github.event.number }}-reports
+      path: /playwright
+      # #?show-metadata-other allows showing extra metadata sections in the report
+      # Ref: https://github.com/microsoft/playwright/blob/e76ca6c/packages/html-reporter/src/metadataView.tsx#L62
+      environment-url-append: '#?show-metadata-other'

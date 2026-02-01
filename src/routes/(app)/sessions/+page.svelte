@@ -11,11 +11,13 @@
 	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
+	import { defaultClassificationMetadata } from '$lib/protocols.js';
 	import { importMore } from '$lib/queue.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { switchSession } from '$lib/sessions.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte.js';
+	import { orEmptyObj } from '$lib/utils.js';
 
 	seo({ title: 'Sessions' });
 
@@ -30,13 +32,38 @@
 			return;
 		}
 
+		const classificationMetadata = defaultClassificationMetadata(
+			defaultProtocol,
+			tables.Metadata.state
+		);
+
+		const mtimeMetadata = defaultProtocol.exports?.images.mtime;
+
 		const { id } = await tables.Session.add({
 			name: `Session du ${Intl.DateTimeFormat().format(new Date())}`,
 			description: '',
-			protocol: tables.Protocol.state[0]?.id,
+			protocol: defaultProtocol.id,
 			createdAt: new Date().toISOString(),
 			openedAt: new Date().toISOString(),
-			metadata: {}
+			metadata: {},
+			fullscreenClassifier: {
+				layout: 'top-bottom',
+				...orEmptyObj(classificationMetadata !== undefined, {
+					focusedMetadata: classificationMetadata ?? ''
+				})
+			},
+			group: {
+				global: { field: 'none' },
+				crop: { field: 'metadataPresence', metadata: defaultProtocol.crop.metadata },
+				classify: classificationMetadata
+					? { field: 'metadataConfidence', metadata: classificationMetadata }
+					: { field: 'none' }
+			},
+			sort: {
+				global: mtimeMetadata
+					? { field: 'metadataValue', direction: 'asc', metadata: mtimeMetadata }
+					: { field: 'name', direction: 'asc' }
+			}
 		});
 
 		await goto('/(app)/sessions/[id]', { id });

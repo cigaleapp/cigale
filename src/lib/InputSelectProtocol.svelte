@@ -23,26 +23,40 @@
 	{testid}
 	items={[
 		{
-			protocol: null,
-			label: 'Gérer les protocoles',
-			onclick() {
-				goto('/protocols');
-			}
+			label: 'Choisir un protocole',
+			items: tables.Protocol.state.map((p) => ({
+				type: 'selectable',
+				data: { protocol: p },
+				key: p.id,
+				label: p.name,
+				selected: value === p.id,
+				async onclick() {
+					value = p.id;
+					await onchange?.(value);
+				}
+			}))
+		},
+		{
+			items: [
+				{
+					type: 'clickable',
+					data: { protocol: null },
+					label: 'Gérer les protocoles',
+					async onclick() {
+						await goto('/protocols');
+					}
+				}
+			]
 		}
 	]}
-	selectableItems={tables.Protocol.state.map((p) => ({
-		protocol: p,
-		key: p.id,
-		label: p.name,
-		selected: value === p.id,
-		async onclick() {
-			value = p.id;
-			await onchange?.(value);
-		}
-	}))}
 >
 	{#snippet trigger(props)}
-		<button class:none-selected={!value} class="trigger" {...props}>
+		<button
+			aria-label="Choisir un protocole"
+			class:none-selected={!value}
+			class="trigger"
+			{...props}
+		>
 			{#if value}
 				{tables.Protocol.getFromState(value)?.name}
 			{:else}
@@ -52,7 +66,7 @@
 		</button>
 	{/snippet}
 
-	{#snippet item({ label, protocol })}
+	{#snippet item({ protocol }, { label })}
 		<div class="item">
 			<div class="label">
 				<div class="icon">

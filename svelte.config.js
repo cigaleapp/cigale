@@ -8,12 +8,8 @@ const config = {
 		},
 		adapter: adapter({
 			pages: process.env.ELECTRON_BUILD ? '.vite/build/sveltekit' : 'public',
-			strict: false,
-			fallback: '404.html'
+			fallback: process.env.SVELTE_FALLBACK_PAGE || 'index.html'
 		}),
-		router: {
-			type: 'hash'
-		},
 		alias: {
 			$worker: 'src/worker',
 			$locales: 'src/locales',

@@ -1,5 +1,4 @@
 <script>
-	import { watch } from 'runed';
 	import { fade } from 'svelte/transition';
 
 	import { page } from '$app/state';
@@ -14,7 +13,7 @@
 		deleteMetadataValue,
 		mergeMetadataFromImagesAndObservations,
 		storeMetadataValue
-	} from '$lib/metadata';
+	} from '$lib/metadata/index.js';
 	import { deleteObservation, mergeToObservation, newObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
@@ -162,32 +161,28 @@
 				const box = uiState.cropMetadataValueOf(image)?.value;
 				return {
 					src,
+					id: image.id,
+					dimensions: image.dimensions,
 					box: box ? toTopLeftCoords(box) : undefined
 				};
 			})
 			.filter((i) => i !== undefined)
 	);
 
-	/** @type {Awaited<ReturnType<typeof mergeMetadataFromImagesAndObservations>>} */
-	let mergedMetadataValues = $state({});
+	let mergedMetadataValues = $derived.by(() => {
+		if (!uiState.currentProtocol) return {};
 
-	watch([() => selectedImages, () => selectedObservations], () => {
-		if (!uiState.currentProtocol) return;
-
-		// FIXME needed to force refresh when selectedObservations' metadataOverrides change values, this isn't picked up by Svelte for some reason. I tried reproducing but couldn't yet, see https://svelte.dev/playground/eef37e409ca04fa888badd3e7588f461?version=5.25.0
-		void mergeMetadataFromImagesAndObservations(
-			db.databaseHandle(),
-			uiState.currentProtocol,
-			selectedImages,
-			selectedObservations
-		)
-			.then((values) => {
-				mergedMetadataValues = values;
-			})
-			.catch((e) => {
-				console.error(e);
-				toasts.error(e);
+		try {
+			return mergeMetadataFromImagesAndObservations({
+				definitions: tables.Metadata.state,
+				images: selectedImages,
+				observations: selectedObservations
 			});
+		} catch (e) {
+			console.error(e);
+			toasts.error(e);
+			return {};
+		}
 	});
 </script>
 
@@ -229,17 +224,6 @@
 						});
 					}
 				}
-
-				await mergeMetadataFromImagesAndObservations(
-					db.databaseHandle(),
-					uiState.currentProtocol,
-					selectedImages,
-					selectedObservations
-				)
-					.then((values) => {
-						mergedMetadataValues = values;
-					})
-					.catch((e) => toasts.error(e));
 			}}
 		/>
 	{/if}

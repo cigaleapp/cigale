@@ -15,7 +15,7 @@ import {
 	newSession,
 	observationCard,
 	setInferenceModels
-} from './utils.js';
+} from './utils/index.js';
 
 test.describe('correct results.zip', () => {
 	test.beforeEach(async ({ page }) => {

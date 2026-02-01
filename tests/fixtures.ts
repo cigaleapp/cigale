@@ -3,7 +3,7 @@ import { test as base, type Locator } from '@playwright/test';
 
 import type { Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
-import type { RuntimeValue } from '$lib/metadata';
+import type { RuntimeValue } from '$lib/schemas/metadata';
 import type { ExportedProtocol } from '$lib/schemas/protocols';
 import type { Toast } from '$lib/toasts.svelte.js';
 import { safeJSONParse } from '$lib/utils';
@@ -28,12 +28,17 @@ import {
 	setSettings,
 	sidepanelMetadataSectionFor,
 	toast,
+	tooltipOf,
 	waitForLoadingEnd,
+	waitForRoute,
 	type NavigationTab,
 	type PredownloadedModel
-} from './utils.js';
+} from './utils/index.js';
 
 const fullProtocol = _fullProtocol as ExportedProtocol;
+
+type RemoveNamespace<Key extends `io.github.cigaleapp.arthropods.example.light__${string}`> =
+	Key extends `io.github.cigaleapp.arthropods.example.light__${infer Rest}` ? Rest : never;
 
 let arthropodaClassifierModel: PredownloadedModel | null = null;
 let collembolaClassifierModel: PredownloadedModel | null = null;
@@ -42,6 +47,7 @@ let arthropodaDetectionModel: PredownloadedModel | null = null;
 export type AppFixture = {
 	db: {
 		ready(): Promise<void>;
+		refresh(): Promise<void>;
 		protocol: {
 			byId(id: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
 			byName(name: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
@@ -62,6 +68,7 @@ export type AppFixture = {
 			list(): Promise<IDBDatabaseType['Session']['value'][]>;
 		};
 		metadata: {
+			get(id: string): Promise<IDBDatabaseType['Metadata']['value'] | undefined>;
 			values(args: {
 				/** The image's filename */
 				image?: string;
@@ -74,6 +81,14 @@ export type AppFixture = {
 				/** Remove namespace from metadata id (keys of returned object). By default, set to lightweight protocol's id */
 				protocolId?: string | null;
 			}): Promise<Record<string, RuntimeValue>>;
+			set(
+				/** The image's ID  */
+				imageId: string,
+				/** The metadata key. If not namespaced, it'll be namespaced to the lightweight protocol's id */
+				key: RemoveNamespace<keyof typeof lightProtocol.metadata> | (string & {}),
+				/** The new value to set it as. Use null to remove the value  */
+				value: null | RuntimeValue | { confidence: number; value: RuntimeValue }
+			): Promise<void>;
 		};
 	};
 	modals: {
@@ -99,8 +114,13 @@ export type AppFixture = {
 		go(tab: NavigationTab): Promise<void>;
 		get(tab: NavigationTab): Locator;
 	};
+	path: {
+		wait(route: Parameters<typeof waitForRoute>[1]): Promise<void>;
+		go(path: import('$app/types').ResolvedPathname): Promise<void>;
+	};
 	tooltips: {
 		expectContent(element: Locator, content: string | RegExp): Promise<void>;
+		trigger(element: Locator): Promise<Locator>;
 	};
 	loading: {
 		wait(timeout?: number): Promise<void>;
@@ -119,10 +139,15 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 		await use({
 			sidepanel,
 			db: {
-				ready: async () => {
+				async ready() {
 					await page.waitForFunction(() =>
 						Boolean(window.devalue && window.DB && window.refreshDB)
 					);
+				},
+				async refresh() {
+					await page.evaluate(async () => {
+						window.refreshDB();
+					});
 				},
 				protocol: {
 					byId: async (id) => getDatabaseRowById(page, 'Protocol', id),
@@ -146,6 +171,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 					byName: async (name) => getDatabaseRowByField(page, 'Session', 'name', name)
 				},
 				metadata: {
+					get: async (id) => getDatabaseRowById(page, 'Metadata', id),
 					async values({
 						session,
 						image,
@@ -194,6 +220,60 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 									safeJSONParse(value)
 								])
 						);
+					},
+					async set(imageId, key, value) {
+						const original = await getDatabaseRowById(page, 'Image', imageId);
+						if (!original) {
+							throw new Error(`Could not find image with ID ${imageId}`);
+						}
+
+						if (!key.includes('__')) {
+							key = `${lightProtocol.id}__${key}`;
+						}
+
+						if (value === null) {
+							await page.evaluate(
+								async ([imageId, key]) => {
+									const image = await window.DB.get('Image', imageId);
+									if (!image) {
+										throw new Error(`Could not find image with ID ${imageId}`);
+									}
+
+									delete image.metadata[key];
+
+									await window.DB.put('Image', image);
+								},
+								[imageId, key]
+							);
+							return;
+						}
+
+						const newValue =
+							typeof value === 'object' && 'value' in value
+								? {
+										confidence: value.confidence,
+										value: JSON.stringify(value.value)
+									}
+								: { value: JSON.stringify(value) };
+
+						const updated: IDBDatabaseType['Image']['value'] = {
+							...original,
+							metadata: {
+								...original.metadata,
+								[key]: {
+									alternatives: {},
+									confidence: 1,
+									...newValue
+								}
+							}
+						};
+
+						await page.evaluate(
+							async ([updated]) => {
+								await window.DB.put('Image', updated);
+							},
+							[updated]
+						);
 					}
 				}
 			},
@@ -220,9 +300,21 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 				go: async (tab) => goToTab(page, tab),
 				get: (tab) => getTab(page, tab)
 			},
+			path: {
+				wait: async (route) => waitForRoute(page, route),
+				async go(path) {
+					const fullPath = (process.env.BASE_PATH || '') + path;
+					await page.goto(fullPath);
+				}
+			},
 			tooltips: {
-				expectContent: async (element, content) =>
-					expectTooltipContent(page, element, content)
+				async expectContent(element, content) {
+					return expectTooltipContent(page, element, content);
+				},
+				async trigger(element) {
+					await element.hover({ force: true });
+					return tooltipOf(page, element);
+				}
 			},
 			loading: {
 				wait: async (timeout) => waitForLoadingEnd(page, timeout),

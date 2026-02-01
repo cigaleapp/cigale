@@ -9,19 +9,19 @@ import {
 	sessionMetadataSectionFor,
 	setInferenceModels,
 	switchSession
-} from './utils.js';
+} from './utils/index.js';
 
 test.describe('isolation', () => {
 	test.beforeEach(() => {
 		test.setTimeout(40_000);
 	});
 	test('no images from one session shows up in another', async ({ page, app }) => {
-		await newSession(page, { name: 'Session A' });
+		await newSession(page, { name: 'Session α' });
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
 		await app.loading.wait();
 
-		await newSession(page, { name: 'Session B' });
+		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
@@ -32,7 +32,7 @@ test.describe('isolation', () => {
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
-		await switchSession(page, 'Session A');
+		await switchSession(page, 'Session α');
 		await app.tabs.go('import');
 
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
@@ -40,22 +40,22 @@ test.describe('isolation', () => {
 	});
 
 	test('deleting a session only deletes its images', async ({ page, app }) => {
-		await newSession(page, { name: 'Session A' });
+		await newSession(page, { name: 'Session α' });
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
 		await app.loading.wait();
 		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
 
-		await newSession(page, { name: 'Session B' });
+		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'debugsquare.png');
 		await app.loading.wait();
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 
-		await deleteSession(page, 'Session A');
-		await expect(page.getByText('Session A')).not.toBeVisible();
+		await deleteSession(page, 'Session α');
+		await expect(page.getByText('Session α')).not.toBeVisible();
 
-		await switchSession(page, 'Session B');
+		await switchSession(page, 'Session β');
 		await app.tabs.go('import');
 		await expect(page.getByText('debugsquare.png')).toBeVisible();
 		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
@@ -69,7 +69,7 @@ test('import into new session', async ({ page, app }) => {
 	await picker.then((picker) => {
 		picker.setFiles('./tests/fixtures/exports/correct.zip');
 	});
-	await page.waitForURL((u) => u.hash === '#/import');
+	await app.path.wait('/import');
 
 	await expect(page.getByTestId('goto-current-session')).toHaveText('Testing session');
 
@@ -85,7 +85,7 @@ test('import into new session', async ({ page, app }) => {
 	});
 
 	await app.tabs.go('crop');
-	await expect(page.locator('main header > *').nth(1)).toHaveText('4 éléments');
+	await expect(page.locator('main header > *').nth(2)).toHaveText('4 éléments');
 
 	await app.tabs.go('classify');
 	await page.getByText('cyan', { exact: true }).click();
@@ -254,7 +254,7 @@ test('import into new session', async ({ page, app }) => {
 	`);
 
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');
 	// Check metadata set in the export
 	await expect(
 		sessionMetadataSectionFor(page, 'Durée de prospection').getByRole('textbox').first()
@@ -277,7 +277,7 @@ test('import into new session', async ({ page, app }) => {
 test('changing metadata values saves them in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Metadata session' });
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');
 
 	/** @param {string} key */
 	const metadataValueFor = async (key) =>
@@ -312,9 +312,9 @@ test('changing metadata values saves them in the database', async ({ page, app }
 test('changing session info saves in the database', async ({ page, app }) => {
 	await newSession(page, { name: 'Test!!' });
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');
 
-	const id = new URL(page.url()).hash.split('/')[2];
+	const id = new URL(page.url()).pathname.split('/')[2];
 
 	expect(await app.db.session.byId(id)).toMatchObject({
 		id,
@@ -346,11 +346,15 @@ test('can change protocol of session', async ({ page, app }) => {
 	await newSession(page, { name: 'Test' });
 
 	await page.getByTestId('goto-current-session').click();
-	await page.waitForURL((u) => u.hash.startsWith('#/sessions/'));
+	await app.path.wait('/(app)/sessions/[id]');
 
 	expect(await app.db.session.byName('Test')).toHaveProperty('protocol', exampleProtocol.id);
 
-	await chooseInDropdown(page, 'protocol', 'Kitchen sink');
+	await chooseInDropdown(
+		page,
+		page.getByRole('button', { name: 'Choisir un protocole' }),
+		'Kitchen sink'
+	);
 
 	expect(await app.db.session.byName('Test')).toHaveProperty(
 		'protocol',

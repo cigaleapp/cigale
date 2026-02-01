@@ -43,7 +43,7 @@
 	});
 
 	async function computeChangesWithUpstream() {
-		const { changes, dirty } = await page.data.swarpc.diffProtocolWithRemote(
+		const { changes, dirty } = await page.data.swarpc.diffProtocolWithRemote.once(
 			{ protocolId: id },
 			(progress) => {
 				upstreamComparison.progress = progress;

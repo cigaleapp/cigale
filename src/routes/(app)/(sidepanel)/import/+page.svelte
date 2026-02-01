@@ -12,17 +12,17 @@
 	import Logo from '$lib/Logo.svelte';
 	import { deleteObservation } from '$lib/observations';
 	import { cancelTask, importMore } from '$lib/queue.svelte.js';
-	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
 	import { toasts } from '$lib/toasts.svelte';
 	import { unique } from '$lib/utils';
 
 	const allImages = $derived([
 		...unique(
-			tables.Image.state.map(({ filename, id, addedAt, fileId, sessionId }) => ({
+			tables.Image.state.map(({ filename, id, addedAt, fileId, sessionId, metadata }) => ({
 				id: fileId ?? id,
 				addedAt,
 				sessionId,
+				metadata,
 				name: filename,
 				virtual: false,
 				data: tables.Image.getFromState(id)
@@ -36,6 +36,7 @@
 			sessionId: uiState.currentSessionId,
 			addedAt,
 			name,
+			metadata: {},
 			virtual: true,
 			data: null
 		}))
@@ -54,17 +55,17 @@
 	<section class="observations" class:empty in:fade={{ duration: 100 }}>
 		<AreaObservations
 			items={allImages}
-			sort={getSettings().gallerySort}
+			zone="import"
 			onemptyclick={async () => {
 				if (uiState.selection.length > 0) return;
 				importMore(await promptForFiles({ accept: ACCEPTED_IMPORT_TYPES, multiple: true }));
 			}}
 		>
 			{#snippet item(image, { id, name })}
-				{#if image && image.fileId}
+				{#if image}
 					<CardImage
 						boxes="none"
-						image={{ ...image, fileId: image.fileId }}
+						{image}
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);
@@ -80,6 +81,7 @@
 						status={error ? 'errored' : queued ? 'queued' : 'loading'}
 						tooltip={error}
 						image={undefined}
+						dimensions={undefined}
 						ondelete={async () => {
 							cancelTask(id, 'Cancelled by user');
 							uiState.processing.removeFile(id);

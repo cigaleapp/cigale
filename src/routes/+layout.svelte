@@ -3,6 +3,9 @@
 	import '$lib/tippy-svg-arrow.css';
 	import '$lib/range-inputs.css';
 
+	import { onMount } from 'svelte';
+
+	import { uiState } from '$lib/state.svelte';
 	import { fadeOutElement } from '$lib/utils';
 
 	const { children } = $props();
@@ -17,6 +20,10 @@
 		window.nativeWindow?.setControlsColor(
 			getComputedStyle(document.documentElement).getPropertyValue('--fg-primary')
 		);
+	});
+
+	onMount(() => {
+		window.uiState = uiState;
 	});
 </script>
 

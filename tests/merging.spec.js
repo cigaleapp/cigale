@@ -5,7 +5,7 @@ import {
 	loadDatabaseDump,
 	observationCard,
 	setInferenceModels
-} from './utils.js';
+} from './utils/index.js';
 
 test.beforeEach(async ({ page, app }) => {
 	await app.settings.set({ gallerySort: { direction: 'asc', key: 'filename' } });

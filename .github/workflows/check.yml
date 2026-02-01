@@ -47,12 +47,13 @@ jobs:
     name: Build
     uses: ./.github/workflows/build.yml
     with:
-      minify: false
+      debug: false
 
   test:
-    needs: build
+    needs: lint
     name: Unit tests
     uses: ./.github/workflows/vitest.yml
+    secrets: inherit
     with:
       publish-report: false
       compare-coverage: false
@@ -62,6 +63,7 @@ jobs:
     needs: test
     name: Check coverage
     uses: ./.github/workflows/vitest.yml
+    secrets: inherit
     with:
       compare-coverage: true
 
@@ -69,6 +71,7 @@ jobs:
     needs: [build, json-schema, lint, test]
     name: E2E
     uses: ./.github/workflows/playwright.yml
+    secrets: inherit
     with:
       artifact: ${{ needs.build.outputs.artifact }}
 
@@ -83,10 +86,11 @@ jobs:
     needs: [json-schema, build]
     name: PR Preview
     uses: ./.github/workflows/preview.yml
+    secrets: inherit
 
   deploy:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs: e2e
+    needs: [e2e, dont-merge-comment]
     name: Deploy
     concurrency:
       group: deploy-gh-pages
@@ -101,7 +105,6 @@ jobs:
 
   dont-merge-comment:
     name: Check for presence of "do not merge" comment
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

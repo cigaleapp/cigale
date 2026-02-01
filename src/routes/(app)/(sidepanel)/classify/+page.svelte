@@ -7,7 +7,6 @@
 	import CardImage from '$lib/CardImage.svelte';
 	import CardObservation from '$lib/CardObservation.svelte';
 	import { classificationInferenceSettings } from '$lib/classification.svelte.js';
-	import { errorMessage } from '$lib/i18n';
 	import { tables } from '$lib/idb.svelte';
 	import {
 		deleteImageFile,
@@ -17,27 +16,43 @@
 		isValidImageId
 	} from '$lib/images';
 	import { loadModel } from '$lib/inference.js';
+	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
+	import { mergeMetadataFromImagesAndObservations } from '$lib/metadata/merging.js';
 	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
 	import { seo } from '$lib/seo.svelte';
-	import { getSettings, isDebugMode } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
-	import { nonnull } from '$lib/utils.js';
+	import { isAbortError, nonnull } from '$lib/utils.js';
+
+	/**
+	 * @import * as DB from '$lib/database.js';
+	 * @import { GalleryItem } from '$lib/gallery.js';
+	 */
+
+	/**
+	 * @typedef {GalleryItem<{ image: DB.Image | undefined; observation: DB.Observation | undefined; images: DB.Image[] }>} Item
+	 */
 
 	seo({ title: 'Classification' });
 
 	const { data } = $props();
 
+	/** @type {Item[]} */
 	const items = $derived(
 		tables.Observation.state.map((obs) => ({
 			id: obs.id,
 			sessionId: obs.sessionId,
 			addedAt: obs.addedAt,
 			name: obs.label,
+			metadata: mergeMetadataFromImagesAndObservations({
+				definitions: tables.Metadata.state,
+				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
+				observations: [obs]
+			}),
 			virtual: false,
 			data: {
 				image: undefined,
@@ -48,6 +63,8 @@
 	);
 
 	let unrolledObservation = $state('');
+
+	/** @type {[string, Item[]]} */
 	const unroll = $derived([
 		unrolledObservation,
 		items
@@ -56,6 +73,8 @@
 				id: img.id,
 				name: img.filename,
 				addedAt: img.addedAt,
+				sessionId: img.sessionId,
+				metadata: img.metadata,
 				virtual: false,
 				data: {
 					image: img,
@@ -70,6 +89,7 @@
 	 */
 	let modelLoadingProgress = $state(0);
 
+	let modelAbortController = new AbortController();
 	let classifmodelLoaded = $state(false);
 	/** @type {Error|undefined}*/
 	let classifModelLoadingError = $state();
@@ -90,7 +110,12 @@
 			return;
 		}
 
+		modelAbortController.abort();
+		classifModelLoadingError = undefined;
+		modelAbortController = new AbortController();
+
 		await loadModel(data.swarpc, 'classification', {
+			abortSignal: modelAbortController.signal,
 			protocolId: uiState.currentProtocol.id,
 			requests: {
 				model: settings.model,
@@ -99,14 +124,7 @@
 			onProgress(p) {
 				modelLoadingProgress = p;
 			}
-		})
-			.then(() => {
-				classifmodelLoaded = true;
-			})
-			.catch((error) => {
-				console.error(error);
-				toasts.error('Erreur lors du chargement du modèle de classification');
-			});
+		});
 	}
 
 	// TODO fix chunked batching: add a throttle to
@@ -137,8 +155,11 @@
 			void loadClassifModel()
 				.catch((error) => {
 					classifModelLoadingError = error;
+					if (isAbortError(error)) return;
+					console.error(error);
+					toasts.error('Erreur lors du chargement du modèle de classification');
 				})
-				.finally(() => {
+				.then(() => {
 					classifmodelLoaded = true;
 				});
 		}
@@ -147,6 +168,29 @@
 	$effect(() => {
 		if (!uiState.setSelection) return;
 		void ensureNoLoneImages();
+	});
+
+	defineKeyboardShortcuts('classification', {
+		'$mod+Enter': {
+			help: "Classifier l'image sélectionnée en plein écran",
+			when: () => uiState.selection.length === 1,
+			async do() {
+				let id = uiState.selection.at(0);
+				if (!id) return;
+
+				const isImage = tables.Image.state.find((img) => img.id === id);
+
+				if (!isImage) {
+					id = tables.Observation.state.find(
+						(obs) => obs.id === id && obs.images.length === 1
+					)?.images?.[0];
+				}
+
+				if (!id) return;
+
+				await goto('/(app)/(sidepanel)/classify/[image]', { image: id });
+			}
+		}
 	});
 </script>
 
@@ -170,18 +214,9 @@
 			<ProgressBar percentage alwaysActive progress={modelLoadingProgress} />
 		</div>
 	</section>
-{:else if !classifModelLoadingError}
+{:else}
 	<section class="observations" class:empty={!items.length} in:fade={{ duration: 100 }}>
-		<AreaObservations
-			{items}
-			{unroll}
-			sort={getSettings().gallerySort}
-			groups={['Recadrées', 'Non recadrées']}
-			grouping={({ data: { images } }) =>
-				images.some((img) => uiState.cropMetadataValueOf(img))
-					? 'Recadrées'
-					: 'Non recadrées'}
-		>
+		<AreaObservations {items} {unroll} zone="classify">
 			{#snippet item({ observation, image, images }, { id })}
 				{#if observation}
 					<CardObservation
@@ -191,6 +226,11 @@
 						loadingStatusText="Analyse…"
 						onstacksizeclick={() => {
 							unrolledObservation = unrolledObservation === id ? '' : id;
+						}}
+						ondoubleclick={() => {
+							const imageIds = observation.images;
+							if (imageIds.length !== 1) return;
+							goto('/(app)/(sidepanel)/classify/[image]', { image: imageIds[0] });
 						}}
 						onretry={() => {
 							uiState.erroredImages.delete(id);
@@ -210,7 +250,13 @@
 						}}
 					/>
 				{:else if image}
-					<CardImage {image} boxes="apply-first" />
+					<CardImage
+						{image}
+						boxes="apply-first"
+						ondoubleclick={() => {
+							goto('/(app)/(sidepanel)/classify/[image]', { image: image.id });
+						}}
+					/>
 				{/if}
 			{/snippet}
 		</AreaObservations>
@@ -220,17 +266,6 @@
 				<p>Aucune image</p>
 				<ButtonSecondary onclick={() => goto('/import')}>Importer</ButtonSecondary>
 			</div>
-		{/if}
-	</section>
-{:else}
-	<section class="loading errored" in:fade={{ duration: 100 }}>
-		<Logo variant="error" />
-		<h2>Oops!</h2>
-		<p>Impossible de charger le modèle de classification</p>
-		<p class="source">{@render modelsource()}</p>
-		<p class="message">{errorMessage(classifModelLoadingError)}</p>
-		{#if isDebugMode()}
-			<pre class="trace">{classifModelLoadingError?.stack}</pre>
 		{/if}
 	</section>
 {/if}
@@ -269,20 +304,6 @@
 	}
 
 	.loading .source {
-		font-size: 0.8em;
-	}
-
-	.loading.errored {
-		gap: 0.5em;
-	}
-
-	.loading.errored *:not(p.message) {
-		color: var(--fg-error);
-	}
-
-	.loading.errored .trace {
-		max-width: 80%;
-		overflow-x: auto;
 		font-size: 0.8em;
 	}
 
