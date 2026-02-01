@@ -50,11 +50,15 @@
 		});
 	}
 
+	const currently = $derived(currentImage.metadata[focusedMetadata?.id ?? '']);
+
+	const allConfirmed = $derived(totalImages === confirmedClassificationsCount);
+
+	$inspect({ nextUnconfirmedImage });
+
 	async function setConfirmation(confirmed: boolean) {
 		if (!focusedMetadata) return;
 		if (!uiState.currentSessionId) return;
-
-		const currently = currentImage.metadata[focusedMetadata.id];
 
 		if (!currently) {
 			toasts.warn('Aucune classification à confirmer pour cette image.');
@@ -74,6 +78,15 @@
 		await invalidate(dependencyURI('Image', currentImage.id));
 	}
 
+	async function confirmAndContinue() {
+		await setConfirmation(true);
+		if (nextUnconfirmedImage) {
+			await goToImage(nextUnconfirmedImage);
+		} else if (allConfirmed) {
+			await goto('/results');
+		}
+	}
+
 	defineKeyboardShortcuts('classification', {
 		'$mod+ArrowRight': {
 			help: 'Image suivante',
@@ -81,10 +94,7 @@
 		},
 		Space: {
 			help: 'Marquer la classification comme confirmée et passer à la prochaine image non confirmée',
-			async do() {
-				await setConfirmation(true);
-				await goToImage(nextUnconfirmedImage);
-			}
+			do: async () => confirmAndContinue()
 		},
 		'$mod+ArrowLeft': {
 			help: 'Image précédente',
@@ -156,10 +166,9 @@
 		<ButtonSecondary
 			keyboard="Space"
 			help="Marquer la classification comme confirmée et passer à la prochaine classification non confirmée"
-			disabled={!nextUnconfirmedImage}
+			disabled={!currently}
 			onclick={async () => {
-				await setConfirmation(true);
-				await goToImage(nextUnconfirmedImage);
+				await confirmAndContinue();
 			}}
 		>
 			Continuer
