@@ -24,11 +24,10 @@
 
 		toggleLayoutTransitions(false);
 
-		await tables.Session.update(
-			uiState.currentSessionId,
-			'fullscreenClassifyLayout',
-			nextLayout
-		);
+		await tables.Session.update(uiState.currentSessionId, 'fullscreenClassifier', {
+			...uiState.currentSession?.fullscreenClassifier,
+			layout: nextLayout
+		});
 
 		await sleep(50);
 		toggleLayoutTransitions(true);
