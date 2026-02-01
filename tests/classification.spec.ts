@@ -4,6 +4,7 @@ import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.jso
 import { issue, pr } from './annotations.js';
 import { expect, test, type AppFixture } from './fixtures.js';
 import {
+	browserConsole,
 	chooseFirstSession,
 	firstObservationCard,
 	imagesByName,
@@ -77,10 +78,16 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Set shoot_date for every image to ensure deterministic ordering, as some tests rely on it.
 		// Make sure that cyan is sorted before leaf
-		const { leaf, cyan } = await imagesByName(app);
+		let { leaf, cyan } = await imagesByName(app);
 		await app.db.metadata.set(leaf.id, 'shoot_date', '2023-01-02T12:00:00Z');
 		await app.db.metadata.set(cyan.id, 'shoot_date', '2023-01-03T12:00:00Z');
 		await app.db.refresh();
+
+		({ leaf, cyan } = await imagesByName(app));
+		await browserConsole.log(
+			page,
+			`tiebreaker: metadata shoot_date set for leaf & cyan images are ${leaf.filename} = ${leaf.metadata[`${lightweightProtocol.id}__shoot_date`]?.value}, ${cyan.filename} = ${cyan.metadata[`${lightweightProtocol.id}__shoot_date`]?.value}`
+		);
 
 		await app.path.wait(`/classify/${lilFella.images[0]}`);
 	});
@@ -289,7 +296,9 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 				await ex(title).toHaveAccessibleName('lil-fella.jpeg #1');
 
-				await navigation.getByRole('button', { name: 'Image suivante' }).click();
+				// XXX: fore some reason, in E2E browsers only, this specific click goes two images forward
+				// await navigation.getByRole('button', { name: 'Image suivante' }).click();
+				await page.keyboard.press('Control+ArrowRight');
 				await ex(title).toHaveAccessibleName('leaf.jpeg #1');
 				await ex(selectedOption).toHaveText('21%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');

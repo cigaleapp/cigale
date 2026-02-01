@@ -15,9 +15,12 @@ export async function load({ params, depends, parent }) {
 
 	if (!uiState.currentSessionId) error(400, 'Aucune session active');
 
+	const currentSession = await tables.Session.get(uiState.currentSessionId);
+	if (!currentSession) error(404, 'Session active introuvable');
+
 	const focusedMetadataId =
-		uiState.currentSession?.fullscreenClassifier.focusedMetadata ??
-		uiState.classificationMetadataId;
+		currentSession?.fullscreenClassifier.focusedMetadata ?? uiState.classificationMetadataId;
+
 	const focusedMetadata = focusedMetadataId
 		? await tables.Metadata.get(focusedMetadataId)
 		: undefined;
@@ -37,12 +40,10 @@ export async function load({ params, depends, parent }) {
 
 	depends(dependencyURI('Image', image.id));
 
-	const images = await listByIndex('Image', 'sessionId', uiState.currentSessionId);
+	const images = await listByIndex('Image', 'sessionId', currentSession.id);
 
-	const sortSettings =
-		uiState.currentSession?.sort.classify ?? uiState.currentSession?.sort.global;
-	const groupSettings =
-		uiState.currentSession?.group.classify ?? uiState.currentSession?.group.global;
+	const sortSettings = currentSession?.sort.classify ?? currentSession?.sort.global;
+	const groupSettings = currentSession?.group.classify ?? currentSession?.group.global;
 
 	if (sortSettings && groupSettings) {
 		const imagesSorter = await galleryEffectiveSorter({
@@ -57,6 +58,8 @@ export async function load({ params, depends, parent }) {
 		});
 
 		images.sort((a, b) => imagesSorter(toGalleryItem(a), toGalleryItem(b)));
+
+		console.info(`Sorted ${images.length} images for classification navigation`, images);
 	}
 
 	/** Number of the image within the images that point to its ImageFile */
@@ -75,6 +78,8 @@ export async function load({ params, depends, parent }) {
 
 	const nextImage = nextImageIndex < images.length ? images[nextImageIndex] : null;
 	const prevImage = prevImageIndex >= 0 ? images[prevImageIndex] : null;
+
+	console.log({ currentImageIndex, nextImage, prevImage });
 
 	// Counts
 	const classifiedImagesCount = focusedMetadata
