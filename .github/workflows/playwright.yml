@@ -24,9 +24,7 @@ env:
   PLEYE_DEBUG: nodebug
   PLEYE_API_KEY: ${{ secrets.PLEYE_API_KEY }}
   PR_NUMBER: ${{ github.event.number }}
-  PR_TITLE: ${{ github.event.pull_request.title }}
   COMMIT_SHA: ${{  github.event.pull_request.head.sha || github.sha }}
-  WORKFLOW_NAME: ${{ github.workflow }}
   # XXX: Depends on dev-deployments workflow's domain default value
   TRACE_VIEWER_BASE_URL: https://pr-${{ github.event.number }}-reports.cigale.gwen.works/playwright
 

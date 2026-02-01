@@ -133,54 +133,18 @@ function pleyeReporter() {
 		const env = arkenv({
 			PLEYE_DEBUG: 'string',
 			PLEYE_API_KEY: 'string > 8',
-			GITHUB_REPOSITORY_ID: 'number',
 			JOB_ID: 'number',
-			WORKFLOW_NAME: 'string',
-			GITHUB_RUN_ID: 'number',
-			GITHUB_WORKSPACE: 'string',
 			COMMIT_SHA: 'string > 10',
 			// Empty string does not count as undefined or absent
 			// Theres no way to fix this, so we just use process.env for this one
 			// PR_NUMBER: 'number',
 			'PR_TITLE?': 'string',
-			'GITHUB_HEAD_REF?': 'string',
-			GITHUB_REF_NAME: 'string',
 			TRACE_VIEWER_BASE_URL: [
 				'string.url',
 				':',
 				(url, ctx) => !url.endsWith('/') || ctx.reject('base url must not end with a slash')
 			]
 		});
-
-		const [commitTitle, authorName, authorEmail, ...commitDescription] = spawnSync('git', [
-			'log',
-			'-1',
-			`--pretty=%s%n%an%n%ae%n%b`,
-			env.COMMIT_SHA
-		])
-			.stdout.toString('utf-8')
-			.split('\n');
-
-		const jobName = spawnSync('gh', [
-			'run',
-			'view',
-			env.GITHUB_RUN_ID.toString(),
-			'--json',
-			'jobs',
-			'--jq',
-			`.jobs[] | select(.databaseId == ${env.JOB_ID}).name`
-		])
-			.stdout.toString('utf-8')
-			.trim();
-
-		const commitUsername = spawnSync('gh', [
-			'api',
-			`/repos/${process.env.GITHUB_REPOSITORY}/commits/${env.COMMIT_SHA}`,
-			'--jq',
-			'.author.login'
-		])
-			.stdout.toString('utf-8')
-			.trim();
 
 		/**
 		 * @type {import('./tests/reporters/pleye').PleyeParams}
@@ -189,22 +153,8 @@ function pleyeReporter() {
 			debug: env.PLEYE_DEBUG === 'debug',
 			apiKey: env.PLEYE_API_KEY || '',
 			serverOrigin: 'https://pleye.gwen.works',
-			repositoryGitHubId: env.GITHUB_REPOSITORY_ID,
 			githubJobId: env.JOB_ID,
-			githubJobName: jobName,
-			githubRunId: env.GITHUB_RUN_ID,
-			githubRunName: env.WORKFLOW_NAME,
-			// Careful: use GITHUB_WORKSPACE and NOT ${{ github.workspace }}, see
-			// https://github.com/actions/runner/issues/2058
-			baseDirectory: env.GITHUB_WORKSPACE,
 			commitSha: env.COMMIT_SHA,
-			commitTitle: commitTitle,
-			commitDescription: commitDescription.join('\n'),
-			commitAuthorName: authorName,
-			commitAuthorEmail: authorEmail,
-			commitAuthorUsername: commitUsername,
-			branch: env.GITHUB_HEAD_REF || env.GITHUB_REF_NAME,
-			pullRequestTitle: env.PR_TITLE || '',
 			traceViewerUrl: (sha1, extension) =>
 				urlWithBase(env.TRACE_VIEWER_BASE_URL, '/trace/index.html', {
 					trace: urlWithBase(env.TRACE_VIEWER_BASE_URL, `/data/${sha1 + extension}`)
