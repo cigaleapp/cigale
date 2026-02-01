@@ -1,9 +1,12 @@
+import type { Page } from '@playwright/test';
+
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
 import { expect, test, type AppFixture } from './fixtures.js';
 import {
 	chooseFirstSession,
 	firstObservationCard,
+	imagesByName,
 	importPhotos,
 	loadDatabaseDump,
 	newSession,
@@ -71,6 +74,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		const lilFella = await app.db.observation.byLabel('lil-fella');
 		if (!lilFella) throw new Error('Missing lil-fella observation in database dump');
+
+		// Set shoot_date for every image to ensure deterministic ordering, as some tests rely on it.
+		// Make sure that cyan is sorted before leaf
+		const { leaf, cyan } = await imagesByName(app);
+		await app.db.metadata.set(leaf.id, 'shoot_date', '2023-01-02T12:00:00Z');
+		await app.db.metadata.set(cyan.id, 'shoot_date', '2023-01-03T12:00:00Z');
+		await app.db.refresh();
 
 		await app.path.wait(`/classify/${lilFella.images[0]}`);
 	});
@@ -277,20 +287,88 @@ test.describe('full-screen classification view', pr(1071), () => {
 					.getByTestId('focused-option')
 					.getByTestId('current');
 
+				await ex(title).toHaveAccessibleName('lil-fella.jpeg #1');
+
+				await navigation.getByRole('button', { name: 'Image suivante' }).click();
+				await ex(title).toHaveAccessibleName('leaf.jpeg #1');
+				await ex(selectedOption).toHaveText('21%');
+				await ex(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
+
+				await navigation.getByRole('button', { name: 'Image suivante' }).click();
 				await navigation.getByRole('button', { name: 'Image suivante' }).click();
 				await ex(title).toHaveAccessibleName('with-exif-gps.jpeg #1');
 				await ex(selectedOption).toHaveText('--%');
 
 				await navigation.getByRole('button', { name: 'Image précédente' }).click();
+				await navigation.getByRole('button', { name: 'Image précédente' }).click();
+				await navigation.getByRole('button', { name: 'Image précédente' }).click();
 				await ex(title).toHaveAccessibleName('lil-fella.jpeg #1');
 				await ex(selectedOption).toHaveText('32%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
-
-				await navigation.getByRole('button', { name: 'Image précédente' }).click();
-				await ex(title).toHaveAccessibleName('leaf.jpeg #1');
-				await ex(selectedOption).toHaveText('21%');
-				await ex(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
 			});
 		});
 	}
+
+	test('classification confirmation', async ({ page, app }) => {
+		// XXX: DONT MERGE
+		// TODO: assertions about the progress bar
+
+		const ex = expect.soft;
+
+		// Switch to horizontal layout for window size reasons
+		await page.getByTestId('layout-switcher').getByRole('button').click();
+
+		// Go to next when continue is clicked, since there are still other unconfirmed images
+		await page.getByRole('button', { name: 'Continuer' }).click();
+
+		await ex(confirmedCropOverlay(page)).toBeVisible();
+
+		// eslint-disable-next-line prefer-const
+		let { leaf, lilFella, cyan, withExifGps } = await imagesByName(app);
+
+		ex(lilFella.metadata[`${lightweightProtocol.id}__species`]).toHaveProperty(
+			'confirmed',
+			true
+		);
+
+		await app.path.wait(`/classify/${leaf.id}`);
+
+		// Mark the next images as confirmed too
+
+		await page.keyboard.press('ArrowUp');
+
+		// Arrows should be silent
+		await ex(confirmedCropOverlay(page)).not.toBeVisible();
+		({ leaf } = await imagesByName(app));
+		ex(leaf.metadata[`${lightweightProtocol.id}__species`]).toHaveProperty('confirmed', true);
+
+		await page.keyboard.press('Control+ArrowRight');
+
+		await app.path.wait(`/classify/${cyan.id}`);
+		await page.keyboard.press('ArrowUp');
+		await page.keyboard.press('Control+ArrowRight');
+
+		await app.path.wait(`/classify/${withExifGps.id}`);
+		await page.keyboard.press('ArrowUp');
+
+		await page.keyboard.press('ArrowDown');
+		({ withExifGps } = await imagesByName(app));
+		ex(withExifGps.metadata[`${lightweightProtocol.id}__species`]).toHaveProperty(
+			'confirmed',
+			false
+		);
+
+		// Now all the other images are confirmed, clicking continue should exit the full screen view
+		await page.getByRole('button', { name: 'Continuer' }).click();
+		await ex(confirmedCropOverlay(page)).toBeVisible();
+
+		await app.path.wait('/results');
+	});
 });
+
+/**
+ * Gets the "Confirmé" overlay that appears in the cropper view if the current image has been marked as confirmed through implicit means.
+ */
+function confirmedCropOverlay(page: Page) {
+	return page.locator('.confirmed-overlay');
+}

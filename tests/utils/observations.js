@@ -2,6 +2,8 @@
  * @import { Page } from '@playwright/test';
  */
 
+import { throwError } from './core.js';
+
 /**
  *
  * @param {Page} page
@@ -25,4 +27,22 @@ export function observationCard(page, label) {
 			})
 		})
 		.first();
+}
+
+/**
+ * @param {import('../fixtures').AppFixture} app
+ */
+export async function imagesByName(app) {
+	return {
+		leaf:
+			(await app.db.image.byFilename('leaf.jpeg')) ?? throwError('Image leaf.jpeg not found'),
+		lilFella:
+			(await app.db.image.byFilename('lil-fella.jpeg')) ??
+			throwError('Image lil-fella.jpeg not found'),
+		cyan:
+			(await app.db.image.byFilename('cyan.jpeg')) ?? throwError('Image cyan.jpeg not found'),
+		withExifGps:
+			(await app.db.image.byFilename('with-exif-gps.jpeg')) ??
+			throwError('Image with-exif-gps.jpeg not found')
+	};
 }

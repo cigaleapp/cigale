@@ -5,6 +5,7 @@ import {
 	browserConsole,
 	chooseFirstSession,
 	getDatabaseRowById,
+	imagesByName,
 	loadDatabaseDump,
 	setImageMetadata,
 	throwError
@@ -28,26 +29,6 @@ test.describe('Cropper view', () => {
 		);
 		await app.tabs.go('crop');
 	});
-
-	/**
-	 * @param {AppFixture} app
-	 */
-	async function imagesByName(app) {
-		return {
-			leaf:
-				(await app.db.image.byFilename('leaf.jpeg')) ??
-				throwError('Image leaf.jpeg not found'),
-			lilFella:
-				(await app.db.image.byFilename('lil-fella.jpeg')) ??
-				throwError('Image lil-fella.jpeg not found'),
-			cyan:
-				(await app.db.image.byFilename('cyan.jpeg')) ??
-				throwError('Image cyan.jpeg not found'),
-			withExifGps:
-				(await app.db.image.byFilename('with-exif-gps.jpeg')) ??
-				throwError('Image with-exif-gps.jpeg not found')
-		};
-	}
 
 	test('should have all cards visible @webkit-no-parallelization', async ({ page, app }) => {
 		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
@@ -152,7 +133,7 @@ test.describe('Cropper view', () => {
 			await app.path.wait(`/crop/${images.leaf.fileId}`);
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
-			await app.path.wait(`/crop/${images.withExifGps	.fileId}`);
+			await app.path.wait(`/crop/${images.withExifGps.fileId}`);
 			await expect(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 		});
 
