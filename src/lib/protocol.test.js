@@ -117,7 +117,6 @@ test('toExportedProtocol', async () => {
 		description: 'A test protocol',
 		crop: {
 			metadata: 'meta1',
-			confirmationMetadata: 'meta2'
 		},
 		exports: {
 			metadata: {
@@ -230,7 +229,6 @@ describe('compareProtocolWithUpstream', () => {
 				// no source:
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -272,7 +270,6 @@ describe('compareProtocolWithUpstream', () => {
 				source: 'https://example.com/protocol.json',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -303,7 +300,6 @@ describe('compareProtocolWithUpstream', () => {
 				source: 'https://example.com/protocol.json',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -348,7 +344,6 @@ describe('compareProtocolWithUpstream', () => {
 				source: 'https://example.com/protocol.json',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				exports: {
@@ -439,7 +434,6 @@ describe('compareProtocolWithUpstream', () => {
 				updates: 'automatic',
 				crop: {
 					metadata: 'feur',
-					confirmationMetadata: 'quoicoubaka',
 					padding: '0px'
 				},
 				metadata: {

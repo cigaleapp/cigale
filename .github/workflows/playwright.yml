@@ -21,7 +21,7 @@ on:
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
-  PLEYE_DEBUG: debug
+  PLEYE_DEBUG: nodebug
   PLEYE_API_KEY: ${{ secrets.PLEYE_API_KEY }}
   PR_NUMBER: ${{ github.event.number }}
   PR_TITLE: ${{ github.event.pull_request.title }}

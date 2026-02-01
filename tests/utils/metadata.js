@@ -35,13 +35,14 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 				)
 			}
 		});
+		if (refreshDB) {
+			console.info('Image updated, refreshing DB', {
+				id,
+				metadata
+			});
 
-		console.info('Image updated, refreshing DB', {
-			id,
-			metadata
-		});
-
-		if (refreshDB) await window.refreshDB();
+			window.refreshDB();
+		}
 	}, /** @type {const} */ ([id, metadata, refreshDB]));
 }
 

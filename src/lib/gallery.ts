@@ -10,7 +10,7 @@ import type { GroupSettings, SortSettings } from './schemas/sessions.js';
 import { getSettings } from './settings.svelte.js';
 import { applySortDirection, compareBy, type Comparator } from './utils.js';
 
-export type GalleryItem<AdditionalData> = {
+export type GalleryItem<AdditionalData = never> = {
 	sessionId: string;
 	id: string;
 	name: string;
@@ -20,10 +20,15 @@ export type GalleryItem<AdditionalData> = {
 	data: AdditionalData;
 };
 
-export async function galleryItemsSorter<D>(
+/**
+ * Needed data for sorting gallery items
+ */
+type GallerySorterItem = Pick<GalleryItem, 'id' | 'name' | 'metadata'>;
+
+export async function galleryItemsSorter(
 	settings: typeof SortSettings.infer
-): Promise<Comparator<GalleryItem<D>>> {
-	const dir = (comparator: Comparator<GalleryItem<D>>) =>
+): Promise<Comparator<GallerySorterItem>> {
+	const dir = (comparator: Comparator<GallerySorterItem>) =>
 		applySortDirection(settings.direction, comparator);
 
 	switch (settings.field) {
@@ -66,12 +71,17 @@ export async function galleryItemsSorter<D>(
 }
 
 /**
+ * Needed data for grouping gallery items
+ */
+type GalleryGrouperItem = Pick<GalleryItem, 'metadata'>;
+
+/**
  *
  * @returns Either null (no grouping) or a function that takes a gallery item and returns [key to sort the groups on, group label]
  */
-export async function galleryItemsGrouper<D>(
+export async function galleryItemsGrouper(
 	settings: typeof GroupSettings.infer
-): Promise<null | ((item: GalleryItem<D>) => [number | string, string])> {
+): Promise<null | ((item: GalleryGrouperItem) => [number | string, string])> {
 	if (settings.field === 'none') return null;
 
 	if (!settings.metadata) {
@@ -133,4 +143,42 @@ export async function galleryItemsGrouper<D>(
 			};
 		}
 	}
+}
+
+/**
+ * Returns a comparator function to sort gallery items based on grouping & sorting settings,
+ * guaranteeing that the comparator sorts items into the same order as they are displayed in the gallery.
+ *
+ * Useful for full-screen views, that allow you to step through images with "prev/next" buttons.
+ * We have to make sure that the full-screen view's navigation order matches the one shown in the corresponding tab's gallery.
+ */
+export async function galleryEffectiveSorter({
+	sortSettings,
+	groupSettings
+}: {
+	sortSettings: typeof SortSettings.infer;
+	groupSettings: typeof GroupSettings.infer;
+}): Promise<Comparator<GallerySorterItem & GalleryGrouperItem>> {
+	const sorter = await galleryItemsSorter(sortSettings);
+	const grouper = await galleryItemsGrouper(groupSettings);
+
+	// We group items first, then sort within each group with sorter.
+	// Finally, we sort the groups by their sortKey
+
+	const groupComparator = compareBy<GalleryGrouperItem>((item) => {
+		if (!grouper) return 0;
+
+		const [sortKey] = grouper(item);
+		return sortKey;
+	});
+
+	return (a, b) => {
+		const groupComparison = groupComparator(a, b);
+
+		if (groupComparison !== 0) {
+			return groupComparison;
+		}
+
+		return sorter(a, b);
+	};
 }

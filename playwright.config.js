@@ -124,6 +124,11 @@ export default defineConfig({
  * @returns {[[string, import('./tests/reporters/pleye').PleyeParams]] | []}
  */
 function pleyeReporter() {
+	if (!process.env.PLEYE_API_KEY) {
+		console.warn('PLEYE_API_KEY not set, skipping Pleye reporter setup');
+		return [];
+	}
+
 	try {
 		const env = arkenv({
 			PLEYE_DEBUG: 'string',
@@ -141,10 +146,10 @@ function pleyeReporter() {
 			'GITHUB_HEAD_REF?': 'string',
 			GITHUB_REF_NAME: 'string',
 			TRACE_VIEWER_BASE_URL: [
-				'string.url.parse',
+				'string.url',
 				':',
 				(url, ctx) =>
-					!url.pathname.endsWith('/') || ctx.reject('base url must not end with a slash')
+					!url.endsWith('/') || ctx.reject('base url must not end with a slash')
 			]
 		});
 
@@ -234,11 +239,12 @@ function dependsOnTarget({ live, dev, built }) {
 
 /**
  *
- * @param {URL} base
+ * @param {URL | string} base
  * @param {`/${string}`} pathname
  * @param {Record<string, { toString(): string }>} query
  */
 function urlWithBase(base, pathname, query = {}) {
+	if (!(base instanceof URL)) base = new URL(base);
 	const search = '?' + new URLSearchParams({ ...base.searchParams, ...query });
 	return new URL(base.pathname + pathname + search + base.hash, base);
 }

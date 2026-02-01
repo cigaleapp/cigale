@@ -149,7 +149,6 @@
 		"devalue": "^5.6.2",
 		"electron-serve": "^3.0.0",
 		"electron-squirrel-startup": "^1.0.1",
-		"embla-carousel-auto-height": "^8.6.0",
 		"embla-carousel-svelte": "^8.6.0",
 		"exif-parser": "^0.1.12",
 		"fetch-progress": "git+https://github.com/gwennlbh/fetch-progress#explicit-import-extensions",

@@ -115,8 +115,10 @@ export async function waitForRoute(page, route) {
 	/** @type {string | RegExp} */
 	let path = `${process.env.BASE_PATH || ''}${route}`;
 
+	// (app), etc
 	const groupFragment = /\(.+\)/;
-	const paramFragment = /\[.+\]/;
+	// [id], [[from]], etc
+	const paramFragment = /(\[.+\]|\[\[.+\]\])/;
 
 	if (groupFragment.test(path)) {
 		path = path

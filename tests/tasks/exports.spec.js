@@ -18,7 +18,7 @@ async function prepare({ page, app }) {
 	await newSession(page, { name: 'Testing session' });
 
 	await page.getByTestId('goto-current-session').click();
-	await app.path.wait('/sessions');
+	await app.path.wait('/(app)/sessions/[id]');
 	await sessionMetadataSectionFor(page, 'Durée de prospection')
 		.getByRole('textbox')
 		.first()
