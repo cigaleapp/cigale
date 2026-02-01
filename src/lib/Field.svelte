@@ -2,6 +2,7 @@
 	import 'svelte';
 
 	import IconError from '~icons/ri/close-line';
+	import { componentOrSnippet } from './componentOrSnippet.svelte';
 
 	/**
 	 * @import { Snippet, Component } from 'svelte';
@@ -12,26 +13,37 @@
 	 * @property {string | Snippet} [hint]
 	 * @property {undefined | Component } [Icon]
 	 * @property {undefined | Snippet} [icon]
+	 * @property {boolean} [indent-icon=true] if true, the contents below the label will be indented to align with the label's text, putting the icon outside the indentation. Only has an effect if an icon is provided.
 	 * @property {boolean} [composite=false] if true, the children will not be wrapped in a label element. useful when the children is composed of multiple inputs.
 	 * @property {Snippet} children
 	 */
 
 	/** @type {Props} */
-	const { label, hint, error, children, composite, icon, Icon } = $props();
+	const {
+		label,
+		hint,
+		error,
+		children,
+		composite,
+		icon,
+		Icon,
+		'indent-icon': indentIcon = true
+	} = $props();
 </script>
 
-<div class="field" class:has-icon={Icon || icon}>
-	<div class="icon">
-		{#if Icon}
-			<Icon />
-		{:else if icon}
-			{@render icon()}
-		{/if}
-	</div>
+<div class="field" class:has-icon={Icon || icon} class:indent-icon={indentIcon}>
+	{#if indentIcon}
+		<div class="icon">
+			{@render componentOrSnippet(Icon, icon)}
+		</div>
+	{/if}
 
 	<div class="main">
 		<svelte:element this={composite ? 'div' : 'label'}>
 			<div class="label">
+				{#if !indentIcon}
+					<div class="icon">{@render componentOrSnippet(Icon, icon)}</div>
+				{/if}
 				{#if typeof label === 'string'}
 					{label}
 				{:else}
@@ -63,6 +75,8 @@
 	</div>
 </div>
 
+
+
 <style>
 	.field {
 		width: 100%;
@@ -90,6 +104,18 @@
 		letter-spacing: normal;
 		font-weight: normal;
 		font-size: 1rem;
+	}
+
+	.field.has-icon:not(.indent-icon) .label {
+		margin-bottom: 1em;
+	}
+
+	.label .icon {
+		display: inline-block;
+		margin-right: 0.25ch;
+		font-size: 1.1em;
+		height: 1.1lh;
+		vertical-align: middle;
 	}
 
 	.hint.error {

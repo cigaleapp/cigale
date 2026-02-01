@@ -46,12 +46,18 @@ export async function newSession(page, { name, protocol, models = {} } = {}) {
 		await textbox.blur();
 	}
 
-	await page
-		.getByRole('button', {
-			name: 'Ouvrir',
-			exact: true
-		})
-		.click();
+	// XXX: Sometimes clicking the open button does nothing for some reason
+	// Can't reproduce outside of the testing environment though
+	while (page.url().includes('/sessions/')) {
+		await page
+			.getByRole('button', {
+				name: 'Ouvrir',
+				exact: true
+			})
+			.click();
+
+		await new Promise((r) => setTimeout(r, 500));
+	}
 
 	await waitForRoute(page, '/import');
 

@@ -28,6 +28,7 @@ import {
 	setSettings,
 	sidepanelMetadataSectionFor,
 	toast,
+	tooltipOf,
 	waitForLoadingEnd,
 	waitForRoute,
 	type NavigationTab,
@@ -119,6 +120,7 @@ export type AppFixture = {
 	};
 	tooltips: {
 		expectContent(element: Locator, content: string | RegExp): Promise<void>;
+		trigger(element: Locator): Promise<Locator>;
 	};
 	loading: {
 		wait(timeout?: number): Promise<void>;
@@ -144,7 +146,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 				},
 				async refresh() {
 					await page.evaluate(async () => {
-						await window.refreshDB();
+						window.refreshDB();
 					});
 				},
 				protocol: {
@@ -306,8 +308,13 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 				}
 			},
 			tooltips: {
-				expectContent: async (element, content) =>
-					expectTooltipContent(page, element, content)
+				async expectContent(element, content) {
+					return expectTooltipContent(page, element, content);
+				},
+				async trigger(element) {
+					await element.hover({ force: true });
+					return tooltipOf(page, element);
+				}
 			},
 			loading: {
 				wait: async (timeout) => waitForLoadingEnd(page, timeout),

@@ -39,6 +39,7 @@
 	id={fileId}
 	title={images[0].filename}
 	image={uiState.getPreviewURL(fileId)}
+	dimensions={images[0].dimensions}
 	selected={uiState.selection.includes(fileId)}
 	boxes="show-all"
 	{tooltip}

@@ -17,6 +17,12 @@ const OPERATIONS = {
 		imageId: 'string',
 		before: centeredBoundingBox,
 		after: centeredBoundingBox
+	}),
+	'classify/enum/edit': type({
+		imageId: 'string',
+		metadataId: 'string',
+		before: { key: 'string' },
+		after: { key: 'string' }
 	})
 };
 
@@ -29,8 +35,13 @@ const OPERATION_REWINDERS = {
 	'crop/box/edit': ({ imageId, before, after }) => ({
 		op: 'crop/box/edit',
 		data: { imageId, before: after, after: before }
+	}),
+	'classify/enum/edit': ({ imageId, metadataId, before, after }) => ({
+		op: 'classify/enum/edit',
+		data: { imageId, metadataId, before: after, after: before }
 	})
 };
+
 /**
  * @typedef {keyof typeof OPERATIONS} UndoableOperationName
  */

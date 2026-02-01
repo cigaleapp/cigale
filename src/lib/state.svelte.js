@@ -147,15 +147,6 @@ class UIState {
 		)?.id ?? 'crop'
 	);
 
-	/** @type {string} */
-	cropConfirmationMetadataId = $derived(
-		tables.Metadata.state.find(
-			(m) =>
-				this.currentProtocol?.metadata.includes(m.id) &&
-				this.currentProtocol?.crop?.confirmationMetadata === m.id
-		)?.id ?? ''
-	);
-
 	/**
 	 * @param {string | undefined | null} imageFileId
 	 * @returns {boolean}

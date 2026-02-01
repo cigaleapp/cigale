@@ -81,23 +81,14 @@
 						type: 'boundingbox',
 						required: false
 					});
-					await tables.Metadata.set({
-						id: namespace('crop_confirmation'),
-						description: '',
-						label: '',
-						mergeMethod: 'none',
-						type: 'boolean',
-						required: false
-					});
 					await tables.Protocol.set({
 						id: newProtocol.id,
 						name: newProtocol.name,
-						metadata: ['crop', 'crop_confirmation'].map(namespace),
+						metadata: ['crop'].map(namespace),
 						description: '',
 						authors: [],
 						crop: {
-							metadata: namespace('crop'),
-							confirmationMetadata: namespace('crop_confirmation')
+							metadata: namespace('crop')
 						}
 					});
 					await goto('/(app)/protocols/[id]/infos', { id: newProtocol.id });

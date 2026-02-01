@@ -24,6 +24,32 @@ if (import.meta.vitest) {
 }
 
 /**
+ * @template {string} KIn
+ * @template {string} KOut
+ * @template {any} V
+ * @param {Record<KIn, V>} subject
+ * @param {(key: KIn, value: V) => KOut} mapper
+ * @returns {Record<KOut, V>}
+ */
+export function mapKeys(subject, mapper) {
+	// @ts-expect-error
+	return Object.fromEntries(
+		Object.entries(subject).map(([key, value]) => [
+			mapper(/** @type {KIn} */ (key), value),
+			value
+		])
+	);
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('mapKeys', () => {
+		expect(mapKeys({ a: 1, b: 2 }, (k) => k.toUpperCase())).toEqual({ A: 1, B: 2 });
+		expect(mapKeys({ a: 1, b: 2 }, (k) => k + k)).toEqual({ aa: 1, bb: 2 });
+	});
+}
+
+/**
  * Maps values of an object, and filters out entries with nullable values from the result
  * @template {string} K
  * @template {any} VIn
@@ -1332,6 +1358,7 @@ ratione facere!`;
 export function isAbortError(error) {
 	return error instanceof DOMException && error.name === 'AbortError';
 }
+
 /**
  * Spread into an array literal to conditionally add something to it
  * @template T
@@ -1341,6 +1368,38 @@ export function isAbortError(error) {
  */
 export function orEmpty(predicate, obj) {
 	return predicate ? [obj] : [];
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('orEmpty', () => {
+		expect(orEmpty(true, 1)).toEqual([1]);
+		expect(orEmpty(false, 1)).toEqual([]);
+		expect(orEmpty(undefined, 1)).toEqual([]);
+		expect(orEmpty(null, 1)).toEqual([]);
+	});
+}
+
+/**
+ * Spread into an object literal to conditionally add something to it
+ * @template T
+ * @param {boolean | undefined | null} predicate
+ * @param {T} obj
+ * @returns { T | {} }
+ */
+export function orEmptyObj(predicate, obj) {
+	return predicate ? obj : {};
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+
+	test('orEmptyObj', () => {
+		expect(orEmptyObj(true, { a: 1 })).toEqual({ a: 1 });
+		expect(orEmptyObj(false, { a: 1 })).toEqual({});
+		expect(orEmptyObj(undefined, { a: 1 })).toEqual({});
+		expect(orEmptyObj(null, { a: 1 })).toEqual({});
+	});
 }
 
 /**
@@ -1367,3 +1426,20 @@ export function orEmpty(predicate, obj) {
  * @template {import('$app/types').RouteId} Root
  * @typedef {RemovePrefix<`${Root}/`, WithPrefix<`${Root}/`, import('$app/types').RouteId>>} ChildRouteId
  */
+/**
+ * Promisified setTimeout
+ * @param {number} ms
+ */
+export async function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+if (import.meta.vitest) {
+	const { test, expect } = import.meta.vitest;
+	test('sleep', async () => {
+		const start = Date.now();
+		await sleep(100);
+		const end = Date.now();
+		expect(end - start).toBeGreaterThanOrEqual(100);
+	});
+}

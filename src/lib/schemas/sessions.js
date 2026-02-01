@@ -61,6 +61,8 @@ export const GROUPING_TOLERANCES = /** @type {const} */ ({
 	}
 });
 
+export const FULLSCREEN_CLASSIFY_LAYOUTS = /** @type {const} */ (['top-bottom', 'left-right']);
+
 /**
  * @param {['sort', keyof typeof SORT_FIELDS] | ['group', keyof typeof GROUP_FIELDS]} param0 [task, field]
  * @returns {boolean}
@@ -101,6 +103,12 @@ export const Session = type({
 	description: 'string',
 	protocol: ID,
 	metadata: MetadataValues,
+	fullscreenClassifier: type({
+		layout: type.enumerated(...FULLSCREEN_CLASSIFY_LAYOUTS),
+		'focusedMetadata?': ID
+	}).default(() => ({
+		layout: 'top-bottom'
+	})),
 	sort: type({
 		global: SortSettings,
 		// Per-tab

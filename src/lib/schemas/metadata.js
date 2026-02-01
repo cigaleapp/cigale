@@ -98,6 +98,9 @@ export const MetadataValue = type({
 		return out;
 	}, MetadataRuntimeValueAny),
 	confidence: Probability.default(1),
+	confirmed: type('boolean')
+		.describe('Si la valeur a été manuellement confirmée comme correcte')
+		.default(false),
 	manuallyModified: type('boolean')
 		.describe('Si la valeur a été modifiée manuellement')
 		.default(false),
