@@ -71,8 +71,6 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		await app.tabs.go('classify');
 
-		await page.locator('main').getByRole('article', { name: 'lil-fella' }).dblclick();
-
 		const lilFella = await app.db.observation.byLabel('lil-fella');
 		if (!lilFella) throw new Error('Missing lil-fella observation in database dump');
 
@@ -88,6 +86,8 @@ test.describe('full-screen classification view', pr(1071), () => {
 			page,
 			`tiebreaker: metadata shoot_date set for leaf & cyan images are ${leaf.filename} = ${leaf.metadata[`${lightweightProtocol.id}__shoot_date`]?.value}, ${cyan.filename} = ${cyan.metadata[`${lightweightProtocol.id}__shoot_date`]?.value}`
 		);
+
+		await page.locator('main').getByRole('article', { name: 'lil-fella' }).dblclick();
 
 		await app.path.wait(`/classify/${lilFella.images[0]}`);
 	});
