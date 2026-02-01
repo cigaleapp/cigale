@@ -30,6 +30,7 @@ import * as path from 'node:path';
  * @property {string} commitAuthorName Name of the commit author
  * @property {string} [commitAuthorUsername] Username of the commit author
  * @property {string} commitAuthorEmail Email of the commit author
+ * @property {Date} [committedAt] Date when the commit was made
  * @property {string} branch Current branch name
  * @property {string} [baseDirectory] Absolute directory to the root of the repository, used to relativize file paths
  * @property {boolean} [debug] Whether to enable debug logging
