@@ -80,6 +80,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.db.metadata.set(cyan.id, 'shoot_date', '2023-01-03T12:00:00Z');
 		await app.db.refresh();
 
+		await firstObservationCard(page).dblclick();
 		await app.path.wait(`/classify/${lilFella.images[0]}`);
 	});
 
@@ -310,57 +311,91 @@ test.describe('full-screen classification view', pr(1071), () => {
 	}
 
 	test('classification confirmation', async ({ page, app }) => {
-		// XXX: DONT MERGE
-		// TODO: assertions about the progress bar
-
 		const ex = expect.soft;
-
-		// Switch to horizontal layout for window size reasons
-		await page.getByTestId('layout-switcher').getByRole('button').click();
-
-		// Go to next when continue is clicked, since there are still other unconfirmed images
-		await page.getByRole('button', { name: 'Continuer' }).click();
-
-		await ex(confirmedCropOverlay(page)).toBeVisible();
 
 		// eslint-disable-next-line prefer-const
 		let { leaf, lilFella, cyan, withExifGps } = await imagesByName(app);
 
-		ex(lilFella.metadata[`${lightweightProtocol.id}__species`]).toHaveProperty(
-			'confirmed',
-			true
-		);
+		async function assertDatabaseConfirmedStatus(imageId: string, confirmed: boolean) {
+			const image = await app.db.image.byId(imageId);
+			if (!image) throw new Error(`Missing image ${imageId} in database`);
+
+			const metadata = image.metadata[`${lightweightProtocol.id}__species`];
+
+			if (confirmed) {
+				ex(metadata).toHaveProperty('confirmed', true);
+			} else {
+				// allow either a confirmed=false or no confirmed property at all
+				// TODO: a custom matcher to make the error more readable
+				ex(metadata?.confirmed ?? false).toBe(false);
+			}
+		}
+
+		// Switch to horizontal layout for window size reasons
+		await page.getByTestId('layout-switcher').getByRole('button').click();
+
+		// Initially
+
+		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Classifications confirmées 0%')).toBeVisible();
+		await assertDatabaseConfirmedStatus(lilFella.id, false);
+
+		// Confirming lil-fella
+
+		await page.getByRole('button', { name: 'Continuer' }).click();
+		await ex(confirmedCropOverlay(page)).toBeVisible();
+
+		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Classifications confirmées 25%')).toBeVisible();
+		await assertDatabaseConfirmedStatus(lilFella.id, true);
+
+		// Confirming leaf
 
 		await app.path.wait(`/classify/${leaf.id}`);
 
-		// Mark the next images as confirmed too
-
 		await page.keyboard.press('ArrowUp');
-
-		// Arrows should be silent
 		await ex(confirmedCropOverlay(page)).not.toBeVisible();
-		({ leaf } = await imagesByName(app));
-		ex(leaf.metadata[`${lightweightProtocol.id}__species`]).toHaveProperty('confirmed', true);
+
+		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Classifications confirmées 50%')).toBeVisible();
+		await assertDatabaseConfirmedStatus(leaf.id, true);
+
+		// Confirming cyan
 
 		await page.keyboard.press('Control+ArrowRight');
-
 		await app.path.wait(`/classify/${cyan.id}`);
+
 		await page.keyboard.press('ArrowUp');
+		await ex(confirmedCropOverlay(page)).not.toBeVisible();
+
+		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await assertDatabaseConfirmedStatus(cyan.id, true);
+
+		// Confirming with-exif-gps does nothing since theres no classification
+
 		await page.keyboard.press('Control+ArrowRight');
 
 		await app.path.wait(`/classify/${withExifGps.id}`);
 		await page.keyboard.press('ArrowUp');
 
-		await page.keyboard.press('ArrowDown');
-		({ withExifGps } = await imagesByName(app));
-		ex(withExifGps.metadata[`${lightweightProtocol.id}__species`]).toHaveProperty(
-			'confirmed',
-			false
-		);
+		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await assertDatabaseConfirmedStatus(withExifGps.id, false);
 
-		// Now all the other images are confirmed, clicking continue should exit the full screen view
+		// Classify it
+
+		await page.getByTestId('current').getByRole('combobox').fill('Seira musarum');
+		await page.keyboard.press('Enter');
+		await page.getByTestId('current').getByRole('combobox').blur();
+		await ex(page.getByText('Images classifiées 100%')).toBeVisible();
+		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
+
+		// Now that all other images are classified, confirming should work
+
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await ex(confirmedCropOverlay(page)).toBeVisible();
+		await assertDatabaseConfirmedStatus(withExifGps.id, true);
 
 		await app.path.wait('/results');
 	});
