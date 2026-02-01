@@ -45,7 +45,6 @@
 
 	async function goToImage(image: { id: string } | undefined | null) {
 		if (!image) return;
-		console.log(`Navigating to image`, image);
 		await goto('/(app)/(sidepanel)/classify/[image]', {
 			image: image.id
 		});

@@ -4,7 +4,6 @@ import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.jso
 import { issue, pr } from './annotations.js';
 import { expect, test, type AppFixture } from './fixtures.js';
 import {
-	browserConsole,
 	chooseFirstSession,
 	firstObservationCard,
 	imagesByName,
@@ -76,18 +75,10 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Set shoot_date for every image to ensure deterministic ordering, as some tests rely on it.
 		// Make sure that cyan is sorted before leaf
-		let { leaf, cyan } = await imagesByName(app);
+		const { leaf, cyan } = await imagesByName(app);
 		await app.db.metadata.set(leaf.id, 'shoot_date', '2023-01-02T12:00:00Z');
 		await app.db.metadata.set(cyan.id, 'shoot_date', '2023-01-03T12:00:00Z');
 		await app.db.refresh();
-
-		({ leaf, cyan } = await imagesByName(app));
-		await browserConsole.log(
-			page,
-			`tiebreaker: metadata shoot_date set for leaf & cyan images are ${leaf.filename} = ${leaf.metadata[`${lightweightProtocol.id}__shoot_date`]?.value}, ${cyan.filename} = ${cyan.metadata[`${lightweightProtocol.id}__shoot_date`]?.value}`
-		);
-
-		await page.locator('main').getByRole('article', { name: 'lil-fella' }).dblclick();
 
 		await app.path.wait(`/classify/${lilFella.images[0]}`);
 	});

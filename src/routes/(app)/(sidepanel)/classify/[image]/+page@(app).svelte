@@ -77,7 +77,6 @@
 		<div class="layout-switcher" {@attach area('layout-switcher')}>
 			<LayoutSwitcher
 				toggleLayoutTransitions={(enable) => {
-					console.log('toggleLayoutTransitions', enable);
 					layoutTransitions = enable;
 				}}
 			/>

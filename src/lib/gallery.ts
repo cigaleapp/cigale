@@ -169,7 +169,6 @@ export async function galleryEffectiveSorter({
 		if (!grouper) return 0;
 
 		const [sortKey] = grouper(item);
-		console.log('group key for item', item.name, 'is', sortKey);
 		return sortKey;
 	});
 
@@ -180,10 +179,6 @@ export async function galleryEffectiveSorter({
 			return groupComparison;
 		}
 
-		const result = sorter(a, b);
-		console.log(
-			`tiebreaked ${a.name} ${result < 0 ? '<' : '>'} ${b.name} within group ${grouper ? JSON.stringify(grouper(a)) : 'no group'}: (on ${sortSettings.field} ${sortSettings.metadata} ${sortSettings.direction}) ${a.name} = ${a.metadata[sortSettings.metadata!]?.value} vs ${b.name} = ${b.metadata[sortSettings.metadata!]?.value}`
-		);
-		return result;
+		return sorter(a, b);
 	};
 }

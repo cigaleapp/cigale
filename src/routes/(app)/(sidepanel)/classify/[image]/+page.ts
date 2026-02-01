@@ -79,8 +79,6 @@ export async function load({ params, depends, parent }) {
 	const nextImage = nextImageIndex < images.length ? images[nextImageIndex] : null;
 	const prevImage = prevImageIndex >= 0 ? images[prevImageIndex] : null;
 
-	console.log({ currentImageIndex, nextImage, prevImage });
-
 	// Counts
 	const classifiedImagesCount = focusedMetadata
 		? images.filter((img) => img.metadata[focusedMetadata.id]).length
