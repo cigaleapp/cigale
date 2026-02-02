@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/019bbfb6e3cbed443bb8b9f1e5a6126f3cfd8ede/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 56,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/f2690739b05f824f0dfc38fa170bfe339ada23dc/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 57,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
@@ -2641,7 +2641,6 @@
 	},
 	"crop": {
 		"metadata": "io.github.cigaleapp.arthropods.example.light__crop",
-		"confirmationMetadata": "io.github.cigaleapp.arthropods.example.light__crop_is_confirmed",
 		"infer": [
 			{
 				"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/detector-arthropoda.onnx?download=true",
