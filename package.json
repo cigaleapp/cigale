@@ -102,7 +102,7 @@
 		"eslint": "^9.39.2",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-depend": "^1.4.0",
-		"eslint-plugin-oxlint": "^1.42.0",
+		"eslint-plugin-oxlint": "^1.43.0",
 		"eslint-plugin-svelte": "^3.14.0",
 		"fake-indexeddb": "^6.2.5",
 		"gitmoji-cli": "^9.7.0",
