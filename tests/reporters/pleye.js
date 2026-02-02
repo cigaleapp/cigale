@@ -98,16 +98,34 @@ export default class Pleye {
 			throw new Error('GITHUB_REPOSITORY environment variable is not set');
 		}
 
-		const [commitTitle, commitDate, authorName, authorEmail, ...commitDescription] = spawnSync(
+		this.#debug(`Getting commit data for ${commitSha}`);
+
+		const [commitTitle, commitDate, authorName, authorEmail, ...commitDescription] = this.#run(
 			'git',
-			['log', '-1', '--pretty=' + ['%s', '%cI', '%an', '%ae', '%b'].join('%n'), commitSha]
-		)
-			.stdout.toString('utf-8')
-			.split('\n');
+			'log',
+			'-1',
+			'--pretty=' + ['%s', '%cI', '%an', '%ae', '%b'].join('%n'),
+			commitSha
+		).split('\n');
+
+		this.#debug(`Got commit details`, {
+			commitTitle,
+			commitDate,
+			authorName,
+			authorEmail,
+			commitDescription
+		});
 
 		const githubRunId = Number(process.env.GITHUB_RUN_ID);
 
-		const jobName = spawnSync('gh', [
+		this.#debug(
+			`Run ID is ${githubRunId}: https://github.com/${repository}/actions/runs/${githubRunId}`
+		);
+
+		this.#debug(`Getting job name for job ID ${githubJobId}`);
+
+		const jobName = this.#run(
+			'gh',
 			'run',
 			'view',
 			githubRunId.toString(),
@@ -115,32 +133,40 @@ export default class Pleye {
 			'jobs',
 			'--jq',
 			`.jobs[] | select(.databaseId == ${githubJobId}).name`
-		])
-			.stdout.toString('utf-8')
-			.trim();
+		);
 
-		const commitUsername = spawnSync('gh', [
+		this.#debug(`Job name is "${jobName}"`);
+
+		this.#debug(`Getting commit author username for commit ${commitSha}`);
+
+		const commitUsername = this.#run(
+			'gh',
 			'api',
 			`/repos/${repository}/commits/${commitSha}`,
 			'--jq',
 			'.author.login'
-		])
-			.stdout.toString('utf-8')
-			.trim();
+		);
 
-		const pullRequestTitle = pullRequestNumber
-			? spawnSync('gh', [
-					'pr',
-					'view',
-					pullRequestNumber.toString(),
-					'--json',
-					'title',
-					'--jq',
-					'.title'
-				])
-					.stdout.toString('utf-8')
-					.trim()
-			: '';
+		this.#debug(`Commit author username is "${commitUsername}"`);
+
+		let pullRequestTitle = '';
+
+		if (pullRequestNumber) {
+			this.#debug('Maybe getting pull request title for PR', pullRequestNumber);
+
+			pullRequestTitle = this.#run(
+				'gh',
+				'pr',
+				'view',
+				pullRequestNumber.toString(),
+				'--json',
+				'title',
+				'--jq',
+				'.title'
+			);
+
+			this.#debug(`Pull request title is "${pullRequestTitle}"`);
+		}
 
 		const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
 		if (!branch) {
@@ -166,6 +192,8 @@ export default class Pleye {
 			pullRequestNumber,
 			pullRequestTitle
 		};
+
+		this.#debug('Will start run with data', this.#runData);
 	}
 
 	/**
@@ -289,8 +317,7 @@ export default class Pleye {
 		}
 
 		this.#stepIndices.set(this.#stepIndicesKey(test), -1);
-		if (this.#debugging)
-			console.info('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
+		this.#debug('[Pleye] onTestBegin, stepIndices are', this.#stepIndices);
 
 		void this.#sendPayload('test-begin', {
 			githubJobId: this.#runData.githubJobId,
@@ -320,12 +347,10 @@ export default class Pleye {
 	 * @param {PW.TestResult} result
 	 */
 	onTestEnd(test, result) {
-		if (this.#debugging) console.info('[Pleye] onTestEnd, attachments are', result.attachments);
-		if (this.#debugging)
-			console.info(
-				'[Pleye] onTestEnd, the following trace viewer URLs were derived:',
-				result.attachments.map((a) => this.#attachmentTraceViewerURL(a))
-			);
+		this.#debug('onTestEnd', {
+			attachments: result.attachments,
+			traceViewerURLs: result.attachments.map((a) => this.#attachmentTraceViewerURL(a))
+		});
 
 		void this.#sendPayload('test-end', {
 			githubJobId: this.#runData.githubJobId,
@@ -471,6 +496,29 @@ export default class Pleye {
 		if (!extension.startsWith('.')) return null;
 
 		return this.#traceViewerUrl(sha1, /** @type {`.${string}`} */ (extension));
+	}
+
+	/**
+	 * @param {string} command
+	 * @param  {...any} args
+	 */
+	#run(command, ...args) {
+		this.#debug(`Running command`, command, ...args);
+		const cmd = spawnSync(command, args);
+		this.#debug({ cmd });
+		const [, stdout, stderr] = cmd.output;
+		this.#debug(`Command stdout:`, stdout?.toString('utf-8'));
+		this.#debug(`Command stderr:`, stderr?.toString('utf-8'));
+		return stdout?.toString('utf-8').trim() ?? '';
+	}
+
+	/**
+	 * @param  {...any} args
+	 */
+	#debug(...args) {
+		if (this.#debugging) {
+			console.debug('[Pleye]', ...args);
+		}
 	}
 }
 
