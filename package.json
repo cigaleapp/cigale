@@ -117,7 +117,7 @@
 		"knip": "^5.82.1",
 		"octokit": "^5.0.5",
 		"odt2html": "^1.0.1",
-		"oxlint": "^1.42.0",
+		"oxlint": "^1.43.0",
 		"pdf-to-png-converter": "^3.11.0",
 		"pixelmatch": "^7.1.0",
 		"pngjs": "^7.0.0",
