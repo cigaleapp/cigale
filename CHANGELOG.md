@@ -2,30 +2,52 @@
 
 All notable changes to this project will be documented in this file, on a monthly basis, with a consistent, simple format: month/year heading > type of change heading > list of changes.
 
+## February 2026
+
+### Bug Fixes
+
+- Fix behavior of continue button in fullscreen classifier view
+- Fix fullscreen classifier layout switching
+
+### Translation Updates
+
+- Refresh translation files
+
 ## January 2026
 
 ### Improvements
 
 - Add ETA as tooltip on navbar logo when processing is ongoing (Closes #51) (#1027)
 - Add ability to catch coercion errors in switchOnMetadataType()
+- Add confirmation for classification full-screen view
+- Add full-screen classification view
+- Add icons to labels for classify fullscreen view's cascades, description and synonyms
 - Add protocol auto-updating (Closes #954) (#1088)
 - Allow changing tolerance settings for grouping in gallery tabs
 - Allow grouping observation with hundreds number precision
+- Cap height of synonyms list
+- Don't cut the 0 in 0.n% in the classifier option bar buttons
 - Fix opacity of disabled ButtonSecondary
 - Fix vertical line in zip contents preview tree not extending when scrolling
 - Handle empty state for tab settings group/sort metadata submenu
 - Handle invalid grouping/sorting settings gracefully
 - Implement average merge method for enum metadata
 - Improve keyboard shortcuts hints
+- Improve option bar prev/next button content alignemnt
 - Make Chrome scrollbars thinner
+- Make full-screen views' navigation order match their galleries' group & sort settings
 - Make gallery groups collapsible
 - Make model switching less buggy (#1110)
+- Prevent weird layout shift when switching layout options
 - Rajouter validation pour les forms de creation d'issue (Closes #1049)
 - Safeguard against crashing if somehow a plural i18n message doesn't have enough candidates
 - Safeguard against storing >1-confidence metadata values
+- Save fullscreen classifier layout setting in session
 - Show loading spinner when opening a session
+- Show loading state on fullscreen classifier open sidepanel button
 - Show uncompressed zip size estimate
 - Sort metadata in tab's sort/group dropdowns
+- Stabilize width of option bar in classifier
 - Take crop padding into account when estimating .zip sizes (#1052)
 - Turn results modal into a full page, complete with zip files preview and size estimations
 - Use enter key glyph to display Enter in keybind hints
@@ -34,15 +56,21 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Bug Fixes
 
+- Fix UI not reflecting confirmed status change on spacebar/continue button
+- Fix aspect ratio issues in CroppedImg
 - Fix click-to-import triggering when clicking on buttons in gallery groups' headers
 - Fix crashes related to metadata merging code changes
 - Fix current tab indicators not showing on non-root base path deployments
+- Fix data about current option not shown when fullscreen classifier is the initial page load
 - Fix duplicates in sort/group metadata submenus
 - Fix inference models not being cached (Closes #1077)
+- Fix location of PWA manifest
 - Fix reactivity over value prop of MetadataInput
+- Fix schema for MetadataRecord.confirmed
 - Fix sessionId index name for file tables
 - Include protocol ID in caching key when using string-form HTTPRequest for inference model
 - Parse serialized date metadata values with fractional seconds
+- Prevent details of the fullscreen classifier page not being there on first page load
 - Prevent zip preview from being empty if we went from import tab to results tab directly
 - Reset collapsed groups state when group settings change
 - Restore group and sort settings when importing an exported session
