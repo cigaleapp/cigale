@@ -2246,6 +2246,22 @@ msgstr ""
 msgid "<0/> Retour <1/>"
 msgstr ""
 
+#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
+msgid "Aucune session active"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
+msgid "Session active introuvable"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
+msgid "Image introuvable"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
+msgid "Image introuvable dans la session"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
@@ -2266,20 +2282,4 @@ msgstr ""
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
-msgid "Aucune session active"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
-msgid "Session active introuvable"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
-msgid "Image introuvable"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
-msgid "Image introuvable dans la session"
 msgstr ""

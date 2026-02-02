@@ -4,6 +4,7 @@
 
 // This script is served by Pleye, on /reporter.js of your instance.
 
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
@@ -18,26 +19,28 @@ import * as path from 'node:path';
  * @typedef {object} PleyeParams
  * @property {string} apiKey API Key to use
  * @property {string} serverOrigin Origin of the Pleye server, e.g. https://pleye.example.com
- * @property {number} repositoryGitHubId Github ID of the current repository, ${{ github.repository_id }}
  * @property {number} githubJobId ID of the current GitHub job we're on, ${{ github.job.check_run_id }}
- * @property {string} githubJobName Name of the current GitHub job we're on
- * @property {number} githubRunId ID of the current GitHub run we're on, ${{ github.run_id }}
- * @property {string} githubRunName Name of the current GitHub run we're on, ${{ github.workflow }}
  * @property {string} commitSha Current commit SHA
- * @property {string} commitTitle Current commit title
- * @property {string} commitDescription Current commit description
+ * @property {number | undefined} [pullRequestNumber] Current pull request number, if applicable
  * @property {(sha1: string, extension: `.${string}`) => URL | null} traceViewerUrl Function that generates a trace viewer URL given a trace attachment's  SHA1 content hash and its file extension. For example, for Playwright's HTML reporter, traces are at `/data/${sha1}${extension}`
- * @property {string} commitAuthorName Name of the commit author
- * @property {string} [commitAuthorUsername] Username of the commit author
- * @property {string} commitAuthorEmail Email of the commit author
- * @property {string} branch Current branch name
- * @property {string} [baseDirectory] Absolute directory to the root of the repository, used to relativize file paths
+ * @property {string} [baseDirectory] Absolute directory to the root of the repository, used to relativize file paths. Defaults to $GITHUB_WORKSPACE
  * @property {boolean} [debug] Whether to enable debug logging
- * @property {number | undefined | null} [pullRequestNumber] Pull request number, if any
- * @property {string} [pullRequestTitle] Pull request title, if any
  */
 
 /**
+ * Requires the following environment variables to be set:
+ * - GITHUB_WORKSPACE
+ * - GITHUB_REPOSITORY
+ * - GITHUB_RUN_ID
+ * - GITHUB_JOB
+ * - GITHUB_HEAD_REF or GITHUB_REF_NAME
+ * - GITHUB_WORKFLOW
+ * - GITHUB_REPOSITORY
+ * - GITHUB_REPOSITORY_ID
+ * - GH_TOKEN
+ * And the following binaries to be available in PATH:
+ * - git
+ * - gh (GitHub CLI)
  * @implements {PW.Reporter}
  */
 export default class Pleye {
@@ -74,23 +77,94 @@ export default class Pleye {
 		const {
 			apiKey,
 			serverOrigin,
-			repositoryGitHubId,
 			debug,
 			baseDirectory,
 			traceViewerUrl,
-			...runData
+			commitSha,
+			githubJobId,
+			pullRequestNumber
 		} = params;
 
 		this.#apiKey = apiKey;
 		this.#serverOrigin = serverOrigin;
-		this.#repositoryGitHubId = repositoryGitHubId;
+		this.#repositoryGitHubId = Number(process.env.GITHUB_REPOSITORY_ID);
 		this.#debugging = debug ?? false;
-		this.#baseDirectory = baseDirectory ?? '/';
+		this.#baseDirectory = baseDirectory ?? process.env.GITHUB_WORKSPACE ?? process.cwd();
 		this.#traceViewerUrl = traceViewerUrl ?? (() => null);
+
+		const repository = process.env.GITHUB_REPOSITORY;
+
+		if (!repository) {
+			throw new Error('GITHUB_REPOSITORY environment variable is not set');
+		}
+
+		const [commitTitle, commitDate, authorName, authorEmail, ...commitDescription] = spawnSync(
+			'git',
+			['log', '-1', '--pretty=' + ['%s', '%cI', '%an', '%ae', '%b'].join('%n'), commitSha]
+		)
+			.stdout.toString('utf-8')
+			.split('\n');
+
+		const githubRunId = Number(process.env.GITHUB_RUN_ID);
+
+		const jobName = spawnSync('gh', [
+			'run',
+			'view',
+			githubRunId.toString(),
+			'--json',
+			'jobs',
+			'--jq',
+			`.jobs[] | select(.databaseId == ${githubJobId}).name`
+		])
+			.stdout.toString('utf-8')
+			.trim();
+
+		const commitUsername = spawnSync('gh', [
+			'api',
+			`/repos/${repository}/commits/${commitSha}`,
+			'--jq',
+			'.author.login'
+		])
+			.stdout.toString('utf-8')
+			.trim();
+
+		const pullRequestTitle = pullRequestNumber
+			? spawnSync('gh', [
+					'pr',
+					'view',
+					pullRequestNumber.toString(),
+					'--json',
+					'title',
+					'--jq',
+					'.title'
+				])
+					.stdout.toString('utf-8')
+					.trim()
+			: '';
+
+		const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME;
+		if (!branch) {
+			throw new Error(
+				'Could not determine branch name from GITHUB_HEAD_REF or GITHUB_REF_NAME'
+			);
+		}
 
 		this.#runData = {
 			startedAt: new Date(),
-			...runData
+			githubJobId,
+			githubJobName: jobName,
+			githubRunId,
+			githubRunName: process.env.GITHUB_WORKFLOW || '',
+			commitSha,
+			commitTitle,
+			commitDescription: commitDescription.join('\n'),
+			commitAuthorName: authorName,
+			commitAuthorEmail: authorEmail,
+			commitAuthorUsername: commitUsername,
+			committedAt: new Date(commitDate),
+			branch,
+			pullRequestNumber,
+			pullRequestTitle
 		};
 	}
 
