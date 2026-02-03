@@ -439,7 +439,7 @@ if (import.meta.vitest) {
 /**
  * @param {ArrayBuffer} bytes image bytes
  * @param {string} contentType content type of the image
- * @param {import('./metadata').RuntimeValue<'boundingbox'>} centeredBoundingBox
+ * @param {import('./schemas/metadata.js').RuntimeValue<'boundingbox'>} centeredBoundingBox
  * @param {string} [padding] padding to add around the bounding box when cropping images. string of the form "npx" or "n%"
  * @returns {Promise<{ cropped: ArrayBuffer, original: ArrayBuffer }>}
  */
