@@ -168,21 +168,57 @@
 	<header>
 		<h1>Résultats</h1>
 
-		<ButtonSecondary onclick={generateExport}>
-			{#if exporting}
-				<LoadingSpinner />
-			{:else}
-				<Download />
-			{/if}
-			results.zip
-			<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
-				<LoadingText value={sizeEstimates.compressed} mask="~{formatBytesSize(150e3)}">
-					{#snippet loaded(size)}
-						~{formatBytesSize(size)}
-					{/snippet}
-				</LoadingText>
-			</code>
-		</ButtonSecondary>
+		<div class="actions">
+			<ButtonSecondary onclick={async () => await downloadExport(undefined)}>
+				{#if exporting === 'zip'}
+					<LoadingSpinner />
+				{:else}
+					<IconDownloadAsZip />
+				{/if}
+				Archive ZIP
+				<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
+					<LoadingText value={sizeEstimates.compressed} mask="~{formatBytesSize(150e3)}">
+						{#snippet loaded(size)}
+							~{formatBytesSize(size)}
+						{/snippet}
+					</LoadingText>
+				</code>
+			</ButtonSecondary>
+			<ButtonSecondary
+				disabled={!supportsWritingFolder}
+				help={supportsWritingFolder
+					? undefined
+					: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
+				onclick={async () => {
+					if (!supportsWritingFolder) return;
+					const directory = await (window as any).showDirectoryPicker({
+						mode: 'readwrite',
+						startIn: 'documents',
+						id: 'results-export'
+					});
+					await downloadExport(directory);
+				}}
+			>
+				{#if exporting === 'folder'}
+					<LoadingSpinner />
+				{:else}
+					<IconDownloadAsFolder />
+				{/if}
+				Dossier
+				{#if supportsWritingFolder}
+					<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
+						<LoadingText
+							value={sizeEstimates.uncompressed}
+							mask="~{formatBytesSize(150e3)}"
+						>
+							{#snippet loaded(size)}
+								~{formatBytesSize(size)}
+							{/snippet}
+						</LoadingText>
+					</code>
+				{/if}
+			</ButtonSecondary>
+		</div>
 	</header>
 	<div class="side-by-side">
 		<section class="settings">

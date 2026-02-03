@@ -45,13 +45,18 @@ export const browserConsole = {
 /**
  * @param {Page} page
  * @param {import('@playwright/test').Locator} locator
+ * @param {object} [options]
+ * @param {number} [options.timeout]
  */
-export async function tooltipOf(page, locator) {
+export async function tooltipOf(page, locator, { timeout } = {}) {
+	await browserConsole.log(page, `Looking for tooltip of locator:`, await locator.innerHTML());
+
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, {
-		timeout: 1_000
+		timeout: timeout ?? 1_000
 	});
 
-	const tippyId = await locator.getAttribute('aria-describedby');
+	const tippyId = await locator.getAttribute('aria-describedby', timeout ? { timeout } : {});
+
 	return page.locator(`#${tippyId}`);
 }
 
