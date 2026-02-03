@@ -6,8 +6,10 @@
 import { ArkErrors } from 'arktype';
 import { strToU8, zip } from 'fflate';
 
+import * as DB from '$lib/database.js';
 import { stringifyWithToplevelOrdering } from '$lib/download';
 import { addExifMetadata } from '$lib/exif';
+import type { DatabaseHandle } from '$lib/idb.svelte.js';
 import { cropImage, parseCropPadding } from '$lib/images.js';
 import {
 	addValueLabels,
@@ -71,7 +73,7 @@ swarp.generateResultsZip(
 		/**
 		 * @type {Array<{imageId: string, croppedBytes: Uint8Array, originalBytes?: Uint8Array|undefined, contentType: string, filename: string}>}
 		 */
-		let buffersOfImages = [];
+		const buffersOfImages = [];
 
 		let total = 1;
 		let done = 0;
@@ -81,7 +83,7 @@ swarp.generateResultsZip(
 		if (include !== 'metadataonly') {
 			total += observations.flatMap((o) => o.images).length;
 			for (const [observation, imageId] of observations.flatMap((o) =>
-				o.images.map((img) => /** @type {const} */ ([o, img]))
+				o.images.map((img) => /** @type {const} */ [o, img])
 			)) {
 				const image = imagesFromDatabase.find((i) => i.id === imageId);
 				if (!image) continue;
@@ -105,16 +107,14 @@ swarp.generateResultsZip(
 					? await cropImage(
 							file.bytes,
 							contentType,
-							// @ts-expect-error
+							// @ts-expect-error FIXME its the wrong type
 							cropbox,
 							cropPadding
 						)
 					: { cropped: file.bytes, original: file.bytes };
 
-				/** @type {undefined | Uint8Array} */
-				let originalBytes = undefined;
-				/** @type {Uint8Array} */
-				let croppedBytes;
+				let originalBytes: undefined | Uint8Array = undefined;
+				let croppedBytes: Uint8Array;
 
 				abortSignal?.throwIfAborted();
 
@@ -384,19 +384,14 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 		)
 	};
 
-	/** @satisfies { Record<keyof typeof estimations, number> } */
 	const compressionRates = {
 		json: 1 - 0.93,
 		csv: 1 - 0.7,
 		cropped: 1,
 		full: 1
-	};
+	} satisfies Record<keyof typeof estimations, number>;
 
-	/**
-	 *
-	 * @param  {...(keyof typeof estimations)} things
-	 */
-	function computeEstimates(...things) {
+	function computeEstimates(...things: (keyof typeof estimations)[]) {
 		return {
 			compressed: sum(things.map((thing) => compressionRates[thing] * estimations[thing])),
 			uncompressed: sum(things.map((thing) => estimations[thing]))
@@ -415,16 +410,19 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 	}
 });
 
-/**
- *
- * @param {object} param0
- * @param {import('../lib/database.js').Protocol} param0.protocolUsed
- * @param {string} param0.sessionId
- * @param {import('$lib/idb.svelte.js').DatabaseHandle} param0.db
- * @param {AbortSignal} [param0.abortSignal]
- * @param {(progress: number) => void} [param0.onProgress]
- */
-async function prepare({ protocolUsed, sessionId, db, abortSignal, onProgress }) {
+async function prepare({
+	protocolUsed,
+	sessionId,
+	db,
+	abortSignal,
+	onProgress
+}: {
+	protocolUsed: DB.Protocol;
+	sessionId: string;
+	db: DatabaseHandle;
+	abortSignal?: AbortSignal;
+	onProgress?: (progress: number) => void;
+}) {
 	const filepaths = protocolUsed.exports ?? {
 		images: {
 			cropped: FilepathTemplate.assert('cropped/{{sequence}}.{{extension image.filename}}'),
@@ -441,8 +439,7 @@ async function prepare({ protocolUsed, sessionId, db, abortSignal, onProgress })
 	const imagesFromDatabase = await db.getAllFromIndex('Image', 'sessionId', sessionId);
 	abortSignal?.throwIfAborted();
 	const metadataOptions = await db.getAll('MetadataOption').then((opts) => {
-		/** @type {Record<string, Record<string, typeof opts[number]>>} */
-		const options = {};
+		const options: Record<string, Record<string, typeof opts[number]>> = {};
 		for (const opt of opts) {
 			if (!options[opt.metadataId]) options[opt.metadataId] = {};
 			options[opt.metadataId][opt.key] = opt;
@@ -451,10 +448,7 @@ async function prepare({ protocolUsed, sessionId, db, abortSignal, onProgress })
 	});
 	abortSignal?.throwIfAborted();
 
-	/**
-	 * @type {typeof Analysis.inferIn['observations']}
-	 */
-	let exportedObservations = {};
+	const exportedObservations: typeof Analysis.inferIn['observations'] = {};
 	let sequence = 1;
 	let observationNumber = 0;
 
