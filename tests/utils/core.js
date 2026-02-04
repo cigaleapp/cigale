@@ -66,17 +66,23 @@ export async function tooltipOf(page, locator, { timeout } = {}) {
  * @param {Page} page
  * @param {import('@playwright/test').Locator} locator
  * @param {string|RegExp} content
+ * @param {object} [options]
+ * @param {number} [options.timeout]
  */
-export async function expectTooltipContent(page, locator, content) {
+export async function expectTooltipContent(page, locator, content, { timeout } = {}) {
 	await locator.hover({
 		force: true
 	});
 
 	try {
-		const tooltip = await tooltipOf(page, locator);
-		await expect(tooltip).toHaveText(content);
+		const tooltip = await tooltipOf(page, locator, { timeout });
+		await expect(tooltip).toHaveText(content, timeout ? { timeout } : {});
 	} catch {
-		await expect(locator).toHaveAttribute('data-tooltip-content', content);
+		await expect(locator).toHaveAttribute(
+			'data-tooltip-content',
+			content,
+			timeout ? { timeout } : {}
+		);
 	}
 }
 
@@ -378,4 +384,14 @@ export async function chooseInDropdown(page, trigger, ...option) {
 			name: locator
 		});
 	}
+}
+
+/**
+ *
+ * @param {Page} page
+ * @param {Function} func
+ */
+export async function exposeNamedFunction(page, func) {
+	await browserConsole.log(page, `Exposing function ${func.name} to the page context`);
+	await page.exposeFunction(func.name, func);
 }
