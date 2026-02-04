@@ -22,15 +22,15 @@ import { Analysis } from '$lib/schemas/exports.js';
 import { MetadataRuntimeValue, MetadataValues } from '$lib/schemas/metadata';
 import { FilepathTemplate } from '$lib/schemas/protocols';
 import { toMetadataRecord } from '$lib/schemas/results';
-import { compareBy, progressSplitter, sum } from '$lib/utils';
+import { compareBy, mapValues, progressSplitter, sum } from '$lib/utils';
 
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
 import { unlessAborted } from '../lib/utils.js';
 import { openDatabase, swarp } from './index.js';
 
-swarp.generateResultsZip(
-	async ({ sessionId, include, cropPadding, jsonSchemaURL }, notify, { abortSignal }) => {
+swarp.generateResultsExport(
+	async ({ sessionId, include, cropPadding, jsonSchemaURL, format }, notify, { abortSignal }) => {
 		const db = await openDatabase();
 		const session = await db.get('Session', sessionId).then(Schemas.Session.assert);
 		if (!session) throw new Error(`Session with ID ${sessionId} not found`);
@@ -60,7 +60,7 @@ swarp.generateResultsZip(
 			db,
 			abortSignal,
 			onProgress(p) {
-				notify({ progress: splitProgress('prepare', p) });
+				notify({ event: 'progress', data: splitProgress('prepare', p) });
 			}
 		});
 
@@ -70,10 +70,13 @@ swarp.generateResultsZip(
 			)
 		];
 
-		/**
-		 * @type {Array<{imageId: string, croppedBytes: Uint8Array, originalBytes?: Uint8Array|undefined, contentType: string, filename: string}>}
-		 */
-		const buffersOfImages = [];
+		const buffersOfImages: Array<{
+			imageId: string;
+			croppedBytes: Uint8Array;
+			originalBytes?: Uint8Array | undefined;
+			contentType: string;
+			filename: string;
+		}> = [];
 
 		let total = 1;
 		let done = 0;
@@ -83,7 +86,7 @@ swarp.generateResultsZip(
 		if (include !== 'metadataonly') {
 			total += observations.flatMap((o) => o.images).length;
 			for (const [observation, imageId] of observations.flatMap((o) =>
-				o.images.map((img) => /** @type {const} */ [o, img])
+				o.images.map((img) => [o, img] as const)
 			)) {
 				const image = imagesFromDatabase.find((i) => i.id === imageId);
 				if (!image) continue;
@@ -142,7 +145,10 @@ swarp.generateResultsZip(
 					}
 				} catch (error) {
 					console.error(error);
-					notify({ warning: ['exif-write-error', { filename: file.filename }] });
+					notify({
+						event: 'warning',
+						data: ['exif-write-error', { filename: file.filename }]
+					});
 					originalBytes = new Uint8Array(original);
 					croppedBytes = new Uint8Array(cropped);
 				}
@@ -158,109 +164,153 @@ swarp.generateResultsZip(
 				});
 
 				done++;
-				notify({ progress: splitProgress('encode', done / total) });
+				notify({ event: 'progress', data: splitProgress('encode', done / total) });
 			}
 		}
 
 		abortSignal?.throwIfAborted();
 
-		/** @type {Uint8Array<ArrayBuffer>} */
-		const zipfile = await unlessAborted(
+		const files: Record<string, { contents: Uint8Array | string; mtime?: Date | undefined }> =
+			{};
+
+		files[filepaths.metadata.json] = {
+			contents: stringifyWithToplevelOrdering(
+				'json',
+				jsonSchemaURL.toString(),
+				Analysis.assert({
+					session: {
+						...session,
+						metadata: toMetadataRecord(session.metadata)
+					},
+					observations: exportedObservations
+				}),
+				['protocol', 'observations']
+			)
+		};
+
+		if (format === 'folder') {
+			notify({
+				event: 'writeFile',
+				data: {
+					filepath: filepaths.metadata.json,
+					contents: files[filepaths.metadata.json].contents
+				}
+			});
+		}
+
+		files[filepaths.metadata.csv] = {
+			contents: toCSV(
+				[
+					'Identifiant',
+					'Observation',
+					// 2 columns for each metadata: for the value itself, and for the confidence in the value
+					...allMetadataKeys
+						.filter((k) => Boolean(metadataDefinitions[k]?.label))
+						.flatMap((k) => [
+							metadataPrettyKey(metadataDefinitions[k]),
+							`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
+						])
+				],
+				observations.map((o) => ({
+					Identifiant: o.id,
+					Observation: o.label,
+					...Object.fromEntries(
+						Object.entries(exportedObservations[o.id].metadata).flatMap(
+							([key, { value, confidence, valueLabel }]) => [
+								[
+									metadataPrettyKey(metadataDefinitions[key]),
+									metadataPrettyValue(value, {
+										// Exports always have english value serializations for better interoperability
+										language: 'en',
+										type: metadataDefinitions[key].type,
+										valueLabel
+									})
+								],
+								[
+									`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
+									confidence.toString()
+								]
+							]
+						)
+					)
+				}))
+			)
+		};
+
+		if (format === 'folder') {
+			notify({
+				event: 'writeFile',
+				data: {
+					filepath: filepaths.metadata.csv,
+					contents: files[filepaths.metadata.csv].contents
+				}
+			});
+		}
+
+		if (include !== 'metadataonly') {
+			for (const { exportedAs, id, metadata } of Object.values(exportedObservations).flatMap(
+				(o) => o.images
+			)) {
+				const buffers = buffersOfImages.find((i) => i.imageId === id);
+				if (!buffers) continue;
+
+				/** @type {Date | undefined} */
+				let mtime = undefined;
+
+				if (mtimeMetadataKey && typeof metadata[mtimeMetadataKey]?.value === 'string') {
+					mtime = new Date(metadata[mtimeMetadataKey].value);
+				}
+
+				files[exportedAs.cropped] = {
+					mtime,
+					contents: buffers.croppedBytes
+				};
+
+				if (format === 'folder') {
+					notify({
+						event: 'writeFile',
+						data: {
+							filepath: exportedAs.cropped,
+							contents: buffers.croppedBytes
+						}
+					});
+				}
+
+				if (include === 'full' && buffers.originalBytes) {
+					files[exportedAs.original] = {
+						mtime,
+						contents: buffers.originalBytes
+					};
+
+					if (format === 'folder') {
+						notify({
+							event: 'writeFile',
+							data: {
+								filepath: exportedAs.original,
+								contents: buffers.originalBytes
+							}
+						});
+					}
+				}
+			}
+		}
+
+		if (format === 'folder') {
+			notify({ event: 'progress', data: 1 });
+			return new ArrayBuffer(0);
+		}
+
+		const zipfile: Uint8Array<ArrayBuffer> = await unlessAborted(
 			abortSignal,
 			new Promise((resolve, reject) =>
 				zip(
-					{
-						[filepaths.metadata.json]: strToU8(
-							stringifyWithToplevelOrdering(
-								'json',
-								jsonSchemaURL.toString(),
-								Analysis.assert({
-									session: {
-										...session,
-										metadata: toMetadataRecord(session.metadata)
-									},
-									observations: exportedObservations
-								}),
-								['protocol', 'observations']
-							)
-						),
-						[filepaths.metadata.csv]: strToU8(
-							toCSV(
-								[
-									'Identifiant',
-									'Observation',
-									// 2 columns for each metadata: for the value itself, and for the confidence in the value
-									...allMetadataKeys
-										.filter((k) => Boolean(metadataDefinitions[k]?.label))
-										.flatMap((k) => [
-											metadataPrettyKey(metadataDefinitions[k]),
-											`${metadataPrettyKey(metadataDefinitions[k])}: Confiance`
-										])
-								],
-								observations.map((o) => ({
-									Identifiant: o.id,
-									Observation: o.label,
-									...Object.fromEntries(
-										Object.entries(exportedObservations[o.id].metadata).flatMap(
-											([key, { value, confidence, valueLabel }]) => [
-												[
-													metadataPrettyKey(metadataDefinitions[key]),
-													metadataPrettyValue(value, {
-														// Exports always have english value serializations for better interoperability
-														language: 'en',
-														type: metadataDefinitions[key].type,
-														valueLabel
-													})
-												],
-												[
-													`${metadataPrettyKey(metadataDefinitions[key])}: Confiance`,
-													confidence.toString()
-												]
-											]
-										)
-									)
-								}))
-							)
-						),
-						...(include === 'metadataonly'
-							? {}
-							: Object.fromEntries(
-									Object.values(exportedObservations)
-										.flatMap(({ images }) => images)
-										.flatMap(({ exportedAs, id, metadata }) => {
-											const buffers = buffersOfImages.find(
-												(i) => i.imageId === id
-											);
-											if (!buffers) return [];
-
-											/**
-											 * @type {import('fflate').AsyncZipOptions}
-											 */
-											let options = { level: 0 };
-
-											if (
-												mtimeMetadataKey &&
-												typeof metadata[mtimeMetadataKey]?.value ===
-													'string'
-											) {
-												options.mtime = new Date(
-													metadata[mtimeMetadataKey].value
-												);
-											}
-
-											return [
-												[
-													exportedAs.cropped,
-													[buffers.croppedBytes, options]
-												],
-												[
-													exportedAs.original,
-													[buffers.originalBytes, options]
-												]
-											].filter(([, [bytes]]) => bytes !== undefined);
-										})
-								))
-					},
+					mapValues(
+						files,
+						({ contents, ...options }): import('fflate').AsyncZippableFile =>
+							typeof contents === 'string'
+								? strToU8(contents)
+								: [contents, { level: 0, ...options }]
+					),
 					{
 						comment: `Generated by C.i.g.a.l.e on ${new Date().toISOString()}`
 					},
@@ -272,7 +322,7 @@ swarp.generateResultsZip(
 			)
 		);
 
-		notify({ progress: 1 });
+		notify({ event: 'progress', data: 1 });
 		return zipfile.buffer;
 	}
 );
@@ -439,7 +489,7 @@ async function prepare({
 	const imagesFromDatabase = await db.getAllFromIndex('Image', 'sessionId', sessionId);
 	abortSignal?.throwIfAborted();
 	const metadataOptions = await db.getAll('MetadataOption').then((opts) => {
-		const options: Record<string, Record<string, typeof opts[number]>> = {};
+		const options: Record<string, Record<string, (typeof opts)[number]>> = {};
 		for (const opt of opts) {
 			if (!options[opt.metadataId]) options[opt.metadataId] = {};
 			options[opt.metadataId][opt.key] = opt;
@@ -448,7 +498,7 @@ async function prepare({
 	});
 	abortSignal?.throwIfAborted();
 
-	const exportedObservations: typeof Analysis.inferIn['observations'] = {};
+	const exportedObservations: (typeof Analysis.inferIn)['observations'] = {};
 	let sequence = 1;
 	let observationNumber = 0;
 
