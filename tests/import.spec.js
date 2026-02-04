@@ -197,8 +197,7 @@ test('fails when importing a .CR2 image', issue(413), async ({ page, app }) => {
 	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 5_000
 	});
-	await app.tooltips.expectContent(
-		firstObservationCard(page),
+	await expect(firstObservationCard(page)).toHaveTooltip(
 		/Les fichiers .+? ne sont pas (encore )?supportés/
 	);
 });
@@ -221,8 +220,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page, a
 	await app.tabs.go('import');
 	await importPhotos({ page }, '20K-gray.jpeg');
 	await app.loading.wait();
-	await app.tooltips.expectContent(
-		firstObservationCard(page),
+	await expect(firstObservationCard(page)).toHaveTooltip(
 		/L'image est trop grande pour être traitée/
 	);
 });
