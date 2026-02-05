@@ -108,7 +108,13 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		progress: type.or(
 			{ event: '"progress"', data: 'number' },
 			{ event: '"warning"', data: type.or(['"exif-write-error"', { filename: 'string' }]) },
-			{ event: '"writeFile"', data: { filepath: 'string', contents: type.or('string', ['instanceof', Uint8Array]) } }
+			{
+				event: '"writeFile"',
+				data: {
+					filepath: 'string',
+					contents: type.or('string', ['instanceof', Uint8Array])
+				}
+			}
 		),
 		success: type('ArrayBuffer')
 	},
