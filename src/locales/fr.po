@@ -2016,10 +2016,6 @@ msgid "Aucune session active à prévisualiser."
 msgstr "Aucune session active à prévisualiser."
 
 #: src/routes/(app)/results/+page.svelte
-msgid "<0/> results.zip <1/>"
-msgstr "<0/> results.zip <1/>"
-
-#: src/routes/(app)/results/+page.svelte
 msgid ""
 "Une valeur en % signifie que la marge est relative aux dimensions de chacune des\n"
 "images"
@@ -2261,6 +2257,19 @@ msgstr "Image introuvable"
 #: src/routes/(app)/(sidepanel)/classify/[image]/+page.ts
 msgid "Image introuvable dans la session"
 msgstr "Image introuvable dans la session"
+
+#. placeholder {0}: directoryHandle.name
+#: src/routes/(app)/results/+page.svelte
+msgid "Fichiers sauvegardés dans {0}"
+msgstr "Fichiers sauvegardés dans {0}"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Archive ZIP <1/>"
+msgstr "<0/> Archive ZIP <1/>"
+
+#: src/routes/(app)/results/+page.svelte
+msgid "<0/> Dossier <1/>"
+msgstr "<0/> Dossier <1/>"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
