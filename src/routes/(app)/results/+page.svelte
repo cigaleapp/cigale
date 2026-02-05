@@ -2,12 +2,14 @@
 	import { watch } from 'runed';
 	import { tick } from 'svelte';
 
-	import Download from '~icons/ri/download-2-line';
+	import IconDownloadAsZip from '~icons/ri/file-zip-line';
+	import IconDownloadAsFolder from '~icons/ri/folder-download-line';
 	import { asset } from '$app/paths';
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import { downloadAsFile } from '$lib/download.js';
 	import { gatherToTree, type TreeNode, type TreeNodeMaybeLoading } from '$lib/file-tree.js';
+	import { writeToFilesystem } from '$lib/filesystem.js';
 	import { formatBytesSize } from '$lib/i18n';
 	import { parseCropPadding } from '$lib/images';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
@@ -25,7 +27,9 @@
 	const { data } = $props();
 	const swarpc = $derived(data.swarpc);
 
-	let exporting = $state(false);
+	/** We are currently generating an export (of the specified format) */
+	let exporting: 'zip' | 'folder' | false = $state(false);
+
 	let include: 'metadataonly' | 'croppedonly' | 'full' = $state('croppedonly');
 
 	let cropPadding = $derived(parseCropPadding(uiState.currentProtocol?.crop.padding ?? '0px'));
@@ -63,10 +67,11 @@
 		}
 	});
 
-	async function generateExport() {
+	async function downloadExport(directoryHandle: FileSystemDirectoryHandle | undefined) {
 		await toasts.clear('exporter');
 		uiState.processing.reset();
-		exporting = true;
+		const exportFormat = directoryHandle ? 'folder' : 'zip';
+		exporting = exportFormat;
 
 		if (!uiState.currentSessionId) {
 			toasts.error('Aucune session active à exporter.');
@@ -79,9 +84,11 @@
 			uiState.processing.task = 'export';
 			uiState.processing.total = 1;
 			uiState.processing.done = 0;
-			const zipfileBytes = await swarpc.generateResultsZip.once(
+
+			const zipfileBytes = await swarpc.generateResultsExport.once(
 				{
 					include,
+					format: exportFormat,
 					sessionId: uiState.currentSessionId,
 					cropPadding: cropPadding.withUnit,
 					jsonSchemaURL: new URL(
@@ -89,24 +96,39 @@
 						page.url.origin
 					).toString()
 				},
-				({ warning, progress }) => {
-					if (warning) {
-						const [message, { filename }] = warning;
+				async ({ event, data }) => {
+					switch (event) {
+						case 'progress':
+							uiState.processing.done = data;
+							break;
+						case 'writeFile': {
+							if (!directoryHandle) return;
+							await writeToFilesystem(directoryHandle, data.filepath, data.contents);
+							break;
+						}
+						case 'warning': {
+							const [message, { filename }] = data;
+							switch (message) {
+								case 'exif-write-error':
+									toasts.warn(
+										`Impossible d'ajouter les métadonnées EXIF à l'image ${filename}`
+									);
+									break;
+							}
 
-						switch (message) {
-							case 'exif-write-error':
-								toasts.warn(
-									`Impossible d'ajouter les métadonnées EXIF à l'image ${filename}`
-								);
-								break;
+							break;
 						}
 					}
-
-					if (progress) uiState.processing.done = progress;
 				}
 			);
 
-			downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
+			if (exportFormat === 'folder' && directoryHandle) {
+				toasts.success(`Fichiers sauvegardés dans ${directoryHandle.name}`);
+			}
+
+			if (exportFormat === 'zip') {
+				downloadAsFile(zipfileBytes, 'results.zip', 'application/zip');
+			}
 		} catch (error) {
 			console.error(error);
 			toasts.error(`Erreur lors de l'exportation des résultats: ${error}`);
@@ -162,27 +184,70 @@
 		folder: Loading,
 		children: Array(10).fill(Loading)
 	};
+
+	let supportsWritingFolder = $state(false);
+	$effect(() => {
+		if ('showDirectoryPicker' in window) {
+			supportsWritingFolder = true;
+		}
+	});
 </script>
 
 <main>
 	<header>
 		<h1>Résultats</h1>
 
-		<ButtonSecondary onclick={generateExport}>
-			{#if exporting}
-				<LoadingSpinner />
-			{:else}
-				<Download />
-			{/if}
-			results.zip
-			<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
-				<LoadingText value={sizeEstimates.compressed} mask="~{formatBytesSize(150e3)}">
-					{#snippet loaded(size)}
-						~{formatBytesSize(size)}
-					{/snippet}
-				</LoadingText>
-			</code>
-		</ButtonSecondary>
+		<div class="actions">
+			<ButtonSecondary onclick={async () => await downloadExport(undefined)}>
+				{#if exporting === 'zip'}
+					<LoadingSpinner />
+				{:else}
+					<IconDownloadAsZip />
+				{/if}
+				Archive ZIP
+				<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
+					<LoadingText value={sizeEstimates.compressed} mask="~{formatBytesSize(150e3)}">
+						{#snippet loaded(size)}
+							~{formatBytesSize(size)}
+						{/snippet}
+					</LoadingText>
+				</code>
+			</ButtonSecondary>
+			<ButtonSecondary
+				disabled={!supportsWritingFolder}
+				help={supportsWritingFolder
+					? undefined
+					: "Votre navigateur ne supporte pas l'exportation en dossier, utilisez Chrome ou Edge."}
+				onclick={async () => {
+					if (!supportsWritingFolder) return;
+					const directory = await (window as any).showDirectoryPicker({
+						mode: 'readwrite',
+						startIn: 'documents',
+						id: 'results-export'
+					});
+					await downloadExport(directory);
+				}}
+			>
+				{#if exporting === 'folder'}
+					<LoadingSpinner />
+				{:else}
+					<IconDownloadAsFolder />
+				{/if}
+				Dossier
+				{#if supportsWritingFolder}
+					<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
+						<LoadingText
+							value={sizeEstimates.uncompressed}
+							mask="~{formatBytesSize(150e3)}"
+						>
+							{#snippet loaded(size)}
+								~{formatBytesSize(size)}
+							{/snippet}
+						</LoadingText>
+					</code>
+				{/if}
+			</ButtonSecondary>
+		</div>
 	</header>
 	<div class="side-by-side">
 		<section class="settings">
@@ -287,6 +352,11 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		gap: 1em;
+	}
+
+	header .actions {
+		display: flex;
 		gap: 1em;
 	}
 

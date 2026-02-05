@@ -3,14 +3,18 @@ import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
+import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
 import {
+	browserConsole,
 	chooseFirstSession,
 	entries,
 	expectZipFiles,
 	firstObservationCard,
 	importPhotos,
 	loadDatabaseDump,
-	newSession
+	newSession,
+	setInferenceModels,
+	toast
 } from './utils/index.js';
 
 test('correctly applies crop padding', issue(463), async ({ page, app }) => {
@@ -42,7 +46,7 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
 
 	const resultsFilepath = path.resolve('./tests/results/crop-padding.zip');
-	await page.getByRole('button', { name: 'results.zip' }).click();
+	await page.getByRole('button', { name: 'Archive ZIP' }).click();
 	await page.waitForEvent('download').then((e) => e.saveAs(resultsFilepath));
 
 	const zip = await yauzl.open(resultsFilepath);
@@ -61,7 +65,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	await app.tabs.go('results');
 
 	const preview = page.getByRole('main').getByTestId('zip-preview');
-	const downloadButton = page.getByRole('main').getByRole('button', { name: 'results.zip' });
+	const downloadButton = page.getByRole('main').getByRole('button', { name: 'Archive ZIP' });
 
 	/**
 	 *
@@ -91,7 +95,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	}
 
 	await changeExportSettings({ include: 'Métadonnées seulement' });
-	await expect.soft(downloadButton).toHaveText('results.zip ~16ko');
+	await expect.soft(downloadButton).toHaveText('Archive ZIP ~16ko');
 	await expect.soft(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
@@ -108,7 +112,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées et images recadrées' });
-	await expect.soft(downloadButton).toHaveText('results.zip ~4,2Mo');
+	await expect.soft(downloadButton).toHaveText('Archive ZIP ~4,2Mo');
 	await expect.soft(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
@@ -141,7 +145,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées, images recadrées et images originales' });
-	await expect.soft(downloadButton).toHaveText('results.zip ~9,8Mo');
+	await expect.soft(downloadButton).toHaveText('Archive ZIP ~9,8Mo');
 	await expect.soft(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
@@ -190,5 +194,42 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ cropPadding: { px: 200 } });
-	await expect.soft(downloadButton).toHaveText('results.zip ~12Mo');
+	await expect.soft(downloadButton).toHaveText('Archive ZIP ~12Mo');
+});
+
+test('export to a folder', async ({ page, app, browserName }) => {
+	await loadDatabaseDump(page, 'db/basic.devalue');
+	await chooseFirstSession(page);
+	await setInferenceModels(page, {
+		crop: 'Aucune inférence',
+		classify: 'Aucune inférence'
+	});
+
+	await app.tabs.go('results');
+
+	if (browserName !== 'chromium') {
+		await expect(page.getByRole('button', { name: 'Dossier' })).toHaveTooltip(
+			/navigateur ne supporte pas.*Chrome ou Edge/
+		);
+
+		return;
+	}
+
+	const handleId = 'export-folder-test';
+	await mockFilesystemAccessAPI(page, 'Cigale Export Test', handleId);
+
+	await page.getByRole('button', { name: 'Dossier' }).click();
+
+	await expect(toast(page, 'Fichiers sauvegardés dans Cigale Export Test')).toBeVisible();
+
+	const files = await writtenFilesOfHandle(page, handleId);
+
+	expect(files).toStrictEqual({
+		'Cigale Export Test/metadata.csv': expect.stringContaining('"Observation";"Espèce"'),
+		'Cigale Export Test/analysis.json': expect.stringContaining('"observations":'),
+		'Cigale Export Test/Cropped/Allacma fusca_obs1_1.jpeg': expect.any(Uint8Array),
+		'Cigale Export Test/Cropped/Orchesella cincta_obs2_2.jpeg': expect.any(Uint8Array),
+		'Cigale Export Test/Cropped/Entomobrya muscorum_obs3_3.jpeg': expect.any(Uint8Array),
+		'Cigale Export Test/Cropped/(Unknown)_obs4_4.jpeg': expect.any(Uint8Array)
+	});
 });

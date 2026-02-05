@@ -56,47 +56,67 @@ Available CSS variables:
 	let isLoading = $state(false);
 </script>
 
-<button
-	type={submits ? 'submit' : 'button'}
-	disabled={disabled || isLoading}
-	class:tight
-	class:danger
-	{...aria}
-	onclick={async (e) => {
-		if (!onclick) return;
+<!-- 
+	We wrap the button in a div because tooltips wont show on disabled buttons 
+	(and sometimes the tooltip is there to tell you *why* the button is disabled so... it's pretty important) 
 
-		// Only set isLoading here if the onclick handler does not define its own loadingStarted signal.
-		// This is kinda crude but you cant reflect a function object's args in JS, see https://stackoverflow.com/q/6921588/9943464 (well you can, but by uhhhh parsing the source code, yeah.)
-		if (loading && !onclick.toString().includes('loadingStarted')) isLoading = true;
-
-		try {
-			await onclick(e, {
-				loadingStarted: () => {
-					isLoading = true;
-				},
-				loadingEnded: () => {
-					isLoading = false;
-				}
-			});
-		} finally {
-			if (loading) isLoading = false;
-		}
-	}}
+	We set data-tooltip-content on the button itself so that E2E tests can still find the tooltip's contents (climbing up the DOM isnt possible with Playwright)
+ -->
+<div
+	class="tooltip-container"
 	use:tooltip={typeof help === 'string' && keyboard ? { text: help, keyboard } : help}
-	data-testid={testid || undefined}
 >
-	{#if isLoading}
-		<div class="loading-spinner">
-			<LoadingSpinner />
-		</div>
-	{/if}
-	{@render children({ loading: isLoading && loading !== false })}
-	{#if keyboard}
-		<KeyboardHint shortcut={keyboard} />
-	{/if}
-</button>
+	<button
+		data-tooltip-content={typeof help === 'string'
+			? help
+			: Array.isArray(help)
+				? help[0]
+				: `${help?.text} ${help?.keyboard ?? ''}`}
+		type={submits ? 'submit' : 'button'}
+		disabled={disabled || isLoading}
+		class:tight
+		class:danger
+		{...aria}
+		onclick={async (e) => {
+			if (!onclick) return;
+
+			// Only set isLoading here if the onclick handler does not define its own loadingStarted signal.
+			// This is kinda crude but you cant reflect a function object's args in JS, see https://stackoverflow.com/q/6921588/9943464 (well you can, but by uhhhh parsing the source code, yeah.)
+			if (loading && !onclick.toString().includes('loadingStarted')) isLoading = true;
+
+			try {
+				await onclick(e, {
+					loadingStarted: () => {
+						isLoading = true;
+					},
+					loadingEnded: () => {
+						isLoading = false;
+					}
+				});
+			} finally {
+				if (loading) isLoading = false;
+			}
+		}}
+		data-testid={testid || undefined}
+	>
+		{#if isLoading}
+			<div class="loading-spinner">
+				<LoadingSpinner />
+			</div>
+		{/if}
+		{@render children({ loading: isLoading && loading !== false })}
+		{#if keyboard}
+			<KeyboardHint shortcut={keyboard} />
+		{/if}
+	</button>
+</div>
 
 <style>
+	.tooltip-container {
+		display: flex;
+		width: var(--width);
+	}
+
 	button {
 		cursor: pointer;
 		background-color: var(--bg, var(--bg-neutral));
@@ -107,10 +127,10 @@ Available CSS variables:
 		border: 0.1625em solid var(--fg, var(--gray));
 		padding: 0.75em;
 		border-radius: var(--corner-radius);
-		width: var(--width);
 		font-weight: bold;
 		font-size: var(--font-size, 1em);
 		gap: 0.5em;
+		width: 100%;
 
 		transition:
 			background-color 0.2s,

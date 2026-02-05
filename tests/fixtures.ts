@@ -1,5 +1,5 @@
 import { mkdir, rm } from 'node:fs/promises';
-import { test as base, type Locator } from '@playwright/test';
+import { test as base, expect as baseExpect, type Locator } from '@playwright/test';
 
 import type { Settings } from '$lib/database';
 import type { IDBDatabaseType } from '$lib/idb.svelte';
@@ -28,7 +28,6 @@ import {
 	setSettings,
 	sidepanelMetadataSectionFor,
 	toast,
-	tooltipOf,
 	waitForLoadingEnd,
 	waitForRoute,
 	type NavigationTab,
@@ -117,10 +116,6 @@ export type AppFixture = {
 	path: {
 		wait(route: Parameters<typeof waitForRoute>[1]): Promise<void>;
 		go(path: import('$app/types').ResolvedPathname): Promise<void>;
-	};
-	tooltips: {
-		expectContent(element: Locator, content: string | RegExp): Promise<void>;
-		trigger(element: Locator): Promise<Locator>;
 	};
 	loading: {
 		wait(timeout?: number): Promise<void>;
@@ -307,15 +302,6 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 					await page.goto(fullPath);
 				}
 			},
-			tooltips: {
-				async expectContent(element, content) {
-					return expectTooltipContent(page, element, content);
-				},
-				async trigger(element) {
-					await element.hover({ force: true });
-					return tooltipOf(page, element);
-				}
-			},
 			loading: {
 				wait: async (timeout) => waitForLoadingEnd(page, timeout),
 				waitIn: async (area, timeout) => waitForLoadingEnd(area, timeout)
@@ -379,5 +365,45 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 	]
 });
 
-export { expect } from '@playwright/test';
+export const expect = baseExpect.extend({
+	async toHaveTooltip(
+		locator: Locator,
+		expected: string | RegExp,
+		options?: { timeout?: number }
+	) {
+		const assertionName = 'toHaveTooltip';
+
+		let pass: boolean;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		let matcherResult: any;
+		try {
+			await expectTooltipContent(locator.page(), locator, expected, options);
+			pass = true;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (e: any) {
+			matcherResult = e.matcherResult;
+			pass = false;
+		}
+
+		if (this.isNot) pass = !pass;
+
+		const message = () =>
+			this.utils.matcherHint(assertionName, undefined, undefined, {
+				isNot: this.isNot
+			}) +
+			'\n\n' +
+			`Locator: ${locator}\n` +
+			`Expected: ${this.isNot ? 'not' : ''} tooltip with ${this.utils.printExpected(expected)}\n` +
+			(matcherResult ? `Received: ${this.utils.printReceived(matcherResult.actual)}` : '');
+
+		return {
+			message,
+			pass,
+			name: assertionName,
+			expected,
+			actual: matcherResult?.actual
+		};
+	}
+});
+
 export { lightProtocol as exampleProtocol };
