@@ -48,7 +48,7 @@ export const browserConsole = {
  * @param {object} [options]
  * @param {number} [options.timeout]
  */
-export async function tooltipOf(page, locator, { timeout } = {}) {
+async function tooltipOf(page, locator, { timeout } = {}) {
 	await browserConsole.log(page, `Looking for tooltip of locator:`, await locator.innerHTML());
 
 	await expect(locator).toHaveAttribute('aria-describedby', /tippy-\d+/, {
@@ -384,14 +384,4 @@ export async function chooseInDropdown(page, trigger, ...option) {
 			name: locator
 		});
 	}
-}
-
-/**
- *
- * @param {Page} page
- * @param {Function} func
- */
-export async function exposeNamedFunction(page, func) {
-	await browserConsole.log(page, `Exposing function ${func.name} to the page context`);
-	await page.exposeFunction(func.name, func);
 }
