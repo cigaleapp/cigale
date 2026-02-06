@@ -102,6 +102,8 @@ jobs:
   deploy-breakdown:
     name: Breakdown site
     needs: build
+    permissions:
+      contents: read
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
     with: 
