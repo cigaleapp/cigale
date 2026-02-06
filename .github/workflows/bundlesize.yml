@@ -3,6 +3,9 @@ name: Bundle size
 on:
   workflow_call:
     inputs: {}
+    secrets:
+      DEV_DEPLOYMENTS_SSH_PRIVATE_KEY:
+        required: true
 
 env:
   ELECTRON_SKIP_BINARY_DOWNLOAD: 'true'
@@ -70,7 +73,13 @@ jobs:
           bun-version-file: .bun-version
 
       - run: bun install
+
       - run: bun run build
+        if: matrix.name == 'head'
+        env:
+          BUNDLE_ANALYZER: json,static
+      - run: bun run build
+        if: matrix.name != 'head'
         env:
           BUNDLE_ANALYZER: json
 
@@ -79,3 +88,26 @@ jobs:
         with:
           name: ${{ matrix.name }}-stats
           path: ./public/stats.json
+
+      # dev-deploy.yml expects a index.html file
+      - if: matrix.name == 'head'
+        run: mkdir -p bundlestats; mv public/stats.html bundlestats/index.html
+      - if: matrix.name == 'head'
+        name: Upload bundle analysis site
+        uses: actions/upload-artifact@v6
+        with:
+          path: ./bundlestats
+          name: ${{ matrix.name }}-bundle-analysis
+
+  deploy-breakdown:
+    name: Breakdown site
+    needs: build
+    uses: ./.github/workflows/dev-deploy.yml
+    secrets: inherit
+    with: 
+      artifact: head-bundle-analysis
+      subdomain: pr-${{ github.event.pull_request.number }}-reports
+      path: bundlesize
+      environment: "#${{ github.event.pull_request.number }}: Bundle breakdown"
+
+          
