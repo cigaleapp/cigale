@@ -60,6 +60,7 @@
 		letter-spacing: 0.05em;
 		cursor: pointer;
 		text-decoration: none;
+		font-size: 1em;
 	}
 
 	[role='button'].inline {

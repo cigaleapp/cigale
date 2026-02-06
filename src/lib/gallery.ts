@@ -137,7 +137,7 @@ export async function galleryItemsGrouper(
 				if (value === undefined) return [options.length, `Sans ${label}`];
 				const group = grouper(value);
 				return [
-					options.find((opt) => opt.key === value)?.index ?? group,
+					options.find((opt) => opt.key === value.toString())?.index ?? group,
 					`${label} = ${group}`
 				];
 			};

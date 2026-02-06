@@ -7,7 +7,7 @@
 	import { invalidate } from '$app/navigation';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfidencePercentage from '$lib/ConfidencePercentage.svelte';
-	import type { Image, Metadata, MetadataEnumVariant } from '$lib/database.js';
+	import type { Metadata, MetadataEnumVariant, Observation } from '$lib/database.js';
 	import { dependencyURI, openDatabase } from '$lib/idb.svelte.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { storeMetadataValue, type TypedMetadataValue } from '$lib/metadata/index.js';
@@ -17,25 +17,31 @@
 	import { compareBy, entries, mapKeys, nonnull } from '$lib/utils.js';
 
 	interface Props {
-		image: Image;
+		observation: Observation;
 		focusedMetadata: Metadata;
 		options: MetadataEnumVariant[];
 		currentMetadataValue: TypedMetadataValue<'enum'> | undefined;
 	}
 
-	const { image, focusedMetadata, options, currentMetadataValue: current }: Props = $props();
+	const {
+		observation,
+		focusedMetadata,
+		options,
+		currentMetadataValue: current
+	}: Props = $props();
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	let focusOptionCombobox: ComboboxProps['focuser'] = $state((_) => {});
 
-	const option = $derived(options.find((o) => o.key === current?.value));
+	const option = $derived(options.find((o) => o.key === current?.value?.toString()));
 
 	const confidences = $derived.by(() => {
 		if (!current) return {};
+		if (!option) return {};
 		return {
-			[option!.key]: current.confidence,
-			...mapKeys(current.alternatives!, (k) => JSON.parse(k).toString() as string)
+			...mapKeys(current.alternatives, (k) => JSON.parse(k).toString() as string),
+			[option.key]: current.confidence
 		};
 	});
 
@@ -57,7 +63,7 @@
 		confidences: Record<string, number>,
 		{ confirmed = false, manuallyModified = false, pushToUndoStack = true } = {}
 	) {
-		if (!image) throw new Error('Image not found');
+		if (!observation) throw new Error('Image not found');
 		if (!focusedMetadata) throw new Error('No metadata focused');
 
 		const newAlternative = current
@@ -67,7 +73,7 @@
 		await storeMetadataValue({
 			db: await openDatabase(),
 			metadataId: focusedMetadata.id,
-			subjectId: image.id,
+			subjectId: observation.id,
 			type: 'enum',
 			value: option.key,
 			confidence: confidences[option.key] ?? 1,
@@ -84,18 +90,18 @@
 
 		if (pushToUndoStack && current) {
 			undo.push('classify/enum/edit', {
-				imageId: image.id,
+				observationId: observation.id,
 				metadataId: focusedMetadata.id,
-				before: { key: current.value },
+				before: { key: current.value.toString() },
 				after: { key: option.key }
 			});
 		}
 
-		await invalidate(dependencyURI('Image', image.id));
+		await invalidate(dependencyURI('Observation', observation.id));
 	}
 
-	undo.on('classify/enum/edit', async ({ metadataId, imageId, before }) => {
-		if (imageId !== image.id) return;
+	undo.on('classify/enum/edit', async ({ metadataId, observationId, before }) => {
+		if (observationId !== observation.id) return;
 		if (metadataId !== focusedMetadata.id) return;
 		await setOption(before, confidences, { pushToUndoStack: false });
 	});

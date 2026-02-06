@@ -18,8 +18,7 @@
 	import { loadModel } from '$lib/inference.js';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import Logo from '$lib/Logo.svelte';
-	import { mergeMetadataFromImagesAndObservations } from '$lib/metadata/merging.js';
-	import { deleteObservation, ensureNoLoneImages } from '$lib/observations';
+	import { deleteObservation, ensureNoLoneImages, observationMetadata } from '$lib/observations';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { cancelTask, classifyMore } from '$lib/queue.svelte.js';
@@ -48,10 +47,10 @@
 			sessionId: obs.sessionId,
 			addedAt: obs.addedAt,
 			name: obs.label,
-			metadata: mergeMetadataFromImagesAndObservations({
+			metadata: observationMetadata({
 				definitions: tables.Metadata.state,
 				images: obs.images.map((id) => tables.Image.getFromState(id)).filter(nonnull),
-				observations: [obs]
+				observation: obs
 			}),
 			virtual: false,
 			data: {
@@ -173,22 +172,14 @@
 	defineKeyboardShortcuts('classification', {
 		'$mod+Enter': {
 			help: "Classifier l'image sélectionnée en plein écran",
-			when: () => uiState.selection.length === 1,
+			when: () =>
+				uiState.selection.length === 1 &&
+				tables.Observation.getFromState(uiState.selection[0]),
 			async do() {
 				let id = uiState.selection.at(0);
 				if (!id) return;
 
-				const isImage = tables.Image.state.find((img) => img.id === id);
-
-				if (!isImage) {
-					id = tables.Observation.state.find(
-						(obs) => obs.id === id && obs.images.length === 1
-					)?.images?.[0];
-				}
-
-				if (!id) return;
-
-				await goto('/(app)/(sidepanel)/classify/[image]', { image: id });
+				await goto('/(app)/(sidepanel)/classify/[observation]', { observation: id });
 			}
 		}
 	});
@@ -228,9 +219,9 @@
 							unrolledObservation = unrolledObservation === id ? '' : id;
 						}}
 						ondoubleclick={() => {
-							const imageIds = observation.images;
-							if (imageIds.length !== 1) return;
-							goto('/(app)/(sidepanel)/classify/[observation]', { observation: imageIds[0] });
+							goto('/(app)/(sidepanel)/classify/[observation]', {
+								observation: observation.id
+							});
 						}}
 						onretry={() => {
 							uiState.erroredImages.delete(id);
@@ -250,13 +241,7 @@
 						}}
 					/>
 				{:else if image}
-					<CardImage
-						{image}
-						boxes="apply-first"
-						ondoubleclick={() => {
-							goto('/(app)/(sidepanel)/classify/[observation]', { observation: image.id });
-						}}
-					/>
+					<CardImage {image} boxes="apply-first" />
 				{/if}
 			{/snippet}
 		</AreaObservations>

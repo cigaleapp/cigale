@@ -1,33 +1,30 @@
 <script lang="ts">
 	import IconConfirmed from '~icons/ri/check-double-line';
 	import IconCrop from '~icons/ri/crop-line';
+	import IconUnconfirmed from '~icons/ri/error-warning-line';
 	import IconGallery from '~icons/ri/function-line';
+	import { invalidate } from '$app/navigation';
 	import ButtonInk from '$lib/ButtonInk.svelte';
-	import type { Image, Metadata } from '$lib/database';
-	import { parseImageId } from '$lib/images';
+	import type * as DB from '$lib/database';
+	import { dependencyURI, tables } from '$lib/idb.svelte';
+	import { imageIdToFileId } from '$lib/images';
+	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
-	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto, resolve } from '$lib/paths.js';
 	import { tooltip } from '$lib/tooltips';
 
 	interface Props {
-		image: Image | undefined;
-		imageNo: number;
-		focusedMetadata: Metadata | undefined;
+		observation: DB.Observation;
+		focusedMetadata: DB.Metadata | undefined;
+		currentImage: DB.Image;
 	}
 
-	const { image, imageNo, focusedMetadata }: Props = $props();
+	const { observation, focusedMetadata, currentImage }: Props = $props();
 
-	const cropUrlParams = $derived.by(() => {
-		if (!image) return;
-		const { subindex, fileId } = parseImageId(image.id);
-		if (subindex === null) return;
-
-		return {
-			image: fileId,
-			from: subindex.toString()
-		};
+	const cropUrlParams = $derived({
+		image: imageIdToFileId(currentImage.id),
+		from: observation.id
 	});
 
 	defineKeyboardShortcuts('classification', {
@@ -49,20 +46,17 @@
 </script>
 
 <header>
-	<div class="line">
+	<div class="line preactions">
 		<ButtonInk inline href={resolve('/classify')}>
 			<IconGallery />
-			Autres images
+			Voir tout
 			<KeyboardHint shortcut="Escape" />
 		</ButtonInk>
 
 		<ButtonInk
 			inline
+			href={resolve('/(app)/(sidepanel)/crop/[image]/[[from]]', cropUrlParams)}
 			disabled={!cropUrlParams}
-			href={resolve(
-				'/(app)/(sidepanel)/crop/[image]/[[from]]',
-				cropUrlParams ?? { image: '' }
-			)}
 		>
 			<IconCrop />
 			Recadrer
@@ -72,14 +66,27 @@
 
 	<div class="line">
 		<h1>
-			{#if image}
-				<OverflowableText text={`${image.filename} #${imageNo}`} />
-
-				{#if focusedMetadata && image.metadata[focusedMetadata.id]?.confirmed}
+			{#if observation}
+				{#if focusedMetadata && observation.metadataOverrides[focusedMetadata.id]?.confirmed}
 					<div class="confirmed" use:tooltip={'Classification confirmée'}>
 						<IconConfirmed />
 					</div>
+				{:else}
+					<div class="unconfirmed" use:tooltip={'Classification non confirmée'}>
+						<IconUnconfirmed />
+					</div>
 				{/if}
+
+				<InlineTextInput
+					discreet
+					label="Nom de l'observation"
+					value={observation.label}
+					onblur={async (newLabel) => {
+						if (newLabel === observation.label) return;
+						await tables.Observation.update(observation.id, 'label', newLabel);
+						await invalidate(dependencyURI('Observation', observation.id));
+					}}
+				/>
 			{/if}
 		</h1>
 	</div>
@@ -98,16 +105,27 @@
 		gap: 3em;
 	}
 
+	.preactions {
+		font-size: 0.9em;
+	}
+
 	h1 {
 		overflow: hidden;
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+		font-size: 1.5em;
 	}
 
-	.confirmed {
-		color: var(--fg-success);
+	.confirmed,
+	.unconfirmed {
 		display: inline-flex;
 		font-size: 0.8em;
+	}
+	.confirmed {
+		color: var(--fg-success);
+	}
+	.unconfirmed {
+		color: var(--gray);
 	}
 </style>

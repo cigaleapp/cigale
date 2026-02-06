@@ -1,115 +1,106 @@
 import { error } from '@sveltejs/kit';
 
 import type { MetadataEnumVariant } from '$lib/database.js';
-import { galleryEffectiveSorter } from '$lib/gallery.js';
-import { dependencyURI, list, listByIndex, tables } from '$lib/idb.svelte.js';
+import { dependencyURI, list, tables } from '$lib/idb.svelte.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
+import { observationMetadata } from '$lib/observations.js';
 import { uiState } from '$lib/state.svelte.js';
+import { compareBy } from '$lib/utils.js';
 
-let allOptions: [string | undefined, MetadataEnumVariant[]] = [undefined, []];
+/**
+ * To avoid re-fetching options of the focused metadata every time
+ */
+let optionsOfMetadata = {
+	metadataId: undefined as string | undefined,
+	options: [] as MetadataEnumVariant[]
+};
 
 export async function load({ params, depends, parent }) {
-	// Make sure tables are loaded, otherwise uiState.currentSession will be undefined,
-	// even though uiState.currentSessionId is set.
-	await parent();
+	const { currentSession, metadataDefinitions, observationsOrder } = await parent();
 
-	if (!uiState.currentSessionId) error(400, 'Aucune session active');
-
-	const currentSession = await tables.Session.get(uiState.currentSessionId);
-	if (!currentSession) error(404, 'Session active introuvable');
+	const allObservations = await tables.Observation.list('sessionId', currentSession.id);
+	allObservations.sort(compareBy(({ id }) => observationsOrder.get(id) ?? -1));
 
 	const focusedMetadataId =
 		currentSession?.fullscreenClassifier.focusedMetadata ?? uiState.classificationMetadataId;
 
 	const focusedMetadata = focusedMetadataId
-		? await tables.Metadata.get(focusedMetadataId)
+		? metadataDefinitions.find(({ id }) => id === focusedMetadataId)
 		: undefined;
 
-	if (focusedMetadata && uiState.currentProtocolId && allOptions[0] !== focusedMetadata.id) {
-		allOptions = [
-			focusedMetadata.id,
-			await list(
+	if (
+		focusedMetadata &&
+		uiState.currentProtocolId &&
+		optionsOfMetadata.metadataId !== focusedMetadata.id
+	) {
+		optionsOfMetadata = {
+			metadataId: focusedMetadata.id,
+			options: await list(
 				'MetadataOption',
 				metadataOptionsKeyRange(uiState.currentProtocolId, focusedMetadata.id)
 			)
-		];
+		};
 	}
 
-	const image = await tables.Image.get(params.observation);
-	if (!image) error(404, 'Image introuvable');
+	const observation = await tables.Observation.get(params.observation);
+	if (!observation) error(404, 'Observation introuvable');
 
-	depends(dependencyURI('Image', image.id));
+	depends(dependencyURI('Observation', observation.id));
 
-	const images = await listByIndex('Image', 'sessionId', currentSession.id);
+	const imagesOfObservation = await tables.Image.getMany(observation.images);
 
-	const sortSettings = currentSession?.sort.classify ?? currentSession?.sort.global;
-	const groupSettings = currentSession?.group.classify ?? currentSession?.group.global;
+	// Get next observation
+	const currentObsIndex = allObservations.findIndex(({ id }) => id === observation.id);
 
-	if (sortSettings && groupSettings) {
-		const imagesSorter = await galleryEffectiveSorter({
-			sortSettings,
-			groupSettings
-		});
-
-		const toGalleryItem = ({ id, filename, metadata }: (typeof images)[number]) => ({
-			id,
-			metadata,
-			name: filename
-		});
-
-		images.sort((a, b) => imagesSorter(toGalleryItem(a), toGalleryItem(b)));
-
-		console.info(`Sorted ${images.length} images for classification navigation`, images);
-	}
-
-	/** Number of the image within the images that point to its ImageFile */
-	const imageNo =
-		images.filter((i) => i.fileId === image.fileId).findIndex((i) => i.id === image.id) + 1;
-
-	// Get next image
-	const currentImageIndex = images.findIndex((i) => i.id === image.id);
-
-	if (currentImageIndex === -1) {
+	if (currentObsIndex === -1) {
 		error(500, 'Image introuvable dans la session');
 	}
 
-	const nextImageIndex = currentImageIndex + 1;
-	const prevImageIndex = currentImageIndex - 1;
+	const nextObsIndex = currentObsIndex + 1;
+	const prevObsIndex = currentObsIndex - 1;
 
-	const nextImage = nextImageIndex < images.length ? images[nextImageIndex] : null;
-	const prevImage = prevImageIndex >= 0 ? images[prevImageIndex] : null;
+	const nextObs = nextObsIndex < allObservations.length ? allObservations[nextObsIndex] : null;
+	const prevObs = prevObsIndex >= 0 ? allObservations[prevObsIndex] : null;
+
+	const allImages = await tables.Image.getMany(allObservations.flatMap(({ images }) => images));
+	const focusedValues = new Map(
+		allObservations.map((obs) => [
+			obs.id,
+			observationMetadata({
+				definitions: metadataDefinitions,
+				observation: obs,
+				images: allImages
+			})[focusedMetadata?.id ?? '']
+		])
+	);
 
 	// Counts
-	const classifiedImagesCount = focusedMetadata
-		? images.filter((img) => img.metadata[focusedMetadata.id]).length
-		: 0;
+	const classifiedObservationsCount = allObservations.filter(
+		({ id }) => focusedValues.get(id) !== undefined
+	).length;
 
-	const confirmedClassificationsCount = focusedMetadata
-		? images.filter((img) => img.metadata[focusedMetadata.id]?.confirmed).length
-		: 0;
+	const confirmedClassificationsCount = allObservations.filter(
+		({ id }) => focusedValues.get(id)?.confirmed
+	).length;
 
-	const nextUnconfirmedImage = focusedMetadata
-		? images.find(
-				(img, index) =>
-					index > currentImageIndex &&
-					img.metadata[focusedMetadata.id] &&
-					!img.metadata[focusedMetadata.id]?.confirmed
-			)
-		: null;
+	const nextUnconfirmedObservation = allObservations.find(
+		({ id }, index) => index > currentObsIndex && focusedValues.get(id)?.confirmed === false
+	);
 
 	return {
-		image,
-		imageNo,
+		observation,
+		metadataDefinitions,
+		images: imagesOfObservation,
 		focusedMetadata,
-		allOptions: allOptions[1],
+		allOptions: optionsOfMetadata.options,
 		navigation: {
-			nextImage,
-			prevImage,
-			currentImageIndex,
-			totalImages: images.length,
-			classifiedImagesCount,
+			nextObservation: nextObs,
+			prevObservation: prevObs,
+			currentObservationIndex: currentObsIndex,
+			totalObservations: allObservations.length,
+			classifiedObservationsCount,
 			confirmedClassificationsCount,
-			nextUnconfirmedImage
+			nextUnconfirmedObservation
 		}
 	};
 }

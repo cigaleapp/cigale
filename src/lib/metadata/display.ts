@@ -11,10 +11,10 @@ import { round } from '$lib/utils';
  * @param metadataOptions
  * @returns
  */
-export async function addValueLabels(
+export function addValueLabels(
 	values: DB.MetadataValues,
-	metadataOptions: Record<string, Record<string, DB.MetadataEnumVariant>>
-): Promise<Record<string, DB.MetadataValue & { valueLabel?: string }>> {
+	metadataOptions: Record<string, Record<string, Pick<DB.MetadataEnumVariant, 'key' | 'label'>>>
+): Record<string, DB.MetadataValue & { valueLabel?: string }> {
 	return Object.fromEntries(
 		Object.entries(values).map(([key, value]) => {
 			const opts = metadataOptions[key];

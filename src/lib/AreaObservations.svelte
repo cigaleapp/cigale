@@ -36,7 +36,8 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 	import { deleteObservation } from './observations.js';
 	import { cancelTask } from './queue.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
-	import { toasts } from './toasts.svelte';
+	import { toasts } from './toasts.svelte.js';
+	import { tooltip } from './tooltips.js';
 	import { compareBy, entries } from './utils.js';
 
 	/**
@@ -273,6 +274,7 @@ The zone where dragging can be performed is defined by the _parent element_ of t
 				>
 					{#if label}
 						<header
+							use:tooltip={isDebugMode() ? `sort key = ${sortKey}` : undefined}
 							aria-expanded={!collapsedGroups.has(sortKey)}
 							aria-controls="{componentId}-group-{sortKey}"
 						>

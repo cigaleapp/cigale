@@ -24,7 +24,6 @@
 	import IconRevert from '~icons/ri/reset-left-fill';
 	import IconToolDragCrop from '~icons/ri/shape-2-line';
 	import IconNeuralNet from '~icons/ri/sparkling-line';
-	import { page } from '$app/state';
 	import {
 		boundingBoxIsNonZero,
 		coordsAreEqual,
@@ -45,7 +44,6 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import {
 		deleteImageFile,
-		imageId,
 		imageIdToFileId,
 		imagesOfImageFile,
 		imageId as makeImageId,
@@ -80,14 +78,10 @@
 
 	navbarAppearance('hidden');
 
-	const { data } = $props();
+	const { data, params } = $props();
 	const { sortedFileIds } = $derived(data);
 
-	// TODO figure out why the [image] route param is nullable
-	const fileId = $derived(page.params.image || '');
-	const openedFromImage = $derived(
-		page.params.from ? imageId(fileId, Number(page.params.from)) : undefined
-	);
+	const fileId = $derived(params.image);
 
 	const images = $derived(
 		imagesOfImageFile(
@@ -172,7 +166,13 @@
 
 	let activeTool = $derived(tools.find(({ name }) => name === activeToolName) || tools[0]);
 
-	let focusedImageId = $state('');
+	let focusedImageId = $derived(
+		params.from
+			? idb.tables.Observation.getFromState(params.from)?.images.find(
+					(i) => i.fileId === params.image
+				)
+			: ''
+	);
 
 	/**
 	 * @type {Record<string, RuntimeValue<'boundingbox'>>}
@@ -631,8 +631,8 @@
 
 	function exit() {
 		uiState.imagePreviouslyOpenedInCropper = fileId;
-		if (openedFromImage) {
-			goto('/(app)/(sidepanel)/classify/[image]', { image: openedFromImage });
+		if (params.from) {
+			goto('/(app)/(sidepanel)/classify/[observation]', { observation: params.from });
 		} else {
 			goto('/crop');
 		}
@@ -965,7 +965,7 @@
 	<aside class="info">
 		<section class="top">
 			<section class="preactions">
-				{#if openedFromImage}
+				{#if params.from}
 					<ButtonInk
 						inline
 						onclick={exit}
@@ -1320,6 +1320,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5em;
+		font-size: 0.9em;
 	}
 
 	.info h1 {

@@ -9,6 +9,7 @@ import {
 	isSessionDependentReactiveTable,
 	Tables
 } from './database.js';
+import { nonnull } from './utils.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =
@@ -86,6 +87,11 @@ function wrangler(table) {
 				_tablesState[table] = await this.list();
 			}
 		},
+		/** @param {string[]} keys */
+		getMany: async (keys) =>
+			Promise.all(keys.map((key) => get(table, key))).then((results) =>
+				results.filter(nonnull)
+			),
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
 		/** @param {string} key */

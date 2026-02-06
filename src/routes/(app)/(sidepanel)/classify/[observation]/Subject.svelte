@@ -1,40 +1,40 @@
 <script lang="ts">
 	import IconZoomIn from '~icons/ri/zoom-in-line';
 	import IconZoomOut from '~icons/ri/zoom-out-line';
-	import { toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
+	import { FULL_IMAGE_CROPBOX, toTopLeftCoords } from '$lib/BoundingBoxes.svelte';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
+	import Carousel, { type Props as CarouselProps } from '$lib/Carousel.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
 	import type { Image } from '$lib/database';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte';
 	import { uiState } from '$lib/state.svelte';
 
-	import type { Expandable } from './+page@(app).svelte';
+	import type { Expandable } from './+page.svelte';
 	import WithExpandButton from './WithExpandButton.svelte';
 
 	interface Props {
-		image: Image;
+		images: Image[];
+		currentImage: Image;
 		expand: Expandable;
 	}
 
-	let { image, expand = $bindable() }: Props = $props();
+	let { images, currentImage = $bindable(), expand = $bindable() }: Props = $props();
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
 	let zoomed = $state(true);
 	let transitionCrop = $state(false);
-
-	const box = $derived(
-		zoomed
-			? uiState.cropMetadataValueOf(image)?.value
-			: {
-					w: 1,
-					h: 1,
-					x: 0.5,
-					y: 0.5
-				}
-	);
+	let carouselScrollers: CarouselProps['scrollers'] = $state();
 
 	defineKeyboardShortcuts('classification', {
+		ArrowRight: {
+			help: 'Image suivante',
+			do: () => carouselScrollers?.next()
+		},
+		ArrowLeft: {
+			help: 'Image précédente',
+			do: () => carouselScrollers?.prev()
+		},
 		O: {
 			help: "Agrandir/Réduire l'image",
 			do() {
@@ -81,17 +81,28 @@
 		</ButtonIcon>
 	{/snippet}
 
-	{#if box}
-		<CroppedImg
-			dimensions={image.dimensions}
-			src={uiState.getPreviewURL(image.fileId)}
-			box={toTopLeftCoords(box)}
-			transitions={transitionCrop}
-			background
-		/>
-	{:else}
-		<picture><img src={uiState.getPreviewURL(image.fileId)} alt="" /></picture>
-	{/if}
+	<Carousel
+		items={images}
+		bind:scrollers={carouselScrollers}
+		bind:currentItem={currentImage}
+		keyboard-prev="ArrowLeft"
+		keyboard-next="ArrowRight"
+	>
+		{#snippet item(image)}
+			{@const box = zoomed ? uiState.cropMetadataValueOf(image)?.value : FULL_IMAGE_CROPBOX}
+			{#if box}
+				<CroppedImg
+					dimensions={image.dimensions}
+					src={uiState.getPreviewURL(image.fileId)}
+					box={toTopLeftCoords(box)}
+					transitions={transitionCrop}
+					background
+				/>
+			{:else}
+				<picture><img src={uiState.getPreviewURL(image.fileId)} alt="" /></picture>
+			{/if}
+		{/snippet}
+	</Carousel>
 </WithExpandButton>
 
 <style>

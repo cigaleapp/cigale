@@ -2,10 +2,15 @@
 	export interface Props<T = unknown> {
 		items: T[];
 		item: Snippet<[T]>;
+		currentItem?: T;
 		scrollers?: {
 			next: () => void;
 			prev: () => void;
 		};
+		/** Show keyboard shortcuts on the next button's tooltip */
+		'keyboard-next'?: string;
+		/** Show keyboard shortcuts on the previous button's tooltip */
+		'keyboard-prev'?: string;
 	}
 </script>
 
@@ -19,12 +24,16 @@
 
 	import ButtonIcon from './ButtonIcon.svelte';
 
-	let { item: itemSnippet, items, scrollers = $bindable() }: Props<T> = $props();
+	let { item: itemSnippet, items, scrollers = $bindable(), currentItem = $bindable(), 'keyboard-next': keyboardNext, 'keyboard-prev': keyboardPrev }: Props<T> = $props();
 
 	let canScrollNext = $state(true);
 	let canScrollPrev = $state(false);
 	let currentIndex = $state(0);
 	let carousel: EmblaCarouselType | undefined = $state();
+
+	$effect(() => {
+		currentItem = items[currentIndex];
+	})
 
 	$effect(() => {
 		if (!carousel) return;
@@ -52,6 +61,7 @@
 			<nav>
 				<ButtonIcon
 					help="Image précédente"
+					keyboard={keyboardPrev ?? ""}
 					class="embla__prev"
 					disabled={!canScrollPrev}
 					onclick={() => {
@@ -74,7 +84,8 @@
 				</div>
 				<ButtonIcon
 					help="Image suivante"
-					class="embla_next"
+					keyboard={keyboardNext ?? ""}
+					class="embla__next"
 					disabled={!canScrollNext}
 					onclick={() => {
 						carousel?.scrollNext();
@@ -139,6 +150,7 @@
 		padding-top: 2em;
 		z-index: 10;
 		width: 100%;
+		--fg: white;
 		background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
 	}
 

@@ -376,7 +376,7 @@ if (import.meta.vitest) {
 
 /**
  *
- * @param {Image[]} images
+ * @param {Array<Pick<Image, "fileId">>} images
  * @returns {string[]}
  */
 export function imageFileIds(images) {
