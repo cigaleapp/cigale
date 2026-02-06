@@ -111,7 +111,7 @@ jobs:
     with: 
       artifact: head-bundle-analysis
       subdomain: pr-${{ github.event.pull_request.number }}-reports
-      path: bundlesize
+      path: /bundlesize
       environment: "#${{ github.event.pull_request.number }}: Bundle breakdown"
 
           
