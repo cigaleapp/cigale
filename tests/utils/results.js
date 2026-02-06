@@ -68,7 +68,7 @@ export async function exportResults(
 		)
 		.click();
 
-	await page.getByRole('button', { name: 'results.zip' }).click();
+	await page.getByRole('button', { name: 'Archive ZIP' }).click();
 	const download = await page.waitForEvent('download');
 	expect(download.suggestedFilename()).toBe('results.zip');
 	const saveAs = `./tests/results/${destination}.zip`;

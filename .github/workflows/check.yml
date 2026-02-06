@@ -80,6 +80,7 @@ jobs:
     needs: test
     name: Bundle size
     uses: ./.github/workflows/bundlesize.yml
+    secrets: inherit
 
   preview:
     if: github.event_name == 'pull_request'

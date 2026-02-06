@@ -92,23 +92,30 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 			iconsToPreload: 'string[]'
 		})
 	},
-	generateResultsZip: {
+	/**
+	 * Returns ZIP bytes (if format is zip)
+	 * or a series of writeFile events (if format is folder)
+	 */
+	generateResultsExport: {
 		input: type({
+			/** ID of the session */
 			sessionId: 'string',
 			include: type.enumerated('croppedonly', 'full', 'metadataonly'),
 			cropPadding: /^\d+(px|%)$/,
-			jsonSchemaURL: 'string.url.parse'
+			jsonSchemaURL: 'string.url.parse',
+			format: '"zip" | "folder"'
 		}),
-		progress: type
-			.or(
-				{ progress: 'number' },
-				{ warning: type.or(['"exif-write-error"', { filename: 'string' }]) }
-			)
-			.pipe((o) =>
-				'progress' in o
-					? { progress: o.progress, warning: undefined }
-					: { progress: undefined, warning: o.warning }
-			),
+		progress: type.or(
+			{ event: '"progress"', data: 'number' },
+			{ event: '"warning"', data: type.or(['"exif-write-error"', { filename: 'string' }]) },
+			{
+				event: '"writeFile"',
+				data: {
+					filepath: 'string',
+					contents: type.or('string', ['instanceof', Uint8Array])
+				}
+			}
+		),
 		success: type('ArrayBuffer')
 	},
 	previewResultsZip: {

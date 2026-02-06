@@ -11,12 +11,20 @@ import { analyzer } from 'vite-bundle-analyzer';
 import crossOriginIsolation from 'vite-plugin-cross-origin-isolation';
 import { defineConfig } from 'vitest/config';
 
-const env = arkenv({
-	GITHUB_ACTIONS: 'boolean = false',
-	BUNDLE_ANALYZER: type.enumerated('json', 'server', 'static', 'disabled').default('disabled'),
-	VITEST: 'boolean = false',
-	DEBUG: 'boolean = false'
-});
+const env = arkenv(
+	{
+		GITHUB_ACTIONS: 'boolean = false',
+		BUNDLE_ANALYZER: type
+			.enumerated('json', 'server', 'static')
+			.array()
+			.default(() => []),
+		VITEST: 'boolean = false',
+		DEBUG: 'boolean = false'
+	},
+	{
+		arrayFormat: 'comma'
+	}
+);
 
 const prNumber = process.env.PR_NUMBER ? parseInt(process.env.PR_NUMBER, 10) : undefined;
 
@@ -69,10 +77,11 @@ export default defineConfig({
 		}
 	},
 	plugins: [
-		analyzer(
-			env.BUNDLE_ANALYZER === 'disabled'
-				? { enabled: false }
-				: { analyzerMode: env.BUNDLE_ANALYZER }
+		...env.BUNDLE_ANALYZER.map((mode) =>
+			analyzer({
+				analyzerMode: mode,
+				openAnalyzer: false
+			})
 		),
 		icons({
 			compiler: 'svelte',

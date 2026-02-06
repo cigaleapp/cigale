@@ -131,7 +131,7 @@ test.describe('correct results.zip', () => {
 	test('exporting does not fail', async ({ page, app }) => {
 		await app.tabs.go('results');
 		await page.getByText(/et images originales/i).click();
-		await page.getByRole('button', { name: 'results.zip' }).click();
+		await page.getByRole('button', { name: 'Archive ZIP' }).click();
 		const download = await page.waitForEvent('download');
 		expect(download.suggestedFilename()).toBe('results.zip');
 
@@ -291,8 +291,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page, a
 	await app.tabs.go('import');
 	await importPhotos({ page }, '20K-gray.jpeg');
 	await app.loading.wait();
-	await app.tooltips.expectContent(
-		firstObservationCard(page),
+	await expect(firstObservationCard(page)).toHaveTooltip(
 		/L'image est trop grande pour être traitée/
 	);
 });

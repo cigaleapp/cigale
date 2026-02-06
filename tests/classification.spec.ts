@@ -114,7 +114,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				await ex(prev).toBeDisabled();
 				await ex(next).not.toBeDisabled();
 
-				await ex(await app.tooltips.trigger(next)).toHaveText(
+				await ex(next).toHaveTooltip(
 					// [A-Z] is the keybind hint
 					/^\s*Dicyrtomina saundersi [A-Z]\s*$/
 				);

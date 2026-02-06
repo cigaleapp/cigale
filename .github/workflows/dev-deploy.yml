@@ -37,7 +37,7 @@ on:
         required: true
       path:
         type: string
-        description: Path to put the contents at
+        description: Path to put the contents at. Must start with a slash
         required: true
       live-check:
         type: boolean
