@@ -230,7 +230,7 @@
 						ondoubleclick={() => {
 							const imageIds = observation.images;
 							if (imageIds.length !== 1) return;
-							goto('/(app)/(sidepanel)/classify/[image]', { image: imageIds[0] });
+							goto('/(app)/(sidepanel)/classify/[observation]', { observation: imageIds[0] });
 						}}
 						onretry={() => {
 							uiState.erroredImages.delete(id);
@@ -254,7 +254,7 @@
 						{image}
 						boxes="apply-first"
 						ondoubleclick={() => {
-							goto('/(app)/(sidepanel)/classify/[image]', { image: image.id });
+							goto('/(app)/(sidepanel)/classify/[observation]', { observation: image.id });
 						}}
 					/>
 				{/if}

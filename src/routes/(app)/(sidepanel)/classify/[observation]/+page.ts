@@ -35,7 +35,7 @@ export async function load({ params, depends, parent }) {
 		];
 	}
 
-	const image = await tables.Image.get(params.image);
+	const image = await tables.Image.get(params.observation);
 	if (!image) error(404, 'Image introuvable');
 
 	depends(dependencyURI('Image', image.id));

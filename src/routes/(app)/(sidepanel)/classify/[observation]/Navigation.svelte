@@ -45,8 +45,8 @@
 
 	async function goToImage(image: { id: string } | undefined | null) {
 		if (!image) return;
-		await goto('/(app)/(sidepanel)/classify/[image]', {
-			image: image.id
+		await goto('/(app)/(sidepanel)/classify/[observation]', {
+			observation: image.id
 		});
 	}
 
