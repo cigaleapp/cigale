@@ -15,16 +15,12 @@
 			"query": "repo:${owner}/${repository} milestone:\"Terraforma: Échéance 1\" state:open"
 		},
 		{
-			"label": "Created Issues",
-			"query": "author:${user} state:open repo:${owner}/${repository} sort:created-desc"
+			"label": "All Issues",
+			"query": "repo:${owner}/${repository} state:open sort:created-desc"
 		},
 		{
 			"label": "No milestone",
 			"query": "repo:${owner}/${repository} state:open no:milestone no:parent-issue"
 		},
-		{
-			"label": "All Issues",
-			"query": "repo:${owner}/${repository} state:open sort:created-desc"
-		}
 	]
 }
