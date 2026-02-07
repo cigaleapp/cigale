@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 
 import { Dimensions, ID, References } from './common.js';
-import { MetadataValues } from './metadata.js';
+import { MetadataErrors, MetadataValues } from './metadata.js';
 
 export const Image = type({
 	id: /\d+(_\d+)*/,
@@ -9,6 +9,7 @@ export const Image = type({
 	addedAt: 'string.date.iso.parse',
 	dimensions: Dimensions,
 	metadata: MetadataValues,
+	metadataErrors: MetadataErrors.default(() => ({})),
 	contentType: /\w+\/\w+/,
 	fileId: ID.or('null').describe("ID vers l'objet ImageFile associé"),
 	sessionId: ID.describe('ID de la session à laquelle cette image appartient'),
@@ -22,5 +23,6 @@ export const Observation = type({
 	label: 'string',
 	addedAt: 'string.date.iso.parse',
 	metadataOverrides: MetadataValues,
+	metadataErrors: MetadataErrors.default(() => ({})),
 	images: References
 });
