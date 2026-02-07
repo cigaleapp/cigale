@@ -31,7 +31,6 @@
 	import { toasts } from '$lib/toasts.svelte';
 	import { tooltip } from '$lib/tooltips.js';
 	import { slugify } from '$lib/utils';
-	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
 	import ModalDeleteProtocol from '../ModalDeleteProtocol.svelte';
 	import { updater } from './updater.svelte';
@@ -49,7 +48,6 @@
 
 	let collapsedSidebar = $state(false);
 
-	navbarAppearance('hidden');
 
 	/**
 	 * Available route IDs relative to here.

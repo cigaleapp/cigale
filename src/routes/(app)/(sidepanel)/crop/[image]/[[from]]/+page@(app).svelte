@@ -70,13 +70,11 @@
 	import { tooltip } from '$lib/tooltips';
 	import { undo } from '$lib/undo.svelte';
 	import { clamp, fromEntries, mapValues, nonnull, pick, range, sign } from '$lib/utils';
-	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
 	/**
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
 	 */
 
-	navbarAppearance('hidden');
 
 	const { data, params } = $props();
 	const { sortedFileIds } = $derived(data);
