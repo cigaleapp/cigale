@@ -9,7 +9,7 @@ import {
 	isSessionDependentReactiveTable,
 	Tables
 } from './database.js';
-import { nonnull } from './utils.js';
+import { nonnull, safeJSONStringify } from './utils.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =
@@ -126,7 +126,7 @@ function wrangler(table) {
 		 * @returns {Promise<boolean>} true if the item was found and updated, false otherwise
 		 */
 		async update(key, property, value) {
-			const logLabel = `upd ${table} ${key} ${typeof property === 'string' ? property : '<Symbol>'} = ${value}`;
+			const logLabel = `upd ${table} ${key} ${typeof property === 'string' ? property : '<Symbol>'} = ${typeof value === 'object' ? safeJSONStringify(value) : value}`;
 
 			// Get item from DB
 			const item = await this.raw.get(key);
