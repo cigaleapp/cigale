@@ -290,14 +290,14 @@ test.describe('full-screen classification view', pr(1071), () => {
 				await ex(selectedOption).toHaveText('21%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
 
-				await navigation.getByRole('button', { name: 'Image suivante' }).click();
-				await navigation.getByRole('button', { name: 'Image suivante' }).click();
+				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
+				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
 				await ex(title).toHaveAccessibleName('with-exif-gps');
 				await ex(selectedOption).toHaveText('--%');
 
-				await navigation.getByRole('button', { name: 'Image précédente' }).click();
-				await navigation.getByRole('button', { name: 'Image précédente' }).click();
-				await navigation.getByRole('button', { name: 'Image précédente' }).click();
+				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
+				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
+				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
 				await ex(title).toHaveAccessibleName('lil-fella');
 				await ex(selectedOption).toHaveText('32%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
@@ -393,6 +393,53 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await assertDatabaseConfirmedStatus(withExifGps.id, true);
 
 		await app.path.wait('/results');
+	});
+
+	// TODO: revisit once https://github.com/cigaleapp/cigale/issues/1191 is closed
+	test('handles merged observations', async ({ page, app }) => {
+		await page.keyboard.press('Escape');
+		await app.path.wait('/classify');
+
+		await page.keyboard.down('Control');
+		await page.getByRole('article', { name: 'cyan' }).click();
+		await page.getByRole('article', { name: 'leaf' }).click();
+		await page.keyboard.up('Control');
+
+		await page.getByRole('button', { name: 'Regrouper' }).click();
+
+		await expect(page.getByRole('article', { name: 'leaf' })).not.toBeVisible();
+
+		await page.getByRole('article', { name: 'cyan' }).dblclick();
+
+		await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
+
+		const ex = expect.soft;
+
+		await ex(page.getByTestId('focused-option').getByText('21%')).toBeVisible();
+		await ex(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
+			'Orchesella cincta'
+		);
+
+		await page.getByRole('button', { name: 'Option suivante' }).click();
+
+		await ex(page.getByTestId('focused-option').getByText('16%')).toBeVisible();
+		await ex(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
+			'Tomocerus vulgaris'
+		);
+
+		// Can flip through the observation's images
+		const subject = page.getByTestId('subject');
+
+		await ex(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
+		await ex(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
+
+		await subject.getByRole('button', { name: 'Image suivante' }).click();
+		await ex(subject).toBeOnSlide('leaf.jpeg (2 sur 2)');
+		await ex(subject.getByRole('img', { name: 'leaf.jpeg' })).toBeInViewport();
+
+		await subject.getByRole('button', { name: 'Image précédente' }).click();
+		await ex(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
+		await ex(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
 	});
 });
 

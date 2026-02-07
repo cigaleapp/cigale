@@ -52,6 +52,7 @@
 	>
 		<Carousel
 			items={images ?? [image]}
+			slideName={(_, i) => `Image de référence ${i+1} sur ${images?.length ?? 1}`}
 			bind:scrollers={carouselScrollers}
 			keyboard-prev="Shift+J"
 			keyboard-next="Shift+L"

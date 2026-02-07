@@ -83,6 +83,7 @@
 
 	<Carousel
 		items={images}
+		slideName={(img, i) => `${img.filename} (${i + 1} sur ${images.length})`}
 		bind:scrollers={carouselScrollers}
 		bind:currentItem={currentImage}
 		keyboard-prev="ArrowLeft"
@@ -94,6 +95,7 @@
 				<CroppedImg
 					dimensions={image.dimensions}
 					src={uiState.getPreviewURL(image.fileId)}
+					alt={image.filename}
 					box={toTopLeftCoords(box)}
 					transitions={transitionCrop}
 					background
