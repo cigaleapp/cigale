@@ -6,7 +6,7 @@
 	import Logo from '$lib/Logo.svelte';
 	import { uiState } from '$lib/state.svelte';
 
-	import type { Expandable } from './+page@(app).svelte';
+	import type { Expandable } from './+page.svelte';
 	import WithExpandButton from './WithExpandButton.svelte';
 
 	interface Props {
@@ -50,7 +50,13 @@
 			}
 		}
 	>
-		<Carousel items={images ?? [image]} bind:scrollers={carouselScrollers}>
+		<Carousel
+			items={images ?? [image]}
+			slideName={(_, i) => `Image de référence ${i+1} sur ${images?.length ?? 1}`}
+			bind:scrollers={carouselScrollers}
+			keyboard-prev="Shift+J"
+			keyboard-next="Shift+L"
+		>
 			{#snippet item(src)}
 				{#if src && page.url.hostname === 'localhost'}
 					<img src="https://cors.gwen.works/{src}" />

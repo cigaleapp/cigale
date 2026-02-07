@@ -16,11 +16,11 @@
 	import LearnMoreLink from '$lib/LearnMoreLink.svelte';
 	import { getMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
+	import { observationMetadata } from '$lib/observations';
 	import { scrollfader } from '$lib/scrollfader';
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
 	import { undo } from '$lib/undo.svelte';
-	import { navbarAppearance } from '$routes/(app)/+layout.svelte';
 
 	import Header from './Header.svelte';
 	import LayoutSwitcher from './LayoutSwitcher.svelte';
@@ -29,23 +29,37 @@
 	import References from './References.svelte';
 	import Subject from './Subject.svelte';
 
-	navbarAppearance('hidden');
-
 	const { data } = $props();
-	const { image, imageNo, navigation, focusedMetadata, allOptions: options } = $derived(data);
+	const {
+		observation,
+		images,
+		navigation,
+		focusedMetadata,
+		metadataDefinitions,
+		allOptions: options
+	} = $derived(data);
 
 	const cascadeLabelsCache: CascadeLabelsCache = $state({});
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
-	const currentMetadataValue = $derived(
-		image && focusedMetadata ? getMetadataValue(image, 'enum', focusedMetadata.id) : undefined
-	);
+	const currentMetadataValue = $derived.by(() => {
+		if (!observation) return undefined;
+		if (!focusedMetadata) return undefined;
 
-	const option = $derived(options.find((o) => o.key === currentMetadataValue?.value));
+		const metadata = observationMetadata({
+			definitions: metadataDefinitions,
+			observation,
+			images
+		});
+		return getMetadataValue({ metadata }, 'enum', focusedMetadata.id);
+	});
+
+	const option = $derived(options.find((o) => o.key === currentMetadataValue?.value?.toString()));
 
 	let expand = $state<Expandable>('none');
 	let layoutTransitions = $state(true);
+	let currentImage = $state(images[0]);
 
 	undo.initialize(100);
 
@@ -65,13 +79,13 @@
 		{/if}
 	</div>
 	<div class="subject" {@attach area('subject')} in:fade={{ duration: 200 }}>
-		{#if image}
-			<Subject {image} bind:expand />
+		{#if observation}
+			<Subject {images} bind:expand bind:currentImage />
 		{/if}
 	</div>
 	<div class="panel" {@attach area('panel')}>
 		<div class="header" {@attach area('header')}>
-			<Header {image} {imageNo} {focusedMetadata} />
+			<Header {observation} {focusedMetadata} {currentImage} />
 		</div>
 
 		<div class="layout-switcher" {@attach area('layout-switcher')}>
@@ -83,8 +97,8 @@
 		</div>
 
 		<div class="focused-option" {@attach area('focused-option')} in:fade={{ duration: 200 }}>
-			{#if image && focusedMetadata}
-				<OptionBar {options} {image} {focusedMetadata} {currentMetadataValue} />
+			{#if observation && focusedMetadata}
+				<OptionBar {options} {observation} {focusedMetadata} {currentMetadataValue} />
 			{/if}
 		</div>
 
@@ -154,7 +168,7 @@
 		{/if}
 
 		<div class="nav" {@attach area('nav')}>
-			<Navigation {...navigation} {focusedMetadata} currentImage={image} />
+			<Navigation {...navigation} {focusedMetadata} currentObservation={observation} />
 		</div>
 	</div>
 </main>

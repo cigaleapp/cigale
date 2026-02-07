@@ -249,18 +249,19 @@
 		{/if}
 		{#if page.route.id === '/(app)/(sidepanel)/classify'}
 			<ButtonSecondary
-				disabled={images.length !== 1}
+				disabled={!singleObservationSelected}
 				loading
 				onclick={async () => {
-					const [image] = images;
-					if (!image) return;
-					await goto('/(app)/(sidepanel)/classify/[image]', { image: image.id });
+					if (!singleObservationSelected) return;
+					await goto('/(app)/(sidepanel)/classify/[observation]', {
+						observation: singleObservationSelected.id
+					});
 				}}
 			>
 				<IconFullScreen />
 				Ouvrir en plein écran
-				{#if images.length > 1}
-					&nbsp;(sélectionnez une seule image)
+				{#if !singleObservationSelected}
+					&nbsp;(sélectionnez une seule observation)
 				{:else}
 					<KeyboardHint shortcut="$mod+Enter" />
 				{/if}

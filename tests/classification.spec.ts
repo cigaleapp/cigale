@@ -10,6 +10,7 @@ import {
 	importPhotos,
 	loadDatabaseDump,
 	newSession,
+	observationsByLabel,
 	setInferenceModels
 } from './utils/index.js';
 
@@ -81,7 +82,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.db.refresh();
 
 		await firstObservationCard(page).dblclick();
-		await app.path.wait(`/classify/${lilFella.images[0]}`);
+		await app.path.wait(`/classify/${lilFella.id}`);
 	});
 
 	for (const switchLayout of [false, true]) {
@@ -95,14 +96,12 @@ test.describe('full-screen classification view', pr(1071), () => {
 			test('displays the correct information', async ({ page, app }) => {
 				const lilFella = await app.db.observation.byLabel('lil-fella');
 				if (!lilFella) throw new Error('Missing lil-fella observation in database dump');
-				const image = await app.db.image.byId(lilFella.images[0]);
-				if (!image) throw new Error('Missing lil-fella first image in database dump');
 
 				const panel = page.getByTestId('panel');
 				const option = panel.getByTestId('focused-option');
 
 				await ex(panel.getByRole('heading', { level: 1 })).toHaveAccessibleName(
-					`${image.filename} #1`
+					lilFella.label
 				);
 
 				await ex(option.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
@@ -165,13 +164,8 @@ test.describe('full-screen classification view', pr(1071), () => {
 				    - listitem: Entomobrya orcheselloides
 				`);
 				await ex(page.getByTestId('description')).toMatchAriaSnapshot(`
+				  - img
 				  - text: Description
-				  - paragraph:
-				    - text: A test description to test stuff out woooo here's some
-				    - strong: markdown
-				    - text: . I hope you get rendered into a
-				    - strong: HTML tag buddy! See you soon in a expect() call down there :p
-				  - strong
 				  - link "En savoir plus gbif.org":
 				    - /url: https://gbif.org/species/2120749
 				    - img
@@ -188,8 +182,8 @@ test.describe('full-screen classification view', pr(1071), () => {
 					confidencePercentage: number
 				) {
 					const { species } = await app.db.metadata.values({
-						image: 'lil-fella.jpeg',
-						protocolId: lightweightProtocol.id
+						protocolId: lightweightProtocol.id,
+						observation: 'lil-fella'
 					});
 
 					const expectedOption = lightweightProtocol.metadata[
@@ -198,12 +192,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 					ex(species).toBe(expectedOption.key);
 
-					const image = await app.db.image.byFilename('lil-fella.jpeg');
-					if (!image) throw new Error('Missing lil-fella image in database');
+					const confidence = (await app.db.observation.byLabel('lil-fella'))
+						?.metadataOverrides[`${lightweightProtocol.id}__species`]?.confidence;
 
-					ex(image.metadata[`${lightweightProtocol.id}__species`].confidence).toBeCloseTo(
-						confidencePercentage / 100
-					);
+					if (confidence === undefined)
+						throw new Error('Missing confidence value in database');
+
+					ex(confidence).toBeCloseTo(confidencePercentage / 100);
 				}
 
 				test('using the combobox', async ({ page, app }) => {
@@ -257,7 +252,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 				await page.getByRole('button', { name: 'Retour' }).click();
 
-				await app.path.wait('/(app)/(sidepanel)/classify/[image]');
+				await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
 				await ex(page).toHaveURL(url);
 			});
 
@@ -266,7 +261,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 					await page
 						.getByTestId('panel')
 						.getByTestId('header')
-						.getByRole('button', { name: 'Autres images' })
+						.getByRole('button', { name: 'Voir tout' })
 						.click();
 
 					await app.path.wait('/classify');
@@ -286,24 +281,24 @@ test.describe('full-screen classification view', pr(1071), () => {
 					.getByTestId('focused-option')
 					.getByTestId('current');
 
-				await ex(title).toHaveAccessibleName('lil-fella.jpeg #1');
+				await ex(title).toHaveAccessibleName('lil-fella');
 
 				// XXX: fore some reason, in E2E browsers only, this specific click goes two images forward
 				// await navigation.getByRole('button', { name: 'Image suivante' }).click();
 				await page.keyboard.press('Control+ArrowRight');
-				await ex(title).toHaveAccessibleName('leaf.jpeg #1');
+				await ex(title).toHaveAccessibleName('leaf');
 				await ex(selectedOption).toHaveText('21%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
 
-				await navigation.getByRole('button', { name: 'Image suivante' }).click();
-				await navigation.getByRole('button', { name: 'Image suivante' }).click();
-				await ex(title).toHaveAccessibleName('with-exif-gps.jpeg #1');
+				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
+				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
+				await ex(title).toHaveAccessibleName('with-exif-gps');
 				await ex(selectedOption).toHaveText('--%');
 
-				await navigation.getByRole('button', { name: 'Image précédente' }).click();
-				await navigation.getByRole('button', { name: 'Image précédente' }).click();
-				await navigation.getByRole('button', { name: 'Image précédente' }).click();
-				await ex(title).toHaveAccessibleName('lil-fella.jpeg #1');
+				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
+				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
+				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
+				await ex(title).toHaveAccessibleName('lil-fella');
 				await ex(selectedOption).toHaveText('32%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
 			});
@@ -314,13 +309,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 		const ex = expect.soft;
 
 		// eslint-disable-next-line prefer-const
-		let { leaf, lilFella, cyan, withExifGps } = await imagesByName(app);
+		let { leaf, lilFella, cyan, withExifGps } = await observationsByLabel(app);
 
-		async function assertDatabaseConfirmedStatus(imageId: string, confirmed: boolean) {
-			const image = await app.db.image.byId(imageId);
-			if (!image) throw new Error(`Missing image ${imageId} in database`);
+		async function assertDatabaseConfirmedStatus(observationId: string, confirmed: boolean) {
+			const observation = await app.db.observation.byId(observationId);
+			if (!observation) throw new Error(`Missing observation ${observationId} in database`);
 
-			const metadata = image.metadata[`${lightweightProtocol.id}__species`];
+			const metadata = observation.metadataOverrides[`${lightweightProtocol.id}__species`];
 
 			if (confirmed) {
 				ex(metadata).toHaveProperty('confirmed', true);
@@ -336,7 +331,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Initially
 
-		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
 		await ex(page.getByText('Classifications confirmées 0%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(lilFella.id, false);
 
@@ -345,7 +340,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await ex(confirmedCropOverlay(page)).toBeVisible();
 
-		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
 		await ex(page.getByText('Classifications confirmées 25%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(lilFella.id, true);
 
@@ -356,7 +351,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.keyboard.press('ArrowUp');
 		await ex(confirmedCropOverlay(page)).not.toBeVisible();
 
-		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
 		await ex(page.getByText('Classifications confirmées 50%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(leaf.id, true);
 
@@ -368,7 +363,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.keyboard.press('ArrowUp');
 		await ex(confirmedCropOverlay(page)).not.toBeVisible();
 
-		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
 		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(cyan.id, true);
 
@@ -379,7 +374,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.path.wait(`/classify/${withExifGps.id}`);
 		await page.keyboard.press('ArrowUp');
 
-		await ex(page.getByText('Images classifiées 75%')).toBeVisible();
+		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
 		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(withExifGps.id, false);
 
@@ -388,16 +383,63 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.getByTestId('current').getByRole('combobox').fill('Seira musarum');
 		await page.keyboard.press('Enter');
 		await page.getByTestId('current').getByRole('combobox').blur();
-		await ex(page.getByText('Images classifiées 100%')).toBeVisible();
+		await ex(page.getByText('Observations classifiées 100%')).toBeVisible();
 		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
 
-		// Now that all other images are classified, confirming should work
+		// Now that all other observations are classified, confirming should work
 
 		await page.getByRole('button', { name: 'Continuer' }).click();
 		await ex(confirmedCropOverlay(page)).toBeVisible();
 		await assertDatabaseConfirmedStatus(withExifGps.id, true);
 
 		await app.path.wait('/results');
+	});
+
+	// TODO: revisit once https://github.com/cigaleapp/cigale/issues/1191 is closed
+	test('handles merged observations', async ({ page, app }) => {
+		await page.keyboard.press('Escape');
+		await app.path.wait('/classify');
+
+		await page.keyboard.down('Control');
+		await page.getByRole('article', { name: 'cyan' }).click();
+		await page.getByRole('article', { name: 'leaf' }).click();
+		await page.keyboard.up('Control');
+
+		await page.getByRole('button', { name: 'Regrouper' }).click();
+
+		await expect(page.getByRole('article', { name: 'leaf' })).not.toBeVisible();
+
+		await page.getByRole('article', { name: 'cyan' }).dblclick();
+
+		await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
+
+		const ex = expect.soft;
+
+		await ex(page.getByTestId('focused-option').getByText('21%')).toBeVisible();
+		await ex(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
+			'Orchesella cincta'
+		);
+
+		await page.getByRole('button', { name: 'Option suivante' }).click();
+
+		await ex(page.getByTestId('focused-option').getByText('16%')).toBeVisible();
+		await ex(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
+			'Tomocerus vulgaris'
+		);
+
+		// Can flip through the observation's images
+		const subject = page.getByTestId('subject');
+
+		await ex(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
+		await ex(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
+
+		await subject.getByRole('button', { name: 'Image suivante' }).click();
+		await ex(subject).toBeOnSlide('leaf.jpeg (2 sur 2)');
+		await ex(subject.getByRole('img', { name: 'leaf.jpeg' })).toBeInViewport();
+
+		await subject.getByRole('button', { name: 'Image précédente' }).click();
+		await ex(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
+		await ex(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
 	});
 });
 

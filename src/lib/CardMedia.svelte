@@ -432,7 +432,7 @@
 
 	.errored-actions {
 		margin-top: 0.75em;
-		font-size: 0.4em;
+		font-size: 0.37em;
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;

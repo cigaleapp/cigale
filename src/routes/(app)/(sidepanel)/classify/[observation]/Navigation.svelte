@@ -3,58 +3,55 @@
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedClassification from '~icons/ri/check-double-line';
 	import IconClassified from '~icons/ri/check-line';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate, preloadData } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
-	import type { Image, Metadata } from '$lib/database';
+	import type { Metadata, Observation } from '$lib/database';
 	import { percent } from '$lib/i18n';
 	import { databaseHandle, dependencyURI } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import { storeMetadataValue } from '$lib/metadata/index.js';
-	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
 
 	interface Props {
-		currentImage: Image;
-		currentImageIndex: number;
-		totalImages: number;
-		nextImage: { id: string } | undefined | null;
-		prevImage: { id: string } | undefined | null;
-		classifiedImagesCount: number;
+		currentObservation: Observation;
+		currentObservationIndex: number;
+		totalObservations: number;
+		nextObservation: { id: string } | undefined | null;
+		prevObservation: { id: string } | undefined | null;
+		classifiedObservationsCount: number;
 		confirmedClassificationsCount: number;
-		nextUnconfirmedImage?: { id: string } | undefined | null;
+		nextUnconfirmedObservation?: { id: string } | undefined | null;
 		focusedMetadata: Metadata | undefined;
 	}
 
 	const {
-		currentImage,
-		currentImageIndex,
-		totalImages,
-		nextImage,
-		prevImage,
-		classifiedImagesCount,
+		currentObservation,
+		currentObservationIndex,
+		totalObservations,
+		nextObservation,
+		prevObservation,
+		classifiedObservationsCount,
 		confirmedClassificationsCount,
-		nextUnconfirmedImage,
+		nextUnconfirmedObservation,
 		focusedMetadata
 	}: Props = $props();
 
 	let showOverlay = $state(async () => {});
 
-	async function goToImage(image: { id: string } | undefined | null) {
-		if (!image) return;
-		await goto('/(app)/(sidepanel)/classify/[image]', {
-			image: image.id
+	function observationRoute(observation: { id: string }) {
+		return resolve('/(app)/(sidepanel)/classify/[observation]', {
+			observation: observation.id
 		});
 	}
 
-	const currently = $derived(currentImage.metadata[focusedMetadata?.id ?? '']);
+	const currently = $derived(currentObservation.metadataOverrides[focusedMetadata?.id ?? '']);
 
-	const allConfirmed = $derived(totalImages === confirmedClassificationsCount);
-
-	$inspect({ nextUnconfirmedImage });
+	const allConfirmed = $derived(totalObservations === confirmedClassificationsCount);
 
 	async function setConfirmation(confirmed: boolean) {
 		if (!focusedMetadata) return;
@@ -67,7 +64,7 @@
 				db: databaseHandle(),
 				metadataId: focusedMetadata.id,
 				sessionId: uiState.currentSessionId,
-				subjectId: currentImage.id,
+				subjectId: currentObservation.id,
 				...currently,
 				confirmed
 			});
@@ -75,34 +72,34 @@
 			if (!currently.confirmed && confirmed) await showOverlay();
 		}
 
-		await invalidate(dependencyURI('Image', currentImage.id));
+		await invalidate(dependencyURI('Observation', currentObservation.id));
 	}
 
 	async function confirmAndContinue() {
 		await setConfirmation(true);
-		if (nextUnconfirmedImage) {
-			await goToImage(nextUnconfirmedImage);
+		if (nextUnconfirmedObservation) {
+			await goto(observationRoute(nextUnconfirmedObservation));
 		} else if (allConfirmed) {
-			await goto('/results');
+			await goto(resolve('/results'));
 		}
 	}
 
 	defineKeyboardShortcuts('classification', {
 		'$mod+ArrowRight': {
-			help: 'Image suivante',
-			do: async () => goToImage(nextImage)
+			help: 'Observation suivante',
+			do: async () => nextObservation && goto(observationRoute(nextObservation))
 		},
 		Space: {
-			help: 'Marquer la classification comme confirmée et passer à la prochaine image non confirmée',
+			help: 'Marquer la classification comme confirmée et passer à la prochaine observation non confirmée',
 			do: async () => confirmAndContinue()
 		},
 		'$mod+ArrowLeft': {
-			help: 'Image précédente',
-			do: async () => goToImage(prevImage)
+			help: 'Observation précédente',
+			do: async () => prevObservation && goto(observationRoute(prevObservation))
 		},
 		'Shift+Space': {
-			help: 'Image précédente',
-			do: async () => goToImage(prevImage)
+			help: 'Observation précédente',
+			do: async () => prevObservation && goto(observationRoute(prevObservation))
 		}
 	});
 </script>
@@ -112,17 +109,17 @@
 <section class="progress">
 	{#snippet percentage(value: number)}
 		<code>
-			{percent(value / totalImages)}
+			{percent(value / totalObservations)}
 		</code>
 	{/snippet}
 
 	<div class="bar">
 		<p>
 			<IconClassified />
-			Images classifiées
-			{@render percentage(classifiedImagesCount)}
+			Observations classifiées
+			{@render percentage(classifiedObservationsCount)}
 		</p>
-		<ProgressBar alwaysActive progress={classifiedImagesCount / totalImages} />
+		<ProgressBar alwaysActive progress={classifiedObservationsCount / totalObservations} />
 	</div>
 	<div class="bar">
 		<p>
@@ -130,33 +127,43 @@
 			Classifications confirmées
 			{@render percentage(confirmedClassificationsCount)}
 		</p>
-		<ProgressBar alwaysActive progress={confirmedClassificationsCount / totalImages} />
+		<ProgressBar alwaysActive progress={confirmedClassificationsCount / totalObservations} />
 	</div>
 </section>
 
 <nav>
 	<div class="image-switcher">
 		<ButtonIcon
-			help="Image précédente"
+			help="Observation précédente"
 			keyboard="$mod+ArrowLeft"
-			disabled={!prevImage}
+			disabled={!prevObservation}
+			preload={() => {
+				if (!prevObservation) return;
+				void preloadData(observationRoute(prevObservation));
+			}}
 			onclick={async () => {
-				await goToImage(prevImage);
+				if (!prevObservation) return;
+				await goto(observationRoute(prevObservation));
 			}}
 		>
 			<IconPrev />
 		</ButtonIcon>
 		<code class="numbers">
-			{currentImageIndex + 1}
+			{currentObservationIndex + 1}
 			<div class="separator">⁄</div>
-			{totalImages}
+			{totalObservations}
 		</code>
 		<ButtonIcon
-			help="Image suivante"
+			help="Observation suivante"
 			keyboard="$mod+ArrowRight"
-			disabled={!nextImage}
+			disabled={!nextObservation}
+			preload={() => {
+				if (!nextObservation) return;
+				void preloadData(observationRoute(nextObservation));
+			}}
 			onclick={async () => {
-				await goToImage(nextImage);
+				if (!nextObservation) return;
+				await goto(observationRoute(nextObservation));
 			}}
 		>
 			<IconNext />

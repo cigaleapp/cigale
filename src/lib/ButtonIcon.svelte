@@ -12,6 +12,7 @@
 	 * @property {boolean} [disabled]
 	 * @property {boolean} [crossout] draw a diagonal line through the button's content
 	 * @property {boolean} [dangerous] style the button to indicate a dangerous action
+	 * @property {() => void} [preload] function to call on mouseover, useful for preloading the next page in a navigation button for instance
 	 * @property {Partial<import('$lib/tooltips.js').TooltipParameters>} [tooltipParams] additional params for the tooltip
 	 */
 
@@ -23,6 +24,7 @@
 		keyboard,
 		disabled,
 		crossout,
+		preload,
 		dangerous,
 		submits,
 		tooltipParams = {},
@@ -33,6 +35,7 @@
 <button
 	{disabled}
 	{onclick}
+	onmouseenter={() => preload?.()}
 	class:crossout
 	class:dangerous
 	use:tooltip={{ text: help, keyboard, ...tooltipParams }}

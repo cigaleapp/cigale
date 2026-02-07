@@ -3,16 +3,17 @@ import { METADATA_TYPES } from '$lib/schemas/metadata';
 import { mapEntries } from '$lib/utils';
 
 export const metadatas = {
-	integer: { id: 'metadata_integer', type: 'integer', options: [] },
-	float: { id: 'metadata_float', type: 'float', options: [] },
-	date: { id: 'metadata_date', type: 'date', options: [] },
-	string: { id: 'metadata_string', type: 'string', options: [] },
-	boolean: { id: 'metadata_boolean ', type: 'boolean', options: [] },
-	location: { id: 'metadata_location ', type: 'location', options: [] },
-	boundingbox: { id: 'metadata_boundingbox ', type: 'boundingbox', options: [] },
+	integer: { id: 'metadata_integer', type: 'integer', mergeMethod: 'average', options: [] },
+	float: { id: 'metadata_float', type: 'float', mergeMethod: 'average', options: [] },
+	date: { id: 'metadata_date', type: 'date', mergeMethod: 'average', options: [] },
+	string: { id: 'metadata_string', type: 'string', mergeMethod: 'none', options: [] },
+	boolean: { id: 'metadata_boolean ', type: 'boolean', mergeMethod: 'average', options: [] },
+	location: { id: 'metadata_location ', type: 'location', mergeMethod: 'average', options: [] },
+	boundingbox: { id: 'metadata_boundingbox ', type: 'boundingbox', mergeMethod: 'union', options: [] },
 	enum: {
 		id: 'metadata_enum ',
 		type: 'enum',
+		mergeMethod: 'max',
 		options: [
 			{ key: 'A', label: 'Option A', index: 1, synonyms: ['Option α'] },
 			{ key: 'B', label: 'Option B', index: 0, synonyms: ['Option β'] },
@@ -20,7 +21,7 @@ export const metadatas = {
 		]
 	}
 } as const satisfies {
-	[K in DB.MetadataType]: Pick<DB.Metadata, 'id' | 'type'> & {
+	[K in DB.MetadataType]: Pick<DB.Metadata, 'id' | 'type'| 'mergeMethod'> & {
 		options: DB.MetadataEnumVariant[];
 	};
 };
@@ -112,6 +113,7 @@ export const items: Array<{ id: string; metadata: DB.MetadataValues }> = [
 			{
 				value: v,
 				manuallyModified: false,
+				confirmed: false,
 				confidence: 1,
 				alternatives: {}
 			} satisfies DB.MetadataValue
