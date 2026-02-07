@@ -105,8 +105,6 @@
 		gap: 3em;
 	}
 
-	
-
 	h1 {
 		overflow: hidden;
 		display: flex;

@@ -9,7 +9,12 @@ export const metadatas = {
 	string: { id: 'metadata_string', type: 'string', mergeMethod: 'none', options: [] },
 	boolean: { id: 'metadata_boolean ', type: 'boolean', mergeMethod: 'average', options: [] },
 	location: { id: 'metadata_location ', type: 'location', mergeMethod: 'average', options: [] },
-	boundingbox: { id: 'metadata_boundingbox ', type: 'boundingbox', mergeMethod: 'union', options: [] },
+	boundingbox: {
+		id: 'metadata_boundingbox ',
+		type: 'boundingbox',
+		mergeMethod: 'union',
+		options: []
+	},
 	enum: {
 		id: 'metadata_enum ',
 		type: 'enum',
@@ -21,7 +26,7 @@ export const metadatas = {
 		]
 	}
 } as const satisfies {
-	[K in DB.MetadataType]: Pick<DB.Metadata, 'id' | 'type'| 'mergeMethod'> & {
+	[K in DB.MetadataType]: Pick<DB.Metadata, 'id' | 'type' | 'mergeMethod'> & {
 		options: DB.MetadataEnumVariant[];
 	};
 };

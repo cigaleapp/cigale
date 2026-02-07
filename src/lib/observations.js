@@ -211,40 +211,42 @@ export function observationMetadata({ definitions, observation, images }) {
 
 if (import.meta.vitest) {
 	const { describe, it, expect } = import.meta.vitest;
-	const {  metadatas, items, values } = await import('./metadata/_testdata.js')
+	const { metadatas, items, values } = await import('./metadata/_testdata.js');
 
 	/**
 	 * @type {DB.Image[]}
 	 */
-	const images = items.map(({id, metadata}) => ({
-		id, 
-		filename:  id + ".jpg",
+	const images = items.map(({ id, metadata }) => ({
+		id,
+		filename: id + '.jpg',
 		metadata,
 		sessionId: 'session1',
 		addedAt: new Date(),
 		boundingBoxesAnalyzed: true,
-		contentType: "image/jpeg",
+		contentType: 'image/jpeg',
 		dimensions: { width: 100, height: 100, aspectRatio: 1 },
 		fileId: 'file_' + id
-	}))
+	}));
 
 	describe('observationMetadata', () => {
 		it('merges metadata from images and observation overrides', () => {
 			const observation = {
-				images: items.slice(0, 2).map(({id}) => id),
+				images: items.slice(0, 2).map(({ id }) => id),
 				metadataOverrides: {
 					[metadatas.enum.id]: {
 						...items[0].metadata.enum,
 						value: 'A'
 					}
 				}
-			}
+			};
 
-			expect(observationMetadata({
-				definitions: Object.values(metadatas),
-				observation,
-				images,
-			})).toMatchInlineSnapshot(`
+			expect(
+				observationMetadata({
+					definitions: Object.values(metadatas),
+					observation,
+					images
+				})
+			).toMatchInlineSnapshot(`
 				{
 				  "metadata_date": {
 				    "alternatives": {},
@@ -274,7 +276,7 @@ if (import.meta.vitest) {
 				    "value": 10,
 				  },
 				}
-			`)
-		})
-	})
+			`);
+		});
+	});
 }

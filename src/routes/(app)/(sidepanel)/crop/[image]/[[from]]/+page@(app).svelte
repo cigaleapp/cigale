@@ -75,7 +75,6 @@
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
 	 */
 
-
 	const { data, params } = $props();
 	const { sortedFileIds } = $derived(data);
 

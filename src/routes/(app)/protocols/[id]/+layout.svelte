@@ -48,7 +48,6 @@
 
 	let collapsedSidebar = $state(false);
 
-
 	/**
 	 * Available route IDs relative to here.
 	 * @import { ChildRouteId, WithoutPrefix  } from '$lib/utils';
