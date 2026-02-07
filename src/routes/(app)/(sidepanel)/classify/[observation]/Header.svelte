@@ -46,7 +46,7 @@
 </script>
 
 <header>
-	<div class="line preactions">
+	<div class="line">
 		<ButtonInk inline href={resolve('/classify')}>
 			<IconGallery />
 			Voir tout
@@ -105,9 +105,7 @@
 		gap: 3em;
 	}
 
-	.preactions {
-		font-size: 0.9em;
-	}
+	
 
 	h1 {
 		overflow: hidden;

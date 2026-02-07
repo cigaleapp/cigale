@@ -1320,7 +1320,6 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5em;
-		font-size: 0.9em;
 	}
 
 	.info h1 {

@@ -3,16 +3,16 @@
 	import IconNext from '~icons/ri/arrow-right-s-line';
 	import IconConfirmedClassification from '~icons/ri/check-double-line';
 	import IconClassified from '~icons/ri/check-line';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate, preloadData } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import ConfirmedOverlay from '$lib/ConfirmedOverlay.svelte';
-	import type { Observation, Metadata } from '$lib/database';
+	import type { Metadata, Observation } from '$lib/database';
 	import { percent } from '$lib/i18n';
 	import { databaseHandle, dependencyURI } from '$lib/idb.svelte';
 	import { defineKeyboardShortcuts } from '$lib/keyboard.svelte.js';
 	import { storeMetadataValue } from '$lib/metadata/index.js';
-	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { toasts } from '$lib/toasts.svelte';
@@ -43,9 +43,8 @@
 
 	let showOverlay = $state(async () => {});
 
-	async function goToObservation(observation: { id: string } | undefined | null) {
-		if (!observation) return;
-		await goto('/(app)/(sidepanel)/classify/[observation]', {
+	function observationRoute(observation: { id: string }) {
+		return resolve('/(app)/(sidepanel)/classify/[observation]', {
 			observation: observation.id
 		});
 	}
@@ -79,16 +78,16 @@
 	async function confirmAndContinue() {
 		await setConfirmation(true);
 		if (nextUnconfirmedObservation) {
-			await goToObservation(nextUnconfirmedObservation);
+			await goto(observationRoute(nextUnconfirmedObservation));
 		} else if (allConfirmed) {
-			await goto('/results');
+			await goto(resolve('/results'));
 		}
 	}
 
 	defineKeyboardShortcuts('classification', {
 		'$mod+ArrowRight': {
 			help: 'Observation suivante',
-			do: async () => goToObservation(nextObservation)
+			do: async () => nextObservation && goto(observationRoute(nextObservation))
 		},
 		Space: {
 			help: 'Marquer la classification comme confirmée et passer à la prochaine observation non confirmée',
@@ -96,11 +95,11 @@
 		},
 		'$mod+ArrowLeft': {
 			help: 'Observation précédente',
-			do: async () => goToObservation(prevObservation)
+			do: async () => prevObservation && goto(observationRoute(prevObservation))
 		},
 		'Shift+Space': {
 			help: 'Observation précédente',
-			do: async () => goToObservation(prevObservation)
+			do: async () => prevObservation && goto(observationRoute(prevObservation))
 		}
 	});
 </script>
@@ -138,8 +137,13 @@
 			help="Observation précédente"
 			keyboard="$mod+ArrowLeft"
 			disabled={!prevObservation}
+			preload={() => {
+				if (!prevObservation) return;
+				void preloadData(observationRoute(prevObservation));
+			}}
 			onclick={async () => {
-				await goToObservation(prevObservation);
+				if (!prevObservation) return;
+				await goto(observationRoute(prevObservation));
 			}}
 		>
 			<IconPrev />
@@ -153,8 +157,13 @@
 			help="Observation suivante"
 			keyboard="$mod+ArrowRight"
 			disabled={!nextObservation}
+			preload={() => {
+				if (!nextObservation) return;
+				void preloadData(observationRoute(nextObservation));
+			}}
 			onclick={async () => {
-				await goToObservation(nextObservation);
+				if (!nextObservation) return;
+				await goto(observationRoute(nextObservation));
 			}}
 		>
 			<IconNext />

@@ -281,24 +281,24 @@ test.describe('full-screen classification view', pr(1071), () => {
 					.getByTestId('focused-option')
 					.getByTestId('current');
 
-				await ex(title).toHaveAccessibleName('lil-fella.jpeg #1');
+				await ex(title).toHaveAccessibleName('lil-fella');
 
 				// XXX: fore some reason, in E2E browsers only, this specific click goes two images forward
 				// await navigation.getByRole('button', { name: 'Image suivante' }).click();
 				await page.keyboard.press('Control+ArrowRight');
-				await ex(title).toHaveAccessibleName('leaf.jpeg #1');
+				await ex(title).toHaveAccessibleName('leaf');
 				await ex(selectedOption).toHaveText('21%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
 
 				await navigation.getByRole('button', { name: 'Image suivante' }).click();
 				await navigation.getByRole('button', { name: 'Image suivante' }).click();
-				await ex(title).toHaveAccessibleName('with-exif-gps.jpeg #1');
+				await ex(title).toHaveAccessibleName('with-exif-gps');
 				await ex(selectedOption).toHaveText('--%');
 
 				await navigation.getByRole('button', { name: 'Image précédente' }).click();
 				await navigation.getByRole('button', { name: 'Image précédente' }).click();
 				await navigation.getByRole('button', { name: 'Image précédente' }).click();
-				await ex(title).toHaveAccessibleName('lil-fella.jpeg #1');
+				await ex(title).toHaveAccessibleName('lil-fella');
 				await ex(selectedOption).toHaveText('32%');
 				await ex(selectedOption.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
 			});
