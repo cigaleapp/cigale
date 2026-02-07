@@ -44,14 +44,18 @@
 	});
 
 	$effect(() => {
-		function onSettle() {
+		function onSelect() {
 			canScrollPrev = carousel?.canScrollPrev() ?? false;
 			canScrollNext = carousel?.canScrollNext() ?? false;
 			currentIndex = carousel?.selectedScrollSnap() ?? 0;
 		}
 
-		carousel?.on('settle', onSettle);
-		return () => carousel?.off('settle', onSettle);
+		carousel?.on('settle', onSelect);
+		carousel?.on('select', onSelect);
+		return () => {
+			carousel?.off('settle', onSelect);
+			carousel?.off('select', onSelect);
+		};
 	});
 </script>
 
@@ -98,7 +102,7 @@
 		<div
 			class="embla__viewport"
 			use:embla={{
-				options: { duration: 15 }
+				options: { duration: 12 }
 			}}
 			onemblaInit={(event: CustomEvent) => {
 				carousel = event.detail;
