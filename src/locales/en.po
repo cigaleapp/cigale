@@ -2276,6 +2276,10 @@ msgstr ""
 msgid "<0/> Observations classifiées <1/>"
 msgstr ""
 
+#: src/routes/(app)/(sidepanel)/classify/[observation]/+page.ts
+msgid "Observation introuvable"
+msgstr ""
+
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
 msgstr ""
@@ -2296,8 +2300,4 @@ msgstr ""
 #. placeholder {0}: file.name
 #: src/lib/results.svelte.js
 msgid "Importée depuis {0}"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/classify/[observation]/+page.ts
-msgid "Observation introuvable"
 msgstr ""
