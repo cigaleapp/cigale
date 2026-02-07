@@ -15,8 +15,6 @@
 
 	const layout = $derived(uiState.currentSession?.fullscreenClassifier.layout ?? 'top-bottom');
 
-	const nextLayout = $derived(LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]);
-
 	let { toggleLayoutTransitions }: Props = $props();
 
 	async function cycleLayout() {
@@ -26,7 +24,7 @@
 
 		await tables.Session.update(uiState.currentSessionId, 'fullscreenClassifier', {
 			...uiState.currentSession?.fullscreenClassifier,
-			layout: nextLayout
+			layout: LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length]
 		});
 
 		await sleep(50);
