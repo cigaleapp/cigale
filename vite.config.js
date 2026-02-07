@@ -65,7 +65,7 @@ export default defineConfig({
 	resolve: env.VITEST ? { conditions: ['browser'] } : {},
 	assetsInclude: ['**/*.wasm'],
 	optimizeDeps: {
-		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress']
+		exclude: ['onnxruntime-web', 'turbo_exif', 'fetch-progress', 'libraw-wasm']
 	},
 	build: {
 		minify: !env.DEBUG,

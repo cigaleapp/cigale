@@ -1,4 +1,3 @@
-import path from 'node:path';
 import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations.js';
@@ -9,6 +8,7 @@ import {
 	chooseFirstSession,
 	entries,
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
 	importPhotos,
 	loadDatabaseDump,
@@ -41,13 +41,9 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 
 	await page.getByRole('button', { name: 'Autres photos Esc' }).click();
 
-	await app.tabs.go('results');
-
-	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
-
-	const resultsFilepath = path.resolve('./tests/results/crop-padding.zip');
-	await page.getByRole('button', { name: 'Archive ZIP' }).click();
-	await page.waitForEvent('download').then((e) => e.saveAs(resultsFilepath));
+	const resultsFilepath = await exportResults(page, 'crop-padding', {
+		cropPadding: '40px'
+	});
 
 	const zip = await yauzl.open(resultsFilepath);
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
