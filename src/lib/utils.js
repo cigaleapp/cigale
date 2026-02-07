@@ -1360,6 +1360,7 @@ export function isAbortError(error) {
 }
 
 /**
+ * [] if predicate is falsy, [obj] if predicate is truthy.
  * Spread into an array literal to conditionally add something to it
  * @template T
  * @param {boolean | undefined | null} predicate
@@ -1381,6 +1382,7 @@ if (import.meta.vitest) {
 }
 
 /**
+ * {} if predicate is falsy, obj if predicate is truthy.
  * Spread into an object literal to conditionally add something to it
  * @template T
  * @param {boolean | undefined | null} predicate

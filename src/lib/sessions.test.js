@@ -79,7 +79,7 @@ describe('deleteSession', () => {
 			dimensions: { width: 100, height: 100 },
 			fileId: 'file_image1',
 			addedAt: new Date().toISOString(),
-			metadata: {}
+			metadata: {},
 		});
 
 		await db.tables.Image.set({
@@ -90,7 +90,7 @@ describe('deleteSession', () => {
 			dimensions: { width: 100, height: 100 },
 			fileId: 'file_image2',
 			addedAt: new Date().toISOString(),
-			metadata: {}
+			metadata: {},
 		});
 
 		// Image from other session
@@ -103,7 +103,7 @@ describe('deleteSession', () => {
 			dimensions: { width: 100, height: 100 },
 			fileId: 'file_image3',
 			addedAt: '2025-12-09T11:57:15.440Z',
-			metadata: {}
+			metadata: {},
 		});
 
 		await db.tables.Observation.set({
@@ -112,7 +112,7 @@ describe('deleteSession', () => {
 			label: 'Observation 1',
 			images: [imgid('image1')],
 			addedAt: '2025-12-09T11:57:15.440Z',
-			metadataOverrides: {}
+			metadataOverrides: {},
 		});
 
 		await db.tables.Observation.set({
@@ -121,7 +121,7 @@ describe('deleteSession', () => {
 			label: 'Observation 2',
 			images: [imgid('image3')],
 			addedAt: '2025-12-09T11:57:15.440Z',
-			metadataOverrides: {}
+			metadataOverrides: {},
 		});
 	});
 
@@ -215,6 +215,7 @@ describe('deleteSession', () => {
 			    "filename": "image3.jpg",
 			    "id": "00000000000000000000IMAGE3_000000",
 			    "metadata": {},
+			    "metadataErrors": {},
 			    "sessionId": "session2",
 			  },
 			]
@@ -228,6 +229,7 @@ describe('deleteSession', () => {
 			      "00000000000000000000IMAGE3_000000",
 			    ],
 			    "label": "Observation 2",
+			    "metadataErrors": {},
 			    "metadataOverrides": {},
 			    "sessionId": "session2",
 			  },
