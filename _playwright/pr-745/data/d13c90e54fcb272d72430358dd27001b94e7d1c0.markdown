@@ -1,0 +1,466 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - dialog:
+    - banner:
+      - heading [level=1]: Raccourcis clavier
+      - button:
+        - img
+    - main:
+      - heading [level=2]: Observations
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: A
+        - definition: Tout sélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: D
+        - definition: Tout désélectionner
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: G
+        - definition: Fusionner des observations ou images
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: G
+        - definition: Séparer toutes les observations sélectionnées en images seules
+        - term:
+          - generic:
+            - generic:
+              - generic: Suppr
+        - definition: Supprimer les images et observations sélectionnées
+      - heading [level=2]: Général
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Z
+        - definition: Annuler
+        - term:
+          - generic:
+            - generic:
+              - generic: Ctrl
+              - generic: +
+              - generic: Shift
+              - generic: +
+              - generic: Z
+        - definition: Rétablir
+        - term:
+          - generic:
+            - generic:
+              - generic: I
+              - generic: D
+              - generic: E
+              - generic: V
+        - definition: Activer/Désactiver le debug mode
+      - heading [level=2]: Navigation
+      - generic:
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: P
+        - definition: Choisir le protocole
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: I
+        - definition: Importer des images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: R
+        - definition: Recadrer les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: "N"
+        - definition: Classifier les images
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: X
+        - definition: Exporter les résultats
+        - term:
+          - generic:
+            - generic:
+              - generic: G
+              - generic: M
+        - definition: Gérer les protocoles
+  - dialog:
+    - banner:
+      - heading [level=1]: Préparation hors-ligne
+      - button:
+        - img
+    - main:
+      - paragraph: Télécharger tout ce qu'il est nécéssaire pour pouvoir utiliser l'application hors-ligne. Télécharge tout les modèles pour tout les protocoles actuellement installés.
+    - contentinfo:
+      - generic:
+        - button: Démarrer
+  - generic [ref=e3]:
+    - dialog:
+      - banner:
+        - heading [level=1]: Exporter les résultats
+        - button:
+          - img
+      - main:
+        - generic:
+          - radiogroup:
+            - generic:
+              - radio
+              - text: Métadonnées seulement
+            - generic:
+              - radio [checked]
+              - text: Métadonnées et images recadrées
+            - generic:
+              - radio
+              - text: Métadonnées, images recadrées et images originales
+              - paragraph: Permet de ré-importer les résultats ultérieurement
+        - generic:
+          - generic: Marge autour des images recadrées
+          - radiogroup:
+            - radio [checked]: Aucune
+            - radio: 5%
+            - radio: 10%
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: "%"
+            - radio:
+              - generic:
+                - textbox: "0"
+                - text: px
+          - paragraph: Une valeur en % signifie que la marge est relative aux dimensions de chacune des images
+      - contentinfo:
+        - generic:
+          - paragraph:
+            - code: 0%
+        - button:
+          - img
+          - text: results.zip
+  - banner [ref=e4]:
+    - navigation [ref=e7]:
+      - button [ref=e9] [cursor=pointer]:
+        - img [ref=e11]
+      - generic [ref=e20]:
+        - link "Session du 11/12/2025" [ref=e21]:
+          - /url: "#/sessions/stys59n5"
+        - link "Importer" [ref=e22]:
+          - /url: "#/import"
+        - generic [ref=e23]:
+          - link "Recadrer" [ref=e24]:
+            - /url: "#/crop"
+            - text: Recadrer
+          - button [ref=e27] [cursor=pointer]:
+            - img [ref=e28]
+        - generic [ref=e30]:
+          - link "Classifier" [ref=e31]:
+            - /url: "#/classify"
+          - button [ref=e33] [cursor=pointer]:
+            - img [ref=e34]
+        - button "Résultats" [ref=e36] [cursor=pointer]
+      - complementary [ref=e37]:
+        - generic [ref=e38]:
+          - button "Activer" [ref=e39] [cursor=pointer]:
+            - img [ref=e40]
+            - text: Activer
+          - button "Ne pas activer les notifications" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+        - generic [ref=e46]:
+          - button "Réglages" [ref=e48] [cursor=pointer]:
+            - img [ref=e49]
+          - dialog:
+            - generic: Réglages
+            - generic:
+              - generic: Thème
+              - generic:
+                - generic:
+                  - switch [checked]:
+                    - generic:
+                      - img
+                - button "Synchroniser avec le thème du système" [disabled]:
+                  - img
+              - generic:
+                - text: Notifications
+                - paragraph: Quand un traitement est terminé
+              - generic:
+                - generic:
+                  - switch:
+                    - generic:
+                      - img
+              - generic: Mode debug
+              - generic:
+                - generic:
+                  - switch:
+                    - generic:
+                      - img
+              - generic: Trier les images par
+              - generic:
+                - radiogroup "Par quoi trier":
+                  - radio "Fichier"
+                  - radio "Date" [checked]
+                - button "Trier par ordre décroissant":
+                  - img
+              - generic: Taille des images
+              - generic:
+                - slider: "1"
+              - generic: Langue
+              - generic:
+                - radiogroup "Langue de l'interface":
+                  - radio "English"
+                  - radio "Français" [checked]
+              - generic:
+                - text: Parallélisme
+                - paragraph: Nombre de tâches en parallèle
+              - generic:
+                - button "Réduire":
+                  - img
+                - generic:
+                  - textbox "Nombre de tâches en parallèle":
+                    - /placeholder: ""
+                    - text: "2"
+                - button "Augmenter":
+                  - img
+            - generic:
+              - button "Raccourcis clavier"
+              - button "Préparation hors-ligne"
+            - generic:
+              - text: CIGALE ver.
+              - link "1b16e90":
+                - /url: https://github.com/cigaleapp/cigale/tree/1b16e9018be8e6352ae89f691fb7df9e3f0b5552
+              - text: ·
+              - link "À propos":
+                - /url: "#/about"
+  - generic [ref=e52]:
+    - main [ref=e53]:
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - heading "Avec détections" [level=2] [ref=e58]
+          - paragraph [ref=e59]: 4 éléments
+          - button "Supprimer" [ref=e61] [cursor=pointer]:
+            - img [ref=e62]
+            - text: Supprimer
+        - generic [ref=e64]:
+          - article [ref=e66] [cursor=pointer]:
+            - generic [ref=e69]:
+              - img "cyan.jpeg" [ref=e71]
+              - generic [ref=e73]:
+                - img [ref=e74]
+                - heading "cyan.jpeg" [level=2] [ref=e76]
+          - article [ref=e78] [cursor=pointer]:
+            - generic [ref=e81]:
+              - img "leaf.jpeg" [ref=e83]
+              - generic [ref=e85]:
+                - img [ref=e86]
+                - heading "leaf.jpeg" [level=2] [ref=e88]
+          - article [ref=e90] [cursor=pointer]:
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - img [ref=e96]
+                - generic [ref=e98]: Ouverture…
+                - button "Supprimer" [ref=e100]:
+                  - img [ref=e101]
+                  - text: Supprimer
+              - img "lil-fella.jpeg" [ref=e104]
+              - generic [ref=e106]:
+                - img [ref=e107]
+                - heading "lil-fella.jpeg" [level=2] [ref=e109]
+          - article [ref=e111] [cursor=pointer]:
+            - generic [ref=e114]:
+              - img "with-exif-gps.jpeg" [ref=e116]
+              - generic [ref=e118]:
+                - img [ref=e119]
+                - heading "with-exif-gps.jpeg" [level=2] [ref=e121]
+    - complementary [ref=e122]:
+      - generic [ref=e124]:
+        - img [ref=e125]
+        - img "Image 1 de la sélection" [ref=e126]
+      - heading "lil-fella.jpeg" [level=2] [ref=e127]:
+        - img [ref=e128]
+        - text: lil-fella.jpeg
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - generic [ref=e133]: Espèce
+            - generic [ref=e134]:
+              - combobox [ref=e136]: Entomobrya muscorum
+              - code [ref=e138]: 32%
+              - button [ref=e139] [cursor=pointer]:
+                - img [ref=e140]
+          - generic [ref=e142]:
+            - generic [ref=e143]: Alternatives
+            - list [ref=e144]:
+              - listitem [ref=e145]:
+                - generic [ref=e146]: Dicyrtomina saundersi
+                - code [ref=e148]: 18%
+                - button [ref=e149] [cursor=pointer]:
+                  - img [ref=e150]
+              - listitem [ref=e152]:
+                - generic [ref=e153]: Allacma fusca
+                - code [ref=e155]: 9%
+                - button [ref=e156] [cursor=pointer]:
+                  - img [ref=e157]
+              - listitem [ref=e159]:
+                - generic [ref=e160]: Pogonognathellus longicornis
+                - code [ref=e162]: 5%
+                - button [ref=e163] [cursor=pointer]:
+                  - img [ref=e164]
+        - generic [ref=e166]:
+          - generic [ref=e167]:
+            - generic [ref=e168]: Genre
+            - generic [ref=e169]:
+              - combobox [ref=e171]: Entomobrya
+              - code [ref=e173]: 38%
+              - button [ref=e174] [cursor=pointer]:
+                - img [ref=e175]
+          - generic [ref=e177]:
+            - generic [ref=e178]: Alternatives
+            - list [ref=e179]:
+              - listitem [ref=e180]:
+                - generic [ref=e181]: Dicyrtomina
+                - code [ref=e183]: 24%
+                - button [ref=e184] [cursor=pointer]:
+                  - img [ref=e185]
+              - listitem [ref=e187]:
+                - generic [ref=e188]: Allacma
+                - code [ref=e190]: 9%
+                - button [ref=e191] [cursor=pointer]:
+                  - img [ref=e192]
+              - listitem [ref=e194]:
+                - generic [ref=e195]: Pogonognathellus
+                - code [ref=e197]: 6%
+                - button [ref=e198] [cursor=pointer]:
+                  - img [ref=e199]
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - generic [ref=e203]: Famille
+            - generic [ref=e204]:
+              - combobox [ref=e206]: Entomobryidae
+              - code [ref=e208]: 43%
+              - button [ref=e209] [cursor=pointer]:
+                - img [ref=e210]
+          - generic [ref=e212]:
+            - generic [ref=e213]: Alternatives
+            - list [ref=e214]:
+              - listitem [ref=e215]:
+                - generic [ref=e216]: Dicyrtomidae
+                - code [ref=e218]: 25%
+                - button [ref=e219] [cursor=pointer]:
+                  - img [ref=e220]
+              - listitem [ref=e222]:
+                - generic [ref=e223]: Sminthuridae
+                - code [ref=e225]: 12%
+                - button [ref=e226] [cursor=pointer]:
+                  - img [ref=e227]
+              - listitem [ref=e229]:
+                - generic [ref=e230]: Tomoceridae
+                - code [ref=e232]: 7%
+                - button [ref=e233] [cursor=pointer]:
+                  - img [ref=e234]
+        - generic [ref=e236]:
+          - generic [ref=e237]:
+            - generic [ref=e238]: Ordre
+            - generic [ref=e239]:
+              - combobox [ref=e241]: Entomobryomorpha
+              - code [ref=e243]: 58%
+              - button [ref=e244] [cursor=pointer]:
+                - img [ref=e245]
+          - generic [ref=e247]:
+            - generic [ref=e248]: Alternatives
+            - list [ref=e249]:
+              - listitem [ref=e250]:
+                - generic [ref=e251]: Symphypleona
+                - code [ref=e253]: 39%
+                - button [ref=e254] [cursor=pointer]:
+                  - img [ref=e255]
+              - listitem [ref=e257]:
+                - generic [ref=e258]: Poduromorpha
+                - code [ref=e260]: 2%
+                - button [ref=e261] [cursor=pointer]:
+                  - img [ref=e262]
+              - listitem [ref=e264]:
+                - generic [ref=e265]: Neelipleona
+                - code [ref=e267]: 0.3%
+                - button [ref=e268] [cursor=pointer]:
+                  - img [ref=e269]
+        - generic [ref=e271]:
+          - generic [ref=e272]:
+            - generic [ref=e273]: Photo d'habitat
+            - generic [ref=e274]:
+              - radiogroup [ref=e276]:
+                - generic [ref=e277]:
+                  - radio "C'est une photo de l'habitat à proximité" [ref=e278]
+                  - generic [ref=e279]: C'est une photo de l'habitat à proximité
+                - generic [ref=e280]:
+                  - radio "C'est une photo de l'habitat actuel" [ref=e281]
+                  - generic [ref=e282]: C'est une photo de l'habitat actuel
+              - button [disabled] [ref=e283] [cursor=pointer]:
+                - img [ref=e284]
+          - paragraph [ref=e287]: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
+        - generic [ref=e288]:
+          - generic [ref=e289]:
+            - generic [ref=e290]: Date
+            - generic [ref=e291]:
+              - generic [ref=e293]:
+                - img [ref=e294]
+                - paragraph [ref=e296]: Irreprésentable
+              - button [ref=e297] [cursor=pointer]:
+                - img [ref=e298]
+          - paragraph [ref=e301]: Moment où la photo a été prise
+        - generic [ref=e302]:
+          - generic [ref=e303]:
+            - generic [ref=e304]: Localisation
+            - generic [ref=e305]:
+              - textbox "Localisation" [ref=e307]
+              - button [disabled] [ref=e308] [cursor=pointer]:
+                - img [ref=e309]
+          - paragraph [ref=e312]: Endroit où la photo a été prise
+        - generic [ref=e314]:
+          - generic [ref=e315]: Classe
+          - generic [ref=e316]:
+            - combobox [ref=e318]: Collembola
+            - code [ref=e320]: 100%
+            - button [ref=e321] [cursor=pointer]:
+              - img [ref=e322]
+        - generic [ref=e325]:
+          - generic [ref=e326]: Phylum
+          - generic [ref=e327]:
+            - combobox [ref=e329]: Arthropoda
+            - code [ref=e331]: 100%
+            - button [ref=e332] [cursor=pointer]:
+              - img [ref=e333]
+        - generic [ref=e336]:
+          - generic [ref=e337]: Règne
+          - generic [ref=e338]:
+            - combobox [ref=e340]: Animalia
+            - code [ref=e342]: 100%
+            - button [ref=e343] [cursor=pointer]:
+              - img [ref=e344]
+      - button "Supprimer 1 images Suppr" [ref=e347] [cursor=pointer]:
+        - img [ref=e348]
+        - text: Supprimer 1 images
+        - generic [ref=e351]: Suppr
+  - generic [ref=e352]: Importer · Session du 11/12/2025
+```
