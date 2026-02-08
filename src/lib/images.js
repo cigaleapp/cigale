@@ -139,7 +139,9 @@ export function imageIsAnalyzed(protocol, imageFileId) {
 export function imageIsClassified(image) {
 	return Boolean(
 		(uiState.classificationMetadataId && image.metadata[uiState.classificationMetadataId]) ||
-		uiState.erroredImages.has(image.id)
+		uiState.erroredImages.has(image.id) ||
+		(uiState.classificationMetadataId &&
+			image.metadataErrors?.[uiState.classificationMetadataId]?.length)
 	);
 }
 

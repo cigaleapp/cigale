@@ -1,8 +1,11 @@
 import { match, type } from 'arktype';
+import { RequestCancelledError } from 'swarpc';
 
-import { tables } from './idb.svelte.js';
+import { databaseHandle, tables } from './idb.svelte.js';
+import { storeMetadataErrors } from './metadata/storage.js';
 import { MetadataInferOptionsNeural } from './schemas/metadata.js';
 import { uiState } from './state.svelte.js';
+import { safeJSONStringify } from './utils.js';
 
 /**
  * Classifies an image using the current protocol and selected model.
@@ -22,21 +25,48 @@ export async function classifyImage(swarpc, id, cancellers) {
 		return;
 	}
 
+	const taskSettings = classificationInferenceSettings(
+		uiState.currentProtocol,
+		uiState.selectedClassificationModel
+	);
+
 	const { cancel, request: done } = swarpc.classify.cancelable({
 		imageId: id,
+		taskSettings,
 		metadataIds: {
 			cropbox: uiState.cropMetadataId,
 			target: uiState.classificationMetadataId
-		},
-		taskSettings: classificationInferenceSettings(
-			uiState.currentProtocol,
-			uiState.selectedClassificationModel
-		)
+		}
 	});
 
 	cancellers?.set(id, cancel);
 
-	await done;
+	try {
+		await done;
+	} catch (error) {
+		if (error instanceof RequestCancelledError) throw error;
+		if (!uiState.currentSessionId) throw error;
+
+		await storeMetadataErrors(
+			{
+				db: databaseHandle(),
+				subjectId: id,
+				sessionId: uiState.currentSessionId,
+				metadataId: uiState.classificationMetadataId
+			},
+			{
+				kind: 'inference',
+				message: error instanceof Error ? error.message : String(error),
+				stack: error instanceof Error ? (error.stack ?? '') : '',
+				ignored: false,
+				details: {
+					taskSettings,
+					image: await tables.Image.get(id),
+					fullError: safeJSONStringify(error)
+				}
+			}
+		);
+	}
 
 	await tables.Image.refresh(uiState.currentSessionId);
 }

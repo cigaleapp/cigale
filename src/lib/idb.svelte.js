@@ -184,16 +184,18 @@ function wrangler(table) {
 				delete _tablesState[table][index];
 			}
 		},
+		// TODO: two signatures, to allow not providing a abortSignal
 		/**
 		 * Create a read-write transaction, execute `actions` given the transaction's object store for that table, and commit the transaction
-		 * @param {(store: import('idb').IDBPObjectStore<IDBDatabaseType, [Table], Table, "readwrite">) => void | Promise<void>} actions
+		 * @param {AbortSignal|undefined} abortSignal
+		 * @param {(store: import('idb').IDBPObjectStore<IDBDatabaseType, [Table], Table, "readwrite">, sig: AbortSignal | undefined) => void | Promise<void>} actions
 		 * @returns
 		 */
-		async do(actions) {
+		async do(abortSignal, actions) {
 			const loglabel = `do ${table} #${nanoid()}`;
 			console.debug(loglabel);
-			await openTransaction([table], { mode: 'readwrite' }, async (tx) => {
-				await actions(tx.objectStore(table));
+			await openTransaction([table], { mode: 'readwrite', abortSignal }, async (tx, sig) => {
+				await actions(tx.objectStore(table), sig);
 			});
 		},
 		/**
@@ -372,10 +374,11 @@ export function dependencyURI(tableName, key, ...additionalPath) {
  * @param {object} param1
  * @param {Mode} [param1.mode="readwrite"]
  * @param {string} [param1.session] current session ID, used to refresh session-dependent reactive tables. Defaults to localStorage's currentSessionId
+ * @param {AbortSignal} [param1.abortSignal] if provided, the transaction will be aborted when the signal is aborted. Note that in this case, the transaction is not automatically retried, so it's your responsibility to call openTransaction again if you want to retry the transaction after an abort
  * @param {IDBTransactionWithAtLeast<Tables, Mode>} [param1.tx] already existing transaction to use instead of creating a new one. In that case, the transaction is not committed and the reactive tables' state is not refreshed, since it's assumed that a openTransactions() call higher up in the call stack will already do this
- * @param {(tx: IDBTransactionWithAtLeast<Tables, Mode>) => void | Promise<void>} actions
+ * @param {(tx: IDBTransactionWithAtLeast<Tables, Mode>, sig: AbortSignal | undefined) => void | Promise<void>} actions
  */
-export async function openTransaction(tableNames, { mode, session }, actions) {
+export async function openTransaction(tableNames, { mode, session, abortSignal }, actions) {
 	// @ts-ignore
 	mode ??= 'readwrite';
 
@@ -400,7 +403,7 @@ export async function openTransaction(tableNames, { mode, session }, actions) {
 	newTx.id = txid;
 
 	// @ts-ignore
-	await actions(newTx);
+	await actions(newTx, abortSignal);
 
 	// @ts-ignore
 	console.debug(`txn commit ${txid} `);

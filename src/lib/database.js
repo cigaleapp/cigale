@@ -16,6 +16,7 @@ import {
 	MetadataMergeMethod,
 	Metadata as MetadataSchema,
 	MetadataType as MetadataTypeSchema,
+	MetadataError,
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
@@ -167,6 +168,7 @@ export const Schemas = {
 	Probability,
 	MetadataValues,
 	MetadataValue,
+	MetadataError,
 	Image,
 	ModelInput,
 	ModelDetectionOutputShape,
@@ -281,6 +283,11 @@ export const idComparator = (a, b) => {
 /**
  * @typedef  MetadataValues
  * @type {typeof MetadataValues.infer}
+ */
+
+/**
+ * @typedef MetadataError
+ * @type {typeof MetadataError.infer}
  */
 
 /**
