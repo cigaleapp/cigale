@@ -15,6 +15,7 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 /** @type {import('eslint').Linter.Config[]} */
 export default [
 	includeIgnoreFile(gitignorePath),
+	{ name: 'Ignore Pleye reporter', ignores: ['tests/reporters/pleye.js'] },
 	depend.configs['flat/recommended'],
 	js.configs.recommended,
 	...ts.configs.recommended.map((cfg) => ({

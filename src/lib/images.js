@@ -2,7 +2,7 @@ import { ulid } from 'ulid';
 
 import { uiState } from '$lib/state.svelte';
 
-import { coordsScaler, toTopLeftCoords } from './BoundingBoxes.svelte.js';
+import { toTopLeftCoords } from './BoundingBoxes.svelte.js';
 import { errorMessage, humanFormatName } from './i18n.js';
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';

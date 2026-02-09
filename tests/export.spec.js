@@ -5,7 +5,6 @@ import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
 import {
-	browserConsole,
 	chooseFirstSession,
 	entries,
 	expectZipFiles,

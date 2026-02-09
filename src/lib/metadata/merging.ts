@@ -66,7 +66,7 @@ export function mergeMetadataFromImagesAndObservations({
 	return output;
 }
 
-export function mergeMetadataValues(
+function mergeMetadataValues(
 	values: Array<DB.MetadataValues>,
 	{
 		definitions,
