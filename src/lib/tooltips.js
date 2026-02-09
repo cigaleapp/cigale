@@ -17,15 +17,9 @@ function props(parameters) {
 	const base = { arrow: svgArrow };
 	let content = '';
 	let delay = 50;
-	if (!parameters) {
-		return {
-			...base,
-			content: '',
-			delay: [delay, 0]
-		};
-	}
 
-	if (typeof parameters === 'string') content = parameters;
+	if (!parameters) return { ...base, content, delay: [delay, 0] };
+	else if (typeof parameters === 'string') content = parameters;
 	else if (Array.isArray(parameters)) [content, delay] = parameters;
 	else {
 		return {

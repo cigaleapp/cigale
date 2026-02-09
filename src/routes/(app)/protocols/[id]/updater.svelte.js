@@ -20,7 +20,8 @@ export function updater(changes) {
 		const protocol = await tables.Protocol.raw.get(page.params.id);
 		if (!protocol) return;
 
-		let needsUpdate = true;
+		/** @type {boolean} */
+		let needsUpdate;
 
 		try {
 			const result = await changes(protocol, ...value);

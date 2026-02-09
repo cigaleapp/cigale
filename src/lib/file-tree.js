@@ -79,12 +79,10 @@ function splitPath(path) {
 	let fragment = '';
 	let chars = path.split('');
 	let previousChar = '';
-	let char = '';
+	let char = chars.shift() ?? '';
 	let insideBraces = false;
 
 	while (chars.length > 0) {
-		// @ts-expect-error chars.length > 0 implies !undefined
-		char = chars.shift();
 
 		if (char === '{' && previousChar === '{') {
 			insideBraces = true;
@@ -102,6 +100,9 @@ function splitPath(path) {
 		}
 
 		previousChar = char;
+
+		// chars.length > 0 implies !undefined
+		char = chars.shift() ?? '';
 	}
 
 	if (fragment) fragments.push(fragment);

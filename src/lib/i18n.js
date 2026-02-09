@@ -93,7 +93,7 @@ if (import.meta.vitest) {
 export function errorMessage(error, prefix = '') {
 	const defaultMessage = 'Erreur inattendue';
 
-	let result = defaultMessage;
+	let result = error?.toString() || defaultMessage;
 
 	if (error instanceof Error) {
 		if ('message' in error && error.message) {
@@ -104,13 +104,9 @@ export function errorMessage(error, prefix = '') {
 		}
 	}
 
-	result = error?.toString() || defaultMessage;
-
 	while (result.startsWith('Error: ')) {
 		result = result.slice('Error: '.length);
 	}
-
-	result ||= defaultMessage;
 
 	return prefix ? `${prefix}: ${result}` : result;
 }

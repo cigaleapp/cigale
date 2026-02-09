@@ -139,7 +139,6 @@ export async function loadToTensor(
 		targetWidth
 	]);
 
-	float32Data = new Float32Array(0);
 	return tensor;
 }
 /**

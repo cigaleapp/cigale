@@ -42,16 +42,10 @@ export function fittedImageRect(
 	const naturalRatio = naturalWidth / naturalHeight;
 	const clientRatio = clientWidth / clientHeight;
 
-	let width = 0;
-	let height = 0;
-
-	if (naturalRatio < clientRatio) {
-		width = clientHeight * naturalRatio;
-		height = clientHeight;
-	} else {
-		height = clientWidth / naturalRatio;
-		width = clientWidth;
-	}
+	let [width, height] =
+		naturalRatio < clientRatio
+			? [clientHeight * naturalRatio, clientHeight]
+			: [clientWidth, clientWidth / naturalRatio];
 
 	if (zoomState) {
 		width *= zoomState.scale;
