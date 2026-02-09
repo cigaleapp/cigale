@@ -27,7 +27,7 @@
 		event.preventDefault();
 
 		/** @type {File[]} */
-		let files = [];
+		let files;
 
 		if (event.dataTransfer.items) {
 			// Use DataTransferItemList interface to access the file(s)

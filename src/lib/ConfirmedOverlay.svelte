@@ -7,15 +7,14 @@
 		show: () => Promise<void>;
 	}
 
-	let { shown = $bindable(false), show = $bindable() }: Props = $props();
-
-	$effect(() => {
-		show = async () => {
+	let {
+		shown = $bindable(false),
+		show = $bindable(async () => {
 			shown = true;
 			await new Promise((resolve) => setTimeout(resolve, 500));
 			shown = false;
-		};
-	});
+		})
+	}: Props = $props();
 </script>
 
 <div class="confirmed-overlay" aria-hidden={!shown}>

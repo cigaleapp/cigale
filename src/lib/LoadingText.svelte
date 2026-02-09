@@ -36,7 +36,7 @@
 	const loadingTextLines = $derived.by(() => {
 		if (!mask) return ['Chargement...'];
 
-		let output: string[] = [];
+		let output: string[];
 
 		if (typeof mask === 'string') {
 			output = mask.split('\n');
