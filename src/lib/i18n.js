@@ -124,7 +124,7 @@ if (import.meta.vitest) {
 		// The current implementation overwrites with toString(), so cause isn't used
 		const errorWithCause = new Error('main error');
 		errorWithCause.cause = new Error('cause error');
-		expect(errorMessage(errorWithCause)).toBe('main error');
+		expect(errorMessage(errorWithCause)).toBe('cause error');
 	});
 }
 

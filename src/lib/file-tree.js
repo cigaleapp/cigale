@@ -78,11 +78,16 @@ function splitPath(path) {
 	let fragments = [];
 	let fragment = '';
 	let chars = path.split('');
-	let previousChar = '';
-	let char = chars.shift() ?? '';
 	let insideBraces = false;
 
+	/** @type {string} */
+	let char;
+	let previousChar = '';
+
 	while (chars.length > 0) {
+		// chars.length > 0 implies !undefined
+		char = chars.shift() ?? '';
+
 		if (char === '{' && previousChar === '{') {
 			insideBraces = true;
 		}
@@ -99,9 +104,6 @@ function splitPath(path) {
 		}
 
 		previousChar = char;
-
-		// chars.length > 0 implies !undefined
-		char = chars.shift() ?? '';
 	}
 
 	if (fragment) fragments.push(fragment);
