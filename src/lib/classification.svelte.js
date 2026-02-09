@@ -1,7 +1,5 @@
-import { match, type } from 'arktype';
-
 import { tables } from './idb.svelte.js';
-import { MetadataInferOptionsNeural } from './schemas/metadata.js';
+import { defaultClassificationMetadata } from './protocols.js';
 import { uiState } from './state.svelte.js';
 
 /**
@@ -47,19 +45,14 @@ export async function classifyImage(swarpc, id, cancellers) {
  * @param {number} modelIndex index du modèle à utiliser dans la liste des modèles pour le protocole actuel
  */
 export function classificationInferenceSettings(protocol, modelIndex) {
-	const matcher = match
-		.case(
-			{
-				id: type.string.narrow((id) => protocol.metadata.includes(id)),
-				type: '"enum"',
-				infer: MetadataInferOptionsNeural
-			},
-			(m) => m.infer.neural[modelIndex]
-		)
-		.default(() => undefined);
+	const inference = defaultClassificationMetadata(protocol, tables.Metadata.state)?.infer;
 
-	return tables.Metadata.state
-		.map((m) => matcher(m))
-		.filter(Boolean)
-		.at(0);
+	if (!inference)
+		throw new Error(`Current protocol ${protocol.id} has no metadata with inference settings`);
+	if (!('neural' in inference))
+		throw new Error(
+			`Current protocol ${protocol.id} has no metadata with neural inference settings`
+		);
+
+	return inference.neural[modelIndex];
 }

@@ -3,10 +3,10 @@ import * as dates from 'date-fns';
 import { describe, expect, test } from 'vitest';
 
 import { generateId, idComparator, Schemas } from './database.js';
-import { FilepathTemplate } from './schemas/protocols.js';
+import { ExportsFilepathTemplate } from './schemas/protocols.js';
 
 /**
- * @type {Parameters<typeof FilepathTemplate.infer.render>[0]}
+ * @type {Parameters<typeof ExportsFilepathTemplate.infer.render>[0]}
  */
 const filepathMockData = {
 	numberInObservation: 1,
@@ -43,8 +43,8 @@ describe('generateId', () => {
 
 describe('filepath templates', () => {
 	/**
-	 * @param {typeof FilepathTemplate.infer|ArkErrors} template
-	 * @param {Partial<Parameters<typeof FilepathTemplate.infer.render>[0]> | Record<string, any>} data
+	 * @param {typeof ExportsFilepathTemplate.infer|ArkErrors} template
+	 * @param {Partial<Parameters<typeof ExportsFilepathTemplate.infer.render>[0]> | Record<string, any>} data
 	 * @returns
 	 */
 	function expectRendered(template, data) {
@@ -60,7 +60,7 @@ describe('filepath templates', () => {
 	}
 
 	test('renders simple variables', () => {
-		const template = FilepathTemplate('{{sequence}}.jpg');
+		const template = ExportsFilepathTemplate('{{sequence}}.jpg');
 		expect(template).not.toBeInstanceOf(ArkErrors);
 		expectRendered(template, { sequence: 123 }).toBe('123.jpg');
 	});
@@ -73,7 +73,7 @@ describe('filepath templates', () => {
 	// });
 
 	test('fails at runtime with malformed templates', () => {
-		const template = FilepathTemplate('{{sequence}');
+		const template = ExportsFilepathTemplate('{{sequence}');
 		expect(template).not.toBeInstanceOf(ArkErrors);
 		// TODO: find a way to have type inference for a isinstance check
 		// This way, we can also get rid of expectRendered and use template.render directly, making code clearer
@@ -87,7 +87,7 @@ describe('filepath templates', () => {
 	});
 
 	test('is JSON serializable', () => {
-		const template = FilepathTemplate('{{id}}.jpg');
+		const template = ExportsFilepathTemplate('{{id}}.jpg');
 		expect(template).not.toBeInstanceOf(ArkErrors);
 		expect(
 			JSON.stringify({
@@ -98,7 +98,7 @@ describe('filepath templates', () => {
 	});
 
 	test('has the fallback helper', () => {
-		const template = FilepathTemplate('{{ fallback thing.foo "yay" }}.jpeg');
+		const template = ExportsFilepathTemplate('{{ fallback thing.foo "yay" }}.jpeg');
 		expect(template).not.toBeInstanceOf(ArkErrors);
 		expectRendered(template, { thing: { foo: 'bar' } }).toBe('bar.jpeg');
 		expectRendered(template, { thing: {} }).toBe('yay.jpeg');
@@ -108,7 +108,7 @@ describe('filepath templates', () => {
 	});
 
 	test('has the extension helper', () => {
-		const template = FilepathTemplate('file.{{ extension thing.foo }}');
+		const template = ExportsFilepathTemplate('file.{{ extension thing.foo }}');
 		expect(template).not.toBeInstanceOf(ArkErrors);
 		expectRendered(template, { thing: { foo: 'bar' } }).toBe('file.');
 		expectRendered(template, { thing: { foo: 'bar.jpeg' } }).toBe('file.jpeg');
@@ -117,7 +117,7 @@ describe('filepath templates', () => {
 	});
 
 	test('has the suffix helper', () => {
-		const template = FilepathTemplate('{{ suffix filename suf }}');
+		const template = ExportsFilepathTemplate('{{ suffix filename suf }}');
 		expect(template).not.toBeInstanceOf(ArkErrors);
 		expectRendered(template, { filename: 'file.jpg', suf: '_cropped' }).toBe(
 			'file_cropped.jpg'

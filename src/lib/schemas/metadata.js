@@ -3,7 +3,8 @@ import { scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
 import { keys, unique } from '../utils.js';
-import { ColorHex, HTTPRequest, ID, ModelInput, Probability, URLString } from './common.js';
+import { ColorHex, ID, Probability, URLString } from './common.js';
+import { NeuralBoundingBoxInference, NeuralEnumInference } from './neural.js';
 
 /**
  * @param {string} metadataId
@@ -188,34 +189,11 @@ export const MetadataEnumVariant = type({
 
 export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 
-export const MetadataInferOptionsNeural = type({
-	neural: type({
-		model: HTTPRequest.describe(
-			'Lien vers le modèle de classification utilisé pour inférer les métadonnées. Au format ONNX (.onnx) seulement, pour le moment.'
-		),
-		classmapping: HTTPRequest.describe(
-			'Fichier texte contenant une clé de la métadonnée par ligne, dans le même ordre que les neurones de sortie du modèle.'
-		),
-		'name?': [
-			'string',
-			'@',
-			"Nom du réseau à afficher dans l'interface. Particulièrement utile si il y a plusieurs réseaux"
-		],
-		input: ModelInput.describe("Configuration de l'entrée des modèles"),
-		'output?': type({
-			'name?': ['string', '@', "Nom de l'output du modèle à utiliser. output0 par défaut"]
-		})
-	}).array()
-}).describe('Inférer depuis un modèle de réseau de neurones', 'self');
+export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
 
-export const MetadataInferOptionsEXIF = type({ exif: EXIFField }).describe(
-	'Inférer depuis un champ EXIF',
-	'self'
-);
-
-export const MetadataInferOptions = type
-	.or(MetadataInferOptionsEXIF, MetadataInferOptionsNeural)
-	.describe('Comment inférer la valeur de cette métadonnée', 'self');
+/**
+ * @typedef {typeof EXIFInference.infer} EXIFInference
+ */
 
 export const Metadata = type({
 	id: ID.describe(
@@ -234,23 +212,51 @@ export const Metadata = type({
 	groupable: type('boolean')
 		.describe('Si la métadonnée peut être utilisée pour grouper des images ou observations')
 		.default(false),
-	type: MetadataType.describe('Type de la métadonnée'),
-	learnMore: URLString.describe(
-		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
-	).optional(),
 	'options?': MetadataEnumVariant.array()
 		.pipe((opts) => unique(opts, (o) => o.key))
 		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
-		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"')
+		.describe('Les options valides. Uniquement utile pour une métadonnée de type "enum"'),
+	learnMore: URLString.describe(
+		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
+	).optional()
 }).and(
 	type.or(
 		{
-			type: "'location'",
-			'infer?': { latitude: MetadataInferOptions, longitude: MetadataInferOptions }
+			type: '"boolean"',
+			'infer?': type.or({ exif: EXIFInference })
 		},
 		{
-			type: MetadataType.exclude('"location"'),
-			'infer?': MetadataInferOptions
+			type: '"string"',
+			'infer?': type.or({ exif: EXIFInference })
+		},
+		{
+			type: '"integer"',
+			'infer?': type.or({ exif: EXIFInference })
+		},
+		{
+			type: '"float"',
+			'infer?': type.or({ exif: EXIFInference })
+		},
+		{
+			type: '"date"',
+			'infer?': type.or({ exif: EXIFInference })
+		},
+		{
+			type: '"location"',
+			'infer?': type({
+				latitude: type.or({ exif: EXIFInference }),
+				longitude: type.or({ exif: EXIFInference })
+			})
+		},
+		{
+			type: '"enum"',
+			'infer?': type.or({ exif: EXIFInference }, { neural: NeuralEnumInference.array() })
+		},
+		{
+			type: '"boundingbox"',
+			'infer?': type.or({
+				neural: NeuralBoundingBoxInference.array()
+			})
 		}
 	)
 );

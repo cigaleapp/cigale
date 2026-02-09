@@ -341,7 +341,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			}
 
 			await mockPredownloadedModels(page, context, fullProtocol, {
-				detection: [arthropodaDetectionModel],
+				crop: [arthropodaDetectionModel],
 				species: [collembolaClassifierModel, arthropodaClassifierModel]
 			});
 
