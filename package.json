@@ -109,7 +109,7 @@
 		"globals": "^17.3.0",
 		"google-auth-library": "^10.5.0",
 		"google-fonts-helper": "^3.7.3",
-		"googleapis": "^171.0.0",
+		"googleapis": "^171.4.0",
 		"jpeg-js": "^0.4.4",
 		"jsdom": "^28.0.0",
 		"json-schema-doc-ts": "^2.0.0",
