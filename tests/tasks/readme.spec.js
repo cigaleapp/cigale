@@ -35,7 +35,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				await page.getByTestId('settings-button').click();
 			});
 
-			test('protocol', async ({ page, app }) => {
+			test('protocol', async ({ page }) => {
 				await newSession(page);
 				await expect(page).toHaveScreenshot();
 			});

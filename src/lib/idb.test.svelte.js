@@ -560,7 +560,8 @@ describe('wrangler', () => {
 			]);
 		});
 
-		test.todo('do');
+		// TODO: test .do()
+		// TODO: test .getMany()
 
 		test('list', async () => {
 			await tables.Observation.set(observation(0));

@@ -1,5 +1,4 @@
 // @ts-check
-import { spawnSync } from 'node:child_process';
 import { tz } from '@date-fns/tz';
 import { defineConfig, devices } from '@playwright/test';
 import arkenv from 'arkenv';

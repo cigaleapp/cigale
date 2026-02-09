@@ -9,7 +9,7 @@
 	import * as idb from '$lib/idb.svelte.js';
 	import { deleteImageFile, imageIsAnalyzed } from '$lib/images';
 	import Logo from '$lib/Logo.svelte';
-	import { mergeMetadataValues } from '$lib/metadata';
+	import { mergeMetadataValues } from '$lib/metadata/index.js';
 	import { deleteObservation } from '$lib/observations.js';
 	import { goto } from '$lib/paths.js';
 	import { cancelTask, detectMore } from '$lib/queue.svelte.js';

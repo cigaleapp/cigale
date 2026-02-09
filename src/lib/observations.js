@@ -211,7 +211,7 @@ export function observationMetadata({ definitions, observation, images }) {
 
 if (import.meta.vitest) {
 	const { describe, it, expect } = import.meta.vitest;
-	const { metadatas, items, values } = await import('./metadata/_testdata.js');
+	const { metadatas, items } = await import('./metadata/_testdata.js');
 
 	/**
 	 * @type {DB.Image[]}

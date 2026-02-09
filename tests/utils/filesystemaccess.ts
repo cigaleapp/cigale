@@ -109,9 +109,9 @@ export async function writtenFilesOfHandle(
 ): Promise<Record<string, string | Uint8Array<ArrayBufferLike>>> {
 	const filesHandle = await page.evaluateHandle(
 		([handleId]) => {
-			return Object.fromEntries([
-				...(window as any).___playwright_fsa_files?.[handleId].entries()
-			]);
+			const handle = (window as any).___playwright_fsa_files?.[handleId];
+			if (!handle) return {};
+			return Object.fromEntries([...handle.entries()]);
 		},
 		[id]
 	);
