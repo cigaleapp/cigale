@@ -83,7 +83,6 @@ function splitPath(path) {
 	let insideBraces = false;
 
 	while (chars.length > 0) {
-
 		if (char === '{' && previousChar === '{') {
 			insideBraces = true;
 		}
