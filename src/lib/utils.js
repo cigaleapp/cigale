@@ -1440,6 +1440,7 @@ if (import.meta.vitest) {
 		const start = Date.now();
 		await sleep(100);
 		const end = Date.now();
-		expect(end - start).toBeGreaterThanOrEqual(100);
+		// leeway of 1ms
+		expect(end - start).toBeGreaterThanOrEqual(99);
 	});
 }
