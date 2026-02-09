@@ -394,7 +394,7 @@ test.describe('Cropper view', () => {
 				await expectConfirmed(page, app, true);
 			});
 
-			test('undo/redo', async ({ page, }) => {
+			test('undo/redo', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
 
