@@ -108,25 +108,34 @@ export async function extractMetadata(buffer, extractionPlan) {
 					longitude: { exif: 'string' }
 				}
 			},
-			({ infer }) => ({
-				confidence: 1,
-				alternatives: {},
-				value: {
-					longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
-					latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float')
-				}
-			})
+			({ infer }) => {
+				if (!(infer.longitude.exif in exif.tags)) return undefined;
+				if (!(infer.latitude.exif in exif.tags)) return undefined;
+
+				return {
+					confidence: 1,
+					alternatives: {},
+					value: {
+						longitude: coerceExifValue(exif.tags[infer.longitude.exif], 'float'),
+						latitude: coerceExifValue(exif.tags[infer.latitude.exif], 'float')
+					}
+				};
+			}
 		)
 		.case(
 			{
 				type: Schemas.MetadataTypeSchema,
 				infer: { exif: 'string' }
 			},
-			({ infer, type }) => ({
-				confidence: 1,
-				alternatives: {},
-				value: coerceExifValue(exif.tags[infer.exif], type)
-			})
+			({ infer, type }) => {
+				if (!(infer.exif in exif.tags)) return undefined;
+
+				return {
+					confidence: 1,
+					alternatives: {},
+					value: coerceExifValue(exif.tags[infer.exif], type)
+				};
+			}
 		)
 		.default(() => undefined);
 

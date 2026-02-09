@@ -19,7 +19,7 @@ const OPERATIONS = {
 		after: centeredBoundingBox
 	}),
 	'classify/enum/edit': type({
-		imageId: 'string',
+		observationId: 'string',
 		metadataId: 'string',
 		before: { key: 'string' },
 		after: { key: 'string' }
@@ -36,9 +36,9 @@ const OPERATION_REWINDERS = {
 		op: 'crop/box/edit',
 		data: { imageId, before: after, after: before }
 	}),
-	'classify/enum/edit': ({ imageId, metadataId, before, after }) => ({
+	'classify/enum/edit': ({ observationId, metadataId, before, after }) => ({
 		op: 'classify/enum/edit',
-		data: { imageId, metadataId, before: after, after: before }
+		data: { observationId, metadataId, before: after, after: before }
 	})
 };
 

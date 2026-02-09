@@ -4,7 +4,6 @@ import { issue } from './annotations.js';
 import { expect, test } from './fixtures.js';
 import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
 import {
-	browserConsole,
 	chooseFirstSession,
 	entries,
 	expectZipFiles,
@@ -221,7 +220,7 @@ test('export to a folder', async ({ page, app, browserName }) => {
 	const files = await writtenFilesOfHandle(page, handleId);
 
 	expect(files).toStrictEqual({
-		'Cigale Export Test/metadata.csv': expect.stringContaining('"Observation";"Espèce"'),
+		'Cigale Export Test/metadata.csv': expect.stringContaining('"Identifiant";"Observation"'),
 		'Cigale Export Test/analysis.json': expect.stringContaining('"observations":'),
 		'Cigale Export Test/Cropped/Allacma fusca_obs1_1.jpeg': expect.any(Uint8Array),
 		'Cigale Export Test/Cropped/Orchesella cincta_obs2_2.jpeg': expect.any(Uint8Array),

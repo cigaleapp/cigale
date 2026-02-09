@@ -484,10 +484,21 @@ async function prepare({
 		}
 	};
 
-	const observations = await db.getAllFromIndex('Observation', 'sessionId', sessionId);
+	const metadataDefinitions = await db
+		.getAll('Metadata')
+		.then((ms) => ms.map((m) => Schemas.Metadata.assert(m)));
 	abortSignal?.throwIfAborted();
-	const imagesFromDatabase = await db.getAllFromIndex('Image', 'sessionId', sessionId);
+
+	const sessionObservations = await db
+		.getAllFromIndex('Observation', 'sessionId', sessionId)
+		.then((obs) => obs.map((o) => Schemas.Observation.assert(o)));
 	abortSignal?.throwIfAborted();
+
+	const sessionImages = await db
+		.getAllFromIndex('Image', 'sessionId', sessionId)
+		.then((images) => images.map((img) => Schemas.Image.assert(img)));
+	abortSignal?.throwIfAborted();
+
 	const metadataOptions = await db.getAll('MetadataOption').then((opts) => {
 		const options: Record<string, Record<string, (typeof opts)[number]>> = {};
 		for (const opt of opts) {
@@ -503,22 +514,26 @@ async function prepare({
 	let observationNumber = 0;
 
 	// To have stable sequence numbers, really useful for testing
-	observations.sort(compareBy((o) => o.label + o.id));
+	sessionObservations.sort(compareBy((o) => o.label + o.id));
 	abortSignal?.throwIfAborted();
 
-	const total = sum(observations.map((o) => o.images.length));
+	const total = sum(sessionObservations.map((o) => o.images.length));
 
-	for (const { id, label, images, metadataOverrides } of observations) {
+	for (const obs of sessionObservations) {
 		observationNumber++;
 
-		const metadata = await observationMetadata(db, protocolUsed, {
-			images,
-			metadataOverrides: MetadataValues.assert(metadataOverrides)
-		}).then((obsm) => addValueLabels(obsm, metadataOptions));
+		const metadata = addValueLabels(
+			observationMetadata({
+				definitions: metadataDefinitions,
+				observation: obs,
+				images: sessionImages
+			}),
+			metadataOptions
+		);
 		abortSignal?.throwIfAborted();
 
-		exportedObservations[id] = {
-			label,
+		exportedObservations[obs.id] = {
+			label: obs.label,
 			number: observationNumber,
 			metadata: toMetadataRecord(metadata),
 			protocolMetadata: toMetadataRecord(protocolMetadataValues(protocolUsed, metadata)),
@@ -526,22 +541,18 @@ async function prepare({
 		};
 		abortSignal?.throwIfAborted();
 
-		for (const [i, imageId] of images.entries()) {
-			const databaseImage = imagesFromDatabase.find((i) => i.id === imageId);
+		for (const [i, imageId] of obs.images.entries()) {
+			const databaseImage = sessionImages.find((i) => i.id === imageId);
 			if (!databaseImage) continue;
-			const imageFromDatabase = Schemas.Image.assert(databaseImage);
 
-			const metadataValues = await addValueLabels(
-				imageFromDatabase.metadata,
-				metadataOptions
-			);
+			const metadataValues = addValueLabels(databaseImage.metadata, metadataOptions);
 
 			abortSignal?.throwIfAborted();
 
 			const numberInObservation = i + 1;
 
 			const image = {
-				...imageFromDatabase,
+				...databaseImage,
 				sequence,
 				numberInObservation,
 				metadata: toMetadataRecord(metadataValues),
@@ -553,13 +564,13 @@ async function prepare({
 			abortSignal?.throwIfAborted();
 
 			const filepathsData = {
-				observation: exportedObservations[id],
+				observation: exportedObservations[obs.id],
 				image,
 				sequence,
 				numberInObservation
 			};
 
-			exportedObservations[id].images.push({
+			exportedObservations[obs.id].images.push({
 				...image,
 				sequence,
 				numberInObservation,

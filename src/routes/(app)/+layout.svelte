@@ -7,21 +7,6 @@
 	/**
 	 * @typedef {'full' | 'hidden'} NavbarAppearance
 	 */
-	let _navbarAppearance = $state('full');
-
-	/**
-	 * Set navbar appearance for the page or layout, until unmounted.
-	 * Uses `onMount` and `onDestroy` internally.
-	 * @param {NavbarAppearance} appearance
-	 */
-	export function navbarAppearance(appearance) {
-		$effect(() => {
-			_navbarAppearance = appearance;
-			return () => {
-				_navbarAppearance = 'full';
-			};
-		});
-	}
 </script>
 
 <script>
@@ -53,6 +38,15 @@
 	const { swarpc, parallelism } = $derived(data);
 
 	initializeProcessingQueue({ swarpc, cancellers, parallelism });
+
+	/** @type {NavbarAppearance} */
+	const navbarAppearance = $derived.by(() => {
+		if (page.route.id === '/(app)/(sidepanel)/classify/[observation]') return 'hidden';
+		if (page.route.id === '/(app)/(sidepanel)/crop/[image]/[[from]]') return 'hidden';
+		if (page.route.id?.startsWith('/(app)/protocols/[id]')) return 'hidden';
+
+		return 'full';
+	});
 
 	undo.initialize(100);
 
@@ -175,7 +169,7 @@
 <Navigation
 	{openKeyboardShortcuts}
 	{openPrepareForOfflineUse}
-	progressbarOnly={_navbarAppearance === 'hidden'}
+	progressbarOnly={navbarAppearance === 'hidden'}
 	progress={uiState.processing.progress}
 	eta={uiState.eta}
 />

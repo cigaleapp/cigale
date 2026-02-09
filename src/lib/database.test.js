@@ -65,11 +65,12 @@ describe('filepath templates', () => {
 		expectRendered(template, { sequence: 123 }).toBe('123.jpg');
 	});
 
-	test.todo('fails with malformed templates', () => {
-		const template = FilepathTemplate('{{id}');
-		expect(template).toBeInstanceOf(ArkErrors);
-		expect(template).toHaveProperty('message', 'Invalid template: {{id}');
-	});
+	// TODO: fail with malformed templates at construction time, not at runtime
+	// test('fails with malformed templates', () => {
+	// 	const template = FilepathTemplate('{{id}');
+	// 	expect(template).toBeInstanceOf(ArkErrors);
+	// 	expect(template).toHaveProperty('message', 'Invalid template: {{id}');
+	// });
 
 	test('fails at runtime with malformed templates', () => {
 		const template = FilepathTemplate('{{sequence}');

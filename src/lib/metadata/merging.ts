@@ -140,6 +140,7 @@ function mergeMetadata(
 		value,
 		manuallyModified: values.some((v) => v.manuallyModified),
 		confidence: confidences(values.map((v) => v.confidence)),
+		confirmed: values.every((v) => v.confirmed),
 		alternatives: mergeAlternatives(confidences, values)
 	});
 

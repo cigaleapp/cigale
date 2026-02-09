@@ -108,10 +108,8 @@ jobs:
     needs: build
     uses: ./.github/workflows/dev-deploy.yml
     secrets: inherit
-    with: 
+    with:
       artifact: head-bundle-analysis
       subdomain: pr-${{ github.event.pull_request.number }}-reports
       path: /bundlesize
-      environment: "#${{ github.event.pull_request.number }}: Bundle breakdown"
-
-          
+      environment: '#${{ github.event.pull_request.number }}: Bundle breakdown'

@@ -4,10 +4,24 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ## February 2026
 
+### Improvements
+
+- Implement export-to-folder
+- Make carousel scroll buttons much more responsive
+- Make classifier take observations instead of images
+
 ### Bug Fixes
 
 - Fix behavior of continue button in fullscreen classifier view
 - Fix fullscreen classifier layout switching
+- Fix layout switch in classifier not working immediately
+- Fix navbar not hiding when going to cropper from classifier
+- Fix tooltips not showing on disabled buttons
+- Fix warning when JPEG file has no EXIF date (#1193)
+
+### Data Updates
+
+- Regenerate example protocols
 
 ### Translation Updates
 

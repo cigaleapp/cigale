@@ -7,10 +7,8 @@ import * as ort from 'onnxruntime-web';
 
 import { Schemas } from '$lib/database.js';
 import { loadToTensor } from '$lib/inference_utils.js';
-import { classify, infer, loadModel } from '$lib/inference.js';
+import { classify, infer } from '$lib/inference.js';
 import { storeMetadataValue } from '$lib/metadata/index.js';
-import { progressSplitter } from '$lib/utils';
-import { fetchHttpRequest } from '$lib/utils.js';
 
 import { openDatabase, swarp } from './index.js';
 

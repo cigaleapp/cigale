@@ -403,6 +403,45 @@ export const expect = baseExpect.extend({
 			expected,
 			actual: matcherResult?.actual
 		};
+	},
+
+	async toBeOnSlide(locator: Locator, slideName: string, options?: { timeout?: number }) {
+		const assertionName = 'toBeOnSlide';
+
+		let pass: boolean;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		let matcherResult: any;
+
+		try {
+			const currentSlide = locator.locator("[data-current-slide='true']");
+			await expect(currentSlide).toHaveAccessibleName(slideName, options);
+			pass = true;
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (e: any) {
+			matcherResult = e.matcherResult;
+			pass = false;
+		}
+
+		if (this.isNot) pass = !pass;
+
+		const message = () =>
+			this.utils.matcherHint(assertionName, undefined, undefined, {
+				isNot: this.isNot
+			}) +
+			'\n\n' +
+			`Locator: ${locator}\n` +
+			`Expected: ${this.isNot ? 'not' : ''} to be on slide ${this.utils.printExpected(slideName)}\n` +
+			(matcherResult
+				? `Received: is on slide ${this.utils.printReceived(matcherResult.actual)}`
+				: '');
+
+		return {
+			message,
+			pass,
+			name: assertionName,
+			expected: slideName,
+			actual: matcherResult?.actual
+		};
 	}
 });
 

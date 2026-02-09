@@ -2,10 +2,17 @@
 	export interface Props<T = unknown> {
 		items: T[];
 		item: Snippet<[T]>;
+		// eslint-disable-next-line no-unused-vars
+		slideName: (item: T, index: number) => string;
+		currentItem?: T;
 		scrollers?: {
 			next: () => void;
 			prev: () => void;
 		};
+		/** Show keyboard shortcuts on the next button's tooltip */
+		'keyboard-next'?: string;
+		/** Show keyboard shortcuts on the previous button's tooltip */
+		'keyboard-prev'?: string;
 	}
 </script>
 
@@ -19,12 +26,24 @@
 
 	import ButtonIcon from './ButtonIcon.svelte';
 
-	let { item: itemSnippet, items, scrollers = $bindable() }: Props<T> = $props();
+	let {
+		item: itemSnippet,
+		slideName,
+		items,
+		scrollers = $bindable(),
+		currentItem = $bindable(),
+		'keyboard-next': keyboardNext,
+		'keyboard-prev': keyboardPrev
+	}: Props<T> = $props();
 
 	let canScrollNext = $state(true);
 	let canScrollPrev = $state(false);
 	let currentIndex = $state(0);
 	let carousel: EmblaCarouselType | undefined = $state();
+
+	$effect(() => {
+		currentItem = items[currentIndex];
+	});
 
 	$effect(() => {
 		if (!carousel) return;
@@ -35,23 +54,28 @@
 	});
 
 	$effect(() => {
-		function onSettle() {
+		function onSelect() {
 			canScrollPrev = carousel?.canScrollPrev() ?? false;
 			canScrollNext = carousel?.canScrollNext() ?? false;
 			currentIndex = carousel?.selectedScrollSnap() ?? 0;
 		}
 
-		carousel?.on('settle', onSettle);
-		return () => carousel?.off('settle', onSettle);
+		carousel?.on('settle', onSelect);
+		carousel?.on('select', onSelect);
+		return () => {
+			carousel?.off('settle', onSelect);
+			carousel?.off('select', onSelect);
+		};
 	});
 </script>
 
-<div class="embla">
+<div class="embla" aria-roledescription="carousel">
 	{#key items}
 		{#if items.length > 1}
-			<nav>
+			<section role="group" class="controls">
 				<ButtonIcon
 					help="Image précédente"
+					keyboard={keyboardPrev ?? ''}
 					class="embla__prev"
 					disabled={!canScrollPrev}
 					onclick={() => {
@@ -62,9 +86,12 @@
 				</ButtonIcon>
 				<div class="dots">
 					{#each items as _, i (i)}
+						<!-- We use aria-disabled instead of disabled to avoid removing the button from the tab order -->
+						<!-- See https://www.w3.org/WAI/ARIA/apg/patterns/carousel/  -->
 						<button
 							class="dot"
 							aria-label="Aller à l'image {i + 1}"
+							aria-disabled={currentIndex === i}
 							class:active={currentIndex === i}
 							onclick={() => {
 								carousel?.scrollTo(i);
@@ -74,7 +101,8 @@
 				</div>
 				<ButtonIcon
 					help="Image suivante"
-					class="embla_next"
+					keyboard={keyboardNext ?? ''}
+					class="embla__next"
 					disabled={!canScrollNext}
 					onclick={() => {
 						carousel?.scrollNext();
@@ -82,20 +110,26 @@
 				>
 					<IconNext />
 				</ButtonIcon>
-			</nav>
+			</section>
 		{/if}
 		<div
 			class="embla__viewport"
 			use:embla={{
-				options: { duration: 15 }
+				options: { duration: 12 }
 			}}
 			onemblaInit={(event: CustomEvent) => {
 				carousel = event.detail;
 			}}
 		>
-			<div class="embla__container">
+			<div class="embla__container" aria-atomic="false" aria-live="polite">
 				{#each items as item, i (i)}
-					<div class="embla__slide">
+					<div
+						class="embla__slide"
+						data-current-slide={currentIndex === i}
+						role="group"
+						aria-roledescription="slide"
+						aria-label={slideName(item, i)}
+					>
 						{@render itemSnippet(item)}
 					</div>
 				{/each}
@@ -128,7 +162,7 @@
 		height: 100%;
 	}
 
-	nav {
+	.controls {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -139,6 +173,7 @@
 		padding-top: 2em;
 		z-index: 10;
 		width: 100%;
+		--fg: white;
 		background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
 	}
 

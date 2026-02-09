@@ -137,7 +137,7 @@ test('allows merging a second time into the same observation', async ({ page, ap
 	]);
 });
 
-test('can split merged observations', async ({ page, app }) => {
+test('can split merged observations', async ({ page }) => {
 	await selectObservation(page, 'lil-fella');
 	await selectObservation(page, 'cyan');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();

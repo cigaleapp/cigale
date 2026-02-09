@@ -7,8 +7,7 @@ import {
 	getDatabaseRowById,
 	imagesByName,
 	loadDatabaseDump,
-	setImageMetadata,
-	throwError
+	setImageMetadata
 } from './utils/index.js';
 
 /**
@@ -30,7 +29,7 @@ test.describe('Cropper view', () => {
 		await app.tabs.go('crop');
 	});
 
-	test('should have all cards visible @webkit-no-parallelization', async ({ page, app }) => {
+	test('should have all cards visible @webkit-no-parallelization', async ({ page }) => {
 		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
@@ -38,7 +37,7 @@ test.describe('Cropper view', () => {
 
 	test.describe('autoskip enabled OR disabled', async () => {
 		for (const enabled of [true, false]) {
-			test.beforeEach(async ({ page, app }) => {
+			test.beforeEach(async ({ app }) => {
 				await app.settings.set({ cropAutoNext: enabled });
 			});
 
@@ -83,7 +82,7 @@ test.describe('Cropper view', () => {
 	});
 
 	test.describe('autoskip disabled', () => {
-		test.beforeEach(async ({ page, app }) => {
+		test.beforeEach(async ({ app }) => {
 			await app.settings.set({ cropAutoNext: false });
 		});
 
@@ -295,7 +294,7 @@ test.describe('Cropper view', () => {
 				await page.mouse.up();
 			}
 
-			test('should create boxes on mouseup', async ({ page, app }) => {
+			test('should create boxes on mouseup', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 245, 245);
 				await makeBox(page, 100, 100, 340, 120);
@@ -316,7 +315,7 @@ test.describe('Cropper view', () => {
 				await expectConfirmed(page, app, true);
 			});
 
-			test('undo/redo', async ({ page, app }) => {
+			test('undo/redo', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 245, 245);
 
@@ -352,7 +351,7 @@ test.describe('Cropper view', () => {
 		});
 
 		test.describe('with 2-point tool', () => {
-			test.beforeEach(async ({ page, app }) => {
+			test.beforeEach(async ({ page }) => {
 				await page.getByRole('button', { name: '2 points' }).click();
 			});
 
@@ -374,7 +373,7 @@ test.describe('Cropper view', () => {
 				});
 			}
 
-			test('should create boxes every 2 clicks', async ({ page, app }) => {
+			test('should create boxes every 2 clicks', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
 				await makeBox(page, 100, 100, 170, 80);
@@ -395,7 +394,7 @@ test.describe('Cropper view', () => {
 				await expectConfirmed(page, app, true);
 			});
 
-			test('undo/redo', async ({ page, app }) => {
+			test('undo/redo', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50);
 				await expectBoxInList(page, 2, 327, 327);
 
@@ -411,7 +410,7 @@ test.describe('Cropper view', () => {
 		});
 
 		test.describe('with 4-point tool', () => {
-			test.beforeEach(async ({ page, app }) => {
+			test.beforeEach(async ({ page }) => {
 				await page.getByRole('button', { name: '4 points' }).click();
 			});
 
@@ -436,7 +435,7 @@ test.describe('Cropper view', () => {
 				await changeArea.click({ position: { x: x4, y: y4 } });
 			}
 
-			test('should create boxes every 4 clicks', async ({ page, app }) => {
+			test('should create boxes every 4 clicks', async ({ page }) => {
 				await makeBox(page, 10, 10, 50, 50, 50, 100, 10, 100);
 				await expectBoxInList(page, 2, 327, 735);
 				await makeBox(page, 100, 100, 170, 80, 170, 150, 100, 150);
@@ -534,7 +533,7 @@ test.describe('Cropper view', () => {
 			}
 		}
 
-		test.fixme('should zoom in and out with the mouse wheel', async ({ page, app }) => {
+		test.fixme('should zoom in and out with the mouse wheel', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
@@ -550,7 +549,7 @@ test.describe('Cropper view', () => {
 			await checkImageTransforms(page, 2.75188, 142.537, -173.856);
 		});
 
-		test('should zoom in and out with the keyboard', async ({ page, app }) => {
+		test('should zoom in and out with the keyboard', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 
@@ -578,7 +577,7 @@ test.describe('Cropper view', () => {
 			await checkImageTransforms(page, 1);
 		});
 
-		test('should pan with the mouse', async ({ page, app }) => {
+		test('should pan with the mouse', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
 			expect(image).toBeVisible();
 

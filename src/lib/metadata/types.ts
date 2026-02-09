@@ -93,14 +93,18 @@ export function assertIs<Type extends DB.MetadataType>(type: Type, value: any): 
 }
 
 /**
- * Get a strongly-typed metadata value from an image (Image ONLY, not Observation).
+ * Get a strongly-typed metadata value from an image or an observation
  */
 export function getMetadataValue<Type extends DB.MetadataType>(
-	image: DB.Image,
+	subject: Pick<DB.Image, 'metadata'> | Pick<DB.Observation, 'metadataOverrides'>,
 	type: Type,
 	metadataId: string
 ): TypedMetadataValue<Type> | undefined {
-	const value = image.metadata[metadataId];
+	const value =
+		'metadataOverrides' in subject
+			? subject.metadataOverrides[metadataId]
+			: subject.metadata[metadataId];
+
 	if (value === undefined) return undefined;
 
 	return {

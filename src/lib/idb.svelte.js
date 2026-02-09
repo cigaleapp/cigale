@@ -9,6 +9,7 @@ import {
 	isSessionDependentReactiveTable,
 	Tables
 } from './database.js';
+import { nonnull, safeJSONStringify } from './utils.js';
 
 /** @type {number | null} */
 export const previewingPrNumber =
@@ -86,6 +87,11 @@ function wrangler(table) {
 				_tablesState[table] = await this.list();
 			}
 		},
+		/** @param {string[]} keys */
+		getMany: async (keys) =>
+			Promise.all(keys.map((key) => get(table, key))).then((results) =>
+				results.filter(nonnull)
+			),
 		/** @param {string} key  */
 		get: async (key) => get(table, key),
 		/** @param {string} key */
@@ -120,7 +126,7 @@ function wrangler(table) {
 		 * @returns {Promise<boolean>} true if the item was found and updated, false otherwise
 		 */
 		async update(key, property, value) {
-			const logLabel = `upd ${table} ${key} ${typeof property === 'string' ? property : '<Symbol>'} = ${value}`;
+			const logLabel = `upd ${table} ${key} ${typeof property === 'string' ? property : '<Symbol>'} = ${typeof value === 'object' ? safeJSONStringify(value) : value}`;
 
 			// Get item from DB
 			const item = await this.raw.get(key);

@@ -53,7 +53,7 @@ export function metadataValueGrouper<Type extends DB.MetadataType>({
 		metadataPrettyValue(value, {
 			type,
 			language,
-			valueLabel: options.find((o) => o.key === value)?.label,
+			valueLabel: options.find((o) => o.key === value?.toString())?.label,
 			boundingBoxPrecision: decimalTolerance
 		});
 

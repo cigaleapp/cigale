@@ -46,3 +46,21 @@ export async function imagesByName(app) {
 			throwError('Image with-exif-gps.jpeg not found')
 	};
 }
+
+/**
+ * @param {import('../fixtures').AppFixture} app
+ */
+export async function observationsByLabel(app) {
+	return {
+		leaf:
+			(await app.db.observation.byLabel('leaf')) ?? throwError('Observation leaf not found'),
+		lilFella:
+			(await app.db.observation.byLabel('lil-fella')) ??
+			throwError('Observation lil-fella not found'),
+		cyan:
+			(await app.db.observation.byLabel('cyan')) ?? throwError('Observation cyan not found'),
+		withExifGps:
+			(await app.db.observation.byLabel('with-exif-gps')) ??
+			throwError('Observation with-exif-gps not found')
+	};
+}

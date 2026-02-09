@@ -90,8 +90,8 @@ export const TemplatedString = (Input) =>
 				 */
 				render: (data) => compiled(Input.assert(data))
 			};
-		} catch (e) {
-			throw new Error(`Invalid template ${safeJSONStringify(t)}: ${e}`);
+		} catch (cause) {
+			throw new Error(`Invalid template ${safeJSONStringify(t)}`, { cause });
 		}
 	});
 

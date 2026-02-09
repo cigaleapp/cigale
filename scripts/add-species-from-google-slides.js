@@ -13,7 +13,7 @@ import { x } from 'tinyexec';
 import Turndown from 'turndown';
 
 import keys from '../google-drive-key.json' with { type: 'json' };
-import { decodePhoto, photoChanged, range } from './utils.js';
+import { range } from './utils.js';
 
 await mkdir(path.join(import.meta.dirname, '../examples/arthropods.cigaleprotocol.images'), {
 	recursive: true
@@ -302,7 +302,7 @@ for (const [i, { name, id }] of files.entries()) {
 					`${name}_${i}.png`
 				);
 
-				const oldPhoto = decodePhoto(imagePath);
+				// const oldPhoto = decodePhoto(imagePath);
 
 				log(`Writing image to ${cc.blue}${imagePath}${cc.reset}`);
 				image.write(imagePath);

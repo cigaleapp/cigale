@@ -15,6 +15,7 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 /** @type {import('eslint').Linter.Config[]} */
 export default [
 	includeIgnoreFile(gitignorePath),
+	{ name: 'Ignore Pleye reporter', ignores: ['tests/reporters/pleye.js'] },
 	depend.configs['flat/recommended'],
 	js.configs.recommended,
 	...ts.configs.recommended.map((cfg) => ({
@@ -33,6 +34,10 @@ export default [
 			}
 		},
 		rules: {
+			// False positives since v10.0.1 upgrade
+			// See for example https://github.com/eslint/eslint/issues/20486
+			// or https://github.com/eslint/eslint/issues/20491
+			'no-useless-assignment': 'off',
 			'svelte/no-at-html-tags': 'off',
 			// See https://github.com/sveltejs/kit/issues/14894
 			'svelte/no-navigation-without-resolve': 'off',

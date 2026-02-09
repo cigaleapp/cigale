@@ -1,13 +1,11 @@
-import { generateId, Schemas } from '$lib/database.js';
+import { generateId } from '$lib/database.js';
 
 import * as db from './idb.svelte.js';
 import { tables } from './idb.svelte.js';
 import { deleteImageFile, imageFileIds } from './images.js';
 import {
 	mergeMetadataFromImagesAndObservations,
-	mergeMetadataValues,
-	serializeMetadataFullValue,
-	serializeMetadataValue
+	serializeMetadataFullValue
 } from './metadata/index.js';
 import { uiState } from './state.svelte.js';
 import { compareBy, mapValues, nonnull } from './utils.js';
@@ -190,28 +188,95 @@ export async function ensureNoLoneImages(tx) {
 
 /**
  * Gets all metadata for an observation, including metadata derived from merging the metadata values of the images that make up the observation.
- * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} observation
- * @param {DatabaseHandle} db
- * @param {DB.Protocol} protocol
- * @returns {Promise<DB.MetadataValues>}
+ * @param {object} arg0
+ * @param {DB.Metadata[]} arg0.definitions
+ * @param {Pick<DB.Observation, 'images' | 'metadataOverrides'>} arg0.observation
+ * @param {DB.Image[]} arg0.images
+ * @returns {DB.MetadataValues}
  */
-export async function observationMetadata(db, protocol, observation) {
-	const images = await Promise.all(
-		observation.images.map(async (id) => await db.get('Image', id))
-	).then((ims) => ims.filter(nonnull).map((img) => Schemas.Image.assert(img)));
-
-	images.sort(compareBy(({ id }) => observation.images.indexOf(id)));
-
+export function observationMetadata({ definitions, observation, images }) {
 	const metadataFromImages = mergeMetadataFromImagesAndObservations({
-		definitions: await db
-			.getAll('Metadata')
-			.then((defs) => defs.map((def) => Schemas.Metadata.assert(def))),
-		images,
-		observations: []
+		definitions,
+		observations: [],
+		images: images
+			.filter(({ id }) => observation.images.includes(id))
+			.toSorted(compareBy(({ id }) => observation.images.indexOf(id)))
 	});
 
 	return {
 		...metadataFromImages,
 		...observation.metadataOverrides
 	};
+}
+
+if (import.meta.vitest) {
+	const { describe, it, expect } = import.meta.vitest;
+	const { metadatas, items } = await import('./metadata/_testdata.js');
+
+	/**
+	 * @type {DB.Image[]}
+	 */
+	const images = items.map(({ id, metadata }) => ({
+		id,
+		filename: id + '.jpg',
+		metadata,
+		sessionId: 'session1',
+		addedAt: new Date(),
+		boundingBoxesAnalyzed: true,
+		contentType: 'image/jpeg',
+		dimensions: { width: 100, height: 100, aspectRatio: 1 },
+		fileId: 'file_' + id
+	}));
+
+	describe('observationMetadata', () => {
+		it('merges metadata from images and observation overrides', () => {
+			const observation = {
+				images: items.slice(0, 2).map(({ id }) => id),
+				metadataOverrides: {
+					[metadatas.enum.id]: {
+						...items[0].metadata.enum,
+						value: 'A'
+					}
+				}
+			};
+
+			expect(
+				observationMetadata({
+					definitions: Object.values(metadatas),
+					observation,
+					images
+				})
+			).toMatchInlineSnapshot(`
+				{
+				  "metadata_date": {
+				    "alternatives": {},
+				    "confidence": 1,
+				    "confirmed": false,
+				    "manuallyModified": false,
+				    "merged": true,
+				    "value": 2023-01-01T12:00:15.000Z,
+				  },
+				  "metadata_enum ": {
+				    "value": "A",
+				  },
+				  "metadata_float": {
+				    "alternatives": {},
+				    "confidence": 1,
+				    "confirmed": false,
+				    "manuallyModified": false,
+				    "merged": true,
+				    "value": 10.124500000000001,
+				  },
+				  "metadata_integer": {
+				    "alternatives": {},
+				    "confidence": 1,
+				    "confirmed": false,
+				    "manuallyModified": false,
+				    "merged": false,
+				    "value": 10,
+				  },
+				}
+			`);
+		});
+	});
 }
