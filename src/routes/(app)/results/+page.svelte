@@ -32,7 +32,7 @@
 
 	let include: 'metadataonly' | 'croppedonly' | 'full' = $state('croppedonly');
 
-	let cropPadding = $derived(parseCropPadding(uiState.currentProtocol?.crop.padding ?? '0px'));
+	let cropPadding = $derived(parseCropPadding(uiState.currentProtocol?.crop?.padding ?? '0px'));
 
 	let cropPaddingPreset = $derived.by(() => {
 		if (cropPadding.unitless === 0) return 'none' as const;

@@ -61,8 +61,8 @@ jobs:
           echo "non-huggingface-urls=$non_huggingface_urls" >> $GITHUB_OUTPUT
         env:
           PROTOCOL_URL: https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json
-          JQ_SELECTORS: .crop.infer[].model,
-            .metadata[].infer?.neural[]?.model,
+          JQ_SELECTORS: 
+            .metadata[].infer?.neural[]?.model, 
             .metadata[].infer?.neural[]?.classmapping
 
       - name: Compute cache key

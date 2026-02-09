@@ -18,9 +18,10 @@ import {
 	protocolMetadataValues
 } from '$lib/metadata/index.js';
 import { observationMetadata } from '$lib/observations.js';
+import { defaultCropMetadata } from '$lib/protocols.js';
 import { Analysis } from '$lib/schemas/exports.js';
 import { MetadataRuntimeValue, MetadataValues } from '$lib/schemas/metadata';
-import { FilepathTemplate } from '$lib/schemas/protocols';
+import { ExportsFilepathTemplate } from '$lib/schemas/protocols';
 import { toMetadataRecord } from '$lib/schemas/results';
 import { compareBy, mapValues, progressSplitter, sum } from '$lib/utils';
 
@@ -54,7 +55,7 @@ swarp.generateResultsExport(
 
 		const splitProgress = progressSplitter('prepare', 0.7, 'encode');
 
-		const { exportedObservations, filepaths } = await prepare({
+		const { exportedObservations, filepaths, cropMetadata } = await prepare({
 			protocolUsed,
 			sessionId,
 			db,
@@ -99,7 +100,7 @@ swarp.generateResultsExport(
 				abortSignal?.throwIfAborted();
 
 				const { contentType, filename } = Schemas.Image.assert(image);
-				const cropbox = metadata[protocolUsed.crop?.metadata ?? 'crop']?.value;
+				const cropbox = metadata[cropMetadata.id]?.value;
 				if (!image.fileId) continue;
 				const file = await db.get('ImageFile', image.fileId);
 				if (!file) continue;
@@ -397,6 +398,18 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 	);
 	abortSignal?.throwIfAborted();
 
+	const metadataDefinitions = await db
+		.getAll('Metadata')
+		.then((ms) => ms.map((m) => Schemas.Metadata.assert(m)));
+	abortSignal?.throwIfAborted();
+
+	const cropMetadata = defaultCropMetadata(protocolUsed, metadataDefinitions);
+	if (!cropMetadata) {
+		throw new Error(
+			`No crop metadata defined for protocol ${protocolUsed.id}, and default crop metadata does not apply to this protocol`
+		);
+	}
+
 	const estimations = {
 		json: (5300e3 / 94) * Object.keys(observations).length,
 		csv: (30e3 / 94) * Object.keys(observations).length,
@@ -414,9 +427,7 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 				if (!fileId) return 0;
 				const stats = imageFileStats.get(fileId);
 				if (!stats) return 0;
-				const cropbox = MetadataRuntimeValue.boundingbox(
-					metadata[protocolUsed.crop?.metadata ?? 'crop']?.value
-				);
+				const cropbox = MetadataRuntimeValue.boundingbox(metadata[cropMetadata.id]?.value);
 				if (cropbox instanceof ArkErrors) return stats.fullSize;
 
 				const { width, height } = parseCropPadding(cropPadding).apply(
@@ -475,8 +486,12 @@ async function prepare({
 }) {
 	const filepaths = protocolUsed.exports ?? {
 		images: {
-			cropped: FilepathTemplate.assert('cropped/{{sequence}}.{{extension image.filename}}'),
-			original: FilepathTemplate.assert('original/{{sequence}}.{{extension image.filename}}')
+			cropped: ExportsFilepathTemplate.assert(
+				'cropped/{{sequence}}.{{extension image.filename}}'
+			),
+			original: ExportsFilepathTemplate.assert(
+				'original/{{sequence}}.{{extension image.filename}}'
+			)
 		},
 		metadata: {
 			json: 'analysis.json',
@@ -488,6 +503,14 @@ async function prepare({
 		.getAll('Metadata')
 		.then((ms) => ms.map((m) => Schemas.Metadata.assert(m)));
 	abortSignal?.throwIfAborted();
+
+	const cropMetadata = defaultCropMetadata(protocolUsed, metadataDefinitions);
+
+	if (!cropMetadata) {
+		throw new Error(
+			`No crop metadata defined for protocol ${protocolUsed.id}, and default crop metadata does not apply to this protocol`
+		);
+	}
 
 	const sessionObservations = await db
 		.getAllFromIndex('Observation', 'sessionId', sessionId)
@@ -589,5 +612,5 @@ async function prepare({
 		}
 	}
 
-	return { exportedObservations, filepaths };
+	return { exportedObservations, filepaths, cropMetadata };
 }

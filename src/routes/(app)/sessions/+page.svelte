@@ -11,7 +11,7 @@
 	import { plural } from '$lib/i18n.js';
 	import { tables } from '$lib/idb.svelte.js';
 	import { goto } from '$lib/paths.js';
-	import { defaultClassificationMetadata } from '$lib/protocols.js';
+	import { defaultClassificationMetadata, defaultCropMetadata } from '$lib/protocols.js';
 	import { importMore } from '$lib/queue.svelte';
 	import { seo } from '$lib/seo.svelte';
 	import { switchSession } from '$lib/sessions.js';
@@ -37,6 +37,8 @@
 			tables.Metadata.state
 		);
 
+		const cropMetadata = defaultCropMetadata(defaultProtocol, tables.Metadata.state);
+
 		const mtimeMetadata = defaultProtocol.exports?.images.mtime;
 
 		const { id } = await tables.Session.add({
@@ -49,14 +51,16 @@
 			fullscreenClassifier: {
 				layout: 'top-bottom',
 				...orEmptyObj(classificationMetadata !== undefined, {
-					focusedMetadata: classificationMetadata ?? ''
+					focusedMetadata: classificationMetadata?.id ?? ''
 				})
 			},
 			group: {
 				global: { field: 'none' },
-				crop: { field: 'metadataPresence', metadata: defaultProtocol.crop.metadata },
+				crop: cropMetadata
+					? { field: 'metadataPresence', metadata: cropMetadata.id }
+					: { field: 'none' },
 				classify: classificationMetadata
-					? { field: 'metadataConfidence', metadata: classificationMetadata }
+					? { field: 'metadataConfidence', metadata: classificationMetadata.id }
 					: { field: 'none' }
 			},
 			sort: {

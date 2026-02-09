@@ -14,6 +14,8 @@ import {
  * @import { AppFixture } from './fixtures.js';
  */
 
+const CROP_METADATA_ID = `${exampleProtocol.id}__crop`;
+
 test.describe('Cropper view', () => {
 	test.beforeEach(async ({ page, app }, testInfo) => {
 		testInfo.setTimeout(40_000);
@@ -683,9 +685,7 @@ function confirmedCropBadge(page) {
  */
 async function isImageConfirmedInDatabase(app, id) {
 	return Boolean(
-		await app.db.image
-			.byId(id)
-			.then((img) => img?.metadata[exampleProtocol.crop.metadata]?.confirmed)
+		await app.db.image.byId(id).then((img) => img?.metadata[CROP_METADATA_ID]?.confirmed)
 	);
 }
 
@@ -700,7 +700,7 @@ async function setImageConfirmedStatusInDB(page, ids, confirmed = true) {
 	for (const [i, id] of ids.entries()) {
 		await browserConsole.log(
 			page,
-			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${exampleProtocol.crop.metadata}) (${i + 1}/${ids.length})`
+			`Marking image ${id} as ${confirmed ? 'confirmed' : 'unconfirmed'} (${CROP_METADATA_ID}) (${i + 1}/${ids.length})`
 		);
 
 		const image = await getDatabaseRowById(page, 'Image', id).then((img) =>
@@ -711,8 +711,8 @@ async function setImageConfirmedStatusInDB(page, ids, confirmed = true) {
 			{ page },
 			id,
 			{
-				[exampleProtocol.crop.metadata]: {
-					...image?.metadata[exampleProtocol.crop.metadata],
+				[CROP_METADATA_ID]: {
+					...image?.metadata[CROP_METADATA_ID],
 					confirmed
 				}
 			},

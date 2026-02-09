@@ -6,15 +6,14 @@
 
 	/**
 	 * @typedef {object} Props
-	 * @property {Pick<import('$lib/database').Metadata, 'id' | 'label' | 'infer'>} metadata
-	 * @property {Pick<import('$lib/database').Protocol, 'crop'>} protocol
+	 * @property {Pick<import('$lib/database').Metadata,  'label' | 'infer'>} metadata
 	 */
 
 	/**
 	 * @type {Props}
 	 */
-	const { metadata, protocol } = $props();
-	const { label, id, infer } = $derived(metadata);
+	const { metadata } = $props();
+	const { label, infer } = $derived(metadata);
 </script>
 
 {#if !label}
@@ -22,7 +21,7 @@
 		<IconTechnical />
 	</span>
 {/if}
-{#if id === protocol.crop?.metadata || (infer && 'neural' in infer)}
+{#if infer && 'neural' in infer}
 	<span use:tooltip={'Inférence par réseau neuronal'} style:color="var(--fg-primary)">
 		<IconInferred />
 	</span>

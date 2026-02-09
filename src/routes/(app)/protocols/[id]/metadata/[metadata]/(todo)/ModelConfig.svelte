@@ -8,27 +8,48 @@
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import RadioButtons from '$lib/RadioButtons.svelte';
 
-	import { updater } from '../updater.svelte';
+	import { updater as _updater } from '../updater.svelte';
 	import ModelOutputShapeDiagram from './ModelOutputShapeDiagram.svelte';
 
 	/**
 	 * @typedef {object} Props
 	 * @property {number} i index of the model in the protocol.crop.infer array
-	 * @property {NonNullable<import('$lib/database').Protocol['crop']['infer']>[number]} inference
+	 * @property {import('$lib/schemas/neural').NeuralInference} inference
 	 */
 
 	/** @type {Props} */
 	const { inference, i } = $props();
 	const { name, input, output, model } = $derived(inference);
+
+	/**
+	 * @template T
+	 * @param {(inferences: import('$lib/schemas/neural').NeuralInference[], v: T) => void | Promise<void>} changes
+	 * @returns {(v: T) => Promise<void>}
+	 */
+	const updater = (changes) =>
+		_updater((m, ...args) => {
+			if (!m.infer || !('neural' in m.infer)) return;
+			changes(m.infer.neural, ...args);
+		});
+
+	/**
+	 * @template T
+	 * @param {(shape: typeof import('$lib/schemas/neural').NeuralBoundingBoxInference.infer['output']['shape'], v: T) => void | Promise<void>} changes
+	 * @returns {(v: T) => Promise<void>}
+	 */
+	const outputShapeUpdater = (changes) =>
+		updater((inf, ...args) => {
+			if (!inf[i].output || !('shape' in inf[i].output)) return;
+			changes(inf[i].output.shape, ...args);
+		});
 </script>
 
 <Field label="Nom du modèle">
 	<InlineTextInput
 		value={name ?? '(Sans nom)'}
 		label="Nom du modèle"
-		onblur={updater((p, newName) => {
-			if (!p.crop.infer) return;
-			p.crop.infer[i].name = newName;
+		onblur={updater((inf, newName) => {
+			inf[i].name = newName;
 		})}
 	/>
 </Field>
@@ -36,9 +57,8 @@
 	check
 	label="URL du ficher .onnx"
 	value={typeof model === 'string' ? model : ''}
-	onblur={updater((p, newModel) => {
-		if (!p.crop.infer) return;
-		p.crop.infer[i].model = newModel;
+	onblur={updater((inf, newModel) => {
+		inf[i].model = newModel;
 	})}
 />
 <Field composite label="Taille des images en entrée">
@@ -46,18 +66,16 @@
 		<InlineTextInput
 			label="Largeur"
 			value={input.width.toString()}
-			onblur={updater((p, width) => {
-				if (!p.crop.infer) return;
-				p.crop.infer[i].input.width = parseInt(width, 10);
+			onblur={updater((inf, width) => {
+				inf[i].input.width = parseInt(width, 10);
 			})}
 		/>
 		<span class="separator">×</span>
 		<InlineTextInput
 			label="Hauteur"
 			value={input.height.toString()}
-			onblur={updater((p, height) => {
-				if (!p.crop.infer) return;
-				p.crop.infer[i].input.height = parseInt(height, 10);
+			onblur={updater((inf, height) => {
+				inf[i].input.height = parseInt(height, 10);
 			})}
 		/>
 		<span class="unit">pixels</span>
@@ -69,15 +87,17 @@
 		horizontal
 		cards
 		value={input.disposition ?? 'CHW'}
-		onchange={updater((p, newValue) => {
-			if (!p.crop.infer) return;
+		onchange={updater((inf, newValue) => {
+
+			if (!newValue) return
 
 			// The if prevent infinite loops since calling the updater
 			// triggers a load function re-run, which
 			// in turns updates input.disposition
-			if (newValue === p.crop.infer[i].input.disposition) return false;
+			if (newValue === inf[i].input.disposition) return;
 
-			p.crop.infer[i].input.disposition = newValue;
+
+			inf[i].input.disposition = newValue;
 		})}
 		options={[
 			{
@@ -179,15 +199,13 @@
 		horizontal
 		cards
 		value={input.normalized ? 'normalized' : 'raw'}
-		onchange={updater((p, newValue) => {
-			if (!p.crop.infer) return;
-
+		onchange={updater((inf, newValue) => {
 			// The if prevent infinite loops since calling the updater
 			// See comment in updater() of RadioButtons above
 			const newNormalized = newValue === 'normalized';
-			if (newNormalized === p.crop.infer[i].input.normalized) return false;
+			if (newNormalized === inf[i].input.normalized) return;
 
-			p.crop.infer[i].input.normalized = newNormalized;
+			inf[i].input.normalized = newNormalized;
 		})}
 		options={[
 			{
@@ -235,27 +253,24 @@
 	</RadioButtons>
 </Field>
 
-<Field composite label="Forme de la sortie">
-	<div class="diagram">
-		<ModelOutputShapeDiagram
-			{...output}
-			onadd={updater((p, atom) => {
-				if (!p.crop.infer) return;
-				p.crop.infer[i].output.shape.push(atom);
-			})}
-			onchange={updater((p, j, atom) => {
-				if (!p.crop.infer) return;
-				p.crop.infer[i].output.shape[j] = atom;
-			})}
-			ondelete={updater((p, j) => {
-				if (!p.crop.infer) return;
-				p.crop.infer[i].output.shape = p.crop.infer[i].output.shape.filter(
-					(_, index) => index !== j
-				);
-			})}
-		/>
-	</div>
-</Field>
+{#if output && 'shape' in output}
+	<Field composite label="Forme de la sortie">
+		<div class="diagram">
+			<ModelOutputShapeDiagram
+				{...output}
+				onadd={outputShapeUpdater((shape, atom) => {
+					shape.push(atom);
+				})}
+				onchange={outputShapeUpdater((shape, [j, atom]) => {
+					shape[j] = atom;
+				})}
+				ondelete={outputShapeUpdater((shape, j) => {
+					shape.splice(j, 1);
+				})}
+			/>
+		</div>
+	</Field>
+{/if}
 
 <style>
 	.composite-input-line {

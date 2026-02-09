@@ -8,7 +8,7 @@
 	import IconTrash from '~icons/ri/delete-bin-line';
 	import IconEdit from '~icons/ri/pencil-line';
 	import ButtonIcon from '$lib/ButtonIcon.svelte';
-	import { MODEL_DETECTION_OUTPUT_SHAPES } from '$lib/schemas/protocols.js';
+	import { MODEL_DETECTION_OUTPUT_SHAPES } from '$lib/schemas/neural.js';
 	import { tooltip } from '$lib/tooltips';
 	import { entries } from '$lib/utils.js';
 
@@ -16,14 +16,14 @@
 	import ShapeAtomDisplay from './ShapeAtomDisplay.svelte';
 
 	/**
-	 * @typedef {typeof import('$lib/schemas/protocols.js').ModelDetectionOutputShape.infer[number]} Atom
+	 * @typedef {typeof import('$lib/schemas/neural.js').ModelDetectionOutputShape.infer[number]} Atom
 	 */
 
 	/**
 	 * @typedef {object} Props
 	 * @property {Atom[]} shape
 	 * @property {(i: number) => Promise<void>} ondelete
-	 * @property {(i: number, newAtom: Atom) => Promise<void>} onchange
+	 * @property {(change: [number, Atom]) => Promise<void>} onchange
 	 * @property {(newAtom: Atom) => Promise<void>} onadd
 	 */
 
@@ -157,7 +157,7 @@
 										if (dim === '') {
 											onadd(atom);
 										} else {
-											onchange(i, atom);
+											onchange([i, atom]);
 										}
 									}}
 								>

@@ -298,7 +298,7 @@ export async function infer(
 
 /**
  *
- * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
+ * @param {import('$lib/schemas/neural.js').NeuralInference} settings
  * @param {ort.Tensor} image
  * @param {import('onnxruntime-web').InferenceSession} model
  * @param {AbortSignal} [abortSignal]
