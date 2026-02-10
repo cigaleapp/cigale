@@ -163,7 +163,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			delete observation.metadataErrors[metadataId];
 		}
 		db.put('Observation', observation);
-	} else if (imagesFromImageFile) {
+	} else if (imagesFromImageFile.length > 0) {
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
 				db,
