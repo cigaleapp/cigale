@@ -1,11 +1,11 @@
 import { openDatabase, type DatabaseHandle } from '$lib/idb.svelte.js';
-import { namespacedMetadataId, metadataOptionId, MetadataType } from '$lib/schemas/metadata.js';
+import { metadataOptionId, MetadataType, namespacedMetadataId } from '$lib/schemas/metadata.js';
 
 import 'fake-indexeddb/auto';
 
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { storeMetadataValue, storeMetadataErrors, deleteMetadataValue } from './storage.js';
+import { deleteMetadataValue, storeMetadataErrors, storeMetadataValue } from './storage.js';
 
 const PROTOCOL_ID = 'testproto';
 const SESSION_ID = 'sess001';

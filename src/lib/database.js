@@ -12,11 +12,11 @@ import {
 import {
 	EXIFField,
 	MetadataEnumVariant,
+	MetadataError,
 	MetadataInferOptions,
 	MetadataMergeMethod,
 	Metadata as MetadataSchema,
 	MetadataType as MetadataTypeSchema,
-	MetadataError,
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
