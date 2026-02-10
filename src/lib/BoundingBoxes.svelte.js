@@ -118,8 +118,8 @@ if (import.meta.vitest) {
  */
 export function toTopLeftCoords({ x, y, w, h }) {
 	return {
-		x: x - w / 2,
-		y: y - h / 2,
+		x: Math.max(x - w / 2, 0),
+		y: Math.max(y - h / 2, 0),
 		width: w,
 		height: h
 	};

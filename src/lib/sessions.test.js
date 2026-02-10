@@ -215,6 +215,7 @@ describe('deleteSession', () => {
 			    "filename": "image3.jpg",
 			    "id": "00000000000000000000IMAGE3_000000",
 			    "metadata": {},
+			    "metadataErrors": {},
 			    "sessionId": "session2",
 			  },
 			]
@@ -228,6 +229,7 @@ describe('deleteSession', () => {
 			      "00000000000000000000IMAGE3_000000",
 			    ],
 			    "label": "Observation 2",
+			    "metadataErrors": {},
 			    "metadataOverrides": {},
 			    "sessionId": "session2",
 			  },

@@ -85,6 +85,26 @@ export const MetadataRuntimeValueAny = type.or(
 	MetadataRuntimeValue.boundingbox
 );
 
+export const MetadataError = type({
+	message: 'string',
+	details: 'unknown',
+	stack: 'string = ""',
+	/** Ignored by the user */
+	ignored: 'boolean = false',
+	happenedAt: ['string.date.iso', '=', () => new Date().toISOString()],
+	kind: type.or(
+		type(
+			'"inference"',
+			'@',
+			"Erreur survenue lors de l'inférence de la valeur de cette métadonnée"
+		)
+	)
+});
+
+export const MetadataErrors = scope({ ID }).type({
+	'[ID]': MetadataError.array()
+});
+
 /**
  * @template {MetadataType} [Type=MetadataType]
  * @typedef  RuntimeValue

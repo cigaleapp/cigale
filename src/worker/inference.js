@@ -5,10 +5,11 @@
 
 import * as ort from 'onnxruntime-web';
 
+import { FULL_IMAGE_CROPBOX } from '$lib/BoundingBoxes.svelte.js';
 import { Schemas } from '$lib/database.js';
 import { loadToTensor } from '$lib/inference_utils.js';
 import { classify, infer } from '$lib/inference.js';
-import { storeMetadataValue } from '$lib/metadata/index.js';
+import { getMetadataValue, storeMetadataValue } from '$lib/metadata/index.js';
 
 import { openDatabase, swarp } from './index.js';
 
@@ -78,6 +79,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 	tools.abortSignal?.throwIfAborted();
 
 	const db = await openDatabase();
+
 	const image = Schemas.Image.assert(await db.get('Image', imageId));
 
 	tools.abortSignal?.throwIfAborted();
@@ -95,9 +97,7 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 	}
 
 	const cropbox =
-		/** @type {undefined | import('$lib/metadata/index.js').RuntimeValue<'boundingbox'>} */ (
-			image.metadata[metadataIds.cropbox]?.value ?? { x: 0.5, y: 0.5, w: 1, h: 1 }
-		);
+		getMetadataValue(image, 'boundingbox', metadataIds.cropbox)?.value ?? FULL_IMAGE_CROPBOX;
 
 	console.debug('Classifying image', image.id, 'with cropbox', cropbox);
 
@@ -110,10 +110,10 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 	});
 
 	const scores = await classify(taskSettings, img, onnx, tools.abortSignal);
-
 	tools.abortSignal?.throwIfAborted();
+
 	const results = scores
-		.map((score, i) => ({
+		?.map((score, i) => ({
 			confidence: score,
 			value: classmapping[i]
 		}))
@@ -121,23 +121,21 @@ swarp.classify(async ({ imageId, metadataIds, taskSettings }, _, tools) => {
 		.slice(0, 100);
 
 	tools.abortSignal?.throwIfAborted();
-	if (!results.length) {
-		throw new Error('No species detected');
-	} else {
-		const [firstChoice, ...alternatives] = results;
-		const metadataValue = /** @type {const} */ ({
-			subjectId: imageId,
-			...firstChoice,
-			alternatives
-		});
 
-		await storeMetadataValue({
-			db,
-			...metadataValue,
-			metadataId: metadataIds.target,
-			abortSignal: tools.abortSignal
-		});
+	if (!results?.length) {
+		throw new Error("Le modèle de classification n'a retourné aucun résultat");
 	}
+
+	const [firstChoice, ...alternatives] = results;
+
+	await storeMetadataValue({
+		db,
+		abortSignal: tools.abortSignal,
+		metadataId: metadataIds.target,
+		subjectId: imageId,
+		alternatives,
+		...firstChoice
+	});
 
 	return { scores };
 });

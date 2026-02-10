@@ -56,7 +56,7 @@ export async function mergeToObservation(parts) {
 
 	observation.label = defaultObservationLabel({ protocol, images, observation });
 
-	await tables.Observation.do((tx) => {
+	await tables.Observation.do(undefined, (tx) => {
 		tx.add(observation);
 		for (const { id } of observations) {
 			tx.delete(id);

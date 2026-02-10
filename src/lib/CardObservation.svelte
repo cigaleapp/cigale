@@ -1,6 +1,7 @@
 <script>
 	import { toTopLeftCoords } from './BoundingBoxes.svelte.js';
 	import CardMedia from './CardMedia.svelte';
+	import { tables } from './idb.svelte.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { uiState } from './state.svelte.js';
 	import { nonnull } from './utils.js';
@@ -15,19 +16,30 @@
 	/** @type { Omit< Partial<import('$lib/CardMedia.svelte').Props>, keyof Props> & Props} */
 	const { observation, images, highlighted = false, ...rest } = $props();
 
+	const errorMessages = $derived(
+		images.flatMap(({ metadataErrors, id }) => {
+			const otherError = uiState.erroredImages.get(id);
+			if (otherError) return [otherError];
+
+			return Object.entries(metadataErrors).flatMap(([metadataId, errors]) => {
+				const metadata = tables.Metadata.getFromState(metadataId);
+				return errors.map(
+					(e) => `${e.kind} sur ${metadata?.label || metadataId}: ${e.message}`
+				);
+			});
+		})
+	);
+
 	const status = $derived.by(() => {
 		if (images.some(({ id }) => uiState.queuedImages.has(id))) return 'queued';
 		if (images.some(({ id }) => uiState.loadingImages.has(id))) return 'loading';
-		if (images.some(({ id }) => uiState.erroredImages.has(id))) return 'errored';
+		if (errorMessages.length > 0) return 'errored';
 		return 'ok';
 	});
 
 	const tooltip = $derived.by(() => {
 		if (status === 'errored') {
-			return images
-				.map(({ id }) => uiState.erroredImages.get(id))
-				.filter(nonnull)
-				.join('; ');
+			return errorMessages.join('\n');
 		}
 
 		if (isDebugMode())

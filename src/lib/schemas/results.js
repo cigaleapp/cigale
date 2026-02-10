@@ -3,7 +3,7 @@ import { type } from 'arktype';
 // Can't use $lib/ in $lib/schemas files, they're susceptible
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
 import { mapValues } from '../utils.js';
-import { MetadataRuntimeValue } from './metadata.js';
+import { MetadataErrors, MetadataRuntimeValue } from './metadata.js';
 
 export const MetadataRecord = type({
 	'[string]': {
@@ -65,6 +65,7 @@ export const AnalyzedImage = type({
 	],
 	numberInObservation: ['number > 0', '@', "Numéro de l'image dans l'observation"],
 	metadata: MetadataRecord,
+	metadataErrors: MetadataErrors.default(() => ({})),
 	exportedAs: type({
 		original: ['string', '@', "Chemin vers l'image originale"],
 		cropped: ['string', '@', "Chemin vers l'image recadrée"]
@@ -76,6 +77,7 @@ export const AnalyzedObservation = type({
 	label: ['string', '@', "Label de l'observation"],
 	images: AnalyzedImage.array(),
 	metadata: MetadataRecord,
+	metadataErrors: MetadataErrors.default(() => ({})),
 	protocolMetadata: MetadataRecord.describe(
 		"Métadonnées définies par le protocole. Les clés de l'objet sont les identifiants des métadonnées, sans le préfixe qui identifie leur protocole de provenance"
 	)

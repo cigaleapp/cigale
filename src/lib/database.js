@@ -5,6 +5,7 @@ import { Dimensions, HTTPRequest, ID, Probability, References } from './schemas/
 import {
 	EXIFField,
 	MetadataEnumVariant,
+	MetadataError,
 	MetadataMergeMethod,
 	Metadata as MetadataSchema,
 	MetadataType as MetadataTypeSchema,
@@ -156,6 +157,7 @@ export const Schemas = {
 	Probability,
 	MetadataValues,
 	MetadataValue,
+	MetadataError,
 	Image,
 	ModelInput,
 	ModelDetectionOutputShape,
@@ -269,6 +271,11 @@ export const idComparator = (a, b) => {
 /**
  * @typedef  MetadataValues
  * @type {typeof MetadataValues.infer}
+ */
+
+/**
+ * @typedef MetadataError
+ * @type {typeof MetadataError.infer}
  */
 
 /**
