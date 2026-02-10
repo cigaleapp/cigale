@@ -85,9 +85,9 @@ async function mockPredownloadedModel(
 	if (!('neural' in metadata.infer))
 		throw new Error(`Metadata ${metadataId} has no neural inference settings`);
 
-	const inference = metadata.infer.neural.find(({ model }) => {
-		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
-	});
+	const inference = metadata.infer.neural.find(({ model }) =>
+		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename)
+	);
 
 	if (!inference)
 		throw new Error(
