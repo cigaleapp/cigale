@@ -366,7 +366,7 @@ describe('storeMetadataValue', () => {
 				value: 'test',
 				sessionId: SESSION_ID
 			})
-		).rejects.toThrow();
+		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Aucune image ou observation avec l'ID nonexistent]`);
 	});
 
 	test('aborts when abortSignal is already aborted', async () => {
@@ -386,7 +386,7 @@ describe('storeMetadataValue', () => {
 				abortSignal: controller.signal,
 				sessionId: SESSION_ID
 			})
-		).rejects.toThrow();
+		).rejects.toThrowErrorMatchingInlineSnapshot(`[AbortError: This operation was aborted]`);
 	});
 
 	test('stores value on all images matching a fileId when subjectId is the fileId', async () => {
@@ -584,7 +584,7 @@ describe('storeMetadataErrors', () => {
 				{ db, subjectId: 'nope', sessionId: SESSION_ID, metadataId: nsId('x') },
 				{ message: 'err', details: null, kind: 'inference' }
 			)
-		).rejects.toThrow();
+		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Aucune image ou observation avec l'ID nope]`);
 	});
 });
 
@@ -750,7 +750,7 @@ describe('deleteMetadataValue', () => {
 				metadataId: nsId('species'),
 				sessionId: SESSION_ID
 			})
-		).rejects.toThrow();
+		).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Aucune image, observation ou session avec l'ID nonexistent]`);
 	});
 
 	test('does not delete other metadata on the same subject', async () => {
