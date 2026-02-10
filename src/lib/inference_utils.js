@@ -103,7 +103,14 @@ export async function loadToTensor(
 			const scaler = coordsScaler({ x: imageTensor.width, y: imageTensor.height });
 			const { x, y, height: h, width: w } = toTopLeftCoords(scaler(crop));
 			abortSignal?.throwIfAborted();
-			imageTensor.crop({ x, y, w, h });
+			try {
+				imageTensor.crop({ x, y, w, h });
+			} catch (error) {
+				throw new Error(
+					`Could not crop image of size ${imageTensor.width}×${imageTensor.height} with crop box ${JSON.stringify({ x, y, w, h })}. Check that your crop metadata is correct.`,
+					{ cause: error }
+				);
+			}
 		}
 
 		abortSignal?.throwIfAborted();

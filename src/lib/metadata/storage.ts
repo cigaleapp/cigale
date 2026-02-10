@@ -3,6 +3,7 @@ import type * as DB from '$lib/database.js';
 import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
 import {
 	ensureNamespacedMetadataId,
+	MetadataError,
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 	type RuntimeValue
@@ -53,6 +54,7 @@ async function refreshTables(sessionId: string, ...tableNames: ReactiveTableName
  * @param options.manuallyModified si la valeur a été modifiée manuellement
  * @param options.confidence la confiance dans la valeur (proba que ce soit la bonne valeur)
  * @param options.confirmed si la valeur a été confirmée manuellement comme correcte
+ * @param options.clearErrors effacer tout les metadataErrors associés à cette métadonnée. True par défaut.
  * @param options.db BDD à modifier
  * @param options.alternatives les autres valeurs possibles
  * @param options.cascadedFrom ID des métadonnées dont celle-ci est dérivée, pour éviter les boucles infinies (cf "cascade" dans MetadataEnumVariant)
@@ -69,6 +71,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	confirmed = false,
 	alternatives = [],
 	manuallyModified = false,
+	clearErrors = true,
 	cascadedFrom = [],
 	sessionId,
 	abortSignal
@@ -80,6 +83,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	manuallyModified?: boolean;
 	confidence?: number;
 	confirmed?: boolean;
+	clearErrors?: boolean;
 	db: DatabaseHandle;
 	alternatives?:
 		| DB.MetadataValue['alternatives']
@@ -149,11 +153,17 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		db.put('Session', session);
 	} else if (image) {
 		image.metadata[metadataId] = newValue;
+		if (clearErrors && image.metadataErrors?.[metadataId]) {
+			delete image.metadataErrors[metadataId];
+		}
 		db.put('Image', image);
 	} else if (observation) {
 		observation.metadataOverrides[metadataId] = newValue;
+		if (clearErrors && observation.metadataErrors?.[metadataId]) {
+			delete observation.metadataErrors[metadataId];
+		}
 		db.put('Observation', observation);
-	} else if (imagesFromImageFile) {
+	} else if (imagesFromImageFile.length > 0) {
 		for (const { id } of imagesFromImageFile) {
 			await storeMetadataValue({
 				db,
@@ -164,6 +174,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				confidence,
 				confirmed,
 				manuallyModified,
+				clearErrors,
 				abortSignal
 			});
 		}
@@ -210,6 +221,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			confirmed,
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
+			clearErrors,
 			...cascade
 		});
 	}
@@ -220,6 +232,64 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	}
 }
 
+export async function storeMetadataErrors(
+	{
+		db,
+		subjectId,
+		sessionId,
+		metadataId
+	}: {
+		db: DatabaseHandle;
+		subjectId: string;
+		sessionId: string;
+		metadataId: string;
+	},
+	...errors: Array<typeof DB.Schemas.MetadataError.inferIn>
+) {
+	const image = await db.get('Image', subjectId);
+	const observation = await db.get('Observation', subjectId);
+	const imagesFromImageFile = await db
+		.getAllFromIndex('Image', 'sessionId', sessionId)
+		.then((imgs) => imgs.filter(({ fileId }) => fileId === subjectId));
+
+	if (!image && !observation && imagesFromImageFile.length === 0)
+		throw new Error(`Aucune image ou observation avec l'ID ${subjectId}`);
+
+	const serializedErrors = errors.map((error) => {
+		try {
+			JSON.stringify(error.details);
+		} catch {
+			error.details = `{{Non-JSONable}} ${String(error.details)}`;
+		}
+
+		return MetadataError.assert(error);
+	});
+
+	console.debug(`Store metadata error on ${metadataId} in ${subjectId}:`, errors);
+	if (image) {
+		image.metadataErrors ??= {};
+		image.metadataErrors[metadataId] = serializedErrors;
+		db.put('Image', image);
+	} else if (observation) {
+		observation.metadataErrors ??= {};
+		observation.metadataErrors[metadataId] = serializedErrors;
+		db.put('Observation', observation);
+	} else if (imagesFromImageFile) {
+		for (const { id } of imagesFromImageFile) {
+			await storeMetadataErrors(
+				{
+					db,
+					sessionId,
+					subjectId: id,
+					metadataId
+				},
+				...errors
+			);
+		}
+	}
+
+	return;
+}
 /**
  *
  * @param options

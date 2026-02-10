@@ -536,6 +536,7 @@ async function prepare({
 			label: obs.label,
 			number: observationNumber,
 			metadata: toMetadataRecord(metadata),
+			metadataErrors: obs.metadataErrors,
 			protocolMetadata: toMetadataRecord(protocolMetadataValues(protocolUsed, metadata)),
 			images: []
 		};

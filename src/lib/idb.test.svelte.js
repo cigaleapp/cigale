@@ -141,6 +141,7 @@ describe('operations', () => {
 				dimensions: { width: 100, height: 100, aspectRatio: 1 },
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
+				metadataErrors: {},
 				metadata: {
 					water: {
 						value: 'bucket',
@@ -164,7 +165,8 @@ describe('operations', () => {
 				addedAt: new Date().toISOString(),
 				images: [],
 				label: 'Test',
-				metadataOverrides: {}
+				metadataOverrides: {},
+				metadataErrors: {}
 			});
 		}
 		for (const i of [0, 1, 2]) {
@@ -194,6 +196,7 @@ describe('operations', () => {
 			dimensions: { width: 100, height: 100 },
 			contentType: 'what/ever',
 			filename: 'THE NETHER',
+			metadataErrors: {},
 			metadata: {
 				water: {
 					value: '"bucket"',
@@ -211,6 +214,7 @@ describe('operations', () => {
 			dimensions: { width: 100, height: 100 },
 			contentType: 'the ehehhe',
 			filename: 'ogrjoigrejo',
+			metadataErrors: {},
 			metadata: {
 				water: {
 					value: '"ogjroe"',
@@ -229,6 +233,7 @@ describe('operations', () => {
 			dimensions: { width: 100, height: 100, aspectRatio: 1 },
 			contentType: 'what/ever',
 			filename: 'THE NETHER',
+			metadataErrors: {},
 			metadata: {
 				water: {
 					value: 'bucket',
@@ -252,6 +257,7 @@ describe('operations', () => {
 				addedAt: addedAt.toISOString(),
 				images: [],
 				label: 'Test',
+				metadataErrors: {},
 				metadataOverrides: {}
 			});
 		}
@@ -269,6 +275,7 @@ describe('operations', () => {
 				addedAt: addedAt.toISOString(),
 				images: [],
 				label: 'Test',
+				metadataErrors: {},
 				metadataOverrides: {}
 			});
 		}
@@ -286,6 +293,7 @@ describe('operations', () => {
 			addedAt: addedAt.toISOString(),
 			images: [],
 			label: 'Test',
+			metadataErrors: {},
 			metadataOverrides: {}
 		});
 
@@ -325,6 +333,7 @@ describe('wrangler', () => {
 		addedAt: addedAt.toISOString(),
 		images: [],
 		label: 'Test',
+		metadataErrors: {},
 		metadataOverrides: {}
 	});
 
@@ -336,6 +345,7 @@ describe('wrangler', () => {
 		dimensions: { width: 100, height: 100 },
 		contentType: 'what/ever',
 		filename: 'THE NETHER',
+		metadataErrors: {},
 		metadata: {
 			water: {
 				value: '"bucket"',
@@ -490,6 +500,7 @@ describe('wrangler', () => {
 				sessionId: 'testing',
 				images: [],
 				label: 'Test',
+				metadataErrors: {},
 				metadataOverrides: {}
 			};
 			const { id } = await tables.Observation.add(observation);
