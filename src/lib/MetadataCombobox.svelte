@@ -16,7 +16,6 @@
 	import Icon from '@iconify/svelte';
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps } from 'bits-ui';
-	import { marked } from 'marked';
 
 	import IconCheck from '~icons/ri/check-line';
 
@@ -26,9 +25,9 @@
 	import * as idb from './idb.svelte.js';
 	import LearnMoreLink from './LearnMoreLink.svelte';
 	import Logo from './Logo.svelte';
+	import Markdown from './Markdown.svelte';
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
 	import { scrollfader } from './scrollfader.js';
-	import { isDebugMode } from './settings.svelte';
 	import { uiState } from './state.svelte';
 	import { compareBy, pick, readableOn } from './utils.js';
 
@@ -233,14 +232,7 @@
 					{/if}
 					{#if highlightedOption?.description}
 						<section class="description">
-							{#await marked(highlightedOption.description) then html}
-								{@html html}
-							{:catch error}
-								{#if isDebugMode()}
-									<p class="error">Markdown invalide: {error}</p>
-								{/if}
-								{highlightedOption.description}
-							{/await}
+							<Markdown source={highlightedOption.description} />
 						</section>
 					{/if}
 					{#if highlightedOption?.learnMore}
