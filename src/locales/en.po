@@ -561,7 +561,7 @@ msgstr "Padding around cropped images"
 
 #. placeholder {0}: error
 #. placeholder {0}: error
-#: src/lib/MetadataCombobox.svelte
+#: src/lib/Markdown.svelte
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.svelte
 msgid "Markdown invalide: {0}"
 msgstr "Invalid markdown: {0}"
@@ -2278,6 +2278,34 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.ts
 msgid "Observation introuvable"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "User Agent"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Database rev."
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Loaded objects"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Metadata Errors"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Open session"
+msgstr ""
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Métadonnées envoyées"
+msgstr ""
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
+msgid "Entrer des coordonnées de boîte"
 msgstr ""
 
 #: src/lib/queue.svelte.js

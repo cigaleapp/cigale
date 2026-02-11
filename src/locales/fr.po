@@ -560,7 +560,7 @@ msgstr "Marge autour des images recadrées"
 
 #. placeholder {0}: error
 #. placeholder {0}: error
-#: src/lib/MetadataCombobox.svelte
+#: src/lib/Markdown.svelte
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.svelte
 msgid "Markdown invalide: {0}"
 msgstr "Markdown invalide: {0}"
@@ -2279,6 +2279,34 @@ msgstr "<0/> Observations classifiées <1/>"
 #: src/routes/(app)/(sidepanel)/classify/[observation]/+page.ts
 msgid "Observation introuvable"
 msgstr "Observation introuvable"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "User Agent"
+msgstr "User Agent"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Database rev."
+msgstr "Database rev."
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Loaded objects"
+msgstr "Loaded objects"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Metadata Errors"
+msgstr "Metadata Errors"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Open session"
+msgstr "Open session"
+
+#: src/routes/(app)/ModalSubmitIssue.svelte
+msgid "Métadonnées envoyées"
+msgstr "Métadonnées envoyées"
+
+#: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
+msgid "Entrer des coordonnées de boîte"
+msgstr "Entrer des coordonnées de boîte"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
