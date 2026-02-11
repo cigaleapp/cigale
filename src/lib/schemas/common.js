@@ -1,6 +1,7 @@
 import { type } from 'arktype';
+import Handlebars from 'handlebars';
 
-import { clamp } from '../utils.js';
+import { clamp, safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 
 export const ID = type(/^[\w._]+$/);
 
@@ -38,24 +39,6 @@ export const HTTPRequest = URLString.configure(
 		'self'
 	);
 
-export const ModelInput = type({
-	width: ['number < 1024', '@', "Largeur en pixels du tenseur d'entrée du modèle"],
-	height: ['number < 1024', '@', "Hauteur en pixels du tenseur d'entrée du modèle"],
-	'disposition?': type(['"CHW"', '@', 'Tenseurs de la forme [3, H, W]']).or(
-		type(['"1CHW"', '@', 'Tenseurs de la forme [1, 3, H, W]'])
-	),
-	normalized: [
-		'boolean',
-		'@',
-		'Si les valeurs des pixels doivent être normalisées entre 0 et 1. Sinon, elles sont entre 0 et 255'
-	],
-	'name?': [
-		'string',
-		'@',
-		"Nom de l'input du modèle à utiliser. Par défaut, prend la première input"
-	]
-});
-
 export const Dimensions = type({
 	width: 'number > 0',
 	height: 'number > 0'
@@ -64,3 +47,81 @@ export const Dimensions = type({
 	height,
 	aspectRatio: width / height
 }));
+
+export const HANDLEBARS_HELPERS = {
+	suffix: {
+		documentation: "Ajoute un suffixe à un nom de fichier, avant l'extension",
+		usage: "{{ suffix 'filename.jpeg' '_example' }} -> 'filename_example.jpeg'",
+		/**
+		 * @param {string} subject
+		 * @param {string} suffix
+		 */
+		implementation: (subject, suffix) => {
+			const [stem, ext] = splitFilenameOnExtension(subject);
+			return `${stem}${suffix}.${ext}`;
+		}
+	},
+	extension: {
+		documentation: 'Récupère l’extension d’un nom de fichier',
+		usage: "{{ extension 'filename.jpeg' }} -> 'jpeg'",
+		/**
+		 * @param {string} subject
+		 */
+		implementation: (subject) => {
+			return splitFilenameOnExtension(subject)[1];
+		}
+	},
+	fallback: {
+		documentation: 'Fournit une valeur de repli si la première est indéfinie',
+		usage: "{{ fallback obj.does_not_exist 'Unknown' }} -> 'Unknown'",
+		/**
+		 * @param {string} subject
+		 * @param {string} fallback
+		 */
+		implementation: (subject, fallback) => {
+			return subject ?? fallback;
+		}
+	}
+};
+
+for (const [name, { implementation }] of Object.entries(HANDLEBARS_HELPERS)) {
+	Handlebars.registerHelper(name, implementation);
+}
+
+/**
+ * @template {import("arktype").Type} T
+ * @param {T} Input
+ */
+export const TemplatedString = (Input) =>
+	type.string.pipe((t) => {
+		try {
+			const compiled = Handlebars.compile(t, {
+				noEscape: true,
+				assumeObjects: true,
+				knownHelpersOnly: true,
+				knownHelpers: { suffix: true, extension: true, fallback: true }
+			});
+
+			return {
+				toJSON: () => t,
+				/**
+				 * @param {T["inferIn"]} data
+				 * @returns {string}
+				 */
+				render: (data) => compiled(Input.assert(data))
+			};
+		} catch (cause) {
+			throw new Error(`Invalid template ${safeJSONStringify(t)}`, { cause });
+		}
+	});
+
+/**
+ * @template {import("arktype").Type} T
+ * @param {T} Input
+ */
+export const FilepathTemplate = (Input) =>
+	TemplatedString(Input).pipe(({ render, toJSON }) => ({
+		toJSON,
+		/** @type {typeof render} */
+		render: (data) => render(data).replaceAll('\\', '/')
+	}));

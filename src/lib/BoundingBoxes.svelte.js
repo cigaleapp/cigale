@@ -72,12 +72,12 @@ if (import.meta.vitest) {
 	});
 }
 
-/** @param {undefined | import('./database').Protocol} protocol  */
-export const toRelativeCoords = (protocol) => {
-	if (!protocol) throw new Error('No protocol was provided');
+/** @param {undefined | typeof import('./schemas/neural.js').ModelInput.infer} input  */
+export const toRelativeCoords = (input) => {
+	if (!input) throw new Error('No input settings were provided');
 	return coordsScaler({
-		x: 1 / (protocol.crop?.infer?.input?.width ?? TARGETWIDTH),
-		y: 1 / (protocol.crop?.infer?.input?.height ?? TARGETHEIGHT)
+		x: 1 / (input.width ?? TARGETWIDTH),
+		y: 1 / (input.height ?? TARGETHEIGHT)
 	});
 };
 

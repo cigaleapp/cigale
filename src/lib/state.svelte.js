@@ -3,7 +3,7 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 import { tables } from './idb.svelte.js';
 import { getMetadataValue } from './metadata/index.js';
-import { defaultClassificationMetadata } from './protocols.js';
+import { defaultClassificationMetadata, defaultCropMetadata } from './protocols.js';
 
 /**
  * @import * as DB from './database';
@@ -130,6 +130,24 @@ class UIState {
 	/** @type {import('./database').Protocol | undefined} */
 	currentProtocol = $derived(tables.Protocol.state.find((p) => p.id === this.currentProtocolId));
 
+	classificationMetadata = $derived(
+		this.currentProtocol
+			? defaultClassificationMetadata(this.currentProtocol, tables.Metadata.state)
+			: undefined
+	);
+
+	/** @type {string|undefined} */
+	classificationMetadataId = $derived(this.classificationMetadata?.id);
+
+	cropMetadata = $derived(
+		this.currentProtocol
+			? defaultCropMetadata(this.currentProtocol, tables.Metadata.state)
+			: undefined
+	);
+
+	/** @type {string} */
+	cropMetadataId = $derived(this.cropMetadata?.id ?? 'crop');
+
 	/**
 	 * @param {import('./database').Image} image
 	 * @returns {import('./metadata').TypedMetadataValue<'boundingbox'>|undefined}
@@ -137,15 +155,6 @@ class UIState {
 	cropMetadataValueOf(image) {
 		return getMetadataValue(image, 'boundingbox', this.cropMetadataId);
 	}
-
-	/** @type {string} */
-	cropMetadataId = $derived(
-		tables.Metadata.state.find(
-			(m) =>
-				this.currentProtocol?.metadata.includes(m.id) &&
-				this.currentProtocol?.crop?.metadata === m.id
-		)?.id ?? 'crop'
-	);
 
 	/**
 	 * @param {string | undefined | null} imageFileId
@@ -198,13 +207,22 @@ class UIState {
 		}
 	}
 
-	/** @type {typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']} */
-	classificationModels = $derived(
-		tables.Metadata.state.find((m) => m.id === this.classificationMetadataId)?.infer?.neural ??
-			[]
-	);
-	/** @type {NonNullable<typeof import('$lib/schemas/protocols.js').Protocol.infer['crop']['infer']>} */
-	cropModels = $derived(this.currentProtocol?.crop?.infer ?? []);
+	/** @type {typeof import('$lib/schemas/neural.js').NeuralEnumInference.infer[]} */
+	classificationModels = $derived.by(() => {
+		const inference = this.classificationMetadata?.infer;
+
+		if (!inference) return [];
+		if (!('neural' in inference)) return [];
+		return inference.neural;
+	});
+
+	/** @type {typeof import('$lib/schemas/neural.js').NeuralBoundingBoxInference.infer[]} */
+	cropModels = $derived.by(() => {
+		const inference = this.cropMetadata?.infer;
+
+		if (!inference) return [];
+		return inference.neural;
+	});
 
 	/** @type {number} */
 	selectedCropModel = $derived.by(() => {
@@ -265,13 +283,6 @@ class UIState {
 			...changes
 		});
 	}
-
-	/** @type {string|undefined} */
-	classificationMetadataId = $derived(
-		this.currentProtocol
-			? defaultClassificationMetadata(this.currentProtocol, tables.Metadata.state)
-			: undefined
-	);
 }
 
 export const uiState = new UIState();

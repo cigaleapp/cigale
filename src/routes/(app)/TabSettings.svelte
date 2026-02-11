@@ -9,11 +9,8 @@
 	import DropdownMenu from '$lib/DropdownMenu.svelte';
 	import { tables } from '$lib/idb.svelte';
 	import { metadataDefinitionComparator } from '$lib/protocols';
-	import {
-		namespaceOfMetadataId,
-		removeNamespaceFromMetadataId,
-		type MetadataInferOptionsNeural
-	} from '$lib/schemas/metadata';
+	import { namespaceOfMetadataId, removeNamespaceFromMetadataId } from '$lib/schemas/metadata';
+	import type { NeuralInference } from '$lib/schemas/neural';
 	import {
 		GROUP_FIELDS,
 		GROUPING_TOLERANCES,
@@ -28,7 +25,7 @@
 	interface Props {
 		tab: 'crop' | 'classify' | 'import';
 		label: string;
-		models: (typeof MetadataInferOptionsNeural.infer)['neural'];
+		models: NeuralInference[];
 		currentModelIndex: number;
 		setModel: (_i: number) => Promise<void>;
 	}

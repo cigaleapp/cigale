@@ -103,6 +103,7 @@ if (import.meta.vitest) {
 					value: new Date('2024-01-01T12:00:00Z'),
 					confidence: 0.9,
 					manuallyModified: false,
+					confirmed: true,
 					alternatives: {
 						alt1: 0.7
 					}
@@ -120,6 +121,7 @@ if (import.meta.vitest) {
 					value: 42,
 					confidence: 0.8,
 					manuallyModified: true,
+					confirmed: false,
 					alternatives: {
 						alt1: 0.7
 					}
@@ -128,6 +130,7 @@ if (import.meta.vitest) {
 					value: 'test',
 					confidence: 1,
 					manuallyModified: false,
+					confirmed: false,
 					alternatives: {
 						alt1: 0.7
 					}
@@ -136,6 +139,7 @@ if (import.meta.vitest) {
 					value: null,
 					confidence: 0,
 					manuallyModified: false,
+					confirmed: false,
 					alternatives: {
 						alt1: 0.7
 					}

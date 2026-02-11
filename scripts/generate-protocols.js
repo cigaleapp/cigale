@@ -451,7 +451,25 @@ const protocol = {
 			description: '',
 			required: true,
 			mergeMethod: 'union',
-			groupable: true
+			groupable: true,
+			infer: {
+				neural: [
+					{
+						model: MODELS.detectors.arthropoda,
+						name: 'YOLO11',
+						input: {
+							height: 640,
+							width: 640,
+							disposition: '1CHW',
+							normalized: true
+						},
+						output: {
+							normalized: true,
+							shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
+						}
+					}
+				]
+			}
 		},
 		[namespaced('crop_is_confirmed')]: {
 			type: 'boolean',
@@ -494,25 +512,6 @@ const protocol = {
 				]
 			}
 		}
-	},
-	crop: {
-		metadata: namespaced('crop'),
-		infer: [
-			{
-				model: MODELS.detectors.arthropoda,
-				name: 'YOLO11',
-				input: {
-					height: 640,
-					width: 640,
-					disposition: '1CHW',
-					normalized: true
-				},
-				output: {
-					normalized: true,
-					shape: ['sx', 'sy', 'ex', 'ey', 'score', '_']
-				}
-			}
-		]
 	},
 	exports: {
 		images: {

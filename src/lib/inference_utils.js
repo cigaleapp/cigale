@@ -46,7 +46,7 @@ if (import.meta.vitest) {
 }
 /**
  *
- * @param {NonNullable<typeof import('$lib/schemas/metadata.js').MetadataInferOptionsNeural.infer['neural']>[number] } settings
+ * @param {import('$lib/schemas/neural.js').NeuralInference} settings
  * @param {ort.Tensor} tensor
  * @param {number[]} mean
  * @param {number[]} std

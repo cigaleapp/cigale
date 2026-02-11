@@ -17,14 +17,15 @@ export async function prepareForOfflineUse(protocolIds, onProgress) {
 		throw new Error(`Some protocols not found in ${protocolIds.join(', ')}`);
 
 	const models = [
-		...protocols.flatMap((protocol) => protocol.crop.infer?.map((i) => i.model) ?? []),
 		...protocols.flatMap((protocol) =>
 			protocol.metadata
 				.map((metadataId) => tables.Metadata.getFromState(metadataId))
 				.filter(nonnull)
 				.flatMap(({ infer }) => {
-					if (infer && 'neural' in infer) return infer.neural.map(({ model }) => model);
-					return [];
+					if (!infer) return [];
+					if (!('neural' in infer)) return [];
+
+					return infer.neural.map(({ model }) => model);
 				})
 		)
 	];

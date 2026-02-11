@@ -22,7 +22,7 @@
 		// Prevent multiple loads
 		if (!uiState.currentProtocol) return;
 		if (!uiState.cropInferenceAvailable) return;
-		const cropModel = uiState.currentProtocol.crop.infer?.[selectedModel]?.model;
+		const cropModel = uiState.cropModels[selectedModel]?.model;
 		if (!cropModel) return;
 
 		modelAbortController.abort();

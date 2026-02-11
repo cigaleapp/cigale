@@ -11,8 +11,8 @@ import { ensureNamespacedMetadataId } from './schemas/metadata.js';
 import { toasts } from './toasts.svelte.js';
 
 /**
- * @import { MetadataInferOptions, MetadataType } from './database.js';
- * @import { RuntimeValue } from './metadata/index.js';
+ * @import { MetadataType } from './database.js';
+ * @import { RuntimeValue, EXIFInference } from './schemas/metadata.js';
  */
 
 /**
@@ -84,7 +84,7 @@ export async function processExifData(sessionId, imageFileId, imageBytes, file) 
 /**
  * @typedef {object} ExifExtractionPlanItem
  * @property {string} key key in the output object
- * @property {MetadataInferOptions | { latitude: MetadataInferOptions, longitude: MetadataInferOptions }} infer how to extract the value
+ * @property {{ exif: EXIFInference } | { latitude: { exif: EXIFInference }, longitude: { exif: EXIFInference } }} infer how to extract the value
  * @property {MetadataType} type type to coerce the extracted value to
  */
 
@@ -160,7 +160,7 @@ export async function extractMetadata(buffer, extractionPlan) {
  * @template {import('./database.js').MetadataType} T
  * @param {unknown} value
  * @param {T} coerceTo
- * @returns {import('./metadata/index.js').RuntimeValue<T>}
+ * @returns {import('./schemas/metadata.js').RuntimeValue<T>}
  */
 export function coerceExifValue(value, coerceTo) {
 	switch (coerceTo) {

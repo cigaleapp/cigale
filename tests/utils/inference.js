@@ -69,39 +69,43 @@ export async function getPredownloadedModel(filename, classmappingFilename) {
  * @param {Page} page
  * @param {import('@playwright/test').BrowserContext} context
  * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
- * @param {{metadata: string} | 'detection'} task
+ * @param {string} metadataId
  * @param {PredownloadedModel} model
  */
 async function mockPredownloadedModel(
 	page,
 	context,
 	protocol,
-	task,
+	metadataId,
 	{ filename, model, classmapping }
 ) {
-	/** @param {typeof import('$lib/schemas/metadata').MetadataInferOptionsNeural.infer['neural'][number]} arg0 */
-	const modelMatches = ({ model }) =>
+	const metadata = protocol.metadata[`${protocol.id}__${metadataId}`];
+
+	if (!('infer' in metadata)) throw new Error(`Metadata ${metadataId} has no inference settings`);
+	if (!('neural' in metadata.infer))
+		throw new Error(`Metadata ${metadataId} has no neural inference settings`);
+
+	const inference = metadata.infer.neural.find(({ model }) => {
 		new URL(typeof model === 'string' ? model : model.url).pathname.endsWith(filename);
+	});
 
-	const url =
-		task === 'detection'
-			? protocol.crop.infer?.find(modelMatches)?.model
-			: protocol.metadata[`${protocol.id}__${task.metadata}`].infer?.neural.find(modelMatches)
-					?.model;
+	if (!inference)
+		throw new Error(
+			`No inference model found in metadata ${metadataId} with filename ${filename}`
+		);
 
-	await mockUrl(page, context, url, {
+	if (typeof inference.model !== 'string')
+		throw new Error(`Model URL for metadata ${metadataId} is not a string`);
+
+	await mockUrl(page, context, inference.model, {
 		body: model
 	});
 
-	if (classmapping && task !== 'detection') {
-		const classmappingUrl =
-			protocol.metadata[`${protocol.id}__${task.metadata}`].infer?.neural.find(
-				modelMatches
-			)?.classmapping;
+	if (classmapping && 'classmapping' in inference) {
+		if (typeof inference.classmapping !== 'string')
+			throw new Error(`Classmapping URL for metadata ${metadataId} is not a string`);
 
-		if (!classmappingUrl) return;
-
-		await mockUrl(page, context, classmappingUrl, {
+		await mockUrl(page, context, inference.classmapping, {
 			body: classmapping
 		});
 	}
@@ -111,24 +115,14 @@ async function mockPredownloadedModel(
  * @param {Page} page
  * @param {import('@playwright/test').BrowserContext} context
  * @param {typeof import('$lib/schemas/protocols').ExportedProtocol.infer} protocol
- * @param {Record<'detection'|'species', Array<null | PredownloadedModel>>} models
+ * @param {Record<string, Array<null | PredownloadedModel>>} models
  */
 export async function mockPredownloadedModels(page, context, protocol, models) {
-	for (const [task, taskModels] of Object.entries(models)) {
+	for (const [metadataId, taskModels] of Object.entries(models)) {
 		for (const model of taskModels) {
 			if (!model) continue;
 
-			await mockPredownloadedModel(
-				page,
-				context,
-				protocol,
-				task === 'detection'
-					? 'detection'
-					: {
-							metadata: task
-						},
-				model
-			);
+			await mockPredownloadedModel(page, context, protocol, metadataId, model);
 		}
 	}
 }

@@ -139,9 +139,7 @@
 				imageBufferWasSaved(image) &&
 				!imageIsClassified(image) &&
 				!uiState.loadingImages.has(image.id) &&
-				(uiState.currentProtocol?.crop.classifyUncropped
-					? true
-					: uiState.cropMetadataValueOf(image))
+				uiState.cropMetadataValueOf(image)
 		);
 
 		classifyMore(toClassify.map((i) => i.id));
