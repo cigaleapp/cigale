@@ -83,7 +83,6 @@ jobs:
 
           echo "key=predownloaded-models:$key" >> $GITHUB_OUTPUT
 
-
       - name: Use cache
         uses: actions/cache@v3
         with:
@@ -102,7 +101,6 @@ jobs:
             echo "Downloading $url"
             wget --content-disposition -q $url
           done
-
 
       - name: Save to artifact
         uses: actions/upload-artifact@v6
