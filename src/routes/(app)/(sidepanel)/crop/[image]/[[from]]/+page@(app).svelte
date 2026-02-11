@@ -58,6 +58,7 @@
 		hasRuntimeType,
 		storeMetadataValue
 	} from '$lib/metadata/index.js';
+	import OverflowableText from '$lib/OverflowableText.svelte';
 	import { goto } from '$lib/paths.js';
 	import ProgressBar from '$lib/ProgressBar.svelte';
 	import SentenceJoin from '$lib/SentenceJoin.svelte';
@@ -69,7 +70,16 @@
 	import Tooltip from '$lib/Tooltip.svelte';
 	import { tooltip } from '$lib/tooltips';
 	import { undo } from '$lib/undo.svelte';
-	import { clamp, fromEntries, mapValues, nonnull, pick, range, sign } from '$lib/utils';
+	import {
+		clamp,
+		fromEntries,
+		mapValues,
+		nonnull,
+		pick,
+		range,
+		sign,
+		throwError
+	} from '$lib/utils';
 
 	/**
 	 * @import { RuntimeValue } from '$lib/schemas/metadata';
@@ -801,7 +811,20 @@
 					}
 				}
 			])
-		)
+		),
+		'd e v +': {
+			help: 'Entrer des coordonnées de boîte',
+			async do() {
+				const [x, y, w, h] = (
+					prompt('Coords? (x space y space w space h, ∈ [0, 1])') ??
+					throwError('Prompt annulé')
+				)
+					.split(' ')
+					.map(Number.parseFloat);
+
+				await onCropChange(null, toTopLeftCoords({ x, y, w, h }));
+			}
+		}
 	});
 
 	// Scroll to selected box
@@ -994,7 +1017,7 @@
 			<section class="filename">
 				{#if firstImage}
 					<h1>
-						{firstImage.filename}
+						<OverflowableText text={firstImage.filename} />
 						{#if hasConfirmedCrop(fileId)}
 							<div class="status" use:tooltip={'Recadrage confirmé'}>
 								<IconConfirmedCrop />
