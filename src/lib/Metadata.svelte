@@ -1,28 +1,29 @@
-<script>
+<script lang="ts" generics="T extends MetadataType">
 	import IconCheck from '~icons/ri/check-line';
 	import IconClear from '~icons/ri/close-line';
 	import IconTechnical from '~icons/ri/settings-line';
 	import IconMerged from '~icons/ri/stack-line';
 
 	import ConfidencePercentage from './ConfidencePercentage.svelte';
-	import { hasRuntimeType } from './metadata/index.js';
+	import type { Metadata, MetadataEnumVariant } from './database.js';
+	import { hasRuntimeType, type TypedMetadataValue } from './metadata/index.js';
 	import MetadataInput from './MetadataInput.svelte';
-	import { splitMetadataId } from './schemas/metadata.js';
+	import { splitMetadataId, type MetadataType, type RuntimeValue } from './schemas/metadata.js';
 	import { isDebugMode } from './settings.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { safeJSONParse } from './utils.js';
+	import { orEmpty, safeJSONParse } from './utils.js';
+	import WorldMap from './WorldMap.svelte';
 
-	/**
-	 * @typedef {object} Props
-	 * @property {import('./database').Metadata} definition
-	 * @property {import('./database').MetadataEnumVariant[]} [options]
-	 * @property {undefined | import('./database').MetadataValue} value
-	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
-	 * @property {(value: undefined | import('./schemas/metadata').RuntimeValue) => void} [onchange]
-	 */
+	interface Props {
+		definition: Metadata & { type: T };
+		options?: MetadataEnumVariant[];
+		value: undefined | TypedMetadataValue<NoInfer<T>>;
+		merged?: boolean;
+		// eslint-disable-next-line no-unused-vars
+		onchange?: (value: undefined | RuntimeValue<T>) => void;
+	}
 
-	/** @type {Props} */
-	let { value, merged, definition, options = [], onchange = () => {} } = $props();
+	let { value, merged, definition, options = [], onchange = () => {} }: Props = $props();
 
 	const _id = $props.id();
 
@@ -54,7 +55,6 @@
 				{options}
 				value={value?.value}
 				onblur={onchange}
-				{merged}
 				{isCompactEnum}
 				confidences={Object.fromEntries([
 					...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
@@ -135,9 +135,28 @@
 			{/if}
 		</section>
 	{/if}
+	{#if definition.type === 'location'}
+		{@const coords = (value as TypedMetadataValue<'location'> | undefined)?.value}
+
+		<section class="map">
+			<WorldMap
+				onNewMarker={({ lngLat: { lng, lat } }) => {
+					onchange?.({ latitude: lat, longitude: lng });
+				}}
+				markers={orEmpty(coords !== undefined, {
+					...coords!,
+					id: '_',
+					onMove({ lngLat: [longitude, latitude] }) {
+						onchange?.({ latitude, longitude });
+					}
+				})}
+			/>
+		</section>
+	{/if}
 	{#if isDebugMode()}
 		<pre class="debug">{JSON.stringify(
 				{
+					type: definition.type,
 					...splitMetadataId(definition.id),
 					...(options.length <= 10 ? { options } : {}),
 					value
@@ -233,5 +252,12 @@
 
 	.debug {
 		font-size: 0.7em;
+	}
+
+	.map {
+		height: 15rem;
+		border-radius: var(--corner-radius);
+		overflow: hidden;
+		margin: 1rem 0;
 	}
 </style>

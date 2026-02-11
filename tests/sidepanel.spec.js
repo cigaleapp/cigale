@@ -107,7 +107,8 @@ test('does not show technical metadata ', async ({ page, app }) => {
 test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	await initialize({ page, app });
 
-	const nthCombobox = (/** @type {number} */ n) =>
+	/** @param {number} n 1-based */
+	const nthCombobox = (n) =>
 		page
 			.getByTestId('sidepanel')
 			.getByRole('combobox')
@@ -261,13 +262,14 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	await expect.soft(nthCombobox(4)).toMatchAriaSnapshot(`
 	  - combobox: Symphypleona
 	`);
-	await expect.soft(nthCombobox(5)).toMatchAriaSnapshot(`
+	// 4th combobox is the location input
+	await expect.soft(nthCombobox(6)).toMatchAriaSnapshot(`
 	  - combobox: Collembola
 	`);
-	await expect.soft(nthCombobox(6)).toMatchAriaSnapshot(`
+	await expect.soft(nthCombobox(7)).toMatchAriaSnapshot(`
 	  - combobox: Arthropoda
 	`);
-	await expect.soft(nthCombobox(7)).toMatchAriaSnapshot(`
+	await expect.soft(nthCombobox(8)).toMatchAriaSnapshot(`
 	  - combobox: Animalia
 	`);
 

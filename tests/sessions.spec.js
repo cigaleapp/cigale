@@ -193,10 +193,27 @@ test('import into new session', async ({ page, app }) => {
 	    - img
 	  - paragraph: Moment où la photo a été prise
 	  - text: Localisation
-	  - textbox "Localisation"
+	  - combobox
 	  - button [disabled]:
 	    - img
 	  - paragraph: Endroit où la photo a été prise
+	  - region "Map"
+	  - button "Zoom in"
+	  - button "Zoom out" [disabled]
+	  - button "Drag to rotate map, click to reset north"
+	  - button "Find my location"
+	  - button "Enter fullscreen"
+	  - text: /\\d+ km/
+	  - group:
+	    - link "MapLibre":
+	      - /url: https://maplibre.org/
+	    - text: "| ©"
+	    - link "CARTO":
+	      - /url: https://carto.com/about-carto/
+	    - text: ", ©"
+	    - link "OpenStreetMap":
+	      - /url: http://www.openstreetmap.org/about/
+	    - text: contributors
 	  - text: Difficulté d'identification
 	  - radiogroup:
 	    - radio "Facile"
@@ -412,10 +429,27 @@ test('can change protocol of session', async ({ page, app }) => {
 	    - img
 	  - paragraph: integer metadata
 	  - text: location
-	  - textbox "location"
+	  - combobox
 	  - button [disabled]:
 	    - img
 	  - paragraph: location metadata
+	  - region "Map"
+	  - button "Zoom in"
+	  - button "Zoom out" [disabled]
+	  - button "Drag to rotate map, click to reset north"
+	  - button "Find my location"
+	  - button "Enter fullscreen"
+	  - text: /\\d+ km/
+	  - group:
+	    - link "MapLibre":
+	      - /url: https://maplibre.org/
+	    - text: "| ©"
+	    - link "CARTO":
+	      - /url: https://carto.com/about-carto/
+	    - text: ", ©"
+	    - link "OpenStreetMap":
+	      - /url: http://www.openstreetmap.org/about/
+	    - text: contributors
 	  - text: string
 	  - textbox "string"
 	  - button [disabled]:

@@ -2,14 +2,12 @@
 	type Item = {
 		key: string;
 		label: string;
-		synonyms: string[];
-		icon?: string;
-		color?: string;
 	};
 
 	type Props<I extends Item, V extends string> = {
 		items: I[];
 		value: V | undefined;
+		// eslint-disable-next-line no-unused-vars
 		onValueChange?: (newValue: V) => void;
 		// eslint-disable-next-line no-unused-vars
 		searcher: (search: string, item: I) => string | undefined;
@@ -25,12 +23,13 @@
 		focuser?: (action: 'focus' | 'blur' | 'toggle') => void;
 		highlight: Snippet<[I, I[]]>;
 		listItem: Snippet<[I & { selected: boolean; highlighted: boolean; matchedFrom: string }]>;
-	}
+	};
 </script>
 
 <script lang="ts" generics="I extends Item, V extends string">
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 	import { Combobox, mergeProps, type WithoutChildrenOrChild } from 'bits-ui';
+	import { Debounced } from 'runed';
 	import type { Snippet } from 'svelte';
 
 	import Logo from './Logo.svelte';
@@ -40,9 +39,10 @@
 	type MergedProps = Props<I, V> & Omit<Combobox.RootProps, keyof Props<I, V>>;
 
 	let {
-		items,
+		items: staticItems,
 		sorter,
-		searcher = nameMatches,
+		suggestions,
+		searcher,
 		value = $bindable(),
 		open = $bindable(false),
 		focuser = $bindable(),
@@ -52,17 +52,31 @@
 		listItem,
 		highlight,
 		...restProps
-	}: Props<I> & Combobox.RootProps = $props();
+	}: MergedProps = $props();
 
 	let searchValue = $state('');
 
+	let dynamicItems: undefined | I[] = $state();
+	const items = $derived(dynamicItems ?? staticItems);
+
 	const label = $derived(items.find((i) => i.key === value)?.label ?? '');
 
-	function nameMatches(search: string, item: I) {
-		return [item.label, ...item.synonyms].find((val) =>
-			val.toLowerCase().includes(search.toLowerCase())
-		);
-	}
+	const debouncedSearchValue = new Debounced(() => searchValue, 300);
+
+	$effect(() => {
+		if (debouncedSearchValue.current === '' || !suggestions) {
+			dynamicItems = undefined;
+			return;
+		}
+
+		void suggestions(debouncedSearchValue.current)
+			.then((newItems) => {
+				dynamicItems = newItems;
+			})
+			.catch((err) => {
+				console.error('Error fetching suggestions for Combobox:', err);
+			});
+	});
 
 	const filteredItems = $derived.by(() => {
 		if (searchValue === '') {
@@ -101,7 +115,12 @@
 	let highlightedItem: undefined | I = $state();
 </script>
 
-<Combobox.Root {value} bind:open {...mergedRootProps} {items}>
+<Combobox.Root
+	{value}
+	bind:open
+	{...mergedRootProps}
+	items={items.map((i) => ({ ...i, value: i.key }))}
+>
 	<!-- <div class="search-icon" class:shown={open}>
 		<IconSearch />
 	</div> -->
