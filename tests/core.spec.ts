@@ -3,10 +3,13 @@ import * as path from 'node:path';
 import { ArkErrors } from 'arktype';
 import * as yauzl from 'yauzl-promise';
 
+import type * as SvelteTypes from '$app/types';
+
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/exports.js';
 import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
 import { pr, withParallelism } from './annotations.js';
+import type { FixturePaths } from './filepaths.js';
 import { expect, test } from './fixtures.js';
 import {
 	browserConsole,
@@ -175,8 +178,12 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 
 	const observations = page.getByTestId('observations-area');
 
-	/** @type {import('./filepaths').FixturePaths.Photos[]} */
-	const images = ['cyan.jpeg', 'lil-fella.jpeg', 'leaf.jpeg', 'large-image.jpeg'];
+	const images: FixturePaths.Photos[] = [
+		'cyan.jpeg',
+		'lil-fella.jpeg',
+		'leaf.jpeg',
+		'large-image.jpeg'
+	];
 	const randomImage = () => images[Math.floor(Math.random() * images.length)];
 	await importPhotos({ page, wait: false }, Array.from({ length: imagesCount }, randomImage));
 
@@ -246,11 +253,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 	await importPhotos({ page }, ['cyan.jpeg']);
 	await app.loading.wait();
 
-	/**
-	 * @param {boolean} toBePresent
-	 * @param {string} text
-	 */
-	async function expectLoadingText(toBePresent, text) {
+	async function expectLoadingText(toBePresent: boolean, text: string) {
 		let expector = expect(page.getByTestId('app-main'));
 		if (!toBePresent) expector = expector.not;
 		await expector.toHaveText(makeRegexpUnion(text));
@@ -281,8 +284,7 @@ test('changing model while on tab reloads it @real-protocol', pr(659), async ({ 
 });
 
 test('can send a bug report', async ({ page, app, context }) => {
-	/** @type {undefined | typeof import('../src/lib/schemas/issue-creator').IssueCreatorRequest['inferIn']} */
-	let requestBody;
+	let requestBody: undefined | typeof IssueCreatorRequest.inferIn;
 
 	await mockUrl(
 		page,
@@ -320,22 +322,18 @@ test('can send a bug report', async ({ page, app, context }) => {
 	).toHaveAttribute('href', 'https://example.com/issue/123');
 
 	expect.soft(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
-	expect.soft(URL.canParse(requestBody?.metadata.Page ?? '')).toBeTruthy();
-	expect.soft(requestBody).toEqual(
-		/** @satisfies {typeof requestBody} */ ({
-			title: 'Test Bug Report',
-			body: 'This is a test bug report.',
-			type: 'bug',
-			metadata: expect.objectContaining({
-				// FIXME: seems like URL doesnt change when using playwright
-				// Page: expect.stringMatching(/#\/crop\/?$/),
-				Protocol: expect.stringMatching(
-					// Version number depends on what was captured in the database dump
-					// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
-					new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
-				),
-				'Open session': '4 images, 4 observations'
-			})
+	expect.soft(requestBody).toEqual({
+		title: 'Test Bug Report',
+		body: 'This is a test bug report.',
+		type: 'bug',
+		metadata: expect.objectContaining({
+			Route: '/(app)/(sidepanel)/crop' as const satisfies SvelteTypes.RouteId,
+			Protocol: expect.stringMatching(
+				// Version number depends on what was captured in the database dump
+				// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
+				new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
+			),
+			'Loaded objects': '4 observations, 4 images, 1 sessions, 25 metadatas, 1 protocols'
 		})
-	);
+	} satisfies typeof requestBody);
 });
