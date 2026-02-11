@@ -38,18 +38,71 @@ jobs:
         with:
           bun-version-file: .bun-version
 
-      - name: Pre-download default protocol's models
+      - name: Get list of model URLs
+        id: models
         run: |
-          urls=$(curl -fsSL $PROTOCOL_URL | jq -r "[$JQ_SELECTORS] | .[]")
+          urls=$(curl -fsSL $PROTOCOL_URL | jq -r "[$JQ_SELECTORS] | join(\" \")")
+          echo "urls=$urls" >> $GITHUB_OUTPUT
+
+          huggingface_repos=""
+          non_huggingface_urls=""
           for url in $urls; do
-            echo "Downloading $url"
-            wget --content-disposition -q $url
+            if echo $url | grep -q 'huggingface.co'; then
+              repo=$(echo $url | sed -E 's#https://huggingface.co/([^/]+/[^/]+)/.+#\1#')
+              huggingface_repos="$huggingface_repos $repo"
+            else
+              non_huggingface_urls="$non_huggingface_urls $url"
+            fi
           done
+
+          huggingface_repos=$(printf '%s\n' $huggingface_repos | sort -u | tr '\n' ' ')
+
+          echo "huggingface-repos=$huggingface_repos" >> $GITHUB_OUTPUT
+          echo "non-huggingface-urls=$non_huggingface_urls" >> $GITHUB_OUTPUT
         env:
           PROTOCOL_URL: https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json
           JQ_SELECTORS: .crop.infer[].model,
             .metadata[].infer?.neural[]?.model,
             .metadata[].infer?.neural[]?.classmapping
+
+      - name: Compute cache key
+        id: caching
+        run: |
+          key=""
+          for repo in ${{ steps.models.outputs.huggingface-repos }}; do
+            echo "Getting latest commit hash for $repo"
+            hash=$(curl -s "https://huggingface.co/api/models/$repo/commits/main?limit=1" | jq -r '.[0].id')
+            key+="$repo@$hash;"
+          done
+
+          for url in ${{ steps.models.outputs.non-huggingface-urls }}; do
+            key+="$url;"
+          done
+
+          echo "Computed cache key: $key"
+
+          echo "key=predownloaded-models:$key" >> $GITHUB_OUTPUT
+
+
+      - name: Use cache
+        uses: actions/cache@v3
+        with:
+          key: ${{ steps.caching.outputs.key }}
+          path: |
+            *.onnx
+            *-classmapping.txt
+
+      - name: Pre-download default protocol's models
+        run: |
+          for url in ${{ steps.models.outputs.urls }}; do
+            if [ -f "$(basename $url)" ]; then
+              echo "File for $url already exists, skipping download"
+              continue
+            fi
+            echo "Downloading $url"
+            wget --content-disposition -q $url
+          done
+
 
       - name: Save to artifact
         uses: actions/upload-artifact@v6
