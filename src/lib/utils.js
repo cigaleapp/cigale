@@ -836,8 +836,8 @@ if (import.meta.vitest) {
 	});
 }
 
-/** 
- * @param {number[]} values  
+/**
+ * @param {number[]} values
  * @param {number} fallback if values is empty
  */
 export function avg(values, fallback = NaN) {
