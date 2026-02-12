@@ -11,6 +11,7 @@ import {
 	importResults,
 	loadDatabaseDump,
 	loadingText,
+	mockUrl,
 	newSession,
 	observationCard,
 	setInferenceModels
@@ -66,7 +67,9 @@ test.describe('correct results.zip', () => {
 		    - img "Image 1 de l'observation cyan"
 		    - heading "cyan" [level=2]:
 		      - img
-		      - textbox "Nom de l'observation"
+		      - textbox "Nom de l'observation":
+		        - /placeholder: ""
+		        - text: ""
 		    - text: Espèce
 		    - combobox: Allacma fusca
 		    - code: /\\d+%/
@@ -84,46 +87,179 @@ test.describe('correct results.zip', () => {
 		        - code: /\\d+%/
 		        - button:
 		          - img
+		      - listitem:
+		        - text: Sminthurides aquaticus
+		        - code: 4%
+		        - button:
+		          - img
 		    - text: Genre
 		    - combobox: Allacma
+		    - code: /\\d+%/
 		    - button:
 		      - img
+		    - text: Alternatives
+		    - list:
+		      - listitem:
+		        - text: Bourletiella
+		        - code: /\\d+%/
+		        - button:
+		          - img
+		      - listitem:
+		        - text: Sminthurus
+		        - code: /\\d+%/
+		        - button:
+		          - img
+		      - listitem:
+		        - text: Willowsia
+		        - code: 7%
+		        - button:
+		          - img
 		    - text: Famille
 		    - combobox: Sminthuridae
+		    - code: /\\d+%/
 		    - button:
 		      - img
+		    - text: Alternatives
+		    - list:
+		      - listitem:
+		        - text: Entomobryidae
+		        - code: /\\d+%/
+		        - button:
+		          - img
+		      - listitem:
+		        - text: Bourletiellidae
+		        - code: /\\d+%/
+		        - button:
+		          - img
+		      - listitem:
+		        - text: Isotomidae
+		        - code: 6%
+		        - button:
+		          - img
 		    - text: Ordre
 		    - combobox: Symphypleona
+		    - code: /\\d+%/
 		    - button:
 		      - img
+		    - text: Alternatives
+		    - list:
+		      - listitem:
+		        - text: Entomobryomorpha
+		        - code: /\\d+%/
+		        - button:
+		          - img
+		      - listitem:
+		        - text: Poduromorpha
+		        - code: 5%
+		        - button:
+		          - img
+		      - listitem:
+		        - text: Neelipleona
+		        - code: 0.8%
+		        - button:
+		          - img
+		    - text: Photo d'habitat
+		    - radiogroup:
+		      - radio "C'est une photo de l'habitat actuel"
+		      - text: C'est une photo de l'habitat actuel
+		      - radio "C'est une photo de l'habitat à proximité"
+		      - text: C'est une photo de l'habitat à proximité
+		    - button [disabled]:
+		      - img
+		    - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
 		    - text: Date
 		    - textbox "Date"
 		    - button [disabled]:
 		      - img
 		    - paragraph: Moment où la photo a été prise
 		    - text: Localisation
-		    - textbox "Localisation"
+		    - combobox
 		    - button [disabled]:
 		      - img
 		    - paragraph: Endroit où la photo a été prise
+		    - region "Map"
+		    - button "Zoom in"
+		    - button "Zoom out" [disabled]
+		    - button "Drag to rotate map, click to reset north"
+		    - button "Find my location"
+		    - button "Enter fullscreen"
+		    - text: /\\d+ km/
+		    - group:
+		      - link "MapLibre":
+		        - /url: https://maplibre.org/
+		      - text: "| ©"
+		      - link "CARTO":
+		        - /url: https://carto.com/about-carto/
+		      - text: ", ©"
+		      - link "OpenStreetMap":
+		        - /url: http://www.openstreetmap.org/about/
+		      - text: contributors
+		    - text: Difficulté d'identification
+		    - radiogroup:
+		      - radio "Facile"
+		      - text: Facile
+		      - radio "Moyenne"
+		      - text: Moyenne
+		      - radio "Difficile"
+		      - text: Difficile
+		      - radio "Très difficile"
+		      - text: Très difficile
+		    - button [disabled]:
+		      - img
+		    - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
+		    - text: Statut de conservation
+		    - radiogroup:
+		      - radio "EX Éteint (“Extinct”)"
+		      - text: EX
+		      - paragraph: Éteint (“Extinct”)
+		      - radio "EW Éteint à l’état sauvage (“Extinct in the Wild”)"
+		      - text: EW
+		      - paragraph: Éteint à l’état sauvage (“Extinct in the Wild”)
+		      - radio "CR En danger critique d’extinction (“Critically Endangered”)"
+		      - text: CR
+		      - paragraph: En danger critique d’extinction (“Critically Endangered”)
+		      - radio "EN En danger (“Endangered”)"
+		      - text: EN
+		      - paragraph: En danger (“Endangered”)
+		      - radio "VU Vulnérable (“Vulnerable”)"
+		      - text: VU
+		      - paragraph: Vulnérable (“Vulnerable”)
+		      - radio "NT Quasi menacé (“Near Threatened”)"
+		      - text: NT
+		      - paragraph: Quasi menacé (“Near Threatened”)
+		      - radio "LC Préoccupation mineure (“Least Concern”)"
+		      - text: LC
+		      - paragraph: Préoccupation mineure (“Least Concern”)
+		    - button [disabled]:
+		      - img
+		    - paragraph: Statut de conservation IUCN de l'espèce
 		    - text: Classe
 		    - combobox: Collembola
+		    - code: /\\d+%/
 		    - button:
 		      - img
 		    - text: Phylum
 		    - combobox: Arthropoda
+		    - code: /\\d+%/
 		    - button:
 		      - img
 		    - text: Règne
 		    - combobox: Animalia
+		    - code: /\\d+%/
 		    - button:
 		      - img
 		    - button "Regrouper Ctrl + G":
 		      - img
+		      - text: ""
 		    - button "Séparer Ctrl + Shift + G":
 		      - img
+		      - text: ""
+		    - button "Ouvrir en plein écran Ctrl + ⏎":
+		      - img
+		      - text: ""
 		    - button "Supprimer 1 images Suppr":
 		      - img
+		      - text: ""
 		`);
 	});
 
@@ -320,7 +456,31 @@ test('can extract EXIF date from an image', async ({ page, app }) => {
 	});
 });
 
-test('can extract EXIF GPS data from an image', async ({ page, app }) => {
+test('can extract EXIF GPS data from an image', async ({ page, context, app }) => {
+	await mockUrl(
+		page,
+		context,
+		'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=43.46715666666389&lon=11.885394999997223&addressdetails=0',
+		{
+			json: {
+				place_id: 73806197,
+				licence: 'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+				osm_type: 'node',
+				osm_id: 4797360321,
+				lat: '43.4674527',
+				lon: '11.8850787',
+				category: 'tourism',
+				type: 'viewpoint',
+				place_rank: 30,
+				importance: 0.00006763332570377688,
+				addresstype: 'tourism',
+				name: '',
+				display_name: 'Via Madonna Laura, Arezzo, Toscane, 52100, Italie',
+				boundingbox: ['43.4674027', '43.4675027', '11.8850287', '11.8851287']
+			}
+		}
+	);
+
 	await newSession(page);
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'with-exif-gps.jpeg');
@@ -329,8 +489,8 @@ test('can extract EXIF GPS data from an image', async ({ page, app }) => {
 	await expect(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
 		'2008-10-22'
 	);
-	await expect(app.sidepanel.metadataSection('Localisation').getByRole('textbox')).toHaveValue(
-		'43.46715666666389, 11.885394999997223'
+	await expect(app.sidepanel.metadataSection('Localisation').getByRole('combobox')).toHaveValue(
+		'Via Madonna Laura, Arezzo, Toscane, 52100, Italie'
 	);
 
 	const metadataValues = await app.db.metadata.values({ image: 'with-exif-gps.jpeg' });

@@ -836,8 +836,12 @@ if (import.meta.vitest) {
 	});
 }
 
-/** @param {number[]} values  */
-export function avg(values) {
+/** 
+ * @param {number[]} values  
+ * @param {number} fallback if values is empty
+ */
+export function avg(values, fallback = NaN) {
+	if (values.length === 0) return fallback;
 	return sum(values) / values.length;
 }
 
@@ -1369,6 +1373,22 @@ export function isAbortError(error) {
  */
 export function orEmpty(predicate, obj) {
 	return predicate ? [obj] : [];
+}
+
+// TODO: overload orEmpty instead of exporting orEmpty2, but we'll do this once we convert utils.js to typescript
+
+/**
+ * [] if predicate is falsy, [obj(subject)] if predicate is truthy.
+ * obj gets the non-nullable value
+ * Spread into an array literal to conditionally add something to it
+ * @template T, O
+ * @param {T} subject
+ * @param {(subject: NonNullable<T>) => O } obj
+ * @returns { [O] | [] }
+ */
+export function orEmpty2(subject, obj) {
+	if (subject === null || subject === undefined) return [];
+	return [obj(subject)];
 }
 
 if (import.meta.vitest) {

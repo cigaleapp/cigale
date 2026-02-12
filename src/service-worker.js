@@ -3,6 +3,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
+import { hoursToMilliseconds } from 'date-fns';
+
 import { build, files, version } from '$service-worker';
 
 // Create a unique cache name for this deployment
@@ -11,6 +13,10 @@ const CACHE = `cache-${version}`;
 const MODELS_CACHE = `cache-models`;
 // Icon data from Iconfiy API can be cached indefinitely
 const ICONS_CACHE = `cache-icons`;
+// Memoize requests to OpenStreetMap's Nominatim API for forward or reverse geocoding, cuz we're nice
+const NOMINATIM_API_CACHE = `cache-nominatim-api`;
+// Cache map tiles
+const MAP_TILES_CACHE = `cache-map-tiles`;
 
 const ASSETS = [
 	...build, // the app itself
@@ -59,6 +65,15 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
 			return tryCache(event.request, ICONS_CACHE);
 		}
 
+		if (url.hostname === 'nominatim.openstreetmap.org') {
+			// Cache Nominatim API responses for 31 days, since the underlying OSM data doesn't change super frequently but we still want to be nice to their servers
+			return tryCache(event.request, NOMINATIM_API_CACHE, hoursToMilliseconds(24 * 31));
+		}
+
+		if (url.hostname.endsWith('.cartocdn.com')) {
+			return tryCache(event.request, MAP_TILES_CACHE, hoursToMilliseconds(24 * 365));
+		}
+
 		// for everything else, try the network first, but
 		// fall back to the cache if we're offline
 		try {
@@ -97,8 +112,9 @@ sw.addEventListener('fetch', (/** @type {FetchEvent} */ event) => {
  *
  * @param {Request} request
  * @param {string} cacheName
+ * @param {number} [maxAge] max age in milliseconds for cached entries, if not provided cached entries will never expire (TODO not implemented yet, needs storing the entry's timestamps in IDB, as we cant touch the requests)
  */
-async function tryCache(request, cacheName) {
+async function tryCache(request, cacheName, _maxAge) {
 	const cache = await caches.open(cacheName);
 	const match = await cache.match(request.url);
 
@@ -107,7 +123,10 @@ async function tryCache(request, cacheName) {
 		return match;
 	}
 
-	console.warn(`${request.url} not found in ${cacheName} cache, fetching from network`);
+	if (!_maxAge) {
+		console.warn(`${request.url} not found in ${cacheName} cache, fetching from network`);
+	}
+
 	const response = await fetch(request);
 
 	// if we're offline, fetch can return a value that is not a Response
@@ -118,6 +137,7 @@ async function tryCache(request, cacheName) {
 
 	if (response.ok) {
 		const cache = await caches.open(cacheName);
+
 		cache.put(request, response.clone());
 	}
 

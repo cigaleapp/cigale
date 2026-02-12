@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Icon from '@iconify/svelte';
 	import * as dates from 'date-fns';
 
@@ -6,31 +6,28 @@
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
 
+	import type { Metadata, MetadataEnumVariant } from './database.js';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
 	import MetadataCombobox from './MetadataCombobox.svelte';
 	import RadioButtons from './RadioButtons.svelte';
+	import type { RuntimeValue } from './schemas/metadata.js';
 	import Switch from './Switch.svelte';
 	import { tooltip } from './tooltips.js';
 	import { compareBy, pick, readableOn, round, safeJSONParse } from './utils.js';
+	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
 
-	/**
-	 * @import { RuntimeValue } from './schemas/metadata';
-	 */
+	interface Props {
+		definition: Metadata;
+		value: undefined | RuntimeValue;
+		// eslint-disable-next-line no-unused-vars
+		onblur: (value: undefined | RuntimeValue) => void;
+		id: string;
+		disabled?: boolean;
+		options?: MetadataEnumVariant[];
+		confidences?: Record<string, number>;
+		isCompactEnum?: boolean;
+	}
 
-	/**
-	 * @typedef {object} Props
-	 * @property {import('./database').Metadata} definition
-	 * @property {undefined | RuntimeValue} value
-	 * @property {boolean} [merged] the value is the result of the merge of multiple metadata values
-	 * @property {(value: undefined | RuntimeValue) => void} onblur
-	 * @property {string} id
-	 * @property {boolean} [disabled]
-	 * @property {import('./database').MetadataEnumVariant[]} [options]
-	 * @property {Record<string, number>} [confidences]
-	 * @property {boolean} [isCompactEnum] whether to use the compact enum display (radio buttons)
-	 */
-
-	/** @type {Props} */
 	const {
 		value,
 		confidences = {},
@@ -40,7 +37,7 @@
 		options = [],
 		isCompactEnum = false,
 		onblur
-	} = $props();
+	}: Props = $props();
 
 	const { type } = $derived(definition);
 </script>
@@ -96,13 +93,7 @@
 						type="single"
 						disabled={disabled ?? false}
 						value={safeJSONParse(value?.toString())?.toString() ?? value}
-						onValueChange={(newValue) => {
-							if (newValue === undefined) {
-								onblur(undefined);
-								return;
-							}
-							onblur(newValue.toString());
-						}}
+						onValueChange={(val: string) => onblur(val)}
 					/>
 				{/if}
 			{/snippet}
@@ -203,33 +194,7 @@
 				/>
 			{/snippet}
 			{#snippet location(value)}
-				<input
-					type="text"
-					{id}
-					{disabled}
-					onblur={({ currentTarget }) => {
-						let newValue = currentTarget.value;
-						if (newValue === undefined) {
-							onblur(undefined);
-							return;
-						}
-						if (!newValue.includes(',')) {
-							return;
-						}
-						if (newValue.split(',').length > 3) {
-							return;
-						}
-						// French convention: commas for decimals, semicolons for separation
-						if (newValue.split(',').length === 3) {
-							newValue = newValue.replace(',', '.').replace(';', ',');
-						}
-						const [latitude, longitude] = newValue
-							.split(',')
-							.map((v) => parseFloat(v.trim()));
-						onblur({ latitude, longitude });
-					}}
-					value={value ? `${value.latitude}, ${value.longitude}` : ''}
-				/>
+				<WorldLocationCombobox value={value as RuntimeValue<'location'>} {onblur} />
 			{/snippet}
 			{#snippet fallback()}
 				<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>

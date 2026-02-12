@@ -1,31 +1,43 @@
-<script>
-	import './style.css';
-	import '$lib/tippy-svg-arrow.css';
+<script lang="ts" module>
+	const [getTheme, setTheme] = createContext<Theme>();
+
+	export { getTheme };
+</script>
+
+<script lang="ts">
 	import '$lib/range-inputs.css';
+	import '$lib/tippy-svg-arrow.css';
+	import './style.css';
 
-	import { onMount } from 'svelte';
+	import { createContext } from 'svelte';
 
+	import { Theme } from '$lib/colorscheme.svelte';
 	import { uiState } from '$lib/state.svelte';
 	import { fadeOutElement } from '$lib/utils';
 
 	const { children } = $props();
+
+	setTheme(new Theme());
 
 	$effect(() =>
 		fadeOutElement('#loading', 250, {
 			firstTimeDuration: 1_000
 		})
 	);
+</script>
 
-	$effect(() => {
+<svelte:window
+	{@attach (window) => {
+		// @ts-expect-error
+		window.uiState = uiState;
+	}}
+	{@attach (window) => {
+		// @ts-expect-error
 		window.nativeWindow?.setControlsColor(
 			getComputedStyle(document.documentElement).getPropertyValue('--fg-primary')
 		);
-	});
-
-	onMount(() => {
-		window.uiState = uiState;
-	});
-</script>
+	}}
+/>
 
 {@render children?.()}
 

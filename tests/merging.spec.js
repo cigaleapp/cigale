@@ -284,14 +284,32 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
 	    - text: Date
 	    - textbox "Date": /\\d+-\\d+-\\d+/
+	    - code: "--%"
 	    - button:
 	      - img
 	    - paragraph: Moment où la photo a été prise
 	    - text: Localisation
-	    - textbox "Localisation"
+	    - combobox
 	    - button [disabled]:
 	      - img
 	    - paragraph: Endroit où la photo a été prise
+	    - region "Map"
+	    - button "Zoom in"
+	    - button "Zoom out" [disabled]
+	    - button "Drag to rotate map, click to reset north"
+	    - button "Find my location"
+	    - button "Enter fullscreen"
+	    - text: /\\d+ km/
+	    - group:
+	      - link "MapLibre":
+	        - /url: https://maplibre.org/
+	      - text: "| ©"
+	      - link "CARTO":
+	        - /url: https://carto.com/about-carto/
+	      - text: ", ©"
+	      - link "OpenStreetMap":
+	        - /url: http://www.openstreetmap.org/about/
+	      - text: contributors
 	    - text: Difficulté d'identification
 	    - radiogroup:
 	      - radio "Facile"
@@ -302,6 +320,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - text: Difficile
 	      - radio "Très difficile"
 	      - text: Très difficile
+	    - code: "--%"
 	    - button:
 	      - img
 	    - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
@@ -350,6 +369,9 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - img
 	      - text: ""
 	    - button "Séparer Ctrl + Shift + G":
+	      - img
+	      - text: ""
+	    - button "Ouvrir en plein écran Ctrl + ⏎" [disabled]:
 	      - img
 	      - text: ""
 	    - button "Supprimer 3 images Suppr":
