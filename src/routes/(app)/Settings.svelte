@@ -1,6 +1,4 @@
 <script>
-	import { watch } from 'runed';
-
 	import IconIncrease from '~icons/ri/add-line';
 	import Cross from '~icons/ri/close-circle-line';
 	import IconSyncWithSystemTheme from '~icons/ri/loop-left-fill';
@@ -17,6 +15,7 @@
 	import SegmentedGroup from '$lib/SegmentedGroup.svelte';
 	import { getColorScheme, getSettings, setSetting } from '$lib/settings.svelte';
 	import Switch from '$lib/Switch.svelte';
+	import { getTheme } from '$routes/+layout.svelte';
 
 	/**
 	 * @type {{openKeyboardShortcuts?: (() => void) | undefined, openPrepareForOfflineUse?: (() => void) | undefined}}
@@ -38,32 +37,17 @@
 		});
 	});
 
-	const { theme, showTechnicalMetadata, gridSize, language, parallelism } =
-		$derived(getSettings());
+	const { showTechnicalMetadata, gridSize, language, parallelism } = $derived(getSettings());
 
-	let systemIsLight = $state(true);
+	const theme = getTheme();
+
 	$effect(() => {
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-			systemIsLight = !e.matches;
-		});
+		window.nativeWindow?.setControlsColor(
+			getComputedStyle(document.documentElement).getPropertyValue(
+				`--${theme.effective}__fg-primary`
+			)
+		);
 	});
-
-	const effectiveTheme = $derived.by(() => {
-		const theme = getSettings().theme;
-		if (theme === 'auto') return systemIsLight ? 'light' : 'dark';
-		return theme;
-	});
-
-	watch(
-		() => effectiveTheme,
-		(theme) => {
-			window.nativeWindow?.setControlsColor(
-				getComputedStyle(document.documentElement).getPropertyValue(
-					`--${theme}__fg-primary`
-				)
-			);
-		}
-	);
 </script>
 
 <ButtonIcon
@@ -96,14 +80,14 @@
 		<div class="label">Thème</div>
 		<div class="setting">
 			<Switch
-				value={theme === 'auto' ? systemIsLight : theme === 'light'}
+				value={theme.effective === 'light'}
 				onchange={async (isLight) => {
 					await setSetting('theme', isLight ? 'light' : 'dark');
 				}}
 				icons={{ on: Sun, off: Moon }}
 			></Switch>
 			<ButtonIcon
-				disabled={theme === 'auto'}
+				disabled={theme.setting === 'auto'}
 				onclick={async () => await setSetting('theme', 'auto')}
 				help="Synchroniser avec le thème du système"
 			>
