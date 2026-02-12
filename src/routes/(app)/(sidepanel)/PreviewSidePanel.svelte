@@ -251,6 +251,7 @@
 			<ButtonSecondary
 				disabled={!singleObservationSelected}
 				loading
+				help={!singleObservationSelected ? 'Sélectionnez une seule observation' : ''}
 				onclick={async () => {
 					if (!singleObservationSelected) return;
 					await goto('/(app)/(sidepanel)/classify/[observation]', {
@@ -260,11 +261,7 @@
 			>
 				<IconFullScreen />
 				Ouvrir en plein écran
-				{#if !singleObservationSelected}
-					&nbsp;(sélectionnez une seule observation)
-				{:else}
-					<KeyboardHint shortcut="$mod+Enter" />
-				{/if}
+				<KeyboardHint shortcut="$mod+Enter" />
 			</ButtonSecondary>
 		{/if}
 		<ButtonSecondary

@@ -371,7 +371,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - button "Séparer Ctrl + Shift + G":
 	      - img
 	      - text: ""
-	    - button "Ouvrir en plein écran (sélectionnez une seule observation)" [disabled]:
+	    - button "Ouvrir en plein écran Ctrl + ⏎" [disabled]:
 	      - img
 	      - text: ""
 	    - button "Supprimer 3 images Suppr":
