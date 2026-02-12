@@ -63,6 +63,9 @@ export default [
 				parser: ts.parser,
 				svelteConfig
 			}
+		},
+		rules: {
+			'svelte/no-inspect': 'error'
 		}
 	},
 	// oxlint should be the last one
