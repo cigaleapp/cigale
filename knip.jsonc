@@ -14,7 +14,12 @@
 		"tests/reporters/pleye.js",
 		"src/**/\\(todo\\)/*"
 	],
-	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector", "svelte-mathml"],
+	"ignoreDependencies": [
+		"@iconify-json/.+",
+		"bun",
+		"@sveltejs/vite-plugin-svelte-inspector",
+		"svelte-mathml"
+	],
 	"entry": [
 		"scripts/issue-creator-server.ts",
 		"scripts/issue-creator-discord-bot.ts",

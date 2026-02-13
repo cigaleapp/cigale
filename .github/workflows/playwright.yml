@@ -60,8 +60,7 @@ jobs:
           echo "huggingface-repos=$huggingface_repos" >> $GITHUB_OUTPUT
           echo "non-huggingface-urls=$non_huggingface_urls" >> $GITHUB_OUTPUT
         env:
-          JQ_SELECTORS: 
-            .metadata[].infer?.neural[]?.model, 
+          JQ_SELECTORS: .metadata[].infer?.neural[]?.model,
             .metadata[].infer?.neural[]?.classmapping
 
       - name: Compute cache key

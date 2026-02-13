@@ -88,14 +88,12 @@
 		cards
 		value={input.disposition ?? 'CHW'}
 		onchange={updater((inf, newValue) => {
-
-			if (!newValue) return
+			if (!newValue) return;
 
 			// The if prevent infinite loops since calling the updater
 			// triggers a load function re-run, which
 			// in turns updates input.disposition
 			if (newValue === inf[i].input.disposition) return;
-
 
 			inf[i].input.disposition = newValue;
 		})}

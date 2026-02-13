@@ -92,7 +92,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 		return;
 	}
 
-	const inferenceSettings = $state.snapshot( uiState.cropModels.at(uiState.selectedCropModel));
+	const inferenceSettings = $state.snapshot(uiState.cropModels.at(uiState.selectedCropModel));
 
 	if (!inferenceSettings) {
 		return;

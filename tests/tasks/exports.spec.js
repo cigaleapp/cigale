@@ -54,7 +54,7 @@ async function prepare({ page, app }) {
 
 	const withExifGps = await app.db.image.byFilename('with-exif-gps.jpeg');
 	if (!withExifGps) throw new Error('Image with-exif-gps.jpeg not found in database');
-	await app.db.metadata.set(withExifGps.id, 'species', null)
+	await app.db.metadata.set(withExifGps.id, 'species', null);
 }
 
 test('correct', async ({ page, app }) => {
