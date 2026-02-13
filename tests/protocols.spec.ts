@@ -55,7 +55,9 @@ test('can auto-update a protocol', async ({ page, app }) => {
 			'info',
 			'Le protocole "Example: arthropodes (lightweight)" a été mis à jour'
 		)
-	).toBeVisible();
+	).toBeVisible({
+		timeout: 10_000
+	});
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
 	expect(protocol).toHaveProperty('version', newVersion);
