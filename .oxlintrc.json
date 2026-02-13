@@ -2,6 +2,12 @@
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
 	"plugins": ["import", "jsdoc", "node", "promise", "vitest"],
 	"rules": {
+		"array-callback-return": [
+			"error",
+			{
+				"allowImplicit": true
+			}
+		],
 		"require-property-description": "off",
 		"no-defaults": "off",
 		"no-console": [

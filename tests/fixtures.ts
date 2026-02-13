@@ -10,6 +10,7 @@ import { safeJSONParse } from '$lib/utils';
 
 import _fullProtocol from '../examples/arthropods.cigaleprotocol.json' with { type: 'json' };
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
+import type { FixturePaths } from './filepaths.js';
 import {
 	confirmDeletionModal,
 	expectTooltipContent,
@@ -57,7 +58,9 @@ export type AppFixture = {
 			list(): Promise<IDBDatabaseType['Observation']['value'][]>;
 		};
 		image: {
-			byFilename(filename: string): Promise<IDBDatabaseType['Image']['value'] | undefined>;
+			byFilename(
+				filename: FixturePaths.Photos | (string & {})
+			): Promise<IDBDatabaseType['Image']['value'] | undefined>;
 			byId(id: string): Promise<IDBDatabaseType['Image']['value'] | undefined>;
 			list(): Promise<IDBDatabaseType['Image']['value'][]>;
 		};
@@ -86,7 +89,7 @@ export type AppFixture = {
 				/** The metadata key. If not namespaced, it'll be namespaced to the lightweight protocol's id */
 				key: RemoveNamespace<keyof typeof lightProtocol.metadata> | (string & {}),
 				/** The new value to set it as. Use null to remove the value  */
-				value: null | RuntimeValue | { confidence: number; value: RuntimeValue }
+				value: null | RuntimeValue | { confidence: number; value?: RuntimeValue }
 			): Promise<void>;
 		};
 	};
@@ -249,7 +252,12 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 										confidence: value.confidence,
 										value: JSON.stringify(value.value)
 									}
-								: { value: JSON.stringify(value) };
+								: typeof value === 'object' && 'confidence' in value
+									? {
+											confidence: value.confidence,
+											value: original.metadata[key]?.value
+										}
+									: { value: JSON.stringify(value) };
 
 						const updated: IDBDatabaseType['Image']['value'] = {
 							...original,
@@ -341,7 +349,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 			}
 
 			await mockPredownloadedModels(page, context, fullProtocol, {
-				detection: [arthropodaDetectionModel],
+				crop: [arthropodaDetectionModel],
 				species: [collembolaClassifierModel, arthropodaClassifierModel]
 			});
 

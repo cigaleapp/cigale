@@ -92,14 +92,9 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 		return;
 	}
 
-	if (!uiState.currentProtocol.crop.infer) {
-		console.warn(
-			'No crop inference defined, not analyzing image. Configure crop inference in the protocol (crop.infer) if this was not intentional.'
-		);
-		return;
-	}
+	const inferenceSettings = $state.snapshot( uiState.cropModels.at(uiState.selectedCropModel));
 
-	if (!uiState.cropInferenceAvailable) {
+	if (!inferenceSettings) {
 		return;
 	}
 
@@ -113,7 +108,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 
 	const inference = swarpc.inferBoundingBoxes.cancelable({
 		fileId: image.fileId,
-		taskSettings: $state.snapshot(uiState.currentProtocol.crop.infer[uiState.selectedCropModel])
+		taskSettings: inferenceSettings
 	});
 
 	cancellers?.set(image.fileId, inference.cancel);
@@ -137,7 +132,7 @@ export async function inferBoundingBoxes(swarpc, cancellers, fileId) {
 	/**
 	 * @param {[number, number, number, number]} param0
 	 */
-	const toCropBox = ([x, y, w, h]) => toRelativeCoords(uiState.currentProtocol)({ x, y, w, h });
+	const toCropBox = ([x, y, w, h]) => toRelativeCoords(inferenceSettings.input)({ x, y, w, h });
 
 	for (let i = 0; i < boxes.length; i++) {
 		await tables.Image.set({

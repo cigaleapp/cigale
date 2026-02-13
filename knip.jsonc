@@ -11,9 +11,10 @@
 		"src/lib/FloatingButton.svelte",
 		"src/lib/UnsavedChangesIndicator.svelte",
 		"src/locales/**/*.js",
-		"tests/reporters/pleye.js"
+		"tests/reporters/pleye.js",
+		"src/**/\\(todo\\)/*"
 	],
-	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector"],
+	"ignoreDependencies": ["@iconify-json/.+", "bun", "@sveltejs/vite-plugin-svelte-inspector", "svelte-mathml"],
 	"entry": [
 		"scripts/issue-creator-server.ts",
 		"scripts/issue-creator-discord-bot.ts",

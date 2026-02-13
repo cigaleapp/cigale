@@ -2,8 +2,8 @@
 	"$schema": "https://cigaleapp.github.io/cigale/protocol.schema.json",
 	"id": "io.github.cigaleapp.arthropods.example.light",
 	"name": "Example: arthropodes (lightweight)",
-	"learnMore": "https://github.com/cigaleapp/cigale/tree/b71b2f048c72778079db8c3b68b7064afa7cd0f8/scripts/README.md#protocoles-arthropodsexamplelight",
-	"version": 62,
+	"learnMore": "https://github.com/cigaleapp/cigale/tree/d040ac67d5a74146375ac453862bdd159c1e8d60/scripts/README.md#protocoles-arthropodsexamplelight",
+	"version": 64,
 	"updates": "automatic",
 	"source": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.light.cigaleprotocol.json",
 	"description": "Protocole de transect pour l’identification des arthropodes. Descriptions et photos des espèces de Jessica Joachim, cf https://jessica-joachim.com/identification",
@@ -943,7 +943,25 @@
 			"description": "",
 			"required": true,
 			"mergeMethod": "union",
-			"groupable": true
+			"groupable": true,
+			"infer": {
+				"neural": [
+					{
+						"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/detector-arthropoda.onnx?download=true",
+						"name": "YOLO11",
+						"input": {
+							"height": 640,
+							"width": 640,
+							"disposition": "1CHW",
+							"normalized": true
+						},
+						"output": {
+							"normalized": true,
+							"shape": ["sx", "sy", "ex", "ey", "score", "_"]
+						}
+					}
+				]
+			}
 		},
 		"io.github.cigaleapp.arthropods.example.light__crop_is_confirmed": {
 			"type": "boolean",
@@ -2638,25 +2656,6 @@
 				]
 			}
 		}
-	},
-	"crop": {
-		"metadata": "io.github.cigaleapp.arthropods.example.light__crop",
-		"infer": [
-			{
-				"model": "https://huggingface.co/cigaleapp/built-in-protocols/resolve/main/detector-arthropoda.onnx?download=true",
-				"name": "YOLO11",
-				"input": {
-					"height": 640,
-					"width": 640,
-					"disposition": "1CHW",
-					"normalized": true
-				},
-				"output": {
-					"normalized": true,
-					"shape": ["sx", "sy", "ex", "ey", "score", "_"]
-				}
-			}
-		]
 	},
 	"exports": {
 		"images": {

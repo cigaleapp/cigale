@@ -1,31 +1,20 @@
 import { type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
-import {
-	Dimensions,
-	HTTPRequest,
-	ID,
-	ModelInput,
-	Probability,
-	References
-} from './schemas/common.js';
+import { Dimensions, HTTPRequest, ID, Probability, References } from './schemas/common.js';
 import {
 	EXIFField,
 	MetadataEnumVariant,
 	MetadataError,
-	MetadataInferOptions,
 	MetadataMergeMethod,
 	Metadata as MetadataSchema,
 	MetadataType as MetadataTypeSchema,
 	MetadataValue,
 	MetadataValues
 } from './schemas/metadata.js';
+import { ModelDetectionOutputShape, ModelInput } from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
-import {
-	FilepathTemplate,
-	ModelDetectionOutputShape,
-	Protocol as ProtocolSchema
-} from './schemas/protocols.js';
+import { ExportsFilepathTemplate, Protocol as ProtocolSchema } from './schemas/protocols.js';
 import { Session as SessionSchema } from './schemas/sessions.js';
 import { clamp } from './utils.js';
 
@@ -164,7 +153,7 @@ const Settings = table(
 
 export const Schemas = {
 	ID,
-	FilepathTemplate,
+	ExportsFilepathTemplate,
 	Probability,
 	MetadataValues,
 	MetadataValue,
@@ -174,7 +163,6 @@ export const Schemas = {
 	ModelDetectionOutputShape,
 	Observation,
 	Session,
-	MetadataInferOptions,
 	MetadataTypeSchema,
 	MetadataMergeMethod,
 	MetadataEnumVariant,
@@ -353,11 +341,6 @@ export const idComparator = (a, b) => {
 /**
  * @typedef EXIFField
  * @type {typeof EXIFField.infer}
- */
-
-/**
- * @typedef MetadataInferOptions
- * @type {typeof MetadataInferOptions.infer}
  */
 
 /**

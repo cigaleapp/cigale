@@ -51,6 +51,10 @@ async function prepare({ page, app }) {
 	});
 	await page.waitForTimeout(5_000);
 	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, { timeout: 10_000 });
+
+	const withExifGps = await app.db.image.byFilename('with-exif-gps.jpeg');
+	if (!withExifGps) throw new Error('Image with-exif-gps.jpeg not found in database');
+	await app.db.metadata.set(withExifGps.id, 'species', null)
 }
 
 test('correct', async ({ page, app }) => {

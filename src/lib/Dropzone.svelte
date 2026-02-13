@@ -34,10 +34,9 @@
 			files = [...event.dataTransfer.items]
 				.map((item) => {
 					// If dropped items aren't files, reject them
-					if (item.kind === 'file') {
-						const file = item.getAsFile();
-						return file;
-					}
+					if (item.kind !== 'file') return;
+
+					return item.getAsFile();
 				})
 				.filter(
 					/** @returns {item is File} */
