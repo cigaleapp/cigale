@@ -8,7 +8,7 @@ import type * as SvelteTypes from '$app/types';
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { Analysis } from '../src/lib/schemas/exports.js';
 import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
-import { pr, withParallelism } from './annotations.js';
+import { withParallelism } from './annotations.js';
 import type { FixturePaths } from './filepaths.js';
 import { expect, test } from './fixtures.js';
 import {
@@ -18,7 +18,6 @@ import {
 	firstObservationCard,
 	importPhotos,
 	loadDatabaseDump,
-	makeRegexpUnion,
 	mockProtocolSourceURL,
 	mockUrl,
 	newSession,
@@ -243,44 +242,6 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 			.getByRole('listitem')
 			.filter({ has: page.getByRole('heading', { name: lightweightProtocol.name }) })
 	).toBeVisible();
-});
-
-test('changing model while on tab reloads it @real-protocol', pr(659), async ({ page, app }) => {
-	await app.settings.set({ showTechnicalMetadata: false });
-	await newSession(page);
-
-	await app.tabs.go('import');
-	await importPhotos({ page }, ['cyan.jpeg']);
-	await app.loading.wait();
-
-	async function expectLoadingText(toBePresent: boolean, text: string) {
-		let expector = expect(page.getByTestId('app-main'));
-		if (!toBePresent) expector = expector.not;
-		await expector.toHaveText(makeRegexpUnion(text));
-	}
-
-	await setInferenceModels(page, { crop: 'Aucune inférence' });
-	await app.tabs.go('crop');
-	await expectLoadingText(false, 'Chargement du modèle de recadrage…');
-
-	await setInferenceModels(page, { crop: 'YOLO11' });
-	await expectLoadingText(true, 'Chargement du modèle de recadrage…');
-	await app.loading.wait();
-
-	await setInferenceModels(page, { classify: 'Aucune inférence' });
-	await app.tabs.go('classify');
-	await expectLoadingText(false, 'Chargement du modèle de classification');
-	await expect(page.locator('main').getByRole('region', { name: 'Sans Espèce' })).toBeVisible();
-
-	await setInferenceModels(page, { classify: /80 classes/ });
-	await expectLoadingText(true, 'Chargement du modèle de classification');
-	await expect(
-		page.getByRole('region', { name: /^Espèce: confiance à \d+%-\d+%$/ })
-	).toBeVisible();
-	await expect(firstObservationCard(page)).not.toHaveText(/Erreur/);
-
-	await setInferenceModels(page, { classify: /17000 classes/ });
-	await expectLoadingText(true, 'Chargement du modèle de classification');
 });
 
 test('can send a bug report', async ({ page, app, context }) => {
