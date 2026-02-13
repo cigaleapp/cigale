@@ -72,6 +72,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	alternatives = [],
 	manuallyModified = false,
 	clearErrors = true,
+	isDefault = false,
 	cascadedFrom = [],
 	sessionId,
 	abortSignal
@@ -84,6 +85,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 	confidence?: number;
 	confirmed?: boolean;
 	clearErrors?: boolean;
+	isDefault?: boolean;
 	db: DatabaseHandle;
 	alternatives?:
 		| DB.MetadataValue['alternatives']
@@ -107,6 +109,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 		confidence,
 		confirmed,
 		manuallyModified,
+		isDefault,
 		alternatives: !Array.isArray(alternatives)
 			? alternatives
 			: Object.fromEntries(
@@ -172,6 +175,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 				metadataId,
 				value,
 				confidence,
+				isDefault,
 				confirmed,
 				manuallyModified,
 				clearErrors,
@@ -218,6 +222,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 			sessionId,
 			subjectId,
 			manuallyModified,
+			isDefault,
 			confirmed,
 			cascadedFrom: [...cascadedFrom, metadataId],
 			abortSignal,
@@ -228,7 +233,7 @@ export async function storeMetadataValue<Type extends DB.MetadataType>({
 
 	// Only refresh table state once everything has been cascaded, meaning not inside recursive calls
 	if (cascadedFrom.length === 0 && sessionId) {
-		await refreshTables(sessionId, image ? 'Image' : 'Observation');
+		await refreshTables(sessionId, session ? 'Session' : image ? 'Image' : 'Observation');
 	}
 }
 
@@ -361,7 +366,7 @@ export async function deleteMetadataValue({
 		}
 	}
 
-	if (reactive && sessionId) await refreshTables(sessionId, 'Image', 'Observation');
+	if (reactive && sessionId) await refreshTables(sessionId, 'Image', 'Observation', 'Session');
 
 	return;
 }

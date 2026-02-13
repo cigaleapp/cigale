@@ -1,9 +1,9 @@
-import { scope, type } from 'arktype';
+import { ArkErrors, scope, type } from 'arktype';
 
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
-import { keys, unique } from '../utils.js';
-import { ColorHex, ID, Probability, URLString } from './common.js';
+import { keys, safeJSONStringify, unique } from '../utils.js';
+import { ColorHex, ID, Probability, TemplatedString, URLString } from './common.js';
 import { NeuralBoundingBoxInference, NeuralEnumInference } from './neural.js';
 
 /**
@@ -125,6 +125,9 @@ export const MetadataValue = type({
 	manuallyModified: type('boolean')
 		.describe('Si la valeur a été modifiée manuellement')
 		.default(false),
+	isDefault: type('boolean')
+		.describe('Si la valeur est la valeur par défaut définie dans le protocole')
+		.default(false),
 	alternatives: {
 		'[string.json]': Probability
 	}
@@ -132,6 +135,50 @@ export const MetadataValue = type({
 
 export const MetadataValues = scope({ ID }).type({
 	'[ID]': MetadataValue
+});
+
+export const MetadataRecord = type({
+	'[string]': {
+		value: [
+			type.or(
+				'null',
+				MetadataRuntimeValue.boolean,
+				MetadataRuntimeValue.integer,
+				MetadataRuntimeValue.float,
+				MetadataRuntimeValue.string,
+				// MetadataRuntimeValue.date
+				// Date is not compatible with JSON Schemas, use a datestring instead
+				'string.date.iso',
+				MetadataRuntimeValue.location,
+				MetadataRuntimeValue.boundingbox
+			),
+			'@',
+			'Valeur de la métadonnée'
+		],
+		'valueLabel?': [
+			'string',
+			'@',
+			"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
+		],
+		confidence: ['number', '@', 'Confiance dans la valeur de la métadonnée, entre 0 et 1'],
+		manuallyModified: [
+			'boolean',
+			'@',
+			'La valeur de la métadonnée a été modifiée manuellement'
+		],
+		confirmed: type('boolean')
+			.describe('La valeur de la métadonnée a été confirmée par un·e utilisateurice')
+			.default(false),
+		alternatives: type({
+			'[string]': [
+				'number',
+				'@',
+				'Confiance dans cette valeur alternative de la métadonnée, entre 0 et 1.'
+			]
+		}).describe(
+			"Autres valeurs possibles. Les clés de l'objet sont les autres valeurs possibles pour cette métadonnée (converties en texte via JSON), les valeurs de l'objet sont les confiances associées à ces alternatives."
+		)
+	}
 });
 
 /**
@@ -211,6 +258,38 @@ export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 
 export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
 
+export const MetadataDefaultDynamicPayload = type({
+	protocolMetadata: MetadataRecord,
+	metadata: MetadataRecord,
+	session: {
+		protocolMetadata: MetadataRecord,
+		metadata: MetadataRecord,
+		createdAt: 'string.date.iso'
+	}
+});
+
+export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
+	'<static extends MetadataRuntimeValueAny>',
+	[
+		[
+			'Exclude<static, string>',
+			'@',
+			"Une valeur par défaut pour une métadonnée. Pour l'instant, uniquement supportée sur les métadonnées de session"
+		],
+		'|',
+		TemplatedString(MetadataDefaultDynamicPayload, (serialized) => {
+			const parsed = MetadataValue.get('value')(serialized);
+
+			if (parsed instanceof ArkErrors) {
+				return serialized.trim();
+			}
+
+			return parsed;
+		}).describe(
+			"Une valeur par défaut dynamique. Pour l'instant, uniquement supportée sur les métadonnées de session. C'est une templates Handlebars, avec pour variables `protocolMetadata` (contenant les métadonnées du protocole courant) et `metadata` (contenant les métadonnées de _toutes_ les métadonnées). La valeur par défaut sera évaluée en considérant que le texte final (après éxécution de la template Handlebars) est une représentation JSON (sauf pour les métadonnées de type texte ou enum, où le text final est pris tel-quel). Les helpers gps, boundingBox, date, object et array sont disponibles pour facilement construire des représentations JSON de valeurs complexes"
+		)
+	]
+);
 /**
  * @typedef {typeof EXIFInference.infer} EXIFInference
  */
@@ -220,6 +299,8 @@ export const Metadata = type({
 		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
+	// TODO: move to type-specific branches (e.g. for boundingbox, it's union | none, for others there isnt union, ...)
+	// Get the allowed per-type methods from mergeBy<method> functions' declarations (add a satisfies to the implementations' type switches and export a const for each method)
 	mergeMethod: MetadataMergeMethod.configure(
 		"Méthode utiliser pour fusionner plusieurs différentes valeurs d'une métadonnée. Notamment utilisé pour calculer la valeur d'une métadonnée sur une Observation à partir de ses images",
 		'self'
@@ -232,6 +313,7 @@ export const Metadata = type({
 	groupable: type('boolean')
 		.describe('Si la métadonnée peut être utilisée pour grouper des images ou observations')
 		.default(false),
+	// TODO move to the type: '"enum"' only branch
 	'options?': MetadataEnumVariant.array()
 		.pipe((opts) => unique(opts, (o) => o.key))
 		.pipe((opts) => opts.map((opt, index) => ({ index, ...opt })))
@@ -243,26 +325,32 @@ export const Metadata = type({
 	type.or(
 		{
 			type: '"boolean"',
+			'default?': MetadataDefault('boolean'),
 			'infer?': type.or({ exif: EXIFInference })
 		},
 		{
 			type: '"string"',
+			'default?': MetadataDefault('string'),
 			'infer?': type.or({ exif: EXIFInference })
 		},
 		{
 			type: '"integer"',
+			'default?': MetadataDefault('number.integer'),
 			'infer?': type.or({ exif: EXIFInference })
 		},
 		{
 			type: '"float"',
+			'default?': MetadataDefault('number'),
 			'infer?': type.or({ exif: EXIFInference })
 		},
 		{
 			type: '"date"',
+			'default?': MetadataDefault('string.date.iso'),
 			'infer?': type.or({ exif: EXIFInference })
 		},
 		{
 			type: '"location"',
+			'default?': MetadataDefault({ latitude: 'number', longitude: 'number' }),
 			'infer?': type({
 				latitude: type.or({ exif: EXIFInference }),
 				longitude: type.or({ exif: EXIFInference })
@@ -270,10 +358,17 @@ export const Metadata = type({
 		},
 		{
 			type: '"enum"',
+			'default?': MetadataDefault('string | number'),
 			'infer?': type.or({ exif: EXIFInference }, { neural: NeuralEnumInference.array() })
 		},
 		{
 			type: '"boundingbox"',
+			'default?': MetadataDefault({
+				x: '0 <= number <= 1',
+				y: '0 <= number <= 1',
+				w: '0 <= number <= 1',
+				h: '0 <= number <= 1'
+			}),
 			'infer?': type.or({
 				neural: NeuralBoundingBoxInference.array()
 			})

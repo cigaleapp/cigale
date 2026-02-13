@@ -1,10 +1,14 @@
-import { assert, exampleProtocol, test } from './fixtures.js';
+import { tz } from '@date-fns/tz';
+import { differenceInMinutes, format as formatDate } from 'date-fns';
+
+import { assert, exampleProtocol, expect, test } from './fixtures.js';
 import {
 	chooseInDropdown,
 	deleteSession,
 	goToProtocolManagement,
 	importPhotos,
 	importProtocol,
+	loadDatabaseDump,
 	newSession,
 	sessionMetadataSectionFor,
 	setInferenceModels,
@@ -456,4 +460,49 @@ test('can change protocol of session', async ({ page, app }) => {
 	    - img
 	  - paragraph: string metadata
 	`);
+});
+
+test('session metadata form has default values', async ({ page, app }) => {
+	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+	await app.settings.set({ showTechnicalMetadata: false });
+	await newSession(page, { name: 'Test' });
+	await page.getByTestId('app-nav').getByRole('link', { name: 'Test' }).click();
+	await app.path.wait('/(app)/sessions/[id]');
+
+	const session = await app.db.session.byName('Test');
+	if (!session) throw new Error('Session not found');
+
+	expect(differenceInMinutes(new Date(), new Date(session.createdAt))).toBeLessThan(5);
+
+	await expect(page.getByRole('textbox', { name: 'Date du transect' })).toHaveValue(
+		formatDate(session.createdAt, 'yyyy-MM-dd', {
+			in: tz('Etc/UTC')
+		})
+	);
+	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
+		formatDate(session.createdAt, "yyyyMMddHHmm'AB'", {
+			in: tz('Etc/UTC')
+		})
+	);
+
+	await expect(page.getByRole('textbox', { name: 'ohio respect' })).toHaveValue('6.7');
+	await expect(page.getByRole('textbox', { name: 'has no default' })).toHaveValue('');
+
+	// Changing a value that another default value depends on
+
+	await page.getByRole('textbox', { name: 'Date du transect' }).fill('2024-01-01');
+
+	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
+		'202401010000AB'
+	);
+
+	// Value should not change even if resolved default value changes if its value has been modified by the user
+
+	await page.getByRole('textbox', { name: 'Code du transect' }).fill('custom code');
+
+	await page.getByRole('textbox', { name: 'Date du transect' }).fill('2024-02-01');
+
+	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
+		'custom code'
+	);
 });

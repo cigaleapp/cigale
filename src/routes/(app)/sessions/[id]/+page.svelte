@@ -130,6 +130,8 @@
 									metadataId: def.id
 								});
 							}
+
+							invalidate(dependencyURI('Session', data.session.id));
 						}}
 					/>
 				{/each}

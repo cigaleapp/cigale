@@ -5,6 +5,42 @@ description: Made to demo all of the available data types and features that are 
 authors:
   - name: Gwenn Le Bihan
 
+sessionMetadata:
+  transect_date:
+    type: date
+    label: Date du transect
+    mergeMethod: average
+    required: true
+    description: feur
+    default: '{{ session.createdAt }}'
+
+  transect_code:
+    label: Code du transect
+    mergeMethod: none
+    required: true
+    type: string
+    description: |
+      Le code du transect est composé de la date, de l'heure, et de vos initiales. Par exemple, un transect réalisé par Martin Galli le 07/12/2023 à 14h50 s'écrira : 202312071450MG
+    default: |
+      {{#with (metadata session "transect_date")}}
+        {{ year . }}{{ month . }}{{ day . }}{{ hour . }}{{ minute . }}AB
+      {{/with}}
+
+  ohio_respect:
+    label: ohio respect
+    mergeMethod: average
+    required: false
+    type: float
+    description: '*watches*'
+    default: 6.7
+
+  has_no_default:
+    label: has no default
+    mergeMethod: average
+    required: false
+    type: float
+    description: 'This metadata has no default value, so it will be undefined if not set'
+
 metadata:
   crop:
     type: boundingbox

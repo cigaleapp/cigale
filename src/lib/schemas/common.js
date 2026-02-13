@@ -1,7 +1,8 @@
 import { type } from 'arktype';
+import { format as formatDate } from 'date-fns';
 import Handlebars from 'handlebars';
 
-import { clamp, safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
+import { clamp, mapValues, safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 
 export const ID = type(/^[\w._]+$/);
 
@@ -81,6 +82,184 @@ export const HANDLEBARS_HELPERS = {
 		implementation: (subject, fallback) => {
 			return subject ?? fallback;
 		}
+	},
+	metadata: {
+		documentation:
+			"Récupère la valeur d'une métadonnée sur un subjet (une session, une observation ou une image) donnée. L'ID de la métadonnée peut ne pas comporter de namespace. Dans ce cas, le namespace correspondant au protocole courant est utilisé. Renvoie null si la métadonnée n'existe pas.",
+		usage: "{{ metadata session 'transect_code' }} -> 'TR123'",
+		/**
+		 * @param {{ [ K in "protocolMetadata" | "metadata"]: import('$lib/database.js').MetadataValues } | { [ K in "metadataOverrides" | "protocolMetadataOverrides"]: import('$lib/database.js').MetadataValues }} subject
+		 * @param {string} metadataId
+		 */
+		implementation: (subject, metadataId) => {
+			if ('metadata' in subject) {
+				return (
+					subject.protocolMetadata[metadataId]?.value ??
+					subject.metadata[metadataId]?.value ??
+					null
+				);
+			}
+
+			if ('metadataOverrides' in subject) {
+				return (
+					subject.protocolMetadataOverrides[metadataId]?.value ??
+					subject.metadataOverrides[metadataId]?.value ??
+					null
+				);
+			}
+
+			throw new Error('Subject must have either metadata or metadataOverrides property');
+		}
+	},
+	now: {
+		documentation:
+			'Renvoie la date actuelle dans le format précisé. Voir https://date-fns.org/v4.1.0/docs/format pour une description complète du format',
+		usage: "{{ now \"dd/MM/yyyy 'à' HH:mm\" }} -> '31/12/2026 à 23:59'",
+		/**
+		 * @param {string} format
+		 */
+		implementation: (format) => {
+			return formatDate(Date.now(), format);
+		}
+	},
+	year: {
+		documentation: "Renvoie l’année d'une date sur 4 chiffres",
+		usage: "{{ year '2024-12-31' }} -> '2024'",
+		/**
+		 * @param {string} date
+		 */
+		implementation: (date) => {
+			return formatDate(new Date(date), 'yyyy');
+		}
+	},
+	month: {
+		documentation: "Renvoie le mois d'une date sur 2 chiffres",
+		usage: "{{ month '2024-12-31' }} -> '12'",
+		/**
+		 * @param {string} date
+		 */
+		implementation: (date) => {
+			return formatDate(new Date(date), 'MM');
+		}
+	},
+	day: {
+		documentation: "Renvoie le jour d'une date sur 2 chiffres",
+		usage: "{{ day '2024-12-31' }} -> '31'",
+		/**
+		 * @param {string} date
+		 */
+		implementation: (date) => {
+			return formatDate(new Date(date), 'dd');
+		}
+	},
+	hour: {
+		documentation: "Renvoie l'heure d'une date sur 2 chiffres",
+		usage: "{{ hour '2024-12-31T23:59' }} -> '23'",
+		/**
+		 * @param {string} date
+		 */
+		implementation: (date) => {
+			return formatDate(new Date(date), 'HH');
+		}
+	},
+	minute: {
+		documentation: "Renvoie les minutes d'une date sur 2 chiffres",
+		usage: "{{ minute '2024-12-31T23:59' }} -> '59'",
+		/**
+		 * @param {string} date
+		 */
+		implementation: (date) => {
+			return formatDate(new Date(date), 'mm');
+		}
+	},
+	second: {
+		documentation: "Renvoie les secondes d'une date sur 2 chiffres",
+		usage: "{{ second '2024-12-31T23:59:01' }} -> '01'",
+		/**
+		 * @param {string} date
+		 */
+		implementation: (date) => {
+			return formatDate(new Date(date), 'ss');
+		}
+	},
+	date: {
+		documentation:
+			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donnent dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
+		usage: "{{ date year=2024 month=12 day=31 hours=23 minutes=59 seconds=1.5 }} -> '2024-12-31T23:59:01.500+02:00'",
+		/**
+		 * @param {number} year
+		 * @param {number} month
+		 * @param {number} day
+		 * @param {number | undefined} hours
+		 * @param {number | undefined} minutes
+		 * @param {{hash: { year?: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number}}} options
+		 */
+		implementation: (year, month, day, hours, minutes, { hash }) => {
+			const seconds = hash.seconds ?? 0;
+
+			return new Date(
+				year,
+				month - 1, // JavaScript 🥰
+				day,
+				hours ?? hash.hours ?? 0,
+				minutes ?? hash.minutes ?? 0,
+				Math.floor(seconds),
+				Math.round((seconds - Math.floor(seconds)) * 1000)
+			);
+		}
+	},
+	object: {
+		documentation:
+			"Crée une représentation JSON d'un objet en prenant les paramètres comme paires clé-valeur",
+		usage: '{{ object key1=\'value1\' key2=\'value2\' }} -> \'{"key1":"value1","key2":"value2"}\'',
+		/**
+		 * @param {{hash: Record<string, unknown>}} options
+		 */
+		implementation: ({ hash }) => {
+			return safeJSONStringify(hash);
+		}
+	},
+	array: {
+		documentation:
+			"Crée une représentation JSON d'un tableau en prenant les paramètres comme éléments du tableau",
+		usage: "{{ array 'value1' 'value2' }} -> '[\"value1\",\"value2\"]'",
+		/**
+		 * @param {unknown} e0
+		 * @param {unknown} e1
+		 * @param {unknown} e2
+		 * @param {unknown} e3
+		 * @param {unknown} e4
+		 * @param {unknown} e5
+		 */
+		implementation: (e0, e1, e2, e3, e4, e5) => {
+			return safeJSONStringify([e0, e1, e2, e3, e4, e5].filter((e) => e !== undefined));
+		}
+	},
+	gps: {
+		documentation:
+			'Crée une représetation JSON des coordonnées GPS données (latitude puis longitude)',
+		usage: '{{ gps 42.957408 1.0859884 }} -> \'{"latitude": 42.957408, "longitude": 1.0859884}\'',
+		/**
+		 * @param {number} latitude
+		 * @param {number} longitude
+		 */
+		implementation: (latitude, longitude) => {
+			return safeJSONStringify({ latitude, longitude });
+		}
+	},
+	boundingBox: {
+		documentation:
+			'Crée une représentation JSON d’une bounding box à partir de ses coordonnées normalisées (x, y, w, h)',
+		usage: '{{ boundingBox 0.5 0.5 1 1 }} -> \'{"x":0.5,"y":0.5,"w":1,"h":1}\'',
+		/**
+		 * @param {number} x
+		 * @param {number} y
+		 * @param {number} w
+		 * @param {number} h
+		 */
+		implementation: (x, y, w, h) => {
+			return safeJSONStringify({ x, y, w, h });
+		}
 	}
 };
 
@@ -90,25 +269,31 @@ for (const [name, { implementation }] of Object.entries(HANDLEBARS_HELPERS)) {
 
 /**
  * @template {import("arktype").Type} T
+ * @template {any} [O=string]
  * @param {T} Input
+ * @param {(output: string) => O} [postprocess]
  */
-export const TemplatedString = (Input) =>
+export const TemplatedString = (Input, postprocess) =>
 	type.string.pipe((t) => {
 		try {
 			const compiled = Handlebars.compile(t, {
 				noEscape: true,
 				assumeObjects: true,
 				knownHelpersOnly: true,
-				knownHelpers: { suffix: true, extension: true, fallback: true }
+				knownHelpers: mapValues(HANDLEBARS_HELPERS, () => true)
 			});
 
 			return {
 				toJSON: () => t,
 				/**
 				 * @param {T["inferIn"]} data
-				 * @returns {string}
+				 * @returns {O}
 				 */
-				render: (data) => compiled(Input.assert(data))
+				render(data) {
+					const rendered = compiled(Input.assert(data));
+					// @ts-ignore
+					return postprocess ? postprocess(rendered) : rendered;
+				}
 			};
 		} catch (cause) {
 			throw new Error(`Invalid template ${safeJSONStringify(t)}`, { cause });
@@ -120,8 +305,4 @@ export const TemplatedString = (Input) =>
  * @param {T} Input
  */
 export const FilepathTemplate = (Input) =>
-	TemplatedString(Input).pipe(({ render, toJSON }) => ({
-		toJSON,
-		/** @type {typeof render} */
-		render: (data) => render(data).replaceAll('\\', '/')
-	}));
+	TemplatedString(Input, (path) => path.replaceAll('\\', '/'));

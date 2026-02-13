@@ -63,7 +63,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 		console.time(`Storing Metadata Options for ${id}`);
 		const total = metadata.options?.length ?? 0;
 		let done = 0;
-		for (const option of metadata.options ?? []) {
+		for (const [i, option] of metadata.options?.entries() ?? []) {
 			done++;
 			if (done % 1000 === 0) {
 				onLoadingState(
@@ -74,6 +74,7 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 			tx.objectStore('MetadataOption').put({
 				id: metadataOptionId(namespacedMetadataId(protocol.id, id), option.key),
 				metadataId: namespacedMetadataId(protocol.id, id),
+				index: i,
 				...option
 			});
 

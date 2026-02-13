@@ -3,51 +3,7 @@ import { type } from 'arktype';
 // Can't use $lib/ in $lib/schemas files, they're susceptible
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
 import { mapValues } from '../utils.js';
-import { MetadataErrors, MetadataRuntimeValue } from './metadata.js';
-
-export const MetadataRecord = type({
-	'[string]': {
-		value: [
-			type.or(
-				'null',
-				MetadataRuntimeValue.boolean,
-				MetadataRuntimeValue.integer,
-				MetadataRuntimeValue.float,
-				MetadataRuntimeValue.string,
-				// MetadataRuntimeValue.date
-				// Date is not compatible with JSON Schemas, use a datestring instead
-				'string.date.iso',
-				MetadataRuntimeValue.location,
-				MetadataRuntimeValue.boundingbox
-			),
-			'@',
-			'Valeur de la métadonnée'
-		],
-		'valueLabel?': [
-			'string',
-			'@',
-			"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
-		],
-		confidence: ['number', '@', 'Confiance dans la valeur de la métadonnée, entre 0 et 1'],
-		manuallyModified: [
-			'boolean',
-			'@',
-			'La valeur de la métadonnée a été modifiée manuellement'
-		],
-		confirmed: type('boolean')
-			.describe('La valeur de la métadonnée a été confirmée par un·e utilisateurice')
-			.default(false),
-		alternatives: type({
-			'[string]': [
-				'number',
-				'@',
-				'Confiance dans cette valeur alternative de la métadonnée, entre 0 et 1.'
-			]
-		}).describe(
-			"Autres valeurs possibles. Les clés de l'objet sont les autres valeurs possibles pour cette métadonnée (converties en texte via JSON), les valeurs de l'objet sont les confiances associées à ces alternatives."
-		)
-	}
-});
+import { MetadataErrors, MetadataRecord } from './metadata.js';
 
 export const AnalyzedImage = type({
 	id: ['string', '@', "ID de l'image"],
