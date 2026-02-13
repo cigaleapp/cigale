@@ -173,7 +173,7 @@ msgstr "No protocol selected"
 msgid "Aucun raccouci clavier pour cette page"
 msgstr "No keyboard shortcuts for this page"
 
-#: src/lib/MetadataCombobox.svelte
+#: src/lib/Combobox.svelte
 msgid "Aucun résultat :/"
 msgstr "No results :/"
 
@@ -1053,26 +1053,6 @@ msgstr "Delete the metadata"
 msgid "Impossible de sauvegarder : {0}"
 msgstr "Cannot save: {0}"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Recadrage des images"
-msgstr "Image cropping"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Marge par défault <0>Pour les images recadrées</0>"
-msgstr "Default padding <0>for cropped images</0>"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Marge par défaut"
-msgstr "Default padding"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Stockage des boîtes"
-msgstr "Bounding boxes storage"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Boîtes de recadrage stockées dans cette métadonnée"
-msgstr "Bounding boxes are stored using this metadata"
-
 #: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "<0/> Voir"
 msgstr "<0/> See"
@@ -1081,58 +1061,42 @@ msgstr "<0/> See"
 msgid "<0/> Aucune métadonnée"
 msgstr "<0/> No metadata"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Le protocole ne peut pas stocker les boîtes de recadrage!"
-msgstr "Protocol cannot store bounding boxes!"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Modèles d'inférence <0><0/> Ajouter</0>"
-msgstr "Inference models <0><0/> Add</0>"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Supprimer ce modèle"
-msgstr "Delete this model"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Aucun modèle de recadrage défini."
-msgstr "No crop model defined."
-
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Nom du modèle"
 msgstr "Model name"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "URL du ficher .onnx"
 msgstr ".onnx file URL"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Taille des images en entrée"
 msgstr "Size of input images"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Largeur"
 msgstr "Width"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Hauteur"
 msgstr "Height"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "pixels"
 msgstr "pixels"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Disposition des pixels"
 msgstr "Pixel layout"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Représente"
 msgstr "Interpreted as"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid ""
 "*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des\n"
 "images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement\n"
@@ -1142,42 +1106,42 @@ msgstr ""
 "Only one image will be sent at a time to the model.<0/> This could change in the future, so it's still useful to\n"
 "configure the pixel layout correctly."
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Valeur des pixels"
 msgstr "Pixel values"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "entre 0 et 255"
 msgstr "between 0 and 255"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "entre 0 et 1"
 msgstr "between 0 and 1"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Forme de la sortie"
 msgstr "Output shape"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
 msgstr "Add"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Supprimer cet élément"
 msgstr "Delete this element"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Invalide"
 msgstr "Invalid"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
 msgstr "Model output layer <0>Repeats for each detected bounding box</0>"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Boîte englobante"
 msgstr "Bounding box"
 
@@ -1627,14 +1591,6 @@ msgstr "Not versioned"
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
 msgstr "ID must only contain letters, numbers, <0/> or <1/>"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid ""
-"Entrez un nombre suivi de <0/> pour une marge relative à la taille de chaque\n"
-"image, ou suivi de <1/> pour une marge en pixels."
-msgstr ""
-"Enter a number followed by <0/> for a value relative to the size of each\n"
-"image, or followed by <1/> for a value in pixels."
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
@@ -2247,10 +2203,6 @@ msgstr ""
 
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> Dossier <1/>"
-msgstr ""
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "(sélectionnez une seule observation)"
 msgstr ""
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Header.svelte

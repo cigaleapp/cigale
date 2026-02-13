@@ -172,7 +172,7 @@ msgstr "Aucun protocole sélectionné"
 msgid "Aucun raccouci clavier pour cette page"
 msgstr "Aucun raccouci clavier pour cette page"
 
-#: src/lib/MetadataCombobox.svelte
+#: src/lib/Combobox.svelte
 msgid "Aucun résultat :/"
 msgstr "Aucun résultat :/"
 
@@ -1052,26 +1052,6 @@ msgstr "Supprimer la métadonnée"
 msgid "Impossible de sauvegarder : {0}"
 msgstr "Impossible de sauvegarder : {0}"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Recadrage des images"
-msgstr "Recadrage des images"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Marge par défault <0>Pour les images recadrées</0>"
-msgstr "Marge par défault <0>Pour les images recadrées</0>"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Marge par défaut"
-msgstr "Marge par défaut"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Stockage des boîtes"
-msgstr "Stockage des boîtes"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Boîtes de recadrage stockées dans cette métadonnée"
-msgstr "Boîtes de recadrage stockées dans cette métadonnée"
-
 #: src/routes/(app)/protocols/[id]/MetadataLink.svelte
 msgid "<0/> Voir"
 msgstr "<0/> Voir"
@@ -1080,58 +1060,42 @@ msgstr "<0/> Voir"
 msgid "<0/> Aucune métadonnée"
 msgstr "<0/> Aucune métadonnée"
 
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Le protocole ne peut pas stocker les boîtes de recadrage!"
-msgstr "Le protocole ne peut pas stocker les boîtes de recadrage!"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Modèles d'inférence <0><0/> Ajouter</0>"
-msgstr "Modèles d'inférence <0><0/> Ajouter</0>"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Supprimer ce modèle"
-msgstr "Supprimer ce modèle"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid "Aucun modèle de recadrage défini."
-msgstr "Aucun modèle de recadrage défini."
-
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Nom du modèle"
 msgstr "Nom du modèle"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "URL du ficher .onnx"
 msgstr "URL du ficher .onnx"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Taille des images en entrée"
 msgstr "Taille des images en entrée"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Largeur"
 msgstr "Largeur"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Hauteur"
 msgstr "Hauteur"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "pixels"
 msgstr "pixels"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Disposition des pixels"
 msgstr "Disposition des pixels"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Représente"
 msgstr "Représente"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid ""
 "*Pour l'instant, CIGALE ne prend pas avantage des réseaux capables de traiter des\n"
 "images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement\n"
@@ -1141,42 +1105,42 @@ msgstr ""
 "images par batch, donc il n'enverra toujours qu'une image à la fois au modèle. <0/> Cela pourrait changer dans le futur, donc il est toujours utile de configurer correctement\n"
 "la disposition des pixels."
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Valeur des pixels"
 msgstr "Valeur des pixels"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "entre 0 et 255"
 msgstr "entre 0 et 255"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "entre 0 et 1"
 msgstr "entre 0 et 1"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelConfig.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelConfig.svelte
 msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
 msgstr "Ajouter"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Supprimer cet élément"
 msgstr "Supprimer cet élément"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Invalide"
 msgstr "Invalide"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
 msgstr "Couche de sortie du modèle <0>Répété pour chaque boîte englobante détectée</0>"
 
-#: src/routes/(app)/protocols/[id]/cropping/ModelOutputShapeDiagram.svelte
+#: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Boîte englobante"
 msgstr "Boîte englobante"
 
@@ -1626,14 +1590,6 @@ msgstr "Non versionné"
 #: src/routes/(app)/protocols/ModalCreateProtocol.svelte
 msgid "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
 msgstr "L'identifiant ne doit comporter que des lettres, chiffres, <0/> ou <1/>"
-
-#: src/routes/(app)/protocols/[id]/cropping/+page.svelte
-msgid ""
-"Entrez un nombre suivi de <0/> pour une marge relative à la taille de chaque\n"
-"image, ou suivi de <1/> pour une marge en pixels."
-msgstr ""
-"Entrez un nombre suivi de <0/> pour une marge relative à la taille de chaque\n"
-"image, ou suivi de <1/> pour une marge en pixels."
 
 #: src/routes/(app)/protocols/[id]/versioning/+page.svelte
 msgid "<0/> Dernière version en ligne: <1>v{0}</1> <2>Réétablir</2>"
@@ -2248,10 +2204,6 @@ msgstr "<0/> Archive ZIP <1/>"
 #: src/routes/(app)/results/+page.svelte
 msgid "<0/> Dossier <1/>"
 msgstr "<0/> Dossier <1/>"
-
-#: src/routes/(app)/(sidepanel)/PreviewSidePanel.svelte
-msgid "(sélectionnez une seule observation)"
-msgstr "(sélectionnez une seule observation)"
 
 #: src/routes/(app)/(sidepanel)/classify/[observation]/Header.svelte
 msgid "<0/> Voir tout <1/>"
