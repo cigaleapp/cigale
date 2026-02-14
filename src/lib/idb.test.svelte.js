@@ -148,6 +148,7 @@ describe('operations', () => {
 						confidence: 1,
 						confirmed: false,
 						manuallyModified: false,
+						isDefault: false,
 						alternatives: {
 							'"release!!!!"': 0.3
 						}
@@ -240,6 +241,7 @@ describe('operations', () => {
 					confidence: 1,
 					confirmed: false,
 					manuallyModified: false,
+					isDefault: false,
 					alternatives: {
 						'"release!!!!"': 0.3
 					}
@@ -635,6 +637,7 @@ describe('wrangler', () => {
 								confidence: 1,
 								confirmed: false,
 								manuallyModified: false,
+								isDefault: false,
 								alternatives: {
 									'"release!!!!"': 0.3
 								}
@@ -652,6 +655,7 @@ describe('wrangler', () => {
 								confidence: 1,
 								confirmed: false,
 								manuallyModified: false,
+								isDefault: false,
 								alternatives: {
 									'"release!!!!"': 0.3
 								}
@@ -675,6 +679,7 @@ describe('wrangler', () => {
 							confidence: 1,
 							confirmed: false,
 							manuallyModified: false,
+							isDefault: false,
 							alternatives: {
 								'"release!!!!"': 0.3
 							}

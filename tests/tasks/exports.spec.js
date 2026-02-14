@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import JSZip from 'jszip';
 
-import { expect, test } from '../fixtures.js';
+import { assert, test } from '../fixtures.js';
 import { importPhotos, newSession, sessionMetadataSectionFor } from '../utils/index.js';
 
 test.skip(
@@ -34,7 +34,7 @@ async function prepare({ page, app }) {
 
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'cyan.jpeg', 'leaf.jpeg', 'lil-fella.jpeg', 'with-exif-gps.jpeg');
-	await expect(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {
+	await assert(page.getByText(/Analyse….|En attente/)).toHaveCount(0, {
 		timeout: 30_000
 	});
 
@@ -46,11 +46,11 @@ async function prepare({ page, app }) {
 
 	await app.tabs.go('classify');
 	await page.waitForTimeout(1000);
-	await expect(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
+	await assert(page.getByText('Chargement du modèle de classification')).toHaveCount(0, {
 		timeout: 10_000
 	});
 	await page.waitForTimeout(5_000);
-	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, { timeout: 10_000 });
+	await assert(page.getByText(/Analyse…|En attente/)).toHaveCount(0, { timeout: 10_000 });
 
 	const withExifGps = await app.db.image.byFilename('with-exif-gps.jpeg');
 	if (!withExifGps) throw new Error('Image with-exif-gps.jpeg not found in database');

@@ -373,7 +373,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 	]
 });
 
-export const expect = baseExpect.extend({
+export const assert = baseExpect.extend({
 	async toHaveTooltip(
 		locator: Locator,
 		expected: string | RegExp,
@@ -422,7 +422,7 @@ export const expect = baseExpect.extend({
 
 		try {
 			const currentSlide = locator.locator("[data-current-slide='true']");
-			await expect(currentSlide).toHaveAccessibleName(slideName, options);
+			await assert(currentSlide).toHaveAccessibleName(slideName, options);
 			pass = true;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (e: any) {
@@ -452,5 +452,8 @@ export const expect = baseExpect.extend({
 		};
 	}
 });
+
+// Encourage using soft expects in tests, and only use hard expects (assert in our case) when it's necessary for the rest of the test to continue
+export const expect = assert.soft;
 
 export { lightProtocol as exampleProtocol };

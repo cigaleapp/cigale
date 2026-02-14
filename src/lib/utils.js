@@ -66,6 +66,24 @@ export function mapValuesNoNullables(subject, mapper) {
 	);
 }
 
+/**
+ * Maps values and keys of an object, and filters out entries with nullable values from the result
+ * @template {string} KIn
+ * @template {string} KOut
+ * @template {any} VIn
+ * @template {any} VOut
+ * @param {Record<KIn, VIn>} subject
+ * @param {(key: KIn, value: VIn) => [KOut, VOut] | undefined} mapper
+ * @return {Record<KOut, VOut>}
+ */
+export function transformObject(subject, mapper) {
+	return fromEntries(
+		entries(subject)
+			.map(([key, value]) => mapper(key, value))
+			.filter((entry) => entry !== undefined)
+	);
+}
+
 if (import.meta.vitest) {
 	const { test, expect, describe } = import.meta.vitest;
 	describe('mapValuesNoNullables', () => {

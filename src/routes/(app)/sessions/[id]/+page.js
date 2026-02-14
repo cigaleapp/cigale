@@ -2,12 +2,13 @@ import { error } from '@sveltejs/kit';
 
 import * as idb from '$lib/idb.svelte.js';
 import { tables } from '$lib/idb.svelte.js';
+import { resolveDefaults } from '$lib/metadata/defaults.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 import { compareBy, nonnull } from '$lib/utils';
 
 export async function load({ params: { id }, depends }) {
 	depends(idb.dependencyURI('Session', id));
-	const session = await tables.Session.get(id);
+	let session = await tables.Session.get(id);
 	if (!session) {
 		error(404, 'Session not found');
 	}
@@ -32,11 +33,6 @@ export async function load({ params: { id }, depends }) {
 
 	sessionMetadataDefs.sort(compareBy(({ id }) => protocol.metadataOrder?.indexOf(id) ?? -1));
 
-	const sessionMetadata = sessionMetadataDefs.map((def) => ({
-		def,
-		value: session.metadata?.[def.id]
-	}));
-
 	const sessionMetadataOptions = await Promise.all(
 		sessionMetadataDefs.map(async (def) => [
 			def.id,
@@ -52,6 +48,20 @@ export async function load({ params: { id }, depends }) {
 			.then((obs) => obs.length),
 		images: await idb.listByIndex('Image', 'sessionId', session.id).then((imgs) => imgs.length)
 	};
+
+	await resolveDefaults({
+		db: idb.databaseHandle(),
+		sessionId: session.id,
+		metadataToConsider: sessionMetadataDefs.map(({ id }) => id)
+});
+
+	session = await tables.Session.get(id);
+	if (!session) error(404, 'Session not found');
+
+	const sessionMetadata = sessionMetadataDefs.map((def) => ({
+		def,
+		value: session.metadata?.[def.id]
+	}));
 
 	return { session, protocol, sessionMetadata, sessionMetadataOptions, counts };
 }

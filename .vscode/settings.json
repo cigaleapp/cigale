@@ -4,6 +4,8 @@
 	"bun.test.enable": false,
 	"iconify.delimiters": ["/"],
 	"iconify.includes": ["ph", "ri"],
+	"javascript.preferences.importModuleSpecifierEnding": "js",
+	"typescript.preferences.importModuleSpecifierEnding": "js",
 	"emmet.syntaxProfiles": {
 		"html": {
 			"compactBooleanAttributes": true

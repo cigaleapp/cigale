@@ -1,5 +1,5 @@
 import { issue } from './annotations.js';
-import { expect, test } from './fixtures.js';
+import { expect, assert, test } from './fixtures.js';
 import { newSession } from './utils/index.js';
 
 test.describe('closing a modal', () => {
@@ -16,9 +16,9 @@ test.describe('closing a modal', () => {
 
 		await page.mouse.click(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 		await page.waitForTimeout(1000);
-		await expect.soft(dialog).toBeVisible();
+		await expect(dialog).toBeVisible();
 
 		await page.mouse.click(50, 50);
-		await expect.soft(dialog).toBeHidden();
+		await expect(dialog).toBeHidden();
 	});
 });

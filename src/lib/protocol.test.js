@@ -164,14 +164,12 @@ test('toExportedProtocol', async () => {
 				groupable: false,
 				options: [
 					{
-						index: 0,
 						key: 'opt1',
 						label: 'Option 1',
 						description: 'Desc 1',
 						synonyms: []
 					},
 					{
-						index: 1,
 						key: 'opt2',
 						label: 'Option 2',
 						description: 'Desc 2',
@@ -190,7 +188,6 @@ test('toExportedProtocol', async () => {
 				groupable: false,
 				options: [
 					{
-						index: 0,
 						key: 'opt1',
 						label: 'Option A',
 						description: 'Desc A',
@@ -343,7 +340,6 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {
-					metadata: 'feur',
 					padding: '0px'
 				},
 				exports: {
@@ -399,7 +395,9 @@ describe('compareProtocolWithUpstream', () => {
 							description: 'Metadata 1 description',
 							label: 'Metadata 1',
 							mergeMethod: 'max',
-							required: false
+							required: false,
+							sortable: false, 
+							groupable: false
 						},
 						{
 							id: 'protocol1__meta2',
@@ -407,7 +405,9 @@ describe('compareProtocolWithUpstream', () => {
 							label: 'Metadata 2',
 							description: 'Metadata 2 description',
 							mergeMethod: 'max',
-							required: false
+							required: false,
+							sortable: false, 
+							groupable: false
 						},
 						{
 							id: 'protocol1__meta4',
@@ -415,7 +415,9 @@ describe('compareProtocolWithUpstream', () => {
 							label: 'Metadata 4',
 							description: 'Metadata 4 description',
 							mergeMethod: 'max',
-							required: false
+							required: false,
+							sortable: false, 
+							groupable: false
 						}
 					];
 				}
@@ -433,7 +435,6 @@ describe('compareProtocolWithUpstream', () => {
 				version: 2,
 				updates: 'automatic',
 				crop: {
-					metadata: 'feur',
 					padding: '0px'
 				},
 				metadata: {
@@ -443,10 +444,12 @@ describe('compareProtocolWithUpstream', () => {
 						description: 'Metadata 1 description updated',
 						mergeMethod: 'max',
 						required: false,
+						groupable: false, 
+						sortable: false,
 						options: [
-							{ key: 'opt1', label: 'Option 1', description: 'Desc 1' },
+							{ key: 'opt1', label: 'Option 1', description: 'Desc 1', synonyms: [] },
 							// opt2 removed
-							{ key: 'opt3', label: 'Option 3', description: 'Desc 3' } // new option
+							{ key: 'opt3', label: 'Option 3', description: 'Desc 3', synonyms: [] } // new option
 						]
 					},
 					protocol1__meta2: {
@@ -454,10 +457,12 @@ describe('compareProtocolWithUpstream', () => {
 						description: 'Metadata 2 description',
 						mergeMethod: 'max',
 						required: false,
+						groupable: false, 
+						sortable: false,
 						type: 'enum',
 						options: [
-							{ key: 'opt1', label: 'Option A', description: 'Desc A' },
-							{ key: 'opt2', label: 'Option B', description: 'Desc B' } // new option
+							{ key: 'opt1', label: 'Option A', description: 'Desc A', synonyms: [] },
+							{ key: 'opt2', label: 'Option B', description: 'Desc B', synonyms: [] } // new option
 						]
 					},
 					// meta4 removed
@@ -467,8 +472,10 @@ describe('compareProtocolWithUpstream', () => {
 						description: 'Metadata 3 description',
 						mergeMethod: 'max',
 						required: false,
+						groupable: false, 
+						sortable: false,
 						type: 'enum',
-						options: [{ key: 'opt1', label: 'Option X', description: 'Desc X' }]
+						options: [{ key: 'opt1', label: 'Option X', description: 'Desc X', synonyms: [] }]
 					}
 				},
 				authors: [],

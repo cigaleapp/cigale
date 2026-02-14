@@ -1,6 +1,6 @@
 import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
-import { exampleProtocol, expect, test } from './fixtures.js';
+import { exampleProtocol, expect, assert, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
@@ -32,9 +32,9 @@ test.describe('Cropper view', () => {
 	});
 
 	test('should have all cards visible @webkit-no-parallelization', async ({ page }) => {
-		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
-		await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
-		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 	});
 
 	test.describe('autoskip enabled OR disabled', async () => {
@@ -52,13 +52,13 @@ test.describe('Cropper view', () => {
 				await app.path.wait(`/crop/${images.leaf.fileId}`);
 				await page.keyboard.press('ArrowRight');
 				await app.path.wait(`/crop/${images.withExifGps.fileId}`);
-				await expect(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
+				await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
 				await app.path.wait(`/crop/${images.leaf.fileId}`);
-				await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+				await assert(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
 				await page.keyboard.press('ArrowLeft');
 				await app.path.wait(`/crop/${images.cyan.fileId}`);
-				await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
+				await assert(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
 			});
 
 			test(`go back to import view with escape key (autoskip ${enabled ? 'on' : 'off'})`, async ({
@@ -70,13 +70,13 @@ test.describe('Cropper view', () => {
 				await app.path.wait(`/crop/${image.fileId}`);
 				await page.keyboard.press('Escape');
 				await app.path.wait('/crop');
-				await expect(
+				await assert(
 					page.getByRole('main').getByText('lil-fella.jpeg', { exact: true })
 				).toBeVisible();
-				await expect(
+				await assert(
 					page.getByRole('main').getByText('cyan.jpeg', { exact: true })
 				).toBeVisible();
-				await expect(
+				await assert(
 					page.getByRole('main').getByText('leaf.jpeg', { exact: true })
 				).toBeVisible();
 			});
@@ -95,7 +95,7 @@ test.describe('Cropper view', () => {
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await app.path.wait(`/crop/${image.fileId}`);
-			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
+			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should not skip on confirmation keybind', async ({ page, app }) => {
@@ -105,7 +105,7 @@ test.describe('Cropper view', () => {
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
 			await app.path.wait(`/crop/${image.fileId}`);
-			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
+			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 		});
 
 		test('should toggle autoskip on on keybind press', async ({ page, app }) => {
@@ -118,8 +118,8 @@ test.describe('Cropper view', () => {
 			await page.waitForTimeout(500);
 			const { cropAutoNext, ...othersAfter } = await app.settings.get();
 
-			expect(cropAutoNext).toBe(true);
-			expect(othersBefore).toMatchObject(othersAfter);
+			assert(cropAutoNext).toBe(true);
+			assert(othersBefore).toMatchObject(othersAfter);
 		});
 	});
 
@@ -135,7 +135,7 @@ test.describe('Cropper view', () => {
 			await page.waitForTimeout(1000);
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await app.path.wait(`/crop/${images.withExifGps.fileId}`);
-			await expect(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
+			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should skip on confirmation keybind', async ({ page, app }) => {
@@ -145,7 +145,7 @@ test.describe('Cropper view', () => {
 			await page.waitForTimeout(1000);
 			await page.keyboard.press('Space');
 			await app.path.wait(`/crop/${images.withExifGps.fileId}`);
-			await expect(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
+			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
 		});
 
 		test('should toggle autoskip off on keybind press', async ({ page, app }) => {
@@ -158,8 +158,8 @@ test.describe('Cropper view', () => {
 			await page.waitForTimeout(500);
 			const { cropAutoNext, ...othersAfter } = await app.settings.get();
 
-			expect(cropAutoNext).toBe(false);
-			expect(othersBefore).toMatchObject(othersAfter);
+			assert(cropAutoNext).toBe(false);
+			assert(othersBefore).toMatchObject(othersAfter);
 		});
 
 		test('should autoskip to classify when all images are confirmed', async ({ page, app }) => {
@@ -177,7 +177,7 @@ test.describe('Cropper view', () => {
 			await app.path.wait(`/crop/${image.fileId}`);
 			await page.getByRole('button', { name: 'Continuer' }).click();
 			await page.waitForTimeout(1000);
-			expect(new URL(page.url()).pathname).toMatch(/^\/classify\/?$/);
+			assert(new URL(page.url()).pathname).toMatch(/^\/classify\/?$/);
 		});
 	});
 
@@ -198,10 +198,10 @@ test.describe('Cropper view', () => {
 
 			await app.path.wait(`/crop/${withExifGps.fileId}`);
 
-			await expect(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
-			await expect(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
+			await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
+			await assert(page.getByText('leaf.jpeg', { exact: true })).not.toBeVisible();
 
-			expect(await app.db.image.list()).toEqual(
+			assert(await app.db.image.list()).toEqual(
 				imagesBefore.filter(({ fileId }) => fileId !== leaf.fileId)
 			);
 		}
@@ -240,7 +240,7 @@ test.describe('Cropper view', () => {
 			const { lilFella: image } = await imagesByName(app);
 			const boxesCount = await boxesInBoxesList(page).count();
 			for (let i = 0; i < boxesCount; i++) {
-				await expect(
+				await assert(
 					isImageConfirmedInDatabase(
 						app,
 						`${image.fileId}_${i.toString().padStart(6, '0')}`
@@ -260,9 +260,9 @@ test.describe('Cropper view', () => {
 		 * @param {boolean} implicit also check that the overlay is shown
 		 */
 		async function expectConfirmed(page, app, implicit = false) {
-			if (implicit) await expect(confirmedCropOverlay(page)).toBeVisible();
-			await expect(confirmedCropBadge(page)).toBeVisible();
-			await expect(page.getByRole('button', { name: 'Invalider' })).toBeVisible();
+			if (implicit) await assert(confirmedCropOverlay(page)).toBeVisible();
+			await assert(confirmedCropBadge(page)).toBeVisible();
+			await assert(page.getByRole('button', { name: 'Invalider' })).toBeVisible();
 			await page.waitForTimeout(500);
 			await expectAllImagesConfirmedInDatabase(page, app, true);
 		}
@@ -302,9 +302,9 @@ test.describe('Cropper view', () => {
 				await makeBox(page, 100, 100, 340, 120);
 				// Wait for overlay from the first box to disappear
 				await page.waitForTimeout(500);
-				await expect(confirmedCropOverlay(page)).not.toBeVisible();
+				await assert(confirmedCropOverlay(page)).not.toBeVisible();
 				await expectBoxInList(page, 3, 1143, 653);
-				await expect(boxesInBoxesList(page)).toHaveCount(3);
+				await assert(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({
@@ -323,22 +323,22 @@ test.describe('Cropper view', () => {
 
 				// Undo box creation
 				await page.keyboard.press('Control+z');
-				await expect(boxesInBoxesList(page)).toHaveCount(1);
+				await assert(boxesInBoxesList(page)).toHaveCount(1);
 
 				// Redo box creation
 				await page.keyboard.press('Control+Shift+z');
 				await expectBoxInList(page, 2, 245, 245);
-				await expect(boxesInBoxesList(page)).toHaveCount(2);
+				await assert(boxesInBoxesList(page)).toHaveCount(2);
 			});
 
 			test('dragging outside the crop surface cancels', issue(431), async ({ page, app }) => {
 				await app.settings.set({ showTechnicalMetadata: true });
 				await makeBox(page, 10, 10, 50, -30);
-				await expect(page.locator('.change-area .debug')).toHaveText(
+				await assert(page.locator('.change-area .debug')).toHaveText(
 					/create {2}\(0 0\) × \[0 0\]/
 				);
-				await expect(page.locator('.change-area .debug')).not.toHaveText(/ready/);
-				await expect(boxesInBoxesList(page)).toMatchAriaSnapshot(`
+				await assert(page.locator('.change-area .debug')).not.toHaveText(/ready/);
+				await assert(boxesInBoxesList(page)).toMatchAriaSnapshot(`
 				  - listitem:
 				    - img
 				    - paragraph: "Boîte #1"
@@ -381,9 +381,9 @@ test.describe('Cropper view', () => {
 				await makeBox(page, 100, 100, 170, 80);
 				// Wait for overlay from the first box to disappear
 				await page.waitForTimeout(500);
-				await expect(confirmedCropOverlay(page)).not.toBeVisible();
+				await assert(confirmedCropOverlay(page)).not.toBeVisible();
 				await expectBoxInList(page, 3, 572, 163);
-				await expect(boxesInBoxesList(page)).toHaveCount(3);
+				await assert(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({
@@ -402,12 +402,12 @@ test.describe('Cropper view', () => {
 
 				// Undo box creation
 				await page.keyboard.press('Control+z');
-				await expect(boxesInBoxesList(page)).toHaveCount(1);
+				await assert(boxesInBoxesList(page)).toHaveCount(1);
 
 				// Redo box creation
 				await page.keyboard.press('Control+Shift+z');
 				await expectBoxInList(page, 2, 327, 327);
-				await expect(boxesInBoxesList(page)).toHaveCount(2);
+				await assert(boxesInBoxesList(page)).toHaveCount(2);
 			});
 		});
 
@@ -442,9 +442,9 @@ test.describe('Cropper view', () => {
 				await expectBoxInList(page, 2, 327, 735);
 				await makeBox(page, 100, 100, 170, 80, 170, 150, 100, 150);
 				await page.waitForTimeout(1000);
-				await expect(confirmedCropOverlay(page)).not.toBeVisible();
+				await assert(confirmedCropOverlay(page)).not.toBeVisible();
 				await expectBoxInList(page, 3, 572, 571);
-				await expect(boxesInBoxesList(page)).toHaveCount(3);
+				await assert(boxesInBoxesList(page)).toHaveCount(3);
 			});
 
 			test('should mark the image as confirmed if image was untouched', async ({
@@ -467,9 +467,9 @@ test.describe('Cropper view', () => {
 
 				// Ensure that the ghost box does not appear ever, for 1 second, checking every 100ms
 				for (const _ of Array.from({ length: 10 })) {
-					await expect(page.locator('.boundingbox')).toHaveCount(1);
+					await assert(page.locator('.boundingbox')).toHaveCount(1);
 					await page.waitForTimeout(100);
-					await expect(page.locator('.boundingbox')).toHaveCount(1);
+					await assert(page.locator('.boundingbox')).toHaveCount(1);
 				}
 			});
 		});
@@ -516,30 +516,30 @@ test.describe('Cropper view', () => {
 		 */
 		async function checkImageTransforms(page, scale, translateX, translateY) {
 			const image = page.getByTestId('crop-subject-image');
-			expect(image).toBeVisible();
+			assert(image).toBeVisible();
 
-			await expect.soft(image).toHaveCSS('scale', /[0-9]+(\.[0-9]+)?/);
+			await expect(image).toHaveCSS('scale', /[0-9]+(\.[0-9]+)?/);
 
-			expect.soft(await image.evaluate((i) => Number(i.style.scale))).toBeCloseTo(scale, 3);
+			expect(await image.evaluate((i) => Number(i.style.scale))).toBeCloseTo(scale, 3);
 
 			if (translateX !== undefined && translateY !== undefined) {
-				await expect.soft(image).toHaveCSS('translate', /.+px .+px/);
+				await expect(image).toHaveCSS('translate', /.+px .+px/);
 
-				expect
+				assert
 					.soft(
 						await image.evaluate((i) =>
 							i.style.translate.split(' ').map(Number.parseFloat)
 						)
 					)
-					.toEqual([expect.closeTo(translateX, 2), expect.closeTo(translateY, 2)]);
+					.toEqual([assert.closeTo(translateX, 2), assert.closeTo(translateY, 2)]);
 			}
 		}
 
 		test.fixme('should zoom in and out with the mouse wheel', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
-			expect(image).toBeVisible();
+			assert(image).toBeVisible();
 
-			await expect(image).toHaveCSS('scale', '1');
+			await assert(image).toHaveCSS('scale', '1');
 
 			await zoomAt(page, 120, 100, 100);
 			await checkImageTransforms(page, 1.728, 255.668, 140.98);
@@ -553,9 +553,9 @@ test.describe('Cropper view', () => {
 
 		test('should zoom in and out with the keyboard', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
-			expect(image).toBeVisible();
+			assert(image).toBeVisible();
 
-			await expect(image).toHaveCSS('scale', '1');
+			await assert(image).toHaveCSS('scale', '1');
 
 			await page.keyboard.press('+');
 			await checkImageTransforms(page, 1.4);
@@ -581,9 +581,9 @@ test.describe('Cropper view', () => {
 
 		test('should pan with the mouse', async ({ page }) => {
 			const image = page.getByTestId('crop-subject-image');
-			expect(image).toBeVisible();
+			assert(image).toBeVisible();
 
-			await expect(image).toHaveCSS('scale', '1');
+			await assert(image).toHaveCSS('scale', '1');
 
 			await zoomAt(page, 120, 100, 100);
 			await checkImageTransforms(page, 1.728, 254.761, 140.527);
@@ -596,7 +596,7 @@ test.describe('Cropper view', () => {
 			await checkImageTransforms(page, 1.728, 181.761, 46.5267);
 
 			// Make sure no box was created
-			await expect(page.getByText(/Boîte #\d+/)).toHaveCount(1);
+			await assert(page.getByText(/Boîte #\d+/)).toHaveCount(1);
 		});
 
 		test('recalls zoom and pan between image changes', async ({ page, app }) => {
@@ -627,7 +627,7 @@ test.describe('Cropper view', () => {
  * @param {number} [tolerance=0.1] relative tolerance for pixel count differences for the width and height, relative to the expected width and height (between 0 and 1). Mainly used to account for discrepancies between browser engines.
  */
 async function expectBoxInList(page, number, width, height, tolerance = 0.1) {
-	await expect(page.locator('aside').getByText(`Boîte #${number}`)).toBeVisible();
+	await assert(page.locator('aside').getByText(`Boîte #${number}`)).toBeVisible();
 
 	const box = page
 		.locator('aside')
@@ -635,7 +635,7 @@ async function expectBoxInList(page, number, width, height, tolerance = 0.1) {
 		.locator('li')
 		.filter({ has: page.getByText(`Boîte #${number}`) });
 
-	await expect(box.getByText(/\d+×\d+/)).toBeVisible();
+	await assert(box.getByText(/\d+×\d+/)).toBeVisible();
 
 	// @ts-expect-error checked just above
 	const [, actualWidth, actualHeight] = /(\d+)×(\d+)/
@@ -647,8 +647,8 @@ async function expectBoxInList(page, number, width, height, tolerance = 0.1) {
 		)
 		.map(Number);
 
-	expect(Math.abs((width - actualWidth) / actualWidth)).toBeLessThan(tolerance);
-	expect(Math.abs((height - actualHeight) / actualHeight)).toBeLessThan(tolerance);
+	assert(Math.abs((width - actualWidth) / actualWidth)).toBeLessThan(tolerance);
+	assert(Math.abs((height - actualHeight) / actualHeight)).toBeLessThan(tolerance);
 }
 
 /**

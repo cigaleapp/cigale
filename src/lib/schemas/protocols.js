@@ -106,12 +106,12 @@ export const Protocol = type({
 export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'dirty')
 	.in.and({
 		metadata: {
-			'[string]': Metadata.omit('id').describe(
+			'[string]': Metadata.in.omit('id').describe(
 				'Métadonnées associées aux observations/imagess'
 			)
 		},
 		'sessionMetadata?': {
-			'[string]': Metadata.omit('id').describe('Métadonnées associées à la session entière')
+			'[string]': Metadata.in.omit('id').describe('Métadonnées associées à la session entière')
 		}
 	})
 	.pipe((protocol) => ({

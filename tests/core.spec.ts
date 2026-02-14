@@ -10,7 +10,7 @@ import { Analysis } from '../src/lib/schemas/exports.js';
 import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
 import { withParallelism } from './annotations.js';
 import type { FixturePaths } from './filepaths.js';
-import { expect, test } from './fixtures.js';
+import { assert, expect, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
@@ -44,7 +44,7 @@ for (const offline of [false, true]) {
 					.getByRole('button', { name: 'Démarrer' })
 					.click();
 
-				await expect(app.modals.byTitle('Préparation hors-ligne')).toHaveText(/OK!/, {
+				await assert(app.modals.byTitle('Préparation hors-ligne')).toHaveText(/OK!/, {
 					timeout: 10_000
 				});
 
@@ -62,10 +62,10 @@ for (const offline of [false, true]) {
 			await app.tabs.go('import');
 
 			// Import fixture image
-			await expect(page.getByText(/Cliquer ou déposer/)).toBeVisible();
+			await assert(page.getByText(/Cliquer ou déposer/)).toBeVisible();
 			const fileInput = await page.$('input[type="file"]');
 			await fileInput?.setInputFiles('./tests/fixtures/lil-fella.jpeg');
-			await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
+			await assert(page.getByText('lil-fella.jpeg')).toBeVisible();
 
 			await app.tabs.go('crop');
 			await app.loading.wait();
@@ -87,10 +87,10 @@ for (const offline of [false, true]) {
 					)
 			);
 
-			expect(boundingBoxStyle.left).toBeCloseTo(52.3334, 0);
-			expect(boundingBoxStyle.top).toBeCloseTo(29.0534, 0);
-			expect(boundingBoxStyle.width).toBeCloseTo(23.2713, 0);
-			expect(boundingBoxStyle.height).toBeCloseTo(36.4674, 0);
+			assert(boundingBoxStyle.left).toBeCloseTo(52.3334, 0);
+			assert(boundingBoxStyle.top).toBeCloseTo(29.0534, 0);
+			assert(boundingBoxStyle.width).toBeCloseTo(23.2713, 0);
+			assert(boundingBoxStyle.height).toBeCloseTo(36.4674, 0);
 
 			// Go to crop view
 			await app.tabs.go('crop');
@@ -98,7 +98,7 @@ for (const offline of [false, true]) {
 
 			// Check for continuing
 			await page.getByRole('button', { name: /^Continuer/ }).click();
-			await expect(page.getByText('Confirmé', { exact: true })).toBeVisible();
+			await assert(page.getByText('Confirmé', { exact: true })).toBeVisible();
 
 			// Go to classification view
 			await app.tabs.go('classify');
@@ -107,14 +107,14 @@ for (const offline of [false, true]) {
 
 			// Check for classification results in sidepanel
 			await firstObservationCard(page).click();
-			await expect(page.getByText('Espèce', { exact: true })).toBeVisible();
+			await assert(page.getByText('Espèce', { exact: true })).toBeVisible();
 
 			// Export results
 			await app.tabs.go('results');
 			await page.getByText(/et images originales/i).click();
 			await page.getByRole('button', { name: 'Archive ZIP' }).click();
 			const download = await page.waitForEvent('download');
-			expect(download.suggestedFilename()).toBe('results.zip');
+			assert(download.suggestedFilename()).toBe('results.zip');
 			await download.saveAs('./tests/results/lil-fella.zip');
 
 			await expectZipFiles(
@@ -128,14 +128,14 @@ for (const offline of [false, true]) {
 				{
 					'analysis.json': {
 						json(data) {
-							expect.soft(Analysis.allows(data)).toBe(true);
+							expect(Analysis.allows(data)).toBe(true);
 						}
 					},
 					'metadata.csv': {
 						text(txt) {
 							const lines = txt.split('\n');
-							expect(lines).toHaveLength(2);
-							expect
+							assert(lines).toHaveLength(2);
+							assert
 								.soft(lines.at(0))
 								.toBe(
 									'"Identifiant";"Observation";"Date";"Date: Confiance";"Espèce";"Espèce: Confiance";"Genre";"Genre: Confiance";"Famille";"Famille: Confiance";"Ordre";"Ordre: Confiance";"Classe";"Classe: Confiance";"Phylum";"Phylum: Confiance";"Règne";"Règne: Confiance"'
@@ -144,10 +144,10 @@ for (const offline of [false, true]) {
 					},
 					'Cropped/Entomobrya muscorum_obs1_1.jpeg': {
 						buffer(buf) {
-							expect.soft(buf).toMatchSnapshot({ maxDiffPixelRatio: 0.01 });
+							expect(buf).toMatchSnapshot({ maxDiffPixelRatio: 0.01 });
 						},
 						entry(entry) {
-							expect
+							assert
 								.soft(entry.getLastMod().toISOString())
 								.toEqual('2025-04-25T12:38:36.000Z');
 						}
@@ -198,10 +198,10 @@ test('can handle a bunch of images at once', withParallelism(4), async ({ page, 
 
 	await page.keyboard.press('Control+A');
 	// await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot();
-	await expect(page.getByTestId('sidepanel').getByRole('heading', { level: 2 })).toHaveText(
+	await assert(page.getByTestId('sidepanel').getByRole('heading', { level: 2 })).toHaveText(
 		`${imagesCount} images`
 	);
-	await expect(observations).not.toHaveText(new RegExp('Rééssayer'));
+	await assert(observations).not.toHaveText(new RegExp('Rééssayer'));
 });
 
 test('can import a protocol via /protocols/import/url', async ({ page, app, context }) => {
@@ -217,10 +217,10 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 	await app.path.wait('/sessions');
 
 	await app.path.go(`/protocols/import/${protocolUrl}`);
-	await expect(app.modals.byTitle('Importer le protocole distant ?')).toBeVisible({
+	await assert(app.modals.byTitle('Importer le protocole distant ?')).toBeVisible({
 		timeout: 30_000
 	});
-	await expect(
+	await assert(
 		app.modals.byTitle('Importer le protocole distant ?').getByRole('link')
 	).toHaveAttribute('href', protocolUrl);
 
@@ -231,13 +231,13 @@ test('can import a protocol via /protocols/import/url', async ({ page, app, cont
 
 	await app.path.wait('/protocols');
 
-	await expect(page.getByRole('listitem')).toHaveCount(2);
-	await expect(
+	await assert(page.getByRole('listitem')).toHaveCount(2);
+	await assert(
 		page
 			.getByRole('listitem')
 			.filter({ has: page.getByRole('heading', { name: 'Kitchen sink' }) })
 	).toBeVisible();
-	await expect(
+	await assert(
 		page
 			.getByRole('listitem')
 			.filter({ has: page.getByRole('heading', { name: lightweightProtocol.name }) })
@@ -271,25 +271,25 @@ test('can send a bug report', async ({ page, app, context }) => {
 
 	await page.getByTestId('open-bug-report').click();
 
-	await expect(report).toBeVisible();
+	await assert(report).toBeVisible();
 	await report.getByRole('textbox', { name: 'Description' }).fill('This is a test bug report.');
 	await report.getByRole('textbox', { name: 'Titre' }).fill('Test Bug Report');
 	await report.getByRole('button', { name: 'Envoyer' }).click();
 
-	await expect(
+	await assert(
 		app.toasts.byMessage('success', 'Merci pour votre contribution!').getByRole('button', {
 			name: 'Voir'
 		})
 	).toHaveAttribute('href', 'https://example.com/issue/123');
 
-	expect.soft(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
-	expect.soft(requestBody).toEqual({
+	expect(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
+	expect(requestBody).toEqual({
 		title: 'Test Bug Report',
 		body: 'This is a test bug report.',
 		type: 'bug',
-		metadata: expect.objectContaining({
+		metadata: assert.objectContaining({
 			Route: '/(app)/(sidepanel)/crop' as const satisfies SvelteTypes.RouteId,
-			Protocol: expect.stringMatching(
+			Protocol: assert.stringMatching(
 				// Version number depends on what was captured in the database dump
 				// TODO: use RegExp.escape once available (ie when VSCode ships with Node 24 ?? or something. Bun has it already, idk if it would work in CI yet)
 				new RegExp(`^${lightweightProtocol.id.replaceAll('.', '\\.')} v\\d+$`)
