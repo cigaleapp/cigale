@@ -453,6 +453,7 @@ export const assert = baseExpect.extend({
 	}
 });
 
+// Encourage using soft expects in tests, and only use hard expects (assert in our case) when it's necessary for the rest of the test to continue
 export const expect = assert.soft;
 
 export { lightProtocol as exampleProtocol };
