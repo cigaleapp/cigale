@@ -1,5 +1,5 @@
 import { issue } from './annotations.js';
-import { ex, expect, test } from './fixtures.js';
+import { ex, assert, test } from './fixtures.js';
 import {
 	chooseFirstSession,
 	loadDatabaseDump,
@@ -23,7 +23,7 @@ test('allows merging and unrolling two observations', async ({ page, app }) => {
 	if (!src.lilfella) throw new Error('Could not get lil-fella image src');
 	if (!src.cyan) throw new Error('Could not get cyan image src');
 
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(4);
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(4);
 	await selectObservation(page, 'lil-fella');
 	await selectObservation(page, 'cyan');
 
@@ -37,13 +37,13 @@ test('allows merging and unrolling two observations', async ({ page, app }) => {
 	if (!imageIds.lilfella) throw new Error('Could not get lil-fella image ID');
 	if (!imageIds.cyan) throw new Error('Could not get cyan image ID');
 
-	expect(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
+	assert(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
 		imageIds.lilfella.id,
 		imageIds.cyan.id
 	]);
 
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
-	await expect(observationCard(page, 'lil-fella')).toMatchAriaSnapshot(`
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
+	await assert(observationCard(page, 'lil-fella')).toMatchAriaSnapshot(`
 		  - article:
 		    - img "lil-fella"
 		    - img
@@ -54,20 +54,20 @@ test('allows merging and unrolling two observations', async ({ page, app }) => {
 
 	await observationCard(page, 'lil-fella').getByRole('button', { name: '2' }).click();
 
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(5);
-	await expect(observationCard(page, 'cyan.jpeg')).toBeVisible();
-	await expect(observationImage(page, 'cyan.jpeg')).toHaveAttribute('src', src.cyan);
-	await expect(observationCard(page, 'lil-fella.jpeg')).toBeVisible();
-	await expect
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(5);
+	await assert(observationCard(page, 'cyan.jpeg')).toBeVisible();
+	await assert(observationImage(page, 'cyan.jpeg')).toHaveAttribute('src', src.cyan);
+	await assert(observationCard(page, 'lil-fella.jpeg')).toBeVisible();
+	await assert
 		.soft(observationImage(page, 'lil-fella.jpeg'))
 		.toHaveAttribute('src', src.lilfella);
-	await expect(observationCard(page, 'lil-fella')).toBeVisible();
+	await assert(observationCard(page, 'lil-fella')).toBeVisible();
 
 	await observationCard(page, 'lil-fella').getByRole('button', { name: '2' }).click();
 
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
-	await expect(observationCard(page, 'cyan.jpeg')).not.toBeVisible();
-	await expect(observationCard(page, 'lil-fella.jpeg')).not.toBeVisible();
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
+	await assert(observationCard(page, 'cyan.jpeg')).not.toBeVisible();
+	await assert(observationCard(page, 'lil-fella.jpeg')).not.toBeVisible();
 });
 
 test('allows merging three observations', async ({ page, app }) => {
@@ -89,21 +89,21 @@ test('allows merging three observations', async ({ page, app }) => {
 	if (!imageIds.cyan) throw new Error('Could not get cyan image ID');
 	if (!imageIds.leaf) throw new Error('Could not get leaf image ID');
 
-	expect(await app.db.observation.byLabel('leaf')).toHaveProperty('images', [
+	assert(await app.db.observation.byLabel('leaf')).toHaveProperty('images', [
 		imageIds.leaf.id,
 		imageIds.lilfella.id,
 		imageIds.cyan.id
 	]);
 
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
-	await expect(observationCard(page, 'leaf')).toMatchAriaSnapshot(`
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
+	await assert(observationCard(page, 'leaf')).toMatchAriaSnapshot(`
 		  - article:
 		    - img "leaf"
 		    - img
 		    - heading "leaf" [level=2]
 		    - button "3"
 		`);
-	await expect(observationImage(page, 'leaf')).toHaveAttribute('src', leafImageSrc);
+	await assert(observationImage(page, 'leaf')).toHaveAttribute('src', leafImageSrc);
 });
 
 test('allows merging a second time into the same observation', async ({ page, app }) => {
@@ -112,8 +112,8 @@ test('allows merging a second time into the same observation', async ({ page, ap
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
 	await selectObservation(page, 'leaf');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
-	await expect(observationCard(page, 'lil-fella')).toMatchAriaSnapshot(`
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(2);
+	await assert(observationCard(page, 'lil-fella')).toMatchAriaSnapshot(`
 	  - article:
 	    - img "lil-fella"
 	    - img
@@ -130,7 +130,7 @@ test('allows merging a second time into the same observation', async ({ page, ap
 	if (!imageIds.cyan) throw new Error('Could not get cyan image ID');
 	if (!imageIds.leaf) throw new Error('Could not get leaf image ID');
 
-	expect(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
+	assert(await app.db.observation.byLabel('lil-fella')).toHaveProperty('images', [
 		imageIds.lilfella.id,
 		imageIds.cyan.id,
 		imageIds.leaf.id
@@ -141,13 +141,13 @@ test('can split merged observations', async ({ page }) => {
 	await selectObservation(page, 'lil-fella');
 	await selectObservation(page, 'cyan');
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Regrouper' }).click();
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(3);
 	await page.getByTestId('sidepanel').getByRole('button', { name: 'Séparer' }).click();
 
-	await expect(page.getByTestId('observations-area').locator('article')).toHaveCount(4);
-	await expect(observationCard(page, 'lil-fella')).toBeVisible();
-	await expect(observationCard(page, 'cyan')).toBeVisible();
-	await expect(observationCard(page, 'leaf')).toBeVisible();
+	await assert(page.getByTestId('observations-area').locator('article')).toHaveCount(4);
+	await assert(observationCard(page, 'lil-fella')).toBeVisible();
+	await assert(observationCard(page, 'cyan')).toBeVisible();
+	await assert(observationCard(page, 'leaf')).toBeVisible();
 });
 
 test('selecting multiple images', issue(1054), async ({ page, app }) => {
@@ -171,11 +171,11 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	for (const observation of ['cyan', 'leaf', 'lil-fella']) {
 		await selectObservation(page, observation);
 		await page.waitForTimeout(500);
-		await expect(app.toasts.byType('error')).not.toBeVisible();
+		await assert(app.toasts.byType('error')).not.toBeVisible();
 	}
 
 	// Assert sidepanel content
-	await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
+	await assert(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
 	  - complementary:
 	    - img "Image 1 de la sélection"
 	    - img "Image 2 de la sélection"

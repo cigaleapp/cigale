@@ -1,5 +1,5 @@
 import { issue } from './annotations.js';
-import { ex, expect, test } from './fixtures.js';
+import { ex, assert, test } from './fixtures.js';
 import {
 	changeSessionProtocol,
 	chooseFirstSession,
@@ -57,10 +57,10 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 
 	await app.tabs.go('import');
 	await firstObservationCard(page).click();
-	await expect(page.getByTestId('sidepanel')).toBeVisible();
+	await assert(page.getByTestId('sidepanel')).toBeVisible();
 
 	// Set to True on image itself
-	await expect(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
+	await assert(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "":
 	    - img
@@ -68,7 +68,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	    - img
 	`);
 	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
-	await expect(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await assert(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
 	  - switch "" [checked]:
 	    - img
 	`);
@@ -79,7 +79,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
 	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
 	await app.sidepanel.metadataSection('bool').getByRole('switch').click();
-	await expect(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
+	await assert(app.sidepanel.metadataSection('bool').getByRole('switch')).toMatchAriaSnapshot(`
 	  - switch "":
 	    - img
 	`);
@@ -87,7 +87,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 	// Expect image to be still True
 	await app.tabs.go('import');
 	await firstObservationCard(page).click();
-	await expect(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
+	await assert(app.sidepanel.metadataSection('bool')).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch "" [checked]:
 	    - img
@@ -99,7 +99,7 @@ test('allows changing metadata values on import page', issue(440), async ({ page
 
 test('does not show technical metadata ', async ({ page, app }) => {
 	await initialize({ page, app });
-	await expect(
+	await assert(
 		page.getByText('io.github.cigaleapp.arthropods.example__crop', { exact: true })
 	).toBeHidden();
 });
@@ -116,7 +116,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 
 	// Opening the combobox
 	await nthCombobox(1).click();
-	await expect(page.getByTestId('metadata-combobox-viewport')).toBeVisible();
+	await assert(page.getByTestId('metadata-combobox-viewport')).toBeVisible();
 	await ex(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Entomobrya muscorum \\d+%/ [selected]:
 	    - img
@@ -281,7 +281,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	await groupHeader.getByRole('button', { name: 'Développer le groupe' }).click();
 	await page.getByText('lil-fella', { exact: true }).click();
 
-	await expect(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(
+	await assert(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(
 		`
 	  - text: Espèce
 	  - combobox: Dicyrtomina saundersi
@@ -293,7 +293,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	// Check database
 	const metadata = await app.db.metadata.values({ observation: 'lil-fella' });
 
-	expect(metadata).toEqual({
+	assert(metadata).toEqual({
 		...metadata,
 		species: '4536978',
 		genus: '2122281',
@@ -311,7 +311,7 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
-		await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 		  - option "Dicyrtoma fusca 0.4%":
 		    - text: ""
 		    - code: 0.4%
@@ -367,7 +367,7 @@ test.describe('can search in a enum-type metadata combobox', () => {
 	test('by synonym', async ({ page, app }) => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
-		await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
 		    - text: ""
 		    - code: 0.4%
@@ -439,7 +439,7 @@ test('can update a boolean-type metadata', issue(216), async ({ page, app }) => 
 test('shows crop-type metadata as non representable', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
-	await expect(app.sidepanel.metadataSection('crop')).toMatchAriaSnapshot(`
+	await assert(app.sidepanel.metadataSection('crop')).toMatchAriaSnapshot(`
 	  - text: crop
 	  - img
 	  - paragraph: Irreprésentable
@@ -452,51 +452,51 @@ test('can update a date-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const dateSection = app.sidepanel.metadataSection('date');
-	await expect(dateSection.getByRole('textbox')).toHaveValue('');
+	await assert(dateSection.getByRole('textbox')).toHaveValue('');
 
 	await dateSection.getByRole('textbox').fill('2025-05-01');
 
-	await expect(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
-	expect(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
+	await assert(dateSection.getByRole('textbox')).toHaveValue('2025-05-01');
+	assert(await metadataValueInDatabase(app, 'date')).toBe('2025-05-01T00:00:00');
 });
 
 test('can update a float-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const floatSection = app.sidepanel.metadataSection('float');
-	await expect(floatSection.getByRole('textbox')).toHaveValue('');
+	await assert(floatSection.getByRole('textbox')).toHaveValue('');
 
 	await floatSection.getByRole('textbox').fill('3.14');
 	await floatSection.getByRole('textbox').blur();
 	await floatSection.getByRole('button', { name: 'Incrémenter' }).click();
 
-	await expect(floatSection.getByRole('textbox')).toHaveValue('4.14');
-	expect(await metadataValueInDatabase(app, 'float')).toBe(4.14);
+	await assert(floatSection.getByRole('textbox')).toHaveValue('4.14');
+	assert(await metadataValueInDatabase(app, 'float')).toBe(4.14);
 });
 
 test('can update a integer-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const integerSection = app.sidepanel.metadataSection('integer');
-	await expect(integerSection.getByRole('textbox')).toHaveValue('');
+	await assert(integerSection.getByRole('textbox')).toHaveValue('');
 
 	await integerSection.getByRole('textbox').fill('42');
 	await integerSection.getByRole('textbox').blur();
 	await integerSection.getByRole('button', { name: 'Décrémenter' }).click();
 
-	await expect(integerSection.getByRole('textbox')).toHaveValue('41');
-	expect(await metadataValueInDatabase(app, 'integer')).toBe(41);
+	await assert(integerSection.getByRole('textbox')).toHaveValue('41');
+	assert(await metadataValueInDatabase(app, 'integer')).toBe(41);
 });
 
 test('can update a string-type metadata', async ({ page, app }) => {
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 
 	const textbox = app.sidepanel.metadataSection('string').getByRole('textbox');
-	await expect(textbox).toHaveValue('');
+	await assert(textbox).toHaveValue('');
 
 	await textbox.fill('Hello world');
 	await textbox.blur();
 
-	await expect(textbox).toHaveValue('Hello world');
-	expect(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
+	await assert(textbox).toHaveValue('Hello world');
+	assert(await metadataValueInDatabase(app, 'string')).toBe('Hello world');
 });

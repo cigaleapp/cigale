@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
-import { ex, expect, test, type AppFixture } from './fixtures.js';
+import { ex, assert, test, type AppFixture } from './fixtures.js';
 import {
 	chooseFirstSession,
 	firstObservationCard,
@@ -18,21 +18,21 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 	await newSession(page);
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'lil-fella.jpeg');
-	await expect(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
+	await assert(firstObservationCard(page)).not.toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
 	});
 	await app.tabs.go('crop');
 	await app.loading.wait();
 	await app.tabs.go('classify');
-	await expect(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
+	await assert(firstObservationCard(page)).toHaveText(/Analyse…|En attente/, {
 		timeout: 10_000
 	});
 	await page.waitForTimeout(1_000);
 	await firstObservationCard(page).getByRole('button', { name: 'Supprimer' }).click();
-	await expect(firstObservationCard(page)).not.toBeVisible({
+	await assert(firstObservationCard(page)).not.toBeVisible({
 		timeout: 5_000
 	});
-	expect(await app.db.observation.byLabel('lil-fella')).toBeUndefined();
+	assert(await app.db.observation.byLabel('lil-fella')).toBeUndefined();
 });
 
 test.describe('full-screen classification view', pr(1071), () => {
@@ -403,7 +403,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		await page.getByRole('button', { name: 'Regrouper' }).click();
 
-		await expect(page.getByRole('article', { name: 'leaf' })).not.toBeVisible();
+		await assert(page.getByRole('article', { name: 'leaf' })).not.toBeVisible();
 
 		await page.getByRole('article', { name: 'cyan' }).dblclick();
 

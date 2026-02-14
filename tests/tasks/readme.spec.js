@@ -1,4 +1,4 @@
-import { expect, test } from '../fixtures.js';
+import { assert, test } from '../fixtures.js';
 import { firstObservationCard, importPhotos, newSession } from '../utils/index.js';
 
 test.describe('screenshots', { tag: '@real-protocol' }, () => {
@@ -13,7 +13,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 			 * @param {import('@playwright/test').Page} page
 			 */
 			async function waitForAnalysis(page) {
-				await expect(firstObservationCard(page)).not.toHaveText(new RegExp('Analyse…'), {
+				await assert(firstObservationCard(page)).not.toHaveText(new RegExp('Analyse…'), {
 					timeout: 20_000
 				});
 			}
@@ -37,7 +37,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 			test('protocol', async ({ page }) => {
 				await newSession(page);
-				await expect(page).toHaveScreenshot();
+				await assert(page).toHaveScreenshot();
 			});
 
 			test('import', async ({ page, app }) => {
@@ -45,7 +45,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 				await app.tabs.go('import');
 				await importPhotos({ page }, 'lil-fella.jpeg');
 				await waitForAnalysis(page);
-				await expect(page).toHaveScreenshot();
+				await assert(page).toHaveScreenshot();
 			});
 
 			test('crop', async ({ page, app }) => {
@@ -56,7 +56,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 
 				await app.tabs.go('crop');
 				await firstObservationCard(page).click();
-				await expect(page).toHaveScreenshot();
+				await assert(page).toHaveScreenshot();
 			});
 
 			test('classify', async ({ page, app }) => {
@@ -76,7 +76,7 @@ test.describe('screenshots', { tag: '@real-protocol' }, () => {
 					.getByRole('option', { name: 'Allacma fusca' })
 					.hover();
 
-				await expect(page).toHaveScreenshot();
+				await assert(page).toHaveScreenshot();
 			});
 		});
 	}

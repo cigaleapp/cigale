@@ -1,4 +1,4 @@
-import { exampleProtocol, expect, test } from './fixtures.js';
+import { assert, exampleProtocol, test } from './fixtures.js';
 import {
 	chooseInDropdown,
 	deleteSession,
@@ -24,19 +24,19 @@ test.describe('isolation', () => {
 		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 
-		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
+		await assert(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
 		await importPhotos({ page }, 'debugsquare.png');
 		await app.loading.wait();
 
-		await expect(page.getByText('debugsquare.png')).toBeVisible();
-		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
+		await assert(page.getByText('debugsquare.png')).toBeVisible();
+		await assert(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 
 		await switchSession(page, 'Session α');
 		await app.tabs.go('import');
 
-		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
-		await expect(page.getByText('debugsquare.png')).not.toBeVisible();
+		await assert(page.getByText('lil-fella.jpeg')).toBeVisible();
+		await assert(page.getByText('debugsquare.png')).not.toBeVisible();
 	});
 
 	test('deleting a session only deletes its images', async ({ page, app }) => {
@@ -44,21 +44,21 @@ test.describe('isolation', () => {
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'lil-fella.jpeg');
 		await app.loading.wait();
-		await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
+		await assert(page.getByText('lil-fella.jpeg')).toBeVisible();
 
 		await newSession(page, { name: 'Session β' });
 		await app.tabs.go('import');
 		await importPhotos({ page }, 'debugsquare.png');
 		await app.loading.wait();
-		await expect(page.getByText('debugsquare.png')).toBeVisible();
+		await assert(page.getByText('debugsquare.png')).toBeVisible();
 
 		await deleteSession(page, 'Session α');
-		await expect(page.getByText('Session α')).not.toBeVisible();
+		await assert(page.getByText('Session α')).not.toBeVisible();
 
 		await switchSession(page, 'Session β');
 		await app.tabs.go('import');
-		await expect(page.getByText('debugsquare.png')).toBeVisible();
-		await expect(page.getByText('lil-fella.jpeg')).not.toBeVisible();
+		await assert(page.getByText('debugsquare.png')).toBeVisible();
+		await assert(page.getByText('lil-fella.jpeg')).not.toBeVisible();
 	});
 });
 
@@ -71,13 +71,13 @@ test('import into new session', async ({ page, app }) => {
 	});
 	await app.path.wait('/import');
 
-	await expect(page.getByTestId('goto-current-session')).toHaveText('Testing session');
+	await assert(page.getByTestId('goto-current-session')).toHaveText('Testing session');
 
-	await expect(page.getByText('cyan.jpeg')).toBeVisible();
-	await expect(page.getByText('leaf.jpeg')).toBeVisible();
-	await expect(page.getByText('lil-fella.jpeg')).toBeVisible();
-	await expect(page.getByText('with-exif-gps.jpeg')).toBeVisible();
-	await expect(page.locator('main article')).toHaveCount(4);
+	await assert(page.getByText('cyan.jpeg')).toBeVisible();
+	await assert(page.getByText('leaf.jpeg')).toBeVisible();
+	await assert(page.getByText('lil-fella.jpeg')).toBeVisible();
+	await assert(page.getByText('with-exif-gps.jpeg')).toBeVisible();
+	await assert(page.locator('main article')).toHaveCount(4);
 
 	await setInferenceModels(page, {
 		crop: 'Aucune inférence',
@@ -85,11 +85,11 @@ test('import into new session', async ({ page, app }) => {
 	});
 
 	await app.tabs.go('crop');
-	await expect(page.locator('main header > *').nth(2)).toHaveText('4 éléments');
+	await assert(page.locator('main header > *').nth(2)).toHaveText('4 éléments');
 
 	await app.tabs.go('classify');
 	await page.getByText('cyan', { exact: true }).click();
-	await expect(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
+	await assert(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: Espèce
 	  - combobox: Allacma fusca
 	  - code: /\\d+%/
@@ -273,20 +273,20 @@ test('import into new session', async ({ page, app }) => {
 	await page.getByTestId('goto-current-session').click();
 	await app.path.wait('/(app)/sessions/[id]');
 	// Check metadata set in the export
-	await expect(
+	await assert(
 		sessionMetadataSectionFor(page, 'Durée de prospection').getByRole('textbox').first()
 	).toHaveValue('54');
-	await expect(
+	await assert(
 		sessionMetadataSectionFor(page, 'Vent')
 			.getByRole('radiogroup')
 			.getByRole('radio', { name: 'Modéré' })
 	).toBeChecked();
 	// Check that other metadata are unset
-	await expect(
+	await assert(
 		sessionMetadataSectionFor(page, 'Distance de prospection').getByRole('textbox').first()
 	).toBeEmpty();
 
-	await expect(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
+	await assert(page.getByRole('textbox', { name: 'Description' })).toHaveValue(
 		'Importée depuis correct.zip'
 	);
 });
@@ -300,7 +300,7 @@ test('changing metadata values saves them in the database', async ({ page, app }
 	const metadataValueFor = async (key) =>
 		app.db.metadata.values({ session: 'Metadata session' }).then((values) => values[key]);
 
-	expect(await metadataValueFor('prospection_duration')).toBeUndefined();
+	assert(await metadataValueFor('prospection_duration')).toBeUndefined();
 
 	await sessionMetadataSectionFor(page, 'Durée de prospection')
 		.getByRole('textbox')
@@ -312,9 +312,9 @@ test('changing metadata values saves them in the database', async ({ page, app }
 		.first()
 		.blur();
 
-	expect(await metadataValueFor('prospection_duration')).toBe(120);
+	assert(await metadataValueFor('prospection_duration')).toBe(120);
 
-	expect(await metadataValueFor('wind')).toBeUndefined();
+	assert(await metadataValueFor('wind')).toBeUndefined();
 
 	await sessionMetadataSectionFor(page, 'Vent')
 		.getByRole('radiogroup')
@@ -323,7 +323,7 @@ test('changing metadata values saves them in the database', async ({ page, app }
 
 	await page.waitForTimeout(500); // Wait for DB write
 
-	expect(await metadataValueFor('wind')).toBe('strong');
+	assert(await metadataValueFor('wind')).toBe('strong');
 });
 
 test('changing session info saves in the database', async ({ page, app }) => {
@@ -333,11 +333,11 @@ test('changing session info saves in the database', async ({ page, app }) => {
 
 	const id = new URL(page.url()).pathname.split('/')[2];
 
-	expect(await app.db.session.byId(id)).toMatchObject({
+	assert(await app.db.session.byId(id)).toMatchObject({
 		id,
 		name: 'Test!!',
-		createdAt: expect.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z/),
-		openedAt: expect.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z/),
+		createdAt: assert.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z/),
+		openedAt: assert.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z/),
 		description: '',
 		protocol: exampleProtocol.id,
 		metadata: {}
@@ -347,13 +347,13 @@ test('changing session info saves in the database', async ({ page, app }) => {
 	await nameInput.fill('New name');
 	await nameInput.blur();
 
-	expect(await app.db.session.byId(id)).toHaveProperty('name', 'New name');
+	assert(await app.db.session.byId(id)).toHaveProperty('name', 'New name');
 
 	const descriptionInput = page.getByRole('textbox', { name: 'Description' });
 	await descriptionInput.fill('A description');
 	await descriptionInput.blur();
 
-	expect(await app.db.session.byId(id)).toHaveProperty('description', 'A description');
+	assert(await app.db.session.byId(id)).toHaveProperty('description', 'A description');
 });
 
 test('can change protocol of session', async ({ page, app }) => {
@@ -365,7 +365,7 @@ test('can change protocol of session', async ({ page, app }) => {
 	await page.getByTestId('goto-current-session').click();
 	await app.path.wait('/(app)/sessions/[id]');
 
-	expect(await app.db.session.byName('Test')).toHaveProperty('protocol', exampleProtocol.id);
+	assert(await app.db.session.byName('Test')).toHaveProperty('protocol', exampleProtocol.id);
 
 	await chooseInDropdown(
 		page,
@@ -373,7 +373,7 @@ test('can change protocol of session', async ({ page, app }) => {
 		'Kitchen sink'
 	);
 
-	expect(await app.db.session.byName('Test')).toHaveProperty(
+	assert(await app.db.session.byName('Test')).toHaveProperty(
 		'protocol',
 		'io.github.cigaleapp.kitchensink'
 	);
@@ -382,7 +382,7 @@ test('can change protocol of session', async ({ page, app }) => {
 	await importPhotos({ page }, 'cyan.jpeg');
 	await app.loading.wait();
 	await page.getByText('cyan.jpeg').click();
-	await expect(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
+	await assert(page.getByTestId('sidepanel').locator('> *').nth(2)).toMatchAriaSnapshot(`
 	  - text: bool
 	  - switch:
 	    - img

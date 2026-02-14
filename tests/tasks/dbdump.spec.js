@@ -1,4 +1,4 @@
-import { exampleProtocol, expect, test } from '../fixtures.js';
+import { exampleProtocol, assert, test } from '../fixtures.js';
 import {
 	confirmDeletionModal,
 	dumpDatabase,
@@ -36,7 +36,7 @@ test('kitchensink-protocol', async ({ page, app }) => {
 		.getByRole('button', { name: 'Supprimer' })
 		.click();
 	await confirmDeletionModal(page, { type: exampleProtocol.name });
-	await expect(page.getByText('Protocole supprimé')).toBeVisible();
+	await assert(page.getByText('Protocole supprimé')).toBeVisible();
 	await newSession(page);
 
 	await app.tabs.go('import');

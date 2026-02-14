@@ -373,7 +373,7 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 	]
 });
 
-export const expect = baseExpect.extend({
+export const assert = baseExpect.extend({
 	async toHaveTooltip(
 		locator: Locator,
 		expected: string | RegExp,
@@ -422,7 +422,7 @@ export const expect = baseExpect.extend({
 
 		try {
 			const currentSlide = locator.locator("[data-current-slide='true']");
-			await expect(currentSlide).toHaveAccessibleName(slideName, options);
+			await assert(currentSlide).toHaveAccessibleName(slideName, options);
 			pass = true;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (e: any) {
@@ -453,6 +453,6 @@ export const expect = baseExpect.extend({
 	}
 });
 
-export const ex = expect.soft;
+export const ex = assert.soft;
 
 export { lightProtocol as exampleProtocol };

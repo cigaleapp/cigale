@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import { expect, test, type AppFixture } from './fixtures.js';
+import { assert, test, type AppFixture } from './fixtures.js';
 import { goToProtocolManagement } from './utils/index.js';
 
 async function setup(
@@ -50,7 +50,7 @@ async function setup(
 test('can auto-update a protocol', async ({ page, app }) => {
 	const { newVersion } = await setup({ page, app }, true);
 
-	await expect(
+	await assert(
 		app.toasts.byMessage(
 			'info',
 			'Le protocole "Example: arthropodes (lightweight)" a été mis à jour'
@@ -60,18 +60,18 @@ test('can auto-update a protocol', async ({ page, app }) => {
 	});
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
-	expect(protocol).toHaveProperty('version', newVersion);
+	assert(protocol).toHaveProperty('version', newVersion);
 });
 
 test('does not auto-update when disabled', async ({ page, app }) => {
 	const { oldVersion } = await setup({ page, app }, false);
 
-	await expect(
+	await assert(
 		app.toasts.byMessage('info', 'Le protocole "Example: arthropodes" a été mis à jour')
 	).not.toBeVisible({
 		timeout: 3000
 	});
 
 	const protocol = await app.db.protocol.byName('Example: arthropodes (lightweight)');
-	expect(protocol).toHaveProperty('version', oldVersion);
+	assert(protocol).toHaveProperty('version', oldVersion);
 });

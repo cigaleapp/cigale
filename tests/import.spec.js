@@ -2,7 +2,7 @@ import * as dates from 'date-fns';
 import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations.js';
-import { expect, test } from './fixtures.js';
+import { assert, test } from './fixtures.js';
 import {
 	chooseFirstSession,
 	expectZipFiles,
@@ -23,11 +23,11 @@ test.describe('correct results.zip', () => {
 	});
 
 	test('has all the images', async ({ page }) => {
-		await expect(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
-		await expect(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
-		await expect(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
-		await expect(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
-		await expect(page.getByText(/\.jpeg$/)).toHaveCount(4);
+		await assert(page.getByText('lil-fella.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByText('cyan.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByText('leaf.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByText('with-exif-gps.jpeg', { exact: true })).toBeVisible();
+		await assert(page.getByText(/\.jpeg$/)).toHaveCount(4);
 	});
 
 	test('has the correct bounding boxes @webkit-no-parallelization', async ({ page, app }) => {
@@ -39,7 +39,7 @@ test.describe('correct results.zip', () => {
 		 * @param {number} count
 		 */
 		async function expectBoundingBoxesCount(id, count) {
-			await expect(
+			await assert(
 				page.locator(`[data-id='${id}']`).getByTestId('card-observation-bounding-box')
 			).toHaveCount(count);
 		}
@@ -62,7 +62,7 @@ test.describe('correct results.zip', () => {
 		await page.getByText('cyan', { exact: true }).click({
 			timeout: 5_000
 		});
-		await expect(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
+		await assert(page.getByTestId('sidepanel')).toMatchAriaSnapshot(`
 		  - complementary:
 		    - img "Image 1 de l'observation cyan"
 		    - heading "cyan" [level=2]:
@@ -268,7 +268,7 @@ test.describe('correct results.zip', () => {
 		await page.getByText(/et images originales/i).click();
 		await page.getByRole('button', { name: 'Archive ZIP' }).click();
 		const download = await page.waitForEvent('download');
-		expect(download.suggestedFilename()).toBe('results.zip');
+		assert(download.suggestedFilename()).toBe('results.zip');
 
 		await download.saveAs('./tests/results/correct.zip');
 		await expectZipFiles(await yauzl.open('./tests/results/correct.zip'), [
@@ -292,7 +292,7 @@ test.describe('missing original photos', () => {
 	});
 
 	test('fails with the appropriate error message', async ({ app }) => {
-		await expect(app.toasts.byMessage('error', 'Aucune image trouvée')).toBeVisible();
+		await assert(app.toasts.byMessage('error', 'Aucune image trouvée')).toBeVisible();
 	});
 });
 
@@ -302,7 +302,7 @@ test.describe('missing analysis file', () => {
 	});
 
 	test('fails with the appriopriate error message', async ({ app }) => {
-		await expect(app.toasts.byMessage('error', "Aucun fichier d'analyse")).toBeVisible();
+		await assert(app.toasts.byMessage('error', "Aucun fichier d'analyse")).toBeVisible();
 	});
 });
 
@@ -312,7 +312,7 @@ test.describe('wrong protocol used', () => {
 	});
 
 	test('fails with the appriopriate error message', async ({ app }) => {
-		await expect(app.toasts.byMessage('error', 'le protocole de la session est')).toBeVisible();
+		await assert(app.toasts.byMessage('error', 'le protocole de la session est')).toBeVisible();
 	});
 });
 
@@ -322,7 +322,7 @@ test.describe('invalid json analysis', async () => {
 	});
 
 	test('fails with the appriopriate error message', async ({ app }) => {
-		await expect(app.toasts.byMessage('error', 'JSON')).toBeVisible();
+		await assert(app.toasts.byMessage('error', 'JSON')).toBeVisible();
 	});
 });
 
@@ -330,10 +330,10 @@ test('fails when importing a .CR2 image', issue(413), async ({ page, app }) => {
 	await newSession(page);
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'sample.cr2');
-	await expect(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
+	await assert(page.getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 5_000
 	});
-	await expect(firstObservationCard(page)).toHaveTooltip(
+	await assert(firstObservationCard(page)).toHaveTooltip(
 		/Les fichiers .+? ne sont pas (encore )?supportés/
 	);
 });
@@ -342,11 +342,11 @@ test('can import a large image', issue(412, 415), async ({ page, app }) => {
 	await newSession(page);
 	await app.tabs.go('import');
 	await importPhotos({ page }, 'large-image.jpeg');
-	await expect(page.getByText('large-image.jpeg')).toBeVisible({
+	await assert(page.getByText('large-image.jpeg')).toBeVisible({
 		timeout: 10_000
 	});
 	await app.tabs.go('classify');
-	await expect(page.getByText('large-image')).toBeVisible({
+	await assert(page.getByText('large-image')).toBeVisible({
 		timeout: 10_000
 	});
 });
@@ -356,7 +356,7 @@ test('cannot import an extremely large image', issue(412, 414), async ({ page, a
 	await app.tabs.go('import');
 	await importPhotos({ page }, '20K-gray.jpeg');
 	await app.loading.wait();
-	await expect(firstObservationCard(page)).toHaveTooltip(
+	await assert(firstObservationCard(page)).toHaveTooltip(
 		/L'image est trop grande pour être traitée/
 	);
 });
@@ -370,14 +370,14 @@ test.fixme('can cancel import', issue(430), async ({ page, app }) => {
 		'leaf.jpeg',
 		'with-exif-gps.jpeg'
 	]);
-	await expect(firstObservationCard(page)).toHaveText(loadingText, {
+	await assert(firstObservationCard(page)).toHaveText(loadingText, {
 		timeout: 10_000
 	});
 	await page
 		.locator('article', { hasText: 'lil-fella.jpeg' })
 		.getByRole('button', { name: 'Supprimer' })
 		.click();
-	await expect(page.getByText('lil-fella.jpeg').first()).not.toBeVisible({
+	await assert(page.getByText('lil-fella.jpeg').first()).not.toBeVisible({
 		timeout: 500
 	});
 });
@@ -390,14 +390,14 @@ test('can import in multiple batches', async ({ page, app }) => {
 		['lil-fella.jpeg', 'leaf.jpeg'],
 		['with-exif-gps.jpeg', '20K-gray.jpeg', 'debugsquare.png']
 	);
-	await expect(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
+	await assert(page.locator('main').getByText(/Analyse…|En attente/)).toHaveCount(0, {
 		timeout: 60_000
 	});
-	await expect(page.locator('main').getByText('lil-fella.jpeg')).toBeVisible();
-	await expect(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
-	await expect(page.locator('main').getByText('with-exif-gps.jpeg')).toBeVisible();
-	await expect(page.locator('main').getByText('debugsquare.png')).toBeVisible();
-	await expect(page.locator('main').locator('article.observation')).toHaveCount(5);
+	await assert(page.locator('main').getByText('lil-fella.jpeg')).toBeVisible();
+	await assert(page.locator('main').getByText('leaf.jpeg')).toBeVisible();
+	await assert(page.locator('main').getByText('with-exif-gps.jpeg')).toBeVisible();
+	await assert(page.locator('main').getByText('debugsquare.png')).toBeVisible();
+	await assert(page.locator('main').locator('article.observation')).toHaveCount(5);
 });
 
 test(
@@ -415,7 +415,7 @@ test(
 			.getByRole('button', { name: 'Supprimer 1 images Suppr' })
 			.click();
 		await app.tabs.go('classify');
-		await expect(observationCard(page, 'cyan')).not.toBeVisible();
+		await assert(observationCard(page, 'cyan')).not.toBeVisible();
 	}
 );
 
@@ -429,12 +429,12 @@ test('cannot go to classify tab while detection is ongoing', issue(437), async (
 
 	await app.tabs.go('crop');
 
-	await expect(app.tabs.get('classify')).toBeDisabled({ timeout: 100 });
+	await assert(app.tabs.get('classify')).toBeDisabled({ timeout: 100 });
 
 	// Once everything is done, make sure that we can go to the classify tab
 	await app.loading.wait();
 
-	await expect(app.tabs.get('classify')).toBeEnabled({ timeout: 1_000 });
+	await assert(app.tabs.get('classify')).toBeEnabled({ timeout: 1_000 });
 	await app.tabs.go('classify');
 });
 
@@ -444,13 +444,13 @@ test('can extract EXIF date from an image', async ({ page, app }) => {
 	await importPhotos({ page }, 'lil-fella.jpeg');
 	await app.loading.wait();
 	await firstObservationCard(page).click();
-	await expect(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
+	await assert(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
 		'2025-04-25'
 	);
 
 	const metadataValues = await app.db.metadata.values({ image: 'lil-fella.jpeg' });
 
-	expect(metadataValues).toMatchObject({
+	assert(metadataValues).toMatchObject({
 		...metadataValues,
 		shoot_date: '2025-04-25T12:38:36'
 	});
@@ -486,16 +486,16 @@ test('can extract EXIF GPS data from an image', async ({ page, context, app }) =
 	await importPhotos({ page }, 'with-exif-gps.jpeg');
 	await app.loading.wait();
 	await firstObservationCard(page).click();
-	await expect(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
+	await assert(app.sidepanel.metadataSection('Date').getByRole('textbox')).toHaveValue(
 		'2008-10-22'
 	);
-	await expect(app.sidepanel.metadataSection('Localisation').getByRole('combobox')).toHaveValue(
+	await assert(app.sidepanel.metadataSection('Localisation').getByRole('combobox')).toHaveValue(
 		'Via Madonna Laura, Arezzo, Toscane, 52100, Italie'
 	);
 
 	const metadataValues = await app.db.metadata.values({ image: 'with-exif-gps.jpeg' });
 
-	expect(metadataValues).toMatchObject({
+	assert(metadataValues).toMatchObject({
 		...metadataValues,
 		shoot_date: '2008-10-22T16:29:49',
 		shoot_location: {

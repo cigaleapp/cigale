@@ -4,7 +4,7 @@ import { addDays } from 'date-fns';
 import lightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import type { GROUP_FIELDS, SORT_FIELDS } from '../src/lib/schemas/sessions.js';
 import type { FixturePaths } from './filepaths.js';
-import { expect, test, type AppFixture } from './fixtures.js';
+import { assert, test, type AppFixture } from './fixtures.js';
 import {
 	chooseFirstSession,
 	chooseInDropdown,
@@ -116,11 +116,11 @@ test.describe('grouping', () => {
 		const group = page.locator('main').getByRole('region', { name: 'Ordre = Symphypleona' });
 		const leaf = page.locator('main').getByRole('article', { name: 'leaf.jpeg' });
 
-		await expect(leaf).toBeVisible();
+		await assert(leaf).toBeVisible();
 		await group.getByRole('button', { name: 'Réduire le groupe' }).click();
-		await expect(leaf).not.toBeVisible();
+		await assert(leaf).not.toBeVisible();
 		await group.getByRole('button', { name: 'Développer le groupe' }).click();
-		await expect(leaf).toBeVisible();
+		await assert(leaf).toBeVisible();
 	});
 });
 
@@ -192,7 +192,7 @@ function testCardsGroups<Field extends keyof GroupFieldByLabel>(
 }
 
 async function expectCardsOrder(locator: Locator, order: string[]) {
-	await expect
+	await assert
 		.poll(() =>
 			locator
 				.locator('article.observation footer')
