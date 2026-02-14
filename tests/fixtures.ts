@@ -453,6 +453,6 @@ export const assert = baseExpect.extend({
 	}
 });
 
-export const ex = assert.soft;
+export const expect = assert.soft;
 
 export { lightProtocol as exampleProtocol };

@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
-import { ex, assert, test, type AppFixture } from './fixtures.js';
+import { expect, assert, test, type AppFixture } from './fixtures.js';
 import {
 	chooseFirstSession,
 	firstObservationCard,
@@ -98,26 +98,26 @@ test.describe('full-screen classification view', pr(1071), () => {
 				const panel = page.getByTestId('panel');
 				const option = panel.getByTestId('focused-option');
 
-				await ex(panel.getByRole('heading', { level: 1 })).toHaveAccessibleName(
+				await expect(panel.getByRole('heading', { level: 1 })).toHaveAccessibleName(
 					lilFella.label
 				);
 
-				await ex(option.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
-				await ex(option.getByTestId('current')).toHaveText(/32%\s*$/);
+				await expect(option.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
+				await expect(option.getByTestId('current')).toHaveText(/32%\s*$/);
 
 				const prev = option.getByRole('button', { name: 'Option précédente' });
 				const next = option.getByRole('button', { name: 'Option suivante' });
 
-				await ex(prev).toBeDisabled();
-				await ex(next).not.toBeDisabled();
+				await expect(prev).toBeDisabled();
+				await expect(next).not.toBeDisabled();
 
-				await ex(next).toHaveTooltip(
+				await expect(next).toHaveTooltip(
 					// [A-Z] is the keybind hint
 					/^\s*Dicyrtomina saundersi [A-Z]\s*$/
 				);
-				await ex(next).toHaveText(/\s*(Suivante )?\s*18%\s*/);
+				await expect(next).toHaveText(/\s*(Suivante )?\s*18%\s*/);
 
-				await ex(page.getByTestId('cascades')).toMatchAriaSnapshot(`
+				await expect(page.getByTestId('cascades')).toMatchAriaSnapshot(`
 				  - text: Métadonnées associées
 				  - table:
 				    - rowgroup:
@@ -140,7 +140,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				        - cell "Genre"
 				        - cell "Entomobrya"
 				`);
-				await ex(page.getByTestId('synonyms')).toMatchAriaSnapshot(`
+				await expect(page.getByTestId('synonyms')).toMatchAriaSnapshot(`
 				  - text: Synonymes
 				  - list:
 				    - listitem: Degeeria muscorum
@@ -161,7 +161,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 				    - listitem: Entomobrya nivalis
 				    - listitem: Entomobrya orcheselloides
 				`);
-				await ex(page.getByTestId('description')).toMatchAriaSnapshot(`
+				await expect(page.getByTestId('description')).toMatchAriaSnapshot(`
 				  - img
 				  - text: Description
 				  - link "En savoir plus gbif.org":
@@ -188,7 +188,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 						'io.github.cigaleapp.arthropods.example.light__species'
 					].options.find((o) => o.label === expectedOptionLabel)!;
 
-					ex(species).toBe(expectedOption.key);
+					expect(species).toBe(expectedOption.key);
 
 					const confidence = (await app.db.observation.byLabel('lil-fella'))
 						?.metadataOverrides[`${lightweightProtocol.id}__species`]?.confidence;
@@ -196,7 +196,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 					if (confidence === undefined)
 						throw new Error('Missing confidence value in database');
 
-					ex(confidence).toBeCloseTo(confidencePercentage / 100);
+					expect(confidence).toBeCloseTo(confidencePercentage / 100);
 				}
 
 				test('using the combobox', async ({ page, app }) => {
@@ -212,7 +212,7 @@ test.describe('full-screen classification view', pr(1071), () => {
 						.first()
 						.click();
 
-					await ex(combobox).toHaveValue('Allacma fusca');
+					await expect(combobox).toHaveValue('Allacma fusca');
 					await assertValueInDB(app, 'Allacma fusca', 9);
 				});
 
@@ -222,15 +222,15 @@ test.describe('full-screen classification view', pr(1071), () => {
 					const prev = option.getByRole('button', { name: 'Option précédente' });
 
 					await next.click();
-					await ex(option.getByRole('combobox')).toHaveValue('Dicyrtomina saundersi');
+					await expect(option.getByRole('combobox')).toHaveValue('Dicyrtomina saundersi');
 					await assertValueInDB(app, 'Dicyrtomina saundersi', 18);
 
 					await next.click();
-					await ex(option.getByRole('combobox')).toHaveValue('Allacma fusca');
+					await expect(option.getByRole('combobox')).toHaveValue('Allacma fusca');
 					await assertValueInDB(app, 'Allacma fusca', 9);
 
 					await prev.click();
-					await ex(option.getByRole('combobox')).toHaveValue('Dicyrtomina saundersi');
+					await expect(option.getByRole('combobox')).toHaveValue('Dicyrtomina saundersi');
 					await assertValueInDB(app, 'Dicyrtomina saundersi', 18);
 				});
 			});
@@ -246,12 +246,12 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 				await app.path.wait('/(app)/(sidepanel)/crop/[image]/[[from]]');
 
-				await ex(page).toHaveTitle(/^Recadrer lil-fella.jpeg · /);
+				await expect(page).toHaveTitle(/^Recadrer lil-fella.jpeg · /);
 
 				await page.getByRole('button', { name: 'Retour' }).click();
 
 				await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
-				await ex(page).toHaveURL(url);
+				await expect(page).toHaveURL(url);
 			});
 
 			test.describe('can exit out to the classification tab', () => {
@@ -279,26 +279,26 @@ test.describe('full-screen classification view', pr(1071), () => {
 					.getByTestId('focused-option')
 					.getByTestId('current');
 
-				await ex(title).toHaveAccessibleName('lil-fella');
+				await expect(title).toHaveAccessibleName('lil-fella');
 
 				// XXX: fore some reason, in E2E browsers only, this specific click goes two images forward
 				// await navigation.getByRole('button', { name: 'Image suivante' }).click();
 				await page.keyboard.press('Control+ArrowRight');
-				await ex(title).toHaveAccessibleName('leaf');
-				await ex(selectedOption).toHaveText('21%');
-				await ex(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
+				await expect(title).toHaveAccessibleName('leaf');
+				await expect(selectedOption).toHaveText('21%');
+				await expect(selectedOption.getByRole('combobox')).toHaveValue('Orchesella cincta');
 
 				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
 				await navigation.getByRole('button', { name: 'Observation suivante' }).click();
-				await ex(title).toHaveAccessibleName('with-exif-gps');
-				await ex(selectedOption).toHaveText('--%');
+				await expect(title).toHaveAccessibleName('with-exif-gps');
+				await expect(selectedOption).toHaveText('--%');
 
 				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
 				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
 				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
-				await ex(title).toHaveAccessibleName('lil-fella');
-				await ex(selectedOption).toHaveText('32%');
-				await ex(selectedOption.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
+				await expect(title).toHaveAccessibleName('lil-fella');
+				await expect(selectedOption).toHaveText('32%');
+				await expect(selectedOption.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
 			});
 		});
 	}
@@ -314,11 +314,11 @@ test.describe('full-screen classification view', pr(1071), () => {
 			const metadata = observation.metadataOverrides[`${lightweightProtocol.id}__species`];
 
 			if (confirmed) {
-				ex(metadata).toHaveProperty('confirmed', true);
+				expect(metadata).toHaveProperty('confirmed', true);
 			} else {
 				// allow either a confirmed=false or no confirmed property at all
 				// TODO: a custom matcher to make the error more readable
-				ex(metadata?.confirmed ?? false).toBe(false);
+				expect(metadata?.confirmed ?? false).toBe(false);
 			}
 		}
 
@@ -327,17 +327,17 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		// Initially
 
-		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await ex(page.getByText('Classifications confirmées 0%')).toBeVisible();
+		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
+		await expect(page.getByText('Classifications confirmées 0%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(lilFella.id, false);
 
 		// Confirming lil-fella
 
 		await page.getByRole('button', { name: 'Continuer' }).click();
-		await ex(confirmedCropOverlay(page)).toBeVisible();
+		await expect(confirmedCropOverlay(page)).toBeVisible();
 
-		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await ex(page.getByText('Classifications confirmées 25%')).toBeVisible();
+		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
+		await expect(page.getByText('Classifications confirmées 25%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(lilFella.id, true);
 
 		// Confirming leaf
@@ -345,10 +345,10 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.path.wait(`/classify/${leaf.id}`);
 
 		await page.keyboard.press('ArrowUp');
-		await ex(confirmedCropOverlay(page)).not.toBeVisible();
+		await expect(confirmedCropOverlay(page)).not.toBeVisible();
 
-		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await ex(page.getByText('Classifications confirmées 50%')).toBeVisible();
+		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
+		await expect(page.getByText('Classifications confirmées 50%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(leaf.id, true);
 
 		// Confirming cyan
@@ -357,10 +357,10 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.path.wait(`/classify/${cyan.id}`);
 
 		await page.keyboard.press('ArrowUp');
-		await ex(confirmedCropOverlay(page)).not.toBeVisible();
+		await expect(confirmedCropOverlay(page)).not.toBeVisible();
 
-		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
+		await expect(page.getByText('Classifications confirmées 75%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(cyan.id, true);
 
 		// Confirming with-exif-gps does nothing since theres no classification
@@ -370,8 +370,8 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await app.path.wait(`/classify/${withExifGps.id}`);
 		await page.keyboard.press('ArrowUp');
 
-		await ex(page.getByText('Observations classifiées 75%')).toBeVisible();
-		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await expect(page.getByText('Observations classifiées 75%')).toBeVisible();
+		await expect(page.getByText('Classifications confirmées 75%')).toBeVisible();
 		await assertDatabaseConfirmedStatus(withExifGps.id, false);
 
 		// Classify it
@@ -379,13 +379,13 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.getByTestId('current').getByRole('combobox').fill('Seira musarum');
 		await page.keyboard.press('Enter');
 		await page.getByTestId('current').getByRole('combobox').blur();
-		await ex(page.getByText('Observations classifiées 100%')).toBeVisible();
-		await ex(page.getByText('Classifications confirmées 75%')).toBeVisible();
+		await expect(page.getByText('Observations classifiées 100%')).toBeVisible();
+		await expect(page.getByText('Classifications confirmées 75%')).toBeVisible();
 
 		// Now that all other observations are classified, confirming should work
 
 		await page.getByRole('button', { name: 'Continuer' }).click();
-		await ex(confirmedCropOverlay(page)).toBeVisible();
+		await expect(confirmedCropOverlay(page)).toBeVisible();
 		await assertDatabaseConfirmedStatus(withExifGps.id, true);
 
 		await app.path.wait('/results');
@@ -409,31 +409,31 @@ test.describe('full-screen classification view', pr(1071), () => {
 
 		await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
 
-		await ex(page.getByTestId('focused-option').getByText('21%')).toBeVisible();
-		await ex(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
+		await expect(page.getByTestId('focused-option').getByText('21%')).toBeVisible();
+		await expect(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
 			'Orchesella cincta'
 		);
 
 		await page.getByRole('button', { name: 'Option suivante' }).click();
 
-		await ex(page.getByTestId('focused-option').getByText('16%')).toBeVisible();
-		await ex(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
+		await expect(page.getByTestId('focused-option').getByText('16%')).toBeVisible();
+		await expect(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
 			'Tomocerus vulgaris'
 		);
 
 		// Can flip through the observation's images
 		const subject = page.getByTestId('subject');
 
-		await ex(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
-		await ex(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
+		await expect(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
+		await expect(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
 
 		await subject.getByRole('button', { name: 'Image suivante' }).click();
-		await ex(subject).toBeOnSlide('leaf.jpeg (2 sur 2)');
-		await ex(subject.getByRole('img', { name: 'leaf.jpeg' })).toBeInViewport();
+		await expect(subject).toBeOnSlide('leaf.jpeg (2 sur 2)');
+		await expect(subject.getByRole('img', { name: 'leaf.jpeg' })).toBeInViewport();
 
 		await subject.getByRole('button', { name: 'Image précédente' }).click();
-		await ex(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
-		await ex(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
+		await expect(subject).toBeOnSlide('cyan.jpeg (1 sur 2)');
+		await expect(subject.getByRole('img', { name: 'cyan.jpeg' })).toBeInViewport();
 	});
 });
 

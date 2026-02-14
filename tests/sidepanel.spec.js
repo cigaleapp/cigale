@@ -1,5 +1,5 @@
 import { issue } from './annotations.js';
-import { ex, assert, test } from './fixtures.js';
+import { expect, assert, test } from './fixtures.js';
 import {
 	changeSessionProtocol,
 	chooseFirstSession,
@@ -117,7 +117,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 	// Opening the combobox
 	await nthCombobox(1).click();
 	await assert(page.getByTestId('metadata-combobox-viewport')).toBeVisible();
-	await ex(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Entomobrya muscorum \\d+%/ [selected]:
 	    - img
 	    - text: ""
@@ -181,7 +181,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 		.getByTestId('metadata-combobox-viewport')
 		.getByText('Dicyrtomina saundersi 18%')
 		.hover();
-	await ex(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+	await expect(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
 	  - option /Entomobrya muscorum \\d+%/ [selected]:
 	    - img
 	    - text: ""
@@ -245,7 +245,7 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 		.getByTestId('metadata-combobox-viewport')
 		.getByText('Dicyrtomina saundersi 18%')
 		.click();
-	await ex(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(`
+	await expect(app.sidepanel.metadataSection('Espèce')).toMatchAriaSnapshot(`
 		  - text: Espèce
 		  - combobox: Dicyrtomina saundersi
 		  - button:
@@ -253,23 +253,23 @@ test('can update a enum-type metadata with cascades', async ({ page, app }) => {
 		`);
 
 	// Check the cascades
-	await ex(nthCombobox(2)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(2)).toMatchAriaSnapshot(`
 	  - combobox: Dicyrtomina
 	`);
-	await ex(nthCombobox(3)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(3)).toMatchAriaSnapshot(`
 	  - combobox: Dicyrtomidae
 	`);
-	await ex(nthCombobox(4)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(4)).toMatchAriaSnapshot(`
 	  - combobox: Symphypleona
 	`);
 	// 4th combobox is the location input
-	await ex(nthCombobox(6)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(6)).toMatchAriaSnapshot(`
 	  - combobox: Collembola
 	`);
-	await ex(nthCombobox(7)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(7)).toMatchAriaSnapshot(`
 	  - combobox: Arthropoda
 	`);
-	await ex(nthCombobox(8)).toMatchAriaSnapshot(`
+	await expect(nthCombobox(8)).toMatchAriaSnapshot(`
 	  - combobox: Animalia
 	`);
 
@@ -422,18 +422,18 @@ test('can update a boolean-type metadata', issue(216), async ({ page, app }) => 
 	await initialize({ page, app, dump: 'db/kitchensink-protocol.devalue' });
 	const switch_ = app.sidepanel.metadataSection('bool').getByRole('switch');
 
-	await ex(switch_).toHaveAttribute('aria-checked', 'false');
-	ex(await metadataValueInDatabase(app, 'bool')).toBeUndefined();
+	await expect(switch_).toHaveAttribute('aria-checked', 'false');
+	expect(await metadataValueInDatabase(app, 'bool')).toBeUndefined();
 
 	await switch_.click();
 
-	await ex(switch_).toHaveAttribute('aria-checked', 'true');
-	ex(await metadataValueInDatabase(app, 'bool')).toBe(true);
+	await expect(switch_).toHaveAttribute('aria-checked', 'true');
+	expect(await metadataValueInDatabase(app, 'bool')).toBe(true);
 
 	await switch_.click();
 
-	await ex(switch_).toHaveAttribute('aria-checked', 'false');
-	ex(await metadataValueInDatabase(app, 'bool')).toBe(false);
+	await expect(switch_).toHaveAttribute('aria-checked', 'false');
+	expect(await metadataValueInDatabase(app, 'bool')).toBe(false);
 });
 
 test('shows crop-type metadata as non representable', async ({ page, app }) => {

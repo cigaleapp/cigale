@@ -2,7 +2,7 @@ import path from 'node:path';
 import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations.js';
-import { ex, assert, test } from './fixtures.js';
+import { expect, assert, test } from './fixtures.js';
 import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
 import {
 	chooseFirstSession,
@@ -94,8 +94,8 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	}
 
 	await changeExportSettings({ include: 'Métadonnées seulement' });
-	await ex(downloadButton).toHaveText('Archive ZIP ~16ko');
-	await ex(preview).toMatchAriaSnapshot(`
+	await expect(downloadButton).toHaveText('Archive ZIP ~16ko');
+	await expect(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
@@ -111,8 +111,8 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées et images recadrées' });
-	await ex(downloadButton).toHaveText('Archive ZIP ~4,2Mo');
-	await ex(preview).toMatchAriaSnapshot(`
+	await expect(downloadButton).toHaveText('Archive ZIP ~4,2Mo');
+	await expect(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
@@ -144,8 +144,8 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées, images recadrées et images originales' });
-	await ex(downloadButton).toHaveText('Archive ZIP ~9,8Mo');
-	await ex(preview).toMatchAriaSnapshot(`
+	await expect(downloadButton).toHaveText('Archive ZIP ~9,8Mo');
+	await expect(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
@@ -193,7 +193,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ cropPadding: { px: 200 } });
-	await ex(downloadButton).toHaveText('Archive ZIP ~12Mo');
+	await expect(downloadButton).toHaveText('Archive ZIP ~12Mo');
 });
 
 test('export to a folder', async ({ page, app, browserName }) => {

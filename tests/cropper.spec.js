@@ -1,6 +1,6 @@
 import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
-import { exampleProtocol, ex, assert, test } from './fixtures.js';
+import { exampleProtocol, expect, assert, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
@@ -518,12 +518,12 @@ test.describe('Cropper view', () => {
 			const image = page.getByTestId('crop-subject-image');
 			assert(image).toBeVisible();
 
-			await ex(image).toHaveCSS('scale', /[0-9]+(\.[0-9]+)?/);
+			await expect(image).toHaveCSS('scale', /[0-9]+(\.[0-9]+)?/);
 
-			ex(await image.evaluate((i) => Number(i.style.scale))).toBeCloseTo(scale, 3);
+			expect(await image.evaluate((i) => Number(i.style.scale))).toBeCloseTo(scale, 3);
 
 			if (translateX !== undefined && translateY !== undefined) {
-				await ex(image).toHaveCSS('translate', /.+px .+px/);
+				await expect(image).toHaveCSS('translate', /.+px .+px/);
 
 				assert
 					.soft(
