@@ -53,7 +53,7 @@ export async function load({ params: { id }, depends }) {
 		db: idb.databaseHandle(),
 		sessionId: session.id,
 		metadataToConsider: sessionMetadataDefs.map(({ id }) => id)
-});
+	});
 
 	session = await tables.Session.get(id);
 	if (!session) error(404, 'Session not found');

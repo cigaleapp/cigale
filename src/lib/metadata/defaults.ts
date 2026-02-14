@@ -170,9 +170,7 @@ if (import.meta.vitest) {
 
 		it('does nothing when no metadata definitions have defaults', async () => {
 			const db = mockDb(makeSession());
-			_tables.Metadata.getMany.mockResolvedValue([
-				{ id: 'proto__field1', type: 'string' }
-			]);
+			_tables.Metadata.getMany.mockResolvedValue([{ id: 'proto__field1', type: 'string' }]);
 
 			await resolveDefaults({
 				db,
@@ -211,7 +209,7 @@ if (import.meta.vitest) {
 		it('skips metadata whose current value is not a default', async () => {
 			const db = mockDb(
 				makeSession({
-					'proto__field1': {
+					proto__field1: {
 						value: 'existing',
 						confidence: 1,
 						confirmed: false,
@@ -237,7 +235,7 @@ if (import.meta.vitest) {
 		it('overwrites a current default value with a different new default', async () => {
 			const db = mockDb(
 				makeSession({
-					'proto__field1': {
+					proto__field1: {
 						value: 'old',
 						confidence: 1,
 						confirmed: false,
@@ -265,7 +263,7 @@ if (import.meta.vitest) {
 		it('does not store when new default equals current value', async () => {
 			const db = mockDb(
 				makeSession({
-					'proto__field1': {
+					proto__field1: {
 						value: 'hello',
 						confidence: 1,
 						confirmed: false,
@@ -335,9 +333,7 @@ if (import.meta.vitest) {
 		it('recurses on metadata that was stored', async () => {
 			const db = mockDb(makeSession());
 			_tables.Metadata.getMany
-				.mockResolvedValueOnce([
-					{ id: 'proto__field1', type: 'string', default: 'hello' }
-				])
+				.mockResolvedValueOnce([{ id: 'proto__field1', type: 'string', default: 'hello' }])
 				.mockResolvedValueOnce([]);
 
 			await resolveDefaults({
@@ -381,7 +377,7 @@ if (import.meta.vitest) {
 			const db = mockDb(
 				makeSession(
 					{
-						'proto__species': {
+						proto__species: {
 							value: 'Apis mellifera',
 							confidence: 1,
 							confirmed: false,
@@ -394,7 +390,9 @@ if (import.meta.vitest) {
 				)
 			);
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const renderFn = vi.fn((_payload: typeof MetadataDefaultDynamicPayload.inferIn) => 'derived');
+			const renderFn = vi.fn(
+				(_payload: typeof MetadataDefaultDynamicPayload.inferIn) => 'derived'
+			);
 			_tables.Metadata.getMany.mockResolvedValue([
 				{ id: 'proto__label', type: 'string', default: { render: renderFn } }
 			]);

@@ -1,4 +1,4 @@
-import { exampleProtocol, assert, test } from '../fixtures.js';
+import { assert, exampleProtocol, test } from '../fixtures.js';
 import {
 	confirmDeletionModal,
 	dumpDatabase,

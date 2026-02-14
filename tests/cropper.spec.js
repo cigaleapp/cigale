@@ -1,6 +1,6 @@
 import { Schemas } from '../src/lib/database.js';
 import { issue } from './annotations.js';
-import { exampleProtocol, expect, assert, test } from './fixtures.js';
+import { assert, exampleProtocol, expect, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,

@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
-import { expect, assert, test, type AppFixture } from './fixtures.js';
+import { assert, expect, test, type AppFixture } from './fixtures.js';
 import {
 	chooseFirstSession,
 	firstObservationCard,
@@ -298,7 +298,9 @@ test.describe('full-screen classification view', pr(1071), () => {
 				await navigation.getByRole('button', { name: 'Observation précédente' }).click();
 				await expect(title).toHaveAccessibleName('lil-fella');
 				await expect(selectedOption).toHaveText('32%');
-				await expect(selectedOption.getByRole('combobox')).toHaveValue('Entomobrya muscorum');
+				await expect(selectedOption.getByRole('combobox')).toHaveValue(
+					'Entomobrya muscorum'
+				);
 			});
 		});
 	}

@@ -396,7 +396,7 @@ describe('compareProtocolWithUpstream', () => {
 							label: 'Metadata 1',
 							mergeMethod: 'max',
 							required: false,
-							sortable: false, 
+							sortable: false,
 							groupable: false
 						},
 						{
@@ -406,7 +406,7 @@ describe('compareProtocolWithUpstream', () => {
 							description: 'Metadata 2 description',
 							mergeMethod: 'max',
 							required: false,
-							sortable: false, 
+							sortable: false,
 							groupable: false
 						},
 						{
@@ -416,7 +416,7 @@ describe('compareProtocolWithUpstream', () => {
 							description: 'Metadata 4 description',
 							mergeMethod: 'max',
 							required: false,
-							sortable: false, 
+							sortable: false,
 							groupable: false
 						}
 					];
@@ -444,7 +444,7 @@ describe('compareProtocolWithUpstream', () => {
 						description: 'Metadata 1 description updated',
 						mergeMethod: 'max',
 						required: false,
-						groupable: false, 
+						groupable: false,
 						sortable: false,
 						options: [
 							{ key: 'opt1', label: 'Option 1', description: 'Desc 1', synonyms: [] },
@@ -457,7 +457,7 @@ describe('compareProtocolWithUpstream', () => {
 						description: 'Metadata 2 description',
 						mergeMethod: 'max',
 						required: false,
-						groupable: false, 
+						groupable: false,
 						sortable: false,
 						type: 'enum',
 						options: [
@@ -472,10 +472,12 @@ describe('compareProtocolWithUpstream', () => {
 						description: 'Metadata 3 description',
 						mergeMethod: 'max',
 						required: false,
-						groupable: false, 
+						groupable: false,
 						sortable: false,
 						type: 'enum',
-						options: [{ key: 'opt1', label: 'Option X', description: 'Desc X', synonyms: [] }]
+						options: [
+							{ key: 'opt1', label: 'Option X', description: 'Desc X', synonyms: [] }
+						]
 					}
 				},
 				authors: [],

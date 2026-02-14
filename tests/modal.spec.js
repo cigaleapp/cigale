@@ -1,5 +1,5 @@
 import { issue } from './annotations.js';
-import { expect, assert, test } from './fixtures.js';
+import { assert, expect, test } from './fixtures.js';
 import { newSession } from './utils/index.js';
 
 test.describe('closing a modal', () => {
