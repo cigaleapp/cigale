@@ -1860,6 +1860,7 @@ msgid "ID de la session"
 msgstr "Session ID"
 
 #: src/routes/(app)/sessions/[id]/+page.js
+#: src/routes/(app)/sessions/[id]/+page.js
 msgid "Session not found"
 msgstr "Session not found"
 
