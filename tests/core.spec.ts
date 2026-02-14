@@ -10,7 +10,7 @@ import { Analysis } from '../src/lib/schemas/exports.js';
 import { IssueCreatorRequest } from '../src/lib/schemas/issue-creator.js';
 import { withParallelism } from './annotations.js';
 import type { FixturePaths } from './filepaths.js';
-import { expect, test } from './fixtures.js';
+import { expect, ex, test } from './fixtures.js';
 import {
 	browserConsole,
 	chooseFirstSession,
@@ -128,7 +128,7 @@ for (const offline of [false, true]) {
 				{
 					'analysis.json': {
 						json(data) {
-							expect.soft(Analysis.allows(data)).toBe(true);
+							ex(Analysis.allows(data)).toBe(true);
 						}
 					},
 					'metadata.csv': {
@@ -144,7 +144,7 @@ for (const offline of [false, true]) {
 					},
 					'Cropped/Entomobrya muscorum_obs1_1.jpeg': {
 						buffer(buf) {
-							expect.soft(buf).toMatchSnapshot({ maxDiffPixelRatio: 0.01 });
+							ex(buf).toMatchSnapshot({ maxDiffPixelRatio: 0.01 });
 						},
 						entry(entry) {
 							expect
@@ -282,8 +282,8 @@ test('can send a bug report', async ({ page, app, context }) => {
 		})
 	).toHaveAttribute('href', 'https://example.com/issue/123');
 
-	expect.soft(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
-	expect.soft(requestBody).toEqual({
+	ex(IssueCreatorRequest(requestBody)).not.toBeInstanceOf(ArkErrors);
+	ex(requestBody).toEqual({
 		title: 'Test Bug Report',
 		body: 'This is a test bug report.',
 		type: 'bug',

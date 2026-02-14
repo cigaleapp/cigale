@@ -1,5 +1,5 @@
 import { issue } from './annotations.js';
-import { expect, test } from './fixtures.js';
+import { ex, expect, test } from './fixtures.js';
 import {
 	chooseFirstSession,
 	loadDatabaseDump,
@@ -50,7 +50,7 @@ test('allows merging and unrolling two observations', async ({ page, app }) => {
 		    - heading "lil-fella" [level=2]
 		    - button "2"
 		`);
-	await expect.soft(observationImage(page, 'lil-fella')).toHaveAttribute('src', src.lilfella);
+	await ex(observationImage(page, 'lil-fella')).toHaveAttribute('src', src.lilfella);
 
 	await observationCard(page, 'lil-fella').getByRole('button', { name: '2' }).click();
 

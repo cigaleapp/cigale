@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import lightweightProtocol from '../examples/arthropods.light.cigaleprotocol.json' with { type: 'json' };
 import { issue, pr } from './annotations.js';
-import { expect, test, type AppFixture } from './fixtures.js';
+import { ex, expect, test, type AppFixture } from './fixtures.js';
 import {
 	chooseFirstSession,
 	firstObservationCard,
@@ -36,8 +36,6 @@ test('allows cancelling classification of an observation', issue(430), async ({ 
 });
 
 test.describe('full-screen classification view', pr(1071), () => {
-	const ex = expect.soft;
-
 	test.beforeEach(async ({ page, app }) => {
 		page.setViewportSize({ width: 1280, height: 800 });
 
@@ -306,8 +304,6 @@ test.describe('full-screen classification view', pr(1071), () => {
 	}
 
 	test('classification confirmation', async ({ page, app }) => {
-		const ex = expect.soft;
-
 		// eslint-disable-next-line prefer-const
 		let { leaf, lilFella, cyan, withExifGps } = await observationsByLabel(app);
 
@@ -412,8 +408,6 @@ test.describe('full-screen classification view', pr(1071), () => {
 		await page.getByRole('article', { name: 'cyan' }).dblclick();
 
 		await app.path.wait('/(app)/(sidepanel)/classify/[observation]');
-
-		const ex = expect.soft;
 
 		await ex(page.getByTestId('focused-option').getByText('21%')).toBeVisible();
 		await ex(page.getByTestId('focused-option').getByRole('combobox')).toHaveValue(
