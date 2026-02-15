@@ -8,13 +8,15 @@
 	 * @property {number|undefined} value if undefined, the element shows a fallback "--%" text
 	 * @property {(percent: `${number}%`) => string} [tooltip] - text to show when hovering the percentage
 	 * @property {import('svelte').Snippet} [children] optional content to put before the percentage, useful to make it under the tooltip activation area
+	 * @property {boolean} [no-fallback] if true, the "--%" fallback will not be shown when value is undefined, and the tooltip will not be activated. Useful when you want to show confidence without drawing attention to the fact that it's missing.
 	 */
 
 	/** @type {Props} */
 	const {
 		value,
 		children,
-		tooltip: help = (percentage) => `Confiance: ${percentage}`
+		tooltip: help = (percentage) => `Confiance: ${percentage}`,
+		'no-fallback': noFallback = false
 	} = $props();
 
 	const color = $derived(
@@ -31,7 +33,7 @@
 			{percent(value, decimals, { pad: 'nbsp', length: 4 })}
 		</code>
 	</span>
-{:else}
+{:else if !noFallback}
 	<span class="confidence empty">
 		{@render children?.()}
 		<code class="figure">&nbsp;--%</code>

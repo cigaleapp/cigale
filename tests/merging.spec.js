@@ -185,7 +185,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - combobox: Entomobrya muscorum
 	    - code: /\\d+%/
 	    - img
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Alternatives
 	    - list:
@@ -208,7 +208,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - combobox: Entomobrya
 	    - code: /\\d+%/
 	    - img
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Alternatives
 	    - list:
@@ -231,7 +231,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - combobox: Entomobryidae
 	    - code: /\\d+%/
 	    - img
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Alternatives
 	    - list:
@@ -254,7 +254,7 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	    - combobox: Entomobryomorpha
 	    - code: /\\d+%/
 	    - img
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Alternatives
 	    - list:
@@ -274,23 +274,22 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	        - button:
 	          - img
 	    - text: Photo d'habitat
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
 	    - radiogroup:
 	      - radio "C'est une photo de l'habitat actuel"
 	      - text: C'est une photo de l'habitat actuel
 	      - radio "C'est une photo de l'habitat à proximité"
 	      - text: C'est une photo de l'habitat à proximité
-	    - button [disabled]:
-	      - img
-	    - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
 	    - text: Date
 	    - textbox "Date": /\\d+-\\d+-\\d+/
-	    - code: "--%"
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - paragraph: Moment où la photo a été prise
 	    - text: Localisation
 	    - combobox
-	    - button [disabled]:
+	    - button "Supprimer cette valeur" [disabled]:
 	      - img
 	    - paragraph: Endroit où la photo a été prise
 	    - region "Map"
@@ -311,6 +310,9 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	        - /url: http://www.openstreetmap.org/about/
 	      - text: contributors
 	    - text: Difficulté d'identification
+	    - button "Supprimer cette valeur":
+	      - img
+	    - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
 	    - radiogroup:
 	      - radio "Facile"
 	      - text: Facile
@@ -320,11 +322,10 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - text: Difficile
 	      - radio "Très difficile"
 	      - text: Très difficile
-	    - code: "--%"
-	    - button:
-	      - img
-	    - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
 	    - text: Statut de conservation
+	    - button "Supprimer cette valeur" [disabled]:
+	      - img
+	    - paragraph: Statut de conservation IUCN de l'espèce
 	    - radiogroup:
 	      - radio "EX Éteint (“Extinct”)"
 	      - text: EX
@@ -347,23 +348,20 @@ test('selecting multiple images', issue(1054), async ({ page, app }) => {
 	      - radio "LC Préoccupation mineure (“Least Concern”)"
 	      - text: LC
 	      - paragraph: Préoccupation mineure (“Least Concern”)
-	    - button [disabled]:
-	      - img
-	    - paragraph: Statut de conservation IUCN de l'espèce
 	    - text: Classe
 	    - combobox: Collembola
 	    - code: /\\d+%/
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Phylum
 	    - combobox: Arthropoda
 	    - code: /\\d+%/
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - text: Règne
 	    - combobox: Animalia
 	    - code: /\\d+%/
-	    - button:
+	    - button "Supprimer cette valeur":
 	      - img
 	    - button "Regrouper Ctrl + G":
 	      - img

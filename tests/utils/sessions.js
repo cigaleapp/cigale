@@ -111,7 +111,8 @@ export async function deleteSession(page, name) {
 
 	await page
 		.getByRole('button', {
-			name: 'Supprimer'
+			name: 'Supprimer',
+			exact: true
 		})
 		.click();
 
