@@ -5,6 +5,7 @@ import {
 	HTTPRequest,
 	ID,
 	MIMEType,
+	ProtocolID,
 	References,
 	TemplatedString,
 	URLString
@@ -41,13 +42,26 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 
 export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
 
+export const ProtocolRegistry = type({
+	protocols: type({
+		id: ProtocolID,
+		url: URLString.describe('URL où télécharger le protocole')
+	}).array()
+});
+
+export const ProtocolImport = type({
+	from: ProtocolID.describe('De quel protocole hériter'),
+	metadata: References.describe(
+		"Clés (sans le namespace) de métadonnées à hériter du protocole spécifié dans 'from'."
+	)
+});
+
 export const Protocol = type({
-	id: ID.describe(
-		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
-	),
+	id: ProtocolID,
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
+	imports: ProtocolImport.array().default(() => []),
 	metadata: References.describe(
 		"Toutes les métadonnées du protocole (qu'elles soient associées aux sessions ou aux observations/images)"
 	),

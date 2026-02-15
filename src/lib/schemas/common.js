@@ -4,7 +4,11 @@ import Handlebars from 'handlebars';
 
 import { clamp, mapValues, safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 
-export const ID = type(/^[\w._]+$/);
+export const ID = type(/^[\w._-]+$/);
+
+export const ProtocolID = type(/[\w.-]+/).describe(
+	'Identifiant unique pour un protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, fr.sete-moulis-cnrs.mon-protocole si vous contrôler le nom de domain sete-moulis.cnrs.fr'
+);
 
 export const References = ID.array().pipe((ids) => [...new Set(ids)]);
 

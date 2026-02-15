@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=../public/protocol.schema.json
+id: fr.osug.terra-forma-web.entomoscope
+name: Entomoscope
+
+description: Protocole de collecte d'images d'insectes via l'Entomoscope
+
+authors:
+  - name: Jerome Briot
+  - { name: Gwenn Le Bihan, email: gwenn.lebihan7@gmail.com }
+  - name: Maxime Cauchoix
+
+imports:
+  - from: io.github.cigaleapp.arthropods.example
+    metadata: [species, genus, family, order, class, phylum, kingdom]
+
+crop:
+  metadata: crop
+
+sidecars:
+  filepath: ./{{ filepath | replace("_original.jpg", ".json") }}
+
+metadata:
+  location:
+    type: location
+    label: Lieu
+    description: Lieu de prise de vue
+    mergeMethod: average
+    required: false
+    # infer: 
+    #   latitude: { sidecar: .EntomoscopeLatitude }
+    #   longitude: { sidecar: .EntomoscopeLongitude }
+  altitude:
+    type: float
+    label: Altitude
+    description: Altitude de l'entomoscope
+    unit: m
+    required: false
+    mergeMethod: average
+    # infer: 
+    #   sidecar: .EntomoscopeAltitude
+  crop_inference_model:
+    type: string
+    label: Modèle utilisé pour la détection
+    description: Nom du modèle d'inférence utilisé par l'entomoscope pour générer les métadonnées de crop
+    mergeMethod: none
+    required: false
+    # infer:
+    #   sidecar: .EntomoscopeAiModel
+  camera_model:
+    type: enum
+    label: Modèle de caméra
+    description: Modèle de caméra de l'entomoscope
+    mergeMethod: none
+    required: false
+    options:
+      - { key: v1, label: V1, description: ... }
+      - { key: v2, label: V2, description: ... }
+      - { key: v3, label: V3, description: ... }
+    # infer:
+    #   sidecar: .EntomoscopeCameraModel
+  raspberry_model:
+    type: string
+    label: Modèle de Raspberry Pi
+    description: Modèle de Raspberry Pi utilisé dans l'entomoscope
+    mergeMethod: none
+    required: false
+    # infer:
+    #   sidecar: .EntomoscopeRaspberryPiModel
+  raspberry_serial_number:
+    type: string
+    label: Numéro de série du Raspberry Pi
+    description: Numéro de série du Raspberry Pi utilisé dans l'entomoscope
+    mergeMethod: none
+    required: false
+    # infer:
+    #   sidecar: .EntomoscopeRaspberryPiSerialNumber
+  date:
+    type: date
+    label: Date
+    description: Date de prise de vue
+    mergeMethod: average
+    required: false
+    # infer: 
+    #   sidecar: .FrameWallClock * 1e-6
+  brightness:
+    type: float
+    label: Luminosité
+    description: Luminosité mesurée par l'entomoscope
+    mergeMethod: average
+    required: false
+    unit: lux
+    # infer: 
+    #   sidecar: .Lux
+  led_intensity:
+    type: integer
+    label: Intensité des LEDs
+    description: Intensité des LEDs de l'entomoscope, de 0 à 100
+    mergeMethod: average
+    required: false
+    # infer: 
+    #   sidecar: .EntomoscopeLedIntensity
+  site:
+    type: string
+    label: ID du site
+    description: ID du site d'installation de l'entomoscope
+    mergeMethod: none
+    required: true
+    # infer: 
+    #   sidecar: .EntomoscopeSiteID
+  misc_config:
+    type: string
+    description: Tout les paramètres de configuration de l'entomoscope, encodés en JSON
+    label: ""
+    mergeMethod: none
+    required: false
+    # infer: 
+    #   sidecar: . | tostring
+  crop:
+    type: boundingbox
+    description: Boîte englobante du crop d'insecte détecté par l'entomoscope
+    label: ""
+    mergeMethod: union
+    required: false
+    # infer:
+    #   sidecar: |
+    #     .EntomoscopeAiPredictionBoxes as $boxes |
+    #     .EntomoscopeAiPredictionConf as $scores |
+
+    #     range($boxes | length) | {
+    #       sx: $boxes[.][0],
+    #       sy: $boxes[.][1],
+    #       w: $boxes[.][2],
+    #       h: $boxes[.][3],
+    #       score: $scores[.]
+    #     }

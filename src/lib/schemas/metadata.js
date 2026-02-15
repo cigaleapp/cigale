@@ -8,6 +8,7 @@ import {
 	FileSize,
 	ID,
 	Probability,
+	ProtocolID,
 	TemplatedString,
 	UniqueFileTypeSpecifier,
 	URLString
@@ -312,6 +313,9 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
 const MetadataBase = type({
 	id: ID.describe(
 		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
+	),
+	'inheritedFrom?': ProtocolID.describe(
+		"Si cette métadonnée est héritée d'un autre protocole, indique de quel protocole elle est héritée"
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
 	// TODO: move to type-specific branches (e.g. for boundingbox, it's union | none, for others there isnt union, ...)

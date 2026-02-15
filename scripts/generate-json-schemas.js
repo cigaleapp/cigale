@@ -3,7 +3,7 @@ import path from 'node:path';
 import { type } from 'arktype';
 
 import { Analysis } from '../src/lib/schemas/exports.js';
-import { ExportedProtocol } from '../src/lib/schemas/protocols.js';
+import { ExportedProtocol, ProtocolRegistry } from '../src/lib/schemas/protocols.js';
 
 const here = path.dirname(new URL(import.meta.url).pathname);
 const outputDir = path.resolve(here, '../static/');
@@ -34,6 +34,7 @@ async function exportJsonSchema(name, schema) {
 if (process.argv[1] === import.meta.filename) {
 	await exportJsonSchema('protocol', ExportedProtocol);
 	await exportJsonSchema('results', Analysis);
+	await exportJsonSchema('registry', ProtocolRegistry)
 }
 
 function deleteKeys(obj, pred) {

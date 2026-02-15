@@ -5,6 +5,7 @@
 
 import YAML from 'yaml';
 
+import { resolveProtocolImports } from '$lib/metadata/imports.js';
 import { compareProtocolWithUpstream } from '$lib/protocols.js';
 import { metadataOptionId, namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol } from '$lib/schemas/protocols.js';
@@ -35,8 +36,18 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 
 	onLoadingState('input-validation');
 	console.time('Validating protocol');
-	const protocol = ExportedProtocol.assert(parsed);
+	let protocol = ExportedProtocol.assert(parsed);
 	console.timeEnd('Validating protocol');
+
+	console.time('Resolve inheritances');
+	const inheritedMetadata = await resolveProtocolImports(protocol.id, protocol.imports ?? []);
+	console.timeEnd('Resolve inheritances');
+
+	protocol.metadata = { ...inheritedMetadata.metadata, ...protocol.metadata };
+	protocol.sessionMetadata = {
+		...inheritedMetadata.sessionMetadata,
+		...protocol.sessionMetadata
+	};
 
 	const db = await openDatabase();
 	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
