@@ -1,0 +1,9 @@
+{
+	"$schema": "http://localhost:5173/registry.schema.json",
+	"protocols": [
+		{
+			"id": "io.github.cigaleapp.arthropods.example",
+			"url": "https://raw.githubusercontent.com/cigaleapp/cigale/main/examples/arthropods.cigaleprotocol.json"
+		}
+	]
+}
