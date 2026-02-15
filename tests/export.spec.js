@@ -1,6 +1,3 @@
-import path from 'node:path';
-import * as yauzl from 'yauzl-promise';
-
 import { issue } from './annotations.js';
 import { assert, expect, test } from './fixtures.js';
 import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
@@ -100,7 +97,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	  - list:
 	    - listitem:
 	      - img
-	      - text: results.zip ~221ko une fois dézippé
+	      - text: results.zip ~227ko une fois dézippé
 	    - list:
 	      - listitem:
 	        - img
@@ -111,13 +108,13 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées et images recadrées' });
-	await expect(downloadButton).toHaveText('Archive ZIP ~4,2Mo');
+	await expect(downloadButton).toHaveText('Archive ZIP ~4,4Mo');
 	await expect(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
 	      - img
-	      - text: results.zip ~4,4Mo une fois dézippé
+	      - text: results.zip ~4,6Mo une fois dézippé
 	    - list:
 	      - listitem:
 	        - img
@@ -144,7 +141,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées, images recadrées et images originales' });
-	await expect(downloadButton).toHaveText('Archive ZIP ~9,8Mo');
+	await expect(downloadButton).toHaveText('Archive ZIP ~10Mo');
 	await expect(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
@@ -193,7 +190,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ cropPadding: { px: 200 } });
-	await expect(downloadButton).toHaveText('Archive ZIP ~12Mo');
+	await expect(downloadButton).toHaveText('Archive ZIP ~13Mo');
 });
 
 test('export to a folder', async ({ page, app, browserName }) => {
