@@ -3,7 +3,15 @@ import { ArkErrors, scope, type } from 'arktype';
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
 import { keys, safeJSONStringify, unique } from '../utils.js';
-import { ColorHex, ID, Probability, TemplatedString, URLString } from './common.js';
+import {
+	ColorHex,
+	FileSize,
+	ID,
+	Probability,
+	TemplatedString,
+	UniqueFileTypeSpecifier,
+	URLString
+} from './common.js';
 import { NeuralBoundingBoxInference, NeuralEnumInference } from './neural.js';
 
 /**
@@ -42,6 +50,10 @@ export const METADATA_TYPES = /** @type {const} */ ({
 	boundingbox: {
 		label: "région d'image",
 		help: 'un objet représentant une région rectangulaire au format YOLO'
+	},
+	file: {
+		label: 'fichier',
+		help: 'un fichier, représenté par une référence à un MetadataFile, qui est exporté séparément'
 	}
 });
 
@@ -53,7 +65,8 @@ export const MetadataType = type.or(
 	type("'enum'", '@', METADATA_TYPES.enum.help),
 	type("'date'", '@', METADATA_TYPES.date.help),
 	type("'location'", '@', METADATA_TYPES.location.help),
-	type("'boundingbox'", '@', METADATA_TYPES.boundingbox.help)
+	type("'boundingbox'", '@', METADATA_TYPES.boundingbox.help),
+	type("'file'", '@', METADATA_TYPES.file.help)
 );
 
 /**
@@ -71,7 +84,8 @@ export const MetadataRuntimeValue = /** @type {const} */ ({
 	enum: type('string | number'),
 	date: type('Date'),
 	location: type({ latitude: 'number', longitude: 'number' }),
-	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' })
+	boundingbox: type({ x: 'number', y: 'number', w: 'number', h: 'number' }),
+	file: type(ID)
 });
 
 export const MetadataRuntimeValueAny = type.or(
@@ -150,7 +164,8 @@ export const MetadataRecord = type({
 				// Date is not compatible with JSON Schemas, use a datestring instead
 				'string.date.iso',
 				MetadataRuntimeValue.location,
-				MetadataRuntimeValue.boundingbox
+				MetadataRuntimeValue.boundingbox,
+				MetadataRuntimeValue.file
 			),
 			'@',
 			'Valeur de la métadonnée'
@@ -294,7 +309,7 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
  * @typedef {typeof EXIFInference.infer} EXIFInference
  */
 
-export const Metadata = type({
+const MetadataBase = type({
 	id: ID.describe(
 		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
 	),
@@ -321,59 +336,89 @@ export const Metadata = type({
 	learnMore: URLString.describe(
 		'Un lien pour en apprendre plus sur ce que cette métadonnée décrit'
 	).optional()
-}).and(
-	type.or(
-		{
-			type: '"boolean"',
-			'default?': MetadataDefault('boolean'),
-			'infer?': type.or({ exif: EXIFInference })
-		},
-		{
-			type: '"string"',
-			'default?': MetadataDefault('string'),
-			'infer?': type.or({ exif: EXIFInference })
-		},
-		{
-			type: '"integer"',
-			'default?': MetadataDefault('number.integer'),
-			'infer?': type.or({ exif: EXIFInference })
-		},
-		{
-			type: '"float"',
-			'default?': MetadataDefault('number'),
-			'infer?': type.or({ exif: EXIFInference })
-		},
-		{
-			type: '"date"',
-			'default?': MetadataDefault('string.date.iso'),
-			'infer?': type.or({ exif: EXIFInference })
-		},
-		{
-			type: '"location"',
-			'default?': MetadataDefault({ latitude: 'number', longitude: 'number' }),
-			'infer?': type({
-				latitude: type.or({ exif: EXIFInference }),
-				longitude: type.or({ exif: EXIFInference })
-			})
-		},
-		{
-			type: '"enum"',
-			'default?': MetadataDefault('string | number'),
-			'infer?': type.or({ exif: EXIFInference }, { neural: NeuralEnumInference.array() })
-		},
-		{
-			type: '"boundingbox"',
-			'default?': MetadataDefault({
-				x: '0 <= number <= 1',
-				y: '0 <= number <= 1',
-				w: '0 <= number <= 1',
-				h: '0 <= number <= 1'
-			}),
-			'infer?': type.or({
-				neural: NeuralBoundingBoxInference.array()
-			})
-		}
-	)
+});
+
+const MetadataBoolean = MetadataBase.and({
+	type: '"boolean"',
+	'default?': MetadataDefault('boolean'),
+	'infer?': type.or({ exif: EXIFInference })
+});
+
+const MetadataString = MetadataBase.and({
+	type: '"string"',
+	'default?': MetadataDefault('string'),
+	'infer?': type.or({ exif: EXIFInference })
+});
+
+const MetadataInteger = MetadataBase.and({
+	type: '"integer"',
+	'default?': MetadataDefault('number.integer'),
+	'infer?': type.or({ exif: EXIFInference })
+});
+
+const MetadataFloat = MetadataBase.and({
+	type: '"float"',
+	'default?': MetadataDefault('number'),
+	'infer?': type.or({ exif: EXIFInference })
+});
+
+const MetadataDate = MetadataBase.and({
+	type: '"date"',
+	'default?': MetadataDefault('string.date.iso'),
+	'infer?': type.or({ exif: EXIFInference })
+});
+
+const MetadataLocation = MetadataBase.and({
+	type: '"location"',
+	'default?': MetadataDefault({ latitude: 'number', longitude: 'number' }),
+	'infer?': type({
+		latitude: type.or({ exif: EXIFInference }),
+		longitude: type.or({ exif: EXIFInference })
+	})
+});
+
+const MetadataEnum = MetadataBase.and({
+	type: '"enum"',
+	'default?': MetadataDefault('string | number'),
+	'infer?': type.or({ exif: EXIFInference }, { neural: NeuralEnumInference.array() })
+});
+
+const MetadataBoundingbox = MetadataBase.and({
+	type: '"boundingbox"',
+	'default?': MetadataDefault({
+		x: '0 <= number <= 1',
+		y: '0 <= number <= 1',
+		w: '0 <= number <= 1',
+		h: '0 <= number <= 1'
+	}),
+	'infer?': type.or({
+		neural: NeuralBoundingBoxInference.array()
+	})
+});
+
+export const MetadataFile = MetadataBase.and({
+	type: '"file"',
+	'default?': 'null',
+	'infer?': 'null',
+	size: type({ 'minimum?': FileSize, 'maximum?': FileSize })
+		.describe('Limites sur la taille du fichier')
+		.default(() => ({})),
+	accept: UniqueFileTypeSpecifier.array()
+		.pipe((specs) => specs.join(', '))
+		.describe('Fichiers acceptés pour cette métadonnée')
+		.default(() => [])
+});
+
+export const Metadata = type.or(
+	MetadataBoolean,
+	MetadataString,
+	MetadataInteger,
+	MetadataFloat,
+	MetadataDate,
+	MetadataLocation,
+	MetadataEnum,
+	MetadataBoundingbox,
+	MetadataFile
 );
 
 /**

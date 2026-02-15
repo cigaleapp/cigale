@@ -72,6 +72,16 @@ export const HANDLEBARS_HELPERS = {
 			return splitFilenameOnExtension(subject)[1];
 		}
 	},
+	stem: {
+		documentation: 'Récupère le nom d’un fichier sans son extension',
+		usage: "{{ stem 'filename.jpeg' }} -> 'filename'",
+		/**
+		 * @param {string} subject
+		 */
+		implementation: (subject) => {
+			return splitFilenameOnExtension(subject)[0];
+		}
+	},
 	fallback: {
 		documentation: 'Fournit une valeur de repli si la première est indéfinie',
 		usage: "{{ fallback obj.does_not_exist 'Unknown' }} -> 'Unknown'",
@@ -306,3 +316,65 @@ export const TemplatedString = (Input, postprocess) =>
  */
 export const FilepathTemplate = (Input) =>
 	TemplatedString(Input, (path) => path.replaceAll('\\', '/'));
+
+export const MIMEType = type(
+	/^(application|audio|font|example|image|message|model|multipart|text|video|x-\w+)\/\w+$/
+);
+
+/**
+ * Describes valid values of `<input type=file>`'s "accept" list
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file#unique_file_type_specifiers
+ */
+export const UniqueFileTypeSpecifier = type.or(
+	[/^\..+$/, '@', 'Une extension de fichier'],
+	[MIMEType, '@', 'Un type MIME'],
+	['"audio/*"', '@', 'Un fichier audio'],
+	['"video/*"', '@', 'Un fichier vidéo'],
+	['"image/*"', '@', 'Un fichier image']
+);
+
+// XXX: Most JSON schema integrations don't support named capture groups...
+const FILE_SIZE_PATTERN =
+	// /^\s*(?<amount>\d+(\.\d+)?)\s+(?<prefix>[kMGTP])(?<binary>i?)(?<unit>[oBb])\s*$/i;
+	/^\s*(\d+(?:[.,]\d+)?)\s+([kMGTP]?)(i?)([oBb])\s*$/i;
+
+/**
+ * Parse a human-readable file size (e.g. "2.5 MB") into a number of bytes
+ */
+export const FileSize = type('number')
+	.describe('Une taille de fichier exprimée en octets')
+	.or(
+		type(FILE_SIZE_PATTERN)
+			.pipe.try((literal) => {
+				const match = literal.match(FILE_SIZE_PATTERN);
+				if (!match) throw new Error(`Invalid file size: ${literal}`);
+
+				const [_, amountString, prefix, binary, unit] = match;
+
+				let amount = Number.parseFloat(amountString.replace(',', '.'));
+				if (Number.isNaN(amount))
+					throw new Error(`Invalid file size amount: ${amountString} is ${amount}`);
+
+				const power = {
+					'': 0,
+					K: 3,
+					M: 6,
+					G: 9,
+					T: 12,
+					P: 15
+				}[prefix.toUpperCase()];
+
+				const base = binary ? 2 : 10;
+
+				amount *= Math.pow(base, power ?? 0);
+
+				if (unit === 'b') {
+					amount /= 8;
+				}
+
+				return amount;
+			})
+			.describe(
+				"Une taille de fichier sous une forme plus lisible comme '2.5 MB' (les suffixes k, M, G, T et P sont supportés, avec une base 10 ou 2 selon la présence du suffixe 'i', et les unités 'B'/'o' ou 'b' sont supportées pour indiquer si le nombre donné est en bits ou en octets)"
+			)
+	);

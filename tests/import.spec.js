@@ -6,6 +6,7 @@ import { assert, test } from './fixtures.js';
 import {
 	chooseFirstSession,
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
 	importPhotos,
 	importResults,
@@ -265,13 +266,8 @@ test.describe('correct results.zip', () => {
 
 	test('exporting does not fail', async ({ page, app }) => {
 		await app.tabs.go('results');
-		await page.getByText(/et images originales/i).click();
-		await page.getByRole('button', { name: 'Archive ZIP' }).click();
-		const download = await page.waitForEvent('download');
-		assert(download.suggestedFilename()).toBe('results.zip');
-
-		await download.saveAs('./tests/results/correct.zip');
-		await expectZipFiles(await yauzl.open('./tests/results/correct.zip'), [
+		const zip = await exportResults(page, { kind: 'full' });
+		await expectZipFiles(zip, [
 			'analysis.json',
 			'metadata.csv',
 			/^Cropped\/Allacma fusca_obs\d_1\.jpeg$/,

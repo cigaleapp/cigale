@@ -1,9 +1,12 @@
+import { ArkErrors } from 'arktype';
+
 import { computeCascades } from '$lib/cascades.js';
 import type * as DB from '$lib/database.js';
 import type { DatabaseHandle, ReactiveTableNames } from '$lib/idb.svelte.js';
 import {
 	ensureNamespacedMetadataId,
 	MetadataError,
+	MetadataValue,
 	namespacedMetadataId,
 	namespaceOfMetadataId,
 	type RuntimeValue
@@ -330,14 +333,19 @@ export async function deleteMetadataValue({
 	if (!image && !observation && !session && imagesFromImageFile.length === 0)
 		throw new Error(`Aucune image, observation ou session avec l'ID ${subjectId}`);
 
+	let deletedValue: ArkErrors | typeof MetadataValue.infer | undefined = undefined;
+
 	console.debug(`Delete metadata ${metadataId} in ${subjectId}`);
 	if (image) {
+		deletedValue = MetadataValue(structuredClone(image.metadata[metadataId]));
 		delete image.metadata[metadataId];
 		db.put('Image', image);
 	} else if (session) {
+		deletedValue = MetadataValue(structuredClone(session.metadata[metadataId]));
 		delete session.metadata[metadataId];
 		db.put('Session', session);
 	} else if (observation) {
+		deletedValue = MetadataValue(structuredClone(observation.metadataOverrides[metadataId]));
 		delete observation.metadataOverrides[metadataId];
 		db.put('Observation', observation);
 		if (recursive) {
@@ -363,6 +371,13 @@ export async function deleteMetadataValue({
 				metadataId,
 				reactive: false
 			});
+		}
+	}
+
+	if (!(deletedValue instanceof ArkErrors) && typeof deletedValue?.value === 'string') {
+		const metadataType = await db.get('Metadata', metadataId).then((m) => m?.type);
+		if (metadataType === 'file') {
+			await db.delete('MetadataValueFile', deletedValue.value);
 		}
 	}
 

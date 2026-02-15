@@ -1,19 +1,30 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import * as dates from 'date-fns';
+	import { fade } from 'svelte/transition';
 
 	import IconIncrement from '~icons/ri/add-line';
 	import IconError from '~icons/ri/error-warning-fill';
 	import IconDecrement from '~icons/ri/subtract-line';
+	import * as idb from '$lib/idb.svelte.js';
 
-	import type { Metadata, MetadataEnumVariant } from './database.js';
+	import ButtonInk from './ButtonInk.svelte';
+	import { generateId, type Metadata, type MetadataEnumVariant } from './database.js';
+	import FilePreview from './FilePreview.svelte';
+	import { promptForFiles } from './files.js';
+	import { formatBytesSize } from './i18n.js';
+	import LoadingText, { Loading } from './LoadingText.svelte';
 	import MetadataTypeswitch from './metadata/MetadataTypeswitch.svelte';
 	import MetadataCombobox from './MetadataCombobox.svelte';
+	import { sendNotification } from './notifications.js';
+	import OverflowableText from './OverflowableText.svelte';
 	import RadioButtons from './RadioButtons.svelte';
-	import type { RuntimeValue } from './schemas/metadata.js';
+	import type { MetadataFile, RuntimeValue } from './schemas/metadata.js';
+	import { uiState } from './state.svelte.js';
 	import Switch from './Switch.svelte';
+	import { toasts } from './toasts.svelte.js';
 	import { tooltip } from './tooltips.js';
-	import { compareBy, pick, readableOn, round, safeJSONParse } from './utils.js';
+	import { compareBy, gradientedColor, pick, readableOn, round, safeJSONParse } from './utils.js';
 	import WorldLocationCombobox from './WorldLocationCombobox.svelte';
 
 	interface Props {
@@ -39,7 +50,19 @@
 		onblur
 	}: Props = $props();
 
+	let savingFile = $state(false);
+
 	const { type } = $derived(definition);
+
+	let windowIsFocused = $state(true);
+	$effect(() => {
+		window.onfocus = () => {
+			windowIsFocused = true;
+		};
+		window.onblur = () => {
+			windowIsFocused = false;
+		};
+	});
 </script>
 
 <div
@@ -196,7 +219,129 @@
 			{#snippet location(value)}
 				<WorldLocationCombobox value={value as RuntimeValue<'location'>} {onblur} />
 			{/snippet}
-			{#snippet fallback()}
+			{#snippet file(currentFileId)}
+				{@const { accept, size } = definition as typeof MetadataFile.infer}
+				<div class="file-input">
+					{#await idb.get('MetadataValueFile', currentFileId ?? '')}
+						<div class="current">
+							<code class="size">
+								<LoadingText value={Loading} mask={formatBytesSize(100e3)} />
+							</code>
+							<div class="name">
+								<LoadingText value={Loading} />
+							</div>
+							<div class="actions"></div>
+						</div>
+						<div class="preview">
+							<FilePreview file={undefined} />
+						</div>
+					{:then fileObject}
+						<div class="current">
+							{#if fileObject}
+								<code
+									class="size"
+									use:tooltip={size.maximum
+										? `La taille maximale est de ${formatBytesSize(size.maximum)}`
+										: undefined}
+									style:color={size.maximum !== undefined
+										? fileObject.file.size > size.maximum
+											? 'var(--fg-error)'
+											: gradientedColor(
+													fileObject.file.size / size.maximum,
+													'fg-success',
+													'fg-warning'
+												)
+										: undefined}
+								>
+									{formatBytesSize(fileObject.file.size)}
+								</code>
+								<span class="name">
+									<OverflowableText text={fileObject.file.name} />
+								</span>
+							{:else}
+								<code
+									class="size"
+									use:tooltip={size.maximum
+										? `La taille maximale est de ${formatBytesSize(size.maximum)}`
+										: 'Aucune limite de taille'}
+								>
+									{#if size.maximum}
+										&lt;{formatBytesSize(size.maximum, 'narrow')}
+									{:else}
+										∞
+									{/if}
+								</code>
+								<div class="name empty">Aucun fichier</div>
+							{/if}
+
+							<div class="actions">
+								<ButtonInk
+									onclick={async () => {
+										const [file] = await promptForFiles({
+											accept
+										});
+
+										const savingStart = performance.now();
+										savingFile = true;
+
+										if (fileObject) {
+											await idb.drop('MetadataValueFile', fileObject.id);
+										}
+
+										if (!file) {
+											savingFile = false;
+											onblur(undefined);
+											return;
+										}
+
+										if (!uiState.currentSessionId) {
+											toasts.error(
+												"Aucune session active. Impossible d'enregistrer le fichier."
+											);
+											savingFile = false;
+											return;
+										}
+
+										const id = await idb.set('MetadataValueFile', {
+											id: generateId('MetadataValueFile'),
+											sessionId: uiState.currentSessionId,
+											file
+										});
+
+										const timeElapsed = performance.now() - savingStart;
+
+										if (
+											(!windowIsFocused && timeElapsed > 2_000) ||
+											timeElapsed > 5_000
+										) {
+											sendNotification(`${file.name} enregistré`, {
+												body: 'Le fichier a été enregistré avec succès'
+											});
+										}
+
+										savingFile = false;
+										onblur(id);
+									}}
+								>
+									{#if savingFile}
+										Chargement…
+									{:else if fileObject}
+										Modifier
+									{:else}
+										Ajouter
+									{/if}
+								</ButtonInk>
+							</div>
+						</div>
+						{#if fileObject}
+							<div class="preview" in:fade>
+								<FilePreview file={fileObject.file} />
+							</div>
+						{/if}
+					{/await}
+				</div>
+			{/snippet}
+			{#snippet boundingbox()}
 				<div class="unrepresentable" use:tooltip={JSON.stringify(value, null, 2)}>
 					<IconError />
 					<p>Irreprésentable</p>
@@ -259,14 +404,16 @@
 		}
 	}
 
-	.metadata-input:not([data-type='boolean']):not(.compact-enum):not(:has(.unrepresentable)) {
+	.metadata-input:not(
+		:is([data-type='boolean'], [data-type='file'], [data-type='boundingbox'], .compact-enum)
+	) {
 		border-bottom: 2px dashed var(--fg-neutral);
 		display: flex;
 		align-items: center;
-	}
 
-	.metadata-input:not([data-type='boolean']):not(.compact-enum):focus-within {
-		border-bottom-style: solid;
+		&:focus-within {
+			border-bottom-style: solid;
+		}
 	}
 
 	.unrepresentable {
@@ -280,5 +427,48 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+	}
+
+	.metadata-input[data-type='file'] {
+		flex-grow: 1;
+		width: 100%;
+	}
+
+	.file-input {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+
+		.current {
+			display: flex;
+			gap: 1em;
+			align-items: center;
+		}
+
+		.size {
+			font-size: 0.8em;
+			/* "000" + " " + "kB" */
+			width: calc(3ch + 1ch + 2ch);
+		}
+
+		.name.empty {
+			color: var(--gay);
+		}
+
+		.name {
+			display: flex;
+			align-items: center;
+			line-height: 1.2;
+			vertical-align: middle;
+		}
+
+		.actions {
+			margin-left: auto;
+		}
+
+		.preview {
+			height: 25vh;
+		}
 	}
 </style>

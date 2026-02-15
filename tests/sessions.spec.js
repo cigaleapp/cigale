@@ -6,10 +6,12 @@ import {
 	chooseInDropdown,
 	deleteSession,
 	goToProtocolManagement,
+	goToSessionPage,
 	importPhotos,
 	importProtocol,
 	loadDatabaseDump,
 	newSession,
+	pickFiles,
 	sessionMetadataSectionFor,
 	setInferenceModels,
 	switchSession
@@ -512,4 +514,110 @@ test('session metadata form has default values', async ({ page, app }) => {
 	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
 		'custom code'
 	);
+});
+
+test('can set file-type metadata', async ({ page, app, browserName }) => {
+	test.skip(
+		browserName === 'webkit',
+		'Unsupported on webkit, see https://stackoverflow.com/questions/59138045/error-indexeddb-error-preparing-blob-file-to-be-stored-in-object-store'
+	);
+
+	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+	await app.settings.set({ showTechnicalMetadata: false });
+	await newSession(page, { name: 'Test' });
+	await goToSessionPage(page);
+
+	const metadataKey = 'io.github.cigaleapp.kitchensink__sessionwide_file';
+
+	const fileMetadata = sessionMetadataSectionFor(page, 'Sessionwide file');
+
+	// Make sure DB is clean
+	assert(await app.db.count('MetadataValueFile')).toBe(0);
+
+	/**
+	 * @param {{size: number, type: string, name: string}} expected
+	 */
+	async function expectFileInDB(expected) {
+		const session = await app.db.session.byName('Test');
+		if (!session) throw new Error('Session not found');
+
+		assert(session.metadata).toHaveProperty([metadataKey]);
+		const fileId = String(JSON.parse(session.metadata[metadataKey].value));
+
+		const file = await page.evaluate(async (fileId) => {
+			const value = await window.DB.get('MetadataValueFile', fileId);
+			if (!value) return;
+			return {
+				id: value.id,
+				file: {
+					name: value.file.name,
+					type: value.file.type,
+					size: value.file.size
+				}
+			};
+		}, fileId);
+
+		expect(file).toMatchObject({
+			id: fileId,
+			file: expected
+		});
+	}
+
+	await expect(fileMetadata).toHaveText(/<1,2Mo/);
+	await expect(fileMetadata).toHaveText(/Aucun fichier/);
+
+	// Empty -> a file
+
+	await pickFiles(fileMetadata.getByRole('button', { name: 'Ajouter' }), '20K-gray.jpeg');
+
+	await expect(fileMetadata).toHaveText(/1,6\sMo/);
+	await expect(fileMetadata.locator('code.size')).toHaveTooltip(
+		'La taille maximale est de 1,2 Mo'
+	);
+	await expect(fileMetadata).toHaveText(/20K-gray\.jpeg/);
+	await expect(fileMetadata.getByRole('img', { name: '20K-gray.jpeg' })).toHaveScreenshot();
+
+	await page.waitForTimeout(500); // XXX: Wait for DB write
+
+	await expectFileInDB({
+		name: '20K-gray.jpeg',
+		type: 'image/jpeg',
+		size: 1_562_661
+	});
+
+	// A file -> another file
+
+	await pickFiles(fileMetadata.getByRole('button', { name: 'Modifier' }), 'large-image.jpeg');
+
+	await expect(fileMetadata).toHaveText(/792\sko/);
+	await expect(fileMetadata).toHaveText(/large-image\.jpeg/);
+	await expect(fileMetadata.getByRole('img', { name: 'large-image.jpeg' })).toHaveScreenshot();
+
+	await page.waitForTimeout(500); // XXX: Wait for DB write
+
+	// Old file should be deleted
+	expect(await app.db.count('MetadataValueFile')).toBe(1);
+
+	await expectFileInDB({
+		name: 'large-image.jpeg',
+		type: 'image/jpeg',
+		size: 792_031
+	});
+
+	// A file -> empty
+
+	await fileMetadata.getByRole('button', { name: 'Supprimer cette valeur' }).click();
+
+	await expect(fileMetadata).toHaveText(/Aucun fichier/);
+	await expect(fileMetadata).not.toHaveText(/large-image\.jpeg/);
+
+	await page.waitForTimeout(500); // XXX: Wait for DB write
+
+	// File should be deleted
+	expect(await app.db.count('MetadataValueFile')).toBe(0);
+
+	const session = await app.db.session.byName('Test');
+	if (!session) throw new Error('Session not found');
+
+	expect(session.metadata).not.toHaveProperty([metadataKey]);
 });

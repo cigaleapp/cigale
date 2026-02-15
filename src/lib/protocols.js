@@ -63,6 +63,11 @@ export async function toExportedProtocol(db, protocol) {
 			...protocol.exports,
 			...(protocol.exports
 				? {
+						metadata: {
+							csv: protocol.exports.metadata.csv,
+							json: protocol.exports.metadata.json,
+							files: protocol.exports.metadata.files.toJSON()
+						},
 						images: {
 							cropped: protocol.exports.images.cropped.toJSON(),
 							original: protocol.exports.images.original.toJSON()

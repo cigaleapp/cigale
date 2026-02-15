@@ -48,6 +48,11 @@ export type AppFixture = {
 	db: {
 		ready(): Promise<void>;
 		refresh(): Promise<void>;
+		get<T extends keyof IDBDatabaseType>(
+			name: T,
+			key: string
+		): Promise<undefined | IDBDatabaseType[T]['value']>;
+		count(name: keyof IDBDatabaseType): Promise<number>;
 		protocol: {
 			byId(id: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
 			byName(name: string): Promise<IDBDatabaseType['Protocol']['value'] | undefined>;
@@ -146,6 +151,12 @@ export const test = base.extend<{ forEachTest: void; app: AppFixture }, { forEac
 					await page.evaluate(async () => {
 						window.refreshDB();
 					});
+				},
+				async get<T extends keyof IDBDatabaseType>(name: T, key: string) {
+					return getDatabaseRowById(page, name, key);
+				},
+				async count(name) {
+					return page.evaluate(async (name) => window.DB.count(name), name);
 				},
 				protocol: {
 					byId: async (id) => getDatabaseRowById(page, 'Protocol', id),

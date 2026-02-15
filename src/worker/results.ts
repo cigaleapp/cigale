@@ -20,10 +20,18 @@ import {
 import { observationMetadata } from '$lib/observations.js';
 import { defaultCropMetadata } from '$lib/protocols.js';
 import { Analysis } from '$lib/schemas/exports.js';
-import { MetadataRuntimeValue, MetadataValues } from '$lib/schemas/metadata';
-import { ExportsFilepathTemplate } from '$lib/schemas/protocols';
-import { toMetadataRecord } from '$lib/schemas/results';
-import { compareBy, mapValues, progressSplitter, sum } from '$lib/utils';
+import {
+	MetadataRuntimeValue,
+	MetadataValues,
+	removeNamespaceFromMetadataId,
+	type RuntimeValue
+} from '$lib/schemas/metadata';
+import {
+	ExportsFilepathTemplateMetadataFile,
+	ExportsFilepathTemplateObservation
+} from '$lib/schemas/protocols';
+import { AnalyzedImage, AnalyzedObservation, toMetadataRecord } from '$lib/schemas/results';
+import { compareBy, entries, mapValues, nonnull, progressSplitter, sum } from '$lib/utils';
 
 import { Schemas } from '../lib/database.js';
 import { toCSV } from '../lib/results.svelte.js';
@@ -55,15 +63,16 @@ swarp.generateResultsExport(
 
 		const splitProgress = progressSplitter('prepare', 0.7, 'encode');
 
-		const { exportedObservations, filepaths, cropMetadata } = await prepare({
-			protocolUsed,
-			sessionId,
-			db,
-			abortSignal,
-			onProgress(p) {
-				notify({ event: 'progress', data: splitProgress('prepare', p) });
-			}
-		});
+		const { exportedObservations, exportedMetadataFiles, filepaths, cropMetadata } =
+			await prepare({
+				protocolUsed,
+				sessionId,
+				db,
+				abortSignal,
+				onProgress(p) {
+					notify({ event: 'progress', data: splitProgress('prepare', p) });
+				}
+			});
 
 		const allMetadataKeys = [
 			...new Set(
@@ -79,10 +88,36 @@ swarp.generateResultsExport(
 			filename: string;
 		}> = [];
 
+		const files: Record<string, { contents: Uint8Array | string; mtime?: Date | undefined }> =
+			{};
+
 		let total = 1;
 		let done = 0;
 
 		abortSignal?.throwIfAborted();
+
+		total += exportedMetadataFiles.length;
+		for (const { file, path } of exportedMetadataFiles) {
+			abortSignal?.throwIfAborted();
+
+			files[path] = {
+				contents: await file.bytes(),
+				mtime: file.lastModified ? new Date(file.lastModified) : undefined
+			};
+
+			if (format === 'folder') {
+				notify({
+					event: 'writeFile',
+					data: {
+						filepath: path,
+						contents: files[path].contents
+					}
+				});
+			}
+
+			done++;
+			notify({ event: 'progress', data: splitProgress('encode', done / total) });
+		}
 
 		if (include !== 'metadataonly') {
 			total += observations.flatMap((o) => o.images).length;
@@ -171,9 +206,6 @@ swarp.generateResultsExport(
 
 		abortSignal?.throwIfAborted();
 
-		const files: Record<string, { contents: Uint8Array | string; mtime?: Date | undefined }> =
-			{};
-
 		files[filepaths.metadata.json] = {
 			contents: stringifyWithToplevelOrdering(
 				'json',
@@ -183,6 +215,9 @@ swarp.generateResultsExport(
 						...session,
 						metadata: toMetadataRecord(session.metadata)
 					},
+					files: Object.fromEntries(
+						exportedMetadataFiles.map(({ id, path }) => [id, path])
+					),
 					observations: exportedObservations
 				}),
 				['protocol', 'observations']
@@ -339,7 +374,7 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 	if (!protocolUsed) throw new Error(`Protocol with ID ${protocolId} not found`);
 	abortSignal?.throwIfAborted();
 
-	const { exportedObservations, filepaths } = await prepare({
+	const { exportedObservations, filepaths, exportedMetadataFiles } = await prepare({
 		protocolUsed,
 		sessionId,
 		db,
@@ -347,19 +382,29 @@ swarp.previewResultsZip(async ({ sessionId, include }, _, { abortSignal }) => {
 	});
 
 	return {
-		'metadata.csv': [filepaths.metadata.csv],
-		'metadata.json': [filepaths.metadata.json],
+		'metadata.csv': [{ path: filepaths.metadata.csv, contentType: 'text/csv' }],
+		'metadata.json': [{ path: filepaths.metadata.json, contentType: 'application/json' }],
+		'metadata.files': exportedMetadataFiles.map(({ path, file }) => ({
+			path,
+			contentType: file.type
+		})),
 		'images.cropped':
 			include === 'metadataonly'
 				? []
 				: Object.values(exportedObservations).flatMap((o) =>
-						o.images.map((i) => i.exportedAs.cropped)
+						o.images.map((i) => ({
+							path: i.exportedAs.cropped,
+							contentType: i.contentType
+						}))
 					),
 		'images.original':
 			include !== 'full'
 				? []
 				: Object.values(exportedObservations).flatMap((o) =>
-						o.images.map((i) => i.exportedAs.original)
+						o.images.map((i) => ({
+							path: i.exportedAs.original,
+							contentType: i.contentType
+						}))
 					)
 	};
 });
@@ -374,6 +419,12 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 	const protocolUsed = await db.get('Protocol', protocolId).then(Schemas.Protocol.assert);
 	if (!protocolUsed) throw new Error(`Protocol with ID ${protocolId} not found`);
 	abortSignal?.throwIfAborted();
+
+	const metadataValueFiles = await db.getAllFromIndex(
+		'MetadataValueFile',
+		'sessionId',
+		sessionId
+	);
 
 	const observations = await db.getAllFromIndex('Observation', 'sessionId', sessionId);
 	const images = await Promise.all(
@@ -413,6 +464,7 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 	const estimations = {
 		json: (5300e3 / 94) * Object.keys(observations).length,
 		csv: (30e3 / 94) * Object.keys(observations).length,
+		files: sum(metadataValueFiles.map(({ file }) => file.size)),
 		full: sum(
 			images.map(({ fileId }) => {
 				if (!fileId) return 0;
@@ -449,7 +501,8 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 		json: 1 - 0.93,
 		csv: 1 - 0.7,
 		cropped: 1,
-		full: 1
+		full: 1,
+		files: 1
 	} satisfies Record<keyof typeof estimations, number>;
 
 	function computeEstimates(...things: (keyof typeof estimations)[]) {
@@ -461,11 +514,11 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 
 	switch (include) {
 		case 'metadataonly':
-			return computeEstimates('json', 'csv');
+			return computeEstimates('json', 'csv', 'files');
 		case 'croppedonly':
-			return computeEstimates('json', 'csv', 'cropped');
+			return computeEstimates('json', 'csv', 'files', 'cropped');
 		case 'full':
-			return computeEstimates('json', 'csv', 'cropped', 'full');
+			return computeEstimates('json', 'csv', 'files', 'cropped', 'full');
 		default:
 			throw new Error(`Unknown include type: ${include}`);
 	}
@@ -481,27 +534,29 @@ async function prepare({
 	protocolUsed: DB.Protocol;
 	sessionId: string;
 	db: DatabaseHandle;
-	abortSignal?: AbortSignal;
-	onProgress?: (progress: number) => void;
+	abortSignal?: AbortSignal | undefined;
+	onProgress?: undefined | ((progress: number) => void);
 }) {
 	const filepaths = protocolUsed.exports ?? {
 		images: {
-			cropped: ExportsFilepathTemplate.assert(
+			cropped: ExportsFilepathTemplateObservation.assert(
 				'cropped/{{sequence}}.{{extension image.filename}}'
 			),
-			original: ExportsFilepathTemplate.assert(
+			original: ExportsFilepathTemplateObservation.assert(
 				'original/{{sequence}}.{{extension image.filename}}'
 			)
 		},
 		metadata: {
 			json: 'analysis.json',
-			csv: 'metadata.csv'
+			csv: 'metadata.csv',
+			files: ExportsFilepathTemplateMetadataFile.assert(
+				'files/{{metadataKey}}/{{stem filename}}-{{id}}.{{extension filename}}'
+			)
 		}
 	};
 
-	const metadataDefinitions = await db
-		.getAll('Metadata')
-		.then((ms) => ms.map((m) => Schemas.Metadata.assert(m)));
+	const metadataDefinitionsRaw = await db.getAll('Metadata');
+	const metadataDefinitions = metadataDefinitionsRaw.map((m) => Schemas.Metadata.assert(m));
 	abortSignal?.throwIfAborted();
 
 	const cropMetadata = defaultCropMetadata(protocolUsed, metadataDefinitions);
@@ -511,6 +566,13 @@ async function prepare({
 			`No crop metadata defined for protocol ${protocolUsed.id}, and default crop metadata does not apply to this protocol`
 		);
 	}
+
+	const session = await db.get('Session', sessionId).then(Schemas.Session.assert);
+	const metadataValueFiles = await db.getAllFromIndex(
+		'MetadataValueFile',
+		'sessionId',
+		sessionId
+	);
 
 	const sessionObservations = await db
 		.getAllFromIndex('Observation', 'sessionId', sessionId)
@@ -532,7 +594,7 @@ async function prepare({
 	});
 	abortSignal?.throwIfAborted();
 
-	const exportedObservations: (typeof Analysis.inferIn)['observations'] = {};
+	const exportedObservations: Record<string, typeof AnalyzedObservation.infer> = {};
 	let sequence = 1;
 	let observationNumber = 0;
 
@@ -612,5 +674,80 @@ async function prepare({
 		}
 	}
 
-	return { exportedObservations, filepaths, cropMetadata };
+	const exportedMetadataFiles = metadataValueFiles
+		.map(({ file, id }) => {
+			// Find metadata value associated with this file
+			let source:
+				| undefined
+				| {
+						kind: 'session' | 'observation' | 'image';
+						metadataId: string;
+						image?: typeof AnalyzedImage.inferOut;
+						observation?: typeof AnalyzedObservation.inferOut;
+				  };
+
+			function matches(candidate: {
+				metadataId: string;
+				value: RuntimeValue | null;
+			}): boolean {
+				return (
+					candidate.value === id &&
+					metadataDefinitions.find((m) => m.id === candidate.metadataId)?.type === 'file'
+				);
+			}
+
+			source = entries(session.metadata)
+				.map(([metadataId, { value }]) => ({
+					kind: 'session' as const,
+					metadataId,
+					value
+				}))
+				.find(matches);
+
+			source ??= Object.values(exportedObservations)
+				.flatMap((o) =>
+					entries(o.metadata).map(([metadataId, { value }]) => ({
+						kind: 'observation' as const,
+						metadataId,
+						value,
+						observation: o
+					}))
+				)
+				.find(matches);
+
+			source ??= Object.values(exportedObservations)
+				.flatMap((o) => o.images.map((i) => [o, i] as const))
+				.flatMap(([o, i]) =>
+					entries(i.metadata).map(([metadataId, { value }]) => ({
+						kind: 'image' as const,
+						metadataId,
+						value,
+						image: i,
+						observation: o
+					}))
+				)
+				.find(matches);
+
+			if (!source) {
+				console.warn(`Could not find source for metadata value file with ID ${id}`);
+				return;
+			}
+
+			const path = filepaths.metadata.files.render({
+				id,
+				metadataKey: removeNamespaceFromMetadataId(source.metadataId),
+				metadata: metadataDefinitionsRaw.find((m) => m.id === source.metadataId)!,
+				session: source.kind === 'session' ? { id: sessionId } : undefined,
+				observation: source.observation,
+				image: source.image,
+				filename: file.name,
+				size: file.size,
+				contentType: file.type
+			});
+
+			return { id, path, file };
+		})
+		.filter(nonnull);
+
+	return { exportedObservations, filepaths, cropMetadata, exportedMetadataFiles };
 }

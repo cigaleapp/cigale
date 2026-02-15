@@ -4,12 +4,22 @@
 	import IconCroppedImage from '~icons/ri/crop-line';
 	import IconCsvFile from '~icons/ri/file-chart-line';
 	import IconJsonFile from '~icons/ri/file-code-line';
+	import IconFileImage from '~icons/ri/file-image-line';
 	import IconFile from '~icons/ri/file-line';
+	import IconFileAudio from '~icons/ri/file-music-line';
+	import IconFilePDF from '~icons/ri/file-pdf-2-line';
+	import IconFileText from '~icons/ri/file-text-line';
+	import IconFileVideo from '~icons/ri/file-video-line';
 	import IconZipFile from '~icons/ri/file-zip-line';
 	import IconFolder from '~icons/ri/folder-2-line';
 	import IconFolderNew from '~icons/ri/folder-add-line';
 	import IconFullImage from '~icons/ri/image-2-line';
-	import type { NodeProvenance, TreeNode, TreeNodeMaybeLoading } from '$lib/file-tree.js';
+	import type {
+		NodeProvenance,
+		TreeLeaf,
+		TreeNode,
+		TreeNodeMaybeLoading
+	} from '$lib/file-tree.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import { toasts } from '$lib/toasts.svelte.js';
 	import Tooltip from '$lib/Tooltip.svelte';
@@ -46,7 +56,7 @@
 		}
 	}
 
-	function iconOfNode(provenance: NodeProvenance): Component {
+	function iconOfNode({ provenance, contentType }: TreeLeaf): Component {
 		switch (provenance) {
 			case 'metadata.csv':
 				return IconCsvFile;
@@ -56,6 +66,13 @@
 				return IconCroppedImage;
 			case 'images.original':
 				return IconFullImage;
+			default:
+				if (contentType.startsWith('image/')) return IconFileImage;
+				if (contentType.startsWith('audio/')) return IconFileAudio;
+				if (contentType.startsWith('video/')) return IconFileVideo;
+				if (contentType === 'application/pdf') return IconFilePDF;
+				if (contentType.startsWith('text/')) return IconFileText;
+				return IconFile;
 		}
 	}
 
@@ -160,7 +177,7 @@
 						</Badge>
 					{/if}
 				{:else}
-					{@const Icon = iconOfNode(child.provenance)}
+					{@const Icon = iconOfNode(child)}
 					<Icon />
 					<div class="text">
 						<span class="filename">

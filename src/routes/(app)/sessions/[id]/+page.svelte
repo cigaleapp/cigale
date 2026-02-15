@@ -112,7 +112,6 @@
 						definition={def}
 						{value}
 						onchange={async (v) => {
-							console.log(v, value);
 							if (dequal(v, value?.value)) return;
 
 							if (v !== undefined) {

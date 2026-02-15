@@ -46,6 +46,8 @@ async function namespacedDeclarations(
 	return [
 		`export namespace ${namespace} {`,
 		`export const root = "${root.replaceAll('\\', '/')}";`,
+		`export type Any = ${Object.keys(decls).join(' | ')};`,
+		`export type Absolute<T extends Any = Any> = ${'`${typeof root}/${T}`'}`,
 		...(await filepathTypesDeclarations(root, decls)),
 		'};'
 	];

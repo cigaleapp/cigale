@@ -16,7 +16,7 @@ export const previewingPrNumber =
 	import.meta.env.previewingPrNumber === 'null' ? null : import.meta.env.previewingPrNumber;
 
 export const databaseName = previewingPrNumber ? `previews/pr-${previewingPrNumber}` : 'database';
-export const databaseRevision = 5;
+export const databaseRevision = 6;
 
 /**
  * @typedef {typeof import('./database.js').NO_REACTIVE_STATE_TABLES[number]} NonReactiveTableNames
