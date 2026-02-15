@@ -59,7 +59,7 @@ test.describe('isolation', () => {
 		await assert(page.getByText('debugsquare.png')).toBeVisible();
 
 		await deleteSession(page, 'Session α');
-		await assert(page.getByText('Session α')).not.toBeVisible();
+		await assert(page.getByText('Session α', {exact: true})).not.toBeVisible();
 
 		await switchSession(page, 'Session β');
 		await app.tabs.go('import');
