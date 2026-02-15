@@ -165,7 +165,7 @@ if (import.meta.vitest) {
  * @param {Intl.NumberFormatOptions['unitDisplay']} [unitDisplay] unit display style
  * @returns {string} formatted size
  */
-export function formatBytesSize(bytes, unitDisplay = 'short'	) {
+export function formatBytesSize(bytes, unitDisplay = 'short') {
 	// SI powers (so, in terms of powers of ten and not powers of two)
 	const power = bytes < 1e3 ? 0 : bytes < 1e6 ? 3 : bytes < 1e9 ? 6 : bytes < 1e12 ? 9 : 12;
 

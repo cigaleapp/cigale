@@ -75,7 +75,7 @@ export function gatherToTree({
 			paths: [deeper.join('/')],
 			provenance,
 			help,
-			contentType,
+			contentType
 		});
 	}
 }
@@ -212,7 +212,6 @@ if (import.meta.vitest) {
 											help: 'Cropped image',
 											provenance: 'images.cropped',
 											contentType: 'image/jpeg'
-
 										}
 									]
 								}

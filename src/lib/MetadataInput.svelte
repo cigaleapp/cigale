@@ -309,7 +309,9 @@
 											contentType: file.type,
 											filename: file.name,
 											bytes: await file.arrayBuffer(),
-											lastModifiedAt: new Date(file.lastModified || Date.now()).toISOString()
+											lastModifiedAt: new Date(
+												file.lastModified || Date.now()
+											).toISOString()
 										});
 
 										const timeElapsed = performance.now() - savingStart;

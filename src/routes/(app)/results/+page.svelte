@@ -152,7 +152,13 @@
 
 		const tree: TreeNode = [];
 		for (const [provenance, files] of entries(preview)) {
-			gatherToTree({ tree, paths: files.map(f => f.path), provenance, contentType : path => files.find(f => f.path === path)?.contentType ?? 'application/octet-stream' });
+			gatherToTree({
+				tree,
+				paths: files.map((f) => f.path),
+				provenance,
+				contentType: (path) =>
+					files.find((f) => f.path === path)?.contentType ?? 'application/octet-stream'
+			});
 		}
 		return tree;
 	}

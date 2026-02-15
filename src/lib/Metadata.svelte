@@ -184,7 +184,7 @@
 	<button
 		class="clear"
 		use:tooltip={'Supprimer cette valeur'}
-							aria-label="Supprimer cette valeur"
+		aria-label="Supprimer cette valeur"
 		disabled={!value}
 		onclick={() => {
 			if (!value) return;
