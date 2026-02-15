@@ -70,6 +70,7 @@
 			}
 		});
 
+		await switchSession(id);
 		await goto('/(app)/sessions/[id]', { id });
 	}
 </script>
@@ -142,6 +143,7 @@
 							fills
 							onclick={async (e) => {
 								e.stopPropagation();
+								await switchSession(id);
 								await goto('/(app)/sessions/[id]', { id });
 							}}
 						>
