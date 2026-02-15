@@ -41,6 +41,17 @@ sessionMetadata:
     type: float
     description: 'This metadata has no default value, so it will be undefined if not set'
 
+  sessionwide_file:
+    label: sessionwide file
+    mergeMethod: none
+    required: false
+    type: file
+    description: 'A file that is accessible from all snippets in the session'
+    size:
+      minimum: 1 Ko
+      maximum: 1.2 Mo
+    accept: [.jpeg, .jpg, .png, image/tiff, video/*]
+
 metadata:
   crop:
     type: boundingbox
@@ -105,6 +116,22 @@ metadata:
     required: false
     type: location
 
+  sidecar:
+    description: sidecar file
+    label: sidecar
+    mergeMethod: none
+    required: false
+    type: file
+    accept: [application/json, application/yaml]
+
 crop:
-  metadata: crop
   padding: 0px
+
+exports:
+  images:
+    cropped: image-{{ sequence }}.cropped.{{ extension image.filename }}
+    original: image-{{ sequence }}.{{ extension image.filename }}
+  metadata:
+    csv: metadata.csv
+    json: analysis.json
+    files: file-{{ metadataKey }}-{{ filename }}

@@ -53,7 +53,7 @@ export async function setImageMetadata({ page }, id, metadata, { refreshDB = tru
 export function sidepanelMetadataSectionFor(page, metadataLabel) {
 	return page
 		.getByTestId('sidepanel')
-		.locator('section')
+		.locator('.metadata')
 		.filter({
 			hasText: metadataLabel
 		})
@@ -68,7 +68,7 @@ export function sidepanelMetadataSectionFor(page, metadataLabel) {
 export function sessionMetadataSectionFor(page, metadataLabel) {
 	return page
 		.getByTestId('session-metadata')
-		.locator('section')
+		.locator('.metadata')
 		.filter({
 			hasText: metadataLabel
 		})

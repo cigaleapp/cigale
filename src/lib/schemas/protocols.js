@@ -4,6 +4,7 @@ import {
 	FilepathTemplate,
 	HTTPRequest,
 	ID,
+	MIMEType,
 	References,
 	TemplatedString,
 	URLString
@@ -12,12 +13,30 @@ import { Metadata, namespacedMetadataId } from './metadata.js';
 import { Image, Observation } from './observations.js';
 import { AnalyzedImage, AnalyzedObservation } from './results.js';
 
-export const ExportsFilepathTemplate = FilepathTemplate(
+export const ExportsFilepathTemplateObservation = FilepathTemplate(
 	type({
 		observation: AnalyzedObservation.omit('images'),
 		image: AnalyzedImage.omit('exportedAs')
 		// TODO deprecate these, put them in the image object only
 	}).and(AnalyzedImage.pick('sequence', 'numberInObservation'))
+);
+
+export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
+	type({
+		observation: ['undefined', '|', AnalyzedObservation.omit('images')],
+		image: ['undefined', '|', AnalyzedImage.omit('exportedAs')],
+		session: ['undefined', '|', { id: 'string' }],
+		metadata: Metadata,
+		metadataKey: ['string', '@', 'ID de la métadonnée, sans namespace'],
+		size: ['number', '@', 'Taille du fichier en octets'],
+		filename: 'string',
+		contentType: MIMEType,
+		id: [
+			'string',
+			'@',
+			'Référence du fichier, correspondant à la valeur de la métadonnée de type "file"'
+		]
+	})
 );
 
 export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
@@ -78,8 +97,8 @@ export const Protocol = type({
 	}).describe('Configuration de la partie recadrage'),
 	exports: type({
 		images: type({
-			cropped: ExportsFilepathTemplate.describe('Chemins des images recadrées'),
-			original: ExportsFilepathTemplate.describe('Chemins des images originales'),
+			cropped: ExportsFilepathTemplateObservation.describe('Chemins des images recadrées'),
+			original: ExportsFilepathTemplateObservation.describe('Chemins des images originales'),
 			'mtime?': [
 				'string',
 				'@',
@@ -96,7 +115,12 @@ export const Protocol = type({
 				.default(ANALYSIS_JSON_ZIP_FILEPATH),
 			csv: type.string
 				.describe("Chemin du fichier CSV contenant les résultats de l'analyse")
-				.pipe((path) => path.replaceAll('\\', '/'))
+				.pipe((path) => path.replaceAll('\\', '/')),
+			files: ExportsFilepathTemplateMetadataFile.describe(
+				'Chemins où sauvegarder les fichiers pour les métadonnées de type "file". Même syntaxe que pour les images, mais avec en plus {{metadata}} pour accéder à la métadonnée elle-même, {{metadataKey}} pour accéder à la clé de la métadonnée (sans namespace), {{filename}} pour le nom du fichier, {{contentType}} pour son type MIME, {{id}} pour sa référence (cette référence est ce qui est stocké dans la valeur de la métadonnée de type "file", et peut être utilisée pour faire le lien entre les fichiers et les métadonnées), et {{size}} pour sa taille en octets.'
+			).default(
+				'{{ metadataKey }}-files/{{ stem filename }}-{{ id }}.{{ extension filename }}'
+			)
 		}
 	})
 		.describe("La structure du fichier .zip d'export pour ce protocole.")

@@ -30,28 +30,32 @@ export async function load({ parent }) {
 		tree: nodes,
 		provenance: 'metadata.csv',
 		paths: [csv],
-		help: 'Métadonnées des images exportées'
+		help: 'Métadonnées des images exportées',
+		contentType: () => 'text/csv'
 	});
 
 	gatherToTree({
 		tree: nodes,
 		provenance: 'metadata.json',
 		paths: [json],
-		help: "Export JSON complet de l'analyse"
+		help: "Export JSON complet de l'analyse",
+		contentType: () => 'application/json'
 	});
 
 	gatherToTree({
 		tree: nodes,
 		provenance: 'images.cropped',
 		paths: [cropped.toJSON()],
-		help: 'Images recadrées'
+		help: 'Images recadrées',
+		contentType: () => 'image/x-unknown'
 	});
 
 	gatherToTree({
 		tree: nodes,
 		provenance: 'images.original',
 		paths: [original.toJSON()],
-		help: 'Images originales'
+		help: 'Images originales',
+		contentType: () => 'image/x-unknown'
 	});
 
 	return { protocol, initialTree: nodes };

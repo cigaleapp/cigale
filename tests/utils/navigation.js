@@ -24,6 +24,14 @@ export async function goHome(page) {
 }
 
 /**
+ * @param {Page} page
+ */
+export async function goToSessionPage(page) {
+	await page.getByTestId('goto-current-session').click();
+	await waitForRoute(page, '/(app)/sessions/[id]');
+}
+
+/**
  *
  * @param {import('$lib/i18n').Language} lang
  */

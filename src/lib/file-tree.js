@@ -3,6 +3,7 @@ import { type } from 'arktype';
 export const NodeProvenance = type.enumerated(
 	'metadata.json',
 	'metadata.csv',
+	'metadata.files',
 	'images.cropped',
 	'images.original'
 );
@@ -17,6 +18,7 @@ export const NodeProvenance = type.enumerated(
 /**
  * @typedef {object} TreeLeaf
  * @property {string} filename
+ * @property {string} contentType
  * @property {string} help
  * @property {NodeProvenance} provenance
  */
@@ -37,15 +39,23 @@ export const NodeProvenance = type.enumerated(
  * @param {boolean} [arg.isDirectory=false] whether the path is a directory
  * @param {string} [arg.help]
  * @param {NodeProvenance} arg.provenance
+ * @param {(path: string) => string} arg.contentType get the contenttype for a given path
  */
-export function gatherToTree({ tree, paths, provenance, isDirectory = false, help = '' }) {
+export function gatherToTree({
+	tree,
+	paths,
+	provenance,
+	isDirectory = false,
+	help = '',
+	contentType
+}) {
 	for (const path of paths) {
 		const [current, ...deeper] = splitPath(path);
 		if (deeper.length === 0) {
 			if (isDirectory) {
 				tree.push({ folder: current, provenance, children: [] });
 			} else {
-				tree.push({ filename: current, help, provenance });
+				tree.push({ filename: current, help, provenance, contentType: contentType(path) });
 			}
 			return;
 		}
@@ -64,7 +74,8 @@ export function gatherToTree({ tree, paths, provenance, isDirectory = false, hel
 			tree: folder.children,
 			paths: [deeper.join('/')],
 			provenance,
-			help
+			help,
+			contentType,
 		});
 	}
 }
@@ -162,25 +173,29 @@ if (import.meta.vitest) {
 				tree,
 				paths: ['images/cropped/{observation.id}/{image.exportedAs.original}'],
 				provenance: 'images.cropped',
-				help: 'Cropped image'
+				help: 'Cropped image',
+				contentType: () => 'image/jpeg'
 			});
 			gatherToTree({
 				tree,
 				paths: ['images/original/{observation.id}/{image.exportedAs.original}'],
 				provenance: 'images.original',
-				help: 'Original image'
+				help: 'Original image',
+				contentType: () => 'image/jpeg'
 			});
 			gatherToTree({
 				tree,
 				paths: ['metadata.json'],
 				provenance: 'metadata.json',
-				help: 'Metadata in JSON format'
+				help: 'Metadata in JSON format',
+				contentType: () => 'application/json'
 			});
 			gatherToTree({
 				tree,
 				paths: ['metadata.csv'],
 				provenance: 'metadata.csv',
-				help: 'Metadata in CSV format'
+				help: 'Metadata in CSV format',
+				contentType: () => 'text/csv'
 			});
 			expect(tree).toEqual([
 				{
@@ -195,7 +210,9 @@ if (import.meta.vitest) {
 										{
 											filename: '{image.exportedAs.original}',
 											help: 'Cropped image',
-											provenance: 'images.cropped'
+											provenance: 'images.cropped',
+											contentType: 'image/jpeg'
+
 										}
 									]
 								}
@@ -210,7 +227,8 @@ if (import.meta.vitest) {
 										{
 											filename: '{image.exportedAs.original}',
 											help: 'Original image',
-											provenance: 'images.original'
+											provenance: 'images.original',
+											contentType: 'image/jpeg'
 										}
 									]
 								}
@@ -221,12 +239,14 @@ if (import.meta.vitest) {
 				{
 					filename: 'metadata.json',
 					help: 'Metadata in JSON format',
-					provenance: 'metadata.json'
+					provenance: 'metadata.json',
+					contentType: 'application/json'
 				},
 				{
 					filename: 'metadata.csv',
 					help: 'Metadata in CSV format',
-					provenance: 'metadata.csv'
+					provenance: 'metadata.csv',
+					contentType: 'text/csv'
 				}
 			]);
 		});

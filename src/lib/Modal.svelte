@@ -164,7 +164,7 @@ Show a pop-up dialog, that can be closed via a close button provided by the comp
 	dialog:not([open]) {
 		opacity: 0;
 		pointer-events: none;
-		transform: scale(0.75);
+		transform: scale(0.95);
 	}
 
 	dialog::backdrop {

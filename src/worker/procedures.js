@@ -125,7 +125,7 @@ export const PROCEDURES = /** @type {const} @satisfies {ProceduresMap} */ ({
 		}),
 		progress: type('undefined'),
 		success: type.scope({ NodeProvenance }).type({
-			'[NodeProvenance]': 'string[]'
+			'[NodeProvenance]': [{ path: 'string', contentType: 'string' }, '[]']
 		})
 	},
 	estimateResultsZipSize: {

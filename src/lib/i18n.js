@@ -162,25 +162,26 @@ if (import.meta.vitest) {
 /**
  *
  * @param {number} bytes byte count
+ * @param {Intl.NumberFormatOptions['unitDisplay']} [unitDisplay] unit display style
  * @returns {string} formatted size
  */
-export function formatBytesSize(bytes) {
+export function formatBytesSize(bytes, unitDisplay = 'short'	) {
 	// SI powers (so, in terms of powers of ten and not powers of two)
-	const power = bytes < 1e3 ? 0 : bytes < 1e6 ? 1 : bytes < 1e9 ? 2 : bytes < 1e12 ? 3 : 4;
+	const power = bytes < 1e3 ? 0 : bytes < 1e6 ? 3 : bytes < 1e9 ? 6 : bytes < 1e12 ? 9 : 12;
 
 	const formatter = new Intl.NumberFormat(undefined, {
 		style: 'unit',
-		unitDisplay: 'narrow',
+		unitDisplay,
 		unit: {
 			0: 'byte',
-			1: 'kilobyte',
-			2: 'megabyte',
-			3: 'gigabyte',
-			4: 'terabyte'
+			3: 'kilobyte',
+			6: 'megabyte',
+			9: 'gigabyte',
+			12: 'terabyte'
 		}[power]
 	});
 
-	const value = bytes / 2 ** (10 * power);
+	const value = bytes / 10 ** power;
 
 	const rounding = value > 10 ? 0 : value > 1 ? 1 : 2;
 

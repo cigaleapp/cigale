@@ -41,7 +41,7 @@ jobs:
       - name: Get list of model URLs
         id: models
         run: |
-          urls=$(curl -fsSL $PROTOCOL_URL | jq -r "[$JQ_SELECTORS] | join(\" \")")
+          urls=$(jq -r "[$JQ_SELECTORS] | join(\" \")" examples/arthropods.cigaleprotocol.json)
           echo "urls=$urls" >> $GITHUB_OUTPUT
 
           huggingface_repos=""

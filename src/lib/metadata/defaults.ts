@@ -389,8 +389,8 @@ if (import.meta.vitest) {
 					'proto'
 				)
 			);
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const renderFn = vi.fn(
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				(_payload: typeof MetadataDefaultDynamicPayload.inferIn) => 'derived'
 			);
 			_tables.Metadata.getMany.mockResolvedValue([

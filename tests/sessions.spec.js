@@ -6,10 +6,12 @@ import {
 	chooseInDropdown,
 	deleteSession,
 	goToProtocolManagement,
+	goToSessionPage,
 	importPhotos,
 	importProtocol,
 	loadDatabaseDump,
 	newSession,
+	pickFiles,
 	sessionMetadataSectionFor,
 	setInferenceModels,
 	switchSession
@@ -57,7 +59,7 @@ test.describe('isolation', () => {
 		await assert(page.getByText('debugsquare.png')).toBeVisible();
 
 		await deleteSession(page, 'Session α');
-		await assert(page.getByText('Session α')).not.toBeVisible();
+		await assert(page.getByText('Session α', { exact: true })).not.toBeVisible();
 
 		await switchSession(page, 'Session β');
 		await app.tabs.go('import');
@@ -97,7 +99,7 @@ test('import into new session', async ({ page, app }) => {
 	  - text: Espèce
 	  - combobox: Allacma fusca
 	  - code: /\\d+%/
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	  - text: Alternatives
 	  - list:
@@ -119,7 +121,7 @@ test('import into new session', async ({ page, app }) => {
 	  - text: Genre
 	  - combobox: Allacma
 	  - code: /\\d+%/
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	  - text: Alternatives
 	  - list:
@@ -141,7 +143,7 @@ test('import into new session', async ({ page, app }) => {
 	  - text: Famille
 	  - combobox: Sminthuridae
 	  - code: /\\d+%/
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	  - text: Alternatives
 	  - list:
@@ -163,7 +165,7 @@ test('import into new session', async ({ page, app }) => {
 	  - text: Ordre
 	  - combobox: Symphypleona
 	  - code: /\\d+%/
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	  - text: Alternatives
 	  - list:
@@ -183,22 +185,22 @@ test('import into new session', async ({ page, app }) => {
 	      - button:
 	        - img
 	  - text: Photo d'habitat
+	  - button "Supprimer cette valeur" [disabled]:
+	    - img
+	  - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
 	  - radiogroup:
 	    - radio "C'est une photo de l'habitat actuel"
 	    - text: C'est une photo de l'habitat actuel
 	    - radio "C'est une photo de l'habitat à proximité"
 	    - text: C'est une photo de l'habitat à proximité
-	  - button [disabled]:
-	    - img
-	  - paragraph: Indique si cette photo est une photo de l'habitat. Laisser vide si ce n'est pas une photo d'habitat
 	  - text: Date
 	  - textbox "Date"
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: Moment où la photo a été prise
 	  - text: Localisation
 	  - combobox
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: Endroit où la photo a été prise
 	  - region "Map"
@@ -219,6 +221,9 @@ test('import into new session', async ({ page, app }) => {
 	      - /url: http://www.openstreetmap.org/about/
 	    - text: contributors
 	  - text: Difficulté d'identification
+	  - button "Supprimer cette valeur" [disabled]:
+	    - img
+	  - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
 	  - radiogroup:
 	    - radio "Facile"
 	    - text: Facile
@@ -228,10 +233,10 @@ test('import into new session', async ({ page, app }) => {
 	    - text: Difficile
 	    - radio "Très difficile"
 	    - text: Très difficile
-	  - button [disabled]:
-	    - img
-	  - paragraph: Niveau de difficulté pour identifier l'espèce sur la photo
 	  - text: Statut de conservation
+	  - button "Supprimer cette valeur" [disabled]:
+	    - img
+	  - paragraph: Statut de conservation IUCN de l'espèce
 	  - radiogroup:
 	    - radio "EX Éteint (“Extinct”)"
 	    - text: EX
@@ -254,23 +259,20 @@ test('import into new session', async ({ page, app }) => {
 	    - radio "LC Préoccupation mineure (“Least Concern”)"
 	    - text: LC
 	    - paragraph: Préoccupation mineure (“Least Concern”)
-	  - button [disabled]:
-	    - img
-	  - paragraph: Statut de conservation IUCN de l'espèce
 	  - text: Classe
 	  - combobox: Collembola
 	  - code: /\\d+%/
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	  - text: Phylum
 	  - combobox: Arthropoda
 	  - code: /\\d+%/
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	  - text: Règne
 	  - combobox: Animalia
 	  - code: /\\d+%/
-	  - button:
+	  - button "Supprimer cette valeur":
 	    - img
 	`);
 
@@ -390,20 +392,23 @@ test('can change protocol of session', async ({ page, app }) => {
 	  - text: bool
 	  - switch:
 	    - img
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: boolean metadata
 	  - text: crop
 	  - img
 	  - paragraph: Irreprésentable
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - text: date
 	  - textbox "date"
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: date metadata
 	  - text: enum
+	  - button "Supprimer cette valeur" [disabled]:
+	    - img
+	  - paragraph: enum metadata
 	  - radiogroup:
 	    - radio "One Option 1"
 	    - text: One
@@ -411,16 +416,13 @@ test('can change protocol of session', async ({ page, app }) => {
 	    - radio "Two Option 2"
 	    - text: Two
 	    - paragraph: Option 2
-	  - button [disabled]:
-	    - img
-	  - paragraph: enum metadata
 	  - text: float
 	  - textbox "float"
 	  - button "Décrémenter":
 	    - img
 	  - button "Incrémenter":
 	    - img
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: float metadata
 	  - text: integer
@@ -429,12 +431,12 @@ test('can change protocol of session', async ({ page, app }) => {
 	    - img
 	  - button "Incrémenter":
 	    - img
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: integer metadata
 	  - text: location
 	  - combobox
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: location metadata
 	  - region "Map"
@@ -454,9 +456,16 @@ test('can change protocol of session', async ({ page, app }) => {
 	    - link "OpenStreetMap":
 	      - /url: http://www.openstreetmap.org/about/
 	    - text: contributors
+	  - text: sidecar
+	  - button "Supprimer cette valeur" [disabled]:
+	    - img
+	  - paragraph: sidecar file
+	  - code: ∞
+	  - text: Aucun fichier
+	  - button "Ajouter"
 	  - text: string
 	  - textbox "string"
-	  - button [disabled]:
+	  - button "Supprimer cette valeur" [disabled]:
 	    - img
 	  - paragraph: string metadata
 	`);
@@ -505,4 +514,86 @@ test('session metadata form has default values', async ({ page, app }) => {
 	await expect(page.getByRole('textbox', { name: 'Code du transect' })).toHaveValue(
 		'custom code'
 	);
+});
+
+test('can set file-type metadata', async ({ page, app }) => {
+	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+	await app.settings.set({ showTechnicalMetadata: false });
+	await newSession(page, { name: 'Test' });
+	await goToSessionPage(page);
+
+	const metadataKey = 'io.github.cigaleapp.kitchensink__sessionwide_file';
+
+	const fileMetadata = sessionMetadataSectionFor(page, 'Sessionwide file');
+
+	// Make sure DB is clean
+	assert(await app.db.count('MetadataValueFile')).toBe(0);
+
+	async function fileInDb() {
+		const session = await app.db.session.byName('Test');
+		if (!session) throw new Error('Session not found');
+
+		assert(session.metadata).toHaveProperty([metadataKey]);
+		const fileId = String(JSON.parse(session.metadata[metadataKey].value));
+
+		return app.db.get('MetadataValueFile', fileId);
+	}
+
+	await expect(fileMetadata).toHaveText(/<1,2Mo/);
+	await expect(fileMetadata).toHaveText(/Aucun fichier/);
+
+	// Empty -> a file
+
+	await pickFiles(fileMetadata.getByRole('button', { name: 'Ajouter' }), '20K-gray.jpeg');
+
+	await expect(fileMetadata).toHaveText(/1,6\sMo/);
+	await expect(fileMetadata.locator('code.size')).toHaveTooltip(
+		'La taille maximale est de 1,2 Mo'
+	);
+	await expect(fileMetadata).toHaveText(/20K-gray\.jpeg/);
+	await expect(fileMetadata.getByRole('img', { name: '20K-gray.jpeg' })).toHaveScreenshot();
+
+	await page.waitForTimeout(500); // XXX: Wait for DB write
+
+	expect(await fileInDb()).toMatchObject({
+		filename: '20K-gray.jpeg',
+		contentType: 'image/jpeg',
+		size: 1_562_661
+	});
+
+	// A file -> another file
+
+	await pickFiles(fileMetadata.getByRole('button', { name: 'Modifier' }), 'large-image.jpeg');
+
+	await expect(fileMetadata).toHaveText(/792\sko/);
+	await expect(fileMetadata).toHaveText(/large-image\.jpeg/);
+	await expect(fileMetadata.getByRole('img', { name: 'large-image.jpeg' })).toHaveScreenshot();
+
+	await page.waitForTimeout(500); // XXX: Wait for DB write
+
+	// Old file should be deleted
+	expect(await app.db.count('MetadataValueFile')).toBe(1);
+
+	await expect(fileInDb()).resolves.toMatchObject({
+		filename: 'large-image.jpeg',
+		contentType: 'image/jpeg',
+		size: 792_031
+	});
+
+	// A file -> empty
+
+	await fileMetadata.getByRole('button', { name: 'Supprimer cette valeur' }).click();
+
+	await expect(fileMetadata).toHaveText(/Aucun fichier/);
+	await expect(fileMetadata).not.toHaveText(/large-image\.jpeg/);
+
+	await page.waitForTimeout(500); // XXX: Wait for DB write
+
+	// File should be deleted
+	expect(await app.db.count('MetadataValueFile')).toBe(0);
+
+	const session = await app.db.session.byName('Test');
+	if (!session) throw new Error('Session not found');
+
+	expect(session.metadata).not.toHaveProperty([metadataKey]);
 });

@@ -1,7 +1,14 @@
 import { type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
-import { Dimensions, HTTPRequest, ID, Probability, References } from './schemas/common.js';
+import {
+	Dimensions,
+	HTTPRequest,
+	ID,
+	MIMEType,
+	Probability,
+	References
+} from './schemas/common.js';
 import {
 	EXIFField,
 	MetadataEnumVariant,
@@ -14,7 +21,10 @@ import {
 } from './schemas/metadata.js';
 import { ModelDetectionOutputShape, ModelInput } from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
-import { ExportsFilepathTemplate, Protocol as ProtocolSchema } from './schemas/protocols.js';
+import {
+	ExportsFilepathTemplateObservation,
+	Protocol as ProtocolSchema
+} from './schemas/protocols.js';
 import { Session as SessionSchema } from './schemas/sessions.js';
 import { clamp } from './utils.js';
 
@@ -57,7 +67,7 @@ const ImageFile = table(
 		id: ID,
 		bytes: 'ArrayBuffer',
 		filename: 'string',
-		contentType: /\w+\/\w+/,
+		contentType: MIMEType,
 		dimensions: Dimensions,
 		sessionId: ID
 	})
@@ -70,9 +80,26 @@ const ImagePreviewFile = table(
 		id: ID,
 		bytes: 'ArrayBuffer',
 		filename: 'string',
-		contentType: /\w+\/\w+/,
+		contentType: MIMEType,
 		dimensions: Dimensions,
 		sessionId: ID
+	})
+);
+
+const MetadataValueFile = table(
+	['id', 'sessionId'],
+	type({
+		id: ID,
+		sessionId: ID,
+		// File-in-IndexedDB is not supported on Safari
+		// see https://stackoverflow.com/a/46331687/9943464
+		// bug confirmed via Playwright testing
+		// file: 'File',
+		bytes: 'ArrayBuffer',
+		filename: 'string',
+		contentType: MIMEType,
+		size: ['number', '@', 'in bytes'],
+		lastModifiedAt: 'string.date.iso'
 	})
 );
 
@@ -153,7 +180,7 @@ const Settings = table(
 
 export const Schemas = {
 	ID,
-	ExportsFilepathTemplate,
+	ExportsFilepathTemplateObservation,
 	Probability,
 	MetadataValues,
 	MetadataValue,
@@ -173,12 +200,19 @@ export const Schemas = {
 	HTTPRequest
 };
 
+/**
+ * @satisfies {Array<keyof typeof Tables>}
+ */
 export const NO_REACTIVE_STATE_TABLES = /** @type {const} */ ([
 	'ImageFile',
 	'ImagePreviewFile',
-	'MetadataOption'
+	'MetadataOption',
+	'MetadataValueFile'
 ]);
 
+/**
+ * @satisfies {Array<keyof typeof Tables>}
+ */
 const SESSION_DEPENDENT_REACTIVE_TABLES = /** @type {const} */ (['Image', 'Observation']);
 
 /**
@@ -204,6 +238,7 @@ export const Tables = {
 	Image,
 	ImageFile,
 	ImagePreviewFile,
+	MetadataValueFile,
 	Observation,
 	Session,
 	Metadata,
@@ -354,4 +389,9 @@ export const idComparator = (a, b) => {
  *
  * @typedef DimensionsInput
  * @type {typeof Dimensions.inferIn}
+ */
+
+/**
+ * @typedef MetadataValueFile
+ * @type {typeof MetadataValueFile.infer}
  */

@@ -105,7 +105,7 @@
 				onchange={async (enabled) => {
 					if (enabled) {
 						await askForNotificationPermission();
-						setSetting('notifications', hasNotificationsEnabled());
+						setSetting('notifications', true);
 					} else {
 						setSetting('notifications', false);
 					}

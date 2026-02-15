@@ -121,7 +121,8 @@ test('toExportedProtocol', async () => {
 		exports: {
 			metadata: {
 				json: 'analysis.json',
-				csv: 'metadata.csv'
+				csv: 'metadata.csv',
+				files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
 			},
 			images: {
 				cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -199,7 +200,8 @@ test('toExportedProtocol', async () => {
 		exports: {
 			metadata: {
 				json: 'analysis.json',
-				csv: 'metadata.csv'
+				csv: 'metadata.csv',
+				files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
 			},
 			images: {
 				cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -225,13 +227,13 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				// no source:
 				crop: {
-					metadata: 'feur',
 					padding: '0px'
 				},
 				exports: {
 					metadata: {
 						json: 'analysis.json',
-						csv: 'metadata.csv'
+						csv: 'metadata.csv',
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -266,13 +268,13 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {
-					metadata: 'feur',
 					padding: '0px'
 				},
 				exports: {
 					metadata: {
 						json: 'analysis.json',
-						csv: 'metadata.csv'
+						csv: 'metadata.csv',
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -296,13 +298,13 @@ describe('compareProtocolWithUpstream', () => {
 				description: 'A test protocol',
 				source: 'https://example.com/protocol.json',
 				crop: {
-					metadata: 'feur',
 					padding: '0px'
 				},
 				exports: {
 					metadata: {
 						json: 'analysis.json',
-						csv: 'metadata.csv'
+						csv: 'metadata.csv',
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -345,7 +347,8 @@ describe('compareProtocolWithUpstream', () => {
 				exports: {
 					metadata: {
 						json: 'analysis.json',
-						csv: 'metadata.csv'
+						csv: 'metadata.csv',
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',
@@ -485,7 +488,8 @@ describe('compareProtocolWithUpstream', () => {
 				exports: {
 					metadata: {
 						json: 'analysis.json',
-						csv: 'metadata_v2.csv' // changed
+						csv: 'metadata_v2.csv', // changed
+						files: 'files/{{metadataKey}}/{{id}}.{{extension filename}}'
 					},
 					images: {
 						cropped: 'cropped/{{sequence}}.{{extension image.filename}}',

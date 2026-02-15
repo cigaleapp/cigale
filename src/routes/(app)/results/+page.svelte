@@ -151,8 +151,8 @@
 		});
 
 		const tree: TreeNode = [];
-		for (const [provenance, paths] of entries(preview)) {
-			gatherToTree({ tree, paths, provenance });
+		for (const [provenance, files] of entries(preview)) {
+			gatherToTree({ tree, paths: files.map(f => f.path), provenance, contentType : path => files.find(f => f.path === path)?.contentType ?? 'application/octet-stream' });
 		}
 		return tree;
 	}
@@ -206,9 +206,12 @@
 				{/if}
 				Archive ZIP
 				<code class="size" use:tooltip={"Taille estimée de l'archive .zip"}>
-					<LoadingText value={sizeEstimates.compressed} mask="~{formatBytesSize(150e3)}">
+					<LoadingText
+						value={sizeEstimates.compressed}
+						mask="~{formatBytesSize(150e3, 'narrow')}"
+					>
 						{#snippet loaded(size)}
-							~{formatBytesSize(size)}
+							~{formatBytesSize(size, 'narrow')}
 						{/snippet}
 					</LoadingText>
 				</code>
@@ -238,10 +241,10 @@
 					<code class="size" use:tooltip={'Taille totale estimée du dossier'}>
 						<LoadingText
 							value={sizeEstimates.uncompressed}
-							mask="~{formatBytesSize(150e3)}"
+							mask="~{formatBytesSize(150e3, 'narrow')}"
 						>
 							{#snippet loaded(size)}
-								~{formatBytesSize(size)}
+								~{formatBytesSize(size, 'narrow')}
 							{/snippet}
 						</LoadingText>
 					</code>
@@ -324,10 +327,10 @@
 					{#snippet rootHelp()}
 						<LoadingText
 							value={sizeEstimates.uncompressed}
-							mask="~{formatBytesSize(1e6)}"
+							mask="~{formatBytesSize(1e6, 'narrow')}"
 						>
 							{#snippet loaded(size)}
-								~{formatBytesSize(size)}
+								~{formatBytesSize(size, 'narrow')}
 							{/snippet}
 						</LoadingText>
 						une fois dézippé

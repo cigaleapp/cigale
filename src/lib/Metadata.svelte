@@ -32,10 +32,12 @@
 			options.length <= 10 &&
 			options.every((opt) => !opt.image && !opt.learnMore)
 	);
+
+	const inputIsInline = $derived(!isCompactEnum && definition.type !== 'file');
 </script>
 
 <div class="metadata">
-	<section class="first-line" class:break={isCompactEnum}>
+	<section class="first-line">
 		<label for={_id}>
 			{#if definition.label}
 				{definition.label}
@@ -49,46 +51,20 @@
 			{/if}
 		</label>
 		<div class="value">
-			<MetadataInput
-				id={_id}
-				{definition}
-				{options}
-				value={value?.value}
-				onblur={onchange}
-				{isCompactEnum}
-				confidences={Object.fromEntries([
-					...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
-						safeJSONParse(key)?.toString(),
-						value
-					]),
-					[safeJSONParse(value?.value)?.toString(), value?.confidence]
-				])}
-			/>
-			{#if value?.confidence}
-				<ConfidencePercentage value={value.confidence} />
+			{#if inputIsInline}
+				{@render input()}
 			{/if}
-			{#if merged}
-				<div
-					class="merged-indicator"
-					use:tooltip={'Valeur issue de la fusion de plusieurs valeurs différentes. Modifier cette valeur pour modifier toutes les valeurs de la sélection'}
-				>
-					<IconMerged />
-				</div>
-			{/if}
-			<button
-				class="clear"
-				use:tooltip={'Supprimer cette valeur'}
-				disabled={!value}
-				onclick={() => {
-					if (!value) return;
-					value = undefined;
-					onchange(undefined);
-				}}
-			>
-				<IconClear />
-			</button>
+			{@render extraInline()}
 		</div>
 	</section>
+
+	{#if !inputIsInline}
+		{@render description()}
+		<div class="input-line">
+			{@render input()}
+		</div>
+	{/if}
+
 	{#if value && Object.keys(value.alternatives).length > 0}
 		<section class="alternatives">
 			<div class="title">Alternatives</div>
@@ -124,17 +100,11 @@
 			</ul>
 		</section>
 	{/if}
-	{#if definition.description || definition.learnMore}
-		<section class="learnmore">
-			{#if definition.description}
-				<p>{definition.description}</p>
-			{/if}
-			{#if definition.learnMore}
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href={definition.learnMore} target="_blank">En savoir plus</a>
-			{/if}
-		</section>
+
+	{#if inputIsInline}
+		{@render description()}
 	{/if}
+
 	{#if definition.type === 'location'}
 		{@const coords = (value as TypedMetadataValue<'location'> | undefined)?.value}
 
@@ -167,6 +137,65 @@
 	{/if}
 </div>
 
+{#snippet description()}
+	{#if definition.description || definition.learnMore}
+		<section class="learnmore">
+			{#if definition.description}
+				<p>{definition.description}</p>
+			{/if}
+			{#if definition.learnMore}
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<a href={definition.learnMore} target="_blank">En savoir plus</a>
+			{/if}
+		</section>
+	{/if}
+{/snippet}
+
+{#snippet input()}
+	<MetadataInput
+		id={_id}
+		{definition}
+		{options}
+		value={value?.value}
+		onblur={onchange}
+		{isCompactEnum}
+		confidences={Object.fromEntries([
+			...Object.entries(value?.alternatives ?? {}).map(([key, value]) => [
+				safeJSONParse(key)?.toString(),
+				value
+			]),
+			[safeJSONParse(value?.value)?.toString(), value?.confidence]
+		])}
+	/>
+{/snippet}
+
+{#snippet extraInline()}
+	{#if value?.confidence}
+		<ConfidencePercentage no-fallback value={value.confidence} />
+	{/if}
+	{#if merged}
+		<div
+			class="merged-indicator"
+			use:tooltip={'Valeur issue de la fusion de plusieurs valeurs différentes. Modifier cette valeur pour modifier toutes les valeurs de la sélection'}
+		>
+			<IconMerged />
+		</div>
+	{/if}
+	<button
+		class="clear"
+		use:tooltip={'Supprimer cette valeur'}
+							aria-label="Supprimer cette valeur"
+		disabled={!value}
+		onclick={() => {
+			if (!value) return;
+			value = undefined;
+			onchange(undefined);
+		}}
+	>
+		<IconClear />
+	</button>
+{/snippet}
+
 <style>
 	.metadata {
 		display: flex;
@@ -178,16 +207,6 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1em;
-
-		&.break {
-			flex-direction: column;
-			align-items: flex-start;
-			margin-bottom: 1em;
-
-			.value {
-				width: 100%;
-			}
-		}
 	}
 	.value {
 		display: flex;
@@ -199,9 +218,13 @@
 		background: none;
 		cursor: pointer;
 	}
-	.metadata:not(:hover):not(:focus-within) button,
-	button:disabled {
+
+	.metadata:not(:hover):not(:focus-within) button:not(.clear) {
 		opacity: 0;
+	}
+
+	button:disabled {
+		opacity: 0.25;
 	}
 
 	label {

@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import { ArkErrors } from 'arktype';
-import * as yauzl from 'yauzl-promise';
 
 import type * as SvelteTypes from '$app/types';
 
@@ -15,6 +14,7 @@ import {
 	browserConsole,
 	chooseFirstSession,
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
 	importPhotos,
 	loadDatabaseDump,
@@ -111,14 +111,11 @@ for (const offline of [false, true]) {
 
 			// Export results
 			await app.tabs.go('results');
-			await page.getByText(/et images originales/i).click();
-			await page.getByRole('button', { name: 'Archive ZIP' }).click();
-			const download = await page.waitForEvent('download');
-			assert(download.suggestedFilename()).toBe('results.zip');
-			await download.saveAs('./tests/results/lil-fella.zip');
+
+			const zip = await exportResults(page, { kind: 'full' });
 
 			await expectZipFiles(
-				await yauzl.open('./tests/results/lil-fella.zip'),
+				zip,
 				[
 					'analysis.json',
 					'metadata.csv',

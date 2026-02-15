@@ -1,6 +1,3 @@
-import path from 'node:path';
-import * as yauzl from 'yauzl-promise';
-
 import { issue } from './annotations.js';
 import { assert, expect, test } from './fixtures.js';
 import { mockFilesystemAccessAPI, writtenFilesOfHandle } from './utils/filesystemaccess.js';
@@ -8,10 +5,14 @@ import {
 	chooseFirstSession,
 	entries,
 	expectZipFiles,
+	exportResults,
 	firstObservationCard,
+	goToSessionPage,
 	importPhotos,
 	loadDatabaseDump,
 	newSession,
+	pickFiles,
+	sessionMetadataSectionFor,
 	setInferenceModels,
 	toast
 } from './utils/index.js';
@@ -41,14 +42,7 @@ test('correctly applies crop padding', issue(463), async ({ page, app }) => {
 	await page.getByRole('button', { name: 'Autres photos Esc' }).click();
 
 	await app.tabs.go('results');
-
-	await page.getByRole('radio', { name: '0 px' }).getByRole('textbox').fill('40');
-
-	const resultsFilepath = path.resolve('./tests/results/crop-padding.zip');
-	await page.getByRole('button', { name: 'Archive ZIP' }).click();
-	await page.waitForEvent('download').then((e) => e.saveAs(resultsFilepath));
-
-	const zip = await yauzl.open(resultsFilepath);
+	const zip = await exportResults(page, { cropPadding: '40px' });
 	await expectZipFiles(zip, ['analysis.json', 'metadata.csv', 'Cropped/(Unknown)_obs1_1.png'], {
 		'Cropped/(Unknown)_obs1_1.png': {
 			buffer: async (buf) => assert(buf).toMatchSnapshot()
@@ -100,7 +94,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	  - list:
 	    - listitem:
 	      - img
-	      - text: results.zip ~221ko une fois dézippé
+	      - text: results.zip ~227ko une fois dézippé
 	    - list:
 	      - listitem:
 	        - img
@@ -111,13 +105,13 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées et images recadrées' });
-	await expect(downloadButton).toHaveText('Archive ZIP ~4,2Mo');
+	await expect(downloadButton).toHaveText('Archive ZIP ~4,4Mo');
 	await expect(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
 	    - listitem:
 	      - img
-	      - text: results.zip ~4,4Mo une fois dézippé
+	      - text: results.zip ~4,6Mo une fois dézippé
 	    - list:
 	      - listitem:
 	        - img
@@ -144,7 +138,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ include: 'Métadonnées, images recadrées et images originales' });
-	await expect(downloadButton).toHaveText('Archive ZIP ~9,8Mo');
+	await expect(downloadButton).toHaveText('Archive ZIP ~10Mo');
 	await expect(preview).toMatchAriaSnapshot(`
 	  - heading "Contenu de l'export .zip" [level=2]
 	  - list:
@@ -193,7 +187,7 @@ test('correctly shows .zip preview', async ({ page, app }) => {
 	`);
 
 	await changeExportSettings({ cropPadding: { px: 200 } });
-	await expect(downloadButton).toHaveText('Archive ZIP ~12Mo');
+	await expect(downloadButton).toHaveText('Archive ZIP ~13Mo');
 });
 
 test('export to a folder', async ({ page, app, browserName }) => {
@@ -231,4 +225,54 @@ test('export to a folder', async ({ page, app, browserName }) => {
 		'Cigale Export Test/Cropped/Entomobrya muscorum_obs3_3.jpeg': assert.any(Uint8Array),
 		'Cigale Export Test/Cropped/(Unknown)_obs4_4.jpeg': assert.any(Uint8Array)
 	});
+});
+
+test('includes metadata files in export', async ({ page, app }) => {
+	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
+	await chooseFirstSession(page);
+	await goToSessionPage(page);
+
+	const sessionwideFile = sessionMetadataSectionFor(page, 'Sessionwide file');
+
+	await pickFiles(sessionwideFile.getByRole('button', { name: 'Ajouter' }), 'debugsquare.png');
+	await assert(sessionwideFile).toHaveText(/debugsquare\.png/);
+
+	await app.tabs.go('results');
+	await expect(page.getByTestId('zip-preview')).toMatchAriaSnapshot(`
+	  - heading "Contenu de l'export .zip" [level=2]
+	  - list:
+	    - listitem:
+	      - img
+	      - text: results.zip ~139ko une fois dézippé
+	    - list:
+	      - listitem:
+	        - img
+	        - text: metadata.csv
+	      - listitem:
+	        - img
+	        - text: analysis.json
+	      - listitem:
+	        - img
+	        - text: file-sessionwide_file-debugsquare.png
+	      - listitem:
+	        - img
+	        - text: image-1.cropped.jpeg
+	`);
+
+	const zip = await exportResults(page);
+	await expectZipFiles(
+		zip,
+		[
+			'analysis.json',
+			'metadata.csv',
+			'image-1.cropped.jpeg',
+			'image-2.cropped.jpeg',
+			'file-sessionwide_file-debugsquare.png'
+		],
+		{
+			'file-sessionwide_file-debugsquare.png': {
+				buffer: async (buf) => expect(buf).toMatchSnapshot()
+			}
+		}
+	);
 });

@@ -2,6 +2,7 @@ import path from 'node:path';
 import { expect } from '@playwright/test';
 
 import { FixturePaths } from '../filepaths.js';
+import { pickFiles } from './core.js';
 import { loadingText } from './loading.js';
 
 /**
@@ -29,24 +30,19 @@ export async function importPhotos({ page, wait = true, additionalWaitTime = 0 }
 
 	for (const name of names) {
 		i++;
-		const batch = Array.isArray(name) ? name.map(nameToPath) : nameToPath(name);
+		const batch = Array.isArray(name) ? name : [name];
 
 		// Once we have at least a card, the file input from the dropzone disappears
 		if (i === 0) {
 			const fileInput = await page.$("input[type='file']");
-			await fileInput?.setInputFiles(batch);
+			await fileInput?.setInputFiles(batch.map(nameToPath));
 		} else {
-			const filePicker = page.waitForEvent('filechooser');
-
-			await page
-				.getByRole('button', {
+			await pickFiles(
+				page.getByRole('button', {
 					name: "Importer d'autres images"
-				})
-				.click();
-
-			await filePicker.then((picker) => {
-				picker.setFiles(batch);
-			});
+				}),
+				...batch
+			);
 		}
 
 		if (wait) await waitUntilLastAppears(name);

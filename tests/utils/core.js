@@ -1,5 +1,7 @@
 import { expect } from '@playwright/test';
 
+import { FixturePaths } from '../filepaths.js';
+
 /**
  * @import { Page, Locator } from '@playwright/test'
  */
@@ -384,4 +386,18 @@ export async function chooseInDropdown(page, trigger, ...option) {
 			name: locator
 		});
 	}
+}
+
+/**
+ * Clicks the trigger, wait for a filechooser even and sets the files.
+ * Filepaths are relative to {@link FixturePaths.root}
+ * @param {Locator} trigger
+ * @param {...(string & {}) | FixturePaths.Any} files
+ */
+export async function pickFiles(trigger, ...files) {
+	const filepicker = trigger.page().waitForEvent('filechooser');
+	await trigger.click();
+	await filepicker.then((picker) =>
+		picker.setFiles(files.map((f) => `${FixturePaths.root}/${f}`))
+	);
 }
