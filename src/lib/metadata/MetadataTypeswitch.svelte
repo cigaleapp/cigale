@@ -49,9 +49,13 @@ You can also provide a `numeric` snippet that will be used for both `integer` an
 			case 'enum':
 				return branches.enum_;
 			case 'integer':
-				return 'integer' in branches ? branches.integer : branches.numeric;
+				if ('integer' in branches) return branches.integer;
+				if ('numeric' in branches) return branches.numeric;
+				return undefined;
 			case 'float':
-				return 'float' in branches ? branches.float : branches.numeric;
+				if ('float' in branches) return branches.float;
+				if ('numeric' in branches) return branches.numeric;
+				return undefined;
 			default:
 				return branches[typ];
 		}
@@ -63,7 +67,7 @@ You can also provide a `numeric` snippet that will be used for both `integer` an
 {#if validated instanceof ArkErrors}
 	{@render error(validated)}
 {:else if branch}
-	{@render branch(validated)}
+	{@render (branch as Branch<MetadataType>)(validated)}
 {:else}
 	{@render fallback!(validated)}
 {/if}
