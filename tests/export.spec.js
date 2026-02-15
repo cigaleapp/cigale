@@ -227,12 +227,7 @@ test('export to a folder', async ({ page, app, browserName }) => {
 	});
 });
 
-test('includes metadata files in export', async ({ page, app, browserName }) => {
-	test.skip(
-		browserName === 'webkit',
-		'Unsupported on webkit, see https://stackoverflow.com/questions/59138045/error-indexeddb-error-preparing-blob-file-to-be-stored-in-object-store'
-	);
-
+test('includes metadata files in export', async ({ page, app }) => {
 	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 	await chooseFirstSession(page);
 	await goToSessionPage(page);

@@ -1,7 +1,14 @@
 import { type } from 'arktype';
 
 import { localeFromNavigator } from './i18n.js';
-import { Dimensions, HTTPRequest, ID, MIMEType, Probability, References } from './schemas/common.js';
+import {
+	Dimensions,
+	HTTPRequest,
+	ID,
+	MIMEType,
+	Probability,
+	References
+} from './schemas/common.js';
 import {
 	EXIFField,
 	MetadataEnumVariant,
@@ -14,7 +21,10 @@ import {
 } from './schemas/metadata.js';
 import { ModelDetectionOutputShape, ModelInput } from './schemas/neural.js';
 import { Image as ImageSchema, Observation as ObservationSchema } from './schemas/observations.js';
-import { ExportsFilepathTemplateObservation, Protocol as ProtocolSchema } from './schemas/protocols.js';
+import {
+	ExportsFilepathTemplateObservation,
+	Protocol as ProtocolSchema
+} from './schemas/protocols.js';
 import { Session as SessionSchema } from './schemas/sessions.js';
 import { clamp } from './utils.js';
 
@@ -81,7 +91,15 @@ const MetadataValueFile = table(
 	type({
 		id: ID,
 		sessionId: ID,
-		file: 'File',
+		// File-in-IndexedDB is not supported on Safari
+		// see https://stackoverflow.com/a/46331687/9943464
+		// bug confirmed via Playwright testing
+		// file: 'File',
+		bytes: 'ArrayBuffer',
+		filename: 'string',
+		contentType: MIMEType,
+		size: ['number', '@', 'in bytes'],
+		lastModifiedAt: 'string.date.iso'
 	})
 );
 
@@ -372,7 +390,6 @@ export const idComparator = (a, b) => {
  * @typedef DimensionsInput
  * @type {typeof Dimensions.inferIn}
  */
-
 
 /**
  * @typedef MetadataValueFile

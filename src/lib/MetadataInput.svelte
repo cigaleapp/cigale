@@ -244,19 +244,19 @@
 										? `La taille maximale est de ${formatBytesSize(size.maximum)}`
 										: undefined}
 									style:color={size.maximum !== undefined
-										? fileObject.file.size > size.maximum
+										? fileObject.size > size.maximum
 											? 'var(--fg-error)'
 											: gradientedColor(
-													fileObject.file.size / size.maximum,
+													fileObject.size / size.maximum,
 													'fg-success',
 													'fg-warning'
 												)
 										: undefined}
 								>
-									{formatBytesSize(fileObject.file.size)}
+									{formatBytesSize(fileObject.size)}
 								</code>
 								<span class="name">
-									<OverflowableText text={fileObject.file.name} />
+									<OverflowableText text={fileObject.filename} />
 								</span>
 							{:else}
 								<code
@@ -305,7 +305,11 @@
 										const id = await idb.set('MetadataValueFile', {
 											id: generateId('MetadataValueFile'),
 											sessionId: uiState.currentSessionId,
-											file
+											size: file.size,
+											contentType: file.type,
+											filename: file.name,
+											bytes: await file.arrayBuffer(),
+											lastModifiedAt: new Date(file.lastModified || Date.now()).toISOString()
 										});
 
 										const timeElapsed = performance.now() - savingStart;
@@ -334,8 +338,12 @@
 							</div>
 						</div>
 						{#if fileObject}
+							{@const file = new File([fileObject.bytes], fileObject.filename, {
+								type: fileObject.contentType,
+								lastModified: new Date(fileObject.lastModifiedAt).getTime()
+							})}
 							<div class="preview" in:fade>
-								<FilePreview file={fileObject.file} />
+								<FilePreview {file} />
 							</div>
 						{/if}
 					{/await}

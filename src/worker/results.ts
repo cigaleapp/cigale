@@ -101,8 +101,8 @@ swarp.generateResultsExport(
 			abortSignal?.throwIfAborted();
 
 			files[path] = {
-				contents: await file.bytes(),
-				mtime: file.lastModified ? new Date(file.lastModified) : undefined
+				contents: new Uint8Array(file.bytes),
+				mtime: file.lastModifiedAt ? new Date(file.lastModifiedAt) : undefined
 			};
 
 			if (format === 'folder') {
@@ -464,7 +464,7 @@ swarp.estimateResultsZipSize(async ({ sessionId, include, cropPadding }, _, { ab
 	const estimations = {
 		json: (5300e3 / 94) * Object.keys(observations).length,
 		csv: (30e3 / 94) * Object.keys(observations).length,
-		files: sum(metadataValueFiles.map(({ file }) => file.size)),
+		files: sum(metadataValueFiles.map(({ size }) => size)),
 		full: sum(
 			images.map(({ fileId }) => {
 				if (!fileId) return 0;
@@ -675,7 +675,7 @@ async function prepare({
 	}
 
 	const exportedMetadataFiles = metadataValueFiles
-		.map(({ file, id }) => {
+		.map(({ id, ...file }) => {
 			// Find metadata value associated with this file
 			let source:
 				| undefined
@@ -740,9 +740,9 @@ async function prepare({
 				session: source.kind === 'session' ? { id: sessionId } : undefined,
 				observation: source.observation,
 				image: source.image,
-				filename: file.name,
+				filename: file.filename,
 				size: file.size,
-				contentType: file.type
+				contentType: file.contentType
 			});
 
 			return { id, path, file };

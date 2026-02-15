@@ -59,7 +59,7 @@ test.describe('isolation', () => {
 		await assert(page.getByText('debugsquare.png')).toBeVisible();
 
 		await deleteSession(page, 'Session α');
-		await assert(page.getByText('Session α', {exact: true})).not.toBeVisible();
+		await assert(page.getByText('Session α', { exact: true })).not.toBeVisible();
 
 		await switchSession(page, 'Session β');
 		await app.tabs.go('import');
@@ -516,12 +516,7 @@ test('session metadata form has default values', async ({ page, app }) => {
 	);
 });
 
-test('can set file-type metadata', async ({ page, app, browserName }) => {
-	test.skip(
-		browserName === 'webkit',
-		'Unsupported on webkit, see https://stackoverflow.com/questions/59138045/error-indexeddb-error-preparing-blob-file-to-be-stored-in-object-store'
-	);
-
+test('can set file-type metadata', async ({ page, app }) => {
 	await loadDatabaseDump(page, 'db/kitchensink-protocol.devalue');
 	await app.settings.set({ showTechnicalMetadata: false });
 	await newSession(page, { name: 'Test' });
@@ -534,33 +529,14 @@ test('can set file-type metadata', async ({ page, app, browserName }) => {
 	// Make sure DB is clean
 	assert(await app.db.count('MetadataValueFile')).toBe(0);
 
-	/**
-	 * @param {{size: number, type: string, name: string}} expected
-	 */
-	async function expectFileInDB(expected) {
+	async function fileInDb() {
 		const session = await app.db.session.byName('Test');
 		if (!session) throw new Error('Session not found');
 
 		assert(session.metadata).toHaveProperty([metadataKey]);
 		const fileId = String(JSON.parse(session.metadata[metadataKey].value));
 
-		const file = await page.evaluate(async (fileId) => {
-			const value = await window.DB.get('MetadataValueFile', fileId);
-			if (!value) return;
-			return {
-				id: value.id,
-				file: {
-					name: value.file.name,
-					type: value.file.type,
-					size: value.file.size
-				}
-			};
-		}, fileId);
-
-		expect(file).toMatchObject({
-			id: fileId,
-			file: expected
-		});
+		return app.db.get('MetadataValueFile', fileId);
 	}
 
 	await expect(fileMetadata).toHaveText(/<1,2Mo/);
@@ -579,9 +555,9 @@ test('can set file-type metadata', async ({ page, app, browserName }) => {
 
 	await page.waitForTimeout(500); // XXX: Wait for DB write
 
-	await expectFileInDB({
-		name: '20K-gray.jpeg',
-		type: 'image/jpeg',
+	expect(await fileInDb()).toMatchObject({
+		filename: '20K-gray.jpeg',
+		contentType: 'image/jpeg',
 		size: 1_562_661
 	});
 
@@ -598,9 +574,9 @@ test('can set file-type metadata', async ({ page, app, browserName }) => {
 	// Old file should be deleted
 	expect(await app.db.count('MetadataValueFile')).toBe(1);
 
-	await expectFileInDB({
-		name: 'large-image.jpeg',
-		type: 'image/jpeg',
+	await expect(fileInDb()).resolves.toMatchObject({
+		filename: 'large-image.jpeg',
+		contentType: 'image/jpeg',
 		size: 792_031
 	});
 
