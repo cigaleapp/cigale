@@ -268,6 +268,7 @@ msgid "Chargement du protocole intégré"
 msgstr "Loading built-in protocol"
 
 #: src/lib/CardMedia.svelte
+#: src/lib/MetadataInput.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Chargement…"
@@ -1122,6 +1123,7 @@ msgstr "between 0 and 1"
 msgid "Forme de la sortie"
 msgstr "Output shape"
 
+#: src/lib/MetadataInput.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
 msgstr "Add"
@@ -2259,6 +2261,67 @@ msgstr ""
 
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Entrer des coordonnées de boîte"
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+#: src/lib/MetadataInput.svelte
+msgid "Aucun fichier"
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+msgid "Fichier trop volumineux pour être prévisualisé"
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+#: src/lib/FilePreview.svelte
+msgid "Télécharger"
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+msgid "Your browser does not support the audio element."
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+msgid "Your browser does not support the video element."
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+msgid "Contenu copié !"
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+msgid "Copier le contenu"
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+msgid "Afficher en plein écran"
+msgstr ""
+
+#. placeholder {0}: error.message
+#: src/lib/FilePreview.svelte
+msgid "Error loading file preview: {0}"
+msgstr ""
+
+#: src/lib/FilePreview.svelte
+#: src/lib/FilePreview.svelte
+msgid "Download"
+msgstr ""
+
+#. placeholder {0}: file.type
+#: src/lib/FilePreview.svelte
+msgid "Cannot preview this file type ({0})."
+msgstr ""
+
+#: src/lib/Metadata.svelte
+msgid "Supprimer cette valeur"
+msgstr ""
+
+#: src/lib/MetadataInput.svelte
+msgid "Aucune session active. Impossible d'enregistrer le fichier."
+msgstr ""
+
+#: src/lib/MetadataInput.svelte
+msgid "Modifier"
 msgstr ""
 
 #: src/lib/queue.svelte.js

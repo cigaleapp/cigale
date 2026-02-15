@@ -267,6 +267,7 @@ msgid "Chargement du protocole intégré"
 msgstr "Chargement du protocole intégré"
 
 #: src/lib/CardMedia.svelte
+#: src/lib/MetadataInput.svelte
 #: src/routes/(app)/+layout.js
 #: src/routes/(app)/DeploymentDetails.svelte
 msgid "Chargement…"
@@ -1121,6 +1122,7 @@ msgstr "entre 0 et 1"
 msgid "Forme de la sortie"
 msgstr "Forme de la sortie"
 
+#: src/lib/MetadataInput.svelte
 #: src/routes/(app)/protocols/[id]/metadata/[metadata]/(todo)/ModelOutputShapeDiagram.svelte
 msgid "Ajouter"
 msgstr "Ajouter"
@@ -2260,6 +2262,67 @@ msgstr "Métadonnées envoyées"
 #: src/routes/(app)/(sidepanel)/crop/[image]/[[from]]/+page@(app).svelte
 msgid "Entrer des coordonnées de boîte"
 msgstr "Entrer des coordonnées de boîte"
+
+#: src/lib/FilePreview.svelte
+#: src/lib/MetadataInput.svelte
+msgid "Aucun fichier"
+msgstr "Aucun fichier"
+
+#: src/lib/FilePreview.svelte
+msgid "Fichier trop volumineux pour être prévisualisé"
+msgstr "Fichier trop volumineux pour être prévisualisé"
+
+#: src/lib/FilePreview.svelte
+#: src/lib/FilePreview.svelte
+msgid "Télécharger"
+msgstr "Télécharger"
+
+#: src/lib/FilePreview.svelte
+msgid "Your browser does not support the audio element."
+msgstr "Your browser does not support the audio element."
+
+#: src/lib/FilePreview.svelte
+msgid "Your browser does not support the video element."
+msgstr "Your browser does not support the video element."
+
+#: src/lib/FilePreview.svelte
+msgid "Contenu copié !"
+msgstr "Contenu copié !"
+
+#: src/lib/FilePreview.svelte
+msgid "Copier le contenu"
+msgstr "Copier le contenu"
+
+#: src/lib/FilePreview.svelte
+msgid "Afficher en plein écran"
+msgstr "Afficher en plein écran"
+
+#. placeholder {0}: error.message
+#: src/lib/FilePreview.svelte
+msgid "Error loading file preview: {0}"
+msgstr "Error loading file preview: {0}"
+
+#: src/lib/FilePreview.svelte
+#: src/lib/FilePreview.svelte
+msgid "Download"
+msgstr "Download"
+
+#. placeholder {0}: file.type
+#: src/lib/FilePreview.svelte
+msgid "Cannot preview this file type ({0})."
+msgstr "Cannot preview this file type ({0})."
+
+#: src/lib/Metadata.svelte
+msgid "Supprimer cette valeur"
+msgstr "Supprimer cette valeur"
+
+#: src/lib/MetadataInput.svelte
+msgid "Aucune session active. Impossible d'enregistrer le fichier."
+msgstr "Aucune session active. Impossible d'enregistrer le fichier."
+
+#: src/lib/MetadataInput.svelte
+msgid "Modifier"
+msgstr "Modifier"
 
 #: src/lib/queue.svelte.js
 msgid "Import des images terminé"
