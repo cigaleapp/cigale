@@ -21,6 +21,9 @@ export const AnalyzedImage = type({
 	],
 	numberInObservation: ['number > 0', '@', "Numéro de l'image dans l'observation"],
 	metadata: MetadataRecord,
+	protocolMetadata: MetadataRecord.describe(
+		'Même logique que protocolMetadata pour les observations'
+	),
 	metadataErrors: MetadataErrors.default(() => ({})),
 	exportedAs: type({
 		original: ['string', '@', "Chemin vers l'image originale"],

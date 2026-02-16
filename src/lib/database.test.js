@@ -16,6 +16,7 @@ const filepathMockData = {
 		sequence: 1,
 		numberInObservation: 1,
 		metadata: {},
+		protocolMetadata: {},
 		metadataErrors: {},
 		contentType: 'image/jpeg',
 		id: 'i12345',
