@@ -124,7 +124,7 @@ if (import.meta.vitest) {
 /**
  * @template {string} K
  * @template {any} V
- * @param {Array<[K, V]>} subject
+ * @param {Array<[K, V] | readonly [K, V]>} subject
  * @returns {Record<K, V>}
  */
 export function fromEntries(subject) {

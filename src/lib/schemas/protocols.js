@@ -1,11 +1,14 @@
 import { type } from 'arktype';
 
+import { fromEntries, mapKeys } from '../utils.js';
 import {
 	FilepathTemplate,
 	HTTPRequest,
 	ID,
 	MIMEType,
+	ProtocolID,
 	References,
+	SingleEntryRecord,
 	TemplatedString,
 	URLString
 } from './common.js';
@@ -41,13 +44,41 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 
 export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
 
+export const ProtocolRegistry = type({
+	protocols: type({
+		id: ProtocolID,
+		url: URLString.describe('URL où télécharger le protocole')
+	}).array()
+});
+
+export const ProtocolImport = type({
+	from: ProtocolID.describe('De quel protocole hériter'),
+	metadata: type
+		.or(
+			ID.describe('Clé de métadonnée à importer, sans le namespace'),
+			SingleEntryRecord(ID, ID).describe('Import avec renommage. ')
+		)
+		.pipe((spec) =>
+			typeof spec === 'string'
+				? { source: spec, target: spec }
+				: { source: spec.value, target: spec.key }
+		)
+		.array()
+		.describe(
+			"Clés (sans le namespace) de métadonnées à hériter du protocole spécifié dans 'from'. List de simples clés, ou d'objet avec une seule paire, de la forme { cible: source } où source est la clé dans le protocole duquel on importe, et cible est la clé que l'on donne à cette métadonnée dans le protocole courant (les deux sont sans namespace). Astuce: en YAML, quand on décrit une liste, les {} autour des objets sont optionnels. Par exemple: metadata: [a, b: b_source, c] ou - a↵ - b: b_source↵ - c importera la métadonnée 'a', la métadonnée 'b_source' renommée en 'b', et la métadonnée 'c' du protocole spécifié dans 'from'."
+		)
+});
+
 export const Protocol = type({
-	id: ID.describe(
-		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
-	),
+	id: ProtocolID,
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
+	importedMetadata: type
+		.Record(ID, ID)
+		.describe(
+			"Toutes les métadonnées importées depuis d'autres protocoles, associées à leur ID dans ce protocole-ci"
+		),
 	metadata: References.describe(
 		"Toutes les métadonnées du protocole (qu'elles soient associées aux sessions ou aux observations/images)"
 	),
@@ -127,8 +158,14 @@ export const Protocol = type({
 		.optional()
 });
 
-export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'dirty')
+export const ExportedProtocol = Protocol.omit(
+	'metadata',
+	'sessionMetadata',
+	'dirty',
+	'importedMetadata'
+)
 	.in.and({
+		imports: ProtocolImport.array().default(() => []),
 		metadata: {
 			'[string]': Metadata.in
 				.omit('id')
@@ -142,17 +179,20 @@ export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'di
 	})
 	.pipe((protocol) => ({
 		...protocol,
-		metadata: Object.fromEntries(
-			Object.entries(protocol.metadata).map(([id, metadata]) => [
-				namespacedMetadataId(protocol.id, id),
-				metadata
-			])
+		importedMetadata: fromEntries(
+			protocol.imports.flatMap(({ from, metadata }) =>
+				metadata.map(
+					({ source, target }) =>
+						/** @type {const} */ ([
+							namespacedMetadataId(protocol.id, target),
+							namespacedMetadataId(from, source)
+						])
+				)
+			)
 		),
-		sessionMetadata: Object.fromEntries(
-			Object.entries(protocol.sessionMetadata ?? {}).map(([id, metadata]) => [
-				namespacedMetadataId(protocol.id, id),
-				metadata
-			])
+		metadata: mapKeys(protocol.metadata, (key) => namespacedMetadataId(protocol.id, key)),
+		sessionMetadata: mapKeys(protocol.sessionMetadata ?? {}, (key) =>
+			namespacedMetadataId(protocol.id, key)
 		)
 	}));
 
