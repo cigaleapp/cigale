@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=../public/protocol.schema.json
+# yaml-language-server: $schema=../static/protocol.schema.json
 id: fr.osug.terra-forma-web.entomoscope
 name: Entomoscope
 
@@ -11,7 +11,17 @@ authors:
 
 imports:
   - from: io.github.cigaleapp.arthropods.example
-    metadata: [species, genus, family, order, class, phylum, kingdom]
+    metadata:
+      - species
+      - genus
+      - family
+      - order
+      - class
+      - phylum
+      - kingdom
+      - identification_difficulty
+      # To test renames
+      - iucn: conservation_status
 
 crop:
   metadata: crop
@@ -20,13 +30,13 @@ sidecars:
   filepath: ./{{ filepath | replace("_original.jpg", ".json") }}
 
 metadata:
-  location:
+  shoot_location:
     type: location
     label: Lieu
     description: Lieu de prise de vue
     mergeMethod: average
     required: false
-    # infer: 
+    # infer:
     #   latitude: { sidecar: .EntomoscopeLatitude }
     #   longitude: { sidecar: .EntomoscopeLongitude }
   altitude:
@@ -36,7 +46,7 @@ metadata:
     unit: m
     required: false
     mergeMethod: average
-    # infer: 
+    # infer:
     #   sidecar: .EntomoscopeAltitude
   crop_inference_model:
     type: string
@@ -74,13 +84,13 @@ metadata:
     required: false
     # infer:
     #   sidecar: .EntomoscopeRaspberryPiSerialNumber
-  date:
+  shoot_date:
     type: date
     label: Date
     description: Date de prise de vue
     mergeMethod: average
     required: false
-    # infer: 
+    # infer:
     #   sidecar: .FrameWallClock * 1e-6
   brightness:
     type: float
@@ -89,7 +99,7 @@ metadata:
     mergeMethod: average
     required: false
     unit: lux
-    # infer: 
+    # infer:
     #   sidecar: .Lux
   led_intensity:
     type: integer
@@ -97,7 +107,7 @@ metadata:
     description: Intensité des LEDs de l'entomoscope, de 0 à 100
     mergeMethod: average
     required: false
-    # infer: 
+    # infer:
     #   sidecar: .EntomoscopeLedIntensity
   site:
     type: string
@@ -105,20 +115,20 @@ metadata:
     description: ID du site d'installation de l'entomoscope
     mergeMethod: none
     required: true
-    # infer: 
+    # infer:
     #   sidecar: .EntomoscopeSiteID
   misc_config:
     type: string
     description: Tout les paramètres de configuration de l'entomoscope, encodés en JSON
-    label: ""
+    label: ''
     mergeMethod: none
     required: false
-    # infer: 
+    # infer:
     #   sidecar: . | tostring
   crop:
     type: boundingbox
     description: Boîte englobante du crop d'insecte détecté par l'entomoscope
-    label: ""
+    label: ''
     mergeMethod: union
     required: false
     # infer:

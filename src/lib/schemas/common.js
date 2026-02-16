@@ -198,7 +198,7 @@ export const HANDLEBARS_HELPERS = {
 	},
 	date: {
 		documentation:
-			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donnent dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
+			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donne dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
 		usage: "{{ date year=2024 month=12 day=31 hours=23 minutes=59 seconds=1.5 }} -> '2024-12-31T23:59:01.500+02:00'",
 		/**
 		 * @param {number} year
@@ -382,3 +382,22 @@ export const FileSize = type('number')
 				"Une taille de fichier sous une forme plus lisible comme '2.5 MB' (les suffixes k, M, G, T et P sont supportés, avec une base 10 ou 2 selon la présence du suffixe 'i', et les unités 'B'/'o' ou 'b' sont supportées pour indiquer si le nombre donné est en bits ou en octets)"
 			)
 	);
+
+/**
+ * @template {import("arktype").Type} K
+ * @template {import("arktype").Type} V
+ * @param {K} k
+ * @param {V} v
+ */
+export const SingleEntryRecord = (k, v) =>
+	type('Record<string, unknown>')
+		.pipe.try((obj) => {
+			const entries = Object.entries(obj);
+			if (entries.length !== 1) {
+				throw new Error(
+					`Expected an object with a single entry, but got ${entries.length} entries: ${safeJSONStringify(obj)}`
+				);
+			}
+			const [key, value] = entries[0];
+			return { key: k.assert(key), value: v.assert(value) };
+		})

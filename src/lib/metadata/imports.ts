@@ -1,17 +1,18 @@
-import { namespacedMetadataId } from '$lib/schemas/metadata.js';
 import { ExportedProtocol, ProtocolImport, ProtocolRegistry } from '$lib/schemas/protocols.js';
 
 let PROTOCOLS_REGISTRY: typeof ProtocolRegistry.infer | null = null;
 
+/**
+ * Downloads (recursively) all the protocols needed to import the given protocol
+ */
 export async function resolveProtocolImports(
 	protocolId: string,
-	imports: Array<typeof ProtocolImport.infer>
-): Promise<Pick<typeof ExportedProtocol.infer, 'metadata' | 'sessionMetadata'>> {
+	imports: Array<typeof ProtocolImport.infer>,
+	/** Resolved imports  */
+	resolved = new Map<string, typeof ExportedProtocol.infer>()
+): Promise<(typeof ExportedProtocol.infer)[]> {
 	if (imports.length === 0) {
-		return {
-			metadata: {},
-			sessionMetadata: {}
-		};
+		return [];
 	}
 
 	if (!PROTOCOLS_REGISTRY) {
@@ -22,13 +23,11 @@ export async function resolveProtocolImports(
 			.then((data) => ProtocolRegistry.assert(data));
 	}
 
-	const parentProtocols = new Map<string, typeof ExportedProtocol.infer>();
-	const inheritedMetadata: Pick<typeof ExportedProtocol.infer, 'metadata' | 'sessionMetadata'> = {
-		metadata: {},
-		sessionMetadata: {}
-	};
-
 	for (const imprt of imports) {
+		if (resolved.has(imprt.from)) {
+			continue;
+		}
+
 		const registryEntry = PROTOCOLS_REGISTRY?.protocols.find(
 			(entry) => entry.id === imprt.from
 		);
@@ -37,37 +36,16 @@ export async function resolveProtocolImports(
 			throw new Error(`Protocol ${protocolId} inherits from unknown protocol ${imprt.from}`);
 		}
 
-		if (!parentProtocols.has(imprt.from)) {
-			const parentProtocol = await fetch(registryEntry.url)
-				.then((res) => res.json())
-				.then((data) => ExportedProtocol.assert(data));
+		const parentProtocol = await fetch(registryEntry.url)
+			.then((res) => res.json())
+			.then((data) => ExportedProtocol.assert(data));
 
-			parentProtocols.set(imprt.from, parentProtocol);
-		}
+		// TODO resolve parentProtocol.importedMetadata in case there's a >2-depth import. We can also detect import cycles there
 
-		const parentProtocol = parentProtocols.get(imprt.from)!;
+		resolved.set(imprt.from, parentProtocol);
 
-		for (const key of imprt.metadata) {
-			const namespacedKey = {
-				parent: namespacedMetadataId(imprt.from, key),
-				child: namespacedMetadataId(protocolId, key)
-			};
-
-			if (namespacedKey.parent in parentProtocol.metadata) {
-				inheritedMetadata.metadata[namespacedKey.child] = {
-					...parentProtocol.metadata[namespacedKey.parent],
-					inheritedFrom: imprt.from
-				};
-			}
-
-			if (namespacedKey.parent in parentProtocol.sessionMetadata) {
-				inheritedMetadata.sessionMetadata[namespacedKey.child] = {
-					...parentProtocol.sessionMetadata[namespacedKey.parent],
-					inheritedFrom: imprt.from
-				};
-			}
-		}
+		await resolveProtocolImports(parentProtocol.id, parentProtocol.imports ?? [], resolved);
 	}
 
-	return inheritedMetadata;
+	return [...resolved.values()];
 }
