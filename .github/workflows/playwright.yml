@@ -82,7 +82,7 @@ jobs:
           echo "key=predownloaded-models:$key" >> $GITHUB_OUTPUT
 
       - name: Use cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           key: ${{ steps.caching.outputs.key }}
           path: |
