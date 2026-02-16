@@ -74,7 +74,7 @@ export function mapValuesNoNullables(subject, mapper) {
  * @template {any} VOut
  * @param {Record<KIn, VIn>} subject
  * @param {(key: KIn, value: VIn) => [KOut, VOut] | undefined} mapper
- * @return {Record<KOut, VOut>}
+ * @returns {Record<KOut, VOut>}
  */
 export function transformObject(subject, mapper) {
 	return fromEntries(
@@ -124,7 +124,7 @@ if (import.meta.vitest) {
 /**
  * @template {string} K
  * @template {any} V
- * @param {Array<[K, V]>} subject
+ * @param {Array<[K, V] | readonly [K, V]>} subject
  * @returns {Record<K, V>}
  */
 export function fromEntries(subject) {
@@ -1440,6 +1440,23 @@ if (import.meta.vitest) {
 		expect(orEmptyObj(undefined, { a: 1 })).toEqual({});
 		expect(orEmptyObj(null, { a: 1 })).toEqual({});
 	});
+}
+
+/**
+ * {} if predicate is falsy, obj if predicate is truthy.
+ * Spread into an object literal to conditionally add something to it
+ * @template T, O
+ * @template {string} K
+ * @param {K} key
+ * @param {T} subject
+ * @param {(subject: NonNullable<T>) => O} obj
+ * @returns { T extends null | undefined ? {} : { [key in K]: O } }
+ */
+export function orEmptyObj2(key, subject, obj) {
+	if (subject === null) return {};
+	if (subject === undefined) return {};
+
+	return { [key]: obj(subject) };
 }
 
 /**

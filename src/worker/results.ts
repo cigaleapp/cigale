@@ -213,7 +213,10 @@ swarp.generateResultsExport(
 				Analysis.assert({
 					session: {
 						...session,
-						metadata: toMetadataRecord(session.metadata)
+						metadata: toMetadataRecord(session.metadata),
+						protocolMetadata: toMetadataRecord(
+							protocolMetadataValues('session', protocolUsed, session.metadata)
+						)
 					},
 					files: Object.fromEntries(
 						exportedMetadataFiles.map(({ id, path }) => [id, path])
@@ -622,7 +625,9 @@ async function prepare({
 			number: observationNumber,
 			metadata: toMetadataRecord(metadata),
 			metadataErrors: obs.metadataErrors,
-			protocolMetadata: toMetadataRecord(protocolMetadataValues(protocolUsed, metadata)),
+			protocolMetadata: toMetadataRecord(
+				protocolMetadataValues('observations+images', protocolUsed, metadata)
+			),
 			images: []
 		};
 		abortSignal?.throwIfAborted();
@@ -643,7 +648,7 @@ async function prepare({
 				numberInObservation,
 				metadata: toMetadataRecord(metadataValues),
 				protocolMetadata: toMetadataRecord(
-					protocolMetadataValues(protocolUsed, metadataValues)
+					protocolMetadataValues('observations+images', protocolUsed, metadataValues)
 				)
 			};
 

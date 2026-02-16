@@ -6,9 +6,19 @@ import { downloadAsFile, stringifyWithToplevelOrdering } from './download.js';
 import { promptForFiles } from './files.js';
 import { errorMessage } from './i18n.js';
 import { metadataOptionsKeyRange } from './metadata/index.js';
-import { isNamespacedToProtocol } from './schemas/metadata.js';
-import { ExportedProtocol, Protocol } from './schemas/protocols.js';
-import { cachebust, fetchHttpRequest, fromEntries, keys, omit, pick, range, sum } from './utils.js';
+import { removeNamespaceFromMetadataId } from './schemas/metadata.js';
+import { ExportedProtocol, isMetadataInProtocol, Protocol } from './schemas/protocols.js';
+import {
+	cachebust,
+	compareBy,
+	fetchHttpRequest,
+	fromEntries,
+	keys,
+	omit,
+	pick,
+	range,
+	sum
+} from './utils.js';
 
 /**
  * @import { Tables } from './database.js';
@@ -150,22 +160,26 @@ export async function promptAndImportProtocol({
 		[...files].map(async (file) => {
 			console.time(`Reading file ${file.name}`);
 			const reader = new FileReader();
-			return new Promise((resolve) => {
+			return new Promise((resolve, reject) => {
 				reader.onload = async () => {
 					if (!reader.result) throw new Error('Fichier vide');
 					if (reader.result instanceof ArrayBuffer) throw new Error('Fichier binaire');
 
 					console.timeEnd(`Reading file ${file.name}`);
-					const result = await importProtocol({
-						contents: reader.result,
-						isJSON: file.name.endsWith('.json')
-					}).catch((err) => Promise.reject(new Error(errorMessage(err))));
+					try {
+						const result = await importProtocol({
+							contents: reader.result,
+							isJSON: file.name.endsWith('.json')
+						});
 
-					const { tables } = await import('./idb.svelte.js');
-					await tables.Protocol.refresh(null);
-					await tables.Metadata.refresh(null);
+						const { tables } = await import('./idb.svelte.js');
+						await tables.Protocol.refresh(null);
+						await tables.Metadata.refresh(null);
 
-					resolve(result);
+						resolve(result);
+					} catch (err) {
+						reject(new Error(errorMessage(err)));
+					}
 				};
 				reader.readAsText(file);
 			});
@@ -481,7 +495,12 @@ export function metadataDefinitionComparator(protocol) {
 		if (typeof b !== 'string') b = b.id;
 
 		if (protocol.metadataOrder) {
-			return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
+			// return protocol.metadataOrder.indexOf(a) - protocol.metadataOrder.indexOf(b);
+			return compareBy((key) =>
+				protocol.metadataOrder
+					?.map(removeNamespaceFromMetadataId)
+					.indexOf(removeNamespaceFromMetadataId(key))
+			)(a, b);
 		}
 		return idComparator(a, b);
 	};
@@ -496,7 +515,7 @@ export function metadataDefinitionComparator(protocol) {
 export function defaultClassificationMetadata(protocol, metadata) {
 	return metadata
 		.filter((m) => m.type === 'enum')
-		.filter((m) => isNamespacedToProtocol(protocol.id, m.id))
+		.filter((m) => isMetadataInProtocol(protocol, m.id))
 		.find((m) => m.infer && 'neural' in m.infer);
 }
 
@@ -507,9 +526,9 @@ export function defaultClassificationMetadata(protocol, metadata) {
  * @param {DB.Metadata[]} metadata
  */
 export function defaultCropMetadata(protocol, metadata) {
-	const boundingBoxes = metadata
+	const boxes = metadata
 		.filter((m) => m.type === 'boundingbox')
-		.filter((m) => isNamespacedToProtocol(protocol.id, m.id));
+		.filter((m) => isMetadataInProtocol(protocol, m.id));
 
-	return boundingBoxes.find((m) => m.infer && 'neural' in m.infer) ?? boundingBoxes.at(0);
+	return boxes.find((m) => m.infer && 'neural' in m.infer) ?? boxes.at(0);
 }

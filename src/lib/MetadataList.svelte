@@ -1,8 +1,15 @@
-<script>
-	let { children } = $props();
+<script lang="ts">
+	import type { Snippet } from "svelte";
+
+	interface Props {
+		children: Snippet;
+		testid?: string
+	}
+
+	let { children, testid }: Props = $props();
 </script>
 
-<div class="liste">
+<div class="liste" data-testid={testid}>
 	{@render children()}
 </div>
 

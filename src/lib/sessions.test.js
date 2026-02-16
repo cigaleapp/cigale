@@ -139,6 +139,7 @@ describe('deleteSession', () => {
 			    "description": "Test Protocol",
 			    "dirty": false,
 			    "id": "com.example.test.protocol",
+			    "importedMetadata": [],
 			    "learnMore": "https://example.com",
 			    "metadata": [
 			      "com.example.test.protocol__date",

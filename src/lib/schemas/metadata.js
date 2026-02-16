@@ -149,7 +149,7 @@ export const MetadataValue = type({
 
 export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
 
-export const MetadataRecord = type.Record(NamespacedMetadataID, {
+export const MetadataRecordValue = MetadataValue.omit('value').and({
 	value: [
 		type.or(
 			'null',
@@ -171,22 +171,14 @@ export const MetadataRecord = type.Record(NamespacedMetadataID, {
 		'string',
 		'@',
 		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
-	],
-	confidence: ['number', '@', 'Confiance dans la valeur de la métadonnée, entre 0 et 1'],
-	manuallyModified: ['boolean', '@', 'La valeur de la métadonnée a été modifiée manuellement'],
-	confirmed: type('boolean')
-		.describe('La valeur de la métadonnée a été confirmée par un·e utilisateurice')
-		.default(false),
-	alternatives: type({
-		'[string]': [
-			'number',
-			'@',
-			'Confiance dans cette valeur alternative de la métadonnée, entre 0 et 1.'
-		]
-	}).describe(
-		"Autres valeurs possibles. Les clés de l'objet sont les autres valeurs possibles pour cette métadonnée (converties en texte via JSON), les valeurs de l'objet sont les confiances associées à ces alternatives."
-	)
+	]
 });
+
+/**
+ * @template {string} K
+ * @param {type.Any<K>} keySchema
+ */
+export const MetadataRecord = (keySchema) => type.Record(keySchema, MetadataRecordValue);
 
 /**
  * @satisfies { Record<string, { label: string; help: string }> }
@@ -266,11 +258,11 @@ export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
 
 export const MetadataDefaultDynamicPayload = type({
-	protocolMetadata: MetadataRecord,
-	metadata: MetadataRecord,
+	protocolMetadata: MetadataRecord(NamespacedMetadataID),
+	metadata: MetadataRecord(ID),
 	session: {
-		protocolMetadata: MetadataRecord,
-		metadata: MetadataRecord,
+		protocolMetadata: MetadataRecord(NamespacedMetadataID),
+		metadata: MetadataRecord(ID),
 		createdAt: 'string.date.iso'
 	}
 });
@@ -304,6 +296,9 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
 const MetadataBase = type({
 	id: NamespacedMetadataID.describe(
 		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
+	),
+	'inheritedFrom?': ProtocolID.describe(
+		"Si cette métadonnée est héritée d'un autre protocole, indique de quel protocole elle est héritée"
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
 	// TODO: move to type-specific branches (e.g. for boundingbox, it's union | none, for others there isnt union, ...)

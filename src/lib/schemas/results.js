@@ -3,6 +3,7 @@ import { type } from 'arktype';
 // Can't use $lib/ in $lib/schemas files, they're susceptible
 // to be imported by non-Vite-managed pre-build scripts (e.g. JSON Schema generation)
 import { mapValues } from '../utils.js';
+import { ID, NamespacedMetadataID } from './common.js';
 import { MetadataErrors, MetadataRecord } from './metadata.js';
 
 export const AnalyzedImage = type({
@@ -20,8 +21,8 @@ export const AnalyzedImage = type({
 		"Numéro de séquence de l'image dans l'archive .zip. Unique à l'entièreté de l'export"
 	],
 	numberInObservation: ['number > 0', '@', "Numéro de l'image dans l'observation"],
-	metadata: MetadataRecord,
-	protocolMetadata: MetadataRecord.describe(
+	metadata: MetadataRecord(NamespacedMetadataID),
+	protocolMetadata: MetadataRecord(ID).describe(
 		'Même logique que protocolMetadata pour les observations'
 	),
 	metadataErrors: MetadataErrors.default(() => ({})),
@@ -35,16 +36,17 @@ export const AnalyzedObservation = type({
 	number: ['number > 0', '@', "Numéro de l'observation dans l'export"],
 	label: ['string', '@', "Label de l'observation"],
 	images: AnalyzedImage.array(),
-	metadata: MetadataRecord,
+	metadata: MetadataRecord(NamespacedMetadataID),
 	metadataErrors: MetadataErrors.default(() => ({})),
-	protocolMetadata: MetadataRecord.describe(
+	protocolMetadata: MetadataRecord(ID).describe(
 		"Métadonnées définies par le protocole. Les clés de l'objet sont les identifiants des métadonnées, sans le préfixe qui identifie leur protocole de provenance"
 	)
 });
 
 /**
- * @param {Record<string, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/schemas/metadata.js').RuntimeValue }>} values
- * @returns {typeof MetadataRecord.infer}
+ * @template {string} K
+ * @param {Record<K, Omit<import('$lib/database.js').MetadataValue, 'value'> & { value: null | import('$lib/schemas/metadata.js').RuntimeValue }>} values
+ * @returns {Record<K, typeof import('$lib/schemas/metadata.js').MetadataRecordValue.infer>}
  */
 export function toMetadataRecord(values) {
 	return mapValues(values, ({ value, ...rest }) => ({

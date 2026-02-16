@@ -312,24 +312,24 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('Dicyrt');
 
 		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
+		  - option "Dicyrtomina signata 0.3%":
+		    - text: ""
+		    - code: 0.3%
+		  - option "Dicyrtomina minuta 1%":
+		    - text: ""
+		    - code: 1%
+		  - option /Dicyrtomina saundersi \\d+%/:
+		    - text: ""
+		    - code: /\\d+%/
+		  - option "Dicyrtomina ornata 4%":
+		    - text: ""
+		    - code: 4%
 		  - option "Dicyrtoma fusca 0.4%":
 		    - text: ""
 		    - code: 0.4%
 		  - option "Dicyrtomina flavosignata 0.2%":
 		    - text: ""
 		    - code: 0.2%
-		  - option "Dicyrtomina minuta 1%":
-		    - text: ""
-		    - code: 1%
-		  - option "Dicyrtomina ornata 4%":
-		    - text: ""
-		    - code: 4%
-		  - option /Dicyrtomina saundersi \\d+%/:
-		    - text: ""
-		    - code: /\\d+%/
-		  - option "Dicyrtomina signata 0.3%":
-		    - text: ""
-		    - code: 0.3%
 		  - option "Allacma fusca AKA Dicyrtoma fusca 9%":
 		    - text: ""
 		    - code: 9%
@@ -368,21 +368,21 @@ test.describe('can search in a enum-type metadata combobox', () => {
 		await initialize({ page, app });
 		await page.getByTestId('sidepanel').getByRole('combobox').first().fill('desoria');
 		await assert(page.getByTestId('metadata-combobox-viewport')).toMatchAriaSnapshot(`
-		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
-		    - text: ""
-		    - code: 0.4%
-		  - option "Isotoma viridis AKA Desoria fusia 0.1%":
+		  - option "Isotomurus palustris AKA Desoria riparia 0.1%":
 		    - text: ""
 		    - code: 0.1%
 		  - option "Isotomurus maculatus AKA Desoria riparia 1%":
 		    - text: ""
 		    - code: 1%
-		  - option "Isotomurus palustris AKA Desoria riparia 0.1%":
-		    - text: ""
-		    - code: 0.1%
 		  - option "Parisotoma notabilis AKA Desoria monticola 0.1%":
 		    - text: ""
 		    - code: 0.1%
+		  - option "Isotoma viridis AKA Desoria fusia 0.1%":
+		    - text: ""
+		    - code: 0.1%
+		  - option "Isotoma riparia AKA Desoria riparia 0.4%":
+		    - text: ""
+		    - code: 0.4%
 		  - option "Vertagopus asiaticus AKA Desoria cylindrica 0.1%":
 		    - text: ""
 		    - code: 0.1%

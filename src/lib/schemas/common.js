@@ -392,3 +392,21 @@ export const FileSize = type('number')
 				"Une taille de fichier sous une forme plus lisible comme '2.5 MB' (les suffixes k, M, G, T et P sont supportés, avec une base 10 ou 2 selon la présence du suffixe 'i', et les unités 'B'/'o' ou 'b' sont supportées pour indiquer si le nombre donné est en bits ou en octets)"
 			)
 	);
+
+/**
+ * @template {import("arktype").Type} K
+ * @template {import("arktype").Type} V
+ * @param {K} k
+ * @param {V} v
+ */
+export const SingleEntryRecord = (k, v) =>
+	type('Record<string, unknown>').pipe.try((obj) => {
+		const entries = Object.entries(obj);
+		if (entries.length !== 1) {
+			throw new Error(
+				`Expected an object with a single entry, but got ${entries.length} entries: ${safeJSONStringify(obj)}`
+			);
+		}
+		const [key, value] = entries[0];
+		return { key: k.assert(key), value: v.assert(value) };
+	});

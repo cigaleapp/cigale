@@ -4,7 +4,7 @@ import * as idb from '$lib/idb.svelte.js';
 import { tables } from '$lib/idb.svelte.js';
 import { resolveDefaults } from '$lib/metadata/defaults.js';
 import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
-import { compareBy, nonnull } from '$lib/utils';
+import { compareBy } from '$lib/utils.js';
 
 export async function load({ params: { id }, depends }) {
 	depends(idb.dependencyURI('Session', id));
@@ -25,9 +25,12 @@ export async function load({ params: { id }, depends }) {
 		};
 	}
 
-	const sessionMetadataDefs = await Promise.all(
-		protocol.sessionMetadata.map((mdId) => tables.Metadata.get(mdId))
-	).then((defs) => defs.filter(nonnull));
+	// const sessionMetadataDefs = await Promise.all(
+	// 	protocol.sessionMetadata.map((mdId) => tables.Metadata.get(mdId))
+	// ).then((defs) => defs.filter(nonnull));
+	const sessionMetadataDefs = await tables.Metadata.getMany(
+		[...protocol.sessionMetadata, ...protocol.importedMetadata.filter(imp => imp.sessionwide).map(imp => imp.source)]
+	)
 
 	sessionMetadataDefs.forEach(({ id }) => depends(idb.dependencyURI('Metadata', id)));
 
