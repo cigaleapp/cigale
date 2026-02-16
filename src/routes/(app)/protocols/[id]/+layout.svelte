@@ -68,7 +68,7 @@
 		try {
 			let newId = namespacedMetadataId(id, slugify(name).replaceAll('-', '_'));
 			if (metadata.includes(newId))
-				newId += `_${metadata.filter((k) => k.startsWith(newId)).length + 1}`;
+				newId = `${newId}_${metadata.filter((k) => k.startsWith(newId)).length + 1}`;
 
 			await tables.Metadata.set({
 				id: newId,

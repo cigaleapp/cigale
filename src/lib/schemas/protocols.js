@@ -1,11 +1,13 @@
 import { type } from 'arktype';
 
+import { mapKeys } from '../utils.js';
 import {
 	FilepathTemplate,
 	HTTPRequest,
 	ID,
 	MIMEType,
-	References,
+	NamespacedMetadataID,
+	ProtocolID,
 	TemplatedString,
 	URLString
 } from './common.js';
@@ -42,18 +44,16 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
 
 export const Protocol = type({
-	id: ID.describe(
-		'Identifiant unique pour le protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.mon-protocole'
-	),
+	id: ProtocolID,
 	dirty: type('boolean')
 		.describe('Si le protocole a été modifié depuis sa dernière exportation')
 		.default(false),
-	metadata: References.describe(
+	metadata: NamespacedMetadataID.array().describe(
 		"Toutes les métadonnées du protocole (qu'elles soient associées aux sessions ou aux observations/images)"
 	),
-	sessionMetadata: References.describe('Métadonnées associées à la session entière').default(
-		() => []
-	),
+	sessionMetadata: NamespacedMetadataID.array()
+		.describe('Métadonnées associées à la session entière')
+		.default(() => []),
 	name: ['string', '@', 'Nom du protocole'],
 	description: ['string', '@', 'Description du protocole'],
 	'learnMore?': URLString.describe(
@@ -75,7 +75,7 @@ export const Protocol = type({
 	})
 		.array()
 		.describe("Les auteurices ayant participé à l'élaboration du protocole"),
-	'metadataOrder?': type(ID.array()).describe(
+	'metadataOrder?': type(NamespacedMetadataID.array()).describe(
 		"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
 	),
 	'observations?': {
@@ -127,32 +127,31 @@ export const Protocol = type({
 		.optional()
 });
 
-export const ExportedProtocol = Protocol.omit('metadata', 'sessionMetadata', 'dirty')
+export const ExportedProtocol = Protocol.omit(
+	'metadata',
+	'sessionMetadata',
+	'metadataOrder',
+	'dirty'
+)
 	.in.and({
-		metadata: {
-			'[string]': Metadata.in
-				.omit('id')
-				.describe('Métadonnées associées aux observations/imagess')
-		},
-		'sessionMetadata?': {
-			'[string]': Metadata.in
-				.omit('id')
-				.describe('Métadonnées associées à la session entière')
-		}
+		'metadataOrder?': ID.array().describe(
+			"L'ordre dans lequel les métadonnées doivent être présentées dans l'interface utilisateur. Les métadonnées non listées ici seront affichées après toutes celles listées ici"
+		),
+		metadata: type.Record(
+			ID,
+			Metadata.in.omit('id').describe('Métadonnées associées aux observations/imagess')
+		),
+		'sessionMetadata?': type.Record(
+			ID,
+			Metadata.in.omit('id').describe('Métadonnées associées à la session entière')
+		)
 	})
 	.pipe((protocol) => ({
 		...protocol,
-		metadata: Object.fromEntries(
-			Object.entries(protocol.metadata).map(([id, metadata]) => [
-				namespacedMetadataId(protocol.id, id),
-				metadata
-			])
-		),
-		sessionMetadata: Object.fromEntries(
-			Object.entries(protocol.sessionMetadata ?? {}).map(([id, metadata]) => [
-				namespacedMetadataId(protocol.id, id),
-				metadata
-			])
+		metadataOrder: protocol.metadataOrder?.map((key) => namespacedMetadataId(protocol.id, key)),
+		metadata: mapKeys(protocol.metadata, (key) => namespacedMetadataId(protocol.id, key)),
+		sessionMetadata: mapKeys(protocol.sessionMetadata ?? {}, (key) =>
+			namespacedMetadataId(protocol.id, key)
 		)
 	}));
 

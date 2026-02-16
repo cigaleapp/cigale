@@ -4,7 +4,21 @@ import Handlebars from 'handlebars';
 
 import { clamp, mapValues, safeJSONStringify, splitFilenameOnExtension } from '../utils.js';
 
-export const ID = type(/^[\w._]+$/);
+export const ID = type(/^[\w._-]+$/);
+
+export const ProtocolID = type(/[\w.-]+/).describe(
+	'Identifiant unique pour un protocole. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, fr.sete-moulis-cnrs.mon-protocole si vous contrôler le nom de domain sete-moulis.cnrs.fr'
+);
+
+export const NamespacedMetadataID = type('/^([\\w.-]+)__([\\w._-]+)$/').describe(
+	'Identifiant de métadonnée avec namespace, sous la forme "protocolId__metadataId"'
+);
+
+/**
+ * @template {string} [P=string]
+ * @typedef {`${P}__${string}`} NamespacedMetadataID
+ */
+
 
 export const References = ID.array().pipe((ids) => [...new Set(ids)]);
 
@@ -99,7 +113,7 @@ export const HANDLEBARS_HELPERS = {
 		usage: "{{ metadata session 'transect_code' }} -> 'TR123'",
 		/**
 		 * @param {{ [ K in "protocolMetadata" | "metadata"]: import('$lib/database.js').MetadataValues } | { [ K in "metadataOverrides" | "protocolMetadataOverrides"]: import('$lib/database.js').MetadataValues }} subject
-		 * @param {string} metadataId
+		 * @param {import('$lib/schemas/common.js').NamespacedMetadataID} metadataId
 		 */
 		implementation: (subject, metadataId) => {
 			if ('metadata' in subject) {
@@ -194,7 +208,7 @@ export const HANDLEBARS_HELPERS = {
 	},
 	date: {
 		documentation:
-			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donnent dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
+			"Construire une date à partir de ses composantes. il est possible d'omettre les noms des composantes si on les donne dans l'ordre descendant (year, ..., minutes). toutes les composantes sont optionelles à partir des heures (et valent 0 par défaut). Les dates sont interprétées localement (dans le fuseau horaire local) ",
 		usage: "{{ date year=2024 month=12 day=31 hours=23 minutes=59 seconds=1.5 }} -> '2024-12-31T23:59:01.500+02:00'",
 		/**
 		 * @param {number} year

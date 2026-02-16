@@ -6,6 +6,7 @@ import {
 	HTTPRequest,
 	ID,
 	MIMEType,
+	NamespacedMetadataID,
 	Probability,
 	References
 } from './schemas/common.js';
@@ -113,8 +114,8 @@ const Metadata = table('id', MetadataSchema.omit('options'));
 const MetadataOption = table(
 	['id'],
 	MetadataEnumVariant.and({
-		id: [/\w+:\w+/, '@', 'ID of the form metadata_id:key'],
-		metadataId: ID
+		id: [/\w+__\w+:\w+/, '@', 'ID of the form namespaced_metadata_id:key'],
+		metadataId: NamespacedMetadataID
 	})
 );
 const Protocol = table('id', ProtocolSchema);
