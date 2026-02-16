@@ -154,7 +154,7 @@
 		"idb": "^8.0.3",
 		"jimp": "^1.6.0",
 		"maplibre-gl": "^5.18.0",
-		"marked": "^17.0.1",
+		"marked": "^17.0.2",
 		"microdiff": "^1.5.0",
 		"nanoid": "^5.1.6",
 		"onnxruntime-web": "^1.22.0",
