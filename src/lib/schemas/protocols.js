@@ -43,6 +43,13 @@ export const ExportsFilepathTemplateMetadataFile = FilepathTemplate(
 
 export const ANALYSIS_JSON_ZIP_FILEPATH = 'analysis.json';
 
+export const ProtocolRegistry = type({
+	protocols: type({
+		id: ProtocolID,
+		url: URLString.describe('URL où télécharger le protocole')
+	}).array()
+});
+
 export const Protocol = type({
 	id: ProtocolID,
 	dirty: type('boolean')
