@@ -1,0 +1,1 @@
+import"./DsnmJJEf.js";import{f as a,a as e}from"./ky4CV-y8.js";import{a as i}from"./DXiM5GYn.js";import{r as p}from"./CUvanNpq.js";var m=a('<svg><path fill="currentColor" d="M5 11v2h14v-2z"></path></svg>');function l(r,o){const s=p(o,["$$slots","$$events","$$legacy"]);var t=m();i(t,()=>({class:"icon",viewBox:"0 0 24 24",width:"1.2em",height:"1.2em",...s})),e(r,t)}export{l as S};
