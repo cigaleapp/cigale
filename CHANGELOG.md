@@ -6,18 +6,32 @@ All notable changes to this project will be documented in this file, on a monthl
 
 ### Improvements
 
+- Add default values on metadata definitions for session metadata (Closes #1223)
+- Add map for displaying/inputting location metadata values
 - Implement export-to-folder
+- Implement file metadata
+- Improve clear button & confidence indicator on metadata inputs
+- Improve error message in crop step of loadTensor()
+- Include open session and metadata errors in bug report metadata, show metadata in modal
 - Make carousel scroll buttons much more responsive
 - Make classifier take observations instead of images
+- Put full-screen-classifier open button disabled-help in tooltip
+- Store inference errors in exports
 
 ### Bug Fixes
 
+- Fix a test and fix $lib/file-tree
 - Fix behavior of continue button in fullscreen classifier view
+- Fix confirmation overlay not showing up
+- Fix formatBytesSize()
 - Fix fullscreen classifier layout switching
 - Fix layout switch in classifier not working immediately
 - Fix navbar not hiding when going to cropper from classifier
+- Fix session not switching when opening via Manage button on session card
 - Fix tooltips not showing on disabled buttons
 - Fix warning when JPEG file has no EXIF date (#1193)
+- Prevent negative coords when converting bounding box to topleft format
+- Raise error in storeMetadataValue if no subjects found
 
 ### Data Updates
 
