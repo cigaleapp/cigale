@@ -2,12 +2,14 @@ import { ArkErrors, scope, type } from 'arktype';
 
 import { parseISOSafe } from '../date.js';
 import { EXIF_FIELDS } from '../exiffields.js';
-import { keys, safeJSONStringify, unique } from '../utils.js';
+import { keys, unique } from '../utils.js';
 import {
 	ColorHex,
 	FileSize,
 	ID,
+	NamespacedMetadataID,
 	Probability,
+	ProtocolID,
 	TemplatedString,
 	UniqueFileTypeSpecifier,
 	URLString
@@ -115,9 +117,7 @@ export const MetadataError = type({
 	)
 });
 
-export const MetadataErrors = scope({ ID }).type({
-	'[ID]': MetadataError.array()
-});
+export const MetadataErrors = type.Record(NamespacedMetadataID, MetadataError.array());
 
 /**
  * @template {MetadataType} [Type=MetadataType]
@@ -147,54 +147,38 @@ export const MetadataValue = type({
 	}
 });
 
-export const MetadataValues = scope({ ID }).type({
-	'[ID]': MetadataValue
+export const MetadataValues = type.Record(NamespacedMetadataID, MetadataValue);
+
+export const MetadataRecordValue = MetadataValue.omit('value').and({
+	value: [
+		type.or(
+			'null',
+			MetadataRuntimeValue.boolean,
+			MetadataRuntimeValue.integer,
+			MetadataRuntimeValue.float,
+			MetadataRuntimeValue.string,
+			// MetadataRuntimeValue.date
+			// Date is not compatible with JSON Schemas, use a datestring instead
+			'string.date.iso',
+			MetadataRuntimeValue.location,
+			MetadataRuntimeValue.boundingbox,
+			MetadataRuntimeValue.file
+		),
+		'@',
+		'Valeur de la métadonnée'
+	],
+	'valueLabel?': [
+		'string',
+		'@',
+		"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
+	]
 });
 
-export const MetadataRecord = type({
-	'[string]': {
-		value: [
-			type.or(
-				'null',
-				MetadataRuntimeValue.boolean,
-				MetadataRuntimeValue.integer,
-				MetadataRuntimeValue.float,
-				MetadataRuntimeValue.string,
-				// MetadataRuntimeValue.date
-				// Date is not compatible with JSON Schemas, use a datestring instead
-				'string.date.iso',
-				MetadataRuntimeValue.location,
-				MetadataRuntimeValue.boundingbox,
-				MetadataRuntimeValue.file
-			),
-			'@',
-			'Valeur de la métadonnée'
-		],
-		'valueLabel?': [
-			'string',
-			'@',
-			"Label de la valeur de la métadonnée. Existe pour les métadonnées de type enum, contient dans ce cas le label associé à la clé de l'option de l'enum choisie"
-		],
-		confidence: ['number', '@', 'Confiance dans la valeur de la métadonnée, entre 0 et 1'],
-		manuallyModified: [
-			'boolean',
-			'@',
-			'La valeur de la métadonnée a été modifiée manuellement'
-		],
-		confirmed: type('boolean')
-			.describe('La valeur de la métadonnée a été confirmée par un·e utilisateurice')
-			.default(false),
-		alternatives: type({
-			'[string]': [
-				'number',
-				'@',
-				'Confiance dans cette valeur alternative de la métadonnée, entre 0 et 1.'
-			]
-		}).describe(
-			"Autres valeurs possibles. Les clés de l'objet sont les autres valeurs possibles pour cette métadonnée (converties en texte via JSON), les valeurs de l'objet sont les confiances associées à ces alternatives."
-		)
-	}
-});
+/**
+ * @template {string} K
+ * @param {type.Any<K>} keySchema
+ */
+export const MetadataRecord = (keySchema) => type.Record(keySchema, MetadataRecordValue);
 
 /**
  * @satisfies { Record<string, { label: string; help: string }> }
@@ -262,8 +246,8 @@ export const MetadataEnumVariant = type({
 	'icon?': type(/^ri:[\w-]+$/).describe(
 		"Code Iconify d'une icône associée à cette option, provenant du pack d'icônes “Remix Icon”. Voir https://icon-sets.iconify.design/ri/ pour la liste."
 	),
-	'cascade?': scope({ ID })
-		.type({ '[ID]': 'ID' })
+	'cascade?': type
+		.Record(ID, ID)
 		.describe(
 			'Objet contenant pour clés des identifiants d\'autres métadonnées, et pour valeurs la valeur à assigner à cette métadonnée si cette option est choisie. Le processus est récursif: Imaginons une métadonnée species ayant une option avec `{ key: "1", cascade: { genus: "2" } }`, une métadonnée genus ayant une option `{ key: "2", cascade: { family: "3" } }`. Si l\'option "1" de la métadonnée species est choisie, la métadonnée genus sera définie sur l\'option "2" et la métadonnée family sera à son tour définie sur l\'option "3".'
 		)
@@ -274,11 +258,11 @@ export const EXIFField = type.enumerated(...keys(EXIF_FIELDS));
 export const EXIFInference = EXIFField.describe('Inférer depuis un champ EXIF', 'self');
 
 export const MetadataDefaultDynamicPayload = type({
-	protocolMetadata: MetadataRecord,
-	metadata: MetadataRecord,
+	protocolMetadata: MetadataRecord(NamespacedMetadataID),
+	metadata: MetadataRecord(ID),
 	session: {
-		protocolMetadata: MetadataRecord,
-		metadata: MetadataRecord,
+		protocolMetadata: MetadataRecord(NamespacedMetadataID),
+		metadata: MetadataRecord(ID),
 		createdAt: 'string.date.iso'
 	}
 });
@@ -310,8 +294,11 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
  */
 
 const MetadataBase = type({
-	id: ID.describe(
+	id: NamespacedMetadataID.describe(
 		'Identifiant unique pour la métadonnée. On conseille de mettre une partie qui vous identifie dans cet identifiant, car il doit être globalement unique. Par exemple, mon-organisation.ma-métadonnée'
+	),
+	'inheritedFrom?': ProtocolID.describe(
+		"Si cette métadonnée est héritée d'un autre protocole, indique de quel protocole elle est héritée"
 	),
 	label: ['string', '@', 'Nom de la métadonnée'],
 	// TODO: move to type-specific branches (e.g. for boundingbox, it's union | none, for others there isnt union, ...)
@@ -424,10 +411,10 @@ export const Metadata = type.or(
 /**
  * Ensures a metadata ID is namespaced to the given protocol ID
  * If the ID is already namespaced, the existing namespace is re-namespaced to the given protocol ID.
- * @template {string} ProtocolID
- * @param {ProtocolID} protocolId
+ * @template {string} P
+ * @param {P} protocolId
  * @param {string} metadataId
- * @returns {`${ProtocolID}__${string}`}
+ * @returns {NamespacedMetadataID<P>}
  */
 export function namespacedMetadataId(protocolId, metadataId) {
 	metadataId = metadataId.replace(/^.+__/, '');
@@ -465,6 +452,18 @@ export function removeNamespaceFromMetadataId(metadataId) {
 }
 
 /**
+ * @overload
+ * @param {NamespacedMetadataID} metadataId
+ * @returns {string}
+ */
+
+/**
+ * @overload
+ * @param {string} metadataId
+ * @returns {string	| undefined}
+ */
+
+/**
  *
  * @param {string} metadataId
  * @returns
@@ -474,6 +473,18 @@ export function namespaceOfMetadataId(metadataId) {
 	if (parts.length < 2) return undefined;
 	return parts.slice(0, -1).join('__');
 }
+
+/**
+ * @overload
+ * @param {NamespacedMetadataID} metadataId
+ * @returns {{ namespace: string, id: string }}
+ */
+
+/**
+ * @overload
+ * @param {string} metadataId
+ * @returns {{ namespace: string | undefined, id: string }}
+ */
 
 /**
  *

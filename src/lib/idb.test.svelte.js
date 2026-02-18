@@ -74,16 +74,16 @@ describe('operations', () => {
 	describe('set', () => {
 		test('regular case', async () => {
 			await idb.set('Metadata', {
-				id: 'test',
+				id: 'proto__test',
 				description: '',
 				label: 'Test',
 				mergeMethod: 'none',
 				required: false,
 				type: 'string'
 			});
-			const object = await idb.get('Metadata', 'test');
+			const object = await idb.get('Metadata', 'proto__test');
 			expect(object).toEqual({
-				id: 'test',
+				id: 'proto__test',
 				description: '',
 				label: 'Test',
 				mergeMethod: 'none',
@@ -97,7 +97,7 @@ describe('operations', () => {
 			const db = await openDatabase();
 			const addedAt = new Date();
 			await idb.set('Image', {
-				id: imageId(0, 0),
+				id: imageId('0', 0),
 				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
@@ -105,7 +105,7 @@ describe('operations', () => {
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
 				metadata: {
-					water: {
+					proto__water: {
 						value: '"bucket"',
 						alternatives: {
 							'"release!!!!"': 0.3
@@ -114,9 +114,9 @@ describe('operations', () => {
 				}
 			});
 
-			const serialized = await db.get('Image', imageId(0, 0));
+			const serialized = await db.get('Image', imageId("0", 0));
 			expect(serialized).toEqual({
-				id: imageId(0, 0),
+				id: imageId('0', 0),
 				sessionId: 'testing',
 				addedAt: addedAt.toISOString(),
 				fileId: 'quoicoubaka',
@@ -124,7 +124,7 @@ describe('operations', () => {
 				contentType: 'what/ever',
 				filename: 'THE NETHER',
 				metadata: {
-					water: {
+					proto__water: {
 						value: '"bucket"',
 						alternatives: {
 							'"release!!!!"': 0.3
@@ -133,9 +133,9 @@ describe('operations', () => {
 				}
 			});
 
-			const deserialized = await idb.get('Image', imageId(0, 0));
+			const deserialized = await idb.get('Image', imageId('0', 0));
 			expect(deserialized).toEqual({
-				id: imageId(0, 0),
+				id: imageId('0', 0),
 				sessionId: 'testing',
 				addedAt,
 				fileId: 'quoicoubaka',
@@ -145,7 +145,7 @@ describe('operations', () => {
 				filename: 'THE NETHER',
 				metadataErrors: {},
 				metadata: {
-					water: {
+					proto__water: {
 						value: 'bucket',
 						confidence: 1,
 						confirmed: false,
@@ -192,7 +192,7 @@ describe('operations', () => {
 		const db = await openDatabase();
 		const addedAt = new Date();
 		await db.put('Image', {
-			id: imageId(0, 0),
+			id: imageId('0', 0),
 			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
@@ -201,7 +201,7 @@ describe('operations', () => {
 			filename: 'THE NETHER',
 			metadataErrors: {},
 			metadata: {
-				water: {
+				proto__water: {
 					value: '"bucket"',
 					alternatives: {
 						'"release!!!!"': 0.3
@@ -210,7 +210,7 @@ describe('operations', () => {
 			}
 		});
 		await db.put('Image', {
-			id: imageId(0, 1),
+			id: imageId('0', 1),
 			sessionId: 'testing',
 			addedAt: addedAt.toISOString(),
 			fileId: 'quoicoubaka',
@@ -219,7 +219,7 @@ describe('operations', () => {
 			filename: 'ogrjoigrejo',
 			metadataErrors: {},
 			metadata: {
-				water: {
+				proto__water: {
 					value: '"ogjroe"',
 					alternatives: {
 						'"release!!!!"': 0.3
@@ -227,8 +227,8 @@ describe('operations', () => {
 				}
 			}
 		});
-		expect(await idb.get('Image', imageId(0, 0))).toEqual({
-			id: imageId(0, 0),
+		expect(await idb.get('Image', imageId('0', 0))).toEqual({
+			id: imageId('0', 0),
 			sessionId: 'testing',
 			addedAt,
 			fileId: 'quoicoubaka',
@@ -238,7 +238,7 @@ describe('operations', () => {
 			filename: 'THE NETHER',
 			metadataErrors: {},
 			metadata: {
-				water: {
+				proto__water: {
 					value: 'bucket',
 					confidence: 1,
 					confirmed: false,
@@ -351,7 +351,7 @@ describe('wrangler', () => {
 		filename: 'THE NETHER',
 		metadataErrors: {},
 		metadata: {
-			water: {
+			proto__water: {
 				value: '"bucket"',
 				alternatives: {
 					'"release!!!!"': 0.3
@@ -401,7 +401,7 @@ describe('wrangler', () => {
 
 		test('without session', async () => {
 			await idb.set('Metadata', {
-				id: 'test',
+				id: 'proto__test',
 				label: 'Test',
 				description: '',
 				mergeMethod: 'none',
@@ -617,7 +617,7 @@ describe('wrangler', () => {
 				await tables.Image.raw.set({
 					...image(1),
 					metadata: {
-						water: {
+						proto__water: {
 							value: '"bucket"',
 							alternatives: {
 								'"release!!!!"': 0.3
@@ -634,7 +634,7 @@ describe('wrangler', () => {
 						dimensions: { width: 100, height: 100, aspectRatio: 1 },
 						addedAt,
 						metadata: {
-							water: {
+							proto__water: {
 								value: 'bucket',
 								confidence: 1,
 								confirmed: false,
@@ -652,7 +652,7 @@ describe('wrangler', () => {
 						dimensions: { width: 100, height: 100, aspectRatio: 1 },
 						addedAt,
 						metadata: {
-							water: {
+							proto__water: {
 								value: 'bucket',
 								confidence: 1,
 								confirmed: false,
@@ -676,7 +676,7 @@ describe('wrangler', () => {
 					dimensions: { width: 100, height: 100, aspectRatio: 1 },
 					boundingBoxesAnalyzed: false,
 					metadata: {
-						water: {
+						proto__water: {
 							value: 'bucket',
 							confidence: 1,
 							confirmed: false,
@@ -692,7 +692,7 @@ describe('wrangler', () => {
 					...image(1),
 					addedAt: addedAt.toISOString(),
 					metadata: {
-						water: {
+						proto__water: {
 							value: '"bucket"',
 							alternatives: {
 								'"release!!!!"': 0.3

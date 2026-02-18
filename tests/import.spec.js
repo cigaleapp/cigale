@@ -1,5 +1,4 @@
 import * as dates from 'date-fns';
-import * as yauzl from 'yauzl-promise';
 
 import { issue } from './annotations.js';
 import { assert, test } from './fixtures.js';

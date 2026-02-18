@@ -17,6 +17,7 @@
 	import { getMetadataValue } from '$lib/metadata/index.js';
 	import MetadataCascadesTable from '$lib/MetadataCascadesTable.svelte';
 	import { observationMetadata } from '$lib/observations';
+	import { namespaceOfMetadataId } from '$lib/schemas/metadata.js';
 	import { scrollfader } from '$lib/scrollfader';
 	import { isDebugMode } from '$lib/settings.svelte.js';
 	import { uiState } from '$lib/state.svelte.js';
@@ -102,7 +103,7 @@
 			{/if}
 		</div>
 
-		{#if option}
+		{#if option && focusedMetadata}
 			<div
 				class="cascades"
 				{@attach area('cascades')}
@@ -116,7 +117,7 @@
 					indent-icon={false}
 				>
 					{#await openDatabase() then db}
-						{#await cascadeLabels( { cache: cascadeLabelsCache, db, protocolId: uiState.currentProtocolId, option } ) then cascades}
+						{#await cascadeLabels( { cache: cascadeLabelsCache, db, protocolId: namespaceOfMetadataId(focusedMetadata.id), option } ) then cascades}
 							<MetadataCascadesTable {cascades} />
 						{/await}
 					{/await}

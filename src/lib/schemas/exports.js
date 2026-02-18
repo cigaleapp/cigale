@@ -1,5 +1,6 @@
 import { type } from 'arktype';
 
+import { ID, NamespacedMetadataID } from './common.js';
 import { MetadataRecord } from './metadata.js';
 import { AnalyzedObservation } from './results.js';
 import { Session } from './sessions.js';
@@ -10,7 +11,9 @@ export const Analysis = type({
 		.describe("Associe l'ID d'une observation à son label et les valeurs de ses métadonnées"),
 	session: Session.omit('metadata')
 		.and({
-			metadata: MetadataRecord
+			metadata: MetadataRecord(NamespacedMetadataID),
+			// TODO(2026-02-17): remove the default in a little while
+			protocolMetadata: MetadataRecord(ID).default(() => ({}))
 		})
 		.describe("La session d'analyse"),
 	files: type

@@ -15,8 +15,8 @@
 	import { page } from '$app/state';
 	import ButtonSecondary from '$lib/ButtonSecondary.svelte';
 	import CroppedImg from '$lib/CroppedImg.svelte';
-	import { plural } from '$lib/i18n';
-	import { tables } from '$lib/idb.svelte';
+	import { plural } from '$lib/i18n.js';
+	import { tables } from '$lib/idb.svelte.js';
 	import * as idb from '$lib/idb.svelte.js';
 	import InlineTextInput from '$lib/InlineTextInput.svelte';
 	import KeyboardHint from '$lib/KeyboardHint.svelte';
@@ -24,16 +24,20 @@
 	import Metadata from '$lib/Metadata.svelte';
 	import { metadataOptionsKeyRange } from '$lib/metadata/index.js';
 	import MetadataList from '$lib/MetadataList.svelte';
-	import { goto } from '$lib/paths';
-	import { metadataDefinitionComparator } from '$lib/protocols';
+	import { goto } from '$lib/paths.js';
+	import { metadataDefinitionComparator } from '$lib/protocols.js';
+	import { splitMetadataId } from '$lib/schemas/metadata.js';
 	import { getSettings } from '$lib/settings.svelte';
 	import { uiState } from '$lib/state.svelte.js';
+
+	/**
+	 * @import * as DB from '$lib/database.js';
+	 */
 
 	/**
 	 * @typedef {object} Props
 	 * @property {Array<{ src: string; box?: undefined | TopLeftBoundingBox, id: string, dimensions: {width: number, height: number} }>} images source **href**s of the images/observations we're modifying the metadata on
 	 * @property {(() => void) | undefined} [onmerge] callback to call when the user wants to merge images or observations into a single one. If not set, the merge button is not shown.
-	 * @property {() => void} onaddmetadata callback to call when the user wants to add metadata
 	 * @property {() => void} ondelete callback to call when the user wants to delete the images or observations
 	 * @property {(() => void) | undefined} [onsplit] callback to call when the user wants to split the selected observation(s). If not set, the split button is not shown.
 	 * @property {(() => void) | undefined} [onimport] callback to call when the user wants to import additional images. If not set, the import button is not shown.
@@ -57,11 +61,16 @@
 	} = $props();
 
 	const definitions = $derived.by(() => {
-		const protocol = tables.Protocol.state.find((p) => p.id === uiState.currentProtocolId);
+		const protocol = uiState.currentProtocol;
 		if (!protocol) return [];
-		return protocol.metadata
-			.filter((id) => !protocol.sessionMetadata.includes(id))
-			.map((id) => tables.Metadata.state.find((m) => m.id === id))
+		return [
+			...protocol.importedMetadata
+				.filter((imp) => !imp.sessionwide)
+				.map((imp) => tables.Metadata.getFromState(imp.source)),
+			...protocol.metadata
+				.filter((id) => !protocol.sessionMetadata.includes(id))
+				.map((id) => tables.Metadata.getFromState(id))
+		]
 			.filter((m) => m !== undefined)
 			.toSorted(metadataDefinitionComparator(protocol));
 	});
@@ -69,12 +78,12 @@
 	/**
 	 * Contains EVERY options for every metadata.
 	 * This is a SHALLOW $state, otherwise it makes the browser lag the hell out cuz Svelte's runtime tries to deeply proxify everything (some metadata can have tens of thousands of options).
-	 * @type {Record<string, import('$lib/database').MetadataEnumVariant[]>} */
+	 * @type {Record<string, Map<string, DB.MetadataEnumVariant>>} */
 	const options = $state.raw({});
 
 	let loadingOptions = $state(true);
 	watch([() => definitions], () => {
-		if (!uiState.currentProtocolId) {
+		if (!uiState.currentProtocol) {
 			loadingOptions = false;
 			return;
 		}
@@ -85,23 +94,31 @@
 			return;
 		}
 
-		idb.list('MetadataOption', metadataOptionsKeyRange(uiState.currentProtocolId, null)).then(
-			(result) => {
-				// Prevent double-load even if both promises resolved at the same time
-				if (Object.keys(options).length > 0) {
-					loadingOptions = false;
-					return;
-				}
-				for (const { metadataId, key, ...rest } of result) {
-					options[metadataId] ??= [];
-					options[metadataId].push({ key: key.toString(), ...rest });
-				}
-				for (const metadataId of Object.keys(options)) {
-					options[metadataId].sort((a, b) => a.label.localeCompare(b.label));
-				}
+		const keyranges = [
+			metadataOptionsKeyRange(uiState.currentProtocol.id, null),
+			...uiState.currentProtocol.importedMetadata
+				.filter(({ sessionwide }) => !sessionwide)
+				.map(({ source }) => {
+					const { namespace, id } = splitMetadataId(source);
+					return metadataOptionsKeyRange(namespace, id);
+				})
+		];
+
+		Promise.all(keyranges.map((range) => idb.list('MetadataOption', range))).then((results) => {
+			// Prevent double-load even if both promises resolved at the same time
+			if (Object.keys(options).length > 0) {
 				loadingOptions = false;
+				return;
 			}
-		);
+
+			for (const { metadataId, key, ...rest } of results.flat()) {
+				options[metadataId] ??= new Map();
+				const k = key.toString();
+				options[metadataId].set(k, { key: k, ...rest });
+			}
+
+			loadingOptions = false;
+		});
 	});
 
 	const showTechnicalMetadata = $derived(getSettings().showTechnicalMetadata);
@@ -190,7 +207,7 @@
 				{plural(selectionCounts.observation, ['1 observation', '# observations'])}
 			{/if}
 		</h2>
-		<MetadataList>
+		<MetadataList testid="sidepanel-metadata">
 			{#each definitions as definition (definition.id)}
 				{@const value = metadata[definition.id]}
 				{#if definition.label || showTechnicalMetadata}
@@ -198,7 +215,7 @@
 						merged={value?.merged}
 						{definition}
 						{value}
-						options={options[definition.id]}
+						options={[...(options[definition.id] ?? new Map()).values()]}
 						onchange={async (v) => {
 							if (dequal(v, value?.value)) return;
 							onmetadatachange(definition.id, v);

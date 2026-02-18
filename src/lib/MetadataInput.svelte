@@ -113,6 +113,7 @@
 						{id}
 						{options}
 						{confidences}
+						metadata={definition}
 						type="single"
 						disabled={disabled ?? false}
 						value={safeJSONParse(value?.toString())?.toString() ?? value}

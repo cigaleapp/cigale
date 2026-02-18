@@ -200,7 +200,6 @@
 			onsplit={page.route.id?.endsWith('classify') ? splitSelection : undefined}
 			onimport={page.route.id?.endsWith('import') ? importImages : undefined}
 			ondelete={deleteSelection}
-			onaddmetadata={() => {}}
 			onmetadatachange={async (id, value) => {
 				if (!uiState.currentProtocol) return;
 				for (const subjectId of uiState.selection) {

@@ -187,6 +187,7 @@
 			<MetadataCombobox
 				{confidences}
 				{options}
+				metadata={focusedMetadata}
 				type="single"
 				value={option?.key ?? ''}
 				bind:focuser={focusOptionCombobox}

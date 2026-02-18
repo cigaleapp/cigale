@@ -3,6 +3,7 @@
 	 * @typedef {object} Props
 	 * @property {string|undefined} value
 	 * @property {(newValue: string) => void} onValueChange
+	 * @property {Pick<import('./database.js').Metadata, "id">} metadata
 	 * @property {import('./database.js').MetadataEnumVariant[]} options
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.InputProps>} [inputProps]
 	 * @property {WithoutChildrenOrChild<import('bits-ui').Combobox.ContentProps>} [contentProps]
@@ -25,7 +26,7 @@
 	import LearnMoreLink from './LearnMoreLink.svelte';
 	import Markdown from './Markdown.svelte';
 	import MetadataCascadesTable from './MetadataCascadesTable.svelte';
-	import { uiState } from './state.svelte';
+	import { namespaceOfMetadataId } from './schemas/metadata.js';
 	import { readableOn } from './utils.js';
 
 	/**
@@ -39,6 +40,7 @@
 	 */
 	let {
 		options,
+		metadata,
 		confidences = {},
 		value = $bindable(),
 		open = $bindable(false),
@@ -47,6 +49,8 @@
 		contentProps,
 		...restProps
 	} = $props();
+
+	const protocolId = $derived(namespaceOfMetadataId(metadata.id));
 
 	const hasImages = $derived(options.some((opt) => opt.image));
 
@@ -143,7 +147,7 @@
 				<LearnMoreLink href={o.learnMore} />
 			{/if}
 
-			{#await cascadeLabels( { cache: cascadeLabelsCache, db: idb.databaseHandle(), protocolId: uiState.currentProtocolId, option: o } ) then cascades}
+			{#await cascadeLabels( { cache: cascadeLabelsCache, db: idb.databaseHandle(), protocolId, option: o } ) then cascades}
 				<MetadataCascadesTable {cascades} />
 				{#if Object.keys(cascades).length > 0}
 					<p><em>Métadonées mises à jour à la sélection de cette option</em></p>

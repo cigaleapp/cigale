@@ -332,60 +332,69 @@ describe('serializeExifValue', () => {
 });
 
 describe('addExifMetadata', () => {
+	/**
+	 * @type {Array<import('./database.js').Metadata>}
+	 */
 	const metadataDefs = [
 		{
-			id: 'gps',
+			id: 'proto__gps',
 			type: /** @type {const} */ ('location'),
 			description: 'GPS',
 			label: '',
 			mergeMethod: /** @type {const} */ ('none'),
 			required: false,
+			sortable: false,
+			groupable: false,
 			infer: /** @type {const} */ ({
 				latitude: { exif: 'GPSLatitude' },
 				longitude: { exif: 'GPSLongitude' }
 			})
 		},
 		{
-			id: 'date',
+			id: 'proto__date',
 			type: /** @type {const} */ ('date'),
 			description: 'Date',
 			label: '',
 			mergeMethod: /** @type {const} */ ('none'),
 			required: false,
+			sortable: false,
+			groupable: false,
 			infer: /** @type {const} */ ({
 				exif: 'DateTimeOriginal'
 			})
 		},
 		{
-			id: 'non-exif',
+			id: 'proto__non_exif',
 			type: /** @type {const} */ ('string'),
 			description: 'Not a EXIF-infered field',
 			label: '',
 			mergeMethod: /** @type {const} */ ('none'),
-			required: false
+			required: false,
+			sortable: false,
+			groupable: false,
 		}
 	];
 	const metadataValues = {
-		gps: {
+		proto__gps: {
 			value: {
 				latitude: 43.46715666666389,
 				longitude: 11.885394999997223
 			},
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {}
+			alternatives: {},
 		},
-		date: {
+		proto__date: {
 			value: new Date('2023-10-01T12:00:00Z'),
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {}
+			alternatives: {},
 		},
-		'non-exif': {
+		proto__non_exif: {
 			value: 'test',
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {}
+			alternatives: {},
 		}
 	};
 

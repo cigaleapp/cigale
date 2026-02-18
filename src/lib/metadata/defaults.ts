@@ -60,6 +60,7 @@ export async function resolveDefaults({
 
 	for (const { default: defaultSpec, id, type } of defs) {
 		if (defaultSpec === undefined) continue;
+		if (defaultSpec === null) continue;
 
 		const currentValue = getMetadataValue(session, type, id);
 

@@ -16,10 +16,10 @@ import {
  * @param {Page} page
  * @param {object} [options]
  * @param {string} [options.protocol] name of protocol to use
- * @param {{ crop?: string, classify?: string }} [options.models] names of tasks to names of models to select. use "la détection" for the detection model, and the metadata's labels for classification model(s)
+ * @param {Parameters<typeof setInferenceModels>[1]} [options.models] 
  * @param {string} [options.name] name of the session
  */
-export async function newSession(page, { name, protocol, models = {} } = {}) {
+export async function newSession(page, { name, protocol, models } = {}) {
 	await goHome(page);
 	await goToTab(page, 'sessions');
 
