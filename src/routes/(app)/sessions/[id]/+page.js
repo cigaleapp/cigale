@@ -28,9 +28,10 @@ export async function load({ params: { id }, depends }) {
 	// const sessionMetadataDefs = await Promise.all(
 	// 	protocol.sessionMetadata.map((mdId) => tables.Metadata.get(mdId))
 	// ).then((defs) => defs.filter(nonnull));
-	const sessionMetadataDefs = await tables.Metadata.getMany(
-		[...protocol.sessionMetadata, ...protocol.importedMetadata.filter(imp => imp.sessionwide).map(imp => imp.source)]
-	)
+	const sessionMetadataDefs = await tables.Metadata.getMany([
+		...protocol.sessionMetadata,
+		...protocol.importedMetadata.filter((imp) => imp.sessionwide).map((imp) => imp.source)
+	]);
 
 	sessionMetadataDefs.forEach(({ id }) => depends(idb.dependencyURI('Metadata', id)));
 

@@ -16,7 +16,7 @@ import {
  * @param {Page} page
  * @param {object} [options]
  * @param {string} [options.protocol] name of protocol to use
- * @param {Parameters<typeof setInferenceModels>[1]} [options.models] 
+ * @param {Parameters<typeof setInferenceModels>[1]} [options.models]
  * @param {string} [options.name] name of the session
  */
 export async function newSession(page, { name, protocol, models } = {}) {

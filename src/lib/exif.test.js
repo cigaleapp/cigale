@@ -371,7 +371,7 @@ describe('addExifMetadata', () => {
 			mergeMethod: /** @type {const} */ ('none'),
 			required: false,
 			sortable: false,
-			groupable: false,
+			groupable: false
 		}
 	];
 	const metadataValues = {
@@ -382,19 +382,19 @@ describe('addExifMetadata', () => {
 			},
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {},
+			alternatives: {}
 		},
 		proto__date: {
 			value: new Date('2023-10-01T12:00:00Z'),
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {},
+			alternatives: {}
 		},
 		proto__non_exif: {
 			value: 'test',
 			manuallyModified: false,
 			confidence: 1,
-			alternatives: {},
+			alternatives: {}
 		}
 	};
 

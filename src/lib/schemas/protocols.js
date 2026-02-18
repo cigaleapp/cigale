@@ -96,7 +96,7 @@ export const Protocol = type({
 		)
 	})
 		.array()
-		
+
 		.describe("Toutes les métadonnées importées depuis d'autres protocoles")
 		.default(() => []),
 	metadata: NamespacedMetadataID.array().describe(
@@ -271,7 +271,9 @@ if (import.meta.vitest) {
 		});
 
 		test('returns false with empty protocol', () => {
-			expect(isMetadataInProtocol({ metadata: [], importedMetadata: [] }, 'any__id')).toBe(false);
+			expect(isMetadataInProtocol({ metadata: [], importedMetadata: [] }, 'any__id')).toBe(
+				false
+			);
 		});
 	});
 }

@@ -34,7 +34,7 @@ async function exportJsonSchema(name, schema) {
 if (process.argv[1] === import.meta.filename) {
 	await exportJsonSchema('protocol', ExportedProtocol);
 	await exportJsonSchema('results', Analysis);
-	await exportJsonSchema('registry', ProtocolRegistry)
+	await exportJsonSchema('registry', ProtocolRegistry);
 }
 
 function deleteKeys(obj, pred) {

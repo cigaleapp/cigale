@@ -19,7 +19,6 @@ export const NamespacedMetadataID = type('/^([\\w.-]+)__([\\w._-]+)$/').describe
  * @typedef {`${P}__${string}`} NamespacedMetadataID
  */
 
-
 export const References = ID.array().pipe((ids) => [...new Set(ids)]);
 
 /**

@@ -121,18 +121,23 @@ if (import.meta.vitest) {
 				vi.fn(async (url: string) => ({
 					json: async () => {
 						if (url.includes('registry.json')) {
-							return { protocols: [{ id: 'parent-protocol', url: 'https://example.com/parent.json' }] };
+							return {
+								protocols: [
+									{
+										id: 'parent-protocol',
+										url: 'https://example.com/parent.json'
+									}
+								]
+							};
 						}
 						return parentInput;
 					}
 				}))
 			);
 
-			const result = await resolveProtocolImports(
-				mockDb(),
-				'my-protocol',
-				[imp('parent-protocol__field1', 'my-protocol__field1')]
-			);
+			const result = await resolveProtocolImports(mockDb(), 'my-protocol', [
+				imp('parent-protocol__field1', 'my-protocol__field1')
+			]);
 
 			expect(result).toHaveLength(1);
 			expect(result[0].id).toBe('parent-protocol');
@@ -146,7 +151,11 @@ if (import.meta.vitest) {
 			vi.stubGlobal(
 				'fetch',
 				vi.fn(async () => ({
-					json: async () => ({ protocols: [{ id: 'parent-protocol', url: 'https://example.com/parent.json' }] })
+					json: async () => ({
+						protocols: [
+							{ id: 'parent-protocol', url: 'https://example.com/parent.json' }
+						]
+					})
 				}))
 			);
 
@@ -167,17 +176,19 @@ if (import.meta.vitest) {
 			vi.stubGlobal(
 				'fetch',
 				vi.fn(async () => ({
-					json: async () => ({ protocols: [{ id: 'parent-protocol', url: 'https://example.com/parent.json' }] })
+					json: async () => ({
+						protocols: [
+							{ id: 'parent-protocol', url: 'https://example.com/parent.json' }
+						]
+					})
 				}))
 			);
 
 			const db = mockDb({ Protocol: { 'parent-protocol': { id: 'parent-protocol' } } });
 
-			const result = await resolveProtocolImports(
-				db,
-				'my-protocol',
-				[imp('parent-protocol__field1', 'my-protocol__field1')]
-			);
+			const result = await resolveProtocolImports(db, 'my-protocol', [
+				imp('parent-protocol__field1', 'my-protocol__field1')
+			]);
 
 			expect(result).toEqual([]);
 			expect(db.get).toHaveBeenCalledWith('Protocol', 'parent-protocol');
@@ -192,11 +203,9 @@ if (import.meta.vitest) {
 			);
 
 			await expect(
-				resolveProtocolImports(
-					mockDb(),
-					'my-protocol',
-					[imp('unknown-protocol__field1', 'my-protocol__field1')]
-				)
+				resolveProtocolImports(mockDb(), 'my-protocol', [
+					imp('unknown-protocol__field1', 'my-protocol__field1')
+				])
 			).rejects.toThrow('inherits from unknown protocol unknown-protocol');
 		});
 
@@ -208,21 +217,24 @@ if (import.meta.vitest) {
 				vi.fn(async (url: string) => ({
 					json: async () => {
 						if (url.includes('registry.json')) {
-							return { protocols: [{ id: 'parent-protocol', url: 'https://example.com/parent.json' }] };
+							return {
+								protocols: [
+									{
+										id: 'parent-protocol',
+										url: 'https://example.com/parent.json'
+									}
+								]
+							};
 						}
 						return parentInput;
 					}
 				}))
 			);
 
-			const result = await resolveProtocolImports(
-				mockDb(),
-				'my-protocol',
-				[
-					imp('parent-protocol__field1', 'my-protocol__field1'),
-					imp('parent-protocol__field2', 'my-protocol__field2'),
-				]
-			);
+			const result = await resolveProtocolImports(mockDb(), 'my-protocol', [
+				imp('parent-protocol__field1', 'my-protocol__field1'),
+				imp('parent-protocol__field2', 'my-protocol__field2')
+			]);
 
 			expect(result).toHaveLength(1);
 			// registry fetch + one protocol fetch = 2 calls total
@@ -243,7 +255,10 @@ if (import.meta.vitest) {
 							return {
 								protocols: [
 									{ id: 'parent', url: 'https://example.com/proto-parent.json' },
-									{ id: 'grandparent', url: 'https://example.com/proto-grandparent.json' }
+									{
+										id: 'grandparent',
+										url: 'https://example.com/proto-grandparent.json'
+									}
 								]
 							};
 						}
@@ -254,11 +269,9 @@ if (import.meta.vitest) {
 				}))
 			);
 
-			const result = await resolveProtocolImports(
-				mockDb(),
-				'child',
-				[imp('parent__field', 'child__field')]
-			);
+			const result = await resolveProtocolImports(mockDb(), 'child', [
+				imp('parent__field', 'child__field')
+			]);
 
 			expect(result).toHaveLength(2);
 			const ids = result.map((p) => p.id);

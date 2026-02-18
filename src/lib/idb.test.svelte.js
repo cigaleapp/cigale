@@ -114,7 +114,7 @@ describe('operations', () => {
 				}
 			});
 
-			const serialized = await db.get('Image', imageId("0", 0));
+			const serialized = await db.get('Image', imageId('0', 0));
 			expect(serialized).toEqual({
 				id: imageId('0', 0),
 				sessionId: 'testing',

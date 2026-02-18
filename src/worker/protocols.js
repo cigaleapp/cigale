@@ -42,7 +42,11 @@ swarp.importProtocol(async ({ contents, isJSON }, onProgress) => {
 	const db = await openDatabase();
 
 	console.time('Resolve imports');
-	const importedProtocols = await resolveProtocolImports(db, protocol.id, protocol.importedMetadata);
+	const importedProtocols = await resolveProtocolImports(
+		db,
+		protocol.id,
+		protocol.importedMetadata
+	);
 	console.timeEnd('Resolve imports');
 
 	const tx = db.transaction(['Protocol', 'Metadata', 'MetadataOption'], 'readwrite');
