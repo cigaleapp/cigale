@@ -239,3 +239,39 @@ export function isMetadataInProtocol(protocol, metadataId) {
 		...protocol.importedMetadata.flatMap(({ source, target }) => [source, target])
 	].includes(metadataId);
 }
+
+if (import.meta.vitest) {
+	const { test, expect, describe } = import.meta.vitest;
+
+	describe('isMetadataInProtocol', () => {
+		/** @type {Pick<typeof Protocol.infer, "metadata" | "importedMetadata">} */
+		const protocol = {
+			metadata: ['proto__color', 'proto__size'],
+			importedMetadata: [
+				{ sessionwide: false, source: 'other__shape', target: 'proto__shape' }
+			]
+		};
+
+		test('returns true for a direct metadata', () => {
+			expect(isMetadataInProtocol(protocol, 'proto__color')).toBe(true);
+			expect(isMetadataInProtocol(protocol, 'proto__size')).toBe(true);
+		});
+
+		test('returns true for the source of an imported metadata', () => {
+			expect(isMetadataInProtocol(protocol, 'other__shape')).toBe(true);
+		});
+
+		test('returns true for the target of an imported metadata', () => {
+			expect(isMetadataInProtocol(protocol, 'proto__shape')).toBe(true);
+		});
+
+		test('returns false for an unrelated metadata', () => {
+			expect(isMetadataInProtocol(protocol, 'proto__weight')).toBe(false);
+			expect(isMetadataInProtocol(protocol, 'other__color')).toBe(false);
+		});
+
+		test('returns false with empty protocol', () => {
+			expect(isMetadataInProtocol({ metadata: [], importedMetadata: [] }, 'any__id')).toBe(false);
+		});
+	});
+}
