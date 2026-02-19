@@ -1,0 +1,199 @@
+<script lang="ts">
+	import { range, unique } from './utils.js';
+
+	interface Props {
+		min: number;
+		max: number;
+		/** Maximum step size */
+		granularity?: number | undefined;
+		/** Number of steps to use. If not set, uses as much steps as granularity allows */
+		stepcount?: number;
+		/** Array of numbers to specify every tick's value, a single number of specify a number of ticks to uniformly distribute on the slider */
+		ticks?: number | number[];
+		value: number | undefined;
+		disabled?: boolean;
+		// eslint-disable-next-line no-unused-vars
+		onblur?: () => void;
+		// eslint-disable-next-line no-unused-vars
+		onvalue?: (value: number) => void;
+	}
+
+	let {
+		min,
+		max,
+		stepcount = Infinity,
+		granularity,
+		ticks = 0,
+		value = $bindable(),
+		disabled,
+		onblur,
+		onvalue
+	}: Props = $props();
+
+	const componentId = $props.id();
+
+	const stepsize = $derived((max - min) / (stepcount - 1));
+	const step = $derived(granularity ? Math.max(stepsize, granularity) : stepsize);
+</script>
+
+<input
+	type="range"
+	{min}
+	{max}
+	{step}
+	{disabled}
+	bind:value
+	list="{componentId}-ticks"
+	{onblur}
+	oninput={({ currentTarget }) => {
+		onvalue?.(
+			granularity && granularity >= 1
+				? Number.parseInt(currentTarget.value, 10)
+				: Number.parseFloat(currentTarget.value)
+		);
+	}}
+/>
+
+{#if Array.isArray(ticks) || ticks > 0}
+	<datalist id="{componentId}-ticks">
+		{#if Array.isArray(ticks)}
+			{#each unique(ticks) as tick (tick)}
+				<option value={tick}></option>
+			{/each}
+		{:else}
+			{#each range(ticks) as i (i)}
+				<option value={min + (i * (max - min)) / (ticks - 1)}></option>
+			{/each}
+		{/if}
+	</datalist>
+{/if}
+
+<style>
+	/* Many thanks to CSS Tricks: https://css-tricks.com/sliding-nightmare-understanding-range-input/ */
+
+	input {
+		margin: 0;
+		padding: 0;
+		width: 12.5em;
+		height: 1.5em;
+		background: transparent;
+
+		--track-height: 0.5em;
+		--track-color: var(--bg-primary-translucent);
+		--track-filled-color: var(--fg-primary);
+		--thumb-color: var(--bg-neutral);
+	}
+
+	input,
+	input::-webkit-slider-thumb {
+		-webkit-appearance: none;
+	}
+
+	input::-ms-tooltip {
+		display: none;
+	}
+
+	/* Full track */
+
+	input::-webkit-slider-runnable-track {
+		box-sizing: border-box;
+		border: none;
+		width: 12.5em;
+		height: var(--track-height);
+		background: var(--track-color);
+		border-radius: 9999px;
+	}
+
+	input:is(:focus-visible)::-webkit-slider-runnable-track {
+		border: 1px solid var(--fg-neutral);
+	}
+
+	input::-moz-range-track {
+		box-sizing: border-box;
+		border: none;
+		width: 12.5em;
+		height: var(--track-height);
+		background: var(--track-color);
+		border-radius: 9999px;
+	}
+
+	input:is(:focus-visible)::-moz-range-track {
+		border: 1px solid var(--fg-neutral);
+	}
+
+	input::-ms-track {
+		box-sizing: border-box;
+		border: none;
+		width: 12.5em;
+		height: var(--track-height);
+		background: var(--track-color);
+		border-radius: 9999px;
+	}
+
+	input:is(:focus-visible)::-ms-track {
+		border: 1px solid var(--fg-neutral);
+	}
+
+	/* Thumb */
+
+	input::-webkit-slider-thumb {
+		cursor: pointer;
+		margin-top: -0.625em;
+		box-sizing: border-box;
+		border: none;
+		width: 1.5em;
+		height: 1.5em;
+		border-radius: 50%;
+		background: var(--thumb-color);
+		border: 1px solid var(--fg-neutral);
+	}
+
+	input:is(:hover, :focus-visible)::-webkit-slider-thumb {
+		border-width: 3px;
+	}
+
+	input::-moz-range-thumb {
+		cursor: pointer;
+		box-sizing: border-box;
+		border: none;
+		width: 1.5em;
+		height: 1.5em;
+		border-radius: 50%;
+		background: var(--thumb-color);
+		border: 1px solid var(--fg-neutral);
+	}
+
+	input:is(:hover, :focus-visible)::-moz-range-thumb {
+		border-width: 3px;
+	}
+
+	input::-ms-thumb {
+		cursor: pointer;
+		margin-top: 0;
+		box-sizing: border-box;
+		border: none;
+		width: 1.5em;
+		height: 1.5em;
+		border-radius: 50%;
+		background: var(--thumb-color);
+		border: 1px solid var(--fg-neutral);
+	}
+
+	input:is(:hover, :focus-visible)::-ms-thumb {
+		border-width: 3px;
+	}
+
+	/* Filled track */
+
+	input::-moz-range-progress {
+		height: var(--track-height);
+		background: var(--track-filled-color);
+		border-radius: 9999px;
+	}
+
+	input::-ms-fill-lower {
+		height: var(--track-height);
+		background: var(--track-filled-color);
+		border-radius: 9999px;
+	}
+</style>

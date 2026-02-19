@@ -5,7 +5,6 @@
 </script>
 
 <script lang="ts">
-	import '$lib/range-inputs.css';
 	import '$lib/tippy-svg-arrow.css';
 	import './style.css';
 
@@ -115,11 +114,6 @@
 		fill: var(--bg-neutral) !important;
 		stroke: var(--fg-neutral);
 		stroke-width: 1px;
-	}
-
-	:global(input[type='range']) {
-		accent-color: var(--fg-primary);
-		--track-height: 0.5em;
 	}
 
 	:global(textarea) {
