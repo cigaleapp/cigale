@@ -14,6 +14,7 @@ import {
 	UniqueFileTypeSpecifier,
 	URLString
 } from './common.js';
+import { NaturalRegexExpression, NumberRangeLiteral, RegexExpression } from './constraints.js';
 import { NeuralBoundingBoxInference, NeuralEnumInference } from './neural.js';
 
 /**
@@ -289,6 +290,9 @@ export const MetadataDefault = scope({ MetadataRuntimeValueAny }).type(
 		)
 	]
 );
+
+export const MetadataPatternConstraint = type.or();
+
 /**
  * @typedef {typeof EXIFInference.infer} EXIFInference
  */
@@ -331,26 +335,33 @@ const MetadataBoolean = MetadataBase.and({
 	'infer?': type.or({ exif: EXIFInference })
 });
 
-const MetadataString = MetadataBase.and({
+export const MetadataString = MetadataBase.and({
 	type: '"string"',
 	'default?': MetadataDefault('string'),
-	'infer?': type.or({ exif: EXIFInference })
+	'infer?': type.or({ exif: EXIFInference }),
+	'regex?': RegexExpression.describe(
+		'Une expression régulière que la valeur de cette métadonnée doit respecter'
+	),
+	'pattern?': NaturalRegexExpression
 });
 
-const MetadataInteger = MetadataBase.and({
+export const MetadataInteger = MetadataBase.and({
 	type: '"integer"',
+	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number.integer'),
 	'infer?': type.or({ exif: EXIFInference })
-});
+}).pipe();
 
-const MetadataFloat = MetadataBase.and({
+export const MetadataFloat = MetadataBase.and({
 	type: '"float"',
+	'range?': NumberRangeLiteral,
 	'default?': MetadataDefault('number'),
 	'infer?': type.or({ exif: EXIFInference })
 });
 
-const MetadataDate = MetadataBase.and({
+export const MetadataDate = MetadataBase.and({
 	type: '"date"',
+	'range?': '"future" | "past"',
 	'default?': MetadataDefault('string.date.iso'),
 	'infer?': type.or({ exif: EXIFInference })
 });

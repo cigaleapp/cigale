@@ -12,7 +12,6 @@
 		ticks?: number | number[];
 		value: number | undefined;
 		disabled?: boolean;
-		// eslint-disable-next-line no-unused-vars
 		onblur?: () => void;
 		// eslint-disable-next-line no-unused-vars
 		onvalue?: (value: number) => void;
@@ -75,14 +74,18 @@
 	input {
 		margin: 0;
 		padding: 0;
-		width: 12.5em;
+		width: 100%;
 		height: 1.5em;
 		background: transparent;
 
 		--track-height: 0.5em;
-		--track-color: var(--bg-primary-translucent);
-		--track-filled-color: var(--fg-primary);
-		--thumb-color: var(--bg-neutral);
+		--track-color: var(--track-background, var(--bg-primary-translucent));
+		--track-filled-color: var(--track-fill, var(--bg-primary));
+		--thumb-color: var(--track-thumb, var(--bg-neutral));
+
+		&:is(:hover, :focus-visible) {
+			--track-filled-color: var(--track-fill, var(--fg-primary));
+		}
 	}
 
 	input,
@@ -99,7 +102,7 @@
 	input::-webkit-slider-runnable-track {
 		box-sizing: border-box;
 		border: none;
-		width: 12.5em;
+		width: 100%;
 		height: var(--track-height);
 		background: var(--track-color);
 		border-radius: 9999px;
@@ -112,7 +115,7 @@
 	input::-moz-range-track {
 		box-sizing: border-box;
 		border: none;
-		width: 12.5em;
+		width: 100%;
 		height: var(--track-height);
 		background: var(--track-color);
 		border-radius: 9999px;
@@ -125,7 +128,7 @@
 	input::-ms-track {
 		box-sizing: border-box;
 		border: none;
-		width: 12.5em;
+		width: 100%;
 		height: var(--track-height);
 		background: var(--track-color);
 		border-radius: 9999px;
@@ -147,10 +150,15 @@
 		border-radius: 50%;
 		background: var(--thumb-color);
 		border: 1px solid var(--fg-neutral);
+		transition: border 0.1s ease;
 	}
 
 	input:is(:hover, :focus-visible)::-webkit-slider-thumb {
-		border-width: 3px;
+		border-color: var(--track-filled-color);
+	}
+
+	input:is(:active)::-webkit-slider-thumb {
+		border-width: calc(1.5em / 2 - 5px);
 	}
 
 	input::-moz-range-thumb {
@@ -162,10 +170,15 @@
 		border-radius: 50%;
 		background: var(--thumb-color);
 		border: 1px solid var(--fg-neutral);
+		transition: border 0.1s ease;
 	}
 
 	input:is(:hover, :focus-visible)::-moz-range-thumb {
-		border-width: 3px;
+		border-color: var(--track-filled-color);
+	}
+
+	input:is(:active)::-moz-range-thumb {
+		border-width: calc(1.5em / 2 - 5px);
 	}
 
 	input::-ms-thumb {
@@ -178,15 +191,21 @@
 		border-radius: 50%;
 		background: var(--thumb-color);
 		border: 1px solid var(--fg-neutral);
+		transition: border 0.1s ease;
 	}
 
 	input:is(:hover, :focus-visible)::-ms-thumb {
-		border-width: 3px;
+		border-color: var(--track-filled-color);
+	}
+
+	input:is(:active)::-ms-thumb {
+		border-width: calc(1.5em / 2 - 5px);
 	}
 
 	/* Filled track */
 
 	input::-webkit-slider-runnable-track {
+		transition: background 0.1s ease;
 		background: linear-gradient(
 			to right,
 			var(--track-filled-color) var(--slider-width),
@@ -195,12 +214,14 @@
 	}
 
 	input::-moz-range-progress {
+		transition: background 0.1s ease;
 		height: var(--track-height);
 		background: var(--track-filled-color);
 		border-radius: 9999px;
 	}
 
 	input::-ms-fill-lower {
+		transition: background 0.1s ease;
 		height: var(--track-height);
 		background: var(--track-filled-color);
 		border-radius: 9999px;

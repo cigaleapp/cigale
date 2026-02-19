@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://cigaleapp.github.io/cigale/protocol.schema.json
+# yaml-language-server: $schema=../static/protocol.schema.json
 id: io.github.cigaleapp.kitchensink
 name: Kitchen sink
 description: Made to demo all of the available data types and features that are supported by CIGALE protocols.
@@ -19,6 +19,7 @@ sessionMetadata:
     mergeMethod: none
     required: true
     type: string
+    pattern: year month day hours minutes then uppercase letter minimum 2 times
     description: |
       Le code du transect est composé de la date, de l'heure, et de vos initiales. Par exemple, un transect réalisé par Martin Galli le 07/12/2023 à 14h50 s'écrira : 202312071450MG
     default: |
@@ -32,6 +33,7 @@ sessionMetadata:
     required: false
     type: float
     description: '*watches*'
+    range: 0..10
     default: 6.7
 
   has_no_default:
@@ -48,7 +50,7 @@ sessionMetadata:
     type: file
     description: 'A file that is accessible from all snippets in the session'
     size:
-      minimum: 1 Ko
+      minimum: 1 ko
       maximum: 1.2 Mo
     accept: [.jpeg, .jpg, .png, image/tiff, video/*]
 
@@ -73,6 +75,7 @@ metadata:
     mergeMethod: average
     required: false
     type: date
+    range: future
 
   enum:
     description: enum metadata

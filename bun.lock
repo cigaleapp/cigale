@@ -28,6 +28,7 @@
         "marked": "^17.0.2",
         "microdiff": "^1.5.0",
         "nanoid": "^5.1.6",
+        "natural-regex": "^0.5.0",
         "onnxruntime-web": "^1.22.0",
         "pica-gpu": "^0.2.0",
         "piexifjs": "^1.0.6",
@@ -120,6 +121,9 @@
         "yauzl-promise": "^4.0.0",
       },
     },
+  },
+  "patchedDependencies": {
+    "natural-regex@0.5.0": "patches/natural-regex@0.5.0.patch",
   },
   "packages": {
     "@acemir/cssom": ["@acemir/cssom@0.9.31", "", {}, "sha512-ZnR3GSaH+/vJ0YlHau21FjfLYjMpYVIzTD8M8vIEQvIGxeOXyXdzCI140rrCY862p/C/BbzWsjc1dgnM9mkoTA=="],
@@ -1899,6 +1903,8 @@
     "nanoid": ["nanoid@5.1.6", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg=="],
 
     "natural-compare": ["natural-compare@1.4.0", "", {}, "sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw=="],
+
+    "natural-regex": ["natural-regex@0.5.0", "", {}, "sha512-RZEuBeB5A1TJ9rh7dVXf64s8ZQMyeXDOvGGhWIc/PbeTXyPRkHiuBUGZsiwGg4BsLclXK4gbjU+OMxbkobraTg=="],
 
     "negotiator": ["negotiator@0.6.4", "", {}, "sha512-myRT3DiWPHqho5PrJaIRyaMv2kgYf0mUVgBNOYMuCH5Ki1yEiQaf/ZJuQ62nvpc44wL5WDbTX7yGJi1Neevw8w=="],
 
