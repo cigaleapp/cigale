@@ -44,6 +44,7 @@
 	{disabled}
 	bind:value
 	list="{componentId}-ticks"
+	style:--slider-width="{value ? ((value - min) / (max - min)) * 100 : 0}%"
 	{onblur}
 	oninput={({ currentTarget }) => {
 		onvalue?.(
@@ -184,6 +185,14 @@
 	}
 
 	/* Filled track */
+
+	input::-webkit-slider-runnable-track {
+		background: linear-gradient(
+			to right,
+			var(--track-filled-color) var(--slider-width),
+			var(--track-color) var(--slider-width)
+		);
+	}
 
 	input::-moz-range-progress {
 		height: var(--track-height);
