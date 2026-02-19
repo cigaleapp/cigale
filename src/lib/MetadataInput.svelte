@@ -262,6 +262,7 @@
 							{:else}
 								<code
 									class="size"
+									class:infinite={size.maximum === undefined}
 									use:tooltip={size.maximum
 										? `La taille maximale est de ${formatBytesSize(size.maximum)}`
 										: 'Aucune limite de taille'}
@@ -269,7 +270,7 @@
 									{#if size.maximum}
 										&lt;{formatBytesSize(size.maximum, 'narrow')}
 									{:else}
-										∞
+										<span>∞</span>
 									{/if}
 								</code>
 								<div class="name empty">Aucun fichier</div>
@@ -461,6 +462,15 @@
 			font-size: 0.8em;
 			/* "000" + " " + "kB" */
 			width: calc(3ch + 1ch + 2ch);
+		}
+
+		.size.infinite {
+			text-align: center;
+
+			span {
+				font-weight: 100;
+				font-size: 2em;
+			}
 		}
 
 		.name.empty {
