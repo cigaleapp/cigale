@@ -216,14 +216,16 @@ const protocol = {
 			label: 'Durée de prospection',
 			description: 'Durée (en minutes) de la prospection sur le terrain',
 			required: false,
-			mergeMethod: 'average'
+			mergeMethod: 'average',
+			range: '> 0'
 		},
 		[namespaced('prospection_distance')]: {
 			type: 'integer',
 			label: 'Distance de prospection',
 			description: 'Distance (en mètres) parcourue pendant la prospection',
 			required: false,
-			mergeMethod: 'average'
+			mergeMethod: 'average',
+			range: '> 0'
 		},
 		// TODO trajectory
 		[namespaced('homogenous_habitat')]: {
@@ -264,7 +266,8 @@ const protocol = {
 			label: 'Température',
 			description: 'Température approximative pendant la prospection (en °C)',
 			required: false,
-			mergeMethod: 'average'
+			mergeMethod: 'average',
+			range: '>= -273.15'
 		},
 		[namespaced('cloud_coverage')]: {
 			type: 'enum',
@@ -285,7 +288,8 @@ const protocol = {
 			label: "Photos à l'ombre",
 			description: "Part des photos prises à l'ombre (en pourcentage)",
 			required: false,
-			mergeMethod: 'average'
+			mergeMethod: 'average',
+			range:  '0..100'
 		},
 		[namespaced('camera_type')]: {
 			type: 'enum',
@@ -314,7 +318,8 @@ const protocol = {
 			description:
 				'Date à laquelle la session a été réalisée. On peut laisser vide si la date a été correctement réglée sur l’appareil photo',
 			required: false,
-			mergeMethod: 'average'
+			mergeMethod: 'average',
+			range: 'past'
 		}
 	},
 	metadata: {
